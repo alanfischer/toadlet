@@ -396,22 +396,42 @@ bool D3D10RenderDevice::setShaderState(ShaderState *shaderState){
 	return result;
 }
 
-void D3D10RenderDevice::setBuffer(int i,VariableBuffer *buffer){
-	D3D10Buffer *d3dBuffer=buffer!=NULL?d3dBuffer=(D3D10Buffer*)buffer->getRootVariableBuffer():NULL;
-	ID3D10Buffer *id3dbuffer=NULL;
-	if(d3dBuffer!=NULL){
-		id3dbuffer=d3dBuffer->mBuffer;
+void D3D10RenderDevice::setBuffer(Shader::ShaderType shaderType,int i,VariableBuffer *buffer){
+	D3D10Buffer *d3dbuffer=buffer!=NULL?(D3D10Buffer*)buffer->getRootVariableBuffer():NULL;
+	ID3D10Buffer *constantBuffer=NULL;
+	if(d3dbuffer!=NULL){
+		constantBuffer=d3dbuffer->mBuffer;
+	}
+
+	switch(shaderType){
+		case Shader::ShaderType_VERTEX:
+			mD3DDevice->VSSetConstantBuffers(i,1,&constantBuffer);
+		break;
+		case Shader::ShaderType_FRAGMENT:
+			mD3DDevice->PSSetConstantBuffers(i,1,&constantBuffer);
+		break;
+		case Shader::ShaderType_GEOMETRY:
+			mD3DDevice->GSSetConstantBuffers(i,1,&constantBuffer);
+		break;
+	}
+}
+
+void D3D10RenderDevice::setTexture(int i,Texture *texture){
+	D3D10Texture *d3dtexture=texture!=NULL?(D3D10Texture*)texture->getRootTexture():NULL;
+	ID3D10ShaderResourceView *resourceview=NULL;
+	if(d3dtexture!=NULL){
+		resourceview=d3dtexture->mShaderResourceView;
 	}
 
 //	switch(type){
 //		case Shader::ShaderType_VERTEX:
-			mD3DDevice->VSSetConstantBuffers(i,1,&id3dbuffer);
+			mD3DDevice->VSSetShaderResources(i,1,&resourceview);
 //		break;
 //		case Shader::ShaderType_FRAGMENT:
-			mD3DDevice->PSSetConstantBuffers(i,1,&id3dbuffer);
+			mD3DDevice->PSSetShaderResources(i,1,&resourceview);
 //		break;
 //		case Shader::ShaderType_GEOMETRY:
-			mD3DDevice->GSSetConstantBuffers(i,1,&id3dbuffer);
+			mD3DDevice->GSSetShaderResources(i,1,&resourceview);
 //		break;
 //	}
 }

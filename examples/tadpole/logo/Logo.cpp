@@ -68,7 +68,7 @@ Logo::~Logo(){
 }
 
 void Logo::create(){
-	Application::create();
+	Application::create("d3d10");
 
 	mEngine->setDirectory("../../../data");
 
@@ -90,8 +90,8 @@ void Logo::create(){
 	meshNode->getController()->start();
 	meshNode->getController()->setCycling(Controller::Cycling_REFLECT);
 	scene->getRoot()->attach(meshNode);
-Material::ptr funkyMaterial=makeFunkyMaterial();
-for(int i=0;i<meshNode->getNumSubMeshes();++i)meshNode->getSubMesh(i)->material=funkyMaterial;
+//Material::ptr funkyMaterial=makeFunkyMaterial();
+//for(int i=0;i<meshNode->getNumSubMeshes();++i)meshNode->getSubMesh(i)->material=funkyMaterial;
 
 	cameraNode=getEngine()->createNodeType(CameraNode::type(),scene);
 	cameraNode->setLookAt(Vector3(0,-Math::fromInt(150),0),Math::ZERO_VECTOR3,Math::Z_UNIT_VECTOR3);

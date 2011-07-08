@@ -38,7 +38,7 @@ namespace material{
 
 class MVPMatrixVariable:public RenderVariable{
 public:
-	TOADLET_SHARED_POINTERS(MVPMatrixVariable);
+	int getFormat(){return VariableBufferFormat::Format_TYPE_FLOAT_32|VariableBufferFormat::Format_COUNT_4X4;}
 
 	void update(tbyte *data,SceneParameters *parameters){
 		if(parameters->getRenderable()!=NULL){
@@ -54,7 +54,7 @@ protected:
 
 class LightModelPositionVariable:public RenderVariable{
 public:
-	TOADLET_SHARED_POINTERS(LightModelPositionVariable);
+	int getFormat(){return VariableBufferFormat::Format_TYPE_FLOAT_32|VariableBufferFormat::Format_COUNT_4;}
 
 	void update(tbyte *data,SceneParameters *parameters){
 		if(parameters->getRenderable()!=NULL){
@@ -73,8 +73,8 @@ protected:
 
 class LightDiffuseVariable:public RenderVariable{
 public:
-	TOADLET_SHARED_POINTERS(LightDiffuseVariable);
-	
+	int getFormat(){return VariableBufferFormat::Format_TYPE_FLOAT_32|VariableBufferFormat::Format_COUNT_4;}
+
 	void update(tbyte *data,SceneParameters *parameters){
 		memcpy(data,parameters->getLightState().diffuseColor.getData(),sizeof(Vector4));
 	}
@@ -82,16 +82,26 @@ public:
 
 class AmbientVariable:public RenderVariable{
 public:
-	TOADLET_SHARED_POINTERS(AmbientVariable);
-	
+	int getFormat(){return VariableBufferFormat::Format_TYPE_FLOAT_32|VariableBufferFormat::Format_COUNT_4;}
+
 	void update(tbyte *data,SceneParameters *parameters){
 		memcpy(data,parameters->getAmbient().getData(),sizeof(Vector4));
 	}
 };
 
+class MaterialLightingVariable:public RenderVariable{
+public:
+	int getFormat(){return VariableBufferFormat::Format_TYPE_FLOAT_32|VariableBufferFormat::Format_COUNT_1;}
+
+	void update(tbyte *data,SceneParameters *parameters){
+		float lighting=parameters->getMaterialState().lighting?1.0:0.0;
+		memcpy(data,&lighting,sizeof(float));
+	}
+};
+
 class MaterialDiffuseVariable:public RenderVariable{
 public:
-	TOADLET_SHARED_POINTERS(MaterialDiffuseVariable);
+	int getFormat(){return VariableBufferFormat::Format_TYPE_FLOAT_32|VariableBufferFormat::Format_COUNT_4;}
 	
 	void update(tbyte *data,SceneParameters *parameters){
 		memcpy(data,parameters->getMaterialState().diffuse.getData(),sizeof(Vector4));
@@ -100,16 +110,45 @@ public:
 
 class MaterialAmbientVariable:public RenderVariable{
 public:
-	TOADLET_SHARED_POINTERS(MaterialAmbientVariable);
+	int getFormat(){return VariableBufferFormat::Format_TYPE_FLOAT_32|VariableBufferFormat::Format_COUNT_4;}
 	
 	void update(tbyte *data,SceneParameters *parameters){
 		memcpy(data,parameters->getMaterialState().ambient.getData(),sizeof(Vector4));
 	}
 };
 
+class PointSizeVariable:public RenderVariable{
+public:
+	int getFormat(){return VariableBufferFormat::Format_TYPE_FLOAT_32|VariableBufferFormat::Format_COUNT_1;}
+
+	void update(tbyte *data,SceneParameters *parameters){
+		memcpy(data,&parameters->getPointState().size,sizeof(float));
+	}
+};
+
+class PointAttenuatedVariable:public RenderVariable{
+public:
+	int getFormat(){return VariableBufferFormat::Format_TYPE_FLOAT_32|VariableBufferFormat::Format_COUNT_1;}
+
+	void update(tbyte *data,SceneParameters *parameters){
+		float attenuated=parameters->getPointState().attenuated?Math::ONE:0;
+		memcpy(data,&attenuated,sizeof(float));
+	}
+};
+
+class ViewportVariable:public RenderVariable{
+public:
+	int getFormat(){return VariableBufferFormat::Format_TYPE_FLOAT_32|VariableBufferFormat::Format_COUNT_4;}
+
+	void update(tbyte *data,SceneParameters *parameters){
+		Vector4 viewport(parameters->getViewport().x,parameters->getViewport().y,parameters->getViewport().width,parameters->getViewport().height);
+		memcpy(data,&viewport,sizeof(Vector4));
+	}
+};
+
 class TimeVariable:public RenderVariable{
 public:
-	TOADLET_SHARED_POINTERS(TimeVariable);
+	int getFormat(){return VariableBufferFormat::Format_TYPE_FLOAT_32|VariableBufferFormat::Format_COUNT_1;}
 
 	void update(tbyte *data,SceneParameters *parameters){
 		mTime=Math::fromMilli(parameters->getScene()->getTime());

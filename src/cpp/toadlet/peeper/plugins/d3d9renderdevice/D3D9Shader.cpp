@@ -80,6 +80,9 @@ bool D3D9Shader::createContext(){
 		case ShaderType_FRAGMENT:
 			targetProfile="ps_3_0";
 		break;
+		default:
+			return false;
+		break;
 	}
 	
 	HRESULT result=E_FAIL;

@@ -35,6 +35,7 @@ namespace toadlet{
 namespace peeper{
 
 class D3D10RenderDevice;
+class D3D10ShaderState;
 class D3D10VertexFormat;
 
 class TOADLET_API D3D10Shader:protected BaseResource,public Shader{
@@ -57,8 +58,6 @@ public:
 
 	ID3D10InputLayout *findInputLayout(D3D10VertexFormat *vertexFormat);
 
-	bool activate();
-
 protected:
 	bool createContext();
 	bool destroyContext();
@@ -75,11 +74,12 @@ protected:
 	ID3D10Blob *mBytecode,*mLog;
 	ID3D10ShaderReflection *mReflector;
 
+	Collection<D3D10_SIGNATURE_PARAMETER_DESC> mInputParameters;
 	Collection<VariableBufferFormat::ptr> mVariableBufferFormats;
-
 	Collection<ID3D10InputLayout*> mLayouts;
 
 	friend class D3D10RenderDevice;
+	friend class D3D10ShaderState;
 };
 
 }

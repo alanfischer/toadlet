@@ -46,6 +46,7 @@ public:
 	Material::ptr findMaterial(const String &name){return shared_static_cast<Material>(ResourceManager::find(name));}
 
 	Material::ptr createDiffuseMaterial(Texture::ptr texture);
+	Material::ptr createDiffusePointSpriteMaterial(Texture::ptr texture,scalar size,bool attenuated);
 	Material::ptr createSkyboxMaterial(Texture::ptr texture);
 
 	RenderState::ptr createRenderState();
@@ -76,7 +77,7 @@ protected:
 	Collection<ShaderState::ptr> mShaderStates;
 
 	SamplerState mDefaultSamplerState;
-	Shader::ptr mFixedVertexShader,mFixedFragmentShader;
+	Shader::ptr mFixedVertexShader,mFixedFragmentShader,mFixedGeometryShader;
 };
 
 }

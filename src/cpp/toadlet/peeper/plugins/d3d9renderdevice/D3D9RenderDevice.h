@@ -83,7 +83,7 @@ public:
 	void setDefaultState();
 	bool setRenderState(RenderState *renderState);
 	bool setShaderState(ShaderState *shaderState);
-	void setBuffer(int i,VariableBuffer *buffer);
+	void setBuffer(Shader::ShaderType shaderType,int i,VariableBuffer *buffer);
 	void setTexture(int i,Texture *texture);
 
 	// Old fixed states

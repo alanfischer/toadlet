@@ -26,6 +26,7 @@
 #ifndef TOADLET_TADPOLE_MATERIAL_SCENEPARAMETERS_H
 #define TOADLET_TADPOLE_MATERIAL_SCENEPARAMETERS_H
 
+#include <toadlet/peeper/Viewport.h>
 #include <toadlet/peeper/LightState.h>
 #include <toadlet/tadpole/Types.h>
 
@@ -54,11 +55,17 @@ public:
 	inline void setCamera(CameraNode *camera){mCamera=camera;}
 	inline CameraNode *getCamera() const{return mCamera;}
 
+	inline void setViewport(Viewport viewport){mViewport=viewport;}
+	inline const Viewport &getViewport() const{return mViewport;}
+
 	inline void setRenderable(Renderable *renderable){mRenderable=renderable;}
 	inline Renderable *getRenderable() const{return mRenderable;}
 
 	inline void setMaterialState(const MaterialState &state){mMaterialState.set(state);}
 	inline const MaterialState &getMaterialState() const{return mMaterialState;}
+
+	inline void setPointState(const PointState &state){mPointState.set(state);}
+	inline const PointState &getPointState() const{return mPointState;}
 
 	inline void setLightState(const LightState &state){mLightState.set(state);}
 	inline const LightState &getLightState() const{return mLightState;}
@@ -69,8 +76,10 @@ public:
 protected:
 	Scene *mScene;
 	CameraNode *mCamera;
+	Viewport mViewport;
 	Renderable *mRenderable;
 	MaterialState mMaterialState;
+	PointState mPointState;
 	LightState mLightState;
 	Vector4 mAmbient;
 };

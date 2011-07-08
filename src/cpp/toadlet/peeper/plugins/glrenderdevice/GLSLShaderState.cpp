@@ -113,7 +113,12 @@ int GLSLShaderState::getNumVariableBuffers(Shader::ShaderType type){
 		link();
 	}
 
-	return mVariableBufferFormats.size();
+	if(type==Shader::ShaderType_VERTEX){
+		return mVariableBufferFormats.size();
+	}
+	else{
+		return 0;
+	}
 }
 
 VariableBufferFormat::ptr GLSLShaderState::getVariableBufferFormat(Shader::ShaderType type,int i){
@@ -121,7 +126,12 @@ VariableBufferFormat::ptr GLSLShaderState::getVariableBufferFormat(Shader::Shade
 		link();
 	}
 
-	return mVariableBufferFormats[i];
+	if(type==Shader::ShaderType_VERTEX){
+		return mVariableBufferFormats[i];
+	}
+	else{
+		return 0;
+	}
 }
 
 bool GLSLShaderState::activate(){

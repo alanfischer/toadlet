@@ -30,6 +30,7 @@
 #include <toadlet/peeper/Types.h>
 #include <toadlet/peeper/IndexData.h>
 #include <toadlet/peeper/VertexData.h>
+#include <toadlet/peeper/Shader.h>
 
 namespace toadlet{
 namespace peeper{
@@ -48,7 +49,6 @@ class RenderTarget;
 class RasterizerState;
 class RenderCaps;
 class RenderState;
-class Shader;
 class ShaderState;
 class Texture;
 class VariableBuffer;
@@ -117,8 +117,8 @@ public:
 	virtual void setDefaultState()=0;
 	virtual bool setRenderState(RenderState *renderState)=0;
 	virtual bool setShaderState(ShaderState *shaderState)=0;
-	virtual void setBuffer(/*Shader::ShaderType type,*/int i,VariableBuffer *buffer)=0;
-	virtual void setTexture(/*Shader::ShaderType type,*/int i,Texture *texture)=0;
+	virtual void setBuffer(Shader::ShaderType type,int i,VariableBuffer *buffer)=0;
+	virtual void setTexture(int i,Texture *texture)=0;
 
 	// Old fixed states
 	virtual void setMatrix(MatrixType type,const Matrix4x4 &matrix)=0;

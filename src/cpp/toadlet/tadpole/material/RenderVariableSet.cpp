@@ -46,10 +46,13 @@ void RenderVariableSet::destroy(){
 	mBuffers.clear();
 }
 
-bool RenderVariableSet::addBuffer(VariableBuffer::ptr buffer){
+bool RenderVariableSet::addBuffer(Shader::ShaderType shaderType,int index,VariableBuffer::ptr buffer){
 	BufferInfo set;
 	set.buffer=buffer;
 	set.scope=0;
+	set.shaderType=shaderType;
+	set.index=index;
+
 	mBuffers.add(set);
 	return true;
 }
@@ -66,9 +69,11 @@ void RenderVariableSet::removeBuffer(VariableBuffer::ptr buffer){
 
 // Search for the correct buffer and correct index
 bool RenderVariableSet::addVariable(const String &name,RenderVariable::ptr variable,int scope){
-	int i=name.find(".");
+	int i=name.find("."),j=0;
 	String fullName=name;
 	BufferInfo *buffer=NULL;
+	VariableBufferFormat::Variable *formatVariable=NULL;
+
 	if(i>0){
 		String possibleBufferName=name.substr(0,i);
 		for(i=0;i<mBuffers.size();++i){
@@ -79,32 +84,40 @@ bool RenderVariableSet::addVariable(const String &name,RenderVariable::ptr varia
 			}
 		}
 	}
-	if(buffer==NULL){
-		for(i=0;i<mBuffers.size();++i){
-			if(mBuffers[i].buffer->getVariableBufferFormat()->getPrimary()){
-				buffer=&mBuffers[i];
-				String bufferName=buffer->buffer->getVariableBufferFormat()->getName();
-				break;
+
+	if(buffer!=NULL){
+		VariableBufferFormat *format=buffer->buffer->getVariableBufferFormat();
+		for(j=0;j<format->getSize();++j){
+			if(fullName.equals(format->getVariable(j)->getFullName())){
+				formatVariable=format->getVariable(j);
 			}
 		}
 	}
-	if(buffer==NULL){
-		Logger::warning(Categories::TOADLET_TADPOLE,
-			"VariableBuffer not found for RenderVariable with name:"+name);
-		return false;
-	}
+	else{
+		for(i=0;i<mBuffers.size();++i){
+			if(mBuffers[i].buffer->getVariableBufferFormat()->getPrimary()){
+				buffer=&mBuffers[i];
 
-	VariableBufferFormat *format=buffer->buffer->getVariableBufferFormat();
-	VariableBufferFormat::Variable *formatVariable=NULL;
-	for(i=0;i<format->getSize();++i){
-		if(fullName.equals(format->getVariable(i)->getFullName())){
-			formatVariable=format->getVariable(i);
+				VariableBufferFormat *format=buffer->buffer->getVariableBufferFormat();
+				for(j=0;j<format->getSize();++j){
+					if(fullName.equals(format->getVariable(j)->getFullName())){
+						formatVariable=format->getVariable(j);
+						i=mBuffers.size();
+						break;
+					}
+				}
+			}
 		}
 	}
 	
 	if(formatVariable==NULL){
 		Logger::warning(Categories::TOADLET_TADPOLE,
 			"RenderVariable not found with name:"+name);
+		return false;
+	}
+	if(variable->getFormat()!=(formatVariable->getFormat()&~VariableBufferFormat::Format_BIT_TRANSPOSE)){
+		Logger::warning(Categories::TOADLET_TADPOLE,
+			String("RenderVariable format does not match format:")+variable->getFormat()+"!="+formatVariable->getFormat());
 		return false;
 	}
 	

@@ -1264,7 +1264,7 @@ void GLRenderDevice::setTextureStatePostTexture(int i,TextureState *state){
 	TOADLET_CHECK_GLERROR("setTextureState");
 }
 
-void GLRenderDevice::setBuffer(int i,VariableBuffer *buffer){
+void GLRenderDevice::setBuffer(Shader::ShaderType shaderType,int i,VariableBuffer *buffer){
 	GLBuffer *glbuffer=buffer!=NULL?(GLBuffer*)buffer->getRootVariableBuffer():NULL;
 	if(glbuffer==NULL){
 		return;

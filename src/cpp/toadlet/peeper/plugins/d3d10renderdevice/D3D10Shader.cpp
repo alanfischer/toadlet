@@ -101,6 +101,9 @@ bool D3D10Shader::createContext(){
 		case ShaderType_GEOMETRY:
 			targetProfile="gs_4_0";
 		break;
+		default:
+			return false;
+		break;
 	}
 
 	HRESULT result=((D3D10WindowRenderTarget*)mDevice->getPrimaryRenderTarget()->getRootRenderTarget())->CompileFromMemorySymbol(mCode,mCode.length(),NULL,NULL,NULL,function,targetProfile,0,0,NULL,&mBytecode,&mLog,NULL);
@@ -169,32 +172,49 @@ ID3D10InputLayout *D3D10Shader::findInputLayout(D3D10VertexFormat *vertexFormat)
 		layout=mLayouts[handle];
 	}
 	else{
-		/// @todo: See if we can modify the vertexElements to add or subtract ones to force it to match
-		mDevice->getD3D10Device()->CreateInputLayout(
-			vertexFormat->mElements,vertexFormat->mElements.size(),mBytecode->GetBufferPointer(),mBytecode->GetBufferSize(),&layout
-		);
+		Collection<D3D10_SIGNATURE_PARAMETER_DESC> missingParameters;
+		int i,j;
+		for(i=0;i<mInputParameters.size();++i){
+			const D3D10_SIGNATURE_PARAMETER_DESC &parameterDesc=mInputParameters[i];
+			for(j=0;j<vertexFormat->mElements.size();++j){
+				const D3D10_INPUT_ELEMENT_DESC &elementDesc=vertexFormat->mElements[j];
+				if(strcmp(elementDesc.SemanticName,parameterDesc.SemanticName)==0 && elementDesc.SemanticIndex==parameterDesc.SemanticIndex){
+					break;
+				}
+			}
+			if(j==vertexFormat->mElements.size()){
+				missingParameters.add(parameterDesc);
+			}
+		}
+
+		D3D10_INPUT_ELEMENT_DESC *elements=NULL;
+		int numElements=0;
+		if(missingParameters.size()==0){
+			elements=vertexFormat->mElements;
+			numElements=vertexFormat->mElements.size();
+		}
+		else{
+			numElements=vertexFormat->mElements.size()+missingParameters.size();
+			elements=new D3D10_INPUT_ELEMENT_DESC[numElements];
+			for(i=0;i<vertexFormat->mElements.size();++i){
+				elements[i]=vertexFormat->mElements[i];
+			}
+			for(i=0;i<missingParameters.size();++i){
+				D3D10_INPUT_ELEMENT_DESC element={
+					missingParameters[i].SemanticName,missingParameters[i].SemanticIndex,DXGI_FORMAT_R32G32B32A32_FLOAT,0,0,D3D10_INPUT_PER_VERTEX_DATA,0
+				};
+				elements[vertexFormat->mElements.size()+i]=element;
+			}
+		}
+		mDevice->getD3D10Device()->CreateInputLayout(elements,numElements,mBytecode->GetBufferPointer(),mBytecode->GetBufferSize(),&layout);
+		if(elements!=vertexFormat->mElements){
+			delete[] elements;
+			elements=NULL;
+		}
 		mLayouts.resize(handle+1,NULL);
 		mLayouts[handle]=layout;
 	}
 	return layout;
-}
-
-bool D3D10Shader::activate(){
-	ID3D10Device *device=mD3DDevice;
-
-	switch(mShaderType){
-		case ShaderType_VERTEX:
-			device->VSSetShader((ID3D10VertexShader*)mShader);
-		break;
-		case ShaderType_FRAGMENT:
-			device->PSSetShader((ID3D10PixelShader*)mShader);
-		break;
-		case ShaderType_GEOMETRY:
-			device->GSSetShader((ID3D10GeometryShader*)mShader);
-		break;
-	}
-
-	return true;
 }
 
 bool D3D10Shader::reflect(){
@@ -204,9 +224,15 @@ bool D3D10Shader::reflect(){
 		Error::unknown(Categories::TOADLET_PEEPER,"unable to get reflection description");
 	}
 
+	int i,j;
+	for(i=0;i<desc.InputParameters;++i){
+		D3D10_SIGNATURE_PARAMETER_DESC parameterDesc;
+		mReflector->GetInputParameterDesc(i,&parameterDesc);
+		mInputParameters.add(parameterDesc);
+	}
+
 	mVariableBufferFormats.resize(desc.ConstantBuffers);
 
-	int i,j;
 	for(i=0;i<desc.ConstantBuffers;++i){
 		ID3D10ShaderReflectionConstantBuffer *buffer=mReflector->GetConstantBufferByIndex(i);
 		D3D10_SHADER_BUFFER_DESC bufferDesc;
