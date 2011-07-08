@@ -215,13 +215,16 @@ void SceneRenderer::renderQueueItems(Material *material,const RenderableSet::Ren
 }
 
 void SceneRenderer::setupViewport(CameraNode *camera,RenderDevice *device){
+	Viewport viewport;
 	if(camera->getViewportSet()){
-		device->setViewport(camera->getViewport());
+		viewport=camera->getViewport();
 	}
 	else{
 		RenderTarget *renderTarget=device->getRenderTarget();
-		device->setViewport(Viewport(0,0,renderTarget->getWidth(),renderTarget->getHeight()));
+		viewport=Viewport(0,0,renderTarget->getWidth(),renderTarget->getHeight());
 	}
+	device->setViewport(viewport);
+	mSceneParameters->setViewport(viewport);
 }
 
 /// @todo: Do this only if the material is fixed function

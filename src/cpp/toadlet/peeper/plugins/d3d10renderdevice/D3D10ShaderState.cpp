@@ -37,6 +37,7 @@ D3D10ShaderState::D3D10ShaderState(D3D10RenderDevice *renderDevice):
 	//mShaders
 {
 	mDevice=renderDevice;
+	mShaders.resize(Shader::ShaderType_MAX);
 }
 
 D3D10ShaderState::~D3D10ShaderState(){
@@ -89,11 +90,24 @@ VariableBufferFormat::ptr D3D10ShaderState::getVariableBufferFormat(Shader::Shad
 bool D3D10ShaderState::activate(){
 	bool result=true;
 
+	ID3D10Device *device=mDevice->getD3D10Device();
+
 	int i;
 	for(i=0;i<mShaders.size();++i){
 		Shader *shader=mShaders[i];
-		D3D10Shader *d3d10shader=(shader!=NULL)?(D3D10Shader*)shader->getRootShader():NULL;
-		result|=d3d10shader->activate();
+		D3D10Shader *d3dshader=(shader!=NULL)?(D3D10Shader*)shader->getRootShader():NULL;
+		ID3D10DeviceChild *id3dshader=(d3dshader!=NULL)?d3dshader->mShader:NULL;
+		switch(i){
+			case Shader::ShaderType_VERTEX:
+				device->VSSetShader((ID3D10VertexShader*)id3dshader);
+			break;
+			case Shader::ShaderType_FRAGMENT:
+				device->PSSetShader((ID3D10PixelShader*)id3dshader);
+			break;
+			case Shader::ShaderType_GEOMETRY:
+				device->GSSetShader((ID3D10GeometryShader*)id3dshader);
+			break;
+		}
 	}
 
 	return result;

@@ -27,6 +27,7 @@
 #define TOADLET_TADPOLE_MATERIAL_RENDERVARIABLESET_H
 
 #include <toadlet/peeper/VariableBuffer.h>
+#include <toadlet/peeper/Shader.h>
 #include <toadlet/tadpole/material/RenderVariable.h>
 
 namespace toadlet{
@@ -42,11 +43,13 @@ public:
 	
 	void destroy();
 
-	bool addBuffer(VariableBuffer::ptr buffer);
+	bool addBuffer(Shader::ShaderType shaderType,int index,VariableBuffer::ptr buffer);
 	void removeBuffer(VariableBuffer::ptr buffer);
 	inline int getNumBuffers() const{return mBuffers.size();}
 	inline VariableBuffer::ptr getBuffer(int i){return mBuffers[i].buffer;}
 	inline int getBufferScope(int i){return mBuffers[i].scope;}
+	inline Shader::ShaderType getBufferShaderType(int i){return mBuffers[i].shaderType;}
+	inline int getBufferIndex(int i){return mBuffers[i].index;}
 	
 	bool addVariable(const String &name,RenderVariable::ptr variable,int scope);
 	void removeVariable(RenderVariable::ptr variable);
@@ -66,6 +69,8 @@ protected:
 	public:
 		VariableBuffer::ptr buffer;
 		int scope;
+		Shader::ShaderType shaderType;
+		int index;
 		Collection<VariableInfo> variables;
 	};
 

@@ -44,7 +44,7 @@ public:
 		maxSize(Math::ONE)
 	{}
 
-	PointState(bool sprite1,scalar size1,bool attenuated1,scalar constant1,scalar linear1,scalar quadratic1,scalar minSize1,scalar maxSize1){
+	PointState(bool sprite1,scalar size1,bool attenuated1,scalar constant1=Math::ONE,scalar linear1=Math::ONE,scalar quadratic1=Math::ONE,scalar minSize1=Math::ONE,scalar maxSize1=Math::ONE*128){
 		set(sprite1,size1,attenuated1,constant1,linear1,quadratic1,minSize1,maxSize1);
 	}
 
@@ -60,7 +60,7 @@ public:
 		return *this;
 	}
 
-	PointState &set(bool sprite1,scalar size1,bool attenuated1,scalar constant1,scalar linear1,scalar quadratic1,scalar minSize1,scalar maxSize1){
+	PointState &set(bool sprite1,scalar size1,bool attenuated1,scalar constant1=Math::ONE,scalar linear1=Math::ONE,scalar quadratic1=Math::ONE,scalar minSize1=Math::ONE,scalar maxSize1=Math::ONE){
 		sprite=sprite1;
 		size=size1;
 		attenuated=attenuated1;

@@ -26,6 +26,7 @@
 #ifndef TOADLET_TADPOLE_MATERIAL_RENDERVARIABLE_H
 #define TOADLET_TADPOLE_MATERIAL_RENDERVARIABLE_H
 
+#include <toadlet/peeper/VariableBufferFormat.h>
 #include <toadlet/tadpole/Types.h>
 
 namespace toadlet{
@@ -40,6 +41,7 @@ public:
 
 	virtual ~RenderVariable(){}
 
+	virtual int getFormat()=0;
 	virtual void update(tbyte *data,SceneParameters *parameters)=0;
 };
 

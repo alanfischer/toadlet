@@ -7,7 +7,7 @@ Particles::~Particles(){
 }
 
 void Particles::create(){
-	Application::create("d3d9");
+	Application::create("d3d10");
 
 	mEngine->setDirectory("../../../data");
 
@@ -33,18 +33,25 @@ void Particles::create(){
 		Vector3(-ten,-ten,0),
 	};
 
-	Material::ptr pointMaterial=mEngine->getMaterialManager()->findMaterial("sparkle.png");
-	pointMaterial->getPass()->setPointState(PointState(true,ten,false,Math::ONE,Math::ONE,Math::ONE,Math::ONE,Math::fromInt(100)));
+	Material::ptr pointMaterial=mEngine->getMaterialManager()->createDiffusePointSpriteMaterial(mEngine->getTextureManager()->findTexture("sparkle.png"),ten,false);
 	pointMaterial->getPass()->setBlendState(BlendState::Combination_ALPHA_ADDITIVE);
 	pointMaterial->getPass()->setRasterizerState(RasterizerState(RasterizerState::CullType_NONE));
+	pointMaterial->getPass()->setMaterialState(MaterialState(false));
 	pointMaterial->getPass()->setDepthState(DepthState(DepthState::DepthTest_LEQUAL,false));
+
+	Material::ptr spriteMaterial=mEngine->getMaterialManager()->findMaterial("sparkle.png");
+	spriteMaterial->getPass()->setBlendState(BlendState::Combination_ALPHA_ADDITIVE);
+	spriteMaterial->getPass()->setRasterizerState(RasterizerState(RasterizerState::CullType_NONE));
+	spriteMaterial->getPass()->setMaterialState(MaterialState(false));
+	spriteMaterial->getPass()->setDepthState(DepthState(DepthState::DepthTest_LEQUAL,false));
 
 	Material::ptr beamMaterial=mEngine->getMaterialManager()->findMaterial("fancyGlow.png");
 	beamMaterial->getPass()->setBlendState(BlendState::Combination_ALPHA_ADDITIVE);
 	beamMaterial->getPass()->setRasterizerState(RasterizerState(RasterizerState::CullType_NONE));
+	beamMaterial->getPass()->setMaterialState(MaterialState(false));
 	beamMaterial->getPass()->setDepthState(DepthState(DepthState::DepthTest_LEQUAL,false));
 
- 	pointNode=getEngine()->createNodeType(ParticleNode::type(),scene);
+	pointNode=getEngine()->createNodeType(ParticleNode::type(),scene);
 	pointNode->setNumParticles(4,ParticleNode::ParticleType_POINTSPRITE,Math::ONE,pointPositions);
 	pointNode->setMaterial(pointMaterial);
 	pointNode->setTranslate(-Math::fromInt(40),0,0);
@@ -52,7 +59,7 @@ void Particles::create(){
 
  	spriteNode=getEngine()->createNodeType(ParticleNode::type(),scene);
 	spriteNode->setNumParticles(4,ParticleNode::ParticleType_SPRITE,Math::ONE,pointPositions);
-	spriteNode->setMaterial(pointMaterial);
+	spriteNode->setMaterial(spriteMaterial);
 	spriteNode->setTranslate(0,0,0);
 	scene->getRoot()->attach(spriteNode);
 

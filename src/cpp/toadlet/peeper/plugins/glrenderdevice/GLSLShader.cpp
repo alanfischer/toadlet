@@ -80,6 +80,9 @@ bool GLSLShader::createContext(){
 		case ShaderType_GEOMETRY:
 			mTarget=GL_GEOMETRY_SHADER_EXT;
 		break;
+		default:
+			return false;
+		break;
 	}
 	
 	mHandle=glCreateShader(mTarget);

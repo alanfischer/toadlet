@@ -151,11 +151,13 @@ RenderVariableSet::ptr RenderPass::getVariables(){
 
 	mVariables=RenderVariableSet::ptr(new RenderVariableSet());
 
-	int i;
-	for(i=0;i<mShaderState->getNumVariableBuffers(Shader::ShaderType_VERTEX);++i){
-		VariableBufferFormat::ptr format=mShaderState->getVariableBufferFormat(Shader::ShaderType_VERTEX,i);
-		VariableBuffer::ptr buffer=mManager->getBufferManager()->createVariableBuffer(Buffer::Usage_BIT_DYNAMIC,Buffer::Access_BIT_WRITE,format);
-		mVariables->addBuffer(buffer);
+	int i,j;
+	for(i=0;i<Shader::ShaderType_MAX;++i){
+		for(j=0;j<mShaderState->getNumVariableBuffers((Shader::ShaderType)i);++j){
+			VariableBufferFormat::ptr format=mShaderState->getVariableBufferFormat((Shader::ShaderType)i,j);
+			VariableBuffer::ptr buffer=mManager->getBufferManager()->createVariableBuffer(Buffer::Usage_BIT_DYNAMIC,Buffer::Access_BIT_WRITE,format);
+			mVariables->addBuffer((Shader::ShaderType)i,j,buffer);
+		}
 	}
 
 	return mVariables;
@@ -177,7 +179,7 @@ void RenderPass::setupRenderVariables(RenderDevice *renderDevice,int scope,Scene
 		int bufferScope=mVariables->getBufferScope(i);
 		// If the buffer applies to this scope, and it is the highest bit scope in the buffer
 		if((bufferScope&scope)!=0 && (bufferScope&~scope)<=scope){
-			renderDevice->setBuffer(i,mVariables->getBuffer(i));
+			renderDevice->setBuffer(mVariables->getBufferShaderType(i),mVariables->getBufferIndex(i),mVariables->getBuffer(i));
 		}
 	}
 }

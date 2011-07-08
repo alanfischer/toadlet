@@ -793,11 +793,11 @@ void D3D9RenderDevice::setTextureState(int i,TextureState *state){
 	}
 }
 
-void D3D9RenderDevice::setBuffer(int i,VariableBuffer *buffer){
+void D3D9RenderDevice::setBuffer(Shader::ShaderType shaderType,int i,VariableBuffer *buffer){
 	D3D9VariableBuffer *d3dbuffer=buffer!=NULL?(D3D9VariableBuffer*)buffer->getRootVariableBuffer():NULL;
-
-	d3dbuffer->activateConstants(Shader::ShaderType_VERTEX);
-	d3dbuffer->activateConstants(Shader::ShaderType_FRAGMENT);
+	if(d3dbuffer!=NULL){
+		d3dbuffer->activateConstants(shaderType);
+	}
 }
 
 void D3D9RenderDevice::setTexture(int i,Texture *texture){
