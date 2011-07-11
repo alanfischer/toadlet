@@ -954,6 +954,11 @@ namespace Math{
 	}
 
 	// Matrix4x4 advanced operations
+	inline void zeroTranslateSheer(Matrix4x4 &r){
+		r.data[3+0*4]=0; r.data[3+1*4]=0; r.data[3+2*4]=0; r.data[3+3*4]=ONE;
+		r.data[0+3*4]=0; r.data[1+3*4]=0; r.data[2+3*4]=0;
+	}
+
 	inline void setAxesFromMatrix4x4(const Matrix4x4 &m,Vector3 &xAxis,Vector3 &yAxis,Vector3 &zAxis){ setAxesFromMatrix(m,xAxis,yAxis,zAxis); }
 
 	inline void setMatrix4x4FromAxes(Matrix4x4 &m,const Vector3 &xAxis,const Vector3 &yAxis,const Vector3 &zAxis){ setMatrixFromAxes(m,xAxis,yAxis,zAxis); }

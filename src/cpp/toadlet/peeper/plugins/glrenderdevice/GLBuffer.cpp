@@ -273,7 +273,7 @@ uint8 *GLBuffer::lock(int lockAccess){
 	#endif
 
 	if(mVariableFormat!=NULL && mHasTranspose){
-		BackableBuffer::transposeVariables(mVariableFormat,mData);
+		BackableBuffer::unpackVariables(mVariableFormat,mData);
 	}
 
 	TOADLET_CHECK_GLERROR("GLBuffer::lock");
@@ -283,7 +283,7 @@ uint8 *GLBuffer::lock(int lockAccess){
 
 bool GLBuffer::unlock(){
 	if(mVariableFormat!=NULL && mHasTranspose){
-		BackableBuffer::transposeVariables(mVariableFormat,mData);
+		BackableBuffer::packVariables(mVariableFormat,mData);
 	}
 
 	#if defined(TOADLET_LITTLE_ENDIAN)

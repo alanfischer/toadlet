@@ -149,6 +149,31 @@ void RenderVariableSet::removeVariable(RenderVariable::ptr variable){
 	}
 }
 
+void RenderVariableSet::buildBuffers(BufferManager *manager,ShaderState *state){
+	Collection<VariableInfo> variables;
+	int i,j;
+
+	while(mBuffers.size()>0){
+		BufferInfo *buffer=&mBuffers[0];
+		for(j=0;j<buffer->variables.size();++j){
+			variables.add(buffer->variables[j]);
+		}
+		buffer->buffer->destroy();
+		mBuffers.removeAt(0);
+	}
+
+	for(i=0;i<Shader::ShaderType_MAX;++i){
+		for(j=0;j<state->getNumVariableBuffers((Shader::ShaderType)i);++j){
+			VariableBufferFormat::ptr format=state->getVariableBufferFormat((Shader::ShaderType)i,j);
+			VariableBuffer::ptr buffer=manager->createVariableBuffer(Buffer::Usage_BIT_DYNAMIC,Buffer::Access_BIT_WRITE,format);
+			addBuffer((Shader::ShaderType)i,j,buffer);
+		}
+	}
+	for(i=0;i<variables.size();++i){
+		addVariable(variables[i].name,variables[i].variable,variables[i].scope);
+	}
+}
+
 void RenderVariableSet::update(int scope,SceneParameters *parameters){
 	int i,j;
 	for(i=0;i<mBuffers.size();++i){

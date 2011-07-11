@@ -80,6 +80,7 @@ Material::ptr MaterialManager::createDiffuseMaterial(Texture::ptr texture){
 		fixedPass->setDepthState(DepthState());
 		fixedPass->setRasterizerState(RasterizerState());
 		fixedPass->setMaterialState(MaterialState(true,false,MaterialState::ShadeType_GOURAUD));
+
 		fixedPass->setSamplerState(0,mDefaultSamplerState);
 		fixedPass->setTexture(0,texture);
 	}
@@ -87,15 +88,22 @@ Material::ptr MaterialManager::createDiffuseMaterial(Texture::ptr texture){
 	RenderPath::ptr shaderPath=material->addPath();
 	RenderPass::ptr shaderPass=shaderPath->addPass();
 	{
+		shaderPass->setBlendState(BlendState());
+		shaderPass->setDepthState(DepthState());
+		shaderPass->setRasterizerState(RasterizerState());
+		shaderPass->setMaterialState(MaterialState(true,false,MaterialState::ShadeType_GOURAUD));
+
 		shaderPass->setShader(Shader::ShaderType_VERTEX,mFixedVertexShader);
 		shaderPass->setShader(Shader::ShaderType_FRAGMENT,mFixedFragmentShader);
 		shaderPass->getVariables()->addVariable("modelViewProjectionMatrix",RenderVariable::ptr(new MVPMatrixVariable()),Material::Scope_RENDERABLE);
-		shaderPass->getVariables()->addVariable("lightModelPosition",RenderVariable::ptr(new LightModelPositionVariable()),Material::Scope_RENDERABLE);
+		shaderPass->getVariables()->addVariable("normalMatrix",RenderVariable::ptr(new NormalMatrixVariable()),Material::Scope_RENDERABLE);
+		shaderPass->getVariables()->addVariable("lightViewPosition",RenderVariable::ptr(new LightViewPositionVariable()),Material::Scope_MATERIAL);
 		shaderPass->getVariables()->addVariable("lightColor",RenderVariable::ptr(new LightDiffuseVariable()),Material::Scope_MATERIAL);
 		shaderPass->getVariables()->addVariable("ambientColor",RenderVariable::ptr(new AmbientVariable()),Material::Scope_RENDERABLE);
 		shaderPass->getVariables()->addVariable("materialLighting",RenderVariable::ptr(new MaterialLightingVariable()),Material::Scope_MATERIAL);
 		shaderPass->getVariables()->addVariable("materialDiffuseColor",RenderVariable::ptr(new MaterialDiffuseVariable()),Material::Scope_MATERIAL);
 		shaderPass->getVariables()->addVariable("materialAmbientColor",RenderVariable::ptr(new MaterialAmbientVariable()),Material::Scope_MATERIAL);
+		shaderPass->getVariables()->addVariable("textureMatrix",RenderVariable::ptr(new TextureMatrixVariable(0)),Material::Scope_MATERIAL);
 
 		shaderPass->setSamplerState(0,mDefaultSamplerState);
 		shaderPass->setTexture(0,texture);
@@ -109,39 +117,21 @@ Material::ptr MaterialManager::createDiffuseMaterial(Texture::ptr texture){
 }
 
 Material::ptr MaterialManager::createDiffusePointSpriteMaterial(Texture::ptr texture,scalar size,bool attenuated){
-	Material::ptr material(new Material(this));
+	Material::ptr material=createDiffuseMaterial(texture);
 
-	RenderPath::ptr fixedPath=material->addPath();
-	RenderPass::ptr fixedPass=fixedPath->addPass();
+	RenderPath::ptr fixedPath=material->getPath(0);
+	RenderPass::ptr fixedPass=fixedPath->getPass(0);
 	{
-		fixedPass->setBlendState(BlendState());
-		fixedPass->setDepthState(DepthState());
-		fixedPass->setRasterizerState(RasterizerState());
-		fixedPass->setMaterialState(MaterialState(true,false,MaterialState::ShadeType_GOURAUD));
 		fixedPass->setPointState(PointState(true,size,attenuated));
-		fixedPass->setSamplerState(0,mDefaultSamplerState);
-		fixedPass->setTexture(0,texture);
 	}
 
-	RenderPath::ptr shaderPath=material->addPath();
-	RenderPass::ptr shaderPass=shaderPath->addPass();
+	RenderPath::ptr shaderPath=material->getPath(1);
+	RenderPass::ptr shaderPass=shaderPath->getPass(0);
 	{
-		shaderPass->setShader(Shader::ShaderType_VERTEX,mFixedVertexShader);
-		shaderPass->setShader(Shader::ShaderType_FRAGMENT,mFixedFragmentShader);
 		shaderPass->setShader(Shader::ShaderType_GEOMETRY,mFixedGeometryShader);
-		shaderPass->getVariables()->addVariable("modelViewProjectionMatrix",RenderVariable::ptr(new MVPMatrixVariable()),Material::Scope_RENDERABLE);
-		shaderPass->getVariables()->addVariable("lightModelPosition",RenderVariable::ptr(new LightModelPositionVariable()),Material::Scope_RENDERABLE);
-		shaderPass->getVariables()->addVariable("lightColor",RenderVariable::ptr(new LightDiffuseVariable()),Material::Scope_MATERIAL);
-		shaderPass->getVariables()->addVariable("ambientColor",RenderVariable::ptr(new AmbientVariable()),Material::Scope_RENDERABLE);
-		shaderPass->getVariables()->addVariable("materialLighting",RenderVariable::ptr(new MaterialLightingVariable()),Material::Scope_MATERIAL);
-		shaderPass->getVariables()->addVariable("materialDiffuseColor",RenderVariable::ptr(new MaterialDiffuseVariable()),Material::Scope_MATERIAL);
-		shaderPass->getVariables()->addVariable("materialAmbientColor",RenderVariable::ptr(new MaterialAmbientVariable()),Material::Scope_MATERIAL);
 		shaderPass->getVariables()->addVariable("pointSize",RenderVariable::ptr(new PointSizeVariable()),Material::Scope_MATERIAL);
 		shaderPass->getVariables()->addVariable("pointAttenuated",RenderVariable::ptr(new PointAttenuatedVariable()),Material::Scope_MATERIAL);
 		shaderPass->getVariables()->addVariable("viewport",RenderVariable::ptr(new ViewportVariable()),Material::Scope_MATERIAL);
-
-		shaderPass->setSamplerState(0,mDefaultSamplerState);
-		shaderPass->setTexture(0,texture);
 	}
 
 	manage(material);
@@ -287,19 +277,29 @@ void MaterialManager::contextActivate(RenderDevice *renderDevice){
 		"#version 150\n" \
 		"in vec4 POSITION;\n" \
 		"in vec3 NORMAL;\n" \
+		"in vec2 TEXCOORD0;\n" \
 		"out vec4 color;\n" \
+		"out vec2 texCoord;\n" \
 
 		"uniform mat4 modelViewProjectionMatrix;\n" \
+		"uniform mat4 normalMatrix;\n" \
 		"uniform vec4 materialDiffuseColor;\n" \
 		"uniform vec4 materialAmbientColor;\n" \
-		"uniform vec4 lightModelPosition;\n" \
+		"uniform vec4 lightViewPosition;\n" \
 		"uniform vec4 lightColor;\n" \
 		"uniform vec4 ambientColor;\n" \
+		"uniform float materialLighting;\n" \
+		"uniform mat4 textureMatrix;\n" \
 
 		"void main(){\n" \
 			"gl_Position=modelViewProjectionMatrix * POSITION;\n" \
-			"color=-dot(lightModelPosition,vec4(NORMAL,1.0))*lightColor*materialDiffuseColor + ambientColor*materialAmbientColor;\n" \
+			"vec3 viewNormal=normalize(normalMatrix * vec4(NORMAL,0.0)).xyz;\n" \
+			"float lightIntensity=clamp(-dot(lightViewPosition.xyz,viewNormal),0,1);\n" \
+			"vec4 localLightColor=lightIntensity*lightColor*materialLighting;\n" \
+			"color=localLightColor*materialDiffuseColor + ambientColor*materialAmbientColor;\n" \
+			"texCoord=(textureMatrix * vec4(TEXCOORD0,0.0,1.0)).xy;\n "
 		"}",
+
 
 		"struct VIN{\n" \
 			"float4 position : POSITION;\n" \
@@ -313,29 +313,37 @@ void MaterialManager::contextActivate(RenderDevice *renderDevice){
 		"};\n" \
 
 		"float4x4 modelViewProjectionMatrix;\n" \
+		"float4x4 normalMatrix;\n" \
 		"float4 materialDiffuseColor;\n" \
 		"float4 materialAmbientColor;\n" \
-		"float4 lightModelPosition;\n" \
+		"float4 lightViewPosition;\n" \
 		"float4 lightColor;\n" \
 		"float4 ambientColor;\n" \
 		"float materialLighting;\n" \
+		"float4x4 textureMatrix;\n" \
 
 		"VOUT main(VIN vin){\n" \
-		"	VOUT vout;\n" \
-		"	vout.position=mul(vin.position,modelViewProjectionMatrix);\n" \
-		"	float lightIntensity=clamp(-dot(lightModelPosition,vin.normal),0,1);\n" \
-		"	float4 localLightColor=lightIntensity*lightColor*materialLighting;\n" \
-		"	vout.color=localLightColor*materialDiffuseColor + ambientColor*materialAmbientColor;\n" \
-		"	vout.texCoord=vin.texCoord;\n "
-		"	return vout;\n" \
+			"VOUT vout;\n" \
+			"vout.position=mul(modelViewProjectionMatrix,vin.position);\n" \
+			"float3 viewNormal=normalize(mul(normalMatrix,float4(vin.normal,0.0)));\n" \
+			"float lightIntensity=clamp(-dot(lightViewPosition,viewNormal),0,1);\n" \
+			"float4 localLightColor=lightIntensity*lightColor*materialLighting;\n" \
+			"vout.color=localLightColor*materialDiffuseColor + ambientColor*materialAmbientColor;\n" \
+			"vout.texCoord=mul(textureMatrix,float4(vin.texCoord,0.0,1.0));\n "
+			"return vout;\n" \
 		"}"
 	};
 
 	String fixedFragmentCode[]={
 		"in vec4 color;\n" \
+		"in vec2 texCoord;\n" \
+
+		"sampler2D tex;\n" \
+
 		"void main(){\n" \
-			"gl_FragColor = color;\n" \
+			"gl_FragColor = color*texture2D(tex,texCoord);\n" \
 		"}",
+
 
 		"struct PIN{\n" \
 			"float4 position: SV_POSITION;\n" \
@@ -347,12 +355,46 @@ void MaterialManager::contextActivate(RenderDevice *renderDevice){
 		"SamplerState samp;\n" \
 
 		"float4 main(PIN pin): SV_TARGET{\n" \
-		"	return pin.color*tex.Sample(samp,pin.texCoord);\n" \
+			"return pin.color*tex.Sample(samp,pin.texCoord);\n" \
 		"}"
 	};
 
 	String fixedGeometryCode[]={
-		"EMPTY",
+		"#version 150\n" \
+		"layout(points) in;\n" \
+		"layout(triangle_strip,max_vertices=4) out;\n" \
+		"uniform float pointSize;\n" \
+		"uniform float pointAttenuation;\n" \
+		"uniform vec4 viewport;\n" \
+
+		"in vec4 color[];\n" \
+		"out vec4 kolor;\n" \
+		"out vec2 texCoord;\n" \
+
+		"void main(){\n "
+			"float aspect=viewport.w/viewport.z;\n" \
+			"float w=aspect*pointSize*2.0,h=pointSize*2.0;\n" \
+			"vec3 positions[4]=vec3[](\n" \
+				"vec3(-w,-h,0.0),\n" \
+				"vec3(w,-h,0.0),\n" \
+				"vec3(-w,h,0.0),\n" \
+				"vec3(w,h,0.0)\n" \
+			");\n" \
+			"vec2 texCoords[4]=vec2[](\n" \
+				"vec2(0.0,0.0),\n" \
+				"vec2(1.0,0.0),\n" \
+				"vec2(0.0,1.0),\n" \
+				"vec2(1.0,1.0)\n" \
+			");\n" \
+			"for(int i=0;i<4;i++){\n" \
+				"gl_Position=gl_in[0].gl_Position+vec4(positions[i],0.0);\n" \
+				"kolor=color[i];\n" \
+				"texCoord=texCoords[i];\n" \
+				"EmitVertex();\n" \
+			"}\n" \
+			"EndPrimitive();\n" \
+		"}\n",
+
 
 		"struct GIN{\n" \
 			"float4 position: SV_POSITION;\n" \
@@ -387,7 +429,7 @@ void MaterialManager::contextActivate(RenderDevice *renderDevice){
 			"};\n" \
 			"GOUT gout;\n" \
 			"for(int i=0;i<4;i++){\n" \
-				"gout.position=float4(positions[i],0.0)+gin[0].position;\n" \
+				"gout.position=gin[0].position+float4(positions[i],0.0);\n" \
 				"gout.color=gin[0].color;\n" \
 				"gout.texCoord=texCoords[i];\n" \
 				"stream.Append(gout);\n" \

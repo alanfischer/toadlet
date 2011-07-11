@@ -7,7 +7,7 @@ Particles::~Particles(){
 }
 
 void Particles::create(){
-	Application::create("d3d10");
+	Application::create("gl");
 
 	mEngine->setDirectory("../../../data");
 

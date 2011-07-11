@@ -162,6 +162,7 @@ bool D3D9Shader::reflect(){
 		}
 		variable->setFormat(format);
 		variable->setOffset(dataSize);
+		variable->setSize(constantDesc.Bytes);
 		variable->setIndex(constantDesc.RegisterIndex);
 		primaryFormat->setStructVariable(i,variable);
 

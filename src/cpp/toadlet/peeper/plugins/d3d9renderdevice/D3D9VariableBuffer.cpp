@@ -82,7 +82,7 @@ void D3D9VariableBuffer::destroy(){
 
 tbyte *D3D9VariableBuffer::lock(int lockAccess){
 	if(mVariableFormat!=NULL && mHasTranspose){
-		BackableBuffer::transposeVariables(mVariableFormat,mData);
+		BackableBuffer::unpackVariables(mVariableFormat,mData);
 	}
 
 	return mData;
@@ -90,7 +90,7 @@ tbyte *D3D9VariableBuffer::lock(int lockAccess){
 
 bool D3D9VariableBuffer::unlock(){
 	if(mVariableFormat!=NULL && mHasTranspose){
-		BackableBuffer::transposeVariables(mVariableFormat,mData);
+		BackableBuffer::packVariables(mVariableFormat,mData);
 	}
 
 	return true;

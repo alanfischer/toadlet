@@ -144,20 +144,18 @@ void RenderPass::shareStates(RenderPass *source){
 	mOwnsStates=false;
 }
 
-RenderVariableSet::ptr RenderPass::getVariables(){
+void RenderPass::setShader(Shader::ShaderType type,Shader::ptr shader){
+	mShaderState->setShader(type,shader);
+
 	if(mVariables!=NULL){
-		return mVariables;
+		mVariables->buildBuffers(mManager->getBufferManager(),mShaderState);
 	}
+}
 
-	mVariables=RenderVariableSet::ptr(new RenderVariableSet());
-
-	int i,j;
-	for(i=0;i<Shader::ShaderType_MAX;++i){
-		for(j=0;j<mShaderState->getNumVariableBuffers((Shader::ShaderType)i);++j){
-			VariableBufferFormat::ptr format=mShaderState->getVariableBufferFormat((Shader::ShaderType)i,j);
-			VariableBuffer::ptr buffer=mManager->getBufferManager()->createVariableBuffer(Buffer::Usage_BIT_DYNAMIC,Buffer::Access_BIT_WRITE,format);
-			mVariables->addBuffer((Shader::ShaderType)i,j,buffer);
-		}
+RenderVariableSet::ptr RenderPass::getVariables(){
+	if(mVariables==NULL){
+		mVariables=RenderVariableSet::ptr(new RenderVariableSet());
+		mVariables->buildBuffers(mManager->getBufferManager(),mShaderState);
 	}
 
 	return mVariables;

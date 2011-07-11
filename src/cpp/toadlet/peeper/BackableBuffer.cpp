@@ -279,7 +279,19 @@ void BackableBuffer::setBack(VariableBuffer::ptr back){
 	}
 }
 
-void BackableBuffer::transposeVariables(VariableBufferFormat *variableFormat,tbyte *data){
+/// @todo: Our Matrix format should be templated to allow us to do anything from 1x1 to 4x4
+///  And then our pack/unpack would be smarter or perhaps unnecessary
+void BackableBuffer::packVariables(VariableBufferFormat *variableFormat,tbyte *data){
+	int i;
+	for(i=0;i<variableFormat->getSize();++i){
+		int format=variableFormat->getVariable(i)->getFormat();
+		if((format&VariableBufferFormat::Format_BIT_TRANSPOSE)!=0){
+			transposeVariable(variableFormat,data,i);
+		}
+	}
+}
+
+void BackableBuffer::unpackVariables(VariableBufferFormat *variableFormat,tbyte *data){
 	int i;
 	for(i=0;i<variableFormat->getSize();++i){
 		int format=variableFormat->getVariable(i)->getFormat();
@@ -294,15 +306,15 @@ void BackableBuffer::transposeVariable(VariableBufferFormat *variableFormat,tbyt
 	int format=variable->getFormat();
 	int offset=variable->getOffset();
 	int rows=VariableBufferFormat::getFormatRows(format),cols=VariableBufferFormat::getFormatColumns(format);
-	TOADLET_ASSERT((format&VariableBufferFormat::Format_TYPE_FLOAT_32)!=0 && rows==cols);
+	TOADLET_ASSERT((format&VariableBufferFormat::Format_TYPE_FLOAT_32)!=0);
 
 	float *m=(float*)(data+offset);
 	int j;
 	for(i=0;i<cols;++i){
 		for(j=i+1;j<rows;++j){
-			float t=m[i*cols+j];
-			m[i*cols+j]=m[j*rows+i];
-			m[j*rows+i]=t;
+			float t=m[i*4+j];
+			m[i*4+j]=m[j*4+i];
+			m[j*4+i]=t;
 		}
 	}
 }

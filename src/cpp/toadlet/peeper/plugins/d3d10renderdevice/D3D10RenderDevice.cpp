@@ -374,6 +374,10 @@ bool D3D10RenderDevice::setRenderState(RenderState *renderState){
 	if(d3drenderState->mD3DRasterizerState!=NULL){
 		mD3DDevice->RSSetState(d3drenderState->mD3DRasterizerState);
 	}
+	/// @todo: Be able to select which shader will get the samplers
+	if(d3drenderState->mD3DSamplerStates.size()>0){
+		mD3DDevice->PSSetSamplers(0,d3drenderState->mD3DSamplerStates.size(),&d3drenderState->mD3DSamplerStates[0]);
+	}
 
 	return true;
 }

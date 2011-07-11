@@ -13,8 +13,6 @@ public:
 	}
 	
 	bool load(Engine *engine){
-		Matrix4x4 matrix;
-	
 		skyColor=Colors::AZURE;
 		fadeColor=Vector4(0xB5C1C3FF);
 
@@ -33,21 +31,121 @@ public:
 		if(water!=NULL){
 			Vector4 color=Colors::AZURE*1.5;
 			color.w=0.5f;
-			water->getPass()->setMaterialState(MaterialState(color));
-			water->getPass()->setBlendState(BlendState::Combination_ALPHA);
-			water->getPass()->setDepthState(DepthState(DepthState::DepthTest_LEQUAL,false));
-			water->getPass()->setRasterizerState(RasterizerState(RasterizerState::CullType_NONE));
 
-			TextureState textureState;
-			textureState.calculation=TextureState::CalculationType_NORMAL;
+			RenderPath::ptr fixedPath=water->addPath();
+			RenderPass::ptr fixedPass=fixedPath->addPass();
+			{
+				fixedPass->setMaterialState(MaterialState(color));
+				fixedPass->setBlendState(BlendState::Combination_ALPHA);
+				fixedPass->setDepthState(DepthState(DepthState::DepthTest_LEQUAL,false));
+				fixedPass->setRasterizerState(RasterizerState(RasterizerState::CullType_NONE));
 
-			water->getPass()->setTexture(0,engine->getTextureManager()->createTexture(createNoise(512,512,16,6,0.5,0.5)));
-			Math::setMatrix4x4FromScale(textureState.matrix,16,16,16);
-			water->getPass()->setTextureState(0,textureState);
+				TextureState textureState;
+				textureState.calculation=TextureState::CalculationType_NORMAL;
 
-			water->getPass()->setTexture(1,engine->getTextureManager()->createTexture(createNoise(512,512,16,5,0.5,0.5)));
-			Math::setMatrix4x4FromScale(textureState.matrix,16,16,16);
-			water->getPass()->setTextureState(1,textureState);
+				fixedPass->setTexture(0,engine->getTextureManager()->createTexture(createNoise(512,512,16,6,0.5,0.5)));
+				Math::setMatrix4x4FromScale(textureState.matrix,16,16,16);
+				fixedPass->setTextureState(0,textureState);
+
+				fixedPass->setTexture(1,engine->getTextureManager()->createTexture(createNoise(512,512,16,5,0.5,0.5)));
+				Math::setMatrix4x4FromScale(textureState.matrix,16,16,16);
+				fixedPass->setTextureState(1,textureState);
+			}
+
+			RenderPath::ptr shaderPath=water->addPath();
+			RenderPass::ptr shaderPass=shaderPath->addPass();
+			{
+				shaderPass->setMaterialState(MaterialState(color));
+				shaderPass->setBlendState(BlendState::Combination_ALPHA);
+				shaderPass->setDepthState(DepthState(DepthState::DepthTest_LEQUAL,false));
+				shaderPass->setRasterizerState(RasterizerState(RasterizerState::CullType_NONE));
+
+				TextureState textureState;
+				textureState.calculation=TextureState::CalculationType_NORMAL;
+
+				shaderPass->setTexture(0,engine->getTextureManager()->createTexture(createNoise(512,512,16,6,0.5,0.5)));
+				Math::setMatrix4x4FromScale(textureState.matrix,16,16,16);
+				shaderPass->setTextureState(0,textureState);
+
+				shaderPass->setTexture(1,engine->getTextureManager()->createTexture(createNoise(512,512,16,5,0.5,0.5)));
+				Math::setMatrix4x4FromScale(textureState.matrix,16,16,16);
+				shaderPass->setTextureState(1,textureState);
+
+				String profiles[]={
+					"glsl",
+					"hlsl"
+				};
+
+				String vertexCodes[]={
+					"EMPTY",
+
+					"struct VIN{\n" \
+						"float4 position : POSITION;\n" \
+						"float3 normal : NORMAL;\n" \
+						"float2 texCoord: TEXCOORD0;\n" \
+					"};\n" \
+					"struct VOUT{\n" \
+						"float4 position : SV_POSITION;\n" \
+						"float4 color : COLOR;\n" \
+						"float2 texCoord0: TEXCOORD0;\n" \
+						"float2 texCoord1: TEXCOORD1;\n" \
+					"};\n" \
+
+					"float4x4 modelViewProjectionMatrix;\n" \
+					"float4x4 normalMatrix;\n" \
+					"float4 materialDiffuseColor;\n" \
+					"float4 materialAmbientColor;\n" \
+					"float4 lightViewPosition;\n" \
+					"float4 lightColor;\n" \
+					"float4 ambientColor;\n" \
+					"float4x4 textureMatrix0,textureMatrix1;\n" \
+
+					"VOUT main(VIN vin){\n" \
+						"VOUT vout;\n" \
+						"vout.position=mul(modelViewProjectionMatrix,vin.position);\n" \
+						"float3 viewNormal=normalize(mul(normalMatrix,float4(vin.normal,0.0)));\n" \
+						"float lightIntensity=clamp(-dot(lightViewPosition,viewNormal),0,1);\n" \
+						"float4 localLightColor=lightIntensity*lightColor;\n" \
+						"vout.color=localLightColor*materialDiffuseColor + ambientColor*materialAmbientColor;\n" \
+						"vout.texCoord0=mul(textureMatrix0,float4(vin.texCoord,0.0,1.0));\n " \
+						"vout.texCoord1=mul(textureMatrix1,float4(vin.texCoord,0.0,1.0));\n " \
+						"return vout;\n" \
+					"}"
+				};
+
+				String fragmentCodes[]={
+					"EMPTY",
+
+					"struct PIN{\n" \
+						"float4 position: SV_POSITION;\n" \
+						"float4 color: COLOR;\n" \
+						"float2 texCoord0: TEXCOORD0;\n" \
+						"float2 texCoord1: TEXCOORD1;\n" \
+					"};\n" \
+
+					"Texture2D tex0,tex1;\n" \
+					"SamplerState samp0,samp1;\n" \
+
+					"float4 main(PIN pin): SV_TARGET{\n" \
+						"return pin.color*tex0.Sample(samp0,pin.texCoord0)*tex1.Sample(samp1,pin.texCoord1);\n" \
+					"}"
+				};
+
+				Shader::ptr vertexShader=engine->getShaderManager()->createShader(Shader::ShaderType_VERTEX,profiles,vertexCodes,2);
+				shaderPass->setShader(Shader::ShaderType_VERTEX,vertexShader);
+				Shader::ptr fragmentShader=engine->getShaderManager()->createShader(Shader::ShaderType_FRAGMENT,profiles,fragmentCodes,2);
+				shaderPass->setShader(Shader::ShaderType_FRAGMENT,fragmentShader);
+
+				shaderPass->getVariables()->addVariable("modelViewProjectionMatrix",RenderVariable::ptr(new MVPMatrixVariable()),Material::Scope_RENDERABLE);
+				shaderPass->getVariables()->addVariable("normalMatrix",RenderVariable::ptr(new NormalMatrixVariable()),Material::Scope_RENDERABLE);
+				shaderPass->getVariables()->addVariable("lightViewPosition",RenderVariable::ptr(new LightViewPositionVariable()),Material::Scope_MATERIAL);
+				shaderPass->getVariables()->addVariable("lightColor",RenderVariable::ptr(new LightDiffuseVariable()),Material::Scope_MATERIAL);
+				shaderPass->getVariables()->addVariable("ambientColor",RenderVariable::ptr(new AmbientVariable()),Material::Scope_RENDERABLE);
+				shaderPass->getVariables()->addVariable("materialDiffuseColor",RenderVariable::ptr(new MaterialDiffuseVariable()),Material::Scope_MATERIAL);
+				shaderPass->getVariables()->addVariable("materialAmbientColor",RenderVariable::ptr(new MaterialAmbientVariable()),Material::Scope_MATERIAL);
+				shaderPass->getVariables()->addVariable("textureMatrix0",RenderVariable::ptr(new TextureMatrixVariable(0)),Material::Scope_MATERIAL);
+				shaderPass->getVariables()->addVariable("textureMatrix1",RenderVariable::ptr(new TextureMatrixVariable(1)),Material::Scope_MATERIAL);
+			}
 
 			water->setSort(Material::SortType_DEPTH);
 			water->compile();
@@ -120,9 +218,9 @@ public:
 		
 		hudCompass=engine->getMaterialManager()->findMaterial("compass.png");
 		if(hudCompass!=NULL){
-			hudCompass->getPass()->setMaterialState(MaterialState(false));
-			hudCompass->getPass()->setDepthState(DepthState(DepthState::DepthTest_NEVER,false));
-			hudCompass->getPass()->setBlendState(BlendState(BlendState::Operation_ZERO,BlendState::Operation_SOURCE_COLOR));
+//			hudCompass->getPass()->setMaterialState(MaterialState(false));
+//			hudCompass->getPass()->setDepthState(DepthState(DepthState::DepthTest_NEVER,false));
+//			hudCompass->getPass()->setBlendState(BlendState(BlendState::Operation_ZERO,BlendState::Operation_SOURCE_COLOR));
 			hudCompass->retain();
 		}
 
@@ -130,9 +228,9 @@ public:
 			hudAcorn=engine->getMaterialManager()->cloneMaterial(acorn);
 		}
 		if(hudAcorn!=NULL){
-			hudAcorn->getPass()->setMaterialState(MaterialState(false));
-			hudAcorn->getPass()->setDepthState(DepthState(DepthState::DepthTest_NEVER,false));
-			hudAcorn->getPass()->setBlendState(BlendState(BlendState::Combination_ALPHA));
+//			hudAcorn->getPass()->setMaterialState(MaterialState(false));
+//			hudAcorn->getPass()->setDepthState(DepthState(DepthState::DepthTest_NEVER,false));
+//			hudAcorn->getPass()->setBlendState(BlendState(BlendState::Combination_ALPHA));
 			hudAcorn->retain();
 		}
 

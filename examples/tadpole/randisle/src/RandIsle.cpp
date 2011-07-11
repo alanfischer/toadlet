@@ -6,6 +6,11 @@
 
 #define TREE_CAMERA_DISTANCE 80
 
+/// @todo: Fix D3D10 HUD
+/// @todo: Fix D3D10 Fog
+/// @todo: Fix D3D10 MipMaps
+/// @todo: Text D3D9 Shaders
+/// @todo: Move HLSL shaders to gl, text gl shaders
 /// @todo: Use the leaf bump & bottom textures
 
 static const scalar epsilon=0.001f;
@@ -26,7 +31,7 @@ RandIsle::~RandIsle(){
 void RandIsle::create(const String &directory){
 	Logger::debug("RandIsle::create");
 
-	Application::create("d3d9");
+	Application::create("gl");
 
 	mEngine->setDirectory(directory);
 
@@ -345,7 +350,7 @@ void RandIsle::logicUpdate(int dt){
 		mFollower->logicUpdated(position,dt);
 	}
 
-	updateDanger(dt);
+//	updateDanger(dt);
 
 	bool inWater=(mPlayer->getWorldTranslate().z-((Node*)mPlayer)->getBound().getSphere().radius)<=0;
 	if(!inWater && mPlayer->getCoefficientOfGravity()==0){
@@ -408,15 +413,16 @@ void RandIsle::frameUpdate(int dt){
 	}
 	mFollowNode->setTranslate(position);
 	mFollowNode->frameUpdate(0,-1);
-	{
+	Material::ptr water=Resources::instance->water;
+	if(water!=NULL){
 		TextureState textureState;
-		Resources::instance->water->getPass()->getTextureState(0,textureState);
+		water->getPass()->getTextureState(0,textureState);
 		Math::setMatrix4x4FromTranslate(textureState.matrix,Math::sin(Math::fromMilli(mScene->getTime())/4)/4,0,0);
-		Resources::instance->water->getPass()->setTextureState(0,textureState);
+		water->getPass()->setTextureState(0,textureState);
 
-		Resources::instance->water->getPass()->getTextureState(1,textureState);
+		water->getPass()->getTextureState(1,textureState);
 		Math::setMatrix4x4FromTranslate(textureState.matrix,0,Math::sin(Math::fromMilli(mScene->getTime())/4)/4,0);
-		Resources::instance->water->getPass()->setTextureState(1,textureState);
+		water->getPass()->setTextureState(1,textureState);
 	}
 
 	if(mPlayer->getPath()!=NULL){

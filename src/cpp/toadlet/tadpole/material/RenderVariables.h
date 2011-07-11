@@ -52,23 +52,36 @@ protected:
 	Matrix4x4 mMVPMatrix,mModelMatrix;
 };
 
-class LightModelPositionVariable:public RenderVariable{
+class NormalMatrixVariable:public RenderVariable{
+public:
+	int getFormat(){return VariableBufferFormat::Format_TYPE_FLOAT_32|VariableBufferFormat::Format_COUNT_4X4;}
+
+	void update(tbyte *data,SceneParameters *parameters){
+		if(parameters->getRenderable()!=NULL){
+			parameters->getRenderable()->getRenderTransform().getMatrix(mModelMatrix);
+			Math::mul(mNormalMatrix,parameters->getCamera()->getViewMatrix(),mModelMatrix);
+			Math::zeroTranslateSheer(mNormalMatrix);
+			Math::invert(mInverseMatrix,mNormalMatrix);
+			Math::transpose(mNormalMatrix,mInverseMatrix);
+			memcpy(data,mNormalMatrix.getData(),sizeof(Matrix4x4));
+		}
+	}
+
+protected:
+	Matrix4x4 mModelMatrix,mModelViewMatrix,mInverseMatrix,mNormalMatrix;
+};
+
+class LightViewPositionVariable:public RenderVariable{
 public:
 	int getFormat(){return VariableBufferFormat::Format_TYPE_FLOAT_32|VariableBufferFormat::Format_COUNT_4;}
 
 	void update(tbyte *data,SceneParameters *parameters){
 		if(parameters->getRenderable()!=NULL){
-			/// @todo: Modify the LightState so it only has 1 4d vector position/direction
-			Vector4 position(parameters->getLightState().direction,0.0);
-			parameters->getRenderable()->getRenderTransform().getMatrix(mModelMatrix);
-			Math::invert(mInverseModelMatrix,mModelMatrix);
-			Math::mul(position,mInverseModelMatrix);
-			memcpy(data,position.getData(),sizeof(Vector4));
+			Vector4 lightViewPosition(parameters->getLightState().direction,0);
+			Math::mul(lightViewPosition,parameters->getCamera()->getViewMatrix());
+			memcpy(data,lightViewPosition.getData(),sizeof(Vector4));
 		}
 	}
-
-protected:
-	Matrix4x4 mModelMatrix,mInverseModelMatrix;
 };
 
 class LightDiffuseVariable:public RenderVariable{
@@ -134,6 +147,20 @@ public:
 		float attenuated=parameters->getPointState().attenuated?Math::ONE:0;
 		memcpy(data,&attenuated,sizeof(float));
 	}
+};
+
+class TextureMatrixVariable:public RenderVariable{
+public:
+	TextureMatrixVariable(int index):mIndex(index){}
+
+	int getFormat(){return VariableBufferFormat::Format_TYPE_FLOAT_32|VariableBufferFormat::Format_COUNT_4X4;}
+	
+	void update(tbyte *data,SceneParameters *parameters){
+		memcpy(data,parameters->getTextureState(mIndex).matrix.getData(),sizeof(Matrix4x4));
+	}
+
+protected:
+	int mIndex;
 };
 
 class ViewportVariable:public RenderVariable{
