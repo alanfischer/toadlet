@@ -83,7 +83,8 @@ public:
 	virtual void setBack(VariableBuffer::ptr back);
 	virtual Buffer::ptr getBack(){return mBack;}
 
-	static void transposeVariables(VariableBufferFormat *variableFormat,tbyte *data);
+	static void packVariables(VariableBufferFormat *variableFormat,tbyte *data);
+	static void unpackVariables(VariableBufferFormat *variableFormat,tbyte *data);
 	static void transposeVariable(VariableBufferFormat *variableFormat,tbyte *data,int i);
 
 protected:

@@ -74,9 +74,22 @@ void SceneRenderer::setupPass(RenderPass *pass){
 		mDevice->setShaderState(mLastShaderState);
 	}
 
-	MaterialState materialState;
-	pass->getRenderState()->getMaterialState(materialState);
-	mSceneParameters->setMaterialState(materialState);
+	RenderState::ptr renderState=pass->getRenderState();
+	{
+		MaterialState materialState;
+		renderState->getMaterialState(materialState);
+		mSceneParameters->setMaterialState(materialState);
+		PointState pointState;
+		renderState->getPointState(pointState);
+		mSceneParameters->setPointState(pointState);
+
+		int i;
+		for(i=0;i<renderState->getNumTextureStates();++i){
+			TextureState textureState;
+			renderState->getTextureState(i,textureState);
+			mSceneParameters->setTextureState(i,textureState);
+		}
+	}
 	pass->setupRenderVariables(mDevice,Material::Scope_MATERIAL,mSceneParameters);
 
 	int i;
@@ -227,8 +240,13 @@ void SceneRenderer::setupViewport(CameraNode *camera,RenderDevice *device){
 	mSceneParameters->setViewport(viewport);
 }
 
-/// @todo: Do this only if the material is fixed function
+/// @todo: Clean this up to handle multiple lights in shader passes
 void SceneRenderer::setupLights(const RenderableSet::LightQueue &lightQueue,RenderDevice *device){
+	if(lightQueue.size()>0){
+		LightNode *light=lightQueue[0].light;
+		mSceneParameters->setLightState(light->getLightState());
+	}
+
 	int i;
 	int maxLights=mScene->getEngine()->getRenderCaps().maxLights;
 	for(i=0;i<maxLights;++i){

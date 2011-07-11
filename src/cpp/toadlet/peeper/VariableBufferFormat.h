@@ -77,6 +77,7 @@ public:
 		Variable():
 			mFormat(0),
 			mOffset(0),
+			mSize(0),
 			mIndex(0),
 			mArraySize(0)
 		{}
@@ -92,6 +93,9 @@ public:
 
 		inline void setOffset(int offset){mOffset=offset;}
 		inline int getOffset() const{return mOffset;}
+
+		inline void setSize(int size){mSize=size;}
+		inline int getSize() const{return mSize;}
 
 		inline void setIndex(int index){mIndex=index;}
 		inline int getIndex() const{return mIndex;}
@@ -110,6 +114,7 @@ public:
 		String mFullName;
 		int mFormat;
 		int mOffset;
+		int mSize;
 		int mIndex;
 		int mArraySize;
 		Collection<Variable::ptr> mStructVariables;

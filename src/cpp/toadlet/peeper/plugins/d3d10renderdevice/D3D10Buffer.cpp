@@ -261,7 +261,7 @@ uint8 *D3D10Buffer::lock(int lockAccess){
 	}
 
 	if(mVariableFormat!=NULL && mHasTranspose){
-		BackableBuffer::transposeVariables(mVariableFormat,mData);
+		BackableBuffer::unpackVariables(mVariableFormat,mData);
 	}
 
 	return mData;
@@ -269,7 +269,7 @@ uint8 *D3D10Buffer::lock(int lockAccess){
 
 bool D3D10Buffer::unlock(){
 	if(mVariableFormat!=NULL && mHasTranspose){
-		BackableBuffer::transposeVariables(mVariableFormat,mData);
+		BackableBuffer::packVariables(mVariableFormat,mData);
 	}
 
 	// We do this even if its read only, since we have to do it in all situations for locking

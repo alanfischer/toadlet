@@ -28,6 +28,8 @@
 
 #include <toadlet/peeper/VariableBuffer.h>
 #include <toadlet/peeper/Shader.h>
+#include <toadlet/peeper/ShaderState.h>
+#include <toadlet/tadpole/BufferManager.h>
 #include <toadlet/tadpole/material/RenderVariable.h>
 
 namespace toadlet{
@@ -54,6 +56,7 @@ public:
 	bool addVariable(const String &name,RenderVariable::ptr variable,int scope);
 	void removeVariable(RenderVariable::ptr variable);
 
+	void buildBuffers(BufferManager *manager,ShaderState *state);
 	void update(int scope,SceneParameters *parameters);
 
 protected:

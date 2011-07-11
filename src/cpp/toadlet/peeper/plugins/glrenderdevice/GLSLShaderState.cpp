@@ -183,7 +183,16 @@ bool GLSLShaderState::link(){
 	GLint status=0;
 	glGetProgramiv(mHandle,GL_LINK_STATUS,&status);
 	if(status==GL_FALSE){
-		Error::unknown("error linking program");
+		String logString;
+		GLint length=0;
+		glGetProgramiv(mHandle,GL_INFO_LOG_LENGTH,&length);
+		if(length>0){
+			char *log=new char[length];
+			glGetProgramInfoLog(mHandle,length,NULL,log);
+			logString=log;
+			delete log;
+		}
+		Error::unknown(Categories::TOADLET_PEEPER,"glsl link error:\n"+logString);
 		return false;
 	}
 
@@ -213,6 +222,7 @@ bool GLSLShaderState::reflect(){
 		VariableBufferFormat::Variable::ptr variable(new VariableBufferFormat::Variable());
 		variable->setName(name);
 		variable->setFormat(GLRenderDevice::getVariableFormat(type));
+		variable->setSize(size);
 		variable->setIndex(i);
 		primaryVariables[i]=variable;
 	}

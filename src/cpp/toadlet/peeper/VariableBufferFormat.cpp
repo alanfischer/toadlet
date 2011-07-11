@@ -50,41 +50,23 @@ int VariableBufferFormat::getFormatSize(int format){
 	int count=(format&Format_MASK_COUNTS);
 	switch(count){
 		case Format_COUNT_1:
-			size*=1;
-		break;
 		case Format_COUNT_2:
-			size*=2;
-		break;
 		case Format_COUNT_3:
-			size*=3;
-		break;
 		case Format_COUNT_4:
 			size*=4;
 		break;
 		case Format_COUNT_2X2:
-			size*=4;
-		break;
 		case Format_COUNT_2X3:
-			size*=6;
-		break;
 		case Format_COUNT_2X4:
 			size*=8;
 		break;
 		case Format_COUNT_3X2:
-			size*=6;
-		break;
 		case Format_COUNT_3X3:
-			size*=9;
-		break;
 		case Format_COUNT_3X4:
 			size*=12;
 		break;
 		case Format_COUNT_4X2:
-			size*=8;
-		break;
 		case Format_COUNT_4X3:
-			size*=12;
-		break;
 		case Format_COUNT_4X4:
 			size*=16;
 		break;

@@ -292,8 +292,8 @@ bool GLRenderDevice::create(RenderTarget *target,int *options){
 			caps.pointSprites=(gl_version>=11);
 		#endif
 
-		caps.vertexFixedFunction=true;
-		caps.fragmentFixedFunction=true;
+		caps.vertexFixedFunction=false;
+		caps.fragmentFixedFunction=false;
 
 		#if defined(TOADLET_HAS_GLEW)
 			caps.vertexShaders=(GLEW_ARB_vertex_program>0);
