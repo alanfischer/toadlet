@@ -49,6 +49,7 @@ public:
 		Format_TYPE_FLOAT_32=	6,
 		Format_TYPE_DOUBLE_64=	7,
 		Format_TYPE_COLOR_RGBA=	8,
+		Format_TYPE_RESOURCE=	9,
 
 		// Format counts
 		Format_SHIFT_COUNTS=	16,

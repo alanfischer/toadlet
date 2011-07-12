@@ -274,12 +274,13 @@ void MaterialManager::contextActivate(RenderDevice *renderDevice){
 	};
 
 	String fixedVertexCode[]={
+/*
 		"#version 150\n" \
-		"in vec4 POSITION;\n" \
-		"in vec3 NORMAL;\n" \
-		"in vec2 TEXCOORD0;\n" \
-		"out vec4 color;\n" \
-		"out vec2 texCoord;\n" \
+		"in vec4 POSITION\n;" \
+		"in vec3 NORMAL\n;" \
+		"in vec2 TEXCOORD0\n;" \
+		"out vec4 color\n;" \
+		"out vec2 texCoord\n;" \
 
 		"uniform mat4 modelViewProjectionMatrix;\n" \
 		"uniform mat4 normalMatrix;\n" \
@@ -299,6 +300,32 @@ void MaterialManager::contextActivate(RenderDevice *renderDevice){
 			"color=localLightColor*materialDiffuseColor + ambientColor*materialAmbientColor;\n" \
 			"texCoord=(textureMatrix * vec4(TEXCOORD0,0.0,1.0)).xy;\n "
 		"}",
+*/
+		"attribute vec4 POSITION;"
+		"attribute vec3 NORMAL;"
+		"attribute vec2 TEXCOORD0;"
+		"varying vec4 color\n;" \
+		"varying vec2 texCoord\n;" \
+
+		"uniform mat4 modelViewProjectionMatrix;\n" \
+		"uniform mat4 normalMatrix;\n" \
+		"uniform vec4 materialDiffuseColor;\n" \
+		"uniform vec4 materialAmbientColor;\n" \
+		"uniform vec4 lightViewPosition;\n" \
+		"uniform vec4 lightColor;\n" \
+		"uniform vec4 ambientColor;\n" \
+		"uniform float materialLighting;\n" \
+		"uniform mat4 textureMatrix;\n" \
+
+		"void main(){\n" \
+			"gl_Position=modelViewProjectionMatrix * POSITION;\n" \
+			"vec3 viewNormal=normalize(normalMatrix * vec4(NORMAL,0.0)).xyz;\n" \
+			"float lightIntensity=-dot(lightViewPosition.xyz,viewNormal);\n" \
+			"vec4 localLightColor=lightIntensity*lightColor*materialLighting;\n" \
+			"color=localLightColor*materialDiffuseColor + ambientColor*materialAmbientColor;\n" \
+			"texCoord=(textureMatrix * vec4(TEXCOORD0,0.0,1.0)).xy;\n "
+		"}",
+
 
 
 		"struct VIN{\n" \
@@ -335,6 +362,7 @@ void MaterialManager::contextActivate(RenderDevice *renderDevice){
 	};
 
 	String fixedFragmentCode[]={
+/*
 		"in vec4 color;\n" \
 		"in vec2 texCoord;\n" \
 
@@ -343,6 +371,16 @@ void MaterialManager::contextActivate(RenderDevice *renderDevice){
 		"void main(){\n" \
 			"gl_FragColor = color*texture2D(tex,texCoord);\n" \
 		"}",
+*/
+		"varying vec4 color;"
+		"varying vec2 texCoord;"
+		
+		"uniform sampler2D tex;\n"
+		
+		"void main(){\n" \
+			"gl_FragColor = color;//*texture2D(tex,texCoord);\n" \
+		"}",
+
 
 
 		"struct PIN{\n" \
@@ -360,6 +398,7 @@ void MaterialManager::contextActivate(RenderDevice *renderDevice){
 	};
 
 	String fixedGeometryCode[]={
+/*
 		"#version 150\n" \
 		"layout(points) in;\n" \
 		"layout(triangle_strip,max_vertices=4) out;\n" \
@@ -394,7 +433,8 @@ void MaterialManager::contextActivate(RenderDevice *renderDevice){
 			"}\n" \
 			"EndPrimitive();\n" \
 		"}\n",
-
+*/
+		(char*)NULL,
 
 		"struct GIN{\n" \
 			"float4 position: SV_POSITION;\n" \

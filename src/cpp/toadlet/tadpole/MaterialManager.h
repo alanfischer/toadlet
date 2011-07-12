@@ -41,7 +41,7 @@ public:
 
 	void destroy();
 
-	Material::ptr createMaterial(Material::ptr source=NULL);
+	Material::ptr createMaterial(Material::ptr source=Material::ptr());
 	Material::ptr cloneMaterial(Material::ptr source);
 	Material::ptr findMaterial(const String &name){return shared_static_cast<Material>(ResourceManager::find(name));}
 

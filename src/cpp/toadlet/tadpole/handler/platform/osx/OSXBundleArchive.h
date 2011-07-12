@@ -29,6 +29,7 @@
 #include <toadlet/egg/BaseResource.h>
 #include <toadlet/egg/Map.h>
 #include <toadlet/egg/io/Archive.h>
+#include <toadlet/tadpole/Types.h>
 #include <Foundation/NSBundle.h>
 
 namespace toadlet{
