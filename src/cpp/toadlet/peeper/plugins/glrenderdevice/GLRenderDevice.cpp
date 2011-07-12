@@ -186,6 +186,8 @@ bool GLRenderDevice::create(RenderTarget *target,int *options){
 	Logger::alert(Categories::TOADLET_PEEPER,
 		String("GL_VERSION:") + glGetString(GL_VERSION));
 	Logger::alert(Categories::TOADLET_PEEPER,
+		String("GL_SHADING_LANGUAGE_VERSION:") + glGetString(GL_SHADING_LANGUAGE_VERSION));
+	Logger::alert(Categories::TOADLET_PEEPER,
 		String("GL_EXTENSIONS:") + glGetString(GL_EXTENSIONS));
 
 	RenderCaps &caps=mCaps;
@@ -1814,8 +1816,6 @@ void GLRenderDevice::setShaderVertexData(const VertexData *vertexData){
 
 		for(j=0;j<numElements;++j){
 			int semantic=glvertexFormat->mSemantics[j];
-			int index=glvertexFormat->mIndexes[j];
-
 			int semanticIndex=gllayout->mSemanticIndexes[j];
 
 			semanticBits|=(1<<semanticIndex);
@@ -2370,6 +2370,13 @@ int GLRenderDevice::getVariableFormat(GLuint type){
 			return VariableBufferFormat::Format_TYPE_FLOAT_32|VariableBufferFormat::Format_COUNT_4X2;
 		case GL_FLOAT_MAT4x3:
 			return VariableBufferFormat::Format_TYPE_FLOAT_32|VariableBufferFormat::Format_COUNT_4X3;
+		case GL_SAMPLER_1D:
+		case GL_SAMPLER_2D:
+		case GL_SAMPLER_3D:
+		case GL_SAMPLER_CUBE:
+		case GL_SAMPLER_1D_SHADOW:
+		case GL_SAMPLER_2D_SHADOW:
+			return VariableBufferFormat::Format_TYPE_RESOURCE;
 		default:
 			return 0;
 	}

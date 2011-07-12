@@ -68,9 +68,9 @@ Logo::~Logo(){
 }
 
 void Logo::create(){
-	Application::create("d3d10");
+	Application::create("gl");
 
-	mEngine->setDirectory("../../../data");
+	mEngine->setDirectory("../../../../data");
 
 	scene=Scene::ptr(new Scene(mEngine));
 

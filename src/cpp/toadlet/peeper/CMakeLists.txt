@@ -53,7 +53,7 @@ set (PEEPER_HEADERS
 	SamplerState.h
 	Shader.h
 	ShaderState.h
-	ShaderStateDestroyedListener.h>
+	ShaderStateDestroyedListener.h
 	Texture.h
 	TextureState.h
 	Types.h

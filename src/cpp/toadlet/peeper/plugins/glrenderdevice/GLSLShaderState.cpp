@@ -81,7 +81,7 @@ void GLSLShaderState::destroy(){
 }
 
 void GLSLShaderState::setShader(Shader::ShaderType type,Shader::ptr shader){
-	GLSLShader *glshader=(GLSLShader*)shader->getRootShader();
+	GLSLShader *glshader=shader!=NULL?(GLSLShader*)shader->getRootShader():NULL;
 
 	if(mShaders.size()<=type){
 		mShaders.resize(type+1);
@@ -218,12 +218,13 @@ bool GLSLShaderState::reflect(){
 	int i;
 	for(i=0;i<numUniforms;++i){
 		glGetActiveUniform(mHandle,i,sizeof(name),&nameLength,&size,&type,name);
+		int location=glGetUniformLocation(mHandle,name);
 
 		VariableBufferFormat::Variable::ptr variable(new VariableBufferFormat::Variable());
 		variable->setName(name);
 		variable->setFormat(GLRenderDevice::getVariableFormat(type));
 		variable->setSize(size);
-		variable->setIndex(i);
+		variable->setIndex(location);
 		primaryVariables[i]=variable;
 	}
 

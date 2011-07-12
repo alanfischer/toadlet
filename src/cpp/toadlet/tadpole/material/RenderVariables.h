@@ -31,6 +31,7 @@
 #include <toadlet/tadpole/material/RenderVariable.h>
 #include <toadlet/tadpole/material/SceneParameters.h>
 #include <toadlet/tadpole/node/CameraNode.h>
+#include <string.h>
 
 namespace toadlet{
 namespace tadpole{
