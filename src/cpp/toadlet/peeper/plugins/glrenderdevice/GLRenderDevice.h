@@ -58,6 +58,8 @@ public:
 	const static int Option_USE_PBUFFERS=1;
 	const static int Option_USE_FBOS=2;
 	const static int Option_USE_HARDWARE_BUFFERS=3;
+	const static int Option_USE_FIXED_FUNCTION=4;
+	const static int Option_USE_SHADERS=5;
 
 	GLRenderDevice();
 	virtual ~GLRenderDevice();

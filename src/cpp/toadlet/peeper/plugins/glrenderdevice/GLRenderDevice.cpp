@@ -114,6 +114,8 @@ bool GLRenderDevice::create(RenderTarget *target,int *options){
 	bool usePBuffers=true;
 	bool useFBOs=true;
 	bool useHardwareBuffers=true;
+	bool useFixedFunction=true;
+	bool useShaders=true;
 	if(options!=NULL){
 		int i=0;
 		while(options[i]!=0){
@@ -132,6 +134,16 @@ bool GLRenderDevice::create(RenderTarget *target,int *options){
 					useHardwareBuffers=options[i++]>0;
 					Logger::alert(Categories::TOADLET_PEEPER,
 						String("Setting Hardware Buffer usage to:")+useHardwareBuffers);
+				break;
+				case Option_USE_FIXED_FUNCTION:
+					useFixedFunction=options[i++]>0;
+					Logger::alert(Categories::TOADLET_PEEPER,
+						String("Setting Fixed Function usage to:")+useFixedFunction);
+				break;
+				case Option_USE_SHADERS:
+					useShaders=options[i++]>0;
+					Logger::alert(Categories::TOADLET_PEEPER,
+						String("Setting Shader usage to:")+useShaders);
 				break;
 			}
 		}
@@ -294,16 +306,14 @@ bool GLRenderDevice::create(RenderTarget *target,int *options){
 			caps.pointSprites=(gl_version>=11);
 		#endif
 
-		caps.vertexFixedFunction=false;
-		caps.fragmentFixedFunction=false;
+		caps.vertexFixedFunction=useFixedFunction;
+		caps.fragmentFixedFunction=useFixedFunction;
 
 		#if defined(TOADLET_HAS_GLEW)
-			caps.vertexShaders=(GLEW_ARB_vertex_program>0);
+			caps.vertexShaders=(GLEW_ARB_vertex_program>0) && useShaders;
 			if(caps.vertexShaders) glGetProgramivARB(GL_VERTEX_PROGRAM_ARB,GL_MAX_PROGRAM_ENV_PARAMETERS_ARB,(GLint*)&caps.maxVertexShaderLocalParameters);
-		#endif
 
-		#if defined(TOADLET_HAS_GLEW)
-			caps.fragmentShaders=(GLEW_ARB_fragment_program>0);
+			caps.fragmentShaders=(GLEW_ARB_fragment_program>0) && useShaders;
 			if(caps.fragmentShaders) glGetProgramivARB(GL_FRAGMENT_PROGRAM_ARB,GL_MAX_PROGRAM_ENV_PARAMETERS_ARB,(GLint*)&caps.maxFragmentShaderLocalParameters);
 		#endif
 
@@ -840,13 +850,16 @@ bool GLRenderDevice::setRenderState(RenderState *renderState){
 
 bool GLRenderDevice::setShaderState(ShaderState *shaderState){
 	GLSLShaderState *glshaderState=shaderState!=NULL?(GLSLShaderState*)shaderState->getRootShaderState():NULL;
-	if(glshaderState==NULL || glshaderState->mShaders.size()==0){
-		mLastShaderState=NULL;
+	if(glshaderState==NULL){
 		return false;
 	}
 
-	mLastShaderState=glshaderState;
-	glshaderState->activate();
+	if(glshaderState->activate()){
+		mLastShaderState=glshaderState;
+	}
+	else{
+		mLastShaderState=NULL;
+	}
 
 	TOADLET_CHECK_GLERROR("setShaderState");
 

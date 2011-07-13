@@ -29,11 +29,14 @@ RandIsle::~RandIsle(){
 }
 
 void RandIsle::create(const String &directory){
+	Logger::getInstance()->setMasterReportingLevel(Logger::Level_ALERT);
+
 	Logger::debug("RandIsle::create");
 
 	Application::create("gl");
 
 	mEngine->setDirectory(directory);
+//	mEngine->getMaterialManager()->setRenderPathChooser(this);
 
 	Resources::init(mEngine);
 
@@ -774,6 +777,16 @@ scalar RandIsle::terrainValue(float tx,float ty){
 
 scalar RandIsle::pathValue(float ty){
 	return mPatchNoise.perlin1(ty/4);
+}
+
+RenderPath::ptr RandIsle::chooseBestPath(Material *material){
+	int i;
+	for(i=material->getNumPaths()-1;i>=0;--i){
+		if(mEngine->getMaterialManager()->isPathUseable(material->getPath(i),mEngine->getRenderCaps())){
+			return material->getPath(i);
+		}
+	}
+	return 0;
 }
 
 int toadletMain(int argc,char **argv){

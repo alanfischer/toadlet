@@ -40,6 +40,7 @@ GLSLShaderState::GLSLShaderState(GLRenderDevice *renderDevice):
 	//mShaders
 {
 	mDevice=renderDevice;
+	mNeedsLink=true;
 }
 
 GLSLShaderState::~GLSLShaderState(){
@@ -139,9 +140,14 @@ bool GLSLShaderState::activate(){
 		link();
 	}
 
-	glUseProgram(mHandle);
+	// Only use the program if we succesfully linked
+	if(!mNeedsLink){
+		glUseProgram(mHandle);
+	}
 
-	return true;
+	TOADLET_CHECK_GLERROR("GLSLShaderState::activate");
+
+	return !mNeedsLink;
 }
 
 GLSLVertexLayout *GLSLShaderState::findVertexLayout(GLVertexFormat *vertexFormat){
@@ -178,6 +184,14 @@ bool GLSLShaderState::destroyContext(){
 }
 
 bool GLSLShaderState::link(){
+	int i;
+	for(i=0;i<mShaders.size();++i){
+		if(mShaders[i]!=NULL) break;
+	}
+	if(i==mShaders.size()){
+		return false;
+	}
+
 	glLinkProgram(mHandle);
 
 	GLint status=0;
@@ -199,6 +213,8 @@ bool GLSLShaderState::link(){
 	reflect();
 
 	mNeedsLink=false;
+
+	TOADLET_CHECK_GLERROR("GLSLShaderState::link");
 
 	return true;
 }
@@ -283,6 +299,8 @@ bool GLSLShaderState::reflect(){
 
 		mVariableBufferFormats.insert(mVariableBufferFormats.begin(),primaryFormat);
 	}
+
+	TOADLET_CHECK_GLERROR("GLSLShaderState::reflect");
 
 	return true;
 }

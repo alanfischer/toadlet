@@ -58,6 +58,10 @@ Shader::ptr ShaderManager::createShader(Shader::ShaderType type,const String pro
 Shader::ptr ShaderManager::createShader(Shader::ShaderType type,const String &profile,const String &code){
 	Logger::debug(Categories::TOADLET_TADPOLE,"ShaderManager::createShader");
 
+	if(code.length()==0){
+		return NULL;
+	}
+
 	Shader::ptr shader=Shader::ptr(mEngine->getRenderDevice()->createShader());
 	if(shader->create(type,profile,code)==false){
 		return NULL;

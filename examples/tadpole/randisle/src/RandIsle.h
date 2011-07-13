@@ -11,7 +11,7 @@
 
 class HUD;
 
-class RandIsle:public Application,public TerrainNodeDataSource,public UpdateListener,public TerrainNodeListener,public PathClimberListener{
+class RandIsle:public Application,public TerrainNodeDataSource,public UpdateListener,public TerrainNodeListener,public PathClimberListener,public RenderPathChooser{
 public:
 	enum{
 		Scope_BIT_TREE=			1<<1,
@@ -71,6 +71,8 @@ public:
 	bool getPatchData(scalar *data,int px,int py);
 	scalar terrainValue(float tx,float ty);
 	scalar pathValue(float ty);
+
+	RenderPath::ptr chooseBestPath(Material *material);
 
 protected:
 	class PopulatePatch{

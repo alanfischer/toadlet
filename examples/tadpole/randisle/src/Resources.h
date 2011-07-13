@@ -32,26 +32,6 @@ public:
 			Vector4 color=Colors::AZURE*1.5;
 			color.w=0.5f;
 
-			RenderPath::ptr fixedPath=water->addPath();
-			RenderPass::ptr fixedPass=fixedPath->addPass();
-			{
-				fixedPass->setMaterialState(MaterialState(color));
-				fixedPass->setBlendState(BlendState::Combination_ALPHA);
-				fixedPass->setDepthState(DepthState(DepthState::DepthTest_LEQUAL,false));
-				fixedPass->setRasterizerState(RasterizerState(RasterizerState::CullType_NONE));
-
-				TextureState textureState;
-				textureState.calculation=TextureState::CalculationType_NORMAL;
-
-				fixedPass->setTexture(0,engine->getTextureManager()->createTexture(createNoise(512,512,16,6,0.5,0.5)));
-				Math::setMatrix4x4FromScale(textureState.matrix,16,16,16);
-				fixedPass->setTextureState(0,textureState);
-
-				fixedPass->setTexture(1,engine->getTextureManager()->createTexture(createNoise(512,512,16,5,0.5,0.5)));
-				Math::setMatrix4x4FromScale(textureState.matrix,16,16,16);
-				fixedPass->setTextureState(1,textureState);
-			}
-
 			RenderPath::ptr shaderPath=water->addPath();
 			RenderPass::ptr shaderPass=shaderPath->addPass();
 			{
@@ -77,57 +57,57 @@ public:
 				};
 
 				String vertexCodes[]={
-					"EMPTY",
+					(char*)NULL,
 
-					"struct VIN{\n" \
-						"float4 position : POSITION;\n" \
-						"float3 normal : NORMAL;\n" \
-						"float2 texCoord: TEXCOORD0;\n" \
-					"};\n" \
-					"struct VOUT{\n" \
-						"float4 position : SV_POSITION;\n" \
-						"float4 color : COLOR;\n" \
-						"float2 texCoord0: TEXCOORD0;\n" \
-						"float2 texCoord1: TEXCOORD1;\n" \
-					"};\n" \
+					"struct VIN{\n"
+						"float4 position : POSITION;\n"
+						"float3 normal : NORMAL;\n"
+						"float2 texCoord: TEXCOORD0;\n"
+					"};\n"
+					"struct VOUT{\n"
+						"float4 position : SV_POSITION;\n"
+						"float4 color : COLOR;\n"
+						"float2 texCoord0: TEXCOORD0;\n"
+						"float2 texCoord1: TEXCOORD1;\n"
+					"};\n"
 
-					"float4x4 modelViewProjectionMatrix;\n" \
-					"float4x4 normalMatrix;\n" \
-					"float4 materialDiffuseColor;\n" \
-					"float4 materialAmbientColor;\n" \
-					"float4 lightViewPosition;\n" \
-					"float4 lightColor;\n" \
-					"float4 ambientColor;\n" \
-					"float4x4 textureMatrix0,textureMatrix1;\n" \
+					"float4x4 modelViewProjectionMatrix;\n"
+					"float4x4 normalMatrix;\n"
+					"float4 materialDiffuseColor;\n"
+					"float4 materialAmbientColor;\n"
+					"float4 lightViewPosition;\n"
+					"float4 lightColor;\n"
+					"float4 ambientColor;\n"
+					"float4x4 textureMatrix0,textureMatrix1;\n"
 
-					"VOUT main(VIN vin){\n" \
-						"VOUT vout;\n" \
-						"vout.position=mul(modelViewProjectionMatrix,vin.position);\n" \
-						"float3 viewNormal=normalize(mul(normalMatrix,float4(vin.normal,0.0)));\n" \
-						"float lightIntensity=clamp(-dot(lightViewPosition,viewNormal),0,1);\n" \
-						"float4 localLightColor=lightIntensity*lightColor;\n" \
-						"vout.color=localLightColor*materialDiffuseColor + ambientColor*materialAmbientColor;\n" \
-						"vout.texCoord0=mul(textureMatrix0,float4(vin.texCoord,0.0,1.0));\n " \
-						"vout.texCoord1=mul(textureMatrix1,float4(vin.texCoord,0.0,1.0));\n " \
-						"return vout;\n" \
+					"VOUT main(VIN vin){\n"
+						"VOUT vout;\n"
+						"vout.position=mul(modelViewProjectionMatrix,vin.position);\n"
+						"float3 viewNormal=normalize(mul(normalMatrix,float4(vin.normal,0.0)));\n"
+						"float lightIntensity=clamp(-dot(lightViewPosition,viewNormal),0,1);\n"
+						"float4 localLightColor=lightIntensity*lightColor;\n"
+						"vout.color=localLightColor*materialDiffuseColor + ambientColor*materialAmbientColor;\n"
+						"vout.texCoord0=mul(textureMatrix0,float4(vin.texCoord,0.0,1.0));\n "
+						"vout.texCoord1=mul(textureMatrix1,float4(vin.texCoord,0.0,1.0));\n "
+						"return vout;\n"
 					"}"
 				};
 
 				String fragmentCodes[]={
-					"EMPTY",
+					(char*)NULL,
 
-					"struct PIN{\n" \
-						"float4 position: SV_POSITION;\n" \
-						"float4 color: COLOR;\n" \
-						"float2 texCoord0: TEXCOORD0;\n" \
-						"float2 texCoord1: TEXCOORD1;\n" \
-					"};\n" \
+					"struct PIN{\n"
+						"float4 position: SV_POSITION;\n"
+						"float4 color: COLOR;\n"
+						"float2 texCoord0: TEXCOORD0;\n"
+						"float2 texCoord1: TEXCOORD1;\n"
+					"};\n"
 
-					"Texture2D tex0,tex1;\n" \
-					"SamplerState samp0,samp1;\n" \
+					"Texture2D tex0,tex1;\n"
+					"SamplerState samp0,samp1;\n"
 
-					"float4 main(PIN pin): SV_TARGET{\n" \
-						"return pin.color*tex0.Sample(samp0,pin.texCoord0)*tex1.Sample(samp1,pin.texCoord1);\n" \
+					"float4 main(PIN pin): SV_TARGET{\n"
+						"return pin.color*tex0.Sample(samp0,pin.texCoord0)*tex1.Sample(samp1,pin.texCoord1);\n"
 					"}"
 				};
 
@@ -145,6 +125,26 @@ public:
 				shaderPass->getVariables()->addVariable("materialAmbientColor",RenderVariable::ptr(new MaterialAmbientVariable()),Material::Scope_MATERIAL);
 				shaderPass->getVariables()->addVariable("textureMatrix0",RenderVariable::ptr(new TextureMatrixVariable(0)),Material::Scope_MATERIAL);
 				shaderPass->getVariables()->addVariable("textureMatrix1",RenderVariable::ptr(new TextureMatrixVariable(1)),Material::Scope_MATERIAL);
+			}
+
+			RenderPath::ptr fixedPath=water->addPath();
+			RenderPass::ptr fixedPass=fixedPath->addPass();
+			{
+				fixedPass->setMaterialState(MaterialState(color));
+				fixedPass->setBlendState(BlendState::Combination_ALPHA);
+				fixedPass->setDepthState(DepthState(DepthState::DepthTest_LEQUAL,false));
+				fixedPass->setRasterizerState(RasterizerState(RasterizerState::CullType_NONE));
+
+				TextureState textureState;
+				textureState.calculation=TextureState::CalculationType_NORMAL;
+
+				fixedPass->setTexture(0,engine->getTextureManager()->createTexture(createNoise(512,512,16,6,0.5,0.5)));
+				Math::setMatrix4x4FromScale(textureState.matrix,16,16,16);
+				fixedPass->setTextureState(0,textureState);
+
+				fixedPass->setTexture(1,engine->getTextureManager()->createTexture(createNoise(512,512,16,5,0.5,0.5)));
+				Math::setMatrix4x4FromScale(textureState.matrix,16,16,16);
+				fixedPass->setTextureState(1,textureState);
 			}
 
 			water->setSort(Material::SortType_DEPTH);

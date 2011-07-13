@@ -53,19 +53,11 @@ bool GLSLShader::create(ShaderType shaderType,const String &profile,const String
 
 	bool result=createContext();
 
-	if(result && mDevice!=NULL){
-//		mDevice->shaderCreated(this);
-	}
-
 	return result;
 }
 
 void GLSLShader::destroy(){
 	destroyContext();
-
-	if(mDevice!=NULL){
-//		mDevice->shaderDestroyed(this);
-	}
 }
 
 bool GLSLShader::createContext(){

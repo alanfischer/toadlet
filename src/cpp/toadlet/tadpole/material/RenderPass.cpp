@@ -35,7 +35,13 @@ namespace tadpole{
 namespace material{
 
 RenderPass::RenderPass(MaterialManager *manager,RenderPass *source,bool clone):
+	mManager(NULL),
+	//mRenderState,
+	//mShaderState,
 	mOwnsStates(false)
+	//mTextures,
+	//mTextureNames,
+	//mVariables
 {
 	mManager=manager;
 	if(manager!=NULL && clone==false){

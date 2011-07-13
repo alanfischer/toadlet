@@ -53,12 +53,14 @@ public:
 
 	void destroy();
 
+	RenderPath::ptr addPath();
 	inline int getNumPaths() const{return mPaths.size();}
 	inline RenderPath::ptr getPath(int i) const{return mPaths[i];}
-	RenderPath::ptr addPath();
+	inline void setBestPath(RenderPath::ptr path){mBestPath=path;}
 	RenderPath::ptr getBestPath(){return mBestPath;}
 	RenderPass::ptr getPass(int path=-1,int pass=-1);
 
+	/// @todo: Move SortType to the RenderPath at least, so some paths may be sorted, and others not
 	inline void setSort(SortType sort){mSort=sort;}
 	inline SortType getSort() const{return mSort;}
 

@@ -74,6 +74,7 @@ void SceneRenderer::setupPass(RenderPass *pass){
 		mDevice->setShaderState(mLastShaderState);
 	}
 
+	mSceneParameters->setRenderPass(pass);
 	RenderState::ptr renderState=pass->getRenderState();
 	{
 		MaterialState materialState;

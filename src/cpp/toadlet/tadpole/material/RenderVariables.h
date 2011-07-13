@@ -164,6 +164,21 @@ protected:
 	int mIndex;
 };
 
+class TextureSetVariable:public RenderVariable{
+public:
+	TextureSetVariable(int index):mIndex(index){}
+
+	int getFormat(){return VariableBufferFormat::Format_TYPE_FLOAT_32|VariableBufferFormat::Format_COUNT_1;}
+
+	void update(tbyte *data,SceneParameters *parameters){
+		float textureSet=parameters->getRenderPass()->getTexture(mIndex)!=NULL?1.0:0.0;
+		memcpy(data,&textureSet,sizeof(float));
+	}
+
+protected:
+	int mIndex;
+};
+
 class ViewportVariable:public RenderVariable{
 public:
 	int getFormat(){return VariableBufferFormat::Format_TYPE_FLOAT_32|VariableBufferFormat::Format_COUNT_4;}
