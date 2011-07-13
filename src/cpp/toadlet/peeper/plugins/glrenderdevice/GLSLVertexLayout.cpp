@@ -46,6 +46,9 @@ bool GLSLVertexLayout::create(GLVertexFormat *vertexFormat,GLSLShaderState *shad
 	int i;
 	for(i=0;i<vertexFormat->getNumElements();++i){
 		int location=glGetAttribLocation(shaderState->mHandle,vertexFormat->getName(i));
+		if(location==-1){
+			location=glGetAttribLocation(shaderState->mHandle,vertexFormat->getName(i)+vertexFormat->getIndex(i));
+		}
 		Logger::excess(String("Semantic name:")+vertexFormat->getName(i)+" found location:"+location);
 		if(location==-1){
 			location=GLRenderDevice::getFixedAttribFromSemantic(vertexFormat->getSemantic(i),vertexFormat->getIndex(i));

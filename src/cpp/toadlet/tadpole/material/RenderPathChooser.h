@@ -23,62 +23,24 @@
  *
  ********** Copyright header - do not remove **********/
 
-#include <toadlet/tadpole/material/RenderPath.h>
+#ifndef TOADLET_TADPOLE_MATERIAL_RENDERPATHCHOOSER_H
+#define TOADLET_TADPOLE_MATERIAL_RENDERPATHCHOOSER_H
+
+#include <toadlet/tadpole/material/Material.h>
 
 namespace toadlet{
 namespace tadpole{
 namespace material{
 
-RenderPath::RenderPath(MaterialManager *manager,RenderPath *source,bool clone):
-	mManager(NULL)
-	//mPasses
-{
-	mManager=manager;
+class RenderPathChooser{
+public:
+	virtual ~RenderPathChooser(){}
 
-	if(source!=NULL){
-		int i;
-		for(i=0;i<source->getNumPasses();++i){
-			RenderPass::ptr pass(new RenderPass(manager,source->getPass(i),clone));
-			mPasses.add(pass);
-		}
-	}
-}
-
-RenderPath::~RenderPath(){
-	destroy();
-}
-
-void RenderPath::destroy(){
-	int i;
-	for(i=0;i<mPasses.size();++i){
-		mPasses[i]->destroy();
-	}
-	mPasses.clear();
-}
-
-RenderPass::ptr RenderPath::addPass(){
-	RenderPass::ptr pass(new RenderPass(mManager));
-	mPasses.add(pass);
-	return pass;
-}
-
-bool RenderPath::isDepthSorted() const{
-	int i;
-	for(i=0;i<mPasses.size();++i){
-		if(mPasses[i]->isDepthSorted()){
-			return true;
-		}
-	}
-	return false;
-}
-
-void RenderPath::shareStates(RenderPath *path){
-	int i;
-	for(i=0;i<mPasses.size() && i<path->getNumPasses();++i){
-		mPasses[i]->shareStates(path->getPass(i));
-	}
-}
+	virtual RenderPath::ptr chooseBestPath(Material *material)=0;
+};
 
 }
 }
 }
+
+#endif

@@ -37,7 +37,12 @@ namespace tadpole{
 
 MaterialManager::MaterialManager(Engine *engine,bool backable):ResourceManager(engine->getArchiveManager()),
 	mEngine(NULL),
-	mBackable(false)
+	mBackable(false),
+
+	//mRenderStates,
+	//mShaderStates,
+
+	mRenderPathChooser(NULL)
 {
 	mEngine=engine;
 	mBackable=backable;
@@ -73,18 +78,6 @@ Material::ptr MaterialManager::cloneMaterial(Material::ptr source){
 Material::ptr MaterialManager::createDiffuseMaterial(Texture::ptr texture){
 	Material::ptr material(new Material(this));
 
-	RenderPath::ptr fixedPath=material->addPath();
-	RenderPass::ptr fixedPass=fixedPath->addPass();
-	{
-		fixedPass->setBlendState(BlendState());
-		fixedPass->setDepthState(DepthState());
-		fixedPass->setRasterizerState(RasterizerState());
-		fixedPass->setMaterialState(MaterialState(true,false,MaterialState::ShadeType_GOURAUD));
-
-		fixedPass->setSamplerState(0,mDefaultSamplerState);
-		fixedPass->setTexture(0,texture);
-	}
-
 	RenderPath::ptr shaderPath=material->addPath();
 	RenderPass::ptr shaderPass=shaderPath->addPass();
 	{
@@ -104,9 +97,22 @@ Material::ptr MaterialManager::createDiffuseMaterial(Texture::ptr texture){
 		shaderPass->getVariables()->addVariable("materialDiffuseColor",RenderVariable::ptr(new MaterialDiffuseVariable()),Material::Scope_MATERIAL);
 		shaderPass->getVariables()->addVariable("materialAmbientColor",RenderVariable::ptr(new MaterialAmbientVariable()),Material::Scope_MATERIAL);
 		shaderPass->getVariables()->addVariable("textureMatrix",RenderVariable::ptr(new TextureMatrixVariable(0)),Material::Scope_MATERIAL);
+		shaderPass->getVariables()->addVariable("textureSet",RenderVariable::ptr(new TextureSetVariable(0)),Material::Scope_MATERIAL);
 
 		shaderPass->setSamplerState(0,mDefaultSamplerState);
 		shaderPass->setTexture(0,texture);
+	}
+
+	RenderPath::ptr fixedPath=material->addPath();
+	RenderPass::ptr fixedPass=fixedPath->addPass();
+	{
+		fixedPass->setBlendState(BlendState());
+		fixedPass->setDepthState(DepthState());
+		fixedPass->setRasterizerState(RasterizerState());
+		fixedPass->setMaterialState(MaterialState(true,false,MaterialState::ShadeType_GOURAUD));
+
+		fixedPass->setSamplerState(0,mDefaultSamplerState);
+		fixedPass->setTexture(0,texture);
 	}
 
 	manage(material);
@@ -119,19 +125,20 @@ Material::ptr MaterialManager::createDiffuseMaterial(Texture::ptr texture){
 Material::ptr MaterialManager::createDiffusePointSpriteMaterial(Texture::ptr texture,scalar size,bool attenuated){
 	Material::ptr material=createDiffuseMaterial(texture);
 
-	RenderPath::ptr fixedPath=material->getPath(0);
-	RenderPass::ptr fixedPass=fixedPath->getPass(0);
-	{
-		fixedPass->setPointState(PointState(true,size,attenuated));
-	}
-
-	RenderPath::ptr shaderPath=material->getPath(1);
+	RenderPath::ptr shaderPath=material->getPath(0);
 	RenderPass::ptr shaderPass=shaderPath->getPass(0);
 	{
 		shaderPass->setShader(Shader::ShaderType_GEOMETRY,mFixedGeometryShader);
 		shaderPass->getVariables()->addVariable("pointSize",RenderVariable::ptr(new PointSizeVariable()),Material::Scope_MATERIAL);
 		shaderPass->getVariables()->addVariable("pointAttenuated",RenderVariable::ptr(new PointAttenuatedVariable()),Material::Scope_MATERIAL);
 		shaderPass->getVariables()->addVariable("viewport",RenderVariable::ptr(new ViewportVariable()),Material::Scope_MATERIAL);
+	}
+
+
+	RenderPath::ptr fixedPath=material->getPath(1);
+	RenderPass::ptr fixedPass=fixedPath->getPass(0);
+	{
+		fixedPass->setPointState(PointState(true,size,attenuated));
 	}
 
 	manage(material);
@@ -267,6 +274,11 @@ void MaterialManager::modifyShaderState(ShaderState::ptr dst,ShaderState::ptr sr
 	}
 }
 
+void MaterialManager::setRenderPathChooser(RenderPathChooser *chooser){
+	mRenderPathChooser=chooser;
+	/// @todo: Recompile all materials
+}
+
 void MaterialManager::contextActivate(RenderDevice *renderDevice){
 	String fixedProfiles[]={
 		"glsl",
@@ -274,207 +286,187 @@ void MaterialManager::contextActivate(RenderDevice *renderDevice){
 	};
 
 	String fixedVertexCode[]={
-/*
-		"#version 150\n" \
-		"in vec4 POSITION\n;" \
-		"in vec3 NORMAL\n;" \
-		"in vec2 TEXCOORD0\n;" \
-		"out vec4 color\n;" \
-		"out vec2 texCoord\n;" \
-
-		"uniform mat4 modelViewProjectionMatrix;\n" \
-		"uniform mat4 normalMatrix;\n" \
-		"uniform vec4 materialDiffuseColor;\n" \
-		"uniform vec4 materialAmbientColor;\n" \
-		"uniform vec4 lightViewPosition;\n" \
-		"uniform vec4 lightColor;\n" \
-		"uniform vec4 ambientColor;\n" \
-		"uniform float materialLighting;\n" \
-		"uniform mat4 textureMatrix;\n" \
-
-		"void main(){\n" \
-			"gl_Position=modelViewProjectionMatrix * POSITION;\n" \
-			"vec3 viewNormal=normalize(normalMatrix * vec4(NORMAL,0.0)).xyz;\n" \
-			"float lightIntensity=clamp(-dot(lightViewPosition.xyz,viewNormal),0,1);\n" \
-			"vec4 localLightColor=lightIntensity*lightColor*materialLighting;\n" \
-			"color=localLightColor*materialDiffuseColor + ambientColor*materialAmbientColor;\n" \
-			"texCoord=(textureMatrix * vec4(TEXCOORD0,0.0,1.0)).xy;\n "
-		"}",
-*/
 		"attribute vec4 POSITION;"
 		"attribute vec3 NORMAL;"
 		"attribute vec2 TEXCOORD0;"
-		"varying vec4 color\n;" \
-		"varying vec2 texCoord\n;" \
+		"varying vec4 color\n;"
+		"varying vec2 texCoord\n;"
 
-		"uniform mat4 modelViewProjectionMatrix;\n" \
-		"uniform mat4 normalMatrix;\n" \
-		"uniform vec4 materialDiffuseColor;\n" \
-		"uniform vec4 materialAmbientColor;\n" \
-		"uniform vec4 lightViewPosition;\n" \
-		"uniform vec4 lightColor;\n" \
-		"uniform vec4 ambientColor;\n" \
-		"uniform float materialLighting;\n" \
-		"uniform mat4 textureMatrix;\n" \
+		"uniform mat4 modelViewProjectionMatrix;\n"
+		"uniform mat4 normalMatrix;\n"
+		"uniform vec4 materialDiffuseColor;\n"
+		"uniform vec4 materialAmbientColor;\n"
+		"uniform vec4 lightViewPosition;\n"
+		"uniform vec4 lightColor;\n"
+		"uniform vec4 ambientColor;\n"
+		"uniform float materialLighting;\n"
+		"uniform mat4 textureMatrix;\n"
 
-		"void main(){\n" \
-			"gl_Position=modelViewProjectionMatrix * POSITION;\n" \
-			"vec3 viewNormal=normalize(normalMatrix * vec4(NORMAL,0.0)).xyz;\n" \
-			"float lightIntensity=-dot(lightViewPosition.xyz,viewNormal);\n" \
-			"vec4 localLightColor=lightIntensity*lightColor*materialLighting;\n" \
-			"color=localLightColor*materialDiffuseColor + ambientColor*materialAmbientColor;\n" \
+		"void main(){\n"
+			"gl_Position=modelViewProjectionMatrix * POSITION;\n"
+			"vec3 viewNormal=normalize(normalMatrix * vec4(NORMAL,0.0)).xyz;\n"
+			"float lightIntensity=-dot(lightViewPosition.xyz,viewNormal);\n"
+			"vec4 localLightColor=lightIntensity*lightColor*materialLighting;\n"
+			"color=localLightColor*materialDiffuseColor + ambientColor*materialAmbientColor;\n"
 			"texCoord=(textureMatrix * vec4(TEXCOORD0,0.0,1.0)).xy;\n "
 		"}",
 
 
 
-		"struct VIN{\n" \
-			"float4 position : POSITION;\n" \
-			"float3 normal : NORMAL;\n" \
-			"float2 texCoord: TEXCOORD0;\n" \
-		"};\n" \
-		"struct VOUT{\n" \
-			"float4 position : SV_POSITION;\n" \
-			"float4 color : COLOR;\n" \
-			"float2 texCoord: TEXCOORD0;\n" \
-		"};\n" \
+		"struct VIN{\n"
+			"float4 position : POSITION;\n"
+			"float3 normal : NORMAL;\n"
+			"float2 texCoord: TEXCOORD0;\n"
+		"};\n"
+		"struct VOUT{\n"
+			"float4 position : SV_POSITION;\n"
+			"float4 color : COLOR;\n"
+			"float2 texCoord: TEXCOORD0;\n"
+		"};\n"
 
-		"float4x4 modelViewProjectionMatrix;\n" \
-		"float4x4 normalMatrix;\n" \
-		"float4 materialDiffuseColor;\n" \
-		"float4 materialAmbientColor;\n" \
-		"float4 lightViewPosition;\n" \
-		"float4 lightColor;\n" \
-		"float4 ambientColor;\n" \
-		"float materialLighting;\n" \
-		"float4x4 textureMatrix;\n" \
+		"float4x4 modelViewProjectionMatrix;\n"
+		"float4x4 normalMatrix;\n"
+		"float4 materialDiffuseColor;\n"
+		"float4 materialAmbientColor;\n"
+		"float4 lightViewPosition;\n"
+		"float4 lightColor;\n"
+		"float4 ambientColor;\n"
+		"float materialLighting;\n"
+		"float4x4 textureMatrix;\n"
 
-		"VOUT main(VIN vin){\n" \
-			"VOUT vout;\n" \
-			"vout.position=mul(modelViewProjectionMatrix,vin.position);\n" \
-			"float3 viewNormal=normalize(mul(normalMatrix,float4(vin.normal,0.0)));\n" \
-			"float lightIntensity=clamp(-dot(lightViewPosition,viewNormal),0,1);\n" \
-			"float4 localLightColor=lightIntensity*lightColor*materialLighting;\n" \
-			"vout.color=localLightColor*materialDiffuseColor + ambientColor*materialAmbientColor;\n" \
+		"VOUT main(VIN vin){\n"
+			"VOUT vout;\n"
+			"vout.position=mul(modelViewProjectionMatrix,vin.position);\n"
+			"float3 viewNormal=normalize(mul(normalMatrix,float4(vin.normal,0.0)));\n"
+			"float lightIntensity=-dot(lightViewPosition,viewNormal);\n"
+			"float4 localLightColor=lightIntensity*lightColor*materialLighting;\n"
+			"vout.color=localLightColor*materialDiffuseColor + ambientColor*materialAmbientColor;\n"
 			"vout.texCoord=mul(textureMatrix,float4(vin.texCoord,0.0,1.0));\n "
-			"return vout;\n" \
+			"return vout;\n"
 		"}"
 	};
 
 	String fixedFragmentCode[]={
-/*
-		"in vec4 color;\n" \
-		"in vec2 texCoord;\n" \
-
-		"sampler2D tex;\n" \
-
-		"void main(){\n" \
-			"gl_FragColor = color*texture2D(tex,texCoord);\n" \
-		"}",
-*/
 		"varying vec4 color;"
 		"varying vec2 texCoord;"
 		
 		"uniform sampler2D tex;\n"
+		"uniform float textureSet;\n"
 		
-		"void main(){\n" \
-			"gl_FragColor = color;//*texture2D(tex,texCoord);\n" \
+		"void main(){\n"
+			"gl_FragColor = color*(texture2D(tex,texCoord)+(1.0-textureSet));\n"
 		"}",
 
 
 
-		"struct PIN{\n" \
-			"float4 position: SV_POSITION;\n" \
-			"float4 color: COLOR;\n" \
-			"float2 texCoord: TEXCOORD0;\n" \
-		"};\n" \
+		"struct PIN{\n"
+			"float4 position: SV_POSITION;\n"
+			"float4 color: COLOR;\n"
+			"float2 texCoord: TEXCOORD0;\n"
+		"};\n"
 
-		"Texture2D tex;\n" \
-		"SamplerState samp;\n" \
+		"float textureSet;\n"
+		"Texture2D tex;\n"
+		"SamplerState samp;\n"
 
-		"float4 main(PIN pin): SV_TARGET{\n" \
-			"return pin.color*tex.Sample(samp,pin.texCoord);\n" \
+		"float4 main(PIN pin): SV_TARGET{\n"
+			"return pin.color*(tex.Sample(samp,pin.texCoord)+(1.0-textureSet));\n"
 		"}"
 	};
 
 	String fixedGeometryCode[]={
 /*
-		"#version 150\n" \
-		"layout(points) in;\n" \
-		"layout(triangle_strip,max_vertices=4) out;\n" \
-		"uniform float pointSize;\n" \
-		"uniform float pointAttenuation;\n" \
-		"uniform vec4 viewport;\n" \
+		"#version 150\n"
+		"layout(points) in;\n"
+		"layout(triangle_strip,max_vertices=4) out;\n"
+		"uniform float pointSize;\n"
+		"uniform float pointAttenuation;\n"
+		"uniform vec4 viewport;\n"
 
-		"in vec4 color[];\n" \
-		"out vec4 kolor;\n" \
-		"out vec2 texCoord;\n" \
+		"//in vec4 color[1];\n"
+		"//out vec4 color;\n"
+		"//out vec2 texCoord;\n"
 
 		"void main(){\n "
-			"float aspect=viewport.w/viewport.z;\n" \
-			"float w=aspect*pointSize*2.0,h=pointSize*2.0;\n" \
-			"vec3 positions[4]=vec3[](\n" \
-				"vec3(-w,-h,0.0),\n" \
-				"vec3(w,-h,0.0),\n" \
-				"vec3(-w,h,0.0),\n" \
-				"vec3(w,h,0.0)\n" \
-			");\n" \
-			"vec2 texCoords[4]=vec2[](\n" \
-				"vec2(0.0,0.0),\n" \
-				"vec2(1.0,0.0),\n" \
-				"vec2(0.0,1.0),\n" \
-				"vec2(1.0,1.0)\n" \
-			");\n" \
-			"for(int i=0;i<4;i++){\n" \
-				"gl_Position=gl_in[0].gl_Position+vec4(positions[i],0.0);\n" \
-				"kolor=color[i];\n" \
-				"texCoord=texCoords[i];\n" \
-				"EmitVertex();\n" \
-			"}\n" \
-			"EndPrimitive();\n" \
+			"float aspect=viewport.w/viewport.z;\n"
+			"float w=aspect*pointSize*2.0,h=pointSize*2.0;\n"
+			"vec3 positions[4]=vec3[](\n"
+				"vec3(-w,-h,0.0),\n"
+				"vec3(w,-h,0.0),\n"
+				"vec3(-w,h,0.0),\n"
+				"vec3(w,h,0.0)\n"
+			");\n"
+			"vec2 texCoords[4]=vec2[](\n"
+				"vec2(0.0,0.0),\n"
+				"vec2(1.0,0.0),\n"
+				"vec2(0.0,1.0),\n"
+				"vec2(1.0,1.0)\n"
+			");\n"
+
+			"gl_Position=gl_in[0].gl_Position+vec4(positions[0],0.0);\n"
+			"gl_Color=gl_in[0].gl_Color[0];\n"
+			"texCoord=texCoords[0];\n"
+			"EmitVertex();\n"
+
+			"gl_Position=gl_in[0].gl_Position+vec4(positions[1],0.0);\n"
+			"color=color[0];\n"
+			"texCoord=texCoords[1];\n"
+			"EmitVertex();\n"
+
+			"gl_Position=gl_in[0].gl_Position+vec4(positions[2],0.0);\n"
+			"color=color[0];\n"
+			"texCoord=texCoords[2];\n"
+			"EmitVertex();\n"
+
+			"gl_Position=gl_in[0].gl_Position+vec4(positions[3],0.0);\n"
+			"color=color[0];\n"
+			"texCoord=texCoords[3];\n"
+			"EmitVertex();\n"
+
+			"EndPrimitive();\n"
 		"}\n",
 */
 		(char*)NULL,
 
-		"struct GIN{\n" \
-			"float4 position: SV_POSITION;\n" \
-			"float4 color : COLOR;\n" \
-			"float2 texCoord: TEXCOORD0;\n" \
-		"};\n" \
-		"struct GOUT{\n" \
-			"float4 position: SV_POSITION;\n" \
-			"float4 color : COLOR;\n" \
-			"float2 texCoord: TEXCOORD0;\n" \
-		"};\n" \
+		"struct GIN{\n"
+			"float4 position: SV_POSITION;\n"
+			"float4 color : COLOR;\n"
+			"float2 texCoord: TEXCOORD0;\n"
+		"};\n"
+		"struct GOUT{\n"
+			"float4 position: SV_POSITION;\n"
+			"float4 color : COLOR;\n"
+			"float2 texCoord: TEXCOORD0;\n"
+		"};\n"
 
-		"float pointSize;\n" \
-		"float pointAttenuation;\n" \
-		"float4 viewport;\n" \
+		"float pointSize;\n"
+		"float pointAttenuation;\n"
+		"float4 viewport;\n"
 
-		"[maxvertexcount(4)]\n" \
-		"void main(point GIN gin[1],inout TriangleStream<GOUT> stream){\n" \
-			"float aspect=viewport.w/viewport.z;\n" \
-			"float w=aspect*pointSize*2.0,h=pointSize*2.0;\n" \
-			"const float3 positions[4]={\n" \
-				"float3(-w,-h,0.0),\n" \
-				"float3(w,-h,0.0),\n" \
-				"float3(-w,h,0.0),\n" \
-				"float3(w,h,0.0),\n" \
-			"};\n" \
-			"const float2 texCoords[4]={\n" \
-				"float2(0.0,0.0),\n" \
-				"float2(1.0,0.0),\n" \
-				"float2(0.0,1.0),\n" \
-				"float2(1.0,1.0),\n" \
-			"};\n" \
-			"GOUT gout;\n" \
-			"for(int i=0;i<4;i++){\n" \
-				"gout.position=gin[0].position+float4(positions[i],0.0);\n" \
-				"gout.color=gin[0].color;\n" \
-				"gout.texCoord=texCoords[i];\n" \
-				"stream.Append(gout);\n" \
-			"}\n" \
-			"stream.RestartStrip();\n" \
+		"[maxvertexcount(4)]\n"
+		"void main(point GIN gin[1],inout TriangleStream<GOUT> stream){\n"
+			"float aspect=viewport.w/viewport.z;\n"
+			"float w=aspect*pointSize*2.0,h=pointSize*2.0;\n"
+			"const float3 positions[4]={\n"
+				"float3(-w,-h,0.0),\n"
+				"float3(w,-h,0.0),\n"
+				"float3(-w,h,0.0),\n"
+				"float3(w,h,0.0),\n"
+			"};\n"
+			"const float2 texCoords[4]={\n"
+				"float2(0.0,0.0),\n"
+				"float2(1.0,0.0),\n"
+				"float2(0.0,1.0),\n"
+				"float2(1.0,1.0),\n"
+			"};\n"
+			"GOUT gout;\n"
+			"for(int i=0;i<4;i++){\n"
+				"gout.position=gin[0].position+float4(positions[i],0.0);\n"
+				"gout.color=gin[0].color;\n"
+				"gout.texCoord=texCoords[i];\n"
+				"stream.Append(gout);\n"
+			"}\n"
+			"stream.RestartStrip();\n"
 		"}"
 	};
 
@@ -527,6 +519,60 @@ Resource::ptr MaterialManager::unableToFindHandler(const String &name,const Reso
 	else{
 		return ResourceManager::unableToFindHandler(name,handlerData);
 	}
+}
+
+bool MaterialManager::isPathUseable(RenderPath *path,const RenderCaps &caps){
+	int i;
+	for(i=0;i<path->getNumPasses();++i){
+		RenderPass *pass=path->getPass(i);
+		ShaderState *state=pass->getShaderState();
+
+		/// @todo: Use a new RenderCaps interface to check all types of shader programs
+		if(state!=NULL && state->getShader(Shader::ShaderType_VERTEX)!=NULL){
+			if(caps.vertexShaders==false){
+				break;
+			}
+		}
+		else{
+			if(caps.vertexFixedFunction==false){
+				break;
+			}
+		}
+
+		if(state!=NULL && state->getShader(Shader::ShaderType_FRAGMENT)!=NULL){
+			if(caps.fragmentShaders==false){
+				break;
+			}
+		}
+		else{
+			if(caps.fragmentFixedFunction==false){
+				break;
+			}
+		}
+	}
+
+	return i==path->getNumPasses();
+}
+
+bool MaterialManager::compileMaterial(Material *material){
+	RenderPath::ptr bestPath;
+
+	if(mRenderPathChooser!=NULL){
+		bestPath=mRenderPathChooser->chooseBestPath(material);
+	}
+	else{
+		int i;
+		for(i=0;i<material->getNumPaths();++i){
+			RenderPath::ptr path=material->getPath(i);
+			if(isPathUseable(path,mEngine->getRenderCaps())){
+				bestPath=path;
+				break;
+			}
+		}
+	}
+
+	material->setBestPath(bestPath);
+	return bestPath!=NULL;
 }
 
 BufferManager *MaterialManager::getBufferManager(){

@@ -28,6 +28,7 @@
 
 #include <toadlet/tadpole/ResourceManager.h>
 #include <toadlet/tadpole/material/Material.h>
+#include <toadlet/tadpole/material/RenderPathChooser.h>
 
 namespace toadlet{
 namespace tadpole{
@@ -55,6 +56,12 @@ public:
 	void modifyRenderState(RenderState::ptr dst,RenderState::ptr src);
 	void modifyShaderState(ShaderState::ptr dst,ShaderState::ptr src);
 
+	void setRenderPathChooser(RenderPathChooser *chooser);
+	inline RenderPathChooser *getRenderPathChooser() const{return mRenderPathChooser;}
+
+	void setDefaultSamplerState(const SamplerState &samplerState){mDefaultSamplerState.set(samplerState);}
+	inline const SamplerState &getDefaultSamplerState() const{return mDefaultSamplerState;}
+
 	void contextActivate(RenderDevice *renderDevice);
 	void contextDeactivate(RenderDevice *renderDevice);
 
@@ -63,8 +70,8 @@ public:
 
 	Resource::ptr unableToFindHandler(const String &name,const ResourceHandlerData *handlerData);
 
-	void setDefaultSamplerState(const SamplerState &samplerState){mDefaultSamplerState.set(samplerState);}
-	const SamplerState &getDefaultSamplerState(){return mDefaultSamplerState;}
+	bool isPathUseable(RenderPath *path,const RenderCaps &caps);
+	bool compileMaterial(Material *material);
 
 	inline Engine *getEngine(){return mEngine;}
 	BufferManager *getBufferManager();
@@ -76,6 +83,7 @@ protected:
 	Collection<RenderState::ptr> mRenderStates;
 	Collection<ShaderState::ptr> mShaderStates;
 
+	RenderPathChooser *mRenderPathChooser;
 	SamplerState mDefaultSamplerState;
 	Shader::ptr mFixedVertexShader,mFixedFragmentShader,mFixedGeometryShader;
 };

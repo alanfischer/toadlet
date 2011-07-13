@@ -126,49 +126,8 @@ void Material::shareStates(Material *material){
 	}
 }
 
-/// @todo: Change the RenderCaps into an interface where we can query for the items, would let us move the TextureSupport and ProfileSupport into it
 bool Material::compile(){
-	RenderDevice *device=mManager->getEngine()->getRenderDevice();
-	RenderCaps caps;
-	device->getRenderCaps(caps);
-	int i,j;
-	for(i=0;i<getNumPaths();++i){
-		RenderPath::ptr path=getPath(i);
-		for(j=0;j<path->getNumPasses();++j){
-			RenderPass *pass=path->getPass(j);
-			ShaderState *state=pass->getShaderState();
-
-			/// @todo: Use a new RenderCaps interface to check all types of shader programs
-			if(state->getShader(Shader::ShaderType_VERTEX)!=NULL){
-				if(caps.vertexShaders==false){
-					break;
-				}
-			}
-			else{
-				if(caps.vertexFixedFunction==false){
-					break;
-				}
-			}
-
-			if(state->getShader(Shader::ShaderType_FRAGMENT)!=NULL){
-				if(caps.fragmentShaders==false){
-					break;
-				}
-			}
-			else{
-				if(caps.fragmentFixedFunction==false){
-					break;
-				}
-			}
-		}
-		if(j==path->getNumPasses()){
-			mBestPath=path;
-			return true;
-		}
-	}
-
-	mBestPath=NULL;
-	return false;
+	return mManager->compileMaterial(this);
 }
 
 }

@@ -39,6 +39,8 @@ namespace node{class CameraNode;}
 
 namespace material{
 
+class RenderPass;
+
 class SceneParameters{
 public:
 	TOADLET_SHARED_POINTERS(SceneParameters);
@@ -63,6 +65,9 @@ public:
 	inline void setRenderable(Renderable *renderable){mRenderable=renderable;}
 	inline Renderable *getRenderable() const{return mRenderable;}
 
+	inline void setRenderPass(RenderPass *renderPass){mRenderPass=renderPass;}
+	inline RenderPass *getRenderPass() const{return mRenderPass;}
+
 	inline void setMaterialState(const MaterialState &state){mMaterialState.set(state);}
 	inline const MaterialState &getMaterialState() const{return mMaterialState;}
 
@@ -83,6 +88,7 @@ protected:
 	CameraNode *mCamera;
 	Viewport mViewport;
 	Renderable *mRenderable;
+	RenderPass *mRenderPass;
 	MaterialState mMaterialState;
 	Collection<TextureState> mTextureState;
 	PointState mPointState;
