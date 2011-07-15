@@ -19,6 +19,11 @@ set (FLICK_HEADERS
 )
 
 
+# Give the headers and namespaces parent scope for inclusion into the master flick.h file
+set (FLICK_HEADERS ${FLICK_HEADERS} PARENT_SCOPE)
+set (FLICK_NAMESPACES ${FLICK_NAMESPACES} PARENT_SCOPE)
+
+
 # Dynamic library
 if (NOT TOADLET_PLATFORM_IPHONE)
 	add_library (toadlet_flick SHARED ${FLICK_SRC} ${FLICK_HEADERS})

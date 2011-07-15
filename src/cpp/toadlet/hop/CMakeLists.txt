@@ -27,6 +27,11 @@ set (HOP_HEADERS
 )
 
 
+# Give the headers and namespaces parent scope for inclusion into the master hop.h file
+set (HOP_HEADERS ${HOP_HEADERS} PARENT_SCOPE)
+set (HOP_NAMESPACES ${HOP_NAMESPACES} PARENT_SCOPE)
+
+
 # Dynamic library
 if (NOT TOADLET_PLATFORM_IPHONE)
 	add_library (toadlet_hop SHARED ${HOP_SRC} ${HOP_HEADERS})
