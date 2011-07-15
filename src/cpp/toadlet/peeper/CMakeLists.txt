@@ -66,6 +66,11 @@ set (PEEPER_HEADERS
 )
 
 
+# Give the headers and namespaces parent scope for inclusion into the master peeper.h file
+set (PEEPER_HEADERS ${PEEPER_HEADERS} PARENT_SCOPE)
+set (PEEPER_NAMESPACES ${PEEPER_NAMESPACES} PARENT_SCOPE)
+
+
 # Dynamic library
 if (NOT TOADLET_PLATFORM_IPHONE)
 	add_library (toadlet_peeper SHARED ${PEEPER_SRC} ${PEEPER_HEADERS})

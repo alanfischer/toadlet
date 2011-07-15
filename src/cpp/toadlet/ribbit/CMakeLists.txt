@@ -47,11 +47,16 @@ set (RIBBIT_DECODER_SIDDECODER_HEADERS
 )
 
 
+# Bundle source and header files
 source_group ("Source Files\\\\decoder" FILES ${RIBBIT_DECODER_WAVEDECODER_SRC})
 source_group ("Header Files\\\\decoder" FILES ${RIBBIT_DECODER_WAVEDECODER_HEADERS})
 
+
+# Sources, headers and namespaces
 set (RIBBIT_SRC ${RIBBIT_SRC} ${RIBBIT_DECODER_WAVEDECODER_SRC})
 set (RIBBIT_HEADERS ${RIBBIT_HEADERS} ${RIBBIT_DECODER_WAVEDECODER_HEADERS})
+set (RIBBIT_NAMESPACES ${RIBBIT_NAMESPACES} decoder)
+
 
 find_package (OggVorbis)
 if (OGGVORBIS_FOUND)
@@ -124,6 +129,12 @@ if (SIDPLAY_FOUND)
 		set (RIBBIT_DEFS_S ${RIBBIT_DEFS_S} TOADLET_LIBRESID_NAME="${RESID_LIBRARY}")
 	endif (${SIDPLAY_VERSION} EQUAL 2)
 endif (SIDPLAY_FOUND)
+
+
+# Give the headers and namespaces parent scope for inclusion into the master ribbit.h file
+set (RIBBIT_HEADERS ${RIBBIT_HEADERS} PARENT_SCOPE)
+set (RIBBIT_NAMESPACES ${RIBBIT_NAMESPACES} PARENT_SCOPE)
+
 
 # Dynamic library
 if (NOT TOADLET_PLATFORM_IPHONE)

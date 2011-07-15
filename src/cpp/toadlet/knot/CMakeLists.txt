@@ -39,6 +39,10 @@ set (KNOT_HEADERS
 )
 
 
+# Give the headers parent scope for inclusion into the master knot.h file
+set (KNOT_HEADERS ${KNOT_HEADERS} PARENT_SCOPE)
+
+
 # Dynamic library
 if (NOT TOADLET_PLATFORM_IPHONE)
 	add_library (toadlet_knot SHARED ${KNOT_SRC} ${KNOT_HEADERS})

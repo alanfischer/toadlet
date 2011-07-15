@@ -61,7 +61,7 @@ elseif (TOADLET_PLATFORM_POSIX)
 endif (TOADLET_PLATFORM_WIN32)
 
 
-# Dependcies for toadlet_pad
+# Dependencies for toadlet_pad
 if (TOADLET_PLATFORM_WINCE)
 	if (TOADLET_HAS_D3DM)
 		set (PAD_LIBS ${PAD_LIBS} toadlet_peeper_d3dmrenderdevice)
@@ -123,6 +123,11 @@ elseif (TOADLET_PLATFORM_POSIX)
 		message ("The libXxf86vm was not found, so pad will not be built.")
 	endif (X11_xf86vmode_FOUND)
 endif (TOADLET_PLATFORM_WINCE)
+
+
+# Give the headers and namespaces parent scope for inclusion into the master pad.h file
+set (PAD_HEADERS ${PAD_HEADERS} PARENT_SCOPE)
+set (PAD_NAMESPACES ${PAD_NAMESPACES} PARENT_SCOPE)
 
 
 # Dynamic Library

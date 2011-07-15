@@ -253,22 +253,35 @@ set (EGG_PLATFORM_WIN32_HEADERS
 # Bundle source
 source_group ("Source Files\\\\image" FILES ${EGG_IMAGE_SRC})
 source_group ("Source Files\\\\io" FILES ${EGG_IO_SRC})
-source_group ("Source Files\\\\math" FILES ${EGG_MATH_SRC})
-source_group ("Source Files\\\\mathfixed" FILES ${EGG_MATHFIXED_SRC})
 source_group ("Source Files\\\\net" FILES ${EGG_NET_SRC})
 
 
 # Bundle headers
 source_group ("Header Files\\\\image" FILES ${EGG_IMAGE_HEADERS})
 source_group ("Header Files\\\\io" FILES ${EGG_IO_HEADERS})
-source_group ("Header Files\\\\math" FILES ${EGG_MATH_HEADERS})
-source_group ("Header Files\\\\mathfixed" FILES ${EGG_MATHFIXED_HEADERS})
 source_group ("Header Files\\\\net" FILES ${EGG_NET_HEADERS})
 
 
-# Sources and headers
-set (EGG_SRC ${EGG_SRC} ${EGG_IMAGE_SRC} ${EGG_IO_SRC} ${EGG_MATH_SRC} ${EGG_MATHFIXED_SRC} ${EGG_NET_SRC})
-set (EGG_HEADERS ${EGG_HEADERS} ${EGG_IMAGE_HEADERS} ${EGG_IO_HEADERS} ${EGG_MATH_HEADERS} ${EGG_MATHFIXED_HEADERS} ${EGG_NET_HEADERS})
+# Sources, headers and namespaces
+set (EGG_SRC ${EGG_SRC} ${EGG_IMAGE_SRC} ${EGG_IO_SRC} ${EGG_NET_SRC})
+set (EGG_HEADERS ${EGG_HEADERS} ${EGG_IMAGE_HEADERS} ${EGG_IO_HEADERS} ${EGG_NET_HEADERS})
+set (EGG_NAMESPACES ${EGG_NAMESPACES} image io net)
+
+
+# Choose between fixed and floating point math
+if (TOADLET_FIXED_POINT)
+	set (EGG_SRC ${EGG_SRC} ${EGG_MATHFIXED_SRC})
+	set (EGG_HEADERS ${EGG_HEADERS} ${EGG_MATHFIXED_HEADERS})
+	set (EGG_NAMESPACES ${EGG_NAMESPACES} mathfixed)
+	source_group ("Source Files\\\\mathfixed" FILES ${EGG_MATH_SRC})
+	source_group ("Header Files\\\\mathfixed" FILES ${EGG_MATH_HEADERS})
+else (TOADLET_FIXED_POINT)
+	set (EGG_SRC ${EGG_SRC} ${EGG_MATH_SRC})
+	set (EGG_HEADERS ${EGG_HEADERS} ${EGG_MATH_HEADERS})
+	set (EGG_NAMESPACES ${EGG_NAMESPACES} math)
+	source_group ("Source Files\\\\math" FILES ${EGG_MATH_SRC})
+	source_group ("Header Files\\\\math" FILES ${EGG_MATH_HEADERS})
+endif (TOADLET_FIXED_POINT)
 
 
 # Platform specific files
@@ -430,6 +443,11 @@ if (ZZIP_FOUND)
 	set (EGG_DEFS_S ${EGG_DEFS_S} TOADLET_ZZIPLIB_NAME="${ZZIP_LIBRARY}")
 	set (EGG_LIBS_S ${EGG_LIBS_S} zziplib_s)
 endif (ZZIP_FOUND)
+
+
+# Give the headers and namespaces parent scope for inclusion into the master egg.h file
+set (EGG_HEADERS ${EGG_HEADERS} PARENT_SCOPE)
+set (EGG_NAMESPACES ${EGG_NAMESPACES} PARENT_SCOPE)
 
 
 #  Dynamic library
