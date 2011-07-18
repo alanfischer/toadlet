@@ -202,6 +202,20 @@ protected:
 	scalar mTime;
 };
 
+class ConstantVariable:public RenderVariable{
+public:
+	ConstantVariable(const Vector4 &constant){mConstant=constant;}
+
+	int getFormat(){return VariableBufferFormat::Format_TYPE_FLOAT_32|VariableBufferFormat::Format_COUNT_4;}
+
+	void update(tbyte *data,SceneParameters *parameters){
+		memcpy(data,&mConstant,sizeof(Vector4));
+	}
+
+protected:
+	Vector4 mConstant;;
+};
+
 }
 }
 }

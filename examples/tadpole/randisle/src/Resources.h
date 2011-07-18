@@ -218,9 +218,9 @@ public:
 		
 		hudCompass=engine->getMaterialManager()->findMaterial("compass.png");
 		if(hudCompass!=NULL){
-//			hudCompass->getPass()->setMaterialState(MaterialState(false));
-//			hudCompass->getPass()->setDepthState(DepthState(DepthState::DepthTest_NEVER,false));
-//			hudCompass->getPass()->setBlendState(BlendState(BlendState::Operation_ZERO,BlendState::Operation_SOURCE_COLOR));
+			hudCompass->getPass()->setMaterialState(MaterialState(false));
+			hudCompass->getPass()->setDepthState(DepthState(DepthState::DepthTest_NEVER,false));
+			hudCompass->getPass()->setBlendState(BlendState(BlendState::Operation_ZERO,BlendState::Operation_SOURCE_COLOR));
 			hudCompass->retain();
 		}
 
@@ -228,9 +228,9 @@ public:
 			hudAcorn=engine->getMaterialManager()->cloneMaterial(acorn);
 		}
 		if(hudAcorn!=NULL){
-//			hudAcorn->getPass()->setMaterialState(MaterialState(false));
-//			hudAcorn->getPass()->setDepthState(DepthState(DepthState::DepthTest_NEVER,false));
-//			hudAcorn->getPass()->setBlendState(BlendState(BlendState::Combination_ALPHA));
+			hudAcorn->getPass()->setMaterialState(MaterialState(false));
+			hudAcorn->getPass()->setDepthState(DepthState(DepthState::DepthTest_NEVER,false));
+			hudAcorn->getPass()->setBlendState(BlendState(BlendState::Combination_ALPHA));
 			hudAcorn->retain();
 		}
 
