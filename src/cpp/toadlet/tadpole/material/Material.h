@@ -69,6 +69,8 @@ public:
 
 	bool isDepthSorted() const;
 
+	RenderPath::ptr findFixedPath();
+
 	void shareStates(Material *source);
 
 	bool compile();

@@ -515,8 +515,9 @@ DXGI_FORMAT D3D10RenderDevice::getVertexDXGI_FORMAT(int format){
 		case VertexFormat::Format_TYPE_UINT_8|VertexFormat::Format_COUNT_2:
 			return DXGI_FORMAT_R8G8_UINT;
 		case VertexFormat::Format_TYPE_UINT_8|VertexFormat::Format_COUNT_4:
-		case VertexFormat::Format_TYPE_COLOR_RGBA:
 			return DXGI_FORMAT_R8G8B8A8_UINT;
+		case VertexFormat::Format_TYPE_COLOR_RGBA:
+			return DXGI_FORMAT_R8G8B8A8_UNORM;
 
 		case VertexFormat::Format_TYPE_INT_8|VertexFormat::Format_COUNT_1:
 			return DXGI_FORMAT_R8_SINT;
