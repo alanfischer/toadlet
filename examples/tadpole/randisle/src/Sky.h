@@ -18,22 +18,22 @@ class TextureStateMatrix4x4Accessor:public Matrix4x4Accessor{
 public:
 	TOADLET_SHARED_POINTERS(TextureStateMatrix4x4Accessor);
 
-	TextureStateMatrix4x4Accessor(Material::ptr material,int state):
-		mMaterial(material),mState(state){}
+	TextureStateMatrix4x4Accessor(RenderPass::ptr pass,int state):
+		mPass(pass),mState(state){}
 
 	void setMatrix4x4(const Matrix4x4 &matrix){
-		mMaterial->getPass()->getTextureState(mState,mTextureState);
+		mPass->getTextureState(mState,mTextureState);
 		mTextureState.matrix.set(matrix);
-		mMaterial->getPass()->setTextureState(mState,mTextureState);
+		mPass->setTextureState(mState,mTextureState);
 	}
 
 	const Matrix4x4 &getMatrix4x4(){
-		mMaterial->getPass()->getTextureState(mState,mTextureState);
+		mPass->getTextureState(mState,mTextureState);
 		return mTextureState.matrix;
 	}
 
 protected:
-	Material::ptr mMaterial;
+	RenderPass::ptr mPass;
 	int mState;
 	TextureState mTextureState;
 };
@@ -68,7 +68,7 @@ protected:
 	MeshNode::ptr mSkyDome;
 	SpriteNode::ptr mSun;
 	
-	Matrix4x4Accessor::ptr mBumpAccessor,mCloudAccessor,mColorAccessor,mFadeAccessor;
+	Matrix4x4Accessor::ptr mShaderAccessor,mBumpAccessor,mCloudAccessor,mColorAccessor,mFadeAccessor;
 	Matrix4x4Accessor::ptr mCompositeAccessor;
 	Material::ptr mSkyMaterial;
 };

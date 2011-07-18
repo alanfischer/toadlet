@@ -28,6 +28,7 @@
 #include <toadlet/peeper/BackableRenderState.h>
 #include <toadlet/peeper/BackableShaderState.h>
 #include <toadlet/peeper/Texture.h>
+#include <toadlet/tadpole/Colors.h>
 #include <toadlet/tadpole/Engine.h>
 #include <toadlet/tadpole/MaterialManager.h>
 #include <toadlet/tadpole/material/RenderVariables.h>
@@ -156,7 +157,8 @@ Material::ptr MaterialManager::createSkyboxMaterial(Texture::ptr texture){
 	fixedPass->setBlendState(BlendState());
 	fixedPass->setDepthState(DepthState(DepthState::DepthTest_NEVER,false));
 	fixedPass->setRasterizerState(RasterizerState());
-	fixedPass->setMaterialState(MaterialState(false));
+	fixedPass->setMaterialState(MaterialState(false,true));
+	fixedPass->setFogState(FogState(FogState::FogType_NONE,1,0,0,Colors::BLACK));
 
 	if(texture!=NULL){
 		SamplerState samplerState(mDefaultSamplerState);
@@ -305,8 +307,8 @@ void MaterialManager::contextActivate(RenderDevice *renderDevice){
 		"void main(){\n"
 			"gl_Position=modelViewProjectionMatrix * POSITION;\n"
 			"vec3 viewNormal=normalize(normalMatrix * vec4(NORMAL,0.0)).xyz;\n"
-			"float lightIntensity=-dot(lightViewPosition.xyz,viewNormal);\n"
-			"vec4 localLightColor=lightIntensity*lightColor*materialLighting;\n"
+			"float lightIntensity=clamp(-dot(lightViewPosition.xyz,viewNormal);\n"
+			"vec4 localLightColor=(lightIntensity*lightColor*materialLighting)+(1.0-materialLighting);\n"
 			"color=localLightColor*materialDiffuseColor + ambientColor*materialAmbientColor;\n"
 			"texCoord=(textureMatrix * vec4(TEXCOORD0,0.0,1.0)).xy;\n "
 		"}",
@@ -338,8 +340,8 @@ void MaterialManager::contextActivate(RenderDevice *renderDevice){
 			"VOUT vout;\n"
 			"vout.position=mul(modelViewProjectionMatrix,vin.position);\n"
 			"float3 viewNormal=normalize(mul(normalMatrix,float4(vin.normal,0.0)));\n"
-			"float lightIntensity=-dot(lightViewPosition,viewNormal);\n"
-			"float4 localLightColor=lightIntensity*lightColor*materialLighting;\n"
+			"float lightIntensity=clamp(-dot(lightViewPosition,viewNormal),0.0,1.0);\n"
+			"float4 localLightColor=lightIntensity*lightColor*materialLighting+(1.0-materialLighting);\n"
 			"vout.color=localLightColor*materialDiffuseColor + ambientColor*materialAmbientColor;\n"
 			"vout.texCoord=mul(textureMatrix,float4(vin.texCoord,0.0,1.0));\n "
 			"return vout;\n"
@@ -354,7 +356,7 @@ void MaterialManager::contextActivate(RenderDevice *renderDevice){
 		"uniform float textureSet;\n"
 		
 		"void main(){\n"
-			"gl_FragColor = color*(texture2D(tex,texCoord)+(1.0-textureSet));\n"
+			"gl_FragColor = color*(texture2D(tex,texCoord)+vec4(1.0-textureSet,1.0-textureSet,1.0-textureSet,1.0)));\n"
 		"}",
 
 
