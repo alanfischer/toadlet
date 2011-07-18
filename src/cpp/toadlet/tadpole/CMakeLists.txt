@@ -232,6 +232,7 @@ set (TADPOLE_MATERIAL_HEADERS
 	material/RenderPass.h
 	material/RenderPath.h
 	material/RenderVariable.h
+	material/RenderVariables.h
 	material/RenderVariableSet.h
 	material/SceneParameters.h
 )
@@ -305,8 +306,11 @@ source_group ("Header Files\\\\terrain" FILES ${TADPOLE_TERRAIN_HEADERS})
 
 # Source headers and namespaces
 set (TADPOLE_SRC ${TADPOLE_SRC} ${TADPOLE_ANIMATION_SRC} ${TADPOLE_HANDLER_SRC} ${TADPOLE_MATERIAL_SRC} ${TADPOLE_NODE_SRC} ${TADPOLE_SENSOR_SRC} ${TADPOLE_TERRAIN_SRC})
-set (TADPOLE_HEADERS ${TADPOLE_HEADERS} ${TADPOLE_ANIMATION_HEADERS} ${TADPOLE_HANDLER_HEADERS} ${TADPOLE_MATERIAL_HEADERS} ${TADPOLE_NODE_HEADERS} ${TADPOLE_SENSOR_HEADERS} ${TADPOLE_TERRAIN_HEADERS})
-set (TADPOLE_NAMESPACES ${TADPOLE_NAMESPACES} animation handler material node sensor terrain)
+
+# TODO: The handlers/ subdirectory is going to become a plugin system, and so they are NOT included in the aggregate header files
+# This is true for all handler/ subdirectory files
+set (TADPOLE_HEADERS ${TADPOLE_HEADERS} ${TADPOLE_ANIMATION_HEADERS} ${TADPOLE_MATERIAL_HEADERS} ${TADPOLE_NODE_HEADERS} ${TADPOLE_SENSOR_HEADERS} ${TADPOLE_TERRAIN_HEADERS})
+set (TADPOLE_NAMESPACES ${TADPOLE_NAMESPACES} animation material node sensor terrain)
 
 if (NOT TOADLET_FIXED_POINT)
 	source_group ("Source Files\\\\bsp" FILES ${TADPOLE_BSP_SRC})
@@ -329,7 +333,6 @@ if (NOT TOADLET_PLATFORM_OSX)
 		source_group ("Source Files\\\\handler" FILES ${TADPOLE_HANDLER_FREETYPE_SRC})
 		source_group ("Header Files\\\\handler" FILES ${TADPOLE_HANDLER_FREETYPE_HEADERS})
 		set (TADPOLE_SRC ${TADPOLE_SRC} ${TADPOLE_HANDLER_FREETYPE_SRC})
-		set (TADPOLE_HEADERS ${TADPOLE_HEADERS} ${TADPOLE_HANDLER_FREETYPE_HEADERS})
 
 		# Libraries
 		set (TADPOLE_LIBS ${FREETYPE_LIBRARIES})
@@ -354,7 +357,6 @@ if (MXML_FOUND)
 	source_group ("Source Files\\\\handler" FILES ${TADPOLE_HANDLER_XML_SRC})
 	source_group ("Header Files\\\\handler" FILES ${TADPOLE_HANDLER_XML_HEADERS})
 	set (TADPOLE_SRC ${TADPOLE_SRC} ${TADPOLE_HANDLER_XML_SRC})
-	set (TADPOLE_HEADERS ${TADPOLE_HEADERS} ${TADPOLE_HANDLER_XML_HEADERS})
 
 	# Libraries
 	set (TADPOLE_LIBS ${TADPOLE_LIBS} ${MXML_LIBRARY})
@@ -380,7 +382,6 @@ if (TOADLET_PLATFORM_OSX)
 	source_group ("Source Files\\\\handler\\\\platform\\\\osx" FILES ${TADPOLE_HANDLER_PLATFORM_OSX_SRC})
 	source_group ("Header Files\\\\handler\\\\platform\\\\osx" FILES ${TADPOLE_HANDLER_PLATFORM_OSX_HEADERS})
 	set (TADPOLE_SRC ${TADPOLE_SRC} ${TADPOLE_HANDLER_PLATFORM_OSX_SRC})
-	set (TADPOLE_HEADERS ${TADPOLE_HEADERS} ${TADPOLE_HANDLER_PLATFORM_OSX_HEADERS})
 	if (TOADLET_PLATFORM_IPHONE)
 		find_library (UIKIT_LIBS UIKit)
 		set (TADPOLE_LIBS_S ${TADPOLE_LIBS_S} ${UIKIT_LIBS})
@@ -398,12 +399,10 @@ elseif (TOADLET_PLATFORM_WIN32)
 		source_group ("Source Files\\\\handler\\\\platform\\\\win32" FILES ${TADPOLE_HANDLER_PLATFORM_WIN32_GDIPLUS_SRC})
 		source_group ("Header Files\\\\handler\\\\platform\\\\win32" FILES ${TADPOLE_HANDLER_PLATFORM_WIN32_GDIPLUS_HEADERS})
 		set (TADPOLE_SRC ${TADPOLE_SRC} ${TADPOLE_HANDLER_PLATFORM_WIN32_GDIPLUS_SRC})
-		set (TADPOLE_HEADERS ${TADPOLE_HEADERS} ${TADPOLE_HANDLER_PLATFORM_WIN32_GDIPLUS_HEADERS})
 	endif (GDIPLUS_FOUND)
 	source_group ("Source Files\\\\handler\\\\platform\\\\win32" FILES ${TADPOLE_HANDLER_PLATFORM_WIN32_SRC})
 	source_group ("Header Files\\\\handler\\\\platform\\\\win32" FILES ${TADPOLE_HANDLER_PLATFORM_WIN32_HEADERS})
 	set (TADPOLE_SRC ${TADPOLE_SRC} ${TADPOLE_HANDLER_PLATFORM_WIN32_SRC})
-	set (TADPOLE_HEADERS ${TADPOLE_HEADERS} ${TADPOLE_HANDLER_PLATFORM_WIN32_HEADERS})
 endif (TOADLET_PLATFORM_OSX)
 
 
