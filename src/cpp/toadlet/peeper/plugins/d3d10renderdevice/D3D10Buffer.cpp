@@ -26,6 +26,7 @@
 #include "D3D10Buffer.h"
 #include "D3D10RenderDevice.h"
 #include <toadlet/egg/Logger.h>
+#include <toadlet/egg/EndianConversion.h>
 #include <toadlet/peeper/BackableBuffer.h>
 
 namespace toadlet{
@@ -245,7 +246,7 @@ uint8 *D3D10Buffer::lock(int lockAccess){
 					tbyte *data=mData+mVertexFormat->getOffset(i);
 					for(j=0;j<mSize;++j){
 						uint32 &color=*(uint32*)(data+vertexSize*j);
-						color=Math::argbToRGBA(color);
+						swap4(color);
 					}
 				}
 			}
@@ -282,7 +283,7 @@ bool D3D10Buffer::unlock(){
 					tbyte *data=mData+mVertexFormat->getOffset(i);
 					for(j=0;j<mSize;++j){
 						uint32 &color=*(uint32*)(data+vertexSize*j);
-						color=Math::rgbaToARGB(color);
+						swap4(color);
 					}
 				}
 			}

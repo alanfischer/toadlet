@@ -119,6 +119,28 @@ bool Material::isDepthSorted() const{
 	}
 }
 
+RenderPath::ptr Material::findFixedPath(){
+	int i,j,k;
+	for(i=0;i<mPaths.size();++i){
+		RenderPath::ptr path=mPaths[i];
+		for(j=0;j<path->getNumPasses();++j){
+			ShaderState *state=path->getPass(j)->getShaderState();
+			for(k=0;k<Shader::ShaderType_MAX;++k){
+				if(state->getShader((Shader::ShaderType)k)!=NULL){
+					break;
+				}
+			}
+			if(k<Shader::ShaderType_MAX){
+				break;
+			}
+		}
+		if(j==path->getNumPasses()){
+			return path;
+		}
+	}
+	return NULL;
+}
+
 void Material::shareStates(Material *material){
 	int i;
 	for(i=0;i<mPaths.size() && i<material->getNumPaths();++i){

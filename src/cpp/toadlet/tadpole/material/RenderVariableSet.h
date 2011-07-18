@@ -55,6 +55,10 @@ public:
 	
 	bool addVariable(const String &name,RenderVariable::ptr variable,int scope);
 	void removeVariable(RenderVariable::ptr variable);
+	int getNumVariables(){int count=0,j;for(j=0;j<mBuffers.size();++j){count+=mBuffers[j].variables.size();}return count;}
+	RenderVariable::ptr getVariable(int i){return getVariableInfo(i)->variable;}
+	const String &getVariableName(int i){return getVariableInfo(i)->name;}
+	int getVariableScope(int i){return getVariableInfo(i)->scope;}
 
 	void buildBuffers(BufferManager *manager,ShaderState *state);
 	void update(int scope,SceneParameters *parameters);
@@ -76,6 +80,14 @@ protected:
 		int index;
 		Collection<VariableInfo> variables;
 	};
+
+	inline VariableInfo *getVariableInfo(int i){
+		int j;
+		for(j=0;j<mBuffers.size() && i>=mBuffers[j].variables.size();++j){
+			i-=mBuffers[j].variables.size();
+		}
+		return &mBuffers[j].variables[i];
+	}
 
 	Collection<BufferInfo> mBuffers;
 };

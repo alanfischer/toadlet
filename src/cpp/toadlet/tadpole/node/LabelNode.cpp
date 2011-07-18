@@ -60,7 +60,7 @@ Node *LabelNode::create(Scene *scene){
 	setNormalized(true);
 	setWordWrap(false);
 
-	mMaterial=getEngine()->getMaterialManager()->createMaterial();
+	mMaterial=getEngine()->getMaterialManager()->createDiffuseMaterial(NULL);
 	mMaterial->retain();
 	mMaterial->getPass()->setRasterizerState(RasterizerState(RasterizerState::CullType_NONE));
 	mMaterial->getPass()->setDepthState(DepthState(DepthState::DepthTest_LEQUAL,false));

@@ -41,6 +41,9 @@ public:
 
 	void destroy();
 
+	inline void setName(const String &name){mName=name;}
+	inline const String &getName() const{return mName;}
+
 	inline int getNumPasses() const{return mPasses.size();}
 	inline RenderPass::ptr getPass(int i) const{return mPasses[i];}
 	RenderPass::ptr addPass();
@@ -51,6 +54,7 @@ public:
 
 protected:
 	MaterialManager *mManager;
+	String mName;
 	Collection<RenderPass::ptr> mPasses;
 };
 
