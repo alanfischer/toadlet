@@ -168,7 +168,7 @@ bool D3D10Shader::destroyContext(){
 ID3D10InputLayout *D3D10Shader::findInputLayout(D3D10VertexFormat *vertexFormat){
 	int handle=vertexFormat->mUniqueHandle;
 	ID3D10InputLayout *layout=NULL;
-	if(handle<mLayouts.size()){
+	if(handle<mLayouts.size() && mLayouts[handle]!=NULL){
 		layout=mLayouts[handle];
 	}
 	else{
@@ -200,10 +200,37 @@ ID3D10InputLayout *D3D10Shader::findInputLayout(D3D10VertexFormat *vertexFormat)
 				elements[i]=vertexFormat->mElements[i];
 			}
 			for(i=0;i<missingParameters.size();++i){
+				int elementFormat=0;
+				switch(missingParameters[i].Mask){
+					case 1:
+						elementFormat|=VertexFormat::Format_COUNT_1;
+					break;
+					case 3:
+						elementFormat|=VertexFormat::Format_COUNT_2;
+					break;
+					case 7:
+						elementFormat|=VertexFormat::Format_COUNT_3;
+					break;
+					case 15:
+						elementFormat|=VertexFormat::Format_COUNT_4;
+					break;
+				}
+				switch(missingParameters[i].ComponentType){
+					case D3D_REGISTER_COMPONENT_UINT32:
+					case D3D_REGISTER_COMPONENT_SINT32:
+						elementFormat|=VertexFormat::Format_TYPE_INT_32;
+					break;
+					case D3D_REGISTER_COMPONENT_FLOAT32:
+						elementFormat|=VertexFormat::Format_TYPE_FLOAT_32;
+					break;
+				}
+				DXGI_FORMAT dxgiFormat=D3D10RenderDevice::getVertexDXGI_FORMAT(elementFormat);
 				D3D10_INPUT_ELEMENT_DESC element={
-					missingParameters[i].SemanticName,missingParameters[i].SemanticIndex,DXGI_FORMAT_R32G32B32A32_FLOAT,0,0,D3D10_INPUT_PER_VERTEX_DATA,0
+					missingParameters[i].SemanticName,missingParameters[i].SemanticIndex,dxgiFormat,0,0,D3D10_INPUT_PER_VERTEX_DATA,0
 				};
 				elements[vertexFormat->mElements.size()+i]=element;
+
+				Logger::alert(String("D3D10Shader: adding missing vertex element:")+missingParameters[i].SemanticName);
 			}
 		}
 		mDevice->getD3D10Device()->CreateInputLayout(elements,numElements,mBytecode->GetBufferPointer(),mBytecode->GetBufferSize(),&layout);
@@ -211,7 +238,9 @@ ID3D10InputLayout *D3D10Shader::findInputLayout(D3D10VertexFormat *vertexFormat)
 			delete[] elements;
 			elements=NULL;
 		}
-		mLayouts.resize(handle+1,NULL);
+		if(mLayouts.size()<=handle){
+			mLayouts.resize(handle+1,NULL);
+		}
 		mLayouts[handle]=layout;
 	}
 	return layout;

@@ -68,9 +68,9 @@ Logo::~Logo(){
 }
 
 void Logo::create(){
-	Application::create("gl");
+	Application::create("d3d10");
 
-	mEngine->setDirectory("../../../../data");
+	mEngine->setDirectory("../../../data");
 
 	scene=Scene::ptr(new Scene(mEngine));
 
@@ -90,8 +90,8 @@ void Logo::create(){
 	meshNode->getController()->start();
 	meshNode->getController()->setCycling(Controller::Cycling_REFLECT);
 	scene->getRoot()->attach(meshNode);
-//Material::ptr funkyMaterial=makeFunkyMaterial();
-//for(int i=0;i<meshNode->getNumSubMeshes();++i)meshNode->getSubMesh(i)->material=funkyMaterial;
+Material::ptr funkyMaterial=makeFunkyMaterial();
+for(int i=0;i<meshNode->getNumSubMeshes();++i)meshNode->getSubMesh(i)->material=funkyMaterial;
 
 	cameraNode=getEngine()->createNodeType(CameraNode::type(),scene);
 	cameraNode->setLookAt(Vector3(0,-Math::fromInt(150),0),Math::ZERO_VECTOR3,Math::Z_UNIT_VECTOR3);
@@ -142,22 +142,11 @@ String funkyProfiles[]={
 	"hlsl"
 };
 String funkyVertexCode[]={
-	"#version 150\n" \
-	"in vec4 POSITION;\n" \
-	"in vec3 NORMAL;\n" \
-	"out vec4 color;\n" \
-	"uniform mat4 mvp;\n" \
-	"uniform float time;\n" \
-	"void main(){\n" \
-		"vec4 p=mvp * POSITION;\n" \
-		"p.y=p.y+sin(p.x/10)*10;\n" \
-		"gl_Position=p;\n" \
-		"color = vec4(sin(time),0,0,1.0);\n" \
-	"}",
+	(char*)NULL,
 
 	"struct VIN{\n" \
 		"float4 position : POSITION;\n" \
-		"float3 normal : NORMAL;\n" \
+		"float4 color: COLOR;\n" \
 	"};\n" \
 	"struct VOUT{\n" \
 		"float4 position : SV_POSITION;\n" \
@@ -167,17 +156,14 @@ String funkyVertexCode[]={
 	"float time;\n" \
 	"VOUT main(VIN vin){\n" \
 	"	VOUT vout;\n" \
-	"	vout.position=mul(vin.position,mvp);\n" \
+	"	vout.position=mul(mvp,vin.position);\n" \
 	"	vout.position.y=vout.position.y+sin(vout.position.x/10)*10;\n" \
-	"	vout.color=float4(sin(time),0,0,1.0);\n" \
+	"	vout.color=vin.color;//float4(sin(time),0,0,1.0);\n" \
 	"	return vout;\n" \
 	"}"
 };
-String funkyFragmentCode[]={
-	"in vec4 color;\n" \
-	"void main(){\n" \
-		"gl_FragColor = color;\n" \
-	"}",
+String funkyFragmentCode[]={ 
+	(char*)NULL,
 
 	"struct PIN{\n" \
 		"float4 position : SV_POSITION;\n" \

@@ -51,7 +51,7 @@ RenderPass::RenderPass(MaterialManager *manager,RenderPass *source,bool clone):
 
 		if(source!=NULL){
 			manager->modifyRenderState(mRenderState,source->getRenderState());
-			manager->modifyRenderState(mRenderState,source->getRenderState());
+			manager->modifyShaderState(mShaderState,source->getShaderState());
 		}
 	}
 	else if(clone){
@@ -67,11 +67,20 @@ RenderPass::RenderPass(MaterialManager *manager,RenderPass *source,bool clone):
 
 	if(source!=NULL){
 		int i;
+
+		if(source->mVariables!=NULL){
+			RenderVariableSet::ptr sourceVars=source->mVariables;
+			RenderVariableSet::ptr destVars=getVariables();
+
+			for(i=0;i<sourceVars->getNumVariables();++i){
+				destVars->addVariable(sourceVars->getVariableName(i),sourceVars->getVariable(i),sourceVars->getVariableScope(i));
+			}
+		}
+
 		for(i=0;i<source->getNumTextures();++i){
 			setTexture(i,source->getTexture(i));
 			setTextureName(i,source->getTextureName(i));
 		}
-		/// @todo: Copy variables
 	}
 }
 

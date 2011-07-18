@@ -6,12 +6,12 @@
 
 #define TREE_CAMERA_DISTANCE 80
 
-/// @todo: Fix D3D10 HUD
 /// @todo: Fix D3D10 Fog
 /// @todo: Fix D3D10 MipMaps
 /// @todo: Text D3D9 Shaders
 /// @todo: Move HLSL shaders to gl, text gl shaders
 /// @todo: Use the leaf bump & bottom textures
+/// @todo: Optimize iPad rendering so we don't get a speedup from the 'manual path' in render()
 
 static const scalar epsilon=0.001f;
 
@@ -33,7 +33,7 @@ void RandIsle::create(const String &directory){
 
 	Logger::debug("RandIsle::create");
 
-	Application::create("gl");
+	Application::create("d3d10");
 
 	mEngine->setDirectory(directory);
 //	mEngine->getMaterialManager()->setRenderPathChooser(this);
