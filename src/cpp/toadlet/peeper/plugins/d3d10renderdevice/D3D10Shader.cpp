@@ -280,7 +280,7 @@ bool D3D10Shader::reflect(){
 
 			VariableBufferFormat::Variable::ptr variable(new VariableBufferFormat::Variable());
 			variable->setName(variableDesc.Name);
-			variable->setFormat(D3D10RenderDevice::getVariableFormat(typeDesc));// | VariableBufferFormat::Format_BIT_TRANSPOSE); // Only applies to the matrixes
+			variable->setFormat(D3D10RenderDevice::getVariableFormat(typeDesc));
 			variable->setOffset(variableDesc.StartOffset);
 			variable->setSize(variableDesc.Size);
 			variable->setIndex(j);

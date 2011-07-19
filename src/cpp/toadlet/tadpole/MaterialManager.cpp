@@ -288,9 +288,9 @@ void MaterialManager::contextActivate(RenderDevice *renderDevice){
 	};
 
 	String fixedVertexCode[]={
-		"attribute vec4 POSITION;"
-		"attribute vec3 NORMAL;"
-		"attribute vec2 TEXCOORD0;"
+		"attribute vec4 POSITION;\n"
+		"attribute vec3 NORMAL;\n"
+		"attribute vec2 TEXCOORD0;\n"
 		"varying vec4 color\n;"
 		"varying vec2 texCoord\n;"
 
@@ -307,7 +307,7 @@ void MaterialManager::contextActivate(RenderDevice *renderDevice){
 		"void main(){\n"
 			"gl_Position=modelViewProjectionMatrix * POSITION;\n"
 			"vec3 viewNormal=normalize(normalMatrix * vec4(NORMAL,0.0)).xyz;\n"
-			"float lightIntensity=clamp(-dot(lightViewPosition.xyz,viewNormal);\n"
+			"float lightIntensity=clamp(-dot(lightViewPosition.xyz,viewNormal),0.0,1.0);\n"
 			"vec4 localLightColor=(lightIntensity*lightColor*materialLighting)+(1.0-materialLighting);\n"
 			"color=localLightColor*materialDiffuseColor + ambientColor*materialAmbientColor;\n"
 			"texCoord=(textureMatrix * vec4(TEXCOORD0,0.0,1.0)).xy;\n "
@@ -349,8 +349,8 @@ void MaterialManager::contextActivate(RenderDevice *renderDevice){
 	};
 
 	String fixedFragmentCode[]={
-		"varying vec4 color;"
-		"varying vec2 texCoord;"
+		"varying vec4 color;\n"
+		"varying vec2 texCoord;\n"
 		
 		"uniform sampler2D tex;\n"
 		"uniform float textureSet;\n"

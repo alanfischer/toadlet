@@ -24,6 +24,7 @@
  ********** Copyright header - do not remove **********/
 
 #include "D3D9ShaderState.h"
+#include "D3D9RenderDevice.h"
 #include "D3D9Shader.h"
  
 namespace toadlet{
@@ -85,11 +86,21 @@ VariableBufferFormat::ptr D3D9ShaderState::getVariableBufferFormat(Shader::Shade
 bool D3D9ShaderState::activate(){
 	bool result=true;
 
+	IDirect3DDevice9 *device=mDevice->getDirect3DDevice9();
+
 	int i;
 	for(i=0;i<mShaders.size();++i){
 		Shader *shader=mShaders[i];
-		D3D9Shader *d3d9shader=(shader!=NULL)?(D3D9Shader*)shader->getRootShader():NULL;
-		result|=d3d9shader->activate();
+		D3D9Shader *d3dshader=(shader!=NULL)?(D3D9Shader*)shader->getRootShader():NULL;
+		IUnknown *id3dshader=(d3dshader!=NULL)?d3dshader->mShader:NULL;
+		switch(i){
+			case Shader::ShaderType_VERTEX:
+				device->SetVertexShader((IDirect3DVertexShader9*)id3dshader);
+			break;
+			case Shader::ShaderType_FRAGMENT:
+				device->SetPixelShader((IDirect3DPixelShader9*)id3dshader);
+			break;
+		}
 	}
 
 	return result;
