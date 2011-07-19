@@ -157,9 +157,6 @@ bool D3D9Shader::reflect(){
 		VariableBufferFormat::Variable::ptr variable(new VariableBufferFormat::Variable());
 		variable->setName(constantDesc.Name);
 		int format=D3D9RenderDevice::getVariableFormat(constantDesc);
-		if(VariableBufferFormat::getFormatRows(format)>1 && VariableBufferFormat::getFormatColumns(format)>1){
-			format|=VariableBufferFormat::Format_BIT_TRANSPOSE;
-		}
 		variable->setFormat(format);
 		variable->setOffset(dataSize);
 		variable->setSize(constantDesc.Bytes);
@@ -173,28 +170,6 @@ bool D3D9Shader::reflect(){
 
 	primaryFormat->compile();
 	mVariableBufferFormats.add(primaryFormat);
-
-	return true;
-}
-
-bool D3D9Shader::activate(){
-	IDirect3DDevice9 *device=mD3DDevice;
-
-	HRESULT result=S_OK;
-	switch(mShaderType){
-		case ShaderType_VERTEX:
-			result=device->SetVertexShader((IDirect3DVertexShader9*)mShader);
-		break;
-		case ShaderType_FRAGMENT:
-			result=device->SetPixelShader((IDirect3DPixelShader9*)mShader);
-		break;
-		default:
-			result=E_FAIL;
-	}
-	if(FAILED(result)){
-		Error::unknown(Categories::TOADLET_PEEPER,"unable to set shader");
-		return false;
-	}
 
 	return true;
 }

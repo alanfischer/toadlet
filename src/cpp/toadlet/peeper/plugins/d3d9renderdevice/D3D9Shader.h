@@ -57,7 +57,6 @@ protected:
 	bool createContext();
 	bool destroyContext();
 	bool reflect();
-	bool activate();
 
 	D3D9RenderDevice *mDevice;
 	IDirect3DDevice9 *mD3DDevice;
