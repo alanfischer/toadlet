@@ -131,7 +131,7 @@ int main(int argc,char **argv){
 		VertexBuffer::ptr vertexBuffer=mesh->getStaticVertexData()->getVertexBuffer(0);
 		VertexBufferAccessor vba(vertexBuffer);
 
-		int ci=vertexBuffer->getVertexFormat()->findSemantic(VertexFormat::Semantic_COLOR);
+		int ci=vertexBuffer->getVertexFormat()->findElement(VertexFormat::Semantic_COLOR);
 		TOADLET_ASSERT(ci>=0);
 
 		int j;

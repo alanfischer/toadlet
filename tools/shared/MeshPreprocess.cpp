@@ -38,7 +38,7 @@ void MeshPreprocess::adjustTexCoords(Mesh *mesh,float texCoordAdjust){
 	VertexData::ptr vertexData=mesh->getStaticVertexData();
 	VertexBuffer::ptr vertexBuffer=vertexData->getVertexBuffer(0);
 	VertexFormat::ptr vertexFormat=vertexBuffer->getVertexFormat();
-	int texCoordIndex=vertexFormat->findSemantic(VertexFormat::Semantic_TEX_COORD);
+	int texCoordIndex=vertexFormat->findElement(VertexFormat::Semantic_TEXCOORD);
 
 	VertexBufferAccessor vba(vertexBuffer);
 	if(texCoordAdjust>0 && texCoordIndex>=0){
@@ -110,7 +110,7 @@ void MeshPreprocess::adjustPositions(Mesh *mesh,float positionAdjust){
 	VertexData::ptr vertexData=mesh->getStaticVertexData();
 	VertexBuffer::ptr vertexBuffer=vertexData->getVertexBuffer(0);
 	VertexFormat::ptr vertexFormat=vertexBuffer->getVertexFormat();
-	int positionIndex=vertexFormat->findSemantic(VertexFormat::Semantic_POSITION);
+	int positionIndex=vertexFormat->findElement(VertexFormat::Semantic_POSITION);
 
 	VertexBufferAccessor vba(vertexBuffer);
 	if(positionAdjust!=0){

@@ -1798,11 +1798,11 @@ M3GObject3D *M3GConverter::buildSceneGraph(Mesh *toadletMesh,float scale,int for
 	{
 		VertexBuffer::ptr vertexBuffer=toadletMesh->getStaticVertexData()->getVertexBuffer(0);
 		VertexFormat::ptr vertexFormat=vertexBuffer->getVertexFormat();
-		int positionIndex=vertexFormat->findSemantic(VertexFormat::Semantic_POSITION);
+		int positionIndex=vertexFormat->findElement(VertexFormat::Semantic_POSITION);
 		int positionOffset=positionIndex>=0?vertexFormat->getOffset(positionIndex):0;
-		int normalIndex=vertexFormat->findSemantic(VertexFormat::Semantic_NORMAL);
-		int colorIndex=vertexFormat->findSemantic(VertexFormat::Semantic_COLOR);
-		int texCoordIndex=vertexFormat->findSemantic(VertexFormat::Semantic_TEX_COORD);
+		int normalIndex=vertexFormat->findElement(VertexFormat::Semantic_NORMAL);
+		int colorIndex=vertexFormat->findElement(VertexFormat::Semantic_COLOR);
+		int texCoordIndex=vertexFormat->findElement(VertexFormat::Semantic_TEXCOORD);
 		int texCoordOffset=texCoordIndex>=0?vertexFormat->getOffset(texCoordIndex):0;
 
 		int numVertexes=vertexBuffer->getSize();
@@ -2103,7 +2103,7 @@ M3GObject3D *M3GConverter::buildSceneGraph(Mesh *toadletMesh,float scale,int for
 			RasterizerState rasterizerState;
 			MaterialState materialState;
 
-			if(material->getRasterizerState(rasterizerState)){
+			if(material->getPass()->getRasterizerState(rasterizerState)){
 				M3GPolygonMode *polygonMode=new M3GPolygonMode();
 
 				if(rasterizerState.cull==RasterizerState::CullType_NONE) polygonMode->culling=M3GPolygonMode::CULL_NONE;
@@ -2111,7 +2111,7 @@ M3GObject3D *M3GConverter::buildSceneGraph(Mesh *toadletMesh,float scale,int for
 				appearance->polygonMode=polygonMode;
 			}
 
-			if(material->getMaterialState(materialState) && materialState.lighting){
+			if(material->getPass()->getMaterialState(materialState) && materialState.lighting){
 				M3GMaterial *m3gMaterial=new M3GMaterial();
 
 				m3gMaterial->ambientColor=toM3GColor(materialState.ambient);
@@ -2126,7 +2126,7 @@ M3GObject3D *M3GConverter::buildSceneGraph(Mesh *toadletMesh,float scale,int for
 
 			// ID 0 of the userParameters on an appearance specifies if it should have a texture or not on it
 			appearance->userParameters.resize(1);
-			if(material->getNumTextures()>0){
+			if(material->getPass()->getNumTextures()>0){
 				appearance->userParameters[0].id=0;
 				appearance->userParameters[0].value.add(1);
 			}

@@ -86,6 +86,8 @@ void RenderableSet::queueRenderable(Renderable *renderable){
 		int numRenderables=depthQueue.size();
 		int i;
 		for(i=0;i<numRenderables;++i){
+			if(depthQueue[i].material->getLayer()<material->getLayer()) continue;
+			if(i<numRenderables-1 && depthQueue[i+1].material->getLayer()>material->getLayer()) break;
 			if(depthQueue[i].depth<depth) break;
 		}
 		depthQueue.insert(i,RenderableQueueItem(renderable,material,ambient,depth));

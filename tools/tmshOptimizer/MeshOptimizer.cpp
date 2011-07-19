@@ -25,21 +25,13 @@ bool MeshOptimizer::optimizeMesh(Mesh *mesh,Engine *engine){
 				Material::ptr material2=subMesh2->material;
 
 				if(material1!=NULL && material2!=NULL){
+					/// @todo: We need a much smarter Material comparison function
 					{
-						// Just check a couple states here
-						BlendState blendState1,blendState2;
-						material1->getBlendState(blendState1);material2->getBlendState(blendState2);
-						if(blendState1!=blendState2) continue;
-
-						RasterizerState rasterizerState1,rasterizerState2;
-						material1->getRasterizerState(rasterizerState1);material2->getRasterizerState(rasterizerState2);
-						if(rasterizerState1!=rasterizerState2) continue;
-
 						MaterialState materialState1,materialState2;
-						material1->getMaterialState(materialState1);material2->getMaterialState(materialState2);
+						material1->getPass()->getMaterialState(materialState1);material2->getPass()->getMaterialState(materialState2);
 						if(materialState1!=materialState2) continue;
 
-						if(material1->getTexture()!=material2->getTexture() || material1->getTextureName()!=material2->getTextureName()) continue;
+						if(material1->getPass()->getTexture()!=material2->getPass()->getTexture() || material1->getPass()->getTextureName()!=material2->getPass()->getTextureName()) continue;
 					}
 
 					IndexBuffer::ptr ib1=subMesh1->indexData->getIndexBuffer();
@@ -70,10 +62,10 @@ bool MeshOptimizer::optimizeMesh(Mesh *mesh,Engine *engine){
 	// Zero out unused texture coodinates
 	VertexBuffer::ptr vertexBuffer=mesh->getStaticVertexData()->getVertexBuffer(0);
 	VertexFormat::ptr vertexFormat=vertexBuffer->getVertexFormat();
-	int positionIndex=vertexFormat->findSemantic(VertexFormat::Semantic_POSITION);
-	int normalIndex=vertexFormat->findSemantic(VertexFormat::Semantic_NORMAL);
-	int colorIndex=vertexFormat->findSemantic(VertexFormat::Semantic_COLOR);
-	int texCoordIndex=vertexFormat->findSemantic(VertexFormat::Semantic_TEX_COORD);
+	int positionIndex=vertexFormat->findElement(VertexFormat::Semantic_POSITION);
+	int normalIndex=vertexFormat->findElement(VertexFormat::Semantic_NORMAL);
+	int colorIndex=vertexFormat->findElement(VertexFormat::Semantic_COLOR);
+	int texCoordIndex=vertexFormat->findElement(VertexFormat::Semantic_TEXCOORD);
 	if(texCoordIndex>=0){
 		Collection<uint8> vertHasTex;
 		vertHasTex.resize(vertexBuffer->getSize(),0);
@@ -82,7 +74,7 @@ bool MeshOptimizer::optimizeMesh(Mesh *mesh,Engine *engine){
 			Mesh::SubMesh::ptr subMesh=mesh->getSubMesh(i);
 
 			Material::ptr material=subMesh->material;
-			if(material!=NULL && material->getNumTextures()>0){
+			if(material!=NULL && material->getPass()->getNumTextures()>0){
 				IndexBufferAccessor iba(subMesh->indexData->getIndexBuffer());
 				for(j=0;j<iba.getSize();++j){
 					vertHasTex[iba.get(j)]=true;

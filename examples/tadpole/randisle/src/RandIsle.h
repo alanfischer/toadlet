@@ -2,6 +2,8 @@
 #define RANDISLE_H
 
 #include <toadlet/toadlet.h>
+#include <toadlet/tadpole/plugins/hop/HopScene.h>
+#include <toadlet/tadpole/plugins/hop/HopEntity.h>
 #include "PathSystem.h"
 #include "PathClimberListener.h"
 #include "SmoothFollower.h"
