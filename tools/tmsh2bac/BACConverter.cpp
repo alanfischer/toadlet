@@ -123,13 +123,13 @@ bool BACConverter::extractMeshData(Mesh::ptr mesh,bool useSubmeshes){
 	VertexBuffer *vertexBuffer=mesh->getStaticVertexData()->getVertexBuffer(0);
 	VertexFormat *vertexFormat=vertexBuffer->getVertexFormat();
 	const Collection<Mesh::VertexBoneAssignmentList> &vbas=mesh->getVertexBoneAssignments();
-	mHasNormal=vertexFormat->findSemantic(VertexFormat::Semantic_NORMAL)>=0;
+	mHasNormal=vertexFormat->findElement(VertexFormat::Semantic_NORMAL)>=0;
 	mHasBone=vbas.size()>0;
 
 	// Collect vertices and texture coordinates
-	int positionIndex=vertexFormat->findSemantic(VertexFormat::Semantic_POSITION);
-	int normalIndex=vertexFormat->findSemantic(VertexFormat::Semantic_NORMAL);
-	int texCoordIndex=vertexFormat->findSemantic(VertexFormat::Semantic_TEX_COORD);
+	int positionIndex=vertexFormat->findElement(VertexFormat::Semantic_POSITION);
+	int normalIndex=vertexFormat->findElement(VertexFormat::Semantic_NORMAL);
+	int texCoordIndex=vertexFormat->findElement(VertexFormat::Semantic_TEXCOORD);
 	VertexBufferAccessor vba(vertexBuffer);
 	for(i=0;i<vba.getSize();++i){
 		BACVertex *v=new BACVertex();

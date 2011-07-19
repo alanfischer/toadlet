@@ -70,12 +70,6 @@ set (EGG_NET_SRC
 	net/Socket.cpp
 )
 
-set (EGG_NET_PLATFORM_WIN32_SRC
-	net/platform/win32/Win32BluetoothClient.cpp
-	net/platform/win32/Win32BluetoothServer.cpp
-	net/platform/win32/Win32BluetoothServerQuery.cpp
-)
-
 set (EGG_NET_PLATFORM_WINCE_SRC
 	net/platform/wince/WinCEConnectionManager.cpp
 )
@@ -210,19 +204,8 @@ set (EGG_MATHFIXED_HEADERS
 )
 
 set (EGG_NET_HEADERS
-	net/BluetoothAddress.h
-	net/BluetoothClient.h
-	net/BluetoothServer.h
-	net/BluetoothServerQuery.h
 	net/ConnectionManager.h
 	net/Socket.h
-)
-
-set (EGG_NET_PLATFORM_WIN32_HEADERS
-	net/platform/win32/Win32BluetoothClient.h
-	net/platform/win32/Win32BluetoothIncludes.h
-	net/platform/win32/Win32BluetoothServer.h
-	net/platform/win32/Win32BluetoothServerQuery.h
 )
 
 set (EGG_NET_PLATFORM_WINCE_HEADERS
@@ -291,15 +274,6 @@ if (TOADLET_PLATFORM_WIN32)
 	source_group ("Header Files\\\\platform\\\\win32" FILES ${EGG_PLATFORM_WIN32_HEADERS})
 	set (EGG_SRC ${EGG_SRC} ${EGG_PLATFORM_WIN32_SRC})
 	set (EGG_HEADERS ${EGG_HEADERS} ${EGG_PLATFORM_WIN32_HEADERS})
-	if (TOADLET_USE_BLUETOOTH)
-		find_package (WS2BTH)
-	endif (TOADLET_USE_BLUETOOTH)
-	if (WS2BTH_FOUND)
-		source_group ("Source Files\\\\net\\\\platform\\\\win32" FILES ${EGG_NET_PLATFORM_WIN32_SRC})
-		source_group ("Header Files\\\\net\\\\platform\\\\win32" FILES ${EGG_NET_PLATFORM_WIN32_HEADERS})
-		set (EGG_SRC ${EGG_SRC} ${EGG_NET_PLATFORM_WIN32_SRC})
-		set (EGG_HEADERS ${EGG_HEADERS} ${EGG_NET_PLATFORM_WIN32_HEADERS})
-	endif (WS2BTH_FOUND)
 	if (TOADLET_PLATFORM_WINCE)
 		source_group ("Source Files\\\\net\\\\platform\\\\wince" FILES ${EGG_NET_PLATFORM_WINCE_SRC})
 		source_group ("Header Files\\\\net\\\\platform\\\\wince" FILES ${EGG_NET_PLATFORM_WINCE_HEADERS})

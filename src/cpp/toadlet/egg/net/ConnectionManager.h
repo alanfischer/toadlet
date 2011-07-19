@@ -37,8 +37,6 @@
 	}
 	}
 	}
-#else
-	#error "ConnectionManager not implemented on this platform"
 #endif
 
 #endif

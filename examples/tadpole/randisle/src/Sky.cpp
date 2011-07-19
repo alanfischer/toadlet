@@ -185,6 +185,7 @@ Node *Sky::create(Scene *scene,const Vector4 &skyColor,const Vector4 &fadeColor)
 
 	Material::ptr sunMaterial=mEngine->getMaterialManager()->createDiffuseMaterial(mEngine->getTextureManager()->createTexture(glow));
 	sunMaterial->setLayer(-1);
+	sunMaterial->setSort(Material::SortType_MATERIAL);
 	sunMaterial->getPass()->setBlendState(BlendState::Combination_COLOR_ADDITIVE);
 	sunMaterial->getPass()->setMaterialState(MaterialState(false));
 	sunMaterial->getPass()->setDepthState(DepthState(DepthState::DepthTest_NEVER,false));

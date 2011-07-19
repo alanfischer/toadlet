@@ -109,11 +109,11 @@ void Viewer::update(int dt){
 	mScene->update(dt);
 }
 
-void Viewer::render(Renderer *renderer){
-	renderer->beginScene();
-		mCamera->render(renderer);
-	renderer->endScene();
-	renderer->swap();
+void Viewer::render(RenderDevice *device){
+	device->beginScene();
+		mCamera->render(device);
+	device->endScene();
+	device->swap();
 }
 
 void Viewer::mouseMoved(int x,int y){

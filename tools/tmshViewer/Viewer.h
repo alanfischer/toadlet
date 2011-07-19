@@ -17,7 +17,7 @@ public:
 	void start(toadlet::tadpole::node::MeshNode::ptr meshNode);
 
 	void update(int dt);
-	void render(toadlet::peeper::Renderer *renderer);
+	void render(toadlet::peeper::RenderDevice *device);
 
 	void mouseMoved(int x,int y);
 	void mousePressed(int x,int y,int button);

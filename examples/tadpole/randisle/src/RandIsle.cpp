@@ -8,7 +8,7 @@
 
 /// @todo: Fix D3D10 Fog
 /// @todo: Fix D3D10 MipMaps
-/// @todo: Text D3D9 Shaders
+/// @todo: Test D3D9 Shaders
 /// @todo: Move HLSL shaders to gl, text gl shaders
 /// @todo: Use the leaf bump & bottom textures
 /// @todo: Optimize iPad rendering so we don't get a speedup from the 'manual path' in render()
@@ -33,7 +33,7 @@ void RandIsle::create(const String &directory){
 
 	Logger::debug("RandIsle::create");
 
-	Application::create("d3d10");
+	Application::create("gl");
 
 	mEngine->setDirectory(directory);
 //	mEngine->getMaterialManager()->setRenderPathChooser(this);

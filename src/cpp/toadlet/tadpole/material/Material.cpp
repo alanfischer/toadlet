@@ -35,7 +35,7 @@ namespace tadpole{
 namespace material{
 
 Material::Material(MaterialManager *manager,Material *source,bool clone):BaseResource(),
-	mSort(SortType_MATERIAL),
+	mSort(SortType_AUTO),
 	mLayer(0)
 {
 	mManager=manager;

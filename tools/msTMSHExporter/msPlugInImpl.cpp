@@ -290,9 +290,9 @@ cPlugIn::exportMesh(msModel *pModel,const String &name){
 
 	VertexFormat::ptr vertexFormat(new BackableVertexFormat());
 	vertexFormat->create();
-	vertexFormat->addElement(VertexFormat::Semantic_POSITION,0,VertexFormat::Format_BIT_FLOAT_32|VertexFormat::Format_BIT_COUNT_3);
-	vertexFormat->addElement(VertexFormat::Semantic_NORMAL,0,VertexFormat::Format_BIT_FLOAT_32|VertexFormat::Format_BIT_COUNT_3);
-	vertexFormat->addElement(VertexFormat::Semantic_TEX_COORD,0,VertexFormat::Format_BIT_FLOAT_32|VertexFormat::Format_BIT_COUNT_2);
+	vertexFormat->addElement(VertexFormat::Semantic_POSITION,0,VertexFormat::Format_TYPE_FLOAT_32|VertexFormat::Format_COUNT_3);
+	vertexFormat->addElement(VertexFormat::Semantic_NORMAL,0,VertexFormat::Format_TYPE_FLOAT_32|VertexFormat::Format_COUNT_3);
+	vertexFormat->addElement(VertexFormat::Semantic_TEXCOORD,0,VertexFormat::Format_TYPE_FLOAT_32|VertexFormat::Format_COUNT_2);
 
 	VertexBuffer::ptr vertexBuffer(new BackableBuffer());
 	vertexBuffer->create(Buffer::Usage_BIT_STATIC,Buffer::Access_READ_WRITE,vertexFormat,vertexes.size());

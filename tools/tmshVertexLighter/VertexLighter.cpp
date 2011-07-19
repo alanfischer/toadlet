@@ -43,7 +43,7 @@ void VertexLighter::lightMesh(Mesh *mesh){
 
 	VertexBuffer::ptr vertexBuffer=mesh->getStaticVertexData()->getVertexBuffer(0);
 	VertexFormat::ptr vertexFormat=vertexBuffer->getVertexFormat();
-	if(vertexFormat->findSemantic(VertexFormat::Semantic_NORMAL)<0){
+	if(vertexFormat->findElement(VertexFormat::Semantic_NORMAL)<0){
 		return; // Cannot be lit
 	}
 
@@ -53,16 +53,16 @@ void VertexLighter::lightMesh(Mesh *mesh){
 			newVertexFormat->addElement(vertexFormat->getSemantic(i),vertexFormat->getIndex(i),vertexFormat->getFormat(i));
 		}
 	}
-	if(vertexFormat->findSemantic(VertexFormat::Semantic_COLOR)<0){
-		newVertexFormat->addElement(VertexFormat::Semantic_COLOR,0,VertexFormat::Format_COLOR_RGBA);
+	if(vertexFormat->findElement(VertexFormat::Semantic_COLOR)<0){
+		newVertexFormat->addElement(VertexFormat::Semantic_COLOR,0,VertexFormat::Format_TYPE_COLOR_RGBA);
 	}
 
 	VertexBuffer::ptr newVertexBuffer=mEngine->getBufferManager()->cloneVertexBuffer(vertexBuffer,Buffer::Usage_BIT_STATIC,Buffer::Access_READ_WRITE,newVertexFormat,vertexBuffer->getSize());
 	mesh->setStaticVertexData(VertexData::ptr(new VertexData(newVertexBuffer)));
 
-	int pi=newVertexFormat->findSemantic(VertexFormat::Semantic_POSITION);
-	int ni=newVertexFormat->findSemantic(VertexFormat::Semantic_NORMAL);
-	int ci=newVertexFormat->findSemantic(VertexFormat::Semantic_TEX_COORD);
+	int pi=newVertexFormat->findElement(VertexFormat::Semantic_POSITION);
+	int ni=newVertexFormat->findElement(VertexFormat::Semantic_NORMAL);
+	int ci=newVertexFormat->findElement(VertexFormat::Semantic_TEXCOORD);
 
 	VertexBufferAccessor vba;(vertexBuffer);
 	VertexBufferAccessor nvba(newVertexBuffer);
@@ -106,10 +106,10 @@ void VertexLighter::lightMesh(Mesh *mesh){
 		Material::ptr material=subMesh->material;
 
 		MaterialState materialState;
-		material->getMaterialState(materialState);
+		material->getPass()->getMaterialState(materialState);
 		materialState.lighting=false;
 		materialState.trackColor=true;
-		material->setMaterialState(materialState);
+		material->getPass()->setMaterialState(materialState);
 		if(materialState.diffuse!=Colors::BLACK){
 			diffuse=materialState.diffuse;
 		}
