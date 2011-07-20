@@ -355,6 +355,7 @@ bool GLBuffer::update(tbyte *data,int start,int size){
 }
 
 bool GLBuffer::activateUniforms(){
+	int resourceCount=0;
 	int i;
 	for(i=0;i<mVariableFormat->getSize();++i){
 		VariableBufferFormat::Variable *variable=mVariableFormat->getVariable(i);
@@ -417,6 +418,10 @@ bool GLBuffer::activateUniforms(){
 			break;
 			case VariableBufferFormat::Format_TYPE_FLOAT_32|VariableBufferFormat::Format_COUNT_4X3:
 				glUniformMatrix4x3fv(index,1,transpose,(float*)(mData+offset));
+			break;
+
+			case VariableBufferFormat::Format_TYPE_RESOURCE:
+				glUniform1i(index,resourceCount++);
 			break;
 		}
 	}
