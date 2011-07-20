@@ -356,7 +356,7 @@ void MaterialManager::contextActivate(RenderDevice *renderDevice){
 		"uniform float textureSet;\n"
 		
 		"void main(){\n"
-			"gl_FragColor = color*(texture2D(tex,texCoord)+vec4(1.0-textureSet,1.0-textureSet,1.0-textureSet,1.0)));\n"
+			"gl_FragColor = color*(texture2D(tex,texCoord)+(1.0-textureSet));\n"
 		"}",
 
 
