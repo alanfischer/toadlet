@@ -339,7 +339,7 @@ void MaterialManager::contextActivate(RenderDevice *renderDevice){
 		"VOUT main(VIN vin){\n"
 			"VOUT vout;\n"
 			"vout.position=mul(modelViewProjectionMatrix,vin.position);\n"
-			"float3 viewNormal=normalize(mul(normalMatrix,float4(vin.normal,0.0)));\n"
+			"float3 viewNormal=normalize(mul(normalMatrix,vin.normal));\n"
 			"float lightIntensity=clamp(-dot(lightViewPosition,viewNormal),0.0,1.0);\n"
 			"float4 localLightColor=lightIntensity*lightColor*materialLighting+(1.0-materialLighting);\n"
 			"vout.color=localLightColor*materialDiffuseColor + ambientColor*materialAmbientColor;\n"

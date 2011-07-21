@@ -119,6 +119,18 @@ void VariableBufferFormat::compile(){
 	for(i=0;i<mStructVariable->getStructSize();++i){
 		compile(mStructVariable->getStructVariable(i),mStructVariable);
 	}
+
+	// Sort the Flat Variables based on index.  D3D9 needs this.
+	int j;
+	for(i=0;i<mFlatVariables.size();++i){
+		for(j=i;j<mFlatVariables.size();++j){
+			if(mFlatVariables[i]->getIndex()>mFlatVariables[j]->getIndex()){
+				Variable::ptr v=mFlatVariables[i];
+				mFlatVariables[i]=mFlatVariables[j];
+				mFlatVariables[j]=v;
+			}
+		}
+	}
 }
 
 void VariableBufferFormat::compile(Variable::ptr variable,Variable *parent){

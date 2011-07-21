@@ -34,7 +34,7 @@ void RandIsle::create(const String &directory){
 	Logger::debug("RandIsle::create");
 
 	Application::create("d3d9");
-
+ 
 	mEngine->setDirectory(directory);
 //	mEngine->getMaterialManager()->setRenderPathChooser(this);
 
