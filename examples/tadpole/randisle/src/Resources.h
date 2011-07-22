@@ -16,6 +16,8 @@ public:
 		skyColor=Colors::AZURE;
 		fadeColor=Vector4(0xB5C1C3FF);
 
+		Logger::alert("Loading grass");
+
 		grass=engine->getMaterialManager()->findMaterial("grass.png");
 		if(grass!=NULL){
 			TextureState textureState;
@@ -27,6 +29,8 @@ public:
 			grass->setLayer(-1);
 			grass->retain();
 		}
+
+		Logger::alert("Loading water");
 
 		water=engine->getMaterialManager()->createMaterial();
 		if(water!=NULL){
@@ -44,11 +48,11 @@ public:
 				TextureState textureState;
 				textureState.calculation=TextureState::CalculationType_NORMAL;
 
-				shaderPass->setTexture(0,engine->getTextureManager()->createTexture(createNoise(512,512,16,6,0.5,0.5)));
+				shaderPass->setTexture(0,engine->getTextureManager()->createTexture(createNoise(128,128,16,6,0.5,0.5)));
 				Math::setMatrix4x4FromScale(textureState.matrix,16,16,16);
 				shaderPass->setTextureState(0,textureState);
 
-				shaderPass->setTexture(1,engine->getTextureManager()->createTexture(createNoise(512,512,16,5,0.5,0.5)));
+				shaderPass->setTexture(1,engine->getTextureManager()->createTexture(createNoise(128,128,16,5,0.5,0.5)));
 				Math::setMatrix4x4FromScale(textureState.matrix,16,16,16);
 				shaderPass->setTextureState(1,textureState);
 
@@ -139,11 +143,11 @@ public:
 				TextureState textureState;
 				textureState.calculation=TextureState::CalculationType_NORMAL;
 
-				fixedPass->setTexture(0,engine->getTextureManager()->createTexture(createNoise(512,512,16,6,0.5,0.5)));
+				fixedPass->setTexture(0,engine->getTextureManager()->createTexture(createNoise(128,128,16,6,0.5,0.5)));
 				Math::setMatrix4x4FromScale(textureState.matrix,16,16,16);
 				fixedPass->setTextureState(0,textureState);
 
-				fixedPass->setTexture(1,engine->getTextureManager()->createTexture(createNoise(512,512,16,5,0.5,0.5)));
+				fixedPass->setTexture(1,engine->getTextureManager()->createTexture(createNoise(128,128,16,5,0.5,0.5)));
 				Math::setMatrix4x4FromScale(textureState.matrix,16,16,16);
 				fixedPass->setTextureState(1,textureState);
 			}
@@ -152,6 +156,8 @@ public:
 			water->compile();
 			water->retain();
 		}
+
+		Logger::alert("Loading frog");
 
 		creature=engine->getMeshManager()->findMesh("frog.xmsh");
 		if(creature!=NULL){
@@ -162,6 +168,8 @@ public:
 			creature->retain();
 		}
 		
+		Logger::alert("Loading shadow");
+
 		shadow=engine->getMeshManager()->createBox(AABox(-4,-4,0,4,4,0));
 		{
 			Material::ptr material=engine->getMaterialManager()->createDiffuseMaterial(engine->getTextureManager()->createTexture(createPoint(128,128)));
@@ -172,6 +180,8 @@ public:
 			shadow->getSubMesh(0)->material=material;
 			shadow->retain();
 		}
+
+		Logger::alert("Loading tree items");
 
 		treeBranch=engine->getMaterialManager()->findMaterial("bark.png");
 		if(treeBranch!=NULL){
@@ -193,6 +203,8 @@ public:
 			treeBranchHighlighted->getPass()->setMaterialState(MaterialState(Vector4(2,2,2,2)));
 			treeBranchHighlighted->retain();
 		}
+
+		Logger::alert("Loading sounds");
 
  		dog=engine->getAudioBufferManager()->findAudioBuffer("dog.wav");
 		shark=engine->getAudioBufferManager()->findAudioBuffer("shark.wav");

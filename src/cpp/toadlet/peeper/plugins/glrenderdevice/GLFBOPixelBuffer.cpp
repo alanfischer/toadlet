@@ -60,7 +60,7 @@ bool GLFBOPixelBuffer::create(int usage,int access,int pixelFormat,int width,int
 
 	glGenRenderbuffers(1,&mHandle);
 	glBindRenderbuffer(GL_RENDERBUFFER,mHandle);
-	glRenderbufferStorage(GL_RENDERBUFFER,GLRenderDevice::getGLFormat(mPixelFormat,false),mWidth,mHeight);
+	glRenderbufferStorage(GL_RENDERBUFFER,GLRenderDevice::getGLFormat(mPixelFormat,true),mWidth,mHeight);
 
 	TOADLET_CHECK_GLERROR("GLFBOPixelBuffer::create");
 
