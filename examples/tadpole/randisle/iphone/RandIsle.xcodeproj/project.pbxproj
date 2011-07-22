@@ -41,6 +41,7 @@
 		8C7B607713995F6E0095C5C5 /* Resource License.txt in Resources */ = {isa = PBXBuildFile; fileRef = 8C7B606713995F6E0095C5C5 /* Resource License.txt */; };
 		8C7B607813995F6E0095C5C5 /* rustle.wav in Resources */ = {isa = PBXBuildFile; fileRef = 8C7B606813995F6E0095C5C5 /* rustle.wav */; };
 		8C7B607913995F6E0095C5C5 /* shark.wav in Resources */ = {isa = PBXBuildFile; fileRef = 8C7B606913995F6E0095C5C5 /* shark.wav */; };
+		8C8E21F413D9F79000351C50 /* MainWindow-iPad.xib in Resources */ = {isa = PBXBuildFile; fileRef = 8C8E21F313D9F79000351C50 /* MainWindow-iPad.xib */; };
 		8CF6BE19105A74230001E399 /* SystemConfiguration.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 8CF6BE18105A74230001E399 /* SystemConfiguration.framework */; };
 /* End PBXBuildFile section */
 
@@ -94,6 +95,7 @@
 		8C7B606713995F6E0095C5C5 /* Resource License.txt */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; name = "Resource License.txt"; path = "../res/Resource License.txt"; sourceTree = SOURCE_ROOT; };
 		8C7B606813995F6E0095C5C5 /* rustle.wav */ = {isa = PBXFileReference; lastKnownFileType = audio.wav; name = rustle.wav; path = ../res/rustle.wav; sourceTree = SOURCE_ROOT; };
 		8C7B606913995F6E0095C5C5 /* shark.wav */ = {isa = PBXFileReference; lastKnownFileType = audio.wav; name = shark.wav; path = ../res/shark.wav; sourceTree = SOURCE_ROOT; };
+		8C8E21F313D9F79000351C50 /* MainWindow-iPad.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = "MainWindow-iPad.xib"; sourceTree = "<group>"; };
 		8CF6BE18105A74230001E399 /* SystemConfiguration.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = SystemConfiguration.framework; path = System/Library/Frameworks/SystemConfiguration.framework; sourceTree = SDKROOT; };
 		8D1107310486CEB800E47090 /* RandIsle-Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = "RandIsle-Info.plist"; plistStructureDefinitionIdentifier = "com.apple.xcode.plist.structure-definition.iphone.info-plist"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
@@ -178,6 +180,7 @@
 		29B97317FDCFA39411CA2CEA /* Resources */ = {
 			isa = PBXGroup;
 			children = (
+				8C8E21F313D9F79000351C50 /* MainWindow-iPad.xib */,
 				8C7B605A13995F6E0095C5C5 /* acorn.png */,
 				8C7B605B13995F6E0095C5C5 /* bark.png */,
 				8C7B605C13995F6E0095C5C5 /* compass.png */,
@@ -282,6 +285,7 @@
 				8C7B607713995F6E0095C5C5 /* Resource License.txt in Resources */,
 				8C7B607813995F6E0095C5C5 /* rustle.wav in Resources */,
 				8C7B607913995F6E0095C5C5 /* shark.wav in Resources */,
+				8C8E21F413D9F79000351C50 /* MainWindow-iPad.xib in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -311,6 +315,7 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
+				ARCHS = "$(ARCHS_STANDARD_32_BIT)";
 				BUNDLE_IDENTIFIER = com.lightningtoads.shovestuff;
 				COPY_PHASE_STRIP = NO;
 				GCC_DYNAMIC_NO_PIC = NO;
@@ -324,6 +329,8 @@
 					"\"$(SRCROOT)/../../../../../iphone/lib\"",
 				);
 				PRODUCT_NAME = RandIsle;
+				SDKROOT = iphoneos;
+				TARGETED_DEVICE_FAMILY = "1,2";
 			};
 			name = Debug;
 		};
@@ -331,6 +338,7 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
+				ARCHS = "$(ARCHS_STANDARD_32_BIT)";
 				BUNDLE_IDENTIFIER = com.lightningtoads.shovestuff;
 				CODE_SIGN_IDENTITY = "";
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
@@ -345,6 +353,8 @@
 				);
 				PRODUCT_NAME = RandIsle;
 				"PROVISIONING_PROFILE[sdk=iphoneos*]" = "";
+				SDKROOT = iphoneos;
+				TARGETED_DEVICE_FAMILY = "1,2";
 			};
 			name = Release;
 		};
@@ -382,6 +392,7 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
+				ARCHS = "$(ARCHS_STANDARD_32_BIT)";
 				BUNDLE_IDENTIFIER = com.lightningtoads.shovestuff;
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Distribution";
 				COPY_PHASE_STRIP = YES;
@@ -395,6 +406,8 @@
 				);
 				PRODUCT_NAME = RandIsle;
 				"PROVISIONING_PROFILE[sdk=iphoneos*]" = "";
+				SDKROOT = iphoneos;
+				TARGETED_DEVICE_FAMILY = "1,2";
 			};
 			name = Distribution;
 		};
@@ -405,15 +418,17 @@
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
 				GCC_C_LANGUAGE_STANDARD = c99;
 				GCC_INPUT_FILETYPE = sourcecode.cpp.objcpp;
+				GCC_VERSION = com.apple.compilers.llvmgcc42;
 				GCC_WARN_ABOUT_RETURN_TYPE = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
 				HEADER_SEARCH_PATHS = "~/iphone/include";
+				IPHONEOS_DEPLOYMENT_TARGET = 3.0;
 				LIBRARY_SEARCH_PATHS = "~/iphone/lib";
 				OTHER_CFLAGS = "-DTOADLET_DEBUG";
 				OTHER_LDFLAGS = (
-					"-ltoadlet_flick_iosmotiondetector_sd",
-					"-ltoadlet_ribbit_alplayer_sd",
-					"-ltoadlet_peeper_glrenderer_sd",
+					"-ltoadlet_flick_iosmotiondevice_sd",
+					"-ltoadlet_ribbit_alaudiodevice_sd",
+					"-ltoadlet_peeper_glrenderdevice_sd",
 					"-ltoadlet_tadpole_hop_sd",
 					"-ltoadlet_pad_sd",
 					"-ltoadlet_flick_sd",
@@ -436,15 +451,17 @@
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer: Alan Fischer (FYP4N6S36H)";
 				GCC_C_LANGUAGE_STANDARD = c99;
 				GCC_INPUT_FILETYPE = sourcecode.cpp.objcpp;
+				GCC_VERSION = com.apple.compilers.llvmgcc42;
 				GCC_WARN_ABOUT_RETURN_TYPE = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
 				HEADER_SEARCH_PATHS = "~/iphone/include";
+				IPHONEOS_DEPLOYMENT_TARGET = 3.0;
 				LIBRARY_SEARCH_PATHS = "~/iphone/lib";
 				OTHER_LDFLAGS = (
-					"-ltoadlet_flick_iosmotiondetector_s",
+					"-ltoadlet_flick_iosmotiondevice_s",
 					"-ltoadlet_pad_s",
-					"-ltoadlet_ribbit_alplayer_s",
-					"-ltoadlet_peeper_glrenderer_s",
+					"-ltoadlet_ribbit_alaudiodevice_s",
+					"-ltoadlet_peeper_glrenderdevice_s",
 					"-ltoadlet_tadpole_hop_s",
 					"-ltoadlet_tadpole_s",
 					"-ltoadlet_flick_s",

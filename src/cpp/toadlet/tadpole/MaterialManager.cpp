@@ -239,6 +239,10 @@ ShaderState::ptr MaterialManager::createShaderState(){
 }
 
 void MaterialManager::modifyRenderState(RenderState::ptr dst,RenderState::ptr src){
+	if(src==NULL || dst==NULL){
+		return;
+	}
+
 	BlendState blendState;
 	if(src->getBlendState(blendState)) dst->setBlendState(blendState);
 
@@ -269,6 +273,10 @@ void MaterialManager::modifyRenderState(RenderState::ptr dst,RenderState::ptr sr
 }
 
 void MaterialManager::modifyShaderState(ShaderState::ptr dst,ShaderState::ptr src){
+	if(src==NULL || dst==NULL){
+		return;
+	}
+
 	int i;
 	for(i=0;i<Shader::ShaderType_MAX;++i){
 		Shader::ptr shader=src->getShader((Shader::ShaderType)i);
