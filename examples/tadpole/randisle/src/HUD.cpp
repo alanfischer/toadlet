@@ -162,8 +162,9 @@ void HUD::logicUpdate(int dt,int scope){
 			mSharkSound->stop();
 		}
 	}
-	
-//	mSystemLabel->setText(String("FPS:")+(int)getFramesPerSecond());
+
+	/// @todo: Why isn't this working?
+	mSystemLabel->setText(String("FPS:")+(int)getFramesPerSecond());
 
 	super::logicUpdate(dt,scope);
 }
