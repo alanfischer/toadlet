@@ -354,6 +354,7 @@ bool GLBuffer::update(tbyte *data,int start,int size){
 	return true;
 }
 
+#if defined(TOADLET_HAS_GLSHADERS)
 bool GLBuffer::activateUniforms(){
 	int resourceCount=0;
 	int i;
@@ -430,6 +431,7 @@ bool GLBuffer::activateUniforms(){
 
 	return true;
 }
+#endif
 
 GLenum GLBuffer::getBufferUsage(int usage,int access){
 	GLenum glusage=0;

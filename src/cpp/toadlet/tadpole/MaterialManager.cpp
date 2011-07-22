@@ -198,7 +198,7 @@ RenderState::ptr MaterialManager::createRenderState(){
 		Logger::debug(Categories::TOADLET_TADPOLE,"creating RenderState");
 
 		renderState=RenderState::ptr(mEngine->getRenderDevice()->createRenderState());
-		if(renderState->create()==false){
+		if(renderState==NULL || renderState->create()==false){
 			return NULL;
 		}
 	}
@@ -227,7 +227,7 @@ ShaderState::ptr MaterialManager::createShaderState(){
 		Logger::debug(Categories::TOADLET_TADPOLE,"creating ShaderState");
 
 		shaderState=ShaderState::ptr(mEngine->getRenderDevice()->createShaderState());
-		if(shaderState->create()==false){
+		if(shaderState==NULL || shaderState->create()==false){
 			return NULL;
 		}
 	}

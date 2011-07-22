@@ -160,6 +160,10 @@ void RenderPass::shareStates(RenderPass *source){
 }
 
 void RenderPass::setShader(Shader::ShaderType type,Shader::ptr shader){
+	if(mShaderState==NULL){
+		return;
+	}
+	
 	mShaderState->setShader(type,shader);
 
 	if(mVariables!=NULL){

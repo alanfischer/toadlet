@@ -29,6 +29,8 @@
 #include "GLIncludes.h"
 #include "GLVertexFormat.h"
 
+#if defined(TOADLET_HAS_GLSL)
+
 namespace toadlet{
 namespace peeper{
 
@@ -55,5 +57,7 @@ protected:
 
 }
 }
+
+#endif
 
 #endif

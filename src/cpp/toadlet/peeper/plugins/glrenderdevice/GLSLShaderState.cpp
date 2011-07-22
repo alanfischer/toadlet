@@ -28,6 +28,8 @@
 #include "GLSLVertexLayout.h"
 #include "GLRenderDevice.h"
 
+#if defined(TOADLET_HAS_GLSL)
+
 namespace toadlet{
 namespace peeper{
 
@@ -307,3 +309,5 @@ bool GLSLShaderState::reflect(){
 
 }
 }
+
+#endif
