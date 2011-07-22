@@ -4,18 +4,9 @@
 #include "msPlugInImpl.h"
 #undef CreatePlugIn
 #include "../shared/msConversion.h"
-
-#include <toadlet/egg/io/FileStream.h>
-#include <toadlet/tadpole/MeshManager.h>
-#include <toadlet/tadpole/handler/XMSHHandler.h>
-#include <toadlet/tadpole/handler/XANMHandler.h>
+#include <toadlet/tadpole.h>
 
 #pragma warning(disable:4996)
-
-using namespace toadlet;
-using namespace toadlet::egg::io;
-using namespace toadlet::peeper;
-using namespace toadlet::tadpole::handler;
 
 enum {
     eMeshes         = 1,
@@ -266,7 +257,7 @@ cPlugIn::importMesh(msModel *pModel,const String &name,int flags){
 				msMaterial_SetName(msmat,materialName);
 
 				MaterialState materialState;
-				if(material->getMaterialState(materialState)){
+				if(material->getPass()->getMaterialState(materialState)){
 					msMaterial_SetAmbient(msmat,(float*)materialState.ambient.getData());
 					msMaterial_SetDiffuse(msmat,(float*)materialState.diffuse.getData());
 					msMaterial_SetSpecular(msmat,(float*)materialState.specular.getData());
@@ -275,7 +266,7 @@ cPlugIn::importMesh(msModel *pModel,const String &name,int flags){
 					msMaterial_SetTransparency(msmat,1.0);
 				}
 
-				String textureName=material->getTextureName();
+				String textureName=material->getPass()->getTextureName(0);
 				msMaterial_SetDiffuseTexture(msmat,textureName);
 
 				//msMaterial_SetAlphaTexture(msmat,szAlphaTexture);

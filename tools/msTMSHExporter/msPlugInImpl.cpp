@@ -5,10 +5,8 @@
 #undef CreatePlugIn
 #include "commctrl.h"
 #include "../shared/msConversion.h"
+#include <toadlet/toadlet.h>
 #pragma comment(lib,"comctl32.lib")
-
-#include <toadlet/egg/io/FileStream.h>
-#include <toadlet/tadpole/MeshManager.h>
 
 #pragma warning(disable:4996)
 
@@ -139,6 +137,8 @@ cPlugIn::Execute (msModel *pModel)
     UpdateWindow(hwndProgress);
 
     SendMessage(hwndProgress,PBM_SETRANGE,0,MAKELPARAM(0,100));
+
+	Engine *engine=new Engine(true);
 
 	int result=-1;
 	String name=szFile;

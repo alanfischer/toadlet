@@ -1440,6 +1440,9 @@ int D3D9RenderDevice::getVariableFormat(const D3DXCONSTANT_DESC &desc){
 		case D3DXPT_FLOAT:
 			format|=VariableBufferFormat::Format_TYPE_FLOAT_32;
 		break;
+		default:
+			format|=VariableBufferFormat::Format_TYPE_RESOURCE;
+		break;
 	}
 
 	if(desc.Rows>1){

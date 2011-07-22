@@ -310,17 +310,17 @@ bool BACConverter::extractMeshData(Mesh::ptr mesh,bool useSubmeshes){
 				}
 
 				RasterizerState rasterizerState;
-				if(material->getRasterizerState(rasterizerState)){
+				if(material->getPass()->getRasterizerState(rasterizerState)){
 					m->doubleSided=(rasterizerState.cull==RasterizerState::CullType_NONE);
 				}
 
 				MaterialState materialState;
-				if(material->getMaterialState(materialState)){
+				if(material->getPass()->getMaterialState(materialState)){
 					m->lighting=materialState.lighting;
 				}
 
-				Texture *texture=material->getTexture();
-				String name=material->getTextureName();
+				Texture *texture=material->getPass()->getTexture(0);
+				String name=material->getPass()->getTextureName(0);
 				if(texture!=NULL || name.length()>0){
 					int width=256,height=256;
 					if(texture!=NULL){
