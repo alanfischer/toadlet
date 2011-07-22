@@ -63,7 +63,7 @@ Shader::ptr ShaderManager::createShader(Shader::ShaderType type,const String &pr
 	}
 
 	Shader::ptr shader=Shader::ptr(mEngine->getRenderDevice()->createShader());
-	if(shader->create(type,profile,code)==false){
+	if(shader==NULL || shader->create(type,profile,code)==false){
 		return NULL;
 	}
 

@@ -150,6 +150,10 @@ void RenderVariableSet::removeVariable(RenderVariable::ptr variable){
 }
 
 void RenderVariableSet::buildBuffers(BufferManager *manager,ShaderState *state){
+	if(state==NULL){
+		return;
+	}
+
 	Collection<VariableInfo> variables;
 	int i,j;
 

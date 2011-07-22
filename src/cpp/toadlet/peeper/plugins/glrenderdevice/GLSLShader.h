@@ -30,6 +30,8 @@
 #include <toadlet/egg/BaseResource.h>
 #include <toadlet/peeper/Shader.h>
 
+#if defined(TOADLET_HAS_GLSL)
+
 namespace toadlet{
 namespace peeper{
 
@@ -71,5 +73,7 @@ protected:
 
 }
 }
+
+#endif
 
 #endif

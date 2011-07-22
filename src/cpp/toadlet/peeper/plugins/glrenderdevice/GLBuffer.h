@@ -80,7 +80,9 @@ public:
 	bool unlock();
 	bool update(tbyte *data,int start,int size);
 
-	bool activateUniforms();
+	#if defined(TOADLET_HAS_GLSHADERS)
+		bool activateUniforms();
+	#endif
 
 protected:
 	bool createContext();

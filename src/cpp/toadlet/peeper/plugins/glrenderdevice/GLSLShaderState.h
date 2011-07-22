@@ -30,6 +30,8 @@
 #include "GLSLShader.h"
 #include "GLSLVertexLayout.h"
 
+#if defined(TOADLET_HAS_GLSL)
+
 namespace toadlet{
 namespace peeper{
 
@@ -83,5 +85,7 @@ protected:
 
 }
 }
+
+#endif
 
 #endif

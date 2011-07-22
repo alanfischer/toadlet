@@ -165,13 +165,17 @@ public:
 	static GLuint getGLDepthTextureMode(TextureState::ShadowResult shadow);
 	static int getFixedAttribFromSemantic(int semantic,int index);
 	static GLuint getClientStateFromSemantic(int semantic,int index);
-	static int getVariableFormat(GLuint type);
+	#if defined(TOADLET_HAS_GLSHADERS)
+		static int getVariableFormat(GLuint type);
+	#endif
 	static GLuint GLCubeFaces[6];
 
 protected:
 	void setVertexData(const VertexData *vertexData);
 	void setFixedVertexData(const VertexData *vertexData);
-	void setShaderVertexData(const VertexData *vertexData);
+	#if defined(TOADLET_HAS_GLSHADERS)
+		void setShaderVertexData(const VertexData *vertexData);
+	#endif
 
 	void vertexFormatCreated(GLVertexFormat *format);
 	void vertexFormatDestroyed(GLVertexFormat *format);

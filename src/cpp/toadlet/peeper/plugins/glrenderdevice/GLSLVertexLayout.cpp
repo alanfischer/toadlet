@@ -27,6 +27,8 @@
 #include "GLRenderDevice.h"
 #include "GLSLShaderState.h"
 
+#if defined(TOADLET_HAS_GLSL)
+
 namespace toadlet{
 namespace peeper{
 
@@ -65,3 +67,5 @@ void GLSLVertexLayout::destroy(){
 
 }
 }
+
+#endif

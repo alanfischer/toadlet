@@ -181,7 +181,7 @@ void RandIsle::render(RenderDevice *renderDevice){
 */
 		mHUD->render(renderDevice);
 #else
-mCamera->updateFramesPerSecond();
+mCamera->updateFramesPerSecond();  
 
 mScene->getBackground()->setTranslate(mCamera->getWorldTranslate());
 mScene->getBackground()->frameUpdate(0,-1);

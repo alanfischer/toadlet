@@ -197,8 +197,10 @@ bool GLRenderDevice::create(RenderTarget *target,int *options){
 		String("GL_RENDERER:") + glGetString(GL_RENDERER));
 	Logger::alert(Categories::TOADLET_PEEPER,
 		String("GL_VERSION:") + glGetString(GL_VERSION));
-	Logger::alert(Categories::TOADLET_PEEPER,
-		String("GL_SHADING_LANGUAGE_VERSION:") + glGetString(GL_SHADING_LANGUAGE_VERSION));
+	#if defined(TOADLET_HAS_GLSHADERS)
+		Logger::alert(Categories::TOADLET_PEEPER,
+			String("GL_SHADING_LANGUAGE_VERSION:") + glGetString(GL_SHADING_LANGUAGE_VERSION));
+	#endif
 	Logger::alert(Categories::TOADLET_PEEPER,
 		String("GL_EXTENSIONS:") + glGetString(GL_EXTENSIONS));
 
@@ -447,52 +449,58 @@ RenderState *GLRenderDevice::createRenderState(){
 }
 
 ShaderState *GLRenderDevice::createShaderState(){
-	return new GLSLShaderState(this);
+	#if defined(TOADLET_HAS_GLSL)
+		return new GLSLShaderState(this);
+	#else
+		return NULL;
+	#endif
 }
 
 void GLRenderDevice::setMatrix(MatrixType type,const Matrix4x4 &matrix){
-	if(type==MatrixType_MODEL || type==MatrixType_VIEW){
-		if(type==MatrixType_MODEL){
-			#if defined(TOADLET_FIXED_POINT) && !defined(TOADLET_HAS_GLES)
-				MathConversion::scalarToFloat(mModelMatrix,matrix);
+	#if defined(TOADLET_HAS_GLFIXED)
+		if(type==MatrixType_MODEL || type==MatrixType_VIEW){
+			if(type==MatrixType_MODEL){
+				#if defined(TOADLET_FIXED_POINT) && !defined(TOADLET_HAS_GLES)
+					MathConversion::scalarToFloat(mModelMatrix,matrix);
+				#else
+					mModelMatrix.set(matrix);
+				#endif
+			}
+			else{
+				#if defined(TOADLET_FIXED_POINT) && !defined(TOADLET_HAS_GLES)
+					MathConversion::scalarToFloat(mViewMatrix,matrix);
+				#else
+					mViewMatrix.set(matrix);
+				#endif
+			}
+
+			glMatrixMode(GL_MODELVIEW);
+
+			#if defined(TOADLET_FIXED_POINT) && defined(TOADLET_HAS_GLES)
+				glLoadMatrixx(mViewMatrix.data);
+				glMultMatrixx(mModelMatrix.data);
 			#else
-				mModelMatrix.set(matrix);
+				glLoadMatrixf(mViewMatrix.data);
+				glMultMatrixf(mModelMatrix.data);
 			#endif
 		}
 		else{
-			#if defined(TOADLET_FIXED_POINT) && !defined(TOADLET_HAS_GLES)
-				MathConversion::scalarToFloat(mViewMatrix,matrix);
+			glMatrixMode(GL_PROJECTION);
+
+			#if defined(TOADLET_FIXED_POINT)
+				#if defined(TOADLET_HAS_GLES)
+					glLoadMatrixx(matrix.data);
+				#else
+					MathConversion::scalarToFloat(cacheMatrix4x4,matrix);
+					glLoadMatrixf(cacheMatrix4x4.data);
+				#endif
 			#else
-				mViewMatrix.set(matrix);
+				glLoadMatrixf(matrix.data);
 			#endif
 		}
 
-		glMatrixMode(GL_MODELVIEW);
-
-		#if defined(TOADLET_FIXED_POINT) && defined(TOADLET_HAS_GLES)
-			glLoadMatrixx(mViewMatrix.data);
-			glMultMatrixx(mModelMatrix.data);
-		#else
-			glLoadMatrixf(mViewMatrix.data);
-			glMultMatrixf(mModelMatrix.data);
-		#endif
-	}
-	else{
-		glMatrixMode(GL_PROJECTION);
-
-		#if defined(TOADLET_FIXED_POINT)
-			#if defined(TOADLET_HAS_GLES)
-				glLoadMatrixx(matrix.data);
-			#else
-				MathConversion::scalarToFloat(cacheMatrix4x4,matrix);
-				glLoadMatrixf(cacheMatrix4x4.data);
-			#endif
-		#else
-			glLoadMatrixf(matrix.data);
-		#endif
-	}
-
-	TOADLET_CHECK_GLERROR("setMatrix");
+		TOADLET_CHECK_GLERROR("setMatrix");
+	#endif
 }
 
 bool GLRenderDevice::setRenderTarget(RenderTarget *target){
@@ -849,21 +857,25 @@ bool GLRenderDevice::setRenderState(RenderState *renderState){
 }
 
 bool GLRenderDevice::setShaderState(ShaderState *shaderState){
-	GLSLShaderState *glshaderState=shaderState!=NULL?(GLSLShaderState*)shaderState->getRootShaderState():NULL;
-	if(glshaderState==NULL){
+	#if defined(TOADLET_HAS_GLSL)
+		GLSLShaderState *glshaderState=shaderState!=NULL?(GLSLShaderState*)shaderState->getRootShaderState():NULL;
+		if(glshaderState==NULL){
+			return false;
+		}
+
+		if(glshaderState->activate()){
+			mLastShaderState=glshaderState;
+		}
+		else{
+			mLastShaderState=NULL;
+		}
+
+		TOADLET_CHECK_GLERROR("setShaderState");
+
+		return true;
+	#else
 		return false;
-	}
-
-	if(glshaderState->activate()){
-		mLastShaderState=glshaderState;
-	}
-	else{
-		mLastShaderState=NULL;
-	}
-
-	TOADLET_CHECK_GLERROR("setShaderState");
-
-	return true;
+	#endif
 }
 
 void GLRenderDevice::setBlendState(const BlendState &state){
@@ -1280,6 +1292,7 @@ void GLRenderDevice::setTextureStatePostTexture(int i,TextureState *state){
 }
 
 void GLRenderDevice::setBuffer(Shader::ShaderType shaderType,int i,VariableBuffer *buffer){
+#if defined(TOADLET_HAS_GLSHADERS)
 	GLBuffer *glbuffer=buffer!=NULL?(GLBuffer*)buffer->getRootVariableBuffer():NULL;
 	if(glbuffer==NULL){
 		return;
@@ -1296,6 +1309,7 @@ void GLRenderDevice::setBuffer(Shader::ShaderType shaderType,int i,VariableBuffe
 	}
 
 	TOADLET_CHECK_GLERROR("setBuffer");
+#endif
 }
 
 void GLRenderDevice::setTexture(int i,Texture *texture){
@@ -1649,18 +1663,24 @@ bool GLRenderDevice::hardwareMappingSupported(GLBuffer *buffer) const{
 }
 
 void GLRenderDevice::setVertexData(const VertexData *vertexData){
-	if(mLastShaderState==NULL){
-		if(mLastShaderSemanticBits!=0){
-			setShaderVertexData(NULL);
+	#if defined(TOADLET_HAS_GLSHADERS) && defined(TOADLET_HAS_GLFIXED)
+		if(mLastShaderState==NULL){
+			if(mLastShaderSemanticBits!=0){
+				setShaderVertexData(NULL);
+			}
+			setFixedVertexData(vertexData);
 		}
-		setFixedVertexData(vertexData);
-	}
-	else{
-		if(mLastFixedSemanticBits!=0){
-			setFixedVertexData(NULL);
+		else{
+			if(mLastFixedSemanticBits!=0){
+				setFixedVertexData(NULL);
+			}
+			setShaderVertexData(vertexData);
 		}
+	#elif defined(TOADLET_HAS_GLSHADERS)
 		setShaderVertexData(vertexData);
-	}
+	#elif defined(TOADLET_HAS_GLFIXED)
+		setFixedVertexData(vertexData);
+	#endif
 
 	if(vertexData!=NULL){
 		mLastVertexBuffers.resize(vertexData->vertexBuffers.size());
@@ -1800,6 +1820,7 @@ void GLRenderDevice::setFixedVertexData(const VertexData *vertexData){
 	TOADLET_CHECK_GLERROR("setFixedVertexData");
 }
 
+#if defined(TOADLET_HAS_GLSHADERS)
 void GLRenderDevice::setShaderVertexData(const VertexData *vertexData){
 	int numVertexBuffers=0;
 	int semanticBits=0,lastSemanticBits=mLastShaderSemanticBits;
@@ -1867,6 +1888,7 @@ void GLRenderDevice::setShaderVertexData(const VertexData *vertexData){
 
 	TOADLET_CHECK_GLERROR("setShaderVertexData");
 }
+#endif
 
 GLenum GLRenderDevice::getGLDepthFunc(DepthState::DepthTest test){
 	switch(test){
@@ -2329,8 +2351,10 @@ GLuint GLRenderDevice::getClientStateFromSemantic(int semantic,int index){
 			switch(index){
 				case 0:
 					return GL_COLOR_ARRAY;
-				case 1:
-					return GL_SECONDARY_COLOR_ARRAY;
+				#if !defined(TOADLET_HAS_GLES)
+					case 1:
+						return GL_SECONDARY_COLOR_ARRAY;
+				#endif
 				default:
 					return 0;
 			}
@@ -2339,6 +2363,7 @@ GLuint GLRenderDevice::getClientStateFromSemantic(int semantic,int index){
 	}
 };
 
+#if defined(TOADLET_HAS_GLSHADERS)
 int GLRenderDevice::getVariableFormat(GLuint type){
 	switch(type){
 		case GL_FLOAT:
@@ -2394,6 +2419,7 @@ int GLRenderDevice::getVariableFormat(GLuint type){
 			return 0;
 	}
 }
+#endif
 
 #if !defined(TOADLET_HAS_GLES)
 	GLuint GLRenderDevice::GLCubeFaces[6]={
@@ -2420,16 +2446,18 @@ void GLRenderDevice::vertexFormatDestroyed(GLVertexFormat *format){
 	}
 
 	int i;
-	for(i=mShaderStates.size()-1;i>=0;--i){
-		GLSLShaderState *state=mShaderStates[i];
-		if(handle<state->mLayouts.size()){
-			GLSLVertexLayout *layout=state->mLayouts[handle];
-			if(layout!=NULL){
-				layout->destroy();
+	#if defined(TOADLET_HAS_GLSL)
+		for(i=mShaderStates.size()-1;i>=0;--i){
+			GLSLShaderState *state=mShaderStates[i];
+			if(handle<state->mLayouts.size()){
+				GLSLVertexLayout *layout=state->mLayouts[handle];
+				if(layout!=NULL){
+					layout->destroy();
+				}
+				state->mLayouts.removeAt(handle);
 			}
-			state->mLayouts.removeAt(handle);
 		}
-	}
+	#endif
 	for(i=handle;i<mVertexFormats.size();++i){
 		mVertexFormats[i]->mUniqueHandle--;
 	}

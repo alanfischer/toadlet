@@ -72,9 +72,8 @@
 		#include <OpenGLES/ES2/glext.h>
 		#define TOADLET_HAS_EAGL
 		#define TOADLET_HAS_EGL
-		#define TOADLET_HAS_EGL_11
+		#define TOADLET_HAS_EGL_20
 		#define TOADLET_HAS_GLES
-		#define TOADLET_HAS_GL_11
 		#define TOADLET_HAS_GL_20
 	#endif
 #else
@@ -271,6 +270,14 @@
 #if defined(TOADLET_HAS_GLES)
 	#define TOADLET_HAS_GLVBOS
 	#define TOADLET_HAS_GLIBOS
+#endif
+
+#if defined(TOADLET_HAS_GL_11)
+	#define TOADLET_HAS_GLFIXED
+#endif
+#if defined(TOADLET_HAS_GL_20)
+	#define TOADLET_HAS_GLSHADERS
+	#define TOADLET_HAS_GLSL
 #endif
 
 #if defined(TOADLET_DEBUG)
