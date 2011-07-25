@@ -77,7 +77,7 @@ if (_CMAKE_IPHONEOS_SDKS)
 	set (CMAKE_OSX_SYSROOT ${_CMAKE_IPHONEOS_SDK_ROOT} CACHE PATH "Sysroot used for iPhoneOS support")
 
 	# set the architecture for iPhoneOS
-	set (CMAKE_OSX_ARCHITECTURES armv6 CACHE string  "Build architecture for iPhoneOS")
+	set (CMAKE_OSX_ARCHITECTURES "$(ARCHS_UNIVERSAL_IPHONE_OS)" CACHE string  "Build architecture for iPhoneOS")
 
 	# TODO: Do we actually need this? It appears not...
 	#add_definitions(-DTARGET_OS_IPHONE)
