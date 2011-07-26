@@ -1,6 +1,6 @@
 MXML is usually built for the iOS platform with these cmake files. The instructions below explain how to use them.
 
-1. Extract the version of MXML you have download to a directory (say mxml/)
+1. Extract the version of MXML you have downloaded to a directory (say mxml/)
 
 2. Copy these 2 files (CMakeLists.txt and config.h.cmake) into the mxml/ directory.
 
