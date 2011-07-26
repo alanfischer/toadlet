@@ -152,7 +152,7 @@ The following options may be set using cmake to control the build of toadlet. Ma
 
 
 
-*TOADLET_PLATFORM_IPHONE* OFF/ON _Enables iOS build (OSX only - enabled through CMake Toolchain)_
+*TOADLET_PLATFORM_IOS* OFF/ON _Enables iOS build (OSX only - enabled through CMake Toolchain)_
 
 
 
@@ -366,19 +366,19 @@ The same valid architectures are as above is OSX
 
 
 
-Toadlet is avaialble for the iOS platform using the included Toolchain files. Simply point cmake to the proper iPhoneOS toolchain and enable the Xcode generator. It also pays to install your iOS libraries in a separate folder.
+Toadlet is avaialble for the iOS platform using the included Toolchain files. Simply point cmake to the iOS toolchain and enable the Xcode generator. It also pays to install your iOS libraries in a separate folder.
 
 
 
-  cmake -GXcode -DCMAKE_TOOLCHAIN_FILE=../cmake/Toolchains/iPhoneOS.cmake -DCMAKE_INSTALL_PREFIX=$HOME/iPhoneOS ..
+  cmake -GXcode -DCMAKE_TOOLCHAIN_FILE=../cmake/Toolchains/iOS.cmake -DCMAKE_INSTALL_PREFIX=$HOME/iOS ..
 
 
 
-To build for the iPhoneSimulator, just point CMake to the iPhoneSimulator toolchain file.
+You can build for the iOS Simulator from the same toolchain used above. Just change your build target in XCode. However, it's best to install the libraries into a different location to avoid confusion. 
 
 
 
-  cmake -GXcode -DCMAKE_TOOLCHAIN_FILE=../cmake/Toolchains/iPhoneSimulator.cmake -DCMAKE_INSTALL_PREFIX=$HOME/iPhoneOS ..
+  cmake -GXcode -DCMAKE_TOOLCHAIN_FILE=../cmake/Toolchains/iOS.cmake -DCMAKE_INSTALL_PREFIX=$HOME/iOSsimulator..
 
 
 
