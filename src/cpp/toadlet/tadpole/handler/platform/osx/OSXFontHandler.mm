@@ -28,7 +28,7 @@
 #include <toadlet/tadpole/handler/platform/osx/OSXFontHandler.h>
 #include <dlfcn.h>
 
-#if defined(TOADLET_PLATFORM_IPHONE)
+#if defined(TOADLET_PLATFORM_IOS)
 #	import <UIKit/UIKit.h>
 #else
 #	import <AppKit/AppKit.h>

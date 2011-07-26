@@ -382,15 +382,15 @@ if (TOADLET_PLATFORM_OSX)
 	source_group ("Source Files\\\\handler\\\\platform\\\\osx" FILES ${TADPOLE_HANDLER_PLATFORM_OSX_SRC})
 	source_group ("Header Files\\\\handler\\\\platform\\\\osx" FILES ${TADPOLE_HANDLER_PLATFORM_OSX_HEADERS})
 	set (TADPOLE_SRC ${TADPOLE_SRC} ${TADPOLE_HANDLER_PLATFORM_OSX_SRC})
-	if (TOADLET_PLATFORM_IPHONE)
+	if (TOADLET_PLATFORM_IOS)
 		find_library (UIKIT_LIBS UIKit)
 		set (TADPOLE_LIBS_S ${TADPOLE_LIBS_S} ${UIKIT_LIBS})
 		set (TADPOLE_LIBS ${TADPOLE_LIBS} ${UIKIT_LIBS})
-	else (TOADLET_PLATFORM_IPHONE)
+	else (TOADLET_PLATFORM_IOS)
 		find_library (APPKIT_LIBS AppKit)
 		set (TADPOLE_LIBS_S ${TADPOLE_LIBS_S} ${APPKIT_LIBS})	
 		set (TADPOLE_LIBS ${TADPOLE_LIBS} ${APPKIT_LIBS})	
-	endif (TOADLET_PLATFORM_IPHONE)
+	endif (TOADLET_PLATFORM_IOS)
 elseif (TOADLET_PLATFORM_WIN32)
 	find_package (GDIPLUS)
 	if (GDIPLUS_FOUND)
@@ -412,12 +412,12 @@ set (TADPOLE_NAMESPACES ${TADPOLE_NAMESPACES} PARENT_SCOPE)
 
 
 # Dynamic library
-if (NOT TOADLET_PLATFORM_IPHONE)
+if (NOT TOADLET_PLATFORM_IOS)
 	add_library (toadlet_tadpole SHARED ${TADPOLE_SRC} ${TADPOLE_HEADERS})
 	set_target_properties (toadlet_tadpole PROPERTIES ${DYNAMIC_LIB_PROPS})
 	target_link_libraries (toadlet_tadpole toadlet_egg toadlet_peeper toadlet_ribbit ${TADPOLE_LIBS})
 	install (TARGETS toadlet_tadpole DESTINATION lib)
-endif (NOT TOADLET_PLATFORM_IPHONE)
+endif (NOT TOADLET_PLATFORM_IOS)
 
 
 # Static library

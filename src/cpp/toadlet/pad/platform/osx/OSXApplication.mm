@@ -25,7 +25,7 @@
 
 #include <toadlet/Types.h>
 
-#if defined(TOADLET_PLATFORM_IPHONE)
+#if defined(TOADLET_PLATFORM_IOS)
 	#define TOADLET_HAS_UIKIT
 #endif
  
@@ -62,7 +62,7 @@ using namespace toadlet::pad;
 #if defined(TOADLET_HAS_OPENAL)
 	extern "C" AudioDevice *new_ALAudioDevice();
 #endif
-#if defined(TOADLET_PLATFORM_IPHONE)
+#if defined(TOADLET_PLATFORM_IOS)
 	extern "C" MotionDevice *new_IOSMotionDevice();
 #endif
 
@@ -300,7 +300,7 @@ OSXApplication::OSXApplication():
 		mAudioDevicePreferences.add("al");
 	#endif
 	
-	#if defined(TOADLET_PLATFORM_IPHONE)
+	#if defined(TOADLET_PLATFORM_IOS)
 		mMotionDevicePlugins.add("ios",MotionDevicePlugin(new_IOSMotionDevice));
 		mMotionDevicePreferences.add("ios");
 	#endif
@@ -476,7 +476,7 @@ bool OSXApplication::getFullscreen() const{
 void OSXApplication::setDifferenceMouse(bool difference){
 	mDifferenceMouse=difference;
 	
-	#if !defined(TOADLET_PLATFORM_IPHONE)
+	#if !defined(TOADLET_PLATFORM_IOS)
 		if(difference){
 			CGDisplayHideCursor(kCGDirectMainDisplay);
 		}
@@ -488,7 +488,7 @@ void OSXApplication::setDifferenceMouse(bool difference){
 
 void OSXApplication::internal_mouseMoved(int x,int y){
 	if(mDifferenceMouse){
-		#if !defined(TOADLET_PLATFORM_IPHONE)
+		#if !defined(TOADLET_PLATFORM_IOS)
 			CGGetLastMouseDelta(&x,&y);
 
 			NSPoint npoint=NSMakePoint(getWidth()/2,getHeight()/2);

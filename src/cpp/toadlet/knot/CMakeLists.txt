@@ -45,12 +45,12 @@ set (KNOT_HEADERS ${KNOT_HEADERS} PARENT_SCOPE)
 
 
 # Dynamic library
-if (NOT TOADLET_PLATFORM_IPHONE)
+if (NOT TOADLET_PLATFORM_IOS)
 	add_library (toadlet_knot SHARED ${KNOT_SRC} ${KNOT_HEADERS})
 	set_target_properties (toadlet_knot PROPERTIES ${DYNAMIC_LIB_PROPS})
 	target_link_libraries (toadlet_knot toadlet_egg)
 	install (TARGETS toadlet_knot DESTINATION lib)
-endif (NOT TOADLET_PLATFORM_IPHONE)
+endif (NOT TOADLET_PLATFORM_IOS)
 
 
 # Static library

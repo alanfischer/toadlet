@@ -426,12 +426,12 @@ set (EGG_NAMESPACES ${EGG_NAMESPACES} PARENT_SCOPE)
 
 
 #  Dynamic library
-if (NOT TOADLET_PLATFORM_IPHONE)
+if (NOT TOADLET_PLATFORM_IOS)
 	add_library (toadlet_egg SHARED ${EGG_SRC} ${EGG_HEADERS})
 	set_target_properties (toadlet_egg PROPERTIES ${DYNAMIC_LIB_PROPS})
 	target_link_libraries (toadlet_egg ${EGG_LIBS})
 	install (TARGETS toadlet_egg DESTINATION lib)
-endif (NOT TOADLET_PLATFORM_IPHONE)
+endif (NOT TOADLET_PLATFORM_IOS)
 
 
 # Static library

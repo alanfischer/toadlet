@@ -32,7 +32,7 @@
 #include <toadlet/knot/ConnectionListener.h>
 #include <string.h> // memset
 
-#if defined(TOADLET_PLATFORM_IPHONE)
+#if defined(TOADLET_PLATFORM_IOS)
 	#import <SystemConfiguration/SCNetworkReachability.h>
 	#define ReachableViaWiFiNetwork	2
 	#define ReachableDirectWWAN	(1<<18)
@@ -596,7 +596,7 @@ bool LANPeerEventConnector::ensureConnectionAbility(){
 			}
 			mConnectionManagerMutex.unlock();
 		#endif
-	#elif defined(TOADLET_PLATFORM_IPHONE)
+	#elif defined(TOADLET_PLATFORM_IOS)
 		SCNetworkReachabilityFlags flags=0;
 		SCNetworkReachabilityRef reachabilityRef=SCNetworkReachabilityCreateWithName(CFAllocatorGetDefault(),"www.google.com");
 		bool gotFlags=SCNetworkReachabilityGetFlags(reachabilityRef,&flags);

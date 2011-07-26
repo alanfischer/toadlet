@@ -91,7 +91,7 @@ elseif (TOADLET_PLATFORM_WIN32)
 		set (PAD_LIBS ${PAD_LIBS} toadlet_peeper_glrenderdevice)
 		set (PAD_LIBS_S ${PAD_LIBS_S} toadlet_peeper_glrenderdevice_s)
 	endif (TOADLET_HAS_OPENGL)
-elseif (TOADLET_PLATFORM_IPHONE)
+elseif (TOADLET_PLATFORM_IOS)
 	find_library (UIKIT_LIBS UIKit)
 	set (PAD_LIBS objc ${UIKIT_LIBS} toadlet_peeper_glrenderdevice toadlet_ribbit_alaudiodevice)
 	set (PAD_LIBS_S objc ${UIKIT_LIBS} toadlet_peeper_glrenderdevice_s toadlet_ribbit_alaudiodevice_s)
@@ -132,12 +132,12 @@ set (PAD_NAMESPACES ${PAD_NAMESPACES} PARENT_SCOPE)
 
 
 # Dynamic Library
-if (NOT TOADLET_PLATFORM_IPHONE)
+if (NOT TOADLET_PLATFORM_IOS)
 	add_library (toadlet_pad SHARED ${PAD_SRC} ${PAD_HEADERS})
 	set_target_properties (toadlet_pad PROPERTIES ${DYNAMIC_LIB_PROPS})
 	target_link_libraries (toadlet_pad toadlet_flick toadlet_tadpole ${PAD_LIBS})
 	install (TARGETS toadlet_pad DESTINATION lib)
-endif (NOT TOADLET_PLATFORM_IPHONE)
+endif (NOT TOADLET_PLATFORM_IOS)
 
 
 # Static Library

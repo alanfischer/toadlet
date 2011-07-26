@@ -34,12 +34,12 @@ set (HOP_NAMESPACES ${HOP_NAMESPACES} PARENT_SCOPE)
 
 
 # Dynamic library
-if (NOT TOADLET_PLATFORM_IPHONE)
+if (NOT TOADLET_PLATFORM_IOS)
 	add_library (toadlet_hop SHARED ${HOP_SRC} ${HOP_HEADERS})
 	set_target_properties (toadlet_hop PROPERTIES ${DYNAMIC_LIB_PROPS})
 	target_link_libraries (toadlet_hop toadlet_egg)
 	install (TARGETS toadlet_hop DESTINATION lib)
-endif (NOT TOADLET_PLATFORM_IPHONE)
+endif (NOT TOADLET_PLATFORM_IOS)
 
 
 # Static library
