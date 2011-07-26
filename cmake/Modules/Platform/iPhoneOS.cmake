@@ -23,8 +23,8 @@ if (NOT DEFINED HAVE_FLAG_SEARCH_PATHS_FIRST)
 	endif ("${DARWIN_MAJOR_VERSION}" GREATER 6)
 endif (NOT DEFINED HAVE_FLAG_SEARCH_PATHS_FIRST)
 # More desirable, but does not work:
-  #INCLUDE(CheckCXXCompilerFlag)
-  #CHECK_CXX_COMPILER_FLAG("-Wl,-search_paths_first" HAVE_FLAG_SEARCH_PATHS_FIRST)
+#INCLUDE(CheckCXXCompilerFlag)
+#CHECK_CXX_COMPILER_FLAG("-Wl,-search_paths_first" HAVE_FLAG_SEARCH_PATHS_FIRST)
 
 set (CMAKE_SHARED_LIBRARY_PREFIX "lib")
 set (CMAKE_SHARED_LIBRARY_SUFFIX ".dylib")
@@ -38,8 +38,9 @@ set (CMAKE_C_OSX_CURRENT_VERSION_FLAG "-current_version ")
 set (CMAKE_CXX_OSX_COMPATIBILITY_VERSION_FLAG "${CMAKE_C_OSX_COMPATIBILITY_VERSION_FLAG}")
 set (CMAKE_CXX_OSX_CURRENT_VERSION_FLAG "${CMAKE_C_OSX_CURRENT_VERSION_FLAG}")
 
-set (CMAKE_C_LINK_FLAGS "-headerpad_max_install_names")
-set (CMAKE_CXX_LINK_FLAGS "-headerpad_max_install_names")
+# Hidden visibilty is required for cxx on iOS 
+set (CMAKE_C_FLAGS "")
+set (CMAKE_CXX_FLAGS "-headerpad_max_install_names -fvisibility=hidden -fvisibility-inlines-hidden")
 
 if (HAVE_FLAG_SEARCH_PATHS_FIRST)
 	set (CMAKE_C_LINK_FLAGS "-Wl,-search_paths_first ${CMAKE_C_LINK_FLAGS}")
@@ -76,11 +77,8 @@ if (_CMAKE_IPHONEOS_SDKS)
 	# Set the sysroot default to the most recent SDK
 	set (CMAKE_OSX_SYSROOT ${_CMAKE_IPHONEOS_SDK_ROOT} CACHE PATH "Sysroot used for iPhoneOS support")
 
-	# set the architecture for iPhoneOS
-	set (CMAKE_OSX_ARCHITECTURES "$(ARCHS_UNIVERSAL_IPHONE_OS)" CACHE string  "Build architecture for iPhoneOS")
-
-	# TODO: Do we actually need this? It appears not...
-	#add_definitions(-DTARGET_OS_IPHONE)
+	# set the architecture for iPhoneOS - this env var sets armv6,armv7 and appears to be XCode's standard. The other found is ARCHS_UNIVERSAL_IPHONE_OS but that is armv7 only
+	set (CMAKE_OSX_ARCHITECTURES "$(ARCHS_STANDARD_32_BIT)" CACHE string  "Build architecture for iPhoneOS")
 
 	# Set the default based on this file and not the environment variable
 	set (CMAKE_FIND_ROOT_PATH ${_CMAKE_IPHONEOS_DEVELOPER_ROOT} ${_CMAKE_IPHONEOS_SDK_ROOT} CACHE string  "iPhoneOS library search path root")
