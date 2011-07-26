@@ -177,7 +177,7 @@ Engine::Engine(bool backable):
 	Math::optimize();
 
 	// Make a guess at what the ideal format is.
-	#if defined(TOADLET_FIXED_POINT) && (defined(TOADLET_PLATFORM_WINCE) || defined(TOADLET_PLATFORM_IPHONE) || defined(TOADLET_PLATFORM_ANDROID))
+	#if defined(TOADLET_FIXED_POINT) && (defined(TOADLET_PLATFORM_WINCE) || defined(TOADLET_PLATFORM_IOS) || defined(TOADLET_PLATFORM_ANDROID))
 		mIdealVertexFormatType=VertexFormat::Format_TYPE_FIXED_32;
 	#else
 		mIdealVertexFormatType=VertexFormat::Format_TYPE_FLOAT_32;

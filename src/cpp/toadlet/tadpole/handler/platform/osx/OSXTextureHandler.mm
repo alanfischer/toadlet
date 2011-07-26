@@ -27,7 +27,7 @@
 #include <toadlet/egg/Error.h>
 #include <toadlet/tadpole/handler/platform/osx/OSXTextureHandler.h>
 
-#if defined(TOADLET_PLATFORM_IPHONE)
+#if defined(TOADLET_PLATFORM_IOS)
 #	import <UIKit/UIKit.h>
 #else
 #	import <AppKit/AppKit.h>

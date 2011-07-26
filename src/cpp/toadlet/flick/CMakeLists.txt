@@ -26,12 +26,12 @@ set (FLICK_NAMESPACES ${FLICK_NAMESPACES} PARENT_SCOPE)
 
 
 # Dynamic library
-if (NOT TOADLET_PLATFORM_IPHONE)
+if (NOT TOADLET_PLATFORM_IOS)
 	add_library (toadlet_flick SHARED ${FLICK_SRC} ${FLICK_HEADERS})
 	set_target_properties (toadlet_flick PROPERTIES ${DYNAMIC_LIB_PROPS})
 	target_link_libraries (toadlet_flick toadlet_egg)
 	install (TARGETS toadlet_flick DESTINATION lib)
-endif (NOT TOADLET_PLATFORM_IPHONE)
+endif (NOT TOADLET_PLATFORM_IOS)
 
 
 # Static library
@@ -45,7 +45,7 @@ install (TARGETS toadlet_flick_s DESTINATION lib)
 if (TOADLET_PLATFORM_WINCE)
 	add_subdirectory (plugins/htcmotiondevice)
 	add_subdirectory (plugins/samsungmotiondevice)
-elseif (TOADLET_PLATFORM_IPHONE)
+elseif (TOADLET_PLATFORM_IOS)
 	add_subdirectory (plugins/iosmotiondevice)
 endif (TOADLET_PLATFORM_WINCE)
 

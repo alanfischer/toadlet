@@ -128,7 +128,7 @@
 	#else
 		#define TOADLET_API
 	#endif
-	#if defined(TOADLET_PLATFORM_IPHONE)
+	#if defined(TOADLET_PLATFORM_IOS)
 		#define TOADLET_GCC_INHERITANCE_BUG
 	#endif
 	namespace toadlet{

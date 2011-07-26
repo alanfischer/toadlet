@@ -73,12 +73,12 @@ set (PEEPER_NAMESPACES ${PEEPER_NAMESPACES} PARENT_SCOPE)
 
 
 # Dynamic library
-if (NOT TOADLET_PLATFORM_IPHONE)
+if (NOT TOADLET_PLATFORM_IOS)
 	add_library (toadlet_peeper SHARED ${PEEPER_SRC} ${PEEPER_HEADERS})
 	set_target_properties (toadlet_peeper PROPERTIES ${DYNAMIC_LIB_PROPS})
 	target_link_libraries (toadlet_peeper toadlet_egg)
 	install (TARGETS toadlet_peeper DESTINATION lib)
-endif (NOT TOADLET_PLATFORM_IPHONE)
+endif (NOT TOADLET_PLATFORM_IOS)
 
 
 # Static library
@@ -129,7 +129,7 @@ elseif (TOADLET_PLATFORM_WIN32)
 	else (GLEW_FOUND)
 		message ("GLEW was not found. The peeper_glrenderdevice will not be built")
 	endif (GLEW_FOUND)
-elseif (TOADLET_PLATFORM_IPHONE)
+elseif (TOADLET_PLATFORM_IOS)
 	# Both iPhoneOS and iPhoneSimulator always have opengles
 	set (TOADLET_HAS_OPENGL ON PARENT_SCOPE)
 	add_subdirectory (plugins/glrenderdevice)

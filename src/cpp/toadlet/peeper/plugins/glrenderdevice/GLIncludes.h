@@ -57,7 +57,7 @@
 	#endif
 	#define GL_POINT_SPRITE GL_POINT_SPRITE_OES 
 	#define GL_COORD_REPLACE GL_COORD_REPLACE_OES
-#elif defined(TOADLET_PLATFORM_IPHONE)
+#elif defined(TOADLET_PLATFORM_IOS)
 	#if 1
 		#include <OpenGLES/ES1/gl.h>
 		#include <OpenGLES/ES1/glext.h>
@@ -246,7 +246,7 @@
 #endif
 
 #if defined(TOADLET_PLATFORM_WIN32) || defined(TOADLET_PLATFORM_WINCE) || \
-	(defined(TOADLET_PLATFORM_POSIX) && !defined(TOADLET_PLATFORM_OSX) && !defined(TOADLET_PLATFORM_IPHONE))
+	(defined(TOADLET_PLATFORM_POSIX) && !defined(TOADLET_PLATFORM_OSX) && !defined(TOADLET_PLATFORM_IOS))
 	#define TOADLET_HAS_GLPBUFFERS
 #endif
 #if defined(TOADLET_HAS_GLEW) || defined(TOADLET_HAS_EAGL)

@@ -11,19 +11,19 @@ set (STATIC_LIB_PROPS COMPILE_DEFINITIONS TOADLET_BUILD_STATIC COMPILE_DEFINITIO
 # Set win32 platform specific options
 if (TOADLET_PLATFORM_WIN32)
 	# Set defaults
-	if (TOADLET_PLATFORM_WINCE OR TOADLET_PLATFORM_IPHONE)
+	if (TOADLET_PLATFORM_WINCE OR TOADLET_PLATFORM_IOS)
 		option (TOADLET_USE_BLUETOOTH "Enable Bluetooth support" ON)
 		option (TOADLET_DYNAMIC_MULTITHREAD_DYNAMIC "Use the /MD (Not /MT) compile switch with dynamic libraries" OFF)
 		option (TOADLET_STATIC_MULTITHREAD_DYNAMIC "Use the /MD (Not /MT) compile switch with static libraries" OFF)
 		option (TOADLET_RTTI "Enable Run Time Type Information" OFF)
 		option (TOADLET_EXCEPTIONS "Enable Exception handling" OFF)
-	else (TOADLET_PLATFORM_WINCE OR TOADLET_PLATFORM_IPHONE)
+	else (TOADLET_PLATFORM_WINCE OR TOADLET_PLATFORM_IOS)
 		option (TOADLET_USE_BLUETOOTH "Enable Bluetooth support" OFF)
 		option (TOADLET_DYNAMIC_MULTITHREAD_DYNAMIC "Use the /MD (Not /MT) compile switch with dynamic libraries" ON)
 		option (TOADLET_STATIC_MULTITHREAD_DYNAMIC "Use the /MD (Not /MT) compile switch with static libraries" OFF)
 		option (TOADLET_RTTI "Enable Run Time Type Information" ON)
 		option (TOADLET_EXCEPTIONS "Enable Exception handling" ON)
-	endif (TOADLET_PLATFORM_WINCE OR TOADLET_PLATFORM_IPHONE)
+	endif (TOADLET_PLATFORM_WINCE OR TOADLET_PLATFORM_IOS)
 	
 	# Deal with multithread static/dynamic libraries
 	# TODO: Once cmake supports _<CONFIGURATION> compile flags, make the /MDd /MD /MTd /MT all configuration specific!
@@ -113,7 +113,7 @@ endif (TOADLET_PLATFORM_WIN32)
 # Set Posix Platform options
 if (TOADLET_PLATFORM_POSIX)
 	# Check for SSE2 support
-	if (NOT TOADLET_PLATFORM_IPHONE)
+	if (NOT TOADLET_PLATFORM_IOS)
 		include (CheckCXXCompilerFlag)
 		CHECK_CXX_COMPILER_FLAG ("-msse2" TOADLET_HAS_SSE)
 		if (TOADLET_HAS_SSE)
@@ -121,7 +121,7 @@ if (TOADLET_PLATFORM_POSIX)
 			set (STATIC_LIB_FLAGS "${STATIC_LIB_FLAGS} -msse2")
 			message ("SSE2 support enabled")
 		endif (TOADLET_HAS_SSE)
-	endif (NOT TOADLET_PLATFORM_IPHONE)
+	endif (NOT TOADLET_PLATFORM_IOS)
 
 	# Append the compile flags to the properties
 	if (DYNAMIC_LIB_FLAGS)
