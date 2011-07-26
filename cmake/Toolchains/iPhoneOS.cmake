@@ -13,8 +13,6 @@ CMAKE_FORCE_CXX_COMPILER (g++ g++)
 set (CMAKE_CXX_COMPILER_WORKS TRUE)
 set (CMAKE_C_COMPILER_WORKS TRUE)
 
-message ("toolchain file=${CMAKE_TOOLCHAIN_FILE}")
-
 # Include extra modules for the iOS platform files
 set (CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${PROJECT_SOURCE_DIR}/cmake/Modules/")
 
