@@ -31,7 +31,7 @@ set (TOADLET_BUILD_VERSION_PAD_MICRO 0)
 
 
 # Custom cmake scripts
-set (CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${toadlet_SOURCE_DIR}/cmake/Modules/")
+set (CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${PROJECT_SOURCE_DIR}/cmake/Modules/")
 
 
 # TODO: Right now WinCE is being blocked due to the uncertain future of Toadlet and Windows Phone 7. 
@@ -42,14 +42,17 @@ endif (TOADLET_PLATFORM_WINCE)
 
 # Platform options
 if (WIN32)
-	set (TOADLET_PLATFORM_WIN32 ON)
+	set (TOADLET_PLATFORM_WIN32 ON CACHE BOOL "Toadlet for windows platforms")
 	option (TOADLET_PLATFORM_ANDROID "Build for Android devices" OFF)
 	option (TOADLET_PLATFORM_BLACKBERRY "Build for Blackberry devices" OFF)
 elseif (UNIX)
-	set (TOADLET_PLATFORM_POSIX ON)
+	set (TOADLET_PLATFORM_POSIX ON CACHE BOOL "Toadlet for unix platforms")
 	option (TOADLET_PLATFORM_ANDROID "Build for Android devices" OFF)
 	if (APPLE) 
-		set (TOADLET_PLATFORM_OSX ON)
+		set (TOADLET_PLATFORM_OSX ON CACHE BOOL "Toadlet for OSX")
+		if (IOS)
+			set (TOADLET_PLATFORM_IOS ON CACHE BOOL "Toadlet for iOS")
+		endif (IOS)
 	endif (APPLE)
 endif (WIN32)
 
