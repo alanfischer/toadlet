@@ -45,4 +45,4 @@ set (H
 # Executable
 add_executable (randisle ${SRC} ${H})
 target_link_libraries (randisle ${LIBS})
-install (TARGETS randisle DESTINATION ${randisle_BINARY_DIR})
+install (TARGETS randisle DESTINATION bin)
