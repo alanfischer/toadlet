@@ -252,20 +252,17 @@ set (EGG_HEADERS ${EGG_HEADERS} ${EGG_IMAGE_HEADERS} ${EGG_IO_HEADERS} ${EGG_NET
 set (EGG_NAMESPACES ${EGG_NAMESPACES} image io net)
 
 
-# Choose between fixed and floating point math
-if (TOADLET_FIXED_POINT)
-	set (EGG_SRC ${EGG_SRC} ${EGG_MATHFIXED_SRC})
-	set (EGG_HEADERS ${EGG_HEADERS} ${EGG_MATHFIXED_HEADERS})
-	set (EGG_NAMESPACES ${EGG_NAMESPACES} mathfixed)
-	source_group ("Source Files\\\\mathfixed" FILES ${EGG_MATH_SRC})
-	source_group ("Header Files\\\\mathfixed" FILES ${EGG_MATH_HEADERS})
-else (TOADLET_FIXED_POINT)
-	set (EGG_SRC ${EGG_SRC} ${EGG_MATH_SRC})
-	set (EGG_HEADERS ${EGG_HEADERS} ${EGG_MATH_HEADERS})
-	set (EGG_NAMESPACES ${EGG_NAMESPACES} math)
-	source_group ("Source Files\\\\math" FILES ${EGG_MATH_SRC})
-	source_group ("Header Files\\\\math" FILES ${EGG_MATH_HEADERS})
-endif (TOADLET_FIXED_POINT)
+# Always build both fixed & floating point math
+set (EGG_SRC ${EGG_SRC} ${EGG_MATHFIXED_SRC})
+set (EGG_HEADERS ${EGG_HEADERS} ${EGG_MATHFIXED_HEADERS})
+set (EGG_NAMESPACES ${EGG_NAMESPACES} mathfixed)
+source_group ("Source Files\\\\mathfixed" FILES ${EGG_MATH_SRC})
+source_group ("Header Files\\\\mathfixed" FILES ${EGG_MATH_HEADERS})
+set (EGG_SRC ${EGG_SRC} ${EGG_MATH_SRC})
+set (EGG_HEADERS ${EGG_HEADERS} ${EGG_MATH_HEADERS})
+set (EGG_NAMESPACES ${EGG_NAMESPACES} math)
+source_group ("Source Files\\\\math" FILES ${EGG_MATH_SRC})
+source_group ("Header Files\\\\math" FILES ${EGG_MATH_HEADERS})
 
 
 # Platform specific files
