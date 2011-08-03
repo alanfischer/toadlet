@@ -91,16 +91,14 @@ Node *Sky::create(Scene *scene,const Vector4 &skyColor,const Vector4 &fadeColor)
 				"uniform vec4 skyColor;\n"
 				"uniform sampler2D bumpTex,cloudTex,fadeTex;\n"
 
-				"vec4 lerp(vec4 c1,vec4 c2,float a){return c1*a+c2*(1.0-a);}\n"
-
 				"void main(){\n"
 					"vec4 bump=texture2D(bumpTex,texCoord0);\n"
 					"vec4 cloud=texture2D(cloudTex,texCoord0);\n"
 					"vec4 fade=texture2D(fadeTex,texCoord1);\n"
 					"vec4 color=dot((color.xyz-0.5)*2,(bump.xyz-0.5)*2);\n"
 					"color=vec4(color.xyz+cloud.xyz,cloud.a);\n"
-					"color=lerp(color,skyColor,cloud.w);\n"
-					"color=lerp(color,fade,fade.w);\n"
+					"color=mix(skyColor,color,cloud.w);\n"
+					"color=mix(fade,color,fade.w);\n"
 					"gl_FragColor = color;\n"
 				"}",
 
@@ -117,16 +115,14 @@ Node *Sky::create(Scene *scene,const Vector4 &skyColor,const Vector4 &fadeColor)
 				"Texture2D bumpTex,cloudTex,fadeTex;\n"
 				"SamplerState bumpSamp,cloudSamp,fadeSamp;\n"
 
-				"float4 lerp(float4 c1,float4 c2,float a){return c1*a+c2*(1.0-a);}\n"
-
 				"float4 main(PIN pin): SV_TARGET{\n"
 					"float4 bump=bumpTex.Sample(bumpSamp,pin.texCoord0);\n"
 					"float4 cloud=cloudTex.Sample(cloudSamp,pin.texCoord0);\n"
 					"float4 fade=fadeTex.Sample(fadeSamp,pin.texCoord1);\n"
 					"float4 color=dot((pin.color.xyz-0.5)*2,(bump.xyz-0.5)*2);\n"
 					"color=float4(color.xyz+cloud.xyz,cloud.a);\n"
-					"color=lerp(color,skyColor,cloud.w);\n"
-					"color=lerp(color,fade,fade.w);\n"
+					"color=lerp(skyColor,color,cloud.w);\n"
+					"color=lerp(fade,color,fade.w);\n"
 					"return color;\n"
 				"}"
 			};
