@@ -37,25 +37,25 @@ public:
 			Vector4 color=Colors::AZURE*1.5;
 			color.w=0.5f;
 
+			RenderPath::ptr shaderPath=water->addPath();
 			{
-				RenderPath::ptr shaderPath=water->addPath();
-				RenderPass::ptr shaderPass=shaderPath->addPass();
+				RenderPass::ptr pass=shaderPath->addPass();
 
-				shaderPass->setMaterialState(MaterialState(color));
-				shaderPass->setBlendState(BlendState::Combination_ALPHA);
-				shaderPass->setDepthState(DepthState(DepthState::DepthTest_LEQUAL,false));
-				shaderPass->setRasterizerState(RasterizerState(RasterizerState::CullType_NONE));
+				pass->setMaterialState(MaterialState(color));
+				pass->setBlendState(BlendState::Combination_ALPHA);
+				pass->setDepthState(DepthState(DepthState::DepthTest_LEQUAL,false));
+				pass->setRasterizerState(RasterizerState(RasterizerState::CullType_NONE));
 
 				TextureState textureState;
 				textureState.calculation=TextureState::CalculationType_NORMAL;
 
-				shaderPass->setTexture(0,engine->getTextureManager()->createTexture(createNoise(128,128,16,6,0.5,0.5)));
+				pass->setTexture(0,engine->getTextureManager()->createTexture(createNoise(128,128,16,6,0.5,0.5)));
 				Math::setMatrix4x4FromScale(textureState.matrix,16,16,16);
-				shaderPass->setTextureState(0,textureState);
+				pass->setTextureState(0,textureState);
 
-				shaderPass->setTexture(1,engine->getTextureManager()->createTexture(createNoise(128,128,16,5,0.5,0.5)));
+				pass->setTexture(1,engine->getTextureManager()->createTexture(createNoise(128,128,16,5,0.5,0.5)));
 				Math::setMatrix4x4FromScale(textureState.matrix,16,16,16);
-				shaderPass->setTextureState(1,textureState);
+				pass->setTextureState(1,textureState);
 
 				String profiles[]={
 					"glsl",
@@ -68,6 +68,7 @@ public:
 					"attribute vec2 TEXCOORD0;\n"
 					"varying vec4 color\n;"
 					"varying vec2 texCoord0\n;"
+					"varying float fog;\n"
 					"varying vec2 texCoord1\n;"
 
 					"uniform mat4 modelViewProjectionMatrix;\n"
@@ -78,6 +79,7 @@ public:
 					"uniform vec4 lightColor;\n"
 					"uniform vec4 ambientColor;\n"
 					"uniform mat4 textureMatrix0,textureMatrix1;\n"
+					"uniform vec2 fogDistance;\n"
 
 					"void main(){\n"
 						"gl_Position=modelViewProjectionMatrix * POSITION;\n"
@@ -87,6 +89,7 @@ public:
 						"color=localLightColor*materialDiffuseColor + ambientColor*materialAmbientColor;\n"
 						"texCoord0=(textureMatrix0 * vec4(TEXCOORD0,0.0,1.0)).xy;\n "
 						"texCoord1=(textureMatrix1 * vec4(TEXCOORD0,0.0,1.0)).xy;\n "
+						"fog=clamp(1.0-(gl_Position.z-fogDistance.x)/(fogDistance.y-fogDistance.x),0.0,1.0);\n"
 					"}",
 
 
@@ -99,6 +102,7 @@ public:
 					"struct VOUT{\n"
 						"float4 position : SV_POSITION;\n"
 						"float4 color : COLOR;\n"
+						"float fog: FOG;\n"
 						"float2 texCoord0: TEXCOORD0;\n"
 						"float2 texCoord1: TEXCOORD1;\n"
 					"};\n"
@@ -111,6 +115,7 @@ public:
 					"float4 lightColor;\n"
 					"float4 ambientColor;\n"
 					"float4x4 textureMatrix0,textureMatrix1;\n"
+					"float2 fogDistance;\n"
 
 					"VOUT main(VIN vin){\n"
 						"VOUT vout;\n"
@@ -121,6 +126,7 @@ public:
 						"vout.color=localLightColor*materialDiffuseColor + ambientColor*materialAmbientColor;\n"
 						"vout.texCoord0=mul(textureMatrix0,float4(vin.texCoord,0.0,1.0));\n "
 						"vout.texCoord1=mul(textureMatrix1,float4(vin.texCoord,0.0,1.0));\n "
+						"vout.fog=clamp(1.0-(vout.position.z-fogDistance.x)/(fogDistance.y-fogDistance.x),0.0,1.0);\n"
 						"return vout;\n"
 					"}"
 				};
@@ -129,11 +135,14 @@ public:
 					"varying vec4 color;\n"
 					"varying vec2 texCoord0;\n"
 					"varying vec2 texCoord1;\n"
-					
+					"varying float fog;\n"
+
+					"uniform vec4 fogColor;\n"
 					"uniform sampler2D tex0,tex1;\n"
 					
 					"void main(){\n"
-						"gl_FragColor = color*texture2D(tex0,texCoord0)*texture2D(tex1,texCoord1);\n"
+						"vec4 fragColor=color*texture2D(tex0,texCoord0)*texture2D(tex1,texCoord1);\n"
+						"gl_FragColor=mix(fogColor,fragColor,fog);\n"
 					"}",
 
 
@@ -141,53 +150,58 @@ public:
 					"struct PIN{\n"
 						"float4 position: SV_POSITION;\n"
 						"float4 color: COLOR;\n"
+						"float fog: FOG;\n"
 						"float2 texCoord0: TEXCOORD0;\n"
 						"float2 texCoord1: TEXCOORD1;\n"
 					"};\n"
 
+					"float4 fogColor;\n"
 					"Texture2D tex0,tex1;\n"
 					"SamplerState samp0,samp1;\n"
 
 					"float4 main(PIN pin): SV_TARGET{\n"
-						"return pin.color*tex0.Sample(samp0,pin.texCoord0)*tex1.Sample(samp1,pin.texCoord1);\n"
+						"float4 fragColor=pin.color*tex0.Sample(samp0,pin.texCoord0)*tex1.Sample(samp1,pin.texCoord1);\n"
+						"return lerp(fogColor,fragColor,pin.fog);\n"
 					"}"
 				};
 
 				Shader::ptr vertexShader=engine->getShaderManager()->createShader(Shader::ShaderType_VERTEX,profiles,vertexCodes,2);
-				shaderPass->setShader(Shader::ShaderType_VERTEX,vertexShader);
+				pass->setShader(Shader::ShaderType_VERTEX,vertexShader);
 				Shader::ptr fragmentShader=engine->getShaderManager()->createShader(Shader::ShaderType_FRAGMENT,profiles,fragmentCodes,2);
-				shaderPass->setShader(Shader::ShaderType_FRAGMENT,fragmentShader);
+				pass->setShader(Shader::ShaderType_FRAGMENT,fragmentShader);
 
-				shaderPass->getVariables()->addVariable("modelViewProjectionMatrix",RenderVariable::ptr(new MVPMatrixVariable()),Material::Scope_RENDERABLE);
-				shaderPass->getVariables()->addVariable("normalMatrix",RenderVariable::ptr(new NormalMatrixVariable()),Material::Scope_RENDERABLE);
-				shaderPass->getVariables()->addVariable("lightViewPosition",RenderVariable::ptr(new LightViewPositionVariable()),Material::Scope_MATERIAL);
-				shaderPass->getVariables()->addVariable("lightColor",RenderVariable::ptr(new LightDiffuseVariable()),Material::Scope_MATERIAL);
-				shaderPass->getVariables()->addVariable("ambientColor",RenderVariable::ptr(new AmbientVariable()),Material::Scope_RENDERABLE);
-				shaderPass->getVariables()->addVariable("materialDiffuseColor",RenderVariable::ptr(new MaterialDiffuseVariable()),Material::Scope_MATERIAL);
-				shaderPass->getVariables()->addVariable("materialAmbientColor",RenderVariable::ptr(new MaterialAmbientVariable()),Material::Scope_MATERIAL);
-				shaderPass->getVariables()->addVariable("textureMatrix0",RenderVariable::ptr(new TextureMatrixVariable(0)),Material::Scope_MATERIAL);
-				shaderPass->getVariables()->addVariable("textureMatrix1",RenderVariable::ptr(new TextureMatrixVariable(1)),Material::Scope_MATERIAL);
+				pass->getVariables()->addVariable("modelViewProjectionMatrix",RenderVariable::ptr(new MVPMatrixVariable()),Material::Scope_RENDERABLE);
+				pass->getVariables()->addVariable("normalMatrix",RenderVariable::ptr(new NormalMatrixVariable()),Material::Scope_RENDERABLE);
+				pass->getVariables()->addVariable("lightViewPosition",RenderVariable::ptr(new LightViewPositionVariable()),Material::Scope_MATERIAL);
+				pass->getVariables()->addVariable("lightColor",RenderVariable::ptr(new LightDiffuseVariable()),Material::Scope_MATERIAL);
+				pass->getVariables()->addVariable("ambientColor",RenderVariable::ptr(new AmbientVariable()),Material::Scope_RENDERABLE);
+				pass->getVariables()->addVariable("materialDiffuseColor",RenderVariable::ptr(new MaterialDiffuseVariable()),Material::Scope_MATERIAL);
+				pass->getVariables()->addVariable("materialAmbientColor",RenderVariable::ptr(new MaterialAmbientVariable()),Material::Scope_MATERIAL);
+				pass->getVariables()->addVariable("fogDistance",RenderVariable::ptr(new FogDistanceVariable()),Material::Scope_MATERIAL);
+				pass->getVariables()->addVariable("fogColor",RenderVariable::ptr(new FogColorVariable()),Material::Scope_MATERIAL);
+				pass->getVariables()->addVariable("textureMatrix0",RenderVariable::ptr(new TextureMatrixVariable(0)),Material::Scope_MATERIAL);
+				pass->getVariables()->addVariable("textureMatrix1",RenderVariable::ptr(new TextureMatrixVariable(1)),Material::Scope_MATERIAL);
 			}
 
+			RenderPath::ptr fixedPath=water->addPath();
 			{
-				RenderPath::ptr fixedPath=water->addPath();
-				RenderPass::ptr fixedPass=fixedPath->addPass();
+				RenderPass::ptr pass=fixedPath->addPass();
 
-				fixedPass->setMaterialState(MaterialState(color));
-				fixedPass->setBlendState(BlendState::Combination_ALPHA);
-				fixedPass->setDepthState(DepthState(DepthState::DepthTest_LEQUAL,false));
-				fixedPass->setRasterizerState(RasterizerState(RasterizerState::CullType_NONE));
+				pass->setMaterialState(MaterialState(color));
+				pass->setBlendState(BlendState::Combination_ALPHA);
+				pass->setDepthState(DepthState(DepthState::DepthTest_LEQUAL,false));
+				pass->setRasterizerState(RasterizerState(RasterizerState::CullType_NONE));
 
 				TextureState textureState;
 				textureState.calculation=TextureState::CalculationType_NORMAL;
 
-				fixedPass->setTexture(0,engine->getTextureManager()->createTexture(createNoise(128,128,16,6,0.5,0.5)));
+				pass->setTexture(0,engine->getTextureManager()->createTexture(createNoise(128,128,16,6,0.5,0.5)));
 				Math::setMatrix4x4FromScale(textureState.matrix,16,16,16);
-				fixedPass->setTextureState(0,textureState);
+				pass->setTextureState(0,textureState);
 
-				fixedPass->setTexture(1,engine->getTextureManager()->createTexture(createNoise(128,128,16,5,0.5,0.5)));
+				pass->setTexture(1,engine->getTextureManager()->createTexture(createNoise(128,128,16,5,0.5,0.5)));
 				Math::setMatrix4x4FromScale(textureState.matrix,16,16,16);
-				fixedPass->setTextureState(1,textureState);
+				pass->setTextureState(1,textureState);
 			}
 
 			water->setLayer(-1);

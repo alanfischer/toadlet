@@ -68,6 +68,7 @@ void SceneRenderer::setupPass(RenderPass *pass){
 	if(mLastRenderState==NULL || mLastRenderState!=pass->getRenderState()){
 		mLastRenderState=pass->getRenderState();
 		mDevice->setRenderState(mLastRenderState);
+		mSceneParameters->setRenderState(mLastRenderState);
 	}
 	if(mLastShaderState==NULL || mLastShaderState!=pass->getShaderState()){
 		mLastShaderState=pass->getShaderState();
@@ -75,22 +76,6 @@ void SceneRenderer::setupPass(RenderPass *pass){
 	}
 
 	mSceneParameters->setRenderPass(pass);
-	RenderState::ptr renderState=pass->getRenderState();
-	{
-		MaterialState materialState;
-		renderState->getMaterialState(materialState);
-		mSceneParameters->setMaterialState(materialState);
-		PointState pointState;
-		renderState->getPointState(pointState);
-		mSceneParameters->setPointState(pointState);
-
-		int i;
-		for(i=0;i<renderState->getNumTextureStates();++i){
-			TextureState textureState;
-			renderState->getTextureState(i,textureState);
-			mSceneParameters->setTextureState(i,textureState);
-		}
-	}
 	pass->setupRenderVariables(mDevice,Material::Scope_MATERIAL,mSceneParameters);
 
 	int i;
@@ -149,6 +134,7 @@ void SceneRenderer::renderRenderables(RenderableSet *set,RenderDevice *device,Ca
 		device->setDefaultState();
 		if(camera->getDefaultState()!=NULL){
 			device->setRenderState(camera->getDefaultState());
+			mSceneParameters->setRenderState(camera->getDefaultState());
 		}
 	}
 
@@ -234,6 +220,7 @@ void SceneRenderer::renderQueueItems(Material *material,const RenderableSet::Ren
 
 		if(mSceneParameters->getCamera()->getDefaultState()!=NULL){
 			mDevice->setRenderState(mSceneParameters->getCamera()->getDefaultState());
+			mSceneParameters->setRenderState(mSceneParameters->getCamera()->getDefaultState());
 			mLastRenderState=NULL;
 		}
 	}

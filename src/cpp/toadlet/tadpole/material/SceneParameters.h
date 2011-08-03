@@ -68,14 +68,25 @@ public:
 	inline void setRenderPass(RenderPass *renderPass){mRenderPass=renderPass;}
 	inline RenderPass *getRenderPass() const{return mRenderPass;}
 
-	inline void setMaterialState(const MaterialState &state){mMaterialState.set(state);}
+	inline void setRenderState(RenderState *renderState){
+		renderState->getMaterialState(mMaterialState);
+		renderState->getPointState(mPointState);
+		renderState->getFogState(mFogState);
+
+		if(mTextureState.size()<renderState->getNumTextureStates()){
+			mTextureState.resize(renderState->getNumTextureStates());
+		}
+
+		int i;
+		for(i=0;i<renderState->getNumTextureStates();++i){
+			renderState->getTextureState(i,mTextureState[i]);
+		}
+	}
+
 	inline const MaterialState &getMaterialState() const{return mMaterialState;}
-
-	inline void setTextureState(int i,const TextureState &state){mTextureState[i].set(state);}
 	inline const TextureState &getTextureState(int i) const{return mTextureState[i];}
-
-	inline void setPointState(const PointState &state){mPointState.set(state);}
 	inline const PointState &getPointState() const{return mPointState;}
+	inline const FogState &getFogState() const{return mFogState;}
 
 	inline void setLightState(const LightState &state){mLightState.set(state);}
 	inline const LightState &getLightState() const{return mLightState;}
@@ -89,9 +100,12 @@ protected:
 	Viewport mViewport;
 	Renderable *mRenderable;
 	RenderPass *mRenderPass;
+
 	MaterialState mMaterialState;
-	Collection<TextureState> mTextureState;
 	PointState mPointState;
+	FogState mFogState;
+	Collection<TextureState> mTextureState;
+
 	LightState mLightState;
 	Vector4 mAmbient;
 };

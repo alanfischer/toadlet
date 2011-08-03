@@ -79,43 +79,45 @@ Material::ptr MaterialManager::cloneMaterial(Material::ptr source){
 Material::ptr MaterialManager::createDiffuseMaterial(Texture::ptr texture){
 	Material::ptr material(new Material(this));
 
+	RenderPath::ptr shaderPath=material->addPath();
 	{
-		RenderPath::ptr shaderPath=material->addPath();
-		RenderPass::ptr shaderPass=shaderPath->addPass();
+		RenderPass::ptr pass=shaderPath->addPass();
 
-		shaderPass->setBlendState(BlendState());
-		shaderPass->setDepthState(DepthState());
-		shaderPass->setRasterizerState(RasterizerState());
-		shaderPass->setMaterialState(MaterialState(true,false,MaterialState::ShadeType_GOURAUD));
+		pass->setBlendState(BlendState());
+		pass->setDepthState(DepthState());
+		pass->setRasterizerState(RasterizerState());
+		pass->setMaterialState(MaterialState(true,false,MaterialState::ShadeType_GOURAUD));
 
-		shaderPass->setShader(Shader::ShaderType_VERTEX,mDiffuseVertexShader);
-		shaderPass->setShader(Shader::ShaderType_FRAGMENT,mDiffuseFragmentShader);
-		shaderPass->getVariables()->addVariable("modelViewProjectionMatrix",RenderVariable::ptr(new MVPMatrixVariable()),Material::Scope_RENDERABLE);
-		shaderPass->getVariables()->addVariable("normalMatrix",RenderVariable::ptr(new NormalMatrixVariable()),Material::Scope_RENDERABLE);
-		shaderPass->getVariables()->addVariable("lightViewPosition",RenderVariable::ptr(new LightViewPositionVariable()),Material::Scope_MATERIAL);
-		shaderPass->getVariables()->addVariable("lightColor",RenderVariable::ptr(new LightDiffuseVariable()),Material::Scope_MATERIAL);
-		shaderPass->getVariables()->addVariable("ambientColor",RenderVariable::ptr(new AmbientVariable()),Material::Scope_RENDERABLE);
-		shaderPass->getVariables()->addVariable("materialLighting",RenderVariable::ptr(new MaterialLightingVariable()),Material::Scope_MATERIAL);
-		shaderPass->getVariables()->addVariable("materialDiffuseColor",RenderVariable::ptr(new MaterialDiffuseVariable()),Material::Scope_MATERIAL);
-		shaderPass->getVariables()->addVariable("materialAmbientColor",RenderVariable::ptr(new MaterialAmbientVariable()),Material::Scope_MATERIAL);
-		shaderPass->getVariables()->addVariable("textureMatrix",RenderVariable::ptr(new TextureMatrixVariable(0)),Material::Scope_MATERIAL);
-		shaderPass->getVariables()->addVariable("textureSet",RenderVariable::ptr(new TextureSetVariable(0)),Material::Scope_MATERIAL);
+		pass->setShader(Shader::ShaderType_VERTEX,mDiffuseVertexShader);
+		pass->setShader(Shader::ShaderType_FRAGMENT,mDiffuseFragmentShader);
+		pass->getVariables()->addVariable("modelViewProjectionMatrix",RenderVariable::ptr(new MVPMatrixVariable()),Material::Scope_RENDERABLE);
+		pass->getVariables()->addVariable("normalMatrix",RenderVariable::ptr(new NormalMatrixVariable()),Material::Scope_RENDERABLE);
+		pass->getVariables()->addVariable("lightViewPosition",RenderVariable::ptr(new LightViewPositionVariable()),Material::Scope_MATERIAL);
+		pass->getVariables()->addVariable("lightColor",RenderVariable::ptr(new LightDiffuseVariable()),Material::Scope_MATERIAL);
+		pass->getVariables()->addVariable("ambientColor",RenderVariable::ptr(new AmbientVariable()),Material::Scope_RENDERABLE);
+		pass->getVariables()->addVariable("materialLighting",RenderVariable::ptr(new MaterialLightingVariable()),Material::Scope_MATERIAL);
+		pass->getVariables()->addVariable("materialDiffuseColor",RenderVariable::ptr(new MaterialDiffuseVariable()),Material::Scope_MATERIAL);
+		pass->getVariables()->addVariable("materialAmbientColor",RenderVariable::ptr(new MaterialAmbientVariable()),Material::Scope_MATERIAL);
+		pass->getVariables()->addVariable("fogDistance",RenderVariable::ptr(new FogDistanceVariable()),Material::Scope_MATERIAL);
+		pass->getVariables()->addVariable("fogColor",RenderVariable::ptr(new FogColorVariable()),Material::Scope_MATERIAL);
+		pass->getVariables()->addVariable("textureMatrix",RenderVariable::ptr(new TextureMatrixVariable(0)),Material::Scope_MATERIAL);
+		pass->getVariables()->addVariable("textureSet",RenderVariable::ptr(new TextureSetVariable(0)),Material::Scope_MATERIAL);
 
-		shaderPass->setSamplerState(0,mDefaultSamplerState);
-		shaderPass->setTexture(0,texture);
+		pass->setSamplerState(0,mDefaultSamplerState);
+		pass->setTexture(0,texture);
 	}
 
+	RenderPath::ptr fixedPath=material->addPath();
 	{
-		RenderPath::ptr fixedPath=material->addPath();
-		RenderPass::ptr fixedPass=fixedPath->addPass();
+		RenderPass::ptr pass=fixedPath->addPass();
 
-		fixedPass->setBlendState(BlendState());
-		fixedPass->setDepthState(DepthState());
-		fixedPass->setRasterizerState(RasterizerState());
-		fixedPass->setMaterialState(MaterialState(true,false,MaterialState::ShadeType_GOURAUD));
+		pass->setBlendState(BlendState());
+		pass->setDepthState(DepthState());
+		pass->setRasterizerState(RasterizerState());
+		pass->setMaterialState(MaterialState(true,false,MaterialState::ShadeType_GOURAUD));
 
-		fixedPass->setSamplerState(0,mDefaultSamplerState);
-		fixedPass->setTexture(0,texture);
+		pass->setSamplerState(0,mDefaultSamplerState);
+		pass->setTexture(0,texture);
 	}
 
 	manage(material);
@@ -128,21 +130,21 @@ Material::ptr MaterialManager::createDiffuseMaterial(Texture::ptr texture){
 Material::ptr MaterialManager::createDiffusePointSpriteMaterial(Texture::ptr texture,scalar size,bool attenuated){
 	Material::ptr material=createDiffuseMaterial(texture);
 
+	RenderPath::ptr shaderPath=material->getPath(0);
 	{
-		RenderPath::ptr shaderPath=material->getPath(0);
-		RenderPass::ptr shaderPass=shaderPath->getPass(0);
+		RenderPass::ptr pass=shaderPath->getPass(0);
 
-		shaderPass->setShader(Shader::ShaderType_GEOMETRY,mPointSpriteGeometryShader);
-		shaderPass->getVariables()->addVariable("pointSize",RenderVariable::ptr(new PointSizeVariable()),Material::Scope_MATERIAL);
-		shaderPass->getVariables()->addVariable("pointAttenuated",RenderVariable::ptr(new PointAttenuatedVariable()),Material::Scope_MATERIAL);
-		shaderPass->getVariables()->addVariable("viewport",RenderVariable::ptr(new ViewportVariable()),Material::Scope_MATERIAL);
+		pass->setShader(Shader::ShaderType_GEOMETRY,mPointSpriteGeometryShader);
+		pass->getVariables()->addVariable("pointSize",RenderVariable::ptr(new PointSizeVariable()),Material::Scope_MATERIAL);
+		pass->getVariables()->addVariable("pointAttenuated",RenderVariable::ptr(new PointAttenuatedVariable()),Material::Scope_MATERIAL);
+		pass->getVariables()->addVariable("viewport",RenderVariable::ptr(new ViewportVariable()),Material::Scope_MATERIAL);
 	}
 
+	RenderPath::ptr fixedPath=material->getPath(1);
 	{
-		RenderPath::ptr fixedPath=material->getPath(1);
-		RenderPass::ptr fixedPass=fixedPath->getPass(0);
+		RenderPass::ptr pass=fixedPath->getPass(0);
 
-		fixedPass->setPointState(PointState(true,size,attenuated));
+		pass->setPointState(PointState(true,size,attenuated));
 	}
 
 	manage(material);
@@ -155,45 +157,45 @@ Material::ptr MaterialManager::createDiffusePointSpriteMaterial(Texture::ptr tex
 Material::ptr MaterialManager::createSkyboxMaterial(Texture::ptr texture){
 	Material::ptr material(new Material(this));
 
+	RenderPath::ptr shaderPath=material->addPath();
 	{
-		RenderPath::ptr shaderPath=material->addPath();
-		RenderPass::ptr shaderPass=shaderPath->addPass();
+		RenderPass::ptr pass=shaderPath->addPass();
 
-		shaderPass->setBlendState(BlendState());
-		shaderPass->setDepthState(DepthState(DepthState::DepthTest_NEVER,false));
-		shaderPass->setRasterizerState(RasterizerState());
+		pass->setBlendState(BlendState());
+		pass->setDepthState(DepthState(DepthState::DepthTest_NEVER,false));
+		pass->setRasterizerState(RasterizerState());
 
-		shaderPass->setShader(Shader::ShaderType_VERTEX,mSkyboxVertexShader);
-		shaderPass->setShader(Shader::ShaderType_FRAGMENT,mSkyboxFragmentShader);
-		shaderPass->getVariables()->addVariable("modelViewProjectionMatrix",RenderVariable::ptr(new MVPMatrixVariable()),Material::Scope_RENDERABLE);
-		shaderPass->getVariables()->addVariable("textureMatrix",RenderVariable::ptr(new TextureMatrixVariable(0)),Material::Scope_MATERIAL);
+		pass->setShader(Shader::ShaderType_VERTEX,mSkyboxVertexShader);
+		pass->setShader(Shader::ShaderType_FRAGMENT,mSkyboxFragmentShader);
+		pass->getVariables()->addVariable("modelViewProjectionMatrix",RenderVariable::ptr(new MVPMatrixVariable()),Material::Scope_RENDERABLE);
+		pass->getVariables()->addVariable("textureMatrix",RenderVariable::ptr(new TextureMatrixVariable(0)),Material::Scope_MATERIAL);
 
 		SamplerState samplerState(mDefaultSamplerState);
 		samplerState.uAddress=SamplerState::AddressType_CLAMP_TO_EDGE;
 		samplerState.vAddress=SamplerState::AddressType_CLAMP_TO_EDGE;
 		samplerState.wAddress=SamplerState::AddressType_CLAMP_TO_EDGE;
-		shaderPass->setSamplerState(0,samplerState);
-		shaderPass->setTextureState(0,TextureState());
-		shaderPass->setTexture(0,texture);
+		pass->setSamplerState(0,samplerState);
+		pass->setTextureState(0,TextureState());
+		pass->setTexture(0,texture);
 	}
 
+	RenderPath::ptr fixedPath=material->addPath();
 	{
-		RenderPath::ptr fixedPath=material->addPath();
-		RenderPass::ptr fixedPass=fixedPath->addPass();
+		RenderPass::ptr pass=fixedPath->addPass();
 
-		fixedPass->setBlendState(BlendState());
-		fixedPass->setDepthState(DepthState(DepthState::DepthTest_NEVER,false));
-		fixedPass->setRasterizerState(RasterizerState());
-		fixedPass->setMaterialState(MaterialState(false,true));
-		fixedPass->setFogState(FogState(FogState::FogType_NONE,1,0,0,Colors::BLACK));
+		pass->setBlendState(BlendState());
+		pass->setDepthState(DepthState(DepthState::DepthTest_NEVER,false));
+		pass->setRasterizerState(RasterizerState());
+		pass->setMaterialState(MaterialState(false,true));
+		pass->setFogState(FogState(FogState::FogType_NONE,1,0,0,Colors::BLACK));
 
 		SamplerState samplerState(mDefaultSamplerState);
 		samplerState.uAddress=SamplerState::AddressType_CLAMP_TO_EDGE;
 		samplerState.vAddress=SamplerState::AddressType_CLAMP_TO_EDGE;
 		samplerState.wAddress=SamplerState::AddressType_CLAMP_TO_EDGE;
-		fixedPass->setSamplerState(0,samplerState);
-		fixedPass->setTextureState(0,TextureState());
-		fixedPass->setTexture(0,texture);
+		pass->setSamplerState(0,samplerState);
+		pass->setTextureState(0,TextureState());
+		pass->setTexture(0,texture);
 	}
 
 	material->compile();
@@ -323,6 +325,7 @@ void MaterialManager::contextActivate(RenderDevice *renderDevice){
 		"attribute vec3 NORMAL;\n"
 		"attribute vec2 TEXCOORD0;\n"
 		"varying vec4 color;\n"
+		"varying float fog;\n"
 		"varying vec2 texCoord;\n"
 
 		"uniform mat4 modelViewProjectionMatrix;\n"
@@ -334,6 +337,7 @@ void MaterialManager::contextActivate(RenderDevice *renderDevice){
 		"uniform vec4 ambientColor;\n"
 		"uniform float materialLighting;\n"
 		"uniform mat4 textureMatrix;\n"
+		"uniform vec2 fogDistance;\n"
 
 		"void main(){\n"
 			"gl_Position=modelViewProjectionMatrix * POSITION;\n"
@@ -341,7 +345,8 @@ void MaterialManager::contextActivate(RenderDevice *renderDevice){
 			"float lightIntensity=clamp(-dot(lightViewPosition.xyz,viewNormal),0.0,1.0);\n"
 			"vec4 localLightColor=(lightIntensity*lightColor*materialLighting)+(1.0-materialLighting);\n"
 			"color=localLightColor*materialDiffuseColor + ambientColor*materialAmbientColor;\n"
-			"texCoord=(textureMatrix * vec4(TEXCOORD0,0.0,1.0)).xy;\n "
+			"texCoord=(textureMatrix * vec4(TEXCOORD0,0.0,1.0)).xy;\n"
+			"fog=clamp(1.0-(gl_Position.z-fogDistance.x)/(fogDistance.y-fogDistance.x),0.0,1.0);\n"
 		"}",
 
 
@@ -354,6 +359,7 @@ void MaterialManager::contextActivate(RenderDevice *renderDevice){
 		"struct VOUT{\n"
 			"float4 position : SV_POSITION;\n"
 			"float4 color : COLOR;\n"
+			"float fog: FOG;\n"
 			"float2 texCoord: TEXCOORD0;\n"
 		"};\n"
 
@@ -366,6 +372,7 @@ void MaterialManager::contextActivate(RenderDevice *renderDevice){
 		"float4 ambientColor;\n"
 		"float materialLighting;\n"
 		"float4x4 textureMatrix;\n"
+		"float2 fogDistance;\n"
 
 		"VOUT main(VIN vin){\n"
 			"VOUT vout;\n"
@@ -375,6 +382,7 @@ void MaterialManager::contextActivate(RenderDevice *renderDevice){
 			"float4 localLightColor=lightIntensity*lightColor*materialLighting+(1.0-materialLighting);\n"
 			"vout.color=localLightColor*materialDiffuseColor + ambientColor*materialAmbientColor;\n"
 			"vout.texCoord=mul(textureMatrix,float4(vin.texCoord,0.0,1.0));\n "
+			"vout.fog=clamp(1.0-(vout.position.z-fogDistance.x)/(fogDistance.y-fogDistance.x),0.0,1.0);\n"
 			"return vout;\n"
 		"}"
 	};
@@ -382,12 +390,15 @@ void MaterialManager::contextActivate(RenderDevice *renderDevice){
 	String diffuseFragmentCode[]={
 		"varying vec4 color;\n"
 		"varying vec2 texCoord;\n"
-		
-		"uniform sampler2D tex;\n"
+		"varying float fog;\n"
+
 		"uniform float textureSet;\n"
-		
+		"uniform vec4 fogColor;\n"
+		"uniform sampler2D tex;\n"
+
 		"void main(){\n"
-			"gl_FragColor = color*(texture2D(tex,texCoord)+(1.0-textureSet));\n"
+			"vec4 fragColor=color*(texture2D(tex,texCoord)+(1.0-textureSet));\n"
+			"gl_FragColor=mix(fogColor,fragColor,fog);\n"
 		"}",
 
 
@@ -395,15 +406,18 @@ void MaterialManager::contextActivate(RenderDevice *renderDevice){
 		"struct PIN{\n"
 			"float4 position: SV_POSITION;\n"
 			"float4 color: COLOR;\n"
+			"float fog: FOG;\n"
 			"float2 texCoord: TEXCOORD0;\n"
 		"};\n"
 
 		"float textureSet;\n"
+		"float4 fogColor;\n"
 		"Texture2D tex;\n"
 		"SamplerState samp;\n"
 
 		"float4 main(PIN pin): SV_TARGET{\n"
-			"return pin.color*(tex.Sample(samp,pin.texCoord)+(1.0-textureSet));\n"
+			"float4 fragColor=pin.color*(tex.Sample(samp,pin.texCoord)+(1.0-textureSet));\n"
+			"return lerp(fogColor,fragColor,pin.fog);\n"
 		"}"
 	};
 
@@ -531,11 +545,13 @@ void MaterialManager::contextActivate(RenderDevice *renderDevice){
 		"struct GIN{\n"
 			"float4 position: SV_POSITION;\n"
 			"float4 color : COLOR;\n"
+			"float fog : FOG;\n"
 			"float2 texCoord: TEXCOORD0;\n"
 		"};\n"
 		"struct GOUT{\n"
 			"float4 position: SV_POSITION;\n"
 			"float4 color : COLOR;\n"
+			"float fog : FOG;\n"
 			"float2 texCoord: TEXCOORD0;\n"
 		"};\n"
 
@@ -563,6 +579,7 @@ void MaterialManager::contextActivate(RenderDevice *renderDevice){
 			"for(int i=0;i<4;i++){\n"
 				"gout.position=gin[0].position+float4(positions[i],0.0);\n"
 				"gout.color=gin[0].color;\n"
+				"gout.fog=gin[0].fog;\n"
 				"gout.texCoord=texCoords[i];\n"
 				"stream.Append(gout);\n"
 			"}\n"

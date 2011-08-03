@@ -53,6 +53,22 @@ protected:
 	Matrix4x4 mMVPMatrix,mModelMatrix;
 };
 
+class MVMatrixVariable:public RenderVariable{
+public:
+	int getFormat(){return VariableBufferFormat::Format_TYPE_FLOAT_32|VariableBufferFormat::Format_COUNT_4X4;}
+
+	void update(tbyte *data,SceneParameters *parameters){
+		if(parameters->getRenderable()!=NULL){
+			parameters->getRenderable()->getRenderTransform().getMatrix(mModelMatrix);
+			Math::mul(mMVMatrix,parameters->getCamera()->getViewMatrix(),mModelMatrix);
+			memcpy(data,mMVMatrix.getData(),sizeof(Matrix4x4));
+		}
+	}
+
+protected:
+	Matrix4x4 mMVMatrix,mModelMatrix;
+};
+
 class NormalMatrixVariable:public RenderVariable{
 public:
 	int getFormat(){return VariableBufferFormat::Format_TYPE_FLOAT_32|VariableBufferFormat::Format_COUNT_4X4;}
@@ -77,10 +93,10 @@ public:
 	int getFormat(){return VariableBufferFormat::Format_TYPE_FLOAT_32|VariableBufferFormat::Format_COUNT_4;}
 
 	void update(tbyte *data,SceneParameters *parameters){
+		Vector4 &lightViewPosition=*(Vector4*)data;
 		if(parameters->getRenderable()!=NULL){
-			Vector4 lightViewPosition(parameters->getLightState().direction,0);
+			lightViewPosition=Vector4(parameters->getLightState().direction,0);
 			Math::mul(lightViewPosition,parameters->getCamera()->getViewMatrix());
-			memcpy(data,lightViewPosition.getData(),sizeof(Vector4));
 		}
 	}
 };
@@ -108,8 +124,8 @@ public:
 	int getFormat(){return VariableBufferFormat::Format_TYPE_FLOAT_32|VariableBufferFormat::Format_COUNT_1;}
 
 	void update(tbyte *data,SceneParameters *parameters){
-		float lighting=parameters->getMaterialState().lighting?1.0:0.0;
-		memcpy(data,&lighting,sizeof(float));
+		float &lighting=*(float*)data;
+		lighting=parameters->getMaterialState().lighting?1.0:0.0;
 	}
 };
 
@@ -136,7 +152,8 @@ public:
 	int getFormat(){return VariableBufferFormat::Format_TYPE_FLOAT_32|VariableBufferFormat::Format_COUNT_1;}
 
 	void update(tbyte *data,SceneParameters *parameters){
-		memcpy(data,&parameters->getPointState().size,sizeof(float));
+		float &size=*(float*)data;
+		size=parameters->getPointState().size;
 	}
 };
 
@@ -145,8 +162,49 @@ public:
 	int getFormat(){return VariableBufferFormat::Format_TYPE_FLOAT_32|VariableBufferFormat::Format_COUNT_1;}
 
 	void update(tbyte *data,SceneParameters *parameters){
-		float attenuated=parameters->getPointState().attenuated?Math::ONE:0;
-		memcpy(data,&attenuated,sizeof(float));
+		float &attenuated=*(float*)data;
+		attenuated=parameters->getPointState().attenuated?Math::ONE:0;
+	}
+};
+
+class FogTypeVariable:public RenderVariable{
+public:
+	int getFormat(){return VariableBufferFormat::Format_TYPE_FLOAT_32|VariableBufferFormat::Format_COUNT_1;}
+
+	void update(tbyte *data,SceneParameters *parameters){
+		float &fog=*(float*)data;
+		fog=parameters->getFogState().fog;
+	}
+};
+
+class FogDensityVariable:public RenderVariable{
+public:
+	int getFormat(){return VariableBufferFormat::Format_TYPE_FLOAT_32|VariableBufferFormat::Format_COUNT_1;}
+
+	void update(tbyte *data,SceneParameters *parameters){
+		float &density=*(float*)data;
+		density=parameters->getFogState().density;
+	}
+};
+
+class FogDistanceVariable:public RenderVariable{
+public:
+	int getFormat(){return VariableBufferFormat::Format_TYPE_FLOAT_32|VariableBufferFormat::Format_COUNT_2;}
+
+	void update(tbyte *data,SceneParameters *parameters){
+		Vector2 &distances=*(Vector2*)data;
+		distances.x=parameters->getFogState().nearDistance;
+		distances.y=parameters->getFogState().farDistance;
+	}
+};
+
+class FogColorVariable:public RenderVariable{
+public:
+	int getFormat(){return VariableBufferFormat::Format_TYPE_FLOAT_32|VariableBufferFormat::Format_COUNT_4;}
+
+	void update(tbyte *data,SceneParameters *parameters){
+		Vector4 &color=*(Vector4*)data;
+		color=parameters->getFogState().color;
 	}
 };
 
@@ -171,8 +229,8 @@ public:
 	int getFormat(){return VariableBufferFormat::Format_TYPE_FLOAT_32|VariableBufferFormat::Format_COUNT_1;}
 
 	void update(tbyte *data,SceneParameters *parameters){
-		float textureSet=parameters->getRenderPass()->getTexture(mIndex)!=NULL?1.0:0.0;
-		memcpy(data,&textureSet,sizeof(float));
+		float &textureSet=*(float*)data;
+		textureSet=parameters->getRenderPass()->getTexture(mIndex)!=NULL?1.0:0.0;
 	}
 
 protected:
@@ -184,8 +242,8 @@ public:
 	int getFormat(){return VariableBufferFormat::Format_TYPE_FLOAT_32|VariableBufferFormat::Format_COUNT_4;}
 
 	void update(tbyte *data,SceneParameters *parameters){
-		Vector4 viewport(parameters->getViewport().x,parameters->getViewport().y,parameters->getViewport().width,parameters->getViewport().height);
-		memcpy(data,&viewport,sizeof(Vector4));
+		Vector4 &viewport=*(Vector4*)data;
+		viewport=Vector4(parameters->getViewport().x,parameters->getViewport().y,parameters->getViewport().width,parameters->getViewport().height);
 	}
 };
 
@@ -194,12 +252,9 @@ public:
 	int getFormat(){return VariableBufferFormat::Format_TYPE_FLOAT_32|VariableBufferFormat::Format_COUNT_1;}
 
 	void update(tbyte *data,SceneParameters *parameters){
-		mTime=Math::fromMilli(parameters->getScene()->getTime());
-		memcpy(data,&mTime,sizeof(scalar));
+		float &time=*(float*)data;
+		time=Math::fromMilli(parameters->getScene()->getTime());
 	}
-
-protected:
-	scalar mTime;
 };
 
 class ConstantVariable:public RenderVariable{
@@ -209,11 +264,12 @@ public:
 	int getFormat(){return VariableBufferFormat::Format_TYPE_FLOAT_32|VariableBufferFormat::Format_COUNT_4;}
 
 	void update(tbyte *data,SceneParameters *parameters){
-		memcpy(data,&mConstant,sizeof(Vector4));
+		Vector4 &constant=*(Vector4*)data;
+		constant=mConstant;
 	}
 
 protected:
-	Vector4 mConstant;;
+	Vector4 mConstant;
 };
 
 }
