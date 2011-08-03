@@ -42,7 +42,7 @@ public:
 
 	FogState():
 		fog(FogType_NONE),
-		density(Math::ONE),
+		density(0),
 		nearDistance(0),
 		farDistance(Math::ONE)
 		//color

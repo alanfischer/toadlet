@@ -98,6 +98,7 @@ Material::ptr MaterialManager::createDiffuseMaterial(Texture::ptr texture){
 		pass->getVariables()->addVariable("materialLighting",RenderVariable::ptr(new MaterialLightingVariable()),Material::Scope_MATERIAL);
 		pass->getVariables()->addVariable("materialDiffuseColor",RenderVariable::ptr(new MaterialDiffuseVariable()),Material::Scope_MATERIAL);
 		pass->getVariables()->addVariable("materialAmbientColor",RenderVariable::ptr(new MaterialAmbientVariable()),Material::Scope_MATERIAL);
+		pass->getVariables()->addVariable("fogDensity",RenderVariable::ptr(new FogDensityVariable()),Material::Scope_MATERIAL);
 		pass->getVariables()->addVariable("fogDistance",RenderVariable::ptr(new FogDistanceVariable()),Material::Scope_MATERIAL);
 		pass->getVariables()->addVariable("fogColor",RenderVariable::ptr(new FogColorVariable()),Material::Scope_MATERIAL);
 		pass->getVariables()->addVariable("textureMatrix",RenderVariable::ptr(new TextureMatrixVariable(0)),Material::Scope_MATERIAL);
@@ -337,6 +338,7 @@ void MaterialManager::contextActivate(RenderDevice *renderDevice){
 		"uniform vec4 ambientColor;\n"
 		"uniform float materialLighting;\n"
 		"uniform mat4 textureMatrix;\n"
+		"uniform float fogDensity;\n"
 		"uniform vec2 fogDistance;\n"
 
 		"void main(){\n"
@@ -346,7 +348,7 @@ void MaterialManager::contextActivate(RenderDevice *renderDevice){
 			"vec4 localLightColor=(lightIntensity*lightColor*materialLighting)+(1.0-materialLighting);\n"
 			"color=localLightColor*materialDiffuseColor + ambientColor*materialAmbientColor;\n"
 			"texCoord=(textureMatrix * vec4(TEXCOORD0,0.0,1.0)).xy;\n"
-			"fog=clamp(1.0-(gl_Position.z-fogDistance.x)/(fogDistance.y-fogDistance.x),0.0,1.0);\n"
+			"fog=clamp(1.0-fogDensity*(gl_Position.z-fogDistance.x)/(fogDistance.y-fogDistance.x),0.0,1.0);\n"
 		"}",
 
 
@@ -372,6 +374,7 @@ void MaterialManager::contextActivate(RenderDevice *renderDevice){
 		"float4 ambientColor;\n"
 		"float materialLighting;\n"
 		"float4x4 textureMatrix;\n"
+		"float fogDensity;\n"
 		"float2 fogDistance;\n"
 
 		"VOUT main(VIN vin){\n"
@@ -382,7 +385,7 @@ void MaterialManager::contextActivate(RenderDevice *renderDevice){
 			"float4 localLightColor=lightIntensity*lightColor*materialLighting+(1.0-materialLighting);\n"
 			"vout.color=localLightColor*materialDiffuseColor + ambientColor*materialAmbientColor;\n"
 			"vout.texCoord=mul(textureMatrix,float4(vin.texCoord,0.0,1.0));\n "
-			"vout.fog=clamp(1.0-(vout.position.z-fogDistance.x)/(fogDistance.y-fogDistance.x),0.0,1.0);\n"
+			"vout.fog=clamp(1.0-fogDensity*(vout.position.z-fogDistance.x)/(fogDistance.y-fogDistance.x),0.0,1.0);\n"
 			"return vout;\n"
 		"}"
 	};
