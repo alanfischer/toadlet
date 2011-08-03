@@ -8,7 +8,7 @@ Node *Sky::create(Scene *scene,const Vector4 &skyColor,const Vector4 &fadeColor)
 	int cloudSize=256;
 	Sphere sphere(Vector3(0,0,0),512);
 	Vector3 lightDir(1,1,0.5);
-	bool advanced=false; // Use realtime bumpmapping, or precalculated
+	bool advanced=true; // Use realtime bumpmapping, or precalculated
 
  	int numSegments=16,numRings=16;
 	VertexBuffer::ptr vertexBuffer=mEngine->getBufferManager()->createVertexBuffer(Buffer::Usage_BIT_STREAM,Buffer::Access_READ_WRITE,mEngine->getVertexFormats().POSITION_COLOR_TEX_COORD,mEngine->getMeshManager()->getSkyDomeVertexCount(numSegments,numRings));
@@ -25,9 +25,13 @@ Node *Sky::create(Scene *scene,const Vector4 &skyColor,const Vector4 &fadeColor)
 		Texture::ptr fadeTexture=mEngine->getTextureManager()->createTexture(fade);
 
 		material=mEngine->getMaterialManager()->createMaterial();
+		RenderPath::ptr shaderPath=material->addPath();
 		{
-			RenderPath::ptr shaderPath=material->addPath();
-			RenderPass::ptr shaderPass=shaderPath->addPass();
+			RenderPass::ptr pass=shaderPath->addPass();
+
+			pass->setBlendState(BlendState());
+			pass->setDepthState(DepthState(DepthState::DepthTest_NEVER,false));
+			pass->setRasterizerState(RasterizerState());
 
 			String profiles[]={
 				"glsl",
@@ -35,7 +39,24 @@ Node *Sky::create(Scene *scene,const Vector4 &skyColor,const Vector4 &fadeColor)
 			};
 
 			String vertexCodes[]={
-				(char*)NULL,
+				"attribute vec4 POSITION;\n"
+				"attribute vec4 COLOR;\n"
+				"attribute vec2 TEXCOORD0;\n"
+				"varying vec4 color;\n"
+				"varying vec2 texCoord0;\n"
+				"varying vec2 texCoord1;\n"
+
+				"uniform mat4 modelViewProjectionMatrix;\n"
+				"uniform mat4 textureMatrix;\n"
+
+				"void main(){\n"
+					"gl_Position=modelViewProjectionMatrix * POSITION;\n"
+					"color=COLOR;\n"
+					"texCoord0=(textureMatrix * vec4(TEXCOORD0,0.0,1.0)).xy;\n "
+					"texCoord1=TEXCOORD0;\n"
+				"}",
+
+
 
 				"struct VIN{\n"
 					"float4 position : POSITION;\n"
@@ -63,7 +84,27 @@ Node *Sky::create(Scene *scene,const Vector4 &skyColor,const Vector4 &fadeColor)
 			};
 
 			String fragmentCodes[]={
-				(char*)NULL,
+				"varying vec4 color;\n"
+				"varying vec2 texCoord0;\n"
+				"varying vec2 texCoord1;\n"
+
+				"uniform vec4 skyColor;\n"
+				"uniform sampler2D bumpTex,cloudTex,fadeTex;\n"
+
+				"vec4 lerp(vec4 c1,vec4 c2,float a){return c1*a+c2*(1.0-a);}\n"
+
+				"void main(){\n"
+					"vec4 bump=texture2D(bumpTex,texCoord0);\n"
+					"vec4 cloud=texture2D(cloudTex,texCoord0);\n"
+					"vec4 fade=texture2D(fadeTex,texCoord1);\n"
+					"vec4 color=dot((color.xyz-0.5)*2,(bump.xyz-0.5)*2);\n"
+					"color=vec4(color.xyz+cloud.xyz,cloud.a);\n"
+					"color=lerp(color,skyColor,cloud.w);\n"
+					"color=lerp(color,fade,fade.w);\n"
+					"gl_FragColor = color;\n"
+				"}",
+
+
 
 				"struct PIN{\n"
 					"float4 position: SV_POSITION;\n"
@@ -91,36 +132,41 @@ Node *Sky::create(Scene *scene,const Vector4 &skyColor,const Vector4 &fadeColor)
 			};
 
 			Shader::ptr vertexShader=mEngine->getShaderManager()->createShader(Shader::ShaderType_VERTEX,profiles,vertexCodes,2);
-			shaderPass->setShader(Shader::ShaderType_VERTEX,vertexShader);
+			pass->setShader(Shader::ShaderType_VERTEX,vertexShader);
 			Shader::ptr fragmentShader=mEngine->getShaderManager()->createShader(Shader::ShaderType_FRAGMENT,profiles,fragmentCodes,2);
-			shaderPass->setShader(Shader::ShaderType_FRAGMENT,fragmentShader);
+			pass->setShader(Shader::ShaderType_FRAGMENT,fragmentShader);
 
-			shaderPass->getVariables()->addVariable("modelViewProjectionMatrix",RenderVariable::ptr(new MVPMatrixVariable()),Material::Scope_RENDERABLE);
-			shaderPass->getVariables()->addVariable("textureMatrix",RenderVariable::ptr(new TextureMatrixVariable(0)),Material::Scope_MATERIAL);
-			shaderPass->getVariables()->addVariable("skyColor",RenderVariable::ptr(new ConstantVariable(skyColor)),Material::Scope_MATERIAL);
+			pass->getVariables()->addVariable("modelViewProjectionMatrix",RenderVariable::ptr(new MVPMatrixVariable()),Material::Scope_RENDERABLE);
+			pass->getVariables()->addVariable("textureMatrix",RenderVariable::ptr(new TextureMatrixVariable(0)),Material::Scope_MATERIAL);
+			pass->getVariables()->addVariable("skyColor",RenderVariable::ptr(new ConstantVariable(skyColor)),Material::Scope_MATERIAL);
 
 			int state=0;
 			TextureState bumpState;
-			shaderPass->setTexture(state,bumpTexture);
-			shaderPass->setTextureState(state,bumpState);
-			mShaderAccessor=Matrix4x4Accessor::ptr(new TextureStateMatrix4x4Accessor(shaderPass,state++));
+			pass->setTexture(state,bumpTexture);
+			pass->setTextureState(state,bumpState);
+			mShaderAccessor=Matrix4x4Accessor::ptr(new TextureStateMatrix4x4Accessor(pass,state++));
 
-			shaderPass->setTexture(state++,cloudTexture);
-			shaderPass->setTexture(state++,fadeTexture);
+			pass->setTexture(state++,cloudTexture);
+			pass->setTexture(state++,fadeTexture);
 		}
 
+		RenderPath::ptr fixedPath=material->addPath();
 		{
-			RenderPath::ptr fixedPath=material->addPath();
-			RenderPass::ptr fixedPass=fixedPath->addPass();
+			RenderPass::ptr pass=fixedPath->addPass();
+
+			pass->setBlendState(BlendState());
+			pass->setDepthState(DepthState(DepthState::DepthTest_NEVER,false));
+			pass->setRasterizerState(RasterizerState());
+			pass->setMaterialState(MaterialState(false,true));
 
 			int state=0;
 			TextureState bumpState;
 			bumpState.colorOperation=TextureState::Operation_DOTPRODUCT;
 			bumpState.colorSource1=TextureState::Source_PREVIOUS;
 			bumpState.colorSource2=TextureState::Source_TEXTURE;
-			fixedPass->setTexture(state,bumpTexture);
-			fixedPass->setTextureState(state,bumpState);
-			mBumpAccessor=Matrix4x4Accessor::ptr(new TextureStateMatrix4x4Accessor(fixedPass,state++));
+			pass->setTexture(state,bumpTexture);
+			pass->setTextureState(state,bumpState);
+			mBumpAccessor=Matrix4x4Accessor::ptr(new TextureStateMatrix4x4Accessor(pass,state++));
 
 			TextureState cloudState;
 			cloudState.colorOperation=TextureState::Operation_ADD;
@@ -128,9 +174,9 @@ Node *Sky::create(Scene *scene,const Vector4 &skyColor,const Vector4 &fadeColor)
 			cloudState.colorSource2=TextureState::Source_TEXTURE;
 			cloudState.alphaOperation=TextureState::Operation_REPLACE;
 			cloudState.alphaSource1=TextureState::Source_TEXTURE;
-			fixedPass->setTexture(state,cloudTexture);
-			fixedPass->setTextureState(state,cloudState);
-			mCloudAccessor=Matrix4x4Accessor::ptr(new TextureStateMatrix4x4Accessor(fixedPass,state++));
+			pass->setTexture(state,cloudTexture);
+			pass->setTextureState(state,cloudState);
+			mCloudAccessor=Matrix4x4Accessor::ptr(new TextureStateMatrix4x4Accessor(pass,state++));
 
 			TextureState colorState;
 			colorState.constantColor.set(skyColor);
@@ -140,9 +186,9 @@ Node *Sky::create(Scene *scene,const Vector4 &skyColor,const Vector4 &fadeColor)
 			colorState.colorSource3=TextureState::Source_PREVIOUS;
 			colorState.alphaOperation=TextureState::Operation_REPLACE;
 			colorState.alphaSource1=TextureState::Source_PREVIOUS;
-			fixedPass->setTexture(state,cloudTexture); // Need a texture for this state to function on OpenGL currently
-			fixedPass->setTextureState(state,colorState);
-			mColorAccessor=Matrix4x4Accessor::ptr(new TextureStateMatrix4x4Accessor(fixedPass,state++));
+			pass->setTexture(state,cloudTexture); // Need a texture for this state to function on OpenGL currently
+			pass->setTextureState(state,colorState);
+			mColorAccessor=Matrix4x4Accessor::ptr(new TextureStateMatrix4x4Accessor(pass,state++));
 
 			TextureState fadeState;
 			fadeState.colorOperation=TextureState::Operation_ALPHABLEND;
@@ -151,9 +197,9 @@ Node *Sky::create(Scene *scene,const Vector4 &skyColor,const Vector4 &fadeColor)
 			fadeState.colorSource3=TextureState::Source_TEXTURE;
 			fadeState.alphaOperation=TextureState::Operation_REPLACE;
 			fadeState.alphaSource1=TextureState::Source_TEXTURE;
-			fixedPass->setTexture(state,fadeTexture);
-			fixedPass->setTextureState(state,fadeState);
-			mFadeAccessor=Matrix4x4Accessor::ptr(new TextureStateMatrix4x4Accessor(fixedPass,state++));
+			pass->setTexture(state,fadeTexture);
+			pass->setTextureState(state,fadeState);
+			mFadeAccessor=Matrix4x4Accessor::ptr(new TextureStateMatrix4x4Accessor(pass,state++));
 		}
 
 		material->compile();
@@ -165,9 +211,10 @@ Node *Sky::create(Scene *scene,const Vector4 &skyColor,const Vector4 &fadeColor)
 		material=mEngine->getMaterialManager()->createSkyboxMaterial(compositeTexture);
 		mCompositeAccessor=Matrix4x4Accessor::ptr(new TextureStateMatrix4x4Accessor(material->getPass(),0));
 		material->getPass()->setBlendState(BlendState::Combination_ALPHA);
+		material->getPass()->setSamplerState(0,SamplerState());
 	}
 	mSkyMaterial=material;
-	mSkyMaterial->setLayer(-1);
+	mSkyMaterial->setLayer(-2);
 	mSkyMaterial->retain();
 
 	Mesh::ptr mesh=mEngine->getMeshManager()->createSkyDome(vertexBuffer,indexBuffer,sphere,numSegments,numRings,0.35);

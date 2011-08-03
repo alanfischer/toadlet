@@ -77,6 +77,7 @@ public:
 	typedef Collection<RenderableQueueItem> RenderableQueue;
 	typedef Collection<LightQueueItem> LightQueue;
 	typedef Map<Material*,int> MaterialToQueueIndexMap;
+	typedef Map<int,int> LayerToQueueIndexMap;
 	typedef Collection<int> IndexCollection;
 
 	RenderableSet(Scene *scene);
@@ -88,11 +89,11 @@ public:
 	virtual void queueRenderable(Renderable *renderable);
 	virtual void queueLight(LightNode *light);
 
-	inline const RenderableQueue &getDepthSortedQueue() const{return mRenderableQueues[0];}
 	inline const RenderableQueue &getRenderableQueue(int i) const{return mRenderableQueues[i];}
 	inline int getNumRenderableQueues() const{return mRenderableQueues.size();}
 	inline const MaterialToQueueIndexMap &getMaterialToQueueIndexMap() const{return mMaterialToQueueIndexMap;}
-	inline const IndexCollection &getLayerSortedQueueIndexes() const{return mLayerSortedQueueIndexes;}
+	inline const IndexCollection &getLayeredMaterialQueueIndexes() const{return mLayeredMaterialQueueIndexes;}
+	inline const IndexCollection &getLayeredDepthQueueIndexes() const{return mLayeredDepthQueueIndexes;}
 	inline const LightQueue &getLightQueue(){return mLightQueue;}
 
 protected:
@@ -102,7 +103,9 @@ protected:
 	Collection<RenderableQueue> mRenderableQueues;
 	int mRenderableQueueCount;
 	MaterialToQueueIndexMap mMaterialToQueueIndexMap;
-	IndexCollection mLayerSortedQueueIndexes;
+	LayerToQueueIndexMap mLayerToQueueIndexMap;
+	IndexCollection mLayeredMaterialQueueIndexes;
+	IndexCollection mLayeredDepthQueueIndexes;
 	LightQueue mLightQueue;
 };
 

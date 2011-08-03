@@ -85,7 +85,7 @@ protected:
 
 	RenderPathChooser *mRenderPathChooser;
 	SamplerState mDefaultSamplerState;
-	Shader::ptr mFixedVertexShader,mFixedFragmentShader,mFixedGeometryShader;
+	Shader::ptr mDiffuseVertexShader,mDiffuseFragmentShader,mSkyboxVertexShader,mSkyboxFragmentShader,mPointSpriteGeometryShader;
 };
 
 }
