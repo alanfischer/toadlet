@@ -79,16 +79,17 @@ Material::ptr MaterialManager::cloneMaterial(Material::ptr source){
 Material::ptr MaterialManager::createDiffuseMaterial(Texture::ptr texture){
 	Material::ptr material(new Material(this));
 
-	RenderPath::ptr shaderPath=material->addPath();
-	RenderPass::ptr shaderPass=shaderPath->addPass();
 	{
+		RenderPath::ptr shaderPath=material->addPath();
+		RenderPass::ptr shaderPass=shaderPath->addPass();
+
 		shaderPass->setBlendState(BlendState());
 		shaderPass->setDepthState(DepthState());
 		shaderPass->setRasterizerState(RasterizerState());
 		shaderPass->setMaterialState(MaterialState(true,false,MaterialState::ShadeType_GOURAUD));
 
-		shaderPass->setShader(Shader::ShaderType_VERTEX,mFixedVertexShader);
-		shaderPass->setShader(Shader::ShaderType_FRAGMENT,mFixedFragmentShader);
+		shaderPass->setShader(Shader::ShaderType_VERTEX,mDiffuseVertexShader);
+		shaderPass->setShader(Shader::ShaderType_FRAGMENT,mDiffuseFragmentShader);
 		shaderPass->getVariables()->addVariable("modelViewProjectionMatrix",RenderVariable::ptr(new MVPMatrixVariable()),Material::Scope_RENDERABLE);
 		shaderPass->getVariables()->addVariable("normalMatrix",RenderVariable::ptr(new NormalMatrixVariable()),Material::Scope_RENDERABLE);
 		shaderPass->getVariables()->addVariable("lightViewPosition",RenderVariable::ptr(new LightViewPositionVariable()),Material::Scope_MATERIAL);
@@ -104,9 +105,10 @@ Material::ptr MaterialManager::createDiffuseMaterial(Texture::ptr texture){
 		shaderPass->setTexture(0,texture);
 	}
 
-	RenderPath::ptr fixedPath=material->addPath();
-	RenderPass::ptr fixedPass=fixedPath->addPass();
 	{
+		RenderPath::ptr fixedPath=material->addPath();
+		RenderPass::ptr fixedPass=fixedPath->addPass();
+
 		fixedPass->setBlendState(BlendState());
 		fixedPass->setDepthState(DepthState());
 		fixedPass->setRasterizerState(RasterizerState());
@@ -126,19 +128,20 @@ Material::ptr MaterialManager::createDiffuseMaterial(Texture::ptr texture){
 Material::ptr MaterialManager::createDiffusePointSpriteMaterial(Texture::ptr texture,scalar size,bool attenuated){
 	Material::ptr material=createDiffuseMaterial(texture);
 
-	RenderPath::ptr shaderPath=material->getPath(0);
-	RenderPass::ptr shaderPass=shaderPath->getPass(0);
 	{
-		shaderPass->setShader(Shader::ShaderType_GEOMETRY,mFixedGeometryShader);
+		RenderPath::ptr shaderPath=material->getPath(0);
+		RenderPass::ptr shaderPass=shaderPath->getPass(0);
+
+		shaderPass->setShader(Shader::ShaderType_GEOMETRY,mPointSpriteGeometryShader);
 		shaderPass->getVariables()->addVariable("pointSize",RenderVariable::ptr(new PointSizeVariable()),Material::Scope_MATERIAL);
 		shaderPass->getVariables()->addVariable("pointAttenuated",RenderVariable::ptr(new PointAttenuatedVariable()),Material::Scope_MATERIAL);
 		shaderPass->getVariables()->addVariable("viewport",RenderVariable::ptr(new ViewportVariable()),Material::Scope_MATERIAL);
 	}
 
-
-	RenderPath::ptr fixedPath=material->getPath(1);
-	RenderPass::ptr fixedPass=fixedPath->getPass(0);
 	{
+		RenderPath::ptr fixedPath=material->getPath(1);
+		RenderPass::ptr fixedPass=fixedPath->getPass(0);
+
 		fixedPass->setPointState(PointState(true,size,attenuated));
 	}
 
@@ -152,24 +155,44 @@ Material::ptr MaterialManager::createDiffusePointSpriteMaterial(Texture::ptr tex
 Material::ptr MaterialManager::createSkyboxMaterial(Texture::ptr texture){
 	Material::ptr material(new Material(this));
 
-	RenderPath::ptr fixedPath=material->addPath();
-	RenderPass::ptr fixedPass=fixedPath->addPass();
-	fixedPass->setBlendState(BlendState());
-	fixedPass->setDepthState(DepthState(DepthState::DepthTest_NEVER,false));
-	fixedPass->setRasterizerState(RasterizerState());
-	fixedPass->setMaterialState(MaterialState(false,true));
-	fixedPass->setFogState(FogState(FogState::FogType_NONE,1,0,0,Colors::BLACK));
+	{
+		RenderPath::ptr shaderPath=material->addPath();
+		RenderPass::ptr shaderPass=shaderPath->addPass();
 
-	if(texture!=NULL){
+		shaderPass->setBlendState(BlendState());
+		shaderPass->setDepthState(DepthState(DepthState::DepthTest_NEVER,false));
+		shaderPass->setRasterizerState(RasterizerState());
+
+		shaderPass->setShader(Shader::ShaderType_VERTEX,mSkyboxVertexShader);
+		shaderPass->setShader(Shader::ShaderType_FRAGMENT,mSkyboxFragmentShader);
+		shaderPass->getVariables()->addVariable("modelViewProjectionMatrix",RenderVariable::ptr(new MVPMatrixVariable()),Material::Scope_RENDERABLE);
+		shaderPass->getVariables()->addVariable("textureMatrix",RenderVariable::ptr(new TextureMatrixVariable(0)),Material::Scope_MATERIAL);
+
+		SamplerState samplerState(mDefaultSamplerState);
+		samplerState.uAddress=SamplerState::AddressType_CLAMP_TO_EDGE;
+		samplerState.vAddress=SamplerState::AddressType_CLAMP_TO_EDGE;
+		samplerState.wAddress=SamplerState::AddressType_CLAMP_TO_EDGE;
+		shaderPass->setSamplerState(0,samplerState);
+		shaderPass->setTextureState(0,TextureState());
+		shaderPass->setTexture(0,texture);
+	}
+
+	{
+		RenderPath::ptr fixedPath=material->addPath();
+		RenderPass::ptr fixedPass=fixedPath->addPass();
+
+		fixedPass->setBlendState(BlendState());
+		fixedPass->setDepthState(DepthState(DepthState::DepthTest_NEVER,false));
+		fixedPass->setRasterizerState(RasterizerState());
+		fixedPass->setMaterialState(MaterialState(false,true));
+		fixedPass->setFogState(FogState(FogState::FogType_NONE,1,0,0,Colors::BLACK));
+
 		SamplerState samplerState(mDefaultSamplerState);
 		samplerState.uAddress=SamplerState::AddressType_CLAMP_TO_EDGE;
 		samplerState.vAddress=SamplerState::AddressType_CLAMP_TO_EDGE;
 		samplerState.wAddress=SamplerState::AddressType_CLAMP_TO_EDGE;
 		fixedPass->setSamplerState(0,samplerState);
-
-		TextureState textureState;
-		fixedPass->setTextureState(0,textureState);
-
+		fixedPass->setTextureState(0,TextureState());
 		fixedPass->setTexture(0,texture);
 	}
 
@@ -290,17 +313,17 @@ void MaterialManager::setRenderPathChooser(RenderPathChooser *chooser){
 }
 
 void MaterialManager::contextActivate(RenderDevice *renderDevice){
-	String fixedProfiles[]={
+	String profiles[]={
 		"glsl",
 		"hlsl"
 	};
 
-	String fixedVertexCode[]={
+	String diffuseVertexCode[]={
 		"attribute vec4 POSITION;\n"
 		"attribute vec3 NORMAL;\n"
 		"attribute vec2 TEXCOORD0;\n"
-		"varying vec4 color\n;"
-		"varying vec2 texCoord\n;"
+		"varying vec4 color;\n"
+		"varying vec2 texCoord;\n"
 
 		"uniform mat4 modelViewProjectionMatrix;\n"
 		"uniform mat4 normalMatrix;\n"
@@ -356,7 +379,7 @@ void MaterialManager::contextActivate(RenderDevice *renderDevice){
 		"}"
 	};
 
-	String fixedFragmentCode[]={
+	String diffuseFragmentCode[]={
 		"varying vec4 color;\n"
 		"varying vec2 texCoord;\n"
 		
@@ -384,7 +407,74 @@ void MaterialManager::contextActivate(RenderDevice *renderDevice){
 		"}"
 	};
 
-	String fixedGeometryCode[]={
+	String skyboxVertexCode[]={
+		"attribute vec4 POSITION;\n"
+		"attribute vec4 COLOR;\n"
+		"attribute vec2 TEXCOORD0;\n"
+		"varying vec4 color;\n"
+		"varying vec2 texCoord;\n"
+
+		"uniform mat4 modelViewProjectionMatrix;\n"
+		"uniform mat4 textureMatrix;\n"
+
+		"void main(){\n"
+			"gl_Position=modelViewProjectionMatrix * POSITION;\n"
+			"color=COLOR;\n"
+			"texCoord=(textureMatrix * vec4(TEXCOORD0,0.0,1.0)).xy;\n"
+		"}",
+
+
+
+		"struct VIN{\n"
+			"float4 position : POSITION;\n"
+			"float4 color : COLOR;\n"
+			"float2 texCoord: TEXCOORD0;\n"
+		"};\n"
+		"struct VOUT{\n"
+			"float4 position : SV_POSITION;\n"
+			"float4 color : COLOR;\n"
+			"float2 texCoord: TEXCOORD0;\n"
+		"};\n"
+
+		"float4x4 modelViewProjectionMatrix;\n"
+		"float4x4 textureMatrix;\n"
+
+		"VOUT main(VIN vin){\n"
+			"VOUT vout;\n"
+			"vout.position=mul(modelViewProjectionMatrix,vin.position);\n"
+			"vout.color=vin.color;\n"
+			"vout.texCoord=mul(textureMatrix,float4(vin.texCoord,0.0,1.0));\n"
+			"return vout;\n"
+		"}"
+	};
+
+	String skyboxFragmentCode[]={
+		"varying vec4 color;\n"
+		"varying vec2 texCoord;\n"
+		
+		"uniform sampler2D tex;\n"
+		
+		"void main(){\n"
+			"gl_FragColor = color * texture2D(tex,texCoord);\n"
+		"}",
+
+
+
+		"struct PIN{\n"
+			"float4 position: SV_POSITION;\n"
+			"float4 color: COLOR;\n"
+			"float2 texCoord: TEXCOORD0;\n"
+		"};\n"
+
+		"Texture2D tex;\n"
+		"SamplerState samp;\n"
+
+		"float4 main(PIN pin): SV_TARGET{\n"
+			"return pin.color * tex.Sample(samp,pin.texCoord);\n"
+		"}"
+	};
+
+	String pointSpriteGeometryCode[]={
 /*
 		"#version 150\n"
 		"layout(points) in;\n"
@@ -480,9 +570,11 @@ void MaterialManager::contextActivate(RenderDevice *renderDevice){
 		"}"
 	};
 
-	mFixedVertexShader=getEngine()->getShaderManager()->createShader(Shader::ShaderType_VERTEX,fixedProfiles,fixedVertexCode,2);
-	mFixedFragmentShader=getEngine()->getShaderManager()->createShader(Shader::ShaderType_FRAGMENT,fixedProfiles,fixedFragmentCode,2);
-	mFixedGeometryShader=getEngine()->getShaderManager()->createShader(Shader::ShaderType_GEOMETRY,fixedProfiles,fixedGeometryCode,2);
+	mDiffuseVertexShader=getEngine()->getShaderManager()->createShader(Shader::ShaderType_VERTEX,profiles,diffuseVertexCode,2);
+	mDiffuseFragmentShader=getEngine()->getShaderManager()->createShader(Shader::ShaderType_FRAGMENT,profiles,diffuseFragmentCode,2);
+	mSkyboxVertexShader=getEngine()->getShaderManager()->createShader(Shader::ShaderType_VERTEX,profiles,skyboxVertexCode,2);
+	mSkyboxFragmentShader=getEngine()->getShaderManager()->createShader(Shader::ShaderType_FRAGMENT,profiles,skyboxFragmentCode,2);
+	mPointSpriteGeometryShader=getEngine()->getShaderManager()->createShader(Shader::ShaderType_GEOMETRY,profiles,pointSpriteGeometryCode,2);
 
 	int i;
 	for(i=0;i<mRenderStates.size();++i){
@@ -495,13 +587,25 @@ void MaterialManager::contextActivate(RenderDevice *renderDevice){
 }
 
 void MaterialManager::contextDeactivate(RenderDevice *renderDevice){
-	if(mFixedVertexShader!=NULL){
-		mFixedVertexShader->release();
-		mFixedVertexShader=NULL;
+	if(mDiffuseVertexShader!=NULL){
+		mDiffuseVertexShader->release();
+		mDiffuseVertexShader=NULL;
 	}
-	if(mFixedFragmentShader!=NULL){
-		mFixedFragmentShader->release();
-		mFixedFragmentShader=NULL;
+	if(mDiffuseFragmentShader!=NULL){
+		mDiffuseFragmentShader->release();
+		mDiffuseFragmentShader=NULL;
+	}
+	if(mSkyboxVertexShader!=NULL){
+		mSkyboxVertexShader->release();
+		mSkyboxVertexShader=NULL;
+	}
+	if(mSkyboxFragmentShader!=NULL){
+		mSkyboxFragmentShader->release();
+		mSkyboxFragmentShader=NULL;
+	}
+	if(mPointSpriteGeometryShader!=NULL){
+		mPointSpriteGeometryShader->release();
+		mPointSpriteGeometryShader=NULL;
 	}
 
 	int i;

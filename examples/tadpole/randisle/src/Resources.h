@@ -37,9 +37,10 @@ public:
 			Vector4 color=Colors::AZURE*1.5;
 			color.w=0.5f;
 
-			RenderPath::ptr shaderPath=water->addPath();
-			RenderPass::ptr shaderPass=shaderPath->addPass();
 			{
+				RenderPath::ptr shaderPath=water->addPath();
+				RenderPass::ptr shaderPass=shaderPath->addPass();
+
 				shaderPass->setMaterialState(MaterialState(color));
 				shaderPass->setBlendState(BlendState::Combination_ALPHA);
 				shaderPass->setDepthState(DepthState(DepthState::DepthTest_LEQUAL,false));
@@ -62,7 +63,33 @@ public:
 				};
 
 				String vertexCodes[]={
-					(char*)NULL,
+					"attribute vec4 POSITION;\n"
+					"attribute vec3 NORMAL;\n"
+					"attribute vec2 TEXCOORD0;\n"
+					"varying vec4 color\n;"
+					"varying vec2 texCoord0\n;"
+					"varying vec2 texCoord1\n;"
+
+					"uniform mat4 modelViewProjectionMatrix;\n"
+					"uniform mat4 normalMatrix;\n"
+					"uniform vec4 materialDiffuseColor;\n"
+					"uniform vec4 materialAmbientColor;\n"
+					"uniform vec4 lightViewPosition;\n"
+					"uniform vec4 lightColor;\n"
+					"uniform vec4 ambientColor;\n"
+					"uniform mat4 textureMatrix0,textureMatrix1;\n"
+
+					"void main(){\n"
+						"gl_Position=modelViewProjectionMatrix * POSITION;\n"
+						"vec3 viewNormal=normalize(normalMatrix * vec4(NORMAL,0.0)).xyz;\n"
+						"float lightIntensity=clamp(-dot(lightViewPosition.xyz,viewNormal),0.0,1.0);\n"
+						"vec4 localLightColor=lightIntensity*lightColor;\n"
+						"color=localLightColor*materialDiffuseColor + ambientColor*materialAmbientColor;\n"
+						"texCoord0=(textureMatrix0 * vec4(TEXCOORD0,0.0,1.0)).xy;\n "
+						"texCoord1=(textureMatrix1 * vec4(TEXCOORD0,0.0,1.0)).xy;\n "
+					"}",
+
+
 
 					"struct VIN{\n"
 						"float4 position : POSITION;\n"
@@ -99,7 +126,17 @@ public:
 				};
 
 				String fragmentCodes[]={
-					(char*)NULL,
+					"varying vec4 color;\n"
+					"varying vec2 texCoord0;\n"
+					"varying vec2 texCoord1;\n"
+					
+					"uniform sampler2D tex0,tex1;\n"
+					
+					"void main(){\n"
+						"gl_FragColor = color*texture2D(tex0,texCoord0)*texture2D(tex1,texCoord1);\n"
+					"}",
+
+
 
 					"struct PIN{\n"
 						"float4 position: SV_POSITION;\n"
@@ -132,9 +169,10 @@ public:
 				shaderPass->getVariables()->addVariable("textureMatrix1",RenderVariable::ptr(new TextureMatrixVariable(1)),Material::Scope_MATERIAL);
 			}
 
-			RenderPath::ptr fixedPath=water->addPath();
-			RenderPass::ptr fixedPass=fixedPath->addPass();
 			{
+				RenderPath::ptr fixedPath=water->addPath();
+				RenderPass::ptr fixedPass=fixedPath->addPass();
+
 				fixedPass->setMaterialState(MaterialState(color));
 				fixedPass->setBlendState(BlendState::Combination_ALPHA);
 				fixedPass->setDepthState(DepthState(DepthState::DepthTest_LEQUAL,false));

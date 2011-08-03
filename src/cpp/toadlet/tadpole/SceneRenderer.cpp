@@ -154,23 +154,35 @@ void SceneRenderer::renderRenderables(RenderableSet *set,RenderDevice *device,Ca
 
 	setupLights(set->getLightQueue(),device);
 
-	bool renderedDepthSorted=false;
-	const RenderableSet::IndexCollection &sortedIndexes=set->getLayerSortedQueueIndexes();
+	const RenderableSet::IndexCollection &materialQueueIndexes=set->getLayeredMaterialQueueIndexes();
+	const RenderableSet::IndexCollection &depthQueueIndexes=set->getLayeredDepthQueueIndexes();
+	int depthIndex=0;
 	int i;
-	for(i=0;i<sortedIndexes.size();++i){
-		const RenderableSet::RenderableQueue &renderableQueue=set->getRenderableQueue(sortedIndexes[i]);
-		Material *material=renderableQueue[0].material;
+	for(i=0;i<materialQueueIndexes.size();++i){
+		const RenderableSet::RenderableQueue &queue=set->getRenderableQueue(materialQueueIndexes[i]);
+		Material *material=queue[0].material;
+		int layer=material->getLayer();
 
-		if(renderedDepthSorted==false && (material!=NULL && material->getLayer()>0)){
-			renderedDepthSorted=true;
-			renderDepthSortedRenderables(set,useMaterials);
+		while(depthIndex<depthQueueIndexes.size()){
+			const RenderableSet::RenderableQueue &depthQueue=set->getRenderableQueue(depthQueueIndexes[depthIndex]);
+			Material *depthMaterial=depthQueue[0].material;
+			int depthLayer=depthMaterial->getLayer();
+			if(depthLayer<layer){
+				renderDepthSortedRenderables(depthQueue,useMaterials);
+				depthIndex++;
+			}
+			else{
+				break;
+			}
 		}
 
-		renderQueueItems((useMaterials && material!=NULL)?material:NULL,&renderableQueue[0],renderableQueue.size());
+		renderQueueItems((useMaterials && material!=NULL)?material:NULL,&queue[0],queue.size());
 	}
 
-	if(renderedDepthSorted==false){
-		renderDepthSortedRenderables(set,useMaterials);
+	while(depthIndex<depthQueueIndexes.size()){
+		const RenderableSet::RenderableQueue &depthQueue=set->getRenderableQueue(depthQueueIndexes[depthIndex]);
+		renderDepthSortedRenderables(depthQueue,useMaterials);
+		depthIndex++;
 	}
 
 	if(listener!=NULL){
@@ -178,11 +190,10 @@ void SceneRenderer::renderRenderables(RenderableSet *set,RenderDevice *device,Ca
 	}
 }
 
-void SceneRenderer::renderDepthSortedRenderables(RenderableSet *set,bool useMaterials){
+void SceneRenderer::renderDepthSortedRenderables(const RenderableSet::RenderableQueue &queue,bool useMaterials){
 	int i;
-	const RenderableSet::RenderableQueue &renderableQueue=set->getDepthSortedQueue();
-	for(i=0;i<renderableQueue.size();++i){
-		const RenderableSet::RenderableQueueItem &item=renderableQueue[i];
+	for(i=0;i<queue.size();++i){
+		const RenderableSet::RenderableQueueItem &item=queue[i];
 		Material *material=item.material;
 		renderQueueItems((useMaterials && material!=NULL)?material:NULL,&item,1);
 	}

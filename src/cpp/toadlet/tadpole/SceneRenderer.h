@@ -46,7 +46,7 @@ public:
 protected:
 	virtual void gatherRenderables(RenderableSet *set,Node *node,CameraNode *camera);
 	virtual void renderRenderables(RenderableSet *set,RenderDevice *renderDevice,CameraNode *camera,bool useMaterials=true);
-	virtual void renderDepthSortedRenderables(RenderableSet *set,bool useMaterials);
+	virtual void renderDepthSortedRenderables(const RenderableSet::RenderableQueue &queue,bool useMaterials);
 	virtual void renderQueueItems(Material *material,const RenderableSet::RenderableQueueItem *items,int numItems);
 
 	void setupViewport(CameraNode *camera,RenderDevice *renderDevice);

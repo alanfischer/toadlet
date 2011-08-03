@@ -47,17 +47,15 @@ RenderableSet::~RenderableSet(){
 }
 
 void RenderableSet::startQueuing(){
-	if(mRenderableQueues.size()==0){
-		mRenderableQueues.resize(1);
-	}
-	mRenderableQueueCount=1;
-
 	int i;
 	for(i=0;i<mRenderableQueues.size();++i){
 		mRenderableQueues[i].clear();
 	}
+	mRenderableQueueCount=0;
 	mMaterialToQueueIndexMap.clear();
-	mLayerSortedQueueIndexes.clear();
+	mLayerToQueueIndexMap.clear();
+	mLayeredMaterialQueueIndexes.clear();
+	mLayeredDepthQueueIndexes.clear();
 	mLightQueue.clear();
 
 	mRoot=mScene->getRoot();
@@ -78,19 +76,42 @@ void RenderableSet::queueRenderable(Renderable *renderable){
 		ambient.set(mScene->getAmbientColor());
 	}
 
+	int layer=material!=NULL?material->getLayer():0;
+
 	if(material!=NULL && material->isDepthSorted()){
+		LayerToQueueIndexMap::iterator it=mLayerToQueueIndexMap.find(layer);
+		int queueIndex=0;
+		if(it!=mLayerToQueueIndexMap.end()){
+			queueIndex=it->second;
+		}
+		else{
+			queueIndex=mRenderableQueueCount;
+			if(mRenderableQueues.size()<=queueIndex){
+				mRenderableQueues.resize(queueIndex+1);
+			}
+			mRenderableQueueCount++;
+			mLayerToQueueIndexMap[layer]=queueIndex;
+			int i;
+			for(i=0;i<mLayeredDepthQueueIndexes.size();++i){
+				int index=mLayeredDepthQueueIndexes[i];
+				const RenderableQueue &queue=mRenderableQueues[index];
+				int queueLayer=queue[0].material!=NULL?queue[0].material->getLayer():0;
+				if(layer<queueLayer) break;
+			}
+			mLayeredDepthQueueIndexes.insert(i,queueIndex);
+		}
+
 		/// @todo: Real sorting algorithm, clean this up
 		scalar depth=Math::lengthSquared(bound.getSphere().origin,mCamera->getWorldTranslate());
-
-		RenderableQueue &depthQueue=mRenderableQueues[0];
-		int numRenderables=depthQueue.size();
+		RenderableQueue &queue=mRenderableQueues[queueIndex];
+		int numRenderables=queue.size();
 		int i;
 		for(i=0;i<numRenderables;++i){
-			if(depthQueue[i].material->getLayer()<material->getLayer()) continue;
-			if(i<numRenderables-1 && depthQueue[i+1].material->getLayer()>material->getLayer()) break;
-			if(depthQueue[i].depth<depth) break;
+			if(queue[i].material->getLayer()<layer) continue;
+			if(i<numRenderables-1 && queue[i+1].material->getLayer()>layer) break;
+			if(queue[i].depth<depth) break;
 		}
-		depthQueue.insert(i,RenderableQueueItem(renderable,material,ambient,depth));
+		queue.insert(i,RenderableQueueItem(renderable,material,ambient,depth));
 	}
 	else{
 		MaterialToQueueIndexMap::iterator it=mMaterialToQueueIndexMap.find(material);
@@ -105,16 +126,16 @@ void RenderableSet::queueRenderable(Renderable *renderable){
 			}
 			mRenderableQueueCount++;
 			mMaterialToQueueIndexMap[material]=queueIndex;
-			int layer=material!=NULL?material->getLayer():0;
 			int i;
-			for(i=0;i<mLayerSortedQueueIndexes.size();++i){
-				int index=mLayerSortedQueueIndexes[i];
+			for(i=0;i<mLayeredMaterialQueueIndexes.size();++i){
+				int index=mLayeredMaterialQueueIndexes[i];
 				const RenderableQueue &queue=mRenderableQueues[index];
 				int queueLayer=queue[0].material!=NULL?queue[0].material->getLayer():0;
 				if(layer<queueLayer) break;
 			}
-			mLayerSortedQueueIndexes.insert(i,queueIndex);
+			mLayeredMaterialQueueIndexes.insert(i,queueIndex);
 		}
+
 		mRenderableQueues[queueIndex].add(RenderableQueueItem(renderable,material,ambient,0));
 	}
 }
