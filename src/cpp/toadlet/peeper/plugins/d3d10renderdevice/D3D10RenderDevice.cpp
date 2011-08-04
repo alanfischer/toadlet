@@ -111,7 +111,7 @@ bool D3D10RenderDevice::create(RenderTarget *target,int *options){
 		caps.textureDot3=false;
 		caps.textureNonPowerOf2=true;
 		caps.textureNonPowerOf2Restricted=true;
-		caps.textureAutogenMipMaps=false;
+		caps.textureAutogenMipMaps=true;
 		caps.renderToTexture=true;
 		caps.renderToDepthTexture=true;
 		caps.renderToTextureNonPowerOf2Restricted=true;

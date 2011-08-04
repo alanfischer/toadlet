@@ -191,15 +191,15 @@ void SceneRenderer::renderQueueItems(Material *material,const RenderableSet::Ren
 	Matrix4x4 matrix;
 	RenderPath *path=(material!=NULL)?material->getBestPath():NULL;
 	int numPasses=(path!=NULL?path->getNumPasses():1);
-	int i;
+	int i,j;
 	for(i=0;i<numPasses;++i){
 		RenderPass *pass=(path!=NULL)?path->getPass(i):NULL;
 		if(pass!=NULL){
 			setupPass(pass);
 		}
 
-		for(i=0;i<numItems;++i){
-			const RenderableSet::RenderableQueueItem &item=items[i];
+		for(j=0;j<numItems;++j){
+			const RenderableSet::RenderableQueueItem &item=items[j];
 			Renderable *renderable=item.renderable;
 			renderable->getRenderTransform().getMatrix(matrix);
 

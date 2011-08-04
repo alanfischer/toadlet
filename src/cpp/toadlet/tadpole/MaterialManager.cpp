@@ -137,8 +137,11 @@ Material::ptr MaterialManager::createDiffusePointSpriteMaterial(Texture::ptr tex
 
 		pass->setShader(Shader::ShaderType_GEOMETRY,mPointSpriteGeometryShader);
 		pass->getVariables()->addVariable("pointSize",RenderVariable::ptr(new PointSizeVariable()),Material::Scope_MATERIAL);
-		pass->getVariables()->addVariable("pointAttenuated",RenderVariable::ptr(new PointAttenuatedVariable()),Material::Scope_MATERIAL);
 		pass->getVariables()->addVariable("viewport",RenderVariable::ptr(new ViewportVariable()),Material::Scope_MATERIAL);
+
+		/// @todo: We need to sort out how to handle the case in GL where you can have Geometry Shaders and PointSprites both functional.
+		/// Though I suppose that would be in the GLRenderDevice, it would deactivate PointSprites if Geometry Shaders are used.
+		pass->setPointState(PointState(true,size,attenuated));
 	}
 
 	RenderPath::ptr fixedPath=material->getPath(1);
@@ -497,7 +500,6 @@ void MaterialManager::contextActivate(RenderDevice *renderDevice){
 		"layout(points) in;\n"
 		"layout(triangle_strip,max_vertices=4) out;\n"
 		"uniform float pointSize;\n"
-		"uniform float pointAttenuation;\n"
 		"uniform vec4 viewport;\n"
 
 		"//in vec4 color[1];\n"
@@ -506,7 +508,7 @@ void MaterialManager::contextActivate(RenderDevice *renderDevice){
 
 		"void main(){\n "
 			"float aspect=viewport.w/viewport.z;\n"
-			"float w=aspect*pointSize*2.0,h=pointSize*2.0;\n"
+			"float w=aspect*pointSize/4.0,h=pointSize/4.0;\n"
 			"vec3 positions[4]=vec3[](\n"
 				"vec3(-w,-h,0.0),\n"
 				"vec3(w,-h,0.0),\n"
@@ -559,13 +561,12 @@ void MaterialManager::contextActivate(RenderDevice *renderDevice){
 		"};\n"
 
 		"float pointSize;\n"
-		"float pointAttenuation;\n"
 		"float4 viewport;\n"
 
 		"[maxvertexcount(4)]\n"
 		"void main(point GIN gin[1],inout TriangleStream<GOUT> stream){\n"
 			"float aspect=viewport.w/viewport.z;\n"
-			"float w=aspect*pointSize*2.0,h=pointSize*2.0;\n"
+			"float w=aspect*pointSize/4.0,h=pointSize/4.0;\n"
 			"const float3 positions[4]={\n"
 				"float3(-w,-h,0.0),\n"
 				"float3(w,-h,0.0),\n"

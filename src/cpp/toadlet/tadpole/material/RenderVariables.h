@@ -93,10 +93,12 @@ public:
 	int getFormat(){return VariableBufferFormat::Format_TYPE_FLOAT_32|VariableBufferFormat::Format_COUNT_4;}
 
 	void update(tbyte *data,SceneParameters *parameters){
-		Vector4 &lightViewPosition=*(Vector4*)data;
+		// This Vector4 isn't aligned, so we don't multiply directly into it.
+		Vector4 &finalLightPosition=*(Vector4*)data;
 		if(parameters->getRenderable()!=NULL){
-			lightViewPosition=Vector4(parameters->getLightState().direction,0);
-			Math::mul(lightViewPosition,parameters->getCamera()->getViewMatrix());
+			Vector4 lightPosition(parameters->getLightState().direction,0);
+			Math::mul(lightPosition,parameters->getCamera()->getViewMatrix());
+			finalLightPosition=lightPosition;
 		}
 	}
 };

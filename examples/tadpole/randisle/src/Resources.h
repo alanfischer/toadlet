@@ -240,11 +240,29 @@ public:
 			treeBranch->retain();
 		}
 
-		treeLeaf=engine->getMaterialManager()->findMaterial("leaf_top1_alpha.png");
+		treeLeaf=engine->getMaterialManager()->createMaterial();
 		if(treeLeaf!=NULL){
-			treeLeaf->getPass()->setRasterizerState(RasterizerState(RasterizerState::CullType_NONE));
-			treeLeaf->getPass()->setDepthState(DepthState(DepthState::DepthTest_LEQUAL,false));
-			treeLeaf->getPass()->setBlendState(BlendState::Combination_ALPHA);
+			Material::ptr treeLeafTop=engine->getMaterialManager()->findMaterial("leaf_top1_alpha.png");
+			Material::ptr treeLeafBottom=engine->getMaterialManager()->findMaterial("leaf_bottom1_alpha.png");
+
+			int i;
+			for(i=0;i<treeLeafTop->getNumPaths();++i){
+				RenderPath::ptr path=treeLeaf->addPath();
+				RenderPath::ptr topPath=treeLeafTop->getPath(i);
+				RenderPath::ptr bottomPath=treeLeafBottom->getPath(i);
+
+				RenderPass::ptr topPass=path->addPass(topPath->takePass(0));
+				topPass->setRasterizerState(RasterizerState(RasterizerState::CullType_BACK));
+				topPass->setDepthState(DepthState(DepthState::DepthTest_LEQUAL,false));
+				topPass->setBlendState(BlendState::Combination_ALPHA);
+
+				RenderPass::ptr bottomPass=path->addPass(bottomPath->takePass(0));
+				bottomPass->setRasterizerState(RasterizerState(RasterizerState::CullType_FRONT));
+				bottomPass->setDepthState(DepthState(DepthState::DepthTest_LEQUAL,false));
+				bottomPass->setBlendState(BlendState::Combination_ALPHA);
+			}
+
+			treeLeaf->compile();
 			treeLeaf->retain();
 		}
 

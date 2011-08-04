@@ -88,6 +88,11 @@ bool D3D10Texture::create(int usage,Dimension dimension,int format,int width,int
 	mDepth=depth;
 	mMipLevels=mipLevels;
 
+	// Perhaps this should be moved to TextureManager, but it allows us to make use of the D3D10 AutoGen Mipmaps functionality
+	if((mUsage&(Usage_BIT_STATIC|Usage_BIT_AUTOGEN_MIPMAPS))==(Usage_BIT_STATIC|Usage_BIT_AUTOGEN_MIPMAPS)){
+		mUsage=Usage_BIT_STREAM|Usage_BIT_AUTOGEN_MIPMAPS|Usage_BIT_RENDERTARGET;
+	}
+
 	bool result=false;
 	if((mUsage&Usage_BIT_STATIC)>0){
 		result=createContext(mipLevels,mipDatas);
@@ -129,7 +134,7 @@ bool D3D10Texture::createContext(int mipLevels,byte *mipDatas[]){
 	int miscFlags=0;
 	int bindFlags=0;
 
-	if((mUsage&(Usage_BIT_AUTOGEN_MIPMAPS|Usage_BIT_RENDERTARGET))==(Usage_BIT_AUTOGEN_MIPMAPS|Usage_BIT_RENDERTARGET)){
+	if((mUsage&Usage_BIT_AUTOGEN_MIPMAPS|Usage_BIT_RENDERTARGET)==(Usage_BIT_AUTOGEN_MIPMAPS|Usage_BIT_RENDERTARGET)){
 		miscFlags|=D3D10_RESOURCE_MISC_GENERATE_MIPS;
 	}
 
@@ -155,12 +160,12 @@ bool D3D10Texture::createContext(int mipLevels,byte *mipDatas[]){
 
 	D3D10_SUBRESOURCE_DATA *sData=NULL;
 	if(mipDatas!=NULL){
-		int numMipDatas=mipLevels>0?mipLevels:1;
 		int hwidth=mWidth,hheight=mHeight,hdepth=mDepth;
-		sData=new D3D10_SUBRESOURCE_DATA[numMipDatas];
+		int numSubResources=mipLevels>0 ? mipLevels:1;
+		sData=new D3D10_SUBRESOURCE_DATA[numSubResources];
 		int i;
-		for(i=0;i<numMipDatas;++i){
-			sData[i].pSysMem=mipDatas[i];
+		for(i=0;i<numSubResources;++i){
+			sData[i].pSysMem=(i==0 || i<mipLevels) ? mipDatas[i]:NULL;
 			sData[i].SysMemPitch=ImageFormatConversion::getRowPitch(mFormat,hwidth);
 			sData[i].SysMemSlicePitch=sData[i].SysMemPitch*hheight;
 
@@ -359,7 +364,7 @@ bool D3D10Texture::read(int width,int height,int depth,int mipLevel,byte *mipDat
 }
 
 bool D3D10Texture::generateMipLevels(){
-	if((mUsage&(Usage_BIT_RENDERTARGET|Usage_BIT_AUTOGEN_MIPMAPS))==(Usage_BIT_RENDERTARGET|Usage_BIT_AUTOGEN_MIPMAPS)){
+	if((mUsage&Usage_BIT_AUTOGEN_MIPMAPS)==Usage_BIT_AUTOGEN_MIPMAPS){
 		mD3DDevice->GenerateMips(mShaderResourceView);
 	}
 	return true;

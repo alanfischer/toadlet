@@ -311,6 +311,7 @@ bool BackableTexture::convertCreate(Texture::ptr texture,RenderDevice *renderDev
 	return result;
 }
 
+/// @todo: Fix the mipmap generation.  It's just nearest neighbor right now.  The format conversion, mipmap generation, and scaling should all be moved into egg::image, and work with raw memory, not Image objects.
 void BackableTexture::convertAndScale(tbyte *src,int srcFormat,int srcWidth,int srcHeight,int srcDepth,tbyte *dst,int dstFormat,int dstWidth,int dstHeight,int dstDepth){
 	int srcPitch=ImageFormatConversion::getRowPitch(srcFormat,srcWidth);
 
@@ -335,7 +336,7 @@ void BackableTexture::convertAndScale(tbyte *src,int srcFormat,int srcWidth,int 
 		for(z=0;z<dstDepth;++z){
 			for(y=0;y<dstHeight;++y){
 				for(x=0;x<dstWidth;++x){
-					converted->getPixel(pixel,x*srcWidth/dstWidth,y*srcHeight/dstHeight,z*srcDepth/dstDepth);
+					converted->getPixel(pixel,x*srcWidth/dstWidth + srcWidth/dstWidth/2,y*srcHeight/dstHeight + srcHeight/dstHeight/2,z*srcDepth/dstDepth + srcDepth/dstDepth/2);
 					scaled->setPixel(pixel,x,y,z);
 				}
 			}
