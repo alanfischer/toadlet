@@ -46,7 +46,8 @@ public:
 
 	inline int getNumPasses() const{return mPasses.size();}
 	inline RenderPass::ptr getPass(int i) const{return mPasses[i];}
-	RenderPass::ptr addPass();
+	RenderPass::ptr takePass(int i){RenderPass::ptr pass=mPasses[i];mPasses.removeAt(i);return pass;}
+	RenderPass::ptr addPass(RenderPass::ptr pass=RenderPass::ptr());
 
 	bool isDepthSorted() const;
 

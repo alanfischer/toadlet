@@ -56,8 +56,10 @@ void RenderPath::destroy(){
 	mPasses.clear();
 }
 
-RenderPass::ptr RenderPath::addPass(){
-	RenderPass::ptr pass(new RenderPass(mManager));
+RenderPass::ptr RenderPath::addPass(RenderPass::ptr pass){
+	if(pass==NULL){
+		pass=RenderPass::ptr(new RenderPass(mManager));
+	}
 	mPasses.add(pass);
 	return pass;
 }

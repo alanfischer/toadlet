@@ -6,8 +6,7 @@
 
 #define TREE_CAMERA_DISTANCE 80
 
-/// @todo: Fix D3D10 MipMaps
-/// @todo: Use the leaf bump & bottom textures
+/// @todo: Use the leaf bump textures
 /// @todo: Optimize iPad rendering so we don't get a speedup from the 'manual path' in render()
 
 static const scalar epsilon=0.001f;
