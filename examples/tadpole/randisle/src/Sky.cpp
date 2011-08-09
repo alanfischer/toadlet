@@ -95,7 +95,7 @@ Node *Sky::create(Scene *scene,const Vector4 &skyColor,const Vector4 &fadeColor)
 					"vec4 bump=texture2D(bumpTex,texCoord0);\n"
 					"vec4 cloud=texture2D(cloudTex,texCoord0);\n"
 					"vec4 fade=texture2D(fadeTex,texCoord1);\n"
-					"vec4 color=dot((color.xyz-0.5)*2,(bump.xyz-0.5)*2);\n"
+					"vec4 color=vec4(dot((color.xyz-0.5)*2.0,(bump.xyz-0.5)*2.0));\n"
 					"color=vec4(color.xyz+cloud.xyz,cloud.a);\n"
 					"color=mix(skyColor,color,cloud.w);\n"
 					"color=mix(fade,color,fade.w);\n"
