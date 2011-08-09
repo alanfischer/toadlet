@@ -166,13 +166,16 @@ Material::ptr MaterialManager::createSkyboxMaterial(Texture::ptr texture){
 		RenderPass::ptr pass=shaderPath->addPass();
 
 		pass->setBlendState(BlendState());
-		pass->setDepthState(DepthState(DepthState::DepthTest_NEVER,false));
+		pass->setDepthState(DepthState(DepthState::DepthTest_LEQUAL,false));
 		pass->setRasterizerState(RasterizerState());
+		pass->setMaterialState(MaterialState());
+		pass->setFogState(FogState());
 
 		pass->setShader(Shader::ShaderType_VERTEX,mSkyboxVertexShader);
 		pass->setShader(Shader::ShaderType_FRAGMENT,mSkyboxFragmentShader);
 		pass->getVariables()->addVariable("modelViewProjectionMatrix",RenderVariable::ptr(new MVPMatrixVariable()),Material::Scope_RENDERABLE);
 		pass->getVariables()->addVariable("textureMatrix",RenderVariable::ptr(new TextureMatrixVariable(0)),Material::Scope_MATERIAL);
+		pass->getVariables()->addVariable("materialTrackColor",RenderVariable::ptr(new MaterialTrackColorVariable()),Material::Scope_MATERIAL);
 
 		SamplerState samplerState(mDefaultSamplerState);
 		samplerState.uAddress=SamplerState::AddressType_CLAMP_TO_EDGE;
@@ -188,10 +191,10 @@ Material::ptr MaterialManager::createSkyboxMaterial(Texture::ptr texture){
 		RenderPass::ptr pass=fixedPath->addPass();
 
 		pass->setBlendState(BlendState());
-		pass->setDepthState(DepthState(DepthState::DepthTest_NEVER,false));
+		pass->setDepthState(DepthState(DepthState::DepthTest_LEQUAL,false));
 		pass->setRasterizerState(RasterizerState());
-		pass->setMaterialState(MaterialState(false,true));
-		pass->setFogState(FogState(FogState::FogType_NONE,1,0,0,Colors::BLACK));
+		pass->setMaterialState(MaterialState());
+		pass->setFogState(FogState());
 
 		SamplerState samplerState(mDefaultSamplerState);
 		samplerState.uAddress=SamplerState::AddressType_CLAMP_TO_EDGE;
@@ -202,6 +205,7 @@ Material::ptr MaterialManager::createSkyboxMaterial(Texture::ptr texture){
 		pass->setTexture(0,texture);
 	}
 
+	material->setLayer(-1);
 	material->compile();
 
 	manage(material);
@@ -436,10 +440,11 @@ void MaterialManager::contextActivate(RenderDevice *renderDevice){
 
 		"uniform mat4 modelViewProjectionMatrix;\n"
 		"uniform mat4 textureMatrix;\n"
+		"uniform float materialTrackColor;\n"
 
 		"void main(){\n"
 			"gl_Position=modelViewProjectionMatrix * POSITION;\n"
-			"color=COLOR;\n"
+			"color=COLOR*materialTrackColor+(1.0-materialTrackColor);\n"
 			"texCoord=(textureMatrix * vec4(TEXCOORD0,0.0,1.0)).xy;\n"
 		"}",
 
@@ -458,11 +463,12 @@ void MaterialManager::contextActivate(RenderDevice *renderDevice){
 
 		"float4x4 modelViewProjectionMatrix;\n"
 		"float4x4 textureMatrix;\n"
+		"float materialTrackColor;\n"
 
 		"VOUT main(VIN vin){\n"
 			"VOUT vout;\n"
 			"vout.position=mul(modelViewProjectionMatrix,vin.position);\n"
-			"vout.color=vin.color;\n"
+			"vout.color=vin.color*materialTrackColor+(1.0-materialTrackColor);\n"
 			"vout.texCoord=mul(textureMatrix,float4(vin.texCoord,0.0,1.0));\n"
 			"return vout;\n"
 		"}"
@@ -495,56 +501,6 @@ void MaterialManager::contextActivate(RenderDevice *renderDevice){
 	};
 
 	String pointSpriteGeometryCode[]={
-/*
-		"#version 150\n"
-		"layout(points) in;\n"
-		"layout(triangle_strip,max_vertices=4) out;\n"
-		"uniform float pointSize;\n"
-		"uniform vec4 viewport;\n"
-
-		"//in vec4 color[1];\n"
-		"//out vec4 color;\n"
-		"//out vec2 texCoord;\n"
-
-		"void main(){\n "
-			"float aspect=viewport.w/viewport.z;\n"
-			"float w=aspect*pointSize/4.0,h=pointSize/4.0;\n"
-			"vec3 positions[4]=vec3[](\n"
-				"vec3(-w,-h,0.0),\n"
-				"vec3(w,-h,0.0),\n"
-				"vec3(-w,h,0.0),\n"
-				"vec3(w,h,0.0)\n"
-			");\n"
-			"vec2 texCoords[4]=vec2[](\n"
-				"vec2(0.0,0.0),\n"
-				"vec2(1.0,0.0),\n"
-				"vec2(0.0,1.0),\n"
-				"vec2(1.0,1.0)\n"
-			");\n"
-
-			"gl_Position=gl_in[0].gl_Position+vec4(positions[0],0.0);\n"
-			"gl_Color=gl_in[0].gl_Color[0];\n"
-			"texCoord=texCoords[0];\n"
-			"EmitVertex();\n"
-
-			"gl_Position=gl_in[0].gl_Position+vec4(positions[1],0.0);\n"
-			"color=color[0];\n"
-			"texCoord=texCoords[1];\n"
-			"EmitVertex();\n"
-
-			"gl_Position=gl_in[0].gl_Position+vec4(positions[2],0.0);\n"
-			"color=color[0];\n"
-			"texCoord=texCoords[2];\n"
-			"EmitVertex();\n"
-
-			"gl_Position=gl_in[0].gl_Position+vec4(positions[3],0.0);\n"
-			"color=color[0];\n"
-			"texCoord=texCoords[3];\n"
-			"EmitVertex();\n"
-
-			"EndPrimitive();\n"
-		"}\n",
-*/
 		(char*)NULL,
 
 		"struct GIN{\n"

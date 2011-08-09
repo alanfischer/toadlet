@@ -25,6 +25,7 @@
 
 #include "GLBuffer.h"
 #include "GLRenderDevice.h"
+#include "GLTexture.h"
 #include "GLVertexFormat.h"
 #include <toadlet/egg/EndianConversion.h>
 #include <toadlet/egg/Error.h>
@@ -356,6 +357,8 @@ bool GLBuffer::update(tbyte *data,int start,int size){
 
 #if defined(TOADLET_HAS_GLSHADERS)
 bool GLBuffer::activateUniforms(){
+	Matrix4x4 matrix;
+
 	int resourceCount=0;
 	int i;
 	for(i=0;i<mVariableFormat->getSize();++i){
@@ -364,61 +367,69 @@ bool GLBuffer::activateUniforms(){
 		int index=variable->getIndex();
 		int offset=variable->getOffset();
 		bool transpose=(format&VariableBufferFormat::Format_BIT_TRANSPOSE)!=0;
-		format&=~VariableBufferFormat::Format_BIT_TRANSPOSE;
+		tbyte *data=mData+offset;
+		int samplerMatrix=((format&VariableBufferFormat::Format_MASK_SAMPLER_MATRIX)>>VariableBufferFormat::Format_SHIFT_SAMPLER_MATRIX)-1;
+		if(samplerMatrix>=0){
+			GLTexture *texture=mDevice->mLastTextures[samplerMatrix];
+			matrix.set((float*)data);
+			Math::postMul(matrix,texture->getMatrix());
+			data=(tbyte*)matrix.data;
+		}
+		format&=~VariableBufferFormat::Format_MASK_OPTIONS;
 
 		switch(format){
 			case VariableBufferFormat::Format_TYPE_FLOAT_32|VariableBufferFormat::Format_COUNT_1:
-				glUniform1fv(index,1,(float*)(mData+offset));
+				glUniform1fv(index,1,(float*)data);
 			break;
 			case VariableBufferFormat::Format_TYPE_FLOAT_32|VariableBufferFormat::Format_COUNT_2:
-				glUniform2fv(index,1,(float*)(mData+offset));
+				glUniform2fv(index,1,(float*)data);
 			break;
 			case VariableBufferFormat::Format_TYPE_FLOAT_32|VariableBufferFormat::Format_COUNT_3:
-				glUniform3fv(index,1,(float*)(mData+offset));
+				glUniform3fv(index,1,(float*)data);
 			break;
 			case VariableBufferFormat::Format_TYPE_FLOAT_32|VariableBufferFormat::Format_COUNT_4:
-				glUniform4fv(index,1,(float*)(mData+offset));
+				glUniform4fv(index,1,(float*)data);
 			break;
 
 			case VariableBufferFormat::Format_TYPE_INT_32|VariableBufferFormat::Format_COUNT_1:
-				glUniform1iv(index,1,(int*)(mData+offset));
+				glUniform1iv(index,1,(int*)data);
 			break;
 			case VariableBufferFormat::Format_TYPE_INT_32|VariableBufferFormat::Format_COUNT_2:
-				glUniform2iv(index,1,(int*)(mData+offset));
+				glUniform2iv(index,1,(int*)data);
 			break;
 			case VariableBufferFormat::Format_TYPE_INT_32|VariableBufferFormat::Format_COUNT_3:
-				glUniform3iv(index,1,(int*)(mData+offset));
+				glUniform3iv(index,1,(int*)data);
 			break;
 			case VariableBufferFormat::Format_TYPE_INT_32|VariableBufferFormat::Format_COUNT_4:
-				glUniform4iv(index,1,(int*)(mData+offset));
+				glUniform4iv(index,1,(int*)data);
 			break;
 
 			case VariableBufferFormat::Format_TYPE_FLOAT_32|VariableBufferFormat::Format_COUNT_2X2:
-				glUniformMatrix2fv(index,1,transpose,(float*)(mData+offset));
+				glUniformMatrix2fv(index,1,transpose,(float*)data);
 			break;
 			case VariableBufferFormat::Format_TYPE_FLOAT_32|VariableBufferFormat::Format_COUNT_3X3:
-				glUniformMatrix3fv(index,1,transpose,(float*)(mData+offset));
+				glUniformMatrix3fv(index,1,transpose,(float*)data);
 			break;
 			case VariableBufferFormat::Format_TYPE_FLOAT_32|VariableBufferFormat::Format_COUNT_4X4:
-				glUniformMatrix4fv(index,1,transpose,(float*)(mData+offset));
+				glUniformMatrix4fv(index,1,transpose,(float*)data);
 			break;
 			case VariableBufferFormat::Format_TYPE_FLOAT_32|VariableBufferFormat::Format_COUNT_2X3:
-				glUniformMatrix2x3fv(index,1,transpose,(float*)(mData+offset));
+				glUniformMatrix2x3fv(index,1,transpose,(float*)data);
 			break;
 			case VariableBufferFormat::Format_TYPE_FLOAT_32|VariableBufferFormat::Format_COUNT_3X2:
-				glUniformMatrix3x2fv(index,1,transpose,(float*)(mData+offset));
+				glUniformMatrix3x2fv(index,1,transpose,(float*)data);
 			break;
 			case VariableBufferFormat::Format_TYPE_FLOAT_32|VariableBufferFormat::Format_COUNT_2X4:
-				glUniformMatrix2x4fv(index,1,transpose,(float*)(mData+offset));
+				glUniformMatrix2x4fv(index,1,transpose,(float*)data);
 			break;
 			case VariableBufferFormat::Format_TYPE_FLOAT_32|VariableBufferFormat::Format_COUNT_4X2:
-				glUniformMatrix4x2fv(index,1,transpose,(float*)(mData+offset));
+				glUniformMatrix4x2fv(index,1,transpose,(float*)data);
 			break;
 			case VariableBufferFormat::Format_TYPE_FLOAT_32|VariableBufferFormat::Format_COUNT_3X4:
-				glUniformMatrix3x4fv(index,1,transpose,(float*)(mData+offset));
+				glUniformMatrix3x4fv(index,1,transpose,(float*)data);
 			break;
 			case VariableBufferFormat::Format_TYPE_FLOAT_32|VariableBufferFormat::Format_COUNT_4X3:
-				glUniformMatrix4x3fv(index,1,transpose,(float*)(mData+offset));
+				glUniformMatrix4x3fv(index,1,transpose,(float*)data);
 			break;
 
 			case VariableBufferFormat::Format_TYPE_RESOURCE:

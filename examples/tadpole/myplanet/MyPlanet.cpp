@@ -515,7 +515,7 @@ ParentNode::ptr MyPlanet::createSun(scalar size){
 void MyPlanet::create(){
 	int i;
 
-	Application::create();
+	Application::create("gl");
 
 	mScene=Scene::ptr(new Scene(mEngine));
 

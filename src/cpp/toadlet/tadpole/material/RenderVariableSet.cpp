@@ -115,12 +115,14 @@ bool RenderVariableSet::addVariable(const String &name,RenderVariable::ptr varia
 			"RenderVariable not found with name:"+name);
 		return false;
 	}
-	if(variable->getFormat()!=(formatVariable->getFormat()&~VariableBufferFormat::Format_BIT_TRANSPOSE)){
+	if((variable->getFormat()&~VariableBufferFormat::Format_MASK_OPTIONS)!=(formatVariable->getFormat()&~VariableBufferFormat::Format_MASK_OPTIONS)){
 		Logger::warning(Categories::TOADLET_TADPOLE,
 			String("RenderVariable format does not match format:")+variable->getFormat()+"!="+formatVariable->getFormat());
 		return false;
 	}
-	
+	// Combine the two format, not sure this is ideal, but it will let us transfer information about the RenderVariable to the Buffer for items like Format_SAMPLER_MATRIX
+	formatVariable->setFormat(formatVariable->getFormat()|variable->getFormat());
+
 	VariableInfo v;
 	v.name=name;
 	v.location=formatVariable->getOffset();

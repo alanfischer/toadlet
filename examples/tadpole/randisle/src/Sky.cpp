@@ -8,7 +8,7 @@ Node *Sky::create(Scene *scene,const Vector4 &skyColor,const Vector4 &fadeColor)
 	int cloudSize=256;
 	Sphere sphere(Vector3(0,0,0),512);
 	Vector3 lightDir(1,1,0.5);
-	bool advanced=true; // Use realtime bumpmapping, or precalculated
+	bool advanced=false; // Use realtime bumpmapping, or precalculated
 
  	int numSegments=16,numRings=16;
 	VertexBuffer::ptr vertexBuffer=mEngine->getBufferManager()->createVertexBuffer(Buffer::Usage_BIT_STREAM,Buffer::Access_READ_WRITE,mEngine->getVertexFormats().POSITION_COLOR_TEX_COORD,mEngine->getMeshManager()->getSkyDomeVertexCount(numSegments,numRings));
@@ -208,6 +208,7 @@ Node *Sky::create(Scene *scene,const Vector4 &skyColor,const Vector4 &fadeColor)
 		mCompositeAccessor=Matrix4x4Accessor::ptr(new TextureStateMatrix4x4Accessor(material->getPass(),0));
 		material->getPass()->setBlendState(BlendState::Combination_ALPHA);
 		material->getPass()->setSamplerState(0,SamplerState());
+		material->getPass()->setMaterialState(MaterialState(false,true));
 	}
 	mSkyMaterial=material;
 	mSkyMaterial->setLayer(-2);

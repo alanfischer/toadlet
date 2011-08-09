@@ -149,6 +149,16 @@ public:
 	}
 };
 
+class MaterialTrackColorVariable:public RenderVariable{
+public:
+	int getFormat(){return VariableBufferFormat::Format_TYPE_FLOAT_32|VariableBufferFormat::Format_COUNT_1;}
+	
+	void update(tbyte *data,SceneParameters *parameters){
+		float &trackColor=*(float*)data;
+		trackColor=parameters->getMaterialState().trackColor?1.0:0.0;
+	}
+};
+
 class PointSizeVariable:public RenderVariable{
 public:
 	int getFormat(){return VariableBufferFormat::Format_TYPE_FLOAT_32|VariableBufferFormat::Format_COUNT_1;}
@@ -214,7 +224,7 @@ class TextureMatrixVariable:public RenderVariable{
 public:
 	TextureMatrixVariable(int index):mIndex(index){}
 
-	int getFormat(){return VariableBufferFormat::Format_TYPE_FLOAT_32|VariableBufferFormat::Format_COUNT_4X4;}
+	int getFormat(){return VariableBufferFormat::Format_TYPE_FLOAT_32|VariableBufferFormat::Format_COUNT_4X4|((mIndex+1)<<VariableBufferFormat::Format_SHIFT_SAMPLER_MATRIX);}
 	
 	void update(tbyte *data,SceneParameters *parameters){
 		memcpy(data,parameters->getTextureState(mIndex).matrix.getData(),sizeof(Matrix4x4));

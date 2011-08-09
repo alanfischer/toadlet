@@ -42,14 +42,14 @@ public:
 		// Format types
 		Format_MASK_TYPES=		0xFF,
 		Format_TYPE_UINT_8=		1,
-		Format_TYPE_INT_8=		2,
-		Format_TYPE_INT_16=		3,
-		Format_TYPE_INT_32=		4,
-		Format_TYPE_FIXED_32=	5,
-		Format_TYPE_FLOAT_32=	6,
-		Format_TYPE_DOUBLE_64=	7,
-		Format_TYPE_COLOR_RGBA=	8,
-		Format_TYPE_RESOURCE=	9,
+		Format_TYPE_INT_8,
+		Format_TYPE_INT_16,
+		Format_TYPE_INT_32,
+		Format_TYPE_FIXED_32,
+		Format_TYPE_FLOAT_32,
+		Format_TYPE_DOUBLE_64,
+		Format_TYPE_COLOR_RGBA,
+		Format_TYPE_RESOURCE,
 
 		// Format counts
 		Format_SHIFT_COUNTS=	16,
@@ -68,6 +68,18 @@ public:
 		Format_COUNT_4X3=		12<<16,
 		Format_COUNT_4X4=		13<<16,
 
+		/// @todo: Move these option bits to a separate field
+		Format_MASK_OPTIONS=	0xFF<<24,
+		Format_SHIFT_SAMPLER_MATRIX=24,
+		Format_MASK_SAMPLER_MATRIX=0xF<<24,
+		Format_SAMPLER_MATRIX_0=1<<24,
+		Format_SAMPLER_MATRIX_1=2<<24,
+		Format_SAMPLER_MATRIX_2=3<<24,
+		Format_SAMPLER_MATRIX_3=4<<24,
+		Format_SAMPLER_MATRIX_4=5<<24,
+		Format_SAMPLER_MATRIX_5=6<<24,
+		Format_SAMPLER_MATRIX_6=7<<24,
+		Format_SAMPLER_MATRIX_7=8<<24,
 		Format_BIT_TRANSPOSE=	1<<31,
 	};
 
