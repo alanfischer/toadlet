@@ -562,7 +562,7 @@ void D3D9RenderDevice::setBlendState(const BlendState &state){
 void D3D9RenderDevice::setDepthState(const DepthState &state){
 	HRESULT hr=S_OK;
 
-	if(state.test==DepthState::DepthTest_NEVER){
+	if(state.test==DepthState::DepthTest_ALWAYS){
 		mD3DDevice->SetRenderState(D3DRS_ZENABLE,D3DZB_FALSE);
 	}
 	else{

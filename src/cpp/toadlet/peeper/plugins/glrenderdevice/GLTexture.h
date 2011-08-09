@@ -67,6 +67,7 @@ public:
 	inline GLenum getTarget() const{return mTarget;}
 
 	inline void setMatrix(const Matrix4x4 &matrix){mMatrix.set(matrix);}
+	inline Matrix4x4 getMatrix() const{return mMatrix;}
 
 	bool generateMipLevels();
 

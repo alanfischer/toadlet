@@ -898,7 +898,7 @@ void GLRenderDevice::setBlendState(const BlendState &state){
 void GLRenderDevice::setDepthState(const DepthState &state){
 	mDepthState.set(state);
 
-	if(state.test==DepthState::DepthTest_NEVER){
+	if(state.test==DepthState::DepthTest_ALWAYS){
 		glDisable(GL_DEPTH_TEST);
 	}
 	else{
@@ -1186,12 +1186,12 @@ void GLRenderDevice::setTextureStatePostTexture(int i,TextureState *state){
 				if(calculation==TextureState::CalculationType_NORMAL){
 					#if defined(TOADLET_FIXED_POINT)
 						#if defined(TOADLET_HAS_GLES)
-							glMultMatrixx(texture->mMatrix.data);
+							glMultMatrixx(texture->getMatrix().data);
 						#else
-							glMultMatrixf(MathConversion::scalarToFloat(cacheMatrix4x4,texture->mMatrix).data);
+							glMultMatrixf(MathConversion::scalarToFloat(cacheMatrix4x4,texture->getMatrix()).data);
 						#endif
 					#else
-						glMultMatrixf(texture->mMatrix.data);
+						glMultMatrixf(texture->getMatrix().data);
 					#endif
 
 					#if defined(TOADLET_FIXED_POINT)
