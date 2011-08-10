@@ -372,7 +372,9 @@ bool GLBuffer::activateUniforms(){
 		if(samplerMatrix>=0){
 			GLTexture *texture=mDevice->mLastTextures[samplerMatrix];
 			matrix.set((float*)data);
-			Math::postMul(matrix,texture->getMatrix());
+			if(texture!=NULL){
+				Math::postMul(matrix,texture->getMatrix());
+			}
 			data=(tbyte*)matrix.data;
 		}
 		format&=~VariableBufferFormat::Format_MASK_OPTIONS;
