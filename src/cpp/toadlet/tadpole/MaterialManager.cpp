@@ -98,6 +98,7 @@ Material::ptr MaterialManager::createDiffuseMaterial(Texture::ptr texture){
 		pass->getVariables()->addVariable("materialLighting",RenderVariable::ptr(new MaterialLightingVariable()),Material::Scope_MATERIAL);
 		pass->getVariables()->addVariable("materialDiffuseColor",RenderVariable::ptr(new MaterialDiffuseVariable()),Material::Scope_MATERIAL);
 		pass->getVariables()->addVariable("materialAmbientColor",RenderVariable::ptr(new MaterialAmbientVariable()),Material::Scope_MATERIAL);
+		pass->getVariables()->addVariable("materialTrackColor",RenderVariable::ptr(new MaterialTrackColorVariable()),Material::Scope_MATERIAL);
 		pass->getVariables()->addVariable("fogDensity",RenderVariable::ptr(new FogDensityVariable()),Material::Scope_MATERIAL);
 		pass->getVariables()->addVariable("fogDistance",RenderVariable::ptr(new FogDistanceVariable()),Material::Scope_MATERIAL);
 		pass->getVariables()->addVariable("fogColor",RenderVariable::ptr(new FogColorVariable()),Material::Scope_MATERIAL);
@@ -331,6 +332,7 @@ void MaterialManager::contextActivate(RenderDevice *renderDevice){
 	String diffuseVertexCode[]={
 		"attribute vec4 POSITION;\n"
 		"attribute vec3 NORMAL;\n"
+		"attribute vec4 COLOR;\n"
 		"attribute vec2 TEXCOORD0;\n"
 		"varying vec4 color;\n"
 		"varying float fog;\n"
@@ -340,6 +342,7 @@ void MaterialManager::contextActivate(RenderDevice *renderDevice){
 		"uniform mat4 normalMatrix;\n"
 		"uniform vec4 materialDiffuseColor;\n"
 		"uniform vec4 materialAmbientColor;\n"
+		"uniform float materialTrackColor;\n"
 		"uniform vec4 lightViewPosition;\n"
 		"uniform vec4 lightColor;\n"
 		"uniform vec4 ambientColor;\n"
@@ -354,6 +357,7 @@ void MaterialManager::contextActivate(RenderDevice *renderDevice){
 			"float lightIntensity=clamp(-dot(lightViewPosition.xyz,viewNormal),0.0,1.0);\n"
 			"vec4 localLightColor=(lightIntensity*lightColor*materialLighting)+(1.0-materialLighting);\n"
 			"color=localLightColor*materialDiffuseColor + ambientColor*materialAmbientColor;\n"
+			"color=COLOR*materialTrackColor+color*(1.0-materialTrackColor);\n"
 			"texCoord=(textureMatrix * vec4(TEXCOORD0,0.0,1.0)).xy;\n"
 			"fog=clamp(1.0-fogDensity*(gl_Position.z-fogDistance.x)/(fogDistance.y-fogDistance.x),0.0,1.0);\n"
 		"}",
@@ -363,6 +367,7 @@ void MaterialManager::contextActivate(RenderDevice *renderDevice){
 		"struct VIN{\n"
 			"float4 position : POSITION;\n"
 			"float3 normal : NORMAL;\n"
+			"float4 color : COLOR;\n"
 			"float2 texCoord: TEXCOORD0;\n"
 		"};\n"
 		"struct VOUT{\n"
@@ -376,6 +381,7 @@ void MaterialManager::contextActivate(RenderDevice *renderDevice){
 		"float4x4 normalMatrix;\n"
 		"float4 materialDiffuseColor;\n"
 		"float4 materialAmbientColor;\n"
+		"float materialTrackColor;\n"
 		"float4 lightViewPosition;\n"
 		"float4 lightColor;\n"
 		"float4 ambientColor;\n"
@@ -391,6 +397,7 @@ void MaterialManager::contextActivate(RenderDevice *renderDevice){
 			"float lightIntensity=clamp(-dot(lightViewPosition,viewNormal),0.0,1.0);\n"
 			"float4 localLightColor=lightIntensity*lightColor*materialLighting+(1.0-materialLighting);\n"
 			"vout.color=localLightColor*materialDiffuseColor + ambientColor*materialAmbientColor;\n"
+			"vout.color=vin.color*materialTrackColor+vout.color*(1.0-materialTrackColor);\n"
 			"vout.texCoord=mul(textureMatrix,float4(vin.texCoord,0.0,1.0));\n "
 			"vout.fog=clamp(1.0-fogDensity*(vout.position.z-fogDistance.x)/(fogDistance.y-fogDistance.x),0.0,1.0);\n"
 			"return vout;\n"
