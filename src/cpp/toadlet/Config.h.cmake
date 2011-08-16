@@ -34,6 +34,7 @@
 #cmakedefine TOADLET_PLATFORM_POSIX
 #cmakedefine TOADLET_PLATFORM_OSX
 #cmakedefine TOADLET_PLATFORM_IOS
+#cmakedefine TOADLET_PLATFORM_ANDROID
 
 // Setup specific build options
 #cmakedefine TOADLET_FIXED_POINT

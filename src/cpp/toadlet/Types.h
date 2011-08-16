@@ -103,6 +103,9 @@
 	#include <sys/param.h>
 	#include <stdlib.h>
 	#include <new>
+	#if defined(TOADLET_PLATFORM_ANDROID)
+		#define BYTE_ORDER _BYTE_ORDER
+	#endif
 	#if defined(__BYTE_ORDER)
 		#if __BYTE_ORDER == __LITTLE_ENDIAN
 			#define TOADLET_LITTLE_ENDIAN 1
@@ -138,7 +141,11 @@
 	#define TOADLET_SIZEOF_WCHAR 32
 	#define TOADLET_ALIGNOF(Type) offsetof(alignment_trick<Type>,member)
 	#define TOADLET_ALIGN(a) __attribute__((aligned(a)))
-	inline void *toadlet_malloc(int size,int a){void *r=NULL;posix_memalign(&r,a,size);return r;}
+	#if defined (TOADLET_PLATFORM_ANDROID)
+		inline void *toadlet_malloc(int size,int a){memalign(a,size);}
+	#else
+		inline void *toadlet_malloc(int size,int a){void *r=NULL;posix_memalign(&r,a,size);return r;}
+	#endif
 	#define TOADLET_ALIGNED_MALLOC(size,a) toadlet_malloc(size,a);
 	#define TOADLET_ALIGNED_FREE(pointer) free(pointer)
 	#if defined(__ARM_NEON__)
