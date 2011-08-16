@@ -25,9 +25,10 @@
 
 #include <toadlet/egg/platform/posix/PosixErrorHandler.h>
 #include <stdlib.h>
-#include <execinfo.h>
+#if !defined(TOADLET_PLATFORM_ANDROID)
+	#include <execinfo.h>
+#endif
 #include <string.h> //memset
-
 #include <stdio.h>
 
 namespace toadlet{
@@ -107,30 +108,36 @@ bool PosixErrorHandler::uninstallHandler(){
 
 void PosixErrorHandler::signalHandler(int sig,siginfo_t *info,void *context){
 	void **stackFrames=instance->mStackFrames;
-	int frameCount=backtrace(stackFrames,MAX_STACKFRAMES);
+	#if defined(TOADLET_PLATFORM_ANDROID)
+		int frameCount=0;
+	#else
+		int frameCount=backtrace(stackFrames,MAX_STACKFRAMES);
+	#endif
 	instance->handleFrames(stackFrames,frameCount);
 	instance->errorHandled();
 }
 
 void PosixErrorHandler::handleFrames(void **frames,int count){
-	char **strings=backtrace_symbols(frames,count);
+	#if !defined(TOADLET_PLATFORM_ANDROID)
+		char **strings=backtrace_symbols(frames,count);
 
-	if(mListener!=NULL){
-		mListener->startTrace();
-	}
-
-	int i;
-	for(i=0;i<count;++i){
 		if(mListener!=NULL){
-			mListener->traceFrame(strings[i]);
+			mListener->startTrace();
 		}
-	}
 
-	if(mListener!=NULL){
-		mListener->endTrace();
-	}
+		int i;
+		for(i=0;i<count;++i){
+			if(mListener!=NULL){
+				mListener->traceFrame(strings[i]);
+			}
+		}
 
-	free(strings);
+		if(mListener!=NULL){
+			mListener->endTrace();
+		}
+
+		free(strings);
+	#endif
 }
 	
 void PosixErrorHandler::errorHandled(){
