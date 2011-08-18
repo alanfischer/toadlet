@@ -29,7 +29,6 @@
 #include <toadlet/tadpole/Scene.h>
 #include <toadlet/tadpole/bsp/BSP30Node.h>
 #include <toadlet/tadpole/bsp/BSP30Handler.h>
-#include <string.h> // memset
 
 namespace toadlet{
 namespace tadpole{

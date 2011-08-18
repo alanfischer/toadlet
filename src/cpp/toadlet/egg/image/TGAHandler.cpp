@@ -27,7 +27,6 @@
 #include <toadlet/egg/io/DataStream.h>
 #include <toadlet/egg/Error.h>
 #include <toadlet/egg/Logger.h>
-#include <string.h> // memset
 
 namespace toadlet{
 namespace egg{

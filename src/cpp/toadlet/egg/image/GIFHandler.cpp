@@ -36,7 +36,6 @@ extern "C"{
 #include <toadlet/egg/EndianConversion.h>
 #include <toadlet/egg/Error.h>
 #include <toadlet/egg/Logger.h>
-#include <string.h> // memcpy
 
 #if defined(TOADLET_PLATFORM_WIN32) && defined(TOADLET_LIBGIF_NAME)
 	#pragma comment(lib,TOADLET_LIBGIF_NAME)

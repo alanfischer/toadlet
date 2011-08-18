@@ -27,7 +27,6 @@
 #include <toadlet/egg/Error.h>
 #include <toadlet/egg/Logger.h>
 #include <toadlet/egg/System.h>
-#include <string.h>
 
 namespace toadlet{
 namespace egg{

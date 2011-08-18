@@ -28,7 +28,6 @@
 #include <toadlet/egg/Logger.h>
 #include <toadlet/pad/BaseApplication.h>
 #include <ctype.h> // isalpha
-#include <string.h> // memcpy
 
 using namespace toadlet;
 using namespace toadlet::egg;

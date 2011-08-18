@@ -24,7 +24,6 @@
  ********** Copyright header - do not remove **********/
 
 #include <toadlet/egg/io/MemoryStream.h>
-#include <string.h> // memcpy
 
 namespace toadlet{
 namespace egg{

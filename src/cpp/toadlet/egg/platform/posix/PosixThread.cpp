@@ -27,9 +27,6 @@
 #include <toadlet/egg/Error.h>
 #include <unistd.h>
 #include <stdlib.h>
-#if defined(TOADLET_PLATFORM_POSIX)
-	#include <string.h>
-#endif
 
 namespace toadlet{
 namespace egg{

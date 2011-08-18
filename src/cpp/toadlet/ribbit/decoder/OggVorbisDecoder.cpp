@@ -28,7 +28,6 @@
 #include <toadlet/egg/Logger.h>
 #include <vorbis/codec.h>
 #include <vorbis/vorbisfile.h>
-#include <string.h> // memcpy
 
 #if defined(TOADLET_PLATFORM_WIN32)
 	#if defined(TOADLET_LIBOGG_NAME)

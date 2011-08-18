@@ -28,7 +28,6 @@
 #include <toadlet/egg/Error.h>
 #include <toadlet/egg/Logger.h>
 #include <toadlet/egg/EndianConversion.h>
-#include <string.h> // memset
 
 #if !defined(BI_RGB)
 	#define BI_RGB 0L

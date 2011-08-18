@@ -26,7 +26,6 @@
 #include <toadlet/egg/image/ImageFormatConversion.h>
 #include <toadlet/egg/Logger.h>
 #include <toadlet/egg/Error.h>
-#include <string.h> //memcpy
 
 namespace toadlet{
 namespace egg{

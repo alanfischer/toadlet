@@ -27,8 +27,6 @@
 #include <toadlet/tadpole/bsp/BSP30Handler.h>
 #include <toadlet/tadpole/bsp/BSP30Node.h>
 #include <toadlet/tadpole/handler/WADArchive.h>
-#include <stdlib.h>
-#include <string.h> // memset
 
 namespace toadlet{
 namespace tadpole{

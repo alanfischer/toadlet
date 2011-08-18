@@ -30,7 +30,6 @@
 #include <toadlet/knot/PeerPacketConnection.h>
 #include <toadlet/knot/TCPConnection.h>
 #include <toadlet/knot/ConnectionListener.h>
-#include <string.h> // memset
 
 #if defined(TOADLET_PLATFORM_IOS)
 	#import <SystemConfiguration/SCNetworkReachability.h>

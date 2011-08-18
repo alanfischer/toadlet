@@ -30,7 +30,6 @@
 #include <toadlet/tadpole/studio/StudioModelNode.h>
 #include <toadlet/tadpole/studio/StudioModelController.h>
 #include <toadlet/tadpole/studio/StudioHandler.h>
-#include <string.h> // memset
 
 namespace toadlet{
 namespace tadpole{

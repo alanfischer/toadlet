@@ -28,7 +28,6 @@
 #include <toadlet/egg/EndianConversion.h>
 #include <toadlet/egg/io/DataStream.h>
 #include <toadlet/tadpole/handler/WADArchive.h>
-#include <string.h>
 
 namespace toadlet{
 namespace tadpole{
