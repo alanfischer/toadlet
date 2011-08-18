@@ -1,6 +1,7 @@
 # Standard setup
 cmake_minimum_required (VERSION 2.8)
-project (toadlet CXX C Java)
+project (toadlet CXX C)
+#project (toadlet CXX C Java)
 
 
 # Version Settings for cpp libraries
@@ -41,13 +42,14 @@ endif (TOADLET_PLATFORM_WINCE)
 
 
 # Platform options
+if (ANDROID)
+	set (TOADLET_PLATFORM_ANDROID ON CACHE BOOL "Build for Android devices")
+endif (ANDROID)
 if (WIN32)
 	set (TOADLET_PLATFORM_WIN32 ON CACHE BOOL "Toadlet for windows platforms")
-	option (TOADLET_PLATFORM_ANDROID "Build for Android devices" OFF)
 	option (TOADLET_PLATFORM_BLACKBERRY "Build for Blackberry devices" OFF)
 elseif (UNIX)
 	set (TOADLET_PLATFORM_POSIX ON CACHE BOOL "Toadlet for unix platforms")
-	option (TOADLET_PLATFORM_ANDROID "Build for Android devices" OFF)
 	if (APPLE) 
 		set (TOADLET_PLATFORM_OSX ON CACHE BOOL "Toadlet for OSX")
 		if (IOS)
@@ -62,21 +64,18 @@ option (TOADLET_BUILD_DOXYGEN "Build doxygen documentation along with source fil
 option (TOADLET_BUILD_DOXYGEN_ONLY "Build ONLY the doxygen documentation" OFF)
 
 
-# Android and Blackberry specific options
+# Android requires the ndk
 if (TOADLET_PLATFORM_ANDROID)
-	# We require the android.jar
-	if (NOT ANDROID_JAR)
-		message (FATAL_ERROR "Required variable ANDROID_JAR not set as path/to/android.jar, please set ANDROID_JAR and rerun!")
-	else (NOT ANDROID_JAR)
-		message ("Using android.jar file: ${ANDROID_JAR}")
-	endif (NOT ANDROID_JAR)
+	if (NOT ANDROID_NDK)
+		message (FATAL_ERROR "Required variable ANDROID_NDK not set as path/to/android_ndk, please set ANDROID_NDK and rerun!")
+	else (NOT ANDROID_NDK)
+		message ("Using android ndk: ${ANDROID_NDK}")
+	endif (NOT ANDROID_NDK)
+endif (TOADLET_PLATFORM_ANDROID)
 
-	# Android uses fixed point by default 
-	option (TOADLET_FIXED_POINT "Use a fixed point build of toadlet" ON)
 
-	# Add the gpp executable for java file preprocessing
-	add_subdirectory (gpp)
-elseif (TOADLET_PLATFORM_BLACKBERRY)
+# Blackberry specific options
+if (TOADLET_PLATFORM_BLACKBERRY)
 	# We require the blackberry JDE install dir
 	if (NOT BLACKBERRY_JDE_DIR)
 		message (FATAL_ERROR "Required variable BLACKBERRY_JDE_DIR not set as path/to/blackberryJDE, please set BLACKBERRY_JDE_DIR and rerun!")
@@ -89,10 +88,10 @@ elseif (TOADLET_PLATFORM_BLACKBERRY)
 
 	# Add the gpp executable for java file preprocessing
 	add_subdirectory (gpp)
-else (TOADLET_PLATFORM_ANDROID)
+else (TOADLET_PLATFORM_BLACKBERRY)
 	# All Other platforms default to using floating point math
 	option (TOADLET_FIXED_POINT "Use a fixed point build of toadlet" OFF)
-endif (TOADLET_PLATFORM_ANDROID)
+endif (TOADLET_PLATFORM_BLACKBERRY)
 
 
 # Add the source code subdirectory

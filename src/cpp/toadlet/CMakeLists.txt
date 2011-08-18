@@ -113,7 +113,7 @@ endif (TOADLET_PLATFORM_WIN32)
 # Set Posix Platform options
 if (TOADLET_PLATFORM_POSIX)
 	# Check for SSE2 support
-	if (NOT TOADLET_PLATFORM_IOS)
+	if (NOT TOADLET_PLATFORM_IOS AND NOT TOADLET_PLATFORM_ANDROID)
 		include (CheckCXXCompilerFlag)
 		CHECK_CXX_COMPILER_FLAG ("-msse2" TOADLET_HAS_SSE)
 		if (TOADLET_HAS_SSE)
@@ -121,7 +121,7 @@ if (TOADLET_PLATFORM_POSIX)
 			set (STATIC_LIB_FLAGS "${STATIC_LIB_FLAGS} -msse2")
 			message ("SSE2 support enabled")
 		endif (TOADLET_HAS_SSE)
-	endif (NOT TOADLET_PLATFORM_IOS)
+	endif (NOT TOADLET_PLATFORM_IOS AND NOT TOADLET_PLATFORM_ANDROID)
 
 	# Append the compile flags to the properties
 	if (DYNAMIC_LIB_FLAGS)
