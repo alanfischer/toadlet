@@ -23,18 +23,18 @@
  *
  ********** Copyright header - do not remove **********/
 
-#include <toadlet/egg/image/DDSHandler.h>
-#include <toadlet/egg/io/DataStream.h>
-#include <toadlet/egg/math/Math.h>
 #include <toadlet/egg/Error.h>
 #include <toadlet/egg/Logger.h>
 #include <toadlet/egg/EndianConversion.h>
+#include <toadlet/egg/io/DataStream.h>
+#include <toadlet/egg/math/Math.h>
+#include <toadlet/tadpole/handler/DDSHandler.h>
 
 using namespace toadlet::egg::math;
 
 namespace toadlet{
-namespace egg{
-namespace image{
+namespace tadpole{
+namespace handler{
 
 #define DDS_MAGIC 0x20534444
 
@@ -135,17 +135,11 @@ typedef struct{
 	uint32 dwReserved2[3];
 } DDS_HEADER;
 
-DDSHandler::DDSHandler(){
-}
-
-DDSHandler::~DDSHandler(){
-}
-
-bool DDSHandler::loadImage(Stream *stream,Collection<Image::ptr> &mipLevels){
+Resource::ptr DDSHandler::load(Stream::ptr stream,ResourceData *data,ProgressListener *listener){
 	if(stream==NULL){
 		Error::nullPointer(Categories::TOADLET_EGG,
 			"Stream is NULL");
-		return false;
+		return NULL;
 	}
 
 	DataStream::ptr dataStream(new DataStream(stream));
@@ -154,7 +148,7 @@ bool DDSHandler::loadImage(Stream *stream,Collection<Image::ptr> &mipLevels){
 	if(magic!=DDS_MAGIC){
 		Error::unknown(Categories::TOADLET_EGG,
 			"bad magic number");
-		return false;
+		return NULL;
 	}
 
 	DDS_HEADER hdr={0};
@@ -200,6 +194,7 @@ bool DDSHandler::loadImage(Stream *stream,Collection<Image::ptr> &mipLevels){
 	int depth=hdr.dwDepth;
 	int mipCount=(hdr.dwHeaderFlags&DDSD_MIPMAPCOUNT) ? hdr.dwMipMapCount : 1;
 
+	Collection<Image::ptr> mipLevels;
 	mipLevels.resize(mipCount);
 
 	if((hdr.ddspf.dwFlags&DDPF_FOURCC)!=0 && (
@@ -257,11 +252,7 @@ bool DDSHandler::loadImage(Stream *stream,Collection<Image::ptr> &mipLevels){
 		Logger::alert("Other type");
 	}
 
-	return true;
-}
-
-bool DDSHandler::saveImage(Image *image,Stream *stream){
-	return false;
+	return mTextureManager->createTexture(mipLevels.size(),mipLevels.begin());
 }
 
 }

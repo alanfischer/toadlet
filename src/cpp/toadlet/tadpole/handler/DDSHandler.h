@@ -26,9 +26,9 @@
 #ifndef TOADLET_TADPOLE_HANDLER_DDSHANDLER_H
 #define TOADLET_TADPOLE_HANDLER_DDSHANDLER_H
 
-#include <toadlet/egg/image/DDSHandler.h>
 #include <toadlet/peeper/Texture.h>
 #include <toadlet/tadpole/ResourceStreamer.h>
+#include <toadlet/tadpole/TextureManager.h>
 
 namespace toadlet{
 namespace tadpole{
@@ -40,24 +40,11 @@ public:
 
 	DDSHandler(TextureManager *textureManager){mTextureManager=textureManager;}
 
-	Resource::ptr load(Stream::ptr stream,ResourceData *data,ProgressListener *listener){
-		Collection<Image::ptr> mipLevels;
-		if(mHandler.loadImage(stream,mipLevels)){
-			return mTextureManager->createTexture(mipLevels.size(),mipLevels.begin());
-		}
-		else{
-			return NULL;
-		}
-	}
-
-	bool save(Stream::ptr stream,Resource::ptr resource,ResourceData *data,ProgressListener *listener){
-		Texture::ptr texture=shared_static_cast<Texture>(resource);
-		return mHandler.saveImage(mTextureManager->createImage(texture),stream);
-	}
-
+	Resource::ptr load(Stream::ptr stream,ResourceData *data,ProgressListener *listener);
+	bool save(Stream::ptr stream,Resource::ptr resource,ResourceData *data,ProgressListener *listener){return false;}
+	
 protected:
 	TextureManager *mTextureManager;
-	egg::image::DDSHandler mHandler;
 };
 
 }
@@ -65,4 +52,3 @@ protected:
 }
 
 #endif
-
