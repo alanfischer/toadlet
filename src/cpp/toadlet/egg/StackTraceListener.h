@@ -26,6 +26,8 @@
 #ifndef STACKTRACELISTENER_H
 #define STACKTRACELISTENER_H
 
+#include <toadlet/Types.h>
+
 namespace toadlet{
 namespace egg{
 
