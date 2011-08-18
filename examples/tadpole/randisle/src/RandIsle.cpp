@@ -183,22 +183,23 @@ mScene->getBackground()->setTranslate(mCamera->getWorldTranslate());
 mScene->getBackground()->frameUpdate(0,-1);
 
 renderDevice->setViewport(mCamera->getViewport());
-renderDevice->setDefaultStates();
+renderDevice->setDefaultState();
 
-renderDevice->setProjectionMatrix(mCamera->getProjectionTransform());
-renderDevice->setViewMatrix(mCamera->getViewTransform());
+renderDevice->setMatrix(RenderDevice::MatrixType_PROJECTION,mCamera->getProjectionMatrix());
+renderDevice->setMatrix(RenderDevice::MatrixType_VIEW,mCamera->getViewMatrix());
 Renderable *renderable=mSky->getSkyDome()->getSubMesh(0);
+SceneRenderer r;
 	renderable->getRenderMaterial()->setupRenderDevice(renderDevice);
-	renderDevice->setModelMatrix(renderable->getRenderTransform());
+	renderDevice->setMatrix(RenderDevice::MatrixType_MODEL,renderable->getRenderTransform());
 	renderable->render(renderDevice);
 renderable=mSky->getSun();
 	renderable->getRenderMaterial()->setupRenderDevice(renderDevice);
-	renderDevice->setModelMatrix(renderable->getRenderTransform());
+	renderDevice->setMatrix(RenderDevice::MatrixType_MODEL,renderable->getRenderTransform());
 	renderable->render(renderDevice);
 
 Renderable *lastRenderable=renderable;
 
-renderDevice->setModelMatrix(Math::IDENTITY_MATRIX4X4);
+renderDevice->setMatrix(RenderDevice::MatrixType_MODEL,Math::IDENTITY_MATRIX4X4);
 renderDevice->setAmbientColor(Colors::GREY);
 renderDevice->setLight(0,mSky->getLight()->internal_getLight());
 renderDevice->setLightEnabled(0,true);
@@ -209,7 +210,7 @@ for(int i=0;i<mScene->getRoot()->getNumChildren();++i){
 		Tree *tree=(Tree*)child;
 		renderable=tree->getLowMeshNode()->getSubMesh(0);
 			renderable->getRenderMaterial()->setupRenderDevice(renderDevice,lastRenderable->getRenderMaterial());
-			renderDevice->setModelMatrix(renderable->getRenderTransform());
+			renderDevice->setMatrix(RenderDevice::MatrixType_MODEL,renderable->getRenderTransform());
 			renderable->render(renderDevice);
 			lastRenderable=renderable;
 	}
@@ -220,7 +221,7 @@ for(int i=0;i<mScene->getRoot()->getNumChildren();++i){
 		Tree *tree=(Tree*)child;
 		renderable=tree->getLowMeshNode()->getSubMesh(1);
 			renderable->getRenderMaterial()->setupRenderDevice(renderDevice,lastRenderable->getRenderMaterial());
-			renderDevice->setModelMatrix(renderable->getRenderTransform());
+			renderDevice->setMatrix(RenderDevice::MatrixType_MODEL,renderable->getRenderTransform());
 			renderable->render(renderDevice);
 			lastRenderable=renderable;
 	}
@@ -229,7 +230,7 @@ for(int i=0;i<mScene->getRoot()->getNumChildren();++i){
 if(mPlayer->getPlayerMeshNode()->getMesh()!=NULL){
 renderable=mPlayer->getPlayerMeshNode()->getSubMesh(0);
 	renderable->getRenderMaterial()->setupRenderDevice(renderDevice,lastRenderable->getRenderMaterial());
-	renderDevice->setModelMatrix(renderable->getRenderTransform());
+	renderDevice->setMatrix(RenderDevice::MatrixType_MODEL,renderable->getRenderTransform());
 	renderable->render(renderDevice);
 	lastRenderable=renderable;
 }
@@ -247,7 +248,7 @@ TerrainPatchNode *terrain=mTerrain->patchAt(x+mTerrain->getTerrainX(),y+mTerrain
 
 		renderable=terrain;
 		renderable->getRenderMaterial()->setupRenderDevice(renderDevice,lastRenderable->getRenderMaterial());
-		renderDevice->setModelMatrix(renderable->getRenderTransform());
+		renderDevice->setMatrix(RenderDevice::MatrixType_MODEL,renderable->getRenderTransform());
 		renderable->render(renderDevice);
 		lastRenderable=renderable;
 	}
@@ -257,7 +258,7 @@ TerrainPatchNode *terrain=mTerrain->patchAt(x+mTerrain->getTerrainX(),y+mTerrain
 	if(mCamera->culled(terrain)==false){
 		renderable=terrain->internal_getWaterRenderable();
 			renderable->getRenderMaterial()->setupRenderDevice(renderDevice,lastRenderable->getRenderMaterial());
-			renderDevice->setModelMatrix(renderable->getRenderTransform());
+			renderDevice->setMatrix(RenderDevice::MatrixType_MODEL,renderable->getRenderTransform());
 			renderable->render(renderDevice);
 			lastRenderable=renderable;
 	}
@@ -268,7 +269,7 @@ renderDevice->setFogParameters(RenderDevice::Fog_NONE,0,0,Colors::BLACK);
 
 renderable=mPlayer->getShadowMeshNode()->getSubMesh(0);
 	renderable->getRenderMaterial()->setupRenderDevice(renderDevice);
-	renderDevice->setModelMatrix(renderable->getRenderTransform());
+	renderDevice->setMatrix(RenderDevice::MatrixType_MODEL,renderable->getRenderTransform());
 	renderable->render(renderDevice);
 
 #endif

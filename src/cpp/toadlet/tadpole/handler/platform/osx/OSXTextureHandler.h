@@ -27,6 +27,7 @@
 #define TOADLET_TADPOLE_HANDLER_OSXTEXTUREHANDLER_H
 
 #include <toadlet/peeper/Texture.h>
+#include <toadlet/tadpole/ResourceStreamer.h>
 #include <toadlet/tadpole/TextureManager.h>
 
 namespace toadlet{
@@ -35,12 +36,12 @@ namespace handler{
 
 /// @brief  A lighter weight texture handling class for the OSX platform
 
-class TOADLET_API OSXTextureHandler:public ResourceHandler{
+class TOADLET_API OSXTextureHandler:public ResourceStreamer{
 public:
 	OSXTextureHandler(TextureManager *textureManager);
 	virtual ~OSXTextureHandler(){}
 
-	Resource::ptr load(Stream::ptr in,const ResourceHandlerData *handlerData);
+	Resource::ptr load(Stream::ptr stream,ResourceData *data,ProgressListener *listener);
 
 protected:
 	TextureManager *mTextureManager;
