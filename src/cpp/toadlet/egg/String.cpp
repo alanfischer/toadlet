@@ -26,8 +26,6 @@
 #include <toadlet/egg/Assert.h>
 #include <toadlet/egg/String.h>
 #include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
 #include <ctype.h>
 
 #if defined(TOADLET_PLATFORM_POSIX)

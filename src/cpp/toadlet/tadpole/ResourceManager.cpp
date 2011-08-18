@@ -26,7 +26,6 @@
 #include <toadlet/tadpole/ResourceManager.h>
 #include <toadlet/egg/Error.h>
 #include <toadlet/egg/Logger.h>
-#include <string.h>
 
 namespace toadlet{
 namespace tadpole{

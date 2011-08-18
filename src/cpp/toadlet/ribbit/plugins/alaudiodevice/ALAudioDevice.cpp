@@ -31,7 +31,6 @@
 #include <toadlet/egg/Error.h>
 #include <toadlet/egg/EndianConversion.h>
 #include <stdlib.h>
-#include <string.h> // memcpy
 
 #if defined(TOADLET_PLATFORM_WIN32)
 	#if defined(TOADLET_LIBOPENAL_NAME)

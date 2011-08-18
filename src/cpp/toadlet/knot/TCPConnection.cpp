@@ -28,7 +28,6 @@
 #include <toadlet/egg/System.h>
 #include <toadlet/knot/TCPConnection.h>
 #include <toadlet/knot/TCPConnector.h>
-#include <string.h>
 
 namespace toadlet{
 namespace knot{

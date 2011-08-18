@@ -20,7 +20,6 @@ set (EGG_SRC
 set (EGG_IMAGE_SRC
 	image/Image.cpp
 	image/ImageFormatConversion.cpp
-	image/BMPHandler.cpp
 	image/DDSHandler.cpp
 	image/TGAHandler.cpp
 )
@@ -138,7 +137,6 @@ set (EGG_IMAGE_HEADERS
 	image/Image.h
 	image/ImageDefinitions.h
 	image/ImageFormatConversion.h
-	image/BMPHandler.h
 	image/DDSHandler.h
 	image/TGAHandler.h
 )

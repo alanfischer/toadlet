@@ -31,9 +31,6 @@
 #if defined(TOADLET_PLATFORM_WIN32)
 	#include <windows.h>
 #endif
-#if defined(TOADLET_PLATFORM_POSIX)
-	#include <string.h>
-#endif
 extern "C"{
 	#include <jpeglib.h>
 }

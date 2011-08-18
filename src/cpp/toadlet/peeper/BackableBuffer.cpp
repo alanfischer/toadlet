@@ -28,7 +28,6 @@
 #include <toadlet/egg/image/ImageFormatConversion.h>
 #include <toadlet/peeper/BackableBuffer.h>
 #include <toadlet/peeper/RenderDevice.h>
-#include <string.h> // memcpy
 
 namespace toadlet{
 namespace peeper{

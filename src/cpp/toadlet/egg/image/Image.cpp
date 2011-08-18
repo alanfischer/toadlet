@@ -25,7 +25,6 @@
 
 #include <toadlet/egg/image/Image.h>
 #include <toadlet/egg/Error.h>
-#include <string.h> // memcpy
 
 namespace toadlet{
 namespace egg{

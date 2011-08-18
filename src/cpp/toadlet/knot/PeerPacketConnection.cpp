@@ -27,7 +27,6 @@
 #include <toadlet/egg/Logger.h>
 #include <toadlet/egg/System.h>
 #include <toadlet/knot/PeerPacketConnection.h>
-#include <string.h>
 
 namespace toadlet{
 namespace knot{

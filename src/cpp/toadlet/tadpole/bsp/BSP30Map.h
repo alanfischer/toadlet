@@ -34,8 +34,6 @@
 #include <toadlet/tadpole/TextureManager.h>
 #include <toadlet/tadpole/material/Material.h>
 
-#include <string.h> // memset
-
 namespace toadlet{
 namespace tadpole{
 namespace bsp{

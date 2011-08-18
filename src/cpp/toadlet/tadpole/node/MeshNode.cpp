@@ -29,8 +29,6 @@
 #include <toadlet/tadpole/node/MeshNode.h>
 #include <toadlet/tadpole/node/ParentNode.h>
 #include <toadlet/tadpole/animation/SkeletonAnimation.h>
-#include <stdlib.h>
-#include <string.h> // memcpy
 
 namespace toadlet{
 namespace tadpole{

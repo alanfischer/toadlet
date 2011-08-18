@@ -32,7 +32,6 @@
 #include <toadlet/egg/Logger.h>
 #include <toadlet/egg/image/ImageFormatConversion.h>
 #include <toadlet/peeper/BackableBuffer.h>
-#include <string.h>
 
 namespace toadlet{
 namespace peeper{

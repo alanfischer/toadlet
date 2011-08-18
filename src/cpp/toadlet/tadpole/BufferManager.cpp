@@ -26,7 +26,6 @@
 #include <toadlet/tadpole/BufferManager.h>
 #include <toadlet/tadpole/Engine.h>
 #include <toadlet/peeper/BackableBuffer.h>
-#include <string.h> //memcpy
 
 namespace toadlet{
 namespace tadpole{

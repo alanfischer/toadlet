@@ -27,7 +27,6 @@
 #include <toadlet/egg/Extents.h>
 #include <toadlet/egg/EndianConversion.h>
 #include <toadlet/ribbit/AudioFormatConversion.h>
-#include <string.h> //memcpy
 
 namespace toadlet{
 namespace ribbit{

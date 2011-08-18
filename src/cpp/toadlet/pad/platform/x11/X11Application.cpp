@@ -39,9 +39,6 @@
 #include <X11/Xutil.h>
 #include <X11/extensions/xf86vmode.h>
 #include <stdlib.h>
-#if defined(TOADLET_PLATFORM_POSIX)
-	#include <string.h>
-#endif
 
 using namespace toadlet;
 using namespace toadlet::egg;

@@ -25,7 +25,6 @@
 
 #include <toadlet/tadpole/MathFormatter.h>
 #include <stdio.h>
-#include <string.h>
 
 namespace toadlet{
 namespace tadpole{

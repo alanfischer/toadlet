@@ -27,7 +27,6 @@
 #include <toadlet/egg/Error.h>
 #include <toadlet/egg/Logger.h>
 #include <time.h>
-#include <string.h> // memset
 
 #if !defined(TOADLET_PLATFORM_WIN32)
 	#include <sys/ioctl.h>

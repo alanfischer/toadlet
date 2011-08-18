@@ -28,7 +28,6 @@
 #if !defined(TOADLET_PLATFORM_ANDROID)
 	#include <execinfo.h>
 #endif
-#include <string.h> //memset
 #include <stdio.h>
 
 namespace toadlet{

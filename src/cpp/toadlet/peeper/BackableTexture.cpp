@@ -29,7 +29,6 @@
 #include <toadlet/peeper/BackableTexture.h>
 #include <toadlet/peeper/BackableTextureMipPixelBuffer.h>
 #include <toadlet/peeper/RenderCaps.h>
-#include <string.h>
 
 namespace toadlet{
 namespace peeper{

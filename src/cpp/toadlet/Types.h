@@ -79,6 +79,8 @@
 	#else
 		#define TOADLET_API
 	#endif
+	#include <stdlib.h>
+	#include <string.h>
 	#if	defined(_WCHAR_T_DEFINED) || defined(_WCHAR_T_DEFINED_)
 		namespace toadlet{
 			typedef wchar_t wchar;
@@ -102,6 +104,7 @@
 	#define TOADLET_COMPILER_GCC 1
 	#include <sys/param.h>
 	#include <stdlib.h>
+	#include <string.h>
 	#include <new>
 	#if defined(TOADLET_PLATFORM_ANDROID)
 		#define BYTE_ORDER _BYTE_ORDER

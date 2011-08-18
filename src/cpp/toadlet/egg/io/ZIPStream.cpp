@@ -29,8 +29,6 @@
 #include <zzip/zzip.h>
 #include <zzip/plugin.h>
 #include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
 
 namespace toadlet{
 namespace egg{

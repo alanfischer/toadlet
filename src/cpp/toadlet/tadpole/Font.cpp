@@ -26,7 +26,6 @@
 #include <toadlet/egg/Error.h>
 #include <toadlet/egg/Extents.h>
 #include <toadlet/tadpole/Font.h>
-#include <string.h>
 
 namespace toadlet{
 namespace tadpole{
