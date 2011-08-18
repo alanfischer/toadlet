@@ -27,7 +27,7 @@
 #define TOADLET_TADPOLE_HANDLER_FREETYPEHANDLER_H
 
 #include <toadlet/tadpole/Font.h>
-#include <toadlet/tadpole/ResourceHandler.h>
+#include <toadlet/tadpole/ResourceStreamer.h>
 #include <toadlet/tadpole/TextureManager.h>
 
 extern "C" {
@@ -43,14 +43,14 @@ namespace toadlet{
 namespace tadpole{
 namespace handler{
 
-class FreeTypeHandler:public ResourceHandler{
+class FreeTypeHandler:public ResourceStreamer{
 public:
 	TOADLET_SHARED_POINTERS(FreeTypeHandler);
 
 	FreeTypeHandler(TextureManager *textureManager);
 	virtual ~FreeTypeHandler();
 
-	Resource::ptr load(Stream::ptr stream,const ResourceHandlerData *handlerData);
+	Resource::ptr load(Stream::ptr stream,ResourceData *data,ProgressListener *listener);
 
 protected:
 	TextureManager *mTextureManager;

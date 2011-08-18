@@ -36,14 +36,13 @@ namespace tadpole{
 namespace handler{
 
 /// @brief  A lighter weight font handling class for the Win32 platform
-
-class TOADLET_API Win32FontHandler:public ResourceHandler{
+class TOADLET_API Win32FontHandler:public ResourceStreamer{
 public:
 	Win32FontHandler(TextureManager *textureManager);
 	virtual ~Win32FontHandler();
 	bool valid();
 
-	Resource::ptr load(Stream::ptr stream,const ResourceHandlerData *handlerData);
+	Resource::ptr load(Stream::ptr stream,ResourceData *data,ProgressListener *listener);
 
 protected:
 	TextureManager *mTextureManager;

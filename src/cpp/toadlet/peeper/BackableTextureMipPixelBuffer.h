@@ -53,7 +53,7 @@ public:
 
 	virtual void setBufferDestroyedListener(BufferDestroyedListener *listener){}
 
-	virtual bool create(int usage,int access,int pixelFormat,int width,int height,int depth){return false;}
+	virtual bool create(int usage,int access,TextureFormat::ptr format){return false;}
 	virtual void destroy(){
 		resetDestroy();
 
@@ -71,11 +71,7 @@ public:
 	virtual int getUsage() const{return mBack!=NULL?mBack->getUsage():0;}
 	virtual int getAccess() const{return mBack!=NULL?mBack->getAccess():0;}
 	virtual int getDataSize() const{return mBack!=NULL?mBack->getDataSize():0;}
-	virtual int getWidth() const{return mBack!=NULL?mBack->getWidth():0;}
-	virtual int getHeight() const{return mBack!=NULL?mBack->getHeight():0;}
-	virtual int getDepth() const{return mBack!=NULL?mBack->getDepth():0;}
-
-	virtual int getPixelFormat() const{return mBack!=NULL?mBack->getPixelFormat():0;}
+	virtual TextureFormat::ptr getTextureFormat() const{return mBack!=NULL?mBack->getTextureFormat():NULL;}
 
 	virtual tbyte *lock(int lockAccess){return mBack!=NULL?mBack->lock(lockAccess):NULL;}
 	virtual bool unlock(){return mBack!=NULL?mBack->unlock():false;}

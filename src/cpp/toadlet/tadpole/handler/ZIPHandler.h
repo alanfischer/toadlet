@@ -27,19 +27,19 @@
 #define TOADLET_TADPOLE_HANDLER_ZIPHANDLER_H
 
 #include <toadlet/egg/io/ZIPArchive.h>
-#include <toadlet/tadpole/ResourceHandler.h>
+#include <toadlet/tadpole/ResourceStreamer.h>
 
 namespace toadlet{
 namespace tadpole{
 namespace handler{
 
-class TOADLET_API ZIPHandler:public ResourceHandler{
+class TOADLET_API ZIPHandler:public ResourceStreamer{
 public:
 	TOADLET_SHARED_POINTERS(ZIPHandler);
 
 	ZIPHandler(){}
 
-	Resource::ptr load(Stream::ptr stream,const ResourceHandlerData *handlerData){
+	Resource::ptr load(Stream::ptr stream,ResourceData *data,ProgressListener *listener){
 		ZIPArchive::ptr archive(new ZIPArchive());
 		bool result=archive->open(stream);
 		if(result){

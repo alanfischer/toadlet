@@ -56,6 +56,7 @@ set (PEEPER_HEADERS
 	ShaderState.h
 	ShaderStateDestroyedListener.h
 	Texture.h
+	TextureFormat.h
 	TextureState.h
 	Types.h
 	VertexBuffer.h

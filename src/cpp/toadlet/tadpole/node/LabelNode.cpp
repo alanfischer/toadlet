@@ -219,7 +219,7 @@ void LabelNode::updateLabel(){
 	// Update material
 	Texture::ptr texture=mFont->getTexture();
 	mMaterial->getPass()->setTexture(0,texture);
-	if(ImageFormatConversion::getAlphaBits(texture->getFormat())>0){
+	if(ImageFormatConversion::getAlphaBits(texture->getFormat()->pixelFormat)>0){
 		mMaterial->getPass()->setBlendState(BlendState::Combination_ALPHA);
 	}
 	else{

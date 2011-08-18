@@ -44,19 +44,14 @@ public:
 
 	Texture *getRootTexture(){return this;}
 
-	bool create(int usageFlags,Dimension dimension,int format,int width,int height,int depth,int mipLevels,tbyte *mipDatas[]);
+	bool create(int usageFlags,TextureFormat::ptr format,tbyte *mipDatas[]);
 	void destroy();
 
 	void resetCreate(){}
 	void resetDestroy(){}
 
 	int getUsage() const{return mUsage;}
-	Dimension getDimension() const{return mDimension;}
-	int getFormat() const{return mFormat;}
-	int getWidth() const{return mWidth;}
-	int getHeight() const{return mHeight;}
-	int getDepth() const{return mDepth;}
-	int getNumMipLevels() const{return mMipLevels;}
+	TextureFormat::ptr getFormat() const{return mFormat;}
 	scalar getLength() const{return 0;}
 
 	PixelBuffer::ptr getMipPixelBuffer(int level,int cubeSide);
@@ -80,12 +75,7 @@ protected:
 	GLRenderDevice *mDevice;
 
 	int mUsage;
-	Dimension mDimension;
-	int mFormat;
-	int mWidth;
-	int mHeight;
-	int mDepth;
-	int mMipLevels;
+	TextureFormat::ptr mFormat;
 
 	GLuint mHandle;
 	GLenum mTarget;

@@ -213,7 +213,7 @@ bool DDSHandler::loadImage(Stream *stream,Collection<Image::ptr> &mipLevels){
 		int format=0;
 		switch(hdr.ddspf.dwFourCC){
 			case D3DFMT_DXT1:
-				format=Image::Format_RGBA_DXT1;
+				format=Image::Format_RGB_DXT1;
 			break;
 			case D3DFMT_DXT2:
 				format=Image::Format_RGBA_DXT2;

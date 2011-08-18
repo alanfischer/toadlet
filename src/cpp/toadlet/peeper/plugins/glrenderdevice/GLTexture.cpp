@@ -27,6 +27,7 @@
 #include "GLTexture.h"
 #include <toadlet/egg/Error.h>
 #include <toadlet/egg/Logger.h>
+#include <toadlet/egg/image/ImageFormatConversion.h>
 
 namespace toadlet{
 namespace peeper{
@@ -35,12 +36,7 @@ GLTexture::GLTexture(GLRenderDevice *renderDevice):BaseResource(),
 	mDevice(NULL),
 
 	mUsage(0),
-	mDimension(Dimension_UNKNOWN),
-	mFormat(0),
-	mWidth(0),
-	mHeight(0),
-	mDepth(0),
-	mMipLevels(0),
+	//mFormat,
 
 	mHandle(0),
 	mTarget(0),
@@ -55,12 +51,10 @@ GLTexture::~GLTexture(){
 	destroy();
 }
 
-bool GLTexture::create(int usage,Dimension dimension,int format,int width,int height,int depth,int mipLevels,tbyte *mipDatas[]){
-	destroy();
+bool GLTexture::create(int usage,TextureFormat::ptr format,tbyte *mipDatas[]){
+	format->width=format->width>0?format->width:1;format->height=format->height>0?format->height:1;format->depth=format->depth>0?format->depth:1;
 
-	width=width>0?width:1;height=height>0?height:1;depth=depth>0?depth:1;
-
-	if((Math::isPowerOf2(width)==false || Math::isPowerOf2(height)==false || (dimension!=Dimension_CUBE && Math::isPowerOf2(depth)==false)) &&
+	if((Math::isPowerOf2(format->width)==false || Math::isPowerOf2(format->height)==false || (format->dimension!=TextureFormat::Dimension_CUBE && Math::isPowerOf2(format->depth)==false)) &&
 		mDevice->mNPOT==false && (mDevice->mNPOTR==false || (usage&Usage_BIT_NPOT_RESTRICTED)==0))
 	{
 		Error::unknown(Categories::TOADLET_PEEPER,
@@ -69,14 +63,9 @@ bool GLTexture::create(int usage,Dimension dimension,int format,int width,int he
 	}
 
 	mUsage=usage;
-	mDimension=dimension;
 	mFormat=format;
-	mWidth=width;
-	mHeight=height;
-	mDepth=depth;
-	mMipLevels=mipLevels;
 
-	bool result=createContext(mipLevels,mipDatas);
+	bool result=createContext(format->mipLevels,mipDatas);
 
 	return result;
 }
@@ -119,7 +108,7 @@ bool GLTexture::createContext(int mipLevels,tbyte *mipDatas[]){
 		}
 	}
 
-	int totalMipLevels=Math::intLog2(Math::maxVal(mWidth,Math::maxVal(mHeight,mDepth)));
+	int totalMipLevels=Math::intLog2(Math::maxVal(mFormat->width,Math::maxVal(mFormat->height,mFormat->depth)));
 	int specifiedMipLevels=mipLevels>0?mipLevels:totalMipLevels;
 
 	// If we don't support partial miplevel specification, then calculate the amount of levels we'll need
@@ -131,11 +120,11 @@ bool GLTexture::createContext(int mipLevels,tbyte *mipDatas[]){
 		else
 	#endif
 	/// @todo: Determine if GLES will let us do partial specifications anyway, and if so, enable that
-	if(totalMipLevels!=mMipLevels && mMipLevels>0){
+	if(totalMipLevels!=mFormat->mipLevels && mFormat->mipLevels>0){
 		specifiedMipLevels=totalMipLevels;
 
 		Logger::debug(Categories::TOADLET_PEEPER,
-			String("partial mipmap specification not supported.  calculated:")+totalMipLevels+" requested:"+mMipLevels);
+			String("partial mipmap specification not supported.  calculated:")+totalMipLevels+" requested:"+mFormat->mipLevels);
 	}
 
 	// Always need to specify at least 1 level
@@ -143,18 +132,19 @@ bool GLTexture::createContext(int mipLevels,tbyte *mipDatas[]){
 		specifiedMipLevels=1;
 	}
 
-	GLint glinternalFormat=GLRenderDevice::getGLFormat(mFormat,true);
-	GLint glformat=GLRenderDevice::getGLFormat(mFormat,false);
-	GLint gltype=ImageFormatConversion::isFormatCompressed(mFormat)==false?GLRenderDevice::getGLType(mFormat):0;
+	int pixelFormat=mFormat->pixelFormat;
+	GLint glinternalFormat=GLRenderDevice::getGLFormat(pixelFormat,true);
+	GLint glformat=GLRenderDevice::getGLFormat(pixelFormat,false);
+	GLint gltype=ImageFormatConversion::isFormatCompressed(pixelFormat)==false?GLRenderDevice::getGLType(pixelFormat):0;
 
 	if(glinternalFormat==0 || glformat==0){
 		return false;
 	}
 
 	// Allocate texture memory
-	int level=0,width=mWidth,height=mHeight,depth=mDepth;
+	int level=0,width=mFormat->width,height=mFormat->height,depth=mFormat->depth;
 	for(level=0;level<specifiedMipLevels;++level,width/=2,height/=2,depth/=2){
-		int rowPitch=ImageFormatConversion::getRowPitch(mFormat,width);
+		int rowPitch=ImageFormatConversion::getRowPitch(mFormat->pixelFormat,width);
  		int slicePitch=rowPitch*height;
 		TOADLET_IGNORE_UNUSED_VARIABLE_WARNING(slicePitch);
 
@@ -169,7 +159,7 @@ bool GLTexture::createContext(int mipLevels,tbyte *mipDatas[]){
 			if(level>0 && onlyFirstLevel) break;
 		}
 
-		if(ImageFormatConversion::isFormatCompressed(mFormat)==false){
+		if(ImageFormatConversion::isFormatCompressed(mFormat->pixelFormat)==false){
 			switch(mTarget){
 				#if !defined(TOADLET_HAS_GLES)
 					case GL_TEXTURE_1D:
@@ -201,7 +191,7 @@ bool GLTexture::createContext(int mipLevels,tbyte *mipDatas[]){
 				#if !defined(TOADLET_HAS_GLES)
 					case GL_TEXTURE_RECTANGLE_ARB:
 						// Set up rectangle scale matrix
-						Math::setMatrix4x4FromScale(mMatrix,mWidth,mHeight,Math::ONE);
+						Math::setMatrix4x4FromScale(mMatrix,mFormat->width,mFormat->height,Math::ONE);
 
 						glTexImage2D(mTarget,level,glinternalFormat,width,height,0,glformat,gltype,data);
 					break;
@@ -242,7 +232,7 @@ bool GLTexture::createContext(int mipLevels,tbyte *mipDatas[]){
 				#if !defined(TOADLET_HAS_GLES)
 					case GL_TEXTURE_RECTANGLE_ARB:
 						// Set up rectangle scale matrix
-						Math::setMatrix4x4FromScale(mMatrix,mWidth,mHeight,Math::ONE);
+						Math::setMatrix4x4FromScale(mMatrix,mFormat->width,mFormat->height,Math::ONE);
 
 						glCompressedTexImage2D(mTarget,level,glinternalFormat,width,height,0,slicePitch,data);
 					break;
@@ -251,11 +241,11 @@ bool GLTexture::createContext(int mipLevels,tbyte *mipDatas[]){
 		}
 	}
 
+	TOADLET_CHECK_GLERROR("GLTexture::createContext");
+
 	if(mipDatas!=NULL){
 		generateMipLevels();
 	}
-
-	TOADLET_CHECK_GLERROR("GLTexture::createContext");
 
 	if(mHandle==0){
 		Error::unknown("error in createContext");
@@ -289,7 +279,7 @@ PixelBuffer::ptr GLTexture::getMipPixelBuffer(int level,int cubeSide){
 	}
 
 	int index=level;
-	if(mDimension==Dimension_CUBE){
+	if(mFormat->dimension==TextureFormat::Dimension_CUBE){
 		index=level*6+cubeSide;
 	}
 
@@ -312,7 +302,7 @@ bool GLTexture::load(int width,int height,int depth,int mipLevel,tbyte *mipData)
 
 	width=width>0?width:1;height=height>0?height:1;depth=depth>0?depth:1;
 
-	if(mipLevel==0 && (width!=mWidth || height!=mHeight || depth!=mDepth)){
+	if(mipLevel==0 && (width!=mFormat->width || height!=mFormat->height || depth!=mFormat->depth)){
 		Error::unknown(Categories::TOADLET_PEEPER,
 			"GLTexture: Texture data of incorrect dimensions");
 		return false;
@@ -320,20 +310,20 @@ bool GLTexture::load(int width,int height,int depth,int mipLevel,tbyte *mipData)
 
 	glBindTexture(mTarget,mHandle);
 
-	int format=mFormat;
-	int rowPitch=ImageFormatConversion::getRowPitch(format,width);
+	int pixelFormat=mFormat->pixelFormat;
+	int rowPitch=ImageFormatConversion::getRowPitch(pixelFormat,width);
 	int slicePitch=rowPitch*height;
 	TOADLET_IGNORE_UNUSED_VARIABLE_WARNING(slicePitch);
-	GLint glformat=GLRenderDevice::getGLFormat(format,false);
+	GLint glformat=GLRenderDevice::getGLFormat(pixelFormat,false);
 	TOADLET_IGNORE_UNUSED_VARIABLE_WARNING(glformat);
-	GLint gltype=ImageFormatConversion::isFormatCompressed(mFormat)==false?GLRenderDevice::getGLType(mFormat):0;
+	GLint gltype=ImageFormatConversion::isFormatCompressed(pixelFormat)==false?GLRenderDevice::getGLType(pixelFormat):0;
 	TOADLET_IGNORE_UNUSED_VARIABLE_WARNING(gltype);
 
 	int alignment=1,pitch=rowPitch;
 	while((pitch&1)==0){alignment<<=1;pitch>>=1;}
 	glPixelStorei(GL_UNPACK_ALIGNMENT,alignment<8?alignment:8);
 
-	if(ImageFormatConversion::isFormatCompressed(mFormat)==false){
+	if(ImageFormatConversion::isFormatCompressed(pixelFormat)==false){
 		switch(mTarget){
 			#if !defined(TOADLET_HAS_GLES)
 				case GL_TEXTURE_1D:
@@ -384,9 +374,9 @@ bool GLTexture::load(int width,int height,int depth,int mipLevel,tbyte *mipData)
 		}
 	}
 	
-	generateMipLevels();
-
 	TOADLET_CHECK_GLERROR("GLTexture::load");
+
+	generateMipLevels();
 
 	return true;
 }
@@ -398,7 +388,7 @@ bool GLTexture::read(int width,int height,int depth,int mipLevel,tbyte *mipData)
 
 	width=width>0?width:1;height=height>0?height:1;depth=depth>0?depth:1;
 
-	if(mipLevel==0 && (width!=mWidth || height!=mHeight || depth!=mDepth)){
+	if(mipLevel==0 && (width!=mFormat->width || height!=mFormat->height || depth!=mFormat->depth)){
 		Error::unknown(Categories::TOADLET_PEEPER,
 			"GLTexture: Texture data of incorrect dimensions");
 		return false;
@@ -406,13 +396,13 @@ bool GLTexture::read(int width,int height,int depth,int mipLevel,tbyte *mipData)
 
 	glBindTexture(mTarget,mHandle);
 
-	int format=mFormat;
-	int rowPitch=ImageFormatConversion::getRowPitch(format,width);
+	int pixelFormat=mFormat->pixelFormat;
+	int rowPitch=ImageFormatConversion::getRowPitch(pixelFormat,width);
 	int slicePitch=rowPitch*height;
 	TOADLET_IGNORE_UNUSED_VARIABLE_WARNING(slicePitch);
-	GLint glformat=GLRenderDevice::getGLFormat(format,false);
+	GLint glformat=GLRenderDevice::getGLFormat(pixelFormat,false);
 	TOADLET_IGNORE_UNUSED_VARIABLE_WARNING(glformat);
-	GLint gltype=ImageFormatConversion::isFormatCompressed(mFormat)==false?GLRenderDevice::getGLType(mFormat):0;
+	GLint gltype=ImageFormatConversion::isFormatCompressed(pixelFormat)==false?GLRenderDevice::getGLType(pixelFormat):0;
 	TOADLET_IGNORE_UNUSED_VARIABLE_WARNING(gltype);
 
 	int alignment=1,pitch=rowPitch;
@@ -470,12 +460,12 @@ bool GLTexture::generateMipLevels(){
 }
 
 GLuint GLTexture::getGLTarget(){
-	switch(mDimension){
+	switch(mFormat->dimension){
 		#if !defined(TOADLET_HAS_GLES)
-			case Texture::Dimension_D1:
+			case TextureFormat::Dimension_D1:
 				return GL_TEXTURE_1D;
 		#endif
-		case Texture::Dimension_D2:
+		case TextureFormat::Dimension_D2:
 			#if !defined(TOADLET_HAS_GLES)
 				if((mUsage&Usage_BIT_NPOT_RESTRICTED)>0){
 					return GL_TEXTURE_RECTANGLE_ARB;
@@ -484,9 +474,9 @@ GLuint GLTexture::getGLTarget(){
 			return GL_TEXTURE_2D;
 		break;
 		#if !defined(TOADLET_HAS_GLES)
-			case Texture::Dimension_D3:
+			case TextureFormat::Dimension_D3:
 				return GL_TEXTURE_3D;
-			case Texture::Dimension_CUBE:
+			case TextureFormat::Dimension_CUBE:
 				return GL_TEXTURE_CUBE_MAP;
 		#endif
 		default:

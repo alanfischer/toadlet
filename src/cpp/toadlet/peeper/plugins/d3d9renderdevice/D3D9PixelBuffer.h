@@ -45,7 +45,7 @@ public:
 
 	void setBufferDestroyedListener(BufferDestroyedListener *listener){mListener=listener;}
 
-	bool create(int usage,int access,int pixelFormat,int width,int height,int depth);
+	bool create(int usage,int access,TextureFormat::ptr format);
 	void destroy();
 
 	void resetCreate();
@@ -55,10 +55,7 @@ public:
 	int getAccess() const{return mAccess;}
 	int getDataSize() const{return mDataSize;}
 
-	int getPixelFormat() const{return mPixelFormat;}
-	int getWidth() const{return mWidth;}
-	int getHeight() const{return mHeight;}
-	int getDepth() const{return mDepth;}
+	TextureFormat::ptr getTextureFormat() const{return mFormat;}
 
 	tbyte *lock(int lockAccess);
 	bool unlock();
@@ -81,9 +78,8 @@ protected:
 	IDirect3DVolume9 *mVolume;
 	int mUsage;
 	int mAccess;
+	TextureFormat::ptr mFormat;
 	int mDataSize;
-	int mPixelFormat;
-	int mWidth,mHeight,mDepth;
 	D3DPOOL mD3DPool;
 
 	friend D3D9RenderDevice;

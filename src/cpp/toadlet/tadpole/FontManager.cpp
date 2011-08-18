@@ -71,8 +71,8 @@ void FontManager::unmanage(Resource *resource){
 	return ResourceManager::unmanage(resource);
 }
 
-Resource::ptr FontManager::find(const String &name,ResourceHandlerData::ptr handlerData){
-	FontData *fontData=(FontData*)handlerData.get();
+Resource::ptr FontManager::find(const String &name,ResourceData::ptr data){
+	FontData *fontData=(FontData*)data.get();
 	if(fontData==NULL){
 		Error::nullPointer(Categories::TOADLET_TADPOLE,
 			"invalid FontData");
@@ -83,7 +83,7 @@ Resource::ptr FontManager::find(const String &name,ResourceHandlerData::ptr hand
 		fontData->characterSet=mDefaultCharacterSet;
 //	}
 
-	return ResourceManager::find(name,handlerData);
+	return ResourceManager::find(name,data);
 }
 
 }

@@ -69,10 +69,10 @@ Win32FontHandler::~Win32FontHandler(){
 	#endif
 }
 
-Resource::ptr Win32FontHandler::load(Stream::ptr stream,const ResourceHandlerData *handlerData){
+Resource::ptr Win32FontHandler::load(Stream::ptr stream,ResourceData *data,ProgressListener *listener){
 	int i=0,j=0;
 
-	FontData *fontData=(FontData*)handlerData;
+	FontData *fontData=(FontData*)data;
 	if(fontData==NULL){
 		Error::nullPointer(Categories::TOADLET_TADPOLE,
 			"invalid FontData");

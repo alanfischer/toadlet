@@ -43,20 +43,14 @@ public:
 
 	virtual Texture *getRootTexture(){return mBack!=NULL?mBack->getRootTexture():NULL;}
 
-	virtual bool create(int usage,Dimension dimension,int format,int width,int height,int depth,int mipLevels,tbyte *mipDatas[]);
+	virtual bool create(int usage,TextureFormat::ptr format,tbyte *mipDatas[]);
 	virtual void destroy();
 
 	virtual void resetCreate();
 	virtual void resetDestroy();
 
 	virtual int getUsage() const{return mUsage;}
-	virtual Dimension getDimension() const{return mDimension;}
-	virtual int getFormat() const{return mFormat;}
-	virtual int getWidth() const{return mWidth;}
-	virtual int getHeight() const{return mHeight;}
-	virtual int getDepth() const{return mDepth;}
-	virtual int getNumMipLevels() const{return 0;}
-	virtual scalar getLength() const{return 0;}
+	virtual TextureFormat::ptr getFormat() const{return mFormat;}
 
 	virtual PixelBuffer::ptr getMipPixelBuffer(int level,int cubeSide);
 	virtual bool load(int width,int height,int depth,int mipLevel,tbyte *mipData);
@@ -65,19 +59,15 @@ public:
 	virtual void setBack(Texture::ptr back,RenderDevice *renderDevice);
 	virtual Texture::ptr getBack(){return mBack;}
 
-	static bool convertLoad(Texture::ptr texture,int format,int width,int height,int depth,int mipLevel,tbyte *mipData);
-	static bool convertRead(Texture::ptr texture,int format,int width,int height,int depth,int mipLevel,tbyte *mipData);
-	static bool convertCreate(Texture::ptr texture,RenderDevice *renderDevice,int usage,Dimension dimension,int format,int width,int height,int depth,int mipLevels,tbyte *mipDatas[]);
+	static bool convertLoad(Texture::ptr texture,int pixelFormat,int width,int height,int depth,int mipLevel,tbyte *mipData);
+	static bool convertRead(Texture::ptr texture,int pixelFormat,int width,int height,int depth,int mipLevel,tbyte *mipData);
+	static bool convertCreate(Texture::ptr texture,RenderDevice *renderDevice,int usage,TextureFormat::ptr format,tbyte *mipDatas[]);
 
 protected:
 	static void convertAndScale(tbyte *src,int srcFormat,int srcWidth,int srcHeight,int srcDepth,tbyte *dst,int dstFormat,int dstWidth,int dstHeight,int dstDepth);
 
 	int mUsage;
-	Dimension mDimension;
-	int mFormat;
-	int mWidth;
-	int mHeight;
-	int mDepth;
+	TextureFormat::ptr mFormat;
 
 	int mRowPitch;
 	int mSlicePitch;

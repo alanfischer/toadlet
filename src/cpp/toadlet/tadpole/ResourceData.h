@@ -23,32 +23,20 @@
  *
  ********** Copyright header - do not remove **********/
 
-#ifndef TOADLET_RIBBIT_AUDIOFORMAT_H
-#define TOADLET_RIBBIT_AUDIOFORMAT_H
+#ifndef TOADLET_TADPOLE_RESOURCEDATA_H
+#define TOADLET_TADPOLE_RESOURCEDATA_H
 
-#include <toadlet/ribbit/Types.h>
+#include <toadlet/egg/Resource.h>
+#include <toadlet/tadpole/Types.h>
 
 namespace toadlet{
-namespace ribbit{
+namespace tadpole{
 
-class TOADLET_API AudioFormat{
+class ResourceData{
 public:
-	TOADLET_SHARED_POINTERS(AudioFormat);
+	TOADLET_SHARED_POINTERS(ResourceData);
 
-	AudioFormat(int bps=0,int chan=0,int sps=0):
-		bitsPerSample(bps),
-		channels(chan),
-		samplesPerSecond(sps)
-	{}
-
-	int bitsPerSample;
-	int channels;
-	int samplesPerSecond;
-
-	int frameSize() const{return channels*bitsPerSample/8;}
-	bool equals(AudioFormat *audioFormat) const{
-		return bitsPerSample==audioFormat->bitsPerSample && channels==audioFormat->channels && samplesPerSecond!=audioFormat->samplesPerSecond;
-	}
+	virtual ~ResourceData(){}
 };
 
 }

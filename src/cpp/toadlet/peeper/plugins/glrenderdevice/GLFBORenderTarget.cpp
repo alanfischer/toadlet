@@ -149,8 +149,8 @@ bool GLFBORenderTarget::attach(PixelBuffer::ptr buffer,Attachment attachment){
 		GLuint handle=textureBuffer->getHandle();
 		GLenum target=textureBuffer->getTarget();
 		GLuint level=textureBuffer->getLevel();
-		mWidth=textureBuffer->getWidth();
-		mHeight=textureBuffer->getHeight();
+		mWidth=textureBuffer->getTextureFormat()->width;
+		mHeight=textureBuffer->getTextureFormat()->height;
 
 		glFramebufferTexture2D(GL_FRAMEBUFFER,getGLAttachment(attachment),target,handle,level);
 
@@ -242,7 +242,7 @@ bool GLFBORenderTarget::compile(){
 	if(color!=NULL && depth==NULL){
 		// No Depth-Stencil buffer, so add one
 		GLFBOPixelBuffer::ptr buffer(new GLFBOPixelBuffer(this));
-		if(buffer->create(Buffer::Usage_BIT_STREAM,Buffer::Access_NONE,Texture::Format_DEPTH_24,mWidth,mHeight,1)){
+		if(buffer->create(Buffer::Usage_BIT_STREAM,Buffer::Access_NONE,TextureFormat::ptr(new TextureFormat(TextureFormat::Dimension_D2,TextureFormat::Format_DEPTH_24,mWidth,mHeight,1)))){
 			attach(buffer,Attachment_DEPTH_STENCIL);
 			mDepthBuffer=buffer;
 		}
@@ -258,7 +258,7 @@ bool GLFBORenderTarget::compile(){
 	glBindFramebuffer(GL_FRAMEBUFFER,mHandle);
 	GLenum status=glCheckFramebufferStatus(GL_FRAMEBUFFER);
 	if(status!=GL_FRAMEBUFFER_COMPLETE){
-		Logger::warning(Categories::TOADLET_PEEPER,getFBOMessage(status));
+		Logger::warning(Categories::TOADLET_PEEPER,String("FBO Warning:")+getFBOMessage(status));
 	}
 	glBindFramebuffer(GL_FRAMEBUFFER,0);
 

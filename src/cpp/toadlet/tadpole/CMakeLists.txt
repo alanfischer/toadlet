@@ -143,11 +143,13 @@ set (TADPOLE_HEADERS
 	MeshManager.h
 	NodeManager.h
 	Noise.h
+	ProgressListener.h
 	Renderable.h
 	RenderListener.h
-	ResourceHandler.h
-	ResourceHandlerData.h
+	ResourceCreator.h
+	ResourceData.h
 	ResourceManager.h
+	ResourceStreamer.h
 	RenderableSet.h
 	Scene.h
 	SceneRenderer.h

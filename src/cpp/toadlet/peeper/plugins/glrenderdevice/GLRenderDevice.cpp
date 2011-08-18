@@ -736,7 +736,7 @@ bool GLRenderDevice::copyFrameBufferToPixelBuffer(PixelBuffer *dst){
 		glBindTexture(gltexture->mTarget,gltexture->mHandle);
 		TOADLET_CHECK_GLERROR("glBindTexture");
 
-		glCopyTexSubImage2D(gltexture->mTarget,textureBuffer->getLevel(),0,0,0,renderTarget->getHeight()-gltexture->mHeight,gltexture->mWidth,gltexture->mHeight);
+		glCopyTexSubImage2D(gltexture->mTarget,textureBuffer->getLevel(),0,0,0,renderTarget->getHeight()-gltexture->mFormat->height,gltexture->mFormat->width,gltexture->mFormat->height);
 		TOADLET_CHECK_GLERROR("glCopyTexSubImage2D");
 
 		Matrix4x4 matrix;
@@ -772,7 +772,7 @@ bool GLRenderDevice::copyPixelBuffer(PixelBuffer *dst,PixelBuffer *src){
 			glBindBuffer(GL_PIXEL_PACK_BUFFER_ARB,dstPixelBuffer->mHandle);
 
 			GLTexture *srcTexture=srcTextureBuffer->mTexture;
-			srcTexture->load(srcTexture->mWidth,srcTexture->mHeight,srcTexture->mDepth,srcTextureBuffer->mLevel,NULL);
+			srcTexture->load(srcTexture->mFormat->width,srcTexture->mFormat->height,srcTexture->mFormat->depth,srcTextureBuffer->mLevel,NULL);
 
 			glBindBuffer(GL_PIXEL_PACK_BUFFER_ARB,0);
 		}
@@ -780,7 +780,7 @@ bool GLRenderDevice::copyPixelBuffer(PixelBuffer *dst,PixelBuffer *src){
 			glBindBuffer(GL_PIXEL_UNPACK_BUFFER_ARB,srcPixelBuffer->mHandle);
 
 			GLTexture *dstTexture=dstTextureBuffer->mTexture;
-			dstTexture->load(dstTexture->mWidth,dstTexture->mHeight,dstTexture->mDepth,dstTextureBuffer->mLevel,NULL);
+			dstTexture->load(dstTexture->mFormat->width,dstTexture->mFormat->height,dstTexture->mFormat->depth,dstTextureBuffer->mLevel,NULL);
 
 			glBindBuffer(GL_PIXEL_UNPACK_BUFFER_ARB,0);
 		}
@@ -1601,25 +1601,25 @@ void GLRenderDevice::getShadowBiasMatrix(const Texture *shadowTexture,Matrix4x4 
 				0,          0,          0,          Math::ONE);
 }
 
-int GLRenderDevice::getCloseTextureFormat(int textureFormat,int usage){
+int GLRenderDevice::getClosePixelFormat(int format,int usage){
 	#if !defined(TOADLET_HAS_GLES) && defined(TOADLET_HAS_GL_12)
 		if(gl_version<12)
 	#endif
 	{
-		switch(textureFormat){
-			case Texture::Format_BGR_8:
-				return Texture::Format_RGB_8;
-			case Texture::Format_BGRA_8:
-				return Texture::Format_RGBA_8;
+		switch(format){
+			case TextureFormat::Format_BGR_8:
+				return TextureFormat::Format_RGB_8;
+			case TextureFormat::Format_BGRA_8:
+				return TextureFormat::Format_RGBA_8;
 		}
 	}
 
-	switch(textureFormat){
-		case Texture::Format_R_8:
-		case Texture::Format_RG_8:
-			return Texture::Format_RGB_8;
+	switch(format){
+		case TextureFormat::Format_R_8:
+		case TextureFormat::Format_RG_8:
+			return TextureFormat::Format_RGB_8;
 		default:
-			return textureFormat;
+			return format;
 	}
 }
 
@@ -1628,13 +1628,13 @@ bool GLRenderDevice::getShaderProfileSupported(const String &profile){
 }
 
 bool GLRenderDevice::hardwareBuffersSupported(GLBuffer *buffer) const{
-	if(buffer->mVertexFormat!=NULL){
-		return mVBOs;
-	}
-	else if(buffer->mIndexFormat>0){
+	if(buffer->mIndexFormat>0){
 		return mIBOs;
 	}
-	else if(buffer->mPixelFormat>0){
+	else if(buffer->mVertexFormat!=NULL){
+		return mVBOs;
+	}
+	else if(buffer->mTextureFormat!=NULL){
 		return mPBOs;
 	}
 	else if(buffer->mVariableFormat!=NULL && buffer->mVariableFormat->getPrimary()==false){
@@ -2072,94 +2072,88 @@ GLenum GLRenderDevice::getGLDataType(int format){
 }
 
 GLuint GLRenderDevice::getGLFormat(int textureFormat,bool internal){
-	if((textureFormat&Texture::Format_BIT_L)>0){
-		return GL_LUMINANCE;
-	}
-	else if((textureFormat&Texture::Format_BIT_A)>0){
-		return GL_ALPHA;
-	}
-	else if((textureFormat&Texture::Format_BIT_LA)>0){
-		return GL_LUMINANCE_ALPHA;
-	}
-	#if !defined(TOADLET_HAS_GLES) && defined(TOADLET_HAS_GL_12)
-		else if((textureFormat&Texture::Format_BIT_BGR)>0){
-			if(internal==false){
-				return GL_BGR;
-			}
-			else{
-				return GL_RGB;
-			}
-		}
-		else if((textureFormat&Texture::Format_BIT_BGRA)>0){
-			if(internal==false){
-				return GL_BGRA;
-			}
-			else{
-				return GL_RGBA;
-			}
-		}
-	#endif
-	else if((textureFormat&Texture::Format_BIT_RGB)>0){
-		return GL_RGB;
-	}
-	else if((textureFormat&Texture::Format_BIT_RGBA)>0){
-		return GL_RGBA;
-	}
-	#if defined(TOADLET_HAS_GLEW)
-		else if((textureFormat&Texture::Format_BIT_DXT1)>0){
-			return GL_COMPRESSED_RGBA_S3TC_DXT1_EXT;
-		}
-		else if((textureFormat&Texture::Format_BIT_DXT2)>0 ||
-				(textureFormat&Texture::Format_BIT_DXT3)>0){
-			return GL_COMPRESSED_RGBA_S3TC_DXT3_EXT;
-		}
-		else if((textureFormat&Texture::Format_BIT_DXT4)>0 ||
-				(textureFormat&Texture::Format_BIT_DXT5)>0){
-			return GL_COMPRESSED_RGBA_S3TC_DXT5_EXT;
-		}
-	#endif
-
-	#if !defined(TOADLET_HAS_GLES) || defined(TOADLET_HAS_EAGL)
-		else if((textureFormat&Texture::Format_BIT_DEPTH)>0){
-			if(internal && (textureFormat&Texture::Format_BIT_UINT_16)>0){
-				return GL_DEPTH_COMPONENT16;
-			}
-			else if(internal && (textureFormat&Texture::Format_BIT_UINT_24)>0){
-				return GL_DEPTH_COMPONENT24;
-			}
-			#if !defined(TOADLET_HAS_EAGL)
-				else if(internal && (textureFormat&Texture::Format_BIT_UINT_32)>0){
-					return GL_DEPTH_COMPONENT32;
+	int formatSemantic=(textureFormat&TextureFormat::Format_MASK_SEMANTICS);
+	int formatType=(textureFormat&TextureFormat::Format_MASK_TYPES);
+	switch(formatSemantic){
+		case TextureFormat::Format_SEMANTIC_L:
+			return GL_LUMINANCE;
+		case TextureFormat::Format_SEMANTIC_A:
+			return GL_ALPHA;
+		case TextureFormat::Format_SEMANTIC_LA:
+			return GL_LUMINANCE_ALPHA;
+		#if !defined(TOADLET_HAS_GLES) && defined(TOADLET_HAS_GL_12)
+			case TextureFormat::Format_SEMANTIC_BGR:
+				if(internal==false){
+					return GL_BGR;
 				}
+				else{
+					return GL_RGB;
+				}
+			case TextureFormat::Format_SEMANTIC_BGRA:
+				if(internal==false){
+					return GL_BGRA;
+				}
+				else{
+					return GL_RGBA;
+				}
+		#endif
+		case TextureFormat::Format_SEMANTIC_RGB:
+			#if defined(TOADLET_HAS_GLEW)
+				if(formatType==TextureFormat::Format_TYPE_DXT1){
+					return GL_COMPRESSED_RGBA_S3TC_DXT1_EXT;
+				}
+			#endif
+			return GL_RGB;
+		case TextureFormat::Format_SEMANTIC_RGBA:
+			#if defined(TOADLET_HAS_GLEW)
+				if(formatType==TextureFormat::Format_TYPE_DXT2 || formatType==TextureFormat::Format_TYPE_DXT3){
+					return GL_COMPRESSED_RGBA_S3TC_DXT3_EXT;
+				}
+				else if(formatType==TextureFormat::Format_TYPE_DXT4 || formatType==TextureFormat::Format_TYPE_DXT5){
+					return GL_COMPRESSED_RGBA_S3TC_DXT5_EXT;
+				}
+			#endif
+			return GL_RGBA;
+		#if !defined(TOADLET_HAS_GLES) || defined(TOADLET_HAS_EAGL)
+			case TextureFormat::Format_SEMANTIC_DEPTH:
+				if(internal && formatType==TextureFormat::Format_TYPE_UINT_16){
+					return GL_DEPTH_COMPONENT16;
+				}
+				else if(internal && formatType==TextureFormat::Format_TYPE_UINT_24){
+					return GL_DEPTH_COMPONENT24;
+				}
+				#if !defined(TOADLET_HAS_EAGL)
+					else if(internal && formatType==TextureFormat::Format_TYPE_UINT_32){
+						return GL_DEPTH_COMPONENT32;
+					}
+				#endif
 				else{
 					return GL_DEPTH_COMPONENT;
 				}
-			#endif
-		}
-	#endif
-
+		#endif
+	}
 	return 0;
 }
 
 GLuint GLRenderDevice::getGLType(int textureFormat){
-	if((textureFormat&Texture::Format_BIT_UINT_8)>0 || (textureFormat&Texture::Format_BIT_UINT_16)>0 || (textureFormat&Texture::Format_BIT_UINT_24)>0 || (textureFormat&Texture::Format_BIT_UINT_32)>0){
-		return GL_UNSIGNED_BYTE;
+	int formatSemantic=(textureFormat&TextureFormat::Format_MASK_SEMANTICS);
+	int formatType=(textureFormat&TextureFormat::Format_MASK_TYPES);
+	switch(formatType){
+		case TextureFormat::Format_TYPE_UINT_8:
+		case TextureFormat::Format_TYPE_UINT_16:
+		case TextureFormat::Format_TYPE_UINT_24:
+		case TextureFormat::Format_TYPE_UINT_32:
+			return GL_UNSIGNED_BYTE;
+		case TextureFormat::Format_TYPE_FLOAT_32:
+			return GL_FLOAT;
+		case TextureFormat::Format_TYPE_UINT_5_6_5:
+			return GL_UNSIGNED_SHORT_5_6_5;
+		case TextureFormat::Format_TYPE_UINT_5_5_5_1:
+			return GL_UNSIGNED_SHORT_5_5_5_1;
+		case TextureFormat::Format_TYPE_UINT_4_4_4_4:
+			return GL_UNSIGNED_SHORT_4_4_4_4;
 	}
-	else if((textureFormat&Texture::Format_BIT_FLOAT_32)>0){
-		return GL_FLOAT;
-	}
-	else if((textureFormat&Texture::Format_BIT_UINT_5_6_5)>0){
-		return GL_UNSIGNED_SHORT_5_6_5;
-	}
-	else if((textureFormat&Texture::Format_BIT_UINT_5_5_5_1)>0){
-		return GL_UNSIGNED_SHORT_5_5_5_1;
-	}
-	else if((textureFormat&Texture::Format_BIT_UINT_4_4_4_4)>0){
-		return GL_UNSIGNED_SHORT_4_4_4_4;
-	}
-	else{
-		return 0;
-	}
+	return 0;
 }
 
 GLuint GLRenderDevice::getGLIndexType(int indexFormat){

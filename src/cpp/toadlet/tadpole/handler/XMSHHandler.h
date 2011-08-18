@@ -35,15 +35,14 @@ namespace toadlet{
 namespace tadpole{
 namespace handler{
 
-class TOADLET_API XMSHHandler:public ResourceHandler{
+class TOADLET_API XMSHHandler:public ResourceStreamer{
 public:
 	TOADLET_SHARED_POINTERS(XMSHHandler);
 
 	XMSHHandler(Engine *engine);
 
-	Resource::ptr load(Stream::ptr stream,const ResourceHandlerData *handlerData);
-
-	bool save(Mesh::ptr resource,Stream::ptr stream,ProgressListener *listener=NULL);
+	Resource::ptr load(Stream::ptr stream,ResourceData *data,ProgressListener *listener);
+	bool save(Stream::ptr stream,Resource::ptr resource,ResourceData *data,ProgressListener *listener);
 
 protected:
 	Mesh::ptr loadMeshVersion1(mxml_node_t *root);

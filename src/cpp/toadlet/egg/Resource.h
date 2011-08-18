@@ -46,7 +46,7 @@ public:
 	virtual void release()=0;
 
 	virtual void setFullyReleasedListener(ResourceFullyReleasedListener *listener)=0;
-	
+
 	virtual void setName(const String &name)=0;
 	virtual const String &getName() const=0;
 	

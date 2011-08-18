@@ -37,7 +37,7 @@ TMSHHandler::TMSHHandler(Engine *engine){
 	mEngine=engine;
 }
 
-Resource::ptr TMSHHandler::load(Stream::ptr stream,const ResourceHandlerData *handlerData){
+Resource::ptr TMSHHandler::load(Stream::ptr stream,ResourceData *data,ProgressListener *listener){
 	int i,j;
 
 	DataStream::ptr dataStream(new DataStream(stream));
@@ -104,9 +104,13 @@ Resource::ptr TMSHHandler::load(Stream::ptr stream,const ResourceHandlerData *ha
 	return mesh;
 }
 
-bool TMSHHandler::save(Mesh::ptr mesh,Stream::ptr stream){
-	int i;
+bool TMSHHandler::save(Stream::ptr stream,Resource::ptr resource,ResourceData *data,ProgressListener *listener){
+	Mesh::ptr mesh=shared_static_cast<Mesh>(resource);
+	if(mesh==NULL){
+		return false;
+	}
 
+	int i;
 	DataStream::ptr dataStream(new DataStream(stream));
 
 	dataStream->writeUInt32(TMSH);

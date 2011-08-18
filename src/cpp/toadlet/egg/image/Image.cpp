@@ -31,7 +31,7 @@ namespace toadlet{
 namespace egg{
 namespace image{
 
-Image *Image::createAndReallocate(Dimension dimension,int format,int width,int height,int depth){
+Image *Image::createAndReallocate(int dimension,int format,int width,int height,int depth){
 	Image *image=new Image();
 	
 	bool result=false;
@@ -96,7 +96,7 @@ Image *Image::clone(){
 	return image;
 }
 
-bool Image::reallocate(Dimension dimension,int format,int width,int height,int depth,bool clear){
+bool Image::reallocate(int dimension,int format,int width,int height,int depth,bool clear){
 	if(mData){
 		delete[] mData;
 		mData=NULL;

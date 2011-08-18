@@ -27,21 +27,21 @@
 #define TOADLET_TADPOLE_BSP_BSP30HANDLER_H
 
 #include <toadlet/tadpole/Engine.h>
-#include <toadlet/tadpole/ResourceHandler.h>
+#include <toadlet/tadpole/ResourceStreamer.h>
 #include <toadlet/tadpole/bsp/BSP30Map.h>
 
 namespace toadlet{
 namespace tadpole{
 namespace bsp{
 
-class BSP30Handler:public ResourceHandler{
+class BSP30Handler:public ResourceStreamer{
 public:
 	TOADLET_SHARED_POINTERS(BSP30Handler);
 
 	BSP30Handler(Engine *engine);
 	virtual ~BSP30Handler();
 
-	virtual Resource::ptr load(Stream::ptr stream,const ResourceHandlerData *handlerData);
+	virtual Resource::ptr load(Stream::ptr stream,ResourceData *data,ProgressListener *listener);
 
 protected:
 	void readLump(Stream *stream,blump *lump,void **data,int size,int *count);

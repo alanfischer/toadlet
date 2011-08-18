@@ -40,7 +40,7 @@ public:
 	virtual ~AudioStream(){}
 
 	virtual bool startStream(Stream::ptr stream)=0;
-	virtual AudioFormat::ptr getAudioFormat()=0;
+	virtual AudioFormat::ptr getAudioFormat() const=0;
 };
 
 }

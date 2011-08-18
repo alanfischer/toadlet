@@ -110,7 +110,7 @@ void SpriteModelNode::setModel(const String &name){
 	}
 
 	SpriteHandler::ptr handler(new SpriteHandler(mEngine));
-	SpriteModel::ptr model=shared_static_cast<SpriteModel>(handler->load(stream,NULL));
+	SpriteModel::ptr model=shared_static_cast<SpriteModel>(handler->load(stream,NULL,NULL));
 	model->setName(name);
 	setModel(model);
 }

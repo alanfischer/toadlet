@@ -36,7 +36,7 @@ XMATHandler::XMATHandler(Engine *engine){
 	mEngine=engine;
 }
 
-Resource::ptr XMATHandler::load(Stream::ptr stream,const ResourceHandlerData *handlerData){
+Resource::ptr XMATHandler::load(Stream::ptr stream,ResourceData *data,ProgressListener *listener){
 	Material::ptr material=NULL;
 
 	/// @todo: Replace the following when mxml implements custom load/save callbacks
@@ -73,7 +73,12 @@ Resource::ptr XMATHandler::load(Stream::ptr stream,const ResourceHandlerData *ha
 	return material;
 }
 
-bool XMATHandler::save(Material::ptr material,Stream::ptr stream,ProgressListener *listener){
+bool XMATHandler::save(Stream::ptr stream,Resource::ptr resource,ResourceData *data,ProgressListener *listener){
+	Material::ptr material=shared_static_cast<Material>(resource);
+	if(material==NULL){
+		return false;
+	}
+
 	mxml_node_t *root=mxmlNewElement(MXML_NO_PARENT,"XMAT");
 
 	int version=XMLMeshUtilities::version;

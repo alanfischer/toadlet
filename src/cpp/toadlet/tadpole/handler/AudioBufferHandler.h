@@ -26,14 +26,14 @@
 #ifndef TOADLET_TADPOLE_HANDLER_AUDIOBUFFERHANDLER_H
 #define TOADLET_TADPOLE_HANDLER_AUDIOBUFFERHANDLER_H
 
-#include <toadlet/tadpole/ResourceHandler.h>
+#include <toadlet/tadpole/ResourceStreamer.h>
 #include <toadlet/tadpole/AudioBufferManager.h>
 
 namespace toadlet{
 namespace tadpole{
 namespace handler{
 
-class TOADLET_API AudioBufferHandler:public ResourceHandler{
+class TOADLET_API AudioBufferHandler:public ResourceStreamer{
 public:
 	TOADLET_SHARED_POINTERS(AudioBufferHandler);
 
@@ -41,7 +41,7 @@ public:
 
 	virtual AudioStream::ptr createAudioStream(Stream::ptr stream)=0;
 
-	Resource::ptr load(Stream::ptr stream,const ResourceHandlerData *handlerData){
+	Resource::ptr load(Stream::ptr stream,ResourceData *data){
 		return mAudioBufferManager->createAudioBuffer(createAudioStream(stream));
 	}
 

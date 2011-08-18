@@ -30,6 +30,7 @@
 #include <toadlet/egg/EndianConversion.h>
 #include <toadlet/egg/Error.h>
 #include <toadlet/egg/Logger.h>
+#include <toadlet/egg/image/ImageFormatConversion.h>
 #include <toadlet/peeper/BackableBuffer.h>
 #include <string.h>
 
@@ -44,11 +45,10 @@ GLBuffer::GLBuffer(GLRenderDevice *renderDevice):
 	mAccess(0),
 	mDataSize(0),
 	mSize(0),
-	mWidth(0),mHeight(0),mDepth(0),
 
 	mIndexFormat((IndexFormat)0),
 	//mVertexFormat,
-	mPixelFormat(0),
+	//mTextureFormat,
 	//mElementOffsets,
 	mHasTranspose(false),
 
@@ -116,16 +116,13 @@ bool GLBuffer::create(int usage,int access,VertexFormat::ptr vertexFormat,int si
 	return true;
 }
 
-bool GLBuffer::create(int usage,int access,int pixelFormat,int width,int height,int depth){
+bool GLBuffer::create(int usage,int access,TextureFormat::ptr textureFormat){
 	destroy();
 
 	mUsage=usage;
 	mAccess=access;
-	mWidth=width;
-	mHeight=height;
-	mDepth=depth;
-	mPixelFormat=pixelFormat;
-	mDataSize=ImageFormatConversion::getRowPitch(mPixelFormat,mWidth)*mHeight*mDepth;
+	mTextureFormat=textureFormat;
+	mDataSize=ImageFormatConversion::getRowPitch(mTextureFormat->pixelFormat,mTextureFormat->width)*mTextureFormat->height*mTextureFormat->depth;
 
 	#if defined(TOADLET_HAS_GLPBOS)
 		mTarget=GL_PIXEL_UNPACK_BUFFER;
@@ -189,7 +186,7 @@ void GLBuffer::destroy(){
 		else if(mVertexFormat!=NULL){
 			mListener->bufferDestroyed((VertexBuffer*)this);
 		}
-		else if(mPixelFormat>0){
+		else if(mTextureFormat!=NULL){
 			mListener->bufferDestroyed((PixelBuffer*)this);
 		}
 		else{

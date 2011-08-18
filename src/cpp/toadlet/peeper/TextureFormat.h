@@ -23,23 +23,18 @@
  *
  ********** Copyright header - do not remove **********/
 
-#ifndef TOADLET_EGG_IMAGE_IMAGEDEFINITIONS_H
-#define TOADLET_EGG_IMAGE_IMAGEDEFINITIONS_H
+#ifndef TOADLET_PEEPER_TEXTUREFORMAT_H
+#define TOADLET_PEEPER_TEXTUREFORMAT_H
 
-#include <toadlet/Types.h>
+#include <toadlet/peeper/Types.h>
 
 namespace toadlet{
-namespace egg{
-namespace image{};
-using namespace image;
+namespace peeper{
 
-namespace image{
-
-/*	This may be an instance of the constant interface antipattern, but it achieves the purpose of
-	letting both Images and Textures have these attributes without placing them in an external class,
-	which is the desired effect. */
-class ImageDefinitions{
+class TOADLET_API TextureFormat{
 public:
+	TOADLET_SHARED_POINTERS(TextureFormat);
+
 	enum Dimension{
 		Dimension_UNKNOWN=0,
 		Dimension_D1,
@@ -125,9 +120,47 @@ public:
 		Format_RGBA_DXT4=			Format_SEMANTIC_RGBA|Format_TYPE_DXT4,
 		Format_RGBA_DXT5=			Format_SEMANTIC_RGBA|Format_TYPE_DXT5,
 	};
+
+	TextureFormat(int texDimension,int texPixelFormat,int texWidth=0,int texHeight=0,int texDepth=0,int texMipLevels=0):
+		dimension(texDimension),
+		pixelFormat(texPixelFormat),
+		width(texWidth),
+		height(texHeight),
+		depth(texDepth),
+		mipLevels(texMipLevels)
+	{}
+
+	TextureFormat(const TextureFormat *format):
+		dimension(Dimension_UNKNOWN),
+		pixelFormat(Format_UNKNOWN),
+		width(0),
+		height(0),
+		depth(0),
+		mipLevels(0)
+	{
+		if(format!=NULL){
+			dimension=format->dimension;
+			pixelFormat=format->pixelFormat;
+			width=format->width;
+			height=format->height;
+			depth=format->depth;
+			mipLevels=format->mipLevels;
+		}
+	}
+
+	int dimension;
+	int pixelFormat;
+	int width;
+	int height;
+	int depth;
+	int mipLevels;
+
+	bool equals(TextureFormat *format) const{
+		return dimension==format->dimension && pixelFormat==format->pixelFormat &&
+			width==format->width && height==format->height && depth==format->depth && mipLevels==format->mipLevels;
+	}
 };
 
-}
 }
 }
 

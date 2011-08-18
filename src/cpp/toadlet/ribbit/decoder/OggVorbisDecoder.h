@@ -59,7 +59,7 @@ public:
 	int position();
 	bool seek(int offs);
 
-	AudioFormat::ptr getAudioFormat(){return mFormat;}
+	AudioFormat::ptr getAudioFormat() const{return mFormat;}
 
 private:
 	OggVorbis_File *mVorbisFile;

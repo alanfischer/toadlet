@@ -71,14 +71,14 @@ AudioStream::ptr AudioBufferManager::findAudioStream(const String &name){
 		filename+="."+extension;
 	}
 
-	ResourceHandler::ptr handler=getHandler(extension);
-	if(handler==NULL){
-		handler=mDefaultHandler;
+	ResourceStreamer::ptr streamer=getStreamer(extension);
+	if(streamer==NULL){
+		streamer=mDefaultStreamer;
 	}
-	if(handler!=NULL){
+	if(streamer!=NULL){
 		Stream::ptr stream=mArchive->openStream(filename);
 		if(stream!=NULL){
-			return shared_static_cast<AudioBufferHandler>(handler)->createAudioStream(stream);
+			return shared_static_cast<AudioBufferHandler>(streamer)->createAudioStream(stream);
 		}
 		else{
 			Error::unknown(Categories::TOADLET_TADPOLE,

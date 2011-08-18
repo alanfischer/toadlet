@@ -95,7 +95,7 @@ public:
 	void setLightEnabled(int i,bool enable){}
 
 	// Misc operations
-	int getCloseTextureFormat(int textureFormat,int usage);
+	int getClosePixelFormat(int pixelFormat,int usage);
 	bool getShaderProfileSupported(const String &profile);
 	void getShadowBiasMatrix(const Texture *shadowTexture,Matrix4x4 &result);
 	bool getRenderCaps(RenderCaps &caps){caps.set(mCaps);return true;}

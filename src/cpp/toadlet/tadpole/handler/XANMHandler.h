@@ -26,7 +26,7 @@
 #ifndef TOADLET_TADPOLE_HANDLER_XANMHANDLER_H
 #define TOADLET_TADPOLE_HANDLER_XANMHANDLER_H
 
-#include <toadlet/tadpole/ResourceHandler.h>
+#include <toadlet/tadpole/ResourceStreamer.h>
 #include <toadlet/tadpole/TransformSequence.h>
 
 typedef struct mxml_node_s mxml_node_t;
@@ -35,14 +35,14 @@ namespace toadlet{
 namespace tadpole{
 namespace handler{
 
-class TOADLET_API XANMHandler:public ResourceHandler{
+class TOADLET_API XANMHandler:public ResourceStreamer{
 public:
 	TOADLET_SHARED_POINTERS(XANMHandler);
 
 	XANMHandler();
 
-	Resource::ptr load(Stream::ptr stream,const ResourceHandlerData *handlerData);
-	bool save(TransformSequence::ptr resource,Stream::ptr stream,ProgressListener *listener=NULL);
+	Resource::ptr load(Stream::ptr stream,ResourceData *data,ProgressListener *listener);
+	bool save(Stream::ptr stream,Resource::ptr resource,ResourceData *data,ProgressListener *listener);
 
 protected:
 	TransformSequence::ptr loadSequenceVersion1(mxml_node_t *root);

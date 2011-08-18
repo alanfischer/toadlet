@@ -26,14 +26,14 @@
 #ifndef TOADLET_TADPOLE_HANDLER_WADHANDLER_H
 #define TOADLET_TADPOLE_HANDLER_WADHANDLER_H
 
-#include <toadlet/tadpole/ResourceHandler.h>
+#include <toadlet/tadpole/ResourceStreamer.h>
 #include <toadlet/tadpole/handler/WADArchive.h>
 
 namespace toadlet{
 namespace tadpole{
 namespace handler{
 
-class TOADLET_API WADHandler:public ResourceHandler{
+class TOADLET_API WADHandler:public ResourceStreamer{
 public:
 	TOADLET_SHARED_POINTERS(WADHandler);
 
@@ -41,7 +41,7 @@ public:
 		mTextureManager=textureManager;
 	}
 
-	Resource::ptr load(Stream::ptr stream,const ResourceHandlerData *handlerData){
+	Resource::ptr load(Stream::ptr stream,ResourceData *data,ProgressListener *listener){
 		WADArchive::ptr archive(new WADArchive(mTextureManager));
 		bool result=archive->open(stream);
 		if(result){

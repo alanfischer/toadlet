@@ -81,8 +81,8 @@ int MMAudio::read(tbyte *data,int length){
 
 	int amount=0;
 	if(mAudioStream!=NULL){
-		AudioFormat::ptr format=mAudioStream->getAudioFormat();
-		AudioFormat::ptr playerFormat=mDevice->getAudioFormat();
+		AudioFormat *format=mAudioStream->getAudioFormat();
+		AudioFormat *playerFormat=mDevice->getAudioFormat();
 
 		if(format->equals(playerFormat)==false){
 			int olength=AudioFormatConversion::findConvertedLength(length,playerFormat,format);

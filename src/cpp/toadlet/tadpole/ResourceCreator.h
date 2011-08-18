@@ -28,25 +28,19 @@
 
 #include <toadlet/egg/Resource.h>
 #include <toadlet/egg/io/Stream.h>
-#include <toadlet/tadpole/ResourceHandlerData.h>
-#include <toadlet/tadpole/Types.h>
+#include <toadlet/tadpole/ResourceData.h>
+#include <toadlet/tadpole/ProgressListener.h>
 
 namespace toadlet{
 namespace tadpole{
 
-/// @todo: Just stuck this here, should be in its own file
-class ProgressListener{
+class ResourceCreator{
 public:
-	virtual void progressUpdated(float amount)=0;
-};
+	TOADLET_SHARED_POINTERS(ResourceCreator);
 
-class ResourceHandler{
-public:
-	TOADLET_SHARED_POINTERS(ResourceHandler);
+	virtual ~ResourceCreator(){}
 
-	virtual ~ResourceHandler(){}
-
-	virtual Resource::ptr load(Stream::ptr stream,const ResourceHandlerData *handlerData)=0;
+	virtual Resource::ptr create(const String &name,ResourceData *data,ProgressListener *listener)=0;
 };
 
 }

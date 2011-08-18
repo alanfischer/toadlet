@@ -27,7 +27,7 @@
 #define TOADLET_PEEPER_PIXELBUFFER_H
 
 #include <toadlet/peeper/Buffer.h>
-#include <toadlet/egg/image/ImageDefinitions.h>
+#include <toadlet/peeper/TextureFormat.h>
 
 namespace toadlet{
 namespace peeper{
@@ -40,16 +40,13 @@ public:
 
 	virtual PixelBuffer *getRootPixelBuffer()=0;
 
-	virtual bool create(int usage,int access,int pixelFormat,int width,int height,int depth)=0;
+	virtual bool create(int usage,int access,TextureFormat::ptr format)=0;
 	virtual void destroy()=0;
 
 	virtual void resetCreate()=0;
 	virtual void resetDestroy()=0;
 
-	virtual int getPixelFormat() const=0;
-	virtual int getWidth() const=0;
-	virtual int getHeight() const=0;
-	virtual int getDepth() const=0;
+	virtual TextureFormat::ptr getTextureFormat() const=0;
 };
 
 }

@@ -24,6 +24,8 @@
  ********** Copyright header - do not remove **********/
 
 #include <toadlet/egg/Logger.h>
+#include <toadlet/egg/image/ImageFormatConversion.h>
+#include <toadlet/egg/image/Image.h>
 #include <toadlet/peeper/BackableTexture.h>
 #include <toadlet/peeper/BackableTextureMipPixelBuffer.h>
 #include <toadlet/peeper/RenderCaps.h>
@@ -34,11 +36,7 @@ namespace peeper{
 
 BackableTexture::BackableTexture():BaseResource(),
 	mUsage(0),
-	mDimension(Dimension_UNKNOWN),
-	mFormat(0),
-	mWidth(0),
-	mHeight(0),
-	mDepth(0),
+	//mFormat,
 	
 	mRowPitch(0),
 	mSlicePitch(0),
@@ -51,24 +49,23 @@ BackableTexture::~BackableTexture(){
 	destroy();
 }
 
-bool BackableTexture::create(int usage,Dimension dimension,int format,int width,int height,int depth,int mipLevels,tbyte *mipDatas[]){
+bool BackableTexture::create(int usage,TextureFormat::ptr format,tbyte *mipDatas[]){
 	mUsage=usage;
-	mDimension=dimension;
-	mFormat=format;
-	mWidth=width;
-	mHeight=height;
-	mDepth=depth;
+	mFormat=TextureFormat::ptr(new TextureFormat(format));
 
-	mRowPitch=ImageFormatConversion::getPixelSize(mFormat)*mWidth;
-	mSlicePitch=mRowPitch*mHeight;
-	if(mDimension==Dimension_D1){
-		mDataSize=mRowPitch;
-	}
-	else if(mDimension==Dimension_D2){
-		mDataSize=mSlicePitch;
-	}
-	else if(mDimension==Dimension_D3 || mDimension==Dimension_CUBE){
-		mDataSize=mSlicePitch*mDepth;
+	mRowPitch=ImageFormatConversion::getPixelSize(mFormat->pixelFormat)*mFormat->width;
+	mSlicePitch=mRowPitch*mFormat->height;
+	switch(mFormat->dimension){
+		case TextureFormat::Dimension_D1:
+			mDataSize=mRowPitch;
+		break;
+		case TextureFormat::Dimension_D2:
+			mDataSize=mSlicePitch;
+		break;
+		case TextureFormat::Dimension_D3:
+		case TextureFormat::Dimension_CUBE:
+			mDataSize=mSlicePitch*mFormat->depth;
+		break;
 	}
 
 	// BackableTextures only store the first mipLevel, so if it's not a staging resource, then we need to autogen mipmaps
@@ -82,7 +79,7 @@ bool BackableTexture::create(int usage,Dimension dimension,int format,int width,
 	}
 
 	if(mipDatas!=NULL){
-		load(width,height,depth,0,mipDatas[0]);
+		load(format->width,format->height,format->depth,0,mipDatas[0]);
 	}
 
 	return true;
@@ -136,7 +133,7 @@ void BackableTexture::resetDestroy(){
 
 PixelBuffer::ptr BackableTexture::getMipPixelBuffer(int level,int cubeSide){
 	int index=level;
-	if(mDimension==Dimension_CUBE){
+	if(mFormat->dimension==TextureFormat::Dimension_CUBE){
 		index=level*6+cubeSide;
 	}
 
@@ -156,10 +153,10 @@ bool BackableTexture::load(int width,int height,int depth,int mipLevel,tbyte *mi
 	bool result=false;
 
 	if(mBack!=NULL){
-		result=convertLoad(mBack,mFormat,width,height,depth,mipLevel,mipData);
+		result=convertLoad(mBack,mFormat->pixelFormat,width,height,depth,mipLevel,mipData);
 	}
 	else if(mipLevel==0 && mData!=NULL){
-		ImageFormatConversion::convert(mipData,mFormat,mRowPitch,mSlicePitch,mData,mFormat,mRowPitch,mSlicePitch,width,height,depth);
+		ImageFormatConversion::convert(mipData,mFormat->pixelFormat,mRowPitch,mSlicePitch,mData,mFormat->pixelFormat,mRowPitch,mSlicePitch,width,height,depth);
 		result=true;
 	}
 
@@ -170,10 +167,10 @@ bool BackableTexture::read(int width,int height,int depth,int mipLevel,tbyte *mi
 	bool result=false;
 
 	if(mBack!=NULL){
-		result=convertRead(mBack,mFormat,width,height,depth,mipLevel,mipData);
+		result=convertRead(mBack,mFormat->pixelFormat,width,height,depth,mipLevel,mipData);
 	}
 	else if(mipLevel==0 && mData!=NULL){
-		ImageFormatConversion::convert(mData,mFormat,mRowPitch,mSlicePitch,mipData,mFormat,mRowPitch,mSlicePitch,width,height,depth);
+		ImageFormatConversion::convert(mData,mFormat->pixelFormat,mRowPitch,mSlicePitch,mipData,mFormat->pixelFormat,mRowPitch,mSlicePitch,width,height,depth);
 		result=true;
 	}
 
@@ -195,7 +192,9 @@ void BackableTexture::setBack(Texture::ptr back,RenderDevice *renderDevice){
 	mBack=back;
 	
 	if(mBack!=NULL){
-		convertCreate(mBack,renderDevice,mUsage,mDimension,mFormat,mWidth,mHeight,mDepth,(mUsage&Usage_BIT_AUTOGEN_MIPMAPS)!=0?0:1,(mData!=NULL?&mData:NULL));
+		TextureFormat::ptr format(new TextureFormat(mFormat));
+		format->mipLevels=(mUsage&Usage_BIT_AUTOGEN_MIPMAPS)!=0?0:1;
+		convertCreate(mBack,renderDevice,mUsage,format,(mData!=NULL?&mData:NULL));
 
 		for(i=0;i<mBuffers.size();++i){
 			if(mBuffers[i]!=NULL){
@@ -205,61 +204,63 @@ void BackableTexture::setBack(Texture::ptr back,RenderDevice *renderDevice){
 	}
 }
 
-bool BackableTexture::convertLoad(Texture::ptr texture,int format,int width,int height,int depth,int mipLevel,tbyte *mipData){
-	if(texture->getFormat()==format){
+bool BackableTexture::convertLoad(Texture::ptr texture,int pixelFormat,int width,int height,int depth,int mipLevel,tbyte *mipData){
+	if(texture->getFormat()->pixelFormat==pixelFormat){
 		return texture->load(width,height,depth,mipLevel,mipData);
 	}
 	else{
-		int pitch=ImageFormatConversion::getRowPitch(format,width);
-		int textureFormat=texture->getFormat();
+		int pitch=ImageFormatConversion::getRowPitch(pixelFormat,width);
+		int textureFormat=texture->getFormat()->pixelFormat;
 		int texturePitch=ImageFormatConversion::getRowPitch(textureFormat,width);
 		tbyte *textureData=new tbyte[texturePitch * height];
-		ImageFormatConversion::convert(mipData,format,pitch,pitch*height,textureData,textureFormat,texturePitch,texturePitch*height,width,height,depth);
+		ImageFormatConversion::convert(mipData,pixelFormat,pitch,pitch*height,textureData,textureFormat,texturePitch,texturePitch*height,width,height,depth);
 		bool result=texture->load(width,height,depth,mipLevel,textureData);
 		delete[] textureData;
 		return result;
 	}
 }
 
-bool BackableTexture::convertRead(Texture::ptr texture,int format,int width,int height,int depth,int mipLevel,tbyte *mipData){
-	if(texture->getFormat()==format){
+bool BackableTexture::convertRead(Texture::ptr texture,int pixelFormat,int width,int height,int depth,int mipLevel,tbyte *mipData){
+	if(texture->getFormat()->pixelFormat==pixelFormat){
 		return texture->read(width,height,depth,mipLevel,mipData);
 	}
 	else{
-		int pitch=ImageFormatConversion::getRowPitch(format,width);
-		int textureFormat=texture->getFormat();
+		int pitch=ImageFormatConversion::getRowPitch(pixelFormat,width);
+		int textureFormat=texture->getFormat()->pixelFormat;
 		int texturePitch=ImageFormatConversion::getRowPitch(textureFormat,width);
 		tbyte *textureData=new tbyte[texturePitch * height];
 		bool result=texture->read(width,height,depth,mipLevel,textureData);
-		ImageFormatConversion::convert(textureData,textureFormat,texturePitch,texturePitch*height,mipData,format,pitch,pitch*height,width,height,depth);
+		ImageFormatConversion::convert(textureData,textureFormat,texturePitch,texturePitch*height,mipData,pixelFormat,pitch,pitch*height,width,height,depth);
 		delete[] textureData;
 		return result;
 	}
 }
 
-bool BackableTexture::convertCreate(Texture::ptr texture,RenderDevice *renderDevice,int usage,Dimension dimension,int format,int width,int height,int depth,int mipLevels,tbyte *mipDatas[]){
+bool BackableTexture::convertCreate(Texture::ptr texture,RenderDevice *renderDevice,int usage,TextureFormat::ptr format,tbyte *mipDatas[]){
 	RenderCaps caps;
 	renderDevice->getRenderCaps(caps);
-	int newFormat=renderDevice->getCloseTextureFormat(format,usage);
+	int newPixelFormat=renderDevice->getClosePixelFormat(format->pixelFormat,usage);
 	bool hasNPOT=caps.textureNonPowerOf2;
-	bool wantsNPOT=(Math::isPowerOf2(width)==false || Math::isPowerOf2(height)==false || (dimension!=Image::Dimension_CUBE && Math::isPowerOf2(depth)==false));
+	bool wantsNPOT=(Math::isPowerOf2(format->width)==false || Math::isPowerOf2(format->height)==false || (format->dimension!=TextureFormat::Dimension_CUBE && Math::isPowerOf2(format->depth)==false));
 	bool needsNPOT=wantsNPOT & !hasNPOT;
 	bool hasAutogen=caps.textureAutogenMipMaps;
 	bool wantsAutogen=(usage&Texture::Usage_BIT_AUTOGEN_MIPMAPS)>0;
 	bool needsAutogen=wantsAutogen & !hasAutogen;
-	bool needsConvert=(newFormat!=format);
+	bool needsConvert=(newPixelFormat!=format->pixelFormat);
 
 	bool result=false;
 	if(mipDatas==NULL){
-		result=texture->create(usage,dimension,newFormat,width,height,depth,mipLevels,NULL);
+		TextureFormat::ptr newFormat(new TextureFormat(format));
+		newFormat->pixelFormat=newPixelFormat;
+		result=texture->create(usage,newFormat,NULL);
 	}
 	else{
-		int totalMipLevels=Math::intLog2(Math::maxVal(width,Math::maxVal(height,depth)));
+		int totalMipLevels=Math::intLog2(Math::maxVal(format->width,Math::maxVal(format->height,format->depth)));
 		int specifiedMipLevels=0;
 		int allocatedMipLevels=0;
-		if(needsAutogen || mipLevels>0){
-			if(mipLevels>0){
-				specifiedMipLevels=mipLevels;
+		if(needsAutogen || format->mipLevels>0){
+			if(format->mipLevels>0){
+				specifiedMipLevels=format->mipLevels;
 			}
 			else{
 				specifiedMipLevels=totalMipLevels;
@@ -272,23 +273,23 @@ bool BackableTexture::convertCreate(Texture::ptr texture,RenderDevice *renderDev
 
 		int i;
 		if(!needsNPOT && !needsAutogen && !needsConvert){
-			result=texture->create(usage,dimension,format,width,height,depth,mipLevels,mipDatas);
+			result=texture->create(usage,format,mipDatas);
 		}
 		else{
 			tbyte **newMipDatas=new tbyte*[allocatedMipLevels];
-			int newWidth=Math::nextPowerOf2(width),newHeight=Math::nextPowerOf2(height),newDepth=Math::nextPowerOf2(depth);
+			int newWidth=Math::nextPowerOf2(format->width),newHeight=Math::nextPowerOf2(format->height),newDepth=Math::nextPowerOf2(format->depth);
 			int newMipWidth=newWidth,newMipHeight=newHeight,newMipDepth=newDepth;
-			int mipWidth=width,mipHeight=height,mipDepth=depth;
+			int mipWidth=format->width,mipHeight=format->height,mipDepth=format->depth;
 
 			for(i=0;i<allocatedMipLevels;++i){
-				int newPitch=ImageFormatConversion::getRowPitch(newFormat,newMipWidth);
+				int newPitch=ImageFormatConversion::getRowPitch(newPixelFormat,newMipWidth);
 				newMipDatas[i]=new tbyte[newPitch*newMipHeight*newMipDepth];
 
-				if((mipLevels==0 && i==0) || i<mipLevels){
-					convertAndScale(mipDatas[i],format,mipWidth,mipHeight,mipDepth,newMipDatas[i],newFormat,newMipWidth,newMipHeight,newMipDepth);
+				if((format->mipLevels==0 && i==0) || i<format->mipLevels){
+					convertAndScale(mipDatas[i],format->pixelFormat,mipWidth,mipHeight,mipDepth,newMipDatas[i],newPixelFormat,newMipWidth,newMipHeight,newMipDepth);
 				}
 				else{
-					convertAndScale(mipDatas[0],format,width,height,depth,newMipDatas[i],newFormat,newMipWidth,newMipHeight,newMipDepth);
+					convertAndScale(mipDatas[0],format->pixelFormat,format->width,format->height,format->depth,newMipDatas[i],newPixelFormat,newMipWidth,newMipHeight,newMipDepth);
 				}
 
 				mipWidth=mipWidth>1?mipWidth/2:1;mipHeight=mipHeight>1?mipHeight/2:1;mipDepth=mipDepth>1?mipDepth/2:1;
@@ -299,7 +300,8 @@ bool BackableTexture::convertCreate(Texture::ptr texture,RenderDevice *renderDev
 				usage&=~Usage_BIT_AUTOGEN_MIPMAPS;
 			}
 
-			result=texture->create(usage,dimension,newFormat,newWidth,newHeight,newDepth,specifiedMipLevels,newMipDatas);
+			TextureFormat::ptr newFormat(new TextureFormat(format->dimension,newPixelFormat,newWidth,newHeight,newDepth,specifiedMipLevels));
+			result=texture->create(usage,newFormat,newMipDatas);
 
 			for(i=0;i<specifiedMipLevels;++i){
 				delete[] newMipDatas[i];

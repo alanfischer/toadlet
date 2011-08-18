@@ -52,7 +52,7 @@ public:
 	int position(){return mPosition;}
 	bool seek(int offs){return false;}
 
-	AudioFormat::ptr getAudioFormat(){return mFormat;}
+	AudioFormat::ptr getAudioFormat() const{return mFormat;}
 
 private:
 	void skip(Stream::ptr stream,int amount);

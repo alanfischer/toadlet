@@ -112,9 +112,9 @@ Texture::ptr WADArchive::createTexture(toadlet::tadpole::TextureManager *texture
 		pal=(tbyte*)miptex + littleInt32(miptex->offsets[0]) + datasize + 2;
 	}
 
-	int format=Texture::Format_RGB_8;
+	int format=TextureFormat::Format_RGB_8;
 	if(miptex->name[0]=='{'){
-		format=Texture::Format_RGBA_8;
+		format=TextureFormat::Format_RGBA_8;
 	}
 
 	Image::ptr images[4];
@@ -130,7 +130,7 @@ Texture::ptr WADArchive::createTexture(toadlet::tadpole::TextureManager *texture
 		tbyte *data=images[mipLevel]->getData();
 
 		int j=0,k=0,j3=0,k3=0;
-		if(format==Texture::Format_RGB_8){
+		if(format==TextureFormat::Format_RGB_8){
 			for(j=0;j<hwidth*hheight;j++){
 				k=*(src+j);
 

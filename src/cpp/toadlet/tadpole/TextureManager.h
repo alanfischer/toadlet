@@ -26,6 +26,7 @@
 #ifndef TOADLET_TADPOLE_TEXTUREMANAGER_H
 #define TOADLET_TADPOLE_TEXTUREMANAGER_H
 
+#include <toadlet/egg/image/Image.h>
 #include <toadlet/peeper/RenderDevice.h>
 #include <toadlet/peeper/BackableTexture.h>
 #include <toadlet/peeper/PixelBufferRenderTarget.h>
@@ -43,10 +44,9 @@ public:
 
 	void destroy();
 
-	/// @todo: We need a TextureFormat class, which has a PixelFormat, plus usage, dimension, width, height, depth, pitch, and mipLevels
 	Texture::ptr createTexture(Image::ptr image);
 	Texture::ptr createTexture(int mipLevels,Image::ptr mipImages[]);
-	Texture::ptr createTexture(int usage,Texture::Dimension dimension,int format,int width,int height,int depth,int mipLevels,tbyte *mipDatas[]=NULL);
+	Texture::ptr createTexture(int usage,int dimension,int pixelFormat,int width,int height,int depth,int mipLevels,tbyte *mipDatas[]=NULL);
 	Texture::ptr findTexture(const String &name){return shared_static_cast<Texture>(ResourceManager::find(name));}
 
 	Image::ptr createImage(Texture *texture);

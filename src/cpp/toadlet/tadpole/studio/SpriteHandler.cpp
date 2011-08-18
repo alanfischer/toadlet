@@ -36,7 +36,7 @@ SpriteHandler::SpriteHandler(Engine *engine){
 
 SpriteHandler::~SpriteHandler(){}
 
-Resource::ptr SpriteHandler::load(Stream::ptr stream,const ResourceHandlerData *handlerData){
+Resource::ptr SpriteHandler::load(Stream::ptr stream,ResourceData *data,ProgressListener *listener){
 	if(stream==NULL){
 		Error::nullPointer(Categories::TOADLET_TADPOLE_STUDIO,
 			"null stream");
