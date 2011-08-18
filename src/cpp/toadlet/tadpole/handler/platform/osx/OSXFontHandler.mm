@@ -76,14 +76,14 @@ float fromEm(float e,float pointSize,float unitsPerEm){
 	return unitsPerEm!=0?(e/unitsPerEm):e;
 }
 
-Resource::ptr OSXFontHandler::load(Stream::ptr in,const ResourceHandlerData *handlerData){
+Resource::ptr OSXFontHandler::load(Stream::ptr in,ResourceData *resourceData,ProgressListener *listener){
 	if(!CGFontGetGlyphsForUnichars){
 		Error::nullPointer(Categories::TOADLET_TADPOLE,
 			"error finding CGFontGetGlyphsForUnichars");
 		return NULL;
 	}
 
-	FontData *fontData=(FontData*)handlerData;
+	FontData *fontData=(FontData*)resourceData;
 	if(fontData==NULL){
 		Error::nullPointer(Categories::TOADLET_TADPOLE,
 			"invalid FontData");

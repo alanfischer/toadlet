@@ -45,12 +45,12 @@ void PosixErrorHandler_exceptionHandler(NSException *exception){
 	PosixErrorHandler::instance->errorHandled();
 }
 
-void PosixErrorHandler_installNSHandler(){
+extern "C" void PosixErrorHandler_installNSHandler(){
 	mOldHandler=NSGetUncaughtExceptionHandler();
 	NSSetUncaughtExceptionHandler(PosixErrorHandler_exceptionHandler);
 }
 	
-void PosixErrorHandler_uninstallNSHandler(){
+extern "C" void PosixErrorHandler_uninstallNSHandler(){
 	NSSetUncaughtExceptionHandler(mOldHandler);
 	mOldHandler=NULL;
 }
