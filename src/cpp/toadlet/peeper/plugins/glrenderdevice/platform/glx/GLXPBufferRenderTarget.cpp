@@ -29,6 +29,7 @@
 #include "../../GLRenderDevice.h"
 #include <toadlet/egg/Logger.h>
 #include <toadlet/egg/Error.h>
+#include <toadlet/egg/image/ImageFormatConversion.h>
 
 namespace toadlet{
 namespace peeper{
@@ -109,7 +110,7 @@ bool GLXPBufferRenderTarget::attach(PixelBuffer::ptr buffer,Attachment attachmen
 	GLTextureMipPixelBuffer *gltextureBuffer=((GLPixelBuffer*)buffer->getRootPixelBuffer())->castToGLTextureMipPixelBuffer();
 	mTexture=gltextureBuffer->getTexture();
 
-	if((mTexture->getFormat()&Texture::Format_BIT_DEPTH)>0){
+	if((mTexture->getFormat()->pixelFormat&TextureFormat::Format_MASK_SEMANTICS)==TextureFormat::Format_SEMANTIC_DEPTH){
 		Error::invalidParameters(Categories::TOADLET_PEEPER,
 			"Format_BIT_DEPTH not available for pbuffers");
 		return false;
@@ -154,8 +155,8 @@ static int handleXError(Display *,XErrorEvent *){
 bool GLXPBufferRenderTarget::createBuffer(){
 	destroyBuffer();
 
-	int width=mTexture->getWidth();
-	int height=mTexture->getHeight();
+	int width=mTexture->getFormat()->width;
+	int height=mTexture->getFormat()->height;
 
 	GLXRenderTarget *renderTarget=(GLXRenderTarget*)(mDevice->getPrimaryRenderTarget()->getRootRenderTarget());
 
@@ -170,10 +171,10 @@ bool GLXPBufferRenderTarget::createBuffer(){
 	int (*oldHandler)(Display*,XErrorEvent*);
 	oldHandler=XSetErrorHandler(handleXError);
 
-	int format=mTexture->getFormat();
-	int redBits=ImageFormatConversion::getRedBits(format);
-	int greenBits=ImageFormatConversion::getGreenBits(format);
-	int blueBits=ImageFormatConversion::getBlueBits(format);
+	int pixelFormat=mTexture->getFormat()->pixelFormat;
+	int redBits=ImageFormatConversion::getRedBits(pixelFormat);
+	int greenBits=ImageFormatConversion::getGreenBits(pixelFormat);
+	int blueBits=ImageFormatConversion::getBlueBits(pixelFormat);
 	int depthBits=16;
 
 	int fbAttribs[]={

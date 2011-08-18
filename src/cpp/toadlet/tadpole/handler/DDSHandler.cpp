@@ -186,7 +186,7 @@ Resource::ptr DDSHandler::load(Stream::ptr stream,ResourceData *data,ProgressLis
 	if(!(hdr.dwHeaderFlags & DDSD_PIXELFORMAT) || !(hdr.dwHeaderFlags & DDSD_CAPS)){\
 		Error::unknown(Categories::TOADLET_EGG,
 			"invalid format or caps");
-		return false;
+		return NULL;
 	}
 
 	int width=hdr.dwWidth;
@@ -231,7 +231,7 @@ Resource::ptr DDSHandler::load(Stream::ptr stream,ResourceData *data,ProgressLis
 			if(i==0 && (hdr.dwHeaderFlags & DDSD_LINEARSIZE)!=0 && size!=(int)hdr.dwPitchOrLinearSize){
 				Error::unknown(Categories::TOADLET_EGG,
 					"incorrect size");
-				return false;
+				return NULL;
 			}
 
 			TOADLET_ASSERT(image->getSlicePitch()==size);

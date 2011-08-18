@@ -57,8 +57,8 @@ FreeTypeHandler::~FreeTypeHandler(){
 	}
 }
 
-Resource::ptr FreeTypeHandler::load(Stream::ptr stream,ResourceData *data,ProgressListener *listener){
-	FontData *fontData=(FontData*)data;
+Resource::ptr FreeTypeHandler::load(Stream::ptr stream,ResourceData *resourceData,ProgressListener *listener){
+	FontData *fontData=(FontData*)resourceData;
 	if(fontData==NULL){
 		Error::nullPointer(Categories::TOADLET_TADPOLE,
 			"invalid FontData");
