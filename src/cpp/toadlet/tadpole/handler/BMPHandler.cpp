@@ -23,19 +23,19 @@
  *
  ********** Copyright header - do not remove **********/
 
-#include <toadlet/egg/image/BMPHandler.h>
-#include <toadlet/egg/io/DataStream.h>
+#include <toadlet/egg/EndianConversion.h>
 #include <toadlet/egg/Error.h>
 #include <toadlet/egg/Logger.h>
-#include <toadlet/egg/EndianConversion.h>
+#include <toadlet/egg/io/DataStream.h>
+#include <toadlet/tadpole/handler/BMPHandler.h>
 
 #if !defined(BI_RGB)
 	#define BI_RGB 0L
 #endif
 
 namespace toadlet{
-namespace egg{
-namespace image{
+namespace tadpole{
+namespace handler{
 
 typedef struct{
 	uint32	biSize;
@@ -63,13 +63,7 @@ typedef struct{
 
 const static int SIZEOF_BITMAPFILEHEADER=14;
 
-BMPHandler::BMPHandler(){
-}
-
-BMPHandler::~BMPHandler(){
-}
-
-Image *BMPHandler::loadImage(Stream *stream){
+Resource::ptr BMPHandler::load(Stream::ptr stream,ResourceData *data,ProgressListener *listener){
 	int i,j;
 	BITMAPINFOHEADER bmih={0};
 	BITMAPFILEHEADER bmfh={0};
@@ -134,7 +128,7 @@ Image *BMPHandler::loadImage(Stream *stream){
 		return NULL;
 	}
 
-	Image *image=Image::createAndReallocate(Image::Dimension_D2,format,width,height);
+	Image::ptr image(Image::createAndReallocate(Image::Dimension_D2,format,width,height));
 	if(image==NULL){
 		return NULL;
 	}
@@ -206,10 +200,15 @@ Image *BMPHandler::loadImage(Stream *stream){
 		}
 	}
 
-	return image;
+	if(image!=NULL){
+		return mTextureManager->createTexture(image);
+	}
+	else{
+		return NULL;
+	}
 } 
 
-bool BMPHandler::saveImage(Image *image,Stream *stream){
+bool BMPHandler::save(Stream::ptr stream,Resource::ptr resource,ResourceData *data,ProgressListener *listener){
 	int rowSize;
 	int i,j;
 	int ihSize;
@@ -217,6 +216,9 @@ bool BMPHandler::saveImage(Image *image,Stream *stream){
 
 	BITMAPINFOHEADER bmih={0};
 	BITMAPFILEHEADER bmfh={0};
+
+	Texture::ptr texture=shared_static_cast<Texture>(resource);
+	Image::ptr image=mTextureManager->createImage(texture);
 
 	if(image->getDimension()!=Image::Dimension_D2){
 		Error::loadingImage(Categories::TOADLET_EGG,

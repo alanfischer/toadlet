@@ -23,14 +23,14 @@
  *
  ********** Copyright header - do not remove **********/
 
-#include <toadlet/egg/image/TGAHandler.h>
-#include <toadlet/egg/io/DataStream.h>
 #include <toadlet/egg/Error.h>
 #include <toadlet/egg/Logger.h>
+#include <toadlet/egg/io/DataStream.h>
+#include <toadlet/tadpole/handler/TGAHandler.h>
 
 namespace toadlet{
-namespace egg{
-namespace image{
+namespace tadpole{
+namespace handler{
 
 enum ColorMap{
 	ColorMap_NO=0,
@@ -47,13 +47,7 @@ enum Encoding{
 	Encoding_RLE_BW=11,
 };
 
-TGAHandler::TGAHandler(){
-}
-
-TGAHandler::~TGAHandler(){
-}
-
-Image *TGAHandler::loadImage(Stream *stream){
+Resource::ptr TGAHandler::load(Stream::ptr stream,ResourceData *data,ProgressListener *listener){
 	if(stream==NULL){
 		Error::nullPointer(Categories::TOADLET_EGG,
 			"Stream is NULL");
@@ -113,7 +107,7 @@ Image *TGAHandler::loadImage(Stream *stream){
 		return NULL;
 	}
 
-	Image *image=Image::createAndReallocate(Image::Dimension_D2,format,width,height);
+	Image::ptr image(Image::createAndReallocate(Image::Dimension_D2,format,width,height));
 	if(image==NULL){
 		return NULL;
 	}
@@ -166,13 +160,12 @@ Image *TGAHandler::loadImage(Stream *stream){
 		}break;
 	}
 
-	return image;
-}
-
-bool TGAHandler::saveImage(Image *image,Stream *stream){
-	Error::unimplemented(Categories::TOADLET_EGG,
-		"TGAHandler::saveImage: Not implemented");
-	return false;
+	if(image!=NULL){
+		return mTextureManager->createTexture(image);
+	}
+	else{
+		return NULL;
+	}
 }
 
 }

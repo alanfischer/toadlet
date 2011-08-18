@@ -47,6 +47,8 @@ set (TADPOLE_BSP_SRC
 
 set (TADPOLE_HANDLER_SRC
 	handler/BMPHandler.cpp
+	handler/DDSHandler.cpp
+	handler/TGAHandler.cpp
 	handler/TMSHHandler.cpp
 	handler/WADArchive.cpp
 )
