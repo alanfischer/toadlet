@@ -46,7 +46,7 @@ public:
 	Resource::ptr manage(const Resource::ptr &resource,const String &name=(char*)NULL);
 	void unmanage(Resource *resource);
 
-	Resource::ptr find(const String &name,ResourceHandlerData::ptr handlerData=ResourceHandlerData::ptr());
+	Resource::ptr find(const String &name,ResourceData::ptr data=ResourceData::ptr());
 
 protected:
 	String mDefaultCharacterSet;

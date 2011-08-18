@@ -27,7 +27,7 @@
 #define TOADLET_TADPOLE_HANDLER_XMATHANDLER_H
 
 #include <toadlet/tadpole/Engine.h>
-#include <toadlet/tadpole/ResourceHandler.h>
+#include <toadlet/tadpole/ResourceStreamer.h>
 #include <toadlet/tadpole/material/Material.h>
 
 typedef struct mxml_node_s mxml_node_t;
@@ -36,14 +36,14 @@ namespace toadlet{
 namespace tadpole{
 namespace handler{
 
-class TOADLET_API XMATHandler:public ResourceHandler{
+class TOADLET_API XMATHandler:public ResourceStreamer{
 public:
 	TOADLET_SHARED_POINTERS(XMATHandler);
 
 	XMATHandler(Engine *engine);
 
-	Resource::ptr load(Stream::ptr stream,const ResourceHandlerData *handlerData);
-	bool save(Material::ptr resource,Stream::ptr stream,ProgressListener *listener=NULL);
+	Resource::ptr load(Stream::ptr stream,ResourceData *data,ProgressListener *listener);
+	bool save(Stream::ptr stream,Resource::ptr resource,ResourceData *data,ProgressListener *listener);
 
 protected:
 	Material::ptr loadMaterial(mxml_node_t *root,int version);

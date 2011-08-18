@@ -88,16 +88,17 @@ Texture::ptr TextureManager::createTexture(int mipLevels,Image::ptr mipImages[])
 	return texture;
 }
 
-Texture::ptr TextureManager::createTexture(int usage,Texture::Dimension dimension,int format,int width,int height,int depth,int mipLevels,tbyte *mipDatas[]){
+Texture::ptr TextureManager::createTexture(int usage,int dimension,int format,int width,int height,int depth,int mipLevels,tbyte *mipDatas[]){
 	Logger::debug(Categories::TOADLET_TADPOLE,"TextureManager::createTexture");
 
+	TextureFormat::ptr textureFormat(new TextureFormat(dimension,format,width,height,depth,mipLevels));
 	RenderDevice *renderDevice=mEngine->getRenderDevice();
 	Texture::ptr texture;
 	if(mBackable || renderDevice==NULL){
 		Logger::debug(Categories::TOADLET_TADPOLE,"creating BackableTexture");
 
 		BackableTexture::ptr backableTexture(new BackableTexture());
-		backableTexture->create(usage,dimension,format,width,height,depth,mipLevels,mipDatas);
+		backableTexture->create(usage,textureFormat,mipDatas);
 		if(renderDevice!=NULL){
 			backableTexture->setBack(Texture::ptr(renderDevice->createTexture()),renderDevice);
 		}
@@ -107,7 +108,7 @@ Texture::ptr TextureManager::createTexture(int usage,Texture::Dimension dimensio
 		Logger::debug(Categories::TOADLET_TADPOLE,"creating Texture");
 
 		texture=Texture::ptr(renderDevice->createTexture());
-		if(BackableTexture::convertCreate(texture,renderDevice,usage,dimension,format,width,height,depth,mipLevels,mipDatas)==false){
+		if(BackableTexture::convertCreate(texture,renderDevice,usage,textureFormat,mipDatas)==false){
 			return NULL;
 		}
 	}
@@ -118,7 +119,7 @@ Texture::ptr TextureManager::createTexture(int usage,Texture::Dimension dimensio
 }
 
 Image::ptr TextureManager::createImage(Texture *texture){
-	Image::ptr image(Image::createAndReallocate(texture->getDimension(),texture->getFormat(),texture->getWidth(),texture->getHeight(),texture->getDepth()));
+	Image::ptr image(Image::createAndReallocate(texture->getFormat()->dimension,texture->getFormat()->pixelFormat,texture->getFormat()->width,texture->getFormat()->height,texture->getFormat()->depth));
 	if(image==NULL){
 		return NULL;
 	}
@@ -156,15 +157,15 @@ PixelBufferRenderTarget::ptr TextureManager::createPixelBufferRenderTarget(){
 
 bool TextureManager::textureLoad(Texture::ptr texture,int pixelFormat,int width,int height,int depth,int mipLevel,tbyte *mipData){
 	bool result=false;
-	int textureFormat=texture->getFormat();
-	if(pixelFormat==textureFormat){
+	int texturePixelFormat=texture->getFormat()->pixelFormat;
+	if(pixelFormat==texturePixelFormat){
 		result=texture->load(width,height,depth,mipLevel,mipData);
 	}
 	else{
 		int srcPitch=ImageFormatConversion::getRowPitch(pixelFormat,width);
-		int dstPitch=ImageFormatConversion::getRowPitch(textureFormat,width);
+		int dstPitch=ImageFormatConversion::getRowPitch(texturePixelFormat,width);
 		tbyte *newData=new tbyte[dstPitch*height*depth];
-		ImageFormatConversion::convert(mipData,pixelFormat,srcPitch,srcPitch*height,newData,textureFormat,dstPitch,dstPitch*height,width,height,depth);
+		ImageFormatConversion::convert(mipData,pixelFormat,srcPitch,srcPitch*height,newData,texturePixelFormat,dstPitch,dstPitch*height,width,height,depth);
 		result=texture->load(width,height,depth,mipLevel,newData);
 		delete[] newData;
 	}
@@ -345,7 +346,7 @@ Texture::ptr TextureManager::createNormalization(int size){
 		}
 	}
 
-	return createTexture(Texture::Usage_BIT_STATIC,Texture::Dimension_D2,image->getFormat(),image->getWidth(),image->getHeight(),image->getDepth(),1,&data);
+	return createTexture(Texture::Usage_BIT_STATIC,TextureFormat::Dimension_D2,image->getFormat(),image->getWidth(),image->getHeight(),image->getDepth(),1,&data);
 }
 
 }

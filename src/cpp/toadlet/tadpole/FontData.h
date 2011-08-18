@@ -28,12 +28,12 @@
 
 #include <toadlet/tadpole/Types.h>
 #include <toadlet/egg/String.h>
-#include <toadlet/tadpole/ResourceHandlerData.h>
+#include <toadlet/tadpole/ResourceData.h>
 
 namespace toadlet{
 namespace tadpole{
 
-class TOADLET_API FontData:public ResourceHandlerData{
+class TOADLET_API FontData:public ResourceData{
 public:
 	TOADLET_SHARED_POINTERS(FontData);
 

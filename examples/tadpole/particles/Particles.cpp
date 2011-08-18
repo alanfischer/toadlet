@@ -7,7 +7,7 @@ Particles::~Particles(){
 }
 
 void Particles::create(){
-	Application::create("d3d10");
+	Application::create("d3d9");
 
 	mEngine->setDirectory("../../../data");
 
@@ -147,9 +147,9 @@ void Particles::addSimulatedParticles(ParticleNode::ptr particles){
 	int i;
 	for(i=0;i<particles->getNumParticles();++i){
 		ParticleNode::Particle *p=particles->getParticle(i);
-		p->vx=random.nextScalar(-v,v);
-		p->vy=random.nextScalar(-v,v);
-		p->vz=random.nextScalar(-v,v);
+		p->vx+=random.nextScalar(-v,v);
+		p->vy+=random.nextScalar(-v,v);
+		p->vz+=random.nextScalar(-v,v);
 	}
 
 	simulatedParticles.add(particles);

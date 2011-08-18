@@ -102,7 +102,7 @@ BaseApplication::BaseApplication():
 	mapKeyNames(mKeyToName,mNameToKey);
 	
 	mFormat=WindowRenderTargetFormat::ptr(new WindowRenderTargetFormat());
-	mFormat->pixelFormat=Texture::Format_RGBA_8;
+	mFormat->pixelFormat=TextureFormat::Format_RGBA_8;
 	mFormat->depthBits=16;
 	mFormat->multisamples=2;
 	mFormat->threads=2;

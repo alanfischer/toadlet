@@ -23,19 +23,17 @@
  *
  ********** Copyright header - do not remove **********/
 
-#ifndef TOADLET_TADPOLE_RESOURCEHANDLERDATA_H
-#define TOADLET_TADPOLE_RESOURCEHANDLERDATA_H
+#ifndef TOADLET_TADPOLE_PROGRESSLISTENER_H
+#define TOADLET_TADPOLE_PROGRESSLISTENER_H
 
-#include <toadlet/egg/Resource.h>
+#include <toadlet/tadpole/Types.h>
 
 namespace toadlet{
 namespace tadpole{
 
-class ResourceHandlerData{
+class ProgressListener{
 public:
-	TOADLET_SHARED_POINTERS(ResourceHandlerData);
-
-	virtual ~ResourceHandlerData(){}
+	virtual void progressUpdated(scalar amount)=0;
 };
 
 }

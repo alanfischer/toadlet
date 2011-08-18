@@ -29,7 +29,7 @@
 #include <toadlet/egg/io/DataStream.h>
 #include <toadlet/peeper/IndexData.h>
 #include <toadlet/peeper/VertexData.h>
-#include <toadlet/tadpole/ResourceHandler.h>
+#include <toadlet/tadpole/ResourceStreamer.h>
 #include <toadlet/tadpole/ResourceManager.h>
 #include <toadlet/tadpole/Engine.h>
 #include <toadlet/tadpole/Mesh.h>
@@ -38,7 +38,7 @@ namespace toadlet{
 namespace tadpole{
 namespace handler{
 
-class TOADLET_API TMSHHandler:public ResourceHandler{
+class TOADLET_API TMSHHandler:public ResourceStreamer{
 public:
 	TOADLET_SHARED_POINTERS(TMSHHandler);
 
@@ -47,8 +47,8 @@ public:
 
 	TMSHHandler(Engine *engine);
 
-	Resource::ptr load(Stream::ptr stream,const ResourceHandlerData *handlerData);
-	bool save(Mesh::ptr mesh,Stream::ptr stream);
+	Resource::ptr load(Stream::ptr stream,ResourceData *data,ProgressListener *listener);
+	bool save(Stream::ptr stream,Resource::ptr resource,ResourceData *data,ProgressListener *listener);
 
 protected:
 	Mesh::ptr readMesh(DataStream *stream,int blockSize);

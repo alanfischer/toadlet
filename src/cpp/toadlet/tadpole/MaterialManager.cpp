@@ -130,26 +130,56 @@ Material::ptr MaterialManager::createDiffuseMaterial(Texture::ptr texture){
 }
 
 Material::ptr MaterialManager::createDiffusePointSpriteMaterial(Texture::ptr texture,scalar size,bool attenuated){
-	Material::ptr material=createDiffuseMaterial(texture);
+	Material::ptr material(new Material(this));
 
-	RenderPath::ptr shaderPath=material->getPath(0);
+	RenderPath::ptr shaderPath=material->addPath();
 	{
-		RenderPass::ptr pass=shaderPath->getPass(0);
+		RenderPass::ptr pass=shaderPath->addPass();
 
-		pass->setShader(Shader::ShaderType_GEOMETRY,mPointSpriteGeometryShader);
-		pass->getVariables()->addVariable("pointSize",RenderVariable::ptr(new PointSizeVariable()),Material::Scope_MATERIAL);
-		pass->getVariables()->addVariable("viewport",RenderVariable::ptr(new ViewportVariable()),Material::Scope_MATERIAL);
-
+		pass->setBlendState(BlendState());
+		pass->setDepthState(DepthState());
+		pass->setRasterizerState(RasterizerState());
+		pass->setMaterialState(MaterialState(true,false,MaterialState::ShadeType_GOURAUD));
 		/// @todo: We need to sort out how to handle the case in GL where you can have Geometry Shaders and PointSprites both functional.
 		/// Though I suppose that would be in the GLRenderDevice, it would deactivate PointSprites if Geometry Shaders are used.
 		pass->setPointState(PointState(true,size,attenuated));
+
+		pass->setShader(Shader::ShaderType_VERTEX,mDiffuseVertexShader);
+		pass->setShader(Shader::ShaderType_GEOMETRY,mPointSpriteGeometryShader);
+		pass->setShader(Shader::ShaderType_FRAGMENT,mPointSpriteFragmentShader);
+		pass->getVariables()->addVariable("modelViewProjectionMatrix",RenderVariable::ptr(new MVPMatrixVariable()),Material::Scope_RENDERABLE);
+		pass->getVariables()->addVariable("normalMatrix",RenderVariable::ptr(new NormalMatrixVariable()),Material::Scope_RENDERABLE);
+		pass->getVariables()->addVariable("lightViewPosition",RenderVariable::ptr(new LightViewPositionVariable()),Material::Scope_MATERIAL);
+		pass->getVariables()->addVariable("lightColor",RenderVariable::ptr(new LightDiffuseVariable()),Material::Scope_MATERIAL);
+		pass->getVariables()->addVariable("ambientColor",RenderVariable::ptr(new AmbientVariable()),Material::Scope_RENDERABLE);
+		pass->getVariables()->addVariable("materialLighting",RenderVariable::ptr(new MaterialLightingVariable()),Material::Scope_MATERIAL);
+		pass->getVariables()->addVariable("materialDiffuseColor",RenderVariable::ptr(new MaterialDiffuseVariable()),Material::Scope_MATERIAL);
+		pass->getVariables()->addVariable("materialAmbientColor",RenderVariable::ptr(new MaterialAmbientVariable()),Material::Scope_MATERIAL);
+		pass->getVariables()->addVariable("materialTrackColor",RenderVariable::ptr(new MaterialTrackColorVariable()),Material::Scope_MATERIAL);
+		pass->getVariables()->addVariable("fogDensity",RenderVariable::ptr(new FogDensityVariable()),Material::Scope_MATERIAL);
+		pass->getVariables()->addVariable("fogDistance",RenderVariable::ptr(new FogDistanceVariable()),Material::Scope_MATERIAL);
+		pass->getVariables()->addVariable("fogColor",RenderVariable::ptr(new FogColorVariable()),Material::Scope_MATERIAL);
+		pass->getVariables()->addVariable("textureMatrix",RenderVariable::ptr(new TextureMatrixVariable(0)),Material::Scope_MATERIAL);
+		pass->getVariables()->addVariable("textureSet",RenderVariable::ptr(new TextureSetVariable(0)),Material::Scope_MATERIAL);
+		pass->getVariables()->addVariable("pointSize",RenderVariable::ptr(new PointSizeVariable()),Material::Scope_MATERIAL);
+		pass->getVariables()->addVariable("viewport",RenderVariable::ptr(new ViewportVariable()),Material::Scope_MATERIAL);
+
+		pass->setSamplerState(0,mDefaultSamplerState);
+		pass->setTexture(0,texture);
 	}
 
-	RenderPath::ptr fixedPath=material->getPath(1);
+	RenderPath::ptr fixedPath=material->addPath();
 	{
-		RenderPass::ptr pass=fixedPath->getPass(0);
+		RenderPass::ptr pass=fixedPath->addPass();
 
+		pass->setBlendState(BlendState());
+		pass->setDepthState(DepthState());
+		pass->setRasterizerState(RasterizerState());
+		pass->setMaterialState(MaterialState(true,false,MaterialState::ShadeType_GOURAUD));
 		pass->setPointState(PointState(true,size,attenuated));
+
+		pass->setSamplerState(0,mDefaultSamplerState);
+		pass->setTexture(0,texture);
 	}
 
 	manage(material);
@@ -414,7 +444,7 @@ void MaterialManager::contextActivate(RenderDevice *renderDevice){
 		"uniform sampler2D tex;\n"
 
 		"void main(){\n"
-			"vec4 fragColor=color*(texture2D(tex,texCoord)+(1.0-textureSet));\n"
+		"vec4 fragColor=color*(texture2D(tex,texCoord)+(1.0-textureSet));\n"
 			"gl_FragColor=mix(fogColor,fragColor,fog);\n"
 		"}",
 
@@ -554,11 +584,46 @@ void MaterialManager::contextActivate(RenderDevice *renderDevice){
 		"}"
 	};
 
+	String pointSpriteFragmentCode[]={
+		"#version 120\n"
+		"varying vec4 color;\n"
+		"varying float fog;\n"
+
+		"uniform float textureSet;\n"
+		"uniform vec4 fogColor;\n"
+		"uniform sampler2D tex;\n"
+
+		"void main(){\n"
+		"vec4 fragColor=color*(texture2D(tex,gl_PointCoord)+(1.0-textureSet));\n"
+			"gl_FragColor=mix(fogColor,fragColor,fog);\n"
+		"}",
+
+
+
+		"struct PIN{\n"
+			"float4 position: SV_POSITION;\n"
+			"float4 color: COLOR;\n"
+			"float fog: FOG;\n"
+			"float2 texCoord: TEXCOORD0;\n"
+		"};\n"
+
+		"float textureSet;\n"
+		"float4 fogColor;\n"
+		"Texture2D tex;\n"
+		"SamplerState samp;\n"
+
+		"float4 main(PIN pin): SV_TARGET{\n"
+			"float4 fragColor=pin.color*(tex.Sample(samp,pin.texCoord)+(1.0-textureSet));\n"
+			"return lerp(fogColor,fragColor,pin.fog);\n"
+		"}"
+	};
+
 	mDiffuseVertexShader=getEngine()->getShaderManager()->createShader(Shader::ShaderType_VERTEX,profiles,diffuseVertexCode,2);
 	mDiffuseFragmentShader=getEngine()->getShaderManager()->createShader(Shader::ShaderType_FRAGMENT,profiles,diffuseFragmentCode,2);
 	mSkyboxVertexShader=getEngine()->getShaderManager()->createShader(Shader::ShaderType_VERTEX,profiles,skyboxVertexCode,2);
 	mSkyboxFragmentShader=getEngine()->getShaderManager()->createShader(Shader::ShaderType_FRAGMENT,profiles,skyboxFragmentCode,2);
 	mPointSpriteGeometryShader=getEngine()->getShaderManager()->createShader(Shader::ShaderType_GEOMETRY,profiles,pointSpriteGeometryCode,2);
+	mPointSpriteFragmentShader=getEngine()->getShaderManager()->createShader(Shader::ShaderType_FRAGMENT,profiles,pointSpriteFragmentCode,2);
 
 	int i;
 	for(i=0;i<mRenderStates.size();++i){
@@ -591,6 +656,10 @@ void MaterialManager::contextDeactivate(RenderDevice *renderDevice){
 		mPointSpriteGeometryShader->release();
 		mPointSpriteGeometryShader=NULL;
 	}
+	if(mPointSpriteFragmentShader!=NULL){
+		mPointSpriteFragmentShader->release();
+		mPointSpriteFragmentShader=NULL;
+	}
 
 	int i;
 	for(i=0;i<mRenderStates.size();++i){
@@ -609,13 +678,13 @@ void MaterialManager::shaderStateDestroyed(ShaderState *shaderState){
 	mShaderStates.remove(shaderState);
 }
 
-Resource::ptr MaterialManager::unableToFindHandler(const String &name,const ResourceHandlerData *handlerData){
+Resource::ptr MaterialManager::unableToFindStreamer(const String &name,ResourceData *data){
 	Texture::ptr texture=mEngine->getTextureManager()->findTexture(name);
 	if(texture!=NULL){
 		return createDiffuseMaterial(texture);
 	}
 	else{
-		return ResourceManager::unableToFindHandler(name,handlerData);
+		return ResourceManager::unableToFindStreamer(name,data);
 	}
 }
 

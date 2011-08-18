@@ -40,7 +40,7 @@ BackableBuffer::BackableBuffer():
 	mDataSize(0),
 	mIndexFormat((IndexFormat)0),
 	//mVertexFormat,
-	mPixelFormat(0),
+	//mTextureFormat,
 	mSize(0),
 
 	mHasData(false),
@@ -82,12 +82,11 @@ bool BackableBuffer::create(int usage,int access,VertexFormat::ptr vertexFormat,
 	return true;
 }
 
-bool BackableBuffer::create(int usage,int access,int pixelFormat,int width,int height,int depth){
+bool BackableBuffer::create(int usage,int access,TextureFormat::ptr textureFormat){
 	mUsage=usage;
 	mAccess=access;
-	mPixelFormat=pixelFormat;
-	mWidth=width;mHeight=height;mDepth=depth;
-	mDataSize=ImageFormatConversion::getRowPitch(mPixelFormat,mWidth)*mHeight*mDepth;
+	mTextureFormat=textureFormat;
+	mDataSize=ImageFormatConversion::getRowPitch(textureFormat->pixelFormat,textureFormat->width)*textureFormat->height*textureFormat->depth;
 
 	mHasData=false;
 	if(mData==NULL){
@@ -119,7 +118,7 @@ void BackableBuffer::destroy(){
 		else if(mVertexFormat!=NULL){
 			((VertexBuffer*)(mBack.get()))->destroy();
 		}
-		else if(mPixelFormat!=0){
+		else if(mTextureFormat!=NULL){
 			((PixelBuffer*)(mBack.get()))->destroy();
 		}
 		else if(mVariableFormat!=NULL){
@@ -140,7 +139,7 @@ void BackableBuffer::destroy(){
 		else if(mVertexFormat!=NULL){
 			mListener->bufferDestroyed((VertexBuffer*)this);
 		}
-		else if(mPixelFormat!=0){
+		else if(mTextureFormat!=NULL){
 			mListener->bufferDestroyed((PixelBuffer*)this);
 		}
 		else if(mVariableFormat!=NULL){
@@ -158,10 +157,10 @@ void BackableBuffer::resetCreate(){
 		else if(mVertexFormat!=NULL){
 			((VertexBuffer*)(mBack.get()))->resetCreate();
 		}
-		else if(mPixelFormat!=0){
+		else if(mTextureFormat!=NULL){
 			((PixelBuffer*)(mBack.get()))->resetCreate();
 		}
-		else if(mVariableFormat!=0){
+		else if(mVariableFormat!=NULL){
 			((VariableBuffer*)(mBack.get()))->resetCreate();
 		}
 	}
@@ -175,7 +174,7 @@ void BackableBuffer::resetDestroy(){
 		else if(mVertexFormat!=NULL){
 			((VertexBuffer*)(mBack.get()))->resetDestroy();
 		}
-		else if(mPixelFormat!=0){
+		else if(mTextureFormat!=NULL){
 			((PixelBuffer*)(mBack.get()))->resetCreate();
 		}
 		else if(mVariableFormat!=NULL){
@@ -252,9 +251,11 @@ void BackableBuffer::setBack(PixelBuffer::ptr back,RenderDevice *renderDevice){
 	mBack=back;
 	
 	if(back!=NULL){
-		int newPixelFormat=renderDevice->getCloseTextureFormat(mPixelFormat,mUsage);
+		int newPixelFormat=renderDevice->getClosePixelFormat(mTextureFormat->pixelFormat,mUsage);
 
-		back->create(mUsage,mAccess,newPixelFormat,mWidth,mHeight,mDepth);
+		TextureFormat::ptr format(new TextureFormat(mTextureFormat));
+		format->pixelFormat=newPixelFormat;
+		back->create(mUsage,mAccess,format);
 
 		if(mHasData){
 			writeBack();
@@ -333,10 +334,10 @@ void BackableBuffer::writeBack(){
 	TOADLET_TRY
 		tbyte *data=mBack->lock(Access_BIT_WRITE);
 		if(data!=NULL){
-			if(mPixelFormat!=0 && mPixelFormat!=((PixelBuffer*)(mBack.get()))->getPixelFormat()){
-				int backFormat=((PixelBuffer*)(mBack.get()))->getPixelFormat();
-				int srcPitch=ImageFormatConversion::getRowPitch(mPixelFormat,mWidth),dstPitch=ImageFormatConversion::getRowPitch(backFormat,mWidth);
-				ImageFormatConversion::convert(mData,mPixelFormat,srcPitch,srcPitch*mHeight,data,backFormat,dstPitch,dstPitch*mHeight,mWidth,mHeight,mDepth);
+			if(mTextureFormat!=NULL && mTextureFormat->equals(((PixelBuffer*)(mBack.get()))->getTextureFormat())==false){
+				TextureFormat::ptr backFormat=((PixelBuffer*)(mBack.get()))->getTextureFormat();
+				int srcPitch=ImageFormatConversion::getRowPitch(mTextureFormat->pixelFormat,mTextureFormat->width),dstPitch=ImageFormatConversion::getRowPitch(backFormat->pixelFormat,mTextureFormat->width);
+				ImageFormatConversion::convert(mData,mTextureFormat->pixelFormat,srcPitch,srcPitch*mTextureFormat->height,data,backFormat->pixelFormat,dstPitch,dstPitch*mTextureFormat->height,mTextureFormat->width,mTextureFormat->height,mTextureFormat->depth);
 			}
 			else{
 				memcpy(data,mData,mDataSize);

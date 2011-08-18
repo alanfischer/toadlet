@@ -46,20 +46,14 @@ public:
 
 	Texture *getRootTexture(){return this;}
 
-	bool create(int usageFlags,Dimension dimension,int format,int width,int height,int depth,int mipLevels,byte *mipDatas[]);
+	bool create(int usageFlags,TextureFormat::ptr format,byte *mipDatas[]);
 	void destroy();
 
 	void resetCreate(){}
 	void resetDestroy(){}
 
 	int getUsage() const{return mUsage;}
-	Dimension getDimension() const{return mDimension;}
-	int getFormat() const{return mFormat;}
-	int getWidth() const{return mWidth;}
-	int getHeight() const{return mHeight;}
-	int getDepth() const{return mDepth;}
-	int getNumMipLevels() const{return mMipLevels;}
-	scalar getLength() const{return 0;}
+	TextureFormat::ptr getFormat() const{return mFormat;}
 
 	PixelBuffer::ptr getMipPixelBuffer(int level,int cubeSide);
 	bool load(int width,int height,int depth,int mipLevel,byte *mipData);
@@ -70,19 +64,14 @@ public:
 	bool generateMipLevels();
 
 protected:
-	bool createContext(int mipLevels,byte *mipDatas[]);
+	bool createContext(int numMipDatas,byte *mipDatas[]);
 	bool destroyContext();
 
 	D3D10RenderDevice *mDevice;
 	ID3D10Device *mD3DDevice;
 
 	int mUsage;
-	Dimension mDimension;
-	int mFormat;
-	int mWidth;
-	int mHeight;
-	int mDepth;
-	int mMipLevels;
+	TextureFormat::ptr mFormat;
 
 	ID3D10Resource *mTexture;
 	ID3D10ShaderResourceView *mShaderResourceView;

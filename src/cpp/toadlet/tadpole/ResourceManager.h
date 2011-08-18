@@ -32,7 +32,7 @@
 #include <toadlet/egg/ResourceFullyReleasedListener.h>
 #include <toadlet/egg/io/Archive.h>
 #include <toadlet/egg/io/Stream.h>
-#include <toadlet/tadpole/ResourceHandler.h>
+#include <toadlet/tadpole/ResourceStreamer.h>
 
 namespace toadlet{
 namespace tadpole{
@@ -52,15 +52,15 @@ public:
 
 	virtual Resource::ptr get(int handle);
 	virtual Resource::ptr get(const String &name);
-	virtual Resource::ptr find(const String &name,ResourceHandlerData::ptr handlerData=ResourceHandlerData::ptr());
+	virtual Resource::ptr find(const String &name,ResourceData::ptr data=ResourceData::ptr());
 	virtual Resource::ptr manage(const Resource::ptr &resource,const String &name=(char*)NULL);
 	virtual void unmanage(Resource *resource);
 
-	virtual void setHandler(ResourceHandler::ptr handler,const String &extension);
-	virtual ResourceHandler::ptr getHandler(const String &extension);
+	virtual void setStreamer(ResourceStreamer::ptr streamer,const String &extension);
+	virtual ResourceStreamer::ptr getStreamer(const String &extension);
 
-	virtual void setDefaultHandler(ResourceHandler::ptr handler);
-	virtual ResourceHandler::ptr getDefaultHandler(){return mDefaultHandler;}
+	virtual void setDefaultStreamer(ResourceStreamer::ptr streamer);
+	virtual ResourceStreamer::ptr getDefaultStreamer(){return mDefaultStreamer;}
 
 	virtual void setDefaultExtension(const String &extension){mDefaultExtension=extension;}
 	virtual const String &getDefaultExtension(){return mDefaultExtension;}
@@ -71,10 +71,10 @@ public:
 
 protected:
 	typedef Map<String,Resource::ptr> NameResourceMap;
-	typedef Map<String,ResourceHandler::ptr> ExtensionHandlerMap;
+	typedef Map<String,ResourceStreamer::ptr> ExtensionStreamerMap;
 
-	virtual Resource::ptr unableToFindHandler(const String &name,const ResourceHandlerData *handlerData);
-	virtual Resource::ptr findFromFile(const String &name,const ResourceHandlerData *handlerData);
+	virtual Resource::ptr unableToFindStreamer(const String &name,ResourceData *data);
+	virtual Resource::ptr findFromFile(const String &name,ResourceData *data);
 
 	virtual void resourceLoaded(const Resource::ptr &resource){}
 	virtual void resourceUnloaded(const Resource::ptr &resource){}
@@ -86,8 +86,8 @@ protected:
 	Collection<Resource::ptr> mResources;
 	NameResourceMap mNameResourceMap;
 
-	ExtensionHandlerMap mExtensionHandlerMap;
-	ResourceHandler::ptr mDefaultHandler;
+	ExtensionStreamerMap mExtensionStreamerMap;
+	ResourceStreamer::ptr mDefaultStreamer;
 	String mDefaultExtension;
 };
 

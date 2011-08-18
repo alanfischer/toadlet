@@ -197,9 +197,11 @@ public:
 
 	static inline int getRowPitch(int format,int width){
 		switch(format){
-			case Format_RGBA_DXT1:
+			case Format_RGB_DXT1:
 				return width/2;
+			case Format_RGBA_DXT2:
 			case Format_RGBA_DXT3:
+			case Format_RGBA_DXT4:
 			case Format_RGBA_DXT5:
 				return width;
 			default:
@@ -209,8 +211,10 @@ public:
 
 	static bool isFormatCompressed(int format){
 		switch(format){
-			case Format_RGBA_DXT1:
+			case Format_RGB_DXT1:
+			case Format_RGBA_DXT2:
 			case Format_RGBA_DXT3:
+			case Format_RGBA_DXT4:
 			case Format_RGBA_DXT5:
 				return true;
 			default:

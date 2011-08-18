@@ -94,8 +94,8 @@ public:
 
 	// Misc operations
 	void getShadowBiasMatrix(const Texture *shadowTexture,Matrix4x4 &result);
-	int getCloseTextureFormat(int format,int usage);
-	int getCloseTextureFormat(int format);
+	int getClosePixelFormat(int format,int usage);
+	int getClosePixelFormat(int format);
 	bool getShaderProfileSupported(const String &profile);
 	bool getRenderCaps(RenderCaps &caps){caps.set(mCaps);return true;}
 	const RenderCaps &getCaps() const{return mCaps;}

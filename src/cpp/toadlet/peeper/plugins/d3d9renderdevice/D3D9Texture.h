@@ -46,20 +46,14 @@ public:
 
 	Texture *getRootTexture(){return this;}
 
-	bool create(int usage,Dimension dimension,int format,int width,int height,int depth,int mipLevels,byte *mipDatas[]);
+	bool create(int usage,TextureFormat::ptr format,byte *mipDatas[]);
 	void destroy();
 
 	void resetCreate();
 	void resetDestroy();
 
 	int getUsage() const{return mUsage;}
-	Dimension getDimension() const{return mDimension;}
-	int getFormat() const{return mFormat;}
-	int getWidth() const{return mWidth;}
-	int getHeight() const{return mHeight;}
-	int getDepth() const{return mDepth;}
-	int getNumMipLevels() const{return mMipLevels;} // If we just returned mTexture->GetLevelCount(), it could return 1 if we had autogenerate on, which isn't what is desired.
-	scalar getLength() const{return 0;}
+	TextureFormat::ptr getFormat() const{return mFormat;}
 
 	PixelBuffer::ptr getMipPixelBuffer(int level,int cubeSide);
 	bool load(int width,int height,int depth,int mipLevel,byte *mipData);
@@ -74,12 +68,7 @@ protected:
 	D3D9RenderDevice *mDevice;
 
 	int mUsage;
-	Dimension mDimension;
-	int mFormat;
-	int mWidth;
-	int mHeight;
-	int mDepth;
-	int mMipLevels;
+	TextureFormat::ptr mFormat;
 
 	D3DFORMAT mD3DFormat;
 	DWORD mD3DUsage;

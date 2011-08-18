@@ -28,6 +28,7 @@
 #include "D3D9TextureMipPixelBuffer.h"
 #include <toadlet/egg/Error.h>
 #include <toadlet/egg/Logger.h>
+#include <toadlet/egg/image/Image.h>
 
 namespace toadlet{
 namespace peeper{
@@ -37,12 +38,7 @@ D3D9Texture::D3D9Texture(D3D9RenderDevice *renderDevice):BaseResource(),
 	mDevice(NULL),
 
 	mUsage(0),
-	mDimension(Dimension_UNKNOWN),
-	mFormat(0),
-	mWidth(0),
-	mHeight(0),
-	mDepth(0),
-	mMipLevels(0),
+	//mFormat,
 
 	mD3DFormat(D3DFMT_X8R8G8B8),
 	mD3DUsage(0),
@@ -61,10 +57,10 @@ D3D9Texture::~D3D9Texture(){
 	}
 }
 
-bool D3D9Texture::create(int usage,Dimension dimension,int format,int width,int height,int depth,int mipLevels,byte *mipDatas[]){
-	width=width>0?width:1;height=height>0?height:1;depth=depth>0?depth:1;
+bool D3D9Texture::create(int usage,TextureFormat::ptr format,byte *mipDatas[]){
+	format->width=format->width>0?format->width:1;format->height=format->height>0?format->height:1;format->depth=format->depth>0?format->depth:1;
 
-	if((Math::isPowerOf2(width)==false || Math::isPowerOf2(height)==false || (dimension!=Dimension_CUBE && Math::isPowerOf2(depth)==false)) &&
+	if((Math::isPowerOf2(format->width)==false || Math::isPowerOf2(format->height)==false || (format->dimension!=TextureFormat::Dimension_CUBE && Math::isPowerOf2(format->depth)==false)) &&
 		mDevice->getCaps().textureNonPowerOf2==false &&
 		(mDevice->getCaps().textureNonPowerOf2Restricted==false || (usage&Usage_BIT_NPOT_RESTRICTED)==0))
 	{
@@ -74,17 +70,13 @@ bool D3D9Texture::create(int usage,Dimension dimension,int format,int width,int 
 	}
 
 	mUsage=usage;
-	mDimension=dimension;
 	mFormat=format;
-	mWidth=width;
-	mHeight=height;
-	mDepth=depth;
-	mMipLevels=mipLevels;
 
 	bool result=createContext(false);
 
 	if(result && mipDatas!=NULL){
-		int specifiedMipLevels=mMipLevels>0?mMipLevels:1;
+		int width=mFormat->width,height=mFormat->height,depth=mFormat->depth;
+		int specifiedMipLevels=mFormat->mipLevels>0?mFormat->mipLevels:1;
 		int level;
 		for(level=0;level<specifiedMipLevels;++level){
 			load(width,height,depth,level,mipDatas[level]);
@@ -116,9 +108,10 @@ void D3D9Texture::resetDestroy(){
 bool D3D9Texture::createContext(bool restore){
 	IDirect3DDevice9 *device=mDevice->getDirect3DDevice9();
 
-	mD3DUsage=mDevice->getD3DUSAGE(mFormat,mUsage);
+	int width=mFormat->width,height=mFormat->height,depth=mFormat->depth,mipLevels=mFormat->mipLevels;
+	mD3DUsage=mDevice->getD3DUSAGE(mFormat->pixelFormat,mUsage);
 	mD3DPool=mDevice->getD3DPOOL(mUsage);
-	mD3DFormat=mDevice->getD3DFORMAT(mFormat);
+	mD3DFormat=mDevice->getD3DFORMAT(mFormat->pixelFormat);
 	mManuallyGenerateMipLevels=(mUsage&Usage_BIT_AUTOGEN_MIPMAPS)>0;
 	#if !defined(TOADLET_SET_D3DM)
 		if(mManuallyGenerateMipLevels && mDevice->isD3DFORMATValid(mD3DFormat,D3DUSAGE_AUTOGENMIPMAP)){
@@ -128,22 +121,22 @@ bool D3D9Texture::createContext(bool restore){
 	#endif
 
 	HRESULT result=E_FAIL;
-	switch(mDimension){
-		case Texture::Dimension_D1:
-		case Texture::Dimension_D2:{
+	switch(mFormat->dimension){
+		case TextureFormat::Dimension_D1:
+		case TextureFormat::Dimension_D2:{
 			IDirect3DTexture9 *texture=NULL;
-			result=device->CreateTexture(mWidth,mHeight,mMipLevels,mD3DUsage,mD3DFormat,mD3DPool,&texture TOADLET_SHAREDHANDLE);
+			result=device->CreateTexture(width,height,mipLevels,mD3DUsage,mD3DFormat,mD3DPool,&texture TOADLET_SHAREDHANDLE);
 			mTexture=texture;
 		}break;
 		#if !defined(TOADLET_SET_D3DM)
-			case Texture::Dimension_D3:{
+			case TextureFormat::Dimension_D3:{
 				IDirect3DVolumeTexture9 *texture=NULL;
-				result=device->CreateVolumeTexture(mWidth,mHeight,mDepth,mMipLevels,mD3DUsage,mD3DFormat,mD3DPool,&texture TOADLET_SHAREDHANDLE);
+				result=device->CreateVolumeTexture(width,height,depth,mipLevels,mD3DUsage,mD3DFormat,mD3DPool,&texture TOADLET_SHAREDHANDLE);
 				mTexture=texture;
 			}break;
-			case Texture::Dimension_CUBE:{
+			case TextureFormat::Dimension_CUBE:{
 				IDirect3DCubeTexture9 *texture=NULL;
-				result=device->CreateCubeTexture(mWidth,mMipLevels,mD3DUsage,mD3DFormat,mD3DPool,&texture TOADLET_SHAREDHANDLE);
+				result=device->CreateCubeTexture(width,mipLevels,mD3DUsage,mD3DFormat,mD3DPool,&texture TOADLET_SHAREDHANDLE);
 				mTexture=texture;
 			}break;
 		#endif
@@ -190,7 +183,7 @@ bool D3D9Texture::destroyContext(bool backup){
 
 	if(backup && (mUsage&Usage_BIT_DYNAMIC)==0){
 		D3D9PixelBuffer::ptr buffer((D3D9PixelBuffer*)(mDevice->createPixelBuffer()));
-		if(buffer->create(Buffer::Usage_BIT_DYNAMIC,Buffer::Access_READ_WRITE,mFormat,mWidth,mHeight,mDepth)){
+		if(buffer->create(Buffer::Usage_BIT_DYNAMIC,Buffer::Access_READ_WRITE,mFormat)){
 			IDirect3DSurface9 *surface=NULL;
 			((IDirect3DTexture9*)mTexture)->GetSurfaceLevel(0,&surface);
 			mDevice->copySurface(buffer->getSurface(),surface);
@@ -218,7 +211,7 @@ PixelBuffer::ptr D3D9Texture::getMipPixelBuffer(int level,int cubeSide){
 	}
 
 	int index=level;
-	if(mDimension==Dimension_CUBE){
+	if(mFormat->dimension==TextureFormat::Dimension_CUBE){
 		index=level*6+cubeSide;
 	}
 
@@ -246,41 +239,41 @@ bool D3D9Texture::load(int width,int height,int depth,int mipLevel,byte *mipData
 
 	width=width>0?width:1;height=height>0?height:1;depth=depth>0?depth:1;
 
-	if(mipLevel==0 && (width!=mWidth || height!=mHeight || depth!=mDepth)){
+	if(mipLevel==0 && (width!=mFormat->width || height!=mFormat->height || depth!=mFormat->depth)){
 		Error::unknown(Categories::TOADLET_PEEPER,
 			"D3D9Texture: data of incorrect dimensions");
 		return false;
 	}
 
-	int format=mFormat;
-	int rowPitch=ImageFormatConversion::getRowPitch(format,width);
+	int pixelFormat=mFormat->pixelFormat;
+	int rowPitch=ImageFormatConversion::getRowPitch(pixelFormat,width);
 	int slicePitch=rowPitch*height;
 
 	HRESULT result=S_OK;
-	if(mDimension==Texture::Dimension_D1 || mDimension==Texture::Dimension_D2){
+	if(mFormat->dimension==TextureFormat::Dimension_D1 || mFormat->dimension==TextureFormat::Dimension_D2){
 		IDirect3DTexture9 *texture=(IDirect3DTexture9*)mTexture;
 
 		D3DLOCKED_RECT rect={0};
 		result=texture->LockRect(mipLevel,&rect,NULL,0);
 		TOADLET_CHECK_D3D9ERROR(result,"LockRect");
 		if(SUCCEEDED(result)){
-			ImageFormatConversion::convert(mipData,format,rowPitch,slicePitch,(uint8*)rect.pBits,mFormat,rect.Pitch,rect.Pitch*height,width,height,depth);
+			ImageFormatConversion::convert(mipData,pixelFormat,rowPitch,slicePitch,(uint8*)rect.pBits,pixelFormat,rect.Pitch,rect.Pitch*height,width,height,depth);
 			texture->UnlockRect(mipLevel);
 		}
 	}
 	#if !defined(TOADLET_SET_D3DM)
-		else if(mDimension==Texture::Dimension_D3){
+		else if(mFormat->dimension==TextureFormat::Dimension_D3){
 			IDirect3DVolumeTexture9 *texture=(IDirect3DVolumeTexture9*)mTexture;
 
 			D3DLOCKED_BOX box={0};
 			result=texture->LockBox(mipLevel,&box,NULL,0);
 			TOADLET_CHECK_D3D9ERROR(result,"LockBox");
 			if(SUCCEEDED(result)){
-				ImageFormatConversion::convert(mipData,format,rowPitch,slicePitch,(uint8*)box.pBits,mFormat,box.RowPitch,box.SlicePitch,width,height,depth);
+				ImageFormatConversion::convert(mipData,pixelFormat,rowPitch,slicePitch,(uint8*)box.pBits,pixelFormat,box.RowPitch,box.SlicePitch,width,height,depth);
 				texture->UnlockBox(mipLevel);
 			}
 		}
-		else if(mDimension==Texture::Dimension_CUBE){
+		else if(mFormat->dimension==TextureFormat::Dimension_CUBE){
 			IDirect3DCubeTexture9 *texture=(IDirect3DCubeTexture9*)mTexture;
 
 			int i;
@@ -289,7 +282,7 @@ bool D3D9Texture::load(int width,int height,int depth,int mipLevel,byte *mipData
 				result=texture->LockRect((D3DCUBEMAP_FACES)i,mipLevel,&rect,NULL,0);
 				TOADLET_CHECK_D3D9ERROR(result,"LockRect");
 				if(SUCCEEDED(result)){
-					ImageFormatConversion::convert((mipData+slicePitch*i),format,rowPitch,slicePitch,(uint8*)rect.pBits,mFormat,rect.Pitch,rect.Pitch*height,width,height,1);
+					ImageFormatConversion::convert((mipData+slicePitch*i),pixelFormat,rowPitch,slicePitch,(uint8*)rect.pBits,pixelFormat,rect.Pitch,rect.Pitch*height,width,height,1);
 					texture->UnlockRect((D3DCUBEMAP_FACES)i,mipLevel);
 				}
 			}
@@ -317,30 +310,30 @@ bool D3D9Texture::read(int width,int height,int depth,int mipLevel,byte *mipData
 
 	width=width>0?width:1;height=height>0?height:1;depth=depth>0?depth:1;
 
-	if(mipLevel==0 && (width!=mWidth || height!=mHeight || depth!=mDepth)){
+	if(mipLevel==0 && (width!=mFormat->width || height!=mFormat->height || depth!=mFormat->depth)){
 		Error::unknown(Categories::TOADLET_PEEPER,
 			"D3D9Texture: data of incorrect dimensions");
 		return false;
 	}
 
-	int format=mFormat;
-	int rowPitch=ImageFormatConversion::getRowPitch(format,width);
+	int pixelFormat=mFormat->pixelFormat;
+	int rowPitch=ImageFormatConversion::getRowPitch(pixelFormat,width);
 	int slicePitch=rowPitch*height;
 
 	HRESULT result=S_OK;
-	if(mDimension==Texture::Dimension_D1 || mDimension==Texture::Dimension_D2){
+	if(mFormat->dimension==TextureFormat::Dimension_D1 || mFormat->dimension==TextureFormat::Dimension_D2){
 		IDirect3DTexture9 *texture=(IDirect3DTexture9*)mTexture;
 
 		D3DLOCKED_RECT rect={0};
 		result=texture->LockRect(mipLevel,&rect,NULL,D3DLOCK_READONLY);
 		TOADLET_CHECK_D3D9ERROR(result,"LockRect");
 		if(SUCCEEDED(result)){
-			ImageFormatConversion::convert((uint8*)rect.pBits,mFormat,rect.Pitch,rect.Pitch*height,mipData,format,rowPitch,slicePitch,width,height,depth);
+			ImageFormatConversion::convert((uint8*)rect.pBits,mFormat->pixelFormat,rect.Pitch,rect.Pitch*height,mipData,pixelFormat,rowPitch,slicePitch,width,height,depth);
 			texture->UnlockRect(mipLevel);
 		}
 	}
 	#if !defined(TOADLET_SET_D3DM)
-		else if(mDimension==Texture::Dimension_D3){
+		else if(mFormat->dimension==TextureFormat::Dimension_D3){
 			if(mD3DPool==D3DPOOL_DEFAULT){
 				return false;
 			}
@@ -351,7 +344,7 @@ bool D3D9Texture::read(int width,int height,int depth,int mipLevel,byte *mipData
 			result=texture->LockBox(mipLevel,&box,NULL,D3DLOCK_READONLY);
 			TOADLET_CHECK_D3D9ERROR(result,"LockBox");
 			if(SUCCEEDED(result)){
-				ImageFormatConversion::convert((uint8*)box.pBits,mFormat,box.RowPitch,box.SlicePitch,mipData,format,rowPitch,slicePitch,width,height,depth);
+				ImageFormatConversion::convert((uint8*)box.pBits,mFormat->pixelFormat,box.RowPitch,box.SlicePitch,mipData,pixelFormat,rowPitch,slicePitch,width,height,depth);
 				texture->UnlockBox(mipLevel);
 			}
 		}

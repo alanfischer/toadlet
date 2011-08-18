@@ -27,6 +27,7 @@
 #include "../../GLRenderDevice.h"
 #include <toadlet/egg/Logger.h>
 #include <toadlet/egg/Error.h>
+#include <toadlet/egg/image/ImageFormatConversion.h>
 
 namespace toadlet{
 namespace peeper{
@@ -109,9 +110,9 @@ bool WGLPBufferRenderTarget::attach(PixelBuffer::ptr buffer,Attachment attachmen
 	GLTextureMipPixelBuffer *texturebuffer=((GLPixelBuffer*)buffer->getRootPixelBuffer())->castToGLTextureMipPixelBuffer();
 	mTexture=texturebuffer->getTexture();
 
-	if((mTexture->getFormat()&Texture::Format_BIT_DEPTH)>0){
+	if((mTexture->getFormat()->pixelFormat&TextureFormat::Format_SEMANTIC_DEPTH)>0){
 		Error::invalidParameters(Categories::TOADLET_PEEPER,
-			"Format_BIT_DEPTH not available for pbuffers");
+			"Format_SEMANTIC_DEPTH not available for pbuffers");
 		return false;
 	}
 
@@ -149,8 +150,8 @@ bool WGLPBufferRenderTarget::createBuffer(){
 
 	WGLRenderTarget *primaryTarget=(WGLRenderTarget*)(mDevice->getPrimaryRenderTarget()->getRootRenderTarget());
 
-	int width=mTexture->getWidth();
-	int height=mTexture->getHeight();
+	int width=mTexture->getFormat()->width;
+	int height=mTexture->getFormat()->height;
 
 	HDC hdc=primaryTarget->getDC();
 
@@ -158,11 +159,11 @@ bool WGLPBufferRenderTarget::createBuffer(){
 	int pixelType=WGL_TYPE_RGBA_ARB;
 	int texFormat=WGL_TEXTURE_RGB_ARB;
 
-	int format=mTexture->getFormat();
-	int redBits=ImageFormatConversion::getRedBits(format);
-	int greenBits=ImageFormatConversion::getGreenBits(format);
-	int blueBits=ImageFormatConversion::getBlueBits(format);
-	int alphaBits=ImageFormatConversion::getAlphaBits(format);
+	int pixelFormat=mTexture->getFormat()->pixelFormat;
+	int redBits=ImageFormatConversion::getRedBits(pixelFormat);
+	int greenBits=ImageFormatConversion::getGreenBits(pixelFormat);
+	int blueBits=ImageFormatConversion::getBlueBits(pixelFormat);
+	int alphaBits=ImageFormatConversion::getAlphaBits(pixelFormat);
 	int depthBits=16;
 
 	int iAttributes[]={

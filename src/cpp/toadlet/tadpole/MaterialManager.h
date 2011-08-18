@@ -68,7 +68,7 @@ public:
 	void renderStateDestroyed(RenderState *renderState);
 	void shaderStateDestroyed(ShaderState *shaderState);
 
-	Resource::ptr unableToFindHandler(const String &name,const ResourceHandlerData *handlerData);
+	Resource::ptr unableToFindStreamer(const String &name,ResourceData *data);
 
 	bool isPathUseable(RenderPath *path,const RenderCaps &caps);
 	bool compileMaterial(Material *material);
@@ -85,7 +85,7 @@ protected:
 
 	RenderPathChooser *mRenderPathChooser;
 	SamplerState mDefaultSamplerState;
-	Shader::ptr mDiffuseVertexShader,mDiffuseFragmentShader,mSkyboxVertexShader,mSkyboxFragmentShader,mPointSpriteGeometryShader;
+	Shader::ptr mDiffuseVertexShader,mDiffuseFragmentShader,mSkyboxVertexShader,mSkyboxFragmentShader,mPointSpriteGeometryShader,mPointSpriteFragmentShader;
 };
 
 }

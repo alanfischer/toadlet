@@ -34,13 +34,6 @@ namespace tadpole{
 
 class Engine;
 
-class NodeHandler{
-public:
-	TOADLET_SHARED_POINTERS(NodeHandler);
-
-	virtual NodeResource *load(const String &name,const ResourceHandlerData *handlerData)=0;
-};
-
 class TOADLET_API NodeManager:public ResourceManager{
 public:
 	NodeManager(Engine *engine);
@@ -52,19 +45,9 @@ public:
 	Node::ptr createNode(int handle,Scene *scene){return createNode(getNodeResource(handle),scene);}
 	Node::ptr createNode(const String &name,Scene *scene){return createNode(findNodeResource(name),scene);}
 	Node::ptr createNode(NodeResource *resource,Scene *scene);
-	
-	void setNodeHandler(NodeHandler::ptr handler,const String &extension);
-	NodeHandler::ptr getNodeHandler(const String &extension);
 
 protected:
-	typedef Map<String,NodeHandler::ptr> ExtensionNodeHandlerMap;
-
-	Resource::ptr findFromFile(const String &name,const ResourceHandlerData *handlerData);
-	NodeHandler::ptr findNodeHandler(const String &extension);
-
 	Engine *mEngine;
-
-	ExtensionNodeHandlerMap mExtensionNodeHandlerMap;
 };
 
 }

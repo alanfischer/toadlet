@@ -27,19 +27,19 @@
 #define TOADLET_TADPOLE_HANDLER_GIFHANDLER_H
 
 #include <toadlet/egg/image/GIFHandler.h>
-#include <toadlet/tadpole/ResourceHandler.h>
+#include <toadlet/tadpole/ResourceStreamer.h>
 
 namespace toadlet{
 namespace tadpole{
 namespace handler{
 
-class TOADLET_API GIFHandler:public ResourceHandler{
+class TOADLET_API GIFHandler:public ResourceStreamer{
 public:
 	TOADLET_SHARED_POINTERS(GIFHandler);
 
 	GIFHandler(TextureManager *textureManager){mTextureManager=textureManager;}
 
-	Resource::ptr load(Stream::ptr stream,const ResourceHandlerData *handlerData){
+	Resource::ptr load(Stream::ptr stream,ResourceData *data,ProgressListener *listener){
 		Collection<Image*> images;
 		Collection<int> delays;
 
@@ -63,8 +63,9 @@ return NULL;
 		}
 	}
 
-	bool save(Texture::ptr resource,Stream::ptr stream){
-		return mHandler.saveImage(mTextureManager->createImage(resource),stream);
+	bool save(Stream::ptr stream,Resource::ptr resource,ResourceData *data,ProgressListener *listener){
+		Texture::ptr texture=shared_static_cast<Texture>(resource);
+		return mHandler.saveImage(mTextureManager->createImage(texture),stream);
 	}
 
 protected:

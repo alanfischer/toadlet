@@ -27,21 +27,21 @@
 #define TOADLET_TADPOLE_STUDIO_SPRITEHANDLER_H
 
 #include <toadlet/tadpole/Engine.h>
-#include <toadlet/tadpole/ResourceHandler.h>
+#include <toadlet/tadpole/ResourceStreamer.h>
 #include <toadlet/tadpole/studio/SpriteModel.h>
 
 namespace toadlet{
 namespace tadpole{
 namespace studio{
 
-class TOADLET_API SpriteHandler:public ResourceHandler{
+class TOADLET_API SpriteHandler:public ResourceStreamer{
 public:
 	TOADLET_SHARED_POINTERS(SpriteHandler);
 
 	SpriteHandler(Engine *engine);
 	virtual ~SpriteHandler();
 
-	virtual Resource::ptr load(Stream::ptr stream,const ResourceHandlerData *handlerData);
+	virtual Resource::ptr load(Stream::ptr stream,ResourceData *data,ProgressListener *listener);
 
 protected:
 	void buildTextures(SpriteModel *model);

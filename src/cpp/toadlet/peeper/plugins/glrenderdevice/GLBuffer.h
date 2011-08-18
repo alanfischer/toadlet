@@ -56,8 +56,8 @@ public:
 
 	bool create(int usage,int access,IndexFormat indexFormat,int size);
 	bool create(int usage,int access,VertexFormat::ptr vertexFormat,int size);
-	bool create(int usage,int access,int pixelFormat,int width,int height,int depth);
-	bool create(int usage,int access,VariableBufferFormat::ptr format);
+	bool create(int usage,int access,TextureFormat::ptr textureFormat);
+	bool create(int usage,int access,VariableBufferFormat::ptr variableFormat);
 	void destroy();
 
 	void resetCreate(){}
@@ -67,13 +67,10 @@ public:
 	int getAccess() const{return mAccess;}
 	int getDataSize() const{return mDataSize;}
 	int getSize() const{return mSize;}
-	int getWidth() const{return mWidth;}
-	int getHeight() const{return mHeight;}
-	int getDepth() const{return mDepth;}
 
 	IndexFormat getIndexFormat() const{return mIndexFormat;}
 	VertexFormat::ptr getVertexFormat() const{return mVertexFormat;}
-	int getPixelFormat() const{return mPixelFormat;}
+	TextureFormat::ptr getTextureFormat() const{return mTextureFormat;}
 	VariableBufferFormat::ptr getVariableBufferFormat() const{return mVariableFormat;}
 
 	tbyte *lock(int lockAccess);
@@ -97,11 +94,10 @@ protected:
 	int mAccess;
 	int mDataSize;
 	int mSize;
-	int mWidth,mHeight,mDepth;
 
 	IndexFormat mIndexFormat;
 	VertexFormat::ptr mVertexFormat;
-	int mPixelFormat;
+	TextureFormat::ptr mTextureFormat;
 	VariableBufferFormat::ptr mVariableFormat;
 	Collection<tbyte*> mElementOffsets;
 	bool mHasTranspose;

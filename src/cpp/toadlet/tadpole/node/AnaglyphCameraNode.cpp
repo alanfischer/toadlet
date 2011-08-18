@@ -42,13 +42,13 @@ Node *AnaglyphCameraNode::create(Scene *scene){
 
 	int flags=Texture::Usage_BIT_RENDERTARGET;
 	int size=1024;//Math::nextPowerOf2((getWidth()<getHeight()?getWidth():getHeight())/2);
-	int format=Texture::Format_L_8;
+	int format=TextureFormat::Format_L_8;
 
-	mLeftTexture=mEngine->getTextureManager()->createTexture(flags,Texture::Dimension_D2,format,size,size,0,1);
+	mLeftTexture=mEngine->getTextureManager()->createTexture(flags,TextureFormat::Dimension_D2,format,size,size,0,1);
 	mLeftRenderTarget=mEngine->getTextureManager()->createPixelBufferRenderTarget();
 	mLeftRenderTarget->attach(mLeftTexture->getMipPixelBuffer(0,0),PixelBufferRenderTarget::Attachment_COLOR_0);
 
-	mRightTexture=mEngine->getTextureManager()->createTexture(flags,Texture::Dimension_D2,format,size,size,0,1);
+	mRightTexture=mEngine->getTextureManager()->createTexture(flags,TextureFormat::Dimension_D2,format,size,size,0,1);
 	mRightRenderTarget=mEngine->getTextureManager()->createPixelBufferRenderTarget();
 	mRightRenderTarget->attach(mRightTexture->getMipPixelBuffer(0,0),PixelBufferRenderTarget::Attachment_COLOR_0);
 

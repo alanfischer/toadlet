@@ -87,7 +87,7 @@ bool Win32TextureHandler::valid(){
 	#endif
 }
 
-Resource::ptr Win32TextureHandler::load(Stream::ptr in,const ResourceHandlerData *handlerData){
+Resource::ptr Win32TextureHandler::load(Stream::ptr in,ResourceData *data,ProgressListener *listener){
 	Logger::debug(Categories::TOADLET_TADPOLE,"Win32TextureHandler::load");
 
 	Texture::ptr texture=NULL;
@@ -222,25 +222,25 @@ Resource::ptr Win32TextureHandler::load(Stream::ptr in,const ResourceHandlerData
 int Win32TextureHandler::getFormat(PixelFormat *gdiformat){
 	switch(*gdiformat){
 		case(PixelFormat16bppARGB1555):
-			return Texture::Format_BGRA_5_5_5_1;
+			return TextureFormat::Format_BGRA_5_5_5_1;
 		break;
 		case(PixelFormat16bppRGB565):
-			return Texture::Format_BGR_5_6_5;
+			return TextureFormat::Format_BGR_5_6_5;
 		break;
 		case(PixelFormat24bppRGB):
-			return Texture::Format_BGR_8;
+			return TextureFormat::Format_BGR_8;
 		break;
 		case(PixelFormat32bppARGB):
-			return Texture::Format_BGRA_8;
+			return TextureFormat::Format_BGRA_8;
 		break;
 		default:
 			if(((*gdiformat)&PixelFormatAlpha)>0){
 				*gdiformat=PixelFormat32bppARGB;
-				return Texture::Format_BGRA_8;
+				return TextureFormat::Format_BGRA_8;
 			}
 			else{
 				*gdiformat=PixelFormat24bppRGB;
-				return Texture::Format_BGR_8;
+				return TextureFormat::Format_BGR_8;
 			}
 		break;
 	}

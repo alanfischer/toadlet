@@ -26,6 +26,8 @@
 #include "D3D10TextureMipPixelBuffer.h"
 #include "D3D10RenderDevice.h"
 #include <toadlet/egg/Error.h>
+#include <toadlet/egg/Logger.h>
+#include <toadlet/egg/image/Image.h>
 
 namespace toadlet{
 namespace peeper{
@@ -39,9 +41,8 @@ D3D10TextureMipPixelBuffer::D3D10TextureMipPixelBuffer(D3D10Texture *texture,int
 	mD3DDepthStencilView(NULL),
 	mLevel(0),
 	mCubeSide(0),
-	mDataSize(0),
-	mPixelFormat(0),
-	mWidth(0),mHeight(0),mDepth(0)
+	//mFormat,
+	mDataSize(0)
 {
 	mDevice=texture->mDevice;
 	mTexture=texture;
@@ -49,24 +50,24 @@ D3D10TextureMipPixelBuffer::D3D10TextureMipPixelBuffer(D3D10Texture *texture,int
 	mD3DTexture=mTexture->mTexture;
 	mLevel=level;
 	mCubeSide=cubeSide;
-	mPixelFormat=texture->mFormat;
 
 	/// @todo: Unify this with the GLTextureMipPixelBuffer creation
 	int l=level;
-	int w=mTexture->getWidth(),h=mTexture->getHeight(),d=mTexture->getDepth();
+	int w=texture->getFormat()->width,h=texture->getFormat()->height,d=texture->getFormat()->depth;
 	while(l>0){
 		w/=2; h/=2; d/=2;
 		l--;
 	}
-	mWidth=w;
-	mHeight=h;
-	mDepth=d;
+
+	mFormat=TextureFormat::ptr(new TextureFormat(texture->getFormat()));
+	mFormat->width=w;
+	mFormat->height=h;
+	mFormat->depth=d;
+	mDataSize=ImageFormatConversion::getRowPitch(mFormat->pixelFormat,mFormat->width)*mFormat->height*mFormat->depth;
 
 	if((mTexture->getUsage()&Texture::Usage_BIT_RENDERTARGET)>0){
-		createViews(mTexture->mDimension,mTexture->mFormat,level);
+		createViews(mTexture->getFormat()->dimension,mTexture->getFormat()->pixelFormat,level);
 	}
-
-	mDataSize=ImageFormatConversion::getRowPitch(mTexture->getFormat(),mWidth)*mHeight*mDepth;
 }
 
 D3D10TextureMipPixelBuffer::D3D10TextureMipPixelBuffer(D3D10RenderDevice *renderDevice):
@@ -78,9 +79,8 @@ D3D10TextureMipPixelBuffer::D3D10TextureMipPixelBuffer(D3D10RenderDevice *render
 	mD3DDepthStencilView(NULL),
 	mLevel(0),
 	mCubeSide(0),
-	mDataSize(0),
-	mPixelFormat(0),
-	mWidth(0),mHeight(0),mDepth(0)
+	//mFormat
+	mDataSize(0)
 {
 	mDevice=renderDevice;
 }
@@ -89,26 +89,25 @@ D3D10TextureMipPixelBuffer::~D3D10TextureMipPixelBuffer(){
 	destroy();
 }
 
-bool D3D10TextureMipPixelBuffer::create(int usage,int access,int pixelFormat,int width,int height,int depth){
+bool D3D10TextureMipPixelBuffer::create(int usage,int access,TextureFormat::ptr format){
 	if(mTexture!=NULL){
 		// We are a D3D10Texture backed PixelBuffer, so we can not be created
 		return false;
 	}
 
+	mFormat=format;
+	mFormat->mipLevels=1;
+
 	mBufferTexture=Texture::ptr(mDevice->createTexture());
 	mTexture=shared_static_cast<D3D10Texture>(mBufferTexture);
 	mTexture->retain();
-	mTexture->create(usage|Texture::Usage_BIT_RENDERTARGET,Texture::Dimension_D2,pixelFormat,width,height,depth,1,NULL);
+	mTexture->create(usage|Texture::Usage_BIT_RENDERTARGET,mFormat,NULL);
 	mD3DTexture=mTexture->mTexture;
 	mLevel=0;
 	mCubeSide=0;
-	mPixelFormat=pixelFormat;
-	mWidth=width;
-	mHeight=height;
-	mDepth=depth;
 
 	if((mTexture->getUsage()&Usage_BIT_STAGING)==0){
-		createViews(Texture::Dimension_D2,pixelFormat,0);
+		createViews(TextureFormat::Dimension_D2,mFormat->pixelFormat,0);
 	}
 
 	return true;
@@ -133,8 +132,8 @@ uint8 *D3D10TextureMipPixelBuffer::lock(int lockAccess){
 	tbyte *data=NULL;
 
 	HRESULT result=S_OK;
- 	switch(mTexture->getDimension()){
-		case Texture::Dimension_D1:{
+ 	switch(mTexture->getFormat()->dimension){
+		case TextureFormat::Dimension_D1:{
 			tbyte *mappedTex=NULL;
 			ID3D10Texture1D *texture=(ID3D10Texture1D*)mD3DTexture;
 			result=texture->Map(subresource,mapType,mapFlags,(void**)&mappedTex);
@@ -142,7 +141,7 @@ uint8 *D3D10TextureMipPixelBuffer::lock(int lockAccess){
 				data=mappedTex;
 			}
 		}break;
-		case Texture::Dimension_D2:{
+		case TextureFormat::Dimension_D2:{
 			D3D10_MAPPED_TEXTURE2D mappedTex;
 			ID3D10Texture2D *texture=(ID3D10Texture2D*)mD3DTexture;
 			result=texture->Map(subresource,mapType,mapFlags,&mappedTex);
@@ -150,7 +149,7 @@ uint8 *D3D10TextureMipPixelBuffer::lock(int lockAccess){
 				data=(tbyte*)mappedTex.pData;
 			}
 		}break;
-		case Texture::Dimension_D3:{
+		case TextureFormat::Dimension_D3:{
 			D3D10_MAPPED_TEXTURE3D mappedTex;
 			ID3D10Texture3D *texture=(ID3D10Texture3D*)mD3DTexture;
 			result=texture->Map(subresource,mapType,mapFlags,&mappedTex);
@@ -166,16 +165,16 @@ uint8 *D3D10TextureMipPixelBuffer::lock(int lockAccess){
 bool D3D10TextureMipPixelBuffer::unlock(){
 	int subresource=D3D10CalcSubresource(mLevel,0,0);
 
-	switch(mTexture->getDimension()){
-		case Texture::Dimension_D1:{
+	switch(mTexture->getFormat()->dimension){
+		case TextureFormat::Dimension_D1:{
 			ID3D10Texture1D *texture=(ID3D10Texture1D*)mD3DTexture;
 			texture->Unmap(subresource);
 		}break;
-		case Texture::Dimension_D2:{
+		case TextureFormat::Dimension_D2:{
 			ID3D10Texture2D *texture=(ID3D10Texture2D*)mD3DTexture;
 			texture->Unmap(subresource);
 		}break;
-		case Texture::Dimension_D3:{
+		case TextureFormat::Dimension_D3:{
 			ID3D10Texture3D *texture=(ID3D10Texture3D*)mD3DTexture;
 			texture->Unmap(subresource);
 		}break;
@@ -184,40 +183,40 @@ bool D3D10TextureMipPixelBuffer::unlock(){
 	return true;
 }
 
-bool D3D10TextureMipPixelBuffer::createViews(Texture::Dimension dimension,int pixelFormat,int level){
+bool D3D10TextureMipPixelBuffer::createViews(int dimension,int pixelFormat,int level){
 	HRESULT result=S_OK;
-	if((pixelFormat&Texture::Format_BIT_DEPTH)==0){
+	if((pixelFormat&TextureFormat::Format_MASK_SEMANTICS)!=TextureFormat::Format_SEMANTIC_DEPTH){
 		D3D10_RENDER_TARGET_VIEW_DESC desc;
 		switch(dimension){
-			case Texture::Dimension_D1:
+			case TextureFormat::Dimension_D1:
 				desc.ViewDimension=D3D10_RTV_DIMENSION_TEXTURE1D;
 				desc.Texture1D.MipSlice=level;
 			break;
-			case Texture::Dimension_D2:
+			case TextureFormat::Dimension_D2:
 				desc.ViewDimension=D3D10_RTV_DIMENSION_TEXTURE2D;
 				desc.Texture2D.MipSlice=level;
 			break;
-			case Texture::Dimension_D3:
+			case TextureFormat::Dimension_D3:
 				desc.ViewDimension=D3D10_RTV_DIMENSION_TEXTURE3D;
 				desc.Texture3D.MipSlice=level;
 			break;
 		}
-		desc.Format=mDevice->getTextureDXGI_FORMAT(mPixelFormat);
+		desc.Format=mDevice->getTextureDXGI_FORMAT(pixelFormat);
 		result=mDevice->getD3D10Device()->CreateRenderTargetView(mD3DTexture,&desc,&mD3DRenderTargetView);
 	}
 	else{
 		D3D10_DEPTH_STENCIL_VIEW_DESC desc;
 		switch(dimension){
-			case Texture::Dimension_D1:
+			case TextureFormat::Dimension_D1:
 				desc.ViewDimension=D3D10_DSV_DIMENSION_TEXTURE1D;
 				desc.Texture1D.MipSlice=level;
 			break;
-			case Texture::Dimension_D2:
+			case TextureFormat::Dimension_D2:
 				desc.ViewDimension=D3D10_DSV_DIMENSION_TEXTURE2D;
 				desc.Texture2D.MipSlice=level;
 			break;
 		}
-		desc.Format=mDevice->getTextureDXGI_FORMAT(mPixelFormat);
+		desc.Format=mDevice->getTextureDXGI_FORMAT(pixelFormat);
 		result=mDevice->getD3D10Device()->CreateDepthStencilView(mD3DTexture,&desc,&mD3DDepthStencilView);
 	}
 	if(FAILED(result)){

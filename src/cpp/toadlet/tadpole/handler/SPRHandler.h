@@ -26,7 +26,7 @@
 #ifndef TOADLET_TADPOLE_HANDLER_SPRHANDLER_H
 #define TOADLET_TADPOLE_HANDLER_SPRHANDLER_H
 
-#include <toadlet/tadpole/ResourceHandler.h>
+#include <toadlet/tadpole/ResourceStreamer.h>
 #include <toadlet/tadpole/TextureManager.h>
 #include <toadlet/tadpole/studio/SpriteHandler.h>
 
@@ -34,14 +34,14 @@ namespace toadlet{
 namespace tadpole{
 namespace handler{
 
-class TOADLET_API SPRHandler:public ResourceHandler{
+class TOADLET_API SPRHandler:public ResourceStreamer{
 public:
 	TOADLET_SHARED_POINTERS(SPRHandler);
 
 	SPRHandler(Engine *engine):mHandler(engine){}
 
-	Resource::ptr load(Stream::ptr stream,const ResourceHandlerData *handlerData){
-		studio::SpriteModel::ptr sprite=shared_static_cast<studio::SpriteModel>(mHandler.load(stream,NULL));
+	Resource::ptr load(Stream::ptr stream,ResourceData *data,ProgressListener *listener){
+		studio::SpriteModel::ptr sprite=shared_static_cast<studio::SpriteModel>(mHandler.load(stream,NULL,NULL));
 
 		if(sprite!=NULL && sprite->textures.size()>0){
 			return sprite->textures[0];

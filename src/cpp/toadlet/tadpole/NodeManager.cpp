@@ -46,61 +46,6 @@ NodeResource::ptr NodeManager::createNodeResource(Node *node,const String &name)
 	return shared_static_cast<NodeResource>(manage(NodeResource::ptr(new NodeResource(node)),name));
 }
 
-void NodeManager::setNodeHandler(NodeHandler::ptr handler,const String &extension){
-	ExtensionNodeHandlerMap::iterator it=mExtensionNodeHandlerMap.find(extension);
-	if(it!=mExtensionNodeHandlerMap.end()){
-		Logger::debug(Categories::TOADLET_TADPOLE,
-			"Removing handler for extension "+extension);
-
-		it->second=NULL;
-	}
-
-	if(handler!=NULL){
-		Logger::debug(Categories::TOADLET_TADPOLE,
-			"Adding handler for extension "+extension);
-		mExtensionNodeHandlerMap.add(extension,handler);
-	}
-}
-
-NodeHandler::ptr NodeManager::getNodeHandler(const String &extension){
-	ExtensionNodeHandlerMap::iterator it=mExtensionNodeHandlerMap.find(extension);
-	if(it!=mExtensionNodeHandlerMap.end()){
-		return it->second;
-	}
-	else{
-		return NULL;
-	}
-}
-
-Resource::ptr NodeManager::findFromFile(const String &name,const ResourceHandlerData *handlerData){
-	String filename=cleanFilename(name);
-	String extension;
-	int i=filename.rfind('.');
-	if(i!=String::npos){
-		extension=filename.substr(i+1,filename.length()).toLower();
-	}
-	else if(mDefaultExtension.length()>0){
-		extension=mDefaultExtension;
-		filename+="."+extension;
-	}
-
-	for(i=0;i<mResourceArchives.size();++i){
-		Resource::ptr resource=mResourceArchives[i]->openResource(filename);
-		if(resource!=NULL){
-			return resource;
-		}
-	}
-
-	if(extension!=(char*)NULL){
-		NodeHandler *handler=getNodeHandler(extension);
-		if(handler!=NULL){
-			return Resource::ptr(handler->load(name,handlerData));
-		}
-	}
-
-	return NULL;
-}
-
 }
 }
 

@@ -26,6 +26,7 @@
 #ifndef TOADLET_TADPOLE_NODE_CAMERANODE_H
 #define TOADLET_TADPOLE_NODE_CAMERANODE_H
 
+#include <toadlet/egg/image/Image.h>
 #include <toadlet/peeper/Viewport.h>
 #include <toadlet/peeper/RenderDevice.h>
 #include <toadlet/tadpole/material/Material.h>

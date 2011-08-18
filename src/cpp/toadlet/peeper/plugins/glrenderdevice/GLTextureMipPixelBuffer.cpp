@@ -26,6 +26,7 @@
 #include "GLTextureMipPixelBuffer.h"
 #include "GLTexture.h"
 #include "GLRenderDevice.h"
+#include <toadlet/egg/image/ImageFormatConversion.h>
 
 namespace toadlet{
 namespace peeper{
@@ -34,28 +35,25 @@ GLTextureMipPixelBuffer::GLTextureMipPixelBuffer(GLTexture *texture,GLuint level
 	mTexture(NULL),
 	mLevel(0),
 	mCubeSide(0),
-	mDataSize(0),
-	mWidth(0),mHeight(0),mDepth(0)
+	//mFormat,
+	mDataSize(0)
 {
 	mTexture=texture;
 	mLevel=level;
 	mCubeSide=cubeSide;
 
 	int l=level;
-	int w=texture->getWidth(),h=texture->getHeight(),d=texture->getDepth();
+	int w=texture->getFormat()->width,h=texture->getFormat()->height,d=texture->getFormat()->depth;
 	while(l>0){
 		w/=2; h/=2; d/=2;
 		l--;
 	}
-	mWidth=w;
-	mHeight=h;
-	mDepth=d;
 
-	mDataSize=ImageFormatConversion::getRowPitch(texture->getFormat(),mWidth)*mHeight*mDepth;
-}
-
-int GLTextureMipPixelBuffer::getPixelFormat() const{
-	return mTexture->getFormat();
+	mFormat=TextureFormat::ptr(new TextureFormat(texture->getFormat()));
+	mFormat->width=w;
+	mFormat->height=h;
+	mFormat->depth=d;
+	mDataSize=ImageFormatConversion::getRowPitch(mFormat->pixelFormat,mFormat->width)*mFormat->height*mFormat->depth;
 }
 
 GLuint GLTextureMipPixelBuffer::getHandle() const{

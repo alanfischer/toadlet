@@ -181,7 +181,7 @@ void StudioModelNode::setModel(const String &name){
 	}
 
 	StudioHandler::ptr handler(new StudioHandler(mEngine));
-	StudioModel::ptr model=shared_static_cast<StudioModel>(handler->load(stream,NULL));
+	StudioModel::ptr model=shared_static_cast<StudioModel>(handler->load(stream,NULL,NULL));
 	model->setName(name);
 	setModel(model);
 }

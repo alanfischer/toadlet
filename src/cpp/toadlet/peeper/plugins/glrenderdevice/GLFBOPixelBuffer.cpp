@@ -35,11 +35,10 @@ GLFBOPixelBuffer::GLFBOPixelBuffer(GLFBORenderTarget *target):GLPixelBuffer(),
 	mListener(NULL),
 	mTarget(NULL),
 	mHandle(0),
-	mPixelFormat(0),
 	mUsage(0),
 	mAccess(0),
-	mDataSize(0),
-	mWidth(0),mHeight(0)
+	//mFormat,
+	mDataSize(0)
 {
 	mTarget=target;
 }
@@ -48,19 +47,17 @@ GLFBOPixelBuffer::~GLFBOPixelBuffer(){
 	destroy();
 }
 
-bool GLFBOPixelBuffer::create(int usage,int access,int pixelFormat,int width,int height,int depth){
+bool GLFBOPixelBuffer::create(int usage,int access,TextureFormat::ptr format){
 	TOADLET_CHECK_GLERROR("entering GLFBOPixelBuffer::create");
 
 	mUsage=usage;
 	mAccess=access;
-	mPixelFormat=pixelFormat;
-	mWidth=width;
-	mHeight=height;
-	mDataSize=ImageFormatConversion::getRowPitch(mPixelFormat,mWidth)*mHeight;
+	mFormat=format;
+	mDataSize=ImageFormatConversion::getRowPitch(format->pixelFormat,format->width)*format->height;
 
 	glGenRenderbuffers(1,&mHandle);
 	glBindRenderbuffer(GL_RENDERBUFFER,mHandle);
-	glRenderbufferStorage(GL_RENDERBUFFER,GLRenderDevice::getGLFormat(mPixelFormat,true),mWidth,mHeight);
+	glRenderbufferStorage(GL_RENDERBUFFER,GLRenderDevice::getGLFormat(format->pixelFormat,true),format->width,format->height);
 
 	TOADLET_CHECK_GLERROR("GLFBOPixelBuffer::create");
 

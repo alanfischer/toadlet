@@ -36,7 +36,7 @@ StudioHandler::StudioHandler(Engine *engine){
 
 StudioHandler::~StudioHandler(){}
 
-Resource::ptr StudioHandler::load(Stream::ptr stream,const ResourceHandlerData *handlerData){
+Resource::ptr StudioHandler::load(Stream::ptr stream,ResourceData *data,ProgressListener *listener){
 	if(stream==NULL){
 		Error::nullPointer(Categories::TOADLET_TADPOLE_STUDIO,
 			"null stream");

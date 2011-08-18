@@ -23,32 +23,25 @@
  *
  ********** Copyright header - do not remove **********/
 
-#ifndef TOADLET_RIBBIT_AUDIOFORMAT_H
-#define TOADLET_RIBBIT_AUDIOFORMAT_H
+#ifndef TOADLET_TADPOLE_RESOURCEHANDLER_H
+#define TOADLET_TADPOLE_RESOURCEHANDLER_H
 
-#include <toadlet/ribbit/Types.h>
+#include <toadlet/egg/Resource.h>
+#include <toadlet/egg/io/Stream.h>
+#include <toadlet/tadpole/ResourceData.h>
+#include <toadlet/tadpole/ProgressListener.h>
 
 namespace toadlet{
-namespace ribbit{
+namespace tadpole{
 
-class TOADLET_API AudioFormat{
+class ResourceStreamer{
 public:
-	TOADLET_SHARED_POINTERS(AudioFormat);
+	TOADLET_SHARED_POINTERS(ResourceStreamer);
 
-	AudioFormat(int bps=0,int chan=0,int sps=0):
-		bitsPerSample(bps),
-		channels(chan),
-		samplesPerSecond(sps)
-	{}
+	virtual ~ResourceStreamer(){}
 
-	int bitsPerSample;
-	int channels;
-	int samplesPerSecond;
-
-	int frameSize() const{return channels*bitsPerSample/8;}
-	bool equals(AudioFormat *audioFormat) const{
-		return bitsPerSample==audioFormat->bitsPerSample && channels==audioFormat->channels && samplesPerSecond!=audioFormat->samplesPerSecond;
-	}
+	virtual Resource::ptr load(Stream::ptr stream,ResourceData *data,ProgressListener *listener){return Resource::ptr();}
+	virtual bool save(Stream::ptr stream,Resource::ptr resource,ResourceData *data,ProgressListener *listener){return false;}
 };
 
 }

@@ -45,15 +45,15 @@ public:
 
 	virtual IndexBuffer *getRootIndexBuffer(){return (mIndexFormat!=(IndexFormat)0)?(IndexBuffer*)mBack.get():NULL;}
 	virtual VertexBuffer *getRootVertexBuffer(){return (mVertexFormat!=NULL)?(VertexBuffer*)mBack.get():NULL;}
-	virtual PixelBuffer *getRootPixelBuffer(){return (mPixelFormat!=0)?(PixelBuffer*)mBack.get():NULL;}
+	virtual PixelBuffer *getRootPixelBuffer(){return (mTextureFormat!=NULL)?(PixelBuffer*)mBack.get():NULL;}
 	virtual VariableBuffer *getRootVariableBuffer(){return (mVariableFormat!=0)?(VariableBuffer*)mBack.get():NULL;}
 
 	virtual void setBufferDestroyedListener(BufferDestroyedListener *listener){mListener=listener;}
 
 	virtual bool create(int usage,int access,IndexFormat indexFormat,int size);
 	virtual bool create(int usage,int access,VertexFormat::ptr vertexFormat,int size);
-	virtual bool create(int usage,int access,int pixelFormat,int width,int height,int depth);
-	virtual bool create(int usage,int access,VariableBufferFormat::ptr format);
+	virtual bool create(int usage,int access,TextureFormat::ptr textureFormat);
+	virtual bool create(int usage,int access,VariableBufferFormat::ptr variableFormat);
 	virtual void destroy();
 
 	virtual void resetCreate();
@@ -63,13 +63,10 @@ public:
 	virtual int getAccess() const{return mAccess;}
 	virtual int getDataSize() const{return mDataSize;}
 	virtual int getSize() const{return mSize;}
-	virtual int getWidth() const{return mWidth;}
-	virtual int getHeight() const{return mHeight;}
-	virtual int getDepth() const{return mDepth;}
 
 	virtual IndexFormat getIndexFormat() const{return mIndexFormat;}
 	virtual VertexFormat::ptr getVertexFormat() const{return mVertexFormat;}
-	virtual int getPixelFormat() const{return mPixelFormat;}
+	virtual TextureFormat::ptr getTextureFormat() const{return mTextureFormat;}
 	virtual VariableBufferFormat::ptr getVariableBufferFormat() const{return mVariableFormat;}
 
 	virtual tbyte *lock(int lockAccess);
@@ -98,7 +95,7 @@ protected:
 	int mDataSize;
 	IndexFormat mIndexFormat;
 	VertexFormat::ptr mVertexFormat;
-	int mPixelFormat;
+	TextureFormat::ptr mTextureFormat;
 	VariableBufferFormat::ptr mVariableFormat;
 	int mSize;
 	int mWidth,mHeight,mDepth;

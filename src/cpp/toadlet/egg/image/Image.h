@@ -58,7 +58,7 @@ class TOADLET_API Image:public ImageDefinitions{
 public:
 	TOADLET_SHARED_POINTERS(Image);
 
-	static Image *createAndReallocate(Dimension dimension,int format,int width,int height=1,int depth=1);
+	static Image *createAndReallocate(int dimension,int format,int width,int height=1,int depth=1);
 
 	Image();
 
@@ -66,7 +66,7 @@ public:
 
 	Image *clone();
 
-	bool reallocate(Dimension dimension,int format,int width,int height=1,int depth=1,bool clear=true);
+	bool reallocate(int dimension,int format,int width,int height=1,int depth=1,bool clear=true);
 	bool reallocate(const Image *image,bool clear);
 
 	bool hasSameParametersAs(const Image *image) const;
@@ -75,7 +75,7 @@ public:
 	inline int getHeight() const{return mHeight;}
 	inline int getDepth() const{return mDepth;}
 
-	inline Dimension getDimension() const{return mDimension;}
+	inline int getDimension() const{return mDimension;}
 	inline int getFormat() const{return mFormat;}
 	inline tbyte *getData(){return mData;}
 	inline const tbyte *getData() const{return mData;}
@@ -269,7 +269,7 @@ public:
 	}
 
 protected:
-	Dimension mDimension;
+	int mDimension;
 	int mFormat;
 	int mWidth,mHeight,mDepth;
 	tbyte *mData;

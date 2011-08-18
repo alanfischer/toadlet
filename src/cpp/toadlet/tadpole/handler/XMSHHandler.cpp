@@ -36,7 +36,7 @@ XMSHHandler::XMSHHandler(Engine *engine){
 	mEngine=engine;
 }
 
-Resource::ptr XMSHHandler::load(Stream::ptr stream,const ResourceHandlerData *handlerData){
+Resource::ptr XMSHHandler::load(Stream::ptr stream,ResourceData *data,ProgressListener *listener){
 	Mesh::ptr mesh;
 
 	/// @todo: Replace the following when mxml implements custom load/save callbacks
@@ -149,7 +149,12 @@ Resource::ptr XMSHHandler::load(Stream::ptr stream,const ResourceHandlerData *ha
 	return mesh;
 }
 
-bool XMSHHandler::save(Mesh::ptr mesh,Stream::ptr stream,ProgressListener *listener){
+bool XMSHHandler::save(Stream::ptr stream,Resource::ptr resource,ResourceData *data,ProgressListener *listener){
+	Mesh::ptr mesh=shared_static_cast<Mesh>(resource);
+	if(mesh==NULL){
+		return false;
+	}
+
 	mxml_node_t *root=mxmlNewElement(MXML_NO_PARENT,"XMSH");
 
 	int version=XMLMeshUtilities::version;

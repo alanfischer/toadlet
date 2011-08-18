@@ -41,7 +41,7 @@ public:
 	D3D9TextureMipPixelBuffer(D3D9Texture *texture,int level,int cubeSide);
 	virtual ~D3D9TextureMipPixelBuffer();
 
-	bool create(int usage,int access,int pixelFormat,int width,int height,int depth);
+	bool create(int usage,int access,TextureFormat::ptr format);
 	void destroy();
 
 	void resetCreate();

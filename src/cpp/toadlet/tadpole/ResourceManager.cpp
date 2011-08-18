@@ -80,7 +80,7 @@ Resource::ptr ResourceManager::get(const String &name){
 	}
 }
 
-Resource::ptr ResourceManager::find(const egg::String &name,ResourceHandlerData::ptr handlerData){
+Resource::ptr ResourceManager::find(const egg::String &name,ResourceData::ptr data){
 	Resource::ptr resource=get(name);
 	if(resource==NULL){
 		if(Logger::getInstance()->getMasterCategoryReportingLevel(Categories::TOADLET_TADPOLE)>=Logger::Level_EXCESS){
@@ -89,7 +89,7 @@ Resource::ptr ResourceManager::find(const egg::String &name,ResourceHandlerData:
 		}
 
 		TOADLET_TRY
-			resource=findFromFile(name,handlerData);
+			resource=findFromFile(name,data);
 		TOADLET_CATCH(const Exception &){resource=NULL;}
 		if(resource!=NULL){
 			resource->setName(name);
@@ -162,32 +162,32 @@ void ResourceManager::unmanage(Resource *resource){
 	resource->destroy();
 }
 
-void ResourceManager::setHandler(ResourceHandler::ptr handler,const String &extension){
-	ExtensionHandlerMap::iterator it=mExtensionHandlerMap.find(extension);
-	if(it!=mExtensionHandlerMap.end()){
+void ResourceManager::setStreamer(ResourceStreamer::ptr streamer,const String &extension){
+	ExtensionStreamerMap::iterator it=mExtensionStreamerMap.find(extension);
+	if(it!=mExtensionStreamerMap.end()){
 		Logger::debug(Categories::TOADLET_TADPOLE,
-			"Removing handler for extension "+extension);
+			"Removing streamer for extension "+extension);
 
 		it->second=NULL;
 	}
 
-	if(handler!=NULL){
+	if(streamer!=NULL){
 		Logger::debug(Categories::TOADLET_TADPOLE,
-			"Adding handler for extension "+extension);
-		mExtensionHandlerMap.add(extension,handler);
+			"Adding streamer for extension "+extension);
+		mExtensionStreamerMap.add(extension,streamer);
 	}
 }
 
-void ResourceManager::setDefaultHandler(ResourceHandler::ptr handler){
+void ResourceManager::setDefaultStreamer(ResourceStreamer::ptr streamer){
 	Logger::debug(Categories::TOADLET_TADPOLE,
-		"Adding default handler");
+		"Adding default streamer");
 
-	mDefaultHandler=handler;
+	mDefaultStreamer=streamer;
 }
 
-ResourceHandler::ptr ResourceManager::getHandler(const String &extension){
-	ExtensionHandlerMap::iterator it=mExtensionHandlerMap.find(extension);
-	if(it!=mExtensionHandlerMap.end()){
+ResourceStreamer::ptr ResourceManager::getStreamer(const String &extension){
+	ExtensionStreamerMap::iterator it=mExtensionStreamerMap.find(extension);
+	if(it!=mExtensionStreamerMap.end()){
 		return it->second;
 	}
 	else{
@@ -245,13 +245,13 @@ String ResourceManager::cleanFilename(const String &name){
 	return cleanName;
 }
 
-Resource::ptr ResourceManager::unableToFindHandler(const String &name,const ResourceHandlerData *handlerData){
+Resource::ptr ResourceManager::unableToFindStreamer(const String &name,ResourceData *data){
 	Error::unknown(Categories::TOADLET_TADPOLE,
-		"handler for \""+name+"\" not found");
+		"streamer for \""+name+"\" not found");
 	return NULL;
 }
 
-Resource::ptr ResourceManager::findFromFile(const String &name,const ResourceHandlerData *handlerData){
+Resource::ptr ResourceManager::findFromFile(const String &name,ResourceData *data){
 	String filename=cleanFilename(name);
 	String extension;
 	int i=filename.rfind('.');
@@ -271,14 +271,14 @@ Resource::ptr ResourceManager::findFromFile(const String &name,const ResourceHan
 	}
 
 	if(extension!=(char*)NULL){
-		ResourceHandler *handler=getHandler(extension);
-		if(handler==NULL){
-			handler=mDefaultHandler;
+		ResourceStreamer *streamer=getStreamer(extension);
+		if(streamer==NULL){
+			streamer=mDefaultStreamer;
 		}
-		if(handler!=NULL){
+		if(streamer!=NULL){
 			Stream::ptr stream=mArchive->openStream(filename);
 			if(stream!=NULL){
-				return Resource::ptr(handler->load(stream,handlerData));
+				return Resource::ptr(streamer->load(stream,data,NULL));
 			}
 			else{
 				Error::unknown(Categories::TOADLET_TADPOLE,
@@ -287,7 +287,7 @@ Resource::ptr ResourceManager::findFromFile(const String &name,const ResourceHan
 			}
 		}
 		else{
-			return Resource::ptr(unableToFindHandler(name,handlerData));
+			return Resource::ptr(unableToFindStreamer(name,data));
 		}
 	}
 	else{

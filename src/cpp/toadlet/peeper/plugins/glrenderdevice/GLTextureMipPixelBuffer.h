@@ -53,7 +53,7 @@ public:
 	GLFBOPixelBuffer *castToGLFBOPixelBuffer(){return NULL;}
 	GLBuffer *castToGLBuffer(){return NULL;}
 
-	bool create(int usage,int access,int pixelFormat,int width,int height,int depth){return false;}
+	bool create(int usage,int access,TextureFormat::ptr format){return false;}
 	void destroy(){}
 
 	void resetCreate(){}
@@ -62,12 +62,8 @@ public:
 	/// @todo: implement
 	int getUsage() const{return 0;}
 	int getAccess() const{return 0;}
+	TextureFormat::ptr getTextureFormat() const{return mFormat;}
 	int getDataSize() const{return mDataSize;}
-
-	int getPixelFormat() const;
-	int getWidth() const{return mWidth;}
-	int getHeight() const{return mHeight;}
-	int getDepth() const{return mDepth;}
 
 	inline GLTexture *getTexture() const{return mTexture;}
 	inline GLuint getLevel() const{return mLevel;}
@@ -84,8 +80,8 @@ protected:
 	GLTexture *mTexture;
 	GLuint mLevel;
 	GLuint mCubeSide;
+	TextureFormat::ptr mFormat;
 	int mDataSize;
-	int mWidth,mHeight,mDepth;
 
 	friend class GLTexture;
 	friend class GLRenderDevice;

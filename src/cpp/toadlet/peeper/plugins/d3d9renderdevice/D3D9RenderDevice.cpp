@@ -945,8 +945,8 @@ void D3D9RenderDevice::getPrimitiveTypeAndCount(D3DPRIMITIVETYPE &d3dpt,int &cou
 }
 
 void D3D9RenderDevice::getShadowBiasMatrix(const Texture *shadowTexture,Matrix4x4 &result){
-	int width=shadowTexture->getWidth();
-	int height=shadowTexture->getHeight();
+	int width=shadowTexture->getFormat()->width;
+	int height=shadowTexture->getFormat()->height;
 	scalar xoff=Math::HALF+Math::div(Math::HALF,Math::fromInt(width));
 	scalar yoff=Math::HALF+Math::div(Math::HALF,Math::fromInt(height));
 	result.set( Math::HALF, 0,           0,         xoff,
@@ -955,45 +955,45 @@ void D3D9RenderDevice::getShadowBiasMatrix(const Texture *shadowTexture,Matrix4x
 				0,          0,           0,         Math::ONE);
 }
 
-int D3D9RenderDevice::getCloseTextureFormat(int format,int usage){
-	int closeFormat=getCloseTextureFormat(format);
+int D3D9RenderDevice::getClosePixelFormat(int format,int usage){
+	int closeFormat=getClosePixelFormat(format);
 	DWORD d3dusage=getD3DUSAGE(closeFormat,usage);
 	D3DFORMAT d3dformat=getD3DFORMAT(closeFormat);
 	if(isD3DFORMATValid(d3dformat,d3dusage)==false){
-		return Texture::Format_BGRA_8;
+		return TextureFormat::Format_BGRA_8;
 	}
 	else{
 		return closeFormat;
 	}
 }
 
-int D3D9RenderDevice::getCloseTextureFormat(int format){
+int D3D9RenderDevice::getClosePixelFormat(int format){
 	switch(format){
 		#if defined(TOADLET_SET_D3DM)
-			case Texture::Format_L_8:
-				else return Texture::Format_BGR_8;
-			case Texture::Format_A_8:
-			case Texture::Format_LA_8:
-				else return return Texture::Format_BGRA_8;
+			case TextureFormat::Format_L_8:
+				else return TextureFormat::Format_BGR_8;
+			case TextureFormat::Format_A_8:
+			case TextureFormat::Format_LA_8:
+				else return TextureFormat::Format_BGRA_8;
 		#else
-			case Texture::Format_L_8:
-			case Texture::Format_R_8:
-			case Texture::Format_RG_8:
-				return Texture::Format_BGR_8;
-			case Texture::Format_A_8:
-			case Texture::Format_LA_8:
-				return Texture::Format_BGRA_8;
+			case TextureFormat::Format_L_8:
+			case TextureFormat::Format_R_8:
+			case TextureFormat::Format_RG_8:
+				return TextureFormat::Format_BGR_8;
+			case TextureFormat::Format_A_8:
+			case TextureFormat::Format_LA_8:
+				return TextureFormat::Format_BGRA_8;
 		#endif
-		case Texture::Format_RGB_8:
-			return Texture::Format_BGR_8;
-		case Texture::Format_RGBA_8:
-			return Texture::Format_BGRA_8;
-		case Texture::Format_RGB_5_6_5:
-			return Texture::Format_BGR_5_6_5;
-		case Texture::Format_RGBA_5_5_5_1:
-			return Texture::Format_BGRA_5_5_5_1;
-		case Texture::Format_RGBA_4_4_4_4:
-			return Texture::Format_BGRA_4_4_4_4;
+		case TextureFormat::Format_RGB_8:
+			return TextureFormat::Format_BGR_8;
+		case TextureFormat::Format_RGBA_8:
+			return TextureFormat::Format_BGRA_8;
+		case TextureFormat::Format_RGB_5_6_5:
+			return TextureFormat::Format_BGR_5_6_5;
+		case TextureFormat::Format_RGBA_5_5_5_1:
+			return TextureFormat::Format_BGRA_5_5_5_1;
+		case TextureFormat::Format_RGBA_4_4_4_4:
+			return TextureFormat::Format_BGRA_4_4_4_4;
 		default:
 			return format;
 	}
@@ -1038,38 +1038,38 @@ DWORD D3D9RenderDevice::getD3DTOP(TextureState::Operation operation,TextureState
 D3DFORMAT D3D9RenderDevice::getD3DFORMAT(int format){
 	switch(format){
 		#if !defined(TOADLET_SET_D3DM)
-			case Texture::Format_L_8:
+			case TextureFormat::Format_L_8:
 				return D3DFMT_L8;
-			case Texture::Format_A_8:
+			case TextureFormat::Format_A_8:
 				return D3DFMT_A8;
-			case Texture::Format_LA_8:
+			case TextureFormat::Format_LA_8:
 				return D3DFMT_A8L8;
 		#endif
-		case Texture::Format_BGR_8:
+		case TextureFormat::Format_BGR_8:
 			return D3DFMT_R8G8B8;
-		case Texture::Format_BGRA_8:
+		case TextureFormat::Format_BGRA_8:
 			return D3DFMT_A8R8G8B8;
-		case Texture::Format_BGR_5_6_5:
+		case TextureFormat::Format_BGR_5_6_5:
 			return D3DFMT_R5G6B5;
-		case Texture::Format_BGRA_5_5_5_1:
+		case TextureFormat::Format_BGRA_5_5_5_1:
 			return D3DFMT_A1R5G5B5;
-		case Texture::Format_BGRA_4_4_4_4:
+		case TextureFormat::Format_BGRA_4_4_4_4:
 			return D3DFMT_A4R4G4B4;
-		case Texture::Format_DEPTH_16:
+		case TextureFormat::Format_DEPTH_16:
 			return D3DFMT_D16;
-		case Texture::Format_DEPTH_24:
+		case TextureFormat::Format_DEPTH_24:
 			return D3DFMT_D24S8;
-		case Texture::Format_DEPTH_32:
+		case TextureFormat::Format_DEPTH_32:
 			return D3DFMT_D32;
-		case Texture::Format_RGBA_DXT1:
+		case TextureFormat::Format_RGB_DXT1:
 			return D3DFMT_DXT1;
-		case Texture::Format_RGBA_DXT2:
+		case TextureFormat::Format_RGBA_DXT2:
 			return D3DFMT_DXT2;
-		case Texture::Format_RGBA_DXT3:
+		case TextureFormat::Format_RGBA_DXT3:
 			return D3DFMT_DXT3;
-		case Texture::Format_RGBA_DXT4:
+		case TextureFormat::Format_RGBA_DXT4:
 			return D3DFMT_DXT4;
-		case Texture::Format_RGBA_DXT5:
+		case TextureFormat::Format_RGBA_DXT5:
 			return D3DFMT_DXT5;
 		default:
 			return D3DFMT_UNKNOWN;
@@ -1084,7 +1084,7 @@ DWORD D3D9RenderDevice::getD3DUSAGE(int textureFormat,int usage){
 			0;
 		#endif
 	if((usage&Texture::Usage_BIT_RENDERTARGET)>0){
-		if((textureFormat&Texture::Format_BIT_DEPTH)>0){
+		if((textureFormat&TextureFormat::Format_MASK_SEMANTICS)==TextureFormat::Format_SEMANTIC_DEPTH){
 			d3dusage|=D3DUSAGE_DEPTHSTENCIL;
 		}
 		else{

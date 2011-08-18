@@ -46,7 +46,7 @@ D3D9TextureMipPixelBuffer::~D3D9TextureMipPixelBuffer(){
 	destroy();
 }
 
-bool D3D9TextureMipPixelBuffer::create(int usage,int access,int pixelFormat,int width,int height,int depth){
+bool D3D9TextureMipPixelBuffer::create(int usage,int access,TextureFormat::ptr format){
 	return false;
 }
 
@@ -57,36 +57,36 @@ void D3D9TextureMipPixelBuffer::destroy(){
 void D3D9TextureMipPixelBuffer::resetCreate(){
 	IDirect3DBaseTexture9 *d3dtexture=mTexture->mTexture;
 
-	switch(mTexture->mDimension){
-		case Texture::Dimension_D1:
-		case Texture::Dimension_D2:
+	switch(mTexture->mFormat->dimension){
+		case TextureFormat::Dimension_D1:
+		case TextureFormat::Dimension_D2:
 			((IDirect3DTexture9*)d3dtexture)->GetSurfaceLevel(mLevel,&mSurface);
 		break;
 		#if !defined(TOADLET_SET_D3DM)
-			case Texture::Dimension_D3:
+			case TextureFormat::Dimension_D3:
 				((IDirect3DVolumeTexture9*)d3dtexture)->GetVolumeLevel(mLevel,&mVolume);
 			break;
-			case Texture::Dimension_CUBE:
+			case TextureFormat::Dimension_CUBE:
 				((IDirect3DCubeTexture9*)d3dtexture)->GetCubeMapSurface((D3DCUBEMAP_FACES)mCubeSide,mLevel,&mSurface);
 			break;
 		#endif
 	}
 
-	mPixelFormat=mTexture->mFormat;
+	mFormat=TextureFormat::ptr(new TextureFormat(mTexture->mFormat));
 	
 	if(mSurface!=NULL){
 		D3DSURFACE_DESC desc;
 		mSurface->GetDesc(&desc);
-		mWidth=desc.Width;
-		mHeight=desc.Height;
-		mDepth=1;
+		mFormat->width=desc.Width;
+		mFormat->height=desc.Height;
+		mFormat->depth=1;
 	}
 	else if(mVolume!=NULL){
 		D3DVOLUME_DESC desc;
 		mVolume->GetDesc(&desc);
-		mWidth=desc.Width;
-		mHeight=desc.Height;
-		mDepth=desc.Depth;
+		mFormat->width=desc.Width;
+		mFormat->height=desc.Height;
+		mFormat->depth=desc.Depth;
 	}
 }
 

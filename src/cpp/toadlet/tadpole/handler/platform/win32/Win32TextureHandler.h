@@ -35,14 +35,13 @@ namespace tadpole{
 namespace handler{
 
 /// @brief  A lighter weight texture handling class for the Win32 platform
-
-class TOADLET_API Win32TextureHandler:public ResourceHandler{
+class TOADLET_API Win32TextureHandler:public ResourceStreamer{
 public:
 	Win32TextureHandler(TextureManager *textureManager);
 	virtual ~Win32TextureHandler();
 	bool valid();
 
-	Resource::ptr load(Stream::ptr in,const ResourceHandlerData *handlerData);
+	Resource::ptr load(Stream::ptr in,ResourceData *data,ProgressListener *listener);
 
 protected:
 	int getFormat(INT *gdiformat);

@@ -34,7 +34,7 @@ namespace handler{
 XANMHandler::XANMHandler(){
 }
 
-Resource::ptr XANMHandler::load(Stream::ptr stream,const ResourceHandlerData *handlerData){
+Resource::ptr XANMHandler::load(Stream::ptr stream,ResourceData *data,ProgressListener *listener){
 	TransformSequence::ptr sequence=NULL;
 
 	/// @todo: Replace the following when mxml implements custom load/save callbacks
@@ -74,7 +74,12 @@ Resource::ptr XANMHandler::load(Stream::ptr stream,const ResourceHandlerData *ha
 	return sequence;
 }
 
-bool XANMHandler::save(TransformSequence::ptr sequence,Stream::ptr stream,ProgressListener *listener){
+bool XANMHandler::save(Stream::ptr stream,Resource::ptr resource,ResourceData *data,ProgressListener *listener){
+	TransformSequence::ptr sequence=shared_static_cast<TransformSequence>(resource);
+	if(sequence==NULL){
+		return false;
+	}
+
 	mxml_node_t *root=mxmlNewElement(MXML_NO_PARENT,"XANM");
 
 	int version=XMLMeshUtilities::version;

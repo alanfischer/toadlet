@@ -36,7 +36,7 @@ namespace bsp{
 
 extern tbyte Quake1Palette[];
 
-BSP30Handler::BSP30Handler(Engine *engine):ResourceHandler(),
+BSP30Handler::BSP30Handler(Engine *engine):
 	mEngine(NULL)
 {
 	mEngine=engine;
@@ -44,7 +44,7 @@ BSP30Handler::BSP30Handler(Engine *engine):ResourceHandler(),
 
 BSP30Handler::~BSP30Handler(){}
 
-Resource::ptr BSP30Handler::load(Stream::ptr stream,const ResourceHandlerData *handlerData){
+Resource::ptr BSP30Handler::load(Stream::ptr stream,ResourceData *data,ProgressListener *listener){
 	DataStream::ptr dataStream(new DataStream(stream));
 	int version=dataStream->readLInt32();
 	dataStream->reset();

@@ -48,7 +48,7 @@ public:
 
 	void setBufferDestroyedListener(BufferDestroyedListener *listener){mListener=listener;}
 
-	bool create(int usage,int access,int pixelFormat,int width,int height,int depth);
+	bool create(int usage,int access,TextureFormat::ptr format);
 	void destroy();
 
 	void resetCreate(){}
@@ -58,10 +58,7 @@ public:
 	int getAccess() const{return mAccess;}
 	int getDataSize() const{return mDataSize;}
 
-	int getPixelFormat() const{return mPixelFormat;}
-	int getWidth() const{return mWidth;}
-	int getHeight() const{return mHeight;}
-	int getDepth() const{return 1;}
+	TextureFormat::ptr getTextureFormat() const{return mFormat;}
 	
 	/// @todo: Can these be implemented
 	tbyte *lock(int access){return NULL;}
@@ -74,11 +71,10 @@ protected:
 	BufferDestroyedListener *mListener;
 	GLFBORenderTarget *mTarget;
 	GLuint mHandle;
-	int mPixelFormat;
 	int mUsage;
 	int mAccess;
+	TextureFormat::ptr mFormat;
 	int mDataSize;
-	int mWidth,mHeight;
 
 	friend class GLFBORenderTarget;
 };

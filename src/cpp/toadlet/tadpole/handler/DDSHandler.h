@@ -28,19 +28,19 @@
 
 #include <toadlet/egg/image/DDSHandler.h>
 #include <toadlet/peeper/Texture.h>
-#include <toadlet/tadpole/ResourceHandler.h>
+#include <toadlet/tadpole/ResourceStreamer.h>
 
 namespace toadlet{
 namespace tadpole{
 namespace handler{
 
-class TOADLET_API DDSHandler:public ResourceHandler{
+class TOADLET_API DDSHandler:public ResourceStreamer{
 public:
 	TOADLET_SHARED_POINTERS(DDSHandler);
 
 	DDSHandler(TextureManager *textureManager){mTextureManager=textureManager;}
 
-	Resource::ptr load(Stream::ptr stream,const ResourceHandlerData *handlerData){
+	Resource::ptr load(Stream::ptr stream,ResourceData *data,ProgressListener *listener){
 		Collection<Image::ptr> mipLevels;
 		if(mHandler.loadImage(stream,mipLevels)){
 			return mTextureManager->createTexture(mipLevels.size(),mipLevels.begin());
@@ -50,8 +50,9 @@ public:
 		}
 	}
 
-	bool save(Texture::ptr resource,Stream::ptr stream){
-		return mHandler.saveImage(mTextureManager->createImage(resource),stream);
+	bool save(Stream::ptr stream,Resource::ptr resource,ResourceData *data,ProgressListener *listener){
+		Texture::ptr texture=shared_static_cast<Texture>(resource);
+		return mHandler.saveImage(mTextureManager->createImage(texture),stream);
 	}
 
 protected:

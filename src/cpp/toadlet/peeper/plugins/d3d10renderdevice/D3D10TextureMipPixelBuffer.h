@@ -46,7 +46,7 @@ public:
 
 	void setBufferDestroyedListener(BufferDestroyedListener *listener){mListener=listener;}
 
-	bool create(int usage,int access,int pixelFormat,int width,int height,int depth);
+	bool create(int usage,int access,TextureFormat::ptr textureFormat);
 	void destroy();
 
 	void resetCreate(){}
@@ -54,12 +54,8 @@ public:
 
 	int getUsage() const{return 0;}
 	int getAccess() const{return 0;}
+	TextureFormat::ptr getTextureFormat() const{return mFormat;}
 	int getDataSize() const{return mDataSize;}
-
-	int getPixelFormat() const{return mPixelFormat;}
-	int getWidth() const{return mWidth;}
-	int getHeight() const{return mHeight;}
-	int getDepth() const{return mDepth;}
 
 	tbyte *lock(int lockAccess);
 	bool unlock();
@@ -70,7 +66,7 @@ public:
 	inline ID3D10DepthStencilView *getD3D10DepthStencilView() const{return mD3DDepthStencilView;}
 
 protected:
-	bool createViews(Texture::Dimension dimension,int pixelFormat,int level);
+	bool createViews(int dimension,int pixelFormat,int level);
 
 	D3D10RenderDevice *mDevice;
 	BufferDestroyedListener *mListener;
@@ -82,8 +78,7 @@ protected:
 	int mLevel;
 	int mCubeSide;
 	int mDataSize;
-	int mPixelFormat;
-	int mWidth,mHeight,mDepth;
+	TextureFormat::ptr mFormat;
 
 	friend class D3D10RenderDevice;
 	friend class D3D10Texture;

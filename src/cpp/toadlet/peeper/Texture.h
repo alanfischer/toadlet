@@ -28,14 +28,14 @@
 
 #include <toadlet/egg/Resource.h>
 #include <toadlet/egg/String.h>
-#include <toadlet/egg/image/Image.h>
 #include <toadlet/peeper/Types.h>
 #include <toadlet/peeper/PixelBuffer.h>
+#include <toadlet/peeper/TextureFormat.h>
 
 namespace toadlet{
 namespace peeper{
 
-class Texture:public Resource,public ImageDefinitions{
+class Texture:public Resource{
 public:
 	TOADLET_SHARED_POINTERS(Texture);
 
@@ -55,20 +55,14 @@ public:
 
 	virtual Texture *getRootTexture()=0;
 
-	virtual bool create(int usage,Dimension dimension,int format,int width,int height,int depth,int mipLevels,tbyte *mipDatas[])=0;
+	virtual bool create(int usage,TextureFormat::ptr format,tbyte *mipDatas[])=0;
 	virtual void destroy()=0;
 
 	virtual void resetCreate()=0;
 	virtual void resetDestroy()=0;
 
 	virtual int getUsage() const=0;
-	virtual Dimension getDimension() const=0;
-	virtual int getFormat() const=0;
-	virtual int getWidth() const=0;
-	virtual int getHeight() const=0;
-	virtual int getDepth() const=0;
-	virtual int getNumMipLevels() const=0;
-	virtual scalar getLength() const=0;
+	virtual TextureFormat::ptr getFormat() const=0;
 
 	virtual PixelBuffer::ptr getMipPixelBuffer(int i,int cubeSide)=0;
 	virtual bool load(int width,int height,int depth,int mipLevel,tbyte *mipData)=0;
