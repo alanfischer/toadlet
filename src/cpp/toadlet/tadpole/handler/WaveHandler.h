@@ -26,8 +26,8 @@
 #ifndef TOADLET_TADPOLE_HANDLER_WAVEHANDLER_H
 #define TOADLET_TADPOLE_HANDLER_WAVEHANDLER_H
 
-#include <toadlet/ribbit/decoder/WaveDecoder.h>
 #include <toadlet/tadpole/handler/AudioBufferHandler.h>
+#include <toadlet/tadpole/handler/WaveDecoder.h>
 
 namespace toadlet{
 namespace tadpole{

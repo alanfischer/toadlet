@@ -23,15 +23,16 @@
  *
  ********** Copyright header - do not remove **********/
 
-#ifndef TOADLET_EGG_IO_ZIPARCHIVE_H
-#define TOADLET_EGG_IO_ZIPARCHIVE_H
+#ifndef TOADLET_TADPOLE_HANDLER_ZIPARCHIVE_H
+#define TOADLET_TADPOLE_HANDLER_ZIPARCHIVE_H
 
 #include <toadlet/egg/BaseResource.h>
 #include <toadlet/egg/io/Archive.h>
+#include <toadlet/tadpole/Types.h>
 
 namespace toadlet{
-namespace egg{
-namespace io{
+namespace tadpole{
+namespace handler{
 
 class TOADLET_API ZIPArchive:public Archive,public BaseResource{
 	TOADLET_BASERESOURCE_PASSTHROUGH(Archive);
