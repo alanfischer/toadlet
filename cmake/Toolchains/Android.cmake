@@ -164,6 +164,11 @@ if( EXISTS "${ANDROID_NDK}" )
   message( FATAL_ERROR "Your platform is not supported" )
  endif()
 
+ # On some platforms (OSX) this may not be defined, so search for it
+ if( NOT DEFINED CMAKE_INSTALL_NAME_TOOL)
+  find_program( CMAKE_INSTALL_NAME_TOOL install_name_tool)
+ endif( NOT DEFINED CMAKE_INSTALL_NAME_TOOL)
+
  set( ANDROID_API_LEVEL $ENV{ANDROID_API_LEVEL} )
  string( REGEX REPLACE "[\t ]*android-([0-9]+)[\t ]*" "\\1" ANDROID_API_LEVEL "${ANDROID_API_LEVEL}" )
  string( REGEX REPLACE "[\t ]*([0-9]+)[\t ]*" "\\1" ANDROID_API_LEVEL "${ANDROID_API_LEVEL}" )
