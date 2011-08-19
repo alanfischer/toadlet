@@ -26,8 +26,8 @@
 #ifndef TOADLET_TADPOLE_HANDLER_TPKGHANDLER_H
 #define TOADLET_TADPOLE_HANDLER_TPKGHANDLER_H
 
-#include <toadlet/egg/io/TPKGArchive.h>
 #include <toadlet/tadpole/ResourceStreamer.h>
+#include <toadlet/tadpole/handler/TPKGArchive.h>
 
 namespace toadlet{
 namespace tadpole{

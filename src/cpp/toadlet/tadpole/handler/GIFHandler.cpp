@@ -32,18 +32,19 @@
 extern "C"{
 	#include <gif_lib.h>
 }
-#include <toadlet/egg/image/GIFHandler.h>
 #include <toadlet/egg/EndianConversion.h>
 #include <toadlet/egg/Error.h>
 #include <toadlet/egg/Logger.h>
+#include <toadlet/egg/image/Image.h>
+#include <toadlet/tadpole/handler/GIFHandler.h>
 
 #if defined(TOADLET_PLATFORM_WIN32) && defined(TOADLET_LIBGIF_NAME)
 	#pragma comment(lib,TOADLET_LIBGIF_NAME)
-#endif
+#endif`1
 
 namespace toadlet{
-namespace egg{
-namespace image{
+namespace tadpole{
+namespace handler{
 
 int readGifData(GifFileType *file,GifByteType *data,int amount){
 	Stream *stream=(Stream*)file->UserData;
@@ -122,27 +123,7 @@ void setImagePortion(Image *dest,int x,int y,int width,int height,int red,int gr
 	}
 }
 
-GIFHandler::GIFHandler(){
-	mWorking=NULL;
-	mBase=NULL;
-}
-
-GIFHandler::~GIFHandler(){
-	resetReader();
-}
-
-void GIFHandler::resetReader(){
-	if(mWorking!=NULL){
-		delete mWorking;
-		mWorking=NULL;
-	}
-	if(mBase!=NULL){
-		delete mBase;
-		mBase=NULL;
-	}
-}
-
-int GIFHandler::getNextImage(GifFileType *gifFile,Image *&image,int &frameDelay){
+int GIFHandler::getNextImage(Image *&image,int &frameDelay,GifFileType *gifFile,Image *&base,Image *&working){
 	GifRecordType RecordType;
 	GifByteType *pLine=NULL;
 	GifByteType *pExtension=NULL;
@@ -184,34 +165,34 @@ int GIFHandler::getNextImage(GifFileType *gifFile,Image *&image,int &frameDelay)
 					pixelSize=4;
 				}
 
-				if(mWorking==NULL){
-					mWorking=Image::createAndReallocate(Image::Dimension_D2,format,width,height);
-					if(mWorking==NULL){
+				if(working==NULL){
+					working=Image::createAndReallocate(Image::Dimension_D2,format,width,height);
+					if(working==NULL){
 						return GIF_ERROR;
 					}
 
-					memset(mWorking->getData(),0,pixelSize*width*height);
+					memset(working->getData(),0,pixelSize*width*height);
 
 					GifColorType *color=gifFile->SColorMap->Colors + gifFile->SBackGroundColor;
-					setImagePortion(mWorking,gifFile->Image.Left,gifFile->Image.Top,gifFile->Image.Width,gifFile->Image.Height,color->Red,color->Green,color->Blue);
+					setImagePortion(working,gifFile->Image.Left,gifFile->Image.Top,gifFile->Image.Width,gifFile->Image.Height,color->Red,color->Green,color->Blue);
 				}
 
-				if(mBase==NULL){
-					mBase=Image::createAndReallocate(Image::Dimension_D2,format,width,height);
-					if(mBase==NULL){
+				if(base==NULL){
+					base=Image::createAndReallocate(Image::Dimension_D2,format,width,height);
+					if(base==NULL){
 						return GIF_ERROR;
 					}
 					
-					memset(mWorking->getData(),0,pixelSize*width*height);
+					memset(working->getData(),0,pixelSize*width*height);
 
 					GifColorType *color=gifFile->SColorMap->Colors + gifFile->SBackGroundColor;
-					setImagePortion(mWorking,gifFile->Image.Left,gifFile->Image.Top,gifFile->Image.Width,gifFile->Image.Height,color->Red,color->Green,color->Blue);
+					setImagePortion(working,gifFile->Image.Left,gifFile->Image.Top,gifFile->Image.Width,gifFile->Image.Height,color->Red,color->Green,color->Blue);
 				}
 
 				pLine=new GifByteType[width*pixelSize];
 
-				unsigned int workingWidth=mWorking->getWidth();
-				unsigned int workingHeight=mWorking->getHeight();
+				unsigned int workingWidth=working->getWidth();
+				unsigned int workingHeight=working->getHeight();
 
 				if(gifFile->Image.Interlace){
 					// Need to perform 4 passes on the images:
@@ -221,7 +202,7 @@ int GIFHandler::getNextImage(GifFileType *gifFile,Image *&image,int &frameDelay)
 								delete[] pLine;
 								return GIF_ERROR;
 							}
-							copyGIFLine(mWorking->getData(),workingWidth,workingHeight,x,y,width,height,width,i,pLine,transparent,pColorTable,pixelSize,format);
+							copyGIFLine(working->getData(),workingWidth,workingHeight,x,y,width,height,width,i,pLine,transparent,pColorTable,pixelSize,format);
  						}
 					}
 				}
@@ -232,19 +213,19 @@ int GIFHandler::getNextImage(GifFileType *gifFile,Image *&image,int &frameDelay)
 							delete[] pLine;
 							return GIF_ERROR;
 						}
-						copyGIFLine(mWorking->getData(),workingWidth,workingHeight,x,y,width,height,width,i,pLine,transparent,pColorTable,pixelSize,format);
+						copyGIFLine(working->getData(),workingWidth,workingHeight,x,y,width,height,width,i,pLine,transparent,pColorTable,pixelSize,format);
 					}
 				}
 				delete[] pLine;
 
-				image=flipImage(mWorking);
+				image=flipImage(working);
 
 				if(dispose == GIF_DISPOSE_LEAVE){
-					memcpy(mBase->getData(),mWorking->getData(),mWorking->getPixelSize()*mWorking->getWidth()*mWorking->getHeight());
+					memcpy(base->getData(),working->getData(),working->getPixelSize()*working->getWidth()*working->getHeight());
 				}
  				else if(dispose == GIF_DISPOSE_BACKGND){
 					GifColorType *color=gifFile->SColorMap->Colors + gifFile->SBackGroundColor;
-					setImagePortion(mWorking,gifFile->Image.Left,gifFile->Image.Top,gifFile->Image.Width,gifFile->Image.Height,color->Red,color->Green,color->Blue);
+					setImagePortion(working,gifFile->Image.Left,gifFile->Image.Top,gifFile->Image.Width,gifFile->Image.Height,color->Red,color->Green,color->Blue);
 				}
 				else if(dispose == GIF_DISPOSE_RESTORE){
 					const int x = gifFile->Image.Left;
@@ -255,7 +236,7 @@ int GIFHandler::getNextImage(GifFileType *gifFile,Image *&image,int &frameDelay)
 
 					int j;
 					for(j=y;j<y+height;++j){
-						memcpy(mWorking->getData()+y*stride+x,mBase->getData()+y*stride+x,stride);
+						memcpy(working->getData()+y*stride+x,base->getData()+y*stride+x,stride);
 					}
 				}
 				else{
@@ -336,55 +317,7 @@ int GIFHandler::closeFile(GifFileType *file){
 	return result;
 }
 
-Image *GIFHandler::loadImage(Stream *stream){
-	if(stream==NULL){
-		Error::nullPointer(Categories::TOADLET_EGG,
-			"Stream is NULL");
-		return NULL;
-	}
-
-	GifFileType *file=openFile(stream);
-
-	if(file==NULL){
-		Error::loadingImage(Categories::TOADLET_EGG,
-			"GIFHandler::loadImage: Invalid file");
-		return NULL;
-	}
-
-	resetReader();
-
-	Image *image=0;
-	int frameDelay=0;
-	int result=0;
-
-	result=getNextImage(file,image,frameDelay);
-	if(result==GIF_ERROR){
-		delete image;
-
-		Error::loadingImage(Categories::TOADLET_EGG,
-			"GIFHandler::loadImage: Error in getNextImage");
-		return NULL;
-	}
-
-	result=closeFile(file);
-	if(result==GIF_ERROR){
-		delete image;
-
-		Error::loadingImage(Categories::TOADLET_EGG,
-			String("GIFHandler::loadImage: Error closing file: ")+result);
-		return NULL;
-	}
-
-	return image;
-}
-
-bool GIFHandler::saveImage(Image *image,Stream *stream){
-	Error::unimplemented(Categories::TOADLET_EGG,
-		"GIFHandler::saveImage: Not implemented");
-	return false;
-}
-
-bool GIFHandler::loadAnimatedImage(Stream *stream,Collection<Image*> &images,Collection<int> &frameDelays){
+Resource::ptr GIFHandler::load(Stream::ptr stream,ResourceData *data,ProgressListener *listener){
 	if(stream==NULL){
 		Error::nullPointer(Categories::TOADLET_EGG,
 			"Stream is NULL");
@@ -399,36 +332,52 @@ bool GIFHandler::loadAnimatedImage(Stream *stream,Collection<Image*> &images,Col
 		return false;
 	}
 
-	resetReader();
-
-	Image *image;
-	int frameDelay;
-	int result;
+	Collection<int> frameDelays;
+	Collection<Image::ptr> images;
+	Image *image=NULL,*base=NULL,*working=NULL;
+	int frameDelay=0;
+	int result=0;
 
 	do{
-		image=0;
+		image=NULL;
 		frameDelay=0;
-		result=getNextImage(file,image,frameDelay);
-		if(image!=0 && result!=GIF_ERROR){
-			images.add(image);
+		result=getNextImage(image,frameDelay,file,base,working);
+		if(image!=NULL && result!=GIF_ERROR){
+			images.add(Image::ptr(image));
 			frameDelays.add(frameDelay);
 		}
-	}while(result!=GIF_ERROR && image!=0);
+	}while(result!=GIF_ERROR && image!=NULL);
 
+	if(result!=GIF_ERROR){
+		result=DGifCloseFile(file);
+	}
+	
+	Texture::ptr texture;
+	if(result!=GIF_ERROR){
+		Image::ptr image=images[0];
+		if(images.size()>1){
+			Image::ptr image3d(Image::createAndReallocate(Image::Dimension_D3,image->getFormat(),image->getWidth(),image->getHeight(),images.size()));
+			int i;
+			for(i=0;i<images.size();++i){
+				memcpy(image3d->getData()+image3d->getSlicePitch()*i,images[i]->getData(),image3d->getSlicePitch());
+			}
+			texture=mTextureManager->createTexture(image3d);
+		}
+		else{
+			texture=mTextureManager->createTexture(image);
+		}
+	}
+	
+	delete base;
+	delete working;
+	
 	if(result==GIF_ERROR){
 		Error::loadingImage(Categories::TOADLET_EGG,
-			"GIFHandler::loadAnimatedImage: Error in getNextImage");
-		return false;
+			"GIFHandler::loadAnimatedImage: Error loading image");
+		return NULL;
 	}
 
-	result=DGifCloseFile(file);
-	if(result==GIF_ERROR){
-		Error::loadingImage(Categories::TOADLET_EGG,
-			"GIFHandler::loadAnimatedImage: Error closing file");
-		return false;
-	}
-
-	return true;
+	return texture;
 }
 
 Image *GIFHandler::flipImage(Image *image){

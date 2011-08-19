@@ -50,6 +50,7 @@ set (TADPOLE_HANDLER_SRC
 	handler/DDSHandler.cpp
 	handler/TGAHandler.cpp
 	handler/TMSHHandler.cpp
+	handler/TPKGArchive.cpp
 	handler/WADArchive.cpp
 )
 
@@ -58,6 +59,18 @@ set (TADPOLE_HANDLER_XML_SRC
 	handler/XMLMeshUtilities.cpp
 	handler/XMATHandler.cpp
 	handler/XMSHHandler.cpp
+)
+
+set (TADPOLE_HANDLER_GIF_SRC
+	handler/GIFHandler.cpp
+)
+
+set (TADPOLE_HANDLER_JPEG_SRC
+	handler/JPEGHandler.cpp
+)
+
+set (TADPOLE_HANDLER_PNG_SRC
+	handler/PNGHandler.cpp
 )
 
 set (TADPOLE_HANDLER_FREETYPE_SRC
@@ -193,12 +206,12 @@ set (TADPOLE_BSP_HEADERS
 set (TADPOLE_HANDLER_HEADERS
 	handler/AudioBufferHandler.h
 	handler/BMPHandler.h
-	handler/GIFHandler.h
 	handler/JPEGHandler.h
 	handler/TMSHHandler.h
 	handler/PNGHandler.h
 	handler/SPRHandler.h
 	handler/TGAHandler.h
+	handler/TPKGArchive.h
 	handler/TPKGHandler.h
 	handler/WADArchive.h
 	handler/WADHandler.h
@@ -210,6 +223,18 @@ set (TADPOLE_HANDLER_XML_HEADERS
 	handler/XMLMeshUtilities.h
 	handler/XMATHandler.h
 	handler/XMSHHandler.h
+)
+
+set (TADPOLE_HANDLER_GIF_HEADERS
+	handler/GIFHandler.h
+)
+
+set (TADPOLE_HANDLER_JPEG_HEADERS
+	handler/JPEGHandler.h
+)
+
+set (TADPOLE_HANDLER_PNG_HEADERS
+	handler/PNGHandler.h
 )
 
 set (TADPOLE_HANDLER_FREETYPE_HEADERS
@@ -362,6 +387,7 @@ if (MXML_FOUND)
 	source_group ("Source Files\\\\handler" FILES ${TADPOLE_HANDLER_XML_SRC})
 	source_group ("Header Files\\\\handler" FILES ${TADPOLE_HANDLER_XML_HEADERS})
 	set (TADPOLE_SRC ${TADPOLE_SRC} ${TADPOLE_HANDLER_XML_SRC})
+	set (TADPOLE_HEADERS ${TADPOLE_HEADERS} ${TADPOLE_HANDLER_XML_HEADERS})
 
 	# Libraries
 	set (TADPOLE_LIBS ${TADPOLE_LIBS} ${MXML_LIBRARY})
@@ -381,6 +407,78 @@ if (MXML_FOUND)
 		set (STATIC_LIB_PROPS ${STATIC_LIB_PROPS} STATIC_LIBRARY_FLAGS ${MXML_LIBRARY})	
 	endif (TOADLET_PLATFORM_OSX)
 endif (MXML_FOUND)
+
+find_package (GIF)
+if (GIF_FOUND)
+	# Files
+	set (TOADLET_HAS_GIF ON PARENT_SCOPE)
+	include_directories (${GIF_INCLUDE_DIR})
+	source_group ("Source Files\\\\handler" FILES ${TADPOLE_HANDLER_GIF_SRC})
+	source_group ("Header Files\\\\handler" FILES ${TADPOLE_HANDLER_GIF_HEADERS})
+	set (TADPOLE_SRC ${TADPOLE_SRC} ${TADPOLE_HANDLER_GIF_SRC})
+	set (TADPOLE_HEADERS ${TADPOLE_HEADERS} ${TADPOLE_HANDLER_GIF_HEADERS})
+
+	# Libraries
+	set (TADPOLE_LIBS ${TADPOLE_LIBS} ${GIF_LIBRARY})
+	add_library (libgif_s STATIC IMPORTED)
+	if (TOADLET_PLATFORM_POSIX)
+		string (REPLACE ".so" ".a" GIF_A ${GIF_LIBRARY})
+		if (EXISTS ${GIF_A})
+			set (GIF_LIBRARY ${GIF_A})
+		endif (EXISTS ${GIF_A})
+	endif (TOADLET_PLATFORM_POSIX)
+	set_property (TARGET libgif_s PROPERTY IMPORTED_LOCATION ${GIF_LIBRARY})
+	set (TADPOLE_DEFS_S ${TADPOLE_DEFS_S} TOADLET_LIBGIF_NAME="${GIF_LIBRARY}")
+	set (TADPOLE_LIBS_S ${TADPOLE_LIBS_S} libgif_s)
+endif (GIF_FOUND)
+
+find_package (JPEG)
+if (JPEG_FOUND)
+	# Files 
+	set (TOADLET_HAS_JPEG ON PARENT_SCOPE)
+	include_directories (${JPEG_INCLUDE_DIR})
+	source_group ("Source Files\\\\handler" FILES ${TADPOLE_HANDLER_JPEG_SRC})
+	source_group ("Header Files\\\\handler" FILES ${TADPOLE_HANDLER_JPEG_HEADERS})
+	set (TADPOLE_SRC ${TADPOLE_SRC} ${TADPOLE_HANDLER_JPEG_SRC})
+	set (TADPOLE_HEADERS ${TADPOLE_HEADERS} ${TADPOLE_HANDLER_JPEG_HEADERS})
+	
+	# Libraries
+	set (TADPOLE_LIBS ${TADPOLE_LIBS} ${JPEG_LIBRARY})
+	add_library (libjpeg_s STATIC IMPORTED)
+	if (TOADLET_PLATFORM_POSIX)
+		string (REPLACE ".so" ".a" JPEG_A ${JPEG_LIBRARY})
+		if (EXISTS ${JPEG_A})
+			set (JPEG_LIBRARY ${JPEG_A})
+		endif (EXISTS ${JPEG_A})
+	endif (TOADLET_PLATFORM_POSIX)
+	set_property (TARGET libjpeg_s PROPERTY IMPORTED_LOCATION ${JPEG_LIBRARY})
+	set (TADPOLE_DEFS_S ${TADPOLE_DEFS_S} TOADLET_LIBJPEG_NAME="${JPEG_LIBRARY}")
+	set (TADPOLE_LIBS_S ${TADPOLE_LIBS_S} libjpeg_s)
+endif (JPEG_FOUND)
+
+find_package (PNG)
+if (PNG_FOUND)
+	# Files
+	set (TOADLET_HAS_PNG ON PARENT_SCOPE)
+	include_directories (${PNG_INCLUDE_DIR})
+	source_group ("Source Files\\\\handler" FILES ${TADPOLE_HANDLER_PNG_SRC})
+	source_group ("Header Files\\\\handler" FILES ${TADPOLE_HANDLER_PNG_HEADERS})
+	set (TADPOLE_SRC ${TADPOLE_SRC} ${TADPOLE_HANDLER_PNG_SRC})
+	set (TADPOLE_HEADERS ${TADPOLE_HEADERS} ${TADPOLE_HANDLER_PNG_HEADERS})
+	
+	# Libraries
+	set (TADPOLE_LIBS ${TADPOLE_LIBS} ${PNG_LIBRARY})
+	add_library (libpng_s STATIC IMPORTED)
+	if (TOADLET_PLATFORM_POSIX)
+		string (REPLACE ".so" ".a" PNG_A ${PNG_LIBRARY})
+		if (EXISTS ${PNG_A})
+			set (PNG_LIBRARY ${PNG_A})
+		endif (EXISTS ${PNG_A})
+	endif (TOADLET_PLATFORM_POSIX)
+	set_property (TARGET libpng_s PROPERTY IMPORTED_LOCATION ${PNG_LIBRARY})
+	set (TADPOLE_DEFS_S ${TADPOLE_DEFS_S} TOADLET_LIBPNG_NAME="${PNG_LIBRARY}")
+	set (TADPOLE_LIBS_S ${TADPOLE_LIBS_S} libpng_s)
+endif (PNG_FOUND)
 
 # Platform specific files
 if (TOADLET_PLATFORM_OSX)

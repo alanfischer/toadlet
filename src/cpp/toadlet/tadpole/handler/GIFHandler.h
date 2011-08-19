@@ -26,8 +26,11 @@
 #ifndef TOADLET_TADPOLE_HANDLER_GIFHANDLER_H
 #define TOADLET_TADPOLE_HANDLER_GIFHANDLER_H
 
-#include <toadlet/egg/image/GIFHandler.h>
+#include <toadlet/peeper/Texture.h>
 #include <toadlet/tadpole/ResourceStreamer.h>
+#include <toadlet/tadpole/TextureManager.h>
+
+struct GifFileType;
 
 namespace toadlet{
 namespace tadpole{
@@ -39,38 +42,15 @@ public:
 
 	GIFHandler(TextureManager *textureManager){mTextureManager=textureManager;}
 
-	Resource::ptr load(Stream::ptr stream,ResourceData *data,ProgressListener *listener){
-		Collection<Image*> images;
-		Collection<int> delays;
-
-		mHandler.loadAnimatedImage(stream,images,delays);
-
-		if(images.size()==0){
-			return NULL;
-		}
-		else if(images.size()==1){
-			return mTextureManager->createTexture(Image::ptr(images[0]));
-		}
-		else{
-/// @todo: Revive this somehow, probably as a 3d texture
-//			SequenceTexture::ptr sequence(new SequenceTexture(Texture::Dimension_D2,images.size()));
-//			int i;
-//			for(i=0;i<images.size();++i){
-//				sequence->setTexture(i,mTextureManager->createTexture(Image::ptr(images[i])),Math::fromMilli(delays[i]));
-//			}
-//			return shared_static_cast<Texture>(sequence);
-return NULL;
-		}
-	}
-
-	bool save(Stream::ptr stream,Resource::ptr resource,ResourceData *data,ProgressListener *listener){
-		Texture::ptr texture=shared_static_cast<Texture>(resource);
-		return mHandler.saveImage(mTextureManager->createImage(texture),stream);
-	}
+	Resource::ptr load(Stream::ptr stream,ResourceData *data,ProgressListener *listener);
 
 protected:
+	GifFileType *openFile(Stream *stream);
+	int closeFile(GifFileType *file);
+	int getNextImage(Image *&image,int &frameDelay,GifFileType *gifFile,Image *&base,Image *&working);
+	Image *flipImage(Image *image);
+
 	TextureManager *mTextureManager;
-	egg::image::GIFHandler mHandler;
 };
 
 }
