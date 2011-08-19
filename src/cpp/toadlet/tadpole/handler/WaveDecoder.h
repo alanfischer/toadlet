@@ -23,42 +23,47 @@
  *
  ********** Copyright header - do not remove **********/
 
-#ifndef TOADLET_RIBBIT_DECODER_SIDDECODER_H
-#define TOADLET_RIBBIT_DECODER_SIDDECODER_H
+#ifndef TOADLET_TADPOLE_HANDLER_WAVEDECODER_H
+#define TOADLET_TADPOLE_HANDLER_WAVEDECODER_H
 
 #include <toadlet/ribbit/AudioStream.h>
+#include <toadlet/tadpole/Types.h>
 
 namespace toadlet{
-namespace ribbit{
-namespace decoder{
+namespace tadpole{
+namespace handler{
 
-class SIDAttributes;
-
-class TOADLET_API SIDDecoder:public AudioStream{
+class TOADLET_API WaveDecoder:public AudioStream{
 public:
-	SIDDecoder();
-	virtual ~SIDDecoder();
-
-	bool startStream(Stream::ptr stream);
-
-	AudioFormat::ptr getAudioFormat() const{return mFormat;}
+	WaveDecoder();
+	virtual ~WaveDecoder();
 
 	void close(){}
 	bool closed(){return false;}
+
 	bool readable(){return true;}
 	int read(tbyte *buffer,int length);
 
 	bool writeable(){return false;}
 	int write(const tbyte *buffer,int length){return -1;}
 
-	bool reset(){return false;}
-	int length(){return -1;}
-	int position(){return -1;}
+	bool startStream(Stream::ptr stream);
+	bool reset();
+	int length(){return mSize;}
+	int position(){return mPosition;}
 	bool seek(int offs){return false;}
 
-protected:
+	AudioFormat::ptr getAudioFormat() const{return mFormat;}
+
+private:
+	void skip(Stream::ptr stream,int amount);
+	void ADPCMDecoder(const char *in,short *out,int len);
+
 	AudioFormat::ptr mFormat;
-	SIDAttributes *sid;
+	tbyte *mData;
+	int mSize;
+	int mPosition;
+	Stream::ptr mStream;
 };
 
 }
@@ -66,3 +71,4 @@ protected:
 }
 
 #endif
+

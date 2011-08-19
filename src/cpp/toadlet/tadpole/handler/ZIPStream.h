@@ -23,51 +23,54 @@
  *
  ********** Copyright header - do not remove **********/
 
-#ifndef TOADLET_RIBBIT_DECODER_OGGVORBISDECODER_H
-#define TOADLET_RIBBIT_DECODER_OGGVORBISDECODER_H
+#ifndef TOADLET_TADPOLE_HANDLER_ZIPSTREAM_H
+#define TOADLET_TADPOLE_HANDLER_ZIPSTREAM_H
 
-#include <toadlet/ribbit/AudioStream.h>
-
-struct OggVorbis_File;
-struct vorbis_info;
+#include <toadlet/egg/io/Stream.h>
+#include <toadlet/tadpole/Types.h>
 
 namespace toadlet{
-namespace ribbit{
-namespace decoder{
+namespace tadpole{
+namespace handler{
 
-const int OGGPACKETSIZE=4096;
-
-class TOADLET_API OggVorbisDecoder:public AudioStream{
+/// @todo: Ideally the zlib usage would be replaced with zziplib, but zziplib does not support writing
+class TOADLET_API ZIPStream:public Stream{
 public:
-	OggVorbisDecoder();
-	virtual ~OggVorbisDecoder();
+	TOADLET_SHARED_POINTERS(ZIPStream);
+
+	enum OpenFlags{
+		OpenFlags_UNKNOWN=	0,
+		OpenFlags_READ=		1<<0,
+		OpenFlags_WRITE=	1<<1,
+	};
+
+	// Constructor to open a stream that compresses or decompresses data to a parent stream
+	ZIPStream(Stream::ptr stream,int openFlags=0);
+
+	// Constructor to open a ZZIP_FILE in a ZZIP_DIR
+	ZIPStream(void *dir,const String &name);
+
+	virtual ~ZIPStream();
 
 	void close();
-	bool closed(){return mVorbisInfo==NULL;}
+	bool closed();
 
-	bool readable(){return true;}
+	bool readable(){return mStream!=NULL?mStream->readable():true;}
 	int read(tbyte *buffer,int length);
 
-	bool writeable(){return false;}
-	int write(const tbyte *buffer,int length){return -1;}
-
-	bool startStream(Stream::ptr stream);
-	bool stopStream();
+	bool writeable(){return mStream!=NULL?mStream->writeable():false;}
+	int write(const tbyte *buffer,int length);
 
 	bool reset();
 	int length();
 	int position();
 	bool seek(int offs);
 
-	AudioFormat::ptr getAudioFormat() const{return mFormat;}
-
-private:
-	OggVorbis_File *mVorbisFile;
-	vorbis_info *mVorbisInfo;
-	char mDataBuffer[OGGPACKETSIZE];
-	int mDataLength;
-	AudioFormat::ptr mFormat;
+protected:
+	int mOpenFlags;
 	Stream::ptr mStream;
+	void *mZStream;
+	void *mFile;
 };
 
 }

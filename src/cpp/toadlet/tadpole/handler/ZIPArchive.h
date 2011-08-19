@@ -23,39 +23,38 @@
  *
  ********** Copyright header - do not remove **********/
 
-#ifndef TOADLET_EGG_IMAGE_GIFHANDLER_H
-#define TOADLET_EGG_IMAGE_GIFHANDLER_H
+#ifndef TOADLET_TADPOLE_HANDLER_ZIPARCHIVE_H
+#define TOADLET_TADPOLE_HANDLER_ZIPARCHIVE_H
 
-#include <toadlet/egg/image/Image.h>
-#include <toadlet/egg/io/Stream.h>
-#include <toadlet/egg/Collection.h>
-
-struct GifFileType;
+#include <toadlet/egg/BaseResource.h>
+#include <toadlet/egg/io/Archive.h>
+#include <toadlet/tadpole/Types.h>
 
 namespace toadlet{
-namespace egg{
-namespace image{
+namespace tadpole{
+namespace handler{
 
-class TOADLET_API GIFHandler{
+class TOADLET_API ZIPArchive:public Archive,public BaseResource{
+	TOADLET_BASERESOURCE_PASSTHROUGH(Archive);
 public:
-	GIFHandler();
-	virtual ~GIFHandler();
+	TOADLET_SHARED_POINTERS(ZIPArchive);
 
-	virtual Image *loadImage(Stream *stream);
-	virtual bool saveImage(Image *image,Stream *stream);
+	ZIPArchive();
+	virtual ~ZIPArchive();
 
-	virtual bool loadAnimatedImage(Stream *stream,Collection<Image*> &images,Collection<int> &frameDelays);
+	void destroy();
+
+	bool open(Stream::ptr stream);
+
+	Stream::ptr openStream(const String &name);
+	Resource::ptr openResource(const String &name){return NULL;}
+
+	Collection<String>::ptr getEntries();
 
 protected:
-	GifFileType *openFile(Stream *stream);
-	int closeFile(GifFileType *file);
-	void resetReader();
-	int getNextImage(GifFileType *gifFile,Image *&image,int &frameDelay);
-
-	Image *flipImage(Image *image);
-
-	Image *mWorking;
-	Image *mBase;
+	void *mIO;
+	void *mDir;
+	Stream::ptr mStream;
 };
 
 }

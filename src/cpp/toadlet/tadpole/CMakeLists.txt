@@ -50,7 +50,9 @@ set (TADPOLE_HANDLER_SRC
 	handler/DDSHandler.cpp
 	handler/TGAHandler.cpp
 	handler/TMSHHandler.cpp
+	handler/TPKGArchive.cpp
 	handler/WADArchive.cpp
+	handler/WaveDecoder.cpp
 )
 
 set (TADPOLE_HANDLER_XML_SRC
@@ -58,6 +60,18 @@ set (TADPOLE_HANDLER_XML_SRC
 	handler/XMLMeshUtilities.cpp
 	handler/XMATHandler.cpp
 	handler/XMSHHandler.cpp
+)
+
+set (TADPOLE_HANDLER_GIF_SRC
+	handler/GIFHandler.cpp
+)
+
+set (TADPOLE_HANDLER_JPEG_SRC
+	handler/JPEGHandler.cpp
+)
+
+set (TADPOLE_HANDLER_PNG_SRC
+	handler/PNGHandler.cpp
 )
 
 set (TADPOLE_HANDLER_FREETYPE_SRC
@@ -77,6 +91,19 @@ set (TADPOLE_HANDLER_PLATFORM_WIN32_SRC
 set (TADPOLE_HANDLER_PLATFORM_WIN32_GDIPLUS_SRC
 	handler/platform/win32/Win32FontHandler.cpp
 	handler/platform/win32/Win32TextureHandler.cpp
+)
+
+set (TADPOLE_HANDLER_OGGVORBISDECODER_SRC
+	handler/OggVorbisDecoder.cpp
+)
+
+set (TADPOLE_HANDLER_SIDDECODER_SRC
+	handler/SIDDecoder.cpp
+)
+
+set (TADPOLE_HANDLER_ZIP_SRC
+	handler/ZIPArchive.cpp
+	handler/ZIPStream.cpp
 )
 
 set (TADPOLE_MATERIAL_SRC
@@ -193,16 +220,15 @@ set (TADPOLE_BSP_HEADERS
 set (TADPOLE_HANDLER_HEADERS
 	handler/AudioBufferHandler.h
 	handler/BMPHandler.h
-	handler/GIFHandler.h
-	handler/JPEGHandler.h
 	handler/TMSHHandler.h
 	handler/PNGHandler.h
 	handler/SPRHandler.h
 	handler/TGAHandler.h
+	handler/TPKGArchive.h
 	handler/TPKGHandler.h
 	handler/WADArchive.h
 	handler/WADHandler.h
-	handler/ZIPHandler.h
+	handler/WaveDecoder.h
 )
 
 set (TADPOLE_HANDLER_XML_HEADERS
@@ -210,6 +236,18 @@ set (TADPOLE_HANDLER_XML_HEADERS
 	handler/XMLMeshUtilities.h
 	handler/XMATHandler.h
 	handler/XMSHHandler.h
+)
+
+set (TADPOLE_HANDLER_GIF_HEADERS
+	handler/GIFHandler.h
+)
+
+set (TADPOLE_HANDLER_JPEG_HEADERS
+	handler/JPEGHandler.h
+)
+
+set (TADPOLE_HANDLER_PNG_HEADERS
+	handler/PNGHandler.h
 )
 
 set (TADPOLE_HANDLER_FREETYPE_HEADERS
@@ -230,6 +268,19 @@ set (TADPOLE_HANDLER_PLATFORM_WIN32_GDIPLUS_HEADERS
 	handler/platform/win32/StreamIStream.h
 	handler/platform/win32/Win32FontHandler.h
 	handler/platform/win32/Win32TextureHandler.h
+)
+
+set (TADPOLE_HANDLER_OGGVORBISDECODER_HEADERS
+	handler/OggVorbisDecoder.h
+)
+
+set (TADPOLE_HANDLER_SIDDECODER_HEADERS
+	handler/SIDDecoder.h
+)
+
+set (TADPOLE_HANDLER_ZIP_HEADERS
+	handler/ZIPArchive.h
+	handler/ZIPStream.h
 )
 
 set (TADPOLE_MATERIAL_HEADERS
@@ -362,6 +413,7 @@ if (MXML_FOUND)
 	source_group ("Source Files\\\\handler" FILES ${TADPOLE_HANDLER_XML_SRC})
 	source_group ("Header Files\\\\handler" FILES ${TADPOLE_HANDLER_XML_HEADERS})
 	set (TADPOLE_SRC ${TADPOLE_SRC} ${TADPOLE_HANDLER_XML_SRC})
+	set (TADPOLE_HEADERS ${TADPOLE_HEADERS} ${TADPOLE_HANDLER_XML_HEADERS})
 
 	# Libraries
 	set (TADPOLE_LIBS ${TADPOLE_LIBS} ${MXML_LIBRARY})
@@ -381,6 +433,192 @@ if (MXML_FOUND)
 		set (STATIC_LIB_PROPS ${STATIC_LIB_PROPS} STATIC_LIBRARY_FLAGS ${MXML_LIBRARY})	
 	endif (TOADLET_PLATFORM_OSX)
 endif (MXML_FOUND)
+
+find_package (GIF)
+if (GIF_FOUND)
+	# Files
+	set (TOADLET_HAS_GIF ON PARENT_SCOPE)
+	include_directories (${GIF_INCLUDE_DIR})
+	source_group ("Source Files\\\\handler" FILES ${TADPOLE_HANDLER_GIF_SRC})
+	source_group ("Header Files\\\\handler" FILES ${TADPOLE_HANDLER_GIF_HEADERS})
+	set (TADPOLE_SRC ${TADPOLE_SRC} ${TADPOLE_HANDLER_GIF_SRC})
+	set (TADPOLE_HEADERS ${TADPOLE_HEADERS} ${TADPOLE_HANDLER_GIF_HEADERS})
+
+	# Libraries
+	set (TADPOLE_LIBS ${TADPOLE_LIBS} ${GIF_LIBRARY})
+	add_library (libgif_s STATIC IMPORTED)
+	if (TOADLET_PLATFORM_POSIX)
+		string (REPLACE ".so" ".a" GIF_A ${GIF_LIBRARY})
+		if (EXISTS ${GIF_A})
+			set (GIF_LIBRARY ${GIF_A})
+		endif (EXISTS ${GIF_A})
+	endif (TOADLET_PLATFORM_POSIX)
+	set_property (TARGET libgif_s PROPERTY IMPORTED_LOCATION ${GIF_LIBRARY})
+	set (TADPOLE_DEFS_S ${TADPOLE_DEFS_S} TOADLET_LIBGIF_NAME="${GIF_LIBRARY}")
+	set (TADPOLE_LIBS_S ${TADPOLE_LIBS_S} libgif_s)
+endif (GIF_FOUND)
+
+find_package (JPEG)
+if (JPEG_FOUND)
+	# Files 
+	set (TOADLET_HAS_JPEG ON PARENT_SCOPE)
+	include_directories (${JPEG_INCLUDE_DIR})
+	source_group ("Source Files\\\\handler" FILES ${TADPOLE_HANDLER_JPEG_SRC})
+	source_group ("Header Files\\\\handler" FILES ${TADPOLE_HANDLER_JPEG_HEADERS})
+	set (TADPOLE_SRC ${TADPOLE_SRC} ${TADPOLE_HANDLER_JPEG_SRC})
+	set (TADPOLE_HEADERS ${TADPOLE_HEADERS} ${TADPOLE_HANDLER_JPEG_HEADERS})
+	
+	# Libraries
+	set (TADPOLE_LIBS ${TADPOLE_LIBS} ${JPEG_LIBRARY})
+	add_library (libjpeg_s STATIC IMPORTED)
+	if (TOADLET_PLATFORM_POSIX)
+		string (REPLACE ".so" ".a" JPEG_A ${JPEG_LIBRARY})
+		if (EXISTS ${JPEG_A})
+			set (JPEG_LIBRARY ${JPEG_A})
+		endif (EXISTS ${JPEG_A})
+	endif (TOADLET_PLATFORM_POSIX)
+	set_property (TARGET libjpeg_s PROPERTY IMPORTED_LOCATION ${JPEG_LIBRARY})
+	set (TADPOLE_DEFS_S ${TADPOLE_DEFS_S} TOADLET_LIBJPEG_NAME="${JPEG_LIBRARY}")
+	set (TADPOLE_LIBS_S ${TADPOLE_LIBS_S} libjpeg_s)
+endif (JPEG_FOUND)
+
+find_package (PNG)
+if (PNG_FOUND)
+	# Files
+	set (TOADLET_HAS_PNG ON PARENT_SCOPE)
+	include_directories (${PNG_INCLUDE_DIR})
+	source_group ("Source Files\\\\handler" FILES ${TADPOLE_HANDLER_PNG_SRC})
+	source_group ("Header Files\\\\handler" FILES ${TADPOLE_HANDLER_PNG_HEADERS})
+	set (TADPOLE_SRC ${TADPOLE_SRC} ${TADPOLE_HANDLER_PNG_SRC})
+	set (TADPOLE_HEADERS ${TADPOLE_HEADERS} ${TADPOLE_HANDLER_PNG_HEADERS})
+	
+	# Libraries
+	set (TADPOLE_LIBS ${TADPOLE_LIBS} ${PNG_LIBRARY})
+	add_library (libpng_s STATIC IMPORTED)
+	if (TOADLET_PLATFORM_POSIX)
+		string (REPLACE ".so" ".a" PNG_A ${PNG_LIBRARY})
+		if (EXISTS ${PNG_A})
+			set (PNG_LIBRARY ${PNG_A})
+		endif (EXISTS ${PNG_A})
+	endif (TOADLET_PLATFORM_POSIX)
+	set_property (TARGET libpng_s PROPERTY IMPORTED_LOCATION ${PNG_LIBRARY})
+	set (TADPOLE_DEFS_S ${TADPOLE_DEFS_S} TOADLET_LIBPNG_NAME="${PNG_LIBRARY}")
+	set (TADPOLE_LIBS_S ${TADPOLE_LIBS_S} libpng_s)
+endif (PNG_FOUND)
+
+find_package (OggVorbis)
+if (OGGVORBIS_FOUND)
+	set (TOADLET_HAS_OGGVORBIS ON PARENT_SCOPE)
+		
+	source_group ("Source Files\\\\handler" FILES ${TADPOLE_HANDLER_OGGVORBISDECODER_SRC})
+	source_group ("Header Files\\\\handler" FILES ${TADPOLE_HANDLER_OGGVORBISDECODER_HEADERS})
+	set (TADPOLE_SRC ${TADPOLE_SRC} ${TADPOLE_HANDLER_OGGVORBISDECODER_SRC})
+	set (TADPOLE_HEADERS ${TADPOLE_HEADERS} ${TADPOLE_HANDLER_OGGVORBISDECODER_HEADERS})
+	include_directories (${OGGVORBIS_INCLUDES})
+
+	# Dynamic libs
+	set (TADPOLE_LIBS ${TADPOLE_LIBS} ${OGGVORBIS_LIBRARIES})
+
+	# Static libs are ugly since we add references to external static libraries in toadlet
+	add_library (libogg_s STATIC IMPORTED)
+	add_library (libvorbis_s STATIC IMPORTED)
+	add_library (libvorbisfile_s STATIC IMPORTED)
+	add_library (libvorbisenc_s STATIC IMPORTED)
+	if (TOADLET_PLATFORM_POSIX)
+		string (REPLACE ".so" ".a" OGG_A ${OGG_LIBRARY})
+		if (EXISTS ${OGG_A})
+			set (OGG_LIBRARY ${OGG_A})
+		endif (EXISTS ${OGG_A})
+		string (REPLACE ".so" ".a" VORBIS_A ${VORBIS_LIBRARY})
+		if (EXISTS ${VORBIS_A})
+			set (VORBIS_LIBRARY ${VORBIS_A})
+		endif (EXISTS ${VORBIS_A})
+		string (REPLACE ".so" ".a" VORBISFILE_A ${VORBISFILE_LIBRARY})
+		if (EXISTS ${VORBISFILE_A})
+			set (VORBISFILE_LIBRARY ${VORBISFILE_A})
+		endif (EXISTS ${VORBISFILE_A})
+		string (REPLACE ".so" ".a" VORBISENG_A ${VORBISENC_LIBRARY})
+		if (EXISTS ${VORBISENC_A})
+			set (VORBISENC_LIBRARY ${VORBISENC_A})
+		endif (EXISTS ${VORBISENC_A})
+	endif (TOADLET_PLATFORM_POSIX)
+	set_property (TARGET libogg_s PROPERTY IMPORTED_LOCATION ${OGG_LIBRARY})
+	set_property (TARGET libvorbis_s PROPERTY IMPORTED_LOCATION ${VORBIS_LIBRARY})
+	set_property (TARGET libvorbisfile_s PROPERTY IMPORTED_LOCATION ${VORBISFILE_LIBRARY})
+	set_property (TARGET libvorbisenc_s PROPERTY IMPORTED_LOCATION ${VORBISENC_LIBRARY})
+	set (TADPOLE_DEFS_S ${TADPOLE_DEFS_S} TOADLET_LIBOGG_NAME="${OGG_LIBRARY}" TOADLET_LIBVORBIS_NAME="${VORBIS_LIBRARY}" TOADLET_LIBVORBISFILE_NAME="${VORBISFILE_LIBRARY}" TOADLET_LIBVORBISENC_NAME="${VORBISENC_LIBRARY}")
+	set (TADPOLE_LIBS_S ${TADPOLE_LIBS_S} libogg_s libvorbis_s libvorbisfile_s libvorbisenc_s)
+endif (OGGVORBIS_FOUND)
+
+find_package (Sidplay)
+if (SIDPLAY_FOUND)
+	set (TOADLET_HAS_SIDPLAY ON PARENT_SCOPE)
+
+	add_definitions(-DSIDPLAY_VERSION=${SIDPLAY_VERSION})
+	
+	source_group ("Source Files\\\\handler" FILES ${TADPOLE_HANDLER_SIDDECODER_SRC})
+	source_group ("Header Files\\\\handler" FILES ${TADPOLE_HANDLER_SIDDECODER_HEADERS})
+	set (TADPOLE_SRC ${TADPOLE_SRC} ${TADPOLE_HANDLER_SIDDECODER_SRC})
+	set (TADPOLE_HEADERS ${TADPOLE_HEADERS} ${TADPOLE_HANDLER_SIDDECODER_HEADERS})
+	include_directories (${SIDPLAY_INCLUDES})
+
+	# Dynamic libs
+	set (TADPOLE_LIBS ${TADPOLE_LIBS} ${SIDPLAY_LIBRARY})
+
+	# Static libs are ugly since we add references to external static libraries in toadlet
+	set (TADPOLE_DEFS_S ${TADPOLE_DEFS_S} TOADLET_LIBSIDPLAY_NAME="${SIDPLAY_LIBRARY}")
+	set (TADPOLE_LIBS_S ${TADPOLE_LIBS_S} libsidplay_s)
+
+	# Resid is only used with sidplay 2
+	if (${SIDPLAY_VERSION} EQUAL 2)
+		set (TADPOLE_LIBS ${TADPOLE_LIBS} ${RESID_LIBRARY})
+		set (TADPOLE_DEFS_S ${TADPOLE_DEFS_S} TOADLET_LIBRESID_NAME="${RESID_LIBRARY}")
+	endif (${SIDPLAY_VERSION} EQUAL 2)
+endif (SIDPLAY_FOUND)
+
+find_package (ZLIB)
+if (ZLIB_FOUND)
+	# Files
+	set (TOADLET_HAS_ZLIB ON PARENT_SCOPE)
+	include_directories (${ZLIB_INCLUDE_DIR})
+	
+	# Libraries
+	set (TADPOLE_LIBS ${TADPOLE_LIBS} ${ZLIB_LIBRARY})
+	add_library (zlib_s STATIC IMPORTED)
+	if (TOADLET_PLATFORM_POSIX)
+		string (REPLACE ".so" ".a" ZLIB_A ${ZLIB_LIBRARY})
+		if (EXISTS ${ZLIB_A})
+			set (ZLIB_LIBRARY ${ZLIB_A})
+		endif (EXISTS ${ZLIB_A})
+	endif (TOADLET_PLATFORM_POSIX)
+	set_property (TARGET zlib_s PROPERTY IMPORTED_LOCATION ${ZLIB_LIBRARY})
+	set (TADPOLE_DEFS_S ${TADPOLE_DEFS_S} TOADLET_ZLIB_NAME="${ZLIB_LIBRARY}")
+	set (TADPOLE_LIBS_S ${TADPOLE_LIBS_S} zlib_s)
+endif (ZLIB_FOUND)
+
+find_package (ZZIP)
+if (ZZIP_FOUND)
+	# Files
+	set (TOADLET_HAS_ZZIP ON PARENT_SCOPE)
+	include_directories (${ZZIP_INCLUDE_DIR})
+	source_group ("Source Files\\\\handler" FILES ${TADPOLE_HANDLER_ZIP_SRC})
+	source_group ("Header Files\\\\handler" FILES ${TADPOLE_HANDLER_ZIP_HEADERS})
+	set (TADPOLE_SRC ${TADPOLE_SRC} ${TADPOLE_HANDLER_ZIP_SRC})
+	set (TADPOLE_HEADERS ${TADPOLE_HEADERS} ${TADPOLE_HANDLER_ZIP_HEADERS})
+	
+	# Libraries
+	set (TADPOLE_LIBS ${TADPOLE_LIBS} ${ZZIP_LIBRARY})
+	add_library (zziplib_s STATIC IMPORTED)
+	if (TOADLET_PLATFORM_POSIX)
+		string (REPLACE ".so" ".a" ZZIP_A ${ZZIP_LIBRARY})
+		if (EXISTS ${ZZIP_A})
+			set (ZZIP_LIBRARY ${ZZIP_A})
+		endif (EXISTS ${ZZIP_A})
+	endif (TOADLET_PLATFORM_POSIX)
+	set_property (TARGET zziplib_s PROPERTY IMPORTED_LOCATION ${ZZIP_LIBRARY})
+	set (TADPOLE_DEFS_S ${TADPOLE_DEFS_S} TOADLET_ZZIPLIB_NAME="${ZZIP_LIBRARY}")
+	set (TADPOLE_LIBS_S ${TADPOLE_LIBS_S} zziplib_s)
+endif (ZZIP_FOUND)
 
 # Platform specific files
 if (TOADLET_PLATFORM_OSX)

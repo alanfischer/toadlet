@@ -2136,7 +2136,6 @@ GLuint GLRenderDevice::getGLFormat(int textureFormat,bool internal){
 }
 
 GLuint GLRenderDevice::getGLType(int textureFormat){
-	int formatSemantic=(textureFormat&TextureFormat::Format_MASK_SEMANTICS);
 	int formatType=(textureFormat&TextureFormat::Format_MASK_TYPES);
 	switch(formatType){
 		case TextureFormat::Format_TYPE_UINT_8:

@@ -23,23 +23,52 @@
  *
  ********** Copyright header - do not remove **********/
 
-#ifndef TOADLET_EGG_IMAGE_PNGHANDLER_H
-#define TOADLET_EGG_IMAGE_PNGHANDLER_H
+#ifndef TOADLET_TADPOLE_HANDLER_OGGVORBISDECODER_H
+#define TOADLET_TADPOLE_HANDLER_OGGVORBISDECODER_H
 
-#include <toadlet/egg/image/Image.h>
-#include <toadlet/egg/io/Stream.h>
+#include <toadlet/ribbit/AudioStream.h>
+#include <toadlet/tadpole/Types.h>
+
+struct OggVorbis_File;
+struct vorbis_info;
 
 namespace toadlet{
-namespace egg{
-namespace image{
+namespace tadpole{
+namespace handler{
 
-class TOADLET_API PNGHandler{
+const int OGGPACKETSIZE=4096;
+
+class TOADLET_API OggVorbisDecoder:public AudioStream{
 public:
-	PNGHandler();
-	virtual ~PNGHandler();
+	OggVorbisDecoder();
+	virtual ~OggVorbisDecoder();
 
-	virtual Image *loadImage(Stream *stream);
-	virtual bool saveImage(Image *image,Stream *stream);
+	void close();
+	bool closed(){return mVorbisInfo==NULL;}
+
+	bool readable(){return true;}
+	int read(tbyte *buffer,int length);
+
+	bool writeable(){return false;}
+	int write(const tbyte *buffer,int length){return -1;}
+
+	bool startStream(Stream::ptr stream);
+	bool stopStream();
+
+	bool reset();
+	int length();
+	int position();
+	bool seek(int offs);
+
+	AudioFormat::ptr getAudioFormat() const{return mFormat;}
+
+private:
+	OggVorbis_File *mVorbisFile;
+	vorbis_info *mVorbisInfo;
+	char mDataBuffer[OGGPACKETSIZE];
+	int mDataLength;
+	AudioFormat::ptr mFormat;
+	Stream::ptr mStream;
 };
 
 }
@@ -47,4 +76,3 @@ public:
 }
 
 #endif
-
