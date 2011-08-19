@@ -23,39 +23,49 @@
  *
  ********** Copyright header - do not remove **********/
 
-#ifndef TOADLET_EGG_IMAGE_GIFHANDLER_H
-#define TOADLET_EGG_IMAGE_GIFHANDLER_H
+#ifndef TOADLET_TADPOLE_HANDLER_TPKGARCHIVE_H
+#define TOADLET_TADPOLE_HANDLER_TPKGARCHIVE_H
 
-#include <toadlet/egg/image/Image.h>
-#include <toadlet/egg/io/Stream.h>
-#include <toadlet/egg/Collection.h>
-
-struct GifFileType;
+#include <toadlet/egg/BaseResource.h>
+#include <toadlet/egg/Map.h>
+#include <toadlet/egg/io/Archive.h>
+#include <toadlet/egg/io/DataStream.h>
+#include <toadlet/egg/io/MemoryStream.h>
+#include <toadlet/tadpole/Types.h>
 
 namespace toadlet{
-namespace egg{
-namespace image{
+namespace tadpole{
+namespace handler{
 
-class TOADLET_API GIFHandler{
+class TOADLET_API TPKGArchive:public Archive,public BaseResource{
+	TOADLET_BASERESOURCE_PASSTHROUGH(Archive);
 public:
-	GIFHandler();
-	virtual ~GIFHandler();
+	TOADLET_SHARED_POINTERS(TPKGArchive);
 
-	virtual Image *loadImage(Stream *stream);
-	virtual bool saveImage(Image *image,Stream *stream);
+	TPKGArchive();
+	virtual ~TPKGArchive();
 
-	virtual bool loadAnimatedImage(Stream *stream,Collection<Image*> &images,Collection<int> &frameDelays);
+	void destroy();
+
+	bool open(MemoryStream::ptr memoryStream);
+	bool open(Stream::ptr stream);
+
+	Stream::ptr openStream(const String &name);
+	Resource::ptr openResource(const String &name){return NULL;}
+
+	Collection<String>::ptr getEntries();
 
 protected:
-	GifFileType *openFile(Stream *stream);
-	int closeFile(GifFileType *file);
-	void resetReader();
-	int getNextImage(GifFileType *gifFile,Image *&image,int &frameDelay);
+	class Index{
+	public:
+		uint32 position;
+		uint32 length;
+	};
 
-	Image *flipImage(Image *image);
-
-	Image *mWorking;
-	Image *mBase;
+	Map<String,Index> mIndex;
+	int mDataOffset;
+	DataStream::ptr mStream;
+	MemoryStream::ptr mMemoryStream;
 };
 
 }

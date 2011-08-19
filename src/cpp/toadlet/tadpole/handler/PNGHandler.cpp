@@ -23,10 +23,9 @@
  *
  ********** Copyright header - do not remove **********/
 
-#include <toadlet/egg/image/PNGHandler.h>
 #include <toadlet/egg/Error.h>
 #include <toadlet/egg/Logger.h>
-#include <stdlib.h>
+#include <toadlet/tadpole/handler/PNGHandler.h>
 extern "C"{
 	#include <png.h>
 }
@@ -40,14 +39,8 @@ extern "C"{
 #endif
 
 namespace toadlet{
-namespace egg{
-namespace image{
-	
-PNGHandler::PNGHandler(){
-}
-
-PNGHandler::~PNGHandler(){
-}
+namespace tadpole{
+namespace handler{
 
 void toadlet_png_read_data(png_structp png_ptr,png_bytep data,png_size_t length){
 	png_size_t check; 
@@ -60,7 +53,7 @@ void toadlet_png_read_data(png_structp png_ptr,png_bytep data,png_size_t length)
 	}
 }
 
-Image *PNGHandler::loadImage(Stream *stream){
+Resource::ptr PNGHandler::load(Stream::ptr stream,ResourceData *resourceData,ProgressListener *listener){
 	png_byte header[8];
 	int y;
 
@@ -129,7 +122,7 @@ Image *PNGHandler::loadImage(Stream *stream){
 	
 	png_read_image(png_ptr,row_pointers);
 
-	Image *image=NULL;
+	Image::ptr image;
 
 	#if 0 // This code is removed until I have time to update it to all the non-depreciated & new trans stuff
 	if(color_type==PNG_COLOR_TYPE_PALETTE){
@@ -208,7 +201,7 @@ Image *PNGHandler::loadImage(Stream *stream){
 		break;
 	}
 
-	image=Image::createAndReallocate(Image::Dimension_D2,format,width,height);
+	image=Image::ptr(Image::createAndReallocate(Image::Dimension_D2,format,width,height));
 	if(image==NULL){
 		return NULL;
 	}
@@ -227,13 +220,7 @@ Image *PNGHandler::loadImage(Stream *stream){
 
 	png_destroy_read_struct(&png_ptr,&info_ptr,NULL);
 
-	return image;
-}
-
-bool PNGHandler::saveImage(Image *image,Stream *stream){
-	Error::unimplemented(Categories::TOADLET_EGG,
-		"PNGHandler::saveImage: Not implemented");
-	return false;
+	return mTextureManager->createTexture(image);
 }
 
 }

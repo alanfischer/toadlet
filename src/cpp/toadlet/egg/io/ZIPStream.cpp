@@ -107,7 +107,7 @@ int ZIPStream::read(tbyte *buffer,int length){
 		/// @todo: Finish zlib stremaing
 		return -1;
 	}
-	else if(mFile=NULL){
+	else if(mFile!=NULL){
 		return zzip_file_read((ZZIP_FILE*)mFile,buffer,length);
 	}
 	return -1;

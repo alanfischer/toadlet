@@ -21,22 +21,12 @@ set (EGG_IMAGE_SRC
 	image/Image.cpp
 	image/ImageFormatConversion.cpp
 )
-set (EGG_IMAGE_GIF_SRC
-	image/GIFHandler.cpp
-)
-set (EGG_IMAGE_JPG_SRC
-	image/JPEGHandler.cpp
-)
-set (EGG_IMAGE_PNG_SRC
-	image/PNGHandler.cpp
-)
 
 set (EGG_IO_SRC
 	io/DataStream.cpp
 	io/FileStream.cpp
 	io/MemoryStream.cpp
 	io/SocketStream.cpp
-	io/TPKGArchive.cpp
 )
 set (EGG_IO_ZZIP_SRC
 	io/ZIPArchive.cpp
@@ -136,15 +126,6 @@ set (EGG_IMAGE_HEADERS
 	image/ImageDefinitions.h
 	image/ImageFormatConversion.h
 )
-set (EGG_IMAGE_GIF_HEADERS
-	image/GIFHandler.h
-)
-set (EGG_IMAGE_JPG_HEADERS
-	image/JPEGHandler.h
-)
-set (EGG_IMAGE_PNG_HEADERS
-	image/PNGHandler.h
-)
 
 set (EGG_IO_HEADERS
 	io/Archive.h
@@ -153,7 +134,6 @@ set (EGG_IO_HEADERS
 	io/MemoryStream.h
 	io/SocketStream.h
 	io/Stream.h
-	io/TPKGArchive.h
 )
 set (EGG_IO_ZZIP_HEADERS
 	io/ZIPArchive.h
@@ -290,60 +270,11 @@ endif (TOADLET_PLATFORM_WIN32)
 # Dependencies for toadlet_egg
 find_package (ZZIP)
 if (NOT TOADLET_PLATFORM_OSX)
-	find_package (GIF)
-	find_package (JPEG)
 	find_package (ZLIB)
-	find_package (PNG)
 endif (NOT TOADLET_PLATFORM_OSX)
 
 
 # Setup dependecy specific files and libraries
-if (GIF_FOUND)
-	# Files
-	set (TOADLET_HAS_GIF ON PARENT_SCOPE)
-	include_directories (${GIF_INCLUDE_DIR})
-	source_group ("Source Files\\\\image" FILES ${EGG_IMAGE_GIF_SRC})
-	source_group ("Header Files\\\\image" FILES ${EGG_IMAGE_GIF_HEADERS})
-	set (EGG_SRC ${EGG_SRC} ${EGG_IMAGE_GIF_SRC})
-	set (EGG_HEADERS ${EGG_HEADERS} ${EGG_IMAGE_GIF_HEADERS})
-	
-	# Libraries
-	set (EGG_LIBS ${EGG_LIBS} ${GIF_LIBRARY})
-	add_library (libgif_s STATIC IMPORTED)
-	if (TOADLET_PLATFORM_POSIX)
-		string (REPLACE ".so" ".a" GIF_A ${GIF_LIBRARY})
-		if (EXISTS ${GIF_A})
-			set (GIF_LIBRARY ${GIF_A})
-		endif (EXISTS ${GIF_A})
-	endif (TOADLET_PLATFORM_POSIX)
-	set_property (TARGET libgif_s PROPERTY IMPORTED_LOCATION ${GIF_LIBRARY})
-	set (EGG_DEFS_S ${EGG_DEFS_S} TOADLET_LIBGIF_NAME="${GIF_LIBRARY}")
-	set (EGG_LIBS_S ${EGG_LIBS_S} libgif_s)
-endif (GIF_FOUND)
-
-if (JPEG_FOUND)
-	# Files 
-	set (TOADLET_HAS_JPEG ON PARENT_SCOPE)
-	include_directories (${JPEG_INCLUDE_DIR})
-	source_group ("Source Files\\\\image" FILES ${EGG_IMAGE_JPG_SRC})
-	source_group ("Header Files\\\\image" FILES ${EGG_IMAGE_JPG_HEADERS})
-	set (EGG_SRC ${EGG_SRC} ${EGG_IMAGE_JPG_SRC})
-	set (EGG_HEADERS ${EGG_HEADERS} ${EGG_IMAGE_JPG_HEADERS})
-	
-	# Libraries
-	set (EGG_LIBS ${EGG_LIBS} ${JPEG_LIBRARY})
-	add_library (libjpeg_s STATIC IMPORTED)
-	if (TOADLET_PLATFORM_POSIX)
-		string (REPLACE ".so" ".a" JPEG_A ${JPEG_LIBRARY})
-		if (EXISTS ${JPEG_A})
-			set (JPEG_LIBRARY ${JPEG_A})
-		endif (EXISTS ${JPEG_A})
-	endif (TOADLET_PLATFORM_POSIX)
-	set_property (TARGET libjpeg_s PROPERTY IMPORTED_LOCATION ${JPEG_LIBRARY})
-	set (EGG_DEFS_S ${EGG_DEFS_S} TOADLET_LIBJPEG_NAME="${JPEG_LIBRARY}")
-	set (EGG_LIBS_S ${EGG_LIBS_S} libjpeg_s)
-endif (JPEG_FOUND)
-
 if (ZLIB_FOUND)
 	# Files
 	set (TOADLET_HAS_ZLIB ON PARENT_SCOPE)
@@ -362,29 +293,6 @@ if (ZLIB_FOUND)
 	set (EGG_DEFS_S ${EGG_DEFS_S} TOADLET_ZLIB_NAME="${ZLIB_LIBRARY}")
 	set (EGG_LIBS_S ${EGG_LIBS_S} zlib_s)
 endif (ZLIB_FOUND)
-
-if (PNG_FOUND)
-	# Files
-	set (TOADLET_HAS_PNG ON PARENT_SCOPE)
-	include_directories (${PNG_INCLUDE_DIR})
-	source_group ("Source Files\\\\image" FILES ${EGG_IMAGE_PNG_SRC})
-	source_group ("Header Files\\\\image" FILES ${EGG_IMAGE_PNG_HEADERS})
-	set (EGG_SRC ${EGG_SRC} ${EGG_IMAGE_PNG_SRC})
-	set (EGG_HEADERS ${EGG_HEADERS} ${EGG_IMAGE_PNG_HEADERS})
-	
-	# Libraries
-	set (EGG_LIBS ${EGG_LIBS} ${PNG_LIBRARY})
-	add_library (libpng_s STATIC IMPORTED)
-	if (TOADLET_PLATFORM_POSIX)
-		string (REPLACE ".so" ".a" PNG_A ${PNG_LIBRARY})
-		if (EXISTS ${PNG_A})
-			set (PNG_LIBRARY ${PNG_A})
-		endif (EXISTS ${PNG_A})
-	endif (TOADLET_PLATFORM_POSIX)
-	set_property (TARGET libpng_s PROPERTY IMPORTED_LOCATION ${PNG_LIBRARY})
-	set (EGG_DEFS_S ${EGG_DEFS_S} TOADLET_LIBPNG_NAME="${PNG_LIBRARY}")
-	set (EGG_LIBS_S ${EGG_LIBS_S} libpng_s)
-endif (PNG_FOUND)
 
 if (ZZIP_FOUND)
 	# Files
