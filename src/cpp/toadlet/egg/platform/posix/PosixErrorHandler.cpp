@@ -34,8 +34,8 @@ namespace toadlet{
 namespace egg{
 
 #if defined(TOADLET_PLATFORM_OSX)
-	extern "C" PosixErrorHandler_installNSHandler();
-	extern "C" PosixErrorHandler_uninstallNSHandler();
+	extern "C" void PosixErrorHandler_installNSHandler();
+	extern "C" void PosixErrorHandler_uninstallNSHandler();
 #endif
 
 int PosixErrorHandler::mSignals[]={

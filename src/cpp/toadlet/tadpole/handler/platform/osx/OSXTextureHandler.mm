@@ -56,7 +56,7 @@ OSXTextureHandler::OSXTextureHandler(TextureManager *textureManager){
 	mTextureManager=textureManager;
 }
 
-Resource::ptr OSXTextureHandler::load(Stream::ptr in,const ResourceHandlerData *handlerData){
+Resource::ptr OSXTextureHandler::load(Stream::ptr in,ResourceData *data,ProgressListener *listener){
 	CGDataProviderSequentialCallbacks callbacks={0};
 	callbacks.version=0;
 	callbacks.getBytes=TextureStreamGetBytes;
