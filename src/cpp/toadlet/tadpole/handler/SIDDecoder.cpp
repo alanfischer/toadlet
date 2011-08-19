@@ -23,10 +23,10 @@
  *
  ********** Copyright header - do not remove **********/
 
-#include "SIDDecoder.h"
 #include <toadlet/egg/Error.h>
 #include <toadlet/egg/Logger.h>
 #include <toadlet/ribbit/AudioFormatConversion.h>
+#include <toadlet/tadpole/handler/SIDDecoder.h>
 
 #pragma warning(disable:4231) // nonstandard extension used : 'extern' before template explicit
 
@@ -45,8 +45,8 @@
 #endif
 
 namespace toadlet{
-namespace ribbit{
-namespace decoder{
+namespace tadpole{
+namespace handler{
 
 #if SIDPLAY_VERSION==1
 	// The sidplay1 engine can not be reused after deallocation, so allocate it statically

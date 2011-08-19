@@ -26,8 +26,8 @@
 #ifndef TOADLET_TADPOLE_HANDLER_OGGVORBISHANDLER_H
 #define TOADLET_TADPOLE_HANDLER_OGGVORBISHANDLER_H
 
-#include <toadlet/ribbit/decoder/OggVorbisDecoder.h>
 #include <toadlet/tadpole/handler/AudioBufferHandler.h>
+#include <toadlet/tadpole/handler/OggVorbisDecoder.h>
 
 namespace toadlet{
 namespace tadpole{

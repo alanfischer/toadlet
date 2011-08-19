@@ -23,53 +23,43 @@
  *
  ********** Copyright header - do not remove **********/
 
-#ifndef TOADLET_EGG_IO_ZIPSTREAM_H
-#define TOADLET_EGG_IO_ZIPSTREAM_H
+#ifndef TOADLET_TADPOLE_HANDLER_SIDDECODER_H
+#define TOADLET_TADPOLE_HANDLER_SIDDECODER_H
 
-#include <toadlet/egg/io/Stream.h>
+#include <toadlet/ribbit/AudioStream.h>
+#include <toadlet/tadpole/Types.h>
 
 namespace toadlet{
-namespace egg{
-namespace io{
+namespace tadpole{
+namespace handler{
 
-/// @todo: Ideally the zlib usage would be replaced with zziplib, but zziplib does not support writing
-class TOADLET_API ZIPStream:public Stream{
+class SIDAttributes;
+
+class TOADLET_API SIDDecoder:public AudioStream{
 public:
-	TOADLET_SHARED_POINTERS(ZIPStream);
+	SIDDecoder();
+	virtual ~SIDDecoder();
 
-	enum OpenFlags{
-		OpenFlags_UNKNOWN=	0,
-		OpenFlags_READ=		1<<0,
-		OpenFlags_WRITE=	1<<1,
-	};
+	bool startStream(Stream::ptr stream);
 
-	// Constructor to open a stream that compresses or decompresses data to a parent stream
-	ZIPStream(Stream::ptr stream,int openFlags=0);
+	AudioFormat::ptr getAudioFormat() const{return mFormat;}
 
-	// Constructor to open a ZZIP_FILE in a ZZIP_DIR
-	ZIPStream(void *dir,const String &name);
-
-	virtual ~ZIPStream();
-
-	void close();
-	bool closed();
-
-	bool readable(){return mStream!=NULL?mStream->readable():true;}
+	void close(){}
+	bool closed(){return false;}
+	bool readable(){return true;}
 	int read(tbyte *buffer,int length);
 
-	bool writeable(){return mStream!=NULL?mStream->writeable():false;}
-	int write(const tbyte *buffer,int length);
+	bool writeable(){return false;}
+	int write(const tbyte *buffer,int length){return -1;}
 
-	bool reset();
-	int length();
-	int position();
-	bool seek(int offs);
+	bool reset(){return false;}
+	int length(){return -1;}
+	int position(){return -1;}
+	bool seek(int offs){return false;}
 
 protected:
-	int mOpenFlags;
-	Stream::ptr mStream;
-	void *mZStream;
-	void *mFile;
+	AudioFormat::ptr mFormat;
+	SIDAttributes *sid;
 };
 
 }

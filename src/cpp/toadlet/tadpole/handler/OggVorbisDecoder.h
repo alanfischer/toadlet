@@ -23,22 +23,28 @@
  *
  ********** Copyright header - do not remove **********/
 
-#ifndef TOADLET_RIBBIT_DECODER_WAVEDECODER_H
-#define TOADLET_RIBBIT_DECODER_WAVEDECODER_H
+#ifndef TOADLET_TADPOLE_HANDLER_OGGVORBISDECODER_H
+#define TOADLET_TADPOLE_HANDLER_OGGVORBISDECODER_H
 
 #include <toadlet/ribbit/AudioStream.h>
+#include <toadlet/tadpole/Types.h>
+
+struct OggVorbis_File;
+struct vorbis_info;
 
 namespace toadlet{
-namespace ribbit{
-namespace decoder{
+namespace tadpole{
+namespace handler{
 
-class TOADLET_API WaveDecoder:public AudioStream{
+const int OGGPACKETSIZE=4096;
+
+class TOADLET_API OggVorbisDecoder:public AudioStream{
 public:
-	WaveDecoder();
-	virtual ~WaveDecoder();
+	OggVorbisDecoder();
+	virtual ~OggVorbisDecoder();
 
-	void close(){}
-	bool closed(){return false;}
+	void close();
+	bool closed(){return mVorbisInfo==NULL;}
 
 	bool readable(){return true;}
 	int read(tbyte *buffer,int length);
@@ -47,21 +53,21 @@ public:
 	int write(const tbyte *buffer,int length){return -1;}
 
 	bool startStream(Stream::ptr stream);
+	bool stopStream();
+
 	bool reset();
-	int length(){return mSize;}
-	int position(){return mPosition;}
-	bool seek(int offs){return false;}
+	int length();
+	int position();
+	bool seek(int offs);
 
 	AudioFormat::ptr getAudioFormat() const{return mFormat;}
 
 private:
-	void skip(Stream::ptr stream,int amount);
-	void ADPCMDecoder(const char *in,short *out,int len);
-
+	OggVorbis_File *mVorbisFile;
+	vorbis_info *mVorbisInfo;
+	char mDataBuffer[OGGPACKETSIZE];
+	int mDataLength;
 	AudioFormat::ptr mFormat;
-	tbyte *mData;
-	int mSize;
-	int mPosition;
 	Stream::ptr mStream;
 };
 
@@ -70,4 +76,3 @@ private:
 }
 
 #endif
-

@@ -25,8 +25,8 @@
 
 #include <toadlet/egg/Error.h>
 #include <toadlet/egg/Logger.h>
-#include <toadlet/egg/io/ZIPArchive.h>
-#include <toadlet/egg/io/ZIPStream.h>
+#include <toadlet/tadpole/handler/ZIPArchive.h>
+#include <toadlet/tadpole/handler/ZIPStream.h>
 #include <zzip/zzip.h>
 #include <zzip/plugin.h>
 #include <stdio.h>
@@ -40,8 +40,8 @@
 #endif
 
 namespace toadlet{
-namespace egg{
-namespace io{
+namespace tadpole{
+namespace handler{
 
 Collection<Stream::ptr> ZIPArchive_streams;
 Mutex ZIPArchive_mutex;
