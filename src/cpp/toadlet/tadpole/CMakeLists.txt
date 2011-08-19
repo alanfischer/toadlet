@@ -220,7 +220,6 @@ set (TADPOLE_BSP_HEADERS
 set (TADPOLE_HANDLER_HEADERS
 	handler/AudioBufferHandler.h
 	handler/BMPHandler.h
-	handler/JPEGHandler.h
 	handler/TMSHHandler.h
 	handler/PNGHandler.h
 	handler/SPRHandler.h
@@ -230,7 +229,6 @@ set (TADPOLE_HANDLER_HEADERS
 	handler/WADArchive.h
 	handler/WADHandler.h
 	handler/WaveDecoder.h
-	handler/ZIPHandler.h
 )
 
 set (TADPOLE_HANDLER_XML_HEADERS
