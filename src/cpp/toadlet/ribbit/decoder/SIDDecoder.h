@@ -41,7 +41,7 @@ public:
 
 	bool startStream(Stream::ptr stream);
 
-	AudioFormat::ptr getAudioFormat(){return mFormat;}
+	AudioFormat::ptr getAudioFormat() const{return mFormat;}
 
 	void close(){}
 	bool closed(){return false;}
