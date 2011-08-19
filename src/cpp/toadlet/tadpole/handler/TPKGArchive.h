@@ -23,26 +23,31 @@
  *
  ********** Copyright header - do not remove **********/
 
-#ifndef TOADLET_EGG_IO_ZIPARCHIVE_H
-#define TOADLET_EGG_IO_ZIPARCHIVE_H
+#ifndef TOADLET_TADPOLE_HANDLER_TPKGARCHIVE_H
+#define TOADLET_TADPOLE_HANDLER_TPKGARCHIVE_H
 
 #include <toadlet/egg/BaseResource.h>
+#include <toadlet/egg/Map.h>
 #include <toadlet/egg/io/Archive.h>
+#include <toadlet/egg/io/DataStream.h>
+#include <toadlet/egg/io/MemoryStream.h>
+#include <toadlet/tadpole/Types.h>
 
 namespace toadlet{
-namespace egg{
-namespace io{
+namespace tadpole{
+namespace handler{
 
-class TOADLET_API ZIPArchive:public Archive,public BaseResource{
+class TOADLET_API TPKGArchive:public Archive,public BaseResource{
 	TOADLET_BASERESOURCE_PASSTHROUGH(Archive);
 public:
-	TOADLET_SHARED_POINTERS(ZIPArchive);
+	TOADLET_SHARED_POINTERS(TPKGArchive);
 
-	ZIPArchive();
-	virtual ~ZIPArchive();
+	TPKGArchive();
+	virtual ~TPKGArchive();
 
 	void destroy();
 
+	bool open(MemoryStream::ptr memoryStream);
 	bool open(Stream::ptr stream);
 
 	Stream::ptr openStream(const String &name);
@@ -51,9 +56,16 @@ public:
 	Collection<String>::ptr getEntries();
 
 protected:
-	void *mIO;
-	void *mDir;
-	Stream::ptr mStream;
+	class Index{
+	public:
+		uint32 position;
+		uint32 length;
+	};
+
+	Map<String,Index> mIndex;
+	int mDataOffset;
+	DataStream::ptr mStream;
+	MemoryStream::ptr mMemoryStream;
 };
 
 }

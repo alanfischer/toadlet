@@ -23,9 +23,10 @@
  *
  ********** Copyright header - do not remove **********/
 
-#include <toadlet/egg/image/JPEGHandler.h>
 #include <toadlet/egg/Error.h>
-#include <stdlib.h>
+#include <toadlet/egg/Logger.h>
+#include <toadlet/egg/image/Image.h>
+#include <toadlet/tadpole/handler/JPEGHandler.h>
 #include <setjmp.h>
 #include <stdio.h>
 #if defined(TOADLET_PLATFORM_WIN32)
@@ -40,8 +41,8 @@ extern "C"{
 #endif
 
 namespace toadlet{
-namespace egg{
-namespace image{
+namespace tadpole{
+namespace handler{
 
 typedef struct{
 	struct jpeg_source_mgr pub;
@@ -171,27 +172,17 @@ void toadlet_error_exit(j_common_ptr cinfo){
 	longjmp(toadleterr->setjmp_buffer,1);
 }
 
-JPEGHandler::JPEGHandler(){
-}
-
-JPEGHandler::~JPEGHandler(){
-}
-
-Image *JPEGHandler::loadImage(io::Stream *stream){
+Resource::ptr JPEGHandler::load(Stream::ptr stream,ResourceData *data,ProgressListener *listener){
 	struct jpeg_decompress_struct cinfo;
 	struct toadlet_error_mgr jerr;
 	JSAMPARRAY buffer;
 	int row_stride;	
-	Image *image=NULL;
+	Image::ptr image;
 
 	cinfo.err=jpeg_std_error(&jerr.pub);
 	jerr.pub.error_exit=toadlet_error_exit;
 	if(setjmp(jerr.setjmp_buffer)){
 		jpeg_destroy_decompress(&cinfo);
-
-		if(image!=NULL){
-			delete image;
-		}
 
 		Error::loadingImage(Categories::TOADLET_EGG,
 			"JPEGHandler::loadImage: error in jpeg loading");
@@ -233,7 +224,7 @@ Image *JPEGHandler::loadImage(io::Stream *stream){
 		return NULL;
 	}
 
-	image=Image::createAndReallocate(Image::Dimension_D2,format,cinfo.output_width,cinfo.output_height);
+	image=Image::ptr(Image::createAndReallocate(Image::Dimension_D2,format,cinfo.output_width,cinfo.output_height));
 	if(image==NULL){
 		return NULL;
 	}
@@ -258,13 +249,7 @@ Image *JPEGHandler::loadImage(io::Stream *stream){
 
 	jpeg_destroy_decompress(&cinfo);
 
-	return image;
-}
-
-bool JPEGHandler::saveImage(Image *image,io::Stream *stream){
-	Error::loadingImage(Categories::TOADLET_EGG,
-		"JPEGHandler::saveImage: Not implemented");
-	return false;
+	return mTextureManager->createTexture(image);
 }
 
 }

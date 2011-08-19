@@ -23,16 +23,17 @@
  *
  ********** Copyright header - do not remove **********/
 
+#include <toadlet/egg/Logger.h>
 #include <toadlet/egg/Error.h>
-#include <toadlet/egg/io/ZIPStream.h>
+#include <toadlet/tadpole/handler/ZIPStream.h>
 #include <zlib.h>
 #include <zzip/zzip.h>
 #include <zzip/plugin.h>
 #include <stdio.h>
 
 namespace toadlet{
-namespace egg{
-namespace io{
+namespace tadpole{
+namespace handler{
 
 ZIPStream::ZIPStream(Stream::ptr stream,int openFlags):
 	mOpenFlags(0),
@@ -107,7 +108,7 @@ int ZIPStream::read(tbyte *buffer,int length){
 		/// @todo: Finish zlib stremaing
 		return -1;
 	}
-	else if(mFile=NULL){
+	else if(mFile!=NULL){
 		return zzip_file_read((ZZIP_FILE*)mFile,buffer,length);
 	}
 	return -1;

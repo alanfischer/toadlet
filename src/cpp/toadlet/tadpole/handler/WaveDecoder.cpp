@@ -23,14 +23,14 @@
  *
  ********** Copyright header - do not remove **********/
 
-#include "WaveDecoder.h"
 #include <toadlet/egg/EndianConversion.h>
+#include <toadlet/egg/Error.h>
 #include <toadlet/egg/Logger.h>
-#include <memory.h>
+#include <toadlet/tadpole/handler/WaveDecoder.h>
 
 namespace toadlet{
-namespace ribbit{
-namespace decoder{
+namespace tadpole{
+namespace handler{
 
 #if !defined(WAVE_Format_PCM)
 #	define WAVE_Format_PCM 0x0001

@@ -23,9 +23,9 @@
  *
  ********** Copyright header - do not remove **********/
 
-#include "OggVorbisDecoder.h"
 #include <toadlet/egg/Error.h>
 #include <toadlet/egg/Logger.h>
+#include <toadlet/tadpole/handler/OggVorbisDecoder.h>
 #include <vorbis/codec.h>
 #include <vorbis/vorbisfile.h>
 
@@ -42,8 +42,8 @@
 #endif
 
 namespace toadlet{
-namespace ribbit{
-namespace decoder{
+namespace tadpole{
+namespace handler{
 
 size_t read_func(void *ptr,size_t size,size_t nmemb,void *datasource);
 int seek_func(void *datasource,ogg_int64_t offset,int whence);

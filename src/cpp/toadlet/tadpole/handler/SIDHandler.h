@@ -26,8 +26,8 @@
 #ifndef TOADLET_TADPOLE_HANDLER_SIDHANDLER_H
 #define TOADLET_TADPOLE_HANDLER_SIDHANDLER_H
 
-#include <toadlet/ribbit/decoder/SIDDecoder.h>
 #include <toadlet/tadpole/handler/AudioBufferHandler.h>
+#include <toadlet/tadpole/handler/SIDDecoder.h>
 
 namespace toadlet{
 namespace tadpole{

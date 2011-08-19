@@ -25,11 +25,11 @@
 
 #include <toadlet/egg/Error.h>
 #include <toadlet/egg/Logger.h>
-#include <toadlet/egg/io/TPKGArchive.h>
+#include <toadlet/tadpole/handler/TPKGArchive.h>
 
 namespace toadlet{
-namespace egg{
-namespace io{
+namespace tadpole{
+namespace handler{
 
 TPKGArchive::TPKGArchive():
 	//mIndex,

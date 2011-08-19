@@ -26,9 +26,9 @@
 #ifndef TOADLET_TADPOLE_HANDLER_PNGHANDLER_H
 #define TOADLET_TADPOLE_HANDLER_PNGHANDLER_H
 
-#include <toadlet/egg/image/PNGHandler.h>
 #include <toadlet/peeper/Texture.h>
 #include <toadlet/tadpole/ResourceStreamer.h>
+#include <toadlet/tadpole/TextureManager.h>
 
 namespace toadlet{
 namespace tadpole{
@@ -40,24 +40,10 @@ public:
 
 	PNGHandler(TextureManager *textureManager){mTextureManager=textureManager;}
 
-	Resource::ptr load(Stream::ptr stream,ResourceData *data,ProgressListener *listener){
-		Image::ptr image(mHandler.loadImage(stream));
-		if(image!=NULL){
-			return mTextureManager->createTexture(image);
-		}
-		else{
-			return NULL;
-		}
-	}
-
-	bool save(Stream::ptr stream,Resource::ptr resource,ResourceData *data,ProgressListener *listener){
-		Texture::ptr texture=shared_static_cast<Texture>(resource);
-		return mHandler.saveImage(mTextureManager->createImage(texture),stream);
-	}
+	Resource::ptr load(Stream::ptr stream,ResourceData *data,ProgressListener *listener);
 
 protected:
 	TextureManager *mTextureManager;
-	egg::image::PNGHandler mHandler;
 };
 
 }
