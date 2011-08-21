@@ -244,7 +244,7 @@ const char *makeBoneAssignment(char *buffer,const Mesh::VertexBoneAssignmentList
 	return buffer;
 }
 
-/// @todo: Support multi-path-pass materials
+/// @todo: Support loading all of the material, instead of starting with a DiffuseMaterial
 Material::ptr XMLMeshUtilities::loadMaterial(mxml_node_t *node,int version,MaterialManager *materialManager,TextureManager *textureManager){
 	Material::ptr material;
 	if(materialManager!=NULL){

@@ -46,6 +46,8 @@ set (TADPOLE_BSP_SRC
 )
 
 set (TADPOLE_HANDLER_SRC
+	handler/DiffuseMaterialCreator.cpp
+	handler/SkyboxMaterialCreator.cpp
 	handler/BMPHandler.cpp
 	handler/DDSHandler.cpp
 	handler/TGAHandler.cpp
@@ -218,6 +220,8 @@ set (TADPOLE_BSP_HEADERS
 )
 
 set (TADPOLE_HANDLER_HEADERS
+	handler/DiffuseMaterialCreator.h
+	handler/SkyboxMaterialCreator.h
 	handler/AudioBufferHandler.h
 	handler/BMPHandler.h
 	handler/TMSHHandler.h
@@ -344,7 +348,6 @@ set (TADPOLE_TERRAIN_HEADERS
 
 # Bundle source
 source_group ("Source Files\\\\animation" FILES ${TADPOLE_ANIMATION_SRC})
-source_group ("Source Files\\\\handler" FILES ${TADPOLE_HANDLER_SRC})
 source_group ("Source Files\\\\material" FILES ${TADPOLE_MATERIAL_SRC})
 source_group ("Source Files\\\\node" FILES ${TADPOLE_NODE_SRC})
 source_group ("Source Files\\\\sensor" FILES ${TADPOLE_SENSOR_SRC})
@@ -353,20 +356,22 @@ source_group ("Source Files\\\\terrain" FILES ${TADPOLE_TERRAIN_SRC})
 
 # Bundle headers
 source_group ("Header Files\\\\animation" FILES ${TADPOLE_ANIMATION_HEADERS})
-source_group ("Header Files\\\\handler" FILES ${TADPOLE_HANDLER_HEADERS})
 source_group ("Header Files\\\\material" FILES ${TADPOLE_MATERIAL_HEADERS})
 source_group ("Header Files\\\\node" FILES ${TADPOLE_NODE_HEADERS})
 source_group ("Header Files\\\\sensor" FILES ${TADPOLE_SENSOR_HEADERS})
 source_group ("Header Files\\\\terrain" FILES ${TADPOLE_TERRAIN_HEADERS})
 
-
-# Source headers and namespaces
 set (TADPOLE_SRC ${TADPOLE_SRC} ${TADPOLE_ANIMATION_SRC} ${TADPOLE_HANDLER_SRC} ${TADPOLE_MATERIAL_SRC} ${TADPOLE_NODE_SRC} ${TADPOLE_SENSOR_SRC} ${TADPOLE_TERRAIN_SRC})
 
 # TODO: The handlers/ subdirectory is going to become a plugin system, and so they are NOT included in the aggregate header files
 # This is true for all handler/ subdirectory files
 set (TADPOLE_HEADERS ${TADPOLE_HEADERS} ${TADPOLE_ANIMATION_HEADERS} ${TADPOLE_MATERIAL_HEADERS} ${TADPOLE_NODE_HEADERS} ${TADPOLE_SENSOR_HEADERS} ${TADPOLE_TERRAIN_HEADERS})
 set (TADPOLE_NAMESPACES ${TADPOLE_NAMESPACES} animation material node sensor terrain)
+
+# Give the headers and namespaces parent scope for inclusion into the master tadpole.h file
+set (TADPOLE_HEADERS ${TADPOLE_HEADERS} PARENT_SCOPE)
+set (TADPOLE_NAMESPACES ${TADPOLE_NAMESPACES} PARENT_SCOPE)
+
 
 if (NOT TOADLET_FIXED_POINT)
 	source_group ("Source Files\\\\bsp" FILES ${TADPOLE_BSP_SRC})
@@ -378,6 +383,10 @@ if (NOT TOADLET_FIXED_POINT)
 	set (TADPOLE_NAMESPACES ${TADPOLE_NAMESPACES} bsp studio)
 endif (NOT TOADLET_FIXED_POINT)
 
+# Give the headers and namespaces parent scope for inclusion into the master tadpole.h file
+set (TADPOLE_HEADERS ${TADPOLE_HEADERS} PARENT_SCOPE)
+set (TADPOLE_NAMESPACES ${TADPOLE_NAMESPACES} PARENT_SCOPE)
+
 
 # Setup dependecy specific files and libraries
 # Freetype is not required on OSX
@@ -386,9 +395,8 @@ if (NOT TOADLET_PLATFORM_OSX)
 	if (FREETYPE_FOUND)
 		set (TOADLET_HAS_FREETYPE ON PARENT_SCOPE)
 		include_directories (${FREETYPE_INCLUDE_DIRS})
-		source_group ("Source Files\\\\handler" FILES ${TADPOLE_HANDLER_FREETYPE_SRC})
-		source_group ("Header Files\\\\handler" FILES ${TADPOLE_HANDLER_FREETYPE_HEADERS})
-		set (TADPOLE_SRC ${TADPOLE_SRC} ${TADPOLE_HANDLER_FREETYPE_SRC})
+		set (TADPOLE_HANDLER_SRC ${TADPOLE_HANDLER_SRC} ${TADPOLE_HANDLER_FREETYPE_SRC})
+		set (TADPOLE_HANDLER_HEADERS ${TADPOLE_HANDLER_HEADERS} ${TADPOLE_HANDLER_FREETYPE_HEADERS})
 
 		# Libraries
 		set (TADPOLE_LIBS ${FREETYPE_LIBRARIES})
@@ -410,10 +418,8 @@ if (MXML_FOUND)
 	# Files
 	set (TOADLET_HAS_MXML ON PARENT_SCOPE)
 	include_directories (${MXML_INCLUDE_DIR})
-	source_group ("Source Files\\\\handler" FILES ${TADPOLE_HANDLER_XML_SRC})
-	source_group ("Header Files\\\\handler" FILES ${TADPOLE_HANDLER_XML_HEADERS})
-	set (TADPOLE_SRC ${TADPOLE_SRC} ${TADPOLE_HANDLER_XML_SRC})
-	set (TADPOLE_HEADERS ${TADPOLE_HEADERS} ${TADPOLE_HANDLER_XML_HEADERS})
+	set (TADPOLE_HANDLER_SRC ${TADPOLE_HANDLER_SRC} ${TADPOLE_HANDLER_XML_SRC})
+	set (TADPOLE_HANDLER_HEADERS ${TADPOLE_HANDLER_HEADERS} ${TADPOLE_HANDLER_XML_HEADERS})
 
 	# Libraries
 	set (TADPOLE_LIBS ${TADPOLE_LIBS} ${MXML_LIBRARY})
@@ -439,10 +445,8 @@ if (GIF_FOUND)
 	# Files
 	set (TOADLET_HAS_GIF ON PARENT_SCOPE)
 	include_directories (${GIF_INCLUDE_DIR})
-	source_group ("Source Files\\\\handler" FILES ${TADPOLE_HANDLER_GIF_SRC})
-	source_group ("Header Files\\\\handler" FILES ${TADPOLE_HANDLER_GIF_HEADERS})
-	set (TADPOLE_SRC ${TADPOLE_SRC} ${TADPOLE_HANDLER_GIF_SRC})
-	set (TADPOLE_HEADERS ${TADPOLE_HEADERS} ${TADPOLE_HANDLER_GIF_HEADERS})
+	set (TADPOLE_HANDLER_SRC ${TADPOLE_HANDLER_SRC} ${TADPOLE_HANDLER_GIF_SRC})
+	set (TADPOLE_HANDLER_HEADERS ${TADPOLE_HANDLER_HEADERS} ${TADPOLE_HANDLER_GIF_HEADERS})
 
 	# Libraries
 	set (TADPOLE_LIBS ${TADPOLE_LIBS} ${GIF_LIBRARY})
@@ -463,10 +467,8 @@ if (JPEG_FOUND)
 	# Files 
 	set (TOADLET_HAS_JPEG ON PARENT_SCOPE)
 	include_directories (${JPEG_INCLUDE_DIR})
-	source_group ("Source Files\\\\handler" FILES ${TADPOLE_HANDLER_JPEG_SRC})
-	source_group ("Header Files\\\\handler" FILES ${TADPOLE_HANDLER_JPEG_HEADERS})
-	set (TADPOLE_SRC ${TADPOLE_SRC} ${TADPOLE_HANDLER_JPEG_SRC})
-	set (TADPOLE_HEADERS ${TADPOLE_HEADERS} ${TADPOLE_HANDLER_JPEG_HEADERS})
+	set (TADPOLE_HANDLER_SRC ${TADPOLE_HANDLER_SRC} ${TADPOLE_HANDLER_JPEG_SRC})
+	set (TADPOLE_HANDLER_HEADERS ${TADPOLE_HANDLER_HEADERS} ${TADPOLE_HANDLER_JPEG_HEADERS})
 	
 	# Libraries
 	set (TADPOLE_LIBS ${TADPOLE_LIBS} ${JPEG_LIBRARY})
@@ -487,10 +489,8 @@ if (PNG_FOUND)
 	# Files
 	set (TOADLET_HAS_PNG ON PARENT_SCOPE)
 	include_directories (${PNG_INCLUDE_DIR})
-	source_group ("Source Files\\\\handler" FILES ${TADPOLE_HANDLER_PNG_SRC})
-	source_group ("Header Files\\\\handler" FILES ${TADPOLE_HANDLER_PNG_HEADERS})
-	set (TADPOLE_SRC ${TADPOLE_SRC} ${TADPOLE_HANDLER_PNG_SRC})
-	set (TADPOLE_HEADERS ${TADPOLE_HEADERS} ${TADPOLE_HANDLER_PNG_HEADERS})
+	set (TADPOLE_HANDLER_SRC ${TADPOLE_HANDLER_SRC} ${TADPOLE_HANDLER_PNG_SRC})
+	set (TADPOLE_HANDLER_HEADERS ${TADPOLE_HANDLER_HEADERS} ${TADPOLE_HANDLER_PNG_HEADERS})
 	
 	# Libraries
 	set (TADPOLE_LIBS ${TADPOLE_LIBS} ${PNG_LIBRARY})
@@ -509,12 +509,9 @@ endif (PNG_FOUND)
 find_package (OggVorbis)
 if (OGGVORBIS_FOUND)
 	set (TOADLET_HAS_OGGVORBIS ON PARENT_SCOPE)
-		
-	source_group ("Source Files\\\\handler" FILES ${TADPOLE_HANDLER_OGGVORBISDECODER_SRC})
-	source_group ("Header Files\\\\handler" FILES ${TADPOLE_HANDLER_OGGVORBISDECODER_HEADERS})
-	set (TADPOLE_SRC ${TADPOLE_SRC} ${TADPOLE_HANDLER_OGGVORBISDECODER_SRC})
-	set (TADPOLE_HEADERS ${TADPOLE_HEADERS} ${TADPOLE_HANDLER_OGGVORBISDECODER_HEADERS})
 	include_directories (${OGGVORBIS_INCLUDES})
+	set (TADPOLE_HANDLER_SRC ${TADPOLE_HANDLER_SRC} ${TADPOLE_HANDLER_OGGVORBISDECODER_SRC})
+	set (TADPOLE_HANDLER_HEADERS ${TADPOLE_HANDLER_HEADERS} ${TADPOLE_HANDLER_OGGVORBISDECODER_HEADERS})
 
 	# Dynamic libs
 	set (TADPOLE_LIBS ${TADPOLE_LIBS} ${OGGVORBIS_LIBRARIES})
@@ -553,14 +550,10 @@ endif (OGGVORBIS_FOUND)
 find_package (Sidplay)
 if (SIDPLAY_FOUND)
 	set (TOADLET_HAS_SIDPLAY ON PARENT_SCOPE)
-
-	add_definitions(-DSIDPLAY_VERSION=${SIDPLAY_VERSION})
-	
-	source_group ("Source Files\\\\handler" FILES ${TADPOLE_HANDLER_SIDDECODER_SRC})
-	source_group ("Header Files\\\\handler" FILES ${TADPOLE_HANDLER_SIDDECODER_HEADERS})
-	set (TADPOLE_SRC ${TADPOLE_SRC} ${TADPOLE_HANDLER_SIDDECODER_SRC})
-	set (TADPOLE_HEADERS ${TADPOLE_HEADERS} ${TADPOLE_HANDLER_SIDDECODER_HEADERS})
 	include_directories (${SIDPLAY_INCLUDES})
+	add_definitions(-DSIDPLAY_VERSION=${SIDPLAY_VERSION})
+	set (TADPOLE_HANDLER_SRC ${TADPOLE_HANDLER_SRC} ${TADPOLE_HANDLER_SIDDECODER_SRC})
+	set (TADPOLE_HANDLER_HEADERS ${TADPOLE_HANDLER_HEADERS} ${TADPOLE_HANDLER_SIDDECODER_HEADERS})
 
 	# Dynamic libs
 	set (TADPOLE_LIBS ${TADPOLE_LIBS} ${SIDPLAY_LIBRARY})
@@ -601,10 +594,8 @@ if (ZZIP_FOUND)
 	# Files
 	set (TOADLET_HAS_ZZIP ON PARENT_SCOPE)
 	include_directories (${ZZIP_INCLUDE_DIR})
-	source_group ("Source Files\\\\handler" FILES ${TADPOLE_HANDLER_ZIP_SRC})
-	source_group ("Header Files\\\\handler" FILES ${TADPOLE_HANDLER_ZIP_HEADERS})
-	set (TADPOLE_SRC ${TADPOLE_SRC} ${TADPOLE_HANDLER_ZIP_SRC})
-	set (TADPOLE_HEADERS ${TADPOLE_HEADERS} ${TADPOLE_HANDLER_ZIP_HEADERS})
+	set (TADPOLE_HANDLER_SRC ${TADPOLE_HANDLER_SRC} ${TADPOLE_HANDLER_ZIP_SRC})
+	set (TADPOLE_HANDLER_HEADERS ${TADPOLE_HANDLER_HEADERS} ${TADPOLE_HANDLER_ZIP_HEADERS})
 	
 	# Libraries
 	set (TADPOLE_LIBS ${TADPOLE_LIBS} ${ZZIP_LIBRARY})
@@ -648,10 +639,11 @@ elseif (TOADLET_PLATFORM_WIN32)
 	set (TADPOLE_SRC ${TADPOLE_SRC} ${TADPOLE_HANDLER_PLATFORM_WIN32_SRC})
 endif (TOADLET_PLATFORM_OSX)
 
+# Use dependency results
+source_group ("Source Files\\\\handler" FILES ${TADPOLE_HANDLER_SRC})
+source_group ("Header Files\\\\handler" FILES ${TADPOLE_HANDLER_HEADERS})
 
-# Give the headers and namespaces parent scope for inclusion into the master tadpole.h file
-set (TADPOLE_HEADERS ${TADPOLE_HEADERS} PARENT_SCOPE)
-set (TADPOLE_NAMESPACES ${TADPOLE_NAMESPACES} PARENT_SCOPE)
+set (TADPOLE_SRC ${TADPOLE_SRC} ${TADPOLE_HANDLER_SRC})
 
 
 # Dynamic library

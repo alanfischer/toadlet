@@ -45,7 +45,6 @@
 #include <toadlet/tadpole/ShaderManager.h>
 #include <toadlet/tadpole/ContextListener.h>
 #include <toadlet/tadpole/node/Node.h>
-#include <toadlet/tadpole/handler/AudioBufferHandler.h>
 
 namespace toadlet{
 namespace tadpole{
@@ -57,6 +56,7 @@ public:
 
 	void destroy();
 
+	void installHandlers();
 	bool setRenderDevice(RenderDevice *renderDevice);
 	RenderDevice *getRenderDevice() const;
 	void updateVertexFormats();

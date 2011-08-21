@@ -23,32 +23,32 @@
  *
  ********** Copyright header - do not remove **********/
 
-#ifndef TOADLET_TADPOLE_HANDLER_ZIPHANDLER_H
-#define TOADLET_TADPOLE_HANDLER_ZIPHANDLER_H
+#ifndef TOADLET_TADPOLE_HANDLER_SKYBOXMATERIALCREATOR_H
+#define TOADLET_TADPOLE_HANDLER_SKYBOXMATERIALCREATOR_H
 
-#include <toadlet/tadpole/ResourceStreamer.h>
-#include <toadlet/tadpole/handler/ZIPArchive.h>
+#include <toadlet/tadpole/Engine.h>
+#include <toadlet/tadpole/ResourceCreator.h>
+#include <toadlet/tadpole/material/Material.h>
 
 namespace toadlet{
 namespace tadpole{
 namespace handler{
 
-class TOADLET_API ZIPHandler:public ResourceStreamer{
+class SkyboxMaterialCreator:public ResourceCreator{
 public:
-	TOADLET_SHARED_POINTERS(ZIPHandler);
+	SkyboxMaterialCreator(Engine *engine);
 
-	ZIPHandler(){}
+	void destroy();
 
-	Resource::ptr load(Stream::ptr stream,ResourceData *data,ProgressListener *listener){
-		ZIPArchive::ptr archive(new ZIPArchive());
-		bool result=archive->open(stream);
-		if(result){
-			return shared_static_cast<Archive>(archive);
-		}
-		else{
-			return NULL;
-		}
-	}
+	void createShaders();
+	void destroyShaders();
+
+	Resource::ptr create(const String &name,ResourceData *data,ProgressListener *listener);
+	Material::ptr createSkyboxMaterial(Texture::ptr texture);
+
+protected:
+	Engine *mEngine;
+	Shader::ptr mSkyboxVertexShader,mSkyboxFragmentShader;
 };
 
 }
@@ -56,4 +56,3 @@ public:
 }
 
 #endif
-
