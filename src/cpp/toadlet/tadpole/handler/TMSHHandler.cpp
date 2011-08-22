@@ -388,7 +388,7 @@ void TMSHHandler::writeVertexFormat(DataStream *stream,VertexFormat::ptr vertexF
 	}
 };
 
-/// @todo: Support multi-path-pass materials
+/// @todo: Support loading all of the material, instead of starting with a DiffuseMaterial
 Material::ptr TMSHHandler::readMaterial(DataStream *stream,int blockSize){
 	int i;
 

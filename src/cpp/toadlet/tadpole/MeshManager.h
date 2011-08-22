@@ -43,54 +43,20 @@ public:
 	Mesh::ptr findMesh(const String &name){return shared_static_cast<Mesh>(ResourceManager::find(name));}
 	Resource::ptr manage(const Resource::ptr &resource,const String &name=(char*)NULL);
 
-	Mesh::ptr createBox(const AABox &box,Material::ptr material=Material::ptr());
-	Mesh::ptr createSkyBox(scalar size,bool unfolded,bool invert,Material::ptr bottom=Material::ptr(),Material::ptr top=Material::ptr(),Material::ptr left=Material::ptr(),Material::ptr right=Material::ptr(),Material::ptr back=Material::ptr(),Material::ptr front=Material::ptr());
+	inline void setAABoxCreator(ResourceCreator::ptr creator){mAABoxCreator=creator;}
+	inline void setSkyBoxCreator(ResourceCreator::ptr creator){mSkyBoxCreator=creator;}
+	inline void setSkyDomeCreator(ResourceCreator::ptr creator){mSkyDomeCreator=creator;}
+	inline void setSphereCreator(ResourceCreator::ptr creator){mSphereCreator=creator;}
 
-	int getGridVertexCount(int numWidth,int numHeight){return numWidth*numHeight;}
-	int getGridIndexCount(int numWidth,int numHeight){return (numWidth*2) * (numHeight-1) + (numHeight-2);}
-	Mesh::ptr createGrid(scalar width,scalar height,int numWidth,int numHeight,Material::ptr material=Material::ptr());
-	Mesh::ptr createGrid(VertexBuffer::ptr vertexBuffer,IndexBuffer::ptr indexBuffer,scalar width,scalar height,int numWidth,int numHeight);
-
-	int getSphereVertexCount(int numSegments,int numRings){return (numRings+1)*(numSegments+1);}
-	int getSphereIndexCount(int numSegments,int numRings){return 6*numRings*(numSegments+1);}
-	Mesh::ptr createSphere(const Sphere &sphere,int numSegments=16,int numRings=16,Material::ptr material=Material::ptr());
-	Mesh::ptr createSphere(VertexBuffer::ptr vertexBuffer,IndexBuffer::ptr indexBuffer,const Sphere &sphere,int numSegments,int numRings);
-
-	int getSkyDomeVertexCount(int numSegments,int numRings){return (numRings+1)*(numSegments+1);}
-	int getSkyDomeIndexCount(int numSegments,int numRings){return 6*numRings*(numSegments+1);}
-	Mesh::ptr createSkyDome(const Sphere &sphere,int numSegments=16,int numRings=16,scalar fade=0.5,Material::ptr material=Material::ptr());
-	Mesh::ptr createSkyDome(VertexBuffer::ptr vertexBuffer,IndexBuffer::ptr indexBuffer,const Sphere &sphere,int numSegments,int numRings,scalar fade);
-
-	inline int getGeoSphereInitialTriangleCount(bool icosahedron){return icosahedron?20:8;}
-	inline int getGeoSphereInitialVertexCount(bool icosahedron){return icosahedron?12:6;}
-	inline int getGeoSphereTriangleCount(int depth,bool icosahedron){return getGeoSphereInitialTriangleCount(icosahedron)<<(depth*2);}
-	int getGeoSphereVertexCount(int depth,bool icosahedron){return getGeoSphereInitialTriangleCount(icosahedron) * (((1 << ((depth+1) * 2)) - 1) / (4 - 1) - 1) + getGeoSphereInitialVertexCount(icosahedron);}
-	int getGeoSphereIndexCount(int depth,bool icosahedron){return getGeoSphereTriangleCount(depth,icosahedron)*3;}
-	Mesh::ptr createGeoSphere(const Sphere &sphere,int depth=3,bool icosahedron=false,Material::ptr material=Material::ptr());
-	Mesh::ptr createGeoSphere(VertexBuffer::ptr vertexBuffer,IndexBuffer::ptr indexBuffer,const Sphere &sphere,int depth,bool icosahedron);
-
-	int getTorusVertexCount(int numMajor,int numMinor){return numMajor*(numMinor+1)*2;}
-	Mesh::ptr createTorus(scalar majorRadius,scalar minorRadius,int numMajor=16,int numMinor=16,Material::ptr material=Material::ptr());
-	Mesh::ptr createTorus(VertexBuffer::ptr vertexBuffer,scalar majorRadius,scalar minorRadius,int numMajor,int numMinor);
+	Mesh::ptr createAABoxMesh(const AABox &box,Material::ptr material=Material::ptr());
+	Mesh::ptr createSkyBoxMesh(scalar size,bool unfolded,bool invert,Material::ptr bottom,Material::ptr top,Material::ptr left,Material::ptr right,Material::ptr back,Material::ptr front);
+	Mesh::ptr createSkyDomeMesh(const Sphere &sphere,int numSegments,int numRings,scalar fade,Material::ptr material=Material::ptr());
+	Mesh::ptr createSphereMesh(const Sphere &sphere,Material::ptr material=Material::ptr());
 
 protected:
-	class IndexTri{
-	public:
-		void set(int i1,int i2,int i3){
-			index[0]=i1;
-			index[1]=i2;
-			index[2]=i3;
-		}
-
-		int index[3];
-	};
-
-	void geoSet(int vertexIndex,const Vector3 &vec);
-
 	Engine *mEngine;
-	VertexBufferAccessor vba;
-	IndexBufferAccessor iba;
-	Sphere currentSphere;
+
+	ResourceCreator::ptr mAABoxCreator,mSkyBoxCreator,mSkyDomeCreator,mSphereCreator;
 };
 
 }

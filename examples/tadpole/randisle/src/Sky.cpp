@@ -10,9 +10,10 @@ Node *Sky::create(Scene *scene,const Vector4 &skyColor,const Vector4 &fadeColor)
 	Vector3 lightDir(1,1,0.5);
 	bool advanced=false; // Use realtime bumpmapping, or precalculated
 
+	SkyDomeMeshCreator::ptr skyDomeCreator(new SkyDomeMeshCreator(mEngine));
  	int numSegments=16,numRings=16;
-	VertexBuffer::ptr vertexBuffer=mEngine->getBufferManager()->createVertexBuffer(Buffer::Usage_BIT_STREAM,Buffer::Access_READ_WRITE,mEngine->getVertexFormats().POSITION_COLOR_TEX_COORD,mEngine->getMeshManager()->getSkyDomeVertexCount(numSegments,numRings));
-	IndexBuffer::ptr indexBuffer=mEngine->getBufferManager()->createIndexBuffer(Buffer::Usage_BIT_STATIC,Buffer::Access_BIT_WRITE,IndexBuffer::IndexFormat_UINT16,mEngine->getMeshManager()->getSkyDomeIndexCount(numSegments,numRings));
+	VertexBuffer::ptr vertexBuffer=mEngine->getBufferManager()->createVertexBuffer(Buffer::Usage_BIT_STREAM,Buffer::Access_READ_WRITE,mEngine->getVertexFormats().POSITION_COLOR_TEX_COORD,skyDomeCreator->getSkyDomeVertexCount(numSegments,numRings));
+	IndexBuffer::ptr indexBuffer=mEngine->getBufferManager()->createIndexBuffer(Buffer::Usage_BIT_STATIC,Buffer::Access_BIT_WRITE,IndexBuffer::IndexFormat_UINT16,skyDomeCreator->getSkyDomeIndexCount(numSegments,numRings));
 
 	Image::ptr cloud=createCloud(cloudSize,cloudSize,16,9,0.45,0.000025,0.75);
 	Image::ptr bump=createBump(cloud,-1,-1,-32,4); // To debug any bump issues, try disabling fadeStage, make bump/cloud stage modulate, add a rotating sun, and use a zscale of 1
@@ -204,7 +205,7 @@ Node *Sky::create(Scene *scene,const Vector4 &skyColor,const Vector4 &fadeColor)
 		Image::ptr composite=createComposite(cloud,bump,lightDir,skyColor);
 		Texture::ptr compositeTexture=mEngine->getTextureManager()->createTexture(composite);
 
-		material=mEngine->getMaterialManager()->createSkyboxMaterial(compositeTexture);
+		material=mEngine->getMaterialManager()->createSkyBoxMaterial(compositeTexture);
 		mCompositeAccessor=Matrix4x4Accessor::ptr(new TextureStateMatrix4x4Accessor(material->getPass(),0));
 		material->getPass()->setBlendState(BlendState::Combination_ALPHA);
 		material->getPass()->setSamplerState(0,SamplerState());
@@ -214,7 +215,7 @@ Node *Sky::create(Scene *scene,const Vector4 &skyColor,const Vector4 &fadeColor)
 	mSkyMaterial->setLayer(-2);
 	mSkyMaterial->retain();
 
-	Mesh::ptr mesh=mEngine->getMeshManager()->createSkyDome(vertexBuffer,indexBuffer,sphere,numSegments,numRings,0.35);
+	Mesh::ptr mesh=skyDomeCreator->createSkyDomeMesh(vertexBuffer,indexBuffer,sphere,numSegments,numRings,0.35);
 	Transform transform;
 	transform.setScale(1,1,0.5f);
 	mesh->setTransform(transform);

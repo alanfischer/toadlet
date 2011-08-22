@@ -23,32 +23,38 @@
  *
  ********** Copyright header - do not remove **********/
 
-#ifndef TOADLET_TADPOLE_HANDLER_ZIPHANDLER_H
-#define TOADLET_TADPOLE_HANDLER_ZIPHANDLER_H
+#ifndef TOADLET_TADPOLE_CREATOR_SKYBOXMESHCREATOR
+#define TOADLET_TADPOLE_CREATOR_SKYBOXMESHCREATOR
 
-#include <toadlet/tadpole/ResourceStreamer.h>
-#include <toadlet/tadpole/handler/ZIPArchive.h>
+#include <toadlet/tadpole/ResourceCreator.h>
+#include <toadlet/tadpole/Mesh.h>
 
 namespace toadlet{
 namespace tadpole{
-namespace handler{
+namespace creator{
 
-class TOADLET_API ZIPHandler:public ResourceStreamer{
+class TOADLET_API SkyBoxMeshCreator:public ResourceCreator{
 public:
-	TOADLET_SHARED_POINTERS(ZIPHandler);
+	TOADLET_SHARED_POINTERS(SkyBoxMeshCreator);
 
-	ZIPHandler(){}
-
-	Resource::ptr load(Stream::ptr stream,ResourceData *data,ProgressListener *listener){
-		ZIPArchive::ptr archive(new ZIPArchive());
-		bool result=archive->open(stream);
-		if(result){
-			return shared_static_cast<Archive>(archive);
-		}
-		else{
-			return NULL;
-		}
+	SkyBoxMeshCreator(Engine *engine){
+		mEngine=engine;
 	}
+
+	void destroy(){}
+
+	Resource::ptr create(const String &name,ResourceData *data,ProgressListener *listener){
+		Resource::ptr resource=createSkyBoxMesh(Math::ONE,false,false,Material::ptr(),Material::ptr(),Material::ptr(),Material::ptr(),Material::ptr(),Material::ptr());
+		resource->setName(name);
+		return resource;
+	}
+
+	Mesh::ptr createSkyBoxMesh(scalar size,bool unfolded,bool invert,Material::ptr bottom,Material::ptr top,Material::ptr left,Material::ptr right,Material::ptr back,Material::ptr front);
+
+protected:
+	Engine *mEngine;
+	VertexBufferAccessor vba;
+	IndexBufferAccessor iba;
 };
 
 }
@@ -56,4 +62,3 @@ public:
 }
 
 #endif
-

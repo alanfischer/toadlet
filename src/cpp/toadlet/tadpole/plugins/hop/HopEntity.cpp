@@ -307,15 +307,15 @@ void HopEntity::updateCollisionVolumes(){
 			Shape *shape=mSolid->getShape(i);
 			switch(shape->getType()){
 				case Shape::Type_AABOX:
-					mesh=mEngine->getMeshManager()->createBox(shape->getAABox());
+					mesh=mEngine->getMeshManager()->createAABoxMesh(shape->getAABox());
 				break;
 				case Shape::Type_SPHERE:
-					mesh=mEngine->getMeshManager()->createSphere(shape->getSphere());
+					mesh=mEngine->getMeshManager()->createSphereMesh(shape->getSphere());
 				break;
 				default:{
 					AABox box;
 					shape->getBound(box);
-					mesh=mEngine->getMeshManager()->createBox(box);
+					mesh=mEngine->getMeshManager()->createAABoxMesh(box);
 				}break;
 			}
 

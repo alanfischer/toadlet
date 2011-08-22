@@ -23,8 +23,8 @@
  *
  ********** Copyright header - do not remove **********/
 
-#ifndef TOADLET_TADPOLE_RESOURCEHANDLER_H
-#define TOADLET_TADPOLE_RESOURCEHANDLER_H
+#ifndef TOADLET_TADPOLE_RESOURCESTREAMER_H
+#define TOADLET_TADPOLE_RESOURCESTREAMER_H
 
 #include <toadlet/egg/Resource.h>
 #include <toadlet/egg/io/Stream.h>
@@ -39,6 +39,8 @@ public:
 	TOADLET_SHARED_POINTERS(ResourceStreamer);
 
 	virtual ~ResourceStreamer(){}
+
+	virtual void destroy(){}
 
 	virtual Resource::ptr load(Stream::ptr stream,ResourceData *data,ProgressListener *listener){return Resource::ptr();}
 	virtual bool save(Stream::ptr stream,Resource::ptr resource,ResourceData *data,ProgressListener *listener){return false;}

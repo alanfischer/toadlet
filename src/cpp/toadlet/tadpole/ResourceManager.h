@@ -32,6 +32,7 @@
 #include <toadlet/egg/ResourceFullyReleasedListener.h>
 #include <toadlet/egg/io/Archive.h>
 #include <toadlet/egg/io/Stream.h>
+#include <toadlet/tadpole/ResourceCreator.h>
 #include <toadlet/tadpole/ResourceStreamer.h>
 
 namespace toadlet{

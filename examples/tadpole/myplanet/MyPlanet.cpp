@@ -16,7 +16,7 @@ public:
 	Node *create(Scene *scene){
 		super::create(scene);
 
-		Mesh::ptr mesh=getEngine()->getMeshManager()->createSphere(Sphere(Math::ONE));
+		Mesh::ptr mesh=getEngine()->getMeshManager()->createSphereMesh(Sphere(Math::ONE));
 		{
 			mesh->getSubMesh(0)->material->getPass()->setMaterialState(MaterialState(Colors::BLUE));
 		}
@@ -118,7 +118,7 @@ public:
 		mPlanet=planet;
 		attach(mPlanet);
 
-		Mesh::ptr mesh=getEngine()->getMeshManager()->createTorus(size,thickness,16,4);
+		Mesh::ptr mesh=getEngine()->getMeshManager()->createTorusMesh(size,thickness,16,4);
 		{
 			mMaterial=getEngine()->getMaterialManager()->createDiffuseMaterial(createDash(128,1));
 			mMaterial->getPass()->setBlendState(BlendState::Combination_COLOR_ADDITIVE);
@@ -477,7 +477,7 @@ ParentNode::ptr MyPlanet::createSun(scalar size){
 		flareNode->setScale(flareSize,flareSize,Math::ONE);
 		sun->attach(flareNode);
 
-		Mesh::ptr mesh=getEngine()->getMeshManager()->createSphere(Sphere(size));
+		Mesh::ptr mesh=getEngine()->getMeshManager()->createSphereMesh(Sphere(size));
 		{
 			Material::ptr material=mesh->getSubMesh(0)->material;
 			MaterialState materialState(Colors::YELLOW);
