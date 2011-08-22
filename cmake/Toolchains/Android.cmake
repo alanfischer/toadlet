@@ -156,6 +156,9 @@ if( EXISTS "${ANDROID_NDK}" )
  if( APPLE )
   set( NDKSYSTEM "darwin-x86" )
  elseif( WIN32 )
+  # HACK: The Windows Android NDK uses make under cygwin, which doesn't cooperate very well with cmake.
+  # Ignoring non-toadlet includes in depends.make greatly simplfies pathing issues.
+  include_regular_expression(".*toadlet.*")
   set( NDKSYSTEM "windows" )
   set( TOOL_OS_SUFFIX ".exe" )
  elseif( UNIX )
