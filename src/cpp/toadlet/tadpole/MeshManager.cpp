@@ -25,10 +25,10 @@
 
 #include <toadlet/tadpole/MeshManager.h>
 #include <toadlet/tadpole/Engine.h>
-#include <toadlet/tadpole/handler/AABoxMeshCreator.h>
-#include <toadlet/tadpole/handler/SkyBoxMeshCreator.h>
-#include <toadlet/tadpole/handler/SkyDomeMeshCreator.h>
-#include <toadlet/tadpole/handler/SphereMeshCreator.h>
+#include <toadlet/tadpole/creator/AABoxMeshCreator.h>
+#include <toadlet/tadpole/creator/SkyBoxMeshCreator.h>
+#include <toadlet/tadpole/creator/SkyDomeMeshCreator.h>
+#include <toadlet/tadpole/creator/SphereMeshCreator.h>
 
 namespace toadlet{
 namespace tadpole{

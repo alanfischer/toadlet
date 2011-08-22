@@ -23,35 +23,33 @@
  *
  ********** Copyright header - do not remove **********/
 
-#ifndef TOADLET_TADPOLE_HANDLER_SKYDOMEMESHCREATOR
-#define TOADLET_TADPOLE_HANDLER_SKYDOMEMESHCREATOR
+#ifndef TOADLET_TADPOLE_CREATOR_AABOXMESHCREATOR
+#define TOADLET_TADPOLE_CREATOR_AABOXMESHCREATOR
 
 #include <toadlet/tadpole/ResourceCreator.h>
 #include <toadlet/tadpole/Mesh.h>
 
 namespace toadlet{
 namespace tadpole{
-namespace handler{
+namespace creator{
 
-class SkyDomeMeshCreator:public ResourceCreator{
+class TOADLET_API AABoxMeshCreator:public ResourceCreator{
 public:
-	SkyDomeMeshCreator(Engine *engine){
+	TOADLET_SHARED_POINTERS(AABoxMeshCreator);
+
+	AABoxMeshCreator(Engine *engine){
 		mEngine=engine;
 	}
 
 	void destroy(){}
 
 	Resource::ptr create(const String &name,ResourceData *data,ProgressListener *listener){
-		Resource::ptr resource=createSkyDomeMesh(Sphere(Math::ONE),16,16,Math::HALF,Material::ptr());
+		Resource::ptr resource=createAABoxMesh(AABox(-Math::ONE,-Math::ONE,-Math::ONE,Math::ONE,Math::ONE,Math::ONE),Material::ptr());
 		resource->setName(name);
 		return resource;
 	}
 
-	int getSkyDomeVertexCount(int numSegments,int numRings){return (numRings+1)*(numSegments+1);}
-	int getSkyDomeIndexCount(int numSegments,int numRings){return 6*numRings*(numSegments+1);}
-
-	Mesh::ptr createSkyDomeMesh(VertexBuffer::ptr vertexBuffer,IndexBuffer::ptr indexBuffer,const Sphere &sphere,int numSegments,int numRings,scalar fade);
-	Mesh::ptr createSkyDomeMesh(const Sphere &sphere,int numSegments,int numRings,scalar fade,Material::ptr material);
+	Mesh::ptr createAABoxMesh(const AABox &box,Material::ptr material);
 
 protected:
 	Engine *mEngine;

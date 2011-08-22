@@ -23,15 +23,16 @@
  *
  ********** Copyright header - do not remove **********/
 
-#include <toadlet/tadpole/handler/SkyBoxMaterialCreator.h>
+#include <toadlet/tadpole/creator/SkyBoxMaterialCreator.h>
 #include <toadlet/tadpole/material/RenderVariables.h>
 
 namespace toadlet{
 namespace tadpole{
-namespace handler{
+namespace creator{
 
 SkyBoxMaterialCreator::SkyBoxMaterialCreator(Engine *engine){
 	mEngine=engine;
+	createShaders();
 }
 
 void SkyBoxMaterialCreator::destroy(){

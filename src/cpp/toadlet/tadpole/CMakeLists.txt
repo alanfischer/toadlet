@@ -45,16 +45,19 @@ set (TADPOLE_BSP_SRC
 	bsp/BSP30Handler.cpp
 )
 
+set (TADPOLE_CREATOR_SRC
+	creator/DiffuseMaterialCreator.cpp
+	creator/SkyboxMaterialCreator.cpp
+	creator/AABoxMeshCreator.cpp
+	creator/GridMeshCreator.cpp
+	creator/GeoSphereMeshCreator.cpp
+	creator/SkyBoxMeshCreator.cpp
+	creator/SkyDomeMeshCreator.cpp
+	creator/SphereMeshCreator.cpp
+	creator/TorusMeshCreator.cpp
+)
+
 set (TADPOLE_HANDLER_SRC
-	handler/DiffuseMaterialCreator.cpp
-	handler/SkyboxMaterialCreator.cpp
-	handler/AABoxMeshCreator.cpp
-	handler/GridMeshCreator.cpp
-	handler/GeoSphereMeshCreator.cpp
-	handler/SkyBoxMeshCreator.cpp
-	handler/SkyDomeMeshCreator.cpp
-	handler/SphereMeshCreator.cpp
-	handler/TorusMeshCreator.cpp
 	handler/BMPHandler.cpp
 	handler/DDSHandler.cpp
 	handler/TGAHandler.cpp
@@ -226,16 +229,19 @@ set (TADPOLE_BSP_HEADERS
 	bsp/BSP30Types.h
 )
 
+set (TADPOLE_CREATOR_HEADERS
+	creator/DiffuseMaterialCreator.h
+	creator/SkyboxMaterialCreator.h
+	creator/AABoxMeshCreator.h
+	creator/GridMeshCreator.h
+	creator/GeoSphereMeshCreator.h
+	creator/SkyBoxMeshCreator.h
+	creator/SkyDomeMeshCreator.h
+	creator/TorusMeshCreator.h
+	creator/SphereMeshCreator.h
+)
+
 set (TADPOLE_HANDLER_HEADERS
-	handler/DiffuseMaterialCreator.h
-	handler/SkyboxMaterialCreator.h
-	handler/AABoxMeshCreator.h
-	handler/GridMeshCreator.h
-	handler/GeoSphereMeshCreator.h
-	handler/SkyBoxMeshCreator.h
-	handler/SkyDomeMeshCreator.h
-	handler/TorusMeshCreator.h
-	handler/SphereMeshCreator.h
 	handler/AudioBufferHandler.h
 	handler/BMPHandler.h
 	handler/TMSHHandler.h
@@ -362,6 +368,7 @@ set (TADPOLE_TERRAIN_HEADERS
 
 # Bundle source
 source_group ("Source Files\\\\animation" FILES ${TADPOLE_ANIMATION_SRC})
+source_group ("Source Files\\\\creator" FILES ${TADPOLE_CREATOR_SRC})
 source_group ("Source Files\\\\material" FILES ${TADPOLE_MATERIAL_SRC})
 source_group ("Source Files\\\\node" FILES ${TADPOLE_NODE_SRC})
 source_group ("Source Files\\\\sensor" FILES ${TADPOLE_SENSOR_SRC})
@@ -370,17 +377,18 @@ source_group ("Source Files\\\\terrain" FILES ${TADPOLE_TERRAIN_SRC})
 
 # Bundle headers
 source_group ("Header Files\\\\animation" FILES ${TADPOLE_ANIMATION_HEADERS})
+source_group ("Header Files\\\\creator" FILES ${TADPOLE_CREATOR_HEADERS})
 source_group ("Header Files\\\\material" FILES ${TADPOLE_MATERIAL_HEADERS})
 source_group ("Header Files\\\\node" FILES ${TADPOLE_NODE_HEADERS})
 source_group ("Header Files\\\\sensor" FILES ${TADPOLE_SENSOR_HEADERS})
 source_group ("Header Files\\\\terrain" FILES ${TADPOLE_TERRAIN_HEADERS})
 
-set (TADPOLE_SRC ${TADPOLE_SRC} ${TADPOLE_ANIMATION_SRC} ${TADPOLE_HANDLER_SRC} ${TADPOLE_MATERIAL_SRC} ${TADPOLE_NODE_SRC} ${TADPOLE_SENSOR_SRC} ${TADPOLE_TERRAIN_SRC})
+set (TADPOLE_SRC ${TADPOLE_SRC} ${TADPOLE_ANIMATION_SRC} ${TADPOLE_CREATOR_SRC} ${TADPOLE_HANDLER_SRC} ${TADPOLE_MATERIAL_SRC} ${TADPOLE_NODE_SRC} ${TADPOLE_SENSOR_SRC} ${TADPOLE_TERRAIN_SRC})
 
 # TODO: The handlers/ subdirectory is going to become a plugin system, and so they are NOT included in the aggregate header files
 # This is true for all handler/ subdirectory files
-set (TADPOLE_HEADERS ${TADPOLE_HEADERS} ${TADPOLE_ANIMATION_HEADERS} ${TADPOLE_MATERIAL_HEADERS} ${TADPOLE_NODE_HEADERS} ${TADPOLE_SENSOR_HEADERS} ${TADPOLE_TERRAIN_HEADERS})
-set (TADPOLE_NAMESPACES ${TADPOLE_NAMESPACES} animation material node sensor terrain)
+set (TADPOLE_HEADERS ${TADPOLE_HEADERS} ${TADPOLE_ANIMATION_HEADERS} ${TADPOLE_CREATOR_HEADERS} ${TADPOLE_MATERIAL_HEADERS} ${TADPOLE_NODE_HEADERS} ${TADPOLE_SENSOR_HEADERS} ${TADPOLE_TERRAIN_HEADERS})
+set (TADPOLE_NAMESPACES ${TADPOLE_NAMESPACES} animation creator material node sensor terrain)
 
 # Give the headers and namespaces parent scope for inclusion into the master tadpole.h file
 set (TADPOLE_HEADERS ${TADPOLE_HEADERS} PARENT_SCOPE)

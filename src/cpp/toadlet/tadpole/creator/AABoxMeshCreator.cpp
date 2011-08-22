@@ -24,11 +24,11 @@
  ********** Copyright header - do not remove **********/
 
 #include <toadlet/tadpole/Engine.h>
-#include <toadlet/tadpole/handler/AABoxMeshCreator.h>
+#include <toadlet/tadpole/creator/AABoxMeshCreator.h>
 
 namespace toadlet{
 namespace tadpole{
-namespace handler{
+namespace creator{
 
 Mesh::ptr AABoxMeshCreator::createAABoxMesh(const AABox &box,Material::ptr material){
 	VertexBuffer::ptr vertexBuffer=mEngine->getBufferManager()->createVertexBuffer(Buffer::Usage_BIT_STATIC,Buffer::Access_BIT_WRITE,mEngine->getVertexFormats().POSITION_NORMAL_TEX_COORD,24);

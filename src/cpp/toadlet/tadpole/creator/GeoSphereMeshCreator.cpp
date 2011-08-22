@@ -24,11 +24,11 @@
  ********** Copyright header - do not remove **********/
 
 #include <toadlet/tadpole/Engine.h>
-#include <toadlet/tadpole/handler/GeoSphereMeshCreator.h>
+#include <toadlet/tadpole/creator/GeoSphereMeshCreator.h>
 
 namespace toadlet{
 namespace tadpole{
-namespace handler{
+namespace creator{
 
 Mesh::ptr GeoSphereMeshCreator::createGeoSphereMesh(VertexBuffer::ptr vertexBuffer,IndexBuffer::ptr indexBuffer,const Sphere &sphere,int depth,bool icosahedron){
 	currentSphere=sphere;

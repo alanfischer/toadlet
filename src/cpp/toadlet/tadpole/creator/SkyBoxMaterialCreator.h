@@ -23,36 +23,34 @@
  *
  ********** Copyright header - do not remove **********/
 
-#ifndef TOADLET_TADPOLE_HANDLER_AABOXMESHCREATOR
-#define TOADLET_TADPOLE_HANDLER_AABOXMESHCREATOR
+#ifndef TOADLET_TADPOLE_CREATOR_SKYBOXMATERIALCREATOR_H
+#define TOADLET_TADPOLE_CREATOR_SKYBOXMATERIALCREATOR_H
 
+#include <toadlet/tadpole/Engine.h>
 #include <toadlet/tadpole/ResourceCreator.h>
-#include <toadlet/tadpole/Mesh.h>
+#include <toadlet/tadpole/material/Material.h>
 
 namespace toadlet{
 namespace tadpole{
-namespace handler{
+namespace creator{
 
-class AABoxMeshCreator:public ResourceCreator{
+class TOADLET_API SkyBoxMaterialCreator:public ResourceCreator{
 public:
-	AABoxMeshCreator(Engine *engine){
-		mEngine=engine;
-	}
+	TOADLET_SHARED_POINTERS(SkyBoxMaterialCreator);
 
-	void destroy(){}
+	SkyBoxMaterialCreator(Engine *engine);
 
-	Resource::ptr create(const String &name,ResourceData *data,ProgressListener *listener){
-		Resource::ptr resource=createAABoxMesh(AABox(-Math::ONE,-Math::ONE,-Math::ONE,Math::ONE,Math::ONE,Math::ONE),Material::ptr());
-		resource->setName(name);
-		return resource;
-	}
+	void destroy();
 
-	Mesh::ptr createAABoxMesh(const AABox &box,Material::ptr material);
+	void createShaders();
+	void destroyShaders();
+
+	Resource::ptr create(const String &name,ResourceData *data,ProgressListener *listener);
+	Material::ptr createSkyBoxMaterial(Texture::ptr texture);
 
 protected:
 	Engine *mEngine;
-	VertexBufferAccessor vba;
-	IndexBufferAccessor iba;
+	Shader::ptr mSkyBoxVertexShader,mSkyBoxFragmentShader;
 };
 
 }

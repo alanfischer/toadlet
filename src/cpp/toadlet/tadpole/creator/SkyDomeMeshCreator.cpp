@@ -24,11 +24,11 @@
  ********** Copyright header - do not remove **********/
 
 #include <toadlet/tadpole/Engine.h>
-#include <toadlet/tadpole/handler/SkyDomeMeshCreator.h>
+#include <toadlet/tadpole/creator/SkyDomeMeshCreator.h>
 
 namespace toadlet{
 namespace tadpole{
-namespace handler{
+namespace creator{
 
 Mesh::ptr SkyDomeMeshCreator::createSkyDomeMesh(VertexBuffer::ptr vertexBuffer,IndexBuffer::ptr indexBuffer,const Sphere &sphere,int numSegments,int numRings,scalar fade){
 	{

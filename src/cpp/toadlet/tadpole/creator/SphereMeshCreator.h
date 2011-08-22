@@ -23,34 +23,43 @@
  *
  ********** Copyright header - do not remove **********/
 
-#ifndef TOADLET_TADPOLE_HANDLER_DIFFUSEMATERIALCREATOR_H
-#define TOADLET_TADPOLE_HANDLER_DIFFUSEMATERIALCREATOR_H
+#ifndef TOADLET_TADPOLE_CREATOR_SPHEREMESHCREATOR
+#define TOADLET_TADPOLE_CREATOR_SPHEREMESHCREATOR
 
 #include <toadlet/tadpole/Engine.h>
-#include <toadlet/tadpole/ResourceManager.h>
-#include <toadlet/tadpole/material/Material.h>
+#include <toadlet/tadpole/ResourceCreator.h>
+#include <toadlet/tadpole/Mesh.h>
 
 namespace toadlet{
 namespace tadpole{
-namespace handler{
+namespace creator{
 
-class DiffuseMaterialCreator:public ResourceCreator{
+class TOADLET_API SphereMeshCreator:public ResourceCreator{
 public:
-	DiffuseMaterialCreator(Engine *engine);
+	TOADLET_SHARED_POINTERS(SphereMeshCreator);
 
-	void destroy();
+	SphereMeshCreator(Engine *engine){
+		mEngine=engine;
+	}
 
-	void createShaders();
-	void destroyShaders();
+	void destroy(){}
 
-	Resource::ptr create(const String &name,ResourceData *data,ProgressListener *listener);
-	Material::ptr createDiffuseMaterial(Texture::ptr texture);
-	Material::ptr createDiffusePointSpriteMaterial(Texture::ptr texture,scalar size,bool attenuated);
+	Resource::ptr create(const String &name,ResourceData *data,ProgressListener *listener){
+		Resource::ptr resource=createSphereMesh(Sphere(Math::ONE),8,8,Material::ptr());
+		resource->setName(name);
+		return resource;
+	}
+
+	int getSphereVertexCount(int numSegments,int numRings){return (numRings+1)*(numSegments+1);}
+	int getSphereIndexCount(int numSegments,int numRings){return 6*numRings*(numSegments+1);}
+
+	Mesh::ptr createSphereMesh(VertexBuffer::ptr vertexBuffer,IndexBuffer::ptr indexBuffer,const Sphere &sphere,int numSegments,int numRings);
+	Mesh::ptr createSphereMesh(const Sphere &sphere,int numSegments,int numRings,Material::ptr material);
 
 protected:
 	Engine *mEngine;
-	Shader::ptr mDiffuseVertexShader,mDiffuseFragmentShader;
-	Shader::ptr mPointSpriteGeometryShader,mPointSpriteFragmentShader;
+	VertexBufferAccessor vba;
+	IndexBufferAccessor iba;
 };
 
 }

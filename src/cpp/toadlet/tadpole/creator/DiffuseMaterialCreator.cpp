@@ -23,15 +23,16 @@
  *
  ********** Copyright header - do not remove **********/
 
-#include <toadlet/tadpole/handler/DiffuseMaterialCreator.h>
+#include <toadlet/tadpole/creator/DiffuseMaterialCreator.h>
 #include <toadlet/tadpole/material/RenderVariables.h>
 
 namespace toadlet{
 namespace tadpole{
-namespace handler{
+namespace creator{
 
 DiffuseMaterialCreator::DiffuseMaterialCreator(Engine *engine){
 	mEngine=engine;
+	createShaders();
 }
 
 void DiffuseMaterialCreator::destroy(){

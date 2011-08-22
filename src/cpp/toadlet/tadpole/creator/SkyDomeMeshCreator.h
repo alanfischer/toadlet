@@ -23,36 +23,37 @@
  *
  ********** Copyright header - do not remove **********/
 
-#ifndef TOADLET_TADPOLE_HANDLER_SPHEREMESHCREATOR
-#define TOADLET_TADPOLE_HANDLER_SPHEREMESHCREATOR
+#ifndef TOADLET_TADPOLE_CREATOR_SKYDOMEMESHCREATOR
+#define TOADLET_TADPOLE_CREATOR_SKYDOMEMESHCREATOR
 
-#include <toadlet/tadpole/Engine.h>
 #include <toadlet/tadpole/ResourceCreator.h>
 #include <toadlet/tadpole/Mesh.h>
 
 namespace toadlet{
 namespace tadpole{
-namespace handler{
+namespace creator{
 
-class SphereMeshCreator:public ResourceCreator{
+class TOADLET_API SkyDomeMeshCreator:public ResourceCreator{
 public:
-	SphereMeshCreator(Engine *engine){
+	TOADLET_SHARED_POINTERS(SkyDomeMeshCreator);
+
+	SkyDomeMeshCreator(Engine *engine){
 		mEngine=engine;
 	}
 
 	void destroy(){}
 
 	Resource::ptr create(const String &name,ResourceData *data,ProgressListener *listener){
-		Resource::ptr resource=createSphereMesh(Sphere(Math::ONE),8,8,Material::ptr());
+		Resource::ptr resource=createSkyDomeMesh(Sphere(Math::ONE),16,16,Math::HALF,Material::ptr());
 		resource->setName(name);
 		return resource;
 	}
 
-	int getSphereVertexCount(int numSegments,int numRings){return (numRings+1)*(numSegments+1);}
-	int getSphereIndexCount(int numSegments,int numRings){return 6*numRings*(numSegments+1);}
+	int getSkyDomeVertexCount(int numSegments,int numRings){return (numRings+1)*(numSegments+1);}
+	int getSkyDomeIndexCount(int numSegments,int numRings){return 6*numRings*(numSegments+1);}
 
-	Mesh::ptr createSphereMesh(VertexBuffer::ptr vertexBuffer,IndexBuffer::ptr indexBuffer,const Sphere &sphere,int numSegments,int numRings);
-	Mesh::ptr createSphereMesh(const Sphere &sphere,int numSegments,int numRings,Material::ptr material);
+	Mesh::ptr createSkyDomeMesh(VertexBuffer::ptr vertexBuffer,IndexBuffer::ptr indexBuffer,const Sphere &sphere,int numSegments,int numRings,scalar fade);
+	Mesh::ptr createSkyDomeMesh(const Sphere &sphere,int numSegments,int numRings,scalar fade,Material::ptr material);
 
 protected:
 	Engine *mEngine;

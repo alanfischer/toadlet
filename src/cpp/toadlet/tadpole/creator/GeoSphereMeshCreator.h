@@ -23,8 +23,8 @@
  *
  ********** Copyright header - do not remove **********/
 
-#ifndef TOADLET_TADPOLE_HANDLER_GEOSPHEREMESHCREATOR
-#define TOADLET_TADPOLE_HANDLER_GEOSPHEREMESHCREATOR
+#ifndef TOADLET_TADPOLE_CREATOR_GEOSPHEREMESHCREATOR
+#define TOADLET_TADPOLE_CREATOR_GEOSPHEREMESHCREATOR
 
 #include <toadlet/tadpole/Engine.h>
 #include <toadlet/tadpole/ResourceCreator.h>
@@ -32,10 +32,12 @@
 
 namespace toadlet{
 namespace tadpole{
-namespace handler{
+namespace creator{
 
-class GeoSphereMeshCreator:public ResourceCreator{
+class TOADLET_API GeoSphereMeshCreator:public ResourceCreator{
 public:
+	TOADLET_SHARED_POINTERS(GeoSphereMeshCreator);
+
 	GeoSphereMeshCreator(Engine *engine){
 		mEngine=engine;
 	}
