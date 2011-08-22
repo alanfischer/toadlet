@@ -222,7 +222,7 @@ public:
 		
 		Logger::alert("Loading shadow");
 
-		shadow=engine->getMeshManager()->createBox(AABox(-4,-4,0,4,4,0));
+		shadow=engine->getMeshManager()->createAABoxMesh(AABox(-4,-4,0,4,4,0));
 		{
 			Material::ptr material=engine->getMaterialManager()->createDiffuseMaterial(engine->getTextureManager()->createTexture(createPoint(128,128)));
 			material->getPass()->setBlendState(BlendState(BlendState::Operation_ONE_MINUS_SOURCE_ALPHA,BlendState::Operation_SOURCE_ALPHA));

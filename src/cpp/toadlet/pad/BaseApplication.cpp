@@ -150,6 +150,8 @@ void BaseApplication::create(String renderDevice,String audioDevice,String motio
 		}
 	}
 
+	mEngine->installHandlers();
+
 	activate();
 }
 

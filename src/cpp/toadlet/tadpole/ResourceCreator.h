@@ -23,11 +23,10 @@
  *
  ********** Copyright header - do not remove **********/
 
-#ifndef TOADLET_TADPOLE_RESOURCEHANDLER_H
-#define TOADLET_TADPOLE_RESOURCEHANDLER_H
+#ifndef TOADLET_TADPOLE_RESOURCECREATOR_H
+#define TOADLET_TADPOLE_RESOURCECREATOR_H
 
 #include <toadlet/egg/Resource.h>
-#include <toadlet/egg/io/Stream.h>
 #include <toadlet/tadpole/ResourceData.h>
 #include <toadlet/tadpole/ProgressListener.h>
 
@@ -39,6 +38,8 @@ public:
 	TOADLET_SHARED_POINTERS(ResourceCreator);
 
 	virtual ~ResourceCreator(){}
+
+	virtual void destroy(){}
 
 	virtual Resource::ptr create(const String &name,ResourceData *data,ProgressListener *listener)=0;
 };

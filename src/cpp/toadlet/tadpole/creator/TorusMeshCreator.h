@@ -23,32 +23,41 @@
  *
  ********** Copyright header - do not remove **********/
 
-#ifndef TOADLET_TADPOLE_HANDLER_ZIPHANDLER_H
-#define TOADLET_TADPOLE_HANDLER_ZIPHANDLER_H
+#ifndef TOADLET_TADPOLE_CREATOR_TORUSMESHCREATOR
+#define TOADLET_TADPOLE_CREATOR_TORUSMESHCREATOR
 
-#include <toadlet/tadpole/ResourceStreamer.h>
-#include <toadlet/tadpole/handler/ZIPArchive.h>
+#include <toadlet/tadpole/Engine.h>
+#include <toadlet/tadpole/ResourceCreator.h>
+#include <toadlet/tadpole/Mesh.h>
 
 namespace toadlet{
 namespace tadpole{
-namespace handler{
+namespace creator{
 
-class TOADLET_API ZIPHandler:public ResourceStreamer{
+class TOADLET_API TorusMeshCreator:public ResourceCreator{
 public:
-	TOADLET_SHARED_POINTERS(ZIPHandler);
+	TOADLET_SHARED_POINTERS(TorusMeshCreator);
 
-	ZIPHandler(){}
-
-	Resource::ptr load(Stream::ptr stream,ResourceData *data,ProgressListener *listener){
-		ZIPArchive::ptr archive(new ZIPArchive());
-		bool result=archive->open(stream);
-		if(result){
-			return shared_static_cast<Archive>(archive);
-		}
-		else{
-			return NULL;
-		}
+	TorusMeshCreator(Engine *engine){
+		mEngine=engine;
 	}
+
+	void destroy(){}
+
+	Resource::ptr create(const String &name,ResourceData *data,ProgressListener *listener){
+		Resource::ptr resource=createTorusMesh(Math::ONE,Math::HALF,16,16,Material::ptr());
+		resource->setName(name);
+		return resource;
+	}
+
+	int getTorusVertexCount(int numMajor,int numMinor){return numMajor*(numMinor+1)*2;}
+
+	Mesh::ptr createTorusMesh(VertexBuffer::ptr vertexBuffer,scalar majorRadius,scalar minorRadius,int numMajor,int numMinor);
+	Mesh::ptr createTorusMesh(scalar majorRadius,scalar minorRadius,int numMajor,int numMinor,Material::ptr material);
+
+protected:
+	Engine *mEngine;
+	VertexBufferAccessor vba;
 };
 
 }
@@ -56,4 +65,3 @@ public:
 }
 
 #endif
-

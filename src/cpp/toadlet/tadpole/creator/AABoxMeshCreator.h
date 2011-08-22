@@ -23,32 +23,38 @@
  *
  ********** Copyright header - do not remove **********/
 
-#ifndef TOADLET_TADPOLE_HANDLER_ZIPHANDLER_H
-#define TOADLET_TADPOLE_HANDLER_ZIPHANDLER_H
+#ifndef TOADLET_TADPOLE_CREATOR_AABOXMESHCREATOR
+#define TOADLET_TADPOLE_CREATOR_AABOXMESHCREATOR
 
-#include <toadlet/tadpole/ResourceStreamer.h>
-#include <toadlet/tadpole/handler/ZIPArchive.h>
+#include <toadlet/tadpole/ResourceCreator.h>
+#include <toadlet/tadpole/Mesh.h>
 
 namespace toadlet{
 namespace tadpole{
-namespace handler{
+namespace creator{
 
-class TOADLET_API ZIPHandler:public ResourceStreamer{
+class TOADLET_API AABoxMeshCreator:public ResourceCreator{
 public:
-	TOADLET_SHARED_POINTERS(ZIPHandler);
+	TOADLET_SHARED_POINTERS(AABoxMeshCreator);
 
-	ZIPHandler(){}
-
-	Resource::ptr load(Stream::ptr stream,ResourceData *data,ProgressListener *listener){
-		ZIPArchive::ptr archive(new ZIPArchive());
-		bool result=archive->open(stream);
-		if(result){
-			return shared_static_cast<Archive>(archive);
-		}
-		else{
-			return NULL;
-		}
+	AABoxMeshCreator(Engine *engine){
+		mEngine=engine;
 	}
+
+	void destroy(){}
+
+	Resource::ptr create(const String &name,ResourceData *data,ProgressListener *listener){
+		Resource::ptr resource=createAABoxMesh(AABox(-Math::ONE,-Math::ONE,-Math::ONE,Math::ONE,Math::ONE,Math::ONE),Material::ptr());
+		resource->setName(name);
+		return resource;
+	}
+
+	Mesh::ptr createAABoxMesh(const AABox &box,Material::ptr material);
+
+protected:
+	Engine *mEngine;
+	VertexBufferAccessor vba;
+	IndexBufferAccessor iba;
 };
 
 }
@@ -56,4 +62,3 @@ public:
 }
 
 #endif
-

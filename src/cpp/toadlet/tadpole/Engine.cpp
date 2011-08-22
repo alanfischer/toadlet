@@ -83,6 +83,13 @@
 #include <toadlet/tadpole/node/ParticleNode.h>
 #include <toadlet/tadpole/node/SpriteNode.h>
 
+#include <toadlet/tadpole/creator/AABoxMeshCreator.h>
+#include <toadlet/tadpole/creator/SkyBoxMeshCreator.h>
+#include <toadlet/tadpole/creator/SkyDomeMeshCreator.h>
+#include <toadlet/tadpole/creator/SphereMeshCreator.h>
+#include <toadlet/tadpole/creator/DiffuseMaterialCreator.h>
+#include <toadlet/tadpole/creator/SkyboxMaterialCreator.h>
+
 #include <toadlet/tadpole/handler/BMPHandler.h>
 #include <toadlet/tadpole/handler/DDSHandler.h>
 #include <toadlet/tadpole/handler/TGAHandler.h>
@@ -195,76 +202,8 @@ Engine::Engine(bool backable):
 	registerNodeType(ParticleNode::type());
 	registerNodeType(SpriteNode::type());
 
-	Logger::debug(Categories::TOADLET_TADPOLE,
-		"Engine: adding all handlers");
-
-	// Archive handlers
-	mArchiveManager->setStreamer(TPKGHandler::ptr(new TPKGHandler()),"tpkg");
-	mArchiveManager->setStreamer(WADHandler::ptr(new WADHandler(mTextureManager)),"wad");
-	#if defined(TOADLET_HAS_ZZIP)
-		mArchiveManager->setStreamer(ZIPHandler::ptr(new ZIPHandler()),"zip");
-	#endif
-
-	// Texture handlers
-	mTextureManager->setStreamer(DDSHandler::ptr(new DDSHandler(mTextureManager)),"dds");
-	#if defined(TOADLET_HAS_GDIPLUS)
-		mTextureManager->setDefaultStreamer(Win32TextureHandler::ptr(new Win32TextureHandler(mTextureManager)));
-	#elif defined(TOADLET_PLATFORM_OSX)
-		mTextureManager->setStreamer(BMPHandler::ptr(new BMPHandler(mTextureManager)),"bmp"); // OSXTextureHandler only handles jpgs & pngs currently, so add our own bmp handler
-		mTextureManager->setDefaultStreamer(OSXTextureHandler::ptr(new OSXTextureHandler(mTextureManager)));
-	#else
-		mTextureManager->setStreamer(BMPHandler::ptr(new BMPHandler(mTextureManager)),"bmp");
-		#if defined(TOADLET_HAS_GIF)
-			mTextureManager->setStreamer(GIFHandler::ptr(new GIFHandler(mTextureManager)),"gif");
-		#endif
-		#if defined(TOADLET_HAS_JPEG)
-			JPEGHandler::ptr jpegHandler(new JPEGHandler(mTextureManager));
-			mTextureManager->setStreamer(jpegHandler,"jpeg");
-			mTextureManager->setStreamer(jpegHandler,"jpg");
-		#endif
-		#if defined(TOADLET_HAS_PNG)
-			mTextureManager->setStreamer(PNGHandler::ptr(new PNGHandler(mTextureManager)),"png");
-		#endif
-	#endif
-	mTextureManager->setStreamer(TGAHandler::ptr(new TGAHandler(mTextureManager)),"tga");
-
-	// Font handlers, try for freetype first, since it currently looks best.  This can be changed back once the others look as nice
-	#if defined(TOADLET_HAS_FREETYPE)
-		mFontManager->setDefaultStreamer(FreeTypeHandler::ptr(new FreeTypeHandler(mTextureManager)));
-	#elif defined(TOADLET_HAS_GDIPLUS)
-		mFontManager->setDefaultStreamer(Win32FontHandler::ptr(new Win32FontHandler(mTextureManager)));
-	#elif defined(TOADLET_PLATFORM_OSX)
-		mFontManager->setDefaultStreamer(OSXFontHandler::ptr(new OSXFontHandler(mTextureManager)));
-	#endif
-
-	// Material handlers
-	#if defined(TOADLET_HAS_MXML)
-		mMaterialManager->setStreamer(XMATHandler::ptr(new XMATHandler(this)),"xmat");
-	#endif
-
-	// Mesh handlers
-	#if defined(TOADLET_HAS_MXML)
-		mMeshManager->setStreamer(XMSHHandler::ptr(new XMSHHandler(this)),"xmsh");
-	#endif
-	mMeshManager->setStreamer(TMSHHandler::ptr(new TMSHHandler(this)),"tmsh");
-
-	// AudioBuffer handlers
-	mAudioBufferManager->setStreamer(WaveHandler::ptr(new WaveHandler(mAudioBufferManager)),"wav");
-	#if defined(TOADLET_HAS_OGGVORBIS)
-		mAudioBufferManager->setStreamer(OggVorbisHandler::ptr(new OggVorbisHandler(mAudioBufferManager)),"ogg");
-	#endif
-	#if defined(TOADLET_HAS_SIDPLAY)
-		mAudioBufferManager->setStreamer(SIDHandler::ptr(new SIDHandler(mAudioBufferManager)),"sid");
-	#endif
-	#if defined(TOADLET_PLATFORM_OSX)
-		/// @todo: We need to fix the createStream function of AudioBufferManager so it will try the default handler
-//		mAudioBufferManager->setDefaultStreamer(CoreAudioHandler::ptr(new CoreAudioHandler(mAudioBufferManager)));
-	#endif
-
 	// Plugin types, should be removed from here somehow
 	#if !defined(TOADLET_FIXED_POINT)
-		mTextureManager->setStreamer(SPRHandler::ptr(new SPRHandler(this)),"spr");
-
 		registerNodeType(bsp::BSP30Node::type());
 		registerNodeType(bsp::BSP30ModelNode::type());
 		registerNodeType(studio::StudioModelNode::type());
@@ -331,6 +270,83 @@ void Engine::destroy(){
 	mBufferManager->destroy();
 	mTextureManager->destroy();
 	mArchiveManager->destroy();
+}
+
+void Engine::installHandlers(){
+	Logger::debug(Categories::TOADLET_TADPOLE,
+		"Engine: installing handlers");
+
+	// Archive handlers
+	mArchiveManager->setStreamer(TPKGHandler::ptr(new TPKGHandler()),"tpkg");
+	mArchiveManager->setStreamer(WADHandler::ptr(new WADHandler(mTextureManager)),"wad");
+	#if defined(TOADLET_HAS_ZZIP)
+		mArchiveManager->setStreamer(ZIPHandler::ptr(new ZIPHandler()),"zip");
+	#endif
+
+	// Texture handlers
+	mTextureManager->setStreamer(DDSHandler::ptr(new DDSHandler(mTextureManager)),"dds");
+	#if defined(TOADLET_HAS_GDIPLUS)
+		mTextureManager->setDefaultStreamer(Win32TextureHandler::ptr(new Win32TextureHandler(mTextureManager)));
+	#elif defined(TOADLET_PLATFORM_OSX)
+		mTextureManager->setStreamer(BMPHandler::ptr(new BMPHandler(mTextureManager)),"bmp"); // OSXTextureHandler only handles jpgs & pngs currently, so add our own bmp handler
+		mTextureManager->setDefaultStreamer(OSXTextureHandler::ptr(new OSXTextureHandler(mTextureManager)));
+	#else
+		mTextureManager->setStreamer(BMPHandler::ptr(new BMPHandler(mTextureManager)),"bmp");
+		#if defined(TOADLET_HAS_GIF)
+			mTextureManager->setStreamer(GIFHandler::ptr(new GIFHandler(mTextureManager)),"gif");
+		#endif
+		#if defined(TOADLET_HAS_JPEG)
+			JPEGHandler::ptr jpegHandler(new JPEGHandler(mTextureManager));
+			mTextureManager->setStreamer(jpegHandler,"jpeg");
+			mTextureManager->setStreamer(jpegHandler,"jpg");
+		#endif
+		#if defined(TOADLET_HAS_PNG)
+			mTextureManager->setStreamer(PNGHandler::ptr(new PNGHandler(mTextureManager)),"png");
+		#endif
+	#endif
+	mTextureManager->setStreamer(TGAHandler::ptr(new TGAHandler(mTextureManager)),"tga");
+
+	// Font handlers, try for freetype first, since it currently looks best.  This can be changed back once the others look as nice
+	#if defined(TOADLET_HAS_FREETYPE)
+		mFontManager->setDefaultStreamer(FreeTypeHandler::ptr(new FreeTypeHandler(mTextureManager)));
+	#elif defined(TOADLET_HAS_GDIPLUS)
+		mFontManager->setDefaultStreamer(Win32FontHandler::ptr(new Win32FontHandler(mTextureManager)));
+	#elif defined(TOADLET_PLATFORM_OSX)
+		mFontManager->setDefaultStreamer(OSXFontHandler::ptr(new OSXFontHandler(mTextureManager)));
+	#endif
+
+	// Material handlers
+	#if defined(TOADLET_HAS_MXML)
+		mMaterialManager->setStreamer(XMATHandler::ptr(new XMATHandler(this)),"xmat");
+	#endif
+
+	// Mesh handlers
+	#if defined(TOADLET_HAS_MXML)
+		mMeshManager->setStreamer(XMSHHandler::ptr(new XMSHHandler(this)),"xmsh");
+	#endif
+	mMeshManager->setStreamer(TMSHHandler::ptr(new TMSHHandler(this)),"tmsh");
+
+	// AudioBuffer handlers
+	mAudioBufferManager->setStreamer(WaveHandler::ptr(new WaveHandler(mAudioBufferManager)),"wav");
+	#if defined(TOADLET_HAS_OGGVORBIS)
+		mAudioBufferManager->setStreamer(OggVorbisHandler::ptr(new OggVorbisHandler(mAudioBufferManager)),"ogg");
+	#endif
+	#if defined(TOADLET_HAS_SIDPLAY)
+		mAudioBufferManager->setStreamer(SIDHandler::ptr(new SIDHandler(mAudioBufferManager)),"sid");
+	#endif
+
+	// Plugin types, should be removed from here somehow
+	#if !defined(TOADLET_FIXED_POINT)
+		mTextureManager->setStreamer(SPRHandler::ptr(new SPRHandler(this)),"spr");
+	#endif
+
+	mMeshManager->setAABoxCreator(ResourceCreator::ptr(new AABoxMeshCreator(this)));
+	mMeshManager->setSkyBoxCreator(ResourceCreator::ptr(new SkyBoxMeshCreator(this)));
+	mMeshManager->setSkyDomeCreator(ResourceCreator::ptr(new SkyDomeMeshCreator(this)));
+	mMeshManager->setSphereCreator(ResourceCreator::ptr(new SphereMeshCreator(this)));
+
+	mMaterialManager->setDiffuseCreator(ResourceCreator::ptr(new DiffuseMaterialCreator(this)));
+	mMaterialManager->setSkyBoxCreator(ResourceCreator::ptr(new SkyBoxMaterialCreator(this)));
 }
 
 bool Engine::setRenderDevice(RenderDevice *renderDevice){
