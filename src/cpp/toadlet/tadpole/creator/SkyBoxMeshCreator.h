@@ -23,18 +23,20 @@
  *
  ********** Copyright header - do not remove **********/
 
-#ifndef TOADLET_TADPOLE_HANDLER_SKYBOXMESHCREATOR
-#define TOADLET_TADPOLE_HANDLER_SKYBOXMESHCREATOR
+#ifndef TOADLET_TADPOLE_CREATOR_SKYBOXMESHCREATOR
+#define TOADLET_TADPOLE_CREATOR_SKYBOXMESHCREATOR
 
 #include <toadlet/tadpole/ResourceCreator.h>
 #include <toadlet/tadpole/Mesh.h>
 
 namespace toadlet{
 namespace tadpole{
-namespace handler{
+namespace creator{
 
-class SkyBoxMeshCreator:public ResourceCreator{
+class TOADLET_API SkyBoxMeshCreator:public ResourceCreator{
 public:
+	TOADLET_SHARED_POINTERS(SkyBoxMeshCreator);
+
 	SkyBoxMeshCreator(Engine *engine){
 		mEngine=engine;
 	}

@@ -83,8 +83,13 @@
 #include <toadlet/tadpole/node/ParticleNode.h>
 #include <toadlet/tadpole/node/SpriteNode.h>
 
-#include <toadlet/tadpole/handler/DiffuseMaterialCreator.h>
-#include <toadlet/tadpole/handler/SkyboxMaterialCreator.h>
+#include <toadlet/tadpole/creator/AABoxMeshCreator.h>
+#include <toadlet/tadpole/creator/SkyBoxMeshCreator.h>
+#include <toadlet/tadpole/creator/SkyDomeMeshCreator.h>
+#include <toadlet/tadpole/creator/SphereMeshCreator.h>
+#include <toadlet/tadpole/creator/DiffuseMaterialCreator.h>
+#include <toadlet/tadpole/creator/SkyboxMaterialCreator.h>
+
 #include <toadlet/tadpole/handler/BMPHandler.h>
 #include <toadlet/tadpole/handler/DDSHandler.h>
 #include <toadlet/tadpole/handler/TGAHandler.h>
@@ -314,7 +319,6 @@ void Engine::installHandlers(){
 	#if defined(TOADLET_HAS_MXML)
 		mMaterialManager->setStreamer(XMATHandler::ptr(new XMATHandler(this)),"xmat");
 	#endif
-	mMaterialManager->setDiffuseCreator(ResourceCreator::ptr(new DiffuseMaterialCreator(this)));
 
 	// Mesh handlers
 	#if defined(TOADLET_HAS_MXML)
@@ -335,6 +339,14 @@ void Engine::installHandlers(){
 	#if !defined(TOADLET_FIXED_POINT)
 		mTextureManager->setStreamer(SPRHandler::ptr(new SPRHandler(this)),"spr");
 	#endif
+
+	mMeshManager->setAABoxCreator(ResourceCreator::ptr(new AABoxMeshCreator(this)));
+	mMeshManager->setSkyBoxCreator(ResourceCreator::ptr(new SkyBoxMeshCreator(this)));
+	mMeshManager->setSkyDomeCreator(ResourceCreator::ptr(new SkyDomeMeshCreator(this)));
+	mMeshManager->setSphereCreator(ResourceCreator::ptr(new SphereMeshCreator(this)));
+
+	mMaterialManager->setDiffuseCreator(ResourceCreator::ptr(new DiffuseMaterialCreator(this)));
+	mMaterialManager->setSkyBoxCreator(ResourceCreator::ptr(new SkyBoxMaterialCreator(this)));
 }
 
 bool Engine::setRenderDevice(RenderDevice *renderDevice){

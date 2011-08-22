@@ -23,20 +23,22 @@
  *
  ********** Copyright header - do not remove **********/
 
-#ifndef TOADLET_TADPOLE_HANDLER_SKYBOXMATERIALCREATOR_H
-#define TOADLET_TADPOLE_HANDLER_SKYBOXMATERIALCREATOR_H
+#ifndef TOADLET_TADPOLE_CREATOR_DIFFUSEMATERIALCREATOR_H
+#define TOADLET_TADPOLE_CREATOR_DIFFUSEMATERIALCREATOR_H
 
 #include <toadlet/tadpole/Engine.h>
-#include <toadlet/tadpole/ResourceCreator.h>
+#include <toadlet/tadpole/ResourceManager.h>
 #include <toadlet/tadpole/material/Material.h>
 
 namespace toadlet{
 namespace tadpole{
-namespace handler{
+namespace creator{
 
-class SkyBoxMaterialCreator:public ResourceCreator{
+class TOADLET_API DiffuseMaterialCreator:public ResourceCreator{
 public:
-	SkyBoxMaterialCreator(Engine *engine);
+	TOADLET_SHARED_POINTERS(DiffuseMaterialCreator);
+
+	DiffuseMaterialCreator(Engine *engine);
 
 	void destroy();
 
@@ -44,11 +46,13 @@ public:
 	void destroyShaders();
 
 	Resource::ptr create(const String &name,ResourceData *data,ProgressListener *listener);
-	Material::ptr createSkyBoxMaterial(Texture::ptr texture);
+	Material::ptr createDiffuseMaterial(Texture::ptr texture);
+	Material::ptr createDiffusePointSpriteMaterial(Texture::ptr texture,scalar size,bool attenuated);
 
 protected:
 	Engine *mEngine;
-	Shader::ptr mSkyBoxVertexShader,mSkyBoxFragmentShader;
+	Shader::ptr mDiffuseVertexShader,mDiffuseFragmentShader;
+	Shader::ptr mPointSpriteGeometryShader,mPointSpriteFragmentShader;
 };
 
 }

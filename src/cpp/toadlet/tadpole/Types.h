@@ -39,6 +39,7 @@ namespace toadlet{
 namespace egg{}
 namespace tadpole{
 namespace animation{}
+namespace creator{}
 namespace handler{}
 namespace material{}
 namespace node{}
@@ -54,6 +55,7 @@ using namespace toadlet::egg;
 using namespace toadlet::peeper;
 using namespace toadlet::ribbit;
 using namespace toadlet::tadpole::animation;
+using namespace toadlet::tadpole::creator;
 using namespace toadlet::tadpole::handler;
 using namespace toadlet::tadpole::material;
 using namespace toadlet::tadpole::node;

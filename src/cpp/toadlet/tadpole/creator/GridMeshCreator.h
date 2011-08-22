@@ -23,39 +23,42 @@
  *
  ********** Copyright header - do not remove **********/
 
-#ifndef TOADLET_TADPOLE_HANDLER_TORUSMESHCREATOR
-#define TOADLET_TADPOLE_HANDLER_TORUSMESHCREATOR
+#ifndef TOADLET_TADPOLE_CREATOR_GRIDMESHCREATOR
+#define TOADLET_TADPOLE_CREATOR_GRIDMESHCREATOR
 
-#include <toadlet/tadpole/Engine.h>
 #include <toadlet/tadpole/ResourceCreator.h>
 #include <toadlet/tadpole/Mesh.h>
 
 namespace toadlet{
 namespace tadpole{
-namespace handler{
+namespace creator{
 
-class TorusMeshCreator:public ResourceCreator{
+class TOADLET_API GridMeshCreator:public ResourceCreator{
 public:
-	TorusMeshCreator(Engine *engine){
+	TOADLET_SHARED_POINTERS(GridMeshCreator);
+
+	GridMeshCreator(Engine *engine){
 		mEngine=engine;
 	}
 
 	void destroy(){}
 
 	Resource::ptr create(const String &name,ResourceData *data,ProgressListener *listener){
-		Resource::ptr resource=createTorusMesh(Math::ONE,Math::HALF,16,16,Material::ptr());
+		Resource::ptr resource=createGridMesh(Math::ONE,Math::ONE,4,4,Material::ptr());
 		resource->setName(name);
 		return resource;
 	}
 
-	int getTorusVertexCount(int numMajor,int numMinor){return numMajor*(numMinor+1)*2;}
+	int getGridVertexCount(int numWidth,int numHeight){return numWidth*numHeight;}
+	int getGridIndexCount(int numWidth,int numHeight){return (numWidth*2) * (numHeight-1) + (numHeight-2);}
 
-	Mesh::ptr createTorusMesh(VertexBuffer::ptr vertexBuffer,scalar majorRadius,scalar minorRadius,int numMajor,int numMinor);
-	Mesh::ptr createTorusMesh(scalar majorRadius,scalar minorRadius,int numMajor,int numMinor,Material::ptr material);
+	Mesh::ptr createGridMesh(VertexBuffer::ptr vertexBuffer,IndexBuffer::ptr indexBuffer,scalar width,scalar height,int numWidth,int numHeight);
+	Mesh::ptr createGridMesh(scalar width,scalar height,int numWidth,int numHeight,Material::ptr material);
 
 protected:
 	Engine *mEngine;
 	VertexBufferAccessor vba;
+	IndexBufferAccessor iba;
 };
 
 }

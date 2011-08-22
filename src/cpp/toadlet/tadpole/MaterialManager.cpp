@@ -31,8 +31,8 @@
 #include <toadlet/tadpole/Colors.h>
 #include <toadlet/tadpole/Engine.h>
 #include <toadlet/tadpole/MaterialManager.h>
-#include <toadlet/tadpole/handler/DiffuseMaterialCreator.h>
-#include <toadlet/tadpole/handler/SkyBoxMaterialCreator.h>
+#include <toadlet/tadpole/creator/DiffuseMaterialCreator.h>
+#include <toadlet/tadpole/creator/SkyBoxMaterialCreator.h>
 
 namespace toadlet{
 namespace tadpole{
