@@ -23,42 +23,39 @@
  *
  ********** Copyright header - do not remove **********/
 
-#ifndef TOADLET_TADPOLE_MESHMANAGER_H
-#define TOADLET_TADPOLE_MESHMANAGER_H
+#ifndef TOADLET_TADPOLE_HANDLER_SKYBOXMESHCREATOR
+#define TOADLET_TADPOLE_HANDLER_SKYBOXMESHCREATOR
 
-#include <toadlet/peeper/IndexBufferAccessor.h>
-#include <toadlet/peeper/VertexBufferAccessor.h>
-#include <toadlet/tadpole/ResourceManager.h>
+#include <toadlet/tadpole/ResourceCreator.h>
 #include <toadlet/tadpole/Mesh.h>
 
 namespace toadlet{
 namespace tadpole{
+namespace handler{
 
-class Engine;
-
-class TOADLET_API MeshManager:public ResourceManager{
+class SkyBoxMeshCreator:public ResourceCreator{
 public:
-	MeshManager(Engine *engine);
+	SkyBoxMeshCreator(Engine *engine){
+		mEngine=engine;
+	}
 
-	Mesh::ptr findMesh(const String &name){return shared_static_cast<Mesh>(ResourceManager::find(name));}
-	Resource::ptr manage(const Resource::ptr &resource,const String &name=(char*)NULL);
+	void destroy(){}
 
-	inline void setAABoxCreator(ResourceCreator::ptr creator){mAABoxCreator=creator;}
-	inline void setSkyBoxCreator(ResourceCreator::ptr creator){mSkyBoxCreator=creator;}
-	inline void setSkyDomeCreator(ResourceCreator::ptr creator){mSkyDomeCreator=creator;}
-	inline void setSphereCreator(ResourceCreator::ptr creator){mSphereCreator=creator;}
+	Resource::ptr create(const String &name,ResourceData *data,ProgressListener *listener){
+		Resource::ptr resource=createSkyBoxMesh(Math::ONE,false,false,Material::ptr(),Material::ptr(),Material::ptr(),Material::ptr(),Material::ptr(),Material::ptr());
+		resource->setName(name);
+		return resource;
+	}
 
-	Mesh::ptr createAABoxMesh(const AABox &box,Material::ptr material=Material::ptr());
 	Mesh::ptr createSkyBoxMesh(scalar size,bool unfolded,bool invert,Material::ptr bottom,Material::ptr top,Material::ptr left,Material::ptr right,Material::ptr back,Material::ptr front);
-	Mesh::ptr createSkyDomeMesh(const Sphere &sphere,int numSegments,int numRings,scalar fade,Material::ptr material=Material::ptr());
-	Mesh::ptr createSphereMesh(const Sphere &sphere,Material::ptr material=Material::ptr());
 
 protected:
 	Engine *mEngine;
-
-	ResourceCreator::ptr mAABoxCreator,mSkyBoxCreator,mSkyDomeCreator,mSphereCreator;
+	VertexBufferAccessor vba;
+	IndexBufferAccessor iba;
 };
 
+}
 }
 }
 

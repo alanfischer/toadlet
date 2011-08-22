@@ -47,9 +47,9 @@ public:
 	Material::ptr findMaterial(const String &name){return shared_static_cast<Material>(ResourceManager::find(name));}
 
 	inline void setDiffuseCreator(ResourceCreator::ptr creator){mDiffuseCreator=creator;}
-	inline void setSkyboxCreator(ResourceCreator::ptr creator){mSkyboxCreator=creator;}
+	inline void setSkyBoxCreator(ResourceCreator::ptr creator){mSkyBoxCreator=creator;}
 	Material::ptr createDiffuseMaterial(Texture::ptr texture);
-	Material::ptr createSkyboxMaterial(Texture::ptr texture);
+	Material::ptr createSkyBoxMaterial(Texture::ptr texture);
 
 	RenderState::ptr createRenderState();
 	ShaderState::ptr createShaderState();
@@ -86,7 +86,7 @@ protected:
 
 	RenderPathChooser *mRenderPathChooser;
 	SamplerState mDefaultSamplerState;
-	ResourceCreator::ptr mDiffuseCreator,mSkyboxCreator;
+	ResourceCreator::ptr mDiffuseCreator,mSkyBoxCreator;
 };
 
 }

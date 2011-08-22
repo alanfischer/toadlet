@@ -297,7 +297,7 @@ void BSP30Node::setSkyTextures(const String &skyDown,const String &skyUp,const S
 	Material::ptr left=mEngine->getMaterialManager()->findMaterial(skyNorth);
 
 	if(down!=NULL || up!=NULL || front!=NULL || back!=NULL || right!=NULL || left!=NULL){
-		Mesh::ptr mesh=mEngine->getMeshManager()->createSkyBox(1024,false,false,down,up,front,back,right,left);
+		Mesh::ptr mesh=mEngine->getMeshManager()->createSkyBoxMesh(1024,false,false,down,up,front,back,right,left);
 		int i;
 		for(i=0;i<mesh->getNumSubMeshes();++i){
 			Material *material=mesh->getSubMesh(i)->material;
