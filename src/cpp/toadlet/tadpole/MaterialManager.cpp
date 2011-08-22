@@ -32,7 +32,7 @@
 #include <toadlet/tadpole/Engine.h>
 #include <toadlet/tadpole/MaterialManager.h>
 #include <toadlet/tadpole/handler/DiffuseMaterialCreator.h>
-#include <toadlet/tadpole/handler/SkyboxMaterialCreator.h>
+#include <toadlet/tadpole/handler/SkyBoxMaterialCreator.h>
 
 namespace toadlet{
 namespace tadpole{
@@ -86,8 +86,8 @@ Material::ptr MaterialManager::createDiffuseMaterial(Texture::ptr texture){
 	return shared_static_cast<DiffuseMaterialCreator>(mDiffuseCreator)->createDiffuseMaterial(texture);
 }
 
-Material::ptr MaterialManager::createSkyboxMaterial(Texture::ptr texture){
-	return shared_static_cast<SkyboxMaterialCreator>(mSkyboxCreator)->createSkyboxMaterial(texture);
+Material::ptr MaterialManager::createSkyBoxMaterial(Texture::ptr texture){
+	return shared_static_cast<SkyBoxMaterialCreator>(mSkyBoxCreator)->createSkyBoxMaterial(texture);
 }
 
 RenderState::ptr MaterialManager::createRenderState(){

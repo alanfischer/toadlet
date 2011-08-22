@@ -23,22 +23,22 @@
  *
  ********** Copyright header - do not remove **********/
 
-#include <toadlet/tadpole/handler/SkyboxMaterialCreator.h>
+#include <toadlet/tadpole/handler/SkyBoxMaterialCreator.h>
 #include <toadlet/tadpole/material/RenderVariables.h>
 
 namespace toadlet{
 namespace tadpole{
 namespace handler{
 
-SkyboxMaterialCreator::SkyboxMaterialCreator(Engine *engine){
+SkyBoxMaterialCreator::SkyBoxMaterialCreator(Engine *engine){
 	mEngine=engine;
 }
 
-void SkyboxMaterialCreator::destroy(){
+void SkyBoxMaterialCreator::destroy(){
 	destroyShaders();
 }
 
-void SkyboxMaterialCreator::createShaders(){
+void SkyBoxMaterialCreator::createShaders(){
 	destroyShaders();
 
 	String profiles[]={
@@ -46,7 +46,7 @@ void SkyboxMaterialCreator::createShaders(){
 		"hlsl"
 	};
 
-	String skyboxVertexCode[]={
+	String skyBoxVertexCode[]={
 		"attribute vec4 POSITION;\n"
 		"attribute vec4 COLOR;\n"
 		"attribute vec2 TEXCOORD0;\n"
@@ -89,7 +89,7 @@ void SkyboxMaterialCreator::createShaders(){
 		"}"
 	};
 
-	String skyboxFragmentCode[]={
+	String skyBoxFragmentCode[]={
 		"varying vec4 color;\n"
 		"varying vec2 texCoord;\n"
 		
@@ -115,27 +115,27 @@ void SkyboxMaterialCreator::createShaders(){
 		"}"
 	};
 
-	mSkyboxVertexShader=mEngine->getShaderManager()->createShader(Shader::ShaderType_VERTEX,profiles,skyboxVertexCode,2);
-	mSkyboxFragmentShader=mEngine->getShaderManager()->createShader(Shader::ShaderType_FRAGMENT,profiles,skyboxFragmentCode,2);
+	mSkyBoxVertexShader=mEngine->getShaderManager()->createShader(Shader::ShaderType_VERTEX,profiles,skyBoxVertexCode,2);
+	mSkyBoxFragmentShader=mEngine->getShaderManager()->createShader(Shader::ShaderType_FRAGMENT,profiles,skyBoxFragmentCode,2);
 }
 
-void SkyboxMaterialCreator::destroyShaders(){
-	if(mSkyboxVertexShader!=NULL){
-		mSkyboxVertexShader->release();
-		mSkyboxVertexShader=NULL;
+void SkyBoxMaterialCreator::destroyShaders(){
+	if(mSkyBoxVertexShader!=NULL){
+		mSkyBoxVertexShader->release();
+		mSkyBoxVertexShader=NULL;
 	}
-	if(mSkyboxFragmentShader!=NULL){
-		mSkyboxFragmentShader->release();
-		mSkyboxFragmentShader=NULL;
+	if(mSkyBoxFragmentShader!=NULL){
+		mSkyBoxFragmentShader->release();
+		mSkyBoxFragmentShader=NULL;
 	}
 }
 
-Resource::ptr SkyboxMaterialCreator::create(const String &name,ResourceData *data,ProgressListener *listener){
-	Error::unimplemented(Categories::TOADLET_TADPOLE,"SkyboxMaterialCreator::create unimplemented");
+Resource::ptr SkyBoxMaterialCreator::create(const String &name,ResourceData *data,ProgressListener *listener){
+	Error::unimplemented(Categories::TOADLET_TADPOLE,"SkyBoxMaterialCreator::create unimplemented");
 	return NULL;
 }
 
-Material::ptr SkyboxMaterialCreator::createSkyboxMaterial(Texture::ptr texture){
+Material::ptr SkyBoxMaterialCreator::createSkyBoxMaterial(Texture::ptr texture){
 	Material::ptr material(new Material(mEngine->getMaterialManager()));
 
 	RenderPath::ptr shaderPath=material->addPath();
@@ -148,8 +148,8 @@ Material::ptr SkyboxMaterialCreator::createSkyboxMaterial(Texture::ptr texture){
 		pass->setMaterialState(MaterialState());
 		pass->setFogState(FogState());
 
-		pass->setShader(Shader::ShaderType_VERTEX,mSkyboxVertexShader);
-		pass->setShader(Shader::ShaderType_FRAGMENT,mSkyboxFragmentShader);
+		pass->setShader(Shader::ShaderType_VERTEX,mSkyBoxVertexShader);
+		pass->setShader(Shader::ShaderType_FRAGMENT,mSkyBoxFragmentShader);
 		pass->getVariables()->addVariable("modelViewProjectionMatrix",RenderVariable::ptr(new MVPMatrixVariable()),Material::Scope_RENDERABLE);
 		pass->getVariables()->addVariable("textureMatrix",RenderVariable::ptr(new TextureMatrixVariable(0)),Material::Scope_MATERIAL);
 		pass->getVariables()->addVariable("materialTrackColor",RenderVariable::ptr(new MaterialTrackColorVariable()),Material::Scope_MATERIAL);

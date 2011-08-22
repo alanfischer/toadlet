@@ -48,6 +48,13 @@ set (TADPOLE_BSP_SRC
 set (TADPOLE_HANDLER_SRC
 	handler/DiffuseMaterialCreator.cpp
 	handler/SkyboxMaterialCreator.cpp
+	handler/AABoxMeshCreator.cpp
+	handler/GridMeshCreator.cpp
+	handler/GeoSphereMeshCreator.cpp
+	handler/SkyBoxMeshCreator.cpp
+	handler/SkyDomeMeshCreator.cpp
+	handler/SphereMeshCreator.cpp
+	handler/TorusMeshCreator.cpp
 	handler/BMPHandler.cpp
 	handler/DDSHandler.cpp
 	handler/TGAHandler.cpp
@@ -222,6 +229,13 @@ set (TADPOLE_BSP_HEADERS
 set (TADPOLE_HANDLER_HEADERS
 	handler/DiffuseMaterialCreator.h
 	handler/SkyboxMaterialCreator.h
+	handler/AABoxMeshCreator.h
+	handler/GridMeshCreator.h
+	handler/GeoSphereMeshCreator.h
+	handler/SkyBoxMeshCreator.h
+	handler/SkyDomeMeshCreator.h
+	handler/TorusMeshCreator.h
+	handler/SphereMeshCreator.h
 	handler/AudioBufferHandler.h
 	handler/BMPHandler.h
 	handler/TMSHHandler.h
