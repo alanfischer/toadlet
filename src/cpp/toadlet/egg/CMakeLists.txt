@@ -15,8 +15,6 @@ set (EGG_SRC
 	Version.cpp
 )
 
-# Specific Image handlers are separated out here due to different ones being built for different platforms
-# Yes it's ugly, no I don't have a better idea right now
 set (EGG_IMAGE_SRC
 	image/Image.cpp
 	image/ImageFormatConversion.cpp
@@ -115,8 +113,6 @@ set (EGG_HEADERS
 	Version.h
 )
 
-# Specific Image handlers are separated out here due to different ones being built for different platforms
-# Yes it's ugly, no I don't have a better idea right now
 set (EGG_IMAGE_HEADERS
 	image/Image.h
 	image/ImageDefinitions.h

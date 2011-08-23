@@ -30,8 +30,6 @@ Toadlet is built with the cmake build system. It has a number of optional depend
 
     * [#Android]
 
-    * [#Blackberry]
-
     * [#Doxygen]
 
 
@@ -52,23 +50,11 @@ Toadlet is built with the cmake build system. It has a number of optional depend
 
 
 
-toadlet_egg:
-
-  * libpng
-
-  * libjpeg
-
-  * libgif
-
-  * libzlib
-
-  * libzzip
-
-
-
 toadlet-peeper:
 
-  * GLEW and OpenGL
+  * OpenGL
+
+  * GLEW
 
   * Direct3D Mobile (WinCE only)
 
@@ -91,6 +77,16 @@ toadlet-ribbit:
 
 
 toadlet-tadpole:
+
+  * libpng
+
+  * libjpeg
+
+  * libgif
+
+  * libzlib
+
+  * libzzip
 
   * Freetype
 
@@ -140,22 +136,6 @@ The following options may be set using cmake to control the build of toadlet. Ma
 
 
 
-*TOADLET_PLATFORM_WINCE* OFF/ON _Enables WinCE build (Windows only - enabled through CMake Toolchain)_
-
-
-
-*TOADLET_PLATFORM_ANDROID* OFF/ON _Enables android build_
-
-
-
-*TOADLET_PLATFORM_BLACKBERRY* OFF/ON _Enables blackberry build (Windows only)_
-
-
-
-*TOADLET_PLATFORM_IOS* OFF/ON _Enables iOS build (OSX only - enabled through CMake Toolchain)_
-
-
-
 *TOADLET_BUILD_DOXYGEN* OFF/ON _Add Doxygen documentation to build_
 
 
@@ -165,10 +145,6 @@ The following options may be set using cmake to control the build of toadlet. Ma
 
 
 *TOADLET_FIXED_POINT* OFF/ON _Switches to fixed point math in toadlet_
-
-
-
-*TOADLET_SPLIT_JARS* OFF/ON _Splits the android/blackberry builds into separate jars for each library_
 
 
 
@@ -392,37 +368,31 @@ NOTE: CMake will automatically search for your installed iOS SDKs and choose the
 
 
 
-When building for android, you need to specify the android.jar for the android sdk you wish to build against, using the ANDROID_JAR variable. 
+Toadlet for Android may be built using the included Toolchain file. When building for android, you need to specify the location of the android ndk you wish to build against, using the ANDROID_NDK variable. 
 
 
 
-  cmake -DTOADLET_PLATFORM_ANDROID=ON -DANDROID_JAR=$HOME/androidSdkDir/android.jar -DCMAKE_INSTALL_PREFIX=$HOME/toadlet/android ..
+On Posix and OSX systems, the process is straightforward.
+
+
+
+  cmake -DCMAKE_TOOLCHAIN_FILE=../cmake/Toolchains/Android.cmake -DANDROID_NDK=$HOME/androidNdkDir -DCMAKE_INSTALL_PREFIX=$HOME/toadlet/android ..
 
 	
 
-On Windows systems, the Visual Studio generators for cmake and java tend to be annoying to use, since Visual Studio wants to edit the already preprocessed java files instead of the original source files. 
+On Windows systems, the android-ndk requires the use of cygwin for GNUMake. This complicates the android build process on windows. Be sure to follow these steps:
 
+  * 1. Ensure you have cygwin and GNUMake installed in cygwin
 
+  * 2. Open a cygwin command shell and navigate to your toadlet build directory
 
-Instead, use the nmake generators an run command line builds, and a separate editor for the .java sources. It is so much nicer to use.
+  * 3a. Make SURE you call your native windows install of CMake.exe, and NOT a cygwin build of CMake. The cygwin build will not operate with the android ndk build tools. 
 
+  * 3b. If you have not installed cygwin CMake, the native CMake will be used automatcially. If you have, then be sure to specify the full path to your native CMake.exe when called.
 
+  * 4. You must force the generation of Unix Makefiles, otherwise CMake will create visual studio solutions which will not work.
 
-  cmake -G"NMake Makefiles" -DTOADLET_PLATFORM_ANDROID=ON -DANDROID_JAR="C:\androidSdkDir\android.jar" -DCMAKE_INSTALL_PREFIX="C:\toadlet\android" ..
-
-
-
-
-
-==Blackberry==
-
-
-
-Blackberry builds are very similar to the android builds, except you need to specify the location of your blackberry JDE using BLACKBERRY_JDE_DIR. Again, we strongly recommend using the nmake generators on Windows platforms to run a command line build.
-
-
-
-  cmake -G"NMake Makefiles" -DTOADLET_PLATFORM_BLACKBERRY=ON -DBLACKBERRY_JDE_DIR="C:\blackberryJdeDir" -DCMAKE_INSTALL_PREFIX="C:\toadlet\blackberry" ..
+  C:/path/to/windows/cmake -G"Unix Makefiles" -DCMAKE_TOOLCHAIN_FILE=../cmake/Toolchains/Android.cmake -DANDROID_NDK=$HOME/androidNdkDir -DCMAKE_INSTALL_PREFIX="C:\toadlet\android" ..
 
 
 

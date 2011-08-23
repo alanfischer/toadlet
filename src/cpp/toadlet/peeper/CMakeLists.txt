@@ -90,7 +90,17 @@ install (TARGETS toadlet_peeper_s DESTINATION lib)
 
 
 # Platform specific modules
-if (TOADLET_PLATFORM_WINCE)	
+if (TOADLET_PLATFORM_ANDROID)
+	#TODO: Get the Android OpenGLES working!!
+	#find_library (GLESV2 GLESv2)
+	if (GLESV2)
+		set (TOADLET_HAS_OPENGL ON PARENT_SCOPE)
+		add_subdirectory (plugins/glrenderdevice)
+	else (GLESV2)
+		#message ("GLESv2 was not found. The peeper_glrenderdevice will not be built")
+		message ("TODO: Make toadlet_peeper_glrenderer work on android")
+	endif (GLESV2)
+elseif (TOADLET_PLATFORM_WINCE)	
 	find_package (D3DM)
 	if (D3DM_FOUND)
 		set (TOADLET_HAS_D3DM ON PARENT_SCOPE)
@@ -153,5 +163,5 @@ elseif (TOADLET_PLATFORM_POSIX)
 	else (GLEW_FOUND)
 		message ("GLEW was not found. The peeper_glrenderdevice will not be built")
 	endif (GLEW_FOUND)
-endif (TOADLET_PLATFORM_WINCE)
+endif (TOADLET_PLATFORM_ANDROID)
 

@@ -44,7 +44,9 @@ set (PAD_PLATFORM_X11_HEADERS
 
 
 # Platform specific files
-if (TOADLET_PLATFORM_WIN32)
+if (TOADLET_PLATFORM_ANDROID)
+	message ("TODO: Make toadlet_pad work on android")
+elseif (TOADLET_PLATFORM_WIN32)
 	source_group ("Source Files\\\\platform\\\\win32" FILES ${PAD_PLATFORM_WIN32_SRC})
 	source_group ("Header Files\\\\platform\\\\win32" FILES ${PAD_PLATFORM_WIN32_HEADERS})
 	set (PAD_SRC ${PAD_SRC} ${PAD_PLATFORM_WIN32_SRC})
@@ -59,11 +61,12 @@ elseif (TOADLET_PLATFORM_POSIX)
 	source_group ("Header Files\\\\platform\\\\posix" FILES ${PAD_PLATFORM_POSIX_HEADERS})
 	set (PAD_SRC ${PAD_SRC} ${PAD_PLATFORM_X11_SRC})
 	set (PAD_HEADERS ${PAD_HEADERS} ${PAD_PLATFORM_X11_HEADERS})
-endif (TOADLET_PLATFORM_WIN32)
+endif (TOADLET_PLATFORM_ANDROID)
 
 
 # Dependencies for toadlet_pad
-if (TOADLET_PLATFORM_WINCE)
+if (TOADLET_PLATFORM_ANDROID)
+elseif (TOADLET_PLATFORM_WINCE)
 	if (TOADLET_HAS_D3DM)
 		set (PAD_LIBS ${PAD_LIBS} toadlet_peeper_d3dmrenderdevice)
 		set (PAD_LIBS_S ${PAD_LIBS_S} toadlet_peeper_d3dmrenderdevice_s)
@@ -124,7 +127,7 @@ elseif (TOADLET_PLATFORM_POSIX)
 		message ("libXxf86vm was not found, so pad will not be built.")
 		return ()
 	endif (X11_xf86vmode_FOUND)
-endif (TOADLET_PLATFORM_WINCE)
+endif (TOADLET_PLATFORM_ANDROID)
 
 
 # Give the headers and namespaces parent scope for inclusion into the master pad.h file
