@@ -42,19 +42,19 @@ elseif (TOADLET_PLATFORM_POSIX)
 	endif (STATIC_LIB_FLAGS)
 elseif (TOADLET_PLATFORM_WIN32)
 	# Set defaults
-	if (TOADLET_PLATFORM_WINCE OR TOADLET_PLATFORM_IOS)
+	if (TOADLET_PLATFORM_WINCE)
 		option (TOADLET_USE_BLUETOOTH "Enable Bluetooth support" ON)
 		option (TOADLET_DYNAMIC_MULTITHREAD_DYNAMIC "Use the /MD (Not /MT) compile switch with dynamic libraries" OFF)
 		option (TOADLET_STATIC_MULTITHREAD_DYNAMIC "Use the /MD (Not /MT) compile switch with static libraries" OFF)
 		option (TOADLET_RTTI "Enable Run Time Type Information" OFF)
 		option (TOADLET_EXCEPTIONS "Enable Exception handling" OFF)
-	else (TOADLET_PLATFORM_WINCE OR TOADLET_PLATFORM_IOS)
+	else (TOADLET_PLATFORM_WINCE)
 		option (TOADLET_USE_BLUETOOTH "Enable Bluetooth support" OFF)
 		option (TOADLET_DYNAMIC_MULTITHREAD_DYNAMIC "Use the /MD (Not /MT) compile switch with dynamic libraries" ON)
 		option (TOADLET_STATIC_MULTITHREAD_DYNAMIC "Use the /MD (Not /MT) compile switch with static libraries" OFF)
 		option (TOADLET_RTTI "Enable Run Time Type Information" ON)
 		option (TOADLET_EXCEPTIONS "Enable Exception handling" ON)
-	endif (TOADLET_PLATFORM_WINCE OR TOADLET_PLATFORM_IOS)
+	endif (TOADLET_PLATFORM_WINCE)
 	
 	# Deal with multithread static/dynamic libraries
 	# TODO: Once cmake supports _<CONFIGURATION> compile flags, make the /MDd /MD /MTd /MT all configuration specific!
@@ -200,7 +200,7 @@ file (APPEND ${HEADER_FILE} "#define TOADLET_H\n")
 file (APPEND ${HEADER_FILE} ""\n)
 
 foreach (TOADLET_LIBRARY ${TOADLET_LIBRARY_LIST})
-		file (APPEND ${HEADER_FILE} "#include <toadlet/${TOADLET_LIBRARY}.h>\n")
+	file (APPEND ${HEADER_FILE} "#include <toadlet/${TOADLET_LIBRARY}.h>\n")
 endforeach (TOADLET_LIBRARY)
 
 file (APPEND ${HEADER_FILE} "\n")

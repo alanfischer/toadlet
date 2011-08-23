@@ -672,11 +672,13 @@ set (TADPOLE_SRC ${TADPOLE_SRC} ${TADPOLE_HANDLER_SRC})
 if (NOT TOADLET_PLATFORM_IOS)
 	add_library (toadlet_tadpole SHARED ${TADPOLE_SRC} ${TADPOLE_HEADERS})
 	set_target_properties (toadlet_tadpole PROPERTIES ${DYNAMIC_LIB_PROPS})
-	if (TOADLET_PLATFORM_ANDROID AND ${NDKSYSTEM} STREQUAL "windows")
-		# HACK: The Windows Android NDK uses make under cygwin, which doesn't cooperate very well with cmake. 
-		# So one must manually fix library paths to change the windows drive location.
-		string (REGEX REPLACE "([A-Z]):" "/cygdrive/\\1" TADPOLE_LIBS ${TADPOLE_LIBS})
-	endif (TOADLET_PLATFORM_ANDROID AND ${NDKSYSTEM} STREQUAL "windows")
+	if (TOADLET_PLATFORM_ANDROID)
+		if (${NDKSYSTEM} STREQUAL "windows")
+			# HACK: The Windows Android NDK uses make under cygwin, which doesn't cooperate very well with cmake. 
+			# So one must manually fix library paths to change the windows drive location.
+			string (REGEX REPLACE "([A-Z]):" "/cygdrive/\\1" TADPOLE_LIBS ${TADPOLE_LIBS})
+		endif (${NDKSYSTEM} STREQUAL "windows")
+	endif (TOADLET_PLATFORM_ANDROID)
 	target_link_libraries (toadlet_tadpole toadlet_egg toadlet_peeper toadlet_ribbit ${TADPOLE_LIBS})
 	install (TARGETS toadlet_tadpole DESTINATION lib)
 endif (NOT TOADLET_PLATFORM_IOS)
