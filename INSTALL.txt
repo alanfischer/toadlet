@@ -386,13 +386,15 @@ On Windows systems, the android-ndk requires the use of cygwin for GNUMake. This
 
   * 2. Open a cygwin command shell and navigate to your toadlet build directory
 
-  * 3a. Make SURE you call your native windows install of CMake.exe, and NOT a cygwin build of CMake. The cygwin build will not operate with the android ndk build tools. 
+  * 3a. Make SURE you call your native windows install of CMake.exe, and NOT a cygwin build of CMake. The cygwin build will not operate with the android ndk build tools, and a number of errors will result.
 
-  * 3b. If you have not installed cygwin CMake, the native CMake will be used automatcially. If you have, then be sure to specify the full path to your native CMake.exe when called.
+  * 3b. If you have not installed cygwin CMake, the native CMake will be used automatcially. If you have installed cygwin CMake, then be sure to specify the full path to your native CMake.exe when called (with cygwin pathing, as seen in the example below)
 
   * 4. You must force the generation of Unix Makefiles, otherwise CMake will create visual studio solutions which will not work.
 
-  C:/path/to/windows/cmake -G"Unix Makefiles" -DCMAKE_TOOLCHAIN_FILE=../cmake/Toolchains/Android.cmake -DANDROID_NDK=$HOME/androidNdkDir -DCMAKE_INSTALL_PREFIX="C:\toadlet\android" ..
+  * 5. Make sure you use RELATIVE PATHS for the ANDROID_NDK value passed to cmake. Using C:\ will confuse cygwin, and using /cygdrive/c/ will confuse cmake. 
+
+  /cygdrive/c/path/to/windows/cmake.exe -G"Unix Makefiles" -DCMAKE_TOOLCHAIN_FILE=../cmake/Toolchains/Android.cmake -DANDROID_NDK=../../../androidNdkDir -DCMAKE_INSTALL_PREFIX=../../toadlet-android" ..
 
 
 
