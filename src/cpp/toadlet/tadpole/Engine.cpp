@@ -88,7 +88,7 @@
 #include <toadlet/tadpole/creator/SkyDomeMeshCreator.h>
 #include <toadlet/tadpole/creator/SphereMeshCreator.h>
 #include <toadlet/tadpole/creator/DiffuseMaterialCreator.h>
-#include <toadlet/tadpole/creator/SkyboxMaterialCreator.h>
+#include <toadlet/tadpole/creator/SkyBoxMaterialCreator.h>
 
 #include <toadlet/tadpole/handler/BMPHandler.h>
 #include <toadlet/tadpole/handler/DDSHandler.h>
