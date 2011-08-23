@@ -47,7 +47,7 @@ set (TADPOLE_BSP_SRC
 
 set (TADPOLE_CREATOR_SRC
 	creator/DiffuseMaterialCreator.cpp
-	creator/SkyboxMaterialCreator.cpp
+	creator/SkyBoxMaterialCreator.cpp
 	creator/AABoxMeshCreator.cpp
 	creator/GridMeshCreator.cpp
 	creator/GeoSphereMeshCreator.cpp
@@ -231,7 +231,7 @@ set (TADPOLE_BSP_HEADERS
 
 set (TADPOLE_CREATOR_HEADERS
 	creator/DiffuseMaterialCreator.h
-	creator/SkyboxMaterialCreator.h
+	creator/SkyBoxMaterialCreator.h
 	creator/AABoxMeshCreator.h
 	creator/GridMeshCreator.h
 	creator/GeoSphereMeshCreator.h
