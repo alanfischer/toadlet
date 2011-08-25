@@ -66,6 +66,10 @@ endif (TOADLET_PLATFORM_ANDROID)
 
 # Dependencies for toadlet_pad
 if (TOADLET_PLATFORM_ANDROID)
+	if (ANDROID_API_LEVEL LESS 9)
+		message (STATUS "WARNING: pad will not be built at an android api level less than 9")
+		return ()
+	endif (ANDROID_API_LEVEL LESS 9)	
 elseif (TOADLET_PLATFORM_WINCE)
 	if (TOADLET_HAS_D3DM)
 		set (PAD_LIBS ${PAD_LIBS} toadlet_peeper_d3dmrenderdevice)
