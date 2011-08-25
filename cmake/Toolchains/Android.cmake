@@ -183,6 +183,10 @@ if( EXISTS "${ANDROID_NDK}" )
   message( STATUS "  If you prefer to use a different API level, please define the variable: ANDROID_API_LEVEL" )
  endif()
  
+ if( ANDROID_API_LEVEL LESS 9 AND ANDROID_ARCH STREQUAL "X86" )
+  message( FATAL_ERROR "Android api levels < 9 do not support x86 builds. Please choose a different api level or switch architectures" )
+ endif( ANDROID_API_LEVEL LESS 9 AND ANDROID_ARCH STREQUAL "X86" )
+ 
  if( NOT ANDROID_ARCH )
   set( ANDROID_ARCH "ARM" )
  endif (NOT ANDROID_ARCH )
