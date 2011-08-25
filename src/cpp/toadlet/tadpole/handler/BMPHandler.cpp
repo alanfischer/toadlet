@@ -69,7 +69,7 @@ Resource::ptr BMPHandler::load(Stream::ptr stream,ResourceData *data,ProgressLis
 	BITMAPFILEHEADER bmfh={0};
 
 	if(stream==NULL){
-		Error::nullPointer(Categories::TOADLET_EGG,
+		Error::nullPointer(Categories::TOADLET_TADPOLE,
 			"Stream is NULL");
 		return NULL;
 	}
@@ -104,7 +104,7 @@ Resource::ptr BMPHandler::load(Stream::ptr stream,ResourceData *data,ProgressLis
 	int height=bmih.biHeight;
 
 	if(bmih.biPlanes!=1){
-		Error::loadingImage(Categories::TOADLET_EGG,
+		Error::unknown(Categories::TOADLET_TADPOLE,
 			String("BMPHandler: Planes are ")+(int)bmih.biPlanes+", not 1");
 		return NULL;
 	}
@@ -117,13 +117,13 @@ Resource::ptr BMPHandler::load(Stream::ptr stream,ResourceData *data,ProgressLis
 		format=Image::Format_RGBA_8;
 	}
 	else{
-		Error::loadingImage(Categories::TOADLET_EGG,
+		Error::unknown(Categories::TOADLET_TADPOLE,
 			String("BMPHandler: Format is ")+(int)bmih.biBitCount+", not 1, 2, 4, 8, 24, or 32 bit");
 		return NULL;
 	}
 
 	if(bmih.biCompression!=BI_RGB){
-		Error::loadingImage(Categories::TOADLET_EGG,
+		Error::unknown(Categories::TOADLET_TADPOLE,
 			String("BMPHandler: Compression is ")+(int)bmih.biCompression+", not BI_RGB");
 		return NULL;
 	}
@@ -221,13 +221,13 @@ bool BMPHandler::save(Stream::ptr stream,Resource::ptr resource,ResourceData *da
 	Image::ptr image=mTextureManager->createImage(texture);
 
 	if(image->getDimension()!=Image::Dimension_D2){
-		Error::loadingImage(Categories::TOADLET_EGG,
+		Error::unknown(Categories::TOADLET_TADPOLE,
 			"BMPHandler: Image isn't D2");
 		return false;
 	}
 
 	if(!(image->getFormat()==Image::Format_RGB_8 || image->getFormat()==Image::Format_RGBA_8)){
-		Error::loadingImage(Categories::TOADLET_EGG,
+		Error::unknown(Categories::TOADLET_TADPOLE,
 			"BMPHandler: Image isn't in RGB/RGBA format");
 		return false;
 	}

@@ -319,7 +319,7 @@ Material::ptr DiffuseMaterialCreator::createDiffuseMaterial(Texture::ptr texture
 	return material;
 }
 
-Material::ptr DiffuseMaterialCreator::createDiffusePointSpriteMaterial(Texture::ptr texture,scalar size,bool attenuated){
+Material::ptr DiffuseMaterialCreator::createPointSpriteMaterial(Texture::ptr texture,scalar size,bool attenuated){
 	Material::ptr material(new Material(mEngine->getMaterialManager()));
 
 	RenderPath::ptr shaderPath=material->addPath();

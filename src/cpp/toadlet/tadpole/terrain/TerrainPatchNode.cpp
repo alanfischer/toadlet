@@ -149,14 +149,14 @@ void *TerrainPatchNode::hasInterface(int type){
 	}
 }
 
-bool TerrainPatchNode::setData(scalar *data,int rowPitch,int width,int height,bool water){
-	int sizeN=0;
-	for(sizeN=0;(1<<(sizeN+1))<=width;sizeN++);
-
+bool TerrainPatchNode::setHeightData(scalar *data,int rowPitch,int width,int height,bool water){
 	if(width!=height){
 		Error::invalidParameters(Categories::TOADLET_TADPOLE_TERRAIN,"width!=height");
 		return false;
 	}
+
+	int sizeN=0;
+	for(sizeN=0;(1<<(sizeN+1))<=width;sizeN++);
 
 	if(width!=(1<<sizeN)){
 		Error::invalidParameters(Categories::TOADLET_TADPOLE_TERRAIN,"width & height not a power of 2");
@@ -283,6 +283,76 @@ bool TerrainPatchNode::setData(scalar *data,int rowPitch,int width,int height,bo
 	addBlockToBack(0);
 
 	mBound.set(mBlocks[0].mins,mBlocks[0].maxs);
+
+	return true;
+}
+
+inline float calculateLayerWeight(tbyte *data,int rowPitch,int size,int layer,int i,int j,float io,float jo){
+	float weights[8];
+	memset(weights,0,sizeof(weights));
+
+	int mini=i-1<0?0:i-1;
+	int maxi=i+1>size-1?size-1:i+1;
+	int minj=j-1<0?0:j-1;
+	int maxj=j+1>size-1?size-1:j+1;
+
+	int x,y;
+	for(y=minj;y<=maxj;++y){
+		for(x=mini;x<=maxi;++x){
+			int l=data[y*rowPitch+x];
+			float w=1.0 - (Math::square(x-(i+io))+Math::square(y-(j+jo))) / Math::square(1.75);
+			weights[l]+=w<0?0:w;
+		}
+	}
+
+	float sum=0;
+	for(x=0;x<8;++x){
+		sum+=weights[x];
+	}
+
+	return weights[layer]/sum;
+}
+
+bool TerrainPatchNode::setLayerData(tbyte *data,int rowPitch,int width,int height){
+	if(width!=mSize || height!=mSize){
+		Error::invalidParameters(Categories::TOADLET_TADPOLE_TERRAIN,"width or height !=size");
+		return false;
+	}
+
+	int numLayers=0;
+	int i,j;
+	for(j=0;j<mSize;++j){
+		for(i=0;i<mSize;++i){
+			numLayers=Math::maxVal(data[rowPitch*j+i],numLayers);
+		}
+	}
+
+	if(numLayers>8){
+		Error::invalidParameters(Categories::TOADLET_TADPOLE_TERRAIN,"max of 8 layers");
+		return false;
+	}
+
+	mLayerTextures.resize(8);
+	mLayerData.resize(width*height);
+	memcpy(&mLayerData[0],data,width*height);
+
+	Collection<tbyte> textureData((width*2)*(height*2));
+	tbyte *tdata=&textureData[0];
+	int textureRowPitch=width*2;
+
+	int k;
+	for(k=0;k<numLayers;++k){
+		for(j=0;j<mSize;++j){
+			for(i=0;i<mSize;++i){
+				tdata[(j*2+0) * textureRowPitch + i*2+0]=calculateLayerWeight(data,rowPitch,mSize,k,i,j,-0.25,-0.25)*255;
+				tdata[(j*2+0) * textureRowPitch + i*2+1]=calculateLayerWeight(data,rowPitch,mSize,k,i,j,0.25,-0.25)*255;
+				tdata[(j*2+1) * textureRowPitch + i*2+0]=calculateLayerWeight(data,rowPitch,mSize,k,i,j,-0.25,0.25)*255;
+				tdata[(j*2+1) * textureRowPitch + i*2+1]=calculateLayerWeight(data,rowPitch,mSize,k,i,j,0.25,0.25)*255;
+			}
+		}
+
+		mLayerTextures[k]=mEngine->getTextureManager()->createTexture(Texture::Usage_BIT_STREAM,TextureFormat::Dimension_D2,TextureFormat::Format_A_8,width*2,height*2,1,0,&tdata);
+	}
 
 	return true;
 }
@@ -563,6 +633,13 @@ void TerrainPatchNode::updateIndexBuffers(CameraNode *camera){
 void TerrainPatchNode::updateWaterIndexBuffers(CameraNode *camera){
 	int indexCount=gatherBlocks(mWaterIndexBuffer,camera,true);
 	mWaterIndexData->setCount(indexCount);
+}
+
+void TerrainPatchNode::render(SceneRenderer *renderer) const{
+	renderer->getDevice()->setTexture(1,mLayerTextures[0]);
+	renderer->getDevice()->setTexture(3,mLayerTextures[1]);
+
+	renderer->getDevice()->renderPrimitive(mVertexData,mIndexData);
 }
 
 void TerrainPatchNode::traceSegment(Collision &result,const Vector3 &position,const Segment &segment,const Vector3 &size){

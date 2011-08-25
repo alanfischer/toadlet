@@ -86,6 +86,10 @@ Material::ptr MaterialManager::createDiffuseMaterial(Texture::ptr texture){
 	return shared_static_cast<DiffuseMaterialCreator>(mDiffuseCreator)->createDiffuseMaterial(texture);
 }
 
+Material::ptr MaterialManager::createPointSpriteMaterial(Texture::ptr texture,scalar size,bool attenuated){
+	return shared_static_cast<DiffuseMaterialCreator>(mDiffuseCreator)->createPointSpriteMaterial(texture,size,attenuated);
+}
+
 Material::ptr MaterialManager::createSkyBoxMaterial(Texture::ptr texture){
 	return shared_static_cast<SkyBoxMaterialCreator>(mSkyBoxCreator)->createSkyBoxMaterial(texture);
 }

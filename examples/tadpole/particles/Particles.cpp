@@ -33,7 +33,7 @@ void Particles::create(){
 		Vector3(-ten,-ten,0),
 	};
 
-	Material::ptr pointMaterial=mEngine->getMaterialManager()->createDiffusePointSpriteMaterial(mEngine->getTextureManager()->findTexture("sparkle.png"),ten,false);
+	Material::ptr pointMaterial=mEngine->getMaterialManager()->createPointSpriteMaterial(mEngine->getTextureManager()->findTexture("sparkle.png"),ten,false);
 	pointMaterial->getPass()->setBlendState(BlendState::Combination_ALPHA_ADDITIVE);
 	pointMaterial->getPass()->setRasterizerState(RasterizerState(RasterizerState::CullType_NONE));
 	pointMaterial->getPass()->setMaterialState(MaterialState(false));

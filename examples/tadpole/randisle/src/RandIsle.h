@@ -70,7 +70,8 @@ public:
 
 	int getPatchSize(){return mPatchSize;}
 	const Vector3 &getPatchScale(){return mPatchScale;}
-	bool getPatchData(scalar *data,int px,int py);
+	bool getPatchHeightData(scalar *data,int px,int py);
+	bool getPatchLayerData(tbyte *data,int px,int py);
 	scalar terrainValue(float tx,float ty);
 	scalar pathValue(float ty);
 

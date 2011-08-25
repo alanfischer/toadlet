@@ -36,7 +36,8 @@ class TerrainNodeDataSource{
 public:
 	virtual int getPatchSize()=0;
 	virtual const Vector3 &getPatchScale()=0;
-	virtual bool getPatchData(scalar *data,int px,int py)=0;
+	virtual bool getPatchHeightData(scalar *data,int px,int py)=0;
+	virtual bool getPatchLayerData(tbyte *data,int px,int py)=0;
 };
 
 }

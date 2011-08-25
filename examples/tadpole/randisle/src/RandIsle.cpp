@@ -29,7 +29,7 @@ void RandIsle::create(const String &directory){
 
 	Logger::debug("RandIsle::create");
 
-	Application::create();
+	Application::create("gl");
 	
 	mEngine->setDirectory(directory);
 //	mEngine->getMaterialManager()->setRenderPathChooser(this);
@@ -750,7 +750,7 @@ void RandIsle::terrainPatchDestroyed(int px,int py,const Bound &bound){
 	}
 }
 
-bool RandIsle::getPatchData(scalar *data,int px,int py){
+bool RandIsle::getPatchHeightData(scalar *data,int px,int py){
 	int size=getPatchSize();
 	for(int x=0;x<size;++x){
 		for(int y=0;y<size;++y){
@@ -758,6 +758,24 @@ bool RandIsle::getPatchData(scalar *data,int px,int py){
 			float ty=(float)(py*size+y - size/2)/(float)size;
 			scalar v=terrainValue(tx,ty);
 			data[y*size+x]=v;
+		}
+	}
+	return true;
+}
+
+bool RandIsle::getPatchLayerData(tbyte *data,int px,int py){
+	int size=getPatchSize();
+	for(int x=0;x<size;++x){
+		for(int y=0;y<size;++y){
+			float tx=(float)(px*size+x - size/2)/(float)size;
+			float ty=(float)(py*size+y - size/2)/(float)size;
+			scalar v=terrainValue(tx,ty);
+			if(v<-0.25){
+				data[y*size+x]=0;
+			}
+			else{
+				data[y*size+x]=1;
+			}
 		}
 	}
 	return true;
