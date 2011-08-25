@@ -118,7 +118,7 @@ public:
 		mPlanet=planet;
 		attach(mPlanet);
 
-		Mesh::ptr mesh=getEngine()->getMeshManager()->createTorusMesh(size,thickness,16,4);
+		TorusMeshCreator::ptr torusCreator(new TorusMeshCreator(mEngine));
 		{
 			mMaterial=getEngine()->getMaterialManager()->createDiffuseMaterial(createDash(128,1));
 			mMaterial->getPass()->setBlendState(BlendState::Combination_COLOR_ADDITIVE);
@@ -128,8 +128,8 @@ public:
 			textureState.calculation=TextureState::CalculationType_NORMAL;
 			Math::setMatrix4x4FromScale(textureState.matrix,Math::fromInt(32),Math::ONE,Math::ONE);
 			mMaterial->getPass()->setTextureState(0,textureState);
-			mesh->getSubMesh(0)->material=mMaterial;
 		}
+		Mesh::ptr mesh=torusCreator->createTorusMesh(size,thickness,16,4,mMaterial);
 
 		mMeshNode=getEngine()->createNodeType(MeshNode::type(),getScene());
 		mMeshNode->setMesh(mesh);

@@ -140,13 +140,15 @@ void PosixSystem::testNEON(SystemCaps &caps){
 }
 
 void PosixSystem::signalHandler(int s){
-    if(!doJump){
-        signal(s,SIG_DFL);
-        raise(s);
-    }
+	#if defined(TOADLET_HAS_NEON)
+		if(!doJump){
+			signal(s,SIG_DFL);
+			raise(s);
+		}
 
-    doJump=0;
-    siglongjmp(jmpbuf,1);
+		doJump=0;
+		siglongjmp(jmpbuf,1);
+	#endif
 }
 
 }

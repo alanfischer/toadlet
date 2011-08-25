@@ -319,7 +319,7 @@ int GIFHandler::closeFile(GifFileType *file){
 
 Resource::ptr GIFHandler::load(Stream::ptr stream,ResourceData *data,ProgressListener *listener){
 	if(stream==NULL){
-		Error::nullPointer(Categories::TOADLET_EGG,
+		Error::nullPointer(Categories::TOADLET_TADPOLE,
 			"Stream is NULL");
 		return false;
 	}
@@ -327,7 +327,7 @@ Resource::ptr GIFHandler::load(Stream::ptr stream,ResourceData *data,ProgressLis
 	GifFileType *file=openFile(stream);
 
 	if(file==NULL){
-		Error::loadingImage(Categories::TOADLET_EGG,
+		Error::unknown(Categories::TOADLET_TADPOLE,
 			"GIFHandler::loadAnimatedImage: Invalid file");
 		return false;
 	}
@@ -372,7 +372,7 @@ Resource::ptr GIFHandler::load(Stream::ptr stream,ResourceData *data,ProgressLis
 	delete working;
 	
 	if(result==GIF_ERROR){
-		Error::loadingImage(Categories::TOADLET_EGG,
+		Error::unknown(Categories::TOADLET_TADPOLE,
 			"GIFHandler::loadAnimatedImage: Error loading image");
 		return NULL;
 	}

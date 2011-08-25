@@ -58,7 +58,7 @@ Resource::ptr PNGHandler::load(Stream::ptr stream,ResourceData *resourceData,Pro
 	int y;
 
 	if(stream==NULL){
-		Error::nullPointer(Categories::TOADLET_EGG,
+		Error::nullPointer(Categories::TOADLET_TADPOLE,
 			"Stream is NULL");
 		return NULL;
 	}
@@ -74,14 +74,14 @@ Resource::ptr PNGHandler::load(Stream::ptr stream,ResourceData *resourceData,Pro
 	
 	stream->read(header,8);
 	if(png_sig_cmp(header,0,8)){
-		Error::loadingImage(Categories::TOADLET_EGG,
+		Error::unknown(Categories::TOADLET_TADPOLE,
 			"PNGHandler::loadImage: Not a PNG file");
 		return NULL;
 	}
 		
 	png_ptr=png_create_read_struct(PNG_LIBPNG_VER_STRING,NULL,NULL,NULL);
 	if(png_ptr==NULL){
-		Error::loadingImage(Categories::TOADLET_EGG,
+		Error::unknown(Categories::TOADLET_TADPOLE,
 			"PNGHandler::loadImage: png_create_read_struct failed");
 		return NULL;
 	}
@@ -90,7 +90,7 @@ Resource::ptr PNGHandler::load(Stream::ptr stream,ResourceData *resourceData,Pro
 	if(info_ptr==NULL){
 		png_destroy_read_struct(&png_ptr,NULL,NULL);
 
-		Error::loadingImage(Categories::TOADLET_EGG,
+		Error::unknown(Categories::TOADLET_TADPOLE,
 			"PNGHandler::loadImage: png_create_info_struct failed");
 		return NULL;
 	}
@@ -98,7 +98,7 @@ Resource::ptr PNGHandler::load(Stream::ptr stream,ResourceData *resourceData,Pro
 	if(setjmp(png_jmpbuf(png_ptr))){
 		png_destroy_read_struct(&png_ptr,&info_ptr,NULL);
 
-		Error::loadingImage(Categories::TOADLET_EGG,
+		Error::unknown(Categories::TOADLET_TADPOLE,
 			"PNGHandler::loadImage: error in png loading");
 		return NULL;
 	}
@@ -196,7 +196,7 @@ Resource::ptr PNGHandler::load(Stream::ptr stream,ResourceData *resourceData,Pro
 		break;
 		default:
 			png_destroy_read_struct(&png_ptr,&info_ptr,NULL);
-			Error::loadingImage(Categories::TOADLET_EGG,
+			Error::unknown(Categories::TOADLET_TADPOLE,
 				String("PNGHandler::loadImage: Unknown PNG type:")+color_type);
 		break;
 	}

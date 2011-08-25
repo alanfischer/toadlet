@@ -46,7 +46,8 @@ TerrainNode::TerrainNode():super(),
 	//mPatchMaterial,
 	mPatchTolerance(0),
 	//mPatchScale,
-	//mPatchData,
+	//mPatchHeightData,
+	//mPatchLayerData,
 	mUpdateTargetBias(0)
 {}
 
@@ -106,7 +107,8 @@ void TerrainNode::setDataSource(TerrainNodeDataSource *dataSource){
 
 	mPatchSize=mDataSource->getPatchSize();
 	mPatchScale.set(mDataSource->getPatchScale());
-	mPatchData.resize(mPatchSize*mPatchSize);
+	mPatchHeightData.resize(mPatchSize*mPatchSize);
+	mPatchLayerData.resize(mPatchSize*mPatchSize);
 
 	int x,y;
 	for(y=mTerrainY-mHalfSize;y<=mTerrainY+mHalfSize;++y){
@@ -300,8 +302,10 @@ void TerrainNode::createPatch(int x,int y){
 	patch->setWaterMaterial(mPatchWaterMaterial);
 	patch->setTolerance(mPatchTolerance);
 
-	mDataSource->getPatchData(&mPatchData[0],x,y);
-	patch->setData(&mPatchData[0],mPatchSize,mPatchSize,mPatchSize,true);
+	mDataSource->getPatchHeightData(&mPatchHeightData[0],x,y);
+	patch->setHeightData(&mPatchHeightData[0],mPatchSize,mPatchSize,mPatchSize,true);
+	mDataSource->getPatchLayerData(&mPatchLayerData[0],x,y);
+	patch->setLayerData(&mPatchLayerData[0],mPatchSize,mPatchSize,mPatchSize);
 
 	attach(patch);
 

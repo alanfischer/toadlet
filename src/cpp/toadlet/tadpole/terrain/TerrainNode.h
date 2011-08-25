@@ -128,7 +128,8 @@ protected:
 	Material::ptr mPatchWaterMaterial;
 	scalar mPatchTolerance;
 	Vector3 mPatchScale;
-	Collection<scalar> mPatchData;
+	Collection<scalar> mPatchHeightData;
+	Collection<tbyte> mPatchLayerData;
 	scalar mUpdateTargetBias;
 };
 

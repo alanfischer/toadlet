@@ -305,6 +305,7 @@ void Engine::installHandlers(){
 		#endif
 	#endif
 	mTextureManager->setStreamer(TGAHandler::ptr(new TGAHandler(mTextureManager)),"tga");
+mTextureManager->setStreamer(BMPHandler::ptr(new BMPHandler(mTextureManager)),"bmp"); // OSXTextureHandler only handles jpgs & pngs currently, so add our own bmp handler
 
 	// Font handlers, try for freetype first, since it currently looks best.  This can be changed back once the others look as nice
 	#if defined(TOADLET_HAS_FREETYPE)

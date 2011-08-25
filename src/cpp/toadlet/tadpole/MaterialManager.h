@@ -49,6 +49,7 @@ public:
 	inline void setDiffuseCreator(ResourceCreator::ptr creator){mDiffuseCreator=creator;}
 	inline void setSkyBoxCreator(ResourceCreator::ptr creator){mSkyBoxCreator=creator;}
 	Material::ptr createDiffuseMaterial(Texture::ptr texture);
+	Material::ptr createPointSpriteMaterial(Texture::ptr texture,scalar size,bool attenuated);
 	Material::ptr createSkyBoxMaterial(Texture::ptr texture);
 
 	RenderState::ptr createRenderState();

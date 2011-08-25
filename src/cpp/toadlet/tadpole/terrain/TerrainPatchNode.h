@@ -83,7 +83,8 @@ public:
 
 	void *hasInterface(int type);
 
-	bool setData(scalar *data,int rowPitch,int width,int height,bool water);
+	bool setHeightData(scalar *data,int rowPitch,int width,int height,bool water);
+	bool setLayerData(tbyte *data,int rowPitch,int width,int height);
 	bool setMaterial(Material::ptr material);
 	bool setWaterMaterial(Material::ptr material);
 
@@ -110,12 +111,14 @@ public:
 	Material *getRenderMaterial() const{return mMaterial;}
 	const Transform &getRenderTransform() const{return getWorldTransform();}
 	const Bound &getRenderBound() const{return getWorldBound();}
-	void render(SceneRenderer *renderer) const{renderer->getDevice()->renderPrimitive(mVertexData,mIndexData);}
+	void render(SceneRenderer *renderer) const;
 
 	const Bound &getBound() const{return super::getBound();}
 	void traceSegment(Collision &result,const Vector3 &position,const Segment &segment,const Vector3 &size);
 	void traceLocalSegment(Collision &result,const Segment &segment,scalar epsilon,scalar cellEpsilon);
 	bool traceCell(Collision &result,int x,int y,const Segment &segment,scalar epsilon,scalar cellEpsilon);
+
+	Texture::ptr getLayerTexture(int i){return mLayerTextures[i];}
 
 	inline Renderable *internal_getWaterRenderable(){return mWaterRenderable;}
 
@@ -233,6 +236,8 @@ protected:
 	IndexBuffer::ptr mIndexBuffer;
 	VertexData::ptr mVertexData;
 	IndexData::ptr mIndexData;
+	Collection<tbyte> mLayerData;
+	Collection<Texture::ptr> mLayerTextures;
 
 	Material::ptr mWaterMaterial;
 	VertexBuffer::ptr mWaterVertexBuffer;

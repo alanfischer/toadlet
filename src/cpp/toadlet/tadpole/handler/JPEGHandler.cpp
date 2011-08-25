@@ -184,7 +184,7 @@ Resource::ptr JPEGHandler::load(Stream::ptr stream,ResourceData *data,ProgressLi
 	if(setjmp(jerr.setjmp_buffer)){
 		jpeg_destroy_decompress(&cinfo);
 
-		Error::loadingImage(Categories::TOADLET_EGG,
+		Error::unknown(Categories::TOADLET_TADPOLE,
 			"JPEGHandler::loadImage: error in jpeg loading");
 		return NULL;
 	}
@@ -206,7 +206,7 @@ Resource::ptr JPEGHandler::load(Stream::ptr stream,ResourceData *data,ProgressLi
 	if(cinfo.output_components!=1 && cinfo.output_components!=3){
 		jpeg_destroy_decompress(&cinfo);
 
-		Error::loadingImage(Categories::TOADLET_EGG,
+		Error::unknown(Categories::TOADLET_TADPOLE,
 			"JPEGHandler::loadImage: Not 1 or 3 components");
 		return NULL;
 	}
@@ -219,7 +219,7 @@ Resource::ptr JPEGHandler::load(Stream::ptr stream,ResourceData *data,ProgressLi
 		format=Image::Format_RGB_8;
 	}
 	else{
-		Error::loadingImage(Categories::TOADLET_EGG,
+		Error::unknown(Categories::TOADLET_TADPOLE,
 			"JPEGHandler::loadImage: Not 1 or 3 output_components");
 		return NULL;
 	}

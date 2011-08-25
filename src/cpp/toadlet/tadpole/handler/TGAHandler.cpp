@@ -49,7 +49,7 @@ enum Encoding{
 
 Resource::ptr TGAHandler::load(Stream::ptr stream,ResourceData *data,ProgressListener *listener){
 	if(stream==NULL){
-		Error::nullPointer(Categories::TOADLET_EGG,
+		Error::nullPointer(Categories::TOADLET_TADPOLE,
 			"Stream is NULL");
 		return NULL;
 	}
@@ -77,19 +77,19 @@ Resource::ptr TGAHandler::load(Stream::ptr stream,ResourceData *data,ProgressLis
 	TOADLET_IGNORE_UNUSED_VARIABLE_WARNING(y);
 	
 	if(colorMapType>1){
-		Error::loadingImage(Categories::TOADLET_EGG,
+		Error::unknown(Categories::TOADLET_TADPOLE,
 			"Invalid color map type");
 		return NULL;
 	}
 	
 	if(!(imageType==Encoding_TRUECOLOR || imageType==Encoding_RLE_TRUECOLOR)){
-		Error::loadingImage(Categories::TOADLET_EGG,
+		Error::unknown(Categories::TOADLET_TADPOLE,
 			"Only truecolor currently supported");
 		return NULL;
 	}
 
 	if(descriptor>32){
-		Error::loadingImage(Categories::TOADLET_EGG,
+		Error::unknown(Categories::TOADLET_TADPOLE,
 			"Interleaved not currently supported");
 		return NULL;
 	}
@@ -102,7 +102,7 @@ Resource::ptr TGAHandler::load(Stream::ptr stream,ResourceData *data,ProgressLis
 		format=Image::Format_BGRA_8;
 	}
 	else{
-		Error::loadingImage(Categories::TOADLET_EGG,
+		Error::unknown(Categories::TOADLET_TADPOLE,
 			String("TGAHandler: Format is ")+bpp+", not 1, 2, 4, 8, 24, or 32 bit");
 		return NULL;
 	}

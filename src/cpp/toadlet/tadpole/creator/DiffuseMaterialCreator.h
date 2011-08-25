@@ -47,7 +47,7 @@ public:
 
 	Resource::ptr create(const String &name,ResourceData *data,ProgressListener *listener);
 	Material::ptr createDiffuseMaterial(Texture::ptr texture);
-	Material::ptr createDiffusePointSpriteMaterial(Texture::ptr texture,scalar size,bool attenuated);
+	Material::ptr createPointSpriteMaterial(Texture::ptr texture,scalar size,bool attenuated);
 
 protected:
 	Engine *mEngine;

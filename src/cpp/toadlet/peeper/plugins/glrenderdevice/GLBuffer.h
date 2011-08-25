@@ -76,6 +76,7 @@ public:
 	tbyte *lock(int lockAccess);
 	bool unlock();
 	bool update(tbyte *data,int start,int size);
+	bool updateResource(Resource::ptr resource,int offset);
 
 	#if defined(TOADLET_HAS_GLSHADERS)
 		bool activateUniforms();
