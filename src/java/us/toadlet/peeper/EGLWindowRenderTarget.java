@@ -35,9 +35,9 @@ public class EGLWindowRenderTarget extends EGLRenderTarget{
 	public EGLWindowRenderTarget(Object nativeSurface,Visual visual){createContext(nativeSurface,visual,false);}
 	public EGLWindowRenderTarget(Object nativeSurface,Visual visual,boolean pixmap){createContext(nativeSurface,visual,pixmap);}
 	
-	public void destroy(){
-		destroyContext();
-	}
+	public void destroy(){destroyContext();}
+
+	public RenderTarget getRootRenderTarget(){return this;}
 
 	public boolean createContext(Object nativeSurface,Visual visual){return createContext(nativeSurface,visual,false);}
 	public boolean createContext(Object nativeSurface,Visual visual,boolean pixmap){
@@ -148,13 +148,15 @@ public class EGLWindowRenderTarget extends EGLRenderTarget{
 		return true;
 	}
 
-	public void swap(){
+	public void bool(){
 		if(mPixmap){
 			egl.eglWaitGL();
 		}
 		else{
 			egl.eglSwapBuffers(mDisplay,mSurface);
 		}
+		
+		return true;
 	}
 
 	public boolean isPrimary(){return true;}
