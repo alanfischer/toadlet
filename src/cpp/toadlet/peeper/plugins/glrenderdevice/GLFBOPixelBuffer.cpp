@@ -28,6 +28,8 @@
 #include "GLRenderDevice.h"
 #include <toadlet/egg/image/ImageFormatConversion.h>
 
+#if defined(TOADLET_HAS_GLFBOS)
+
 namespace toadlet{
 namespace peeper{
 
@@ -81,3 +83,5 @@ void GLFBOPixelBuffer::destroy(){
 
 }
 }
+
+#endif

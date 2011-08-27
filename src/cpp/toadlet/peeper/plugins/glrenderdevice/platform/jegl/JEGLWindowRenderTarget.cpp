@@ -29,63 +29,72 @@
 namespace toadlet{
 namespace peeper{
 
-JEGLWindowRenderTarget::JEGLWindowRenderTarget(JNIEnv *jenv,jobject jobj):GLRenderTarget()
-	env(jenv),
-	obj(jobj)
+JEGLWindowRenderTarget::JEGLWindowRenderTarget(JNIEnv *jenv,jobject jobj):GLRenderTarget(),
+	env(NULL),
+	obj(NULL)
 {
-	jclass clazz=GetObjectClass(env,obj);
+	env=jenv;
+	obj=env->NewGlobalRef(jobj);
 
-	swapID=env->GetMethodID(env,clazz,"swap","()Z");
-	resetID=env->GetMethodID(env,clazz,"reset","()V");
-	activateID=env->GetMethodID(env,clazz,"activate","()Z");
-	deactivateID=env->GetMethodID(env,clazz,"deactivate","()Z");
-	activateAdditionalContextID=env->GetMethodID(env,clazz,"activateAdditionalContext","()Z");
-	deactivateAdditionalContextID=env->GetMethodID(env,clazz,"deactivateAdditionalContext","()V");
+	jclass clazz=env->GetObjectClass(obj);
+
+	swapID=env->GetMethodID(clazz,"swap","()Z");
+	resetID=env->GetMethodID(clazz,"reset","()V");
+	activateID=env->GetMethodID(clazz,"activate","()Z");
+	deactivateID=env->GetMethodID(clazz,"deactivate","()Z");
+	activateAdditionalContextID=env->GetMethodID(clazz,"activateAdditionalContext","()Z");
+	deactivateAdditionalContextID=env->GetMethodID(clazz,"deactivateAdditionalContext","()V");
 	
-	isPrimaryID=env->GetMethodID(env,clazz,"isPrimary","()Z");
-	isValidID=env->GetMethodID(env,clazz,"isValid","()Z");
-	getWidthID=env->GetMethodID(env,clazz,"getWidth","()I");
-	getHeightID=env->GetMethodID(env,clazz,"getHeight","()I");
+	isPrimaryID=env->GetMethodID(clazz,"isPrimary","()Z");
+	isValidID=env->GetMethodID(clazz,"isValid","()Z");
+	getWidthID=env->GetMethodID(clazz,"getWidth","()I");
+	getHeightID=env->GetMethodID(clazz,"getHeight","()I");
 }
 
-bool EGLWindowRenderTarget::swap(){
-	return env->CallBooleanMethod(env,obj,swapID);
+JEGLWindowRenderTarget::~JEGLWindowRenderTarget(){
+	env->DeleteGlobalRef(obj);
+	obj=NULL;
+	env=NULL;
 }
 
-void EGLWindowRenderTarget::reset(){
-	env->CallVoidMethod(env,obj,resetID);
+bool JEGLWindowRenderTarget::swap(){
+	return env->CallBooleanMethod(obj,swapID);
 }
 
-bool EGLWindowRenderTarget::activate(){
-	return env->CallBooleanMethod(env,obj,activateID);
+void JEGLWindowRenderTarget::reset(){
+	env->CallVoidMethod(obj,resetID);
 }
 
-bool EGLWindowRenderTarget::deactivate(){
-	return env->CallBooleanMethod(env,obj,deactivateID);
+bool JEGLWindowRenderTarget::activate(){
+	return env->CallBooleanMethod(obj,activateID);
 }
 
-bool EGLWindowRenderTarget::activateAdditionalContext(){
-	return env->CallBooleanMethod(env,obj,activateAdditionalContextID);
+bool JEGLWindowRenderTarget::deactivate(){
+	return env->CallBooleanMethod(obj,deactivateID);
 }
 
-void EGLWindowRenderTarget::deactivateAdditionalContext(){
-	return env->CallVoidMethod(env,obj,deactivateAdditionalContextID);
+bool JEGLWindowRenderTarget::activateAdditionalContext(){
+	return env->CallBooleanMethod(obj,activateAdditionalContextID);
 }
 
-bool EGLWindowRenderTarget::isPrimary() const{
-	return env->CallBooleanMethod(env,obj,isPrimaryID);
+void JEGLWindowRenderTarget::deactivateAdditionalContext(){
+	return env->CallVoidMethod(obj,deactivateAdditionalContextID);
 }
 
-bool EGLWindowRenderTarget::isValid() const{
-	return env->CallBooleanMethod(env,obj,isValidID);
+bool JEGLWindowRenderTarget::isPrimary() const{
+	return env->CallBooleanMethod(obj,isPrimaryID);
 }
 
-int EGLWindowRenderTarget::getWidth() const{
-	return env->CallIntMethod(env,obj,getWidthID);
+bool JEGLWindowRenderTarget::isValid() const{
+	return env->CallBooleanMethod(obj,isValidID);
 }
 
-int EGLWindowRenderTarget::getHeight() const{
-	return env->CallIntMethod(env,obj,getHeightID);
+int JEGLWindowRenderTarget::getWidth() const{
+	return env->CallIntMethod(obj,getWidthID);
+}
+
+int JEGLWindowRenderTarget::getHeight() const{
+	return env->CallIntMethod(obj,getHeightID);
 }
 
 }

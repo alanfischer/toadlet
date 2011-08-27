@@ -27,6 +27,8 @@
 #include "GLRenderDevice.h"
 #include <toadlet/egg/Error.h>
 
+#if defined(TOADLET_HAS_GLQUERY)
+
 namespace toadlet{
 namespace peeper{
 
@@ -86,3 +88,5 @@ uint64 GLQuery::getResult(){
 
 }
 }
+
+#endif

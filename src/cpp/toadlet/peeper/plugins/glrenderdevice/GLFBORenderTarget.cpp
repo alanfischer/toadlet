@@ -29,6 +29,8 @@
 #include <toadlet/egg/Error.h>
 #include <toadlet/egg/Logger.h>
 
+#if defined(TOADLET_HAS_GLFBOS)
+
 namespace toadlet{
 namespace peeper{
 
@@ -315,3 +317,5 @@ const char *GLFBORenderTarget::getFBOMessage(GLenum status){
 
 }
 }
+
+#endif
