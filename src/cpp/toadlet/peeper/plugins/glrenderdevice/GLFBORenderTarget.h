@@ -30,6 +30,8 @@
 #include "GLFBOPixelBuffer.h"
 #include <toadlet/peeper/PixelBufferRenderTarget.h>
 
+#if defined(TOADLET_HAS_GLFBOS)
+
 namespace toadlet{
 namespace peeper{
 
@@ -87,5 +89,7 @@ protected:
 
 }
 }
+
+#endif
 
 #endif

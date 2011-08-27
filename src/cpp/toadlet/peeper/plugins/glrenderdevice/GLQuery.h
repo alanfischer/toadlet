@@ -29,6 +29,8 @@
 #include "GLIncludes.h"
 #include <toadlet/peeper/Query.h>
 
+#if defined(TOADLET_HAS_GLQUERY)
+
 namespace toadlet{
 namespace peeper{
 
@@ -60,5 +62,7 @@ protected:
 
 }
 }
+
+#endif
 
 #endif

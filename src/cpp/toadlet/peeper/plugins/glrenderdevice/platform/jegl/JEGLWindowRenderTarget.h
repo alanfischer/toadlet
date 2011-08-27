@@ -26,8 +26,7 @@
 #ifndef TOADLET_PEEPER_JEGLWINDOWRENDERTARGET_H
 #define TOADLET_PEEPER_JEGLWINDOWRENDERTARGET_H
 
-#include <toadlet/peeper/GLRenderTarget.h>
-#include <toadlet/peeper/Visual.h>
+#include "../../GLRenderTarget.h"
 #include <jni.h>
 
 namespace toadlet{
@@ -53,8 +52,10 @@ public:
 	int getHeight() const;
 
 protected:
-	JNIEnv *mEnv;
-	jobject mObj;
+	JNIEnv *env;
+	jobject obj;
+	jmethodID swapID,resetID,activateID,deactivateID,activateAdditionalContextID,deactivateAdditionalContextID;
+	jmethodID isPrimaryID,isValidID,getWidthID,getHeightID;
 };
 
 }
