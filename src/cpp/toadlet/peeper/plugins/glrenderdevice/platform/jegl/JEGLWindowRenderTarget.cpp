@@ -23,7 +23,7 @@
  *
  ********** Copyright header - do not remove **********/
 
-#include "JEGLWIndowRenderTarget.h"
+#include "JEGLWindowRenderTarget.h"
 #include <toadlet/egg/Error.h>
 
 namespace toadlet{

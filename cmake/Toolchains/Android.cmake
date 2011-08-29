@@ -2,6 +2,9 @@
 #  Android CMake toolchain file, for use with the ndk r5,r6
 #  See home page: http://code.google.com/p/android-cmake/
 #
+#  Altered for x86 builds by http://lightningtoads.com for use
+#  with the toadlet engine http://code.google.com/p/toadlet
+#
 #  Usage Linux:
 #   $ export ANDROID_NDK=/<absolute path to NDK>
 #   $ cmake -DCMAKE_TOOLCHAIN_FILE=<path to this file>/android.toolchain.cmake ..
@@ -19,6 +22,9 @@
 #   $ SET ANDROID_NDK=C:\<absolute path to NDK>\android-ndk-r6
 #   $ cmake.exe -G"Unix Makefiles" -DCMAKE_TOOLCHAIN_FILE=<path to this file>\android.toolchain.cmake -DCMAKE_MAKE_PROGRAM=C:\<absolute path to make>\make.exe ..
 #   $ C:\<absolute path to make>\make.exe
+#
+#     OR: You may instead use nmake, which is part of visual studio
+#   $ cmake.exe -G"NMake Makefiles" etc.
 #
 #
 #  Toolchain options (can be set as cmake parameters: -D<option_name>=<value>):
@@ -183,6 +189,29 @@ if( EXISTS "${ANDROID_NDK}" )
   message( STATUS "  If you prefer to use a different API level, please define the variable: ANDROID_API_LEVEL" )
  endif()
  
+ # NDK versions less than 9 require the android SDK when building toadlet
+ if( ANDROID_API_LEVEL LESS 9 )
+  if( NOT DEFINED ANDROID_SDK )
+   set( ANDROID_SDK $ENV{ANDROID_SDK} )
+  endif( NOT DEFINED ANDROID_SDK )
+  if( NOT DEFINED ANDROID_SDK )
+   message( FATAL_ERROR "Android NDK API levels < 9 require the ANDROID_SDK variable to be set to your install of the Android SDK" )
+  endif( NOT DEFINED ANDROID_SDK )
+
+  set( ANDROID_SDK_API_LEVEL $ENV{ANDROID_SDK_API_LEVEL} )
+  if( NOT DEFINED ANDROID_SDK_API_LEVEL )
+   set( ANDROID_SDK_API_LEVEL 8)
+   message( STATUS "Using default android SDK API level android-${ANDROID_SDK_API_LEVEL}" )
+   message( STATUS "If you prefer to use a different SDK API level, please define the variable: ANDROID_SDK_API_LEVEL" )
+  endif( NOT DEFINED ANDROID_SDK_API_LEVEL )
+
+  # Find and set the android.jar file for the selected API level
+  if( NOT DEFINED ANDROID_JAR)
+   set( ANDROID_JAR ${ANDROID_SDK}/platforms/android-${ANDROID_SDK_API_LEVEL}/android.jar )
+  endif( NOT DEFINED ANDROID_JAR)
+  message( STATUS "Using android.jar found at ${ANDROID_JAR}")
+ endif( ANDROID_API_LEVEL LESS 9 )
+
  if( ANDROID_API_LEVEL LESS 9 AND ANDROID_ARCH STREQUAL "X86" )
   message( FATAL_ERROR "Android api levels < 9 do not support x86 builds. Please choose a different api level or switch architectures" )
  endif( ANDROID_API_LEVEL LESS 9 AND ANDROID_ARCH STREQUAL "X86" )
