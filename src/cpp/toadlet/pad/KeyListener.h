@@ -23,12 +23,21 @@
  *
  ********** Copyright header - do not remove **********/
 
-package us.toadlet.pad;
+#ifndef TOADLET_PAD_KEYLISTENER_H
+#define TOADLET_PAD_KEYLISTENER_H
 
-public class Version{
-	public static final int MAJOR=0;
-	public static final int MINOR=0;
-	public static final int MICRO=1;
+namespace toadlet{
+namespace pad{
 
-	public static final String STRING=TOADLET_BUILD_VERSION_PAD_MAJOR+"."+TOADLET_BUILD_VERSION_PAD_MINOR+"."+TOADLET_BUILD_VERSION_PAD_MICRO;
+class KeyListener{
+public:
+	virtual ~KeyListener(){}
+
+	virtual void keyPressed(int key)=0;
+	virtual void keyReleased(int key)=0;
 };
+
+}
+}
+
+#endif

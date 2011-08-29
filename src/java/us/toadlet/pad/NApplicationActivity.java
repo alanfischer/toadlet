@@ -25,10 +25,20 @@
 
 package us.toadlet.pad;
 
-public class Version{
-	public static final int MAJOR=0;
-	public static final int MINOR=0;
-	public static final int MICRO=1;
+public class NApplicationActivity implements ApplicationActivity{
+	public native NApplicationActivity();
 
-	public static final String STRING=TOADLET_BUILD_VERSION_PAD_MAJOR+"."+TOADLET_BUILD_VERSION_PAD_MINOR+"."+TOADLET_BUILD_VERSION_PAD_MICRO;
-};
+	public native void resized(int width,int height);
+	public native void focusGained();
+	public native void focusLost();
+	public native void update(int dt);
+	public native void render(RenderDevice renderDevice);
+
+	public native void keyPressed(int key);
+	public native void keyReleased(int key);
+
+	public native void mousePressed(int x,int y,int button);
+	public native void mouseMoved(int x,int y);
+	public native void mouseReleased(int x,int y,int button);
+	public native void mouseScrolled(int x,int y,int scroll);
+}

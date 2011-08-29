@@ -29,14 +29,6 @@
 #include <toadlet/pad/BaseApplication.h>
 #include <ctype.h> // isalpha
 
-using namespace toadlet;
-using namespace toadlet::egg;
-using namespace toadlet::egg::io;
-using namespace toadlet::peeper;
-using namespace toadlet::ribbit;
-using namespace toadlet::flick;
-using namespace toadlet::tadpole;
-
 namespace toadlet{
 namespace pad{
 
@@ -82,7 +74,7 @@ void BaseApplication::mapKeyNames(Map<int,String> &keyToName,Map<String,int> &na
 BaseApplication::BaseApplication():
 	mBackable(false),
 	//mFormat,
-	mListener(NULL),
+	mActivity(NULL),
 
 	//mRenderDevicePlugins,
 	//mCurrentRenderDevicePlugin,
@@ -152,6 +144,10 @@ void BaseApplication::create(String renderDevice,String audioDevice,String motio
 
 	mEngine->installHandlers();
 
+	if(mActivity!=NULL){
+		mActivity->create();
+	}
+
 	activate();
 }
 
@@ -161,6 +157,10 @@ void BaseApplication::destroy(){
 	}
 
 	deactivate();
+
+	if(mActivity!=NULL){
+		mActivity->destroy();
+	}
 
 	destroyRenderDeviceAndContext();
 	destroyAudioDevice();

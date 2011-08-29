@@ -1,17 +1,18 @@
 #include "Particles.h"
 
-Particles::Particles():Application(){
+Particles::Particles(Application *application){
+	app=application;
 }
 
 Particles::~Particles(){
 }
 
 void Particles::create(){
-	Application::create("d3d9");
+	engine=app->getEngine();
 
-	mEngine->setDirectory("../../../data");
+	engine->setDirectory("../../../data");
 
-	scene=Scene::ptr(new Scene(mEngine));
+	scene=Scene::ptr(new Scene(engine));
 
 	scalar ten=Math::ONE*10;
 
@@ -33,43 +34,43 @@ void Particles::create(){
 		Vector3(-ten,-ten,0),
 	};
 
-	Material::ptr pointMaterial=mEngine->getMaterialManager()->createPointSpriteMaterial(mEngine->getTextureManager()->findTexture("sparkle.png"),ten,false);
+	Material::ptr pointMaterial=engine->getMaterialManager()->createPointSpriteMaterial(engine->getTextureManager()->findTexture("sparkle.png"),ten,false);
 	pointMaterial->getPass()->setBlendState(BlendState::Combination_ALPHA_ADDITIVE);
 	pointMaterial->getPass()->setRasterizerState(RasterizerState(RasterizerState::CullType_NONE));
 	pointMaterial->getPass()->setMaterialState(MaterialState(false));
 	pointMaterial->getPass()->setDepthState(DepthState(DepthState::DepthTest_LEQUAL,false));
 
-	Material::ptr spriteMaterial=mEngine->getMaterialManager()->findMaterial("sparkle.png");
+	Material::ptr spriteMaterial=engine->getMaterialManager()->findMaterial("sparkle.png");
 	spriteMaterial->getPass()->setBlendState(BlendState::Combination_ALPHA_ADDITIVE);
 	spriteMaterial->getPass()->setRasterizerState(RasterizerState(RasterizerState::CullType_NONE));
 	spriteMaterial->getPass()->setMaterialState(MaterialState(false));
 	spriteMaterial->getPass()->setDepthState(DepthState(DepthState::DepthTest_LEQUAL,false));
 
-	Material::ptr beamMaterial=mEngine->getMaterialManager()->findMaterial("fancyGlow.png");
+	Material::ptr beamMaterial=engine->getMaterialManager()->findMaterial("fancyGlow.png");
 	beamMaterial->getPass()->setBlendState(BlendState::Combination_ALPHA_ADDITIVE);
 	beamMaterial->getPass()->setRasterizerState(RasterizerState(RasterizerState::CullType_NONE));
 	beamMaterial->getPass()->setMaterialState(MaterialState(false));
 	beamMaterial->getPass()->setDepthState(DepthState(DepthState::DepthTest_LEQUAL,false));
 
-	pointNode=getEngine()->createNodeType(ParticleNode::type(),scene);
+	pointNode=engine->createNodeType(ParticleNode::type(),scene);
 	pointNode->setNumParticles(4,ParticleNode::ParticleType_POINTSPRITE,Math::ONE,pointPositions);
 	pointNode->setMaterial(pointMaterial);
 	pointNode->setTranslate(-Math::fromInt(40),0,0);
 	scene->getRoot()->attach(pointNode);
 
- 	spriteNode=getEngine()->createNodeType(ParticleNode::type(),scene);
+ 	spriteNode=engine->createNodeType(ParticleNode::type(),scene);
 	spriteNode->setNumParticles(4,ParticleNode::ParticleType_SPRITE,Math::ONE,pointPositions);
 	spriteNode->setMaterial(spriteMaterial);
 	spriteNode->setTranslate(0,0,0);
 	scene->getRoot()->attach(spriteNode);
 
- 	beamNode=getEngine()->createNodeType(ParticleNode::type(),scene);
+ 	beamNode=engine->createNodeType(ParticleNode::type(),scene);
 	beamNode->setNumParticles(8,ParticleNode::ParticleType_BEAM,Math::ONE,beamPositions);
 	beamNode->setMaterial(beamMaterial);
 	beamNode->setTranslate(Math::fromInt(40),0,0);
 	scene->getRoot()->attach(beamNode);
 
-	cameraNode=getEngine()->createNodeType(CameraNode::type(),scene);
+	cameraNode=engine->createNodeType(CameraNode::type(),scene);
 	cameraNode->setLookAt(Vector3(0,-Math::fromInt(150),0),Math::ZERO_VECTOR3,Math::Z_UNIT_VECTOR3);
 	cameraNode->setClearColor(Colors::BLACK);
 	scene->getRoot()->attach(cameraNode);
@@ -78,7 +79,7 @@ void Particles::create(){
 void Particles::destroy(){
 	scene->destroy();
 
-	Application::destroy();
+//	Application::destroy();
 }
 
 void Particles::resized(int width,int height){
@@ -127,10 +128,10 @@ void Particles::update(int dt){
 }
 
 void Particles::keyPressed(int key){
-	if(key==Key_ESC){
-		stop();
+	if(key==Application::Key_ESC){
+		app->stop();
 	}
-	else if(key==Key_SPACE){
+	else if(key==Application::Key_SPACE){
 		pointNode->setWorldSpace(true);
 		spriteNode->setWorldSpace(true);
 		spriteNode->setVelocityAligned(true);
@@ -156,8 +157,10 @@ void Particles::addSimulatedParticles(ParticleNode::ptr particles){
 }
 
 int toadletMain(int argc,char **argv){
-	Particles app;
-	app.create();
+	Application app;
+	Particles parts(&app);
+	app.setApplicationActivity(&parts);
+	app.create("d3d10");
 	app.start();
 	app.destroy();
 	return 0;

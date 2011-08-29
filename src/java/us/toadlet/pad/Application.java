@@ -80,7 +80,7 @@ class ApplicationView extends SurfaceView implements SurfaceHolder.Callback{
 	Application mApplication;
 }
 
-public class Application extends Activity implements RenderContext,Runnable{
+public class Application extends Activity implements RenderTarget,Runnable{
     public Application(){
 		super();
 	}
