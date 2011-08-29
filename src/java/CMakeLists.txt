@@ -36,5 +36,6 @@ set (PAD_SRC
 
 add_library (jtoadlet_pad STATIC ${PAD_SRC})
 set_target_properties (jtoadlet_pad PROPERTIES COMPILE_DEFINITIONS_DEBUG TOADLET_DEBUG DEBUG_POSTFIX d)
+add_dependencies (jtoadlet_pad jtoadlet_peeper)
 install (TARGETS jtoadlet_pad DESTINATION lib)
 
