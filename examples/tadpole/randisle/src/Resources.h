@@ -17,7 +17,7 @@ public:
 		fadeColor=Vector4(0xB5C1C3FF);
 
 		Logger::alert("Loading grass");
-/*
+#if 1
 		grass=engine->getMaterialManager()->findMaterial("grass.png");
 		if(grass!=NULL){
 			TextureState textureState;
@@ -29,7 +29,7 @@ public:
 			grass->setLayer(-1);
 			grass->retain();
 		}
-*/
+#else
 		grass=engine->getMaterialManager()->createMaterial();
 		{
 			RenderPath::ptr shaderPath=grass->addPath();
@@ -126,7 +126,7 @@ public:
 			grass->compile();
 			grass->retain();
 		}
-
+#endif
 		Logger::alert("Loading water");
 
 		water=engine->getMaterialManager()->createMaterial();
