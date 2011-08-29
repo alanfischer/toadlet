@@ -53,7 +53,7 @@ GLFBORenderTarget::GLFBORenderTarget(GLRenderDevice *renderDevice):GLRenderTarge
 	mNeedsCompile(false)
 	//mBuffers,
 	//mBufferAttachments,
-	//mDepthBuffer
+	//mOwnedDepthBuffer
 {
 	mDevice=renderDevice;
 }
@@ -80,9 +80,9 @@ void GLFBORenderTarget::destroy(){
 		glBindFramebuffer(GL_FRAMEBUFFER,0);
 	}
  
-	if(mDepthBuffer!=NULL){
-		mDepthBuffer->destroy();
-		mDepthBuffer=NULL;
+	if(mOwnedDepthBuffer!=NULL){
+		mOwnedDepthBuffer->destroy();
+		mOwnedDepthBuffer=NULL;
 	}
 
 	if(mHandle!=0){
@@ -224,6 +224,12 @@ bool GLFBORenderTarget::compile(){
 	PixelBuffer::ptr depth;
 	PixelBuffer::ptr color;
 
+	if(mOwnedDepthBuffer!=NULL){
+		remove(mOwnedDepthBuffer);
+		mOwnedDepthBuffer->destroy();
+		mOwnedDepthBuffer=NULL;
+	}
+
 	int i;
 	for(i=0;i<mBufferAttachments.size();++i){
 		if(mBufferAttachments[i]==Attachment_DEPTH_STENCIL){
@@ -234,19 +240,13 @@ bool GLFBORenderTarget::compile(){
 		}
 	}
 
-	if(mDepthBuffer!=NULL){
-		remove(mDepthBuffer);
-		mDepthBuffer->destroy();
-		mDepthBuffer=NULL;
-	}
-
 	glBindFramebuffer(GL_FRAMEBUFFER,mHandle);
 	if(color!=NULL && depth==NULL){
 		// No Depth-Stencil buffer, so add one
 		GLFBOPixelBuffer::ptr buffer(new GLFBOPixelBuffer(this));
 		if(buffer->create(Buffer::Usage_BIT_STREAM,Buffer::Access_NONE,TextureFormat::ptr(new TextureFormat(TextureFormat::Dimension_D2,TextureFormat::Format_DEPTH_24,mWidth,mHeight,1)))){
 			attach(buffer,Attachment_DEPTH_STENCIL);
-			mDepthBuffer=buffer;
+			mOwnedDepthBuffer=buffer;
 		}
 	}
 	else if(color==NULL && depth!=NULL){

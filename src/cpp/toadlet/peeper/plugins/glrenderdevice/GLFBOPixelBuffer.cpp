@@ -59,6 +59,7 @@ bool GLFBOPixelBuffer::create(int usage,int access,TextureFormat::ptr format){
 
 	glGenRenderbuffers(1,&mHandle);
 	glBindRenderbuffer(GL_RENDERBUFFER,mHandle);
+Logger::alert("GENNING RENDERBUFFER");
 	glRenderbufferStorage(GL_RENDERBUFFER,GLRenderDevice::getGLFormat(format->pixelFormat,true),format->width,format->height);
 
 	TOADLET_CHECK_GLERROR("GLFBOPixelBuffer::create");
