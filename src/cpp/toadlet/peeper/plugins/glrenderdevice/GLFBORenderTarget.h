@@ -84,7 +84,7 @@ protected:
 	bool mNeedsCompile;
 	Collection<PixelBuffer::ptr> mBuffers;
 	Collection<Attachment> mBufferAttachments;
-	PixelBuffer::ptr mDepthBuffer;
+	PixelBuffer::ptr mOwnedDepthBuffer;
 };
 
 }

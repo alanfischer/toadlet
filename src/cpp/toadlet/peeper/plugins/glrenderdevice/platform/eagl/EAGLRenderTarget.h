@@ -63,6 +63,7 @@ protected:
 	CAEAGLLayer *mDrawable;
 	EAGLContext *mContext;
 	GLuint mRenderBufferHandle;
+	GLFBOPixelBuffer::ptr mDepthBuffer;
 };
 
 }
