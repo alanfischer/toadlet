@@ -2128,7 +2128,11 @@ GLuint GLRenderDevice::getGLFormat(int textureFormat,bool internal){
 					}
 				#endif
 				else{
-					return GL_DEPTH_COMPONENT;
+					#if defined(GL_DEPTH_COMPOMENT)
+						return GL_DEPTH_COMPONENT;
+					#else
+						return GL_DEPTH_COMPONENT16;
+					#endif
 				}
 		#endif
 	}

@@ -421,9 +421,9 @@
 				GCC_VERSION = com.apple.compilers.llvmgcc42;
 				GCC_WARN_ABOUT_RETURN_TYPE = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
-				HEADER_SEARCH_PATHS = "~/iphone/include";
+				HEADER_SEARCH_PATHS = "~/ios/include";
 				IPHONEOS_DEPLOYMENT_TARGET = 3.0;
-				LIBRARY_SEARCH_PATHS = "~/iphone/lib";
+				LIBRARY_SEARCH_PATHS = "~/ios/lib";
 				OTHER_CFLAGS = "-DTOADLET_DEBUG";
 				OTHER_LDFLAGS = (
 					"-ltoadlet_flick_iosmotiondevice_sd",
@@ -454,9 +454,9 @@
 				GCC_VERSION = com.apple.compilers.llvmgcc42;
 				GCC_WARN_ABOUT_RETURN_TYPE = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
-				HEADER_SEARCH_PATHS = "~/iphone/include";
+				HEADER_SEARCH_PATHS = "~/ios/include";
 				IPHONEOS_DEPLOYMENT_TARGET = 3.0;
-				LIBRARY_SEARCH_PATHS = "~/iphone/lib";
+				LIBRARY_SEARCH_PATHS = "~/ios/lib";
 				OTHER_LDFLAGS = (
 					"-ltoadlet_flick_iosmotiondevice_s",
 					"-ltoadlet_pad_s",
