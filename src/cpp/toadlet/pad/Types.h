@@ -23,32 +23,21 @@
  *
  ********** Copyright header - do not remove **********/
 
-#ifndef TOADLET_PAD_APPLICATIONLISTENER_H
-#define TOADLET_PAD_APPLICATIONLISTENER_H
+#ifndef TOADLET_PAD_TYPES_H
+#define TOADLET_PAD_TYPES_H
+
+#include <toadlet/peeper/Types.h>
+#include <toadlet/ribbit/Types.h>
+#include <toadlet/flick/Types.h>
+#include <toadlet/tadpole/Types.h>
 
 namespace toadlet{
-namespace peeper{class RenderDevice;}
 namespace pad{
 
-class ApplicationListener{
-public:
-	virtual ~ApplicationListener(){}
-
-	virtual void resized(int width,int height)=0;
-	virtual void focusGained()=0;
-	virtual void focusLost()=0;
-	virtual void keyPressed(int key)=0;
-	virtual void keyReleased(int key)=0;
-	virtual void mousePressed(int x,int y,int button)=0;
-	virtual void mouseMoved(int x,int y)=0;
-	virtual void mouseReleased(int x,int y,int button)=0;
-	virtual void mouseScrolled(int x,int y,int scroll)=0;
-	virtual void joyPressed(int button)=0;
-	virtual void joyMoved(scalar x,scalar y,scalar z,scalar r,scalar u,scalar v)=0;
-	virtual void joyReleased(int button)=0;
-	virtual void update(int dt)=0;
-	virtual void render(peeper::RenderDevice *renderDevice)=0;
-};
+using namespace toadlet::peeper;
+using namespace toadlet::ribbit;
+using namespace toadlet::flick;
+using namespace toadlet::tadpole;
 
 }
 }

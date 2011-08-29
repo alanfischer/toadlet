@@ -111,8 +111,8 @@ INT WINAPI WinMain(HINSTANCE hInst,HINSTANCE,LPSTR szCmd,INT cmdShow){
 void ANativeActivity_onCreate(ANativeActivity *activity,void *savedState,size_t savedStateSize){
 	toadletMain(activity,savedState,savedStateSize);
 }
-#else
+#endif
+
 int main(int argc,char **argv){
 	return toadletMain(argc,argv);
 }
-#endif

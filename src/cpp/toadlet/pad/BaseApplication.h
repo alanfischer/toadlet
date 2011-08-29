@@ -35,15 +35,13 @@
 #include <toadlet/ribbit/AudioDevice.h>
 #include <toadlet/flick/MotionDevice.h>
 #include <toadlet/tadpole/Engine.h>
-#include <toadlet/pad/ApplicationListener.h>
-//#include <cctype>
+#include <toadlet/pad/Types.h>
+#include <toadlet/pad/ApplicationActivity.h>
 
 namespace toadlet{
 namespace pad{
 
-class ApplicationListener;
-
-class TOADLET_API BaseApplication:public peeper::RenderTarget{
+class TOADLET_API BaseApplication:public RenderTarget{
 public:
 	TOADLET_SHARED_POINTERS(BaseApplication);
 
@@ -74,12 +72,12 @@ public:
 		Key_BACK,
 	};
 
-	static void mapKeyNames(egg::Map<int,egg::String> &keyToName,egg::Map<egg::String,int> &nameToKey);
+	static void mapKeyNames(Map<int,String> &keyToName,Map<String,int> &nameToKey);
 
 	BaseApplication();
 	virtual ~BaseApplication(){}
 
-	virtual void create(egg::String renderDevice,egg::String audioDevice,egg::String motionDevice);
+	virtual void create(String renderDevice,String audioDevice,String motionDevice);
 	virtual void destroy();
 
 	virtual void start()=0;
@@ -94,8 +92,8 @@ public:
 	virtual void deactivate()=0;
 	virtual bool active() const=0;
 
-	virtual void setTitle(const egg::String &title)=0;
-	virtual const egg::String &getTitle() const=0;
+	virtual void setTitle(const String &title)=0;
+	virtual const String &getTitle() const=0;
 
 	virtual void setPosition(int x,int y)=0;
 	virtual int getPositionX() const=0;
@@ -114,46 +112,49 @@ public:
 	virtual void setDifferenceMouse(bool difference)=0;
 	virtual bool getDifferenceMouse() const=0;
 
-	virtual peeper::RenderTarget *getRootRenderTarget(){return mRenderTarget;}
+	virtual RenderTarget *getRootRenderTarget(){return mRenderTarget;}
 	virtual bool isPrimary() const{return mRenderTarget->isPrimary();}
 	virtual bool isValid() const{return mRenderTarget->isValid();}
 
-	virtual void setWindowRenderTargetFormat(const peeper::WindowRenderTargetFormat::ptr format){mFormat=format;}
-	virtual peeper::WindowRenderTargetFormat::ptr getWindowRenderTargetFormat() const{return mFormat;}
+	virtual void setWindowRenderTargetFormat(const WindowRenderTargetFormat::ptr format){mFormat=format;}
+	virtual WindowRenderTargetFormat::ptr getWindowRenderTargetFormat() const{return mFormat;}
 
-	virtual void setApplicationListener(ApplicationListener *listener){mListener=listener;}
-	virtual ApplicationListener *getApplicationListener() const{return mListener;}
+	virtual void setApplicationActivity(ApplicationActivity *activity){mActivity=activity;}
+	virtual ApplicationActivity *getApplicationActivity() const{return mActivity;}
 
-	virtual void changeRenderDevicePlugin(const egg::String &plugin)=0;
+	virtual void changeRenderDevicePlugin(const String &plugin)=0;
 	virtual void setRenderDeviceOptions(int *options,int length);
 	virtual void setAudioDeviceOptions(int *options,int length);
 
-	virtual void resized(int width,int height)		{if(mListener!=NULL){mListener->resized(width,height);}}
-	virtual void focusGained()						{if(mListener!=NULL){mListener->focusGained();}}
-	virtual void focusLost()						{if(mListener!=NULL){mListener->focusLost();}}
-	virtual void keyPressed(int key)				{if(mListener!=NULL){mListener->keyPressed(key);}}
-	virtual void keyReleased(int key)				{if(mListener!=NULL){mListener->keyReleased(key);}}
-	virtual void mousePressed(int x,int y,int button){if(mListener!=NULL){mListener->mousePressed(x,y,button);}}
-	virtual void mouseMoved(int x,int y)			{if(mListener!=NULL){mListener->mouseMoved(x,y);}}
-	virtual void mouseReleased(int x,int y,int button){if(mListener!=NULL){mListener->mouseReleased(x,y,button);}}
-	virtual void mouseScrolled(int x,int y,int scroll){if(mListener!=NULL){mListener->mouseScrolled(x,y,scroll);}}
-	virtual void joyPressed(int button)				{if(mListener!=NULL){mListener->joyPressed(button);}}
-	virtual void joyMoved(scalar x,scalar y,scalar z,scalar r,scalar u,scalar v){if(mListener!=NULL){mListener->joyMoved(x,y,z,r,u,v);}}
-	virtual void joyReleased(int button)			{if(mListener!=NULL){mListener->joyReleased(button);}}
-	virtual void update(int dt)						{if(mListener!=NULL){mListener->update(dt);}}
-	virtual void render(peeper::RenderDevice *renderDevice)	{if(mListener!=NULL){mListener->render(renderDevice);}}
+	virtual void resized(int width,int height)		{if(mActivity!=NULL){mActivity->resized(width,height);}}
+	virtual void focusGained()						{if(mActivity!=NULL){mActivity->focusGained();}}
+	virtual void focusLost()						{if(mActivity!=NULL){mActivity->focusLost();}}
+	virtual void update(int dt)						{if(mActivity!=NULL){mActivity->update(dt);}}
+	virtual void render(RenderDevice *renderDevice)	{if(mActivity!=NULL){mActivity->render(renderDevice);}}
 
-	virtual tadpole::Engine *getEngine() const{return mEngine;}
-	virtual peeper::RenderDevice *getRenderDevice() const{return mRenderDevice;}
-	virtual ribbit::AudioDevice *getAudioDevice() const{return mAudioDevice;}
-	virtual flick::MotionDevice *getMotionDevice() const{return mMotionDevice;}
+	virtual void keyPressed(int key)				{if(mActivity!=NULL){mActivity->keyPressed(key);}}
+	virtual void keyReleased(int key)				{if(mActivity!=NULL){mActivity->keyReleased(key);}}
 
-	virtual egg::String getKeyName(int key){egg::Map<int,egg::String>::iterator it=mKeyToName.find(key);return it!=mKeyToName.end()?it->second:(char*)NULL;}
-	virtual int getKeyValue(const egg::String &name){egg::Map<egg::String,int>::iterator it=mNameToKey.find(name);return it!=mNameToKey.end()?it->second:0;}
+	virtual void mousePressed(int x,int y,int button){if(mActivity!=NULL){mActivity->mousePressed(x,y,button);}}
+	virtual void mouseMoved(int x,int y)			{if(mActivity!=NULL){mActivity->mouseMoved(x,y);}}
+	virtual void mouseReleased(int x,int y,int button){if(mActivity!=NULL){mActivity->mouseReleased(x,y,button);}}
+	virtual void mouseScrolled(int x,int y,int scroll){if(mActivity!=NULL){mActivity->mouseScrolled(x,y,scroll);}}
+
+	virtual void joyPressed(int button)				{if(mActivity!=NULL){mActivity->joyPressed(button);}}
+	virtual void joyMoved(scalar x,scalar y,scalar z,scalar r,scalar u,scalar v){if(mActivity!=NULL){mActivity->joyMoved(x,y,z,r,u,v);}}
+	virtual void joyReleased(int button)			{if(mActivity!=NULL){mActivity->joyReleased(button);}}
+
+	virtual Engine *getEngine() const{return mEngine;}
+	virtual RenderDevice *getRenderDevice() const{return mRenderDevice;}
+	virtual AudioDevice *getAudioDevice() const{return mAudioDevice;}
+	virtual MotionDevice *getMotionDevice() const{return mMotionDevice;}
+
+	virtual String getKeyName(int key){Map<int,String>::iterator it=mKeyToName.find(key);return it!=mKeyToName.end()?it->second:(char*)NULL;}
+	virtual int getKeyValue(const String &name){Map<String,int>::iterator it=mNameToKey.find(name);return it!=mNameToKey.end()?it->second:0;}
 
 	virtual void setBackable(bool backable){
 		if(mEngine!=NULL){
-			egg::Error::unknown(egg::Categories::TOADLET_PAD,"can not change backable once engine is created");
+			Error::unknown(Categories::TOADLET_PAD,"can not change backable once engine is created");
 			return;
 		}
 
@@ -167,68 +168,68 @@ protected:
 	class RenderDevicePlugin{
 	public:
 		RenderDevicePlugin(
-			peeper::RenderTarget *(*renderTarget)(void *,peeper::WindowRenderTargetFormat *)=NULL,
-			peeper::RenderDevice *(*renderDevice)()=NULL
+			RenderTarget *(*renderTarget)(void *,WindowRenderTargetFormat *)=NULL,
+			RenderDevice *(*renderDevice)()=NULL
 		):createRenderTarget(renderTarget),createRenderDevice(renderDevice){}
 
-		peeper::RenderTarget *(*createRenderTarget)(void *,peeper::WindowRenderTargetFormat *);
-		peeper::RenderDevice *(*createRenderDevice)();
+		RenderTarget *(*createRenderTarget)(void *,WindowRenderTargetFormat *);
+		RenderDevice *(*createRenderDevice)();
 	};
 
 	class AudioDevicePlugin{
 	public:
 		AudioDevicePlugin(
-			ribbit::AudioDevice *(*audioDevice)()=NULL
+			AudioDevice *(*audioDevice)()=NULL
 		):createAudioDevice(audioDevice){}
 
-		ribbit::AudioDevice *(*createAudioDevice)();
+		AudioDevice *(*createAudioDevice)();
 	};
 
 	class MotionDevicePlugin{
 	public:
 		MotionDevicePlugin(
-			flick::MotionDevice *(*motionDevice)()=NULL
+			MotionDevice *(*motionDevice)()=NULL
 		):createMotionDevice(motionDevice){}
 
-		flick::MotionDevice *(*createMotionDevice)();
+		MotionDevice *(*createMotionDevice)();
 	};
 
-	virtual peeper::RenderTarget *makeRenderTarget(const egg::String &plugin);
-	virtual peeper::RenderDevice *makeRenderDevice(const egg::String &plugin);
-	virtual bool createContextAndRenderDevice(const egg::String &plugin);
+	virtual RenderTarget *makeRenderTarget(const String &plugin);
+	virtual RenderDevice *makeRenderDevice(const String &plugin);
+	virtual bool createContextAndRenderDevice(const String &plugin);
 	virtual bool destroyRenderDeviceAndContext();
 
-	virtual ribbit::AudioDevice *makeAudioDevice(const egg::String &plugin);
-	virtual bool createAudioDevice(const egg::String &plugin);
+	virtual AudioDevice *makeAudioDevice(const String &plugin);
+	virtual bool createAudioDevice(const String &plugin);
 	virtual bool destroyAudioDevice();
 
-	virtual flick::MotionDevice *makeMotionDevice(const egg::String &plugin);
-	virtual bool createMotionDevice(const egg::String &plugin);
+	virtual MotionDevice *makeMotionDevice(const String &plugin);
+	virtual bool createMotionDevice(const String &plugin);
 	virtual bool destroyMotionDevice();
 
 	bool mBackable;
-	peeper::WindowRenderTargetFormat::ptr mFormat;
-	ApplicationListener *mListener;
+	WindowRenderTargetFormat::ptr mFormat;
+	ApplicationActivity *mActivity;
 
-	egg::Map<egg::String,RenderDevicePlugin> mRenderDevicePlugins;
-	egg::Collection<egg::String> mRenderDevicePreferences;
-	egg::String mCurrentRenderDevicePlugin;
-	egg::String mNewRenderDevicePlugin;
+	Map<String,RenderDevicePlugin> mRenderDevicePlugins;
+	Collection<String> mRenderDevicePreferences;
+	String mCurrentRenderDevicePlugin;
+	String mNewRenderDevicePlugin;
 	int *mRenderDeviceOptions;
-	egg::Map<egg::String,AudioDevicePlugin> mAudioDevicePlugins;
-	egg::Collection<egg::String> mAudioDevicePreferences;
+	Map<String,AudioDevicePlugin> mAudioDevicePlugins;
+	Collection<String> mAudioDevicePreferences;
 	int *mAudioDeviceOptions;
-	egg::Map<egg::String,MotionDevicePlugin> mMotionDevicePlugins;
-	egg::Collection<egg::String> mMotionDevicePreferences;
+	Map<String,MotionDevicePlugin> mMotionDevicePlugins;
+	Collection<String> mMotionDevicePreferences;
 
-	egg::Map<egg::String,int> mNameToKey;
-	egg::Map<int,egg::String> mKeyToName;
+	Map<String,int> mNameToKey;
+	Map<int,String> mKeyToName;
 
-	tadpole::Engine *mEngine;
-	peeper::RenderTarget *mRenderTarget;
-	peeper::RenderDevice *mRenderDevice;
-	ribbit::AudioDevice *mAudioDevice;
-	flick::MotionDevice *mMotionDevice;
+	Engine *mEngine;
+	RenderTarget *mRenderTarget;
+	RenderDevice *mRenderDevice;
+	AudioDevice *mAudioDevice;
+	MotionDevice *mMotionDevice;
 };
 
 }
