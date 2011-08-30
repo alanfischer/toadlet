@@ -8,18 +8,19 @@ set (JAVA_OBJ_DIR ${CMAKE_CURRENT_BINARY_DIR}/objects)
 execute_process(COMMAND ${CMAKE_COMMAND} -E make_directory ${JAVA_OBJ_DIR})
 
 # Special setup for java cmake compiling
-if (WIN32)
+# Somewhat ugly since cmake wants to use posix path separators due to the android ndk toolchain
+if (${NDKSYSTEM} STREQUAL "windows")
 	set (CMAKE_Java_COMPILE_OBJECT
 		"<CMAKE_Java_COMPILER> -Xlint:unchecked -classpath ${ANDROID_JAR}\;${JAVA_OBJ_DIR} <SOURCE> -d ${JAVA_OBJ_DIR}"
 	)
-else (WIN32)
+else (${NDKSYSTEM} STREQUAL "windows")
 	set (CMAKE_Java_COMPILE_OBJECT
 		"<CMAKE_Java_COMPILER> -Xlint:unchecked -classpath \"${ANDROID_JAR}:${JAVA_OBJ_DIR}\" <SOURCE> -d ${JAVA_OBJ_DIR}"
 	)
-endif (WIN32)
-set (CMAKE_Java_CREATE_STATIC_LIBRARY
-        "<CMAKE_Java_ARCHIVE> -cf <TARGET> -C <OBJECT_DIR> ."
-)
+endif (${NDKSYSTEM} STREQUAL "windows")
+#set (CMAKE_Java_CREATE_STATIC_LIBRARY
+#        "<CMAKE_Java_ARCHIVE> -cf <TARGET> -C <OBJECT_DIR> ."
+#)
 
 
 # toadlet_peeper
@@ -34,7 +35,6 @@ set (PEEPER_SRC
 )
 
 add_library (jtoadlet_peeper STATIC ${PEEPER_SRC})
-#set_target_properties (jtoadlet_peeper PROPERTIES COMPILE_FLAGS "-d \"${CMAKE_CURRENT_BINARY_DIR}/CMakeFiles/jtoadlet_peeper.dir\"")
 set_target_properties (jtoadlet_peeper PROPERTIES COMPILE_DEFINITIONS_DEBUG TOADLET_DEBUG DEBUG_POSTFIX d)
 install (TARGETS jtoadlet_peeper DESTINATION lib)
 
@@ -49,7 +49,6 @@ set (PAD_SRC
 )
 
 add_library (jtoadlet_pad STATIC ${PAD_SRC})
-#set_target_properties (jtoadlet_pad PROPERTIES COMPILE_FLAGS "-d \"${CMAKE_CURRENT_BINARY_DIR}/CMakeFiles/jtoadlet_pad.dir\"")
 set_target_properties (jtoadlet_pad PROPERTIES COMPILE_DEFINITIONS_DEBUG TOADLET_DEBUG DEBUG_POSTFIX d)
 add_dependencies (jtoadlet_pad jtoadlet_peeper)
 install (TARGETS jtoadlet_pad DESTINATION lib)
