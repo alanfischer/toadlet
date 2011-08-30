@@ -5,8 +5,13 @@ enable_language (Java OPTIONAL)
 # Java is fussy about pathing, so do all cmake work here instead of in subdirectories.
 set (JAVA_SRC_DIR us/toadlet)
 
-# This causes cmake to bring in the android.jar file 
-include_directories(${ANDROID_JAR})
+#Special setup for java cmake compiling
+set (CMAKE_Java_COMPILE_OBJECT
+        "<CMAKE_Java_COMPILER> -Xlint:unchecked -classpath ${ANDROID_JAR} <SOURCE>"
+)
+set (CMAKE_Java_CREATE_STATIC_LIBRARY
+        "<CMAKE_Java_ARCHIVE> -cf <TARGET> -C <OBJECT_DIR> ."
+)
 
 
 # toadlet_peeper
