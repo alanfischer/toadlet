@@ -9,7 +9,7 @@ set (JAVA_SRC_DIR us/toadlet)
 include_directories(${ANDROID_JAR})
 
 
-# Source files
+# toadlet_peeper
 set (PEEPER_SRC
 	${JAVA_SRC_DIR}/peeper/EGLRenderTarget.java
 	${JAVA_SRC_DIR}/peeper/EGLWindowRenderTarget.java
@@ -23,14 +23,10 @@ install (TARGETS jtoadlet_peeper DESTINATION lib)
 
 
 # toadlet_pad
-
-# Configure
-configure_file (${JAVA_SRC_DIR}/pad/Version.h.cmake ${CMAKE_CURRENT_BINARY_DIR}/${JAVA_SRC_DIR}/pad/Version.h)
-
-# Source files
 set (PAD_SRC
+	${JAVA_SRC_DIR}/pad/ApplicationActivity.java
 	${JAVA_SRC_DIR}/pad/Application.java
-	${JAVA_SRC_DIR}/pad/ApplicationListener.java
+	${JAVA_SRC_DIR}/pad/NApplicationActivity.java
 	${JAVA_SRC_DIR}/pad/Version.java
 )
 
