@@ -197,6 +197,7 @@ if( EXISTS "${ANDROID_NDK}" )
   if( NOT DEFINED ANDROID_SDK )
    message( FATAL_ERROR "Android NDK API levels < 9 require the ANDROID_SDK variable to be set to your install of the Android SDK" )
   endif( NOT DEFINED ANDROID_SDK )
+  set( ANDROID_SDK "${ANDROID_SDK}" CACHE PATH "root of the android sdk" FORCE )
 
   set( ANDROID_SDK_API_LEVEL $ENV{ANDROID_SDK_API_LEVEL} )
   if( NOT DEFINED ANDROID_SDK_API_LEVEL )
@@ -207,9 +208,9 @@ if( EXISTS "${ANDROID_NDK}" )
 
   # Find and set the android.jar file for the selected API level
   if( NOT DEFINED ANDROID_JAR)
-   set( ANDROID_JAR ${ANDROID_SDK}/platforms/android-${ANDROID_SDK_API_LEVEL}/android.jar )
+   set(ANDROID_JAR ${ANDROID_SDK}/platforms/android-${ANDROID_SDK_API_LEVEL}/android.jar)
+   message( STATUS "Using android.jar found at ${ANDROID_JAR}")
   endif( NOT DEFINED ANDROID_JAR)
-  message( STATUS "Using android.jar found at ${ANDROID_JAR}")
  endif( ANDROID_API_LEVEL LESS 9 )
 
  if( ANDROID_API_LEVEL LESS 9 AND ANDROID_ARCH STREQUAL "X86" )
