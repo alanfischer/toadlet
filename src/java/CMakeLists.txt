@@ -8,9 +8,15 @@ set (JAVA_OBJ_DIR ${CMAKE_CURRENT_BINARY_DIR}/objects)
 execute_process(COMMAND ${CMAKE_COMMAND} -E make_directory ${JAVA_OBJ_DIR})
 
 # Special setup for java cmake compiling
-set (CMAKE_Java_COMPILE_OBJECT
-        "<CMAKE_Java_COMPILER> -Xlint:unchecked -classpath ${ANDROID_JAR}\;${JAVA_OBJ_DIR} <SOURCE> -d ${JAVA_OBJ_DIR}"
-)
+if (WIN32)
+	set (CMAKE_Java_COMPILE_OBJECT
+		"<CMAKE_Java_COMPILER> -Xlint:unchecked -classpath ${ANDROID_JAR}\;${JAVA_OBJ_DIR} <SOURCE> -d ${JAVA_OBJ_DIR}"
+	)
+else (WIN32)
+	set (CMAKE_Java_COMPILE_OBJECT
+		"<CMAKE_Java_COMPILER> -Xlint:unchecked -classpath \"${ANDROID_JAR}:${JAVA_OBJ_DIR}\" <SOURCE> -d ${JAVA_OBJ_DIR}"
+	)
+endif (WIN32)
 set (CMAKE_Java_CREATE_STATIC_LIBRARY
         "<CMAKE_Java_ARCHIVE> -cf <TARGET> -C <OBJECT_DIR> ."
 )
