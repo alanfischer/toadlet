@@ -34,8 +34,16 @@
 #    ANDROID_NDK_TOOLCHAIN_ROOT=/opt/android-toolchain - path to standalone toolchain.
 #      Option is not used if full NDK is found. Can be set as environment variable.
 #
-#    ANDROID_API_LEVEL=android-8 - level of android API to use.
+#    ANDROID_NDK_API_LEVEL=android-8 - level of android NDK API to use.
 #      Option is ignored when build uses stanalone toolchain.
+#
+#    ANDROID_SDK=no default - path to SDK root. Required for toadlet builds with ANDROID_NDK_API_LEVEL<9
+#      Can be set as environment variable.
+#
+#    ANDROID_SDK_API_LEVEL=8 - level of android SDK API to use. 
+#
+#    ANDROID_ARCH=ARM - target architecture for the android build, may be either ARM or X86. 
+#      The X86 architecture is only available with the ANDROID_NDK_API_LEVEL>=9
 #
 #    ARM_TARGET=armeabi-v7a - type of floating point support.
 #      Other possible values are: "armeabi", "armeabi-v7a with NEON", "armeabi-v7a with VFPV3"
@@ -87,11 +95,11 @@
 #     [~] ARM_TARGETS renamed to ARM_TARGET
 #   - modified April 2011 Andrey Kamaev andrey.kamaev@itseez.com
 #     [+] EXECUTABLE_OUTPUT_PATH is set by toolchain (required on Windows)
-#     [~] Fixed bug with ANDROID_API_LEVEL variable
+#     [~] Fixed bug with ANDROID_NDK_API_LEVEL variable
 #     [~] turn off SWIG search if it is not found first time
 #   - modified May 2011 Andrey Kamaev andrey.kamaev@itseez.com
-#     [~] ANDROID_LEVEL is renamed to ANDROID_API_LEVEL
-#     [+] ANDROID_API_LEVEL is detected by toolchain if not specified
+#     [~] ANDROID_LEVEL is renamed to ANDROID_NDK_API_LEVEL
+#     [+] ANDROID_NDK_API_LEVEL is detected by toolchain if not specified
 #     [~] added guard to prevent changing of output directories on first cmake pass
 #     [~] toolchain exits with error if ARM_TARGET is not recognized
 #   - modified June 2011 Andrey Kamaev andrey.kamaev@itseez.com
@@ -133,7 +141,7 @@ macro( __TOOLCHAIN_DETECT_API_LEVEL _path )
    message( FATAL_ERROR "Specified Android API level does not match level found. Probably your copy of NDK/toolchain is broken." )
   endif()
  endif()
- set( ANDROID_API_LEVEL ${ANDROID_LEVEL_FOUND} CACHE STRING "android API level" FORCE )
+ set( ANDROID_NDK_API_LEVEL ${ANDROID_LEVEL_FOUND} CACHE STRING "android API level" FORCE )
 endmacro()
 
 if( NOT DEFINED ANDROID_NDK )
@@ -175,22 +183,22 @@ if( EXISTS "${ANDROID_NDK}" )
   find_program( CMAKE_INSTALL_NAME_TOOL install_name_tool)
  endif( NOT DEFINED CMAKE_INSTALL_NAME_TOOL)
 
- set( ANDROID_API_LEVEL $ENV{ANDROID_API_LEVEL} )
- string( REGEX REPLACE "[\t ]*android-([0-9]+)[\t ]*" "\\1" ANDROID_API_LEVEL "${ANDROID_API_LEVEL}" )
- string( REGEX REPLACE "[\t ]*([0-9]+)[\t ]*" "\\1" ANDROID_API_LEVEL "${ANDROID_API_LEVEL}" )
+ set( ANDROID_NDK_API_LEVEL $ENV{ANDROID_NDK_API_LEVEL} )
+ string( REGEX REPLACE "[\t ]*android-([0-9]+)[\t ]*" "\\1" ANDROID_NDK_API_LEVEL "${ANDROID_NDK_API_LEVEL}" )
+ string( REGEX REPLACE "[\t ]*([0-9]+)[\t ]*" "\\1" ANDROID_NDK_API_LEVEL "${ANDROID_NDK_API_LEVEL}" )
 
  set( PossibleAndroidLevels "3;4;5;8;9" )
- set( ANDROID_API_LEVEL ${ANDROID_API_LEVEL} CACHE STRING "android API level" )
- set_property( CACHE ANDROID_API_LEVEL PROPERTY STRINGS ${PossibleAndroidLevels} )
+ set( ANDROID_NDK_API_LEVEL ${ANDROID_NDK_API_LEVEL} CACHE STRING "android API level" )
+ set_property( CACHE ANDROID_NDK_API_LEVEL PROPERTY STRINGS ${PossibleAndroidLevels} )
  
- if( NOT ANDROID_API_LEVEL GREATER 2 )
-  set( ANDROID_API_LEVEL 9)
-  message( STATUS "Using default android API level android-${ANDROID_API_LEVEL}" )
-  message( STATUS "  If you prefer to use a different API level, please define the variable: ANDROID_API_LEVEL" )
+ if( NOT ANDROID_NDK_API_LEVEL GREATER 2 )
+  set( ANDROID_NDK_API_LEVEL 9)
+  message( STATUS "Using default android API level android-${ANDROID_NDK_API_LEVEL}" )
+  message( STATUS "  If you prefer to use a different API level, please define the variable: ANDROID_NDK_API_LEVEL" )
  endif()
  
  # NDK versions less than 9 require the android SDK when building toadlet
- if( ANDROID_API_LEVEL LESS 9 )
+ if( ANDROID_NDK_API_LEVEL LESS 9 )
   if( NOT DEFINED ANDROID_SDK )
    set( ANDROID_SDK $ENV{ANDROID_SDK} )
   endif( NOT DEFINED ANDROID_SDK )
@@ -211,11 +219,11 @@ if( EXISTS "${ANDROID_NDK}" )
    set(ANDROID_JAR ${ANDROID_SDK}/platforms/android-${ANDROID_SDK_API_LEVEL}/android.jar)
    message( STATUS "Using android.jar found at ${ANDROID_JAR}")
   endif( NOT DEFINED ANDROID_JAR)
- endif( ANDROID_API_LEVEL LESS 9 )
+ endif( ANDROID_NDK_API_LEVEL LESS 9 )
 
- if( ANDROID_API_LEVEL LESS 9 AND ANDROID_ARCH STREQUAL "X86" )
+ if( ANDROID_NDK_API_LEVEL LESS 9 AND ANDROID_ARCH STREQUAL "X86" )
   message( FATAL_ERROR "Android api levels < 9 do not support x86 builds. Please choose a different api level or switch architectures" )
- endif( ANDROID_API_LEVEL LESS 9 AND ANDROID_ARCH STREQUAL "X86" )
+ endif( ANDROID_NDK_API_LEVEL LESS 9 AND ANDROID_ARCH STREQUAL "X86" )
  
  if( NOT ANDROID_ARCH )
   set( ANDROID_ARCH "ARM" )
@@ -234,9 +242,9 @@ if( EXISTS "${ANDROID_NDK}" )
  endif( ANDROID_ARCH STREQUAL "X86" )
  
  set( ANDROID_NDK_TOOLCHAIN_ROOT "${ANDROID_NDK}/toolchains/${ANDROID_NDK_TOOLCHAIN_ARCH}-4.4.3/prebuilt/${NDKSYSTEM}" )
- set( ANDROID_NDK_SYSROOT "${ANDROID_NDK}/platforms/android-${ANDROID_API_LEVEL}/${ANDROID_NDK_SYSROOT_ARCH}" )
+ set( ANDROID_NDK_SYSROOT "${ANDROID_NDK}/platforms/android-${ANDROID_NDK_API_LEVEL}/${ANDROID_NDK_SYSROOT_ARCH}" )
 
- __TOOLCHAIN_DETECT_API_LEVEL( "${ANDROID_NDK_SYSROOT}/usr/include/android/api-level.h" ${ANDROID_API_LEVEL} )
+ __TOOLCHAIN_DETECT_API_LEVEL( "${ANDROID_NDK_SYSROOT}/usr/include/android/api-level.h" ${ANDROID_NDK_API_LEVEL} )
  
  #message( STATUS "Using android NDK from ${ANDROID_NDK}" )
  set( BUILD_WITH_ANDROID_NDK True )

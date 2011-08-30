@@ -342,7 +342,7 @@ The same valid architectures are as above is OSX
 
 
 
-Toadlet is avaialble for the iOS platform using the included Toolchain files. Simply point cmake to the iOS toolchain and enable the Xcode generator. It also pays to install your iOS libraries in a separate folder.
+Toadlet is available for the iOS platform using the included Toolchain files. Simply point cmake to the iOS toolchain and enable the Xcode generator. It also pays to install your iOS libraries in a separate folder.
 
 
 
@@ -358,7 +358,7 @@ You can build for the iOS Simulator from the same toolchain used above. Just cha
 
 
 
-NOTE: CMake will automatically search for your installed iOS SDKs and choose the most recent. You will have to alter your XCode project if you wish to use a different SDK.
+NOTE: CMake will automatically search for your installed iOS SDKs and choose the most recent. You will have to alter your output XCode project if you wish to use a different SDK.
 
 
 
@@ -368,7 +368,11 @@ NOTE: CMake will automatically search for your installed iOS SDKs and choose the
 
 
 
-Toadlet for Android may be built using the included Toolchain file. When building for android, you need to specify the location of the android ndk you wish to build against, using the ANDROID_NDK variable. 
+Full support for toadlet on Android uses the Android NDK with api level 9 or newer. Toadlet builds against the Android NDK using the included Toolchain file. When building for android, you need to specify the location of the Android NDK you wish to build against, using the ANDROID_NDK variable. 
+
+
+
+A complete list of Android build options (such as ANDROID_ARCH=ARM or X86) is available in the Android.cmake toolchain file, located at cmake/Toolchains/Android.cmake.
 
 
 
@@ -376,25 +380,35 @@ On Posix and OSX systems, the process is straightforward.
 
 
 
-  cmake -DCMAKE_TOOLCHAIN_FILE=../cmake/Toolchains/Android.cmake -DANDROID_NDK=$HOME/androidNdkDir -DCMAKE_INSTALL_PREFIX=$HOME/toadlet/android ..
+  cmake -DCMAKE_TOOLCHAIN_FILE=../cmake/Toolchains/Android.cmake -DANDROID_NDK=$HOME/androidNdkDir -DCMAKE_INSTALL_PREFIX=path/to/install/dir ..
 
 	
 
-On Windows systems, the android-ndk requires the use of cygwin for GNUMake. This complicates the android build process on windows. Be sure to follow these steps:
+On Windows systems, the android-ndk needs some type of make system to build. If you have Visual Studio, the nmake program works well. Just be sure to request nmake makefiles from cmake:
 
-  * 1. Ensure you have cygwin and GNUMake installed in cygwin
 
-  * 2. Open a cygwin command shell and navigate to your toadlet build directory
 
-  * 3a. Make SURE you call your native windows install of CMake.exe, and NOT a cygwin build of CMake. The cygwin build will not operate with the android ndk build tools, and a number of errors will result.
+  cmake.exe -G"NMake Makefiles" -DCMAKE_TOOLCHAIN_FILE=../cmake/Toolchains/Android.cmake -DANDROID_NDK=path/to/androidNdkDir -DCMAKE_INSTALL_PREFIX=path/to/install/dir ..
 
-  * 3b. If you have not installed cygwin CMake, the native CMake will be used automatcially. If you have installed cygwin CMake, then be sure to specify the full path to your native CMake.exe when called (with cygwin pathing, as seen in the example below)
 
-  * 4. You must force the generation of Unix Makefiles, otherwise CMake will create visual studio solutions which will not work.
 
-  * 5. Make sure you use RELATIVE PATHS for the ANDROID_NDK value passed to cmake. Using C:\ will confuse cygwin, and using /cygdrive/c/ will confuse cmake. 
+Another windows make option is the gnuwin32 build of make, available here: http://gnuwin32.sourceforge.net/packages/make.htm
 
-  /cygdrive/c/path/to/windows/cmake.exe -G"Unix Makefiles" -DCMAKE_TOOLCHAIN_FILE=../cmake/Toolchains/Android.cmake -DANDROID_NDK=../../../androidNdkDir -DCMAKE_INSTALL_PREFIX=../../toadlet-android" ..
+
+
+===Android 2.2 and older===
+
+
+
+Android versions 2.2 and older that still support the Android NDK do not support all features of the NDK required to build the toadlet peeper and pad libraries. You may use the Android SDK and a small set of toadlet java shim files to get full toadlet functionality in this case.  
+
+
+
+To build for Android 2.2 and lower be sure to specify the Android NDK API level as 8 (or lower) and add the ANDROID_SDK variable to your cmake command. An example for windows platforms follows:
+
+
+
+  cmake.exe -G"NMake Makefiles" -DCMAKE_TOOLCHAIN_FILE=../cmake/Toolchains/Android.cmake -DANDROID_NDK=path/to/androidNdkDir -DANDROID_NDK_API_LEVEL=8 -DANDROID_SDK=path/to/androidSdkDir -DCMAKE_INSTALL_PREFIX=path/to/install/dir ..
 
 
 
@@ -404,7 +418,7 @@ On Windows systems, the android-ndk requires the use of cygwin for GNUMake. This
 
 
 
-Optionally, you can build the toadlet Doxygen documentation when creating your project. You can either add the doxygen build with the TOADLET_BUILD_DOXYGEN flag:
+You have the option to build the toadlet Doxygen documentation when creating your project. You can either add the doxygen build with the TOADLET_BUILD_DOXYGEN flag:
 
 
 
@@ -420,11 +434,7 @@ Or, you can only build the doxygen files by themselves using TOADLET_BUILD_DOXYG
 
 
 
-Note: You'll need the Doxygen tool installed, and
-
-we recommend the Graphviz package for the dot graph
-
-generator.
+Note: You'll need the Doxygen tool installed, and we recommend the Graphviz package for the dot graph generator.
 
 
 
