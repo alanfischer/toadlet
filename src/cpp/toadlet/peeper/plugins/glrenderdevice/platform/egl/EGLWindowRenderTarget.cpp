@@ -30,12 +30,12 @@
 namespace toadlet{
 namespace peeper{
 
-TOADLET_C_API RenderTarget *new_EGLWindowRenderTarget(void *window,const Visual &visual){
+TOADLET_C_API RenderTarget *new_EGLWindowRenderTarget(void *window,WindowRenderTargetFormat *format){
 	void *display=NULL;
 	#if defind(TOADLET_PLATFORM_WIN32)
 		display=GetDC((HWND)window);
 	#endif
-	return new EGLWindowRenderTarget(display,window,visual);
+	return new EGLWindowRenderTarget(display,window,format);
 }
 
 EGLWindowRenderTarget::EGLWindowRenderTarget():EGLRenderTarget(),
@@ -43,7 +43,7 @@ EGLWindowRenderTarget::EGLWindowRenderTarget():EGLRenderTarget(),
 	mPixmap(false)
 {}
 
-EGLWindowRenderTarget::EGLWindowRenderTarget(void *display,void *window,const Visual &visual,bool pixmap):EGLRenderTarget(),
+EGLWindowRenderTarget::EGLWindowRenderTarget(void *display,void *window,WindowRenderTargetFormat *format,bool pixmap):EGLRenderTarget(),
 	mConfig(0),
 	mPixmap(false)
 {
@@ -61,7 +61,7 @@ EGLWindowRenderTarget::EGLWindowRenderTarget(void *display,void *window,const Vi
 		}
 	#endif
 
-	bool result=createContext(display,window,visual,pixmap);
+	bool result=createContext(display,window,format,pixmap);
 
 	#if defined(TOADLET_HAS_GLESEM)
 		if(result==false && !initialized){
@@ -75,7 +75,7 @@ EGLWindowRenderTarget::EGLWindowRenderTarget(void *display,void *window,const Vi
 			}
 		}
 
-		result=createContext(window,visual,pixmap);
+		result=createContext(window,format,pixmap);
 	#endif
 }
 
@@ -83,7 +83,7 @@ EGLWindowRenderTarget::~EGLWindowRenderTarget(){
 	destroyContext();
 }
 
-bool EGLWindowRenderTarget::createContext(void *display,void *window,const Visual &visual,bool pixmap){
+bool EGLWindowRenderTarget::createContext(void *display,void *window,WindowRenderTargetFormat *format,bool pixmap){
 	if(mContext!=EGL_NO_CONTEXT){
 		return true;
 	}
@@ -134,16 +134,16 @@ bool EGLWindowRenderTarget::createContext(void *display,void *window,const Visua
 	Logger::alert(Categories::TOADLET_PEEPER,
 		String("EGL_EXTENSIONS:")+eglQueryString(mDisplay,EGL_EXTENSIONS));
 
-	int format=visual.pixelFormat;
-	int redBits=ImageFormatConversion::getRedBits(format);
-	int greenBits=ImageFormatConversion::getGreenBits(format);
-	int blueBits=ImageFormatConversion::getBlueBits(format);
-	int alphaBits=ImageFormatConversion::getAlphaBits(format);
-	int depthBits=visual.depthBits;
-	int stencilBits=visual.stencilBits;
-	int multisamples=visual.multisamples;
+	int pixelFormat=format->pixelFormat;
+	int redBits=ImageFormatConversion::getRedBits(pixelFormat);
+	int greenBits=ImageFormatConversion::getGreenBits(pixelFormat);
+	int blueBits=ImageFormatConversion::getBlueBits(pixelFormat);
+	int alphaBits=ImageFormatConversion::getAlphaBits(pixelFormat);
+	int depthBits=format->depthBits;
+	int stencilBits=format->stencilBits;
+	int multisamples=format->multisamples;
 
-	mConfig=chooseEGLConfig(mDisplay,redBits,greenBits,blueBits,alphaBits,depthBits,stencilBits,!pixmap,pixmap,false,visual.multisamples);
+	mConfig=chooseEGLConfig(mDisplay,redBits,greenBits,blueBits,alphaBits,depthBits,stencilBits,!pixmap,pixmap,false,multisamples);
 	TOADLET_CHECK_EGLERROR("chooseEGLConfig");
 
 	Logger::debug(Categories::TOADLET_PEEPER,

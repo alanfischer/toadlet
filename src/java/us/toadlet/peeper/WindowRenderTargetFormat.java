@@ -25,10 +25,24 @@
 
 package us.toadlet.peeper;
 
-public class Version{
-	public static final int MAJOR=${TOADLET_BUILD_VERSION_PEEPER_MAJOR};
-	public static final int MINOR=${TOADLET_BUILD_VERSION_PEEPER_MINOR};
-	public static final int MICRO=${TOADLET_BUILD_VERSION_PEEPER_MICRO};
+public class WindowRenderTargetFormat{
+	public WindowRenderTargetFormat(int pixelFormat,int depthBits,int stencilBits,int multisamples,boolean vsync,int threads,boolean debug,int flags){
+		this.pixelFormat=pixelFormat;
+		this.depthBits=depthBits;
+		this.stencilBits=stencilBits;
+		this.multisamples=multisamples;
+		this.vsync=vsync;
+		this.threads=threads;
+		this.debug=debug;
+		this.flags=flags;
+	}
 
-	public static final String STRING=${TOADLET_BUILD_VERSION_PEEPER_MAJOR}+"."+${TOADLET_BUILD_VERSION_PEEPER_MINOR}+"."+${TOADLET_BUILD_VERSION_PEEPER_MICRO};
-};
+	public int pixelFormat;
+	public int depthBits;
+	public int stencilBits;
+	public int multisamples;
+	public boolean vsync;
+	public int threads;
+	public boolean debug;
+	public int flags;
+}

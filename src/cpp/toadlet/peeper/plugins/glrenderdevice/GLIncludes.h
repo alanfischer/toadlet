@@ -58,7 +58,7 @@
 	#define GL_POINT_SPRITE GL_POINT_SPRITE_OES 
 	#define GL_COORD_REPLACE GL_COORD_REPLACE_OES
 #elif defined(TOADLET_PLATFORM_ANDROID)
-	#if ANDROID_API_LEVEL>=9
+	#if ANDROID_NDK_API_LEVEL>=9
 		#include <EGL/egl.h>
 	#endif
 	#include <GLES/gl.h>

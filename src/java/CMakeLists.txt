@@ -27,6 +27,8 @@ endif (${NDKSYSTEM} STREQUAL "windows")
 configure_file (${JAVA_SRC_DIR}/peeper/Version.java.cmake ${CMAKE_CURRENT_BINARY_DIR}/${JAVA_SRC_DIR}/peeper/Version.java)
 
 set (PEEPER_SRC
+	${JAVA_SRC_DIR}/peeper/TextureFormat.java
+	${JAVA_SRC_DIR}/peeper/WindowRenderTargetFormat.java
 	${JAVA_SRC_DIR}/peeper/RenderTarget.java
 	${JAVA_SRC_DIR}/peeper/GLRenderTarget.java
 	${JAVA_SRC_DIR}/peeper/EGLRenderTarget.java

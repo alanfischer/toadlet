@@ -53,6 +53,8 @@ public abstract class EGLRenderTarget implements GLRenderTarget{
 		return egl.eglMakeCurrent(mDisplay,EGL_NO_SURFACE,EGL_NO_SURFACE,EGL_NO_CONTEXT);
 	}
 
+	public void reset(){}
+
 	protected EGLConfig chooseEGLConfig(EGLDisplay display,int redBits,int greenBits,int blueBits,int alphaBits,int depthBits,int stencilBits,boolean window,boolean pixmap,boolean pbuffer,int fsaaCount){
 		int[] configOptions=new int[32];
 		int i=0;
