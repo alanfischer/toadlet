@@ -45,12 +45,12 @@ public abstract class EGLRenderTarget implements GLRenderTarget{
 	public EGLSurface getEGLSurface(){return mSurface;}
 	public EGLContext getEGLContext(){return mContext;}
 
-	public void makeCurrent(){
-		boolean result=egl.eglMakeCurrent(mDisplay,mSurface,mSurface,mContext);
-		if(result==false){
-			Error.unknown(Categories.TOADLET_EGG,
-				"eglMakeCurrent failed");
-		}
+	public boolean activate(){
+		return egl.eglMakeCurrent(mDisplay,mSurface,mSurface,mContext);
+	}
+	
+	public boolean deactivate(){
+		return egl.eglMakeCurrent(mDisplay,EGL_NO_SURFACE,EGL_NO_SURFACE,EGL_NO_CONTEXT);
 	}
 
 	protected EGLConfig chooseEGLConfig(EGLDisplay display,int redBits,int greenBits,int blueBits,int alphaBits,int depthBits,int stencilBits,boolean window,boolean pixmap,boolean pbuffer,int fsaaCount){

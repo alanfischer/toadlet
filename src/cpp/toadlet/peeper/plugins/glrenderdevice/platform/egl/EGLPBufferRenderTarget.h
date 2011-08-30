@@ -28,14 +28,14 @@
 
 #include "EGLRenderTarget.h"
 #include "../../GLTexture.h"
-#include <toadlet/peeper/SurfaceRenderTarget.h>
+#include <toadlet/peeper/PixelBufferRenderTarget.h>
 
 namespace toadlet{
 namespace peeper{
 
 class GLRenderDevice;
 
-class EGLPBufferRenderTarget:public EGLRenderTarget,public SurfaceRenderTarget{
+class EGLPBufferRenderTarget:public EGLRenderTarget,public PixelBufferRenderTarget{
 public:
 	static bool available(GLRenderDevice *renderDevice);
 
@@ -54,8 +54,10 @@ public:
 	void resetCreate(){}
 	void resetDestroy(){}
 
-	bool makeCurrent();
+	bool activate();
 	bool swap();
+	bool activateAdditionalContext(){return false;}
+	void deactivateAdditionalContext(){}
 
 	bool attach(PixelBuffer::ptr buffer,Attachment attachment);
 	bool remove(PixelBuffer::ptr buffer);
