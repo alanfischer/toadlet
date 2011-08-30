@@ -54,7 +54,6 @@ public:
 protected:
 	static void testSSE(SystemCaps &caps);
 	static void testNEON(SystemCaps &caps);
-	static void signalHandler(int s);
 };
 
 }

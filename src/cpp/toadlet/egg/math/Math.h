@@ -661,22 +661,27 @@ namespace Math{
 	TOADLET_API void mul(Matrix4x4 &r,const Matrix4x4 &m1,const Matrix4x4 &m2);
 	TOADLET_API void mulMatrix4x4Traditional(Matrix4x4 &r,const Matrix4x4 &m1,const Matrix4x4 &m2);
 	TOADLET_API void mulMatrix4x4SSE(Matrix4x4 &r,const Matrix4x4 &m1,const Matrix4x4 &m2);
+	TOADLET_API void mulMatrix4x4NEON(Matrix4x4 &r,const Matrix4x4 &m1,const Matrix4x4 &m2);
 
 	TOADLET_API void postMul(Matrix4x4 &m1,const Matrix4x4 &m2);
 	TOADLET_API void postMulMatrix4x4Traditional(Matrix4x4 &m1,const Matrix4x4 &m2);
 	TOADLET_API void postMulMatrix4x4SSE(Matrix4x4 &m1,const Matrix4x4 &m2);
+	TOADLET_API void postMulMatrix4x4NEON(Matrix4x4 &m1,const Matrix4x4 &m2);
 
 	TOADLET_API void preMul(Matrix4x4 &m2,const Matrix4x4 &m1);
 	TOADLET_API void preMulMatrix4x4Traditional(Matrix4x4 &m2,const Matrix4x4 &m1);
 	TOADLET_API void preMulMatrix4x4SSE(Matrix4x4 &m2,const Matrix4x4 &m1);
+	TOADLET_API void preMulMatrix4x4NEON(Matrix4x4 &m2,const Matrix4x4 &m1);
 
 	TOADLET_API void mul(Vector4 &r,const Matrix4x4 &m,const Vector4 &v);
 	TOADLET_API void mulVector4Matrix4x4Vector4Traditional(Vector4 &r,const Matrix4x4 &m,const Vector4 &v);
 	TOADLET_API void mulVector4Matrix4x4Vector4SSE(Vector4 &r,const Matrix4x4 &m,const Vector4 &v);
+	TOADLET_API void mulVector4Matrix4x4Vector4NEON(Vector4 &r,const Matrix4x4 &m,const Vector4 &v);
 
 	TOADLET_API void mul(Vector4 &r,const Matrix4x4 &m);
 	TOADLET_API void mulVector4Matrix4x4Traditional(Vector4 &r,const Matrix4x4 &m);
 	TOADLET_API void mulVector4Matrix4x4SSE(Vector4 &r,const Matrix4x4 &m);
+	TOADLET_API void mulVector4Matrix4x4NEON(Vector4 &r,const Matrix4x4 &m);
 
 	inline void mul(Vector3 &r,const Matrix4x4 &m,const Vector3 &v){
 		r.x=(m.data[0+0*4]*v.x) + (m.data[0+1*4]*v.y) + (m.data[0+2*4]*v.z);
