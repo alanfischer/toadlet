@@ -29,9 +29,9 @@
 #include <fstream>
 #include <unistd.h>
 #include <pthread.h>
-#include <stdlib.h>
-#include <signal.h>
-#include <setjmp.h>
+#if defined(TOADLET_HAS_NEON)
+	#include <arm/arch.h>
+#endif
 
 namespace toadlet{
 namespace egg{
@@ -48,9 +48,6 @@ namespace egg{
 		__asm__ __volatile__ ("cpuid": \
 		"=a" (r[0]), "=b" (r[1]), "=c" (r[2]), "=d" (r[3]): "a" (infoType));
 #endif
-
-static sigjmp_buf jmpbuf;
-static volatile sig_atomic_t doJump=0;
 
 void PosixSystem::usleep(uint64 microseconds){
 	::usleep(microseconds);
@@ -121,33 +118,12 @@ void PosixSystem::testSSE(SystemCaps &caps){
 
 void PosixSystem::testNEON(SystemCaps &caps){
 	#if defined(TOADLET_HAS_NEON)
-		caps.neonVersion=0;
-		static void (*lastSignal)(int);
-		lastSignal=signal(SIGILL,signalHandler);
-		if(sigsetjmp(jmpbuf,1)){
-			signal(SIGILL,lastSignal);
-			return;
-		}
-		doJump=1;
-		asm(
-			"vadd.i16 q0,q0,q0\n\t"
-			"bx lr"
-		);
-		doJump=0;
-		signal(SIGILL,lastSignal);
-		caps.neonVersion=1;
-	#endif
-}
-
-void PosixSystem::signalHandler(int s){
-	#if defined(TOADLET_HAS_NEON)
-		if(!doJump){
-			signal(s,SIG_DFL);
-			raise(s);
-		}
-
-		doJump=0;
-		siglongjmp(jmpbuf,1);
+		#if defined(_ARM_ARCH_7)
+			caps.neonVersion=1;
+		#else
+			/// @todo: Do a proc test
+			caps.neonVersion=0;
+		#endif
 	#endif
 }
 

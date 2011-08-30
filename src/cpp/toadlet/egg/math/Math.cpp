@@ -1362,6 +1362,144 @@ void Math::mulVector4Matrix4x4SSE(Vector4 &r,const Matrix4x4 &m){
 	_mm_store_ps((float*)&r,mrl);
 }
 
+#elif defined(TOADLET_HAS_NEON)
+
+void Math::mulMatrix4x4NEON(Matrix4x4 &r,const Matrix4x4 &m1,const Matrix4x4 &m2){
+	_asm volatile(
+		"vldmia %1, {q4-q7}\n"
+		"vldmia %2, {q8-q11}\n"
+
+		"vmul.f32 q0, q8, d8[0]\n"
+		"vmul.f32 q1, q8, d10[0]\n"
+		"vmul.f32 q2, q8, d12[0]\n"
+		"vmul.f32 q3, q8, d14[0]\n"
+
+		"vmla.f32 q0, q9, d8[1]\n"
+		"vmla.f32 q1, q9, d10[1]\n"
+		"vmla.f32 q2, q9, d12[1]\n"
+		"vmla.f32 q3, q9, d14[1]\n"
+
+		"vmla.f32 q0, q10, d9[0]\n"
+		"vmla.f32 q1, q10, d11[0]\n"
+		"vmla.f32 q2, q10, d13[0]\n"
+		"vmla.f32 q3, q10, d15[0]\n"
+
+		"vmla.f32 q0, q11, d9[1]\n"
+		"vmla.f32 q1, q11, d11[1]\n"
+		"vmla.f32 q2, q11, d13[1]\n"
+		"vmla.f32 q3, q11, d15[1]\n"
+
+		"vstmia %0, {q0-q3}"
+		:
+		: "r" (r.getData()), "r" (m1.getData()), "r" (m2.getData())
+		: "memory", "q0", "q1", "q2", "q3", "q4", "q5", "q6", "q7", "q8", "q9", "q11"
+	);
+}
+
+void Math::postMulMatrix4x4NEON(Matrix4x4 &m1,const Matrix4x4 &m2){
+	_asm volatile(
+		"vldmia %1, {q4-q7}\n"
+		"vldmia %2, {q8-q11}\n"
+
+		"vmul.f32 q0, q8, d8[0]\n"
+		"vmul.f32 q1, q8, d10[0]\n"
+		"vmul.f32 q2, q8, d12[0]\n"
+		"vmul.f32 q3, q8, d14[0]\n"
+
+		"vmla.f32 q0, q9, d8[1]\n"
+		"vmla.f32 q1, q9, d10[1]\n"
+		"vmla.f32 q2, q9, d12[1]\n"
+		"vmla.f32 q3, q9, d14[1]\n"
+
+		"vmla.f32 q0, q10, d9[0]\n"
+		"vmla.f32 q1, q10, d11[0]\n"
+		"vmla.f32 q2, q10, d13[0]\n"
+		"vmla.f32 q3, q10, d15[0]\n"
+
+		"vmla.f32 q0, q11, d9[1]\n"
+		"vmla.f32 q1, q11, d11[1]\n"
+		"vmla.f32 q2, q11, d13[1]\n"
+		"vmla.f32 q3, q11, d15[1]\n"
+
+		"vstmia %0, {q0-q3}"
+		:
+		: "r" (m1.getData()), "r" (m1.getData()), "r" (m2.getData())
+		: "memory", "q0", "q1", "q2", "q3", "q4", "q5", "q6", "q7", "q8", "q9", "q11"
+	);
+}
+
+void Math::preMulMatrix4x4NEON(Matrix4x4 &m2,const Matrix4x4 &m1){
+	_asm volatile(
+		"vldmia %1, {q4-q7}\n"
+		"vldmia %2, {q8-q11}\n"
+
+		"vmul.f32 q0, q8, d8[0]\n"
+		"vmul.f32 q1, q8, d10[0]\n"
+		"vmul.f32 q2, q8, d12[0]\n"
+		"vmul.f32 q3, q8, d14[0]\n"
+
+		"vmla.f32 q0, q9, d8[1]\n"
+		"vmla.f32 q1, q9, d10[1]\n"
+		"vmla.f32 q2, q9, d12[1]\n"
+		"vmla.f32 q3, q9, d14[1]\n"
+
+		"vmla.f32 q0, q10, d9[0]\n"
+		"vmla.f32 q1, q10, d11[0]\n"
+		"vmla.f32 q2, q10, d13[0]\n"
+		"vmla.f32 q3, q10, d15[0]\n"
+
+		"vmla.f32 q0, q11, d9[1]\n"
+		"vmla.f32 q1, q11, d11[1]\n"
+		"vmla.f32 q2, q11, d13[1]\n"
+		"vmla.f32 q3, q11, d15[1]\n"
+
+		"vstmia %0, {q0-q3}"
+		:
+		: "r" (m2.getData()), "r" (m1.getData()), "r" (m2.getData())
+		: "memory", "q0", "q1", "q2", "q3", "q4", "q5", "q6", "q7", "q8", "q9", "q11"
+	);
+}
+
+void Math::mulVector4Matrix4x4Vector4NEON(Vector4 &r,const Matrix4x4 &m,const Vector4 &v){
+	_asm volatile(
+		"vldmia %1, {q1-q4}\n"
+		"vldmia %2, {q5}\n"
+
+		"vmul.f32 q0, q1, d10[0]\n"
+
+		"vmla.f32 q0, q2, d10[1]\n"
+
+		"vmla.f32 q0, q3, d11[0]\n"
+
+		"vmla.f32 q0, q4, d11[1]\n"
+
+		"vstmia %0, {q0}"
+		:
+		: "r" (r.getData()), "r" (m.getData()), "r" (v.getData())
+		: "memory", "q0", "q1", "q2", "q3", "q4", "q5"
+	);
+}
+
+void Math::mulVector4Matrix4x4NEON(Vector4 &r,const Matrix4x4 &m){
+	_asm volatile(
+		"vldmia %1, {q1-q4}\n"
+		"vldmia %2, {q5}\n"
+
+		"vmul.f32 q0, q1, d10[0]\n"
+
+		"vmla.f32 q0, q2, d10[1]\n"
+
+		"vmla.f32 q0, q3, d11[0]\n"
+
+		"vmla.f32 q0, q4, d11[1]\n"
+
+		"vstmia %0, {q0}"
+		:
+		: "r" (r.getData()), "r" (m.getData()), "r" (r.getData())
+		: "memory", "q0", "q1", "q2", "q3", "q4", "q5"
+	);
+}
+
 #endif
 
 class MathInitializer{
@@ -1474,6 +1612,87 @@ void Math::optimize(int o){
 			mulVector4Matrix4x4=mulVector4Matrix4x4SSE;
 		}
 		else
+	#elif defined(TOADLET_HAS_NEON)
+		if(o==Optimize_AUTO && caps.neonVersion>0){
+			// Time different paths to choose most optimal
+			static int count=1000;
+			Matrix4x4 m,r;
+			Vector4 v;
+			int i;
+
+			uint64 t0=System::utime();
+
+			r.set(Math::IDENTITY_MATRIX4X4);
+			m.set(Math::IDENTITY_MATRIX4X4);
+			for(i=0;i<count;++i){
+				Math::preMulMatrix4x4Traditional(r,m);
+			}
+
+			uint64 t1=System::utime();
+
+			r.set(Math::IDENTITY_MATRIX4X4);
+			m.set(Math::IDENTITY_MATRIX4X4);
+			for(i=0;i<count;++i){
+				Math::preMulMatrix4x4NEON(r,m);
+			}
+
+			uint64 t2=System::utime();
+
+			m.set(Math::IDENTITY_MATRIX4X4);
+			v.set(Math::X_UNIT_VECTOR4);
+			for(i=0;i<count;++i){
+				Math::mulVector4Matrix4x4Traditional(v,m);
+			}
+
+			uint64 t3=System::utime();
+
+			m.set(Math::IDENTITY_MATRIX4X4);
+			v.set(Math::X_UNIT_VECTOR4);
+			for(i=0;i<count;++i){
+				Math::mulVector4Matrix4x4NEON(v,m);
+			}
+
+			uint64 t4=System::utime();
+
+			Logger::alert(String("Timings - MatrixTraditional:")+(t1-t0)+" MatrixNEON:"+(t2-t1)+" VectorTraditional:"+(t3-t2)+" VectorNEON:"+(t4-t3));
+
+			if(t1-t0 < t2-t1){
+				Logger::excess(Categories::TOADLET_EGG,"using Traditional Matrix4x4 math");
+
+				mulMatrix4x4=mulMatrix4x4Traditional;
+				preMulMatrix4x4=preMulMatrix4x4Traditional;
+				postMulMatrix4x4=postMulMatrix4x4Traditional;
+			}
+			else{
+				Logger::excess(Categories::TOADLET_EGG,"using NEON Matrix4x4 math");
+
+				mulMatrix4x4=mulMatrix4x4NEON;
+				preMulMatrix4x4=preMulMatrix4x4NEON;
+				postMulMatrix4x4=postMulMatrix4x4NEON;
+			}
+
+			if(t3-t2 < t4-t3){
+				Logger::excess(Categories::TOADLET_EGG,"using Traditional Vector4 math");
+
+				mulVector4Matrix4x4Vector4=mulVector4Matrix4x4Vector4Traditional;
+				mulVector4Matrix4x4=mulVector4Matrix4x4Traditional;
+			}
+			else{
+				Logger::excess(Categories::TOADLET_EGG,"using NEON Vector4 math");
+
+				mulVector4Matrix4x4Vector4=mulVector4Matrix4x4Vector4NEON;
+				mulVector4Matrix4x4=mulVector4Matrix4x4NEON;
+			}
+		}
+		else if(o==Optimize_FORCE && caps.neonVersion>0){
+			Logger::excess(Categories::TOADLET_EGG,"forcing NEON math");
+
+			mulMatrix4x4=mulMatrix4x4NEON;
+			preMulMatrix4x4=preMulMatrix4x4NEON;
+			postMulMatrix4x4=postMulMatrix4x4NEON;
+			mulVector4Matrix4x4Vector4=mulVector4Matrix4x4Vector4NEON;
+			mulVector4Matrix4x4=mulVector4Matrix4x4NEON;
+		}
 	#endif
 	{
 		Logger::excess(Categories::TOADLET_EGG,"forcing Traditional math");
