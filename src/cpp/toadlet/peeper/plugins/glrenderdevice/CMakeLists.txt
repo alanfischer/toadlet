@@ -22,7 +22,7 @@ set (PEEPER_GLRENDERDEVICE_PLATFORM_EAGL_SRC
 )
 
 set (PEEPER_GLRENDERDEVICE_PLATFORM_EGL_SRC
-	platform/egl/EGLPBufferSurfaceRenderTarget.cpp
+	platform/egl/EGLPBufferRenderTarget.cpp
 	platform/egl/EGLWindowRenderTarget.cpp
 	platform/egl/EGLRenderTarget.cpp
 	platform/egl/glesem/glesem.c
@@ -76,7 +76,7 @@ set (PEEPER_GLRENDERDEVICE_PLATFORM_EAGL_HEADERS
 )
 
 set (PEEPER_GLRENDERDEVICE_PLATFORM_EGL_HEADERS
-	platform/egl/EGLPBufferSurfaceRenderTarget.h
+	platform/egl/EGLPBufferRenderTarget.h
 	platform/egl/EGLWindowRenderTarget.h
 	platform/egl/EGLRenderTarget.h
 	platform/egl/glesem/glesem.h

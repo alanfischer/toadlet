@@ -14,12 +14,15 @@ set (CMAKE_Java_CREATE_STATIC_LIBRARY
 )
 
 
+# Configure
 # toadlet_peeper
+configure_file (${JAVA_SRC_DIR}/peeper/Version.java.cmake ${CMAKE_CURRENT_BINARY_DIR}/${JAVA_SRC_DIR}/peeper/Version.java)
+
 set (PEEPER_SRC
+	${JAVA_SRC_DIR}/peeper/RenderTarget.java
+	${JAVA_SRC_DIR}/peeper/GLRenderTarget.java
 	${JAVA_SRC_DIR}/peeper/EGLRenderTarget.java
 	${JAVA_SRC_DIR}/peeper/EGLWindowRenderTarget.java
-	${JAVA_SRC_DIR}/peeper/GLRenderTarget.java
-	${JAVA_SRC_DIR}/peeper/RenderTarget.java
 )
 
 add_library (jtoadlet_peeper STATIC ${PEEPER_SRC})
@@ -28,6 +31,7 @@ install (TARGETS jtoadlet_peeper DESTINATION lib)
 
 
 # toadlet_pad
+configure_file (${JAVA_SRC_DIR}/pad/Version.java.cmake ${CMAKE_CURRENT_BINARY_DIR}/${JAVA_SRC_DIR}/pad/Version.java)
 set (PAD_SRC
 	${JAVA_SRC_DIR}/pad/ApplicationActivity.java
 	${JAVA_SRC_DIR}/pad/Application.java

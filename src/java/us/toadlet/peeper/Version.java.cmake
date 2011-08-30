@@ -23,12 +23,12 @@
  *
  ********** Copyright header - do not remove **********/
 
-package us.toadlet.pad;
+package us.toadlet.peeper;
 
 public class Version{
-	public static final int MAJOR=0;
-	public static final int MINOR=0;
-	public static final int MICRO=1;
+	public static final int MAJOR=${TOADLET_BUILD_VERSION_PEEPER_MAJOR};
+	public static final int MINOR=${TOADLET_BUILD_VERSION_PEEPER_MINOR};
+	public static final int MICRO=${TOADLET_BUILD_VERSION_PEEPER_MICRO};
 
-	public static final String STRING=TOADLET_BUILD_VERSION_PAD_MAJOR+"."+TOADLET_BUILD_VERSION_PAD_MINOR+"."+TOADLET_BUILD_VERSION_PAD_MICRO;
+	public static final String STRING=TOADLET_BUILD_VERSION_PEEPER_MAJOR+"."+TOADLET_BUILD_VERSION_PEEPER_MINOR+"."+TOADLET_BUILD_VERSION_PEEPER_MICRO;
 };
