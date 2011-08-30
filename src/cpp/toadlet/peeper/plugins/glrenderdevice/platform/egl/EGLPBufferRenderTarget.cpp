@@ -26,7 +26,7 @@
 #include "EGLPBufferRenderTarget.h"
 #include "../../GLRenderDevice.h"
 #include <toadlet/egg/Error.h>
-#include <windows.h>
+#include <toadlet/egg/image/ImageFormatConversion.h>
 
 namespace toadlet{
 namespace peeper{
@@ -82,10 +82,10 @@ void EGLPBufferRenderTarget::destroy(){
 	}
 }
 
-bool EGLPBufferRenderTarget::makeCurrent(){
+bool EGLPBufferRenderTarget::activate(){
 	unbind();
 
-	EGLRenderTarget::makeCurrent();
+	EGLRenderTarget::activate();
 
 	if(mInitialized==false){
 		mDevice->setDefaultState();
@@ -104,12 +104,12 @@ bool EGLPBufferRenderTarget::swap(){
 }
 
 bool EGLPBufferRenderTarget::attach(PixelBuffer::ptr buffer,Attachment attachment){
-	GLTextureMipPixelBuffer *glbuffer=((GLPixelBuffer*)buffer->getRootPixelBuffer())->castToGLTextureMipSurface();
-	mTexture=gltextureSurface->getTexture();
+	GLTextureMipPixelBuffer *glbuffer=((GLPixelBuffer*)buffer->getRootPixelBuffer())->castToGLTextureMipPixelBuffer();
+	mTexture=glbuffer->getTexture();
 
-	if((mTexture->getFormat()&Texture::Format_BIT_DEPTH)>0){
+	if((mTexture->getFormat()->pixelFormat&TextureFormat::Format_SEMANTIC_DEPTH)>0){
 		Error::invalidParameters(Categories::TOADLET_PEEPER,
-			"Format_BIT_DEPTH not available for pbuffers");
+			"Format_SEMANTIC_DEPTH not available for pbuffers");
 		return false;
 	}
 
@@ -118,7 +118,7 @@ bool EGLPBufferRenderTarget::attach(PixelBuffer::ptr buffer,Attachment attachmen
 	return true;
 }
 
-bool EGLPBufferSurfaceRenderTarget::remove(Surface::ptr surface){
+bool EGLPBufferRenderTarget::remove(PixelBuffer::ptr buffer){
 	mTexture=NULL;
 
 	compile();
@@ -126,7 +126,7 @@ bool EGLPBufferSurfaceRenderTarget::remove(Surface::ptr surface){
 	return false;
 }
 
-bool EGLPBufferSurfaceRenderTarget::compile(){
+bool EGLPBufferRenderTarget::compile(){
 	if(mTexture!=NULL){
 		createBuffer();
 
@@ -142,21 +142,20 @@ bool EGLPBufferSurfaceRenderTarget::compile(){
 	return true;
 }
 
-bool EGLPBufferSurfaceRenderTarget::createBuffer(){
+bool EGLPBufferRenderTarget::createBuffer(){
 	destroyBuffer();
 
 	Logger::debug("creating EGL context for pbuffer");
 
-	int width=mTexture->getWidth();
-	int height=mTexture->getHeight();
-
 	mDisplay=((EGLRenderTarget*)mDevice->getPrimaryRenderTarget()->getRootRenderTarget())->getEGLDisplay();
 
-	int format=mTexture->getFormat();
-	int redBits=ImageFormatConversion::getRedBits(format);
-	int greenBits=ImageFormatConversion::getGreenBits(format);
-	int blueBits=ImageFormatConversion::getBlueBits(format);
-	int alphaBits=ImageFormatConversion::getAlphaBits(format);
+	int width=mTexture->getFormat()->width;
+	int height=mTexture->getFormat()->height;
+	int pixelFormat=mTexture->getFormat()->pixelFormat;
+	int redBits=ImageFormatConversion::getRedBits(pixelFormat);
+	int greenBits=ImageFormatConversion::getGreenBits(pixelFormat);
+	int blueBits=ImageFormatConversion::getBlueBits(pixelFormat);
+	int alphaBits=ImageFormatConversion::getAlphaBits(pixelFormat);
 	int depthBits=16;
 
 	EGLConfig config=chooseEGLConfig(mDisplay,redBits,greenBits,blueBits,alphaBits,depthBits,0,false,false,true,false);
@@ -218,12 +217,12 @@ bool EGLPBufferSurfaceRenderTarget::createBuffer(){
 	return true;
 }
 
-bool EGLPBufferSurfaceRenderTarget::destroyBuffer(){
+bool EGLPBufferRenderTarget::destroyBuffer(){
 	unbind();
 
 	if(mDisplay!=EGL_NO_DISPLAY){
 		if(mContext==eglGetCurrentContext()){
-			((GLRenderTarget*)mDevice->getPrimaryRenderTarget()->getRootRenderTarget())->makeCurrent();
+			((GLRenderTarget*)mDevice->getPrimaryRenderTarget()->getRootRenderTarget())->activate();
 		}
 
 		if(mSeparateContext && mContext!=EGL_NO_CONTEXT){
@@ -242,7 +241,7 @@ bool EGLPBufferSurfaceRenderTarget::destroyBuffer(){
 	return true;
 }
 
-void EGLPBufferSurfaceRenderTarget::bind(){
+void EGLPBufferRenderTarget::bind(){
 	if(mBound==false){
 		mBound=true;
 		glBindTexture(mTexture->getTarget(),mTexture->getHandle());
@@ -258,7 +257,7 @@ void EGLPBufferSurfaceRenderTarget::bind(){
 	}
 }
 
-void EGLPBufferSurfaceRenderTarget::unbind(){
+void EGLPBufferRenderTarget::unbind(){
 	if(mBound==true){
 		mBound=false;
 		if(mCopy==false){

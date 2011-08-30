@@ -23,7 +23,7 @@
  *
  ********** Copyright header - do not remove **********/
 
-#include "EGLWIndowRenderTarget.h"
+#include "EGLWindowRenderTarget.h"
 #include <toadlet/egg/Error.h>
 #include <toadlet/egg/image/ImageFormatConversion.h>
 
