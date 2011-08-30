@@ -32,15 +32,15 @@ import static javax.microedition.khronos.egl.EGL11.*;
 
 public class EGLWindowRenderTarget extends EGLRenderTarget{
 	public EGLWindowRenderTarget(){super();}
-	public EGLWindowRenderTarget(Object nativeSurface,Visual visual){createContext(nativeSurface,visual,false);}
-	public EGLWindowRenderTarget(Object nativeSurface,Visual visual,boolean pixmap){createContext(nativeSurface,visual,pixmap);}
+	public EGLWindowRenderTarget(Object nativeSurface,WindowRenderTargetFormat format){createContext(nativeSurface,format,false);}
+	public EGLWindowRenderTarget(Object nativeSurface,WindowRenderTargetFormat format,boolean pixmap){createContext(nativeSurface,format,pixmap);}
 	
 	public void destroy(){destroyContext();}
 
 	public RenderTarget getRootRenderTarget(){return this;}
 
-	public boolean createContext(Object nativeSurface,Visual visual){return createContext(nativeSurface,visual,false);}
-	public boolean createContext(Object nativeSurface,Visual visual,boolean pixmap){
+	public boolean createContext(Object nativeSurface,WindowRenderTargetFormat format){return createContext(nativeSurface,format,false);}
+	public boolean createContext(Object nativeSurface,WindowRenderTargetFormat format,boolean pixmap){
 		if(mContext!=EGL_NO_CONTEXT){
 			return true;
 		}
@@ -49,43 +49,43 @@ public class EGLWindowRenderTarget extends EGLRenderTarget{
 
 		mDisplay=egl.eglGetDisplay(EGL_DEFAULT_DISPLAY);
 		if(mDisplay==EGL_NO_DISPLAY){
-			Error.unknown(Categories.TOADLET_PEEPER,
+			System.out.println(
 				"error getting display");
 			return false;
 		}
 
 		int[] version=new int[2];
 		if(egl.eglInitialize(mDisplay,version)==false){
-			Error.unknown(Categories.TOADLET_PEEPER,
+			System.out.println(
 				"eglInitialize error");
 			return false;
 		}
 		egl_version=version[0]*10+version[1];
 
-		Logger.alert(Categories.TOADLET_PEEPER,
+		System.out.println(
 			"CALCULATED EGL VERSION:"+(egl_version/10)+"."+(egl_version%10));
 
 		// Crashes on Android 1.1
-		Logger.alert(Categories.TOADLET_PEEPER,
+		System.out.println(
 			"EGL_VENDOR:"+egl.eglQueryString(mDisplay,EGL_VENDOR));
-		Logger.alert(Categories.TOADLET_PEEPER,
+		System.out.println(
 			"EGL_VERSION:"+egl.eglQueryString(mDisplay,EGL_VERSION));
-		Logger.alert(Categories.TOADLET_PEEPER,
+		System.out.println(
 			"EGL_EXTENSIONS:"+egl.eglQueryString(mDisplay,EGL_EXTENSIONS));
 
-		int format=visual.pixelFormat;
-		int redBits=ImageFormatConversion.getRedBits(format);
-		int greenBits=ImageFormatConversion.getGreenBits(format);
-		int blueBits=ImageFormatConversion.getBlueBits(format);
-		int alphaBits=ImageFormatConversion.getAlphaBits(format);
-		int depthBits=visual.depthBits;
-		int stencilBits=visual.stencilBits;
-		int multisamples=visual.multisamples;
+		int pixelFormat=format.pixelFormat;
+		int redBits=TextureFormat.getRedBits(pixelFormat);
+		int greenBits=TextureFormat.getGreenBits(pixelFormat);
+		int blueBits=TextureFormat.getBlueBits(pixelFormat);
+		int alphaBits=TextureFormat.getAlphaBits(pixelFormat);
+		int depthBits=format.depthBits;
+		int stencilBits=format.stencilBits;
+		int multisamples=format.multisamples;
 
-		mConfig=chooseEGLConfig(mDisplay,redBits,greenBits,blueBits,alphaBits,depthBits,stencilBits,!pixmap,pixmap,false,visual.multisamples);
+		mConfig=chooseEGLConfig(mDisplay,redBits,greenBits,blueBits,alphaBits,depthBits,stencilBits,!pixmap,pixmap,false,multisamples);
 		TOADLET_CHECK_EGLERROR("chooseEGLConfig");
 
-		Logger.debug(Categories.TOADLET_PEEPER,
+		System.out.println(
 			"chooseEGLConfig config:"+mConfig);
 
 		if(!pixmap){
@@ -98,7 +98,7 @@ public class EGLWindowRenderTarget extends EGLRenderTarget{
 		}
 
 		if(mSurface==EGL_NO_SURFACE){
-			Error.unknown(Categories.TOADLET_PEEPER,
+			System.out.println(
 				"error creating surface");
 			return false;
 		}
@@ -107,14 +107,14 @@ public class EGLWindowRenderTarget extends EGLRenderTarget{
 		TOADLET_CHECK_EGLERROR("eglCreateContext");
 
 		if(mContext==EGL_NO_CONTEXT){
-			Error.unknown(Categories.TOADLET_PEEPER,
+			System.out.println(
 				"error creating context");
 			return false;
 		}
 
 		if(egl_version>=12){
-			egl.eglBindAPI(EGL_OPENGL_ES_API);
-			TOADLET_CHECK_EGLERROR("eglBindAPI");
+//			egl.eglBindAPI(EGL_OPENGL_ES_API);
+//			TOADLET_CHECK_EGLERROR("eglBindAPI");
 		}
 
 		egl.eglMakeCurrent(mDisplay,mSurface,mSurface,mContext);
@@ -142,13 +142,16 @@ public class EGLWindowRenderTarget extends EGLRenderTarget{
 		}
 
 		if(egl_version>=12){
-			egl.eglReleaseThread();
+//			egl.eglReleaseThread();
 		}
 
 		return true;
 	}
 
-	public void bool(){
+	public boolean activateAdditionalContext(){return false;}
+	public void deactivateAdditionalContext(){}
+	
+	public boolean swap(){
 		if(mPixmap){
 			egl.eglWaitGL();
 		}
@@ -176,4 +179,12 @@ public class EGLWindowRenderTarget extends EGLRenderTarget{
 	
 	protected EGLConfig mConfig=null;
 	protected boolean mPixmap=false;
+	
+	public void TOADLET_CHECK_EGLERROR(String function){
+		int error=egl.eglGetError();
+		if(error!=EGL_SUCCESS){
+			System.out.println(
+				("EGL Error in ") + function + ": error=" + error);
+		}
+	}
 }

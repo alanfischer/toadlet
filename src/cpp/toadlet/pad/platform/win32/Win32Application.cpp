@@ -450,10 +450,10 @@ bool Win32Application::createWindow(){
 
 	if(mFullscreen){
 		int format=mFormat->pixelFormat;
-		int redBits=ImageFormatConversion::getRedBits(format);
-		int greenBits=ImageFormatConversion::getGreenBits(format);
-		int blueBits=ImageFormatConversion::getBlueBits(format);
-		int alphaBits=ImageFormatConversion::getAlphaBits(format);
+		int redBits=TextureFormat::getRedBits(format);
+		int greenBits=TextureFormat::getGreenBits(format);
+		int blueBits=TextureFormat::getBlueBits(format);
+		int alphaBits=TextureFormat::getAlphaBits(format);
 		bool result=changeVideoMode(mWidth,mHeight,redBits+greenBits+blueBits+alphaBits);
 
 		if(result==false){

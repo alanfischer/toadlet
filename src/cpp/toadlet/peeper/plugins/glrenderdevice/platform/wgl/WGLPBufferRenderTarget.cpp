@@ -27,7 +27,7 @@
 #include "../../GLRenderDevice.h"
 #include <toadlet/egg/Logger.h>
 #include <toadlet/egg/Error.h>
-#include <toadlet/egg/image/ImageFormatConversion.h>
+#include <toadlet/peeper/TextureFormat.h>
 
 namespace toadlet{
 namespace peeper{
@@ -160,10 +160,10 @@ bool WGLPBufferRenderTarget::createBuffer(){
 	int texFormat=WGL_TEXTURE_RGB_ARB;
 
 	int pixelFormat=mTexture->getFormat()->pixelFormat;
-	int redBits=ImageFormatConversion::getRedBits(pixelFormat);
-	int greenBits=ImageFormatConversion::getGreenBits(pixelFormat);
-	int blueBits=ImageFormatConversion::getBlueBits(pixelFormat);
-	int alphaBits=ImageFormatConversion::getAlphaBits(pixelFormat);
+	int redBits=TextureFormat::getRedBits(pixelFormat);
+	int greenBits=TextureFormat::getGreenBits(pixelFormat);
+	int blueBits=TextureFormat::getBlueBits(pixelFormat);
+	int alphaBits=TextureFormat::getAlphaBits(pixelFormat);
 	int depthBits=16;
 
 	int iAttributes[]={

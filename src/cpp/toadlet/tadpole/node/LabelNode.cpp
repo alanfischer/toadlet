@@ -24,7 +24,6 @@
  ********** Copyright header - do not remove **********/
 
 #include <toadlet/egg/Error.h>
-#include <toadlet/egg/image/ImageFormatConversion.h>
 #include <toadlet/tadpole/Engine.h>
 #include <toadlet/tadpole/RenderableSet.h>
 #include <toadlet/tadpole/SceneRenderer.h>
@@ -219,7 +218,7 @@ void LabelNode::updateLabel(){
 	// Update material
 	Texture::ptr texture=mFont->getTexture();
 	mMaterial->getPass()->setTexture(0,texture);
-	if(ImageFormatConversion::getAlphaBits(texture->getFormat()->pixelFormat)>0){
+	if(TextureFormat::getAlphaBits(texture->getFormat()->pixelFormat)>0){
 		mMaterial->getPass()->setBlendState(BlendState::Combination_ALPHA);
 	}
 	else{

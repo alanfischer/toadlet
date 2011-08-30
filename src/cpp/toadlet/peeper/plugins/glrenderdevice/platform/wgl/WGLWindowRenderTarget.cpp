@@ -24,9 +24,9 @@
  ********** Copyright header - do not remove **********/
 
 #include "WGLWindowRenderTarget.h"
-#include <toadlet/egg/image/ImageFormatConversion.h>
 #include <toadlet/egg/Error.h>
 #include <toadlet/egg/System.h>
+#include <toadlet/peeper/TextureFormat.h>
 
 namespace toadlet{
 namespace peeper{
@@ -57,10 +57,10 @@ WGLWindowRenderTarget::WGLWindowRenderTarget(HWND wnd,WindowRenderTargetFormat *
 		PFNWGLCHOOSEPIXELFORMATARBPROC wglChoosePixelFormatARB=NULL;
 		if(result && wglIsExtensionSupported("WGL_ARB_multisample") && (wglChoosePixelFormatARB=(PFNWGLCHOOSEPIXELFORMATARBPROC)wglGetProcAddress("wglChoosePixelFormatARB"))!=NULL){
 			int pixelFormat=format->pixelFormat;
-			int redBits=ImageFormatConversion::getRedBits(pixelFormat);
-			int greenBits=ImageFormatConversion::getGreenBits(pixelFormat);
-			int blueBits=ImageFormatConversion::getBlueBits(pixelFormat);
-			int alphaBits=ImageFormatConversion::getAlphaBits(pixelFormat);
+			int redBits=TextureFormat::getRedBits(pixelFormat);
+			int greenBits=TextureFormat::getGreenBits(pixelFormat);
+			int blueBits=TextureFormat::getBlueBits(pixelFormat);
+			int alphaBits=TextureFormat::getAlphaBits(pixelFormat);
 			int colorBits=checkDefaultColorBits(redBits+blueBits+greenBits);
 
 			unsigned int numFormats;
@@ -110,10 +110,10 @@ bool WGLWindowRenderTarget::createContext(HWND wnd,WindowRenderTargetFormat *for
 
 	if(winPixelFormat==0){
 		int pixelFormat=format->pixelFormat;
-		int redBits=ImageFormatConversion::getRedBits(pixelFormat);
-		int greenBits=ImageFormatConversion::getGreenBits(pixelFormat);
-		int blueBits=ImageFormatConversion::getBlueBits(pixelFormat);
-		int alphaBits=ImageFormatConversion::getAlphaBits(pixelFormat);
+		int redBits=TextureFormat::getRedBits(pixelFormat);
+		int greenBits=TextureFormat::getGreenBits(pixelFormat);
+		int blueBits=TextureFormat::getBlueBits(pixelFormat);
+		int alphaBits=TextureFormat::getAlphaBits(pixelFormat);
 		int colorBits=checkDefaultColorBits(redBits+blueBits+greenBits);
 
 		PIXELFORMATDESCRIPTOR pfd={0};

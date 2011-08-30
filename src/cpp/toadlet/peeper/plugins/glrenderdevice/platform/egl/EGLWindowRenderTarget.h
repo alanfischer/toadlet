@@ -27,7 +27,7 @@
 #define TOADLET_PEEPER_EGLWINDOWRENDERTARGET_H
 
 #include "EGLRenderTarget.h"
-#include <toadlet/peeper/Visual.h>
+#include <toadlet/peeper/WindowRenderTargetFormat.h>
 
 namespace toadlet{
 namespace peeper{
@@ -35,14 +35,16 @@ namespace peeper{
 class TOADLET_API EGLWindowRenderTarget:public EGLRenderTarget{
 public:
 	EGLWindowRenderTarget();
-	EGLWindowRenderTarget(void *window,const Visual &visual,bool pixmap=false);
+	EGLWindowRenderTarget(void *window,WindowRenderTargetFormat *format,bool pixmap=false);
 	virtual ~EGLWindowRenderTarget();
 
 	virtual RenderTarget *getRootRenderTarget(){return (GLRenderTarget*)this;}
 
-	bool createContext(void *display,void *window,const Visual &visual,bool pixmap=false);
+	bool createContext(void *display,void *window,WindowRenderTargetFormat *format,bool pixmap=false);
 	bool destroyContext();
-	
+	bool activateAdditionalContext(){return false;}
+	void deactivateAdditionalContext(){}
+
 	bool swap();
 
 	bool isPrimary() const{return true;}
@@ -53,6 +55,8 @@ public:
 protected:
 	EGLConfig mConfig;
 	bool mPixmap;
+	Collection<HGLRC> mThreadContexts;
+	Collection<int> mThreadIDs;
 };
 
 }
