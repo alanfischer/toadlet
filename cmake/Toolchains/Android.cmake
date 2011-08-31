@@ -325,6 +325,7 @@ elseif( ANDROID_ARCH STREQUAL "X86" )
  set( NDK_NAME_ARCH "x86" )
 endif( ANDROID_ARCH STREQUAL "ARM" )
 
+# Eliminate the automatic assignment of output directories, for now.
 #setup output directories
 #set( LIBRARY_OUTPUT_PATH_ROOT ${CMAKE_SOURCE_DIR} CACHE PATH "root for library output, set this to change where android libs are installed to" )
 
@@ -365,9 +366,9 @@ if( BUILD_WITH_ANDROID_NDK_TOOLCHAIN )
 endif()
 
 # only search for libraries and includes in the ndk toolchain
-#set( CMAKE_FIND_ROOT_PATH_MODE_PROGRAM ONLY )
-#set( CMAKE_FIND_ROOT_PATH_MODE_LIBRARY ONLY )
-#set( CMAKE_FIND_ROOT_PATH_MODE_INCLUDE ONLY )
+set( CMAKE_FIND_ROOT_PATH_MODE_PROGRAM ONLY )
+set( CMAKE_FIND_ROOT_PATH_MODE_LIBRARY ONLY )
+set( CMAKE_FIND_ROOT_PATH_MODE_INCLUDE ONLY )
 
 set( CMAKE_CXX_FLAGS "-fPIC -DANDROID -Wno-psabi -fsigned-char" )
 set( CMAKE_C_FLAGS "-fPIC -DANDROID -Wno-psabi -fsigned-char" )
