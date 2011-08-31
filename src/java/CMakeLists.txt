@@ -22,7 +22,7 @@ set (CMAKE_Java_COMPILE_OBJECT
 	"<CMAKE_Java_COMPILER> -Xlint:unchecked <FLAGS> <SOURCE>"
 )
 set (CMAKE_Java_CREATE_STATIC_LIBRARY
-        "<CMAKE_Java_ARCHIVE> -cf <TARGET> -C <OBJECT_DIR>/${JAVA_OBJ} ."
+	"<CMAKE_Java_ARCHIVE> -cf <TARGET> -C <OBJECT_DIR>/${JAVA_OBJ} ."
 )
 
 

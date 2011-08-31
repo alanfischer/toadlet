@@ -18,8 +18,12 @@ class TextureStateMatrix4x4Accessor:public Matrix4x4Accessor{
 public:
 	TOADLET_SHARED_POINTERS(TextureStateMatrix4x4Accessor);
 
-	TextureStateMatrix4x4Accessor(RenderPass::ptr pass,int state):
-		mPass(pass),mState(state){}
+	TextureStateMatrix4x4Accessor(RenderPass::ptr pass,int state,TextureState::CalculationType calculation=TextureState::CalculationType_NORMAL):
+		mPass(pass),mState(state){
+		mPass->getTextureState(mState,mTextureState);
+		mTextureState.calculation=calculation;
+		mPass->setTextureState(mState,mTextureState);
+	}
 
 	void setMatrix4x4(const Matrix4x4 &matrix){
 		mPass->getTextureState(mState,mTextureState);

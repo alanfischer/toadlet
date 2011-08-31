@@ -65,6 +65,7 @@ set (PEEPER_HEADERS
 	VertexFormat.h
 	Viewport.h
 	Version.h
+	WindowRenderTargetFormat.h
 )
 
 

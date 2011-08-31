@@ -31,7 +31,7 @@ Node *Sky::create(Scene *scene,const Vector4 &skyColor,const Vector4 &fadeColor)
 			RenderPass::ptr pass=shaderPath->addPass();
 
 			pass->setBlendState(BlendState());
-			pass->setDepthState(DepthState(DepthState::DepthTest_NEVER,false));
+			pass->setDepthState(DepthState(DepthState::DepthTest_ALWAYS,false));
 			pass->setRasterizerState(RasterizerState());
 
 			String profiles[]={
@@ -233,7 +233,7 @@ Node *Sky::create(Scene *scene,const Vector4 &skyColor,const Vector4 &fadeColor)
 	sunMaterial->setSort(Material::SortType_MATERIAL);
 	sunMaterial->getPass()->setBlendState(BlendState::Combination_COLOR_ADDITIVE);
 	sunMaterial->getPass()->setMaterialState(MaterialState(false));
-	sunMaterial->getPass()->setDepthState(DepthState(DepthState::DepthTest_NEVER,false));
+	sunMaterial->getPass()->setDepthState(DepthState(DepthState::DepthTest_ALWAYS,false));
 	sunMaterial->compile();
 
 	mSun=mEngine->createNodeType(SpriteNode::type(),mScene);

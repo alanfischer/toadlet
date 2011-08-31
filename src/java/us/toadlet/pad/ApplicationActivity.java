@@ -25,9 +25,7 @@
 
 package us.toadlet.pad;
 
-import us.toadlet.peeper.Renderer;
-
-public interface ApplicationListener{
+public interface ApplicationActivity{
 	public void resized(int width,int height);
 	public void focusGained();
 	public void focusLost();
@@ -38,5 +36,5 @@ public interface ApplicationListener{
 	public void mouseReleased(int x,int y,int button);
 	public void mouseScrolled(int x,int y,int scroll);
 	public void update(int dt);
-	public void render(RenderDevice renderDevice);
+	public void render(Object renderDevice);
 }

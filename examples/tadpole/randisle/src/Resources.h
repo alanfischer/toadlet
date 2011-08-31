@@ -133,7 +133,7 @@ public:
 		if(water!=NULL){
 			Vector4 color=Colors::AZURE*1.5;
 			color.w=0.5f;
-
+#if 1
 			RenderPath::ptr shaderPath=water->addPath();
 			{
 				RenderPass::ptr pass=shaderPath->addPass();
@@ -279,7 +279,7 @@ public:
 				pass->getVariables()->addVariable("textureMatrix0",RenderVariable::ptr(new TextureMatrixVariable(0)),Material::Scope_MATERIAL);
 				pass->getVariables()->addVariable("textureMatrix1",RenderVariable::ptr(new TextureMatrixVariable(1)),Material::Scope_MATERIAL);
 			}
-
+#else
 			RenderPath::ptr fixedPath=water->addPath();
 			{
 				RenderPass::ptr pass=fixedPath->addPass();
@@ -300,7 +300,7 @@ public:
 				Math::setMatrix4x4FromScale(textureState.matrix,16,16,16);
 				pass->setTextureState(1,textureState);
 			}
-
+#endif
 			water->setLayer(-1);
 			water->compile();
 			water->retain();
