@@ -236,9 +236,7 @@ bool BaseApplication::createContextAndRenderDevice(const String &plugin){
 	if(result==false){
 		delete mRenderTarget;
 		mRenderTarget=NULL;
-	}
 
-	if(result==false){
 		Logger::error(Categories::TOADLET_PAD,
 			"error starting RenderDevice");
 		return false;

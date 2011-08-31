@@ -35,6 +35,7 @@ import android.view.WindowManager;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
+import us.toadlet.peeper.*;
 
 class ApplicationView extends SurfaceView implements SurfaceHolder.Callback{
 	public ApplicationView(Application application){
@@ -133,7 +134,7 @@ public class Application extends Activity implements RenderTarget,Runnable{
 		}
 	
 		mView=new ApplicationView(this);
-        setContentView(mView);
+		setContentView(mView);
 
 		mLastTime=System.currentTimeMillis();
 
@@ -154,8 +155,8 @@ public class Application extends Activity implements RenderTarget,Runnable{
 			long currentTime=System.currentTimeMillis();
 			if(mActive){
 				update((int)(currentTime-mLastTime));
-				if(mRenderer!=null){
-					render(mRenderer);
+				if(mRenderDevice!=null){
+					render(mRenderDevice);
 				}
 			}
 			mLastTime=currentTime;
@@ -178,15 +179,8 @@ public class Application extends Activity implements RenderTarget,Runnable{
 		
 					resized(mWidth,mHeight);
 
-					if(mActive && mRenderer!=null){
-						if(mRenderer.getCapabilitySet().resetOnResize){
-							mEngine.setRenderer(null);
-
-							mRenderer.reset();
-
-							mEngine.setRenderer(mRenderer);
-						}
-						render(mRenderer);
+					if(mActive && mRenderDevice!=null){
+						render(mRenderDevice);
 					}
 				}
 			}
@@ -298,90 +292,98 @@ public class Application extends Activity implements RenderTarget,Runnable{
 	public void setFullscreen(boolean fullscreen){mFullscreen=fullscreen;}
 	public boolean getFullscreen(){return mFullscreen;}
 	
-	public void setVisual(Visual visual){}
-	public Visual getVisual(){return null;}
+	public void setApplicationActivity(ApplicationActivity activity){mActivity=activity;}
+	public ApplicationActivity getApplicationActivity(){return mActivity;}
 
-	public void setApplicationListener(ApplicationListener listener){mListener=listener;}
-	public ApplicationListener getApplicationListener(){return mListener;}
+	public RenderTarget getRootRenderTarget(){return mRenderTarget;}
+	public boolean isPrimary(){return mRenderTarget.isPrimary();}
+	public boolean isValid(){return mRenderTarget.isValid();}
 
-	public Engine getEngine(){return mEngine;}
-	public Renderer getRenderer(){return mRenderer;}
-	//public AudioPlayer getAudioPlayer(){return mAudioPlayer;}
+	public Object getEngine(){return mEngine;}
+	public Object getRenderDevice(){return mRenderDevice;}
 
-	public void resized(int width,int height)		{if(mListener!=null)mListener.resized(width,height);}
-	public void focusGained()						{if(mListener!=null)mListener.focusGained();}
-	public void focusLost()							{if(mListener!=null)mListener.focusLost();}
-	public void keyPressed(int key)					{if(mListener!=null)mListener.keyPressed(key);}
-	public void keyReleased(int key)				{if(mListener!=null)mListener.keyReleased(key);}
-	public void mouseMoved(int x,int y)				{if(mListener!=null)mListener.mouseMoved(x,y);}
-	public void mousePressed(int x,int y,int button){if(mListener!=null)mListener.mousePressed(x,y,button);}
-	public void mouseReleased(int x,int y,int button){if(mListener!=null)mListener.mouseReleased(x,y,button);}
-	public void mouseScrolled(int x,int y,int scroll){if(mListener!=null)mListener.mouseScrolled(x,y,scroll);}
-	public void update(int dt)						{if(mListener!=null)mListener.update(dt);}
-	public void render(Renderer renderer)			{if(mListener!=null)mListener.render(renderer);}
-
-	public void setRendererOptions(int[] options){
-		mRendererOptions=new int[options.length];
-		System.arraycopy(options,0,mRendererOptions,0,options.length);
-	}
+	public void resized(int width,int height)		{if(mActivity!=null)mActivity.resized(width,height);}
+	public void focusGained()						{if(mActivity!=null)mActivity.focusGained();}
+	public void focusLost()							{if(mActivity!=null)mActivity.focusLost();}
+	public void keyPressed(int key)					{if(mActivity!=null)mActivity.keyPressed(key);}
+	public void keyReleased(int key)				{if(mActivity!=null)mActivity.keyReleased(key);}
+	public void mouseMoved(int x,int y)				{if(mActivity!=null)mActivity.mouseMoved(x,y);}
+	public void mousePressed(int x,int y,int button){if(mActivity!=null)mActivity.mousePressed(x,y,button);}
+	public void mouseReleased(int x,int y,int button){if(mActivity!=null)mActivity.mouseReleased(x,y,button);}
+	public void mouseScrolled(int x,int y,int scroll){if(mActivity!=null)mActivity.mouseScrolled(x,y,scroll);}
+	public void update(int dt)						{if(mActivity!=null)mActivity.update(dt);}
+	public void render(Object renderDevice)			{if(mActivity!=null)mActivity	.render(renderDevice);}
 
 	public void surfaceCreated(SurfaceHolder holder){
-		Logger.alert(Categories.TOADLET_PAD,
+		System.out.println(
 			"surfaceCreated");
 
-		RenderTarget.Peer renderTargetPeer=new EGLRenderContextPeer(holder,new Visual());
-		if(renderTargetPeer.isValid()){
-			internal_setRenderTargetPeer(renderTargetPeer);
-			
-			mRenderer=new GLRenderer();
-			if(mRenderer.startup(this,mRendererOptions)==false){
-				mRenderer=null;
+		boolean result=false;
+		mRenderTarget=makeRenderTarget(holder);
+		if(mRenderTarget!=null){
+			mRenderDevice=makeRenderDevice();
 
-				Error.unknown(Categories.TOADLET_PAD,
-					"Error starting Renderer");
-			}
-
-			if(mRenderer==null){
-				internal_setRenderTargetPeer(null);
+			result=mRenderDevice.create(this,null);
+			if(result==false){
+				mRenderDevice=null;
 			}
 		}
-		else{
-			Error.unknown(Categories.TOADLET_PAD,
+		if(result==false){
+			mRenderTarget=null;
+
+			System.out.println(
 				"Error creating RenderTargetPeer");
 		}
+		else if(mRenderDevice==null){
+			System.out.println(
+				"error creating RenderDevice");
+		}
 
-		if(mRenderer!=null){
-			mRenderer.setRenderTarget(this);
-			mEngine.setRenderer(mRenderer);
+		if(mRenderDevice!=null){
+			mRenderDevice.setRenderTarget(this);
+			mEngine.setRenderDevice(mRenderDevice);
 		}
 	}
 
 	public void surfaceDestroyed(SurfaceHolder holder){
-		Logger.alert(Categories.TOADLET_PAD,
+		System.out.println(
 			"surfaceDestroyed");
 
-		if(mRenderer!=null){
-			mEngine.setRenderer(null);
-
-			mRenderer.shutdown();
-			mRenderer=null;
+		if(mRenderDevice!=null){
+			mEngine.setRenderDevice(null);
+			mRenderDevice.destroy();
+			mRenderDevice=null;
 		}
 
-		internal_setRenderTargetPeer(null);
+		if(mRenderTarget!=null){
+			mRenderTarget=null;
+		}
+	}
+
+	RenderTarget makeRenderTarget(SurfaceHolder holder){
+		WindowRenderTargetFormat format=new WindowRenderTargetFormat();
+		format.pixelFormat=TextureFormat.Format_RGBA_8;
+		format.depthBits=16;
+		format.multisamples=2;
+		format.threads=2;
+		RenderTarget target=new EGLWindowRenderTarget(holder,format);
+		if(target!=null && target.isValid()==false){
+			target=null;
+		}
+		return target;
 	}
 
 	Thread mThread=null;
 	protected ApplicationView mView;
-	protected ApplicationListener mListener;
-	protected Engine mEngine;
+	protected ApplicationActivity mActivity;
+	protected Object mEngine;
 	protected boolean mFullscreen;
 	protected boolean mActive;
 	protected boolean mRun;
 	protected Object mSurfaceMutex=new Object();
 	protected long mLastTime=0;
-	protected RenderTarget.Peer mRenderTargetPeer;
-	protected Renderer mRenderer;
-	protected int[] mRendererOptions;
+	protected RenderTarget mRenderTarget;
+	protected Object mRenderDevice;
 		
 	protected SurfaceHolder mNotifySurfaceCreated;
 	protected SurfaceHolder mNotifySurfaceDestroyed;

@@ -26,6 +26,9 @@
 package us.toadlet.peeper;
 
 public class WindowRenderTargetFormat{
+	public WindowRenderTargetFormat(){
+	}
+
 	public WindowRenderTargetFormat(int pixelFormat,int depthBits,int stencilBits,int multisamples,boolean vsync,int threads,boolean debug,int flags){
 		this.pixelFormat=pixelFormat;
 		this.depthBits=depthBits;
