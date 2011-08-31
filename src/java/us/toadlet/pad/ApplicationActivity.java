@@ -36,5 +36,5 @@ public interface ApplicationActivity{
 	public void mouseReleased(int x,int y,int button);
 	public void mouseScrolled(int x,int y,int scroll);
 	public void update(int dt);
-	public void render(Object renderDevice);
+	public void render(RenderDevice renderDevice);
 }
