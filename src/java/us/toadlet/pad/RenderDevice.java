@@ -25,24 +25,17 @@
 
 package us.toadlet.pad;
 
-public class NApplicationActivity implements ApplicationActivity{
-	public NApplicationActivity(){
+import us.toadlet.peeper.*;
+
+public class RenderDevice{
+	public RenderDevice(){
 		constructor();
 	}
 
 	public native void constructor();
 
-	public native void resized(int width,int height);
-	public native void focusGained();
-	public native void focusLost();
-	public native void update(int dt);
-	public native void render(RenderDevice renderDevice);
+	public native boolean create(RenderTarget target,int[] options);
+	public native void destroy();
 
-	public native void keyPressed(int key);
-	public native void keyReleased(int key);
-
-	public native void mousePressed(int x,int y,int button);
-	public native void mouseMoved(int x,int y);
-	public native void mouseReleased(int x,int y,int button);
-	public native void mouseScrolled(int x,int y,int scroll);
+	public native boolean setRenderTarget(RenderTarget target);
 }

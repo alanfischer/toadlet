@@ -121,7 +121,7 @@ public class Application extends Activity implements RenderTarget,Runnable{
 	}
 	
 	public void create(){
-		mEngine=new Engine();
+		mEngine=makeEngine();
 	}
 	
 	public void destroy(){
@@ -299,8 +299,8 @@ public class Application extends Activity implements RenderTarget,Runnable{
 	public boolean isPrimary(){return mRenderTarget.isPrimary();}
 	public boolean isValid(){return mRenderTarget.isValid();}
 
-	public Object getEngine(){return mEngine;}
-	public Object getRenderDevice(){return mRenderDevice;}
+	public Engine getEngine(){return mEngine;}
+	public RenderDevice getRenderDevice(){return mRenderDevice;}
 
 	public void resized(int width,int height)		{if(mActivity!=null)mActivity.resized(width,height);}
 	public void focusGained()						{if(mActivity!=null)mActivity.focusGained();}
@@ -312,7 +312,7 @@ public class Application extends Activity implements RenderTarget,Runnable{
 	public void mouseReleased(int x,int y,int button){if(mActivity!=null)mActivity.mouseReleased(x,y,button);}
 	public void mouseScrolled(int x,int y,int scroll){if(mActivity!=null)mActivity.mouseScrolled(x,y,scroll);}
 	public void update(int dt)						{if(mActivity!=null)mActivity.update(dt);}
-	public void render(Object renderDevice)			{if(mActivity!=null)mActivity	.render(renderDevice);}
+	public void render(RenderDevice renderDevice)	{if(mActivity!=null)mActivity.render(renderDevice);}
 
 	public void surfaceCreated(SurfaceHolder holder){
 		System.out.println(
@@ -360,7 +360,7 @@ public class Application extends Activity implements RenderTarget,Runnable{
 		}
 	}
 
-	RenderTarget makeRenderTarget(SurfaceHolder holder){
+	protected RenderTarget makeRenderTarget(SurfaceHolder holder){
 		WindowRenderTargetFormat format=new WindowRenderTargetFormat();
 		format.pixelFormat=TextureFormat.Format_RGBA_8;
 		format.depthBits=16;
@@ -373,17 +373,22 @@ public class Application extends Activity implements RenderTarget,Runnable{
 		return target;
 	}
 
+	protected native Engine makeEngine();
+	protected native RenderDevice makeRenderDevice();
+	
 	Thread mThread=null;
 	protected ApplicationView mView;
 	protected ApplicationActivity mActivity;
-	protected Object mEngine;
+	protected Engine mEngine;
 	protected boolean mFullscreen;
 	protected boolean mActive;
 	protected boolean mRun;
 	protected Object mSurfaceMutex=new Object();
 	protected long mLastTime=0;
 	protected RenderTarget mRenderTarget;
-	protected Object mRenderDevice;
+	protected RenderDevice mRenderDevice;
+//	protected AudioDevice mAudioDevice;
+//	protected MotionDevice mMotionDevice;
 		
 	protected SurfaceHolder mNotifySurfaceCreated;
 	protected SurfaceHolder mNotifySurfaceDestroyed;

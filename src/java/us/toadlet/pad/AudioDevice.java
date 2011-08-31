@@ -26,11 +26,7 @@
 package us.toadlet.pad;
 
 public class NApplicationActivity implements ApplicationActivity{
-	public NApplicationActivity(){
-		constructor();
-	}
-
-	public native void constructor();
+	public native NApplicationActivity();
 
 	public native void resized(int width,int height);
 	public native void focusGained();
