@@ -26,7 +26,7 @@
 #include "EGLPBufferRenderTarget.h"
 #include "../../GLRenderDevice.h"
 #include <toadlet/egg/Error.h>
-#include <toadlet/egg/image/ImageFormatConversion.h>
+#include <toadlet/peeper/TextureFormat.h>
 
 namespace toadlet{
 namespace peeper{
@@ -152,10 +152,10 @@ bool EGLPBufferRenderTarget::createBuffer(){
 	int width=mTexture->getFormat()->width;
 	int height=mTexture->getFormat()->height;
 	int pixelFormat=mTexture->getFormat()->pixelFormat;
-	int redBits=ImageFormatConversion::getRedBits(pixelFormat);
-	int greenBits=ImageFormatConversion::getGreenBits(pixelFormat);
-	int blueBits=ImageFormatConversion::getBlueBits(pixelFormat);
-	int alphaBits=ImageFormatConversion::getAlphaBits(pixelFormat);
+	int redBits=TextureFormat::getRedBits(pixelFormat);
+	int greenBits=TextureFormat::getGreenBits(pixelFormat);
+	int blueBits=TextureFormat::getBlueBits(pixelFormat);
+	int alphaBits=TextureFormat::getAlphaBits(pixelFormat);
 	int depthBits=16;
 
 	EGLConfig config=chooseEGLConfig(mDisplay,redBits,greenBits,blueBits,alphaBits,depthBits,0,false,false,true,false);
