@@ -92,6 +92,8 @@ install (TARGETS toadlet_peeper_s DESTINATION lib)
 
 # Platform specific modules
 if (TOADLET_PLATFORM_ANDROID)
+	find_library (EGL EGL)
+
 	find_library (GLESV1 GLESv1_CM)
 	if (GLESV1)
 		set (TOADLET_HAS_OPENGL ON PARENT_SCOPE)

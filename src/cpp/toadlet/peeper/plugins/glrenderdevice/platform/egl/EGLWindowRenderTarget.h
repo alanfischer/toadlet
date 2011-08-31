@@ -35,7 +35,7 @@ namespace peeper{
 class TOADLET_API EGLWindowRenderTarget:public EGLRenderTarget{
 public:
 	EGLWindowRenderTarget();
-	EGLWindowRenderTarget(void *window,WindowRenderTargetFormat *format,bool pixmap=false);
+	EGLWindowRenderTarget(void *display,void *window,WindowRenderTargetFormat *format,bool pixmap=false);
 	virtual ~EGLWindowRenderTarget();
 
 	virtual RenderTarget *getRootRenderTarget(){return (GLRenderTarget*)this;}
@@ -55,8 +55,6 @@ public:
 protected:
 	EGLConfig mConfig;
 	bool mPixmap;
-	Collection<HGLRC> mThreadContexts;
-	Collection<int> mThreadIDs;
 };
 
 }

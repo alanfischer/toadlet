@@ -25,14 +25,14 @@
 
 #include "EGLWindowRenderTarget.h"
 #include <toadlet/egg/Error.h>
-#include <toadlet/egg/image/ImageFormatConversion.h>
+#include <toadlet/peeper/TextureFormat.h>
 
 namespace toadlet{
 namespace peeper{
 
 TOADLET_C_API RenderTarget *new_EGLWindowRenderTarget(void *window,WindowRenderTargetFormat *format){
 	void *display=NULL;
-	#if defind(TOADLET_PLATFORM_WIN32)
+	#if defined(TOADLET_PLATFORM_WIN32)
 		display=GetDC((HWND)window);
 	#endif
 	return new EGLWindowRenderTarget(display,window,format);
@@ -118,7 +118,7 @@ bool EGLWindowRenderTarget::createContext(void *display,void *window,WindowRende
 	#else
 		int version[2];
 		if(eglInitialize(mDisplay,&version[0],&version[1])==false){
-			Error::unknown(Logger.TOADLET_PEEPER,
+			Error::unknown(Categories::TOADLET_PEEPER,
 				"eglInitialize error");
 			return false;
 		}
@@ -135,10 +135,10 @@ bool EGLWindowRenderTarget::createContext(void *display,void *window,WindowRende
 		String("EGL_EXTENSIONS:")+eglQueryString(mDisplay,EGL_EXTENSIONS));
 
 	int pixelFormat=format->pixelFormat;
-	int redBits=ImageFormatConversion::getRedBits(pixelFormat);
-	int greenBits=ImageFormatConversion::getGreenBits(pixelFormat);
-	int blueBits=ImageFormatConversion::getBlueBits(pixelFormat);
-	int alphaBits=ImageFormatConversion::getAlphaBits(pixelFormat);
+	int redBits=TextureFormat::getRedBits(pixelFormat);
+	int greenBits=TextureFormat::getGreenBits(pixelFormat);
+	int blueBits=TextureFormat::getBlueBits(pixelFormat);
+	int alphaBits=TextureFormat::getAlphaBits(pixelFormat);
 	int depthBits=format->depthBits;
 	int stencilBits=format->stencilBits;
 	int multisamples=format->multisamples;
@@ -151,11 +151,11 @@ bool EGLWindowRenderTarget::createContext(void *display,void *window,WindowRende
 
 	try{
 		if(!pixmap){
-			mSurface=eglCreateWindowSurface(mDisplay,mConfig,window,NULL);
+			mSurface=eglCreateWindowSurface(mDisplay,mConfig,(ANativeWindow*)window,NULL);
 			TOADLET_CHECK_EGLERROR("eglCreateWindowSurface");
 		}
 		else{
-			mSurface=eglCreatePixmapSurface(mDisplay,mConfig,window,NULL);
+			mSurface=eglCreatePixmapSurface(mDisplay,mConfig,(egl_native_pixmap_t*)window,NULL);
 			TOADLET_CHECK_EGLERROR("eglCreatePixmapSurface");
 		}
 	}catch(...){mSurface=EGL_NO_SURFACE;}
