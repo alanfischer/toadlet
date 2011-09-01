@@ -13,7 +13,7 @@
 
 class HUD;
 
-class RandIsle:public Application,public TerrainNodeDataSource,public UpdateListener,public TerrainNodeListener,public PathClimberListener,public RenderPathChooser{
+class RandIsle:public Applet,public TerrainNodeDataSource,public UpdateListener,public TerrainNodeListener,public PathClimberListener,public RenderPathChooser{
 public:
 	enum{
 		Scope_BIT_TREE=			1<<1,
@@ -26,10 +26,10 @@ public:
 		Scope_HUD=				Scope_BIT_HUD,
 	};
 
-	RandIsle();
+	RandIsle(Application *app,String path);
 	virtual ~RandIsle();
 
-	void create(const String &directory);
+	void create();
 	void destroy();
 	void resized(int width,int height);
 	void render(RenderDevice *renderDevice);
@@ -42,9 +42,12 @@ public:
 	void postFrameUpdate(int dt){}
 	void keyPressed(int key);
 	void keyReleased(int key);
+	void focusGained(){}
+	void focusLost(){}
 	void mousePressed(int x,int y,int button);
 	void mouseReleased(int x,int y,int button);
 	void mouseMoved(int x,int y);
+	void mouseScrolled(int x,int y,int scroll){}
 	void joyPressed(int button);
 	void joyMoved(scalar x,scalar y,scalar z,scalar r,scalar u,scalar v);
 	void joyReleased(int button);
@@ -95,6 +98,9 @@ protected:
 		int y;
 	};
 
+	Application *mApp;
+	String mPath;
+	Engine *mEngine;
 	HopScene::ptr mScene;
 	TerrainNode::ptr mTerrain;
 	SmoothFollower::ptr mFollower;

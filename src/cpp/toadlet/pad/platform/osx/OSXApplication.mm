@@ -41,15 +41,10 @@
 	#import <AppKit/AppKit.h>
 #endif
 
-using namespace toadlet;
-using namespace toadlet::egg;
-using namespace toadlet::egg::io;
-using namespace toadlet::flick;
 using namespace toadlet::peeper;
 using namespace toadlet::ribbit;
-using namespace toadlet::tadpole;
+using namespace toadlet::flick;
 using namespace toadlet::tadpole::handler;
-using namespace toadlet::pad;
 
 #if defined(TOADLET_HAS_OPENGL)
 	extern "C" RenderDevice *new_GLRenderDevice();

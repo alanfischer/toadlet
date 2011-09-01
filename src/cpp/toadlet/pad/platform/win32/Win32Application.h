@@ -39,7 +39,7 @@ public:
 	Win32Application();
 	virtual ~Win32Application();
 
-	virtual void create(egg::String renderDevice=(char*)NULL,egg::String audioPlayer=(char*)NULL,egg::String motionDevice=(char*)NULL);
+	virtual void create(String renderDevice=(char*)NULL,String audioPlayer=(char*)NULL,String motionDevice=(char*)NULL);
 	virtual void destroy();
 
 	virtual void start();
@@ -54,8 +54,8 @@ public:
 	virtual void deactivate();
 	virtual bool active() const{return mActive;}
 
-	virtual void setTitle(const egg::String &title);
-	virtual const egg::String &getTitle() const;
+	virtual void setTitle(const String &title);
+	virtual const String &getTitle() const;
 
 	virtual void setPosition(int x,int y);
 	virtual int getPositionX() const;
@@ -77,7 +77,7 @@ public:
 	tadpole::handler::Win32ResourceArchive::ptr getResourceArchive() const{return mResourceArchive;}
 
 	virtual void *getWindowHandle(){return getHWND();}
-	void changeRenderDevicePlugin(const egg::String &plugin){mNewRenderDevicePlugin=plugin;}
+	void changeRenderDevicePlugin(const String &plugin){mNewRenderDevicePlugin=plugin;}
 	void setIcon(void *icon);
 	void *getHINSTANCE() const;
 	void *getHWND() const;
@@ -86,7 +86,7 @@ public:
 	void internal_resize(int width,int height);
 	void internal_mouseMoved(int x,int y);
 
-	typedef egg::Map<void*,Win32Application*> ApplicationMap;
+	typedef Map<void*,Win32Application*> ApplicationMap;
 	static int mWindowCount;
 	static ApplicationMap mApplicationMap;
 	static int translateKey(int key);
@@ -96,7 +96,7 @@ protected:
 	bool createWindow();
 	void destroyWindow();
 
-	egg::String mTitle;
+	String mTitle;
 	int mPositionX,mPositionY;
 	int mWidth,mHeight;
 	bool mFullscreen;

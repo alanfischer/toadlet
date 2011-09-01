@@ -36,7 +36,7 @@
 #include <toadlet/flick/MotionDevice.h>
 #include <toadlet/tadpole/Engine.h>
 #include <toadlet/pad/Types.h>
-#include <toadlet/pad/ApplicationActivity.h>
+#include <toadlet/pad/Applet.h>
 
 namespace toadlet{
 namespace pad{
@@ -119,30 +119,30 @@ public:
 	virtual void setWindowRenderTargetFormat(const WindowRenderTargetFormat::ptr format){mFormat=format;}
 	virtual WindowRenderTargetFormat::ptr getWindowRenderTargetFormat() const{return mFormat;}
 
-	virtual void setApplicationActivity(ApplicationActivity *activity){mActivity=activity;}
-	virtual ApplicationActivity *getApplicationActivity() const{return mActivity;}
+	virtual void setApplet(Applet *applet){mApplet=applet;}
+	virtual Applet *getApplet() const{return mApplet;}
 
 	virtual void changeRenderDevicePlugin(const String &plugin)=0;
 	virtual void setRenderDeviceOptions(int *options,int length);
 	virtual void setAudioDeviceOptions(int *options,int length);
 
-	virtual void resized(int width,int height)		{if(mActivity!=NULL){mActivity->resized(width,height);}}
-	virtual void focusGained()						{if(mActivity!=NULL){mActivity->focusGained();}}
-	virtual void focusLost()						{if(mActivity!=NULL){mActivity->focusLost();}}
-	virtual void update(int dt)						{if(mActivity!=NULL){mActivity->update(dt);}}
-	virtual void render(RenderDevice *renderDevice)	{if(mActivity!=NULL){mActivity->render(renderDevice);}}
+	virtual void resized(int width,int height)		{if(mApplet!=NULL){mApplet->resized(width,height);}}
+	virtual void focusGained()						{if(mApplet!=NULL){mApplet->focusGained();}}
+	virtual void focusLost()						{if(mApplet!=NULL){mApplet->focusLost();}}
+	virtual void update(int dt)						{if(mApplet!=NULL){mApplet->update(dt);}}
+	virtual void render(RenderDevice *renderDevice)	{if(mApplet!=NULL){mApplet->render(renderDevice);}}
 
-	virtual void keyPressed(int key)				{if(mActivity!=NULL){mActivity->keyPressed(key);}}
-	virtual void keyReleased(int key)				{if(mActivity!=NULL){mActivity->keyReleased(key);}}
+	virtual void keyPressed(int key)				{if(mApplet!=NULL){mApplet->keyPressed(key);}}
+	virtual void keyReleased(int key)				{if(mApplet!=NULL){mApplet->keyReleased(key);}}
 
-	virtual void mousePressed(int x,int y,int button){if(mActivity!=NULL){mActivity->mousePressed(x,y,button);}}
-	virtual void mouseMoved(int x,int y)			{if(mActivity!=NULL){mActivity->mouseMoved(x,y);}}
-	virtual void mouseReleased(int x,int y,int button){if(mActivity!=NULL){mActivity->mouseReleased(x,y,button);}}
-	virtual void mouseScrolled(int x,int y,int scroll){if(mActivity!=NULL){mActivity->mouseScrolled(x,y,scroll);}}
+	virtual void mousePressed(int x,int y,int button){if(mApplet!=NULL){mApplet->mousePressed(x,y,button);}}
+	virtual void mouseMoved(int x,int y)			{if(mApplet!=NULL){mApplet->mouseMoved(x,y);}}
+	virtual void mouseReleased(int x,int y,int button){if(mApplet!=NULL){mApplet->mouseReleased(x,y,button);}}
+	virtual void mouseScrolled(int x,int y,int scroll){if(mApplet!=NULL){mApplet->mouseScrolled(x,y,scroll);}}
 
-	virtual void joyPressed(int button)				{if(mActivity!=NULL){mActivity->joyPressed(button);}}
-	virtual void joyMoved(scalar x,scalar y,scalar z,scalar r,scalar u,scalar v){if(mActivity!=NULL){mActivity->joyMoved(x,y,z,r,u,v);}}
-	virtual void joyReleased(int button)			{if(mActivity!=NULL){mActivity->joyReleased(button);}}
+	virtual void joyPressed(int button)				{if(mApplet!=NULL){mApplet->joyPressed(button);}}
+	virtual void joyMoved(scalar x,scalar y,scalar z,scalar r,scalar u,scalar v){if(mApplet!=NULL){mApplet->joyMoved(x,y,z,r,u,v);}}
+	virtual void joyReleased(int button)			{if(mApplet!=NULL){mApplet->joyReleased(button);}}
 
 	virtual Engine *getEngine() const{return mEngine;}
 	virtual RenderDevice *getRenderDevice() const{return mRenderDevice;}
@@ -209,7 +209,7 @@ protected:
 
 	bool mBackable;
 	WindowRenderTargetFormat::ptr mFormat;
-	ApplicationActivity *mActivity;
+	Applet *mApplet;
 
 	Map<String,RenderDevicePlugin> mRenderDevicePlugins;
 	Collection<String> mRenderDevicePreferences;

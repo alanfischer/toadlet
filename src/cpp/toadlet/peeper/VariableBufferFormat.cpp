@@ -115,6 +115,7 @@ int VariableBufferFormat::getFormatColumns(int format){
 
 void VariableBufferFormat::compile(){
 	mFlatVariables.clear();
+	mStructVariable->setName(mName);
 	int i;
 	for(i=0;i<mStructVariable->getStructSize();++i){
 		compile(mStructVariable->getStructVariable(i),mStructVariable);
@@ -140,6 +141,16 @@ void VariableBufferFormat::compile(Variable::ptr variable,Variable *parent){
 	for(i=0;i<variable->getStructSize();++i){
 		compile(variable->getStructVariable(i),variable);
 	}
+}
+
+String VariableBufferFormat::toString(Variable::ptr variable,String tab){
+	String result;
+	result+=tab+variable->getName()+":"+variable->getIndex()+"\n";
+	int i;
+	for(i=0;i<variable->getStructSize();++i){
+		result+=toString(variable->getStructVariable(i),tab+"\t");
+	}
+	return result;
 }
 
 }

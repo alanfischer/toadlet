@@ -39,7 +39,7 @@ public:
 	X11Application();
 	virtual ~X11Application();
 
-	virtual void create(egg::String renderDevice=(char*)NULL,egg::String audioDevice=(char*)NULL,egg::String motionDevice=(char*)NULL);
+	virtual void create(String renderDevice=(char*)NULL,String audioDevice=(char*)NULL,String motionDevice=(char*)NULL);
 	virtual void destroy();
 
 	virtual void start();
@@ -54,8 +54,8 @@ public:
 	virtual void deactivate();
 	virtual bool active() const{return mActive;}
 
-	virtual void setTitle(const egg::String &title);
-	virtual const egg::String &getTitle() const;
+	virtual void setTitle(const String &title);
+	virtual const String &getTitle() const;
 
 	virtual void setPosition(int x,int y);
 	virtual int getPositionX() const;
@@ -74,7 +74,7 @@ public:
 	virtual void setDifferenceMouse(bool difference);
 	virtual bool getDifferenceMouse() const{return mDifferenceMouse;}
 
-	virtual void changeRenderDevicePlugin(const egg::String &plugin){}
+	virtual void changeRenderDevicePlugin(const String &plugin){}
 
 	virtual void *getWindowHandle(){return getWindow();}
 	void *getDisplay() const;
@@ -91,14 +91,14 @@ protected:
 	void configured(int x,int y,int width,int height);
 
 	// Keeping our custom versions of these until we can unify the GLXRenderTargetWindow's constructor
-	peeper::RenderTarget *makeRenderTarget();
-	peeper::RenderDevice *makeRenderDevice();
-	bool createContextAndRenderDevice(const egg::String &plugin);
+	RenderTarget *makeRenderTarget();
+	RenderDevice *makeRenderDevice();
+	bool createContextAndRenderDevice(const String &plugin);
 	bool destroyRenderDeviceAndContext();
 
 	static int translateKey(int key);
 
-	egg::String mTitle;
+	String mTitle;
 	int mPositionX,mPositionY;
 	int mWidth,mHeight;
 	bool mFullscreen;

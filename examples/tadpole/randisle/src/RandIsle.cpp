@@ -11,12 +11,14 @@
 
 static const scalar epsilon=0.001f;
 
-RandIsle::RandIsle():Application(),
+RandIsle::RandIsle(Application *app,String path):
 	mMouseButtons(0),
 	mXJoy(0),mYJoy(0),
 
 	mPatchNoise(4,4,1,1,256)
 {
+	mApp=app;
+	mPath=path;
 	mPatchSize=64;
 	mPatchScale.set(16,16,64);
 }
@@ -24,14 +26,12 @@ RandIsle::RandIsle():Application(),
 RandIsle::~RandIsle(){
 }
 
-void RandIsle::create(const String &directory){
-	Logger::getInstance()->setMasterReportingLevel(Logger::Level_ALERT);
-
+void RandIsle::create(){
+//	Logger::getInstance()->setMasterReportingLevel(Logger::Level_ALERT);
 	Logger::debug("RandIsle::create");
 
-	Application::create("d3d9");
-	
-	mEngine->setDirectory(directory);
+	mEngine=mApp->getEngine();
+	mEngine->setDirectory(mPath);
 //	mEngine->getMaterialManager()->setRenderPathChooser(this);
 
 	Resources::init(mEngine);
@@ -130,8 +130,6 @@ void RandIsle::destroy(){
 		mPredictedMaterial->release();
 		mPredictedMaterial=NULL;
 	}
-
-	Application::destroy();
 
 	Logger::debug("RandIsle::destroy finished");
 }
@@ -371,7 +369,7 @@ void RandIsle::logicUpdate(int dt){
 
 	playerMove(-mXJoy/8.0,-mYJoy*80);
 
-	setTitle(String("FPS:")+mCamera->getFramesPerSecond()+" VISIBLE:"+mCamera->getVisibleCount()+" ACTIVE:"+mScene->countActiveNodes());
+	mApp->setTitle(String("FPS:")+mCamera->getFramesPerSecond()+" VISIBLE:"+mCamera->getVisibleCount()+" ACTIVE:"+mScene->countActiveNodes());
 }
 
 void RandIsle::frameUpdate(int dt){
@@ -522,8 +520,8 @@ void RandIsle::updatePredictedPath(){
 }
 
 void RandIsle::keyPressed(int key){
-	if(key==Key_ESC){
-		stop();
+	if(key==Application::Key_ESC){
+		mApp->stop();
 	}
 	else if(key==' '){
 		playerJump();
@@ -536,18 +534,18 @@ void RandIsle::keyReleased(int key){
 void RandIsle::mousePressed(int x,int y,int button){
 	mMouseButtons|=1<<button;
 
-	setDifferenceMouse(true);
+	mApp->setDifferenceMouse(true);
 }
 
 void RandIsle::mouseReleased(int x,int y,int button){
 	mMouseButtons&=~(1<<button);
 
-	setDifferenceMouse(false);
+	mApp->setDifferenceMouse(false);
 }
 
 void RandIsle::mouseMoved(int x,int y){
-	scalar xamount=(float)x/(float)getWidth();
-	scalar yamount=(float)y/(float)getHeight();
+	scalar xamount=(float)x/(float)mApp->getWidth();
+	scalar yamount=(float)y/(float)mApp->getHeight();
 
 	if(mMouseButtons>0){
 		playerMove(-xamount*3,-yamount*80);
@@ -804,21 +802,17 @@ RenderPath::ptr RandIsle::chooseBestPath(Material *material){
 	return 0;
 }
 
-int toadletMain(int argc,char **argv){
-	RandIsle app;
-	String directory;
+Applet *createApplet(Application *app){
+	String path;
 	String lookFor="/grass.png";
 	const char *paths[]={"../../res","../res","res",".",NULL};
 	int i;
 	for(i=0;paths[i]!=NULL;++i){
 		if(FileStream(paths[i]+lookFor,FileStream::Open_BIT_READ|FileStream::Open_BIT_BINARY).closed()==false){
-			directory=paths[i];
+			path=paths[i];
 			break;
 		}
 	}
 
-	app.create(directory);
-	app.start();
-	app.destroy();
-	return 0;
+	return new RandIsle(app,path);
 }

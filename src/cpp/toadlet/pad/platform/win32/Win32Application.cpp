@@ -58,14 +58,9 @@
 	#endif
 #endif
 
-using namespace toadlet;
-using namespace toadlet::egg;
-using namespace toadlet::egg::image;
-using namespace toadlet::egg::io;
 using namespace toadlet::peeper;
 using namespace toadlet::ribbit;
 using namespace toadlet::flick;
-using namespace toadlet::tadpole;
 using namespace toadlet::tadpole::handler;
 
 #if defined(TOADLET_HAS_OPENGL)
