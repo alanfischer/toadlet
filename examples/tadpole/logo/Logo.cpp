@@ -61,46 +61,46 @@ public:
 	Quaternion mRotate,mLastRotate;
 };
 
-Logo::Logo():Application(){
+Logo::Logo(Application *app){
+	this->app=app;
 }
 
 Logo::~Logo(){
 }
 
 void Logo::create(){
-	Application::create("gl");
+	engine=app->getEngine();
+	engine->setDirectory("../../../data");
 
-	mEngine->setDirectory("../../../data");
-
-	scene=Scene::ptr(new Scene(mEngine));
+	scene=Scene::ptr(new Scene(engine));
 
 //	DecalShadowSceneRenderer::ptr sceneRenderer(new DecalShadowSceneRenderer(scene));
 //	sceneRenderer->setPlane(Plane(Math::Z_UNIT_VECTOR3,-30));
 //	scene->setSceneRenderer(sceneRenderer);
 
-	LightNode::ptr light=getEngine()->createNodeType(LightNode::type(),scene);
+	LightNode::ptr light=engine->createNodeType(LightNode::type(),scene);
 	LightState state;
 	state.type=LightState::Type_DIRECTION;
 	state.direction=Math::NEG_Z_UNIT_VECTOR3;
 	light->setLightState(state);
 	scene->getRoot()->attach(light);
 
- 	meshNode=getEngine()->createNodeType(MeshNode::type(),scene);
+ 	meshNode=engine->createNodeType(MeshNode::type(),scene);
 	meshNode->setMesh("lt.xmsh");
 	meshNode->getController()->start();
 	meshNode->getController()->setCycling(Controller::Cycling_REFLECT);
 	scene->getRoot()->attach(meshNode);
-//Material::ptr funkyMaterial=makeFunkyMaterial();
-//for(int i=0;i<meshNode->getNumSubMeshes();++i)meshNode->getSubMesh(i)->material=funkyMaterial;
+	//Material::ptr funkyMaterial=makeFunkyMaterial();
+	//for(int i=0;i<meshNode->getNumSubMeshes();++i)meshNode->getSubMesh(i)->material=funkyMaterial;
 
-	cameraNode=getEngine()->createNodeType(CameraNode::type(),scene);
+	cameraNode=engine->createNodeType(CameraNode::type(),scene);
 	cameraNode->setLookAt(Vector3(0,-Math::fromInt(150),0),Math::ZERO_VECTOR3,Math::Z_UNIT_VECTOR3);
 	cameraNode->setClearColor(Colors::BLUE);
 	scene->getRoot()->attach(cameraNode);
 
 // Only looks good if running on device, in simulator its always a top down view
 #if 1
-	MotionDevice *motionDevice=getMotionDevice();
+	MotionDevice *motionDevice=app->getMotionDevice();
 	if(motionDevice!=NULL){
 		cameraNode->addNodeListener(NodeListener::ptr(new GravityFollower(motionDevice)));
 		motionDevice->startup();
@@ -110,8 +110,6 @@ void Logo::create(){
 
 void Logo::destroy(){
 	scene->destroy();
-
-	Application::destroy();
 }
 
 void Logo::resized(int width,int height){
@@ -175,10 +173,10 @@ String funkyFragmentCode[]={
 };
 
 Material::ptr Logo::makeFunkyMaterial(){
-	Material::ptr material=mEngine->getMaterialManager()->createMaterial();
+	Material::ptr material=engine->getMaterialManager()->createMaterial();
 
-	Shader::ptr funkyVertexShader=getEngine()->getShaderManager()->createShader(Shader::ShaderType_VERTEX,funkyProfiles,funkyVertexCode,2);
-	Shader::ptr funkyFragmentShader=getEngine()->getShaderManager()->createShader(Shader::ShaderType_FRAGMENT,funkyProfiles,funkyFragmentCode,2);
+	Shader::ptr funkyVertexShader=engine->getShaderManager()->createShader(Shader::ShaderType_VERTEX,funkyProfiles,funkyVertexCode,2);
+	Shader::ptr funkyFragmentShader=engine->getShaderManager()->createShader(Shader::ShaderType_FRAGMENT,funkyProfiles,funkyFragmentCode,2);
 
 	RenderPass::ptr pass=material->getPass();
 	pass->setShader(Shader::ShaderType_VERTEX,funkyVertexShader);
@@ -191,10 +189,4 @@ Material::ptr Logo::makeFunkyMaterial(){
 	return material;
 }
 
-int toadletMain(int argc,char **argv){
-	Logo app;
-	app.create();
-	app.start();
-	app.destroy();
-	return 0;
-}
+Applet *createApplet(Application *app){return new Logo(app);}

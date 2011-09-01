@@ -74,7 +74,7 @@ void BaseApplication::mapKeyNames(Map<int,String> &keyToName,Map<String,int> &na
 BaseApplication::BaseApplication():
 	mBackable(false),
 	//mFormat,
-	mActivity(NULL),
+	mApplet(NULL),
 
 	//mRenderDevicePlugins,
 	//mCurrentRenderDevicePlugin,
@@ -144,8 +144,8 @@ void BaseApplication::create(String renderDevice,String audioDevice,String motio
 
 	mEngine->installHandlers();
 
-	if(mActivity!=NULL){
-		mActivity->create();
+	if(mApplet!=NULL){
+		mApplet->create();
 	}
 
 	activate();
@@ -158,8 +158,9 @@ void BaseApplication::destroy(){
 
 	deactivate();
 
-	if(mActivity!=NULL){
-		mActivity->destroy();
+	if(mApplet!=NULL){
+		mApplet->destroy();
+		mApplet=NULL;
 	}
 
 	destroyRenderDeviceAndContext();

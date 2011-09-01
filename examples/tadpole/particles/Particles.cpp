@@ -9,7 +9,6 @@ Particles::~Particles(){
 
 void Particles::create(){
 	engine=app->getEngine();
-
 	engine->setDirectory("../../../data");
 
 	scene=Scene::ptr(new Scene(engine));
@@ -156,12 +155,4 @@ void Particles::addSimulatedParticles(ParticleNode::ptr particles){
 	simulatedParticles.add(particles);
 }
 
-int toadletMain(int argc,char **argv){
-	Application app;
-	Particles parts(&app);
-	app.setApplicationActivity(&parts);
-	app.create("d3d10");
-	app.start();
-	app.destroy();
-	return 0;
-}
+Applet *createApplet(Application *app){return new Particles(app);}

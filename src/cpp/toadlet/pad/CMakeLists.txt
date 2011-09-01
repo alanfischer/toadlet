@@ -24,7 +24,7 @@ set (PAD_PLATFORM_X11_SRC
 
 # Headers
 set (PAD_HEADERS
-	ApplicationActivity.h
+	Applet.h
 	BaseApplication.h
 	Application.h
 	Version.h

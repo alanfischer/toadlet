@@ -262,13 +262,31 @@ bool D3D10Shader::reflect(){
 
 	mVariableBufferFormats.resize(desc.ConstantBuffers);
 
+	int numResources=0;
+	for(i=0;i<desc.BoundResources;++i){
+		D3D10_SHADER_INPUT_BIND_DESC bindDesc;
+		mReflector->GetResourceBindingDesc(i,&bindDesc);
+
+		if(bindDesc.Type!=D3D10_SIT_CBUFFER){
+			numResources++;
+		}
+	}
+
+	VariableBufferFormat::ptr primaryFormat;
 	for(i=0;i<desc.ConstantBuffers;++i){
 		ID3D10ShaderReflectionConstantBuffer *buffer=mReflector->GetConstantBufferByIndex(i);
 		D3D10_SHADER_BUFFER_DESC bufferDesc;
 		buffer->GetDesc(&bufferDesc);
 
+		int numVariables=bufferDesc.Variables;
 		bool primary=(strcmp(bufferDesc.Name,"$Globals")==0);
-		VariableBufferFormat::ptr format(new VariableBufferFormat(primary,bufferDesc.Name,bufferDesc.Size,bufferDesc.Variables));
+		if(primary){
+			numVariables+=numResources;
+		}
+		VariableBufferFormat::ptr format(new VariableBufferFormat(primary,bufferDesc.Name,bufferDesc.Size,numVariables));
+		if(primary){
+			primaryFormat=format;
+		}
 
 		for(j=0;j<bufferDesc.Variables;++j){
 			ID3D10ShaderReflectionVariable *d3dvariable=buffer->GetVariableByIndex(j);
@@ -287,15 +305,31 @@ bool D3D10Shader::reflect(){
 			format->setStructVariable(j,variable);
 		}
 
-		format->compile();
 		mVariableBufferFormats[i]=format;
 	}
 
-	Logger::alert(String("Num Resources:")+desc.BoundResources);
-	for(i=0;i<desc.BoundResources;++i){
+	if(primaryFormat==NULL && desc.BoundResources>0){
+		primaryFormat=VariableBufferFormat::ptr(new VariableBufferFormat(true,"$Globals",0,desc.BoundResources));
+	}
+
+	for(i=0,j=0;i<desc.BoundResources;++i){
 		D3D10_SHADER_INPUT_BIND_DESC bindDesc;
 		mReflector->GetResourceBindingDesc(i,&bindDesc);
-		Logger::alert(String("Resource Name:")+bindDesc.Name+" :"+bindDesc.BindPoint);
+
+		if(bindDesc.Type!=D3D10_SIT_CBUFFER){
+			VariableBufferFormat::Variable::ptr variable(new VariableBufferFormat::Variable());
+			variable->setName(bindDesc.Name);
+			variable->setFormat(VariableBufferFormat::Format_TYPE_RESOURCE);
+			variable->setOffset(bindDesc.BindPoint);
+			variable->setSize(bindDesc.BindCount);
+			variable->setIndex(bindDesc.BindPoint);
+			primaryFormat->setStructVariable(primaryFormat->getStructSize() - numResources + j,variable);
+			j++;
+		}
+	}
+
+	for(i=0;i<mVariableBufferFormats.size();++i){
+		mVariableBufferFormats[i]->compile();
 	}
 
 	return true;

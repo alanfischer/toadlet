@@ -291,7 +291,8 @@ enum{
 	Mode_CREATE_LAND,
 };
 
-MyPlanet::MyPlanet():Application(){
+MyPlanet::MyPlanet(Application *app){
+	mApp=app;
 	mMode=Mode_FOCUS_SUN;
 	mRandom.setSeed(System::mtime());
 	mCreatePlanetStartTime=0;
@@ -515,8 +516,7 @@ ParentNode::ptr MyPlanet::createSun(scalar size){
 void MyPlanet::create(){
 	int i;
 
-	Application::create("d3d10");
-
+	mEngine=mApp->getEngine();
 	mScene=Scene::ptr(new Scene(mEngine));
 
 	mOverlay=mEngine->createNodeType(CameraNode::type(),mScene);
@@ -545,7 +545,7 @@ void MyPlanet::create(){
 	mScene->getBackground()->attach(background);
 	bool backgroundToSkybox=true;
 	if(backgroundToSkybox){
-		Mesh::ptr skyBoxMesh=mCamera->renderToSkyBox(mRenderDevice,Image::Format_RGB_5_6_5,2048,Math::fromInt(10));
+		Mesh::ptr skyBoxMesh=mCamera->renderToSkyBox(mApp->getRenderDevice(),Image::Format_RGB_5_6_5,2048,Math::fromInt(10));
 		MeshNode::ptr skyBox=mEngine->createNodeType(MeshNode::type(),mScene);
 		skyBox->setMesh(skyBoxMesh);
 		background->destroy();
@@ -588,8 +588,6 @@ void MyPlanet::create(){
 
 void MyPlanet::destroy(){
 	mScene->destroy();
-
-	Application::destroy();
 }
 
 void MyPlanet::resized(int width,int height){
@@ -1048,10 +1046,4 @@ void MyPlanet::createLand(){
 	mMode=Mode_CREATE_LAND;
 }
 
-int toadletMain(int argc,char **argv){
-	MyPlanet app;
-	app.create();
-	app.start();
-	app.destroy();
-	return 1;
-}
+Applet *createApplet(Application *app){return new MyPlanet(app);}

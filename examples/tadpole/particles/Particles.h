@@ -3,9 +3,9 @@
 
 #include <toadlet/toadlet.h>
 
-class Particles:public ApplicationActivity{
+class Particles:public Applet{
 public:
-	Particles(Application *application);
+	Particles(Application *app);
 	virtual ~Particles();
 
 	void create();
@@ -13,20 +13,21 @@ public:
 	void resized(int width,int height);
 	void render(RenderDevice *device);
 	void update(int dt);
+	
 	void focusGained(){}
 	void focusLost(){}
 
 	void keyPressed(int key);
 	void keyReleased(int){}
 
-	virtual void mousePressed(int x,int y,int button){}
-	virtual void mouseMoved(int x,int y){}
-	virtual void mouseReleased(int x,int y,int button){}
-	virtual void mouseScrolled(int x,int y,int scroll){}
+	void mousePressed(int x,int y,int button){}
+	void mouseMoved(int x,int y){}
+	void mouseReleased(int x,int y,int button){}
+	void mouseScrolled(int x,int y,int scroll){}
 
-	virtual void joyPressed(int button){}
-	virtual void joyMoved(scalar x,scalar y,scalar z,scalar r,scalar u,scalar v){}
-	virtual void joyReleased(int button){}
+	void joyPressed(int button){}
+	void joyMoved(scalar x,scalar y,scalar z,scalar r,scalar u,scalar v){}
+	void joyReleased(int button){}
 
 	void addSimulatedParticles(ParticleNode::ptr particles);
 

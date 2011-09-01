@@ -33,19 +33,15 @@
 	#include <toadlet/ribbit/plugins/alaudiodevice/ALAudioDevice.h>
 #endif
 #include <toadlet/pad/platform/x11/X11Application.h>
-#include <toadlet/pad/ApplicationListener.h>
 #include <X11/Xlib.h>
 #include <X11/keysym.h>
 #include <X11/Xutil.h>
 #include <X11/extensions/xf86vmode.h>
 #include <stdlib.h>
 
-using namespace toadlet;
-using namespace toadlet::egg;
-using namespace toadlet::egg::image;
 using namespace toadlet::peeper;
 using namespace toadlet::ribbit;
-using namespace toadlet::tadpole;
+using namespace toadlet::flick;
 
 #if defined(TOADLET_HAS_OPENAL)
 	extern "C" AudioDevice *new_ALAudioDevice();

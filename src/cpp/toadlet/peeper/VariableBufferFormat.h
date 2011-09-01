@@ -167,6 +167,9 @@ public:
 
 	void compile();
 
+	inline String toString(){return toString(mStructVariable,String());}
+	String toString(Variable::ptr variable,String tab);
+
 protected:
 	void compile(Variable::ptr variable,Variable *parent);
 

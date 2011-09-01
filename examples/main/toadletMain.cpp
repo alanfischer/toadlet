@@ -2,15 +2,9 @@
 
 #if defined(TOADLET_PLATFORM_WIN32)
 	#include <windows.h>
-#elif defined(TOADLET_PLATFORM_ANDROID)
-	#include <android/native_activity.h>
 #endif
 
-#if defined(TOADLET_PLATFORM_ANDROID)
-	extern int toadletMain(ANativeActivity *activity,void *savedState,size_t savedStateSize);
-#else
-	extern int toadletMain(int argc,char **argv);
-#endif
+extern int toadletMain(int argc,char **argv);
 
 #if defined(TOADLET_PLATFORM_WIN32) 
 #if defined(TOADLET_PLATFORM_WINCE)
@@ -106,10 +100,6 @@ INT WINAPI WinMain(HINSTANCE hInst,HINSTANCE,LPSTR szCmd,INT cmdShow){
 	free(argv);
 
 	return result;
-}
-#elif defined(TOADLET_PLATFORM_ANDROID)
-void ANativeActivity_onCreate(ANativeActivity *activity,void *savedState,size_t savedStateSize){
-	toadletMain(activity,savedState,savedStateSize);
 }
 #endif
 

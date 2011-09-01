@@ -38,7 +38,7 @@ public:
 	virtual ~OSXApplication();
 
 	virtual void setWindow(void *window);
-	virtual void create(egg::String renderDevice=(char*)NULL,egg::String audioDevice=(char*)NULL,egg::String motionDevice=(char*)NULL);
+	virtual void create(String renderDevice=(char*)NULL,String audioDevice=(char*)NULL,String motionDevice=(char*)NULL);
 	virtual void destroy();
 	
 	virtual void start();
@@ -53,8 +53,8 @@ public:
 	virtual void deactivate();
 	virtual bool active() const{return mActive;}
 
-	virtual void setTitle(const egg::String &title);
-	virtual const egg::String &getTitle() const;
+	virtual void setTitle(const String &title);
+	virtual const String &getTitle() const;
 
 	virtual void setPosition(int x,int y);
 	virtual int getPositionX() const;
@@ -75,7 +75,7 @@ public:
 
 	static int translateKey(int key);
 
-	virtual void changeRenderDevicePlugin(const egg::String &plugin){}
+	virtual void changeRenderDevicePlugin(const String &plugin){}
 
 	virtual void *getWindowHandle();
 	inline void *getWindow() const{return mWindow;}
@@ -84,13 +84,13 @@ public:
 	void internal_mouseMoved(int x,int y);
 	
 protected:
-	egg::String mTitle;
+	String mTitle;
 	int mPositionX,mPositionY;
 	int mWidth,mHeight;
 	bool mFullscreen;
 	bool mDifferenceMouse;
 
-	egg::io::Archive::ptr mBundleArchive;
+	Archive::ptr mBundleArchive;
 	
 	bool mRun;
 	bool mAutoActivate;

@@ -16,6 +16,7 @@ set (LIBS ${TOADLET_EGG_LIB} ${TOADLET_PEEPER_LIB} ${TOADLET_RIBBIT_LIB} ${TOADL
 
 # Source files
 set (SRC
+	../../main/toadletApp.cpp
 	../../main/toadletMain.cpp
 	Logo.cpp
 )
@@ -26,6 +27,9 @@ set (H
 )
 
 # Executable
+if (TOADLET_PLATFORM_ANDROID)
+	message ("SUP")
+endif (TOADLET_PLATFORM_ANDROID)
 add_executable (logo ${SRC} ${H})
 target_link_libraries (logo ${LIBS})
 install (TARGETS logo DESTINATION ${logo_BINARY_DIR})

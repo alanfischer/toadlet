@@ -173,6 +173,9 @@ void RenderVariableSet::buildBuffers(BufferManager *manager,ShaderState *state){
 			VariableBufferFormat::ptr format=state->getVariableBufferFormat((Shader::ShaderType)i,j);
 			VariableBuffer::ptr buffer=manager->createVariableBuffer(Buffer::Usage_BIT_DYNAMIC,Buffer::Access_BIT_WRITE,format);
 			addBuffer((Shader::ShaderType)i,j,buffer);
+
+			Logger::debug(Categories::TOADLET_TADPOLE,
+				"\n"+format->toString());
 		}
 	}
 	for(i=0;i<variables.size();++i){

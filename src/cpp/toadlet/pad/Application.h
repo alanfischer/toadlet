@@ -28,29 +28,45 @@
 
 #include <toadlet/Types.h>
 
-#if defined(TOADLET_PLATFORM_WIN32)
-#	include <toadlet/pad/platform/win32/Win32Application.h>
+#if defined(TOADLET_PLATFORM_ANDROID)
+	#if ANDROID_NDK_API_LEVEL>=9
+		#include <toadlet/pad/platform/android/AndroidApplication.h>
+		namespace toadlet{
+		namespace pad{
+			typedef AndroidApplication Application;
+		}
+		}
+	#else
+		#include <toadlet/pad/platform/android/JAndroidApplication.h>
+		namespace toadlet{
+		namespace pad{
+			typedef JAndroidApplication Application;
+		}
+		}
+	#endif
+#elif defined(TOADLET_PLATFORM_WIN32)
+	#include <toadlet/pad/platform/win32/Win32Application.h>
 	namespace toadlet{
 	namespace pad{
 		typedef Win32Application Application;
 	}
 	}
 #elif defined(TOADLET_PLATFORM_OSX)
-#	include <toadlet/pad/platform/osx/OSXApplication.h>
+	#include <toadlet/pad/platform/osx/OSXApplication.h>
 	namespace toadlet{
 	namespace pad{
 		typedef OSXApplication Application;
 	}
 	}
 #elif defined(TOADLET_PLATFORM_POSIX)
-#	include <toadlet/pad/platform/x11/X11Application.h>
+	#include <toadlet/pad/platform/x11/X11Application.h>
 	namespace toadlet{
 	namespace pad{
 		typedef X11Application Application;
 	}
 	}
 #else
-#	error "Application not implemented on this platform"
+	#error "Application not implemented on this platform"
 #endif
 
 #endif

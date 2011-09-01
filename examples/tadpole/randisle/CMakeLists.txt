@@ -16,6 +16,7 @@ set (LIBS ${TOADLET_EGG_LIB} ${TOADLET_PEEPER_LIB} ${TOADLET_RIBBIT_LIB} ${TOADL
 
 # Source files
 set (SRC
+	../../main/toadletApp.cpp
 	../../main/toadletMain.cpp
 	src/Acorn.cpp
 	src/HUD.cpp
