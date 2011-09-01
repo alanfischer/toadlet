@@ -188,7 +188,7 @@ if( EXISTS "${ANDROID_NDK}" )
  string( REGEX REPLACE "[\t ]*([0-9]+)[\t ]*" "\\1" ANDROID_NDK_API_LEVEL "${ANDROID_NDK_API_LEVEL}" )
 
  set( PossibleAndroidLevels "3;4;5;8;9" )
- set( ANDROID_NDK_API_LEVEL ${ANDROID_NDK_API_LEVEL} CACHE STRING "android API level" )
+ set( ANDROID_NDK_API_LEVEL ${ANDROID_NDK_API_LEVEL} CACHE STRING "android NDK API level" )
  set_property( CACHE ANDROID_NDK_API_LEVEL PROPERTY STRINGS ${PossibleAndroidLevels} )
  
  if( NOT ANDROID_NDK_API_LEVEL GREATER 2 )
@@ -205,7 +205,7 @@ if( EXISTS "${ANDROID_NDK}" )
   if( NOT DEFINED ANDROID_SDK )
    message( FATAL_ERROR "Android NDK API levels < 9 require the ANDROID_SDK variable to be set to your install of the Android SDK" )
   endif( NOT DEFINED ANDROID_SDK )
-  set( ANDROID_SDK "${ANDROID_SDK}" CACHE PATH "root of the android sdk" FORCE )
+  set( ANDROID_SDK ${ANDROID_SDK} CACHE PATH "root of the android SDK" FORCE )
 
   set( ANDROID_SDK_API_LEVEL $ENV{ANDROID_SDK_API_LEVEL} )
   if( NOT DEFINED ANDROID_SDK_API_LEVEL )
@@ -213,22 +213,31 @@ if( EXISTS "${ANDROID_NDK}" )
    message( STATUS "Using default android SDK API level android-${ANDROID_SDK_API_LEVEL}" )
    message( STATUS "If you prefer to use a different SDK API level, please define the variable: ANDROID_SDK_API_LEVEL" )
   endif( NOT DEFINED ANDROID_SDK_API_LEVEL )
+  set (ANDROID_SDK_API_LEVEL ${ANDROID_SDK_API_LEVEL} CACHE STRING "android SDK API level" FORCE)
 
   # Find and set the android.jar file for the selected API level
   if( NOT DEFINED ANDROID_JAR)
-   set(ANDROID_JAR ${ANDROID_SDK}/platforms/android-${ANDROID_SDK_API_LEVEL}/android.jar)
+   set( ANDROID_JAR ${ANDROID_SDK}/platforms/android-${ANDROID_SDK_API_LEVEL}/android.jar )
    message( STATUS "Using android.jar found at ${ANDROID_JAR}")
   endif( NOT DEFINED ANDROID_JAR)
+  set( ANDROID_JAR ${ANDROID_JAR} CACHE FILEPATH "android SDK jar file" FORCE )
  endif( ANDROID_NDK_API_LEVEL LESS 9 )
 
- if( ANDROID_NDK_API_LEVEL LESS 9 AND ANDROID_ARCH STREQUAL "X86" )
-  message( FATAL_ERROR "Android api levels < 9 do not support x86 builds. Please choose a different api level or switch architectures" )
- endif( ANDROID_NDK_API_LEVEL LESS 9 AND ANDROID_ARCH STREQUAL "X86" )
- 
+ # Setup the android architecture
  if( NOT ANDROID_ARCH )
   set( ANDROID_ARCH "ARM" )
  endif (NOT ANDROID_ARCH )
- message( STATUS "Using architecture ANDROID_ARCH=${ANDROID_ARCH}. Valid options are ARM or X86.")
+ if( NOT ANDROID_ARCH )
+  message( STATUS "Using architecture ANDROID_ARCH=${ANDROID_ARCH}. Valid options are ARM or X86.")
+ endif (NOT ANDROID_ARCH )
+ set( ANDROID_ARCH ${ANDROID_ARCH} CACHE STRING "android architecture" FORCE )
+
+ # x86 builds are only supported for ndk api level 9 and greater
+ if( ANDROID_NDK_API_LEVEL LESS 9 AND ANDROID_ARCH STREQUAL "X86" )
+  message( FATAL_ERROR "Android api levels < 9 do not support x86 builds. Please choose a different api level or switch architectures" )
+ endif( ANDROID_NDK_API_LEVEL LESS 9 AND ANDROID_ARCH STREQUAL "X86" )
+
+ # Use architecture to setup the toolchains
  if( ANDROID_ARCH STREQUAL "X86" )
   set( ANDROID_NDK_TOOLCHAIN_ARCH "x86" )
   set( ANDROID_NDK_TOOLS_PREFIX "i686-android-linux" )
@@ -342,7 +351,7 @@ endif( ANDROID_ARCH STREQUAL "ARM" )
 #SET( DO_NOT_CHANGE_OUTPUT_PATHS_ON_FIRST_PASS ON CACHE INTERNAL "" FORCE)
 
 # where is the target environment 
-set( CMAKE_FIND_ROOT_PATH "${ANDROID_NDK_TOOLCHAIN_ROOT}/bin" "${ANDROID_NDK_TOOLCHAIN_ROOT}/${ANDROID_NDK_TOOLCHAIN_ARCH}" "${ANDROID_NDK_SYSROOT}" "${CMAKE_INSTALL_PREFIX}" "${CMAKE_INSTALL_PREFIX}/share" )
+set( CMAKE_FIND_ROOT_PATH "${ANDROID_NDK_TOOLCHAIN_ROOT}/bin" "${ANDROID_NDK_TOOLCHAIN_ROOT}/${ANDROID_NDK_TOOLCHAIN_ARCH}" "${ANDROID_NDK_SYSROOT}" "${CMAKE_INSTALL_PREFIX}" "${CMAKE_INSTALL_PREFIX}" "${CMAKE_PREFIX_PATH}")
 
 if( BUILD_WITH_ANDROID_NDK )
  set( STL_PATH "${ANDROID_NDK}/sources/cxx-stl/gnu-libstdc++" )
