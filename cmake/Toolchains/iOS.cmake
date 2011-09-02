@@ -2,11 +2,11 @@
 # files which are included with CMake 2.8.4
 # It has been altered for iOS development
 # Standard settings
-set (CMAKE_SYSTEM_NAME iOS)
-set( CMAKE_SYSTEM_VERSION 1 )
-set (UNIX 1)
-set (APPLE 1)
-set (IOS 1)
+set (CMAKE_SYSTEM_NAME Darwin)
+set (CMAKE_SYSTEM_VERSION 1 )
+set (UNIX True)
+set (APPLE True)
+set (IOS True)
 
 # Force the compilers to gcc for iOS
 include (CMakeForceCompiler)
@@ -17,27 +17,7 @@ CMAKE_FORCE_CXX_COMPILER (g++ g++)
 set (CMAKE_CXX_COMPILER_WORKS TRUE)
 set (CMAKE_C_COMPILER_WORKS TRUE)
 
-# Darwin versions:
-#   6.x == Mac OSX 10.2
-#   7.x == Mac OSX 10.3
-#   8.x == Mac OSX 10.4
-#   9.x == Mac OSX 10.5
-#  10.x == Mac OSX 10.6 (Snow Leopard)
-string (REGEX REPLACE "^([0-9]+)\\.([0-9]+).*$" "\\1" DARWIN_MAJOR_VERSION "${CMAKE_SYSTEM_VERSION}")
-string (REGEX REPLACE "^([0-9]+)\\.([0-9]+).*$" "\\2" DARWIN_MINOR_VERSION "${CMAKE_SYSTEM_VERSION}")
-
-# Do not use the "-Wl,-search_paths_first" flag with the OSX 10.2 compiler.
-# Done this way because it is too early to do a TRY_COMPILE.
-if (NOT DEFINED HAVE_FLAG_SEARCH_PATHS_FIRST)
-	set (HAVE_FLAG_SEARCH_PATHS_FIRST 0)
-	if ("${DARWIN_MAJOR_VERSION}" GREATER 6)
-		set (HAVE_FLAG_SEARCH_PATHS_FIRST 1)
-	endif ("${DARWIN_MAJOR_VERSION}" GREATER 6)
-endif (NOT DEFINED HAVE_FLAG_SEARCH_PATHS_FIRST)
-# More desirable, but does not work:
-#INCLUDE(CheckCXXCompilerFlag)
-#CHECK_CXX_COMPILER_FLAG("-Wl,-search_paths_first" HAVE_FLAG_SEARCH_PATHS_FIRST)
-
+# All iOS/Darwin specific settings - some may be redundant
 set (CMAKE_SHARED_LIBRARY_PREFIX "lib")
 set (CMAKE_SHARED_LIBRARY_SUFFIX ".dylib")
 set (CMAKE_SHARED_MODULE_PREFIX "lib")
@@ -54,10 +34,8 @@ set (CMAKE_CXX_OSX_CURRENT_VERSION_FLAG "${CMAKE_C_OSX_CURRENT_VERSION_FLAG}")
 set (CMAKE_C_FLAGS "")
 set (CMAKE_CXX_FLAGS "-headerpad_max_install_names -fvisibility=hidden -fvisibility-inlines-hidden")
 
-if (HAVE_FLAG_SEARCH_PATHS_FIRST)
-	set (CMAKE_C_LINK_FLAGS "-Wl,-search_paths_first ${CMAKE_C_LINK_FLAGS}")
-	set (CMAKE_CXX_LINK_FLAGS "-Wl,-search_paths_first ${CMAKE_CXX_LINK_FLAGS}")
-endif (HAVE_FLAG_SEARCH_PATHS_FIRST)
+set (CMAKE_C_LINK_FLAGS "-Wl,-search_paths_first ${CMAKE_C_LINK_FLAGS}")
+set (CMAKE_CXX_LINK_FLAGS "-Wl,-search_paths_first ${CMAKE_CXX_LINK_FLAGS}")
 
 set (CMAKE_PLATFORM_HAS_INSTALLNAME 1)
 set (CMAKE_SHARED_LIBRARY_CREATE_C_FLAGS "-dynamiclib -headerpad_max_install_names")
@@ -75,10 +53,13 @@ if (NOT DEFINED CMAKE_INSTALL_NAME_TOOL)
 endif (NOT DEFINED CMAKE_INSTALL_NAME_TOOL)
 
 # Setup iOS developer location
-set (_CMAKE_IOS_DEVELOPER_ROOT "/Developer/Platforms/iPhoneOS.platform/Developer")
+if (NOT DEFINED CMAKE_IOS_DEVELOPER_ROOT)
+	set (CMAKE_IOS_DEVELOPER_ROOT "/Developer/Platforms/iPhoneOS.platform/Developer")
+endif (NOT DEFINED CMAKE_IOS_DEVELOPER_ROOT)
+set (CMAKE_IOS_DEVELOPER_ROOT ${CMAKE_IOS_DEVELOPER_ROOT} CACHE PATH "Location of iOS SDKs")
 
 # Find installed iOS SDKs
-file (GLOB _CMAKE_IOS_SDKS "${_CMAKE_IOS_DEVELOPER_ROOT}/SDKs/*")
+file (GLOB _CMAKE_IOS_SDKS "${CMAKE_IOS_DEVELOPER_ROOT}/SDKs/*")
 
 # Find and use the most recent iOS sdk 
 if (_CMAKE_IOS_SDKS) 
@@ -94,7 +75,7 @@ if (_CMAKE_IOS_SDKS)
 	set (CMAKE_OSX_ARCHITECTURES "$(ARCHS_STANDARD_32_BIT)" CACHE string  "Build architecture for iOS")
 
 	# Set the default based on this file and not the environment variable
-	set (CMAKE_FIND_ROOT_PATH ${_CMAKE_IOS_DEVELOPER_ROOT} ${_CMAKE_IOS_SDK_ROOT} CACHE string  "iOS library search path root")
+	set (CMAKE_FIND_ROOT_PATH ${CMAKE_IOS_DEVELOPER_ROOT} ${_CMAKE_IOS_SDK_ROOT} CACHE string  "iOS library search path root")
 
 	# default to searching for frameworks first
 	set (CMAKE_FIND_FRAMEWORK FIRST)
@@ -105,7 +86,16 @@ if (_CMAKE_IOS_SDKS)
 		${_CMAKE_IOS_SDK_ROOT}/System/Library/PrivateFrameworks
 		${_CMAKE_IOS_SDK_ROOT}/Developer/Library/Frameworks
 	)
+
+	# only search the iOS sdks, not the remainder of the host filesystem
+	set (CMAKE_FIND_ROOT_PATH_MODE_PROGRAM ONLY)
+	set (CMAKE_FIND_ROOT_PATH_MODE_LIBRARY ONLY)
+	set (CMAKE_FIND_ROOT_PATH_MODE_INCLUDE ONLY)
+else (_CMAKE_IOS_SDKS)
+	message (FATAL_ERROR "No iOS SDK's found in default seach path ${CMAKE_IOS_DEVELOPER_ROOT}. Set their location or install the iOS SDK.")
 endif (_CMAKE_IOS_SDKS)
+
+if (False)
 
 if ("${CMAKE_BACKWARDS_COMPATIBILITY}" MATCHES "^1\\.[0-6]$")
 	set (CMAKE_SHARED_MODULE_CREATE_C_FLAGS "${CMAKE_SHARED_MODULE_CREATE_C_FLAGS} -flat_namespace -undefined suppress")
@@ -157,7 +147,7 @@ get_filename_component (_CMAKE_INSTALL_DIR "${_CMAKE_INSTALL_DIR}" PATH)
 # List common installation prefixes.  These will be used for all search types
 list (APPEND CMAKE_SYSTEM_PREFIX_PATH
 	# Standard
-	${_CMAKE_IOS_DEVELOPER_ROOT}/usr
+	${CMAKE_IOS_DEVELOPER_ROOT}/usr
 	${_CMAKE_IOS_SDK_ROOT}/usr
 
 	# CMake install location
@@ -166,4 +156,5 @@ list (APPEND CMAKE_SYSTEM_PREFIX_PATH
 	# Project install destination.
 	"${CMAKE_INSTALL_PREFIX}"
 )
-
+message (FATAL_ERROR "F yuou!")
+endif (False)
