@@ -25,7 +25,7 @@
 
 package us.toadlet.pad;
 
-public interface ApplicationActivity{
+public interface Applet{
 	public void resized(int width,int height);
 	public void focusGained();
 	public void focusLost();

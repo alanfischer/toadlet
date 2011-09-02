@@ -16,8 +16,10 @@ set (LIBS ${TOADLET_EGG_LIB} ${TOADLET_PEEPER_LIB} ${TOADLET_RIBBIT_LIB} ${TOADL
 
 # Source files
 set (SRC
-	../../main/toadletApp.cpp
-	../../main/toadletMain.cpp
+#	../../main/toadletApp.cpp
+#	../../main/toadletMain.cpp
+	android/jni/ParticlesImpl.cpp
+
 	Particles.cpp
 )
 
@@ -27,6 +29,7 @@ set (H
 )
 
 # Executable
-add_executable (particles ${SRC} ${H})
+#add_executable (particles ${SRC} ${H})
+add_library (particles SHARED ${SRC} ${H})
 target_link_libraries (particles ${LIBS})
 install (TARGETS particles DESTINATION ${particles_BINARY_DIR})

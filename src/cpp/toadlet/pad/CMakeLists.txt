@@ -9,6 +9,12 @@ set (PAD_SRC
 	Version.cpp
 )
 
+set (PAD_PLATFORM_ANDROID_SRC
+	platform/android/AndroidApplicationImpl.cpp
+	platform/android/JAndroidApplication.cpp
+	platform/android/NAppletImpl.cpp
+)
+
 set (PAD_PLATFORM_WIN32_SRC
 	platform/win32/Win32Application.cpp
 )
@@ -30,6 +36,10 @@ set (PAD_HEADERS
 	Version.h
 )
 
+set (PAD_PLATFORM_ANDROID_HEADERS
+	platform/android/JAndroidApplication.h
+)
+
 set (PAD_PLATFORM_WIN32_HEADERS
 	platform/win32/Win32Application.h
 )
@@ -45,7 +55,10 @@ set (PAD_PLATFORM_X11_HEADERS
 
 # Platform specific files
 if (TOADLET_PLATFORM_ANDROID)
-	message ("TODO: Make toadlet_pad work on android")
+	source_group ("Source Files\\\\platform\\\\android" FILES ${PAD_PLATFORM_ANDROID_SRC})
+	source_group ("Header Files\\\\platform\\\\android" FILES ${PAD_PLATFORM_ANDROID_HEADERS})
+	set (PAD_SRC ${PAD_SRC} ${PAD_PLATFORM_ANDROID_SRC})
+	set (PAD_HEADERS ${PAD_HEADERS} ${PAD_PLATFORM_ANDROID_HEADERS})
 elseif (TOADLET_PLATFORM_WIN32)
 	source_group ("Source Files\\\\platform\\\\win32" FILES ${PAD_PLATFORM_WIN32_SRC})
 	source_group ("Header Files\\\\platform\\\\win32" FILES ${PAD_PLATFORM_WIN32_HEADERS})
@@ -66,6 +79,8 @@ endif (TOADLET_PLATFORM_ANDROID)
 
 # Dependencies for toadlet_pad
 if (TOADLET_PLATFORM_ANDROID)
+	set (PAD_LIBS ${PAD_LIBS} toadlet_peeper_glrenderdevice)
+	set (PAD_LIBS_S ${PAD_LIBS_S} toadlet_peeper_glrenderdevice_s)
 elseif (TOADLET_PLATFORM_WINCE)
 	if (TOADLET_HAS_D3DM)
 		set (PAD_LIBS ${PAD_LIBS} toadlet_peeper_d3dmrenderdevice)

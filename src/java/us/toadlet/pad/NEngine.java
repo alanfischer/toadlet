@@ -25,24 +25,11 @@
 
 package us.toadlet.pad;
 
-public class NApplicationActivity implements ApplicationActivity{
-	public NApplicationActivity(){
-		constructor();
-	}
+public class Engine{
+	public Engine(int nativeHandle){mNativeHandle=nativeHandle;}
 
-	public native void constructor();
-
-	public native void resized(int width,int height);
-	public native void focusGained();
-	public native void focusLost();
-	public native void update(int dt);
-	public native void render(RenderDevice renderDevice);
-
-	public native void keyPressed(int key);
-	public native void keyReleased(int key);
-
-	public native void mousePressed(int x,int y,int button);
-	public native void mouseMoved(int x,int y);
-	public native void mouseReleased(int x,int y,int button);
-	public native void mouseScrolled(int x,int y,int scroll);
+	public native boolean setRenderDevice(RenderDevice device);
+	
+	public int getNativeHandle(){return mNativeHandle;}
+	protected int mNativeHandle;
 }
