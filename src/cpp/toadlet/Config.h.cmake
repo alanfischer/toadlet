@@ -35,7 +35,7 @@
 #cmakedefine TOADLET_PLATFORM_OSX
 #cmakedefine TOADLET_PLATFORM_IOS
 #cmakedefine TOADLET_PLATFORM_ANDROID
-#define ANDROID_NDK_API_LEVEL ${ANDROID_NDK_API_LEVEL}
+#cmakedefine ANDROID_NDK_API_LEVEL ${ANDROID_NDK_API_LEVEL}
 
 // Setup specific build options
 #cmakedefine TOADLET_FIXED_POINT
