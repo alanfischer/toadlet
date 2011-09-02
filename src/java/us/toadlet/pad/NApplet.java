@@ -25,12 +25,23 @@
 
 package us.toadlet.pad;
 
-public class Engine{
-	public Engine(){
-		constructor();
-	}
+public class NApplet implements Applet{
+	public NApplet(int nativeHandle){mNativeHandle=nativeHandle;}
 
-	public native boolean constructor();
+	public native void resized(int width,int height);
+	public native void focusGained();
+	public native void focusLost();
+	public native void update(int dt);
+	public native void render(RenderDevice renderDevice);
 
-	public native boolean setRenderDevice(RenderDevice device);
+	public native void keyPressed(int key);
+	public native void keyReleased(int key);
+
+	public native void mousePressed(int x,int y,int button);
+	public native void mouseMoved(int x,int y);
+	public native void mouseReleased(int x,int y,int button);
+	public native void mouseScrolled(int x,int y,int scroll);
+	
+	public int getNativeHandle(){return mNativeHandle;}
+	protected int mNativeHandle;
 }

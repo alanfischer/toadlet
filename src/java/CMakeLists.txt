@@ -55,9 +55,9 @@ configure_file (${JAVA_SRC_DIR}/pad/Version.java.cmake ${PAD_OBJ_DIR}/${JAVA_SRC
 set (PAD_SRC
 	${JAVA_SRC_DIR}/pad/RenderDevice.java
 	${JAVA_SRC_DIR}/pad/Engine.java
-	${JAVA_SRC_DIR}/pad/ApplicationActivity.java
-	${JAVA_SRC_DIR}/pad/Application.java
-	${JAVA_SRC_DIR}/pad/NApplicationActivity.java
+	${JAVA_SRC_DIR}/pad/Applet.java
+	${JAVA_SRC_DIR}/pad/AndroidApplication.java
+	${JAVA_SRC_DIR}/pad/NApplet.java
 	${PAD_OBJ_DIR}/${JAVA_SRC_DIR}/pad/Version.java
 )
 

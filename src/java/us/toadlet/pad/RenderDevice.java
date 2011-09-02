@@ -28,14 +28,13 @@ package us.toadlet.pad;
 import us.toadlet.peeper.*;
 
 public class RenderDevice{
-	public RenderDevice(){
-		constructor();
-	}
-
-	public native void constructor();
+	public RenderDevice(int nativeHandle){mNativeHandle=nativeHandle;}
 
 	public native boolean create(RenderTarget target,int[] options);
 	public native void destroy();
 
 	public native boolean setRenderTarget(RenderTarget target);
+
+	public int getNativeHandle(){return mNativeHandle;}
+	protected int mNativeHandle;
 }

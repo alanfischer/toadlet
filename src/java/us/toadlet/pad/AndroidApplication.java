@@ -38,7 +38,7 @@ import android.os.Message;
 import us.toadlet.peeper.*;
 
 class ApplicationView extends SurfaceView implements SurfaceHolder.Callback{
-	public ApplicationView(Application application){
+	public ApplicationView(AndroidApplication application){
 		super(application);
 		mApplication=application;
 		getHolder().addCallback(this);
@@ -78,11 +78,15 @@ class ApplicationView extends SurfaceView implements SurfaceHolder.Callback{
 
 	public void surfaceChanged(SurfaceHolder holder,int format,int width,int height){}
 
-	Application mApplication;
+	AndroidApplication mApplication;
 }
 
-public class Application extends Activity implements RenderTarget,Runnable{
-    public Application(){
+public class AndroidApplication extends Activity implements RenderTarget,Runnable{
+	static{
+		System.loadLibrary("jtoadlet_pad");
+	}
+
+    public AndroidApplication(){
 		super();
 	}
 
@@ -292,8 +296,8 @@ public class Application extends Activity implements RenderTarget,Runnable{
 	public void setFullscreen(boolean fullscreen){mFullscreen=fullscreen;}
 	public boolean getFullscreen(){return mFullscreen;}
 	
-	public void setApplicationActivity(ApplicationActivity activity){mActivity=activity;}
-	public ApplicationActivity getApplicationActivity(){return mActivity;}
+	public void setApplet(Applet applet){mApplet=applet;}
+	public Applet getApplet(){return mApplet;}
 
 	public RenderTarget getRootRenderTarget(){return mRenderTarget;}
 	public boolean isPrimary(){return mRenderTarget.isPrimary();}
@@ -302,17 +306,17 @@ public class Application extends Activity implements RenderTarget,Runnable{
 	public Engine getEngine(){return mEngine;}
 	public RenderDevice getRenderDevice(){return mRenderDevice;}
 
-	public void resized(int width,int height)		{if(mActivity!=null)mActivity.resized(width,height);}
-	public void focusGained()						{if(mActivity!=null)mActivity.focusGained();}
-	public void focusLost()							{if(mActivity!=null)mActivity.focusLost();}
-	public void keyPressed(int key)					{if(mActivity!=null)mActivity.keyPressed(key);}
-	public void keyReleased(int key)				{if(mActivity!=null)mActivity.keyReleased(key);}
-	public void mouseMoved(int x,int y)				{if(mActivity!=null)mActivity.mouseMoved(x,y);}
-	public void mousePressed(int x,int y,int button){if(mActivity!=null)mActivity.mousePressed(x,y,button);}
-	public void mouseReleased(int x,int y,int button){if(mActivity!=null)mActivity.mouseReleased(x,y,button);}
-	public void mouseScrolled(int x,int y,int scroll){if(mActivity!=null)mActivity.mouseScrolled(x,y,scroll);}
-	public void update(int dt)						{if(mActivity!=null)mActivity.update(dt);}
-	public void render(RenderDevice renderDevice)	{if(mActivity!=null)mActivity.render(renderDevice);}
+	public void resized(int width,int height)		{if(mApplet!=null)mApplet.resized(width,height);}
+	public void focusGained()						{if(mApplet!=null)mApplet.focusGained();}
+	public void focusLost()							{if(mApplet!=null)mApplet.focusLost();}
+	public void keyPressed(int key)					{if(mApplet!=null)mApplet.keyPressed(key);}
+	public void keyReleased(int key)				{if(mApplet!=null)mApplet.keyReleased(key);}
+	public void mouseMoved(int x,int y)				{if(mApplet!=null)mApplet.mouseMoved(x,y);}
+	public void mousePressed(int x,int y,int button){if(mApplet!=null)mApplet.mousePressed(x,y,button);}
+	public void mouseReleased(int x,int y,int button){if(mApplet!=null)mApplet.mouseReleased(x,y,button);}
+	public void mouseScrolled(int x,int y,int scroll){if(mApplet!=null)mApplet.mouseScrolled(x,y,scroll);}
+	public void update(int dt)						{if(mApplet!=null)mApplet.update(dt);}
+	public void render(RenderDevice renderDevice)	{if(mApplet!=null)mApplet.render(renderDevice);}
 
 	public void surfaceCreated(SurfaceHolder holder){
 		System.out.println(
@@ -378,7 +382,7 @@ public class Application extends Activity implements RenderTarget,Runnable{
 	
 	Thread mThread=null;
 	protected ApplicationView mView;
-	protected ApplicationActivity mActivity;
+	protected Applet mApplet;
 	protected Engine mEngine;
 	protected boolean mFullscreen;
 	protected boolean mActive;

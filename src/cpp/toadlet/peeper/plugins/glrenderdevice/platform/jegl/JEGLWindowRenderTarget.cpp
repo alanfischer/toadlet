@@ -49,6 +49,8 @@ JEGLWindowRenderTarget::JEGLWindowRenderTarget(JNIEnv *jenv,jobject jobj):GLRend
 	isValidID=env->GetMethodID(clazz,"isValid","()Z");
 	getWidthID=env->GetMethodID(clazz,"getWidth","()I");
 	getHeightID=env->GetMethodID(clazz,"getHeight","()I");
+
+	env->DeleteLocalRef(clazz);
 }
 
 JEGLWindowRenderTarget::~JEGLWindowRenderTarget(){
