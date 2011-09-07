@@ -5,7 +5,8 @@
 #  TOADLET_INCLUDE_DIR	- path to the toadlet include directory
 #  TOADLET_LIBRARY_DIR	- path to the toadlet library installation dir
 #
-# Define each toadlet library individually, both dynamic (no suffix) and static (_S) versions, and release (no suffix) and debug (_D):
+# Define each toadlet library individually: dynamic (no suffix), static (_S), release (no suffix), debug (_D)
+# Each library, when at least one of the above is found, sets TOADLET_${LIBNAME}_FOUND = YES
 #  TOADLET_EGG_LIB
 #  TOADLET_FLICK_LIB
 #  TOADLET_FLICK_HTCMOTIONDEVICE_LIB
@@ -84,53 +85,63 @@ set (TOADLET_LIB_BASENAMES
 
 # Search for and assign the toadlet libraries
 foreach (TOADLET_LIB ${TOADLET_LIB_BASENAMES})
-	# Capitalize the library variable name
 	string (TOUPPER ${TOADLET_LIB} TOADLET_LIB_VAR)
 
-	# Find dynamic release, dynamic debug, static release and then static debug
-	find_library (${TOADLET_LIB_VAR}_LIB NAMES ${TOADLET_LIB} PATHS ${LIBRARY_SEARCH_PATHS})
-	find_library (${TOADLET_LIB_VAR}_LIB_D NAMES ${TOADLET_LIB}_d PATHS ${LIBRARY_SEARCH_PATHS})
-	find_library (${TOADLET_LIB_VAR}_LIB_S NAMES ${TOADLET_LIB}_s PATHS ${LIBRARY_SEARCH_PATHS})
-	find_library (${TOADLET_LIB_VAR}_LIB_SD NAMES ${TOADLET_LIB}_sd PATHS ${LIBRARY_SEARCH_PATHS})
+	# Only search for a library if we haven't already
+	# Otherwise the debug/release assignment settings below will cause trouble with multiple runs
+	if (NOT ${TOADLET_LIB_VAR}_FOUND)
+		# Find dynamic release, dynamic debug, static release and then static debug
+		find_library (${TOADLET_LIB_VAR}_LIB NAMES ${TOADLET_LIB} PATHS ${LIBRARY_SEARCH_PATHS})
+		find_library (${TOADLET_LIB_VAR}_LIB_D NAMES ${TOADLET_LIB}_d PATHS ${LIBRARY_SEARCH_PATHS})
+		find_library (${TOADLET_LIB_VAR}_LIB_S NAMES ${TOADLET_LIB}_s PATHS ${LIBRARY_SEARCH_PATHS})
+		find_library (${TOADLET_LIB_VAR}_LIB_SD NAMES ${TOADLET_LIB}_sd PATHS ${LIBRARY_SEARCH_PATHS})
 
-	# The first toadlet library we find sets the TOADLET_LIBRARY_DIR path
-	if (NOT TOADLET_LIBRARY_DIR)
-		if (${TOADLET_LIB_VAR}_LIB)
-			get_filename_component (TOADLET_LIBRARY_DIR ${${TOADLET_LIB_VAR}_LIB} PATH CACHE)
-		elseif(${TOADLET_LIB_VAR}_LIB_D)
-			get_filename_component (TOADLET_LIBRARY_DIR ${${TOADLET_LIB_VAR}_LIB_D} PATH CACHE)
-		elseif(${TOADLET_LIB_VAR}_LIB_S)
-			get_filename_component (TOADLET_LIBRARY_DIR ${${TOADLET_LIB_VAR}_LIB_S} PATH CACHE)
-		elseif(${TOADLET_LIB_VAR}_LIB_SD)
-			get_filename_component (TOADLET_LIBRARY_DIR ${${TOADLET_LIB_VAR}_LIB_SD} PATH CACHE)
-		endif (${TOADLET_LIB_VAR}_LIB)
-	endif (NOT TOADLET_LIBRARY_DIR)
+		# The first toadlet library we find sets the TOADLET_LIBRARY_DIR path
+		if (NOT TOADLET_LIBRARY_DIR)
+			if (${TOADLET_LIB_VAR}_LIB)
+				get_filename_component (TOADLET_LIBRARY_DIR ${${TOADLET_LIB_VAR}_LIB} PATH CACHE)
+			elseif(${TOADLET_LIB_VAR}_LIB_D)
+				get_filename_component (TOADLET_LIBRARY_DIR ${${TOADLET_LIB_VAR}_LIB_D} PATH CACHE)
+			elseif(${TOADLET_LIB_VAR}_LIB_S)
+				get_filename_component (TOADLET_LIBRARY_DIR ${${TOADLET_LIB_VAR}_LIB_S} PATH CACHE)
+			elseif(${TOADLET_LIB_VAR}_LIB_SD)
+				get_filename_component (TOADLET_LIBRARY_DIR ${${TOADLET_LIB_VAR}_LIB_SD} PATH CACHE)
+			endif (${TOADLET_LIB_VAR}_LIB)
+		endif (NOT TOADLET_LIBRARY_DIR)
 
-	# If both versions are found, set configuration specific libraries
-	if (${TOADLET_LIB_VAR}_LIB AND ${TOADLET_LIB_VAR}_LIB_D)
-		set (${TOADLET_LIB_VAR}_LIB optimized ${${TOADLET_LIB_VAR}_LIB} debug ${${TOADLET_LIB_VAR}_LIB_D} CACHE STRING "Both libraries" FORCE)
-	endif (${TOADLET_LIB_VAR}_LIB AND ${TOADLET_LIB_VAR}_LIB_D)
-	if (${TOADLET_LIB_VAR}_LIB_S AND ${TOADLET_LIB_VAR}_LIB_SD)
-		set (${TOADLET_LIB_VAR}_LIB_S optimized ${${TOADLET_LIB_VAR}_LIB_S} debug ${${TOADLET_LIB_VAR}_LIB_SD} CACHE STRING "Both libraries" FORCE)
-	endif (${TOADLET_LIB_VAR}_LIB_S AND ${TOADLET_LIB_VAR}_LIB_SD)
+		# If both versions are found, set configuration specific libraries
+		if (${TOADLET_LIB_VAR}_LIB AND ${TOADLET_LIB_VAR}_LIB_D)
+			set (${TOADLET_LIB_VAR}_LIB optimized ${${TOADLET_LIB_VAR}_LIB} debug ${${TOADLET_LIB_VAR}_LIB_D} CACHE STRING "Both libraries" FORCE)
+			set (${TOADLET_LIB_VAR}_FOUND "YES")
+		endif (${TOADLET_LIB_VAR}_LIB AND ${TOADLET_LIB_VAR}_LIB_D)
+		if (${TOADLET_LIB_VAR}_LIB_S AND ${TOADLET_LIB_VAR}_LIB_SD)
+			set (${TOADLET_LIB_VAR}_LIB_S optimized ${${TOADLET_LIB_VAR}_LIB_S} debug ${${TOADLET_LIB_VAR}_LIB_SD} CACHE STRING "Both libraries" FORCE)
+			set (${TOADLET_LIB_VAR}_FOUND "YES")
+		endif (${TOADLET_LIB_VAR}_LIB_S AND ${TOADLET_LIB_VAR}_LIB_SD)
 
-	# If only release libraries are found, assign them to the debug libraries
-	if (${TOADLET_LIB_VAR}_LIB AND NOT ${TOADLET_LIB_VAR}_LIB_D)
-		set (${TOADLET_LIB_VAR}_LIB_D ${${TOADLET_LIB_VAR}_LIB} CACHE FILEPATH "Path to a library" FORCE)
-	endif (${TOADLET_LIB_VAR}_LIB AND NOT ${TOADLET_LIB_VAR}_LIB_D)
-	if (${TOADLET_LIB_VAR}_LIB_S AND NOT ${TOADLET_LIB_VAR}_LIB_SD)
-		set (${TOADLET_LIB_VAR}_LIB_SD ${${TOADLET_LIB_VAR}_LIB_S} CACHE FILEPATH "Path to a library" FORCE)
-	endif (${TOADLET_LIB_VAR}_LIB_S AND NOT ${TOADLET_LIB_VAR}_LIB_SD)
-	
-	# If only debug libraries are found, assign them to the release libraries
-	if (${TOADLET_LIB_VAR}_LIB_D AND NOT ${TOADLET_LIB_VAR}_LIB)
-		set (${TOADLET_LIB_VAR}_LIB ${${TOADLET_LIB_VAR}_LIB_D} CACHE FILEPATH "Path to a library" FORCE)
-	endif (${TOADLET_LIB_VAR}_LIB_D AND NOT ${TOADLET_LIB_VAR}_LIB)
-	if (${TOADLET_LIB_VAR}_LIB_SD AND NOT ${TOADLET_LIB_VAR}_LIB_S)
-		set (${TOADLET_LIB_VAR}_LIB_S ${${TOADLET_LIB_VAR}_LIB_SD} CACHE FILEPATH "Path to a library" FORCE)
-	endif (${TOADLET_LIB_VAR}_LIB_SD AND NOT ${TOADLET_LIB_VAR}_LIB_S)
-
-	mark_as_advanced (${TOADLET_LIB_VAR}_LIB ${TOADLET_LIB_VAR}_LIB_D ${TOADLET_LIB_VAR}_LIB_S ${TOADLET_LIB_VAR}_LIB_SD)
+		# If only release libraries are found, assign them to the debug libraries
+		if (${TOADLET_LIB_VAR}_LIB AND NOT ${TOADLET_LIB_VAR}_LIB_D)
+			set (${TOADLET_LIB_VAR}_LIB_D ${${TOADLET_LIB_VAR}_LIB} CACHE FILEPATH "Path to a library" FORCE)
+			set (${TOADLET_LIB_VAR}_FOUND "YES")
+		endif (${TOADLET_LIB_VAR}_LIB AND NOT ${TOADLET_LIB_VAR}_LIB_D)
+		if (${TOADLET_LIB_VAR}_LIB_S AND NOT ${TOADLET_LIB_VAR}_LIB_SD)
+			set (${TOADLET_LIB_VAR}_LIB_SD ${${TOADLET_LIB_VAR}_LIB_S} CACHE FILEPATH "Path to a library" FORCE)
+			set (${TOADLET_LIB_VAR}_FOUND "YES")
+		endif (${TOADLET_LIB_VAR}_LIB_S AND NOT ${TOADLET_LIB_VAR}_LIB_SD)
+		
+		# If only debug libraries are found, assign them to the release libraries
+		if (${TOADLET_LIB_VAR}_LIB_D AND NOT ${TOADLET_LIB_VAR}_LIB)
+			set (${TOADLET_LIB_VAR}_LIB ${${TOADLET_LIB_VAR}_LIB_D} CACHE FILEPATH "Path to a library" FORCE)
+			set (${TOADLET_LIB_VAR}_FOUND "YES")
+		endif (${TOADLET_LIB_VAR}_LIB_D AND NOT ${TOADLET_LIB_VAR}_LIB)
+		if (${TOADLET_LIB_VAR}_LIB_SD AND NOT ${TOADLET_LIB_VAR}_LIB_S)
+			set (${TOADLET_LIB_VAR}_LIB_S ${${TOADLET_LIB_VAR}_LIB_SD} CACHE FILEPATH "Path to a library" FORCE)
+			set (${TOADLET_LIB_VAR}_FOUND "YES")
+		endif (${TOADLET_LIB_VAR}_LIB_SD AND NOT ${TOADLET_LIB_VAR}_LIB_S)
+		
+		set (${TOADLET_LIB_VAR}_FOUND ${${TOADLET_LIB_VAR}_FOUND} CACHE BOOL "Library ${TOADLET_LIB} found flag" FORCE)
+		mark_as_advanced (${TOADLET_LIB_VAR}_LIB ${TOADLET_LIB_VAR}_LIB_D ${TOADLET_LIB_VAR}_LIB_S ${TOADLET_LIB_VAR}_LIB_SD ${TOADLET_LIB_VAR}_FOUND)
+	endif (NOT ${TOADLET_LIB_VAR}_FOUND)
 endforeach (TOADLET_LIB)
 
 # Consider toadlet found if we have the header file and a library path
