@@ -1,14 +1,14 @@
-package us.toadlet.particles;
+package us.toadlet.myplanet;
 
 import us.toadlet.pad.*;
 import android.os.Bundle;
 
-public class Particles extends AndroidApplication{
+public class MyPlanet extends AndroidApplication{
 	static{
-		System.loadLibrary("particles");
+		System.loadLibrary("myplanet");
 	}
 
-	public Particles(){
+	public MyPlanet(){
 		super();
 	}
 
