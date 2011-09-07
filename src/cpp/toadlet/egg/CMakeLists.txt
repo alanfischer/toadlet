@@ -276,7 +276,7 @@ if (NOT TOADLET_PLATFORM_IOS)
 	add_library (toadlet_egg SHARED ${EGG_SRC} ${EGG_HEADERS})
 	set_target_properties (toadlet_egg PROPERTIES ${DYNAMIC_LIB_PROPS})
 	target_link_libraries (toadlet_egg ${EGG_LIBS})
-	install (TARGETS toadlet_egg DESTINATION lib)
+	install (TARGETS toadlet_egg DESTINATION ${LIB_INSTALL_DIR})
 endif (NOT TOADLET_PLATFORM_IOS)
 
 
@@ -285,5 +285,5 @@ add_library (toadlet_egg_s STATIC ${EGG_SRC} ${EGG_HEADERS})
 set_target_properties (toadlet_egg_s PROPERTIES ${STATIC_LIB_PROPS})
 set_property (TARGET toadlet_egg_s APPEND PROPERTY COMPILE_DEFINITIONS ${EGG_DEFS_S})
 target_link_libraries (toadlet_egg_s ${EGG_LIBS_S})
-install (TARGETS toadlet_egg_s DESTINATION lib)
+install (TARGETS toadlet_egg_s DESTINATION ${LIB_INSTALL_DIR})
 

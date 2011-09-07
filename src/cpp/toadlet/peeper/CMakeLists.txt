@@ -79,7 +79,7 @@ if (NOT TOADLET_PLATFORM_IOS)
 	add_library (toadlet_peeper SHARED ${PEEPER_SRC} ${PEEPER_HEADERS})
 	set_target_properties (toadlet_peeper PROPERTIES ${DYNAMIC_LIB_PROPS})
 	target_link_libraries (toadlet_peeper toadlet_egg)
-	install (TARGETS toadlet_peeper DESTINATION lib)
+	install (TARGETS toadlet_peeper DESTINATION ${LIB_INSTALL_DIR})
 endif (NOT TOADLET_PLATFORM_IOS)
 
 
@@ -87,7 +87,7 @@ endif (NOT TOADLET_PLATFORM_IOS)
 add_library (toadlet_peeper_s STATIC ${PEEPER_SRC} ${PEEPER_HEADERS})
 set_target_properties (toadlet_peeper_s PROPERTIES ${STATIC_LIB_PROPS})
 target_link_libraries (toadlet_peeper_s toadlet_egg_s)
-install (TARGETS toadlet_peeper_s DESTINATION lib)
+install (TARGETS toadlet_peeper_s DESTINATION ${LIB_INSTALL_DIR})
 
 
 # Platform specific modules

@@ -19,7 +19,7 @@ if (NOT TOADLET_PLATFORM_IOS)
 	add_library (toadlet_tadpole_hop SHARED ${TADPOLE_HOP_SRC} ${TADPOLE_HOP_HEADERS})
 	set_target_properties (toadlet_tadpole_hop PROPERTIES ${DYNAMIC_LIB_PROPS})
 	target_link_libraries (toadlet_tadpole_hop toadlet_hop toadlet_knot toadlet_tadpole)
-	install (TARGETS toadlet_tadpole_hop DESTINATION lib)
+	install (TARGETS toadlet_tadpole_hop DESTINATION ${LIB_INSTALL_DIR})
 endif (NOT TOADLET_PLATFORM_IOS)
 
 
@@ -27,5 +27,5 @@ endif (NOT TOADLET_PLATFORM_IOS)
 add_library (toadlet_tadpole_hop_s STATIC ${TADPOLE_HOP_SRC} ${TADPOLE_HOP_HEADERS})
 set_target_properties (toadlet_tadpole_hop_s PROPERTIES ${STATIC_LIB_PROPS})
 target_link_libraries (toadlet_tadpole_hop_s toadlet_hop_s toadlet_knot_s toadlet_tadpole_s)
-install (TARGETS toadlet_tadpole_hop_s DESTINATION lib)
+install (TARGETS toadlet_tadpole_hop_s DESTINATION ${LIB_INSTALL_DIR})
 

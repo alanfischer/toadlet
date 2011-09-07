@@ -673,7 +673,7 @@ if (NOT TOADLET_PLATFORM_IOS)
 	add_library (toadlet_tadpole SHARED ${TADPOLE_SRC} ${TADPOLE_HEADERS})
 	set_target_properties (toadlet_tadpole PROPERTIES ${DYNAMIC_LIB_PROPS})
 	target_link_libraries (toadlet_tadpole toadlet_egg toadlet_peeper toadlet_ribbit ${TADPOLE_LIBS})
-	install (TARGETS toadlet_tadpole DESTINATION lib)
+	install (TARGETS toadlet_tadpole DESTINATION ${LIB_INSTALL_DIR})
 endif (NOT TOADLET_PLATFORM_IOS)
 
 
@@ -682,7 +682,7 @@ add_library (toadlet_tadpole_s STATIC ${TADPOLE_SRC} ${TADPOLE_HEADERS})
 set_target_properties (toadlet_tadpole_s PROPERTIES ${STATIC_LIB_PROPS})
 set_property (TARGET toadlet_tadpole_s APPEND PROPERTY COMPILE_DEFINITIONS ${TADPOLE_DEFS_S})
 target_link_libraries (toadlet_tadpole_s toadlet_egg_s toadlet_peeper_s toadlet_ribbit_s ${TADPOLE_LIBS_S})
-install (TARGETS toadlet_tadpole_s DESTINATION lib)
+install (TARGETS toadlet_tadpole_s DESTINATION ${LIB_INSTALL_DIR})
 
 
 # Add plugins
