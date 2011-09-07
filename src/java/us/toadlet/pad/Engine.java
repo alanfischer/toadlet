@@ -28,6 +28,8 @@ package us.toadlet.pad;
 public class Engine{
 	public Engine(int nativeHandle){mNativeHandle=nativeHandle;}
 
+	public native void destroy();
+
 	public native void installHandlers();
 	
 	public native boolean setRenderDevice(RenderDevice device);
