@@ -54,14 +54,21 @@ JAndroidApplication::JAndroidApplication(JNIEnv *jenv,jobject jobj):
 		startID=env->GetMethodID(appClass,"start","()V");
 		stopID=env->GetMethodID(appClass,"stop","()V");
 		getEngineID=env->GetMethodID(appClass,"getEngine","()Lus/toadlet/pad/Engine;");
+		getRenderDeviceID=env->GetMethodID(appClass,"getRenderDevice","()Lus/toadlet/pad/RenderDevice;");
 	}
 	env->DeleteLocalRef(appClass);
 	
-	jclass nengineClass=env->FindClass("us/toadlet/pad/Engine");
+	jclass engineClass=env->FindClass("us/toadlet/pad/Engine");
 	{
-		getNativeHandleID=env->GetMethodID(nengineClass,"getNativeHandle","()I");
+		getNativeHandleEngineID=env->GetMethodID(engineClass,"getNativeHandle","()I");
 	}
-	env->DeleteLocalRef(nengineClass);
+	env->DeleteLocalRef(engineClass);
+
+	jclass renderDeviceClass=env->FindClass("us/toadlet/pad/RenderDevice");
+	{
+		getNativeHandleRenderDeviceID=env->GetMethodID(renderDeviceClass,"getNativeHandle","()I");
+	}
+	env->DeleteLocalRef(renderDeviceClass);
 }
 
 JAndroidApplication::~JAndroidApplication(){
@@ -91,11 +98,23 @@ Engine *JAndroidApplication::getEngine(){
 
 	jobject jengine=env->CallObjectMethod(obj,getEngineID);
 
-	engine=(Engine*)env->CallIntMethod(jengine,getNativeHandleID);
+	engine=(Engine*)env->CallIntMethod(jengine,getNativeHandleEngineID);
 
 	env->DeleteLocalRef(jengine);
 
 	return engine;
+}
+
+RenderDevice *JAndroidApplication::getRenderDevice(){
+	RenderDevice *device=NULL;
+
+	jobject jdevice=env->CallObjectMethod(obj,getRenderDeviceID);
+
+	device=(RenderDevice*)env->CallIntMethod(jdevice,getNativeHandleRenderDeviceID);
+
+	env->DeleteLocalRef(jdevice);
+
+	return device;
 }
 
 }
