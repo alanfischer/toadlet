@@ -12,10 +12,10 @@ include_directories (${MXML_INCLUDES})
 set(MXML_VERSION "Mini-XML v2.6")
 
 # Perform configure file checks
-if (IOS)
+if (IOS OR ANDROID)
 	set (HAVE_SNPRINTF TRUE)
 	set (HAVE_VSNPRINTF TRUE)
-else (IOS)
+else (IOS OR ANDROID)
 	include (CheckIncludeFiles)
 	include (CheckFunctionExists)
 	include (CheckTypeSize)
@@ -27,7 +27,7 @@ else (IOS)
 	check_function_exists (vsnprintf HAVE_VSNPRINTF)
 	check_function_exists (strdup HAVE_STRDUP)
 	check_include_files (pthread.h HAVE_PTHREAD_H)
-endif (IOS)
+endif (IOS OR ANDROID)
 
 # Setup configure file based on results from the checks performed above
 configure_file (${CMAKE_CURRENT_SOURCE_DIR}/config.h.cmake ${CMAKE_CURRENT_BINARY_DIR}/config.h)
