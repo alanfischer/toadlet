@@ -30,7 +30,6 @@ set (H
 )
 
 # Executable
-#add_executable (particles ${SRC} ${H})
-add_library (particles SHARED ${SRC} ${H})
+add_executable (particles ${SRC} ${H})
 target_link_libraries (particles ${LIBS})
 install (TARGETS particles DESTINATION ${particles_BINARY_DIR})
