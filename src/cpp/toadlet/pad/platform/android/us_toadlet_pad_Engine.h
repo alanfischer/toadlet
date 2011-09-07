@@ -9,6 +9,14 @@ extern "C" {
 #endif
 /*
  * Class:     us_toadlet_pad_Engine
+ * Method:    destroy
+ * Signature: ()V
+ */
+JNIEXPORT void JNICALL Java_us_toadlet_pad_Engine_destroy
+  (JNIEnv *, jobject);
+
+/*
+ * Class:     us_toadlet_pad_Engine
  * Method:    installHandlers
  * Signature: ()V
  */

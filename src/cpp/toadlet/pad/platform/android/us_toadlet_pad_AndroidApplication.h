@@ -17,11 +17,27 @@ JNIEXPORT jobject JNICALL Java_us_toadlet_pad_AndroidApplication_makeEngine
 
 /*
  * Class:     us_toadlet_pad_AndroidApplication
+ * Method:    deleteEngine
+ * Signature: (Lus/toadlet/pad/Engine;)V
+ */
+JNIEXPORT jobject JNICALL Java_us_toadlet_pad_AndroidApplication_deleteEngine
+  (JNIEnv *, jobject, jobject);
+
+/*
+ * Class:     us_toadlet_pad_AndroidApplication
  * Method:    makeRenderDevice
  * Signature: ()Lus/toadlet/pad/RenderDevice;
  */
 JNIEXPORT jobject JNICALL Java_us_toadlet_pad_AndroidApplication_makeRenderDevice
   (JNIEnv *, jobject);
+
+/*
+ * Class:     us_toadlet_pad_AndroidApplication
+ * Method:    deleteRenderDevice
+ * Signature: (Lus/toadlet/pad/RenderDevice;)V
+ */
+JNIEXPORT jobject JNICALL Java_us_toadlet_pad_AndroidApplication_deleteRenderDevice
+  (JNIEnv *, jobject, jobject);
 
 #ifdef __cplusplus
 }

@@ -19,6 +19,7 @@ JNIEXPORT void JNICALL Java_us_toadlet_pad_RenderDevice_destroy(JNIEnv *env,jobj
 	Java_us_toadlet_pad(env);
 	RenderDevice *device=(RenderDevice*)env->CallIntMethod(obj,getNativeHandleRenderDeviceID);
 	device->destroy();
+	renderTarget=NULL;
 }
 
 JNIEXPORT jboolean JNICALL Java_us_toadlet_pad_RenderDevice_setRenderTarget(JNIEnv *env,jobject obj,jobject renderTargetObj){

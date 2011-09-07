@@ -9,26 +9,52 @@ JNIEXPORT jobject JNICALL Java_us_toadlet_pad_AndroidApplication_makeEngine(JNIE
 	Engine *engine=new Engine();
 	jobject jengine=NULL;
 	
-	jclass nengineClass=env->FindClass("us/toadlet/pad/Engine");
+	jclass engineClass=env->FindClass("us/toadlet/pad/Engine");
 	{
-		jmethodID initID=env->GetMethodID(nengineClass,"<init>","(I)V");
-		jengine=env->NewObject(nengineClass,initID,(int)engine);
+		jmethodID initID=env->GetMethodID(engineClass,"<init>","(I)V");
+		jengine=env->NewObject(engineClass,initID,(int)engine);
 	}
-	env->DeleteLocalRef(nengineClass);
+	env->DeleteLocalRef(engineClass);
 	
 	return jengine;
+}
+
+JNIEXPORT jobject JNICALL Java_us_toadlet_pad_AndroidApplication_deleteEngine(JNIEnv *env,jobject obj,jobject engineObj){
+	Engine *engine=NULL;
+
+	jclass engineClass=env->FindClass("us/toadlet/pad/Engine");
+	{
+		jmethodID getNativeHandleID=env->GetMethodID(engineClass,"getNativeHandle","()I");
+		engine=(Engine*)env->CallIntMethod(engineObj,getNativeHandleID);
+	}
+	env->DeleteLocalRef(engineClass);
+	
+	delete engine;
 }
 
 JNIEXPORT jobject JNICALL Java_us_toadlet_pad_AndroidApplication_makeRenderDevice(JNIEnv *env,jobject obj){
 	RenderDevice *device=new_GLRenderDevice();
 	jobject jdevice=NULL;
-	
-	jclass ndeviceClass=env->FindClass("us/toadlet/pad/RenderDevice");
+
+	jclass deviceClass=env->FindClass("us/toadlet/pad/RenderDevice");
 	{
-		jmethodID initID=env->GetMethodID(ndeviceClass,"<init>","(I)V");
-		jdevice=env->NewObject(ndeviceClass,initID,(int)device);
+		jmethodID initID=env->GetMethodID(deviceClass,"<init>","(I)V");
+		jdevice=env->NewObject(deviceClass,initID,(int)device);
 	}
-	env->DeleteLocalRef(ndeviceClass);
+	env->DeleteLocalRef(deviceClass);
 
 	return jdevice;
+}
+
+JNIEXPORT jobject JNICALL Java_us_toadlet_pad_AndroidApplication_deleteRenderDevice(JNIEnv *env,jobject obj,jobject deviceObj){
+	RenderDevice *device=NULL;
+
+	jclass deviceClass=env->FindClass("us/toadlet/pad/RenderDevice");
+	{
+		jmethodID getNativeHandleID=env->GetMethodID(deviceClass,"getNativeHandle","()I");
+		device=(RenderDevice*)env->CallIntMethod(deviceObj,getNativeHandleID);
+	}
+	env->DeleteLocalRef(deviceClass);
+	
+	delete device;
 }
