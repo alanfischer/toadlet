@@ -147,12 +147,12 @@ void SceneRenderer::renderRenderables(RenderableSet *set,RenderDevice *device,Ca
 	for(i=0;i<materialQueueIndexes.size();++i){
 		const RenderableSet::RenderableQueue &queue=set->getRenderableQueue(materialQueueIndexes[i]);
 		Material *material=queue[0].material;
-		int layer=material->getLayer();
+		int layer=material!=NULL?material->getLayer():0;
 
 		while(depthIndex<depthQueueIndexes.size()){
 			const RenderableSet::RenderableQueue &depthQueue=set->getRenderableQueue(depthQueueIndexes[depthIndex]);
 			Material *depthMaterial=depthQueue[0].material;
-			int depthLayer=depthMaterial->getLayer();
+			int depthLayer=depthMaterial!=NULL?depthMaterial->getLayer():0;
 			if(depthLayer<layer){
 				renderDepthSortedRenderables(depthQueue,useMaterials);
 				depthIndex++;

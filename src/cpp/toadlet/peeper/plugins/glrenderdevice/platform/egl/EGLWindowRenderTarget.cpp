@@ -145,6 +145,11 @@ bool EGLWindowRenderTarget::createContext(void *display,void *window,WindowRende
 
 	mConfig=chooseEGLConfig(mDisplay,redBits,greenBits,blueBits,alphaBits,depthBits,stencilBits,!pixmap,pixmap,false,multisamples);
 	TOADLET_CHECK_EGLERROR("chooseEGLConfig");
+	if(mConfig==0){
+		Error::unknown(Categories::TOADLET_PEEPER,
+			"error choosing config");
+		return false;
+	}
 
 	Logger::debug(Categories::TOADLET_PEEPER,
 		String("chooseEGLConfig config:")+(int)mConfig);

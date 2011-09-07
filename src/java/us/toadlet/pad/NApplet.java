@@ -28,11 +28,14 @@ package us.toadlet.pad;
 public class NApplet implements Applet{
 	public NApplet(int nativeHandle){mNativeHandle=nativeHandle;}
 
+	public native void create();
+	public native void destroy();
+	public native void update(int dt);
+	public native void render(RenderDevice renderDevice);
+
 	public native void resized(int width,int height);
 	public native void focusGained();
 	public native void focusLost();
-	public native void update(int dt);
-	public native void render(RenderDevice renderDevice);
 
 	public native void keyPressed(int key);
 	public native void keyReleased(int key);

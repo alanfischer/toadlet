@@ -81,31 +81,34 @@ class ApplicationView extends SurfaceView implements SurfaceHolder.Callback{
 	AndroidApplication mApplication;
 }
 
-public class AndroidApplication extends Activity implements RenderTarget,Runnable{
-	static{
-		System.loadLibrary("jtoadlet_pad");
-	}
-
+public abstract class AndroidApplication extends Activity implements RenderTarget,Runnable{
     public AndroidApplication(){
 		super();
 	}
 
 	protected void onCreate(Bundle bundle){
 		super.onCreate(bundle);
+
 		create();
 	}
 
 	protected void onStart(){
+		System.out.println("AndroidApplication.onStart");
+	
 		super.onStart();
-		start(true);
+		start();
 	}
 
 	protected void onStop(){
+		System.out.println("AndroidApplication.onStop");
+
 		super.onStop();
 		stop();
 	}
 
 	protected void onDestroy(){
+		System.out.println("AndroidApplication.onDestroy");
+
 		super.onStop();
 		destroy();
 	}
@@ -125,34 +128,47 @@ public class AndroidApplication extends Activity implements RenderTarget,Runnabl
 	}
 	
 	public void create(){
-		mEngine=makeEngine();
+//		mEngine=makeEngine();
+
+//		mEngine.installHandlers();
+		
+//		if(mApplet!=null){
+//			mApplet.create();
+//		}
 	}
 	
 	public void destroy(){
+		if(mApplet!=null){
+			mApplet.destroy();
+		}
 	}
 	
-	public boolean start(boolean runEventLoop){
+	public void start(){
 		if(mFullscreen){
 			requestWindowFeature(Window.FEATURE_NO_TITLE);   
 			getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN,WindowManager.LayoutParams.FLAG_FULLSCREEN);
 		}
 	
+System.out.println("CREATE VIEW");
 		mView=new ApplicationView(this);
+System.out.println("SET CREATE VIEW");
 		setContentView(mView);
+System.out.println("START THREAD");
 
 		mLastTime=System.currentTimeMillis();
 
 		mRun=true;
 		mThread=new Thread(this);
 		mThread.start();
-		
-		return true;
 	}
 	
 	public void stop(){
 		finish();
 		mRun=false;
 	}
+
+	protected abstract Applet createApplet(AndroidApplication app);
+	protected abstract void destroyApplet(Applet applet);
 
 	public void run(){
 		while(mRun){
@@ -167,7 +183,15 @@ public class AndroidApplication extends Activity implements RenderTarget,Runnabl
 
 			synchronized(mSurfaceMutex){
 				if(mNotifySurfaceCreated!=null){
+mEngine=makeEngine();
+
 					surfaceCreated(mNotifySurfaceCreated);
+
+mEngine.installHandlers();
+
+setApplet(createApplet(this));
+mApplet.create();
+
 					mNotifySurfaceCreated=null;
 					mActive=true;
 					mSurfaceMutex.notify();
@@ -320,7 +344,7 @@ public class AndroidApplication extends Activity implements RenderTarget,Runnabl
 
 	public void surfaceCreated(SurfaceHolder holder){
 		System.out.println(
-			"surfaceCreated");
+			"AndroidApplication.surfaceCreated");
 
 		boolean result=false;
 		mRenderTarget=makeRenderTarget(holder);
@@ -351,7 +375,7 @@ public class AndroidApplication extends Activity implements RenderTarget,Runnabl
 
 	public void surfaceDestroyed(SurfaceHolder holder){
 		System.out.println(
-			"surfaceDestroyed");
+			"AndroidApplication.surfaceDestroyed");
 
 		if(mRenderDevice!=null){
 			mEngine.setRenderDevice(null);
@@ -366,10 +390,10 @@ public class AndroidApplication extends Activity implements RenderTarget,Runnabl
 
 	protected RenderTarget makeRenderTarget(SurfaceHolder holder){
 		WindowRenderTargetFormat format=new WindowRenderTargetFormat();
-		format.pixelFormat=TextureFormat.Format_RGBA_8;
+		format.pixelFormat=TextureFormat.Format_RGB_5_6_5;
 		format.depthBits=16;
-		format.multisamples=2;
-		format.threads=2;
+		format.multisamples=0;
+		format.threads=0;
 		RenderTarget target=new EGLWindowRenderTarget(holder,format);
 		if(target!=null && target.isValid()==false){
 			target=null;
