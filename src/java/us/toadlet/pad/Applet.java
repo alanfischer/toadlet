@@ -26,6 +26,11 @@
 package us.toadlet.pad;
 
 public interface Applet{
+	public void create();
+	public void destroy();
+	public void update(int dt);
+	public void render(RenderDevice renderDevice);
+
 	public void resized(int width,int height);
 	public void focusGained();
 	public void focusLost();
@@ -35,6 +40,4 @@ public interface Applet{
 	public void mouseMoved(int x,int y);
 	public void mouseReleased(int x,int y,int button);
 	public void mouseScrolled(int x,int y,int scroll);
-	public void update(int dt);
-	public void render(RenderDevice renderDevice);
 }

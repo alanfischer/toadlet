@@ -10,9 +10,7 @@ set (PAD_SRC
 )
 
 set (PAD_PLATFORM_ANDROID_SRC
-	platform/android/AndroidApplicationImpl.cpp
 	platform/android/JAndroidApplication.cpp
-	platform/android/NAppletImpl.cpp
 )
 
 set (PAD_PLATFORM_WIN32_SRC

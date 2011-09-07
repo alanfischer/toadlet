@@ -34,22 +34,28 @@ void Particles::create(){
 	};
 
 	Material::ptr pointMaterial=engine->getMaterialManager()->createPointSpriteMaterial(engine->getTextureManager()->findTexture("sparkle.png"),ten,false);
-	pointMaterial->getPass()->setBlendState(BlendState::Combination_ALPHA_ADDITIVE);
-	pointMaterial->getPass()->setRasterizerState(RasterizerState(RasterizerState::CullType_NONE));
-	pointMaterial->getPass()->setMaterialState(MaterialState(false));
-	pointMaterial->getPass()->setDepthState(DepthState(DepthState::DepthTest_LEQUAL,false));
+	if(pointMaterial!=NULL){
+		pointMaterial->getPass()->setBlendState(BlendState::Combination_ALPHA_ADDITIVE);
+		pointMaterial->getPass()->setRasterizerState(RasterizerState(RasterizerState::CullType_NONE));
+		pointMaterial->getPass()->setMaterialState(MaterialState(false));
+		pointMaterial->getPass()->setDepthState(DepthState(DepthState::DepthTest_LEQUAL,false));
+	}
 
 	Material::ptr spriteMaterial=engine->getMaterialManager()->findMaterial("sparkle.png");
-	spriteMaterial->getPass()->setBlendState(BlendState::Combination_ALPHA_ADDITIVE);
-	spriteMaterial->getPass()->setRasterizerState(RasterizerState(RasterizerState::CullType_NONE));
-	spriteMaterial->getPass()->setMaterialState(MaterialState(false));
-	spriteMaterial->getPass()->setDepthState(DepthState(DepthState::DepthTest_LEQUAL,false));
+	if(spriteMaterial!=NULL){
+		spriteMaterial->getPass()->setBlendState(BlendState::Combination_ALPHA_ADDITIVE);
+		spriteMaterial->getPass()->setRasterizerState(RasterizerState(RasterizerState::CullType_NONE));
+		spriteMaterial->getPass()->setMaterialState(MaterialState(false));
+		spriteMaterial->getPass()->setDepthState(DepthState(DepthState::DepthTest_LEQUAL,false));
+	}
 
 	Material::ptr beamMaterial=engine->getMaterialManager()->findMaterial("fancyGlow.png");
-	beamMaterial->getPass()->setBlendState(BlendState::Combination_ALPHA_ADDITIVE);
-	beamMaterial->getPass()->setRasterizerState(RasterizerState(RasterizerState::CullType_NONE));
-	beamMaterial->getPass()->setMaterialState(MaterialState(false));
-	beamMaterial->getPass()->setDepthState(DepthState(DepthState::DepthTest_LEQUAL,false));
+	if(beamMaterial!=NULL){
+		beamMaterial->getPass()->setBlendState(BlendState::Combination_ALPHA_ADDITIVE);
+		beamMaterial->getPass()->setRasterizerState(RasterizerState(RasterizerState::CullType_NONE));
+		beamMaterial->getPass()->setMaterialState(MaterialState(false));
+		beamMaterial->getPass()->setDepthState(DepthState(DepthState::DepthTest_LEQUAL,false));
+	}
 
 	pointNode=engine->createNodeType(ParticleNode::type(),scene);
 	pointNode->setNumParticles(4,ParticleNode::ParticleType_POINTSPRITE,Math::ONE,pointPositions);
@@ -77,8 +83,6 @@ void Particles::create(){
 
 void Particles::destroy(){
 	scene->destroy();
-
-//	Application::destroy();
 }
 
 void Particles::resized(int width,int height){
@@ -140,6 +144,10 @@ void Particles::keyPressed(int key){
 		addSimulatedParticles(spriteNode);
 		addSimulatedParticles(beamNode);
 	}
+}
+
+void Particles::mousePressed(int x,int y,int button){
+	keyPressed(Application::Key_SPACE);
 }
 
 void Particles::addSimulatedParticles(ParticleNode::ptr particles){

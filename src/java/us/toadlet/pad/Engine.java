@@ -25,6 +25,13 @@
 
 package us.toadlet.pad;
 
-public interface Engine{
-	public boolean setRenderDevice(RenderDevice device);
+public class Engine{
+	public Engine(int nativeHandle){mNativeHandle=nativeHandle;}
+
+	public native void installHandlers();
+	
+	public native boolean setRenderDevice(RenderDevice device);
+	
+	public int getNativeHandle(){return mNativeHandle;}
+	protected int mNativeHandle;
 }

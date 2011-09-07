@@ -27,16 +27,21 @@
 #include <toadlet/egg/LoggerListener.h>
 #include <toadlet/egg/System.h>
 #include <toadlet/egg/Version.h>
-	#include <time.h>
+#include <time.h>
 #if defined(TOADLET_PLATFORM_WIN32)
 	#include <windows.h>
-#else
-	#include <time.h>
+#endif
+#if defined(TOADLET_PLATFORM_ANDROID)
+	#include <android/log.h>
 #endif
 
 // Choose output method
 #if defined(TOADLET_PLATFORM_WIN32)
 	#define TOADLET_USE_OUTPUTDEBUGSTRING_LOGGING
+#endif
+
+#if defined(TOADLET_PLATFORM_ANDROID)
+	#define TOADLET_USE_ANDROID_LOGGING
 #endif
 
 #if !defined(TOADLET_PLATFORM_WINCE)
@@ -74,17 +79,17 @@ Logger::Logger(){
 	mOutputLogEntry=true;
 	mStoreLogEntry=false;
 
-	addCategory("toadlet.egg.Logger");//Categories::TOADLET_EGG_LOGGER);
-	addCategory("toadlet.egg.net");//Categories::TOADLET_EGG_NET);
-	setCategoryReportingLevel("toadlet.egg.net"/*Categories::TOADLET_EGG_NET*/,Logger::Level_DISABLED); // Don't log socket errors
-	addCategory("toadlet.egg");//Categories::TOADLET_EGG);
-	addCategory("toadlet.flick");//Categories::TOADLET_FLICK);
-	addCategory("toadlet.hop");//Categories::TOADLET_HOP);
-	addCategory("toadlet.knot");//Categories::TOADLET_KNOT);
-	addCategory("toadlet.peeper");//Categories::TOADLET_PEEPER);
-	addCategory("toadlet.ribbit");//Categories::TOADLET_RIBBIT);
-	addCategory("toadlet.tadpole");//Categories::TOADLET_TADPOLE);
-	addCategory("toadlet.pad");//Categories::TOADLET_PAD);
+	addCategory(Categories::TOADLET_EGG_LOGGER);
+	addCategory(Categories::TOADLET_EGG_NET);
+	setCategoryReportingLevel(Categories::TOADLET_EGG_NET,Logger::Level_DISABLED); // Don't log socket errors
+	addCategory(Categories::TOADLET_EGG);
+	addCategory(Categories::TOADLET_FLICK);
+	addCategory(Categories::TOADLET_HOP);
+	addCategory(Categories::TOADLET_KNOT);
+	addCategory(Categories::TOADLET_PEEPER);
+	addCategory(Categories::TOADLET_RIBBIT);
+	addCategory(Categories::TOADLET_TADPOLE);
+	addCategory(Categories::TOADLET_PAD);
 }
 
 Logger::~Logger(){
@@ -254,6 +259,10 @@ void Logger::addCompleteLogEntry(Category *category,Level level,const String &te
 				OutputDebugString(line.substr(i,newi-i));
 				i=newi;
 			}
+		#endif
+
+		#if defined(TOADLET_USE_ANDROID_LOGGING)
+			__android_log_write(ANDROID_LOG_INFO,category!=NULL?category->name:"toadlet",text);
 		#endif
 
 		#if defined(TOADLET_USE_STDERR_LOGGING)

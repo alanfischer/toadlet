@@ -19,7 +19,7 @@
 -->
 
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    package="us.toadlet.particle">
+    package="us.toadlet.particles">
     <application
             android:label="@string/particles_activity">
         <activity android:name="Particles"

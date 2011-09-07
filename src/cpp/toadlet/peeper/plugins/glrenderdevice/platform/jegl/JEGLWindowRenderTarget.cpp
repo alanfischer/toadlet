@@ -29,6 +29,10 @@
 namespace toadlet{
 namespace peeper{
 
+TOADLET_C_API RenderTarget *new_JEGLWindowRenderTarget(JNIEnv *jenv,jobject jobj){
+	return new JEGLWindowRenderTarget(jenv,jobj);
+}
+
 JEGLWindowRenderTarget::JEGLWindowRenderTarget(JNIEnv *jenv,jobject jobj):GLRenderTarget(),
 	env(NULL),
 	obj(NULL)

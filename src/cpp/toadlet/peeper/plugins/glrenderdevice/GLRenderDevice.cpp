@@ -1624,7 +1624,11 @@ int GLRenderDevice::getClosePixelFormat(int format,int usage){
 }
 
 bool GLRenderDevice::getShaderProfileSupported(const String &profile){
-	return profile=="glsl";
+	#if defined(TOADLET_HAS_GLSL)
+		return profile=="glsl";
+	#else
+		return false;
+	#endif
 }
 
 bool GLRenderDevice::hardwareBuffersSupported(GLBuffer *buffer) const{

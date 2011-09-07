@@ -84,6 +84,11 @@ public class EGLWindowRenderTarget extends EGLRenderTarget{
 
 		mConfig=chooseEGLConfig(mDisplay,redBits,greenBits,blueBits,alphaBits,depthBits,stencilBits,!pixmap,pixmap,false,multisamples);
 		TOADLET_CHECK_EGLERROR("chooseEGLConfig");
+		if(mConfig==null){
+			System.out.println(
+				"error choosing config");
+			return false;
+		}
 
 		System.out.println(
 			"chooseEGLConfig config:"+mConfig);
@@ -96,7 +101,6 @@ public class EGLWindowRenderTarget extends EGLRenderTarget{
 			mSurface=egl.eglCreatePixmapSurface(mDisplay,mConfig,nativeSurface,null);
 			TOADLET_CHECK_EGLERROR("eglCreatePixmapSurface");
 		}
-
 		if(mSurface==EGL_NO_SURFACE){
 			System.out.println(
 				"error creating surface");
@@ -105,7 +109,6 @@ public class EGLWindowRenderTarget extends EGLRenderTarget{
 
 		mContext=egl.eglCreateContext(mDisplay,mConfig,EGL_NO_CONTEXT,null);
 		TOADLET_CHECK_EGLERROR("eglCreateContext");
-
 		if(mContext==EGL_NO_CONTEXT){
 			System.out.println(
 				"error creating context");
