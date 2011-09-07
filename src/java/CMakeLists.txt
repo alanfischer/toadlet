@@ -28,8 +28,9 @@ set (CMAKE_Java_CREATE_STATIC_LIBRARY
 
 # toadlet_peeper
 set (PEEPER_OBJ_DIR ${CMAKE_CURRENT_BINARY_DIR}/CMakeFiles/jtoadlet_peeper.dir/${JAVA_OBJ})
+execute_process(COMMAND ${CMAKE_COMMAND} -E make_directory ${PEEPER_OBJ_DIR})
 include_directories (${PEEPER_OBJ_DIR})
-configure_file (${JAVA_SRC_DIR}/peeper/Version.java.cmake ${PEEPER_OBJ_DIR}/${JAVA_SRC_DIR}/peeper/Version.java)
+configure_file (${JAVA_SRC_DIR}/peeper/Version.java.cmake ${CMAKE_CURRENT_BINARY_DIR}/${JAVA_SRC_DIR}/peeper/Version.java)
 
 set (PEEPER_SRC
 	${JAVA_SRC_DIR}/peeper/TextureFormat.java
@@ -38,19 +39,20 @@ set (PEEPER_SRC
 	${JAVA_SRC_DIR}/peeper/GLRenderTarget.java
 	${JAVA_SRC_DIR}/peeper/EGLRenderTarget.java
 	${JAVA_SRC_DIR}/peeper/EGLWindowRenderTarget.java
-	${PEEPER_OBJ_DIR}/${JAVA_SRC_DIR}/peeper/Version.java
+	${CMAKE_CURRENT_BINARY_DIR}/${JAVA_SRC_DIR}/peeper/Version.java
 )
 
 add_library (jtoadlet_peeper STATIC ${PEEPER_SRC})
 set_target_properties (jtoadlet_peeper PROPERTIES COMPILE_FLAGS "-d \"${PEEPER_OBJ_DIR}\"")
-set_target_properties (jtoadlet_peeper PROPERTIES COMPILE_DEFINITIONS_DEBUG TOADLET_DEBUG DEBUG_POSTFIX d)
+set_target_properties (jtoadlet_peeper PROPERTIES COMPILE_DEFINITIONS_DEBUG TOADLET_DEBUG DEBUG_POSTFIX _d)
 install (TARGETS jtoadlet_peeper DESTINATION lib)
 
 
 # toadlet_pad
 set (PAD_OBJ_DIR ${CMAKE_CURRENT_BINARY_DIR}/CMakeFiles/jtoadlet_pad.dir/${JAVA_OBJ})
+execute_process(COMMAND ${CMAKE_COMMAND} -E make_directory ${PAD_OBJ_DIR})
 include_directories (${PAD_OBJ_DIR})
-configure_file (${JAVA_SRC_DIR}/pad/Version.java.cmake ${PAD_OBJ_DIR}/${JAVA_SRC_DIR}/pad/Version.java)
+configure_file (${JAVA_SRC_DIR}/pad/Version.java.cmake ${CMAKE_CURRENT_BINARY_DIR}/${JAVA_SRC_DIR}/pad/Version.java)
 
 set (PAD_SRC
 	${JAVA_SRC_DIR}/pad/RenderDevice.java
@@ -58,12 +60,12 @@ set (PAD_SRC
 	${JAVA_SRC_DIR}/pad/Applet.java
 	${JAVA_SRC_DIR}/pad/AndroidApplication.java
 	${JAVA_SRC_DIR}/pad/NApplet.java
-	${PAD_OBJ_DIR}/${JAVA_SRC_DIR}/pad/Version.java
+	${CMAKE_CURRENT_BINARY_DIR}/${JAVA_SRC_DIR}/pad/Version.java
 )
 
 add_library (jtoadlet_pad STATIC ${PAD_SRC})
 set_target_properties (jtoadlet_pad PROPERTIES COMPILE_FLAGS "-d \"${PAD_OBJ_DIR}\"")
-set_target_properties (jtoadlet_pad PROPERTIES COMPILE_DEFINITIONS_DEBUG TOADLET_DEBUG DEBUG_POSTFIX d)
+set_target_properties (jtoadlet_pad PROPERTIES COMPILE_DEFINITIONS_DEBUG TOADLET_DEBUG DEBUG_POSTFIX _d)
 add_dependencies (jtoadlet_pad jtoadlet_peeper)
 install (TARGETS jtoadlet_pad DESTINATION lib)
 
