@@ -3,7 +3,7 @@ cmake_minimum_required (VERSION 2.6)
 project (particles CXX C)
 
 # Custom cmake scripts
-set (CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${particles_SOURCE_DIR}/../../../cmake/Modules/")
+set (CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${particles_SOURCE_DIR}/../../../../cmake/Modules/")
 
 # Find toadlet
 find_package (toadlet REQUIRED)
@@ -12,21 +12,20 @@ find_package (toadlet REQUIRED)
 include_directories (${particles_SOURCE_DIR} ${TOADLET_INCLUDE_DIR})
 
 # Libraries
-set (LIBS ${TOADLET_PAD_LIB} ${TOADLET_TADPOLE_LIB} ${TOADLET_PEEPER_GLRENDERDEVICE_LIB} ${TOADLET_PEEPER_LIB} ${TOADLET_RIBBIT_LIB} ${TOADLET_EGG_LIB})
+set (LIBS ${TOADLET_PAD_LIB_S} ${TOADLET_TADPOLE_LIB_S} ${TOADLET_PEEPER_GLRENDERDEVICE_LIB_S} ${TOADLET_PEEPER_LIB_S} ${TOADLET_RIBBIT_LIB_S} ${TOADLET_EGG_LIB_S} GLESv1_CM log)
 
 message ( ${TOADLET_EGG_LIB_S} )
 message ( ${TOADLET_TADPOLE_LIB_S} )
 
 # Source files
 set (SRC
-	../../main/toadletApp.cpp
-	../../main/toadletMain.cpp
-	Particles.cpp
+	jni/ParticlesImpl.cpp
+	../Particles.cpp
 )
 
 # Headers
 set (H
-	Particles.h
+	../Particles.h
 )
 
 # Executable
