@@ -74,11 +74,12 @@ public:
 	virtual void stop();
 
 	virtual Engine *getEngine();
+	virtual RenderDevice *getRenderDevice();
 	
 protected:
 	JNIEnv *env;
 	jobject obj;
-	jmethodID createID,destroyID,startID,stopID,getEngineID,getNativeHandleID;
+	jmethodID createID,destroyID,startID,stopID,getEngineID,getRenderDeviceID,getNativeHandleEngineID,getNativeHandleRenderDeviceID;
 };
 
 }

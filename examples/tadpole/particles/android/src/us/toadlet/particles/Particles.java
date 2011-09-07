@@ -10,6 +10,8 @@ public class Particles extends AndroidApplication{
 
 	public Particles(){
 		super();
+
+		System.out.println("Particles");
 	}
 
     protected void onCreate(Bundle icicle){

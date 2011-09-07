@@ -1,15 +1,15 @@
-#include "../../Particles.h"
+#include "../../MyPlanet.h"
 #include <jni.h>
 
 JAndroidApplication *application=NULL;
 Applet *applet=NULL;
 
-extern "C" JNIEXPORT jobject JNICALL Java_us_toadlet_particles_Particles_createApplet(JNIEnv *env,jobject obj,jobject app){
+extern "C" JNIEXPORT jobject JNICALL Java_us_toadlet_myplanet_MyPlanet_createApplet(JNIEnv *env,jobject obj,jobject app){
 	Logger::alert("Creating application");
 	application=new JAndroidApplication(env,app);
 
 	Logger::alert("Creating applet");
-	applet=new Particles(application);
+	applet=new MyPlanet(application);
 
 	jobject japplet=NULL;
 
@@ -25,7 +25,7 @@ extern "C" JNIEXPORT jobject JNICALL Java_us_toadlet_particles_Particles_createA
 	return japplet;
 }
 
-extern "C" JNIEXPORT void JNICALL Java_us_toadlet_particles_Particles_destroyApplet(JNIEnv *env,jobject obj,jobject applet){
+extern "C" JNIEXPORT void JNICALL Java_us_toadlet_myplanet_MyPlanet_destroyApplet(JNIEnv *env,jobject obj,jobject applet){
 	delete applet;
 	delete application;
 }
