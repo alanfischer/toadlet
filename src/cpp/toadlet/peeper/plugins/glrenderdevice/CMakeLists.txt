@@ -204,7 +204,7 @@ if (NOT TOADLET_PLATFORM_IOS)
 	set_target_properties (toadlet_peeper_glrenderdevice PROPERTIES ${DYNAMIC_LIB_PROPS})
 	set_property (TARGET toadlet_peeper_glrenderdevice APPEND PROPERTY COMPILE_DEFINITIONS ${PEEPER_GLRENDERDEVICE_DEFS})
 	target_link_libraries (toadlet_peeper_glrenderdevice toadlet_peeper ${PEEPER_GLRENDERDEVICE_LIBS})
-	install (TARGETS toadlet_peeper_glrenderdevice DESTINATION lib)
+	install (TARGETS toadlet_peeper_glrenderdevice DESTINATION ${LIB_INSTALL_DIR})
 endif (NOT TOADLET_PLATFORM_IOS)
 
 
@@ -213,5 +213,5 @@ add_library (toadlet_peeper_glrenderdevice_s STATIC ${PEEPER_GLRENDERDEVICE_SRC}
 set_target_properties (toadlet_peeper_glrenderdevice_s PROPERTIES ${STATIC_LIB_PROPS})
 set_property (TARGET toadlet_peeper_glrenderdevice_s APPEND PROPERTY COMPILE_DEFINITIONS ${PEEPER_GLRENDERDEVICE_DEFS_S})
 target_link_libraries (toadlet_peeper_glrenderdevice_s toadlet_peeper_s ${PEEPER_GLRENDERDEVICE_LIBS_S})
-install (TARGETS toadlet_peeper_glrenderdevice_s DESTINATION lib)
+install (TARGETS toadlet_peeper_glrenderdevice_s DESTINATION ${LIB_INSTALL_DIR})
 

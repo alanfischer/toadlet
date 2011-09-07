@@ -35,7 +35,7 @@ if (NOT TOADLET_PLATFORM_IOS)
 	set_target_properties (toadlet_ribbit PROPERTIES ${DYNAMIC_LIB_PROPS})
 	set_property (TARGET toadlet_ribbit APPEND PROPERTY COMPILE_DEFINITIONS ${RIBBIT_DEFS})
 	target_link_libraries (toadlet_ribbit toadlet_egg ${RIBBIT_LIBS})
-	install (TARGETS toadlet_ribbit DESTINATION lib)
+	install (TARGETS toadlet_ribbit DESTINATION ${LIB_INSTALL_DIR})
 endif (NOT TOADLET_PLATFORM_IOS)
 
 
@@ -44,7 +44,7 @@ add_library (toadlet_ribbit_s STATIC ${RIBBIT_SRC} ${RIBBIT_HEADERS})
 set_target_properties (toadlet_ribbit_s PROPERTIES ${STATIC_LIB_PROPS})
 set_property (TARGET toadlet_ribbit_s APPEND PROPERTY COMPILE_DEFINITIONS ${RIBBIT_DEFS_S})
 target_link_libraries (toadlet_ribbit_s toadlet_egg_s ${RIBBIT_LIBS_S})
-install (TARGETS toadlet_ribbit_s DESTINATION lib)
+install (TARGETS toadlet_ribbit_s DESTINATION ${LIB_INSTALL_DIR})
 
 
 # Platform specific modules

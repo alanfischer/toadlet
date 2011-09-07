@@ -24,12 +24,12 @@ set (RIBBIT_MMAUDIODEVICE_HEADERS ${RIBBIT_MMAUDIODEVICE_HEADERS})
 add_library (toadlet_ribbit_mmaudiodevice SHARED ${RIBBIT_MMAUDIODEVICE_SRC} ${RIBBIT_MMAUDIODEVICE_HEADERS})
 set_target_properties (toadlet_ribbit_mmaudiodevice PROPERTIES ${DYNAMIC_LIB_PROPS})
 target_link_libraries (toadlet_ribbit_mmaudiodevice toadlet_ribbit)
-install (TARGETS toadlet_ribbit_mmaudiodevice DESTINATION lib)
+install (TARGETS toadlet_ribbit_mmaudiodevice DESTINATION ${LIB_INSTALL_DIR})
 
 
 # Static library
 add_library (toadlet_ribbit_mmaudiodevice_s STATIC ${RIBBIT_MMAUDIODEVICE_SRC} ${RIBBIT_MMAUDIODEVICE_HEADERS})
 set_target_properties (toadlet_ribbit_mmaudiodevice_s PROPERTIES ${STATIC_LIB_PROPS})
 target_link_libraries (toadlet_ribbit_mmaudiodevice_s toadlet_ribbit_s)
-install (TARGETS toadlet_ribbit_mmaudiodevice_s DESTINATION lib)
+install (TARGETS toadlet_ribbit_mmaudiodevice_s DESTINATION ${LIB_INSTALL_DIR})
 

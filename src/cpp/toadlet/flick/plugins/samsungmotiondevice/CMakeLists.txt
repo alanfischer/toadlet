@@ -14,12 +14,12 @@ set (SAMSUNGMOTIONDEVICE_HEADERS
 add_library (toadlet_flick_samsungmotiondevice SHARED ${SAMSUNGMOTIONDEVICE_SRC} ${SAMSUNGMOTIONDEVICE_HEADERS})
 set_target_properties (toadlet_flick_samsungmotiondevice PROPERTIES ${DYNAMIC_LIB_PROPS})
 target_link_libraries (toadlet_flick_samsungmotiondevice toadlet_flick)
-install (TARGETS toadlet_flick_samsungmotiondevice DESTINATION lib)
+install (TARGETS toadlet_flick_samsungmotiondevice DESTINATION ${LIB_INSTALL_DIR})
 
 
 # Static library
 add_library (toadlet_flick_samsungmotiondevice_s STATIC ${SAMSUNGMOTIONDEVICE_SRC} ${SAMSUNGMOTIONDEVICE_HEADERS})
 set_target_properties (toadlet_flick_samsungmotiondevice_s PROPERTIES ${STATIC_LIB_PROPS})
 target_link_libraries (toadlet_flick_samsungmotiondevice_s toadlet_flick_s)
-install (TARGETS toadlet_flick_samsungmotiondevice_s DESTINATION lib)
+install (TARGETS toadlet_flick_samsungmotiondevice_s DESTINATION ${LIB_INSTALL_DIR})
 

@@ -46,12 +46,12 @@ include_directories (${D3D10_INCLUDE_PATH})
 add_library (toadlet_peeper_d3d10renderdevice SHARED ${PEEPER_D3D10RENDERDEVICE_SRC} ${PEEPER_D3D10RENDERDEVICE_HEADERS})
 set_target_properties (toadlet_peeper_d3d10renderdevice PROPERTIES ${DYNAMIC_LIB_PROPS})
 target_link_libraries (toadlet_peeper_d3d10renderdevice toadlet_peeper ${PEEPER_D3D10RENDERDEVICE_LIBS})
-install (TARGETS toadlet_peeper_d3d10renderdevice DESTINATION lib)
+install (TARGETS toadlet_peeper_d3d10renderdevice DESTINATION ${LIB_INSTALL_DIR})
 
 
 # Static library
 add_library (toadlet_peeper_d3d10renderdevice_s STATIC ${PEEPER_D3D10RENDERDEVICE_SRC} ${PEEPER_D3D10RENDERDEVICE_HEADERS})
 set_target_properties (toadlet_peeper_d3d10renderdevice_s PROPERTIES ${STATIC_LIB_PROPS})
 target_link_libraries (toadlet_peeper_d3d10renderdevice_s toadlet_peeper_s ${PEEPER_D3D10RENDERDEVICE_LIBS})
-install (TARGETS toadlet_peeper_d3d10renderdevice_s DESTINATION lib)
+install (TARGETS toadlet_peeper_d3d10renderdevice_s DESTINATION ${LIB_INSTALL_DIR})
 

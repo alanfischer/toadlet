@@ -38,7 +38,7 @@ if (NOT TOADLET_PLATFORM_IOS)
 	add_library (toadlet_hop SHARED ${HOP_SRC} ${HOP_HEADERS})
 	set_target_properties (toadlet_hop PROPERTIES ${DYNAMIC_LIB_PROPS})
 	target_link_libraries (toadlet_hop toadlet_egg)
-	install (TARGETS toadlet_hop DESTINATION lib)
+	install (TARGETS toadlet_hop DESTINATION ${LIB_INSTALL_DIR})
 endif (NOT TOADLET_PLATFORM_IOS)
 
 
@@ -46,5 +46,5 @@ endif (NOT TOADLET_PLATFORM_IOS)
 add_library (toadlet_hop_s STATIC ${HOP_SRC} ${HOP_HEADERS})
 set_target_properties (toadlet_hop_s PROPERTIES ${STATIC_LIB_PROPS})
 target_link_libraries (toadlet_hop_s toadlet_egg_s)
-install (TARGETS toadlet_hop_s DESTINATION lib)
+install (TARGETS toadlet_hop_s DESTINATION ${LIB_INSTALL_DIR})
 
