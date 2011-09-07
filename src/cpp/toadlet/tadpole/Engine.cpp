@@ -165,7 +165,7 @@ Engine::Engine(bool backable):
 	//mContextListeners
 {
 	Logger::debug(Categories::TOADLET_TADPOLE,
-		String("creating ")+Categories::TOADLET_TADPOLE+".Engine:"+Version::STRING);
+		String("allocating ")+Categories::TOADLET_TADPOLE+".Engine:"+Version::STRING);
 
 	mBackable=backable;
 
@@ -212,6 +212,9 @@ Engine::Engine(bool backable):
 }
 
 Engine::~Engine(){
+	Logger::debug(Categories::TOADLET_TADPOLE,
+		"Engine::~Engine");
+
 	destroy();
 
 	if(mNodeManager!=NULL){
@@ -261,6 +264,9 @@ Engine::~Engine(){
 }
 
 void Engine::destroy(){
+	Logger::debug(Categories::TOADLET_TADPOLE,
+		"Engine::destroy");
+
 	mNodeManager->destroy();
 	mAudioBufferManager->destroy();
 	mMeshManager->destroy();
