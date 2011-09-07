@@ -27,26 +27,32 @@ package us.toadlet.pad;
 
 import android.app.Activity;
 import android.content.Context;
-import android.view.SurfaceHolder;
-import android.view.SurfaceView;
-import android.view.MotionEvent;
-import android.view.Window;
-import android.view.WindowManager;
-import android.os.Bundle;
-import android.os.Handler;
-import android.os.Message;
+import android.view.*;
+import android.os.*;
 import us.toadlet.peeper.*;
 
 class ApplicationView extends SurfaceView implements SurfaceHolder.Callback{
 	public ApplicationView(AndroidApplication application){
 		super(application);
 		mApplication=application;
+		requestFocus();
+		setFocusableInTouchMode(true);
 		getHolder().addCallback(this);
 		getHolder().setType(SurfaceHolder.SURFACE_TYPE_GPU);
 	}
 
 	public void onSizeChanged(int w,int h,int oldw,int oldh){
 		mApplication.notifySizeChanged(w,h);
+	}
+
+	public boolean onKeyDown(int keyCode,KeyEvent event){
+		mApplication.notifyKeyPressed(event.getUnicodeChar());
+		return true;
+	}
+	
+	public boolean onKeyUp(int keyCode,KeyEvent event){
+		mApplication.notifyKeyReleased(event.getUnicodeChar());
+		return true;
 	}
 
 	public boolean onTouchEvent(MotionEvent event){
@@ -138,9 +144,11 @@ public abstract class AndroidApplication extends Activity implements RenderTarge
 	}
 	
 	public void destroy(){
-		if(mApplet!=null){
-			mApplet.destroy();
-		}
+//		if(mApplet!=null){
+//			mApplet.destroy();
+//		}
+
+//		deleteEngine(mEngine);
 	}
 	
 	public void start(){
@@ -149,11 +157,8 @@ public abstract class AndroidApplication extends Activity implements RenderTarge
 			getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN,WindowManager.LayoutParams.FLAG_FULLSCREEN);
 		}
 	
-System.out.println("CREATE VIEW");
 		mView=new ApplicationView(this);
-System.out.println("SET CREATE VIEW");
 		setContentView(mView);
-System.out.println("START THREAD");
 
 		mLastTime=System.currentTimeMillis();
 
@@ -164,7 +169,12 @@ System.out.println("START THREAD");
 	
 	public void stop(){
 		finish();
+		
 		mRun=false;
+		
+		try{
+			mThread.join();
+		}catch(InterruptedException ex){}
 	}
 
 	protected abstract Applet createApplet(AndroidApplication app);
@@ -183,21 +193,42 @@ System.out.println("START THREAD");
 
 			synchronized(mSurfaceMutex){
 				if(mNotifySurfaceCreated!=null){
-mEngine=makeEngine();
+if(mEngine==null){
+	mEngine=makeEngine();
+}
 
 					surfaceCreated(mNotifySurfaceCreated);
 
-mEngine.installHandlers();
+if(mEngine!=null){
+	mEngine.installHandlers();
+}
 
-setApplet(createApplet(this));
-mApplet.create();
+if(mApplet==null){
+	setApplet(createApplet(this));
+	mApplet.create();
+}
 
 					mNotifySurfaceCreated=null;
 					mActive=true;
 					mSurfaceMutex.notify();
 				}
 				if(mNotifySurfaceDestroyed!=null){
+if(mApplet!=null){
+	mApplet.destroy();
+	destroyApplet(mApplet);
+	setApplet(null);
+}
+
+if(mEngine!=null){
+	mEngine.destroy();
+}
 					surfaceDestroyed(mNotifySurfaceDestroyed);
+
+if(mEngine!=null){
+	deleteEngine(mEngine);
+	mEngine=null;
+}
+
 					mNotifySurfaceDestroyed=null;
 					mActive=false;
 					mSurfaceMutex.notify();
@@ -213,6 +244,14 @@ mApplet.create();
 				}
 			}
 			synchronized(this){
+				if(mNotifyKeyPressed){
+					mNotifyKeyPressed=false;
+					keyPressed(mKeyPressed);
+				}
+				if(mNotifyKeyReleased){
+					mNotifyKeyReleased=false;
+					keyReleased(mKeyReleased);
+				}
 				if(mNotifyMousePressed){
 					mNotifyMousePressed=false;
 					mousePressed(mMousePressedX,mMousePressedY,0);
@@ -229,6 +268,20 @@ mApplet.create();
 					mouseReleased(mMouseReleasedX,mMouseReleasedY,0);
 				}
 			}
+		}
+	}
+
+	synchronized void notifyKeyPressed(int key){
+		if(mNotifyKeyPressed==false){
+			mNotifyKeyPressed=true;
+			mKeyPressed=key;
+		}
+	}
+
+	synchronized void notifyKeyReleased(int key){
+		if(mNotifyKeyReleased==false){
+			mNotifyKeyReleased=true;
+			mKeyReleased=key;
 		}
 	}
 
@@ -380,6 +433,7 @@ mApplet.create();
 		if(mRenderDevice!=null){
 			mEngine.setRenderDevice(null);
 			mRenderDevice.destroy();
+			deleteRenderDevice(mRenderDevice);
 			mRenderDevice=null;
 		}
 
@@ -402,7 +456,9 @@ mApplet.create();
 	}
 
 	protected native Engine makeEngine();
+	protected native void deleteEngine(Engine engine);
 	protected native RenderDevice makeRenderDevice();
+	protected native void deleteRenderDevice(RenderDevice device);
 	
 	Thread mThread=null;
 	protected ApplicationView mView;
@@ -423,6 +479,10 @@ mApplet.create();
 	protected boolean mSurfaceCreated;
 	protected boolean mNotifySizeChanged;
 	protected int mWidth,mHeight;
+	protected boolean mNotifyKeyPressed;
+	protected int mKeyPressed;
+	protected boolean mNotifyKeyReleased;
+	protected int mKeyReleased;
 	protected boolean mNotifyMousePressed;
 	protected int mMousePressedX,mMousePressedY;
 	protected boolean mNotifyMouseMoved;
