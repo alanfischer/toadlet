@@ -7,7 +7,10 @@
 
 set (MXML_FOUND "NO")
 
-if (WIN32)
+if (ANDROID)
+	find_path (MXML_INCLUDE_DIR mxml.h)
+	find_library (MXML_LIBRARY NAMES mxml PATH_SUFFIXES ${NDK_NAME_ARCH})
+elseif (WIN32)
 	if (WINCE)
 		# Add default search paths for each supported winmo SDK
 		find_path (MXML_INCLUDE_DIR mxml.h PATHS
@@ -26,7 +29,7 @@ if (WIN32)
 			"C:/Program Files/Microsoft Visual Studio 8/VC/lib"
 		)
 	endif (WINCE)
-else (WIN32)
+else (ANDROID)
 	find_path (MXML_INCLUDE_DIR mxml.h PATHS
 		/usr/include
 		/usr/local/include
@@ -35,7 +38,7 @@ else (WIN32)
 		/usr/lib 
 		/usr/local/lib
 	)
-endif (WIN32)
+endif (ANDROID)
 
 mark_as_advanced (MXML_INCLUDE_DIR MXML_LIBRARY)
 
