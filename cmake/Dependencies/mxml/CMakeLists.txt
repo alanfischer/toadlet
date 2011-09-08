@@ -4,18 +4,23 @@ project (mxml C)
 # Platform specific dependencies
 # This includes all header files from the source tree (SOURCE_DIR) and the cmake build tree (BINARY_DIR)
 set (MXML_INCLUDES ${CMAKE_CURRENT_SOURCE_DIR} ${CMAKE_CURRENT_BINARY_DIR})
+set (LIB_INSTALL_DIR lib)
 
 # Actually include the directories for CMake to use
 include_directories (${MXML_INCLUDES})
 
 # Keep the source code happy
-set(MXML_VERSION "Mini-XML v2.6")
+set (MXML_VERSION "Mini-XML v2.6")
 
-# Perform configure file checks
-if (IOS OR ANDROID)
+# Platform specific settings - toolchain plaforms do not perform configure checks
+if (ANDROID)
+	set (LIB_INSTALL_DIR ${LIB_INSTALL_DIR}/${NDK_NAME_ARCH})
 	set (HAVE_SNPRINTF TRUE)
 	set (HAVE_VSNPRINTF TRUE)
-else (IOS OR ANDROID)
+elseif (IOS)
+	set (HAVE_SNPRINTF TRUE)
+	set (HAVE_VSNPRINTF TRUE)
+else (ANDROID)
 	include (CheckIncludeFiles)
 	include (CheckFunctionExists)
 	include (CheckTypeSize)
@@ -27,7 +32,7 @@ else (IOS OR ANDROID)
 	check_function_exists (vsnprintf HAVE_VSNPRINTF)
 	check_function_exists (strdup HAVE_STRDUP)
 	check_include_files (pthread.h HAVE_PTHREAD_H)
-endif (IOS OR ANDROID)
+endif (ANDROID)
 
 # Setup configure file based on results from the checks performed above
 configure_file (${CMAKE_CURRENT_SOURCE_DIR}/config.h.cmake ${CMAKE_CURRENT_BINARY_DIR}/config.h)
@@ -53,6 +58,6 @@ set (MXML_H
 
 # Static library
 add_library (mxml STATIC ${MXML_SRC} ${MXML_H})
-install (TARGETS mxml DESTINATION lib)
+install (TARGETS mxml DESTINATION ${LIB_INSTALL_DIR})
 install (FILES mxml.h DESTINATION include)
 
