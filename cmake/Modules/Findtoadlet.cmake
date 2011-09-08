@@ -183,8 +183,6 @@ foreach (TOADLET_LIB ${TOADLET_LIB_BASENAMES})
 	endif (NOT ${TOADLET_LIB_VAR}_FOUND)
 endforeach (TOADLET_LIB)
 
-
-
 # Consider toadlet found if we have the header file and a library path
 if (TOADLET_INCLUDE_DIR AND TOADLET_LIBRARY_DIR)
 	set (TOADLET_FOUND "YES")
