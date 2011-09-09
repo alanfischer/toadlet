@@ -19,11 +19,11 @@
 -->
 
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    package="us.toadlet.particles">
+    package="us.toadlet.logo">
     <application
-            android:label="@string/particles_activity"
+            android:label="@string/logo_activity"
 			android:icon="@drawable/icon">
-        <activity android:name="Particles"
+        <activity android:name="Logo"
                 android:theme="@android:style/Theme.NoTitleBar.Fullscreen"
             	android:launchMode="singleTask"
             	android:configChanges="orientation|keyboardHidden">

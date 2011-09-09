@@ -1,13 +1,16 @@
 #include "us_toadlet_pad_AndroidApplication.h"
 #include <toadlet/pad/Application.h>
+#include <toadlet/tadpole/handler/platform/android/AndroidAssetArchive.h>
 
 #include <android/log.h>
 
 using namespace toadlet::pad;
+using namespace toadlet::tadpole::handler;
 
 JNIEXPORT jobject JNICALL Java_us_toadlet_pad_AndroidApplication_makeEngine(JNIEnv *env,jobject obj){
 	Engine *engine=new Engine();
 	jobject jengine=NULL;
+	jobject jassetManager=NULL;
 	
 	jclass engineClass=env->FindClass("us/toadlet/pad/Engine");
 	{
@@ -15,7 +18,18 @@ JNIEXPORT jobject JNICALL Java_us_toadlet_pad_AndroidApplication_makeEngine(JNIE
 		jengine=env->NewObject(engineClass,initID,(int)engine);
 	}
 	env->DeleteLocalRef(engineClass);
-	
+
+	jclass contextClass=env->FindClass("android/content/Context");
+	{
+		jmethodID getAssetsID=env->GetMethodID(contextClass,"getAssets","()Landroid/content/res/AssetManager;");
+		jassetManager=env->CallObjectMethod(obj,getAssetsID);
+	}
+	env->DeleteLocalRef(engineClass);
+
+	/// @todo: This should be moved away from here, perhaps to a JAndroidApplication post-engine init method
+	AndroidAssetArchive::ptr assetArchive=AndroidAssetArchive::ptr(new AndroidAssetArchive(env,jassetManager));
+	engine->getArchiveManager()->manage(shared_static_cast<Archive>(assetArchive));
+
 	return jengine;
 }
 

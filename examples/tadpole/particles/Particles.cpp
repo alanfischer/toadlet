@@ -164,3 +164,4 @@ void Particles::addSimulatedParticles(ParticleNode::ptr particles){
 }
 
 Applet *createApplet(Application *app){return new Particles(app);}
+void destroyApplet(Applet *applet){delete applet;}

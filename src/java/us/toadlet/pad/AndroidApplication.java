@@ -76,6 +76,7 @@ class ApplicationView extends SurfaceView implements SurfaceHolder.Callback{
 
 	public void surfaceCreated(SurfaceHolder holder){
 		mApplication.notifySurfaceCreated(holder,true);
+		mApplication.notifySizeChanged(getWidth(),getHeight());
 	}
 
 	public void surfaceDestroyed(SurfaceHolder holder){
@@ -130,6 +131,7 @@ public abstract class AndroidApplication extends Activity implements RenderTarge
 		super.onResume();
 		if(mActive==false){
 			notifySurfaceCreated(mView.getHolder(),false);
+			notifySizeChanged(mView.getWidth(),mView.getHeight());
 		}
 	}
 	
@@ -235,7 +237,6 @@ if(mEngine!=null){
 				}
 				if(mNotifySizeChanged){
 					mNotifySizeChanged=false;
-		
 					resized(mWidth,mHeight);
 
 					if(mActive && mRenderDevice!=null){

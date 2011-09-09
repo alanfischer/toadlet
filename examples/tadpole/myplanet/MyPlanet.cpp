@@ -543,7 +543,7 @@ void MyPlanet::create(){
 
 	Node::ptr background=createBackground();
 	mScene->getBackground()->attach(background);
-	bool backgroundToSkybox=true;
+	bool backgroundToSkybox=false;//true;
 	if(backgroundToSkybox){
 		Mesh::ptr skyBoxMesh=mCamera->renderToSkyBox(mApp->getRenderDevice(),Image::Format_RGB_5_6_5,2048,Math::fromInt(10));
 		MeshNode::ptr skyBox=mEngine->createNodeType(MeshNode::type(),mScene);
