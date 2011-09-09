@@ -190,3 +190,4 @@ Material::ptr Logo::makeFunkyMaterial(){
 }
 
 Applet *createApplet(Application *app){return new Logo(app);}
+void destroyApplet(Applet *applet){delete applet;}

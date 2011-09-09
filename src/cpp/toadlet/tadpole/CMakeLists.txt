@@ -90,6 +90,10 @@ set (TADPOLE_HANDLER_FREETYPE_SRC
 	handler/FreeTypeHandler.cpp
 )
 
+set (TADPOLE_HANDLER_PLATFORM_ANDROID_SRC
+	handler/platform/android/AndroidAssetArchive.cpp
+)
+
 set (TADPOLE_HANDLER_PLATFORM_OSX_SRC
 	handler/platform/osx/OSXBundleArchive.mm
 	handler/platform/osx/OSXFontHandler.mm
@@ -276,6 +280,10 @@ set (TADPOLE_HANDLER_PNG_HEADERS
 
 set (TADPOLE_HANDLER_FREETYPE_HEADERS
 	handler/FreeTypeHandler.h
+)
+
+set (TADPOLE_HANDLER_PLATFORM_ANDROID_HEADERS
+	handler/platform/android/AndroidAssetArchive.h
 )
 
 set (TADPOLE_HANDLER_PLATFORM_OSX_HEADERS
@@ -634,7 +642,11 @@ if (ZZIP_FOUND)
 endif (ZZIP_FOUND)
 
 # Platform specific files
-if (TOADLET_PLATFORM_OSX)
+if (TOADLET_PLATFORM_ANDROID)
+	source_group ("Source Files\\\\handler\\\\platform\\\\android" FILES ${TADPOLE_HANDLER_PLATFORM_ANDROID_SRC})
+	source_group ("Header Files\\\\handler\\\\platform\\\\android" FILES ${TADPOLE_HANDLER_PLATFORM_ANDROID_HEADERS})
+	set (TADPOLE_SRC ${TADPOLE_SRC} ${TADPOLE_HANDLER_PLATFORM_ANDROID_SRC})
+elseif (TOADLET_PLATFORM_OSX)
 	source_group ("Source Files\\\\handler\\\\platform\\\\osx" FILES ${TADPOLE_HANDLER_PLATFORM_OSX_SRC})
 	source_group ("Header Files\\\\handler\\\\platform\\\\osx" FILES ${TADPOLE_HANDLER_PLATFORM_OSX_HEADERS})
 	set (TADPOLE_SRC ${TADPOLE_SRC} ${TADPOLE_HANDLER_PLATFORM_OSX_SRC})
@@ -659,7 +671,7 @@ elseif (TOADLET_PLATFORM_WIN32)
 	source_group ("Source Files\\\\handler\\\\platform\\\\win32" FILES ${TADPOLE_HANDLER_PLATFORM_WIN32_SRC})
 	source_group ("Header Files\\\\handler\\\\platform\\\\win32" FILES ${TADPOLE_HANDLER_PLATFORM_WIN32_HEADERS})
 	set (TADPOLE_SRC ${TADPOLE_SRC} ${TADPOLE_HANDLER_PLATFORM_WIN32_SRC})
-endif (TOADLET_PLATFORM_OSX)
+endif (TOADLET_PLATFORM_ANDROID)
 
 # Use dependency results
 source_group ("Source Files\\\\handler" FILES ${TADPOLE_HANDLER_SRC})

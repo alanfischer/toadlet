@@ -28,6 +28,7 @@
 
 #include <toadlet/pad/Types.h>
 #include <toadlet/tadpole/Engine.h>
+#include <toadlet/flick/MotionDevice.h>
 #include <jni.h>
 
 namespace toadlet{
@@ -75,6 +76,7 @@ public:
 
 	virtual Engine *getEngine();
 	virtual RenderDevice *getRenderDevice();
+	virtual MotionDevice *getMotionDevice(){return NULL;}
 	
 protected:
 	JNIEnv *env;

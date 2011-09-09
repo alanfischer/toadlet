@@ -48,10 +48,14 @@
 	#define TOADLET_SPRINTF(str,fmt,x) \
 		char temp[128]; \
 		str.mLength=sprintf(temp,fmt,x); \
-		mbstowcs((wchar_t*)(str).mData,temp,128);
+		char *src=temp; \
+		stringchar *dst=(str).mData; \
+		while((*dst++=*src++)!=0);
 	#define TOADLET_SSCANF(str,fmt,x) \
 		char temp[128]; \
-		wcstombs(temp,(wchar_t*)(str).mData,128); \
+		stringchar *src=(str).mData; \
+		char *dst=temp; \
+		while((*dst++=*src++)!=0); \
 		sscanf(temp,fmt,x)
 #endif
 
@@ -71,6 +75,9 @@
 		}
 	}
 	#define TOADLET_WCSNCPY(dst,src,len) toadlet_wcsncpy(dst,src,len)
+#else
+	#define TOADLET_WCSLEN wcslen
+	#define TOADLET_WCSNCPY wcsncpy
 #endif
 
 namespace toadlet{
