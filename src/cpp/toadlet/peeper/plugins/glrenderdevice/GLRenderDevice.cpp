@@ -175,10 +175,8 @@ bool GLRenderDevice::create(RenderTarget *target,int *options){
 		}
 
 		gl_version=GLEW_VERSION_2_1?21:(GLEW_VERSION_2_0?20:(GLEW_VERSION_1_5?15:(GLEW_VERSION_1_4?14:(GLEW_VERSION_1_3?13:(GLEW_VERSION_1_2?12:(GLEW_VERSION_1_1?11:00))))));
-	#elif defined(TOADLET_PLATFORM_IOS)
-		gl_version=11;
 	#else
-		gl_version=10;
+		gl_version=11; /// @todo: Actually calculate a GLES version
 	#endif
 
 	Logger::alert(Categories::TOADLET_PEEPER,

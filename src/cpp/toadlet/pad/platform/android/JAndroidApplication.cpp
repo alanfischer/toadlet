@@ -133,7 +133,7 @@ jmethodID getNativeHandleAppletID=0;
 void Java_us_toadlet_pad(JNIEnv *env){
 	if(Java_us_toadlet_pad_init==false){
 		Java_us_toadlet_pad_init=true;
-
+Logger::alert("INITTING");
 		jclass targetClass=env->FindClass("us/toadlet/peeper/RenderTarget");
 		{
 			getRootRenderTargetRenderTargetID=env->GetMethodID(targetClass,"getRootRenderTarget","()Lus/toadlet/peeper/RenderTarget;");
@@ -157,6 +157,7 @@ void Java_us_toadlet_pad(JNIEnv *env){
 			getNativeHandleAppletID=env->GetMethodID(appletClass,"getNativeHandle","()I");
 		}
 		env->DeleteLocalRef(appletClass);
+Logger::alert("DONE");
 	}
 }
 

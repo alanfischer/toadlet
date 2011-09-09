@@ -78,7 +78,7 @@ bool BackableTexture::create(int usage,TextureFormat::ptr format,tbyte *mipDatas
 	}
 
 	if(mipDatas!=NULL){
-		load(format->width,format->height,format->depth,0,mipDatas[0]);
+		load(format->width,format->height,format->depth,format->mipLevels==1?1:0,mipDatas[0]);
 	}
 
 	return true;
@@ -236,6 +236,8 @@ bool BackableTexture::convertRead(Texture::ptr texture,int pixelFormat,int width
 }
 
 bool BackableTexture::convertCreate(Texture::ptr texture,RenderDevice *renderDevice,int usage,TextureFormat::ptr format,tbyte *mipDatas[]){
+Logger::alert(String("mipmaps2:")+(usage&Texture::Usage_BIT_AUTOGEN_MIPMAPS));
+
 	RenderCaps caps;
 	renderDevice->getRenderCaps(caps);
 	int newPixelFormat=renderDevice->getClosePixelFormat(format->pixelFormat,usage);

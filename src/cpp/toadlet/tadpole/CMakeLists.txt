@@ -92,6 +92,7 @@ set (TADPOLE_HANDLER_FREETYPE_SRC
 
 set (TADPOLE_HANDLER_PLATFORM_ANDROID_SRC
 	handler/platform/android/AndroidAssetArchive.cpp
+	handler/platform/android/AndroidTextureHandler.cpp
 )
 
 set (TADPOLE_HANDLER_PLATFORM_OSX_SRC
@@ -284,6 +285,7 @@ set (TADPOLE_HANDLER_FREETYPE_HEADERS
 
 set (TADPOLE_HANDLER_PLATFORM_ANDROID_HEADERS
 	handler/platform/android/AndroidAssetArchive.h
+	handler/platform/android/AndroidTextureHandler.h
 )
 
 set (TADPOLE_HANDLER_PLATFORM_OSX_HEADERS

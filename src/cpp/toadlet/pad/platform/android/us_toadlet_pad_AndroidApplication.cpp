@@ -1,6 +1,7 @@
 #include "us_toadlet_pad_AndroidApplication.h"
 #include <toadlet/pad/Application.h>
 #include <toadlet/tadpole/handler/platform/android/AndroidAssetArchive.h>
+#include <toadlet/tadpole/handler/platform/android/AndroidTextureHandler.h>
 
 #include <android/log.h>
 
@@ -24,11 +25,13 @@ JNIEXPORT jobject JNICALL Java_us_toadlet_pad_AndroidApplication_makeEngine(JNIE
 		jmethodID getAssetsID=env->GetMethodID(contextClass,"getAssets","()Landroid/content/res/AssetManager;");
 		jassetManager=env->CallObjectMethod(obj,getAssetsID);
 	}
-	env->DeleteLocalRef(engineClass);
+	env->DeleteLocalRef(contextClass);
 
 	/// @todo: This should be moved away from here, perhaps to a JAndroidApplication post-engine init method
 	AndroidAssetArchive::ptr assetArchive=AndroidAssetArchive::ptr(new AndroidAssetArchive(env,jassetManager));
 	engine->getArchiveManager()->manage(shared_static_cast<Archive>(assetArchive));
+	AndroidTextureHandler::ptr textureHandler=AndroidTextureHandler::ptr(new AndroidTextureHandler(engine->getTextureManager(),env));
+	engine->getTextureManager()->setDefaultStreamer(textureHandler);
 
 	return jengine;
 }
