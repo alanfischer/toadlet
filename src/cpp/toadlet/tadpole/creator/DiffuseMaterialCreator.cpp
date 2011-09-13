@@ -269,8 +269,9 @@ Resource::ptr DiffuseMaterialCreator::create(const String &name,ResourceData *da
 Material::ptr DiffuseMaterialCreator::createDiffuseMaterial(Texture::ptr texture){
 	Material::ptr material(new Material(mEngine->getMaterialManager()));
 
-	RenderPath::ptr shaderPath=material->addPath();
-	{
+	if(mEngine->hasShader(Shader::ShaderType_VERTEX) && mEngine->hasShader(Shader::ShaderType_FRAGMENT)){
+		RenderPath::ptr shaderPath=material->addPath();
+
 		RenderPass::ptr pass=shaderPath->addPass();
 
 		pass->setBlendState(BlendState());
@@ -299,8 +300,9 @@ Material::ptr DiffuseMaterialCreator::createDiffuseMaterial(Texture::ptr texture
 		pass->setTexture(0,texture);
 	}
 
-	RenderPath::ptr fixedPath=material->addPath();
-	{
+	if(mEngine->hasFixed(Shader::ShaderType_VERTEX) && mEngine->hasFixed(Shader::ShaderType_FRAGMENT)){
+		RenderPath::ptr fixedPath=material->addPath();
+
 		RenderPass::ptr pass=fixedPath->addPass();
 
 		pass->setBlendState(BlendState());
@@ -322,8 +324,12 @@ Material::ptr DiffuseMaterialCreator::createDiffuseMaterial(Texture::ptr texture
 Material::ptr DiffuseMaterialCreator::createPointSpriteMaterial(Texture::ptr texture,scalar size,bool attenuated){
 	Material::ptr material(new Material(mEngine->getMaterialManager()));
 
-	RenderPath::ptr shaderPath=material->addPath();
+	if(	mEngine->hasShader(Shader::ShaderType_VERTEX) &&
+		mEngine->hasShader(Shader::ShaderType_FRAGMENT)	&& 
+		mEngine->hasShader(Shader::ShaderType_GEOMETRY))
 	{
+		RenderPath::ptr shaderPath=material->addPath();
+
 		RenderPass::ptr pass=shaderPath->addPass();
 
 		pass->setBlendState(BlendState());
@@ -358,8 +364,12 @@ Material::ptr DiffuseMaterialCreator::createPointSpriteMaterial(Texture::ptr tex
 		pass->setTexture(0,texture);
 	}
 
-	RenderPath::ptr fixedPath=material->addPath();
+	if(	mEngine->hasFixed(Shader::ShaderType_VERTEX) &&
+		mEngine->hasFixed(Shader::ShaderType_FRAGMENT) &&
+		mEngine->hasFixed(Shader::ShaderType_GEOMETRY))
 	{
+		RenderPath::ptr fixedPath=material->addPath();
+
 		RenderPass::ptr pass=fixedPath->addPass();
 
 		pass->setBlendState(BlendState());

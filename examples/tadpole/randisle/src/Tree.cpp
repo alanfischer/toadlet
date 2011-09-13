@@ -42,6 +42,8 @@ Tree::Tree():super(),
 Node *Tree::create(Scene *scene,int seed,ParentNode *parent,const Vector3 &translate){
 	super::create(scene);
 
+	Logger::alert("Tree::create");
+
 	setScope(RandIsle::Scope_TREE);
 
 	setTranslate(translate);
@@ -160,6 +162,8 @@ Node *Tree::create(Scene *scene,int seed,ParentNode *parent,const Vector3 &trans
 	mLowMeshNode=mEngine->createNodeType(MeshNode::type(),mScene);
 	mLowMeshNode->setMesh(lowMesh);
 	attach(mLowMeshNode);
+
+	Logger::alert("tree created");
 
 	return this;
 }

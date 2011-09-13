@@ -89,14 +89,12 @@ Texture::ptr TextureManager::createTexture(int mipLevels,Image::ptr mipImages[])
 }
 
 Texture::ptr TextureManager::createTexture(int usage,int dimension,int format,int width,int height,int depth,int mipLevels,tbyte *mipDatas[]){
-	Logger::debug(Categories::TOADLET_TADPOLE,"TextureManager::createTexture");
+	Logger::debug(Categories::TOADLET_TADPOLE,String("TextureManager::createTexture:")+width+","+height);
 
 	TextureFormat::ptr textureFormat(new TextureFormat(dimension,format,width,height,depth,mipLevels));
 	RenderDevice *renderDevice=mEngine->getRenderDevice();
 	Texture::ptr texture;
 	if(mBackable || renderDevice==NULL){
-		Logger::debug(Categories::TOADLET_TADPOLE,"creating BackableTexture");
-
 		BackableTexture::ptr backableTexture(new BackableTexture());
 		backableTexture->create(usage,textureFormat,mipDatas);
 		if(renderDevice!=NULL){
@@ -105,15 +103,16 @@ Texture::ptr TextureManager::createTexture(int usage,int dimension,int format,in
 		texture=backableTexture;
 	}
 	else{
-		Logger::debug(Categories::TOADLET_TADPOLE,"creating Texture");
-
 		texture=Texture::ptr(renderDevice->createTexture());
 		if(BackableTexture::convertCreate(texture,renderDevice,usage,textureFormat,mipDatas)==false){
+			Logger::error(Categories::TOADLET_TADPOLE,"Error in convertCreate");
 			return NULL;
 		}
 	}
 
 	manage(shared_static_cast<Texture>(texture));
+
+	Logger::debug(Categories::TOADLET_TADPOLE,"texture created");
 
 	return texture;
 }

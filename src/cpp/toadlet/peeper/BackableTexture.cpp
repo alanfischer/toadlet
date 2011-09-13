@@ -236,8 +236,6 @@ bool BackableTexture::convertRead(Texture::ptr texture,int pixelFormat,int width
 }
 
 bool BackableTexture::convertCreate(Texture::ptr texture,RenderDevice *renderDevice,int usage,TextureFormat::ptr format,tbyte *mipDatas[]){
-Logger::alert(String("mipmaps2:")+(usage&Texture::Usage_BIT_AUTOGEN_MIPMAPS));
-
 	RenderCaps caps;
 	renderDevice->getRenderCaps(caps);
 	int newPixelFormat=renderDevice->getClosePixelFormat(format->pixelFormat,usage);
@@ -277,6 +275,8 @@ Logger::alert(String("mipmaps2:")+(usage&Texture::Usage_BIT_AUTOGEN_MIPMAPS));
 			result=texture->create(usage,format,mipDatas);
 		}
 		else{
+			Logger::alert(Categories::TOADLET_PEEPER,String("BackableTexture::convertCreate - converting texture:")+needsNPOT+","+needsAutogen+","+needsConvert);
+
 			tbyte **newMipDatas=new tbyte*[allocatedMipLevels];
 			int newWidth=Math::nextPowerOf2(format->width),newHeight=Math::nextPowerOf2(format->height),newDepth=Math::nextPowerOf2(format->depth);
 			int newMipWidth=newWidth,newMipHeight=newHeight,newMipDepth=newDepth;

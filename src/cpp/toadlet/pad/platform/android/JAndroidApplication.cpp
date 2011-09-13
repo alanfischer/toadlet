@@ -53,6 +53,9 @@ JAndroidApplication::JAndroidApplication(JNIEnv *jenv,jobject jobj):
 		destroyID=env->GetMethodID(appClass,"destroy","()V");
 		startID=env->GetMethodID(appClass,"start","()V");
 		stopID=env->GetMethodID(appClass,"stop","()V");
+		getWidthID=env->GetMethodID(appClass,"getWidth","()I");
+		getHeightID=env->GetMethodID(appClass,"getHeight","()I");
+		setDifferenceMouseID=env->GetMethodID(appClass,"setDifferenceMouse","(Z)V");
 		getEngineID=env->GetMethodID(appClass,"getEngine","()Lus/toadlet/pad/Engine;");
 		getRenderDeviceID=env->GetMethodID(appClass,"getRenderDevice","()Lus/toadlet/pad/RenderDevice;");
 	}
@@ -91,6 +94,18 @@ void JAndroidApplication::start(){
 
 void JAndroidApplication::stop(){
 	env->CallVoidMethod(obj,stopID);
+}
+
+int JAndroidApplication::getWidth(){
+	env->CallIntMethod(obj,getWidthID);
+}
+
+int JAndroidApplication::getHeight(){
+	env->CallIntMethod(obj,getHeightID);
+}
+
+void JAndroidApplication::setDifferenceMouse(bool difference){
+	env->CallVoidMethod(obj,setDifferenceMouseID,difference);
 }
 
 Engine *JAndroidApplication::getEngine(){
@@ -133,7 +148,7 @@ jmethodID getNativeHandleAppletID=0;
 void Java_us_toadlet_pad(JNIEnv *env){
 	if(Java_us_toadlet_pad_init==false){
 		Java_us_toadlet_pad_init=true;
-Logger::alert("INITTING");
+
 		jclass targetClass=env->FindClass("us/toadlet/peeper/RenderTarget");
 		{
 			getRootRenderTargetRenderTargetID=env->GetMethodID(targetClass,"getRootRenderTarget","()Lus/toadlet/peeper/RenderTarget;");
@@ -157,7 +172,6 @@ Logger::alert("INITTING");
 			getNativeHandleAppletID=env->GetMethodID(appletClass,"getNativeHandle","()I");
 		}
 		env->DeleteLocalRef(appletClass);
-Logger::alert("DONE");
 	}
 }
 

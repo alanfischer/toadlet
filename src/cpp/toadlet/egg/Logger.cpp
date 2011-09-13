@@ -78,18 +78,6 @@ Logger::Logger(){
 	mReportingLevel=Level_MAX;
 	mOutputLogEntry=true;
 	mStoreLogEntry=false;
-
-	addCategory(Categories::TOADLET_EGG_LOGGER);
-	addCategory(Categories::TOADLET_EGG_NET);
-	setCategoryReportingLevel(Categories::TOADLET_EGG_NET,Logger::Level_DISABLED); // Don't log socket errors
-	addCategory(Categories::TOADLET_EGG);
-	addCategory(Categories::TOADLET_FLICK);
-	addCategory(Categories::TOADLET_HOP);
-	addCategory(Categories::TOADLET_KNOT);
-	addCategory(Categories::TOADLET_PEEPER);
-	addCategory(Categories::TOADLET_RIBBIT);
-	addCategory(Categories::TOADLET_TADPOLE);
-	addCategory(Categories::TOADLET_PAD);
 }
 
 Logger::~Logger(){
@@ -262,7 +250,26 @@ void Logger::addCompleteLogEntry(Category *category,Level level,const String &te
 		#endif
 
 		#if defined(TOADLET_USE_ANDROID_LOGGING)
-			__android_log_write(ANDROID_LOG_INFO,category!=NULL?category->name:"toadlet",text);
+			int priority=0;
+			switch(level){
+				case Level_EXCESS:
+					priority=ANDROID_LOG_VERBOSE;
+				break;
+				case Level_DEBUG:
+					priority=ANDROID_LOG_DEBUG;
+				break;
+				case Level_ALERT:
+					priority=ANDROID_LOG_INFO;
+				break;
+				case Level_WARNING:
+					priority=ANDROID_LOG_WARN;
+				break;
+				case Level_ERROR:
+					priority=ANDROID_LOG_ERROR;
+				break;
+			}
+
+			__android_log_write(priority,category!=NULL?category->name:"toadlet",text);
 		#endif
 
 		#if defined(TOADLET_USE_STDERR_LOGGING)

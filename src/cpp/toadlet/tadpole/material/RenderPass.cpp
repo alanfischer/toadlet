@@ -45,8 +45,8 @@ RenderPass::RenderPass(MaterialManager *manager,RenderPass *source,bool clone):
 {
 	mManager=manager;
 	if(manager!=NULL && clone==false){
-		mRenderState=mManager->createRenderState();
-		mShaderState=mManager->createShaderState();
+		mRenderState=manager->createRenderState();
+		mShaderState=manager->createShaderState();
 		mOwnsStates=true;
 
 		if(source!=NULL){

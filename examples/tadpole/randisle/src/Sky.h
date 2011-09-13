@@ -48,7 +48,7 @@ public:
 
 	Sky():super(){}
 
-	Node *create(Scene *scene,const Vector4 &skyColor,const Vector4 &fadeColor);
+	Node *create(Scene *scene,int cloudSize,const Vector4 &skyColor,const Vector4 &fadeColor);
 	void destroy();
 
 	void updateLightDirection(const Vector3 &lightDir);

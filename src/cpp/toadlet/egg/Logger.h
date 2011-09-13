@@ -123,14 +123,14 @@ public:
 	int getNumLogEntries();
 	Entry *getLogEntry(int i);
 
+	Category *addCategory(const String &categoryName);
+	Category *getCategory(const String &categoryName);
+
 private:
 	Logger();
 	~Logger();
 
 	typedef Map<String,Category*> CategoryNameCategoryMap;
-
-	Category *addCategory(const String &categoryName);
-	Category *getCategory(const String &categoryName);
 
 	void addCompleteLogEntry(Category *category,Level level,const String &text);
 

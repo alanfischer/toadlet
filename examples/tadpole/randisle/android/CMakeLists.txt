@@ -14,7 +14,7 @@ find_package (mxml REQUIRED)
 include_directories (${randisle_SOURCE_DIR} ${TOADLET_INCLUDE_DIR})
 
 # Libraries
-set (LIBS ${TOADLET_PAD_LIB_S} ${TOADLET_TADPOLE_LIB_S} ${TOADLET_PEEPER_GLRENDERDEVICE_LIB_S} ${TOADLET_PEEPER_LIB_S} ${TOADLET_RIBBIT_LIB_S} ${TOADLET_EGG_LIB_S})
+set (LIBS ${TOADLET_TADPOLE_HOP_LIB_S} ${TOADLET_HOP_LIB_S} ${TOADLET_PAD_LIB_S} ${TOADLET_TADPOLE_LIB_S} ${TOADLET_PEEPER_GLRENDERDEVICE_LIB_S} ${TOADLET_PEEPER_LIB_S} ${TOADLET_RIBBIT_LIB_S} ${TOADLET_EGG_LIB_S})
 # Add required android static libs
 set (LIBS ${LIBS} ${MXML_LIBRARY} GLESv1_CM log)
 
@@ -24,12 +24,18 @@ message ( ${TOADLET_TADPOLE_LIB_S} )
 # Source files
 set (SRC
 	jni/RandIsleImpl.cpp
-	../RandIsle.cpp
+	../src/Acorn.cpp
+	../src/HUD.cpp
+	../src/PathClimber.cpp
+	../src/RandIsle.cpp
+	../src/Resources.cpp
+	../src/Sky.cpp
+	../src/Tree.cpp
 )
 
 # Headers
 set (H
-	../RandIsle.h
+	../src/RandIsle.h
 )
 
 # Executable

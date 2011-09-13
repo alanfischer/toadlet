@@ -74,14 +74,20 @@ public:
 	virtual void start();
 	virtual void stop();
 
+	virtual void setTitle(const String &title){}
+
+	virtual void setDifferenceMouse(bool difference);
+	virtual int getWidth();
+	virtual int getHeight();
+
 	virtual Engine *getEngine();
 	virtual RenderDevice *getRenderDevice();
 	virtual MotionDevice *getMotionDevice(){return NULL;}
-	
+
 protected:
 	JNIEnv *env;
 	jobject obj;
-	jmethodID createID,destroyID,startID,stopID,getEngineID,getRenderDeviceID,getNativeHandleEngineID,getNativeHandleRenderDeviceID;
+	jmethodID createID,destroyID,startID,stopID,setDifferenceMouseID,getWidthID,getHeightID,getEngineID,getRenderDeviceID,getNativeHandleEngineID,getNativeHandleRenderDeviceID;
 };
 
 }

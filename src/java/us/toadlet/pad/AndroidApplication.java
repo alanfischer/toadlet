@@ -256,10 +256,19 @@ if(mEngine!=null){
 				if(mNotifyMousePressed){
 					mNotifyMousePressed=false;
 					mousePressed(mMousePressedX,mMousePressedY,0);
+					mLastMouseX=mMousePressedX;
+					mLastMouseY=mMousePressedY;
 				}
 				if(mNotifyMouseMoved){
 					mNotifyMouseMoved=false;
-					mouseMoved(mMouseMovedX,mMouseMovedY);
+					if(mDifferenceMouse){
+						mouseMoved(mLastMouseX-mMouseMovedX,mLastMouseY-mMouseMovedY);
+					}
+					else{
+						mouseMoved(mMouseMovedX,mMouseMovedY);
+					}
+					mLastMouseX=mMouseMovedX;
+					mLastMouseY=mMouseMovedY;
 				}
 				if(mNotifyMouseReleased){
 					mNotifyMouseReleased=false;
@@ -267,6 +276,8 @@ if(mEngine!=null){
 						mouseMoved(mMouseReleasedX,mMouseReleasedY);
 					}
 					mouseReleased(mMouseReleasedX,mMouseReleasedY,0);
+					mLastMouseX=mMouseReleasedX;
+					mLastMouseY=mMouseReleasedY;
 				}
 			}
 		}
@@ -371,6 +382,9 @@ if(mEngine!=null){
 	public int getWidth(){return mView==null?0:mView.getWidth();}
 	public int getHeight(){return mView==null?0:mView.getHeight();}
 
+	public void setDifferenceMouse(boolean difference){mDifferenceMouse=difference;}
+	public boolean getDifferenceMouse(){return mDifferenceMouse;}
+
 	public void setFullscreen(boolean fullscreen){mFullscreen=fullscreen;}
 	public boolean getFullscreen(){return mFullscreen;}
 	
@@ -470,6 +484,8 @@ if(mEngine!=null){
 	protected boolean mRun;
 	protected Object mSurfaceMutex=new Object();
 	protected long mLastTime=0;
+	protected boolean mDifferenceMouse;
+	protected int mLastMouseX,mLastMouseY;
 	protected RenderTarget mRenderTarget;
 	protected RenderDevice mRenderDevice;
 //	protected AudioDevice mAudioDevice;

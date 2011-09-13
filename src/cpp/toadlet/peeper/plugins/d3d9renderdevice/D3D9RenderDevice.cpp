@@ -875,7 +875,6 @@ void D3D9RenderDevice::setCapsFromD3DCAPS9(RenderCaps &caps,const D3DCAPS9 &d3dc
 	#else
 		caps.pointSprites=(d3dcaps.FVFCaps & D3DFVFCAPS_PSIZE)!=0 && d3dcaps.MaxPointSize>1.0f;
 	#endif
-	caps.maxLights=d3dcaps.MaxActiveLights;
 	caps.maxTextureStages=d3dcaps.MaxTextureBlendStages;
 	caps.maxTextureSize=math::Math::minVal(d3dcaps.MaxTextureWidth,d3dcaps.MaxTextureHeight);
 	caps.textureDot3=(d3dcaps.TextureOpCaps & D3DTEXOPCAPS_DOTPRODUCT3)!=0;
@@ -898,12 +897,18 @@ void D3D9RenderDevice::setCapsFromD3DCAPS9(RenderCaps &caps,const D3DCAPS9 &d3dc
 	#else
 		caps.idealVertexFormatType=VertexFormat::Format_TYPE_FLOAT_32;
 	#endif
+
+	caps.hasFixed[Shader::ShaderType_VERTEX]=true;
+	caps.hasFixed[Shader::ShaderType_FRAGMENT]=true;
+	caps.hasFixed[Shader::ShaderType_GEOMETRY]=caps.pointSprites;
+
+	caps.hasShader[Shader::ShaderType_VERTEX]=d3dcaps.VertexShaderVersion>0;
+	caps.hasShader[Shader::ShaderType_FRAGMENT]=d3dcaps.PixelShaderVersion>0;
+	caps.hasShader[Shader::ShaderType_GEOMETRY]=false;
+
+	caps.maxLights=d3dcaps.MaxActiveLights;
 	caps.triangleFan=true;
 	caps.fill=true;
-	caps.vertexFixedFunction=true;
-	caps.vertexShaders=true;
-	caps.fragmentFixedFunction=true;
-	caps.fragmentShaders=true;
 	#if !defined(TOADLET_SET_D3DM)
 		caps.texturePerspective=true;
 		caps.cubeMap=true;

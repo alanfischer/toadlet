@@ -19,8 +19,6 @@ RandIsle::RandIsle(Application *app,String path):
 {
 	mApp=app;
 	mPath=path;
-	mPatchSize=64;
-	mPatchScale.set(16,16,64);
 }
 
 RandIsle::~RandIsle(){
@@ -35,6 +33,10 @@ void RandIsle::create(){
 //	mEngine->getMaterialManager()->setRenderPathChooser(this);
 
 	Resources::init(mEngine);
+
+	mPatchSize=Resources::instance->patchSize;
+	scalar scale=16*64/mPatchSize;
+	mPatchScale.set(scale,scale,64);
 
 	mScene=HopScene::ptr(new HopScene(mEngine));
 	mScene->setUpdateListener(this);
@@ -73,7 +75,7 @@ void RandIsle::create(){
 	mHUD->setScope(Scope_HUD);
 	mScene->getRoot()->attach(mHUD);
 
-	mSky=(Sky*)mEngine->allocNodeType(Sky::type())->create(mScene,Resources::instance->skyColor,Resources::instance->fadeColor);
+	mSky=(Sky*)mEngine->allocNodeType(Sky::type())->create(mScene,Resources::instance->cloudSize,Resources::instance->skyColor,Resources::instance->fadeColor);
 	mSky->setScope(Scope_BIT_ABOVEWATER);
 	mScene->getBackground()->attach(mSky);
 
@@ -348,7 +350,7 @@ void RandIsle::logicUpdate(int dt){
 		mFollower->logicUpdated(position,dt);
 	}
 
-//	updateDanger(dt);
+	updateDanger(dt);
 
 	bool inWater=(mPlayer->getWorldTranslate().z-((Node*)mPlayer)->getBound().getSphere().radius)<=0;
 	if(!inWater && mPlayer->getCoefficientOfGravity()==0){
@@ -816,3 +818,5 @@ Applet *createApplet(Application *app){
 
 	return new RandIsle(app,path);
 }
+
+void destroyApplet(Applet *applet){delete applet;}

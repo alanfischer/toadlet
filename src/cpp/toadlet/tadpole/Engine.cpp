@@ -181,6 +181,19 @@ Engine::Engine(bool backable):
 	
 	mHandles.resize(1); // Handle 0 is always NULL
 
+	Logger *logger=Logger::getInstance();
+	logger->addCategory(Categories::TOADLET_EGG_LOGGER);
+	logger->addCategory(Categories::TOADLET_EGG_NET);
+	logger->setCategoryReportingLevel(Categories::TOADLET_EGG_NET,Logger::Level_DISABLED); // Don't log socket errors
+	logger->addCategory(Categories::TOADLET_EGG);
+	logger->addCategory(Categories::TOADLET_FLICK);
+	logger->addCategory(Categories::TOADLET_HOP);
+	logger->addCategory(Categories::TOADLET_KNOT);
+	logger->addCategory(Categories::TOADLET_PEEPER);
+	logger->addCategory(Categories::TOADLET_RIBBIT);
+	logger->addCategory(Categories::TOADLET_TADPOLE);
+	logger->addCategory(Categories::TOADLET_PAD);
+
 	Math::optimize();
 
 	// Make a guess at what the ideal format is.
@@ -371,19 +384,9 @@ bool Engine::setRenderDevice(RenderDevice *renderDevice){
 			Logger::alert(Categories::TOADLET_TADPOLE,
 				"RenderDevice Capabilities:");
 			Logger::alert(Categories::TOADLET_TADPOLE,
-				String()+(char)9+"maxLights:"+caps.maxLights);
-			Logger::alert(Categories::TOADLET_TADPOLE,
 				String()+(char)9+"maxTextureStages:"+caps.maxTextureStages);
 			Logger::alert(Categories::TOADLET_TADPOLE,
 				String()+(char)9+"maxTextureSize:"+caps.maxTextureSize);
-			Logger::alert(Categories::TOADLET_TADPOLE,
-				String()+(char)9+"vertexShaders:"+caps.vertexShaders);
-			Logger::alert(Categories::TOADLET_TADPOLE,
-				String()+(char)9+"maxVertexShaderLocalParameters:"+caps.maxVertexShaderLocalParameters);
-			Logger::alert(Categories::TOADLET_TADPOLE,
-				String()+(char)9+"fragmentShaders:"+caps.fragmentShaders);
-			Logger::alert(Categories::TOADLET_TADPOLE,
-				String()+(char)9+"maxFragmentShaderLocalParameters:"+caps.maxFragmentShaderLocalParameters);
 			Logger::alert(Categories::TOADLET_TADPOLE,
 				String()+(char)9+"renderToTexture:"+caps.renderToTexture);
 			Logger::alert(Categories::TOADLET_TADPOLE,
