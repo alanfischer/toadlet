@@ -69,6 +69,10 @@ void RenderVariableSet::removeBuffer(VariableBuffer::ptr buffer){
 
 // Search for the correct buffer and correct index
 bool RenderVariableSet::addVariable(const String &name,RenderVariable::ptr variable,int scope){
+	if(mBuffers.size()==0){
+		return false;
+	}
+
 	int i=name.find("."),j=0;
 	String fullName=name;
 	BufferInfo *buffer=NULL;

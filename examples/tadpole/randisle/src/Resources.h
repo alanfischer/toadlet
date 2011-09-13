@@ -17,6 +17,15 @@ public:
 		fadeColor=Vector4(0xB5C1C3FF);
 
 		Logger::alert("Loading grass");
+
+		#if defined(TOADLET_PLATFORM_ANDROID)
+			cloudSize=128;
+			patchSize=16;
+		#else
+			cloudSize=256;
+			patchSize=64;
+		#endif
+
 #if 1
 		grass=engine->getMaterialManager()->findMaterial("grass.png");
 		if(grass!=NULL){
@@ -339,7 +348,9 @@ public:
 
 		treeLeaf=engine->getMaterialManager()->createMaterial();
 		if(treeLeaf!=NULL){
+Logger::alert("Loading leaf top");
 			Material::ptr treeLeafTop=engine->getMaterialManager()->findMaterial("leaf_top1_alpha.png");
+Logger::alert("Loading leaf bottom");
 			Material::ptr treeLeafBottom=engine->getMaterialManager()->findMaterial("leaf_bottom1_alpha.png");
 
 			int i;
@@ -432,6 +443,8 @@ public:
 
 	static Resources *instance;
 
+	int cloudSize;
+	int patchSize;
 	Vector4 skyColor,fadeColor;
 	Material::ptr grass;
 	Material::ptr water;

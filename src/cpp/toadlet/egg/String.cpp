@@ -75,9 +75,19 @@
 		}
 	}
 	#define TOADLET_WCSNCPY(dst,src,len) toadlet_wcsncpy(dst,src,len)
+
+	inline int toadlet_wcscmp(wchar_t *s1,wchar_t *s2){
+		while(*s1==*s2){
+			if(*s1==0) return 0;
+			++s1;++s2;
+		}
+		return *s1<*s2?-1:1;
+	}
+	#define TOADLET_WCSCMP(s1,s2) toadlet_wcscmp(s1,s2)
 #else
 	#define TOADLET_WCSLEN wcslen
 	#define TOADLET_WCSNCPY wcsncpy
+	#define TOADLET_WCSCMP wcscmp
 #endif
 
 namespace toadlet{
@@ -587,11 +597,11 @@ void String::internal_addassign(const stringchar *text){
 }
 
 bool String::equals(const String &string) const{
-	return wcscmp((wchar_t*)mData,(wchar_t*)string.mData)==0;
+	return TOADLET_WCSCMP((wchar_t*)mData,(wchar_t*)string.mData)==0;
 }
 
 bool String::operator!=(const String &string) const{
-	return wcscmp((wchar_t*)mData,(wchar_t*)string.mData)!=0;
+	return TOADLET_WCSCMP((wchar_t*)mData,(wchar_t*)string.mData)!=0;
 }
 
 bool String::equals(const char *text) const{
@@ -625,7 +635,7 @@ bool String::internal_equals(const stringchar *text) const{
 		return mLength!=0;
 	}
 
-	return wcscmp((wchar_t*)mData,(wchar_t*)text)==0;
+	return TOADLET_WCSCMP((wchar_t*)mData,(wchar_t*)text)==0;
 }
 
 bool String::internal_notequals(const stringchar *text) const{
@@ -633,11 +643,11 @@ bool String::internal_notequals(const stringchar *text) const{
 		return mLength!=0;
 	}
 
-	return wcscmp((wchar_t*)mData,(wchar_t*)text)!=0;
+	return TOADLET_WCSCMP((wchar_t*)mData,(wchar_t*)text)!=0;
 }
 
 bool String::operator<(const String &string) const{
-	return (wcscmp((wchar_t*)mData,(wchar_t*)string.mData)<0);
+	return (TOADLET_WCSCMP((wchar_t*)mData,(wchar_t*)string.mData)<0);
 }
 
 void String::clearExtraData(){

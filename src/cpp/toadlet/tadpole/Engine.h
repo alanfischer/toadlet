@@ -95,6 +95,8 @@ public:
 	int getIdealVertexFormatType() const{return mIdealVertexFormatType;}
 	const VertexFormats &getVertexFormats() const{return mVertexFormats;}
 	const RenderCaps &getRenderCaps() const{return mRenderCaps;}
+	bool hasShader(Shader::ShaderType type){return mBackable || mRenderCaps.hasShader[type];}
+	bool hasFixed(Shader::ShaderType type){return mBackable || mRenderCaps.hasFixed[type];}
 
 	inline ArchiveManager *getArchiveManager() const{return mArchiveManager;}
 	inline TextureManager *getTextureManager() const{return mTextureManager;}

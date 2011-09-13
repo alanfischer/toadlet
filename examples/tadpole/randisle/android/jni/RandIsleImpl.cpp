@@ -1,4 +1,4 @@
-#include "../../RandIsle.h"
+#include "../../src/RandIsle.h"
 #include <jni.h>
 
 JAndroidApplication *application=NULL;
@@ -9,7 +9,7 @@ extern "C" JNIEXPORT jobject JNICALL Java_us_toadlet_randisle_RandIsle_createApp
 	application=new JAndroidApplication(env,app);
 
 	Logger::alert("Creating applet");
-	applet=new RandIsle(application);
+	applet=new RandIsle(application,"");
 
 	jobject japplet=NULL;
 

@@ -2,13 +2,14 @@
 
 TOADLET_NODE_IMPLEMENT(Sky,"Sky");
 
-Node *Sky::create(Scene *scene,const Vector4 &skyColor,const Vector4 &fadeColor){
+Node *Sky::create(Scene *scene,int cloudSize,const Vector4 &skyColor,const Vector4 &fadeColor){
 	super::create(scene);
 
-	int cloudSize=256;
 	Sphere sphere(Vector3(0,0,0),512);
 	Vector3 lightDir(1,1,0.5);
 	bool advanced=false; // Use realtime bumpmapping, or precalculated
+
+	Logger::alert("Allocating Sky resources");
 
 	SkyDomeMeshCreator::ptr skyDomeCreator(new SkyDomeMeshCreator(mEngine));
  	int numSegments=16,numRings=16;
@@ -26,8 +27,8 @@ Node *Sky::create(Scene *scene,const Vector4 &skyColor,const Vector4 &fadeColor)
 		Texture::ptr fadeTexture=mEngine->getTextureManager()->createTexture(fade);
 
 		material=mEngine->getMaterialManager()->createMaterial();
-		RenderPath::ptr shaderPath=material->addPath();
-		{
+		if(mEngine->hasShader(Shader::ShaderType_VERTEX) && mEngine->hasShader(Shader::ShaderType_FRAGMENT)){
+			RenderPath::ptr shaderPath=material->addPath();
 			RenderPass::ptr pass=shaderPath->addPass();
 
 			pass->setBlendState(BlendState());
@@ -147,8 +148,8 @@ Node *Sky::create(Scene *scene,const Vector4 &skyColor,const Vector4 &fadeColor)
 			pass->setTexture(state++,fadeTexture);
 		}
 
-		RenderPath::ptr fixedPath=material->addPath();
-		{
+		if(mEngine->hasFixed(Shader::ShaderType_VERTEX) && mEngine->hasFixed(Shader::ShaderType_FRAGMENT)){
+			RenderPath::ptr fixedPath=material->addPath();
 			RenderPass::ptr pass=fixedPath->addPass();
 
 			pass->setBlendState(BlendState());
@@ -240,6 +241,8 @@ Node *Sky::create(Scene *scene,const Vector4 &skyColor,const Vector4 &fadeColor)
 	mSun->setMaterial(sunMaterial);
 	mSun->setScale(128,128,128);
 	attach(mSun);
+
+	Logger::alert("Done allocating Sky resources");
 
 	mLight=mEngine->createNodeType(LightNode::type(),mScene);
 	LightState lightState;
@@ -340,21 +343,23 @@ Image::ptr Sky::createCloud(int width,int height,int scale,int seed,float cover,
 
 Image::ptr Sky::createBump(Image *in,float xscale,float yscale,float zscale,int spread){
 	int width=in->getWidth(),height=in->getHeight();
-	Image::ptr image(Image::createAndReallocate(Image::Dimension_D2,Image::Format_RGB_8,width,height));
+	uint8 *inData=in->getData();
 
-	Pixel<tbyte> ip,xp,yp;
+	Image::ptr image(Image::createAndReallocate(Image::Dimension_D2,Image::Format_RGB_8,width,height));
 	uint8 *data=image->getData();
+	uint8 ip,xp,yp; 
 	int x=0,y=0;
 	for(y=0;y<height;y++){
 		for(x=0;x<width;x++){
 			int sx=(x+1)%width;
 			int sy=(y+1)%height;
 
-			in->getPixel(ip,x,y);
-			in->getPixel(xp,sx,y);
-			in->getPixel(yp,x,sy);
-			Vector3 xv(xscale,0,xp.a-ip.a);Math::normalize(xv);
-			Vector3 yv(0,yscale,yp.a-ip.a);Math::normalize(yv);
+			ip=inData[(y*width+x)*4+3];
+			xp=inData[(y*width+sx)*4+3];
+			yp=inData[(sy*width+x)*4+3];
+
+			Vector3 xv(xscale,0,xp-ip);Math::normalize(xv);
+			Vector3 yv(0,yscale,yp-ip);Math::normalize(yv);
 			Vector3 zv;Math::cross(zv,xv,yv);
 			zv.z*=zscale;Math::normalize(zv);
 

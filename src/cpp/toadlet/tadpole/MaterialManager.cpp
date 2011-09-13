@@ -126,6 +126,10 @@ RenderState::ptr MaterialManager::createRenderState(){
 ShaderState::ptr MaterialManager::createShaderState(){
 	ShaderState::ptr shaderState;
 
+	if(mEngine->hasShader(Shader::ShaderType_VERTEX)==false){
+		return shaderState;
+	}
+
 	if(mBackable || mEngine->getRenderDevice()==NULL){
 		Logger::debug(Categories::TOADLET_TADPOLE,"creating BackableShaderState");
 
@@ -243,31 +247,19 @@ Resource::ptr MaterialManager::unableToFindStreamer(const String &name,ResourceD
 }
 
 bool MaterialManager::isPathUseable(RenderPath *path,const RenderCaps &caps){
-	int i;
+	int i,j;
 	for(i=0;i<path->getNumPasses();++i){
 		RenderPass *pass=path->getPass(i);
 		ShaderState *state=pass->getShaderState();
 
-		/// @todo: Use a new RenderCaps interface to check all types of shader programs
-		if(state!=NULL && state->getShader(Shader::ShaderType_VERTEX)!=NULL){
-			if(caps.vertexShaders==false){
-				break;
-			}
-		}
-		else{
-			if(caps.vertexFixedFunction==false){
-				break;
-			}
-		}
-
-		if(state!=NULL && state->getShader(Shader::ShaderType_FRAGMENT)!=NULL){
-			if(caps.fragmentShaders==false){
-				break;
-			}
-		}
-		else{
-			if(caps.fragmentFixedFunction==false){
-				break;
+		if(state!=NULL){
+			for(j=0;j<Shader::ShaderType_MAX;++j){
+				if(state->getShader((Shader::ShaderType)j)!=NULL && caps.hasShader[j]==false){
+					break;
+				}
+				else if(j<=Shader::ShaderType_FRAGMENT){
+					break;
+				}
 			}
 		}
 	}

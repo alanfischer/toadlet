@@ -51,6 +51,8 @@
 	#endif
 #endif
 
+#undef TOADLET_HAS_GLSL
+
 namespace toadlet{
 namespace peeper{
 
@@ -306,15 +308,14 @@ bool GLRenderDevice::create(RenderTarget *target,int *options){
 			caps.pointSprites=(gl_version>=11);
 		#endif
 
-		caps.vertexFixedFunction=useFixedFunction;
-		caps.fragmentFixedFunction=useFixedFunction;
+		caps.hasFixed[Shader::ShaderType_VERTEX]=useFixedFunction;
+		caps.hasFixed[Shader::ShaderType_FRAGMENT]=useFixedFunction;
+		caps.hasFixed[Shader::ShaderType_GEOMETRY]=useFixedFunction;
 
-		#if defined(TOADLET_HAS_GLEW)
-			caps.vertexShaders=(GLEW_ARB_vertex_program>0) && useShaders;
-			if(caps.vertexShaders) glGetProgramivARB(GL_VERTEX_PROGRAM_ARB,GL_MAX_PROGRAM_ENV_PARAMETERS_ARB,(GLint*)&caps.maxVertexShaderLocalParameters);
-
-			caps.fragmentShaders=(GLEW_ARB_fragment_program>0) && useShaders;
-			if(caps.fragmentShaders) glGetProgramivARB(GL_FRAGMENT_PROGRAM_ARB,GL_MAX_PROGRAM_ENV_PARAMETERS_ARB,(GLint*)&caps.maxFragmentShaderLocalParameters);
+		#if defined(TOADLET_HAS_GLSL)
+			caps.hasShader[Shader::ShaderType_VERTEX]=useShaders;
+			caps.hasShader[Shader::ShaderType_FRAGMENT]=useShaders;
+			caps.hasShader[Shader::ShaderType_GEOMETRY]=useShaders;
 		#endif
 
 		#if defined(TOADLET_HAS_GLES) && defined(TOADLET_FIXED_POINT)

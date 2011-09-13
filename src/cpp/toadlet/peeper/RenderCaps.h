@@ -28,6 +28,7 @@
 
 #include <toadlet/peeper/Types.h>
 #include <toadlet/peeper/VertexFormat.h>
+#include <toadlet/peeper/Shader.h>
 
 namespace toadlet{
 namespace peeper{
@@ -36,41 +37,31 @@ class RenderCaps{
 public:
 	RenderCaps():
 		resetOnResize(false),
-		maxLights(0),
 		maxTextureStages(0),
 		maxTextureSize(0),
-		pointSprites(false),
-		vertexFixedFunction(false),
-		vertexShaders(false),
-		maxVertexShaderLocalParameters(0),
-		fragmentFixedFunction(false),
-		fragmentShaders(false),
-		maxFragmentShaderLocalParameters(0),
 		renderToTexture(false),
 		renderToTextureNonPowerOf2Restricted(false),
 		textureDot3(false),
 		textureNonPowerOf2Restricted(false),
 		textureNonPowerOf2(false),
 		textureAutogenMipMaps(false),
+		cubeMap(false),
 		idealVertexFormatType(VertexFormat::Format_TYPE_FLOAT_32),
 		triangleFan(false),
+
+		maxLights(0),
 		fill(false),
 		texturePerspective(false),
-		cubeMap(false)
-	{}
+		pointSprites(false)
+	{
+		memset(hasShader,0,sizeof(hasShader));
+		memset(hasFixed,0,sizeof(hasFixed));
+	}
 
 	RenderCaps &set(const RenderCaps &caps){
 		resetOnResize=caps.resetOnResize;
-		maxLights=caps.maxLights;
 		maxTextureStages=caps.maxTextureStages;
 		maxTextureSize=caps.maxTextureSize;
-		pointSprites=caps.pointSprites;
-		vertexFixedFunction=caps.vertexFixedFunction;
-		vertexShaders=caps.vertexShaders;
-		maxVertexShaderLocalParameters=caps.maxVertexShaderLocalParameters;
-		fragmentFixedFunction=caps.fragmentFixedFunction;
-		fragmentShaders=caps.fragmentShaders;
-		maxFragmentShaderLocalParameters=caps.maxFragmentShaderLocalParameters;
 		renderToTexture=caps.renderToTexture;
 		renderToDepthTexture=caps.renderToDepthTexture;
 		renderToTextureNonPowerOf2Restricted=caps.renderToTextureNonPowerOf2Restricted;
@@ -78,26 +69,25 @@ public:
 		textureNonPowerOf2Restricted=caps.textureNonPowerOf2Restricted;
 		textureNonPowerOf2=caps.textureNonPowerOf2;
 		textureAutogenMipMaps=caps.textureAutogenMipMaps;
+		cubeMap=caps.cubeMap;
 		idealVertexFormatType=caps.idealVertexFormatType;
 		triangleFan=caps.triangleFan;
-		fill=caps.fill;
+
+		memcpy(hasShader,caps.hasShader,sizeof(hasShader));
+		memcpy(hasFixed,caps.hasFixed,sizeof(hasFixed));
+
+		maxLights=caps.maxLights;
 		texturePerspective=caps.texturePerspective;
-		cubeMap=caps.cubeMap;
+		fill=caps.fill;
+		pointSprites=caps.pointSprites;
 
 		return *this;
 	}
 
+	// Resource parameters
 	bool resetOnResize;
-	int maxLights;
 	int maxTextureStages;
 	int maxTextureSize;
-	bool pointSprites;
-	bool vertexFixedFunction;
-	bool vertexShaders;
-	int maxVertexShaderLocalParameters;
-	bool fragmentFixedFunction;
-	bool fragmentShaders;
-	int maxFragmentShaderLocalParameters;
 	bool renderToTexture;
 	bool renderToDepthTexture;
 	bool renderToTextureNonPowerOf2Restricted;
@@ -105,11 +95,21 @@ public:
 	bool textureNonPowerOf2Restricted;
 	bool textureNonPowerOf2;
 	bool textureAutogenMipMaps;
+	bool cubeMap;
 	int idealVertexFormatType;
 	bool triangleFan;
+
+	// Shader parameters
+	bool hasShader[Shader::ShaderType_MAX];
+	bool hasFixed[Shader::ShaderType_MAX];
+
+	// Fixed Vertex
+	int maxLights;
+	// Fixed Fragment
 	bool fill;
 	bool texturePerspective;
-	bool cubeMap;
+	// Fixed Geometry
+	bool pointSprites;
 };
 
 }

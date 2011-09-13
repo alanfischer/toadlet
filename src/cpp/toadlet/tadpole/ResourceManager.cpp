@@ -82,11 +82,6 @@ Resource::ptr ResourceManager::get(const String &name){
 Resource::ptr ResourceManager::find(const egg::String &name,ResourceData::ptr data){
 	Resource::ptr resource=get(name);
 	if(resource==NULL){
-		if(Logger::getInstance()->getMasterCategoryReportingLevel(Categories::TOADLET_TADPOLE)>=Logger::Level_EXCESS){
-			Logger::excess(Categories::TOADLET_TADPOLE,
-				String("Finding ")+name);
-		}
-
 		TOADLET_TRY
 			resource=findFromFile(name,data);
 		TOADLET_CATCH(const Exception &){resource=NULL;}
@@ -139,7 +134,7 @@ Resource::ptr ResourceManager::manage(const Resource::ptr &resource,const String
 void ResourceManager::unmanage(Resource *resource){
 	if(mResources.contains(resource)==false){
 		Error::unknown(Categories::TOADLET_TADPOLE,
-			"Error unmanaging resource, check that resource is managed, or check inheritance heiarchy");
+			"error unmanaging resource, check that resource is managed, or check inheritance heiarchy");
 		return;
 	}
 	else{
@@ -165,21 +160,21 @@ void ResourceManager::setStreamer(ResourceStreamer::ptr streamer,const String &e
 	ExtensionStreamerMap::iterator it=mExtensionStreamerMap.find(extension);
 	if(it!=mExtensionStreamerMap.end()){
 		Logger::debug(Categories::TOADLET_TADPOLE,
-			"Removing streamer for extension "+extension);
+			"removing streamer for extension "+extension);
 
 		it->second=NULL;
 	}
 
 	if(streamer!=NULL){
 		Logger::debug(Categories::TOADLET_TADPOLE,
-			"Adding streamer for extension "+extension);
+			"adding streamer for extension "+extension);
 		mExtensionStreamerMap.add(extension,streamer);
 	}
 }
 
 void ResourceManager::setDefaultStreamer(ResourceStreamer::ptr streamer){
 	Logger::debug(Categories::TOADLET_TADPOLE,
-		"Adding default streamer");
+		"adding default streamer");
 
 	mDefaultStreamer=streamer;
 }
@@ -246,11 +241,14 @@ String ResourceManager::cleanFilename(const String &name){
 
 Resource::ptr ResourceManager::unableToFindStreamer(const String &name,ResourceData *data){
 	Error::unknown(Categories::TOADLET_TADPOLE,
-		"streamer for \""+name+"\" not found");
+		"streamer for "+name+" not found");
 	return NULL;
 }
 
 Resource::ptr ResourceManager::findFromFile(const String &name,ResourceData *data){
+	Logger::debug(Categories::TOADLET_TADPOLE,
+		"ResourceManager::findFromFile:"+name);
+
 	String filename=cleanFilename(name);
 	String extension;
 	int i=filename.rfind('.');
@@ -277,7 +275,12 @@ Resource::ptr ResourceManager::findFromFile(const String &name,ResourceData *dat
 		if(streamer!=NULL){
 			Stream::ptr stream=mArchive->openStream(filename);
 			if(stream!=NULL){
-				return Resource::ptr(streamer->load(stream,data,NULL));
+				Resource::ptr resource=Resource::ptr(streamer->load(stream,data,NULL));
+
+				Logger::debug(Categories::TOADLET_TADPOLE,
+					"loaded resource");
+
+				return resource;
 			}
 			else{
 				Error::unknown(Categories::TOADLET_TADPOLE,
@@ -291,7 +294,7 @@ Resource::ptr ResourceManager::findFromFile(const String &name,ResourceData *dat
 	}
 	else{
 		Error::unknown(Categories::TOADLET_TADPOLE,
-			"Extension not found on file");
+			"extension not found on file");
 		return NULL;
 	}
 }

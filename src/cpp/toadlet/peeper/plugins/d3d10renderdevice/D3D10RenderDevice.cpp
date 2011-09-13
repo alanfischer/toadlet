@@ -104,8 +104,6 @@ bool D3D10RenderDevice::create(RenderTarget *target,int *options){
 	RenderCaps &caps=mCaps;
 	{
 		caps.resetOnResize=false;
-		caps.pointSprites=false;
-		caps.maxLights=0;
 		caps.maxTextureStages=16;
 		caps.maxTextureSize=8192;
 		caps.textureDot3=false;
@@ -116,11 +114,11 @@ bool D3D10RenderDevice::create(RenderTarget *target,int *options){
 		caps.renderToDepthTexture=true;
 		caps.renderToTextureNonPowerOf2Restricted=true;
 		caps.idealVertexFormatType=VertexFormat::Format_TYPE_FLOAT_32;
-		caps.vertexFixedFunction=false;
-		caps.vertexShaders=true;
-		caps.fragmentFixedFunction=false;
-		caps.fragmentShaders=true;
 		caps.triangleFan=false;
+
+		caps.hasShader[Shader::ShaderType_VERTEX]=true;
+		caps.hasShader[Shader::ShaderType_FRAGMENT]=true;
+		caps.hasShader[Shader::ShaderType_GEOMETRY]=true;
 	}
 
 	Logger::alert(Categories::TOADLET_PEEPER,
