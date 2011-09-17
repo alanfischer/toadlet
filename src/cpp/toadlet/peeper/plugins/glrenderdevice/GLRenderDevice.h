@@ -203,6 +203,9 @@ protected:
 	GLSLShaderState *mLastShaderState;
 	Collection<GLSLShaderState*> mShaderStates;
 	Collection<GLVertexFormat*> mVertexFormats;
+	#if defined(TOADLET_HAS_GLES)
+		RasterizerState::FillType mRasterizerFill;
+	#endif
 
 	#if defined(TOADLET_FIXED_POINT) && defined(TOADLET_HAS_GLES)
 		egg::mathfixed::Matrix4x4 mModelMatrix;

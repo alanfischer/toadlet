@@ -22,37 +22,45 @@ public:
 };
 
 static void *lock(void *data, void **p_pixels){
+Logger::alert("LOCKED");
+return NULL;
 	VLCToadlet *self=(VLCToadlet*)data;
 	if(self->activated==false){
-		self->getRenderer()->activateAdditionalContext();
+		self->app->getRenderDevice()->activateAdditionalContext();
 		self->activated=true;
 	}
 
-	*p_pixels=self->backBuffer->lock(Buffer::Access_BIT_WRITE);
+//	*p_pixels=self->backBuffer->lock(Buffer::Access_BIT_WRITE);
 
+Logger::alert("LOCK DONE");
 	return NULL;
 }
 
 static void unlock(void *data, void *id, void *const *p_pixels){
+Logger::alert("UNLOCK");
+return;
 	VLCToadlet *self=(VLCToadlet*)data;
 
 	PixelBuffer *backBuffer=self->backBuffer;
-	if(self->backBuffer->getPixelFormat()!=self->videoPixelFormat){
-		int width=self->backBuffer->getWidth(),height=self->backBuffer->getHeight();
+	int pixelFormat=self->backBuffer->getTextureFormat()->pixelFormat;
+	if(pixelFormat!=self->videoPixelFormat){
+		int width=self->backBuffer->getTextureFormat()->width,height=self->backBuffer->getTextureFormat()->height;
 		tbyte *conversionData=self->conversionBuffer->lock(Buffer::Access_BIT_WRITE);
-		int srcPitch=ImageFormatConversion::getRowPitch(self->backBuffer->getPixelFormat(),width);
+		int srcPitch=ImageFormatConversion::getRowPitch(pixelFormat,width);
 		int dstPitch=ImageFormatConversion::getRowPitch(self->videoPixelFormat,width);
-		ImageFormatConversion::convert((tbyte*)*p_pixels,self->backBuffer->getPixelFormat(),srcPitch,srcPitch*height,conversionData,self->videoPixelFormat,dstPitch,dstPitch*height,width,height,1);
+		ImageFormatConversion::convert((tbyte*)*p_pixels,pixelFormat,srcPitch,srcPitch*height,conversionData,self->videoPixelFormat,dstPitch,dstPitch*height,width,height,1);
 		self->conversionBuffer->unlock();
 		backBuffer=self->conversionBuffer;
 	}
-	self->backBuffer->unlock();
-	self->getRenderer()->copyPixelBuffer(self->texture->getMipPixelBuffer(0,0),backBuffer);
+//	self->backBuffer->unlock();
+//	self->getRenderDevice()->copyPixelBuffer(self->texture->getMipPixelBuffer(0,0),backBuffer);
+Logger::alert("UNLOCK DONE");
 }
 
 static void display(void *data, void *id){}
 
-VLCToadlet::VLCToadlet():Application(){
+VLCToadlet::VLCToadlet(Application *application){
+	app=application;
 	plugin=false;
 	activated=false;
 }
@@ -62,27 +70,25 @@ VLCToadlet::~VLCToadlet(){
 }
 
 void VLCToadlet::create(){
-	setBackable(true);
-
-	Application::create();
-
 	String url="../../data/video.3gp";
 
-	scene=Scene::ptr(new Scene(mEngine));
+	Engine *engine=app->getEngine();
 
-	videoPixelFormat=Texture::Format_BGRA_8;
-	int format=mRenderer->getCloseTextureFormat(videoPixelFormat,Texture::Usage_BIT_STREAM);
-	texture=mEngine->getTextureManager()->createTexture(Texture::Usage_BIT_STREAM,Texture::Dimension_D2,format,128,128,1,1);
-	backBuffer=mEngine->getBufferManager()->createPixelBuffer(Buffer::Usage_BIT_STAGING,Buffer::Access_BIT_WRITE,texture->getFormat(),texture->getWidth(),texture->getHeight(),1);
-	conversionBuffer=mEngine->getBufferManager()->createPixelBuffer(Buffer::Usage_BIT_STAGING,Buffer::Access_BIT_WRITE,texture->getFormat(),texture->getWidth(),texture->getHeight(),1);
+	scene=Scene::ptr(new Scene(engine));
 
-	Mesh::ptr mesh=mEngine->getMeshManager()->createBox(AABox(-10,-10,-10,10,10,10),mEngine->getMaterialManager()->createMaterial(texture));
-	meshNode=getEngine()->createNodeType(MeshNode::type(),scene);
+	videoPixelFormat=TextureFormat::Format_BGRA_8;
+	int format=app->getRenderDevice()->getClosePixelFormat(videoPixelFormat,Texture::Usage_BIT_STREAM);
+	texture=engine->getTextureManager()->createTexture(Texture::Usage_BIT_STREAM,TextureFormat::Dimension_D2,format,128,128,1,1);
+	backBuffer=engine->getBufferManager()->createPixelBuffer(Buffer::Usage_BIT_STAGING,Buffer::Access_BIT_WRITE,TextureFormat::Dimension_D2,format,128,128);
+	conversionBuffer=engine->getBufferManager()->createPixelBuffer(Buffer::Usage_BIT_STAGING,Buffer::Access_BIT_WRITE,texture->getFormat()->pixelFormat,128,128,1);
+
+	Mesh::ptr mesh=engine->getMeshManager()->createAABoxMesh(AABox(-10,-10,-10,10,10,10),engine->getMaterialManager()->createDiffuseMaterial(texture));
+	meshNode=engine->createNodeType(MeshNode::type(),scene);
 	meshNode->setMesh(mesh);
 	meshNode->addNodeListener(NodeListener::ptr(new Spinner()));
 	scene->getRoot()->attach(meshNode);
 
-	cameraNode=getEngine()->createNodeType(CameraNode::type(),scene);
+	cameraNode=engine->createNodeType(CameraNode::type(),scene);
 	cameraNode->setLookAt(Vector3(0,-Math::fromInt(150),0),Math::ZERO_VECTOR3,Math::Z_UNIT_VECTOR3);
 	cameraNode->setClearColor(Colors::BLUE);
 	scene->getRoot()->attach(cameraNode);
@@ -100,11 +106,11 @@ void VLCToadlet::create(){
 		return;
 	}
 
-	mEngine->addContextListener(this);
+	app->getEngine()->addContextListener(this);
 }
 
 void VLCToadlet::destroy(){
-	mEngine->removeContextListener(this);
+	app->getEngine()->removeContextListener(this);
 
 	libvlc_media_player_stop(mediaplayer);
 	libvlc_media_player_release(mediaplayer);
@@ -113,8 +119,6 @@ void VLCToadlet::destroy(){
 	scene->destroy();
 	texture->destroy();
 	backBuffer->destroy();
-
-	Application::destroy();
 }
 
 void VLCToadlet::resized(int width,int height){
@@ -129,54 +133,35 @@ void VLCToadlet::resized(int width,int height){
 	}
 }
 
-void VLCToadlet::render(Renderer *renderer){
-	renderer->beginScene();
-		scene->render(renderer,cameraNode,NULL);
-	renderer->endScene();
-	renderer->swap();
+void VLCToadlet::render(RenderDevice *device){
+	device->beginScene();
+		cameraNode->render(device);
+	device->endScene();
+	device->swap();
 }
 
 void VLCToadlet::update(int dt){
 	scene->update(dt);
 }
 
-void VLCToadlet::keyPressed(int key){
-#if defined(TOADLET_PLATFORM_WIN32)
-	if(key==' '){
-		if(plugin){
-			changeRendererPlugin("gl");
-		}
-		else{
-			changeRendererPlugin("d3d10");
-		}
-		plugin=!plugin;
-	}
-#endif
-}
-
 /// @todo: I should just be able to use player_pause here, but that doesnt seem to stop the thread like I imagine.  I need to look into this vlc bug
-void VLCToadlet::preContextReset(Renderer *renderer){
+void VLCToadlet::preContextReset(RenderDevice *device){
 	libvlc_media_player_stop(mediaplayer);
 }
 
-void VLCToadlet::postContextReset(Renderer *renderer){
+void VLCToadlet::postContextReset(RenderDevice *device){
 	libvlc_media_player_play(mediaplayer);
 }
 
-void VLCToadlet::postContextActivate(Renderer *renderer){
+void VLCToadlet::postContextActivate(RenderDevice *device){
 	activated=false;
 
 	libvlc_media_player_play(mediaplayer);
 }
 
-void VLCToadlet::preContextDeactivate(Renderer *renderer){
+void VLCToadlet::preContextDeactivate(RenderDevice *device){
 	libvlc_media_player_stop(mediaplayer);
 }
 
-int toadletMain(int argc,char **argv){
-	VLCToadlet app;
-	app.create();
-	app.start();
-	app.destroy();
-	return 0;
-}
+Applet *createApplet(Application *app){return new VLCToadlet(app);}
+void destroyApplet(Applet *applet){delete applet;}

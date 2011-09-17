@@ -1527,8 +1527,10 @@ void Math::optimize(int o){
 	SystemCaps caps;
 	System::getSystemCaps(caps);
 
-	Logger::alert(String("Detected SSE version:")+caps.sseVersion);
-	Logger::alert(String("Detected NEON version:")+caps.neonVersion);
+	Logger::alert(Categories::TOADLET_EGG,
+		String("Detected SSE version:")+caps.sseVersion);
+	Logger::alert(Categories::TOADLET_EGG,
+		String("Detected NEON version:")+caps.neonVersion);
 
 	#if defined(TOADLET_HAS_SSE)
 		if(o==Optimize_AUTO && caps.sseVersion>0){
@@ -1572,7 +1574,8 @@ void Math::optimize(int o){
 
 			uint64 t4=System::utime();
 
-			Logger::alert(String("Timings - MatrixTraditional:")+(t1-t0)+" MatrixSSE:"+(t2-t1)+" VectorTraditional:"+(t3-t2)+" VectorSSE:"+(t4-t3));
+			Logger::alert(Categories::TOADLET_EGG,
+				String("Timings - MatrixTraditional:")+(t1-t0)+" MatrixSSE:"+(t2-t1)+" VectorTraditional:"+(t3-t2)+" VectorSSE:"+(t4-t3));
 
 			if(t1-t0 < t2-t1){
 				Logger::excess(Categories::TOADLET_EGG,"using Traditional Matrix4x4 math");
@@ -1654,7 +1657,8 @@ void Math::optimize(int o){
 
 			uint64 t4=System::utime();
 
-			Logger::alert(String("Timings - MatrixTraditional:")+(t1-t0)+" MatrixNEON:"+(t2-t1)+" VectorTraditional:"+(t3-t2)+" VectorNEON:"+(t4-t3));
+			Logger::alert(Categories::TOADLET_EGG,,
+				String("Timings - MatrixTraditional:")+(t1-t0)+" MatrixNEON:"+(t2-t1)+" VectorTraditional:"+(t3-t2)+" VectorNEON:"+(t4-t3));
 
 			if(t1-t0 < t2-t1){
 				Logger::excess(Categories::TOADLET_EGG,"using Traditional Matrix4x4 math");

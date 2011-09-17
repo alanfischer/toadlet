@@ -146,6 +146,9 @@ bool GLSLShaderState::activate(){
 	if(!mNeedsLink){
 		glUseProgram(mHandle);
 	}
+	else{
+		glUseProgram(0);
+	}
 
 	TOADLET_CHECK_GLERROR("GLSLShaderState::activate");
 

@@ -70,13 +70,17 @@ void D3D10RenderTarget::clear(int clearFlags,const Vector4 &clearColor){
 }
 
 bool D3D10RenderTarget::activate(){
-	mD3DDevice->OMSetRenderTargets(mRenderTargetViews.size(),mRenderTargetViews.begin(),mDepthStencilView);
+	if(mD3DDevice!=NULL){
+		mD3DDevice->OMSetRenderTargets(mRenderTargetViews.size(),mRenderTargetViews.begin(),mDepthStencilView);
+	}
 	return true;
 }
 
 bool D3D10RenderTarget::deactivate(){
-	ID3D10RenderTargetView *view=NULL;
-	mD3DDevice->OMSetRenderTargets(1,&view,NULL);
+	if(mD3DDevice!=NULL){
+		ID3D10RenderTargetView *view=NULL;
+		mD3DDevice->OMSetRenderTargets(1,&view,NULL);
+	}
 	return true;
 }
 

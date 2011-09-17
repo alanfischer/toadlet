@@ -94,7 +94,7 @@ WGLWindowRenderTarget::WGLWindowRenderTarget(HWND wnd,WindowRenderTargetFormat *
 }
 
 WGLWindowRenderTarget::~WGLWindowRenderTarget(){
-	destroyContext();
+	destroy();
 }
 
 bool WGLWindowRenderTarget::createContext(HWND wnd,WindowRenderTargetFormat *format,int winPixelFormat){

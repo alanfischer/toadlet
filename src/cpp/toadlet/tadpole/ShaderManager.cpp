@@ -23,8 +23,7 @@
  *
  ********** Copyright header - do not remove **********/
 
-#include <toadlet/egg/Error.h>
-#include <toadlet/egg/Logger.h>
+#include <toadlet/peeper/BackableShader.h>
 #include <toadlet/tadpole/Engine.h>
 #include <toadlet/tadpole/ShaderManager.h>
 
@@ -41,35 +40,53 @@ ShaderManager::ShaderManager(Engine *engine,bool backable):ResourceManager(engin
 
 Shader::ptr ShaderManager::createShader(Shader::ShaderType type,const String profiles[],const String codes[],int numCodes){
 	RenderDevice *renderDevice=mEngine->getRenderDevice();
-
-	int i;
-	for(i=0;i<numCodes;++i){
-		if(renderDevice->getShaderProfileSupported(profiles[i])){
-			Shader::ptr shader=createShader(type,profiles[i],codes[i]);
-			if(shader!=NULL){
-				return shader;
-			}
+	Shader::ptr shader;
+	if(mBackable || renderDevice==NULL){
+		BackableShader::ptr backableShader(new BackableShader());
+		backableShader->create(type,profiles,codes,numCodes);
+		if(renderDevice!=NULL){
+			backableShader->setBack(Shader::ptr(renderDevice->createShader()),renderDevice);
+		}
+		shader=backableShader;
+	}
+	else{
+		shader=Shader::ptr(renderDevice->createShader());
+		if(BackableShader::convertCreate(shader,renderDevice,type,profiles,codes,numCodes)==false){
+			Logger::error(Categories::TOADLET_TADPOLE,"Error in convertCreate");
+			return NULL;
 		}
 	}
 
-	return NULL;
+	manage(shared_static_cast<Shader>(shader));
+
+	Logger::debug(Categories::TOADLET_TADPOLE,"shader created");
+
+	return shader;
 }
 
 Shader::ptr ShaderManager::createShader(Shader::ShaderType type,const String &profile,const String &code){
-	Logger::debug(Categories::TOADLET_TADPOLE,"ShaderManager::createShader");
+	return createShader(type,&profile,&code,1);
+}
 
-	if(code.length()==0){
-		return NULL;
+void ShaderManager::contextActivate(RenderDevice *renderDevice){
+	int i;
+	for(i=0;i<mResources.size();++i){
+		Shader::ptr shader=shared_static_cast<Shader>(mResources[i]);
+		if(shader!=NULL && shader->getRootShader()!=shader){
+			Shader::ptr back(renderDevice->createShader());
+			shared_static_cast<BackableShader>(shader)->setBack(back,renderDevice);
+		}
 	}
+}
 
-	Shader::ptr shader=Shader::ptr(mEngine->getRenderDevice()->createShader());
-	if(shader==NULL || shader->create(type,profile,code)==false){
-		return NULL;
+void ShaderManager::contextDeactivate(RenderDevice *renderDevice){
+	int i;
+	for(i=0;i<mResources.size();++i){
+		Shader::ptr shader=shared_static_cast<Shader>(mResources[i]);
+		if(shader!=NULL && shader->getRootShader()!=shader){
+			shared_static_cast<BackableShader>(shader)->setBack(NULL,NULL);
+		}
 	}
-
-	manage(shader);
-
-	return shader;
 }
 
 }

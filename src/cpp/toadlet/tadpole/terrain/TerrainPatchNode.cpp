@@ -620,8 +620,7 @@ void TerrainPatchNode::updateBlocks(CameraNode *camera){
 	mWorldTransform.inverseTransform(cameraTranslate,camera->getWorldTranslate());
 
 	resetBlocks();
-	simplifyBlocks(cameraTranslate);
-
+	simplifyBlocks(cameraTranslate,camera);
 	mLastBlockUpdateFrame=mScene->getFrame();
 }
 
@@ -923,7 +922,6 @@ void TerrainPatchNode::resetBlocks(){
 	int x,y,s;
 
 	mNumUnprocessedBlocks=mNumBlocksInQueue;
-
 	for(i=0;i<mNumBlocksInQueue;i++){
 		Block *b=getBlockNumber(i);
 
@@ -974,7 +972,7 @@ void TerrainPatchNode::disableVertex(Vertex *v){
 	}
 }
 
-void TerrainPatchNode::simplifyBlocks(const Vector3 &cameraTranslate){
+void TerrainPatchNode::simplifyBlocks(const Vector3 &cameraTranslate,CameraNode *camera){
 	int blockNum;
 	int i;
 
@@ -992,7 +990,7 @@ void TerrainPatchNode::simplifyBlocks(const Vector3 &cameraTranslate){
 					bool replaceParent=true;
 					
 					for(i=0;i<4;i++){
-						if(blockShouldSubdivide(&mBlocks[blockNum+i],cameraTranslate)){
+						if(blockShouldSubdivide(&mBlocks[blockNum+i],cameraTranslate,camera)){
 							replaceParent=false;
 						}
 					}
@@ -1018,11 +1016,10 @@ void TerrainPatchNode::simplifyBlocks(const Vector3 &cameraTranslate){
 
 			// Is block interrior node?
 			if(mBlocks[blockNum].stride>1){
-				/// @todo: Put back in optional blockIntersectsCamera test here if on single pipe machine
 				bool shouldSubdivide=false;
-					
+
 				for(i=0;i<4;i++){
-					if(blockShouldSubdivide(mBlocks[blockNum].children[i],cameraTranslate)){
+					if(blockShouldSubdivide(mBlocks[blockNum].children[i],cameraTranslate,camera)){
 						shouldSubdivide=true;
 					}
 				}
@@ -1043,39 +1040,17 @@ void TerrainPatchNode::simplifyBlocks(const Vector3 &cameraTranslate){
 	}
 }
 
-#if 0
-// A simple distance calculation
-bool TerrainPatchNode::blockShouldSubdivide(Block *block,const Vector3 &cameraTranslate){
-	Vector3 bo=(block->mins+block->maxs)/2.0f;
-	scalar size=(block->maxs.z-block->mins.z);
-	scalar distx=Math::abs(bo.x-cameraTranslate.x);
-	scalar disty=Math::abs(bo.y-cameraTranslate.y);
-	scalar dist=Math::maxVal(distx,disty);
-
-	dist=Math::mul(dist,Math::square(mS1));
-	size=Math::mul(size,Math::square(mS2));
-
-	if(Math::mul(dist,mS1)-Math::mul(size,mS2)<=0){
-		return true;
-	}
-	else{
+bool TerrainPatchNode::blockShouldSubdivide(Block *block,const Vector3 &cameraTranslate,CameraNode *camera){
+	if(blockVisibleByWater(block,cameraTranslate,false)==false){
 		return false;
 	}
-}
-#else
-/// @todo: Work blockIntersectsCamera in here, but that would require a local space camera transform.  Maybe a transform object with some CameraNode modifications to pass in a transform would work?
-bool TerrainPatchNode::blockShouldSubdivide(Block *block,const Vector3 &cameraTranslate){
-	if(blockVisibleByWater(block,cameraTranslate,false)==false){
+	if(blockIntersectsCamera(block,camera,false)==false){
 		return false;
 	}
 
 	computeDelta(block,cameraTranslate,mTolerance);
 
-	if(block->deltaMax>block->delta0){
-		return true;
-	}
-
-	return false;
+	return (block->deltaMax>block->delta0);
 }
 
 /// @todo: Document this section some, it's from the geometric tools engine books.
@@ -1163,7 +1138,6 @@ void TerrainPatchNode::computeDelta(Block *block,const Vector3 &cameraTranslate,
 	block->delta0=tolerance/fFMax;
 	block->delta1=(fFMin > 0.0 ? tolerance/fFMin : 9999999);
 }
-#endif
 
 void TerrainPatchNode::updateVertexes(){
 	if(mScene->getFrame()==mLastVertexesUpdateFrame){

@@ -34,7 +34,6 @@ public class EGLWindowRenderTarget extends EGLRenderTarget{
 	public EGLWindowRenderTarget(){super();}
 	public EGLWindowRenderTarget(Object nativeSurface,WindowRenderTargetFormat format){createContext(nativeSurface,format,false);}
 	public EGLWindowRenderTarget(Object nativeSurface,WindowRenderTargetFormat format,boolean pixmap){createContext(nativeSurface,format,pixmap);}
-	
 	public void destroy(){destroyContext();}
 
 	public RenderTarget getRootRenderTarget(){return this;}

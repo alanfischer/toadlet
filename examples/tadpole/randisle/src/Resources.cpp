@@ -3,7 +3,7 @@
 Resources *Resources::instance=NULL;
 
 Image::ptr Resources::createPoint(int width,int height){
-	Image::ptr image(Image::createAndReallocate(Image::Dimension_D2,Image::Format_A_8,width,height));
+	Image::ptr image(Image::createAndReallocate(Image::Dimension_D2,Image::Format_L_8,width,height));
 
 	uint8 *data=image->getData();
 	int x=0,y=0;
@@ -25,7 +25,7 @@ Image::ptr Resources::createPoint(int width,int height){
 Image::ptr Resources::createNoise(int width,int height,int scale,int seed,scalar brightnessScale,scalar brightnessOffset){
 	Image::ptr image(Image::createAndReallocate(Image::Dimension_D2,Image::Format_RGB_8,width,height));
 
-	Noise noise(4,scale,seed,4,256);
+	Noise noise(4,scale,4,seed,256);
 	uint8 *data=image->getData();
 	int x=0,y=0;
 	for(y=0;y<height;y++){

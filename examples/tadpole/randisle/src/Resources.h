@@ -12,20 +12,26 @@ public:
 		return instance->load(engine);
 	}
 	
+	static void destroy(){
+		delete instance;
+		instance=NULL;
+	}
+
 	bool load(Engine *engine){
 		skyColor=Colors::AZURE;
 		fadeColor=Vector4(0xB5C1C3FF);
 
-		Logger::alert("Loading grass");
-
 		#if defined(TOADLET_PLATFORM_ANDROID)
 			cloudSize=128;
-			patchSize=16;
+			patchSize=32;
+			tolerance=0.00001;
 		#else
 			cloudSize=256;
 			patchSize=64;
+			tolerance=0.000001;
 		#endif
 
+		Logger::alert("Loading grass");
 #if 1
 		grass=engine->getMaterialManager()->findMaterial("grass.png");
 		if(grass!=NULL){
@@ -34,6 +40,7 @@ public:
 				textureState.calculation=TextureState::CalculationType_NORMAL;
 				Math::setMatrix4x4FromScale(textureState.matrix,16,16,16);
 				grass->getPass()->setTextureState(0,textureState);
+//				grass->getPass()->setRasterizerState(RasterizerState(RasterizerState::CullType_BACK,RasterizerState::FillType_LINE));
 			}
 			grass->setLayer(-1);
 			grass->retain();
@@ -137,12 +144,14 @@ public:
 		}
 #endif
 		Logger::alert("Loading water");
-
 		water=engine->getMaterialManager()->createMaterial();
 		if(water!=NULL){
 			Vector4 color=Colors::AZURE*1.5;
 			color.w=0.5f;
-#if 1
+
+			Texture::ptr noise1=engine->getTextureManager()->createTexture(createNoise(128,128,16,5,0.5,0.5));
+			Texture::ptr noise2=engine->getTextureManager()->createTexture(createNoise(128,128,16,12,0.5,0.5));
+
 			RenderPath::ptr shaderPath=water->addPath();
 			{
 				RenderPass::ptr pass=shaderPath->addPass();
@@ -155,11 +164,11 @@ public:
 				TextureState textureState;
 				textureState.calculation=TextureState::CalculationType_NORMAL;
 
-				pass->setTexture(0,engine->getTextureManager()->createTexture(createNoise(128,128,16,6,0.5,0.5)));
+				pass->setTexture(0,noise1);
 				Math::setMatrix4x4FromScale(textureState.matrix,16,16,16);
 				pass->setTextureState(0,textureState);
 
-				pass->setTexture(1,engine->getTextureManager()->createTexture(createNoise(128,128,16,5,0.5,0.5)));
+				pass->setTexture(1,noise2);
 				Math::setMatrix4x4FromScale(textureState.matrix,16,16,16);
 				pass->setTextureState(1,textureState);
 
@@ -288,7 +297,7 @@ public:
 				pass->getVariables()->addVariable("textureMatrix0",RenderVariable::ptr(new TextureMatrixVariable(0)),Material::Scope_MATERIAL);
 				pass->getVariables()->addVariable("textureMatrix1",RenderVariable::ptr(new TextureMatrixVariable(1)),Material::Scope_MATERIAL);
 			}
-#else
+
 			RenderPath::ptr fixedPath=water->addPath();
 			{
 				RenderPass::ptr pass=fixedPath->addPass();
@@ -301,15 +310,15 @@ public:
 				TextureState textureState;
 				textureState.calculation=TextureState::CalculationType_NORMAL;
 
-				pass->setTexture(0,engine->getTextureManager()->createTexture(createNoise(128,128,16,6,0.5,0.5)));
+				pass->setTexture(0,noise1);
 				Math::setMatrix4x4FromScale(textureState.matrix,16,16,16);
 				pass->setTextureState(0,textureState);
 
-				pass->setTexture(1,engine->getTextureManager()->createTexture(createNoise(128,128,16,5,0.5,0.5)));
+				pass->setTexture(1,noise2);
 				Math::setMatrix4x4FromScale(textureState.matrix,16,16,16);
 				pass->setTextureState(1,textureState);
 			}
-#endif
+
 			water->setLayer(-1);
 			water->compile();
 			water->retain();
@@ -348,9 +357,7 @@ public:
 
 		treeLeaf=engine->getMaterialManager()->createMaterial();
 		if(treeLeaf!=NULL){
-Logger::alert("Loading leaf top");
 			Material::ptr treeLeafTop=engine->getMaterialManager()->findMaterial("leaf_top1_alpha.png");
-Logger::alert("Loading leaf bottom");
 			Material::ptr treeLeafBottom=engine->getMaterialManager()->findMaterial("leaf_bottom1_alpha.png");
 
 			int i;
@@ -445,6 +452,7 @@ Logger::alert("Loading leaf bottom");
 
 	int cloudSize;
 	int patchSize;
+	scalar tolerance;
 	Vector4 skyColor,fadeColor;
 	Material::ptr grass;
 	Material::ptr water;

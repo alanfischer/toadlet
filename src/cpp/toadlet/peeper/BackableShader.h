@@ -23,57 +23,46 @@
  *
  ********** Copyright header - do not remove **********/
 
-#ifndef TOADLET_PEEPER_GLSLSHADER_H
-#define TOADLET_PEEPER_GLSLSHADER_H
+#ifndef TOADLET_PEEPER_BACKABLESHADER_H
+#define TOADLET_PEEPER_BACKABLESHADER_H
 
-#include "GLIncludes.h"
 #include <toadlet/egg/BaseResource.h>
 #include <toadlet/peeper/Shader.h>
-
-#if defined(TOADLET_HAS_GLSL)
+#include <toadlet/peeper/RenderDevice.h>
 
 namespace toadlet{
 namespace peeper{
 
-class GLRenderDevice;
-class GLSLShaderState;
-
-class GLSLShader:protected BaseResource,public Shader{
+class TOADLET_API BackableShader:public BaseResource,public Shader{
 	TOADLET_BASERESOURCE_PASSTHROUGH(Shader);
 public:
-	TOADLET_SHARED_POINTERS(GLSLShader);
+	TOADLET_SHARED_POINTERS(BackableShader);
 
-	GLSLShader(GLRenderDevice *renderDevice);
-	virtual ~GLSLShader();
+	BackableShader();
+	virtual ~BackableShader();
+
+	virtual Shader *getRootShader(){return mBack!=NULL?mBack->getRootShader():NULL;}
+
+	virtual bool create(ShaderType shaderType,const String &profile,const String &code);
+	virtual bool create(ShaderType shaderType,const String profiles[],const String codes[],int numCodes);
+	virtual void destroy();
 	
-	Shader *getRootShader(){return this;}
+	virtual ShaderType getShaderType() const{return mShaderType;}
+	virtual String getProfile() const{return mBack!=NULL?mBack->getProfile():(char*)NULL;}
 
-	bool create(ShaderType shaderType,const String &profile,const String &code);
-	void destroy();
+	virtual void setBack(Shader::ptr back,RenderDevice *renderDevice);
+	virtual Shader::ptr getBack(){return mBack;}
 
-	ShaderType getShaderType() const{return mShaderType;}
-	String getProfile() const{return mProfile;}
+	static bool convertCreate(Shader::ptr shader,RenderDevice *renderDevice,Shader::ShaderType shaderType,const String profiles[],const String codes[],int numCodes);
 
 protected:
-	bool createContext();
-	bool destroyContext();
-
-	GLRenderDevice *mDevice;
-
 	ShaderType mShaderType;
-	String mProfile;
-	String mCode;
-
-	GLuint mHandle;
-	GLenum mTarget;
-	
-	friend class GLRenderDevice;
-	friend class GLSLShaderState;
+	Collection<String> mProfiles;
+	Collection<String> mCodes;
+	Shader::ptr mBack;
 };
 
 }
 }
-
-#endif
 
 #endif

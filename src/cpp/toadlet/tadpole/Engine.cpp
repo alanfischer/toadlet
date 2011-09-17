@@ -164,6 +164,19 @@ Engine::Engine(bool backable):
 
 	//mContextListeners
 {
+	Logger *logger=Logger::getInstance();
+	logger->addCategory(Categories::TOADLET_EGG_LOGGER);
+	logger->addCategory(Categories::TOADLET_EGG_NET);
+	logger->setCategoryReportingLevel(Categories::TOADLET_EGG_NET,Logger::Level_DISABLED); // Don't log socket errors
+	logger->addCategory(Categories::TOADLET_EGG);
+	logger->addCategory(Categories::TOADLET_FLICK);
+	logger->addCategory(Categories::TOADLET_HOP);
+	logger->addCategory(Categories::TOADLET_KNOT);
+	logger->addCategory(Categories::TOADLET_PEEPER);
+	logger->addCategory(Categories::TOADLET_RIBBIT);
+	logger->addCategory(Categories::TOADLET_TADPOLE);
+	logger->addCategory(Categories::TOADLET_PAD);
+
 	Logger::debug(Categories::TOADLET_TADPOLE,
 		String("allocating ")+Categories::TOADLET_TADPOLE+".Engine:"+Version::STRING);
 
@@ -180,19 +193,6 @@ Engine::Engine(bool backable):
 	mNodeManager=new NodeManager(this);
 	
 	mHandles.resize(1); // Handle 0 is always NULL
-
-	Logger *logger=Logger::getInstance();
-	logger->addCategory(Categories::TOADLET_EGG_LOGGER);
-	logger->addCategory(Categories::TOADLET_EGG_NET);
-	logger->setCategoryReportingLevel(Categories::TOADLET_EGG_NET,Logger::Level_DISABLED); // Don't log socket errors
-	logger->addCategory(Categories::TOADLET_EGG);
-	logger->addCategory(Categories::TOADLET_FLICK);
-	logger->addCategory(Categories::TOADLET_HOP);
-	logger->addCategory(Categories::TOADLET_KNOT);
-	logger->addCategory(Categories::TOADLET_PEEPER);
-	logger->addCategory(Categories::TOADLET_RIBBIT);
-	logger->addCategory(Categories::TOADLET_TADPOLE);
-	logger->addCategory(Categories::TOADLET_PAD);
 
 	Math::optimize();
 

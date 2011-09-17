@@ -183,6 +183,14 @@ public abstract class AndroidApplication extends Activity implements RenderTarge
 	protected abstract void destroyApplet(Applet applet);
 
 	public void run(){
+		mEngine=makeEngine();
+		mEngine.installHandlers();
+
+if(mApplet==null){
+	setApplet(createApplet(this));
+	mApplet.create();
+}
+
 		while(mRun){
 			long currentTime=System.currentTimeMillis();
 			if(mActive){
@@ -195,41 +203,14 @@ public abstract class AndroidApplication extends Activity implements RenderTarge
 
 			synchronized(mSurfaceMutex){
 				if(mNotifySurfaceCreated!=null){
-if(mEngine==null){
-	mEngine=makeEngine();
-}
-
 					surfaceCreated(mNotifySurfaceCreated);
-
-if(mEngine!=null){
-	mEngine.installHandlers();
-}
-
-if(mApplet==null){
-	setApplet(createApplet(this));
-	mApplet.create();
-}
 
 					mNotifySurfaceCreated=null;
 					mActive=true;
 					mSurfaceMutex.notify();
 				}
 				if(mNotifySurfaceDestroyed!=null){
-if(mApplet!=null){
-	mApplet.destroy();
-	destroyApplet(mApplet);
-	setApplet(null);
-}
-
-if(mEngine!=null){
-	mEngine.destroy();
-}
 					surfaceDestroyed(mNotifySurfaceDestroyed);
-
-if(mEngine!=null){
-	deleteEngine(mEngine);
-	mEngine=null;
-}
 
 					mNotifySurfaceDestroyed=null;
 					mActive=false;
@@ -244,6 +225,7 @@ if(mEngine!=null){
 					}
 				}
 			}
+
 			synchronized(this){
 				if(mNotifyKeyPressed){
 					mNotifyKeyPressed=false;
@@ -281,6 +263,14 @@ if(mEngine!=null){
 				}
 			}
 		}
+
+		mApplet.destroy();
+		destroyApplet(mApplet);
+		setApplet(null);
+
+		mEngine.destroy();
+		deleteEngine(mEngine);
+		mEngine=null;
 	}
 
 	synchronized void notifyKeyPressed(int key){
@@ -453,11 +443,14 @@ if(mEngine!=null){
 		}
 
 		if(mRenderTarget!=null){
+			mRenderTarget.destroy();
 			mRenderTarget=null;
 		}
 	}
 
 	protected RenderTarget makeRenderTarget(SurfaceHolder holder){
+		System.out.println("AndroidApplciation.makeRenderTarget");
+
 		WindowRenderTargetFormat format=new WindowRenderTargetFormat();
 		format.pixelFormat=TextureFormat.Format_RGB_5_6_5;
 		format.depthBits=16;
@@ -467,6 +460,9 @@ if(mEngine!=null){
 		if(target!=null && target.isValid()==false){
 			target=null;
 		}
+
+		System.out.println("AndroidApplciation.makeRenderTarget done");
+
 		return target;
 	}
 

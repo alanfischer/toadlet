@@ -39,6 +39,8 @@ public:
 
 	virtual RenderTarget *getRootRenderTarget()=0;
 
+	virtual void destroy()=0;
+
 	virtual bool isPrimary() const=0;
 	virtual bool isValid() const=0;
 	virtual int getWidth() const=0;

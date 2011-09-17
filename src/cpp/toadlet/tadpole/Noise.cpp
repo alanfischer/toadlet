@@ -25,6 +25,8 @@
 
 /* Ken Perlin's noise function, based on some code by John Ratcliff on Flipcode */
 
+/// @todo: Change this to use n*2 dimensional circular sampling for tiling, instead of just fading
+
 #include <toadlet/tadpole/Noise.h>
 #include <toadlet/egg/math/Math.h>
 

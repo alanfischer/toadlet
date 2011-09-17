@@ -28,6 +28,8 @@ package us.toadlet.peeper;
 public interface RenderTarget{
 	public RenderTarget getRootRenderTarget();
 
+	public void destroy();
+	
 	public boolean isPrimary();
 	public boolean isValid();
 	public int getWidth();

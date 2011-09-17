@@ -41,8 +41,8 @@ public:
 	Shader::ptr createShader(Shader::ShaderType type,const String profiles[],const String codes[],int numCodes);
 	Shader::ptr createShader(Shader::ShaderType type,const String &profile,const String &code);
 
-//	void contextActivate(RenderDevice *renderDevice);
-//	void contextDeactivate(RenderDevice *renderDevice);
+	void contextActivate(RenderDevice *renderDevice);
+	void contextDeactivate(RenderDevice *renderDevice);
 
 protected:
 	Engine *mEngine;
