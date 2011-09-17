@@ -49,7 +49,6 @@ JNIEXPORT void JNICALL Java_us_toadlet_pad_NApplet_focusLost(JNIEnv *env,jobject
 JNIEXPORT void JNICALL Java_us_toadlet_pad_NApplet_keyPressed(JNIEnv *env,jobject obj,jint key){
 	Java_us_toadlet_pad(env);
 	Applet *applet=(Applet*)env->CallIntMethod(obj,getNativeHandleAppletID);
-	Logger::alert("keyPressed!");
 	applet->keyPressed(key);
 }
 

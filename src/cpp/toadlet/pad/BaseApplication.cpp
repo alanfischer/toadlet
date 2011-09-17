@@ -235,6 +235,7 @@ bool BaseApplication::createContextAndRenderDevice(const String &plugin){
 		}
 	}
 	if(result==false){
+		mRenderTarget->destroy();
 		delete mRenderTarget;
 		mRenderTarget=NULL;
 
@@ -268,6 +269,7 @@ bool BaseApplication::destroyRenderDeviceAndContext(){
 	}
 
 	if(mRenderTarget!=NULL){
+		mRenderTarget->destroy();
 		delete mRenderTarget;
 		mRenderTarget=NULL;
 	}

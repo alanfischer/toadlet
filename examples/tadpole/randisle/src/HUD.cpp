@@ -69,7 +69,9 @@ void HUD::frameUpdate(int dt,int scope){
 		mCompassSprite->setRotate(Math::Z_UNIT_VECTOR3,angle);
 
 		MaterialState materialState;
-		mFadeSprite->getMaterial()->getPass()->getMaterialState(materialState);
+		if(mFadeSprite->getMaterial()!=NULL){
+			mFadeSprite->getMaterial()->getPass()->getMaterialState(materialState);
+		}
 		Vector4 dangerColor=materialState.ambient;
 		dangerColor.w=mPlayer->getDanger();
 
@@ -95,7 +97,9 @@ void HUD::frameUpdate(int dt,int scope){
 		}
 
 		materialState.set(dangerColor);
-		mFadeSprite->getMaterial()->getPass()->setMaterialState(materialState);
+		if(mFadeSprite->getMaterial()!=NULL){
+			mFadeSprite->getMaterial()->getPass()->setMaterialState(materialState);
+		}
 		if(dangerColor.w>0){
 			mFadeSprite->setScope(-1);
 		}

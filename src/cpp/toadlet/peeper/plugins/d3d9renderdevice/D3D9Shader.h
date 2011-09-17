@@ -48,7 +48,7 @@ public:
 	void destroy();
 
 	ShaderType getShaderType() const{return mShaderType;}
-	const String &getProfile() const{return mProfile;}
+	String getProfile() const{return mProfile;}
 
 	int getNumVariableBuffers(){return mVariableBufferFormats.size();}
 	VariableBufferFormat::ptr getVariableBufferFormat(int i){return mVariableBufferFormats[i];}

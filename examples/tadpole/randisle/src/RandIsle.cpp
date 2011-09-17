@@ -52,7 +52,7 @@ void RandIsle::create(){
 	mTerrain->setListener(this);
 	mTerrain->setMaterial(Resources::instance->grass);
 	mTerrain->setWaterMaterial(Resources::instance->water);
-	mTerrain->setTolerance(0.000001);
+	mTerrain->setTolerance(Resources::instance->tolerance);
 	mTerrain->setDataSource(this);
 
 	mFollowNode=mEngine->createNodeType(ParentNode::type(),mScene);
@@ -109,7 +109,13 @@ void RandIsle::create(){
 	mHUD->setTarget(mPlayer,mCamera);
 	mFollower->setTarget(mFollowNode,mPlayer);
 	mTerrain->setUpdateTargetBias(128/(getPatchSize()*getPatchScale().x));
+
+	Logger::alert("Populating terrain");
 	while(updatePopulatePatches());
+
+	Logger::alert("Updating terrain");
+	mTerrain->updatePatches(mCamera);
+
 	mPlayer->setSpeed(40);
 
 	Logger::debug("RandIsle::create finished");
@@ -132,6 +138,8 @@ void RandIsle::destroy(){
 		mPredictedMaterial->release();
 		mPredictedMaterial=NULL;
 	}
+
+	Resources::destroy();
 
 	Logger::debug("RandIsle::destroy finished");
 }
@@ -350,7 +358,7 @@ void RandIsle::logicUpdate(int dt){
 		mFollower->logicUpdated(position,dt);
 	}
 
-	updateDanger(dt);
+//	updateDanger(dt);
 
 	bool inWater=(mPlayer->getWorldTranslate().z-((Node*)mPlayer)->getBound().getSphere().radius)<=0;
 	if(!inWater && mPlayer->getCoefficientOfGravity()==0){

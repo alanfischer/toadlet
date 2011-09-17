@@ -37,6 +37,7 @@ public:
 	WGLWindowRenderTarget();
 	WGLWindowRenderTarget(HWND wnd,WindowRenderTargetFormat *format);
 	virtual ~WGLWindowRenderTarget();
+	void destroy(){destroyContext();}
 
 	RenderTarget *getRootRenderTarget(){return (GLRenderTarget*)this;}
 

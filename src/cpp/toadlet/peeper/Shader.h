@@ -52,7 +52,7 @@ public:
 	virtual void destroy()=0;
 	
 	virtual ShaderType getShaderType() const=0;
-	virtual const String &getProfile() const=0;
+	virtual String getProfile() const=0;
 };
 
 }

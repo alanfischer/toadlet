@@ -908,7 +908,6 @@ void D3D9RenderDevice::setCapsFromD3DCAPS9(RenderCaps &caps,const D3DCAPS9 &d3dc
 
 	caps.maxLights=d3dcaps.MaxActiveLights;
 	caps.triangleFan=true;
-	caps.fill=true;
 	#if !defined(TOADLET_SET_D3DM)
 		caps.texturePerspective=true;
 		caps.cubeMap=true;

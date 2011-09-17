@@ -103,6 +103,8 @@ public:
 	void destroyPatch(int x,int y);
 	void updateBound();
 
+	void updatePatches(CameraNode *camer);
+
 	// Node items
 /*	void nodeAttached(Node *node);
 	void nodeRemoved(Node *node);

@@ -36,6 +36,7 @@ class TOADLET_API JEGLWindowRenderTarget:public GLRenderTarget{
 public:
 	JEGLWindowRenderTarget(JNIEnv *env,jobject obj);
 	virtual ~JEGLWindowRenderTarget();
+	void destroy();
 
 	virtual RenderTarget *getRootRenderTarget(){return (GLRenderTarget*)this;}
 
@@ -55,7 +56,7 @@ protected:
 	JNIEnv *env;
 	jobject obj;
 	jmethodID swapID,resetID,activateID,deactivateID,activateAdditionalContextID,deactivateAdditionalContextID;
-	jmethodID isPrimaryID,isValidID,getWidthID,getHeightID;
+	jmethodID destroyID,isPrimaryID,isValidID,getWidthID,getHeightID;
 };
 
 }

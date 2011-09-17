@@ -51,8 +51,6 @@
 	#endif
 #endif
 
-#undef TOADLET_HAS_GLSL
-
 namespace toadlet{
 namespace peeper{
 
@@ -331,7 +329,6 @@ bool GLRenderDevice::create(RenderTarget *target,int *options){
 
 		caps.triangleFan=true;
 		#if !defined(TOADLET_HAS_GLES)
-			caps.fill=true;
 			caps.cubeMap=true;
 		#else
 			caps.texturePerspective=true;
@@ -644,6 +641,22 @@ void GLRenderDevice::renderPrimitive(VertexData *vertexData,IndexData *indexData
 	}
 
 	IndexData::Primitive primitive=indexData->primitive;
+	#if defined(TOADLET_HAS_GLES)
+		switch(mRasterizerFill){
+			case RasterizerState::FillType_POINT:
+				primitive=IndexData::Primitive_POINTS;
+			break;
+			case RasterizerState::FillType_LINE:
+				switch(primitive){
+					case IndexData::Primitive_TRIS:
+					case IndexData::Primitive_TRISTRIP:
+					case IndexData::Primitive_TRIFAN:
+						primitive=IndexData::Primitive_LINESTRIP;
+					break;
+				}
+			break;
+		}
+	#endif
 
 	GLenum type=0;
 	switch(primitive){
@@ -1445,6 +1458,8 @@ void GLRenderDevice::setRasterizerState(const RasterizerState &state){
 
 	#if !defined(TOADLET_HAS_GLES)
 		glPolygonMode(GL_FRONT_AND_BACK,getGLPolygonMode(state.fill));
+	#else
+		mRasterizerFill=state.fill;
 	#endif
 
 	if(state.depthBiasConstant==0 && state.depthBiasSlope==0){

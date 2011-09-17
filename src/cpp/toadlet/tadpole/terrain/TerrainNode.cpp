@@ -178,14 +178,7 @@ void TerrainNode::setTolerance(scalar tolerance){
 }
 
 void TerrainNode::gatherRenderables(CameraNode *camera,RenderableSet *set){
-	int i;
-	for(i=0;i<mPatchGrid.size();++i){
-		mPatchGrid[i]->updateBlocks(camera);
-	}
-
-	for(i=0;i<mPatchGrid.size();++i){
-		mPatchGrid[i]->updateVertexes();
-	}
+	updatePatches(camera);
 
 	super::gatherRenderables(camera,set);
 }
@@ -360,6 +353,17 @@ void TerrainNode::updateBound(){
 	for(i=0;i<mPatchGrid.size();++i){
 		if(i==0) mBound.set(mPatchGrid[i]->getWorldBound());
 		else mBound.merge(mPatchGrid[i]->getWorldBound(),mScene->getEpsilon());
+	}
+}
+
+void TerrainNode::updatePatches(CameraNode *camera){
+	int i;
+	for(i=0;i<mPatchGrid.size();++i){
+		mPatchGrid[i]->updateBlocks(camera);
+	}
+
+	for(i=0;i<mPatchGrid.size();++i){
+		mPatchGrid[i]->updateVertexes();
 	}
 }
 

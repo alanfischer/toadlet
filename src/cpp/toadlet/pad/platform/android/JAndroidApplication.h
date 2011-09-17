@@ -37,7 +37,6 @@ namespace pad{
 /// @todo: We should have the Application class be an interface, and BaseApplication be the implementation, then JAndroidApplication would just extend Application
 class JAndroidApplication{
 public:
-
 	enum Key{
 		Key_ENTER=10,
 		Key_TAB=8,
@@ -87,7 +86,7 @@ public:
 protected:
 	JNIEnv *env;
 	jobject obj;
-	jmethodID createID,destroyID,startID,stopID,setDifferenceMouseID,getWidthID,getHeightID,getEngineID,getRenderDeviceID,getNativeHandleEngineID,getNativeHandleRenderDeviceID;
+	jmethodID createID,destroyID,startID,stopID,setDifferenceMouseID,getWidthID,getHeightID,getEngineID,getRenderDeviceID;
 };
 
 }

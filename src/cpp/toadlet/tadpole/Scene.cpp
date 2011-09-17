@@ -59,7 +59,7 @@ Scene::Scene(Engine *engine):
 	mEngine=engine;
 	mEngine->addContextListener(this);
 
-	setExcessiveDT(5000);
+	setExcessiveDT(500);
 	setRangeLogicDT(0,0);
 	setAmbientColor(Colors::GREY);
 
@@ -122,11 +122,11 @@ void Scene::setLogicTimeAndFrame(int time,int frame){
 }
 
 void Scene::update(int dt){
-//	if(mExcessiveDT>0 && dt>mExcessiveDT){
-//		Logger::alert(Categories::TOADLET_TADPOLE,
-//			String("skipping excessive dt:")+dt);
-//		return;
-//	}
+	if(mExcessiveDT>0 && dt>mExcessiveDT){
+		Logger::alert(Categories::TOADLET_TADPOLE,
+			String("skipping excessive dt:")+dt);
+		return;
+	}
 
 	mAccumulatedDT+=dt;
 

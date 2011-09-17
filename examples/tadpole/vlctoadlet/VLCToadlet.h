@@ -8,26 +8,41 @@
 #endif
 #include <vlc/vlc.h>
 
-class VLCToadlet:public Application,public ContextListener{
+class VLCToadlet:public Applet,public ContextListener{
 public:
-	VLCToadlet();
+	VLCToadlet(Application *application);
 	virtual ~VLCToadlet();
 
 	void create();
 	void destroy();
 	void resized(int width,int height);
-	void render(Renderer *renderer);
+	void render(RenderDevice *device);
 	void update(int dt);
-	void keyPressed(int key);
 
-	void preContextReset(Renderer *renderer);
-	void postContextReset(Renderer *renderer);
+	void preContextReset(RenderDevice *device);
+	void postContextReset(RenderDevice *device);
 	
-	void preContextActivate(Renderer *renderer){}
-	void postContextActivate(Renderer *renderer);
-	void preContextDeactivate(Renderer *renderer);
-	void postContextDeactivate(Renderer *renderer){}
+	void preContextActivate(RenderDevice *device){}
+	void postContextActivate(RenderDevice *device);
+	void preContextDeactivate(RenderDevice *device);
+	void postContextDeactivate(RenderDevice *device){}
 
+	void focusGained(){}
+	void focusLost(){}
+
+	void keyPressed(int key){}
+	void keyReleased(int){}
+
+	void mousePressed(int x,int y,int button){}
+	void mouseMoved(int x,int y){}
+	void mouseReleased(int x,int y,int button){}
+	void mouseScrolled(int x,int y,int scroll){}
+
+	void joyPressed(int button){}
+	void joyMoved(scalar x,scalar y,scalar z,scalar r,scalar u,scalar v){}
+	void joyReleased(int button){}
+
+	Application *app;
 	Scene::ptr scene;
 	CameraNode::ptr cameraNode;
 	MeshNode::ptr meshNode;

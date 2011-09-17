@@ -171,8 +171,8 @@ protected:
 	void resetBlocks();
 	void enableVertex(Vertex *v);
 	void disableVertex(Vertex *v);
-	void simplifyBlocks(const Vector3 &cameraTranslate);
-	bool blockShouldSubdivide(Block *block,const Vector3 &cameraTranslate);
+	void simplifyBlocks(const Vector3 &cameraTranslate,CameraNode *camera);
+	bool blockShouldSubdivide(Block *block,const Vector3 &cameraTranslate,CameraNode *camera);
 	void computeDelta(Block *block,const Vector3 &cameraTranslate,float tolerance);
 	bool blockIntersectsCamera(const Block *block,CameraNode *camera,bool water) const;
 	bool blockVisibleByWater(const Block *block,const Vector3 &cameraTranslate,bool water) const;

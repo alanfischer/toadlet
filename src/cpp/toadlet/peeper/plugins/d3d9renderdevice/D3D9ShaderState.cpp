@@ -89,8 +89,8 @@ bool D3D9ShaderState::activate(){
 	IDirect3DDevice9 *device=mDevice->getDirect3DDevice9();
 
 	int i;
-	for(i=0;i<mShaders.size();++i){
-		Shader *shader=mShaders[i];
+	for(i=0;i<Shader::ShaderType_FRAGMENT;++i){
+		Shader *shader=i<mShaders.size()?mShaders[i]:NULL;
 		D3D9Shader *d3dshader=(shader!=NULL)?(D3D9Shader*)shader->getRootShader():NULL;
 		IUnknown *id3dshader=(d3dshader!=NULL)?d3dshader->mShader:NULL;
 		switch(i){

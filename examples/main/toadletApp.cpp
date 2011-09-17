@@ -7,7 +7,7 @@ int toadletMain(int argc,char **argv){
 	Application app;
 	Applet *applet=createApplet(&app);
 	app.setApplet(applet);
-	app.create();
+	app.create("gl");
 	app.start();
 	app.destroy();
 	destroyApplet(applet);

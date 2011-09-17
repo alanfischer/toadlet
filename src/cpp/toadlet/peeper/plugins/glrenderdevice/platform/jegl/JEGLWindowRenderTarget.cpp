@@ -25,6 +25,7 @@
 
 #include "JEGLWindowRenderTarget.h"
 #include <toadlet/egg/Error.h>
+#include <toadlet/egg/Logger.h>
 
 namespace toadlet{
 namespace peeper{
@@ -49,6 +50,7 @@ JEGLWindowRenderTarget::JEGLWindowRenderTarget(JNIEnv *jenv,jobject jobj):GLRend
 	activateAdditionalContextID=env->GetMethodID(clazz,"activateAdditionalContext","()Z");
 	deactivateAdditionalContextID=env->GetMethodID(clazz,"deactivateAdditionalContext","()V");
 	
+	destroyID=env->GetMethodID(clazz,"destroy","()V");
 	isPrimaryID=env->GetMethodID(clazz,"isPrimary","()Z");
 	isValidID=env->GetMethodID(clazz,"isValid","()Z");
 	getWidthID=env->GetMethodID(clazz,"getWidth","()I");
@@ -61,6 +63,10 @@ JEGLWindowRenderTarget::~JEGLWindowRenderTarget(){
 	env->DeleteGlobalRef(obj);
 	obj=NULL;
 	env=NULL;
+}
+
+void JEGLWindowRenderTarget::destroy(){
+	env->CallVoidMethod(obj,destroyID);
 }
 
 bool JEGLWindowRenderTarget::swap(){

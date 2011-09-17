@@ -3,13 +3,11 @@
 #include <toadlet/tadpole/handler/platform/android/AndroidAssetArchive.h>
 #include <toadlet/tadpole/handler/platform/android/AndroidTextureHandler.h>
 
-#include <android/log.h>
-
 using namespace toadlet::pad;
 using namespace toadlet::tadpole::handler;
 
 JNIEXPORT jobject JNICALL Java_us_toadlet_pad_AndroidApplication_makeEngine(JNIEnv *env,jobject obj){
-	Engine *engine=new Engine();
+	Engine *engine=new Engine(true);
 	jobject jengine=NULL;
 	jobject jassetManager=NULL;
 	

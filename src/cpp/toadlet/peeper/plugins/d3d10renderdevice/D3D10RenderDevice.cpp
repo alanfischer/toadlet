@@ -266,7 +266,10 @@ void D3D10RenderDevice::renderPrimitive(VertexData *vertexData,IndexData *indexD
 		return;
 	}
 
-	if(mLastShaderState==NULL || mLastShaderState->mShaders.size()==0){
+	if(	mLastShaderState==NULL || 
+		mLastShaderState->getShader(Shader::ShaderType_VERTEX)==NULL ||
+		mLastShaderState->getShader(Shader::ShaderType_FRAGMENT)==NULL
+	){
 		Logger::warning(Categories::TOADLET_PEEPER,
 			"D3D10RenderDevice requires a vertex and fragment shader");
 		return;

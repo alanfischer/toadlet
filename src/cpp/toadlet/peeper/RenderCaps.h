@@ -50,7 +50,6 @@ public:
 		triangleFan(false),
 
 		maxLights(0),
-		fill(false),
 		texturePerspective(false),
 		pointSprites(false)
 	{
@@ -78,7 +77,6 @@ public:
 
 		maxLights=caps.maxLights;
 		texturePerspective=caps.texturePerspective;
-		fill=caps.fill;
 		pointSprites=caps.pointSprites;
 
 		return *this;
@@ -106,7 +104,6 @@ public:
 	// Fixed Vertex
 	int maxLights;
 	// Fixed Fragment
-	bool fill;
 	bool texturePerspective;
 	// Fixed Geometry
 	bool pointSprites;
