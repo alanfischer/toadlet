@@ -30,7 +30,7 @@
 #include <toadlet/ribbit/AudioDevice.h>
 #include <toadlet/ribbit/AudioBuffer.h>
 #include <toadlet/ribbit/AudioStream.h>
-#include <toadlet/ribbit/CapabilitySet.h>
+#include <toadlet/ribbit/AudioCaps.h>
 #include <toadlet/egg/Collection.h>
 #include <windows.h>
 #include <mmsystem.h>
@@ -66,7 +66,7 @@ public:
 
 	void update(int dt);
 
-	const CapabilitySet &getCapabilitySet(){return mCapabilitySet;}
+	bool getAudioCaps(AudioCaps &caps){caps.set(mCaps);return true;}
 
 	int getBufferFadeTime() const{return mBufferFadeTime;}
 	AudioFormat::ptr getAudioFormat(){return mFormat;}
@@ -77,7 +77,7 @@ public:
 protected:
 	int read(tbyte *data,int length);
 
-	CapabilitySet mCapabilitySet;
+	AudioCaps mCaps;
 
 	AudioFormat::ptr mFormat;
 	HWAVEOUT mDevice;

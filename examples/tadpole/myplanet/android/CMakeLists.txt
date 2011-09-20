@@ -7,12 +7,15 @@ set (CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${myplanet_SOURCE_DIR}/../../../../
 
 # Find toadlet
 find_package (toadlet REQUIRED)
+find_package (mxml REQUIRED)
 
 # Includes
 include_directories (${myplanet_SOURCE_DIR} ${TOADLET_INCLUDE_DIR})
 
 # Libraries
-set (LIBS ${TOADLET_PAD_LIB_S} ${TOADLET_TADPOLE_LIB_S} ${TOADLET_PEEPER_GLRENDERDEVICE_LIB_S} ${TOADLET_PEEPER_LIB_S} ${TOADLET_RIBBIT_LIB_S} ${TOADLET_EGG_LIB_S} GLESv1_CM log)
+set (LIBS ${TOADLET_ALL_LIB_S})
+# Add required android static libs
+set (LIBS ${LIBS} ${MXML_LIBRARY} GLESv1_CM log)
 
 message ( ${TOADLET_EGG_LIB_S} )
 message ( ${TOADLET_TADPOLE_LIB_S} )
@@ -31,4 +34,7 @@ set (H
 # Executable
 add_library (myplanet SHARED ${SRC} ${H})
 target_link_libraries (myplanet ${LIBS})
-install (TARGETS myplanet DESTINATION ${myplanet_BINARY_DIR})
+install (TARGETS myplanet DESTINATION ${myplanet_SOURCE_DIR}/libs/${NDK_NAME_ARCH})
+if (${ANDROID_NDK_API_LEVEL} LESS 9)
+	install (FILES ${JTOADLET_PEEPER_JAR} ${JTOADLET_PAD_JAR} DESTINATION ${myplanet_SOURCE_DIR}/libs)
+endif (${ANDROID_NDK_API_LEVEL} LESS 9)

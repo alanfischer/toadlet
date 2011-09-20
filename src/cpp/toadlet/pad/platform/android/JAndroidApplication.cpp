@@ -111,9 +111,11 @@ Engine *JAndroidApplication::getEngine(){
 
 	jobject jengine=env->CallObjectMethod(obj,getEngineID);
 
-	engine=(Engine*)env->CallIntMethod(jengine,getNativeHandleEngineID);
+	if(jengine!=NULL){
+		engine=(Engine*)env->CallIntMethod(jengine,getNativeHandleEngineID);
 
-	env->DeleteLocalRef(jengine);
+		env->DeleteLocalRef(jengine);
+	}
 
 	return engine;
 }
@@ -123,9 +125,11 @@ RenderDevice *JAndroidApplication::getRenderDevice(){
 
 	jobject jdevice=env->CallObjectMethod(obj,getRenderDeviceID);
 
-	device=(RenderDevice*)env->CallIntMethod(jdevice,getNativeHandleRenderDeviceID);
+	if(jdevice!=NULL){
+		device=(RenderDevice*)env->CallIntMethod(jdevice,getNativeHandleRenderDeviceID);
 
-	env->DeleteLocalRef(jdevice);
+		env->DeleteLocalRef(jdevice);
+	}
 
 	return device;
 }

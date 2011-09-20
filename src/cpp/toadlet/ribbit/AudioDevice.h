@@ -32,7 +32,7 @@
 namespace toadlet{
 namespace ribbit{
 
-class CapabilitySet;
+class AudioCaps;
 
 class AudioDevice{
 public:
@@ -55,7 +55,7 @@ public:
 	virtual void suspend()=0;
 	virtual void resume()=0;
 
-	virtual const CapabilitySet &getCapabilitySet()=0;
+	virtual bool getAudioCaps(AudioCaps &caps)=0;
 };
 
 }

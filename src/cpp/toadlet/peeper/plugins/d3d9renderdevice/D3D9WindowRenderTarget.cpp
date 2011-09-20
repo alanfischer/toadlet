@@ -126,6 +126,9 @@ void D3D9WindowRenderTarget::reset(){
 bool D3D9WindowRenderTarget::createContext(HWND wnd,WindowRenderTargetFormat *format){
 	HRESULT result;
 
+	Logger::alert(Categories::TOADLET_PEEPER,
+		"D3D9WindowRenderTarget::createContext");
+
 	char *d3dName=format->debug?TOADLET_D3D9_DEBUG_DLL_NAME:TOADLET_D3D9_DLL_NAME;
 	mD3DLibrary=LoadLibrary(d3dName);
 	if(mD3DLibrary==0){
@@ -261,6 +264,9 @@ bool D3D9WindowRenderTarget::createContext(HWND wnd,WindowRenderTargetFormat *fo
 		mD3DDevice->GetRenderTarget(0,&mColorSurface);
 	#endif
 	mD3DDevice->GetDepthStencilSurface(&mDepthSurface);
+
+	Logger::alert(Categories::TOADLET_PEEPER,
+		"context created");
 
 	return true;
 }

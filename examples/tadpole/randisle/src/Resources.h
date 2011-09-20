@@ -24,7 +24,7 @@ public:
 		#if defined(TOADLET_PLATFORM_ANDROID)
 			cloudSize=128;
 			patchSize=32;
-			tolerance=0.00001;
+			tolerance=0.00005;
 		#else
 			cloudSize=256;
 			patchSize=64;
@@ -40,7 +40,7 @@ public:
 				textureState.calculation=TextureState::CalculationType_NORMAL;
 				Math::setMatrix4x4FromScale(textureState.matrix,16,16,16);
 				grass->getPass()->setTextureState(0,textureState);
-//				grass->getPass()->setRasterizerState(RasterizerState(RasterizerState::CullType_BACK,RasterizerState::FillType_LINE));
+				grass->getPass()->setRasterizerState(RasterizerState(RasterizerState::CullType_BACK,RasterizerState::FillType_LINE));
 			}
 			grass->setLayer(-1);
 			grass->retain();

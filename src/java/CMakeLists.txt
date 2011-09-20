@@ -48,6 +48,26 @@ set_target_properties (jtoadlet_peeper PROPERTIES COMPILE_DEFINITIONS_DEBUG TOAD
 install (TARGETS jtoadlet_peeper DESTINATION lib)
 
 
+# toadlet_ribbit
+set (RIBBIT_OBJ_DIR ${CMAKE_CURRENT_BINARY_DIR}/CMakeFiles/jtoadlet_ribbit.dir/${JAVA_OBJ})
+execute_process(COMMAND ${CMAKE_COMMAND} -E make_directory ${RIBBIT_OBJ_DIR})
+include_directories (${RIBBIT_OBJ_DIR})
+configure_file (${JAVA_SRC_DIR}/ribbit/Version.java.cmake ${CMAKE_CURRENT_BINARY_DIR}/${JAVA_SRC_DIR}/ribbit/Version.java)
+
+set (RIBBIT_SRC
+	${JAVA_SRC_DIR}/ribbit/AudioFormat.java
+	${JAVA_SRC_DIR}/ribbit/AudioStream.java
+	${JAVA_SRC_DIR}/ribbit/AudioBuffer.java
+	${JAVA_SRC_DIR}/ribbit/ATAudioBuffer.java
+	${CMAKE_CURRENT_BINARY_DIR}/${JAVA_SRC_DIR}/ribbit/Version.java
+)
+
+add_library (jtoadlet_ribbit STATIC ${RIBBIT_SRC})
+set_target_properties (jtoadlet_ribbit PROPERTIES COMPILE_FLAGS "-d \"${RIBBIT_OBJ_DIR}\"")
+set_target_properties (jtoadlet_ribbit PROPERTIES COMPILE_DEFINITIONS_DEBUG TOADLET_DEBUG DEBUG_POSTFIX _d)
+install (TARGETS jtoadlet_ribbit DESTINATION lib)
+
+
 # toadlet_pad
 set (PAD_OBJ_DIR ${CMAKE_CURRENT_BINARY_DIR}/CMakeFiles/jtoadlet_pad.dir/${JAVA_OBJ})
 execute_process(COMMAND ${CMAKE_COMMAND} -E make_directory ${PAD_OBJ_DIR})
