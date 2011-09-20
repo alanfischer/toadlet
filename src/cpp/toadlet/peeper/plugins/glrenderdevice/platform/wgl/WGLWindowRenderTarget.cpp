@@ -98,8 +98,10 @@ WGLWindowRenderTarget::~WGLWindowRenderTarget(){
 }
 
 bool WGLWindowRenderTarget::createContext(HWND wnd,WindowRenderTargetFormat *format,int winPixelFormat){
-	BOOL result=0;
+	Logger::alert(Categories::TOADLET_PEEPER,
+		"WGLWindowRenderTarget::createContext");
 
+	BOOL result=0;
 	mWnd=wnd;
 	mDC=GetDC(mWnd);
 	if(mDC==0){
@@ -194,6 +196,9 @@ bool WGLWindowRenderTarget::createContext(HWND wnd,WindowRenderTargetFormat *for
 			return false;
 		}
 	}
+
+	Logger::alert(Categories::TOADLET_PEEPER,
+		"context created");
 
 	return true;
 }

@@ -23,8 +23,8 @@
  *
  ********** Copyright header - do not remove **********/
 
-#ifndef TOADLET_PEEPER_JEGLWINDOWRENDERTARGET_H
-#define TOADLET_PEEPER_JEGLWINDOWRENDERTARGET_H
+#ifndef TOADLET_PEEPER_JGLWINDOWRENDERTARGET_H
+#define TOADLET_PEEPER_JGLWINDOWRENDERTARGET_H
 
 #include "../../GLRenderTarget.h"
 #include <jni.h>
@@ -32,10 +32,10 @@
 namespace toadlet{
 namespace peeper{
 
-class TOADLET_API JEGLWindowRenderTarget:public GLRenderTarget{
+class TOADLET_API JGLWindowRenderTarget:public GLRenderTarget{
 public:
-	JEGLWindowRenderTarget(JNIEnv *env,jobject obj);
-	virtual ~JEGLWindowRenderTarget();
+	JGLWindowRenderTarget(JNIEnv *env,jobject obj);
+	virtual ~JGLWindowRenderTarget();
 	void destroy();
 
 	virtual RenderTarget *getRootRenderTarget(){return (GLRenderTarget*)this;}

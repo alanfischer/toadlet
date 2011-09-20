@@ -23,18 +23,18 @@
  *
  ********** Copyright header - do not remove **********/
 
-#include "JEGLWindowRenderTarget.h"
+#include "JGLWindowRenderTarget.h"
 #include <toadlet/egg/Error.h>
 #include <toadlet/egg/Logger.h>
 
 namespace toadlet{
 namespace peeper{
 
-TOADLET_C_API RenderTarget *new_JEGLWindowRenderTarget(JNIEnv *jenv,jobject jobj){
-	return new JEGLWindowRenderTarget(jenv,jobj);
+TOADLET_C_API RenderTarget *new_JGLWindowRenderTarget(JNIEnv *jenv,jobject jobj){
+	return new JGLWindowRenderTarget(jenv,jobj);
 }
 
-JEGLWindowRenderTarget::JEGLWindowRenderTarget(JNIEnv *jenv,jobject jobj):GLRenderTarget(),
+JGLWindowRenderTarget::JGLWindowRenderTarget(JNIEnv *jenv,jobject jobj):GLRenderTarget(),
 	env(NULL),
 	obj(NULL)
 {
@@ -59,53 +59,53 @@ JEGLWindowRenderTarget::JEGLWindowRenderTarget(JNIEnv *jenv,jobject jobj):GLRend
 	env->DeleteLocalRef(clazz);
 }
 
-JEGLWindowRenderTarget::~JEGLWindowRenderTarget(){
+JGLWindowRenderTarget::~JGLWindowRenderTarget(){
 	env->DeleteGlobalRef(obj);
 	obj=NULL;
 	env=NULL;
 }
 
-void JEGLWindowRenderTarget::destroy(){
+void JGLWindowRenderTarget::destroy(){
 	env->CallVoidMethod(obj,destroyID);
 }
 
-bool JEGLWindowRenderTarget::swap(){
+bool JGLWindowRenderTarget::swap(){
 	return env->CallBooleanMethod(obj,swapID);
 }
 
-void JEGLWindowRenderTarget::reset(){
+void JGLWindowRenderTarget::reset(){
 	env->CallVoidMethod(obj,resetID);
 }
 
-bool JEGLWindowRenderTarget::activate(){
+bool JGLWindowRenderTarget::activate(){
 	return env->CallBooleanMethod(obj,activateID);
 }
 
-bool JEGLWindowRenderTarget::deactivate(){
+bool JGLWindowRenderTarget::deactivate(){
 	return env->CallBooleanMethod(obj,deactivateID);
 }
 
-bool JEGLWindowRenderTarget::activateAdditionalContext(){
+bool JGLWindowRenderTarget::activateAdditionalContext(){
 	return env->CallBooleanMethod(obj,activateAdditionalContextID);
 }
 
-void JEGLWindowRenderTarget::deactivateAdditionalContext(){
+void JGLWindowRenderTarget::deactivateAdditionalContext(){
 	return env->CallVoidMethod(obj,deactivateAdditionalContextID);
 }
 
-bool JEGLWindowRenderTarget::isPrimary() const{
+bool JGLWindowRenderTarget::isPrimary() const{
 	return env->CallBooleanMethod(obj,isPrimaryID);
 }
 
-bool JEGLWindowRenderTarget::isValid() const{
+bool JGLWindowRenderTarget::isValid() const{
 	return env->CallBooleanMethod(obj,isValidID);
 }
 
-int JEGLWindowRenderTarget::getWidth() const{
+int JGLWindowRenderTarget::getWidth() const{
 	return env->CallIntMethod(obj,getWidthID);
 }
 
-int JEGLWindowRenderTarget::getHeight() const{
+int JGLWindowRenderTarget::getHeight() const{
 	return env->CallIntMethod(obj,getHeightID);
 }
 

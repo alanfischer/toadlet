@@ -139,9 +139,9 @@ bool ALAudioDevice::create(int *options){
 	TOADLET_CHECK_ALERROR("alcMakeContextCurrent");
 
 	/// @todo: Change this to a loop with alGenSources till it returns an error
-	mCapabilitySet.maxSources=8;
-	mCapabilitySet.streaming=true;
-	mCapabilitySet.positional=true;
+	mCaps.maxSources=8;
+	mCaps.streaming=true;
+	mCaps.positional=true;
 
 	alListenerf(AL_GAIN,1.0);
 	TOADLET_CHECK_ALERROR("alListenerf");
@@ -151,7 +151,7 @@ bool ALAudioDevice::create(int *options){
 	alDopplerVelocity(340.0); /// @todo: Move the doppler parameters to the interface
 	TOADLET_CHECK_ALERROR("alDopplerVelocity");
 
-	mAllSources.resize(mCapabilitySet.maxSources);
+	mAllSources.resize(mCaps.maxSources);
 	alGenSources(mAllSources.size(),&mAllSources[0]);
 	TOADLET_CHECK_ALERROR("alGenSources");
 	mSourcePool=mAllSources;
@@ -280,10 +280,6 @@ void ALAudioDevice::setListenerGain(scalar gain){
 	alListenerf(AL_GAIN,MathConversion::scalarToFloat(gain));
 	
 	TOADLET_CHECK_ALERROR("setListenerGain");
-}
-
-const CapabilitySet &ALAudioDevice::getCapabilitySet(){
-	return mCapabilitySet;
 }
 
 ALuint ALAudioDevice::checkoutSourceHandle(ALAudio *audio){

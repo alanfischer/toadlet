@@ -31,7 +31,7 @@
 #include <toadlet/ribbit/AudioDevice.h>
 #include <toadlet/ribbit/AudioBuffer.h>
 #include <toadlet/ribbit/AudioStream.h>
-#include <toadlet/ribbit/CapabilitySet.h>
+#include <toadlet/ribbit/AudioCaps.h>
 #include <toadlet/egg/Collection.h>
 #include <toadlet/egg/Map.h>
 #include <toadlet/egg/Mutex.h>
@@ -69,7 +69,7 @@ public:
 
 	void update(int dt);
 
-	const CapabilitySet &getCapabilitySet();
+	bool getAudioCaps(AudioCaps &caps){caps.set(mCaps);return true;}
 
 	ALuint checkoutSourceHandle(ALAudio *audio);
 	void checkinSourceHandle(ALAudio *audio,ALuint source);
@@ -92,7 +92,7 @@ protected:
 
 	Mutex mMutex;
 
-	CapabilitySet mCapabilitySet;
+	AudioCaps mCaps;
 
 	proc_alBufferDataStatic alBufferDataStatic;
 

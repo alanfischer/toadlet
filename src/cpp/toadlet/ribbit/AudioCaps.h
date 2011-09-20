@@ -23,22 +23,28 @@
  *
  ********** Copyright header - do not remove **********/
 
-#ifndef TOADLET_RIBBIT_CAPABILITYSET_H
-#define TOADLET_RIBBIT_CAPABILITYSET_H
+#ifndef TOADLET_RIBBIT_AUDIOCAPS_H
+#define TOADLET_RIBBIT_AUDIOCAPS_H
 
 #include <toadlet/ribbit/Types.h>
-#include <toadlet/egg/Collection.h>
-#include <toadlet/egg/String.h>
 
 namespace toadlet{
 namespace ribbit{
 
-class CapabilitySet{
+class AudioCaps{
 public:
-	CapabilitySet(){
+	AudioCaps(){
 		maxSources=0;
 		streaming=false;
 		positional=false;
+	}
+
+	AudioCaps &set(const AudioCaps &caps){
+		maxSources=caps.maxSources;
+		streaming=caps.streaming;
+		positional=caps.positional;
+
+		return *this;
 	}
 
 	int maxSources;

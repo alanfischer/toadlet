@@ -84,19 +84,19 @@ void GLSLShaderState::destroy(){
 }
 
 void GLSLShaderState::setShader(Shader::ShaderType type,Shader::ptr shader){
-	GLSLShader *glshader=shader!=NULL?(GLSLShader*)shader->getRootShader():NULL;
-
 	if(mShaders.size()<=type){
 		mShaders.resize(type+1);
 	}
 
-	if(mShaders[type]!=NULL){
+	GLSLShader *glshader=mShaders[type]!=NULL?(GLSLShader*)mShaders[type]->getRootShader():NULL;
+	if(glshader!=NULL){
 		glDetachShader(mHandle,glshader->mHandle);
 	}
 
 	mShaders[type]=shader;
 
-	if(mShaders[type]!=NULL){
+	glshader=mShaders[type]!=NULL?(GLSLShader*)mShaders[type]->getRootShader():NULL;
+	if(glshader!=NULL){
 		glAttachShader(mHandle,glshader->mHandle);
 	}
 

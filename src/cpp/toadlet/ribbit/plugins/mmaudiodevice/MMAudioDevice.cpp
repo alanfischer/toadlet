@@ -89,7 +89,7 @@ bool MMAudioDevice::create(int *options){
 	mNumBuffers=4;
 	mBufferFadeTime=100;
 
-	mCapabilitySet.maxSources=16;
+	mCaps.maxSources=16;
 
 	WAVEFORMATEX format={0};
 	format.cbSize=sizeof(WAVEFORMATEX);

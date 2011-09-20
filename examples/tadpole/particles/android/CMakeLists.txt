@@ -1,5 +1,4 @@
 # Standard setup
-
 cmake_minimum_required (VERSION 2.6)
 project (particles CXX C)
 
@@ -39,4 +38,3 @@ install (TARGETS particles DESTINATION ${particles_SOURCE_DIR}/libs/${NDK_NAME_A
 if (${ANDROID_NDK_API_LEVEL} LESS 9)
 	install (FILES ${JTOADLET_PEEPER_JAR} ${JTOADLET_PAD_JAR} DESTINATION ${particles_SOURCE_DIR}/libs)
 endif (${ANDROID_NDK_API_LEVEL} LESS 9)
-

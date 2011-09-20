@@ -405,6 +405,10 @@ Image::ptr CameraNode::renderToImage(RenderDevice *device,int format,int width,i
 }
 
 Mesh::ptr CameraNode::renderToSkyBox(RenderDevice *device,int format,int size,scalar scale){
+	if(device==NULL){
+		return NULL;
+	}
+
 	bool rtt=mEngine->getRenderCaps().renderToTexture;
 	int flags=Texture::Usage_BIT_RENDERTARGET;
 	Texture::ptr skyBoxTexture[6];

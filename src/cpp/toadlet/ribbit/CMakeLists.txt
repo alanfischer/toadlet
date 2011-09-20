@@ -14,11 +14,11 @@ set (RIBBIT_SRC
 set (RIBBIT_HEADERS
 	Audio.h
 	AudioBuffer.h
+	AudioCaps.h
 	AudioFormat.h
 	AudioFormatConversion.h
 	AudioDevice.h
 	AudioStream.h
-	CapabilitySet.h
 	Types.h
 	Version.h
 )
