@@ -90,6 +90,11 @@ set (TADPOLE_HANDLER_FREETYPE_SRC
 	handler/FreeTypeHandler.cpp
 )
 
+set (TADPOLE_HANDLER_FFMPEG_SRC
+	handler/FFmpegStreamContext.cpp
+	handler/FFmpegTextureModifier.cpp
+)
+
 set (TADPOLE_HANDLER_PLATFORM_ANDROID_SRC
 	handler/platform/android/AndroidAssetArchive.cpp
 	handler/platform/android/AndroidTextureHandler.cpp
@@ -193,9 +198,11 @@ set (TADPOLE_HEADERS
 	ProgressListener.h
 	Renderable.h
 	RenderListener.h
+	ResourceController.h
 	ResourceCreator.h
 	ResourceData.h
 	ResourceManager.h
+	ResourceModifier.h
 	ResourceStreamer.h
 	RenderableSet.h
 	Scene.h
@@ -281,6 +288,11 @@ set (TADPOLE_HANDLER_PNG_HEADERS
 
 set (TADPOLE_HANDLER_FREETYPE_HEADERS
 	handler/FreeTypeHandler.h
+)
+
+set (TADPOLE_HANDLER_FFMPEG_HEADERS
+	handler/FFmpegStreamContext.h
+	handler/FFmpegTextureModifier.h
 )
 
 set (TADPOLE_HANDLER_PLATFORM_ANDROID_HEADERS
