@@ -31,6 +31,7 @@
 #include <toadlet/peeper/BackableTexture.h>
 #include <toadlet/peeper/PixelBufferRenderTarget.h>
 #include <toadlet/tadpole/ResourceManager.h>
+#include <toadlet/tadpole/ResourceModifier.h>
 
 namespace toadlet{
 namespace tadpole{
@@ -62,10 +63,16 @@ public:
 
 	void renderTargetDestroyed(RenderTarget *renderTarget);
 
+	/// @todo: create a ResourceCreator for this
 	Texture::ptr createNormalization(int size);
+
+	/// @todo: add this to the ResourceManager interface
+	void setDefaultModifier(ResourceModifier::ptr modifier){mDefaultModifier=modifier;}
+	ResourceModifier::ptr getDefaultModifier() const{return mDefaultModifier;}
 
 protected:
 	Collection<PixelBufferRenderTarget::ptr> mRenderTargets;
+	ResourceModifier::ptr mDefaultModifier;
 
 	Engine *mEngine;
 	bool mBackable;

@@ -12,7 +12,7 @@ find_package (toadlet REQUIRED)
 include_directories (${logo_SOURCE_DIR} ${TOADLET_INCLUDE_DIR})
 
 # Libraries
-set (LIBS ${TOADLET_EGG_LIB} ${TOADLET_PEEPER_LIB} ${TOADLET_RIBBIT_LIB} ${TOADLET_TADPOLE_LIB} ${TOADLET_PAD_LIB})
+set (LIBS ${TOADLET_LIBRARIES})
 
 # Source files
 set (SRC
@@ -27,9 +27,6 @@ set (H
 )
 
 # Executable
-if (TOADLET_PLATFORM_ANDROID)
-	message ("SUP")
-endif (TOADLET_PLATFORM_ANDROID)
 add_executable (logo ${SRC} ${H})
 target_link_libraries (logo ${LIBS})
 install (TARGETS logo DESTINATION ${logo_BINARY_DIR})

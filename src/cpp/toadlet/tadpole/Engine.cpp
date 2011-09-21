@@ -113,6 +113,9 @@
 #if defined(TOADLET_HAS_PNG)
 	#include <toadlet/tadpole/handler/PNGHandler.h>
 #endif
+#if defined(TOADLET_HAS_FFMPEG)
+	#include <toadlet/tadpole/handler/FFmpegTextureModifier.h>
+#endif
 
 #if defined(TOADLET_HAS_GDIPLUS)
 	#include <toadlet/tadpole/handler/platform/win32/Win32FontHandler.h>
@@ -324,6 +327,9 @@ void Engine::installHandlers(){
 		#endif
 	#endif
 	mTextureManager->setStreamer(TGAHandler::ptr(new TGAHandler(mTextureManager)),"tga");
+	#if defined(TOADLET_HAS_FFMPEG)
+		mTextureManager->setDefaultModifier(FFmpegTextureModifier::ptr(new FFmpegTextureModifier()));
+	#endif
 
 	// Font handlers, try for freetype first, since it currently looks best.  This can be changed back once the others look as nice
 	#if defined(TOADLET_HAS_FREETYPE)

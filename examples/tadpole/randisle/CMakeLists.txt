@@ -12,7 +12,7 @@ find_package (toadlet REQUIRED)
 include_directories (${randisle_SOURCE_DIR} ${TOADLET_INCLUDE_DIR})
 
 # Libraries
-set (LIBS ${TOADLET_EGG_LIB} ${TOADLET_PEEPER_LIB} ${TOADLET_RIBBIT_LIB} ${TOADLET_TADPOLE_LIB} ${TOADLET_PAD_LIB} ${TOADLET_HOP_LIB} ${TOADLET_TADPOLE_HOP_LIB})
+set (LIBS ${TOADLET_LIBRARIES})
 
 # Source files
 set (SRC

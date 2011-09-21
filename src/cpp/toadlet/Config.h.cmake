@@ -48,6 +48,7 @@
 #cmakedefine TOADLET_HAS_JPEG
 #cmakedefine TOADLET_HAS_ZLIB
 #cmakedefine TOADLET_HAS_PNG
+#cmakedefine TOADLET_HAS_FFMPEG
 #cmakedefine TOADLET_HAS_FREETYPE
 #cmakedefine TOADLET_HAS_MXML
 #cmakedefine TOADLET_HAS_ZZIP
