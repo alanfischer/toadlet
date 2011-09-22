@@ -37,6 +37,7 @@ public:
 	GLXWindowRenderTarget();
 	GLXWindowRenderTarget(GLXDrawable drawable,Display *display,XVisualInfo *visualInfo);
 	virtual ~GLXWindowRenderTarget();
+	void destroy(){destroyContext();}
 
 	RenderTarget *getRootRenderTarget(){return (GLRenderTarget*)this;}
 

@@ -46,7 +46,7 @@ GLXWindowRenderTarget::GLXWindowRenderTarget(GLXDrawable drawable,Display *displ
 }
 
 GLXWindowRenderTarget::~GLXWindowRenderTarget(){
-	destroyContext();
+	destroy();
 }
 
 bool GLXWindowRenderTarget::createContext(GLXDrawable drawable,Display *display,XVisualInfo *visualInfo){
