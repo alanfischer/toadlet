@@ -94,7 +94,7 @@ bool BackableShader::convertCreate(Shader::ptr shader,RenderDevice *renderDevice
 	int i;
 	for(i=0;i<numCodes;++i){
 		if(renderDevice->getShaderProfileSupported(profiles[i])){
-			if(codes[i]==(char*)NULL || shader->create(shaderType,profiles[i],codes[i])==false){
+			if(codes[i]==(char*)NULL || shader==NULL || shader->create(shaderType,profiles[i],codes[i])==false){
 				return false;
 			}
 		}

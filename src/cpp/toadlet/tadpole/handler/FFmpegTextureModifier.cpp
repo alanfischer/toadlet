@@ -271,10 +271,10 @@ void FFmpegTextureController::updateDecode(int dt){
 			av_free_packet(&pkt);
 		}
 
-		if(mStreams[AVMEDIA_TYPE_VIDEO].queue!=NULL && mStreams[AVMEDIA_TYPE_VIDEO].queue->count<16){
+		if(mStreams[AVMEDIA_TYPE_VIDEO].queue!=NULL && mStreams[AVMEDIA_TYPE_VIDEO].queue->count<4){
 			continue;
 		}
-		if(mStreams[AVMEDIA_TYPE_AUDIO].queue!=NULL && mStreams[AVMEDIA_TYPE_AUDIO].queue->count<16){
+		if(mStreams[AVMEDIA_TYPE_AUDIO].queue!=NULL && mStreams[AVMEDIA_TYPE_AUDIO].queue->count<4){
 			continue;
 		}
 	}
@@ -316,9 +316,11 @@ void FFmpegTextureController::updateVideo(int dt){
 		}
 
 		pts*=av_q2d(mFormatCtx->streams[stream->index]->time_base);
-		mPtsTime=pts*AV_TIME_BASE;
+		int64 ptsTime=pts*AV_TIME_BASE;
 
-		if(frameFinished && (mPtsTime>=mTime || mPtsTime==0)){
+		if(frameFinished && (ptsTime>=mTime || ptsTime==0)){
+			mPtsTime=ptsTime;
+
 			sws_scale(
 				mSwsCtx,
 				mVideoFrame->data,
@@ -370,7 +372,8 @@ bool FFmpegTextureController::seek(int64 time){
 		time=maxTime();
 	}
 
-	int flags=time<currentTime()?AVSEEK_FLAG_BACKWARD:0;
+	int flags=AVSEEK_FLAG_BACKWARD;
+	int result=0;
 
 	int index=-1,i=0;
 	for(i=0;i<AVMEDIA_TYPE_NB;++i){
@@ -388,7 +391,8 @@ bool FFmpegTextureController::seek(int64 time){
 
 	if(index>=0){
 		int64 frameTime=av_rescale_q(time,avTimeBaseQ,mFormatCtx->streams[index]->time_base);
-		if(av_seek_frame(mFormatCtx,index,frameTime,flags)){
+		result=av_seek_frame(mFormatCtx,index,frameTime,flags);
+		if(result<0){
 //			Error::unknown(Categories::TOADLET_TADPOLE,
 //				"unable to seek");
 //			return false;
