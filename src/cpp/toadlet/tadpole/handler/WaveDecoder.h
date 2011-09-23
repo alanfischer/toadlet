@@ -35,6 +35,8 @@ namespace handler{
 
 class TOADLET_API WaveDecoder:public AudioStream{
 public:
+	TOADLET_SHARED_POINTERS(WaveDecoder);
+
 	WaveDecoder();
 	virtual ~WaveDecoder();
 

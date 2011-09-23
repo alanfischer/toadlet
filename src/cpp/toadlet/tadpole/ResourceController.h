@@ -41,11 +41,14 @@ public:
 	virtual void destroy(){}
 
 	virtual void start()=0;
-	virtual void update(int dt)=0;
+	virtual void pause()=0;
+	virtual bool paused()=0;
 	virtual void stop()=0;
+	virtual void update(int dt)=0;
 
-	virtual uint64 currentTime()=0;
-	virtual void seek(uint64 time)=0;
+	virtual int64 currentTime()=0;
+	virtual int64 maxTime()=0;
+	virtual bool seek(int64 time)=0;
 };
 
 }

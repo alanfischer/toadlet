@@ -125,6 +125,12 @@ bool AudioFormatConversion::convert(tbyte *src,AudioFormat *srcFormat,tbyte *dst
 	return true;
 }
 
+int AudioFormatConversion::findConvertedLength(int length,AudioFormat *srcFormat,AudioFormat *dstFormat){
+	/// @todo: Until sps conversion is implemented in convert, we just ignore sps
+	//return (int)(length * ((float)(dstFormat->channels*dstFormat->bitsPerSample*srcFormat->samplesPerSecond)/(float)(srcFormat->channels*srcFormat->bitsPerSample*dstFormat->samplesPerSecond)));
+	return (int)(length * ((float)(dstFormat->channels*dstFormat->bitsPerSample)/(float)(srcFormat->channels*srcFormat->bitsPerSample)));
+}
+
 void AudioFormatConversion::fade(tbyte *buffer,int length,AudioFormat *format,int fadeTime){
 	int channels=format->channels;
 	int numFrames=length/format->frameSize();
@@ -156,10 +162,6 @@ void AudioFormatConversion::fade(tbyte *buffer,int length,AudioFormat *format,in
 			}
 		}
 	}
-}
-
-int AudioFormatConversion::findConvertedLength(int length,AudioFormat *srcFormat,AudioFormat *dstFormat){
-	return (int)(length * ((float)(dstFormat->channels*dstFormat->bitsPerSample*srcFormat->samplesPerSecond)/(float)(srcFormat->channels*srcFormat->bitsPerSample*dstFormat->samplesPerSecond)));
 }
 
 }
