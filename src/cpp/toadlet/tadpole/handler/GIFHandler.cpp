@@ -40,7 +40,7 @@ extern "C"{
 
 #if defined(TOADLET_PLATFORM_WIN32) && defined(TOADLET_LIBGIF_NAME)
 	#pragma comment(lib,TOADLET_LIBGIF_NAME)
-#endif`1
+#endif
 
 namespace toadlet{
 namespace tadpole{
@@ -321,7 +321,7 @@ Resource::ptr GIFHandler::load(Stream::ptr stream,ResourceData *data,ProgressLis
 	if(stream==NULL){
 		Error::nullPointer(Categories::TOADLET_TADPOLE,
 			"Stream is NULL");
-		return false;
+		return NULL;
 	}
 
 	GifFileType *file=openFile(stream);
@@ -329,7 +329,7 @@ Resource::ptr GIFHandler::load(Stream::ptr stream,ResourceData *data,ProgressLis
 	if(file==NULL){
 		Error::unknown(Categories::TOADLET_TADPOLE,
 			"GIFHandler::loadAnimatedImage: Invalid file");
-		return false;
+		return NULL;
 	}
 
 	Collection<int> frameDelays;
