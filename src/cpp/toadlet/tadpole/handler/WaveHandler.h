@@ -40,7 +40,7 @@ public:
 	WaveHandler(AudioBufferManager *audioBufferManager):AudioBufferHandler(audioBufferManager){}
 
 	AudioStream::ptr createAudioStream(Stream::ptr stream){
-		AudioStream::ptr audioStream(new WaveDecoder());
+		WaveDecoder::ptr audioStream(new WaveDecoder());
 		if(audioStream->startStream(stream)==false){
 			audioStream=NULL;
 		}

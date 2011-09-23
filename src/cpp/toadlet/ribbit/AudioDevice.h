@@ -42,6 +42,7 @@ public:
 	virtual void destroy()=0;
 
 	virtual AudioBuffer *createAudioBuffer()=0;
+	/// @todo: Replace both of these with 1 with a Flag specifying the type of audio
 	virtual Audio *createBufferedAudio()=0;
 	virtual Audio *createStreamingAudio()=0;
 

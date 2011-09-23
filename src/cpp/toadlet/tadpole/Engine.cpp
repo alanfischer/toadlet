@@ -328,7 +328,7 @@ void Engine::installHandlers(){
 	#endif
 	mTextureManager->setStreamer(TGAHandler::ptr(new TGAHandler(mTextureManager)),"tga");
 	#if defined(TOADLET_HAS_FFMPEG)
-		mTextureManager->setDefaultModifier(FFmpegTextureModifier::ptr(new FFmpegTextureModifier()));
+		mTextureManager->setDefaultModifier(FFmpegTextureModifier::ptr(new FFmpegTextureModifier(this)));
 	#endif
 
 	// Font handlers, try for freetype first, since it currently looks best.  This can be changed back once the others look as nice
