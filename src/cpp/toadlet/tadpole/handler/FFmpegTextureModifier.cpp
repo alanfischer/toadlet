@@ -26,26 +26,15 @@ static int ffmpegLockManager(void **mtx,enum AVLockOp op){
 	}
 }
 
-static int ffmpegGetBuffer(struct AVCodecContext *c,AVFrame *pic){
-	int ret=avcodec_default_get_buffer(c,pic);
-	uint64_t *pts=(uint64_t*)av_malloc(sizeof(uint64_t));
-	*pts=((FFmpegTextureController*)(c->opaque))->video_pkt_pts;
-	pic->opaque=pts;
-	return ret;
-}
 
-static void ffmpegReleaseBuffer(struct AVCodecContext *c,AVFrame *pic){
-	if(pic)av_freep(&pic->opaque);
-	avcodec_default_release_buffer(c,pic);
-}
-
-
-FFmpegAudioStream::FFmpegAudioStream(AVCodecContext *ctx,FFmpegTextureController *controller):
+FFmpegAudioStream::FFmpegAudioStream(FFmpegTextureController *controller,FFmpegTextureController::StreamData *streamData):
 	mDecodeLength(0)
 {
-	mCtx=ctx;
-	mPkt.data=NULL;
 	mController=controller;
+	mStreamData=streamData;
+	av_init_packet(&mPkt);
+
+	AVCodecContext *ctx=mStreamData->codecCtx;
 	mAudioFormat=AudioFormat::ptr(new AudioFormat(16,ctx->channels,ctx->sample_rate));
 }
 
@@ -54,9 +43,8 @@ FFmpegAudioStream::~FFmpegAudioStream(){
 }
 
 void FFmpegAudioStream::close(){
-	if(mCtx!=NULL){
-		mCtx=NULL;
-	}
+	mStreamData=NULL;
+	av_free_packet(&mPkt);
 }
 
 int FFmpegAudioStream::read(tbyte *buffer,int length){
@@ -72,14 +60,18 @@ int FFmpegAudioStream::read(tbyte *buffer,int length){
 		}
 		else{
 			if(mPkt.data==NULL){
-				result=mController->getQueue(AVMEDIA_TYPE_AUDIO)->get(&mPkt,0);
-				if(result<=0){
+				int result=mStreamData->queue->get(&mPkt,0);
+				if(result==FFmpegTextureController::PacketQueue::QueueResult_FLUSH){
+					avcodec_flush_buffers(mStreamData->codecCtx);
+					continue;
+				}
+				else if(result<0){
 					break;
 				}
 			}
-			
+
 			mDecodeLength=AVCODEC_MAX_AUDIO_FRAME_SIZE;
-			result=avcodec_decode_audio3(mCtx,(int16_t*)mDecodeBuffer,&mDecodeLength,&mPkt);
+			result=avcodec_decode_audio3(mStreamData->codecCtx,(int16_t*)mDecodeBuffer,&mDecodeLength,&mPkt);
 			if(result<0){
 				break;
 			}
@@ -91,23 +83,107 @@ int FFmpegAudioStream::read(tbyte *buffer,int length){
 	return total;
 }
 
+FFmpegVideoStream::FFmpegVideoStream(FFmpegTextureController *controller,FFmpegTextureController::StreamData *streamData,Texture::ptr texture):
+	mSwsCtx(NULL),
+	mVideoFrame(NULL),
+	mTextureFrame(NULL),
+	mTextureBuffer(NULL),
+
+	mPtsTime(0)
+{
+	mController=controller;
+	mStreamData=streamData;
+	mTexture=texture;
+	av_init_packet(&mPkt);
+
+	AVCodecContext *ctx=mStreamData->codecCtx;
+	TextureFormat::ptr textureFormat=mTexture->getFormat();
+	mSwsCtx=sws_getContext(
+		ctx->width,ctx->height,
+		ctx->pix_fmt,
+		textureFormat->width,textureFormat->height,
+		FFmpegTextureModifier::getPixelFormat(textureFormat->pixelFormat),
+		SWS_FAST_BILINEAR,
+		NULL,NULL,NULL
+	);
+
+	mVideoFrame=avcodec_alloc_frame();
+	mTextureFrame=avcodec_alloc_frame();
+
+	PixelFormat pixelFormat=FFmpegTextureModifier::getPixelFormat(textureFormat->pixelFormat);
+	int size=avpicture_get_size(pixelFormat,textureFormat->width,textureFormat->height);
+	mTextureBuffer=(tbyte*)av_malloc(size);
+	avpicture_fill((AVPicture*)mTextureFrame,mTextureBuffer,pixelFormat,textureFormat->width,textureFormat->height);
+}
+
+FFmpegVideoStream::~FFmpegVideoStream(){
+	close();
+}
+
+void FFmpegVideoStream::close(){
+	av_free_packet(&mPkt);
+}
+
+void FFmpegVideoStream::update(int dt){
+	int64 time=mController->rawTime();
+	double pts=0.0f;
+	int frameFinished=0;
+
+	while(time>mPtsTime || mPtsTime==0 || mStreamData->queue->flushed()){
+		int result=mStreamData->queue->get(&mPkt,0);
+		if(result==FFmpegTextureController::PacketQueue::QueueResult_FLUSH){
+			mPtsTime=0;
+			avcodec_flush_buffers(mStreamData->codecCtx);
+			continue;
+		}
+		else if(result!=FFmpegTextureController::PacketQueue::QueueResult_AVAILABLE){
+			break;
+		}
+
+		avcodec_decode_video2(mStreamData->codecCtx,mVideoFrame,&frameFinished,&mPkt);
+
+		if(mPkt.dts!=AV_NOPTS_VALUE){
+			pts=mPkt.dts;
+		}
+		else{
+			pts=0;
+		}
+
+		pts*=av_q2d(mController->getFormatCtx()->streams[mStreamData->index]->time_base);
+		int64 ptsTime=pts*AV_TIME_BASE;
+
+		if(frameFinished && (ptsTime>=time || ptsTime==0)){
+			mPtsTime=ptsTime;
+
+			sws_scale(
+				mSwsCtx,
+				mVideoFrame->data,
+				mVideoFrame->linesize,
+				0,
+				mVideoFrame->height,
+				mTextureFrame->data,
+				mTextureFrame->linesize
+			);
+		} 
+
+	    av_free_packet(&mPkt);
+	}
+
+	mTexture->load(mTexture->getFormat()->width,mTexture->getFormat()->height,0,0,mTextureFrame->data[0]);
+}
+
 
 FFmpegTextureController::FFmpegTextureController(Engine *engine):
 	mEngine(NULL),
 	mIOCtx(NULL),
 	mIOBuffer(NULL),
     mFormatCtx(NULL),
-    mSwsCtx(NULL),
 
 	mTime(0),
-	mState(State_STOP),
-
-	video_pkt_pts(0)
+	mState(State_STOP)
 {
 	mEngine=engine;
 }
-
-uint8_t *FFmpegTextureController::FLUSH=(uint8_t*)"FLUSH";
 
 bool FFmpegTextureController::open(Stream::ptr stream,Resource::ptr resource){
 	Logger::alert(Categories::TOADLET_TADPOLE,
@@ -119,7 +195,6 @@ bool FFmpegTextureController::open(Stream::ptr stream,Resource::ptr resource){
 	}
 
 	String name=resource->getName();
-	TextureFormat::ptr textureFormat=mTexture->getFormat();
 
 	mIOBuffer=new tbyte[4096+FF_INPUT_BUFFER_PADDING_SIZE];
 	mIOCtx=new ByteIOContext();
@@ -139,12 +214,12 @@ bool FFmpegTextureController::open(Stream::ptr stream,Resource::ptr resource){
 
     dump_format(mFormatCtx,0,name,0);
 
-	if(mFormatCtx->start_time!=AV_NOPTS_VALUE){
-		mStartTime=mFormatCtx->start_time;
-	}
-	else{
-		mStartTime=0;
-	}
+//	if(mFormatCtx->start_time!=AV_NOPTS_VALUE){
+//		mStartTime=mFormatCtx->start_time;
+//	}
+//	else{
+//		mStartTime=0;
+//	}
 
 	int i;
 	for(i=0;i<mFormatCtx->nb_streams;++i){
@@ -153,9 +228,6 @@ bool FFmpegTextureController::open(Stream::ptr stream,Resource::ptr resource){
 			StreamData stream;
 			stream.codecCtx=mFormatCtx->streams[i]->codec;
 			stream.codecCtx->opaque=this;
-			stream.codecCtx->get_buffer=ffmpegGetBuffer;
-			stream.codecCtx->release_buffer=ffmpegReleaseBuffer;
-
 			stream.codec=avcodec_find_decoder(stream.codecCtx->codec_id);
 			stream.index=i;
 			stream.queue=PacketQueue::ptr(new PacketQueue());
@@ -176,49 +248,18 @@ bool FFmpegTextureController::open(Stream::ptr stream,Resource::ptr resource){
 		}
 	}
 
-	AVCodecContext *videoCodecCtx=mStreams[AVMEDIA_TYPE_VIDEO].codecCtx;
-	if(videoCodecCtx==NULL){
-//		Error::unknown(
-//			"unable to find a video codec");
-//		return false;
-	}
-	else{
-		mSwsCtx=sws_getContext(
-			videoCodecCtx->width,videoCodecCtx->height,
-			videoCodecCtx->pix_fmt,
-			textureFormat->width,textureFormat->height,
-			FFmpegTextureModifier::getPixelFormat(textureFormat->pixelFormat),
-			SWS_FAST_BILINEAR,
-			NULL,NULL,NULL
-		);
-
-		mVideoFrame=avcodec_alloc_frame();
-		mTextureFrame=avcodec_alloc_frame();
-
-		PixelFormat pixelFormat=FFmpegTextureModifier::getPixelFormat(textureFormat->pixelFormat);
-		int size=avpicture_get_size(pixelFormat,textureFormat->width,textureFormat->height);
-		mTextureBuffer=(tbyte*)av_malloc(size);
-		avpicture_fill((AVPicture*)mTextureFrame,mTextureBuffer,pixelFormat,textureFormat->width,textureFormat->height);
+	StreamData *videoStreamData=&mStreams[AVMEDIA_TYPE_VIDEO];
+	if(videoStreamData->codecCtx!=NULL){
+		mVideoStream=FFmpegVideoStream::ptr(new FFmpegVideoStream(this,videoStreamData,mTexture));
 	}
 
-	AVCodecContext *audioCodecCtx=mStreams[AVMEDIA_TYPE_AUDIO].codecCtx;
-	if(audioCodecCtx==NULL){
-//		Error::unknown(
-//			"unable to find a audio codec");
-//		return false;
-	}
-	else{
-		FFmpegAudioStream::ptr audioStream(new FFmpegAudioStream(audioCodecCtx,this));
+	StreamData *audioStreamData=&mStreams[AVMEDIA_TYPE_AUDIO];
+	if(audioStreamData->codecCtx!=NULL){
+		mAudioStream=FFmpegAudioStream::ptr(new FFmpegAudioStream(this,audioStreamData));
 
 		mAudio=Audio::ptr(mEngine->getAudioDevice()->createStreamingAudio());
-		mAudio->create(shared_static_cast<AudioStream>(audioStream));
+		mAudio->create(shared_static_cast<AudioStream>(mAudioStream));
 	};
-
-	mPtsTime=0;
-	mOffsetTime=av_gettime();
-
-	av_init_packet(&mFlushPkt);
-	mFlushPkt.data=FLUSH;
 
 	return true;
 }
@@ -238,7 +279,9 @@ void FFmpegTextureController::destroy(){
 void FFmpegTextureController::start(){
 	mState=State_PLAY;
 
-//	mAudio->play();
+	if(mAudio!=NULL){
+		mAudio->play();
+	}
 }
 
 void FFmpegTextureController::pause(){
@@ -249,7 +292,9 @@ void FFmpegTextureController::stop(){
 	seek(0);
 	mState=State_STOP;
 
-//	mAudio->stop();
+	if(mAudio!=NULL){
+		mAudio->stop();
+	}
 }
 
 void FFmpegTextureController::updateDecode(int dt){
@@ -280,71 +325,18 @@ void FFmpegTextureController::updateDecode(int dt){
 	}
 }
 
-void FFmpegTextureController::updateVideo(int dt){
-//	mTime=av_gettime() - mOffsetTime + mStartTime;
-	if(mState==State_PLAY){
-		mTime+=dt*1000;
-	}
-
-	double pts=0.0f;
-	int frameFinished=0;
-	AVPacket pkt;
-
-	// decode new video frame
-	while(mTime>mPtsTime || mPtsTime==0){
-		StreamData *stream=&mStreams[AVMEDIA_TYPE_VIDEO];
-
-		if(!stream->queue->get(&pkt,0)){
-			break;
-		}
-		if(pkt.data==mFlushPkt.data){
-			avcodec_flush_buffers(stream->codecCtx);
-			continue;
-		}
-
-		video_pkt_pts=pkt.pts;
-		avcodec_decode_video2(stream->codecCtx,mVideoFrame,&frameFinished,&pkt);
-
-		if(pkt.dts!=AV_NOPTS_VALUE){
-			pts=pkt.dts;
-		}
-		else if(pkt.dts==AV_NOPTS_VALUE && mVideoFrame->opaque && *(uint64_t*)mVideoFrame->opaque!=AV_NOPTS_VALUE){
-			pts=*(uint64_t*)mVideoFrame->opaque;
-		}
-		else{
-			pts=0;
-		}
-
-		pts*=av_q2d(mFormatCtx->streams[stream->index]->time_base);
-		int64 ptsTime=pts*AV_TIME_BASE;
-
-		if(frameFinished && (ptsTime>=mTime || ptsTime==0)){
-			mPtsTime=ptsTime;
-
-			sws_scale(
-				mSwsCtx,
-				mVideoFrame->data,
-				mVideoFrame->linesize,
-				0,
-				mVideoFrame->height,
-				mTextureFrame->data,
-				mTextureFrame->linesize
-			);
-		}
-
-	    av_free_packet(&pkt);
-	}
-}
-
 void FFmpegTextureController::update(int dt){
 	updateDecode(dt);
-	updateVideo(dt);
 
-	StreamData *videoStream=&mStreams[AVMEDIA_TYPE_VIDEO];
-
-	if(videoStream->codecCtx){
-		mTexture->load(mTexture->getFormat()->width,mTexture->getFormat()->height,0,0,mTextureFrame->data[0]);
+	if(mState==State_PLAY){
+		mTime+=dt*1000;
+		if(mTime>maxTime()*1000){
+			mTime=maxTime()*1000;
+			mState=State_STOP;
+		}
 	}
+
+	mVideoStream->update(dt);
 }
 
 int64 FFmpegTextureController::currentTime(){
@@ -385,9 +377,7 @@ bool FFmpegTextureController::seek(int64 time){
 
 	time*=(AV_TIME_BASE/1000);
 
-	mPtsTime=0;
 	mTime=time;
-	mOffsetTime=av_gettime()-time;
 
 	if(index>=0){
 		int64 frameTime=av_rescale_q(time,avTimeBaseQ,mFormatCtx->streams[index]->time_base);
@@ -402,7 +392,6 @@ bool FFmpegTextureController::seek(int64 time){
 	for(i=0;i<AVMEDIA_TYPE_NB;++i){
 		if(mStreams[i].queue!=NULL){
 			mStreams[i].queue->flush();
-			mStreams[i].queue->put(&mFlushPkt);
 		}
 	}
 
@@ -478,7 +467,7 @@ PixelFormat FFmpegTextureModifier::getPixelFormat(int textureFormat){
 
 int FFmpegTextureController::PacketQueue::put(AVPacket *pkt){
 	AVPacketList *pkt1;
-	if(pkt->data!=FFmpegTextureController::FLUSH && av_dup_packet(pkt)<0){
+	if(av_dup_packet(pkt)<0){
 		return -1;
 	}
 	pkt1 = (AVPacketList*)av_malloc(sizeof(AVPacketList));
@@ -505,12 +494,17 @@ int FFmpegTextureController::PacketQueue::put(AVPacket *pkt){
 int FFmpegTextureController::PacketQueue::get(AVPacket *pkt,int block){
 	AVPacketList *pkt1;
 	int ret;
-  
+
 	mutex.lock();
   
 	for(;;){
 		if(quit){
-			ret=-1;
+			ret=QueueResult_ERROR;
+			break;
+		}
+		if(didFlush){
+			didFlush=false;
+			ret=QueueResult_FLUSH;
 			break;
 		}
 
@@ -523,17 +517,18 @@ int FFmpegTextureController::PacketQueue::get(AVPacket *pkt,int block){
 			size -= pkt1->pkt.size;
 			*pkt = pkt1->pkt;
 			av_free(pkt1);
-			ret = 1;
+			ret=QueueResult_AVAILABLE;
 			break;
 		}
 		else if (!block){
-			ret = 0;
+			ret=QueueResult_EMPTY;
 			break;
 		}
 		else{
 			cond.wait(&mutex);
 		}
 	}
+
 	mutex.unlock();
 
 	return ret;
@@ -553,6 +548,7 @@ int FFmpegTextureController::PacketQueue::flush(){
 	first=NULL;
 	count=0;
 	size=0;
+	didFlush=true;
 
 	mutex.unlock();
 

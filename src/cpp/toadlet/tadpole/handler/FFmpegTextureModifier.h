@@ -24,39 +24,8 @@ namespace toadlet{
 namespace tadpole{
 namespace handler{
 
-class FFmpegTextureController;
-
-class FFmpegAudioStream:public AudioStream{
-public:
-	TOADLET_SHARED_POINTERS(FFmpegAudioStream);
-
-	FFmpegAudioStream(AVCodecContext *ctx,FFmpegTextureController *controller);
-	virtual ~FFmpegAudioStream();
-
-	void close();
-	bool closed(){return mCtx!=NULL;}
-
-	virtual bool readable(){return true;}
-	virtual int read(tbyte *buffer,int length);
-
-	virtual bool writeable(){return false;}
-	virtual int write(const tbyte *buffer,int length){return -1;}
-
-	virtual bool reset(){return false;}
-	virtual int length(){return -1;}
-	virtual int position(){return 0;}
-	virtual bool seek(int offs){return false;}
-
-	AudioFormat::ptr getAudioFormat() const{return mAudioFormat;}
-
-protected:
-	AVCodecContext *mCtx;
-	AVPacket mPkt;
-	FFmpegTextureController *mController;
-	AudioFormat::ptr mAudioFormat;
-	tbyte mDecodeBuffer[AVCODEC_MAX_AUDIO_FRAME_SIZE];
-	int mDecodeLength;
-};
+class FFmpegAudioStream;
+class FFmpegVideoStream;
 
 class FFmpegTextureController:public ResourceController{
 public:
@@ -66,22 +35,45 @@ public:
 	public:
 		TOADLET_SHARED_POINTERS(PacketQueue);
 
+		enum{
+			QueueResult_ERROR=-1,
+			QueueResult_EMPTY=0,
+			QueueResult_AVAILABLE=1,
+			QueueResult_FLUSH=2,
+		};
+
 		PacketQueue():
 		  first(NULL),last(NULL),
 		  count(0),
 		  size(0),
-		  quit(false){}
+		  quit(false),
+		  didFlush(false){}
 
 		int put(AVPacket *packet);
 		int get(AVPacket *packet,int block);
 		int flush();
+		bool flushed(){return didFlush;}
 
 		AVPacketList *first,*last;
 		int count;
 		int size;
 		bool quit;
+		bool didFlush;
 		Mutex mutex;
 		WaitCondition cond;
+	};
+
+	class StreamData{
+	public:
+		StreamData():
+		  index(-1),
+		  codecCtx(NULL),
+		  codec(NULL){}
+
+		int index;
+		AVCodecContext *codecCtx;
+		AVCodec *codec;
+		PacketQueue::ptr queue;
 	};
 
 	/// @todo: Let us be able to open a stream and query its parameters before specifying a texture
@@ -100,26 +92,13 @@ public:
 	int64 maxTime();
 	bool seek(int64 time);
 
-	PacketQueue *getQueue(int type){return mStreams[type].queue;}
+	AVFormatContext *getFormatCtx(){return mFormatCtx;}
+	StreamData *getStreamData(int type){return &mStreams[type];}
+	int64 rawTime(){return mTime;}
 
 	void run();
 
-	uint64 video_pkt_pts;
-
 protected:
-	class StreamData{
-	public:
-		StreamData():
-		  index(-1),
-		  codecCtx(NULL),
-		  codec(NULL){}
-
-		int index;
-		AVCodecContext *codecCtx;
-		AVCodec *codec;
-		PacketQueue::ptr queue;
-	};
-
 	enum State{
 		State_STOP,
 		State_PLAY,
@@ -129,25 +108,78 @@ protected:
 	void updateDecode(int dt);
 	void updateVideo(int dt);
 
-	static uint8_t *FLUSH;
-
 	Texture::ptr mTexture;
+	SharedPointer<FFmpegVideoStream> mVideoStream;
 	Audio::ptr mAudio;
+	SharedPointer<FFmpegAudioStream> mAudioStream;
 
 	Engine *mEngine;
 	ByteIOContext *mIOCtx;
 	tbyte *mIOBuffer;
     AVFormatContext *mFormatCtx;
-    SwsContext *mSwsCtx;
 	StreamData mStreams[AVMEDIA_TYPE_NB];
 	AVPacket mFlushPkt;
 
 	State mState;
 
+	uint64 mTime;
+};
+
+class FFmpegAudioStream:public AudioStream{
+public:
+	TOADLET_SHARED_POINTERS(FFmpegAudioStream);
+
+	FFmpegAudioStream(FFmpegTextureController *controller,FFmpegTextureController::StreamData *streamData);
+	virtual ~FFmpegAudioStream();
+
+	void close();
+	bool closed(){return mStreamData!=NULL;}
+
+	virtual bool readable(){return true;}
+	virtual int read(tbyte *buffer,int length);
+
+	virtual bool writeable(){return false;}
+	virtual int write(const tbyte *buffer,int length){return -1;}
+
+	virtual bool reset(){return false;}
+	virtual int length(){return -1;}
+	virtual int position(){return 0;}
+	virtual bool seek(int offs){return false;}
+
+	AudioFormat::ptr getAudioFormat() const{return mAudioFormat;}
+
+protected:
+	AVPacket mPkt;
+	FFmpegTextureController *mController;
+	FFmpegTextureController::StreamData *mStreamData;
+	AudioFormat::ptr mAudioFormat;
+	tbyte mDecodeBuffer[AVCODEC_MAX_AUDIO_FRAME_SIZE];
+	int mDecodeLength;
+};
+
+class FFmpegVideoStream{
+public:
+	TOADLET_SHARED_POINTERS(FFmpegVideoStream);
+
+	FFmpegVideoStream(FFmpegTextureController *controller,FFmpegTextureController::StreamData *streamData,Texture::ptr texture);
+	virtual ~FFmpegVideoStream();
+
+	void close();
+
+	void update(int dt);
+
+protected:
+	AVPacket mPkt;
+	FFmpegTextureController *mController;
+	FFmpegTextureController::StreamData *mStreamData;
+	Texture::ptr mTexture;
+
+	SwsContext *mSwsCtx;
 	AVFrame *mVideoFrame;
 	AVFrame *mTextureFrame;
 	tbyte *mTextureBuffer;
-	uint64 mPtsTime,mStartTime,mOffsetTime,mTime;
+
+	uint64 mPtsTime;
 };
 
 class FFmpegTextureModifier:public ResourceModifier{
