@@ -295,11 +295,6 @@ void ALAudio::update(int dt){
 				alBufferData(mStreamingBuffers[i],format,buffer,amount,mAudioStream->getAudioFormat()->samplesPerSecond);
 				TOADLET_CHECK_ALERROR("update::alBufferData");
 			}
-			if(total==0){
-				Logger::error(Categories::TOADLET_RIBBIT,
-					"bad audio stream");
-				return;
-			}
 
 			mTotalBuffersPlayed=numBuffers;
 
@@ -342,7 +337,7 @@ void ALAudio::update(int dt){
 				alSourcePlay(mHandle);
 				TOADLET_CHECK_ALERROR("update::alSourcePlay");
 			}
-			else if(processed>0 && total==0){
+			else if(processed>0 && total<0){
 				alSourceStop(mHandle);
 				TOADLET_CHECK_ALERROR("update::alSourceStop");
 				alDeleteBuffers(numBuffers,mStreamingBuffers);
@@ -359,7 +354,7 @@ void ALAudio::update(int dt){
 
 int ALAudio::readAudioData(tbyte *buffer,int bsize){
 	int amount=mAudioStream->read(buffer,bsize);
-	if(amount==0 && mLooping){
+	if(amount<0 && mLooping){
 		mAudioStream->reset();
 		amount=mAudioStream->read(buffer,bsize);
 	}

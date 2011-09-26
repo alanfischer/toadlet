@@ -52,7 +52,7 @@ bool Win32Mutex::lock(){
 }
 
 bool Win32Mutex::unlock(){
-	int result=ReleaseMutex(mMutex);
+ 	int result=ReleaseMutex(mMutex);
 	return (result==TRUE);
 }
 
