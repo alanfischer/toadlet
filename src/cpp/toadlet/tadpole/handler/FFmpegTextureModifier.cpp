@@ -65,7 +65,7 @@ int FFmpegAudioStream::read(tbyte *buffer,int length){
 					avcodec_flush_buffers(mStreamData->codecCtx);
 					continue;
 				}
-				else if(result<0){
+				else if(result!=FFmpegTextureController::PacketQueue::QueueResult_AVAILABLE){
 					break;
 				}
 			}
@@ -186,13 +186,21 @@ FFmpegTextureController::FFmpegTextureController(Engine *engine):
 }
 
 bool FFmpegTextureController::open(Stream::ptr stream,Resource::ptr resource){
-	Logger::alert(Categories::TOADLET_TADPOLE,
-		"reading stream for "+resource->getName());
+	if(stream->closed()){
+		Error::unknown(Categories::TOADLET_TADPOLE,
+			"stream not opened");
+		return false;
+	}
 
 	mTexture=shared_static_cast<Texture>(resource);
 	if(mTexture==NULL){
+		Error::unknown(Categories::TOADLET_TADPOLE,
+			"no Texture specified");
 		return false;
 	}
+
+	Logger::alert(Categories::TOADLET_TADPOLE,
+		"reading stream for "+resource->getName());
 
 	String name=resource->getName();
 

@@ -589,6 +589,11 @@ void GLRenderDevice::swap(){
 }
 
 void GLRenderDevice::beginScene(){
+Logger::alert("BEGIN SCENE");
+	if(mGLRenderTarget!=NULL){
+		mGLRenderTarget->activate();
+	}
+
 	TOADLET_CHECK_GLERROR("beginScene");
 }
 

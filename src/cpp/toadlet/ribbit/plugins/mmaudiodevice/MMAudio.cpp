@@ -88,7 +88,7 @@ int MMAudio::read(tbyte *data,int length){
 			int olength=AudioFormatConversion::findConvertedLength(length,playerFormat,format);
 			tbyte *odata=new tbyte[olength];
 			amount=mAudioStream->read(odata,olength);
-			if(amount==0){
+			if(amount<0){
 				if(mLooping){
 					mAudioStream->reset();
 					amount=mAudioStream->read(odata,olength);
@@ -103,7 +103,7 @@ int MMAudio::read(tbyte *data,int length){
 		}
 		else{
 			amount=mAudioStream->read(data,length);
-			if(amount==0){
+			if(amount<0){
 				if(mLooping){
 					mAudioStream->reset();
 					amount=mAudioStream->read(data,length);

@@ -626,6 +626,9 @@ void Engine::contextReset(peeper::RenderDevice *renderDevice){
 void Engine::contextActivate(RenderDevice *renderDevice){
 	Logger::debug("Engine::contextActivate");
 
+	// Set the renderTarget so in cases of multiple gl contexts, we know our resource commands will go to the correct one
+	renderDevice->setRenderTarget(renderDevice->getRenderTarget());
+
 	int i;
 	for(i=0;i<mContextListeners.size();++i){
 		mContextListeners[i]->preContextActivate(renderDevice);
