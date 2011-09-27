@@ -30,6 +30,7 @@ import android.content.Context;
 import android.view.*;
 import android.os.*;
 import us.toadlet.peeper.*;
+import us.toadlet.ribbit.*;
 
 class ApplicationView extends SurfaceView implements SurfaceHolder.Callback{
 	public ApplicationView(AndroidApplication application){
@@ -183,9 +184,14 @@ public abstract class AndroidApplication extends Activity implements RenderTarge
 	protected abstract void destroyApplet(Applet applet);
 
 	public void run(){
+		mAudioDevice=makeAudioDevice();
+		if(mAudioDevice!=null){
+			mEngine.setAudioDevice(mAudioDevice);
+		}
+
 		mEngine=makeEngine();
 		mEngine.installHandlers();
-
+	
 if(mApplet==null){
 	setApplet(createApplet(this));
 	mApplet.create();
@@ -271,6 +277,12 @@ if(mApplet==null){
 		mEngine.destroy();
 		deleteEngine(mEngine);
 		mEngine=null;
+
+		if(mAudioDevice!=null){
+			mAudioDevice.destroy();
+			deleteAudioDevice(mAudioDevice);
+			mAudioDevice=null;
+		}
 	}
 
 	synchronized void notifyKeyPressed(int key){
@@ -466,6 +478,9 @@ if(mApplet==null){
 		return target;
 	}
 
+	protected AudioDevice makeAudioDevice(){return new ATAudioDevice();}
+	protected void deleteAudioDevice(AudioDevice device){}
+
 	protected native Engine makeEngine();
 	protected native void deleteEngine(Engine engine);
 	protected native RenderDevice makeRenderDevice();
@@ -484,7 +499,7 @@ if(mApplet==null){
 	protected int mLastMouseX,mLastMouseY;
 	protected RenderTarget mRenderTarget;
 	protected RenderDevice mRenderDevice;
-//	protected AudioDevice mAudioDevice;
+	protected AudioDevice mAudioDevice;
 //	protected MotionDevice mMotionDevice;
 		
 	protected SurfaceHolder mNotifySurfaceCreated;

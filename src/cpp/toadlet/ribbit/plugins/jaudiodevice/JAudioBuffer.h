@@ -23,31 +23,36 @@
  *
  ********** Copyright header - do not remove **********/
 
-#include "JATAudioBuffer.h"
+#ifndef TOADLET_RIBBIT_JAUDIOBUFFER_H
+#define TOADLET_RIBBIT_JAUDIOBUFFER_H
+
+#include <toadlet/egg/BaseResource.h>
+#include <toadlet/ribbit/AudioBuffer.h>
+#include <jni.h>
 
 namespace toadlet{
 namespace ribbit{
 
-JATAudioBuffer::JATAudioBuffer(JNIEnv *jenv,jobject jobj):BaseResource(){
-	env=jenv;
-	obj=jobj;
-}
+class TOADLET_API JAudioBuffer:protected BaseResource,public AudioBuffer{
+	TOADLET_BASERESOURCE_PASSTHROUGH(AudioBuffer);
+public:
+	TOADLET_SHARED_POINTERS(JAudioBuffer);
 
-JATAudioBuffer::~JATAudioBuffer(){
-	destroy();
-}
+	JAudioBuffer(JNIEnv *jenv,jobject jobj);
+	virtual ~JAudioBuffer();
 
-bool JATAudioBuffer::create(AudioStream::ptr stream){
-	jobject jstream=create NAudioStream;
+	AudioBuffer *getRootAudioBuffer(){return this;}
 
-	bool result=jobj->create(jstream);
+	bool create(AudioStream::ptr stream);
+	void destroy();
 
-	return result;
-}
-
-void JATAudioBuffer::destroy(){
-	env->CallVoidMethod(obj,destroyID);
-}
+protected:
+	JNIEnv *env;
+	jobject obj;
+	jmethodID createID,destroyID;
+};
 
 }
 }
+
+#endif

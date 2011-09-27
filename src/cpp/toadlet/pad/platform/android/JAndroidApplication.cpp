@@ -33,6 +33,7 @@ using namespace toadlet::tadpole;
 using namespace toadlet::pad;
 
 TOADLET_C_API RenderDevice* new_GLRenderDevice();
+TOADLET_C_API RenderDevice* new_JATRenderDevice(JNIEnv *env,jobject obj);
 
 bool Java_us_toadlet_pad_init=false;
 jmethodID getRootRenderTargetRenderTargetID=0;
@@ -121,17 +122,47 @@ Engine *JAndroidApplication::getEngine(){
 }
 
 RenderDevice *JAndroidApplication::getRenderDevice(){
-	RenderDevice *device=NULL;
+	jobject deviceObj=env->CallObjectMethod(obj,getRenderDeviceID);
 
-	jobject jdevice=env->CallObjectMethod(obj,getRenderDeviceID);
+	if(mRenderDevice==NULL || mLastRenderDeviceObj!=deviceObj){
+		//if(jobject is NRenderDevice){
+			mRenderDevice=(RenderDevice*)env->CallIntMethod(deviceObj,getNativeHandleRenderDeviceID);
+		//}
+		//else{
+		//	mRenderDevice=new JRenderDevice(env,deviceObj);
+		//
 
-	if(jdevice!=NULL){
-		device=(RenderDevice*)env->CallIntMethod(jdevice,getNativeHandleRenderDeviceID);
+		if(mLastRenderDeviceObj!=NULL){
+			env->DeleteGlobalRef(mLastRenderDeviceObj);
+		}
+		mLastRenderDeviceObj=env->NewGlobalRef(deviceObj);
+		
+		env->DeleteLocalRef(deviceObj);
+	}
+	
+	return mRenderDevice;
+}
 
-		env->DeleteLocalRef(jdevice);
+AudioDevice *JAndroidApplication::getAudioDevice(){
+	jobject deviceObj=env->CallObjectMethod(obj,getAudioDeviceID);
+
+	if(mAudioDevice==NULL || mLastAudioDeviceObj!=deviceObj){
+		//if(jobject is NAudioDevice){
+		//	mAudioDevice=(AudioDevice*)env->CallIntMethod(deviceObj,getNativeHandleAudioDeviceID);
+		//}
+		//else{
+			mAudioDevice=new JATAudioDevice(env,deviceObj);
+		//
+
+		if(mLastAudioDeviceObj!=NULL){
+			env->DeleteGlobalRef(mLastAudioDeviceObj);
+		}
+		mLastAudioDeviceObj=env->NewGlobalRef(deviceObj);
+
+		env->DeleteLocalRef(deviceObj);
 	}
 
-	return device;
+	return mAudioDevice;
 }
 
 }
