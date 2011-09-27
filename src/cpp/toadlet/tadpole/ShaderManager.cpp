@@ -45,7 +45,9 @@ Shader::ptr ShaderManager::createShader(Shader::ShaderType type,const String pro
 		BackableShader::ptr backableShader(new BackableShader());
 		backableShader->create(type,profiles,codes,numCodes);
 		if(renderDevice!=NULL){
-			backableShader->setBack(Shader::ptr(renderDevice->createShader()),renderDevice);
+			TOADLET_TRY
+				backableShader->setBack(Shader::ptr(renderDevice->createShader()),renderDevice);
+			TOADLET_CATCH(Exception &){}
 		}
 		shader=backableShader;
 	}
