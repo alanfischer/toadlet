@@ -23,36 +23,31 @@
  *
  ********** Copyright header - do not remove **********/
 
-#ifndef TOADLET_RIBBIT_AUDIOCAPS_H
-#define TOADLET_RIBBIT_AUDIOCAPS_H
-
-#include <toadlet/ribbit/Types.h>
+#include "JATAudioBuffer.h"
 
 namespace toadlet{
 namespace ribbit{
 
-class AudioCaps{
-public:
-	AudioCaps(){
-		maxSources=0;
-		streaming=false;
-		positional=false;
-	}
+JATAudioBuffer::JATAudioBuffer(JNIEnv *jenv,jobject jobj):BaseResource(){
+	env=jenv;
+	obj=jobj;
+}
 
-	AudioCaps &set(const AudioCaps &caps){
-		maxSources=caps.maxSources;
-		streaming=caps.streaming;
-		positional=caps.positional;
+JATAudioBuffer::~JATAudioBuffer(){
+	destroy();
+}
 
-		return *this;
-	}
+bool JATAudioBuffer::create(AudioStream::ptr stream){
+	jobject jstream=create NAudioStream;
 
-	int maxSources;
-	bool streaming;
-	bool positional;
-};
+	bool result=jobj->create(jstream);
+
+	return result;
+}
+
+void JATAudioBuffer::destroy(){
+	env->CallVoidMethod(obj,destroyID);
+}
 
 }
 }
-
-#endif

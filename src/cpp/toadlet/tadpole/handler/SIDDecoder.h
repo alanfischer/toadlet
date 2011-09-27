@@ -37,6 +37,8 @@ class SIDAttributes;
 
 class TOADLET_API SIDDecoder:public AudioStream{
 public:
+	TOADLET_SHARED_POINTERS(SIDDecoder);
+
 	SIDDecoder();
 	virtual ~SIDDecoder();
 

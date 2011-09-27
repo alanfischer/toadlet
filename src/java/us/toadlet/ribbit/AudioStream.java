@@ -23,36 +23,11 @@
  *
  ********** Copyright header - do not remove **********/
 
-#ifndef TOADLET_RIBBIT_AUDIOCAPS_H
-#define TOADLET_RIBBIT_AUDIOCAPS_H
+package us.toadlet.ribbit;
 
-#include <toadlet/ribbit/Types.h>
+import java.io.InputStream;
 
-namespace toadlet{
-namespace ribbit{
-
-class AudioCaps{
-public:
-	AudioCaps(){
-		maxSources=0;
-		streaming=false;
-		positional=false;
-	}
-
-	AudioCaps &set(const AudioCaps &caps){
-		maxSources=caps.maxSources;
-		streaming=caps.streaming;
-		positional=caps.positional;
-
-		return *this;
-	}
-
-	int maxSources;
-	bool streaming;
-	bool positional;
-};
-
+public abstract class AudioStream extends InputStream{
+	public abstract boolean startStream(InputStream stream);
+	public abstract AudioFormat getAudioFormat();
 }
-}
-
-#endif

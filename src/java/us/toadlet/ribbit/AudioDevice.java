@@ -23,36 +23,22 @@
  *
  ********** Copyright header - do not remove **********/
 
-#ifndef TOADLET_RIBBIT_AUDIOCAPS_H
-#define TOADLET_RIBBIT_AUDIOCAPS_H
+package us.toadlet.ribbit;
 
-#include <toadlet/ribbit/Types.h>
+interface AudioDevice{
+	public boolean create(int[] options);
+	public void destroy();
+	
+	public AudioBuffer createAudioBuffer();
+	public Audio createBufferedAudio();
+	public Audio createStreamingAudio();
 
-namespace toadlet{
-namespace ribbit{
+	public void setListenerGain(float gain);
 
-class AudioCaps{
-public:
-	AudioCaps(){
-		maxSources=0;
-		streaming=false;
-		positional=false;
-	}
+	public void update(int dt);
 
-	AudioCaps &set(const AudioCaps &caps){
-		maxSources=caps.maxSources;
-		streaming=caps.streaming;
-		positional=caps.positional;
+	public void suspend();
+	public void resume();
 
-		return *this;
-	}
-
-	int maxSources;
-	bool streaming;
-	bool positional;
-};
-
+	public boolean getAudioCaps(AudioCaps caps);
 }
-}
-
-#endif
