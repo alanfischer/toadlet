@@ -40,7 +40,7 @@ public:
 	SIDHandler(AudioBufferManager *audioBufferManager):AudioBufferHandler(audioBufferManager){}
 
 	AudioStream::ptr createAudioStream(Stream::ptr stream){
-		AudioStream::ptr audioStream(new SIDDecoder());
+		SIDDecoder::ptr audioStream(new SIDDecoder());
 		if(audioStream->startStream(stream)==false){
 			audioStream=NULL;
 		}

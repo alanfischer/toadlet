@@ -23,36 +23,12 @@
  *
  ********** Copyright header - do not remove **********/
 
-#ifndef TOADLET_RIBBIT_AUDIOCAPS_H
-#define TOADLET_RIBBIT_AUDIOCAPS_H
+package us.toadlet.ribbit;
 
-#include <toadlet/ribbit/Types.h>
+public class Version{
+	public static final int MAJOR=${TOADLET_BUILD_VERSION_RIBBIT_MAJOR};
+	public static final int MINOR=${TOADLET_BUILD_VERSION_RIBBIT_MINOR};
+	public static final int MICRO=${TOADLET_BUILD_VERSION_RIBBIT_MICRO};
 
-namespace toadlet{
-namespace ribbit{
-
-class AudioCaps{
-public:
-	AudioCaps(){
-		maxSources=0;
-		streaming=false;
-		positional=false;
-	}
-
-	AudioCaps &set(const AudioCaps &caps){
-		maxSources=caps.maxSources;
-		streaming=caps.streaming;
-		positional=caps.positional;
-
-		return *this;
-	}
-
-	int maxSources;
-	bool streaming;
-	bool positional;
+	public static final String STRING=${TOADLET_BUILD_VERSION_RIBBIT_MAJOR}+"."+${TOADLET_BUILD_VERSION_RIBBIT_MINOR}+"."+${TOADLET_BUILD_VERSION_RIBBIT_MICRO};
 };
-
-}
-}
-
-#endif

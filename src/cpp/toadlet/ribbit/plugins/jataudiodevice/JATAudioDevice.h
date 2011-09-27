@@ -23,31 +23,23 @@
  *
  ********** Copyright header - do not remove **********/
 
-#ifndef TOADLET_RIBBIT_MMAUDIODEVICE_H
-#define TOADLET_RIBBIT_MMAUDIODEVICE_H
+#ifndef TOADLET_RIBBIT_JATAUDIODEVICE_H
+#define TOADLET_RIBBIT_JATAUDIODEVICE_H
 
 #include <toadlet/ribbit/Audio.h>
 #include <toadlet/ribbit/AudioDevice.h>
 #include <toadlet/ribbit/AudioBuffer.h>
-#include <toadlet/ribbit/AudioStream.h>
 #include <toadlet/ribbit/AudioCaps.h>
-#include <toadlet/egg/Collection.h>
-#include <windows.h>
-#include <mmsystem.h>
+#include <jnih>
 
 namespace toadlet{
 namespace ribbit{
 
-class MMAudio;
-class MMAudioBuffer;
-
-class TOADLET_API MMAudioDevice:public AudioDevice{
+/// @todo: Once all objects are internally reference counted, then switch JATAudioDevice to just a JAudioDevice
+class TOADLET_API JATAudioDevice:public AudioDevice{
 public:
-	// Options
-	const static int Option_BUFFER_FADE_TIME=1;
-	
-	MMAudioDevice();
-	virtual ~MMAudioDevice();
+	JATAudioDevice(JNIEnv *jenv,jobject jobj);
+	virtual ~JATAudioDevice();
 
 	bool create(int *options);
 	void destroy();
@@ -64,29 +56,18 @@ public:
 	void suspend(){}
 	void resume(){}
 
-	void update(int dt);
+	void update(int dt){}
 
 	bool getAudioCaps(AudioCaps &caps){caps.set(mCaps);return true;}
 
 	int getBufferFadeTime() const{return mBufferFadeTime;}
 	AudioFormat::ptr getAudioFormat(){return mFormat;}
 
-	void internal_audioCreate(MMAudio *audio);
-	void internal_audioDestroy(MMAudio *audio);
-
 protected:
-	int read(tbyte *data,int length);
+	JNIEnv *env;
+	jobject obj;
 
 	AudioCaps mCaps;
-
-	AudioFormat::ptr mFormat;
-	HWAVEOUT mDevice;
-	WAVEHDR *mBuffers;
-	tbyte *mBufferData;
-	Collection<MMAudio*> mAudios;
-	int mBufferFadeTime;
-	int mNumBuffers;
-	int mBufferSize;
 };
 
 }

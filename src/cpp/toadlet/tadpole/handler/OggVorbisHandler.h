@@ -40,7 +40,7 @@ public:
 	OggVorbisHandler(AudioBufferManager *audioBufferManager):AudioBufferHandler(audioBufferManager){}
 
 	AudioStream::ptr createAudioStream(Stream::ptr stream){
-		AudioStream::ptr audioStream(new OggVorbisDecoder());
+		OggVorbisDecoder::ptr audioStream(new OggVorbisDecoder());
 		if(audioStream->startStream(stream)==false){
 			audioStream=NULL;
 		}

@@ -58,7 +58,12 @@ set (RIBBIT_SRC
 	${JAVA_SRC_DIR}/ribbit/AudioFormat.java
 	${JAVA_SRC_DIR}/ribbit/AudioStream.java
 	${JAVA_SRC_DIR}/ribbit/AudioBuffer.java
+	${JAVA_SRC_DIR}/ribbit/Audio.java
+	${JAVA_SRC_DIR}/ribbit/AudioCaps.java
+	${JAVA_SRC_DIR}/ribbit/AudioDevice.java
 	${JAVA_SRC_DIR}/ribbit/ATAudioBuffer.java
+	${JAVA_SRC_DIR}/ribbit/ATAudio.java
+	${JAVA_SRC_DIR}/ribbit/ATAudioDevice.java
 	${CMAKE_CURRENT_BINARY_DIR}/${JAVA_SRC_DIR}/ribbit/Version.java
 )
 

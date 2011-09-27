@@ -74,6 +74,7 @@ public:
 	inline scalar getRolloffFactor() const{if(mAudio!=NULL){return mAudio->getRolloffFactor();}else{return 0;}}
 
 	/// @todo: This needs to be integrated into the tadpole plugin
+	/// @todo: Also we need to set the Audio position on a position update
 	inline void setVelocity(const Vector3 &velocity){if(mAudio!=NULL){mAudio->setVelocity(velocity);}}
 
 protected:
