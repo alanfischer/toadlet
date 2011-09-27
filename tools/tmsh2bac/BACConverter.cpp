@@ -324,8 +324,8 @@ bool BACConverter::extractMeshData(Mesh::ptr mesh,bool useSubmeshes){
 				if(texture!=NULL || name.length()>0){
 					int width=256,height=256;
 					if(texture!=NULL){
-						width=texture->getWidth();
-						height=texture->getHeight();
+						width=texture->getFormat()->width;
+						height=texture->getFormat()->height;
 					}
 					else{
 						Logger::alert(String("Texture ")+name+" not found, a texture must be available so msh2bac can determine the texture size.  Will default to 256x256");

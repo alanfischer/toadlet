@@ -158,7 +158,7 @@ int main(int argc,char **argv){
 		if(index!=String::npos) extension=mshFileName.substr(index+1,mshFileName.length()).toLower();
 		if(extension=="xmsh"){
 			XMSHHandler handler(NULL);
-			handler.save(mesh,fout);
+			handler.save(fout,mesh,NULL,NULL);
 		}
 		else{
 			std::cerr << "Error saving \"" << (const char*)mshFileName << "\"" << std::endl;

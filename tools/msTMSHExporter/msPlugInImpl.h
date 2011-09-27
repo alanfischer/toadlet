@@ -3,11 +3,13 @@
 
 #include "msPlugIn.h"
 #include "msLib.h"
+#include <toadlet/egg/io/FileStream.h>
 #include <toadlet/tadpole/Mesh.h>
 #include <toadlet/tadpole/handler/XMSHHandler.h>
 #include <toadlet/tadpole/handler/XANMHandler.h>
 
 using namespace toadlet::egg;
+using namespace toadlet::egg::io;
 using namespace toadlet::tadpole;
 using namespace toadlet::tadpole::handler;
 
@@ -16,6 +18,7 @@ class cPlugIn : public cMsPlugIn,public ProgressListener
 {
     char szTitle[64];
 	HWND hwndProgress;
+	Engine *engine;
 
 	class Frame{
 	public:

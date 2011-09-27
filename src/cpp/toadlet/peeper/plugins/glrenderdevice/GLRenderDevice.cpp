@@ -310,7 +310,7 @@ bool GLRenderDevice::create(RenderTarget *target,int *options){
 		caps.hasFixed[Shader::ShaderType_FRAGMENT]=useFixedFunction;
 		caps.hasFixed[Shader::ShaderType_GEOMETRY]=useFixedFunction;
 
-		#if defined(TOADLET_HAS_GLSL)
+		#if !defined(TOADLET_FIXED_POINT) && defined(TOADLET_HAS_GLSL)
 			caps.hasShader[Shader::ShaderType_VERTEX]=useShaders;
 			caps.hasShader[Shader::ShaderType_FRAGMENT]=useShaders;
 			caps.hasShader[Shader::ShaderType_GEOMETRY]=useShaders;
@@ -424,7 +424,13 @@ VariableBuffer *GLRenderDevice::createVariableBuffer(){
 
 Shader *GLRenderDevice::createShader(){
 	#if defined(TOADLET_HAS_GLSL)
-		return new GLSLShader(this);
+		if(mCaps.hasShader[Shader::ShaderType_VERTEX]){
+			return new GLSLShader(this);
+		}
+		else{
+			Error::unimplemented("shaders not available");
+			return NULL;
+		}
 	#else
 		Error::unimplemented("GLRenderDevice::createShader is unavailable");
 		return NULL;
@@ -589,7 +595,6 @@ void GLRenderDevice::swap(){
 }
 
 void GLRenderDevice::beginScene(){
-Logger::alert("BEGIN SCENE");
 	if(mGLRenderTarget!=NULL){
 		mGLRenderTarget->activate();
 	}

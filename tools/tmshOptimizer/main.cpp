@@ -65,7 +65,7 @@ int main(int argc,char **argv){
 		return 0;
 	}
 	XMSHHandler::ptr handler(new XMSHHandler(NULL));
-	handler->save(mesh,stream);
+	handler->save(stream,mesh,NULL,NULL);
 
 	if(result){
 		std::cout << "complete" << std::endl;

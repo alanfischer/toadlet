@@ -67,11 +67,11 @@ int main(int argc,char **argv){
 	bool result=false;
 	if(xmsh){
 		XMSHHandler handler(engine);
-		result=handler.save(mesh,stream);
+		result=handler.save(stream,mesh,NULL,NULL);
 	}
 	else{
 		TMSHHandler handler(engine);
-		result=handler.save(mesh,stream);
+		result=handler.save(stream,mesh,NULL,NULL);
 	}
 
 	if(result){
