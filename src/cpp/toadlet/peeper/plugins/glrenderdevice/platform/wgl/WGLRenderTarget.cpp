@@ -35,7 +35,6 @@ WGLRenderTarget::WGLRenderTarget():GLRenderTarget(),
 {}
 
 bool WGLRenderTarget::activate(){
-	Logger::alert("ACTIVATING");
 	return wglMakeCurrent(mDC,mGLRC)==TRUE;
 }
 

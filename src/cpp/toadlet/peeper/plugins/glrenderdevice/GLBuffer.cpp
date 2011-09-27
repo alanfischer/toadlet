@@ -353,7 +353,7 @@ bool GLBuffer::update(tbyte *data,int start,int size){
 
 #if defined(TOADLET_HAS_GLSHADERS)
 bool GLBuffer::activateUniforms(){
-	Matrix4x4 matrix;
+	math::Matrix4x4 matrix,textureMatrix;
 
 	int resourceCount=0;
 	int i;
@@ -369,7 +369,8 @@ bool GLBuffer::activateUniforms(){
 			GLTexture *texture=mDevice->mLastTextures[samplerMatrix];
 			matrix.set((float*)data);
 			if(texture!=NULL){
-				Math::postMul(matrix,texture->getMatrix());
+				MathConversion::scalarToFloat(textureMatrix,texture->getMatrix());
+				math::Math::postMul(matrix,textureMatrix);
 			}
 			data=(tbyte*)matrix.data;
 		}

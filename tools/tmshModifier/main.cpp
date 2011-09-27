@@ -84,7 +84,7 @@ int main(int argc,char **argv){
 				return 0;
 			}
 			XANMHandler::ptr handler(new XANMHandler());
-			handler->save(sequence,stream);
+			handler->save(stream,sequence,NULL,NULL);
 		}
 	}
 
@@ -105,7 +105,7 @@ int main(int argc,char **argv){
 				return 0;
 			}
 			XANMHandler::ptr handler(new XANMHandler());
-			TransformSequence::ptr sequence=shared_static_cast<TransformSequence>(handler->load(stream,NULL));
+			TransformSequence::ptr sequence=shared_static_cast<TransformSequence>(handler->load(stream,NULL,NULL));
 			skeleton->sequences.add(sequence);
 		}
 
@@ -115,7 +115,7 @@ int main(int argc,char **argv){
 			return 0;
 		}
 		XMSHHandler::ptr handler(new XMSHHandler(NULL));
-		handler->save(mesh,stream);
+		handler->save(stream,mesh,NULL,NULL);
 	}
 
 	if(scale!=1.0f){
@@ -153,7 +153,7 @@ int main(int argc,char **argv){
 			return 0;
 		}
 		XMSHHandler::ptr handler(new XMSHHandler(NULL));
-		handler->save(mesh,stream);
+		handler->save(stream,mesh,NULL,NULL);
 	}
 
 	std::cout << "complete" << std::endl;

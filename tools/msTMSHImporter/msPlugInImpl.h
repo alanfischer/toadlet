@@ -3,10 +3,15 @@
 
 #include "msPlugIn.h"
 #include "msLib.h"
+#include <toadlet/egg/io/FileStream.h>
 #include <toadlet/tadpole/Mesh.h>
+#include <toadlet/tadpole/handler/XMSHHandler.h>
+#include <toadlet/tadpole/handler/XANMHandler.h>
 
 using namespace toadlet::egg;
+using namespace toadlet::egg::io;
 using namespace toadlet::tadpole;
+using namespace toadlet::tadpole::handler;
 
 struct msModel;
 class cPlugIn : public cMsPlugIn

@@ -287,8 +287,8 @@ bool TerrainPatchNode::setHeightData(scalar *data,int rowPitch,int width,int hei
 	return true;
 }
 
-inline float calculateLayerWeight(tbyte *data,int rowPitch,int size,int layer,int i,int j,float io,float jo){
-	float weights[8];
+inline scalar calculateLayerWeight(tbyte *data,int rowPitch,int size,int layer,int i,int j,scalar io,scalar jo){
+	scalar weights[8];
 	memset(weights,0,sizeof(weights));
 
 	int mini=i-1<0?0:i-1;
@@ -300,12 +300,13 @@ inline float calculateLayerWeight(tbyte *data,int rowPitch,int size,int layer,in
 	for(y=minj;y<=maxj;++y){
 		for(x=mini;x<=maxi;++x){
 			int l=data[y*rowPitch+x];
-			float w=1.0 - (Math::square(x-(i+io))+Math::square(y-(j+jo))) / Math::square(1.75);
+			scalar w=Math::ONE - 
+				Math::div(Math::square(Math::fromInt(x)-(Math::fromInt(i)+io))+Math::square(Math::fromInt(y)-(Math::fromInt(j)+jo)), Math::square(Math::fromFloat(1.75)));
 			weights[l]+=w<0?0:w;
 		}
 	}
 
-	float sum=0;
+	scalar sum=0;
 	for(x=0;x<8;++x){
 		sum+=weights[x];
 	}

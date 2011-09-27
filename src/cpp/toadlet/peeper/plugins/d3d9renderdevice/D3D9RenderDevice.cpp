@@ -223,7 +223,18 @@ VariableBuffer *D3D9RenderDevice::createVariableBuffer(){
 }
 
 Shader *D3D9RenderDevice::createShader(){
-	return new D3D9Shader(this);
+	#if !defined(TOADLET_SET_D3DM)
+		if(mCaps.hasShader[Shader::ShaderType_VERTEX]){
+			return new D3D9Shader(this);
+		}
+		else{
+			Error::unimplemented("shaders not available");
+			return NULL;
+		}
+	#else
+		Error::unimplemented("D3D9RenderDevice::createShader is unavailable");
+		return NULL;
+	#endif
 }
 
 Query *D3D9RenderDevice::createQuery(){
@@ -902,9 +913,10 @@ void D3D9RenderDevice::setCapsFromD3DCAPS9(RenderCaps &caps,const D3DCAPS9 &d3dc
 	caps.hasFixed[Shader::ShaderType_FRAGMENT]=true;
 	caps.hasFixed[Shader::ShaderType_GEOMETRY]=caps.pointSprites;
 
-	caps.hasShader[Shader::ShaderType_VERTEX]=d3dcaps.VertexShaderVersion>0;
-	caps.hasShader[Shader::ShaderType_FRAGMENT]=d3dcaps.PixelShaderVersion>0;
-	caps.hasShader[Shader::ShaderType_GEOMETRY]=false;
+	#if !defined(TOADLET_FIXED_POINT)
+		caps.hasShader[Shader::ShaderType_VERTEX]=d3dcaps.VertexShaderVersion>0;
+		caps.hasShader[Shader::ShaderType_FRAGMENT]=d3dcaps.PixelShaderVersion>0;
+	#endif
 
 	caps.maxLights=d3dcaps.MaxActiveLights;
 	caps.triangleFan=true;

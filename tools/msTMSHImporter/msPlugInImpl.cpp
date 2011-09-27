@@ -137,7 +137,7 @@ cPlugIn::importMesh(msModel *pModel,const String &name,int flags){
 	}
 
 	XMSHHandler::ptr handler(new XMSHHandler(NULL));
-	Mesh::ptr mesh=shared_static_cast<Mesh>(handler->load(stream,NULL));
+	Mesh::ptr mesh=shared_static_cast<Mesh>(handler->load(stream,NULL,NULL));
 	if(mesh==NULL){
 		::MessageBox(NULL,"Toadlet Mesh/Animation Import","Error loading file",MB_OK);
 		return -1;
@@ -400,7 +400,7 @@ cPlugIn::importAnimation(msModel *pModel,const String &name,int flags){
 	}
 
 	XANMHandler::ptr handler(new XANMHandler());
-	TransformSequence::ptr sequence=shared_static_cast<TransformSequence>(handler->load(stream,NULL));
+	TransformSequence::ptr sequence=shared_static_cast<TransformSequence>(handler->load(stream,NULL,NULL));
 	if(sequence==NULL){
 		::MessageBox(NULL,"Toadlet Mesh/Animation Import","Error loading file",MB_OK);
 		return -1;

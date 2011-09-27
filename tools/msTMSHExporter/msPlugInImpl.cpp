@@ -42,6 +42,8 @@ CreatePlugIn ()
 cPlugIn::cPlugIn ()
 {
     strcpy (szTitle, "Toadlet Mesh/Animation...");
+
+	engine=new Engine(true);
 }
 
 
@@ -137,8 +139,6 @@ cPlugIn::Execute (msModel *pModel)
     UpdateWindow(hwndProgress);
 
     SendMessage(hwndProgress,PBM_SETRANGE,0,MAKELPARAM(0,100));
-
-	Engine *engine=new Engine(true);
 
 	int result=-1;
 	String name=szFile;
@@ -343,7 +343,7 @@ cPlugIn::exportMesh(msModel *pModel,const String &name){
 		if(materialIndex>=0){
 			msMaterial *msmat=msModel_GetMaterialAt(pModel,materialIndex);
 
-			Material::ptr material(new Material());
+			Material::ptr material=engine->getMaterialManager()->createDiffuseMaterial(NULL);
 
 			char name[256];
 			msMaterial_GetName(msmat,name,256);
@@ -352,7 +352,7 @@ cPlugIn::exportMesh(msModel *pModel,const String &name){
 			char texture[1024];
 			msMaterial_GetDiffuseTexture(msmat,texture,1024);
 			if(strlen(texture)>0){
-				material->setTextureName(texture);
+				material->getPass()->setTextureName(texture);
 			}
 
 			MaterialState materialState;
@@ -364,14 +364,14 @@ cPlugIn::exportMesh(msModel *pModel,const String &name){
 				materialState.shininess=msMaterial_GetShininess(msmat);
 				materialState.lighting=true;
 			}
-			material->setMaterialState(materialState);
+			material->getPass()->setMaterialState(materialState);
 
 			sub->material=material;
 		}
 		else{
 			MessageBox(NULL,"Mesh has no material, exporting empty material","Warning",NULL);
 
-			sub->material=Material::ptr(new Material());
+			sub->material=engine->getMaterialManager()->createMaterial();
 		}
 	}
 
@@ -382,7 +382,7 @@ cPlugIn::exportMesh(msModel *pModel,const String &name){
 	FileStream::ptr stream(new FileStream(name,FileStream::Open_WRITE_BINARY));
 	XMSHHandler::ptr handler(new XMSHHandler(NULL));
 
-	handler->save(mesh,stream,this);
+	handler->save(stream,mesh,NULL,this);
 
 	return 0;
 }
@@ -666,7 +666,7 @@ cPlugIn::exportAnimation(msModel *pModel,const String &name){
 	FileStream::ptr stream(new FileStream(name,FileStream::Open_WRITE_BINARY));
 	XANMHandler::ptr handler(new XANMHandler());
 
-	handler->save(sequence,stream,this);
+	handler->save(stream,sequence,NULL,this);
 
 	return 0;
 }
