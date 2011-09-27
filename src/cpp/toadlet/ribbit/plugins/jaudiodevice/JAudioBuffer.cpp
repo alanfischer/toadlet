@@ -23,18 +23,31 @@
  *
  ********** Copyright header - do not remove **********/
 
-package us.toadlet.pad;
+#include "JAudioBuffer.h"
 
-public class Engine{
-	public Engine(int nativeHandle){mNativeHandle=nativeHandle;}
+namespace toadlet{
+namespace ribbit{
 
-	public native void destroy();
+JAudioBuffer::JAudioBuffer(JNIEnv *jenv,jobject jobj):BaseResource(){
+	env=jenv;
+	obj=jobj;
+}
 
-	public native void installHandlers();
-	
-	public native boolean setRenderDevice(RenderDevice device);
-	public native boolean setAuioDevice(AudioDevice device);
+JAudioBuffer::~JAudioBuffer(){
+	destroy();
+}
 
-	public int getNativeHandle(){return mNativeHandle;}
-	protected int mNativeHandle;
+bool JAudioBuffer::create(AudioStream::ptr stream){
+	jobject jstream=create NAudioStream;
+
+	bool result=jobj->create(jstream);
+
+	return result;
+}
+
+void JAudioBuffer::destroy(){
+	env->CallVoidMethod(obj,destroyID);
+}
+
+}
 }

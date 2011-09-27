@@ -23,33 +23,50 @@
  *
  ********** Copyright header - do not remove **********/
 
-#ifndef TOADLET_RIBBIT_JATAUDIOBUFFER_H
-#define TOADLET_RIBBIT_JATAUDIOBUFFER_H
+#ifndef TOADLET_RIBBIT_JAUDIODEVICE_H
+#define TOADLET_RIBBIT_JAUDIODEVICE_H
 
-#include <toadlet/egg/BaseResource.h>
+#include <toadlet/ribbit/Audio.h>
+#include <toadlet/ribbit/AudioDevice.h>
 #include <toadlet/ribbit/AudioBuffer.h>
-#include <jni.h>
+#include <toadlet/ribbit/AudioCaps.h>
+#include <jnih>
 
 namespace toadlet{
 namespace ribbit{
 
-class TOADLET_API JATAudioBuffer:protected BaseResource,public AudioBuffer{
-	TOADLET_BASERESOURCE_PASSTHROUGH(AudioBuffer);
+class TOADLET_API JAudioDevice:public AudioDevice{
 public:
-	TOADLET_SHARED_POINTERS(JATAudioBuffer);
+	JAudioDevice(JNIEnv *jenv,jobject jobj);
+	virtual ~JAudioDevice();
 
-	JATAudioBuffer(JNIEnv *jenv,jobject jobj);
-	virtual ~JATAudioBuffer();
-
-	AudioBuffer *getRootAudioBuffer(){return this;}
-
-	bool create(AudioStream::ptr stream);
+	bool create(int *options);
 	void destroy();
+
+	AudioBuffer *createAudioBuffer();
+	Audio *createBufferedAudio();
+	Audio *createStreamingAudio();
+
+	void setListenerTranslate(const Vector3 &translate){}
+	void setListenerRotate(const Matrix3x3 &rotate){}
+	void setListenerVelocity(const Vector3 &velocity){}
+	void setListenerGain(scalar gain){}
+
+	void suspend(){}
+	void resume(){}
+
+	void update(int dt){}
+
+	bool getAudioCaps(AudioCaps &caps){caps.set(mCaps);return true;}
+
+	int getBufferFadeTime() const{return mBufferFadeTime;}
+	AudioFormat::ptr getAudioFormat(){return mFormat;}
 
 protected:
 	JNIEnv *env;
 	jobject obj;
-	jmethodID createID,destroyID;
+
+	AudioCaps mCaps;
 };
 
 }

@@ -23,31 +23,31 @@
  *
  ********** Copyright header - do not remove **********/
 
-#include "JATAudio.h"
+#include "JAudio.h"
 #include <toadlet/egg/Error.h>
 #include <toadlet/egg/Logger.h>
 
 namespace toadlet{
 namespace ribbit{
 
-JATAudio::JATAudio(JNIEnv *jenv,jobject jobj){
+JAudio::JAudio(JNIEnv *jenv,jobject jobj){
 	env=jenv;
 	obj=jobj;
 }
 
-JATAudio::~JATAudio(){
+JAudio::~JAudio(){
 	destroy();
 }
 
-bool JATAudio::create(AudioBuffer::ptr audioBuffer){
+bool JAudio::create(AudioBuffer::ptr audioBuffer){
 	mAudioBuffer=audioBuffer;
 
-	jobject jbuffer=((JATAudioBuffer*)audioBuffer->getRootAudioBuffer())->getNativeHandle();
+	jobject jbuffer=((JAudioBuffer*)audioBuffer->getRootAudioBuffer())->getNativeHandle();
 
 	return obj.create(jbuffer);
 }
 
-bool JATAudio::create(AudioStream::ptr audioStream){
+bool JAudio::create(AudioStream::ptr audioStream){
 	mAudioStream=audioStream;
 
 	jobject jstream=create NAudioStream(audioStream);
@@ -55,43 +55,43 @@ bool JATAudio::create(AudioStream::ptr audioStream){
 	return obj.create(jstream);
 }
 
-void JATAudio::destroy(){
+void JAudio::destroy(){
 	obj.destroy();
 }
 
-bool JATAudio::play(){
+bool JAudio::play(){
 	return obj.play();
 }
 
-bool JATAudio::stop(){
+bool JAudio::stop(){
 	return obj.stop();
 }
 
-bool JATAudio::getPlaying() const{
+bool JAudio::getPlaying() const{
 	return obj.getPlaying();
 }
 
-bool JATAudio::getFinished() const{
+bool JAudio::getFinished() const{
 	return obj.getFinished();
 }
 
-void JATAudio::setLooping(bool looping){
+void JAudio::setLooping(bool looping){
 	obj.setLooping(looping);
 }
 
-bool JATAudio::getLooping() const{
+bool JAudio::getLooping() const{
 	return obj.getLooping();
 }
 
-void JATAudio::setGain(scalar gain){
+void JAudio::setGain(scalar gain){
 	obj.setGain(gain);
 }
 
-void JATAudio::fadeToGain(scalar gain,int time){
+void JAudio::fadeToGain(scalar gain,int time){
 	obj.fadeToGain(gain,time);
 }
 
-scalar JATAudio::getGain() const{
+scalar JAudio::getGain() const{
 	return obj.getGain();
 }
 

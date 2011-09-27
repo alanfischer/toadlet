@@ -23,20 +23,20 @@
  *
  ********** Copyright header - do not remove **********/
 
-#ifndef TOADLET_RIBBIT_JATAUDIO_H
-#define TOADLET_RIBBIT_JATAUDIO_H
+#ifndef TOADLET_RIBBIT_JAUDIO_H
+#define TOADLET_RIBBIT_JAUDIO_H
 
-#include "JATAudioDevice.h"
-#include "JATAudioBuffer.h"
+#include "JAudioDevice.h"
+#include "JAudioBuffer.h"
 #include <toadlet/ribbit/Audio.h>
 
 namespace toadlet{
 namespace ribbit{
 
-class TOADLET_API JATAudio:public Audio{
+class TOADLET_API JAudio:public Audio{
 public:
-	JATAudio(JNIEnv *jenv,jobject jobj);
-	virtual ~JATAudio();
+	JAudio(JNIEnv *jenv,jobject jobj);
+	virtual ~JAudio();
 
 	bool create(AudioBuffer::ptr audioBuffer);
 	bool create(AudioStream::ptr stream);
