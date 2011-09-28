@@ -10,9 +10,8 @@
 # Each library, when at least one of the above is found, sets TOADLET_${LIBNAME}_FOUND = YES
 #  TOADLET_EGG_LIB
 #  TOADLET_FLICK_LIB
-#  TOADLET_FLICK_HTCMOTIONDEVICE_LIB
 #  TOADLET_FLICK_IOSMOTIONDEVICE_LIB
-#  TOADLET_FLICK_SAMSUNGMOTIONDEVICE_LIB
+#  TOADLET_FLICK_WIN32JOYDEVICE_LIB
 #  TOADLET_HOP_LIB
 #  TOADLET_KNOT_LIB
 #  TOADLET_PEEPER_LIB
@@ -72,9 +71,8 @@ find_path (TOADLET_INCLUDE_DIR toadlet/toadlet.h PATHS ${HEADER_SEARCH_PATHS})
 set (TOADLET_LIB_BASENAMES
 	toadlet_egg
 	toadlet_flick
-	toadlet_flick_htcmotiondevice
 	toadlet_flick_iosmotiondevice
-	toadlet_flick_samsungmotiondevice
+	toadlet_flick_win32joydevice
 	toadlet_hop
 	toadlet_knot
 	toadlet_peeper

@@ -23,37 +23,19 @@
  *
  ********** Copyright header - do not remove **********/
 
-#ifndef TOADLET_FLICK_MOTIONDEVICE_H
-#define TOADLET_FLICK_MOTIONDEVICE_H
+#ifndef TOADLET_FLICK_JOYDEVICE_H
+#define TOADLET_FLICK_JOYDEVICE_H
 
 #include <toadlet/flick/Types.h>
 
 namespace toadlet{
 namespace flick{
 
-class MotionDeviceListener;
+class JoyDeviceListener;
 
-class MotionDevice{
+class JoyDevice{
 public:
-	class MotionData{
-	public:
-		MotionData():
-			time(0){}
-
-		void set(const MotionData &data){
-			time=data.time;
-			acceleration.set(data.acceleration);
-			velocity.set(data.velocity);
-			velocityFiltered.set(data.velocityFiltered);
-		}
-
-		uint64 time;
-		Vector3 acceleration;
-		Vector3 velocity;
-		Vector3 velocityFiltered;
-	};
-
-	virtual ~MotionDevice(){}
+	virtual ~JoyDevice(){}
 
 	virtual bool create()=0;
 	virtual void destroy()=0;
@@ -63,13 +45,7 @@ public:
 	virtual bool stop()=0;
 	virtual bool isRunning()=0;
 
-	virtual void setPollSleep(int ms)=0; // Milliseconds to sleep between polls
-
-	virtual void setFilterAlpha(scalar alpha)=0;
-
-	virtual void setNativeOrientation(bool native)=0;
-
-	virtual void setListener(MotionDeviceListener *listener)=0;
+	virtual void setListener(JoyDeviceListener *listener)=0;
 };
 
 }

@@ -23,56 +23,43 @@
  *
  ********** Copyright header - do not remove **********/
 
-#ifndef TOADLET_FLICK_MOTIONDEVICE_H
-#define TOADLET_FLICK_MOTIONDEVICE_H
+#ifndef TOADLET_FLICK_WIN32JOYDEVICE_H
+#define TOADLET_FLICK_WIN32JOYDEVICE_H
 
-#include <toadlet/flick/Types.h>
+#include <toadlet/flick/JoyDevice.h>
+#include <toadlet/egg/System.h>
+#include <toadlet/egg/Logger.h>
+#include <windows.h>
 
 namespace toadlet{
 namespace flick{
 
-class MotionDeviceListener;
-
-class MotionDevice{
+class Win32JoyDevice:public JoyDevice{
 public:
-	class MotionData{
-	public:
-		MotionData():
-			time(0){}
+	Win32JoyDevice();
+	virtual ~Win32JoyDevice();
 
-		void set(const MotionData &data){
-			time=data.time;
-			acceleration.set(data.acceleration);
-			velocity.set(data.velocity);
-			velocityFiltered.set(data.velocityFiltered);
-		}
+	bool create();
+	void destroy();
 
-		uint64 time;
-		Vector3 acceleration;
-		Vector3 velocity;
-		Vector3 velocityFiltered;
-	};
+	bool start();
+	void update(int dt);
+	bool stop();
+	bool isRunning(){return mRunning;}
 
-	virtual ~MotionDevice(){}
+	void setListener(JoyDeviceListener *listener);
 
-	virtual bool create()=0;
-	virtual void destroy()=0;
+	scalar joyToScalar(int joy);
 
-	virtual bool start()=0;
-	virtual void update(int dt)=0;
-	virtual bool stop()=0;
-	virtual bool isRunning()=0;
-
-	virtual void setPollSleep(int ms)=0; // Milliseconds to sleep between polls
-
-	virtual void setFilterAlpha(scalar alpha)=0;
-
-	virtual void setNativeOrientation(bool native)=0;
-
-	virtual void setListener(MotionDeviceListener *listener)=0;
+protected:
+	bool mRunning;
+	JoyDeviceListener *mListener;
+	int mJoyID;
+	JOYINFOEX mJoyInfo,mLastJoyInfo;
 };
 
 }
 }
 
 #endif
+

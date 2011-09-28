@@ -118,11 +118,23 @@ void RandIsle::create(){
 
 	mPlayer->setSpeed(40);
 
+	JoyDevice *joyDevice=mApp->getJoyDevice();
+	if(joyDevice!=NULL){
+		joyDevice->setListener(this);
+		joyDevice->start();
+	}
+
 	Logger::debug("RandIsle::create finished");
 }
 
 void RandIsle::destroy(){
 	Logger::debug("RandIsle::destroy");
+
+	JoyDevice *joyDevice=mApp->getJoyDevice();
+	if(joyDevice!=NULL){
+		joyDevice->stop();
+		joyDevice->setListener(NULL);
+	}
 
 	mScene->destroy();
 

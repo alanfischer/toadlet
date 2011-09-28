@@ -1,4 +1,4 @@
-# Source files for toadlet_flick_iphonemotiondevice
+# Source files for toadlet_flick_iismotiondevice
 set (IOSMOTIONDEVICE_SRC
 	IOSMotionDevice.mm
 )
@@ -11,7 +11,7 @@ set (IOSMOTIONDEVICE_HEADERS
 
 
 # Dynamic library
-# Not available on iPhone platforms
+# Not available on iOS platforms
 
 
 # Static library

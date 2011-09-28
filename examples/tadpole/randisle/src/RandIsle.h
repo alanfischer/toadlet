@@ -13,7 +13,7 @@
 
 class HUD;
 
-class RandIsle:public Applet,public TerrainNodeDataSource,public UpdateListener,public TerrainNodeListener,public PathClimberListener,public RenderPathChooser{
+class RandIsle:public Applet,public TerrainNodeDataSource,public UpdateListener,public JoyDeviceListener,public TerrainNodeListener,public PathClimberListener,public RenderPathChooser{
 public:
 	enum{
 		Scope_BIT_TREE=			1<<1,
