@@ -42,10 +42,6 @@
 namespace toadlet{
 namespace flick{
 
-bool IOSMotionDevice::available(){
-	return true;
-}
-
 TOADLET_C_API MotionDevice *new_IOSMotionDevice(){
 	return new IOSMotionDevice();
 }
@@ -57,7 +53,7 @@ TOADLET_C_API MotionDevice *new_IOSMotionDevice(){
 #endif
 
 IOSMotionDevice::IOSMotionDevice():
-	mState(State_DESTROYED),
+	mRunning(false),
 	mListener(NULL),
 	mNative(false),
 	mAccelerometerDelegate(nil)
@@ -65,78 +61,42 @@ IOSMotionDevice::IOSMotionDevice():
 {}
 
 IOSMotionDevice::~IOSMotionDevice(){
-	TOADLET_ASSERT(mState==State_DESTROYED);
+	destroy();
 }
 
 bool IOSMotionDevice::create(){
-	if(mState==State_STOPPED){
-		return true;
-	}
-
-	if(mState!=State_DESTROYED){
-		Error::sequence(Categories::TOADLET_FLICK,
-			"create called out of sequence");
-		return false;
-	}
-
-	mState=State_STOPPED;
-
 	mAccelerometerDelegate=[[ToadletAccelerometerDelegate alloc] initWithMotionDevice:this];
 
 	return true;
 }
 
-bool IOSMotionDevice::startup(){
-	if(mState==State_RUNNING){
-		return true;
-	}
-
-	if(mState!=State_STOPPED){
-		Error::sequence(Categories::TOADLET_FLICK,
-			"startup called out of sequence");
-		return false;
-	}
-
-	mState=State_RUNNING;
-
+bool IOSMotionDevice::start(){
 	[UIAccelerometer sharedAccelerometer].updateInterval=0.05;
 	[UIAccelerometer sharedAccelerometer].delegate=mAccelerometerDelegate;
 
-	return true;
+	mRunning=true;
+
+	return mRunning;
 }
 
-bool IOSMotionDevice::shutdown(){
-	if(mState==State_STOPPED){
-		return true;
-	}
-
-	if(mState!=State_RUNNING){
-		Error::sequence(Categories::TOADLET_FLICK,
-			"shutdown called out of sequence");
-		return false;
-	}
-
-	mState=State_STOPPED;
-
+bool IOSMotionDevice::stop(){
+	[UIAccelerometer sharedAccelerometer].updateInterval=0;
 	[UIAccelerometer sharedAccelerometer].delegate=nil;
 
-	return true;
+	mRunning=false;
+
+	return mRunning;
 }
 
 void IOSMotionDevice::destroy(){
-	if(mState==State_DESTROYED){
-		return;
+	if(mRunning){
+		stop();
 	}
 
-	if(mState!=State_STOPPED){
-		Error::sequence(Categories::TOADLET_FLICK,
-			"destroy called out of sequence");
-		return;
+	if(mAccelerometerDelegate!=nil){
+		[mAccelerometerDelegate release];
+		mAccelerometerDelegate=nil;
 	}
-
-	mState=State_DESTROYED;
-
-	[mAccelerometerDelegate release];
 }
 
 void IOSMotionDevice::setPollSleep(int ms){
@@ -150,10 +110,6 @@ void IOSMotionDevice::setNativeOrientation(bool native){
 void IOSMotionDevice::setListener(MotionDeviceListener *listener){
 	mMotionData.time=0;
 	mListener=listener;
-}
-
-MotionDevice::State IOSMotionDevice::getState(){
-	return mState;
 }
 
 void IOSMotionDevice::didAccelerate(UIAcceleration *acceleration){

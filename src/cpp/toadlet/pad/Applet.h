@@ -53,10 +53,6 @@ public:
 	virtual void mouseMoved(int x,int y)=0;
 	virtual void mouseReleased(int x,int y,int button)=0;
 	virtual void mouseScrolled(int x,int y,int scroll)=0;
-
-	virtual void joyPressed(int button)=0;
-	virtual void joyMoved(scalar x,scalar y,scalar z,scalar r,scalar u,scalar v)=0;
-	virtual void joyReleased(int button)=0;
 };
 
 }

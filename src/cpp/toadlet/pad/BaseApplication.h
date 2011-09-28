@@ -34,6 +34,7 @@
 #include <toadlet/peeper/WindowRenderTargetFormat.h>
 #include <toadlet/ribbit/AudioDevice.h>
 #include <toadlet/flick/MotionDevice.h>
+#include <toadlet/flick/JoyDevice.h>
 #include <toadlet/tadpole/Engine.h>
 #include <toadlet/pad/Types.h>
 #include <toadlet/pad/Applet.h>
@@ -77,7 +78,7 @@ public:
 	BaseApplication();
 	virtual ~BaseApplication(){}
 
-	virtual void create(String renderDevice,String audioDevice,String motionDevice);
+	virtual void create(String renderDevice,String audioDevice,String motionDevice=(char*)NULL,String joyDevice=(char*)NULL);
 	virtual void destroy();
 
 	virtual void start()=0;
@@ -140,14 +141,11 @@ public:
 	virtual void mouseReleased(int x,int y,int button){if(mApplet!=NULL){mApplet->mouseReleased(x,y,button);}}
 	virtual void mouseScrolled(int x,int y,int scroll){if(mApplet!=NULL){mApplet->mouseScrolled(x,y,scroll);}}
 
-	virtual void joyPressed(int button)				{if(mApplet!=NULL){mApplet->joyPressed(button);}}
-	virtual void joyMoved(scalar x,scalar y,scalar z,scalar r,scalar u,scalar v){if(mApplet!=NULL){mApplet->joyMoved(x,y,z,r,u,v);}}
-	virtual void joyReleased(int button)			{if(mApplet!=NULL){mApplet->joyReleased(button);}}
-
 	virtual Engine *getEngine() const{return mEngine;}
 	virtual RenderDevice *getRenderDevice() const{return mRenderDevice;}
 	virtual AudioDevice *getAudioDevice() const{return mAudioDevice;}
 	virtual MotionDevice *getMotionDevice() const{return mMotionDevice;}
+	virtual JoyDevice *getJoyDevice() const{return mJoyDevice;}
 
 	virtual String getKeyName(int key){Map<int,String>::iterator it=mKeyToName.find(key);return it!=mKeyToName.end()?it->second:(char*)NULL;}
 	virtual int getKeyValue(const String &name){Map<String,int>::iterator it=mNameToKey.find(name);return it!=mNameToKey.end()?it->second:0;}
@@ -194,6 +192,15 @@ protected:
 		MotionDevice *(*createMotionDevice)();
 	};
 
+	class JoyDevicePlugin{
+	public:
+		JoyDevicePlugin(
+			JoyDevice *(*joyDevice)()=NULL
+		):createJoyDevice(joyDevice){}
+
+		JoyDevice *(*createJoyDevice)();
+	};
+
 	virtual RenderTarget *makeRenderTarget(const String &plugin);
 	virtual RenderDevice *makeRenderDevice(const String &plugin);
 	virtual bool createContextAndRenderDevice(const String &plugin);
@@ -206,6 +213,10 @@ protected:
 	virtual MotionDevice *makeMotionDevice(const String &plugin);
 	virtual bool createMotionDevice(const String &plugin);
 	virtual bool destroyMotionDevice();
+
+	virtual JoyDevice *makeJoyDevice(const String &plugin);
+	virtual bool createJoyDevice(const String &plugin);
+	virtual bool destroyJoyDevice();
 
 	bool mBackable;
 	WindowRenderTargetFormat::ptr mFormat;
@@ -221,6 +232,8 @@ protected:
 	int *mAudioDeviceOptions;
 	Map<String,MotionDevicePlugin> mMotionDevicePlugins;
 	Collection<String> mMotionDevicePreferences;
+	Map<String,JoyDevicePlugin> mJoyDevicePlugins;
+	Collection<String> mJoyDevicePreferences;
 
 	Map<String,int> mNameToKey;
 	Map<int,String> mKeyToName;
@@ -230,6 +243,7 @@ protected:
 	RenderDevice *mRenderDevice;
 	AudioDevice *mAudioDevice;
 	MotionDevice *mMotionDevice;
+	JoyDevice *mJoyDevice;
 };
 
 }

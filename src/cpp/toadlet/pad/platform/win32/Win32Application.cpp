@@ -28,7 +28,6 @@
 #include <toadlet/egg/Logger.h>
 #include <toadlet/pad/platform/win32/Win32Application.h>
 #include <windows.h>
-#pragma comment(lib,"winmm.lib")
 #if defined(TOADLET_PLATFORM_WINCE)
 	#include <aygshell.h>
 	#pragma comment(lib,"aygshell.lib")
@@ -95,16 +94,12 @@ using namespace toadlet::tadpole::handler;
 #if defined(TOADLET_PLATFORM_WIN32)
 	#pragma comment(lib,"toadlet_ribbit_mmaudiodevice" TOADLET_LIBRARY_EXTENSION)
 	extern "C" AudioDevice *new_MMAudioDevice();
+	#pragma comment(lib,"toadlet_flick_win32joydevice" TOADLET_LIBRARY_EXTENSION)
+	extern "C" JoyDevice *new_Win32JoyDevice();
 #endif
 #if defined(TOADLET_HAS_OPENAL)
 	#pragma comment(lib,"toadlet_ribbit_alaudiodevice" TOADLET_LIBRARY_EXTENSION)
 	extern "C" AudioDevice *new_ALAudioDevice();
-#endif
-#if defined(TOADLET_PLATFORM_WINCE)
-	#pragma comment(lib,"toadlet_flick_htcmotiondevice" TOADLET_LIBRARY_EXTENSION)
-	extern "C" MotionDevice *new_HTCMotionDevice();
-	#pragma comment(lib,"toadlet_flick_samsungmotiondevice" TOADLET_LIBRARY_EXTENSION)
-	extern "C" MotionDevice *new_SamsungMotionDevice();
 #endif
 
 namespace toadlet{
@@ -115,8 +110,6 @@ struct Win32Attributes{
 	egg::String mClassName;
 	HWND mWnd;
 	HICON mIcon;
-	int mJoyID;
-	JOYINFOEX mJoyInfo,mLastJoyInfo;
 };
 
 LRESULT CALLBACK wndProc(HWND wnd,UINT msg,WPARAM wParam,LPARAM lParam);
@@ -155,10 +148,6 @@ Win32Application::Win32Application():
 	win32->mInstance=0;
 	win32->mWnd=0;
 	win32->mIcon=0;
-	win32->mJoyID=0;
-	memset(&win32->mJoyInfo,0,sizeof(JOYINFOEX));
-	memset(&win32->mLastJoyInfo,0,sizeof(JOYINFOEX));
-
 	win32->mInstance=GetModuleHandle(NULL);
 	
 	#if defined(TOADLET_PLATFORM_WINCE)
@@ -205,12 +194,8 @@ Win32Application::Win32Application():
 	mAudioDevicePreferences.add("al");
 	mAudioDevicePreferences.add("mm");
 
-	#if defined(TOADLET_PLATFORM_WINCE)
-		mMotionDevicePlugins.add("htc",MotionDevicePlugin(new_HTCMotionDevice));
-		mMotionDevicePlugins.add("samsung",MotionDevicePlugin(new_SamsungMotionDevice));
-	#endif
-	mMotionDevicePreferences.add("htc");
-	mMotionDevicePreferences.add("samsung");
+	mJoyDevicePlugins.add("win32",JoyDevicePlugin(new_Win32JoyDevice));
+	mJoyDevicePreferences.add("win32");
 }
 
 Win32Application::~Win32Application(){
@@ -222,30 +207,12 @@ Win32Application::~Win32Application(){
 	delete win32;
 }
 
-void Win32Application::create(String renderDevice,String audioDevice,String motionDevice){
+void Win32Application::create(String renderDevice,String audioDevice){
 	mContextActive=true;
-
-	/// @todo: The Joystick/Keyboard/Mouse input should be moved to an input abstraction class useabout outside of pad or at least the Application class
-	win32->mJoyInfo.dwSize=sizeof(JOYINFOEX);
-	win32->mJoyInfo.dwFlags=JOY_RETURNALL;
-	memcpy(&win32->mLastJoyInfo,&win32->mJoyInfo,sizeof(JOYINFOEX));
-	int numJoys=0;
-	int joyID=JOYSTICKID1;
-	HRESULT result=S_OK;
-	while((result=joyGetPosEx(joyID++,&win32->mJoyInfo))!=JOYERR_PARMS){
-		if(result==JOYERR_NOERROR){numJoys++;}
-	}
-	if(numJoys>0){
-		win32->mJoyID=JOYSTICKID1;
-	}
-	else{
-		win32->mJoyID=-1;
-	}
-	Logger::alert(Categories::TOADLET_PAD,String("detected ")+numJoys+" joysticks");
 
 	createWindow();
 	
-	BaseApplication::create(renderDevice,audioDevice,motionDevice);
+	BaseApplication::create(renderDevice,audioDevice);
 
 	mResourceArchive=Win32ResourceArchive::ptr(new Win32ResourceArchive(mEngine->getTextureManager()));
 	mResourceArchive->open(win32->mInstance);
@@ -296,6 +263,14 @@ void Win32Application::runEventLoop(){
 				mAudioDevice->update(dt);
 			}
 
+			if(mMotionDevice!=NULL){
+				mMotionDevice->update(dt);
+			}
+
+			if(mJoyDevice!=NULL){
+				mJoyDevice->update(dt);
+			}
+
 			lastTime=currentTime;
 		}
 
@@ -313,32 +288,6 @@ void Win32Application::stepEventLoop(){
 			TranslateMessage(&msg);
 			DispatchMessage(&msg);
 		}
-	}
-
-	if(win32->mJoyID>=JOYSTICKID1){
-		JOYINFOEX *joyInfo=&win32->mJoyInfo,*lastJoyInfo=&win32->mLastJoyInfo;
-		MMRESULT result=joyGetPosEx(win32->mJoyID,joyInfo);
-		if(	joyInfo->dwXpos!=lastJoyInfo->dwXpos || joyInfo->dwYpos!=lastJoyInfo->dwYpos || joyInfo->dwZpos!=lastJoyInfo->dwZpos ||
-			joyInfo->dwRpos!=lastJoyInfo->dwRpos || joyInfo->dwUpos!=lastJoyInfo->dwUpos || joyInfo->dwVpos!=lastJoyInfo->dwVpos){
-			joyMoved(joyToScalar(joyInfo->dwXpos),joyToScalar(joyInfo->dwYpos),joyToScalar(joyInfo->dwZpos),joyToScalar(joyInfo->dwRpos),joyToScalar(joyInfo->dwUpos),joyToScalar(joyInfo->dwVpos));
-		}
-		if(joyInfo->dwButtons!=lastJoyInfo->dwButtons){
-			int pressedButtons=(joyInfo->dwButtons^lastJoyInfo->dwButtons)&joyInfo->dwButtons;
-			int releasedButtons=(joyInfo->dwButtons^lastJoyInfo->dwButtons)&lastJoyInfo->dwButtons;
-			int button=0;
-			while(pressedButtons>0 || releasedButtons>0){
-				if((pressedButtons&1)>0){
-					joyPressed(button);
-				}
-				if((releasedButtons&1)>0){
-					joyReleased(button);
-				}
-				pressedButtons>>=1;
-				releasedButtons>>=1;
-				button++;
-			}
-		}
-		memcpy(lastJoyInfo,joyInfo,sizeof(JOYINFOEX));
 	}
 
 	if(mCurrentRenderDevicePlugin!=mNewRenderDevicePlugin){
@@ -850,10 +799,6 @@ int Win32Application::translateKey(int key){
 	}
 
 	return key;
-}
-
-scalar Win32Application::joyToScalar(int joy){
-	return Math::fromFloat(((float)joy/(float)65536)*2-1);
 }
 
 }

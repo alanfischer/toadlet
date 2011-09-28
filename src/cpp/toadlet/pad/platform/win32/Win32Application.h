@@ -39,7 +39,7 @@ public:
 	Win32Application();
 	virtual ~Win32Application();
 
-	virtual void create(String renderDevice=(char*)NULL,String audioPlayer=(char*)NULL,String motionDevice=(char*)NULL);
+	virtual void create(String renderDevice=(char*)NULL,String audioPlayer=(char*)NULL);
 	virtual void destroy();
 
 	virtual void start();
@@ -90,7 +90,6 @@ public:
 	static int mWindowCount;
 	static ApplicationMap mApplicationMap;
 	static int translateKey(int key);
-	static scalar joyToScalar(int joy);
 
 protected:
 	bool createWindow();

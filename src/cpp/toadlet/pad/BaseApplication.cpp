@@ -88,7 +88,8 @@ BaseApplication::BaseApplication():
 	mRenderTarget(NULL),
 	mRenderDevice(NULL),
 	mAudioDevice(NULL),
-	mMotionDevice(NULL)
+	mMotionDevice(NULL),
+	mJoyDevice(NULL)
 {
 	mapKeyNames(mKeyToName,mNameToKey);
 	
@@ -104,7 +105,7 @@ BaseApplication::BaseApplication():
 	#endif
 }
 
-void BaseApplication::create(String renderDevice,String audioDevice,String motionDevice){
+void BaseApplication::create(String renderDevice,String audioDevice,String motionDevice,String joyDevice){
 	int i;
 
 	mEngine=new Engine(mBackable);
@@ -141,6 +142,16 @@ void BaseApplication::create(String renderDevice,String audioDevice,String motio
 			}
 		}
 	}
+	if(joyDevice!="null"){
+		if(joyDevice!=(char*)NULL || mJoyDevicePlugins.size()==0){
+			createJoyDevice(joyDevice);
+		}
+		else{
+			for(i=0;i<mJoyDevicePreferences.size();++i){
+				if(createJoyDevice(mJoyDevicePreferences[i])) break;
+			}
+		}
+	}
 
 	mEngine->installHandlers();
 
@@ -166,6 +177,7 @@ void BaseApplication::destroy(){
 	destroyRenderDeviceAndContext();
 	destroyAudioDevice();
 	destroyMotionDevice();
+	destroyJoyDevice();
 
 	if(mEngine!=NULL){
 		delete mEngine;
@@ -379,6 +391,55 @@ bool BaseApplication::destroyMotionDevice(){
 	}
 	return true;
 }
-	
+
+JoyDevice *BaseApplication::makeJoyDevice(const String &plugin){
+	JoyDevice *joyDevice=NULL;
+	Map<String,JoyDevicePlugin>::iterator it=mJoyDevicePlugins.find(plugin);
+	if(it!=mJoyDevicePlugins.end()){
+		TOADLET_TRY
+			joyDevice=it->second.createJoyDevice();
+		TOADLET_CATCH(const Exception &){joyDevice=NULL;}
+	}
+	return joyDevice;
+}
+
+bool BaseApplication::createJoyDevice(const String &plugin){
+	Logger::debug(Categories::TOADLET_PAD,
+		"BaseApplication: creating JoyDevice:"+plugin);
+
+	bool result=false;
+	mJoyDevice=makeJoyDevice(plugin);
+	if(mJoyDevice!=NULL){
+		TOADLET_TRY
+			result=mJoyDevice->create();
+		TOADLET_CATCH(const Exception &){result=false;}
+		if(result==false){
+			delete mJoyDevice;
+			mJoyDevice=NULL;
+		}
+	}
+
+	if(result==false){
+		Logger::error(Categories::TOADLET_PAD,
+			"error starting JoyDevice");
+		return false;
+	}
+	else if(mJoyDevice==NULL){
+		Logger::error(Categories::TOADLET_PAD,
+			"error creating JoyDevice");
+		return false;
+	}
+	return true;
+}
+
+bool BaseApplication::destroyJoyDevice(){
+	if(mJoyDevice!=NULL){
+		mJoyDevice->destroy();
+		delete mJoyDevice;
+		mJoyDevice=NULL;
+	}
+	return true;
+}
+
 }
 }
