@@ -26,6 +26,34 @@ static int ffmpegLockManager(void **mtx,enum AVLockOp op){
 	}
 }
 
+static Logger::Level ffmpegGetLogLevel(int level){
+	switch(level){
+		case AV_LOG_DEBUG:
+			return Logger::Level_EXCESS;
+		case AV_LOG_VERBOSE:
+			return Logger::Level_DEBUG;
+		case AV_LOG_INFO:
+			return Logger::Level_ALERT;
+		case AV_LOG_WARNING:
+			return Logger::Level_WARNING;
+		case AV_LOG_ERROR:
+		case AV_LOG_FATAL:
+		case AV_LOG_PANIC:
+			return Logger::Level_ERROR;
+		default:
+			return Logger::Level_ALERT;
+	}
+}
+
+static void ffmpegLogCallback(void *ptr,int level,const char *fmt,va_list vl){
+	char buffer[1024];
+	int amt=vsnprintf(buffer,sizeof(buffer),fmt,vl);
+	if(amt>0 && buffer[amt-1]=='\n'){
+		buffer[amt-1]=0; // Trim off the trailing newline
+	}
+	Logger::getInstance()->addLogEntry("ffmpeg",ffmpegGetLogLevel(level),buffer);
+}
+
 
 FFmpegAudioStream::FFmpegAudioStream(FFmpegTextureController *controller,FFmpegTextureController::StreamData *streamData):
 	mDecodeLength(0)
@@ -410,6 +438,8 @@ bool FFmpegTextureController::seek(int64 time){
 FFmpegTextureModifier::FFmpegTextureModifier(Engine *engine){
 	mEngine=engine;
 
+	av_log_set_callback(ffmpegLogCallback);
+
 	if(av_lockmgr_register(ffmpegLockManager)){
 		Error::unknown("Unable to register lock manager");
 	}
@@ -423,6 +453,8 @@ FFmpegTextureModifier::~FFmpegTextureModifier(){
 
 void FFmpegTextureModifier::destroy(){
 	av_lockmgr_register(NULL);
+
+	av_log_set_callback(NULL);
 }
 
 ResourceController::ptr FFmpegTextureModifier::open(Stream::ptr stream,Resource::ptr resource){
