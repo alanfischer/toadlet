@@ -6,6 +6,32 @@
 using namespace toadlet::pad;
 using namespace toadlet::tadpole::handler;
 
+JNIEXPORT void JNICALL Java_us_toadlet_pad_AndroidApplication_createNativeApplication(JNIEnv *env,jobject obj){
+	Application *app=new JAndroidApplication(env,obj);
+	jclass appClass=env->GetObjectClass(obj);
+	{
+		jmethodID setNativeHandleID=env->GetMethodID(appClass,"setNativeHandle","(I)V");
+		env->CallVoidMethod(obj,setNativeHandleID,(int)app);
+	}
+	env->DeleteLocalRef(appClass);
+}
+
+JNIEXPORT void JNICALL Java_us_toadlet_pad_AndroidApplication_destroyNativeApplication(JNIEnv *env,jobject obj){
+	Application *app=NULL;
+	jclass appClass=env->GetObjectClass(obj);
+	{
+		jmethodID getNativeHandleID=env->GetMethodID(appClass,"getNativeHandle","()I");
+		app=(Application*)env->CallIntMethod(obj,getNativeHandleID);
+
+		delete app;
+		app=NULL;
+
+		jmethodID setNativeHandleID=env->GetMethodID(appClass,"setNativeHandle","(I)V");
+		env->CallVoidMethod(obj,setNativeHandleID,(int)app);
+	}
+	env->DeleteLocalRef(appClass);
+}
+
 JNIEXPORT jobject JNICALL Java_us_toadlet_pad_AndroidApplication_makeEngine(JNIEnv *env,jobject obj){
 	Engine *engine=new Engine(true);
 	jobject jengine=NULL;
@@ -34,7 +60,7 @@ JNIEXPORT jobject JNICALL Java_us_toadlet_pad_AndroidApplication_makeEngine(JNIE
 	return jengine;
 }
 
-JNIEXPORT jobject JNICALL Java_us_toadlet_pad_AndroidApplication_deleteEngine(JNIEnv *env,jobject obj,jobject engineObj){
+JNIEXPORT void JNICALL Java_us_toadlet_pad_AndroidApplication_deleteEngine(JNIEnv *env,jobject obj,jobject engineObj){
 	Engine *engine=NULL;
 
 	jclass engineClass=env->FindClass("us/toadlet/pad/Engine");
@@ -45,6 +71,23 @@ JNIEXPORT jobject JNICALL Java_us_toadlet_pad_AndroidApplication_deleteEngine(JN
 	env->DeleteLocalRef(engineClass);
 	
 	delete engine;
+}
+
+JNIEXPORT jboolean JNICALL Java_us_toadlet_pad_AndroidApplication_notifyEngineRenderDevice(JNIEnv *env,jobject obj){
+	Java_us_toadlet_pad(env);
+	JAndroidApplication *app=(JAndroidApplication*)env->CallIntMethod(obj,getNativeHandleApplicationID);
+	Engine *engine=app->getEngine();
+	RenderDevice *device=app->getRenderDevice();
+	return engine->setRenderDevice(device);
+}
+
+JNIEXPORT jboolean JNICALL Java_us_toadlet_pad_AndroidApplication_notifyEngineAudioDevice(JNIEnv *env,jobject obj){
+	Java_us_toadlet_pad(env);
+	JAndroidApplication *app=(JAndroidApplication*)env->CallIntMethod(obj,getNativeHandleApplicationID);
+	Engine *engine=app->getEngine();
+	AudioDevice *device=app->getAudioDevice();
+	bool b=engine->setAudioDevice(device);
+	return b;
 }
 
 JNIEXPORT jobject JNICALL Java_us_toadlet_pad_AndroidApplication_makeRenderDevice(JNIEnv *env,jobject obj){

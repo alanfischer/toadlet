@@ -64,6 +64,7 @@ set (RIBBIT_SRC
 	${JAVA_SRC_DIR}/ribbit/ATAudioBuffer.java
 	${JAVA_SRC_DIR}/ribbit/ATAudio.java
 	${JAVA_SRC_DIR}/ribbit/ATAudioDevice.java
+	${JAVA_SRC_DIR}/ribbit/NAudioStream.java
 	${CMAKE_CURRENT_BINARY_DIR}/${JAVA_SRC_DIR}/ribbit/Version.java
 )
 
@@ -91,6 +92,6 @@ set (PAD_SRC
 add_library (jtoadlet_pad STATIC ${PAD_SRC})
 set_target_properties (jtoadlet_pad PROPERTIES COMPILE_FLAGS "-d \"${PAD_OBJ_DIR}\"")
 set_target_properties (jtoadlet_pad PROPERTIES COMPILE_DEFINITIONS_DEBUG TOADLET_DEBUG DEBUG_POSTFIX _d)
-add_dependencies (jtoadlet_pad jtoadlet_peeper)
+add_dependencies (jtoadlet_pad jtoadlet_peeper jtoadlet_ribbit)
 install (TARGETS jtoadlet_pad DESTINATION lib)
 

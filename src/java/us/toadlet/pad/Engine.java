@@ -25,15 +25,14 @@
 
 package us.toadlet.pad;
 
+import us.toadlet.ribbit.*;
+
 public class Engine{
 	public Engine(int nativeHandle){mNativeHandle=nativeHandle;}
 
 	public native void destroy();
 
 	public native void installHandlers();
-	
-	public native boolean setRenderDevice(RenderDevice device);
-	public native boolean setAuioDevice(AudioDevice device);
 
 	public int getNativeHandle(){return mNativeHandle;}
 	protected int mNativeHandle;

@@ -28,6 +28,7 @@ package us.toadlet.ribbit;
 import java.io.InputStream;
 
 public abstract class AudioStream extends InputStream{
-	public abstract boolean startStream(InputStream stream);
 	public abstract AudioFormat getAudioFormat();
+
+	public int read(){throw new RuntimeException("read() is not available in AudioStream");}
 }

@@ -23,6 +23,7 @@
 #  TOADLET_RIBBIT_LIB
 #  TOADLET_RIBBIT_ALAUIODEVICE_LIB
 #  TOADLET_RIBBIT_MMAUIODEVICE_LIB
+#  TOADLET_RIBBIT_JAUIODEVICE_LIB
 #  TOADLET_TADPOLE_LIB
 #  TOADLET_TADPOLE_HOP_LIB
 #  TOADLET_PAD_LIB
@@ -84,6 +85,7 @@ set (TOADLET_LIB_BASENAMES
 	toadlet_ribbit
 	toadlet_ribbit_alaudiodevice
 	toadlet_ribbit_mmaudiodevice
+	toadlet_ribbit_jaudiodevice
 	toadlet_tadpole
 	toadlet_tadpole_hop
 	toadlet_pad
@@ -93,7 +95,7 @@ set (TOADLET_LIB_BASENAMES
 if (ANDROID) 
 	if (${ANDROID_NDK_API_LEVEL} LESS 9)
 		set (LIBRARY_SEARCH_SUFFIXES ${NDK_NAME_ARCH})
-		set (TOADLET_JAR_BASENAMES jtoadlet_peeper jtoadlet_pad)
+		set (TOADLET_JAR_BASENAMES jtoadlet_peeper jtoadlet_ribbit jtoadlet_pad)
 
 		# Search for and assign the android jar files
 		foreach (TOADLET_JAR ${TOADLET_JAR_BASENAMES})

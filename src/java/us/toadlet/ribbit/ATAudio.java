@@ -29,7 +29,7 @@ import android.media.AudioTrack;
 import android.media.AudioFormat;
 import android.media.AudioManager;
 
-class ATAudio implements Audio{
+public class ATAudio implements Audio{
 	public ATAudio(){
 		mGain=1.0f;
 	}

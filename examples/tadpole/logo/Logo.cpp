@@ -103,7 +103,7 @@ void Logo::create(){
 	MotionDevice *motionDevice=app->getMotionDevice();
 	if(motionDevice!=NULL){
 		cameraNode->addNodeListener(NodeListener::ptr(new GravityFollower(motionDevice)));
-		motionDevice->startup();
+		motionDevice->start();
 	}
 #endif
 }

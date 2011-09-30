@@ -32,67 +32,95 @@ namespace ribbit{
 
 JAudio::JAudio(JNIEnv *jenv,jobject jobj){
 	env=jenv;
-	obj=jobj;
+	obj=env->NewGlobalRef(jobj);
+
+	jclass audioClass=env->GetObjectClass(obj);
+	{
+		createAudioBufferID=env->GetMethodID(audioClass,"create","(Lus/toadlet/ribbit/AudioBuffer;)Z");
+		createAudioStreamID=env->GetMethodID(audioClass,"create","(Lus/toadlet/ribbit/AudioStream;)Z");
+		destroyID=env->GetMethodID(audioClass,"destroy","()V");
+
+		playID=env->GetMethodID(audioClass,"play","()Z");
+		stopID=env->GetMethodID(audioClass,"stop","()Z");
+
+		getPlayingID=env->GetMethodID(audioClass,"getPlaying","()Z");
+		getFinishedID=env->GetMethodID(audioClass,"getFinished","()Z");
+
+		setLoopingID=env->GetMethodID(audioClass,"setLooping","(Z)V");
+		getLoopingID=env->GetMethodID(audioClass,"getLooping","()Z");
+
+		setGainID=env->GetMethodID(audioClass,"setGain","(F)Z");
+		fadeToGainID=env->GetMethodID(audioClass,"fadeToGain","(FI)Z");
+		getGainID=env->GetMethodID(audioClass,"getGain","()F");
+	}
+	env->DeleteLocalRef(audioClass);
 }
 
 JAudio::~JAudio(){
-	destroy();
+	env->DeleteGlobalRef(obj);
+	obj=NULL;
+	env=NULL;
 }
 
 bool JAudio::create(AudioBuffer::ptr audioBuffer){
-	mAudioBuffer=audioBuffer;
+	mAudioBuffer=audioBuffer; // Store the pointer until we have reference counting
+	jobject audioBufferObj=((JAudioBuffer*)audioBuffer->getRootAudioBuffer())->getJObject();
 
-	jobject jbuffer=((JAudioBuffer*)audioBuffer->getRootAudioBuffer())->getNativeHandle();
-
-	return obj.create(jbuffer);
+	return env->CallBooleanMethod(obj,createAudioBufferID,audioBufferObj);
 }
 
 bool JAudio::create(AudioStream::ptr audioStream){
-	mAudioStream=audioStream;
+	mAudioStream=audioStream; // Store the pointer until we have reference counting
+	jobject audioStreamObj=NULL;
 
-	jobject jstream=create NAudioStream(audioStream);
+	jclass streamClass=env->FindClass("us/toadlet/ribbit/NAudioStream");
+	{
+		jmethodID initID=env->GetMethodID(streamClass,"<init>","(I)V");
+		audioStreamObj=env->NewObject(streamClass,initID,(int)audioStream.get());
+	}
+	env->DeleteLocalRef(streamClass);
 
-	return obj.create(jstream);
+	return env->CallBooleanMethod(obj,createAudioStreamID,audioStreamObj);
 }
 
 void JAudio::destroy(){
-	obj.destroy();
+	env->CallVoidMethod(obj,destroyID);
 }
 
 bool JAudio::play(){
-	return obj.play();
+	return env->CallBooleanMethod(obj,playID);
 }
 
 bool JAudio::stop(){
-	return obj.stop();
+	return env->CallBooleanMethod(obj,stopID);
 }
 
 bool JAudio::getPlaying() const{
-	return obj.getPlaying();
+	return env->CallBooleanMethod(obj,getPlayingID);
 }
 
 bool JAudio::getFinished() const{
-	return obj.getFinished();
+	return env->CallBooleanMethod(obj,getFinishedID);
 }
 
 void JAudio::setLooping(bool looping){
-	obj.setLooping(looping);
+	env->CallVoidMethod(obj,setLoopingID,looping);
 }
 
 bool JAudio::getLooping() const{
-	return obj.getLooping();
+	return env->CallBooleanMethod(obj,getLoopingID);
 }
 
 void JAudio::setGain(scalar gain){
-	obj.setGain(gain);
+	env->CallVoidMethod(obj,setGainID,(float)gain);
 }
 
 void JAudio::fadeToGain(scalar gain,int time){
-	obj.fadeToGain(gain,time);
+	env->CallVoidMethod(obj,fadeToGainID,(float)gain,time);
 }
 
 scalar JAudio::getGain() const{
-	return obj.getGain();
+	return env->CallFloatMethod(obj,getGainID);
 }
 
 }

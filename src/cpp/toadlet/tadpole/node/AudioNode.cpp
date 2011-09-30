@@ -82,7 +82,7 @@ bool AudioNode::setAudioBuffer(const AudioBuffer::ptr &audioBuffer){
 	}
 
 	if(mEngine->getAudioDevice()!=NULL){
-		mAudio=Audio::ptr(mEngine->getAudioDevice()->createBufferedAudio());
+		mAudio=Audio::ptr(mEngine->getAudioDevice()->createAudio());
 	}
 	if(mAudio!=NULL){
 		mAudio->create(audioBuffer);
@@ -102,7 +102,7 @@ bool AudioNode::setAudioStream(AudioStream::ptr stream){
 		mAudio->destroy();
 	}
 
-	mAudio=Audio::ptr(mEngine->getAudioDevice()->createStreamingAudio());
+	mAudio=Audio::ptr(mEngine->getAudioDevice()->createAudio());
 	if(mAudio!=NULL){
 		mAudio->create(stream);
 		return true;

@@ -199,11 +199,7 @@ AudioBuffer *ALAudioDevice::createAudioBuffer(){
 	return new ALAudioBuffer(this);
 }
 
-Audio *ALAudioDevice::createBufferedAudio(){
-	return new ALAudio(this);
-}
-
-Audio *ALAudioDevice::createStreamingAudio(){
+Audio *ALAudioDevice::createAudio(){
 	return new ALAudio(this);
 }
 

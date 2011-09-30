@@ -53,8 +53,7 @@ public:
 	void destroy();
 
 	AudioBuffer *createAudioBuffer();
-	Audio *createBufferedAudio();
-	Audio *createStreamingAudio();
+	Audio *createAudio();
 
 	void setListenerTranslate(const Vector3 &translate){}
 	void setListenerRotate(const Matrix3x3 &rotate){}

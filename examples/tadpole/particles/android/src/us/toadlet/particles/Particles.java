@@ -17,8 +17,6 @@ public class Particles extends AndroidApplication{
     protected void onCreate(Bundle icicle){
 		System.out.println("onCreate");
 
-//		setApplet(createApplet(this));
-
 		super.onCreate(icicle);
     }
 
@@ -26,8 +24,6 @@ public class Particles extends AndroidApplication{
 		System.out.println("onDestroy");
 
         super.onDestroy();
-		
-//		destroyApplet(getApplet());
     }
 	
 	protected native Applet createApplet(AndroidApplication app);

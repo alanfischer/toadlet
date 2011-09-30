@@ -25,7 +25,9 @@
 
 #include "JAndroidApplication.h"
 #include <toadlet/egg/Error.h>
+#include <toadlet/egg/Logger.h>
 
+using namespace toadlet::egg;
 using namespace toadlet::peeper;
 using namespace toadlet::ribbit;
 using namespace toadlet::flick;
@@ -33,14 +35,18 @@ using namespace toadlet::tadpole;
 using namespace toadlet::pad;
 
 TOADLET_C_API RenderDevice* new_GLRenderDevice();
-TOADLET_C_API RenderDevice* new_JATRenderDevice(JNIEnv *env,jobject obj);
+TOADLET_C_API AudioDevice* new_JAudioDevice(JNIEnv *env,jobject obj);
 
 bool Java_us_toadlet_pad_init=false;
 jmethodID getRootRenderTargetRenderTargetID=0;
 jmethodID getNativeHandleRenderDeviceID=0;
+jmethodID getNativeHandleAudioDeviceID=0;
 jmethodID getNativeHandleEngineID=0;
 jmethodID getNativeHandleAppletID=0;
+jmethodID getNativeHandleApplicationID=0;
 
+extern "C" JNIEXPORT void JNICALL Java_us_toadlet_pad_AndroidApplication_createNativeApplication(JNIEnv *env,jobject obj);
+extern "C" JNIEXPORT void JNICALL Java_us_toadlet_pad_AndroidApplication_destroyNativeApplication(JNIEnv *env,jobject obj);
 extern "C" JNIEXPORT jobject JNICALL Java_us_toadlet_pad_AndroidApplication_makeEngine(JNIEnv *env,jobject obj);
 extern "C" JNIEXPORT jobject JNICALL Java_us_toadlet_pad_AndroidApplication_makeRenderDevice(JNIEnv *env,jobject obj);
 void Java_us_toadlet_pad(JNIEnv *env);
@@ -51,7 +57,12 @@ namespace pad{
 // Method signatures: http://dev.kanngard.net/Permalinks/ID_20050509144235.html
 JAndroidApplication::JAndroidApplication(JNIEnv *jenv,jobject jobj):
 	env(NULL),
-	obj(NULL)
+	obj(NULL),
+
+	mRenderDevice(NULL),
+	mLastRenderDeviceObj(NULL),
+	mAudioDevice(NULL),
+	mLastAudioDeviceObj(NULL)
 {
 	env=jenv;
 	obj=env->NewGlobalRef(jobj);
@@ -67,8 +78,14 @@ JAndroidApplication::JAndroidApplication(JNIEnv *jenv,jobject jobj):
 		setDifferenceMouseID=env->GetMethodID(appClass,"setDifferenceMouse","(Z)V");
 		getEngineID=env->GetMethodID(appClass,"getEngine","()Lus/toadlet/pad/Engine;");
 		getRenderDeviceID=env->GetMethodID(appClass,"getRenderDevice","()Lus/toadlet/pad/RenderDevice;");
+		getAudioDeviceID=env->GetMethodID(appClass,"getAudioDevice","()Lus/toadlet/ribbit/AudioDevice;");
+
+		setNativeHandleID=env->GetMethodID(appClass,"setNativeHandle","(I)V");
+		getNativeHandleID=env->GetMethodID(appClass,"getNativeHandle","()I");
 	}
 	env->DeleteLocalRef(appClass);
+
+	env->CallVoidMethod(obj,setNativeHandleID,(int)this);
 
 	Java_us_toadlet_pad(env);
 }
@@ -151,7 +168,7 @@ AudioDevice *JAndroidApplication::getAudioDevice(){
 		//	mAudioDevice=(AudioDevice*)env->CallIntMethod(deviceObj,getNativeHandleAudioDeviceID);
 		//}
 		//else{
-			mAudioDevice=new JATAudioDevice(env,deviceObj);
+			mAudioDevice=new_JAudioDevice(env,deviceObj);
 		//
 
 		if(mLastAudioDeviceObj!=NULL){
@@ -201,6 +218,12 @@ void Java_us_toadlet_pad(JNIEnv *env){
 			getNativeHandleAppletID=env->GetMethodID(appletClass,"getNativeHandle","()I");
 		}
 		env->DeleteLocalRef(appletClass);
+
+		jclass appClass=env->FindClass("us/toadlet/pad/AndroidApplication");
+		{
+			getNativeHandleApplicationID=env->GetMethodID(appClass,"getNativeHandle","()I");
+		}
+		env->DeleteLocalRef(appClass);
 	}
 }
 

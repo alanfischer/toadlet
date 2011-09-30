@@ -29,7 +29,7 @@ import android.media.AudioTrack;
 import android.media.AudioFormat;
 import android.media.AudioManager;
 
-class ATAudioBuffer implements AudioBuffer{
+public class ATAudioBuffer implements AudioBuffer{
 	public ATAudioBuffer(){}
 
 	public AudioBuffer getRootAudioBuffer(){return this;}

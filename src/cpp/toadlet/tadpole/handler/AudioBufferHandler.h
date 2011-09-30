@@ -41,7 +41,7 @@ public:
 
 	virtual AudioStream::ptr createAudioStream(Stream::ptr stream)=0;
 
-	Resource::ptr load(Stream::ptr stream,ResourceData *data){
+	Resource::ptr load(Stream::ptr stream,ResourceData *data,ProgressListener *listener){
 		return mAudioBufferManager->createAudioBuffer(createAudioStream(stream));
 	}
 

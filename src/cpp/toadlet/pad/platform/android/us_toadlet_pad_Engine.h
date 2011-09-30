@@ -23,14 +23,6 @@ JNIEXPORT void JNICALL Java_us_toadlet_pad_Engine_destroy
 JNIEXPORT void JNICALL Java_us_toadlet_pad_Engine_installHandlers
   (JNIEnv *, jobject);
 
-/*
- * Class:     us_toadlet_pad_Engine
- * Method:    setRenderDevice
- * Signature: (Lus/toadlet/pad/RenderDevice;)Z
- */
-JNIEXPORT jboolean JNICALL Java_us_toadlet_pad_Engine_setRenderDevice
-  (JNIEnv *, jobject, jobject);
-
 #ifdef __cplusplus
 }
 #endif

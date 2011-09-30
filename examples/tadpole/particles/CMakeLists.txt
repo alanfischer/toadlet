@@ -14,9 +14,6 @@ include_directories (${particles_SOURCE_DIR} ${TOADLET_INCLUDE_DIR})
 # Libraries
 set (LIBS ${TOADLET_LIBRARIES})
 
-message ( ${TOADLET_EGG_LIB_S} )
-message ( ${TOADLET_TADPOLE_LIB_S} )
-
 # Source files
 set (SRC
 	../../main/toadletApp.cpp

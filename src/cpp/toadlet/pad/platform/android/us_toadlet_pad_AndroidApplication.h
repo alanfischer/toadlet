@@ -9,6 +9,22 @@ extern "C" {
 #endif
 /*
  * Class:     us_toadlet_pad_AndroidApplication
+ * Method:    createNativeApplication
+ * Signature: ()V
+ */
+JNIEXPORT void JNICALL Java_us_toadlet_pad_AndroidApplication_createNativeApplication
+  (JNIEnv *, jobject);
+
+/*
+ * Class:     us_toadlet_pad_AndroidApplication
+ * Method:    destroyNativeApplication
+ * Signature: ()V
+ */
+JNIEXPORT void JNICALL Java_us_toadlet_pad_AndroidApplication_destroyNativeApplication
+  (JNIEnv *, jobject);
+
+/*
+ * Class:     us_toadlet_pad_AndroidApplication
  * Method:    makeEngine
  * Signature: ()Lus/toadlet/pad/Engine;
  */
@@ -20,8 +36,24 @@ JNIEXPORT jobject JNICALL Java_us_toadlet_pad_AndroidApplication_makeEngine
  * Method:    deleteEngine
  * Signature: (Lus/toadlet/pad/Engine;)V
  */
-JNIEXPORT jobject JNICALL Java_us_toadlet_pad_AndroidApplication_deleteEngine
+JNIEXPORT void JNICALL Java_us_toadlet_pad_AndroidApplication_deleteEngine
   (JNIEnv *, jobject, jobject);
+
+/*
+ * Class:     us_toadlet_pad_AndroidApplication
+ * Method:    notifyEngineRenderDevice
+ * Signature: ()Z
+ */
+JNIEXPORT jboolean JNICALL Java_us_toadlet_pad_AndroidApplication_notifyEngineRenderDevice
+  (JNIEnv *, jobject);
+
+/*
+ * Class:     us_toadlet_pad_AndroidApplication
+ * Method:    notifyEngineAudioDevice
+ * Signature: ()Z
+ */
+JNIEXPORT jboolean JNICALL Java_us_toadlet_pad_AndroidApplication_notifyEngineAudioDevice
+  (JNIEnv *, jobject);
 
 /*
  * Class:     us_toadlet_pad_AndroidApplication
