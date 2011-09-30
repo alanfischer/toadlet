@@ -293,7 +293,7 @@ bool FFmpegTextureController::open(Stream::ptr stream,Resource::ptr resource){
 	if(audioStreamData->codecCtx!=NULL){
 		mAudioStream=FFmpegAudioStream::ptr(new FFmpegAudioStream(this,audioStreamData));
 
-		mAudio=Audio::ptr(mEngine->getAudioDevice()->createStreamingAudio());
+		mAudio=Audio::ptr(mEngine->getAudioDevice()->createAudio());
 		mAudio->create(shared_static_cast<AudioStream>(mAudioStream));
 	};
 

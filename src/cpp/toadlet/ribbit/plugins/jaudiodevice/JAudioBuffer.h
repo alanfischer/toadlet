@@ -46,10 +46,14 @@ public:
 	bool create(AudioStream::ptr stream);
 	void destroy();
 
+	inline jobject getJObject(){return obj;}
+
 protected:
 	JNIEnv *env;
 	jobject obj;
 	jmethodID createID,destroyID;
+
+	AudioStream::ptr mAudioStream;
 };
 
 }

@@ -29,6 +29,7 @@
 #include <toadlet/pad/Types.h>
 #include <toadlet/tadpole/Engine.h>
 #include <toadlet/flick/MotionDevice.h>
+#include <toadlet/flick/JoyDevice.h>
 #include <jni.h>
 
 namespace toadlet{
@@ -81,12 +82,19 @@ public:
 
 	virtual Engine *getEngine();
 	virtual RenderDevice *getRenderDevice();
+	virtual AudioDevice *getAudioDevice();
 	virtual MotionDevice *getMotionDevice(){return NULL;}
+	virtual JoyDevice *getJoyDevice(){return NULL;}
 
 protected:
 	JNIEnv *env;
 	jobject obj;
-	jmethodID createID,destroyID,startID,stopID,setDifferenceMouseID,getWidthID,getHeightID,getEngineID,getRenderDeviceID;
+	jmethodID createID,destroyID,startID,stopID,setDifferenceMouseID,getWidthID,getHeightID,getEngineID,getRenderDeviceID,getAudioDeviceID,setNativeHandleID,getNativeHandleID;
+
+	RenderDevice *mRenderDevice;
+	jobject mLastRenderDeviceObj;
+	AudioDevice *mAudioDevice;
+	jobject mLastAudioDeviceObj;
 };
 
 }

@@ -42,7 +42,7 @@ public:
 
 	virtual void destroy(){}
 
-	virtual Resource::ptr load(Stream::ptr stream,ResourceData *data,ProgressListener *listener){return Resource::ptr();}
+	virtual Resource::ptr load(Stream::ptr stream,ResourceData *data,ProgressListener *listener)=0;
 	virtual bool save(Stream::ptr stream,Resource::ptr resource,ResourceData *data,ProgressListener *listener){return false;}
 };
 

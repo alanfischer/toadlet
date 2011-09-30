@@ -96,7 +96,7 @@ public abstract class AndroidApplication extends Activity implements RenderTarge
 
 	protected void onCreate(Bundle bundle){
 		super.onCreate(bundle);
-
+		
 		create();
 	}
 
@@ -184,14 +184,16 @@ public abstract class AndroidApplication extends Activity implements RenderTarge
 	protected abstract void destroyApplet(Applet applet);
 
 	public void run(){
-		mAudioDevice=makeAudioDevice();
-		if(mAudioDevice!=null){
-			mEngine.setAudioDevice(mAudioDevice);
-		}
+		createNativeApplication();
 
 		mEngine=makeEngine();
 		mEngine.installHandlers();
-	
+		mAudioDevice=makeAudioDevice();
+		if(mAudioDevice.create()==false){
+			mAudioDevice=null;
+		}
+		notifyEngineAudioDevice(mEngine);
+		
 if(mApplet==null){
 	setApplet(createApplet(this));
 	mApplet.create();
@@ -283,6 +285,8 @@ if(mApplet==null){
 			deleteAudioDevice(mAudioDevice);
 			mAudioDevice=null;
 		}
+
+		destroyNativeApplication();
 	}
 
 	synchronized void notifyKeyPressed(int key){
@@ -399,6 +403,7 @@ if(mApplet==null){
 
 	public Engine getEngine(){return mEngine;}
 	public RenderDevice getRenderDevice(){return mRenderDevice;}
+	public AudioDevice getAudioDevice(){return mAudioDevice;}
 
 	public void resized(int width,int height)		{if(mApplet!=null)mApplet.resized(width,height);}
 	public void focusGained()						{if(mApplet!=null)mApplet.focusGained();}
@@ -439,7 +444,7 @@ if(mApplet==null){
 
 		if(mRenderDevice!=null){
 			mRenderDevice.setRenderTarget(this);
-			mEngine.setRenderDevice(mRenderDevice);
+			notifyEngineRenderDevice(mEngine);
 		}
 	}
 
@@ -448,7 +453,7 @@ if(mApplet==null){
 			"AndroidApplication.surfaceDestroyed");
 
 		if(mRenderDevice!=null){
-			mEngine.setRenderDevice(null);
+			notifyEngineRenderDevice(mEngine);
 			mRenderDevice.destroy();
 			deleteRenderDevice(mRenderDevice);
 			mRenderDevice=null;
@@ -478,11 +483,18 @@ if(mApplet==null){
 		return target;
 	}
 
+	public void setNativeHandle(int handle){mNativeHandle=handle;}
+	public int getNativeHandle(){return mNativeHandle;}
+
 	protected AudioDevice makeAudioDevice(){return new ATAudioDevice();}
 	protected void deleteAudioDevice(AudioDevice device){}
 
+	protected native void createNativeApplication();
+	protected native void destroyNativeApplication();
 	protected native Engine makeEngine();
 	protected native void deleteEngine(Engine engine);
+	protected native boolean notifyEngineRenderDevice(Engine engine);
+	protected native boolean notifyEngineAudioDevice(Engine engine);
 	protected native RenderDevice makeRenderDevice();
 	protected native void deleteRenderDevice(RenderDevice device);
 	
@@ -501,6 +513,7 @@ if(mApplet==null){
 	protected RenderDevice mRenderDevice;
 	protected AudioDevice mAudioDevice;
 //	protected MotionDevice mMotionDevice;
+	protected int mNativeHandle;
 		
 	protected SurfaceHolder mNotifySurfaceCreated;
 	protected SurfaceHolder mNotifySurfaceDestroyed;

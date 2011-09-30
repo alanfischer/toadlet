@@ -25,34 +25,13 @@
 
 package us.toadlet.ribbit;
 
-public class ATAudioDevice implements AudioDevice{
-	public ATAudioDevice(){
-		mCaps=new AudioCaps();
-		mCaps.maxSources=16;
-		mCaps.streaming=true;
-		mCaps.positional=false;
-	}
+public class NAudioStream extends AudioStream{
+	public  NAudioStream(int nativeHandle){mNativeHandle=nativeHandle;}
 
-	public boolean create(){
-		System.out.println("ATAudioDevice.create");
-		return true;
-	}
-	public void destroy(){
-		System.out.println("ATAudioDevice.destroy");
-	}
-	
-	public AudioBuffer createAudioBuffer(){return new ATAudioBuffer();}
-	public Audio createAudio(){return new ATAudio();}
+	public native AudioFormat getAudioFormat();
+	public native int available();
+	public native int read(byte[] b,int off,int len);
 
-	/// @todo: implement gain
-	public void setListenerGain(float gain){}
-	
-	public void update(int dt){}
-	
-	public void suspend(){}
-	public void resume(){}
-
-	public boolean getAudioCaps(AudioCaps caps){caps.set(mCaps);return true;}
-
-	AudioCaps mCaps;
+	public int getNativeHandle(){return mNativeHandle;}
+	protected int mNativeHandle;
 }

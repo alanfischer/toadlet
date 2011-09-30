@@ -486,6 +486,7 @@ void Engine::updateVertexFormats(){
 }
 
 bool Engine::setAudioDevice(AudioDevice *audioDevice){
+Logger::alert(String("SETTING AUDIO DEVICE:")+(int)audioDevice);
 	if(audioDevice!=NULL){
 		if(mBackable==false && mAudioDeviceChanged){
 			Error::unknown(Categories::TOADLET_TADPOLE,"can not change AudioDevice in an unbacked engine");

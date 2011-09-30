@@ -24,25 +24,54 @@
  ********** Copyright header - do not remove **********/
 
 #include "JAudioBuffer.h"
+#include <toadlet/egg/Logger.h>
 
 namespace toadlet{
 namespace ribbit{
 
 JAudioBuffer::JAudioBuffer(JNIEnv *jenv,jobject jobj):BaseResource(){
 	env=jenv;
-	obj=jobj;
+	obj=env->NewGlobalRef(jobj);
+
+	jclass bufferClass=env->GetObjectClass(obj);
+	{
+		createID=env->GetMethodID(bufferClass,"create","(Lus/toadlet/ribbit/AudioStream;)Z");
+		destroyID=env->GetMethodID(bufferClass,"destroy","()V");
+	}
+	env->DeleteLocalRef(bufferClass);
 }
 
 JAudioBuffer::~JAudioBuffer(){
-	destroy();
+	env->DeleteGlobalRef(obj);
+	obj=NULL;
+	env=NULL;
 }
 
 bool JAudioBuffer::create(AudioStream::ptr stream){
-	jobject jstream=create NAudioStream;
+	mAudioStream=stream; // Store the pointer until we have reference counting
+	jobject jstream=NULL;
 
-	bool result=jobj->create(jstream);
+	jclass streamClass=env->FindClass("us/toadlet/ribbit/NAudioStream");
+jthrowable exc=env->ExceptionOccurred();
+if(exc!=NULL){
+	env->ExceptionDescribe();
+	env->ExceptionClear();
+	return false;
+}
+Logger::alert(String("STREMCLASS:")+streamClass);
+	{
+		jmethodID initID=env->GetMethodID(streamClass,"<init>","(I)V");
+		jstream=env->NewObject(streamClass,initID,(int)stream.get());
+	}
+	env->DeleteLocalRef(streamClass);
+exc=env->ExceptionOccurred();
+if(exc!=NULL){
+	env->ExceptionDescribe();
+	env->ExceptionClear();
+	return false;
+}
 
-	return result;
+	return env->CallBooleanMethod(obj,createID,jstream);
 }
 
 void JAudioBuffer::destroy(){

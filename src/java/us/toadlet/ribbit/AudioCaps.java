@@ -25,7 +25,7 @@
 
 package us.toadlet.ribbit;
 
-class AudioCaps{
+public class AudioCaps{
 	public AudioCaps(){}
 
 	AudioCaps set(AudioCaps caps){

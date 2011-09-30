@@ -1,15 +1,24 @@
 #include "../../src/RandIsle.h"
 #include <jni.h>
 
-JAndroidApplication *application=NULL;
 Applet *applet=NULL;
 
-extern "C" JNIEXPORT jobject JNICALL Java_us_toadlet_randisle_RandIsle_createApplet(JNIEnv *env,jobject obj,jobject app){
-	Logger::alert("Creating application");
-	application=new JAndroidApplication(env,app);
+void Java_us_toadlet_pad(JNIEnv *env);
 
-	Logger::alert("Creating applet");
-	applet=new RandIsle(application,"");
+extern "C" JNIEXPORT jobject JNICALL Java_us_toadlet_randisle_RandIsle_createApplet(JNIEnv *env,jobject obj){
+	Java_us_toadlet_pad(env);
+
+	Logger::alert("getting Application");
+	Application *app=NULL;
+	jclass appClass=env->GetObjectClass(obj);
+	{
+		jmethodID getNativeHandleID=env->GetMethodID(appClass,"getNativeHandle","()I");
+		app=(Application*)env->CallIntMethod(obj,getNativeHandleID);
+	}
+	env->DeleteLocalRef(appClass);
+
+	Logger::alert("creating applet");
+	applet=new RandIsle(app,"");
 
 	jobject japplet=NULL;
 
@@ -27,5 +36,4 @@ extern "C" JNIEXPORT jobject JNICALL Java_us_toadlet_randisle_RandIsle_createApp
 
 extern "C" JNIEXPORT void JNICALL Java_us_toadlet_randisle_RandIsle_destroyApplet(JNIEnv *env,jobject obj,jobject applet){
 	delete applet;
-	delete application;
 }

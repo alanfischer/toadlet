@@ -30,7 +30,7 @@
 #include <toadlet/ribbit/AudioDevice.h>
 #include <toadlet/ribbit/AudioBuffer.h>
 #include <toadlet/ribbit/AudioCaps.h>
-#include <jnih>
+#include <jni.h>
 
 namespace toadlet{
 namespace ribbit{
@@ -44,8 +44,7 @@ public:
 	void destroy();
 
 	AudioBuffer *createAudioBuffer();
-	Audio *createBufferedAudio();
-	Audio *createStreamingAudio();
+	Audio *createAudio();
 
 	void setListenerTranslate(const Vector3 &translate){}
 	void setListenerRotate(const Matrix3x3 &rotate){}
@@ -55,16 +54,14 @@ public:
 	void suspend(){}
 	void resume(){}
 
-	void update(int dt){}
+	void update(int dt);
 
 	bool getAudioCaps(AudioCaps &caps){caps.set(mCaps);return true;}
-
-	int getBufferFadeTime() const{return mBufferFadeTime;}
-	AudioFormat::ptr getAudioFormat(){return mFormat;}
 
 protected:
 	JNIEnv *env;
 	jobject obj;
+	jmethodID createID,destroyID,createAudioBufferID,createAudioID,updateID;
 
 	AudioCaps mCaps;
 };

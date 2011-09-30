@@ -175,11 +175,7 @@ AudioBuffer *MMAudioDevice::createAudioBuffer(){
 	return new MMAudioBuffer(this);
 }
 
-Audio *MMAudioDevice::createBufferedAudio(){
-	return new MMAudio(this);
-}
-
-Audio *MMAudioDevice::createStreamingAudio(){
+Audio *MMAudioDevice::createAudio(){
 	return new MMAudio(this);
 }
 

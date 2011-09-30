@@ -25,7 +25,7 @@
 
 package us.toadlet.ribbit;
 
-interface AudioBuffer{
+public interface AudioBuffer{
 	public AudioBuffer getRootAudioBuffer();
 
 	public boolean create(AudioStream stream);

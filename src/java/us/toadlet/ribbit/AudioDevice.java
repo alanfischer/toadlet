@@ -25,13 +25,12 @@
 
 package us.toadlet.ribbit;
 
-interface AudioDevice{
-	public boolean create(int[] options);
+public interface AudioDevice{
+	public boolean create();
 	public void destroy();
 	
 	public AudioBuffer createAudioBuffer();
-	public Audio createBufferedAudio();
-	public Audio createStreamingAudio();
+	public Audio createAudio();
 
 	public void setListenerGain(float gain);
 

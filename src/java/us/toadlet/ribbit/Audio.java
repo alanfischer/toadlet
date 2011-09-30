@@ -25,7 +25,7 @@
 
 package us.toadlet.ribbit;
 
-interface Audio{
+public interface Audio{
 	public boolean create(AudioBuffer buffer);
 	public boolean create(AudioStream stream);
 	public void destroy();
