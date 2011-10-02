@@ -26,7 +26,11 @@
 package us.toadlet.ribbit;
 
 public class AudioFormat{
-	public AudioFormat(int bps,int chan,int sps){}
+	public AudioFormat(int bps,int chan,int sps){
+		bitsPerSample=bps;
+		channels=chan;
+		samplesPerSecond=sps;
+	}
 
 	public int bitsPerSample;
 	public int channels;

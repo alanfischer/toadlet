@@ -37,19 +37,14 @@ using namespace toadlet::pad;
 TOADLET_C_API RenderDevice* new_GLRenderDevice();
 TOADLET_C_API AudioDevice* new_JAudioDevice(JNIEnv *env,jobject obj);
 
-bool Java_us_toadlet_pad_init=false;
+void Java_us_toadlet_pad(JNIEnv *env);
+
 jmethodID getRootRenderTargetRenderTargetID=0;
 jmethodID getNativeHandleRenderDeviceID=0;
 jmethodID getNativeHandleAudioDeviceID=0;
 jmethodID getNativeHandleEngineID=0;
 jmethodID getNativeHandleAppletID=0;
 jmethodID getNativeHandleApplicationID=0;
-
-extern "C" JNIEXPORT void JNICALL Java_us_toadlet_pad_AndroidApplication_createNativeApplication(JNIEnv *env,jobject obj);
-extern "C" JNIEXPORT void JNICALL Java_us_toadlet_pad_AndroidApplication_destroyNativeApplication(JNIEnv *env,jobject obj);
-extern "C" JNIEXPORT jobject JNICALL Java_us_toadlet_pad_AndroidApplication_makeEngine(JNIEnv *env,jobject obj);
-extern "C" JNIEXPORT jobject JNICALL Java_us_toadlet_pad_AndroidApplication_makeRenderDevice(JNIEnv *env,jobject obj);
-void Java_us_toadlet_pad(JNIEnv *env);
 
 namespace toadlet{
 namespace pad{
@@ -185,46 +180,36 @@ AudioDevice *JAndroidApplication::getAudioDevice(){
 }
 }
 
-extern "C" JNIEXPORT jint JNICALL JNI_OnLoad(JavaVM *vm,void *reserved){
-	Java_us_toadlet_pad_init=false;
-
-	return JNI_VERSION_1_2;
-}
-
 void Java_us_toadlet_pad(JNIEnv *env){
-	if(Java_us_toadlet_pad_init==false){
-		Java_us_toadlet_pad_init=true;
-
-		jclass targetClass=env->FindClass("us/toadlet/peeper/RenderTarget");
-		{
-			getRootRenderTargetRenderTargetID=env->GetMethodID(targetClass,"getRootRenderTarget","()Lus/toadlet/peeper/RenderTarget;");
-		}
-		env->DeleteLocalRef(targetClass);
-
-		jclass deviceClass=env->FindClass("us/toadlet/pad/RenderDevice");
-		{
-			getNativeHandleRenderDeviceID=env->GetMethodID(deviceClass,"getNativeHandle","()I");
-		}
-		env->DeleteLocalRef(deviceClass);
-
-		jclass engineClass=env->FindClass("us/toadlet/pad/Engine");
-		{
-			getNativeHandleEngineID=env->GetMethodID(engineClass,"getNativeHandle","()I");
-		}
-		env->DeleteLocalRef(engineClass);
-
-		jclass appletClass=env->FindClass("us/toadlet/pad/NApplet");
-		{
-			getNativeHandleAppletID=env->GetMethodID(appletClass,"getNativeHandle","()I");
-		}
-		env->DeleteLocalRef(appletClass);
-
-		jclass appClass=env->FindClass("us/toadlet/pad/AndroidApplication");
-		{
-			getNativeHandleApplicationID=env->GetMethodID(appClass,"getNativeHandle","()I");
-		}
-		env->DeleteLocalRef(appClass);
+	jclass targetClass=env->FindClass("us/toadlet/peeper/RenderTarget");
+	{
+		getRootRenderTargetRenderTargetID=env->GetMethodID(targetClass,"getRootRenderTarget","()Lus/toadlet/peeper/RenderTarget;");
 	}
+	env->DeleteLocalRef(targetClass);
+
+	jclass deviceClass=env->FindClass("us/toadlet/pad/RenderDevice");
+	{
+		getNativeHandleRenderDeviceID=env->GetMethodID(deviceClass,"getNativeHandle","()I");
+	}
+	env->DeleteLocalRef(deviceClass);
+
+	jclass engineClass=env->FindClass("us/toadlet/pad/Engine");
+	{
+		getNativeHandleEngineID=env->GetMethodID(engineClass,"getNativeHandle","()I");
+	}
+	env->DeleteLocalRef(engineClass);
+
+	jclass appletClass=env->FindClass("us/toadlet/pad/NApplet");
+	{
+		getNativeHandleAppletID=env->GetMethodID(appletClass,"getNativeHandle","()I");
+	}
+	env->DeleteLocalRef(appletClass);
+
+	jclass appClass=env->FindClass("us/toadlet/pad/AndroidApplication");
+	{
+		getNativeHandleApplicationID=env->GetMethodID(appClass,"getNativeHandle","()I");
+	}
+	env->DeleteLocalRef(appClass);
 }
 
 #include "us_toadlet_pad_AndroidApplication.cpp"

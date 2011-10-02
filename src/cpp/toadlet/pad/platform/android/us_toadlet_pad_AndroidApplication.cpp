@@ -74,7 +74,6 @@ JNIEXPORT void JNICALL Java_us_toadlet_pad_AndroidApplication_deleteEngine(JNIEn
 }
 
 JNIEXPORT jboolean JNICALL Java_us_toadlet_pad_AndroidApplication_notifyEngineRenderDevice(JNIEnv *env,jobject obj){
-	Java_us_toadlet_pad(env);
 	JAndroidApplication *app=(JAndroidApplication*)env->CallIntMethod(obj,getNativeHandleApplicationID);
 	Engine *engine=app->getEngine();
 	RenderDevice *device=app->getRenderDevice();
@@ -82,7 +81,6 @@ JNIEXPORT jboolean JNICALL Java_us_toadlet_pad_AndroidApplication_notifyEngineRe
 }
 
 JNIEXPORT jboolean JNICALL Java_us_toadlet_pad_AndroidApplication_notifyEngineAudioDevice(JNIEnv *env,jobject obj){
-	Java_us_toadlet_pad(env);
 	JAndroidApplication *app=(JAndroidApplication*)env->CallIntMethod(obj,getNativeHandleApplicationID);
 	Engine *engine=app->getEngine();
 	AudioDevice *device=app->getAudioDevice();
