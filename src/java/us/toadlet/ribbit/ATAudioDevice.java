@@ -41,7 +41,7 @@ public class ATAudioDevice implements AudioDevice{
 		System.out.println("ATAudioDevice.destroy");
 	}
 	
-	public AudioBuffer createAudioBuffer(){return new ATAudioBuffer();}
+	public AudioBuffer createAudioBuffer(){System.out.println("asdf");return new ATAudioBuffer();}
 	public Audio createAudio(){return new ATAudio();}
 
 	/// @todo: implement gain

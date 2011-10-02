@@ -26,11 +26,7 @@
 #include <toadlet/egg/Error.h>
 #include <toadlet/egg/System.h>
 #if defined(TOADLET_HAS_OPENGL)
-	#include <toadlet/peeper/plugins/glrenderdevice/GLRenderDevice.h>
 	#include <toadlet/peeper/plugins/glrenderdevice/platform/glx/GLXWindowRenderTarget.h>
-#endif
-#if defined(TOADLET_HAS_OPENAL)
-	#include <toadlet/ribbit/plugins/alaudiodevice/ALAudioDevice.h>
 #endif
 #include <toadlet/pad/platform/x11/X11Application.h>
 #include <X11/Xlib.h>
@@ -43,6 +39,9 @@ using namespace toadlet::peeper;
 using namespace toadlet::ribbit;
 using namespace toadlet::flick;
 
+#if defined(TOADLET_HAS_OPENGL)
+	extern "C" RenderDevice *new_GLRenderDevice();
+#endif
 #if defined(TOADLET_HAS_OPENAL)
 	extern "C" AudioDevice *new_ALAudioDevice();
 #endif
@@ -574,7 +573,7 @@ RenderTarget *X11Application::makeRenderTarget(){
 
 RenderDevice *X11Application::makeRenderDevice(){
 	#if defined(TOADLET_HAS_OPENGL)
-		return new GLRenderDevice();
+		return new_GLRenderDevice();
 	#else
 		return NULL;
 	#endif

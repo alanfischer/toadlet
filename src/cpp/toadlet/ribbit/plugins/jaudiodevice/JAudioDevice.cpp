@@ -28,6 +28,8 @@
 #include "JAudioBuffer.h"
 #include <toadlet/egg/Logger.h>
 
+void Java_us_toadlet_ribbit(JNIEnv *env);
+
 namespace toadlet{
 namespace ribbit{
 
@@ -49,6 +51,14 @@ JAudioDevice::JAudioDevice(JNIEnv *jenv,jobject jobj){
 		updateID=env->GetMethodID(deviceClass,"update","(I)V");
 	}
 	env->DeleteLocalRef(deviceClass);
+
+	jthrowable exc=env->ExceptionOccurred();
+	if(exc!=NULL){
+		env->ExceptionDescribe();
+		env->ExceptionClear();
+	}
+
+	Java_us_toadlet_ribbit(env);
 }
 
 JAudioDevice::~JAudioDevice(){
@@ -72,14 +82,18 @@ void JAudioDevice::destroy(){
 }
 
 AudioBuffer *JAudioDevice::createAudioBuffer(){
+Logger::alert(String("CREATE AUDIO BUFFERz")+(int)createAudioBufferID);
 	jobject audioBufferObj=env->CallObjectMethod(obj,createAudioBufferID);
+Logger::alert("CREATE AUDIO BUFFER2");
 
 	return new JAudioBuffer(env,audioBufferObj);
 }
 
 Audio *JAudioDevice::createAudio(){
+Logger::alert(String("CREATE AUDIO:")+createAudioID);
 	jobject audioObj=env->CallObjectMethod(obj,createAudioID);
 
+Logger::alert(String("newing JAudio"));
 	return new JAudio(env,audioObj);
 }
 
@@ -89,3 +103,16 @@ void JAudioDevice::update(int dt){
 
 }
 }
+
+jmethodID getNativeHandleStreamID=0;
+
+void Java_us_toadlet_ribbit(JNIEnv *env){
+	jclass streamClass=env->FindClass("us/toadlet/ribbit/NAudioStream");
+	{
+		getNativeHandleStreamID=env->GetMethodID(streamClass,"getNativeHandle","()I");
+	}
+	env->DeleteLocalRef(streamClass);
+}
+
+#include "us_toadlet_ribbit_NAudioStream.cpp"
+
