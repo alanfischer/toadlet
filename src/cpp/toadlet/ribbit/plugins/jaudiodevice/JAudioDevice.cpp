@@ -82,18 +82,14 @@ void JAudioDevice::destroy(){
 }
 
 AudioBuffer *JAudioDevice::createAudioBuffer(){
-Logger::alert(String("CREATE AUDIO BUFFERz")+(int)createAudioBufferID);
 	jobject audioBufferObj=env->CallObjectMethod(obj,createAudioBufferID);
-Logger::alert("CREATE AUDIO BUFFER2");
 
 	return new JAudioBuffer(env,audioBufferObj);
 }
 
 Audio *JAudioDevice::createAudio(){
-Logger::alert(String("CREATE AUDIO:")+createAudioID);
 	jobject audioObj=env->CallObjectMethod(obj,createAudioID);
 
-Logger::alert(String("newing JAudio"));
 	return new JAudio(env,audioObj);
 }
 

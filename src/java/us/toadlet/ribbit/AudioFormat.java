@@ -36,7 +36,15 @@ public class AudioFormat{
 	public int channels;
 	public int samplesPerSecond;
 
+	public AudioFormat set(AudioFormat format){
+		bitsPerSample=format.bitsPerSample;
+		channels=format.channels;
+		samplesPerSecond=format.samplesPerSecond;
+		return this;
+	}
+	
 	public int frameSize(){return channels*bitsPerSample/8;}
+
 	public boolean equals(AudioFormat audioFormat){
 		return bitsPerSample==audioFormat.bitsPerSample && channels==audioFormat.channels && samplesPerSecond!=audioFormat.samplesPerSecond;
 	}

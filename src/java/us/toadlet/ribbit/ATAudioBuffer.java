@@ -59,6 +59,8 @@ public class ATAudioBuffer implements AudioBuffer{
 		}
 		if(available>0){
 			mAudioTrack.write(data,0,available);
+			mEndPosition=available/format.frameSize();
+			mPlayTime=mEndPosition*1000/format.samplesPerSecond;
 		}
 
 		return true;
@@ -71,5 +73,7 @@ public class ATAudioBuffer implements AudioBuffer{
 		}
 	}
 	
-	protected AudioTrack mAudioTrack;
+	AudioTrack mAudioTrack;
+	int mEndPosition;
+	int mPlayTime;
 }

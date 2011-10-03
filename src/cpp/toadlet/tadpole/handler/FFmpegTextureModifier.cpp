@@ -61,6 +61,7 @@ FFmpegAudioStream::FFmpegAudioStream(FFmpegTextureController *controller,FFmpegT
 	mController=controller;
 	mStreamData=streamData;
 	av_init_packet(&mPkt);
+	mPkt.data=NULL;
 
 	AVCodecContext *ctx=mStreamData->codecCtx;
 	mAudioFormat=AudioFormat::ptr(new AudioFormat(16,ctx->channels,ctx->sample_rate));
@@ -105,6 +106,7 @@ int FFmpegAudioStream::read(tbyte *buffer,int length){
 			}
 
 			av_free_packet(&mPkt);
+			mPkt.data=NULL;
 		}
 	}
 

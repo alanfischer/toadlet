@@ -97,18 +97,22 @@ bool AudioFormatConversion::convert(tbyte *src,AudioFormat *srcFormat,tbyte *dst
 	int dbps=dstFormat->bitsPerSample;
 	int sc=srcFormat->channels;
 	int dc=dstFormat->channels;
+	int ssps=srcFormat->samplesPerSecond;
+	int dsps=dstFormat->samplesPerSecond;
 	int ss=srcFormat->frameSize();
 	int ds=dstFormat->frameSize();
 	int numFrames=length/srcFormat->frameSize();
 
 	/// @todo: Replace this with individual optimized versions
 	for(i=0;i<numFrames;++i){
+		int j=i*dsps/ssps;
+
 		if(sbps==8) v=(*(uint8*)(src+i*ss))-128;
 		else v=*(int16*)(src+i*ss);
 		if(sbps==8 && dbps==16){v=Math::intClamp(Extents::MIN_INT16,Extents::MAX_INT16,v*256);}
 		else if(sbps==16 && dbps==8){v=Math::intClamp(Extents::MIN_INT8,Extents::MAX_INT8,v/256);}
-		if(dbps==8) *(uint8*)(dst+i*ds)=v+128;
-		else *(int16*)(dst+i*ds)=v;
+		if(dbps==8) *(uint8*)(dst+j*ds)=v+128;
+		else *(int16*)(dst+j*ds)=v;
 
 		if(dc==2){
 			if(sc==2){
@@ -117,8 +121,8 @@ bool AudioFormatConversion::convert(tbyte *src,AudioFormat *srcFormat,tbyte *dst
 				if(sbps==8 && dbps==16){v=Math::intClamp(Extents::MIN_INT16,Extents::MAX_INT16,v*256);}
 				else if(sbps==16 && dbps==8){v=Math::intClamp(Extents::MIN_INT8,Extents::MAX_INT8,v/256);}
 			}
-			if(dbps==8) *(uint8*)(dst+i*ds+ds/2)=v+128;
-			else *(int16*)(dst+i*ds+ds/2)=v;
+			if(dbps==8) *(uint8*)(dst+j*ds+ds/2)=v+128;
+			else *(int16*)(dst+j*ds+ds/2)=v;
 		}
 	}
 
@@ -126,9 +130,9 @@ bool AudioFormatConversion::convert(tbyte *src,AudioFormat *srcFormat,tbyte *dst
 }
 
 int AudioFormatConversion::findConvertedLength(int length,AudioFormat *srcFormat,AudioFormat *dstFormat){
-	/// @todo: Until sps conversion is implemented in convert, we just ignore sps
-	//return (int)(length * ((float)(dstFormat->channels*dstFormat->bitsPerSample*srcFormat->samplesPerSecond)/(float)(srcFormat->channels*srcFormat->bitsPerSample*dstFormat->samplesPerSecond)));
-	return (int)(length * ((float)(dstFormat->channels*dstFormat->bitsPerSample)/(float)(srcFormat->channels*srcFormat->bitsPerSample)));
+	uint64 dsize=dstFormat->channels*dstFormat->bitsPerSample*dstFormat->samplesPerSecond;
+	uint64 ssize=srcFormat->channels*srcFormat->bitsPerSample*srcFormat->samplesPerSecond;
+	return (length * dsize) / ssize;
 }
 
 void AudioFormatConversion::fade(tbyte *buffer,int length,AudioFormat *format,int fadeTime){

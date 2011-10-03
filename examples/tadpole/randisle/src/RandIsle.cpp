@@ -89,8 +89,9 @@ void RandIsle::create(){
 	mPredictedMaterial->getPass()->setBlendState(BlendState::Combination_ALPHA);
 
 	mRustleSound=mEngine->createNodeType(AudioNode::type(),mScene);
+	mRustleSound->setAudioBuffer(Resources::instance->rustle);
 	mScene->getRoot()->attach(mRustleSound);
-
+	
 	mPlayer=mEngine->createNodeType(PathClimber::type(),mScene);
 	mPlayer->setPathClimberListener(this);
 	mPlayer->addShape(Shape::ptr(new Shape(AABox(2))));
@@ -670,7 +671,6 @@ void RandIsle::wiggleLeaves(Tree *tree,const Sphere &bound){
 	Math::sub(localBound,bound,tree->getWorldTranslate());
 	localBound.radius=20.0f;
 	if(tree->wiggleLeaves(localBound) && mRustleSound->getPlaying()==false){
-		mRustleSound->setAudioBuffer(Resources::instance->rustle);
 		mRustleSound->setGain(Math::ONE);
 		mRustleSound->play();
 	}
