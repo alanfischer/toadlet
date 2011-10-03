@@ -30,7 +30,6 @@ namespace toadlet{
 namespace ribbit{
 
 JAudioBuffer::JAudioBuffer(JNIEnv *jenv,jobject jobj):BaseResource(){
-Logger::alert("CREATE AUDIO BUFFER3");
 	env=jenv;
 	obj=env->NewGlobalRef(jobj);
 
@@ -40,7 +39,6 @@ Logger::alert("CREATE AUDIO BUFFER3");
 		destroyID=env->GetMethodID(bufferClass,"destroy","()V");
 	}
 	env->DeleteLocalRef(bufferClass);
-Logger::alert("CREATE AUDIO BUFFER4");
 }
 
 JAudioBuffer::~JAudioBuffer(){
@@ -50,7 +48,6 @@ JAudioBuffer::~JAudioBuffer(){
 }
 
 bool JAudioBuffer::create(AudioStream::ptr stream){
-Logger::alert("CREATE AUDIO BUFFER5");
 	mAudioStream=stream; // Store the pointer until we have reference counting
 	jobject streamObj=NULL;
 
@@ -60,7 +57,13 @@ Logger::alert("CREATE AUDIO BUFFER5");
 		streamObj=env->NewObject(streamClass,initID,(int)stream.get());
 	}
 	env->DeleteLocalRef(streamClass);
-Logger::alert("CREATE AUDIO BUFFER6");
+
+	jthrowable exc=env->ExceptionOccurred();
+	if(exc!=NULL){
+		env->ExceptionDescribe();
+		env->ExceptionClear();
+		return false;
+	}
 
 	return env->CallBooleanMethod(obj,createID,streamObj);
 }

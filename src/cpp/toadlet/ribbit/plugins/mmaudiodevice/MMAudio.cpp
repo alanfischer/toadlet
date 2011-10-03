@@ -97,8 +97,10 @@ int MMAudio::read(tbyte *data,int length){
 					mPlaying=false;
 				}
 			}
-			AudioFormatConversion::convert(odata,format,data,playerFormat,olength);
+			AudioFormatConversion::convert(odata,format,data,playerFormat,amount);
+Logger::alert(String("oamt:")+amount);
 			amount=AudioFormatConversion::findConvertedLength(amount,format,playerFormat);
+Logger::alert(String("famt:")+amount);
 			delete[] odata;
 		}
 		else{

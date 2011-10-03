@@ -33,42 +33,27 @@ namespace ribbit{
 JAudio::JAudio(JNIEnv *jenv,jobject jobj){
 	env=jenv;
 	obj=env->NewGlobalRef(jobj);
-Logger::alert(String("CREATE JAUDIO"));
 
 	jclass audioClass=env->GetObjectClass(obj);
 	{
-Logger::alert(String("CREATE JAUDIOa"));
 		createAudioBufferID=env->GetMethodID(audioClass,"create","(Lus/toadlet/ribbit/AudioBuffer;)Z");
 		createAudioStreamID=env->GetMethodID(audioClass,"create","(Lus/toadlet/ribbit/AudioStream;)Z");
 		destroyID=env->GetMethodID(audioClass,"destroy","()V");
-Logger::alert(String("CREATE JAUDIOb"));
 
 		playID=env->GetMethodID(audioClass,"play","()Z");
 		stopID=env->GetMethodID(audioClass,"stop","()Z");
-Logger::alert(String("CREATE JAUDIOc"));
 
 		getPlayingID=env->GetMethodID(audioClass,"getPlaying","()Z");
 		getFinishedID=env->GetMethodID(audioClass,"getFinished","()Z");
-Logger::alert(String("CREATE JAUDIOd"));
 
 		setLoopingID=env->GetMethodID(audioClass,"setLooping","(Z)V");
 		getLoopingID=env->GetMethodID(audioClass,"getLooping","()Z");
-Logger::alert(String("CREATE JAUDIOe"));
 
 		setGainID=env->GetMethodID(audioClass,"setGain","(F)V");
 		fadeToGainID=env->GetMethodID(audioClass,"fadeToGain","(FI)V");
 		getGainID=env->GetMethodID(audioClass,"getGain","()F");
-Logger::alert(String("CREATE JAUDIOf"));
 	}
 	env->DeleteLocalRef(audioClass);
-
-
-Logger::alert("AUDIO CREWATED");
-	jthrowable exc=env->ExceptionOccurred();
-	if(exc!=NULL){
-		env->ExceptionDescribe();
-		env->ExceptionClear();
-	}
 }
 
 JAudio::~JAudio(){
@@ -94,6 +79,13 @@ bool JAudio::create(AudioStream::ptr audioStream){
 		audioStreamObj=env->NewObject(streamClass,initID,(int)audioStream.get());
 	}
 	env->DeleteLocalRef(streamClass);
+
+	jthrowable exc=env->ExceptionOccurred();
+	if(exc!=NULL){
+		env->ExceptionDescribe();
+		env->ExceptionClear();
+		return false;
+	}
 
 	return env->CallBooleanMethod(obj,createAudioStreamID,audioStreamObj);
 }

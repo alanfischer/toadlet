@@ -77,6 +77,10 @@ bool AudioNode::setAudioBuffer(const String &name){
 }
 
 bool AudioNode::setAudioBuffer(const AudioBuffer::ptr &audioBuffer){
+	if(mAudio!=NULL && mAudio->getAudioBuffer()==audioBuffer){
+		return true;
+	}
+
 	if(mAudio!=NULL){
 		mAudio->destroy();
 	}
@@ -98,6 +102,10 @@ bool AudioNode::setAudioStream(const String &name){
 }
 
 bool AudioNode::setAudioStream(AudioStream::ptr stream){
+	if(mAudio!=NULL && mAudio->getAudioStream()==stream){
+		return true;
+	}
+
 	if(mAudio!=NULL){
 		mAudio->destroy();
 	}

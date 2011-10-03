@@ -27,8 +27,16 @@ jbyte streamBuffer[2048];
 
 JNIEXPORT jint JNICALL Java_us_toadlet_ribbit_NAudioStream_read(JNIEnv *env,jobject obj,jbyteArray data,jint off,jint len){
 	AudioStream *stream=(AudioStream*)env->CallIntMethod(obj,getNativeHandleStreamID);
-	len=2048<len?2048:len;
-	int amt=stream->read((toadlet::tbyte*)streamBuffer,len);
-	env->SetByteArrayRegion(data,off,len,streamBuffer);
+	int total=0,amt=0;
+	while(len>0){
+		amt=2048<len?2048:len;
+		amt=stream->read((toadlet::tbyte*)streamBuffer,amt);
+		if(amt==0){
+			break;
+		}
+		env->SetByteArrayRegion(data,total,amt,streamBuffer);
+		total+=amt;
+		len-=amt;
+	}
 	return amt;
 }
