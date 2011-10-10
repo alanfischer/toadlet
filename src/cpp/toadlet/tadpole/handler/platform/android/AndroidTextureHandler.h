@@ -46,7 +46,8 @@ protected:
 	TextureManager *mTextureManager;
 	JNIEnv *env;
 	jclass factoryClass;
-	jmethodID decodeFactoryID,getWidthBitmapID,getHeightBitmapID,getPixelsBitmapID;
+	jmethodID decodeFactoryID,recycleBitmapID,getWidthBitmapID,getHeightBitmapID,getPixelsBitmapID;
+	jclass systemClass;jmethodID gcID;
 };
 
 }

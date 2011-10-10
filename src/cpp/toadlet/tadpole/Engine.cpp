@@ -143,9 +143,6 @@
 #if defined(TOADLET_HAS_SIDPLAY)
 	#include <toadlet/tadpole/handler/SIDHandler.h>
 #endif
-#if defined(TOADLET_PLATFORM_OSX)
-//	#include <toadlet/tadpole/handler/CoreAudioHandler.h>
-#endif
 
 #if !defined(TOADLET_FIXED_POINT)
 	#include <toadlet/tadpole/handler/SPRHandler.h>
@@ -486,7 +483,6 @@ void Engine::updateVertexFormats(){
 }
 
 bool Engine::setAudioDevice(AudioDevice *audioDevice){
-Logger::alert(String("SETTING AUDIO DEVICE:")+(int)audioDevice);
 	if(audioDevice!=NULL){
 		if(mBackable==false && mAudioDeviceChanged){
 			Error::unknown(Categories::TOADLET_TADPOLE,"can not change AudioDevice in an unbacked engine");

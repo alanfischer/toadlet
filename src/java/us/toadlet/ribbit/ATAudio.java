@@ -29,44 +29,60 @@ import android.media.AudioTrack;
 import android.media.AudioFormat;
 import android.media.AudioManager;
 
-public class ATAudio implements Audio,AudioTrack.OnPlaybackPositionUpdateListener,Runnable{
-	public ATAudio(){
+public class ATAudio implements Audio,AudioTrack.OnPlaybackPositionUpdateListener{
+	public ATAudio(ATAudioRegister device){
 		mGain=1.0f;
+		mDevice=device;
+		mDevice.registerAudio(this);
 	}
 
 	public boolean create(AudioBuffer buffer){
 		mAudioStream=null;
-
 		mAudioBuffer=(ATAudioBuffer)buffer.getRootAudioBuffer();
-		mAudioTrack=mAudioBuffer.mAudioTrack;
+
+		us.toadlet.ribbit.AudioFormat format=mAudioBuffer.getAudioFormat();
+		int sps=format.samplesPerSecond;
+		int chan=(format.channels==2?AudioFormat.CHANNEL_OUT_STEREO:AudioFormat.CHANNEL_OUT_MONO);
+		int bps=(format.bitsPerSample==8?AudioFormat.ENCODING_PCM_8BIT:AudioFormat.ENCODING_PCM_16BIT);
+		int available=mAudioBuffer.mData.length;
+		
+		mAudioTrack=new AudioTrack(AudioManager.STREAM_ALARM,sps,chan,bps,available,AudioTrack.MODE_STREAM);
 		mAudioTrack.setPlaybackPositionUpdateListener(this);
+		mAudioTrack.setNotificationMarkerPosition(available/format.frameSize());
 
 		return true;
 	}
 	
 	public boolean create(AudioStream stream){
-		us.toadlet.ribbit.AudioFormat format=stream.getAudioFormat();
+		mAudioBuffer=null;
+		mAudioStream=stream;
+
+		us.toadlet.ribbit.AudioFormat format=mAudioStream.getAudioFormat();
 		int sps=format.samplesPerSecond;
 		int chan=(format.channels==2?AudioFormat.CHANNEL_OUT_STEREO:AudioFormat.CHANNEL_OUT_MONO);
 		int bps=(format.bitsPerSample==8?AudioFormat.ENCODING_PCM_8BIT:AudioFormat.ENCODING_PCM_16BIT);
 		int available=AudioTrack.getMinBufferSize(sps,chan,bps);
 
-		mAudioBuffer=null;
-		mAudioStream=stream;
-		
 		mStreamData=new byte[available];
 		mAudioTrack=new AudioTrack(AudioManager.STREAM_MUSIC,sps,chan,bps,available,AudioTrack.MODE_STREAM);
+		mAudioTrack.setPlaybackPositionUpdateListener(this);
+		mAudioTrack.setPositionNotificationPeriod(available/format.frameSize());
 		
 		return true;
 	}
 	
 	public void destroy(){
+		if(mAudioTrack!=null){
+			if(mAudioTrack.getState()!=AudioTrack.STATE_UNINITIALIZED){
+				mAudioTrack.stop();
+				mAudioTrack.release();
+			}
+			mAudioTrack=null;
+		}
+
 		if(mAudioBuffer!=null){
 			//AudioBuffer destroyed by resource management
 			mAudioBuffer=null;
-
-			//AudioTrack released by AudioBuffer
-			mAudioTrack=null;
 		}
 		if(mAudioStream!=null){
 			try{
@@ -74,10 +90,11 @@ public class ATAudio implements Audio,AudioTrack.OnPlaybackPositionUpdateListene
 			}
 			catch(java.io.IOException ex){}
 			mAudioStream=null;
-
-			mAudioTrack.stop();
-			mAudioTrack.release();
-			mAudioTrack=null;
+		}
+		
+		if(mDevice!=null){
+			mDevice.unregisterAudio(this);
+			mDevice=null;
 		}
 	}
 
@@ -85,23 +102,17 @@ public class ATAudio implements Audio,AudioTrack.OnPlaybackPositionUpdateListene
 	public AudioStream getAudioStream(){return mAudioStream;}
 
 	public boolean play(){
+		mPlayTime=0;
+
 		if(mAudioTrack!=null){
 			try{
-				if(mAudioBuffer!=null){
-					mAudioTrack.reloadStaticData();
-					mAudioTrack.setNotificationMarkerPosition(mAudioBuffer.mEndPosition);
-					mAudioTrack.setPlaybackPositionUpdateListener(this);
-					// The STATIC AudioTracks get queued up if you try to play them right after they finish, so we add a slight delay
-					mFinishTime=System.currentTimeMillis() + mAudioBuffer.mPlayTime + 500;
-				}
-
 				mAudioTrack.play();
-				
-				if(mAudioStream!=null){
-					mFinishTime=0;
-					mAudioThreadRun=true;
-					mAudioThread=new Thread(this);
-					mAudioThread.start();
+
+				if(mAudioBuffer!=null){
+					mAudioTrack.write(mAudioBuffer.mData,0,mAudioBuffer.mData.length);
+				}
+				else if(mAudioStream!=null){
+					onPeriodicNotification(mAudioTrack);
 				}
 			}
 			catch(Exception ex){
@@ -116,19 +127,11 @@ public class ATAudio implements Audio,AudioTrack.OnPlaybackPositionUpdateListene
 		if(mAudioTrack!=null){
 			try{
 				mAudioTrack.stop();
-				
-				if(mAudioStream!=null){
-					mAudioThreadRun=false;
-					//mAudioThread.join();
-					mAudioThread=null;
-				}
 			}
 			catch(Exception ex){
 				return false;
 			}
 		}
-		
-		mFinishTime=0;
 
 		return true;
 	}
@@ -138,7 +141,7 @@ public class ATAudio implements Audio,AudioTrack.OnPlaybackPositionUpdateListene
 		if(mAudioTrack!=null){
 			playState=mAudioTrack.getPlayState();
 		}
-		return playState==AudioTrack.PLAYSTATE_PLAYING || mFinishTime>System.currentTimeMillis();
+		return playState==AudioTrack.PLAYSTATE_PLAYING;
 	}
 	
 	public boolean getFinished(){
@@ -146,7 +149,7 @@ public class ATAudio implements Audio,AudioTrack.OnPlaybackPositionUpdateListene
 		if(mAudioTrack!=null){
 			playState=mAudioTrack.getPlayState();
 		}
-		return playState==AudioTrack.PLAYSTATE_STOPPED && mFinishTime<System.currentTimeMillis();
+		return playState==AudioTrack.PLAYSTATE_STOPPED;
 	}
 
 	/// @todo: enable looping
@@ -170,34 +173,57 @@ public class ATAudio implements Audio,AudioTrack.OnPlaybackPositionUpdateListene
 	/// @todo: enable pitch
 	public void setPitch(float pitch){}
 	public float getPitch(){return 1.0f;}
-	
+
 	public void onMarkerReached(AudioTrack track){
 		try{
-			mAudioTrack.stop();
+			track.stop();
 		}
 		catch(Exception ex){
+			ex.printStackTrace();
 		}
 	}
 
-	public void onPeriodicNotification(AudioTrack track){}
+	public void onPeriodicNotification(AudioTrack track){
+		if(mAudioStream==null){
+			return;
+		}
 	
-	public void run(){
-		while(mAudioThreadRun){
-			try{
-				int amount=mAudioStream.read(mStreamData,0,mStreamData.length);
-				mAudioTrack.write(mStreamData,0,amount);
+		try{
+			int amount=mAudioStream.read(mStreamData,0,mStreamData.length);
+			if(amount>=0 && amount<mStreamData.length){
+				java.util.Arrays.fill(mStreamData,amount,mStreamData.length-amount,(byte)0);
+				amount=mStreamData.length;
 			}
-			catch(Exception ex){}
+			else if(amount<0){
+				track.stop();
+			}
+			
+			if(amount>0){
+				track.write(mStreamData,0,amount);
+			}
+		}
+		catch(Exception ex){
+			ex.printStackTrace();
 		}
 	}
 	
+	void update(int dt){
+		// Hack to work around MarkerReached not being called
+		if(mAudioBuffer!=null && getPlaying()){
+			us.toadlet.ribbit.AudioFormat format=mAudioBuffer.getAudioFormat();
+			mPlayTime+=dt;
+			int endTime=(mAudioBuffer.mData.length/format.frameSize()) * 1000 / format.samplesPerSecond;
+			if(mPlayTime>endTime+500){
+				stop();
+			}
+		}
+	}
+	
+	ATAudioRegister mDevice;
 	ATAudioBuffer mAudioBuffer;
 	AudioStream mAudioStream;
 	AudioTrack mAudioTrack;
 	float mGain;
-	long mFinishTime;
-
-	Thread mAudioThread;
-	boolean mAudioThreadRun;
 	byte[] mStreamData;
+	int mPlayTime;
 }

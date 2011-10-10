@@ -35,7 +35,6 @@
 namespace toadlet{
 namespace egg{namespace io{}}
 namespace ribbit{
-namespace decoder{}
 
 #if defined(TOADLET_FIXED_POINT)
 	using namespace toadlet::egg::mathfixed;
@@ -45,7 +44,6 @@ namespace decoder{}
 
 using namespace toadlet::egg;
 using namespace toadlet::egg::io;
-using namespace ribbit::decoder;
 
 }
 }

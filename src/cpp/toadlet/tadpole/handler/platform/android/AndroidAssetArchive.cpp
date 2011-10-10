@@ -27,16 +27,15 @@
 #include <toadlet/egg/Logger.h>
 #include <toadlet/egg/io/FileStream.h>
 #include <toadlet/egg/io/MemoryStream.h>
-#include <toadlet/tadpole/handler/platform/android/AndroidAssetArchive.h>
+#include "AndroidAssetArchive.h"
 
 namespace toadlet{
 namespace tadpole{
 namespace handler{
 
-AndroidAssetArchive::AndroidAssetArchive(JNIEnv *jenv,jobject jassetManager){
-	env=jenv;
-	assetManager=env->NewGlobalRef(jassetManager);
-	mEntries=Collection<String>::ptr(new Collection<String>());
+AndroidAssetArchive::AndroidAssetArchive(JNIEnv *env1,jobject assetManagerObj1){
+	env=env1;
+	assetManagerObj=env->NewGlobalRef(assetManagerObj1);
 
 	jclass managerClass=env->FindClass("android/content/res/AssetManager");
 	{
@@ -44,49 +43,48 @@ AndroidAssetArchive::AndroidAssetArchive(JNIEnv *jenv,jobject jassetManager){
 	}
 	env->DeleteLocalRef(managerClass);
 
-	jclass streamClass=env->FindClass("java/io/InputStream");
-	{
-		availableStreamID=env->GetMethodID(streamClass,"available","()I");
-		readStreamID=env->GetMethodID(streamClass,"read","([BII)I");
-	}
-	env->DeleteLocalRef(streamClass);
+	mEntries=Collection<String>::ptr(new Collection<String>());
+	mStream=JStream::ptr(new JStream(env));
 }
 
 AndroidAssetArchive::~AndroidAssetArchive(){
 	destroy();
-}
-
-void AndroidAssetArchive::destroy(){
-	if(assetManager!=NULL){
-		env->DeleteGlobalRef(assetManager);
-		assetManager=NULL;
-	}
 
 	env=NULL;
 }
 
+void AndroidAssetArchive::destroy(){
+	if(assetManagerObj!=NULL){
+		env->DeleteGlobalRef(assetManagerObj);
+		assetManagerObj=NULL;
+	}
+}
+
 Stream::ptr AndroidAssetArchive::openStream(const String &name){
-	jstring jname=env->NewStringUTF(name);
-	jobject inputStream=env->CallObjectMethod(assetManager,openManagerID,jname);
+	jstring nameObj=env->NewStringUTF(name);
+	jobject streamObj=env->CallObjectMethod(assetManagerObj,openManagerID,nameObj);
 	jthrowable exc=env->ExceptionOccurred();
 	if(exc!=NULL){
 		env->ExceptionDescribe();
 		env->ExceptionClear();
-		env->DeleteLocalRef(jname);
+	}
+	env->DeleteLocalRef(nameObj);
+	if(exc!=NULL){
 		return NULL;
 	}
-	jint length=env->CallIntMethod(inputStream,availableStreamID);
-	jbyteArray bytes=env->NewByteArray(length);
-	tbyte *data=new tbyte[length];
 
-	env->CallIntMethod(inputStream,readStreamID,bytes,0,length);
-	env->GetByteArrayRegion(bytes,0,length,(jbyte*)data);
-
-	MemoryStream::ptr stream(new MemoryStream(data,length,length,true));
-	env->DeleteLocalRef(bytes);
-	env->DeleteLocalRef(inputStream);
-	env->DeleteLocalRef(jname);
-	
+	JStream::ptr stream;
+	if(mStream->closed()){
+		stream=mStream; // Reuse our stream if its closed
+	}
+	else{
+		stream=JStream::ptr(new JStream(env));
+	}
+	stream->open(streamObj);
+	env->DeleteLocalRef(streamObj);
+	if(stream->closed()){
+		stream=JStream::ptr();
+	}
 	return stream;
 }
 

@@ -138,7 +138,7 @@ RenderDevice *JAndroidApplication::getRenderDevice(){
 
 	if(mRenderDevice==NULL || mLastRenderDeviceObj!=deviceObj){
 		//if(jobject is NRenderDevice){
-			mRenderDevice=(RenderDevice*)env->CallIntMethod(deviceObj,getNativeHandleRenderDeviceID);
+			mRenderDevice=deviceObj!=NULL?(RenderDevice*)env->CallIntMethod(deviceObj,getNativeHandleRenderDeviceID):NULL;
 		//}
 		//else{
 		//	mRenderDevice=new JRenderDevice(env,deviceObj);
@@ -160,7 +160,7 @@ AudioDevice *JAndroidApplication::getAudioDevice(){
 
 	if(mAudioDevice==NULL || mLastAudioDeviceObj!=deviceObj){
 		//if(jobject is NAudioDevice){
-		//	mAudioDevice=(AudioDevice*)env->CallIntMethod(deviceObj,getNativeHandleAudioDeviceID);
+		//	mAudioDevice=deviceObj!=NULL?(AudioDevice*)env->CallIntMethod(deviceObj,getNativeHandleAudioDeviceID):NULL;
 		//}
 		//else{
 			mAudioDevice=new_JAudioDevice(env,deviceObj);

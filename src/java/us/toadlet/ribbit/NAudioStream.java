@@ -26,12 +26,18 @@
 package us.toadlet.ribbit;
 
 public class NAudioStream extends AudioStream{
-	public  NAudioStream(int nativeHandle){mNativeHandle=nativeHandle;}
+	public NAudioStream(int nativeHandle,int nativeBuffer,int nativeLength){
+		mNativeHandle=nativeHandle;
+		mNativeBuffer=nativeBuffer;
+		mNativeLength=nativeLength;
+	}
 
+	public native void close();
 	public native AudioFormat getAudioFormat();
 	public native int available();
 	public native int read(byte[] b,int off,int len);
 
-	public int getNativeHandle(){return mNativeHandle;}
-	protected int mNativeHandle;
+	private int mNativeHandle;
+	private int mNativeBuffer;
+	private int mNativeLength;
 }

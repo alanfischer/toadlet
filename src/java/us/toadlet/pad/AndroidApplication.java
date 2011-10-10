@@ -71,7 +71,6 @@ class ApplicationView extends SurfaceView implements SurfaceHolder.Callback{
 			break;
 		}
 
-		try{Thread.sleep(100);}catch(Exception ex){}
 		return true;
 	}
 
@@ -137,9 +136,18 @@ public abstract class AndroidApplication extends Activity implements RenderTarge
 	}
 	
 	public void create(){
-//		mEngine=makeEngine();
+		createNativeApplication();
 
-//		mEngine.installHandlers();
+System.out.println("MAKING ENGINE");
+		mEngine=makeEngine();
+System.out.println("INSTALL HANDLERS");
+		mEngine.installHandlers();
+
+		mAudioDevice=makeAudioDevice();
+		if(mAudioDevice.create()==false){
+			mAudioDevice=null;
+		}
+		notifyEngineAudioDevice(mEngine);
 		
 //		if(mApplet!=null){
 //			mApplet.create();
@@ -151,7 +159,17 @@ public abstract class AndroidApplication extends Activity implements RenderTarge
 //			mApplet.destroy();
 //		}
 
-//		deleteEngine(mEngine);
+		mEngine.destroy();
+		deleteEngine(mEngine);
+		mEngine=null;
+
+		if(mAudioDevice!=null){
+			mAudioDevice.destroy();
+			deleteAudioDevice(mAudioDevice);
+			mAudioDevice=null;
+		}
+
+		destroyNativeApplication();
 	}
 	
 	public void start(){
@@ -184,16 +202,6 @@ public abstract class AndroidApplication extends Activity implements RenderTarge
 	protected abstract void destroyApplet(Applet applet);
 
 	public void run(){
-		createNativeApplication();
-
-		mEngine=makeEngine();
-		mEngine.installHandlers();
-		mAudioDevice=makeAudioDevice();
-		if(mAudioDevice.create()==false){
-			mAudioDevice=null;
-		}
-		notifyEngineAudioDevice(mEngine);
-		
 if(mApplet==null){
 	setApplet(createApplet(this));
 	mApplet.create();
@@ -203,6 +211,9 @@ if(mApplet==null){
 			long currentTime=System.currentTimeMillis();
 			if(mActive){
 				update((int)(currentTime-mLastTime));
+				if(mAudioDevice!=null){
+					mAudioDevice.update((int)(currentTime-mLastTime));
+				}
 				if(mRenderDevice!=null){
 					render(mRenderDevice);
 				}
@@ -275,18 +286,6 @@ if(mApplet==null){
 		mApplet.destroy();
 		destroyApplet(mApplet);
 		setApplet(null);
-
-		mEngine.destroy();
-		deleteEngine(mEngine);
-		mEngine=null;
-
-		if(mAudioDevice!=null){
-			mAudioDevice.destroy();
-			deleteAudioDevice(mAudioDevice);
-			mAudioDevice=null;
-		}
-
-		destroyNativeApplication();
 	}
 
 	synchronized void notifyKeyPressed(int key){
@@ -453,10 +452,12 @@ if(mApplet==null){
 			"AndroidApplication.surfaceDestroyed");
 
 		if(mRenderDevice!=null){
-			notifyEngineRenderDevice(mEngine);
-			mRenderDevice.destroy();
-			deleteRenderDevice(mRenderDevice);
+			RenderDevice device=mRenderDevice;
 			mRenderDevice=null;
+			
+			notifyEngineRenderDevice(mEngine);
+			device.destroy();
+			deleteRenderDevice(device);
 		}
 
 		if(mRenderTarget!=null){

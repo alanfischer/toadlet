@@ -25,17 +25,21 @@
 
 package us.toadlet.ribbit;
 
-import android.media.AudioTrack;
-import android.media.AudioFormat;
-import android.media.AudioManager;
-
+// AudioTrack STATIC mode apparently leaks memory, so we just buffer the data here
 public class ATAudioBuffer implements AudioBuffer{
-	public ATAudioBuffer(){}
+	public ATAudioBuffer(){
+		mAudioFormat=new AudioFormat(0,0,0);
+	}
 
 	public AudioBuffer getRootAudioBuffer(){return this;}
 
 	public boolean create(AudioStream stream){
-		us.toadlet.ribbit.AudioFormat format=stream.getAudioFormat();
+		System.out.println("ATAudioBuffer.create");
+
+		AudioFormat format=stream.getAudioFormat();
+		mAudioFormat.set(format);
+		
+		/*
 		int sps=format.samplesPerSecond;
 		int chan=(format.channels==2?AudioFormat.CHANNEL_OUT_STEREO:AudioFormat.CHANNEL_OUT_MONO);
 		int bps=(format.bitsPerSample==8?AudioFormat.ENCODING_PCM_8BIT:AudioFormat.ENCODING_PCM_16BIT);
@@ -62,18 +66,37 @@ public class ATAudioBuffer implements AudioBuffer{
 			mEndPosition=available/format.frameSize();
 			mPlayTime=mEndPosition*1000/format.samplesPerSecond;
 		}
-
+		*/
+		
+		int available=0;
+		try{
+			available=stream.available();
+			mData=new byte[available];
+			stream.read(mData,0,available);
+		}
+		catch(java.io.IOException ex){
+			return false;
+		}
+		
 		return true;
 	}
 	
 	public void destroy(){
+		System.out.println("ATAudioBuffer.destroy");
+
+		/*
 		if(mAudioTrack!=null){
 			mAudioTrack.release();
 			mAudioTrack=null;
 		}
+		*/
+		mData=null;
 	}
 	
-	AudioTrack mAudioTrack;
-	int mEndPosition;
-	int mPlayTime;
+	AudioFormat getAudioFormat(){return mAudioFormat;}
+	
+	//AudioTrack mAudioTrack;
+	//int mPlayTime;
+	byte[] mData;
+	AudioFormat mAudioFormat;
 }
