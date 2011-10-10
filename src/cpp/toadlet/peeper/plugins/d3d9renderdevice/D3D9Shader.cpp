@@ -84,9 +84,14 @@ bool D3D9Shader::createContext(){
 			return false;
 		break;
 	}
-	
+
+	D3D9WindowRenderTarget *renderTarget=((D3D9WindowRenderTarget*)mDevice->getPrimaryRenderTarget()->getRootRenderTarget());
+	if(renderTarget==NULL || renderTarget->CompileShaderSymbol==NULL){
+		return false;
+	}
+
 	HRESULT result=E_FAIL;
-	result=((D3D9WindowRenderTarget*)mDevice->getPrimaryRenderTarget()->getRootRenderTarget())->CompileShaderSymbol(mCode,mCode.length(),NULL,NULL,function,targetProfile,0,&mBytecode,&mLog,&mConstantTable);
+	result=renderTarget->CompileShaderSymbol(mCode,mCode.length(),NULL,NULL,function,targetProfile,0,&mBytecode,&mLog,&mConstantTable);
 	if(FAILED(result)){
 		Error::unknown(Categories::TOADLET_PEEPER,(LPCSTR)mLog->GetBufferPointer());
 		return false;

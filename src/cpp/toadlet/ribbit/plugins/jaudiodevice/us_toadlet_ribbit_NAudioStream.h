@@ -11,6 +11,14 @@ extern "C" {
 #define us_toadlet_ribbit_NAudioStream_SKIP_BUFFER_SIZE 2048L
 /*
  * Class:     us_toadlet_ribbit_NAudioStream
+ * Method:    close
+ * Signature: ()V
+ */
+JNIEXPORT void JNICALL Java_us_toadlet_ribbit_NAudioStream_close
+  (JNIEnv *, jobject);
+
+/*
+ * Class:     us_toadlet_ribbit_NAudioStream
  * Method:    getAudioFormat
  * Signature: ()Lus/toadlet/ribbit/AudioFormat;
  */

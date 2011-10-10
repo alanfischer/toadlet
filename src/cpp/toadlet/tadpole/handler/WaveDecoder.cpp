@@ -170,6 +170,9 @@ int WaveDecoder::read(tbyte *buffer,int length){
 
 	mPosition+=length;
 
+	if(length==0){
+		length=-1;
+	}
 	return length;
 }
 

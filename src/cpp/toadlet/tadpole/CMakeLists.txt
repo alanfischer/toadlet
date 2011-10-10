@@ -98,6 +98,7 @@ set (TADPOLE_HANDLER_FFMPEG_SRC
 set (TADPOLE_HANDLER_PLATFORM_ANDROID_SRC
 	handler/platform/android/AndroidAssetArchive.cpp
 	handler/platform/android/AndroidTextureHandler.cpp
+	handler/platform/android/JStream.cpp
 )
 
 set (TADPOLE_HANDLER_PLATFORM_OSX_SRC
@@ -298,6 +299,7 @@ set (TADPOLE_HANDLER_FFMPEG_HEADERS
 set (TADPOLE_HANDLER_PLATFORM_ANDROID_HEADERS
 	handler/platform/android/AndroidAssetArchive.h
 	handler/platform/android/AndroidTextureHandler.h
+	handler/platform/android/JStream.h
 )
 
 set (TADPOLE_HANDLER_PLATFORM_OSX_HEADERS

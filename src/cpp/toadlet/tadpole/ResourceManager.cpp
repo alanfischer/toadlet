@@ -276,6 +276,7 @@ Resource::ptr ResourceManager::findFromFile(const String &name,ResourceData *dat
 			Stream::ptr stream=mArchive->openStream(filename);
 			if(stream!=NULL){
 				Resource::ptr resource=Resource::ptr(streamer->load(stream,data,NULL));
+				stream->close();
 
 				Logger::debug(Categories::TOADLET_TADPOLE,
 					"loaded resource");

@@ -125,6 +125,11 @@ void RandIsle::create(){
 		joyDevice->start();
 	}
 
+		AudioNode::ptr audio=mEngine->createNodeType(AudioNode::type(),mScene);
+		audio->setAudioStream("thermo.wav");
+		mScene->getRoot()->attach(audio);
+		audio->play();
+
 	Logger::debug("RandIsle::create finished");
 }
 

@@ -30,6 +30,8 @@ JNIEXPORT void JNICALL Java_us_toadlet_pad_AndroidApplication_destroyNativeAppli
 		env->CallVoidMethod(obj,setNativeHandleID,(int)app);
 	}
 	env->DeleteLocalRef(appClass);
+
+	Logger::destroy();
 }
 
 JNIEXPORT jobject JNICALL Java_us_toadlet_pad_AndroidApplication_makeEngine(JNIEnv *env,jobject obj){

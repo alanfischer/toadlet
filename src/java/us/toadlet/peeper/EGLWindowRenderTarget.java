@@ -53,7 +53,7 @@ public class EGLWindowRenderTarget extends EGLRenderTarget{
 			return false;
 		}
 
-		int[] version=new int[2];
+		int[] version=mSizeArray;
 		if(egl.eglInitialize(mDisplay,version)==false){
 			System.out.println(
 				"eglInitialize error");
@@ -168,19 +168,18 @@ public class EGLWindowRenderTarget extends EGLRenderTarget{
 	public boolean isValid(){return mContext!=EGL_NO_CONTEXT;}
 
 	public int getWidth(){
-		int[] width=new int[1];
-		egl.eglQuerySurface(mDisplay,mSurface,EGL_WIDTH,width);
-		return width[0];
+		egl.eglQuerySurface(mDisplay,mSurface,EGL_WIDTH,mSizeArray);
+		return mSizeArray[0];
 	}
 	
 	public int getHeight(){
-		int[] height=new int[1];
-		egl.eglQuerySurface(mDisplay,mSurface,EGL_HEIGHT,height);
-		return height[0];
+		egl.eglQuerySurface(mDisplay,mSurface,EGL_HEIGHT,mSizeArray);
+		return mSizeArray[0];
 	}
 	
 	protected EGLConfig mConfig=null;
 	protected boolean mPixmap=false;
+	protected int[] mSizeArray=new int[2];
 	
 	public void TOADLET_CHECK_EGLERROR(String function){
 		int error=egl.eglGetError();

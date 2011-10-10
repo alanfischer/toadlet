@@ -25,7 +25,7 @@
 
 package us.toadlet.ribbit;
 
-public class ATAudioDevice implements AudioDevice{
+public class ATAudioDevice implements AudioDevice,ATAudioRegister{
 	public ATAudioDevice(){
 		mCaps=new AudioCaps();
 		mCaps.maxSources=16;
@@ -41,18 +41,32 @@ public class ATAudioDevice implements AudioDevice{
 		System.out.println("ATAudioDevice.destroy");
 	}
 	
-	public AudioBuffer createAudioBuffer(){System.out.println("asdf");return new ATAudioBuffer();}
-	public Audio createAudio(){return new ATAudio();}
+	public AudioBuffer createAudioBuffer(){return new ATAudioBuffer();}
+	public Audio createAudio(){return new ATAudio(this);}
 
 	/// @todo: implement gain
 	public void setListenerGain(float gain){}
 	
-	public void update(int dt){}
+	public void update(int dt){
+		int i;
+		for(i=0;i<mAudios.size();++i){
+			mAudios.get(i).update(dt);
+		}
+	}
 	
 	public void suspend(){}
 	public void resume(){}
 
 	public boolean getAudioCaps(AudioCaps caps){caps.set(mCaps);return true;}
 
+	public void registerAudio(Audio audio){
+		mAudios.add((ATAudio)audio);
+	}
+	
+	public void unregisterAudio(Audio audio){
+		mAudios.remove((ATAudio)audio);
+	}
+	
 	AudioCaps mCaps;
+	java.util.Vector<ATAudio> mAudios=new java.util.Vector<ATAudio>();
 }

@@ -5,6 +5,7 @@ using namespace toadlet::pad;
 
 JNIEXPORT void JNICALL Java_us_toadlet_pad_NApplet_create(JNIEnv *env,jobject obj){
 	Applet *applet=(Applet*)env->CallIntMethod(obj,getNativeHandleAppletID);
+	Logger::alert("GOING TO CREATE NAPPLETS applet");
 	applet->create();
 }
 

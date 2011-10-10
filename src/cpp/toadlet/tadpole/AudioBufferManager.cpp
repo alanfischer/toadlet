@@ -52,13 +52,18 @@ AudioBuffer::ptr AudioBufferManager::createAudioBuffer(AudioStream::ptr stream){
 	}
 	
 	AudioBuffer::ptr audioBuffer=AudioBuffer::ptr(audioDevice->createAudioBuffer());
-	if(audioBuffer->create(stream)==false){
+	if(audioBuffer!=NULL && audioBuffer->create(stream)==false){
+Logger::alert("sad");
 		audioBuffer=NULL;
 	}
+Logger::alert("happie");
 	return audioBuffer;
 }
 
 AudioStream::ptr AudioBufferManager::findAudioStream(const String &name){
+	Logger::debug(Categories::TOADLET_TADPOLE,
+		"finding audio stream:"+name);
+
 	/// @todo: Unify this with ResourceManager::findFromFile
 	String filename=cleanFilename(name);
 	String extension;

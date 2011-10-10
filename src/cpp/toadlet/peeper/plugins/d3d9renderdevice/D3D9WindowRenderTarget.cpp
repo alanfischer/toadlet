@@ -133,7 +133,7 @@ bool D3D9WindowRenderTarget::createContext(HWND wnd,WindowRenderTargetFormat *fo
 	mD3DLibrary=LoadLibrary(d3dName);
 	if(mD3DLibrary==0){
 		Error::libraryNotFound(Categories::TOADLET_PEEPER,
-			String("D3D9RenderWindow: Error loading ")+d3dName);
+			String("D3D9WindowRenderTarget: Error loading ")+d3dName);
 		return false;
 	}
 
@@ -141,7 +141,7 @@ bool D3D9WindowRenderTarget::createContext(HWND wnd,WindowRenderTargetFormat *fo
 	CreateSymbol=(Direct3DCreate9)GetProcAddress(mD3DLibrary,createName);
 	if(CreateSymbol==NULL){
 		Error::symbolNotFound(Categories::TOADLET_PEEPER,
-			String("D3D9RenderWindow: Error finding ")+createName);
+			String("D3D9WindowRenderTarget: Error finding ")+createName);
 		return NULL;
 	}
 
@@ -149,24 +149,22 @@ bool D3D9WindowRenderTarget::createContext(HWND wnd,WindowRenderTargetFormat *fo
 		char *d3dxName=format->debug?TOADLET_D3DX9_DEBUG_DLL_NAME:TOADLET_D3DX9_DLL_NAME;
 		mD3DXLibrary=LoadLibrary(d3dxName);
 		if(mD3DXLibrary==0){
-			Error::libraryNotFound(Categories::TOADLET_PEEPER,
-				String("D3D9RenderWindow: Error loading ")+d3dxName);
-			return false;
+			Logger::warning(Categories::TOADLET_PEEPER,
+				String("D3D9WindowRenderTarget: Error loading ")+d3dxName);
 		}
 
 		char *compileShaderName=TOADLET_D3DX9_COMPILE_SHADER_NAME;
 		CompileShaderSymbol=(D3DXCompileShader)GetProcAddress(mD3DXLibrary,compileShaderName);
 		if(CompileShaderSymbol==NULL){
-			Error::symbolNotFound(Categories::TOADLET_PEEPER,
-				String("D3D9RenderWindow: Error finding ")+compileShaderName);
-			return NULL;
+			Logger::warning(Categories::TOADLET_PEEPER,
+				String("D3D9WindowRenderTarget: Error finding ")+compileShaderName);
 		}
 	#endif
 
 	mD3D=CreateSymbol(D3D_SDK_VERSION);
 	if(mD3D==NULL){
 		Error::unknown(Categories::TOADLET_PEEPER,
-			"D3D9RenderWindow: Error creating Direct3D object");
+			"D3D9WindowRenderTarget: Error creating Direct3D object");
 		return false;
 	}
 
@@ -190,14 +188,14 @@ bool D3D9WindowRenderTarget::createContext(HWND wnd,WindowRenderTargetFormat *fo
 		result=mD3D->CheckDeviceType(mAdaptor,mDevType,D3DFMT_X8R8G8B8,D3DFMT_X8R8G8B8,FALSE);
 		if(FAILED(result)){
 			Error::unknown(Categories::TOADLET_PEEPER,
-				"D3D9RenderWindow: Error creating 8,8,8 bit back buffer");
+				"D3D9WindowRenderTarget: Error creating 8,8,8 bit back buffer");
 			return false;
 		}
 
 		result=mD3D->CheckDeviceFormat(mAdaptor,mDevType,D3DFMT_X8R8G8B8,D3DUSAGE_DEPTHSTENCIL,D3DRTYPE_SURFACE,D3DFMT_D24S8);
 		if(FAILED(result)){
 			Error::unknown(Categories::TOADLET_PEEPER,
-				"D3D9RenderWindow: Error creating 16 bit depth, 8 bit stencil back buffer");
+				"D3D9WindowRenderTarget: Error creating 16 bit depth, 8 bit stencil back buffer");
 			return false;
 		}
 
@@ -206,7 +204,7 @@ bool D3D9WindowRenderTarget::createContext(HWND wnd,WindowRenderTargetFormat *fo
 		result=mD3D->GetDeviceCaps(mAdaptor,mDevType,&caps);
 		if(FAILED(result)){
 			Error::unknown(Categories::TOADLET_PEEPER,
-				"D3D9RenderWindow: Error getting device caps");
+				"D3D9WindowRenderTarget: Error getting device caps");
 			return false;
 		}
 

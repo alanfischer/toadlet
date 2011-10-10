@@ -118,7 +118,7 @@ int OggVorbisDecoder::read(tbyte *buffer,int length){
 	int count=length;
 
 	if(mVorbisInfo==NULL){
-		return 0;
+		return -1;
 	}
 
 	while(count>0){

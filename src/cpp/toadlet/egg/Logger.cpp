@@ -28,28 +28,20 @@
 #include <toadlet/egg/System.h>
 #include <toadlet/egg/Version.h>
 #include <time.h>
-#if defined(TOADLET_PLATFORM_WIN32)
-	#include <windows.h>
-#endif
-#if defined(TOADLET_PLATFORM_ANDROID)
-	#include <android/log.h>
-#endif
 
 // Choose output method
 #if defined(TOADLET_PLATFORM_WIN32)
 	#define TOADLET_USE_OUTPUTDEBUGSTRING_LOGGING
+	#include <windows.h>
 #endif
 
 #if defined(TOADLET_PLATFORM_ANDROID)
 	#define TOADLET_USE_ANDROID_LOGGING
+	#include <android/log.h>
 #endif
 
 #if !defined(TOADLET_PLATFORM_WINCE)
 	#define TOADLET_USE_STDERR_LOGGING
-#endif
-
-// Include appropriate files
-#if defined(TOADLET_USE_STDERR_LOGGING)
 	#include <stdio.h>
 #endif
 

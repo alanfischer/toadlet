@@ -62,6 +62,7 @@ set (RIBBIT_SRC
 	${JAVA_SRC_DIR}/ribbit/AudioCaps.java
 	${JAVA_SRC_DIR}/ribbit/AudioDevice.java
 	${JAVA_SRC_DIR}/ribbit/ATAudioBuffer.java
+	${JAVA_SRC_DIR}/ribbit/ATAudioRegister.java
 	${JAVA_SRC_DIR}/ribbit/ATAudio.java
 	${JAVA_SRC_DIR}/ribbit/ATAudioDevice.java
 	${JAVA_SRC_DIR}/ribbit/NAudioStream.java
