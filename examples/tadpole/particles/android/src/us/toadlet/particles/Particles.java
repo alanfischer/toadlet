@@ -1,7 +1,7 @@
 package us.toadlet.particles;
 
 import us.toadlet.pad.*;
-import android.os.Bundle;
+import android.os.*;
 
 public class Particles extends AndroidApplication{
 	static{
@@ -25,6 +25,18 @@ public class Particles extends AndroidApplication{
 
         super.onDestroy();
     }
+	
+	protected void onStart(){
+		System.out.println("onStart");
+		
+		super.onStart();
+	}
+
+	protected void onStop(){
+		System.out.println("onStop");
+		
+		super.onStop();
+	}
 	
 	protected native Applet createApplet(AndroidApplication app);
 	protected native void destroyApplet(Applet applet);

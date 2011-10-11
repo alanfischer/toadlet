@@ -54,6 +54,8 @@ JAndroidApplication::JAndroidApplication(JNIEnv *jenv,jobject jobj):
 	env(NULL),
 	obj(NULL),
 
+	mEngine(NULL),
+	mLastEngineObj(NULL),
 	mRenderDevice(NULL),
 	mLastRenderDeviceObj(NULL),
 	mAudioDevice(NULL),
@@ -86,8 +88,26 @@ JAndroidApplication::JAndroidApplication(JNIEnv *jenv,jobject jobj):
 }
 
 JAndroidApplication::~JAndroidApplication(){
-	env->DeleteGlobalRef(obj);
-	obj=NULL;
+	if(obj!=NULL){
+		env->DeleteGlobalRef(obj);
+		obj=NULL;
+	}
+
+	if(mLastEngineObj!=NULL){
+		env->DeleteGlobalRef(mLastEngineObj);
+		mLastEngineObj=NULL;
+	}
+
+	if(mLastRenderDeviceObj!=NULL){
+		env->DeleteGlobalRef(mLastRenderDeviceObj);
+		mLastRenderDeviceObj=NULL;
+	}
+
+	if(mLastAudioDeviceObj!=NULL){
+		env->DeleteGlobalRef(mLastAudioDeviceObj);
+		mLastAudioDeviceObj=NULL;
+	}
+
 	env=NULL;
 }
 
@@ -120,17 +140,25 @@ void JAndroidApplication::setDifferenceMouse(bool difference){
 }
 
 Engine *JAndroidApplication::getEngine(){
-	Engine *engine=NULL;
+	jobject engineObj=env->CallObjectMethod(obj,getEngineID);
 
-	jobject jengine=env->CallObjectMethod(obj,getEngineID);
+	if(mEngine==NULL || mLastEngineObj!=engineObj){
+		//if(obj is NEngine){
+			mEngine=engineObj!=NULL?(Engine*)env->CallIntMethod(engineObj,getNativeHandleEngineID):NULL;
+		//}
+		//else{
+		//	mEngine=new JENgine(env,engineObj);
+		//
 
-	if(jengine!=NULL){
-		engine=(Engine*)env->CallIntMethod(jengine,getNativeHandleEngineID);
-
-		env->DeleteLocalRef(jengine);
+		if(mLastEngineObj!=NULL){
+			env->DeleteGlobalRef(mLastEngineObj);
+		}
+		mLastEngineObj=env->NewGlobalRef(engineObj);
+		
+		env->DeleteLocalRef(engineObj);
 	}
-
-	return engine;
+	
+	return mEngine;
 }
 
 RenderDevice *JAndroidApplication::getRenderDevice(){

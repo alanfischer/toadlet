@@ -55,6 +55,7 @@ protected:
 	JStream::ptr mStream;
 	Collection<String>::ptr mEntries;
 	JNIEnv *env;
+	JavaVM *jvm;
 	jobject assetManagerObj;
 	jmethodID closeManagerID,openManagerID,availableStreamID,readStreamID,closeStreamID;
 };

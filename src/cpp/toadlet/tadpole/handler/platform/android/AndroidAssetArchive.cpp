@@ -33,8 +33,12 @@ namespace toadlet{
 namespace tadpole{
 namespace handler{
 
-AndroidAssetArchive::AndroidAssetArchive(JNIEnv *env1,jobject assetManagerObj1){
+AndroidAssetArchive::AndroidAssetArchive(JNIEnv *env1,jobject assetManagerObj1):
+	env(NULL),
+	jvm(NULL)
+{
 	env=env1;
+	env->GetJavaVM(&jvm);
 	assetManagerObj=env->NewGlobalRef(assetManagerObj1);
 
 	jclass managerClass=env->FindClass("android/content/res/AssetManager");
@@ -61,6 +65,10 @@ void AndroidAssetArchive::destroy(){
 }
 
 Stream::ptr AndroidAssetArchive::openStream(const String &name){
+	Logger::debug(Categories::TOADLET_TADPOLE,"AndroidAssetArchive::openStream");
+
+	jvm->AttachCurrentThread(&env,NULL);
+
 	jstring nameObj=env->NewStringUTF(name);
 	jobject streamObj=env->CallObjectMethod(assetManagerObj,openManagerID,nameObj);
 	jthrowable exc=env->ExceptionOccurred();

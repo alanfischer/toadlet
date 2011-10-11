@@ -32,14 +32,14 @@ namespace toadlet{
 namespace tadpole{
 namespace handler{
 
-jbyteArray bytes;//=env->NewByteArray(length);
-jintArray pixels;//=env->NewIntArray(width*height);
-
 AndroidTextureHandler::AndroidTextureHandler(TextureManager *textureManager,JNIEnv *jenv):
-	mTextureManager(NULL)
+	mTextureManager(NULL),
+	env(NULL),
+	jvm(NULL)
 {
 	mTextureManager=textureManager;
 	env=jenv;
+	env->GetJavaVM(&jvm);
 
 	jclass bitmapClass=env->FindClass("android/graphics/Bitmap");
 	{
@@ -50,18 +50,10 @@ AndroidTextureHandler::AndroidTextureHandler(TextureManager *textureManager,JNIE
 	}
 	env->DeleteLocalRef(bitmapClass);
 
-	systemClass=(jclass)env->NewGlobalRef(env->FindClass("java/lang/System"));
-	{
-		gcID=env->GetStaticMethodID(systemClass,"gc","()V");
-	}
-
 	factoryClass=(jclass)env->NewGlobalRef(env->FindClass("android/graphics/BitmapFactory"));
 	{
 		decodeFactoryID=env->GetStaticMethodID(factoryClass,"decodeByteArray","([BII)Landroid/graphics/Bitmap;");
 	}
-
-//bytes=(jbyteArray)env->NewGlobalRef(env->NewByteArray(65536));
-//pixels=(jintArray)env->NewGlobalRef(env->NewIntArray(256*256));//1024*1024));
 }
 
 AndroidTextureHandler::~AndroidTextureHandler(){
@@ -69,48 +61,40 @@ AndroidTextureHandler::~AndroidTextureHandler(){
 		env->DeleteGlobalRef(factoryClass);
 		factoryClass=NULL;
 	}
-//env->DeleteGlobalRef(bytes);
-//env->DeleteGlobalRef(pixels);
 }
 
 Resource::ptr AndroidTextureHandler::load(Stream::ptr in,ResourceData *data,ProgressListener *listener){
 	Logger::debug(Categories::TOADLET_TADPOLE,"AndroidTextureHandler::load");
 
+	jvm->AttachCurrentThread(&env,NULL);
+
 	int length=in->length();
 	tbyte *streamData=new tbyte[length];
-	in->read(streamData,length);
-Logger::alert(String("1:")+length);
+	length=in->read(streamData,length);
 	jbyteArray bytes=env->NewByteArray(length);
-Logger::alert("2");
 	env->SetByteArrayRegion(bytes,0,length,(jbyte*)streamData);
-Logger::alert(String("3:")+(int)streamData);
 	delete[] streamData;
-Logger::alert(String("factoryClassstuff:")+(int)factoryClass+":"+(int)decodeFactoryID);
-	jobject bitmap=env->CallStaticObjectMethod(factoryClass,decodeFactoryID,bytes,0,length);
 
-Logger::alert("4");
+	jobject bitmap=env->CallStaticObjectMethod(factoryClass,decodeFactoryID,bytes,0,length);
 	jthrowable exc=env->ExceptionOccurred();
-Logger::alert("5");
 	if(exc!=NULL){
 		env->ExceptionDescribe();
 		env->ExceptionClear();
 	}
 	env->DeleteLocalRef(bytes);
-	if(exc!=NULL){
+	if(exc!=NULL || bitmap==NULL){
 		return NULL;
 	}
 	
 	int width=env->CallIntMethod(bitmap,getWidthBitmapID);
 	int height=env->CallIntMethod(bitmap,getHeightBitmapID);
-	Logger::alert(String("5.1:")+width*height);
 
 	jintArray pixels=env->NewIntArray(width*height);
-Logger::alert("8");
+
 	env->CallVoidMethod(bitmap,getPixelsBitmapID,pixels,0,width,0,0,width,height);
-Logger::alert("7");
+
 	exc=env->ExceptionOccurred();
 	if(exc!=NULL){
-Logger::alert("5");
 		env->ExceptionDescribe();
 		env->ExceptionClear();
 	}
@@ -120,20 +104,13 @@ Logger::alert("5");
 		return NULL;
 	}
 
-Logger::alert("9");
 	Image::ptr image(Image::createAndReallocate(Image::Dimension_D2,Image::Format_RGBA_8,width,height));
 	
-Logger::alert("7.5");
 	env->GetIntArrayRegion(pixels,0,width*height,(jint*)image->getData());
 
-Logger::alert("6");
 	env->DeleteLocalRef(pixels);
-Logger::alert("7");
-Logger::alert("7,5");
-Logger::alert("8");
 
-Texture::ptr texture=mTextureManager->createTexture(image);
-	Logger::alert("DONE");
+	Texture::ptr texture=mTextureManager->createTexture(image);
 	return texture;
 }
 
