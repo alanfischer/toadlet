@@ -63,17 +63,23 @@ JAudio::~JAudio(){
 }
 
 bool JAudio::create(AudioBuffer::ptr audioBuffer){
+	Logger::alert(Categories::TOADLET_RIBBIT,
+		"JAudio::create");
+
 	mAudioBuffer=audioBuffer; // Store the pointer until we have reference counting
-	jobject audioBufferObj=((JAudioBuffer*)audioBuffer->getRootAudioBuffer())->getJObject();
+	jobject audioBufferObj=(audioBuffer!=NULL)?((JAudioBuffer*)audioBuffer->getRootAudioBuffer())->getJObject():NULL;
 
 	return env->CallBooleanMethod(obj,createAudioBufferID,audioBufferObj);
 }
 
 bool JAudio::create(AudioStream::ptr audioStream){
+	Logger::alert(Categories::TOADLET_RIBBIT,
+		"JAudio::create");
+
 	mAudioStream=audioStream; // Store the pointer until we have reference counting
 	jobject audioStreamObj=NULL;
 	jclass streamClass=env->FindClass("us/toadlet/ribbit/NAudioStream");
-	{
+	if(audioStream!=NULL){
 		jmethodID initID=env->GetMethodID(streamClass,"<init>","(III)V");
 		int length=2048;
 		tbyte *buffer=new tbyte[length];

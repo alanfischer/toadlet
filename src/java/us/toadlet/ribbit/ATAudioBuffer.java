@@ -25,9 +25,9 @@
 
 package us.toadlet.ribbit;
 
-// AudioTrack STATIC mode apparently leaks memory, so we just buffer the data here
 public class ATAudioBuffer implements AudioBuffer{
-	public ATAudioBuffer(){
+	public ATAudioBuffer(int maxSize){
+		mMaxSize=maxSize;
 		mAudioFormat=new AudioFormat(0,0,0);
 	}
 
@@ -36,45 +36,28 @@ public class ATAudioBuffer implements AudioBuffer{
 	public boolean create(AudioStream stream){
 		System.out.println("ATAudioBuffer.create");
 
+		if(stream==null){
+			return false;
+		}
 		AudioFormat format=stream.getAudioFormat();
 		mAudioFormat.set(format);
-		
-		/*
-		int sps=format.samplesPerSecond;
-		int chan=(format.channels==2?AudioFormat.CHANNEL_OUT_STEREO:AudioFormat.CHANNEL_OUT_MONO);
-		int bps=(format.bitsPerSample==8?AudioFormat.ENCODING_PCM_8BIT:AudioFormat.ENCODING_PCM_16BIT);
 
-		int available=0;
 		try{
-			available=stream.available();
-		}
-		catch(java.io.IOException ex){
-			return false;
-		}
-
-		mAudioTrack=new AudioTrack(AudioManager.STREAM_ALARM,sps,chan,bps,available,AudioTrack.MODE_STATIC);
-		
-		byte[] data=new byte[available];
-		try{
-			available=stream.read(data,0,available);
-		}
-		catch(java.io.IOException ex){
-			return false;
-		}
-		if(available>0){
-			mAudioTrack.write(data,0,available);
-			mEndPosition=available/format.frameSize();
-			mPlayTime=mEndPosition*1000/format.samplesPerSecond;
-		}
-		*/
-		
-		int available=0;
-		try{
-			available=stream.available();
+			int available=stream.available();
+			
+			// Set an arbitrary limit on AudioBuffers, otherwise it seems we can hang
+			if(available>mMaxSize){
+				System.out.println("AudioBuffer too large");
+				return false;
+			}
+			
 			mData=new byte[available];
 			stream.read(mData,0,available);
 		}
 		catch(java.io.IOException ex){
+			return false;
+		}
+		catch(OutOfMemoryError er){
 			return false;
 		}
 		
@@ -84,19 +67,12 @@ public class ATAudioBuffer implements AudioBuffer{
 	public void destroy(){
 		System.out.println("ATAudioBuffer.destroy");
 
-		/*
-		if(mAudioTrack!=null){
-			mAudioTrack.release();
-			mAudioTrack=null;
-		}
-		*/
 		mData=null;
 	}
 	
 	AudioFormat getAudioFormat(){return mAudioFormat;}
-	
-	//AudioTrack mAudioTrack;
-	//int mPlayTime;
+
+	int mMaxSize;
 	byte[] mData;
 	AudioFormat mAudioFormat;
 }

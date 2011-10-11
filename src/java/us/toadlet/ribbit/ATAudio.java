@@ -38,8 +38,12 @@ public class ATAudio implements Audio,AudioTrack.OnPlaybackPositionUpdateListene
 
 	public boolean create(AudioBuffer buffer){
 		mAudioStream=null;
-		mAudioBuffer=(ATAudioBuffer)buffer.getRootAudioBuffer();
+		mAudioBuffer=(buffer!=null)?(ATAudioBuffer)buffer.getRootAudioBuffer():null;
 
+		if(mAudioBuffer==null){
+			return false;
+		}
+		
 		us.toadlet.ribbit.AudioFormat format=mAudioBuffer.getAudioFormat();
 		int sps=format.samplesPerSecond;
 		int chan=(format.channels==2?AudioFormat.CHANNEL_OUT_STEREO:AudioFormat.CHANNEL_OUT_MONO);
@@ -56,6 +60,10 @@ public class ATAudio implements Audio,AudioTrack.OnPlaybackPositionUpdateListene
 	public boolean create(AudioStream stream){
 		mAudioBuffer=null;
 		mAudioStream=stream;
+
+		if(mAudioStream==null){
+			return false;
+		}
 
 		us.toadlet.ribbit.AudioFormat format=mAudioStream.getAudioFormat();
 		int sps=format.samplesPerSecond;
