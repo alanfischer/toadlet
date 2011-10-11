@@ -65,7 +65,7 @@ AndroidTextureHandler::~AndroidTextureHandler(){
 
 Resource::ptr AndroidTextureHandler::load(Stream::ptr in,ResourceData *data,ProgressListener *listener){
 	Logger::debug(Categories::TOADLET_TADPOLE,"AndroidTextureHandler::load");
-
+//return NULL;
 	jvm->AttachCurrentThread(&env,NULL);
 
 	int length=in->length();

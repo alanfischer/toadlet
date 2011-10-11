@@ -408,7 +408,7 @@ To build for Android 2.2 and lower be sure to specify the Android NDK API level 
 
 
 
-  cmake.exe -G"NMake Makefiles" -DCMAKE_TOOLCHAIN_FILE=../cmake/Toolchains/Android.cmake -DANDROID_NDK=path/to/androidNdkDir -DANDROID_NDK_API_LEVEL=8 -DANDROID_SDK=path/to/androidSdkDir -DCMAKE_INSTALL_PREFIX=path/to/install/dir ..
+  cmake.exe -G"NMake Makefiles" -DCMAKE_TOOLCHAIN_FILE=../cmake/Toolchains/Android.cmake -DANDROID_NDK=path/to/androidNdkDir -DANDROID_NDK_API_LEVEL=8 -DANDROID_SDK=path/to/androidSdkDir -DARM_TARGET=armeabi -DCMAKE_INSTALL_PREFIX=path/to/install/dir ..
 
 
 

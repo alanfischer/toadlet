@@ -360,21 +360,23 @@ public:
 			Material::ptr treeLeafTop=engine->getMaterialManager()->findMaterial("leaf_top1_alpha.png");
 			Material::ptr treeLeafBottom=engine->getMaterialManager()->findMaterial("leaf_bottom1_alpha.png");
 
-			int i;
-			for(i=0;i<treeLeafTop->getNumPaths();++i){
-				RenderPath::ptr path=treeLeaf->addPath();
-				RenderPath::ptr topPath=treeLeafTop->getPath(i);
-				RenderPath::ptr bottomPath=treeLeafBottom->getPath(i);
+			if(treeLeafTop!=NULL && treeLeafBottom!=NULL){
+				int i;
+				for(i=0;i<treeLeafTop->getNumPaths();++i){
+					RenderPath::ptr path=treeLeaf->addPath();
+					RenderPath::ptr topPath=treeLeafTop->getPath(i);
+					RenderPath::ptr bottomPath=treeLeafBottom->getPath(i);
 
-				RenderPass::ptr topPass=path->addPass(topPath->takePass(0));
-				topPass->setRasterizerState(RasterizerState(RasterizerState::CullType_BACK));
-				topPass->setDepthState(DepthState(DepthState::DepthTest_LEQUAL,false));
-				topPass->setBlendState(BlendState::Combination_ALPHA);
+					RenderPass::ptr topPass=path->addPass(topPath->takePass(0));
+					topPass->setRasterizerState(RasterizerState(RasterizerState::CullType_BACK));
+					topPass->setDepthState(DepthState(DepthState::DepthTest_LEQUAL,false));
+					topPass->setBlendState(BlendState::Combination_ALPHA);
 
-				RenderPass::ptr bottomPass=path->addPass(bottomPath->takePass(0));
-				bottomPass->setRasterizerState(RasterizerState(RasterizerState::CullType_FRONT));
-				bottomPass->setDepthState(DepthState(DepthState::DepthTest_LEQUAL,false));
-				bottomPass->setBlendState(BlendState::Combination_ALPHA);
+					RenderPass::ptr bottomPass=path->addPass(bottomPath->takePass(0));
+					bottomPass->setRasterizerState(RasterizerState(RasterizerState::CullType_FRONT));
+					bottomPass->setDepthState(DepthState(DepthState::DepthTest_LEQUAL,false));
+					bottomPass->setBlendState(BlendState::Combination_ALPHA);
+				}
 			}
 
 			treeLeaf->compile();
@@ -391,10 +393,15 @@ public:
 
 		Logger::alert("Loading sounds");
 
+Logger::alert("_+_+_+_+_+ DOG");
  		dog=engine->getAudioBufferManager()->findAudioBuffer("dog.wav");
+Logger::alert("_+_+_+_+_+ SHARK");
 		shark=engine->getAudioBufferManager()->findAudioBuffer("shark.wav");
+Logger::alert("_+_+_+_+_+ RUSTLE");
 		rustle=engine->getAudioBufferManager()->findAudioBuffer("rustle.wav");
+Logger::alert("_+_+_+_+_+ CRUNCH");
 		crunch=engine->getAudioBufferManager()->findAudioBuffer("crunch.wav");
+Logger::alert("_+_+_+_+_+ ACORN");
 
 		acorn=engine->getMaterialManager()->findMaterial("acorn.png");
 		if(acorn!=NULL){

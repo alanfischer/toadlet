@@ -53,10 +53,8 @@ AudioBuffer::ptr AudioBufferManager::createAudioBuffer(AudioStream::ptr stream){
 	
 	AudioBuffer::ptr audioBuffer=AudioBuffer::ptr(audioDevice->createAudioBuffer());
 	if(audioBuffer!=NULL && audioBuffer->create(stream)==false){
-Logger::alert("sad");
 		audioBuffer=NULL;
 	}
-Logger::alert("happie");
 	return audioBuffer;
 }
 

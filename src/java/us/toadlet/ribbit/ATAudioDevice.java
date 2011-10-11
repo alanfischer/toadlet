@@ -31,6 +31,7 @@ public class ATAudioDevice implements AudioDevice,ATAudioRegister{
 		mCaps.maxSources=16;
 		mCaps.streaming=true;
 		mCaps.positional=false;
+		mMaxBufferSize=65536;
 	}
 
 	public boolean create(){
@@ -41,7 +42,7 @@ public class ATAudioDevice implements AudioDevice,ATAudioRegister{
 		System.out.println("ATAudioDevice.destroy");
 	}
 	
-	public AudioBuffer createAudioBuffer(){return new ATAudioBuffer();}
+	public AudioBuffer createAudioBuffer(){return new ATAudioBuffer(mMaxBufferSize);}
 	public Audio createAudio(){return new ATAudio(this);}
 
 	/// @todo: implement gain
@@ -67,6 +68,7 @@ public class ATAudioDevice implements AudioDevice,ATAudioRegister{
 		mAudios.remove((ATAudio)audio);
 	}
 	
+	int mMaxBufferSize;
 	AudioCaps mCaps;
 	java.util.Vector<ATAudio> mAudios=new java.util.Vector<ATAudio>();
 }
