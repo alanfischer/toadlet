@@ -26,8 +26,7 @@
 package us.toadlet.ribbit;
 
 public class ATAudioBuffer implements AudioBuffer{
-	public ATAudioBuffer(int maxSize){
-		mMaxSize=maxSize;
+	public ATAudioBuffer(){
 		mAudioFormat=new AudioFormat(0,0,0);
 	}
 
@@ -44,13 +43,6 @@ public class ATAudioBuffer implements AudioBuffer{
 
 		try{
 			int available=stream.available();
-			
-			// Set an arbitrary limit on AudioBuffers, otherwise it seems we can hang
-			if(available>mMaxSize){
-				System.out.println("AudioBuffer too large");
-				return false;
-			}
-			
 			mData=new byte[available];
 			stream.read(mData,0,available);
 		}
@@ -72,7 +64,6 @@ public class ATAudioBuffer implements AudioBuffer{
 	
 	AudioFormat getAudioFormat(){return mAudioFormat;}
 
-	int mMaxSize;
 	byte[] mData;
 	AudioFormat mAudioFormat;
 }

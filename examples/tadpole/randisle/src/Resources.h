@@ -40,7 +40,7 @@ public:
 				textureState.calculation=TextureState::CalculationType_NORMAL;
 				Math::setMatrix4x4FromScale(textureState.matrix,16,16,16);
 				grass->getPass()->setTextureState(0,textureState);
-				grass->getPass()->setRasterizerState(RasterizerState(RasterizerState::CullType_BACK,RasterizerState::FillType_LINE));
+//				grass->getPass()->setRasterizerState(RasterizerState(RasterizerState::CullType_BACK,RasterizerState::FillType_LINE));
 			}
 			grass->setLayer(-1);
 			grass->retain();
@@ -393,15 +393,10 @@ public:
 
 		Logger::alert("Loading sounds");
 
-Logger::alert("_+_+_+_+_+ DOG");
  		dog=engine->getAudioBufferManager()->findAudioBuffer("dog.wav");
-Logger::alert("_+_+_+_+_+ SHARK");
 		shark=engine->getAudioBufferManager()->findAudioBuffer("shark.wav");
-Logger::alert("_+_+_+_+_+ RUSTLE");
 		rustle=engine->getAudioBufferManager()->findAudioBuffer("rustle.wav");
-Logger::alert("_+_+_+_+_+ CRUNCH");
 		crunch=engine->getAudioBufferManager()->findAudioBuffer("crunch.wav");
-Logger::alert("_+_+_+_+_+ ACORN");
 
 		acorn=engine->getMaterialManager()->findMaterial("acorn.png");
 		if(acorn!=NULL){
