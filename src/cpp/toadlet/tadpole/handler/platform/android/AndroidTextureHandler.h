@@ -38,16 +38,17 @@ class TOADLET_API AndroidTextureHandler:public ResourceStreamer{
 public:
 	AndroidTextureHandler(TextureManager *textureManager,JNIEnv *env);
 	virtual ~AndroidTextureHandler();
-	bool valid();
 
 	Resource::ptr load(Stream::ptr in,ResourceData *data,ProgressListener *listener);
+
+	void setEnv(JNIEnv *env){this->env=env;}
 
 protected:
 	TextureManager *mTextureManager;
 	JNIEnv *env;
+	JavaVM *jvm;
 	jclass factoryClass;
 	jmethodID decodeFactoryID,recycleBitmapID,getWidthBitmapID,getHeightBitmapID,getPixelsBitmapID;
-	jclass systemClass;jmethodID gcID;
 };
 
 }

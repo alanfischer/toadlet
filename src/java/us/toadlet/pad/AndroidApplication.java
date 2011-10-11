@@ -103,20 +103,31 @@ public abstract class AndroidApplication extends Activity implements RenderTarge
 		System.out.println("AndroidApplication.onStart");
 	
 		super.onStart();
-		start();
+
+		mLastTime=System.currentTimeMillis();
+		mRun=true;
+		mThread=new Thread(this);
+		mThread.start();
 	}
 
 	protected void onStop(){
 		System.out.println("AndroidApplication.onStop");
 
 		super.onStop();
-		stop();
+
+		mRun=false;
+		if(mThread!=null){
+			try{
+				mThread.join();
+			}catch(InterruptedException ex){}
+			mThread=null;
+		}
 	}
 
 	protected void onDestroy(){
 		System.out.println("AndroidApplication.onDestroy");
 
-		super.onStop();
+		super.onDestroy();
 		destroy();
 	}
 
@@ -138,30 +149,45 @@ public abstract class AndroidApplication extends Activity implements RenderTarge
 	public void create(){
 		createNativeApplication();
 
-System.out.println("MAKING ENGINE");
-		mEngine=makeEngine();
-System.out.println("INSTALL HANDLERS");
-		mEngine.installHandlers();
-
-		mAudioDevice=makeAudioDevice();
-		if(mAudioDevice.create()==false){
-			mAudioDevice=null;
+		if(mEngine==null){
+			mEngine=makeEngine();
+			mEngine.installHandlers();
 		}
-		notifyEngineAudioDevice(mEngine);
-		
-//		if(mApplet!=null){
+
+		if(mAudioDevice==null){
+			mAudioDevice=makeAudioDevice();
+			if(mAudioDevice.create()==false){
+				mAudioDevice=null;
+			}
+			notifyEngineAudioDevice(mEngine);
+		}
+
+//		if(mApplet==null){
+//			mApplet=createApplet(this);
 //			mApplet.create();
 //		}
+
+		if(mFullscreen){
+			requestWindowFeature(Window.FEATURE_NO_TITLE);   
+			getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN,WindowManager.LayoutParams.FLAG_FULLSCREEN);
+		}
+
+		mView=new ApplicationView(this);
+		setContentView(mView);
 	}
 	
 	public void destroy(){
-//		if(mApplet!=null){
-//			mApplet.destroy();
-//		}
-
-		mEngine.destroy();
-		deleteEngine(mEngine);
-		mEngine=null;
+		if(mApplet!=null){
+			mApplet.destroy();
+			destroyApplet(mApplet);
+			mApplet=null;
+		}
+		
+		if(mEngine!=null){
+			mEngine.destroy();
+			deleteEngine(mEngine);
+			mEngine=null;
+		}
 
 		if(mAudioDevice!=null){
 			mAudioDevice.destroy();
@@ -170,42 +196,23 @@ System.out.println("INSTALL HANDLERS");
 		}
 
 		destroyNativeApplication();
-	}
+  	}
 	
 	public void start(){
-		if(mFullscreen){
-			requestWindowFeature(Window.FEATURE_NO_TITLE);   
-			getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN,WindowManager.LayoutParams.FLAG_FULLSCREEN);
-		}
-	
-		mView=new ApplicationView(this);
-		setContentView(mView);
-
-		mLastTime=System.currentTimeMillis();
-
-		mRun=true;
-		mThread=new Thread(this);
-		mThread.start();
 	}
 	
 	public void stop(){
 		finish();
-		
-		mRun=false;
-		
-		try{
-			mThread.join();
-		}catch(InterruptedException ex){}
 	}
 
 	protected abstract Applet createApplet(AndroidApplication app);
 	protected abstract void destroyApplet(Applet applet);
 
 	public void run(){
-if(mApplet==null){
-	setApplet(createApplet(this));
-	mApplet.create();
-}
+		if(mApplet==null){
+			mApplet=createApplet(this);
+			mApplet.create();
+		}
 
 		while(mRun){
 			long currentTime=System.currentTimeMillis();
@@ -282,10 +289,6 @@ if(mApplet==null){
 				}
 			}
 		}
-
-		mApplet.destroy();
-		destroyApplet(mApplet);
-		setApplet(null);
 	}
 
 	synchronized void notifyKeyPressed(int key){

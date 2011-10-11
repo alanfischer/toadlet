@@ -1,7 +1,7 @@
 package us.toadlet.randisle;
 
 import us.toadlet.pad.*;
-import android.os.Bundle;
+import android.os.*;
 
 public class RandIsle extends AndroidApplication{
 	static{
@@ -26,6 +26,18 @@ public class RandIsle extends AndroidApplication{
         super.onDestroy();
     }
 	
+	protected void onStart(){
+		System.out.println("onStart");
+		
+		super.onStart();
+	}
+
+	protected void onStop(){
+		System.out.println("onStop");
+		
+		super.onStop();
+	}
+
 	protected native Applet createApplet(AndroidApplication app);
 	protected native void destroyApplet(Applet applet);
 }

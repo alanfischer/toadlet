@@ -29,7 +29,6 @@ extern "C" JNIEXPORT jobject JNICALL Java_us_toadlet_particles_Particles_createA
 		japplet=env->NewObject(appletClass,initID,applet);
 	}
 	env->DeleteLocalRef(appletClass);
-	Logger::alert("allocated NApplet");
 
 	return japplet;
 }

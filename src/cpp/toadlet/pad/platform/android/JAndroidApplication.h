@@ -91,6 +91,8 @@ protected:
 	jobject obj;
 	jmethodID createID,destroyID,startID,stopID,setDifferenceMouseID,getWidthID,getHeightID,getEngineID,getRenderDeviceID,getAudioDeviceID,setNativeHandleID,getNativeHandleID;
 
+	Engine *mEngine;
+	jobject mLastEngineObj;
 	RenderDevice *mRenderDevice;
 	jobject mLastRenderDeviceObj;
 	AudioDevice *mAudioDevice;
