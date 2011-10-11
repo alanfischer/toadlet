@@ -63,14 +63,21 @@ AndroidTextureHandler::~AndroidTextureHandler(){
 	}
 }
 
-Resource::ptr AndroidTextureHandler::load(Stream::ptr in,ResourceData *data,ProgressListener *listener){
+Resource::ptr AndroidTextureHandler::load(Stream::ptr stream,ResourceData *data,ProgressListener *listener){
 	Logger::debug(Categories::TOADLET_TADPOLE,"AndroidTextureHandler::load");
-//return NULL;
+
 	jvm->AttachCurrentThread(&env,NULL);
 
-	int length=in->length();
+	// If this function is crashing, it is likely due to running out of memory, we attempt to protect from it here
+	if(stream!=NULL && stream->length()>256*256*4){ // 256 x 256 32 bpp image
+		Error::insufficientMemory(Categories::TOADLET_TADPOLE,
+			"stream length too large, will probably result in OutOfMemoryError");
+		return NULL;
+	}
+
+	int length=stream->length();
 	tbyte *streamData=new tbyte[length];
-	length=in->read(streamData,length);
+	length=stream->read(streamData,length);
 	jbyteArray bytes=env->NewByteArray(length);
 	env->SetByteArrayRegion(bytes,0,length,(jbyte*)streamData);
 	delete[] streamData;
