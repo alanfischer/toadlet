@@ -69,6 +69,7 @@ Logo::~Logo(){
 }
 
 void Logo::create(){
+
 	engine=app->getEngine();
 	engine->setDirectory("../../../data");
 
