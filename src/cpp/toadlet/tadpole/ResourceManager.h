@@ -82,6 +82,7 @@ protected:
 
 	Archive *mArchive;
 	Collection<Archive::ptr> mResourceArchives;
+	int mMaxStreamLength;
 
 	Collection<int> mFreeHandles;
 	Collection<Resource::ptr> mResources;

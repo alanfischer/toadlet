@@ -26,6 +26,7 @@
 #include <toadlet/tadpole/ResourceManager.h>
 #include <toadlet/egg/Error.h>
 #include <toadlet/egg/Logger.h>
+#include <toadlet/egg/Extents.h>
 
 namespace toadlet{
 namespace tadpole{
@@ -33,6 +34,11 @@ namespace tadpole{
 ResourceManager::ResourceManager(Archive *archive){
 	mArchive=archive;
 	mResources.resize(1); // Handle 0 is always NULL
+	#if defined(TOADLET_PLATFORM_ANDROID)
+		mMaxStreamLength=256*256*4*2; // Twice the size of a 256x256 32bpp image
+	#else
+		mMaxStreamLength=Extents::MAX_INT; // No real limit otherwise
+	#endif
 }
 
 ResourceManager::~ResourceManager(){
@@ -275,6 +281,13 @@ Resource::ptr ResourceManager::findFromFile(const String &name,ResourceData *dat
 		if(streamer!=NULL){
 			Stream::ptr stream=mArchive->openStream(filename);
 			if(stream!=NULL){
+				if(stream->length()>mMaxStreamLength){
+					stream->close();
+					Error::insufficientMemory(Categories::TOADLET_TADPOLE,
+						"stream length too large, increase ResourceManager max stream length or reduce resource size");
+					return NULL;
+				}
+
 				Resource::ptr resource=Resource::ptr(streamer->load(stream,data,NULL));
 				stream->close();
 
