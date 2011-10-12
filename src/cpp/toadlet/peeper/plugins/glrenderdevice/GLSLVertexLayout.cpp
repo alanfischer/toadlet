@@ -41,7 +41,8 @@ GLSLVertexLayout::~GLSLVertexLayout(){
 }
 
 bool GLSLVertexLayout::create(GLVertexFormat *vertexFormat,GLSLShaderState *shaderState){
-	Logger::excess("GLSLVertexLayout::create");
+	Logger::excess(Categories::TOADLET_PEEPER,
+		"GLSLVertexLayout::create");
 
 	mSemanticIndexes.resize(vertexFormat->getNumElements());
 
@@ -51,7 +52,8 @@ bool GLSLVertexLayout::create(GLVertexFormat *vertexFormat,GLSLShaderState *shad
 		if(location==-1){
 			location=glGetAttribLocation(shaderState->mHandle,vertexFormat->getName(i)+vertexFormat->getIndex(i));
 		}
-		Logger::excess(String("Semantic name:")+vertexFormat->getName(i)+" found location:"+location);
+		Logger::excess(Categories::TOADLET_PEEPER,
+			String("Semantic name:")+vertexFormat->getName(i)+" found location:"+location);
 		if(location==-1){
 			location=GLRenderDevice::getFixedAttribFromSemantic(vertexFormat->getSemantic(i),vertexFormat->getIndex(i));
 		}
