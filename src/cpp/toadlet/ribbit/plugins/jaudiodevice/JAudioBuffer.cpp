@@ -52,13 +52,6 @@ bool JAudioBuffer::create(AudioStream::ptr stream){
 	Logger::alert(Categories::TOADLET_RIBBIT,
 		"JAudioBuffer::create");
 
-	// If this function is crashing, it is likely due to running out of memory, we attempt to protect from it here
-	if(stream!=NULL && stream->length()>16*2*44100){ // 1 second of 16 bit 2 channel audio
-		Error::insufficientMemory(Categories::TOADLET_TADPOLE,
-			"stream length too large, will probably result in OutOfMemoryError");
-		return NULL;
-	}
-
 	mAudioStream=stream; // Store the pointer until we have reference counting
 	jobject streamObj=NULL;
 
