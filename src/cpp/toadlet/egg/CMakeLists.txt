@@ -9,6 +9,7 @@ set (EGG_SRC
 	Error.cpp
 	Exception.cpp
 	Logger.cpp
+	HTTPLoggerListener.cpp
 	Profile.cpp
 	Random.cpp
 	String.cpp
@@ -98,6 +99,7 @@ set (EGG_HEADERS
 	IntrusivePointer.h
 	Logger.h
 	LoggerListener.h
+	HTTPLoggerListener.h
 	MathConversion.h
 	Map.h
 	Mutex.h

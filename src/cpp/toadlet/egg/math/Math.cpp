@@ -1657,7 +1657,7 @@ void Math::optimize(int o){
 
 			uint64 t4=System::utime();
 
-			Logger::alert(Categories::TOADLET_EGG,,
+			Logger::alert(Categories::TOADLET_EGG,
 				String("Timings - MatrixTraditional:")+(t1-t0)+" MatrixNEON:"+(t2-t1)+" VectorTraditional:"+(t3-t2)+" VectorNEON:"+(t4-t3));
 
 			if(t1-t0 < t2-t1){

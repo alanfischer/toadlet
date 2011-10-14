@@ -1,9 +1,16 @@
 #include "HTTPLoggerListener.h"
 
+#include <stdio.h>
+
 namespace toadlet{
 namespace egg{
 
 HTTPLoggerListener::HTTPLoggerListener(String server,String path){
+	// Turn off net errors when in use, to avoid recursion
+	Logger::getInstance()->setCategoryReportingLevel(Categories::TOADLET_EGG_NET,Logger::Level_DISABLED);
+
+	mServer=server;
+	mPath=path;
 	mMutex=Mutex::ptr(new Mutex());
 	mCondition=WaitCondition::ptr(new WaitCondition());
 

@@ -1,11 +1,15 @@
 #ifndef TOADLET_EGG_HTTPLOGGERLISTENER_H
 #define TOADLET_EGG_HTTPLOGGERLISTENER_H
 
-#include <toadlet/egg/String.h>
+#include <toadlet/egg/Logger.h>
+#include <toadlet/egg/LoggerListener.h>
 #include <toadlet/egg/Thread.h>
 #include <toadlet/egg/Mutex.h>
 #include <toadlet/egg/WaitCondition.h>
-#include <toadlet/egg/io/Socket.h>
+#include <toadlet/egg/net/Socket.h>
+
+namespace toadlet{
+namespace egg{
 
 class HTTPLoggerListener:public LoggerListener,public Runnable{
 public:
@@ -16,7 +20,7 @@ public:
 
 	void flush();
 
-	void sendEntry(Logger::Category *category,Logger::Level level,uint64 time,const String &text)
+	void sendEntry(Logger::Category *category,Logger::Level level,uint64 time,const String &text);
 
 	void run();
 
@@ -34,5 +38,8 @@ protected:
 	Thread::ptr mThread;
 	bool mStop;
 };
+
+}
+}
 
 #endif
