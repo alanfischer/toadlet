@@ -49,10 +49,11 @@ public class ATAudio implements Audio,AudioTrack.OnPlaybackPositionUpdateListene
 		int chan=(format.channels==2?AudioFormat.CHANNEL_OUT_STEREO:AudioFormat.CHANNEL_OUT_MONO);
 		int bps=(format.bitsPerSample==8?AudioFormat.ENCODING_PCM_8BIT:AudioFormat.ENCODING_PCM_16BIT);
 		int available=mAudioBuffer.mData.length;
-		
+
 		mAudioTrack=new AudioTrack(AudioManager.STREAM_ALARM,sps,chan,bps,available,AudioTrack.MODE_STREAM);
 		mAudioTrack.setPlaybackPositionUpdateListener(this);
 		mAudioTrack.setNotificationMarkerPosition(available/format.frameSize());
+		mEndTime=(mAudioBuffer.mData.length/format.frameSize()) * 1000 / format.samplesPerSecond;
 
 		return true;
 	}
@@ -75,7 +76,7 @@ public class ATAudio implements Audio,AudioTrack.OnPlaybackPositionUpdateListene
 		mAudioTrack=new AudioTrack(AudioManager.STREAM_MUSIC,sps,chan,bps,available,AudioTrack.MODE_STREAM);
 		mAudioTrack.setPlaybackPositionUpdateListener(this);
 		mAudioTrack.setPositionNotificationPeriod(available/format.frameSize());
-		
+
 		return true;
 	}
 	
@@ -111,7 +112,6 @@ public class ATAudio implements Audio,AudioTrack.OnPlaybackPositionUpdateListene
 
 	public boolean play(){
 		mPlayTime=0;
-
 		if(mAudioTrack!=null){
 			try{
 				mAudioTrack.play();
@@ -135,6 +135,7 @@ public class ATAudio implements Audio,AudioTrack.OnPlaybackPositionUpdateListene
 		if(mAudioTrack!=null){
 			try{
 				mAudioTrack.stop();
+//				mAudioTrack.setPlaybackHeadPosition(0);
 			}
 			catch(Exception ex){
 				return false;
@@ -149,7 +150,7 @@ public class ATAudio implements Audio,AudioTrack.OnPlaybackPositionUpdateListene
 		if(mAudioTrack!=null){
 			playState=mAudioTrack.getPlayState();
 		}
-		return playState==AudioTrack.PLAYSTATE_PLAYING;
+		return playState==AudioTrack.PLAYSTATE_PLAYING;// && mPlayTime<mEndTime;
 	}
 	
 	public boolean getFinished(){
@@ -157,7 +158,7 @@ public class ATAudio implements Audio,AudioTrack.OnPlaybackPositionUpdateListene
 		if(mAudioTrack!=null){
 			playState=mAudioTrack.getPlayState();
 		}
-		return playState==AudioTrack.PLAYSTATE_STOPPED;
+		return playState==AudioTrack.PLAYSTATE_STOPPED;// || mPlayTime>=mEndTime;
 	}
 
 	/// @todo: enable looping
@@ -183,12 +184,7 @@ public class ATAudio implements Audio,AudioTrack.OnPlaybackPositionUpdateListene
 	public float getPitch(){return 1.0f;}
 
 	public void onMarkerReached(AudioTrack track){
-		try{
-			track.stop();
-		}
-		catch(Exception ex){
-			ex.printStackTrace();
-		}
+		stop();
 	}
 
 	public void onPeriodicNotification(AudioTrack track){
@@ -203,11 +199,11 @@ public class ATAudio implements Audio,AudioTrack.OnPlaybackPositionUpdateListene
 				amount=mStreamData.length;
 			}
 			else if(amount<0){
-				track.stop();
+				stop();
 			}
 			
 			if(amount>0){
-				track.write(mStreamData,0,amount);
+				mAudioTrack.write(mStreamData,0,amount);
 			}
 		}
 		catch(Exception ex){
@@ -218,10 +214,8 @@ public class ATAudio implements Audio,AudioTrack.OnPlaybackPositionUpdateListene
 	void update(int dt){
 		// Hack to work around MarkerReached not being called
 		if(mAudioBuffer!=null && getPlaying()){
-			us.toadlet.ribbit.AudioFormat format=mAudioBuffer.getAudioFormat();
 			mPlayTime+=dt;
-			int endTime=(mAudioBuffer.mData.length/format.frameSize()) * 1000 / format.samplesPerSecond;
-			if(mPlayTime>endTime+500){
+			if(mPlayTime>mEndTime+500){
 				stop();
 			}
 		}
@@ -234,4 +228,5 @@ public class ATAudio implements Audio,AudioTrack.OnPlaybackPositionUpdateListene
 	float mGain;
 	byte[] mStreamData;
 	int mPlayTime;
+	int mEndTime;
 }

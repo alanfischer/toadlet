@@ -24,10 +24,12 @@
  ********** Copyright header - do not remove **********/
 
 package us.toadlet.ribbit;
+import android.media.AudioFormat;
+import android.media.AudioTrack;
 
 public class ATAudioBuffer implements AudioBuffer{
 	public ATAudioBuffer(){
-		mAudioFormat=new AudioFormat(0,0,0);
+		mAudioFormat=new us.toadlet.ribbit.AudioFormat(0,0,0);
 	}
 
 	public AudioBuffer getRootAudioBuffer(){return this;}
@@ -38,11 +40,18 @@ public class ATAudioBuffer implements AudioBuffer{
 		if(stream==null){
 			return false;
 		}
-		AudioFormat format=stream.getAudioFormat();
+		us.toadlet.ribbit.AudioFormat format=stream.getAudioFormat();
 		mAudioFormat.set(format);
 
 		try{
 			int available=stream.available();
+			// Adjust available to by a multiple of MinBuffer
+			int sps=format.samplesPerSecond;
+			int chan=(format.channels==2?AudioFormat.CHANNEL_OUT_STEREO:AudioFormat.CHANNEL_OUT_MONO);
+			int bps=(format.bitsPerSample==8?AudioFormat.ENCODING_PCM_8BIT:AudioFormat.ENCODING_PCM_16BIT);
+			int min=AudioTrack.getMinBufferSize(format.samplesPerSecond,format.channels,format.bitsPerSample);
+			available=((int)(available/min)+1)*(min);
+
 			mData=new byte[available];
 			stream.read(mData,0,available);
 		}
@@ -62,8 +71,8 @@ public class ATAudioBuffer implements AudioBuffer{
 		mData=null;
 	}
 	
-	AudioFormat getAudioFormat(){return mAudioFormat;}
+	us.toadlet.ribbit.AudioFormat getAudioFormat(){return mAudioFormat;}
 
 	byte[] mData;
-	AudioFormat mAudioFormat;
+	us.toadlet.ribbit.AudioFormat mAudioFormat;
 }
