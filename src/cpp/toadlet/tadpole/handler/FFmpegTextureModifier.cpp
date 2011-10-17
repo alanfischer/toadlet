@@ -190,7 +190,7 @@ void FFmpegVideoStream::update(int dt){
 				mVideoFrame->data,
 				mVideoFrame->linesize,
 				0,
-				mVideoFrame->height,
+				mStreamData->codecCtx->height,
 				mTextureFrame->data,
 				mTextureFrame->linesize
 			);
@@ -479,8 +479,8 @@ PixelFormat FFmpegTextureModifier::getPixelFormat(int textureFormat){
 	switch(textureFormat){
 		case TextureFormat::Format_L_8:
 			return PIX_FMT_GRAY8;
-		case TextureFormat::Format_LA_8:
-			return PIX_FMT_GRAY8A;
+//		case TextureFormat::Format_LA_8:
+//			return PIX_FMT_GRAY8A;
 		case TextureFormat::Format_RGB_8:
 			return PIX_FMT_RGB24;
 		case TextureFormat::Format_BGR_8:
