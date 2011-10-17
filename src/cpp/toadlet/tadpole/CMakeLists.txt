@@ -684,6 +684,7 @@ endif (NOT TOADLET_PLATFORM_IOS)
 add_library (toadlet_tadpole_s STATIC ${TADPOLE_SRC} ${TADPOLE_HEADERS})
 set_target_properties (toadlet_tadpole_s PROPERTIES ${STATIC_LIB_PROPS})
 target_link_libraries (toadlet_tadpole_s toadlet_egg_s toadlet_peeper_s toadlet_ribbit_s)
+message ("passing in libs: ${TADPOLE_LIBS_S}")
 TOADLET_MERGE_STATIC_LIBRARIES (toadlet_tadpole_s "${TADPOLE_LIBS_S}")
 install (TARGETS toadlet_tadpole_s DESTINATION ${LIB_INSTALL_DIR})
 
