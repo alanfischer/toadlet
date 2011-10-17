@@ -9,6 +9,10 @@ set (STATIC_LIB_PROPS COMPILE_DEFINITIONS TOADLET_BUILD_STATIC COMPILE_DEFINITIO
 set (LIB_INSTALL_DIR lib)
 
 
+# Grab the script for archiving static libraries
+include (ToadletMergeStaticLibraries)
+
+
 # Setup all platform specific options
 if (TOADLET_PLATFORM_ANDROID)
 	# Android libraries install to an architecture specific subdirectory

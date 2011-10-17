@@ -432,10 +432,6 @@ endif (NOT TOADLET_FIXED_POINT)
 set (TADPOLE_HEADERS ${TADPOLE_HEADERS} PARENT_SCOPE)
 set (TADPOLE_NAMESPACES ${TADPOLE_NAMESPACES} PARENT_SCOPE)
 
-# Storage for link libraries
-unset (TADPOLE_LIBS)
-unset (TADPOLE_LIBS_S)
-
 # Setup dependecy specific files and libraries
 # Freetype is not required on OSX
 if (NOT TOADLET_PLATFORM_OSX)
@@ -668,10 +664,10 @@ elseif (TOADLET_PLATFORM_WIN32)
 	set (TADPOLE_SRC ${TADPOLE_SRC} ${TADPOLE_HANDLER_PLATFORM_WIN32_SRC})
 endif (TOADLET_PLATFORM_ANDROID)
 
+
 # Use dependency results
 source_group ("Source Files\\\\handler" FILES ${TADPOLE_HANDLER_SRC})
 source_group ("Header Files\\\\handler" FILES ${TADPOLE_HANDLER_HEADERS})
-
 set (TADPOLE_SRC ${TADPOLE_SRC} ${TADPOLE_HANDLER_SRC})
 
 
@@ -688,7 +684,7 @@ endif (NOT TOADLET_PLATFORM_IOS)
 add_library (toadlet_tadpole_s STATIC ${TADPOLE_SRC} ${TADPOLE_HEADERS})
 set_target_properties (toadlet_tadpole_s PROPERTIES ${STATIC_LIB_PROPS})
 target_link_libraries (toadlet_tadpole_s toadlet_egg_s toadlet_peeper_s toadlet_ribbit_s)
-TOADLET_MERGE_STATIC_LIBRARIES (toadlet_tadpole_s ${TADPOLE_LIBS_S})
+TOADLET_MERGE_STATIC_LIBRARIES (toadlet_tadpole_s "${TADPOLE_LIBS_S}")
 install (TARGETS toadlet_tadpole_s DESTINATION ${LIB_INSTALL_DIR})
 
 
