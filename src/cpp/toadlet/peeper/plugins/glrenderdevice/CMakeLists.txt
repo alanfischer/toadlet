@@ -155,7 +155,7 @@ endif (TOADLET_PLATFORM_ANDROID)
 include_directories (${GLEW_INCLUDE_DIR})
 
 
-# Dynamic Library
+# Library Dependencies
 if (TOADLET_PLATFORM_ANDROID)
 	set (PEEPER_GLRENDERDEVICE_LIBS ${GLESV1_LIBS})
 elseif (TOADLET_PLATFORM_IOS)
@@ -172,20 +172,6 @@ elseif (TOADLET_PLATFORM_POSIX OR TOADLET_PLATFORM_WIN32)
 endif (TOADLET_PLATFORM_ANDROID)
 
 
-# Static Library needs a static glew library
-if (TOADLET_PLATFORM_ANDROID)
-elseif (TOADLET_PLATFORM_IOS)
-elseif (TOADLET_PLATFORM_OSX)
-elseif (TOADLET_PLATFORM_WINCE)
-	set (PEEPER_GLRENDERDEVICE_DEFS_S "GLESEM_BUILD" "GLESEM_STATIC")
-elseif (TOADLET_PLATFORM_OSX OR TOADLET_PLATFORM_POSIX OR TOADLET_PLATFORM_WIN32)
-	LOCATE_STATIC_LIBRARY (${GLEW_LIBRARY} GLEW_LIBRARY_S)
-	if (GLEW_LIBRARY_S)
-		set (PEEPER_GLRENDERDEVICE_LIBS_S GLEW_LIBRARY_S)
-	endif (GLEW_LIBRARY_S)
-endif (TOADLET_PLATFORM_ANDROID)
-
-
 # Dynamic library
 if (NOT TOADLET_PLATFORM_IOS)
 	add_library (toadlet_peeper_glrenderdevice SHARED ${PEEPER_GLRENDERDEVICE_SRC} ${PEEPER_GLRENDERDEVICE_HEADERS})
@@ -196,13 +182,28 @@ if (NOT TOADLET_PLATFORM_IOS)
 endif (NOT TOADLET_PLATFORM_IOS)
 
 
+# Special Static Library Dependencies
+if (TOADLET_PLATFORM_WINCE)
+	set (PEEPER_GLRENDERDEVICE_DEFS_S "GLESEM_BUILD" "GLESEM_STATIC")
+elseif (TOADLET_PLATFORM_OSX OR TOADLET_PLATFORM_POSIX OR TOADLET_PLATFORM_WIN32)
+	LOCATE_STATIC_LIBRARY (${GLEW_LIBRARY} GLEW_LIBRARY_S)
+	if (GLEW_LIBRARY_S)
+		set (PEEPER_GLRENDERDEVICE_LIBS_S ${GLEW_LIBRARY_S})
+	else (GLEW_LIBRARY_S)
+		# Static Library needs a static glew library
+		# If we do not find one, do not build the static plugin
+		message (STATUS "WARNING: GLEW is needed but a static glew was not found,")
+		message (STATUS "WARNING: toadlet_peeper_glrenderdevice_s will not be built")
+		return()
+	endif (GLEW_LIBRARY_S)
+endif (TOADLET_PLATFORM_WINCE)
+
+
 # Static library
 add_library (toadlet_peeper_glrenderdevice_s STATIC ${PEEPER_GLRENDERDEVICE_SRC} ${PEEPER_GLRENDERDEVICE_HEADERS})
 set_target_properties (toadlet_peeper_glrenderdevice_s PROPERTIES ${STATIC_LIB_PROPS})
 set_property (TARGET toadlet_peeper_glrenderdevice_s APPEND PROPERTY COMPILE_DEFINITIONS ${PEEPER_GLRENDERDEVICE_DEFS_S})
 target_link_libraries (toadlet_peeper_glrenderdevice_s toadlet_peeper_s ${PEEPER_GLRENDERDEVICE_LIBS})
-if (GLEW_LIBRARY_S)
-	MERGE_STATIC_LIBRARIES (toadlet_peeper_glrenderdevice_s "${PEEPER_GLRENDERDEVICE_LIBS_S}")
-endif (GLEW_LIBRARY_S)
+MERGE_STATIC_LIBRARIES (toadlet_peeper_glrenderdevice_s "${PEEPER_GLRENDERDEVICE_LIBS_S}")
 install (TARGETS toadlet_peeper_glrenderdevice_s DESTINATION ${LIB_INSTALL_DIR})
 
