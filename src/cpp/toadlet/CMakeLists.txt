@@ -9,8 +9,9 @@ set (STATIC_LIB_PROPS COMPILE_DEFINITIONS TOADLET_BUILD_STATIC COMPILE_DEFINITIO
 set (LIB_INSTALL_DIR lib)
 
 
-# Grab the script for archiving static libraries
-include (ToadletMergeStaticLibraries)
+# Grab the scripts for dealing with purely static libraries
+include (FindStaticLibrary)
+include (MergeStaticLibraries)
 
 
 # Setup all platform specific options
