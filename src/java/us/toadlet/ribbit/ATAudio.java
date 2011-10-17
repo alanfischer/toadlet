@@ -44,17 +44,8 @@ public class ATAudio implements Audio,AudioTrack.OnPlaybackPositionUpdateListene
 			return false;
 		}
 		
-		us.toadlet.ribbit.AudioFormat format=mAudioBuffer.getAudioFormat();
-		int sps=format.samplesPerSecond;
-		int chan=(format.channels==2?AudioFormat.CHANNEL_OUT_STEREO:AudioFormat.CHANNEL_OUT_MONO);
-		int bps=(format.bitsPerSample==8?AudioFormat.ENCODING_PCM_8BIT:AudioFormat.ENCODING_PCM_16BIT);
-		int available=mAudioBuffer.mData.length;
-
-		mAudioTrack=new AudioTrack(AudioManager.STREAM_ALARM,sps,chan,bps,available,AudioTrack.MODE_STREAM);
-		mAudioTrack.setPlaybackPositionUpdateListener(this);
-		mAudioTrack.setNotificationMarkerPosition(available/format.frameSize());
-		mEndTime=(mAudioBuffer.mData.length/format.frameSize()) * 1000 / format.samplesPerSecond;
-
+		createAudioTrack();
+		
 		return true;
 	}
 	
@@ -66,16 +57,7 @@ public class ATAudio implements Audio,AudioTrack.OnPlaybackPositionUpdateListene
 			return false;
 		}
 
-		us.toadlet.ribbit.AudioFormat format=mAudioStream.getAudioFormat();
-		int sps=format.samplesPerSecond;
-		int chan=(format.channels==2?AudioFormat.CHANNEL_OUT_STEREO:AudioFormat.CHANNEL_OUT_MONO);
-		int bps=(format.bitsPerSample==8?AudioFormat.ENCODING_PCM_8BIT:AudioFormat.ENCODING_PCM_16BIT);
-		int available=AudioTrack.getMinBufferSize(sps,chan,bps);
-
-		mStreamData=new byte[available];
-		mAudioTrack=new AudioTrack(AudioManager.STREAM_MUSIC,sps,chan,bps,available,AudioTrack.MODE_STREAM);
-		mAudioTrack.setPlaybackPositionUpdateListener(this);
-		mAudioTrack.setPositionNotificationPeriod(available/format.frameSize());
+		createAudioTrack();
 
 		return true;
 	}
@@ -112,16 +94,19 @@ public class ATAudio implements Audio,AudioTrack.OnPlaybackPositionUpdateListene
 
 	public boolean play(){
 		mPlayTime=0;
+		
 		if(mAudioTrack!=null){
 			try{
-				mAudioTrack.play();
-
+				mAudioTrack.stop();
+				mAudioTrack.setPlaybackHeadPosition(0);
+			
 				if(mAudioBuffer!=null){
 					mAudioTrack.write(mAudioBuffer.mData,0,mAudioBuffer.mData.length);
 				}
 				else if(mAudioStream!=null){
 					onPeriodicNotification(mAudioTrack);
 				}
+				mAudioTrack.play();
 			}
 			catch(Exception ex){
 				return false;
@@ -134,8 +119,12 @@ public class ATAudio implements Audio,AudioTrack.OnPlaybackPositionUpdateListene
 	public boolean stop(){
 		if(mAudioTrack!=null){
 			try{
-				mAudioTrack.stop();
-//				mAudioTrack.setPlaybackHeadPosition(0);
+				if(mAudioTrack.getState()!=AudioTrack.STATE_UNINITIALIZED){
+					mAudioTrack.stop();
+					mAudioTrack.setPlaybackHeadPosition(0);
+//					mAudioTrack.release();
+				}
+//				mAudioTrack=null;
 			}
 			catch(Exception ex){
 				return false;
@@ -145,12 +134,13 @@ public class ATAudio implements Audio,AudioTrack.OnPlaybackPositionUpdateListene
 		return true;
 	}
 	
+	// If the AudioTrack is alive, it is playing since we can't properly stop and reuse them
 	public boolean getPlaying(){
-		int playState=AudioTrack.PLAYSTATE_PLAYING;
+		int playState=AudioTrack.PLAYSTATE_STOPPED;
 		if(mAudioTrack!=null){
 			playState=mAudioTrack.getPlayState();
 		}
-		return playState==AudioTrack.PLAYSTATE_PLAYING;// && mPlayTime<mEndTime;
+		return mPlayTime<mEndTime;//playState==AudioTrack.PLAYSTATE_PLAYING;
 	}
 	
 	public boolean getFinished(){
@@ -158,7 +148,7 @@ public class ATAudio implements Audio,AudioTrack.OnPlaybackPositionUpdateListene
 		if(mAudioTrack!=null){
 			playState=mAudioTrack.getPlayState();
 		}
-		return playState==AudioTrack.PLAYSTATE_STOPPED;// || mPlayTime>=mEndTime;
+		return mPlayTime>=mEndTime;//playState==AudioTrack.PLAYSTATE_STOPPED;
 	}
 
 	/// @todo: enable looping
@@ -218,6 +208,36 @@ public class ATAudio implements Audio,AudioTrack.OnPlaybackPositionUpdateListene
 			if(mPlayTime>mEndTime+500){
 				stop();
 			}
+		}
+	}
+	
+	void createAudioTrack(){
+		if(mAudioBuffer!=null){
+			us.toadlet.ribbit.AudioFormat format=mAudioBuffer.getAudioFormat();
+			int sps=format.samplesPerSecond;
+			int chan=(format.channels==2?AudioFormat.CHANNEL_OUT_STEREO:AudioFormat.CHANNEL_OUT_MONO);
+			int bps=(format.bitsPerSample==8?AudioFormat.ENCODING_PCM_8BIT:AudioFormat.ENCODING_PCM_16BIT);
+			int available=mAudioBuffer.mData.length;
+
+			// We have to allocate twice the available amount to avoid a crash on some 2.3 systems.
+			// This may be causing the audio to play twice sometimes.  Maybe we can allocate only whats needed on 2.2, but twice on 2.3,
+			// trusting that OpenSL will be used on 2.3 systems instead.
+			mAudioTrack=new AudioTrack(AudioManager.STREAM_ALARM,sps,chan,bps,available*2,AudioTrack.MODE_STREAM);
+			mAudioTrack.setPlaybackPositionUpdateListener(this);
+			mAudioTrack.setNotificationMarkerPosition(available/format.frameSize());
+			mEndTime=(mAudioBuffer.mData.length/format.frameSize()) * 1000 / format.samplesPerSecond;
+		}
+		else if(mAudioStream!=null){
+			us.toadlet.ribbit.AudioFormat format=mAudioStream.getAudioFormat();
+			int sps=format.samplesPerSecond;
+			int chan=(format.channels==2?AudioFormat.CHANNEL_OUT_STEREO:AudioFormat.CHANNEL_OUT_MONO);
+			int bps=(format.bitsPerSample==8?AudioFormat.ENCODING_PCM_8BIT:AudioFormat.ENCODING_PCM_16BIT);
+			int available=AudioTrack.getMinBufferSize(sps,chan,bps);
+
+			mStreamData=new byte[available];
+			mAudioTrack=new AudioTrack(AudioManager.STREAM_MUSIC,sps,chan,bps,available,AudioTrack.MODE_STREAM);
+			mAudioTrack.setPlaybackPositionUpdateListener(this);
+			mAudioTrack.setPositionNotificationPeriod(available/format.frameSize());
 		}
 	}
 	
