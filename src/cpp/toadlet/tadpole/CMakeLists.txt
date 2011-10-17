@@ -578,12 +578,10 @@ if (SIDPLAY_FOUND)
 	set (TADPOLE_LIBS ${TADPOLE_LIBS} ${SIDPLAY_LIBRARY})
 
 	# Static libs are ugly since we add references to external static libraries in toadlet
-	set (TADPOLE_DEFS_S ${TADPOLE_DEFS_S} TOADLET_LIBSIDPLAY_NAME="${SIDPLAY_LIBRARY}")
 	set (TADPOLE_LIBS_S ${TADPOLE_LIBS_S} ${SIDPLAY_LIBRARY})
 
 	# Resid is only used with sidplay 2
 	if (${SIDPLAY_VERSION} EQUAL 2)
-		set (TADPOLE_DEFS_S ${TADPOLE_DEFS_S} TOADLET_LIBRESID_NAME="${RESID_LIBRARY}")
 		set (TADPOLE_LIBS ${TADPOLE_LIBS} ${RESID_LIBRARY})
 		set (TADPOLE_LIBS_S ${TADPOLE_LIBS_S} ${RESID_LIBRARY})
 	endif (${SIDPLAY_VERSION} EQUAL 2)
@@ -689,16 +687,8 @@ endif (NOT TOADLET_PLATFORM_IOS)
 # Static library
 add_library (toadlet_tadpole_s STATIC ${TADPOLE_SRC} ${TADPOLE_HEADERS})
 set_target_properties (toadlet_tadpole_s PROPERTIES ${STATIC_LIB_PROPS})
-
-	string (REPLACE ";" " " TADPOLE_LIBS_S "${TADPOLE_LIBS_S}")
-	string (REPLACE "/" "\\" TADPOLE_LIBS_S "${TADPOLE_LIBS_S}")
-	#string (REPLACE "\;" " asdf " TADPOLE_LIB_S "${TADPOLE_LIB_S}")
-	message ("PATH=${TADPOLE_LIBS_S}")
-	set_property (TARGET toadlet_tadpole_s APPEND PROPERTY STATIC_LIBRARY_FLAGS ${TADPOLE_LIBS_S})
-
-#set_target_properties (toadlet_tadpole_s PROPERTIES ${TADPOLE_LIBS_S})
-set_property (TARGET toadlet_tadpole_s APPEND PROPERTY COMPILE_DEFINITIONS ${TADPOLE_DEFS_S})
 target_link_libraries (toadlet_tadpole_s toadlet_egg_s toadlet_peeper_s toadlet_ribbit_s)
+TOADLET_MERGE_STATIC_LIBRARIES (toadlet_tadpole_s ${TADPOLE_LIBS_S})
 install (TARGETS toadlet_tadpole_s DESTINATION ${LIB_INSTALL_DIR})
 
 
