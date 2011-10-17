@@ -17,10 +17,10 @@ macro (TOADLET_MERGE_STATIC_LIBRARIES TARGET LIBRARIES)
 	elseif (TOADLET_PLATFORM_POSIX)
 		# Use a configured script that unarchives the target and all libraries and remerges them into a single library
 		#get_target_property (DIR ${TARGET} LOCATION)
-		configure_file (PosixMergeStaticLibs.cmake.in ${CMAKE_CURRENT_BINARY_DIR}/PosixMergeStaticLibs${TARGET}.cmake @ONLY)
+		configure_file (PosixMergeStaticLibraries.cmake.in ${CMAKE_CURRENT_BINARY_DIR}/PosixMergeStaticLibraries${TARGET}.cmake @ONLY)
 		add_custom_command (TARGET ${TARGET} POST_BUILD
 			#COMMAND rm -f ${DIR}
-			COMMAND ${CMAKE_COMMAND} -P ${CMAKE_CURRENT_BINARY_DIR}/PosixMergeStaticLibs${TARGET}.cmake
+			COMMAND ${CMAKE_COMMAND} -P ${CMAKE_CURRENT_BINARY_DIR}/PosixMergeStaticLibraries${TARGET}.cmake
 		)
 	else
 		message (FATAL_ERROR "Toadlet platform undefined. Toadlet will not be built")
