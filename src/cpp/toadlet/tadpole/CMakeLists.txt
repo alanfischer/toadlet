@@ -418,7 +418,6 @@ set (TADPOLE_NAMESPACES ${TADPOLE_NAMESPACES} animation creator material node se
 set (TADPOLE_HEADERS ${TADPOLE_HEADERS} PARENT_SCOPE)
 set (TADPOLE_NAMESPACES ${TADPOLE_NAMESPACES} PARENT_SCOPE)
 
-
 if (NOT TOADLET_FIXED_POINT)
 	source_group ("Source Files\\\\bsp" FILES ${TADPOLE_BSP_SRC})
 	source_group ("Header Files\\\\bsp" FILES ${TADPOLE_BSP_HEADERS})
@@ -433,6 +432,9 @@ endif (NOT TOADLET_FIXED_POINT)
 set (TADPOLE_HEADERS ${TADPOLE_HEADERS} PARENT_SCOPE)
 set (TADPOLE_NAMESPACES ${TADPOLE_NAMESPACES} PARENT_SCOPE)
 
+# Storage for link libraries
+unset (TADPOLE_LIBS)
+unset (TADPOLE_LIBS_S)
 
 # Setup dependecy specific files and libraries
 # Freetype is not required on OSX
@@ -445,14 +447,14 @@ if (NOT TOADLET_PLATFORM_OSX)
 		set (TADPOLE_HANDLER_HEADERS ${TADPOLE_HANDLER_HEADERS} ${TADPOLE_HANDLER_FREETYPE_HEADERS})
 
 		# Libraries
-		set (TADPOLE_LIBS ${FREETYPE_LIBRARIES})
+		set (TADPOLE_LIBS ${TADPOLE_LIBS} ${FREETYPE_LIBRARIES})
 		if (TOADLET_PLATFORM_POSIX)
 			string (REPLACE ".so" ".a" FREETYPE_A ${FREETYPE_LIBRARY})
 			if (EXISTS ${FREETYPE_A})
 				set (FREETYPE_LIBRARY ${FREETYPE_A})
 			endif (EXISTS ${FREETYPE_A})
 		endif (TOADLET_PLATFORM_POSIX)
-		set (TADPOLE_LIBS_S ${FREETYPE_LIBRARY})
+		set (TADPOLE_LIBS_S ${TADPOLE_LIBS_S} ${FREETYPE_LIBRARY})
 	endif (FREETYPE_FOUND)
 endif (NOT TOADLET_PLATFORM_OSX)
 
@@ -581,9 +583,9 @@ if (SIDPLAY_FOUND)
 
 	# Resid is only used with sidplay 2
 	if (${SIDPLAY_VERSION} EQUAL 2)
+		set (TADPOLE_DEFS_S ${TADPOLE_DEFS_S} TOADLET_LIBRESID_NAME="${RESID_LIBRARY}")
 		set (TADPOLE_LIBS ${TADPOLE_LIBS} ${RESID_LIBRARY})
 		set (TADPOLE_LIBS_S ${TADPOLE_LIBS_S} ${RESID_LIBRARY})
-		set (TADPOLE_DEFS_S ${TADPOLE_DEFS_S} TOADLET_LIBRESID_NAME="${RESID_LIBRARY}")
 	endif (${SIDPLAY_VERSION} EQUAL 2)
 endif (SIDPLAY_FOUND)
 
@@ -623,7 +625,7 @@ if (ZZIP_FOUND)
 	set (TADPOLE_LIBS_S ${TADPOLE_LIBS_S} ${ZZPI_LIBRARY})
 endif (ZZIP_FOUND)
 
-find_package (FFmpeg)
+#find_package (FFmpeg)
 if (FFMPEG_FOUND)
 	# Files 
 	set (TOADLET_HAS_FFMPEG ON PARENT_SCOPE)
@@ -687,8 +689,14 @@ endif (NOT TOADLET_PLATFORM_IOS)
 # Static library
 add_library (toadlet_tadpole_s STATIC ${TADPOLE_SRC} ${TADPOLE_HEADERS})
 set_target_properties (toadlet_tadpole_s PROPERTIES ${STATIC_LIB_PROPS})
-message ("tadpole lib s ${TADPOLE_LIBS_S}")
-set_target_properties (toadlet_tadpole_s PROPERTIES STATIC_LIBRARY_FLAGS "${TADPOLE_LIBS_S}")
+
+	string (REPLACE ";" " " TADPOLE_LIBS_S "${TADPOLE_LIBS_S}")
+	string (REPLACE "/" "\\" TADPOLE_LIBS_S "${TADPOLE_LIBS_S}")
+	#string (REPLACE "\;" " asdf " TADPOLE_LIB_S "${TADPOLE_LIB_S}")
+	message ("PATH=${TADPOLE_LIBS_S}")
+	set_property (TARGET toadlet_tadpole_s APPEND PROPERTY STATIC_LIBRARY_FLAGS ${TADPOLE_LIBS_S})
+
+#set_target_properties (toadlet_tadpole_s PROPERTIES ${TADPOLE_LIBS_S})
 set_property (TARGET toadlet_tadpole_s APPEND PROPERTY COMPILE_DEFINITIONS ${TADPOLE_DEFS_S})
 target_link_libraries (toadlet_tadpole_s toadlet_egg_s toadlet_peeper_s toadlet_ribbit_s)
 install (TARGETS toadlet_tadpole_s DESTINATION ${LIB_INSTALL_DIR})
