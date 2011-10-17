@@ -31,14 +31,6 @@
 #include <zzip/plugin.h>
 #include <stdio.h>
 
-#if defined(TOADLET_PLATFORM_WIN32) && defined(TOADLET_ZZIPLIB_NAME)
-	#pragma comment(lib,TOADLET_ZZIPLIB_NAME)
-#endif
-
-#if defined(TOADLET_PLATFORM_WIN32) && defined(TOADLET_ZLIB_NAME)
-	#pragma comment(lib,TOADLET_ZLIB_NAME)
-#endif
-
 namespace toadlet{
 namespace tadpole{
 namespace handler{
