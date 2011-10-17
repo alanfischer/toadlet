@@ -37,13 +37,6 @@
 	#include <sidplay/builders/resid.h>
 #endif
 
-#if defined(TOADLET_LIBSIDPLAY_NAME)
-	#pragma comment(lib,TOADLET_LIBSIDPLAY_NAME)
-#endif
-#if defined(TOADLET_LIBRESID_NAME)
-	#pragma comment(lib,TOADLET_LIBRESID_NAME)
-#endif
-
 namespace toadlet{
 namespace tadpole{
 namespace handler{
