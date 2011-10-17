@@ -32,7 +32,7 @@ elseif (TOADLET_PLATFORM_POSIX)
 	if (TOADLET_HAS_SSE)
 		set (DYNAMIC_LIB_FLAGS "${DYNAMIC_LIB_FLAGS} -msse2")
 		set (STATIC_LIB_FLAGS "${STATIC_LIB_FLAGS} -msse2")
-		message ("SSE2 support enabled")
+		message (STATUS "SSE2 support enabled")
 	endif (TOADLET_HAS_SSE)
 
 	# Append the compile flags to the properties
@@ -115,7 +115,7 @@ elseif (TOADLET_PLATFORM_WIN32)
 	if (TOADLET_HAS_SSE)
 		set (DYNAMIC_LIB_FLAGS "${DYNAMIC_LIB_FLAGS} /arch:SSE2")
 		set (STATIC_LIB_FLAGS "${STATIC_LIB_FLAGS} /arch:SSE2")
-		message ("SSE2 support enabled")
+		message (STATUS "SSE2 support enabled")
 	endif (TOADLET_HAS_SSE)
 
 	# Append the compile flags to the properties

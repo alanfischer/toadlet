@@ -29,10 +29,6 @@
 #include <toadlet/tadpole/FontData.h>
 #include <toadlet/tadpole/handler/FreeTypeHandler.h>
 
-#if defined(TOADLET_PLATFORM_WIN32) && defined(TOADLET_LIBFREETYPE_NAME)
-	#pragma comment(lib,TOADLET_LIBFREETYPE_NAME)
-#endif
-
 namespace toadlet{
 namespace tadpole{
 namespace handler{
