@@ -2,13 +2,14 @@
 # and then merges them back into a single TARGET using the proper ar tool
 
 # Setup
-set (TARGET "@TARGET@")
+set (TARGETLOC "@TARGETLOC@")
 set (LIBRARIES "@LIBRARIES@")
 set (CMAKE_CURRENT_BINARY_DIR "@CMAKE_CURRENT_BINARY_DIR@")
 set (CMAKE_AR "@CMAKE_AR@")
 set (CMAKE_RANLIB "@CMAKE_RANLIB@")
-set (ARDIR ${CMAKE_CURRENT_BINARY_DIR}/PosixMergeStaticLibs${TARGET})
 unset (AROBJS)
+get_filename_component (TARGETNAME ${TARGETLOC} NAME) 
+set (ARDIR ${CMAKE_CURRENT_BINARY_DIR}/PosixMergeStaticLibraries-${TARGETNAME})
 make_directory (${ARDIR})
 
 # Extract every library into a series of object files
@@ -23,23 +24,21 @@ foreach (LIB ${LIBRARIES})
 endforeach (LIB)
 
 # Extract the target into its own object files
-get_target_property (TARGETDIR ${TARGET} ARCHIVE_OUTPUT_DIRECTORY)
-get_target_property (TARGETNAME ${TARGET} ARCHIVE_OUTPUT_NAME)
 make_directory (${ARDIR}/${TARGETNAME})
 execute_process (
-	COMMAND ${CMAKE_AR} x ${TARGETDIR}/${TARGETNAME} WORKING_DIRECTORY ${ARDIR}/${TARGETNAME}
+	COMMAND ${CMAKE_AR} x ${TARGETLOC} WORKING_DIRECTORY ${ARDIR}/${TARGETNAME}
 )
 file (GLOB_RECURSE OBJS "${ARDIR}/${TARGETNAME}/*")
 set (AROBJS ${AROBJS} ${OBJS})
 
 # Bundle all object files back into a new target archive
 execute_process (
-	COMMAND ${CMAKE_AR} r ${TARGETDIR}/${TARGETNAME} ${AROBJS} WORKING_DIRECTORY ${ARDIR}
+	COMMAND ${CMAKE_AR} r ${TARGETLOC} ${AROBJS} WORKING_DIRECTORY ${ARDIR}
 )
 
 # Ranlib the new archive library
 execute_process (
-	COMMAND ${CMAKE_RANLIB}  ${TARGETDIR}/${TARGETNAME} WORKING_DIRECTORY ${ARDIR}
+	COMMAND ${CMAKE_RANLIB} ${TARGETLOC} WORKING_DIRECTORY ${ARDIR}
 )
 
 # Delete all leftover object files
