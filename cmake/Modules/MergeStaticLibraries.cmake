@@ -2,7 +2,7 @@
 # TARGET - the output library, or target, that you wish to contain all of the object files
 # LIBRARIES - a list of all of the static libraries you want merged into the TARGET
 
-macro (TOADLET_MERGE_STATIC_LIBRARIES TARGET LIBRARIES)
+macro (MERGE_STATIC_LIBRARIES TARGET LIBRARIES)
 	if (TOADLET_PLATFORM_ANDROID)
 		# Android platforms are like Posix, so merge all objects into a single archive
 		configure_file (PosixMergeStaticLibraries.cmake.in ${CMAKE_CURRENT_BINARY_DIR}/PosixMergeStaticLibraries${TARGET}.cmake @ONLY)

@@ -10,7 +10,7 @@ set (LIB_INSTALL_DIR lib)
 
 
 # Grab the scripts for dealing with purely static libraries
-include (FindStaticLibrary)
+include (LocateStaticLibrary)
 include (MergeStaticLibraries)
 
 
