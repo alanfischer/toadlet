@@ -620,7 +620,7 @@ if (ZZIP_FOUND)
 endif (ZZIP_FOUND)
 
 #TODO: Fix the ffmpeg hack
-#find_package (FFmpeg)
+find_package (FFmpeg)
 if (FFMPEG_FOUND)
 	set (TOADLET_HAS_FFMPEG ON PARENT_SCOPE)
 	include_directories (${FFMPEG_INCLUDE_DIR})

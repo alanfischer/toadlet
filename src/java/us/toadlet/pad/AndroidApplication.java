@@ -146,7 +146,7 @@ public abstract class AndroidApplication extends Activity implements RenderTarge
 		}
 	}
 	
-	public void create(){
+	public boolean create(){
 		createNativeApplication();
 
 		if(mEngine==null){
@@ -174,6 +174,8 @@ public abstract class AndroidApplication extends Activity implements RenderTarge
 
 		mView=new ApplicationView(this);
 		setContentView(mView);
+		
+		return true;
 	}
 	
 	public void destroy(){
@@ -377,9 +379,6 @@ public abstract class AndroidApplication extends Activity implements RenderTarge
 
 	public boolean isRunning(){return mRun;}
 
-	public void setAutoActivate(boolean autoActivate){}
-	public boolean getAutoActivate(){return false;}
-	
 	public boolean isActive(){return mActive;}
 
 	public void setPosition(int x,int y){}

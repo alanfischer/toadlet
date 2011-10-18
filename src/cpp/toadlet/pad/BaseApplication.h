@@ -26,92 +26,23 @@
 #ifndef TOADLET_PAD_BASEAPPLICATION_H
 #define TOADLET_PAD_BASEAPPLICATION_H
 
-#include <toadlet/egg/Runnable.h>
-#include <toadlet/egg/Map.h>
-#include <toadlet/egg/String.h>
-#include <toadlet/peeper/RenderTarget.h>
-#include <toadlet/peeper/RenderDevice.h>
-#include <toadlet/peeper/WindowRenderTargetFormat.h>
-#include <toadlet/ribbit/AudioDevice.h>
-#include <toadlet/flick/MotionDevice.h>
-#include <toadlet/flick/JoyDevice.h>
-#include <toadlet/tadpole/Engine.h>
-#include <toadlet/pad/Types.h>
-#include <toadlet/pad/Applet.h>
+#include <toadlet/pad/Application.h>
 
 namespace toadlet{
 namespace pad{
 
-class TOADLET_API BaseApplication:public RenderTarget{
+class TOADLET_API BaseApplication:public Application,public RenderTarget{
 public:
 	TOADLET_SHARED_POINTERS(BaseApplication);
-
-	enum Key{
-		Key_ENTER=10,
-		Key_TAB=8,
-		Key_SPACE=32,
-
-		Key_LEFT=1024,
-		Key_RIGHT,
-		Key_UP,
-		Key_DOWN,
-
-		// Keyboard keys
-		Key_ESC=2048,
-		Key_PAUSE,
-		Key_SHIFT,
-		Key_CTRL,
-		Key_ALT,
-		Key_SPECIAL,
-		Key_BACKSPACE,
-		Key_DELETE,
-
-		// Cellphone keys
-		Key_SOFTLEFT=4096,
-		Key_SOFTRIGHT,
-		Key_ACTION,
-		Key_BACK,
-	};
 
 	static void mapKeyNames(Map<int,String> &keyToName,Map<String,int> &nameToKey);
 
 	BaseApplication();
 	virtual ~BaseApplication(){}
 
-	virtual void create(String renderDevice,String audioDevice,String motionDevice=(char*)NULL,String joyDevice=(char*)NULL);
+	virtual bool defaultCreate(){return create("","","","");}
+	virtual bool create(String renderDevice,String audioDevice,String motionDevice,String joyDevice);
 	virtual void destroy();
-
-	virtual void start()=0;
-	virtual void runEventLoop()=0;
-	virtual void stepEventLoop()=0;
-	virtual void stop()=0;
-	virtual bool isRunning() const=0;
-
-	virtual void setAutoActivate(bool autoActivate)=0;
-	virtual bool getAutoActivate() const=0;
-	virtual void activate()=0;
-	virtual void deactivate()=0;
-	virtual bool active() const=0;
-
-	virtual void setTitle(const String &title)=0;
-	virtual const String &getTitle() const=0;
-
-	virtual void setPosition(int x,int y)=0;
-	virtual int getPositionX() const=0;
-	virtual int getPositionY() const=0;
-
-	virtual void setSize(int width,int height)=0;
-	virtual int getWidth() const=0;
-	virtual int getHeight() const=0;
-
-	virtual void setFullscreen(bool fullscreen)=0;
-	virtual bool getFullscreen() const=0;
-
-	virtual void setStopOnDeactivate(bool stopOnDeactivate)=0;
-	virtual bool getStopOnDeactivate() const=0;
-
-	virtual void setDifferenceMouse(bool difference)=0;
-	virtual bool getDifferenceMouse() const=0;
 
 	virtual RenderTarget *getRootRenderTarget(){return mRenderTarget;}
 	virtual bool isPrimary() const{return mRenderTarget->isPrimary();}
