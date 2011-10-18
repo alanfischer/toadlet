@@ -1,1 +1,0 @@
-This code is based on gpp-2.24.
