@@ -65,10 +65,6 @@ set (EGG_PLATFORM_POSIX_SRC
 	platform/posix/PosixWaitCondition.cpp
 )
 
-set (EGG_PLATFORM_POSIX_ANDROID_SRC
-	platform/posix/PosixDSOHandle_android.cpp
-)
-
 set (EGG_PLATFORM_POSIX_OSX_SRC
 	platform/posix/PosixErrorHandler_osx.mm
 )
@@ -259,10 +255,6 @@ elseif (TOADLET_PLATFORM_POSIX)
 		set (EGG_LIBS objc ${EGG_LIBS} ${FOUNDATION_LIBS})
 	endif (TOADLET_PLATFORM_OSX)
 	if (TOADLET_PLATFORM_ANDROID)
-		source_group ("Source Files\\\\platform\\\\posix" FILES ${EGG_PLATFORM_POSIX_ANDROID_SRC})
-		source_group ("Header Files\\\\platform\\\\posix" FILES ${EGG_PLATFORM_POSIX_ANDROID_HEADERS})
-		set (EGG_SRC ${EGG_SRC} ${EGG_PLATFORM_POSIX_ANDROID_SRC})
-		set (EGG_HEADERS ${EGG_HEADERS} ${EGG_PLATFORM_POSIX_ANDROID_HEADERS})
 		set (EGG_LIBS ${EGG_LIBS} log)
 	endif (TOADLET_PLATFORM_ANDROID)
 endif (TOADLET_PLATFORM_WIN32)
