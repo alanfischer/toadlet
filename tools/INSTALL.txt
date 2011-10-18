@@ -8,7 +8,8 @@ Contents
 
 
 1. Dependencies
-	The following dependencies are required to build the toadlet tools
+
+The following dependencies are required to build the toadlet tools
 
 * A build of toadlet
 * The Milkshape3D SDK (Windows only, if you wish to build the mesh importer & exporter)
@@ -17,23 +18,18 @@ Contents
 
 2. Setup
 
-	If you wish to build the Milkshape3D plugins, you should have copied
+Make sure you know where your build of toadlet is installed to. You will need to set it in 
+the CMAKE_PREFIX_PATH argument below if toadlet is not in a system location.
+
+If you wish to build the Milkshape3D plugins, you should have copied
 the msLib directory to your Milkshape directory. (Do not just copy the contents of
 the folder, make sure the msLib folder is still in your Milkshape directory)
 
-	If you are doing an out of out of source build again, make your directory in tools like:
 
-	toadlet/tools/build.win32.float
-	
-	And then issue the cmake command below.
-	
-	If you are doing an in source build, then just be in the tools directory, and issue
-a similar command to below, but without the trailing ..
-
-	
 3. Build commands
-	Similar to build toadlet, to build the tools, you issue:
 
-	cmake -DCMAKE_PREFIX_PATH=path/to/toadlet_install ..
-	
-	This will build and install the tools, or on windows, create the tool project files.
+Create a build folder in this directory, say build/
+
+Enter the build/ folder and call cmake: cmake -DCMAKE_PREFIX_PATH=path/to/toadlet_install ..
+
+Open the visual studio project, xcode project, or run the makefiles to build the toadlet tools.
