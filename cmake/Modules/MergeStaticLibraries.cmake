@@ -14,8 +14,12 @@ macro (MERGE_STATIC_LIBRARIES TARGET LIBRARIES)
 		add_custom_command (TARGET ${TARGET} POST_BUILD
 			COMMAND ${CMAKE_COMMAND} -P ${CMAKE_CURRENT_BINARY_DIR}/PosixMergeStaticLibraries-${TARGET}.cmake
 		)
+	elseif (TOADLET_PLATFORM_IOS)
+		# IOS is like OSX in that we need to clean up the library list for libtool
+		string (REPLACE ";" " " LIBS "${LIBRARIES}")
+		set_property (TARGET ${TARGET} APPEND PROPERTY STATIC_LIBRARY_FLAGS "${LIBS}")
 	elseif (TOADLET_PLATFORM_WIN32)
-		# On Windows you must directly format the LIBRARIES variable as a single string for the windows libtool
+		# On Windows you must add aditional formatting to the LIBRARIES variable as a single string for the windows libtool
 		string (REPLACE ";" " " LIBS "${LIBRARIES}")
 		string (REPLACE "/" "\\" LIBS "${LIBS}")
 		set_property (TARGET ${TARGET} APPEND PROPERTY STATIC_LIBRARY_FLAGS "${LIBS}")

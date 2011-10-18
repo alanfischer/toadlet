@@ -91,7 +91,7 @@ set (TOADLET_LIB_BASENAMES
 	toadlet_pad
 )
 
-# Android specifics
+# Android specifics for NDK API levels < 9
 if (ANDROID) 
 	if (${ANDROID_NDK_API_LEVEL} LESS 9)
 		set (LIBRARY_SEARCH_SUFFIXES ${NDK_NAME_ARCH})
