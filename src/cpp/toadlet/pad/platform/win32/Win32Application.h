@@ -39,44 +39,39 @@ public:
 	Win32Application();
 	virtual ~Win32Application();
 
-	virtual void create(String renderDevice=(char*)NULL,String audioPlayer=(char*)NULL);
-	virtual void destroy();
+	bool create(String renderDevice,String audioDevice,String motionDevice,String joyDevice);
+	void destroy();
 
-	virtual void start();
-	virtual void runEventLoop();
-	virtual void stepEventLoop();
-	virtual void stop();
-	virtual bool isRunning() const{return mRun;}
+	void start();
+	void runEventLoop();
+	void stepEventLoop();
+	void stop();
+	bool isRunning() const{return mRun;}
 
-	virtual void setAutoActivate(bool activate){mAutoActivate=activate;}
-	virtual bool getAutoActivate() const{return mAutoActivate;}
-	virtual void activate();
-	virtual void deactivate();
-	virtual bool active() const{return mActive;}
+	void activate();
+	void deactivate();
+	bool isActive() const{return mActive;}
 
-	virtual void setTitle(const String &title);
-	virtual const String &getTitle() const;
+	void setTitle(const String &title);
+	String getTitle() const;
 
-	virtual void setPosition(int x,int y);
-	virtual int getPositionX() const;
-	virtual int getPositionY() const;
+	void setPosition(int x,int y);
+	int getPositionX() const;
+	int getPositionY() const;
 
-	virtual void setSize(int width,int height);
-	virtual int getWidth() const;
-	virtual int getHeight() const;
+	void setSize(int width,int height);
+	int getWidth() const;
+	int getHeight() const;
 
-	virtual void setFullscreen(bool fullscreen);
-	virtual bool getFullscreen() const;
+	void setFullscreen(bool fullscreen);
+	bool getFullscreen() const;
 
-	virtual void setStopOnDeactivate(bool stopOnDeactivate){mStopOnDeactivate=stopOnDeactivate;}
-	virtual bool getStopOnDeactivate() const{return mStopOnDeactivate;}
-
-	virtual void setDifferenceMouse(bool difference);
-	virtual bool getDifferenceMouse() const{return mDifferenceMouse;}
+	void setDifferenceMouse(bool difference);
+	bool getDifferenceMouse() const{return mDifferenceMouse;}
 
 	tadpole::handler::Win32ResourceArchive::ptr getResourceArchive() const{return mResourceArchive;}
 
-	virtual void *getWindowHandle(){return getHWND();}
+	void *getWindowHandle(){return getHWND();}
 	void changeRenderDevicePlugin(const String &plugin){mNewRenderDevicePlugin=plugin;}
 	void setIcon(void *icon);
 	void *getHINSTANCE() const;
@@ -95,21 +90,19 @@ protected:
 	bool createWindow();
 	void destroyWindow();
 
-	String mTitle;
-	int mPositionX,mPositionY;
-	int mWidth,mHeight;
-	bool mFullscreen;
-	bool mDifferenceMouse;
+	mutable String mTitle;
+	mutable int mPositionX,mPositionY;
+	mutable int mWidth,mHeight;
+	mutable bool mFullscreen;
+	mutable bool mDifferenceMouse;
 	int mLastXMouse,mLastYMouse;
 	bool mSkipNextMove;
 	
 	tadpole::handler::Win32ResourceArchive::ptr mResourceArchive;
 
 	bool mRun;
-	bool mAutoActivate;
 	bool mActive;
 	bool mDestroyed;
-	bool mStopOnDeactivate;
 	bool mContextActive;
 
 	Win32Attributes *win32;

@@ -81,7 +81,6 @@ X11Application::X11Application():
 	mSkipNextMove(false),
 
 	mRun(false),
-	mAutoActivate(false),
 	mActive(false),
 	mDestroyed(false),
 	x11(NULL)

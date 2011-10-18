@@ -10,7 +10,7 @@ set (PAD_SRC
 )
 
 set (PAD_PLATFORM_ANDROID_SRC
-	platform/android/JAndroidApplication.cpp
+	platform/android/JApplication.cpp
 )
 
 set (PAD_PLATFORM_WIN32_SRC
@@ -31,11 +31,12 @@ set (PAD_HEADERS
 	Applet.h
 	BaseApplication.h
 	Application.h
+	PlatformApplication.h
 	Version.h
 )
 
 set (PAD_PLATFORM_ANDROID_HEADERS
-	platform/android/JAndroidApplication.h
+	platform/android/JApplication.h
 )
 
 set (PAD_PLATFORM_WIN32_HEADERS

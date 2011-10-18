@@ -26,47 +26,92 @@
 #ifndef TOADLET_PAD_APPLICATION_H
 #define TOADLET_PAD_APPLICATION_H
 
-#include <toadlet/Types.h>
+#include <toadlet/egg/String.h>
+#include <toadlet/peeper/RenderTarget.h>
+#include <toadlet/peeper/RenderDevice.h>
+#include <toadlet/peeper/WindowRenderTargetFormat.h>
+#include <toadlet/ribbit/AudioDevice.h>
+#include <toadlet/flick/MotionDevice.h>
+#include <toadlet/flick/JoyDevice.h>
+#include <toadlet/tadpole/Engine.h>
+#include <toadlet/pad/Types.h>
+#include <toadlet/pad/Applet.h>
 
-#if defined(TOADLET_PLATFORM_ANDROID)
-	#if ANDROID_NDK_API_LEVEL>=9
-		#include <toadlet/pad/platform/android/AndroidApplication.h>
-		namespace toadlet{
-		namespace pad{
-			typedef AndroidApplication Application;
-		}
-		}
-	#else
-		#include <toadlet/pad/platform/android/JAndroidApplication.h>
-		namespace toadlet{
-		namespace pad{
-			typedef JAndroidApplication Application;
-		}
-		}
-	#endif
-#elif defined(TOADLET_PLATFORM_WIN32)
-	#include <toadlet/pad/platform/win32/Win32Application.h>
-	namespace toadlet{
-	namespace pad{
-		typedef Win32Application Application;
-	}
-	}
-#elif defined(TOADLET_PLATFORM_OSX)
-	#include <toadlet/pad/platform/osx/OSXApplication.h>
-	namespace toadlet{
-	namespace pad{
-		typedef OSXApplication Application;
-	}
-	}
-#elif defined(TOADLET_PLATFORM_POSIX)
-	#include <toadlet/pad/platform/x11/X11Application.h>
-	namespace toadlet{
-	namespace pad{
-		typedef X11Application Application;
-	}
-	}
-#else
-	#error "Application not implemented on this platform"
-#endif
+namespace toadlet{
+namespace pad{
+
+class TOADLET_API Application{
+public:
+	TOADLET_SHARED_POINTERS(Application);
+
+	enum Key{
+		Key_ENTER=10,
+		Key_TAB=8,
+		Key_SPACE=32,
+
+		Key_LEFT=1024,
+		Key_RIGHT,
+		Key_UP,
+		Key_DOWN,
+
+		// Keyboard keys
+		Key_ESC=2048,
+		Key_PAUSE,
+		Key_SHIFT,
+		Key_CTRL,
+		Key_ALT,
+		Key_SPECIAL,
+		Key_BACKSPACE,
+		Key_DELETE,
+
+		// Cellphone keys
+		Key_SOFTLEFT=4096,
+		Key_SOFTRIGHT,
+		Key_ACTION,
+		Key_BACK,
+	};
+
+	virtual ~Application(){}
+
+	virtual bool create(String renderDevice,String audioDevice,String motionDevice=(char*)NULL,String joyDevice=(char*)NULL)=0;
+	virtual void destroy()=0;
+
+	virtual void start()=0;
+	virtual void stop()=0;
+	virtual bool isRunning() const=0;
+
+	virtual void activate()=0;
+	virtual void deactivate()=0;
+	virtual bool isActive() const=0;
+
+	virtual void setTitle(const String &title)=0;
+	virtual String getTitle() const=0;
+
+	virtual void setPosition(int x,int y)=0;
+	virtual int getPositionX() const=0;
+	virtual int getPositionY() const=0;
+
+	virtual void setSize(int width,int height)=0;
+	virtual int getWidth() const=0;
+	virtual int getHeight() const=0;
+
+	virtual void setFullscreen(bool fullscreen)=0;
+	virtual bool getFullscreen() const=0;
+
+	virtual void setDifferenceMouse(bool difference)=0;
+	virtual bool getDifferenceMouse() const=0;
+
+	virtual void setApplet(Applet *applet)=0;
+	virtual Applet *getApplet() const=0;
+
+	virtual Engine *getEngine() const=0;
+	virtual RenderDevice *getRenderDevice() const=0;
+	virtual AudioDevice *getAudioDevice() const=0;
+	virtual MotionDevice *getMotionDevice() const=0;
+	virtual JoyDevice *getJoyDevice() const=0;
+};
+
+}
+}
 
 #endif
