@@ -44,16 +44,19 @@ MMAudioBuffer::~MMAudioBuffer(){
 }
 
 bool MMAudioBuffer::create(AudioStream::ptr stream){
+Logger::alert("CREATING BUFFER");
 	AudioFormat::ptr format=stream->getAudioFormat();
 	tbyte *buffer=NULL;
 	int length=0;
 
+Logger::alert("GOING TO DECODE");
 	if(AudioFormatConversion::decode(stream,buffer,length)==false){
 		Error::unknown(Categories::TOADLET_RIBBIT,
 			"unable to decode entire stream");
 		return false;
 	}
 
+Logger::alert("DECODED");
 	if(mDevice->getBufferFadeTime()>0){
 		AudioFormatConversion::fade(buffer,length,format,mDevice->getBufferFadeTime());
 	}

@@ -47,8 +47,6 @@ public:
 	virtual void stop();
 	virtual bool isRunning() const{return mRun;}
 
-	virtual void setAutoActivate(bool autoActivate){mAutoActivate=autoActivate;}
-	virtual bool getAutoActivate() const{return mAutoActivate;}
 	virtual void activate();
 	virtual void deactivate();
 	virtual bool active() const{return mActive;}
@@ -66,9 +64,6 @@ public:
 
 	virtual void setFullscreen(bool fullscreen);
 	virtual bool getFullscreen() const;
-
-	virtual void setStopOnDeactivate(bool stop){}
-	virtual bool getStopOnDeactivate() const{return false;}
 
 	virtual void setDifferenceMouse(bool difference);
 	virtual bool getDifferenceMouse() const{return mDifferenceMouse;}
@@ -93,7 +88,6 @@ protected:
 	Archive::ptr mBundleArchive;
 	
 	bool mRun;
-	bool mAutoActivate;
 	bool mActive;
 	bool mDestroyed;
 	void *mWindow;

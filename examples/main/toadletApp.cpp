@@ -4,10 +4,10 @@ extern Applet *createApplet(Application *app);
 extern void destroyApplet(Applet *applet);
 
 int toadletMain(int argc,char **argv){
-	Application app;
+	PlatformApplication app;
 	Applet *applet=createApplet(&app);
 	app.setApplet(applet);
-	app.create();
+	app.defaultCreate();
 	app.start();
 	app.destroy();
 	destroyApplet(applet);

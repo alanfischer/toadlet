@@ -46,8 +46,16 @@ bool AudioFormatConversion::decode(Stream *stream,tbyte *&finalBuffer,int &final
 
 	while(true){
 		tbyte *buffer=new tbyte[bufferSize];
+		if(buffer==NULL){
+			int i;
+			for(i=0;i<buffers.size();++i){
+				delete[] buffers[i];
+			}
+			return false;
+		}
+
 		amount=stream->read(buffer,bufferSize);
-		if(amount==0){
+		if(amount<=0){
 			delete[] buffer;
 			break;
 		}
