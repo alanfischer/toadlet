@@ -2,7 +2,7 @@
 # TARGET - the output library, or target, that you wish to contain all of the object files
 # LIBRARIES - a list of all of the static libraries you want merged into the TARGET
 
-macro (LOCATE_STATIC_LIBRARY LIBRARY STATIC)
+macro (LOCATE_STATIC_LIBRARY STATIC LIBRARY)
 	unset (${STATIC})
 
 	if (TOADLET_PLATFORM_WIN32)
