@@ -23,15 +23,15 @@ macro (MERGE_STATIC_LIBRARIES TARGET LIBRARIES)
 		# We need the debug postfix on posix systems for the merge script
 		string (TOUPPER ${CMAKE_BUILD_TYPE} BUILD_TYPE)
 		if (${BUILD_TYPE} STREQUAL "DEBUG")
-			get_target_property (SUFFIX ${TARGET} LOCATION_DEBUG)
+			get_target_property (TARGETLOC ${TARGET} LOCATION_DEBUG)
 		else (${BUILD_TYPE} STREQUAL "DEBUG")
-			get_target_property (SUFFIX ${TARGET} LOCATION)
+			get_target_property (TARGETLOC ${TARGET} LOCATION)
 		endif (${BUILD_TYPE} STREQUAL "DEBUG")
 
 		# Setup the static library merge script
 		configure_file (
 			${PROJECT_SOURCE_DIR}/cmake/Modules/PosixMergeStaticLibraries.cmake.in 
-			${CMAKE_CURRENT_BINARY_DIR}/PosixMergeStaticLibraries${TARGET}.cmake @ONLY
+			${CMAKE_CURRENT_BINARY_DIR}/PosixMergeStaticLibraries-${TARGET}.cmake @ONLY
 		)
 		add_custom_command (TARGET ${TARGET} POST_BUILD
 			COMMAND ${CMAKE_COMMAND} -P ${CMAKE_CURRENT_BINARY_DIR}/PosixMergeStaticLibraries-${TARGET}.cmake
