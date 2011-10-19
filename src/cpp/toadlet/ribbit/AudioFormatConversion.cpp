@@ -23,6 +23,7 @@
  *
  ********** Copyright header - do not remove **********/
 
+#include <toadlet/egg/Error.h>
 #include <toadlet/egg/Logger.h>
 #include <toadlet/egg/Extents.h>
 #include <toadlet/egg/EndianConversion.h>
@@ -97,9 +98,7 @@ bool AudioFormatConversion::decode(AudioStream *stream,tbyte *&finalBuffer,int &
 	return result;
 }
 
-bool AudioFormatConversion::convert(tbyte *src,AudioFormat *srcFormat,tbyte *dst,AudioFormat *dstFormat,int length){
-	/// @todo: Add in sps conversion
-
+bool AudioFormatConversion::convert(tbyte *src,int srcLength,AudioFormat *srcFormat,tbyte *dst,int dstLength,AudioFormat *dstFormat){
 	int i=0,v=0;
 	int sbps=srcFormat->bitsPerSample;
 	int dbps=dstFormat->bitsPerSample;
@@ -109,11 +108,18 @@ bool AudioFormatConversion::convert(tbyte *src,AudioFormat *srcFormat,tbyte *dst
 	int dsps=dstFormat->samplesPerSecond;
 	int ss=srcFormat->frameSize();
 	int ds=dstFormat->frameSize();
-	int numFrames=length/srcFormat->frameSize();
+	int numFrames=srcLength/srcFormat->frameSize();
+
+	if(dstLength!=findConvertedLength(srcLength,srcFormat,dstFormat)){
+		Error::unknown(Categories::TOADLET_RIBBIT,
+			"invalid destination length");
+		return false;
+	}
 
 	/// @todo: Replace this with individual optimized versions
+	/// @todo: While this no longer corrupts memory, it still doesnt upsample properly
 	for(i=0;i<numFrames;++i){
-		int j=i*dsps/ssps;
+		int j=(i*(uint64)dsps)/(uint64)ssps;
 
 		if(sbps==8) v=(*(uint8*)(src+i*ss))-128;
 		else v=*(int16*)(src+i*ss);
@@ -140,7 +146,12 @@ bool AudioFormatConversion::convert(tbyte *src,AudioFormat *srcFormat,tbyte *dst
 int AudioFormatConversion::findConvertedLength(int length,AudioFormat *srcFormat,AudioFormat *dstFormat){
 	uint64 dsize=dstFormat->channels*dstFormat->bitsPerSample*dstFormat->samplesPerSecond;
 	uint64 ssize=srcFormat->channels*srcFormat->bitsPerSample*srcFormat->samplesPerSecond;
-	return (length * dsize) / ssize;
+	length=(length*(uint64)dsize)/(uint64)ssize;
+	// Make sure our resulting length is a multiple of dst frameSize
+	if(length%dstFormat->frameSize()!=0){
+		length=((length/dstFormat->frameSize())+1)*dstFormat->frameSize();
+	}
+	return length;
 }
 
 void AudioFormatConversion::fade(tbyte *buffer,int length,AudioFormat *format,int fadeTime){

@@ -44,19 +44,16 @@ MMAudioBuffer::~MMAudioBuffer(){
 }
 
 bool MMAudioBuffer::create(AudioStream::ptr stream){
-Logger::alert("CREATING BUFFER");
 	AudioFormat::ptr format=stream->getAudioFormat();
 	tbyte *buffer=NULL;
 	int length=0;
 
-Logger::alert("GOING TO DECODE");
 	if(AudioFormatConversion::decode(stream,buffer,length)==false){
 		Error::unknown(Categories::TOADLET_RIBBIT,
 			"unable to decode entire stream");
 		return false;
 	}
 
-Logger::alert("DECODED");
 	if(mDevice->getBufferFadeTime()>0){
 		AudioFormatConversion::fade(buffer,length,format,mDevice->getBufferFadeTime());
 	}
@@ -67,16 +64,16 @@ Logger::alert("DECODED");
 			format->channels+","+format->bitsPerSample+","+format->samplesPerSecond+" to "+
 			newFormat->channels+","+newFormat->bitsPerSample+","+newFormat->samplesPerSecond);
 
-		if(format->samplesPerSecond!=newFormat->samplesPerSecond){
-			Logger::warning(Categories::TOADLET_RIBBIT,
-				"audio rate conversion not implemented, not converting rate");
+		int newLength=AudioFormatConversion::findConvertedLength(length,format,newFormat);
+		tbyte *newBuffer=new tbyte[newLength];
+		if(newBuffer==NULL){
+			delete[] buffer;
+			Error::unknown(Categories::TOADLET_RIBBIT,
+				"unable to allocate buffer");
+			return false;
 		}
 
-		int numFrames=length/format->frameSize();
-		int newLength=numFrames*newFormat->frameSize();
-		tbyte *newBuffer=new tbyte[newLength];
-
-		AudioFormatConversion::convert(buffer,format,newBuffer,newFormat,length);
+		AudioFormatConversion::convert(buffer,length,format,newBuffer,newLength,newFormat);
 
 		delete[] buffer;
 
