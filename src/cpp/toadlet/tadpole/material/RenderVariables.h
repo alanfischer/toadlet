@@ -38,6 +38,8 @@ namespace material{
 
 class MVPMatrixVariable:public RenderVariable{
 public:
+	TOADLET_ALIGNED_NEW
+
 	int getFormat(){return VariableBufferFormat::Format_TYPE_FLOAT_32|VariableBufferFormat::Format_COUNT_4X4;}
 
 	void update(tbyte *data,SceneParameters *parameters){
@@ -54,6 +56,8 @@ protected:
 
 class MVMatrixVariable:public RenderVariable{
 public:
+	TOADLET_ALIGNED_NEW
+
 	int getFormat(){return VariableBufferFormat::Format_TYPE_FLOAT_32|VariableBufferFormat::Format_COUNT_4X4;}
 
 	void update(tbyte *data,SceneParameters *parameters){
@@ -70,6 +74,8 @@ protected:
 
 class NormalMatrixVariable:public RenderVariable{
 public:
+	TOADLET_ALIGNED_NEW
+
 	int getFormat(){return VariableBufferFormat::Format_TYPE_FLOAT_32|VariableBufferFormat::Format_COUNT_4X4;}
 
 	void update(tbyte *data,SceneParameters *parameters){

@@ -196,7 +196,7 @@ Resource::ptr Win32FontHandler::load(Stream::ptr stream,ResourceData *data,Progr
 
 	char *buffer=NULL;
 	HBITMAP bitmap=CreateDIBSection(cdc,bitmapInfo,DIB_RGB_COLORS,(void**)&buffer,NULL,0);
-	delete bitmapInfo;
+	free(bitmapInfo);
 	if(bitmap==NULL || buffer==NULL){
 		DeleteDC(cdc);
 		ReleaseDC(NULL,dc);
