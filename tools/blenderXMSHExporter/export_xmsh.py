@@ -157,8 +157,8 @@ def export(filename):
 
 			# Loop through all mesh faces and fill up our vertex texture coordinates and our matFaceIndicies arrays
 			# XMSH does not handle multiple UV coords per vertex
-			# Instead, we create additional verticies to handle this case, and write out
-			# additional mesh vertices and face indices to handle them.
+			# Instead, we create additional verticies to handle this case, 
+			# and write out additional mesh vertices and face indices to handle them.
 			# The xmshVertUVs dictionary helps us tell which vertices are duplicates
 			xmshVertUVs={} 
 			for face in mesh.faces:

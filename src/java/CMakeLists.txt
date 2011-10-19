@@ -1,3 +1,6 @@
+# On Android NDK API levels < 9, toadlet uses java shim libraries for peeper, ribbit, and pad.
+
+
 # Shortcut variables
 set (JAVA_SRC_DIR us/toadlet)
 set (JAVA_OBJ obj)
@@ -16,6 +19,7 @@ if (${NDKSYSTEM} STREQUAL "windows")
 else (${NDKSYSTEM} STREQUAL "windows")
 	set (CMAKE_INCLUDE_FLAG_SEP_Java ":")
 endif (${NDKSYSTEM} STREQUAL "windows")
+
 
 # Override the standard cmake java compile and link settings
 set (CMAKE_Java_COMPILE_OBJECT
