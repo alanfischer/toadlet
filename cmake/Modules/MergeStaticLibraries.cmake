@@ -6,7 +6,16 @@ macro (MERGE_STATIC_LIBRARIES TARGET LIBRARIES)
 	if (TOADLET_PLATFORM_ANDROID)
 		# Android platforms are like Posix, so merge all objects into a single archive
 		set (LIBRARIES ${LIBRARIES})
-		get_target_property (TARGETLOC ${TARGET} LOCATION)
+
+		# We need the debug postfix on posix systems for the merge script
+		string (TOUPPER ${CMAKE_BUILD_TYPE} BUILD_TYPE)
+		if (${BUILD_TYPE} STREQUAL "DEBUG")
+			get_target_property (SUFFIX ${TARGET} LOCATION_DEBUG)
+		else (${BUILD_TYPE} STREQUAL "DEBUG")
+			get_target_property (SUFFIX ${TARGET} LOCATION)
+		endif (${BUILD_TYPE} STREQUAL "DEBUG")
+
+		# Setup the static library merge script
 		configure_file (
 			${PROJECT_SOURCE_DIR}/cmake/Modules/PosixMergeStaticLibraries.cmake.in 
 			${CMAKE_CURRENT_BINARY_DIR}/PosixMergeStaticLibraries${TARGET}.cmake @ONLY
@@ -30,7 +39,16 @@ macro (MERGE_STATIC_LIBRARIES TARGET LIBRARIES)
 	elseif (TOADLET_PLATFORM_POSIX)
 		# On Posix use a configured script to merge all objects into a single archive
 		set (LIBRARIES ${LIBRARIES})
-		get_target_property (TARGETLOC ${TARGET} LOCATION)
+
+		# We need the debug postfix on posix systems for the merge script
+		string (TOUPPER ${CMAKE_BUILD_TYPE} BUILD_TYPE)
+		if (${BUILD_TYPE} STREQUAL "DEBUG")
+			get_target_property (TARGETLOC ${TARGET} LOCATION_DEBUG)
+		else (${BUILD_TYPE} STREQUAL "DEBUG")
+			get_target_property (TARGETLOC ${TARGET} LOCATION)
+		endif (${BUILD_TYPE} STREQUAL "DEBUG")
+
+		# Setup the static library merge script
 		configure_file (
 			${PROJECT_SOURCE_DIR}/cmake/Modules/PosixMergeStaticLibraries.cmake.in 
 			${CMAKE_CURRENT_BINARY_DIR}/PosixMergeStaticLibraries-${TARGET}.cmake @ONLY

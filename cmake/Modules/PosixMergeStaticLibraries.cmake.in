@@ -12,7 +12,7 @@ get_filename_component (TARGETNAME ${TARGETLOC} NAME)
 set (ARDIR ${CMAKE_CURRENT_BINARY_DIR}/PosixMergeStaticLibraries-${TARGETNAME})
 make_directory (${ARDIR})
 
-# Extract every library into a series of object files
+# Extract every dependent library into a series of object files
 foreach (LIB ${LIBRARIES})
 	get_filename_component (LIBNAME ${LIB} NAME)
 	file (MAKE_DIRECTORY ${ARDIR}/${LIBNAME})
@@ -23,15 +23,7 @@ foreach (LIB ${LIBRARIES})
 	set (AROBJS ${AROBJS} ${OBJS})
 endforeach (LIB)
 
-# Extract the target into its own object files
-make_directory (${ARDIR}/${TARGETNAME})
-execute_process (
-	COMMAND ${CMAKE_AR} x ${TARGETLOC} WORKING_DIRECTORY ${ARDIR}/${TARGETNAME}
-)
-file (GLOB_RECURSE OBJS "${ARDIR}/${TARGETNAME}/*")
-set (AROBJS ${AROBJS} ${OBJS})
-
-# Bundle all object files back into a new target archive
+# Merge all extracted object files into the existing target archive
 execute_process (
 	COMMAND ${CMAKE_AR} r ${TARGETLOC} ${AROBJS} WORKING_DIRECTORY ${ARDIR}
 )
