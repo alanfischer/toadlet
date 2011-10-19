@@ -23,7 +23,7 @@
  *
  ********** Copyright header - do not remove **********/
 
-#include "JAndroidApplication.h"
+#include "JApplication.h"
 #include <toadlet/egg/Error.h>
 #include <toadlet/egg/Logger.h>
 
@@ -49,8 +49,7 @@ jmethodID getNativeHandleApplicationID=0;
 namespace toadlet{
 namespace pad{
 
-// Method signatures: http://dev.kanngard.net/Permalinks/ID_20050509144235.html
-JAndroidApplication::JAndroidApplication(JNIEnv *jenv,jobject jobj):
+JApplication::JApplication(JNIEnv *jenv,jobject jobj):
 	env(NULL),
 	obj(NULL),
 
@@ -66,13 +65,15 @@ JAndroidApplication::JAndroidApplication(JNIEnv *jenv,jobject jobj):
 
 	jclass appClass=env->GetObjectClass(obj);
 	{
-		createID=env->GetMethodID(appClass,"create","()V");
+		createID=env->GetMethodID(appClass,"create","()Z");
 		destroyID=env->GetMethodID(appClass,"destroy","()V");
 		startID=env->GetMethodID(appClass,"start","()V");
 		stopID=env->GetMethodID(appClass,"stop","()V");
+		isRunningID=env->GetMethodID(appClass,"isRunning","()Z");
 		getWidthID=env->GetMethodID(appClass,"getWidth","()I");
 		getHeightID=env->GetMethodID(appClass,"getHeight","()I");
 		setDifferenceMouseID=env->GetMethodID(appClass,"setDifferenceMouse","(Z)V");
+		getDifferenceMouseID=env->GetMethodID(appClass,"getDifferenceMouse","()Z");
 		getEngineID=env->GetMethodID(appClass,"getEngine","()Lus/toadlet/pad/Engine;");
 		getRenderDeviceID=env->GetMethodID(appClass,"getRenderDevice","()Lus/toadlet/pad/RenderDevice;");
 		getAudioDeviceID=env->GetMethodID(appClass,"getAudioDevice","()Lus/toadlet/ribbit/AudioDevice;");
@@ -87,7 +88,7 @@ JAndroidApplication::JAndroidApplication(JNIEnv *jenv,jobject jobj):
 	Java_us_toadlet_pad(env);
 }
 
-JAndroidApplication::~JAndroidApplication(){
+JApplication::~JApplication(){
 	if(obj!=NULL){
 		env->DeleteGlobalRef(obj);
 		obj=NULL;
@@ -111,35 +112,43 @@ JAndroidApplication::~JAndroidApplication(){
 	env=NULL;
 }
 
-void JAndroidApplication::create(String renderDevice,String audioDevice,String motionDevice){
-	env->CallVoidMethod(obj,createID);
+bool JApplication::create(String renderDevice,String audioDevice,String motionDevice,String joyDevice){
+	return env->CallBooleanMethod(obj,createID);
 }
 
-void JAndroidApplication::destroy(){
+void JApplication::destroy(){
 	env->CallVoidMethod(obj,destroyID);
 }
 
-void JAndroidApplication::start(){
+void JApplication::start(){
 	env->CallVoidMethod(obj,startID);
 }
 
-void JAndroidApplication::stop(){
+void JApplication::stop(){
 	env->CallVoidMethod(obj,stopID);
 }
 
-int JAndroidApplication::getWidth(){
+bool JApplication::isRunning() const{
+	env->CallBooleanMethod(obj,isRunningID);
+}
+
+int JApplication::getWidth() const{
 	env->CallIntMethod(obj,getWidthID);
 }
 
-int JAndroidApplication::getHeight(){
+int JApplication::getHeight() const{
 	env->CallIntMethod(obj,getHeightID);
 }
 
-void JAndroidApplication::setDifferenceMouse(bool difference){
+void JApplication::setDifferenceMouse(bool difference){
 	env->CallVoidMethod(obj,setDifferenceMouseID,difference);
 }
 
-Engine *JAndroidApplication::getEngine(){
+bool JApplication::getDifferenceMouse() const{
+	env->CallBooleanMethod(obj,getDifferenceMouseID);
+}
+
+Engine *JApplication::getEngine() const{
 	jobject engineObj=env->CallObjectMethod(obj,getEngineID);
 
 	if(mEngine==NULL || mLastEngineObj!=engineObj){
@@ -161,7 +170,7 @@ Engine *JAndroidApplication::getEngine(){
 	return mEngine;
 }
 
-RenderDevice *JAndroidApplication::getRenderDevice(){
+RenderDevice *JApplication::getRenderDevice() const{
 	jobject deviceObj=env->CallObjectMethod(obj,getRenderDeviceID);
 
 	if(mRenderDevice==NULL || mLastRenderDeviceObj!=deviceObj){
@@ -183,7 +192,7 @@ RenderDevice *JAndroidApplication::getRenderDevice(){
 	return mRenderDevice;
 }
 
-AudioDevice *JAndroidApplication::getAudioDevice(){
+AudioDevice *JApplication::getAudioDevice() const{
 	jobject deviceObj=env->CallObjectMethod(obj,getAudioDeviceID);
 
 	if(mAudioDevice==NULL || mLastAudioDeviceObj!=deviceObj){

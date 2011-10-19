@@ -50,7 +50,6 @@ AudioBuffer::ptr AudioBufferManager::createAudioBuffer(AudioStream::ptr stream){
 		Error::nullPointer("createAudioBuffer called with a null stream");
 		return NULL;
 	}
-	
 	AudioBuffer::ptr audioBuffer=AudioBuffer::ptr(audioDevice->createAudioBuffer());
 	if(audioBuffer!=NULL && audioBuffer->create(stream)==false){
 		audioBuffer=NULL;

@@ -276,7 +276,6 @@ OSXApplication::OSXApplication():
 	mDifferenceMouse(false),
 
 	mRun(false),
-	mAutoActivate(false),
 	mActive(false),
 	mDestroyed(false),
 	mWindow(nil),

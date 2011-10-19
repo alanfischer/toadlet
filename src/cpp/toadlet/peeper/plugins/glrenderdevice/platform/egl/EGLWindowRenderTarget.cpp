@@ -83,6 +83,10 @@ EGLWindowRenderTarget::~EGLWindowRenderTarget(){
 	destroyContext();
 }
 
+void EGLWindowRenderTarget::destroy(){
+	destroyContext();
+}
+
 bool EGLWindowRenderTarget::createContext(void *display,void *window,WindowRenderTargetFormat *format,bool pixmap){
 	if(mContext!=EGL_NO_CONTEXT){
 		return true;

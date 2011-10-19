@@ -39,44 +39,39 @@ public:
 	X11Application();
 	virtual ~X11Application();
 
-	virtual void create(String renderDevice=(char*)NULL,String audioDevice=(char*)NULL,String motionDevice=(char*)NULL);
-	virtual void destroy();
+	bool create(String renderDevice,String audioDevice,String motionDevice);
+	void destroy();
 
-	virtual void start();
-	virtual void runEventLoop();
-	virtual void stepEventLoop();
-	virtual void stop(){mRun=false;}
-	virtual bool isRunning() const{return mRun;}
+	void start();
+	void runEventLoop();
+	void stepEventLoop();
+	void stop(){mRun=false;}
+	bool isRunning() const{return mRun;}
 
-	virtual void setAutoActivate(bool autoActivate){mAutoActivate=autoActivate;}
-	virtual bool getAutoActivate() const{return mAutoActivate;}
-	virtual void activate();
-	virtual void deactivate();
-	virtual bool active() const{return mActive;}
+	void activate();
+	void deactivate();
+	bool active() const{return mActive;}
 
-	virtual void setTitle(const String &title);
-	virtual const String &getTitle() const;
+	void setTitle(const String &title);
+	String getTitle() const;
 
-	virtual void setPosition(int x,int y);
-	virtual int getPositionX() const;
-	virtual int getPositionY() const;
+	void setPosition(int x,int y);
+	int getPositionX() const;
+	int getPositionY() const;
 
-	virtual void setSize(int width,int height);
-	virtual int getWidth() const;
-	virtual int getHeight() const;
+	void setSize(int width,int height);
+	int getWidth() const;
+	int getHeight() const;
 
-	virtual void setFullscreen(bool fullscreen);
-	virtual bool getFullscreen() const;
+	void setFullscreen(bool fullscreen);
+	bool getFullscreen() const;
 
-	virtual void setStopOnDeactivate(bool stop){}
-	virtual bool getStopOnDeactivate() const{return false;}
+	void setDifferenceMouse(bool difference);
+	bool getDifferenceMouse() const{return mDifferenceMouse;}
 
-	virtual void setDifferenceMouse(bool difference);
-	virtual bool getDifferenceMouse() const{return mDifferenceMouse;}
+	void changeRenderDevicePlugin(const String &plugin){}
 
-	virtual void changeRenderDevicePlugin(const String &plugin){}
-
-	virtual void *getWindowHandle(){return getWindow();}
+	void *getWindowHandle(){return getWindow();}
 	void *getDisplay() const;
 	void *getWindow() const;
 	void *getVisualInfo() const;
@@ -107,7 +102,6 @@ protected:
 	bool mSkipNextMove;
 
 	bool mRun;
-	bool mAutoActivate;
 	bool mActive;
 	bool mDestroyed;
 
