@@ -231,6 +231,7 @@ if (TOADLET_PLATFORM_WIN32)
 	source_group ("Header Files\\\\platform\\\\win32" FILES ${EGG_PLATFORM_WIN32_HEADERS})
 	set (EGG_SRC ${EGG_SRC} ${EGG_PLATFORM_WIN32_SRC})
 	set (EGG_HEADERS ${EGG_HEADERS} ${EGG_PLATFORM_WIN32_HEADERS})
+
 	if (TOADLET_PLATFORM_WINCE)
 		source_group ("Source Files\\\\net\\\\platform\\\\wince" FILES ${EGG_NET_PLATFORM_WINCE_SRC})
 		source_group ("Header Files\\\\net\\\\platform\\\\wince" FILES ${EGG_NET_PLATFORM_WINCE_HEADERS})
@@ -242,10 +243,7 @@ elseif (TOADLET_PLATFORM_POSIX)
 	source_group ("Header Files\\\\platform\\\\posix" FILES ${EGG_PLATFORM_POSIX_HEADERS})
 	set (EGG_SRC ${EGG_SRC} ${EGG_PLATFORM_POSIX_SRC})
 	set (EGG_HEADERS ${EGG_HEADERS} ${EGG_PLATFORM_POSIX_HEADERS})
-	if (NOT TOADLET_PLATFORM_ANDROID)
-		# Android does not have a separate pthread library
-		set (EGG_LIBS ${EGG_LIBS} pthread)
-	endif (NOT TOADLET_PLATFORM_ANDROID)
+
 	if (TOADLET_PLATFORM_OSX)
 		source_group ("Source Files\\\\platform\\\\posix" FILES ${EGG_PLATFORM_POSIX_OSX_SRC})
 		source_group ("Header Files\\\\platform\\\\posix" FILES ${EGG_PLATFORM_POSIX_OSX_HEADERS})
@@ -254,8 +252,12 @@ elseif (TOADLET_PLATFORM_POSIX)
 		find_library (FOUNDATION_LIBS Foundation)
 		set (EGG_LIBS objc ${EGG_LIBS} ${FOUNDATION_LIBS})
 	endif (TOADLET_PLATFORM_OSX)
+
 	if (TOADLET_PLATFORM_ANDROID)
 		set (EGG_LIBS ${EGG_LIBS} log)
+	else (TOADLET_PLATFORM_ANDROID)
+		# Android does not have a separate pthread library
+		set (EGG_LIBS ${EGG_LIBS} pthread)
 	endif (TOADLET_PLATFORM_ANDROID)
 endif (TOADLET_PLATFORM_WIN32)
 

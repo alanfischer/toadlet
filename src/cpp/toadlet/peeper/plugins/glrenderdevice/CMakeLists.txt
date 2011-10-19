@@ -67,6 +67,7 @@ set (PEEPER_GLRENDERDEVICE_HEADERS
 	GLPixelBuffer.h
 	GLVertexFormat.h
 )
+
 if (NOT TOADLET_PLATFORM_WINCE)
 	set (PEEPER_GLRENDERDEVICE_HEADERS ${PEEPER_GLRENDERDEVICE_HEADERS} GLFBORenderTarget.h GLFBOPixelBuffer.h)
 endif (NOT TOADLET_PLATFORM_WINCE)
@@ -151,11 +152,7 @@ elseif (TOADLET_PLATFORM_WIN32)
 endif (TOADLET_PLATFORM_ANDROID)
 
 
-# Dependencies - note these have already been searched for
-include_directories (${GLEW_INCLUDE_DIR})
-
-
-# Library Dependencies
+# Dependencies
 if (TOADLET_PLATFORM_ANDROID)
 	set (PEEPER_GLRENDERDEVICE_LIBS ${GLESV1_LIBS})
 elseif (TOADLET_PLATFORM_IOS)
@@ -164,12 +161,21 @@ elseif (TOADLET_PLATFORM_IOS)
 elseif (TOADLET_PLATFORM_OSX)
 	find_library (APPKIT_LIBS AppKit)
 	include_directories (${OPENGL_INCLUDE_DIR})
-	set (PEEPER_GLRENDERDEVICE_LIBS objc ${APPKIT_LIBS} ${GLEW_LIBRARY} ${OPENGL_LIBRARY})
+	set (PEEPER_GLRENDERDEVICE_LIBS objc ${APPKIT_LIBS} ${OPENGL_LIBRARY})
 elseif (TOADLET_PLATFORM_WINCE)
 	set (PEEPER_GLRENDERDEVICE_DEFS "GLESEM_BUILD") 
-elseif (TOADLET_PLATFORM_POSIX OR TOADLET_PLATFORM_WIN32)
-	set (PEEPER_GLRENDERDEVICE_LIBS ${GLEW_LIBRARY})
+	set (PEEPER_GLRENDERDEVICE_DEFS_S "GLESEM_BUILD" "GLESEM_STATIC")
 endif (TOADLET_PLATFORM_ANDROID)
+
+
+# On platforms that use GLEW, include it and try to setup a static build
+if (GLEW_FOUND)
+	include_directories (${GLEW_INCLUDE_DIR})
+	LOCATE_STATIC_LIBRARY (${GLEW_LIBRARY} GLEW_LIBRARY_S)
+	if (GLEW_LIBRARY_S)
+		set (PEEPER_GLRENDERDEVICE_LIBS_S ${GLEW_LIBRARY_S})
+	endif (GLEW_LIBRARY_S)
+endif (GLEW_FOUND)
 
 
 # Dynamic library
@@ -182,23 +188,14 @@ if (NOT TOADLET_PLATFORM_IOS)
 endif (NOT TOADLET_PLATFORM_IOS)
 
 
-# Special Static Library Dependencies
-if (TOADLET_PLATFORM_ANDROID)
-elseif (TOADLET_PLATFORM_IOS)
-elseif (TOADLET_PLATFORM_WINCE)
-	set (PEEPER_GLRENDERDEVICE_DEFS_S "GLESEM_BUILD" "GLESEM_STATIC")
-elseif (TOADLET_PLATFORM_OSX OR TOADLET_PLATFORM_POSIX OR TOADLET_PLATFORM_WIN32)
-	LOCATE_STATIC_LIBRARY (${GLEW_LIBRARY} GLEW_LIBRARY_S)
-	if (GLEW_LIBRARY_S)
-		set (PEEPER_GLRENDERDEVICE_LIBS_S ${GLEW_LIBRARY_S})
-	else (GLEW_LIBRARY_S)
-		# Static Library needs a static glew library
-		# If we do not find one, do not build the static plugin
-		message (STATUS "WARNING: GLEW is needed but a static glew was not found,")
-		message (STATUS "WARNING: toadlet_peeper_glrenderdevice_s will not be built")
-		return()
-	endif (GLEW_LIBRARY_S)
-endif (TOADLET_PLATFORM_ANDROID)
+# Don't even bother to build the static plugin if we do not have a static GLEW
+if (GLEW_FOUND AND NOT GLEW_LIBRARY_S)
+	# Static Library needs a static glew library
+	# If we do not find one, do not build the static plugin
+	message (STATUS "WARNING: GLEW is needed but a static glew was not found,")
+	message (STATUS "WARNING: toadlet_peeper_glrenderdevice_s will not be built")
+	return()
+endif (GLEW_FOUND AND NOT GLEW_LIBRARY_S)
 
 
 # Static library

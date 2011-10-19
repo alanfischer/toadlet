@@ -407,17 +407,14 @@ source_group ("Header Files\\\\node" FILES ${TADPOLE_NODE_HEADERS})
 source_group ("Header Files\\\\sensor" FILES ${TADPOLE_SENSOR_HEADERS})
 source_group ("Header Files\\\\terrain" FILES ${TADPOLE_TERRAIN_HEADERS})
 
-set (TADPOLE_SRC ${TADPOLE_SRC} ${TADPOLE_ANIMATION_SRC} ${TADPOLE_CREATOR_SRC} ${TADPOLE_HANDLER_SRC} ${TADPOLE_MATERIAL_SRC} ${TADPOLE_NODE_SRC} ${TADPOLE_SENSOR_SRC} ${TADPOLE_TERRAIN_SRC})
 
-# TODO: The handlers/ subdirectory is going to become a plugin system, and so they are NOT included in the aggregate header files
-# This is true for all handler/ subdirectory files
+# Sources, headers and namespaces
+set (TADPOLE_SRC ${TADPOLE_SRC} ${TADPOLE_ANIMATION_SRC} ${TADPOLE_CREATOR_SRC} ${TADPOLE_HANDLER_SRC} ${TADPOLE_MATERIAL_SRC} ${TADPOLE_NODE_SRC} ${TADPOLE_SENSOR_SRC} ${TADPOLE_TERRAIN_SRC})
 set (TADPOLE_HEADERS ${TADPOLE_HEADERS} ${TADPOLE_ANIMATION_HEADERS} ${TADPOLE_CREATOR_HEADERS} ${TADPOLE_MATERIAL_HEADERS} ${TADPOLE_NODE_HEADERS} ${TADPOLE_SENSOR_HEADERS} ${TADPOLE_TERRAIN_HEADERS})
 set (TADPOLE_NAMESPACES ${TADPOLE_NAMESPACES} animation creator material node sensor terrain)
 
-# Give the headers and namespaces parent scope for inclusion into the master tadpole.h file
-set (TADPOLE_HEADERS ${TADPOLE_HEADERS} PARENT_SCOPE)
-set (TADPOLE_NAMESPACES ${TADPOLE_NAMESPACES} PARENT_SCOPE)
 
+# Fixed point builds use fewer features
 if (NOT TOADLET_FIXED_POINT)
 	source_group ("Source Files\\\\bsp" FILES ${TADPOLE_BSP_SRC})
 	source_group ("Header Files\\\\bsp" FILES ${TADPOLE_BSP_HEADERS})
@@ -428,11 +425,15 @@ if (NOT TOADLET_FIXED_POINT)
 	set (TADPOLE_NAMESPACES ${TADPOLE_NAMESPACES} bsp studio)
 endif (NOT TOADLET_FIXED_POINT)
 
+
 # Give the headers and namespaces parent scope for inclusion into the master tadpole.h file
+# TODO: The handlers/ subdirectory is going to become a plugin system, thus they are NOT included in these aggregate header files
 set (TADPOLE_HEADERS ${TADPOLE_HEADERS} PARENT_SCOPE)
 set (TADPOLE_NAMESPACES ${TADPOLE_NAMESPACES} PARENT_SCOPE)
 
+
 # Setup dependecy specific files and libraries
+
 # Freetype is not required on OSX
 if (NOT TOADLET_PLATFORM_OSX)
 	find_package (Freetype)
@@ -554,7 +555,6 @@ if (OGGVORBIS_FOUND)
         if (VORBISENC_LIBRARY_S)
                 set (TADPOLE_HANDLER_LIBS_S ${TADPOLE_HANDLER_LIBS_S} ${VORBISENC_LIBRARY_S})
         endif (VORBISENC_LIBRARY_S)
-
 endif (OGGVORBIS_FOUND)
 
 find_package (Sidplay)
@@ -638,7 +638,8 @@ if (FFMPEG_FOUND)
 	endif (FFMPEG_LIBRARIES_S)
 endif (FFMPEG_FOUND)
 
-# Platform specific files
+
+# Platform specific files 
 if (TOADLET_PLATFORM_ANDROID)
 	source_group ("Source Files\\\\handler\\\\platform\\\\android" FILES ${TADPOLE_HANDLER_PLATFORM_ANDROID_SRC})
 	source_group ("Header Files\\\\handler\\\\platform\\\\android" FILES ${TADPOLE_HANDLER_PLATFORM_ANDROID_HEADERS})
@@ -669,7 +670,7 @@ elseif (TOADLET_PLATFORM_WIN32)
 endif (TOADLET_PLATFORM_ANDROID)
 
 
-# Use dependency results
+# Bring in dependency results
 source_group ("Source Files\\\\handler" FILES ${TADPOLE_HANDLER_SRC})
 source_group ("Header Files\\\\handler" FILES ${TADPOLE_HANDLER_HEADERS})
 set (TADPOLE_SRC ${TADPOLE_SRC} ${TADPOLE_HANDLER_SRC})
