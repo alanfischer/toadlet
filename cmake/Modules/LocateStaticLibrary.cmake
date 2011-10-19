@@ -22,7 +22,7 @@ macro (LOCATE_STATIC_LIBRARY LIBRARY STATIC)
                         # Library is already static
                         set (${STATIC} ${LIBRARY})
                 elseif (${SUFFIX} STREQUAL ${DYNEXT})
-                        string (REPLACE ".so" ".a" LIB_S ${LIBRARY})
+                        string (REPLACE ${DYNEXT} ".a" LIB_S ${LIBRARY})
                         if (EXISTS ${LIB_S})
                                 set (${STATIC} ${LIB_S})
                         else (EXISTS ${LIB_S})
