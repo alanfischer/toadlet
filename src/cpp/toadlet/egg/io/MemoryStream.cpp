@@ -42,6 +42,12 @@ MemoryStream::MemoryStream(Stream::ptr stream):
 	int i;
 	for(i=stream->read(data,sizeof(data));i>0;i=stream->read(data,sizeof(data))){
 		tbyte *newData=new tbyte[mDataLength+i];
+		if(newData==NULL){
+			delete[] mData;
+			mData=NULL;
+			mDataLength=0;
+			break;
+		}
 		if(mData!=NULL){
 			memcpy(newData,mData,mDataLength);
 		}
