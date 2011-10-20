@@ -135,6 +135,11 @@ bool WaveDecoder::startStream(Stream::ptr stream){
 			if(fmt.wFormatTag==WAVE_Format_PCM){
 				mSize=chunk.dwSize;
 				mData=new tbyte[chunk.dwSize];
+				if(mData==NULL){
+					Error::unknown(Categories::TOADLET_TADPOLE,
+						"error allocating chunk");
+					return false;
+				}
 				if(stream->read(mData,chunk.dwSize)!=chunk.dwSize){
 					break;
 				}
@@ -142,6 +147,11 @@ bool WaveDecoder::startStream(Stream::ptr stream){
 			else if(fmt.wFormatTag==WAVE_Format_IMA_ADPCM){
 				mSize=4*chunk.dwSize;
 				mData=new tbyte[4*chunk.dwSize];
+				if(mData==NULL){
+					Error::unknown(Categories::TOADLET_TADPOLE,
+						"error allocating chunk");
+					return false;
+				}
 				if(stream->read(mData+3*chunk.dwSize,chunk.dwSize)!=chunk.dwSize){
 					break;
 				}
