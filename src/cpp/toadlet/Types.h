@@ -192,7 +192,7 @@
 
 template<typename Type> inline void TOADLET_IGNORE_UNUSED_VARIABLE_WARNING(Type t){}
 
-#define TOADLET_ALIGNED_NEW
+#define TOADLET_ALIGNED_NEW \
 	inline void *operator new(size_t size) throw(std::bad_alloc){return TOADLET_ALIGNED_MALLOC(size,16);} \
 	inline void operator delete(void *pointer) throw(){TOADLET_ALIGNED_FREE(pointer);} \
 	inline void *operator new[](size_t size) throw(std::bad_alloc){return TOADLET_ALIGNED_MALLOC(size,16);} \

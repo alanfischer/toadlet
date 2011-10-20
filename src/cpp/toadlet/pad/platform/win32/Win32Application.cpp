@@ -167,11 +167,11 @@ Win32Application::Win32Application():
 			,new_GLRenderDevice
 		));
 	#endif
-	mRenderDevicePreferences.add("gl");
 	mRenderDevicePreferences.add("d3d9");
 	mRenderDevicePreferences.add("d3dm");
 	mRenderDevicePreferences.add("d3d10");
 	mRenderDevicePreferences.add("d3d11");
+	mRenderDevicePreferences.add("gl");
 
 	#if defined(TOADLET_HAS_OPENAL)
 		mAudioDevicePlugins.add("al",AudioDevicePlugin(new_ALAudioDevice));

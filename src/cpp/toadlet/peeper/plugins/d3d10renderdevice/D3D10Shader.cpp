@@ -216,11 +216,11 @@ ID3D10InputLayout *D3D10Shader::findInputLayout(D3D10VertexFormat *vertexFormat)
 					break;
 				}
 				switch(missingParameters[i].ComponentType){
-					case D3D_REGISTER_COMPONENT_UINT32:
-					case D3D_REGISTER_COMPONENT_SINT32:
+					case D3D10_REGISTER_COMPONENT_UINT32:
+					case D3D10_REGISTER_COMPONENT_SINT32:
 						elementFormat|=VertexFormat::Format_TYPE_INT_32;
 					break;
-					case D3D_REGISTER_COMPONENT_FLOAT32:
+					case D3D10_REGISTER_COMPONENT_FLOAT32:
 						elementFormat|=VertexFormat::Format_TYPE_FLOAT_32;
 					break;
 				}
