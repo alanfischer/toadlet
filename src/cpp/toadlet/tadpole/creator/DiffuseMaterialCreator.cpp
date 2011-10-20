@@ -132,7 +132,7 @@ void DiffuseMaterialCreator::createShaders(){
 		"uniform sampler2D tex;\n"
 
 		"void main(){\n"
-		"vec4 fragColor=color*(texture2D(tex,texCoord)+(1.0-textureSet));\n"
+			"vec4 fragColor=color*(texture2D(tex,texCoord)+(1.0-textureSet));\n"
 			"gl_FragColor=mix(fogColor,fragColor,fog);\n"
 		"}",
 
