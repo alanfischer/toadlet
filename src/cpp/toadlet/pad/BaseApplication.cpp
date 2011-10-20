@@ -210,19 +210,12 @@ RenderTarget *BaseApplication::makeRenderTarget(const String &plugin){
 
 	Map<String,RenderDevicePlugin>::iterator it=mRenderDevicePlugins.find(plugin);
 	if(it!=mRenderDevicePlugins.end()){
-Logger::alert("CREATING CONTEXT");
 		TOADLET_TRY
-			Logger::alert("a happy");
 			target=it->second.createRenderTarget(getWindowHandle(),mFormat);
-			Logger::alert("a maybe");
 		TOADLET_CATCH(const Exception &){Logger::alert("a sad");target=NULL;}
-Logger::alert("a sadz");
-Logger::alert(String("CREATING CONTEXT DONE:")+(int)target);
 	}
 	if(target!=NULL && target->isValid()==false){
-Logger::alert("delling");
 		delete target;
-Logger::alert("delled");
 		target=NULL;
 	}
 	return target;

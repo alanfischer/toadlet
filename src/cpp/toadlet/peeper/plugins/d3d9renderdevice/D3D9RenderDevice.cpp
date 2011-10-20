@@ -714,7 +714,9 @@ void D3D9RenderDevice::setSamplerState(int i,SamplerState *state){
 
 			mD3DDevice->SetSamplerState(i,D3DSAMP_BORDERCOLOR,toD3DCOLOR(state->borderColor));
 
-			mD3DDevice->SetSamplerState(i,D3DSAMP_MAXMIPLEVEL,state->maxLOD);
+			// This isn't just state->maxLOD, since state->maxLOD has 0 as lowest and N as highest
+			// But this is 0 as highest and N as lowest, and we don't have N at this ponit, so just leave it at zero
+			mD3DDevice->SetSamplerState(i,D3DSAMP_MAXMIPLEVEL,0);
 		#endif
 
 		if(i==0){
