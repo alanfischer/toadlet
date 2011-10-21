@@ -2,8 +2,8 @@
 #  Android CMake toolchain file, for use with the ndk r5,r6
 #  See home page: http://code.google.com/p/android-cmake/
 #
-#  Altered for x86 builds by http://lightningtoads.com for use
-#  with the toadlet engine http://code.google.com/p/toadlet
+#  Updated by http://lightningtoads.com for use with 
+#  the toadlet engine http://code.google.com/p/toadlet
 #
 #  Usage Linux:
 #   $ export ANDROID_NDK=/<absolute path to NDK>
@@ -113,6 +113,15 @@
 #     [~] fixed options caching
 #     [~] search for all supported NDK versions
 #     [~] allowed spaces in NDK path
+#   - modified October 2011 Andrew Fischer andrew@lightningtoads.com
+#     [~] included the latest ndk version r6b 
+#     [~] added support for the android x86 platform (via ANDROID_ARCH)
+#     [~] added the CMAKE_PREFIX_PATH variable to the CMAKE_FIND_ROOT_PATH
+#     [~] changed ANDROID_API_LEVEL to ANDROID_NDK_API_LEVEL to avoid ambiguity
+#     [~] added ANDROID_SDK location for android SDK awareness, used by toadlet
+#     [~] added ANDROID_SDK_API_LEVEL for android SKD awareness, used by toadlet
+#     [~] added ANDROID_ARCH=ARM or X86. (X86 only available with ANDROID_NDK_API_LEVEL>=9)
+#     [~] fixed CMAKE_INSTALL_NAME_TOOL definition on OSX platforms
 # ----------------------------------------------------------------------------
 
 # this one is important
@@ -121,7 +130,7 @@ set( CMAKE_SYSTEM_NAME Linux )
 set( CMAKE_SYSTEM_VERSION 1 )
 
 set( ANDROID_NDK_DEFAULT_SEARCH_PATH /opt/android-ndk )
-set( ANDROID_NDK_SUPPORTED_VERSIONS -r6 -r5c -r5b -r5 "")
+set( ANDROID_NDK_SUPPORTED_VERSIONS -r6b -r6 -r5c -r5b -r5 "")
 set( ANDROID_NDK_TOOLCHAIN_DEFAULT_SEARCH_PATH /opt/android-toolchain )
 set( TOOL_OS_SUFFIX "" )
 
