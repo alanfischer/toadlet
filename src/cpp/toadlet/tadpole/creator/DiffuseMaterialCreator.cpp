@@ -296,7 +296,8 @@ Material::ptr DiffuseMaterialCreator::createDiffuseMaterial(Texture::ptr texture
 		pass->getVariables()->addVariable("textureMatrix",RenderVariable::ptr(new TextureMatrixVariable(0)),Material::Scope_MATERIAL);
 		pass->getVariables()->addVariable("textureSet",RenderVariable::ptr(new TextureSetVariable(0)),Material::Scope_MATERIAL);
 
-		pass->setSamplerState(0,mEngine->getMaterialManager()->getDefaultSamplerState());
+		SamplerState state=mEngine->getMaterialManager()->getDefaultSamplerState();
+		pass->setSamplerState(0,state);
 		pass->setTexture(0,texture);
 	}
 
@@ -310,7 +311,8 @@ Material::ptr DiffuseMaterialCreator::createDiffuseMaterial(Texture::ptr texture
 		pass->setRasterizerState(RasterizerState());
 		pass->setMaterialState(MaterialState(true,false,MaterialState::ShadeType_GOURAUD));
 
-		pass->setSamplerState(0,mEngine->getMaterialManager()->getDefaultSamplerState());
+		SamplerState state=mEngine->getMaterialManager()->getDefaultSamplerState();
+		pass->setSamplerState(0,state);
 		pass->setTexture(0,texture);
 	}
 
