@@ -42,6 +42,8 @@
 namespace toadlet{
 namespace peeper{
 
+class D3D9Texture;
+
 class D3D9RenderDevice:public RenderDevice{
 public:
 	D3D9RenderDevice();
@@ -108,6 +110,7 @@ public:
 	void setPointState(const PointState &state);
 	void setMaterialState(const MaterialState &state);
 	void setSamplerState(int i,SamplerState *state);
+	void setSamplerStatePostTexture(int i,SamplerState *state);
 	void setTextureState(int i,TextureState *state);
 
 	inline IDirect3DDevice9 *getDirect3DDevice9(){return mD3DDevice;}
@@ -149,6 +152,8 @@ protected:
 	RenderTarget *mRenderTarget;
 	D3D9RenderTarget *mD3DRenderTarget;
 	RenderState *mLastRenderState;
+	Collection<D3D9Texture*> mLastTextures;
+	Collection<SamplerState*> mLastSamplerStates;
 
 	RenderCaps mCaps;
 };

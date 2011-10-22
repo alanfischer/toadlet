@@ -3,7 +3,7 @@
 Resources *Resources::instance=NULL;
 
 Image::ptr Resources::createPoint(int width,int height){
-	Image::ptr image(Image::createAndReallocate(Image::Dimension_D2,Image::Format_L_8,width,height));
+	Image::ptr image(Image::createAndReallocate(Image::Dimension_D2,Image::Format_A_8,width,height));
 
 	uint8 *data=image->getData();
 	int x=0,y=0;

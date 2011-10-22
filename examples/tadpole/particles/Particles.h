@@ -2,6 +2,7 @@
 #define PARTICLES_H
 
 #include <toadlet/toadlet.h>
+#include <LFX2.h>
 
 class Particles:public Applet{
 public:
@@ -29,15 +30,23 @@ public:
 	void joyMoved(scalar x,scalar y,scalar z,scalar r,scalar u,scalar v){}
 	void joyReleased(int button){}
 
-	void addSimulatedParticles(ParticleNode::ptr particles);
-
 	Application *app;
 	Engine *engine;
 	Scene::ptr scene;
 	CameraNode::ptr cameraNode;
 	ParticleNode::ptr pointNode,spriteNode,beamNode;
 	Random random;
-	Collection<ParticleNode::ptr> simulatedParticles;
+	Collection<ParticleNode::ptr> particles;
+
+	#if defined(LFX_DLL_NAME)
+		int lfxTime;
+		DynamicLibrary lfxLibrary;
+		LFX2INITIALIZE lfxInitialize;
+		LFX2RELEASE lfxRelease;
+		LFX2RESET lfxReset;
+		LFX2UPDATE lfxUpdate;
+		LFX2LIGHT lfxLight;
+	#endif
 };
 
 #endif
