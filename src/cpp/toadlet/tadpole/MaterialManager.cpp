@@ -216,6 +216,14 @@ void MaterialManager::contextActivate(RenderDevice *renderDevice){
 			shared_static_cast<BackableRenderState>(renderState)->setBack(back);
 		}
 	}
+
+	for(i=0;i<mShaderStates.size();++i){
+		ShaderState::ptr shaderState=mShaderStates[i];
+		if(shaderState!=NULL && shaderState->getRootShaderState()!=shaderState){
+			ShaderState::ptr back(renderDevice->createShaderState());
+			shared_static_cast<BackableShaderState>(shaderState)->setBack(back);
+		}
+	}
 }
 
 void MaterialManager::contextDeactivate(RenderDevice *renderDevice){
@@ -224,6 +232,13 @@ void MaterialManager::contextDeactivate(RenderDevice *renderDevice){
 		RenderState::ptr renderState=mRenderStates[i];
 		if(renderState!=NULL && renderState->getRootRenderState()!=renderState){
 			shared_static_cast<BackableRenderState>(renderState)->setBack(NULL);
+		}
+	}
+
+	for(i=0;i<mShaderStates.size();++i){
+		ShaderState::ptr shaderState=mShaderStates[i];
+		if(shaderState!=NULL && shaderState->getRootShaderState()!=shaderState){
+			shared_static_cast<BackableShaderState>(shaderState)->setBack(NULL);
 		}
 	}
 }

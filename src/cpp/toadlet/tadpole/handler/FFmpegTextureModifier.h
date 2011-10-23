@@ -79,6 +79,8 @@ public:
 	/// @todo: Let us be able to open a stream and query its parameters before specifying a texture
 	/// @todo: Move the Audio creation out from here, and instead have it be something passed in, if Audio is desired
 	FFmpegTextureController(Engine *engine);
+	virtual ~FFmpegTextureController();
+
 	bool open(Stream::ptr stream,Resource::ptr resource);
 	void destroy();
 
