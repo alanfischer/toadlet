@@ -631,6 +631,7 @@ void Engine::contextActivate(RenderDevice *renderDevice){
 		mContextListeners[i]->preContextActivate(renderDevice);
 	}
 
+	mShaderManager->contextActivate(renderDevice);
 	mBufferManager->contextActivate(renderDevice);
 	mTextureManager->contextActivate(renderDevice);
 	mMaterialManager->contextActivate(renderDevice);
@@ -648,6 +649,7 @@ void Engine::contextDeactivate(RenderDevice *renderDevice){
 		mContextListeners[i]->preContextDeactivate(renderDevice);
 	}
 
+	mShaderManager->contextDeactivate(renderDevice);
 	mBufferManager->contextDeactivate(renderDevice);
 	mTextureManager->contextDeactivate(renderDevice);
 	mMaterialManager->contextDeactivate(renderDevice);

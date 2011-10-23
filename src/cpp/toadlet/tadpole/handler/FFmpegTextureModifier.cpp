@@ -215,6 +215,10 @@ FFmpegTextureController::FFmpegTextureController(Engine *engine):
 	mEngine=engine;
 }
 
+FFmpegTextureController::~FFmpegTextureController(){
+	destroy();
+}
+
 bool FFmpegTextureController::open(Stream::ptr stream,Resource::ptr resource){
 	if(stream->closed()){
 		Error::unknown(Categories::TOADLET_TADPOLE,
@@ -307,6 +311,11 @@ bool FFmpegTextureController::open(Stream::ptr stream,Resource::ptr resource){
 }
 
 void FFmpegTextureController::destroy(){
+	if(mFormatCtx!=NULL){
+		av_close_input_stream(mFormatCtx);
+		mFormatCtx=NULL;
+	}
+
 	if(mIOCtx!=NULL){
 		delete mIOCtx;
 		mIOCtx=NULL;

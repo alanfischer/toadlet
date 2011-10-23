@@ -143,7 +143,6 @@ RenderDevice::DeviceStatus D3D10RenderDevice::getStatus(){
 
 bool D3D10RenderDevice::reset(){
 	// No device reset necessary
-
 	setDefaultState();
 
 	return true;

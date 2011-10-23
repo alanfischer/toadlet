@@ -357,8 +357,6 @@ void GLRenderDevice::destroy(){
 		mRenderTarget=NULL;
 		mGLRenderTarget=NULL;
 
-		TOADLET_CHECK_GLERROR("destroy");
-
 		Logger::alert(Categories::TOADLET_PEEPER,
 			"destroyed GLRenderDevice");
 	}

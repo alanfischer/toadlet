@@ -53,6 +53,10 @@ void BackableShaderState::setShader(Shader::ShaderType type,Shader::ptr shader){
 	}
 	
 	mShaders[type]=shader;
+
+	if(mBack!=NULL){
+		mBack->setShader(type,shader);
+	}
 }
 
 Shader::ptr BackableShaderState::getShader(Shader::ShaderType type){
@@ -71,6 +75,8 @@ void BackableShaderState::setBack(ShaderState::ptr back){
 	mBack=back;
 	
 	if(mBack!=NULL){
+		mBack->create();
+
 		int i;
 		for(i=0;i<mShaders.size();++i){
 			mBack->setShader((Shader::ShaderType)i,mShaders[i]);
