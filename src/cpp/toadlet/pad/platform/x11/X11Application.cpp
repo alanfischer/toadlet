@@ -101,10 +101,10 @@ X11Application::~X11Application(){
 	delete x11;
 }
 
-void X11Application::create(String renderDevice,String audioDevice,String motionDevice){
+bool X11Application::create(String renderDevice,String audioDevice,String motionDevice,String joyDevice){
 	createWindow();
 
-	BaseApplication::create(renderDevice,audioDevice,motionDevice);
+	return BaseApplication::create(renderDevice,audioDevice,motionDevice,joyDevice);
 }
 
 void X11Application::destroy(){
@@ -524,7 +524,7 @@ void X11Application::setTitle(const String &title){
 	mTitle=title;
 }
 
-const String &X11Application::getTitle() const{
+String X11Application::getTitle() const{
 	return mTitle;
 }
 
