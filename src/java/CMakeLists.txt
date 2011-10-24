@@ -6,9 +6,15 @@ set (JAVA_SRC_DIR us/toadlet)
 set (JAVA_OBJ obj)
 
 
-# Setup for Android Java Compilation
-set (CMAKE_Java_COMPILER javac)
-set (CMAKE_Java_ARCHIVE jar)
+# Setup for Android Java Compilation - uses the find_host_program macro from the Android toolchain
+find_host_program (CMAKE_Java_COMPILER javac)
+find_host_program (CMAKE_Java_ARCHIVE jar)
+if (NOT EXISTS ${CMAKE_Java_COMPILER})
+	message (FATAL_ERROR "Java compiler 'javac' could not be found. Ensure it is installed and in your PATH.")
+endif (NOT EXISTS ${CMAKE_Java_COMPILER})
+if (NOT EXISTS ${CMAKE_Java_ARCHIVE})
+	message (FATAL_ERROR "Java archiver 'jar' could not be found. Ensure it is installed and in your PATH.")
+endif (NOT EXISTS ${CMAKE_Java_ARCHIVE})
 enable_language (Java OPTIONAL)
 include_directories (${ANDROID_JAR})
 
