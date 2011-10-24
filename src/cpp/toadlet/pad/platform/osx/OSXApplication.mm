@@ -139,7 +139,7 @@ rect{
 - (void) update{
 	toadlet::uint64 currentTime=System::mtime();
 	int dt=currentTime-mLastTime;
-	if(mApplication->active()){
+	if(mApplication->isActive()){
 		mApplication->update(dt);
 		if(mApplication->getRenderDevice()!=NULL){
 			mApplication->render(mApplication->getRenderDevice());
@@ -161,7 +161,7 @@ rect{
 
 	mApplication->resized(width,height);
 
-	if(mApplication->active() && mApplication->getRenderDevice()!=NULL){
+	if(mApplication->isActive() && mApplication->getRenderDevice()!=NULL){
 		if(mApplication->getEngine()->getRenderCaps().resetOnResize){
 			mApplication->getEngine()->contextReset(mApplication->getRenderDevice());
 		}
@@ -321,7 +321,7 @@ void OSXApplication::setWindow(void *window){
 	[(NSObject*)mWindow retain];
 }
 
-void OSXApplication::create(String renderDevice,String audioDevice,String motionDevice){
+bool OSXApplication::create(String renderDevice,String audioDevice,String motionDevice,String joyDevice){
 	if(mWindow==nil){
 		// This programatic Window creation isn't spectacular, but it's enough to run examples.
 		mPool=[[NSAutoreleasePool alloc] init];
@@ -373,11 +373,13 @@ void OSXApplication::create(String renderDevice,String audioDevice,String motion
 		[(ApplicationView*)mView windowResized:nil];
 	#endif
 
-	BaseApplication::create(renderDevice,audioDevice,motionDevice);
+	bool result=BaseApplication::create(renderDevice,audioDevice,motionDevice,joyDevice);
 
 	mBundleArchive=OSXBundleArchive::ptr(new OSXBundleArchive());
 	shared_static_cast<OSXBundleArchive>(mBundleArchive)->open([NSBundle mainBundle]);
 	mEngine->getArchiveManager()->manage(shared_static_cast<Archive>(mBundleArchive));
+	
+	return result;
 }
 
 void OSXApplication::destroy(){
@@ -431,7 +433,7 @@ void OSXApplication::setTitle(const String &title){
 	mTitle=title;
 }
 
-const String &OSXApplication::getTitle() const{
+String OSXApplication::getTitle() const{
 	return mTitle;
 }
 
