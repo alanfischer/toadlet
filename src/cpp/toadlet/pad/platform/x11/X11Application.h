@@ -39,7 +39,7 @@ public:
 	X11Application();
 	virtual ~X11Application();
 
-	bool create(String renderDevice,String audioDevice,String motionDevice);
+	bool create(String renderDevice,String audioDevice,String motionDevice,String joyDevice);
 	void destroy();
 
 	void start();
@@ -50,7 +50,7 @@ public:
 
 	void activate();
 	void deactivate();
-	bool active() const{return mActive;}
+	bool isActive() const{return mActive;}
 
 	void setTitle(const String &title);
 	String getTitle() const;
