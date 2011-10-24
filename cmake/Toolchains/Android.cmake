@@ -37,10 +37,12 @@
 #    ANDROID_NDK_API_LEVEL=android-8 - level of android NDK API to use.
 #      Option is ignored when build uses stanalone toolchain.
 #
-#    ANDROID_SDK=no default - path to SDK root. Required for toadlet builds with ANDROID_NDK_API_LEVEL<9
+#    ANDROID_SDK=no default - path to SDK root. Used to locate the ANDROID_JAR file.
 #      Can be set as environment variable.
 #
 #    ANDROID_SDK_API_LEVEL=8 - level of android SDK API to use. 
+#
+#    ANDROID_JAR=no default - direct path to the ANDROID_JAR file. If set then the ANDROID_SDK_* values have no effect.
 #
 #    ANDROID_ARCH=ARM - target architecture for the android build, may be either ARM or X86. 
 #      The X86 architecture is only available with the ANDROID_NDK_API_LEVEL>=9
@@ -206,31 +208,31 @@ if( EXISTS "${ANDROID_NDK}" )
   message( STATUS "If you prefer to use a different API level, please define the variable: ANDROID_NDK_API_LEVEL" )
  endif( NOT ANDROID_NDK_API_LEVEL GREATER 2 )
  
- # NDK versions less than 9 require the android SDK when building toadlet
- if( ANDROID_NDK_API_LEVEL LESS 9 )
-  if( NOT DEFINED ANDROID_SDK )
-   set( ANDROID_SDK $ENV{ANDROID_SDK} )
-  endif( NOT DEFINED ANDROID_SDK )
-  if( NOT DEFINED ANDROID_SDK )
-   message( FATAL_ERROR "Android NDK API levels < 9 require the ANDROID_SDK variable to be set to your install of the Android SDK" )
-  endif( NOT DEFINED ANDROID_SDK )
-  set( ANDROID_SDK ${ANDROID_SDK} CACHE PATH "root of the android SDK" FORCE )
+ # Set the android SDK if defined
+ if( NOT DEFINED ANDROID_SDK )
+  set( ANDROID_SDK $ENV{ANDROID_SDK} )
+ endif( NOT DEFINED ANDROID_SDK )
+ set( ANDROID_SDK ${ANDROID_SDK} CACHE PATH "root of the android SDK" FORCE )
 
-  set( ANDROID_SDK_API_LEVEL $ENV{ANDROID_SDK_API_LEVEL} )
-  if( NOT DEFINED ANDROID_SDK_API_LEVEL )
-   set( ANDROID_SDK_API_LEVEL 8)
+ # Set the default api level for the SDK
+ set( ANDROID_SDK_API_LEVEL $ENV{ANDROID_SDK_API_LEVEL} )
+ if( NOT DEFINED ANDROID_SDK_API_LEVEL )
+  set( ANDROID_SDK_API_LEVEL 8)
+  if ( EXISTS ANDROID_SDK )
    message( STATUS "Using default android SDK API level android-${ANDROID_SDK_API_LEVEL}" )
    message( STATUS "If you prefer to use a different SDK API level, please define the variable: ANDROID_SDK_API_LEVEL" )
-  endif( NOT DEFINED ANDROID_SDK_API_LEVEL )
-  set (ANDROID_SDK_API_LEVEL ${ANDROID_SDK_API_LEVEL} CACHE STRING "android SDK API level" FORCE)
+  endif ( EXISTS ANDROID_SDK )
+ endif( NOT DEFINED ANDROID_SDK_API_LEVEL )
+ set (ANDROID_SDK_API_LEVEL ${ANDROID_SDK_API_LEVEL} CACHE STRING "android SDK API level" FORCE)
 
-  # Find and set the android.jar file for the selected API level
-  if( NOT DEFINED ANDROID_JAR)
-   set( ANDROID_JAR ${ANDROID_SDK}/platforms/android-${ANDROID_SDK_API_LEVEL}/android.jar )
+ # Find and set the android.jar file for the selected API level
+ if( NOT DEFINED ANDROID_JAR)
+  set( ANDROID_JAR ${ANDROID_SDK}/platforms/android-${ANDROID_SDK_API_LEVEL}/android.jar )
+  if ( EXISTS ${ANDROID_JAR} )
    message( STATUS "Using android.jar found at ${ANDROID_JAR}")
-  endif( NOT DEFINED ANDROID_JAR)
-  set( ANDROID_JAR ${ANDROID_JAR} CACHE FILEPATH "android SDK jar file" FORCE )
- endif( ANDROID_NDK_API_LEVEL LESS 9 )
+  endif ( EXISTS ${ANDROID_JAR} )
+ endif( NOT DEFINED ANDROID_JAR)
+ set( ANDROID_JAR ${ANDROID_JAR} CACHE FILEPATH "android SDK jar file" FORCE )
 
  # Setup the android architecture
  if( NOT ANDROID_ARCH )
