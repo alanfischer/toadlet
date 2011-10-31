@@ -38,7 +38,7 @@ public:
 	virtual ~OSXApplication();
 
 	virtual void setWindow(void *window);
-	virtual void create(String renderDevice=(char*)NULL,String audioDevice=(char*)NULL,String motionDevice=(char*)NULL);
+	virtual bool create(String renderDevice,String audioDevice,String motionDevice,String joyDevice);
 	virtual void destroy();
 	
 	virtual void start();
@@ -49,10 +49,10 @@ public:
 
 	virtual void activate();
 	virtual void deactivate();
-	virtual bool active() const{return mActive;}
+	virtual bool isActive() const{return mActive;}
 
 	virtual void setTitle(const String &title);
-	virtual const String &getTitle() const;
+	virtual String getTitle() const;
 
 	virtual void setPosition(int x,int y);
 	virtual int getPositionX() const;

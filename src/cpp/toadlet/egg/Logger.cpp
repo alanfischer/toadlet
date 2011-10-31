@@ -169,6 +169,15 @@ void Logger::addLogEntry(const String &categoryName,Level level,const String &te
 	unlock();
 }
 
+void Logger::flush(){
+	lock();
+		int i;
+		for(i=mLoggerListeners.size()-1;i>=0;--i){
+			mLoggerListeners[i]->flush();
+		}
+	unlock();
+}
+
 int Logger::getNumLogEntries(){
 	int size=0;
 	lock();
