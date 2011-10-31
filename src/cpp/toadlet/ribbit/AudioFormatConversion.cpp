@@ -99,7 +99,7 @@ bool AudioFormatConversion::decode(AudioStream *stream,tbyte *&finalBuffer,int &
 }
 
 bool AudioFormatConversion::convert(tbyte *src,int srcLength,AudioFormat *srcFormat,tbyte *dst,int dstLength,AudioFormat *dstFormat){
-	int i=0,v=0;
+	int i=0,j=0,v=0;
 	int sbps=srcFormat->bitsPerSample;
 	int dbps=dstFormat->bitsPerSample;
 	int sc=srcFormat->channels;
@@ -110,7 +110,8 @@ bool AudioFormatConversion::convert(tbyte *src,int srcLength,AudioFormat *srcFor
 	int ds=dstFormat->frameSize();
 	int numFrames=srcLength/srcFormat->frameSize();
 
-	if(dstLength!=findConvertedLength(srcLength,srcFormat,dstFormat)){
+	int reqLength=findConvertedLength(srcLength,srcFormat,dstFormat,true);
+	if(dstLength<reqLength){
 		Error::unknown(Categories::TOADLET_RIBBIT,
 			"invalid destination length");
 		return false;
@@ -119,12 +120,12 @@ bool AudioFormatConversion::convert(tbyte *src,int srcLength,AudioFormat *srcFor
 	/// @todo: Replace this with individual optimized versions
 	/// @todo: While this no longer corrupts memory, it still doesnt upsample properly
 	for(i=0;i<numFrames;++i){
-		int j=(i*(uint64)dsps)/(uint64)ssps;
+		j=(i*(uint64)dsps)/(uint64)ssps;
 
 		if(sbps==8) v=(*(uint8*)(src+i*ss))-128;
 		else v=*(int16*)(src+i*ss);
-		if(sbps==8 && dbps==16){v=Math::intClamp(Extents::MIN_INT16,Extents::MAX_INT16,v*256);}
-		else if(sbps==16 && dbps==8){v=Math::intClamp(Extents::MIN_INT8,Extents::MAX_INT8,v/256);}
+		if(sbps==8 && dbps==16){v=Math::intClamp(Extents::MIN_INT16,Extents::MAX_INT16,v<<8);}
+		else if(sbps==16 && dbps==8){v=Math::intClamp(Extents::MIN_INT8,Extents::MAX_INT8,v>>8);}
 		if(dbps==8) *(uint8*)(dst+j*ds)=v+128;
 		else *(int16*)(dst+j*ds)=v;
 
@@ -132,8 +133,8 @@ bool AudioFormatConversion::convert(tbyte *src,int srcLength,AudioFormat *srcFor
 			if(sc==2){
 				if(sbps==8) v=(*(uint8*)(src+i*ss+ss/2))-128;
 				else v=*(int16*)(src+i*ss+ss/2);
-				if(sbps==8 && dbps==16){v=Math::intClamp(Extents::MIN_INT16,Extents::MAX_INT16,v*256);}
-				else if(sbps==16 && dbps==8){v=Math::intClamp(Extents::MIN_INT8,Extents::MAX_INT8,v/256);}
+				if(sbps==8 && dbps==16){v=Math::intClamp(Extents::MIN_INT16,Extents::MAX_INT16,v<<8);}
+				else if(sbps==16 && dbps==8){v=Math::intClamp(Extents::MIN_INT8,Extents::MAX_INT8,v>>8);}
 			}
 			if(dbps==8) *(uint8*)(dst+j*ds+ds/2)=v+128;
 			else *(int16*)(dst+j*ds+ds/2)=v;
@@ -143,13 +144,18 @@ bool AudioFormatConversion::convert(tbyte *src,int srcLength,AudioFormat *srcFor
 	return true;
 }
 
-int AudioFormatConversion::findConvertedLength(int length,AudioFormat *srcFormat,AudioFormat *dstFormat){
+int AudioFormatConversion::findConvertedLength(int length,AudioFormat *srcFormat,AudioFormat *dstFormat,bool roundUp){
 	uint64 dsize=dstFormat->channels*dstFormat->bitsPerSample*dstFormat->samplesPerSecond;
 	uint64 ssize=srcFormat->channels*srcFormat->bitsPerSample*srcFormat->samplesPerSecond;
 	length=(length*(uint64)dsize)/(uint64)ssize;
 	// Make sure our resulting length is a multiple of dst frameSize
 	if(length%dstFormat->frameSize()!=0){
-		length=((length/dstFormat->frameSize())+1)*dstFormat->frameSize();
+		if(roundUp){
+			length=((length/dstFormat->frameSize())+1)*dstFormat->frameSize();
+		}
+		else{
+			length=((length/dstFormat->frameSize()))*dstFormat->frameSize();
+		}
 	}
 	return length;
 }

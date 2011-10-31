@@ -37,10 +37,10 @@
 		}
 		}
 	#else
-		#include <toadlet/pad/platform/android/JAndroidApplication.h>
+		#include <toadlet/pad/platform/android/JApplication.h>
 		namespace toadlet{
 		namespace pad{
-			typedef JAndroidApplication PlatformApplication;
+			typedef JApplication PlatformApplication;
 		}
 		}
 	#endif

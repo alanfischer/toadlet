@@ -64,7 +64,7 @@ bool MMAudioBuffer::create(AudioStream::ptr stream){
 			format->channels+","+format->bitsPerSample+","+format->samplesPerSecond+" to "+
 			newFormat->channels+","+newFormat->bitsPerSample+","+newFormat->samplesPerSecond);
 
-		int newLength=AudioFormatConversion::findConvertedLength(length,format,newFormat);
+		int newLength=AudioFormatConversion::findConvertedLength(length,format,newFormat,true);
 		tbyte *newBuffer=new tbyte[newLength];
 		if(newBuffer==NULL){
 			delete[] buffer;

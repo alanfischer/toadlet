@@ -44,6 +44,8 @@ class ALAudio;
 
 typedef void (*proc_alBufferDataStatic)(ALuint buffer,ALenum format,ALvoid *data,ALsizei size,ALsizei freq);
 
+// You can not use both the ALAUdioDevice and the MMAudioDevice simultaniously.
+// Whichever one you create second will be the useable device.
 class TOADLET_API ALAudioDevice:public AudioDevice{
 public:
 	// Options
@@ -63,8 +65,11 @@ public:
 	void setListenerVelocity(const Vector3 &velocity);
 	void setListenerGain(scalar gain);
 
-	void suspend();
-	void resume();
+	void activate();
+	void deactivate();
+
+	void suspend(){deactivate();}
+	void resume(){activate();}
 
 	void update(int dt);
 
@@ -77,13 +82,13 @@ public:
 	void lock(){mMutex.lock();}
 	void unlock(){mMutex.unlock();}
 
-	static ALenum getALFormat(int bitsPerSample,int channels);
+	static ALenum getALFormat(AudioFormat *format);
 
 	egg::math::Vector3 cacheVector3;
 	
 protected:
 	ALCdevice *mDevice;
-	ALCcontext *mContext;
+	static ALCcontext *mContext; // Only 1 Context is supported at a time in OpenAL, so we make it static
 	Collection<ALAudio*> mAudios;
 	Collection<unsigned int> mSourcePool;
 	Collection<unsigned int> mAllSources;

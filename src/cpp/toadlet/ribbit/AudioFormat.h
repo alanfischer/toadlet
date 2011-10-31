@@ -47,7 +47,7 @@ public:
 
 	int frameSize() const{return channels*bitsPerSample/8;}
 	bool equals(AudioFormat *audioFormat) const{
-		return bitsPerSample==audioFormat->bitsPerSample && channels==audioFormat->channels && samplesPerSecond!=audioFormat->samplesPerSecond;
+		return bitsPerSample==audioFormat->bitsPerSample && channels==audioFormat->channels && samplesPerSecond==audioFormat->samplesPerSecond;
 	}
 };
 

@@ -100,6 +100,7 @@
 		#define TOADLET_ALIGNED_MALLOC(size,a) _aligned_malloc(size,a)
 		#define TOADLET_ALIGNED_FREE(pointer) _aligned_free(pointer)
 	#endif
+	#define TOADLET_ALIGNED_SIZE 16
 #elif defined(TOADLET_PLATFORM_POSIX)
 	#define TOADLET_COMPILER_GCC 1
 	#include <sys/param.h>
@@ -154,6 +155,9 @@
 	#if defined(__ARM_NEON__)
 		#define TOADLET_HAS_NEON 1
 	#endif
+	#if !defined(TOADLET_PLATFORM_ANDROID) || defined(TOADLET_HAS_NEON)
+		#define TOADLET_ALIGNED_SIZE 16
+	#endif
 #else
 	#error "Unknown platform"
 #endif
@@ -161,9 +165,6 @@
 #if !defined(NULL)
 	#define NULL 0
 #endif
-
-#define TOADLET_ALIGNED TOADLET_ALIGN(16)
-#define TOADLET_IS_ALIGNED(x) ((((uint64)&x)&0xF)==0)
 
 #define TOADLET_QUOTE_(x) #x
 #define TOADLET_QUOTE(x) TOADLET_QUOTE_(x)
@@ -191,12 +192,6 @@
 	TOADLET_VERSION_ITOW(major) L"." TOADLET_VERSION_ITOW(minor) L"." TOADLET_VERSION_ITOW(micro) TOADLET_VERSION_FIXEDWSTRING
 
 template<typename Type> inline void TOADLET_IGNORE_UNUSED_VARIABLE_WARNING(Type t){}
-
-#define TOADLET_ALIGNED_NEW \
-	inline void *operator new(size_t size) throw(std::bad_alloc){return TOADLET_ALIGNED_MALLOC(size,16);} \
-	inline void operator delete(void *pointer) throw(){TOADLET_ALIGNED_FREE(pointer);} \
-	inline void *operator new[](size_t size) throw(std::bad_alloc){return TOADLET_ALIGNED_MALLOC(size,16);} \
-	inline void operator delete[](void *pointer) throw(){TOADLET_ALIGNED_FREE(pointer);}
 
 namespace toadlet{
 
@@ -253,6 +248,20 @@ typedef unsigned int uint32;
 #endif
 
 }
+
+#if defined(TOADLET_ALIGNED_SIZE)
+	#define TOADLET_ALIGNED TOADLET_ALIGN(TOADLET_ALIGNED_SIZE)
+	#define TOADLET_IS_ALIGNED(x) ((((uint64)&x)&0xF)==0)
+	#define TOADLET_ALIGNED_NEW \
+		inline void *operator new(size_t size) throw(std::bad_alloc){return TOADLET_ALIGNED_MALLOC(size,TOADLET_ALIGNED_SIZE);} \
+		inline void operator delete(void *pointer) throw(){TOADLET_ALIGNED_FREE(pointer);} \
+		inline void *operator new[](size_t size) throw(std::bad_alloc){return TOADLET_ALIGNED_MALLOC(size,TOADLET_ALIGNED_SIZE);} \
+		inline void operator delete[](void *pointer) throw(){TOADLET_ALIGNED_FREE(pointer);}
+#else
+	#define TOADLET_ALIGNED
+	#define TOADLET_IS_ALIGNED(x) true
+	#define TOADLET_ALIGNED_NEW
+#endif
 
 #endif
 

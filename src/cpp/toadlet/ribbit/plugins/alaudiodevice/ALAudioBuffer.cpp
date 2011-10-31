@@ -63,15 +63,17 @@ bool ALAudioBuffer::create(AudioStream::ptr stream){
 		AudioFormatConversion::fade(buffer,length,format,mDevice->getBufferFadeTime());
 	}
 
-	ALenum alformat=ALAudioDevice::getALFormat(format->bitsPerSample,format->channels);
-
 	alGenBuffers(1,&mHandle);
 	if(mDevice->alBufferDataStatic!=NULL){
 		mStaticData=buffer;
-		mDevice->alBufferDataStatic(mHandle,alformat,mStaticData,length,format->samplesPerSecond);
+		mDevice->alBufferDataStatic(mHandle,
+			ALAudioDevice::getALFormat(format),
+			mStaticData,length,format->samplesPerSecond);
 	}
 	else{
-		alBufferData(mHandle,alformat,buffer,length,format->samplesPerSecond);
+		alBufferData(mHandle,
+			ALAudioDevice::getALFormat(format),
+			buffer,length,format->samplesPerSecond);
 		delete[] buffer;
 	}
 

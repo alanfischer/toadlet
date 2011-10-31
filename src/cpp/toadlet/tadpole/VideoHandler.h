@@ -23,32 +23,25 @@
  *
  ********** Copyright header - do not remove **********/
 
-#ifndef TOADLET_TADPOLE_RESOURCECONTROLLER_H
-#define TOADLET_TADPOLE_RESOURCECONTROLLER_H
+#ifndef TOADLET_TADPOLE_VIDEOHANDLER_H
+#define TOADLET_TADPOLE_VIDEOHANDLER_H
 
-#include <toadlet/egg/Resource.h>
+#include <toadlet/egg/io/Stream.h>
 #include <toadlet/tadpole/Types.h>
+#include <toadlet/tadpole/VideoController.h>
 
 namespace toadlet{
 namespace tadpole{
 
-class ResourceController{
+class VideoHandler{
 public:
-	TOADLET_SHARED_POINTERS(ResourceController);
+	TOADLET_SHARED_POINTERS(VideoHandler);
 
-	virtual ~ResourceController(){}
+	virtual ~VideoHandler(){}
 
 	virtual void destroy(){}
 
-	virtual void start()=0;
-	virtual void pause()=0;
-	virtual bool paused()=0;
-	virtual void stop()=0;
-	virtual void update(int dt)=0;
-
-	virtual int64 currentTime()=0;
-	virtual int64 maxTime()=0;
-	virtual bool seek(int64 time)=0;
+	virtual VideoController::ptr open(Stream::ptr stream)=0;
 };
 
 }

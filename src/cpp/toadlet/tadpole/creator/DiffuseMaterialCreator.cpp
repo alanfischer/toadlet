@@ -278,7 +278,6 @@ Material::ptr DiffuseMaterialCreator::createDiffuseMaterial(Texture::ptr texture
 		pass->setDepthState(DepthState());
 		pass->setRasterizerState(RasterizerState());
 		pass->setMaterialState(MaterialState(true,false,MaterialState::ShadeType_GOURAUD));
-
 		pass->setShader(Shader::ShaderType_VERTEX,mDiffuseVertexShader);
 		pass->setShader(Shader::ShaderType_FRAGMENT,mDiffuseFragmentShader);
 		pass->getVariables()->addVariable("modelViewProjectionMatrix",RenderVariable::ptr(new MVPMatrixVariable()),Material::Scope_RENDERABLE);

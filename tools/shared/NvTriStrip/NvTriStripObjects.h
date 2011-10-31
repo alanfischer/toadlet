@@ -10,6 +10,8 @@
 #include <list>
 #include "VertexCache.h"
 
+#pragma warning( disable : 4018 )  
+
 /////////////////////////////////////////////////////////////////////////////////
 //
 // Types defined for stripification
