@@ -87,7 +87,7 @@ int MMAudio::read(tbyte *data,int length){
 		if(srcFormat->equals(dstFormat)==false){
 			// For the original src length we want from the dst length
 			int dstLength=length;
-			int srcLength=AudioFormatConversion::findConvertedLength(dstLength,dstFormat,srcFormat);
+			int srcLength=AudioFormatConversion::findConvertedLength(dstLength,dstFormat,srcFormat,false);
 			tbyte *srcData=new tbyte[srcLength];
 			amount=mAudioStream->read(srcData,srcLength);
 			if(amount<0){
@@ -100,7 +100,7 @@ int MMAudio::read(tbyte *data,int length){
 				}
 			}
 			AudioFormatConversion::convert(srcData,amount,srcFormat,data,dstLength,dstFormat);
-			amount=AudioFormatConversion::findConvertedLength(amount,srcFormat,dstFormat);
+			amount=AudioFormatConversion::findConvertedLength(amount,srcFormat,dstFormat,true);
 			delete[] srcData;
 		}
 		else{

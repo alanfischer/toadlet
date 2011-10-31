@@ -1,12 +1,5 @@
 #include "Viewer.h"
 
-using namespace toadlet;
-using namespace toadlet::egg;
-using namespace toadlet::peeper;
-using namespace toadlet::tadpole;
-using namespace toadlet::tadpole::node;
-using namespace toadlet::pad;
-
 /*
 class Axis:public Node,Renderable{
 public:
@@ -61,33 +54,23 @@ protected:
 };
 */
 
-Viewer::Viewer():Application(),
+Viewer::Viewer(Application *app):
 	mMouseX(0),mMouseY(0),
 	mDrag(false),
 	mDistance(0),
 	mZoom(false)
-{}
+{
+	mApp=app;
+	mEngine=mApp->getEngine();
 
-void Viewer::create(){
-	Application::create("d3d9");
-
-	mScene=Scene::ptr(new Scene(mEngine));
-}
-
-void Viewer::destroy(){
-	mScene->destroy();
-}
-
-void Viewer::start(MeshNode::ptr meshNode){
-	mParent=mEngine->createNodeType(ParentNode::type(),mScene);
-	mScene->getRoot()->attach(mParent);
-	mParent->attach(meshNode);
+ 	mScene=Scene::ptr(new Scene(mEngine));
 
 	mCamera=mEngine->createNodeType(CameraNode::type(),mScene);
 	mCamera->setClearColor(Colors::ORANGE);
 	mScene->getRoot()->attach(mCamera);
 
-	mDistance=Math::length(meshNode->getBound().getSphere().origin)+meshNode->getBound().getSphere().radius*2;
+	mParent=mEngine->createNodeType(ParentNode::type(),mScene);
+	mScene->getRoot()->attach(mParent);
 
 	mScene->setAmbientColor(Vector4(Math::QUARTER,Math::QUARTER,Math::QUARTER,Math::ONE));
 
@@ -99,10 +82,25 @@ void Viewer::start(MeshNode::ptr meshNode){
 	state.specularColor.set(Math::ONE_VECTOR4);
 	mLight->setLightState(state);
 	mScene->getRoot()->attach(mLight);
+}
+
+Viewer::~Viewer(){
+	destroy();
+}
+
+void Viewer::setNode(MeshNode::ptr node){
+	mParent->attach(node);
+
+	mDistance=Math::length(node->getBound().getSphere().origin)+node->getBound().getSphere().radius*2;
 
 	updateCamera();
+}
 
-	Application::start();
+void Viewer::destroy(){
+	if(mScene!=NULL){
+		mScene->destroy();
+		mScene=NULL;
+	}
 }
 
 void Viewer::update(int dt){
@@ -190,5 +188,5 @@ void Viewer::updateCamera(){
 	Vector3 eye(Math::Y_UNIT_VECTOR3);
 	Math::mul(eye,-mDistance);
 	mCamera->setLookAt(eye,Math::ZERO_VECTOR3,Math::Z_UNIT_VECTOR3);
-	resized(mWidth,mHeight);
+	resized(mApp->getWidth(),mApp->getHeight());
 }

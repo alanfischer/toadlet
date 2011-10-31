@@ -344,10 +344,6 @@ const Bound &MeshNodeSkeleton::getRenderBound() const{
 void MeshNodeSkeleton::render(SceneRenderer *renderer) const{
 	renderer->getDevice()->renderPrimitive(mSkeletonVertexData,mSkeletonIndexData);
 
-	mSkeletonIndexData->primitive=IndexData::Primitive_POINTS;
-	renderer->getDevice()->renderPrimitive(mSkeletonVertexData,mSkeletonIndexData);
-	mSkeletonIndexData->primitive=IndexData::Primitive_LINES;
-
 	renderer->getDevice()->renderPrimitive(mHitBoxVertexData,mHitBoxIndexData);
 }
 

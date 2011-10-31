@@ -84,8 +84,7 @@ bool MMAudioDevice::create(int *options){
 	mFormat->channels=2;
 	mFormat->bitsPerSample=16;
 	mFormat->samplesPerSecond=11025;
-	AudioFormat standardFormat(2,16,11025);
-	mBufferSize=AudioFormatConversion::findConvertedLength(1024,mFormat,&standardFormat);
+	mBufferSize=1024;
 	mNumBuffers=4;
 	mBufferFadeTime=100;
 

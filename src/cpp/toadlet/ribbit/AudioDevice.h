@@ -51,6 +51,7 @@ public:
 
 	virtual void update(int dt)=0;
 
+	/// @todo: Change these to an activate/deactivate
 	virtual void suspend()=0;
 	virtual void resume()=0;
 

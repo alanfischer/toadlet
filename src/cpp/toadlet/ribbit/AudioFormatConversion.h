@@ -38,7 +38,7 @@ public:
 	static bool decode(AudioStream *stream,tbyte *&finalBuffer,int &finalLength);
 	/// @todo: Pass in an AudioFormat instead of individual elements
 	static bool convert(tbyte *src,int srcLength,AudioFormat *srcFormat,tbyte *dst,int dstLength,AudioFormat *dstFormat);
-	static int findConvertedLength(int length,AudioFormat *srcFormat,AudioFormat *dstFormat);
+	static int findConvertedLength(int length,AudioFormat *srcFormat,AudioFormat *dstFormat,bool roundUp);
 	static void fade(tbyte *buffer,int length,AudioFormat *format,int fadeTime);
 };
 

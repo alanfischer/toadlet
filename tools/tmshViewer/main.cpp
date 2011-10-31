@@ -28,12 +28,15 @@ int main(int argc,char **argv){
 		}
 	}
 
-	Viewer *viewer=new Viewer();
-	viewer->setSize(640,480);
-	viewer->setFullscreen(false);
-	viewer->create();
+	PlatformApplication *app=new PlatformApplication();
+	app->setSize(640,480);
+	app->setFullscreen(false);
+	app->defaultCreate();
 
-	Engine *engine=viewer->getEngine();
+	Viewer *viewer=new Viewer(app);
+	app->setApplet(viewer);
+	Engine *engine=app->getEngine();
+	Scene::ptr scene=viewer->getScene();
 
 	String meshName=argv[1];
 	int loc=meshName.rfind('\\');
@@ -46,13 +49,13 @@ int main(int argc,char **argv){
 	if(mesh==NULL){
 		std::cout << "Error loading " << (const char*)meshName << std::endl;
 
-		viewer->destroy();
 		delete viewer;
+		delete app;
 
 		return -1;
 	}
 
-	MeshNode::ptr meshNode=engine->createNodeType(MeshNode::type(),viewer->getScene());
+	MeshNode::ptr meshNode=engine->createNodeType(MeshNode::type(),scene);
 	meshNode->setMesh(mesh);
 
 	if(mesh->getSkeleton()!=NULL){
@@ -77,9 +80,12 @@ int main(int argc,char **argv){
 		}
 	}
 
-	viewer->start(meshNode);
+	viewer->setNode(meshNode);
+
+	app->start();
 
 	delete viewer;
+	delete app;
 
 	return 1;
 }

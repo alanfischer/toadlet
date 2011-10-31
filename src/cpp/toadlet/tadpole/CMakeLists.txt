@@ -92,7 +92,7 @@ set (TADPOLE_HANDLER_FREETYPE_SRC
 
 set (TADPOLE_HANDLER_FFMPEG_SRC
 	handler/FFmpegStreamContext.cpp
-	handler/FFmpegTextureModifier.cpp
+	handler/FFmpegVideoHandler.cpp
 )
 
 set (TADPOLE_HANDLER_PLATFORM_ANDROID_SRC
@@ -199,11 +199,8 @@ set (TADPOLE_HEADERS
 	ProgressListener.h
 	Renderable.h
 	RenderListener.h
-	ResourceController.h
 	ResourceCreator.h
 	ResourceData.h
-	ResourceManager.h
-	ResourceModifier.h
 	ResourceStreamer.h
 	RenderableSet.h
 	Scene.h
@@ -222,6 +219,8 @@ set (TADPOLE_HEADERS
 	UpdateListener.h
 	VertexFormats.h
 	Version.h
+	VideoController.h
+	VideoHandler.h
 	Visible.h
 )
 
@@ -293,7 +292,7 @@ set (TADPOLE_HANDLER_FREETYPE_HEADERS
 
 set (TADPOLE_HANDLER_FFMPEG_HEADERS
 	handler/FFmpegStreamContext.h
-	handler/FFmpegTextureModifier.h
+	handler/FFmpegVideoHandler.h
 )
 
 set (TADPOLE_HANDLER_PLATFORM_ANDROID_HEADERS
