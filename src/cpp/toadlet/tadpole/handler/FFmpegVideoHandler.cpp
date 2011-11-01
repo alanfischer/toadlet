@@ -238,11 +238,11 @@ bool FFmpegController::open(Stream::ptr stream){
 
 	String name;
 
-	mIOBuffer=new tbyte[4096+FF_INPUT_BUFFER_PADDING_SIZE];
-	mIOCtx=new ByteIOContext();
-	toadlet_ffmpeg_stream_context(mIOCtx,stream,mIOBuffer,4096);
+	mIOBuffer=(tbyte*)av_malloc(4096+FF_INPUT_BUFFER_PADDING_SIZE);
+	mIOCtx=(ByteIOContext*)av_malloc(sizeof(ByteIOContext));
+	int result=toadlet_ffmpeg_stream_context(mIOCtx,stream,mIOBuffer,4096);
 
-	int result=av_open_input_stream(&mFormatCtx,mIOCtx,name,av_find_input_format(name),NULL);
+	result=av_open_input_stream(&mFormatCtx,mIOCtx,name,av_find_input_format(name),NULL);
 	if(result<0){
 		Error::unknown("av_open_input_stream failed");
         return false;
@@ -325,12 +325,12 @@ void FFmpegController::destroy(){
 	}
 
 	if(mIOCtx!=NULL){
-		delete mIOCtx;
+		av_free(mIOCtx);
 		mIOCtx=NULL;
 	}
 
 	if(mIOBuffer!=NULL){
-		delete mIOBuffer;
+		av_free(mIOBuffer);
 		mIOBuffer=NULL;
 	}
 }
