@@ -10,6 +10,8 @@ namespace toadlet{
 namespace tadpole{
 namespace handler{
 
+AVRational avTimeBaseQ={1,AV_TIME_BASE};
+
 static int ffmpegLockManager(void **mtx,enum AVLockOp op){
 	switch(op){
 		case AV_LOCK_CREATE:
@@ -84,7 +86,6 @@ void FFmpegAudioStream::close(){
 
 int FFmpegAudioStream::read(tbyte *buffer,int length){
 	int total=0,amt=0,result=0;
-	double pts=0.0f;
 	int64 time=mController->rawTime();
 
 	while(length>0){
@@ -99,7 +100,7 @@ int FFmpegAudioStream::read(tbyte *buffer,int length){
 		}
 		else{
 			if(mPkt.data==NULL){
-				int result=mStreamData->queue->get(&mPkt,0);
+				result=mStreamData->queue->get(&mPkt,0);
 				if(result==FFmpegController::PacketQueue::QueueResult_FLUSH){
 					avcodec_flush_buffers(mStreamData->codecCtx);
 					continue;
@@ -109,23 +110,22 @@ int FFmpegAudioStream::read(tbyte *buffer,int length){
 				}
 			}
 
-			pts=mPkt.dts!=AV_NOPTS_VALUE?mPkt.dts:0;
-			pts*=av_q2d(mController->getFormatCtx()->streams[mStreamData->index]->time_base);
-			int64 ptsTime=pts*AV_TIME_BASE;
-
-			if(ptsTime>0 && ptsTime>time){
-				break;
+			result=-1;
+			int64 ptsTime=av_rescale_q(mPkt.dts!=AV_NOPTS_VALUE?mPkt.dts:0,mController->getFormatCtx()->streams[mPkt.stream_index]->time_base,avTimeBaseQ);
+			if(ptsTime<=time){
+				mDecodeLength=AVCODEC_MAX_AUDIO_FRAME_SIZE;
+				mDecodeOffset=0;
+				result=avcodec_decode_audio3(mStreamData->codecCtx,(int16_t*)mDecodeBuffer,&mDecodeLength,&mPkt);
 			}
 
-			mDecodeLength=AVCODEC_MAX_AUDIO_FRAME_SIZE;
-			mDecodeOffset=0;
-			result=avcodec_decode_audio3(mStreamData->codecCtx,(int16_t*)mDecodeBuffer,&mDecodeLength,&mPkt);
+			if(ptsTime<=time || mStreamData->queue->flushed()){
+				av_free_packet(&mPkt);
+				mPkt.data=NULL;
+			}
+
 			if(result<0){
 				break;
 			}
-
-			av_free_packet(&mPkt);
-			mPkt.data=NULL;
 		}
 	}
 
@@ -175,13 +175,11 @@ void FFmpegVideoStream::close(){
 
 void FFmpegVideoStream::update(int dt){
 	int64 time=mController->rawTime();
-	double pts=0.0f;
 	int frameFinished=0;
 
 	while(time>mPtsTime || mPtsTime==0 || mStreamData->queue->flushed()){
 		int result=mStreamData->queue->get(&mPkt,0);
 		if(result==FFmpegController::PacketQueue::QueueResult_FLUSH){
-			Logger::alert("FLUSH!");
 			mPtsTime=0;
 			avcodec_flush_buffers(mStreamData->codecCtx);
 			continue;
@@ -189,15 +187,11 @@ void FFmpegVideoStream::update(int dt){
 		else if(result!=FFmpegController::PacketQueue::QueueResult_AVAILABLE){
 			break;
 		}
-		Logger::alert(String("SIZE!")+mStreamData->queue->count);
 
 		avcodec_decode_video2(mStreamData->codecCtx,mVideoFrame,&frameFinished,&mPkt);
 
-		pts=mPkt.dts!=AV_NOPTS_VALUE?mPkt.dts:0;
-		pts*=av_q2d(mController->getFormatCtx()->streams[mStreamData->index]->time_base);
-		int64 ptsTime=pts*AV_TIME_BASE;
+		int64 ptsTime=av_rescale_q(mPkt.dts!=AV_NOPTS_VALUE?mPkt.dts:0,mController->getFormatCtx()->streams[mPkt.stream_index]->time_base,avTimeBaseQ);
 
-		Logger::alert(String("frame:")+ptsTime);
 		if(frameFinished && (ptsTime>=time || ptsTime==0)){
 			mPtsTime=ptsTime;
 
@@ -210,8 +204,6 @@ void FFmpegVideoStream::update(int dt){
 				mTextureFrame->data,
 				mTextureFrame->linesize
 			);
-
-			Logger::alert(String("finished frame:")+mPtsTime);
 		}
 
 	    av_free_packet(&mPkt);
@@ -304,6 +296,14 @@ bool FFmpegController::open(Stream::ptr stream){
 	}
 	else{
 		mVideoFormat=NULL;
+	}
+
+	AVStream *avstream=mStreams[AVMEDIA_TYPE_VIDEO].index>=0?mFormatCtx->streams[mStreams[AVMEDIA_TYPE_VIDEO].index]:NULL;
+	if(avstream!=NULL){
+		mMaxTime=av_rescale_q(avstream->duration,avstream->time_base,avTimeBaseQ);
+	}
+	else{
+		mMaxTime=0;
 	}
 
 	return true;
@@ -410,18 +410,16 @@ void FFmpegController::updateDecode(int dt){
 			av_free_packet(&pkt);
 		}
 
-		if((videoQueue==NULL || videoQueue->count>=4)){// && (audioQueue==NULL || audioQueue->count>=1)){
+		if((videoQueue==NULL || videoQueue->count>=4) && (audioQueue==NULL || audioQueue->count>=1)){
 			break;
 		}
 	}
 
 	while(videoQueue!=NULL && videoQueue->count>maxQueueSize){
-		Logger::alert("video queue too large");
 		videoQueue->get(&pkt,0);
 		av_free_packet(&pkt);
 	}
 	while(audioQueue!=NULL && audioQueue->count>maxQueueSize){
-		Logger::alert("audio queue too large");
 		audioQueue->get(&pkt,0);
 		av_free_packet(&pkt);
 	}
@@ -431,10 +429,14 @@ void FFmpegController::update(int dt){
 	updateDecode(dt);
 
 	if(mState==State_PLAY){
-		mTime+=dt*1000;
-		if(mTime>maxTime()*1000){
-			mTime=maxTime()*1000;
+		mTime+=milliToAVTime(dt);
+		if(mTime>mMaxTime){
+			mTime=mMaxTime;
 			mState=State_STOP;
+
+			if(mAudio!=NULL){
+				mAudio->stop();
+			}
 		}
 	}
 
@@ -443,60 +445,43 @@ void FFmpegController::update(int dt){
 	}
 }
 
-int64 FFmpegController::currentTime(){
-	return mTime/(AV_TIME_BASE/1000);
-}
-
-int64 FFmpegController::maxTime(){
-	AVRational avTimeBaseQ={1,AV_TIME_BASE};
-
-	int64 time=0;
-	AVStream *stream=mStreams[AVMEDIA_TYPE_VIDEO].index>=0?mFormatCtx->streams[mStreams[AVMEDIA_TYPE_VIDEO].index]:NULL;
-	if(stream!=NULL){
-		time=av_rescale_q(stream->duration,stream->time_base,avTimeBaseQ);
-	}
-	return time/(AV_TIME_BASE/1000);
-}
-
 bool FFmpegController::seek(int64 time){
-	AVRational avTimeBaseQ={1,AV_TIME_BASE};
-
+	time=milliToAVTime(time);
 	if(time<0){
 		time=0;
 	}
-	if(time>maxTime()){
-		time=maxTime();
+	if(time>mMaxTime){
+		time=mMaxTime;
 	}
 
-	int flags=AVSEEK_FLAG_ANY;//AVSEEK_FLAG_BACKWARD;
+	int flags=AVSEEK_FLAG_BACKWARD; // If we have this enabled, then it always works, otherwise we can't always go forward
 	int result=0;
 
-	int index=-1,i=0;
-	for(i=0;i<AVMEDIA_TYPE_NB;++i){
-		if(mStreams[i].index>=0){
-//			index=mStreams[i].index;
-			break;
+	int index=mVideoStream!=NULL?mVideoStream->mStreamData->index:-1;
+
+	uint64 avtime=time;
+	if(index>=0){
+		avtime=av_rescale_q(avtime,avTimeBaseQ,mFormatCtx->streams[index]->time_base);
+	}
+
+	if(1 /*is not mpeg with h264*/ || time<mTime){
+		result=av_seek_frame(mFormatCtx,index,avtime,flags);
+
+		mTime=time;
+
+		int i;
+		for(i=0;i<AVMEDIA_TYPE_NB;++i){
+			if(mStreams[i].queue!=NULL){
+				mStreams[i].queue->flush();
+			}
 		}
 	}
+	else{
+		mTime=time;
 
-	time*=(AV_TIME_BASE/1000);
-
-	mTime=time;
-	if(index>=0){
-//		time=av_rescale_q(time,avTimeBaseQ,mFormatCtx->streams[index]->time_base);
-	}
-
-	Logger::alert(String("STREAM TIME:")+time);
-	result=av_seek_frame(mFormatCtx,index,time,flags);
-	if(result<0){
-		Logger::alert("RESULT:FALSE");
-		return false;
-	}
-Logger::alert("WE DID IT!");
-
-	for(i=0;i<AVMEDIA_TYPE_NB;++i){
-		if(mStreams[i].queue!=NULL){
-			mStreams[i].queue->flush();
+		while(mVideoStream->mPtsTime<mTime){
+			updateDecode(0);
+			mVideoStream->update(0);
 		}
 	}
 

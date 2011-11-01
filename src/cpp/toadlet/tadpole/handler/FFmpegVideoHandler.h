@@ -94,8 +94,8 @@ public:
 	void stop();
 	void update(int dt);
 
-	int64 currentTime();
-	int64 maxTime();
+	int64 currentTime(){return avtimeToMilli(mTime);}
+	int64 maxTime(){return avtimeToMilli(mMaxTime);}
 	bool seek(int64 time);
 
 	Resource::ptr getResource(){return mTexture;}
@@ -104,7 +104,8 @@ public:
 	StreamData *getStreamData(int type){return &mStreams[type];}
 	int64 rawTime(){return mTime;}
 
-	void run();
+	inline uint64 milliToAVTime(uint64 t){return t*(AV_TIME_BASE/1000);}
+	inline uint64 avtimeToMilli(uint64 t){return t*1000/AV_TIME_BASE;}
 
 protected:
 	enum State{
@@ -131,7 +132,7 @@ protected:
 
 	State mState;
 
-	uint64 mTime;
+	uint64 mTime,mMaxTime;
 };
 
 class FFmpegAudioStream:public AudioStream{
@@ -164,6 +165,8 @@ protected:
 	AudioFormat::ptr mAudioFormat;
 	tbyte *mDecodeBuffer;
 	int mDecodeLength,mDecodeOffset;
+
+	friend class FFmpegController;
 };
 
 class FFmpegVideoStream{
@@ -189,6 +192,8 @@ protected:
 	tbyte *mTextureBuffer;
 
 	uint64 mPtsTime;
+
+	friend class FFmpegController;
 };
 
 class FFmpegVideoHandler:public VideoHandler{
