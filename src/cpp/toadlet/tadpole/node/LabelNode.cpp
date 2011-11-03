@@ -45,7 +45,8 @@ LabelNode::LabelNode():super(),
 	mAlignment(0),
 	mNormalized(false),
 	mWordWrap(false),
-	mWidth(0)
+	mWidth(0),
+	mRendered(false)
 
 	//mMaterial,
 	//mVertexData,
@@ -55,16 +56,18 @@ LabelNode::LabelNode():super(),
 Node *LabelNode::create(Scene *scene){
 	super::create(scene);
 
-	setAlignment(Font::Alignment_BIT_HCENTER|Font::Alignment_BIT_VCENTER);
-	setNormalized(true);
-	setWordWrap(false);
-
+	mRendered=true;
 	mMaterial=getEngine()->getMaterialManager()->createDiffuseMaterial(NULL);
 	mMaterial->retain();
 	mMaterial->getPass()->setRasterizerState(RasterizerState(RasterizerState::CullType_NONE));
 	mMaterial->getPass()->setDepthState(DepthState(DepthState::DepthTest_LEQUAL,false));
 	mMaterial->getPass()->setMaterialState(MaterialState(true,true,MaterialState::ShadeType_FLAT));
 	mMaterial->compile();
+
+	setFont(mEngine->getFontManager()->getDefaultFont());
+	setAlignment(Font::Alignment_BIT_HCENTER|Font::Alignment_BIT_VCENTER);
+	setNormalized(true);
+	setWordWrap(false);
 
 	return this;
 }
@@ -144,10 +147,14 @@ void LabelNode::setWordWrap(bool wordWrap){
 	updateLabel();
 }
 
+RenderState::ptr LabelNode::getSharedRenderState(){
+	return mMaterial->getPass()->getRenderState();
+}
+
 void LabelNode::gatherRenderables(CameraNode *camera,RenderableSet *set){
 	super::gatherRenderables(camera,set);
 
-	if(mVertexData==NULL || mIndexData==NULL || mMaterial==NULL){
+	if(mRendered==false || mVertexData==NULL || mIndexData==NULL || mMaterial==NULL){
 		return;
 	}
 
@@ -191,7 +198,7 @@ void LabelNode::updateLabel(){
 
 	int length=text.length();
 	if(length>0){
-		VertexBuffer::ptr vertexBuffer=mEngine->getBufferManager()->createVertexBuffer(Buffer::Usage_BIT_STATIC,Buffer::Access_BIT_WRITE,mEngine->getVertexFormats().POSITION_TEX_COORD,length*4);
+		VertexBuffer::ptr vertexBuffer=mEngine->getBufferManager()->createVertexBuffer(Buffer::Usage_BIT_STATIC,Buffer::Access_BIT_WRITE,mEngine->getVertexFormats().POSITION_COLOR_TEX_COORD,length*4);
 		mVertexData=VertexData::ptr(new VertexData(vertexBuffer));
 
 		IndexBuffer::ptr indexBuffer=mEngine->getBufferManager()->createIndexBuffer(Buffer::Usage_BIT_STATIC,Buffer::Access_BIT_WRITE,IndexBuffer::IndexFormat_UINT16,length*6);

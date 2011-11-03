@@ -32,6 +32,7 @@
 #include <toadlet/peeper/VertexData.h>
 #include <toadlet/tadpole/Font.h>
 #include <toadlet/tadpole/Renderable.h>
+#include <toadlet/tadpole/Visible.h>
 #include <toadlet/tadpole/material/Material.h>
 #include <toadlet/tadpole/node/CameraAlignedNode.h>
 
@@ -39,7 +40,7 @@ namespace toadlet{
 namespace tadpole{
 namespace node{
 
-class TOADLET_API LabelNode:public CameraAlignedNode,public Renderable{
+class TOADLET_API LabelNode:public CameraAlignedNode,public Visible,public Renderable{
 public:
 	TOADLET_NODE(LabelNode,CameraAlignedNode);
 
@@ -66,8 +67,13 @@ public:
 	void setWidth(scalar width){mWidth=width;}
 	inline scalar getWidth() const{return mWidth;}
 
+	// Visible
+	bool getRendered() const{return mRendered;}
+	void setRendered(bool rendered){mRendered=rendered;}
+	RenderState::ptr getSharedRenderState();
 	void gatherRenderables(CameraNode *camera,RenderableSet *set);
 
+	// Renderable
 	Material *getRenderMaterial() const{return mMaterial;}
 	const Transform &getRenderTransform() const{return getWorldTransform();}
 	const Bound &getRenderBound() const{return getWorldBound();}
@@ -89,6 +95,7 @@ protected:
 	bool mNormalized;
 	bool mWordWrap;
 	scalar mWidth;
+	bool mRendered;
 
 	Material::ptr mMaterial;
 	VertexData::ptr mVertexData;

@@ -256,7 +256,7 @@ Resource::ptr Win32FontHandler::load(Stream::ptr stream,ResourceData *data,Progr
 		GdiFlush();
 	#endif
 
-	Image::ptr image(Image::createAndReallocate(Image::Dimension_D2,Image::Format_A_8,textureWidth,textureHeight));
+	Image::ptr image(Image::createAndReallocate(Image::Dimension_D2,Image::Format_LA_8,textureWidth,textureHeight));
 	if(image==NULL){
 		return NULL;
 	}
@@ -269,8 +269,8 @@ Resource::ptr Win32FontHandler::load(Stream::ptr stream,ResourceData *data,Progr
 	for(i=0;i<textureHeight;++i){
 		for(j=0;j<textureWidth;++j){
 			uint16 *s=(uint16*)(buffer+bitmapStride*i+j*2);
-			tbyte *d=(tbyte*)(imageData+imageStride*(textureHeight-i-1)+j);
-			*d=(tbyte)((*s)&0x1F)<<3;
+			uint16 *d=(uint16*)(imageData+imageStride*(textureHeight-i-1))+j;
+			*d=(((int)((*s)&0x1F)<<11)) | (((int)((*s)&0x1F)<<3));
 		}
 	}
 
