@@ -65,7 +65,7 @@ Resource::ptr FreeTypeHandler::load(Stream::ptr stream,ResourceData *resourceDat
 	int numChars=numChars=fontData->characterSet.length();
 
 	MemoryStream::ptr memoryStream(new MemoryStream(stream));
-	int i=0,j=0;
+	int i=0,j=0,k=0;
 
 	FT_Face face=NULL;
 	if(FT_New_Memory_Face(mLibrary,(const FT_Byte*)memoryStream->getOriginalDataPointer(),memoryStream->length(),0,&face)){
@@ -125,13 +125,14 @@ Resource::ptr FreeTypeHandler::load(Stream::ptr stream,ResourceData *resourceDat
 	int textureWidth=Math::nextPowerOf2(charmapWidth);
 	int textureHeight=Math::nextPowerOf2(charmapHeight);
 
-	Image::ptr image(Image::createAndReallocate(Image::Dimension_D2,Image::Format_A_8,textureWidth,textureHeight));
+	Image::ptr image(Image::createAndReallocate(Image::Dimension_D2,Image::Format_LA_8,textureWidth,textureHeight));
 	if(image==NULL){
 		return NULL;
 	}
 
 	Collection<Font::Glyph*> glyphs(bitmapGlyphs.size());	
 	tbyte *data=image->getData();
+	int textureStride=image->getRowPitch();
 	int x=0,y=0;
 	for(i=0;i<bitmapGlyphs.size();++i){
 		FT_BitmapGlyph bitmapGlyph=bitmapGlyphs[i];
@@ -155,7 +156,11 @@ Resource::ptr FreeTypeHandler::load(Stream::ptr stream,ResourceData *resourceDat
 			glyphs[i]=glyph;
 
 			for(j=0;j<bitmapGlyph->bitmap.rows;++j){
-				memcpy(data+(y+j)*textureWidth+x,bitmapGlyph->bitmap.buffer+j*bitmapGlyph->bitmap.width,bitmapGlyph->bitmap.width);
+				for(k=0;k<bitmapGlyph->bitmap.width;++k){
+					uint8 *s=(uint8*)(bitmapGlyph->bitmap.buffer+j*bitmapGlyph->bitmap.width)+k;
+					uint16 *d=(uint16*)(data+(y+j)*textureStride)+x+k;
+					*d=(int)((*s)<<8) | (int)(*s);
+				}
 			}
 
 			if(i%charCountWidth==charCountWidth-1){
