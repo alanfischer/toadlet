@@ -95,13 +95,13 @@ public abstract class AndroidApplication extends Activity implements RenderTarge
 
 	protected void onCreate(Bundle bundle){
 		super.onCreate(bundle);
-		
+
 		create();
 	}
 
 	protected void onStart(){
 		System.out.println("AndroidApplication.onStart");
-	
+
 		super.onStart();
 
 		mLastTime=System.currentTimeMillis();
@@ -517,7 +517,7 @@ public abstract class AndroidApplication extends Activity implements RenderTarge
 	protected AudioDevice mAudioDevice;
 //	protected MotionDevice mMotionDevice;
 	protected int mNativeHandle;
-		
+	
 	protected SurfaceHolder mNotifySurfaceCreated;
 	protected SurfaceHolder mNotifySurfaceDestroyed;
 	protected boolean mSurfaceCreated;

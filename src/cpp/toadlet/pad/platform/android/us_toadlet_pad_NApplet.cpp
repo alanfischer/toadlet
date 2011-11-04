@@ -3,8 +3,6 @@
 
 using namespace toadlet::pad;
 
-#include <toadlet/tadpole/handler/platform/android/AndroidTextureHandler.h>
-
 JNIEXPORT void JNICALL Java_us_toadlet_pad_NApplet_create(JNIEnv *env,jobject obj){
 	Applet *applet=(Applet*)env->CallIntMethod(obj,getNativeHandleAppletID);
 	applet->create();
