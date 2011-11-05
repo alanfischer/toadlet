@@ -63,6 +63,7 @@ public class ATAudioDevice implements AudioDevice,ATAudioRegister,Runnable{
 	public void update(int dt){}
 	
 	public void run(){
+		mHandler.removeCallbacks(this);
 		internal_update(50);
 		mHandler.postDelayed(this,50);
 	}
