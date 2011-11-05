@@ -466,7 +466,9 @@ bool FFmpegController::seek(int64 time){
 
 	if(1 /*is not mpeg with h264*/ || time<mTime){
 		result=av_seek_frame(mFormatCtx,index,avtime,flags);
-
+		if(result!=0){
+			result=av_seek_frame(mFormatCtx,index,avtime,AVSEEK_FLAG_ANY);
+		}
 		mTime=time;
 
 		int i;
