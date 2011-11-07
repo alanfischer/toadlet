@@ -23,19 +23,22 @@
  *
  ********** Copyright header - do not remove **********/
 
-#ifndef TOADLET_PAD_JAPPLICATION_H
-#define TOADLET_PAD_JAPPLICATION_H
+#ifndef TOADLET_PAD_ANDROIDAPPLICATION_H
+#define TOADLET_PAD_ANDROIDAPPLICATION_H
 
+#include <toadlet/egg/Thread.h>
 #include <toadlet/pad/Application.h>
-#include <jni.h>
+#include <android/configuration.h>
+#include <android/looper.h>
+#include <android/native_activity.h>
 
 namespace toadlet{
 namespace pad{
 
-class JApplication:public Application{
+class AndroidApplication:public Application,public Runnable{
 public:
-	JApplication(JNIEnv *jenv,jobject jobj);
-	virtual ~JApplication();
+	AndroidApplication();
+	virtual ~AndroidApplication();
 
 	bool create(String renderDevice,String audioDevice,String motionDevice,String joyDevice);
 	void destroy();
@@ -48,7 +51,10 @@ public:
 	void deactivate(){}
 	bool isActive() const{return true;}
 
-	void setTitle(const String &title);
+	void nativeWindowCreated(ANativeWindow *window);
+	void nativeWindowDestroyed(ANativeWindow *window);
+	
+	void setTitle(const String &title){}
 	String getTitle() const{return (char*)NULL;}
 
 	void setPosition(int x,int y){}
@@ -65,27 +71,32 @@ public:
 	void setDifferenceMouse(bool difference);
 	bool getDifferenceMouse() const;
 
-	// Integrate a JApplet class here
-	void setApplet(Applet *applet){}
-	Applet *getApplet() const{return NULL;}
-
-	Engine *getEngine() const;
-	RenderDevice *getRenderDevice() const;
-	AudioDevice *getAudioDevice() const;
+	Engine *getEngine() const{return mEngine;}
+	RenderDevice *getRenderDevice() const{return mRenderDevice;}
+	AudioDevice *getAudioDevice() const{return mAudioDevice;}
 	MotionDevice *getMotionDevice() const{return NULL;}
 	JoyDevice *getJoyDevice() const{return NULL;}
 
-protected:
-	JNIEnv *env;
-	jobject obj;
-	jmethodID createID,destroyID,startID,stopID,isRunningID,setDifferenceMouseID,getDifferenceMouseID,getWidthID,getHeightID,getEngineID,getRenderDeviceID,getAudioDeviceID,setNativeHandleID,getNativeHandleID;
+	void setNativeActivity(ANativeActivity *activity);
 
-	mutable Engine *mEngine;
-	mutable jobject mLastEngineObj;
-	mutable RenderDevice *mRenderDevice;
-	mutable jobject mLastRenderDeviceObj;
-	mutable AudioDevice *mAudioDevice;
-	mutable jobject mLastAudioDeviceObj;
+	void run();
+	
+protected:
+	static void onDestroy(ANativeActivity *activity);
+	static void onStart(ANativeActivity *activity);
+	static void onStop(ANativeActivity *activity);
+	static void onNativeWindowCreated(ANativeActivity *activity,ANativeWindow *window);
+	static void onNativeWindowDestroyed(ANativeActivity *activity,ANativeWindow *window);
+
+	ANativeActivity *mActivity;
+	ANativeWindow *mWindow;
+	Thread::ptr mThread;
+	bool mRunning;
+
+	Engine *mEngine;
+	RenderDevice *mRenderDevice;
+	AudioDevice *mAudioDevice;
+	Applet *mApplet;
 };
 
 }

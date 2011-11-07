@@ -160,7 +160,13 @@ bool EGLWindowRenderTarget::createContext(void *display,void *window,WindowRende
 
 	try{
 		if(!pixmap){
-			mSurface=eglCreateWindowSurface(mDisplay,mConfig,(ANativeWindow*)window,NULL);
+			#if defined(TOADLET_PLATFORM_ANDROID)
+				EGLint format=0;
+				eglGetConfigAttrib(mDisplay,mConfig,EGL_NATIVE_VISUAL_ID,&format);
+				ANativeWindow_setBuffersGeometry((ANativeWindow*)window,0,0,format);
+			#endif
+		
+			mSurface=eglCreateWindowSurface(mDisplay,mConfig,(NativeWindowType)window,NULL);
 			TOADLET_CHECK_EGLERROR("eglCreateWindowSurface");
 		}
 		else{
