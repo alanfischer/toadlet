@@ -3,16 +3,16 @@
 # LIBRARIES - a list of all of the static libraries you want merged into the TARGET
 
 macro (MERGE_STATIC_LIBRARIES TARGET LIBRARIES)
-	if (TOADLET_PLATFORM_WIN32)
+	if (WIN32)
 		# On Windows you must add aditional formatting to the LIBRARIES variable as a single string for the windows libtool
 		string (REPLACE ";" " " LIBS "${LIBRARIES}")
 		string (REPLACE "/" "\\" LIBS "${LIBS}")
 		set_property (TARGET ${TARGET} APPEND PROPERTY STATIC_LIBRARY_FLAGS "${LIBS}")
-	elseif (TOADLET_PLATFORM_OSX)
+	elseif (APPLE)
 		# iOS and OSX platforms need slighly less formatting
 		string (REPLACE ";" " " LIBS "${LIBRARIES}")
 		set_property (TARGET ${TARGET} APPEND PROPERTY STATIC_LIBRARY_FLAGS "${LIBS}")
-	elseif (TOADLET_PLATFORM_POSIX)
+	elseif (UNIX)
 		# Posix platforms, including Android, require manual merging of static libraries via a special script
 		set (LIBRARIES ${LIBRARIES})
 
@@ -36,5 +36,5 @@ macro (MERGE_STATIC_LIBRARIES TARGET LIBRARIES)
 		add_custom_command (TARGET ${TARGET} POST_BUILD
 			COMMAND ${CMAKE_COMMAND} -P ${CMAKE_CURRENT_BINARY_DIR}/PosixMergeStaticLibraries-${TARGET}.cmake
 		)
-	endif (TOADLET_PLATFORM_WIN32)
+	endif (WIN32)
 endmacro (MERGE_STATIC_LIBRARIES)
