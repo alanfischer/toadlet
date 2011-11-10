@@ -69,6 +69,8 @@ public:
 		Key_SOFTRIGHT,
 		Key_ACTION,
 		Key_BACK,
+		Key_MENU,
+		Key_SEARCH,
 	};
 
 	virtual ~Application(){}

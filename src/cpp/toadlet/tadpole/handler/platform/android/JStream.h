@@ -66,6 +66,8 @@ protected:
 	int bufferLength;
 	jbyteArray bufferObj;
 	jmethodID closeID,availableID,readID,writeID;
+	
+	int current;
 };
 
 }

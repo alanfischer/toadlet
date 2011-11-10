@@ -1,5 +1,4 @@
 # Standard setup
-
 cmake_minimum_required (VERSION 2.6)
 project (logo CXX C)
 
@@ -8,18 +7,12 @@ set (CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${logo_SOURCE_DIR}/../../../../cmak
 
 # Find toadlet
 find_package (toadlet REQUIRED)
-find_package (mxml REQUIRED)
 
 # Includes
 include_directories (${logo_SOURCE_DIR} ${TOADLET_INCLUDE_DIR})
 
 # Libraries
-set (LIBS ${TOADLET_LIBRARIES_S} ${TOADLET_TADPOLE_LIB_S} ${TOADLET_PEEPER_GLRENDERDEVICE_LIB_S} ${TOADLET_PEEPER_LIB_S} ${TOADLET_RIBBIT_LIB_S} ${TOADLET_EGG_LIB_S})
-# Add required android static libs
-set (LIBS ${LIBS} ${MXML_LIBRARY} GLESv1_CM log)
-
-message ( ${TOADLET_EGG_LIB_S} )
-message ( ${TOADLET_TADPOLE_LIB_S} )
+set (LIBS ${TOADLET_LIBRARIES})
 
 # Source files
 set (SRC

@@ -24,6 +24,7 @@
  ********** Copyright header - do not remove **********/
 
 #include <toadlet/egg/Error.h>
+#include <toadlet/egg/Extents.h>
 #include <toadlet/egg/io/MemoryStream.h>
 #include <toadlet/tadpole/handler/TMSHHandler.h>
 
@@ -160,7 +161,6 @@ bool TMSHHandler::save(Stream::ptr stream,Resource::ptr resource,ResourceData *d
 
 Mesh::ptr TMSHHandler::readMesh(DataStream *stream,int blockSize){
 	int i;
-
 	Mesh::ptr mesh(new Mesh());
 	
 	Transform transform;
@@ -172,6 +172,11 @@ Mesh::ptr TMSHHandler::readMesh(DataStream *stream,int blockSize){
 	mesh->setBound(bound);
 
 	int numSubMeshes=stream->readUInt32();
+	if(numSubMeshes>Extents::MAX_SHORT){
+		Error::unknown(Categories::TOADLET_TADPOLE,
+			String("too many submeshes:")+numSubMeshes);
+		return NULL;
+	}
 	for(i=0;i<numSubMeshes;++i){
 		Mesh::SubMesh::ptr subMesh(new Mesh::SubMesh());
 	

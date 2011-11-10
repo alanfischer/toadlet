@@ -47,27 +47,26 @@ class ApplicationView extends SurfaceView implements SurfaceHolder.Callback{
 	}
 
 	public boolean onKeyDown(int keyCode,KeyEvent event){
-		mApplication.notifyKeyPressed(event.getUnicodeChar());
-		return true;
+		return mApplication.notifyKeyPressed(mApplication.keyEventToKey(event));
 	}
 	
 	public boolean onKeyUp(int keyCode,KeyEvent event){
-		mApplication.notifyKeyReleased(event.getUnicodeChar());
-		return true;
+		return mApplication.notifyKeyReleased(mApplication.keyEventToKey(event));
 	}
 
 	public boolean onTouchEvent(MotionEvent event){
 		int x=(int)event.getX(),y=(int)event.getY();
 		
+		boolean result=false;
 		switch(event.getAction()){
 			case MotionEvent.ACTION_DOWN:
-				mApplication.notifyMousePressed(x,y);
+				result=mApplication.notifyMousePressed(x,y);
 			break;
 			case MotionEvent.ACTION_MOVE:
-				mApplication.notifyMouseMoved(x,y);
+				result=mApplication.notifyMouseMoved(x,y);
 			break;
 			case MotionEvent.ACTION_UP:
-				mApplication.notifyMouseReleased(x,y);
+				result=mApplication.notifyMouseReleased(x,y);
 			break;
 		}
 
@@ -89,7 +88,33 @@ class ApplicationView extends SurfaceView implements SurfaceHolder.Callback{
 }
 
 public abstract class AndroidApplication extends Activity implements RenderTarget,Runnable{
-    public AndroidApplication(){
+	// Keys
+	final static int Key_ENTER=	10;
+	final static int Key_TAB=	8;
+	final static int Key_SPACE=	32;
+
+	final static int Key_LEFT=	1024;
+	final static int Key_RIGHT=	Key_LEFT+1;
+	final static int Key_UP=	Key_LEFT+2;
+	final static int Key_DOWN=	Key_LEFT+3;
+
+	final static int Key_ESC=	2048;
+	final static int Key_PAUSE=	Key_ESC+1;
+	final static int Key_SHIFT=	Key_ESC+2;
+	final static int Key_CTRL=	Key_ESC+3;
+	final static int Key_ALT=	Key_ESC+4;
+	final static int Key_SPECIAL=	Key_ESC+5;
+	final static int Key_BACKSPACE=	Key_ESC+6;
+	final static int Key_DELETE=	Key_ESC+7;
+
+	final static int Key_ACTION=	4096;
+	final static int Key_BACK=		Key_ACTION+1;
+	final static int Key_MENU=		Key_ACTION+2;
+	final static int Key_SEARCH=	Key_ACTION+3;
+	final static int Key_SOFTLEFT=	Key_ACTION+4;
+	final static int Key_SOFTRIGHT=	Key_ACTION+5;
+
+	public AndroidApplication(){
 		super();
 	}
 
@@ -103,6 +128,11 @@ public abstract class AndroidApplication extends Activity implements RenderTarge
 		System.out.println("AndroidApplication.onStart");
 
 		super.onStart();
+		
+		Runtime runtime=Runtime.getRuntime();
+		System.out.println("Free memory"+runtime.freeMemory());
+		System.gc();
+		System.out.println("Free memory"+runtime.freeMemory());
 
 		mLastTime=System.currentTimeMillis();
 		mRun=true;
@@ -146,6 +176,16 @@ public abstract class AndroidApplication extends Activity implements RenderTarge
 		}
 	}
 	
+	public boolean onCreateOptionsMenu(Menu menu){
+		menu.add("Exit");
+		return true;
+	}
+	
+	public boolean onOptionsItemSelected(MenuItem item){
+		stop();
+		return true;
+	}
+	
 	public boolean create(){
 		createNativeApplication();
 
@@ -162,10 +202,10 @@ public abstract class AndroidApplication extends Activity implements RenderTarge
 			notifyEngineAudioDevice(mEngine);
 		}
 
-//		if(mApplet==null){
-//			mApplet=createApplet(this);
-//			mApplet.create();
-//		}
+		if(mApplet==null){
+			mApplet=createApplet(this);
+			mApplet.create();
+		}
 
 		if(mFullscreen){
 			requestWindowFeature(Window.FEATURE_NO_TITLE);   
@@ -211,11 +251,6 @@ public abstract class AndroidApplication extends Activity implements RenderTarge
 	protected abstract void destroyApplet(Applet applet);
 
 	public void run(){
-		if(mApplet==null){
-			mApplet=createApplet(this);
-			mApplet.create();
-		}
-
 		while(mRun){
 			long currentTime=System.currentTimeMillis();
 			if(mActive){
@@ -293,42 +328,47 @@ public abstract class AndroidApplication extends Activity implements RenderTarge
 		}
 	}
 
-	synchronized void notifyKeyPressed(int key){
+	synchronized boolean notifyKeyPressed(int key){
 		if(mNotifyKeyPressed==false){
 			mNotifyKeyPressed=true;
 			mKeyPressed=key;
 		}
+		return false;
 	}
 
-	synchronized void notifyKeyReleased(int key){
+	synchronized boolean notifyKeyReleased(int key){
 		if(mNotifyKeyReleased==false){
 			mNotifyKeyReleased=true;
 			mKeyReleased=key;
 		}
+		return false;
 	}
 
-	synchronized void notifyMousePressed(int x,int y){
+	synchronized boolean notifyMousePressed(int x,int y){
 		if(mNotifyMousePressed==false){
 			mNotifyMousePressed=true;
 			mMousePressedX=x;
 			mMousePressedY=y;
 		}
+		return false;
 	}
 
-	synchronized void notifyMouseMoved(int x,int y){
+	synchronized boolean notifyMouseMoved(int x,int y){
 		if(mNotifyMouseMoved==false){
 			mNotifyMouseMoved=true;
 			mMouseMovedX=x;
 			mMouseMovedY=y;
 		}
+		return false;
 	}
 
-	synchronized void notifyMouseReleased(int x,int y){
+	synchronized boolean notifyMouseReleased(int x,int y){
 		if(mNotifyMouseReleased==false){
 			mNotifyMouseReleased=true;
 			mMouseReleasedX=x;
 			mMouseReleasedY=y;
 		}
+		return false;
 	}
 
 	void notifySizeChanged(int width,int height){
@@ -486,6 +526,19 @@ public abstract class AndroidApplication extends Activity implements RenderTarge
 		return target;
 	}
 
+	public int keyEventToKey(KeyEvent event){
+		switch(event.getKeyCode()){
+			case KeyEvent.KEYCODE_BACK:
+				return Key_BACK;
+			case KeyEvent.KEYCODE_MENU:
+				return Key_MENU;
+			case KeyEvent.KEYCODE_SEARCH:
+				return Key_SEARCH;
+			default:
+				return event.getUnicodeChar();
+		}
+	}
+	
 	public void setNativeHandle(int handle){mNativeHandle=handle;}
 	public int getNativeHandle(){return mNativeHandle;}
 
@@ -510,6 +563,7 @@ public abstract class AndroidApplication extends Activity implements RenderTarge
 	protected boolean mRun;
 	protected Object mSurfaceMutex=new Object();
 	protected long mLastTime=0;
+	protected String mTitle;
 	protected boolean mDifferenceMouse;
 	protected int mLastMouseX,mLastMouseY;
 	protected RenderTarget mRenderTarget;

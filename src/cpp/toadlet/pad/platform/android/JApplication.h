@@ -49,7 +49,7 @@ public:
 	bool isActive() const{return true;}
 
 	void setTitle(const String &title);
-	String getTitle() const{return (char*)NULL;}
+	String getTitle() const;
 
 	void setPosition(int x,int y){}
 	int getPositionX() const{return 0;}
@@ -78,7 +78,7 @@ public:
 protected:
 	JNIEnv *env;
 	jobject obj;
-	jmethodID createID,destroyID,startID,stopID,isRunningID,setDifferenceMouseID,getDifferenceMouseID,getWidthID,getHeightID,getEngineID,getRenderDeviceID,getAudioDeviceID,setNativeHandleID,getNativeHandleID;
+	jmethodID createID,destroyID,startID,stopID,isRunningID,setTitleID,getTitleID,setDifferenceMouseID,getDifferenceMouseID,getWidthID,getHeightID,getEngineID,getRenderDeviceID,getAudioDeviceID,setNativeHandleID,getNativeHandleID;
 
 	mutable Engine *mEngine;
 	mutable jobject mLastEngineObj;
