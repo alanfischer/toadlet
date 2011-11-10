@@ -32,6 +32,7 @@ import android.media.AudioManager;
 public class ATAudio implements Audio,AudioTrack.OnPlaybackPositionUpdateListener{
 	public ATAudio(ATAudioRegister device){
 		mGain=1.0f;
+		mAudioGain=1.0f;
 		mDevice=device;
 		mDevice.registerAudio(this);
 	}
@@ -146,15 +147,12 @@ public class ATAudio implements Audio,AudioTrack.OnPlaybackPositionUpdateListene
 	public boolean getLooping(){return false;}
 
 	public void setGain(float gain){
-		if(mAudioTrack!=null){
-			mAudioTrack.setStereoVolume(gain,gain);
-		}
 		mGain=gain;
 	}
 	
 	public void fadeToGain(float gain,int time){
 		/// @todo: enable fading to gain
-		setGain(gain);
+		mGain=gain;
 	}
 	
 	public float getGain(){return mGain;}
@@ -205,11 +203,17 @@ public class ATAudio implements Audio,AudioTrack.OnPlaybackPositionUpdateListene
 			mCurrentState=mAudioTrack.getPlayState();
 			if(mDesiredState==AudioTrack.PLAYSTATE_PLAYING && mCurrentState==AudioTrack.PLAYSTATE_STOPPED){
 				mDesiredState=0;
+				System.out.println("internal_play");
 				internal_play();
+				System.out.println("internal_play end");
 			}
 			if(mDesiredState==AudioTrack.PLAYSTATE_STOPPED && mCurrentState==AudioTrack.PLAYSTATE_PLAYING){
 				mDesiredState=0;
 				internal_stop();
+			}
+			if(mGain!=mAudioGain){
+				mAudioGain=mGain;
+				mAudioTrack.setStereoVolume(mGain,mGain);
 			}
 			mCurrentState=mAudioTrack.getPlayState();
 		}
@@ -239,7 +243,7 @@ public class ATAudio implements Audio,AudioTrack.OnPlaybackPositionUpdateListene
 	ATAudioBuffer mAudioBuffer;
 	AudioStream mAudioStream;
 	AudioTrack mAudioTrack;
-	float mGain;
+	float mGain,mAudioGain;
 	byte[] mStreamData;
 	int mBufferPosition;
 	int mDesiredState,mCurrentState;

@@ -65,7 +65,7 @@ void AndroidAssetArchive::destroy(){
 }
 
 Stream::ptr AndroidAssetArchive::openStream(const String &name){
-	Logger::debug(Categories::TOADLET_TADPOLE,"AndroidAssetArchive::openStream");
+	Logger::debug(Categories::TOADLET_TADPOLE,"AndroidAssetArchive::openStream:"+name);
 
 	jvm->AttachCurrentThread(&env,NULL);
 

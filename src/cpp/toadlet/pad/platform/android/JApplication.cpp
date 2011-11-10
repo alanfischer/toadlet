@@ -70,6 +70,8 @@ JApplication::JApplication(JNIEnv *jenv,jobject jobj):
 		startID=env->GetMethodID(appClass,"start","()V");
 		stopID=env->GetMethodID(appClass,"stop","()V");
 		isRunningID=env->GetMethodID(appClass,"isRunning","()Z");
+		setTitleID=env->GetMethodID(appClass,"setTitle","(Ljava/lang/CharSequence;)V");
+		getTitleID=env->GetMethodID(appClass,"getTitle","()Ljava/lang/CharSequence;");
 		getWidthID=env->GetMethodID(appClass,"getWidth","()I");
 		getHeightID=env->GetMethodID(appClass,"getHeight","()I");
 		setDifferenceMouseID=env->GetMethodID(appClass,"setDifferenceMouse","(Z)V");
@@ -130,6 +132,28 @@ void JApplication::stop(){
 
 bool JApplication::isRunning() const{
 	env->CallBooleanMethod(obj,isRunningID);
+}
+
+void JApplication::setTitle(const String &title){
+// Disabled since calling it enough calls a crash in Window.setTitle for some reason
+#if 0
+	jstring titleObj=env->NewStringUTF(title);
+	if(env->ExceptionOccurred()!=NULL){
+		env->ExceptionDescribe();
+		env->ExceptionClear();
+		return;
+	}
+	env->CallVoidMethod(obj,setTitleID,titleObj);
+	env->DeleteLocalRef(titleObj);
+#endif
+}
+
+String JApplication::getTitle() const{
+	jstring titleObj=(jstring)env->CallObjectMethod(obj,getTitleID);
+	const char *chars=env->GetStringUTFChars(titleObj,NULL);
+	String title=chars;
+	env->ReleaseStringUTFChars(titleObj,chars);
+	return title;
 }
 
 int JApplication::getWidth() const{

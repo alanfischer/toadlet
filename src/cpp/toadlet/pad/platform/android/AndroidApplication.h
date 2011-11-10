@@ -43,6 +43,9 @@ public:
 	bool create(String renderDevice,String audioDevice,String motionDevice,String joyDevice);
 	void destroy();
 
+	void setApplet(Applet *applet){mApplet=applet;}
+	Applet *getApplet() const{return mApplet;}
+
 	void start();
 	void stop();
 	bool isRunning() const;
@@ -53,7 +56,7 @@ public:
 
 	void nativeWindowCreated(ANativeWindow *window);
 	void nativeWindowDestroyed(ANativeWindow *window);
-	
+
 	void setTitle(const String &title){}
 	String getTitle() const{return (char*)NULL;}
 

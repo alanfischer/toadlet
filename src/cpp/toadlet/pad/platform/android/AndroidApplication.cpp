@@ -180,3 +180,10 @@ void AndroidApplication::onNativeWindowDestroyed(ANativeActivity *activity,ANati
 
 }
 }
+
+extern "C" void ANativeActivity_onCreate(ANativeActivity *activity,void *savedState,size_t savedStateSize){
+	Logger::alert("ANativeActivity_onCreate");
+
+	AndroidApplication *app=new AndroidApplication();
+	app->setNativeActivity(activity);
+}

@@ -33,6 +33,5 @@
             </intent-filter>
         </activity>
     </application>
-    <uses-feature android:glEsVersion="0x00020000"/>
     <uses-sdk android:minSdkVersion="7"/>
 </manifest>

@@ -326,7 +326,7 @@ public:
 
 		Logger::alert("Loading frog");
 
-		creature=engine->getMeshManager()->findMesh("frog.xmsh");
+		creature=engine->getMeshManager()->findMesh("frog.tmsh");
 		if(creature!=NULL){
 			Transform transform;
 			transform.setTranslate(0,0,-3.5);
