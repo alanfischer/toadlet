@@ -12,7 +12,7 @@ find_package (toadlet REQUIRED)
 include_directories (${logo_SOURCE_DIR} ${TOADLET_INCLUDE_DIR})
 
 # Libraries
-set (LIBS ${TOADLET_LIBRARIES})
+set (LIBS ${TOADLET_LIBRARIES_S} GLESv1_CM log)
 
 # Source files
 set (SRC
