@@ -12,7 +12,11 @@ find_package (toadlet REQUIRED)
 include_directories (${randisle_SOURCE_DIR} ${TOADLET_INCLUDE_DIR})
 
 # Libraries
-set (LIBS ${TOADLET_LIBRARIES_S} GLESv1_CM log android EGL)
+set (LIBS ${TOADLET_LIBRARIES_S} GLESv1_CM log)
+
+if (ANDROID_NDK_API_LEVEL >= 9)
+	set (LIBS ${LIBS} android EGL)
+endif (ANDROID_NDK_API_LEVEL >= 9)
 
 # Source files
 set (SRC
