@@ -34,17 +34,11 @@ using namespace toadlet::flick;
 using namespace toadlet::tadpole;
 using namespace toadlet::pad;
 
-TOADLET_C_API RenderDevice* new_GLRenderDevice();
 TOADLET_C_API AudioDevice* new_JAudioDevice(JNIEnv *env,jobject obj);
 
-void Java_us_toadlet_pad(JNIEnv *env);
-
-jmethodID getRootRenderTargetRenderTargetID=0;
-jmethodID getNativeHandleRenderDeviceID=0;
-jmethodID getNativeHandleAudioDeviceID=0;
-jmethodID getNativeHandleEngineID=0;
-jmethodID getNativeHandleAppletID=0;
-jmethodID getNativeHandleApplicationID=0;
+extern jmethodID getNativeHandleEngineID;
+extern jmethodID getNativeHandleRenderDeviceID;
+extern "C" JNIEXPORT void Java_us_toadlet_pad(JNIEnv *env);
 
 namespace toadlet{
 namespace pad{
@@ -240,41 +234,3 @@ AudioDevice *JApplication::getAudioDevice() const{
 
 }
 }
-
-void Java_us_toadlet_pad(JNIEnv *env){
-	jclass targetClass=env->FindClass("us/toadlet/peeper/RenderTarget");
-	{
-		getRootRenderTargetRenderTargetID=env->GetMethodID(targetClass,"getRootRenderTarget","()Lus/toadlet/peeper/RenderTarget;");
-	}
-	env->DeleteLocalRef(targetClass);
-
-	jclass deviceClass=env->FindClass("us/toadlet/pad/RenderDevice");
-	{
-		getNativeHandleRenderDeviceID=env->GetMethodID(deviceClass,"getNativeHandle","()I");
-	}
-	env->DeleteLocalRef(deviceClass);
-
-	jclass engineClass=env->FindClass("us/toadlet/pad/Engine");
-	{
-		getNativeHandleEngineID=env->GetMethodID(engineClass,"getNativeHandle","()I");
-	}
-	env->DeleteLocalRef(engineClass);
-
-	jclass appletClass=env->FindClass("us/toadlet/pad/NApplet");
-	{
-		getNativeHandleAppletID=env->GetMethodID(appletClass,"getNativeHandle","()I");
-	}
-	env->DeleteLocalRef(appletClass);
-
-	jclass appClass=env->FindClass("us/toadlet/pad/AndroidApplication");
-	{
-		getNativeHandleApplicationID=env->GetMethodID(appClass,"getNativeHandle","()I");
-	}
-	env->DeleteLocalRef(appClass);
-}
-
-#include "us_toadlet_pad_AndroidApplication.cpp"
-#include "us_toadlet_pad_NApplet.cpp"
-#include "us_toadlet_pad_RenderDevice.cpp"
-#include "us_toadlet_pad_Engine.cpp"
-

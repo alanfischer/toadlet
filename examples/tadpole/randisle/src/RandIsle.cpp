@@ -158,6 +158,7 @@ void RandIsle::destroy(){
 }
 
 void RandIsle::resized(int width,int height){
+Logger::alert(String("RandIsle RESIZED:")+width+","+height);
 	if(mCamera!=NULL && width>0 && height>0){
 		if(width>=height){
 			scalar ratio=Math::div(Math::fromInt(width),Math::fromInt(height));

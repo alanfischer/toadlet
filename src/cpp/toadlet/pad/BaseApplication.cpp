@@ -212,7 +212,7 @@ RenderTarget *BaseApplication::makeRenderTarget(const String &plugin){
 	if(it!=mRenderDevicePlugins.end()){
 		TOADLET_TRY
 			target=it->second.createRenderTarget(getWindowHandle(),mFormat);
-		TOADLET_CATCH(const Exception &){Logger::alert("a sad");target=NULL;}
+		TOADLET_CATCH(const Exception &){target=NULL;}
 	}
 	if(target!=NULL && target->isValid()==false){
 		delete target;
