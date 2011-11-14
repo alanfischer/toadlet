@@ -1,10 +1,13 @@
 #include "us_toadlet_pad_AndroidApplication.h"
-#include <toadlet/pad/Application.h>
+#include "JApplication.h"
 #include <toadlet/tadpole/handler/platform/android/AndroidAssetArchive.h>
 #include <toadlet/tadpole/handler/platform/android/AndroidTextureHandler.h>
 
 using namespace toadlet::pad;
+using namespace toadlet::peeper;
 using namespace toadlet::tadpole::handler;
+
+TOADLET_C_API RenderDevice* new_GLRenderDevice();
 
 JNIEXPORT void JNICALL Java_us_toadlet_pad_AndroidApplication_createNativeApplication(JNIEnv *env,jobject obj){
 	Application *app=new JApplication(env,obj);

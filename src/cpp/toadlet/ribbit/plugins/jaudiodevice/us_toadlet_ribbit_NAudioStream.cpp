@@ -1,5 +1,6 @@
 #include "us_toadlet_ribbit_NAudioStream.h"
 #include "JAudioDevice.h"
+#include <toadlet/egg/Logger.h>
 
 using namespace toadlet;
 using namespace toadlet::ribbit;

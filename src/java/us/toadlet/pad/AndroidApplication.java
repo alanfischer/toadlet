@@ -318,7 +318,12 @@ public abstract class AndroidApplication extends Activity implements RenderTarge
 				if(mNotifyMouseReleased){
 					mNotifyMouseReleased=false;
 					if(mMouseMovedX!=mMouseReleasedX || mMouseMovedY!=mMouseReleasedY){
-						mouseMoved(mMouseReleasedX,mMouseReleasedY);
+						if(mDifferenceMouse){
+							mouseMoved(mLastMouseX-mMouseReleasedX,mLastMouseY-mMouseReleasedY);
+						}
+						else{
+							mouseMoved(mMouseReleasedX,mMouseReleasedY);
+						}
 					}
 					mouseReleased(mMouseReleasedX,mMouseReleasedY,0);
 					mLastMouseX=mMouseReleasedX;

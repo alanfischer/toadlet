@@ -45,6 +45,5 @@ public class NApplet implements Applet{
 	public native void mouseReleased(int x,int y,int button);
 	public native void mouseScrolled(int x,int y,int scroll);
 	
-	public int getNativeHandle(){return mNativeHandle;}
-	protected int mNativeHandle;
+	private int mNativeHandle;
 }
