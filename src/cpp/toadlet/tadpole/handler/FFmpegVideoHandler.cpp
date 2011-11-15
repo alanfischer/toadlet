@@ -325,7 +325,18 @@ void FFmpegController::destroy(){
 	}
 
 	if(mAudio!=NULL){
+		mAudio->stop();
 		mAudio=NULL;
+	}
+
+	if(mVideoStream!=NULL){
+		mVideoStream->close();
+		mVideoStream=NULL;
+	}
+
+	if(mAudioStream!=NULL){
+		mAudioStream->close();
+		mAudioStream=NULL;
 	}
 
 	if(mFormatCtx!=NULL){
