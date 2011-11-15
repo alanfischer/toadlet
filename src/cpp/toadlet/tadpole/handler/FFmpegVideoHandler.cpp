@@ -81,7 +81,11 @@ FFmpegAudioStream::~FFmpegAudioStream(){
 
 void FFmpegAudioStream::close(){
 	mStreamData=NULL;
-	av_free_packet(&mPkt);
+
+	if(mPkt.data!=NULL){
+		av_free_packet(&mPkt);
+		mPkt.data=NULL;
+	}
 }
 
 int FFmpegAudioStream::read(tbyte *buffer,int length){
@@ -167,10 +171,20 @@ FFmpegVideoStream::~FFmpegVideoStream(){
 }
 
 void FFmpegVideoStream::close(){
-	avpicture_free((AVPicture*)mDeinterlacedFrame);
-	avpicture_free((AVPicture*)mTextureFrame);
+	if(mDeinterlacedFrame!=NULL){
+		avpicture_free((AVPicture*)mDeinterlacedFrame);
+		mDeinterlacedFrame=NULL;
+	}
 
-	av_free_packet(&mPkt);
+	if(mTextureFrame!=NULL){
+		avpicture_free((AVPicture*)mTextureFrame);
+		mTextureFrame=NULL;
+	}
+
+	if(mPkt.data!=NULL){
+		av_free_packet(&mPkt);
+		mPkt.data=NULL;
+	}
 }
 
 void FFmpegVideoStream::update(int dt){
@@ -239,6 +253,8 @@ FFmpegController::~FFmpegController(){
 }
 
 bool FFmpegController::open(Stream::ptr stream){
+	Logger::alert(Categories::TOADLET_TADPOLE,"FFmpegController::open");
+
 	if(stream->closed()){
 		Error::unknown(Categories::TOADLET_TADPOLE,
 			"stream not opened");
@@ -319,6 +335,8 @@ bool FFmpegController::open(Stream::ptr stream){
 }
 
 void FFmpegController::destroy(){
+	Logger::alert(Categories::TOADLET_TADPOLE,"FFmpegController::destroy");
+
 	if(mTexture!=NULL){
 		mTexture->release();
 		mTexture=NULL;
