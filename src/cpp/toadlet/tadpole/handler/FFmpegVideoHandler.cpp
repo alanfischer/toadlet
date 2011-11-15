@@ -134,9 +134,7 @@ int FFmpegAudioStream::read(tbyte *buffer,int length){
 
 FFmpegVideoStream::FFmpegVideoStream(FFmpegController *controller,FFmpegController::StreamData *streamData,Texture::ptr texture):
 	mSwsCtx(NULL),
-	mVideoFrame(NULL),
-	mTextureFrame(NULL),
-	mTextureBuffer(NULL),
+	mVideoFrame(NULL),mDeinterlacedFrame(NULL),mTextureFrame(NULL),
 
 	mPtsTime(0)
 {
@@ -157,12 +155,11 @@ FFmpegVideoStream::FFmpegVideoStream(FFmpegController *controller,FFmpegControll
 	);
 
 	mVideoFrame=avcodec_alloc_frame();
+	mDeinterlacedFrame=avcodec_alloc_frame();
 	mTextureFrame=avcodec_alloc_frame();
 
-	PixelFormat pixelFormat=FFmpegVideoHandler::getPixelFormat(textureFormat->pixelFormat);
-	int size=avpicture_get_size(pixelFormat,textureFormat->width,textureFormat->height);
-	mTextureBuffer=(tbyte*)av_malloc(size);
-	avpicture_fill((AVPicture*)mTextureFrame,mTextureBuffer,pixelFormat,textureFormat->width,textureFormat->height);
+	avpicture_alloc((AVPicture*)mDeinterlacedFrame,ctx->pix_fmt,ctx->width,ctx->height);
+	avpicture_alloc((AVPicture*)mTextureFrame,FFmpegVideoHandler::getPixelFormat(textureFormat->pixelFormat),textureFormat->width,textureFormat->height);
 }
 
 FFmpegVideoStream::~FFmpegVideoStream(){
@@ -170,6 +167,9 @@ FFmpegVideoStream::~FFmpegVideoStream(){
 }
 
 void FFmpegVideoStream::close(){
+	avpicture_free((AVPicture*)mDeinterlacedFrame);
+	avpicture_free((AVPicture*)mTextureFrame);
+
 	av_free_packet(&mPkt);
 }
 
@@ -195,10 +195,19 @@ void FFmpegVideoStream::update(int dt){
 		if(frameFinished && (ptsTime>=time || ptsTime==0)){
 			mPtsTime=ptsTime;
 
+			AVFrame *frame=mVideoFrame;
+			result=avpicture_deinterlace((AVPicture*)mDeinterlacedFrame,(AVPicture*)mVideoFrame,
+				mStreamData->codecCtx->pix_fmt, 
+				mStreamData->codecCtx->width, 
+				mStreamData->codecCtx->height);
+			if(result>=0){
+				frame=mDeinterlacedFrame;
+			}
+
 			sws_scale(
 				mSwsCtx,
-				mVideoFrame->data,
-				mVideoFrame->linesize,
+				frame->data,
+				frame->linesize,
 				0,
 				mStreamData->codecCtx->height,
 				mTextureFrame->data,

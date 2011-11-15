@@ -187,9 +187,7 @@ protected:
 	Texture::ptr mTexture;
 
 	SwsContext *mSwsCtx;
-	AVFrame *mVideoFrame;
-	AVFrame *mTextureFrame;
-	tbyte *mTextureBuffer;
+	AVFrame *mVideoFrame,*mDeinterlacedFrame,*mTextureFrame;
 
 	uint64 mPtsTime;
 
