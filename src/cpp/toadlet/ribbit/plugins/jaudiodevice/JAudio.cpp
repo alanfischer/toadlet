@@ -50,7 +50,6 @@ JAudio::JAudio(JNIEnv *jenv,jobject jobj){
 		getLoopingID=env->GetMethodID(audioClass,"getLooping","()Z");
 
 		setGainID=env->GetMethodID(audioClass,"setGain","(F)V");
-		fadeToGainID=env->GetMethodID(audioClass,"fadeToGain","(FI)V");
 		getGainID=env->GetMethodID(audioClass,"getGain","()F");
 	}
 	env->DeleteLocalRef(audioClass);
@@ -127,10 +126,6 @@ bool JAudio::getLooping() const{
 
 void JAudio::setGain(scalar gain){
 	env->CallVoidMethod(obj,setGainID,(float)gain);
-}
-
-void JAudio::fadeToGain(scalar gain,int time){
-	env->CallVoidMethod(obj,fadeToGainID,(float)gain,time);
 }
 
 scalar JAudio::getGain() const{

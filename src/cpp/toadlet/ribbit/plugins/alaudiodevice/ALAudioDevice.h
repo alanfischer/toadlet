@@ -79,9 +79,6 @@ public:
 	void checkinSourceHandle(ALAudio *audio,ALuint source);
 	int getBufferFadeTime() const{return mBufferFadeTime;}
 
-	void lock(){mMutex.lock();}
-	void unlock(){mMutex.unlock();}
-
 	static ALenum getALFormat(AudioFormat *format);
 
 	egg::math::Vector3 cacheVector3;
@@ -93,8 +90,6 @@ protected:
 	Collection<unsigned int> mSourcePool;
 	Collection<unsigned int> mAllSources;
 	int mBufferFadeTime;
-
-	Mutex mMutex;
 
 	AudioCaps mCaps;
 

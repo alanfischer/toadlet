@@ -142,22 +142,12 @@ public class ATAudio implements Audio,AudioTrack.OnPlaybackPositionUpdateListene
 		return mDesiredState==AudioTrack.PLAYSTATE_STOPPED && mCurrentState==AudioTrack.PLAYSTATE_STOPPED;
 	}
 
-	/// @todo: enable looping
-	public void setLooping(boolean looping){}
-	public boolean getLooping(){return false;}
+	public void setLooping(boolean looping){mLooping=looping;}
+	public boolean getLooping(){return mLooping;}
 
-	public void setGain(float gain){
-		mGain=gain;
-	}
-	
-	public void fadeToGain(float gain,int time){
-		/// @todo: enable fading to gain
-		mGain=gain;
-	}
-	
+	public void setGain(float gain){mGain=gain;}
 	public float getGain(){return mGain;}
 
-	/// @todo: enable pitch
 	public void setPitch(float pitch){}
 	public float getPitch(){return 1.0f;}
 
@@ -178,7 +168,17 @@ public class ATAudio implements Audio,AudioTrack.OnPlaybackPositionUpdateListene
 
 			if(amount>=0 && amount<mStreamData.length){
 				if(mAudioBuffer!=null){
-					mAudioTrack.stop();
+					if(mLooping){
+						if(mAudioBuffer!=null){
+							mBufferPosition=0;
+						}
+						if(mAudioStream!=null){
+							mAudioStream.reset();
+						}
+					}
+					else{
+						mAudioTrack.stop();
+					}
 				}
 				if(mAudioStream!=null){
 					java.util.Arrays.fill(mStreamData,amount,mStreamData.length-amount,(byte)0);
@@ -244,6 +244,7 @@ public class ATAudio implements Audio,AudioTrack.OnPlaybackPositionUpdateListene
 	AudioStream mAudioStream;
 	AudioTrack mAudioTrack;
 	float mGain,mAudioGain;
+	boolean mLooping;
 	byte[] mStreamData;
 	int mBufferPosition;
 	int mDesiredState,mCurrentState;
