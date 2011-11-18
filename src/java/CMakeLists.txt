@@ -35,6 +35,8 @@ set (CMAKE_Java_CREATE_STATIC_LIBRARY
 	"<CMAKE_Java_ARCHIVE> -cf <TARGET> -C <OBJECT_DIR>/${JAVA_OBJ} ."
 )
 
+# Include the base directory
+include_directories (.)
 
 # toadlet_peeper
 set (PEEPER_OBJ_DIR ${CMAKE_CURRENT_BINARY_DIR}/CMakeFiles/jtoadlet_peeper.dir/${JAVA_OBJ})
@@ -72,7 +74,6 @@ set (RIBBIT_SRC
 	${JAVA_SRC_DIR}/ribbit/AudioCaps.java
 	${JAVA_SRC_DIR}/ribbit/AudioDevice.java
 	${JAVA_SRC_DIR}/ribbit/ATAudioBuffer.java
-	${JAVA_SRC_DIR}/ribbit/ATAudioRegister.java
 	${JAVA_SRC_DIR}/ribbit/ATAudio.java
 	${JAVA_SRC_DIR}/ribbit/ATAudioDevice.java
 	${JAVA_SRC_DIR}/ribbit/NAudioStream.java

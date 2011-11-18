@@ -170,6 +170,7 @@ set (TADPOLE_STUDIO_SRC
 )
 
 set (TADPOLE_TERRAIN_SRC
+	terrain/DiffuseTerrainMaterialSource.cpp
 	terrain/TerrainNode.cpp
 	terrain/TerrainPatchNode.cpp
 )
@@ -382,7 +383,9 @@ set (TADPOLE_STUDIO_HEADERS
 )
 
 set (TADPOLE_TERRAIN_HEADERS
+	terrain/DiffuseTerrainMaterialSource.h
 	terrain/TerrainNodeDataSource.h
+	terrain/TerrainNodeMaterialSource.h
 	terrain/TerrainNodeListener.h
 	terrain/TerrainNode.h
 	terrain/TerrainPatchNode.h

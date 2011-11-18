@@ -32,15 +32,6 @@ namespace creator{
 
 DiffuseMaterialCreator::DiffuseMaterialCreator(Engine *engine){
 	mEngine=engine;
-	createShaders();
-}
-
-void DiffuseMaterialCreator::destroy(){
-	destroyShaders();
-}
-
-void DiffuseMaterialCreator::createShaders(){
-	destroyShaders();
 
 	String profiles[]={
 		"glsl",
@@ -243,7 +234,7 @@ void DiffuseMaterialCreator::createShaders(){
 	mPointSpriteFragmentShader=mEngine->getShaderManager()->createShader(Shader::ShaderType_FRAGMENT,profiles,pointSpriteFragmentCode,2);
 }
 
-void DiffuseMaterialCreator::destroyShaders(){
+void DiffuseMaterialCreator::destroy(){
 	if(mDiffuseVertexShader!=NULL){
 		mDiffuseVertexShader->release();
 		mDiffuseVertexShader=NULL;

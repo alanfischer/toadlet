@@ -65,11 +65,8 @@ RenderPass::ptr RenderPath::addPass(RenderPass::ptr pass){
 }
 
 bool RenderPath::isDepthSorted() const{
-	int i;
-	for(i=0;i<mPasses.size();++i){
-		if(mPasses[i]->isDepthSorted()){
-			return true;
-		}
+	if(mPasses.size()>0 && mPasses[0]->isDepthSorted()){
+		return true;
 	}
 	return false;
 }
