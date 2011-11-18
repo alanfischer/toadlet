@@ -85,9 +85,7 @@ protected:
 	ALuint mHandle;
 	ALuint *mStreamingBuffers;
 	int mTotalBuffersPlayed,mTotalBuffersQueued;
-	scalar mTargetGain;
 	scalar mGain;
-	int mFadeTime;
 	AudioBuffer::ptr mAudioBuffer;
 	AudioStream::ptr mAudioStream;
 

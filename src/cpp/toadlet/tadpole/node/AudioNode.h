@@ -58,7 +58,6 @@ public:
 	inline bool getFinished() const{if(mAudio!=NULL){return mAudio->getFinished();}else{return false;}}
 
 	inline void setGain(scalar gain){if(mAudio!=NULL){mAudio->setGain(gain);}}
-	inline void fadeToGain(scalar gain,int time){if(mAudio!=NULL){mAudio->fadeToGain(gain,time);}}
 	inline scalar getGain() const{if(mAudio!=NULL){return mAudio->getGain();}else{return 0;}}
 
 	inline void setLooping(bool looping){if(mAudio!=NULL){mAudio->setLooping(looping);}}

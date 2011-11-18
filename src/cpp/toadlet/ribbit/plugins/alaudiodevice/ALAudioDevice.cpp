@@ -236,12 +236,10 @@ void ALAudioDevice::update(int dt){
 	alcMakeContextCurrent(mContext);
 	TOADLET_CHECK_ALERROR("alcMakeContextCurrent");
 
-	lock();
-		int i;
-		for(i=0;i<mAudios.size();++i){
-			mAudios[i]->update(dt);
-		}
-	unlock();
+	int i;
+	for(i=0;i<mAudios.size();++i){
+		mAudios[i]->update(dt);
+	}
 }
 
 void ALAudioDevice::setListenerTranslate(const Vector3 &translate){

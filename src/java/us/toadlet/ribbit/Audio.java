@@ -42,7 +42,6 @@ public interface Audio{
 	public boolean getLooping();
 
 	public void setGain(float gain);
-	public void fadeToGain(float gain,int time);
 	public float getGain();
 
 	public void setPitch(float pitch);

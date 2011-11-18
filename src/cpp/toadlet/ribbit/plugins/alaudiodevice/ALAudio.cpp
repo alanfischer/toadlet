@@ -45,15 +45,12 @@ ALAudio::ALAudio(ALAudioDevice *audioDevice):
 	mHandle(0),
 	mStreamingBuffers(NULL),
 	mTotalBuffersPlayed(0),mTotalBuffersQueued(0),
-	mTargetGain(0),
-	mGain(0),
-	mFadeTime(0)
+	mGain(0)
 	//mAudioBuffer,
 	//mAudioStream,
 {
 	mDevice=audioDevice;
 
-	mTargetGain=Math::ONE;
 	mGain=Math::ONE;
 }
 
@@ -95,9 +92,7 @@ bool ALAudio::create(AudioStream::ptr stream){
 	mAudioStream=stream;
 	mAudioBuffer=NULL;
 
-	mDevice->lock();
-		update(0);
-	mDevice->unlock();
+	update(0);
 
 	if(alIsSource(mHandle)){
 		alSourceStop(mHandle);
@@ -221,21 +216,9 @@ bool ALAudio::getLooping() const{
 }
 
 void ALAudio::setGain(scalar gain){
-	if(mDevice!=NULL){
-		mDevice->lock();
-			setImmediateGain(gain);
-			mTargetGain=gain;
-			mFadeTime=0;
-		mDevice->unlock();
-	}
-}
-
-void ALAudio::fadeToGain(scalar gain,int time){
-	if(mDevice!=NULL){
-		mDevice->lock();
-			mTargetGain=gain;
-			mFadeTime=time;
-		mDevice->unlock();
+	mGain=gain;
+	if(alIsSource(mHandle)){
+		alSourcef(mHandle,AL_GAIN,MathConversion::scalarToFloat(gain));
 	}
 }
 
@@ -306,27 +289,6 @@ void ALAudio::setVelocity(const Vector3 &velocity){
 }
 
 void ALAudio::update(int dt){
-	scalar fdt=Math::fromMilli(dt);
-	if(mGain!=mTargetGain){
-		scalar speed=Math::div(fdt,Math::fromMilli(mFadeTime));
-		if(mGain<mTargetGain){
-			mGain+=speed;
-			if(mGain>mTargetGain){
-				mGain=mTargetGain;
-				mFadeTime=0;
-			}
-		}
-		else{
-			mGain-=speed;
-			if(mGain<mTargetGain){
-				mGain=mTargetGain;
-				mFadeTime=0;
-			}
-		}
-
-		setImmediateGain(mGain);
-	}
-
 	if(mAudioStream!=NULL){
 		updateStreaming(dt);
 	}
@@ -399,15 +361,6 @@ int ALAudio::readAudioData(tbyte *buffer,int bsize){
 	#endif
 
 	return amount;
-}
-
-void ALAudio::setImmediateGain(scalar gain){
-	if(mDevice!=NULL){
-		mGain=gain;
-		if(alIsSource(mHandle)){
-			alSourcef(mHandle,AL_GAIN,MathConversion::scalarToFloat(gain));
-		}
-	}
 }
 
 }

@@ -54,7 +54,6 @@ public:
 	bool getLooping() const{return mLooping;}
 
 	void setGain(scalar gain){mGain=gain;}
-	void fadeToGain(scalar gain,int time){mGain=gain;}
 	scalar getGain() const{return mGain;}
 
 	void setPitch(scalar pitch){mPitch=pitch;}
