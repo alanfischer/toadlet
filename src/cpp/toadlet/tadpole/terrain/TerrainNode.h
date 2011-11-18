@@ -28,6 +28,7 @@
 
 #include <toadlet/tadpole/node/PartitionNode.h>
 #include <toadlet/tadpole/terrain/TerrainNodeDataSource.h>
+#include <toadlet/tadpole/terrain/TerrainNodeMaterialSource.h>
 #include <toadlet/tadpole/terrain/TerrainNodeListener.h>
 #include <toadlet/tadpole/terrain/TerrainPatchNode.h>
 
@@ -61,6 +62,9 @@ public:
 
 	void setMaterial(Material::ptr material);
 	Material::ptr getMaterial() const{return mPatchMaterial;}
+
+	void setMaterialSource(TerrainNodeMaterialSource *materialSource);
+	TerrainNodeMaterialSource *getMaterialSource(){return mMaterialSource;}
 
 	void setWaterMaterial(Material::ptr material);
 	Material::ptr getWaterMaterial() const{return mPatchWaterMaterial;}
@@ -121,6 +125,7 @@ protected:
 	TerrainNodeListener *mListener;
 	Node::ptr mTarget;
 	TerrainNodeDataSource *mDataSource;
+	TerrainNodeMaterialSource *mMaterialSource;
 	int mSize,mHalfSize;
 	int mTerrainX,mTerrainY;
 	Collection<TerrainPatchNode::ptr> mUnactivePatches;

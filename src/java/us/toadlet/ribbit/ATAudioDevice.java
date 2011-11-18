@@ -28,7 +28,7 @@ package us.toadlet.ribbit;
 import android.os.Handler;
 import android.os.Looper;
 
-public class ATAudioDevice implements AudioDevice,ATAudioRegister,Runnable{
+public class ATAudioDevice implements AudioDevice,Runnable{
 	public ATAudioDevice(){
 		mCaps=new AudioCaps();
 		mCaps.maxSources=16;

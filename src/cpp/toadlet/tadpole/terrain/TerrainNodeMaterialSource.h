@@ -23,9 +23,24 @@
  *
  ********** Copyright header - do not remove **********/
 
-package us.toadlet.ribbit;
+#ifndef TOADLET_TADPOLE_TERRAIN_TERRAINNODEMATERIALSOURCE_H
+#define TOADLET_TADPOLE_TERRAIN_TERRAINNODEMATERIALSOURCE_H
 
-public interface ATAudioRegister{
-	public void registerAudio(Audio audio);
-	public void unregisterAudio(Audio audio);
+#include <toadlet/tadpole/Types.h>
+
+namespace toadlet{
+namespace tadpole{
+namespace terrain{
+
+class TerrainPatchNode;
+
+class TerrainNodeMaterialSource{
+public:
+	virtual Material::ptr getMaterial(TerrainPatchNode *patch)=0;
+};
+
 }
+}
+}
+
+#endif

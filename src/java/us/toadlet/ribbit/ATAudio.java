@@ -30,7 +30,7 @@ import android.media.AudioFormat;
 import android.media.AudioManager;
 
 public class ATAudio implements Audio,AudioTrack.OnPlaybackPositionUpdateListener{
-	public ATAudio(ATAudioRegister device){
+	public ATAudio(ATAudioDevice device){
 		mGain=1.0f;
 		mAudioGain=1.0f;
 		mDevice=device;
@@ -239,7 +239,7 @@ public class ATAudio implements Audio,AudioTrack.OnPlaybackPositionUpdateListene
 		mAudioTrack.setPositionNotificationPeriod(available/format.frameSize());
 	}
 	
-	ATAudioRegister mDevice;
+	ATAudioDevice mDevice;
 	ATAudioBuffer mAudioBuffer;
 	AudioStream mAudioStream;
 	AudioTrack mAudioTrack;

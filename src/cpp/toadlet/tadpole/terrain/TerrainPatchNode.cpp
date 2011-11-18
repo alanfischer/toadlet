@@ -23,7 +23,8 @@
 #include <toadlet/tadpole/Scene.h>
 #include <toadlet/tadpole/terrain/TerrainPatchNode.h>
 
-#include <toadlet/egg/System.h>
+#include <toadlet/tadpole/handler/BMPHandler.h>
+#include <toadlet/egg/io/FileStream.h>
 
 namespace toadlet{
 namespace tadpole{
@@ -89,7 +90,7 @@ void TerrainPatchNode::destroy(){
 	if(mMaterial!=NULL){
 		mMaterial->destroy();
 		mMaterial=NULL;
-	} 
+	}
 	if(mVertexBuffer!=NULL){
 		mVertexBuffer->destroy();
 		mVertexBuffer=NULL;
@@ -105,6 +106,13 @@ void TerrainPatchNode::destroy(){
 	if(mIndexData!=NULL){
 		mIndexData->destroy();
 		mIndexData=NULL;
+	}
+	int i;
+	for(i=0;i<mLayerTextures.size();++i){
+		if(mLayerTextures[i]!=NULL){
+			mLayerTextures[i]->release();
+			mLayerTextures[i]=NULL;
+		}
 	}
 
 	if(mWaterMaterial!=NULL){
@@ -316,15 +324,22 @@ inline scalar calculateLayerWeight(tbyte *data,int rowPitch,int size,int layer,i
 
 bool TerrainPatchNode::setLayerData(tbyte *data,int rowPitch,int width,int height){
 	if(width!=mSize || height!=mSize){
-		Error::invalidParameters(Categories::TOADLET_TADPOLE_TERRAIN,"width or height !=size");
+		Error::invalidParameters(Categories::TOADLET_TADPOLE_TERRAIN,"width or height != size");
 		return false;
 	}
 
-	int numLayers=0;
 	int i,j;
-	for(j=0;j<mSize;++j){
-		for(i=0;i<mSize;++i){
-			numLayers=Math::maxVal(data[rowPitch*j+i],numLayers);
+	for(i=0;i<mLayerTextures.size();++i){
+		if(mLayerTextures[i]!=NULL){
+			mLayerTextures[i]->release();
+			mLayerTextures[i]=NULL;
+		}
+	}
+
+	int numLayers=0;
+	for(j=0;j<height;++j){
+		for(i=0;i<width;++i){
+			numLayers=Math::maxVal(data[rowPitch*j+i]+1,numLayers);
 		}
 	}
 
@@ -333,22 +348,24 @@ bool TerrainPatchNode::setLayerData(tbyte *data,int rowPitch,int width,int heigh
 		return false;
 	}
 
-	mLayerTextures.resize(8);
+	mLayerTextures.resize(numLayers);
 	mLayerData.resize(width*height);
 	memcpy(&mLayerData[0],data,width*height);
 
-	Collection<tbyte> textureData((width*2)*(height*2));
+	Collection<tbyte> textureData((width*2)*(height*2)*2);
 	tbyte *tdata=&textureData[0];
 	int textureRowPitch=width*2;
 
 	int k;
 	for(k=0;k<numLayers;++k){
-		for(j=0;j<mSize;++j){
-			for(i=0;i<mSize;++i){
-				tdata[(j*2+0) * textureRowPitch + i*2+0]=calculateLayerWeight(data,rowPitch,mSize,k,i,j,-0.25,-0.25)*255;
-				tdata[(j*2+0) * textureRowPitch + i*2+1]=calculateLayerWeight(data,rowPitch,mSize,k,i,j,0.25,-0.25)*255;
-				tdata[(j*2+1) * textureRowPitch + i*2+0]=calculateLayerWeight(data,rowPitch,mSize,k,i,j,-0.25,0.25)*255;
-				tdata[(j*2+1) * textureRowPitch + i*2+1]=calculateLayerWeight(data,rowPitch,mSize,k,i,j,0.25,0.25)*255;
+		for(j=0;j<width;++j){
+			for(i=0;i<height;++i){
+				int p0=(j*2+0) * textureRowPitch + i*2;
+				int p1=(j*2+1) * textureRowPitch + i*2;
+				tdata[p0+0]=calculateLayerWeight(data,rowPitch,mSize,k,i,j,-0.25,-0.25)*255;
+				tdata[p0+1]=calculateLayerWeight(data,rowPitch,mSize,k,i,j,0.25,-0.25)*255;
+				tdata[p1+0]=calculateLayerWeight(data,rowPitch,mSize,k,i,j,-0.25,0.25)*255;
+				tdata[p1+1]=calculateLayerWeight(data,rowPitch,mSize,k,i,j,0.25,0.25)*255;
 			}
 		}
 
@@ -603,7 +620,7 @@ void TerrainPatchNode::gatherRenderables(CameraNode *camera,RenderableSet *set){
 		#endif
 	}
 
-	if(mWaterRenderable!=NULL){
+	if(mWaterRenderable!=NULL && mWaterMaterial!=NULL){
 		updateWaterIndexBuffers(camera);
 
 		if(mWaterIndexData->getCount()>0){
@@ -636,9 +653,6 @@ void TerrainPatchNode::updateWaterIndexBuffers(CameraNode *camera){
 }
 
 void TerrainPatchNode::render(SceneRenderer *renderer) const{
-	renderer->getDevice()->setTexture(1,mLayerTextures[0]);
-	renderer->getDevice()->setTexture(3,mLayerTextures[1]);
-
 	renderer->getDevice()->renderPrimitive(mVertexData,mIndexData);
 }
 
