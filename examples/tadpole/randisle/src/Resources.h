@@ -34,8 +34,8 @@ public:
 		Logger::alert("Loading terrain");
 
 		seafloorTexture=engine->getTextureManager()->findTexture("seafloor.png");
-		grassTexture=engine->getTextureManager()->findTexture("grass.png");
 		rockTexture=engine->getTextureManager()->findTexture("rock.png");
+		grassTexture=engine->getTextureManager()->findTexture("grass.png");
 
 		Logger::alert("Loading water");
 		waterMaterial=engine->getMaterialManager()->createMaterial();
@@ -350,7 +350,7 @@ public:
 	int patchSize;
 	scalar tolerance;
 	Vector4 skyColor,fadeColor;
-	Texture::ptr seafloorTexture,grassTexture,rockTexture;
+	Texture::ptr seafloorTexture,rockTexture,grassTexture;
 	Material::ptr waterMaterial;
 	Mesh::ptr creature;
 	Mesh::ptr shadow;
