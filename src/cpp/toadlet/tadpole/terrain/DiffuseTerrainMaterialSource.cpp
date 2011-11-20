@@ -265,6 +265,7 @@ Material::ptr DiffuseTerrainMaterialSource::getMaterial(TerrainPatchNode *patch)
 			pass->getVariables()->addVariable("fogColor",RenderVariable::ptr(new FogColorVariable()),Material::Scope_MATERIAL);
 
 			pass->setTexture(0,mDiffuseTextures.size()>0?mDiffuseTextures[0]:NULL);
+			pass->setTextureState(0,scaleState);
 		}
 
 		int i;
@@ -291,11 +292,13 @@ Material::ptr DiffuseTerrainMaterialSource::getMaterial(TerrainPatchNode *patch)
 			pass->getVariables()->addVariable("fogColor",RenderVariable::ptr(new FogColorVariable()),Material::Scope_MATERIAL);
 
 			pass->setTexture(0,mDiffuseTextures.size()>i?mDiffuseTextures[i]:NULL);
+			pass->setTextureState(0,scaleState);
 			pass->setTexture(1,patch->getLayerTexture(i));
+			pass->setTextureState(1,layerState);
 			pass->setSamplerState(1,clampState);
 		}
 	}
-	
+
 	if(mEngine->hasFixed(Shader::ShaderType_VERTEX) && mEngine->hasFixed(Shader::ShaderType_FRAGMENT)){
 		RenderPath::ptr fixedPath=material->addPath();
 

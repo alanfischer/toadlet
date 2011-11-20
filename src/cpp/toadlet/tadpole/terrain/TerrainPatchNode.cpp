@@ -369,9 +369,9 @@ bool TerrainPatchNode::setLayerData(tbyte *data,int rowPitch,int width,int heigh
 			}
 		}
 
-		mLayerTextures[k]=mEngine->getTextureManager()->createTexture(Texture::Usage_BIT_STREAM,TextureFormat::Dimension_D2,TextureFormat::Format_A_8,width*2,height*2,1,0,&tdata);
+		mLayerTextures[k]=mEngine->getTextureManager()->createTexture(Texture::Usage_BIT_STATIC,TextureFormat::Dimension_D2,TextureFormat::Format_A_8,width*2,height*2,1,0,&tdata);
 	}
-
+	
 	return true;
 }
 

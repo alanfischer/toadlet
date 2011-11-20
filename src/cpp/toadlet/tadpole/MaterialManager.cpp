@@ -224,6 +224,13 @@ void MaterialManager::contextActivate(RenderDevice *renderDevice){
 			shared_static_cast<BackableShaderState>(shaderState)->setBack(back);
 		}
 	}
+
+	for(i=0;i<mResources.size();++i){
+		Material *material=(Material*)mResources.at(i).get();
+		if(material!=NULL){
+			compileMaterial(material);
+		}
+	}
 }
 
 void MaterialManager::contextDeactivate(RenderDevice *renderDevice){
@@ -272,9 +279,10 @@ bool MaterialManager::isPathUseable(RenderPath *path,const RenderCaps &caps){
 				if(state->getShader((Shader::ShaderType)j)!=NULL && caps.hasShader[j]==false){
 					break;
 				}
-				else if(j<=Shader::ShaderType_FRAGMENT){
-					break;
-				}
+			}
+
+			if(j!=Shader::ShaderType_MAX){
+				break;
 			}
 		}
 	}
