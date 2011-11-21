@@ -214,15 +214,15 @@ file (APPEND ${HEADER_FILE} "\n")
 file (APPEND ${HEADER_FILE} "#endif\n")
 
 
+# Setup toadlet configure file
+configure_file (${CMAKE_CURRENT_SOURCE_DIR}/Config.h.cmake ${CMAKE_CURRENT_BINARY_DIR}/Config.h)
+
+
 # Install header files
-install (DIRECTORY ${toadlet_SOURCE_DIR}/src/cpp/toadlet DESTINATION include FILES_MATCHING PATTERN "*.h")
 install (FILES ${toadlet_BINARY_DIR}/src/cpp/toadlet/Config.h DESTINATION include/toadlet)
 foreach (TOADLET_LIBRARY ${TOADLET_LIBRARY_LIST})
+	install (DIRECTORY ${toadlet_SOURCE_DIR}/src/cpp/toadlet/${TOADLET_LIBRARY}  DESTINATION include/toadlet/${TOADLET_LIBRARY} FILES_MATCHING PATTERN "*.h")
 	install (FILES ${toadlet_BINARY_DIR}/src/cpp/toadlet/${TOADLET_LIBRARY}.h DESTINATION include/toadlet)
 endforeach (TOADLET_LIBRARY)
 install (FILES ${toadlet_BINARY_DIR}/src/cpp/toadlet/toadlet.h DESTINATION include/toadlet)
-
-
-# Setup toadlet configure file
-configure_file (${CMAKE_CURRENT_SOURCE_DIR}/Config.h.cmake ${CMAKE_CURRENT_BINARY_DIR}/Config.h)
 
