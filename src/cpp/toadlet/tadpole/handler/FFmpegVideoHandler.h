@@ -128,7 +128,6 @@ protected:
 	tbyte *mIOBuffer;
     AVFormatContext *mFormatCtx;
 	StreamData mStreams[AVMEDIA_TYPE_NB];
-	AVPacket mFlushPkt;
 	TextureFormat::ptr mVideoFormat;
 
 	State mState;

@@ -436,7 +436,9 @@ const String &String::operator=(const String &string){
 	if(this==&string){
 		return *this;
 	}
+
 	clearExtraData();
+
 	mLength=string.mLength;
 	delete[] mData;
 	mData=new stringchar[mLength+1];

@@ -376,9 +376,15 @@ void FFmpegController::destroy(){
 		int i;
 		for(i=0;i<mFormatCtx->nb_streams;++i){
 			int type=mFormatCtx->streams[i]->codec->codec_type;
-			if(type>=0 && type<AVMEDIA_TYPE_NB && mStreams[type].codecCtx!=NULL){
-				avcodec_close(mStreams[type].codecCtx);
-				mStreams[type].codecCtx=NULL;
+			if(type>=0 && type<AVMEDIA_TYPE_NB){
+				StreamData *stream=&mStreams[type];
+				if(stream->codecCtx!=NULL){
+					avcodec_close(stream->codecCtx);
+					stream->codecCtx=NULL;
+				}
+				if(stream->queue!=NULL){
+					stream->queue->flush();
+				}
 			}
 		}
 
@@ -391,10 +397,10 @@ void FFmpegController::destroy(){
 		mIOCtx=NULL;
 	}
 
-	if(mIOBuffer!=NULL){
-		av_free(mIOBuffer);
-		mIOBuffer=NULL;
-	}
+//	if(mIOBuffer!=NULL){
+//		av_free(mIOBuffer);
+//		mIOBuffer=NULL;
+//	}
 
 	mStream=NULL;
 }
