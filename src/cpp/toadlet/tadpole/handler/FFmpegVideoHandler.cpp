@@ -174,12 +174,24 @@ FFmpegVideoStream::~FFmpegVideoStream(){
 void FFmpegVideoStream::close(){
 	if(mDeinterlacedFrame!=NULL){
 		avpicture_free((AVPicture*)mDeinterlacedFrame);
+		av_free(mDeinterlacedFrame);
 		mDeinterlacedFrame=NULL;
 	}
 
 	if(mTextureFrame!=NULL){
 		avpicture_free((AVPicture*)mTextureFrame);
+		av_free(mTextureFrame);
 		mTextureFrame=NULL;
+	}
+
+	if(mVideoFrame!=NULL){
+		av_free(mVideoFrame);
+		mVideoFrame=NULL;
+	}
+
+	if(mSwsCtx!=NULL){
+		sws_freeContext(mSwsCtx);
+		mSwsCtx=NULL;
 	}
 
 	if(mPkt.data!=NULL){
@@ -361,6 +373,15 @@ void FFmpegController::destroy(){
 	}
 
 	if(mFormatCtx!=NULL){
+		int i;
+		for(i=0;i<mFormatCtx->nb_streams;++i){
+			int type=mFormatCtx->streams[i]->codec->codec_type;
+			if(type>=0 && type<AVMEDIA_TYPE_NB && mStreams[type].codecCtx!=NULL){
+				avcodec_close(mStreams[type].codecCtx);
+				mStreams[type].codecCtx=NULL;
+			}
+		}
+
 		av_close_input_stream(mFormatCtx);
 		mFormatCtx=NULL;
 	}
@@ -370,18 +391,24 @@ void FFmpegController::destroy(){
 		mIOCtx=NULL;
 	}
 
-	// Going to try to just see if this is taken care of by FFmpeg.
-//	if(mIOBuffer!=NULL){
-//		av_free(mIOBuffer);
-//		mIOBuffer=NULL;
-//	}
+	if(mIOBuffer!=NULL){
+		av_free(mIOBuffer);
+		mIOBuffer=NULL;
+	}
 
 	mStream=NULL;
 }
 
 void FFmpegController::setTexture(Texture::ptr texture){
+	if(mTexture!=NULL){
+		mTexture->release();
+	}
+
 	mTexture=texture;
-	mTexture->retain();
+
+	if(mTexture!=NULL){
+		mTexture->retain();
+	}
 
 	StreamData *videoStreamData=&mStreams[AVMEDIA_TYPE_VIDEO];
 	if(videoStreamData->codecCtx!=NULL && mVideoStream==NULL){
