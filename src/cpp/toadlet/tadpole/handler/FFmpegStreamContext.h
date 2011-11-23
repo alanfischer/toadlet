@@ -12,6 +12,8 @@ extern "C"{
 	#include <libavformat/avformat.h>
 }
 
-int toadlet_ffmpeg_stream_context(ByteIOContext *context,toadlet::egg::io::Stream *stream,unsigned char *buffer,int size);
+int toadlet_read_packet(void *opaque,uint8_t *buf,int buf_size);
+int toadlet_write_packet(void *opaque,uint8_t *buf,int buf_size);
+int64_t toadlet_seek(void *opaque,int64_t offset,int whence);
 
 #endif
