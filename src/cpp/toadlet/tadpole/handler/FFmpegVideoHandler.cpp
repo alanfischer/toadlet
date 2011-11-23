@@ -146,6 +146,7 @@ FFmpegVideoStream::FFmpegVideoStream(FFmpegController *controller,FFmpegControll
 	mStreamData=streamData;
 	mTexture=texture;
 	av_init_packet(&mPkt);
+	mPkt.data=NULL;
 
 	AVCodecContext *ctx=mStreamData->codecCtx;
 	TextureFormat::ptr textureFormat=mTexture->getFormat();
@@ -369,10 +370,11 @@ void FFmpegController::destroy(){
 		mIOCtx=NULL;
 	}
 
-	if(mIOBuffer!=NULL){
-		av_free(mIOBuffer);
-		mIOBuffer=NULL;
-	}
+	// Going to try to just see if this is taken care of by FFmpeg.
+//	if(mIOBuffer!=NULL){
+//		av_free(mIOBuffer);
+//		mIOBuffer=NULL;
+//	}
 
 	mStream=NULL;
 }
