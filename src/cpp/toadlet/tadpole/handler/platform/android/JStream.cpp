@@ -35,7 +35,8 @@ JStream::JStream(JNIEnv *env1,jobject streamObj):
 	istreamClass(NULL),ostreamClass(NULL),
 	istreamObj(NULL),ostreamObj(NULL),
 	bufferLength(0),
-	bufferObj(NULL)
+	bufferObj(NULL),
+	current(0)
 {
 	env=env1;
 
@@ -119,9 +120,14 @@ int JStream::read(tbyte *buffer,int length){
 		if(a>0){
 			env->GetByteArrayRegion(bufferObj,0,a,(jbyte*)buffer+amount);
 		}
+		else{
+			break;
+		}
 		length-=a;
 		amount+=a;
+		current+=a;
 	}
+
 	return amount;
 }
 
@@ -142,6 +148,7 @@ int JStream::write(const tbyte *buffer,int length){
 		}
 		length-=a;
 		amount+=a;
+		current+=a;
 	}
 	return amount;
 }
@@ -157,6 +164,9 @@ bool JStream::reset(){
 		env->ExceptionClear();
 		return false;
 	}
+	
+	current=0;
+	
 	return true;
 }
 
@@ -165,18 +175,32 @@ int JStream::length(){
 		return 0;
 	}
 
-	int l=env->CallIntMethod(istreamObj,availableIStreamID);
+	int available=env->CallIntMethod(istreamObj,availableIStreamID);
 	if(env->ExceptionOccurred()!=NULL){
 		env->ExceptionDescribe();
 		env->ExceptionClear();
 		return 0;
 	}
-	return l;
+	return current+available;
 }
 
-int JStream::position(){return -1;}
+int JStream::position(){return current;}
 
-bool JStream::seek(int offs){return false;}
+bool JStream::seek(int offs){
+	if(reset()==false){
+		return false;
+	}
+	
+	env->CallLongMethod(istreamObj,skipIStreamID,offs);
+	if(env->ExceptionOccurred()!=NULL){
+		env->ExceptionDescribe();
+		env->ExceptionClear();
+		return false;
+	}
+
+	current=offs;
+	return true;
+}
 
 }
 }

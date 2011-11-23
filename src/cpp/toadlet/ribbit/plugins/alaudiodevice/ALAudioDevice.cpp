@@ -55,9 +55,11 @@ TOADLET_C_API AudioDevice* new_ALAudioDevice(){
 	}
 #endif
 
+ALCcontext *ALAudioDevice::mContext=NULL;
+
 ALAudioDevice::ALAudioDevice():
 	mDevice(NULL),
-	mContext(NULL),
+	//mContext(NULL),
 	//mAudios,
 	//mSourcePool,
 	//mAllSources,
@@ -79,6 +81,12 @@ ALAudioDevice::~ALAudioDevice(){
 bool ALAudioDevice::create(int *options){
 	Logger::alert(Categories::TOADLET_RIBBIT,
 		"creating ALAudioDevice");
+
+	if(mContext!=NULL){
+		Error::unknown(Categories::TOADLET_RIBBIT,
+			"only 1 OpenAL context available at a time");
+		return false;
+	}
 
 	if(options!=NULL){
 		int i=0;
@@ -174,6 +182,9 @@ void ALAudioDevice::destroy(){
 	Logger::alert(Categories::TOADLET_RIBBIT,
 		"destroying ALAudioDevice");
 
+	alcMakeContextCurrent(mContext);
+	TOADLET_CHECK_ALERROR("alcMakeContextCurrent");
+
 	int i;
 	for(i=0;i<mAudios.size();++i){
 		mAudios[i]->mDevice=NULL;
@@ -203,21 +214,32 @@ Audio *ALAudioDevice::createAudio(){
 	return new ALAudio(this);
 }
 
-void ALAudioDevice::suspend(){
-	alcSuspendContext(mContext);
+void deactivate();
+
+void ALAudioDevice::activate(){
+	alcMakeContextCurrent(mContext);
+	TOADLET_CHECK_ALERROR("alcMakeContextCurrent");
+
+	alcProcessContext(mContext);
+	TOADLET_CHECK_ALERROR("alcProcessContext");
 }
 
-void ALAudioDevice::resume(){
-	alcProcessContext(mContext);
+void ALAudioDevice::deactivate(){
+	alcSuspendContext(mContext);
+	TOADLET_CHECK_ALERROR("alcSuspendContext");
+
+	alcMakeContextCurrent(NULL);
+	TOADLET_CHECK_ALERROR("alcMakeContextCurrent");
 }
 
 void ALAudioDevice::update(int dt){
-	lock();
-		int i;
-		for(i=0;i<mAudios.size();++i){
-			mAudios[i]->update(dt);
-		}
-	unlock();
+	alcMakeContextCurrent(mContext);
+	TOADLET_CHECK_ALERROR("alcMakeContextCurrent");
+
+	int i;
+	for(i=0;i<mAudios.size();++i){
+		mAudios[i]->update(dt);
+	}
 }
 
 void ALAudioDevice::setListenerTranslate(const Vector3 &translate){
@@ -295,23 +317,22 @@ void ALAudioDevice::checkinSourceHandle(ALAudio *audio,ALuint source){
 	mAudios.remove(audio);
 }
 
-ALenum ALAudioDevice::getALFormat(int bitsPerSample,int channels){
-	ALenum format=0;
-
-	if(bitsPerSample==8 && channels==1){
-		format=AL_FORMAT_MONO8;
+ALenum ALAudioDevice::getALFormat(AudioFormat *format){
+	if(format->bitsPerSample==8 && format->channels==1){
+		return AL_FORMAT_MONO8;
 	}
-	else if(bitsPerSample==16 && channels==1){
-		format=AL_FORMAT_MONO16;
+	else if(format->bitsPerSample==16 && format->channels==1){
+		return AL_FORMAT_MONO16;
 	}
-	else if(bitsPerSample==8 && channels==2){
-		format=AL_FORMAT_STEREO8;
+	else if(format->bitsPerSample==8 && format->channels==2){
+		return AL_FORMAT_STEREO8;
 	}
-	else if(bitsPerSample==16 && channels==2){
-		format=AL_FORMAT_STEREO16;
+	else if(format->bitsPerSample==16 && format->channels==2){
+		return AL_FORMAT_STEREO16;
 	}
-
-	return format;
+	else{
+		return 0;
+	}
 }
 
 }

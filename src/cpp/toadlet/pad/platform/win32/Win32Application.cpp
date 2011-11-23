@@ -127,18 +127,8 @@ Win32Application::Win32Application():
 	mSkipNextMove(false),
 
 	mRun(false),
-	#if defined(TOADLET_PLATFORM_WINCE)
-		mAutoActivate(true),
-	#else
-		mAutoActivate(false),
-	#endif
 	mActive(false),
 	mDestroyed(false),
-	#if defined(TOADLET_PLATFORM_WINCE)
-		mStopOnDeactivate(true),
-	#else
-		mStopOnDeactivate(false),
-	#endif
 	mContextActive(false),
 	win32(NULL)
 {
@@ -155,16 +145,6 @@ Win32Application::Win32Application():
 		}
 	#endif
 
-	#if defined(TOADLET_HAS_OPENGL)
-		mRenderDevicePlugins.add("gl",RenderDevicePlugin(
-			#if defined(TOADLET_PLATFORM_WINCE)
-				new_EGLWindowRenderTarget
-			#else
-				new_WGLWindowRenderTarget
-			#endif
-			,new_GLRenderDevice
-		));
-	#endif
 	#if defined(TOADLET_HAS_D3DM)
 		mRenderDevicePlugins.add("d3dm",RenderDevicePlugin(new_D3DMWindowRenderTarget,new_D3DMRenderDevice));
 	#endif
@@ -177,11 +157,21 @@ Win32Application::Win32Application():
 	#if defined(TOADLET_HAS_D3D11)
 		mRenderDevicePlugins.add("d3d11",RenderDevicePlugin(new_D3D11WindowRenderTarget,new_D3D11RenderDevice));
 	#endif
-	mRenderDevicePreferences.add("gl");
+	#if defined(TOADLET_HAS_OPENGL)
+		mRenderDevicePlugins.add("gl",RenderDevicePlugin(
+			#if defined(TOADLET_PLATFORM_WINCE)
+				new_EGLWindowRenderTarget
+			#else
+				new_WGLWindowRenderTarget
+			#endif
+			,new_GLRenderDevice
+		));
+	#endif
 	mRenderDevicePreferences.add("d3d9");
 	mRenderDevicePreferences.add("d3dm");
 	mRenderDevicePreferences.add("d3d10");
 	mRenderDevicePreferences.add("d3d11");
+	mRenderDevicePreferences.add("gl");
 
 	#if defined(TOADLET_HAS_OPENAL)
 		mAudioDevicePlugins.add("al",AudioDevicePlugin(new_ALAudioDevice));
@@ -205,17 +195,19 @@ Win32Application::~Win32Application(){
 	delete win32;
 }
 
-void Win32Application::create(String renderDevice,String audioDevice){
+bool Win32Application::create(String renderDevice,String audioDevice,String motionDevice,String joyDevice){
 	mContextActive=true;
 
 	createWindow();
 	
-	BaseApplication::create(renderDevice,audioDevice);
+	BaseApplication::create(renderDevice,audioDevice,motionDevice,joyDevice);
 
 	mResourceArchive=Win32ResourceArchive::ptr(new Win32ResourceArchive(mEngine->getTextureManager()));
 	mResourceArchive->open(win32->mInstance);
 	mEngine->getArchiveManager()->manage(shared_static_cast<Archive>(mResourceArchive));
 	mEngine->getTextureManager()->addResourceArchive(mResourceArchive);
+
+	return true;
 }
 
 void Win32Application::destroy(){
@@ -335,10 +327,6 @@ void Win32Application::deactivate(){
 		}
 
 		// See Win32Application::activate notes
-		
-		if(mStopOnDeactivate){
-			stop();
-		}
 	}
 }
 
@@ -489,7 +477,12 @@ void Win32Application::setTitle(const String &title){
 	}
 }
 
-const String &Win32Application::getTitle() const{
+String Win32Application::getTitle() const{
+	if(win32->mWnd!=0){
+		TCHAR title[1024];
+		GetWindowText(win32->mWnd,title,1024);
+		mTitle=title;
+	}
 	return mTitle;
 }
 
@@ -636,16 +629,10 @@ LRESULT CALLBACK wndProc(HWND wnd,UINT msg,WPARAM wParam,LPARAM lParam){
 	int key=0;
 	switch(msg){
 		case WM_SETFOCUS:
-			if(application->getAutoActivate()){
-				application->activate();
-			}
 			application->focusGained();
 			return 0;
 		case WM_KILLFOCUS:
 			application->focusLost();
-			if(application->getAutoActivate()){
-				application->deactivate();
-			}
 			return 0;
 		case WM_SETTINGCHANGE:
 			#if defined(TOADLET_PLATFORM_WINCE)

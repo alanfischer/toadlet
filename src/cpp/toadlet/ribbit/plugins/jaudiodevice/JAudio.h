@@ -54,7 +54,6 @@ public:
 	bool getLooping() const;
 
 	void setGain(scalar gain);
-	void fadeToGain(scalar gain,int time);
 	scalar getGain() const;
 
 	void setPitch(scalar pitch){}
@@ -75,7 +74,7 @@ public:
 protected:
 	JNIEnv *env;
 	jobject obj;
-	jmethodID createAudioBufferID,createAudioStreamID,destroyID,playID,stopID,getPlayingID,getFinishedID,setLoopingID,getLoopingID,setGainID,fadeToGainID,getGainID;
+	jmethodID createAudioBufferID,createAudioStreamID,destroyID,playID,stopID,getPlayingID,getFinishedID,setLoopingID,getLoopingID,setGainID,getGainID;
 
 	AudioBuffer::ptr mAudioBuffer;
 	AudioStream::ptr mAudioStream;

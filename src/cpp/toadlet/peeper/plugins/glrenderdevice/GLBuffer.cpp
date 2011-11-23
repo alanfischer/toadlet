@@ -198,7 +198,7 @@ void GLBuffer::destroy(){
 bool GLBuffer::createContext(){
 	bool result=true;
 	if(mDevice->hardwareBuffersSupported(this)){
-		glGenBuffers(1,&mHandle);
+ 		glGenBuffers(1,&mHandle);
 		glBindBuffer(mTarget,mHandle);
 		GLenum usage=getBufferUsage(mUsage,mAccess);
 		glBufferData(mTarget,mDataSize,NULL,usage);

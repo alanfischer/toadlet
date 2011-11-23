@@ -288,7 +288,10 @@ Resource::ptr ResourceManager::findFromFile(const String &name,ResourceData *dat
 					return NULL;
 				}
 
-				Resource::ptr resource=Resource::ptr(streamer->load(stream,data,NULL));
+				Resource::ptr resource;
+				TOADLET_TRY
+					resource=Resource::ptr(streamer->load(stream,data,NULL));
+				TOADLET_CATCH(const Exception &){resource=Resource::ptr();}
 				stream->close();
 
 				Logger::debug(Categories::TOADLET_TADPOLE,

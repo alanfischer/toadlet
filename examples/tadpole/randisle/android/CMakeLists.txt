@@ -7,16 +7,16 @@ set (CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${randisle_SOURCE_DIR}/../../../../
 
 # Find toadlet
 find_package (toadlet REQUIRED)
-find_package (mxml)
 
 # Includes
 include_directories (${randisle_SOURCE_DIR} ${TOADLET_INCLUDE_DIR})
 
 # Libraries
-set (LIBS ${TOADLET_TADPOLE_HOP_LIB_S} ${TOADLET_HOP_LIB_S} ${TOADLET_PAD_LIB_S} ${TOADLET_TADPOLE_LIB_S} ${TOADLET_PEEPER_GLRENDERDEVICE_LIB_S} ${TOADLET_PEEPER_LIB_S} ${TOADLET_RIBBIT_JAUDIODEVICE_LIB_S} ${TOADLET_RIBBIT_LIB_S} ${TOADLET_FLICK_LIB_S} ${TOADLET_EGG_LIB_S})
-# Add required android static libs
-set (LIBS ${LIBS} ${MXML_LIBRARY} GLESv1_CM log)
+set (LIBS ${TOADLET_LIBRARIES_S} GLESv1_CM log)
 
+if (ANDROID_NDK_API_LEVEL >= 9)
+	set (LIBS ${LIBS} android EGL)
+endif (ANDROID_NDK_API_LEVEL >= 9)
 
 # Source files
 set (SRC

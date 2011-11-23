@@ -36,6 +36,7 @@ public:
 	virtual ~LoggerListener(){}
 
 	virtual void addLogEntry(Logger::Category *category,Logger::Level level,uint64 time,const String &text)=0;
+	virtual void flush()=0;
 };
 
 }

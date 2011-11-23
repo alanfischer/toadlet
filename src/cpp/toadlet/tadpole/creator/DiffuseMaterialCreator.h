@@ -42,9 +42,6 @@ public:
 
 	void destroy();
 
-	void createShaders();
-	void destroyShaders();
-
 	Resource::ptr create(const String &name,ResourceData *data,ProgressListener *listener);
 	Material::ptr createDiffuseMaterial(Texture::ptr texture);
 	Material::ptr createPointSpriteMaterial(Texture::ptr texture,scalar size,bool attenuated);

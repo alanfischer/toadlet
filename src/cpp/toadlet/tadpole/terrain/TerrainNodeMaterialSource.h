@@ -23,22 +23,24 @@
  *
  ********** Copyright header - do not remove **********/
 
-package us.toadlet.pad;
+#ifndef TOADLET_TADPOLE_TERRAIN_TERRAINNODEMATERIALSOURCE_H
+#define TOADLET_TADPOLE_TERRAIN_TERRAINNODEMATERIALSOURCE_H
 
-public class NApplicationActivity implements ApplicationActivity{
-	public native NApplicationActivity();
+#include <toadlet/tadpole/Types.h>
 
-	public native void resized(int width,int height);
-	public native void focusGained();
-	public native void focusLost();
-	public native void update(int dt);
-	public native void render(RenderDevice renderDevice);
+namespace toadlet{
+namespace tadpole{
+namespace terrain{
 
-	public native void keyPressed(int key);
-	public native void keyReleased(int key);
+class TerrainPatchNode;
 
-	public native void mousePressed(int x,int y,int button);
-	public native void mouseMoved(int x,int y);
-	public native void mouseReleased(int x,int y,int button);
-	public native void mouseScrolled(int x,int y,int scroll);
+class TerrainNodeMaterialSource{
+public:
+	virtual Material::ptr getMaterial(TerrainPatchNode *patch)=0;
+};
+
 }
+}
+}
+
+#endif

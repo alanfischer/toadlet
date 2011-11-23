@@ -7,18 +7,12 @@ set (CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${myplanet_SOURCE_DIR}/../../../../
 
 # Find toadlet
 find_package (toadlet REQUIRED)
-find_package (mxml REQUIRED)
 
 # Includes
 include_directories (${myplanet_SOURCE_DIR} ${TOADLET_INCLUDE_DIR})
 
 # Libraries
-set (LIBS ${TOADLET_ALL_LIB_S})
-# Add required android static libs
-set (LIBS ${LIBS} ${MXML_LIBRARY} GLESv1_CM log)
-
-message ( ${TOADLET_EGG_LIB_S} )
-message ( ${TOADLET_TADPOLE_LIB_S} )
+set (LIBS ${TOADLET_LIBRARIES_S} GLESv1_CM log)
 
 # Source files
 set (SRC

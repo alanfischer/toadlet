@@ -181,6 +181,9 @@ void ParentNode::logicUpdate(int dt,int scope){
 				mChildrenActive=true;
 			}
 		}
+		else{
+			mergeWorldBound(node,false);
+		}
 	}
 
 	mActivateChildren=false;
@@ -207,6 +210,9 @@ void ParentNode::frameUpdate(int dt,int scope){
 			else{
 				node->frameUpdate(dt,scope);
 			}
+		}
+		else{
+			mergeWorldBound(node,false);
 		}
 	}
 

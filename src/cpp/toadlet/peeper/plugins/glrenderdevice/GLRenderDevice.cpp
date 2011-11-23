@@ -357,8 +357,6 @@ void GLRenderDevice::destroy(){
 		mRenderTarget=NULL;
 		mGLRenderTarget=NULL;
 
-		TOADLET_CHECK_GLERROR("destroy");
-
 		Logger::alert(Categories::TOADLET_PEEPER,
 			"destroyed GLRenderDevice");
 	}
@@ -663,8 +661,10 @@ void GLRenderDevice::renderPrimitive(VertexData *vertexData,IndexData *indexData
 					case IndexData::Primitive_TRIFAN:
 						primitive=IndexData::Primitive_LINESTRIP;
 					break;
+					default: break;
 				}
 			break;
+			default: break;
 		}
 	#endif
 

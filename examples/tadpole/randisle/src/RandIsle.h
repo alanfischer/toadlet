@@ -13,7 +13,7 @@
 
 class HUD;
 
-class RandIsle:public Applet,public TerrainNodeDataSource,public UpdateListener,public JoyDeviceListener,public TerrainNodeListener,public PathClimberListener,public RenderPathChooser{
+class RandIsle:public Applet,public TerrainNodeDataSource,public UpdateListener,public JoyDeviceListener,public TerrainNodeListener,public PathClimberListener{
 public:
 	enum{
 		Scope_BIT_TREE=			1<<1,
@@ -77,6 +77,7 @@ public:
 	bool getPatchLayerData(tbyte *data,int px,int py);
 	scalar terrainValue(float tx,float ty);
 	scalar pathValue(float ty);
+	Material::ptr getMaterial(TerrainPatchNode *patch);
 
 	RenderPath::ptr chooseBestPath(Material *material);
 
@@ -103,6 +104,7 @@ protected:
 	Engine *mEngine;
 	HopScene::ptr mScene;
 	TerrainNode::ptr mTerrain;
+	DiffuseTerrainMaterialSource::ptr mTerrainMaterialSource;
 	SmoothFollower::ptr mFollower;
 	ParentNode::ptr mFollowNode;
 	CameraNode::ptr mCamera;

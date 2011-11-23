@@ -69,32 +69,34 @@ endif (WIN32)
 find_path (TOADLET_INCLUDE_DIR toadlet/toadlet.h PATHS ${HEADER_SEARCH_PATHS})
 
 # List of toadlet library basenames
+# NOTE: These are listed in the order acceptable for static linking
 set (TOADLET_LIB_BASENAMES
-	toadlet_egg
-	toadlet_flick
-	toadlet_flick_iosmotiondevice
-	toadlet_flick_win32joydevice
-	toadlet_hop
-	toadlet_knot
-	toadlet_peeper
-	toadlet_peeper_glrenderdevice
-	toadlet_peeper_d3d9renderdevice
-	toadlet_peeper_d3dmrenderdevice
-	toadlet_peeper_d3d10renderdevice
-	toadlet_peeper_d3d11renderdevice
-	toadlet_ribbit
-	toadlet_ribbit_alaudiodevice
-	toadlet_ribbit_mmaudiodevice
-	toadlet_ribbit_jaudiodevice
-	toadlet_tadpole
-	toadlet_tadpole_hop
 	toadlet_pad
+	toadlet_tadpole_hop
+	toadlet_tadpole
+	toadlet_ribbit_jaudiodevice
+	toadlet_ribbit_mmaudiodevice
+	toadlet_ribbit_alaudiodevice
+	toadlet_ribbit
+	toadlet_peeper_d3d11renderdevice
+	toadlet_peeper_d3d10renderdevice
+	toadlet_peeper_d3dmrenderdevice
+	toadlet_peeper_d3d9renderdevice
+	toadlet_peeper_glrenderdevice
+	toadlet_peeper
+	toadlet_knot
+	toadlet_hop
+	toadlet_flick_win32joydevice
+	toadlet_flick_iosmotiondevice
+	toadlet_flick
+	toadlet_egg
 )
 
 # Android specifics
 if (ANDROID) 
+	set (LIBRARY_SEARCH_SUFFIXES ${NDK_NAME_ARCH})
+
 	if (${ANDROID_NDK_API_LEVEL} LESS 9)
-		set (LIBRARY_SEARCH_SUFFIXES ${NDK_NAME_ARCH})
 		set (TOADLET_JAR_BASENAMES jtoadlet_peeper jtoadlet_ribbit jtoadlet_pad)
 
 		# Search for and assign the android jar files

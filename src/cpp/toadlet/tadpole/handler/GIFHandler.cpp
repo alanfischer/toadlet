@@ -38,10 +38,6 @@ extern "C"{
 #include <toadlet/egg/image/Image.h>
 #include <toadlet/tadpole/handler/GIFHandler.h>
 
-#if defined(TOADLET_PLATFORM_WIN32) && defined(TOADLET_LIBGIF_NAME)
-	#pragma comment(lib,TOADLET_LIBGIF_NAME)
-#endif
-
 namespace toadlet{
 namespace tadpole{
 namespace handler{

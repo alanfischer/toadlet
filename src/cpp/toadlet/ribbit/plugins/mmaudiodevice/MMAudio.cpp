@@ -81,27 +81,27 @@ int MMAudio::read(tbyte *data,int length){
 
 	int amount=0;
 	if(mAudioStream!=NULL){
-		AudioFormat *format=mAudioStream->getAudioFormat();
-		AudioFormat *playerFormat=mDevice->getAudioFormat();
+		AudioFormat *srcFormat=mAudioStream->getAudioFormat();
+		AudioFormat *dstFormat=mDevice->getAudioFormat();
 
-		if(format->equals(playerFormat)==false){
-			int olength=AudioFormatConversion::findConvertedLength(length,playerFormat,format);
-			tbyte *odata=new tbyte[olength];
-			amount=mAudioStream->read(odata,olength);
+		if(srcFormat->equals(dstFormat)==false){
+			// For the original src length we want from the dst length
+			int dstLength=length;
+			int srcLength=AudioFormatConversion::findConvertedLength(dstLength,dstFormat,srcFormat,false);
+			tbyte *srcData=new tbyte[srcLength];
+			amount=mAudioStream->read(srcData,srcLength);
 			if(amount<0){
 				if(mLooping){
 					mAudioStream->reset();
-					amount=mAudioStream->read(odata,olength);
+					amount=mAudioStream->read(srcData,srcLength);
 				}
 				else{
 					mPlaying=false;
 				}
 			}
-			AudioFormatConversion::convert(odata,format,data,playerFormat,amount);
-Logger::alert(String("oamt:")+amount);
-			amount=AudioFormatConversion::findConvertedLength(amount,format,playerFormat);
-Logger::alert(String("famt:")+amount);
-			delete[] odata;
+			AudioFormatConversion::convert(srcData,amount,srcFormat,data,dstLength,dstFormat);
+			amount=AudioFormatConversion::findConvertedLength(amount,srcFormat,dstFormat,true);
+			delete[] srcData;
 		}
 		else{
 			amount=mAudioStream->read(data,length);

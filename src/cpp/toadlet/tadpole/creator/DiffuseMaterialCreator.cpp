@@ -32,15 +32,6 @@ namespace creator{
 
 DiffuseMaterialCreator::DiffuseMaterialCreator(Engine *engine){
 	mEngine=engine;
-	createShaders();
-}
-
-void DiffuseMaterialCreator::destroy(){
-	destroyShaders();
-}
-
-void DiffuseMaterialCreator::createShaders(){
-	destroyShaders();
 
 	String profiles[]={
 		"glsl",
@@ -74,7 +65,7 @@ void DiffuseMaterialCreator::createShaders(){
 			"vec3 viewNormal=normalize(normalMatrix * vec4(NORMAL,0.0)).xyz;\n"
 			"float lightIntensity=clamp(-dot(lightViewPosition.xyz,viewNormal),0.0,1.0);\n"
 			"vec4 localLightColor=(lightIntensity*lightColor*materialLighting)+(1.0-materialLighting);\n"
-			"color=localLightColor*materialDiffuseColor + ambientColor*materialAmbientColor;\n"
+			"color=clamp(localLightColor*materialDiffuseColor + ambientColor*materialAmbientColor,0.0,1.0);\n"
 			"color=COLOR*materialTrackColor+color*(1.0-materialTrackColor);\n"
 			"texCoord=(textureMatrix * vec4(TEXCOORD0,0.0,1.0)).xy;\n"
 			"fog=clamp(1.0-fogDensity*(gl_Position.z-fogDistance.x)/(fogDistance.y-fogDistance.x),0.0,1.0);\n"
@@ -114,7 +105,7 @@ void DiffuseMaterialCreator::createShaders(){
 			"float3 viewNormal=normalize(mul(normalMatrix,vin.normal));\n"
 			"float lightIntensity=clamp(-dot(lightViewPosition,viewNormal),0.0,1.0);\n"
 			"float4 localLightColor=lightIntensity*lightColor*materialLighting+(1.0-materialLighting);\n"
-			"vout.color=localLightColor*materialDiffuseColor + ambientColor*materialAmbientColor;\n"
+			"vout.color=clamp(localLightColor*materialDiffuseColor + ambientColor*materialAmbientColor,0.0,1.0);\n"
 			"vout.color=vin.color*materialTrackColor+vout.color*(1.0-materialTrackColor);\n"
 			"vout.texCoord=mul(textureMatrix,float4(vin.texCoord,0.0,1.0));\n "
 			"vout.fog=clamp(1.0-fogDensity*(vout.position.z-fogDistance.x)/(fogDistance.y-fogDistance.x),0.0,1.0);\n"
@@ -132,7 +123,7 @@ void DiffuseMaterialCreator::createShaders(){
 		"uniform sampler2D tex;\n"
 
 		"void main(){\n"
-		"vec4 fragColor=color*(texture2D(tex,texCoord)+(1.0-textureSet));\n"
+			"vec4 fragColor=color*(texture2D(tex,texCoord)+(1.0-textureSet));\n"
 			"gl_FragColor=mix(fogColor,fragColor,fog);\n"
 		"}",
 
@@ -243,7 +234,7 @@ void DiffuseMaterialCreator::createShaders(){
 	mPointSpriteFragmentShader=mEngine->getShaderManager()->createShader(Shader::ShaderType_FRAGMENT,profiles,pointSpriteFragmentCode,2);
 }
 
-void DiffuseMaterialCreator::destroyShaders(){
+void DiffuseMaterialCreator::destroy(){
 	if(mDiffuseVertexShader!=NULL){
 		mDiffuseVertexShader->release();
 		mDiffuseVertexShader=NULL;
@@ -278,7 +269,6 @@ Material::ptr DiffuseMaterialCreator::createDiffuseMaterial(Texture::ptr texture
 		pass->setDepthState(DepthState());
 		pass->setRasterizerState(RasterizerState());
 		pass->setMaterialState(MaterialState(true,false,MaterialState::ShadeType_GOURAUD));
-
 		pass->setShader(Shader::ShaderType_VERTEX,mDiffuseVertexShader);
 		pass->setShader(Shader::ShaderType_FRAGMENT,mDiffuseFragmentShader);
 		pass->getVariables()->addVariable("modelViewProjectionMatrix",RenderVariable::ptr(new MVPMatrixVariable()),Material::Scope_RENDERABLE);
@@ -296,7 +286,8 @@ Material::ptr DiffuseMaterialCreator::createDiffuseMaterial(Texture::ptr texture
 		pass->getVariables()->addVariable("textureMatrix",RenderVariable::ptr(new TextureMatrixVariable(0)),Material::Scope_MATERIAL);
 		pass->getVariables()->addVariable("textureSet",RenderVariable::ptr(new TextureSetVariable(0)),Material::Scope_MATERIAL);
 
-		pass->setSamplerState(0,mEngine->getMaterialManager()->getDefaultSamplerState());
+		SamplerState state=mEngine->getMaterialManager()->getDefaultSamplerState();
+		pass->setSamplerState(0,state);
 		pass->setTexture(0,texture);
 	}
 
@@ -310,7 +301,8 @@ Material::ptr DiffuseMaterialCreator::createDiffuseMaterial(Texture::ptr texture
 		pass->setRasterizerState(RasterizerState());
 		pass->setMaterialState(MaterialState(true,false,MaterialState::ShadeType_GOURAUD));
 
-		pass->setSamplerState(0,mEngine->getMaterialManager()->getDefaultSamplerState());
+		SamplerState state=mEngine->getMaterialManager()->getDefaultSamplerState();
+		pass->setSamplerState(0,state);
 		pass->setTexture(0,texture);
 	}
 

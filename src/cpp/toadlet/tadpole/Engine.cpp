@@ -114,7 +114,7 @@
 	#include <toadlet/tadpole/handler/PNGHandler.h>
 #endif
 #if defined(TOADLET_HAS_FFMPEG)
-	#include <toadlet/tadpole/handler/FFmpegTextureModifier.h>
+	#include <toadlet/tadpole/handler/FFmpegVideoHandler.h>
 #endif
 
 #if defined(TOADLET_HAS_GDIPLUS)
@@ -325,7 +325,7 @@ void Engine::installHandlers(){
 	#endif
 	mTextureManager->setStreamer(TGAHandler::ptr(new TGAHandler(mTextureManager)),"tga");
 	#if defined(TOADLET_HAS_FFMPEG)
-		mTextureManager->setDefaultModifier(FFmpegTextureModifier::ptr(new FFmpegTextureModifier(this)));
+		mTextureManager->setVideoHandler(FFmpegVideoHandler::ptr(new FFmpegVideoHandler(this)));
 	#endif
 
 	// Font handlers, try for freetype first, since it currently looks best.  This can be changed back once the others look as nice
@@ -631,6 +631,7 @@ void Engine::contextActivate(RenderDevice *renderDevice){
 		mContextListeners[i]->preContextActivate(renderDevice);
 	}
 
+	mShaderManager->contextActivate(renderDevice);
 	mBufferManager->contextActivate(renderDevice);
 	mTextureManager->contextActivate(renderDevice);
 	mMaterialManager->contextActivate(renderDevice);
@@ -648,6 +649,7 @@ void Engine::contextDeactivate(RenderDevice *renderDevice){
 		mContextListeners[i]->preContextDeactivate(renderDevice);
 	}
 
+	mShaderManager->contextDeactivate(renderDevice);
 	mBufferManager->contextDeactivate(renderDevice);
 	mTextureManager->contextDeactivate(renderDevice);
 	mMaterialManager->contextDeactivate(renderDevice);

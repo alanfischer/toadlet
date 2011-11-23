@@ -142,6 +142,9 @@ bool D3D9RenderDevice::create(RenderTarget *target,int *options){
 	#endif
 	setCapsFromD3DCAPS9(mCaps,mD3DCaps,SUCCEEDED(renderToTextureResult),SUCCEEDED(renderToDepthTextureResult));
 
+	mLastTextures.resize(mCaps.maxTextureStages,NULL);
+	mLastSamplerStates.resize(mCaps.maxTextureStages);
+
 	setDefaultState();
 
 	Logger::alert(Categories::TOADLET_PEEPER,
@@ -713,8 +716,6 @@ void D3D9RenderDevice::setSamplerState(int i,SamplerState *state){
 			mD3DDevice->SetSamplerState(i,D3DSAMP_MAGFILTER,getD3DTEXF(state->magFilter));
 
 			mD3DDevice->SetSamplerState(i,D3DSAMP_BORDERCOLOR,toD3DCOLOR(state->borderColor));
-
-			mD3DDevice->SetSamplerState(i,D3DSAMP_MAXMIPLEVEL,state->maxLOD);
 		#endif
 
 		if(i==0){
@@ -722,6 +723,22 @@ void D3D9RenderDevice::setSamplerState(int i,SamplerState *state){
 				mD3DDevice->SetRenderState(D3DMRS_TEXTUREPERSPECTIVE,state->perspective);
 			#endif
 		}
+	}
+
+	mLastSamplerStates[i]=state;
+}
+
+void D3D9RenderDevice::setSamplerStatePostTexture(int i,SamplerState *state){
+	D3D9Texture *texture=mLastTextures[i];
+
+	if(state!=NULL && texture!=NULL){
+		TextureFormat *format=texture->getFormat();
+		int totalMipLevels=Math::intLog2(Math::maxVal(format->width,Math::maxVal(format->height,format->depth)));
+		int d3dlevel=format->mipLevels>0?totalMipLevels-format->mipLevels:0;
+		mD3DDevice->SetSamplerState(i,D3DSAMP_MAXMIPLEVEL,d3dlevel);
+	}
+	else{
+		mD3DDevice->SetSamplerState(i,D3DSAMP_MAXMIPLEVEL,0);
 	}
 }
 
@@ -822,6 +839,10 @@ void D3D9RenderDevice::setTexture(int i,Texture *texture){
 		result=mD3DDevice->SetTexture(i,NULL);
 	}
 	TOADLET_CHECK_D3D9ERROR(result,"SetTexture");
+
+	mLastTextures[i]=d3dtexture;
+
+	setSamplerStatePostTexture(i,mLastSamplerStates[i]);
 }
 
 void D3D9RenderDevice::setLightState(int i,const LightState &light){

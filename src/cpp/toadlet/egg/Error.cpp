@@ -111,6 +111,7 @@ void Error::traceFrame(const char *description){
 
 void Error::endTrace(){
 	Logger::getInstance()->addLogEntry(Logger::Level_ERROR,"Backtrace ended");
+	Logger::getInstance()->flush();
 }
 
 }

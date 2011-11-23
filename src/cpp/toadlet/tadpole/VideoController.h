@@ -23,22 +23,28 @@
  *
  ********** Copyright header - do not remove **********/
 
-#ifndef TOADLET_TADPOLE_RESOURCECONTROLLER_H
-#define TOADLET_TADPOLE_RESOURCECONTROLLER_H
+#ifndef TOADLET_TADPOLE_VIDEOCONTROLLER_H
+#define TOADLET_TADPOLE_VIDEOCONTROLLER_H
 
 #include <toadlet/egg/Resource.h>
+#include <toadlet/ribbit/Audio.h>
+#include <toadlet/peeper/Texture.h>
 #include <toadlet/tadpole/Types.h>
 
 namespace toadlet{
 namespace tadpole{
 
-class ResourceController{
+class VideoController{
 public:
-	TOADLET_SHARED_POINTERS(ResourceController);
+	TOADLET_SHARED_POINTERS(VideoController);
 
-	virtual ~ResourceController(){}
+	virtual ~VideoController(){}
 
-	virtual void destroy(){}
+	virtual void destroy()=0;
+
+	virtual TextureFormat::ptr getVideoFormat()=0;
+	virtual void setTexture(Texture::ptr texture)=0;
+	virtual void setAudio(Audio::ptr audio)=0;
 
 	virtual void start()=0;
 	virtual void pause()=0;

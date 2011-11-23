@@ -67,8 +67,8 @@ bool BackableTexture::create(int usage,TextureFormat::ptr format,tbyte *mipDatas
 		break;
 	}
 
-	// BackableTextures only store the first mipLevel, so if it's not a staging resource, then we need to autogen mipmaps
-	if((usage&Usage_BIT_STAGING)==0){
+	// BackableTextures only store the first mipLevel, so if it's not a staging resource and has multiple mip levels, then we need to autogen mipmaps
+	if((usage&Usage_BIT_STAGING)==0 && format->mipLevels!=1){
 		mUsage|=Usage_BIT_AUTOGEN_MIPMAPS;
 	}
 

@@ -23,28 +23,35 @@
  *
  ********** Copyright header - do not remove **********/
 
-#ifndef TOADLET_TADPOLE_RESOURCEMODIFIER_H
-#define TOADLET_TADPOLE_RESOURCEMODIFIER_H
+#ifndef TOADLET_TADPOLE_TERRAIN_DIFFUSETERRAINMATERIALSOURCE_H
+#define TOADLET_TADPOLE_TERRAIN_DIFFUSETERRAINMATERIALSOURCE_H
 
-#include <toadlet/egg/Resource.h>
-#include <toadlet/egg/io/Stream.h>
-#include <toadlet/tadpole/Types.h>
-#include <toadlet/tadpole/ResourceController.h>
+#include <toadlet/tadpole/Engine.h>
+#include <toadlet/tadpole/terrain/TerrainNodeMaterialSource.h>
 
 namespace toadlet{
 namespace tadpole{
+namespace terrain{
 
-class ResourceModifier{
+class TOADLET_API DiffuseTerrainMaterialSource:public TerrainNodeMaterialSource{
 public:
-	TOADLET_SHARED_POINTERS(ResourceModifier);
+	TOADLET_SHARED_POINTERS(DiffuseTerrainMaterialSource);
+	
+	DiffuseTerrainMaterialSource(Engine *engine);
+	
+	void destroy();
 
-	virtual ~ResourceModifier(){}
+	void setDiffuseTexture(int layer,Texture::ptr texture);
 
-	virtual void destroy(){}
-
-	virtual ResourceController::ptr open(Stream::ptr stream,Resource::ptr resource)=0;
+	Material::ptr getMaterial(TerrainPatchNode *patch);
+	
+protected:
+	Engine *mEngine;
+	Shader::ptr mDiffuseVertexShader,mDiffuseBaseFragmentShader,mDiffuseLayerFragmentShader;
+	Collection<Texture::ptr> mDiffuseTextures;
 };
 
+}
 }
 }
 

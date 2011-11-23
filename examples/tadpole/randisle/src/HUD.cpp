@@ -150,7 +150,7 @@ void HUD::logicUpdate(int dt,int scope){
 			mDogSound->setGain(Math::mul(danger,Math::ONE-mWaterAmount)*4);
 			mSharkSound->setGain(Math::mul(Math::ONE,mWaterAmount)*4); // use Math::mul(danger,mWaterAmount) when the shark sound is constant volume
 
-			if(mDogSound->getPlaying()==false && mNextBarkTime<mScene->getLogicTime()){
+			if(mNextBarkTime<mScene->getLogicTime() && mDogSound->getPlaying()==false){
 				mNextBarkTime=mScene->getLogicTime()+mRandom.nextInt(500,1500);
 				mDogSound->play();
 			}

@@ -66,21 +66,21 @@ Shader::ptr D3D9ShaderState::getShader(Shader::ShaderType type){
 }
 
 int D3D9ShaderState::getNumVariableBuffers(Shader::ShaderType type){
-	if(mShaders.size()<=type || mShaders[type]==NULL){
+	if(mShaders.size()<=type){
 		return 0;
 	}
 
-	D3D9Shader *d3dshader=(D3D9Shader*)mShaders[type]->getRootShader();
-	return d3dshader->getNumVariableBuffers();
+	D3D9Shader *d3dshader=mShaders[type]!=NULL?(D3D9Shader*)mShaders[type]->getRootShader():NULL;
+	return d3dshader!=NULL?d3dshader->getNumVariableBuffers():0;
 }
 
 VariableBufferFormat::ptr D3D9ShaderState::getVariableBufferFormat(Shader::ShaderType type,int i){
-	if(mShaders.size()<=type || mShaders[type]==NULL){
+	if(mShaders.size()<=type){
 		return 0;
 	}
 
-	D3D9Shader *d3dshader=(D3D9Shader*)mShaders[type]->getRootShader();
-	return d3dshader->getVariableBufferFormat(i);
+	D3D9Shader *d3dshader=mShaders[type]!=NULL?(D3D9Shader*)mShaders[type]->getRootShader():NULL;
+	return d3dshader!=NULL?d3dshader->getVariableBufferFormat(i):NULL;
 }
 
 bool D3D9ShaderState::activate(){

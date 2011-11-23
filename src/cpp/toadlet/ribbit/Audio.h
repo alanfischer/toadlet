@@ -53,7 +53,6 @@ public:
 	virtual bool getLooping() const=0;
 
 	virtual void setGain(scalar gain)=0;
-	virtual void fadeToGain(scalar gain,int time)=0; // milliseconds
 	virtual scalar getGain() const=0;
 
 	virtual void setPitch(scalar pitch)=0;

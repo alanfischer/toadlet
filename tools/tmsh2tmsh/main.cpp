@@ -19,7 +19,7 @@ int main(int argc,char **argv){
                 if(arg.substr(j,1)=="h"){
                     std::cout << "Options for " << argv[0] << ": " << std::endl;
                     std::cout << "-h\t\thelp - print this message" << std::endl;
-                    std::cout << "-x\t\txmsh - output xmsh, default it tmsh" << std::endl;
+                    std::cout << "-x\t\txmsh - output xmsh, default is tmsh" << std::endl;
                     return 1;
                 }
                 if(arg.substr(j,1)=="x"){
@@ -43,6 +43,7 @@ int main(int argc,char **argv){
 	Logger::getInstance()->setCategoryReportingLevel(Categories::TOADLET_EGG,Logger::Level_WARNING);
 	Logger::getInstance()->setCategoryReportingLevel(Categories::TOADLET_TADPOLE,Logger::Level_WARNING);
 	Engine *engine=new Engine();
+	engine->installHandlers();
 
 	// Load the mesh data
 	Mesh::ptr mesh=engine->getMeshManager()->findMesh(mshFileName);

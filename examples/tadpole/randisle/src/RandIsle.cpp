@@ -30,7 +30,6 @@ void RandIsle::create(){
 
 	mEngine=mApp->getEngine();
 	mEngine->setDirectory(mPath);
-//	mEngine->getMaterialManager()->setRenderPathChooser(this);
 
 	Resources::init(mEngine);
 
@@ -50,10 +49,15 @@ void RandIsle::create(){
 	mScene->setRoot(mTerrain);
 	mScene->setTraceable(mTerrain);
 	mTerrain->setListener(this);
-	mTerrain->setMaterial(Resources::instance->grass);
-	mTerrain->setWaterMaterial(Resources::instance->water);
 	mTerrain->setTolerance(Resources::instance->tolerance);
 	mTerrain->setDataSource(this);
+
+	mTerrainMaterialSource=DiffuseTerrainMaterialSource::ptr(new DiffuseTerrainMaterialSource(mEngine));
+	mTerrainMaterialSource->setDiffuseTexture(0,Resources::instance->seafloorTexture);
+	mTerrainMaterialSource->setDiffuseTexture(1,Resources::instance->rockTexture);
+	mTerrainMaterialSource->setDiffuseTexture(2,Resources::instance->grassTexture);
+	mTerrain->setMaterialSource(mTerrainMaterialSource);
+	mTerrain->setWaterMaterial(Resources::instance->waterMaterial);
 
 	mFollowNode=mEngine->createNodeType(ParentNode::type(),mScene);
 	mFollower=SmoothFollower::ptr(new SmoothFollower(30));
@@ -434,16 +438,16 @@ void RandIsle::frameUpdate(int dt){
 	}
 	mFollowNode->setTranslate(position);
 	mFollowNode->frameUpdate(0,-1);
-	Material::ptr water=Resources::instance->water;
-	if(water!=NULL){
+	Material::ptr waterMaterial=Resources::instance->waterMaterial;
+	if(waterMaterial!=NULL){
 		TextureState textureState;
-		water->getPass()->getTextureState(0,textureState);
+		waterMaterial->getPass()->getTextureState(0,textureState);
 		Math::setMatrix4x4FromTranslate(textureState.matrix,Math::sin(Math::fromMilli(mScene->getTime())/4)/4,0,0);
-		water->getPass()->setTextureState(0,textureState);
+		waterMaterial->getPass()->setTextureState(0,textureState);
 
-		water->getPass()->getTextureState(1,textureState);
+		waterMaterial->getPass()->getTextureState(1,textureState);
 		Math::setMatrix4x4FromTranslate(textureState.matrix,0,Math::sin(Math::fromMilli(mScene->getTime())/4)/4,0);
-		water->getPass()->setTextureState(1,textureState);
+		waterMaterial->getPass()->setTextureState(1,textureState);
 	}
 
 	if(mPlayer->getPath()!=NULL){
@@ -790,11 +794,14 @@ bool RandIsle::getPatchLayerData(tbyte *data,int px,int py){
 			float tx=(float)(px*size+x - size/2)/(float)size;
 			float ty=(float)(py*size+y - size/2)/(float)size;
 			scalar v=terrainValue(tx,ty);
-			if(v<-0.25){
+			if(v<-0.0){
 				data[y*size+x]=0;
 			}
-			else{
+			else if(v<0.15){
 				data[y*size+x]=1;
+			}
+			else{
+				data[y*size+x]=2;
 			}
 		}
 	}
@@ -812,16 +819,6 @@ scalar RandIsle::terrainValue(float tx,float ty){
 
 scalar RandIsle::pathValue(float ty){
 	return mPatchNoise.perlin1(ty/4);
-}
-
-RenderPath::ptr RandIsle::chooseBestPath(Material *material){
-	int i;
-	for(i=material->getNumPaths()-1;i>=0;--i){
-		if(mEngine->getMaterialManager()->isPathUseable(material->getPath(i),mEngine->getRenderCaps())){
-			return material->getPath(i);
-		}
-	}
-	return 0;
 }
 
 Applet *createApplet(Application *app){

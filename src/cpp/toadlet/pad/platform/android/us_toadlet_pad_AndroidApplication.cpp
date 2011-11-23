@@ -1,13 +1,16 @@
 #include "us_toadlet_pad_AndroidApplication.h"
-#include <toadlet/pad/Application.h>
+#include "JApplication.h"
 #include <toadlet/tadpole/handler/platform/android/AndroidAssetArchive.h>
 #include <toadlet/tadpole/handler/platform/android/AndroidTextureHandler.h>
 
 using namespace toadlet::pad;
+using namespace toadlet::peeper;
 using namespace toadlet::tadpole::handler;
 
+TOADLET_C_API RenderDevice* new_GLRenderDevice();
+
 JNIEXPORT void JNICALL Java_us_toadlet_pad_AndroidApplication_createNativeApplication(JNIEnv *env,jobject obj){
-	Application *app=new JAndroidApplication(env,obj);
+	Application *app=new JApplication(env,obj);
 	jclass appClass=env->GetObjectClass(obj);
 	{
 		jmethodID setNativeHandleID=env->GetMethodID(appClass,"setNativeHandle","(I)V");
@@ -53,7 +56,7 @@ JNIEXPORT jobject JNICALL Java_us_toadlet_pad_AndroidApplication_makeEngine(JNIE
 	}
 	env->DeleteLocalRef(contextClass);
 
-	/// @todo: This should be moved away from here, perhaps to a JAndroidApplication post-engine init method
+	/// @todo: This should be moved away from here, perhaps to a JApplication post-engine init method
 	AndroidAssetArchive::ptr assetArchive=AndroidAssetArchive::ptr(new AndroidAssetArchive(env,assetManagerObj));
 	engine->getArchiveManager()->manage(shared_static_cast<Archive>(assetArchive));
 
@@ -77,14 +80,14 @@ JNIEXPORT void JNICALL Java_us_toadlet_pad_AndroidApplication_deleteEngine(JNIEn
 }
 
 JNIEXPORT jboolean JNICALL Java_us_toadlet_pad_AndroidApplication_notifyEngineRenderDevice(JNIEnv *env,jobject obj){
-	JAndroidApplication *app=(JAndroidApplication*)env->CallIntMethod(obj,getNativeHandleApplicationID);
+	JApplication *app=(JApplication*)env->CallIntMethod(obj,getNativeHandleApplicationID);
 	Engine *engine=app->getEngine();
 	RenderDevice *device=app->getRenderDevice();
 	return engine->setRenderDevice(device);
 }
 
 JNIEXPORT jboolean JNICALL Java_us_toadlet_pad_AndroidApplication_notifyEngineAudioDevice(JNIEnv *env,jobject obj){
-	JAndroidApplication *app=(JAndroidApplication*)env->CallIntMethod(obj,getNativeHandleApplicationID);
+	JApplication *app=(JApplication*)env->CallIntMethod(obj,getNativeHandleApplicationID);
 	Engine *engine=app->getEngine();
 	AudioDevice *device=app->getAudioDevice();
 	bool b=engine->setAudioDevice(device);

@@ -1,39 +1,44 @@
 #ifndef VIEWER_H
 #define VIEWER_H
 
-#include <toadlet/tadpole/Colors.h>
-#include <toadlet/tadpole/Scene.h>
-#include <toadlet/tadpole/node/CameraNode.h>
-#include <toadlet/tadpole/node/LightNode.h>
-#include <toadlet/tadpole/node/MeshNode.h>
-#include <toadlet/pad/Application.h>
+#include <toadlet/tadpole.h>
+#include <toadlet/pad.h>
 
-class Viewer:public toadlet::pad::Application{
+class Viewer:public Applet{
 public:
-	Viewer();
+	Viewer(Application *app);
+	virtual ~Viewer();
 
-	void create();
+	void create(){}
 	void destroy();
-	void start(toadlet::tadpole::node::MeshNode::ptr meshNode);
+	void setNode(MeshNode::ptr meshNode);
 
 	void update(int dt);
-	void render(toadlet::peeper::RenderDevice *device);
+	void render(RenderDevice *device);
 
 	void mouseMoved(int x,int y);
 	void mousePressed(int x,int y,int button);
 	void mouseReleased(int x,int y,int button);
+	void mouseScrolled(int x,int y,int scroll){}
+
 	void resized(int width,int height);
+	void focusGained(){}
 	void focusLost();
 
-	inline toadlet::tadpole::Scene::ptr getScene(){return mScene;}
+	void keyPressed(int key){}
+	void keyReleased(int key){}
+
+	inline Scene::ptr getScene(){return mScene;}
 
 protected:
 	void updateCamera();
 
-	toadlet::tadpole::Scene::ptr mScene;
-	toadlet::tadpole::node::ParentNode::ptr mParent;
-	toadlet::tadpole::node::CameraNode::ptr mCamera;
-	toadlet::tadpole::node::LightNode::ptr mLight;
+	Application *mApp;
+	Engine *mEngine;
+	Scene::ptr mScene;
+	ParentNode::ptr mParent;
+	CameraNode::ptr mCamera;
+	LightNode::ptr mLight;
  	int mMouseX,mMouseY;
 	bool mDrag;
 	toadlet::scalar mDistance;
