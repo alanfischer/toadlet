@@ -60,7 +60,7 @@ public:
 	void gatherRenderables(CameraNode *camera,RenderableSet *set);
 
 	// Renderable
-	Material *getRenderMaterial() const{return mMaterial;}
+	Material *getRenderMaterial() const{return mOwnedMaterial!=NULL?mOwnedMaterial:mMaterial;}
 	const Transform &getRenderTransform() const{return getWorldTransform();}
 	const Bound &getRenderBound() const{return getWorldBound();}
 	void render(SceneRenderer *renderer) const;

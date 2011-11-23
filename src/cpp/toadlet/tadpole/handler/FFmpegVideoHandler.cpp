@@ -69,7 +69,7 @@ FFmpegAudioStream::FFmpegAudioStream(FFmpegController *controller,FFmpegControll
 
 	AVCodecContext *ctx=mStreamData->codecCtx;
 	mAudioFormat=AudioFormat::ptr(new AudioFormat(16,ctx->channels,ctx->sample_rate));
-	mDecodeBuffer=(tbyte*)av_malloc(AVCODEC_MAX_AUDIO_FRAME_SIZE);
+	mDecodeBuffer=(tbyte*)av_mallocz(AVCODEC_MAX_AUDIO_FRAME_SIZE);
 }
 
 FFmpegAudioStream::~FFmpegAudioStream(){
@@ -263,9 +263,10 @@ bool FFmpegController::open(Stream::ptr stream){
 
 	String name;
 
-	mIOBuffer=(tbyte*)av_malloc(4096+FF_INPUT_BUFFER_PADDING_SIZE);
-	mIOCtx=(ByteIOContext*)av_malloc(sizeof(ByteIOContext));
-	int result=toadlet_ffmpeg_stream_context(mIOCtx,stream,mIOBuffer,4096);
+	mStream=stream;
+	mIOCtx=(ByteIOContext*)av_mallocz(sizeof(ByteIOContext));
+	mIOBuffer=(tbyte*)av_mallocz(4096+FF_INPUT_BUFFER_PADDING_SIZE);
+	int result=init_put_byte(mIOCtx,mIOBuffer,4096,0,stream,toadlet_read_packet,toadlet_write_packet,toadlet_seek);
 
 	result=av_open_input_stream(&mFormatCtx,mIOCtx,name,av_find_input_format(name),NULL);
 	if(result<0){
@@ -372,6 +373,8 @@ void FFmpegController::destroy(){
 		av_free(mIOBuffer);
 		mIOBuffer=NULL;
 	}
+
+	mStream=NULL;
 }
 
 void FFmpegController::setTexture(Texture::ptr texture){
@@ -603,11 +606,10 @@ int FFmpegController::PacketQueue::put(AVPacket *pkt){
 	if(av_dup_packet(pkt)<0){
 		return -1;
 	}
-	pkt1 = (AVPacketList*)av_malloc(sizeof(AVPacketList));
+	pkt1 = (AVPacketList*)av_mallocz(sizeof(AVPacketList));
 	if (!pkt1)
 		return -1;
 	pkt1->pkt = *pkt;
-	pkt1->next = NULL;
 
 	mutex.lock();
 

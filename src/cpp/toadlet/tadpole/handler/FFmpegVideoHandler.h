@@ -123,6 +123,7 @@ protected:
 	SharedPointer<FFmpegAudioStream> mAudioStream;
 
 	Engine *mEngine;
+	Stream::ptr mStream;
 	ByteIOContext *mIOCtx;
 	tbyte *mIOBuffer;
     AVFormatContext *mFormatCtx;
