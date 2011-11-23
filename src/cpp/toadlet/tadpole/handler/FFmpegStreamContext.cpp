@@ -32,8 +32,8 @@ static int64_t toadlet_seek(void *opaque,int64_t offset,int whence){
 	else if(whence==AVSEEK_SIZE){
 		return stream->length()-stream->position();
 	}
-	
-	return result?stream->position():-1;
+
+	return result?0:-1;
 }
 
 int toadlet_ffmpeg_stream_context(ByteIOContext *context,Stream *stream,unsigned char *buffer,int size){

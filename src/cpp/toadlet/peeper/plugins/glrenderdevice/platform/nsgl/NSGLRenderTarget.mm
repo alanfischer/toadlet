@@ -57,6 +57,10 @@ NSGLRenderTarget::NSGLRenderTarget(NSOpenGLContext *context):GLRenderTarget(),
 }
 
 NSGLRenderTarget::~NSGLRenderTarget(){
+	destroy();
+}
+
+void NSGLRenderTarget::destroy(){
 	destroyContext();
 }
 

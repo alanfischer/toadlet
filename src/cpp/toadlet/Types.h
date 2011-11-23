@@ -100,6 +100,7 @@
 		#define TOADLET_ALIGNED_MALLOC(size,a) _aligned_malloc(size,a)
 		#define TOADLET_ALIGNED_FREE(pointer) _aligned_free(pointer)
 	#endif
+	#define TOADLET_ALIGNED_SIZE 16
 #elif defined(TOADLET_PLATFORM_POSIX)
 	#define TOADLET_COMPILER_GCC 1
 	#include <sys/param.h>
@@ -145,7 +146,7 @@
 	#define TOADLET_ALIGNOF(Type) offsetof(alignment_trick<Type>,member)
 	#define TOADLET_ALIGN(a) __attribute__((aligned(a)))
 	#if defined (TOADLET_PLATFORM_ANDROID)
-		inline void *toadlet_malloc(int size,int a){memalign(a,size);}
+		inline void *toadlet_malloc(int size,int a){return memalign(a,size);}
 	#else
 		inline void *toadlet_malloc(int size,int a){void *r=NULL;posix_memalign(&r,a,size);return r;}
 	#endif
@@ -161,9 +162,6 @@
 #if !defined(NULL)
 	#define NULL 0
 #endif
-
-#define TOADLET_ALIGNED TOADLET_ALIGN(16)
-#define TOADLET_IS_ALIGNED(x) ((((uint64)&x)&0xF)==0)
 
 #define TOADLET_QUOTE_(x) #x
 #define TOADLET_QUOTE(x) TOADLET_QUOTE_(x)
@@ -191,12 +189,6 @@
 	TOADLET_VERSION_ITOW(major) L"." TOADLET_VERSION_ITOW(minor) L"." TOADLET_VERSION_ITOW(micro) TOADLET_VERSION_FIXEDWSTRING
 
 template<typename Type> inline void TOADLET_IGNORE_UNUSED_VARIABLE_WARNING(Type t){}
-
-#define TOADLET_ALIGNED_NEW
-	inline void *operator new(size_t size) throw(std::bad_alloc){return TOADLET_ALIGNED_MALLOC(size,16);} \
-	inline void operator delete(void *pointer) throw(){TOADLET_ALIGNED_FREE(pointer);} \
-	inline void *operator new[](size_t size) throw(std::bad_alloc){return TOADLET_ALIGNED_MALLOC(size,16);} \
-	inline void operator delete[](void *pointer) throw(){TOADLET_ALIGNED_FREE(pointer);}
 
 namespace toadlet{
 
@@ -253,6 +245,15 @@ typedef unsigned int uint32;
 #endif
 
 }
+
+#define TOADLET_ALIGNED_SIZE 16
+#define TOADLET_ALIGNED TOADLET_ALIGN(TOADLET_ALIGNED_SIZE)
+#define TOADLET_IS_ALIGNED(x) ((((uint64)&x)&0xF)==0)
+#define TOADLET_ALIGNED_NEW \
+	inline void *operator new(size_t size) throw(std::bad_alloc){return TOADLET_ALIGNED_MALLOC(size,TOADLET_ALIGNED_SIZE);} \
+	inline void operator delete(void *pointer) throw(){TOADLET_ALIGNED_FREE(pointer);} \
+	inline void *operator new[](size_t size) throw(std::bad_alloc){return TOADLET_ALIGNED_MALLOC(size,TOADLET_ALIGNED_SIZE);} \
+	inline void operator delete[](void *pointer) throw(){TOADLET_ALIGNED_FREE(pointer);}
 
 #endif
 

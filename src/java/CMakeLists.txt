@@ -1,11 +1,20 @@
+# On Android NDK API levels < 9, toadlet uses java shim libraries for peeper, ribbit, and pad.
+
+
 # Shortcut variables
 set (JAVA_SRC_DIR us/toadlet)
 set (JAVA_OBJ obj)
 
 
-# Setup for Android Java Compilation
-set (CMAKE_Java_COMPILER javac)
-set (CMAKE_Java_ARCHIVE jar)
+# Setup for Android Java Compilation - uses the find_host_program macro from the Android toolchain
+find_host_program (CMAKE_Java_COMPILER javac)
+find_host_program (CMAKE_Java_ARCHIVE jar)
+if (NOT EXISTS ${CMAKE_Java_COMPILER})
+	message (FATAL_ERROR "Java compiler 'javac' could not be found. Ensure it is installed and in your PATH.")
+endif (NOT EXISTS ${CMAKE_Java_COMPILER})
+if (NOT EXISTS ${CMAKE_Java_ARCHIVE})
+	message (FATAL_ERROR "Java archiver 'jar' could not be found. Ensure it is installed and in your PATH.")
+endif (NOT EXISTS ${CMAKE_Java_ARCHIVE})
 enable_language (Java OPTIONAL)
 include_directories (${ANDROID_JAR})
 
@@ -17,6 +26,7 @@ else (${NDKSYSTEM} STREQUAL "windows")
 	set (CMAKE_INCLUDE_FLAG_SEP_Java ":")
 endif (${NDKSYSTEM} STREQUAL "windows")
 
+
 # Override the standard cmake java compile and link settings
 set (CMAKE_Java_COMPILE_OBJECT
 	"<CMAKE_Java_COMPILER> -Xlint:unchecked <FLAGS> <SOURCE>"
@@ -25,6 +35,8 @@ set (CMAKE_Java_CREATE_STATIC_LIBRARY
 	"<CMAKE_Java_ARCHIVE> -cf <TARGET> -C <OBJECT_DIR>/${JAVA_OBJ} ."
 )
 
+# Include the base directory
+include_directories (.)
 
 # toadlet_peeper
 set (PEEPER_OBJ_DIR ${CMAKE_CURRENT_BINARY_DIR}/CMakeFiles/jtoadlet_peeper.dir/${JAVA_OBJ})
@@ -62,7 +74,6 @@ set (RIBBIT_SRC
 	${JAVA_SRC_DIR}/ribbit/AudioCaps.java
 	${JAVA_SRC_DIR}/ribbit/AudioDevice.java
 	${JAVA_SRC_DIR}/ribbit/ATAudioBuffer.java
-	${JAVA_SRC_DIR}/ribbit/ATAudioRegister.java
 	${JAVA_SRC_DIR}/ribbit/ATAudio.java
 	${JAVA_SRC_DIR}/ribbit/ATAudioDevice.java
 	${JAVA_SRC_DIR}/ribbit/NAudioStream.java

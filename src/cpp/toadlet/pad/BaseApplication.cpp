@@ -105,7 +105,7 @@ BaseApplication::BaseApplication():
 	#endif
 }
 
-void BaseApplication::create(String renderDevice,String audioDevice,String motionDevice,String joyDevice){
+bool BaseApplication::create(String renderDevice,String audioDevice,String motionDevice,String joyDevice){
 	int i;
 
 	mEngine=new Engine(mBackable);
@@ -160,6 +160,8 @@ void BaseApplication::create(String renderDevice,String audioDevice,String motio
 	}
 
 	activate();
+
+	return true;
 }
 
 void BaseApplication::destroy(){
@@ -234,34 +236,34 @@ bool BaseApplication::createContextAndRenderDevice(const String &plugin){
 	Logger::debug(Categories::TOADLET_PAD,
 		"BaseApplication: creating RenderTarget and RenderDevice:"+plugin);
 
-	bool result=false;
 	mRenderTarget=makeRenderTarget(plugin);
-	if(mRenderTarget!=NULL){
-		mRenderDevice=makeRenderDevice(plugin);
-		TOADLET_TRY
-			result=mRenderDevice->create(this,mRenderDeviceOptions);
-		TOADLET_CATCH(const Exception &){result=false;}
-		if(result==false){
+	if(mRenderTarget==NULL){
+		return false;
+	}
+
+	bool result=false;
+	mRenderDevice=makeRenderDevice(plugin);
+	TOADLET_TRY
+		result=mRenderDevice->create(this,mRenderDeviceOptions);
+	TOADLET_CATCH(const Exception &){result=false;}
+
+	if(result==false){
+		if(mRenderDevice!=NULL){
 			delete mRenderDevice;
 			mRenderDevice=NULL;
 		}
-	}
-	if(result==false){
-		mRenderTarget->destroy();
-		delete mRenderTarget;
-		mRenderTarget=NULL;
+		if(mRenderTarget!=NULL){
+			mRenderTarget->destroy();
+			delete mRenderTarget;
+			mRenderTarget=NULL;
+		}
 
 		Logger::error(Categories::TOADLET_PAD,
 			"error starting RenderDevice");
 		return false;
 	}
-	else if(mRenderDevice==NULL){
-		Logger::error(Categories::TOADLET_PAD,
-			"error creating RenderDevice");
-		return false;
-	}
 
-	if(mRenderDevice!=NULL){
+	if(mRenderTarget!=NULL && mRenderDevice!=NULL){
 		mRenderDevice->setRenderTarget(this);
 		mEngine->setRenderDevice(mRenderDevice);
 	}

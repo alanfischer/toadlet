@@ -31,128 +31,22 @@ public:
 			tolerance=0.000001;
 		#endif
 
-		Logger::alert("Loading grass");
-#if 1
-		grass=engine->getMaterialManager()->findMaterial("grass.png");
-		if(grass!=NULL){
-			TextureState textureState;
-			if(grass->getPass()->getTextureState(0,textureState)){
-				textureState.calculation=TextureState::CalculationType_NORMAL;
-				Math::setMatrix4x4FromScale(textureState.matrix,16,16,16);
-				grass->getPass()->setTextureState(0,textureState);
-//				grass->getPass()->setRasterizerState(RasterizerState(RasterizerState::CullType_BACK,RasterizerState::FillType_LINE));
-			}
-			grass->setLayer(-1);
-			grass->retain();
-		}
-#else
-		grass=engine->getMaterialManager()->createMaterial();
-		{
-			RenderPath::ptr shaderPath=grass->addPath();
-			{
-				RenderPass::ptr pass=shaderPath->addPass();
+		Logger::alert("Loading terrain");
 
-				pass->setMaterialState(MaterialState(Vector4(1,1,1,1)));
-				pass->setBlendState(BlendState());
-				pass->setDepthState(DepthState(DepthState::DepthTest_LEQUAL,true));
+		seafloorTexture=engine->getTextureManager()->findTexture("seafloor.png");
+		rockTexture=engine->getTextureManager()->findTexture("rock.png");
+		grassTexture=engine->getTextureManager()->findTexture("grass.png");
 
-				TextureState textureState;
-				textureState.calculation=TextureState::CalculationType_NORMAL;
-
-				Math::setMatrix4x4FromScale(textureState.matrix,16,16,16);
-				pass->setTextureState(0,textureState);
-
-				Math::setMatrix4x4FromScale(textureState.matrix,16,16,16);
-				pass->setTextureState(2,textureState);
-
-				String profiles[]={
-					"glsl",
-					"hlsl"
-				};
-
-				String vertexCodes[]={
-					"attribute vec4 POSITION;\n"
-					"attribute vec3 NORMAL;\n"
-					"attribute vec2 TEXCOORD0;\n"
-					"varying vec4 color\n;"
-					"varying vec2 texCoord0\n;"
-					"varying float fog;\n"
-					"varying vec2 texCoord1\n;"
-
-					"uniform mat4 modelViewProjectionMatrix;\n"
-					"uniform mat4 normalMatrix;\n"
-					"uniform vec4 materialDiffuseColor;\n"
-					"uniform vec4 materialAmbientColor;\n"
-					"uniform vec4 lightViewPosition;\n"
-					"uniform vec4 lightColor;\n"
-					"uniform vec4 ambientColor;\n"
-					"uniform mat4 textureMatrix0,textureMatrix1;\n"
-					"uniform vec2 fogDistance;\n"
-
-					"void main(){\n"
-						"gl_Position=modelViewProjectionMatrix * POSITION;\n"
-						"vec3 viewNormal=normalize(normalMatrix * vec4(NORMAL,0.0)).xyz;\n"
-						"float lightIntensity=clamp(-dot(lightViewPosition.xyz,viewNormal),0.0,1.0);\n"
-						"vec4 localLightColor=lightIntensity*lightColor;\n"
-						"color=localLightColor*materialDiffuseColor + ambientColor*materialAmbientColor;\n"
-						"texCoord0=(textureMatrix0 * vec4(TEXCOORD0,0.0,1.0)).xy;\n "
-						"texCoord1=(textureMatrix1 * vec4(TEXCOORD0,0.0,1.0)).xy;\n "
-						"fog=clamp(1.0-(gl_Position.z-fogDistance.x)/(fogDistance.y-fogDistance.x),0.0,1.0);\n"
-					"}"
-				};
-
-				
-				String fragmentCodes[]={
-					"varying vec4 color;\n"
-					"varying vec2 texCoord0;\n"
-					"varying vec2 texCoord1;\n"
-					"varying float fog;\n"
-
-					"uniform vec4 fogColor;\n"
-					"uniform sampler2D tex1,layer1,tex0,layer0;\n"
-					
-					"void main(){\n"
-					"vec4 fragColor=color*vec4(texture2D(layer0,texCoord0).rgb*texture2D(layer1,texCoord1).a + texture2D(tex1,texCoord0).rgb*texture2D(tex0,texCoord1).a,1);\n"
-						"gl_FragColor=mix(fogColor,fragColor,fog);\n"
-					"}"
-				};
-
-				Shader::ptr vertexShader=engine->getShaderManager()->createShader(Shader::ShaderType_VERTEX,profiles,vertexCodes,1);
-				pass->setShader(Shader::ShaderType_VERTEX,vertexShader);
-				Shader::ptr fragmentShader=engine->getShaderManager()->createShader(Shader::ShaderType_FRAGMENT,profiles,fragmentCodes,1);
-				pass->setShader(Shader::ShaderType_FRAGMENT,fragmentShader);
-
-				pass->getVariables()->addVariable("modelViewProjectionMatrix",RenderVariable::ptr(new MVPMatrixVariable()),Material::Scope_RENDERABLE);
-				pass->getVariables()->addVariable("normalMatrix",RenderVariable::ptr(new NormalMatrixVariable()),Material::Scope_RENDERABLE);
-				pass->getVariables()->addVariable("lightViewPosition",RenderVariable::ptr(new LightViewPositionVariable()),Material::Scope_MATERIAL);
-				pass->getVariables()->addVariable("lightColor",RenderVariable::ptr(new LightDiffuseVariable()),Material::Scope_MATERIAL);
-				pass->getVariables()->addVariable("ambientColor",RenderVariable::ptr(new AmbientVariable()),Material::Scope_RENDERABLE);
-				pass->getVariables()->addVariable("materialDiffuseColor",RenderVariable::ptr(new MaterialDiffuseVariable()),Material::Scope_MATERIAL);
-				pass->getVariables()->addVariable("materialAmbientColor",RenderVariable::ptr(new MaterialAmbientVariable()),Material::Scope_MATERIAL);
-				pass->getVariables()->addVariable("fogDistance",RenderVariable::ptr(new FogDistanceVariable()),Material::Scope_MATERIAL);
-				pass->getVariables()->addVariable("fogColor",RenderVariable::ptr(new FogColorVariable()),Material::Scope_MATERIAL);
-				pass->getVariables()->addVariable("textureMatrix0",RenderVariable::ptr(new TextureMatrixVariable(0)),Material::Scope_MATERIAL);
-				pass->getVariables()->addVariable("textureMatrix1",RenderVariable::ptr(new TextureMatrixVariable(1)),Material::Scope_MATERIAL);
-
-				pass->setTexture(0,engine->getTextureManager()->findTexture("grass.png"));
-				pass->setTexture(2,engine->getTextureManager()->findTexture("bark.png"));
-			}
-
-			grass->setLayer(-1);
-			grass->compile();
-			grass->retain();
-		}
-#endif
 		Logger::alert("Loading water");
-		water=engine->getMaterialManager()->createMaterial();
-		if(water!=NULL){
+		waterMaterial=engine->getMaterialManager()->createMaterial();
+		if(waterMaterial!=NULL){
 			Vector4 color=Colors::AZURE*1.5;
 			color.w=0.5f;
 
 			Texture::ptr noise1=engine->getTextureManager()->createTexture(createNoise(128,128,16,5,0.5,0.5));
 			Texture::ptr noise2=engine->getTextureManager()->createTexture(createNoise(128,128,16,12,0.5,0.5));
 
-			RenderPath::ptr shaderPath=water->addPath();
+			RenderPath::ptr shaderPath=waterMaterial->addPath();
 			{
 				RenderPass::ptr pass=shaderPath->addPass();
 
@@ -298,7 +192,7 @@ public:
 				pass->getVariables()->addVariable("textureMatrix1",RenderVariable::ptr(new TextureMatrixVariable(1)),Material::Scope_MATERIAL);
 			}
 
-			RenderPath::ptr fixedPath=water->addPath();
+			RenderPath::ptr fixedPath=waterMaterial->addPath();
 			{
 				RenderPass::ptr pass=fixedPath->addPass();
 
@@ -319,14 +213,14 @@ public:
 				pass->setTextureState(1,textureState);
 			}
 
-			water->setLayer(-1);
-			water->compile();
-			water->retain();
+			waterMaterial->setLayer(-1);
+			waterMaterial->compile();
+			waterMaterial->retain();
 		}
 
 		Logger::alert("Loading frog");
 
-		creature=engine->getMeshManager()->findMesh("frog.xmsh");
+		creature=engine->getMeshManager()->findMesh("frog.tmsh");
 		if(creature!=NULL){
 			Transform transform;
 			transform.setTranslate(0,0,-3.5);
@@ -456,8 +350,8 @@ public:
 	int patchSize;
 	scalar tolerance;
 	Vector4 skyColor,fadeColor;
-	Material::ptr grass;
-	Material::ptr water;
+	Texture::ptr seafloorTexture,rockTexture,grassTexture;
+	Material::ptr waterMaterial;
 	Mesh::ptr creature;
 	Mesh::ptr shadow;
 	Material::ptr treeBranch;

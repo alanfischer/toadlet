@@ -24,6 +24,7 @@
 #include <toadlet/peeper/VertexBuffer.h>
 #include <toadlet/tadpole/Renderable.h>
 #include <toadlet/tadpole/Traceable.h>
+#include <toadlet/tadpole/SceneRenderer.h>
 #include <toadlet/tadpole/node/Node.h>
 
 namespace toadlet{
@@ -118,6 +119,7 @@ public:
 	void traceLocalSegment(Collision &result,const Segment &segment,scalar epsilon,scalar cellEpsilon);
 	bool traceCell(Collision &result,int x,int y,const Segment &segment,scalar epsilon,scalar cellEpsilon);
 
+	int getNumLayers(){return mLayerTextures.size();}
 	Texture::ptr getLayerTexture(int i){return mLayerTextures[i];}
 
 	inline Renderable *internal_getWaterRenderable(){return mWaterRenderable;}

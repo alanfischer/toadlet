@@ -31,6 +31,9 @@
 #include <toadlet/egg/Logger.h>
 #include <windows.h>
 #include <commctrl.h>
+#if defined(TOADLET_DEBUG)
+	#define D3D_DEBUG_INFO
+#endif
 #if defined(TOADLET_SET_D3DM)
 	#include <d3dm.h>
 #else

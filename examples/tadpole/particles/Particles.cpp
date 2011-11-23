@@ -9,7 +9,7 @@ Particles::~Particles(){
 
 void Particles::create(){
 	engine=app->getEngine();
-	engine->setDirectory("../../../data");
+	engine->setDirectory("../../data");
 
 	scene=Scene::ptr(new Scene(engine));
 
@@ -79,9 +79,34 @@ void Particles::create(){
 	cameraNode->setLookAt(Vector3(0,-Math::fromInt(150),0),Math::ZERO_VECTOR3,Math::Z_UNIT_VECTOR3);
 	cameraNode->setClearColor(Colors::BLACK);
 	scene->getRoot()->attach(cameraNode);
+
+	pointNode->setWorldSpace(true);
+	particles.add(pointNode);
+	spriteNode->setWorldSpace(true);
+	spriteNode->setVelocityAligned(true);
+	particles.add(spriteNode);
+	beamNode->setWorldSpace(true);
+	particles.add(beamNode);
+
+	#if defined(LFX_DLL_NAME)
+		lfxLibrary.load(LFX_DLL_NAME,"","","");
+		lfxInitialize=(LFX2INITIALIZE)lfxLibrary.getSymbol(LFX_DLL_INITIALIZE);
+		lfxRelease=(LFX2RELEASE)lfxLibrary.getSymbol(LFX_DLL_RELEASE);
+		lfxReset=(LFX2RESET)lfxLibrary.getSymbol(LFX_DLL_RESET);
+		lfxUpdate=(LFX2UPDATE)lfxLibrary.getSymbol(LFX_DLL_UPDATE);
+		lfxLight=(LFX2LIGHT)lfxLibrary.getSymbol(LFX_DLL_LIGHT);
+
+		lfxInitialize();
+		lfxReset();
+		lfxTime=0;
+	#endif
 }
 
 void Particles::destroy(){
+	#if defined(LFX_DLL_NAME)
+		lfxRelease();
+	#endif
+
 	scene->destroy();
 }
 
@@ -109,10 +134,10 @@ void Particles::update(int dt){
 	scalar edge=Math::fromInt(60);
 
 	int i,j;
-	for(i=0;i<simulatedParticles.size();++i){
-		ParticleNode *particles=simulatedParticles[i];
-		for(j=0;j<particles->getNumParticles();++j){
-			ParticleNode::Particle *p=particles->getParticle(j);
+	for(i=0;i<particles.size();++i){
+		ParticleNode *pn=particles[i];
+		for(j=0;j<pn->getNumParticles();++j){
+			ParticleNode::Particle *p=pn->getParticle(j);
 			p->vz-=Math::mul(Math::fromFloat(9.8),fdt);
 
 			p->x+=Math::mul(p->vx,fdt);
@@ -128,39 +153,52 @@ void Particles::update(int dt){
 	}
 
 	scene->update(dt);
+
+	#if defined(LFX_DLL_NAME)
+		lfxTime+=dt;
+		if(lfxTime>200){
+			lfxTime=0;
+
+			scalar avgz=0;
+			int total=0;
+			for(i=0;i<particles.size();++i){
+				ParticleNode *pn=particles[i];
+				for(j=0;j<pn->getNumParticles();++j){
+					ParticleNode::Particle *p=pn->getParticle(j);
+					avgz+=p->z;
+					total++;
+				}
+			}
+
+			avgz/=(scalar)total;
+			unsigned int intensity=(Math::clamp(0,1,-avgz/edge)*0xFF);
+			lfxLight(LFX_ALL,(intensity<<24)|LFX_PINK);
+			lfxUpdate();
+		}
+	#endif
 }
 
 void Particles::keyPressed(int key){
 	if(key==Application::Key_ESC){
 		app->stop();
 	}
-	else if(key==Application::Key_SPACE){
-		pointNode->setWorldSpace(true);
-		spriteNode->setWorldSpace(true);
-		spriteNode->setVelocityAligned(true);
-		beamNode->setWorldSpace(true);
-
-		addSimulatedParticles(pointNode);
-		addSimulatedParticles(spriteNode);
-		addSimulatedParticles(beamNode);
+	if(key==Application::Key_SPACE){
+		scalar v=Math::fromInt(4);
+		int i,j;
+		for(i=0;i<particles.size();++i){
+			ParticleNode *pn=particles[i];
+			for(j=0;j<pn->getNumParticles();++j){
+				ParticleNode::Particle *p=pn->getParticle(j);
+				p->vx+=random.nextScalar(-v,v);
+				p->vy+=random.nextScalar(-v,v);
+				p->vz+=random.nextScalar(-v,v);
+			}
+		}
 	}
 }
 
 void Particles::mousePressed(int x,int y,int button){
 	keyPressed(Application::Key_SPACE);
-}
-
-void Particles::addSimulatedParticles(ParticleNode::ptr particles){
-	scalar v=Math::fromInt(4);
-	int i;
-	for(i=0;i<particles->getNumParticles();++i){
-		ParticleNode::Particle *p=particles->getParticle(i);
-		p->vx+=random.nextScalar(-v,v);
-		p->vy+=random.nextScalar(-v,v);
-		p->vz+=random.nextScalar(-v,v);
-	}
-
-	simulatedParticles.add(particles);
 }
 
 Applet *createApplet(Application *app){return new Particles(app);}

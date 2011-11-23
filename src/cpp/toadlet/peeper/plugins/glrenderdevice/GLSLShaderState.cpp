@@ -113,7 +113,9 @@ Shader::ptr GLSLShaderState::getShader(Shader::ShaderType type){
 
 int GLSLShaderState::getNumVariableBuffers(Shader::ShaderType type){
 	if(mNeedsLink){
-		link();
+		TOADLET_TRY
+			link();
+		TOADLET_CATCH(const Exception &){}
 	}
 
 	if(type==Shader::ShaderType_VERTEX){
@@ -126,7 +128,9 @@ int GLSLShaderState::getNumVariableBuffers(Shader::ShaderType type){
 
 VariableBufferFormat::ptr GLSLShaderState::getVariableBufferFormat(Shader::ShaderType type,int i){
 	if(mNeedsLink){
-		link();
+		TOADLET_TRY
+			link();
+		TOADLET_CATCH(const Exception &){}
 	}
 
 	if(type==Shader::ShaderType_VERTEX){
@@ -139,7 +143,9 @@ VariableBufferFormat::ptr GLSLShaderState::getVariableBufferFormat(Shader::Shade
 
 bool GLSLShaderState::activate(){
 	if(mNeedsLink){
-		link();
+		TOADLET_TRY
+			link();
+		TOADLET_CATCH(const Exception &){}
 	}
 
 	// Only use the program if we succesfully linked
@@ -215,11 +221,11 @@ bool GLSLShaderState::link(){
 		return false;
 	}
 
+	TOADLET_CHECK_GLERROR("GLSLShaderState::link");
+
 	reflect();
 
 	mNeedsLink=false;
-
-	TOADLET_CHECK_GLERROR("GLSLShaderState::link");
 
 	return true;
 }
@@ -250,35 +256,37 @@ bool GLSLShaderState::reflect(){
 	}
 
 	#if defined(TOADLET_HAS_GLUBOS)
-		int numUniformBlocks=0;
-		glGetProgramiv(mHandle,GL_ACTIVE_UNIFORM_BLOCKS,&numUniformBlocks);
+		if(mDevice->gl_version>=31){
+			int numUniformBlocks=0;
+			glGetProgramiv(mHandle,GL_ACTIVE_UNIFORM_BLOCKS,&numUniformBlocks);
 
-		for(i=0;i<numUniformBlocks;++i){
-			glGetActiveUniformBlockName(mHandle,i,sizeof(name),&nameLength,name);
-			glGetActiveUniformBlockiv(mHandle,i,GL_UNIFORM_BLOCK_DATA_SIZE,&dataSize);
-			glGetActiveUniformBlockiv(mHandle,i,GL_UNIFORM_BLOCK_ACTIVE_UNIFORMS,&numUniforms);
+			for(i=0;i<numUniformBlocks;++i){
+				glGetActiveUniformBlockName(mHandle,i,sizeof(name),&nameLength,name);
+				glGetActiveUniformBlockiv(mHandle,i,GL_UNIFORM_BLOCK_DATA_SIZE,&dataSize);
+				glGetActiveUniformBlockiv(mHandle,i,GL_UNIFORM_BLOCK_ACTIVE_UNIFORMS,&numUniforms);
 
-			VariableBufferFormat::ptr variableFormat(new VariableBufferFormat(false,name,dataSize,numUniforms));
+				VariableBufferFormat::ptr variableFormat(new VariableBufferFormat(false,name,dataSize,numUniforms));
 
-			GLint *indexes=new GLint[numUniforms];
-			glGetActiveUniformBlockiv(mHandle,i,GL_UNIFORM_BLOCK_ACTIVE_UNIFORM_INDICES,indexes);
+				GLint *indexes=new GLint[numUniforms];
+				glGetActiveUniformBlockiv(mHandle,i,GL_UNIFORM_BLOCK_ACTIVE_UNIFORM_INDICES,indexes);
 
-			int j;
-			for(j=0;j<numUniforms;++j){
-				Logger::alert(String("Uniform block uniform index:")+indexes[j]);
+				int j;
+				for(j=0;j<numUniforms;++j){
+					Logger::alert(String("Uniform block uniform index:")+indexes[j]);
 
-				int index=indexes[j];
-				variableFormat->setStructVariable(j,primaryVariables[index]);
-				variableFormat->getStructVariable(j)->setIndex(index);
+					int index=indexes[j];
+					variableFormat->setStructVariable(j,primaryVariables[index]);
+					variableFormat->getStructVariable(j)->setIndex(index);
 
-				primaryVariables[index]=NULL;
+					primaryVariables[index]=NULL;
+				}
+
+				delete[] indexes;
+
+				variableFormat->compile();
+
+				mVariableBufferFormats.add(variableFormat);
 			}
-
-			delete[] indexes;
-
-			variableFormat->compile();
-
-			mVariableBufferFormats.add(variableFormat);
 		}
 	#endif
 

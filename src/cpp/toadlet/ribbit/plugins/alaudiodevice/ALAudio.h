@@ -75,6 +75,7 @@ public:
 
 protected:
 	void update(int dt);
+	void updateStreaming(int dt);
 	int readAudioData(tbyte *buffer,int bsize);
 	void setImmediateGain(scalar gain);
 
@@ -82,11 +83,9 @@ protected:
 	bool mGlobal;
 	bool mLooping;
 	ALuint mHandle;
-	unsigned int *mStreamingBuffers;
-	int mTotalBuffersPlayed;
-	scalar mTargetGain;
+	ALuint *mStreamingBuffers;
+	int mTotalBuffersPlayed,mTotalBuffersQueued;
 	scalar mGain;
-	int mFadeTime;
 	AudioBuffer::ptr mAudioBuffer;
 	AudioStream::ptr mAudioStream;
 

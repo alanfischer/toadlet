@@ -31,10 +31,6 @@
 #include <toadlet/egg/Error.h>
 #include <stdio.h>
 
-#if defined(TOADLET_PLATFORM_WIN32) && defined(TOADLET_LIBMXML_NAME)
-	#pragma comment(lib,TOADLET_LIBMXML_NAME)
-#endif
-
 using namespace toadlet::egg::MathConversion;
 
 namespace toadlet{

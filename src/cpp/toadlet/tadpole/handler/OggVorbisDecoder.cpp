@@ -29,18 +29,6 @@
 #include <vorbis/codec.h>
 #include <vorbis/vorbisfile.h>
 
-#if defined(TOADLET_PLATFORM_WIN32)
-	#if defined(TOADLET_LIBOGG_NAME)
-		#pragma comment(lib,TOADLET_LIBOGG_NAME)
-	#endif
-	#if defined(TOADLET_LIBVORBISFILE_NAME)
-		#pragma comment(lib,TOADLET_LIBVORBISFILE_NAME)
-	#endif
-	#if defined(TOADLET_LIBVORBIS_NAME)
-		#pragma comment(lib,TOADLET_LIBVORBIS_NAME)
-	#endif
-#endif
-
 namespace toadlet{
 namespace tadpole{
 namespace handler{

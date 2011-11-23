@@ -41,6 +41,8 @@ namespace ribbit{
 class MMAudio;
 class MMAudioBuffer;
 
+// You can not use both the ALAUdioDevice and the MMAudioDevice simultaniously.
+// Whichever one you create second will be the useable device.
 class TOADLET_API MMAudioDevice:public AudioDevice{
 public:
 	// Options

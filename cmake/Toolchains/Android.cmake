@@ -2,8 +2,8 @@
 #  Android CMake toolchain file, for use with the ndk r5,r6
 #  See home page: http://code.google.com/p/android-cmake/
 #
-#  Altered for x86 builds by http://lightningtoads.com for use
-#  with the toadlet engine http://code.google.com/p/toadlet
+#  Updated by http://lightningtoads.com for use with 
+#  the toadlet engine http://code.google.com/p/toadlet
 #
 #  Usage Linux:
 #   $ export ANDROID_NDK=/<absolute path to NDK>
@@ -37,10 +37,12 @@
 #    ANDROID_NDK_API_LEVEL=android-8 - level of android NDK API to use.
 #      Option is ignored when build uses stanalone toolchain.
 #
-#    ANDROID_SDK=no default - path to SDK root. Required for toadlet builds with ANDROID_NDK_API_LEVEL<9
+#    ANDROID_SDK=no default - path to SDK root. Used to locate the ANDROID_JAR file.
 #      Can be set as environment variable.
 #
 #    ANDROID_SDK_API_LEVEL=8 - level of android SDK API to use. 
+#
+#    ANDROID_JAR=no default - direct path to the ANDROID_JAR file. If set then the ANDROID_SDK_* values have no effect.
 #
 #    ANDROID_ARCH=ARM - target architecture for the android build, may be either ARM or X86. 
 #      The X86 architecture is only available with the ANDROID_NDK_API_LEVEL>=9
@@ -113,6 +115,15 @@
 #     [~] fixed options caching
 #     [~] search for all supported NDK versions
 #     [~] allowed spaces in NDK path
+#   - modified October 2011 Andrew Fischer andrew@lightningtoads.com
+#     [~] included the latest ndk version r6b 
+#     [~] added support for the android x86 platform (via ANDROID_ARCH)
+#     [~] added the CMAKE_PREFIX_PATH variable to the CMAKE_FIND_ROOT_PATH
+#     [~] changed ANDROID_API_LEVEL to ANDROID_NDK_API_LEVEL to avoid ambiguity
+#     [~] added ANDROID_SDK location for android SDK awareness, used by toadlet
+#     [~] added ANDROID_SDK_API_LEVEL for android SKD awareness, used by toadlet
+#     [~] added ANDROID_ARCH=ARM or X86. (X86 only available with ANDROID_NDK_API_LEVEL>=9)
+#     [~] fixed CMAKE_INSTALL_NAME_TOOL definition on OSX platforms
 # ----------------------------------------------------------------------------
 
 # this one is important
@@ -121,7 +132,7 @@ set( CMAKE_SYSTEM_NAME Linux )
 set( CMAKE_SYSTEM_VERSION 1 )
 
 set( ANDROID_NDK_DEFAULT_SEARCH_PATH /opt/android-ndk )
-set( ANDROID_NDK_SUPPORTED_VERSIONS -r6 -r5c -r5b -r5 "")
+set( ANDROID_NDK_SUPPORTED_VERSIONS -r6b -r6 -r5c -r5b -r5 "")
 set( ANDROID_NDK_TOOLCHAIN_DEFAULT_SEARCH_PATH /opt/android-toolchain )
 set( TOOL_OS_SUFFIX "" )
 
@@ -197,31 +208,31 @@ if( EXISTS "${ANDROID_NDK}" )
   message( STATUS "If you prefer to use a different API level, please define the variable: ANDROID_NDK_API_LEVEL" )
  endif( NOT ANDROID_NDK_API_LEVEL GREATER 2 )
  
- # NDK versions less than 9 require the android SDK when building toadlet
- if( ANDROID_NDK_API_LEVEL LESS 9 )
-  if( NOT DEFINED ANDROID_SDK )
-   set( ANDROID_SDK $ENV{ANDROID_SDK} )
-  endif( NOT DEFINED ANDROID_SDK )
-  if( NOT DEFINED ANDROID_SDK )
-   message( FATAL_ERROR "Android NDK API levels < 9 require the ANDROID_SDK variable to be set to your install of the Android SDK" )
-  endif( NOT DEFINED ANDROID_SDK )
-  set( ANDROID_SDK ${ANDROID_SDK} CACHE PATH "root of the android SDK" FORCE )
+ # Set the android SDK if defined
+ if( NOT DEFINED ANDROID_SDK )
+  set( ANDROID_SDK $ENV{ANDROID_SDK} )
+ endif( NOT DEFINED ANDROID_SDK )
+ set( ANDROID_SDK ${ANDROID_SDK} CACHE PATH "root of the android SDK" FORCE )
 
-  set( ANDROID_SDK_API_LEVEL $ENV{ANDROID_SDK_API_LEVEL} )
-  if( NOT DEFINED ANDROID_SDK_API_LEVEL )
-   set( ANDROID_SDK_API_LEVEL 8)
+ # Set the default api level for the SDK
+ set( ANDROID_SDK_API_LEVEL $ENV{ANDROID_SDK_API_LEVEL} )
+ if( NOT DEFINED ANDROID_SDK_API_LEVEL )
+  set( ANDROID_SDK_API_LEVEL 8)
+  if ( EXISTS ANDROID_SDK )
    message( STATUS "Using default android SDK API level android-${ANDROID_SDK_API_LEVEL}" )
    message( STATUS "If you prefer to use a different SDK API level, please define the variable: ANDROID_SDK_API_LEVEL" )
-  endif( NOT DEFINED ANDROID_SDK_API_LEVEL )
-  set (ANDROID_SDK_API_LEVEL ${ANDROID_SDK_API_LEVEL} CACHE STRING "android SDK API level" FORCE)
+  endif ( EXISTS ANDROID_SDK )
+ endif( NOT DEFINED ANDROID_SDK_API_LEVEL )
+ set (ANDROID_SDK_API_LEVEL ${ANDROID_SDK_API_LEVEL} CACHE STRING "android SDK API level" FORCE)
 
-  # Find and set the android.jar file for the selected API level
-  if( NOT DEFINED ANDROID_JAR)
-   set( ANDROID_JAR ${ANDROID_SDK}/platforms/android-${ANDROID_SDK_API_LEVEL}/android.jar )
+ # Find and set the android.jar file for the selected API level
+ if( NOT DEFINED ANDROID_JAR)
+  set( ANDROID_JAR ${ANDROID_SDK}/platforms/android-${ANDROID_SDK_API_LEVEL}/android.jar )
+  if ( EXISTS ${ANDROID_JAR} )
    message( STATUS "Using android.jar found at ${ANDROID_JAR}")
-  endif( NOT DEFINED ANDROID_JAR)
-  set( ANDROID_JAR ${ANDROID_JAR} CACHE FILEPATH "android SDK jar file" FORCE )
- endif( ANDROID_NDK_API_LEVEL LESS 9 )
+  endif ( EXISTS ${ANDROID_JAR} )
+ endif( NOT DEFINED ANDROID_JAR)
+ set( ANDROID_JAR ${ANDROID_JAR} CACHE FILEPATH "android SDK jar file" FORCE )
 
  # Setup the android architecture
  if( NOT ANDROID_ARCH )

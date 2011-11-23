@@ -1,5 +1,0 @@
-/* Configure options */
-#cmakedefine HAVE_FNMATCH_H 1
-#cmakedefine HAVE_STRDUP 1
-#cmakedefine HAVE_STRCASECMP 1
-#cmakedefine WIN_NT 1

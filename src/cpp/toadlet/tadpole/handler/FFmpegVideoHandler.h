@@ -1,11 +1,11 @@
-#ifndef TOADLET_TADPOLE_HANDLER_FFMPEGTEXTUREMODIFIER_H
-#define TOADLET_TADPOLE_HANDLER_FFMPEGTEXTUREMODIFIER_H
+#ifndef TOADLET_TADPOLE_HANDLER_FFMPEGVIDEOHANDLER_H
+#define TOADLET_TADPOLE_HANDLER_FFMPEGVIDEOHANDLER_H
 
 #include <toadlet/egg/Mutex.h>
 #include <toadlet/egg/WaitCondition.h>
 #include <toadlet/peeper/Texture.h>
 #include <toadlet/ribbit/Audio.h>
-#include <toadlet/tadpole/ResourceModifier.h>
+#include <toadlet/tadpole/VideoHandler.h>
 #include <toadlet/tadpole/Engine.h>
 
 #ifndef INT64_C
@@ -27,9 +27,9 @@ namespace handler{
 class FFmpegAudioStream;
 class FFmpegVideoStream;
 
-class FFmpegTextureController:public ResourceController{
+class FFmpegController:public VideoController{
 public:
-	TOADLET_SHARED_POINTERS(FFmpegTextureController);
+	TOADLET_SHARED_POINTERS(FFmpegController);
 
 	class PacketQueue{
 	public:
@@ -78,9 +78,15 @@ public:
 
 	/// @todo: Let us be able to open a stream and query its parameters before specifying a texture
 	/// @todo: Move the Audio creation out from here, and instead have it be something passed in, if Audio is desired
-	FFmpegTextureController(Engine *engine);
-	bool open(Stream::ptr stream,Resource::ptr resource);
+	FFmpegController(Engine *engine);
+	virtual ~FFmpegController();
+
+	bool open(Stream::ptr stream);
 	void destroy();
+
+	TextureFormat::ptr getVideoFormat(){return mVideoFormat;}
+	void setTexture(Texture::ptr texture);
+	void setAudio(Audio::ptr audio);
 
 	void start();
 	void pause();
@@ -88,15 +94,18 @@ public:
 	void stop();
 	void update(int dt);
 
-	int64 currentTime();
-	int64 maxTime();
+	int64 currentTime(){return avtimeToMilli(mTime);}
+	int64 maxTime(){return avtimeToMilli(mMaxTime);}
 	bool seek(int64 time);
+
+	Resource::ptr getResource(){return mTexture;}
 
 	AVFormatContext *getFormatCtx(){return mFormatCtx;}
 	StreamData *getStreamData(int type){return &mStreams[type];}
 	int64 rawTime(){return mTime;}
 
-	void run();
+	inline uint64 milliToAVTime(uint64 t){return t*(AV_TIME_BASE/1000);}
+	inline uint64 avtimeToMilli(uint64 t){return t*1000/AV_TIME_BASE;}
 
 protected:
 	enum State{
@@ -119,17 +128,18 @@ protected:
     AVFormatContext *mFormatCtx;
 	StreamData mStreams[AVMEDIA_TYPE_NB];
 	AVPacket mFlushPkt;
+	TextureFormat::ptr mVideoFormat;
 
 	State mState;
 
-	uint64 mTime;
+	uint64 mTime,mMaxTime;
 };
 
 class FFmpegAudioStream:public AudioStream{
 public:
 	TOADLET_SHARED_POINTERS(FFmpegAudioStream);
 
-	FFmpegAudioStream(FFmpegTextureController *controller,FFmpegTextureController::StreamData *streamData);
+	FFmpegAudioStream(FFmpegController *controller,FFmpegController::StreamData *streamData);
 	virtual ~FFmpegAudioStream();
 
 	void close();
@@ -150,18 +160,20 @@ public:
 
 protected:
 	AVPacket mPkt;
-	FFmpegTextureController *mController;
-	FFmpegTextureController::StreamData *mStreamData;
+	FFmpegController *mController;
+	FFmpegController::StreamData *mStreamData;
 	AudioFormat::ptr mAudioFormat;
-	tbyte mDecodeBuffer[AVCODEC_MAX_AUDIO_FRAME_SIZE];
-	int mDecodeLength;
+	tbyte *mDecodeBuffer;
+	int mDecodeLength,mDecodeOffset;
+
+	friend class FFmpegController;
 };
 
 class FFmpegVideoStream{
 public:
 	TOADLET_SHARED_POINTERS(FFmpegVideoStream);
 
-	FFmpegVideoStream(FFmpegTextureController *controller,FFmpegTextureController::StreamData *streamData,Texture::ptr texture);
+	FFmpegVideoStream(FFmpegController *controller,FFmpegController::StreamData *streamData,Texture::ptr texture);
 	virtual ~FFmpegVideoStream();
 
 	void close();
@@ -170,28 +182,28 @@ public:
 
 protected:
 	AVPacket mPkt;
-	FFmpegTextureController *mController;
-	FFmpegTextureController::StreamData *mStreamData;
+	FFmpegController *mController;
+	FFmpegController::StreamData *mStreamData;
 	Texture::ptr mTexture;
 
 	SwsContext *mSwsCtx;
-	AVFrame *mVideoFrame;
-	AVFrame *mTextureFrame;
-	tbyte *mTextureBuffer;
+	AVFrame *mVideoFrame,*mDeinterlacedFrame,*mTextureFrame;
 
 	uint64 mPtsTime;
+
+	friend class FFmpegController;
 };
 
-class FFmpegTextureModifier:public ResourceModifier{
+class FFmpegVideoHandler:public VideoHandler{
 public:
-	TOADLET_SHARED_POINTERS(FFmpegTextureModifier);
+	TOADLET_SHARED_POINTERS(FFmpegVideoHandler);
 
-	FFmpegTextureModifier(Engine *engine);
-	virtual ~FFmpegTextureModifier();
+	FFmpegVideoHandler(Engine *engine);
+	virtual ~FFmpegVideoHandler();
 
 	void destroy();
 
-	ResourceController::ptr open(Stream::ptr stream,Resource::ptr resource);
+	VideoController::ptr open(Stream::ptr stream);
 
 	static PixelFormat getPixelFormat(int textureFormat);
 

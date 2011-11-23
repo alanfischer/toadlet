@@ -1,6 +1,23 @@
 # This file is based off of the Platform/Darwin.cmake and Platform/UnixPaths.cmake
 # files which are included with CMake 2.8.4
 # It has been altered for iOS development
+
+# Options:
+#
+# IOS_PLATFORM = OS (default) or SIMULATOR
+#   This decides if SDKS will be selected from the iPhoneOS.platform or iPhoneSimulator.platform folders
+#   OS - the default, used to build for iPhone and iPad physical devices, which have an arm arch.
+#   SIMULATOR - used to build for the Simulator platforms, which have an x86 arch.
+#
+# CMAKE_IOS_DEVELOPER_ROOT = automatic(default) or /path/to/platform/Developer folder
+#   By default this location is automatcially chosen based on the IOS_PLATFORM value above.
+#   If set manually, it will override the default location and force the user of a particular Developer Platform
+#
+# CMAKE_IOS_SDK_ROOT = automatic(default) or /path/to/platform/Developer/SDKs/SDK folder
+#   By default this location is automatcially chosen based on the CMAKE_IOS_DEVELOPER_ROOT value.
+#   In this case it will always be the most up-to-date SDK found in the CMAKE_IOS_DEVELOPER_ROOT path.
+#   If set manually, this will force the use of a specific SDK version
+
 # Standard settings
 set (CMAKE_SYSTEM_NAME Darwin)
 set (CMAKE_SYSTEM_VERSION 1 )
@@ -52,9 +69,24 @@ if (NOT DEFINED CMAKE_INSTALL_NAME_TOOL)
 	find_program(CMAKE_INSTALL_NAME_TOOL install_name_tool)
 endif (NOT DEFINED CMAKE_INSTALL_NAME_TOOL)
 
+# Setup iOS platform
+if (NOT DEFINED IOS_PLATFORM)
+	set (IOS_PLATFORM "OS")
+endif (NOT DEFINED IOS_PLATFORM)
+set (IOS_PLATFORM ${IOS_PLATFORM} CACHE STRING "Type of iOS Platform")
+
+# Check the platform selection and setup for developer root
+if (${IOS_PLATFORM} STREQUAL "OS")
+	set (IOS_PLATFORM_LOCATION "iPhoneOS.platform")
+elseif (${IOS_PLATFORM} STREQUAL "SIMULATOR")
+	set (IOS_PLATFORM_LOCATION "iPhoneSimulator.platform")
+else (${IOS_PLATFORM} STREQUAL "OS")
+	message (FATAL_ERROR "Unsupported IOS_PLATFORM value selected. Please choose OS or SIMULATOR")
+endif (${IOS_PLATFORM} STREQUAL "OS")
+
 # Setup iOS developer location
 if (NOT DEFINED CMAKE_IOS_DEVELOPER_ROOT)
-	set (CMAKE_IOS_DEVELOPER_ROOT "/Developer/Platforms/iPhoneOS.platform/Developer")
+	set (CMAKE_IOS_DEVELOPER_ROOT "/Developer/Platforms/${IOS_PLATFORM_LOCATION}/Developer")
 endif (NOT DEFINED CMAKE_IOS_DEVELOPER_ROOT)
 set (CMAKE_IOS_DEVELOPER_ROOT ${CMAKE_IOS_DEVELOPER_ROOT} CACHE PATH "Location of iOS Platform")
 
@@ -80,7 +112,7 @@ set (CMAKE_OSX_SYSROOT ${CMAKE_IOS_SDK_ROOT} CACHE PATH "Sysroot used for iOS su
 set (CMAKE_OSX_ARCHITECTURES "$(ARCHS_STANDARD_32_BIT)" CACHE string  "Build architecture for iOS")
 
 # Set the find root to the iOS developer roots and to user defined paths
-set (CMAKE_FIND_ROOT_PATH ${CMAKE_IOS_DEVELOPER_ROOT} ${CMAKE_IOS_SDK_ROOT} ${CMAKE_PREFIX_PATH} CACHE string  "iOS library search path root")
+set (CMAKE_FIND_ROOT_PATH ${CMAKE_IOS_DEVELOPER_ROOT} ${CMAKE_IOS_SDK_ROOT} ${CMAKE_PREFIX_PATH} CACHE string  "iOS find search path root")
 
 # default to searching for frameworks first
 set (CMAKE_FIND_FRAMEWORK FIRST)

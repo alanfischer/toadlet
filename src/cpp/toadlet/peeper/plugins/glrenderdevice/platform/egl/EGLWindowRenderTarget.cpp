@@ -83,6 +83,10 @@ EGLWindowRenderTarget::~EGLWindowRenderTarget(){
 	destroyContext();
 }
 
+void EGLWindowRenderTarget::destroy(){
+	destroyContext();
+}
+
 bool EGLWindowRenderTarget::createContext(void *display,void *window,WindowRenderTargetFormat *format,bool pixmap){
 	if(mContext!=EGL_NO_CONTEXT){
 		return true;
@@ -155,8 +159,8 @@ bool EGLWindowRenderTarget::createContext(void *display,void *window,WindowRende
 		String("chooseEGLConfig config:")+(int)mConfig);
 
 	try{
-		if(!pixmap){
-			mSurface=eglCreateWindowSurface(mDisplay,mConfig,(ANativeWindow*)window,NULL);
+		if(!pixmap){		
+			mSurface=eglCreateWindowSurface(mDisplay,mConfig,(NativeWindowType)window,NULL);
 			TOADLET_CHECK_EGLERROR("eglCreateWindowSurface");
 		}
 		else{

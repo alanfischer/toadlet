@@ -9,6 +9,11 @@ set (STATIC_LIB_PROPS COMPILE_DEFINITIONS TOADLET_BUILD_STATIC COMPILE_DEFINITIO
 set (LIB_INSTALL_DIR lib)
 
 
+# Grab the scripts for dealing with purely static libraries
+include (LocateStaticLibrary)
+include (MergeStaticLibraries)
+
+
 # Setup all platform specific options
 if (TOADLET_PLATFORM_ANDROID)
 	# Android libraries install to an architecture specific subdirectory
@@ -32,7 +37,7 @@ elseif (TOADLET_PLATFORM_POSIX)
 	if (TOADLET_HAS_SSE)
 		set (DYNAMIC_LIB_FLAGS "${DYNAMIC_LIB_FLAGS} -msse2")
 		set (STATIC_LIB_FLAGS "${STATIC_LIB_FLAGS} -msse2")
-		message ("SSE2 support enabled")
+		message (STATUS "SSE2 support enabled")
 	endif (TOADLET_HAS_SSE)
 
 	# Append the compile flags to the properties
@@ -115,7 +120,7 @@ elseif (TOADLET_PLATFORM_WIN32)
 	if (TOADLET_HAS_SSE)
 		set (DYNAMIC_LIB_FLAGS "${DYNAMIC_LIB_FLAGS} /arch:SSE2")
 		set (STATIC_LIB_FLAGS "${STATIC_LIB_FLAGS} /arch:SSE2")
-		message ("SSE2 support enabled")
+		message (STATUS "SSE2 support enabled")
 	endif (TOADLET_HAS_SSE)
 
 	# Append the compile flags to the properties
@@ -209,15 +214,16 @@ file (APPEND ${HEADER_FILE} "\n")
 file (APPEND ${HEADER_FILE} "#endif\n")
 
 
+# Setup toadlet configure file
+configure_file (${CMAKE_CURRENT_SOURCE_DIR}/Config.h.cmake ${CMAKE_CURRENT_BINARY_DIR}/Config.h)
+
+
 # Install header files
-install (DIRECTORY ${toadlet_SOURCE_DIR}/src/cpp/toadlet DESTINATION include FILES_MATCHING PATTERN "*.h")
+install (FILES ${toadlet_SOURCE_DIR}/src/cpp/toadlet/Types.h DESTINATION include/toadlet)
 install (FILES ${toadlet_BINARY_DIR}/src/cpp/toadlet/Config.h DESTINATION include/toadlet)
 foreach (TOADLET_LIBRARY ${TOADLET_LIBRARY_LIST})
+	install (DIRECTORY ${toadlet_SOURCE_DIR}/src/cpp/toadlet/${TOADLET_LIBRARY}  DESTINATION include/toadlet/${TOADLET_LIBRARY} FILES_MATCHING PATTERN "*.h")
 	install (FILES ${toadlet_BINARY_DIR}/src/cpp/toadlet/${TOADLET_LIBRARY}.h DESTINATION include/toadlet)
 endforeach (TOADLET_LIBRARY)
 install (FILES ${toadlet_BINARY_DIR}/src/cpp/toadlet/toadlet.h DESTINATION include/toadlet)
-
-
-# Setup toadlet configure file
-configure_file (${CMAKE_CURRENT_SOURCE_DIR}/Config.h.cmake ${CMAKE_CURRENT_BINARY_DIR}/Config.h)
 

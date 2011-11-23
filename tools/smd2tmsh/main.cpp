@@ -59,6 +59,7 @@ int main(int argc,char **argv){
 	Logger::getInstance()->setCategoryReportingLevel(Categories::TOADLET_TADPOLE,Logger::Level_WARNING);
 
 	Engine *engine=new Engine();
+	engine->installHandlers();
 
 	// Load each file
 	for(i=0;i<files.size();++i){

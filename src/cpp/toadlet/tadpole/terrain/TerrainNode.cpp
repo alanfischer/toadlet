@@ -38,6 +38,7 @@ TerrainNode::TerrainNode():super(),
 	mListener(NULL),
 	//mTarget,
 	mDataSource(NULL),
+	mMaterialSource(NULL),
 	mSize(0),mHalfSize(0),
 	mTerrainX(0),mTerrainY(0),
 	//mUnactivePatches,
@@ -125,6 +126,12 @@ void TerrainNode::setDataSource(TerrainNodeDataSource *dataSource){
 }
 
 void TerrainNode::setMaterial(Material::ptr material){
+	if(mPatchMaterial==material){
+		return;
+	}
+
+	setMaterialSource(NULL);
+
 	if(mPatchMaterial!=material){
 		if(mPatchMaterial!=NULL){
 			mPatchMaterial->release();
@@ -136,11 +143,30 @@ void TerrainNode::setMaterial(Material::ptr material){
 			mPatchMaterial->retain();
 		}
 	}
-
+	
 	int i;
 	for(i=0;i<mPatchGrid.size();++i){
 		if(mPatchGrid[i]!=NULL){
 			mPatchGrid[i]->setMaterial(mPatchMaterial);
+		}
+	}
+}
+
+void TerrainNode::setMaterialSource(TerrainNodeMaterialSource *materialSource){
+	if(mMaterialSource==materialSource){
+		return;
+	}
+
+	setMaterial(NULL);
+	
+	mMaterialSource=materialSource;
+	
+	if(mMaterialSource!=NULL){
+		int i;
+		for(i=0;i<mPatchGrid.size();++i){
+			if(mPatchGrid[i]!=NULL){
+				mPatchGrid[i]->setMaterial(mMaterialSource->getMaterial(mPatchGrid[i]));
+			}
 		}
 	}
 }
@@ -291,14 +317,20 @@ void TerrainNode::createPatch(int x,int y){
 
 	patch->setScale(mPatchScale);
 	patch->setTranslate(toWorldXi(x)-mPatchSize*mPatchScale.x/2,toWorldYi(y)-mPatchSize*mPatchScale.y/2,0);
-	patch->setMaterial(mPatchMaterial);
-	patch->setWaterMaterial(mPatchWaterMaterial);
 	patch->setTolerance(mPatchTolerance);
 
 	mDataSource->getPatchHeightData(&mPatchHeightData[0],x,y);
 	patch->setHeightData(&mPatchHeightData[0],mPatchSize,mPatchSize,mPatchSize,true);
 	mDataSource->getPatchLayerData(&mPatchLayerData[0],x,y);
 	patch->setLayerData(&mPatchLayerData[0],mPatchSize,mPatchSize,mPatchSize);
+
+	if(mMaterialSource!=NULL){
+		patch->setMaterial(mMaterialSource->getMaterial(patch));
+	}
+	else{
+		patch->setMaterial(mPatchMaterial);
+	}
+	patch->setWaterMaterial(mPatchWaterMaterial);
 
 	attach(patch);
 

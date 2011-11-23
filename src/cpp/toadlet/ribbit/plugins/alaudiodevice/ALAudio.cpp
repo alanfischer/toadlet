@@ -28,30 +28,29 @@
 #include "ALAudioBuffer.h"
 #include <toadlet/egg/MathConversion.h>
 #include <toadlet/egg/EndianConversion.h>
-#include <toadlet/egg/Exception.h>
+#include <toadlet/egg/System.h>
 
 namespace toadlet{
 namespace ribbit{
 
-const static int bufferSize=4096*4;
-const static int numBuffers=8;
+/// @todo: Move these into member variables of ALAudio
+const static int bufferSize=1024*4;
+const static int numBuffers=4;
 
+/// @todo: When playing back the Stove sample video, when we stop, rewind, and play again the audio timing seems to start later sometimes.  We probably need to flush more buffers.
 ALAudio::ALAudio(ALAudioDevice *audioDevice):
 	mDevice(NULL),
 	mGlobal(false),
 	mLooping(false),
 	mHandle(0),
 	mStreamingBuffers(NULL),
-	mTotalBuffersPlayed(0),
-	mTargetGain(0),
-	mGain(0),
-	mFadeTime(0)
+	mTotalBuffersPlayed(0),mTotalBuffersQueued(0),
+	mGain(0)
 	//mAudioBuffer,
 	//mAudioStream,
 {
 	mDevice=audioDevice;
 
-	mTargetGain=Math::ONE;
 	mGain=Math::ONE;
 }
 
@@ -65,6 +64,8 @@ bool ALAudio::create(AudioBuffer::ptr audioBuffer){
 		return false;
 	}
 	
+	mDevice->activate();
+
 	mHandle=mDevice->checkoutSourceHandle(this);
 
 	mAudioStream=NULL;
@@ -84,18 +85,18 @@ bool ALAudio::create(AudioBuffer::ptr audioBuffer){
 }
 
 bool ALAudio::create(AudioStream::ptr stream){
+	mDevice->activate();
+
 	mHandle=mDevice->checkoutSourceHandle(this);
 
 	mAudioStream=stream;
 	mAudioBuffer=NULL;
 
-	mDevice->lock();
-		update(0);
-	mDevice->unlock();
+	update(0);
 
 	if(alIsSource(mHandle)){
 		alSourceStop(mHandle);
-		TOADLET_CHECK_ALERROR("loadAudioStream::alSourceStop");
+		TOADLET_CHECK_ALERROR("alSourceStop");
 	}
 
 	return true;
@@ -103,6 +104,10 @@ bool ALAudio::create(AudioStream::ptr stream){
 
 void ALAudio::destroy(){
 	if(mDevice!=NULL && mHandle!=0){
+		mDevice->activate();
+
+		stop();
+
 		if(alIsSource(mHandle)){
 			alSourceStop(mHandle);
 			alSourcei(mHandle,AL_BUFFER,0);
@@ -113,15 +118,53 @@ void ALAudio::destroy(){
 }
 
 bool ALAudio::play(){
-	alSourcePlay(mHandle);
-	TOADLET_CHECK_ALERROR("playAudioBuffer::alSourcePlay");
+	if(mAudioStream!=NULL && mStreamingBuffers==NULL){
+		unsigned char buffer[bufferSize];
+		int total=0;
+
+		mStreamingBuffers=new ALuint[numBuffers];
+		alGenBuffers(numBuffers,mStreamingBuffers);
+		TOADLET_CHECK_ALERROR("alGenBuffers");
+
+		int i;
+		for(i=0;i<numBuffers;++i){
+			int amount=readAudioData(buffer,bufferSize);
+			total=total+amount;
+			alBufferData(mStreamingBuffers[i],
+				ALAudioDevice::getALFormat(mAudioStream->getAudioFormat()),
+				buffer,amount,mAudioStream->getAudioFormat()->samplesPerSecond);
+			TOADLET_CHECK_ALERROR("alBufferData");
+		}
+
+		mTotalBuffersPlayed=numBuffers;
+		mTotalBuffersQueued=numBuffers;
+
+		alSourceQueueBuffers(mHandle,numBuffers,mStreamingBuffers);
+		TOADLET_CHECK_ALERROR("alSourceQueueBuffers");
+	}
+
+	if(alIsSource(mHandle)){
+		alSourcePlay(mHandle);
+		TOADLET_CHECK_ALERROR("alSourcePlay");
+	}
 
 	return true;
 }
 
 bool ALAudio::stop(){
-	alSourceStop(mHandle);
-	TOADLET_CHECK_ALERROR("playAudioStream::alSourcePlay");
+	if(alIsSource(mHandle)){
+		alSourceStop(mHandle);
+		TOADLET_CHECK_ALERROR("alSourceStop");
+	}
+
+	if(mAudioStream!=NULL && mStreamingBuffers!=NULL){
+		alSourceUnqueueBuffers(mHandle,numBuffers,mStreamingBuffers);
+		alDeleteBuffers(numBuffers,mStreamingBuffers);
+		TOADLET_CHECK_ALERROR("alDeleteBuffers");
+
+		delete[] mStreamingBuffers;
+		mStreamingBuffers=NULL;
+	}
 
 	return true;
 }
@@ -173,21 +216,9 @@ bool ALAudio::getLooping() const{
 }
 
 void ALAudio::setGain(scalar gain){
-	if(mDevice!=NULL){
-		mDevice->lock();
-			setImmediateGain(gain);
-			mTargetGain=gain;
-			mFadeTime=0;
-		mDevice->unlock();
-	}
-}
-
-void ALAudio::fadeToGain(scalar gain,int time){
-	if(mDevice!=NULL){
-		mDevice->lock();
-			mTargetGain=gain;
-			mFadeTime=time;
-		mDevice->unlock();
+	mGain=gain;
+	if(alIsSource(mHandle)){
+		alSourcef(mHandle,AL_GAIN,MathConversion::scalarToFloat(gain));
 	}
 }
 
@@ -258,96 +289,52 @@ void ALAudio::setVelocity(const Vector3 &velocity){
 }
 
 void ALAudio::update(int dt){
-	scalar fdt=Math::fromMilli(dt);
-	if(mGain!=mTargetGain){
-		scalar speed=Math::div(fdt,Math::fromMilli(mFadeTime));
-		if(mGain<mTargetGain){
-			mGain+=speed;
-			if(mGain>mTargetGain){
-				mGain=mTargetGain;
-				mFadeTime=0;
-			}
-		}
-		else{
-			mGain-=speed;
-			if(mGain<mTargetGain){
-				mGain=mTargetGain;
-				mFadeTime=0;
-			}
-		}
-
-		setImmediateGain(mGain);
-	}
-
 	if(mAudioStream!=NULL){
-		unsigned char buffer[bufferSize];
-		ALenum format=ALAudioDevice::getALFormat(mAudioStream->getAudioFormat()->bitsPerSample,mAudioStream->getAudioFormat()->channels);
-		int total=0;
-		if(mStreamingBuffers==NULL){
-			mStreamingBuffers=new unsigned int[numBuffers];
-			alGenBuffers(numBuffers,mStreamingBuffers);
-			TOADLET_CHECK_ALERROR("update::alGenBuffers");
+		updateStreaming(dt);
+	}
+}
 
+void ALAudio::updateStreaming(int dt){
+	unsigned char buffer[bufferSize];
+	int total=0;
+	if(mStreamingBuffers!=NULL){
+		int processed=0;
+
+		alGetSourcei(mHandle,AL_BUFFERS_PROCESSED,&processed);
+		TOADLET_CHECK_ALERROR("update::alGetSourcei");
+
+		if(mTotalBuffersPlayed>processed && processed>0){
 			int i;
-			for(i=0;i<numBuffers;++i){
+			for(i=(mTotalBuffersPlayed-processed);i<mTotalBuffersPlayed;++i){
+				unsigned int bufferID=mStreamingBuffers[i % numBuffers];
+				
+				alSourceUnqueueBuffers(mHandle,1,&bufferID);
+				TOADLET_CHECK_ALERROR("update::alSourceUnqueueBuffers");
+
 				int amount=readAudioData(buffer,bufferSize);
 				total=total+amount;
-				alBufferData(mStreamingBuffers[i],format,buffer,amount,mAudioStream->getAudioFormat()->samplesPerSecond);
-				TOADLET_CHECK_ALERROR("update::alBufferData");
+				if(amount>0){
+					alBufferData(bufferID,
+						ALAudioDevice::getALFormat(mAudioStream->getAudioFormat()),
+						buffer,amount,mAudioStream->getAudioFormat()->samplesPerSecond);
+					TOADLET_CHECK_ALERROR("update::alBufferData");
+					alSourceQueueBuffers(mHandle,1,&bufferID);
+					TOADLET_CHECK_ALERROR("update::alSourceQueueBuffers");
+
+					mTotalBuffersQueued+=1;
+				}
 			}
+		}
 
-			mTotalBuffersPlayed=numBuffers;
+		mTotalBuffersPlayed+=processed;
+		mTotalBuffersQueued-=processed;
 
-			alSourceQueueBuffers(mHandle,numBuffers,mStreamingBuffers);
-			TOADLET_CHECK_ALERROR("update::alSourceQueueBuffers");
-
+		if(processed>=numBuffers){
 			alSourcePlay(mHandle);
 			TOADLET_CHECK_ALERROR("update::alSourcePlay");
 		}
-		else{
-			int processed=0;
-
-			alGetSourcei(mHandle,AL_BUFFERS_PROCESSED,&processed);
-			TOADLET_CHECK_ALERROR("update::alGetSourcei");
-
-			if(mTotalBuffersPlayed>processed && processed>0){
-				unsigned char buffer[bufferSize];
-
-				int i;
-				for(i=(mTotalBuffersPlayed-processed);i<mTotalBuffersPlayed;++i){
-					unsigned int bufferID=mStreamingBuffers[i % numBuffers];
-					
-					alSourceUnqueueBuffers(mHandle,1,&bufferID);
-					TOADLET_CHECK_ALERROR("update::alSourceUnqueueBuffers");
-
-					int amount=readAudioData(buffer,bufferSize);
-					total=total+amount;
-					if(amount>0){
-						alBufferData(bufferID,format,buffer,amount,mAudioStream->getAudioFormat()->samplesPerSecond);
-						TOADLET_CHECK_ALERROR("update::alBufferData");
-						alSourceQueueBuffers(mHandle,1,&bufferID);
-						TOADLET_CHECK_ALERROR("update::alSourceQueueBuffers");
-					}
-				}
-			}
-
-			mTotalBuffersPlayed+=processed;
-
-			if(processed>=numBuffers){
-				alSourcePlay(mHandle);
-				TOADLET_CHECK_ALERROR("update::alSourcePlay");
-			}
-			else if(processed>0 && total<0){
-				alSourceStop(mHandle);
-				TOADLET_CHECK_ALERROR("update::alSourceStop");
-				alDeleteBuffers(numBuffers,mStreamingBuffers);
-				TOADLET_CHECK_ALERROR("update::alDeleteBuffers");
-
-				delete[] mStreamingBuffers;
-				mStreamingBuffers=NULL;
-
-				mAudioStream=NULL;
-			}
+		else if(processed>0 && total<0){
+			stop();
 		}
 	}
 }
@@ -357,6 +344,10 @@ int ALAudio::readAudioData(tbyte *buffer,int bsize){
 	if(amount<0 && mLooping){
 		mAudioStream->reset();
 		amount=mAudioStream->read(buffer,bsize);
+	}
+	else if(amount==0){
+		amount=4;
+		memset(buffer,0,4);
 	}
 
 	#if !defined(TOADLET_NATIVE_FORMAT)
@@ -370,15 +361,6 @@ int ALAudio::readAudioData(tbyte *buffer,int bsize){
 	#endif
 
 	return amount;
-}
-
-void ALAudio::setImmediateGain(scalar gain){
-	if(mDevice!=NULL){
-		mGain=gain;
-		if(alIsSource(mHandle)){
-			alSourcef(mHandle,AL_GAIN,MathConversion::scalarToFloat(gain));
-		}
-	}
 }
 
 }

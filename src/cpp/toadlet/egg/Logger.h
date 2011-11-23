@@ -120,6 +120,8 @@ public:
 	void addLogEntry(const String &categoryName,Level level,const String &text);
 	void addLogEntry(Level level,const String &text){addLogEntry((char*)NULL,level,text);}
 
+	void flush();
+
 	int getNumLogEntries();
 	Entry *getLogEntry(int i);
 

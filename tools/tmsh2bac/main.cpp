@@ -143,6 +143,7 @@ int main(int argc,char **argv){
 	Logger::getInstance()->setCategoryReportingLevel(Categories::TOADLET_EGG,Logger::Level_WARNING);
 	Logger::getInstance()->setCategoryReportingLevel(Categories::TOADLET_TADPOLE,Logger::Level_WARNING);
 	Engine *engine=new Engine();
+	engine->installHandlers();
 	TextureArchive::ptr textureArchive(new TextureArchive());
 
 	textureArchive->setDirectory(texDir);

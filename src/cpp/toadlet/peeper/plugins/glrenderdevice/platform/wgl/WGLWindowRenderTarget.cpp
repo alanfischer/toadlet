@@ -28,8 +28,49 @@
 #include <toadlet/egg/System.h>
 #include <toadlet/peeper/TextureFormat.h>
 
+#include <stdio.h> 
+
+#include <windows.h> // for EXCEPTION_ACCESS_VIOLATION 
+
+#include <excpt.h>
+
 namespace toadlet{
 namespace peeper{
+
+// Use our safe wrappers, since some drivers cause ACCESS_VIOLATION on attempting to create a context
+int filter(unsigned int code,struct _EXCEPTION_POINTERS *ep){ 
+	if(code==EXCEPTION_ACCESS_VIOLATION){
+		return EXCEPTION_EXECUTE_HANDLER; 
+	}
+	return EXCEPTION_CONTINUE_SEARCH; 
+}
+
+HGLRC safe_wglCreateContext(HDC dc){
+	__try{
+		return wglCreateContext(dc);
+	}
+	__except(filter(GetExceptionCode(), GetExceptionInformation())){
+		return 0;
+	}
+}
+
+BOOL safe_wglMakeCurrent(HDC dc,HGLRC glrc){
+	__try{
+		return wglMakeCurrent(dc,glrc);
+	}
+	__except(filter(GetExceptionCode(), GetExceptionInformation())){
+		return 0;
+	}
+}
+
+BOOL safe_wglDeleteContext(HGLRC glrc){
+	__try{
+		return wglDeleteContext(glrc);
+	}
+	__except(filter(GetExceptionCode(), GetExceptionInformation())){
+		return 0;
+	}
+}
 
 TOADLET_C_API RenderTarget *new_WGLWindowRenderTarget(HWND wnd,WindowRenderTargetFormat *format){
 	return new WGLWindowRenderTarget(wnd,format);
@@ -52,7 +93,12 @@ WGLWindowRenderTarget::WGLWindowRenderTarget(HWND wnd,WindowRenderTargetFormat *
 
 	if(format->multisamples>1){
 		HWND tmpWnd=CreateWindow(TEXT("Static"),NULL,0,0,0,0,0,0,0,0,0);
-		bool result=createContext(tmpWnd,format,winPixelFormat);
+		bool result=false;
+		TOADLET_TRY
+			result=createContext(tmpWnd,format,winPixelFormat);
+		TOADLET_CATCH(const Exception &){
+			result=false;
+		}
 
 		PFNWGLCHOOSEPIXELFORMATARBPROC wglChoosePixelFormatARB=NULL;
 		if(result && wglIsExtensionSupported("WGL_ARB_multisample") && (wglChoosePixelFormatARB=(PFNWGLCHOOSEPIXELFORMATARBPROC)wglGetProcAddress("wglChoosePixelFormatARB"))!=NULL){
@@ -90,7 +136,9 @@ WGLWindowRenderTarget::WGLWindowRenderTarget(HWND wnd,WindowRenderTargetFormat *
 		DestroyWindow(tmpWnd);
 	}
 
-	createContext(wnd,format,winPixelFormat);
+	TOADLET_TRY
+		createContext(wnd,format,winPixelFormat);
+	TOADLET_CATCH(const Exception &){}
 }
 
 WGLWindowRenderTarget::~WGLWindowRenderTarget(){
@@ -109,7 +157,6 @@ bool WGLWindowRenderTarget::createContext(HWND wnd,WindowRenderTargetFormat *for
 			"Failed to get the window DC");
 		return false;
 	}
-
 	if(winPixelFormat==0){
 		int pixelFormat=format->pixelFormat;
 		int redBits=TextureFormat::getRedBits(pixelFormat);
@@ -141,7 +188,7 @@ bool WGLWindowRenderTarget::createContext(HWND wnd,WindowRenderTargetFormat *for
 		return false;
 	}
 
-	mGLRC=wglCreateContext(mDC);
+	mGLRC=safe_wglCreateContext(mDC);
 	if(mGLRC==0){
 		destroyContext();
 		Error::unknown(Categories::TOADLET_PEEPER,
@@ -149,7 +196,7 @@ bool WGLWindowRenderTarget::createContext(HWND wnd,WindowRenderTargetFormat *for
 		return false;
 	}
 
-	result=wglMakeCurrent(mDC,mGLRC);
+	result=safe_wglMakeCurrent(mDC,mGLRC);
 	if(result==0){
 		destroyContext();
 		Error::unknown(Categories::TOADLET_PEEPER,
@@ -207,15 +254,15 @@ bool WGLWindowRenderTarget::destroyContext(){
 	int i;
 	for(i=0;i<mThreadContexts.size();++i){
 		if(mThreadContexts[i]!=0){
-			wglDeleteContext(mThreadContexts[i]);
+			safe_wglDeleteContext(mThreadContexts[i]);
 		}
 	}
 	mThreadContexts.clear();
 	mThreadIDs.clear();
 
 	if(mGLRC!=0){
-		wglMakeCurrent(NULL,NULL);
-		wglDeleteContext(mGLRC);
+		safe_wglMakeCurrent(NULL,NULL);
+		safe_wglDeleteContext(mGLRC);
 		mGLRC=0;
 	}
 

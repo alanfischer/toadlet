@@ -9,8 +9,13 @@ set (PAD_SRC
 	Version.cpp
 )
 
-set (PAD_PLATFORM_ANDROID_SRC
-	platform/android/JAndroidApplication.cpp
+set (PAD_PLATFORM_ANDROID_JAPPLICATION_SRC
+	platform/android/JApplication.cpp
+	platform/android/us_toadlet_pad.cpp
+)
+
+set (PAD_PLATFORM_ANDROID_ANDROIDAPPLICATION_SRC
+	platform/android/AndroidApplication.cpp
 )
 
 set (PAD_PLATFORM_WIN32_SRC
@@ -31,11 +36,16 @@ set (PAD_HEADERS
 	Applet.h
 	BaseApplication.h
 	Application.h
+	PlatformApplication.h
 	Version.h
 )
 
-set (PAD_PLATFORM_ANDROID_HEADERS
-	platform/android/JAndroidApplication.h
+set (PAD_PLATFORM_ANDROID_JAPPLICATION_HEADERS
+	platform/android/JApplication.h
+)
+
+set (PAD_PLATFORM_ANDROID_ANDROIDAPPLICATION_HEADERS
+	platform/android/AndroidApplication.h
 )
 
 set (PAD_PLATFORM_WIN32_HEADERS
@@ -53,10 +63,17 @@ set (PAD_PLATFORM_X11_HEADERS
 
 # Platform specific files
 if (TOADLET_PLATFORM_ANDROID)
-	source_group ("Source Files\\\\platform\\\\android" FILES ${PAD_PLATFORM_ANDROID_SRC})
-	source_group ("Header Files\\\\platform\\\\android" FILES ${PAD_PLATFORM_ANDROID_HEADERS})
-	set (PAD_SRC ${PAD_SRC} ${PAD_PLATFORM_ANDROID_SRC})
-	set (PAD_HEADERS ${PAD_HEADERS} ${PAD_PLATFORM_ANDROID_HEADERS})
+	if (ANDROID_NDK_API_LEVEL LESS 9)
+		source_group ("Source Files\\\\platform\\\\android" FILES ${PAD_PLATFORM_ANDROID_JAPPLICATION_SRC})
+		source_group ("Header Files\\\\platform\\\\android" FILES ${PAD_PLATFORM_ANDROID_JAPPLICATION_HEADERS})
+		set (PAD_SRC ${PAD_SRC} ${PAD_PLATFORM_ANDROID_JAPPLICATION_SRC})
+		set (PAD_HEADERS ${PAD_HEADERS} ${PAD_PLATFORM_ANDROID_JAPPLICATION_HEADERS})
+	else (ANDROID_NDK_API_LEVEL LESS 9)
+		source_group ("Source Files\\\\platform\\\\android" FILES ${PAD_PLATFORM_ANDROID_ANDROIDAPPLICATION_SRC})
+		source_group ("Header Files\\\\platform\\\\android" FILES ${PAD_PLATFORM_ANDROID_ANDROIDAPPLICATION_HEADERS})
+		set (PAD_SRC ${PAD_SRC} ${PAD_PLATFORM_ANDROID_ANDROIDAPPLICATION_SRC})
+		set (PAD_HEADERS ${PAD_HEADERS} ${PAD_PLATFORM_ANDROID_ANDROIDAPPLICATION_HEADERS})
+	endif (ANDROID_NDK_API_LEVEL LESS 9)
 elseif (TOADLET_PLATFORM_WIN32)
 	source_group ("Source Files\\\\platform\\\\win32" FILES ${PAD_PLATFORM_WIN32_SRC})
 	source_group ("Header Files\\\\platform\\\\win32" FILES ${PAD_PLATFORM_WIN32_HEADERS})
