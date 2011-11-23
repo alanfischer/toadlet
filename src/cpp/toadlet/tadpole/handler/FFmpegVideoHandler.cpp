@@ -252,7 +252,6 @@ void FFmpegVideoStream::update(int dt){
 FFmpegController::FFmpegController(Engine *engine):
 	mEngine(NULL),
 	mIOCtx(NULL),
-	mIOBuffer(NULL),
     mFormatCtx(NULL),
 
 	mTime(0),
@@ -278,8 +277,9 @@ bool FFmpegController::open(Stream::ptr stream){
 
 	mStream=stream;
 	mIOCtx=(ByteIOContext*)av_mallocz(sizeof(ByteIOContext));
-	mIOBuffer=(tbyte*)av_mallocz(4096+FF_INPUT_BUFFER_PADDING_SIZE);
-	int result=init_put_byte(mIOCtx,mIOBuffer,4096,0,stream,toadlet_read_packet,toadlet_write_packet,toadlet_seek);
+	int bufferSize=4096;
+	unsigned char *buffer=(unsigned char*)av_mallocz(bufferSize+FF_INPUT_BUFFER_PADDING_SIZE);
+	int result=init_put_byte(mIOCtx,buffer,bufferSize,0,stream,toadlet_read_packet,toadlet_write_packet,toadlet_seek);
 
 	result=av_open_input_stream(&mFormatCtx,mIOCtx,name,av_find_input_format(name),NULL);
 	if(result<0){
@@ -396,11 +396,6 @@ void FFmpegController::destroy(){
 		av_free(mIOCtx);
 		mIOCtx=NULL;
 	}
-
-//	if(mIOBuffer!=NULL){
-//		av_free(mIOBuffer);
-//		mIOBuffer=NULL;
-//	}
 
 	mStream=NULL;
 }
