@@ -104,7 +104,6 @@ protected:
 	Engine *mEngine;
 	HopScene::ptr mScene;
 	TerrainNode::ptr mTerrain;
-	DiffuseTerrainMaterialSource::ptr mTerrainMaterialSource;
 	SmoothFollower::ptr mFollower;
 	ParentNode::ptr mFollowNode;
 	CameraNode::ptr mCamera;

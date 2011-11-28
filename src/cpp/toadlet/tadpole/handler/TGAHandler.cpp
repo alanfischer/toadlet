@@ -94,12 +94,15 @@ Resource::ptr TGAHandler::load(Stream::ptr stream,ResourceData *data,ProgressLis
 		return NULL;
 	}
 
-	int format=0;
+	int pixelFormat=0;
+	int pixelSize=0;
 	if(bpp==1 || bpp==2 || bpp==4 || bpp==8 || bpp==16 || bpp==24){
-		format=Image::Format_BGR_8;
+		pixelFormat=TextureFormat::Format_BGR_8;
+		pixelSize=3;
 	}
 	else if(bpp==32){
-		format=Image::Format_BGRA_8;
+		pixelFormat=TextureFormat::Format_BGRA_8;
+		pixelSize=4;
 	}
 	else{
 		Error::unknown(Categories::TOADLET_TADPOLE,
@@ -107,13 +110,10 @@ Resource::ptr TGAHandler::load(Stream::ptr stream,ResourceData *data,ProgressLis
 		return NULL;
 	}
 
-	Image::ptr image(Image::createAndReallocate(Image::Dimension_D2,format,width,height));
-	if(image==NULL){
-		return NULL;
-	}
+	TextureFormat::ptr textureFormat(new TextureFormat(TextureFormat::Dimension_D2,pixelFormat,width,height,1,0));
+	int textureSize=textureFormat->getDataSize();
+	tbyte *textureData=new tbyte[textureSize];
 
-	int pixelSize=image->getPixelSize();
-	int imageSize=width*height*pixelSize;
 	int loop=0;
 	switch(imageType){
 		case(Encoding_TRUECOLOR):{
@@ -121,7 +121,7 @@ Resource::ptr TGAHandler::load(Stream::ptr stream,ResourceData *data,ProgressLis
 
 			stream->reset();
 			stream->seek(offset);
-			stream->read(image->getData(),imageSize);
+			stream->read(textureData,textureSize);
 		}break;
 		case(Encoding_RLE_TRUECOLOR):{
 			int offset=idLength+18;
@@ -135,13 +135,13 @@ Resource::ptr TGAHandler::load(Stream::ptr stream,ResourceData *data,ProgressLis
 			tbyte *c=data;
 
 			int index=0;
-			while(index<imageSize){
+			while(index<textureSize){
 				if(*c&0x80){ // RLE high bit=1
 					int length=*c-127;
 					c++;
 
 					for(loop=0;loop!=length;++loop,index+=pixelSize){
-						memcpy(image->getData()+index,c,pixelSize);
+						memcpy(textureData+index,c,pixelSize);
 					}
 
 					c+=pixelSize;
@@ -151,7 +151,7 @@ Resource::ptr TGAHandler::load(Stream::ptr stream,ResourceData *data,ProgressLis
 					c++;
 
 					for(loop=0;loop!=length;++loop,index+=pixelSize,c+=pixelSize){
-						memcpy(image->getData()+index,c,pixelSize);
+						memcpy(textureData+index,c,pixelSize);
 					}
 				}
 			}
@@ -160,12 +160,11 @@ Resource::ptr TGAHandler::load(Stream::ptr stream,ResourceData *data,ProgressLis
 		}break;
 	}
 
-	if(image!=NULL){
-		return mTextureManager->createTexture(image);
-	}
-	else{
-		return NULL;
-	}
+	Texture::ptr texture=mTextureManager->createTexture(textureFormat,textureData);
+
+	delete[] textureData;
+
+	return texture;
 }
 
 }

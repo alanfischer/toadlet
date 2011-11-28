@@ -14,6 +14,7 @@ set (PEEPER_SRC
 	BackableTexture.cpp
 	IndexBufferAccessor.cpp
 	IndexData.cpp
+	TextureFormatConversion.cpp
 	VariableBufferFormat.cpp
 	VertexBufferAccessor.cpp
 	VertexData.cpp
@@ -59,6 +60,7 @@ set (PEEPER_HEADERS
 	ShaderStateDestroyedListener.h
 	Texture.h
 	TextureFormat.h
+	TextureFormatConversion.h
 	TextureState.h
 	Types.h
 	VertexBuffer.h

@@ -26,7 +26,6 @@
 #ifndef TOADLET_TADPOLE_NODE_CAMERANODE_H
 #define TOADLET_TADPOLE_NODE_CAMERANODE_H
 
-#include <toadlet/egg/image/Image.h>
 #include <toadlet/peeper/Viewport.h>
 #include <toadlet/peeper/RenderDevice.h>
 #include <toadlet/tadpole/material/Material.h>
@@ -121,7 +120,7 @@ public:
 
 	virtual void render(RenderDevice *renderDevice,Node *node=NULL);
 
-	Image::ptr renderToImage(RenderDevice *renderDevice,int format,int width,int height);
+	Texture::ptr renderToTexture(RenderDevice *renderDevice,int format,int width,int height);
 	Mesh::ptr renderToSkyBox(RenderDevice *renderDevice,int format,int size,scalar scale);
 
 	virtual bool culled(Node *node) const;

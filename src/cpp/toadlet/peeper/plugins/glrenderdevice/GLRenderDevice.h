@@ -156,6 +156,7 @@ public:
 	static GLuint getGLFormat(int textureFormat,bool internal);
 	static GLuint getGLType(int textureFormat);
 	static GLuint getGLIndexType(int indexFormat);
+	static GLuint getGLTextureCompressed(int textureFormat);
 	static GLuint getGLWrap(SamplerState::AddressType address,bool hasClampToEdge=true);
 	static GLuint getGLMinFilter(SamplerState::FilterType minFilter,SamplerState::FilterType mipFilter);
 	static GLuint getGLMagFilter(SamplerState::FilterType magFilter);

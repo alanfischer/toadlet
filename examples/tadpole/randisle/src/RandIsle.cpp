@@ -50,14 +50,9 @@ void RandIsle::create(){
 	mScene->setTraceable(mTerrain);
 	mTerrain->setListener(this);
 	mTerrain->setTolerance(Resources::instance->tolerance);
-	mTerrain->setDataSource(this);
-
-	mTerrainMaterialSource=DiffuseTerrainMaterialSource::ptr(new DiffuseTerrainMaterialSource(mEngine));
-	mTerrainMaterialSource->setDiffuseTexture(0,Resources::instance->seafloorTexture);
-	mTerrainMaterialSource->setDiffuseTexture(1,Resources::instance->rockTexture);
-	mTerrainMaterialSource->setDiffuseTexture(2,Resources::instance->grassTexture);
-	mTerrain->setMaterialSource(mTerrainMaterialSource);
+	mTerrain->setMaterialSource(Resources::instance->terrainMaterialSource);
 	mTerrain->setWaterMaterial(Resources::instance->waterMaterial);
+	mTerrain->setDataSource(this);
 
 	mFollowNode=mEngine->createNodeType(ParentNode::type(),mScene);
 	mFollower=SmoothFollower::ptr(new SmoothFollower(30));
@@ -794,15 +789,17 @@ bool RandIsle::getPatchLayerData(tbyte *data,int px,int py){
 			float tx=(float)(px*size+x - size/2)/(float)size;
 			float ty=(float)(py*size+y - size/2)/(float)size;
 			scalar v=terrainValue(tx,ty);
+			int layer=0;
 			if(v<-0.0){
-				data[y*size+x]=0;
+				layer=0;
 			}
 			else if(v<0.15){
-				data[y*size+x]=1;
+					layer=1;
 			}
 			else{
-				data[y*size+x]=2;
+				layer=2;
 			}
+			data[y*size+x]=Resources::instance->terrainMaterialSource->getDiffuseTexture(layer)!=NULL?layer:0;
 		}
 	}
 	return true;

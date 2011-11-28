@@ -25,6 +25,7 @@
 
 #include <toadlet/peeper/BackableTexture.h>
 #include <toadlet/peeper/BackablePixelBufferRenderTarget.h>
+#include <toadlet/peeper/TextureFormatConversion.h>
 #include <toadlet/tadpole/TextureManager.h>
 #include <toadlet/tadpole/Engine.h>
 
@@ -58,45 +59,26 @@ void TextureManager::destroy(){
 	mRenderTargets.clear();
 }
 
-Texture::ptr TextureManager::createTexture(Image::ptr image){
-	tbyte *mipData=image->getData();
-
-	return createTexture(
-		Texture::Usage_BIT_STATIC|Texture::Usage_BIT_AUTOGEN_MIPMAPS,
-		image->getDimension(),image->getFormat(),image->getWidth(),image->getHeight(),image->getDepth(),
-		0,&mipData
-	);
+Texture::ptr TextureManager::createTexture(TextureFormat::ptr format,tbyte *data){
+	return createTexture(Texture::Usage_BIT_STATIC|Texture::Usage_BIT_AUTOGEN_MIPMAPS,format,&data);
 }
 
-Texture::ptr TextureManager::createTexture(int mipLevels,Image::ptr mipImages[]){
-	Image *image=mipImages[0];
-
-	tbyte **mipDatas=new tbyte*[mipLevels];
-	int i;
-	for(i=0;i<mipLevels;++i){
-		mipDatas[i]=mipImages[i]->getData();
-	}
-
-	Texture::ptr texture=createTexture(
-		Texture::Usage_BIT_STATIC,
-		image->getDimension(),image->getFormat(),image->getWidth(),image->getHeight(),image->getDepth(),
-		mipLevels,mipDatas
-	);
-
-	delete[] mipDatas;
-
-	return texture;
+Texture::ptr TextureManager::createTexture(TextureFormat::ptr format,tbyte *mipDatas[]){
+	return createTexture(Texture::Usage_BIT_STATIC|Texture::Usage_BIT_AUTOGEN_MIPMAPS,format,mipDatas);
 }
 
-Texture::ptr TextureManager::createTexture(int usage,int dimension,int format,int width,int height,int depth,int mipLevels,tbyte *mipDatas[]){
-	Logger::debug(Categories::TOADLET_TADPOLE,String("TextureManager::createTexture:")+width+","+height);
+Texture::ptr TextureManager::createTexture(int usage,TextureFormat::ptr format,tbyte *data){
+	return createTexture(usage,format,&data);
+}
 
-	TextureFormat::ptr textureFormat(new TextureFormat(dimension,format,width,height,depth,mipLevels));
+Texture::ptr TextureManager::createTexture(int usage,TextureFormat::ptr format,tbyte *mipDatas[]){
+	Logger::debug(Categories::TOADLET_TADPOLE,"TextureManager::createTexture");
+
 	RenderDevice *renderDevice=mEngine->getRenderDevice();
 	Texture::ptr texture;
 	if(mBackable || renderDevice==NULL){
 		BackableTexture::ptr backableTexture(new BackableTexture());
-		backableTexture->create(usage,textureFormat,mipDatas);
+		backableTexture->create(usage,format,mipDatas);
 		if(renderDevice!=NULL){
 			backableTexture->setBack(Texture::ptr(renderDevice->createTexture()),renderDevice);
 		}
@@ -104,7 +86,7 @@ Texture::ptr TextureManager::createTexture(int usage,int dimension,int format,in
 	}
 	else{
 		texture=Texture::ptr(renderDevice->createTexture());
-		if(BackableTexture::convertCreate(texture,renderDevice,usage,textureFormat,mipDatas)==false){
+		if(BackableTexture::convertCreate(texture,renderDevice,usage,format,mipDatas)==false){
 			Logger::error(Categories::TOADLET_TADPOLE,"Error in convertCreate");
 			return NULL;
 		}
@@ -115,16 +97,6 @@ Texture::ptr TextureManager::createTexture(int usage,int dimension,int format,in
 	Logger::debug(Categories::TOADLET_TADPOLE,"texture created");
 
 	return texture;
-}
-
-Image::ptr TextureManager::createImage(Texture *texture){
-	Image::ptr image(Image::createAndReallocate(texture->getFormat()->dimension,texture->getFormat()->pixelFormat,texture->getFormat()->width,texture->getFormat()->height,texture->getFormat()->depth));
-	if(image==NULL){
-		return NULL;
-	}
-
-	texture->read(image->getWidth(),image->getHeight(),image->getDepth(),0,image->getData());
-	return image;
 }
 
 PixelBufferRenderTarget::ptr TextureManager::createPixelBufferRenderTarget(){
@@ -154,18 +126,17 @@ PixelBufferRenderTarget::ptr TextureManager::createPixelBufferRenderTarget(){
 	return renderTarget;
 }
 
-bool TextureManager::textureLoad(Texture::ptr texture,int pixelFormat,int width,int height,int depth,int mipLevel,tbyte *mipData){
+bool TextureManager::textureLoad(Texture::ptr texture,TextureFormat *format,tbyte *data){
 	bool result=false;
-	int texturePixelFormat=texture->getFormat()->pixelFormat;
-	if(pixelFormat==texturePixelFormat){
-		result=texture->load(width,height,depth,mipLevel,mipData);
+	if(format->getPixelFormat()==texture->getFormat()->getPixelFormat()){
+		result=texture->load(format,data);
 	}
 	else{
-		int srcPitch=ImageFormatConversion::getRowPitch(pixelFormat,width);
-		int dstPitch=ImageFormatConversion::getRowPitch(texturePixelFormat,width);
-		tbyte *newData=new tbyte[dstPitch*height*depth];
-		ImageFormatConversion::convert(mipData,pixelFormat,srcPitch,srcPitch*height,newData,texturePixelFormat,dstPitch,dstPitch*height,width,height,depth);
-		result=texture->load(width,height,depth,mipLevel,newData);
+		TextureFormat::ptr newFormat(new TextureFormat(format));
+		format->setPixelFormat(texture->getFormat()->getPixelFormat());
+		tbyte *newData=new tbyte[newFormat->getDataSize()];
+		TextureFormatConversion::convert(data,format,newData,newFormat);
+		result=texture->load(newFormat,newData);
 		delete[] newData;
 	}
 	return result;
@@ -250,11 +221,10 @@ void TextureManager::renderTargetDestroyed(RenderTarget *renderTarget){
 }
 
 Texture::ptr TextureManager::createNormalization(int size){
-	Image::ptr image(Image::createAndReallocate(Image::Dimension_CUBE,Image::Format_RGB_8,size,size,Image::CubeSide_MAX));
+	TextureFormat::ptr format(new TextureFormat(TextureFormat::Dimension_CUBE,TextureFormat::Format_RGB_8,size,size,TextureFormat::CubeSide_MAX,1));
+	tbyte *data=new tbyte[format->getDataSize()];
 
 	Vector3 HALF_VECTOR3(Math::HALF,Math::HALF,Math::HALF);
-
-	uint8 *data=image->getData();
 
 	float offset = 0.5f;
 	float halfSize = size * 0.5f;
@@ -345,7 +315,7 @@ Texture::ptr TextureManager::createNormalization(int size){
 		}
 	}
 
-	return createTexture(Texture::Usage_BIT_STATIC,TextureFormat::Dimension_D2,image->getFormat(),image->getWidth(),image->getHeight(),image->getDepth(),1,&data);
+	return createTexture(Texture::Usage_BIT_STATIC,format,data);
 }
 
 }

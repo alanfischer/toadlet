@@ -124,15 +124,11 @@ Resource::ptr FreeTypeHandler::load(Stream::ptr stream,ResourceData *resourceDat
 
 	int textureWidth=Math::nextPowerOf2(charmapWidth);
 	int textureHeight=Math::nextPowerOf2(charmapHeight);
-
-	Image::ptr image(Image::createAndReallocate(Image::Dimension_D2,Image::Format_LA_8,textureWidth,textureHeight));
-	if(image==NULL){
-		return NULL;
-	}
+	TextureFormat::ptr textureFormat(new TextureFormat(TextureFormat::Dimension_D2,TextureFormat::Format_LA_8,textureWidth,textureHeight,1,0));
+	tbyte *textureData=new tbyte[textureFormat->getDataSize()];
+	int textureStride=textureFormat->getXPitch();
 
 	Collection<Font::Glyph*> glyphs(bitmapGlyphs.size());	
-	tbyte *data=image->getData();
-	int textureStride=image->getRowPitch();
 	int x=0,y=0;
 	for(i=0;i<bitmapGlyphs.size();++i){
 		FT_BitmapGlyph bitmapGlyph=bitmapGlyphs[i];
@@ -158,7 +154,7 @@ Resource::ptr FreeTypeHandler::load(Stream::ptr stream,ResourceData *resourceDat
 			for(j=0;j<bitmapGlyph->bitmap.rows;++j){
 				for(k=0;k<bitmapGlyph->bitmap.width;++k){
 					uint8 *s=(uint8*)(bitmapGlyph->bitmap.buffer+j*bitmapGlyph->bitmap.width)+k;
-					uint16 *d=(uint16*)(data+(y+j)*textureStride)+x+k;
+					uint16 *d=(uint16*)(textureData+(y+j)*textureStride)+x+k;
 					*d=(int)((*s)<<8) | (int)(*s);
 				}
 			}
@@ -173,7 +169,8 @@ Resource::ptr FreeTypeHandler::load(Stream::ptr stream,ResourceData *resourceDat
 		}
 	}
 
-	Font::ptr font(new Font(fontData->pointSize,0,mTextureManager->createTexture(image),charArray,&glyphs[0],glyphs.size()));
+	Texture::ptr texture(mTextureManager->createTexture(textureFormat,textureData));
+	Font::ptr font(new Font(fontData->pointSize,0,texture,charArray,&glyphs[0],glyphs.size()));
 
 	// Clean up FreeType data
 	for(i=0;i<bitmapGlyphs.size();++i){
@@ -183,6 +180,8 @@ Resource::ptr FreeTypeHandler::load(Stream::ptr stream,ResourceData *resourceDat
 
 	FT_Done_Face(face);
 	face=NULL;
+
+	delete[] textureData;
 
 	return font;
 }

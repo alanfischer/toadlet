@@ -318,16 +318,17 @@ void ALAudioDevice::checkinSourceHandle(ALAudio *audio,ALuint source){
 }
 
 ALenum ALAudioDevice::getALFormat(AudioFormat *format){
-	if(format->bitsPerSample==8 && format->channels==1){
+	int bps=format->getBitsPerSample(),channels=format->getChannels();
+	if(bps==8 && channels==1){
 		return AL_FORMAT_MONO8;
 	}
-	else if(format->bitsPerSample==16 && format->channels==1){
+	else if(bps==16 && channels==1){
 		return AL_FORMAT_MONO16;
 	}
-	else if(format->bitsPerSample==8 && format->channels==2){
+	else if(bps==8 && channels==2){
 		return AL_FORMAT_STEREO8;
 	}
-	else if(format->bitsPerSample==16 && format->channels==2){
+	else if(bps==16 && channels==2){
 		return AL_FORMAT_STEREO16;
 	}
 	else{

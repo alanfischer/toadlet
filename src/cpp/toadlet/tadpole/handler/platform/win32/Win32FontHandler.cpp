@@ -256,25 +256,25 @@ Resource::ptr Win32FontHandler::load(Stream::ptr stream,ResourceData *data,Progr
 		GdiFlush();
 	#endif
 
-	Image::ptr image(Image::createAndReallocate(Image::Dimension_D2,Image::Format_LA_8,textureWidth,textureHeight));
-	if(image==NULL){
-		return NULL;
-	}
-	
-	tbyte *imageData=image->getData();
-	int imageStride=image->getRowPitch();
+	TextureFormat::ptr textureFormat(new TextureFormat(TextureFormat::Dimension_D2,TextureFormat::Format_LA_8,textureWidth,textureHeight,1,0));	
+	tbyte *textureData=new tbyte[textureFormat->getDataSize()];
+	int textureStride=textureFormat->getXPitch();
 	int bitmapStride=((textureWidth*2+sizeof(DWORD)-1)>>2)<<2; // stride is in DWORDs
 
 	// Flip the bitmap and copy it into the image
 	for(i=0;i<textureHeight;++i){
 		for(j=0;j<textureWidth;++j){
 			uint16 *s=(uint16*)(buffer+bitmapStride*i+j*2);
-			uint16 *d=(uint16*)(imageData+imageStride*(textureHeight-i-1))+j;
+			uint16 *d=(uint16*)(textureData+textureStride*(textureHeight-i-1))+j;
 			*d=(((int)((*s)&0x1F)<<11)) | (((int)((*s)&0x1F)<<3));
 		}
 	}
 
-	Font::ptr font(new Font(fontData->pointSize,0,shared_static_cast<Texture>(mTextureManager->createTexture(image)),charArray,&glyphs[0],glyphs.size()));
+	Texture::ptr texture=mTextureManager->createTexture(textureFormat,textureData);
+
+	delete[] textureData;
+
+	Font::ptr font(new Font(fontData->pointSize,0,texture,charArray,&glyphs[0],glyphs.size()));
 
 	SelectObject(cdc,oldBitmap);
 	DeleteObject(bitmap);

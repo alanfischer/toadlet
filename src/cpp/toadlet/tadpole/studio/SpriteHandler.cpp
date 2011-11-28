@@ -94,13 +94,13 @@ void SpriteHandler::buildMaterials(SpriteModel *model){
 }
 
 Texture::ptr SpriteHandler::createTexture(spriteframe *f,tbyte *data,tbyte *pal){
-	Image::ptr image(Image::createAndReallocate(Image::Dimension_D2,Image::Format_RGBA_8,f->width,f->height));
-	tbyte *imageData=image->getData();
+	TextureFormat::ptr textureFormat(new TextureFormat(TextureFormat::Dimension_D2,TextureFormat::Format_RGBA_8,f->width,f->height,1,0));
+	tbyte *textureData=new tbyte[textureFormat->getDataSize()];
 
 	int i,j;
 	for(j=0;j<f->height;++j){
 		for(i=0;i<f->width;++i){
-			tbyte *d=imageData+(j*f->width+i)*4;
+			tbyte *d=textureData+(j*f->width+i)*4;
 			tbyte s=data[(f->height-j-1)*f->width+i];
 			tbyte *c=pal+s*3;
 
@@ -111,7 +111,11 @@ Texture::ptr SpriteHandler::createTexture(spriteframe *f,tbyte *data,tbyte *pal)
 		}
 	}
 	
-	return mEngine->getTextureManager()->createTexture(image);
+	Texture::ptr texture=mEngine->getTextureManager()->createTexture(textureFormat,textureData);
+
+	delete[] textureData;
+
+	return texture;
 }
 
 }

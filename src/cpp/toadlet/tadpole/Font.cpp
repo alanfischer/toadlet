@@ -94,8 +94,8 @@ bool Font::updateVertexBufferForString(VertexBuffer::ptr vertexBuffer,const Stri
 		return false;
 	}
 
-	scalar scalarTexWidth=Math::fromInt(mTexture->getFormat()->width);
-	scalar scalarTexHeight=Math::fromInt(mTexture->getFormat()->height);
+	scalar scalarTexWidth=Math::fromInt(mTexture->getFormat()->getWidth());
+	scalar scalarTexHeight=Math::fromInt(mTexture->getFormat()->getHeight());
 
 	int height=getStringHeight(string);
 

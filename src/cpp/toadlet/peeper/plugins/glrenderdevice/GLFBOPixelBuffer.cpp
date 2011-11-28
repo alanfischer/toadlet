@@ -26,7 +26,6 @@
 #include "GLFBOPixelBuffer.h"
 #include "GLFBORenderTarget.h"
 #include "GLRenderDevice.h"
-#include <toadlet/egg/image/ImageFormatConversion.h>
 
 #if defined(TOADLET_HAS_GLFBOS)
 
@@ -55,11 +54,11 @@ bool GLFBOPixelBuffer::create(int usage,int access,TextureFormat::ptr format){
 	mUsage=usage;
 	mAccess=access;
 	mFormat=format;
-	mDataSize=ImageFormatConversion::getRowPitch(format->pixelFormat,format->width)*format->height;
+	mDataSize=format->getDataSize();
 
 	glGenRenderbuffers(1,&mHandle);
 	glBindRenderbuffer(GL_RENDERBUFFER,mHandle);
-	glRenderbufferStorage(GL_RENDERBUFFER,GLRenderDevice::getGLFormat(format->pixelFormat,true),format->width,format->height);
+	glRenderbufferStorage(GL_RENDERBUFFER,GLRenderDevice::getGLFormat(format->getPixelFormat(),true),format->getWidth(),format->getHeight());
 
 	TOADLET_CHECK_GLERROR("GLFBOPixelBuffer::create");
 

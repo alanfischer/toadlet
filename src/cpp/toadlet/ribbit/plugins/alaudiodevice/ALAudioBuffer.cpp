@@ -56,8 +56,8 @@ bool ALAudioBuffer::create(AudioStream::ptr stream){
 		return false;
 	}
 
-	int numFrames=length/format->frameSize();
-	mLengthTime=numFrames*1000/format->samplesPerSecond;
+	int numFrames=length/format->getFrameSize();
+	mLengthTime=numFrames*1000/format->getSamplesPerSecond();
 
 	if(mDevice->getBufferFadeTime()>0){
 		AudioFormatConversion::fade(buffer,length,format,mDevice->getBufferFadeTime());
@@ -68,12 +68,12 @@ bool ALAudioBuffer::create(AudioStream::ptr stream){
 		mStaticData=buffer;
 		mDevice->alBufferDataStatic(mHandle,
 			ALAudioDevice::getALFormat(format),
-			mStaticData,length,format->samplesPerSecond);
+			mStaticData,length,format->getSamplesPerSecond());
 	}
 	else{
 		alBufferData(mHandle,
 			ALAudioDevice::getALFormat(format),
-			buffer,length,format->samplesPerSecond);
+			buffer,length,format->getSamplesPerSecond());
 		delete[] buffer;
 	}
 

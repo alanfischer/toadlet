@@ -28,6 +28,7 @@
 
 #include <toadlet/egg/Resource.h>
 #include <toadlet/egg/String.h>
+#include <toadlet/egg/mathfixed/Math.h>
 #include <toadlet/peeper/Types.h>
 #include <toadlet/peeper/PixelBuffer.h>
 #include <toadlet/peeper/TextureFormat.h>
@@ -65,8 +66,8 @@ public:
 	virtual TextureFormat::ptr getFormat() const=0;
 
 	virtual PixelBuffer::ptr getMipPixelBuffer(int i,int cubeSide)=0;
-	virtual bool load(int width,int height,int depth,int mipLevel,tbyte *mipData)=0;
-	virtual bool read(int width,int height,int depth,int mipLevel,tbyte *mipData)=0;
+	virtual bool load(TextureFormat *format,tbyte *data)=0;
+	virtual bool read(TextureFormat *format,tbyte *data)=0;
 };
 
 }

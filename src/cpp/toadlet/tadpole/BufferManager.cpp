@@ -171,7 +171,7 @@ VertexBuffer::ptr BufferManager::createVertexBuffer(int usage,int access,VertexF
 }
 
 PixelBuffer::ptr BufferManager::createPixelBuffer(int usage,int access,int pixelFormat,int width,int height,int depth){
-	TextureFormat::ptr textureFormat(new TextureFormat(TextureFormat::Dimension_D2,pixelFormat,width,height,depth));
+	TextureFormat::ptr textureFormat(new TextureFormat(TextureFormat::Dimension_D2,pixelFormat,width,height,depth,1));
 	PixelBuffer::ptr buffer;
 	if(mBackable || mEngine->getRenderDevice()==NULL){
 		BackableBuffer::ptr backableBuffer(new BackableBuffer());

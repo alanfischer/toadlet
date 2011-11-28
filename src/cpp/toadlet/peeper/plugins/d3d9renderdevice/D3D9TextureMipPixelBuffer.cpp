@@ -57,7 +57,7 @@ void D3D9TextureMipPixelBuffer::destroy(){
 void D3D9TextureMipPixelBuffer::resetCreate(){
 	IDirect3DBaseTexture9 *d3dtexture=mTexture->mTexture;
 
-	switch(mTexture->mFormat->dimension){
+	switch(mTexture->mFormat->getDimension()){
 		case TextureFormat::Dimension_D1:
 		case TextureFormat::Dimension_D2:
 			((IDirect3DTexture9*)d3dtexture)->GetSurfaceLevel(mLevel,&mSurface);
@@ -72,22 +72,24 @@ void D3D9TextureMipPixelBuffer::resetCreate(){
 		#endif
 	}
 
-	mFormat=TextureFormat::ptr(new TextureFormat(mTexture->mFormat));
-	
+	int width=0,height=0,depth=0;
 	if(mSurface!=NULL){
 		D3DSURFACE_DESC desc;
 		mSurface->GetDesc(&desc);
-		mFormat->width=desc.Width;
-		mFormat->height=desc.Height;
-		mFormat->depth=1;
+		width=desc.Width;
+		height=desc.Height;
+		depth=1;
 	}
 	else if(mVolume!=NULL){
 		D3DVOLUME_DESC desc;
 		mVolume->GetDesc(&desc);
-		mFormat->width=desc.Width;
-		mFormat->height=desc.Height;
-		mFormat->depth=desc.Depth;
+		width=desc.Width;
+		height=desc.Height;
+		depth=desc.Depth;
 	}
+
+	mFormat=TextureFormat::ptr(new TextureFormat(mTexture->mFormat));
+	mFormat->setSize(width,height,depth);
 }
 
 void D3D9TextureMipPixelBuffer::resetDestroy(){

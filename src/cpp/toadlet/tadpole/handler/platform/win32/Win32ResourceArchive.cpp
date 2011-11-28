@@ -26,7 +26,6 @@
 #include <toadlet/egg/Error.h>
 #include <toadlet/egg/Logger.h>
 #include <toadlet/egg/io/MemoryStream.h>
-#include <toadlet/egg/image/Image.h>
 #include <toadlet/tadpole/handler/platform/win32/Win32ResourceArchive.h>
 #include <windows.h>
 
@@ -114,50 +113,53 @@ Resource::ptr Win32ResourceArchive::openResource(const String &name){
 
 	int textureWidth=bitmap.bmWidth;
 	int textureHeight=bitmap.bmWidth;
-	int textureFormat=0;
+	int texturePixelFormat=0;
 	switch(bitmap.bmBitsPixel){
 		case(16):
-			textureFormat=Image::Format_BGR_5_6_5;
+			texturePixelFormat=TextureFormat::Format_BGR_5_6_5;
 		break;
 		case(24):
-			textureFormat=Image::Format_BGR_8;
+			texturePixelFormat=TextureFormat::Format_BGR_8;
 		break;
 		case(32):
-			textureFormat=Image::Format_BGRA_8;
+			texturePixelFormat=TextureFormat::Format_BGRA_8;
 		break;
 	}
 
-	if(textureFormat==0){
+	if(texturePixelFormat==0){
 		DeleteObject(hbitmap);
 		return NULL;
 	}
 	
-	Image::ptr image(Image::createAndReallocate(Image::Dimension_D2,textureFormat,textureWidth,textureHeight));
-	if(image==NULL){
+	TextureFormat::ptr textureFormat(new TextureFormat(TextureFormat::Dimension_D2,texturePixelFormat,textureWidth,textureHeight,0,0));
+	tbyte *textureData=new tbyte[textureFormat->getDataSize()];
+
+	int textureStride=textureFormat->getXPitch();
+	/// @todo: Figure out bitmapStride
+	int bitmapStride=textureStride;//((imageWidth*2+sizeof(DWORD)-1)>>2)<<2; // stride is in DWORDs
+
+	tbyte *bitmapData=new tbyte[bitmapStride*textureHeight];
+	if(textureData==NULL || bitmapData==NULL){
+		delete[] textureData;
 		DeleteObject(hbitmap);
 		return NULL;
 	}
-
-	tbyte *imageData=image->getData();
-	int imageStride=image->getRowPitch();
-	/// @todo: Figure out bitmapStride
-	int bitmapStride=imageStride;//((imageWidth*2+sizeof(DWORD)-1)>>2)<<2; // stride is in DWORDs
-
-	tbyte *bitmapData=new tbyte[bitmapStride*textureHeight];
 
 	GetBitmapBits(hbitmap,bitmapStride*textureHeight,bitmapData);
 
 	// Flip the bitmap and copy it into the image
 	int i;
 	for(i=0;i<textureHeight;++i){
-		memcpy(imageData+imageStride*(textureHeight-i-1),bitmapData+bitmapStride*i,bitmapStride);
+		memcpy(textureData+textureStride*(textureHeight-i-1),bitmapData+bitmapStride*i,bitmapStride);
 	}
-	
-	delete[] bitmapData;
 
+	Texture::ptr texture=mTextureManager->createTexture(textureFormat,textureData);
+
+	delete[] bitmapData;
+	delete[] textureData;
 	DeleteObject(hbitmap);
 
-	return mTextureManager->createTexture(image);
+	return texture;
 }
 
 Collection<String>::ptr Win32ResourceArchive::getEntries(){

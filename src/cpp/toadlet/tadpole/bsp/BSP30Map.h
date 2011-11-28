@@ -114,10 +114,11 @@ public:
 	Collection<Material::ptr> materials;
 	VertexData::ptr vertexData;
 	Collection<facedata> facedatas;
-	Image::ptr lightmapImage;
+	TextureFormat::ptr lightmapFormat;
+	tbyte *lightmapData;
 	Collection<Texture::ptr> lightmapTextures;
 	Collection<bool> lightmapDirties;
-	Collection<Image::ptr> lightmapImages; /// @todo: Just modify portions of the texture
+	Collection<tbyte*> lightmapDatas; /// @todo: Just modify portions of the texture
 	int lightmapAllocated[LIGHTMAP_SIZE];
 	uint8 styleIntensities[256];
 	Collection<NodeResource::ptr> modelResources;

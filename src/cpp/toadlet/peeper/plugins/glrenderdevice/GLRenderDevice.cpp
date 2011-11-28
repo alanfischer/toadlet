@@ -758,7 +758,7 @@ bool GLRenderDevice::copyFrameBufferToPixelBuffer(PixelBuffer *dst){
 		glBindTexture(gltexture->mTarget,gltexture->mHandle);
 		TOADLET_CHECK_GLERROR("glBindTexture");
 
-		glCopyTexSubImage2D(gltexture->mTarget,textureBuffer->getLevel(),0,0,0,renderTarget->getHeight()-gltexture->mFormat->height,gltexture->mFormat->width,gltexture->mFormat->height);
+		glCopyTexSubImage2D(gltexture->mTarget,textureBuffer->getLevel(),0,0,0,renderTarget->getHeight()-gltexture->mFormat->getHeight(),gltexture->mFormat->getWidth(),gltexture->mFormat->getDepth());
 		TOADLET_CHECK_GLERROR("glCopyTexSubImage2D");
 
 		Matrix4x4 matrix;
@@ -794,7 +794,7 @@ bool GLRenderDevice::copyPixelBuffer(PixelBuffer *dst,PixelBuffer *src){
 			glBindBuffer(GL_PIXEL_PACK_BUFFER_ARB,dstPixelBuffer->mHandle);
 
 			GLTexture *srcTexture=srcTextureBuffer->mTexture;
-			srcTexture->load(srcTexture->mFormat->width,srcTexture->mFormat->height,srcTexture->mFormat->depth,srcTextureBuffer->mLevel,NULL);
+			srcTexture->load(srcTextureBuffer->mFormat,NULL);
 
 			glBindBuffer(GL_PIXEL_PACK_BUFFER_ARB,0);
 		}
@@ -802,7 +802,7 @@ bool GLRenderDevice::copyPixelBuffer(PixelBuffer *dst,PixelBuffer *src){
 			glBindBuffer(GL_PIXEL_UNPACK_BUFFER_ARB,srcPixelBuffer->mHandle);
 
 			GLTexture *dstTexture=dstTextureBuffer->mTexture;
-			dstTexture->load(dstTexture->mFormat->width,dstTexture->mFormat->height,dstTexture->mFormat->depth,dstTextureBuffer->mLevel,NULL);
+			dstTexture->load(dstTextureBuffer->mFormat,NULL);
 
 			glBindBuffer(GL_PIXEL_UNPACK_BUFFER_ARB,0);
 		}
@@ -2205,6 +2205,19 @@ GLuint GLRenderDevice::getGLIndexType(int indexFormat){
 				"getGLIndexType: Invalid type");
 			return 0;
 		break;
+	}
+}
+
+GLuint GLRenderDevice::getGLTextureCompressed(int format){
+	switch(format){
+		case TextureFormat::Format_RGB_DXT1:
+		case TextureFormat::Format_RGBA_DXT2:
+		case TextureFormat::Format_RGBA_DXT3:
+		case TextureFormat::Format_RGBA_DXT4:
+		case TextureFormat::Format_RGBA_DXT5:
+			return true;
+		default:
+			return false;
 	}
 }
 

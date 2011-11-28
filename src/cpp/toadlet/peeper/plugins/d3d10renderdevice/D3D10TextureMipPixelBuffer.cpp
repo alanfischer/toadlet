@@ -27,7 +27,6 @@
 #include "D3D10RenderDevice.h"
 #include <toadlet/egg/Error.h>
 #include <toadlet/egg/Logger.h>
-#include <toadlet/egg/image/Image.h>
 
 namespace toadlet{
 namespace peeper{
@@ -53,20 +52,18 @@ D3D10TextureMipPixelBuffer::D3D10TextureMipPixelBuffer(D3D10Texture *texture,int
 
 	/// @todo: Unify this with the GLTextureMipPixelBuffer creation
 	int l=level;
-	int w=texture->getFormat()->width,h=texture->getFormat()->height,d=texture->getFormat()->depth;
+	int w=texture->getFormat()->getWidth(),h=texture->getFormat()->getHeight(),d=texture->getFormat()->getDepth();
 	while(l>0){
 		w/=2; h/=2; d/=2;
 		l--;
 	}
 
 	mFormat=TextureFormat::ptr(new TextureFormat(texture->getFormat()));
-	mFormat->width=w;
-	mFormat->height=h;
-	mFormat->depth=d;
-	mDataSize=ImageFormatConversion::getRowPitch(mFormat->pixelFormat,mFormat->width)*mFormat->height*mFormat->depth;
+	mFormat->setSize(w,h,d);
+	mDataSize=mFormat->getDataSize();
 
 	if((mTexture->getUsage()&Texture::Usage_BIT_RENDERTARGET)>0){
-		createViews(mTexture->getFormat()->dimension,mTexture->getFormat()->pixelFormat,level);
+		createViews(mTexture->getFormat()->getDimension(),mTexture->getFormat()->getPixelFormat(),level);
 	}
 }
 
@@ -96,7 +93,6 @@ bool D3D10TextureMipPixelBuffer::create(int usage,int access,TextureFormat::ptr 
 	}
 
 	mFormat=format;
-	mFormat->mipLevels=1;
 
 	mBufferTexture=Texture::ptr(mDevice->createTexture());
 	mTexture=shared_static_cast<D3D10Texture>(mBufferTexture);
@@ -107,7 +103,7 @@ bool D3D10TextureMipPixelBuffer::create(int usage,int access,TextureFormat::ptr 
 	mCubeSide=0;
 
 	if((mTexture->getUsage()&Usage_BIT_STAGING)==0){
-		createViews(TextureFormat::Dimension_D2,mFormat->pixelFormat,0);
+		createViews(TextureFormat::Dimension_D2,mFormat->getPixelFormat(),0);
 	}
 
 	return true;
@@ -132,7 +128,7 @@ uint8 *D3D10TextureMipPixelBuffer::lock(int lockAccess){
 	tbyte *data=NULL;
 
 	HRESULT result=S_OK;
- 	switch(mTexture->getFormat()->dimension){
+ 	switch(mTexture->getFormat()->getDimension()){
 		case TextureFormat::Dimension_D1:{
 			tbyte *mappedTex=NULL;
 			ID3D10Texture1D *texture=(ID3D10Texture1D*)mD3DTexture;
@@ -165,7 +161,7 @@ uint8 *D3D10TextureMipPixelBuffer::lock(int lockAccess){
 bool D3D10TextureMipPixelBuffer::unlock(){
 	int subresource=D3D10CalcSubresource(mLevel,0,0);
 
-	switch(mTexture->getFormat()->dimension){
+	switch(mTexture->getFormat()->getDimension()){
 		case TextureFormat::Dimension_D1:{
 			ID3D10Texture1D *texture=(ID3D10Texture1D*)mD3DTexture;
 			texture->Unmap(subresource);

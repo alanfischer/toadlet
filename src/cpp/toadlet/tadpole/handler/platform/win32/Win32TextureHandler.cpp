@@ -96,15 +96,15 @@ Resource::ptr Win32TextureHandler::load(Stream::ptr in,ResourceData *data,Progre
 	HRESULT hr=0;
 
 	#if defined(TOADLET_PLATFORM_WINCE)
-		IImage *iimage=NULL;
-		hr=((IImagingFactory*)mImagingFactory)->CreateImageFromStream(stream,&iimage);
-		if(FAILED(hr) || iimage==NULL){
+		IImage *image=NULL;
+		hr=((IImagingFactory*)mImagingFactory)->CreateImageFromStream(stream,&image);
+		if(FAILED(hr) || image==NULL){
 			Error::unknown("CreateImageFromStream failed");
 			return NULL;
 		}
 
 		IBitmapImage *bitmap=NULL;
-		hr=((IImagingFactory*)mImagingFactory)->CreateBitmapFromImage(iimage,0,0,0,InterpolationHintDefault,&bitmap);
+		hr=((IImagingFactory*)mImagingFactory)->CreateBitmapFromImage(image,0,0,0,InterpolationHintDefault,&bitmap);
 		if(FAILED(hr) || bitmap==NULL){
 			Error::unknown("CreateBitmapFromImage failed");
 			return NULL;
@@ -112,13 +112,11 @@ Resource::ptr Win32TextureHandler::load(Stream::ptr in,ResourceData *data,Progre
 
 		PixelFormat gdiformat=PixelFormatUndefined;
 		hr=bitmap->GetPixelFormatID(&gdiformat);
-		int format=getFormat(&gdiformat);
+		int pixelFormat=getFormat(&gdiformat);
 		SIZE size={0};
 		hr=bitmap->GetSize(&size);
-		image::Image::ptr image(image::Image::createAndReallocate(image::Image::Dimension_D2,format,size.cx,size.cy));
-		if(image==NULL){
-			return NULL;
-		}
+		TextureFormat::ptr textureFormat(new TextureFormat(TextureFormat::Dimension_D2,pixelFormat,size.cx,size.cy,1,0);
+		tbyte *textureData=new tbyte[textureFormat->getDataSize()];
 		
 		RECT rect={0};
 		rect.right=size.cx;
@@ -127,13 +125,15 @@ Resource::ptr Win32TextureHandler::load(Stream::ptr in,ResourceData *data,Progre
 		bitmap->LockBits(&rect,ImageLockModeRead,gdiformat,&data);
 
 		int i;
-		for(i=0;i<image->getHeight();++i){
-			memcpy(image->getData()+image->getRowPitch()*i,((uint8*)data.Scan0)+data.Stride*(size.cy-i-1),image->getWidth()*image->getPixelSize());
+		for(i=0;i<textureFormat->getHeight();++i){
+			memcpy(textureData+textureFormat->getXPitch()*i,((uint8*)data.Scan0)+data.Stride*(size.cy-i-1),textureFormat->getXPitch());
 		}
 
 		bitmap->UnlockBits(&data);
 
-		texture=mTextureManager->createTexture(image);
+		texture=mTextureManager->createTexture(textureFormat,textureData);
+
+		delete[] textureData;
 	#else
 		Bitmap *bitmap=Bitmap::FromStream(stream);
 		if(bitmap==NULL){
@@ -160,31 +160,26 @@ Resource::ptr Win32TextureHandler::load(Stream::ptr in,ResourceData *data,Progre
 			bitmap->GetPropertyItem(PropertyTagFrameDelay,propertySize,propertyItem);
 		}
 
-		Collection<image::Image::ptr> images;
-		Collection<int> delayMilliseconds;
+		PixelFormat gdiformat=bitmap->GetPixelFormat();
+		int pixelFormat=getFormat(&gdiformat);
+		TextureFormat::ptr textureFormat(new TextureFormat(TextureFormat::Dimension_D2,pixelFormat,bitmap->GetWidth(),bitmap->GetHeight(),1,0));
+		tbyte *textureData=new tbyte[textureFormat->getDataSize()];
+		frameCount=1;
+
 		int i;
 		for(i=0;i<frameCount;++i){
 			bitmap->SelectActiveFrame(&dimensionIDs[0],i);
-			PixelFormat gdiformat=bitmap->GetPixelFormat();
-			int format=getFormat(&gdiformat);
-
-			image::Image::ptr image(image::Image::createAndReallocate(image::Image::Dimension_D2,format,bitmap->GetWidth(),bitmap->GetHeight()));
-			if(image==NULL){
-				return NULL;
-			}
 			
 			Rect rect(0,0,bitmap->GetWidth(),bitmap->GetHeight());
 			BitmapData data;
 			bitmap->LockBits(&rect,ImageLockModeRead,gdiformat,&data);
 
 			int j;
-			for(j=0;j<image->getHeight();++j){
-				memcpy(image->getData()+image->getRowPitch()*j,((uint8*)data.Scan0)+data.Stride*(bitmap->GetHeight()-j-1),image->getWidth()*image->getPixelSize());
+			for(j=0;j<textureFormat->getHeight();++j){
+				memcpy(textureData+textureFormat->getXPitch()*j,((uint8*)data.Scan0)+data.Stride*(textureFormat->getHeight()-j-1),textureFormat->getXPitch());
 			}
 
 			bitmap->UnlockBits(&data);
-
-			images.add(image);
 
 			int delay=0;
 			if(propertyItem!=NULL){
@@ -193,27 +188,14 @@ Resource::ptr Win32TextureHandler::load(Stream::ptr in,ResourceData *data,Progre
 			if(delay<100){
 				delay=100;
 			}
-			delayMilliseconds.add(delay);
 		}
 
 		delete dimensionIDs;
 		free(propertyItem);
 
-		if(images.size()==0){
-			return NULL;
-		}
-		else if(images.size()==1){
-			texture=mTextureManager->createTexture(image::Image::ptr(images[0]));
-		}
- 		else{
-/// @todo: revive this somehow, probably as a 3d texture
-//			SequenceTexture::ptr sequence(new SequenceTexture(Texture::Dimension_D2,images.size()));
-//			int i;
-//			for(i=0;i<images.size();++i){
-//				sequence->setTexture(i,mTextureManager->createTexture(image::Image::ptr(images[i])),Math::fromMilli(delayMilliseconds[i]));
-//			}
-//			texture=shared_static_cast<Texture>(sequence);
-		}
+		texture=mTextureManager->createTexture(textureFormat,textureData);
+
+		delete[] textureData;
 	#endif
 
 	return texture;
@@ -221,16 +203,16 @@ Resource::ptr Win32TextureHandler::load(Stream::ptr in,ResourceData *data,Progre
 
 int Win32TextureHandler::getFormat(PixelFormat *gdiformat){
 	switch(*gdiformat){
-		case(PixelFormat16bppARGB1555):
+		case PixelFormat16bppARGB1555:
 			return TextureFormat::Format_BGRA_5_5_5_1;
 		break;
-		case(PixelFormat16bppRGB565):
+		case PixelFormat16bppRGB565:
 			return TextureFormat::Format_BGR_5_6_5;
 		break;
-		case(PixelFormat24bppRGB):
+		case PixelFormat24bppRGB:
 			return TextureFormat::Format_BGR_8;
 		break;
-		case(PixelFormat32bppARGB):
+		case PixelFormat32bppARGB:
 			return TextureFormat::Format_BGRA_8;
 		break;
 		default:

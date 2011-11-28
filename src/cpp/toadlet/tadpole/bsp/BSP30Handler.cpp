@@ -302,8 +302,8 @@ void BSP30Handler::buildBuffers(BSP30Map *map){
 				}
 			}
 
-			tbyte *dst=map->lightmapImage->getData();
-			int pixelSize=map->lightmapImage->getPixelSize();
+			tbyte *dst=map->lightmapData;
+			int pixelSize=TextureFormat::getPixelSize(map->lightmapFormat->getPixelFormat());
 			tbyte *src=(tbyte*)map->lighting + face->lightofs;
 			for(j=0;j<faced->lightmapSize[1];++j){
 				memcpy(dst + ((faced->lightmapCoord[1]+j)*BSP30Map::LIGHTMAP_SIZE + faced->lightmapCoord[0])*pixelSize,src + faced->lightmapSize[0]*j*pixelSize,faced->lightmapSize[0]*pixelSize);

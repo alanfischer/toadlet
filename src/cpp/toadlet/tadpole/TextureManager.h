@@ -26,7 +26,6 @@
 #ifndef TOADLET_TADPOLE_TEXTUREMANAGER_H
 #define TOADLET_TADPOLE_TEXTUREMANAGER_H
 
-#include <toadlet/egg/image/Image.h>
 #include <toadlet/peeper/RenderDevice.h>
 #include <toadlet/peeper/BackableTexture.h>
 #include <toadlet/peeper/PixelBufferRenderTarget.h>
@@ -45,16 +44,15 @@ public:
 
 	void destroy();
 
-	Texture::ptr createTexture(Image::ptr image);
-	Texture::ptr createTexture(int mipLevels,Image::ptr mipImages[]);
-	Texture::ptr createTexture(int usage,int dimension,int pixelFormat,int width,int height,int depth,int mipLevels,tbyte *mipDatas[]=NULL);
+	Texture::ptr createTexture(TextureFormat::ptr format,tbyte *data=NULL);
+	Texture::ptr createTexture(TextureFormat::ptr format,tbyte *mipDatas[]);
+	Texture::ptr createTexture(int usage,TextureFormat::ptr format,tbyte *data=NULL);
+	Texture::ptr createTexture(int usage,TextureFormat::ptr format,tbyte *mipDatas[]);
 	Texture::ptr findTexture(const String &name){return shared_static_cast<Texture>(ResourceManager::find(name));}
-
-	Image::ptr createImage(Texture *texture);
 
 	PixelBufferRenderTarget::ptr createPixelBufferRenderTarget();
 
-	bool textureLoad(Texture::ptr texture,int pixelFormat,int width,int height,int depth,int mipLevel,tbyte *mipData);
+	bool textureLoad(Texture::ptr texture,TextureFormat *format,tbyte *mipData);
 
 	void contextActivate(RenderDevice *renderDevice);
 	void contextDeactivate(RenderDevice *renderDevice);

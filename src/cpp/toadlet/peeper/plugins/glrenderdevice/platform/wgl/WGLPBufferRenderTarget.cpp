@@ -110,7 +110,7 @@ bool WGLPBufferRenderTarget::attach(PixelBuffer::ptr buffer,Attachment attachmen
 	GLTextureMipPixelBuffer *texturebuffer=((GLPixelBuffer*)buffer->getRootPixelBuffer())->castToGLTextureMipPixelBuffer();
 	mTexture=texturebuffer->getTexture();
 
-	if((mTexture->getFormat()->pixelFormat&TextureFormat::Format_SEMANTIC_DEPTH)>0){
+	if((mTexture->getFormat()->getPixelFormat()&TextureFormat::Format_SEMANTIC_DEPTH)>0){
 		Error::invalidParameters(Categories::TOADLET_PEEPER,
 			"Format_SEMANTIC_DEPTH not available for pbuffers");
 		return false;
@@ -150,8 +150,8 @@ bool WGLPBufferRenderTarget::createBuffer(){
 
 	WGLRenderTarget *primaryTarget=(WGLRenderTarget*)(mDevice->getPrimaryRenderTarget()->getRootRenderTarget());
 
-	int width=mTexture->getFormat()->width;
-	int height=mTexture->getFormat()->height;
+	int width=mTexture->getFormat()->getWidth();
+	int height=mTexture->getFormat()->getHeight();
 
 	HDC hdc=primaryTarget->getDC();
 
@@ -159,7 +159,7 @@ bool WGLPBufferRenderTarget::createBuffer(){
 	int pixelType=WGL_TYPE_RGBA_ARB;
 	int texFormat=WGL_TEXTURE_RGB_ARB;
 
-	int pixelFormat=mTexture->getFormat()->pixelFormat;
+	int pixelFormat=mTexture->getFormat()->getPixelFormat();
 	int redBits=TextureFormat::getRedBits(pixelFormat);
 	int greenBits=TextureFormat::getGreenBits(pixelFormat);
 	int blueBits=TextureFormat::getBlueBits(pixelFormat);

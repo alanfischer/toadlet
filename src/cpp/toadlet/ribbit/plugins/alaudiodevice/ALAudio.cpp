@@ -132,7 +132,7 @@ bool ALAudio::play(){
 			total=total+amount;
 			alBufferData(mStreamingBuffers[i],
 				ALAudioDevice::getALFormat(mAudioStream->getAudioFormat()),
-				buffer,amount,mAudioStream->getAudioFormat()->samplesPerSecond);
+				buffer,amount,mAudioStream->getAudioFormat()->getSamplesPerSecond());
 			TOADLET_CHECK_ALERROR("alBufferData");
 		}
 
@@ -316,7 +316,7 @@ void ALAudio::updateStreaming(int dt){
 				if(amount>0){
 					alBufferData(bufferID,
 						ALAudioDevice::getALFormat(mAudioStream->getAudioFormat()),
-						buffer,amount,mAudioStream->getAudioFormat()->samplesPerSecond);
+						buffer,amount,mAudioStream->getAudioFormat()->getSamplesPerSecond());
 					TOADLET_CHECK_ALERROR("update::alBufferData");
 					alSourceQueueBuffers(mHandle,1,&bufferID);
 					TOADLET_CHECK_ALERROR("update::alSourceQueueBuffers");

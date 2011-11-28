@@ -35,7 +35,6 @@ extern "C"{
 #include <toadlet/egg/EndianConversion.h>
 #include <toadlet/egg/Error.h>
 #include <toadlet/egg/Logger.h>
-#include <toadlet/egg/image/Image.h>
 #include <toadlet/tadpole/handler/GIFHandler.h>
 
 namespace toadlet{
@@ -79,13 +78,13 @@ void copyGIFLine(	unsigned char *dest,
 					unsigned int xoff,unsigned int yoff,
 					unsigned int twidth,unsigned int theight,
 					unsigned int amt,unsigned int yoff2,
-					unsigned char *src,int trans,GifColorType *colorTable,int pixelSize,int format){
+					unsigned char *src,int trans,GifColorType *colorTable,int pixelSize,int pixelFormat){
 
 	dest=dest + (iwidth*pixelSize*(yoff+yoff2)) + xoff*pixelSize;
 
 	int i;
 	for(i=0;i<amt;++i){
-		if(format==Image::Format_RGB_8){
+		if(pixelFormat==TextureFormat::Format_RGB_8){
 			dest[i*3+0]=colorTable[src[i]].Red;
 			dest[i*3+1]=colorTable[src[i]].Green;
 			dest[i*3+2]=colorTable[src[i]].Blue;
@@ -99,12 +98,11 @@ void copyGIFLine(	unsigned char *dest,
 	}
 }
 
-void setImagePortion(Image *dest,int x,int y,int width,int height,int red,int green,int blue){
-	tbyte *data=dest->getData();
+void setImagePortion(TextureFormat *format,tbyte *data,int x,int y,int width,int height,int red,int green,int blue){
 	int i,j;
 	for(j=y;j<y+height;++j){
 		for(i=x;i<x+width;++i){
-			if(dest->getFormat()==Image::Format_RGB_8){
+			if(format->getPixelFormat()==TextureFormat::Format_RGB_8){
 				data[(j*width+i)*3+0]=red;
 				data[(j*width+i)*3+1]=green;
 				data[(j*width+i)*3+2]=blue;
@@ -119,7 +117,7 @@ void setImagePortion(Image *dest,int x,int y,int width,int height,int red,int gr
 	}
 }
 
-int GIFHandler::getNextImage(Image *&image,int &frameDelay,GifFileType *gifFile,Image *&base,Image *&working){
+int GIFHandler::getNextImage(tbyte *&data,int &delay,GifFileType *gifFile,TextureFormat *&format,tbyte *&base,tbyte *&working){
 	GifRecordType RecordType;
 	GifByteType *pLine=NULL;
 	GifByteType *pExtension=NULL;
@@ -150,45 +148,41 @@ int GIFHandler::getNextImage(Image *&image,int &frameDelay,GifFileType *gifFile,
 				const int width=gifFile->Image.Width;
 				const int height=gifFile->Image.Height;
 
-				int format=Image::Format_UNKNOWN;
+				int pixelFormat=TextureFormat::Format_UNKNOWN;
 				int pixelSize=0;
 				if(transparent==GIF_NOT_TRANSPARENT){
-					format=Image::Format_RGB_8;
+					pixelFormat=TextureFormat::Format_RGB_8;
 					pixelSize=3;
 				}
 				else{
-					format=Image::Format_RGBA_8;
+					pixelFormat=TextureFormat::Format_RGBA_8;
 					pixelSize=4;
 				}
 
-				if(working==NULL){
-					working=Image::createAndReallocate(Image::Dimension_D2,format,width,height);
-					if(working==NULL){
-						return GIF_ERROR;
-					}
+				if(format==NULL){
+					format=new TextureFormat(TextureFormat::Dimension_D2,pixelFormat,width,height,1,0);
+				}
 
-					memset(working->getData(),0,pixelSize*width*height);
+				if(working==NULL){
+					working=new tbyte[format->getDataSize()];
+					memset(working,0,format->getDataSize());
 
 					GifColorType *color=gifFile->SColorMap->Colors + gifFile->SBackGroundColor;
-					setImagePortion(working,gifFile->Image.Left,gifFile->Image.Top,gifFile->Image.Width,gifFile->Image.Height,color->Red,color->Green,color->Blue);
+					setImagePortion(format,working,gifFile->Image.Left,gifFile->Image.Top,gifFile->Image.Width,gifFile->Image.Height,color->Red,color->Green,color->Blue);
 				}
 
 				if(base==NULL){
-					base=Image::createAndReallocate(Image::Dimension_D2,format,width,height);
-					if(base==NULL){
-						return GIF_ERROR;
-					}
-					
-					memset(working->getData(),0,pixelSize*width*height);
-
+					base=new tbyte[format->getDataSize()];
+					memset(base,0,format->getDataSize());
+	
 					GifColorType *color=gifFile->SColorMap->Colors + gifFile->SBackGroundColor;
-					setImagePortion(working,gifFile->Image.Left,gifFile->Image.Top,gifFile->Image.Width,gifFile->Image.Height,color->Red,color->Green,color->Blue);
+					setImagePortion(format,base,gifFile->Image.Left,gifFile->Image.Top,gifFile->Image.Width,gifFile->Image.Height,color->Red,color->Green,color->Blue);
 				}
 
 				pLine=new GifByteType[width*pixelSize];
 
-				unsigned int workingWidth=working->getWidth();
-				unsigned int workingHeight=working->getHeight();
+				unsigned int workingWidth=format->getWidth();
+				unsigned int workingHeight=format->getHeight();
 
 				if(gifFile->Image.Interlace){
 					// Need to perform 4 passes on the images:
@@ -198,7 +192,7 @@ int GIFHandler::getNextImage(Image *&image,int &frameDelay,GifFileType *gifFile,
 								delete[] pLine;
 								return GIF_ERROR;
 							}
-							copyGIFLine(working->getData(),workingWidth,workingHeight,x,y,width,height,width,i,pLine,transparent,pColorTable,pixelSize,format);
+							copyGIFLine(working,workingWidth,workingHeight,x,y,width,height,width,i,pLine,transparent,pColorTable,pixelSize,pixelFormat);
  						}
 					}
 				}
@@ -209,19 +203,17 @@ int GIFHandler::getNextImage(Image *&image,int &frameDelay,GifFileType *gifFile,
 							delete[] pLine;
 							return GIF_ERROR;
 						}
-						copyGIFLine(working->getData(),workingWidth,workingHeight,x,y,width,height,width,i,pLine,transparent,pColorTable,pixelSize,format);
+						copyGIFLine(working,workingWidth,workingHeight,x,y,width,height,width,i,pLine,transparent,pColorTable,pixelSize,pixelFormat);
 					}
 				}
 				delete[] pLine;
 
-				image=flipImage(working);
-
 				if(dispose == GIF_DISPOSE_LEAVE){
-					memcpy(base->getData(),working->getData(),working->getPixelSize()*working->getWidth()*working->getHeight());
+					memcpy(base,working,format->getDataSize());
 				}
  				else if(dispose == GIF_DISPOSE_BACKGND){
 					GifColorType *color=gifFile->SColorMap->Colors + gifFile->SBackGroundColor;
-					setImagePortion(working,gifFile->Image.Left,gifFile->Image.Top,gifFile->Image.Width,gifFile->Image.Height,color->Red,color->Green,color->Blue);
+					setImagePortion(format,working,gifFile->Image.Left,gifFile->Image.Top,gifFile->Image.Width,gifFile->Image.Height,color->Red,color->Green,color->Blue);
 				}
 				else if(dispose == GIF_DISPOSE_RESTORE){
 					const int x = gifFile->Image.Left;
@@ -232,7 +224,7 @@ int GIFHandler::getNextImage(Image *&image,int &frameDelay,GifFileType *gifFile,
 
 					int j;
 					for(j=y;j<y+height;++j){
-						memcpy(working->getData()+y*stride+x,base->getData()+y*stride+x,stride);
+						memcpy(working+y*stride+x,base+y*stride+x,stride);
 					}
 				}
 				else{
@@ -253,9 +245,9 @@ int GIFHandler::getNextImage(Image *&image,int &frameDelay,GifFileType *gifFile,
 				case GRAPHICS_EXT_FUNC_CODE:{
 					int flag = pExtension[0];
 
-					frameDelay=(pExtension[2] << 8) | pExtension[1];
-					if(frameDelay<10){
-						frameDelay=10;
+					delay=(pExtension[2] << 8) | pExtension[1];
+					if(delay<10){
+						delay=10;
 					}
 			
 					if((flag&GIF_TRANSPARENT)!=0){
@@ -328,19 +320,20 @@ Resource::ptr GIFHandler::load(Stream::ptr stream,ResourceData *data,ProgressLis
 		return NULL;
 	}
 
-	Collection<int> frameDelays;
-	Collection<Image::ptr> images;
-	Image *image=NULL,*base=NULL,*working=NULL;
-	int frameDelay=0;
+	Collection<tbyte*> images;
+	Collection<int> delays;
+	TextureFormat *format=NULL;
+	tbyte *image=NULL,*base=NULL,*working=NULL;
+	int delay=0;
 	int result=0;
 
 	do{
 		image=NULL;
-		frameDelay=0;
-		result=getNextImage(image,frameDelay,file,base,working);
+		delay=0;
+		result=getNextImage(image,delay,file,format,base,working);
 		if(image!=NULL && result!=GIF_ERROR){
-			images.add(Image::ptr(image));
-			frameDelays.add(frameDelay);
+			images.add(image);
+			delays.add(delay);
 		}
 	}while(result!=GIF_ERROR && image!=NULL);
 
@@ -349,23 +342,17 @@ Resource::ptr GIFHandler::load(Stream::ptr stream,ResourceData *data,ProgressLis
 	}
 	
 	Texture::ptr texture;
+	TextureFormat::ptr textureFormat(format);
 	if(result!=GIF_ERROR){
-		Image::ptr image=images[0];
-		if(images.size()>1){
-			Image::ptr image3d(Image::createAndReallocate(Image::Dimension_D3,image->getFormat(),image->getWidth(),image->getHeight(),images.size()));
-			int i;
-			for(i=0;i<images.size();++i){
-				memcpy(image3d->getData()+image3d->getSlicePitch()*i,images[i]->getData(),image3d->getSlicePitch());
-			}
-			texture=mTextureManager->createTexture(image3d);
-		}
-		else{
-			texture=mTextureManager->createTexture(image);
-		}
+		texture=mTextureManager->createTexture(textureFormat,images[0]);
 	}
 	
-	delete base;
-	delete working;
+	delete[] base;
+	delete[] working;
+	int i;
+	for(i=0;i<images.size();++i){
+		delete[] images;
+	}
 	
 	if(result==GIF_ERROR){
 		Error::unknown(Categories::TOADLET_TADPOLE,
@@ -374,29 +361,6 @@ Resource::ptr GIFHandler::load(Stream::ptr stream,ResourceData *data,ProgressLis
 	}
 
 	return texture;
-}
-
-Image *GIFHandler::flipImage(Image *image){
-	unsigned int width=image->getWidth();
-	unsigned int height=image->getHeight();
-	unsigned int pixelSize=image->getPixelSize();
-
-	int amt=width*pixelSize;
-
-	Image *image2=new Image();
-	image2->reallocate(image,false);
-
-	unsigned char *data1=image->getData();
-	unsigned char *data2=image2->getData();
-
-	int j;
-	for(j=0;j<height;++j){
-		unsigned char *line1=data1+width*j*pixelSize;
-		unsigned char *line2=data2+width*(height-1-j)*pixelSize;
-		memcpy(line2,line1,amt);
-	}
-
-	return image2;
 }
 
 }

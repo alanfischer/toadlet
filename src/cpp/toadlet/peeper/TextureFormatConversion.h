@@ -23,16 +23,15 @@
  *
  ********** Copyright header - do not remove **********/
 
-#ifndef TOADLET_EGG_IMAGE_IMAGEFORMATCONVERSION_H
-#define TOADLET_EGG_IMAGE_IMAGEFORMATCONVERSION_H
+#ifndef TOADLET_PEEPER_TEXTUREFORMATCONVERSION_H
+#define TOADLET_PEEPER_TEXTUREFORMATCONVERSION_H
 
-#include <toadlet/egg/image/ImageDefinitions.h>
+#include <toadlet/peeper/TextureFormat.h>
 
 namespace toadlet{
-namespace egg{
-namespace image{
+namespace peeper{
 
-class TOADLET_API ImageFormatConversion:public ImageDefinitions{
+class TOADLET_API TextureFormatConversion{
 public:
 	static inline uint8 getRedFromRGB565(const uint16 pixel){return (pixel&0xF800)>>8;}
 	static inline uint8 getGreenFromRGB565(const uint16 pixel){return (pixel&0x7E0)>>3;}
@@ -62,71 +61,57 @@ public:
 
 	static inline int getPixelSize(int format){
 		switch(format){
-			case Format_L_8:
-			case Format_A_8:
+			case TextureFormat::Format_L_8:
+			case TextureFormat::Format_A_8:
 				return sizeof(uint8);
-			case Format_LA_8:
+			case TextureFormat::Format_LA_8:
 				return sizeof(uint8)*2;
-			case Format_RGB_8:
-			case Format_BGR_8:
+			case TextureFormat::Format_RGB_8:
+			case TextureFormat::Format_BGR_8:
 				return sizeof(uint8)*3;
-			case Format_RGBA_8:
-			case Format_BGRA_8:
+			case TextureFormat::Format_RGBA_8:
+			case TextureFormat::Format_BGRA_8:
 				return sizeof(uint8)*4;
-			case Format_RGB_5_6_5:
-			case Format_BGR_5_6_5:
-			case Format_RGBA_5_5_5_1:
-			case Format_BGRA_5_5_5_1:
-			case Format_RGBA_4_4_4_4:
-			case Format_BGRA_4_4_4_4:
+			case TextureFormat::Format_RGB_5_6_5:
+			case TextureFormat::Format_BGR_5_6_5:
+			case TextureFormat::Format_RGBA_5_5_5_1:
+			case TextureFormat::Format_BGRA_5_5_5_1:
+			case TextureFormat::Format_RGBA_4_4_4_4:
+			case TextureFormat::Format_BGRA_4_4_4_4:
 				return sizeof(uint16);
-			case Format_L_F32:
-			case Format_A_F32:
+			case TextureFormat::Format_L_F32:
+			case TextureFormat::Format_A_F32:
 				return sizeof(float);
-			case Format_LA_F32:
+			case TextureFormat::Format_LA_F32:
 				return sizeof(float)*2;
-			case Format_RGB_F32:
-			case Format_BGR_F32:
+			case TextureFormat::Format_RGB_F32:
+			case TextureFormat::Format_BGR_F32:
 				return sizeof(float)*3;
-			case Format_RGBA_F32:
-			case Format_BGRA_F32:
+			case TextureFormat::Format_RGBA_F32:
+			case TextureFormat::Format_BGRA_F32:
 				return sizeof(float)*4;
 			default:
 				return 0;
 		}
 	}
 
-	static inline int getRowPitch(int format,int width){
+	static inline int getPitch(int format,int width,int height,int depth){
 		switch(format){
-			case Format_RGB_DXT1:
-				return width/2;
-			case Format_RGBA_DXT2:
-			case Format_RGBA_DXT3:
-			case Format_RGBA_DXT4:
-			case Format_RGBA_DXT5:
-				return width;
+			case TextureFormat::Format_RGB_DXT1:
+				return width/2*height*depth;
+			case TextureFormat::Format_RGBA_DXT2:
+			case TextureFormat::Format_RGBA_DXT3:
+			case TextureFormat::Format_RGBA_DXT4:
+			case TextureFormat::Format_RGBA_DXT5:
+				return width*height*depth;
 			default:
-				return getPixelSize(format)*width;
+				return getPixelSize(format)*width*height*depth;
 		}
 	}
 
-	static bool isFormatCompressed(int format){
-		switch(format){
-			case Format_RGB_DXT1:
-			case Format_RGBA_DXT2:
-			case Format_RGBA_DXT3:
-			case Format_RGBA_DXT4:
-			case Format_RGBA_DXT5:
-				return true;
-			default:
-				return false;
-		}
-	}
-
-	static bool convert(tbyte *src,int srcFormat,int srcRowPitch,int srcSlicePitch,tbyte *dst,int dstFormat,int dstRowPitch,int dstSlicePitch,int width,int height,int depth);
+	static bool convert(tbyte *src,TextureFormat *srcFormat,tbyte *dst,TextureFormat *dstFormat);
 };
 
-}
 }
 }
 

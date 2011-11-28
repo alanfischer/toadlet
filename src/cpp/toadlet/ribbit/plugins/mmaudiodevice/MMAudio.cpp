@@ -135,7 +135,7 @@ int MMAudio::read(tbyte *data,int length){
 	if(amount>0){
 		int i;
 		if(mGain<Math::ONE){
-			int bps=mDevice->getAudioFormat()->bitsPerSample;
+			int bps=mDevice->getAudioFormat()->getBitsPerSample();
 			if(bps==8){
 				for(i=0;i<amount;++i){
 					((uint8*)data)[i]=Math::toInt(Math::mul(Math::fromInt(((int)((uint8*)data)[i])-128),mGain))+128;

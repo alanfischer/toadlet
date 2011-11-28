@@ -16,11 +16,6 @@ set (EGG_SRC
 	Version.cpp
 )
 
-set (EGG_IMAGE_SRC
-	image/Image.cpp
-	image/ImageFormatConversion.cpp
-)
-
 set (EGG_IO_SRC
 	io/DataStream.cpp
 	io/FileStream.cpp
@@ -115,12 +110,6 @@ set (EGG_HEADERS
 	Version.h
 )
 
-set (EGG_IMAGE_HEADERS
-	image/Image.h
-	image/ImageDefinitions.h
-	image/ImageFormatConversion.h
-)
-
 set (EGG_IO_HEADERS
 	io/Archive.h
 	io/DataStream.h
@@ -196,21 +185,19 @@ set (EGG_PLATFORM_WIN32_HEADERS
 
 
 # Bundle source
-source_group ("Source Files\\\\image" FILES ${EGG_IMAGE_SRC})
 source_group ("Source Files\\\\io" FILES ${EGG_IO_SRC})
 source_group ("Source Files\\\\net" FILES ${EGG_NET_SRC})
 
 
 # Bundle headers
-source_group ("Header Files\\\\image" FILES ${EGG_IMAGE_HEADERS})
 source_group ("Header Files\\\\io" FILES ${EGG_IO_HEADERS})
 source_group ("Header Files\\\\net" FILES ${EGG_NET_HEADERS})
 
 
 # Sources, headers and namespaces
-set (EGG_SRC ${EGG_SRC} ${EGG_IMAGE_SRC} ${EGG_IO_SRC} ${EGG_NET_SRC})
-set (EGG_HEADERS ${EGG_HEADERS} ${EGG_IMAGE_HEADERS} ${EGG_IO_HEADERS} ${EGG_NET_HEADERS})
-set (EGG_NAMESPACES ${EGG_NAMESPACES} image io net)
+set (EGG_SRC ${EGG_SRC} ${EGG_IO_SRC} ${EGG_NET_SRC})
+set (EGG_HEADERS ${EGG_HEADERS} ${EGG_IO_HEADERS} ${EGG_NET_HEADERS})
+set (EGG_NAMESPACES ${EGG_NAMESPACES} io net)
 
 
 # Always build both fixed & floating point math

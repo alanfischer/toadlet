@@ -231,44 +231,169 @@ public:
 		}
 	}
 
-	TextureFormat(int texDimension,int texPixelFormat,int texWidth=0,int texHeight=0,int texDepth=0,int texMipLevels=0):
-		dimension(texDimension),
-		pixelFormat(texPixelFormat),
-		width(texWidth),
-		height(texHeight),
-		depth(texDepth),
-		mipLevels(texMipLevels)
-	{}
+	static inline int getPixelSize(int format){
+		switch(format){
+			case Format_L_8:
+			case Format_A_8:
+				return sizeof(uint8);
+			case Format_LA_8:
+				return sizeof(uint8)*2;
+			case Format_RGB_8:
+			case Format_BGR_8:
+				return sizeof(uint8)*3;
+			case Format_RGBA_8:
+			case Format_BGRA_8:
+				return sizeof(uint8)*4;
+			case Format_RGB_5_6_5:
+			case Format_BGR_5_6_5:
+			case Format_RGBA_5_5_5_1:
+			case Format_BGRA_5_5_5_1:
+			case Format_RGBA_4_4_4_4:
+			case Format_BGRA_4_4_4_4:
+				return sizeof(uint16);
+			case Format_L_F32:
+			case Format_A_F32:
+				return sizeof(float);
+			case Format_LA_F32:
+				return sizeof(float)*2;
+			case Format_RGB_F32:
+			case Format_BGR_F32:
+				return sizeof(float)*3;
+			case Format_RGBA_F32:
+			case Format_BGRA_F32:
+				return sizeof(float)*4;
+			default:
+				return 0;
+		}
+	}
 
-	TextureFormat(const TextureFormat *format):
+	TextureFormat(int dimension1,int pixelFormat1,int width,int height,int depth,int mipMax1):
+		dimension(dimension1),
+		pixelFormat(pixelFormat1),
+		xMin(0),yMin(0),zMin(0),
+		xMax(width),yMax(height),zMax(depth),
+		xPitch(0),yPitch(0),zPitch(0),
+		mipMin(0),mipMax(mipMax1)
+	{
+		TOADLET_ASSERT(getWidth()>=1 && getHeight()>-1 && getDepth()>=1);
+		updatePitch();
+	}
+
+	TextureFormat(int dimension1,int pixelFormat1,int xMin1,int yMin1,int zMin1,int xMax1,int yMax1,int zMax1,int mip):
+		dimension(dimension1),
+		pixelFormat(pixelFormat1),
+		xMin(xMin1),yMin(yMin1),zMin(zMin1),
+		xMax(xMax1),yMax(yMax1),zMax(zMax1),
+		xPitch(0),yPitch(0),zPitch(0),
+		mipMin(mip),mipMax(mip)
+	{
+		TOADLET_ASSERT(getWidth()>=1 && getHeight()>-1 && getDepth()>=1);
+		updatePitch();
+	}
+
+	TextureFormat(const TextureFormat *format,int mipLevel=-1):
 		dimension(Dimension_UNKNOWN),
 		pixelFormat(Format_UNKNOWN),
-		width(0),
-		height(0),
-		depth(0),
-		mipLevels(0)
+		xMin(0),yMin(0),zMin(0),
+		xMax(0),yMax(0),zMax(0),
+		xPitch(0),yPitch(0),zPitch(0),
+		mipMin(0),mipMax(0)
 	{
 		if(format!=NULL){
 			dimension=format->dimension;
 			pixelFormat=format->pixelFormat;
-			width=format->width;
-			height=format->height;
-			depth=format->depth;
-			mipLevels=format->mipLevels;
+			xMin=format->xMin,yMin=format->yMin,zMin=format->zMin;
+			xMax=format->xMax,yMax=format->yMax,zMax=format->zMax;
+			xPitch=format->xPitch;yPitch=format->yPitch;zPitch=format->zPitch;
+			mipMin=format->mipMin;mipMax=format->mipMax;
 		}
+
+		if(mipLevel!=-1){
+			mipMin=mipLevel;mipMax=mipLevel;
+			if(mipLevel>0){
+				xMin/=2*mipLevel;yMin/=2*mipLevel;zMin/=2*mipLevel;
+				xMax/=2*mipLevel;yMax/=2*mipLevel;zMax/=2*mipLevel;
+			}
+			xMax=xMax>0?xMax:0;yMax=yMax>0?yMax:0;zMax=zMax>0?zMax:0;
+		}
+	}
+
+	void setPixelFormat(int pixelFormat1){
+		pixelFormat=pixelFormat1;
+		updatePitch();
+	}
+
+	void setSize(int width,int height,int depth){
+		xMin=0;xMax=width;
+		yMin=0;yMax=height;
+		zMin=0;zMax=depth;
+		TOADLET_ASSERT(getWidth()>=1 && getHeight()>-1 && getDepth()>=1);
+		updatePitch();
+	}
+
+	void setMips(int mipMin1,int mipMax1){
+		mipMin=mipMin1;
+		mipMax=mipMax1;
+		updatePitch();
+	}
+
+	inline int getDimension() const{return dimension;}
+	inline int getPixelFormat() const{return pixelFormat;}
+	inline int getXMin() const{return xMin;}
+	inline int getYMin() const{return yMin;}
+	inline int getZMin() const{return zMin;}
+	inline int getXMax() const{return xMax;}
+	inline int getYMax() const{return yMax;}
+	inline int getZMax() const{return zMax;}
+	inline int getWidth() const{return xMax-xMin;}
+	inline int getHeight() const{return yMax-yMin;}
+	inline int getDepth() const{return zMax-zMin;}
+	inline int getXPitch() const{return xPitch;}
+	inline int getYPitch() const{return yPitch;}
+	inline int getZPitch() const{return zPitch;}
+	inline int getMipMin() const{return mipMin;}
+	inline int getMipMax() const{return mipMax;}
+	inline int getDataSize(){return zPitch;}
+
+	inline bool isPowerOf2(){
+		return Math::isPowerOf2(xMax) && Math::isPowerOf2(yMax) && (dimension==Dimension_CUBE || Math::isPowerOf2(zMax));
+	}
+
+	inline int getMipMaxPossible(){
+		return Math::intLog2(Math::maxVal(xMax,Math::maxVal(yMax,zMax)));
+	}
+
+	bool equals(TextureFormat *format) const{
+		return dimension==format->dimension && pixelFormat==format->pixelFormat &&
+			xMin==format->xMin && yMin==format->yMin && zMin==format->zMin &&
+			xMax==format->xMax && yMax==format->yMax && zMax==format->zMax &&
+			xPitch==format->xPitch && yPitch==format->yPitch && zPitch==format->zPitch &&
+			mipMin==format->mipMin && mipMax==format->mipMax;
+	}
+
+protected:
+	void updatePitch(){
+		switch(pixelFormat){
+			case Format_RGB_DXT1:
+				xPitch=getWidth()/2;
+			case Format_RGBA_DXT2:
+			case Format_RGBA_DXT3:
+			case Format_RGBA_DXT4:
+			case Format_RGBA_DXT5:
+				xPitch=getWidth();
+			default:
+				xPitch=getPixelSize(pixelFormat)*getWidth();
+		}		
+		yPitch=xPitch*getHeight();
+		zPitch=yPitch*getDepth();
 	}
 
 	int dimension;
 	int pixelFormat;
-	int width;
-	int height;
-	int depth;
-	int mipLevels;
-
-	bool equals(TextureFormat *format) const{
-		return dimension==format->dimension && pixelFormat==format->pixelFormat &&
-			width==format->width && height==format->height && depth==format->depth && mipLevels==format->mipLevels;
-	}
+	int xMin,yMin,zMin;
+	int xMax,yMax,zMax;
+	int xPitch,yPitch,zPitch;
+	int mipMin,mipMax;
 };
 
 }

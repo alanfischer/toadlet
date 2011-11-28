@@ -111,26 +111,25 @@ Texture::ptr WADArchive::createTexture(toadlet::tadpole::TextureManager *texture
 		pal=(tbyte*)miptex + littleInt32(miptex->offsets[0]) + datasize + 2;
 	}
 
-	int format=TextureFormat::Format_RGB_8;
+	int pixelFormat=TextureFormat::Format_RGB_8;
 	if(miptex->name[0]=='{'){
-		format=TextureFormat::Format_RGBA_8;
+		pixelFormat=TextureFormat::Format_RGBA_8;
 	}
 
-	Image::ptr images[4];
-	int hwidth=width,hheight=height;
+	TextureFormat::ptr textureFormat(new TextureFormat(TextureFormat::Dimension_D2,pixelFormat,width,height,1,4));
+	tbyte *mipDatas[4];
 	int mipLevel;
 	for(mipLevel=0;mipLevel<4;++mipLevel){
-		images[mipLevel]=Image::ptr(Image::createAndReallocate(Image::Dimension_D2,format,width,height));
-		if(images[mipLevel]==NULL){
-			return NULL;
-		}
+		TextureFormat::ptr mipFormat(new TextureFormat(textureFormat,mipLevel));
+		mipDatas[mipLevel]=new tbyte[mipFormat->getDataSize()];
 
 		tbyte *src=(tbyte*)miptex + littleInt32(miptex->offsets[mipLevel]);
-		tbyte *data=images[mipLevel]->getData();
+		tbyte *data=mipDatas[mipLevel];
+		int widthheight=mipFormat->getWidth()*mipFormat->getHeight();
 
 		int j=0,k=0,j3=0,k3=0;
-		if(format==TextureFormat::Format_RGB_8){
-			for(j=0;j<hwidth*hheight;j++){
+		if(pixelFormat==TextureFormat::Format_RGB_8){
+			for(j=0;j<widthheight;j++){
 				k=*(src+j);
 
 				j3=j*3;
@@ -141,7 +140,7 @@ Texture::ptr WADArchive::createTexture(toadlet::tadpole::TextureManager *texture
 			}
 		}
 		else{
-			for(j=0;j<hwidth*hheight;j++){
+			for(j=0;j<widthheight;j++){
 				k=*(src+j);
 
 				j3=j*4;
@@ -152,11 +151,9 @@ Texture::ptr WADArchive::createTexture(toadlet::tadpole::TextureManager *texture
 				*(data+j3+3)=(*(data+j3+0)==0 && *(data+j3+1)==0 && *(data+j3+2)==255)?0:255;
 			}
 		}
-
-		if(hwidth>=2) hwidth/=2; if(hheight>=2) hheight/=2;
 	}
 
-	Texture::ptr texture=textureManager->createTexture(4,images);
+	Texture::ptr texture=textureManager->createTexture(textureFormat,mipDatas);
 	if(texture!=NULL){
 		textureManager->manage(texture,miptex->name);
 	}
