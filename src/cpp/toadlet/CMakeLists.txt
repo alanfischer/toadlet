@@ -222,7 +222,7 @@ configure_file (${CMAKE_CURRENT_SOURCE_DIR}/Config.h.cmake ${CMAKE_CURRENT_BINAR
 install (FILES ${toadlet_SOURCE_DIR}/src/cpp/toadlet/Types.h DESTINATION include/toadlet)
 install (FILES ${toadlet_BINARY_DIR}/src/cpp/toadlet/Config.h DESTINATION include/toadlet)
 foreach (TOADLET_LIBRARY ${TOADLET_LIBRARY_LIST})
-	install (DIRECTORY ${toadlet_SOURCE_DIR}/src/cpp/toadlet/${TOADLET_LIBRARY}  DESTINATION include/toadlet/${TOADLET_LIBRARY} FILES_MATCHING PATTERN "*.h")
+	install (DIRECTORY ${toadlet_SOURCE_DIR}/src/cpp/toadlet/${TOADLET_LIBRARY}  DESTINATION include/toadlet FILES_MATCHING PATTERN "*.h")
 	install (FILES ${toadlet_BINARY_DIR}/src/cpp/toadlet/${TOADLET_LIBRARY}.h DESTINATION include/toadlet)
 endforeach (TOADLET_LIBRARY)
 install (FILES ${toadlet_BINARY_DIR}/src/cpp/toadlet/toadlet.h DESTINATION include/toadlet)
