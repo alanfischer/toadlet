@@ -27,15 +27,16 @@ public:
 			tolerance=0.00005;
 		#else
 			cloudSize=256;
-			patchSize=64;
+			patchSize=128;
 			tolerance=0.000001;
 		#endif
 
 		Logger::alert("Loading terrain");
 
-		seafloorTexture=engine->getTextureManager()->findTexture("seafloor.png");
-		rockTexture=engine->getTextureManager()->findTexture("rock.png");
-		grassTexture=engine->getTextureManager()->findTexture("grass.png");
+		terrainMaterialSource=DiffuseTerrainMaterialSource::ptr(new DiffuseTerrainMaterialSource(engine));
+		terrainMaterialSource->setDiffuseTexture(0,engine->getTextureManager()->findTexture("seafloor.png"));
+		terrainMaterialSource->setDiffuseTexture(1,engine->getTextureManager()->findTexture("rock.png"));
+		terrainMaterialSource->setDiffuseTexture(2,engine->getTextureManager()->findTexture("grass.png"));
 
 		Logger::alert("Loading water");
 		waterMaterial=engine->getMaterialManager()->createMaterial();
@@ -350,7 +351,7 @@ public:
 	int patchSize;
 	scalar tolerance;
 	Vector4 skyColor,fadeColor;
-	Texture::ptr seafloorTexture,rockTexture,grassTexture;
+	DiffuseTerrainMaterialSource::ptr terrainMaterialSource;
 	Material::ptr waterMaterial;
 	Mesh::ptr creature;
 	Mesh::ptr shadow;

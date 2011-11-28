@@ -114,8 +114,6 @@ Resource::ptr PNGHandler::load(Stream::ptr stream,ResourceData *resourceData,Pro
 	
 	png_read_image(png_ptr,row_pointers);
 
-	Image::ptr image;
-
 	#if 0 // This code is removed until I have time to update it to all the non-depreciated & new trans stuff
 	if(color_type==PNG_COLOR_TYPE_PALETTE){
 		#define PNGHANDLER_GET_INDEX \
@@ -172,19 +170,19 @@ Resource::ptr PNGHandler::load(Stream::ptr stream,ResourceData *resourceData,Pro
 		}
 	}
 	#endif
-	int format=0;
+	int pixelFormat=0;
 	switch(color_type){
-		case(PNG_COLOR_TYPE_GRAY):
-			format=Image::Format_L_8;
+		case PNG_COLOR_TYPE_GRAY:
+			pixelFormat=TextureFormat::Format_L_8;
 		break;
-		case(PNG_COLOR_TYPE_GRAY_ALPHA):
-			format=Image::Format_LA_8;
+		case PNG_COLOR_TYPE_GRAY_ALPHA:
+			pixelFormat=TextureFormat::Format_LA_8;
 		break;
-		case(PNG_COLOR_TYPE_RGB):
-			format=Image::Format_RGB_8;
+		case PNG_COLOR_TYPE_RGB:
+			pixelFormat=TextureFormat::Format_RGB_8;
 		break;
-		case(PNG_COLOR_TYPE_RGB_ALPHA):
-			format=Image::Format_RGBA_8;
+		case PNG_COLOR_TYPE_RGB_ALPHA:
+			pixelFormat=TextureFormat::Format_RGBA_8;
 		break;
 		default:
 			png_destroy_read_struct(&png_ptr,&info_ptr,NULL);
@@ -193,16 +191,12 @@ Resource::ptr PNGHandler::load(Stream::ptr stream,ResourceData *resourceData,Pro
 		break;
 	}
 
-	image=Image::ptr(Image::createAndReallocate(Image::Dimension_D2,format,width,height));
-	if(image==NULL){
-		return NULL;
-	}
-	
-	int bytewidth=width*image->getPixelSize();
-	tbyte *data=image->getData();
+	TextureFormat::ptr textureFormat(new TextureFormat(TextureFormat::Dimension_D2,pixelFormat,width,height,1,0));
+	tbyte *textureData=new tbyte[textureFormat->getDataSize()];
+	int textureXPitch=textureFormat->getXPitch();
 	for(y=0;y<height;++y){
 		// Flip image in this copy
-		memcpy(data+bytewidth*(height-y-1),row_pointers[y],bytewidth);
+		memcpy(textureData+textureXPitch*(height-y-1),row_pointers[y],textureXPitch);
 	}
 	
 	for(y=0;y<height;++y){
@@ -212,7 +206,11 @@ Resource::ptr PNGHandler::load(Stream::ptr stream,ResourceData *resourceData,Pro
 
 	png_destroy_read_struct(&png_ptr,&info_ptr,NULL);
 
-	return mTextureManager->createTexture(image);
+	Texture::ptr texture=mTextureManager->createTexture(textureFormat,textureData);
+
+	delete[] textureData;
+
+	return texture;
 }
 
 }

@@ -213,9 +213,14 @@ void DiffuseTerrainMaterialSource::setDiffuseTexture(int layer,Texture::ptr text
 	if(mDiffuseTextures.size()<=layer){
 		mDiffuseTextures.resize(layer+1);
 	}
-	
+
+	if(mDiffuseTextures[layer]!=NULL){
+		mDiffuseTextures[layer]->release();
+	}
 	mDiffuseTextures[layer]=texture;
-	mDiffuseTextures[layer]->retain();
+	if(mDiffuseTextures[layer]!=NULL){
+		mDiffuseTextures[layer]->retain();
+	}
 }
 
 Material::ptr DiffuseTerrainMaterialSource::getMaterial(TerrainPatchNode *patch){
@@ -270,6 +275,8 @@ Material::ptr DiffuseTerrainMaterialSource::getMaterial(TerrainPatchNode *patch)
 
 		int i;
 		for(i=1;i<numLayers;++i){
+			if(patch->getLayerTexture(i)==NULL) continue;
+
 			RenderPass::ptr pass=shaderPath->addPass();
 
 			pass->setBlendState(BlendState::Combination_ALPHA);
@@ -316,6 +323,8 @@ Material::ptr DiffuseTerrainMaterialSource::getMaterial(TerrainPatchNode *patch)
 
 		int i;
 		for(i=1;i<numLayers;++i){
+			if(patch->getLayerTexture(i)==NULL) continue;
+
 			RenderPass::ptr pass=fixedPath->addPass();
 
 			pass->setBlendState(BlendState::Combination_ALPHA);

@@ -56,14 +56,16 @@ public:
 	TextureFormat::ptr getFormat() const{return mFormat;}
 
 	PixelBuffer::ptr getMipPixelBuffer(int level,int cubeSide);
-	bool load(int width,int height,int depth,int mipLevel,byte *mipData);
-	bool read(int width,int height,int depth,int mipLevel,byte *mipData);
+	bool load(TextureFormat *format,byte *data);
+	bool read(TextureFormat *format,byte *data);
 
 	bool needsReset();
 
 protected:
 	bool createContext(bool restore);
 	bool destroyContext(bool backup);
+	static void setRECT(RECT &rect,TextureFormat *format);
+	static void setD3DBOX(D3DBOX &box,TextureFormat *format);
 
 	D3D9RenderDevice *mDevice;
 

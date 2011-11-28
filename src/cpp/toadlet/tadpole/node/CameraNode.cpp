@@ -378,8 +378,9 @@ void CameraNode::render(RenderDevice *device,Node *node){
 //	renderOverlayGamma(device);
 }
 
-Image::ptr CameraNode::renderToImage(RenderDevice *device,int format,int width,int height){
-	Texture::ptr renderTexture=mEngine->getTextureManager()->createTexture(Texture::Usage_BIT_RENDERTARGET,TextureFormat::Dimension_D2,format,width,height,0,1);
+Texture::ptr CameraNode::renderToTexture(RenderDevice *device,int format,int width,int height){
+	TextureFormat::ptr textureFormat(new TextureFormat(TextureFormat::Dimension_D2,format,width,height,1,1));
+	Texture::ptr renderTexture=mEngine->getTextureManager()->createTexture(Texture::Usage_BIT_RENDERTARGET,textureFormat);
 	PixelBufferRenderTarget::ptr renderTarget=mEngine->getTextureManager()->createPixelBufferRenderTarget();
 	renderTarget->attach(renderTexture->getMipPixelBuffer(0,0),PixelBufferRenderTarget::Attachment_COLOR_0);
 
@@ -396,12 +397,9 @@ Image::ptr CameraNode::renderToImage(RenderDevice *device,int format,int width,i
 	setViewport(oldViewport);
 	device->setRenderTarget(oldTarget);
 
-	Image::ptr image=mEngine->getTextureManager()->createImage(renderTexture);
-
 	renderTarget->destroy();
-	renderTexture->release();
 
-	return image;
+	return renderTexture;
 }
 
 Mesh::ptr CameraNode::renderToSkyBox(RenderDevice *device,int format,int size,scalar scale){
@@ -409,16 +407,17 @@ Mesh::ptr CameraNode::renderToSkyBox(RenderDevice *device,int format,int size,sc
 		return NULL;
 	}
 
+	TextureFormat::ptr textureFormat(new TextureFormat(TextureFormat::Dimension_D2,format,size,size,1,1));
 	bool rtt=mEngine->getRenderCaps().renderToTexture;
 	int flags=Texture::Usage_BIT_RENDERTARGET;
 	Texture::ptr skyBoxTexture[6];
 	Material::ptr skyBoxMaterial[6];
-	skyBoxTexture[0]=mEngine->getTextureManager()->createTexture(flags,TextureFormat::Dimension_D2,format,size,size,0,1);
-	skyBoxTexture[1]=mEngine->getTextureManager()->createTexture(flags,TextureFormat::Dimension_D2,format,size,size,0,1);
-	skyBoxTexture[2]=mEngine->getTextureManager()->createTexture(flags,TextureFormat::Dimension_D2,format,size,size,0,1);
-	skyBoxTexture[3]=mEngine->getTextureManager()->createTexture(flags,TextureFormat::Dimension_D2,format,size,size,0,1);
-	skyBoxTexture[4]=mEngine->getTextureManager()->createTexture(flags,TextureFormat::Dimension_D2,format,size,size,0,1);
-	skyBoxTexture[5]=mEngine->getTextureManager()->createTexture(flags,TextureFormat::Dimension_D2,format,size,size,0,1);
+	skyBoxTexture[0]=mEngine->getTextureManager()->createTexture(flags,textureFormat);
+	skyBoxTexture[1]=mEngine->getTextureManager()->createTexture(flags,textureFormat);
+	skyBoxTexture[2]=mEngine->getTextureManager()->createTexture(flags,textureFormat);
+	skyBoxTexture[3]=mEngine->getTextureManager()->createTexture(flags,textureFormat);
+	skyBoxTexture[4]=mEngine->getTextureManager()->createTexture(flags,textureFormat);
+	skyBoxTexture[5]=mEngine->getTextureManager()->createTexture(flags,textureFormat);
 	PixelBufferRenderTarget::ptr renderTarget=rtt?mEngine->getTextureManager()->createPixelBufferRenderTarget():NULL;
 
 	Vector3 forward[6],up[6];
@@ -442,7 +441,7 @@ Mesh::ptr CameraNode::renderToSkyBox(RenderDevice *device,int format,int size,sc
 			device->setRenderTarget(renderTarget);
 		}
 
-		setViewport(Viewport(0,0,skyBoxTexture[i]->getFormat()->width,skyBoxTexture[i]->getFormat()->height));
+		setViewport(Viewport(0,0,skyBoxTexture[i]->getFormat()->getWidth(),skyBoxTexture[i]->getFormat()->getHeight()));
 		setLookDir(getTranslate(),forward[i],up[i]);
 		mScene->update(0);
 		device->beginScene();

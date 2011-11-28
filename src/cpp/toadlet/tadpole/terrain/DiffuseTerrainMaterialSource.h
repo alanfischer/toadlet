@@ -42,6 +42,7 @@ public:
 	void destroy();
 
 	void setDiffuseTexture(int layer,Texture::ptr texture);
+	Texture::ptr getDiffuseTexture(int layer){return mDiffuseTextures.size()>layer?mDiffuseTextures[layer]:NULL;}
 
 	Material::ptr getMaterial(TerrainPatchNode *patch);
 	

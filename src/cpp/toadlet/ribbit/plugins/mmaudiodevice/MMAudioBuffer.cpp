@@ -61,8 +61,8 @@ bool MMAudioBuffer::create(AudioStream::ptr stream){
 	AudioFormat::ptr newFormat=mDevice->getAudioFormat();
 	if(format!=newFormat){
 		Logger::debug(Categories::TOADLET_RIBBIT,String("converting audio from ")+
-			format->channels+","+format->bitsPerSample+","+format->samplesPerSecond+" to "+
-			newFormat->channels+","+newFormat->bitsPerSample+","+newFormat->samplesPerSecond);
+			format->getChannels()+","+format->getBitsPerSample()+","+format->getSamplesPerSecond()+" to "+
+			newFormat->getChannels()+","+newFormat->getBitsPerSample()+","+newFormat->getSamplesPerSecond());
 
 		int newLength=AudioFormatConversion::findConvertedLength(length,format,newFormat,true);
 		tbyte *newBuffer=new tbyte[newLength];

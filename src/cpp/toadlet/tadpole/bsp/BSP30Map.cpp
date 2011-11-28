@@ -51,7 +51,9 @@ BSP30Map::BSP30Map(Engine *engine):
 
 	this->engine=engine;
 
-	lightmapImage=Image::ptr(Image::createAndReallocate(Image::Dimension_D2,Image::Format_RGB_8,LIGHTMAP_SIZE,LIGHTMAP_SIZE));
+	lightmapFormat=TextureFormat::ptr(new TextureFormat(TextureFormat::Dimension_D2,TextureFormat::Format_RGB_8,LIGHTMAP_SIZE,LIGHTMAP_SIZE,1,0));
+	lightmapData=new tbyte[lightmapFormat->getDataSize()];
+
 	memset(styleIntensities,255,sizeof(styleIntensities));
 };
 
@@ -93,6 +95,14 @@ void BSP30Map::destroy(){
 		modelResources[i]->release();
 	}
 	modelResources.clear();
+
+	delete[] lightmapData;
+	lightmapData=NULL;
+
+	for(i=0;i<lightmapDatas.size();++i){
+		delete[] lightmapDatas[i];
+	}
+	lightmapDatas.clear();
 }
 
 int BSP30Map::modelCollisionTrace(Collision &result,int model,const Vector3 &size,const Vector3 &start,const Vector3 &end){
@@ -217,23 +227,19 @@ void BSP30Map::findSurfaceExtents(bface *face,int *smins,int *smaxs){
 }
 
 void BSP30Map::initLightmap(){
-	memset(lightmapImage->getData(),0,lightmapImage->getSlicePitch());
+	memset(lightmapData,0,lightmapFormat->getDataSize());
 	memset(lightmapAllocated,0,sizeof(lightmapAllocated));
 }
 
 void BSP30Map::uploadLightmap(){
-	tbyte *lightmapData=lightmapImage->getData();
-	Texture::ptr texture=engine->getTextureManager()->createTexture(
-		Texture::Usage_BIT_STREAM|Texture::Usage_BIT_AUTOGEN_MIPMAPS,
-		lightmapImage->getDimension(),lightmapImage->getFormat(),lightmapImage->getWidth(),lightmapImage->getHeight(),1,
-		0,&lightmapData
-	);
-
+	Texture::ptr texture=engine->getTextureManager()->createTexture(Texture::Usage_BIT_STREAM|Texture::Usage_BIT_AUTOGEN_MIPMAPS,lightmapFormat,lightmapData);
 	texture->retain();
 	lightmapTextures.add(texture);
 	lightmapDirties.add(false);
 
-lightmapImages.add(Image::ptr(lightmapImage->clone()));
+	tbyte *clonedData=new tbyte[lightmapFormat->getDataSize()];
+	memcpy(clonedData,lightmapData,lightmapFormat->getDataSize());
+	lightmapDatas.add(clonedData);
 }
 
 void BSP30Map::updateFaceLights(int faceIndex){
@@ -257,7 +263,7 @@ void BSP30Map::updateFaceLights(int faceIndex){
 	int pixelSize=3;
 	int size=faced->lightmapSize[0]*faced->lightmapSize[1]*pixelSize;
 
-	uint8 *dst=lightmapImages[faced->lightmapIndex]->getData();
+	uint8 *dst=lightmapDatas[faced->lightmapIndex];
 	for(i=0;i<numStyles;++i){
 		uint8 *src=(tbyte*)lighting + face->lightofs + size*i;
 		for(j=0;j<faced->lightmapSize[1];++j){

@@ -55,8 +55,8 @@ public:
 	scalar getLength() const{return 0;}
 
 	PixelBuffer::ptr getMipPixelBuffer(int level,int cubeSide);
-	bool load(int width,int height,int depth,int mipLevel,tbyte *mipData);
-	bool read(int width,int height,int depth,int mipLevel,tbyte *mipData);
+	bool load(TextureFormat *format,tbyte *data);
+	bool read(TextureFormat *format,tbyte *data);
 
 	inline GLuint getHandle() const{return mHandle;}
 	inline GLenum getTarget() const{return mTarget;}

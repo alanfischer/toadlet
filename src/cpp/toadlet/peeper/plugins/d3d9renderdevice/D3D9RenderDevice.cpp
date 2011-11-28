@@ -733,8 +733,7 @@ void D3D9RenderDevice::setSamplerStatePostTexture(int i,SamplerState *state){
 
 	if(state!=NULL && texture!=NULL){
 		TextureFormat *format=texture->getFormat();
-		int totalMipLevels=Math::intLog2(Math::maxVal(format->width,Math::maxVal(format->height,format->depth)));
-		int d3dlevel=format->mipLevels>0?totalMipLevels-format->mipLevels:0;
+		int d3dlevel=format->getMipMax()>0?format->getMipMaxPossible()-format->getMipMax():0;
 		mD3DDevice->SetSamplerState(i,D3DSAMP_MAXMIPLEVEL,d3dlevel);
 	}
 	else{
@@ -982,8 +981,8 @@ void D3D9RenderDevice::getPrimitiveTypeAndCount(D3DPRIMITIVETYPE &d3dpt,int &cou
 }
 
 void D3D9RenderDevice::getShadowBiasMatrix(const Texture *shadowTexture,Matrix4x4 &result){
-	int width=shadowTexture->getFormat()->width;
-	int height=shadowTexture->getFormat()->height;
+	int width=shadowTexture->getFormat()->getWidth();
+	int height=shadowTexture->getFormat()->getHeight();
 	scalar xoff=Math::HALF+Math::div(Math::HALF,Math::fromInt(width));
 	scalar yoff=Math::HALF+Math::div(Math::HALF,Math::fromInt(height));
 	result.set( Math::HALF, 0,           0,         xoff,

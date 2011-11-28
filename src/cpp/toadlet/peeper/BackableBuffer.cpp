@@ -25,9 +25,9 @@
 
 #include <toadlet/egg/Logger.h>
 #include <toadlet/egg/Error.h>
-#include <toadlet/egg/image/ImageFormatConversion.h>
 #include <toadlet/peeper/BackableBuffer.h>
 #include <toadlet/peeper/RenderDevice.h>
+#include <toadlet/peeper/TextureFormatConversion.h>
 
 namespace toadlet{
 namespace peeper{
@@ -85,7 +85,7 @@ bool BackableBuffer::create(int usage,int access,TextureFormat::ptr textureForma
 	mUsage=usage;
 	mAccess=access;
 	mTextureFormat=textureFormat;
-	mDataSize=ImageFormatConversion::getRowPitch(textureFormat->pixelFormat,textureFormat->width)*textureFormat->height*textureFormat->depth;
+	mDataSize=textureFormat->getDataSize();
 
 	mHasData=false;
 	if(mData==NULL){
@@ -250,10 +250,8 @@ void BackableBuffer::setBack(PixelBuffer::ptr back,RenderDevice *renderDevice){
 	mBack=back;
 	
 	if(back!=NULL){
-		int newPixelFormat=renderDevice->getClosePixelFormat(mTextureFormat->pixelFormat,mUsage);
-
 		TextureFormat::ptr format(new TextureFormat(mTextureFormat));
-		format->pixelFormat=newPixelFormat;
+		format->setPixelFormat(renderDevice->getClosePixelFormat(mTextureFormat->getPixelFormat(),mUsage));
 		back->create(mUsage,mAccess,format);
 
 		if(mHasData){
@@ -335,8 +333,7 @@ void BackableBuffer::writeBack(){
 		if(data!=NULL){
 			if(mTextureFormat!=NULL && mTextureFormat->equals(((PixelBuffer*)(mBack.get()))->getTextureFormat())==false){
 				TextureFormat::ptr backFormat=((PixelBuffer*)(mBack.get()))->getTextureFormat();
-				int srcPitch=ImageFormatConversion::getRowPitch(mTextureFormat->pixelFormat,mTextureFormat->width),dstPitch=ImageFormatConversion::getRowPitch(backFormat->pixelFormat,mTextureFormat->width);
-				ImageFormatConversion::convert(mData,mTextureFormat->pixelFormat,srcPitch,srcPitch*mTextureFormat->height,data,backFormat->pixelFormat,dstPitch,dstPitch*mTextureFormat->height,mTextureFormat->width,mTextureFormat->height,mTextureFormat->depth);
+				TextureFormatConversion::convert(mData,mTextureFormat,data,backFormat);
 			}
 			else{
 				memcpy(data,mData,mDataSize);

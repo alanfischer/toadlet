@@ -153,8 +153,8 @@ FFmpegVideoStream::FFmpegVideoStream(FFmpegController *controller,FFmpegControll
 	mSwsCtx=sws_getContext(
 		ctx->width,ctx->height,
 		ctx->pix_fmt,
-		textureFormat->width,textureFormat->height,
-		FFmpegVideoHandler::getPixelFormat(textureFormat->pixelFormat),
+		textureFormat->getWidth(),textureFormat->getHeight(),
+		FFmpegVideoHandler::getPixelFormat(textureFormat->getPixelFormat()),
 		SWS_FAST_BILINEAR,
 		NULL,NULL,NULL
 	);
@@ -164,7 +164,7 @@ FFmpegVideoStream::FFmpegVideoStream(FFmpegController *controller,FFmpegControll
 	mTextureFrame=avcodec_alloc_frame();
 
 	avpicture_alloc((AVPicture*)mDeinterlacedFrame,ctx->pix_fmt,ctx->width,ctx->height);
-	avpicture_alloc((AVPicture*)mTextureFrame,FFmpegVideoHandler::getPixelFormat(textureFormat->pixelFormat),textureFormat->width,textureFormat->height);
+	avpicture_alloc((AVPicture*)mTextureFrame,FFmpegVideoHandler::getPixelFormat(textureFormat->getPixelFormat()),textureFormat->getWidth(),textureFormat->getHeight());
 }
 
 FFmpegVideoStream::~FFmpegVideoStream(){
@@ -245,7 +245,7 @@ void FFmpegVideoStream::update(int dt){
 	    av_free_packet(&mPkt);
 	}
 
-	mTexture->load(mTexture->getFormat()->width,mTexture->getFormat()->height,0,0,mTextureFrame->data[0]);
+	mTexture->load(mTexture->getFormat(),mTextureFrame->data[0]);
 }
 
 

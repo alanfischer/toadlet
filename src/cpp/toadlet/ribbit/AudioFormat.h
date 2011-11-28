@@ -41,14 +41,19 @@ public:
 		samplesPerSecond(sps)
 	{}
 
-	int bitsPerSample;
-	int channels;
-	int samplesPerSecond;
+	inline int getBitsPerSample(){return bitsPerSample;}
+	inline int getChannels(){return channels;}
+	inline int getSamplesPerSecond(){return samplesPerSecond;}
+	int getFrameSize() const{return channels*bitsPerSample/8;}
 
-	int frameSize() const{return channels*bitsPerSample/8;}
 	bool equals(AudioFormat *audioFormat) const{
 		return bitsPerSample==audioFormat->bitsPerSample && channels==audioFormat->channels && samplesPerSecond==audioFormat->samplesPerSecond;
 	}
+
+protected:
+	int bitsPerSample;
+	int channels;
+	int samplesPerSecond;
 };
 
 }

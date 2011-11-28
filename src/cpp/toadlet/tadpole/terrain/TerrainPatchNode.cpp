@@ -355,21 +355,26 @@ bool TerrainPatchNode::setLayerData(tbyte *data,int rowPitch,int width,int heigh
 	Collection<tbyte> textureData((width*2)*(height*2)*2);
 	tbyte *tdata=&textureData[0];
 	int textureRowPitch=width*2;
+	int totalWeight=0;
 
+	// Start from 1, since the 0th LayerTexture is never used. (It is first pass, no blending)
 	int k;
-	for(k=0;k<numLayers;++k){
+	for(k=1;k<numLayers;++k){
 		for(j=0;j<width;++j){
 			for(i=0;i<height;++i){
 				int p0=(j*2+0) * textureRowPitch + i*2;
 				int p1=(j*2+1) * textureRowPitch + i*2;
-				tdata[p0+0]=calculateLayerWeight(data,rowPitch,mSize,k,i,j,-0.25,-0.25)*255;
-				tdata[p0+1]=calculateLayerWeight(data,rowPitch,mSize,k,i,j,0.25,-0.25)*255;
-				tdata[p1+0]=calculateLayerWeight(data,rowPitch,mSize,k,i,j,-0.25,0.25)*255;
-				tdata[p1+1]=calculateLayerWeight(data,rowPitch,mSize,k,i,j,0.25,0.25)*255;
+				totalWeight+=(tdata[p0+0]=calculateLayerWeight(data,rowPitch,mSize,k,i,j,-0.25,-0.25)*255);
+				totalWeight+=(tdata[p0+1]=calculateLayerWeight(data,rowPitch,mSize,k,i,j,0.25,-0.25)*255);
+				totalWeight+=(tdata[p1+0]=calculateLayerWeight(data,rowPitch,mSize,k,i,j,-0.25,0.25)*255);
+				totalWeight+=(tdata[p1+1]=calculateLayerWeight(data,rowPitch,mSize,k,i,j,0.25,0.25)*255);
 			}
 		}
 
-		mLayerTextures[k]=mEngine->getTextureManager()->createTexture(Texture::Usage_BIT_STATIC,TextureFormat::Dimension_D2,TextureFormat::Format_A_8,width*2,height*2,1,0,&tdata);
+		if(totalWeight!=0){
+			TextureFormat::ptr textureFormat(new TextureFormat(TextureFormat::Dimension_D2,TextureFormat::Format_A_8,width*2,height*2,1,0));
+			mLayerTextures[k]=mEngine->getTextureManager()->createTexture(Texture::Usage_BIT_STREAM,textureFormat,tdata);
+		}
 	}
 	
 	return true;

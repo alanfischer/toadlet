@@ -57,7 +57,6 @@ MMAudioDevice::MMAudioDevice():
 	mNumBuffers(0),
 	mBufferSize(0)
 {
-	mFormat=AudioFormat::ptr(new AudioFormat());
 }
 
 MMAudioDevice::~MMAudioDevice(){
@@ -81,9 +80,7 @@ bool MMAudioDevice::create(int *options){
 		}
 	}
 
-	mFormat->channels=2;
-	mFormat->bitsPerSample=16;
-	mFormat->samplesPerSecond=11025;
+	mFormat=AudioFormat::ptr(new AudioFormat(16,2,11025));
 	mBufferSize=1024;
 	mNumBuffers=4;
 	mBufferFadeTime=100;
@@ -93,10 +90,10 @@ bool MMAudioDevice::create(int *options){
 	WAVEFORMATEX format={0};
 	format.cbSize=sizeof(WAVEFORMATEX);
 	format.wFormatTag=WAVE_FORMAT_PCM;
-	format.nChannels=mFormat->channels;
-	format.nSamplesPerSec=mFormat->samplesPerSecond;
-	format.wBitsPerSample=mFormat->bitsPerSample;
-	format.nBlockAlign=format.nChannels*format.wBitsPerSample/8;
+	format.nChannels=mFormat->getChannels();
+	format.nSamplesPerSec=mFormat->getSamplesPerSecond();
+	format.wBitsPerSample=mFormat->getBitsPerSample();
+	format.nBlockAlign=mFormat->getFrameSize();
 	format.nAvgBytesPerSec=format.nSamplesPerSec*format.nBlockAlign;
 
 	MMRESULT result=waveOutOpen(&mDevice,WAVE_MAPPER,&format,0,0,0);
@@ -108,7 +105,7 @@ bool MMAudioDevice::create(int *options){
 	memset(mBuffers,0,sizeof(WAVEHDR)*mNumBuffers);
 
 	mBufferData=new tbyte[mNumBuffers*mBufferSize];
-	if(mFormat->bitsPerSample==8){
+	if(mFormat->getBitsPerSample()==8){
 		memset(mBufferData,128,mNumBuffers*mBufferSize);
 	}
 	else{
@@ -214,7 +211,7 @@ void MMAudioDevice::internal_audioDestroy(MMAudio *audio){
 
 // Mix all the currently playing audios
 int MMAudioDevice::read(tbyte *data,int length){
-	int bps=mFormat->bitsPerSample;
+	int bps=mFormat->getBitsPerSample();
 
 	bool playing=false;
 	int i,j;

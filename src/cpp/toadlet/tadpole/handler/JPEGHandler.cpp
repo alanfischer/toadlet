@@ -25,7 +25,6 @@
 
 #include <toadlet/egg/Error.h>
 #include <toadlet/egg/Logger.h>
-#include <toadlet/egg/image/Image.h>
 #include <toadlet/tadpole/handler/JPEGHandler.h>
 #include <setjmp.h>
 #include <stdio.h>
@@ -173,7 +172,6 @@ Resource::ptr JPEGHandler::load(Stream::ptr stream,ResourceData *data,ProgressLi
 	struct toadlet_error_mgr jerr;
 	JSAMPARRAY buffer;
 	int row_stride;	
-	Image::ptr image;
 
 	cinfo.err=jpeg_std_error(&jerr.pub);
 	jerr.pub.error_exit=toadlet_error_exit;
@@ -207,12 +205,12 @@ Resource::ptr JPEGHandler::load(Stream::ptr stream,ResourceData *data,ProgressLi
 		return NULL;
 	}
 
-	int format=Image::Format_UNKNOWN;
+	int pixelFormat=TextureFormat::Format_UNKNOWN;
 	if(cinfo.output_components==1){
-		format=Image::Format_L_8;
+		pixelFormat=TextureFormat::Format_L_8;
 	}
 	else if(cinfo.output_components==3){
-		format=Image::Format_RGB_8;
+		pixelFormat=TextureFormat::Format_RGB_8;
 	}
 	else{
 		Error::unknown(Categories::TOADLET_TADPOLE,
@@ -220,10 +218,8 @@ Resource::ptr JPEGHandler::load(Stream::ptr stream,ResourceData *data,ProgressLi
 		return NULL;
 	}
 
-	image=Image::ptr(Image::createAndReallocate(Image::Dimension_D2,format,cinfo.output_width,cinfo.output_height));
-	if(image==NULL){
-		return NULL;
-	}
+	TextureFormat::ptr textureFormat(new TextureFormat(TextureFormat::Dimension_D2,pixelFormat,cinfo.output_width,cinfo.output_height,1,0));
+	tbyte *textureData=new tbyte[textureFormat->getDataSize()];
 
 	/* while (scan lines remain to be read) */
 	/*           jpeg_read_scanlines(...); */
@@ -238,14 +234,18 @@ Resource::ptr JPEGHandler::load(Stream::ptr stream,ResourceData *data,ProgressLi
 		 */
 		jpeg_read_scanlines(&cinfo, buffer, 1);
 
-		memcpy(image->getData()+row_stride*(cinfo.output_height-cinfo.output_scanline),*buffer,row_stride);
+		memcpy(textureData+row_stride*(cinfo.output_height-cinfo.output_scanline),*buffer,row_stride);
 	}
 
 	jpeg_finish_decompress(&cinfo);
 
 	jpeg_destroy_decompress(&cinfo);
 
-	return mTextureManager->createTexture(image);
+	Texture::ptr texture=mTextureManager->createTexture(textureFormat,textureData);
+	
+	delete[] textureData;
+	
+	return texture;
 }
 
 }

@@ -86,7 +86,7 @@ bool AudioFormatConversion::decode(AudioStream *stream,tbyte *&finalBuffer,int &
 	bool result=decode((Stream*)stream,finalBuffer,finalLength);
 
 	#if !defined(TOADLET_NATIVE_FORMAT)
-		if(stream->getAudioFormat()->bitsPerSample==16){
+		if(stream->getAudioFormat()->getBitsPerSample()==16){
 			int i=0;
 			while(i<finalLength){
 				littleInt16InPlace((int16&)finalBuffer[i]);
@@ -100,15 +100,15 @@ bool AudioFormatConversion::decode(AudioStream *stream,tbyte *&finalBuffer,int &
 
 bool AudioFormatConversion::convert(tbyte *src,int srcLength,AudioFormat *srcFormat,tbyte *dst,int dstLength,AudioFormat *dstFormat){
 	int i=0,j=0,v=0;
-	int sbps=srcFormat->bitsPerSample;
-	int dbps=dstFormat->bitsPerSample;
-	int sc=srcFormat->channels;
-	int dc=dstFormat->channels;
-	int ssps=srcFormat->samplesPerSecond;
-	int dsps=dstFormat->samplesPerSecond;
-	int ss=srcFormat->frameSize();
-	int ds=dstFormat->frameSize();
-	int numFrames=srcLength/srcFormat->frameSize();
+	int sbps=srcFormat->getBitsPerSample();
+	int dbps=dstFormat->getBitsPerSample();
+	int sc=srcFormat->getChannels();
+	int dc=dstFormat->getChannels();
+	int ssps=srcFormat->getSamplesPerSecond();
+	int dsps=dstFormat->getSamplesPerSecond();
+	int ss=srcFormat->getFrameSize();
+	int ds=dstFormat->getFrameSize();
+	int numFrames=srcLength/srcFormat->getFrameSize();
 
 	int reqLength=findConvertedLength(srcLength,srcFormat,dstFormat,true);
 	if(dstLength<reqLength){
@@ -145,28 +145,29 @@ bool AudioFormatConversion::convert(tbyte *src,int srcLength,AudioFormat *srcFor
 }
 
 int AudioFormatConversion::findConvertedLength(int length,AudioFormat *srcFormat,AudioFormat *dstFormat,bool roundUp){
-	uint64 dsize=dstFormat->channels*dstFormat->bitsPerSample*dstFormat->samplesPerSecond;
-	uint64 ssize=srcFormat->channels*srcFormat->bitsPerSample*srcFormat->samplesPerSecond;
+	uint64 dsize=dstFormat->getChannels()*dstFormat->getBitsPerSample()*dstFormat->getSamplesPerSecond();
+	uint64 ssize=srcFormat->getChannels()*srcFormat->getBitsPerSample()*srcFormat->getSamplesPerSecond();
 	length=(length*(uint64)dsize)/(uint64)ssize;
 	// Make sure our resulting length is a multiple of dst frameSize
-	if(length%dstFormat->frameSize()!=0){
+	if(length%dstFormat->getFrameSize()!=0){
 		if(roundUp){
-			length=((length/dstFormat->frameSize())+1)*dstFormat->frameSize();
+			length=((length/dstFormat->getFrameSize())+1)*dstFormat->getFrameSize();
 		}
 		else{
-			length=((length/dstFormat->frameSize()))*dstFormat->frameSize();
+			length=((length/dstFormat->getFrameSize()))*dstFormat->getFrameSize();
 		}
 	}
 	return length;
 }
 
 void AudioFormatConversion::fade(tbyte *buffer,int length,AudioFormat *format,int fadeTime){
-	int channels=format->channels;
-	int numFrames=length/format->frameSize();
-	int ftf=format->samplesPerSecond*fadeTime/1000;
+	int bps=format->getBitsPerSample();
+	int channels=format->getChannels();
+	int numFrames=length/format->getFrameSize();
+	int ftf=format->getSamplesPerSecond()*fadeTime/1000;
 	if(ftf>numFrames){ftf=numFrames;}
 	int i,j;
-	if(format->bitsPerSample==8){
+	if(bps==8){
 		for(i=0;i<ftf;++i){
 			// Fade front
 			for(j=0;j<channels;++j){
@@ -178,7 +179,7 @@ void AudioFormatConversion::fade(tbyte *buffer,int length,AudioFormat *format,in
 			}
 		}
 	}
-	else if(format->bitsPerSample==16){
+	else if(bps==16){
 		int16 *buffer16=(int16*)buffer;
 		for(i=0;i<ftf;++i){
 			// Fade front

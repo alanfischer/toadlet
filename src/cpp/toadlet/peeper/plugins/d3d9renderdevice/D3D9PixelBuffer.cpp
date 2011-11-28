@@ -27,7 +27,6 @@
 #include "D3D9RenderDevice.h"
 #include <toadlet/egg/Error.h>
 #include <toadlet/egg/Logger.h>
-#include <toadlet/egg/image/ImageFormatConversion.h>
 
 namespace toadlet{
 namespace peeper{
@@ -56,8 +55,8 @@ bool D3D9PixelBuffer::create(int usage,int access,TextureFormat::ptr format){
 	mUsage=usage;
 	mAccess=access;
 	mFormat=TextureFormat::ptr(new TextureFormat(format));
-	mFormat->pixelFormat=mDevice->getClosePixelFormat(format->pixelFormat);
-	mDataSize=ImageFormatConversion::getRowPitch(mFormat->pixelFormat,mFormat->width)*mFormat->height;
+	mFormat->setPixelFormat(mDevice->getClosePixelFormat(format->getPixelFormat()));
+	mDataSize=mFormat->getDataSize();
 
 	createContext(false);
 
@@ -86,19 +85,19 @@ void D3D9PixelBuffer::resetDestroy(){
 }
 
 bool D3D9PixelBuffer::createContext(bool restore){
-	if(mFormat->depth!=1){
+	if(mFormat->getDepth()!=1){
 		Error::invalidParameters(Categories::TOADLET_PEEPER,"D3D9PixelBuffer may only be created with a depth of 1");
 		return false;
 	}
 
-	int width=mFormat->width,height=mFormat->height;
-	D3DFORMAT d3dformat=D3D9RenderDevice::getD3DFORMAT(mFormat->pixelFormat);
+	int width=mFormat->getWidth(),height=mFormat->getHeight();
+	D3DFORMAT d3dformat=D3D9RenderDevice::getD3DFORMAT(mFormat->getPixelFormat());
 	HRESULT result=S_OK;
 	IDirect3DSurface9 *d3dsurface=NULL;
 	if(mRenderTarget){
 		mD3DPool=D3DPOOL_DEFAULT;
 
-		if((mFormat->pixelFormat&TextureFormat::Format_MASK_SEMANTICS)==TextureFormat::Format_SEMANTIC_DEPTH){
+		if((mFormat->getPixelFormat()&TextureFormat::Format_MASK_SEMANTICS)==TextureFormat::Format_SEMANTIC_DEPTH){
 			#if defined(TOADLET_SET_D3DM)
 				result=mDevice->getDirect3DDevice9()->CreateDepthStencilSurface(width,height,d3dformat,D3DMULTISAMPLE_NONE,&d3dsurface TOADLET_SHAREDHANDLE);
 			#else
@@ -137,12 +136,6 @@ bool D3D9PixelBuffer::createContext(bool restore){
 	}
 
 	mSurface=d3dsurface;
-
-	/// @todo: Is this necessary?
-	D3DSURFACE_DESC desc;
-	mSurface->GetDesc(&desc);
-	mFormat->width=desc.Width;
-	mFormat->height=desc.Height;
 
 	return true;
 }

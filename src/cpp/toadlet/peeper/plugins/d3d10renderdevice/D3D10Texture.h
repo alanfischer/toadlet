@@ -56,8 +56,8 @@ public:
 	TextureFormat::ptr getFormat() const{return mFormat;}
 
 	PixelBuffer::ptr getMipPixelBuffer(int level,int cubeSide);
-	bool load(int width,int height,int depth,int mipLevel,byte *mipData);
-	bool read(int width,int height,int depth,int mipLevel,byte *mipData);
+	bool load(TextureFormat *format,byte *data);
+	bool read(TextureFormat *format,byte *data);
 
 	ID3D10Resource *getD3D10Resource(){return mTexture;}
 
@@ -66,6 +66,8 @@ public:
 protected:
 	bool createContext(int numMipDatas,byte *mipDatas[]);
 	bool destroyContext();
+	static void setD3D10_BOX(D3D10_BOX &box,TextureFormat *format);
+	static void copyData(TextureFormat *dstFormat,tbyte *dstData,TextureFormat *srcFormat,tbyte *srcData,int srcYPitch,int srcZPitch);
 
 	D3D10RenderDevice *mDevice;
 	ID3D10Device *mD3DDevice;

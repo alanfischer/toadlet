@@ -28,7 +28,6 @@
 #include "D3D10TextureMipPixelBuffer.h"
 #include <toadlet/egg/Error.h>
 #include <toadlet/egg/Logger.h>
-#include <toadlet/egg/image/ImageFormatConversion.h>
 
 namespace toadlet{
 namespace peeper{
@@ -69,8 +68,6 @@ D3D10Texture::~D3D10Texture(){
 }
 
 bool D3D10Texture::create(int usage,TextureFormat::ptr format,byte *mipDatas[]){
-	format->width=format->width>0?format->width:1;format->height=format->height>0?format->height:1;format->depth=format->depth>0?format->depth:1;
-
 	mUsage=usage;
 	mFormat=format;
 
@@ -81,20 +78,16 @@ bool D3D10Texture::create(int usage,TextureFormat::ptr format,byte *mipDatas[]){
 
 	bool result=false;
 	if((mUsage&Usage_BIT_STATIC)>0){
-		result=createContext(mFormat->mipLevels,mipDatas);
+		result=createContext(mFormat->getMipMax(),mipDatas);
 	}
 	else{
 		result=createContext(0,NULL);
 
 		if(result && mipDatas!=NULL){
-			int width=mFormat->width,height=mFormat->height,depth=mFormat->depth;
-			int specifiedMipLevels=mFormat->mipLevels>0?mFormat->mipLevels:1;
 			int level;
-			for(level=0;level<specifiedMipLevels;++level){
-				if(mipDatas[level]!=NULL){
-					load(width,height,depth,level,mipDatas[level]);
-				}
-				width/=2;height/=2;depth/=2;
+			for(level=0;level<1 || level<format->getMipMax();++level){
+				TextureFormat::ptr format(new TextureFormat(mFormat,level));
+				load(format,mipDatas[level]);
 			}
 		}
 	}
@@ -126,7 +119,7 @@ bool D3D10Texture::createContext(int numMipDatas,byte *mipDatas[]){
 	}
 
 	if((mUsage&Usage_BIT_RENDERTARGET)>0){
-		if((mFormat->pixelFormat&TextureFormat::Format_MASK_SEMANTICS)==TextureFormat::Format_SEMANTIC_DEPTH){
+		if((mFormat->getPixelFormat()&TextureFormat::Format_MASK_SEMANTICS)==TextureFormat::Format_SEMANTIC_DEPTH){
 			bindFlags|=D3D10_BIND_DEPTH_STENCIL;
 		}
 		else{
@@ -135,7 +128,7 @@ bool D3D10Texture::createContext(int numMipDatas,byte *mipDatas[]){
 	}
 
 	/// @todo: Why can't I have a depth & shader resource?
-	if((mFormat->pixelFormat&TextureFormat::Format_MASK_SEMANTICS)!=TextureFormat::Format_SEMANTIC_DEPTH){
+	if((mFormat->getPixelFormat()&TextureFormat::Format_MASK_SEMANTICS)!=TextureFormat::Format_SEMANTIC_DEPTH){
 		bindFlags|=D3D10_BIND_SHADER_RESOURCE;
 	}
 
@@ -143,32 +136,29 @@ bool D3D10Texture::createContext(int numMipDatas,byte *mipDatas[]){
 		bindFlags=0;
 	}
 
-	DXGI_FORMAT dxgiFormat=D3D10RenderDevice::getTextureDXGI_FORMAT(mFormat->pixelFormat);
-	int width=mFormat->width,height=mFormat->height,depth=mFormat->depth;
-	int mipLevels=mFormat->mipLevels;
+	DXGI_FORMAT dxgiFormat=D3D10RenderDevice::getTextureDXGI_FORMAT(mFormat->getPixelFormat());
+	int width=mFormat->getWidth(),height=mFormat->getHeight(),depth=mFormat->getDepth();
+	int mipMax=mFormat->getMipMax();
 
 	D3D10_SUBRESOURCE_DATA *sData=NULL;
 	if(mipDatas!=NULL){
-		int hwidth=width,hheight=height,hdepth=depth;
 		int numSubResources=numMipDatas>0 ? numMipDatas:1;
 		sData=new D3D10_SUBRESOURCE_DATA[numSubResources];
 		int i;
 		for(i=0;i<numSubResources;++i){
+			TextureFormat::ptr format(new TextureFormat(mFormat,i));
 			sData[i].pSysMem=(i==0 || i<numMipDatas) ? mipDatas[i]:NULL;
-			sData[i].SysMemPitch=ImageFormatConversion::getRowPitch(mFormat->pixelFormat,hwidth);
-			sData[i].SysMemSlicePitch=sData[i].SysMemPitch*hheight;
-
-			hwidth/=2;hheight/=2;hdepth/=2;
-			hwidth=hwidth>0?hwidth:1;hheight=hheight>0?hheight:1;hdepth=hdepth>0?hdepth:1;
+			sData[i].SysMemPitch=mFormat->getXPitch();
+			sData[i].SysMemSlicePitch=mFormat->getYPitch();
 		}
 	}
 
 	HRESULT result=E_FAIL;
-	switch(mFormat->dimension){
+	switch(mFormat->getDimension()){
 		case TextureFormat::Dimension_D1:{
 			D3D10_TEXTURE1D_DESC desc={0};
 			desc.Width=width;
-			desc.MipLevels=mipLevels;
+			desc.MipLevels=mipMax;
 			desc.Usage=d3dUsage;
 			desc.CPUAccessFlags=cpuFlags;
 			desc.BindFlags=bindFlags;
@@ -185,7 +175,7 @@ bool D3D10Texture::createContext(int numMipDatas,byte *mipDatas[]){
 			D3D10_TEXTURE2D_DESC desc={0};
 			desc.Width=width;
 			desc.Height=height;
-			desc.MipLevels=mipLevels;
+			desc.MipLevels=mipMax;
 			desc.SampleDesc.Count=1;
 			desc.SampleDesc.Quality=0;
 			desc.Usage=d3dUsage;
@@ -205,7 +195,7 @@ bool D3D10Texture::createContext(int numMipDatas,byte *mipDatas[]){
 			desc.Width=width;
 			desc.Height=height;
 			desc.Depth=depth;
-			desc.MipLevels=mipLevels;
+			desc.MipLevels=mipMax;
 			desc.Usage=d3dUsage;
 			desc.CPUAccessFlags=cpuFlags;
 			desc.BindFlags=bindFlags;
@@ -261,7 +251,7 @@ PixelBuffer::ptr D3D10Texture::getMipPixelBuffer(int level,int cubeSide){
 	}
 
 	int index=level;
-	if(mFormat->dimension==TextureFormat::Dimension_CUBE){
+	if(mFormat->getDimension()==TextureFormat::Dimension_CUBE){
 		index=level*6+cubeSide;
 	}
 
@@ -277,70 +267,82 @@ PixelBuffer::ptr D3D10Texture::getMipPixelBuffer(int level,int cubeSide){
 	return mBuffers[index];
 }
 
-bool D3D10Texture::load(int width,int height,int depth,int mipLevel,byte *mipData){
-	if(mTexture==NULL){
-		return false;
-	}
+bool D3D10Texture::load(TextureFormat *format,tbyte *data){
+	TOADLET_ASSERT(format->getMipMin()==format->getMipMax());
 
-	width=width>0?width:1;height=height>0?height:1;depth=depth>0?depth:1;
-
-	if(mipLevel==0 && (width!=mFormat->width || height!=mFormat->height || depth!=mFormat->depth)){
+	if(format->getPixelFormat()!=mFormat->getPixelFormat()){
 		Error::unknown(Categories::TOADLET_PEEPER,
-			"D3D10Texture: data of incorrect dimensions");
+			"data of incorrect format");
 		return false;
 	}
 
 	ID3D10Device *device=mD3DDevice;
 
-	int pixelFormat=mFormat->pixelFormat;
-	int rowPitch=ImageFormatConversion::getRowPitch(pixelFormat,width);
-	int slicePitch=rowPitch*height;
-	int subresource=D3D10CalcSubresource(mipLevel,0,0);
-	device->UpdateSubresource(mTexture,subresource,NULL,mipData,rowPitch,slicePitch);
+	D3D10_BOX box;
+	setD3D10_BOX(box,format);
+	int subresource=D3D10CalcSubresource(format->getMipMin(),0,0);
+	device->UpdateSubresource(mTexture,subresource,&box,data,format->getXPitch(),format->getYPitch());
 
 	generateMipLevels();
 
 	return true;
 }
 
-bool D3D10Texture::read(int width,int height,int depth,int mipLevel,byte *mipData){
-	int pixelFormat=mFormat->pixelFormat;
-	int rowPitch=ImageFormatConversion::getRowPitch(pixelFormat,width);
-	int slicePitch=rowPitch*height;
+bool D3D10Texture::read(TextureFormat *format,tbyte *data){
+	TOADLET_ASSERT(format->getMipMin()==format->getMipMax());
 
-	int subresource=D3D10CalcSubresource(mipLevel,0,0);
+	int subresource=D3D10CalcSubresource(format->getMipMin(),0,0);
 	D3D10_MAP mapType=D3D10_MAP_READ;
 	UINT mapFlags=0;
 
+	int xPitch=format->getXPitch(),yPitch=format->getYPitch();
+	tbyte *mapData=NULL;
+	int mapXPitch=xPitch,mapYPitch=yPitch;
 	HRESULT result=S_OK;
-	switch(mFormat->dimension){
+	switch(mFormat->getDimension()){
 		case TextureFormat::Dimension_D1:{
-			tbyte *mappedTex=NULL;
 			ID3D10Texture1D *texture=(ID3D10Texture1D*)mTexture;
-			result=texture->Map(subresource,mapType,mapFlags,(void**)&mappedTex);
-			if(SUCCEEDED(result)){
-				ImageFormatConversion::convert(mappedTex,mFormat->pixelFormat,rowPitch,slicePitch,mipData,pixelFormat,rowPitch,slicePitch,width,height,depth);
-				texture->Unmap(subresource);
-			}
+			result=texture->Map(subresource,mapType,mapFlags,(void**)&mapData);
 		}break;
 		case TextureFormat::Dimension_D2:{
 			D3D10_MAPPED_TEXTURE2D mappedTex;
 			ID3D10Texture2D *texture=(ID3D10Texture2D*)mTexture;
 			result=texture->Map(subresource,mapType,mapFlags,&mappedTex);
-			if(SUCCEEDED(result)){
-				ImageFormatConversion::convert((tbyte*)mappedTex.pData,mFormat->pixelFormat,mappedTex.RowPitch,slicePitch,mipData,pixelFormat,rowPitch,slicePitch,width,height,depth);
-				texture->Unmap(subresource);
-			}
+			mapData=(tbyte*)mappedTex.pData;
+			mapXPitch=mappedTex.RowPitch;
 		}break;
 		case TextureFormat::Dimension_D3:{
 			D3D10_MAPPED_TEXTURE3D mappedTex;
 			ID3D10Texture3D *texture=(ID3D10Texture3D*)mTexture;
 			result=texture->Map(subresource,mapType,mapFlags,&mappedTex);
-			if(SUCCEEDED(result)){
-				ImageFormatConversion::convert((tbyte*)mappedTex.pData,mFormat->pixelFormat,mappedTex.RowPitch,mappedTex.DepthPitch,mipData,pixelFormat,rowPitch,slicePitch,width,height,depth);
-				texture->Unmap(subresource);
-			}
+			mapData=(tbyte*)mappedTex.pData;
+			mapXPitch=mappedTex.RowPitch;
+			mapYPitch=mappedTex.DepthPitch;
 		}break;
+	}
+
+	if(SUCCEEDED(result)){
+		int i,j;
+		for(j=0;j<format->getDepth();++j){
+			for(i=0;i<format->getHeight();++i){
+				memcpy(data+yPitch*j+xPitch*i,mapData+mapYPitch*j+mapXPitch*i,xPitch);
+			}
+		}
+
+		switch(mFormat->getDimension()){
+			case TextureFormat::Dimension_D1:{
+				ID3D10Texture1D *texture=(ID3D10Texture1D*)mTexture;
+				texture->Unmap(subresource);
+			}break;
+			case TextureFormat::Dimension_D2:{
+				ID3D10Texture2D *texture=(ID3D10Texture2D*)mTexture;
+				texture->Unmap(subresource);
+			}break;
+			case TextureFormat::Dimension_D3:{
+				ID3D10Texture3D *texture=(ID3D10Texture3D*)mTexture;
+				texture->Unmap(subresource);
+			}break;
+		}
 	}
 
 	if(FAILED(result)){
@@ -357,6 +359,12 @@ bool D3D10Texture::generateMipLevels(){
 		mD3DDevice->GenerateMips(mShaderResourceView);
 	}
 	return true;
+}
+
+void D3D10Texture::setD3D10_BOX(D3D10_BOX &box,TextureFormat *format){
+	box.left=format->getXMin();box.right=format->getXMax();
+	box.top=format->getYMin();box.bottom=format->getYMax();
+	box.front=format->getZMin();box.back=format->getZMax();
 }
 
 }

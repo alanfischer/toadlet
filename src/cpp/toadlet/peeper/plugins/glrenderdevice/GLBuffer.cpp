@@ -30,7 +30,6 @@
 #include <toadlet/egg/EndianConversion.h>
 #include <toadlet/egg/Error.h>
 #include <toadlet/egg/Logger.h>
-#include <toadlet/egg/image/ImageFormatConversion.h>
 #include <toadlet/peeper/BackableBuffer.h>
 
 namespace toadlet{
@@ -121,7 +120,7 @@ bool GLBuffer::create(int usage,int access,TextureFormat::ptr textureFormat){
 	mUsage=usage;
 	mAccess=access;
 	mTextureFormat=textureFormat;
-	mDataSize=ImageFormatConversion::getRowPitch(mTextureFormat->pixelFormat,mTextureFormat->width)*mTextureFormat->height*mTextureFormat->depth;
+	mDataSize=textureFormat->getDataSize();
 
 	#if defined(TOADLET_HAS_GLPBOS)
 		mTarget=GL_PIXEL_UNPACK_BUFFER;

@@ -53,25 +53,20 @@ public:
 	virtual TextureFormat::ptr getFormat() const{return mFormat;}
 
 	virtual PixelBuffer::ptr getMipPixelBuffer(int level,int cubeSide);
-	virtual bool load(int width,int height,int depth,int mipLevel,tbyte *mipData);
-	virtual bool read(int width,int height,int depth,int mipLevel,tbyte *mipData);
+	virtual bool load(TextureFormat *format,tbyte *data);
+	virtual bool read(TextureFormat *format,tbyte *data);
 
 	virtual void setBack(Texture::ptr back,RenderDevice *renderDevice);
 	virtual Texture::ptr getBack(){return mBack;}
 
-	static bool convertLoad(Texture::ptr texture,int pixelFormat,int width,int height,int depth,int mipLevel,tbyte *mipData);
-	static bool convertRead(Texture::ptr texture,int pixelFormat,int width,int height,int depth,int mipLevel,tbyte *mipData);
+	static bool convertLoad(Texture::ptr texture,TextureFormat *format,tbyte *data);
+	static bool convertRead(Texture::ptr texture,TextureFormat *format,tbyte *data);
 	static bool convertCreate(Texture::ptr texture,RenderDevice *renderDevice,int usage,TextureFormat::ptr format,tbyte *mipDatas[]);
 
 protected:
-	static void convertAndScale(tbyte *src,int srcFormat,int srcWidth,int srcHeight,int srcDepth,tbyte *dst,int dstFormat,int dstWidth,int dstHeight,int dstDepth);
-
 	int mUsage;
 	TextureFormat::ptr mFormat;
 
-	int mRowPitch;
-	int mSlicePitch;
-	int mDataSize;
 	tbyte *mData;
 	Texture::ptr mBack;
 	Collection<PixelBuffer::ptr> mBuffers;

@@ -193,9 +193,10 @@ Resource::ptr DDSHandler::load(Stream::ptr stream,ResourceData *data,ProgressLis
 	int height=hdr.dwHeight;
 	int depth=hdr.dwDepth;
 	int mipCount=(hdr.dwHeaderFlags&DDSD_MIPMAPCOUNT) ? hdr.dwMipMapCount : 1;
+	TextureFormat::ptr textureFormat;
 
-	Collection<Image::ptr> mipLevels;
-	mipLevels.resize(mipCount);
+	Collection<tbyte*> mipDatas;
+	mipDatas.resize(mipCount);
 
 	if((hdr.ddspf.dwFlags&DDPF_FOURCC)!=0 && (
 		hdr.ddspf.dwFourCC==D3DFMT_DXT1 ||
@@ -205,27 +206,29 @@ Resource::ptr DDSHandler::load(Stream::ptr stream,ResourceData *data,ProgressLis
 		int divSize=4;
 		int blockBytes=(hdr.ddspf.dwFourCC==D3DFMT_DXT1) ? 8 : 16;
 
-		int format=0;
+		int pixelFormat=0;
 		switch(hdr.ddspf.dwFourCC){
 			case D3DFMT_DXT1:
-				format=Image::Format_RGB_DXT1;
+				pixelFormat=TextureFormat::Format_RGB_DXT1;
 			break;
 			case D3DFMT_DXT2:
-				format=Image::Format_RGBA_DXT2;
+				pixelFormat=TextureFormat::Format_RGBA_DXT2;
 			break;
 			case D3DFMT_DXT3:
-				format=Image::Format_RGBA_DXT3;
+				pixelFormat=TextureFormat::Format_RGBA_DXT3;
 			break;
 			case D3DFMT_DXT4:
-				format=Image::Format_RGBA_DXT4;
+				pixelFormat=TextureFormat::Format_RGBA_DXT4;
 			break;
 			case D3DFMT_DXT5:
-				format=Image::Format_RGBA_DXT5;
+				pixelFormat=TextureFormat::Format_RGBA_DXT5;
 			break;
 		}
 
+		textureFormat=TextureFormat::ptr(new TextureFormat(TextureFormat::Dimension_D2,pixelFormat,width,height,depth,mipCount));
+
 	    for(i=0;i<mipCount;++i){
-			Image::ptr image(Image::createAndReallocate(Image::Dimension_D2,format,width,height,depth));
+			TextureFormat::ptr mipFormat(new TextureFormat(textureFormat,mipCount));
 			int size=Math::maxVal(divSize,width)/divSize * Math::maxVal(divSize,height)/divSize * blockBytes;
 
 			if(i==0 && (hdr.dwHeaderFlags & DDSD_LINEARSIZE)!=0 && size!=(int)hdr.dwPitchOrLinearSize){
@@ -234,11 +237,13 @@ Resource::ptr DDSHandler::load(Stream::ptr stream,ResourceData *data,ProgressLis
 				return NULL;
 			}
 
-			TOADLET_ASSERT(image->getSlicePitch()==size);
+			TOADLET_ASSERT(mipFormat->getDataSize()==size);
 
-			stream->read(image->getData(),size);
+			tbyte *data=new tbyte[mipFormat->getDataSize()];
 
-			mipLevels[i]=image;
+			stream->read(data,size);
+
+			mipDatas[i]=data;
 
 			width=(width+1)>>1;
 			height=(height+1)>>1;
@@ -246,13 +251,19 @@ Resource::ptr DDSHandler::load(Stream::ptr stream,ResourceData *data,ProgressLis
 		}
 	}
 	else if(PF_IS_INDEX8(hdr.ddspf)){
-		Logger::alert("Other pallette");
+		Logger::alert("Other palette");
 	}
 	else{
 		Logger::alert("Other type");
 	}
 
-	return mTextureManager->createTexture(mipLevels.size(),mipLevels.begin());
+	Texture::ptr texture=mTextureManager->createTexture(textureFormat,mipDatas);
+
+	for(i=0;i<mipCount;++i){
+		delete[] mipDatas[i];
+	}
+
+	return texture;
 }
 
 }
