@@ -52,7 +52,6 @@ bool GLSLShader::create(ShaderType shaderType,const String &profile,const String
 	mShaderType=shaderType;
 	mProfile=profile;
 	mCode=code;
-
 	bool result=createContext();
 
 	return result;

@@ -68,7 +68,7 @@ DiffuseTerrainMaterialSource::DiffuseTerrainMaterialSource(Engine *engine){
 			"color=clamp(localLightColor*materialDiffuseColor + ambientColor*materialAmbientColor,0.0,1.0);\n"
 			"color=materialTrackColor+color*(1.0-materialTrackColor);\n"
 			"texCoord=vec4(TEXCOORD0,0.0,1.0).xy * 16.0;\n"
-			"texCoord2=vec4(TEXCOORD,0.0,1.0).xy;\n"
+			"texCoord2=vec4(TEXCOORD0,0.0,1.0).xy;\n"
 			"fog=clamp(1.0-fogDensity*(gl_Position.z-fogDistance.x)/(fogDistance.y-fogDistance.x),0.0,1.0);\n"
 		"}",
 

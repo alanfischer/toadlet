@@ -61,12 +61,11 @@ public:
 	inline SpriteNode::ptr getSun(){return mSun;}
 
 protected:
-	static Image::ptr createCloud(int width,int height,int scale,int seed,float cover,float sharpness,float brightness);
-	static Image::ptr createBump(Image *image,float xscale,float yscale,float zscale,int spread);
-	static Image::ptr createComposite(Image *cloud,Image *bump,const Vector3 &lightDir,const Vector4 &skyColor);
-	static Image::ptr createFade(int width,int height,const Vector4 &start,const Vector4 &end,float falloff,float sharpness);
-	static Image::ptr createGlow(int width,int height);
-	static Image::ptr createNorm(int size);
+	static tbyte *createCloud(TextureFormat *format,int scale,int seed,float cover,float sharpness,float brightness);
+	static tbyte *createBump(TextureFormat *format,tbyte *src,float xscale,float yscale,float zscale,int spread);
+	static tbyte *createComposite(TextureFormat *format,tbyte *cloudSrc,tbyte *bumpSrc,const Vector3 &lightDir,const Vector4 &skyColor);
+	static tbyte *createFade(TextureFormat *format,const Vector4 &start,const Vector4 &end,float falloff,float sharpness);
+	static tbyte *createGlow(TextureFormat *format);
 
 	LightNode::ptr mLight;
 	MeshNode::ptr mSkyDome;

@@ -222,7 +222,7 @@ bool BackableTexture::convertCreate(Texture::ptr texture,RenderDevice *renderDev
 	renderDevice->getRenderCaps(caps);
 	int newPixelFormat=renderDevice->getClosePixelFormat(format->getPixelFormat(),usage);
 	bool hasNPOT=caps.textureNonPowerOf2;
-	bool wantsNPOT=format->isPowerOf2();
+	bool wantsNPOT=!format->isPowerOf2();
 	bool needsNPOT=wantsNPOT & !hasNPOT;
 	bool hasAutogen=caps.textureAutogenMipMaps;
 	bool wantsAutogen=(usage&Texture::Usage_BIT_AUTOGEN_MIPMAPS)>0;
@@ -236,6 +236,11 @@ bool BackableTexture::convertCreate(Texture::ptr texture,RenderDevice *renderDev
 		result=texture->create(usage,newFormat,NULL);
 	}
 	else{
+		if(format->getMipMax()==0 && wantsAutogen==false){
+			Logger::debug(Categories::TOADLET_PEEPER,
+				"Auto calculated mip levels specified with no autogen, non zero levels may be empty");
+		}
+
 		int totalMipLevels=format->getMipMaxPossible();
 		int specifiedMipLevels=0;
 		int allocatedMipLevels=0;
@@ -259,10 +264,12 @@ bool BackableTexture::convertCreate(Texture::ptr texture,RenderDevice *renderDev
 		else{
 			Logger::alert(Categories::TOADLET_PEEPER,String("BackableTexture::convertCreate - converting texture:")+needsNPOT+","+needsAutogen+","+needsConvert);
 
-			int newWidth=Math::nextPowerOf2(format->getWidth()),newHeight=Math::nextPowerOf2(format->getHeight()),newDepth=Math::nextPowerOf2(format->getDepth());
 			TextureFormat::ptr newFormat(new TextureFormat(format));
 			newFormat->setPixelFormat(newPixelFormat);
-			newFormat->setSize(newWidth,newHeight,newDepth);
+			if(needsNPOT){
+				int newWidth=Math::nextPowerOf2(format->getWidth()),newHeight=Math::nextPowerOf2(format->getHeight()),newDepth=Math::nextPowerOf2(format->getDepth());
+				newFormat->setSize(newWidth,newHeight,newDepth);
+			}
 			tbyte **newMipDatas=new tbyte*[allocatedMipLevels];
 
 			for(i=0;i<allocatedMipLevels;++i){

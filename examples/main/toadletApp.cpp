@@ -5,10 +5,10 @@ extern void destroyApplet(Applet *applet);
 
 int toadletMain(int argc,char **argv){
 	PlatformApplication app;
-	app.setBackable(true);
+//	app.setBackable(true);
 	Applet *applet=createApplet(&app);
 	app.setApplet(applet);
-	app.defaultCreate();
+	app.create("d3d10","","","");
 	app.start();
 	app.destroy();
 	destroyApplet(applet);

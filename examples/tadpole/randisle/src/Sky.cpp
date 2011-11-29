@@ -16,15 +16,20 @@ Node *Sky::create(Scene *scene,int cloudSize,const Vector4 &skyColor,const Vecto
 	VertexBuffer::ptr vertexBuffer=mEngine->getBufferManager()->createVertexBuffer(Buffer::Usage_BIT_STREAM,Buffer::Access_READ_WRITE,mEngine->getVertexFormats().POSITION_COLOR_TEX_COORD,skyDomeCreator->getSkyDomeVertexCount(numSegments,numRings));
 	IndexBuffer::ptr indexBuffer=mEngine->getBufferManager()->createIndexBuffer(Buffer::Usage_BIT_STATIC,Buffer::Access_BIT_WRITE,IndexBuffer::IndexFormat_UINT16,skyDomeCreator->getSkyDomeIndexCount(numSegments,numRings));
 
-	Image::ptr cloud=createCloud(cloudSize,cloudSize,16,9,0.45,0.000025,0.75);
-	Image::ptr bump=createBump(cloud,-1,-1,-32,4); // To debug any bump issues, try disabling fadeStage, make bump/cloud stage modulate, add a rotating sun, and use a zscale of 1
+	TextureFormat::ptr cloudFormat(new TextureFormat(TextureFormat::Dimension_D2,TextureFormat::Format_RGBA_8,cloudSize,cloudSize,1,0));
+	tbyte *cloudData=createCloud(cloudFormat,16,9,0.45,0.000025,0.75);
+	TextureFormat::ptr bumpFormat(new TextureFormat(TextureFormat::Dimension_D2,TextureFormat::Format_RGB_8,cloudSize,cloudSize,1,0));
+	tbyte *bumpData=createBump(bumpFormat,cloudData,-1,-1,-32,4); // To debug any bump issues, try disabling fadeStage, make bump/cloud stage modulate, add a rotating sun, and use a zscale of 1
 
 	Material::ptr material;
 	if(advanced){
-		Image::ptr fade=createFade(cloudSize/2,cloudSize/2,Vector4(fadeColor.x,fadeColor.y,fadeColor.z,0),fadeColor,1.1,0.01);
-		Texture::ptr bumpTexture=mEngine->getTextureManager()->createTexture(bump);
-		Texture::ptr cloudTexture=mEngine->getTextureManager()->createTexture(cloud);
-		Texture::ptr fadeTexture=mEngine->getTextureManager()->createTexture(fade);
+		Texture::ptr cloudTexture=mEngine->getTextureManager()->createTexture(cloudFormat,cloudData);
+		Texture::ptr bumpTexture=mEngine->getTextureManager()->createTexture(bumpFormat,bumpData);
+
+		TextureFormat::ptr fadeFormat(new TextureFormat(TextureFormat::Dimension_D2,TextureFormat::Format_RGBA_8,cloudSize/2,cloudSize/2,1,0));
+		tbyte *fadeData=createFade(fadeFormat,Vector4(fadeColor.x,fadeColor.y,fadeColor.z,0),fadeColor,1.1,0.01);
+		Texture::ptr fadeTexture=mEngine->getTextureManager()->createTexture(fadeFormat,fadeData);
+		delete[] fadeData;
 
 		material=mEngine->getMaterialManager()->createMaterial();
 		if(mEngine->hasShader(Shader::ShaderType_VERTEX) && mEngine->hasShader(Shader::ShaderType_FRAGMENT)){
@@ -203,8 +208,10 @@ Node *Sky::create(Scene *scene,int cloudSize,const Vector4 &skyColor,const Vecto
 		material->compile();
 	}
 	else{
-		Image::ptr composite=createComposite(cloud,bump,lightDir,skyColor);
-		Texture::ptr compositeTexture=mEngine->getTextureManager()->createTexture(composite);
+		TextureFormat::ptr compositeFormat(new TextureFormat(TextureFormat::Dimension_D2,TextureFormat::Format_RGB_8,cloudSize,cloudSize,1,0));
+		tbyte *compositeData=createComposite(compositeFormat,cloudData,bumpData,lightDir,skyColor);
+		Texture::ptr compositeTexture=mEngine->getTextureManager()->createTexture(compositeFormat,compositeData);
+		delete[] compositeData;
 
 		material=mEngine->getMaterialManager()->createSkyBoxMaterial(compositeTexture);
 		mCompositeAccessor=Matrix4x4Accessor::ptr(new TextureStateMatrix4x4Accessor(material->getPass(),0));
@@ -215,6 +222,9 @@ Node *Sky::create(Scene *scene,int cloudSize,const Vector4 &skyColor,const Vecto
 	mSkyMaterial=material;
 	mSkyMaterial->setLayer(-2);
 	mSkyMaterial->retain();
+
+	delete[] cloudData;
+	delete[] bumpData;
 
 	Mesh::ptr mesh=skyDomeCreator->createSkyDomeMesh(vertexBuffer,indexBuffer,sphere,numSegments,numRings,0.35);
 	Transform transform;
@@ -227,9 +237,12 @@ Node *Sky::create(Scene *scene,int cloudSize,const Vector4 &skyColor,const Vecto
 	mSkyDome->setMesh(mesh);
 	attach(mSkyDome);
 
-	Image::ptr glow=createGlow(96,96);
+	TextureFormat::ptr glowFormat(new TextureFormat(TextureFormat::Dimension_D2,TextureFormat::Format_L_8,96,96,1,0));
+	tbyte *glowData=createGlow(glowFormat);
+	Texture::ptr glowTexture=mEngine->getTextureManager()->createTexture(glowFormat,glowData);
+	delete[] glowData;
 
-	Material::ptr sunMaterial=mEngine->getMaterialManager()->createDiffuseMaterial(mEngine->getTextureManager()->createTexture(glow));
+	Material::ptr sunMaterial=mEngine->getMaterialManager()->createDiffuseMaterial(glowTexture);
 	sunMaterial->setLayer(-1);
 	sunMaterial->setSort(Material::SortType_MATERIAL);
 	sunMaterial->getPass()->setBlendState(BlendState::Combination_COLOR_ADDITIVE);
@@ -317,12 +330,12 @@ void Sky::frameUpdate(int dt,int scope){
 	}
 }
 
-Image::ptr Sky::createCloud(int width,int height,int scale,int seed,float cover,float sharpness,float brightness){
-	Image::ptr image(Image::createAndReallocate(Image::Dimension_D2,Image::Format_RGBA_8,width,height));
+tbyte *Sky::createCloud(TextureFormat *format,int scale,int seed,float cover,float sharpness,float brightness){
+	int width=format->getWidth(),height=format->getHeight();
+	tbyte *data=new tbyte[format->getDataSize()];
 
 	Noise noise(4,scale,1,seed,256);
 
-	uint8 *data=image->getData();
 	int x=0,y=0;
 	for(y=0;y<height;y++){
 		for(x=0;x<width;x++){
@@ -338,15 +351,14 @@ Image::ptr Sky::createCloud(int width,int height,int scale,int seed,float cover,
 		}
 	}
 
-	return image;
+	return data;
 }
 
-Image::ptr Sky::createBump(Image *in,float xscale,float yscale,float zscale,int spread){
-	int width=in->getWidth(),height=in->getHeight();
-	uint8 *inData=in->getData();
+tbyte *Sky::createBump(TextureFormat *format,tbyte *cloudSrc,float xscale,float yscale,float zscale,int spread){
+	int width=format->getWidth(),height=format->getHeight();
+	uint8 *inData=cloudSrc;
 
-	Image::ptr image(Image::createAndReallocate(Image::Dimension_D2,Image::Format_RGB_8,width,height));
-	uint8 *data=image->getData();
+	uint8 *data=new uint8[format->getDataSize()];
 	uint8 ip,xp,yp; 
 	int x=0,y=0;
 	for(y=0;y<height;y++){
@@ -369,8 +381,7 @@ Image::ptr Sky::createBump(Image *in,float xscale,float yscale,float zscale,int 
 		}
 	}
 
-	Image::ptr blurImage(Image::createAndReallocate(Image::Dimension_D2,Image::Format_RGB_8,width,height));
-	uint8 *blurData=blurImage->getData();
+	uint8 *blurData=new uint8[format->getDataSize()];
 	int i=0,j=0;
 	for(y=0;y<height;y++){
 		for(x=0;x<width;x++){
@@ -395,13 +406,15 @@ Image::ptr Sky::createBump(Image *in,float xscale,float yscale,float zscale,int 
 		}
 	}
 
-	return blurImage;
+	delete[] data;
+
+	return blurData;
 }
 
-Image::ptr Sky::createFade(int width,int height,const Vector4 &start,const Vector4 &end,float falloff,float sharpness){
-	Image::ptr image(Image::createAndReallocate(Image::Dimension_D2,Image::Format_RGBA_8,width,height));
+tbyte *Sky::createFade(TextureFormat *format,const Vector4 &start,const Vector4 &end,float falloff,float sharpness){
+	int width=format->getWidth(),height=format->getHeight();
+	uint8 *data=new uint8[format->getDataSize()];
 
-	uint8 *data=image->getData();
 	int x=0,y=0;
 	for(y=0;y<height;y++){
 		for(x=0;x<width;x++){
@@ -419,19 +432,16 @@ Image::ptr Sky::createFade(int width,int height,const Vector4 &start,const Vecto
 		}
 	}
 
-	return image;
+	return data;
 }
 
-Image::ptr Sky::createComposite(Image *cloud,Image *bump,const Vector3 &lightDir,const Vector4 &skyColor){
-	int width=cloud->getWidth(),height=cloud->getHeight();
-	Image::ptr image(Image::createAndReallocate(Image::Dimension_D2,Image::Format_RGB_8,width,height));
+tbyte *Sky::createComposite(TextureFormat *format,tbyte *cloudData,tbyte *bumpData,const Vector3 &lightDir,const Vector4 &skyColor){
+	int width=format->getWidth(),height=format->getHeight();
+	uint8 *data=new uint8[format->getDataSize()];
 
 	Vector3 dir;
 	Math::neg(dir,lightDir);
 
-	uint8 *bumpData=bump->getData();
-	uint8 *cloudData=cloud->getData();
-	uint8 *data=image->getData();
 	Vector3 n;
 	Vector4 c,b,f;
 	int x=0,y=0;
@@ -465,13 +475,13 @@ Image::ptr Sky::createComposite(Image *cloud,Image *bump,const Vector3 &lightDir
 		}
 	}
 
-	return image;
+	return data;
 }
 
-Image::ptr Sky::createGlow(int width,int height){
-	Image::ptr image(Image::createAndReallocate(Image::Dimension_D2,Image::Format_L_8,width,height));
+tbyte *Sky::createGlow(TextureFormat *format){
+	int width=format->getWidth(),height=format->getHeight();
+	uint8 *data=new uint8[format->getDataSize()];
 
-	uint8 *data=image->getData();
 	int x=0,y=0;
 	for(y=0;y<height;y++){
 		for(x=0;x<width;x++){
@@ -484,5 +494,5 @@ Image::ptr Sky::createGlow(int width,int height){
 		}
 	}
 
-	return image;
+	return data;
 }

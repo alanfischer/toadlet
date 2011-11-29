@@ -295,19 +295,19 @@ bool TerrainPatchNode::setHeightData(scalar *data,int rowPitch,int width,int hei
 	return true;
 }
 
-inline scalar calculateLayerWeight(tbyte *data,int rowPitch,int size,int layer,int i,int j,scalar io,scalar jo){
+inline scalar calculateLayerWeight(TerrainPatchNode *node,int size,int layer,int i,int j,scalar io,scalar jo){
 	scalar weights[8];
 	memset(weights,0,sizeof(weights));
 
 	int mini=i-1<0?0:i-1;
-	int maxi=i+1>size-1?size-1:i+1;
+	int maxi=i+1>size?size:i+1;
 	int minj=j-1<0?0:j-1;
-	int maxj=j+1>size-1?size-1:j+1;
+	int maxj=j+1>size?size:j+1;
 
 	int x,y;
 	for(y=minj;y<=maxj;++y){
 		for(x=mini;x<=maxi;++x){
-			int l=data[y*rowPitch+x];
+			int l=node->vertexAt(x,y)->layer;
 			scalar w=Math::ONE - 
 				Math::div(Math::square(Math::fromInt(x)-(Math::fromInt(i)+io))+Math::square(Math::fromInt(y)-(Math::fromInt(j)+jo)), Math::square(Math::fromFloat(1.75)));
 			weights[l]+=w<0?0:w;
@@ -339,7 +339,9 @@ bool TerrainPatchNode::setLayerData(tbyte *data,int rowPitch,int width,int heigh
 	int numLayers=0;
 	for(j=0;j<height;++j){
 		for(i=0;i<width;++i){
-			numLayers=Math::maxVal(data[rowPitch*j+i]+1,numLayers);
+			Vertex *vertex=vertexAt(i,j);
+			vertex->layer=data[rowPitch*j+i];
+			numLayers=Math::maxVal(vertex->layer+1,numLayers);
 		}
 	}
 
@@ -349,10 +351,8 @@ bool TerrainPatchNode::setLayerData(tbyte *data,int rowPitch,int width,int heigh
 	}
 
 	mLayerTextures.resize(numLayers);
-	mLayerData.resize(width*height);
-	memcpy(&mLayerData[0],data,width*height);
 
-	Collection<tbyte> textureData((width*2)*(height*2)*2);
+	Collection<tbyte> textureData((width*2)*(height*2));
 	tbyte *tdata=&textureData[0];
 	int textureRowPitch=width*2;
 	int totalWeight=0;
@@ -360,19 +360,19 @@ bool TerrainPatchNode::setLayerData(tbyte *data,int rowPitch,int width,int heigh
 	// Start from 1, since the 0th LayerTexture is never used. (It is first pass, no blending)
 	int k;
 	for(k=1;k<numLayers;++k){
-		for(j=0;j<width;++j){
-			for(i=0;i<height;++i){
+		for(j=0;j<height;++j){
+			for(i=0;i<width;++i){
 				int p0=(j*2+0) * textureRowPitch + i*2;
 				int p1=(j*2+1) * textureRowPitch + i*2;
-				totalWeight+=(tdata[p0+0]=calculateLayerWeight(data,rowPitch,mSize,k,i,j,-0.25,-0.25)*255);
-				totalWeight+=(tdata[p0+1]=calculateLayerWeight(data,rowPitch,mSize,k,i,j,0.25,-0.25)*255);
-				totalWeight+=(tdata[p1+0]=calculateLayerWeight(data,rowPitch,mSize,k,i,j,-0.25,0.25)*255);
-				totalWeight+=(tdata[p1+1]=calculateLayerWeight(data,rowPitch,mSize,k,i,j,0.25,0.25)*255);
+				totalWeight+=(tdata[p0+0]=calculateLayerWeight(this,mSize,k,i,j,-0.25,-0.25)*255);
+				totalWeight+=(tdata[p0+1]=calculateLayerWeight(this,mSize,k,i,j,0.25,-0.25)*255);
+				totalWeight+=(tdata[p1+0]=calculateLayerWeight(this,mSize,k,i,j,-0.25,0.25)*255);
+				totalWeight+=(tdata[p1+1]=calculateLayerWeight(this,mSize,k,i,j,0.25,0.25)*255);
 			}
 		}
 
 		if(totalWeight!=0){
-			TextureFormat::ptr textureFormat(new TextureFormat(TextureFormat::Dimension_D2,TextureFormat::Format_A_8,width*2,height*2,1,0));
+			TextureFormat::ptr textureFormat(new TextureFormat(TextureFormat::Dimension_D2,TextureFormat::Format_A_8,width*2,height*2,1,1));
 			mLayerTextures[k]=mEngine->getTextureManager()->createTexture(Texture::Usage_BIT_STREAM,textureFormat,tdata);
 		}
 	}
@@ -429,7 +429,11 @@ bool TerrainPatchNode::stitchToRight(TerrainPatchNode *terrain,bool restitchDepe
 		rv->dependent0=lv;
 		lv->dependent1=rv;
 		lv->height=rv->height;
+		lv->layer=rv->layer;
 		lv->normal.set(rv->normal);
+		/// @todo: this isn't a perfect fix, just helps it some.  See if we can remove the need to do this
+		// Set the layer one in also, otherwise seams are worse.
+		lt->vertexAt(mSize-1,y)->layer=lv->layer;
 
 		Vertex *llv=lt->vertexAt(mSize-1,y);
 		if(y<mSize){
@@ -443,6 +447,31 @@ bool TerrainPatchNode::stitchToRight(TerrainPatchNode *terrain,bool restitchDepe
 	}
 
 	vba.unlock();
+
+	{
+		Collection<tbyte> textureData(2*mSize*2);
+		tbyte *tdata=&textureData[0];
+		TextureFormat::ptr stitchFormat(new TextureFormat(TextureFormat::Dimension_D2,TextureFormat::Format_A_8,2,mSize*2,1,1));
+		stitchFormat->setOrigin(mSize*2-2,0,0);
+
+		// Start from 1, since the 0th LayerTexture is never used. (It is first pass, no blending)
+		int k;
+		for(k=1;k<mLayerTextures.size();++k){
+			if(mLayerTextures[k]==NULL) continue;
+
+			int i=mSize-1,j=0;
+			for(j=0;j<mSize;++j){
+				int p0=(j*2+0) * 2;
+				int p1=(j*2+1) * 2;
+				(tdata[p0+0]=calculateLayerWeight(this,mSize,k,i,j,-0.25,-0.25)*255);
+				(tdata[p0+1]=calculateLayerWeight(this,mSize,k,i,j,0.25,-0.25)*255);
+				(tdata[p1+0]=calculateLayerWeight(this,mSize,k,i,j,-0.25,0.25)*255);
+				(tdata[p1+1]=calculateLayerWeight(this,mSize,k,i,j,0.25,0.25)*255);
+			}
+
+			mEngine->getTextureManager()->textureLoad(mLayerTextures[k],stitchFormat,tdata);
+		}
+	}
 
 	if(restitchDependents){
 		updateBlockBoundsRight(&mBlocks[0],0,0,0,mInitialStride);
@@ -530,7 +559,10 @@ bool TerrainPatchNode::stitchToBottom(TerrainPatchNode *terrain,bool restitchDep
 		bv->dependent1=tv;
 		tv->dependent0=bv;
 		tv->height=bv->height;
+		tv->layer=bv->layer;
 		tv->normal.set(bv->normal);
+		// Set the layer one in also, otherwise seams are worse.
+		tt->vertexAt(x,mSize-1)->layer=tv->layer;
 
 		Vertex *ttv=tt->vertexAt(x,mSize-1);
 		if(x<mSize){
@@ -544,6 +576,32 @@ bool TerrainPatchNode::stitchToBottom(TerrainPatchNode *terrain,bool restitchDep
 	}
 
 	vba.unlock();
+
+	{
+		Collection<tbyte> textureData(2*mSize*2);
+		tbyte *tdata=&textureData[0];
+		TextureFormat::ptr stitchFormat(new TextureFormat(TextureFormat::Dimension_D2,TextureFormat::Format_A_8,mSize*2,2,1,1));
+		stitchFormat->setOrigin(0,mSize*2-2,0);
+		int textureRowPitch=mSize*2;
+
+		// Start from 1, since the 0th LayerTexture is never used. (It is first pass, no blending)
+		int k;
+		for(k=1;k<mLayerTextures.size();++k){
+			if(mLayerTextures[k]==NULL) continue;
+
+			int i=0,j=mSize-1;
+			for(i=0;i<mSize;++i){
+				int p0=i*2;
+				int p1=textureRowPitch + i*2;
+				(tdata[p0+0]=calculateLayerWeight(this,mSize,k,i,j,-0.25,-0.25)*255);
+				(tdata[p0+1]=calculateLayerWeight(this,mSize,k,i,j,0.25,-0.25)*255);
+				(tdata[p1+0]=calculateLayerWeight(this,mSize,k,i,j,-0.25,0.25)*255);
+				(tdata[p1+1]=calculateLayerWeight(this,mSize,k,i,j,0.25,0.25)*255);
+			}
+
+			mEngine->getTextureManager()->textureLoad(mLayerTextures[k],stitchFormat,tdata);
+		}
+	}
 
 	if(restitchDependents){
 		updateBlockBoundsBottom(&mBlocks[0],0,0,0,mInitialStride);

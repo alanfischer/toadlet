@@ -113,7 +113,6 @@ bool GLTexture::createContext(int mipLevels,tbyte *mipDatas[]){
 			glTexParameteri(mTarget,GL_TEXTURE_BASE_LEVEL,0);
 			glTexParameteri(mTarget,GL_TEXTURE_MAX_LEVEL,specifiedMipLevels-1);
 		}
-		else
 	#endif
 /*
 	/// @todo: Determine if GLES will let us do partial specifications anyway, and if so, enable that

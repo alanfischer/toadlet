@@ -44,8 +44,13 @@ public:
 			Vector4 color=Colors::AZURE*1.5;
 			color.w=0.5f;
 
-			Texture::ptr noise1=engine->getTextureManager()->createTexture(createNoise(128,128,16,5,0.5,0.5));
-			Texture::ptr noise2=engine->getTextureManager()->createTexture(createNoise(128,128,16,12,0.5,0.5));
+			TextureFormat::ptr noiseFormat(new TextureFormat(TextureFormat::Dimension_D2,TextureFormat::Format_RGB_8,128,128,1,0));
+			tbyte *noise1Data=createNoise(noiseFormat,16,5,0.5,0.5);
+			tbyte *noise2Data=createNoise(noiseFormat,16,12,0.5,0.5);
+			Texture::ptr noise1=engine->getTextureManager()->createTexture(noiseFormat,noise1Data);
+			Texture::ptr noise2=engine->getTextureManager()->createTexture(noiseFormat,noise2Data);
+			delete[] noise1Data;
+			delete[] noise2Data;
 
 			RenderPath::ptr shaderPath=waterMaterial->addPath();
 			{
@@ -232,9 +237,14 @@ public:
 		
 		Logger::alert("Loading shadow");
 
+		TextureFormat::ptr pointFormat(new TextureFormat(TextureFormat::Dimension_D2,TextureFormat::Format_A_8,128,128,1,0));
+		tbyte *pointData=createPoint(pointFormat);
+		Texture::ptr pointTexture=engine->getTextureManager()->createTexture(pointFormat,pointData);
+		delete[] pointData;
+
 		shadow=engine->getMeshManager()->createAABoxMesh(AABox(-4,-4,0,4,4,0));
 		{
-			Material::ptr material=engine->getMaterialManager()->createDiffuseMaterial(engine->getTextureManager()->createTexture(createPoint(128,128)));
+			Material::ptr material=engine->getMaterialManager()->createDiffuseMaterial(pointTexture);
 			material->getPass()->setBlendState(BlendState(BlendState::Operation_ONE_MINUS_SOURCE_ALPHA,BlendState::Operation_SOURCE_ALPHA));
 			material->getPass()->setDepthState(DepthState(DepthState::DepthTest_LEQUAL,false));
 			material->getPass()->setMaterialState(MaterialState(Colors::BLACK));
@@ -302,7 +312,7 @@ public:
 		}
 
 		// HUD
-		hudFade=engine->getMaterialManager()->createDiffuseMaterial(engine->getTextureManager()->createTexture(createPoint(128,128)));
+		hudFade=engine->getMaterialManager()->createDiffuseMaterial(pointTexture);
 		hudFade->getPass()->setSamplerState(0,SamplerState(
 			SamplerState::FilterType_LINEAR,SamplerState::FilterType_LINEAR,SamplerState::FilterType_LINEAR,
 			SamplerState::AddressType_CLAMP_TO_EDGE,SamplerState::AddressType_CLAMP_TO_EDGE,SamplerState::AddressType_CLAMP_TO_EDGE));
@@ -342,8 +352,8 @@ public:
 		return true;
 	}
 
-	static Image::ptr createPoint(int width,int height);
-	static Image::ptr createNoise(int width,int height,int scale,int seed,scalar brightnessScale,scalar brightnessOffset);
+	static tbyte *createPoint(TextureFormat *format);
+	static tbyte *createNoise(TextureFormat *format,int scale,int seed,scalar brightnessScale,scalar brightnessOffset);
 
 	static Resources *instance;
 
