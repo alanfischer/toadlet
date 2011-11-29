@@ -91,10 +91,19 @@ void BackableShader::setBack(Shader::ptr back,RenderDevice *renderDevice){
 }
 
 bool BackableShader::convertCreate(Shader::ptr shader,RenderDevice *renderDevice,Shader::ShaderType shaderType,const String profiles[],const String codes[],int numCodes){
+	if(shader==NULL){
+		return false;
+	}
+
 	int i;
 	for(i=0;i<numCodes;++i){
 		if(renderDevice->getShaderProfileSupported(profiles[i])){
-			if(codes[i]==(char*)NULL || shader==NULL || shader->create(shaderType,profiles[i],codes[i])==false){
+			if(codes[i]==(char*)NULL){
+				Logger::debug(Categories::TOADLET_PEEPER,
+					"no code for shader");
+				return false;
+			}
+			if(shader->create(shaderType,profiles[i],codes[i])==false){
 				return false;
 			}
 		}

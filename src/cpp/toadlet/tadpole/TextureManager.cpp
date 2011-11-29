@@ -72,8 +72,6 @@ Texture::ptr TextureManager::createTexture(int usage,TextureFormat::ptr format,t
 }
 
 Texture::ptr TextureManager::createTexture(int usage,TextureFormat::ptr format,tbyte *mipDatas[]){
-	Logger::debug(Categories::TOADLET_TADPOLE,"TextureManager::createTexture");
-
 	RenderDevice *renderDevice=mEngine->getRenderDevice();
 	Texture::ptr texture;
 	if(mBackable || renderDevice==NULL){
@@ -87,7 +85,7 @@ Texture::ptr TextureManager::createTexture(int usage,TextureFormat::ptr format,t
 	else{
 		texture=Texture::ptr(renderDevice->createTexture());
 		if(BackableTexture::convertCreate(texture,renderDevice,usage,format,mipDatas)==false){
-			Logger::error(Categories::TOADLET_TADPOLE,"Error in convertCreate");
+			Logger::error(Categories::TOADLET_TADPOLE,"Error in texture convertCreate");
 			return NULL;
 		}
 	}
@@ -133,7 +131,7 @@ bool TextureManager::textureLoad(Texture::ptr texture,TextureFormat *format,tbyt
 	}
 	else{
 		TextureFormat::ptr newFormat(new TextureFormat(format));
-		format->setPixelFormat(texture->getFormat()->getPixelFormat());
+		newFormat->setPixelFormat(texture->getFormat()->getPixelFormat());
 		tbyte *newData=new tbyte[newFormat->getDataSize()];
 		TextureFormatConversion::convert(data,format,newData,newFormat);
 		result=texture->load(newFormat,newData);

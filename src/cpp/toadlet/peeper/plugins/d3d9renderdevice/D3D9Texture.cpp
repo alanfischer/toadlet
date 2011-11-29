@@ -224,8 +224,6 @@ PixelBuffer::ptr D3D9Texture::getMipPixelBuffer(int level,int cubeSide){
 }
 
 bool D3D9Texture::load(TextureFormat *format,byte *data){
-	TOADLET_ASSERT(format->getMipMin()==format->getMipMax());
-
 	if(mTexture==NULL){
 		return false;
 	}

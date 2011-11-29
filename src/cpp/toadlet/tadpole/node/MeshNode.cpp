@@ -209,9 +209,6 @@ void MeshNode::setMesh(Mesh::ptr mesh){
 
 		subMesh->hasOwnTransform=subMesh->meshSubMesh->hasOwnTransform;
 	}
-
-	Logger::debug(Categories::TOADLET_TADPOLE,
-		"mesh set");
 }
 
 MeshNode::SubMesh *MeshNode::getSubMesh(const String &name){

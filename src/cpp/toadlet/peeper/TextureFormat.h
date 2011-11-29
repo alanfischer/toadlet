@@ -310,11 +310,10 @@ public:
 
 		if(mipLevel!=-1){
 			mipMin=mipLevel;mipMax=mipLevel;
-			if(mipLevel>0){
-				xMin/=2*mipLevel;yMin/=2*mipLevel;zMin/=2*mipLevel;
-				xMax/=2*mipLevel;yMax/=2*mipLevel;zMax/=2*mipLevel;
-			}
-			xMax=xMax>0?xMax:0;yMax=yMax>0?yMax:0;zMax=zMax>0?zMax:0;
+			int div=1<<mipLevel;
+			xMin/=div;yMin/=div;zMin/=div;
+			xMax/=div;yMax/=div;zMax/=div;
+			xMax=xMax>0?xMax:1;yMax=yMax>0?yMax:1;zMax=zMax>0?zMax:1;
 		}
 	}
 
@@ -323,10 +322,21 @@ public:
 		updatePitch();
 	}
 
+	void setOrigin(int x,int y,int z){
+		xMax=(xMax-xMin)+x;
+		yMax=(yMax-yMin)+y;
+		zMax=(zMax-zMin)+z;
+		xMin=x;
+		yMin=y;
+		zMin=z;
+		TOADLET_ASSERT(getWidth()>=1 && getHeight()>-1 && getDepth()>=1);
+		updatePitch();
+	}
+
 	void setSize(int width,int height,int depth){
-		xMin=0;xMax=width;
-		yMin=0;yMax=height;
-		zMin=0;zMax=depth;
+		xMax=xMin+width;
+		yMax=yMin+height;
+		zMax=zMin+depth;
 		TOADLET_ASSERT(getWidth()>=1 && getHeight()>-1 && getDepth()>=1);
 		updatePitch();
 	}

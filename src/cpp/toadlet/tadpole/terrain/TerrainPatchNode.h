@@ -39,6 +39,7 @@ public:
 	public:
 		Vertex():
 			height(0),
+			layer(0),
 			dependent0(NULL),
 			dependent1(NULL),
 			enabled(false)
@@ -46,6 +47,7 @@ public:
 		
 		Vector3 normal;
 		scalar height;
+		int layer;
 		Vertex *dependent0;
 		Vertex *dependent1;
 		bool enabled;
@@ -238,7 +240,6 @@ protected:
 	IndexBuffer::ptr mIndexBuffer;
 	VertexData::ptr mVertexData;
 	IndexData::ptr mIndexData;
-	Collection<tbyte> mLayerData;
 	Collection<Texture::ptr> mLayerTextures;
 
 	Material::ptr mWaterMaterial;

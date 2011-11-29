@@ -116,6 +116,7 @@ bool D3D10Texture::createContext(int numMipDatas,byte *mipDatas[]){
 
 	if((mUsage&Usage_BIT_AUTOGEN_MIPMAPS|Usage_BIT_RENDERTARGET)==(Usage_BIT_AUTOGEN_MIPMAPS|Usage_BIT_RENDERTARGET)){
 		miscFlags|=D3D10_RESOURCE_MISC_GENERATE_MIPS;
+		bindFlags|=(D3D10_BIND_RENDER_TARGET|D3D10_BIND_SHADER_RESOURCE);
 	}
 
 	if((mUsage&Usage_BIT_RENDERTARGET)>0){
@@ -268,8 +269,6 @@ PixelBuffer::ptr D3D10Texture::getMipPixelBuffer(int level,int cubeSide){
 }
 
 bool D3D10Texture::load(TextureFormat *format,tbyte *data){
-	TOADLET_ASSERT(format->getMipMin()==format->getMipMax());
-
 	if(format->getPixelFormat()!=mFormat->getPixelFormat()){
 		Error::unknown(Categories::TOADLET_PEEPER,
 			"data of incorrect format");

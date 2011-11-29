@@ -2,10 +2,10 @@
 
 Resources *Resources::instance=NULL;
 
-Image::ptr Resources::createPoint(int width,int height){
-	Image::ptr image(Image::createAndReallocate(Image::Dimension_D2,Image::Format_A_8,width,height));
+tbyte *Resources::createPoint(TextureFormat *format){
+	int width=format->getWidth(),height=format->getHeight();
+	tbyte *data=new tbyte[format->getDataSize()];
 
-	uint8 *data=image->getData();
 	int x=0,y=0;
 	for(y=0;y<height;y++){
 		for(x=0;x<width;x++){
@@ -19,14 +19,14 @@ Image::ptr Resources::createPoint(int width,int height){
 		}
 	}
 
-	return image;
+	return data;
 }
 
-Image::ptr Resources::createNoise(int width,int height,int scale,int seed,scalar brightnessScale,scalar brightnessOffset){
-	Image::ptr image(Image::createAndReallocate(Image::Dimension_D2,Image::Format_RGB_8,width,height));
+tbyte *Resources::createNoise(TextureFormat *format,int scale,int seed,scalar brightnessScale,scalar brightnessOffset){
+	int width=format->getWidth(),height=format->getHeight();
+	tbyte *data=new tbyte[format->getDataSize()];
 
 	Noise noise(4,scale,4,seed,256);
-	uint8 *data=image->getData();
 	int x=0,y=0;
 	for(y=0;y<height;y++){
 		for(x=0;x<width;x++){
@@ -40,5 +40,5 @@ Image::ptr Resources::createNoise(int width,int height,int scale,int seed,scalar
 		}
 	}
 
-	return image;
+	return data;
 }

@@ -34,7 +34,6 @@ bool TextureFormatConversion::convert(tbyte *src,TextureFormat *srcFormat,tbyte 
 
 	/// @todo: Allow scaling and subsections
 	TOADLET_ASSERT(srcFormat->getWidth()==dstFormat->getWidth() && srcFormat->getHeight()==dstFormat->getHeight() && srcFormat->getDepth()==dstFormat->getDepth());
-	TOADLET_ASSERT(srcFormat->getXMin()==0 && srcFormat->getYMin()==0 && srcFormat->getZMin()==0);
 
 	int srcPixelFormat=srcFormat->getPixelFormat(),dstPixelFormat=dstFormat->getPixelFormat();
 	int width=srcFormat->getWidth(),height=srcFormat->getHeight(),depth=srcFormat->getDepth();
