@@ -46,12 +46,10 @@ unset (TOADLET_LIBRARIES_SD)
 # Default search paths
 if (WIN32)
 	set (HEADER_SEARCH_PATHS
-		"C:/Program Files"
-		"C:/Program Files/toadlet"
+		"C:/Program Files/toadlet/include"
 	)
 	set (LIBRARY_SEARCH_PATHS
-		"C:/Program Files"
-		"C:/Program Files/toadlet"
+		"C:/Program Files/toadlet/lib"
 	)
 else (WIN32)
 	set (HEADER_SEARCH_PATHS
