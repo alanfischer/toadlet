@@ -136,7 +136,7 @@ bool BackableTexture::load(TextureFormat *format,tbyte *data){
 		result=convertLoad(mBack,format,data);
 	}
 	
-	if((format==NULL || format->getMipMax()<=1) && mData!=NULL){
+	if(format->getMipMax()<=1 && mData!=NULL){
 		result=TextureFormatConversion::convert(data,format,mData,mFormat);
 	}
 
@@ -149,7 +149,7 @@ bool BackableTexture::read(TextureFormat *format,tbyte *data){
 	if(mBack!=NULL){
 		result=convertRead(mBack,format,data);
 	}
-	else if((format==NULL || format->getMipMax()<=1) && mData!=NULL){
+	else if(format->getMipMax()<=1 && mData!=NULL){
 		result=TextureFormatConversion::convert(mData,mFormat,data,format);
 	}
 
@@ -188,14 +188,14 @@ bool BackableTexture::convertLoad(Texture::ptr texture,TextureFormat *format,tby
 		return texture->load(format,data);
 	}
 	else{
-		int textureSize=format->getDataSize();
-		tbyte *textureData=new tbyte[textureSize];
 		TextureFormat *textureFormat=new TextureFormat(format);
 		textureFormat->setPixelFormat(texture->getFormat()->getPixelFormat());
+		int textureSize=textureFormat->getDataSize();
+		tbyte *textureData=new tbyte[textureSize];
 		TextureFormatConversion::convert(data,format,textureData,textureFormat);
 		bool result=texture->load(textureFormat,textureData);
-		delete textureFormat;
 		delete[] textureData;
+		delete textureFormat;
 		return result;
 	}
 }

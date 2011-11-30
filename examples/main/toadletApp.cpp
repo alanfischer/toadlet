@@ -8,7 +8,7 @@ int toadletMain(int argc,char **argv){
 //	app.setBackable(true);
 	Applet *applet=createApplet(&app);
 	app.setApplet(applet);
-	app.create("d3d10","","","");
+	app.defaultCreate();
 	app.start();
 	app.destroy();
 	destroyApplet(applet);

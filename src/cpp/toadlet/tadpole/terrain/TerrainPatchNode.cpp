@@ -304,6 +304,12 @@ inline scalar calculateLayerWeight(TerrainPatchNode *node,int size,int layer,int
 	int minj=j-1<0?0:j-1;
 	int maxj=j+1>size?size:j+1;
 
+	// To remove the need to make the layer boarders continuous here and in stitch, we would have to use a texture of size+1,size+1
+	//  and have the max boarders be the same as the min boarders on the next texture.
+	// These make sure that the layer boarders can be continuous on the min side
+	if(i==0){maxi=i;}
+	if(j==0){maxj=j;}
+
 	int x,y;
 	for(y=minj;y<=maxj;++y){
 		for(x=mini;x<=maxi;++x){
@@ -431,8 +437,7 @@ bool TerrainPatchNode::stitchToRight(TerrainPatchNode *terrain,bool restitchDepe
 		lv->height=rv->height;
 		lv->layer=rv->layer;
 		lv->normal.set(rv->normal);
-		/// @todo: this isn't a perfect fix, just helps it some.  See if we can remove the need to do this
-		// Set the layer one in also, otherwise seams are worse.
+		// This makes sure that the layer boarders can be continuous on the max side
 		lt->vertexAt(mSize-1,y)->layer=lv->layer;
 
 		Vertex *llv=lt->vertexAt(mSize-1,y);
@@ -561,7 +566,7 @@ bool TerrainPatchNode::stitchToBottom(TerrainPatchNode *terrain,bool restitchDep
 		tv->height=bv->height;
 		tv->layer=bv->layer;
 		tv->normal.set(bv->normal);
-		// Set the layer one in also, otherwise seams are worse.
+		// This makes sure that the layer boarders can be continuous on the max side
 		tt->vertexAt(x,mSize-1)->layer=tv->layer;
 
 		Vertex *ttv=tt->vertexAt(x,mSize-1);
