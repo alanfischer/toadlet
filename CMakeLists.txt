@@ -43,7 +43,7 @@ endif (ANDROID)
 if (WIN32)
 	set (TOADLET_PLATFORM_WIN32 ON CACHE BOOL "Toadlet for windows platforms")
 	if (WINCE)
-		# TODO: Right now WinCE is being blocked due to the uncertain future of Toadlet and Windows Phone 7. 
+		# TODO: Right now WinCE is being blocked due to the uncertain future of Toadlet on Windows Phone Platforms 
 		message (FATAL_ERROR "WindowsCE builds are currently disabled given the uncertain future of native code on Windows Phone 7. You may comment out this error to attempt the build anyway. Your mileage may vary.")
 		set (TOADLET_PLATFORM_WINCE ON CACHE BOOL "Toadlet for Windows CE")
 	endif(WINCE)
