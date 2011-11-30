@@ -295,25 +295,26 @@ bool TerrainPatchNode::setHeightData(scalar *data,int rowPitch,int width,int hei
 	return true;
 }
 
-inline scalar calculateLayerWeight(TerrainPatchNode *node,int size,int layer,int i,int j,scalar io,scalar jo){
+scalar TerrainPatchNode::calculateLayerWeight(int layer,int i,int j,scalar io,scalar jo){
 	scalar weights[8];
 	memset(weights,0,sizeof(weights));
 
 	int mini=i-1<0?0:i-1;
-	int maxi=i+1>size?size:i+1;
+	int maxi=i+1>mSize?mSize:i+1;
 	int minj=j-1<0?0:j-1;
-	int maxj=j+1>size?size:j+1;
+	int maxj=j+1>mSize?mSize:j+1;
 
-	// To remove the need to make the layer boarders continuous here and in stitch, we would have to use a texture of size+1,size+1
-	//  and have the max boarders be the same as the min boarders on the next texture.
-	// These make sure that the layer boarders can be continuous on the min side
+	// These make sure that the layer boarders can be continuous
+	// To remove this we would have to use a texture of size+1,size+1 and have the max boarders be the same as the min boarders on the next texture.
 	if(i==0){maxi=i;}
 	if(j==0){maxj=j;}
+	if(i==mSize-1){mini=mSize;}
+	if(j==mSize-1){minj=mSize;}
 
 	int x,y;
 	for(y=minj;y<=maxj;++y){
 		for(x=mini;x<=maxi;++x){
-			int l=node->vertexAt(x,y)->layer;
+			int l=vertexAt(x,y)->layer;
 			scalar w=Math::ONE - 
 				Math::div(Math::square(Math::fromInt(x)-(Math::fromInt(i)+io))+Math::square(Math::fromInt(y)-(Math::fromInt(j)+jo)), Math::square(Math::fromFloat(1.75)));
 			weights[l]+=w<0?0:w;
@@ -370,10 +371,10 @@ bool TerrainPatchNode::setLayerData(tbyte *data,int rowPitch,int width,int heigh
 			for(i=0;i<width;++i){
 				int p0=(j*2+0) * textureRowPitch + i*2;
 				int p1=(j*2+1) * textureRowPitch + i*2;
-				totalWeight+=(tdata[p0+0]=calculateLayerWeight(this,mSize,k,i,j,-0.25,-0.25)*255);
-				totalWeight+=(tdata[p0+1]=calculateLayerWeight(this,mSize,k,i,j,0.25,-0.25)*255);
-				totalWeight+=(tdata[p1+0]=calculateLayerWeight(this,mSize,k,i,j,-0.25,0.25)*255);
-				totalWeight+=(tdata[p1+1]=calculateLayerWeight(this,mSize,k,i,j,0.25,0.25)*255);
+				totalWeight+=(tdata[p0+0]=calculateLayerWeight(k,i,j,-0.25,-0.25)*255);
+				totalWeight+=(tdata[p0+1]=calculateLayerWeight(k,i,j,0.25,-0.25)*255);
+				totalWeight+=(tdata[p1+0]=calculateLayerWeight(k,i,j,-0.25,0.25)*255);
+				totalWeight+=(tdata[p1+1]=calculateLayerWeight(k,i,j,0.25,0.25)*255);
 			}
 		}
 
@@ -437,8 +438,6 @@ bool TerrainPatchNode::stitchToRight(TerrainPatchNode *terrain,bool restitchDepe
 		lv->height=rv->height;
 		lv->layer=rv->layer;
 		lv->normal.set(rv->normal);
-		// This makes sure that the layer boarders can be continuous on the max side
-		lt->vertexAt(mSize-1,y)->layer=lv->layer;
 
 		Vertex *llv=lt->vertexAt(mSize-1,y);
 		if(y<mSize){
@@ -468,10 +467,10 @@ bool TerrainPatchNode::stitchToRight(TerrainPatchNode *terrain,bool restitchDepe
 			for(j=0;j<mSize;++j){
 				int p0=(j*2+0) * 2;
 				int p1=(j*2+1) * 2;
-				(tdata[p0+0]=calculateLayerWeight(this,mSize,k,i,j,-0.25,-0.25)*255);
-				(tdata[p0+1]=calculateLayerWeight(this,mSize,k,i,j,0.25,-0.25)*255);
-				(tdata[p1+0]=calculateLayerWeight(this,mSize,k,i,j,-0.25,0.25)*255);
-				(tdata[p1+1]=calculateLayerWeight(this,mSize,k,i,j,0.25,0.25)*255);
+				(tdata[p0+0]=calculateLayerWeight(k,i,j,-0.25,-0.25)*255);
+				(tdata[p0+1]=calculateLayerWeight(k,i,j,0.25,-0.25)*255);
+				(tdata[p1+0]=calculateLayerWeight(k,i,j,-0.25,0.25)*255);
+				(tdata[p1+1]=calculateLayerWeight(k,i,j,0.25,0.25)*255);
 			}
 
 			mEngine->getTextureManager()->textureLoad(mLayerTextures[k],stitchFormat,tdata);
@@ -566,8 +565,6 @@ bool TerrainPatchNode::stitchToBottom(TerrainPatchNode *terrain,bool restitchDep
 		tv->height=bv->height;
 		tv->layer=bv->layer;
 		tv->normal.set(bv->normal);
-		// This makes sure that the layer boarders can be continuous on the max side
-		tt->vertexAt(x,mSize-1)->layer=tv->layer;
 
 		Vertex *ttv=tt->vertexAt(x,mSize-1);
 		if(x<mSize){
@@ -598,10 +595,10 @@ bool TerrainPatchNode::stitchToBottom(TerrainPatchNode *terrain,bool restitchDep
 			for(i=0;i<mSize;++i){
 				int p0=i*2;
 				int p1=textureRowPitch + i*2;
-				(tdata[p0+0]=calculateLayerWeight(this,mSize,k,i,j,-0.25,-0.25)*255);
-				(tdata[p0+1]=calculateLayerWeight(this,mSize,k,i,j,0.25,-0.25)*255);
-				(tdata[p1+0]=calculateLayerWeight(this,mSize,k,i,j,-0.25,0.25)*255);
-				(tdata[p1+1]=calculateLayerWeight(this,mSize,k,i,j,0.25,0.25)*255);
+				(tdata[p0+0]=calculateLayerWeight(k,i,j,-0.25,-0.25)*255);
+				(tdata[p0+1]=calculateLayerWeight(k,i,j,0.25,-0.25)*255);
+				(tdata[p1+0]=calculateLayerWeight(k,i,j,-0.25,0.25)*255);
+				(tdata[p1+1]=calculateLayerWeight(k,i,j,0.25,0.25)*255);
 			}
 
 			mEngine->getTextureManager()->textureLoad(mLayerTextures[k],stitchFormat,tdata);
