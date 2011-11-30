@@ -182,6 +182,7 @@ protected:
 	bool blockVisibleByWater(const Block *block,const Vector3 &cameraTranslate,bool water) const;
 	int gatherBlocks(IndexBuffer *indexBuffer,CameraNode *camera,bool water) const;
 	int gatherTriangle(IndexBufferAccessor &iba,int indexCount,int x0,int y0,int x1,int y1,int x2,int y2) const;
+	scalar calculateLayerWeight(int layer,int i,int j,scalar io,scalar jo);
 
 	// BlockQueue methods
 	inline int getNumBlocksInQueue(){return mNumBlocksInQueue;}

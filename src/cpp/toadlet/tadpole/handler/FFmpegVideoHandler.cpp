@@ -331,7 +331,7 @@ bool FFmpegController::open(Stream::ptr stream){
 
 	AVCodecContext *videoCtx=mStreams[AVMEDIA_TYPE_VIDEO].codecCtx;
 	if(videoCtx!=NULL){
-		mVideoFormat=TextureFormat::ptr(new TextureFormat(TextureFormat::Dimension_D2,0,videoCtx->width,videoCtx->height,0,0));
+		mVideoFormat=TextureFormat::ptr(new TextureFormat(TextureFormat::Dimension_D2,0,videoCtx->width,videoCtx->height,1,0));
 	}
 	else{
 		mVideoFormat=NULL;

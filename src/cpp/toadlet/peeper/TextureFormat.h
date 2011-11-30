@@ -275,7 +275,7 @@ public:
 		xPitch(0),yPitch(0),zPitch(0),
 		mipMin(0),mipMax(mipMax1)
 	{
-		TOADLET_ASSERT(getWidth()>=1 && getHeight()>-1 && getDepth()>=1);
+		TOADLET_ASSERT(getWidth()>=1 && getHeight()>=1 && getDepth()>=1);
 		updatePitch();
 	}
 
@@ -287,7 +287,7 @@ public:
 		xPitch(0),yPitch(0),zPitch(0),
 		mipMin(mip),mipMax(mip)
 	{
-		TOADLET_ASSERT(getWidth()>=1 && getHeight()>-1 && getDepth()>=1);
+		TOADLET_ASSERT(getWidth()>=1 && getHeight()>=1 && getDepth()>=1);
 		updatePitch();
 	}
 
@@ -329,7 +329,7 @@ public:
 		xMin=x;
 		yMin=y;
 		zMin=z;
-		TOADLET_ASSERT(getWidth()>=1 && getHeight()>-1 && getDepth()>=1);
+		TOADLET_ASSERT(getWidth()>=1 && getHeight()>=1 && getDepth()>=1);
 		updatePitch();
 	}
 
@@ -337,7 +337,7 @@ public:
 		xMax=xMin+width;
 		yMax=yMin+height;
 		zMax=zMin+depth;
-		TOADLET_ASSERT(getWidth()>=1 && getHeight()>-1 && getDepth()>=1);
+		TOADLET_ASSERT(getWidth()>=1 && getHeight()>=1 && getDepth()>=1);
 		updatePitch();
 	}
 
