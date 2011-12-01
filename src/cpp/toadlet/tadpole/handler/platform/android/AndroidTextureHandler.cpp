@@ -104,13 +104,17 @@ Resource::ptr AndroidTextureHandler::load(Stream::ptr stream,ResourceData *data,
 		return NULL;
 	}
 
-	Image::ptr image(Image::createAndReallocate(Image::Dimension_D2,Image::Format_RGBA_8,width,height));
-	
-	env->GetIntArrayRegion(pixels,0,width*height,(jint*)image->getData());
+	TextureFormat::ptr textureFormat(new TextureFormat(TextureFormat::Dimension_D2,TextureFormat::Format_RGBA_8,width,height,1,0));
+	tbyte *textureData=new tbyte[textureFormat->getDataSize()];
+
+	env->GetIntArrayRegion(pixels,0,width*height,(jint*)textureData);
 
 	env->DeleteLocalRef(pixels);
 
-	Texture::ptr texture=mTextureManager->createTexture(image);
+	Texture::ptr texture=mTextureManager->createTexture(textureFormat,textureData);
+	
+	delete[] textureData;
+	
 	return texture;
 }
 

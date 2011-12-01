@@ -28,7 +28,7 @@ JNIEXPORT jobject JNICALL Java_us_toadlet_ribbit_NAudioStream_getAudioFormat(JNI
 	jclass streamClass=env->FindClass("us/toadlet/ribbit/AudioFormat");
 	{
 		jmethodID initID=env->GetMethodID(streamClass,"<init>","(III)V");
-		formatObj=env->NewObject(streamClass,initID,format->bitsPerSample,format->channels,format->samplesPerSecond);
+		formatObj=env->NewObject(streamClass,initID,format->getBitsPerSample(),format->getChannels(),format->getSamplesPerSecond());
 	}
 	env->DeleteLocalRef(streamClass);
 
