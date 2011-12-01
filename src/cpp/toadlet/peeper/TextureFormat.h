@@ -369,6 +369,11 @@ public:
 		return Math::isPowerOf2(xMax) && Math::isPowerOf2(yMax) && (dimension==Dimension_CUBE || Math::isPowerOf2(zMax));
 	}
 
+	inline bool isSectionOf(TextureFormat *format){
+		return xMin>=format->xMin && yMin>=format->yMin && zMin>=format->zMin &&
+			xMax<=format->xMax && yMax<=format->yMax && zMax<=format->zMax;
+	}
+
 	inline int getMipMaxPossible(){
 		return Math::intLog2(Math::maxVal(xMax,Math::maxVal(yMax,zMax)));
 	}

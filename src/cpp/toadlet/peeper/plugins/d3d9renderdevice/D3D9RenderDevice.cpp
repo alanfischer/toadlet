@@ -168,7 +168,7 @@ void D3D9RenderDevice::destroy(){
 	}
 }
 
-RenderDevice::DeviceStatus D3D9RenderDevice::getStatus(){
+RenderDevice::DeviceStatus D3D9RenderDevice::activate(){
 	HRESULT result=mD3DDevice->TestCooperativeLevel();
 
 	switch(result){
@@ -313,20 +313,15 @@ void D3D9RenderDevice::swap(){
 }
 
 void D3D9RenderDevice::setMatrix(MatrixType type,const Matrix4x4 &matrix){
-	D3DMATRIX &d3dmatrix=cacheD3DMatrix;
-	toD3DMATRIX(d3dmatrix,matrix);
+	const Matrix4x4 *m=&matrix;
 
 	D3DTRANSFORMSTATETYPE d3dtype;
 	switch(type){
 		case MatrixType_PROJECTION:
+			cacheMatrix4x4.set(matrix);
+			m=&cacheMatrix4x4;
+			updateProjectionMatrix((Matrix4x4&)*m);
 			d3dtype=D3DTS_PROJECTION;
-
-			// Convert depth ranges from -1,1 to 0,1
-			//  Thanks to the OGRE project
-			int i;
-			for(i=0;i<4;++i){
-				d3dmatrix.m[i][2]=(d3dmatrix.m[i][2]+d3dmatrix.m[i][3])/2;
-			};
 		break;
 		case MatrixType_VIEW:
 			d3dtype=D3DTS_VIEW;
@@ -335,6 +330,9 @@ void D3D9RenderDevice::setMatrix(MatrixType type,const Matrix4x4 &matrix){
 			d3dtype=D3DTS_WORLD;
 		break;
 	}
+
+	D3DMATRIX &d3dmatrix=cacheD3DMatrix;
+	toD3DMATRIX(d3dmatrix,*m);
 
 	HRESULT result=mD3DDevice->SetTransform(d3dtype,&d3dmatrix TOADLET_D3DMFMT);
 	TOADLET_CHECK_D3D9ERROR(result,"setMatrix");
@@ -1037,6 +1035,15 @@ int D3D9RenderDevice::getClosePixelFormat(int format){
 
 bool D3D9RenderDevice::getShaderProfileSupported(const String &profile){
 	return profile=="hlsl";
+}
+
+// Convert depth ranges from -1,1 to 0,1
+//  Thanks to the OGRE project
+void D3D9RenderDevice::updateProjectionMatrix(Matrix4x4 &matrix){
+	int i;
+	for(i=0;i<4;++i){
+		matrix[2][i]=(matrix[2][i]+matrix[3][i])/2;
+	}
 }
 
 bool D3D9RenderDevice::isD3DFORMATValid(D3DFORMAT textureFormat,DWORD usage){

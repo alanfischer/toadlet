@@ -280,6 +280,10 @@ void Engine::destroy(){
 	Logger::debug(Categories::TOADLET_TADPOLE,
 		"Engine::destroy");
 
+	if(mRenderDevice!=NULL){
+		mRenderDevice->activate();
+	}
+
 	mNodeManager->destroy();
 	mAudioBufferManager->destroy();
 	mMeshManager->destroy();
@@ -623,8 +627,7 @@ void Engine::contextReset(peeper::RenderDevice *renderDevice){
 void Engine::contextActivate(RenderDevice *renderDevice){
 	Logger::debug("Engine::contextActivate");
 
-	// Set the renderTarget so in cases of multiple gl contexts, we know our resource commands will go to the correct one
-	renderDevice->setRenderTarget(renderDevice->getRenderTarget());
+	renderDevice->activate();
 
 	int i;
 	for(i=0;i<mContextListeners.size();++i){
@@ -643,6 +646,8 @@ void Engine::contextActivate(RenderDevice *renderDevice){
 
 void Engine::contextDeactivate(RenderDevice *renderDevice){
 	Logger::debug("Engine::contextDeactivate");
+
+	renderDevice->activate();
 
 	int i;
 	for(i=0;i<mContextListeners.size();++i){

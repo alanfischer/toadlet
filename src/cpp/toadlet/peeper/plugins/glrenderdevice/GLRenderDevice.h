@@ -67,7 +67,7 @@ public:
 	// Startup/Shutdown
 	bool create(RenderTarget *target,int *options);
 	void destroy();
-	DeviceStatus getStatus(){return DeviceStatus_OK;}
+	DeviceStatus activate();
 	bool reset();
 	bool activateAdditionalContext();
 

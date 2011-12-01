@@ -82,7 +82,7 @@ public:
 	// Creation/Destruction
 	virtual bool create(RenderTarget *target,int *options)=0;
 	virtual void destroy()=0;
-	virtual DeviceStatus getStatus()=0;
+	virtual DeviceStatus activate()=0;
 	virtual bool reset()=0;
 	virtual bool activateAdditionalContext()=0;
 

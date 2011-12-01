@@ -52,7 +52,7 @@ public:
 	// Startup/Shutdown
 	bool create(RenderTarget *target,int *options);
 	void destroy();
-	DeviceStatus getStatus();
+	DeviceStatus activate();
 	bool reset();
 	bool activateAdditionalContext();
 
@@ -116,6 +116,7 @@ public:
 	inline IDirect3DDevice9 *getDirect3DDevice9(){return mD3DDevice;}
 	inline const D3DCAPS9 &getD3DCAPS9() const{return mD3DCaps;}
 	bool isD3DFORMATValid(D3DFORMAT textureFormat,DWORD usage);
+	void updateProjectionMatrix(Matrix4x4 &matrix);
 
 	Matrix4x4 cacheMatrix4x4;
 	D3DMATRIX cacheD3DMatrix;

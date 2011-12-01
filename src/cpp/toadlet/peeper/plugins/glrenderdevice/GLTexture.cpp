@@ -301,6 +301,8 @@ bool GLTexture::load(TextureFormat *format,tbyte *data){
 		return false;
 	}
 
+	TOADLET_ASSERT(format->isSectionOf(mFormat));
+
 	glBindTexture(mTarget,mHandle);
 
 	int pixelFormat=format->getPixelFormat();
