@@ -378,6 +378,10 @@ public:
 		return Math::intLog2(Math::maxVal(xMax,Math::maxVal(yMax,zMax)));
 	}
 
+	inline int getOffset(int x,int y,int z){
+		return z*yPitch + y*xPitch + x*getPixelSize(pixelFormat);
+	}
+
 	bool equals(TextureFormat *format) const{
 		return dimension==format->dimension && pixelFormat==format->pixelFormat &&
 			xMin==format->xMin && yMin==format->yMin && zMin==format->zMin &&

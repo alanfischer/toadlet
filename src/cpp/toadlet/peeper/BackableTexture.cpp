@@ -137,7 +137,34 @@ bool BackableTexture::load(TextureFormat *format,tbyte *data){
 	}
 	
 	if(format->getMipMax()<=1 && mData!=NULL){
-		result=TextureFormatConversion::convert(data,format,mData,mFormat);
+		if(format->getWidth()!=mFormat->getWidth() || format->getHeight()!=mFormat->getHeight() || format->getDepth()!=mFormat->getDepth()){
+			TextureFormat *tempFormat=format;
+			tbyte *tempData=data;
+			if(format->getPixelFormat()!=mFormat->getPixelFormat()){
+				tempFormat=new TextureFormat(format);
+				tempFormat->setPixelFormat(mFormat->getPixelFormat());
+				tempData=new tbyte[tempFormat->getDataSize()];
+
+				result=TextureFormatConversion::convert(data,format,tempData,tempFormat);
+			}
+
+			int j,k;
+			for(k=0;k<tempFormat->getDepth();++k){
+				for(j=0;j<tempFormat->getHeight();++j){
+					tbyte *dst=mData+mFormat->getOffset(tempFormat->getXMin(),tempFormat->getYMin()+j,tempFormat->getZMin()+k);
+					tbyte *src=tempData+tempFormat->getOffset(0,j,k);
+					memcpy(dst,src,tempFormat->getXPitch());
+				}
+			}
+			
+			if(format->getPixelFormat()!=mFormat->getPixelFormat()){
+				delete tempFormat;
+				delete[] tempData;
+			}
+		}
+		else{
+			result=TextureFormatConversion::convert(data,format,mData,mFormat);
+		}
 	}
 
 	return result;
@@ -150,7 +177,34 @@ bool BackableTexture::read(TextureFormat *format,tbyte *data){
 		result=convertRead(mBack,format,data);
 	}
 	else if(format->getMipMax()<=1 && mData!=NULL){
-		result=TextureFormatConversion::convert(mData,mFormat,data,format);
+		if(format->getWidth()!=mFormat->getWidth() || format->getHeight()!=mFormat->getHeight() || format->getDepth()!=mFormat->getDepth()){
+			TextureFormat *tempFormat=format;
+			tbyte *tempData=data;
+			if(format->getPixelFormat()!=mFormat->getPixelFormat()){
+				tempFormat=new TextureFormat(format);
+				tempFormat->setPixelFormat(mFormat->getPixelFormat());
+				tempData=new tbyte[tempFormat->getDataSize()];
+			}
+
+			int j,k;
+			for(k=0;k<tempFormat->getDepth();++k){
+				for(j=0;j<tempFormat->getHeight();++j){
+					tbyte *dst=tempData+tempFormat->getOffset(0,j,k);
+					tbyte *src=mData+mFormat->getOffset(tempFormat->getXMin(),tempFormat->getYMin()+j,tempFormat->getZMin()+k);
+					memcpy(dst,src,tempFormat->getXPitch());
+				}
+			}
+			
+			if(format->getPixelFormat()!=mFormat->getPixelFormat()){
+				result=TextureFormatConversion::convert(tempData,tempFormat,data,format);
+
+				delete tempFormat;
+				delete[] tempData;
+			}
+		}
+		else{
+			result=TextureFormatConversion::convert(mData,mFormat,data,format);
+		}
 	}
 
 	return result;

@@ -180,12 +180,12 @@ bool GLTexture::createContext(int mipLevels,tbyte *mipDatas[]){
 						}
 					}break;
 				#endif
-				#if !defined(GL_TEXTURE_3D)
+				#if defined(GL_TEXTURE_3D)
 					case GL_TEXTURE_3D:
 						glTexImage3D(mTarget,level,glinternalFormat,width,height,depth,0,glformat,gltype,data);
 					break;
 				#endif
-				#if !defined(GL_TEXTURE_RECTANGLE_ARB)
+				#if defined(GL_TEXTURE_RECTANGLE_ARB)
 					case GL_TEXTURE_RECTANGLE_ARB:
 						glTexImage2D(mTarget,level,glinternalFormat,width,height,0,glformat,gltype,data);
 					break;
@@ -218,16 +218,13 @@ bool GLTexture::createContext(int mipLevels,tbyte *mipDatas[]){
 						}
 					}break;
 				#endif
-				#if !defined(GL_TEXTURE_3D)
+				#if defined(GL_TEXTURE_3D)
 					case GL_TEXTURE_3D:
 						glCompressedTexImage3D(mTarget,level,glinternalFormat,width,height,depth,0,yPitch,data);
 					break;
 				#endif
-				#if !defined(GL_TEXTURE_RECTANGLE_ARB)
+				#if defined(GL_TEXTURE_RECTANGLE_ARB)
 					case GL_TEXTURE_RECTANGLE_ARB:
-						// Set up rectangle scale matrix
-						Math::setMatrix4x4FromScale(mMatrix,mFormat->width,mFormat->height,Math::ONE);
-
 						glCompressedTexImage2D(mTarget,level,glinternalFormat,width,height,0,yPitch,data);
 					break;
 				#endif
@@ -238,7 +235,7 @@ bool GLTexture::createContext(int mipLevels,tbyte *mipDatas[]){
 	#if defined(GL_TEXTURE_RECTANGLE_ARB)
 		if(mTarget==GL_TEXTURE_RECTANGLE_ARB){
 			// Set up rectangle scale matrix
-			Math::setMatrix4x4FromScale(mMatrix,mFormat->getWidth(),mFormat->getHeight(),Math::ONE);
+			Math::setMatrix4x4FromScale(mMatrix,mFormat->getWidth(),mFormat->getHeight(),mFormat->getDepth());
 		}
 	#endif
 
