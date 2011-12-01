@@ -113,6 +113,7 @@ bool D3D9VariableBuffer::update(tbyte *data,int start,int size){
 }
 
 void D3D9VariableBuffer::activateConstants(Shader::ShaderType type){
+	math::Matrix4x4 matrix;
 	IDirect3DDevice9 *device=mDevice->getDirect3DDevice9();
 
 	int i;
@@ -121,6 +122,7 @@ void D3D9VariableBuffer::activateConstants(Shader::ShaderType type){
 		int format=variable->getFormat();
 		int index=variable->getIndex();
 		int offset=variable->getOffset();
+		tbyte *data=mData+offset;
 		int count=0;
 		switch(format&VariableBufferFormat::Format_MASK_COUNTS){
 			case VariableBufferFormat::Format_COUNT_2X4:
@@ -138,29 +140,35 @@ void D3D9VariableBuffer::activateConstants(Shader::ShaderType type){
 				count=1;
 		}
 
+		if((format&VariableBufferFormat::Format_BIT_PROJECTION)!=0){
+			matrix.set((float*)data);
+			mDevice->updateProjectionMatrix(matrix);
+			data=(tbyte*)matrix.data;
+		}
+
 		switch(format&VariableBufferFormat::Format_MASK_TYPES){
 			case VariableBufferFormat::Format_TYPE_UINT_8:
 				if(type==Shader::ShaderType_VERTEX){
-					device->SetVertexShaderConstantB(index,(BOOL*)(mData+offset),count);
+					device->SetVertexShaderConstantB(index,(BOOL*)data,count);
 				}
 				else if(type==Shader::ShaderType_FRAGMENT){
-					device->SetPixelShaderConstantB(index,(BOOL*)(mData+offset),count);
+					device->SetPixelShaderConstantB(index,(BOOL*)data,count);
 				}
 			break;
 			case VariableBufferFormat::Format_TYPE_INT_32:
 				if(type==Shader::ShaderType_VERTEX){
-					device->SetVertexShaderConstantI(index,(int*)(mData+offset),count);
+					device->SetVertexShaderConstantI(index,(int*)data,count);
 				}
 				else if(type==Shader::ShaderType_FRAGMENT){
-					device->SetPixelShaderConstantI(index,(int*)(mData+offset),count);
+					device->SetPixelShaderConstantI(index,(int*)data,count);
 				}
 			break;
 			case VariableBufferFormat::Format_TYPE_FLOAT_32:
 				if(type==Shader::ShaderType_VERTEX){
-					device->SetVertexShaderConstantF(index,(float*)(mData+offset),count);
+					device->SetVertexShaderConstantF(index,(float*)data,count);
 				}
 				else if(type==Shader::ShaderType_FRAGMENT){
-					device->SetPixelShaderConstantF(index,(float*)(mData+offset),count);
+					device->SetPixelShaderConstantF(index,(float*)data,count);
 				}
 			break;
 		}

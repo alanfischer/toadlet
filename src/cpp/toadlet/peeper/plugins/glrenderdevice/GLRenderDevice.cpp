@@ -362,6 +362,13 @@ void GLRenderDevice::destroy(){
 	}
 }
 
+RenderDevice::DeviceStatus GLRenderDevice::activate(){
+	if(mGLPrimaryRenderTarget!=NULL){
+		mGLPrimaryRenderTarget->activate();
+	}
+	return DeviceStatus_OK;
+}
+
 bool GLRenderDevice::reset(){
 	if(mGLPrimaryRenderTarget!=NULL){
 		mGLPrimaryRenderTarget->reset();

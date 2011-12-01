@@ -137,7 +137,7 @@ void D3D10RenderDevice::destroy(){
 	mDefaultState->destroy();
 }
 
-RenderDevice::DeviceStatus D3D10RenderDevice::getStatus(){
+RenderDevice::DeviceStatus D3D10RenderDevice::activate(){
 	return DeviceStatus_OK;
 }
 
