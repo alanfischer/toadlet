@@ -263,7 +263,7 @@ void AndroidApplication::run(){
 		update(dt);
 
 		if(mRenderDevice!=NULL){
-			if(mRenderDevice->getStatus()==RenderDevice::DeviceStatus_NEEDSRESET){
+			if(mRenderDevice->activate()==RenderDevice::DeviceStatus_NEEDSRESET){
 				mEngine->contextReset(mRenderDevice);
 			}
 
