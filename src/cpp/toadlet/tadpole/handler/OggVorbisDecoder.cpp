@@ -93,9 +93,7 @@ bool OggVorbisDecoder::startStream(Stream::ptr stream){
 		return false;
 	}
 
-	mFormat->bitsPerSample=16;
-	mFormat->channels=mVorbisInfo->channels;
-	mFormat->samplesPerSecond=mVorbisInfo->rate;
+	mFormat=AudioFormat::ptr(new AudioFormat(16,mVorbisInfo->channels,mVorbisInfo->rate));
 
 	return true;
 }
