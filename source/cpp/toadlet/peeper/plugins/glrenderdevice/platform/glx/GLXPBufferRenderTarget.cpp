@@ -110,7 +110,7 @@ bool GLXPBufferRenderTarget::attach(PixelBuffer::ptr buffer,Attachment attachmen
 	GLTextureMipPixelBuffer *gltextureBuffer=((GLPixelBuffer*)buffer->getRootPixelBuffer())->castToGLTextureMipPixelBuffer();
 	mTexture=gltextureBuffer->getTexture();
 
-	if((mTexture->getFormat()->pixelFormat&TextureFormat::Format_MASK_SEMANTICS)==TextureFormat::Format_SEMANTIC_DEPTH){
+	if((mTexture->getFormat()->getPixelFormat()&TextureFormat::Format_MASK_SEMANTICS)==TextureFormat::Format_SEMANTIC_DEPTH){
 		Error::invalidParameters(Categories::TOADLET_PEEPER,
 			"Format_BIT_DEPTH not available for pbuffers");
 		return false;
@@ -155,8 +155,8 @@ static int handleXError(Display *,XErrorEvent *){
 bool GLXPBufferRenderTarget::createBuffer(){
 	destroyBuffer();
 
-	int width=mTexture->getFormat()->width;
-	int height=mTexture->getFormat()->height;
+	int width=mTexture->getFormat()->getWidth();
+	int height=mTexture->getFormat()->getHeight();
 
 	GLXRenderTarget *renderTarget=(GLXRenderTarget*)(mDevice->getPrimaryRenderTarget()->getRootRenderTarget());
 
@@ -171,7 +171,7 @@ bool GLXPBufferRenderTarget::createBuffer(){
 	int (*oldHandler)(Display*,XErrorEvent*);
 	oldHandler=XSetErrorHandler(handleXError);
 
-	int pixelFormat=mTexture->getFormat()->pixelFormat;
+	int pixelFormat=mTexture->getFormat()->getPixelFormat();
 	int redBits=TextureFormat::getRedBits(pixelFormat);
 	int greenBits=TextureFormat::getGreenBits(pixelFormat);
 	int blueBits=TextureFormat::getBlueBits(pixelFormat);
