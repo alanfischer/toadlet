@@ -1,13 +1,18 @@
-# This macro looks for static library versions of a target
-# TARGET - the output library, or target, that you wish to contain all of the object files
-# LIBRARIES - a list of all of the static libraries you want merged into the TARGET
+# This macro looks for static library versions of a list of libraries
+# STATIC - the output list of static libraries
+# LIBRARIES - the input list of libraries you would like as static
+#
+# Example usage:
+#    LOCATE_STATIC_LIBRARIES (MYLIBS_S "${MYLIBS}")
+#
+# NOTE: When you call this script, make sure you quote the argument to LIBRARIES if it is a list!
 
 macro (LOCATE_STATIC_LIBRARIES STATIC LIBRARIES)
 	unset (${STATIC})
 
 	if (TOADLET_PLATFORM_WIN32)
 		# On windows we can only assume a static version exists and let the linker sort it out
-		set (${STATIC} ${LIBRARY})
+		set (${STATIC} ${LIBRARIES})
 	else (TOADLET_PLATFORM_WIN32)
 		if (TOADLET_PLATFORM_OSX)
 			# Both iOS and OSX use the dylib extension

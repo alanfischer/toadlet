@@ -1,6 +1,11 @@
 # This macro creates a true static library bundle
-# TARGET - the output library, or target, that you wish to contain all of the object files
+# TARGET - the output library, or target, that you wish to contain all of the object files present in LIBRARIES
 # LIBRARIES - a list of all of the static libraries you want merged into the TARGET
+#
+# Example use:
+#   MERGE_STATIC_LIBRARIES (mytarget "${MY_STATIC_LIBRARIES}")
+#
+# NOTE: When you call this script, make sure you quote the argument to LIBRARIES if it is a list!
 
 macro (MERGE_STATIC_LIBRARIES TARGET LIBRARIES)
 	if (WIN32)
