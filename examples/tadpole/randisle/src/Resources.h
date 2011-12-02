@@ -34,8 +34,13 @@ public:
 		Logger::alert("Loading terrain");
 
 		terrainMaterialSource=DiffuseTerrainMaterialSource::ptr(new DiffuseTerrainMaterialSource(engine));
-		terrainMaterialSource->setDiffuseTexture(0,engine->getTextureManager()->findTexture("seafloor.png"));
-		terrainMaterialSource->setDiffuseTexture(1,engine->getTextureManager()->findTexture("rock.png"));
+		#if defined(TOADLET_ANDROID)
+			terrainMaterialSource->setDiffuseTexture(0,engine->getTextureManager()->findTexture("rock.png"));
+			terrainMaterialSource->setDiffuseTexture(1,NULL);
+		#else
+			terrainMaterialSource->setDiffuseTexture(0,engine->getTextureManager()->findTexture("seafloor.png"));
+			terrainMaterialSource->setDiffuseTexture(1,engine->getTextureManager()->findTexture("rock.png"));
+		#endif
 		terrainMaterialSource->setDiffuseTexture(2,engine->getTextureManager()->findTexture("grass.png"));
 
 		Logger::alert("Loading water");
