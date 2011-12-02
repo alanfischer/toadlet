@@ -392,19 +392,21 @@ Texture *GLRenderDevice::createTexture(){
 }
 
 PixelBufferRenderTarget *GLRenderDevice::createPixelBufferRenderTarget(){
+	PixelBufferRenderTarget *target=NULL;
 	#if defined(TOADLET_HAS_GLFBOS)
-		if(mFBOs){
-			return new GLFBORenderTarget(this);
+		if(target==NULL && mFBOs){
+			target=new GLFBORenderTarget(this);
 		}
 	#endif
 	#if defined(TOADLET_HAS_GLPBUFFERS)
-		if(mPBuffers){
-			return new_GLPBufferRenderTarget(this);
+		if(target==NULL && mPBuffers){
+			target=new_GLPBufferRenderTarget(this);
 		}
 	#endif
-
-	Error::unimplemented("GLRenderDevice::createPixelBufferRenderTarget is unavailable");
-	return NULL;
+	if(target==NULL){
+		Error::unimplemented("PixelBufferRenderTargets are unavailable");
+	}
+	return target;
 }
 
 PixelBuffer *GLRenderDevice::createPixelBuffer(){
@@ -428,27 +430,27 @@ VariableBuffer *GLRenderDevice::createVariableBuffer(){
 }
 
 Shader *GLRenderDevice::createShader(){
+	Shader *shader=NULL;
 	#if defined(TOADLET_HAS_GLSL)
-		if(mCaps.hasShader[Shader::ShaderType_VERTEX]){
-			return new GLSLShader(this);
+		if(shader==NULL && mCaps.hasShader[Shader::ShaderType_VERTEX]){
+			shader=new GLSLShader(this);
 		}
-		else{
-			Error::unimplemented("shaders not available");
-			return NULL;
-		}
-	#else
-		Error::unimplemented("GLRenderDevice::createShader is unavailable");
-		return NULL;
 	#endif
+	if(shader==NULL){
+ 		Error::unimplemented("Shaders are unavailable");
+	}
+	return shader;
 }
 
 Query *GLRenderDevice::createQuery(){
+	Query *query=NULL;
 	#if defined(TOADLET_HAS_GLQUERY)
-		return new GLQuery(this);
-	#else
-		Error::unimplemented("GLRenderDevice::createQuery is unavailable");
-		return NULL;
+		query=new GLQuery(this);
 	#endif
+	if(query==NULL){
+		Error::unimplemented("Queries are unavailable");
+	}
+	return query;
 }
 
 RenderState *GLRenderDevice::createRenderState(){
@@ -456,11 +458,16 @@ RenderState *GLRenderDevice::createRenderState(){
 }
 
 ShaderState *GLRenderDevice::createShaderState(){
+	ShaderState *state=NULL;
 	#if defined(TOADLET_HAS_GLSL)
-		return new GLSLShaderState(this);
-	#else
-		return NULL;
+		if(state==NULL && mCaps.hasShader[Shader::ShaderType_VERTEX]){
+			state=new GLSLShaderState(this);
+		}
 	#endif
+	if(state==NULL){
+		Error::unimplemented("ShaderStates are unavailable");
+	}
+	return state;
 }
 
 void GLRenderDevice::setMatrix(MatrixType type,const Matrix4x4 &matrix){
@@ -1090,7 +1097,8 @@ void GLRenderDevice::setSamplerStatePostTexture(int i,SamplerState *state){
 			}
 		#endif
 
-		glTexParameteri(textureTarget,GL_TEXTURE_MIN_FILTER,getGLMinFilter(state->minFilter,state->mipFilter));
+		SamplerState::FilterType mipFilter=(texture->mFormat->getMipMax()==1?SamplerState::FilterType_NONE:state->mipFilter);
+		glTexParameteri(textureTarget,GL_TEXTURE_MIN_FILTER,getGLMinFilter(state->minFilter,mipFilter));
 		glTexParameteri(textureTarget,GL_TEXTURE_MAG_FILTER,getGLMagFilter(state->magFilter));
 
 		/// @todo: Determine if this should be used and override the settings in the GLTexture itself?
