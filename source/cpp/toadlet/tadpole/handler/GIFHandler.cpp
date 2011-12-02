@@ -351,7 +351,7 @@ Resource::ptr GIFHandler::load(Stream::ptr stream,ResourceData *data,ProgressLis
 	delete[] working;
 	int i;
 	for(i=0;i<images.size();++i){
-		delete[] images;
+		delete[] images[i];
 	}
 	
 	if(result==GIF_ERROR){
