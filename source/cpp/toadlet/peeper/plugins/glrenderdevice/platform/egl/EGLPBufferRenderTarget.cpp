@@ -107,7 +107,7 @@ bool EGLPBufferRenderTarget::attach(PixelBuffer::ptr buffer,Attachment attachmen
 	GLTextureMipPixelBuffer *glbuffer=((GLPixelBuffer*)buffer->getRootPixelBuffer())->castToGLTextureMipPixelBuffer();
 	mTexture=glbuffer->getTexture();
 
-	if((mTexture->getFormat()->pixelFormat&TextureFormat::Format_SEMANTIC_DEPTH)>0){
+	if((mTexture->getFormat()->getPixelFormat()&TextureFormat::Format_SEMANTIC_DEPTH)>0){
 		Error::invalidParameters(Categories::TOADLET_PEEPER,
 			"Format_SEMANTIC_DEPTH not available for pbuffers");
 		return false;
@@ -149,9 +149,9 @@ bool EGLPBufferRenderTarget::createBuffer(){
 
 	mDisplay=((EGLRenderTarget*)mDevice->getPrimaryRenderTarget()->getRootRenderTarget())->getEGLDisplay();
 
-	int width=mTexture->getFormat()->width;
-	int height=mTexture->getFormat()->height;
-	int pixelFormat=mTexture->getFormat()->pixelFormat;
+	int width=mTexture->getFormat()->getWidth();
+	int height=mTexture->getFormat()->getHeight();
+	int pixelFormat=mTexture->getFormat()->getPixelFormat();
 	int redBits=TextureFormat::getRedBits(pixelFormat);
 	int greenBits=TextureFormat::getGreenBits(pixelFormat);
 	int blueBits=TextureFormat::getBlueBits(pixelFormat);
