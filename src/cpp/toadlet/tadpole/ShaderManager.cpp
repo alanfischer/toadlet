@@ -77,8 +77,13 @@ void ShaderManager::contextActivate(RenderDevice *renderDevice){
 	for(i=0;i<mResources.size();++i){
 		Shader::ptr shader=shared_static_cast<Shader>(mResources[i]);
 		if(shader!=NULL && shader->getRootShader()!=shader){
-			Shader::ptr back(renderDevice->createShader());
-			shared_static_cast<BackableShader>(shader)->setBack(back,renderDevice);
+			Shader::ptr back;
+			TOADLET_TRY
+				back=Shader::ptr(renderDevice->createShader());
+			TOADLET_CATCH(const Exception &){}
+			if(back!=NULL){
+				shared_static_cast<BackableShader>(shader)->setBack(back,renderDevice);
+			}
 		}
 	}
 }
