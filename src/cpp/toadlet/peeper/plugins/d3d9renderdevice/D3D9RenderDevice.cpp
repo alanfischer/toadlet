@@ -226,27 +226,29 @@ VariableBuffer *D3D9RenderDevice::createVariableBuffer(){
 }
 
 Shader *D3D9RenderDevice::createShader(){
+	Shader *shader=NULL;
 	#if !defined(TOADLET_SET_D3DM)
-		if(mCaps.hasShader[Shader::ShaderType_VERTEX]){
-			return new D3D9Shader(this);
+		if(shader==NULL && mCaps.hasShader[Shader::ShaderType_VERTEX]){
+			shader=new D3D9Shader(this);
 		}
-		else{
-			Error::unimplemented("shaders not available");
-			return NULL;
-		}
-	#else
-		Error::unimplemented("D3D9RenderDevice::createShader is unavailable");
-		return NULL;
 	#endif
+	if(shader==NULL){
+		Error::unimplemented("Shaders are unavailable");
+	}
+	return shader;
 }
 
 Query *D3D9RenderDevice::createQuery(){
+	Query *query=NULL;
 	#if !defined(TOADLET_SET_D3DM)
-		return new D3D9Query(this);
-	#else
-		Error::unimplemented("D3D9RenderDevice::createQuery is unavailable");
-		return NULL;
+		if(query==NULL){
+			query=new D3D9Query(this);
+		}
 	#endif
+	if(query==NULL){
+		Error::unimplemented("Queries are unavailable");
+	}
+	return query;
 }
 
 RenderState *D3D9RenderDevice::createRenderState(){
@@ -254,7 +256,16 @@ RenderState *D3D9RenderDevice::createRenderState(){
 }
 
 ShaderState *D3D9RenderDevice::createShaderState(){
-	return new D3D9ShaderState(this);
+	ShaderState *state=NULL;
+	#if !defined(TOADLET_SET_D3DM)
+		if(state==NULL && mCaps.hasShader[Shader::ShaderType_VERTEX]){
+			state=new D3D9ShaderState(this);
+		}
+	#endif
+	if(state==NULL){
+		Error::unimplemented("ShaderStates are unavailable");
+	}
+	return state;
 }
 
 bool D3D9RenderDevice::setRenderTarget(RenderTarget *target){

@@ -237,7 +237,7 @@ Node *Sky::create(Scene *scene,int cloudSize,const Vector4 &skyColor,const Vecto
 	mSkyDome->setMesh(mesh);
 	attach(mSkyDome);
 
-	TextureFormat::ptr glowFormat(new TextureFormat(TextureFormat::Dimension_D2,TextureFormat::Format_L_8,96,96,1,0));
+	TextureFormat::ptr glowFormat(new TextureFormat(TextureFormat::Dimension_D2,TextureFormat::Format_L_8,128,128,1,0));
 	tbyte *glowData=createGlow(glowFormat);
 	Texture::ptr glowTexture=mEngine->getTextureManager()->createTexture(glowFormat,glowData);
 	delete[] glowData;
