@@ -31,6 +31,7 @@ import android.view.*;
 import android.os.*;
 import us.toadlet.peeper.*;
 import us.toadlet.ribbit.*;
+import us.toadlet.flick.*;
 
 class ApplicationView extends SurfaceView implements SurfaceHolder.Callback{
 	public ApplicationView(AndroidApplication application){
@@ -201,6 +202,13 @@ public abstract class AndroidApplication extends Activity implements RenderTarge
 			}
 			notifyEngineAudioDevice(mEngine);
 		}
+		
+		if(mMotionDevice==null){
+			mMotionDevice=makeMotionDevice();
+			if(mMotionDevice.create()==false){
+				mMotionDevice=null;
+			}
+		}
 
 		if(mApplet==null){
 			mApplet=createApplet(this);
@@ -237,6 +245,12 @@ public abstract class AndroidApplication extends Activity implements RenderTarge
 			mAudioDevice=null;
 		}
 
+		if(mMotionDevice!=null){
+			mMotionDevice.destroy();
+			deleteMotionDevice(mMotionDevice);
+			mMotionDevice=null;
+		}
+		
 		destroyNativeApplication();
   	}
 	
@@ -450,7 +464,8 @@ public abstract class AndroidApplication extends Activity implements RenderTarge
 	public Engine getEngine(){return mEngine;}
 	public RenderDevice getRenderDevice(){return mRenderDevice;}
 	public AudioDevice getAudioDevice(){return mAudioDevice;}
-
+	public MotionDevice getMotionDevice(){return mMotionDevice;}
+	
 	public void resized(int width,int height)		{if(mApplet!=null)mApplet.resized(width,height);}
 	public void focusGained()						{if(mApplet!=null)mApplet.focusGained();}
 	public void focusLost()							{if(mApplet!=null)mApplet.focusLost();}
@@ -550,6 +565,9 @@ public abstract class AndroidApplication extends Activity implements RenderTarge
 	protected AudioDevice makeAudioDevice(){return new ATAudioDevice();}
 	protected void deleteAudioDevice(AudioDevice device){}
 
+	protected MotionDevice makeMotionDevice(){return new AndroidMotionDevice(this);}
+	protected void deleteMotionDevice(MotionDevice device){}
+	
 	protected native void createNativeApplication();
 	protected native void destroyNativeApplication();
 	protected native Engine makeEngine();
@@ -574,7 +592,7 @@ public abstract class AndroidApplication extends Activity implements RenderTarge
 	protected RenderTarget mRenderTarget;
 	protected RenderDevice mRenderDevice;
 	protected AudioDevice mAudioDevice;
-//	protected MotionDevice mMotionDevice;
+	protected MotionDevice mMotionDevice;
 	protected int mNativeHandle;
 	
 	protected SurfaceHolder mNotifySurfaceCreated;

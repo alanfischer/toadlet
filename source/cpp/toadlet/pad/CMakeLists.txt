@@ -94,8 +94,8 @@ endif (TOADLET_PLATFORM_ANDROID)
 
 # Dependencies for toadlet_pad
 if (TOADLET_PLATFORM_ANDROID)
-	set (PAD_LIBS ${PAD_LIBS} toadlet_peeper_glrenderdevice toadlet_ribbit_jaudiodevice)
-	set (PAD_LIBS_S ${PAD_LIBS_S} toadlet_peeper_glrenderdevice_s toadlet_ribbit_jaudiodevice_s)
+	set (PAD_LIBS ${PAD_LIBS} toadlet_peeper_glrenderdevice toadlet_ribbit_jaudiodevice toadlet_flick_jmotiondevice)
+	set (PAD_LIBS_S ${PAD_LIBS_S} toadlet_peeper_glrenderdevice_s toadlet_ribbit_jaudiodevice_s toadlet_flick_jmotiondevice_s)
 elseif (TOADLET_PLATFORM_WINCE)
 	if (TOADLET_HAS_D3DM)
 		set (PAD_LIBS ${PAD_LIBS} toadlet_peeper_d3dmrenderdevice)
