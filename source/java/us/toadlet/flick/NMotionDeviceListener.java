@@ -23,34 +23,14 @@
  *
  ********** Copyright header - do not remove **********/
 
-#ifndef TOADLET_FLICK_MOTIONDEVICE_H
-#define TOADLET_FLICK_MOTIONDEVICE_H
+package us.toadlet.flick;
 
-#include <toadlet/flick/Types.h>
+public class NMotionDeviceListener implements MotionDeviceListener{
+	public NMotionDeviceListener(int nativeHandle){
+		mNativeHandle=nativeHandle;
+	}
 
-namespace toadlet{
-namespace flick{
+	public native void motionDetected(MotionData data);
 
-class MotionDeviceListener;
-
-class MotionDevice{
-public:
-	virtual ~MotionDevice(){}
-
-	virtual bool create()=0;
-	virtual void destroy()=0;
-
-	virtual bool start()=0;
-	virtual void update(int dt)=0;
-	virtual void stop()=0;
-	virtual bool isRunning()=0;
-
-	virtual void setListener(MotionDeviceListener *listener)=0;
-	virtual void setSampleTime(int dt)=0;
-	virtual void setAlpha(scalar alpha)=0;
-};
-
+	private int mNativeHandle;
 }
-}
-
-#endif

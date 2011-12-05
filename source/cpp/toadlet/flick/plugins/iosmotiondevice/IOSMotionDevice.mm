@@ -55,7 +55,6 @@ TOADLET_C_API MotionDevice *new_IOSMotionDevice(){
 IOSMotionDevice::IOSMotionDevice():
 	mRunning(false),
 	mListener(NULL),
-	mNative(false),
 	mAccelerometerDelegate(nil)
 
 {}
@@ -99,12 +98,8 @@ void IOSMotionDevice::destroy(){
 	}
 }
 
-void IOSMotionDevice::setPollSleep(int ms){
-	[UIAccelerometer sharedAccelerometer].updateInterval=(float)ms/1000.0;
-}
-
-void IOSMotionDevice::setNativeOrientation(bool native){
-	mNative=native;
+void IOSMotionDevice::setSampleTime(int dt){
+	[UIAccelerometer sharedAccelerometer].updateInterval=(float)dt/1000.0;
 }
 
 void IOSMotionDevice::setListener(MotionDeviceListener *listener){
@@ -114,12 +109,12 @@ void IOSMotionDevice::setListener(MotionDeviceListener *listener){
 
 void IOSMotionDevice::didAccelerate(UIAcceleration *acceleration){
 	bool result=false;
-	if(mNative){
-		result=updateAcceleration((int)acceleration.timestamp*1000,Math::fromFloat(acceleration.x),Math::fromFloat(acceleration.y),Math::fromFloat(acceleration.z));
+	
+	result=updateAcceleration((int)acceleration.timestamp*1000,Math::fromFloat(acceleration.x),Math::fromFloat(acceleration.y),Math::fromFloat(acceleration.z));
 	}
 	else{
 		result=updateAcceleration((int)acceleration.timestamp*1000,Math::fromFloat(acceleration.x),Math::fromFloat(-acceleration.y),Math::fromFloat(acceleration.z));
-	}
+	} 
 	if(result && mListener!=NULL){
 		mListener->motionDetected(mMotionData);
 	}

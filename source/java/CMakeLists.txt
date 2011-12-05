@@ -1,4 +1,4 @@
-# On Android NDK API levels < 9, toadlet uses java shim libraries for peeper, ribbit, and pad.
+# On Android NDK API levels < 9, toadlet uses java shim libraries for flick, peeper, ribbit, and pad.
 
 
 # Shortcut variables
@@ -37,6 +37,26 @@ set (CMAKE_Java_CREATE_STATIC_LIBRARY
 
 # Include the base directory
 include_directories (.)
+
+
+# toadlet_flick
+set (FLICK_OBJ_DIR ${CMAKE_CURRENT_BINARY_DIR}/CMakeFiles/jtoadlet_flick.dir/${JAVA_OBJ})
+execute_process(COMMAND ${CMAKE_COMMAND} -E make_directory ${FLICK_OBJ_DIR})
+include_directories (${FLICK_OBJ_DIR})
+configure_file (${JAVA_SRC_DIR}/flick/Version.java.cmake ${CMAKE_CURRENT_BINARY_DIR}/${JAVA_SRC_DIR}/flick/Version.java)
+
+set (FLICK_SRC
+	${JAVA_SRC_DIR}/flick/MotionDevice.java
+	${JAVA_SRC_DIR}/flick/MotionDeviceListener.java
+	${JAVA_SRC_DIR}/flick/NMotionDeviceListener.java
+	${JAVA_SRC_DIR}/flick/AndroidMotionDevice.java
+	${CMAKE_CURRENT_BINARY_DIR}/${JAVA_SRC_DIR}/flick/Version.java
+)
+
+add_library (jtoadlet_flick STATIC ${FLICK_SRC})
+set_target_properties (jtoadlet_flick PROPERTIES COMPILE_FLAGS "-d \"${FLICK_OBJ_DIR}\"")
+set_target_properties (jtoadlet_flick PROPERTIES COMPILE_DEFINITIONS_DEBUG TOADLET_DEBUG DEBUG_POSTFIX _d)
+install (TARGETS jtoadlet_flick DESTINATION lib)
 
 # toadlet_peeper
 set (PEEPER_OBJ_DIR ${CMAKE_CURRENT_BINARY_DIR}/CMakeFiles/jtoadlet_peeper.dir/${JAVA_OBJ})
@@ -104,6 +124,6 @@ set (PAD_SRC
 add_library (jtoadlet_pad STATIC ${PAD_SRC})
 set_target_properties (jtoadlet_pad PROPERTIES COMPILE_FLAGS "-d \"${PAD_OBJ_DIR}\"")
 set_target_properties (jtoadlet_pad PROPERTIES COMPILE_DEFINITIONS_DEBUG TOADLET_DEBUG DEBUG_POSTFIX _d)
-add_dependencies (jtoadlet_pad jtoadlet_peeper jtoadlet_ribbit)
+add_dependencies (jtoadlet_pad jtoadlet_peeper jtoadlet_ribbit jtoadlet_flick)
 install (TARGETS jtoadlet_pad DESTINATION lib)
 

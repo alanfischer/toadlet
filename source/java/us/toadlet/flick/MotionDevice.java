@@ -23,34 +23,17 @@
  *
  ********** Copyright header - do not remove **********/
 
-#ifndef TOADLET_FLICK_MOTIONDEVICE_H
-#define TOADLET_FLICK_MOTIONDEVICE_H
+package us.toadlet.flick;
 
-#include <toadlet/flick/Types.h>
+public interface MotionDevice{
+	public boolean create();
+	public void destroy();
 
-namespace toadlet{
-namespace flick{
+	public boolean start();
+	public void update(int dt);
+	public void stop();
+	public boolean isRunning();
 
-class MotionDeviceListener;
-
-class MotionDevice{
-public:
-	virtual ~MotionDevice(){}
-
-	virtual bool create()=0;
-	virtual void destroy()=0;
-
-	virtual bool start()=0;
-	virtual void update(int dt)=0;
-	virtual void stop()=0;
-	virtual bool isRunning()=0;
-
-	virtual void setListener(MotionDeviceListener *listener)=0;
-	virtual void setSampleTime(int dt)=0;
-	virtual void setAlpha(scalar alpha)=0;
-};
-
+	public void setSampleTime(int dt);
+	public void setListener(MotionDeviceListener listener);
 }
-}
-
-#endif

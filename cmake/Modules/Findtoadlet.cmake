@@ -28,6 +28,8 @@
 #  TOADLET_TADPOLE_HOP_LIB
 #  TOADLET_PAD_LIB
 # Android builds with ndk api level < 9 only
+#  TOADLET_FLICK_JAR
+#  TOADLET_RIBBIT_JAR
 #  TOADLET_PEEPER_JAR
 #  TOADLET_PAD_JAR
 # 
@@ -95,7 +97,7 @@ if (ANDROID)
 	set (LIBRARY_SEARCH_SUFFIXES ${NDK_NAME_ARCH})
 
 	if (${ANDROID_NDK_API_LEVEL} LESS 9)
-		set (TOADLET_JAR_BASENAMES jtoadlet_peeper jtoadlet_ribbit jtoadlet_pad)
+		set (TOADLET_JAR_BASENAMES jtoadlet_flick jtoadlet_ribbit jtoadlet_peeper jtoadlet_pad)
 
 		# Search for and assign the android jar files
 		foreach (TOADLET_JAR ${TOADLET_JAR_BASENAMES})
