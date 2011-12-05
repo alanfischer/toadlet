@@ -235,6 +235,11 @@ void Node::setScale(scalar x,scalar y,scalar z){
 	spacialUpdated();
 }
 
+void Node::setMatrix4x4(const Matrix4x4 &matrix){
+	mTransform.setMatrix(matrix);
+	spacialUpdated();
+}
+
 void Node::setTransform(const Transform &transform){
 	mTransform.set(transform);
 	spacialUpdated();

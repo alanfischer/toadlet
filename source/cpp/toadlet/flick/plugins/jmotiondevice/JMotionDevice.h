@@ -23,31 +23,36 @@
  *
  ********** Copyright header - do not remove **********/
 
-#ifndef TOADLET_FLICK_MOTIONDEVICE_H
-#define TOADLET_FLICK_MOTIONDEVICE_H
+#ifndef TOADLET_FLICK_JMOTIONDEVICE_H
+#define TOADLET_FLICK_JMOTIONDEVICE_H
 
-#include <toadlet/flick/Types.h>
+#include <toadlet/flick/MotionDevice.h>
+#include <jni.h>
 
 namespace toadlet{
 namespace flick{
 
-class MotionDeviceListener;
-
-class MotionDevice{
+class TOADLET_API JMotionDevice:public MotionDevice{
 public:
-	virtual ~MotionDevice(){}
+	JMotionDevice(JNIEnv *jenv,jobject jobj);
+	virtual ~JMotionDevice();
 
-	virtual bool create()=0;
-	virtual void destroy()=0;
+	virtual bool create();
+	virtual void destroy();
 
-	virtual bool start()=0;
-	virtual void update(int dt)=0;
-	virtual void stop()=0;
-	virtual bool isRunning()=0;
+	virtual bool start();
+	virtual void update(int dt);
+	virtual void stop();
+	virtual bool isRunning();
 
-	virtual void setListener(MotionDeviceListener *listener)=0;
-	virtual void setSampleTime(int dt)=0;
-	virtual void setAlpha(scalar alpha)=0;
+	virtual void setListener(MotionDeviceListener *listener);
+	virtual void setSampleTime(int dt);
+	virtual void setAlpha(scalar alpha);
+	
+protected:
+	JNIEnv *env;
+	jobject obj;
+	jmethodID createID,destroyID,startID,updateID,stopID,isRunningID,setListenerID,setSampleTimeID,setAlphaID;
 };
 
 }

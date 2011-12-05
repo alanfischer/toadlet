@@ -23,22 +23,16 @@
  *
  ********** Copyright header - do not remove **********/
 
-package us.toadlet.pad;
+package us.toadlet.flick;
 
-public class NApplicationActivity implements ApplicationActivity{
-	public native NApplicationActivity();
+public class MotionData{
+	void set(MotionData data){
+		time=data.time;
+		System.arraycopy(data.acceleration,0,acceleration,0,3);
+		System.arraycopy(data.velocity,0,velocity,0,3);
+	}
 
-	public native void resized(int width,int height);
-	public native void focusGained();
-	public native void focusLost();
-	public native void update(int dt);
-	public native void render(RenderDevice renderDevice);
-
-	public native void keyPressed(int key);
-	public native void keyReleased(int key);
-
-	public native void mousePressed(int x,int y,int button);
-	public native void mouseMoved(int x,int y);
-	public native void mouseReleased(int x,int y,int button);
-	public native void mouseScrolled(int x,int y,int scroll);
-}
+	long time;
+	float[] acceleration=new float[3];
+	float[] velocity=new float[3];
+};

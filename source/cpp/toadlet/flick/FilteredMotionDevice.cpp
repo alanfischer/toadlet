@@ -29,6 +29,8 @@ namespace toadlet{
 namespace flick{
 
 FilteredMotionDevice::FilteredMotionDevice():
+	mListener(NULL),
+	mDevice(NULL),
 	mAlpha(Math::fromMilli(667))
 	//mMotionData
 {}
@@ -36,41 +38,95 @@ FilteredMotionDevice::FilteredMotionDevice():
 FilteredMotionDevice::~FilteredMotionDevice(){
 }
 
-void FilteredMotionDevice::setFilterAlpha(scalar alpha){
-	mAlpha=alpha;
+void FilteredMotionDevice::setMotionDevice(MotionDevice *device){
+	mDevice=device;
 }
 
-bool FilteredMotionDevice::updateAcceleration(int time,scalar x,scalar y,scalar z){
-	Vector3 &lastAcceleration=cache_updateAcceleration_lastAcceleration.set(mMotionData.acceleration);
-	Vector3 &lastVelocity=cache_updateAcceleration_lastAcceleration.set(mMotionData.velocity);
-	Vector3 &lastVelocityFiltered=cache_updateAcceleration_lastVelocityFiltered.set(mMotionData.velocityFiltered);
-	Vector3 &vector=cache_updateAcceleration_vector;
+bool FilteredMotionDevice::create(){
+	if(mDevice==NULL){
+		return false;
+	}
 
-	mMotionData.acceleration.set(x,y,z);
+	return mDevice->create();
+}
+
+void FilteredMotionDevice::destroy(){
+	if(mDevice==NULL){
+		return;
+	}
+	
+	mDevice->destroy();
+}
+
+bool FilteredMotionDevice::start(){
+	if(mDevice==NULL){
+		return false;
+	}
+	
+	return mDevice->start();
+}
+
+void FilteredMotionDevice::update(int dt){
+	if(mDevice==NULL){
+		return;
+	}
+	
+	mDevice->update(dt);
+}
+
+void FilteredMotionDevice::stop(){
+	if(mDevice==NULL){
+		return;
+	}
+	
+	mDevice->stop();
+}
+
+bool FilteredMotionDevice::isRunning(){
+	if(mDevice==NULL){
+		return false;
+	}
+	
+	return mDevice->isRunning();
+}
+
+void FilteredMotionDevice::setSampleTime(int dt){
+	if(mDevice==NULL){
+		return;
+	}
+	
+	mDevice->setSampleTime(dt);
+}
+
+void FilteredMotionDevice::motionDetected(const MotionData &data){
+	Vector3 lastAcceleration=mMotionData.acceleration;
+	Vector3 lastRawVelocity=mRawVelocity;
+	Vector3 lastVelocity=mMotionData.velocity;
+	Vector3 vector;
+
+	mMotionData.acceleration.set(data.acceleration);	
 
 	if(mMotionData.time==0){
+		mRawVelocity.reset();
 		mMotionData.velocity.reset();
-		mMotionData.velocityFiltered.reset();
-		mMotionData.time=time;
-
-		return false;
+		mMotionData.time=data.time;
 	}
 	else{
 		// Improved euler integration
 		// v = v + 0.5dt * (ao + a)
-		Math::add(vector,mMotionData.acceleration,lastAcceleration);
-		Math::mul(vector,Math::fromMilli(time-mMotionData.time)/2);
-		Math::add(mMotionData.velocity,vector);
+		Math::add(vector,data.acceleration,lastAcceleration);
+		Math::mul(vector,Math::fromMilli(data.time-mMotionData.time)/2);
+		Math::add(mRawVelocity,vector);
 
 		// Highpass filtering
 		// vf = alpha*(vf0+v-v0)
-		Math::sub(vector,mMotionData.velocity,lastVelocity);
-		Math::add(vector,lastVelocityFiltered);
-		Math::mul(mMotionData.velocityFiltered,vector,mAlpha);
+		Math::sub(vector,mRawVelocity,lastRawVelocity);
+		Math::add(vector,lastVelocity);
+		Math::mul(mMotionData.velocity,vector,mAlpha);
 
-		mMotionData.time=time;
-
-		return true;		
+		if(mListener!=NULL){
+			mListener->motionDetected(mMotionData);
+		}
 	}
 }
 

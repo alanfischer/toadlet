@@ -50,7 +50,7 @@ toadlet::flick::IOSMotionDevice *mMotionDevice;
 namespace toadlet{
 namespace flick{
 
-class IOSMotionDevice:public FilteredMotionDevice{
+class IOSMotionDevice:public MotionDevice{
 public:
 	IOSMotionDevice();
 	virtual ~IOSMotionDevice();
@@ -63,18 +63,14 @@ public:
 	bool stop();
 	bool isRunning(){return mRunning;}
 
-	void setPollSleep(int ms);
-
-	void setNativeOrientation(bool native);
-
+	void setSampleTime(int dt);
 	void setListener(MotionDeviceListener *listener);
-	
+
 	void didAccelerate(UIAcceleration *acceleration);
 
 protected:
 	bool mRunning;
 	MotionDeviceListener *mListener;
-	bool mNative;
 	ToadletAccelerometerDelegate *mAccelerometerDelegate;
 };
 
