@@ -35,6 +35,7 @@ using namespace toadlet::tadpole;
 using namespace toadlet::pad;
 
 TOADLET_C_API AudioDevice* new_JAudioDevice(JNIEnv *env,jobject obj);
+TOADLET_C_API MotionDevice* new_JMotionDevice(JNIEnv *env,jobject obj);
 
 extern jmethodID getNativeHandleEngineID;
 extern jmethodID getNativeHandleRenderDeviceID;
@@ -73,6 +74,7 @@ JApplication::JApplication(JNIEnv *jenv,jobject jobj):
 		getEngineID=env->GetMethodID(appClass,"getEngine","()Lus/toadlet/pad/Engine;");
 		getRenderDeviceID=env->GetMethodID(appClass,"getRenderDevice","()Lus/toadlet/pad/RenderDevice;");
 		getAudioDeviceID=env->GetMethodID(appClass,"getAudioDevice","()Lus/toadlet/ribbit/AudioDevice;");
+		getMotionDeviceID=env->GetMethodID(appClass,"getMotionDevice","()Lus/toadlet/flick/otionDevice;");
 
 		setNativeHandleID=env->GetMethodID(appClass,"setNativeHandle","(I)V");
 		getNativeHandleID=env->GetMethodID(appClass,"getNativeHandle","()I");
@@ -230,6 +232,28 @@ AudioDevice *JApplication::getAudioDevice() const{
 	}
 
 	return mAudioDevice;
+}
+
+MotionDevice *JApplication::getMotionDevice() const{
+	jobject deviceObj=env->CallObjectMethod(obj,getMotionDeviceID);
+
+	if(mMotionDevice==NULL || mLastMotionDeviceObj!=deviceObj){
+		//if(jobject is NAudioDevice){
+		//	mAudioDevice=deviceObj!=NULL?(AudioDevice*)env->CallIntMethod(deviceObj,getNativeHandleAudioDeviceID):NULL;
+		//}
+		//else{
+			mMotionDevice=new_JMotionDevice(env,deviceObj);
+		//
+
+		if(mLastMotionDeviceObj!=NULL){
+			env->DeleteGlobalRef(mLastMotionDeviceObj);
+		}
+		mLastMotionDeviceObj=env->NewGlobalRef(deviceObj);
+
+		env->DeleteLocalRef(deviceObj);
+	}
+
+	return mMotionDevice;
 }
 
 }

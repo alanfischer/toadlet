@@ -72,13 +72,13 @@ public:
 	Engine *getEngine() const;
 	RenderDevice *getRenderDevice() const;
 	AudioDevice *getAudioDevice() const;
-	MotionDevice *getMotionDevice() const{return NULL;}
+	MotionDevice *getMotionDevice() const;
 	JoyDevice *getJoyDevice() const{return NULL;}
 
 protected:
 	JNIEnv *env;
 	jobject obj;
-	jmethodID createID,destroyID,startID,stopID,isRunningID,setTitleID,getTitleID,setDifferenceMouseID,getDifferenceMouseID,getWidthID,getHeightID,getEngineID,getRenderDeviceID,getAudioDeviceID,setNativeHandleID,getNativeHandleID;
+	jmethodID createID,destroyID,startID,stopID,isRunningID,setTitleID,getTitleID,setDifferenceMouseID,getDifferenceMouseID,getWidthID,getHeightID,getEngineID,getRenderDeviceID,getAudioDeviceID,getMotionDeviceID,setNativeHandleID,getNativeHandleID;
 
 	mutable Engine *mEngine;
 	mutable jobject mLastEngineObj;
@@ -86,6 +86,8 @@ protected:
 	mutable jobject mLastRenderDeviceObj;
 	mutable AudioDevice *mAudioDevice;
 	mutable jobject mLastAudioDeviceObj;
+	mutable MotionDevice *mMotionDevice;
+	mutable jobject mLastMotionDeviceObj;
 };
 
 }

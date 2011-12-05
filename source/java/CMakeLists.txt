@@ -49,6 +49,7 @@ set (FLICK_SRC
 	${JAVA_SRC_DIR}/flick/MotionDevice.java
 	${JAVA_SRC_DIR}/flick/MotionDeviceListener.java
 	${JAVA_SRC_DIR}/flick/NMotionDeviceListener.java
+	${JAVA_SRC_DIR}/flick/AndroidMotionDevice.java
 	${CMAKE_CURRENT_BINARY_DIR}/${JAVA_SRC_DIR}/flick/Version.java
 )
 
