@@ -23,22 +23,16 @@
  *
  ********** Copyright header - do not remove **********/
 
-#ifndef TOADLET_FLICK_MOTIONDEVICELISTENER_H
-#define TOADLET_FLICK_MOTIONDEVICELISTENER_H
+package us.toadlet.flick;
 
-#include <toadlet/flick/MotionData.h>
+public class MotionData{
+	void set(MotionData data){
+		time=data.time;
+		System.arraycopy(data.acceleration,0,acceleration,0,3);
+		System.arraycopy(data.velocity,0,velocity,0,3);
+	}
 
-namespace toadlet{
-namespace flick{
-
-class MotionDeviceListener{
-public:
-	virtual ~MotionDeviceListener(){}
-
-	virtual void motionDetected(const MotionData &data)=0;
+	long time;
+	float[] acceleration=new float[3];
+	float[] velocity=new float[3];
 };
-
-}
-}
-
-#endif
