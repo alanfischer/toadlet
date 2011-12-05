@@ -32,23 +32,33 @@
 namespace toadlet{
 namespace flick{
 
-class TOADLET_API FilteredMotionDevice:public MotionDevice{
+class TOADLET_API FilteredMotionDevice:public MotionDevice,public MotionDeviceListener{
 public:
 	FilteredMotionDevice();
 	virtual ~FilteredMotionDevice();
 
-	virtual void setFilterAlpha(scalar alpha);
+	virtual void setMotionDevice(MotionDevice *device);
+	
+	virtual bool create();
+	virtual void destroy();
 
+	virtual bool start();
+	virtual void update(int dt);
+	virtual void stop();
+	virtual bool isRunning();
+
+	virtual void setListener(MotionDeviceListener *listener){mListener=listener;}
+	virtual void setSampleTime(int dt);
+	virtual void setAlpha(scalar alpha){mAlpha=alpha;}
+
+	virtual void motionDetected(const MotionData &data);
+	
 protected:
-	virtual bool updateAcceleration(int time,scalar x,scalar y,scalar z);
-
+	MotionDeviceListener *mListener;
+	MotionDevice *mDevice;
 	scalar mAlpha;
 	MotionData mMotionData;
-
-	Vector3 cache_updateAcceleration_lastAcceleration;
-	Vector3 cache_updateAcceleration_lastVelocity;
-	Vector3 cache_updateAcceleration_lastVelocityFiltered;
-	Vector3 cache_updateAcceleration_vector;
+	Vector3 mRawVelocity;
 };
 
 }

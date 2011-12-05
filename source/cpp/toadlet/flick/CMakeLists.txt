@@ -46,6 +46,8 @@ install (TARGETS toadlet_flick_s DESTINATION ${LIB_INSTALL_DIR})
 # Platform specific modules
 if (TOADLET_PLATFORM_WIN32)
 	add_subdirectory (plugins/win32joydevice)
+elseif (TOADLET_PLATFORM_ANDROID)
+	add_subdirectory (plugins/jmotiondevice)
 elseif (TOADLET_PLATFORM_IOS)
 	add_subdirectory (plugins/iosmotiondevice)
 endif (TOADLET_PLATFORM_WIN32)

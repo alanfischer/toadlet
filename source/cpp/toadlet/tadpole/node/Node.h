@@ -144,6 +144,8 @@ public:
 	inline const Quaternion &getWorldRotate() const{return mWorldTransform.getRotate();}
 	inline const Vector3 &getWorldScale() const{return mWorldTransform.getScale();}
 
+	virtual void setMatrix4x4(const Matrix4x4 &matrix);
+
 	virtual void setTransform(const Transform &transform);
 	virtual const Transform &getTransform() const{return mTransform;}
 	inline const Transform &getWorldTransform() const{return mWorldTransform;}

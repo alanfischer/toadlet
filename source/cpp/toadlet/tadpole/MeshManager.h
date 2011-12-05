@@ -47,16 +47,18 @@ public:
 	inline void setSkyBoxCreator(ResourceCreator::ptr creator){mSkyBoxCreator=creator;}
 	inline void setSkyDomeCreator(ResourceCreator::ptr creator){mSkyDomeCreator=creator;}
 	inline void setSphereCreator(ResourceCreator::ptr creator){mSphereCreator=creator;}
+	inline void setGridCreator(ResourceCreator::ptr creator){mGridCreator=creator;}
 
 	Mesh::ptr createAABoxMesh(const AABox &box,Material::ptr material=Material::ptr());
 	Mesh::ptr createSkyBoxMesh(scalar size,bool unfolded,bool invert,Material::ptr bottom,Material::ptr top,Material::ptr left,Material::ptr right,Material::ptr back,Material::ptr front);
 	Mesh::ptr createSkyDomeMesh(const Sphere &sphere,int numSegments,int numRings,scalar fade,Material::ptr material=Material::ptr());
 	Mesh::ptr createSphereMesh(const Sphere &sphere,Material::ptr material=Material::ptr());
+	Mesh::ptr createGridMesh(scalar width,scalar height,int numWidth,int numHeight,Material::ptr material=Material::ptr());
 
 protected:
 	Engine *mEngine;
 
-	ResourceCreator::ptr mAABoxCreator,mSkyBoxCreator,mSkyDomeCreator,mSphereCreator;
+	ResourceCreator::ptr mAABoxCreator,mSkyBoxCreator,mSkyDomeCreator,mSphereCreator,mGridCreator;
 };
 
 }

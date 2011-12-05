@@ -23,34 +23,12 @@
  *
  ********** Copyright header - do not remove **********/
 
-#ifndef TOADLET_FLICK_MOTIONDEVICE_H
-#define TOADLET_FLICK_MOTIONDEVICE_H
+package us.toadlet.flick;
 
-#include <toadlet/flick/Types.h>
+public class Version{
+	public static final int MAJOR=${TOADLET_BUILD_VERSION_FLICK_MAJOR};
+	public static final int MINOR=${TOADLET_BUILD_VERSION_FLICK_MINOR};
+	public static final int MICRO=${TOADLET_BUILD_VERSION_FLICK_MICRO};
 
-namespace toadlet{
-namespace flick{
-
-class MotionDeviceListener;
-
-class MotionDevice{
-public:
-	virtual ~MotionDevice(){}
-
-	virtual bool create()=0;
-	virtual void destroy()=0;
-
-	virtual bool start()=0;
-	virtual void update(int dt)=0;
-	virtual void stop()=0;
-	virtual bool isRunning()=0;
-
-	virtual void setListener(MotionDeviceListener *listener)=0;
-	virtual void setSampleTime(int dt)=0;
-	virtual void setAlpha(scalar alpha)=0;
+	public static final String STRING=${TOADLET_BUILD_VERSION_FLICK_MAJOR}+"."+${TOADLET_BUILD_VERSION_FLICK_MINOR}+"."+${TOADLET_BUILD_VERSION_FLICK_MICRO};
 };
-
-}
-}
-
-#endif

@@ -29,6 +29,7 @@
 #include <toadlet/tadpole/creator/SkyBoxMeshCreator.h>
 #include <toadlet/tadpole/creator/SkyDomeMeshCreator.h>
 #include <toadlet/tadpole/creator/SphereMeshCreator.h>
+#include <toadlet/tadpole/creator/GridMeshCreator.h>
 
 namespace toadlet{
 namespace tadpole{
@@ -57,6 +58,10 @@ Mesh::ptr MeshManager::createSkyDomeMesh(const Sphere &sphere,int numSegments,in
 
 Mesh::ptr MeshManager::createSphereMesh(const Sphere &sphere,Material::ptr material){
 	return shared_static_cast<SphereMeshCreator>(mSphereCreator)->createSphereMesh(sphere,16,16,material);
+}
+
+Mesh::ptr MeshManager::createGridMesh(scalar width,scalar height,int numWidth,int numHeight,Material::ptr material){
+	return shared_static_cast<GridMeshCreator>(mGridCreator)->createGridMesh(width,height,numWidth,numHeight,material);
 }
 
 }
