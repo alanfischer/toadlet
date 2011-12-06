@@ -98,22 +98,19 @@ Resource::ptr OSXTextureHandler::load(Stream::ptr in,ResourceData *data,Progress
 	CGContextDrawImage(context,CGRectMake(0,0,textureWidth,textureHeight),cgimage);
 
 	// Build texture
-	Image::ptr image(Image::createAndReallocate(Image::Dimension_D2,Image::Format_RGBA_8,textureWidth,textureHeight));
-	if(image==NULL){
-		return NULL;
-	}
-	
-	tbyte *imageData=image->getData();
-
-	int imageStride=textureWidth*image->getPixelSize();
+	TextureFormat::ptr textureFormat(new TextureFormat(TextureFormat::Dimension_D2,TextureFormat::Format_RGBA_8,textureWidth,textureHeight,1,0));
+	tbyte *textureData=new tbyte[textureFormat->getDataSize()];
+	int textureStride=textureFormat->getXPitch();
 
 	// Flip the bitmap and copy it into the image
 	int i;
 	for(i=0;i<textureHeight;++i){
-		memcpy(imageData+imageStride*(textureHeight-i-1),bitmapData+imageStride*i,imageStride);
+		memcpy(textureData+textureStride*(textureHeight-i-1),bitmapData+textureStride*i,textureStride);
 	}
 
-	Texture::ptr texture=mTextureManager->createTexture(image);
+	Texture::ptr texture=mTextureManager->createTexture(textureFormat,textureData);
+
+	delete[] textureData;
 
 	CGContextRelease(context);
 	free(bitmapData);
