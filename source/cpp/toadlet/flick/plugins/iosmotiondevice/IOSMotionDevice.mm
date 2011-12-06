@@ -78,13 +78,11 @@ bool IOSMotionDevice::start(){
 	return mRunning;
 }
 
-bool IOSMotionDevice::stop(){
+void IOSMotionDevice::stop(){
 	[UIAccelerometer sharedAccelerometer].updateInterval=0;
 	[UIAccelerometer sharedAccelerometer].delegate=nil;
 
 	mRunning=false;
-
-	return mRunning;
 }
 
 void IOSMotionDevice::destroy(){
@@ -102,20 +100,13 @@ void IOSMotionDevice::setSampleTime(int dt){
 	[UIAccelerometer sharedAccelerometer].updateInterval=(float)dt/1000.0;
 }
 
-void IOSMotionDevice::setListener(MotionDeviceListener *listener){
-	mMotionData.time=0;
-	mListener=listener;
-}
-
 void IOSMotionDevice::didAccelerate(UIAcceleration *acceleration){
-	bool result=false;
-	
-	result=updateAcceleration((int)acceleration.timestamp*1000,Math::fromFloat(acceleration.x),Math::fromFloat(acceleration.y),Math::fromFloat(acceleration.z));
-	}
-	else{
-		result=updateAcceleration((int)acceleration.timestamp*1000,Math::fromFloat(acceleration.x),Math::fromFloat(-acceleration.y),Math::fromFloat(acceleration.z));
-	} 
-	if(result && mListener!=NULL){
+	mMotionData.time=(int)acceleration.timestamp*1000;
+	mMotionData.acceleration.x=Math::fromFloat(acceleration.x);
+	mMotionData.acceleration.y=Math::fromFloat(acceleration.y);
+	mMotionData.acceleration.z=Math::fromFloat(acceleration.z);
+
+	if(mListener!=NULL){
 		mListener->motionDetected(mMotionData);
 	}
 }
