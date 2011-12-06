@@ -74,7 +74,7 @@ JApplication::JApplication(JNIEnv *jenv,jobject jobj):
 		getEngineID=env->GetMethodID(appClass,"getEngine","()Lus/toadlet/pad/Engine;");
 		getRenderDeviceID=env->GetMethodID(appClass,"getRenderDevice","()Lus/toadlet/pad/RenderDevice;");
 		getAudioDeviceID=env->GetMethodID(appClass,"getAudioDevice","()Lus/toadlet/ribbit/AudioDevice;");
-		getMotionDeviceID=env->GetMethodID(appClass,"getMotionDevice","()Lus/toadlet/flick/otionDevice;");
+		getMotionDeviceID=env->GetMethodID(appClass,"getMotionDevice","()Lus/toadlet/flick/MotionDevice;");
 
 		setNativeHandleID=env->GetMethodID(appClass,"setNativeHandle","(I)V");
 		getNativeHandleID=env->GetMethodID(appClass,"getNativeHandle","()I");
@@ -220,7 +220,7 @@ AudioDevice *JApplication::getAudioDevice() const{
 		//	mAudioDevice=deviceObj!=NULL?(AudioDevice*)env->CallIntMethod(deviceObj,getNativeHandleAudioDeviceID):NULL;
 		//}
 		//else{
-			mAudioDevice=new_JAudioDevice(env,deviceObj);
+			mAudioDevice=deviceObj!=NULL?new_JAudioDevice(env,deviceObj):NULL;
 		//
 
 		if(mLastAudioDeviceObj!=NULL){
@@ -242,7 +242,7 @@ MotionDevice *JApplication::getMotionDevice() const{
 		//	mAudioDevice=deviceObj!=NULL?(AudioDevice*)env->CallIntMethod(deviceObj,getNativeHandleAudioDeviceID):NULL;
 		//}
 		//else{
-			mMotionDevice=new_JMotionDevice(env,deviceObj);
+			mMotionDevice=deviceObj!=NULL?new_JMotionDevice(env,deviceObj):NULL;
 		//
 
 		if(mLastMotionDeviceObj!=NULL){

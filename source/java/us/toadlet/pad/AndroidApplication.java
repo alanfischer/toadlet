@@ -197,7 +197,7 @@ public abstract class AndroidApplication extends Activity implements RenderTarge
 
 		if(mAudioDevice==null){
 			mAudioDevice=makeAudioDevice();
-			if(mAudioDevice.create()==false){
+			if(mAudioDevice!=null && mAudioDevice.create()==false){
 				mAudioDevice=null;
 			}
 			notifyEngineAudioDevice(mEngine);
@@ -205,7 +205,7 @@ public abstract class AndroidApplication extends Activity implements RenderTarge
 		
 		if(mMotionDevice==null){
 			mMotionDevice=makeMotionDevice();
-			if(mMotionDevice.create()==false){
+			if(mMotionDevice!=null && mMotionDevice.create()==false){
 				mMotionDevice=null;
 			}
 		}
