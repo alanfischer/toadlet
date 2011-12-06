@@ -60,11 +60,12 @@ public:
 
 	bool start();
 	void update(int dt){}
-	bool stop();
+	void stop();
 	bool isRunning(){return mRunning;}
 
+	void setListener(MotionDeviceListener *listener){mListener=listener;}
 	void setSampleTime(int dt);
-	void setListener(MotionDeviceListener *listener);
+	void setAlpha(scalar alpha){}
 
 	void didAccelerate(UIAcceleration *acceleration);
 
@@ -72,6 +73,7 @@ protected:
 	bool mRunning;
 	MotionDeviceListener *mListener;
 	ToadletAccelerometerDelegate *mAccelerometerDelegate;
+	MotionData mMotionData;
 };
 
 }

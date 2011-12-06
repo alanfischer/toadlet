@@ -99,7 +99,7 @@ bool EAGLRenderTarget::createContext(CAEAGLLayer *drawable,WindowRenderTargetFor
 	if(format->depthBits!=0){
 		// No Depth-Stencil buffer, so add one
 		GLFBOPixelBuffer::ptr buffer(new GLFBOPixelBuffer(this));
-		TextureFormat::ptr bufferFormat(new TextureFormat(TextureFormat::Dimension_D2,TextureFormat::Format_DEPTH_16,width,height));
+		TextureFormat::ptr bufferFormat(new TextureFormat(TextureFormat::Dimension_D2,TextureFormat::Format_DEPTH_16,width,height,1,1));
 		if(buffer->create(Buffer::Usage_NONE,Buffer::Access_NONE,bufferFormat)){
 			attach(buffer,Attachment_DEPTH_STENCIL);
 			mDepthBuffer=buffer;
