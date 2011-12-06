@@ -231,21 +231,20 @@ Resource::ptr OSXFontHandler::load(Stream::ptr in,ResourceData *resourceData,Pro
 	}
 
 	// Build texture
-	Image::ptr image(Image::createAndReallocate(Image::Dimension_D2,Image::Format_A_8,textureWidth,textureHeight));
-	if(image==NULL){
-		return NULL;
-	}
-	
-	tbyte *imageData=image->getData();
-
-	int imageStride=textureWidth*image->getPixelSize();
+	TextureFormat::ptr textureFormat(new TextureFormat(TextureFormat::Dimension_D2,TextureFormat::Format_A_8,textureWidth,textureHeight,1,0));
+	tbyte *textureData=new tbyte[textureFormat->getDataSize()];
+	int textureStride=textureFormat->getXPitch();
 
 	for(i=0;i<charmapHeight;++i){
-		memcpy(imageData+imageStride*(textureHeight-i-1),data+imageStride*i,imageStride);
+		memcpy(textureData+textureStride*(textureHeight-i-1),data+textureStride*i,textureStride);
 	}
 
+	Texture::ptr texture=mTextureManager->createTexture(textureFormat,textureData);
+	
+	delete[] textureData;
+
 	// Build font
-	Font::ptr font(new Font(fontData->pointSize,0,mTextureManager->createTexture(image),wcharArray,glyphs.begin(),glyphs.size()));
+	Font::ptr font(new Font(fontData->pointSize,0,texture,wcharArray,glyphs.begin(),glyphs.size()));
 
 	CGContextRelease(context);
 	free(data);
