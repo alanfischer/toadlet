@@ -34,6 +34,7 @@ public interface MotionDevice{
 	public void stop();
 	public boolean isRunning();
 
-	public void setSampleTime(int dt);
 	public void setListener(MotionDeviceListener listener);
+	public void setSampleTime(int dt);
+	public void setAlpha(float alpha);
 }

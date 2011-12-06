@@ -55,10 +55,10 @@ JMotionDevice::JMotionDevice(JNIEnv *jenv,jobject jobj){
 	}
 	env->DeleteLocalRef(deviceClass);
 
-	jthrowable exc=env->ExceptionOccurred();
-	if(exc!=NULL){
+	if(env->ExceptionOccurred()!=0){
 		env->ExceptionDescribe();
 		env->ExceptionClear();
+		return;
 	}
 
 	Java_us_toadlet_flick(env);

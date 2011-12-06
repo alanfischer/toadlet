@@ -11,6 +11,7 @@
 #  TOADLET_EGG_LIB
 #  TOADLET_FLICK_LIB
 #  TOADLET_FLICK_IOSMOTIONDEVICE_LIB
+#  TOADLET_FLICK_JMOTIONDEVICE_LIB
 #  TOADLET_FLICK_WIN32JOYDEVICE_LIB
 #  TOADLET_HOP_LIB
 #  TOADLET_KNOT_LIB
@@ -87,6 +88,7 @@ set (TOADLET_LIB_BASENAMES
 	toadlet_knot
 	toadlet_hop
 	toadlet_flick_win32joydevice
+	toadlet_flick_jmotiondevice
 	toadlet_flick_iosmotiondevice
 	toadlet_flick
 	toadlet_egg

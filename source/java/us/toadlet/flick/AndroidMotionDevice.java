@@ -66,10 +66,11 @@ public class AndroidMotionDevice implements MotionDevice,SensorEventListener{
 	}
 	
 	public boolean isRunning(){return mRunning;}
-
-	public void setSampleTime(int dt){}
 	
 	public void setListener(MotionDeviceListener listener){mListener=listener;}
+
+	public void setSampleTime(int dt){}
+	public void setAlpha(float alpha){}
 
 	public void onAccuracyChanged(Sensor sensor,int accuracy){}
  

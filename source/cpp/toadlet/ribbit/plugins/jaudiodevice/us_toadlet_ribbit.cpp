@@ -1,8 +1,16 @@
 #include <jni.h>
 
+namespace toadlet{
+namespace ribbit{
+
 jfieldID nativeHandleID=0;
 jfieldID nativeBufferID=0;
 jfieldID nativeLengthID=0;
+
+}
+}
+
+using namespace toadlet::ribbit;
 
 extern "C" JNIEXPORT void Java_us_toadlet_ribbit(JNIEnv *env){
 	jclass streamClass=env->FindClass("us/toadlet/ribbit/NAudioStream");
