@@ -253,6 +253,9 @@ public:
 			material->getPass()->setBlendState(BlendState(BlendState::Operation_ONE_MINUS_SOURCE_ALPHA,BlendState::Operation_SOURCE_ALPHA));
 			material->getPass()->setDepthState(DepthState(DepthState::DepthTest_LEQUAL,false));
 			material->getPass()->setMaterialState(MaterialState(Colors::BLACK));
+			// We want it rendered before the water, but on the water layer
+			material->setSort(Material::SortType_MATERIAL);
+			material->setLayer(-1);
 			material->retain();
 			shadow->getSubMesh(0)->material=material;
 			shadow->retain();
