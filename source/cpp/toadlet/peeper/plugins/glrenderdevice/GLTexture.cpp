@@ -294,6 +294,8 @@ PixelBuffer::ptr GLTexture::getMipPixelBuffer(int level,int cubeSide){
 }
 
 bool GLTexture::load(TextureFormat *format,tbyte *data){
+	mDevice->activate(); // Not ideal, but lets us use GLTexture::load with multiple contexts freely, perhaps should be rethought
+
 	if(mHandle==0){
 		return false;
 	}
@@ -374,6 +376,8 @@ bool GLTexture::load(TextureFormat *format,tbyte *data){
 }
 
 bool GLTexture::read(TextureFormat *format,tbyte *data){
+	mDevice->activate(); // Not ideal, but lets us use GLTexture::load with multiple contexts freely, perhaps should be rethought
+
 	if(mHandle==0){
 		return false;
 	}

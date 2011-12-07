@@ -478,6 +478,19 @@ bool D3D9RenderDevice::copySurface(IDirect3DSurface9 *dst,IDirect3DSurface9 *src
 		result=mD3DDevice->StretchRect(src,&rect,dst,&rect,D3DTEXF_NONE);
 		TOADLET_CHECK_D3D9ERROR(result,"D3D9RenderDevice: StretchRect");
 	}
+	else if((srcdesc.Pool==D3DPOOL_DEFAULT && srcdesc.Usage==D3DUSAGE_DYNAMIC) && dstdesc.Pool==D3DPOOL_SYSTEMMEM){
+		D3DLOCKED_RECT srcRect={0},dstRect={0};
+		result=src->LockRect(&srcRect,NULL,0);
+		HRESULT result2=dst->LockRect(&dstRect,NULL,0);
+
+		if(result==S_OK && result2==S_OK){
+			memcpy(dstRect.pBits,srcRect.pBits,srcRect.Pitch*srcdesc.Height);
+		}
+
+		dst->UnlockRect();
+		src->UnlockRect();
+		TOADLET_CHECK_D3D9ERROR(result,"D3D9RenderDevice: LockRect");
+	}
 	else{
 		return false;
 	}

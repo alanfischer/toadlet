@@ -60,7 +60,7 @@ void TextureManager::destroy(){
 }
 
 Texture::ptr TextureManager::createTexture(TextureFormat::ptr format,tbyte *data){
-	return createTexture(Texture::Usage_BIT_STATIC|Texture::Usage_BIT_AUTOGEN_MIPMAPS,format,&data);
+	return createTexture(Texture::Usage_BIT_STATIC|Texture::Usage_BIT_AUTOGEN_MIPMAPS,format,data!=NULL?&data:NULL);
 }
 
 Texture::ptr TextureManager::createTexture(TextureFormat::ptr format,tbyte *mipDatas[]){
