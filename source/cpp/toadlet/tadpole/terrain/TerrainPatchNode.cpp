@@ -23,9 +23,6 @@
 #include <toadlet/tadpole/Scene.h>
 #include <toadlet/tadpole/terrain/TerrainPatchNode.h>
 
-#include <toadlet/tadpole/handler/BMPHandler.h>
-#include <toadlet/egg/io/FileStream.h>
-
 namespace toadlet{
 namespace tadpole{
 namespace terrain{
@@ -244,7 +241,7 @@ bool TerrainPatchNode::setHeightData(scalar *data,int rowPitch,int width,int hei
 			if(mWaterVertexBuffer!=NULL){
 				mWaterVertexBuffer->destroy();
 			}
-			mWaterVertexBuffer=mEngine->getBufferManager()->createVertexBuffer(Buffer::Usage_BIT_STREAM,Buffer::Access_BIT_WRITE,vertexFormat,numVertexes);
+			mWaterVertexBuffer=mEngine->getBufferManager()->createVertexBuffer(Buffer::Usage_BIT_STREAM,Buffer::Access_READ_WRITE,vertexFormat,numVertexes);
 			mWaterVertexData=VertexData::ptr(new VertexData(mWaterVertexBuffer));
 		}
 		if(mWaterIndexBuffer==NULL || mWaterIndexBuffer->getSize()!=numIndexes){
