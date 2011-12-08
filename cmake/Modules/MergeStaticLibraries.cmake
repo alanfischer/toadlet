@@ -11,14 +11,14 @@ macro (MERGE_STATIC_LIBRARIES TARGET LIBRARIES)
 	if (WIN32)
 		# On Windows you must add aditional formatting to the LIBRARIES variable as a single string for the windows libtool
 		string (REPLACE ";" " " LIBS "${LIBRARIES}")
-		string (REPLACE "/" "\\" LIBS "${LIBS}")
 		set_property (TARGET ${TARGET} APPEND PROPERTY STATIC_LIBRARY_FLAGS "${LIBS}")
 	elseif (APPLE)
-		# iOS and OSX platforms need slighly less formatting
+		# iOS and OSX platforms need similar formatting for the osx libtool
 		string (REPLACE ";" " " LIBS "${LIBRARIES}")
 		set_property (TARGET ${TARGET} APPEND PROPERTY STATIC_LIBRARY_FLAGS "${LIBS}")
 	elseif (UNIX)
 		# Posix platforms, including Android, require manual merging of static libraries via a special script
+		# The posix libtool program is capable of merging, but alas it is not enough of a standard to rely on
 		set (LIBRARIES ${LIBRARIES})
 
 		if (NOT CMAKE_BUILD_TYPE)
