@@ -606,6 +606,11 @@ if (FFMPEG_FOUND)
 	if (FFMPEG_LIBRARIES_S)
 		set (TADPOLE_HANDLER_SRC_S ${TADPOLE_HANDLER_SRC_S} ${TADPOLE_HANDLER_FFMPEG_SRC})
 		set (TADPOLE_HANDLER_LIBS_S ${TADPOLE_HANDLER_LIBS_S} ${FFMPEG_LIBRARIES_S})
+		if (TOADLET_PLATFORM_WIN32)
+			# HACK: FFmpeg on windows incorrectly exposes symbols from zlib, which then generate warnings.
+			# We can hide them by passing ignore flags directly to the linker, as if they were libraries.
+			set (TADPOLE_HANDLER_LIBS_S ${TADPOLE_HANDLER_LIBS_S} "/ignore:4006" "/ignore:4221")
+		endif (TOADLET_PLATFORM_WIN32)
 	endif (FFMPEG_LIBRARIES_S)
 endif (FFMPEG_FOUND)
 
@@ -683,10 +688,6 @@ add_library (toadlet_tadpole_s STATIC ${TADPOLE_SRC_S} ${TADPOLE_HEADERS_S})
 set_target_properties (toadlet_tadpole_s PROPERTIES ${STATIC_LIB_PROPS})
 target_link_libraries (toadlet_tadpole_s toadlet_egg_s toadlet_peeper_s toadlet_ribbit_s ${TADPOLE_LIBS})
 MERGE_STATIC_LIBRARIES (toadlet_tadpole_s "${TADPOLE_HANDLER_LIBS_S}")
-if (TOADLET_PLATFORM_WIN32 AND FFMPEG_FOUND)
-	# HACK: FFmpeg incorrectly exposes symbols from zlib, which then generate warnings. Hide them.
-	set_property (TARGET toadlet_tadpole_s APPEND PROPERTY STATIC_LIBRARY_FLAGS "/ignore:4006 /ignore:4221")
-endif (TOADLET_PLATFORM_WIN32 AND FFMPEG_FOUND)
 install (TARGETS toadlet_tadpole_s DESTINATION ${LIB_INSTALL_DIR})
 
 
