@@ -1,17 +1,30 @@
 # This macro looks for static library versions of a list of libraries
 # STATIC - the output list of static libraries
 # LIBRARIES - the input list of libraries you would like as static
+# FALSE(default)/TRUE - No import libraries. This option only has effect on windows platforms. 
+#                       If FALSE(default), then import libraries will be returned as static along with a warning.
+#                       If TRUE, then import libraries will be ignored and only fully static libraries will be returned.
 #
 # Example usage:
 #    LOCATE_STATIC_LIBRARIES (MYLIBS_S "${MYLIBS}")
+#      or
+#    LOCATE_STATIC_LIBRARIES (MYLIBS_S "${MYLIBS}" TRUE) - will not allow import libraries on windows platforms.
 #
 # NOTE: When you call this script, make sure you quote the argument to LIBRARIES if it is a list!
 
-macro (LOCATE_STATIC_LIBRARIES STATIC LIBRARIES)
+macro (LOCATE_STATIC_LIBRARIES STATIC LIBRARIES) #FALSE/TRUE)
 	unset (${STATIC})
 
 	if (TOADLET_PLATFORM_WIN32)
-		# On windows we use the 'lib' tool to try and determine if we have found a fully static library
+		# Are import libraries acceptable?
+		set (NO_IMPORT FALSE)
+		if (${ARGC} EQUAL 3)
+			if (${ARGV2})
+				set (NO_IMPORT TRUE)
+			endif (${ARGV2})
+		endif (${ARGC} EQUAL 3)
+	
+		# On windows we use the 'lib' tool to try and determine if we have found a fully static or an import library
 		find_program (LIBEXE lib)
 
 		if (EXISTS ${LIBEXE})
@@ -31,11 +44,18 @@ macro (LOCATE_STATIC_LIBRARIES STATIC LIBRARIES)
 					file (READ ${CMAKE_CURRENT_BINARY_DIR}/libout-${LIBNAME} LIBOUT)
 					string (FIND ${LIBOUT} ".dll" HASDLL)
 
-					# If a path to a .dll is present, this is an import library
 					if (${HASDLL} GREATER -1)
-						message (STATUS "WARNING: ${LIBRARY} is an IMPORT library. The corresponding .dll(s) will be required.")
+						# If a path to a .dll is present, this is an import library
+						if (${NO_IMPORT})
+							message (STATUS "WARNING: A fully static build of ${LIBRARY} could not be found. ${STATIC} will be incomplete.")
+						else (${NO_IMPORT})
+							message (STATUS "WARNING: ${LIBRARY} is an IMPORT library. The corresponding .dll(s) will be required.")
+							set (${STATIC} ${${STATIC}} ${LIBRARY})
+						endif (${NO_IMPORT})
+					else (${HASDLL} GREATER -1)
+						# We have found a fully static library
+						set (${STATIC} ${${STATIC}} ${LIBRARY})
 					endif (${HASDLL} GREATER -1)
-					set (${STATIC} ${${STATIC}} ${LIBRARY})
 				else (EXISTS ${LIBRARY})
 					message (STATUS "WARNING: A static build of ${LIBRARY} could not be found. ${STATIC} will be incomplete.")
 				endif (EXISTS ${LIBRARY})
