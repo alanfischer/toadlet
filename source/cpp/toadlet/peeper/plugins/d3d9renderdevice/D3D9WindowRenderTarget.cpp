@@ -145,21 +145,29 @@ bool D3D9WindowRenderTarget::createContext(HWND wnd,WindowRenderTargetFormat *fo
 		return NULL;
 	}
 
-	#if defined(TOADLET_D3DX9_DLL_NAME)
-		char *d3dxName=format->debug?TOADLET_D3DX9_DEBUG_DLL_NAME:TOADLET_D3DX9_DLL_NAME;
+	String d3dxName;
+	int maxD3DX=43,minD3DX=24;
+	int i;
+	for(i=maxD3DX;i>=minD3DX && mD3DXLibrary==0;i--){
+		d3dxName=(format->debug?String("D3DX9D_"):String("D3DX9_"))+i+".DLL";
 		mD3DXLibrary=LoadLibrary(d3dxName);
-		if(mD3DXLibrary==0){
-			Logger::warning(Categories::TOADLET_PEEPER,
-				String("D3D9WindowRenderTarget: Error loading ")+d3dxName);
-		}
-
-		char *compileShaderName=TOADLET_D3DX9_COMPILE_SHADER_NAME;
-		CompileShaderSymbol=(D3DXCompileShader)GetProcAddress(mD3DXLibrary,compileShaderName);
-		if(CompileShaderSymbol==NULL){
-			Logger::warning(Categories::TOADLET_PEEPER,
-				String("D3D9WindowRenderTarget: Error finding ")+compileShaderName);
-		}
-	#endif
+		if(mD3DXLibrary!=0){
+			char *compileShaderName=TOADLET_D3DX9_COMPILE_SHADER_NAME;
+			CompileShaderSymbol=(D3DXCompileShader)GetProcAddress(mD3DXLibrary,compileShaderName);
+			if(CompileShaderSymbol==NULL){
+				Logger::warning(Categories::TOADLET_PEEPER,
+					String("D3D9WindowRenderTarget: Error finding ")+compileShaderName);
+			}
+		}		
+	}
+	if(mD3DXLibrary==0){
+		Logger::warning(Categories::TOADLET_PEEPER,
+		String("D3D9WindowRenderTarget: Error loading ")+d3dxName);
+	}
+	else{
+		Logger::alert(Categories::TOADLET_PEEPER,
+			"Found "+d3dxName);
+	}
 
 	mD3D=CreateSymbol(D3D_SDK_VERSION);
 	if(mD3D==NULL){

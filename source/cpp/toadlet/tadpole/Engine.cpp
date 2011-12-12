@@ -87,6 +87,7 @@
 #include <toadlet/tadpole/creator/SkyBoxMeshCreator.h>
 #include <toadlet/tadpole/creator/SkyDomeMeshCreator.h>
 #include <toadlet/tadpole/creator/SphereMeshCreator.h>
+#include <toadlet/tadpole/creator/NormalizationTextureCreator.h>
 #include <toadlet/tadpole/creator/DiffuseMaterialCreator.h>
 #include <toadlet/tadpole/creator/SkyBoxMaterialCreator.h>
 
@@ -365,6 +366,8 @@ void Engine::installHandlers(){
 	#if !defined(TOADLET_FIXED_POINT)
 		mTextureManager->setStreamer(SPRHandler::ptr(new SPRHandler(this)),"spr");
 	#endif
+
+	mTextureManager->setNormalizationCreator(ResourceCreator::ptr(new NormalizationTextureCreator(this)));
 
 	mMeshManager->setAABoxCreator(ResourceCreator::ptr(new AABoxMeshCreator(this)));
 	mMeshManager->setSkyBoxCreator(ResourceCreator::ptr(new SkyBoxMeshCreator(this)));

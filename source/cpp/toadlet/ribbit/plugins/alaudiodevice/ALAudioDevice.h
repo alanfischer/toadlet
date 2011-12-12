@@ -57,6 +57,9 @@ public:
 	bool create(int *options);
 	void destroy();
 
+	void activate();
+	void deactivate();
+
 	AudioBuffer *createAudioBuffer();
 	Audio *createAudio();
 
@@ -64,12 +67,6 @@ public:
 	void setListenerRotate(const Matrix3x3 &rotate);
 	void setListenerVelocity(const Vector3 &velocity);
 	void setListenerGain(scalar gain);
-
-	void activate();
-	void deactivate();
-
-	void suspend(){deactivate();}
-	void resume(){activate();}
 
 	void update(int dt);
 

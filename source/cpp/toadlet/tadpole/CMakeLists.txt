@@ -51,6 +51,7 @@ set (TADPOLE_CREATOR_SRC
 	creator/AABoxMeshCreator.cpp
 	creator/GridMeshCreator.cpp
 	creator/GeoSphereMeshCreator.cpp
+	creator/NormalizationTextureCreator.cpp
 	creator/SkyBoxMeshCreator.cpp
 	creator/SkyDomeMeshCreator.cpp
 	creator/SphereMeshCreator.cpp

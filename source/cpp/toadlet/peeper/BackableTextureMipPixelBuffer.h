@@ -32,18 +32,17 @@
 namespace toadlet{
 namespace peeper{
 
-/// @todo:Clean this up so the getWidth & other functions work without mBack
-///  I should calculate most of these parameters, then update them when the back is set
-///  and move these into a .cpp file
 class TOADLET_API BackableTextureMipPixelBuffer:public PixelBuffer{
 public:
 	TOADLET_SHARED_POINTERS(BackableTextureMipPixelBuffer);
 
-	BackableTextureMipPixelBuffer(BackableTexture *texture,int level,int cubeSide){
-		mTexture=texture;
-		mLevel=level;
-		mCubeSide=cubeSide;
-		
+	BackableTextureMipPixelBuffer(BackableTexture *texture,int level,int cubeSide):
+		mTexture(texture),
+		mLevel(level),
+		mCubeSide(cubeSide),
+		mUsage(0),
+		mAccess(0)
+	{
 		resetCreate();
 	}
 	
@@ -54,6 +53,7 @@ public:
 	virtual void setBufferDestroyedListener(BufferDestroyedListener *listener){}
 
 	virtual bool create(int usage,int access,TextureFormat::ptr format){return false;}
+
 	virtual void destroy(){
 		resetDestroy();
 
@@ -61,30 +61,41 @@ public:
 	}
 
 	virtual void resetCreate(){
-		mBack=mTexture->getBack()->getMipPixelBuffer(mLevel,mCubeSide);
+		setBack(mTexture->getBack()->getMipPixelBuffer(mLevel,mCubeSide));
 	}
 	
 	virtual void resetDestroy(){
-		mBack=NULL;
+		setBack(NULL);
 	}
 
-	virtual int getUsage() const{return mBack!=NULL?mBack->getUsage():0;}
-	virtual int getAccess() const{return mBack!=NULL?mBack->getAccess():0;}
-	virtual int getDataSize() const{return mBack!=NULL?mBack->getDataSize():0;}
-	virtual TextureFormat::ptr getTextureFormat() const{return mBack!=NULL?mBack->getTextureFormat():NULL;}
+	virtual int getUsage() const{return mBack!=NULL?mBack->getUsage():mUsage;}
+	virtual int getAccess() const{return mBack!=NULL?mBack->getAccess():mAccess;}
+	virtual int getDataSize() const{return mBack!=NULL?mBack->getDataSize():(mFormat!=NULL?mFormat->getDataSize():0);}
+	virtual TextureFormat::ptr getTextureFormat() const{return mBack!=NULL?mBack->getTextureFormat():mFormat;}
 
 	virtual tbyte *lock(int lockAccess){return mBack!=NULL?mBack->lock(lockAccess):NULL;}
 	virtual bool unlock(){return mBack!=NULL?mBack->unlock():false;}
 
 	virtual bool update(tbyte *data,int start,int size){return mBack!=NULL?mBack->update(data,start,size):false;}
 
-	virtual void setBack(PixelBuffer::ptr back){mBack=back;}
+	virtual void setBack(PixelBuffer::ptr back){
+		mBack=back;
+		if(mBack!=NULL){
+			mUsage=mBack->getUsage();
+			mAccess=mBack->getAccess();
+			mFormat=mBack->getTextureFormat();
+		}
+	}
+
 	virtual Buffer::ptr getBack(){return mBack;}
 
 protected:
 	BackableTexture *mTexture;
 	int mLevel;
 	int mCubeSide;
+	int mUsage;
+	int mAccess;
+	TextureFormat::ptr mFormat;
 	PixelBuffer::ptr mBack;
 };
 

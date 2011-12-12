@@ -54,6 +54,9 @@ public class ATAudioDevice implements AudioDevice,Runnable{
 		mHandler.removeCallbacks(this);
 	}
 	
+	public void activate(){}
+	public void deactivate(){}
+
 	public AudioBuffer createAudioBuffer(){return new ATAudioBuffer();}
 	public Audio createAudio(){return new ATAudio(this);}
 
@@ -74,9 +77,6 @@ public class ATAudioDevice implements AudioDevice,Runnable{
 			mAudios.get(i).update(dt);
 		}
 	}
-	
-	public void suspend(){}
-	public void resume(){}
 
 	public boolean getAudioCaps(AudioCaps caps){caps.set(mCaps);return true;}
 

@@ -54,6 +54,9 @@ public:
 
 	bool textureLoad(Texture::ptr texture,TextureFormat *format,tbyte *mipData);
 
+	inline void setNormalizationCreator(ResourceCreator::ptr creator){mNormalizationCreator=creator;}
+	Texture::ptr createNormalizationTexture(int size);
+
 	void contextActivate(RenderDevice *renderDevice);
 	void contextDeactivate(RenderDevice *renderDevice);
 	void preContextReset(RenderDevice *renderDevice);
@@ -61,18 +64,17 @@ public:
 
 	void renderTargetDestroyed(RenderTarget *renderTarget);
 
-	/// @todo: create a ResourceCreator for this
-	Texture::ptr createNormalization(int size);
-
 	void setVideoHandler(VideoHandler::ptr handler){mVideoHandler=handler;}
 	VideoHandler::ptr getVideoHandler() const{return mVideoHandler;}
 
 protected:
+	Engine *mEngine;
+	bool mBackable;
+
 	Collection<PixelBufferRenderTarget::ptr> mRenderTargets;
 	VideoHandler::ptr mVideoHandler;
 
-	Engine *mEngine;
-	bool mBackable;
+	ResourceCreator::ptr mNormalizationCreator;
 };
 
 }

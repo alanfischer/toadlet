@@ -348,7 +348,6 @@ bool FFmpegController::open(Stream::ptr stream){
 	return true;
 }
 
-/// @todo: When rapidly switching between videos, we can get a crash randomly in the av_free calls in destroy()
 void FFmpegController::destroy(){
 	Logger::alert(Categories::TOADLET_TADPOLE,"FFmpegController::destroy");
 

@@ -76,8 +76,6 @@ public:
 		PacketQueue::ptr queue;
 	};
 
-	/// @todo: Let us be able to open a stream and query its parameters before specifying a texture
-	/// @todo: Move the Audio creation out from here, and instead have it be something passed in, if Audio is desired
 	FFmpegController(Engine *engine);
 	virtual ~FFmpegController();
 

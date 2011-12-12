@@ -28,6 +28,7 @@
 #include <toadlet/peeper/TextureFormatConversion.h>
 #include <toadlet/tadpole/TextureManager.h>
 #include <toadlet/tadpole/Engine.h>
+#include <toadlet/tadpole/creator/NormalizationTextureCreator.h>
 
 namespace toadlet{
 namespace tadpole{
@@ -140,6 +141,10 @@ bool TextureManager::textureLoad(Texture::ptr texture,TextureFormat *format,tbyt
 	return result;
 }
 
+Texture::ptr TextureManager::createNormalizationTexture(int size){
+	return shared_static_cast<NormalizationTextureCreator>(mNormalizationCreator)->createNormalizationTexture(size);
+}
+
 void TextureManager::contextActivate(RenderDevice *renderDevice){
 	int i;
 	for(i=0;i<mResources.size();++i){
@@ -216,104 +221,6 @@ void TextureManager::postContextReset(peeper::RenderDevice *renderDevice){
 
 void TextureManager::renderTargetDestroyed(RenderTarget *renderTarget){
 	mRenderTargets.remove(renderTarget);
-}
-
-Texture::ptr TextureManager::createNormalization(int size){
-	TextureFormat::ptr format(new TextureFormat(TextureFormat::Dimension_CUBE,TextureFormat::Format_RGB_8,size,size,TextureFormat::CubeSide_MAX,1));
-	tbyte *data=new tbyte[format->getDataSize()];
-
-	Vector3 HALF_VECTOR3(Math::HALF,Math::HALF,Math::HALF);
-
-	float offset = 0.5f;
-	float halfSize = size * 0.5f;
-	Vector3 temp;
-	int pos=0;
-
-	int i,j;
-	for(j=0;j<size;++j){
-		for(i=0;i<size;++i){
-			temp.set(halfSize,(j+offset-halfSize),-(i+offset-halfSize));
-			Math::normalize(temp);
-			Math::madd(temp,Math::HALF,HALF_VECTOR3);
-			data[pos+0]=(tbyte)(temp.x*255);
-			data[pos+1]=(tbyte)(temp.y*255);
-			data[pos+2]=(tbyte)(temp.z*255);
-
-			pos+=3;
-		}
-	}
-
-	for(j=0;j<size;++j){
-		for(i=0;i<size;++i){
-			temp.set(-halfSize,(j+offset-halfSize),(i+offset-halfSize));
-			Math::normalize(temp);
-			Math::madd(temp,Math::HALF,HALF_VECTOR3);
-
-			data[pos+0]=(tbyte)(temp.x*255);
-			data[pos+1]=(tbyte)(temp.y*255);
-			data[pos+2]=(tbyte)(temp.z*255);
-
-			pos+=3;
-		}
-	}
-
-	for(j=0;j<size;++j){
-		for(i=0;i<size;++i){
-			temp.set((i+offset-halfSize),-halfSize,(j+offset-halfSize));
-			Math::normalize(temp);
-			Math::madd(temp,Math::HALF,HALF_VECTOR3);
-
-			data[pos+0]=(tbyte)(temp.x*255);
-			data[pos+1]=(tbyte)(temp.y*255);
-			data[pos+2]=(tbyte)(temp.z*255);
-
-			pos+=3;
-		}
-	}
-
-	for(j=0;j<size;++j){
-		for(i=0;i<size;++i){
-			temp.set((i+offset-halfSize),halfSize,-(j+offset-halfSize));
-			Math::normalize(temp);
-			Math::madd(temp,Math::HALF,HALF_VECTOR3);
-
-			data[pos+0]=(tbyte)(temp.x*255);
-			data[pos+1]=(tbyte)(temp.y*255);
-			data[pos+2]=(tbyte)(temp.z*255);
-
-			pos+=3;
-		}
-	}
-
-	for(j=0;j<size;++j){
-		for(i=0;i<size;++i){
-			temp.set((i+offset-halfSize),(j+offset-halfSize),halfSize);
-			Math::normalize(temp);
-			Math::madd(temp,Math::HALF,HALF_VECTOR3);
-
-			data[pos+0]=(tbyte)(temp.x*255);
-			data[pos+1]=(tbyte)(temp.y*255);
-			data[pos+2]=(tbyte)(temp.z*255);
-
-			pos+=3;
-		}
-	}
-
-	for(j=0;j<size;++j){
-		for(i=0;i<size;++i){
-			temp.set(-(i+offset-halfSize),(j+offset-halfSize),-halfSize);
-			Math::normalize(temp);
-			Math::madd(temp,Math::HALF,HALF_VECTOR3);
-
-			data[pos+0]=(tbyte)(temp.x*255);
-			data[pos+1]=(tbyte)(temp.y*255);
-			data[pos+2]=(tbyte)(temp.z*255);
-
-			pos+=3;
-		}
-	}
-
-	return createTexture(Texture::Usage_BIT_STATIC,format,data);
 }
 
 }
