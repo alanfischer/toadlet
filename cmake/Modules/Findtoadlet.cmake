@@ -5,13 +5,13 @@
 #  TOADLET_INCLUDE_DIR	- path to the toadlet include directory
 #  TOADLET_LIBRARY_DIR	- path to the toadlet library installation dir
 #  TOADLET_LIBRARIES	- sum of all toadlet libraries found for each type: dynamic (no suffix), static (_S), release (no suffix), debug (_D)
+#  TOADLET_DLLS	- WIN32 platforms only - sum of all toadlet dlls found for: release (no suffix), debug (_D)
 #
 # Define each toadlet library individually: dynamic (no suffix), static (_S), release (no suffix), debug (_D)
 # Each library, when at least one of the above is found, sets TOADLET_${LIBNAME}_FOUND = YES
 #  TOADLET_EGG_LIB
 #  TOADLET_FLICK_LIB
 #  TOADLET_FLICK_IOSMOTIONDEVICE_LIB
-#  TOADLET_FLICK_JINPUTDEVICE_LIB
 #  TOADLET_FLICK_WIN32JOYDEVICE_LIB
 #  TOADLET_HOP_LIB
 #  TOADLET_KNOT_LIB
@@ -28,9 +28,27 @@
 #  TOADLET_TADPOLE_LIB
 #  TOADLET_TADPOLE_HOP_LIB
 #  TOADLET_PAD_LIB
+# On Windows platforms, the corresponding DLL's will also be located for each library, including plugins. Debug versions will have (_D).
+#  TOADLET_EGG_DLL
+#  TOADLET_FLICK_DLL
+#  TOADLET_FLICK_IOSMOTIONDEVICE_DLL
+#  TOADLET_FLICK_WIN32JOYDEVICE_DLL
+#  TOADLET_HOP_DLL
+#  TOADLET_KNOT_DLL
+#  TOADLET_PEEPER_DLL
+#  TOADLET_PEEPER_GLRENDERDEVICE_DLL
+#  TOADLET_PEEPER_D3D9RENDERDEVICE_DLL
+#  TOADLET_PEEPER_D3DMRENDERDEVICE_DLL
+#  TOADLET_PEEPER_D3D10RENDERDEVICE_DLL
+#  TOADLET_PEEPER_D3D11RENDERDEVICE_DLL
+#  TOADLET_RIBBIT_DLL
+#  TOADLET_RIBBIT_ALAUIODEVICE_DLL
+#  TOADLET_RIBBIT_MMAUIODEVICE_DLL
+#  TOADLET_RIBBIT_JAUIODEVICE_DLL
+#  TOADLET_TADPOLE_DLL
+#  TOADLET_TADPOLE_HOP_DLL
+#  TOADLET_PAD_DLL
 # Android builds with ndk api level < 9 only
-#  TOADLET_FLICK_JAR
-#  TOADLET_RIBBIT_JAR
 #  TOADLET_PEEPER_JAR
 #  TOADLET_PAD_JAR
 # 
@@ -58,7 +76,6 @@ else (WIN32)
 	set (HEADER_SEARCH_PATHS
 		/usr/include
 		/usr/local/include
-
 	)
 	set (LIBRARY_SEARCH_PATHS
 		/usr/lib 
@@ -88,7 +105,6 @@ set (TOADLET_LIB_BASENAMES
 	toadlet_knot
 	toadlet_hop
 	toadlet_flick_win32joydevice
-	toadlet_flick_jinputdevice
 	toadlet_flick_iosmotiondevice
 	toadlet_flick
 	toadlet_egg
@@ -99,7 +115,7 @@ if (ANDROID)
 	set (LIBRARY_SEARCH_SUFFIXES ${NDK_NAME_ARCH})
 
 	if (${ANDROID_NDK_API_LEVEL} LESS 9)
-		set (TOADLET_JAR_BASENAMES jtoadlet_flick jtoadlet_ribbit jtoadlet_peeper jtoadlet_pad)
+		set (TOADLET_JAR_BASENAMES jtoadlet_peeper jtoadlet_ribbit jtoadlet_pad)
 
 		# Search for and assign the android jar files
 		foreach (TOADLET_JAR ${TOADLET_JAR_BASENAMES})
@@ -199,6 +215,41 @@ foreach (TOADLET_LIB ${TOADLET_LIB_BASENAMES})
 			set (TOADLET_LIBRARIES_SD ${TOADLET_LIBRARIES_SD} ${${TOADLET_LIB_VAR}_LIB_SD})
 		endif (${TOADLET_LIB_VAR}_LIB_SD AND NOT ${TOADLET_LIB_VAR}_LIB_S)
 		
+		if (WIN32)
+			# Setup the find_library suffixes to find dlls
+			set (CMAKE_FIND_LIBRARY_SUFFIXES_DEFAULT ${CMAKE_FIND_LIBRARY_SUFFIXES})
+			set (CMAKE_FIND_LIBRARY_SUFFIXES ${CMAKE_SHARED_MODULE_SUFFIX} ${CMAKE_SHARED_LIBRARY_SUFFIX})
+
+			# Look for release and debug dlls
+			find_library (${TOADLET_LIB_VAR}_DLL NAMES ${TOADLET_LIB} PATHS ${LIBRARY_SEARCH_PATHS} PATH_SUFFIXES ${LIBRARY_SEARCH_SUFFIXES})
+			find_library (${TOADLET_LIB_VAR}_DLL_D NAMES ${TOADLET_LIB}_d PATHS ${LIBRARY_SEARCH_PATHS} PATH_SUFFIXES ${LIBRARY_SEARCH_SUFFIXES})
+			
+			# If both versions are found, set each to their own
+			if (${TOADLET_LIB_VAR}_LIB AND ${TOADLET_LIB_VAR}_LIB_D)
+				set (TOADLET_DLLS ${TOADLET_DLLS} ${${TOADLET_LIB_VAR}_LIB})
+				set (TOADLET_DLL_D ${TOADLET_DLLS_D} ${${TOADLET_LIB_VAR}_LIB_D})
+			endif (${TOADLET_LIB_VAR}_LIB AND ${TOADLET_LIB_VAR}_LIB_D)
+			
+			# If only release dlls are found, assign them to the debug dlls
+			if (${TOADLET_LIB_VAR}_DLL AND NOT ${TOADLET_LIB_VAR}_DLL_D)
+				set (${TOADLET_LIB_VAR}_DLL_D ${${TOADLET_LIB_VAR}_DLL} CACHE FILEPATH "Path to a dll" FORCE)
+				set (TOADLET_DLLS ${TOADLET_DLLS} ${${TOADLET_LIB_VAR}_DLL})
+				set (TOADLET_DLLS_D ${TOADLET_DLLS_D} ${${TOADLET_LIB_VAR}_DLL_D})
+			endif (${TOADLET_LIB_VAR}_DLL AND NOT ${TOADLET_LIB_VAR}_DLL_D)
+			
+			# If only debug dlls are found, assign them to the release dlls
+			if (${TOADLET_LIB_VAR}_DLL_D AND NOT ${TOADLET_LIB_VAR}_DLL)
+				set (${TOADLET_LIB_VAR}_DLL ${${TOADLET_LIB_VAR}_DLL_D} CACHE FILEPATH "Path to a dll" FORCE)
+				set (TOADLET_DLLS ${TOADLET_DLLS} ${${TOADLET_LIB_VAR}_DLL})
+				set (TOADLET_DLLS_D ${TOADLET_DLLS_D} ${${TOADLET_LIB_VAR}_DLL_D})
+			endif (${TOADLET_LIB_VAR}_DLL_D AND NOT ${TOADLET_LIB_VAR}_DLL)
+
+			# Restore the standard find_library suffixes
+			set (CMAKE_FIND_LIBRARY_SUFFIXES ${CMAKE_FIND_LIBRARY_SUFFIXES_DEFAULT})
+			
+			mark_as_advanced (${TOADLET_LIB_VAR}_DLL ${TOADLET_LIB_VAR}_DLL_D)
+		endif (WIN32)
+		
 		set (${TOADLET_LIB_VAR}_FOUND ${${TOADLET_LIB_VAR}_FOUND} CACHE BOOL "Library ${TOADLET_LIB} found flag" FORCE)
 		mark_as_advanced (${TOADLET_LIB_VAR}_LIB ${TOADLET_LIB_VAR}_LIB_D ${TOADLET_LIB_VAR}_LIB_S ${TOADLET_LIB_VAR}_LIB_SD ${TOADLET_LIB_VAR}_FOUND)
 	endif (NOT ${TOADLET_LIB_VAR}_FOUND)
@@ -209,6 +260,10 @@ set (TOADLET_LIBRARIES ${TOADLET_LIBRARIES} CACHE FILEPATH "Toadlet libraries" F
 set (TOADLET_LIBRARIES_S ${TOADLET_LIBRARIES_S} CACHE FILEPATH "Toadlet libraries (static)" FORCE)
 set (TOADLET_LIBRARIES_D ${TOADLET_LIBRARIES_D} CACHE FILEPATH "Toadlet libraries (debug)" FORCE)
 set (TOADLET_LIBRARIES_SD ${TOADLET_LIBRARIES_SD} CACHE FILEPATH "Toadlet libraries (static debug)" FORCE)
+if (WIN32)
+	set (TOADLET_DLLS ${TOADLET_DLLS} CACHE FILEPATH "Toadlet dlls" FORCE)
+	set (TOADLET_DLLS_D ${TOADLET_DLLS_D} CACHE FILEPATH "Toadlet dlls (debug)" FORCE)
+endif (WIN32)
 
 # Consider toadlet found if we have the header file and a library path
 if (TOADLET_INCLUDE_DIR AND TOADLET_LIBRARY_DIR)
