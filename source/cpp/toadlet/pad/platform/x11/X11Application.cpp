@@ -101,10 +101,8 @@ X11Application::~X11Application(){
 	delete x11;
 }
 
-bool X11Application::create(String renderDevice,String audioDevice){
+void X11Application::preEngineCreate(){
 	createWindow();
-
-	return BaseApplication::create(renderDevice,audioDevice);
 }
 
 void X11Application::destroy(){

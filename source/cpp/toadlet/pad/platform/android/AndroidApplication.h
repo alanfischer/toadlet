@@ -43,7 +43,7 @@ public:
 	AndroidApplication();
 	virtual ~AndroidApplication();
 
-	bool create(String renderDevice,String audioDevice,String motionDevice,String joyDevice);
+	bool create(String renderDevice,String audioDevice);
 	void destroy();
 
 	RenderTarget *getRootRenderTarget(){return mRenderTarget;}
@@ -108,8 +108,7 @@ public:
 	Engine *getEngine() const{return mEngine;}
 	RenderDevice *getRenderDevice() const{return mRenderDevice;}
 	AudioDevice *getAudioDevice() const{return mAudioDevice;}
-	MotionDevice *getMotionDevice() const{return NULL;}
-	JoyDevice *getJoyDevice() const{return NULL;}
+	InputDevice *getInputDevice(int i) const{return NULL;}
 
 	void setNativeActivity(ANativeActivity *activity);
 
