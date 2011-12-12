@@ -48,7 +48,6 @@ JInputDevice::JInputDevice(JNIEnv *jenv,jobject jobj){
 		startID=env->GetMethodID(deviceClass,"start","()Z");
 		updateID=env->GetMethodID(deviceClass,"update","(I)V");
 		stopID=env->GetMethodID(deviceClass,"stop","()V");
-		isRunningID=env->GetMethodID(deviceClass,"isRunning","()Z");
 
 		setListenerID=env->GetMethodID(deviceClass,"setListener","(Lus/toadlet/flick/InputDeviceListener;)V");
 		setSampleTimeID=env->GetMethodID(deviceClass,"setSampleTime","(I)V");
@@ -99,10 +98,6 @@ void JInputDevice::update(int dt){
 
 void JInputDevice::stop(){
 	env->CallVoidMethod(obj,stopID);
-}
-
-bool JInputDevice::isRunning(){
-	return env->CallBooleanMethod(obj,isRunningID);
 }
 
 void JInputDevice::setListener(InputDeviceListener *listener){
