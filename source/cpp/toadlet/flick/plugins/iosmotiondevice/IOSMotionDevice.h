@@ -61,7 +61,6 @@ public:
 	bool start();
 	void update(int dt){}
 	void stop();
-	bool isRunning(){return mRunning;}
 
 	void setListener(MotionDeviceListener *listener){mListener=listener;}
 	void setSampleTime(int dt);

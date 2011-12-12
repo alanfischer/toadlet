@@ -46,7 +46,6 @@ public:
 	virtual bool start();
 	virtual void update(int dt);
 	virtual void stop();
-	virtual bool isRunning();
 
 	virtual void setListener(InputDeviceListener *listener){mListener=listener;}
 	virtual void setSampleTime(int dt);

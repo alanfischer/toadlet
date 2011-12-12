@@ -37,7 +37,6 @@ public interface InputDevice{
 	public boolean start();
 	public void update(int dt);
 	public void stop();
-	public boolean isRunning();
 
 	public void setListener(InputDeviceListener listener);
 	public void setSampleTime(int dt);
