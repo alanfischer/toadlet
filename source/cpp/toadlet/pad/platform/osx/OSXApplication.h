@@ -38,7 +38,8 @@ public:
 	virtual ~OSXApplication();
 
 	virtual void setWindow(void *window);
-	virtual bool create(String renderDevice,String audioDevice,String motionDevice,String joyDevice);
+	virtual void preEngineCreate();
+	virtual void postEngineCreate();
 	virtual void destroy();
 	
 	virtual void start();

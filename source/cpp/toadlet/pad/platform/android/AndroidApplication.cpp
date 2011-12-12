@@ -78,7 +78,7 @@ AndroidApplication::AndroidApplication():
 AndroidApplication::~AndroidApplication(){
 }
 
-bool AndroidApplication::create(String renderDevice,String audioDevice,String motionDevice,String joyDevice){
+bool AndroidApplication::create(String renderDevice,String audioDevice){
 	mConfig=AConfiguration_new();
 
 	mEngine=new Engine(true);
@@ -247,7 +247,7 @@ void AndroidApplication::setNativeActivity(ANativeActivity *activity){
 
 	mActivity=activity;
 
-	create("","","","");
+	create("","");
 }
 
 void AndroidApplication::run(){

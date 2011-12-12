@@ -60,7 +60,7 @@ using namespace toadlet::pad;
 	extern "C" AudioDevice *new_ALAudioDevice();
 #endif
 #if defined(TOADLET_PLATFORM_IOS)
-	extern "C" MotionDevice *new_IOSMotionDevice();
+	extern "C" InputDevice *new_IOSMotionDevice();
 #endif
 
 @interface ApplicationView:
@@ -296,11 +296,6 @@ OSXApplication::OSXApplication():
 		mAudioDevicePreferences.add("al");
 	#endif
 	
-	#if defined(TOADLET_PLATFORM_IOS)
-		mMotionDevicePlugins.add("ios",MotionDevicePlugin(new_IOSMotionDevice));
-		mMotionDevicePreferences.add("ios");
-	#endif
-
 	// Fade in buffers over 100 ms, reduces popping
 	int options[]={1,100,0};
 	setAudioDeviceOptions(options,3);
@@ -321,7 +316,7 @@ void OSXApplication::setWindow(void *window){
 	[(NSObject*)mWindow retain];
 }
 
-bool OSXApplication::create(String renderDevice,String audioDevice,String motionDevice,String joyDevice){
+bool OSXApplication::preEngineCreate(){
 	if(mWindow==nil){
 		// This programatic Window creation isn't spectacular, but it's enough to run examples.
 		mPool=[[NSAutoreleasePool alloc] init];
@@ -372,9 +367,20 @@ bool OSXApplication::create(String renderDevice,String audioDevice,String motion
 		// Need to call the initial resized on osx
 		[(ApplicationView*)mView windowResized:nil];
 	#endif
+}
 
-	bool result=BaseApplication::create(renderDevice,audioDevice,motionDevice,joyDevice);
-
+void OSXApplication::postEngineCreate(){
+#if defined(TOADLET_PLATFORM_IOS)
+	InputDevice *motionDevice=new_IOSMotionDevice();
+	if(motionDevice->create()==false){
+		delete motionDevice;
+		motionDevice=NULL;
+	}
+	else{
+		mInputDevices[motionDevice->getType()]=motionDevice;
+	}
+#endif
+	
 	mBundleArchive=OSXBundleArchive::ptr(new OSXBundleArchive());
 	shared_static_cast<OSXBundleArchive>(mBundleArchive)->open([NSBundle mainBundle]);
 	mEngine->getArchiveManager()->manage(shared_static_cast<Archive>(mBundleArchive));
