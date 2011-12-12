@@ -39,7 +39,7 @@ public:
 	X11Application();
 	virtual ~X11Application();
 
-	bool create(String renderDevice,String audioDevice,String motionDevice,String joyDevice);
+	bool create(String renderDevice,String audioDevice);
 	void destroy();
 
 	void start();

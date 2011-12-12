@@ -101,10 +101,10 @@ X11Application::~X11Application(){
 	delete x11;
 }
 
-bool X11Application::create(String renderDevice,String audioDevice,String motionDevice,String joyDevice){
+bool X11Application::create(String renderDevice,String audioDevice){
 	createWindow();
 
-	return BaseApplication::create(renderDevice,audioDevice,motionDevice,joyDevice);
+	return BaseApplication::create(renderDevice,audioDevice);
 }
 
 void X11Application::destroy(){
