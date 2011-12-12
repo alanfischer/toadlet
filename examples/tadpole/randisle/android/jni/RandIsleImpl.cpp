@@ -42,6 +42,6 @@ extern "C" JNIEXPORT jobject JNICALL Java_us_toadlet_randisle_RandIsle_createApp
 }
 
 extern "C" JNIEXPORT void JNICALL Java_us_toadlet_randisle_RandIsle_destroyApplet(JNIEnv *env,jobject obj,jobject applet){
-	delete applet;
+//	delete applet;
 }
 #endif

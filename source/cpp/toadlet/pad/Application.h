@@ -31,8 +31,7 @@
 #include <toadlet/peeper/RenderDevice.h>
 #include <toadlet/peeper/WindowRenderTargetFormat.h>
 #include <toadlet/ribbit/AudioDevice.h>
-#include <toadlet/flick/MotionDevice.h>
-#include <toadlet/flick/JoyDevice.h>
+#include <toadlet/flick/InputDevice.h>
 #include <toadlet/tadpole/Engine.h>
 #include <toadlet/pad/Types.h>
 #include <toadlet/pad/Applet.h>
@@ -75,7 +74,7 @@ public:
 
 	virtual ~Application(){}
 
-	virtual bool create(String renderDevice,String audioDevice,String motionDevice=(char*)NULL,String joyDevice=(char*)NULL)=0;
+	virtual bool create(String renderDevice,String audioDevice)=0;
 	virtual void destroy()=0;
 
 	virtual void start()=0;
@@ -109,8 +108,7 @@ public:
 	virtual Engine *getEngine() const=0;
 	virtual RenderDevice *getRenderDevice() const=0;
 	virtual AudioDevice *getAudioDevice() const=0;
-	virtual MotionDevice *getMotionDevice() const=0;
-	virtual JoyDevice *getJoyDevice() const=0;
+	virtual InputDevice *getInputDevice(InputDevice::InputType type) const=0;
 };
 
 }

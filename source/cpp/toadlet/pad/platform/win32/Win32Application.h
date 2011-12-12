@@ -39,7 +39,8 @@ public:
 	Win32Application();
 	virtual ~Win32Application();
 
-	bool create(String renderDevice,String audioDevice,String motionDevice,String joyDevice);
+	void preEngineCreate();
+	void postEngineCreate();
 	void destroy();
 
 	void start();

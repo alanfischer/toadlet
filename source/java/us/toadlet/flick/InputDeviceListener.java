@@ -23,30 +23,8 @@
  *
  ********** Copyright header - do not remove **********/
 
-#ifndef TOADLET_FLICK_MOTIONDATA_H
-#define TOADLET_FLICK_MOTIONDATA_H
+package us.toadlet.flick;
 
-#include <toadlet/flick/Types.h>
-
-namespace toadlet{
-namespace flick{
-
-class MotionData{
-public:
-	MotionData():time(0){}
-
-	void set(const MotionData &data){
-		time=data.time;
-		acceleration.set(data.acceleration);
-		velocity.set(data.velocity);
-	}
-
-	uint64 time;
-	Vector3 acceleration;
-	Vector3 velocity;
-};
-
+public interface InputDeviceListener{
+	public void inputDetected(InputData data);
 }
-}
-
-#endif

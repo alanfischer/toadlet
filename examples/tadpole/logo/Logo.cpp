@@ -1,8 +1,8 @@
 #include "Logo.h"
 
-class GravityFollower:public NodeListener,MotionDeviceListener{
+class GravityFollower:public NodeListener,InputDeviceListener{
 public:
-	GravityFollower(MotionDevice *device){
+	GravityFollower(InputDevice *device){
 		mDevice=device;
 		mDevice->setListener(this);
 	}
@@ -17,17 +17,16 @@ public:
 
 		mMotionMutex.lock();
 
+			const Vector4 &accel=mMotionData.values[InputData::Semantic_MOTION_ACCELERATION];
 			Vector3 up;
-			// When the phone is vertical, we're at 0,-1,0
-			// When the phone is horizontal, we're at 1,0,0
-			// Grab just the x,y component of this, and move it to x,z, since we are looking along the y.
-			// Store the y component to use for calculating our eye height
-			up.set(mMotionData.acceleration);
+			// When the phone is vertical, we're at 0,1,0
+			// When the phone is horizontal, we're at 0,0,1
+			// Store the z component to use for calculating our eye height
+			up.set(-accel.x,-accel.y,-accel.z);
 			scalar z=up.z;
-			up.z=up.y;
-			up.y=0;
+			up.z=0;
 			if(Math::normalizeCarefully(up,0)){
-				Vector3 eye(0,-z-Math::ONE,-z);
+				Vector3 eye(0,z-Math::ONE,z);
 				Math::normalize(eye);
 				Math::mul(eye,Math::fromInt(150));
 
@@ -48,15 +47,17 @@ public:
 		node->setRotate(rotate);
 	}
 
-	void motionDetected(const MotionDevice::MotionData &motionData){
-		mMotionMutex.lock();
-		mMotionData.set(motionData);
-		mMotionMutex.unlock();
+	void inputDetected(const InputData &data){
+		if(data.type==InputDevice::InputType_MOTION){
+			mMotionMutex.lock();
+			mMotionData.set(data);
+			mMotionMutex.unlock();
+		}
 	}
 
-	MotionDevice *mDevice;
+	InputDevice *mDevice;
 	Mutex mMotionMutex;
-	MotionDevice::MotionData mMotionData;
+	InputData mMotionData;
 	Vector3 mTranslate,mLastTranslate;
 	Quaternion mRotate,mLastRotate;
 };
@@ -101,7 +102,7 @@ void Logo::create(){
 
 // Only looks good if running on device, in simulator its always a top down view
 #if 1
-	MotionDevice *motionDevice=app->getMotionDevice();
+	InputDevice *motionDevice=app->getInputDevice(InputDevice::InputType_MOTION);
 	if(motionDevice!=NULL){
 		cameraNode->addNodeListener(NodeListener::ptr(new GravityFollower(motionDevice)));
 		motionDevice->start();

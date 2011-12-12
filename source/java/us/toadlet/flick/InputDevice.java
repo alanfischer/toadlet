@@ -23,32 +23,23 @@
  *
  ********** Copyright header - do not remove **********/
 
-#ifndef TOADLET_FLICK_JOYDEVICE_H
-#define TOADLET_FLICK_JOYDEVICE_H
+package us.toadlet.flick;
 
-#include <toadlet/flick/Types.h>
+public interface InputDevice{
+	static final int InputType_JOY=0;
+	static final int InputType_MOTION=1;
+	static final int InputType_MAX=2;
 
-namespace toadlet{
-namespace flick{
+	public boolean create();
+	public void destroy();
 
-class JoyDeviceListener;
+	public int getType();
+	public boolean start();
+	public void update(int dt);
+	public void stop();
+	public boolean isRunning();
 
-class JoyDevice{
-public:
-	virtual ~JoyDevice(){}
-
-	virtual bool create()=0;
-	virtual void destroy()=0;
-
-	virtual bool start()=0;
-	virtual void update(int dt)=0;
-	virtual bool stop()=0;
-	virtual bool isRunning()=0;
-
-	virtual void setListener(JoyDeviceListener *listener)=0;
-};
-
+	public void setListener(InputDeviceListener listener);
+	public void setSampleTime(int dt);
+	public void setAlpha(float alpha);
 }
-}
-
-#endif

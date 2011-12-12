@@ -23,29 +23,36 @@
  *
  ********** Copyright header - do not remove **********/
 
-#ifndef TOADLET_FLICK_MOTIONDEVICE_H
-#define TOADLET_FLICK_MOTIONDEVICE_H
+#ifndef TOADLET_FLICK_INPUTDEVICE_H
+#define TOADLET_FLICK_INPUTDEVICE_H
 
 #include <toadlet/flick/Types.h>
 
 namespace toadlet{
 namespace flick{
 
-class MotionDeviceListener;
+class InputDeviceListener;
 
-class MotionDevice{
+class InputDevice{
 public:
-	virtual ~MotionDevice(){}
+	enum InputType{
+		InputType_JOY=0,
+		InputType_MOTION=1,
+		InputType_MAX,
+	};
+
+	virtual ~InputDevice(){}
 
 	virtual bool create()=0;
 	virtual void destroy()=0;
 
+	virtual InputType getType()=0;
 	virtual bool start()=0;
 	virtual void update(int dt)=0;
 	virtual void stop()=0;
 	virtual bool isRunning()=0;
-
-	virtual void setListener(MotionDeviceListener *listener)=0;
+	
+	virtual void setListener(InputDeviceListener *listener)=0;
 	virtual void setSampleTime(int dt)=0;
 	virtual void setAlpha(scalar alpha)=0;
 };

@@ -202,12 +202,10 @@ public abstract class AndroidApplication extends Activity implements RenderTarge
 			}
 			notifyEngineAudioDevice(mEngine);
 		}
-		
-		if(mMotionDevice==null){
-			mMotionDevice=makeMotionDevice();
-			if(mMotionDevice!=null && mMotionDevice.create()==false){
-				mMotionDevice=null;
-			}
+
+		InputDevice motionDevice=new AndroidMotionDevice(this);
+		if(motionDevice.create()){
+			mInputDevices[motionDevice.getType()]=motionDevice;
 		}
 
 		if(mApplet==null){
@@ -245,10 +243,12 @@ public abstract class AndroidApplication extends Activity implements RenderTarge
 			mAudioDevice=null;
 		}
 
-		if(mMotionDevice!=null){
-			mMotionDevice.destroy();
-			deleteMotionDevice(mMotionDevice);
-			mMotionDevice=null;
+		int i;
+		for(i=0;i<InputDevice.InputType_MAX;++i){
+			if(mInputDevices[i]!=null){
+				mInputDevices[i].destroy();
+				mInputDevices[i]=null;
+			}
 		}
 		
 		destroyNativeApplication();
@@ -464,7 +464,7 @@ public abstract class AndroidApplication extends Activity implements RenderTarge
 	public Engine getEngine(){return mEngine;}
 	public RenderDevice getRenderDevice(){return mRenderDevice;}
 	public AudioDevice getAudioDevice(){return mAudioDevice;}
-	public MotionDevice getMotionDevice(){return mMotionDevice;}
+	public InputDevice getInputDevice(int i){return mInputDevices[i];}
 	
 	public void resized(int width,int height)		{if(mApplet!=null)mApplet.resized(width,height);}
 	public void focusGained()						{if(mApplet!=null)mApplet.focusGained();}
@@ -565,9 +565,6 @@ public abstract class AndroidApplication extends Activity implements RenderTarge
 	protected AudioDevice makeAudioDevice(){return new ATAudioDevice();}
 	protected void deleteAudioDevice(AudioDevice device){}
 
-	protected MotionDevice makeMotionDevice(){return new AndroidMotionDevice(this);}
-	protected void deleteMotionDevice(MotionDevice device){}
-	
 	protected native void createNativeApplication();
 	protected native void destroyNativeApplication();
 	protected native Engine makeEngine();
@@ -592,7 +589,7 @@ public abstract class AndroidApplication extends Activity implements RenderTarge
 	protected RenderTarget mRenderTarget;
 	protected RenderDevice mRenderDevice;
 	protected AudioDevice mAudioDevice;
-	protected MotionDevice mMotionDevice;
+	protected InputDevice[] mInputDevices=new InputDevice[InputDevice.InputType_MAX];
 	protected int mNativeHandle;
 	
 	protected SurfaceHolder mNotifySurfaceCreated;

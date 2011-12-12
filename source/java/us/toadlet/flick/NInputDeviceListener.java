@@ -25,16 +25,12 @@
 
 package us.toadlet.flick;
 
-public interface MotionDevice{
-	public boolean create();
-	public void destroy();
+public class NInputDeviceListener implements InputDeviceListener{
+	public NInputDeviceListener(int nativeHandle){
+		mNativeHandle=nativeHandle;
+	}
 
-	public boolean start();
-	public void update(int dt);
-	public void stop();
-	public boolean isRunning();
+	public native void inputDetected(InputData data);
 
-	public void setListener(MotionDeviceListener listener);
-	public void setSampleTime(int dt);
-	public void setAlpha(float alpha);
+	private int mNativeHandle;
 }

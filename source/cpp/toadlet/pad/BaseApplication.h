@@ -40,8 +40,8 @@ public:
 	BaseApplication();
 	virtual ~BaseApplication(){}
 
-	virtual bool defaultCreate(){return create("","","","");}
-	virtual bool create(String renderDevice,String audioDevice,String motionDevice,String joyDevice);
+	virtual bool defaultCreate(){return create("","");}
+	virtual bool create(String renderDevice,String audioDevice);
 	virtual void destroy();
 
 	virtual RenderTarget *getRootRenderTarget(){return mRenderTarget;}
@@ -75,8 +75,7 @@ public:
 	virtual Engine *getEngine() const{return mEngine;}
 	virtual RenderDevice *getRenderDevice() const{return mRenderDevice;}
 	virtual AudioDevice *getAudioDevice() const{return mAudioDevice;}
-	virtual MotionDevice *getMotionDevice() const{return mMotionDevice;}
-	virtual JoyDevice *getJoyDevice() const{return mJoyDevice;}
+	virtual InputDevice *getInputDevice(InputDevice::InputType type) const{return mInputDevices[type];}
 
 	virtual String getKeyName(int key){Map<int,String>::iterator it=mKeyToName.find(key);return it!=mKeyToName.end()?it->second:(char*)NULL;}
 	virtual int getKeyValue(const String &name){Map<String,int>::iterator it=mNameToKey.find(name);return it!=mNameToKey.end()?it->second:0;}
@@ -114,23 +113,8 @@ protected:
 		AudioDevice *(*createAudioDevice)();
 	};
 
-	class MotionDevicePlugin{
-	public:
-		MotionDevicePlugin(
-			MotionDevice *(*motionDevice)()=NULL
-		):createMotionDevice(motionDevice){}
-
-		MotionDevice *(*createMotionDevice)();
-	};
-
-	class JoyDevicePlugin{
-	public:
-		JoyDevicePlugin(
-			JoyDevice *(*joyDevice)()=NULL
-		):createJoyDevice(joyDevice){}
-
-		JoyDevice *(*createJoyDevice)();
-	};
+	virtual void preEngineCreate(){}
+	virtual void postEngineCreate(){}
 
 	virtual RenderTarget *makeRenderTarget(const String &plugin);
 	virtual RenderDevice *makeRenderDevice(const String &plugin);
@@ -140,14 +124,6 @@ protected:
 	virtual AudioDevice *makeAudioDevice(const String &plugin);
 	virtual bool createAudioDevice(const String &plugin);
 	virtual bool destroyAudioDevice();
-
-	virtual MotionDevice *makeMotionDevice(const String &plugin);
-	virtual bool createMotionDevice(const String &plugin);
-	virtual bool destroyMotionDevice();
-
-	virtual JoyDevice *makeJoyDevice(const String &plugin);
-	virtual bool createJoyDevice(const String &plugin);
-	virtual bool destroyJoyDevice();
 
 	bool mBackable;
 	WindowRenderTargetFormat::ptr mFormat;
@@ -161,10 +137,6 @@ protected:
 	Map<String,AudioDevicePlugin> mAudioDevicePlugins;
 	Collection<String> mAudioDevicePreferences;
 	int *mAudioDeviceOptions;
-	Map<String,MotionDevicePlugin> mMotionDevicePlugins;
-	Collection<String> mMotionDevicePreferences;
-	Map<String,JoyDevicePlugin> mJoyDevicePlugins;
-	Collection<String> mJoyDevicePreferences;
 
 	Map<String,int> mNameToKey;
 	Map<int,String> mKeyToName;
@@ -173,8 +145,7 @@ protected:
 	RenderTarget *mRenderTarget;
 	RenderDevice *mRenderDevice;
 	AudioDevice *mAudioDevice;
-	MotionDevice *mMotionDevice;
-	JoyDevice *mJoyDevice;
+	Collection<InputDevice*> mInputDevices;
 };
 
 }

@@ -26,39 +26,40 @@
 #ifndef TOADLET_FLICK_FILTEREDMOTIONDEVICE_H
 #define TOADLET_FLICK_FILTEREDMOTIONDEVICE_H
 
-#include <toadlet/flick/MotionDevice.h>
-#include <toadlet/flick/MotionDeviceListener.h>
+#include <toadlet/flick/InputDevice.h>
+#include <toadlet/flick/InputDeviceListener.h>
 
 namespace toadlet{
 namespace flick{
 
-class TOADLET_API FilteredMotionDevice:public MotionDevice,public MotionDeviceListener{
+class TOADLET_API FilteredMotionDevice:public InputDevice,public InputDeviceListener{
 public:
 	FilteredMotionDevice();
 	virtual ~FilteredMotionDevice();
 
-	virtual void setMotionDevice(MotionDevice *device);
+	virtual void setMotionDevice(InputDevice *device);
 	
 	virtual bool create();
 	virtual void destroy();
 
+	virtual InputType getType();
 	virtual bool start();
 	virtual void update(int dt);
 	virtual void stop();
 	virtual bool isRunning();
 
-	virtual void setListener(MotionDeviceListener *listener){mListener=listener;}
+	virtual void setListener(InputDeviceListener *listener){mListener=listener;}
 	virtual void setSampleTime(int dt);
 	virtual void setAlpha(scalar alpha){mAlpha=alpha;}
 
-	virtual void motionDetected(const MotionData &data);
+	virtual void inputDetected(const InputData &data);
 	
 protected:
-	MotionDeviceListener *mListener;
-	MotionDevice *mDevice;
+	InputDeviceListener *mListener;
+	InputDevice *mDevice;
 	scalar mAlpha;
-	MotionData mMotionData;
-	Vector3 mRawVelocity;
+	InputData mMotionData;
+	Vector4 mRawVelocity;
 };
 
 }

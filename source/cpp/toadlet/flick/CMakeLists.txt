@@ -13,10 +13,9 @@ set (FLICK_SRC
 # Header files for flick
 set (FLICK_HEADERS
 	FilteredMotionDevice.h
-	JoyDevice.h
-	JoyDeviceListener.h
-	MotionDevice.h
-	MotionDeviceListener.h
+	InputData.h
+	InputDevice.h
+	InputDeviceListener.h
 	Types.h
 	Version.h
 )
@@ -47,7 +46,7 @@ install (TARGETS toadlet_flick_s DESTINATION ${LIB_INSTALL_DIR})
 if (TOADLET_PLATFORM_WIN32)
 	add_subdirectory (plugins/win32joydevice)
 elseif (TOADLET_PLATFORM_ANDROID)
-	add_subdirectory (plugins/jmotiondevice)
+	add_subdirectory (plugins/jinputdevice)
 elseif (TOADLET_PLATFORM_IOS)
 	add_subdirectory (plugins/iosmotiondevice)
 endif (TOADLET_PLATFORM_WIN32)

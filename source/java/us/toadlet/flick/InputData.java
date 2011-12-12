@@ -25,14 +25,44 @@
 
 package us.toadlet.flick;
 
-public class MotionData{
-	void set(MotionData data){
+public class InputData{
+	public static final int Semantic_JOY_BUTTON_PRESSED=0;
+	public static final int Semantic_JOY_BUTTON_RELEASED=1;
+	public static final int Semantic_JOY_DIRECTION=2;
+	public static final int Semantic_JOY_ROTATION=3;
+	public static final int Semantic_MAX_JOY=4;
+	
+	public static final int Semantic_MOTION_ACCELERATION=0;
+	public static final int Semantic_MOTION_VELOCITY=1;
+	public static final int Semantic_MAX_MOTION=2;
+
+	public InputData(int type1,int time1,int size){
+		type=type1;
+		time=time1;
+		resize(size);
+	}
+	
+	public void set(InputData data){
+		type=data.type;
 		time=data.time;
-		System.arraycopy(data.acceleration,0,acceleration,0,3);
-		System.arraycopy(data.velocity,0,velocity,0,3);
+		valid=data.valid;
+		resize(data.values.length);
+		int i;
+		for(i=0;i<values.length;++i){
+			System.arraycopy(data.values[i],0,values[i],0,4);
+		}
 	}
 
-	long time;
-	float[] acceleration=new float[3];
-	float[] velocity=new float[3];
+	public void resize(int size){
+		values=new float[size][];
+		int i;
+		for(i=0;i<size;++i){
+			values[i]=new float[4];
+		}
+	}
+
+	public int type;
+	public long time;
+	public int valid;
+	public float[][] values;
 };
