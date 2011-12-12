@@ -35,7 +35,7 @@ using namespace toadlet::tadpole;
 using namespace toadlet::pad;
 
 TOADLET_C_API AudioDevice* new_JAudioDevice(JNIEnv *env,jobject obj);
-TOADLET_C_API MotionDevice* new_JMotionDevice(JNIEnv *env,jobject obj);
+TOADLET_C_API InputDevice* new_JInputDevice(JNIEnv *env,jobject obj);
 
 extern jmethodID getNativeHandleEngineID;
 extern jmethodID getNativeHandleRenderDeviceID;
@@ -74,7 +74,7 @@ JApplication::JApplication(JNIEnv *jenv,jobject jobj):
 		getEngineID=env->GetMethodID(appClass,"getEngine","()Lus/toadlet/pad/Engine;");
 		getRenderDeviceID=env->GetMethodID(appClass,"getRenderDevice","()Lus/toadlet/pad/RenderDevice;");
 		getAudioDeviceID=env->GetMethodID(appClass,"getAudioDevice","()Lus/toadlet/ribbit/AudioDevice;");
-		getMotionDeviceID=env->GetMethodID(appClass,"getMotionDevice","()Lus/toadlet/flick/MotionDevice;");
+		getInputDeviceID=env->GetMethodID(appClass,"getInputDevice","(I)Lus/toadlet/flick/InputDevice;");
 
 		setNativeHandleID=env->GetMethodID(appClass,"setNativeHandle","(I)V");
 		getNativeHandleID=env->GetMethodID(appClass,"getNativeHandle","()I");
@@ -110,7 +110,7 @@ JApplication::~JApplication(){
 	env=NULL;
 }
 
-bool JApplication::create(String renderDevice,String audioDevice,String motionDevice,String joyDevice){
+bool JApplication::create(String renderDevice,String audioDevice){
 	return env->CallBooleanMethod(obj,createID);
 }
 
@@ -234,26 +234,26 @@ AudioDevice *JApplication::getAudioDevice() const{
 	return mAudioDevice;
 }
 
-MotionDevice *JApplication::getMotionDevice() const{
-	jobject deviceObj=env->CallObjectMethod(obj,getMotionDeviceID);
+InputDevice *JApplication::getInputDevice(InputDevice::InputType i) const{
+	jobject deviceObj=env->CallObjectMethod(obj,getInputDeviceID,i);
 
-	if(mMotionDevice==NULL || mLastMotionDeviceObj!=deviceObj){
+	if(mInputDevices[i]==NULL || mLastInputDeviceObjs[i]!=deviceObj){
 		//if(jobject is NAudioDevice){
 		//	mAudioDevice=deviceObj!=NULL?(AudioDevice*)env->CallIntMethod(deviceObj,getNativeHandleAudioDeviceID):NULL;
 		//}
 		//else{
-			mMotionDevice=deviceObj!=NULL?new_JMotionDevice(env,deviceObj):NULL;
+			mInputDevices[i]=deviceObj!=NULL?new_JInputDevice(env,deviceObj):NULL;
 		//
 
-		if(mLastMotionDeviceObj!=NULL){
-			env->DeleteGlobalRef(mLastMotionDeviceObj);
+		if(mLastInputDeviceObjs[i]!=NULL){
+			env->DeleteGlobalRef(mLastInputDeviceObjs[i]);
 		}
-		mLastMotionDeviceObj=env->NewGlobalRef(deviceObj);
+		mLastInputDeviceObjs[i]=env->NewGlobalRef(deviceObj);
 
 		env->DeleteLocalRef(deviceObj);
 	}
 
-	return mMotionDevice;
+	return mInputDevices[i];
 }
 
 }

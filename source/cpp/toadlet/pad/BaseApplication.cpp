@@ -87,9 +87,8 @@ BaseApplication::BaseApplication():
 	mEngine(NULL),
 	mRenderTarget(NULL),
 	mRenderDevice(NULL),
-	mAudioDevice(NULL),
-	mMotionDevice(NULL),
-	mJoyDevice(NULL)
+	mAudioDevice(NULL)
+	//mInputDevices
 {
 	mapKeyNames(mKeyToName,mNameToKey);
 	
@@ -103,10 +102,14 @@ BaseApplication::BaseApplication():
 	#else
 		mFormat->debug=false;
 	#endif
+
+	mInputDevices.resize(InputDevice::InputType_MAX,NULL);
 }
 
-bool BaseApplication::create(String renderDevice,String audioDevice,String motionDevice,String joyDevice){
+bool BaseApplication::create(String renderDevice,String audioDevice){
 	int i;
+
+	preEngineCreate();
 
 	mEngine=new Engine(mBackable);
 
@@ -132,28 +135,10 @@ bool BaseApplication::create(String renderDevice,String audioDevice,String motio
 			}
 		}
 	}
-	if(motionDevice!="null"){
-		if(motionDevice!=(char*)NULL || mMotionDevicePlugins.size()==0){
-			createMotionDevice(motionDevice);
-		}
-		else{
-			for(i=0;i<mMotionDevicePreferences.size();++i){
-				if(createMotionDevice(mMotionDevicePreferences[i])) break;
-			}
-		}
-	}
-	if(joyDevice!="null"){
-		if(joyDevice!=(char*)NULL || mJoyDevicePlugins.size()==0){
-			createJoyDevice(joyDevice);
-		}
-		else{
-			for(i=0;i<mJoyDevicePreferences.size();++i){
-				if(createJoyDevice(mJoyDevicePreferences[i])) break;
-			}
-		}
-	}
 
 	mEngine->installHandlers();
+
+	postEngineCreate();
 
 	if(mApplet!=NULL){
 		mApplet->create();
@@ -178,8 +163,15 @@ void BaseApplication::destroy(){
 
 	destroyRenderDeviceAndContext();
 	destroyAudioDevice();
-	destroyMotionDevice();
-	destroyJoyDevice();
+
+	int i;
+	for(i=0;i<mInputDevices.size();++i){
+		if(mInputDevices[i]!=NULL){
+			mInputDevices[i]->destroy();
+			delete mInputDevices[i];
+			mInputDevices[i]=NULL;
+		}
+	}
 
 	if(mEngine!=NULL){
 		delete mEngine;
@@ -341,104 +333,6 @@ bool BaseApplication::destroyAudioDevice(){
 		mAudioDevice->destroy();
 		delete mAudioDevice;
 		mAudioDevice=NULL;
-	}
-	return true;
-}
-
-MotionDevice *BaseApplication::makeMotionDevice(const String &plugin){
-	MotionDevice *motionDevice=NULL;
-	Map<String,MotionDevicePlugin>::iterator it=mMotionDevicePlugins.find(plugin);
-	if(it!=mMotionDevicePlugins.end()){
-		TOADLET_TRY
-			motionDevice=it->second.createMotionDevice();
-		TOADLET_CATCH(const Exception &){motionDevice=NULL;}
-	}
-	return motionDevice;
-}
-
-bool BaseApplication::createMotionDevice(const String &plugin){
-	Logger::debug(Categories::TOADLET_PAD,
-		"BaseApplication: creating MotionDevice:"+plugin);
-
-	bool result=false;
-	mMotionDevice=makeMotionDevice(plugin);
-	if(mMotionDevice!=NULL){
-		TOADLET_TRY
-			result=mMotionDevice->create();
-		TOADLET_CATCH(const Exception &){result=false;}
-		if(result==false){
-			delete mMotionDevice;
-			mMotionDevice=NULL;
-		}
-	}
-
-	if(result==false){
-		Logger::error(Categories::TOADLET_PAD,
-			"error starting MotionDevice");
-		return false;
-	}
-	else if(mMotionDevice==NULL){
-		Logger::error(Categories::TOADLET_PAD,
-			"error creating MotionDevice");
-		return false;
-	}
-	return true;
-}
-
-bool BaseApplication::destroyMotionDevice(){
-	if(mMotionDevice!=NULL){
-		mMotionDevice->destroy();
-		delete mMotionDevice;
-		mMotionDevice=NULL;
-	}
-	return true;
-}
-
-JoyDevice *BaseApplication::makeJoyDevice(const String &plugin){
-	JoyDevice *joyDevice=NULL;
-	Map<String,JoyDevicePlugin>::iterator it=mJoyDevicePlugins.find(plugin);
-	if(it!=mJoyDevicePlugins.end()){
-		TOADLET_TRY
-			joyDevice=it->second.createJoyDevice();
-		TOADLET_CATCH(const Exception &){joyDevice=NULL;}
-	}
-	return joyDevice;
-}
-
-bool BaseApplication::createJoyDevice(const String &plugin){
-	Logger::debug(Categories::TOADLET_PAD,
-		"BaseApplication: creating JoyDevice:"+plugin);
-
-	bool result=false;
-	mJoyDevice=makeJoyDevice(plugin);
-	if(mJoyDevice!=NULL){
-		TOADLET_TRY
-			result=mJoyDevice->create();
-		TOADLET_CATCH(const Exception &){result=false;}
-		if(result==false){
-			delete mJoyDevice;
-			mJoyDevice=NULL;
-		}
-	}
-
-	if(result==false){
-		Logger::error(Categories::TOADLET_PAD,
-			"error starting JoyDevice");
-		return false;
-	}
-	else if(mJoyDevice==NULL){
-		Logger::error(Categories::TOADLET_PAD,
-			"error creating JoyDevice");
-		return false;
-	}
-	return true;
-}
-
-bool BaseApplication::destroyJoyDevice(){
-	if(mJoyDevice!=NULL){
-		mJoyDevice->destroy();
-		delete mJoyDevice;
-		mJoyDevice=NULL;
 	}
 	return true;
 }

@@ -26,7 +26,7 @@
 #ifndef TOADLET_FLICK_WIN32JOYDEVICE_H
 #define TOADLET_FLICK_WIN32JOYDEVICE_H
 
-#include <toadlet/flick/JoyDevice.h>
+#include <toadlet/flick/InputDevice.h>
 #include <toadlet/egg/System.h>
 #include <toadlet/egg/Logger.h>
 #include <windows.h>
@@ -34,7 +34,7 @@
 namespace toadlet{
 namespace flick{
 
-class Win32JoyDevice:public JoyDevice{
+class Win32JoyDevice:public InputDevice{
 public:
 	Win32JoyDevice();
 	virtual ~Win32JoyDevice();
@@ -42,20 +42,24 @@ public:
 	bool create();
 	void destroy();
 
+	InputType getType(){return InputType_JOY;}
 	bool start();
 	void update(int dt);
-	bool stop();
+	void stop();
 	bool isRunning(){return mRunning;}
 
-	void setListener(JoyDeviceListener *listener);
+	void setListener(InputDeviceListener *listener){mListener=listener;}
+	void setSampleTime(int dt){}
+	void setAlpha(scalar alpha){}
 
 	scalar joyToScalar(int joy);
 
 protected:
 	bool mRunning;
-	JoyDeviceListener *mListener;
+	InputDeviceListener *mListener;
 	int mJoyID;
 	JOYINFOEX mJoyInfo,mLastJoyInfo;
+	InputData mJoyData;
 };
 
 }

@@ -23,21 +23,37 @@
  *
  ********** Copyright header - do not remove **********/
 
-#ifndef TOADLET_FLICK_JOYDEVICELISTENER_H
-#define TOADLET_FLICK_JOYDEVICELISTENER_H
+#ifndef TOADLET_FLICK_JINPUTDEVICE_H
+#define TOADLET_FLICK_JINPUTDEVICE_H
 
-#include <toadlet/flick/JoyDevice.h>
+#include <toadlet/flick/InputDevice.h>
+#include <jni.h>
 
 namespace toadlet{
 namespace flick{
 
-class JoyDeviceListener{
+class TOADLET_API JInputDevice:public InputDevice{
 public:
-	virtual ~JoyDeviceListener(){}
+	JInputDevice(JNIEnv *jenv,jobject jobj);
+	virtual ~JInputDevice();
 
-	virtual void joyPressed(int button)=0;
-	virtual void joyMoved(scalar x,scalar y,scalar z,scalar r,scalar u,scalar v)=0;
-	virtual void joyReleased(int button)=0;
+	virtual bool create();
+	virtual void destroy();
+
+	virtual InputType getType();
+	virtual bool start();
+	virtual void update(int dt);
+	virtual void stop();
+	virtual bool isRunning();
+
+	virtual void setListener(InputDeviceListener *listener);
+	virtual void setSampleTime(int dt);
+	virtual void setAlpha(scalar alpha);
+	
+protected:
+	JNIEnv *env;
+	jobject obj;
+	jmethodID createID,destroyID,getTypeID,startID,updateID,stopID,isRunningID,setListenerID,setSampleTimeID,setAlphaID;
 };
 
 }

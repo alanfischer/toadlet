@@ -3,9 +3,10 @@
 namespace toadlet{
 namespace flick{
 
+jfieldID typeID=0;
 jfieldID timeID=0;
-jfieldID accelerationID=0;
-jfieldID velocityID=0;
+jfieldID validID=0;
+jfieldID valuesID=0;
 jfieldID nativeHandleID=0;
 
 }
@@ -14,11 +15,12 @@ jfieldID nativeHandleID=0;
 using namespace toadlet::flick;
 
 extern "C" JNIEXPORT void Java_us_toadlet_flick(JNIEnv *env){
-	jclass dataClass=env->FindClass("us/toadlet/flick/MotionData");
+	jclass dataClass=env->FindClass("us/toadlet/flick/InputData");
 	{
+		typeID=env->GetFieldID(dataClass,"type","I");
 		timeID=env->GetFieldID(dataClass,"time","J");
-		accelerationID=env->GetFieldID(dataClass,"acceleration","[F");
-		velocityID=env->GetFieldID(dataClass,"velocity","[F");
+		validID=env->GetFieldID(dataClass,"valid","I");
+		valuesID=env->GetFieldID(dataClass,"values","[[F");
 	}
 	env->DeleteLocalRef(dataClass);
 
@@ -28,7 +30,7 @@ extern "C" JNIEXPORT void Java_us_toadlet_flick(JNIEnv *env){
 		return;
 	}
 
-	jclass listenerClass=env->FindClass("us/toadlet/flick/NMotionDeviceListener");
+	jclass listenerClass=env->FindClass("us/toadlet/flick/NInputDeviceListener");
 	{
 		nativeHandleID=env->GetFieldID(listenerClass,"mNativeHandle","I");
 	}
@@ -41,4 +43,4 @@ extern "C" JNIEXPORT void Java_us_toadlet_flick(JNIEnv *env){
 	}
 }
 
-#include "us_toadlet_flick_NMotionDeviceListener.cpp"
+#include "us_toadlet_flick_NInputDeviceListener.cpp"

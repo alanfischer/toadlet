@@ -118,7 +118,7 @@ void RandIsle::create(){
 
 	mPlayer->setSpeed(40);
 
-	JoyDevice *joyDevice=mApp->getJoyDevice();
+	InputDevice *joyDevice=mApp->getInputDevice(InputDevice::InputType_JOY);
 	if(joyDevice!=NULL){
 		joyDevice->setListener(this);
 		joyDevice->start();
@@ -130,7 +130,7 @@ void RandIsle::create(){
 void RandIsle::destroy(){
 	Logger::debug("RandIsle::destroy");
 
-	JoyDevice *joyDevice=mApp->getJoyDevice();
+	InputDevice *joyDevice=mApp->getInputDevice(InputDevice::InputType_JOY);
 	if(joyDevice!=NULL){
 		joyDevice->stop();
 		joyDevice->setListener(NULL);
@@ -574,16 +574,16 @@ void RandIsle::mouseMoved(int x,int y){
 	}
 }
 
-void RandIsle::joyPressed(int button){
-	playerJump();
-}
-
-void RandIsle::joyMoved(scalar x,scalar y,scalar z,scalar r,scalar u,scalar v){
-	mXJoy=x;
-	mYJoy=y;
-}
-
-void RandIsle::joyReleased(int button){
+void RandIsle::inputDetected(const InputData &data){
+	if(data.type==InputDevice::InputType_JOY){
+		if((data.valid&(1<<InputData::Semantic_JOY_BUTTON_PRESSED))!=0){
+			playerJump();
+		}
+		if((data.valid&(1<<InputData::Semantic_JOY_DIRECTION))!=0){
+			mXJoy=data.values[InputData::Semantic_JOY_DIRECTION].x;
+			mYJoy=data.values[InputData::Semantic_JOY_DIRECTION].y;
+		}
+	}
 }
 
 void RandIsle::playerJump(){

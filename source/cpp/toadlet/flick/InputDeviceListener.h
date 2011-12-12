@@ -23,19 +23,21 @@
  *
  ********** Copyright header - do not remove **********/
 
-#ifndef TOADLET_FLICK_MOTIONDEVICELISTENER_H
-#define TOADLET_FLICK_MOTIONDEVICELISTENER_H
+#ifndef TOADLET_FLICK_INPUTDEVICELISTENER_H
+#define TOADLET_FLICK_INPUTDEVICELISTENER_H
 
-#include <toadlet/flick/MotionData.h>
+#include <toadlet/flick/InputData.h>
 
 namespace toadlet{
 namespace flick{
 
-class MotionDeviceListener{
-public:
-	virtual ~MotionDeviceListener(){}
+class InputDevice;
 
-	virtual void motionDetected(const MotionData &data)=0;
+class InputDeviceListener{
+public:
+	virtual ~InputDeviceListener(){}
+
+	virtual void inputDetected(const InputData &data)=0;
 };
 
 }

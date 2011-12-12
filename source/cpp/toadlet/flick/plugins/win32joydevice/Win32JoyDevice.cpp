@@ -24,19 +24,19 @@
  ********** Copyright header - do not remove **********/
 
 #include <toadlet/egg/Error.h>
-#include <toadlet/flick/JoyDeviceListener.h>
+#include <toadlet/flick/InputDeviceListener.h>
 #include "Win32JoyDevice.h"
 #pragma comment(lib,"winmm.lib")
 
 namespace toadlet{
 namespace flick{
 
-TOADLET_C_API JoyDevice *new_Win32JoyDevice(){
+TOADLET_C_API InputDevice *new_Win32JoyDevice(){
 	return new Win32JoyDevice();
 }
 
 #if defined(TOADLET_BUILD_DYNAMIC)
-	TOADLET_C_API JoyDevice *new_JoyDevice(){
+	TOADLET_C_API InputDevice *new_JoyDevice(){
 		return new Win32JoyDevice();
 	}
 #endif
@@ -44,7 +44,8 @@ TOADLET_C_API JoyDevice *new_Win32JoyDevice(){
 Win32JoyDevice::Win32JoyDevice():
 	mRunning(false),
 	mListener(NULL),
-	mJoyID(0)
+	mJoyID(0),
+	mJoyData(InputType_JOY,0,InputData::Semantic_MAX_JOY)
 {
 	memset(&mJoyInfo,0,sizeof(JOYINFOEX));
 	memset(&mLastJoyInfo,0,sizeof(JOYINFOEX));
@@ -88,10 +89,10 @@ bool Win32JoyDevice::start(){
 	return mRunning;
 }
 
-bool Win32JoyDevice::stop(){
+void Win32JoyDevice::stop(){
 	mRunning=false;
 
-	return mRunning;
+	return;
 }
 
 void Win32JoyDevice::update(int dt){
@@ -101,7 +102,10 @@ void Win32JoyDevice::update(int dt){
 		if(	joyInfo->dwXpos!=lastJoyInfo->dwXpos || joyInfo->dwYpos!=lastJoyInfo->dwYpos || joyInfo->dwZpos!=lastJoyInfo->dwZpos ||
 			joyInfo->dwRpos!=lastJoyInfo->dwRpos || joyInfo->dwUpos!=lastJoyInfo->dwUpos || joyInfo->dwVpos!=lastJoyInfo->dwVpos){
 			if(mListener!=NULL){
-				mListener->joyMoved(joyToScalar(joyInfo->dwXpos),joyToScalar(joyInfo->dwYpos),joyToScalar(joyInfo->dwZpos),joyToScalar(joyInfo->dwRpos),joyToScalar(joyInfo->dwUpos),joyToScalar(joyInfo->dwVpos));
+				mJoyData.valid=(1<<InputData::Semantic_JOY_DIRECTION) | (1<<InputData::Semantic_JOY_ROTATION);
+				mJoyData.values[InputData::Semantic_JOY_DIRECTION].set(joyToScalar(joyInfo->dwXpos),joyToScalar(joyInfo->dwYpos),joyToScalar(joyInfo->dwZpos),0);
+				mJoyData.values[InputData::Semantic_JOY_ROTATION].set(joyToScalar(joyInfo->dwRpos),joyToScalar(joyInfo->dwUpos),joyToScalar(joyInfo->dwVpos),0);
+				mListener->inputDetected(this,mJoyData);
 			}
 		}
 		if(joyInfo->dwButtons!=lastJoyInfo->dwButtons){
@@ -111,12 +115,16 @@ void Win32JoyDevice::update(int dt){
 			while(pressedButtons>0 || releasedButtons>0){
 				if((pressedButtons&1)>0){
 					if(mListener!=NULL){
-						mListener->joyPressed(button);
+						mJoyData.valid=(1<<InputData::Semantic_JOY_BUTTON_PRESSED);
+						mJoyData.values[InputData::Semantic_JOY_BUTTON_PRESSED].set(button,0,0,0);
+						mListener->inputDetected(this,mJoyData);
 					}
 				}
 				if((releasedButtons&1)>0){
 					if(mListener!=NULL){
-						mListener->joyReleased(button);
+						mJoyData.valid=(1<<InputData::Semantic_JOY_BUTTON_RELEASED);
+						mJoyData.values[InputData::Semantic_JOY_BUTTON_RELEASED].set(button,0,0,0);
+						mListener->inputDetected(this,mJoyData);
 					}
 				}
 				pressedButtons>>=1;
@@ -126,10 +134,6 @@ void Win32JoyDevice::update(int dt){
 		}
 		memcpy(lastJoyInfo,joyInfo,sizeof(JOYINFOEX));
 	}
-}
-
-void Win32JoyDevice::setListener(JoyDeviceListener *listener){
-	mListener=listener;
 }
 
 scalar Win32JoyDevice::joyToScalar(int joy){

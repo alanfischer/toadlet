@@ -46,9 +46,9 @@ include_directories (${FLICK_OBJ_DIR})
 configure_file (${JAVA_SRC_DIR}/flick/Version.java.cmake ${CMAKE_CURRENT_BINARY_DIR}/${JAVA_SRC_DIR}/flick/Version.java)
 
 set (FLICK_SRC
-	${JAVA_SRC_DIR}/flick/MotionDevice.java
-	${JAVA_SRC_DIR}/flick/MotionDeviceListener.java
-	${JAVA_SRC_DIR}/flick/NMotionDeviceListener.java
+	${JAVA_SRC_DIR}/flick/InputDevice.java
+	${JAVA_SRC_DIR}/flick/InputDeviceListener.java
+	${JAVA_SRC_DIR}/flick/NInputDeviceListener.java
 	${JAVA_SRC_DIR}/flick/AndroidMotionDevice.java
 	${CMAKE_CURRENT_BINARY_DIR}/${JAVA_SRC_DIR}/flick/Version.java
 )

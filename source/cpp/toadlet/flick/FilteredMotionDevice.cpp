@@ -31,14 +31,15 @@ namespace flick{
 FilteredMotionDevice::FilteredMotionDevice():
 	mListener(NULL),
 	mDevice(NULL),
-	mAlpha(Math::fromMilli(667))
-	//mMotionData
-{}
+	mAlpha(Math::fromMilli(667)),
+	mMotionData(InputType_MOTION,0,InputData::Semantic_MAX_MOTION)
+{
+}
 
 FilteredMotionDevice::~FilteredMotionDevice(){
 }
 
-void FilteredMotionDevice::setMotionDevice(MotionDevice *device){
+void FilteredMotionDevice::setMotionDevice(InputDevice *device){
 	mDevice=device;
 }
 
@@ -56,6 +57,14 @@ void FilteredMotionDevice::destroy(){
 	}
 	
 	mDevice->destroy();
+}
+
+InputDevice::InputType FilteredMotionDevice::getType(){
+	if(mDevice==NULL){
+		return (InputType)0;
+	}
+	
+	return mDevice->getType();
 }
 
 bool FilteredMotionDevice::start(){
@@ -98,23 +107,28 @@ void FilteredMotionDevice::setSampleTime(int dt){
 	mDevice->setSampleTime(dt);
 }
 
-void FilteredMotionDevice::motionDetected(const MotionData &data){
-	Vector3 lastAcceleration=mMotionData.acceleration;
-	Vector3 lastRawVelocity=mRawVelocity;
-	Vector3 lastVelocity=mMotionData.velocity;
-	Vector3 vector;
+void FilteredMotionDevice::inputDetected(const InputData &data){
+	Vector4 lastAcceleration=mMotionData.values[InputData::Semantic_MOTION_ACCELERATION];
+	Vector4 lastVelocity=mMotionData.values[InputData::Semantic_MOTION_VELOCITY];
+	Vector4 lastRawVelocity=mRawVelocity;
+	Vector4 newAcceleration=data.values[InputData::Semantic_MOTION_ACCELERATION];
+	Vector4 newVelocity=data.values[InputData::Semantic_MOTION_VELOCITY];
+	Vector4 vector;
 
-	mMotionData.acceleration.set(data.acceleration);	
+	mMotionData.valid=data.valid;
+	mMotionData.values[InputData::Semantic_MOTION_ACCELERATION].set(newAcceleration);
 
 	if(mMotionData.time==0){
-		mRawVelocity.reset();
-		mMotionData.velocity.reset();
 		mMotionData.time=data.time;
+		mMotionData.values[InputData::Semantic_MOTION_VELOCITY].reset();
+		mRawVelocity.reset();
 	}
 	else{
+		mMotionData.time=data.time;
+
 		// Improved euler integration
 		// v = v + 0.5dt * (ao + a)
-		Math::add(vector,data.acceleration,lastAcceleration);
+		Math::add(vector,newAcceleration,lastAcceleration);
 		Math::mul(vector,Math::fromMilli(data.time-mMotionData.time)/2);
 		Math::add(mRawVelocity,vector);
 
@@ -122,10 +136,12 @@ void FilteredMotionDevice::motionDetected(const MotionData &data){
 		// vf = alpha*(vf0+v-v0)
 		Math::sub(vector,mRawVelocity,lastRawVelocity);
 		Math::add(vector,lastVelocity);
-		Math::mul(mMotionData.velocity,vector,mAlpha);
+		Math::mul(newVelocity,vector,mAlpha);
 
+		mMotionData.values[InputData::Semantic_MOTION_VELOCITY].set(newVelocity);
+		
 		if(mListener!=NULL){
-			mListener->motionDetected(mMotionData);
+			mListener->inputDetected(mMotionData);
 		}
 	}
 }

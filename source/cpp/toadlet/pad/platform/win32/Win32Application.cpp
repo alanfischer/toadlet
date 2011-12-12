@@ -89,16 +89,18 @@ using namespace toadlet::tadpole::handler;
 	extern "C" RenderDevice *new_D3D11RenderDevice();
 	extern "C" RenderTarget *new_D3D11WindowRenderTarget(void *window,WindowRenderTargetFormat *format);
 #endif
-#if defined(TOADLET_PLATFORM_WIN32)
-	#pragma comment(lib,"toadlet_ribbit_mmaudiodevice" TOADLET_LIBRARY_EXTENSION)
-	extern "C" AudioDevice *new_MMAudioDevice();
-	#pragma comment(lib,"toadlet_flick_win32joydevice" TOADLET_LIBRARY_EXTENSION)
-	extern "C" JoyDevice *new_Win32JoyDevice();
-#endif
+
 #if defined(TOADLET_HAS_OPENAL)
 	#pragma comment(lib,"toadlet_ribbit_alaudiodevice" TOADLET_LIBRARY_EXTENSION)
 	extern "C" AudioDevice *new_ALAudioDevice();
 #endif
+
+#pragma comment(lib,"toadlet_ribbit_mmaudiodevice" TOADLET_LIBRARY_EXTENSION)
+extern "C" AudioDevice *new_MMAudioDevice();
+
+#pragma comment(lib,"toadlet_flick_win32joydevice" TOADLET_LIBRARY_EXTENSION)
+extern "C" InputDevice *new_Win32JoyDevice();
+
 
 namespace toadlet{
 namespace pad{
@@ -181,9 +183,6 @@ Win32Application::Win32Application():
 	#endif
 	mAudioDevicePreferences.add("al");
 	mAudioDevicePreferences.add("mm");
-
-	mJoyDevicePlugins.add("win32",JoyDevicePlugin(new_Win32JoyDevice));
-	mJoyDevicePreferences.add("win32");
 }
 
 Win32Application::~Win32Application(){
@@ -195,19 +194,26 @@ Win32Application::~Win32Application(){
 	delete win32;
 }
 
-bool Win32Application::create(String renderDevice,String audioDevice,String motionDevice,String joyDevice){
+void Win32Application::preEngineCreate(){
 	mContextActive=true;
 
 	createWindow();
-	
-	BaseApplication::create(renderDevice,audioDevice,motionDevice,joyDevice);
+}
+
+void Win32Application::postEngineCreate(){
+	InputDevice *joyDevice=new_Win32JoyDevice();
+	if(joyDevice->create()==false){
+		delete joyDevice;
+		joyDevice=NULL;
+	}
+	else{
+		mInputDevices[joyDevice->getType()]=joyDevice;
+	}
 
 	mResourceArchive=Win32ResourceArchive::ptr(new Win32ResourceArchive(mEngine->getTextureManager()));
 	mResourceArchive->open(win32->mInstance);
 	mEngine->getArchiveManager()->manage(shared_static_cast<Archive>(mResourceArchive));
 	mEngine->getTextureManager()->addResourceArchive(mResourceArchive);
-
-	return true;
 }
 
 void Win32Application::destroy(){
@@ -253,12 +259,12 @@ void Win32Application::runEventLoop(){
 				mAudioDevice->update(dt);
 			}
 
-			if(mMotionDevice!=NULL){
-				mMotionDevice->update(dt);
-			}
-
-			if(mJoyDevice!=NULL){
-				mJoyDevice->update(dt);
+			int i;
+			for(i=0;i<mInputDevices.size();++i){
+				InputDevice *device=mInputDevices[i];
+				if(device!=NULL){
+					device->update(dt);
+				}
 			}
 
 			lastTime=currentTime;

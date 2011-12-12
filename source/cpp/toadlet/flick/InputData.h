@@ -23,8 +23,51 @@
  *
  ********** Copyright header - do not remove **********/
 
-package us.toadlet.flick;
+#ifndef TOADLET_FLICK_INPUTDATA_H
+#define TOADLET_FLICK_INPUTDATA_H
 
-public interface MotionDeviceListener{
-	public void motionDetected(MotionData motionData);
+#include <toadlet/egg/Collection.h>
+#include <toadlet/flick/Types.h>
+
+namespace toadlet{
+namespace flick{
+
+class InputData{
+public:	
+	enum Semantic{
+		Semantic_JOY_BUTTON_PRESSED=0,
+		Semantic_JOY_BUTTON_RELEASED=1,
+		Semantic_JOY_DIRECTION=2,
+		Semantic_JOY_ROTATION=3,
+		Semantic_MAX_JOY,
+		
+		Semantic_MOTION_ACCELERATION=0,
+		Semantic_MOTION_VELOCITY=1,
+		Semantic_MAX_MOTION,
+	};
+
+	InputData(int type1=0,int time1=0,int size=0):
+		type(type1),
+		time(time1),
+		valid(0)
+	{
+		values.resize(size);
+	}
+
+	void set(const InputData &data){
+		type=data.type;
+		time=data.time;
+		valid=data.valid;
+		values=data.values;
+	}
+	
+	int type;
+	uint64 time;
+	int valid;
+	Collection<Vector4> values;
+};
+
 }
+}
+
+#endif

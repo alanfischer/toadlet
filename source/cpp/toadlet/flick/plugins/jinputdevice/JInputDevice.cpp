@@ -23,7 +23,7 @@
  *
  ********** Copyright header - do not remove **********/
 
-#include "JMotionDevice.h"
+#include "JInputDevice.h"
 #include <toadlet/egg/Logger.h>
 
 extern "C" JNIEXPORT void Java_us_toadlet_flick(JNIEnv *env);
@@ -31,11 +31,11 @@ extern "C" JNIEXPORT void Java_us_toadlet_flick(JNIEnv *env);
 namespace toadlet{
 namespace flick{
 
-TOADLET_C_API MotionDevice* new_JMotionDevice(JNIEnv *jenv,jobject jobj){
-	return new JMotionDevice(jenv,jobj);
+TOADLET_C_API InputDevice* new_JInputDevice(JNIEnv *jenv,jobject jobj){
+	return new JInputDevice(jenv,jobj);
 }
 
-JMotionDevice::JMotionDevice(JNIEnv *jenv,jobject jobj){
+JInputDevice::JInputDevice(JNIEnv *jenv,jobject jobj){
 	env=jenv;
 	obj=env->NewGlobalRef(jobj);
 
@@ -44,12 +44,13 @@ JMotionDevice::JMotionDevice(JNIEnv *jenv,jobject jobj){
 		createID=env->GetMethodID(deviceClass,"create","()Z");
 		destroyID=env->GetMethodID(deviceClass,"destroy","()V");
 
+		getTypeID=env->GetMethodID(deviceClass,"getType","()I");
 		startID=env->GetMethodID(deviceClass,"start","()Z");
 		updateID=env->GetMethodID(deviceClass,"update","(I)V");
 		stopID=env->GetMethodID(deviceClass,"stop","()V");
 		isRunningID=env->GetMethodID(deviceClass,"isRunning","()Z");
 
-		setListenerID=env->GetMethodID(deviceClass,"setListener","(Lus/toadlet/flick/MotionDeviceListener;)V");
+		setListenerID=env->GetMethodID(deviceClass,"setListener","(Lus/toadlet/flick/InputDeviceListener;)V");
 		setSampleTimeID=env->GetMethodID(deviceClass,"setSampleTime","(I)V");
 		setAlphaID=env->GetMethodID(deviceClass,"setAlpha","(F)V");
 	}
@@ -64,46 +65,50 @@ JMotionDevice::JMotionDevice(JNIEnv *jenv,jobject jobj){
 	Java_us_toadlet_flick(env);
 }
 
-JMotionDevice::~JMotionDevice(){
+JInputDevice::~JInputDevice(){
 	env->DeleteGlobalRef(obj);
 	obj=NULL;
 	env=NULL;
 }
 
-bool JMotionDevice::create(){
+bool JInputDevice::create(){
 	Logger::alert(Categories::TOADLET_RIBBIT,
-		"creating JMotionDevice");
+		"creating JInputDevice");
 
 	return env->CallBooleanMethod(obj,createID);
 }
 
-void JMotionDevice::destroy(){
+void JInputDevice::destroy(){
 	Logger::alert(Categories::TOADLET_RIBBIT,
-		"destroying JMotionDevice");
+		"destroying JInputDevice");
 
 	return env->CallVoidMethod(obj,destroyID);
 }
 
-bool JMotionDevice::start(){
+InputDevice::InputType JInputDevice::getType(){
+	return (InputType)env->CallIntMethod(obj,getTypeID);
+}
+
+bool JInputDevice::start(){
 	return env->CallBooleanMethod(obj,startID);
 }
 
-void JMotionDevice::update(int dt){
+void JInputDevice::update(int dt){
 	env->CallVoidMethod(obj,updateID,dt);
 }
 
-void JMotionDevice::stop(){
+void JInputDevice::stop(){
 	env->CallVoidMethod(obj,stopID);
 }
 
-bool JMotionDevice::isRunning(){
+bool JInputDevice::isRunning(){
 	return env->CallBooleanMethod(obj,isRunningID);
 }
 
-void JMotionDevice::setListener(MotionDeviceListener *listener){
+void JInputDevice::setListener(InputDeviceListener *listener){
 	jobject listenerObj=NULL;
 
-	jclass listenerClass=env->FindClass("us/toadlet/flick/NMotionDeviceListener");
+	jclass listenerClass=env->FindClass("us/toadlet/flick/NInputDeviceListener");
 	{
 		jmethodID initID=env->GetMethodID(listenerClass,"<init>","(I)V");
 		listenerObj=env->NewObject(listenerClass,initID,(int)listener);
@@ -120,11 +125,11 @@ void JMotionDevice::setListener(MotionDeviceListener *listener){
 	env->CallVoidMethod(obj,setListenerID,listenerObj);
 }
 
-void JMotionDevice::setSampleTime(int dt){
+void JInputDevice::setSampleTime(int dt){
 	env->CallVoidMethod(obj,setSampleTimeID,dt);
 }
 
-void JMotionDevice::setAlpha(scalar alpha){
+void JInputDevice::setAlpha(scalar alpha){
 	env->CallVoidMethod(obj,setAlphaID,Math::toFloat(alpha));
 }
 

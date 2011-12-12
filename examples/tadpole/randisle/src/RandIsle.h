@@ -13,7 +13,7 @@
 
 class HUD;
 
-class RandIsle:public Applet,public TerrainNodeDataSource,public UpdateListener,public JoyDeviceListener,public TerrainNodeListener,public PathClimberListener{
+class RandIsle:public Applet,public TerrainNodeDataSource,public UpdateListener,public TerrainNodeListener,public InputDeviceListener,public PathClimberListener{
 public:
 	enum{
 		Scope_BIT_TREE=			1<<1,
@@ -48,9 +48,7 @@ public:
 	void mouseReleased(int x,int y,int button);
 	void mouseMoved(int x,int y);
 	void mouseScrolled(int x,int y,int scroll){}
-	void joyPressed(int button);
-	void joyMoved(scalar x,scalar y,scalar z,scalar r,scalar u,scalar v);
-	void joyReleased(int button);
+	void inputDetected(const InputData &data);
 
 	void playerJump();
 	void playerMove(scalar dr,scalar ds);

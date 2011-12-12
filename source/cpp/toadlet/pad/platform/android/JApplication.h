@@ -37,7 +37,7 @@ public:
 	JApplication(JNIEnv *jenv,jobject jobj);
 	virtual ~JApplication();
 
-	bool create(String renderDevice,String audioDevice,String motionDevice,String joyDevice);
+	bool create(String renderDevice,String audioDevice);
 	void destroy();
 
 	void start();
@@ -72,13 +72,12 @@ public:
 	Engine *getEngine() const;
 	RenderDevice *getRenderDevice() const;
 	AudioDevice *getAudioDevice() const;
-	MotionDevice *getMotionDevice() const;
-	JoyDevice *getJoyDevice() const{return NULL;}
+	InputDevice *getInputDevice(InputDevice::InputType i) const;
 
 protected:
 	JNIEnv *env;
 	jobject obj;
-	jmethodID createID,destroyID,startID,stopID,isRunningID,setTitleID,getTitleID,setDifferenceMouseID,getDifferenceMouseID,getWidthID,getHeightID,getEngineID,getRenderDeviceID,getAudioDeviceID,getMotionDeviceID,setNativeHandleID,getNativeHandleID;
+	jmethodID createID,destroyID,startID,stopID,isRunningID,setTitleID,getTitleID,setDifferenceMouseID,getDifferenceMouseID,getWidthID,getHeightID,getEngineID,getRenderDeviceID,getAudioDeviceID,getInputDeviceID,setNativeHandleID,getNativeHandleID;
 
 	mutable Engine *mEngine;
 	mutable jobject mLastEngineObj;
@@ -86,8 +85,8 @@ protected:
 	mutable jobject mLastRenderDeviceObj;
 	mutable AudioDevice *mAudioDevice;
 	mutable jobject mLastAudioDeviceObj;
-	mutable MotionDevice *mMotionDevice;
-	mutable jobject mLastMotionDeviceObj;
+	mutable InputDevice *mInputDevices[InputDevice::InputType_MAX];
+	mutable jobject mLastInputDeviceObjs[InputDevice::InputType_MAX];
 };
 
 }

@@ -29,7 +29,7 @@ import android.content.Context;
 import android.hardware.*;
 import java.util.List;
 
-public class AndroidMotionDevice implements MotionDevice,SensorEventListener{
+public class AndroidMotionDevice implements InputDevice,SensorEventListener{
 	public AndroidMotionDevice(Context context){
 		mContext=context;
 		mSensorManager=(SensorManager)mContext.getSystemService(Context.SENSOR_SERVICE);
@@ -48,6 +48,8 @@ public class AndroidMotionDevice implements MotionDevice,SensorEventListener{
 		mSensor=null;
 	}
 
+	public int getType(){return InputType_MOTION;}
+	
 	public boolean start(){
 		mRunning=false;
 		if(mSensor!=null){
@@ -67,8 +69,7 @@ public class AndroidMotionDevice implements MotionDevice,SensorEventListener{
 	
 	public boolean isRunning(){return mRunning;}
 	
-	public void setListener(MotionDeviceListener listener){mListener=listener;}
-
+	public void setListener(InputDeviceListener listener){mListener=listener;}
 	public void setSampleTime(int dt){}
 	public void setAlpha(float alpha){}
 
@@ -76,12 +77,11 @@ public class AndroidMotionDevice implements MotionDevice,SensorEventListener{
  
 	public void onSensorChanged(SensorEvent event){
 		mMotionData.time=event.timestamp/1000;
-		mMotionData.acceleration[0]=event.values[0];
-		mMotionData.acceleration[1]=event.values[1];
-		mMotionData.acceleration[2]=event.values[2];
+		mMotionData.valid=(1<<InputData.Semantic_MOTION_ACCELERATION);
+		System.arraycopy(event.values,0,mMotionData.values[InputData.Semantic_MOTION_ACCELERATION],0,3);
 
 		if(mListener!=null){
-			mListener.motionDetected(mMotionData);
+			mListener.inputDetected(mMotionData);
 		}
 	}
 
@@ -89,6 +89,6 @@ public class AndroidMotionDevice implements MotionDevice,SensorEventListener{
 	SensorManager mSensorManager;
 	Sensor mSensor;
 	boolean mRunning;
-	MotionDeviceListener mListener;
-	MotionData mMotionData=new MotionData();
+	InputDeviceListener mListener;
+	InputData mMotionData=new InputData(InputType_MOTION,0,InputData.Semantic_MAX_MOTION);
 }
