@@ -105,7 +105,7 @@ void Win32JoyDevice::update(int dt){
 				mJoyData.valid=(1<<InputData::Semantic_JOY_DIRECTION) | (1<<InputData::Semantic_JOY_ROTATION);
 				mJoyData.values[InputData::Semantic_JOY_DIRECTION].set(joyToScalar(joyInfo->dwXpos),joyToScalar(joyInfo->dwYpos),joyToScalar(joyInfo->dwZpos),0);
 				mJoyData.values[InputData::Semantic_JOY_ROTATION].set(joyToScalar(joyInfo->dwRpos),joyToScalar(joyInfo->dwUpos),joyToScalar(joyInfo->dwVpos),0);
-				mListener->inputDetected(this,mJoyData);
+				mListener->inputDetected(mJoyData);
 			}
 		}
 		if(joyInfo->dwButtons!=lastJoyInfo->dwButtons){
@@ -117,14 +117,14 @@ void Win32JoyDevice::update(int dt){
 					if(mListener!=NULL){
 						mJoyData.valid=(1<<InputData::Semantic_JOY_BUTTON_PRESSED);
 						mJoyData.values[InputData::Semantic_JOY_BUTTON_PRESSED].set(button,0,0,0);
-						mListener->inputDetected(this,mJoyData);
+						mListener->inputDetected(mJoyData);
 					}
 				}
 				if((releasedButtons&1)>0){
 					if(mListener!=NULL){
 						mJoyData.valid=(1<<InputData::Semantic_JOY_BUTTON_RELEASED);
 						mJoyData.values[InputData::Semantic_JOY_BUTTON_RELEASED].set(button,0,0,0);
-						mListener->inputDetected(this,mJoyData);
+						mListener->inputDetected(mJoyData);
 					}
 				}
 				pressedButtons>>=1;
