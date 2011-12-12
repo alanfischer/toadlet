@@ -41,6 +41,9 @@ public:
 	virtual bool create(int *options)=0;
 	virtual void destroy()=0;
 
+	virtual void activate()=0;
+	virtual void deactivate()=0;
+
 	virtual AudioBuffer *createAudioBuffer()=0;
 	virtual Audio *createAudio()=0;
 
@@ -50,10 +53,6 @@ public:
 	virtual void setListenerGain(scalar gain)=0;
 
 	virtual void update(int dt)=0;
-
-	/// @todo: Change these to an activate/deactivate
-	virtual void suspend()=0;
-	virtual void resume()=0;
 
 	virtual bool getAudioCaps(AudioCaps &caps)=0;
 };

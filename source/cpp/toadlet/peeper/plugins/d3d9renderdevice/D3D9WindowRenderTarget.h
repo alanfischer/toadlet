@@ -64,10 +64,8 @@ public:
 	typedef IDirect3D9*(WINAPI *Direct3DCreate9)(UINT);
 	Direct3DCreate9 CreateSymbol;
 
-	#if defined(TOADLET_D3DX9_DLL_NAME)
-		typedef HRESULT(WINAPI *D3DXCompileShader)(LPCSTR,UINT,struct _D3DXMACRO *,interface ID3DXInclude *,LPCSTR,LPCSTR,DWORD,interface ID3DXBuffer **,interface ID3DXBuffer **,interface ID3DXConstantTable **);
-		D3DXCompileShader CompileShaderSymbol;
-	#endif
+	typedef HRESULT(WINAPI *D3DXCompileShader)(LPCSTR,UINT,struct _D3DXMACRO *,interface ID3DXInclude *,LPCSTR,LPCSTR,DWORD,interface ID3DXBuffer **,interface ID3DXBuffer **,interface ID3DXConstantTable **);
+	D3DXCompileShader CompileShaderSymbol;
 
 protected:
 	int getClosestSamples(int samples);

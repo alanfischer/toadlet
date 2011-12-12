@@ -168,9 +168,6 @@ namespace peeper{
 #else
 	#define TOADLET_D3D9_DLL_NAME TEXT("D3D9.DLL")
 	#define TOADLET_D3D9_DEBUG_DLL_NAME TEXT("D3D9D.DLL")
-	/// @todo: Search for the most recent D3DX9
-	#define TOADLET_D3DX9_DLL_NAME TEXT("D3DX9_33.DLL")
-	#define TOADLET_D3DX9_DEBUG_DLL_NAME TEXT("D3DX9D_33.DLL")
 	#define TOADLET_D3D9_CREATE_NAME TEXT("Direct3DCreate9")
 	#define TOADLET_D3DX9_COMPILE_SHADER_NAME TEXT("D3DXCompileShader")
 #endif
