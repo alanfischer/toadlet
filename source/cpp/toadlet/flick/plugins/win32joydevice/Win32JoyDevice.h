@@ -46,7 +46,6 @@ public:
 	bool start();
 	void update(int dt);
 	void stop();
-	bool isRunning(){return mRunning;}
 
 	void setListener(InputDeviceListener *listener){mListener=listener;}
 	void setSampleTime(int dt){}

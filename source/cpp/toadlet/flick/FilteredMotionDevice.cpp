@@ -91,14 +91,6 @@ void FilteredMotionDevice::stop(){
 	mDevice->stop();
 }
 
-bool FilteredMotionDevice::isRunning(){
-	if(mDevice==NULL){
-		return false;
-	}
-	
-	return mDevice->isRunning();
-}
-
 void FilteredMotionDevice::setSampleTime(int dt){
 	if(mDevice==NULL){
 		return;

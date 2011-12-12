@@ -67,8 +67,6 @@ public class AndroidMotionDevice implements InputDevice,SensorEventListener{
 		mRunning=false;
 	}
 	
-	public boolean isRunning(){return mRunning;}
-	
 	public void setListener(InputDeviceListener listener){mListener=listener;}
 	public void setSampleTime(int dt){}
 	public void setAlpha(float alpha){}

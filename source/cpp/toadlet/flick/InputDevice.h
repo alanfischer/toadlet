@@ -50,8 +50,7 @@ public:
 	virtual bool start()=0;
 	virtual void update(int dt)=0;
 	virtual void stop()=0;
-	virtual bool isRunning()=0;
-	
+
 	virtual void setListener(InputDeviceListener *listener)=0;
 	virtual void setSampleTime(int dt)=0;
 	virtual void setAlpha(scalar alpha)=0;

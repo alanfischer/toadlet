@@ -44,7 +44,6 @@ public:
 	virtual bool start();
 	virtual void update(int dt);
 	virtual void stop();
-	virtual bool isRunning();
 
 	virtual void setListener(InputDeviceListener *listener);
 	virtual void setSampleTime(int dt);
@@ -53,7 +52,7 @@ public:
 protected:
 	JNIEnv *env;
 	jobject obj;
-	jmethodID createID,destroyID,getTypeID,startID,updateID,stopID,isRunningID,setListenerID,setSampleTimeID,setAlphaID;
+	jmethodID createID,destroyID,getTypeID,startID,updateID,stopID,setListenerID,setSampleTimeID,setAlphaID;
 };
 
 }
