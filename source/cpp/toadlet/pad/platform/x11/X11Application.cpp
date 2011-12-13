@@ -50,7 +50,7 @@ namespace pad{
 struct X11Attributes{
 	Display *mDisplay;
 	Window mWindow;
-	XVisualInfo mVisualInfo;
+	XVisualInfo *mVisualInfo;
 	int mScrnum;
 	Atom mDeleteWindow;
 	Cursor mBlankCursor;
@@ -285,16 +285,20 @@ bool X11Application::createWindow(){
 
 	XSetWindowAttributes attr;
 	unsigned long mask;
-	if(XMatchVisualInfo(x11->mDisplay,x11->mScrnum,16,TrueColor,&x11->mVisualInfo)!=0){
+
+	XVisualInfo info;
+	if(XMatchVisualInfo(x11->mDisplay,x11->mScrnum,mFormat->depthBits,TrueColor,&info)!=0){
 		Error::unknown(Categories::TOADLET_PAD,
 			"couldn't get a visual");
 		return false;
 	}
+	int n=0;
+	x11->mVisualInfo=XGetVisualInfo(x11->mDisplay,VisualAllMask,&info,&n);
 
 	// Set the window attributes
 	attr.background_pixel=0;
 	attr.border_pixel=0;
-	attr.colormap=XCreateColormap(x11->mDisplay,XRootWindow(x11->mDisplay,x11->mScrnum),x11->mVisualInfo.visual,AllocNone);
+	attr.colormap=XCreateColormap(x11->mDisplay,XRootWindow(x11->mDisplay,x11->mScrnum),x11->mVisualInfo->visual,AllocNone);
 	attr.event_mask=StructureNotifyMask | ExposureMask | KeyPressMask | KeyReleaseMask | ButtonPressMask | ButtonReleaseMask | PointerMotionMask | FocusChangeMask;
 
 	// Go to fullscreen mode if requested
@@ -367,7 +371,7 @@ bool X11Application::createWindow(){
 		attr.override_redirect = true;
 
 		// Create window
-		x11->mWindow=XCreateWindow(x11->mDisplay,XRootWindow(x11->mDisplay,x11->mScrnum),mPositionX,mPositionY,mWidth,mHeight,0,x11->mVisualInfo.depth,InputOutput,x11->mVisualInfo.visual,mask,&attr);
+		x11->mWindow=XCreateWindow(x11->mDisplay,XRootWindow(x11->mDisplay,x11->mScrnum),mPositionX,mPositionY,mWidth,mHeight,0,x11->mVisualInfo->depth,InputOutput,x11->mVisualInfo->visual,mask,&attr);
 
 		// Lock things to window
 		XWarpPointer(x11->mDisplay,None,x11->mWindow,0,0,0,0,mWidth/2,mHeight/2);
@@ -381,7 +385,7 @@ bool X11Application::createWindow(){
 		mask = CWBackPixel | CWBorderPixel | CWColormap | CWEventMask;
 		
 		// Create window
-		x11->mWindow=XCreateWindow(x11->mDisplay,XRootWindow(x11->mDisplay,x11->mScrnum),mPositionX,mPositionY,mWidth,mHeight,0,x11->mVisualInfo.depth,InputOutput,x11->mVisualInfo.visual,mask,&attr);
+		x11->mWindow=XCreateWindow(x11->mDisplay,XRootWindow(x11->mDisplay,x11->mScrnum),mPositionX,mPositionY,mWidth,mHeight,0,x11->mVisualInfo->depth,InputOutput,x11->mVisualInfo->visual,mask,&attr);
 		
 		// Set hints and properties
 		XSizeHints sizehints;
