@@ -282,22 +282,6 @@ bool X11Application::createWindow(){
 		}
 	}
 
-	XSetWindowAttributes attr;
-	unsigned long mask;
-	/// @todo: Remove this once we know we wont need it for direct rendering
-	#if 0
-        int attribList[]={
-                GLX_RGBA,
-                GLX_DOUBLEBUFFER,
-                GLX_RED_SIZE,TextureFormat::getRedBits(mFormat->pixelFormat),
-                GLX_GREEN_SIZE,TextureFormat::getGreenBits(mFormat->pixelFormat),
-                GLX_BLUE_SIZE,TextureFormat::getBlueBits(mFormat->pixelFormat),
-                GLX_DEPTH_SIZE,mFormat->depthBits,
-                GLX_STENCIL_SIZE,mFormat->stencilBits,
-                None
-        };
-        x11->mVisualInfo=glXChooseVisual(x11->mDisplay,x11->mScrnum,attribList);
-	#else
 	XVisualInfo info;
 	int redBits=TextureFormat::getRedBits(mFormat->pixelFormat);
 	int greenBits=TextureFormat::getGreenBits(mFormat->pixelFormat);
@@ -317,9 +301,10 @@ bool X11Application::createWindow(){
 			"failed to get visual");
 		return false;
 	}
-	#endif
 
 	// Set the window attributes
+	XSetWindowAttributes attr;
+	unsigned long mask;
 	attr.background_pixel=0;
 	attr.border_pixel=0;
 	attr.colormap=XCreateColormap(x11->mDisplay,XRootWindow(x11->mDisplay,x11->mScrnum),x11->mVisualInfo->visual,AllocNone);
