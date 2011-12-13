@@ -71,10 +71,9 @@ public:
 
 	void changeRenderDevicePlugin(const String &plugin){}
 
-	void *getWindowHandle(){return getWindow();}
-	void *getDisplay() const;
-	void *getWindow() const;
-	void *getVisualInfo() const;
+	void *getDisplay();
+	void *getWindow();
+	void *getVisualInfo();
 
 	void internal_mouseMoved(int x,int y);
 
@@ -84,12 +83,6 @@ protected:
 	void originalResolution();
 	void originalEnv();
 	void configured(int x,int y,int width,int height);
-
-	// Keeping our custom versions of these until we can unify the GLXRenderTargetWindow's constructor
-	RenderTarget *makeRenderTarget();
-	RenderDevice *makeRenderDevice();
-	bool createContextAndRenderDevice(const String &plugin);
-	bool destroyRenderDeviceAndContext();
 
 	static int translateKey(int key);
 

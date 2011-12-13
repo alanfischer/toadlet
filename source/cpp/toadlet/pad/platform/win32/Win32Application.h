@@ -72,7 +72,8 @@ public:
 
 	tadpole::handler::Win32ResourceArchive::ptr getResourceArchive() const{return mResourceArchive;}
 
-	void *getWindowHandle(){return getHWND();}
+	void *getDisplay(){return 0;}
+	void *getWindow(){return getHWND();}
 	void changeRenderDevicePlugin(const String &plugin){mNewRenderDevicePlugin=plugin;}
 	void setIcon(void *icon);
 	void *getHINSTANCE() const;

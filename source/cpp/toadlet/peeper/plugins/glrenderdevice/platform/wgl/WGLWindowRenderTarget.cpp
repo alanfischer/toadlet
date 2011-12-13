@@ -72,8 +72,8 @@ BOOL safe_wglDeleteContext(HGLRC glrc){
 	}
 }
 
-TOADLET_C_API RenderTarget *new_WGLWindowRenderTarget(HWND wnd,WindowRenderTargetFormat *format){
-	return new WGLWindowRenderTarget(wnd,format);
+TOADLET_C_API RenderTarget *new_WGLWindowRenderTarget(void *display,void *window,WindowRenderTargetFormat *format){
+	return new WGLWindowRenderTarget((HWND)window,format);
 }
 
 WGLWindowRenderTarget::WGLWindowRenderTarget():WGLRenderTarget(),

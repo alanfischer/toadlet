@@ -30,11 +30,7 @@
 namespace toadlet{
 namespace peeper{
 
-TOADLET_C_API RenderTarget *new_EGLWindowRenderTarget(void *window,WindowRenderTargetFormat *format){
-	void *display=NULL;
-	#if defined(TOADLET_PLATFORM_WIN32)
-		display=GetDC((HWND)window);
-	#endif
+TOADLET_C_API RenderTarget *new_EGLWindowRenderTarget(void *display,void *window,WindowRenderTargetFormat *format){
 	return new EGLWindowRenderTarget(display,window,format);
 }
 
@@ -75,7 +71,7 @@ EGLWindowRenderTarget::EGLWindowRenderTarget(void *display,void *window,WindowRe
 			}
 		}
 
-		result=createContext(window,format,pixmap);
+		result=createContext(display,window,format,pixmap);
 	#endif
 }
 
@@ -88,6 +84,12 @@ void EGLWindowRenderTarget::destroy(){
 }
 
 bool EGLWindowRenderTarget::createContext(void *display,void *window,WindowRenderTargetFormat *format,bool pixmap){
+	#if defined(TOADLET_PLATFORM_WIN32)
+		if(display==0){
+			display=GetDC((HWND)window);
+		}
+	#endif
+
 	if(mContext!=EGL_NO_CONTEXT){
 		return true;
 	}
