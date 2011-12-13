@@ -50,7 +50,7 @@ namespace pad{
 struct X11Attributes{
 	Display *mDisplay;
 	Window mWindow;
-	XVisualInfo *mVisualInfo;
+	XVisualInfo mVisualInfo;
 	int mScrnum;
 	Atom mDeleteWindow;
 	Cursor mBlankCursor;
@@ -285,21 +285,6 @@ bool X11Application::createWindow(){
 
 	XSetWindowAttributes attr;
 	unsigned long mask;
-	int attrib[] = { GLX_RGBA,
-		GLX_RED_SIZE, 1,
-		GLX_GREEN_SIZE, 1,
-		GLX_BLUE_SIZE, 1,
-		GLX_DOUBLEBUFFER,
-		GLX_DEPTH_SIZE, 1,
-		None };
-		
-	// Find an OpenGL-capable Color Index visual RGB and Double-buffer
-//	x11->mVisualInfo=glXChooseVisual(x11->mDisplay,x11->mScrnum,attrib);
-//	if(!x11->mVisualInfo){
-	//	Error::unknown(Categories::TOADLET_PAD,
-		//	"couldn't get an RGB, Double-buffered visual");
-//		return false;
-//	}
 	if(XMatchVisualInfo(x11->mDisplay,x11->mScrnum,16,TrueColor,&x11->mVisualInfo)!=0){
 		Error::unknown(Categories::TOADLET_PAD,
 			"couldn't get a visual");
@@ -309,7 +294,7 @@ bool X11Application::createWindow(){
 	// Set the window attributes
 	attr.background_pixel=0;
 	attr.border_pixel=0;
-	attr.colormap=XCreateColormap(x11->mDisplay,XRootWindow(x11->mDisplay,x11->mScrnum),x11->mVisualInfo->visual,AllocNone);
+	attr.colormap=XCreateColormap(x11->mDisplay,XRootWindow(x11->mDisplay,x11->mScrnum),x11->mVisualInfo.visual,AllocNone);
 	attr.event_mask=StructureNotifyMask | ExposureMask | KeyPressMask | KeyReleaseMask | ButtonPressMask | ButtonReleaseMask | PointerMotionMask | FocusChangeMask;
 
 	// Go to fullscreen mode if requested
@@ -382,7 +367,7 @@ bool X11Application::createWindow(){
 		attr.override_redirect = true;
 
 		// Create window
-		x11->mWindow=XCreateWindow(x11->mDisplay,XRootWindow(x11->mDisplay,x11->mScrnum),mPositionX,mPositionY,mWidth,mHeight,0,x11->mVisualInfo->depth,InputOutput,x11->mVisualInfo->visual,mask,&attr);
+		x11->mWindow=XCreateWindow(x11->mDisplay,XRootWindow(x11->mDisplay,x11->mScrnum),mPositionX,mPositionY,mWidth,mHeight,0,x11->mVisualInfo.depth,InputOutput,x11->mVisualInfo.visual,mask,&attr);
 
 		// Lock things to window
 		XWarpPointer(x11->mDisplay,None,x11->mWindow,0,0,0,0,mWidth/2,mHeight/2);
@@ -396,7 +381,7 @@ bool X11Application::createWindow(){
 		mask = CWBackPixel | CWBorderPixel | CWColormap | CWEventMask;
 		
 		// Create window
-		x11->mWindow=XCreateWindow(x11->mDisplay,XRootWindow(x11->mDisplay,x11->mScrnum),mPositionX,mPositionY,mWidth,mHeight,0,x11->mVisualInfo->depth,InputOutput,x11->mVisualInfo->visual,mask,&attr);
+		x11->mWindow=XCreateWindow(x11->mDisplay,XRootWindow(x11->mDisplay,x11->mScrnum),mPositionX,mPositionY,mWidth,mHeight,0,x11->mVisualInfo.depth,InputOutput,x11->mVisualInfo.visual,mask,&attr);
 		
 		// Set hints and properties
 		XSizeHints sizehints;
@@ -440,11 +425,6 @@ void X11Application::destroyWindow(){
 
 	originalEnv();
 
-	if(x11->mVisualInfo){
-		XFree(x11->mVisualInfo);
-		x11->mVisualInfo=None;
-	}
-	
 	if(x11->mWindow){
 		XDestroyWindow(x11->mDisplay,x11->mWindow);
 		x11->mWindow=None;
@@ -592,7 +572,6 @@ void X11Application::setDifferenceMouse(bool difference){
 
 void *X11Application::getDisplay(){return x11->mDisplay;}
 void *X11Application::getWindow(){return (void*)x11->mWindow;}
-void *X11Application::getVisualInfo(){return x11->mVisualInfo;}
 
 int X11Application::translateKey(int key){
 	switch(key){
