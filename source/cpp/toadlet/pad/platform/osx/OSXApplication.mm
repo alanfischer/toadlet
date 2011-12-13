@@ -51,9 +51,9 @@ using namespace toadlet::pad;
 #if defined(TOADLET_HAS_OPENGL)
 	extern "C" RenderDevice *new_GLRenderDevice();
 	#if defined(TOADLET_HAS_UIKIT)
-		extern "C" RenderTarget *new_EAGLRenderTarget(void *layer,WindowRenderTargetFormat *format);
+		extern "C" RenderTarget *new_EAGLRenderTarget(void *display,void *layer,WindowRenderTargetFormat *format);
 	#else
-		extern "C" RenderTarget *new_NSGLRenderTarget(void *view,WindowRenderTargetFormat *format);
+		extern "C" RenderTarget *new_NSGLRenderTarget(void *display,void *view,WindowRenderTargetFormat *format);
 	#endif
 #endif
 #if defined(TOADLET_HAS_OPENAL)
@@ -316,7 +316,7 @@ void OSXApplication::setWindow(void *window){
 	[(NSObject*)mWindow retain];
 }
 
-bool OSXApplication::preEngineCreate(){
+void OSXApplication::preEngineCreate(){
 	if(mWindow==nil){
 		// This programatic Window creation isn't spectacular, but it's enough to run examples.
 		mPool=[[NSAutoreleasePool alloc] init];
@@ -384,8 +384,6 @@ void OSXApplication::postEngineCreate(){
 	mBundleArchive=OSXBundleArchive::ptr(new OSXBundleArchive());
 	shared_static_cast<OSXBundleArchive>(mBundleArchive)->open([NSBundle mainBundle]);
 	mEngine->getArchiveManager()->manage(shared_static_cast<Archive>(mBundleArchive));
-	
-	return result;
 }
 
 void OSXApplication::destroy(){
@@ -507,7 +505,7 @@ void OSXApplication::internal_mouseMoved(int x,int y){
 	mouseMoved(x,y);
 }
 
-void *OSXApplication::getWindowHandle(){
+void *OSXApplication::getWindow(){
 	#if defined(TOADLET_HAS_UIKIT)
 		return (CAEAGLLayer*)[(UIView*)mView layer];
 	#else
