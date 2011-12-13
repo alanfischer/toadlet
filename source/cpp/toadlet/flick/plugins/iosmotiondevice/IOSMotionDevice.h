@@ -26,7 +26,8 @@
 #ifndef TOADLET_FLICK_IOSMOTIONDEVICE_H
 #define TOADLET_FLICK_IOSMOTIONDEVICE_H
 
-#include <toadlet/flick/FilteredMotionDevice.h>
+#include <toadlet/flick/InputDevice.h>
+#include <toadlet/flick/InputData.h>
 #include <toadlet/egg/System.h>
 #include <toadlet/egg/Logger.h>
 #import <UIKit/UIKit.h>
@@ -50,7 +51,7 @@ toadlet::flick::IOSMotionDevice *mMotionDevice;
 namespace toadlet{
 namespace flick{
 
-class IOSMotionDevice:public MotionDevice{
+class IOSMotionDevice:public InputDevice{
 public:
 	IOSMotionDevice();
 	virtual ~IOSMotionDevice();
@@ -58,11 +59,12 @@ public:
 	bool create();
 	void destroy();
 
+	InputDevice::InputType getType(){return InputDevice::InputType_MOTION;}
 	bool start();
 	void update(int dt){}
 	void stop();
 
-	void setListener(MotionDeviceListener *listener){mListener=listener;}
+	void setListener(InputDeviceListener *listener){mListener=listener;}
 	void setSampleTime(int dt);
 	void setAlpha(scalar alpha){}
 
@@ -70,9 +72,9 @@ public:
 
 protected:
 	bool mRunning;
-	MotionDeviceListener *mListener;
+	InputDeviceListener *mListener;
 	ToadletAccelerometerDelegate *mAccelerometerDelegate;
-	MotionData mMotionData;
+	InputData mMotionData;
 };
 
 }
