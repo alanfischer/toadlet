@@ -9,21 +9,24 @@ set (CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${artoadlet_SOURCE_DIR}/../../../cm
 find_package (toadlet REQUIRED)
 
 # Includes
-include_directories (${artoadlet_SOURCE_DIR} ${TOADLET_INCLUDE_DIR})
+include_directories (${artoadlet_SOURCE_DIR} ${TOADLET_INCLUDE_DIR} "C:/Program Files/Microsoft SDKs/Windows/v7.1/Include")
 
 # Libraries
-set (LIBS ${TOADLET_LIBRARIES})
+set (LIBS ${TOADLET_LIBRARIES} "C:/Program Files/Microsoft SDKs/Windows/v7.1/Lib/mfreadwrite.lib")
 
 # Source files
 set (SRC
 	../../main/toadletApp.cpp
 	../../main/toadletMain.cpp
 	src/ARToadlet.cpp
+	src/MFVideoDevice.cpp
 )
 
 # Headers
 set (H
 	src/ARToadlet.h
+	src/MFVideoDevice.h
+	src/VideoDevice.h
 )
 
 # Executable

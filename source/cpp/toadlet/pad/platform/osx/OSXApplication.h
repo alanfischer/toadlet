@@ -73,9 +73,9 @@ public:
 
 	virtual void changeRenderDevicePlugin(const String &plugin){}
 
-	virtual void *getWindowHandle();
-	inline void *getWindow() const{return mWindow;}
-	inline void *getView() const{return mView;}
+	void *getDisplay(){return 0;}
+	void *getWindow(){return mWindow;}
+	void *getView(){return mView;}
 
 	void internal_mouseMoved(int x,int y);
 	
