@@ -30,7 +30,6 @@
 #include <X11/keysym.h>
 #include <X11/Xutil.h>
 #include <X11/extensions/xf86vmode.h>
-#include <stdlib.h>
 
 using namespace toadlet::peeper;
 using namespace toadlet::ribbit;
@@ -285,15 +284,40 @@ bool X11Application::createWindow(){
 
 	XSetWindowAttributes attr;
 	unsigned long mask;
-
+	/// @todo: Remove this once we know we wont need it for direct rendering
+	#if 0
+        int attribList[]={
+                GLX_RGBA,
+                GLX_DOUBLEBUFFER,
+                GLX_RED_SIZE,TextureFormat::getRedBits(mFormat->pixelFormat),
+                GLX_GREEN_SIZE,TextureFormat::getGreenBits(mFormat->pixelFormat),
+                GLX_BLUE_SIZE,TextureFormat::getBlueBits(mFormat->pixelFormat),
+                GLX_DEPTH_SIZE,mFormat->depthBits,
+                GLX_STENCIL_SIZE,mFormat->stencilBits,
+                None
+        };
+        x11->mVisualInfo=glXChooseVisual(x11->mDisplay,x11->mScrnum,attribList);
+	#else
 	XVisualInfo info;
-	if(XMatchVisualInfo(x11->mDisplay,x11->mScrnum,mFormat->depthBits,TrueColor,&info)!=0){
+	int redBits=TextureFormat::getRedBits(mFormat->pixelFormat);
+	int greenBits=TextureFormat::getGreenBits(mFormat->pixelFormat);
+	int blueBits=TextureFormat::getBlueBits(mFormat->pixelFormat);
+	int alphaBits=TextureFormat::getAlphaBits(mFormat->pixelFormat);
+	int colorBits=redBits+greenBits+blueBits+alphaBits;
+	if(XMatchVisualInfo(x11->mDisplay,x11->mScrnum,colorBits,TrueColor,&info)==0){
 		Error::unknown(Categories::TOADLET_PAD,
-			"couldn't get a visual");
+			String("failed to match visual for ")+colorBits);
 		return false;
 	}
+	info.screen=0;
 	int n=0;
 	x11->mVisualInfo=XGetVisualInfo(x11->mDisplay,VisualAllMask,&info,&n);
+	if(x11->mVisualInfo==None){
+		Error::unknown(Categories::TOADLET_PAD,
+			"failed to get visual");
+		return false;
+	}
+	#endif
 
 	// Set the window attributes
 	attr.background_pixel=0;
