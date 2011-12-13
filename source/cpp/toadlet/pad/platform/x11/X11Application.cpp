@@ -25,9 +25,6 @@
 
 #include <toadlet/egg/Error.h>
 #include <toadlet/egg/System.h>
-#if defined(TOADLET_HAS_OPENGL)
-	#include <toadlet/peeper/plugins/glrenderdevice/platform/glx/GLXWindowRenderTarget.h>
-#endif
 #include <toadlet/pad/platform/x11/X11Application.h>
 #include <X11/Xlib.h>
 #include <X11/keysym.h>
@@ -41,6 +38,7 @@ using namespace toadlet::flick;
 
 #if defined(TOADLET_HAS_OPENGL)
 	extern "C" RenderDevice *new_GLRenderDevice();
+	extern "C" RenderTarget *new_GLXWindowRenderTarget(void *display,void *window,WindowRenderTargetFormat *format);
 #endif
 #if defined(TOADLET_HAS_OPENAL)
 	extern "C" AudioDevice *new_ALAudioDevice();
@@ -87,6 +85,10 @@ X11Application::X11Application():
 {
 	x11=new X11Attributes();
 	memset(x11,0,sizeof(X11Attributes));
+
+	#if defined(TOADLET_HAS_OPENGL)
+		mRenderDevicePlugins.add("gl",RenderDevicePlugin(new_GLXWindowRenderTarget,new_GLRenderDevice));
+	#endif
 
 	#if defined(TOADLET_HAS_OPENAL)
 		mAudioDevicePlugins.add("al",AudioDevicePlugin(new_ALAudioDevice));
@@ -236,11 +238,6 @@ void X11Application::deactivate(){
 }
 
 bool X11Application::createWindow(){
-#if !defined(TOADLET_HAS_OPENGL)
-	Error::unimplemented(Categories::TOADLET_PAD,
-		"createWindow unimplemented without OpenGL");
-	return false;
-#else
 	x11->mDisplay=XOpenDisplay(getenv("DISPLAY"));
 	if(x11->mDisplay==None){
 		Error::unknown(Categories::TOADLET_PAD,
@@ -250,54 +247,41 @@ bool X11Application::createWindow(){
 
 	x11->mScrnum=XDefaultScreen(x11->mDisplay);
 
-	#if !defined(TOADLET_PLATFORM_IRIX)
-		if(mWidth==-1 || mHeight==-1){
-			XF86VidModeModeLine currentMode;
-			int tmp;
-			XF86VidModeGetModeLine(x11->mDisplay,x11->mScrnum,&tmp,&currentMode);
-			if(mWidth==-1){
-				mWidth=currentMode.hdisplay;
-			}
-			if(mHeight==-1){
-				mHeight=currentMode.vdisplay;
-			}
+	if(mWidth==-1 || mHeight==-1){
+		XF86VidModeModeLine currentMode;
+		int tmp;
+		XF86VidModeGetModeLine(x11->mDisplay,x11->mScrnum,&tmp,&currentMode);
+		if(mWidth==-1){
+			mWidth=currentMode.hdisplay;
 		}
-	#else
-		if(mWidth==-1 || mHeight==-1){
-			if(mWidth==-1){
-				mWidth=640;
-			}
-			if(mHeight==-1){
-				mHeight=480;
-			}
+		if(mHeight==-1){
+			mHeight=currentMode.vdisplay;
 		}
-	#endif
+	}
 
-	#if !defined(TOADLET_PLATFORM_IRIX)
-		// Antialiasing should work with an nvidia card and nvidia glxvpenis
-		x11->mOriginalEnv.antialiasing = getenv("__GL_FSAA_MODE");
-		if(x11->mOriginalEnv.antialiasing==NULL){
-			if(mFormat->multisamples>1){
-				setenv("__GL_FSAA_MODE","4",1);
-				Logger::alert(Categories::TOADLET_PAD,
-					"Antialiasing attempted with __GL_FSAA_MODE = 4");
-			}
-			else{
-				setenv("__GL_FSAA_MODE","0",1);
-			}
+	// Antialiasing should work with an nvidia card and nvidia glx
+	x11->mOriginalEnv.antialiasing = getenv("__GL_FSAA_MODE");
+	if(x11->mOriginalEnv.antialiasing==NULL){
+		if(mFormat->multisamples>1){
+			setenv("__GL_FSAA_MODE","4",1);
+			Logger::alert(Categories::TOADLET_PAD,
+				"Antialiasing attempted with __GL_FSAA_MODE = 4");
 		}
+		else{
+			setenv("__GL_FSAA_MODE","0",1);
+		}
+	}
 
-		// Setup vblank syncing for a smoother display
-		x11->mOriginalEnv.vblank = getenv("__GL_SYNC_TO_VBLANK");
-		if(x11->mOriginalEnv.vblank==NULL){
-			if(mFormat->vsync){
-				setenv("__GL_SYNC_TO_VBLANK","1",1);
-			}
-			else{
-				setenv("__GL_SYNC_TO_VBLANK","0",1);
-			}
+	// Setup vblank syncing for a smoother display
+	x11->mOriginalEnv.vblank = getenv("__GL_SYNC_TO_VBLANK");
+	if(x11->mOriginalEnv.vblank==NULL){
+		if(mFormat->vsync){
+			setenv("__GL_SYNC_TO_VBLANK","1",1);
 		}
-	#endif
+		else{
+			setenv("__GL_SYNC_TO_VBLANK","0",1);
+		}
+	}
 
 	XSetWindowAttributes attr;
 	unsigned long mask;
@@ -308,20 +292,17 @@ bool X11Application::createWindow(){
 		GLX_DOUBLEBUFFER,
 		GLX_DEPTH_SIZE, 1,
 		None };
-	
-	// Check for glx on the display
-	int dummy;
-	if(!glXQueryExtension(x11->mDisplay,&dummy,&dummy)){
-		Error::unknown(Categories::TOADLET_PAD,
-			"glXQueryExtension failure");
-		return false; 
-	}
-	
+		
 	// Find an OpenGL-capable Color Index visual RGB and Double-buffer
-	x11->mVisualInfo=glXChooseVisual(x11->mDisplay,x11->mScrnum,attrib);
-	if(!x11->mVisualInfo){
+//	x11->mVisualInfo=glXChooseVisual(x11->mDisplay,x11->mScrnum,attrib);
+//	if(!x11->mVisualInfo){
+	//	Error::unknown(Categories::TOADLET_PAD,
+		//	"couldn't get an RGB, Double-buffered visual");
+//		return false;
+//	}
+	if(XMatchVisualInfo(x11->mDisplay,x11->mScrnum,16,TrueColor,&x11->mVisualInfo)!=0){
 		Error::unknown(Categories::TOADLET_PAD,
-			"couldn't get an RGB, Double-buffered visual");
+			"couldn't get a visual");
 		return false;
 	}
 
@@ -333,87 +314,81 @@ bool X11Application::createWindow(){
 
 	// Go to fullscreen mode if requested
 	if(mFullscreen){
-		#if defined(TOADLET_PLATFORM_IRIX)
+		// Get the display modes list
+		XF86VidModeModeInfo **displayModes=NULL;
+		int numDisplayModes;
+		XF86VidModeGetAllModeLines(x11->mDisplay,x11->mScrnum,&numDisplayModes,&displayModes);
+		if(displayModes==NULL){
 			Error::unknown(Categories::TOADLET_PAD,
-				"fullscreen mode not supported on IRIX");
+				"XF86VidModeGetAllModeLines didn't find any");
 			return false;
-		#else
-			// Get the display modes list
-			XF86VidModeModeInfo **displayModes=NULL;
-			int numDisplayModes;
-			XF86VidModeGetAllModeLines(x11->mDisplay,x11->mScrnum,&numDisplayModes,&displayModes);
-			if(displayModes==NULL){
-				Error::unknown(Categories::TOADLET_PAD,
-					"XF86VidModeGetAllModeLines didn't find any");
-				return false;
+		}
+		
+		// Store the current mode, converting from ModeLine to ModeInfo
+		XF86VidModeModeLine currentMode;
+		int dotclock=0;
+		XF86VidModeGetModeLine(x11->mDisplay,x11->mScrnum,&dotclock,&currentMode);
+		memcpy(((char*)(&x11->mOriginalMode.mode))+sizeof(int),&currentMode,sizeof(XF86VidModeModeLine));
+		x11->mOriginalMode.mode.dotclock=dotclock;
+		XF86VidModeGetViewPort(x11->mDisplay,x11->mScrnum,&x11->mOriginalMode.viewX,&x11->mOriginalMode.viewY);
+		
+		// See if any display modes match the requested mode and switch
+		int i;
+		int mode=-1;
+		for(i=0; i<numDisplayModes; ++i){
+			if(mWidth==displayModes[i]->hdisplay && mHeight==displayModes[i]->vdisplay){
+				mode=i;
+				i=numDisplayModes;
 			}
-			
-			// Store the current mode, converting from ModeLine to ModeInfo
-			XF86VidModeModeLine currentMode;
-			int dotclock=0;
-			XF86VidModeGetModeLine(x11->mDisplay,x11->mScrnum,&dotclock,&currentMode);
-			memcpy(((char*)(&x11->mOriginalMode.mode))+sizeof(int),&currentMode,sizeof(XF86VidModeModeLine));
-			x11->mOriginalMode.mode.dotclock=dotclock;
-			XF86VidModeGetViewPort(x11->mDisplay,x11->mScrnum,&x11->mOriginalMode.viewX,&x11->mOriginalMode.viewY);
-			
-			// See if any display modes match the requested mode and switch
-			int i;
-			int mode=-1;
-			for(i=0; i<numDisplayModes; ++i){
-				if(mWidth==displayModes[i]->hdisplay && mHeight==displayModes[i]->vdisplay){
-					mode=i;
-					i=numDisplayModes;
-				}
+		}
+
+		if(mode!=-1){
+			Logger::alert(Categories::TOADLET_PAD,
+				String("Attemping to use Mode ") + (int)mode + " : " + (int)displayModes[mode]->hdisplay +
+				" x " + (int)displayModes[mode]->vdisplay + " @ " +
+				(1000 * displayModes[mode]->dotclock / (displayModes[mode]->htotal * displayModes[mode]->vtotal)));
+
+			// Only switch if requested mode is actually different
+			if(displayModes[mode]->hdisplay!=x11->mOriginalMode.mode.hdisplay || displayModes[mode]->vdisplay!=x11->mOriginalMode.mode.vdisplay){
+				XF86VidModeSwitchToMode(x11->mDisplay,x11->mScrnum,displayModes[mode]);
+				XF86VidModeSetViewPort(x11->mDisplay,x11->mScrnum,0,0);
 			}
-
-			if(mode!=-1){
-				Logger::alert(Categories::TOADLET_PAD,
-					String("Attemping to use Mode ") + (int)mode + " : " + (int)displayModes[mode]->hdisplay +
-					" x " + (int)displayModes[mode]->vdisplay + " @ " +
-					(1000 * displayModes[mode]->dotclock / (displayModes[mode]->htotal * displayModes[mode]->vtotal)));
-
-				// Only switch if requested mode is actually different
-				if(displayModes[mode]->hdisplay!=x11->mOriginalMode.mode.hdisplay || displayModes[mode]->vdisplay!=x11->mOriginalMode.mode.vdisplay){
-					XF86VidModeSwitchToMode(x11->mDisplay,x11->mScrnum,displayModes[mode]);
-					XF86VidModeSetViewPort(x11->mDisplay,x11->mScrnum,0,0);
-				}
-				Logger::alert(Categories::TOADLET_PAD,
-					"Success");
-			}
-			else{
-				if(displayModes){
-					XFree(displayModes);
-					displayModes=NULL;
-				}
-
-				Error::unknown(Categories::TOADLET_PAD,
-					"fullscreen mode unavailable due to bad requested fullscreen size");
-				return false;
-			}
-			
-			// Make sure we are square after mode switch
-			XSync(x11->mDisplay,true);
-
-			// Clean up
+			Logger::alert(Categories::TOADLET_PAD,
+				"Success");
+		}
+		else{
 			if(displayModes){
 				XFree(displayModes);
 				displayModes=NULL;
 			}
-			
-			// Set Fullscreen attributes
-			mask = CWBackPixel | CWBorderPixel | CWColormap | CWEventMask | CWOverrideRedirect;
-			attr.border_pixmap = None;
-			attr.override_redirect = true;
 
-			// Create window
-			x11->mWindow=XCreateWindow(x11->mDisplay,XRootWindow(x11->mDisplay,x11->mScrnum),mPositionX,mPositionY,mWidth,mHeight,0,x11->mVisualInfo->depth,InputOutput,x11->mVisualInfo->visual,mask,&attr);
+			Error::unknown(Categories::TOADLET_PAD,
+				"fullscreen mode unavailable due to bad requested fullscreen size");
+			return false;
+		}
+		
+		// Make sure we are square after mode switch
+		XSync(x11->mDisplay,true);
 
-			// Lock things to window
-			XWarpPointer(x11->mDisplay,None,x11->mWindow,0,0,0,0,mWidth/2,mHeight/2);
-			XMapRaised(x11->mDisplay,x11->mWindow);
-			XGrabKeyboard(x11->mDisplay,x11->mWindow,true,GrabModeAsync,GrabModeAsync,CurrentTime);
-			XGrabPointer(x11->mDisplay,x11->mWindow,true,ButtonPressMask,GrabModeAsync,GrabModeAsync,x11->mWindow,None,CurrentTime);
-		#endif
+		// Clean up
+		if(displayModes){
+			XFree(displayModes);
+			displayModes=NULL;
+		}
+		
+		// Set Fullscreen attributes
+		mask = CWBackPixel | CWBorderPixel | CWColormap | CWEventMask | CWOverrideRedirect;
+		attr.border_pixmap = None;
+		attr.override_redirect = true;
+
+		// Create window
+		x11->mWindow=XCreateWindow(x11->mDisplay,XRootWindow(x11->mDisplay,x11->mScrnum),mPositionX,mPositionY,mWidth,mHeight,0,x11->mVisualInfo->depth,InputOutput,x11->mVisualInfo->visual,mask,&attr);
+
+		// Lock things to window
+		XWarpPointer(x11->mDisplay,None,x11->mWindow,0,0,0,0,mWidth/2,mHeight/2);
+		XMapRaised(x11->mDisplay,x11->mWindow);
+		XGrabKeyboard(x11->mDisplay,x11->mWindow,true,GrabModeAsync,GrabModeAsync,CurrentTime);
+		XGrabPointer(x11->mDisplay,x11->mWindow,true,ButtonPressMask,GrabModeAsync,GrabModeAsync,x11->mWindow,None,CurrentTime);
 	}
 	// Otherwise use windowed mode
 	else{
@@ -448,7 +423,6 @@ bool X11Application::createWindow(){
 	XFreePixmap(x11->mDisplay,cursorPixmap);
 
 	return true;
-#endif
 }
 
 void X11Application::destroyWindow(){
@@ -483,39 +457,35 @@ void X11Application::destroyWindow(){
 }
 
 void X11Application::originalResolution(){
-	#if !defined(TOADLET_PLATFORM_IRIX)
-		if(mFullscreen){
-			// Store the current mode
-			XF86VidModeModeLine currentMode;
-			int tmp;
-			XF86VidModeGetModeLine(x11->mDisplay,x11->mScrnum,&tmp,&currentMode);
+	if(mFullscreen){
+		// Store the current mode
+		XF86VidModeModeLine currentMode;
+		int tmp;
+		XF86VidModeGetModeLine(x11->mDisplay,x11->mScrnum,&tmp,&currentMode);
 
-			// Switch if necessary
-			if(currentMode.hdisplay!=x11->mOriginalMode.mode.hdisplay || currentMode.vdisplay!=x11->mOriginalMode.mode.vdisplay){
-				XF86VidModeSwitchToMode(x11->mDisplay,x11->mScrnum,&x11->mOriginalMode.mode);
-				XF86VidModeSetViewPort(x11->mDisplay,x11->mScrnum,x11->mOriginalMode.viewX,x11->mOriginalMode.viewY);
-			}
-
-			// Make sure we are square after mode switch
-			XSync(x11->mDisplay,true);
-			mFullscreen=false;
-
-			// Release 
-			XUngrabKeyboard(x11->mDisplay,CurrentTime);
-			XUngrabPointer(x11->mDisplay,CurrentTime);
+		// Switch if necessary
+		if(currentMode.hdisplay!=x11->mOriginalMode.mode.hdisplay || currentMode.vdisplay!=x11->mOriginalMode.mode.vdisplay){
+			XF86VidModeSwitchToMode(x11->mDisplay,x11->mScrnum,&x11->mOriginalMode.mode);
+			XF86VidModeSetViewPort(x11->mDisplay,x11->mScrnum,x11->mOriginalMode.viewX,x11->mOriginalMode.viewY);
 		}
-	#endif
+
+		// Make sure we are square after mode switch
+		XSync(x11->mDisplay,true);
+		mFullscreen=false;
+
+		// Release 
+		XUngrabKeyboard(x11->mDisplay,CurrentTime);
+		XUngrabPointer(x11->mDisplay,CurrentTime);
+	}
 }
 
 void X11Application::originalEnv(){
-	#if !defined(TOADLET_PLATFORM_IRIX)
-		if(x11->mOriginalEnv.antialiasing==NULL){
-			unsetenv("__GL_FSAA_MODE");
-		}
-		if(x11->mOriginalEnv.vblank==NULL){
-			unsetenv("__GL_SYNC_TO_VBLANK");
-		}
-	#endif
+	if(x11->mOriginalEnv.antialiasing==NULL){
+		unsetenv("__GL_FSAA_MODE");
+	}
+	if(x11->mOriginalEnv.vblank==NULL){
+		unsetenv("__GL_SYNC_TO_VBLANK");
+	}
 }
 
 void X11Application::setTitle(const String &title){
@@ -558,79 +528,6 @@ void X11Application::setFullscreen(bool fullscreen){
 
 bool X11Application::getFullscreen() const{
 	return mFullscreen;
-}
-
-RenderTarget *X11Application::makeRenderTarget(){
-	#if defined(TOADLET_HAS_OPENGL)
-		return new GLXWindowRenderTarget(x11->mWindow,x11->mDisplay,x11->mVisualInfo);
-	#else
-		return NULL;
-	#endif
-}
-
-RenderDevice *X11Application::makeRenderDevice(){
-	#if defined(TOADLET_HAS_OPENGL)
-		return new_GLRenderDevice();
-	#else
-		return NULL;
-	#endif
-}
-
-bool X11Application::createContextAndRenderDevice(const String &plugin){
-	RenderTarget *renderTarget=makeRenderTarget();
-	if(renderTarget!=NULL){
-		mRenderTarget=renderTarget;
-
-		mRenderDevice=makeRenderDevice();
-		if(mRenderDevice!=NULL){
-			if(mRenderDevice->create(this,mRenderDeviceOptions)==false){
-				delete mRenderDevice;
-				mRenderDevice=NULL;
-				Error::unknown(Categories::TOADLET_PAD,
-					"error starting RenderDevice");
-				return false;
-			}
-		}
-		else{
-			Error::unknown(Categories::TOADLET_PAD,
-				"error creating RenderDevice");
-			return false;
-		}
-
-		if(mRenderDevice==NULL){
-			delete mRenderTarget;
-			mRenderTarget=NULL;
-		}
-	}
-	else{
-		Error::unknown(Categories::TOADLET_PAD,
-			"error creating RenderTarget");
-		return false;
-	}
-
-	if(mRenderDevice!=NULL){
-		mRenderDevice->setRenderTarget(this);
-		mEngine->setRenderDevice(mRenderDevice);
-	}
-
-	return mRenderDevice!=NULL;
-}
-
-bool X11Application::destroyRenderDeviceAndContext(){
-	if(mRenderDevice!=NULL){
-		mEngine->setRenderDevice(NULL);
-
-		mRenderDevice->destroy();
-		delete mRenderDevice;
-		mRenderDevice=NULL;
-	}
-
-	if(mRenderTarget!=NULL){
-		delete mRenderTarget;
-		mRenderTarget=NULL;
-	}
-
-	return true;
 }
 
 void X11Application::internal_mouseMoved(int x,int y){
@@ -693,9 +590,9 @@ void X11Application::setDifferenceMouse(bool difference){
 	}
 }
 
-void *X11Application::getDisplay() const{return x11->mDisplay;}
-void *X11Application::getWindow() const{return (void*)x11->mWindow;}
-void *X11Application::getVisualInfo() const{return x11->mVisualInfo;}
+void *X11Application::getDisplay(){return x11->mDisplay;}
+void *X11Application::getWindow(){return (void*)x11->mWindow;}
+void *X11Application::getVisualInfo(){return x11->mVisualInfo;}
 
 int X11Application::translateKey(int key){
 	switch(key){

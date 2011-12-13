@@ -29,15 +29,15 @@ public interface AudioDevice{
 	public boolean create();
 	public void destroy();
 	
+	public void activate();
+	public void deactivate();
+
 	public AudioBuffer createAudioBuffer();
 	public Audio createAudio();
 
 	public void setListenerGain(float gain);
 
 	public void update(int dt);
-
-	public void suspend();
-	public void resume();
 
 	public boolean getAudioCaps(AudioCaps caps);
 }

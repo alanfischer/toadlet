@@ -31,25 +31,29 @@
 namespace toadlet{
 namespace peeper{
 
+TOADLET_C_API RenderTarget *new_GLXWindowRenderTarget(void *display,void *window,WindowRenderTargetFormat *format){
+	return new GLXWindowRenderTarget((Display*)display,(Window*)window,format);
+}
+
 GLXWindowRenderTarget::GLXWindowRenderTarget():GLXRenderTarget(),
 	mVisualInfo(NULL)
 	//mThreadContexts,
 	//mThreadIDs
 {}
 
-GLXWindowRenderTarget::GLXWindowRenderTarget(GLXDrawable drawable,Display *display,XVisualInfo *visualInfo):GLXRenderTarget(),
+GLXWindowRenderTarget::GLXWindowRenderTarget(Display *display,Window *window,WindowRenderTargetFormat *format):GLXRenderTarget(),
 	mVisualInfo(NULL)
 	//mThreadContexts,
 	//mThreadIDs
 {
-	createContext(drawable,display,visualInfo);
+	createContext(display,window,format);
 }
 
 GLXWindowRenderTarget::~GLXWindowRenderTarget(){
 	destroy();
 }
 
-bool GLXWindowRenderTarget::createContext(GLXDrawable drawable,Display *display,XVisualInfo *visualInfo){
+bool GLXWindowRenderTarget::createContext(Display *display,Window *window,XVisualInfo *visualInfo){
 	mDrawable=drawable;
 	mDisplay=display;
 	mVisualInfo=visualInfo;

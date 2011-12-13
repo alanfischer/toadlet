@@ -90,17 +90,18 @@ public:
 	}
 	virtual bool getBackable() const{return mBackable;}
 
-	virtual void *getWindowHandle()=0;
+	virtual void *getDisplay()=0;
+	virtual void *getWindow()=0;
 
 protected:
 	class RenderDevicePlugin{
 	public:
 		RenderDevicePlugin(
-			RenderTarget *(*renderTarget)(void *,WindowRenderTargetFormat *)=NULL,
+			RenderTarget *(*renderTarget)(void *,void *,WindowRenderTargetFormat *)=NULL,
 			RenderDevice *(*renderDevice)()=NULL
 		):createRenderTarget(renderTarget),createRenderDevice(renderDevice){}
 
-		RenderTarget *(*createRenderTarget)(void *,WindowRenderTargetFormat *);
+		RenderTarget *(*createRenderTarget)(void *,void *,WindowRenderTargetFormat *);
 		RenderDevice *(*createRenderDevice)();
 	};
 
