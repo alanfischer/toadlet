@@ -203,7 +203,7 @@ RenderTarget *BaseApplication::makeRenderTarget(const String &plugin){
 	Map<String,RenderDevicePlugin>::iterator it=mRenderDevicePlugins.find(plugin);
 	if(it!=mRenderDevicePlugins.end()){
 		TOADLET_TRY
-			target=it->second.createRenderTarget(getWindowHandle(),mFormat);
+			target=it->second.createRenderTarget(getDisplay(),getWindow(),mFormat);
 		TOADLET_CATCH(const Exception &){target=NULL;}
 	}
 	if(target!=NULL && target->isValid()==false){

@@ -30,12 +30,12 @@ namespace toadlet{
 namespace peeper{
 
 #if defined(TOADLET_SET_D3D10)
-	TOADLET_C_API RenderTarget *new_D3D10WindowRenderTarget(HWND wnd,WindowRenderTargetFormat *format){
-		return new D3D10WindowRenderTarget(wnd,format);
+	TOADLET_C_API RenderTarget *new_D3D10WindowRenderTarget(void *display,void *window,WindowRenderTargetFormat *format){
+		return new D3D10WindowRenderTarget((HWND)window,format);
 	}
 #else
-	TOADLET_C_API RenderTarget *new_D3D11WindowRenderTarget(HWND wnd,WindowRenderTargetFormat *format){
-		return new D3D10WindowRenderTarget(wnd,format);
+	TOADLET_C_API RenderTarget *new_D3D11WindowRenderTarget(void *display,void *window,WindowRenderTargetFormat *format){
+		return new D3D10WindowRenderTarget((HWND)window,format);
 	}
 #endif
 
