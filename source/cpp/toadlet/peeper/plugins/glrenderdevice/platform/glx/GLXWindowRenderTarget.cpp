@@ -59,7 +59,7 @@ bool GLXWindowRenderTarget::createContext(Display *display,Window window,WindowR
 	XWindowAttributes attributes;
 	XGetWindowAttributes(display,window,&attributes);
 	int screen=XScreenNumberOfScreen(attributes.screen);
-
+	
 	int attribList[]={
 		GLX_RGBA,
 		GLX_DOUBLEBUFFER,
