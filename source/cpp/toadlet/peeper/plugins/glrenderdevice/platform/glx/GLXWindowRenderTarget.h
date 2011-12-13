@@ -35,13 +35,13 @@ namespace peeper{
 class TOADLET_API GLXWindowRenderTarget:public GLXRenderTarget{
 public:
 	GLXWindowRenderTarget();
-	GLXWindowRenderTarget(GLXDrawable drawable,Display *display,XVisualInfo *visualInfo);
+	GLXWindowRenderTarget(Display *display,Window window,WindowRenderTargetFormat *format);
 	virtual ~GLXWindowRenderTarget();
 	void destroy(){destroyContext();}
 
 	RenderTarget *getRootRenderTarget(){return (GLRenderTarget*)this;}
 
-	bool createContext(GLXDrawable drawable,Display *display,XVisualInfo *visualInfo);
+	bool createContext(Display *display,Window window,WindowRenderTargetFormat *format);
 	bool destroyContext();
 	bool activateAdditionalContext();
 	void deactivateAdditionalContext();
@@ -54,7 +54,6 @@ public:
 	int getHeight() const;
 
 protected:
-	XVisualInfo *mVisualInfo;
 	Collection<GLXContext> mThreadContexts;
 	Collection<int> mThreadIDs;
 };

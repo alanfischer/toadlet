@@ -27,22 +27,21 @@
 #include <toadlet/egg/Error.h>
 #include <toadlet/egg/Logger.h>
 #include <toadlet/egg/System.h>
+#include <toadlet/peeper/TextureFormat.h>
 
 namespace toadlet{
 namespace peeper{
 
 TOADLET_C_API RenderTarget *new_GLXWindowRenderTarget(void *display,void *window,WindowRenderTargetFormat *format){
-	return new GLXWindowRenderTarget((Display*)display,(Window*)window,format);
+	return new GLXWindowRenderTarget((Display*)display,(Window)window,format);
 }
 
-GLXWindowRenderTarget::GLXWindowRenderTarget():GLXRenderTarget(),
-	mVisualInfo(NULL)
+GLXWindowRenderTarget::GLXWindowRenderTarget():GLXRenderTarget()
 	//mThreadContexts,
 	//mThreadIDs
 {}
 
-GLXWindowRenderTarget::GLXWindowRenderTarget(Display *display,Window *window,WindowRenderTargetFormat *format):GLXRenderTarget(),
-	mVisualInfo(NULL)
+GLXWindowRenderTarget::GLXWindowRenderTarget(Display *display,Window window,WindowRenderTargetFormat *format):GLXRenderTarget()
 	//mThreadContexts,
 	//mThreadIDs
 {
@@ -53,12 +52,32 @@ GLXWindowRenderTarget::~GLXWindowRenderTarget(){
 	destroy();
 }
 
-bool GLXWindowRenderTarget::createContext(Display *display,Window *window,XVisualInfo *visualInfo){
-	mDrawable=drawable;
+bool GLXWindowRenderTarget::createContext(Display *display,Window window,WindowRenderTargetFormat *format){
+	mDrawable=window;
 	mDisplay=display;
-	mVisualInfo=visualInfo;
 
-	mContext=glXCreateContext(mDisplay,mVisualInfo,NULL,True);
+	XWindowAttributes attributes;
+	XGetWindowAttributes(display,window,&attributes);
+	int screen=XScreenNumberOfScreen(attributes.screen);
+
+	int attribList[]={
+		GLX_RGBA,
+		GLX_DOUBLEBUFFER,
+		GLX_RED_SIZE,TextureFormat::getRedBits(format->pixelFormat),
+		GLX_GREEN_SIZE,TextureFormat::getGreenBits(format->pixelFormat),
+		GLX_BLUE_SIZE,TextureFormat::getBlueBits(format->pixelFormat),
+		GLX_DEPTH_SIZE,format->depthBits,
+		GLX_STENCIL_SIZE,format->stencilBits,
+		None
+	};
+	XVisualInfo *visualInfo=glXChooseVisual(display,screen,attribList);
+	if(!visualInfo){
+		Error::unknown(Categories::TOADLET_PEEPER,
+			"glXChooseVisual failed");
+		return false;
+	}
+
+	mContext=glXCreateContext(mDisplay,visualInfo,NULL,True);
 	if(!mContext){
 		Error::unknown(Categories::TOADLET_PEEPER,
 			"glXCreateContext failed");
@@ -67,14 +86,12 @@ bool GLXWindowRenderTarget::createContext(Display *display,Window *window,XVisua
 
 	glXMakeCurrent(mDisplay,mDrawable,mContext);
 	
-	/// @todo: Have this accept a WindowRenderTargetFormat, so we can get thread count from there.
-	int threads=2;
-	int numThreads=threads<=1?0:threads-1;
+	int numThreads=format->threads<=1?0:format->threads-1;
 	mThreadContexts.resize(numThreads,0);
 	mThreadIDs.resize(numThreads,0);
 	int i;
 	for(i=0;i<numThreads;++i){
-		GLXContext context=glXCreateContext(mDisplay,mVisualInfo,mContext,True);
+		GLXContext context=glXCreateContext(mDisplay,visualInfo,mContext,True);
 		if(context==0){
 			destroyContext();
 			Error::unknown(Categories::TOADLET_PEEPER,
