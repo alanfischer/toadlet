@@ -30,7 +30,7 @@
 namespace toadlet{
 namespace peeper{
 
-TOADLET_C_API RenderTarget *new_NSGLRenderTarget(void *view,WindowRenderTargetFormat *format){
+TOADLET_C_API RenderTarget *new_NSGLRenderTarget(void *display,void *view,WindowRenderTargetFormat *format){
 	return new NSGLRenderTarget((NSView*)view,format);
 }
 	
