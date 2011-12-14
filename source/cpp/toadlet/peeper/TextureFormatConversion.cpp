@@ -29,16 +29,14 @@
 namespace toadlet{
 namespace peeper{
 
-inline tbyte clip(int c){return (tbyte)c<0?0:(c>255?255:c);}
-
 inline uint32 convertYCrCbToRGBA(int y,int cr,int cb){
 	uint32 rgba=0;
 	int c=y-16;
 	int d=cb-128;
 	int e=cr-128;
-	rgba|=clip((298*c      +409*e+128)>>8);
-	rgba|=clip((298*c-100*d-208*e+128)>>8)<<8;
-	rgba|=clip((298*c+516*d      +128)>>8)<<16;
+	rgba|=Math::intClamp(0,255,(298*c      +409*e+128)>>8);
+	rgba|=Math::intClamp(0,255,(298*c-100*d-208*e+128)>>8)<<8;
+	rgba|=Math::intClamp(0,255,(298*c+516*d      +128)>>8)<<16;
 	return rgba;
 }
 
@@ -47,9 +45,9 @@ inline uint32 convertYCrCbToBGRA(int y,int cr,int cb){
 	int c=y-16;
 	int d=cb-128;
 	int e=cr-128;
-	rgba|=clip((298*c      +409*e+128)>>8)<<16;
-	rgba|=clip((298*c-100*d-208*e+128)>>8)<<8;
-	rgba|=clip((298*c+516*d      +128)>>8);
+	rgba|=Math::intClamp(0,255,(298*c      +409*e+128)>>8)<<16;
+	rgba|=Math::intClamp(0,255,(298*c-100*d-208*e+128)>>8)<<8;
+	rgba|=Math::intClamp(0,255,(298*c+516*d      +128)>>8);
 	return rgba;
 }
 

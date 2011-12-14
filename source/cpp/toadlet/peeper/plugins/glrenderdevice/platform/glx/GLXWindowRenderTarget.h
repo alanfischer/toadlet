@@ -32,6 +32,8 @@
 namespace toadlet{
 namespace peeper{
 
+TOADLET_C_API RenderTarget *new_GLXWindowRenderTarget(void *display,void *window,WindowRenderTargetFormat *format);
+
 class TOADLET_API GLXWindowRenderTarget:public GLXRenderTarget{
 public:
 	GLXWindowRenderTarget();

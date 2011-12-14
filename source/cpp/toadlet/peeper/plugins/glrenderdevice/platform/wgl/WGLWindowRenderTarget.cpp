@@ -28,10 +28,8 @@
 #include <toadlet/egg/System.h>
 #include <toadlet/peeper/TextureFormat.h>
 
-#include <stdio.h> 
-
+#include <stdio.h>
 #include <windows.h> // for EXCEPTION_ACCESS_VIOLATION 
-
 #include <excpt.h>
 
 namespace toadlet{

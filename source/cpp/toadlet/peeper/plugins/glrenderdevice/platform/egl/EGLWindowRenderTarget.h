@@ -32,6 +32,8 @@
 namespace toadlet{
 namespace peeper{
 
+TOADLET_C_API RenderTarget *new_EGLWindowRenderTarget(void *display,void *window,WindowRenderTargetFormat *format);
+
 class TOADLET_API EGLWindowRenderTarget:public EGLRenderTarget{
 public:
 	EGLWindowRenderTarget();
