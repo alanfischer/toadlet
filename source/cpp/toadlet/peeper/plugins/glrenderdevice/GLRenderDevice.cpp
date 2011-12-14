@@ -1362,17 +1362,19 @@ void GLRenderDevice::setTexture(int i,Texture *texture){
 	if(gltexture!=NULL){
 		textureTarget=gltexture->mTarget;
 
+		if(mLastTexTargets[i]!=textureTarget){
+			if(mLastTexTargets[i]!=0){
+				glBindTexture(mLastTexTargets[i],0);
+				glDisable(mLastTexTargets[i]);
+			}
+			mLastTexTargets[i]=textureTarget;
+		}
+
 		if(mLastTextures[i]!=gltexture){
 			glBindTexture(textureTarget,gltexture->mHandle);
 			mLastTextures[i]=gltexture;
 		}
 
-		if(mLastTexTargets[i]!=textureTarget){
-			if(mLastTexTargets[i]!=0){
-				glDisable(mLastTexTargets[i]);
-			}
-			mLastTexTargets[i]=textureTarget;
-		}
 		// Always re-enable the texture, since it can get glDisabled in mipmap generation
 		if(textureTarget!=0){
 			glEnable(textureTarget);
@@ -1384,6 +1386,7 @@ void GLRenderDevice::setTexture(int i,Texture *texture){
 		}
 
 		if(mLastTexTargets[i]!=0){
+			glBindTexture(mLastTexTargets[i],0);
 			glDisable(mLastTexTargets[i]);
 			mLastTexTargets[i]=0;
 		}
