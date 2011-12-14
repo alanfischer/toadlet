@@ -29,6 +29,30 @@
 namespace toadlet{
 namespace peeper{
 
+inline tbyte clip(int c){return (tbyte)c<0?0:(c>255?255:c);}
+
+inline uint32 convertYCrCbToRGBA(int y,int cr,int cb){
+	uint32 rgba=0;
+	int c=y-16;
+	int d=cb-128;
+	int e=cr-128;
+	rgba|=clip((298*c      +409*e+128)>>8);
+	rgba|=clip((298*c-100*d-208*e+128)>>8)<<8;
+	rgba|=clip((298*c+516*d      +128)>>8)<<16;
+	return rgba;
+}
+
+inline uint32 convertYCrCbToBGRA(int y,int cr,int cb){
+	uint32 rgba=0;
+	int c=y-16;
+	int d=cb-128;
+	int e=cr-128;
+	rgba|=clip((298*c      +409*e+128)>>8)<<16;
+	rgba|=clip((298*c-100*d-208*e+128)>>8)<<8;
+	rgba|=clip((298*c+516*d      +128)>>8);
+	return rgba;
+}
+
 bool TextureFormatConversion::convert(tbyte *src,TextureFormat *srcFormat,tbyte *dst,TextureFormat *dstFormat){
 	int i,j,k;
 
@@ -247,6 +271,42 @@ bool TextureFormatConversion::convert(tbyte *src,TextureFormat *srcFormat,tbyte 
 				}
 			}
 		}
+	}
+	else if(srcPixelFormat==TextureFormat::Format_YUY2 && dstPixelFormat==TextureFormat::Format_RGBA_8){
+		for(k=0;k<depth;++k){
+			for(j=0;j<height;++j){
+				uint16 *srcPel=(uint16*)(src+k*srcYPitch+j*srcXPitch);
+				uint32 *dstPel=(uint32*)(dst+k*dstYPitch+j*dstXPitch);
+				for(i=0;i<width;i+=2){
+					// Byte order is U0 Y0 V0 Y1
+					int y0=(int)(srcPel[i]&0xFF);
+					int u0=(int)(srcPel[i]>>8);
+					int y1=(int)(srcPel[i+1]&0xFF);
+					int v0=(int)(srcPel[i+1]>>8);
+	
+					dstPel[i]=convertYCrCbToRGBA(y0,v0,u0);
+					dstPel[i+1]=convertYCrCbToRGBA(y1,v0,u0);
+				}
+			}
+        }
+	}
+	else if(srcPixelFormat==TextureFormat::Format_YUY2 && dstPixelFormat==TextureFormat::Format_BGRA_8){
+		for(k=0;k<depth;++k){
+			for(j=0;j<height;++j){
+				uint16 *srcPel=(uint16*)(src+k*srcYPitch+j*srcXPitch);
+				uint32 *dstPel=(uint32*)(dst+k*dstYPitch+j*dstXPitch);
+				for(i=0;i<width;i+=2){
+					// Byte order is U0 Y0 V0 Y1
+					int y0=(int)(srcPel[i]&0xFF);
+					int u0=(int)(srcPel[i]>>8);
+					int y1=(int)(srcPel[i+1]&0xFF);
+					int v0=(int)(srcPel[i+1]>>8);
+	
+					dstPel[i]=convertYCrCbToBGRA(y0,v0,u0);
+					dstPel[i+1]=convertYCrCbToBGRA(y1,v0,u0);
+				}
+			}
+        }
 	}
 	else if(srcPixelFormat==dstPixelFormat){
 		// See if dst pitches are multiples of the src, in which case just use the src pitch.

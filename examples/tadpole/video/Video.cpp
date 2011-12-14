@@ -1,4 +1,5 @@
 #include "Video.h"
+#include "MFVideoDevice.h"
 
 Video::Video(Application *application){
 	app=application;
@@ -12,7 +13,12 @@ void Video::create(){
 
 	scene=Scene::ptr(new Scene(engine));
 
-	texture=engine->getTextureManager()->createTexture(Texture::Usage_BIT_STREAM,TextureFormat::Dimension_D2,TextureFormat::Format_RGBA_8,256,256,1,1);
+	MFVideoDevice *device=new MFVideoDevice();
+	device->create();
+	device->setListener(this);
+
+	TextureFormat::ptr format(new TextureFormat(TextureFormat::Dimension_D2,TextureFormat::Format_RGBA_8,640,480,1,1));
+	texture=engine->getTextureManager()->createTexture(Texture::Usage_BIT_STREAM,format);
 
 	meshNode=engine->createNodeType(MeshNode::type(),scene);
 	meshNode->setMesh(engine->getMeshManager()->createAABoxMesh(AABox(-50,-50,-50,50,50,50),engine->getMaterialManager()->createDiffuseMaterial(texture)));
@@ -22,6 +28,8 @@ void Video::create(){
 	cameraNode->setLookAt(Vector3(0,-Math::fromInt(150),0),Math::ZERO_VECTOR3,Math::Z_UNIT_VECTOR3);
 	cameraNode->setClearColor(Colors::AZURE);
 	scene->getRoot()->attach(cameraNode);
+
+	device->start();
 
 //	audioNode=engine->createNodeType(AudioNode::type(),scene);
 //	scene->getRoot()->attach(audioNode);
@@ -49,10 +57,12 @@ void Video::resized(int width,int height){
 }
 
 void Video::render(RenderDevice *device){
+	mutex.lock();
 	device->beginScene();
 		cameraNode->render(device);
 	device->endScene();
  	device->swap();
+	mutex.unlock();
 }
 
 void Video::update(int dt){
@@ -77,6 +87,12 @@ void Video::keyPressed(int key){
 			controller->start();
 		TOADLET_CATCH(const Exception &){controller=NULL;}
 	}
+}
+
+void Video::frameReceived(TextureFormat::ptr format,tbyte *data){
+	mutex.lock();
+	engine->getTextureManager()->textureLoad(texture,format,data);
+	mutex.unlock();
 }
 
 Applet *createApplet(Application *app){return new Video(app);}

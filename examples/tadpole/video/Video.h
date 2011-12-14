@@ -2,8 +2,9 @@
 #define VIDEO_H
 
 #include <toadlet/toadlet.h>
+#include "VideoDevice.h"
 
-class Video:public Applet{
+class Video:public Applet,public VideoDeviceListener{
 public:
 	Video(Application *app);
 	virtual ~Video();
@@ -25,9 +26,7 @@ public:
 	void mouseReleased(int x,int y,int button){}
 	void mouseScrolled(int x,int y,int scroll){}
 
-	void joyPressed(int button){}
-	void joyMoved(scalar x,scalar y,scalar z,scalar r,scalar u,scalar v){}
-	void joyReleased(int button){}
+	void frameReceived(TextureFormat::ptr Format,tbyte *data);
 
 	Application *app;
 	Engine *engine;
@@ -37,6 +36,7 @@ public:
 	VideoController::ptr controller;
 	MeshNode::ptr meshNode;
 	AudioNode::ptr audioNode;
+	Mutex mutex;
 };
 
 #endif
