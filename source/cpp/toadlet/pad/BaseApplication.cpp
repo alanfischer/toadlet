@@ -119,6 +119,9 @@ bool BaseApplication::create(String renderDevice,String audioDevice){
 		if(renderDevice!=(char*)NULL || mRenderDevicePlugins.size()==0){
 			createContextAndRenderDevice(renderDevice);
 		}
+		else if(mRenderDevicePreferences.size()==0){
+			createContextAndRenderDevice(mRenderDevicePlugins.begin()->first);
+		}
 		else{
 			for(i=0;i<mRenderDevicePreferences.size();++i){
 				if(createContextAndRenderDevice(mRenderDevicePreferences[i])) break;
@@ -128,6 +131,9 @@ bool BaseApplication::create(String renderDevice,String audioDevice){
 	if(audioDevice!="null"){
 		if(audioDevice!=(char*)NULL || mAudioDevicePlugins.size()==0){
 			createAudioDevice(audioDevice);
+		}
+		else if(mAudioDevicePreferences.size()==0){
+			createAudioDevice(mAudioDevicePlugins.begin()->first);
 		}
 		else{
 			for(i=0;i<mAudioDevicePreferences.size();++i){

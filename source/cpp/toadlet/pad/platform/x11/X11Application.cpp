@@ -30,7 +30,6 @@
 #include <X11/keysym.h>
 #include <X11/Xutil.h>
 #include <X11/extensions/xf86vmode.h>
-#include <stdlib.h>
 
 using namespace toadlet::peeper;
 using namespace toadlet::ribbit;
@@ -283,30 +282,29 @@ bool X11Application::createWindow(){
 		}
 	}
 
-	XSetWindowAttributes attr;
-	unsigned long mask;
-	int attrib[] = { GLX_RGBA,
-		GLX_RED_SIZE, 1,
-		GLX_GREEN_SIZE, 1,
-		GLX_BLUE_SIZE, 1,
-		GLX_DOUBLEBUFFER,
-		GLX_DEPTH_SIZE, 1,
-		None };
-		
-	// Find an OpenGL-capable Color Index visual RGB and Double-buffer
-//	x11->mVisualInfo=glXChooseVisual(x11->mDisplay,x11->mScrnum,attrib);
-//	if(!x11->mVisualInfo){
-	//	Error::unknown(Categories::TOADLET_PAD,
-		//	"couldn't get an RGB, Double-buffered visual");
-//		return false;
-//	}
-	if(XMatchVisualInfo(x11->mDisplay,x11->mScrnum,16,TrueColor,&x11->mVisualInfo)!=0){
+	XVisualInfo info;
+	int redBits=TextureFormat::getRedBits(mFormat->pixelFormat);
+	int greenBits=TextureFormat::getGreenBits(mFormat->pixelFormat);
+	int blueBits=TextureFormat::getBlueBits(mFormat->pixelFormat);
+	int alphaBits=TextureFormat::getAlphaBits(mFormat->pixelFormat);
+	int colorBits=redBits+greenBits+blueBits+alphaBits;
+	if(XMatchVisualInfo(x11->mDisplay,x11->mScrnum,colorBits,TrueColor,&info)==0){
 		Error::unknown(Categories::TOADLET_PAD,
-			"couldn't get a visual");
+			String("failed to match visual for ")+colorBits);
+		return false;
+	}
+	info.screen=0;
+	int n=0;
+	x11->mVisualInfo=XGetVisualInfo(x11->mDisplay,VisualAllMask,&info,&n);
+	if(x11->mVisualInfo==None){
+		Error::unknown(Categories::TOADLET_PAD,
+			"failed to get visual");
 		return false;
 	}
 
 	// Set the window attributes
+	XSetWindowAttributes attr;
+	unsigned long mask;
 	attr.background_pixel=0;
 	attr.border_pixel=0;
 	attr.colormap=XCreateColormap(x11->mDisplay,XRootWindow(x11->mDisplay,x11->mScrnum),x11->mVisualInfo->visual,AllocNone);
@@ -440,11 +438,6 @@ void X11Application::destroyWindow(){
 
 	originalEnv();
 
-	if(x11->mVisualInfo){
-		XFree(x11->mVisualInfo);
-		x11->mVisualInfo=None;
-	}
-	
 	if(x11->mWindow){
 		XDestroyWindow(x11->mDisplay,x11->mWindow);
 		x11->mWindow=None;
@@ -592,7 +585,6 @@ void X11Application::setDifferenceMouse(bool difference){
 
 void *X11Application::getDisplay(){return x11->mDisplay;}
 void *X11Application::getWindow(){return (void*)x11->mWindow;}
-void *X11Application::getVisualInfo(){return x11->mVisualInfo;}
 
 int X11Application::translateKey(int key){
 	switch(key){

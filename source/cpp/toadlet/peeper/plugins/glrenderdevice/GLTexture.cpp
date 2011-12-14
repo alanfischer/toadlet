@@ -145,6 +145,8 @@ bool GLTexture::createContext(int mipLevels,tbyte *mipDatas[]){
 		int xPitch=format->getXPitch();
 		int yPitch=format->getYPitch();
 
+		TOADLET_IGNORE_UNUSED_VARIABLE_WARNING(depth);
+
 		tbyte *data=NULL;
 		if(mipDatas!=NULL && (level==0 || level<mipLevels)){
 			data=mipDatas[level];
@@ -313,6 +315,9 @@ bool GLTexture::load(TextureFormat *format,tbyte *data){
 	GLint glformat=GLRenderDevice::getGLFormat(pixelFormat,false);
 	GLint gltype=GLRenderDevice::getGLTextureCompressed(pixelFormat)==false?GLRenderDevice::getGLType(pixelFormat):0;
 
+	TOADLET_IGNORE_UNUSED_VARIABLE_WARNING(z);
+	TOADLET_IGNORE_UNUSED_VARIABLE_WARNING(depth);
+
 	int alignment=1,pitch=xPitch;
 	while((pitch&1)==0){alignment<<=1;pitch>>=1;}
 	glPixelStorei(GL_UNPACK_ALIGNMENT,alignment<8?alignment:8);
@@ -396,6 +401,11 @@ bool GLTexture::read(TextureFormat *format,tbyte *data){
 	int mipLevel=format->getMipMin();
 	GLint glformat=GLRenderDevice::getGLFormat(pixelFormat,false);
 	GLint gltype=GLRenderDevice::getGLTextureCompressed(pixelFormat)==false?GLRenderDevice::getGLType(pixelFormat):0;
+
+	TOADLET_IGNORE_UNUSED_VARIABLE_WARNING(yPitch);
+	TOADLET_IGNORE_UNUSED_VARIABLE_WARNING(mipLevel);
+	TOADLET_IGNORE_UNUSED_VARIABLE_WARNING(glformat);
+	TOADLET_IGNORE_UNUSED_VARIABLE_WARNING(gltype);
 
 	int alignment=1,pitch=xPitch;
 	while((pitch&1)==0){alignment<<=1;pitch>>=1;}

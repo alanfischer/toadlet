@@ -24,6 +24,7 @@
  ********** Copyright header - do not remove **********/
 
 #include <toadlet/egg/Error.h>
+#include <toadlet/flick/InputDeviceListener.h>
 #include "IOSMotionDevice.h"
 
 @implementation ToadletAccelerometerDelegate
@@ -42,12 +43,12 @@
 namespace toadlet{
 namespace flick{
 
-TOADLET_C_API MotionDevice *new_IOSMotionDevice(){
+TOADLET_C_API InputDevice *new_IOSMotionDevice(){
 	return new IOSMotionDevice();
 }
 
 #if defined(TOADLET_BUILD_DYNAMIC)
-	TOADLET_C_API MotionDevice* new_MotionDevice(){
+	TOADLET_C_API InputDevice* new_MotionDevice(){
 		return new IOSMotionDevice();
 	}
 #endif
@@ -101,13 +102,13 @@ void IOSMotionDevice::setSampleTime(int dt){
 }
 
 void IOSMotionDevice::didAccelerate(UIAcceleration *acceleration){
+	mMotionData.type=InputDevice::InputType_MOTION;
 	mMotionData.time=(int)acceleration.timestamp*1000;
-	mMotionData.acceleration.x=Math::fromFloat(acceleration.x);
-	mMotionData.acceleration.y=Math::fromFloat(acceleration.y);
-	mMotionData.acceleration.z=Math::fromFloat(acceleration.z);
+	mMotionData.valid=(1<<InputData::Semantic_MOTION_ACCELERATION);
+	mMotionData.values[InputData::Semantic_MOTION_ACCELERATION].set(Math::fromFloat(acceleration.x),Math::fromFloat(acceleration.y),Math::fromFloat(acceleration.z),0);
 
 	if(mListener!=NULL){
-		mListener->motionDetected(mMotionData);
+		mListener->inputDetected(mMotionData);
 	}
 }
 

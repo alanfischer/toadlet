@@ -73,7 +73,6 @@ public:
 
 	void *getDisplay();
 	void *getWindow();
-	void *getVisualInfo();
 
 	void internal_mouseMoved(int x,int y);
 
