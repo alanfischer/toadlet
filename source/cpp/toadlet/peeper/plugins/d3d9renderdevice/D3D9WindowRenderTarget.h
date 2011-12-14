@@ -32,6 +32,12 @@
 namespace toadlet{
 namespace peeper{
 
+#if defined(TOADLET_SET_D3DM)
+	TOADLET_C_API RenderTarget *new_D3DMWindowRenderTarget(void *display,void *window,WindowRenderTargetFormat *format);
+#else
+	TOADLET_C_API RenderTarget *new_D3D9WindowRenderTarget(void *display,void *window,WindowRenderTargetFormat *format);
+#endif
+
 class TOADLET_API D3D9WindowRenderTarget:public D3D9RenderTarget{
 public:
 	D3D9WindowRenderTarget();
