@@ -69,7 +69,8 @@ public:
 		Format_SEMANTIC_BGRA=		9,
 		Format_SEMANTIC_ARGB=		10,
 		Format_SEMANTIC_ABGR=		11,
-		Format_SEMANTIC_DEPTH=		12,
+		Format_SEMANTIC_YUV=		12,
+		Format_SEMANTIC_DEPTH=		13,
 
 		// Format types
 		Format_SHIFT_TYPES=			8,
@@ -89,6 +90,8 @@ public:
 		Format_TYPE_DXT3=			13<<Format_SHIFT_TYPES,
 		Format_TYPE_DXT4=			14<<Format_SHIFT_TYPES,
 		Format_TYPE_DXT5=			15<<Format_SHIFT_TYPES,
+		Format_TYPE_YUY2=			16<<Format_SHIFT_TYPES,
+		Format_TYPE_NV12=			17<<Format_SHIFT_TYPES,
 
 		Format_L_8=					Format_SEMANTIC_L|Format_TYPE_UINT_8,
 		Format_R_8=					Format_SEMANTIC_R|Format_TYPE_UINT_8,
@@ -130,6 +133,8 @@ public:
 		Format_RGBA_DXT3=			Format_SEMANTIC_RGBA|Format_TYPE_DXT3,
 		Format_RGBA_DXT4=			Format_SEMANTIC_RGBA|Format_TYPE_DXT4,
 		Format_RGBA_DXT5=			Format_SEMANTIC_RGBA|Format_TYPE_DXT5,
+		Format_YUY2=				Format_SEMANTIC_YUV|Format_TYPE_YUY2,
+		Format_NV12=				Format_SEMANTIC_YUV|Format_TYPE_NV12,
 	};
 
 	static inline uint8 getRedBits(int format){
@@ -347,6 +352,12 @@ public:
 		updatePitch();
 	}
 
+	void setPitches(int xPitch1,int yPitch1,int zPitch1){
+		xPitch=xPitch1;
+		yPitch=yPitch1;
+		zPitch=zPitch1;
+	}
+
 	inline int getDimension() const{return dimension;}
 	inline int getPixelFormat() const{return pixelFormat;}
 	inline int getXMin() const{return xMin;}
@@ -395,13 +406,21 @@ protected:
 		switch(pixelFormat){
 			case Format_RGB_DXT1:
 				xPitch=getWidth()/2;
+			break;
 			case Format_RGBA_DXT2:
 			case Format_RGBA_DXT3:
 			case Format_RGBA_DXT4:
 			case Format_RGBA_DXT5:
 				xPitch=getWidth();
+			break;
+			case Format_YUY2:
+				xPitch=getWidth()*2;
+			break;
+			case Format_NV12:
+				xPitch=0;
 			default:
 				xPitch=getPixelSize(pixelFormat)*getWidth();
+			break;
 		}		
 		yPitch=xPitch*getHeight();
 		zPitch=yPitch*getDepth();

@@ -26,10 +26,6 @@ public:
 	void mouseReleased(int x,int y,int button){}
 	void mouseScrolled(int x,int y,int scroll){}
 
-	void joyPressed(int button){}
-	void joyMoved(scalar x,scalar y,scalar z,scalar r,scalar u,scalar v){}
-	void joyReleased(int button){}
-
 	Application *app;
 	Engine *engine;
 	Scene::ptr scene;
