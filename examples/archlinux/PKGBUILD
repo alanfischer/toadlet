@@ -15,13 +15,13 @@ optdepends=('giflib: GIF image support'
 'glew: OpenGL support'
 'freetype2: font rendering'
 'openal: audio support'
-'libvorbis: ogg vorbis support'
+'ffmpeg: ogg vorbis support'
 'mxml: xml file IO')
 url="http://code.google.com/p/toadlet"
 source=()
 md5sums=()
 
-_hgroot="ssh://ltdev.no-ip.org//data/Hg"
+_htroot="http://code.google.com/p/"
 _hgrepo="toadlet"
 
 build() {
