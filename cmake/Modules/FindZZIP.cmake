@@ -6,8 +6,8 @@
 
 set (ZZIP_FOUND "NO")
 
-find_path (ZZIP_INCLUDE_DIR zzip/zzip.h)
-find_library (ZZIP_LIBRARY NAMES zziplib)
+find_path (ZZIP_INCLUDE_DIR NAMES zzip.h zzip/zzip.h)
+find_library (ZZIP_LIBRARY NAMES zzip zziplib)
 
 if (ZZIP_INCLUDE_DIR AND ZZIP_LIBRARY)
 	set(ZZIP_FOUND TRUE)
