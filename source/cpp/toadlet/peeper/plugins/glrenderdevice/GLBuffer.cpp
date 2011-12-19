@@ -354,7 +354,6 @@ bool GLBuffer::update(tbyte *data,int start,int size){
 bool GLBuffer::activateUniforms(){
 	math::Matrix4x4 matrix,textureMatrix;
 
-	int resourceCount=0;
 	int i;
 	for(i=0;i<mVariableFormat->getSize();++i){
 		VariableBufferFormat::Variable *variable=mVariableFormat->getVariable(i);
@@ -431,7 +430,7 @@ bool GLBuffer::activateUniforms(){
 			break;
 
 			case VariableBufferFormat::Format_TYPE_RESOURCE:
-				glUniform1i(index,resourceCount++);
+				glUniform1i(index,variable->getResourceIndex());
 			break;
 		}
 	}

@@ -89,9 +89,10 @@ void ShadowMappedSceneRenderer::renderScene(RenderDevice *renderDevice,Node *nod
 		TextureState lightTextureState;
 		lightTextureState.calculation=TextureState::CalculationType_CAMERASPACE;
 		lightTextureState.matrix.set(textureMatrix);
-		mLightState->setTextureState(0,lightTextureState);
-		renderDevice->setRenderState(mLightState);
-		renderDevice->setTexture(0,mShadowTexture);
+TOADLET_ASSERT(false && "BROKEN!");
+	//	mLightState->setTextureState(0,lightTextureState);
+//		renderDevice->setRenderState(mLightState);
+//		renderDevice->setTexture(0,mShadowTexture);
 
 		renderRenderables(mRenderableSet,renderDevice,camera,false);
 	}

@@ -139,50 +139,38 @@ Resource::ptr SkyBoxMaterialCreator::create(const String &name,ResourceData *dat
 Material::ptr SkyBoxMaterialCreator::createSkyBoxMaterial(Texture::ptr texture){
 	Material::ptr material(new Material(mEngine->getMaterialManager()));
 
+	RenderState::ptr renderState=mEngine->getMaterialManager()->createRenderState();
+	renderState->setBlendState(BlendState());
+	renderState->setDepthState(DepthState(DepthState::DepthTest_LEQUAL,false));
+	renderState->setRasterizerState(RasterizerState());
+	renderState->setMaterialState(MaterialState());
+	renderState->setFogState(FogState());
+
+	SamplerState samplerState(mEngine->getMaterialManager()->getDefaultSamplerState());
+	samplerState.uAddress=SamplerState::AddressType_CLAMP_TO_EDGE;
+	samplerState.vAddress=SamplerState::AddressType_CLAMP_TO_EDGE;
+	samplerState.wAddress=SamplerState::AddressType_CLAMP_TO_EDGE;
+
 	if(mEngine->hasShader(Shader::ShaderType_VERTEX) && mEngine->hasShader(Shader::ShaderType_FRAGMENT)){
 		RenderPath::ptr shaderPath=material->addPath();
 
-		RenderPass::ptr pass=shaderPath->addPass();
-
-		pass->setBlendState(BlendState());
-		pass->setDepthState(DepthState(DepthState::DepthTest_LEQUAL,false));
-		pass->setRasterizerState(RasterizerState());
-		pass->setMaterialState(MaterialState());
-		pass->setFogState(FogState());
+		RenderPass::ptr pass=shaderPath->addPass(renderState);
 
 		pass->setShader(Shader::ShaderType_VERTEX,mSkyBoxVertexShader);
 		pass->setShader(Shader::ShaderType_FRAGMENT,mSkyBoxFragmentShader);
 		pass->getVariables()->addVariable("modelViewProjectionMatrix",RenderVariable::ptr(new MVPMatrixVariable()),Material::Scope_RENDERABLE);
-		pass->getVariables()->addVariable("textureMatrix",RenderVariable::ptr(new TextureMatrixVariable(0)),Material::Scope_MATERIAL);
+		pass->getVariables()->addVariable("textureMatrix",RenderVariable::ptr(new TextureMatrixVariable(pass->getVariables(),"tex")),Material::Scope_MATERIAL);
 		pass->getVariables()->addVariable("materialTrackColor",RenderVariable::ptr(new MaterialTrackColorVariable()),Material::Scope_MATERIAL);
 
-		SamplerState samplerState(mEngine->getMaterialManager()->getDefaultSamplerState());
-		samplerState.uAddress=SamplerState::AddressType_CLAMP_TO_EDGE;
-		samplerState.vAddress=SamplerState::AddressType_CLAMP_TO_EDGE;
-		samplerState.wAddress=SamplerState::AddressType_CLAMP_TO_EDGE;
-		pass->setSamplerState(0,samplerState);
-		pass->setTextureState(0,TextureState());
-		pass->setTexture(0,texture);
+		pass->getVariables()->addTexture("tex",texture,"samp",samplerState,TextureState());
 	}
 
 	if(mEngine->hasFixed(Shader::ShaderType_VERTEX) && mEngine->hasFixed(Shader::ShaderType_FRAGMENT)){
 		RenderPath::ptr fixedPath=material->addPath();
 
-		RenderPass::ptr pass=fixedPath->addPass();
+		RenderPass::ptr pass=fixedPath->addPass(renderState);
 
-		pass->setBlendState(BlendState());
-		pass->setDepthState(DepthState(DepthState::DepthTest_LEQUAL,false));
-		pass->setRasterizerState(RasterizerState());
-		pass->setMaterialState(MaterialState());
-		pass->setFogState(FogState());
-
-		SamplerState samplerState(mEngine->getMaterialManager()->getDefaultSamplerState());
-		samplerState.uAddress=SamplerState::AddressType_CLAMP_TO_EDGE;
-		samplerState.vAddress=SamplerState::AddressType_CLAMP_TO_EDGE;
-		samplerState.wAddress=SamplerState::AddressType_CLAMP_TO_EDGE;
-		pass->setSamplerState(0,samplerState);
-		pass->setTextureState(0,TextureState());
-		pass->setTexture(0,texture);
+		pass->setTexture(Shader::ShaderType_FRAGMENT,0,texture,samplerState,TextureState());
 	}
 
 	material->setLayer(-1);

@@ -45,11 +45,13 @@ public:
 	Resource::ptr create(const String &name,ResourceData *data,ProgressListener *listener);
 	Material::ptr createDiffuseMaterial(Texture::ptr texture);
 	Material::ptr createPointSpriteMaterial(Texture::ptr texture,scalar size,bool attenuated);
+	Material::ptr createFontMaterial(Font::ptr font);
 
 protected:
 	Engine *mEngine;
 	Shader::ptr mDiffuseVertexShader,mDiffuseFragmentShader;
 	Shader::ptr mPointSpriteGeometryShader,mPointSpriteFragmentShader;
+	ShaderState::ptr mDiffuseShaderState,mPointShaderState;
 };
 
 }

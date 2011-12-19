@@ -122,8 +122,6 @@ public:
 	PathSystem::Path *getClosestPath(Vector3 &closestPoint,const Vector3 &point);
 	PathSystem::Path *getClosestPath(Vector3 &closestPoint,const Sphere &bound,TreeBranch *path);
 
-	void setHighlight(bool highlight);
-	
 	inline MeshNode::ptr getMeshNode(){return mMeshNode;}
 	inline MeshNode::ptr getLowMeshNode(){return mLowMeshNode;}
 

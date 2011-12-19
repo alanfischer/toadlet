@@ -436,13 +436,13 @@ void RandIsle::frameUpdate(int dt){
 	Material::ptr waterMaterial=Resources::instance->waterMaterial;
 	if(waterMaterial!=NULL){
 		TextureState textureState;
-		waterMaterial->getPass()->getTextureState(0,textureState);
+		waterMaterial->getPass()->getTextureState(Shader::ShaderType_FRAGMENT,0,textureState);
 		Math::setMatrix4x4FromTranslate(textureState.matrix,Math::sin(Math::fromMilli(mScene->getTime())/4)/4,0,0);
-		waterMaterial->getPass()->setTextureState(0,textureState);
+		waterMaterial->getPass()->setTextureState(Shader::ShaderType_FRAGMENT,0,textureState);
 
-		waterMaterial->getPass()->getTextureState(1,textureState);
+		waterMaterial->getPass()->getTextureState(Shader::ShaderType_FRAGMENT,1,textureState);
 		Math::setMatrix4x4FromTranslate(textureState.matrix,0,Math::sin(Math::fromMilli(mScene->getTime())/4)/4,0);
-		waterMaterial->getPass()->setTextureState(1,textureState);
+		waterMaterial->getPass()->setTextureState(Shader::ShaderType_FRAGMENT,1,textureState);
 	}
 
 	if(mPlayer->getPath()!=NULL){

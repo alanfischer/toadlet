@@ -50,7 +50,7 @@ BSP30ModelNode::BSP30ModelNode():Node(),
 	//mMap,
 	mModelIndex(0),
 	//mSubModels,
-	//mOwnedMaterial,
+	//mSharedRenderState,
 	mRendered(false)
 {}
 
@@ -66,9 +66,15 @@ Node *BSP30ModelNode::create(Scene *scene){
 }
 
 void BSP30ModelNode::destroy(){
-	if(mOwnedMaterial!=NULL){
-		mOwnedMaterial->release();
-		mOwnedMaterial=NULL;
+	int i;
+	for(i=0;i<mSubModels.size();++i){
+		mSubModels[i]->destroy();
+	}
+	mSubModels.clear();
+
+	if(mSharedRenderState!=NULL){
+		mSharedRenderState->destroy();
+		mSharedRenderState=NULL;
 	}
 
 	super::destroy();
@@ -110,23 +116,23 @@ void BSP30ModelNode::setModel(BSP30Map::ptr map,int index){
 		return;
 	}
 
-	if(mOwnedMaterial!=NULL){
-		mOwnedMaterial->release();
-		mOwnedMaterial=NULL;
+	int i;
+	for(i=0;i<mSubModels.size();++i){
+		mSubModels[i]->destroy();
 	}
+	mSubModels.clear();
 
 	mMap=map;
 	mModelIndex=index;
-	mSubModels.clear();
 
 	bmodel *model=&mMap->models[mModelIndex];
 
 	mBound.set(model->mins,model->maxs);
-	int i,j;
 	for(i=0;i<model->numfaces;++i){
 		bface *face=&map->faces[model->firstface+i];
 		BSP30Map::facedata *facedata=&map->facedatas[model->firstface+i];
 		int miptex=map->texinfos[face->texinfo].miptex;
+		int j;
 		for(j=mSubModels.size()-1;j>=0;--j){
 			if(mSubModels[j]->material==map->materials[miptex]) break;
 		}
@@ -135,6 +141,11 @@ void BSP30ModelNode::setModel(BSP30Map::ptr map,int index){
 			subModel->material=map->materials[miptex];
 			facedata->next=NULL;
 			subModel->faces=facedata;
+			if(mSharedRenderState!=NULL){
+				Material::ptr material=mEngine->getMaterialManager()->createSharedMaterial(subModel->material,mSharedRenderState);
+				subModel->material->release();
+				subModel->material=material;
+			}
 			mSubModels.add(subModel);
 		}
 		else{
@@ -145,19 +156,17 @@ void BSP30ModelNode::setModel(BSP30Map::ptr map,int index){
 }
 
 RenderState::ptr BSP30ModelNode::getSharedRenderState(){
-	if(mOwnedMaterial==NULL && mSubModels.size()>0){
-		mOwnedMaterial=mSubModels[0]->material=mEngine->getMaterialManager()->createMaterial(mSubModels[0]->material);
-		mSubModels[0]->material->setSort(Material::SortType_AUTO);
+	if(mSharedRenderState==NULL){
+		mSharedRenderState=mEngine->getMaterialManager()->createRenderState();
 		int i;
-		for(i=1;i<mSubModels.size();++i){
-			mSubModels[i]->material=mEngine->getMaterialManager()->cloneMaterial(mSubModels[i]->material);
-			mSubModels[i]->material->shareStates(mOwnedMaterial);
-			mSubModels[i]->material->setSort(Material::SortType_AUTO);
+		for(i=0;i<mSubModels.size();++i){
+			Material::ptr material=mEngine->getMaterialManager()->createSharedMaterial(mSubModels[i]->material,mSharedRenderState);
+			mSubModels[i]->material->release();
+			mSubModels[i]->material=material;
 		}
-		mOwnedMaterial->retain();
 	}
 
-	return mOwnedMaterial!=NULL?mOwnedMaterial->getPass()->getRenderState():NULL;
+	return mSharedRenderState;
 }
 
 void BSP30ModelNode::showPlanarFaces(int plane){
@@ -307,7 +316,8 @@ void BSP30Node::setSkyTextures(const String &skyDown,const String &skyUp,const S
 				SamplerState samplerState;
 				samplerState.uAddress=SamplerState::AddressType_CLAMP_TO_EDGE;
 				samplerState.vAddress=SamplerState::AddressType_CLAMP_TO_EDGE;
-				material->getPass()->setSamplerState(0,samplerState);
+TOADLET_ASSERT(false && "BROKEN");
+//				material->getPass()->setSamplerState(0,samplerState);
 			}
 		}
 

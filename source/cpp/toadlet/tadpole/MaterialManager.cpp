@@ -65,20 +65,59 @@ void MaterialManager::destroy(){
 		renderState->destroy();
 	}
 	mRenderStates.clear();
+
+	for(i=0;i<mShaderStates.size();++i){
+		ShaderState::ptr shaderState=mShaderStates[i];
+		shaderState->setShaderStateDestroyedListener(NULL);
+		shaderState->destroy();
+	}
+	mShaderStates.clear();
 }
 
-/// @todo: Should these two just be merged?
-Material::ptr MaterialManager::createMaterial(Material::ptr source){
-	Material::ptr material(new Material(this,source,false));
+Material::ptr MaterialManager::createMaterial(){
+	Material::ptr material(new Material(this));
 	material->compile();
 	manage(material);
 	return material;
 }
 
-Material::ptr MaterialManager::cloneMaterial(Material::ptr source){
-	Material::ptr material(new Material(this,source,false));
+Material::ptr MaterialManager::createSharedMaterial(Material::ptr source,RenderState::ptr renderState){
+	Material::ptr material(new Material(this));
+
+	int i,j,k,l;
+	for(j=0;j<source->getNumPaths();++j){
+		RenderPath *srcPath=source->getPath(j);
+		RenderPath *dstPath=material->addPath();
+		for(i=0;i<srcPath->getNumPasses();++i){
+			RenderPass *srcPass=srcPath->getPass(i);
+			RenderPass *dstPass=dstPath->addPass(renderState,srcPass->getShaderState());
+
+			for(k=0;k<Shader::ShaderType_MAX;++k){
+				Shader::ShaderType type=(Shader::ShaderType)k;
+				for(l=0;l<srcPass->getNumTextures(type);++l){
+					Texture::ptr texture=srcPass->getTexture(type,l);
+					SamplerState samplerState;
+					TextureState textureState;
+					srcPass->getSamplerState(type,l,samplerState);
+					srcPass->getTextureState(type,l,textureState);
+					dstPass->setTexture(type,l,texture,samplerState,textureState);
+				}
+			}
+
+			// Don't set Buffers, since those are currently constructed upon variable accessing.
+			/// @todo: Should we share buffers instead?
+
+			RenderVariableSet *srcVars=srcPass->getVariables();
+			RenderVariableSet *dstVars=dstPass->getVariables();
+			for(k=0;k<srcVars->getNumVariables();++k){
+				dstVars->addVariable(srcVars->getVariableName(k),srcVars->getVariable(k),srcVars->getVariableScope(k));
+			}
+		}
+	}
+	
+	material->setSort(Material::SortType_AUTO);
 	material->compile();
-	manage(material);
+
 	return material;
 }
 
@@ -88,6 +127,10 @@ Material::ptr MaterialManager::createDiffuseMaterial(Texture::ptr texture){
 
 Material::ptr MaterialManager::createPointSpriteMaterial(Texture::ptr texture,scalar size,bool attenuated){
 	return shared_static_cast<DiffuseMaterialCreator>(mDiffuseCreator)->createPointSpriteMaterial(texture,size,attenuated);
+}
+
+Material::ptr MaterialManager::createFontMaterial(Font::ptr font){
+	return shared_static_cast<DiffuseMaterialCreator>(mDiffuseCreator)->createFontMaterial(font);
 }
 
 Material::ptr MaterialManager::createSkyBoxMaterial(Texture::ptr texture){
@@ -183,16 +226,6 @@ void MaterialManager::modifyRenderState(RenderState::ptr dst,RenderState::ptr sr
 
 	MaterialState materialState;
 	if(src->getMaterialState(materialState)) dst->setMaterialState(materialState);
-
-	int i;
-	for(i=0;i<src->getNumSamplerStates();++i){
-		SamplerState samplerState;
-		if(src->getSamplerState(i,samplerState)) dst->setSamplerState(i,samplerState);
-	}
-	for(i=0;i<src->getNumTextureStates();++i){
-		TextureState textureState;
-		if(src->getTextureState(i,textureState)) dst->setTextureState(i,textureState);
-	}
 }
 
 void MaterialManager::modifyShaderState(ShaderState::ptr dst,ShaderState::ptr src){

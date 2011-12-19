@@ -232,6 +232,15 @@ DiffuseMaterialCreator::DiffuseMaterialCreator(Engine *engine){
 	mDiffuseFragmentShader=mEngine->getShaderManager()->createShader(Shader::ShaderType_FRAGMENT,profiles,diffuseFragmentCode,2);
 	mPointSpriteGeometryShader=mEngine->getShaderManager()->createShader(Shader::ShaderType_GEOMETRY,profiles,pointSpriteGeometryCode,2);
 	mPointSpriteFragmentShader=mEngine->getShaderManager()->createShader(Shader::ShaderType_FRAGMENT,profiles,pointSpriteFragmentCode,2);
+
+	mDiffuseShaderState=mEngine->getMaterialManager()->createShaderState();
+	mDiffuseShaderState->setShader(Shader::ShaderType_VERTEX,mDiffuseVertexShader);
+	mDiffuseShaderState->setShader(Shader::ShaderType_FRAGMENT,mDiffuseFragmentShader);
+
+	mPointShaderState=mEngine->getMaterialManager()->createShaderState();
+	mPointShaderState->setShader(Shader::ShaderType_VERTEX,mDiffuseVertexShader);
+	mPointShaderState->setShader(Shader::ShaderType_GEOMETRY,mPointSpriteGeometryShader);
+	mPointShaderState->setShader(Shader::ShaderType_FRAGMENT,mPointSpriteFragmentShader);
 }
 
 void DiffuseMaterialCreator::destroy(){
@@ -260,17 +269,17 @@ Resource::ptr DiffuseMaterialCreator::create(const String &name,ResourceData *da
 Material::ptr DiffuseMaterialCreator::createDiffuseMaterial(Texture::ptr texture){
 	Material::ptr material(new Material(mEngine->getMaterialManager()));
 
+	RenderState::ptr renderState=mEngine->getMaterialManager()->createRenderState();
+	renderState->setBlendState(BlendState());
+	renderState->setDepthState(DepthState());
+	renderState->setRasterizerState(RasterizerState());
+	renderState->setMaterialState(MaterialState(true,false,MaterialState::ShadeType_GOURAUD));
+
 	if(mEngine->hasShader(Shader::ShaderType_VERTEX) && mEngine->hasShader(Shader::ShaderType_FRAGMENT)){
 		RenderPath::ptr shaderPath=material->addPath();
 
-		RenderPass::ptr pass=shaderPath->addPass();
+		RenderPass::ptr pass=shaderPath->addPass(renderState,mDiffuseShaderState);
 
-		pass->setBlendState(BlendState());
-		pass->setDepthState(DepthState());
-		pass->setRasterizerState(RasterizerState());
-		pass->setMaterialState(MaterialState(true,false,MaterialState::ShadeType_GOURAUD));
-		pass->setShader(Shader::ShaderType_VERTEX,mDiffuseVertexShader);
-		pass->setShader(Shader::ShaderType_FRAGMENT,mDiffuseFragmentShader);
 		pass->getVariables()->addVariable("modelViewProjectionMatrix",RenderVariable::ptr(new MVPMatrixVariable()),Material::Scope_RENDERABLE);
 		pass->getVariables()->addVariable("normalMatrix",RenderVariable::ptr(new NormalMatrixVariable()),Material::Scope_RENDERABLE);
 		pass->getVariables()->addVariable("lightViewPosition",RenderVariable::ptr(new LightViewPositionVariable()),Material::Scope_MATERIAL);
@@ -283,27 +292,18 @@ Material::ptr DiffuseMaterialCreator::createDiffuseMaterial(Texture::ptr texture
 		pass->getVariables()->addVariable("fogDensity",RenderVariable::ptr(new FogDensityVariable()),Material::Scope_MATERIAL);
 		pass->getVariables()->addVariable("fogDistance",RenderVariable::ptr(new FogDistanceVariable()),Material::Scope_MATERIAL);
 		pass->getVariables()->addVariable("fogColor",RenderVariable::ptr(new FogColorVariable()),Material::Scope_MATERIAL);
-		pass->getVariables()->addVariable("textureMatrix",RenderVariable::ptr(new TextureMatrixVariable(0)),Material::Scope_MATERIAL);
-		pass->getVariables()->addVariable("textureSet",RenderVariable::ptr(new TextureSetVariable(0)),Material::Scope_MATERIAL);
+		pass->getVariables()->addVariable("textureMatrix",RenderVariable::ptr(new TextureMatrixVariable(pass->getVariables(),"tex")),Material::Scope_MATERIAL);
+		pass->getVariables()->addVariable("textureSet",RenderVariable::ptr(new TextureSetVariable(pass->getVariables(),"tex")),Material::Scope_MATERIAL);
 
-		SamplerState state=mEngine->getMaterialManager()->getDefaultSamplerState();
-		pass->setSamplerState(0,state);
-		pass->setTexture(0,texture);
+		pass->getVariables()->addTexture("tex",texture,"samp",mEngine->getMaterialManager()->getDefaultSamplerState(),TextureState());
 	}
 
 	if(mEngine->hasFixed(Shader::ShaderType_VERTEX) && mEngine->hasFixed(Shader::ShaderType_FRAGMENT)){
 		RenderPath::ptr fixedPath=material->addPath();
 
-		RenderPass::ptr pass=fixedPath->addPass();
+		RenderPass::ptr pass=fixedPath->addPass(renderState);
 
-		pass->setBlendState(BlendState());
-		pass->setDepthState(DepthState());
-		pass->setRasterizerState(RasterizerState());
-		pass->setMaterialState(MaterialState(true,false,MaterialState::ShadeType_GOURAUD));
-
-		SamplerState state=mEngine->getMaterialManager()->getDefaultSamplerState();
-		pass->setSamplerState(0,state);
-		pass->setTexture(0,texture);
+		pass->setTexture(Shader::ShaderType_FRAGMENT,0,texture,mEngine->getMaterialManager()->getDefaultSamplerState(),TextureState());
 	}
 
 	mEngine->getMaterialManager()->manage(material);
@@ -316,25 +316,23 @@ Material::ptr DiffuseMaterialCreator::createDiffuseMaterial(Texture::ptr texture
 Material::ptr DiffuseMaterialCreator::createPointSpriteMaterial(Texture::ptr texture,scalar size,bool attenuated){
 	Material::ptr material(new Material(mEngine->getMaterialManager()));
 
+	RenderState::ptr renderState=mEngine->getMaterialManager()->createRenderState();
+	renderState->setBlendState(BlendState());
+	renderState->setDepthState(DepthState());
+	renderState->setRasterizerState(RasterizerState());
+	renderState->setMaterialState(MaterialState(true,false,MaterialState::ShadeType_GOURAUD));
+	/// @todo: We need to sort out how to handle the case in GL where you can have Geometry Shaders and PointSprites both functional.
+	/// Though I suppose that would be in the GLRenderDevice, it would deactivate PointSprites if Geometry Shaders are used.
+	renderState->setPointState(PointState(true,size,attenuated));
+
 	if(	mEngine->hasShader(Shader::ShaderType_VERTEX) &&
 		mEngine->hasShader(Shader::ShaderType_FRAGMENT)	&& 
 		mEngine->hasShader(Shader::ShaderType_GEOMETRY))
 	{
 		RenderPath::ptr shaderPath=material->addPath();
 
-		RenderPass::ptr pass=shaderPath->addPass();
+		RenderPass::ptr pass=shaderPath->addPass(renderState,mPointShaderState);
 
-		pass->setBlendState(BlendState());
-		pass->setDepthState(DepthState());
-		pass->setRasterizerState(RasterizerState());
-		pass->setMaterialState(MaterialState(true,false,MaterialState::ShadeType_GOURAUD));
-		/// @todo: We need to sort out how to handle the case in GL where you can have Geometry Shaders and PointSprites both functional.
-		/// Though I suppose that would be in the GLRenderDevice, it would deactivate PointSprites if Geometry Shaders are used.
-		pass->setPointState(PointState(true,size,attenuated));
-
-		pass->setShader(Shader::ShaderType_VERTEX,mDiffuseVertexShader);
-		pass->setShader(Shader::ShaderType_GEOMETRY,mPointSpriteGeometryShader);
-		pass->setShader(Shader::ShaderType_FRAGMENT,mPointSpriteFragmentShader);
 		pass->getVariables()->addVariable("modelViewProjectionMatrix",RenderVariable::ptr(new MVPMatrixVariable()),Material::Scope_RENDERABLE);
 		pass->getVariables()->addVariable("normalMatrix",RenderVariable::ptr(new NormalMatrixVariable()),Material::Scope_RENDERABLE);
 		pass->getVariables()->addVariable("lightViewPosition",RenderVariable::ptr(new LightViewPositionVariable()),Material::Scope_MATERIAL);
@@ -347,13 +345,12 @@ Material::ptr DiffuseMaterialCreator::createPointSpriteMaterial(Texture::ptr tex
 		pass->getVariables()->addVariable("fogDensity",RenderVariable::ptr(new FogDensityVariable()),Material::Scope_MATERIAL);
 		pass->getVariables()->addVariable("fogDistance",RenderVariable::ptr(new FogDistanceVariable()),Material::Scope_MATERIAL);
 		pass->getVariables()->addVariable("fogColor",RenderVariable::ptr(new FogColorVariable()),Material::Scope_MATERIAL);
-		pass->getVariables()->addVariable("textureMatrix",RenderVariable::ptr(new TextureMatrixVariable(0)),Material::Scope_MATERIAL);
-		pass->getVariables()->addVariable("textureSet",RenderVariable::ptr(new TextureSetVariable(0)),Material::Scope_MATERIAL);
+		pass->getVariables()->addVariable("textureMatrix",RenderVariable::ptr(new TextureMatrixVariable(pass->getVariables(),"tex")),Material::Scope_MATERIAL);
+		pass->getVariables()->addVariable("textureSet",RenderVariable::ptr(new TextureSetVariable(pass->getVariables(),"tex")),Material::Scope_MATERIAL);
 		pass->getVariables()->addVariable("pointSize",RenderVariable::ptr(new PointSizeVariable()),Material::Scope_MATERIAL);
 		pass->getVariables()->addVariable("viewport",RenderVariable::ptr(new ViewportVariable()),Material::Scope_MATERIAL);
 
-		pass->setSamplerState(0,mEngine->getMaterialManager()->getDefaultSamplerState());
-		pass->setTexture(0,texture);
+		pass->getVariables()->addTexture("tex",texture,"samp",mEngine->getMaterialManager()->getDefaultSamplerState(),TextureState());
 	}
 
 	if(	mEngine->hasFixed(Shader::ShaderType_VERTEX) &&
@@ -362,16 +359,67 @@ Material::ptr DiffuseMaterialCreator::createPointSpriteMaterial(Texture::ptr tex
 	{
 		RenderPath::ptr fixedPath=material->addPath();
 
-		RenderPass::ptr pass=fixedPath->addPass();
+		RenderPass::ptr pass=fixedPath->addPass(renderState);
 
-		pass->setBlendState(BlendState());
-		pass->setDepthState(DepthState());
-		pass->setRasterizerState(RasterizerState());
-		pass->setMaterialState(MaterialState(true,false,MaterialState::ShadeType_GOURAUD));
-		pass->setPointState(PointState(true,size,attenuated));
+		pass->setTexture(Shader::ShaderType_FRAGMENT,0,texture,mEngine->getMaterialManager()->getDefaultSamplerState(),TextureState());
+	}
 
-		pass->setSamplerState(0,mEngine->getMaterialManager()->getDefaultSamplerState());
-		pass->setTexture(0,texture);
+	mEngine->getMaterialManager()->manage(material);
+
+	material->compile();
+
+	return material;
+}
+
+Material::ptr DiffuseMaterialCreator::createFontMaterial(Font::ptr font){
+	Material::ptr material(new Material(mEngine->getMaterialManager()));
+
+	Texture::ptr texture=font->getTexture();
+
+	RenderState::ptr renderState=mEngine->getMaterialManager()->createRenderState();
+	renderState->setRasterizerState(RasterizerState(RasterizerState::CullType_NONE));
+	renderState->setDepthState(DepthState(DepthState::DepthTest_LEQUAL,false));
+	renderState->setMaterialState(MaterialState(true,true,MaterialState::ShadeType_FLAT));
+	if(TextureFormat::getAlphaBits(texture->getFormat()->getPixelFormat())>0){
+		renderState->setBlendState(BlendState::Combination_ALPHA);
+	}
+	else{
+		renderState->setBlendState(BlendState::Combination_COLOR);
+	}
+
+	if(	mEngine->hasShader(Shader::ShaderType_VERTEX) &&
+		mEngine->hasShader(Shader::ShaderType_FRAGMENT)
+	){
+		RenderPath::ptr shaderPath=material->addPath();
+	
+		RenderPass::ptr pass=shaderPath->addPass(renderState,mDiffuseShaderState);
+
+		pass->getVariables()->addVariable("modelViewProjectionMatrix",RenderVariable::ptr(new MVPMatrixVariable()),Material::Scope_RENDERABLE);
+		pass->getVariables()->addVariable("normalMatrix",RenderVariable::ptr(new NormalMatrixVariable()),Material::Scope_RENDERABLE);
+		pass->getVariables()->addVariable("lightViewPosition",RenderVariable::ptr(new LightViewPositionVariable()),Material::Scope_MATERIAL);
+		pass->getVariables()->addVariable("lightColor",RenderVariable::ptr(new LightDiffuseVariable()),Material::Scope_MATERIAL);
+		pass->getVariables()->addVariable("ambientColor",RenderVariable::ptr(new AmbientVariable()),Material::Scope_RENDERABLE);
+		pass->getVariables()->addVariable("materialLighting",RenderVariable::ptr(new MaterialLightingVariable()),Material::Scope_MATERIAL);
+		pass->getVariables()->addVariable("materialDiffuseColor",RenderVariable::ptr(new MaterialDiffuseVariable()),Material::Scope_MATERIAL);
+		pass->getVariables()->addVariable("materialAmbientColor",RenderVariable::ptr(new MaterialAmbientVariable()),Material::Scope_MATERIAL);
+		pass->getVariables()->addVariable("materialTrackColor",RenderVariable::ptr(new MaterialTrackColorVariable()),Material::Scope_MATERIAL);
+		pass->getVariables()->addVariable("fogDensity",RenderVariable::ptr(new FogDensityVariable()),Material::Scope_MATERIAL);
+		pass->getVariables()->addVariable("fogDistance",RenderVariable::ptr(new FogDistanceVariable()),Material::Scope_MATERIAL);
+		pass->getVariables()->addVariable("fogColor",RenderVariable::ptr(new FogColorVariable()),Material::Scope_MATERIAL);
+		pass->getVariables()->addVariable("textureMatrix",RenderVariable::ptr(new TextureMatrixVariable(pass->getVariables(),"tex")),Material::Scope_MATERIAL);
+		pass->getVariables()->addVariable("textureSet",RenderVariable::ptr(new TextureSetVariable(pass->getVariables(),"tex")),Material::Scope_MATERIAL);
+
+		pass->getVariables()->addTexture("tex",texture,"samp",mEngine->getMaterialManager()->getDefaultSamplerState(),TextureState());
+	}
+
+	if(	mEngine->hasFixed(Shader::ShaderType_VERTEX) &&
+		mEngine->hasFixed(Shader::ShaderType_FRAGMENT)
+	){
+		RenderPath::ptr fixedPath=material->addPath();
+
+		RenderPass::ptr pass=fixedPath->addPass(renderState);
+
+		pass->setTexture(Shader::ShaderType_FRAGMENT,0,texture,mEngine->getMaterialManager()->getDefaultSamplerState(),TextureState());
 	}
 
 	mEngine->getMaterialManager()->manage(material);

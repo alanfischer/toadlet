@@ -72,21 +72,14 @@ public:
 		renderState->getMaterialState(mMaterialState);
 		renderState->getPointState(mPointState);
 		renderState->getFogState(mFogState);
-
-		if(mTextureState.size()<renderState->getNumTextureStates()){
-			mTextureState.resize(renderState->getNumTextureStates());
-		}
-
-		int i;
-		for(i=0;i<renderState->getNumTextureStates();++i){
-			renderState->getTextureState(i,mTextureState[i]);
-		}
 	}
 
+	/// @TODO :Texture states!
+
 	inline const MaterialState &getMaterialState() const{return mMaterialState;}
-	inline const TextureState &getTextureState(int i) const{return mTextureState[i];}
 	inline const PointState &getPointState() const{return mPointState;}
 	inline const FogState &getFogState() const{return mFogState;}
+	inline const TextureState &getTextureState(int i) const{return mTextureState[i];}
 
 	inline void setLightState(const LightState &state){mLightState.set(state);}
 	inline const LightState &getLightState() const{return mLightState;}

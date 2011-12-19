@@ -43,7 +43,7 @@ class TOADLET_API RenderPass{
 public:
 	TOADLET_SHARED_POINTERS(RenderPass);
 
-	RenderPass(MaterialManager *manager,RenderPass *source=NULL,bool clone=false);
+	RenderPass(MaterialManager *manager,RenderState::ptr renderState=RenderState::ptr(),ShaderState::ptr shaderState=ShaderState::ptr());
 	virtual ~RenderPass();
 
 	void destroy();
@@ -66,29 +66,21 @@ public:
 	void setMaterialState(const MaterialState &state){mRenderState->setMaterialState(state);}
 	bool getMaterialState(MaterialState &state) const{return mRenderState->getMaterialState(state);}
 
-	int getNumSamplerStates() const{return mRenderState->getNumSamplerStates();}
-	void setSamplerState(int i,const SamplerState &state){return mRenderState->setSamplerState(i,state);}
-	bool getSamplerState(int i,SamplerState &state) const{return mRenderState->getSamplerState(i,state);}
+	void setSamplerState(Shader::ShaderType type,int i,const SamplerState &state){mRenderState->setSamplerState(type,i,state);}
+	bool getSamplerState(Shader::ShaderType type,int i,SamplerState &state){return mRenderState->getSamplerState(type,i,state);}
 
-	int getNumTextureStates() const{return mRenderState->getNumTextureStates();}
-	void setTextureState(int i,const TextureState &state){return mRenderState->setTextureState(i,state);}
-	bool getTextureState(int i,TextureState &state) const{return mRenderState->getTextureState(i,state);}
+	void setTextureState(Shader::ShaderType type,int i,const TextureState &state){mRenderState->setTextureState(type,i,state);}
+	bool getTextureState(Shader::ShaderType type,int i,TextureState &state){return mRenderState->getTextureState(type,i,state);}
 
 	void setShader(Shader::ShaderType type,Shader::ptr shader);
 	Shader::ptr getShader(Shader::ShaderType type){return mShaderState->getShader(type);}
 
-	int getNumTextures() const{return mTextures.size();}
-	void setTexture(Texture::ptr texture){setTexture(0,texture);}
-	void setTexture(int i,Texture::ptr texture);
-	Texture::ptr getTexture(int i=0) const{return i<mTextures.size()?mTextures[i]:NULL;}
-	void setTextureName(const String &name){setTextureName(0,name);}
-	void setTextureName(int i,const String &name);
-	String getTextureName(int i=0) const{return i<mTextureNames.size()?mTextureNames[i]:(char*)NULL;}
-
 	RenderVariableSet::ptr getVariables();
 
-	void shareStates(RenderPass *pass);
-	inline bool ownsStates() const{return mOwnsStates;}
+	int getNumTextures(Shader::ShaderType type) const{return mTextures[type].size();}
+	void setTexture(Shader::ShaderType type,int i,Texture::ptr texture,const SamplerState &samplerState,const TextureState &textureState);
+	Texture::ptr getTexture(Shader::ShaderType type,int i=0) const{return i<mTextures[type].size()?mTextures[type][i]:NULL;}
+
 	inline RenderState::ptr getRenderState() const{return mRenderState;}
 	inline ShaderState::ptr getShaderState() const{return mShaderState;}
 
@@ -98,11 +90,9 @@ public:
 
 protected:
 	MaterialManager *mManager;
-	RenderState::ptr mRenderState;
-	ShaderState::ptr mShaderState;
-	bool mOwnsStates;
-	Collection<Texture::ptr> mTextures;
-	Collection<String> mTextureNames;
+	RenderState::ptr mRenderState,mOwnRenderState;
+	ShaderState::ptr mShaderState,mOwnShaderState;
+	Collection<Texture::ptr> mTextures[Shader::ShaderType_MAX];
 	RenderVariableSet::ptr mVariables;
 };
 
