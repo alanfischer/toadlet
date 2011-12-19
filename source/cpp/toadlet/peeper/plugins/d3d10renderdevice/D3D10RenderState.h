@@ -64,13 +64,13 @@ public:
 	void setMaterialState(const MaterialState &state);
 	bool getMaterialState(MaterialState &state) const;
 
-	int getNumSamplerStates() const{return mSamplerStates.size();}
-	void setSamplerState(int i,const SamplerState &state);
-	bool getSamplerState(int i,SamplerState &state) const;
+	int getNumSamplerStates(Shader::ShaderType type) const{return mSamplerStates[type].size();}
+	void setSamplerState(Shader::ShaderType type,int i,const SamplerState &state);
+	bool getSamplerState(Shader::ShaderType type,int i,SamplerState &state) const;
 
-	int getNumTextureStates() const{return mTextureStates.size();}
-	void setTextureState(int i,const TextureState &state);
-	bool getTextureState(int i,TextureState &state) const;
+	int getNumTextureStates(Shader::ShaderType type) const{return mTextureStates[type].size();}
+	void setTextureState(Shader::ShaderType type,int i,const TextureState &state);
+	bool getTextureState(Shader::ShaderType type,int i,TextureState &state) const;
 
 protected:
 	D3D10RenderDevice *mDevice;
@@ -83,13 +83,13 @@ protected:
 	FogState *mFogState;
 	PointState *mPointState;
 	MaterialState *mMaterialState;
-	Collection<SamplerState*> mSamplerStates;
-	Collection<TextureState*> mTextureStates;
+	Collection<SamplerState*> mSamplerStates[Shader::ShaderType_MAX];
+	Collection<TextureState*> mTextureStates[Shader::ShaderType_MAX];
 
 	ID3D10BlendState *mD3DBlendState;
 	ID3D10DepthStencilState *mD3DDepthStencilState;
 	ID3D10RasterizerState *mD3DRasterizerState;
-	Collection<ID3D10SamplerState*> mD3DSamplerStates;
+	Collection<ID3D10SamplerState*> mD3DSamplerStates[Shader::ShaderType_MAX];
 
 	friend class D3D10RenderDevice;
 };

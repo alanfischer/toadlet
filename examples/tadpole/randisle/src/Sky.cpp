@@ -140,17 +140,13 @@ Node *Sky::create(Scene *scene,int cloudSize,const Vector4 &skyColor,const Vecto
 			pass->setShader(Shader::ShaderType_FRAGMENT,fragmentShader);
 
 			pass->getVariables()->addVariable("modelViewProjectionMatrix",RenderVariable::ptr(new MVPMatrixVariable()),Material::Scope_RENDERABLE);
-			pass->getVariables()->addVariable("textureMatrix",RenderVariable::ptr(new TextureMatrixVariable(0)),Material::Scope_MATERIAL);
+			pass->getVariables()->addVariable("textureMatrix",RenderVariable::ptr(new TextureMatrixVariable(pass->getVariables(),"bumpTex")),Material::Scope_MATERIAL);
 			pass->getVariables()->addVariable("skyColor",RenderVariable::ptr(new ConstantVariable(skyColor)),Material::Scope_MATERIAL);
 
-			int state=0;
-			TextureState bumpState;
-			pass->setTexture(state,bumpTexture);
-			pass->setTextureState(state,bumpState);
-			mShaderAccessor=Matrix4x4Accessor::ptr(new TextureStateMatrix4x4Accessor(pass,state++));
-
-			pass->setTexture(state++,cloudTexture);
-			pass->setTexture(state++,fadeTexture);
+			pass->getVariables()->addTexture("bumpTex",bumpTexture,"bumpSamp",SamplerState(),TextureState());
+			mShaderAccessor=Matrix4x4Accessor::ptr(new TextureStateMatrix4x4Accessor(pass,0));
+			pass->getVariables()->addTexture("cloudTex",cloudTexture,"cloudSamp",SamplerState(),TextureState());
+			pass->getVariables()->addTexture("fadeTex",cloudTexture,"fadeSamp",SamplerState(),TextureState());
 		}
 
 		if(mEngine->hasFixed(Shader::ShaderType_VERTEX) && mEngine->hasFixed(Shader::ShaderType_FRAGMENT)){
@@ -167,8 +163,7 @@ Node *Sky::create(Scene *scene,int cloudSize,const Vector4 &skyColor,const Vecto
 			bumpState.colorOperation=TextureState::Operation_DOTPRODUCT;
 			bumpState.colorSource1=TextureState::Source_PREVIOUS;
 			bumpState.colorSource2=TextureState::Source_TEXTURE;
-			pass->setTexture(state,bumpTexture);
-			pass->setTextureState(state,bumpState);
+			pass->setTexture(Shader::ShaderType_FRAGMENT,state,bumpTexture,SamplerState(),bumpState);
 			mBumpAccessor=Matrix4x4Accessor::ptr(new TextureStateMatrix4x4Accessor(pass,state++));
 
 			TextureState cloudState;
@@ -177,8 +172,7 @@ Node *Sky::create(Scene *scene,int cloudSize,const Vector4 &skyColor,const Vecto
 			cloudState.colorSource2=TextureState::Source_TEXTURE;
 			cloudState.alphaOperation=TextureState::Operation_REPLACE;
 			cloudState.alphaSource1=TextureState::Source_TEXTURE;
-			pass->setTexture(state,cloudTexture);
-			pass->setTextureState(state,cloudState);
+			pass->setTexture(Shader::ShaderType_FRAGMENT,state,cloudTexture,SamplerState(),cloudState);
 			mCloudAccessor=Matrix4x4Accessor::ptr(new TextureStateMatrix4x4Accessor(pass,state++));
 
 			TextureState colorState;
@@ -189,8 +183,7 @@ Node *Sky::create(Scene *scene,int cloudSize,const Vector4 &skyColor,const Vecto
 			colorState.colorSource3=TextureState::Source_PREVIOUS;
 			colorState.alphaOperation=TextureState::Operation_REPLACE;
 			colorState.alphaSource1=TextureState::Source_PREVIOUS;
-			pass->setTexture(state,cloudTexture); // Need a texture for this state to function on OpenGL currently
-			pass->setTextureState(state,colorState);
+			pass->setTexture(Shader::ShaderType_FRAGMENT,state,cloudTexture,SamplerState(),colorState); // Need a texture for this state to function on OpenGL currently
 			mColorAccessor=Matrix4x4Accessor::ptr(new TextureStateMatrix4x4Accessor(pass,state++));
 
 			TextureState fadeState;
@@ -200,8 +193,7 @@ Node *Sky::create(Scene *scene,int cloudSize,const Vector4 &skyColor,const Vecto
 			fadeState.colorSource3=TextureState::Source_TEXTURE;
 			fadeState.alphaOperation=TextureState::Operation_REPLACE;
 			fadeState.alphaSource1=TextureState::Source_TEXTURE;
-			pass->setTexture(state,fadeTexture);
-			pass->setTextureState(state,fadeState);
+			pass->setTexture(Shader::ShaderType_FRAGMENT,state,fadeTexture,SamplerState(),fadeState);
 			mFadeAccessor=Matrix4x4Accessor::ptr(new TextureStateMatrix4x4Accessor(pass,state++));
 		}
 
@@ -216,7 +208,6 @@ Node *Sky::create(Scene *scene,int cloudSize,const Vector4 &skyColor,const Vecto
 		material=mEngine->getMaterialManager()->createSkyBoxMaterial(compositeTexture);
 		mCompositeAccessor=Matrix4x4Accessor::ptr(new TextureStateMatrix4x4Accessor(material->getPass(),0));
 		material->getPass()->setBlendState(BlendState::Combination_ALPHA);
-		material->getPass()->setSamplerState(0,SamplerState());
 		material->getPass()->setMaterialState(MaterialState(false,true));
 	}
 	mSkyMaterial=material;

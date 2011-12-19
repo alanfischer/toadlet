@@ -328,5 +328,28 @@ bool D3D10Buffer::update(tbyte *data,int start,int size){
 	return unlock();
 }
 
+bool D3D10Buffer::updateTexture(int i,Texture::ptr texture,const SamplerState &state){
+	if(mTextureData.size()<=i){
+		mTextureData.resize(i);
+	}
+	if(mTextureData[i]==NULL){
+		mTextureData[i]=new TextureData();
+	}
+	mTextureData[i]->update(mDevice,texture,state);
+	return true;
+}
+
+void D3D10Buffer::TextureData::update(D3D10RenderDevice *device,Texture::ptr texture,const SamplerState &state){
+	mTexture=texture;
+	mState=state;
+	
+	if(mD3DState!=NULL){
+		mD3DState->Release();
+		mD3DState=NULL;
+	}
+	D3D10_SAMPLER_DESC desc; device->getD3D10_SAMPLER_DESC(desc,state);
+	device->getD3D10Device()->CreateSamplerState(&desc,&mD3DState);
+}
+
 }
 }

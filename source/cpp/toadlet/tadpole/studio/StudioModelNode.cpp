@@ -49,6 +49,7 @@ StudioModelNode::SubModel::SubModel(StudioModelNode *modelNode,int bodypartIndex
 	smesh=model->mesh(smodel,meshIndex);
 	mdata=model->findmeshdata(bodypartIndex,modelIndex,meshIndex);
 	material=model->materials[model->skin(model->header->numskinref*skinIndex+smesh->skinref)];
+	material->retain();
 }
 
 void StudioModelNode::SubModel::render(SceneRenderer *renderer) const{
@@ -62,7 +63,7 @@ StudioModelNode::StudioModelNode():super(),
 	mRendered(false),
 	//mModel,
 	//mSubModels,
-	//mOwnedMaterial,
+	//mSharedRenderState,
 
 	mBodypartIndex(0),
 	mModelIndex(0),
@@ -107,6 +108,12 @@ Node *StudioModelNode::create(Scene *scene){
 }
 
 void StudioModelNode::destroy(){
+	int i;
+	for(i=0;i<mSubModels.size();++i){
+		mSubModels[i]->destroy();
+	}
+	mSubModels.clear();
+
 	if(mModel!=NULL){
 		mModel->release();
 		mModel=NULL;
@@ -186,12 +193,6 @@ void StudioModelNode::setModel(const String &name){
 }
 
 void StudioModelNode::setModel(StudioModel::ptr model){
-	mSubModels.clear();
-	if(mOwnedMaterial!=NULL){
-		mOwnedMaterial->release();
-		mOwnedMaterial=NULL;
-	}
-
 	if(mModel!=NULL){
 		mModel->release();
 	}
@@ -428,19 +429,17 @@ void StudioModelNode::traceSegment(Collision &result,const Vector3 &position,con
 }
 
 RenderState::ptr StudioModelNode::getSharedRenderState(){
-	if(mOwnedMaterial==NULL && mSubModels.size()>0){
-		mOwnedMaterial=mSubModels[0]->material=mEngine->getMaterialManager()->createMaterial(mSubModels[0]->material);
-		mSubModels[0]->material->setSort(Material::SortType_AUTO);
+	if(mSharedRenderState==NULL){
+		mSharedRenderState=mEngine->getMaterialManager()->createRenderState();
 		int i;
-		for(i=1;i<mSubModels.size();++i){
-			mSubModels[i]->material=mEngine->getMaterialManager()->cloneMaterial(mSubModels[i]->material);
-			mSubModels[i]->material->shareStates(mOwnedMaterial);
-			mSubModels[i]->material->setSort(Material::SortType_AUTO);
+		for(i=0;i<mSubModels.size();++i){
+			Material::ptr material=mEngine->getMaterialManager()->createSharedMaterial(mSubModels[i]->material,mSharedRenderState);
+			mSubModels[i]->material->release();
+			mSubModels[i]->material=material;
 		}
-		mOwnedMaterial->retain();
 	}
 
-	return mOwnedMaterial!=NULL?mOwnedMaterial->getPass()->getRenderState():NULL;
+	return mSharedRenderState;
 }
 
 void StudioModelNode::gatherRenderables(CameraNode *camera,RenderableSet *set){
@@ -804,6 +803,9 @@ void StudioModelNode::findBoneRotate(Quaternion &r,int frame,float s,studiobone 
 
 void StudioModelNode::createSubModels(){
 	int i;
+	for(i=0;i<mSubModels.size();++i){
+		mSubModels[i]->destroy();
+	}
 	mSubModels.clear();
 
 	if(mBodypartIndex<0 ||mBodypartIndex>=mModel->header->numbodyparts){
@@ -816,6 +818,11 @@ void StudioModelNode::createSubModels(){
 	studiomodel *smodel=mModel->model(sbodyparts,mModelIndex);
 	for(i=0;i<smodel->nummesh;++i){
 		SubModel::ptr subModel(new SubModel(this,mBodypartIndex,mModelIndex,i,mSkinIndex));
+		if(mSharedRenderState!=NULL){
+			Material::ptr material=mEngine->getMaterialManager()->createSharedMaterial(subModel->material,mSharedRenderState);
+			subModel->material->release();
+			subModel->material=material;
+		}
 		mSubModels.add(subModel);
 	}
 }

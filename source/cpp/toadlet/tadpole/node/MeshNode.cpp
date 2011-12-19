@@ -80,18 +80,21 @@ Node *MeshNode::create(Scene *scene){
 	setCameraAligned(false);
 
 	mRendered=true;
-	mMesh=NULL;
-	mSubMeshes.clear();
-	mSkeleton=NULL;
-	mDynamicVertexData=NULL;
-
-	mController=NULL;
 
 	return this;
 }
 
 void MeshNode::destroy(){
+	int i;
+	for(i=0;i<mSubMeshes.size();++i){
+		mSubMeshes[i]->destroy();
+	}
 	mSubMeshes.clear();
+
+	if(mSharedRenderState!=NULL){
+		mSharedRenderState->destroy();
+		mSharedRenderState=NULL;
+	}
 
 	if(mController!=NULL){
 		mController->stop();
@@ -107,11 +110,6 @@ void MeshNode::destroy(){
 	if(mMesh!=NULL){
 		mMesh->release();
 		mMesh=NULL;
-	}
-
-	if(mOwnedMaterial!=NULL){
-		mOwnedMaterial->release();
-		mOwnedMaterial=NULL;
 	}
 
 	if(mSkeleton!=NULL){
@@ -148,6 +146,10 @@ void MeshNode::setMesh(Mesh::ptr mesh){
 	Logger::debug(Categories::TOADLET_TADPOLE,
 		"MeshNode::setMesh");
 
+	int i;
+	for(i=0;i<mSubMeshes.size();++i){
+		mSubMeshes[i]->destroy();
+	}
 	mSubMeshes.clear();
 
 	if(mController!=NULL){
@@ -164,11 +166,6 @@ void MeshNode::setMesh(Mesh::ptr mesh){
 	if(mMesh!=NULL){
 		mMesh->release();
 		mMesh=NULL;
-	}
-
-	if(mOwnedMaterial!=NULL){
-		mOwnedMaterial->release();
-		mOwnedMaterial=NULL;
 	}
 
 	if(mSkeleton!=NULL){
@@ -194,7 +191,6 @@ void MeshNode::setMesh(Mesh::ptr mesh){
 	}
 
 	mSubMeshes.resize(mMesh->getNumSubMeshes());
-	int i;
 	for(i=0;i<mSubMeshes.size();++i){
 		SubMesh::ptr subMesh(new SubMesh(this,mMesh->getSubMesh(i)));
 		mSubMeshes[i]=subMesh;
@@ -208,6 +204,12 @@ void MeshNode::setMesh(Mesh::ptr mesh){
 		}
 
 		subMesh->hasOwnTransform=subMesh->meshSubMesh->hasOwnTransform;
+
+		if(mSharedRenderState!=NULL){
+			Material::ptr material=mEngine->getMaterialManager()->createSharedMaterial(subMesh->material,mSharedRenderState);
+			subMesh->material->release();
+			subMesh->material=material;
+		}
 	}
 }
 
@@ -272,19 +274,17 @@ void MeshNode::updateWorldTransform(){
 }
 
 RenderState::ptr MeshNode::getSharedRenderState(){
-	if(mOwnedMaterial==NULL && mSubMeshes.size()>0){
-		mOwnedMaterial=mSubMeshes[0]->material=mEngine->getMaterialManager()->createMaterial(mSubMeshes[0]->material);
-		mSubMeshes[0]->material->setSort(Material::SortType_AUTO);
+	if(mSharedRenderState==NULL){
+		mSharedRenderState=mEngine->getMaterialManager()->createRenderState();
 		int i;
-		for(i=1;i<mSubMeshes.size();++i){
-			mSubMeshes[i]->material=mEngine->getMaterialManager()->cloneMaterial(mSubMeshes[i]->material);
-			mSubMeshes[i]->material->shareStates(mOwnedMaterial);
-			mSubMeshes[i]->material->setSort(Material::SortType_AUTO);
+		for(i=0;i<mSubMeshes.size();++i){
+			Material::ptr material=mEngine->getMaterialManager()->createSharedMaterial(mSubMeshes[i]->material,mSharedRenderState);
+			mSubMeshes[i]->material->release();
+			mSubMeshes[i]->material=material;
 		}
-		mOwnedMaterial->retain();
 	}
 
-	return mOwnedMaterial!=NULL?mOwnedMaterial->getPass()->getRenderState():NULL;
+	return mSharedRenderState;
 }
 
 void MeshNode::gatherRenderables(CameraNode *camera,RenderableSet *set){

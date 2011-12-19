@@ -70,15 +70,17 @@ void D3D9RenderState::destroy(){
 		mMaterialState=NULL;
 	}
 
-	int i;
-	for(i=0;i<mSamplerStates.size();++i){
-		delete mSamplerStates[i];
+	int i,j;
+	for(j=0;j<Shader::ShaderType_MAX;++j){
+		for(i=0;i<mSamplerStates[j].size();++i){
+			delete mSamplerStates[j][i];
+		}
+		mSamplerStates[j].clear();
+		for(i=0;i<mTextureStates[j].size();++i){
+			delete mTextureStates[j][i];
+		}
+		mTextureStates[j].clear();
 	}
-	mSamplerStates.clear();
-	for(i=0;i<mTextureStates.size();++i){
-		delete mTextureStates[i];
-	}
-	mTextureStates.clear();
 
 	if(mListener!=NULL){
 		mListener->renderStateDestroyed(this);

@@ -643,17 +643,6 @@ PathSystem::Path *Tree::getClosestPath(Vector3 &closestPoint,const Sphere &bound
 	}
 }
 
-void Tree::setHighlight(bool highlight){
-	if(highlight){
-		mMeshNode->getSubMesh(0)->material=Resources::instance->treeBranchHighlighted;
-		mLowMeshNode->getSubMesh(0)->material=Resources::instance->treeBranchHighlighted;
-	}
-	else{
-		mMeshNode->getSubMesh(0)->material=Resources::instance->treeBranch;
-		mLowMeshNode->getSubMesh(0)->material=Resources::instance->treeBranch;
-	}
-}
-
 void Tree::resetCounts(){
 	mBranchVertexCount=0;
 	mBranchIndexCount=0;

@@ -374,9 +374,21 @@ bool D3D10RenderDevice::setRenderState(RenderState *renderState){
 	if(d3drenderState->mD3DRasterizerState!=NULL){
 		mD3DDevice->RSSetState(d3drenderState->mD3DRasterizerState);
 	}
-	/// @todo: Be able to select which shader will get the samplers
-	if(d3drenderState->mD3DSamplerStates.size()>0){
-		mD3DDevice->PSSetSamplers(0,d3drenderState->mD3DSamplerStates.size(),&d3drenderState->mD3DSamplerStates[0]);
+	int j;
+	for(j=0;j<Shader::ShaderType_MAX;++j){
+		if(d3drenderState->mD3DSamplerStates[j].size()>0){
+			switch(j){
+				case Shader::ShaderType_VERTEX:
+					mD3DDevice->VSSetSamplers(0,d3drenderState->mD3DSamplerStates[j].size(),&d3drenderState->mD3DSamplerStates[j][0]);
+				break;
+				case Shader::ShaderType_FRAGMENT:
+					mD3DDevice->PSSetSamplers(0,d3drenderState->mD3DSamplerStates[j].size(),&d3drenderState->mD3DSamplerStates[j][0]);
+				break;
+				case Shader::ShaderType_GEOMETRY:
+					mD3DDevice->GSSetSamplers(0,d3drenderState->mD3DSamplerStates[j].size(),&d3drenderState->mD3DSamplerStates[j][0]);
+				break;
+			}
+		}
 	}
 
 	return true;
@@ -420,24 +432,24 @@ void D3D10RenderDevice::setBuffer(Shader::ShaderType shaderType,int i,VariableBu
 	}
 }
 
-void D3D10RenderDevice::setTexture(int i,Texture *texture){
+void D3D10RenderDevice::setTexture(Shader::ShaderType shaderType,int i,Texture *texture){
 	D3D10Texture *d3dtexture=texture!=NULL?(D3D10Texture*)texture->getRootTexture():NULL;
 	ID3D10ShaderResourceView *resourceview=NULL;
 	if(d3dtexture!=NULL){
 		resourceview=d3dtexture->mShaderResourceView;
 	}
 
-//	switch(type){
-//		case Shader::ShaderType_VERTEX:
+	switch(shaderType){
+		case Shader::ShaderType_VERTEX:
 			mD3DDevice->VSSetShaderResources(i,1,&resourceview);
-//		break;
-//		case Shader::ShaderType_FRAGMENT:
+		break;
+		case Shader::ShaderType_FRAGMENT:
 			mD3DDevice->PSSetShaderResources(i,1,&resourceview);
-//		break;
-//		case Shader::ShaderType_GEOMETRY:
+		break;
+		case Shader::ShaderType_GEOMETRY:
 			mD3DDevice->GSSetShaderResources(i,1,&resourceview);
-//		break;
-//	}
+		break;
+	}
 }
 
 void D3D10RenderDevice::getShadowBiasMatrix(const Texture *shadowTexture,Matrix4x4 &result){

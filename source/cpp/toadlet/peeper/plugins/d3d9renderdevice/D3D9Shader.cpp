@@ -160,12 +160,19 @@ bool D3D9Shader::reflect(){
         result=mConstantTable->GetConstantDesc(handle,&constantDesc,&params);
 
 		VariableBufferFormat::Variable::ptr variable(new VariableBufferFormat::Variable());
-		variable->setName(constantDesc.Name);
+		String name=constantDesc.Name;
+		// Convert samp+tex name into just tex
+		int plus=name.find('+');
+		if(plus>=0){
+			name=name.substr(plus+1,name.length());
+		}
+		variable->setName(name);
 		int format=D3D9RenderDevice::getVariableFormat(constantDesc);
 		variable->setFormat(format);
 		variable->setOffset(dataSize);
 		variable->setSize(constantDesc.Bytes);
 		variable->setIndex(constantDesc.RegisterIndex);
+		variable->setResourceIndex(constantDesc.RegisterIndex);
 		primaryFormat->setStructVariable(i,variable);
 
 		dataSize+=constantDesc.Bytes;

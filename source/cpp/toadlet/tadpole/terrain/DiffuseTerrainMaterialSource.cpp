@@ -269,8 +269,7 @@ Material::ptr DiffuseTerrainMaterialSource::getMaterial(TerrainPatchNode *patch)
 			pass->getVariables()->addVariable("fogDistance",RenderVariable::ptr(new FogDistanceVariable()),Material::Scope_MATERIAL);
 			pass->getVariables()->addVariable("fogColor",RenderVariable::ptr(new FogColorVariable()),Material::Scope_MATERIAL);
 
-			pass->setTexture(0,mDiffuseTextures.size()>0?mDiffuseTextures[0]:NULL);
-			pass->setTextureState(0,scaleState);
+			pass->getVariables()->addTexture("tex",mDiffuseTextures.size()>0?mDiffuseTextures[0]:NULL,"samp",SamplerState(),TextureState());
 		}
 
 		int i;
@@ -298,11 +297,8 @@ Material::ptr DiffuseTerrainMaterialSource::getMaterial(TerrainPatchNode *patch)
 			pass->getVariables()->addVariable("fogDistance",RenderVariable::ptr(new FogDistanceVariable()),Material::Scope_MATERIAL);
 			pass->getVariables()->addVariable("fogColor",RenderVariable::ptr(new FogColorVariable()),Material::Scope_MATERIAL);
 
-			pass->setTexture(0,mDiffuseTextures.size()>i?mDiffuseTextures[i]:NULL);
-			pass->setTextureState(0,scaleState);
-			pass->setTexture(1,patch->getLayerTexture(i));
-			pass->setTextureState(1,layerState);
-			pass->setSamplerState(1,clampState);
+			pass->getVariables()->addTexture("tex",mDiffuseTextures[i],"samp",SamplerState(),TextureState());
+			pass->getVariables()->addTexture("layerTex",patch->getLayerTexture(i),"layerSamp",clampState,TextureState());
 		}
 	}
 
@@ -317,8 +313,7 @@ Material::ptr DiffuseTerrainMaterialSource::getMaterial(TerrainPatchNode *patch)
 			pass->setRasterizerState(RasterizerState());
 			pass->setMaterialState(MaterialState(true,false,MaterialState::ShadeType_GOURAUD));
 
-			pass->setTexture(0,mDiffuseTextures.size()>0?mDiffuseTextures[0]:NULL);
-			pass->setTextureState(0,scaleState);
+			pass->setTexture(Shader::ShaderType_FRAGMENT,0,mDiffuseTextures.size()>0?mDiffuseTextures[0]:NULL,SamplerState(),scaleState);
 		}
 
 		int i;
@@ -332,11 +327,8 @@ Material::ptr DiffuseTerrainMaterialSource::getMaterial(TerrainPatchNode *patch)
 			pass->setRasterizerState(RasterizerState());
 			pass->setMaterialState(MaterialState(true,false,MaterialState::ShadeType_GOURAUD));
 
-			pass->setTexture(0,mDiffuseTextures.size()>i?mDiffuseTextures[i]:NULL);
-			pass->setTextureState(0,scaleState);
-			pass->setTexture(1,patch->getLayerTexture(i));
-			pass->setTextureState(1,layerState);
-			pass->setSamplerState(1,clampState);
+			pass->setTexture(Shader::ShaderType_FRAGMENT,0,mDiffuseTextures[i],SamplerState(),scaleState);
+			pass->setTexture(Shader::ShaderType_FRAGMENT,1,patch->getLayerTexture(i),clampState,layerState);
 		}
 	}
 

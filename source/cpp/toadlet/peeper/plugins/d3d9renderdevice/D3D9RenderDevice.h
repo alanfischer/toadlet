@@ -86,7 +86,7 @@ public:
 	bool setRenderState(RenderState *renderState);
 	bool setShaderState(ShaderState *shaderState);
 	void setBuffer(Shader::ShaderType shaderType,int i,VariableBuffer *buffer);
-	void setTexture(int i,Texture *texture);
+	void setTexture(Shader::ShaderType shaderType,int i,Texture *texture);
 
 	// Old fixed states
 	void setMatrix(MatrixType type,const Matrix4x4 &matrix);

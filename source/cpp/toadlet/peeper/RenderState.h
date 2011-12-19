@@ -35,6 +35,7 @@
 #include <toadlet/peeper/MaterialState.h>
 #include <toadlet/peeper/SamplerState.h>
 #include <toadlet/peeper/TextureState.h>
+#include <toadlet/peeper/Shader.h>
 
 namespace toadlet{
 namespace peeper{
@@ -70,13 +71,13 @@ public:
 	virtual void setMaterialState(const MaterialState &state)=0;
 	virtual bool getMaterialState(MaterialState &state) const=0;
 
-	virtual void setSamplerState(int i,const SamplerState &state)=0;
-	virtual bool getSamplerState(int i,SamplerState &state) const=0;
-	virtual int getNumSamplerStates() const=0;
+	virtual void setSamplerState(Shader::ShaderType type,int i,const SamplerState &state)=0;
+	virtual bool getSamplerState(Shader::ShaderType type,int i,SamplerState &state) const=0;
+	virtual int getNumSamplerStates(Shader::ShaderType type) const=0;
 
-	virtual void setTextureState(int i,const TextureState &state)=0;
-	virtual bool getTextureState(int i,TextureState &state) const=0;
-	virtual int getNumTextureStates() const=0;
+	virtual void setTextureState(Shader::ShaderType type,int i,const TextureState &state)=0;
+	virtual bool getTextureState(Shader::ShaderType type,int i,TextureState &state) const=0;
+	virtual int getNumTextureStates(Shader::ShaderType type) const=0;
 };
 
 }

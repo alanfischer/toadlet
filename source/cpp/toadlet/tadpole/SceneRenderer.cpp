@@ -65,26 +65,28 @@ void SceneRenderer::renderScene(RenderDevice *device,Node *node,CameraNode *came
 }
 
 void SceneRenderer::setupPass(RenderPass *pass){
+	mSceneParameters->setRenderPass(pass);
+	if(mLastShaderState==NULL || mLastShaderState!=pass->getShaderState()){
+		mLastShaderState=pass->getShaderState();
+		mDevice->setShaderState(mLastShaderState);
+	}
 	if(mLastRenderState==NULL || mLastRenderState!=pass->getRenderState()){
 		mLastRenderState=pass->getRenderState();
 		mDevice->setRenderState(mLastRenderState);
 		mSceneParameters->setRenderState(mLastRenderState);
 	}
-	if(mLastShaderState==NULL || mLastShaderState!=pass->getShaderState()){
-		mLastShaderState=pass->getShaderState();
-		mDevice->setShaderState(mLastShaderState);
-	}
 
-	mSceneParameters->setRenderPass(pass);
 	pass->setupRenderVariables(mDevice,Material::Scope_MATERIAL,mSceneParameters);
 
-	int i;
-	for(i=0;i<pass->getNumTextures();++i){
-		mDevice->setTexture(i,pass->getTexture(i));
-	}
-	if(mLastPass!=NULL){
-		for(;i<mLastPass->getNumTextures();++i){
-			mDevice->setTexture(i,NULL);
+	int i,j;
+	for(j=0;j<Shader::ShaderType_MAX;++j){
+		for(i=0;i<pass->getNumTextures((Shader::ShaderType)j);++i){
+			mDevice->setTexture((Shader::ShaderType)j,i,pass->getTexture((Shader::ShaderType)j,i));
+		}
+		if(mLastPass!=NULL){
+			for(;i<mLastPass->getNumTextures((Shader::ShaderType)j);++i){
+				mDevice->setTexture((Shader::ShaderType)j,i,NULL);
+			}
 		}
 	}
 

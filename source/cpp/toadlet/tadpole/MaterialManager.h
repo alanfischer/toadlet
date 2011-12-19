@@ -29,6 +29,7 @@
 #include <toadlet/tadpole/ResourceManager.h>
 #include <toadlet/tadpole/material/Material.h>
 #include <toadlet/tadpole/material/RenderPathChooser.h>
+#include <toadlet/tadpole/Font.h>
 
 namespace toadlet{
 namespace tadpole{
@@ -42,14 +43,15 @@ public:
 
 	void destroy();
 
-	Material::ptr createMaterial(Material::ptr source=Material::ptr());
-	Material::ptr cloneMaterial(Material::ptr source);
+	Material::ptr createMaterial();
+	Material::ptr createSharedMaterial(Material::ptr source,RenderState::ptr renderState);
 	Material::ptr findMaterial(const String &name){return shared_static_cast<Material>(ResourceManager::find(name));}
 
 	inline void setDiffuseCreator(ResourceCreator::ptr creator){mDiffuseCreator=creator;}
 	inline void setSkyBoxCreator(ResourceCreator::ptr creator){mSkyBoxCreator=creator;}
 	Material::ptr createDiffuseMaterial(Texture::ptr texture);
 	Material::ptr createPointSpriteMaterial(Texture::ptr texture,scalar size,bool attenuated);
+	Material::ptr createFontMaterial(Font::ptr font);
 	Material::ptr createSkyBoxMaterial(Texture::ptr texture);
 
 	RenderState::ptr createRenderState();

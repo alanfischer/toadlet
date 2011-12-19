@@ -45,7 +45,7 @@ SpriteModelNode::SpriteModelNode():super(),
 	//mMaterials,
 	//mVertexData,
 	//mIndexData,
-	//mOwnedMaterial
+	//mSharedRenderState
 {
 }
 
@@ -59,6 +59,17 @@ Node *SpriteModelNode::create(Scene *scene){
 }
 
 void SpriteModelNode::destroy(){
+	int i;
+	for(i=0;i<mMaterials.size();++i){
+		mMaterials[i]->release();
+	}
+	mMaterials.clear();
+
+	if(mSharedRenderState!=NULL){
+		mSharedRenderState->destroy();
+		mSharedRenderState=NULL;
+	}
+
 	if(mModel!=NULL){
 		mModel->release();
 		mModel=NULL;
@@ -72,11 +83,6 @@ void SpriteModelNode::destroy(){
 	if(mIndexData!=NULL){
 		mIndexData->destroy();
 		mIndexData=NULL;
-	}
-	
-	if(mOwnedMaterial!=NULL){
-		mOwnedMaterial->release();
-		mOwnedMaterial=NULL;
 	}
 
 	super::destroy();
@@ -116,11 +122,6 @@ void SpriteModelNode::setModel(const String &name){
 }
 
 void SpriteModelNode::setModel(SpriteModel::ptr model){
-	if(mOwnedMaterial!=NULL){
-		mOwnedMaterial->release();
-		mOwnedMaterial=NULL;
-	}
-
 	if(mModel!=NULL){
 		mModel->release();
 	}
@@ -136,10 +137,20 @@ void SpriteModelNode::setModel(SpriteModel::ptr model){
 
 	mBound.set(mModel->header->boundingradius);
 
-	mMaterials.clear();
 	int i;
+	for(i=0;i<mMaterials.size();++i){
+		mMaterials[i]->release();
+	}
+	mMaterials.clear();
+
 	for(i=0;i<mModel->materials.size();++i){
 		mMaterials.add(mModel->materials[i]);
+		if(mSharedRenderState!=NULL){
+			Material::ptr material=mEngine->getMaterialManager()->createSharedMaterial(mMaterials[i],mSharedRenderState);
+			mMaterials[i]->release();
+			mMaterials[i]=material;
+		}
+		mMaterials[i]->retain();
 	}
 
 	if(mVertexData!=NULL){
@@ -170,19 +181,15 @@ void SpriteModelNode::setModel(SpriteModel::ptr model){
 }
 
 RenderState::ptr SpriteModelNode::getSharedRenderState(){
-	if(mOwnedMaterial==NULL && mMaterials.size()>0){
-		mMaterials[0]=mOwnedMaterial=mEngine->getMaterialManager()->createMaterial(mMaterials[0]);
-		mMaterials[0]->setSort(Material::SortType_AUTO);
+	if(mSharedRenderState==NULL){
+		mSharedRenderState=mEngine->getMaterialManager()->createRenderState();
 		int i;
-		for(i=1;i<mMaterials.size();++i){
-			mMaterials[i]=mEngine->getMaterialManager()->cloneMaterial(mMaterials[i]);
-			mMaterials[i]->shareStates(mOwnedMaterial);
-			mMaterials[i]->setSort(Material::SortType_AUTO);
+		for(i=0;i<mMaterials.size();++i){
+			mMaterials[i]=mEngine->getMaterialManager()->createSharedMaterial(mMaterials[i],mSharedRenderState);
 		}
-		mOwnedMaterial->retain();
 	}
 
-	return mOwnedMaterial!=NULL?mOwnedMaterial->getPass()->getRenderState():NULL;
+	return mSharedRenderState;
 }
 
 void SpriteModelNode::gatherRenderables(CameraNode *camera,RenderableSet *set){

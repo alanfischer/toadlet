@@ -53,17 +53,15 @@ Node *AnaglyphCameraNode::create(Scene *scene){
 	mRightRenderTarget=mEngine->getTextureManager()->createPixelBufferRenderTarget();
 	mRightRenderTarget->attach(mRightTexture->getMipPixelBuffer(0,0),PixelBufferRenderTarget::Attachment_COLOR_0);
 
-	mLeftMaterial=mEngine->getMaterialManager()->createMaterial();
-	mLeftMaterial->getPass()->setDepthState(DepthState(DepthState::DepthTest_NEVER,false));
-	mLeftMaterial->getPass()->setMaterialState(MaterialState(Colors::RED));
-	mLeftMaterial->getPass()->setTexture(0,mLeftTexture);
+	mLeftMaterial=mEngine->getMaterialManager()->createDiffuseMaterial(mLeftTexture);
+	mLeftMaterial->getRenderState()->setDepthState(DepthState(DepthState::DepthTest_NEVER,false));
+	mLeftMaterial->getRenderState()->setMaterialState(MaterialState(Colors::RED));
 	mLeftMaterial->retain();
 
-	mRightMaterial=mEngine->getMaterialManager()->createMaterial();
-	mRightMaterial->getPass()->setDepthState(DepthState(DepthState::DepthTest_NEVER,false));
-	mRightMaterial->getPass()->setMaterialState(MaterialState(Colors::CYAN));
-	mRightMaterial->getPass()->setBlendState(BlendState::Combination_COLOR_ADDITIVE);
-	mRightMaterial->getPass()->setTexture(0,mRightTexture);
+	mRightMaterial=mEngine->getMaterialManager()->createDiffuseMaterial(mRightTexture);
+	mRightMaterial->getRenderState()->setDepthState(DepthState(DepthState::DepthTest_NEVER,false));
+	mRightMaterial->getRenderState()->setMaterialState(MaterialState(Colors::CYAN));
+	mRightMaterial->getRenderState()->setBlendState(BlendState::Combination_COLOR_ADDITIVE);
 	mRightMaterial->retain();
 
 	return this;
