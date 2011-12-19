@@ -881,14 +881,12 @@ bool GLRenderDevice::setRenderState(RenderState *renderState){
 	if(glrenderState->mMaterialState!=NULL){
 		setMaterialState(*glrenderState->mMaterialState);
 	}
-	int i,j;
-	for(j=0;j<Shader::ShaderType_MAX;++j){
-		for(i=0;i<glrenderState->mSamplerStates[j].size();++i){
-			setSamplerState(i,glrenderState->mSamplerStates[j][i]);
-		}
-		for(i=0;i<glrenderState->mTextureStates[j].size();++i){
-			setTextureState(i,glrenderState->mTextureStates[j][i]);
-		}
+	int i;
+	for(i=0;i<glrenderState->mSamplerStates.size();++i){
+		setSamplerState(i,glrenderState->mSamplerStates[i]);
+	}
+	for(i=0;i<glrenderState->mTextureStates.size();++i){
+		setTextureState(i,glrenderState->mTextureStates[i]);
 	}
 
 	return true;
