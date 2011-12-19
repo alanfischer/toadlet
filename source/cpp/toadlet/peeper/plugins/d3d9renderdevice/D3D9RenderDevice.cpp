@@ -544,23 +544,21 @@ bool D3D9RenderDevice::setRenderState(RenderState *renderState){
 	if(d3drenderState->mMaterialState!=NULL){
 		setMaterialState(*d3drenderState->mMaterialState);
 	}
-	int i,j;
-	for(j=0;j<Shader::ShaderType_MAX;++j){
-		for(i=0;i<d3drenderState->mSamplerStates[j].size();++i){
-			setSamplerState(i,d3drenderState->mSamplerStates[j][i]);
+	int i;
+	for(i=0;i<d3drenderState->mSamplerStates.size();++i){
+		setSamplerState(i,d3drenderState->mSamplerStates[i]);
+	}
+	if(mLastRenderState!=NULL){
+		for(;i<mLastRenderState->getNumSamplerStates((Shader::ShaderType)0);++i){
+			setSamplerState(i,NULL);
 		}
-		if(mLastRenderState!=NULL){
-			for(;i<mLastRenderState->getNumSamplerStates((Shader::ShaderType)j);++i){
-				setSamplerState(i,NULL);
-			}
-		}
-		for(i=0;i<d3drenderState->mTextureStates[j].size();++i){
-			setTextureState(i,d3drenderState->mTextureStates[j][i]);
-		}
-		if(mLastRenderState!=NULL){
-			for(;i<mLastRenderState->getNumTextureStates((Shader::ShaderType)j);++i){
-				setTextureState(i,NULL);
-			}
+	}
+	for(i=0;i<d3drenderState->mTextureStates.size();++i){
+		setTextureState(i,d3drenderState->mTextureStates[i]);
+	}
+	if(mLastRenderState!=NULL){
+		for(;i<mLastRenderState->getNumTextureStates((Shader::ShaderType)0);++i){
+			setTextureState(i,NULL);
 		}
 	}
 

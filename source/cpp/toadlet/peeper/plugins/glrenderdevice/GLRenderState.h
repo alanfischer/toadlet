@@ -65,33 +65,33 @@ public:
 	void setMaterialState(const MaterialState &state){if(mMaterialState==NULL){mMaterialState=new MaterialState(state);}else{mMaterialState->set(state);}}
 	bool getMaterialState(MaterialState &state) const{if(mMaterialState==NULL){return false;}else{state.set(*mMaterialState);return true;}}
 
-	int getNumSamplerStates(Shader::ShaderType type) const{return mSamplerStates[type].size();}
+	int getNumSamplerStates(Shader::ShaderType type) const{return mSamplerStates.size();}
 	void setSamplerState(Shader::ShaderType type,int i,const SamplerState &state){
-		if(mSamplerStates[type].size()<=i){
-			mSamplerStates[type].resize(i+1,NULL);
+		if(mSamplerStates.size()<=i){
+			mSamplerStates.resize(i+1,NULL);
 		}
-		if(mSamplerStates[type][i]==NULL){
-			mSamplerStates[type][i]=new SamplerState(state);
+		if(mSamplerStates[i]==NULL){
+			mSamplerStates[i]=new SamplerState(state);
 		}
 		else{
-			mSamplerStates[type][i]->set(state);
+			mSamplerStates[i]->set(state);
 		}
 	}
-	bool getSamplerState(Shader::ShaderType type,int i,SamplerState &state) const{if(mSamplerStates[type].size()<=i || mSamplerStates[type][i]==NULL){return false;}else{state.set(*mSamplerStates[type][i]);return true;}}
+	bool getSamplerState(Shader::ShaderType type,int i,SamplerState &state) const{if(mSamplerStates.size()<=i || mSamplerStates[i]==NULL){return false;}else{state.set(*mSamplerStates[i]);return true;}}
 
-	int getNumTextureStates(Shader::ShaderType type) const{return mTextureStates[type].size();}
+	int getNumTextureStates(Shader::ShaderType type) const{return mTextureStates.size();}
 	void setTextureState(Shader::ShaderType type,int i,const TextureState &state){
-		if(mTextureStates[type].size()<=i){
-			mTextureStates[type].resize(i+1,NULL);
+		if(mTextureStates.size()<=i){
+			mTextureStates.resize(i+1,NULL);
 		}
-		if(mTextureStates[type][i]==NULL){
-			mTextureStates[type][i]=new TextureState(state);
+		if(mTextureStates[i]==NULL){
+			mTextureStates[i]=new TextureState(state);
 		}
 		else{
-			mTextureStates[type][i]->set(state);
+			mTextureStates[i]->set(state);
 		}
 	}
-	bool getTextureState(Shader::ShaderType type,int i,TextureState &state) const{if(mTextureStates[type].size()<=i || mTextureStates[type][i]==NULL){return false;}else{state.set(*mTextureStates[type][i]);return true;}}
+	bool getTextureState(Shader::ShaderType type,int i,TextureState &state) const{if(mTextureStates.size()<=i || mTextureStates[i]==NULL){return false;}else{state.set(*mTextureStates[i]);return true;}}
 
 protected:
 	RenderStateDestroyedListener *mListener;
@@ -101,8 +101,8 @@ protected:
 	FogState *mFogState;
 	PointState *mPointState;
 	MaterialState *mMaterialState;
-	egg::Collection<SamplerState*> mSamplerStates[Shader::ShaderType_MAX];
-	egg::Collection<TextureState*> mTextureStates[Shader::ShaderType_MAX];
+	egg::Collection<SamplerState*> mSamplerStates;
+	egg::Collection<TextureState*> mTextureStates;
 	
 	friend class GLRenderDevice;
 };
