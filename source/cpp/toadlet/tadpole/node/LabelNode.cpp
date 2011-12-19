@@ -57,12 +57,6 @@ Node *LabelNode::create(Scene *scene){
 	super::create(scene);
 
 	mRendered=true;
-	mMaterial=getEngine()->getMaterialManager()->createDiffuseMaterial(NULL);
-	mMaterial->retain();
-	mMaterial->getPass()->setRasterizerState(RasterizerState(RasterizerState::CullType_NONE));
-	mMaterial->getPass()->setDepthState(DepthState(DepthState::DepthTest_LEQUAL,false));
-	mMaterial->getPass()->setMaterialState(MaterialState(true,true,MaterialState::ShadeType_FLAT));
-	mMaterial->compile();
 
 	setFont(mEngine->getFontManager()->getDefaultFont());
 	setAlignment(Font::Alignment_BIT_HCENTER|Font::Alignment_BIT_VCENTER);
@@ -113,11 +107,17 @@ void LabelNode::setFont(const Font::ptr &font){
 	if(mFont!=NULL){
 		mFont->release();
 	}
-
 	mFont=font;
-
 	if(mFont!=NULL){
 		mFont->retain();
+	}
+
+	if(mMaterial!=NULL){
+		mMaterial->release();
+	}
+	mMaterial=getEngine()->getMaterialManager()->createFontMaterial(mFont);
+	if(mMaterial!=NULL){
+		mMaterial->retain();
 	}
 
 	updateLabel();
@@ -220,16 +220,6 @@ void LabelNode::updateLabel(){
 
 		mFont->updateVertexBufferForString(mVertexData->getVertexBuffer(0),text,Math::ONE_VECTOR4,mAlignment,!mNormalized,true);
 		mIndexData->setCount(length*6);
-	}
-
-	// Update material
-	Texture::ptr texture=mFont->getTexture();
-	mMaterial->getPass()->setTexture(0,texture);
-	if(TextureFormat::getAlphaBits(texture->getFormat()->getPixelFormat())>0){
-		mMaterial->getPass()->setBlendState(BlendState::Combination_ALPHA);
-	}
-	else{
-		mMaterial->getPass()->setBlendState(BlendState::Combination_COLOR);
 	}
 
 	// Update bound

@@ -132,9 +132,9 @@ protected:
 	bool mVelocityAligned;
 	bool mRendered;
 	Material::ptr mMaterial;
+	RenderState::ptr mSharedRenderState;
 	VertexData::ptr mVertexData;
 	IndexData::ptr mIndexData;
-	Material::ptr mOwnedMaterial;
 };
 
 }

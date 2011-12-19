@@ -395,8 +395,6 @@ void TMSHHandler::writeVertexFormat(DataStream *stream,VertexFormat::ptr vertexF
 
 /// @todo: Support loading all of the material, instead of starting with a DiffuseMaterial
 Material::ptr TMSHHandler::readMaterial(DataStream *stream,int blockSize){
-	int i;
-
 	if(stream->readBool()==false){
 		return NULL;
 	}
@@ -429,7 +427,9 @@ Material::ptr TMSHHandler::readMaterial(DataStream *stream,int blockSize){
 	stream->read((tbyte*)&materialState,sizeof(materialState));
 	material->getPass()->setMaterialState(materialState);
 
-	int numSamplerStates=stream->readInt32();
+TOADLET_ASSERT(false && "BROKEN");
+/*	int numSamplerStates=stream->readInt32();
+	int i;
 	for(i=0;i<numSamplerStates;++i){
 		SamplerState samplerState;
 		stream->read((tbyte*)&samplerState,sizeof(samplerState));
@@ -449,6 +449,7 @@ Material::ptr TMSHHandler::readMaterial(DataStream *stream,int blockSize){
 		material->getPass()->setTexture(i,mEngine->getTextureManager()->findTexture(textureName));
 		material->getPass()->setTextureName(i,textureName);
 	}
+*/
 
 	material->compile();
 
@@ -456,8 +457,6 @@ Material::ptr TMSHHandler::readMaterial(DataStream *stream,int blockSize){
 }
 
 void TMSHHandler::writeMaterial(DataStream *stream,Material::ptr material){
-	int i;
-
 	if(material==NULL){
 		stream->writeBool(false);
 		return;
@@ -491,7 +490,9 @@ void TMSHHandler::writeMaterial(DataStream *stream,Material::ptr material){
 	material->getPass()->getMaterialState(materialState);
 	stream->write((tbyte*)&materialState,sizeof(materialState));
 
-	stream->writeInt32(material->getPass()->getNumSamplerStates());
+TOADLET_ASSERT(false && "BROKEN");
+/*	stream->writeInt32(material->getPass()->getNumSamplerStates());
+	int i;
 	for(i=0;i<material->getPass()->getNumSamplerStates();++i){
 		SamplerState samplerState;
 		material->getPass()->getSamplerState(i,samplerState);
@@ -510,6 +511,7 @@ void TMSHHandler::writeMaterial(DataStream *stream,Material::ptr material){
 		Texture::ptr texture=material->getPass()->getTexture(i);
 		stream->writeNullTerminatedString(texture!=NULL?texture->getName():material->getPass()->getTextureName(i));
 	}
+*/
 }
 
 Skeleton::ptr TMSHHandler::readSkeleton(DataStream *stream,int blockSize){

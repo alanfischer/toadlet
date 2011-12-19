@@ -118,7 +118,7 @@ public:
 	virtual bool setRenderState(RenderState *renderState)=0;
 	virtual bool setShaderState(ShaderState *shaderState)=0;
 	virtual void setBuffer(Shader::ShaderType type,int i,VariableBuffer *buffer)=0;
-	virtual void setTexture(int i,Texture *texture)=0;
+	virtual void setTexture(Shader::ShaderType type,int i,Texture *texture)=0;
 
 	// Old fixed states
 	virtual void setMatrix(MatrixType type,const Matrix4x4 &matrix)=0;

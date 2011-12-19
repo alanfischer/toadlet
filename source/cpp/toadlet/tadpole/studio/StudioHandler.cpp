@@ -175,10 +175,9 @@ void StudioHandler::buildMaterials(StudioModel *model){
 	for(i=0;i<model->header->numtextures;i++){
 		studiotexture *stexture=model->texture(i);
 
-		Material::ptr material=mEngine->getMaterialManager()->createMaterial();
+		Material::ptr material=mEngine->getMaterialManager()->createDiffuseMaterial(model->textures[i]);
 		material->getPass()->setRasterizerState(RasterizerState(RasterizerState::CullType_FRONT));
 		material->getPass()->setMaterialState(MaterialState(true,false,(stexture->flags&STUDIO_NF_FLATSHADE)!=0?MaterialState::ShadeType_FLAT:MaterialState::ShadeType_GOURAUD));
-		material->getPass()->setTexture(0,model->textures[i]);
 		model->materials[i]=material;
 	}
 }

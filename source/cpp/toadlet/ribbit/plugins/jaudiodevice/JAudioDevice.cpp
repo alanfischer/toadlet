@@ -99,5 +99,3 @@ void JAudioDevice::update(int dt){
 
 }
 }
-
-

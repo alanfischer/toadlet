@@ -68,6 +68,8 @@ public:
 	tbyte *lock(int lockAccess);
 	bool unlock();
 	bool update(tbyte *data,int start,int size);
+	/// @todo: This isn't used.  It will be removed, but I may move it to a ResourceBuffer class.
+	bool updateTexture(int i,Texture::ptr resource,const SamplerState &state);
 
 protected:
 	bool createContext();
@@ -92,6 +94,30 @@ protected:
 	bool mMapping;
 	bool mBacking;
 	uint8 *mData;
+
+	class TextureData{
+	public:
+		TextureData():
+			mD3DState(NULL){}
+
+		~TextureData(){
+			destroy();
+		}
+
+		void destroy(){
+			if(mD3DState!=NULL){
+				mD3DState->Release();
+				mD3DState=NULL;
+			}
+		}
+
+		void update(D3D10RenderDevice *device,Texture::ptr texture,const SamplerState &state);
+
+		Texture::ptr mTexture;
+		SamplerState mState;
+		ID3D10SamplerState *mD3DState;
+	};
+	Collection<TextureData*> mTextureData;
 
 	friend D3D10RenderDevice;
 };

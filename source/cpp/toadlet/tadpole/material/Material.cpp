@@ -34,19 +34,11 @@ namespace toadlet{
 namespace tadpole{
 namespace material{
 
-Material::Material(MaterialManager *manager,Material *source,bool clone):BaseResource(),
+Material::Material(MaterialManager *manager):BaseResource(),
 	mSort(SortType_AUTO),
 	mLayer(0)
 {
 	mManager=manager;
-
-	if(source!=NULL){
-		int i;
-		for(i=0;i<source->getNumPaths();++i){
-			RenderPath::ptr path(new RenderPath(manager,source->getPath(i),clone));
-			mPaths.add(path);
-		}
-	}
 }
 
 Material::~Material(){
@@ -139,13 +131,6 @@ RenderPath::ptr Material::findFixedPath(){
 		}
 	}
 	return NULL;
-}
-
-void Material::shareStates(Material *material){
-	int i;
-	for(i=0;i<mPaths.size() && i<material->getNumPaths();++i){
-		mPaths[i]->shareStates(material->getPath(i));
-	}
 }
 
 bool Material::compile(){

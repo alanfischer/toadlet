@@ -28,6 +28,8 @@
 
 #include <toadlet/peeper/Buffer.h>
 #include <toadlet/peeper/VariableBufferFormat.h>
+#include <toadlet/peeper/Texture.h>
+#include <toadlet/peeper/SamplerState.h>
 
 namespace toadlet{
 namespace peeper{
@@ -47,8 +49,6 @@ public:
 	virtual void resetDestroy()=0;
 
 	virtual VariableBufferFormat::ptr getVariableBufferFormat() const=0;
-
-//	virtual bool updateResource(Resource::ptr resource,int offset)=0;
 };
 
 }

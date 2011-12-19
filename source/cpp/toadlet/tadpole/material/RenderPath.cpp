@@ -29,19 +29,11 @@ namespace toadlet{
 namespace tadpole{
 namespace material{
 
-RenderPath::RenderPath(MaterialManager *manager,RenderPath *source,bool clone):
+RenderPath::RenderPath(MaterialManager *manager):
 	mManager(NULL)
 	//mPasses
 {
 	mManager=manager;
-
-	if(source!=NULL){
-		int i;
-		for(i=0;i<source->getNumPasses();++i){
-			RenderPass::ptr pass(new RenderPass(manager,source->getPass(i),clone));
-			mPasses.add(pass);
-		}
-	}
 }
 
 RenderPath::~RenderPath(){
@@ -56,10 +48,13 @@ void RenderPath::destroy(){
 	mPasses.clear();
 }
 
+RenderPass::ptr RenderPath::addPass(RenderState::ptr renderState,ShaderState::ptr shaderState){
+	RenderPass::ptr pass(new RenderPass(mManager,renderState,shaderState));
+	mPasses.add(pass);
+	return pass;
+}
+
 RenderPass::ptr RenderPath::addPass(RenderPass::ptr pass){
-	if(pass==NULL){
-		pass=RenderPass::ptr(new RenderPass(mManager));
-	}
 	mPasses.add(pass);
 	return pass;
 }
@@ -69,13 +64,6 @@ bool RenderPath::isDepthSorted() const{
 		return true;
 	}
 	return false;
-}
-
-void RenderPath::shareStates(RenderPath *path){
-	int i;
-	for(i=0;i<mPasses.size() && i<path->getNumPasses();++i){
-		mPasses[i]->shareStates(path->getPass(i));
-	}
 }
 
 }

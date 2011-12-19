@@ -48,6 +48,7 @@ public:
 		TOADLET_SHARED_POINTERS(SubModel);
 
 		SubModel(BSP30ModelNode *modelNode,BSP30Map *map);
+		void destroy(){if(material!=NULL){material->release();}}
 
 		Material *getRenderMaterial() const{return material;}
 		const Transform &getRenderTransform() const{return modelNode->getWorldTransform();}
@@ -92,7 +93,7 @@ protected:
 	BSP30Map::ptr mMap;
 	int mModelIndex;
 	Collection<SubModel::ptr> mSubModels;
-	Material::ptr mOwnedMaterial;
+	RenderState::ptr mSharedRenderState;
 	bool mRendered;
 };
 

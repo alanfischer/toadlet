@@ -163,17 +163,14 @@ bool GLSLShaderState::activate(){
 
 GLSLVertexLayout *GLSLShaderState::findVertexLayout(GLVertexFormat *vertexFormat){
 	int handle=vertexFormat->mUniqueHandle;
-	GLSLVertexLayout::ptr layout;
-	if(handle<mLayouts.size()){
-		layout=mLayouts[handle];
-	}
-	else{
-		layout=GLSLVertexLayout::ptr(new GLSLVertexLayout(mDevice));
-		layout->create(vertexFormat,this);
+	if(handle>=mLayouts.size()){
 		mLayouts.resize(handle+1,NULL);
-		mLayouts[handle]=layout;
 	}
-	return layout;
+	if(mLayouts[handle]==NULL){
+		mLayouts[handle]=GLSLVertexLayout::ptr(new GLSLVertexLayout(mDevice));
+		mLayouts[handle]->create(vertexFormat,this);
+	}
+	return mLayouts[handle];
 }
 
 bool GLSLShaderState::createContext(){
@@ -234,6 +231,7 @@ bool GLSLShaderState::reflect(){
 	int numUniforms=0;
 	int dataSize=0;
 	int size=0;
+	int resourceCount=0;
 	GLenum type=0;
 	GLchar name[128];
 	GLsizei nameLength=0;
@@ -252,6 +250,9 @@ bool GLSLShaderState::reflect(){
 		variable->setFormat(GLRenderDevice::getVariableFormat(type));
 		variable->setSize(size);
 		variable->setIndex(location);
+		if((variable->getFormat()&VariableBufferFormat::Format_MASK_TYPES)==VariableBufferFormat::Format_TYPE_RESOURCE){
+			variable->setResourceIndex(resourceCount++);
+		}
 		primaryVariables[i]=variable;
 	}
 

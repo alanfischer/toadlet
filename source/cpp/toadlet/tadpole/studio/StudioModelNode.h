@@ -49,6 +49,7 @@ public:
 		TOADLET_SHARED_POINTERS(SubModel);
 
 		SubModel(StudioModelNode *modelNode,int bodypartIndex,int modelIndex,int meshIndex,int skinIndex);
+		void destroy(){if(material!=NULL){material->release();}}
 
 		Material *getRenderMaterial() const{return material;}
 		const Transform &getRenderTransform() const{return modelNode->getWorldTransform();}
@@ -156,7 +157,7 @@ protected:
 	bool mRendered;
 	StudioModel::ptr mModel;
 	Collection<SubModel::ptr> mSubModels;
-	Material::ptr mOwnedMaterial;
+	RenderState::ptr mSharedRenderState;
 
 	int mBodypartIndex;
 	int mModelIndex;

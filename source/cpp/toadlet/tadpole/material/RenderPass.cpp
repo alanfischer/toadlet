@@ -34,53 +34,28 @@ namespace toadlet{
 namespace tadpole{
 namespace material{
 
-RenderPass::RenderPass(MaterialManager *manager,RenderPass *source,bool clone):
-	mManager(NULL),
+RenderPass::RenderPass(MaterialManager *manager,RenderState::ptr renderState,ShaderState::ptr shaderState):
+	mManager(NULL)
 	//mRenderState,
 	//mShaderState,
-	mOwnsStates(false)
 	//mTextures,
 	//mTextureNames,
 	//mVariables
 {
 	mManager=manager;
-	if(manager!=NULL && clone==false){
+	if(renderState==NULL){
 		mRenderState=manager->createRenderState();
-		mShaderState=manager->createShaderState();
-		mOwnsStates=true;
-
-		if(source!=NULL){
-			manager->modifyRenderState(mRenderState,source->getRenderState());
-			manager->modifyShaderState(mShaderState,source->getShaderState());
-		}
-	}
-	else if(clone){
-		mRenderState=source->getRenderState();
-		mShaderState=source->getShaderState();
-		mOwnsStates=false;
+		mOwnRenderState=mRenderState;
 	}
 	else{
-		mRenderState=RenderState::ptr(new BackableRenderState());
-		mShaderState=ShaderState::ptr(new BackableShaderState());
-		mOwnsStates=true;
+		mRenderState=renderState;
 	}
-
-	if(source!=NULL){
-		int i;
-
-		if(source->mVariables!=NULL){
-			RenderVariableSet::ptr sourceVars=source->mVariables;
-			RenderVariableSet::ptr destVars=getVariables();
-
-			for(i=0;i<sourceVars->getNumVariables();++i){
-				destVars->addVariable(sourceVars->getVariableName(i),sourceVars->getVariable(i),sourceVars->getVariableScope(i));
-			}
-		}
-
-		for(i=0;i<source->getNumTextures();++i){
-			setTexture(i,source->getTexture(i));
-			setTextureName(i,source->getTextureName(i));
-		}
+	if(shaderState==NULL){
+		mShaderState=manager->createShaderState();
+		mOwnShaderState=mShaderState;
+	}
+	else{
+		mShaderState=shaderState;
 	}
 }
 
@@ -89,24 +64,26 @@ RenderPass::~RenderPass(){
 }
 
 void RenderPass::destroy(){
-	if(mOwnsStates){
-		if(mRenderState!=NULL){
-			mRenderState->destroy();
-		}
-		if(mShaderState!=NULL){
-			mShaderState->destroy();
-		}
+	if(mOwnRenderState!=NULL){
+		mOwnRenderState->destroy();
+		mOwnRenderState=NULL;
+	}
+	if(mOwnShaderState!=NULL){
+		mOwnShaderState->destroy();
+		mOwnShaderState=NULL;
 	}
 	mRenderState=NULL;
 	mShaderState=NULL;
 
-	int i;
-	for(i=0;i<mTextures.size();++i){
-		if(mTextures[i]!=NULL){
-			mTextures[i]->release();
+	int i,j;
+	for(j=0;j<Shader::ShaderType_MAX;++j){
+		for(i=0;i<mTextures[j].size();++i){
+			if(mTextures[j][i]!=NULL){
+				mTextures[j][i]->release();
+			}
 		}
+		mTextures[j].clear();
 	}
-	mTextures.clear();
 
 	if(mVariables!=NULL){
 		mVariables->destroy();
@@ -114,49 +91,20 @@ void RenderPass::destroy(){
 	}
 }
 
-void RenderPass::setTexture(int i,Texture::ptr texture){
-	if(i>=mTextures.size()){
-		mTextures.resize(i+1);
-		mTextureNames.resize(i+1);
+void RenderPass::setTexture(Shader::ShaderType type,int i,Texture::ptr texture,const SamplerState &samplerState,const TextureState &textureState){
+	if(i>=mTextures[type].size()){
+		mTextures[type].resize(i+1);
 	}
-	if(mTextures[i]!=NULL){
-		mTextures[i]->release();
+	if(mTextures[type][i]!=NULL){
+		mTextures[type][i]->release();
 	}
-	mTextures[i]=texture;
-	if(mTextures[i]!=NULL){
-		mTextures[i]->retain();
+	mTextures[type][i]=texture;
+	if(mTextures[type][i]!=NULL){
+		mTextures[type][i]->retain();
 	}
 
-	// Always add a default SamplerState and TextureState if non exists
-	{
-		SamplerState samplerState;
-		if(mRenderState->getSamplerState(i,samplerState)==false) mRenderState->setSamplerState(i,samplerState);
-
-		TextureState textureState;
-		if(mRenderState->getTextureState(i,textureState)==false) mRenderState->setTextureState(i,textureState);
-	}
-}
-
-void RenderPass::setTextureName(int i,const String &name){
-	if(i>=mTextures.size()){
-		mTextures.resize(i+1);
-		mTextureNames.resize(i+1);
-	}
-	mTextureNames[i]=name;
-}
-
-void RenderPass::shareStates(RenderPass *source){
-	if(mOwnsStates){
-		if(mRenderState!=NULL){
-			mRenderState->destroy();
-		}
-		if(mShaderState!=NULL){
-			mShaderState->destroy();
-		}
-	}
-	mRenderState=source->getRenderState();
-	mShaderState=source->getShaderState();
-	mOwnsStates=false;
+	mRenderState->setSamplerState(type,i,samplerState);
+	mRenderState->setTextureState(type,i,textureState);
 }
 
 void RenderPass::setShader(Shader::ShaderType type,Shader::ptr shader){
@@ -167,14 +115,14 @@ void RenderPass::setShader(Shader::ShaderType type,Shader::ptr shader){
 	mShaderState->setShader(type,shader);
 
 	if(mVariables!=NULL){
-		mVariables->buildBuffers(mManager->getBufferManager(),mShaderState);
+		mVariables->buildBuffers(mManager->getBufferManager(),this);
 	}
 }
 
 RenderVariableSet::ptr RenderPass::getVariables(){
 	if(mVariables==NULL){
 		mVariables=RenderVariableSet::ptr(new RenderVariableSet());
-		mVariables->buildBuffers(mManager->getBufferManager(),mShaderState);
+		mVariables->buildBuffers(mManager->getBufferManager(),this);
 	}
 
 	return mVariables;
@@ -191,6 +139,7 @@ void RenderPass::setupRenderVariables(RenderDevice *renderDevice,int scope,Scene
 	}
 
 	mVariables->update(scope,parameters);
+
 	int i;
 	for(i=0;i<mVariables->getNumBuffers();++i){
 		int bufferScope=mVariables->getBufferScope(i);

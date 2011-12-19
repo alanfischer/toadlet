@@ -75,21 +75,23 @@ void D3D10RenderState::destroy(){
 		delete mMaterialState;
 		mMaterialState=NULL;
 	}
-	int i;
-	for(i=0;i<mSamplerStates.size();++i){
-		if(mSamplerStates[i]!=NULL){
-			delete mSamplerStates[i];
-			mSamplerStates[i]=NULL;
+	int i,j;
+	for(j=0;j<Shader::ShaderType_MAX;++j){
+		for(i=0;i<mSamplerStates[j].size();++i){
+			if(mSamplerStates[j][i]!=NULL){
+				delete mSamplerStates[j][i];
+				mSamplerStates[j][i]=NULL;
+			}
 		}
-	}
-	mSamplerStates.clear();
-	for(i=0;i<mSamplerStates.size();++i){
-		if(mTextureStates[i]!=NULL){
-			delete mTextureStates[i];
-			mTextureStates[i]=NULL;
+		mSamplerStates[j].clear();
+		for(i=0;i<mTextureStates[j].size();++i){
+			if(mTextureStates[i]!=NULL){
+				delete mTextureStates[j][i];
+				mTextureStates[j][i]=NULL;
+			}
 		}
+		mTextureStates[j].clear();
 	}
-	mTextureStates.clear();
 
 	if(mD3DBlendState!=NULL){
 		mD3DBlendState->Release();
@@ -103,13 +105,15 @@ void D3D10RenderState::destroy(){
 		mD3DRasterizerState->Release();
 		mD3DRasterizerState=NULL;
 	}
-	for(i=0;i<mD3DSamplerStates.size();++i){
-		if(mD3DSamplerStates[i]!=NULL){
-			mD3DSamplerStates[i]->Release();
-			mD3DSamplerStates[i]=NULL;
+	for(j=0;j<Shader::ShaderType_MAX;++j){
+		for(i=0;i<mD3DSamplerStates[j].size();++i){
+			if(mD3DSamplerStates[j][i]!=NULL){
+				mD3DSamplerStates[j][i]->Release();
+				mD3DSamplerStates[j][i]=NULL;
+			}
 		}
+		mD3DSamplerStates[j].clear();
 	}
-	mD3DSamplerStates.clear();
 
 	if(mListener!=NULL){
 		mListener->renderStateDestroyed(this);
@@ -174,40 +178,40 @@ bool D3D10RenderState::getMaterialState(MaterialState &state) const{
 	if(mMaterialState==NULL){return false;}else{state.set(*mMaterialState);return true;}
 }
 
-void D3D10RenderState::setSamplerState(int i,const SamplerState &state){
-	if(mSamplerStates.size()<=i){
-		mSamplerStates.resize(i+1,NULL);
-		mD3DSamplerStates.resize(i+1,NULL);
+void D3D10RenderState::setSamplerState(Shader::ShaderType type,int i,const SamplerState &state){
+	if(mSamplerStates[type].size()<=i){
+		mSamplerStates[type].resize(i+1,NULL);
+		mD3DSamplerStates[type].resize(i+1,NULL);
 	}
-	if(mSamplerStates[i]==NULL){
-		mSamplerStates[i]=new SamplerState(state);
+	if(mSamplerStates[type][i]==NULL){
+		mSamplerStates[type][i]=new SamplerState(state);
 	}
 	else{
-		mSamplerStates[i]->set(state);
+		mSamplerStates[type][i]->set(state);
 	}
-	if(mD3DSamplerStates[i]!=NULL){mD3DSamplerStates[i]->Release();}
+	if(mD3DSamplerStates[type][i]!=NULL){mD3DSamplerStates[type][i]->Release();}
 	D3D10_SAMPLER_DESC desc; mDevice->getD3D10_SAMPLER_DESC(desc,state);
-	mD3DDevice->CreateSamplerState(&desc,&mD3DSamplerStates[i]);
+	mD3DDevice->CreateSamplerState(&desc,&mD3DSamplerStates[type][i]);
 }
 
-bool D3D10RenderState::getSamplerState(int i,SamplerState &state) const{
-	if(mSamplerStates.size()<=i || mSamplerStates[i]==NULL){return false;}else{state.set(*mSamplerStates[i]);return true;}
+bool D3D10RenderState::getSamplerState(Shader::ShaderType type,int i,SamplerState &state) const{
+	if(mSamplerStates[type].size()<=i || mSamplerStates[type][i]==NULL){return false;}else{state.set(*mSamplerStates[type][i]);return true;}
 }
 
-void D3D10RenderState::setTextureState(int i,const TextureState &state){
-	if(mTextureStates.size()<=i){
-		mTextureStates.resize(i+1,NULL);
+void D3D10RenderState::setTextureState(Shader::ShaderType type,int i,const TextureState &state){
+	if(mTextureStates[type].size()<=i){
+		mTextureStates[type].resize(i+1,NULL);
 	}
-	if(mTextureStates[i]==NULL){
-		mTextureStates[i]=new TextureState(state);
+	if(mTextureStates[type][i]==NULL){
+		mTextureStates[type][i]=new TextureState(state);
 	}
 	else{
-		mTextureStates[i]->set(state);
+		mTextureStates[type][i]->set(state);
 	}
 }
 
-bool D3D10RenderState::getTextureState(int i,TextureState &state) const{
-	if(mTextureStates.size()<=i || mTextureStates[i]==NULL){return false;}else{state.set(*mTextureStates[i]);return true;}
+bool D3D10RenderState::getTextureState(Shader::ShaderType type,int i,TextureState &state) const{
+	if(mTextureStates[type].size()<=i || mTextureStates[type][i]==NULL){return false;}else{state.set(*mTextureStates[type][i]);return true;}
 }
 
 }

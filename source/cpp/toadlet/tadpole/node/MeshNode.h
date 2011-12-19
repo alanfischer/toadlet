@@ -49,6 +49,7 @@ public:
 		TOADLET_SHARED_POINTERS(SubMesh);
 
 		SubMesh(MeshNode *meshNode,Mesh::SubMesh *meshSubMesh);
+		void destroy(){if(material!=NULL){material->release();}}
 
 		Material *getRenderMaterial() const{return material;}
 		const Transform &getRenderTransform() const{return hasOwnTransform?worldTransform:meshNode->getWorldTransform();}
@@ -130,7 +131,7 @@ protected:
 	bool mRendered;
 	Mesh::ptr mMesh;
 	Collection<SubMesh::ptr> mSubMeshes;
-	Material::ptr mOwnedMaterial;
+	RenderState::ptr mSharedRenderState;
 	MeshNodeSkeleton::ptr mSkeleton;
 	VertexData::ptr mDynamicVertexData;
 

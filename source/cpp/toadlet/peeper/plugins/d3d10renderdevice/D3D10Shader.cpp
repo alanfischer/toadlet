@@ -322,7 +322,7 @@ bool D3D10Shader::reflect(){
 			variable->setFormat(VariableBufferFormat::Format_TYPE_RESOURCE);
 			variable->setOffset(bindDesc.BindPoint);
 			variable->setSize(bindDesc.BindCount);
-			variable->setIndex(bindDesc.BindPoint);
+			variable->setResourceIndex(bindDesc.BindPoint);
 			primaryFormat->setStructVariable(primaryFormat->getStructSize() - numResources + j,variable);
 			j++;
 		}

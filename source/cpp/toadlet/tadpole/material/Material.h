@@ -48,7 +48,7 @@ public:
 		Scope_RENDERABLE=1<<1,
 	};
 
-	Material(MaterialManager *manager,Material *source=NULL,bool clone=false);
+	Material(MaterialManager *manager);
 	virtual ~Material();
 
 	void destroy();
@@ -60,6 +60,8 @@ public:
 	RenderPath::ptr getBestPath(){return mBestPath;}
 	RenderPass::ptr getPass(int path=-1,int pass=-1);
 
+	RenderState::ptr getRenderState(){return getPass()->getRenderState();}
+
 	/// @todo: Move SortType to the RenderPath at least, so some paths may be sorted, and others not
 	inline void setSort(SortType sort){mSort=sort;}
 	inline SortType getSort() const{return mSort;}
@@ -70,8 +72,6 @@ public:
 	bool isDepthSorted() const;
 
 	RenderPath::ptr findFixedPath();
-
-	void shareStates(Material *source);
 
 	bool compile();
 
