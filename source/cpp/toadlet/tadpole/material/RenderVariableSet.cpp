@@ -86,7 +86,7 @@ bool RenderVariableSet::addTexture(const String &name,Texture::ptr texture,const
 	}
 	if((formatVariable->getFormat()&VariableBufferFormat::Format_MASK_TYPES)!=VariableBufferFormat::Format_TYPE_RESOURCE){
 		Logger::warning(Categories::TOADLET_TADPOLE,
-			String("RenderVariable:")+name+" format does not match format:"+formatVariable->getFormat()+"!="+VariableBufferFormat::Format_TYPE_RESOURCE);
+			String("RenderVariable:")+name+" format does not match format:"+formatVariable->getFormat()+"!="+(int)VariableBufferFormat::Format_TYPE_RESOURCE);
 		return false;
 	}
 
