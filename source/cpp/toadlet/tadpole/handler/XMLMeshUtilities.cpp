@@ -242,13 +242,48 @@ const char *makeBoneAssignment(char *buffer,const Mesh::VertexBoneAssignmentList
 
 /// @todo: Support loading all of the material, instead of starting with a DiffuseMaterial
 Material::ptr XMLMeshUtilities::loadMaterial(mxml_node_t *node,int version,MaterialManager *materialManager,TextureManager *textureManager){
-	Material::ptr material;
-	if(materialManager!=NULL){
-		material=materialManager->createDiffuseMaterial(NULL);
+	String textureName;
+	if(version<=2){
+		mxml_node_t *mapNode=node->child;
+		while((mapNode=mapNode->next)!=NULL){
+			if(strcmp(mxmlGetElementName(mapNode),"Map")!=0){
+				continue;
+			}
+
+			mxml_node_t *fileNode=mxmlFindChild(mapNode,"File");
+			if(fileNode!=NULL){
+				const char *data=mxmlGetOpaque(fileNode->child);
+				if(data!=NULL){
+					textureName=data;
+					textureName=textureName.trimLeft().trimRight();
+				}
+			}
+		}
 	}
 	else{
-		material=Material::ptr(new Material(NULL));
+		mxml_node_t *textureStageNode=node->child;
+		while((textureStageNode=textureStageNode->next)!=NULL){
+			if(strcmp(mxmlGetElementName(textureStageNode),"TextureStage")!=0){
+				continue;
+			}
+
+			int index=0;
+			const char *prop=mxmlElementGetAttr(textureStageNode,"Index");
+			if(prop!=NULL){
+				index=String(prop).toInt32();
+			}
+
+			mxml_node_t *textureNode=mxmlFindChild(textureStageNode,"Texture");
+			if(textureNode!=NULL){
+				prop=mxmlElementGetAttr(textureNode,"File");
+				if(prop!=NULL){
+					textureName=prop;
+				}
+			}
+		}
 	}
+
+	Material::ptr material=materialManager->createDiffuseMaterial(textureManager->findTexture(textureName));
 
 	const char *prop=mxmlElementGetAttr(node,"Name");
 	if(prop!=NULL){
@@ -366,96 +401,6 @@ Material::ptr XMLMeshUtilities::loadMaterial(mxml_node_t *node,int version,Mater
 	}
 	material->getPass()->setRasterizerState(rasterizerState);
 
-	if(version<=2){
-		mxml_node_t *mapNode=node->child;
-		while((mapNode=mapNode->next)!=NULL){
-			if(strcmp(mxmlGetElementName(mapNode),"Map")!=0){
-				continue;
-			}
-
-			int type=MAX_MAP_NAMES;
-			String textureName;
-			float amount;
-
-			const char *prop=mxmlElementGetAttr(mapNode,"Type");
-			if(prop!=NULL){
-				int i;
-				for(i=0;i<MAX_MAP_NAMES;++i){
-					if(strcmp(prop,MAP_NAMES[i])==0){
-						type=i;
-						break;
-					}
-				}
-			}
-
-			if(type!=MAX_MAP_NAMES){
-				mxml_node_t *fileNode=mxmlFindChild(mapNode,"File");
-				if(fileNode!=NULL){
-					const char *data=mxmlGetOpaque(fileNode->child);
-					if(data!=NULL){
-						textureName=data;
-						textureName=textureName.trimLeft().trimRight();
-					}
-				}
-
-				mxml_node_t *amountNode=mxmlFindChild(mapNode,"Amount");
-				if(amountNode!=NULL){
-					const char *data=mxmlGetOpaque(amountNode->child);
-					if(data!=NULL){
-						amount=parseScalar(data);
-					}
-				}
-
-				Texture::ptr texture;
-				if(textureManager!=NULL){
-					textureManager->cleanFilename(textureName);
-					texture=textureManager->findTexture(textureName);
-				}
-				if(texture!=NULL){
-					material->getPass()->setTexture(0,texture);
-					material->getPass()->setTextureName(0,texture->getName());
-				}
-				else{
-					material->getPass()->setTextureName(0,textureName);
-				}
-			}
-		}
-	}
-	else{
-		mxml_node_t *textureStageNode=node->child;
-		while((textureStageNode=textureStageNode->next)!=NULL){
-			if(strcmp(mxmlGetElementName(textureStageNode),"TextureStage")!=0){
-				continue;
-			}
-
-			int index=0;
-			prop=mxmlElementGetAttr(textureStageNode,"Index");
-			if(prop!=NULL){
-				index=String(prop).toInt32();
-			}
-
-			mxml_node_t *textureNode=mxmlFindChild(textureStageNode,"Texture");
-			if(textureNode!=NULL){
-				prop=mxmlElementGetAttr(textureNode,"File");
-				if(prop!=NULL){
-					Texture::ptr texture;
-					String textureName=prop;
-					if(textureManager!=NULL){
-						textureManager->cleanFilename(textureName);
-						texture=textureManager->findTexture(textureName);
-					}
-					if(texture!=NULL){
-						material->getPass()->setTexture(0,texture);
-						material->getPass()->setTextureName(0,texture->getName());
-					}
-					else{
-						material->getPass()->setTextureName(0,textureName);
-					}
-				}
-			}
-		}
-	}
-
 	material->compile();
 
 	return material;
@@ -543,28 +488,26 @@ mxml_node_t *XMLMeshUtilities::saveMaterial(Material::ptr material,int version,P
 			}
 		}
 	}
-
-	int i;
-	for(i=0;i<material->getPass()->getNumTextures();++i){
-		mxml_node_t *textureStageNode=mxmlNewElement(materialNode,"TextureStage");
+TOADLET_ASSERT(false && "BROKEN");
+/*
+	mxml_node_t *textureStageNode=mxmlNewElement(materialNode,"TextureStage");
+	{
+		mxml_node_t *textureNode=mxmlNewElement(textureStageNode,"Texture");
 		{
-			mxml_node_t *textureNode=mxmlNewElement(textureStageNode,"Texture");
-			{
-				Texture *texture=material->getPass()->getTexture(i);
+			Texture *texture=material->getPass()->getTexture(i);
 
-				String textureName;
-				if(texture!=NULL){
-					textureName=texture->getName();
-				}
-				else{
-					textureName=material->getPass()->getTextureName(i);
-				}
-
-				mxmlElementSetAttr(textureNode,"File",textureName);
+			String textureName;
+			if(texture!=NULL){
+				textureName=texture->getName();
 			}
+			else{
+				textureName=material->getPass()->getTextureName(i);
+			}
+
+			mxmlElementSetAttr(textureNode,"File",textureName);
 		}
 	}
-
+*/
 	return materialNode;
 }
 

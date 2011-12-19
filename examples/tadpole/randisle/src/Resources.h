@@ -66,17 +66,6 @@ public:
 				pass->setDepthState(DepthState(DepthState::DepthTest_LEQUAL,false));
 				pass->setRasterizerState(RasterizerState(RasterizerState::CullType_NONE));
 
-				TextureState textureState;
-				textureState.calculation=TextureState::CalculationType_NORMAL;
-
-				pass->setTexture(0,noise1);
-				Math::setMatrix4x4FromScale(textureState.matrix,16,16,16);
-				pass->setTextureState(0,textureState);
-
-				pass->setTexture(1,noise2);
-				Math::setMatrix4x4FromScale(textureState.matrix,16,16,16);
-				pass->setTextureState(1,textureState);
-
 				String profiles[]={
 					"glsl",
 					"hlsl"
@@ -199,8 +188,17 @@ public:
 				pass->getVariables()->addVariable("materialAmbientColor",RenderVariable::ptr(new MaterialAmbientVariable()),Material::Scope_MATERIAL);
 				pass->getVariables()->addVariable("fogDistance",RenderVariable::ptr(new FogDistanceVariable()),Material::Scope_MATERIAL);
 				pass->getVariables()->addVariable("fogColor",RenderVariable::ptr(new FogColorVariable()),Material::Scope_MATERIAL);
-				pass->getVariables()->addVariable("textureMatrix0",RenderVariable::ptr(new TextureMatrixVariable(0)),Material::Scope_MATERIAL);
-				pass->getVariables()->addVariable("textureMatrix1",RenderVariable::ptr(new TextureMatrixVariable(1)),Material::Scope_MATERIAL);
+				pass->getVariables()->addVariable("textureMatrix0",RenderVariable::ptr(new TextureMatrixVariable(pass->getVariables(),"tex0")),Material::Scope_MATERIAL);
+				pass->getVariables()->addVariable("textureMatrix1",RenderVariable::ptr(new TextureMatrixVariable(pass->getVariables(),"tex1")),Material::Scope_MATERIAL);
+
+				TextureState textureState;
+				textureState.calculation=TextureState::CalculationType_NORMAL;
+
+				Math::setMatrix4x4FromScale(textureState.matrix,16,16,16);
+				pass->getVariables()->addTexture("tex0",noise1,"samp0",SamplerState(),textureState);
+
+				Math::setMatrix4x4FromScale(textureState.matrix,16,16,16);
+				pass->getVariables()->addTexture("tex1",noise2,"samp1",SamplerState(),textureState);
 			}
 
 			RenderPath::ptr fixedPath=waterMaterial->addPath();
@@ -215,13 +213,11 @@ public:
 				TextureState textureState;
 				textureState.calculation=TextureState::CalculationType_NORMAL;
 
-				pass->setTexture(0,noise1);
 				Math::setMatrix4x4FromScale(textureState.matrix,16,16,16);
-				pass->setTextureState(0,textureState);
+				pass->setTexture(Shader::ShaderType_FRAGMENT,0,noise1,SamplerState(),textureState);
 
-				pass->setTexture(1,noise2);
 				Math::setMatrix4x4FromScale(textureState.matrix,16,16,16);
-				pass->setTextureState(1,textureState);
+				pass->setTexture(Shader::ShaderType_FRAGMENT,0,noise2,SamplerState(),textureState);
 			}
 
 			waterMaterial->setLayer(-1);
@@ -296,14 +292,6 @@ public:
 			treeLeaf->retain();
 		}
 
-		if(treeBranch!=NULL){
-			treeBranchHighlighted=engine->getMaterialManager()->cloneMaterial(treeBranch);
-		}
-		if(treeBranchHighlighted!=NULL){
-			treeBranchHighlighted->getPass()->setMaterialState(MaterialState(Vector4(2,2,2,2)));
-			treeBranchHighlighted->retain();
-		}
-
 		Logger::alert("Loading sounds");
 
  		dog=engine->getAudioBufferManager()->findAudioBuffer("dog.wav");
@@ -321,13 +309,14 @@ public:
 
 		// HUD
 		hudFade=engine->getMaterialManager()->createDiffuseMaterial(pointTexture);
-		hudFade->getPass()->setSamplerState(0,SamplerState(
+		/// TODO
+/*		hudFade->getPass()->setSamplerState(0,SamplerState(
 			SamplerState::FilterType_LINEAR,SamplerState::FilterType_LINEAR,SamplerState::FilterType_LINEAR,
 			SamplerState::AddressType_CLAMP_TO_EDGE,SamplerState::AddressType_CLAMP_TO_EDGE,SamplerState::AddressType_CLAMP_TO_EDGE));
 		hudFade->getPass()->setDepthState(DepthState(DepthState::DepthTest_NEVER,false));
 		hudFade->getPass()->setBlendState(BlendState::Combination_ALPHA);
 		hudFade->getPass()->setMaterialState(MaterialState(Colors::TRANSPARENT_RED));
-		hudFade->retain();
+*/		hudFade->retain();
 		
 		hudCompass=engine->getMaterialManager()->findMaterial("compass.png");
 		if(hudCompass!=NULL){
@@ -337,9 +326,7 @@ public:
 			hudCompass->retain();
 		}
 
-		if(acorn!=NULL){
-			hudAcorn=engine->getMaterialManager()->cloneMaterial(acorn);
-		}
+		hudAcorn=engine->getMaterialManager()->findMaterial("acorn.png");
 		if(hudAcorn!=NULL){
 			hudAcorn->getPass()->setMaterialState(MaterialState(false));
 			hudAcorn->getPass()->setDepthState(DepthState(DepthState::DepthTest_NEVER,false));
@@ -375,7 +362,6 @@ public:
 	Mesh::ptr shadow;
 	Material::ptr treeBranch;
 	Material::ptr treeLeaf;
-	Material::ptr treeBranchHighlighted;
 	Material::ptr acorn;
 	AudioBuffer::ptr dog;
 	AudioBuffer::ptr shark;

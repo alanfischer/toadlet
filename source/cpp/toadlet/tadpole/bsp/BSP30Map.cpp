@@ -293,7 +293,7 @@ void BSP30Map::renderFaces(RenderDevice *renderDevice,facedata *face){
 		if(face->visible){
 			if(lastLightmapIndex!=face->lightmapIndex){
 				lastLightmapIndex=face->lightmapIndex;
-				renderDevice->setTexture(1,lightmapTextures[face->lightmapIndex]);
+				renderDevice->setTexture(Shader::ShaderType_FRAGMENT,1,lightmapTextures[face->lightmapIndex]);
 			}
 			renderDevice->renderPrimitive(vertexData,face->indexData);
 		}

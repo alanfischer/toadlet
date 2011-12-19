@@ -357,7 +357,7 @@ void D3D9RenderDevice::beginScene(){
 void D3D9RenderDevice::endScene(){
 	int i;
 	for(i=0;i<mCaps.maxTextureStages;++i){
-		setTexture(i,NULL);
+		setTexture((Shader::ShaderType)0,i,NULL);
 		setTextureState(i,NULL);
 	}
 
@@ -509,7 +509,7 @@ void D3D9RenderDevice::setDefaultState(){
 	for(i=0;i<mCaps.maxTextureStages;++i){
 		setSamplerState(i,NULL);
 		setTextureState(i,NULL);
-		setTexture(i,NULL);
+		setTexture((Shader::ShaderType)0,i,NULL);
 	}
 
 	setMaterialState(MaterialState());
@@ -544,21 +544,23 @@ bool D3D9RenderDevice::setRenderState(RenderState *renderState){
 	if(d3drenderState->mMaterialState!=NULL){
 		setMaterialState(*d3drenderState->mMaterialState);
 	}
-	int i;
-	for(i=0;i<d3drenderState->mSamplerStates.size();++i){
-		setSamplerState(i,d3drenderState->mSamplerStates[i]);
-	}
-	if(mLastRenderState!=NULL){
-		for(;i<mLastRenderState->getNumSamplerStates();++i){
-			setSamplerState(i,NULL);
+	int i,j;
+	for(j=0;j<Shader::ShaderType_MAX;++j){
+		for(i=0;i<d3drenderState->mSamplerStates[j].size();++i){
+			setSamplerState(i,d3drenderState->mSamplerStates[j][i]);
 		}
-	}
-	for(i=0;i<d3drenderState->mTextureStates.size();++i){
-		setTextureState(i,d3drenderState->mTextureStates[i]);
-	}
-	if(mLastRenderState!=NULL){
-		for(;i<mLastRenderState->getNumTextureStates();++i){
-			setTextureState(i,NULL);
+		if(mLastRenderState!=NULL){
+			for(;i<mLastRenderState->getNumSamplerStates((Shader::ShaderType)j);++i){
+				setSamplerState(i,NULL);
+			}
+		}
+		for(i=0;i<d3drenderState->mTextureStates[j].size();++i){
+			setTextureState(i,d3drenderState->mTextureStates[j][i]);
+		}
+		if(mLastRenderState!=NULL){
+			for(;i<mLastRenderState->getNumTextureStates((Shader::ShaderType)j);++i){
+				setTextureState(i,NULL);
+			}
 		}
 	}
 
@@ -849,7 +851,7 @@ void D3D9RenderDevice::setBuffer(Shader::ShaderType shaderType,int i,VariableBuf
 	}
 }
 
-void D3D9RenderDevice::setTexture(int i,Texture *texture){
+void D3D9RenderDevice::setTexture(Shader::ShaderType shaderType,int i,Texture *texture){
 	HRESULT result=S_OK;
 
 	D3D9Texture *d3dtexture=texture!=NULL?(D3D9Texture*)texture->getRootTexture():NULL;

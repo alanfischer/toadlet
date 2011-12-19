@@ -36,7 +36,7 @@ class TOADLET_API RenderPath{
 public:
 	TOADLET_SHARED_POINTERS(RenderPath);
 
-	RenderPath(MaterialManager *manager,RenderPath *source=NULL,bool clone=false);
+	RenderPath(MaterialManager *manager);
 	virtual ~RenderPath();
 
 	void destroy();
@@ -47,11 +47,10 @@ public:
 	inline int getNumPasses() const{return mPasses.size();}
 	inline RenderPass::ptr getPass(int i) const{return mPasses[i];}
 	RenderPass::ptr takePass(int i){RenderPass::ptr pass=mPasses[i];mPasses.removeAt(i);return pass;}
-	RenderPass::ptr addPass(RenderPass::ptr pass=RenderPass::ptr());
+	RenderPass::ptr addPass(RenderState::ptr renderState=RenderState::ptr(),ShaderState::ptr shaderState=ShaderState::ptr());
+	RenderPass::ptr addPass(RenderPass::ptr pass);
 
 	bool isDepthSorted() const;
-
-	void shareStates(RenderPath *path);
 
 protected:
 	MaterialManager *mManager;

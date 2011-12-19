@@ -93,6 +93,7 @@ public:
 			mOffset(0),
 			mSize(0),
 			mIndex(0),
+			mResourceIndex(0),
 			mArraySize(0)
 		{}
 
@@ -114,6 +115,9 @@ public:
 		inline void setIndex(int index){mIndex=index;}
 		inline int getIndex() const{return mIndex;}
 
+		inline void setResourceIndex(int index){mResourceIndex=index;}
+		inline int getResourceIndex() const{return mResourceIndex;}
+
 		inline void setArraySize(int size){mArraySize=size;}
 		inline int getArraySize() const{return mArraySize;}
 
@@ -130,11 +134,11 @@ public:
 		int mOffset;
 		int mSize;
 		int mIndex;
+		int mResourceIndex;
 		int mArraySize;
 		Collection<Variable::ptr> mStructVariables;
 	};
 
-	// static methods aren't allowed in Interfaces, but technically enums shouldn't be either, so these need to be separated to an alongside class
 	static int getFormatSize(int format);
 	static int getFormatRows(int format);
 	static int getFormatColumns(int format);

@@ -642,7 +642,7 @@ void GLRenderDevice::endScene(){
 	for(i=0;i<mCaps.maxTextureStages;++i){
 		setSamplerState(i,NULL);
 		setTextureState(i,NULL);
-		setTexture(i,NULL);
+		setTexture((Shader::ShaderType)0,i,NULL);
 	}
 
 	mLastShaderState=NULL;
@@ -844,7 +844,7 @@ void GLRenderDevice::setDefaultState(){
 	for(i=0;i<mCaps.maxTextureStages;++i){
 		setSamplerState(i,NULL);
 		setTextureState(i,NULL);
-		setTexture(i,NULL);
+		setTexture((Shader::ShaderType)0,i,NULL);
 	}
 
 	// GL specific states
@@ -881,12 +881,14 @@ bool GLRenderDevice::setRenderState(RenderState *renderState){
 	if(glrenderState->mMaterialState!=NULL){
 		setMaterialState(*glrenderState->mMaterialState);
 	}
-	int i;
-	for(i=0;i<glrenderState->mSamplerStates.size();++i){
-		setSamplerState(i,glrenderState->mSamplerStates[i]);
-	}
-	for(i=0;i<glrenderState->mTextureStates.size();++i){
-		setTextureState(i,glrenderState->mTextureStates[i]);
+	int i,j;
+	for(j=0;j<Shader::ShaderType_MAX;++j){
+		for(i=0;i<glrenderState->mSamplerStates[j].size();++i){
+			setSamplerState(i,glrenderState->mSamplerStates[j][i]);
+		}
+		for(i=0;i<glrenderState->mTextureStates[j].size();++i){
+			setTextureState(i,glrenderState->mTextureStates[j][i]);
+		}
 	}
 
 	return true;
@@ -1349,7 +1351,7 @@ void GLRenderDevice::setBuffer(Shader::ShaderType shaderType,int i,VariableBuffe
 #endif
 }
 
-void GLRenderDevice::setTexture(int i,Texture *texture){
+void GLRenderDevice::setTexture(Shader::ShaderType shaderType,int i,Texture *texture){
 	if(i>=mCaps.maxTextureStages){
 		return;
 	}

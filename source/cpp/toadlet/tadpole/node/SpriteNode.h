@@ -48,7 +48,7 @@ public:
 	void *hasInterface(int type);
 
 	void setMaterial(Material::ptr material);
-	Material::ptr getMaterial() const{return mOwnedMaterial!=NULL?mOwnedMaterial:mMaterial;}
+	Material::ptr getMaterial() const{return mMaterial;}
 
 	void setAlignment(int alignment);
 	int getAlignment() const{return mAlignment;}
@@ -60,7 +60,7 @@ public:
 	void gatherRenderables(CameraNode *camera,RenderableSet *set);
 
 	// Renderable
-	Material *getRenderMaterial() const{return mOwnedMaterial!=NULL?mOwnedMaterial:mMaterial;}
+	Material *getRenderMaterial() const{return mMaterial;}
 	const Transform &getRenderTransform() const{return getWorldTransform();}
 	const Bound &getRenderBound() const{return getWorldBound();}
 	void render(SceneRenderer *renderer) const;
@@ -73,9 +73,9 @@ protected:
 	int mAlignment;
 	Material::ptr mMaterial;
 	bool mRendered;
+	RenderState::ptr mSharedRenderState;
 	VertexData::ptr mVertexData;
 	IndexData::ptr mIndexData;
-	Material::ptr mOwnedMaterial;
 };
 
 }

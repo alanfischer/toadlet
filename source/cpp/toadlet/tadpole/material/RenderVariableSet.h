@@ -29,12 +29,15 @@
 #include <toadlet/peeper/VariableBuffer.h>
 #include <toadlet/peeper/Shader.h>
 #include <toadlet/peeper/ShaderState.h>
+#include <toadlet/peeper/RenderState.h>
 #include <toadlet/tadpole/BufferManager.h>
 #include <toadlet/tadpole/material/RenderVariable.h>
 
 namespace toadlet{
 namespace tadpole{
 namespace material{
+
+class RenderPass;
 
 class TOADLET_API RenderVariableSet{
 public:
@@ -47,12 +50,16 @@ public:
 
 	bool addBuffer(Shader::ShaderType shaderType,int index,VariableBuffer::ptr buffer);
 	void removeBuffer(VariableBuffer::ptr buffer);
+	int findBuffer(const String &name);
 	inline int getNumBuffers() const{return mBuffers.size();}
 	inline VariableBuffer::ptr getBuffer(int i){return mBuffers[i].buffer;}
 	inline int getBufferScope(int i){return mBuffers[i].scope;}
 	inline Shader::ShaderType getBufferShaderType(int i){return mBuffers[i].shaderType;}
 	inline int getBufferIndex(int i){return mBuffers[i].index;}
-	
+
+	bool addTexture(const String &name,Texture::ptr texture,const String &samplerName,const SamplerState &samplerState,const TextureState &textureState);
+	bool findTexture(const String &name,Shader::ShaderType &type,int &index);
+
 	bool addVariable(const String &name,RenderVariable::ptr variable,int scope);
 	void removeVariable(RenderVariable::ptr variable);
 	int getNumVariables(){int count=0,j;for(j=0;j<mBuffers.size();++j){count+=mBuffers[j].variables.size();}return count;}
@@ -60,7 +67,7 @@ public:
 	const String &getVariableName(int i){return getVariableInfo(i)->name;}
 	int getVariableScope(int i){return getVariableInfo(i)->scope;}
 
-	void buildBuffers(BufferManager *manager,ShaderState *state);
+	void buildBuffers(BufferManager *manager,RenderPass *pass);
 	void update(int scope,SceneParameters *parameters);
 
 protected:
@@ -89,7 +96,13 @@ protected:
 		return &mBuffers[j].variables[i];
 	}
 
+	VariableBufferFormat::Variable *findFormatVariable(const String &name,BufferInfo *&buffer);
+	VariableBufferFormat::Variable *findResourceVariable(const String &name,Shader::ShaderType &type);
+
 	Collection<BufferInfo> mBuffers;
+	RenderPass *mRenderPass;
+	RenderState *mRenderState;
+	ShaderState *mShaderState;
 };
 
 }

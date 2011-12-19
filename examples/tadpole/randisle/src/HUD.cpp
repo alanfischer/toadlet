@@ -75,6 +75,8 @@ void HUD::frameUpdate(int dt,int scope){
 		Vector4 dangerColor=materialState.ambient;
 		dangerColor.w=mPlayer->getDanger();
 
+		/// @todo:
+/*
 		if(mChompTime>0){
 			scalar chompamount=Math::fromMilli(mScene->getTime()-mChompTime);
 			scalar amount=powf(5.0,Math::sin(Math::mul(chompamount,Math::PI)));
@@ -95,6 +97,7 @@ void HUD::frameUpdate(int dt,int scope){
 				dangerColor.w=Math::clamp(0,Math::ONE,(Math::ONE-chompamount*2)+Math::ONE);
 			}
 		}
+*/
 
 		materialState.set(dangerColor);
 		if(mFadeSprite->getMaterial()!=NULL){

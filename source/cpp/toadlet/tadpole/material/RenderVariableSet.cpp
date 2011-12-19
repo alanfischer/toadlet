@@ -26,12 +26,17 @@
 #include <toadlet/egg/Error.h>
 #include <toadlet/egg/Logger.h>
 #include <toadlet/tadpole/material/RenderVariableSet.h>
+#include <toadlet/tadpole/material/RenderPass.h>
 
 namespace toadlet{
 namespace tadpole{
 namespace material{
 
-RenderVariableSet::RenderVariableSet(){
+RenderVariableSet::RenderVariableSet():
+	mRenderPass(NULL),
+	mRenderState(NULL),
+	mShaderState(NULL)
+{
 }
 
 RenderVariableSet::~RenderVariableSet(){
@@ -67,15 +72,93 @@ void RenderVariableSet::removeBuffer(VariableBuffer::ptr buffer){
 	}
 }
 
+bool RenderVariableSet::addTexture(const String &name,Texture::ptr texture,const String &sampName,const SamplerState &samplerState,const TextureState &textureState){
+	Shader::ShaderType type;
+	VariableBufferFormat::Variable *formatVariable=findResourceVariable(name,type);
+	if(formatVariable==NULL){
+		// If not found, then search for the d3d9 style appended name
+		formatVariable=findResourceVariable(sampName+"+"+name,type);
+	}
+	if(formatVariable==NULL){
+		Logger::warning(Categories::TOADLET_TADPOLE,
+			"RenderVariable not found with name:"+name);
+		return false;
+	}
+	if((formatVariable->getFormat()&VariableBufferFormat::Format_MASK_TYPES)!=VariableBufferFormat::Format_TYPE_RESOURCE){
+		Logger::warning(Categories::TOADLET_TADPOLE,
+			String("RenderVariable:")+name+" format does not match format:"+formatVariable->getFormat()+"!="+VariableBufferFormat::Format_TYPE_RESOURCE);
+		return false;
+	}
+
+	/// @todo: Set the sampler by name also
+	mRenderPass->setTexture(type,formatVariable->getResourceIndex(),texture,samplerState,textureState);
+
+	return true;
+}
+
+bool RenderVariableSet::findTexture(const String &name,Shader::ShaderType &type,int &index){
+	type=(Shader::ShaderType)0;
+	index=0;
+	VariableBufferFormat::Variable *formatVariable=findResourceVariable(name,type);
+	if(formatVariable!=NULL){
+		index=formatVariable->getResourceIndex();
+		return true;
+	}
+	return false;
+}
+
 // Search for the correct buffer and correct index
 bool RenderVariableSet::addVariable(const String &name,RenderVariable::ptr variable,int scope){
-	if(mBuffers.size()==0){
+	BufferInfo *bufferInfo=NULL;
+	VariableBufferFormat::Variable *formatVariable=findFormatVariable(name,bufferInfo);
+	if(formatVariable==NULL){
+		Logger::warning(Categories::TOADLET_TADPOLE,
+			"RenderVariable not found with name:"+name);
 		return false;
+	}
+	if((formatVariable->getFormat()&~VariableBufferFormat::Format_MASK_OPTIONS)!=(variable->getFormat()&~VariableBufferFormat::Format_MASK_OPTIONS)){
+		Logger::warning(Categories::TOADLET_TADPOLE,
+			String("RenderVariable:")+name+" format does not match format:"+formatVariable->getFormat()+"!="+variable->getFormat());
+		return false;
+	}
+	// Combine the two format, not sure this is ideal, but it will let us transfer information about the RenderVariable to the Buffer for items like Format_SAMPLER_MATRIX
+	formatVariable->setFormat(formatVariable->getFormat()|variable->getFormat());
+
+	VariableInfo v;
+	v.name=name;
+	v.location=formatVariable->getOffset();
+	v.scope=scope;
+	v.variable=variable;
+	bufferInfo->variables.add(v);
+
+	bufferInfo->scope|=scope;
+	
+	return true;
+}
+
+void RenderVariableSet::removeVariable(RenderVariable::ptr variable){
+	int i,j;
+	for(i=0;i<mBuffers.size();++i){
+		BufferInfo *buffer=&mBuffers[i];
+		buffer->scope=0;
+		for(j=0;j<buffer->variables.size();++j){
+			if(buffer->variables[j].variable==variable){
+				buffer->variables.removeAt(j);
+			}
+			else{
+				buffer->scope|=buffer->variables[j].scope;
+			}
+		}
+	}
+}
+
+VariableBufferFormat::Variable *RenderVariableSet::findFormatVariable(const String &name,BufferInfo *&buffer){
+	if(mBuffers.size()==0){
+		return NULL;
 	}
 
 	int i=name.find("."),j=0;
 	String fullName=name;
-	BufferInfo *buffer=NULL;
 	VariableBufferFormat::Variable *formatVariable=NULL;
 
 	if(i>0){
@@ -113,55 +196,35 @@ bool RenderVariableSet::addVariable(const String &name,RenderVariable::ptr varia
 			}
 		}
 	}
-	
-	if(formatVariable==NULL){
-		Logger::warning(Categories::TOADLET_TADPOLE,
-			"RenderVariable not found with name:"+name);
-		return false;
-	}
-	if((variable->getFormat()&~VariableBufferFormat::Format_MASK_OPTIONS)!=(formatVariable->getFormat()&~VariableBufferFormat::Format_MASK_OPTIONS)){
-		Logger::warning(Categories::TOADLET_TADPOLE,
-			String("RenderVariable:")+name+" format does not match format:"+variable->getFormat()+"!="+formatVariable->getFormat());
-		return false;
-	}
-	// Combine the two format, not sure this is ideal, but it will let us transfer information about the RenderVariable to the Buffer for items like Format_SAMPLER_MATRIX
-	formatVariable->setFormat(formatVariable->getFormat()|variable->getFormat());
 
-	VariableInfo v;
-	v.name=name;
-	v.location=formatVariable->getOffset();
-	v.scope=scope;
-	v.variable=variable;
-	buffer->variables.add(v);
-
-	buffer->scope|=scope;
-	
-	return true;
+	return formatVariable;	
 }
 
-void RenderVariableSet::removeVariable(RenderVariable::ptr variable){
-	int i,j;
-	for(i=0;i<mBuffers.size();++i){
-		BufferInfo *buffer=&mBuffers[i];
-		buffer->scope=0;
-		for(j=0;j<buffer->variables.size();++j){
-			if(buffer->variables[j].variable==variable){
-				buffer->variables.removeAt(j);
-			}
-			else{
-				buffer->scope|=buffer->variables[j].scope;
+VariableBufferFormat::Variable *RenderVariableSet::findResourceVariable(const String &name,Shader::ShaderType &type){
+	VariableBufferFormat::Variable *formatVariable=NULL;
+	int i,j,k;
+	for(j=0;j<Shader::ShaderType_MAX;++j){
+		for(i=0;i<mShaderState->getNumVariableBuffers((Shader::ShaderType)j);++i){
+			VariableBufferFormat::ptr format=mShaderState->getVariableBufferFormat((Shader::ShaderType)j,i);
+			for(k=0;k<format->getSize();++k){
+				if(name.equals(format->getVariable(k)->getFullName())){
+					formatVariable=format->getVariable(k);
+					type=(Shader::ShaderType)j;
+					return formatVariable;
+				}
 			}
 		}
 	}
+	return NULL;
 }
 
-void RenderVariableSet::buildBuffers(BufferManager *manager,ShaderState *state){
-	if(state==NULL){
-		return;
-	}
-
+void RenderVariableSet::buildBuffers(BufferManager *manager,RenderPass *pass){
 	Collection<VariableInfo> variables;
 	int i,j;
+
+	mRenderPass=pass;
+	mRenderState=pass->getRenderState();
+	mShaderState=pass->getShaderState();
 
 	while(mBuffers.size()>0){
 		BufferInfo *buffer=&mBuffers[0];
@@ -173,8 +236,8 @@ void RenderVariableSet::buildBuffers(BufferManager *manager,ShaderState *state){
 	}
 
 	for(i=0;i<Shader::ShaderType_MAX;++i){
-		for(j=0;j<state->getNumVariableBuffers((Shader::ShaderType)i);++j){
-			VariableBufferFormat::ptr format=state->getVariableBufferFormat((Shader::ShaderType)i,j);
+		for(j=0;j<mShaderState->getNumVariableBuffers((Shader::ShaderType)i);++j){
+			VariableBufferFormat::ptr format=mShaderState->getVariableBufferFormat((Shader::ShaderType)i,j);
 			VariableBuffer::ptr buffer=manager->createVariableBuffer(Buffer::Usage_BIT_DYNAMIC,Buffer::Access_BIT_WRITE,format);
 			addBuffer((Shader::ShaderType)i,j,buffer);
 
@@ -191,7 +254,7 @@ void RenderVariableSet::update(int scope,SceneParameters *parameters){
 	int i,j;
 	for(i=0;i<mBuffers.size();++i){
 		BufferInfo *buffer=&mBuffers[i];
-		// We update the whole buffer on it's largest scope, since updating the buffer in seconds doesn't work in D3D10 with dynamic usage.
+		// We update the whole buffer on it's largest scope, since updating the buffer in sections doesn't work in D3D10 with dynamic usage.
 		if((buffer->scope&scope)==0 || (buffer->scope&~scope)>scope){
 			continue;
 		}
