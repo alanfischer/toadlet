@@ -1,6 +1,3 @@
-# Add the source code tree
-add_subdirectory (cpp)
-
 # Older versions of android require shell java libraries
 if (TOADLET_PLATFORM_ANDROID AND ANDROID_NDK_API_LEVEL LESS 9)
 	if (NOT EXISTS ${ANDROID_JAR})
@@ -9,4 +6,7 @@ if (TOADLET_PLATFORM_ANDROID AND ANDROID_NDK_API_LEVEL LESS 9)
 
 	add_subdirectory (java)
 endif (TOADLET_PLATFORM_ANDROID AND ANDROID_NDK_API_LEVEL LESS 9)
+
+# Add the c++ source code
+add_subdirectory (cpp)
 

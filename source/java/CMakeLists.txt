@@ -4,14 +4,19 @@
 # Shortcut variables
 set (JAVA_SRC_DIR us/toadlet)
 set (JAVA_OBJ obj)
+set (TOADLET_JAVA_BASEDIR ${CMAKE_CURRENT_BINARY_DIR} PARENT_SCOPE)
 
 
 # Setup for Android Java Compilation - uses the find_host_program macro from the Android toolchain
 find_host_program (CMAKE_Java_COMPILER javac)
+find_host_program (CMAKE_Java_GENERATOR javah)
 find_host_program (CMAKE_Java_ARCHIVE jar)
 if (NOT EXISTS ${CMAKE_Java_COMPILER})
 	message (FATAL_ERROR "Java compiler 'javac' could not be found. Ensure it is installed and in your PATH.")
 endif (NOT EXISTS ${CMAKE_Java_COMPILER})
+if (NOT EXISTS ${CMAKE_Java_GENERATOR})
+	message (FATAL_ERROR "Java generator 'javah' could not be found. Ensure it is installed and in your PATH.")
+endif (NOT EXISTS ${CMAKE_Java_GENERATOR})
 if (NOT EXISTS ${CMAKE_Java_ARCHIVE})
 	message (FATAL_ERROR "Java archiver 'jar' could not be found. Ensure it is installed and in your PATH.")
 endif (NOT EXISTS ${CMAKE_Java_ARCHIVE})
@@ -35,8 +40,9 @@ set (CMAKE_Java_CREATE_STATIC_LIBRARY
 	"<CMAKE_Java_ARCHIVE> -cf <TARGET> -C <OBJECT_DIR>/${JAVA_OBJ} ."
 )
 
+
 # Include the base directory
-include_directories (.)
+include_directories (${TOADLET_JAVA_BASEDIR})
 
 
 # toadlet_flick
@@ -53,10 +59,23 @@ set (FLICK_SRC
 	${CMAKE_CURRENT_BINARY_DIR}/${JAVA_SRC_DIR}/flick/Version.java
 )
 
+set (FLICK_H
+	us.toadlet.flick.InputDevice
+	us.toadlet.flick.InputDeviceListener
+	us.toadlet.flick.NInputDeviceListener
+	us.toadlet.flick.AndroidMotionDevice
+)
+
 add_library (jtoadlet_flick STATIC ${FLICK_SRC})
 set_target_properties (jtoadlet_flick PROPERTIES COMPILE_FLAGS "-d \"${FLICK_OBJ_DIR}\"")
 set_target_properties (jtoadlet_flick PROPERTIES COMPILE_DEFINITIONS_DEBUG TOADLET_DEBUG DEBUG_POSTFIX _d)
 install (TARGETS jtoadlet_flick DESTINATION lib)
+
+# Generate headers
+add_custom_command (TARGET jtoadlet_flick POST_BUILD
+	COMMAND ${CMAKE_Java_GENERATOR} -classpath \\* ${FLICK_H}
+)
+
 
 # toadlet_peeper
 set (PEEPER_OBJ_DIR ${CMAKE_CURRENT_BINARY_DIR}/CMakeFiles/jtoadlet_peeper.dir/${JAVA_OBJ})
@@ -74,10 +93,24 @@ set (PEEPER_SRC
 	${CMAKE_CURRENT_BINARY_DIR}/${JAVA_SRC_DIR}/peeper/Version.java
 )
 
+set (PEEPER_H
+	us.toadlet.peeper.TextureFormat
+	us.toadlet.peeper.WindowRenderTargetFormat
+	us.toadlet.peeper.RenderTarget
+	us.toadlet.peeper.GLRenderTarget
+	us.toadlet.peeper.EGLRenderTarget
+	us.toadlet.peeper.EGLWindowRenderTarget
+)
+
 add_library (jtoadlet_peeper STATIC ${PEEPER_SRC})
 set_target_properties (jtoadlet_peeper PROPERTIES COMPILE_FLAGS "-d \"${PEEPER_OBJ_DIR}\"")
 set_target_properties (jtoadlet_peeper PROPERTIES COMPILE_DEFINITIONS_DEBUG TOADLET_DEBUG DEBUG_POSTFIX _d)
 install (TARGETS jtoadlet_peeper DESTINATION lib)
+
+# Generate headers
+add_custom_command (TARGET jtoadlet_peeper POST_BUILD
+	COMMAND ${CMAKE_Java_GENERATOR} -classpath \\* ${PEEPER_H}
+)
 
 
 # toadlet_ribbit
@@ -100,10 +133,28 @@ set (RIBBIT_SRC
 	${CMAKE_CURRENT_BINARY_DIR}/${JAVA_SRC_DIR}/ribbit/Version.java
 )
 
+set (RIBBIT_H
+	us.toadlet.ribbit.AudioFormat
+	us.toadlet.ribbit.AudioStream
+	us.toadlet.ribbit.AudioBuffer
+	us.toadlet.ribbit.Audio
+	us.toadlet.ribbit.AudioCaps
+	us.toadlet.ribbit.AudioDevice
+	us.toadlet.ribbit.ATAudioBuffer
+	us.toadlet.ribbit.ATAudio
+	us.toadlet.ribbit.ATAudioDevice
+	us.toadlet.ribbit.NAudioStream
+)
+
 add_library (jtoadlet_ribbit STATIC ${RIBBIT_SRC})
 set_target_properties (jtoadlet_ribbit PROPERTIES COMPILE_FLAGS "-d \"${RIBBIT_OBJ_DIR}\"")
 set_target_properties (jtoadlet_ribbit PROPERTIES COMPILE_DEFINITIONS_DEBUG TOADLET_DEBUG DEBUG_POSTFIX _d)
 install (TARGETS jtoadlet_ribbit DESTINATION lib)
+
+# Generate headers
+add_custom_command (TARGET jtoadlet_ribbit POST_BUILD
+	COMMAND ${CMAKE_Java_GENERATOR} -classpath \\* ${RIBBIT_H}
+)
 
 
 # toadlet_pad
@@ -121,9 +172,21 @@ set (PAD_SRC
 	${CMAKE_CURRENT_BINARY_DIR}/${JAVA_SRC_DIR}/pad/Version.java
 )
 
+set (PAD_H
+	us.toadlet.pad.RenderDevice
+	us.toadlet.pad.Engine
+	us.toadlet.pad.Applet
+	us.toadlet.pad.AndroidApplication
+	us.toadlet.pad.NApplet
+)
+
 add_library (jtoadlet_pad STATIC ${PAD_SRC})
 set_target_properties (jtoadlet_pad PROPERTIES COMPILE_FLAGS "-d \"${PAD_OBJ_DIR}\"")
 set_target_properties (jtoadlet_pad PROPERTIES COMPILE_DEFINITIONS_DEBUG TOADLET_DEBUG DEBUG_POSTFIX _d)
 add_dependencies (jtoadlet_pad jtoadlet_peeper jtoadlet_ribbit jtoadlet_flick)
 install (TARGETS jtoadlet_pad DESTINATION lib)
 
+# Generate headers
+add_custom_command (TARGET jtoadlet_pad POST_BUILD
+	COMMAND ${CMAKE_Java_GENERATOR} -classpath \\* ${PAD_H}
+)

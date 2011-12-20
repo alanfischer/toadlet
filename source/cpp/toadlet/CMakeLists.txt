@@ -1,4 +1,3 @@
-
 # All toadlet libraries require the same toadlet includes
 include_directories (${toadlet_SOURCE_DIR}/source/cpp ${toadlet_BINARY_DIR}/source/cpp)
 
@@ -25,6 +24,11 @@ if (TOADLET_PLATFORM_ANDROID)
 	if (STATIC_LIB_FLAGS)
 		set (STATIC_LIB_PROPS ${STATIC_LIB_PROPS} COMPILE_FLAGS ${STATIC_LIB_FLAGS})
 	endif (STATIC_LIB_FLAGS)
+
+	if (ANDROID_NDK_API_LEVEL LESS 9)
+		# Javah generated header files need to be included
+		include_directories (${TOADLET_JAVA_BASEDIR})
+	endif (ANDROID_NDK_API_LEVEL LESS 9)
 elseif (TOADLET_PLATFORM_IOS)
 	# iOS does not permit dynamic libraries
 	if (STATIC_LIB_FLAGS)
