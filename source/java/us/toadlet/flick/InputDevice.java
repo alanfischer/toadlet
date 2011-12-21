@@ -29,7 +29,8 @@ public interface InputDevice{
 	static final int InputType_JOY=0;
 	static final int InputType_MOTION=1;
 	static final int InputType_LIGHT=2;
-	static final int InputType_MAX=3;
+	static final int InputType_PROXIMITY=3;
+	static final int InputType_MAX=4;
 
 	public boolean create();
 	public void destroy();
