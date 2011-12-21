@@ -38,6 +38,7 @@ public:
 	enum InputType{
 		InputType_JOY=0,
 		InputType_MOTION=1,
+		InputType_LIGHT=2,
 		InputType_MAX,
 	};
 

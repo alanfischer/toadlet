@@ -29,14 +29,17 @@ import android.content.Context;
 import android.hardware.*;
 import java.util.List;
 
-public class AndroidMotionDevice implements InputDevice,SensorEventListener{
-	public AndroidMotionDevice(Context context){
+public class AndroidSensorDevice implements InputDevice,SensorEventListener{
+	public AndroidSensorDevice(Context context,int type){
 		mContext=context;
 		mSensorManager=(SensorManager)mContext.getSystemService(Context.SENSOR_SERVICE);
+		mSensorType=type;
+		mInputType=getInputTypeFromSensorType(mSensorType);
+		mData=new InputData(mInputType,0,2);
 	}
 
 	public boolean create(){
-        List<Sensor> sensors=mSensorManager.getSensorList(Sensor.TYPE_ACCELEROMETER);
+        List<Sensor> sensors=mSensorManager.getSensorList(mSensorType);
 		if(sensors.size()>0){
 			mSensor=sensors.get(0);
 		}
@@ -48,8 +51,8 @@ public class AndroidMotionDevice implements InputDevice,SensorEventListener{
 		mSensor=null;
 	}
 
-	public int getType(){return InputType_MOTION;}
-	
+	public int getType(){return mInputType;}
+
 	public boolean start(){
 		mRunning=false;
 		if(mSensor!=null){
@@ -74,19 +77,44 @@ public class AndroidMotionDevice implements InputDevice,SensorEventListener{
 	public void onAccuracyChanged(Sensor sensor,int accuracy){}
  
 	public void onSensorChanged(SensorEvent event){
-		mMotionData.time=event.timestamp/1000;
-		mMotionData.valid=(1<<InputData.Semantic_MOTION_ACCELERATION);
-		System.arraycopy(event.values,0,mMotionData.values[InputData.Semantic_MOTION_ACCELERATION],0,3);
+		mData.time=event.timestamp/1000;
+
+		switch(mInputType){
+			case InputType_MOTION:
+				mData.valid=(1<<InputData.Semantic_MOTION_ACCELERATION);
+				System.arraycopy(event.values,0,mData.values[InputData.Semantic_MOTION_ACCELERATION],0,event.values.length);
+			break;
+			case InputType_LIGHT:
+				mData.valid=(1<<InputData.Semantic_LIGHT);
+				System.arraycopy(event.values,0,mData.values[InputData.Semantic_LIGHT],0,event.values.length);
+			break;
+			default:
+				System.arraycopy(event.values,0,mData.values[0],0,event.values.length);
+			break;
+		}
 
 		if(mListener!=null){
-			mListener.inputDetected(mMotionData);
+			mListener.inputDetected(mData);
+		}
+	}
+	
+	public static int getInputTypeFromSensorType(int sensorType){
+		switch(sensorType){
+			case Sensor.TYPE_ACCELEROMETER:
+				return InputType_MOTION;
+			case Sensor.TYPE_LIGHT:
+				return InputType_LIGHT;
+			default:
+				return InputType_MAX;
 		}
 	}
 
 	Context mContext;
 	SensorManager mSensorManager;
+	int mSensorType;
 	Sensor mSensor;
+	int mInputType;
 	boolean mRunning;
 	InputDeviceListener mListener;
-	InputData mMotionData=new InputData(InputType_MOTION,0,InputData.Semantic_MAX_MOTION);
+	InputData mData;
 }
