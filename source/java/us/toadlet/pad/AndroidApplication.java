@@ -214,6 +214,11 @@ public abstract class AndroidApplication extends Activity implements RenderTarge
 			mInputDevices[lightDevice.getType()]=lightDevice;
 		}
 
+		us.toadlet.flick.InputDevice proximityDevice=new AndroidSensorDevice(this,Sensor.TYPE_PROXIMITY);
+		if(proximityDevice.create()){
+			mInputDevices[proximityDevice.getType()]=proximityDevice;
+		}
+
 		if(mApplet==null){
 			mApplet=createApplet(this);
 			mApplet.create();
