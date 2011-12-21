@@ -211,3 +211,8 @@ target_link_libraries (toadlet_peeper_glrenderdevice_s toadlet_peeper_s ${PEEPER
 MERGE_STATIC_LIBRARIES (toadlet_peeper_glrenderdevice_s "${PEEPER_GLRENDERDEVICE_LIBS_S}")
 install (TARGETS toadlet_peeper_glrenderdevice_s DESTINATION ${LIB_INSTALL_DIR})
 
+# HACK: install the library on iOS. This will disappear once cmake issue:0012506 is resolved. 
+if (TOADLET_PLATFORM_IOS)
+    install (DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/\$ENV{CONFIGURATION}\$ENV{EFFECTIVE_PLATFORM_NAME}/ DESTINATION ${LIB_INSTALL_DIR} FILES_MATCHING PATTERN "*.a")
+endif (TOADLET_PLATFORM_IOS)
+

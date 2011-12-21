@@ -46,6 +46,11 @@ set_property (TARGET toadlet_ribbit_s APPEND PROPERTY COMPILE_DEFINITIONS ${RIBB
 target_link_libraries (toadlet_ribbit_s toadlet_egg_s)
 install (TARGETS toadlet_ribbit_s DESTINATION ${LIB_INSTALL_DIR})
 
+# HACK: install the library on iOS. This will disappear once cmake issue:0012506 is resolved. 
+if (TOADLET_PLATFORM_IOS)
+    install (DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/\$ENV{CONFIGURATION}\$ENV{EFFECTIVE_PLATFORM_NAME}/ DESTINATION ${LIB_INSTALL_DIR} FILES_MATCHING PATTERN "*.a")
+endif (TOADLET_PLATFORM_IOS)
+
 
 # Platform specific modules
 if (TOADLET_PLATFORM_ANDROID)
