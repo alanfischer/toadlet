@@ -1,9 +1,12 @@
-#include "us_toadlet_ribbit_NAudioStream.h"
 #include "JAudioDevice.h"
 #include <toadlet/egg/Logger.h>
 
 using namespace toadlet;
 using namespace toadlet::ribbit;
+
+extern "C" {
+
+#include "us_toadlet_ribbit_NAudioStream.h"
 
 JNIEXPORT void JNICALL Java_us_toadlet_ribbit_NAudioStream_close(JNIEnv *env,jobject obj){
 	Logger::debug(Categories::TOADLET_RIBBIT,
@@ -60,4 +63,6 @@ JNIEXPORT jint JNICALL Java_us_toadlet_ribbit_NAudioStream_read(JNIEnv *env,jobj
 		total=-1;
 	}
 	return total;
+}
+
 }

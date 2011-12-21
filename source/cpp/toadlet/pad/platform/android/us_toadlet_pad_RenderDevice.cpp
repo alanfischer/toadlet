@@ -1,9 +1,12 @@
-#include "us_toadlet_pad_RenderDevice.h"
 #include <toadlet/peeper/RenderDevice.h>
 
 using namespace toadlet::peeper;
 
 TOADLET_C_API RenderTarget *new_JGLWindowRenderTarget(JNIEnv *jenv,jobject jobj);
+
+extern "C" {
+
+#include "us_toadlet_pad_RenderDevice.h"
 
 RenderTarget::ptr renderTarget;
 
@@ -23,4 +26,6 @@ JNIEXPORT void JNICALL Java_us_toadlet_pad_RenderDevice_destroy(JNIEnv *env,jobj
 JNIEXPORT jboolean JNICALL Java_us_toadlet_pad_RenderDevice_setRenderTarget(JNIEnv *env,jobject obj,jobject renderTargetObj){
 	/// @todo: Implement this once we have intrusive reference counting in all non-pod objects, and can create JGL objects freely
 	return false;
+}
+
 }

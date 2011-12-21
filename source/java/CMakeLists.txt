@@ -72,10 +72,7 @@ set (FLICK_SRC
 )
 
 set (FLICK_H
-	us.toadlet.flick.InputDevice
-	us.toadlet.flick.InputDeviceListener
 	us.toadlet.flick.NInputDeviceListener
-	us.toadlet.flick.AndroidMotionDevice
 )
 
 add_library (jtoadlet_flick STATIC ${FLICK_SRC})
@@ -106,25 +103,10 @@ set (PEEPER_SRC
 	${CMAKE_CURRENT_BINARY_DIR}/${JAVA_SRC_DIR}/peeper/Version.java
 )
 
-set (PEEPER_H
-	us.toadlet.peeper.TextureFormat
-	us.toadlet.peeper.WindowRenderTargetFormat
-	us.toadlet.peeper.RenderTarget
-	us.toadlet.peeper.GLRenderTarget
-	us.toadlet.peeper.EGLRenderTarget
-	us.toadlet.peeper.EGLWindowRenderTarget
-)
-
 add_library (jtoadlet_peeper STATIC ${PEEPER_SRC})
 set_target_properties (jtoadlet_peeper PROPERTIES COMPILE_FLAGS "-d \"${PEEPER_OBJ_DIR}\"")
 set_target_properties (jtoadlet_peeper PROPERTIES COMPILE_DEFINITIONS_DEBUG TOADLET_DEBUG DEBUG_POSTFIX _d)
 install (TARGETS jtoadlet_peeper DESTINATION lib)
-
-# Generate headers
-get_target_property (JARFILE jtoadlet_peeper ${JARLOC})
-add_custom_command (TARGET jtoadlet_peeper POST_BUILD
-	COMMAND ${CMAKE_Java_GENERATOR} -classpath ${JARFILE} ${PEEPER_H}
-)
 
 
 # toadlet_ribbit
@@ -148,15 +130,6 @@ set (RIBBIT_SRC
 )
 
 set (RIBBIT_H
-	us.toadlet.ribbit.AudioFormat
-	us.toadlet.ribbit.AudioStream
-	us.toadlet.ribbit.AudioBuffer
-	us.toadlet.ribbit.Audio
-	us.toadlet.ribbit.AudioCaps
-	us.toadlet.ribbit.AudioDevice
-	us.toadlet.ribbit.ATAudioBuffer
-	us.toadlet.ribbit.ATAudio
-	us.toadlet.ribbit.ATAudioDevice
 	us.toadlet.ribbit.NAudioStream
 )
 
@@ -179,19 +152,18 @@ include_directories (${PAD_OBJ_DIR})
 configure_file (${JAVA_SRC_DIR}/pad/Version.java.cmake ${CMAKE_CURRENT_BINARY_DIR}/${JAVA_SRC_DIR}/pad/Version.java)
 
 set (PAD_SRC
-	${JAVA_SRC_DIR}/pad/RenderDevice.java
-	${JAVA_SRC_DIR}/pad/Engine.java
 	${JAVA_SRC_DIR}/pad/Applet.java
 	${JAVA_SRC_DIR}/pad/AndroidApplication.java
+	${JAVA_SRC_DIR}/pad/Engine.java
+	${JAVA_SRC_DIR}/pad/RenderDevice.java
 	${JAVA_SRC_DIR}/pad/NApplet.java
 	${CMAKE_CURRENT_BINARY_DIR}/${JAVA_SRC_DIR}/pad/Version.java
 )
 
 set (PAD_H
-	us.toadlet.pad.RenderDevice
-	us.toadlet.pad.Engine
-	us.toadlet.pad.Applet
 	us.toadlet.pad.AndroidApplication
+	us.toadlet.pad.Engine
+	us.toadlet.pad.RenderDevice
 	us.toadlet.pad.NApplet
 )
 

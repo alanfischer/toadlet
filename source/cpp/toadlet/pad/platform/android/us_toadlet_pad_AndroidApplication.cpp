@@ -1,4 +1,3 @@
-#include "us_toadlet_pad_AndroidApplication.h"
 #include "JApplication.h"
 #include <toadlet/tadpole/handler/platform/android/AndroidAssetArchive.h>
 #include <toadlet/tadpole/handler/platform/android/AndroidTextureHandler.h>
@@ -8,6 +7,10 @@ using namespace toadlet::peeper;
 using namespace toadlet::tadpole::handler;
 
 TOADLET_C_API RenderDevice* new_GLRenderDevice();
+
+extern "C" {
+
+#include "us_toadlet_pad_AndroidApplication.h"
 
 JNIEXPORT void JNICALL Java_us_toadlet_pad_AndroidApplication_createNativeApplication(JNIEnv *env,jobject obj){
 	Application *app=new JApplication(env,obj);
@@ -79,14 +82,14 @@ JNIEXPORT void JNICALL Java_us_toadlet_pad_AndroidApplication_deleteEngine(JNIEn
 	delete engine;
 }
 
-JNIEXPORT jboolean JNICALL Java_us_toadlet_pad_AndroidApplication_notifyEngineRenderDevice(JNIEnv *env,jobject obj){
+JNIEXPORT jboolean JNICALL Java_us_toadlet_pad_AndroidApplication_notifyEngineRenderDevice(JNIEnv *env,jobject obj,jobject engineObj){
 	JApplication *app=(JApplication*)env->CallIntMethod(obj,getNativeHandleApplicationID);
 	Engine *engine=app->getEngine();
 	RenderDevice *device=app->getRenderDevice();
 	return engine->setRenderDevice(device);
 }
 
-JNIEXPORT jboolean JNICALL Java_us_toadlet_pad_AndroidApplication_notifyEngineAudioDevice(JNIEnv *env,jobject obj){
+JNIEXPORT jboolean JNICALL Java_us_toadlet_pad_AndroidApplication_notifyEngineAudioDevice(JNIEnv *env,jobject obj,jobject engineObj){
 	JApplication *app=(JApplication*)env->CallIntMethod(obj,getNativeHandleApplicationID);
 	Engine *engine=app->getEngine();
 	AudioDevice *device=app->getAudioDevice();
@@ -108,7 +111,7 @@ JNIEXPORT jobject JNICALL Java_us_toadlet_pad_AndroidApplication_makeRenderDevic
 	return jdevice;
 }
 
-JNIEXPORT jobject JNICALL Java_us_toadlet_pad_AndroidApplication_deleteRenderDevice(JNIEnv *env,jobject obj,jobject deviceObj){
+JNIEXPORT void JNICALL Java_us_toadlet_pad_AndroidApplication_deleteRenderDevice(JNIEnv *env,jobject obj,jobject deviceObj){
 	RenderDevice *device=NULL;
 
 	jclass deviceClass=env->FindClass("us/toadlet/pad/RenderDevice");
@@ -119,4 +122,6 @@ JNIEXPORT jobject JNICALL Java_us_toadlet_pad_AndroidApplication_deleteRenderDev
 	env->DeleteLocalRef(deviceClass);
 	
 	delete device;
+}
+
 }

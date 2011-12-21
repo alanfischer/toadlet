@@ -1,4 +1,3 @@
-#include "us_toadlet_flick_NInputDeviceListener.h"
 #include "JInputDevice.h"
 #include <toadlet/egg/Logger.h>
 #include <toadlet/flick/InputData.h>
@@ -6,6 +5,10 @@
 
 using namespace toadlet;
 using namespace toadlet::flick;
+
+extern "C"{
+
+#include "us_toadlet_flick_NInputDeviceListener.h"
 
 JNIEXPORT void JNICALL Java_us_toadlet_flick_NInputDeviceListener_inputDetected(JNIEnv *env,jobject obj,jobject dataObj){
 	InputData data;
@@ -23,4 +26,6 @@ JNIEXPORT void JNICALL Java_us_toadlet_flick_NInputDeviceListener_inputDetected(
 	
 	InputDeviceListener *listener=(InputDeviceListener*)env->GetIntField(obj,nativeHandleID);
 	listener->inputDetected(data);
+}
+
 }
