@@ -4,6 +4,9 @@
 # Shortcut variables
 set (JAVA_SRC_DIR us/toadlet)
 set (JAVA_OBJ obj)
+
+
+# Used by the cpp classes to location the javah generated headers
 set (TOADLET_JAVA_BASEDIR ${CMAKE_CURRENT_BINARY_DIR} PARENT_SCOPE)
 
 
@@ -41,8 +44,8 @@ set (CMAKE_Java_CREATE_STATIC_LIBRARY
 )
 
 
-# Include the base directory
-include_directories (${TOADLET_JAVA_BASEDIR})
+# Include the current directory for java class files
+include_directories (.)
 
 
 # toadlet_flick
