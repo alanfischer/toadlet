@@ -99,7 +99,7 @@ if (TOADLET_PLATFORM_ANDROID)
 	if (ANDROID_NDK_API_LEVEL LESS 9)
 		set (PAD_LIBS ${PAD_LIBS} toadlet_ribbit_jaudiodevice toadlet_flick_jinputdevice)
 		set (PAD_LIBS_S ${PAD_LIBS_S} toadlet_ribbit_jaudiodevice_s toadlet_flick_jinputdevice_s)
-	endif
+	endif (ANDROID_NDK_API_LEVEL LESS 9)
 elseif (TOADLET_PLATFORM_WINCE)
 	if (TOADLET_HAS_D3DM)
 		set (PAD_LIBS ${PAD_LIBS} toadlet_peeper_d3dmrenderdevice)
