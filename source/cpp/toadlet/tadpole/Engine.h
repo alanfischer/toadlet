@@ -51,7 +51,7 @@ namespace tadpole{
 
 class TOADLET_API Engine{
 public:
-	Engine(bool backable=false);
+	Engine(bool fixedBackable=false,bool shaderBackable=false);
 	virtual ~Engine();
 
 	void destroy();
@@ -95,8 +95,9 @@ public:
 	int getIdealVertexFormatType() const{return mIdealVertexFormatType;}
 	const VertexFormats &getVertexFormats() const{return mVertexFormats;}
 	const RenderCaps &getRenderCaps() const{return mRenderCaps;}
-	bool hasShader(Shader::ShaderType type){return mBackable || mRenderCaps.hasShader[type];}
-	bool hasFixed(Shader::ShaderType type){return mBackable || mRenderCaps.hasFixed[type];}
+	bool isBackable() const{return mFixedBackable || mShaderBackable;}
+	bool hasShader(Shader::ShaderType type){return mShaderBackable || mRenderCaps.hasShader[type];}
+	bool hasFixed(Shader::ShaderType type){return mFixedBackable || mRenderCaps.hasFixed[type];}
 
 	inline ArchiveManager *getArchiveManager() const{return mArchiveManager;}
 	inline TextureManager *getTextureManager() const{return mTextureManager;}
@@ -109,7 +110,7 @@ public:
 	inline AudioBufferManager *getAudioBufferManager() const{return mAudioBufferManager;}
 
 protected:
-	bool mBackable;
+	bool mFixedBackable,mShaderBackable;
 	String mDirectory;
 	RenderDevice *mRenderDevice;
 	bool mRenderDeviceChanged;

@@ -155,8 +155,9 @@
 namespace toadlet{
 namespace tadpole{
 
-Engine::Engine(bool backable):
-	mBackable(false),
+Engine::Engine(bool fixedBackable,bool shaderBackable):
+	mFixedBackable(false),
+	mShaderBackable(false),
 	//mDirectory,
 	mRenderDevice(NULL),
 	mRenderDeviceChanged(false),
@@ -181,13 +182,14 @@ Engine::Engine(bool backable):
 	Logger::debug(Categories::TOADLET_TADPOLE,
 		String("allocating ")+Categories::TOADLET_TADPOLE+".Engine:"+Version::STRING);
 
-	mBackable=backable;
+	mFixedBackable=fixedBackable;
+	mShaderBackable=shaderBackable;
 
 	mArchiveManager=new ArchiveManager();
-	mTextureManager=new TextureManager(this,mBackable);
-	mBufferManager=new BufferManager(this,mBackable);
-	mShaderManager=new ShaderManager(this,mBackable);
-	mMaterialManager=new MaterialManager(this,mBackable);
+	mTextureManager=new TextureManager(this);
+	mBufferManager=new BufferManager(this);
+	mShaderManager=new ShaderManager(this);
+	mMaterialManager=new MaterialManager(this);
 	mFontManager=new FontManager(this->getArchiveManager());
 	mMeshManager=new MeshManager(this);
 	mAudioBufferManager=new AudioBufferManager(this);
@@ -380,7 +382,7 @@ void Engine::installHandlers(){
 
 bool Engine::setRenderDevice(RenderDevice *renderDevice){
 	if(renderDevice!=NULL){
-		if(mBackable==false && mRenderDeviceChanged){
+		if(mFixedBackable==false && mShaderBackable==false && mRenderDeviceChanged){
 			Error::unknown(Categories::TOADLET_TADPOLE,"can not change RenderDevice in an unbacked engine");
 			return false;
 		}
@@ -491,8 +493,8 @@ void Engine::updateVertexFormats(){
 
 bool Engine::setAudioDevice(AudioDevice *audioDevice){
 	if(audioDevice!=NULL){
-		if(mBackable==false && mAudioDeviceChanged){
-			Error::unknown(Categories::TOADLET_TADPOLE,"can not change AudioDevice in an unbacked engine");
+		if(mAudioDeviceChanged){
+			Error::unknown(Categories::TOADLET_TADPOLE,"can not change AudioDevice");
 			return false;
 		}
 		else{

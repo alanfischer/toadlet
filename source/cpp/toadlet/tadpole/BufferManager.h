@@ -38,7 +38,7 @@ class Engine;
 
 class TOADLET_API BufferManager:public BufferDestroyedListener,public VertexFormatDestroyedListener{
 public:
-	BufferManager(Engine *engine,bool backable);
+	BufferManager(Engine *engine);
 	virtual ~BufferManager();
 
 	void destroy();
@@ -73,7 +73,6 @@ protected:
 	Collection<VariableBuffer::ptr> mVariableBuffers;
 
 	Engine *mEngine;
-	bool mBackable;
 };
 
 }

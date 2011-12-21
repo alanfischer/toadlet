@@ -33,12 +33,10 @@
 namespace toadlet{
 namespace tadpole{
 
-TextureManager::TextureManager(Engine *engine,bool backable):ResourceManager(engine->getArchiveManager()),
-	mEngine(NULL),
-	mBackable(false)
+TextureManager::TextureManager(Engine *engine):ResourceManager(engine->getArchiveManager()),
+	mEngine(NULL)
 {
 	mEngine=engine;
-	mBackable=backable;
 }
 
 TextureManager::~TextureManager(){
@@ -75,7 +73,7 @@ Texture::ptr TextureManager::createTexture(int usage,TextureFormat::ptr format,t
 Texture::ptr TextureManager::createTexture(int usage,TextureFormat::ptr format,tbyte *mipDatas[]){
 	RenderDevice *renderDevice=mEngine->getRenderDevice();
 	Texture::ptr texture;
-	if(mBackable || renderDevice==NULL){
+	if(mEngine->isBackable()){
 		BackableTexture::ptr backableTexture(new BackableTexture());
 		backableTexture->create(usage,format,mipDatas);
 		if(renderDevice!=NULL){
@@ -83,7 +81,7 @@ Texture::ptr TextureManager::createTexture(int usage,TextureFormat::ptr format,t
 		}
 		texture=backableTexture;
 	}
-	else{
+	else if(renderDevice!=NULL){
 		texture=Texture::ptr(renderDevice->createTexture());
 		if(BackableTexture::convertCreate(texture,renderDevice,usage,format,mipDatas)==false){
 			Logger::error(Categories::TOADLET_TADPOLE,"Error in texture convertCreate");
@@ -91,9 +89,11 @@ Texture::ptr TextureManager::createTexture(int usage,TextureFormat::ptr format,t
 		}
 	}
 
-	manage(shared_static_cast<Texture>(texture));
+	if(texture!=NULL){
+		manage(shared_static_cast<Texture>(texture));
 
-	Logger::debug(Categories::TOADLET_TADPOLE,"texture created");
+		Logger::debug(Categories::TOADLET_TADPOLE,"texture created");
+	}
 
 	return texture;
 }
@@ -101,26 +101,29 @@ Texture::ptr TextureManager::createTexture(int usage,TextureFormat::ptr format,t
 PixelBufferRenderTarget::ptr TextureManager::createPixelBufferRenderTarget(){
 	Logger::debug(Categories::TOADLET_TADPOLE,"TextureManager::createPixelBufferRenderTarget");
 
+	RenderDevice *renderDevice=mEngine->getRenderDevice();
 	PixelBufferRenderTarget::ptr renderTarget;
-	if(mBackable || mEngine->getRenderDevice()==NULL){
+	if(mEngine->isBackable()){
 		BackablePixelBufferRenderTarget::ptr backableRenderTarget(new BackablePixelBufferRenderTarget());
 		backableRenderTarget->create();
-		if(mEngine->getRenderDevice()!=NULL){
-			PixelBufferRenderTarget::ptr back(mEngine->getRenderDevice()->createPixelBufferRenderTarget());
+		if(renderDevice!=NULL){
+			PixelBufferRenderTarget::ptr back(renderDevice->createPixelBufferRenderTarget());
 			backableRenderTarget->setBack(back);
 		}
 		renderTarget=backableRenderTarget;
 	}
-	else{
-		renderTarget=PixelBufferRenderTarget::ptr(mEngine->getRenderDevice()->createPixelBufferRenderTarget());
+	else if(renderDevice!=NULL){
+		renderTarget=PixelBufferRenderTarget::ptr(renderDevice->createPixelBufferRenderTarget());
 		if(renderTarget->create()==false){
 			return NULL;
 		}
 	}
 
-	mRenderTargets.add(renderTarget);
+	if(renderTarget!=NULL){
+		mRenderTargets.add(renderTarget);
 
-	renderTarget->setRenderTargetDestroyedListener(this);
+		renderTarget->setRenderTargetDestroyedListener(this);
+	}
 
 	return renderTarget;
 }

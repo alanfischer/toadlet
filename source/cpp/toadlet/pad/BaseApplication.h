@@ -80,16 +80,6 @@ public:
 	virtual String getKeyName(int key){Map<int,String>::iterator it=mKeyToName.find(key);return it!=mKeyToName.end()?it->second:(char*)NULL;}
 	virtual int getKeyValue(const String &name){Map<String,int>::iterator it=mNameToKey.find(name);return it!=mNameToKey.end()?it->second:0;}
 
-	virtual void setBackable(bool backable){
-		if(mEngine!=NULL){
-			Error::unknown(Categories::TOADLET_PAD,"can not change backable once engine is created");
-			return;
-		}
-
-		mBackable=backable;
-	}
-	virtual bool getBackable() const{return mBackable;}
-
 	virtual void *getDisplay()=0;
 	virtual void *getWindow()=0;
 
@@ -126,7 +116,6 @@ protected:
 	virtual bool createAudioDevice(const String &plugin);
 	virtual bool destroyAudioDevice();
 
-	bool mBackable;
 	WindowRenderTargetFormat::ptr mFormat;
 	Applet *mApplet;
 

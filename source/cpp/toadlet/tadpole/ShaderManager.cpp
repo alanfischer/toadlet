@@ -30,18 +30,16 @@
 namespace toadlet{
 namespace tadpole{
 
-ShaderManager::ShaderManager(Engine *engine,bool backable):ResourceManager(engine->getArchiveManager()),
-	mEngine(NULL),
-	mBackable(false)
+ShaderManager::ShaderManager(Engine *engine):ResourceManager(engine->getArchiveManager()),
+	mEngine(NULL)
 {
 	mEngine=engine;
-	mBackable=backable;
 }
 
 Shader::ptr ShaderManager::createShader(Shader::ShaderType type,const String profiles[],const String codes[],int numCodes){
 	RenderDevice *renderDevice=mEngine->getRenderDevice();
 	Shader::ptr shader;
-	if(mBackable || renderDevice==NULL){
+	if(mEngine->hasShader(type)){
 		BackableShader::ptr backableShader(new BackableShader());
 		backableShader->create(type,profiles,codes,numCodes);
 		if(renderDevice!=NULL){
@@ -51,7 +49,7 @@ Shader::ptr ShaderManager::createShader(Shader::ShaderType type,const String pro
 		}
 		shader=backableShader;
 	}
-	else{
+	else if(renderDevice!=NULL){
 		TOADLET_TRY
 			shader=Shader::ptr(renderDevice->createShader());
 		TOADLET_CATCH(Exception &){shader=NULL;}
@@ -61,9 +59,11 @@ Shader::ptr ShaderManager::createShader(Shader::ShaderType type,const String pro
 		}
 	}
 
-	manage(shared_static_cast<Shader>(shader));
+	if(shader!=NULL){
+		manage(shared_static_cast<Shader>(shader));
 
-	Logger::debug(Categories::TOADLET_TADPOLE,"shader created");
+		Logger::debug(Categories::TOADLET_TADPOLE,"shader created");
+	}
 
 	return shader;
 }
