@@ -44,6 +44,15 @@ set (CMAKE_Java_CREATE_STATIC_LIBRARY
 )
 
 
+# Set the jar postfix used by the javah generator
+string (TOUPPER ${CMAKE_BUILD_TYPE} BUILD_TYPE)
+if (${BUILD_TYPE} STREQUAL "DEBUG")
+	set (JARLOC LOCATION_DEBUG)
+else (${BUILD_TYPE} STREQUAL "DEBUG")
+	set (JARLOC LOCATION)
+endif (${BUILD_TYPE} STREQUAL "DEBUG")
+
+
 # Include the current directory for java class files
 include_directories (.)
 
@@ -75,8 +84,9 @@ set_target_properties (jtoadlet_flick PROPERTIES COMPILE_DEFINITIONS_DEBUG TOADL
 install (TARGETS jtoadlet_flick DESTINATION lib)
 
 # Generate headers
+get_target_property (JARFILE jtoadlet_flick ${JARLOC})
 add_custom_command (TARGET jtoadlet_flick POST_BUILD
-	COMMAND ${CMAKE_Java_GENERATOR} -classpath \\* ${FLICK_H}
+	COMMAND ${CMAKE_Java_GENERATOR} -classpath ${JARFILE} ${FLICK_H}
 )
 
 
@@ -111,8 +121,9 @@ set_target_properties (jtoadlet_peeper PROPERTIES COMPILE_DEFINITIONS_DEBUG TOAD
 install (TARGETS jtoadlet_peeper DESTINATION lib)
 
 # Generate headers
+get_target_property (JARFILE jtoadlet_peeper ${JARLOC})
 add_custom_command (TARGET jtoadlet_peeper POST_BUILD
-	COMMAND ${CMAKE_Java_GENERATOR} -classpath \\* ${PEEPER_H}
+	COMMAND ${CMAKE_Java_GENERATOR} -classpath ${JARFILE} ${PEEPER_H}
 )
 
 
@@ -155,8 +166,9 @@ set_target_properties (jtoadlet_ribbit PROPERTIES COMPILE_DEFINITIONS_DEBUG TOAD
 install (TARGETS jtoadlet_ribbit DESTINATION lib)
 
 # Generate headers
+get_target_property (JARFILE jtoadlet_ribbit ${JARLOC})
 add_custom_command (TARGET jtoadlet_ribbit POST_BUILD
-	COMMAND ${CMAKE_Java_GENERATOR} -classpath \\* ${RIBBIT_H}
+	COMMAND ${CMAKE_Java_GENERATOR} -classpath ${JARFILE} ${RIBBIT_H}
 )
 
 
@@ -190,6 +202,7 @@ add_dependencies (jtoadlet_pad jtoadlet_peeper jtoadlet_ribbit jtoadlet_flick)
 install (TARGETS jtoadlet_pad DESTINATION lib)
 
 # Generate headers
+get_target_property (JARFILE jtoadlet_pad ${JARLOC})
 add_custom_command (TARGET jtoadlet_pad POST_BUILD
-	COMMAND ${CMAKE_Java_GENERATOR} -classpath \\* ${PAD_H}
+	COMMAND ${CMAKE_Java_GENERATOR} -classpath ${JARFILE} ${PAD_H}
 )
