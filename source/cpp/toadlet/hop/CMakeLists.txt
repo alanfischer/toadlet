@@ -48,3 +48,8 @@ set_target_properties (toadlet_hop_s PROPERTIES ${STATIC_LIB_PROPS})
 target_link_libraries (toadlet_hop_s toadlet_egg_s)
 install (TARGETS toadlet_hop_s DESTINATION ${LIB_INSTALL_DIR})
 
+# HACK: install the library on iOS. This will disappear once cmake issue:0012506 is resolved. 
+if (TOADLET_PLATFORM_IOS)
+    install (DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/\$ENV{CONFIGURATION}\$ENV{EFFECTIVE_PLATFORM_NAME}/ DESTINATION ${LIB_INSTALL_DIR} FILES_MATCHING PATTERN "*.a")
+endif (TOADLET_PLATFORM_IOS)
+
