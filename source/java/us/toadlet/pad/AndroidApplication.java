@@ -27,6 +27,7 @@ package us.toadlet.pad;
 
 import android.app.Activity;
 import android.content.Context;
+import android.hardware.*;
 import android.view.*;
 import android.os.*;
 import us.toadlet.peeper.*;
@@ -203,9 +204,14 @@ public abstract class AndroidApplication extends Activity implements RenderTarge
 			notifyEngineAudioDevice(mEngine);
 		}
 
-		InputDevice motionDevice=new AndroidMotionDevice(this);
+		us.toadlet.flick.InputDevice motionDevice=new AndroidSensorDevice(this,Sensor.TYPE_ACCELEROMETER);
 		if(motionDevice.create()){
 			mInputDevices[motionDevice.getType()]=motionDevice;
+		}
+
+		us.toadlet.flick.InputDevice lightDevice=new AndroidSensorDevice(this,Sensor.TYPE_LIGHT);
+		if(lightDevice.create()){
+			mInputDevices[lightDevice.getType()]=lightDevice;
 		}
 
 		if(mApplet==null){
@@ -244,7 +250,7 @@ public abstract class AndroidApplication extends Activity implements RenderTarge
 		}
 
 		int i;
-		for(i=0;i<InputDevice.InputType_MAX;++i){
+		for(i=0;i<us.toadlet.flick.InputDevice.InputType_MAX;++i){
 			if(mInputDevices[i]!=null){
 				mInputDevices[i].destroy();
 				mInputDevices[i]=null;
@@ -464,7 +470,7 @@ public abstract class AndroidApplication extends Activity implements RenderTarge
 	public Engine getEngine(){return mEngine;}
 	public RenderDevice getRenderDevice(){return mRenderDevice;}
 	public AudioDevice getAudioDevice(){return mAudioDevice;}
-	public InputDevice getInputDevice(int i){return mInputDevices[i];}
+	public us.toadlet.flick.InputDevice getInputDevice(int i){return mInputDevices[i];}
 	
 	public void resized(int width,int height)		{if(mApplet!=null)mApplet.resized(width,height);}
 	public void focusGained()						{if(mApplet!=null)mApplet.focusGained();}
@@ -589,7 +595,7 @@ public abstract class AndroidApplication extends Activity implements RenderTarge
 	protected RenderTarget mRenderTarget;
 	protected RenderDevice mRenderDevice;
 	protected AudioDevice mAudioDevice;
-	protected InputDevice[] mInputDevices=new InputDevice[InputDevice.InputType_MAX];
+	protected us.toadlet.flick.InputDevice[] mInputDevices=new us.toadlet.flick.InputDevice[us.toadlet.flick.InputDevice.InputType_MAX];
 	protected int mNativeHandle;
 	
 	protected SurfaceHolder mNotifySurfaceCreated;

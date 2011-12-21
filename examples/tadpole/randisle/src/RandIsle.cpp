@@ -123,6 +123,12 @@ void RandIsle::create(){
 		joyDevice->setListener(this);
 		joyDevice->start();
 	}
+	
+	InputDevice *lightDevice=mApp->getInputDevice(InputDevice::InputType_LIGHT);
+	if(lightDevice!=NULL){
+		lightDevice->setListener(this);
+		lightDevice->start();
+	}
 
 	Logger::debug("RandIsle::create finished");
 }
@@ -134,6 +140,12 @@ void RandIsle::destroy(){
 	if(joyDevice!=NULL){
 		joyDevice->stop();
 		joyDevice->setListener(NULL);
+	}
+
+	InputDevice *lightDevice=mApp->getInputDevice(InputDevice::InputType_LIGHT);
+	if(lightDevice!=NULL){
+		lightDevice->stop();
+		lightDevice->setListener(NULL);
 	}
 
 	mScene->destroy();
@@ -583,6 +595,10 @@ void RandIsle::inputDetected(const InputData &data){
 			mXJoy=data.values[InputData::Semantic_JOY_DIRECTION].x;
 			mYJoy=data.values[InputData::Semantic_JOY_DIRECTION].y;
 		}
+	}
+
+	if(data.type==InputDevice::InputType_LIGHT){
+		Logger::alert(String("LIGHT:")+data.values[0].x);
 	}
 }
 

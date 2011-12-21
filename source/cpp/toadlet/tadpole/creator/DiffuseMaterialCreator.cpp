@@ -234,13 +234,17 @@ DiffuseMaterialCreator::DiffuseMaterialCreator(Engine *engine){
 	mPointSpriteFragmentShader=mEngine->getShaderManager()->createShader(Shader::ShaderType_FRAGMENT,profiles,pointSpriteFragmentCode,2);
 
 	mDiffuseShaderState=mEngine->getMaterialManager()->createShaderState();
-	mDiffuseShaderState->setShader(Shader::ShaderType_VERTEX,mDiffuseVertexShader);
-	mDiffuseShaderState->setShader(Shader::ShaderType_FRAGMENT,mDiffuseFragmentShader);
+	if(mDiffuseShaderState!=NULL){
+		mDiffuseShaderState->setShader(Shader::ShaderType_VERTEX,mDiffuseVertexShader);
+		mDiffuseShaderState->setShader(Shader::ShaderType_FRAGMENT,mDiffuseFragmentShader);
+	}
 
 	mPointShaderState=mEngine->getMaterialManager()->createShaderState();
-	mPointShaderState->setShader(Shader::ShaderType_VERTEX,mDiffuseVertexShader);
-	mPointShaderState->setShader(Shader::ShaderType_GEOMETRY,mPointSpriteGeometryShader);
-	mPointShaderState->setShader(Shader::ShaderType_FRAGMENT,mPointSpriteFragmentShader);
+	if(mPointShaderState!=NULL){
+		mPointShaderState->setShader(Shader::ShaderType_VERTEX,mDiffuseVertexShader);
+		mPointShaderState->setShader(Shader::ShaderType_GEOMETRY,mPointSpriteGeometryShader);
+		mPointShaderState->setShader(Shader::ShaderType_FRAGMENT,mPointSpriteFragmentShader);
+	}
 }
 
 void DiffuseMaterialCreator::destroy(){
@@ -372,6 +376,10 @@ Material::ptr DiffuseMaterialCreator::createPointSpriteMaterial(Texture::ptr tex
 }
 
 Material::ptr DiffuseMaterialCreator::createFontMaterial(Font::ptr font){
+	if(font==NULL){
+		return NULL;
+	}
+
 	Material::ptr material(new Material(mEngine->getMaterialManager()));
 
 	Texture::ptr texture=font->getTexture();

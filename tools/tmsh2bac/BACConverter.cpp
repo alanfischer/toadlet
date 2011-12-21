@@ -319,16 +319,15 @@ bool BACConverter::extractMeshData(Mesh::ptr mesh,bool useSubmeshes){
 					m->lighting=materialState.lighting;
 				}
 
-				Texture *texture=material->getPass()->getTexture(0);
-				String name=material->getPass()->getTextureName(0);
-				if(texture!=NULL || name.length()>0){
+				Texture *texture=material->getPass()->getTexture();
+				if(texture!=NULL){
 					int width=256,height=256;
-					if(texture!=NULL){
+					if(texture->getFormat()->getWidth()>0 && texture->getFormat()->getHeight()>0){
 						width=texture->getFormat()->getWidth();
 						height=texture->getFormat()->getHeight();
 					}
 					else{
-						Logger::alert(String("Texture ")+name+" not found, a texture must be available so msh2bac can determine the texture size.  Will default to 256x256");
+						Logger::alert(String("Texture ")+texture->getName()+" not found, a texture must be available so msh2bac can determine the texture size.  Will default to 256x256");
 					}
 					mTextures.add(Vector2(width,height));
 					m->textureIndex=mTextures.size()-1;
