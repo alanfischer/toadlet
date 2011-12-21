@@ -49,6 +49,7 @@ LabelNode::LabelNode():super(),
 	mRendered(false)
 
 	//mMaterial,
+	//mSharedRenderState,
 	//mVertexData,
 	//mIndexData
 {}
@@ -80,6 +81,11 @@ void LabelNode::destroy(){
 	if(mMaterial!=NULL){
 		mMaterial->release();
 		mMaterial=NULL;
+	}
+
+	if(mSharedRenderState!=NULL){
+		mSharedRenderState->destroy();
+		mSharedRenderState=NULL;
 	}
 
 	if(mFont!=NULL){
@@ -115,7 +121,15 @@ void LabelNode::setFont(const Font::ptr &font){
 	if(mMaterial!=NULL){
 		mMaterial->release();
 	}
-	mMaterial=getEngine()->getMaterialManager()->createFontMaterial(mFont);
+	if(mFont!=NULL){
+		mMaterial=getEngine()->getMaterialManager()->createFontMaterial(mFont);
+
+		if(mSharedRenderState!=NULL){
+			Material::ptr material=mEngine->getMaterialManager()->createSharedMaterial(mMaterial,mSharedRenderState);
+			mMaterial->release();
+			mMaterial=material;
+		}
+	}
 	if(mMaterial!=NULL){
 		mMaterial->retain();
 	}
@@ -148,7 +162,15 @@ void LabelNode::setWordWrap(bool wordWrap){
 }
 
 RenderState::ptr LabelNode::getSharedRenderState(){
-	return mMaterial->getPass()->getRenderState();
+	if(mSharedRenderState==NULL){
+		mSharedRenderState=mEngine->getMaterialManager()->createRenderState();
+		if(mMaterial!=NULL){
+			Material::ptr material=mEngine->getMaterialManager()->createSharedMaterial(mMaterial,mSharedRenderState);
+			mMaterial->release();
+			mMaterial=material;
+		}
+	}
+	return mSharedRenderState;
 }
 
 void LabelNode::gatherRenderables(CameraNode *camera,RenderableSet *set){
