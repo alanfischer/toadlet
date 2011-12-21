@@ -235,7 +235,7 @@ public:
 			creature->setTransform(transform);
 			creature->retain();
 		}
-		
+
 		Logger::alert("Loading shadow");
 
 		TextureFormat::ptr pointFormat(new TextureFormat(TextureFormat::Dimension_D2,TextureFormat::Format_A_8,128,128,1,0));
@@ -343,7 +343,7 @@ public:
 		if(hudSystem!=NULL){
 			hudSystem->retain();
 		}
-		
+
 		return true;
 	}
 
