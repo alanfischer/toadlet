@@ -39,7 +39,7 @@ class Engine;
 
 class TOADLET_API TextureManager:public ResourceManager,public RenderTargetDestroyedListener{
 public:
-	TextureManager(Engine *engine,bool backable);
+	TextureManager(Engine *engine);
 	virtual ~TextureManager();
 
 	void destroy();
@@ -69,7 +69,6 @@ public:
 
 protected:
 	Engine *mEngine;
-	bool mBackable;
 
 	Collection<PixelBufferRenderTarget::ptr> mRenderTargets;
 	VideoHandler::ptr mVideoHandler;

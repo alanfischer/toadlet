@@ -30,12 +30,10 @@
 namespace toadlet{
 namespace tadpole{
 
-BufferManager::BufferManager(Engine *engine,bool backable):
-	mEngine(NULL),
-	mBackable(false)
+BufferManager::BufferManager(Engine *engine):
+	mEngine(NULL)
 {
 	mEngine=engine;
-	mBackable=backable;
 }
 
 BufferManager::~BufferManager(){
@@ -93,132 +91,147 @@ void BufferManager::destroy(){
 }
 
 VertexFormat::ptr BufferManager::createVertexFormat(){
+	RenderDevice *renderDevice=mEngine->getRenderDevice();
 	VertexFormat::ptr vertexFormat;
-	if(mBackable || mEngine->getRenderDevice()==NULL){
+	if(renderDevice==NULL /*mEngine->isBackable()*/){ /// @todo: Engine uses this before it has a renderer.  Need to change the Engine so it wont call any resource items without on
 		BackableVertexFormat::ptr backableVertexFormat(new BackableVertexFormat());
 		backableVertexFormat->create();
-		if(mEngine->getRenderDevice()!=NULL){
-			VertexFormat::ptr back(mEngine->getRenderDevice()->createVertexFormat());
+		if(renderDevice!=NULL){
+			VertexFormat::ptr back(renderDevice->createVertexFormat());
 			backableVertexFormat->setBack(back);
 		}
 		vertexFormat=backableVertexFormat;
 	}
 	else{
-		vertexFormat=VertexFormat::ptr(mEngine->getRenderDevice()->createVertexFormat());
+		vertexFormat=VertexFormat::ptr(renderDevice->createVertexFormat());
 		if(vertexFormat==NULL){
 			return NULL;
 		}
 		vertexFormat->create();
 	}
 
-	mVertexFormats.add(vertexFormat);
+	if(vertexFormat!=NULL){
+		mVertexFormats.add(vertexFormat);
 
-	vertexFormat->setVertexFormatDestroyedListener(this);
+		vertexFormat->setVertexFormatDestroyedListener(this);
+	}
 
 	return vertexFormat;
 }
 
 IndexBuffer::ptr BufferManager::createIndexBuffer(int usage,int access,IndexBuffer::IndexFormat indexFormat,int size){
+	RenderDevice *renderDevice=mEngine->getRenderDevice();
 	IndexBuffer::ptr buffer;
-	if(mBackable || mEngine->getRenderDevice()==NULL){
+	if(mEngine->isBackable()){
 		BackableBuffer::ptr backableBuffer(new BackableBuffer());
 		backableBuffer->create(usage,access,indexFormat,size);
-		if(mEngine->getRenderDevice()!=NULL){
-			IndexBuffer::ptr back(mEngine->getRenderDevice()->createIndexBuffer());
+		if(renderDevice!=NULL){
+			IndexBuffer::ptr back(renderDevice->createIndexBuffer());
 			backableBuffer->setBack(back);
 		}
 		buffer=backableBuffer;
 	}
 	else{
-		buffer=IndexBuffer::ptr(mEngine->getRenderDevice()->createIndexBuffer());
+		buffer=IndexBuffer::ptr(renderDevice->createIndexBuffer());
 		if(buffer==NULL){
 			return NULL;
 		}
 		buffer->create(usage,access,indexFormat,size);
 	}
 
-	mIndexBuffers.add(buffer);
+	if(buffer!=NULL){
+		mIndexBuffers.add(buffer);
 
-	buffer->setBufferDestroyedListener(this);
+		buffer->setBufferDestroyedListener(this);
+	}
 
 	return buffer;
 }
 
 VertexBuffer::ptr BufferManager::createVertexBuffer(int usage,int access,VertexFormat::ptr vertexFormat,int size){
+	RenderDevice *renderDevice=mEngine->getRenderDevice();
 	VertexBuffer::ptr buffer;
-	if(mBackable || mEngine->getRenderDevice()==NULL){
+	if(mEngine->isBackable()){
 		BackableBuffer::ptr backableBuffer(new BackableBuffer());
 		backableBuffer->create(usage,access,vertexFormat,size);
-		if(mEngine->getRenderDevice()!=NULL){
-			VertexBuffer::ptr back(mEngine->getRenderDevice()->createVertexBuffer());
+		if(renderDevice!=NULL){
+			VertexBuffer::ptr back(renderDevice->createVertexBuffer());
 			backableBuffer->setBack(back);
 		}
 		buffer=backableBuffer;
 	}
 	else{
-		buffer=VertexBuffer::ptr(mEngine->getRenderDevice()->createVertexBuffer());
+		buffer=VertexBuffer::ptr(renderDevice->createVertexBuffer());
 		if(buffer==NULL){
 			return NULL;
 		}
 		buffer->create(usage,access,vertexFormat,size);
 	}
 
-	mVertexBuffers.add(buffer);
+	if(buffer!=NULL){
+		mVertexBuffers.add(buffer);
 
-	buffer->setBufferDestroyedListener(this);
+		buffer->setBufferDestroyedListener(this);
+	}
 
 	return buffer;
 }
 
 PixelBuffer::ptr BufferManager::createPixelBuffer(int usage,int access,int pixelFormat,int width,int height,int depth){
+	RenderDevice *renderDevice=mEngine->getRenderDevice();
 	TextureFormat::ptr textureFormat(new TextureFormat(TextureFormat::Dimension_D2,pixelFormat,width,height,depth,1));
 	PixelBuffer::ptr buffer;
-	if(mBackable || mEngine->getRenderDevice()==NULL){
+	if(mEngine->isBackable()){
 		BackableBuffer::ptr backableBuffer(new BackableBuffer());
 		backableBuffer->create(usage,access,textureFormat);
-		if(mEngine->getRenderDevice()!=NULL){
-			PixelBuffer::ptr back(mEngine->getRenderDevice()->createPixelBuffer());
-			backableBuffer->setBack(back,mEngine->getRenderDevice());
+		if(renderDevice!=NULL){
+			PixelBuffer::ptr back(renderDevice->createPixelBuffer());
+			backableBuffer->setBack(back,renderDevice);
 		}
 		buffer=backableBuffer;
 	}
 	else{
-		buffer=PixelBuffer::ptr(mEngine->getRenderDevice()->createPixelBuffer());
+		buffer=PixelBuffer::ptr(renderDevice->createPixelBuffer());
 		if(buffer==NULL){
 			return NULL;
 		}
 		buffer->create(usage,access,textureFormat);
 	}
 
-	mPixelBuffers.add(buffer);
+	if(buffer!=NULL){
+		mPixelBuffers.add(buffer);
 
-	buffer->setBufferDestroyedListener(this);
+		buffer->setBufferDestroyedListener(this);
+	}
 
 	return buffer;
 }
 
 VariableBuffer::ptr BufferManager::createVariableBuffer(int usage,int access,VariableBufferFormat::ptr format){
+	RenderDevice *renderDevice=mEngine->getRenderDevice();
 	VariableBuffer::ptr buffer;
-	if(mBackable || mEngine->getRenderDevice()==NULL){
+	if(mEngine->hasShader(Shader::ShaderType_VERTEX)){
 		BackableBuffer::ptr backableBuffer(new BackableBuffer());
 		backableBuffer->create(usage,access,format);
-		if(mEngine->getRenderDevice()!=NULL){
-			VariableBuffer::ptr back(mEngine->getRenderDevice()->createVariableBuffer());
+		if(renderDevice!=NULL){
+			VariableBuffer::ptr back(renderDevice->createVariableBuffer());
 			backableBuffer->setBack(back);
 		}
 		buffer=backableBuffer;
 	}
 	else{
-		buffer=VariableBuffer::ptr(mEngine->getRenderDevice()->createVariableBuffer());
+		buffer=VariableBuffer::ptr(renderDevice->createVariableBuffer());
 		if(buffer==NULL){
 			return NULL;
 		}
 		buffer->create(usage,access,format);
 	}
 
-	mVariableBuffers.add(buffer);
+	if(buffer!=NULL){
+		mVariableBuffers.add(buffer);
 
-	buffer->setBufferDestroyedListener(this);
+		buffer->setBufferDestroyedListener(this);
+	}
 
 	return buffer;
 }
@@ -429,7 +442,7 @@ void BufferManager::vertexFormatDestroyed(VertexFormat *vertexFormat){
 }
 
 bool BufferManager::useTriFan(){
-	return !mBackable && mEngine->getRenderCaps().triangleFan;
+	return !mEngine->isBackable() && mEngine->getRenderCaps().triangleFan;
 }
 
 void BufferManager::outputVariableBufferFormat(VariableBufferFormat::ptr format){

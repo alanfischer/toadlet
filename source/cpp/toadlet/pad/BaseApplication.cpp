@@ -72,7 +72,6 @@ void BaseApplication::mapKeyNames(Map<int,String> &keyToName,Map<String,int> &na
 }
 
 BaseApplication::BaseApplication():
-	mBackable(false),
 	//mFormat,
 	mApplet(NULL),
 
@@ -111,7 +110,7 @@ bool BaseApplication::create(String renderDevice,String audioDevice){
 
 	preEngineCreate();
 
-	mEngine=new Engine(mBackable);
+	mEngine=new Engine();
 
 	/// @todo: Unify the plugin framework a bit so we dont have as much code duplication for this potion, and the creating of the plugin
 	mNewRenderDevicePlugin=mCurrentRenderDevicePlugin=renderDevice;

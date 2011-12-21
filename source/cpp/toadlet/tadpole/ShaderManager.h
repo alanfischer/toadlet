@@ -36,7 +36,7 @@ class Engine;
 
 class TOADLET_API ShaderManager:public ResourceManager{
 public:
-	ShaderManager(Engine *engine,bool backable);
+	ShaderManager(Engine *engine);
 
 	Shader::ptr createShader(Shader::ShaderType type,const String profiles[],const String codes[],int numCodes);
 	Shader::ptr createShader(Shader::ShaderType type,const String &profile,const String &code);
@@ -46,7 +46,6 @@ public:
 
 protected:
 	Engine *mEngine;
-	bool mBackable;
 };
 
 }

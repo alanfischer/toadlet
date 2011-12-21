@@ -41,7 +41,7 @@ JNIEXPORT void JNICALL Java_us_toadlet_pad_AndroidApplication_destroyNativeAppli
 }
 
 JNIEXPORT jobject JNICALL Java_us_toadlet_pad_AndroidApplication_makeEngine(JNIEnv *env,jobject obj){
-	Engine *engine=new Engine(true);
+	Engine *engine=new Engine(true,false);
 	jobject engineObj=NULL;
 	jobject assetManagerObj=NULL;
 	

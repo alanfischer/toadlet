@@ -57,8 +57,8 @@ public:
 			delete[] noise1Data;
 			delete[] noise2Data;
 
-			RenderPath::ptr shaderPath=waterMaterial->addPath();
-			{
+			if(engine->hasShader(Shader::ShaderType_VERTEX) && engine->hasShader(Shader::ShaderType_FRAGMENT)){
+				RenderPath::ptr shaderPath=waterMaterial->addPath();
 				RenderPass::ptr pass=shaderPath->addPass();
 
 				pass->setMaterialState(MaterialState(color));
@@ -201,8 +201,8 @@ public:
 				pass->getVariables()->addTexture("tex1",noise2,"samp1",SamplerState(),textureState);
 			}
 
-			RenderPath::ptr fixedPath=waterMaterial->addPath();
-			{
+			if(engine->hasFixed(Shader::ShaderType_VERTEX) && engine->hasFixed(Shader::ShaderType_FRAGMENT)){
+				RenderPath::ptr fixedPath=waterMaterial->addPath();
 				RenderPass::ptr pass=fixedPath->addPass();
 
 				pass->setMaterialState(MaterialState(color));

@@ -5,7 +5,6 @@ extern void destroyApplet(Applet *applet);
 
 int toadletMain(int argc,char **argv){
 	PlatformApplication app;
-	app.setBackable(true);
 	Applet *applet=createApplet(&app);
 	app.setApplet(applet);
 	app.defaultCreate();

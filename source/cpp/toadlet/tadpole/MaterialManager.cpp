@@ -37,9 +37,8 @@
 namespace toadlet{
 namespace tadpole{
 
-MaterialManager::MaterialManager(Engine *engine,bool backable):ResourceManager(engine->getArchiveManager()),
+MaterialManager::MaterialManager(Engine *engine):ResourceManager(engine->getArchiveManager()),
 	mEngine(NULL),
-	mBackable(false),
 
 	//mRenderStates,
 	//mShaderStates,
@@ -47,7 +46,6 @@ MaterialManager::MaterialManager(Engine *engine,bool backable):ResourceManager(e
 	mRenderPathChooser(NULL)
 {
 	mEngine=engine;
-	mBackable=backable;
 }
 
 void MaterialManager::destroy(){
@@ -138,68 +136,70 @@ Material::ptr MaterialManager::createSkyBoxMaterial(Texture::ptr texture){
 }
 
 RenderState::ptr MaterialManager::createRenderState(){
+	RenderDevice *renderDevice=mEngine->getRenderDevice();
 	RenderState::ptr renderState;
-
-	if(mBackable || mEngine->getRenderDevice()==NULL){
+	if(mEngine->isBackable()){
 		Logger::debug(Categories::TOADLET_TADPOLE,"creating BackableRenderState");
 
 		BackableRenderState::ptr backableRenderState(new BackableRenderState());
 		backableRenderState->create();
-		if(mEngine->getRenderDevice()!=NULL){
-			RenderState::ptr back(mEngine->getRenderDevice()->createRenderState());
+		if(renderDevice!=NULL){
+			RenderState::ptr back(renderDevice->createRenderState());
 			backableRenderState->setBack(back);
 		}
 		renderState=backableRenderState;
 	}
-	else{
+	else if(renderDevice!=NULL){
 		Logger::debug(Categories::TOADLET_TADPOLE,"creating RenderState");
 
-		renderState=RenderState::ptr(mEngine->getRenderDevice()->createRenderState());
+		renderState=RenderState::ptr(renderDevice->createRenderState());
 		if(renderState==NULL || renderState->create()==false){
 			return NULL;
 		}
 	}
 
-	renderState->setRenderStateDestroyedListener(this);
-	mRenderStates.add(renderState);
+	if(renderState!=NULL){
+		mRenderStates.add(renderState);
+
+		renderState->setRenderStateDestroyedListener(this);
+	}
 
 	return renderState;
 }
 
 ShaderState::ptr MaterialManager::createShaderState(){
+	RenderDevice *renderDevice=mEngine->getRenderDevice();
 	ShaderState::ptr shaderState;
-
-	if(mEngine->hasShader(Shader::ShaderType_VERTEX)==false){
-		return shaderState;
-	}
-
-	if(mBackable || mEngine->getRenderDevice()==NULL){
+	if(mEngine->hasShader(Shader::ShaderType_VERTEX)){
 		Logger::debug(Categories::TOADLET_TADPOLE,"creating BackableShaderState");
 
 		BackableShaderState::ptr backableShaderState(new BackableShaderState());
 		backableShaderState->create();
-		if(mEngine->getRenderDevice()!=NULL){
+		if(renderDevice!=NULL){
 			ShaderState::ptr back;
 			TOADLET_TRY
-				back=ShaderState::ptr(mEngine->getRenderDevice()->createShaderState());
+				back=ShaderState::ptr(renderDevice->createShaderState());
 			TOADLET_CATCH(const Exception &){}
 			backableShaderState->setBack(back);
 		}
 		shaderState=backableShaderState;
 	}
-	else{
+	else if(renderDevice!=NULL){
 		Logger::debug(Categories::TOADLET_TADPOLE,"creating ShaderState");
 
 		TOADLET_TRY
-			shaderState=ShaderState::ptr(mEngine->getRenderDevice()->createShaderState());
+			shaderState=ShaderState::ptr(renderDevice->createShaderState());
 		TOADLET_CATCH(const Exception &){}
 		if(shaderState==NULL || shaderState->create()==false){
 			return NULL;
 		}
 	}
 
-	shaderState->setShaderStateDestroyedListener(this);
-	mShaderStates.add(shaderState);
+	if(shaderState!=NULL){
+		mShaderStates.add(shaderState);
+
+		shaderState->setShaderStateDestroyedListener(this);
+	}
 
 	return shaderState;
 }

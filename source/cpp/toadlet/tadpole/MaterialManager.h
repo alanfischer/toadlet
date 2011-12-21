@@ -39,7 +39,7 @@ class BufferManager;
 
 class TOADLET_API MaterialManager:public ResourceManager,public RenderStateDestroyedListener,public ShaderStateDestroyedListener{
 public:
-	MaterialManager(Engine *engine,bool backable);
+	MaterialManager(Engine *engine);
 
 	void destroy();
 
@@ -82,7 +82,6 @@ public:
 
 protected:
 	Engine *mEngine;
-	bool mBackable;
 
 	Collection<RenderState::ptr> mRenderStates;
 	Collection<ShaderState::ptr> mShaderStates;
