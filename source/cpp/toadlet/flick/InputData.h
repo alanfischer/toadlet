@@ -44,6 +44,9 @@ public:
 		Semantic_MOTION_ACCELERATION=0,
 		Semantic_MOTION_VELOCITY=1,
 		Semantic_MAX_MOTION,
+
+		Semantic_LIGHT=0,
+		Semantic_MAX_LIGHT,
 	};
 
 	InputData(int type1=0,int time1=0,int size=0):
