@@ -44,8 +44,7 @@ Node *HUD::create(Scene *scene){
 	mAcornLabel->setAlignment(Font::Alignment_BIT_VCENTER|Font::Alignment_BIT_LEFT);
 	mAcornLabel->setTranslate(-0.60,0.80,0);
 	mAcornLabel->setScale(0.3,0.3,0.3);
-	mAcornLabel->getRenderMaterial()->getPass()->setDepthState(DepthState(DepthState::DepthTest_NEVER,false));
-	mAcornLabel->getRenderMaterial()->getPass()->setMaterialState(MaterialState(Colors::BROWN));
+	mAcornLabel->getSharedRenderState()->setMaterialState(MaterialState(Colors::BROWN));
 	attach(mAcornLabel);
 	updateAcornCount(0);
 
@@ -53,7 +52,6 @@ Node *HUD::create(Scene *scene){
 	mSystemLabel->setFont(Resources::instance->hudSystem);
 	mSystemLabel->setTranslate(-0.25,-0.80,0);
 	mSystemLabel->setScale(0.1,0.1,0.1);
-	mSystemLabel->getRenderMaterial()->getPass()->setDepthState(DepthState(DepthState::DepthTest_NEVER,false));
 	attach(mSystemLabel);
 
 	return this;
@@ -171,7 +169,7 @@ void HUD::logicUpdate(int dt,int scope){
 	}
 
 	/// @todo: Why isn't this working?
-	mSystemLabel->setText(String("FPS:")+(int)getFramesPerSecond());
+//	mSystemLabel->setText(String("FPS:")+(int)getFramesPerSecond());
 
 	super::logicUpdate(dt,scope);
 }

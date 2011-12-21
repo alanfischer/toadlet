@@ -67,7 +67,7 @@ set (FLICK_SRC
 	${JAVA_SRC_DIR}/flick/InputDevice.java
 	${JAVA_SRC_DIR}/flick/InputDeviceListener.java
 	${JAVA_SRC_DIR}/flick/NInputDeviceListener.java
-	${JAVA_SRC_DIR}/flick/AndroidMotionDevice.java
+	${JAVA_SRC_DIR}/flick/AndroidSensorDevice.java
 	${CMAKE_CURRENT_BINARY_DIR}/${JAVA_SRC_DIR}/flick/Version.java
 )
 

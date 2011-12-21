@@ -24,16 +24,8 @@ bool MeshOptimizer::optimizeMesh(Mesh *mesh,Engine *engine){
 				Material::ptr material1=subMesh1->material;
 				Material::ptr material2=subMesh2->material;
 
-				if(material1!=NULL && material2!=NULL){
-					/// @todo: We need a much smarter Material comparison function
-					{
-						MaterialState materialState1,materialState2;
-						material1->getPass()->getMaterialState(materialState1);material2->getPass()->getMaterialState(materialState2);
-						if(materialState1!=materialState2) continue;
-
-						if(material1->getPass()->getTexture()!=material2->getPass()->getTexture() || material1->getPass()->getTextureName()!=material2->getPass()->getTextureName()) continue;
-					}
-
+				/// @todo: We need a much smarter Material comparison function
+				if(material1==material2){
 					IndexBuffer::ptr ib1=subMesh1->indexData->getIndexBuffer();
 					IndexBuffer::ptr ib2=subMesh2->indexData->getIndexBuffer();
 					IndexBuffer::ptr cib=engine->getBufferManager()->cloneIndexBuffer(ib1,ib1->getUsage(),ib1->getAccess(),ib1->getIndexFormat(),ib1->getSize()+ib2->getSize());
