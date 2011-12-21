@@ -1,7 +1,10 @@
-#include "us_toadlet_pad_Engine.h"
 #include <toadlet/tadpole/Engine.h>
 
 using namespace toadlet::tadpole;
+
+extern "C" {
+
+#include "us_toadlet_pad_Engine.h"
 
 JNIEXPORT void JNICALL Java_us_toadlet_pad_Engine_destroy(JNIEnv *env,jobject obj){
 	Engine *engine=(Engine*)env->CallIntMethod(obj,getNativeHandleEngineID);
@@ -11,4 +14,6 @@ JNIEXPORT void JNICALL Java_us_toadlet_pad_Engine_destroy(JNIEnv *env,jobject ob
 JNIEXPORT void JNICALL Java_us_toadlet_pad_Engine_installHandlers(JNIEnv *env,jobject obj){
 	Engine *engine=(Engine*)env->CallIntMethod(obj,getNativeHandleEngineID);
 	engine->installHandlers();
+}
+
 }

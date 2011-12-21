@@ -1,7 +1,10 @@
-#include "us_toadlet_pad_NApplet.h"
 #include <toadlet/pad/Applet.h>
 
 using namespace toadlet::pad;
+
+extern "C" {
+
+#include "us_toadlet_pad_NApplet.h"
 
 JNIEXPORT void JNICALL Java_us_toadlet_pad_NApplet_create(JNIEnv *env,jobject obj){
 	Applet *applet=(Applet*)env->GetIntField(obj,nativeHandleAppletID);
@@ -67,4 +70,6 @@ JNIEXPORT void JNICALL Java_us_toadlet_pad_NApplet_mouseReleased(JNIEnv *env,job
 JNIEXPORT void JNICALL Java_us_toadlet_pad_NApplet_mouseScrolled(JNIEnv *env,jobject obj,jint x,jint y,jint scroll){
 	Applet *applet=(Applet*)env->GetIntField(obj,nativeHandleAppletID);
 	applet->mouseScrolled(x,y,scroll);
+}
+
 }
