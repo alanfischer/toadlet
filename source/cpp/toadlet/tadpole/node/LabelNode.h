@@ -98,6 +98,7 @@ protected:
 	bool mRendered;
 
 	Material::ptr mMaterial;
+	RenderState::ptr mSharedRenderState;
 	VertexData::ptr mVertexData;
 	IndexData::ptr mIndexData;
 };
