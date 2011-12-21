@@ -49,9 +49,7 @@ public:
 		mScene(NULL),
 		mCamera(NULL),
 		mRenderable(NULL)
-	{
-		mTextureState.resize(8);
-	}
+	{}
 
 	inline void setScene(Scene *scene){mScene=scene;}
 	inline Scene *getScene() const{return mScene;}
@@ -79,7 +77,6 @@ public:
 	inline const MaterialState &getMaterialState() const{return mMaterialState;}
 	inline const PointState &getPointState() const{return mPointState;}
 	inline const FogState &getFogState() const{return mFogState;}
-	inline const TextureState &getTextureState(int i) const{return mTextureState[i];}
 
 	inline void setLightState(const LightState &state){mLightState.set(state);}
 	inline const LightState &getLightState() const{return mLightState;}
@@ -97,7 +94,6 @@ protected:
 	MaterialState mMaterialState;
 	PointState mPointState;
 	FogState mFogState;
-	Collection<TextureState> mTextureState;
 
 	LightState mLightState;
 	Vector4 mAmbient;

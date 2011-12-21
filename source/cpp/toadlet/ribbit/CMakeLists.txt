@@ -49,7 +49,9 @@ install (TARGETS toadlet_ribbit_s DESTINATION ${LIB_INSTALL_DIR})
 
 # Platform specific modules
 if (TOADLET_PLATFORM_ANDROID)
-	add_subdirectory (plugins/jaudiodevice)
+	if (ANDROID_NDK_API_LEVEL LESS 9)
+		add_subdirectory (plugins/jaudiodevice)
+	endif (ANDROID_NDK_API_LEVEL LESS 9)
 elseif (TOADLET_PLATFORM_WINCE)
 	add_subdirectory (plugins/mmaudiodevice)
 elseif (TOADLET_PLATFORM_IOS)
