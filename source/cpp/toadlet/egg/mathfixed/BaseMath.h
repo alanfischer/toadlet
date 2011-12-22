@@ -169,12 +169,12 @@ namespace Math{
 	}
 
 	inline fixed clamp(fixed low,fixed high,fixed value){
-		low=TOADLET_MAX_XX(low,value);
+		value=TOADLET_MAX_XX(low,value);
 		return TOADLET_MIN_XX(high,low);
 	}
 
 	inline int intClamp(int low,int high,int value){
-		low=TOADLET_MAX_XX(low,value);
+		value=TOADLET_MAX_XX(low,value);
 		return TOADLET_MIN_XX(high,low);
 	}
 

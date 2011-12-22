@@ -25,8 +25,6 @@
 
 #include <toadlet/egg/platform/posix/PosixSystem.h>
 #include <sys/time.h>
-#include <iostream>
-#include <fstream>
 #include <unistd.h>
 #include <pthread.h>
 #if defined(TOADLET_HAS_NEON)

@@ -13,6 +13,7 @@
 #  TOADLET_FLICK_LIB
 #  TOADLET_FLICK_IOSMOTIONDEVICE_LIB
 #  TOADLET_FLICK_JINPUTDEVICE_LIB
+#  TOADLET_FLICK_MFVIDEODEVICE_LIB
 #  TOADLET_FLICK_WIN32JOYDEVICE_LIB
 #  TOADLET_HOP_LIB
 #  TOADLET_KNOT_LIB
@@ -34,6 +35,7 @@
 #  TOADLET_FLICK_DLL
 #  TOADLET_FLICK_IOSMOTIONDEVICE_DLL
 #  TOADLET_FLICK_JINPUTDEVICE_DLL
+#  TOADLET_FLICK_MFVIDEODEVICE_DLL
 #  TOADLET_FLICK_WIN32JOYDEVICE_DLL
 #  TOADLET_HOP_DLL
 #  TOADLET_KNOT_DLL
@@ -106,9 +108,10 @@ set (TOADLET_LIB_BASENAMES
 	toadlet_peeper
 	toadlet_knot
 	toadlet_hop
-	toadlet_flick_win32joydevice
-	toadlet_flick_jinputdevice
 	toadlet_flick_iosmotiondevice
+	toadlet_flick_jinputdevice
+	toadlet_flick_mfvideodevice
+	toadlet_flick_win32joydevice
 	toadlet_flick
 	toadlet_egg
 )

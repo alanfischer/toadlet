@@ -2,7 +2,6 @@
 #define VIDEO_H
 
 #include <toadlet/toadlet.h>
-#include "VideoDevice.h"
 
 class Video:public Applet,public VideoDeviceListener{
 public:
