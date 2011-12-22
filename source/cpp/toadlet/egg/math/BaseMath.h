@@ -134,12 +134,12 @@ namespace Math{
 	}
 
 	inline real clamp(real low,real high,real value){
-		low=TOADLET_MAX_RR(low,value);
-		return TOADLET_MIN_RR(high,low);
+		value=TOADLET_MAX_RR(low,value);
+		return TOADLET_MIN_RR(high,value);
 	}
 
 	inline int intClamp(int low,int high,int value){
-		low=TOADLET_MAX_RR(low,value);
+		value=TOADLET_MAX_RR(low,value);
 		return TOADLET_MIN_RR(high,value);
 	}
 

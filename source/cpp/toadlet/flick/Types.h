@@ -31,6 +31,7 @@
 #include <toadlet/egg/math/Math.h>
 #include <toadlet/egg/SharedPointer.h>
 #include <toadlet/egg/WeakPointer.h>
+#include <toadlet/peeper/Types.h>
 
 namespace toadlet{
 namespace flick{
@@ -42,6 +43,7 @@ namespace flick{
 #endif
 
 using namespace toadlet::egg;
+using namespace toadlet::peeper;
 
 }
 }

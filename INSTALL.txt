@@ -70,10 +70,6 @@ toadlet-ribbit:
 
   * OpenAL
 
-  * Ogg Vorbis
-
-  * Sidplay
-
 
 
 toadlet-tadpole:
@@ -93,6 +89,10 @@ toadlet-tadpole:
   * MiniXML
 
   * Gdiplus (Windows only)
+
+  * Ogg Vorbis
+
+  * Sidplay
 
 
 

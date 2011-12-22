@@ -1,5 +1,6 @@
 #include "Video.h"
-#include "MFVideoDevice.h"
+
+extern "C" VideoDevice *new_MFVideoDevice();
 
 Video::Video(Application *application){
 	app=application;
@@ -13,7 +14,7 @@ void Video::create(){
 
 	scene=Scene::ptr(new Scene(engine));
 
-	MFVideoDevice *device=new MFVideoDevice();
+	VideoDevice *device=new_MFVideoDevice();
 	device->create();
 	device->setListener(this);
 
