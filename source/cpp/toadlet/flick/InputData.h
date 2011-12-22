@@ -36,17 +36,20 @@ class InputData{
 public:	
 	enum Semantic{
 		Semantic_JOY_BUTTON_PRESSED=0,
-		Semantic_JOY_BUTTON_RELEASED=1,
-		Semantic_JOY_DIRECTION=2,
-		Semantic_JOY_ROTATION=3,
+		Semantic_JOY_BUTTON_RELEASED,
+		Semantic_JOY_DIRECTION,
+		Semantic_JOY_ROTATION,
 		Semantic_MAX_JOY,
 		
 		Semantic_MOTION_ACCELERATION=0,
-		Semantic_MOTION_VELOCITY=1,
+		Semantic_MOTION_VELOCITY,
 		Semantic_MAX_MOTION,
 
 		Semantic_LIGHT=0,
 		Semantic_MAX_LIGHT,
+
+		Semantic_PROXIMITY=0,
+		Semantic_MAX_PROXIMITY,
 	};
 
 	InputData(int type1=0,int time1=0,int size=0):

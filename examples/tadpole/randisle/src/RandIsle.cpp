@@ -130,6 +130,12 @@ void RandIsle::create(){
 		lightDevice->start();
 	}
 
+	InputDevice *proximityDevice=mApp->getInputDevice(InputDevice::InputType_PROXIMITY);
+	if(proximityDevice!=NULL){
+		proximityDevice->setListener(this);
+		proximityDevice->start();
+	}
+
 	Logger::debug("RandIsle::create finished");
 }
 
@@ -146,6 +152,12 @@ void RandIsle::destroy(){
 	if(lightDevice!=NULL){
 		lightDevice->stop();
 		lightDevice->setListener(NULL);
+	}
+
+	InputDevice *proximityDevice=mApp->getInputDevice(InputDevice::InputType_PROXIMITY);
+	if(proximityDevice!=NULL){
+		proximityDevice->stop();
+		proximityDevice->setListener(NULL);
 	}
 
 	mScene->destroy();
@@ -599,6 +611,10 @@ void RandIsle::inputDetected(const InputData &data){
 
 	if(data.type==InputDevice::InputType_LIGHT){
 		Logger::alert(String("LIGHT:")+data.values[0].x);
+	}
+
+	if(data.type==InputDevice::InputType_PROXIMITY){
+		Logger::alert(String("PROXIMITY:")+data.values[0].x);
 	}
 }
 
