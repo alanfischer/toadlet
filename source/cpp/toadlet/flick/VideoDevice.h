@@ -27,6 +27,7 @@
 #define TOADLET_FLICK_VIDEODEVICE_H
 
 #include <toadlet/flick/Types.h>
+#include <toadlet/peeper/TextureFormat.h>
 
 namespace toadlet{
 namespace flick{
@@ -45,6 +46,7 @@ public:
 	virtual void update(int dt)=0;
 	virtual void stop()=0;
 
+	virtual TextureFormat::ptr getTextureFormat()=0;
 	virtual void setListener(VideoDeviceListener *listener)=0;
 };
 

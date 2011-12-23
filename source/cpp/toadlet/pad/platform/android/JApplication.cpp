@@ -26,6 +26,7 @@
 #include "JApplication.h"
 #include <toadlet/egg/Error.h>
 #include <toadlet/egg/Logger.h>
+#include <toadlet/tadpole/handler/platform/android/JStream.h>
 
 using namespace toadlet::egg;
 using namespace toadlet::peeper;
@@ -254,6 +255,10 @@ InputDevice *JApplication::getInputDevice(InputDevice::InputType i) const{
 	}
 
 	return mInputDevices[i];
+}
+
+Stream::ptr JApplication::makeStream(JNIEnv *env,jobject obj){
+	return Stream::ptr(new JStream(env,obj));
 }
 
 }

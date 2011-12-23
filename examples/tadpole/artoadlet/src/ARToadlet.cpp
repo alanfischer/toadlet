@@ -1,36 +1,26 @@
 #include "ARToadlet.h"
 
+#pragma comment(lib,"libAR.lib")
+
+extern "C" VideoDevice *new_MFVideoDevice();
+
 ARToadlet::ARToadlet(Application *app){
 	mApp=app;
 }
 
 bool ARToadlet::setupARCamera(const String &cameraParamFile,const String &config,ARParam *cameraParams){
 	ARParam wparam;
-	int width,height;
-	
-	if(arVideoOpen((char*)config.c_str())<0){
-		Error::unknown("error opening camera connection");
-		return false;
-	}
-	
-	if(arVideoInqSize(&width,&height)<0){
-		Error::unknown("error getting video size");
-		return false;
-	}
-	
+
 	if(arParamLoad(cameraParamFile,1,&wparam)<0){
 		Error::unknown("error loading parameter file");
 		return false;
 	}
 	
-	arParamChangeSize(&wparam,width,height,cameraParams);
+	arParamChangeSize(&wparam,mTextureFormat->getWidth(),mTextureFormat->getHeight(),cameraParams);
 	arParamDisp(cameraParams);
 	arInitCparam(cameraParams);
 
-	if(arVideoCapStart()!=0){
-		Error::unknown("unable to begin data capture");
-		return false;
-	}
+	mVideoDevice->start();
 	
 	return true;
 }
@@ -38,6 +28,13 @@ bool ARToadlet::setupARCamera(const String &cameraParamFile,const String &config
 void ARToadlet::create(){
 	mEngine=mApp->getEngine();
 	mScene=Scene::ptr(new Scene(mEngine));
+
+	mVideoDevice=new_MFVideoDevice();
+	mVideoDevice->create();
+	mVideoDevice->setListener(this);
+	mTextureFormat=TextureFormat::ptr(new TextureFormat(mVideoDevice->getTextureFormat()));
+	mTextureFormat->setPixelFormat(TextureFormat::Format_RGBA_8);
+	mTextureData=new tbyte[mTextureFormat->getDataSize()];
 
 	mCamera=mEngine->createNodeType(CameraNode::type(),mScene);
 	// Mainly set our near & far distances here, so we can check them later on
@@ -51,25 +48,27 @@ void ARToadlet::create(){
 	mElco=mEngine->createNodeType(ParentNode::type(),mScene);
 	{
 		MeshNode::ptr mesh=mEngine->createNodeType(MeshNode::type(),mScene);
-		mesh->setMesh(mEngine->getMeshManager()->findMesh("elco.xmsh"));
+		mesh->setMesh(mEngine->getMeshManager()->createAABoxMesh(AABox(-10,-10,-10,10,10,10)));//findMesh("elco.xmsh"));
 		mesh->setTranslate(0,0,mesh->getMesh()->getBound().getSphere().radius/2);
 //		mesh->getAnimationController()->setSequenceIndex(1);
 //		mesh->getAnimationController()->setCycling(AnimationController::Cycling_LOOP);
 //		mesh->getAnimationController()->start();
 		mElco->attach(mesh);
 	}
+	mElco->setScope(2);
 	mScene->getRoot()->attach(mElco);
 
 	mMerv=mEngine->createNodeType(ParentNode::type(),mScene);
 	{
 		MeshNode::ptr mesh=mEngine->createNodeType(MeshNode::type(),mScene);
-		mesh->setMesh(mEngine->getMeshManager()->findMesh("merv.xmsh"));
+		mesh->setMesh(mEngine->getMeshManager()->createAABoxMesh(AABox(-10,-10,-10,10,10,10)));//findMesh("merv.xmsh"));
 		mesh->setTranslate(0,0,mesh->getMesh()->getBound().getSphere().radius/2);
 //		mesh->getAnimationController()->setSequenceIndex(1);
 //		mesh->getAnimationController()->setCycling(AnimationController::Cycling_LOOP);
 //		mesh->getAnimationController()->start();
 		mMerv->attach(mesh);
 	}
+	mMerv->setScope(2);
 	mScene->getRoot()->attach(mMerv);
 
 	mLight=mEngine->createNodeType(LightNode::type(),mScene);
@@ -97,42 +96,66 @@ Logger::alert("Setting up done");
 	}
 
 	mOrthoCamera=mEngine->createNodeType(CameraNode::type(),mScene);
-	mOrthoCamera->setProjectionOrtho(-1,1,-1,1,.1,10);
-	mOrthoCamera->setScope(2);
+	mOrthoCamera->setProjectionOrtho(-1,1,-1,1,-10,10);
+	mOrthoCamera->setScope(4);
+	mOrthoCamera->setClearColor(Colors::RED);
 	mCamera->setClearFlags(RenderDevice::ClearType_BIT_DEPTH);
 	mScene->getRoot()->attach(mOrthoCamera);
 
-	mTextureFormat=TextureFormat::ptr(new TextureFormat(TextureFormat::Dimension_D2,getPixelFormatFromARPixelFormat(AR_DEFAULT_PIXEL_FORMAT),mARTCparam.xsize,mARTCparam.ysize,1,1));
-	mBackgroundTexture=mEngine->getTextureManager()->findTexture("c:\\users\\siralanf\\toadlet\\examples\\data\\sparkle.png");//createTexture(Texture::Usage_BIT_STREAM,mTextureFormat);
+	mBackgroundTexture=mEngine->getTextureManager()->createTexture(Texture::Usage_BIT_STREAM,mTextureFormat);
 
 	mBackground=mEngine->createNodeType(MeshNode::type(),mScene);
-	mBackground->setMesh(mEngine->getMeshManager()->createGridMesh(1,1,1,1,mEngine->getMaterialManager()->createDiffuseMaterial(mBackgroundTexture)));
+	Material::ptr material=mEngine->getMaterialManager()->createDiffuseMaterial(mBackgroundTexture);
+	Mesh::ptr mesh=mEngine->getMeshManager()->createGridMesh(2,2,2,2,material);
+	mBackground->setMesh(mesh);
+	mBackground->setScale(1,1,1);
 	mOrthoCamera->attach(mBackground);
 }
 
 void ARToadlet::destroy(){
-	mBackgroundTexture=Texture::ptr();
+	if(mScene!=NULL){
+		mScene->destroy();
+		mScene=NULL;
+	}
 
-	mCamera=NULL;
-	mElco=NULL;
-	mMerv=NULL;
-	mLight=NULL;
+	if(mVideoDevice!=NULL){
+		mVideoDevice->destroy();
+		delete mVideoDevice;
+		mVideoDevice=NULL;
+	}
+}
 
-	arVideoCapStop();
-	arVideoClose();
+void ARToadlet::frameReceived(TextureFormat::ptr format,tbyte *data){
+	mMutex.lock();
+
+	TextureFormatConversion::convert(data,format,mTextureData,mTextureFormat);
+
+	mMutex.unlock();
 }
 	
 void ARToadlet::update(int dt){
-	if((mLastImage=arVideoGetImage())!=NULL){
+	mMutex.lock();
+
+	updateMarkers();
+
+	mMutex.unlock();
+
+	mScene->update(dt);
+}
+
+void ARToadlet::updateMarkers(){
 		double patternTransform[3][4];
 		Matrix4x4 transform;
 		int numMarkers=0;
 		ARMarkerInfo *markerInfo=NULL;
 
 		// Detect the markers in the video frame.
-		if (arDetectMarker(mLastImage, THRESHOLD, &markerInfo, &numMarkers) < 0) {
+		Logger::alert("Markers?");
+		if (arDetectMarker(mTextureData, THRESHOLD, &markerInfo, &numMarkers) < 0) {
+		Logger::alert("Markers? no");
 			return;
 		}
+		Logger::alert(String("Markers:")+numMarkers);
 		
 		// Check through the marker_info array for highest confidence
 		// visible marker matching our preferred pattern.
@@ -171,17 +194,14 @@ void ARToadlet::update(int dt){
 		else{
 			mMerv->setScope(2);
 		}
-	}
-
-	mScene->update(dt);
 }
 
 void ARToadlet::render(RenderDevice *device){
-	if(mLastImage!=NULL){
-		mEngine->getTextureManager()->textureLoad(mBackgroundTexture,mTextureFormat,mLastImage);
-	}
+	mMutex.lock();
 
-	arVideoCapNext(); // Get next video frame, we're done with the previous one
+	mEngine->getTextureManager()->textureLoad(mBackgroundTexture,mTextureFormat,mTextureData);
+
+	mMutex.unlock();
 
 	device->beginScene();
 		mOrthoCamera->render(device);
@@ -279,9 +299,9 @@ void ARToadlet::setMatrix4x4FromARProjection(Matrix4x4 &r,ARParam *cparam,const 
 }
 
 void ARToadlet::setMatrix4x4FromARMatrix(Matrix4x4 &r,const double para[3][4]){
-	r.setAt(0,0,para[0][0]);	r.setAt(0,1,para[0][1]);	r.setAt(0,2,para[0][2]);	r.setAt(0,3,para[0][3]);
-	r.setAt(1,0,-para[1][0]);	r.setAt(1,1,-para[1][1]);	r.setAt(1,2,-para[1][2]);	r.setAt(1,3,-para[1][3]);
-	r.setAt(2,0,-para[2][0]);	r.setAt(2,1,-para[2][1]);	r.setAt(2,2,-para[2][2]);	r.setAt(2,3,-para[2][3]);
+	r.setAt(0,0,para[0][0]);	r.setAt(0,1,para[1][0]);	r.setAt(0,2,para[2][0]);	r.setAt(0,3,para[0][3]);
+	r.setAt(1,0,para[0][1]);	r.setAt(1,1,para[1][1]);	r.setAt(1,2,para[2][1]);	r.setAt(1,3,para[1][3]);
+	r.setAt(2,0,para[0][2]);	r.setAt(2,1,para[1][2]);	r.setAt(2,2,para[2][2]);	r.setAt(2,3,-para[2][3]);
 	r.setAt(3,0,0);				r.setAt(3,1,0);				r.setAt(3,2,0);				r.setAt(3,3,Math::ONE);
 }
 

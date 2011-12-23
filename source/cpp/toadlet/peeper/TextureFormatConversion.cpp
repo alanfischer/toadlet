@@ -60,6 +60,12 @@ bool TextureFormatConversion::convert(tbyte *src,TextureFormat *srcFormat,tbyte 
 	int srcPixelFormat=srcFormat->getPixelFormat(),dstPixelFormat=dstFormat->getPixelFormat();
 	int width=srcFormat->getWidth(),height=srcFormat->getHeight(),depth=srcFormat->getDepth();
 	int srcXPitch=srcFormat->getXPitch(),srcYPitch=srcFormat->getYPitch(),dstXPitch=dstFormat->getXPitch(),dstYPitch=dstFormat->getYPitch();
+	if(srcXPitch<0){
+		src=src+srcFormat->getDataSize()+srcXPitch;
+	}
+	if(dstXPitch<0){
+		dst=dst+dstFormat->getDataSize()+dstXPitch;
+	}
 
 	if(srcPixelFormat==TextureFormat::Format_L_8 && dstPixelFormat==TextureFormat::Format_LA_8){
 		for(k=0;k<depth;++k){
@@ -309,16 +315,16 @@ bool TextureFormatConversion::convert(tbyte *src,TextureFormat *srcFormat,tbyte 
 	else if(srcPixelFormat==dstPixelFormat){
 		// See if dst pitches are multiples of the src, in which case just use the src pitch.
 		// (Can happen in compressed texture formats with D3D, since it will specify pitch in row-multiples of 4)
-		if(dstXPitch/srcXPitch>1 && dstXPitch%srcXPitch==0){
-			dstXPitch=srcXPitch;
-		}
-		if(dstYPitch/srcYPitch>1 && dstYPitch%srcYPitch==0){
-			dstYPitch=srcYPitch;
-		}
+//		if(dstXPitch/srcXPitch>1 && dstXPitch%srcXPitch==0){
+//			dstXPitch=srcXPitch;
+//		}
+//		if(dstYPitch/srcYPitch>1 && dstYPitch%srcYPitch==0){
+//			dstYPitch=srcYPitch;
+//		}
 
 		for(k=0;k<depth;++k){
 			for(j=0;j<height;++j){
-				memcpy(dst+k*dstYPitch+j*dstXPitch,src+k*srcYPitch+j*srcXPitch,dstXPitch);
+				memcpy(dst+k*dstYPitch+j*dstXPitch,src+k*srcYPitch+j*srcXPitch,abs(dstXPitch));
 			}
 		}
 	}

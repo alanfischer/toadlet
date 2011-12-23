@@ -1,20 +1,13 @@
 #include <toadlet/toadlet.h>
 #include <AR/config.h>
-#include <AR/video.h>
 #include <AR/param.h>			// arParamDisp()
 #include <AR/ar.h>
-
-using namespace toadlet::egg;
-using namespace toadlet::pad;
-using namespace toadlet::peeper;
-using namespace toadlet::tadpole::animation;
-using namespace toadlet::tadpole::node;
 
 static double PATTERN_WIDTH=80;
 static double PATTERN_CENTER[2]={0,0};
 static int THRESHOLD=150;
 
-class ARToadlet:public Applet{
+class ARToadlet:public Applet,public VideoDeviceListener{
 public:
 	ARToadlet(Application *app);
 
@@ -23,7 +16,10 @@ public:
 	void create();	
 	void destroy();
 	
+	void frameReceived(TextureFormat::ptr format,tbyte *data);
+
 	void update(int dt);
+	void updateMarkers();
 	void render(RenderDevice *device);
 	void resized(int width,int height);
 
@@ -45,7 +41,8 @@ protected:
 	ARParam mARTCparam;
 	Collection<int> mPatternIDs;
 	TextureFormat::ptr mTextureFormat;
-	ARUint8 *mLastImage;
+	uint8 *mTextureData;
+	VideoDevice *mVideoDevice;
 
 	Application *mApp;
 	Engine *mEngine;
@@ -57,4 +54,6 @@ protected:
 	ParentNode::ptr mElco;
 	ParentNode::ptr mMerv;
 	LightNode::ptr mLight;
+
+	Mutex mMutex;
 };
