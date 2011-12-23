@@ -19,14 +19,11 @@ set (SRC
 	../../main/toadletApp.cpp
 	../../main/toadletMain.cpp
 	src/ARToadlet.cpp
-	src/MFVideoDevice.cpp
 )
 
 # Headers
 set (H
 	src/ARToadlet.h
-	src/MFVideoDevice.h
-	src/VideoDevice.h
 )
 
 # Executable

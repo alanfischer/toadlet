@@ -73,7 +73,9 @@ public:
 	RenderDevice *getRenderDevice() const;
 	AudioDevice *getAudioDevice() const;
 	InputDevice *getInputDevice(InputDevice::InputType i) const;
-
+	
+	Stream::ptr makeStream(JNIEnv *env,jobject obj);
+	
 protected:
 	JNIEnv *env;
 	jobject obj;

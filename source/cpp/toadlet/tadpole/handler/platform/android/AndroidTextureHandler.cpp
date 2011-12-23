@@ -111,6 +111,16 @@ Resource::ptr AndroidTextureHandler::load(Stream::ptr stream,ResourceData *data,
 
 	env->DeleteLocalRef(pixels);
 
+	int linePitch=textureFormat->getXPitch();
+	tbyte *line=new tbyte[linePitch];
+	int i;
+	for(i=0;i<height/2;++i){
+		memcpy(line,textureData+linePitch*i,linePitch);
+		memcpy(textureData+linePitch*i,textureData+linePitch*(height-i-1),linePitch);
+		memcpy(textureData+linePitch*(height-i-1),line,linePitch);
+	}
+	delete[] line;
+
 	Texture::ptr texture=mTextureManager->createTexture(textureFormat,textureData);
 	
 	delete[] textureData;

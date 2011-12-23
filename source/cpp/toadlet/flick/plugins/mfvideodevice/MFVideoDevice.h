@@ -56,6 +56,7 @@ public:
 	void update(int dt){}
 	void stop();
 
+	TextureFormat::ptr getTextureFormat(){return mFormat;}
 	void setListener(VideoDeviceListener *listener){mListener=listener;}
 	
 protected:

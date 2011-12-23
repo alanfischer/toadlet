@@ -150,11 +150,6 @@ HRESULT MFVideoDevice::OnReadSample(HRESULT hrStatus,DWORD dwStreamIndex,DWORD d
 			if(SUCCEEDED(hr)){
 				tbyte *data=NULL;
 	            hr=buffer->Lock(&data,NULL,NULL);
-				if(SUCCEEDED(hr)){
-					if(mFormat->getXPitch()<0){
-						data=data+abs(mFormat->getXPitch())*(mFormat->getHeight()-1);
-					}
-				}
 
 				if(mListener!=NULL){
 					mListener->frameReceived(mFormat,data);
@@ -262,7 +257,7 @@ TextureFormat::ptr MFVideoDevice::getTextureFormat(IMFMediaType *type){
 	}
 	if(SUCCEEDED(hr)){
 		format=TextureFormat::ptr(new TextureFormat(TextureFormat::Dimension_D2,pixelFormat,width,height,1,1));
-		format->setPitches(stride,stride*height,stride*height);
+		format->setPitches(-stride,stride*height,stride*height);
 	}
 
 	return format;

@@ -87,6 +87,7 @@
 #include <toadlet/tadpole/creator/SkyBoxMeshCreator.h>
 #include <toadlet/tadpole/creator/SkyDomeMeshCreator.h>
 #include <toadlet/tadpole/creator/SphereMeshCreator.h>
+#include <toadlet/tadpole/creator/GridMeshCreator.h>
 #include <toadlet/tadpole/creator/NormalizationTextureCreator.h>
 #include <toadlet/tadpole/creator/DiffuseMaterialCreator.h>
 #include <toadlet/tadpole/creator/SkyBoxMaterialCreator.h>
@@ -375,6 +376,7 @@ void Engine::installHandlers(){
 	mMeshManager->setSkyBoxCreator(ResourceCreator::ptr(new SkyBoxMeshCreator(this)));
 	mMeshManager->setSkyDomeCreator(ResourceCreator::ptr(new SkyDomeMeshCreator(this)));
 	mMeshManager->setSphereCreator(ResourceCreator::ptr(new SphereMeshCreator(this)));
+	mMeshManager->setGridCreator(ResourceCreator::ptr(new GridMeshCreator(this)));
 
 	mMaterialManager->setDiffuseCreator(ResourceCreator::ptr(new DiffuseMaterialCreator(this)));
 	mMaterialManager->setSkyBoxCreator(ResourceCreator::ptr(new SkyBoxMaterialCreator(this)));
