@@ -42,14 +42,14 @@ Shader::ptr ShaderManager::createShader(Shader::ShaderType type,const String pro
 	if(mEngine->hasShader(type)){
 		BackableShader::ptr backableShader(new BackableShader());
 		backableShader->create(type,profiles,codes,numCodes);
-		if(renderDevice!=NULL){
+		if(renderDevice!=NULL && mEngine->getRenderCaps().hasShader[type]){
 			TOADLET_TRY
 				backableShader->setBack(Shader::ptr(renderDevice->createShader()),renderDevice);
 			TOADLET_CATCH(Exception &){}
 		}
 		shader=backableShader;
 	}
-	else if(renderDevice!=NULL){
+	else if(renderDevice!=NULL && mEngine->getRenderCaps().hasShader[type]){
 		TOADLET_TRY
 			shader=Shader::ptr(renderDevice->createShader());
 		TOADLET_CATCH(Exception &){shader=NULL;}

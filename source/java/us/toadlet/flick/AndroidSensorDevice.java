@@ -39,10 +39,7 @@ public class AndroidSensorDevice implements InputDevice,SensorEventListener{
 	}
 
 	public boolean create(){
-        List<Sensor> sensors=mSensorManager.getSensorList(mSensorType);
-		if(sensors.size()>0){
-			mSensor=sensors.get(0);
-		}
+		mSensor=mSensorManager.getDefaultSensor(mSensorType);
 		return mSensor!=null;
 	}
 	
@@ -84,6 +81,10 @@ public class AndroidSensorDevice implements InputDevice,SensorEventListener{
 				mData.valid=(1<<InputData.Semantic_MOTION_ACCELERATION);
 				System.arraycopy(event.values,0,mData.values[InputData.Semantic_MOTION_ACCELERATION],0,event.values.length);
 			break;
+			case InputType_ANGULAR:
+				mData.valid=(1<<InputData.Semantic_ANGULAR);
+				System.arraycopy(event.values,0,mData.values[InputData.Semantic_ANGULAR],0,event.values.length);
+			break;
 			case InputType_LIGHT:
 				mData.valid=(1<<InputData.Semantic_LIGHT);
 				System.arraycopy(event.values,0,mData.values[InputData.Semantic_LIGHT],0,event.values.length);
@@ -106,6 +107,8 @@ public class AndroidSensorDevice implements InputDevice,SensorEventListener{
 		switch(sensorType){
 			case Sensor.TYPE_ACCELEROMETER:
 				return InputType_MOTION;
+			case Sensor.TYPE_GYROSCOPE:
+				return InputType_ANGULAR;
 			case Sensor.TYPE_LIGHT:
 				return InputType_LIGHT;
 			case Sensor.TYPE_PROXIMITY:

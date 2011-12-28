@@ -209,6 +209,11 @@ public abstract class AndroidApplication extends Activity implements RenderTarge
 			mInputDevices[motionDevice.getType()]=motionDevice;
 		}
 
+		us.toadlet.flick.InputDevice angularDevice=new AndroidSensorDevice(this,Sensor.TYPE_GYROSCOPE);
+		if(angularDevice.create()){
+			mInputDevices[angularDevice.getType()]=angularDevice;
+		}
+
 		us.toadlet.flick.InputDevice lightDevice=new AndroidSensorDevice(this,Sensor.TYPE_LIGHT);
 		if(lightDevice.create()){
 			mInputDevices[lightDevice.getType()]=lightDevice;
