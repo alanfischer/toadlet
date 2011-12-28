@@ -37,7 +37,8 @@ class InputDevice{
 public:
 	enum InputType{
 		InputType_JOY=0,
-		InputType_MOTION,
+		InputType_MOTION, /// @todo: Rename MOTION to LINEAR
+		InputType_ANGULAR,
 		InputType_LIGHT,
 		InputType_PROXIMITY,
 		InputType_MAX,

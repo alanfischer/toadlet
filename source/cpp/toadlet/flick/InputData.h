@@ -45,6 +45,9 @@ public:
 		Semantic_MOTION_VELOCITY,
 		Semantic_MAX_MOTION,
 
+		Semantic_ANGULAR=0,
+		Semantic_MAX_ANGULAR,
+		
 		Semantic_LIGHT=0,
 		Semantic_MAX_LIGHT,
 

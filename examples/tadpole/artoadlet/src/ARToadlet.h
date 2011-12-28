@@ -1,17 +1,11 @@
 #include <toadlet/toadlet.h>
-#include <AR/config.h>
-#include <AR/param.h>			// arParamDisp()
-#include <AR/ar.h>
+#include <ARToolKitPlus/TrackerSingleMarker.h>
 
-static double PATTERN_WIDTH=80;
-static double PATTERN_CENTER[2]={0,0};
-static int THRESHOLD=150;
+using namespace ARToolKitPlus;
 
 class ARToadlet:public Applet,public VideoDeviceListener{
 public:
 	ARToadlet(Application *app);
-
-	bool setupARCamera(const String &cameraParamFile,const String &config,ARParam *cameraParams);
 
 	void create();	
 	void destroy();
@@ -32,17 +26,14 @@ public:
 	void mouseReleased(int x,int y,int button){}
 	void mouseScrolled(int x,int y,int scroll){}
 
-	static int getPixelFormatFromARPixelFormat(int format);
-
-	static void setMatrix4x4FromARProjection(Matrix4x4 &r,ARParam *cparam,const double minDistance,const double maxDistance);
-	static void setMatrix4x4FromARMatrix(Matrix4x4 &r,const double para[3][4]);
+	static PIXEL_FORMAT getARPixelFormatFromPixelFormat(int format);
 	
 protected:
-	ARParam mARTCparam;
-	Collection<int> mPatternIDs;
 	TextureFormat::ptr mTextureFormat;
 	uint8 *mTextureData;
 	VideoDevice *mVideoDevice;
+
+	SharedPointer<TrackerSingleMarker> mTracker;
 
 	Application *mApp;
 	Engine *mEngine;

@@ -36,6 +36,9 @@ public class InputData{
 	public static final int Semantic_MOTION_VELOCITY=1;
 	public static final int Semantic_MAX_MOTION=2;
 
+	public static final int Semantic_ANGULAR=0;
+	public static final int Semantic_MAX_ANGULAR=1;
+	
 	public static final int Semantic_LIGHT=0;
 	public static final int Semantic_MAX_LIGHT=1;
 

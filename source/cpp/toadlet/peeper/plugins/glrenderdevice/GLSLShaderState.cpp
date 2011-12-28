@@ -96,7 +96,7 @@ void GLSLShaderState::setShader(Shader::ShaderType type,Shader::ptr shader){
 	mShaders[type]=shader;
 
 	glshader=mShaders[type]!=NULL?(GLSLShader*)mShaders[type]->getRootShader():NULL;
-	if(glshader!=NULL){
+	if(glshader!=NULL && glshader->mHandle!=0){
 		glAttachShader(mHandle,glshader->mHandle);
 	}
 

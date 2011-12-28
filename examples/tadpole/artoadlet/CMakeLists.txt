@@ -9,10 +9,10 @@ set (CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${artoadlet_SOURCE_DIR}/../../../cm
 find_package (toadlet REQUIRED)
 
 # Includes
-include_directories (${artoadlet_SOURCE_DIR} ${TOADLET_INCLUDE_DIR} "C:/Program Files/Microsoft SDKs/Windows/v7.1/Include")
+include_directories (${logo_SOURCE_DIR} ${TOADLET_INCLUDE_DIR})
 
 # Libraries
-set (LIBS ${TOADLET_LIBRARIES} "C:/Program Files/Microsoft SDKs/Windows/v7.1/Lib/mfreadwrite.lib")
+set (LIBS ${TOADLET_LIBRARIES})
 
 # Source files
 set (SRC
