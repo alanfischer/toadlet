@@ -1,163 +1,137 @@
 # On Android NDK API levels < 9, toadlet uses java shim libraries for flick, peeper, ribbit, and pad.
 
+# Special settings for debug builds
+string (TOUPPER ${CMAKE_BUILD_TYPE} BUILD_TYPE)
 
-# Shortcut variables
-set (JAVA_SRC_DIR us/toadlet)
-set (JAVA_OBJ obj)
+# Setup for Android Java Compilation
+# Variables are named to mirror those in the FindJava.cmake script, which will not work under the android toolchain
+# This uses the find_host_program macro from the Android toolchain
+find_host_program (Java_JAVAC_EXECUTABLE javac)
+find_host_program (Java_JAVAH_EXECUTABLE javah)
+find_host_program (Java_JAR_EXECUTABLE jar)
+if (NOT EXISTS ${Java_JAVAC_EXECUTABLE})
+    message (FATAL_ERROR "Java compiler 'javac' could not be found. Ensure it is installed and in your PATH.")
+endif (NOT EXISTS ${Java_JAVAC_EXECUTABLE})
+if (NOT EXISTS ${Java_JAVAH_EXECUTABLE})
+    message (FATAL_ERROR "Java generator 'javah' could not be found. Ensure it is installed and in your PATH.")
+endif (NOT EXISTS ${Java_JAVAH_EXECUTABLE})
+if (NOT EXISTS ${Java_JAR_EXECUTABLE})
+    message (FATAL_ERROR "Java archiver 'jar' could not be found. Ensure it is installed and in your PATH.")
+endif (NOT EXISTS ${Java_JAR_EXECUTABLE})
+set (Java_FOUND TRUE)
 
+# Cmake wants to use always use posix path separators due to the android ndk toolchain
+# This does not work with nmake on windows, so force the proper ones here
+if (${NDKSYSTEM} STREQUAL "windows" AND ${CMAKE_GENERATOR} STREQUAL "NMake Makefiles")
+    set (WIN32 TRUE)
+endif (${NDKSYSTEM} STREQUAL "windows" AND ${CMAKE_GENERATOR} STREQUAL "NMake Makefiles")
 
-# Used by the cpp classes to location the javah generated headers
+# Grab the cmake java script
+include (UseJava)
+
+# Add the android jar to the classpath
+set (CMAKE_JAVA_INCLUDE_PATH ${ANDROID_JAR})
+
+# Compiler flags
+set (CMAKE_JAVA_COMPILE_FLAGS -Xlint:unchecked)
+
+# Used by the cpp classes to locate the javah generated headers
 set (TOADLET_JAVA_BASEDIR ${CMAKE_CURRENT_BINARY_DIR} PARENT_SCOPE)
 
 
-# Setup for Android Java Compilation - uses the find_host_program macro from the Android toolchain
-find_host_program (CMAKE_Java_COMPILER javac)
-find_host_program (CMAKE_Java_GENERATOR javah)
-find_host_program (CMAKE_Java_ARCHIVE jar)
-if (NOT EXISTS ${CMAKE_Java_COMPILER})
-	message (FATAL_ERROR "Java compiler 'javac' could not be found. Ensure it is installed and in your PATH.")
-endif (NOT EXISTS ${CMAKE_Java_COMPILER})
-if (NOT EXISTS ${CMAKE_Java_GENERATOR})
-	message (FATAL_ERROR "Java generator 'javah' could not be found. Ensure it is installed and in your PATH.")
-endif (NOT EXISTS ${CMAKE_Java_GENERATOR})
-if (NOT EXISTS ${CMAKE_Java_ARCHIVE})
-	message (FATAL_ERROR "Java archiver 'jar' could not be found. Ensure it is installed and in your PATH.")
-endif (NOT EXISTS ${CMAKE_Java_ARCHIVE})
-enable_language (Java OPTIONAL)
-include_directories (${ANDROID_JAR})
-
-
-# Cmake wants to use always use posix path separators due to the android ndk toolchain; force the proper ones here
-if (${NDKSYSTEM} STREQUAL "windows")
-	set (CMAKE_INCLUDE_FLAG_SEP_Java ";")
-else (${NDKSYSTEM} STREQUAL "windows")
-	set (CMAKE_INCLUDE_FLAG_SEP_Java ":")
-endif (${NDKSYSTEM} STREQUAL "windows")
-
-
-# Override the standard cmake java compile and link settings
-set (CMAKE_Java_COMPILE_OBJECT
-	"<CMAKE_Java_COMPILER> -Xlint:unchecked <FLAGS> <SOURCE>"
-)
-set (CMAKE_Java_CREATE_STATIC_LIBRARY
-	"<CMAKE_Java_ARCHIVE> -cf <TARGET> -C <OBJECT_DIR>/${JAVA_OBJ} ."
-)
-
-
-# Set the jar postfix used by the javah generator
-string (TOUPPER ${CMAKE_BUILD_TYPE} BUILD_TYPE)
-if (${BUILD_TYPE} STREQUAL "DEBUG")
-	set (JARLOC LOCATION_DEBUG)
-else (${BUILD_TYPE} STREQUAL "DEBUG")
-	set (JARLOC LOCATION)
-endif (${BUILD_TYPE} STREQUAL "DEBUG")
-
-
-# Include the current directory for java class files
-include_directories (.)
-
-
 # toadlet_flick
-set (FLICK_OBJ_DIR ${CMAKE_CURRENT_BINARY_DIR}/CMakeFiles/jtoadlet_flick.dir/${JAVA_OBJ})
-execute_process(COMMAND ${CMAKE_COMMAND} -E make_directory ${FLICK_OBJ_DIR})
-include_directories (${FLICK_OBJ_DIR})
-configure_file (${JAVA_SRC_DIR}/flick/Version.java.cmake ${CMAKE_CURRENT_BINARY_DIR}/${JAVA_SRC_DIR}/flick/Version.java)
+configure_file (us/toadlet/flick/Version.java.cmake ${CMAKE_CURRENT_BINARY_DIR}/us/toadlet/flick/Version.java)
 
 set (FLICK_SRC
-	${JAVA_SRC_DIR}/flick/InputDevice.java
-	${JAVA_SRC_DIR}/flick/InputDeviceListener.java
-	${JAVA_SRC_DIR}/flick/NInputDeviceListener.java
-	${JAVA_SRC_DIR}/flick/AndroidSensorDevice.java
-	${CMAKE_CURRENT_BINARY_DIR}/${JAVA_SRC_DIR}/flick/Version.java
+	us/toadlet/flick/InputDevice.java
+	us/toadlet/flick/InputDeviceListener.java
+	us/toadlet/flick/NInputDeviceListener.java
+	us/toadlet/flick/AndroidSensorDevice.java
+	${CMAKE_CURRENT_BINARY_DIR}/us/toadlet/flick/Version.java
 )
 
 set (FLICK_H
 	us.toadlet.flick.NInputDeviceListener
 )
 
-add_library (jtoadlet_flick STATIC ${FLICK_SRC})
-set_target_properties (jtoadlet_flick PROPERTIES COMPILE_FLAGS "-d \"${FLICK_OBJ_DIR}\"")
-set_target_properties (jtoadlet_flick PROPERTIES COMPILE_DEFINITIONS_DEBUG TOADLET_DEBUG DEBUG_POSTFIX _d)
-install (TARGETS jtoadlet_flick DESTINATION lib)
+if (${BUILD_TYPE} STREQUAL "DEBUG")
+	set (CMAKE_JAVA_TARGET_OUTPUT_NAME jtoadlet_flick_d)
+endif (${BUILD_TYPE} STREQUAL "DEBUG")
+add_jar (jtoadlet_flick ${FLICK_SRC})
+get_property (JARFILE TARGET jtoadlet_flick PROPERTY JAR_FILE)
+install (FILES ${JARFILE} DESTINATION lib)
 
 # Generate headers
-get_target_property (JARFILE jtoadlet_flick ${JARLOC})
 add_custom_command (TARGET jtoadlet_flick POST_BUILD
-	COMMAND ${CMAKE_Java_GENERATOR} -classpath ${JARFILE} ${FLICK_H}
+	COMMAND ${Java_JAVAH_EXECUTABLE} -classpath ${JARFILE} ${FLICK_H}
 )
 
 
 # toadlet_peeper
-set (PEEPER_OBJ_DIR ${CMAKE_CURRENT_BINARY_DIR}/CMakeFiles/jtoadlet_peeper.dir/${JAVA_OBJ})
-execute_process(COMMAND ${CMAKE_COMMAND} -E make_directory ${PEEPER_OBJ_DIR})
-include_directories (${PEEPER_OBJ_DIR})
-configure_file (${JAVA_SRC_DIR}/peeper/Version.java.cmake ${CMAKE_CURRENT_BINARY_DIR}/${JAVA_SRC_DIR}/peeper/Version.java)
+configure_file (us/toadlet/peeper/Version.java.cmake ${CMAKE_CURRENT_BINARY_DIR}/us/toadlet/peeper/Version.java)
 
 set (PEEPER_SRC
-	${JAVA_SRC_DIR}/peeper/TextureFormat.java
-	${JAVA_SRC_DIR}/peeper/WindowRenderTargetFormat.java
-	${JAVA_SRC_DIR}/peeper/RenderTarget.java
-	${JAVA_SRC_DIR}/peeper/GLRenderTarget.java
-	${JAVA_SRC_DIR}/peeper/EGLRenderTarget.java
-	${JAVA_SRC_DIR}/peeper/EGLWindowRenderTarget.java
-	${CMAKE_CURRENT_BINARY_DIR}/${JAVA_SRC_DIR}/peeper/Version.java
+	us/toadlet/peeper/TextureFormat.java
+	us/toadlet/peeper/WindowRenderTargetFormat.java
+	us/toadlet/peeper/RenderTarget.java
+	us/toadlet/peeper/GLRenderTarget.java
+	us/toadlet/peeper/EGLRenderTarget.java
+	us/toadlet/peeper/EGLWindowRenderTarget.java
+	${CMAKE_CURRENT_BINARY_DIR}/us/toadlet/peeper/Version.java
 )
 
-add_library (jtoadlet_peeper STATIC ${PEEPER_SRC})
-set_target_properties (jtoadlet_peeper PROPERTIES COMPILE_FLAGS "-d \"${PEEPER_OBJ_DIR}\"")
-set_target_properties (jtoadlet_peeper PROPERTIES COMPILE_DEFINITIONS_DEBUG TOADLET_DEBUG DEBUG_POSTFIX _d)
-install (TARGETS jtoadlet_peeper DESTINATION lib)
+if (${BUILD_TYPE} STREQUAL "DEBUG")
+    set (CMAKE_JAVA_TARGET_OUTPUT_NAME jtoadlet_peeper_d)
+endif (${BUILD_TYPE} STREQUAL "DEBUG")
+add_jar (jtoadlet_peeper ${PEEPER_SRC})
+get_property (JARFILE TARGET jtoadlet_peeper PROPERTY JAR_FILE)
+install (FILES ${JARFILE} DESTINATION lib)
 
 
 # toadlet_ribbit
-set (RIBBIT_OBJ_DIR ${CMAKE_CURRENT_BINARY_DIR}/CMakeFiles/jtoadlet_ribbit.dir/${JAVA_OBJ})
-execute_process(COMMAND ${CMAKE_COMMAND} -E make_directory ${RIBBIT_OBJ_DIR})
-include_directories (${RIBBIT_OBJ_DIR})
-configure_file (${JAVA_SRC_DIR}/ribbit/Version.java.cmake ${CMAKE_CURRENT_BINARY_DIR}/${JAVA_SRC_DIR}/ribbit/Version.java)
+configure_file (us/toadlet/ribbit/Version.java.cmake ${CMAKE_CURRENT_BINARY_DIR}/us/toadlet/ribbit/Version.java)
 
 set (RIBBIT_SRC
-	${JAVA_SRC_DIR}/ribbit/AudioFormat.java
-	${JAVA_SRC_DIR}/ribbit/AudioStream.java
-	${JAVA_SRC_DIR}/ribbit/AudioBuffer.java
-	${JAVA_SRC_DIR}/ribbit/Audio.java
-	${JAVA_SRC_DIR}/ribbit/AudioCaps.java
-	${JAVA_SRC_DIR}/ribbit/AudioDevice.java
-	${JAVA_SRC_DIR}/ribbit/ATAudioBuffer.java
-	${JAVA_SRC_DIR}/ribbit/ATAudio.java
-	${JAVA_SRC_DIR}/ribbit/ATAudioDevice.java
-	${JAVA_SRC_DIR}/ribbit/NAudioStream.java
-	${CMAKE_CURRENT_BINARY_DIR}/${JAVA_SRC_DIR}/ribbit/Version.java
+	us/toadlet/ribbit/AudioFormat.java
+	us/toadlet/ribbit/AudioStream.java
+	us/toadlet/ribbit/AudioBuffer.java
+	us/toadlet/ribbit/Audio.java
+	us/toadlet/ribbit/AudioCaps.java
+	us/toadlet/ribbit/AudioDevice.java
+	us/toadlet/ribbit/ATAudioBuffer.java
+	us/toadlet/ribbit/ATAudio.java
+	us/toadlet/ribbit/ATAudioDevice.java
+	us/toadlet/ribbit/NAudioStream.java
+	${CMAKE_CURRENT_BINARY_DIR}/us/toadlet/ribbit/Version.java
 )
 
 set (RIBBIT_H
 	us.toadlet.ribbit.NAudioStream
 )
 
-add_library (jtoadlet_ribbit STATIC ${RIBBIT_SRC})
-set_target_properties (jtoadlet_ribbit PROPERTIES COMPILE_FLAGS "-d \"${RIBBIT_OBJ_DIR}\"")
-set_target_properties (jtoadlet_ribbit PROPERTIES COMPILE_DEFINITIONS_DEBUG TOADLET_DEBUG DEBUG_POSTFIX _d)
-install (TARGETS jtoadlet_ribbit DESTINATION lib)
+if (${BUILD_TYPE} STREQUAL "DEBUG")
+    set (CMAKE_JAVA_TARGET_OUTPUT_NAME jtoadlet_ribbit_d)
+endif (${BUILD_TYPE} STREQUAL "DEBUG")
+add_jar (jtoadlet_ribbit ${RIBBIT_SRC})
+get_property (JARFILE TARGET jtoadlet_ribbit PROPERTY JAR_FILE)
+install (FILES ${JARFILE} DESTINATION lib)
 
 # Generate headers
-get_target_property (JARFILE jtoadlet_ribbit ${JARLOC})
 add_custom_command (TARGET jtoadlet_ribbit POST_BUILD
-	COMMAND ${CMAKE_Java_GENERATOR} -classpath ${JARFILE} ${RIBBIT_H}
+    COMMAND ${Java_JAVAH_EXECUTABLE} -classpath ${JARFILE} ${RIBBIT_H}
 )
 
 
 # toadlet_pad
-set (PAD_OBJ_DIR ${CMAKE_CURRENT_BINARY_DIR}/CMakeFiles/jtoadlet_pad.dir/${JAVA_OBJ})
-execute_process(COMMAND ${CMAKE_COMMAND} -E make_directory ${PAD_OBJ_DIR})
-include_directories (${PAD_OBJ_DIR})
-configure_file (${JAVA_SRC_DIR}/pad/Version.java.cmake ${CMAKE_CURRENT_BINARY_DIR}/${JAVA_SRC_DIR}/pad/Version.java)
+configure_file (us/toadlet/pad/Version.java.cmake ${CMAKE_CURRENT_BINARY_DIR}/us/toadlet/pad/Version.java)
 
 set (PAD_SRC
-	${JAVA_SRC_DIR}/pad/Applet.java
-	${JAVA_SRC_DIR}/pad/AndroidApplication.java
-	${JAVA_SRC_DIR}/pad/Engine.java
-	${JAVA_SRC_DIR}/pad/RenderDevice.java
-	${JAVA_SRC_DIR}/pad/NApplet.java
-	${CMAKE_CURRENT_BINARY_DIR}/${JAVA_SRC_DIR}/pad/Version.java
+	us/toadlet/pad/Applet.java
+	us/toadlet/pad/AndroidApplication.java
+	us/toadlet/pad/Engine.java
+	us/toadlet/pad/RenderDevice.java
+	us/toadlet/pad/NApplet.java
+	${CMAKE_CURRENT_BINARY_DIR}/us/toadlet/pad/Version.java
 )
 
 set (PAD_H
@@ -167,14 +141,21 @@ set (PAD_H
 	us.toadlet.pad.NApplet
 )
 
-add_library (jtoadlet_pad STATIC ${PAD_SRC})
-set_target_properties (jtoadlet_pad PROPERTIES COMPILE_FLAGS "-d \"${PAD_OBJ_DIR}\"")
-set_target_properties (jtoadlet_pad PROPERTIES COMPILE_DEFINITIONS_DEBUG TOADLET_DEBUG DEBUG_POSTFIX _d)
-add_dependencies (jtoadlet_pad jtoadlet_peeper jtoadlet_ribbit jtoadlet_flick)
-install (TARGETS jtoadlet_pad DESTINATION lib)
+if (${BUILD_TYPE} STREQUAL "DEBUG")
+    set (CMAKE_JAVA_TARGET_OUTPUT_NAME jtoadlet_pad_d)
+endif (${BUILD_TYPE} STREQUAL "DEBUG")
+add_jar (jtoadlet_pad ${PAD_SRC})
+get_property (JARFILE TARGET jtoadlet_pad PROPERTY JAR_FILE)
+install (FILES ${JARFILE} DESTINATION lib)
 
 # Generate headers
-get_target_property (JARFILE jtoadlet_pad ${JARLOC})
 add_custom_command (TARGET jtoadlet_pad POST_BUILD
-	COMMAND ${CMAKE_Java_GENERATOR} -classpath ${JARFILE} ${PAD_H}
+    COMMAND ${Java_JAVAH_EXECUTABLE} -classpath ${JARFILE} ${PAD_H}
 )
+
+
+# Undo the forcing of WIN32
+if (${NDKSYSTEM} STREQUAL "windows" AND ${CMAKE_GENERATOR} STREQUAL "NMake Makefiles")
+    unset (WIN32)
+endif (${NDKSYSTEM} STREQUAL "windows" AND ${CMAKE_GENERATOR} STREQUAL "NMake Makefiles")
+

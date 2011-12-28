@@ -1,5 +1,5 @@
 # ----------------------------------------------------------------------------
-#  Android CMake toolchain file, for use with the ndk r5,r6
+#  Android CMake toolchain file, for use with the ndk r5,r6,r6b,r7
 #  See home page: http://code.google.com/p/android-cmake/
 #
 #  Updated by http://lightningtoads.com for use with 
@@ -49,6 +49,9 @@
 #
 #    ARM_TARGET=armeabi-v7a - type of floating point support.
 #      Other possible values are: "armeabi", "armeabi-v7a with NEON", "armeabi-v7a with VFPV3"
+#
+#    ANDROID_STL=(SYSTEM GNU_SHARED GNU_STATIC GABI_SHARED GABI_STATIC STLPORT_SHARED STLPORT_STATIC) - choose one
+#      Select from among any of the android STL versions, shared or static. SYSTEM is the default
 #
 #    FORCE_ARM=false - set true to generate 32-bit ARM instructions instead of Thumb-1.
 #
@@ -124,6 +127,9 @@
 #     [~] added ANDROID_SDK_API_LEVEL for android SKD awareness, used by toadlet
 #     [~] added ANDROID_ARCH=ARM or X86. (X86 only available with ANDROID_NDK_API_LEVEL>=9)
 #     [~] fixed CMAKE_INSTALL_NAME_TOOL definition on OSX platforms
+#   - modified December 2011 Andrew Fischer andrew@lightningtoads.com
+#     [~] included the latest ndk version r7
+#     [~] added the ANDROID_STL variable which lets the user choose the STL libraries
 # ----------------------------------------------------------------------------
 
 # this one is important
@@ -132,7 +138,7 @@ set( CMAKE_SYSTEM_NAME Linux )
 set( CMAKE_SYSTEM_VERSION 1 )
 
 set( ANDROID_NDK_DEFAULT_SEARCH_PATH /opt/android-ndk )
-set( ANDROID_NDK_SUPPORTED_VERSIONS -r6b -r6 -r5c -r5b -r5 "")
+set( ANDROID_NDK_SUPPORTED_VERSIONS -r7 -r6b -r6 -r5c -r5b -r5 "")
 set( ANDROID_NDK_TOOLCHAIN_DEFAULT_SEARCH_PATH /opt/android-toolchain )
 set( TOOL_OS_SUFFIX "" )
 
@@ -362,7 +368,39 @@ endif( ANDROID_ARCH STREQUAL "ARM" )
 set( CMAKE_FIND_ROOT_PATH "${ANDROID_NDK_TOOLCHAIN_ROOT}/bin" "${ANDROID_NDK_TOOLCHAIN_ROOT}/${ANDROID_NDK_TOOLCHAIN_ARCH}" "${ANDROID_NDK_SYSROOT}" "${CMAKE_PREFIX_PATH}")
 
 if( BUILD_WITH_ANDROID_NDK )
- set( STL_PATH "${ANDROID_NDK}/sources/cxx-stl/gnu-libstdc++" )
+ #setup build targets, mutually exclusive
+ set( PossibleSTLTargets "SYSTEM;GNU_SHARED;GNU_STATIC;GABI_SHARED;GABI_STATIC;STLPORT_SHARED;STLPORT_STATIC")
+ if( NOT ANDROID_STL )
+  set( ANDROID_STL "SYSTEM" )
+ endif( NOT ANDROID_STL )
+ set( ANDROID_STL "${ANDROID_STL}" CACHE INTERNAL "The choice of STL versions. SYSTEM is the default.")
+ set_property( CACHE ANDROID_STL PROPERTY STRINGS ${PossibleSTLTargets} )
+
+ if ( ${ANDROID_STL} STREQUAL "SYSTEM" )
+  set( STL_PATH "${ANDROID_NDK}/sources/cxx-stl/system" )
+  set( STL_LIBS "-lstdc++" )
+ elseif( ${ANDROID_STL} STREQUAL "GNU_SHARED" )
+  set( STL_PATH "${ANDROID_NDK}/sources/cxx-stl/gnu-libstdc++" )
+  set( STL_LIBS "-lstdc++ -lsupc++" )
+ elseif( ${ANDROID_STL} STREQUAL "GNU_STATIC" )
+  set( STL_PATH "${ANDROID_NDK}/sources/cxx-stl/gnu-libstdc++" )
+  set( STL_LIBS "-Wl,-Bstatic -lgnustl_static -lsupc++ -Wl,-Bdynamic" )
+ elseif( ${ANDROID_STL} STREQUAL "GABI_SHARED" )
+  set( STL_PATH "${ANDROID_NDK}/sources/cxx-stl/gabi++" )
+  set( STL_LIBS "-lgabi++_shared" )
+ elseif( ${ANDROID_STL} STREQUAL "GABI_STATIC" )
+  set( STL_PATH "${ANDROID_NDK}/sources/cxx-stl/gabi++" )
+  set( STL_LIBS "-lgabi++_static" )
+ elseif( ${ANDROID_STL} STREQUAL "STLPORT_SHARED" )
+  set( STL_PATH "${ANDROID_NDK}/sources/cxx-stl/stlport" )
+  set( STL_LIBS "-lstlport_shared" )
+ elseif( ${ANDROID_STL} STREQUAL "STLPORT_STATIC" )
+  set( STL_PATH "${ANDROID_NDK}/sources/cxx-stl/stlport" )
+  set( STL_LIBS "-lstlport_static" )
+ else( ${ANDROID_STL} STREQUAL "SYSTEM" )
+  message( STATUS "No C++ STL chosen." )
+ endif( ${ANDROID_STL} STREQUAL "SYSTEM" )
+
  set( STL_LIBRARIES_PATH "${STL_PATH}/libs/${NDK_NAME_ARCH}" )
  include_directories(SYSTEM "${STL_PATH}/include" "${STL_LIBRARIES_PATH}/include" )
 # if ( NOT ARMEABI AND NOT FORCE_ARM )
@@ -380,6 +418,8 @@ if( BUILD_WITH_ANDROID_NDK_TOOLCHAIN )
  endif( NOT FORCE_ARM )
  #for some reason this is needed? TODO figure out why...
  include_directories(SYSTEM "${ANDROID_NDK_TOOLCHAIN_ROOT}/${ANDROID_NDK_TOOLCHAIN_ARCH}/include/c++/4.4.3/${ANDROID_NDK_TOOLCHAIN_ARCH}" )
+ # If using a toolchain, default to the GNU_SHARED libraries
+ set( STL_LIBS "-lstdc++ -lsupc++" )
 endif( BUILD_WITH_ANDROID_NDK_TOOLCHAIN )
 
 # only search for libraries and includes in the ndk toolchain
@@ -406,6 +446,10 @@ endif( ANDROID_ARCH STREQUAL "ARM")
 if( BUILD_WITH_ANDROID_NDK )
  set( CMAKE_CXX_FLAGS "--sysroot=\"${ANDROID_NDK_SYSROOT}\" ${CMAKE_CXX_FLAGS}" )
  set( CMAKE_C_FLAGS "--sysroot=\"${ANDROID_NDK_SYSROOT}\" ${CMAKE_C_FLAGS}" )
+
+ if (${ANDROID_STL} STREQUAL "SYSTEM")
+  set( CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fno-exceptions -fno-rtti" )
+ endif (${ANDROID_STL} STREQUAL "SYSTEM")
 
  # workaround for ugly cmake bug - compiler identification replaces all spaces (and somethimes " !!!) in compiler flags with ; symbol
  # as result identification fails if ANDROID_NDK_SYSROOT contain spaces
@@ -435,9 +479,9 @@ set( CMAKE_C_FLAGS "${CMAKE_C_FLAGS}" CACHE STRING "c flags" )
 #Also, this is *required* to use the following linker flags that routes around
 #a CPU bug in some Cortex-A8 implementations:
 if( ANDROID_ARCH STREQUAL "ARM")
- set( LINKER_FLAGS "-Wl,--fix-cortex-a8 -L\"${STL_LIBRARIES_PATH}\" -L\"${CMAKE_INSTALL_PREFIX}/libs/${NDK_NAME_ARCH}\" -lstdc++ -lsupc++ " )
+ set( LINKER_FLAGS "-Wl,--fix-cortex-a8 -L\"${STL_LIBRARIES_PATH}\" -L\"${CMAKE_INSTALL_PREFIX}/libs/${NDK_NAME_ARCH}\" ${STL_LIBS} " )
 elseif( ANDROID_ARCH STREQUAL "X86")
- set( LINKER_FLAGS "-L\"${STL_LIBRARIES_PATH}\" -L\"${CMAKE_INSTALL_PREFIX}/libs/${NDK_NAME_ARCH}\" -lstdc++ -lsupc++ " )
+ set( LINKER_FLAGS "-L\"${STL_LIBRARIES_PATH}\" -L\"${CMAKE_INSTALL_PREFIX}/libs/${NDK_NAME_ARCH}\" ${STL_LIBS} " )
 endif( ANDROID_ARCH STREQUAL "ARM")
 
 set( NO_UNDEFINED ON CACHE BOOL "Don't all undefined symbols" )
