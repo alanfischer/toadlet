@@ -395,7 +395,7 @@ Material::ptr DiffuseMaterialCreator::createFontMaterial(Font::ptr font){
 		renderState->setBlendState(BlendState::Combination_COLOR);
 	}
 
-	if(	mEngine->hasShader(Shader::ShaderType_VERTEX) &&
+	if(mEngine->hasShader(Shader::ShaderType_VERTEX) &&
 		mEngine->hasShader(Shader::ShaderType_FRAGMENT)
 	){
 		RenderPath::ptr shaderPath=material->addPath();

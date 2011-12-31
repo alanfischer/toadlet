@@ -170,6 +170,10 @@ void D3D10Buffer::destroy(){
 }
 
 bool D3D10Buffer::createContext(){
+	if(mDataSize==0){
+		return true;
+	}
+
 	D3D10_BUFFER_DESC desc={0};
 
 	desc.ByteWidth=mDataSize;

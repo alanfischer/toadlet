@@ -52,7 +52,7 @@ public:
 	Material::ptr createDiffuseMaterial(Texture::ptr texture);
 	Material::ptr createPointSpriteMaterial(Texture::ptr texture,scalar size,bool attenuated);
 	Material::ptr createFontMaterial(Font::ptr font);
-	Material::ptr createSkyBoxMaterial(Texture::ptr texture);
+	Material::ptr createSkyBoxMaterial(Texture::ptr texture,bool clamp=true);
 
 	RenderState::ptr createRenderState();
 	ShaderState::ptr createShaderState();

@@ -105,9 +105,9 @@ bool EGLWindowRenderTarget::createContext(void *display,void *window,WindowRende
 
 	mPixmap=pixmap;
 
-	try{
+	TOADLET_TRY
 		mDisplay=eglGetDisplay((NativeDisplayType)display);
-	}catch(...){mDisplay=EGL_NO_DISPLAY;}
+	TOADLET_CATCH(...}{mDisplay=EGL_NO_DISPLAY;}
 	if(mDisplay==EGL_NO_DISPLAY){
 		Error::unknown(Categories::TOADLET_PEEPER,
 			"error getting display");
@@ -160,7 +160,7 @@ bool EGLWindowRenderTarget::createContext(void *display,void *window,WindowRende
 	Logger::debug(Categories::TOADLET_PEEPER,
 		String("chooseEGLConfig config:")+(int)mConfig);
 
-	try{
+	TOADLET_TRY
 		if(!pixmap){		
 			mSurface=eglCreateWindowSurface(mDisplay,mConfig,(NativeWindowType)window,NULL);
 			TOADLET_CHECK_EGLERROR("eglCreateWindowSurface");
@@ -169,17 +169,17 @@ bool EGLWindowRenderTarget::createContext(void *display,void *window,WindowRende
 			mSurface=eglCreatePixmapSurface(mDisplay,mConfig,(egl_native_pixmap_t*)window,NULL);
 			TOADLET_CHECK_EGLERROR("eglCreatePixmapSurface");
 		}
-	}catch(...){mSurface=EGL_NO_SURFACE;}
+	TOADLET_CATCH(..){mSurface=EGL_NO_SURFACE;}
 	if(mSurface==EGL_NO_SURFACE){
 		Error::unknown(Categories::TOADLET_PEEPER,
 			"error creating surface");
 		return false;
 	}
 
-	try{
+	TOADLET_TRY
 		mContext=eglCreateContext(mDisplay,mConfig,EGL_NO_CONTEXT,NULL);
 		TOADLET_CHECK_EGLERROR("eglCreateContext");
-	}catch(...){mContext=EGL_NO_CONTEXT;}
+	TOADLET_CATCH(...){mContext=EGL_NO_CONTEXT;}
 	if(mContext==EGL_NO_CONTEXT){
 		Error::unknown(Categories::TOADLET_PEEPER,
 			"error creating context");
@@ -193,10 +193,10 @@ bool EGLWindowRenderTarget::createContext(void *display,void *window,WindowRende
 	}
 	#endif
 
-	try{
+	TOADLET_TRY
 		eglMakeCurrent(mDisplay,mSurface,mSurface,mContext);
 		TOADLET_CHECK_EGLERROR("eglMakeCurrent");
-	}catch(...){}
+	TOADLET_CATCH(...)}catch(...){}
 
 	#if defined(TOADLET_HAS_GLESEM)
 		if(glesem_glInitialize()==false){

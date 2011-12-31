@@ -20,15 +20,15 @@ public:
 
 	TextureStateMatrix4x4Accessor(RenderPass::ptr pass,int state,TextureState::CalculationType calculation=TextureState::CalculationType_NORMAL):
 		mPass(pass),mState(state){
-		mPass->getTextureState(Shader::ShaderType_FRAGMENT,mState,mTextureState);
+		mPass->getTextureState(Shader::ShaderType_VERTEX,mState,mTextureState);
 		mTextureState.calculation=calculation;
-		mPass->setTextureState(Shader::ShaderType_FRAGMENT,mState,mTextureState);
+		mPass->setTextureState(Shader::ShaderType_VERTEX,mState,mTextureState);
 	}
 
 	void setMatrix4x4(const Matrix4x4 &matrix){
-		mPass->getTextureState(Shader::ShaderType_FRAGMENT,mState,mTextureState);
+		mPass->getTextureState(Shader::ShaderType_VERTEX,mState,mTextureState);
 		mTextureState.matrix.set(matrix);
-		mPass->setTextureState(Shader::ShaderType_FRAGMENT,mState,mTextureState);
+		mPass->setTextureState(Shader::ShaderType_VERTEX,mState,mTextureState);
 	}
 
 	const Matrix4x4 &getMatrix4x4(){
