@@ -260,8 +260,6 @@ bool D3D10Shader::reflect(){
 		mInputParameters.add(parameterDesc);
 	}
 
-	mVariableBufferFormats.resize(desc.ConstantBuffers);
-
 	int numResources=0;
 	for(i=0;i<desc.BoundResources;++i){
 		D3D10_SHADER_INPUT_BIND_DESC bindDesc;
@@ -305,11 +303,12 @@ bool D3D10Shader::reflect(){
 			format->setStructVariable(j,variable);
 		}
 
-		mVariableBufferFormats[i]=format;
+		mVariableBufferFormats.add(format);
 	}
 
 	if(primaryFormat==NULL && desc.BoundResources>0){
 		primaryFormat=VariableBufferFormat::ptr(new VariableBufferFormat(true,"$Globals",0,desc.BoundResources));
+		mVariableBufferFormats.add(primaryFormat);
 	}
 
 	for(i=0,j=0;i<desc.BoundResources;++i){
