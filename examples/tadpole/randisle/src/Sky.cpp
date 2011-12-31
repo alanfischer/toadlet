@@ -140,13 +140,13 @@ Node *Sky::create(Scene *scene,int cloudSize,const Vector4 &skyColor,const Vecto
 			pass->setShader(Shader::ShaderType_FRAGMENT,fragmentShader);
 
 			pass->getVariables()->addVariable("modelViewProjectionMatrix",RenderVariable::ptr(new MVPMatrixVariable()),Material::Scope_RENDERABLE);
-			pass->getVariables()->addVariable("textureMatrix",RenderVariable::ptr(new TextureMatrixVariable(pass->getVariables(),"bumpTex")),Material::Scope_MATERIAL);
+			pass->getVariables()->addVariable("textureMatrix",RenderVariable::ptr(new TextureMatrixVariable(Shader::ShaderType_VERTEX,0)),Material::Scope_MATERIAL);
 			pass->getVariables()->addVariable("skyColor",RenderVariable::ptr(new ConstantVariable(skyColor)),Material::Scope_MATERIAL);
 
 			pass->getVariables()->addTexture("bumpTex",bumpTexture,"bumpSamp",SamplerState(),TextureState());
-			mShaderAccessor=Matrix4x4Accessor::ptr(new TextureStateMatrix4x4Accessor(pass,0));
 			pass->getVariables()->addTexture("cloudTex",cloudTexture,"cloudSamp",SamplerState(),TextureState());
-			pass->getVariables()->addTexture("fadeTex",cloudTexture,"fadeSamp",SamplerState(),TextureState());
+			pass->getVariables()->addTexture("fadeTex",fadeTexture,"fadeSamp",SamplerState(),TextureState());
+			mShaderAccessor=Matrix4x4Accessor::ptr(new TextureStateMatrix4x4Accessor(pass,0));
 		}
 
 		if(mEngine->hasFixed(Shader::ShaderType_VERTEX) && mEngine->hasFixed(Shader::ShaderType_FRAGMENT)){
@@ -154,7 +154,7 @@ Node *Sky::create(Scene *scene,int cloudSize,const Vector4 &skyColor,const Vecto
 			RenderPass::ptr pass=fixedPath->addPass();
 
 			pass->setBlendState(BlendState());
-			pass->setDepthState(DepthState(DepthState::DepthTest_NEVER,false));
+			pass->setDepthState(DepthState(DepthState::DepthTest_ALWAYS,false));
 			pass->setRasterizerState(RasterizerState());
 			pass->setMaterialState(MaterialState(false,true));
 
@@ -205,7 +205,7 @@ Node *Sky::create(Scene *scene,int cloudSize,const Vector4 &skyColor,const Vecto
 		Texture::ptr compositeTexture=mEngine->getTextureManager()->createTexture(compositeFormat,compositeData);
 		delete[] compositeData;
 
-		material=mEngine->getMaterialManager()->createSkyBoxMaterial(compositeTexture);
+		material=mEngine->getMaterialManager()->createSkyBoxMaterial(compositeTexture,false);
 		mCompositeAccessor=Matrix4x4Accessor::ptr(new TextureStateMatrix4x4Accessor(material->getPass(),0));
 		material->getPass()->setBlendState(BlendState::Combination_ALPHA);
 		material->getPass()->setMaterialState(MaterialState(false,true));
