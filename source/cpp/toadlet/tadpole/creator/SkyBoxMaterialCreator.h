@@ -46,7 +46,7 @@ public:
 	void destroyShaders();
 
 	Resource::ptr create(const String &name,ResourceData *data,ProgressListener *listener);
-	Material::ptr createSkyBoxMaterial(Texture::ptr texture);
+	Material::ptr createSkyBoxMaterial(Texture::ptr texture,bool clamp);
 
 protected:
 	Engine *mEngine;

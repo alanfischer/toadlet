@@ -131,8 +131,8 @@ Material::ptr MaterialManager::createFontMaterial(Font::ptr font){
 	return shared_static_cast<DiffuseMaterialCreator>(mDiffuseCreator)->createFontMaterial(font);
 }
 
-Material::ptr MaterialManager::createSkyBoxMaterial(Texture::ptr texture){
-	return shared_static_cast<SkyBoxMaterialCreator>(mSkyBoxCreator)->createSkyBoxMaterial(texture);
+Material::ptr MaterialManager::createSkyBoxMaterial(Texture::ptr texture,bool clamp){
+	return shared_static_cast<SkyBoxMaterialCreator>(mSkyBoxCreator)->createSkyBoxMaterial(texture,clamp);
 }
 
 RenderState::ptr MaterialManager::createRenderState(){
