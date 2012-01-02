@@ -196,7 +196,7 @@ bool EGLWindowRenderTarget::createContext(void *display,void *window,WindowRende
 	TOADLET_TRY
 		eglMakeCurrent(mDisplay,mSurface,mSurface,mContext);
 		TOADLET_CHECK_EGLERROR("eglMakeCurrent");
-	TOADLET_CATCH(...)}catch(...){}
+	TOADLET_CATCH(...){}
 
 	#if defined(TOADLET_HAS_GLESEM)
 		if(glesem_glInitialize()==false){
