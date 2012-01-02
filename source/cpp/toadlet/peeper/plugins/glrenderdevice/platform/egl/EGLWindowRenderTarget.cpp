@@ -107,7 +107,7 @@ bool EGLWindowRenderTarget::createContext(void *display,void *window,WindowRende
 
 	TOADLET_TRY
 		mDisplay=eglGetDisplay((NativeDisplayType)display);
-	TOADLET_CATCH(...}{mDisplay=EGL_NO_DISPLAY;}
+	TOADLET_CATCH(...){mDisplay=EGL_NO_DISPLAY;}
 	if(mDisplay==EGL_NO_DISPLAY){
 		Error::unknown(Categories::TOADLET_PEEPER,
 			"error getting display");
@@ -169,7 +169,7 @@ bool EGLWindowRenderTarget::createContext(void *display,void *window,WindowRende
 			mSurface=eglCreatePixmapSurface(mDisplay,mConfig,(egl_native_pixmap_t*)window,NULL);
 			TOADLET_CHECK_EGLERROR("eglCreatePixmapSurface");
 		}
-	TOADLET_CATCH(..){mSurface=EGL_NO_SURFACE;}
+	TOADLET_CATCH(...){mSurface=EGL_NO_SURFACE;}
 	if(mSurface==EGL_NO_SURFACE){
 		Error::unknown(Categories::TOADLET_PEEPER,
 			"error creating surface");
