@@ -165,6 +165,7 @@ RenderState::ptr LabelNode::getSharedRenderState(){
 	if(mSharedRenderState==NULL){
 		mSharedRenderState=mEngine->getMaterialManager()->createRenderState();
 		if(mMaterial!=NULL){
+			mEngine->getMaterialManager()->modifyRenderState(mSharedRenderState,mMaterial->getPass()->getRenderState());
 			Material::ptr material=mEngine->getMaterialManager()->createSharedMaterial(mMaterial,mSharedRenderState);
 			mMaterial->release();
 			mMaterial=material;
