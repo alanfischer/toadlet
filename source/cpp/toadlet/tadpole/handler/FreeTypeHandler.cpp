@@ -107,7 +107,7 @@ Resource::ptr FreeTypeHandler::load(Stream::ptr stream,ResourceData *resourceDat
 
 	int charCountHeight=Math::toInt(Math::sqrt(Math::fromInt(numChars)));
 	int charCountWidth=Math::intCeil(Math::div(Math::fromInt(numChars),Math::fromInt(charCountHeight)));
-	int pad=2;
+	int pad=1;
 
 	int charmapWidth=0;
 	int charmapHeight=charCountHeight*(maxHeight+pad);
@@ -126,6 +126,7 @@ Resource::ptr FreeTypeHandler::load(Stream::ptr stream,ResourceData *resourceDat
 	int textureHeight=Math::nextPowerOf2(charmapHeight);
 	TextureFormat::ptr textureFormat(new TextureFormat(TextureFormat::Dimension_D2,TextureFormat::Format_LA_8,textureWidth,textureHeight,1,0));
 	tbyte *textureData=new tbyte[textureFormat->getDataSize()];
+	memset(textureData,0,textureFormat->getDataSize());
 	int textureStride=textureFormat->getXPitch();
 
 	Collection<Font::Glyph*> glyphs(bitmapGlyphs.size());	
