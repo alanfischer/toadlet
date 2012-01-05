@@ -72,7 +72,7 @@ public:
 	void setTolerance(scalar tolerance);
 
 	int localPatchIndex(int x,int y){return (y+mHalfSize)*mSize+(x+mHalfSize);}
-	TerrainPatchNode::ptr patchAt(int x,int y){
+	TerrainPatchNode *patchAt(int x,int y){
 		int index=localPatchIndex(x-mTerrainX,y-mTerrainY);
 		if(index>=0 && index<mPatchGrid.size()) return mPatchGrid[index];
 		else return NULL;

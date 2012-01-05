@@ -123,6 +123,8 @@ public abstract class AndroidApplication extends Activity implements RenderTarge
 	protected void onCreate(Bundle bundle){
 		super.onCreate(bundle);
 
+		System.out.println("Free memory on create:"+Runtime.getRuntime().freeMemory());
+
 		create();
 	}
 
@@ -131,10 +133,8 @@ public abstract class AndroidApplication extends Activity implements RenderTarge
 
 		super.onStart();
 		
-		Runtime runtime=Runtime.getRuntime();
-		System.out.println("Free memory"+runtime.freeMemory());
 		System.gc();
-		System.out.println("Free memory"+runtime.freeMemory());
+		System.out.println("Free memory on start:"+Runtime.getRuntime().freeMemory());
 
 		mLastTime=System.currentTimeMillis();
 		mRun=true;
