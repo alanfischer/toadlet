@@ -54,9 +54,11 @@ set (FLICK_H
 	us.toadlet.flick.NInputDeviceListener
 )
 
+# Create the jar file with UseJava.cmake functions. See UseJava.cmake for details.
 if (${BUILD_TYPE} STREQUAL "DEBUG")
 	set (CMAKE_JAVA_TARGET_OUTPUT_NAME jtoadlet_flick_d)
 endif (${BUILD_TYPE} STREQUAL "DEBUG")
+set (CMAKE_JAR_CLASSES_PREFIX us/toadlet/flick)
 add_jar (jtoadlet_flick ${FLICK_SRC})
 get_property (JARFILE TARGET jtoadlet_flick PROPERTY JAR_FILE)
 install (FILES ${JARFILE} DESTINATION lib)
@@ -80,9 +82,11 @@ set (PEEPER_SRC
 	${CMAKE_CURRENT_BINARY_DIR}/us/toadlet/peeper/Version.java
 )
 
+# Create the jar file with UseJava.cmake functions. See UseJava.cmake for details.
 if (${BUILD_TYPE} STREQUAL "DEBUG")
     set (CMAKE_JAVA_TARGET_OUTPUT_NAME jtoadlet_peeper_d)
 endif (${BUILD_TYPE} STREQUAL "DEBUG")
+set (CMAKE_JAR_CLASSES_PREFIX us/toadlet/peeper)
 add_jar (jtoadlet_peeper ${PEEPER_SRC})
 get_property (JARFILE TARGET jtoadlet_peeper PROPERTY JAR_FILE)
 install (FILES ${JARFILE} DESTINATION lib)
@@ -109,9 +113,11 @@ set (RIBBIT_H
 	us.toadlet.ribbit.NAudioStream
 )
 
+# Create the jar file with UseJava.cmake functions. See UseJava.cmake for details.
 if (${BUILD_TYPE} STREQUAL "DEBUG")
     set (CMAKE_JAVA_TARGET_OUTPUT_NAME jtoadlet_ribbit_d)
 endif (${BUILD_TYPE} STREQUAL "DEBUG")
+set (CMAKE_JAR_CLASSES_PREFIX us/toadlet/ribbit)
 add_jar (jtoadlet_ribbit ${RIBBIT_SRC})
 get_property (JARFILE TARGET jtoadlet_ribbit PROPERTY JAR_FILE)
 install (FILES ${JARFILE} DESTINATION lib)
@@ -141,9 +147,11 @@ set (PAD_H
 	us.toadlet.pad.NApplet
 )
 
+# Create the jar file with UseJava.cmake functions. See UseJava.cmake for details.
 if (${BUILD_TYPE} STREQUAL "DEBUG")
     set (CMAKE_JAVA_TARGET_OUTPUT_NAME jtoadlet_pad_d)
 endif (${BUILD_TYPE} STREQUAL "DEBUG")
+set (CMAKE_JAR_CLASSES_PREFIX us/toadlet/pad)
 add_jar (jtoadlet_pad ${PAD_SRC})
 get_property (JARFILE TARGET jtoadlet_pad PROPERTY JAR_FILE)
 install (FILES ${JARFILE} DESTINATION lib)
