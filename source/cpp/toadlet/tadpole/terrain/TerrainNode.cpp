@@ -333,7 +333,6 @@ void TerrainNode::createPatch(int x,int y){
 	patch->setWaterMaterial(mPatchWaterMaterial);
 
 	attach(patch);
-
 	if(patchAt(x-1,y)!=NULL){
 		patchAt(x-1,y)->stitchToRight(patch);
 	}
