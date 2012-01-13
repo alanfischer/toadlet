@@ -37,7 +37,7 @@ using namespace toadlet::flick;
 using namespace toadlet::tadpole;
 using namespace toadlet::pad;
 
-TOADLET_C_API RenderTarget *new_EGLWindowRenderTarget(void *window,WindowRenderTargetFormat *format);
+TOADLET_C_API RenderTarget *new_EGLWindowRenderTarget(void *display,void *window,WindowRenderTargetFormat *format);
 TOADLET_C_API RenderDevice *new_GLRenderDevice();
 TOADLET_C_API AudioDevice *new_JAudioDevice(JNIEnv *env,jobject obj);
 
@@ -385,7 +385,7 @@ void AndroidApplication::windowCreated(ANativeWindow *window){
 
 	RenderTarget *target=NULL;
 	TOADLET_TRY
-		target=new_EGLWindowRenderTarget(mWindow,mFormat);
+		target=new_EGLWindowRenderTarget(0,mWindow,mFormat);
 	TOADLET_CATCH(const Exception &){target=NULL;}
 	
 	if(target!=NULL && target->isValid()==false){

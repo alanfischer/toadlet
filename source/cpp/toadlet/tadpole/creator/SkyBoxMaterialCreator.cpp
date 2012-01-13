@@ -160,12 +160,13 @@ Material::ptr SkyBoxMaterialCreator::createSkyBoxMaterial(Texture::ptr texture,b
 
 		pass->setShader(Shader::ShaderType_VERTEX,mSkyBoxVertexShader);
 		pass->setShader(Shader::ShaderType_FRAGMENT,mSkyBoxFragmentShader);
-		pass->getVariables()->addVariable("modelViewProjectionMatrix",RenderVariable::ptr(new MVPMatrixVariable()),Material::Scope_RENDERABLE);
-		pass->getVariables()->addVariable("textureMatrix",RenderVariable::ptr(new TextureMatrixVariable(pass->getVariables(),"tex")),Material::Scope_MATERIAL);
-		pass->getVariables()->addVariable("materialTrackColor",RenderVariable::ptr(new MaterialTrackColorVariable()),Material::Scope_MATERIAL);
 
-		pass->getVariables()->addTexture("tex",texture,"samp",samplerState,TextureState());
-//		pass->setTexture(Shader::ShaderType_FRAGMENT,0,texture,samplerState,TextureState());
+		RenderVariableSet::ptr variables=pass->makeVariables();
+		variables->addVariable("modelViewProjectionMatrix",RenderVariable::ptr(new MVPMatrixVariable()),Material::Scope_RENDERABLE);
+		variables->addVariable("textureMatrix",RenderVariable::ptr(new TextureMatrixVariable(variables,"tex")),Material::Scope_MATERIAL);
+		variables->addVariable("materialTrackColor",RenderVariable::ptr(new MaterialTrackColorVariable()),Material::Scope_MATERIAL);
+
+		variables->addTexture("tex",texture,"samp",samplerState,TextureState());
 	}
 
 	if(mEngine->hasFixed(Shader::ShaderType_VERTEX) && mEngine->hasFixed(Shader::ShaderType_FRAGMENT)){

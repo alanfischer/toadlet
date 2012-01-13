@@ -42,9 +42,12 @@ MeshNode::SubMesh::SubMesh(MeshNode *meshNode,Mesh::SubMesh *meshSubMesh):
 {
 	this->meshNode=meshNode;
 	this->meshSubMesh=meshSubMesh;
-	this->material=meshSubMesh->material;
 	this->indexData=meshSubMesh->indexData;
 	this->vertexData=meshSubMesh->vertexData;
+	this->material=meshSubMesh->material;
+	if(material!=NULL){
+		material->retain();
+	}
 }
 
 void MeshNode::SubMesh::render(SceneRenderer *renderer) const{

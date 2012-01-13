@@ -44,6 +44,7 @@ public:
 
 	virtual void retain()=0;
 	virtual void release()=0;
+virtual PointerCounter *pointerCounter()=0;
 
 	virtual void setFullyReleasedListener(ResourceFullyReleasedListener *listener)=0;
 

@@ -106,9 +106,11 @@ Material::ptr MaterialManager::createSharedMaterial(Material::ptr source,RenderS
 			/// @todo: Should we share buffers instead?
 
 			RenderVariableSet *srcVars=srcPass->getVariables();
-			RenderVariableSet *dstVars=dstPass->getVariables();
-			for(k=0;k<srcVars->getNumVariables();++k){
-				dstVars->addVariable(srcVars->getVariableName(k),srcVars->getVariable(k),srcVars->getVariableScope(k));
+			if(srcVars!=NULL){
+				RenderVariableSet *dstVars=dstPass->makeVariables();
+				for(k=0;k<srcVars->getNumVariables();++k){
+					dstVars->addVariable(srcVars->getVariableName(k),srcVars->getVariable(k),srcVars->getVariableScope(k));
+				}
 			}
 		}
 	}

@@ -75,19 +75,19 @@ public:
 	void setShader(Shader::ShaderType type,Shader::ptr shader);
 	Shader::ptr getShader(Shader::ShaderType type){return mShaderState->getShader(type);}
 
-	RenderVariableSet::ptr getVariables();
-
 	int getNumTextures(Shader::ShaderType type=Shader::ShaderType_FRAGMENT) const{return mTextures[type].size();}
-	void setTexture(Texture::ptr texture,const SamplerState &samplerState,const TextureState &textureState){setTexture(Shader::ShaderType_FRAGMENT,0,texture,samplerState,textureState);}
+	inline void setTexture(Texture::ptr texture,const SamplerState &samplerState,const TextureState &textureState){setTexture(Shader::ShaderType_FRAGMENT,0,texture,samplerState,textureState);}
 	void setTexture(Shader::ShaderType type,int i,Texture::ptr texture,const SamplerState &samplerState,const TextureState &textureState);
 	Texture::ptr getTexture(Shader::ShaderType type=Shader::ShaderType_FRAGMENT,int i=0) const{return i<mTextures[type].size()?mTextures[type][i]:NULL;}
 
 	inline RenderState::ptr getRenderState() const{return mRenderState;}
 	inline ShaderState::ptr getShaderState() const{return mShaderState;}
 
-	bool isDepthSorted() const;
+	RenderVariableSet::ptr makeVariables();
+	inline RenderVariableSet::ptr getVariables() const{return mVariables;}
+	void updateVariables(int scope,SceneParameters *parameters);
 
-	void setupRenderVariables(RenderDevice *renderDevice,int scope,SceneParameters *parameters);
+	bool isDepthSorted() const;
 
 protected:
 	MaterialManager *mManager;

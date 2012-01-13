@@ -192,6 +192,17 @@ void TerrainNode::setWaterMaterial(Material::ptr material){
 	}
 }
 
+void TerrainNode::setCameraUpdateScope(int scope){
+	mPatchCameraUpdateScope=scope;
+
+	int i;
+	for(i=0;i<mPatchGrid.size();++i){
+		if(mPatchGrid[i]!=NULL){
+			mPatchGrid[i]->setCameraUpdateScope(scope);
+		}
+	}
+}
+
 void TerrainNode::setTolerance(scalar tolerance){
 	mPatchTolerance=tolerance;
 	
@@ -204,7 +215,9 @@ void TerrainNode::setTolerance(scalar tolerance){
 }
 
 void TerrainNode::gatherRenderables(CameraNode *camera,RenderableSet *set){
-	updatePatches(camera);
+	if((camera->getScope()&mPatchCameraUpdateScope)!=0){
+		updatePatches(camera);
+	}
 
 	super::gatherRenderables(camera,set);
 }
@@ -318,6 +331,7 @@ void TerrainNode::createPatch(int x,int y){
 	patch->setScale(mPatchScale);
 	patch->setTranslate(toWorldXi(x)-mPatchSize*mPatchScale.x/2,toWorldYi(y)-mPatchSize*mPatchScale.y/2,0);
 	patch->setTolerance(mPatchTolerance);
+	patch->setCameraUpdateScope(mPatchCameraUpdateScope);
 
 	mDataSource->getPatchHeightData(&mPatchHeightData[0],x,y);
 	patch->setHeightData(&mPatchHeightData[0],mPatchSize,mPatchSize,mPatchSize,true);
