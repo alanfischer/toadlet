@@ -66,6 +66,9 @@ void SceneRenderer::renderScene(RenderDevice *device,Node *node,CameraNode *came
 
 void SceneRenderer::setupPass(RenderPass *pass){
 	mSceneParameters->setRenderPass(pass);
+
+	pass->updateVariables(Material::Scope_MATERIAL,mSceneParameters);
+
 	if(mLastShaderState==NULL || mLastShaderState!=pass->getShaderState()){
 		mLastShaderState=pass->getShaderState();
 		mDevice->setShaderState(mLastShaderState);
@@ -76,19 +79,8 @@ void SceneRenderer::setupPass(RenderPass *pass){
 		mSceneParameters->setRenderState(mLastRenderState);
 	}
 
-	pass->setupRenderVariables(mDevice,Material::Scope_MATERIAL,mSceneParameters);
-
-	int i,j;
-	for(j=0;j<Shader::ShaderType_MAX;++j){
-		for(i=0;i<pass->getNumTextures((Shader::ShaderType)j);++i){
-			mDevice->setTexture((Shader::ShaderType)j,i,pass->getTexture((Shader::ShaderType)j,i));
-		}
-		if(mLastPass!=NULL){
-			for(;i<mLastPass->getNumTextures((Shader::ShaderType)j);++i){
-				mDevice->setTexture((Shader::ShaderType)j,i,NULL);
-			}
-		}
-	}
+	setupTextures(pass,Material::Scope_MATERIAL,mDevice);
+	setupVariableBuffers(pass,Material::Scope_MATERIAL,mDevice);
 
 	mLastPass=pass;
 }
@@ -213,7 +205,11 @@ void SceneRenderer::renderQueueItems(Material *material,const RenderableSet::Ren
 			if(pass!=NULL){
 				mSceneParameters->setRenderable(renderable);
 				mSceneParameters->setAmbient(item.ambient);
-				pass->setupRenderVariables(mDevice,Material::Scope_RENDERABLE,mSceneParameters);
+
+				pass->updateVariables(Material::Scope_RENDERABLE,mSceneParameters);
+
+				setupVariableBuffers(pass,Material::Scope_RENDERABLE,mDevice);
+	
 				mSceneParameters->setRenderable(NULL);
 			}
 
@@ -258,6 +254,34 @@ void SceneRenderer::setupLights(const RenderableSet::LightQueue &lightQueue,Rend
 		}
 		else{
 			device->setLightEnabled(i,false);
+		}
+	}
+}
+
+void SceneRenderer::setupTextures(RenderPass *pass,int scope,RenderDevice *device){
+	int i,j;
+	for(j=0;j<Shader::ShaderType_MAX;++j){
+		for(i=0;i<pass->getNumTextures((Shader::ShaderType)j);++i){
+			device->setTexture((Shader::ShaderType)j,i,pass->getTexture((Shader::ShaderType)j,i));
+		}
+		if(mLastPass!=NULL){
+			for(;i<mLastPass->getNumTextures((Shader::ShaderType)j);++i){
+				device->setTexture((Shader::ShaderType)j,i,NULL);
+			}
+		}
+	}
+}
+
+void SceneRenderer::setupVariableBuffers(RenderPass *pass,int scope,RenderDevice *device){
+	RenderVariableSet::ptr variables=pass->getVariables();
+	if(variables!=NULL){
+		int i;
+		for(i=0;i<variables->getNumBuffers();++i){
+			int bufferScope=variables->getBufferScope(i);
+			// If the buffer applies to this scope, and it is the highest bit scope in the buffer
+			if((bufferScope&scope)!=0 && (bufferScope&~scope)<=scope){
+				device->setBuffer(variables->getBufferShaderType(i),variables->getBufferIndex(i),variables->getBuffer(i));
+			}
 		}
 	}
 }

@@ -25,8 +25,6 @@ public:
 	void mouseReleased(int x,int y,int button){}
 	void mouseScrolled(int x,int y,int scroll){}
 	
-	Material::ptr makeFunkyMaterial();
-
 	Application *app;
 	Engine *engine;
 	Scene::ptr scene;

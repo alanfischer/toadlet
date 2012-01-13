@@ -152,6 +152,19 @@ void RenderVariableSet::removeVariable(RenderVariable::ptr variable){
 	}
 }
 
+RenderVariable::ptr RenderVariableSet::findVariable(const String &name){
+	int i,j;
+	for(i=0;i<mBuffers.size();++i){
+		BufferInfo *buffer=&mBuffers[i];
+		for(j=0;j<buffer->variables.size();++j){
+			if(buffer->variables[j].name==name){
+				return buffer->variables[j].variable;
+			}
+		}
+	}
+	return NULL;
+}
+
 VariableBufferFormat::Variable *RenderVariableSet::findFormatVariable(const String &name,BufferInfo *&buffer){
 	if(mBuffers.size()==0){
 		return NULL;

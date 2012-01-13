@@ -44,12 +44,19 @@ public:
 		terrainMaterialSource->setDiffuseTexture(2,engine->getTextureManager()->findTexture("grass.png"));
 
 		Logger::alert("Loading water");
+
+		TextureFormat::ptr reflectFormat(new TextureFormat(TextureFormat::Dimension_D2,TextureFormat::Format_RGB_8,1024,1024,1,0));
+		reflectTexture=engine->getTextureManager()->createTexture(Texture::Usage_BIT_RENDERTARGET|Texture::Usage_BIT_AUTOGEN_MIPMAPS,reflectFormat);
+		reflectTexture->retain();
+		reflectTarget=engine->getTextureManager()->createPixelBufferRenderTarget();
+		reflectTarget->attach(reflectTexture->getMipPixelBuffer(0,0),PixelBufferRenderTarget::Attachment_COLOR_0);
+
 		waterMaterial=engine->getMaterialManager()->createMaterial();
 		if(waterMaterial!=NULL){
 			Vector4 color=Colors::AZURE*1.5;
 			color.w=0.5f;
 
-			TextureFormat::ptr noiseFormat(new TextureFormat(TextureFormat::Dimension_D2,TextureFormat::Format_RGB_8,128,128,1,0));
+			TextureFormat::ptr noiseFormat(new TextureFormat(TextureFormat::Dimension_D2,TextureFormat::Format_RGBA_8,128,128,1,0));
 			tbyte *noise1Data=createNoise(noiseFormat,16,5,0.5,0.5);
 			tbyte *noise2Data=createNoise(noiseFormat,16,12,0.5,0.5);
 			Texture::ptr noise1=engine->getTextureManager()->createTexture(noiseFormat,noise1Data);
@@ -112,12 +119,21 @@ public:
 						"float4 position : SV_POSITION;\n"
 						"float4 color : COLOR;\n"
 						"float fog: FOG;\n"
-						"float2 texCoord0: TEXCOORD0;\n"
-						"float2 texCoord1: TEXCOORD1;\n"
+//						"float2 texCoord0: TEXCOORD0;\n"
+//						"float2 texCoord1: TEXCOORD1;\n"
+"float4 reflectionPosition: TEXCOORD0;\n"
+"float4 refractionPosition: TEXCOORD1;\n"
+"float3 some: TEXCOORD2;\n"
 					"};\n"
 
 					"float4x4 modelViewProjectionMatrix;\n"
 					"float4x4 normalMatrix;\n"
+"float4x4 reflectionViewMatrix;\n"
+"float4x4 modelMatrix;\n"
+"float4x4 viewMatrix;\n"
+"float4x4 worldMatrix;\n"
+"float4x4 projectionMatrix;\n"
+
 					"float4 materialDiffuseColor;\n"
 					"float4 materialAmbientColor;\n"
 					"float4 lightViewPosition;\n"
@@ -133,8 +149,18 @@ public:
 						"float lightIntensity=clamp(-dot(lightViewPosition,viewNormal),0,1);\n"
 						"float4 localLightColor=lightIntensity*lightColor;\n"
 						"vout.color=localLightColor*materialDiffuseColor + ambientColor*materialAmbientColor;\n"
-						"vout.texCoord0=mul(textureMatrix0,float4(vin.texCoord,0.0,1.0));\n "
-						"vout.texCoord1=mul(textureMatrix1,float4(vin.texCoord,0.0,1.0));\n "
+//						"vout.texCoord0=mul(textureMatrix0,float4(vin.texCoord,0.0,1.0));\n "
+//						"vout.texCoord1=mul(textureMatrix1,float4(vin.texCoord,0.0,1.0));\n "
+"float4x4 preViewProjection= mul (viewMatrix, projectionMatrix);\n"
+"float4x4 preWorldViewProjection= mul (worldMatrix, preViewProjection);\n"
+"float4x4 preReflectionViewProjection=mul (reflectionViewMatrix, projectionMatrix);\n"
+"float4x4 preWorldReflectionViewProjection= mul (worldMatrix, preReflectionViewProjection);\n"
+"vout.reflectionPosition = mul(vin.position, preWorldReflectionViewProjection);\n"
+"vout.refractionPosition = mul(vin.position, preWorldViewProjection);\n"
+//"vout.refractionPosition = vin.position;\n"
+"vout.some.x = 0.5 * (vout.position.w + vout.position.x);\n"
+"vout.some.y = 0.5 * (vout.position.w + vout.position.y);\n"
+"vout.some.z = vout.position.w;\n"
 						"vout.fog=clamp(1.0-(vout.position.z-fogDistance.x)/(fogDistance.y-fogDistance.x),0.0,1.0);\n"
 						"return vout;\n"
 					"}"
@@ -160,16 +186,28 @@ public:
 						"float4 position: SV_POSITION;\n"
 						"float4 color: COLOR;\n"
 						"float fog: FOG;\n"
-						"float2 texCoord0: TEXCOORD0;\n"
-						"float2 texCoord1: TEXCOORD1;\n"
+//						"float2 texCoord0: TEXCOORD0;\n"
+//						"float2 texCoord1: TEXCOORD1;\n"
+"float4 reflectionPosition: TEXCOORD0;\n"
+"float4 refractionPosition: TEXCOORD1;\n"
+"float4 some: TEXCOORD2;\n"
 					"};\n"
 
 					"float4 fogColor;\n"
-					"Texture2D tex0,tex1;\n"
-					"SamplerState samp0,samp1;\n"
+//					"Texture2D tex0,tex1;\n"
+//					"SamplerState samp0,samp1;\n"
+"Texture2D reflectionTex;\n"
+"SamplerState reflectionSamp;\n"
 
 					"float4 main(PIN pin): SV_TARGET{\n"
-						"float4 fragColor=pin.color*tex0.Sample(samp0,pin.texCoord0)*tex1.Sample(samp1,pin.texCoord1);\n"
+//						"float4 fragColor=pin.color*tex0.Sample(samp0,pin.texCoord0)*tex1.Sample(samp1,pin.texCoord1);\n"
+"float2 projectedTexCoord;\n"
+//"projectedTexCoord.x = pin.reflectionPosition.x/pin.refractionPosition.w/2.0f + 0.5f;\n"
+//"projectedTexCoord.y = pin.reflectionPosition.y/pin.refractionPosition.w/2.0f + 0.5f;\n"
+"projectedTexCoord=(pin.some.xy / pin.some.z);\n"
+
+"float4 fragColor = reflectionTex.Sample(reflectionSamp,projectedTexCoord);\n"
+"fragColor.w=1;\n"
 						"return lerp(fogColor,fragColor,pin.fog);\n"
 					"}"
 				};
@@ -179,26 +217,32 @@ public:
 				Shader::ptr fragmentShader=engine->getShaderManager()->createShader(Shader::ShaderType_FRAGMENT,profiles,fragmentCodes,2);
 				pass->setShader(Shader::ShaderType_FRAGMENT,fragmentShader);
 
-				pass->getVariables()->addVariable("modelViewProjectionMatrix",RenderVariable::ptr(new MVPMatrixVariable()),Material::Scope_RENDERABLE);
-				pass->getVariables()->addVariable("normalMatrix",RenderVariable::ptr(new NormalMatrixVariable()),Material::Scope_RENDERABLE);
-				pass->getVariables()->addVariable("lightViewPosition",RenderVariable::ptr(new LightViewPositionVariable()),Material::Scope_MATERIAL);
-				pass->getVariables()->addVariable("lightColor",RenderVariable::ptr(new LightDiffuseVariable()),Material::Scope_MATERIAL);
-				pass->getVariables()->addVariable("ambientColor",RenderVariable::ptr(new AmbientVariable()),Material::Scope_RENDERABLE);
-				pass->getVariables()->addVariable("materialDiffuseColor",RenderVariable::ptr(new MaterialDiffuseVariable()),Material::Scope_MATERIAL);
-				pass->getVariables()->addVariable("materialAmbientColor",RenderVariable::ptr(new MaterialAmbientVariable()),Material::Scope_MATERIAL);
-				pass->getVariables()->addVariable("fogDistance",RenderVariable::ptr(new FogDistanceVariable()),Material::Scope_MATERIAL);
-				pass->getVariables()->addVariable("fogColor",RenderVariable::ptr(new FogColorVariable()),Material::Scope_MATERIAL);
-				pass->getVariables()->addVariable("textureMatrix0",RenderVariable::ptr(new TextureMatrixVariable(pass->getVariables(),"tex0")),Material::Scope_MATERIAL);
-				pass->getVariables()->addVariable("textureMatrix1",RenderVariable::ptr(new TextureMatrixVariable(pass->getVariables(),"tex1")),Material::Scope_MATERIAL);
+				RenderVariableSet::ptr variables=pass->makeVariables();
+				variables->addVariable("modelViewProjectionMatrix",RenderVariable::ptr(new MVPMatrixVariable()),Material::Scope_RENDERABLE);
+				variables->addVariable("normalMatrix",RenderVariable::ptr(new NormalMatrixVariable()),Material::Scope_RENDERABLE);
+				variables->addVariable("lightViewPosition",RenderVariable::ptr(new LightViewPositionVariable()),Material::Scope_MATERIAL);
+				variables->addVariable("lightColor",RenderVariable::ptr(new LightDiffuseVariable()),Material::Scope_MATERIAL);
+				variables->addVariable("ambientColor",RenderVariable::ptr(new AmbientVariable()),Material::Scope_RENDERABLE);
+				variables->addVariable("materialDiffuseColor",RenderVariable::ptr(new MaterialDiffuseVariable()),Material::Scope_MATERIAL);
+				variables->addVariable("materialAmbientColor",RenderVariable::ptr(new MaterialAmbientVariable()),Material::Scope_MATERIAL);
+				variables->addVariable("fogDistance",RenderVariable::ptr(new FogDistanceVariable()),Material::Scope_MATERIAL);
+				variables->addVariable("fogColor",RenderVariable::ptr(new FogColorVariable()),Material::Scope_MATERIAL);
+//				variables->addVariable("textureMatrix0",RenderVariable::ptr(new TextureMatrixVariable(variables,"tex0")),Material::Scope_MATERIAL);
+//				variables->addVariable("textureMatrix1",RenderVariable::ptr(new TextureMatrixVariable(variables,"tex1")),Material::Scope_MATERIAL);
+variables->addVariable("worldMatrix",RenderVariable::ptr(new ModelMatrixVariable()),Material::Scope_RENDERABLE);
+variables->addVariable("viewMatrix",RenderVariable::ptr(new ViewMatrixVariable()),Material::Scope_RENDERABLE);
+variables->addVariable("projectionMatrix",RenderVariable::ptr(new ProjectionMatrixVariable()),Material::Scope_RENDERABLE);
+variables->addVariable("reflectionViewMatrix",RenderVariable::ptr(new DataVariable(VariableBufferFormat::Format_TYPE_FLOAT_32|VariableBufferFormat::Format_COUNT_4X4,sizeof(Matrix4x4))),Material::Scope_RENDERABLE);
 
-				TextureState textureState;
-				textureState.calculation=TextureState::CalculationType_NORMAL;
+//				TextureState textureState;
+//				textureState.calculation=TextureState::CalculationType_NORMAL;
 
-				Math::setMatrix4x4FromScale(textureState.matrix,16,16,16);
-				pass->getVariables()->addTexture("tex0",noise1,"samp0",SamplerState(),textureState);
+//				Math::setMatrix4x4FromScale(textureState.matrix,16,16,16);
+//				variables->addTexture("tex0",noise1,"samp0",SamplerState(),textureState);
 
-				Math::setMatrix4x4FromScale(textureState.matrix,16,16,16);
-				pass->getVariables()->addTexture("tex1",noise2,"samp1",SamplerState(),textureState);
+//				Math::setMatrix4x4FromScale(textureState.matrix,16,16,16);
+//				variables->addTexture("tex1",noise2,"samp1",SamplerState(),textureState);
+variables->addTexture("reflectionTex",reflectTexture,"reflectionSamp",SamplerState(),TextureState());
 			}
 
 			if(engine->hasFixed(Shader::ShaderType_VERTEX) && engine->hasFixed(Shader::ShaderType_FRAGMENT)){
@@ -206,7 +250,7 @@ public:
 				RenderPass::ptr pass=fixedPath->addPass();
 
 				pass->setMaterialState(MaterialState(color));
-				pass->setBlendState(BlendState::Combination_ALPHA);
+//				pass->setBlendState(BlendState::Combination_ALPHA);
 				pass->setDepthState(DepthState(DepthState::DepthTest_LEQUAL,false));
 				pass->setRasterizerState(RasterizerState(RasterizerState::CullType_NONE));
 
@@ -214,10 +258,10 @@ public:
 				textureState.calculation=TextureState::CalculationType_NORMAL;
 
 				Math::setMatrix4x4FromScale(textureState.matrix,16,16,16);
-				pass->setTexture(Shader::ShaderType_FRAGMENT,0,noise1,SamplerState(),textureState);
+				pass->setTexture(Shader::ShaderType_FRAGMENT,0,reflectTexture,SamplerState(),textureState);
 
 				Math::setMatrix4x4FromScale(textureState.matrix,16,16,16);
-				pass->setTexture(Shader::ShaderType_FRAGMENT,0,noise2,SamplerState(),textureState);
+				pass->setTexture(Shader::ShaderType_FRAGMENT,0,reflectTexture,SamplerState(),textureState);
 			}
 
 			waterMaterial->setLayer(-1);
@@ -357,6 +401,8 @@ public:
 	scalar tolerance;
 	Vector4 skyColor,fadeColor;
 	DiffuseTerrainMaterialSource::ptr terrainMaterialSource;
+	Texture::ptr reflectTexture;
+	PixelBufferRenderTarget::ptr reflectTarget;
 	Material::ptr waterMaterial;
 	Mesh::ptr creature;
 	Mesh::ptr shadow;

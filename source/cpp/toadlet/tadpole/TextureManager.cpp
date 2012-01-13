@@ -91,7 +91,6 @@ Texture::ptr TextureManager::createTexture(int usage,TextureFormat::ptr format,t
 
 	if(texture!=NULL){
 		manage(shared_static_cast<Texture>(texture));
-
 		Logger::debug(Categories::TOADLET_TADPOLE,"texture created");
 	}
 

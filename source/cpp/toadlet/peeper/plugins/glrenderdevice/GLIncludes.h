@@ -60,7 +60,11 @@
 #elif defined(TOADLET_PLATFORM_ANDROID)
 	#if ANDROID_NDK_API_LEVEL>=9
 		#include <EGL/egl.h>
+		#define TOADLET_HAS_GLPBUFFERS
+	#else
+		// PBuffers would be possible to implement, but it wouldn't be that clean since they tie into Textures and PixelBuffers.  Since NDK 8 is a minimum target, we will not support render to texture there
 	#endif
+	
 	#include <GLES/gl.h>
 	// Has defines
 	#define TOADLET_HAS_EGL

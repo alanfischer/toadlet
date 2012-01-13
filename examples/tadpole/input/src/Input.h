@@ -41,6 +41,7 @@ public:
 	Node::ptr motionLabel,proximityLabel,lightLabel;
 	Node::ptr motionNeedle[3],proximityNeedle,lightNeedle;
 	Stream::ptr logStream;
+	Socket::ptr serverSocket,socket;
 };
 
 #endif

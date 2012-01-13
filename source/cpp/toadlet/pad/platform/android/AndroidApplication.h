@@ -108,7 +108,7 @@ public:
 	Engine *getEngine() const{return mEngine;}
 	RenderDevice *getRenderDevice() const{return mRenderDevice;}
 	AudioDevice *getAudioDevice() const{return mAudioDevice;}
-	InputDevice *getInputDevice(int i) const{return NULL;}
+	InputDevice *getInputDevice(InputDevice::InputType type) const{return NULL;}
 
 	void setNativeActivity(ANativeActivity *activity);
 

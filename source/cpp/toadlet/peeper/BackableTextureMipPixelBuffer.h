@@ -61,7 +61,10 @@ public:
 	}
 
 	virtual void resetCreate(){
-		setBack(mTexture->getBack()->getMipPixelBuffer(mLevel,mCubeSide));
+		Texture::ptr back=mTexture->getBack();
+		if(back!=NULL){
+			setBack(back->getMipPixelBuffer(mLevel,mCubeSide));
+		}
 	}
 	
 	virtual void resetDestroy(){

@@ -36,6 +36,35 @@ namespace toadlet{
 namespace tadpole{
 namespace material{
 
+class DataVariable:public RenderVariable{
+public:
+	TOADLET_ALIGNED_NEW
+
+	DataVariable(int format,int size){
+		mFormat=format;
+		mSize=size;
+		mData=new tbyte[size];
+	}
+
+	virtual ~DataVariable(){
+		delete[] mData;
+	}
+
+	void setData(tbyte *data){
+		memcpy(mData,data,mSize);
+	}
+
+	int getFormat(){return mFormat;}
+
+	void update(tbyte *data,SceneParameters *parameters){
+		memcpy(data,mData,mSize);
+	}
+
+	int mFormat;
+	int mSize;
+	tbyte *mData;
+};
+
 class MVPMatrixVariable:public RenderVariable{
 public:
 	TOADLET_ALIGNED_NEW
@@ -70,6 +99,45 @@ public:
 
 protected:
 	Matrix4x4 mMVMatrix,mModelMatrix;
+};
+
+class ModelMatrixVariable:public RenderVariable{
+public:
+	TOADLET_ALIGNED_NEW
+
+	int getFormat(){return VariableBufferFormat::Format_TYPE_FLOAT_32|VariableBufferFormat::Format_COUNT_4X4;}
+
+	void update(tbyte *data,SceneParameters *parameters){
+		if(parameters->getRenderable()!=NULL){
+			parameters->getRenderable()->getRenderTransform().getMatrix(mModelMatrix);
+			memcpy(data,mModelMatrix.getData(),sizeof(Matrix4x4));
+		}
+	}
+
+protected:
+	Matrix4x4 mModelMatrix;
+};
+
+class ViewMatrixVariable:public RenderVariable{
+public:
+	TOADLET_ALIGNED_NEW
+
+	int getFormat(){return VariableBufferFormat::Format_TYPE_FLOAT_32|VariableBufferFormat::Format_COUNT_4X4;}
+
+	void update(tbyte *data,SceneParameters *parameters){
+		memcpy(data,parameters->getCamera()->getViewMatrix().getData(),sizeof(Matrix4x4));
+	}
+};
+
+class ProjectionMatrixVariable:public RenderVariable{
+public:
+	TOADLET_ALIGNED_NEW
+
+	int getFormat(){return VariableBufferFormat::Format_TYPE_FLOAT_32|VariableBufferFormat::Format_COUNT_4X4|VariableBufferFormat::Format_BIT_PROJECTION;}
+
+	void update(tbyte *data,SceneParameters *parameters){
+		memcpy(data,parameters->getCamera()->getProjectionMatrix().getData(),sizeof(Matrix4x4));
+	}
 };
 
 class NormalMatrixVariable:public RenderVariable{

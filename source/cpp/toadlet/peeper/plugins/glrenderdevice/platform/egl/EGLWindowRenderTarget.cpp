@@ -85,8 +85,13 @@ void EGLWindowRenderTarget::destroy(){
 
 bool EGLWindowRenderTarget::createContext(void *display,void *window,WindowRenderTargetFormat *format,bool pixmap){
 	#if defined(TOADLET_PLATFORM_WIN32)
-		if(display==0){
+		if(display==NULL){
+		if(display==NULL){
 			display=GetDC((HWND)window);
+		}
+	#else
+		if(display==NULL){
+			display=EGL_DEFAULT_DISPLAY;
 		}
 	#endif
 
@@ -140,6 +145,7 @@ bool EGLWindowRenderTarget::createContext(void *display,void *window,WindowRende
 	Logger::alert(Categories::TOADLET_PEEPER,
 		String("EGL_EXTENSIONS:")+eglQueryString(mDisplay,EGL_EXTENSIONS));
 
+Logger::alert(String("format:")+(int)format);
 	int pixelFormat=format->pixelFormat;
 	int redBits=TextureFormat::getRedBits(pixelFormat);
 	int greenBits=TextureFormat::getGreenBits(pixelFormat);

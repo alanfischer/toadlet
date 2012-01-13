@@ -1,67 +1,5 @@
 #include "Input.h"
 
-class GravityFollower:public NodeListener,InputDeviceListener{
-public:
-	GravityFollower(InputDevice *device){
-		mDevice=device;
-		mDevice->setListener(this);
-	}
-
-	void nodeDestroyed(Node *node){
-		mDevice->setListener(NULL);
-	}
-
-	void logicUpdated(Node *node,int dt){
-		mLastTranslate.set(mTranslate);
-		mLastRotate.set(mRotate);
-
-		mMotionMutex.lock();
-
-			const Vector4 &accel=mMotionData.values[InputData::Semantic_MOTION_ACCELERATION];
-			Vector3 up;
-			// When the phone is vertical, we're at 0,1,0
-			// When the phone is horizontal, we're at 0,0,1
-			// Store the z component to use for calculating our eye height
-			up.set(-accel.x,-accel.y,-accel.z);
-			scalar z=up.z;
-			up.z=0;
-			if(Math::normalizeCarefully(up,0)){
-				Vector3 eye(0,z-Math::ONE,z);
-				Math::normalize(eye);
-				Math::mul(eye,Math::fromInt(150));
-
-				((CameraNode*)node)->setLookAt(eye,Math::ZERO_VECTOR3,up);
-				mTranslate.set(node->getTranslate());
-				mRotate.set(node->getRotate());
-			}
-
-		mMotionMutex.unlock();
-	}
-	
-	void frameUpdated(Node *node,int dt){
-		Vector3 translate;
-		Math::lerp(translate,mLastTranslate,mTranslate,node->getScene()->getLogicFraction());
-		node->setTranslate(translate);
-		Quaternion rotate;
-		Math::slerp(rotate,mLastRotate,mRotate,node->getScene()->getLogicFraction());
-		node->setRotate(rotate);
-	}
-
-	void inputDetected(const InputData &data){
-		if(data.type==InputDevice::InputType_MOTION){
-			mMotionMutex.lock();
-			mMotionData.set(data);
-			mMotionMutex.unlock();
-		}
-	}
-
-	InputDevice *mDevice;
-	Mutex mMotionMutex;
-	InputData mMotionData;
-	Vector3 mTranslate,mLastTranslate;
-	Quaternion mRotate,mLastRotate;
-};
-
 Input::Input(Application *app){
 	this->app=app;
 }
@@ -129,6 +67,11 @@ void Input::create(){
 		proximityDevice->setListener(this);
 		proximityDevice->start();
 	}
+
+	serverSocket=Socket::ptr(Socket::createTCPSocket());
+	serverSocket->bind(34234);
+	serverSocket->listen(1);
+	socket=Socket::ptr(serverSocket->accept());
 }
 
 void Input::destroy(){
@@ -205,6 +148,16 @@ void Input::inputDetected(const InputData &data){
 	}
 	if(data.type==InputDevice::InputType_LIGHT){
 		setNeedle(lightNeedle,data.values[InputData::Semantic_LIGHT][0]);
+	}
+
+	if(socket!=NULL){
+		int amount=socket->send((tbyte*)&data.time,sizeof(data.time));
+		if(amount>=0){
+			socket->send((tbyte*)&data.type,sizeof(data.type));
+			int dataSize=data.values.size()*4;
+			socket->send((tbyte*)&dataSize,sizeof(dataSize));
+			socket->send((tbyte*)data.values.begin(),data.values.size()*sizeof(Vector4));
+		}
 	}
 
 	if(logStream!=NULL){

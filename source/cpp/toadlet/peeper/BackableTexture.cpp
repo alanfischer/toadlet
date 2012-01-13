@@ -122,6 +122,7 @@ PixelBuffer::ptr BackableTexture::getMipPixelBuffer(int level,int cubeSide){
 	}
 
 	if(mBuffers[index]==NULL){
+		Logger::alert("MAAAKE");
 		PixelBuffer::ptr buffer(new BackableTextureMipPixelBuffer(this,level,cubeSide));
 		mBuffers[index]=buffer;
 	}
