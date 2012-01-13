@@ -552,7 +552,7 @@ public abstract class AndroidApplication extends Activity implements RenderTarge
 		format.depthBits=16;
 		format.multisamples=0;
 		format.threads=0;
-		RenderTarget target=new EGLWindowRenderTarget(holder,format);
+		RenderTarget target=new EGLWindowRenderTarget(null,holder,format);
 		if(target!=null && target.isValid()==false){
 			target=null;
 		}
