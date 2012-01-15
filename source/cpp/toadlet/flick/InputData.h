@@ -53,6 +53,9 @@ public:
 
 		Semantic_PROXIMITY=0,
 		Semantic_MAX_PROXIMITY,
+
+		Semantic_MAGNETIC=0,
+		Semantic_MAX_MAGNETIC,
 	};
 
 	InputData(int type1=0,int time1=0,int size=0):
