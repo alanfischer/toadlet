@@ -25,6 +25,8 @@
 
 package us.toadlet.pad;
 
+import us.toadlet.peeper.*;
+
 public interface Applet{
 	public void create();
 	public void destroy();

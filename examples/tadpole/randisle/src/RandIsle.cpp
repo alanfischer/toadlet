@@ -191,7 +191,7 @@ mReflectCamera->setProjectionFovX(Math::degToRad(Math::fromInt(75)),ratio,mCamer
 }
 
 void RandIsle::render(RenderDevice *renderDevice){
-
+/*
 Matrix4x4 P=mCamera->getProjectionMatrix();
 Matrix4x4 rotate;
 Math::setMatrix4x4FromX(rotate,Math::PI);
@@ -260,7 +260,7 @@ mTerrain->setWaterMaterial(Resources::instance->waterMaterial);
 
 mReflectCamera->setProjectionMatrix(P);
 
-
+*/
 	renderDevice->beginScene();
 		mCamera->render(renderDevice);
 		mHUD->render(renderDevice);
