@@ -31,7 +31,8 @@ public interface InputDevice{
 	static final int InputType_ANGULAR=2;
 	static final int InputType_LIGHT=3;
 	static final int InputType_PROXIMITY=4;
-	static final int InputType_MAX=5;
+	static final int InputType_MAGNETIC=5;
+	static final int InputType_MAX=6;
 
 	public boolean create();
 	public void destroy();

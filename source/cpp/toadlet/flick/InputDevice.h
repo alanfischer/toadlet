@@ -41,6 +41,7 @@ public:
 		InputType_ANGULAR,
 		InputType_LIGHT,
 		InputType_PROXIMITY,
+		InputType_MAGNETIC,
 		InputType_MAX,
 	};
 
