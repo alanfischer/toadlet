@@ -25,15 +25,23 @@
 
 package us.toadlet.pad;
 
+import us.toadlet.peeper.*;
 import us.toadlet.ribbit.*;
 
-public class Engine{
-	public Engine(int nativeHandle){mNativeHandle=nativeHandle;}
-
+public class NEngine implements Engine{
+	public NEngine(){
+		makeEngine();
+	}
+	
 	public native void destroy();
 
 	public native void installHandlers();
 
-	public int getNativeHandle(){return mNativeHandle;}
+	public native void setRenderDevice(RenderDevice device);
+	
+	public native void setAudioDevice(AudioDevice device);
+
+	private native void makeEngine();
+	
 	protected int mNativeHandle;
 }

@@ -23,18 +23,11 @@
  *
  ********** Copyright header - do not remove **********/
 
-package us.toadlet.pad;
+package us.toadlet.peeper;
 
-import us.toadlet.peeper.*;
+public interface RenderDevice{
+	public boolean create(RenderTarget target,int[] options);
+	public void destroy();
 
-public class RenderDevice{
-	public RenderDevice(int nativeHandle){mNativeHandle=nativeHandle;}
-
-	public native boolean create(RenderTarget target,int[] options);
-	public native void destroy();
-
-	public native boolean setRenderTarget(RenderTarget target);
-
-	public int getNativeHandle(){return mNativeHandle;}
-	protected int mNativeHandle;
+	public boolean setRenderTarget(RenderTarget target);
 }

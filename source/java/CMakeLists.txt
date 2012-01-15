@@ -76,6 +76,7 @@ set (PEEPER_SRC
 	us/toadlet/peeper/TextureFormat.java
 	us/toadlet/peeper/WindowRenderTargetFormat.java
 	us/toadlet/peeper/RenderTarget.java
+	us/toadlet/peeper/RenderDevice.java
 	us/toadlet/peeper/GLRenderTarget.java
 	us/toadlet/peeper/EGLRenderTarget.java
 	us/toadlet/peeper/EGLWindowRenderTarget.java
@@ -135,16 +136,16 @@ set (PAD_SRC
 	us/toadlet/pad/Applet.java
 	us/toadlet/pad/AndroidApplication.java
 	us/toadlet/pad/Engine.java
-	us/toadlet/pad/RenderDevice.java
 	us/toadlet/pad/NApplet.java
+	us/toadlet/pad/NRenderDevice.java
 	${CMAKE_CURRENT_BINARY_DIR}/us/toadlet/pad/Version.java
 )
 
 set (PAD_H
 	us.toadlet.pad.AndroidApplication
-	us.toadlet.pad.Engine
-	us.toadlet.pad.RenderDevice
+	us.toadlet.pad.NEngine
 	us.toadlet.pad.NApplet
+	us.toadlet.pad.NRenderDevice
 )
 
 # Create the jar file with UseJava.cmake functions. See UseJava.cmake for details.

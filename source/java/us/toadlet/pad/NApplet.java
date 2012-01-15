@@ -25,6 +25,8 @@
 
 package us.toadlet.pad;
 
+import us.toadlet.peeper.*;
+
 public class NApplet implements Applet{
 	public NApplet(int nativeHandle){mNativeHandle=nativeHandle;}
 

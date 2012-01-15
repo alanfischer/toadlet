@@ -38,8 +38,8 @@ using namespace toadlet::pad;
 TOADLET_C_API AudioDevice* new_JAudioDevice(JNIEnv *env,jobject obj);
 TOADLET_C_API InputDevice* new_JInputDevice(JNIEnv *env,jobject obj);
 
-extern jmethodID getNativeHandleEngineID;
-extern jmethodID getNativeHandleRenderDeviceID;
+extern jfieldID nengineNativeHandleID;
+extern jfieldID nrenderDeviceNativeHandleID;
 extern "C" JNIEXPORT void Java_us_toadlet_pad(JNIEnv *env);
 
 namespace toadlet{
@@ -73,16 +73,11 @@ JApplication::JApplication(JNIEnv *jenv,jobject jobj):
 		setDifferenceMouseID=env->GetMethodID(appClass,"setDifferenceMouse","(Z)V");
 		getDifferenceMouseID=env->GetMethodID(appClass,"getDifferenceMouse","()Z");
 		getEngineID=env->GetMethodID(appClass,"getEngine","()Lus/toadlet/pad/Engine;");
-		getRenderDeviceID=env->GetMethodID(appClass,"getRenderDevice","()Lus/toadlet/pad/RenderDevice;");
+		getRenderDeviceID=env->GetMethodID(appClass,"getRenderDevice","()Lus/toadlet/peeper/RenderDevice;");
 		getAudioDeviceID=env->GetMethodID(appClass,"getAudioDevice","()Lus/toadlet/ribbit/AudioDevice;");
 		getInputDeviceID=env->GetMethodID(appClass,"getInputDevice","(I)Lus/toadlet/flick/InputDevice;");
-
-		setNativeHandleID=env->GetMethodID(appClass,"setNativeHandle","(I)V");
-		getNativeHandleID=env->GetMethodID(appClass,"getNativeHandle","()I");
 	}
 	env->DeleteLocalRef(appClass);
-
-	env->CallVoidMethod(obj,setNativeHandleID,(int)this);
 
 	Java_us_toadlet_pad(env);
 }
@@ -174,7 +169,7 @@ Engine *JApplication::getEngine() const{
 
 	if(mEngine==NULL || mLastEngineObj!=engineObj){
 		//if(obj is NEngine){
-			mEngine=engineObj!=NULL?(Engine*)env->CallIntMethod(engineObj,getNativeHandleEngineID):NULL;
+			mEngine=engineObj!=NULL?(Engine*)env->GetIntField(engineObj,nengineNativeHandleID):NULL;
 		//}
 		//else{
 		//	mEngine=new JENgine(env,engineObj);
@@ -196,7 +191,7 @@ RenderDevice *JApplication::getRenderDevice() const{
 
 	if(mRenderDevice==NULL || mLastRenderDeviceObj!=deviceObj){
 		//if(jobject is NRenderDevice){
-			mRenderDevice=deviceObj!=NULL?(RenderDevice*)env->CallIntMethod(deviceObj,getNativeHandleRenderDeviceID):NULL;
+			mRenderDevice=deviceObj!=NULL?(RenderDevice*)env->GetIntField(deviceObj,nrenderDeviceNativeHandleID):NULL;
 		//}
 		//else{
 		//	mRenderDevice=new JRenderDevice(env,deviceObj);
@@ -218,7 +213,7 @@ AudioDevice *JApplication::getAudioDevice() const{
 
 	if(mAudioDevice==NULL || mLastAudioDeviceObj!=deviceObj){
 		//if(jobject is NAudioDevice){
-		//	mAudioDevice=deviceObj!=NULL?(AudioDevice*)env->CallIntMethod(deviceObj,getNativeHandleAudioDeviceID):NULL;
+		//	mAudioDevice=deviceObj!=NULL?(AudioDevice*)env->GetIntField(deviceObj,audioDeviceNativeHandleID):NULL;
 		//}
 		//else{
 			mAudioDevice=deviceObj!=NULL?new_JAudioDevice(env,deviceObj):NULL;

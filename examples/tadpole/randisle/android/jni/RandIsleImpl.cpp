@@ -16,13 +16,7 @@ extern "C" JNIEXPORT jobject JNICALL Java_us_toadlet_randisle_RandIsle_createApp
 	Java_us_toadlet_pad(env);
 
 	Logger::alert("getting Application");
-	Application *app=NULL;
-	jclass appClass=env->GetObjectClass(obj);
-	{
-		jmethodID getNativeHandleID=env->GetMethodID(appClass,"getNativeHandle","()I");
-		app=(Application*)env->CallIntMethod(obj,getNativeHandleID);
-	}
-	env->DeleteLocalRef(appClass);
+	Application *app=new JApplication(env,obj);
 
 	Logger::alert("creating applet");
 	Applet *applet=new RandIsle(app,"");
