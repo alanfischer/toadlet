@@ -34,6 +34,18 @@ JNIEXPORT jboolean JNICALL Java_us_toadlet_pad_NRenderDevice_setRenderTarget(JNI
 	return false;
 }
 
+JNIEXPORT void JNICALL Java_us_toadlet_pad_NRenderDevice_clear(JNIEnv *env,jobject obj,int clearFlags,int clearColor){
+	RenderDevice *device=(RenderDevice*)env->GetIntField(obj,nrenderDeviceNativeHandleID);
+
+	device->clear(clearFlags,Vector4(clearColor));
+}
+
+JNIEXPORT void JNICALL Java_us_toadlet_pad_NRenderDevice_swap(JNIEnv *env,jobject obj){
+	RenderDevice *device=(RenderDevice*)env->GetIntField(obj,nrenderDeviceNativeHandleID);
+
+	device->swap();
+}
+
 JNIEXPORT void JNICALL Java_us_toadlet_pad_NRenderDevice_makeRenderDevice(JNIEnv *env,jobject obj){
 	RenderDevice *device=new_GLRenderDevice();
 

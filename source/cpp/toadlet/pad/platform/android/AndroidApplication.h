@@ -123,6 +123,7 @@ protected:
 	static void onNativeWindowResized(ANativeActivity *activity,ANativeWindow *window);
 	static void onInputQueueCreated(ANativeActivity *activity,AInputQueue *queue);
 	static void onInputQueueDestroyed(ANativeActivity *activity,AInputQueue *queue);
+	static void onConfigurationChanged(ANativeActivity* activity);
 
 	ANativeActivity *mActivity;
 	AConfiguration *mConfig;
