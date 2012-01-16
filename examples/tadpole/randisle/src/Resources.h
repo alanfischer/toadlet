@@ -159,7 +159,7 @@ public:
 "vout.refractionPosition = mul(vin.position, preWorldViewProjection);\n"
 //"vout.refractionPosition = vin.position;\n"
 "vout.some.x = 0.5 * (vout.position.w + vout.position.x);\n"
-"vout.some.y = 0.5 * (vout.position.w + vout.position.y);\n"
+"vout.some.y = 0.5 * (vout.position.w - vout.position.y);\n"
 "vout.some.z = vout.position.w;\n"
 						"vout.fog=clamp(1.0-(vout.position.z-fogDistance.x)/(fogDistance.y-fogDistance.x),0.0,1.0);\n"
 						"return vout;\n"

@@ -221,7 +221,7 @@ suffix.setAt(2,3,cplane[3]);
 
 Matrix4x4 newP = suffix * P;
 
-mCamera->setProjectionMatrix(newP);
+//mCamera->setProjectionMatrix(newP);
 
 
 float a=0,b=0,c=1;
@@ -239,8 +239,12 @@ Vector3 forward=mCamera->getForward();
 Math::mulPoint3Fast(position,reflectionMatrix);
 Math::mulPoint3Fast(forward,reflectionMatrix);
 
-Math::setMatrix4x4FromLookDir(m,position,forward,Vector3(0,0,1),true);
+Matrix4x4 m,m2;
+Math::setMatrix4x4FromLookDir(m,position,forward,Vector3(0,0,-1),true);
 
+Math::invert(m,mCamera->getViewMatrix());
+Math::postMul(m,reflectionMatrix);
+Math::invert(m2,m);m=m2;
 mReflectCamera->setMatrix4x4(m);
 
 mReflectCamera->frameUpdate(0,-1);
@@ -250,6 +254,7 @@ mTerrain->setWaterMaterial(NULL);
 	RenderTarget *oldTarget=renderDevice->getRenderTarget();
 	renderDevice->setRenderTarget(Resources::instance->reflectTarget);
 	renderDevice->beginScene();
+mCamera->setViewport(Viewport(0,0,Resources::instance->reflectTarget->getWidth(),Resources::instance->reflectTarget->getHeight()));
 		mReflectCamera->render(renderDevice);
 	renderDevice->endScene();
 	renderDevice->swap();
@@ -257,11 +262,12 @@ mTerrain->setWaterMaterial(NULL);
 
 Resources::instance->waterMaterial->retain();
 mTerrain->setWaterMaterial(Resources::instance->waterMaterial);
-
-mReflectCamera->setProjectionMatrix(P);
-
 */
+//mReflectCamera->setProjectionMatrix(P);
+
+
 	renderDevice->beginScene();
+//mCamera->setViewport(Viewport(0,0,oldTarget->getWidth(),oldTarget->getHeight()));
 		mCamera->render(renderDevice);
 		mHUD->render(renderDevice);
 	renderDevice->endScene();
@@ -399,7 +405,7 @@ void RandIsle::frameUpdate(int dt){
 	if(position.z>0){
 		if(position.z<1) position.z=1;
 		mCamera->setClearColor(Resources::instance->fadeColor);
-		mCamera->getDefaultState()->setFogState(FogState());//FogState::FogType_LINEAR,Math::ONE,mCamera->getFarDist()/2,mCamera->getFarDist(),mCamera->getClearColor()));
+		mCamera->getDefaultState()->setFogState(FogState(FogState::FogType_LINEAR,Math::ONE,mCamera->getFarDist()/2,mCamera->getFarDist(),mCamera->getClearColor()));
 		mCamera->setScope(mCamera->getScope()|Scope_BIT_ABOVEWATER);
 	}
 	else{

@@ -35,6 +35,10 @@ public class NRenderDevice implements RenderDevice{
 
 	public native boolean setRenderTarget(RenderTarget target);
 
+	public native void clear(int clearColor,int clearFlags);
+	
+	public native void swap();
+	
 	private native void makeRenderDevice();
 	
 	protected int mNativeHandle;

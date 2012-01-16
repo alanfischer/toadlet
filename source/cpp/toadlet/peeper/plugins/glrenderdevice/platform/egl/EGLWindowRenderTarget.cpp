@@ -145,7 +145,6 @@ bool EGLWindowRenderTarget::createContext(void *display,void *window,WindowRende
 	Logger::alert(Categories::TOADLET_PEEPER,
 		String("EGL_EXTENSIONS:")+eglQueryString(mDisplay,EGL_EXTENSIONS));
 
-Logger::alert(String("format:")+(int)format);
 	int pixelFormat=format->pixelFormat;
 	int redBits=TextureFormat::getRedBits(pixelFormat);
 	int greenBits=TextureFormat::getGreenBits(pixelFormat);
@@ -167,7 +166,7 @@ Logger::alert(String("format:")+(int)format);
 		String("chooseEGLConfig config:")+(int)mConfig);
 
 	TOADLET_TRY
-		if(!pixmap){		
+		if(!pixmap){
 			mSurface=eglCreateWindowSurface(mDisplay,mConfig,(NativeWindowType)window,NULL);
 			TOADLET_CHECK_EGLERROR("eglCreateWindowSurface");
 		}

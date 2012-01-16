@@ -30,4 +30,8 @@ public interface RenderDevice{
 	public void destroy();
 
 	public boolean setRenderTarget(RenderTarget target);
+	
+	public void clear(int clearFlags,int clearColor);
+	
+	public void swap();
 }
