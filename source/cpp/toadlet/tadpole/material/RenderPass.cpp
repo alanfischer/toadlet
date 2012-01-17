@@ -119,7 +119,7 @@ void RenderPass::setShader(Shader::ShaderType type,Shader::ptr shader){
 	}
 }
 
-RenderVariableSet::ptr RenderPass::getVariables(){
+RenderVariableSet::ptr RenderPass::makeVariables(){
 	if(mVariables==NULL){
 		mVariables=RenderVariableSet::ptr(new RenderVariableSet());
 		mVariables->buildBuffers(mManager->getBufferManager(),this);
@@ -128,26 +128,15 @@ RenderVariableSet::ptr RenderPass::getVariables(){
 	return mVariables;
 }
 
+void RenderPass::updateVariables(int scope,SceneParameters *parameters){
+	if(mVariables!=NULL){
+		mVariables->update(scope,parameters);
+	}
+}
+
 bool RenderPass::isDepthSorted() const{
 	DepthState state;
 	return mRenderState->getDepthState(state) && state.write==false;
-}
-
-void RenderPass::setupRenderVariables(RenderDevice *renderDevice,int scope,SceneParameters *parameters){
-	if(mVariables==NULL){
-		return;
-	}
-
-	mVariables->update(scope,parameters);
-
-	int i;
-	for(i=0;i<mVariables->getNumBuffers();++i){
-		int bufferScope=mVariables->getBufferScope(i);
-		// If the buffer applies to this scope, and it is the highest bit scope in the buffer
-		if((bufferScope&scope)!=0 && (bufferScope&~scope)<=scope){
-			renderDevice->setBuffer(mVariables->getBufferShaderType(i),mVariables->getBufferIndex(i),mVariables->getBuffer(i));
-		}
-	}
 }
 
 }

@@ -123,6 +123,8 @@ public abstract class AndroidApplication extends Activity implements RenderTarge
 	protected void onCreate(Bundle bundle){
 		super.onCreate(bundle);
 
+		System.out.println("Free memory on create:"+Runtime.getRuntime().freeMemory());
+
 		create();
 	}
 
@@ -131,10 +133,8 @@ public abstract class AndroidApplication extends Activity implements RenderTarge
 
 		super.onStart();
 		
-		Runtime runtime=Runtime.getRuntime();
-		System.out.println("Free memory"+runtime.freeMemory());
 		System.gc();
-		System.out.println("Free memory"+runtime.freeMemory());
+		System.out.println("Free memory on start:"+Runtime.getRuntime().freeMemory());
 
 		mLastTime=System.currentTimeMillis();
 		mRun=true;
@@ -189,19 +189,18 @@ public abstract class AndroidApplication extends Activity implements RenderTarge
 	}
 	
 	public boolean create(){
-		createNativeApplication();
-
 		if(mEngine==null){
-			mEngine=makeEngine();
+			mEngine=new NEngine();
 			mEngine.installHandlers();
+			installHandlers(mEngine);
 		}
 
 		if(mAudioDevice==null){
-			mAudioDevice=makeAudioDevice();
+			mAudioDevice=new ATAudioDevice();
 			if(mAudioDevice!=null && mAudioDevice.create()==false){
 				mAudioDevice=null;
 			}
-			notifyEngineAudioDevice(mEngine);
+			mEngine.setAudioDevice(mAudioDevice);
 		}
 
 		us.toadlet.flick.InputDevice motionDevice=new AndroidSensorDevice(this,Sensor.TYPE_ACCELEROMETER);
@@ -224,6 +223,11 @@ public abstract class AndroidApplication extends Activity implements RenderTarge
 			mInputDevices[proximityDevice.getType()]=proximityDevice;
 		}
 
+		us.toadlet.flick.InputDevice magneticDevice=new AndroidSensorDevice(this,Sensor.TYPE_MAGNETIC_FIELD);
+		if(magneticDevice.create()){
+			mInputDevices[magneticDevice.getType()]=magneticDevice;
+		}
+		
 		if(mApplet==null){
 			mApplet=createApplet(this);
 			mApplet.create();
@@ -249,13 +253,11 @@ public abstract class AndroidApplication extends Activity implements RenderTarge
 		
 		if(mEngine!=null){
 			mEngine.destroy();
-			deleteEngine(mEngine);
 			mEngine=null;
 		}
 
 		if(mAudioDevice!=null){
 			mAudioDevice.destroy();
-			deleteAudioDevice(mAudioDevice);
 			mAudioDevice=null;
 		}
 
@@ -266,8 +268,6 @@ public abstract class AndroidApplication extends Activity implements RenderTarge
 				mInputDevices[i]=null;
 			}
 		}
-		
-		destroyNativeApplication();
   	}
 	
 	public void start(){
@@ -501,8 +501,7 @@ public abstract class AndroidApplication extends Activity implements RenderTarge
 		boolean result=false;
 		mRenderTarget=makeRenderTarget(holder);
 		if(mRenderTarget!=null){
-			mRenderDevice=makeRenderDevice();
-
+			mRenderDevice=new NRenderDevice();
 			result=mRenderDevice.create(this,null);
 			if(result==false){
 				mRenderDevice=null;
@@ -521,7 +520,7 @@ public abstract class AndroidApplication extends Activity implements RenderTarge
 
 		if(mRenderDevice!=null){
 			mRenderDevice.setRenderTarget(this);
-			notifyEngineRenderDevice(mEngine);
+			mEngine.setRenderDevice(mRenderDevice);
 		}
 	}
 
@@ -530,12 +529,9 @@ public abstract class AndroidApplication extends Activity implements RenderTarge
 			"AndroidApplication.surfaceDestroyed");
 
 		if(mRenderDevice!=null){
-			RenderDevice device=mRenderDevice;
+			mEngine.setRenderDevice(null);
+			mRenderDevice.destroy();
 			mRenderDevice=null;
-			
-			notifyEngineRenderDevice(mEngine);
-			device.destroy();
-			deleteRenderDevice(device);
 		}
 
 		if(mRenderTarget!=null){
@@ -545,19 +541,17 @@ public abstract class AndroidApplication extends Activity implements RenderTarge
 	}
 
 	protected RenderTarget makeRenderTarget(SurfaceHolder holder){
-		System.out.println("AndroidApplciation.makeRenderTarget");
+		System.out.println("AndroidApplication.makeRenderTarget");
 
 		WindowRenderTargetFormat format=new WindowRenderTargetFormat();
 		format.pixelFormat=TextureFormat.Format_RGB_5_6_5;
 		format.depthBits=16;
 		format.multisamples=0;
 		format.threads=0;
-		RenderTarget target=new EGLWindowRenderTarget(holder,format);
+		RenderTarget target=new EGLWindowRenderTarget(null,holder,format);
 		if(target!=null && target.isValid()==false){
 			target=null;
 		}
-
-		System.out.println("AndroidApplciation.makeRenderTarget done");
 
 		return target;
 	}
@@ -575,21 +569,8 @@ public abstract class AndroidApplication extends Activity implements RenderTarge
 		}
 	}
 	
-	public void setNativeHandle(int handle){mNativeHandle=handle;}
-	public int getNativeHandle(){return mNativeHandle;}
-
-	protected AudioDevice makeAudioDevice(){return new ATAudioDevice();}
-	protected void deleteAudioDevice(AudioDevice device){}
-
-	protected native void createNativeApplication();
-	protected native void destroyNativeApplication();
-	protected native Engine makeEngine();
-	protected native void deleteEngine(Engine engine);
-	protected native boolean notifyEngineRenderDevice(Engine engine);
-	protected native boolean notifyEngineAudioDevice(Engine engine);
-	protected native RenderDevice makeRenderDevice();
-	protected native void deleteRenderDevice(RenderDevice device);
-	
+	protected native void installHandlers(Engine engine);
+		
 	Thread mThread=null;
 	protected ApplicationView mView;
 	protected Applet mApplet;
@@ -606,7 +587,6 @@ public abstract class AndroidApplication extends Activity implements RenderTarge
 	protected RenderDevice mRenderDevice;
 	protected AudioDevice mAudioDevice;
 	protected us.toadlet.flick.InputDevice[] mInputDevices=new us.toadlet.flick.InputDevice[us.toadlet.flick.InputDevice.InputType_MAX];
-	protected int mNativeHandle;
 	
 	protected SurfaceHolder mNotifySurfaceCreated;
 	protected SurfaceHolder mNotifySurfaceDestroyed;

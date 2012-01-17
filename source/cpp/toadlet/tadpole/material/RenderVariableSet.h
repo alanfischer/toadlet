@@ -62,6 +62,7 @@ public:
 
 	bool addVariable(const String &name,RenderVariable::ptr variable,int scope);
 	void removeVariable(RenderVariable::ptr variable);
+	RenderVariable::ptr findVariable(const String &name);
 	int getNumVariables(){int count=0,j;for(j=0;j<mBuffers.size();++j){count+=mBuffers[j].variables.size();}return count;}
 	RenderVariable::ptr getVariable(int i){return getVariableInfo(i)->variable;}
 	const String &getVariableName(int i){return getVariableInfo(i)->name;}

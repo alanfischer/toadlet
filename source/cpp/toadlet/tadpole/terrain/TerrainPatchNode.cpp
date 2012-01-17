@@ -49,6 +49,7 @@ TerrainPatchNode::TerrainPatchNode():Node(),
 	mEpsilon(0),
 	mCellEpsilon(0),
 
+	mCameraUpdateScope(-1),
 	mTolerance(0),
 	mS1(0),mS2(0)
 {}
@@ -670,9 +671,11 @@ bool TerrainPatchNode::unstitchFromBottom(TerrainPatchNode *terrain){
 void TerrainPatchNode::gatherRenderables(CameraNode *camera,RenderableSet *set){
 	super::gatherRenderables(camera,set);
 
-	updateBlocks(camera);
-	updateVertexes();
-	updateIndexBuffers(camera);
+	if((camera->getScope()&mCameraUpdateScope)!=0){
+		updateBlocks(camera);
+		updateVertexes();
+		updateIndexBuffers(camera);
+	}
 
 	if(mIndexData->getCount()>0){
 		#if defined(TOADLET_GCC_INHERITANCE_BUG)
@@ -683,7 +686,9 @@ void TerrainPatchNode::gatherRenderables(CameraNode *camera,RenderableSet *set){
 	}
 
 	if(mWaterRenderable!=NULL && mWaterMaterial!=NULL){
-		updateWaterIndexBuffers(camera);
+		if((camera->getScope()&mCameraUpdateScope)!=0){
+			updateWaterIndexBuffers(camera);
+		}
 
 		if(mWaterIndexData->getCount()>0){
 			set->queueRenderable(mWaterRenderable);

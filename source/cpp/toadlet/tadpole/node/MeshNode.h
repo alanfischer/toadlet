@@ -49,7 +49,7 @@ public:
 		TOADLET_SHARED_POINTERS(SubMesh);
 
 		SubMesh(MeshNode *meshNode,Mesh::SubMesh *meshSubMesh);
-		void destroy(){if(material!=NULL){material->release();}}
+		void destroy(){if(material!=NULL){material->release();material=NULL;}}
 
 		Material *getRenderMaterial() const{return material;}
 		const Transform &getRenderTransform() const{return hasOwnTransform?worldTransform:meshNode->getWorldTransform();}

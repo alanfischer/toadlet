@@ -107,10 +107,28 @@ bool WGLPBufferRenderTarget::swap(){
 }
 
 bool WGLPBufferRenderTarget::attach(PixelBuffer::ptr buffer,Attachment attachment){
-	GLTextureMipPixelBuffer *texturebuffer=((GLPixelBuffer*)buffer->getRootPixelBuffer())->castToGLTextureMipPixelBuffer();
-	mTexture=texturebuffer->getTexture();
+	GLPixelBuffer *glbuffer=(GLPixelBuffer*)buffer->getRootPixelBuffer();
+	if(glbuffer==NULL){
+		Error::nullPointer(Categories::TOADLET_PEEPER,
+			"null PixelBuffer");
+		return false;
+	}
+	
+	GLTextureMipPixelBuffer *glmipbuffer=glbuffer->castToGLTextureMipPixelBuffer();
+	if(glmipbuffer==NULL){
+		Error::nullPointer(Categories::TOADLET_PEEPER,
+			"PixelBuffer is not a TextureMipPixelBuffer");
+		return false;
+	}
+		
+	mTexture=glmipbuffer->getTexture();
+	if(mTexture==NULL){
+		Error::invalidParameters(Categories::TOADLET_PEEPER,
+			"texture is null");
+		return false;
+	}
 
-	if((mTexture->getFormat()->getPixelFormat()&TextureFormat::Format_SEMANTIC_DEPTH)>0){
+	if((mTexture->getFormat()->getPixelFormat()&TextureFormat::Format_MASK_SEMANTICS)==TextureFormat::Format_SEMANTIC_DEPTH){
 		Error::invalidParameters(Categories::TOADLET_PEEPER,
 			"Format_SEMANTIC_DEPTH not available for pbuffers");
 		return false;

@@ -32,20 +32,23 @@ import static javax.microedition.khronos.egl.EGL11.*;
 
 public class EGLWindowRenderTarget extends EGLRenderTarget{
 	public EGLWindowRenderTarget(){super();}
-	public EGLWindowRenderTarget(Object nativeSurface,WindowRenderTargetFormat format){createContext(nativeSurface,format,false);}
-	public EGLWindowRenderTarget(Object nativeSurface,WindowRenderTargetFormat format,boolean pixmap){createContext(nativeSurface,format,pixmap);}
+	public EGLWindowRenderTarget(Object display,Object window,WindowRenderTargetFormat format){createContext(display,window,format,false);}
+	public EGLWindowRenderTarget(Object display,Object window,WindowRenderTargetFormat format,boolean pixmap){createContext(display,window,format,pixmap);}
 	public void destroy(){destroyContext();}
 
 	public RenderTarget getRootRenderTarget(){return this;}
 
-	public boolean createContext(Object nativeSurface,WindowRenderTargetFormat format){return createContext(nativeSurface,format,false);}
-	public boolean createContext(Object nativeSurface,WindowRenderTargetFormat format,boolean pixmap){
+	public boolean createContext(Object display,Object window,WindowRenderTargetFormat format){return createContext(display,window,format,false);}
+	public boolean createContext(Object display,Object window,WindowRenderTargetFormat format,boolean pixmap){
 		if(mContext!=EGL_NO_CONTEXT){
 			return true;
 		}
 
 		mPixmap=pixmap;
 
+		if(display==null){
+			display=EGL_DEFAULT_DISPLAY;
+		}
 		mDisplay=egl.eglGetDisplay(EGL_DEFAULT_DISPLAY);
 		if(mDisplay==EGL_NO_DISPLAY){
 			System.out.println(
@@ -93,11 +96,11 @@ public class EGLWindowRenderTarget extends EGLRenderTarget{
 			"chooseEGLConfig config:"+mConfig);
 
 		if(!pixmap){
-			mSurface=egl.eglCreateWindowSurface(mDisplay,mConfig,nativeSurface,null);
+			mSurface=egl.eglCreateWindowSurface(mDisplay,mConfig,window,null);
 			TOADLET_CHECK_EGLERROR("eglCreateWindowSurface");
 		}
 		else{
-			mSurface=egl.eglCreatePixmapSurface(mDisplay,mConfig,nativeSurface,null);
+			mSurface=egl.eglCreatePixmapSurface(mDisplay,mConfig,window,null);
 			TOADLET_CHECK_EGLERROR("eglCreatePixmapSurface");
 		}
 		if(mSurface==EGL_NO_SURFACE){

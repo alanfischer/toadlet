@@ -26,20 +26,22 @@
 package us.toadlet.pad;
 
 import us.toadlet.peeper.*;
+import us.toadlet.ribbit.*;
 
-public interface Applet{
-	public void create();
-	public void destroy();
-	public void update(int dt);
-	public void render(RenderDevice renderDevice);
+public class NEngine implements Engine{
+	public NEngine(){
+		makeEngine();
+	}
+	
+	public native void destroy();
 
-	public void resized(int width,int height);
-	public void focusGained();
-	public void focusLost();
-	public void keyPressed(int key);
-	public void keyReleased(int key);
-	public void mousePressed(int x,int y,int button);
-	public void mouseMoved(int x,int y);
-	public void mouseReleased(int x,int y,int button);
-	public void mouseScrolled(int x,int y,int scroll);
+	public native void installHandlers();
+
+	public native void setRenderDevice(RenderDevice device);
+	
+	public native void setAudioDevice(AudioDevice device);
+
+	private native void makeEngine();
+	
+	protected int mNativeHandle;
 }

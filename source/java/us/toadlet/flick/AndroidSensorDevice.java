@@ -93,6 +93,10 @@ public class AndroidSensorDevice implements InputDevice,SensorEventListener{
 				mData.valid=(1<<InputData.Semantic_PROXIMITY);
 				System.arraycopy(event.values,0,mData.values[InputData.Semantic_PROXIMITY],0,event.values.length);
 			break;
+			case InputType_MAGNETIC:
+				mData.valid=(1<<InputData.Semantic_MAGNETIC);
+				System.arraycopy(event.values,0,mData.values[InputData.Semantic_MAGNETIC],0,event.values.length);
+			break;
 			default:
 				System.arraycopy(event.values,0,mData.values[0],0,event.values.length);
 			break;
@@ -113,6 +117,8 @@ public class AndroidSensorDevice implements InputDevice,SensorEventListener{
 				return InputType_LIGHT;
 			case Sensor.TYPE_PROXIMITY:
 				return InputType_PROXIMITY;
+			case Sensor.TYPE_MAGNETIC_FIELD:
+				return InputType_MAGNETIC;
 			default:
 				return InputType_MAX;
 		}

@@ -26,6 +26,7 @@
 #ifndef TOADLET_EGG_BASERESOURCE_H
 #define TOADLET_EGG_BASERESOURCE_H
 
+#include <toadlet/egg/PointerCounter.h>
 #include <toadlet/egg/Resource.h>
 #include <toadlet/egg/ResourceFullyReleasedListener.h>
 
@@ -36,13 +37,18 @@ class BaseResource:public Resource{
 public:
 	TOADLET_SHARED_POINTERS(BaseResource);
 
-	BaseResource():mReference(0),mListener(NULL),mName(),mUniqueHandle(0){}
-	virtual ~BaseResource(){}
+	BaseResource():mReference(0),mListener(NULL),mName(),mUniqueHandle(0){
+//mPointerCounter=new PointerCounter(0);
+	}
+	virtual ~BaseResource(){
+//mListener->resourceFullyReleased(this);
+	}
 
 	virtual void destroy()=0;
 
 	void retain(){++mReference;}
 	void release(){if(--mReference==0){mListener!=NULL?mListener->resourceFullyReleased(this):destroy();}}
+PointerCounter *pointerCounter(){return mPointerCounter;}
 
 	void setFullyReleasedListener(ResourceFullyReleasedListener *listener){mListener=listener;}
 
@@ -52,10 +58,11 @@ public:
 	void internal_setUniqueHandle(int handle){mUniqueHandle=handle;}
 	int getUniqueHandle() const{return mUniqueHandle;}
 
-	int getReferenceCount(){return mReference;}
+//	int getReferenceCount(){return mReference;}
 
 protected:
 	int mReference;
+PointerCounter *mPointerCounter;
 	ResourceFullyReleasedListener *mListener;
 	String mName;
 	int mUniqueHandle;
@@ -70,6 +77,7 @@ protected:
 #define TOADLET_BASERESOURCE_PASSTHROUGH(BaseClass)\
 	void retain(){toadlet::egg::BaseResource::retain();} \
 	void release(){if(--mReference==0){mListener!=NULL?mListener->resourceFullyReleased((BaseClass*)this):destroy();}} \
+toadlet::egg::PointerCounter *pointerCounter(){return toadlet::egg::BaseResource::pointerCounter();} \
 	void setFullyReleasedListener(toadlet::egg::ResourceFullyReleasedListener *listener){toadlet::egg::BaseResource::setFullyReleasedListener(listener);} \
 	void setName(const toadlet::egg::String &name){toadlet::egg::BaseResource::setName(name);}\
 	const toadlet::egg::String &getName() const{return toadlet::egg::BaseResource::getName();}\

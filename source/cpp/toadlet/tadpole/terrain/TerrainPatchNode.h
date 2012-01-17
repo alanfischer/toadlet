@@ -102,6 +102,8 @@ public:
 	bool stitchToBottom(TerrainPatchNode *terrain,bool restitchDependents=true);
 	void updateBlockBoundsBottom(Block *block,int q,int x,int y,int s);
 	bool unstitchFromBottom(TerrainPatchNode *terrain);
+
+	void setCameraUpdateScope(int scope){mCameraUpdateScope=scope;}
 	void setTolerance(scalar tolerance){mTolerance=tolerance;}
 	void setScale1(float s1){mS1=s1;}
 	void setScale2(float s2){mS2=s2;}
@@ -233,6 +235,7 @@ protected:
 	TerrainPatchNode::ptr mLeftDependent;
 	TerrainPatchNode::ptr mTopDependent;
 
+	int mCameraUpdateScope;
 	scalar mTolerance;
 	scalar mS1,mS2;
 
