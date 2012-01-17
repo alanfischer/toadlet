@@ -25,36 +25,25 @@
 #*
 #********** Copyright header - do not remove **********
 
-#TODO: Replace this with the blender 2.5+ dict
-"""
-Name: 'XMSH Exporter'
-Blender: 249
-Group: 'Export'
-Tooltip: 'Toadlet XMSH exporter'
-"""
-
-__author__ = "Andrew Fischer"
-__url__ = ['http://code.google.com/p/toadlet','www.blender.org']
-__version__ = "1.0"
-
-__bpydoc__ = """\
-This script exports a toadlet XMSH file.
-
-Notes:
-
-* Only selected armatures and meshes will be exported.
-* Only triangle meshes are supported, convert any quads before exporting.
-* Faces without a material will be assigned a dummy one.
-* Bones with idential names are not supported, and will result in badly exported skeletons
-
-Usage:
-
-Select the objects you wish to export and run this script from the "File->Export" menu.
-"""
+bl_info={
+	"name": "Toadlet XMSH Exporter",
+	"author": "Andrew Fischer",
+	"blender": (2, 5, 7),
+	"api": 35622,
+	"location": "File > Import-Export",
+	"description": "Export toadlet meshes and materials",
+	"warning": "Only triangle meshes supported, convert any quads. "
+		"Bones with identical names not supported.",
+	"wiki_url": "http://code.google.com/p/toadlet",
+	"tracker_url": "",
+	"support": 'COMMUNITY',
+	"category": "Import-Export"}
 
 
+import os,sys,subprocess,time
 import bpy
-import os,sys,subprocess
+from bpy.props import BoolProperty
+from bpy_extras.io_utils import ExportHelper
 
 
 class XMSHVertex:	
@@ -67,7 +56,7 @@ class XMSHVertex:
 		self.bones=[]
 		
 	
-def export(filename):
+def doExport(context,props,filepath):
 	# Exporter specific variables
 	mBoneIndicies={}
 	mBoneCounter=0
@@ -89,24 +78,17 @@ def export(filename):
 				tmshoptimizer=f
 				break
 
-	# If available, give the user the option to optimize the xmsh
-	if tmshoptimizer:
-		# TODO: This needs to be an option box available in the export dialog
-		#runOptimizer=Blender.Draw.Create(1)
-		#options=[("Optimize XMSH",runOptimizer,"If tmshOptimizer is present, optimize the output xmsh")]
-		#Blender.Draw.PupBlock("Toadlet XMSH Exporter", options)
-
 	# Write out the xmsh file
-	out = open(filename, "w")
+	out = open(filepath, "w")
 	out.write('<XMSH Version="3">\n')
 
-	scene = bpy.data.scenes.active
-	objects = scene.objects.selected
+	#objects = bpy.data.scenes.active.objects.selected
+	objects = context.selected_objects
 
 	# The XMSH format references bones by index, not by name as blender does.
 	# Find all armatures to create a name,index dictionary for all bones.
 	for ob in objects:
-		if ob.type=='Armature':
+		if ob.type=='ARMATURE':
 			armature = ob.getData()
 			for name in armature.bones.keys():
 				if name in mBoneIndicies:
@@ -118,20 +100,21 @@ def export(filename):
 
 	# Export all selected meshes
 	for ob in objects:
-		if ob.type=='Mesh': 
-			mesh = ob.getData(mesh=True)
-			if len(mesh.verts)==0:
+		if ob.type=='MESH': 
+			mesh = ob.to_mesh(context.scene,True,'PREVIEW')
+			if len(mesh.vertices)==0:
 				continue;
 
 			# Transform the mesh coordinates into worldspace, as suggested by the blender documentation:
 			# http://www.blender.org/documentation/249PythonDoc/NMesh.NMesh-class.html#transform
-			obMatrix=ob.matrix.copy()
-			mesh.transform(obMatrix,True)
+			# Note: Updated for 2.5x
+			obMatrix=ob.matrix_world.copy()
+			mesh.transform(obMatrix)
 
 			# Create our initial xmshVerts by referencing the existing mesh verts
 			xmshVerts=[]
-			for vert in mesh.verts:
-				xmshv=XMSHVertex(vert.index,vert.co,vert.no)
+			for vert in mesh.vertices:
+				xmshv=XMSHVertex(vert.index,vert.co,vert.normal)
 
 				# Assign bones if a skeleton is present
 				if len(mBoneIndicies)>0:
@@ -152,27 +135,27 @@ def export(filename):
 
 			# Loop through all mesh faces and fill up our vertex texture coordinates and our matFaceIndicies arrays
 			# XMSH does not handle multiple UV coords per vertex
-			# Instead, we create additional verticies to handle this case, 
+			# Instead, we create additional vertices to handle this case, 
 			# and write out additional mesh vertices and face indices to handle them.
 			# The xmshVertUVs dictionary helps us tell which vertices are duplicates
 			xmshVertUVs={} 
 			for face in mesh.faces:
-				for i in range(len(face.verts)):
-					vert=face.verts[i];
-					if mesh.faceUV:
+				for i in range(len(face.vertices)):
+					vert=mesh.vertices[face.vertices[i]];
+					if mesh.uv_textures:
 						# FaceUVs means check for a new vertex requirement
 						if vert.index in xmshVertUVs and (
 							xmshVertUVs[vert.index].x!=face.uv[i].x or xmshVertUVs[vert.index].y!=face.uv[i].y):
 
 							# Found a vertex with multiple UV coords
 							# Create a new vertex, give it these UV coords, and bump it's index
-							xmshv=XMSHVertex(vert.index,vert.co,vert.no)
+							xmshv=XMSHVertex(vert.index,vert.co,vert.normal)
 							xmshv.bones=xmshVerts[vert.index].bones
 							xmshv.uv=face.uv[i]
 							xmshv.index=len(xmshVerts)
 
 							# This new vertex goes into our materialFaceIndex 
-							xmshMatFaceIndicies[face.mat].append(xmshv.index)
+							xmshMatFaceIndicies[face.material_index].append(xmshv.index)
 							
 							# Store 
 							xmshVerts.append(xmshv)
@@ -183,23 +166,23 @@ def export(filename):
 
 							# Store the UVs for this vertex index and continue
 							xmshVertUVs[vert.index]=face.uv[i]
-							xmshMatFaceIndicies[face.mat].append(vert.index)
+							xmshMatFaceIndicies[face.material_index].append(vert.index)
 					else:
 						# No UVs mean no worrying about new vertices
-						xmshMatFaceIndicies[face.mat].append(vert.index)
+						xmshMatFaceIndicies[face.material_index].append(vert.index)
 
-			# Write out all xmsh verticies at once
+			# Write out all xmsh vertices at once
 			out.write('\t<Mesh>\n')
 			out.write('\t\t<Vertexes Count=\"%d\" ' % (len(xmshVerts)))
 			out.write('Type=\"Position,Normal') 
-			if mesh.faceUV:
+			if mesh.uv_textures:
 				out.write(',TexCoord')
 			if len(mBoneIndicies)>0:
 				out.write(',Bone')
 			out.write('\">\n')			
 			for vert in xmshVerts:
 				out.write('\t\t\t%f,%f,%f %f,%f,%f' % (vert.co.x,vert.co.y,vert.co.z,vert.no.x,vert.no.y,vert.no.z))
-				if mesh.faceUV:
+				if mesh.uv_textures:
 					out.write(' %f,%f' % (vert.uv.x, vert.uv.y))
 				first=True
 				for bone in vert.bones:
@@ -227,18 +210,16 @@ def export(filename):
 				mat=xmshMaterials[i]
 				if mat:
 					out.write('\t\t\t<Material Name=\"%s\">\n' % (mat.name))
-					
-					# TODO: Right now the mapping of blender material lightning effects to toadlet XMSH is unclear
 					out.write('\t\t\t\t<LightEffect>\n')
-					out.write('\t\t\t\t\t<Ambient>%f,%f,%f,%f</Ambient>\n' % (mat.getRGBCol()[0],mat.getRGBCol()[1],mat.getRGBCol()[2],mat.getAlpha()))
-					out.write('\t\t\t\t\t<Diffuse>%f,%f,%f,%f</Diffuse>\n' % (mat.getRGBCol()[0],mat.getRGBCol()[1],mat.getRGBCol()[2],mat.getAlpha()))
-					out.write('\t\t\t\t\t<Specular>%f,%f,%f,%f</Specular>\n' % (mat.getSpecCol()[0],mat.getSpecCol()[1],mat.getSpecCol()[2],mat.getAlpha()))
-					out.write('\t\t\t\t\t<Shininess>%f</Shininess>\n' % (mat.getHardness()))
-					out.write('\t\t\t\t\t<Emmissive>%f,%f,%f,%f</Emmissive>\n' % (mat.getEmit(),mat.getEmit(),mat.getEmit(),mat.getAlpha()))
+					out.write('\t\t\t\t\t<Ambient>%f,%f,%f,%f</Ambient>\n' % (mat.ambient,mat.ambient,mat.ambient,mat.alpha))
+					out.write('\t\t\t\t\t<Diffuse>%f,%f,%f,%f</Diffuse>\n' % (mat.diffuse_color[0],mat.diffuse_color[1],mat.diffuse_color[2],mat.alpha))
+					out.write('\t\t\t\t\t<Specular>%f,%f,%f,%f</Specular>\n' % (mat.specular_color[0],mat.specular_color[1],mat.specular_color[2],mat.alpha))
+					out.write('\t\t\t\t\t<Shininess>%f</Shininess>\n' % (mat.specular_intensity))
+					out.write('\t\t\t\t\t<Emmissive>%f,%f,%f,%f</Emmissive>\n' % (mat.emit,mat.emit,mat.emit,mat.alpha))
 					out.write('\t\t\t\t</LightEffect>\n')
 
 					# TODO: Right now if a material is set to SHADELESS it is unlit, otherwise light affects it
-					if mat.getMode() & bpy.data.Material.Modes['SHADELESS']:
+					if mat.use_shadeless:
 						out.write('\t\t\t\t<Lighting>false</Lighting>\n')
 					else:
 						out.write('\t\t\t\t<Lighting>true</Lighting>\n')
@@ -246,12 +227,12 @@ def export(filename):
 					# TODO: No idea with this one; how does blender determine culling?
 					out.write('\t\t\t\t<FaceCulling>back</FaceCulling>\n')
 
-					# Export all texture images associated with this material
-					for mtex in mat.textures:
-						if mtex and mtex.tex:
+					# Export all texture images associated with this material, reversed makes topmost the highest priority
+					for mtex in reversed(mat.texture_slots):
+						if mtex and mtex.texture.type=='IMAGE':
 							out.write('\t\t\t\t<TextureStage>\n')
-							if mtex.tex.image and mtex.tex.image.filename:
-								out.write('\t\t\t\t\t<Texture File=\"%s\"/>\n' % (mtex.tex.image.filename))
+							if mtex.texture.image and mtex.texture.image.filepath:
+								out.write('\t\t\t\t\t<Texture File=\"%s\"/>\n' % (mtex.texture.image.filepath))
 							out.write('\t\t\t\t</TextureStage>\n')
 
 					out.write('\t\t\t</Material>\n')
@@ -260,12 +241,14 @@ def export(filename):
 				
 			out.write('\t</Mesh>\n')
 
+			# Clean up
+			bpy.data.meshes.remove(mesh)
 			# Undo the worldspace transforms, otherwise the model will remain transformed in the application
-			mesh.transform(obMatrix.invert(),True)
+			#mesh.transform(obMatrix.invert(),True)
 
 	# Export all selected armatures
 	for ob in objects:
-		if ob.type=='Armature':
+		if ob.type=='ARMATURE':
 			armature = ob.getData()
 			out.write('\t<Skeleton>\n')
 			
@@ -300,15 +283,67 @@ def export(filename):
 	out.write('</XMSH>\n')
 	out.close()
 
-	# Call the mesh optimizer if requested
-	if tmshoptimizer and runOptimizer==1:
+
+class ExportXMSH(bpy.types.Operator, ExportHelper):
+	'''Export to an XMSH file format (.xmsh)'''
+	bl_idname = "export_shape.xmsh"
+	bl_label = "Export Toadlet XMSH (.xmsh)"
+
+	filename_ext = ".xmsh"
+
+		# Call the mesh optimizer if requested
+	    # if tmshoptimizer and runOptimizer==1:
 		# TODO: This needs to be an option box available in the export dialog
 		#args=[tmshoptimizer,filename]
 		#text=subprocess.Popen(args,stdout=subprocess.PIPE).communicate()[0]
 		#texts=text.split("\n")
 		#Blender.Draw.PupBlock("Optimizer Done",texts)
+		# If available, give the user the option to optimize the xmsh
+	    # if tmshoptimizer:
+		# TODO: This needs to be an option box available in the export dialog
+		#runOptimizer=Blender.Draw.Create(1)
+		#options=[("Optimize XMSH",runOptimizer,"If tmshOptimizer is present, optimize the output xmsh")]
+		#Blender.Draw.PupBlock("Toadlet XMSH Exporter", options)
 
-#TODO: This has to be updated for 2.5+
-#Blender.Window.FileSelector(export, "Export toadlet XMSH", Blender.sys.makename(ext='.xmsh'))
+	xmsh_optimize = BoolProperty(name="Optimize Mesh",
+		description="Run the tmshOptimizer tool, if found, on the exported mesh.",
+		default=False,)
+    
+	def execute(self, context):
+		start_time = time.time()
+		print('\n*** Starting XMSH Export ***')
+		props = self.properties
+		filepath= self.filepath
+		filepath= bpy.path.ensure_ext(filepath, self.filename_ext)
 
-#TODO: Add the blender 2.5+ register and unregister functions
+		exported = doExport(context, props, filepath)
+		
+		if exported:
+			print('Export finished in %s seconds' %((time.time() - start_time)))
+			print(filepath)
+			
+		return {'FINISHED'}
+
+	def invoke(self, context, event):
+		wm = context.window_manager
+		wm.fileselect_add(self) # will run self.execute()
+		return {'RUNNING_MODAL'}
+
+
+def menu_func_export(self, context):
+	self.layout.operator(ExportXMSH.bl_idname, text="Toadlet (.xmsh)")
+
+
+def register():
+	bpy.utils.register_module(__name__)
+	bpy.types.INFO_MT_file_export.append(menu_func_export)
+
+
+def unregister():
+	bpy.utils.unregister_module(__name__)
+	bpy.types.INFO_MT_file_export.remove(menu_func_export)
+
+	
+if __name__ == "__main__":
+	register()
+
