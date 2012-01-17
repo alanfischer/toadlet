@@ -37,7 +37,7 @@ using namespace toadlet::flick;
 using namespace toadlet::tadpole;
 using namespace toadlet::pad;
 
-TOADLET_C_API RenderTarget *new_EGLWindowRenderTarget(void *window,WindowRenderTargetFormat *format);
+TOADLET_C_API RenderTarget *new_EGLWindowRenderTarget(void *display,void *window,WindowRenderTargetFormat *format);
 TOADLET_C_API RenderDevice *new_GLRenderDevice();
 TOADLET_C_API AudioDevice *new_JAudioDevice(JNIEnv *env,jobject obj);
 
@@ -64,7 +64,6 @@ AndroidApplication::AndroidApplication():
 	mApplet(NULL)
 {
 	mFormat=WindowRenderTargetFormat::ptr(new WindowRenderTargetFormat());
-	mFormat->pixelFormat=TextureFormat::Format_RGB_5_6_5;
 	mFormat->depthBits=16;
 	mFormat->multisamples=0;
 	mFormat->threads=0;
@@ -147,7 +146,8 @@ void AndroidApplication::start(){
 
 void AndroidApplication::stop(){
 	mRun=false;
-	mThread->join();
+	// pthread_join on android currently hangs here
+//	mThread->join();
 	mThread=NULL;
 }
 
@@ -167,8 +167,6 @@ void AndroidApplication::notifyWindowCreated(ANativeWindow *window){
 			windowCreated(window);
 		}
 	mWindowMutex.unlock();
-	
-	notifyWindowResized();
 }
 
 void AndroidApplication::notifyWindowDestroyed(ANativeWindow *window){
@@ -236,7 +234,7 @@ void AndroidApplication::setNativeActivity(ANativeActivity *activity){
 //	activity->callbacks->onSaveInstanceState = onSaveInstanceState;
 //	activity->callbacks->onPause = onPause;
 	activity->callbacks->onStop = onStop;
-//	activity->callbacks->onConfigurationChanged = onConfigurationChanged;
+	activity->callbacks->onConfigurationChanged = onConfigurationChanged;
 //	activity->callbacks->onLowMemory = onLowMemory;
 //	activity->callbacks->onWindowFocusChanged = onWindowFocusChanged;
 	activity->callbacks->onNativeWindowCreated = onNativeWindowCreated;
@@ -252,7 +250,10 @@ void AndroidApplication::setNativeActivity(ANativeActivity *activity){
 
 void AndroidApplication::run(){
 	mLooper=ALooper_prepare(ALOOPER_PREPARE_ALLOW_NON_CALLBACKS);
-
+	if(mQueue!=NULL){
+		AInputQueue_attachLooper(mQueue,mLooper,0,NULL,this);
+	}
+	
 	uint64 lastTime=System::mtime();
 	while(mRun){
 		stepEventLoop();
@@ -261,8 +262,13 @@ void AndroidApplication::run(){
 		int dt=currentTime-lastTime;
 
 		update(dt);
-
+		
 		if(mRenderDevice!=NULL){
+			// onNativeWindowResized doesn't appear to be called properly, so instead we check each frame for a resize
+			if(mRenderTarget->getWidth()!=mWidth || mRenderTarget->getHeight()!=mHeight){
+				windowResized();
+			}
+		
 			if(mRenderDevice->activate()==RenderDevice::DeviceStatus_NEEDSRESET){
 				mEngine->contextReset(mRenderDevice);
 			}
@@ -312,6 +318,9 @@ void AndroidApplication::run(){
 		System::msleep(0);
 	}
 
+	if(mQueue!=NULL){
+		AInputQueue_detachLooper(mQueue);
+	}
 	mLooper=NULL;
 }
 
@@ -385,7 +394,14 @@ void AndroidApplication::windowCreated(ANativeWindow *window){
 
 	RenderTarget *target=NULL;
 	TOADLET_TRY
-		target=new_EGLWindowRenderTarget(mWindow,mFormat);
+		int nativeFormat=ANativeWindow_getFormat(window);
+		if(nativeFormat==WINDOW_FORMAT_RGB_565){
+			mFormat->pixelFormat=TextureFormat::Format_RGB_5_6_5;
+		}
+		else{
+			mFormat->pixelFormat=TextureFormat::Format_RGBA_8;
+		}
+		target=new_EGLWindowRenderTarget(0,mWindow,mFormat);
 	TOADLET_CATCH(const Exception &){target=NULL;}
 	
 	if(target!=NULL && target->isValid()==false){
@@ -393,8 +409,6 @@ void AndroidApplication::windowCreated(ANativeWindow *window){
 		target=NULL;
 	}
 	mRenderTarget=target;
-	
-//	ANativeWindow_setBuffersGeometry(mWindow,mRenderTarget->getWidth(),mRenderTarget->getHeight(),0);
 
 	RenderDevice *device=NULL;
 	if(target!=NULL){
@@ -430,10 +444,7 @@ void AndroidApplication::windowDestroyed(ANativeWindow *window){
 }
 
 void AndroidApplication::windowResized(){
-Logger::alert(String("SIZE:")+mRenderTarget->getWidth()+","+mRenderTarget->getHeight());
-	if(mRenderDevice!=NULL){
-//		ANativeWindow_setBuffersGeometry(mWindow,mRenderTarget->getWidth(),mRenderTarget->getHeight(),0);
-
+	if(mRenderTarget!=NULL && mRenderDevice!=NULL){
 		mWidth=mRenderTarget->getWidth();
 		mHeight=mRenderTarget->getHeight();
 		resized(mWidth,mHeight);
@@ -490,6 +501,9 @@ void AndroidApplication::onInputQueueCreated(ANativeActivity *activity,AInputQue
 void AndroidApplication::onInputQueueDestroyed(ANativeActivity *activity,AInputQueue *queue){
 	AndroidApplication *app=(AndroidApplication*)activity->instance;
 	app->notifyQueueDestroyed(queue);
+}
+
+void AndroidApplication::onConfigurationChanged(ANativeActivity *activity){
 }
 
 }

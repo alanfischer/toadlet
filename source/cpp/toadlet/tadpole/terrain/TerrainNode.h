@@ -69,10 +69,11 @@ public:
 	void setWaterMaterial(Material::ptr material);
 	Material::ptr getWaterMaterial() const{return mPatchWaterMaterial;}
 
+	void setCameraUpdateScope(int scope);
 	void setTolerance(scalar tolerance);
 
 	int localPatchIndex(int x,int y){return (y+mHalfSize)*mSize+(x+mHalfSize);}
-	TerrainPatchNode::ptr patchAt(int x,int y){
+	TerrainPatchNode *patchAt(int x,int y){
 		int index=localPatchIndex(x-mTerrainX,y-mTerrainY);
 		if(index>=0 && index<mPatchGrid.size()) return mPatchGrid[index];
 		else return NULL;
@@ -133,6 +134,7 @@ protected:
 	int mPatchSize;
 	Material::ptr mPatchMaterial;
 	Material::ptr mPatchWaterMaterial;
+	int mPatchCameraUpdateScope;
 	scalar mPatchTolerance;
 	Vector3 mPatchScale;
 	Collection<scalar> mPatchHeightData;

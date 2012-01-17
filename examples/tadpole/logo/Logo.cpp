@@ -89,11 +89,9 @@ void Logo::create(){
 
  	meshNode=engine->createNodeType(MeshNode::type(),scene);
 	meshNode->setMesh("lt.xmsh");
-	meshNode->getController()->start();
-	meshNode->getController()->setCycling(Controller::Cycling_REFLECT);
+//	meshNode->getController()->start();
+//	meshNode->getController()->setCycling(Controller::Cycling_REFLECT);
 	scene->getRoot()->attach(meshNode);
-	//Material::ptr funkyMaterial=makeFunkyMaterial();
-	//for(int i=0;i<meshNode->getNumSubMeshes();++i)meshNode->getSubMesh(i)->material=funkyMaterial;
 
 	cameraNode=engine->createNodeType(CameraNode::type(),scene);
 	cameraNode->setLookAt(Vector3(0,-Math::fromInt(150),0),Math::ZERO_VECTOR3,Math::Z_UNIT_VECTOR3);
@@ -131,64 +129,10 @@ void Logo::render(RenderDevice *renderDevice){
 		cameraNode->render(renderDevice);
 	renderDevice->endScene();
 	renderDevice->swap();
-}
+\}
 
 void Logo::update(int dt){
 	scene->update(dt);
-}
-
-String funkyProfiles[]={
-	"glsl",
-	"hlsl"
-};
-String funkyVertexCode[]={
-	(char*)NULL,
-
-	"struct VIN{\n" \
-		"float4 position : POSITION;\n" \
-		"float4 color: COLOR;\n" \
-	"};\n" \
-	"struct VOUT{\n" \
-		"float4 position : SV_POSITION;\n" \
-		"float4 color : COLOR;\n" \
-	"};\n" \
-	"float4x4 mvp;\n" \
-	"float time;\n" \
-	"VOUT main(VIN vin){\n" \
-	"	VOUT vout;\n" \
-	"	vout.position=mul(mvp,vin.position);\n" \
-	"	vout.position.y=vout.position.y+sin(vout.position.x/10)*10;\n" \
-	"	vout.color=vin.color;//float4(sin(time),0,0,1.0);\n" \
-	"	return vout;\n" \
-	"}"
-};
-String funkyFragmentCode[]={ 
-	(char*)NULL,
-
-	"struct PIN{\n" \
-		"float4 position : SV_POSITION;\n" \
-		"float4 color: COLOR;\n" \
-	"};\n" \
-	"float4 main(PIN pin): SV_TARGET{" \
-	"	return pin.color;\n" \
-	"}"
-};
-
-Material::ptr Logo::makeFunkyMaterial(){
-	Material::ptr material=engine->getMaterialManager()->createMaterial();
-
-	Shader::ptr funkyVertexShader=engine->getShaderManager()->createShader(Shader::ShaderType_VERTEX,funkyProfiles,funkyVertexCode,2);
-	Shader::ptr funkyFragmentShader=engine->getShaderManager()->createShader(Shader::ShaderType_FRAGMENT,funkyProfiles,funkyFragmentCode,2);
-
-	RenderPass::ptr pass=material->getPass();
-	pass->setShader(Shader::ShaderType_VERTEX,funkyVertexShader);
-	pass->setShader(Shader::ShaderType_FRAGMENT,funkyFragmentShader);
-	pass->getVariables()->addVariable("mvp",RenderVariable::ptr(new MVPMatrixVariable()),Material::Scope_RENDERABLE);
-	pass->getVariables()->addVariable("time",RenderVariable::ptr(new TimeVariable()),Material::Scope_MATERIAL);
-
-	material->compile();
-
-	return material;
 }
 
 Applet *createApplet(Application *app){return new Logo(app);}

@@ -139,13 +139,14 @@ Node *Sky::create(Scene *scene,int cloudSize,const Vector4 &skyColor,const Vecto
 			Shader::ptr fragmentShader=mEngine->getShaderManager()->createShader(Shader::ShaderType_FRAGMENT,profiles,fragmentCodes,2);
 			pass->setShader(Shader::ShaderType_FRAGMENT,fragmentShader);
 
-			pass->getVariables()->addVariable("modelViewProjectionMatrix",RenderVariable::ptr(new MVPMatrixVariable()),Material::Scope_RENDERABLE);
-			pass->getVariables()->addVariable("textureMatrix",RenderVariable::ptr(new TextureMatrixVariable(Shader::ShaderType_VERTEX,0)),Material::Scope_MATERIAL);
-			pass->getVariables()->addVariable("skyColor",RenderVariable::ptr(new ConstantVariable(skyColor)),Material::Scope_MATERIAL);
+			RenderVariableSet::ptr variables=pass->makeVariables();
+			variables->addVariable("modelViewProjectionMatrix",RenderVariable::ptr(new MVPMatrixVariable()),Material::Scope_RENDERABLE);
+			variables->addVariable("textureMatrix",RenderVariable::ptr(new TextureMatrixVariable(Shader::ShaderType_VERTEX,0)),Material::Scope_MATERIAL);
+			variables->addVariable("skyColor",RenderVariable::ptr(new ConstantVariable(skyColor)),Material::Scope_MATERIAL);
 
-			pass->getVariables()->addTexture("bumpTex",bumpTexture,"bumpSamp",SamplerState(),TextureState());
-			pass->getVariables()->addTexture("cloudTex",cloudTexture,"cloudSamp",SamplerState(),TextureState());
-			pass->getVariables()->addTexture("fadeTex",fadeTexture,"fadeSamp",SamplerState(),TextureState());
+			variables->addTexture("bumpTex",bumpTexture,"bumpSamp",SamplerState(),TextureState());
+			variables->addTexture("cloudTex",cloudTexture,"cloudSamp",SamplerState(),TextureState());
+			variables->addTexture("fadeTex",fadeTexture,"fadeSamp",SamplerState(),TextureState());
 			mShaderAccessor=Matrix4x4Accessor::ptr(new TextureStateMatrix4x4Accessor(pass,0));
 		}
 

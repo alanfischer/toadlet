@@ -20,6 +20,7 @@ public:
 		Scope_BIT_ACORN=		1<<2,
 		Scope_BIT_HUD=			1<<3,
 		Scope_BIT_ABOVEWATER=	1<<4,
+		Scope_BIT_MAIN_CAMERA=	1<<5,
 
 		Scope_TREE=				Scope_BIT_TREE,
 		Scope_ACORN=			Scope_BIT_ACORN,
@@ -104,7 +105,7 @@ protected:
 	TerrainNode::ptr mTerrain;
 	SmoothFollower::ptr mFollower;
 	ParentNode::ptr mFollowNode;
-	CameraNode::ptr mCamera;
+	CameraNode::ptr mCamera,mReflectCamera;
 	IntrusivePointer<PathClimber> mPlayer;
 	int mMouseButtons;
 	scalar mXJoy,mYJoy;

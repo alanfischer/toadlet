@@ -364,7 +364,7 @@ void CameraNode::updateWorldTransform(){
 	super::updateWorldTransform();
 
 	Math::mul(mForward,mWorldTransform.getRotate(),Math::NEG_Z_UNIT_VECTOR3);
-	Math::mul(mRight,mWorldTransform.getRotate(),Math::NEG_Z_UNIT_VECTOR3);
+	Math::mul(mRight,mWorldTransform.getRotate(),Math::X_UNIT_VECTOR3);
 
 	updateViewTransform();
 }

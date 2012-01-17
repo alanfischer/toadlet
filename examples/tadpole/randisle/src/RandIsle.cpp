@@ -50,6 +50,7 @@ void RandIsle::create(){
 	mScene->setTraceable(mTerrain);
 	mTerrain->setListener(this);
 	mTerrain->setTolerance(Resources::instance->tolerance);
+	mTerrain->setCameraUpdateScope(Scope_BIT_MAIN_CAMERA);
 	mTerrain->setMaterialSource(Resources::instance->terrainMaterialSource);
 	mTerrain->setWaterMaterial(Resources::instance->waterMaterial);
 	mTerrain->setDataSource(this);
@@ -63,10 +64,16 @@ void RandIsle::create(){
 
 	mCamera=mEngine->createNodeType(CameraNode::type(),mScene);
 	mCamera->setProjectionFovX(Math::degToRad(Math::fromInt(60)),Math::ONE,mCamera->getNearDist(),1024);
-	mCamera->setClearFlags(0);
-	mCamera->setScope(~Scope_HUD);
+	mCamera->setScope(~Scope_HUD | Scope_BIT_MAIN_CAMERA);
 	mCamera->setDefaultState(mEngine->getMaterialManager()->createRenderState());
 	mFollowNode->attach(mCamera);
+
+	mReflectCamera=mEngine->createNodeType(CameraNode::type(),mScene);
+	mReflectCamera->setProjectionFovX(Math::degToRad(Math::fromInt(60)),Math::ONE,mCamera->getNearDist(),1024);
+	mReflectCamera->setScope(~Scope_HUD & ~Scope_BIT_MAIN_CAMERA);
+	mReflectCamera->setDefaultState(mEngine->getMaterialManager()->createRenderState());
+mReflectCamera->setClearColor(Resources::instance->fadeColor);
+	mScene->getRoot()->attach(mReflectCamera);
 
 	mHUD=mEngine->createNodeType(HUD::type(),mScene);
 	mHUD->setProjectionOrtho(-1,1,-1,1,-1,1);
@@ -123,18 +130,6 @@ void RandIsle::create(){
 		joyDevice->setListener(this);
 		joyDevice->start();
 	}
-	
-	InputDevice *lightDevice=mApp->getInputDevice(InputDevice::InputType_LIGHT);
-	if(lightDevice!=NULL){
-		lightDevice->setListener(this);
-		lightDevice->start();
-	}
-
-	InputDevice *proximityDevice=mApp->getInputDevice(InputDevice::InputType_PROXIMITY);
-	if(proximityDevice!=NULL){
-		proximityDevice->setListener(this);
-		proximityDevice->start();
-	}
 
 	Logger::debug("RandIsle::create finished");
 }
@@ -146,18 +141,6 @@ void RandIsle::destroy(){
 	if(joyDevice!=NULL){
 		joyDevice->stop();
 		joyDevice->setListener(NULL);
-	}
-
-	InputDevice *lightDevice=mApp->getInputDevice(InputDevice::InputType_LIGHT);
-	if(lightDevice!=NULL){
-		lightDevice->stop();
-		lightDevice->setListener(NULL);
-	}
-
-	InputDevice *proximityDevice=mApp->getInputDevice(InputDevice::InputType_PROXIMITY);
-	if(proximityDevice!=NULL){
-		proximityDevice->stop();
-		proximityDevice->setListener(NULL);
 	}
 
 	mScene->destroy();
@@ -185,10 +168,12 @@ void RandIsle::resized(int width,int height){
 		if(width>=height){
 			scalar ratio=Math::div(Math::fromInt(width),Math::fromInt(height));
 			mCamera->setProjectionFovY(Math::degToRad(Math::fromInt(75)),ratio,mCamera->getNearDist(),mCamera->getFarDist());
+mReflectCamera->setProjectionFovY(Math::degToRad(Math::fromInt(75)),ratio,mCamera->getNearDist(),mCamera->getFarDist());
 		}
 		else{
 			scalar ratio=Math::div(Math::fromInt(height),Math::fromInt(width));
 			mCamera->setProjectionFovX(Math::degToRad(Math::fromInt(75)),ratio,mCamera->getNearDist(),mCamera->getFarDist());
+mReflectCamera->setProjectionFovX(Math::degToRad(Math::fromInt(75)),ratio,mCamera->getNearDist(),mCamera->getFarDist());
 		}
 		mCamera->setViewport(0,0,width,height);
 	}
@@ -206,117 +191,85 @@ void RandIsle::resized(int width,int height){
 }
 
 void RandIsle::render(RenderDevice *renderDevice){
+/*
+Matrix4x4 P=mCamera->getProjectionMatrix();
+Matrix4x4 rotate;
+Math::setMatrix4x4FromX(rotate,Math::PI);
+Math::setMatrix4x4FromTranslate(rotate,0,0,5);
+Matrix4x4 M=mCamera->getViewMatrix() * rotate;
+
+Matrix4x4 invtrans_MVP,m;
+Math::invert(m,P*M);
+Math::transpose(invtrans_MVP,m);
+
+Vector4 oplane(0,0,-1,0),cplane;
+Math::mul(cplane,invtrans_MVP,oplane);
+
+float inv=abs((int)cplane[2]);
+if(inv!=0){cplane/=inv;}// normalize such that depth is not scaled
+cplane[3] -= 1;
+
+if(cplane[2] < 0)
+    cplane *= -1;
+
+
+Matrix4x4 suffix;
+suffix.setAt(2,0,cplane[0]);
+suffix.setAt(2,1,cplane[1]);
+suffix.setAt(2,2,cplane[2]);
+suffix.setAt(2,3,cplane[3]);
+
+Matrix4x4 newP = suffix * P;
+
+//mCamera->setProjectionMatrix(newP);
+
+
+float a=0,b=0,c=1;
+float k=(0*a + 0*b + 0*c);
+Matrix4x4 reflectionMatrix;
+reflectionMatrix.set(
+   1-2*a*a , -2*a*b , -2*a*c, 0,
+   -2*a*b  , 1-2*b*b, -2*b*c, 0,
+   -2*a*c  , -2*b*c,  1-2*c*c, 0,
+   2*a*k   , 2*b*k  , 2*c*k  , 1);
+
+Vector3 position=mCamera->getWorldTranslate();
+Vector3 forward=mCamera->getForward();
+
+Math::mulPoint3Fast(position,reflectionMatrix);
+Math::mulPoint3Fast(forward,reflectionMatrix);
+
+Matrix4x4 m,m2;
+Math::setMatrix4x4FromLookDir(m,position,forward,Vector3(0,0,-1),true);
+
+Math::invert(m,mCamera->getViewMatrix());
+Math::postMul(m,reflectionMatrix);
+Math::invert(m2,m);m=m2;
+mReflectCamera->setMatrix4x4(m);
+
+mReflectCamera->frameUpdate(0,-1);
+
+mTerrain->setWaterMaterial(NULL);
+
+	RenderTarget *oldTarget=renderDevice->getRenderTarget();
+	renderDevice->setRenderTarget(Resources::instance->reflectTarget);
 	renderDevice->beginScene();
-		/// @todo: This shouldn't be necessary, but depending on the sky to set the contents of the backbuffer doesn't appear to work
-		renderDevice->clear(RenderDevice::ClearType_BIT_DEPTH|RenderDevice::ClearType_BIT_COLOR,mCamera->getClearColor());
-#if 1
-		mCamera->render(renderDevice);
+mCamera->setViewport(Viewport(0,0,Resources::instance->reflectTarget->getWidth(),Resources::instance->reflectTarget->getHeight()));
+		mReflectCamera->render(renderDevice);
+	renderDevice->endScene();
+	renderDevice->swap();
+	renderDevice->setRenderTarget(oldTarget);
 
-/*		if(mPlayer->getPath()!=NULL){
-			mPredictedMaterial->setupRenderDevice(renderDevice);
-			renderDevice->setViewMatrix(mCamera->getViewMatrix());
-			renderDevice->setModelMatrix(Math::IDENTITY_MATRIX4X4);
-			renderDevice->renderPrimitive(mPredictedVertexData,mPredictedIndexData);
-		}
+Resources::instance->waterMaterial->retain();
+mTerrain->setWaterMaterial(Resources::instance->waterMaterial);
 */
+//mReflectCamera->setProjectionMatrix(P);
+
+
+	renderDevice->beginScene();
+//mCamera->setViewport(Viewport(0,0,oldTarget->getWidth(),oldTarget->getHeight()));
+		mCamera->render(renderDevice);
 		mHUD->render(renderDevice);
-#else
-mCamera->updateFramesPerSecond();  
-
-mScene->getBackground()->setTranslate(mCamera->getWorldTranslate());
-mScene->getBackground()->frameUpdate(0,-1);
-
-renderDevice->setViewport(mCamera->getViewport());
-renderDevice->setDefaultState();
-
-renderDevice->setMatrix(RenderDevice::MatrixType_PROJECTION,mCamera->getProjectionMatrix());
-renderDevice->setMatrix(RenderDevice::MatrixType_VIEW,mCamera->getViewMatrix());
-Renderable *renderable=mSky->getSkyDome()->getSubMesh(0);
-SceneRenderer r;
-	renderable->getRenderMaterial()->setupRenderDevice(renderDevice);
-	renderDevice->setMatrix(RenderDevice::MatrixType_MODEL,renderable->getRenderTransform());
-	renderable->render(renderDevice);
-renderable=mSky->getSun();
-	renderable->getRenderMaterial()->setupRenderDevice(renderDevice);
-	renderDevice->setMatrix(RenderDevice::MatrixType_MODEL,renderable->getRenderTransform());
-	renderable->render(renderDevice);
-
-Renderable *lastRenderable=renderable;
-
-renderDevice->setMatrix(RenderDevice::MatrixType_MODEL,Math::IDENTITY_MATRIX4X4);
-renderDevice->setAmbientColor(Colors::GREY);
-renderDevice->setLight(0,mSky->getLight()->internal_getLight());
-renderDevice->setLightEnabled(0,true);
-
-for(int i=0;i<mScene->getRoot()->getNumChildren();++i){
-	Node *child=mScene->getRoot()->getChild(i);
-	if(child->getScope()==Scope_TREE && mCamera->culled(child)==false){
-		Tree *tree=(Tree*)child;
-		renderable=tree->getLowMeshNode()->getSubMesh(0);
-			renderable->getRenderMaterial()->setupRenderDevice(renderDevice,lastRenderable->getRenderMaterial());
-			renderDevice->setMatrix(RenderDevice::MatrixType_MODEL,renderable->getRenderTransform());
-			renderable->render(renderDevice);
-			lastRenderable=renderable;
-	}
-}
-for(int i=0;i<mScene->getRoot()->getNumChildren();++i){
-	Node *child=mScene->getRoot()->getChild(i);
-	if(child->getScope()==Scope_TREE && mCamera->culled(child)==false){
-		Tree *tree=(Tree*)child;
-		renderable=tree->getLowMeshNode()->getSubMesh(1);
-			renderable->getRenderMaterial()->setupRenderDevice(renderDevice,lastRenderable->getRenderMaterial());
-			renderDevice->setMatrix(RenderDevice::MatrixType_MODEL,renderable->getRenderTransform());
-			renderable->render(renderDevice);
-			lastRenderable=renderable;
-	}
-}
-
-if(mPlayer->getPlayerMeshNode()->getMesh()!=NULL){
-renderable=mPlayer->getPlayerMeshNode()->getSubMesh(0);
-	renderable->getRenderMaterial()->setupRenderDevice(renderDevice,lastRenderable->getRenderMaterial());
-	renderDevice->setMatrix(RenderDevice::MatrixType_MODEL,renderable->getRenderTransform());
-	renderable->render(renderDevice);
-	lastRenderable=renderable;
-}
-
-renderDevice->setFogParameters(renderDevice::Fog_LINEAR,mCamera->getFarDist()*7/8,mCamera->getFarDist(),Colors::GREY);
-renderDevice->setLightEnabled(0,false);
-
-for(int x=-1;x<=1;++x){for(int y=-1;y<=1;++y){
-TerrainPatchNode *terrain=mTerrain->patchAt(x+mTerrain->getTerrainX(),y+mTerrain->getTerrainY());
-	if(mCamera->culled(terrain)==false){
-		terrain->updateBlocks(mCamera);
-		terrain->updateVertexes();
-		terrain->updateIndexBuffers(mCamera);
-		terrain->updateWaterIndexBuffers(mCamera);
-
-		renderable=terrain;
-		renderable->getRenderMaterial()->setupRenderDevice(renderDevice,lastRenderable->getRenderMaterial());
-		renderDevice->setMatrix(RenderDevice::MatrixType_MODEL,renderable->getRenderTransform());
-		renderable->render(renderDevice);
-		lastRenderable=renderable;
-	}
-}}
-for(int x=-1;x<=1;++x){for(int y=-1;y<=1;++y){
-TerrainPatchNode *terrain=mTerrain->patchAt(x+mTerrain->getTerrainX(),y+mTerrain->getTerrainY());
-	if(mCamera->culled(terrain)==false){
-		renderable=terrain->internal_getWaterRenderable();
-			renderable->getRenderMaterial()->setupRenderDevice(renderDevice,lastRenderable->getRenderMaterial());
-			renderDevice->setMatrix(RenderDevice::MatrixType_MODEL,renderable->getRenderTransform());
-			renderable->render(renderDevice);
-			lastRenderable=renderable;
-	}
-}}
-
-renderDevice->setLightEnabled(0,false);
-renderDevice->setFogParameters(RenderDevice::Fog_NONE,0,0,Colors::BLACK);
-
-renderable=mPlayer->getShadowMeshNode()->getSubMesh(0);
-	renderable->getRenderMaterial()->setupRenderDevice(renderDevice);
-	renderDevice->setMatrix(RenderDevice::MatrixType_MODEL,renderable->getRenderTransform());
-	renderable->render(renderDevice);
-
-#endif
 	renderDevice->endScene();
 	renderDevice->swap();
 }
@@ -396,7 +349,8 @@ void RandIsle::logicUpdate(int dt){
 
 //	updateDanger(dt);
 
-	bool inWater=(mPlayer->getWorldTranslate().z-((Node*)mPlayer)->getBound().getSphere().radius)<=0;
+	scalar offset=mPlayer->getBound().getMins().z-2;
+	bool inWater=(mPlayer->getPosition().z+offset)<=0;
 	if(!inWater && mPlayer->getCoefficientOfGravity()==0){
 		mPlayer->setCoefficientOfGravity(Math::ONE);
 	}
@@ -405,6 +359,11 @@ void RandIsle::logicUpdate(int dt){
 		velocity.z=0;
 		mPlayer->setVelocity(velocity);
 		mPlayer->setCoefficientOfGravity(0);
+		if(mPlayer->getPosition().z+offset<0){
+			Vector3 position=mPlayer->getPosition();
+			position.z=-offset;
+			mPlayer->setPosition(position);
+		}
 	}
 
 	if(mScene->getLogicFrame()%4==0){
@@ -457,6 +416,7 @@ void RandIsle::frameUpdate(int dt){
 	}
 	mFollowNode->setTranslate(position);
 	mFollowNode->frameUpdate(0,-1);
+/*
 	Material::ptr waterMaterial=Resources::instance->waterMaterial;
 	if(waterMaterial!=NULL){
 		TextureState textureState;
@@ -468,7 +428,7 @@ void RandIsle::frameUpdate(int dt){
 		Math::setMatrix4x4FromTranslate(textureState.matrix,0,Math::sin(Math::fromMilli(mScene->getTime())/4)/4,0);
 		waterMaterial->getPass()->setTextureState(Shader::ShaderType_FRAGMENT,1,textureState);
 	}
-
+*/
 	if(mPlayer->getPath()!=NULL){
 		// In this case the listener is not attached, so we need to update it after the rest of the scene
 		mFollower->frameUpdated(mFollowNode,dt);
@@ -607,14 +567,6 @@ void RandIsle::inputDetected(const InputData &data){
 			mXJoy=data.values[InputData::Semantic_JOY_DIRECTION].x;
 			mYJoy=data.values[InputData::Semantic_JOY_DIRECTION].y;
 		}
-	}
-
-	if(data.type==InputDevice::InputType_LIGHT){
-		Logger::alert(String("LIGHT:")+data.values[0].x);
-	}
-
-	if(data.type==InputDevice::InputType_PROXIMITY){
-		Logger::alert(String("PROXIMITY:")+data.values[0].x);
 	}
 }
 

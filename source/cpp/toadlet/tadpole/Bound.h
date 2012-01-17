@@ -58,12 +58,16 @@ public:
 	Bound(const AABox &box):
 		mType(Type_AABOX),
 		mBox(box)
-	{}
+	{
+		update();
+	}
 
 	Bound(const Sphere &sphere):
 		mType(Type_SPHERE),
 		mSphere(sphere)
-	{}
+	{
+		update();
+	}
 	
 	void reset(){
 		mType=Type_AABOX;

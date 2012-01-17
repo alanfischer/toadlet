@@ -45,6 +45,9 @@ public class InputData{
 	public static final int Semantic_PROXIMITY=0;
 	public static final int Semantic_MAX_PROXIMITY=1;
 
+	public static final int Semantic_MAGNETIC=0;
+	public static final int Semantic_MAX_MAGNETIC=1;
+
 	public InputData(int type1,int time1,int size){
 		type=type1;
 		time=time1;

@@ -112,7 +112,7 @@ bool GLRenderDevice::create(RenderTarget *target,int *options){
 	}
 
 	bool usePBuffers=true;
-	bool useFBOs=true;
+	bool useFBOs=false;
 	bool useHardwareBuffers=true;
 	bool useFixedFunction=true;
 	bool useShaders=true;
@@ -611,6 +611,9 @@ void GLRenderDevice::beginScene(){
 		mGLRenderTarget->activate();
 	}
 
+	// Without this, we have issues when changing from rendering to a PBuffer to the FrameBuffer
+	setDefaultState();
+
 	TOADLET_CHECK_GLERROR("beginScene");
 }
 
@@ -635,6 +638,11 @@ void GLRenderDevice::endScene(){
 	#if defined(TOADLET_HAS_GLUBOS)
 		if(mUBOs){
 			glBindBuffer(GL_UNIFORM_BUFFER,0);
+		}
+	#endif
+	#if defined(TOADLET_HAS_GLSL)
+		if(mCaps.hasShader[Shader::ShaderType_VERTEX]){
+			glUseProgram(0);
 		}
 	#endif
 
