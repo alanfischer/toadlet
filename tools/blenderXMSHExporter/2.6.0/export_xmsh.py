@@ -143,6 +143,7 @@ def doExport(context,props,filepath):
 				for i in range(len(face.vertices)):
 					vert=mesh.vertices[face.vertices[i]];
 					if mesh.uv_textures:
+						uvLayer=mesh.uv_textures.active.data
 						# FaceUVs means check for a new vertex requirement
 						if vert.index in xmshVertUVs and (
 							xmshVertUVs[vert.index].x!=face.uv[i].x or xmshVertUVs[vert.index].y!=face.uv[i].y):
@@ -151,7 +152,7 @@ def doExport(context,props,filepath):
 							# Create a new vertex, give it these UV coords, and bump it's index
 							xmshv=XMSHVertex(vert.index,vert.co,vert.normal)
 							xmshv.bones=xmshVerts[vert.index].bones
-							xmshv.uv=face.uv[i]
+							xmshv.uv=uvLayer[face.index].uv
 							xmshv.index=len(xmshVerts)
 
 							# This new vertex goes into our materialFaceIndex 
@@ -162,10 +163,10 @@ def doExport(context,props,filepath):
 						else:
 							# Just a new vertex
 							# Assign it's UV coords to an existing xmshVert
-							xmshVerts[vert.index].uv=face.uv[i]
+							xmshVerts[vert.index].uv=uvLayer[face.index].uv
 
 							# Store the UVs for this vertex index and continue
-							xmshVertUVs[vert.index]=face.uv[i]
+							xmshVertUVs[vert.index]=uvLayer[face.index].uv
 							xmshMatFaceIndicies[face.material_index].append(vert.index)
 					else:
 						# No UVs mean no worrying about new vertices
