@@ -44,12 +44,19 @@ public:
 		terrainMaterialSource->setDiffuseTexture(2,engine->getTextureManager()->findTexture("grass.png"));
 
 		Logger::alert("Loading water");
+		{
+			TextureFormat::ptr waterFormat(new TextureFormat(TextureFormat::Dimension_D2,TextureFormat::Format_RGB_8,1024,1024,1,0));
 
-		TextureFormat::ptr reflectFormat(new TextureFormat(TextureFormat::Dimension_D2,TextureFormat::Format_RGB_8,1024,1024,1,0));
-		reflectTexture=engine->getTextureManager()->createTexture(Texture::Usage_BIT_RENDERTARGET|Texture::Usage_BIT_AUTOGEN_MIPMAPS,reflectFormat);
-		reflectTexture->retain();
-		reflectTarget=engine->getTextureManager()->createPixelBufferRenderTarget();
-		reflectTarget->attach(reflectTexture->getMipPixelBuffer(0,0),PixelBufferRenderTarget::Attachment_COLOR_0);
+			reflectTexture=engine->getTextureManager()->createTexture(Texture::Usage_BIT_RENDERTARGET|Texture::Usage_BIT_AUTOGEN_MIPMAPS,waterFormat);
+			reflectTexture->retain();
+			reflectTarget=engine->getTextureManager()->createPixelBufferRenderTarget();
+			reflectTarget->attach(reflectTexture->getMipPixelBuffer(0,0),PixelBufferRenderTarget::Attachment_COLOR_0);
+
+			refractTexture=engine->getTextureManager()->createTexture(Texture::Usage_BIT_RENDERTARGET|Texture::Usage_BIT_AUTOGEN_MIPMAPS,waterFormat);
+			refractTexture->retain();
+			refractTarget=engine->getTextureManager()->createPixelBufferRenderTarget();
+			refractTarget->attach(refractTexture->getMipPixelBuffer(0,0),PixelBufferRenderTarget::Attachment_COLOR_0);
+		}
 
 		waterMaterial=engine->getMaterialManager()->createMaterial();
 		if(waterMaterial!=NULL){
@@ -208,7 +215,7 @@ public:
 
 "float4 fragColor = reflectionTex.Sample(reflectionSamp,projectedTexCoord);\n"
 "fragColor.w=1;\n"
-						"return lerp(fogColor,fragColor,pin.fog);\n"
+"return fragColor;//lerp(fogColor,fragColor,pin.fog);\n"
 					"}"
 				};
 
@@ -242,7 +249,7 @@ variables->addVariable("reflectionViewMatrix",RenderVariable::ptr(new DataVariab
 
 //				Math::setMatrix4x4FromScale(textureState.matrix,16,16,16);
 //				variables->addTexture("tex1",noise2,"samp1",SamplerState(),textureState);
-variables->addTexture("reflectionTex",reflectTexture,"reflectionSamp",SamplerState(),TextureState());
+variables->addTexture("reflectionTex",refractTexture,"reflectionSamp",SamplerState(),TextureState());
 			}
 
 			if(engine->hasFixed(Shader::ShaderType_VERTEX) && engine->hasFixed(Shader::ShaderType_FRAGMENT)){
@@ -401,8 +408,8 @@ variables->addTexture("reflectionTex",reflectTexture,"reflectionSamp",SamplerSta
 	scalar tolerance;
 	Vector4 skyColor,fadeColor;
 	DiffuseTerrainMaterialSource::ptr terrainMaterialSource;
-	Texture::ptr reflectTexture;
-	PixelBufferRenderTarget::ptr reflectTarget;
+	Texture::ptr reflectTexture,refractTexture;
+	PixelBufferRenderTarget::ptr reflectTarget,refractTarget;
 	Material::ptr waterMaterial;
 	Mesh::ptr creature;
 	Mesh::ptr shadow;

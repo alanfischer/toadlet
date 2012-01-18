@@ -160,7 +160,7 @@ VertexBuffer::ptr BufferManager::createVertexBuffer(int usage,int access,VertexF
 		}
 		buffer=backableBuffer;
 	}
-	else{
+	else if(renderDevice!=NULL){
 		buffer=VertexBuffer::ptr(renderDevice->createVertexBuffer());
 		if(buffer==NULL){
 			return NULL;
@@ -190,7 +190,7 @@ PixelBuffer::ptr BufferManager::createPixelBuffer(int usage,int access,int pixel
 		}
 		buffer=backableBuffer;
 	}
-	else{
+	else if(renderDevice!=NULL){
 		buffer=PixelBuffer::ptr(renderDevice->createPixelBuffer());
 		if(buffer==NULL){
 			return NULL;
@@ -219,7 +219,7 @@ VariableBuffer::ptr BufferManager::createVariableBuffer(int usage,int access,Var
 		}
 		buffer=backableBuffer;
 	}
-	else{
+	else if(renderDevice!=NULL){
 		buffer=VariableBuffer::ptr(renderDevice->createVariableBuffer());
 		if(buffer==NULL){
 			return NULL;

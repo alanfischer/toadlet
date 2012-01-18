@@ -104,6 +104,9 @@ public:
 	virtual void setDefaultState(RenderState::ptr renderState){mDefaultState=renderState;}
 	inline RenderState::ptr getDefaultState() const{return mDefaultState;}
 
+	virtual void setObliqueNearPlaneMatrix(const Matrix4x4 &oblique);
+	void getObliqueNearPlaneMatrix(Matrix4x4 &oblique){oblique.set(mObliqueMatrix);}
+
 	virtual void setGamma(scalar gamma);
 	virtual scalar getGamma() const{return mGamma;}
 
@@ -156,6 +159,7 @@ protected:
 	Matrix4x4 mProjectionMatrix;
 	scalar mProjectionRotation;
 	bool mProjectionMirrorY;
+	Matrix4x4 mObliqueMatrix;
 	Matrix4x4 mFinalProjectionMatrix;
 	Matrix4x4 mViewMatrix;
 	Matrix4x4 mViewProjectionMatrix;

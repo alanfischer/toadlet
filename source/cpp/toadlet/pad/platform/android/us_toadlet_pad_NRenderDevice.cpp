@@ -20,13 +20,19 @@ JNIEXPORT jboolean JNICALL Java_us_toadlet_pad_NRenderDevice_create(JNIEnv *env,
 JNIEXPORT void JNICALL Java_us_toadlet_pad_NRenderDevice_destroy(JNIEnv *env,jobject obj){
 	RenderDevice *device=(RenderDevice*)env->GetIntField(obj,nrenderDeviceNativeHandleID);
 
-	RenderTarget *renderTarget=device->getPrimaryRenderTarget();
+	if(device!=NULL){
+		RenderTarget *renderTarget=device->getPrimaryRenderTarget();
 
-	device->destroy();
-	delete device;
-	
-	renderTarget->destroy();
-	delete renderTarget;
+		device->destroy();
+		delete device;
+
+		if(renderTarget!=NULL){
+			renderTarget->destroy();
+			delete renderTarget;
+		}
+
+		env->SetIntField(obj,nrenderDeviceNativeHandleID,(jint)NULL);
+	}
 }
 
 JNIEXPORT jboolean JNICALL Java_us_toadlet_pad_NRenderDevice_setRenderTarget(JNIEnv *env,jobject obj,jobject renderTargetObj){

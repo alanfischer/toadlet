@@ -70,6 +70,8 @@ public:
 	Material::ptr getWaterMaterial() const{return mPatchWaterMaterial;}
 
 	void setCameraUpdateScope(int scope);
+	void setTerrainScope(int scope);
+	void setWaterScope(int scope);
 	void setTolerance(scalar tolerance);
 
 	int localPatchIndex(int x,int y){return (y+mHalfSize)*mSize+(x+mHalfSize);}
@@ -135,6 +137,8 @@ protected:
 	Material::ptr mPatchMaterial;
 	Material::ptr mPatchWaterMaterial;
 	int mPatchCameraUpdateScope;
+	int mPatchTerrainScope;
+	int mPatchWaterScope;
 	scalar mPatchTolerance;
 	Vector3 mPatchScale;
 	Collection<scalar> mPatchHeightData;

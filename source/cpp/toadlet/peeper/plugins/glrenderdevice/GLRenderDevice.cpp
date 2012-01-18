@@ -112,7 +112,7 @@ bool GLRenderDevice::create(RenderTarget *target,int *options){
 	}
 
 	bool usePBuffers=true;
-	bool useFBOs=false;
+	bool useFBOs=true;
 	bool useHardwareBuffers=true;
 	bool useFixedFunction=true;
 	bool useShaders=true;

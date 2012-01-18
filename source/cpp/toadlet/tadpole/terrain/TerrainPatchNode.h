@@ -104,6 +104,8 @@ public:
 	bool unstitchFromBottom(TerrainPatchNode *terrain);
 
 	void setCameraUpdateScope(int scope){mCameraUpdateScope=scope;}
+	void setTerrainScope(int scope){mTerrainScope=scope;}
+	void setWaterScope(int scope){mWaterScope=scope;}
 	void setTolerance(scalar tolerance){mTolerance=tolerance;}
 	void setScale1(float s1){mS1=s1;}
 	void setScale2(float s2){mS2=s2;}
@@ -236,6 +238,8 @@ protected:
 	TerrainPatchNode::ptr mTopDependent;
 
 	int mCameraUpdateScope;
+	int mTerrainScope;
+	int mWaterScope;
 	scalar mTolerance;
 	scalar mS1,mS2;
 
