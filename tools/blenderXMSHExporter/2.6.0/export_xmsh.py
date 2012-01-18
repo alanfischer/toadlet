@@ -82,20 +82,19 @@ def doExport(context,props,filepath):
 	out = open(filepath, "w")
 	out.write('<XMSH Version="3">\n')
 
-	#objects = bpy.data.scenes.active.objects.selected
 	objects = context.selected_objects
 
 	# The XMSH format references bones by index, not by name as blender does.
 	# Find all armatures to create a name,index dictionary for all bones.
 	for ob in objects:
 		if ob.type=='ARMATURE':
-			armature = ob.getData()
-			for name in armature.bones.keys():
-				if name in mBoneIndicies:
+			armature = ob.data
+			for bone in armature.bones:
+				if bone.name in mBoneIndicies:
 					# TODO: This should be part of some larger check to ensure the objects being
 					# exported are suitable; then popup and warn the user if not and what the reason is
 					print('Warning! Duplicate bone names detected, exported skeletons will be incorrect')
-				mBoneIndicies[name]=mBoneCounter
+				mBoneIndicies[bone.name]=mBoneCounter
 				mBoneCounter+=1
 
 	# Export all selected meshes
@@ -118,11 +117,15 @@ def doExport(context,props,filepath):
 
 				# Assign bones if a skeleton is present
 				if len(mBoneIndicies)>0:
-					bonePairs=mesh.getVertexInfluences(vert.index)
-					for bone in bonePairs:
-						# Only store the bone if it is present in one of the exported armatures
-						if bone[0] in mBoneIndicies:
-							xmshv.bones.append([mBoneIndicies[bone[0]],bone[1]])
+					#bonePairs=mesh.getVertexInfluences(vert.index)
+					# NOTE: Blender matches verts to bones for influences by having the VertexGroup named the same thing as the bone
+					# Annoyingly, the VertexGroup name is only accessible from object.vertex_groups, so loop through and match IDs 
+					for obGroup in ob.vertex_groups:
+						for vertGroup in vert.groups:
+							if obGroup.index == vertGroup.group:
+								# Only store the bone if it is present in one of the exported armatures
+								if obGroup.name in mBoneIndicies:
+									xmshv.bones.append([mBoneIndicies[obGroup.name],vertGroup.weight])
 
 				# Add the new xmshVert
 				xmshVerts.append(xmshv)
@@ -130,7 +133,7 @@ def doExport(context,props,filepath):
 			# Create a list of materials and face vertex indices by material; adding a dummy material if none exists
 			xmshMaterials=mesh.materials
 			if len(xmshMaterials)==0:
-				xmshMaterials.append(bpy.data.Material.New(''))
+				xmshMaterials.append(bpy.data.materials.new(''))
 			xmshMatFaceIndicies=[[] for i in range(len(xmshMaterials))]
 
 			# Loop through all mesh faces and fill up our vertex texture coordinates and our matFaceIndicies arrays
@@ -252,10 +255,10 @@ def doExport(context,props,filepath):
 	# Export all selected armatures
 	for ob in objects:
 		if ob.type=='ARMATURE':
-			armature = ob.getData()
+			armature = ob.data
 			out.write('\t<Skeleton>\n')
 			
-			for bone in armature.bones.values():
+			for bone in armature.bones:
 				out.write('\t\t<Bone')
 				out.write(' Index=\"%d\"' % (mBoneIndicies[bone.name]))
 				if bone.parent:
@@ -270,21 +273,23 @@ def doExport(context,props,filepath):
 				#	http://www.devmaster.net/forums/showthread.php?t=15178
 				#	http://www.blender.org/development/release-logs/blender-240/how-armatures-work/
 				if bone.parent:
-					parentMat=bone.parent.matrix['ARMATURESPACE'].copy()
+					parentMat=bone.parent.matrix_local.copy()
 					parentMat.invert()
 				else:
-					parentMat=ob.matrixWorld
-				boneMat=bone.matrix['ARMATURESPACE']*parentMat
+					parentMat=ob.matrix_world.copy()
+				boneMat=bone.matrix_local*parentMat
 
-				out.write('\t\t\t<Translate>%f,%f,%f</Translate>\n' % (boneMat.translationPart().x, boneMat.translationPart().y, boneMat.translationPart().z))
-				out.write('\t\t\t<Rotate>%f,%f,%f,%f</Rotate>\n' % (boneMat.toQuat().x, boneMat.toQuat().y, boneMat.toQuat().z, boneMat.toQuat().w))
-				out.write('\t\t\t<Scale>%f,%f,%f</Scale>\n' % (boneMat.scalePart().x, boneMat.scalePart().y, boneMat.scalePart().z))
+				out.write('\t\t\t<Translate>%f,%f,%f</Translate>\n' % (boneMat.to_translation().x, boneMat.to_translation().y, boneMat.to_translation().z))
+				out.write('\t\t\t<Rotate>%f,%f,%f,%f</Rotate>\n' % (boneMat.to_quaternion().x, boneMat.to_quaternion().y, boneMat.to_quaternion().z, boneMat.to_quaternion().w))
+				out.write('\t\t\t<Scale>%f,%f,%f</Scale>\n' % (boneMat.to_scale().x, boneMat.to_scale().y, boneMat.to_scale().z))
 				out.write('\t\t</Bone>\n')
 				
 			out.write('\t</Skeleton>\n')
 			
 	out.write('</XMSH>\n')
 	out.close()
+
+	return True
 
 
 class ExportXMSH(bpy.types.Operator, ExportHelper):
