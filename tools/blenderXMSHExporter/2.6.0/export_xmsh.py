@@ -40,7 +40,7 @@ bl_info={
 	"category": "Import-Export"}
 
 
-import os,sys,subprocess,time
+import os,sys,subprocess,time,mathutils
 import bpy
 from bpy.props import BoolProperty
 from bpy_extras.io_utils import ExportHelper
@@ -142,17 +142,19 @@ def doExport(context,props,filepath):
 			for face in mesh.faces:
 				for i in range(len(face.vertices)):
 					vert=mesh.vertices[face.vertices[i]];
-					if mesh.uv_textures:
+					if len(mesh.uv_textures)>0:
 						uvLayer=mesh.uv_textures.active.data
-						# FaceUVs means check for a new vertex requirement
+						# Having a uv layer means checking to see if a new vertex is required
+						# For clarity define the uv coordinates for this vertex, in this face, as a Vector:
+						uv=mathutils.Vector(uvLayer[face.index].uv[i])
 						if vert.index in xmshVertUVs and (
-							xmshVertUVs[vert.index].x!=face.uv[i].x or xmshVertUVs[vert.index].y!=face.uv[i].y):
+							xmshVertUVs[vert.index].x!=uv.x or xmshVertUVs[vert.index].y!=uv.y):
 
 							# Found a vertex with multiple UV coords
 							# Create a new vertex, give it these UV coords, and bump it's index
 							xmshv=XMSHVertex(vert.index,vert.co,vert.normal)
 							xmshv.bones=xmshVerts[vert.index].bones
-							xmshv.uv=uvLayer[face.index].uv
+							xmshv.uv=uv
 							xmshv.index=len(xmshVerts)
 
 							# This new vertex goes into our materialFaceIndex 
@@ -163,10 +165,10 @@ def doExport(context,props,filepath):
 						else:
 							# Just a new vertex
 							# Assign it's UV coords to an existing xmshVert
-							xmshVerts[vert.index].uv=uvLayer[face.index].uv
+							xmshVerts[vert.index].uv=uv
 
 							# Store the UVs for this vertex index and continue
-							xmshVertUVs[vert.index]=uvLayer[face.index].uv
+							xmshVertUVs[vert.index]=uv
 							xmshMatFaceIndicies[face.material_index].append(vert.index)
 					else:
 						# No UVs mean no worrying about new vertices
@@ -183,7 +185,7 @@ def doExport(context,props,filepath):
 			out.write('\">\n')			
 			for vert in xmshVerts:
 				out.write('\t\t\t%f,%f,%f %f,%f,%f' % (vert.co.x,vert.co.y,vert.co.z,vert.no.x,vert.no.y,vert.no.z))
-				if mesh.uv_textures:
+				if len(mesh.uv_textures)>0:
 					out.write(' %f,%f' % (vert.uv.x, vert.uv.y))
 				first=True
 				for bone in vert.bones:
