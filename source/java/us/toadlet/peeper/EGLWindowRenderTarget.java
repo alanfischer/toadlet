@@ -117,11 +117,6 @@ public class EGLWindowRenderTarget extends EGLRenderTarget{
 			return false;
 		}
 
-		if(egl_version>=12){
-//			egl.eglBindAPI(EGL_OPENGL_ES_API);
-//			TOADLET_CHECK_EGLERROR("eglBindAPI");
-		}
-
 		egl.eglMakeCurrent(mDisplay,mSurface,mSurface,mContext);
 		TOADLET_CHECK_EGLERROR("eglMakeCurrent");
 
@@ -144,10 +139,6 @@ public class EGLWindowRenderTarget extends EGLRenderTarget{
 
 			egl.eglTerminate(mDisplay);
 			mDisplay=EGL_NO_DISPLAY;
-		}
-
-		if(egl_version>=12){
-//			egl.eglReleaseThread();
 		}
 
 		return true;

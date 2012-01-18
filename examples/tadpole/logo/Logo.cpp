@@ -70,7 +70,6 @@ Logo::~Logo(){
 }
 
 void Logo::create(){
-
 	engine=app->getEngine();
 	engine->setDirectory("../../../data");
 
@@ -88,7 +87,11 @@ void Logo::create(){
 	scene->getRoot()->attach(light);
 
  	meshNode=engine->createNodeType(MeshNode::type(),scene);
-	meshNode->setMesh("lt.xmsh");
+	#if defined(TOADLET_PLATFORM_ANDROID)
+		meshNode->setMesh("lt.tmsh");
+	#else
+		meshNode->setMesh("lt.xmsh");
+	#endif
 //	meshNode->getController()->start();
 //	meshNode->getController()->setCycling(Controller::Cycling_REFLECT);
 	scene->getRoot()->attach(meshNode);
@@ -129,7 +132,7 @@ void Logo::render(RenderDevice *renderDevice){
 		cameraNode->render(renderDevice);
 	renderDevice->endScene();
 	renderDevice->swap();
-\}
+}
 
 void Logo::update(int dt){
 	scene->update(dt);

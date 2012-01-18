@@ -221,6 +221,12 @@ void CameraNode::setProjectionMirrorY(bool mirror){
 	projectionUpdated();
 }
 
+void CameraNode::setObliqueNearPlaneMatrix(const Matrix4x4 &oblique){
+	mObliqueMatrix.set(oblique);
+	
+	projectionUpdated();
+}
+
 void CameraNode::setNearAndFarDist(scalar nearDist,scalar farDist){
 	mNearDist=nearDist;
 	mFarDist=farDist;
@@ -356,6 +362,32 @@ void CameraNode::projectionUpdated(){
 	matrix.reset();
 	Math::setMatrix4x4FromScale(matrix,Math::ONE,mProjectionMirrorY?-Math::ONE:Math::ONE,Math::ONE);
 	Math::preMul(mFinalProjectionMatrix,matrix);
+
+	if(mObliqueMatrix.equals(Math::IDENTITY_MATRIX4X4)==false){
+		Matrix4x4 invtransProjMatrix;
+		Math::mul(invtransProjMatrix,mFinalProjectionMatrix,mObliqueMatrix);
+		Math::invert(matrix,invtransProjMatrix);
+		Math::transpose(invtransProjMatrix,matrix);
+
+		Vector4 oplane(0,0,-1,0),cplane;
+		Math::mul(cplane,invtransProjMatrix,oplane);
+
+		float inv=abs((int)cplane[2]);
+		if(inv!=0){cplane/=inv;}// normalize such that depth is not scaled
+		cplane[3] -= 1;
+
+		if(cplane[2] < 0)
+			cplane *= -1;
+
+
+		Matrix4x4 suffix;
+		suffix.setAt(2,0,cplane[0]);
+		suffix.setAt(2,1,cplane[1]);
+		suffix.setAt(2,2,cplane[2]);
+		suffix.setAt(2,3,cplane[3]);
+
+		Math::preMul(mFinalProjectionMatrix,suffix);
+	}
 
 	updateViewTransform();
 }
@@ -563,9 +595,6 @@ void CameraNode::updateViewTransform(){
 	Math::normalize(mClipPlanes[4].set(vpt[3]-vpt[2], vpt[7]-vpt[6], vpt[11]-vpt[10], vpt[15]-vpt[14]));
 	// Near clipping plane.
 	Math::normalize(mClipPlanes[5].set(vpt[3]+vpt[2], vpt[7]+vpt[6], vpt[11]+vpt[10], vpt[15]+vpt[14]));
-
-	// Update ViewProjection matrix;
-	Math::mul(mViewProjectionMatrix,mProjectionMatrix,mViewMatrix);
 }
 /*
 /// @todo: Fix me

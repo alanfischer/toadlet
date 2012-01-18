@@ -241,10 +241,52 @@ const char *makeBoneAssignment(char *buffer,const Mesh::VertexBoneAssignmentList
 }
 
 /// @todo: Support loading all of the material, instead of starting with a DiffuseMaterial
-Material::ptr XMLMeshUtilities::loadMaterial(mxml_node_t *node,int version,MaterialManager *materialManager,TextureManager *textureManager){
-	const char *prop=mxmlElementGetAttr(node,"Name");
+Material::ptr XMLMeshUtilities::loadMaterial(mxml_node_t *materialNode,int version,MaterialManager *materialManager,TextureManager *textureManager){
+	const char *prop=mxmlElementGetAttr(materialNode,"Name");
 
-	return materialManager->findMaterial(prop);
+	Material::ptr material;
+	if(prop!=NULL && strlen(prop)>0){
+		material=materialManager->findMaterial(prop);
+	}
+	else{
+		material=materialManager->createDiffuseMaterial(NULL);
+	}
+
+	if(material==NULL){
+		return NULL;
+	}
+
+	RenderState::ptr renderState=material->getRenderState();
+
+	MaterialState materialState;
+	renderState->getMaterialState(materialState);
+	{
+		mxml_node_t *ambientNode=mxmlFindChild(materialNode,"Ambient");
+		if(ambientNode!=NULL){
+			materialState.ambient=parseVector4(mxmlGetOpaque(ambientNode->child));
+		}
+
+		mxml_node_t *diffuseNode=mxmlFindChild(materialNode,"Diffuse");
+		if(diffuseNode!=NULL){
+			materialState.diffuse=parseVector4(mxmlGetOpaque(diffuseNode->child));
+		}
+
+		mxml_node_t *specularNode=mxmlFindChild(materialNode,"Specular");
+		if(specularNode!=NULL){
+			materialState.specular=parseVector4(mxmlGetOpaque(specularNode->child));
+		}
+
+		mxml_node_t *emissiveNode=mxmlFindChild(materialNode,"Emissive");
+		if(emissiveNode!=NULL){
+			materialState.emissive=parseVector4(mxmlGetOpaque(emissiveNode->child));
+		}
+
+		if(ambientNode!=NULL || diffuseNode!=NULL || specularNode!=NULL || emissiveNode!=NULL){
+			renderState->setMaterialState(materialState);
+		}
+	}
+
+	return material;
 }
 
 mxml_node_t *XMLMeshUtilities::saveMaterial(Material::ptr material,int version,ProgressListener *listener){
@@ -255,6 +297,31 @@ mxml_node_t *XMLMeshUtilities::saveMaterial(Material::ptr material,int version,P
 	mxml_node_t *materialNode=mxmlNewElement(MXML_NO_PARENT,"Material");
 
 	mxmlElementSetAttr(materialNode,"Name",material->getName());
+
+	RenderState::ptr renderState=material->getRenderState();
+
+	MaterialState materialState;
+	if(renderState->getMaterialState(materialState)){
+		mxml_node_t *ambientNode=mxmlNewElement(materialNode,"Ambient");
+		{
+			mxmlNewOpaque(ambientNode,makeVector4(materialState.ambient));
+		}
+
+		mxml_node_t *diffuseNode=mxmlNewElement(materialNode,"Diffuse");
+		{
+			mxmlNewOpaque(diffuseNode,makeVector4(materialState.diffuse));
+		}
+
+		mxml_node_t *specularNode=mxmlNewElement(materialNode,"Specular");
+		{
+			mxmlNewOpaque(specularNode,makeVector4(materialState.specular));
+		}
+		
+		mxml_node_t *emissiveNode=mxmlNewElement(materialNode,"Emissive");
+		{
+			mxmlNewOpaque(emissiveNode,makeVector4(materialState.emissive));
+		}
+	}
 
 	return materialNode;
 }

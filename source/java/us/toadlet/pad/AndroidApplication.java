@@ -190,9 +190,8 @@ public abstract class AndroidApplication extends Activity implements RenderTarge
 	
 	public boolean create(){
 		if(mEngine==null){
-			mEngine=new NEngine();
+			mEngine=new NEngine(this);
 			mEngine.installHandlers();
-			installHandlers(mEngine);
 		}
 
 		if(mAudioDevice==null){
@@ -511,7 +510,7 @@ public abstract class AndroidApplication extends Activity implements RenderTarge
 			mRenderTarget=null;
 
 			System.out.println(
-				"Error creating RenderTargetPeer");
+				"Error creating RenderTarget");
 		}
 		else if(mRenderDevice==null){
 			System.out.println(
@@ -568,8 +567,6 @@ public abstract class AndroidApplication extends Activity implements RenderTarge
 				return event.getUnicodeChar();
 		}
 	}
-	
-	protected native void installHandlers(Engine engine);
 		
 	Thread mThread=null;
 	protected ApplicationView mView;

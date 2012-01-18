@@ -45,6 +45,9 @@ TerrainNode::TerrainNode():super(),
 	//mPatchGrid,
 	mPatchSize(0),
 	//mPatchMaterial,
+	mPatchCameraUpdateScope(0),
+	mPatchTerrainScope(0),
+	mPatchWaterScope(0),
 	mPatchTolerance(0),
 	//mPatchScale,
 	//mPatchHeightData,
@@ -61,6 +64,9 @@ Node *TerrainNode::create(Scene *scene){
 	mHalfSize=mSize/2;
 	mPatchGrid.resize(mSize*mSize);
 	mUpdateTargetBias=Math::fromMilli(250);
+	mPatchCameraUpdateScope=-1;
+	mPatchTerrainScope=-1;
+	mPatchWaterScope=-1;
 	mPatchTolerance=0.00001f;
 
 	int i,j;
@@ -203,6 +209,28 @@ void TerrainNode::setCameraUpdateScope(int scope){
 	}
 }
 
+void TerrainNode::setTerrainScope(int scope){
+	mPatchTerrainScope=scope;
+	
+	int i;
+	for(i=0;i<mPatchGrid.size();++i){
+		if(mPatchGrid[i]!=NULL){
+			mPatchGrid[i]->setTerrainScope(scope);
+		}
+	}	
+}
+
+void TerrainNode::setWaterScope(int scope){
+	mPatchWaterScope=scope;
+	
+	int i;
+	for(i=0;i<mPatchGrid.size();++i){
+		if(mPatchGrid[i]!=NULL){
+			mPatchGrid[i]->setWaterScope(scope);
+		}
+	}	
+}
+
 void TerrainNode::setTolerance(scalar tolerance){
 	mPatchTolerance=tolerance;
 	
@@ -332,6 +360,8 @@ void TerrainNode::createPatch(int x,int y){
 	patch->setTranslate(toWorldXi(x)-mPatchSize*mPatchScale.x/2,toWorldYi(y)-mPatchSize*mPatchScale.y/2,0);
 	patch->setTolerance(mPatchTolerance);
 	patch->setCameraUpdateScope(mPatchCameraUpdateScope);
+	patch->setTerrainScope(mPatchTerrainScope);
+	patch->setWaterScope(mPatchWaterScope);
 
 	mDataSource->getPatchHeightData(&mPatchHeightData[0],x,y);
 	patch->setHeightData(&mPatchHeightData[0],mPatchSize,mPatchSize,mPatchSize,true);

@@ -38,7 +38,6 @@ extern "C" JNIEXPORT void Java_us_toadlet_pad(JNIEnv *env){
 	}
 }
 
-#include "us_toadlet_pad_AndroidApplication.cpp"
 #include "us_toadlet_pad_NApplet.cpp"
 #include "us_toadlet_pad_NEngine.cpp"
 #include "us_toadlet_pad_NRenderDevice.cpp"

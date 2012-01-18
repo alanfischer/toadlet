@@ -25,12 +25,13 @@
 
 package us.toadlet.pad;
 
+import android.content.*;
 import us.toadlet.peeper.*;
 import us.toadlet.ribbit.*;
 
 public class NEngine implements Engine{
-	public NEngine(){
-		makeEngine();
+	public NEngine(Context ctx){
+		makeEngine(ctx);
 	}
 	
 	public native void destroy();
@@ -41,7 +42,10 @@ public class NEngine implements Engine{
 	
 	public native void setAudioDevice(AudioDevice device);
 
-	private native void makeEngine();
+	public native void hack_addNodes();
+	public native void hack_render();
+	
+	private native void makeEngine(Context ctx);
 	
 	protected int mNativeHandle;
 }

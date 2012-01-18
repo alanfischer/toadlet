@@ -401,7 +401,23 @@ Material::ptr TMSHHandler::readMaterial(DataStream *stream,int blockSize){
 
 	String name=stream->readNullTerminatedString();
 
-	Material::ptr material=mEngine->getMaterialManager()->findMaterial(name);
+	Material::ptr material;
+	if(name.length()>0){
+		material=mEngine->getMaterialManager()->findMaterial(name);
+	}
+	else{
+		material=mEngine->getMaterialManager()->createDiffuseMaterial(NULL);
+	}
+
+	RenderState::ptr renderState=material!=NULL?material->getRenderState():NULL;
+
+	MaterialState materialState;
+	if(stream->readBool()){
+		stream->read((tbyte*)&materialState,sizeof(MaterialState));
+		if(renderState!=NULL){
+			renderState->setMaterialState(materialState);
+		}
+	}
 
 	return material;
 }
@@ -415,6 +431,17 @@ void TMSHHandler::writeMaterial(DataStream *stream,Material::ptr material){
 	stream->writeBool(true);
 
 	stream->writeNullTerminatedString(material->getName());
+
+	RenderState::ptr renderState=material->getRenderState();
+
+	MaterialState materialState;
+	if(renderState->getMaterialState(materialState)){
+		stream->writeBool(true);
+		stream->write((tbyte*)&materialState,sizeof(MaterialState));
+	}
+	else{
+		stream->writeBool(false);
+	}
 }
 
 Skeleton::ptr TMSHHandler::readSkeleton(DataStream *stream,int blockSize){

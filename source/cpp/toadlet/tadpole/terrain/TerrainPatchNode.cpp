@@ -50,6 +50,8 @@ TerrainPatchNode::TerrainPatchNode():Node(),
 	mCellEpsilon(0),
 
 	mCameraUpdateScope(-1),
+	mTerrainScope(-1),
+	mWaterScope(-1),
 	mTolerance(0),
 	mS1(0),mS2(0)
 {}
@@ -677,7 +679,7 @@ void TerrainPatchNode::gatherRenderables(CameraNode *camera,RenderableSet *set){
 		updateIndexBuffers(camera);
 	}
 
-	if(mIndexData->getCount()>0){
+	if((camera->getScope()&mTerrainScope)!=0 && mIndexData->getCount()>0){
 		#if defined(TOADLET_GCC_INHERITANCE_BUG)
 			set->queueRenderable(&renderable);
 		#else
@@ -685,7 +687,7 @@ void TerrainPatchNode::gatherRenderables(CameraNode *camera,RenderableSet *set){
 		#endif
 	}
 
-	if(mWaterRenderable!=NULL && mWaterMaterial!=NULL){
+	if((camera->getScope()&mWaterScope)!=0 && mWaterRenderable!=NULL && mWaterMaterial!=NULL){
 		if((camera->getScope()&mCameraUpdateScope)!=0){
 			updateWaterIndexBuffers(camera);
 		}

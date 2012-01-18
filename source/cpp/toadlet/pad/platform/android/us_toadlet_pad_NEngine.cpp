@@ -1,4 +1,9 @@
 #include <toadlet/tadpole/Engine.h>
+#include <toadlet/tadpole/handler/platform/android/AndroidAssetArchive.h>
+#include <toadlet/tadpole/handler/platform/android/AndroidTextureHandler.h>
+
+// Hack
+#include <toadlet/tadpole.h>
 
 using namespace toadlet::tadpole;
 
@@ -15,7 +20,7 @@ JNIEXPORT void JNICALL Java_us_toadlet_pad_NEngine_destroy(JNIEnv *env,jobject o
 		engine->destroy();
 		delete engine;
 
-		env->SetIntField(obj,nengineNativeHandleID,(jint)engine);
+		env->SetIntField(obj,nengineNativeHandleID,(jint)NULL);
 	}
 }
 
@@ -57,12 +62,53 @@ JNIEXPORT void JNICALL Java_us_toadlet_pad_NEngine_setAudioDevice(JNIEnv *env,jo
 	engine->setAudioDevice(device);
 }
 
-JNIEXPORT void JNICALL Java_us_toadlet_pad_NEngine_makeEngine(JNIEnv *env,jobject obj){
+Scene::ptr scene;
+SceneRenderer::ptr sceneRenderer;
+CameraNode::ptr camera;
+MeshNode::ptr mesh;
+
+JNIEXPORT void JNICALL Java_us_toadlet_pad_NEngine_hack_1addNodes(JNIEnv *env,jobject obj){
+	Engine *engine=(Engine*)env->GetIntField(obj,nengineNativeHandleID);
+	
+	scene=Scene::ptr(new Scene(engine));
+	sceneRenderer=SceneRenderer::ptr(new SceneRenderer(scene));
+	scene->setSceneRenderer(sceneRenderer);
+	
+	camera=engine->createNodeType(CameraNode::type(),scene);
+	scene->getRoot()->attach(camera);
+	
+//	camera->setLookAt(
+}
+
+JNIEXPORT void JNICALL Java_us_toadlet_pad_NEngine_hack_1render(JNIEnv *env,jobject obj){
+	Engine *engine=(Engine*)env->GetIntField(obj,nengineNativeHandleID);
+	
+	RenderDevice *device=engine->getRenderDevice();
+	device->beginScene();
+		camera->render(device);
+	device->endScene();
+}
+
+JNIEXPORT void JNICALL Java_us_toadlet_pad_NEngine_makeEngine(JNIEnv *env,jobject obj,jobject contextObj){
 	Java_us_toadlet_pad(env);
 
-	Engine *engine=new Engine(true,false);
+	Engine *engine=new Engine(true,false);	
 	
 	env->SetIntField(obj,nengineNativeHandleID,(jint)engine);
+	
+	jobject assetManagerObj=NULL;
+	jclass contextClass=env->GetObjectClass(contextObj);
+	{
+		jmethodID getAssetsID=env->GetMethodID(contextClass,"getAssets","()Landroid/content/res/AssetManager;");
+		assetManagerObj=env->CallObjectMethod(contextObj,getAssetsID);
+	}
+	env->DeleteLocalRef(contextClass);
+
+	AndroidAssetArchive::ptr assetArchive=AndroidAssetArchive::ptr(new AndroidAssetArchive(env,assetManagerObj));
+	engine->getArchiveManager()->manage(shared_static_cast<Archive>(assetArchive));
+
+	AndroidTextureHandler::ptr textureHandler=AndroidTextureHandler::ptr(new AndroidTextureHandler(engine->getTextureManager(),env));
+	engine->getTextureManager()->setDefaultStreamer(textureHandler);
 }
 
 }

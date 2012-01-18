@@ -7,29 +7,23 @@ extern "C" JNIEXPORT jobject JNICALL Java_us_toadlet_logo_Logo_createApplet(JNIE
 	Java_us_toadlet_pad(env);
 
 	Logger::alert("getting Application");
-	Application *app=NULL;
-	jclass appClass=env->GetObjectClass(obj);
-	{
-		jmethodID getNativeHandleID=env->GetMethodID(appClass,"getNativeHandle","()I");
-		app=(Application*)env->CallIntMethod(obj,getNativeHandleID);
-	}
-	env->DeleteLocalRef(appClass);
+	Application *app=new JApplication(env,obj);
 
 	Logger::alert("creating applet");
 	Applet *applet=new Logo(app);
 
-	jobject japplet=NULL;
+	jobject appletObj=NULL;
 
 	Logger::alert("allocating NApplet");
 	jclass appletClass=env->FindClass("us/toadlet/pad/NApplet");
 	{
 		jmethodID initID=env->GetMethodID(appletClass,"<init>","(I)V");
-		japplet=env->NewObject(appletClass,initID,applet);
+		appletObj=env->NewObject(appletClass,initID,applet);
 	}
 	env->DeleteLocalRef(appletClass);
 	Logger::alert("allocated NApplet");
 
-	return japplet;
+	return appletObj;
 }
 
 extern "C" JNIEXPORT void JNICALL Java_us_toadlet_logo_Logo_destroyApplet(JNIEnv *env,jobject obj,jobject applet){

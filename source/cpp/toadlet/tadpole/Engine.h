@@ -51,7 +51,7 @@ namespace tadpole{
 
 class TOADLET_API Engine{
 public:
-	Engine(bool fixedBackable=false,bool shaderBackable=false);
+	Engine(bool fixedBackable=true,bool shaderBackable=true);
 	virtual ~Engine();
 
 	void destroy();
