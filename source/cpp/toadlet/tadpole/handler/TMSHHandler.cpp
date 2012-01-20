@@ -402,13 +402,13 @@ Material::ptr TMSHHandler::readMaterial(DataStream *stream,int blockSize){
 	String name=stream->readNullTerminatedString();
 
 	Material::ptr material;
-	if(name!=NULL){
+	if(name!=(char*)NULL){
 		material=mEngine->getMaterialManager()->findMaterial(name);
 	}
 	if(material==NULL){
 		material=mEngine->getMaterialManager()->createDiffuseMaterial(NULL);
 	}
-	if(name!=NULL){
+	if(name!=(char*)NULL){
 		material->setName(name);
 	}
 

@@ -74,7 +74,7 @@ bool BackableVertexFormat::addElement(int semantic,const String &name,int index,
 	else{
 		mSemantics.add(semantic);
 	}
-	if(name==NULL){
+	if(name==(char*)NULL){
 		mNames.add(BackableVertexFormat::getNameFromSemantic(semantic));
 	}
 	else{

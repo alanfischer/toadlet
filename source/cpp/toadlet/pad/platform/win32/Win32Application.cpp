@@ -470,7 +470,7 @@ void Win32Application::destroyWindow(){
 		win32->mWnd=0;
 	}
 
-	if(win32->mClassName!=NULL){
+	if(win32->mClassName!=(char*)NULL){
 		UnregisterClass(win32->mClassName,win32->mInstance);
 		win32->mClassName=String();
 	}

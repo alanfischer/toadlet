@@ -84,7 +84,7 @@ bool D3D10VertexFormat::addElement(int semantic,const String &name,int index,int
 	else{
 		mSemantics.add(semantic);
 	}
-	if(name==NULL){
+	if(name==(char*)NULL){
 		mNames.add(BackableVertexFormat::getNameFromSemantic(semantic));
 	}
 	else{

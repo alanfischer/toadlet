@@ -115,7 +115,7 @@ bool BaseApplication::create(String renderDevice,String audioDevice){
 	/// @todo: Unify the plugin framework a bit so we dont have as much code duplication for this potion, and the creating of the plugin
 	mNewRenderDevicePlugin=mCurrentRenderDevicePlugin=renderDevice;
 	if(renderDevice!="null"){
-		if(renderDevice!=NULL || mRenderDevicePlugins.size()==0){
+		if(renderDevice!=(char*)NULL || mRenderDevicePlugins.size()==0){
 			createContextAndRenderDevice(renderDevice);
 		}
 		else if(mRenderDevicePreferences.size()==0){
@@ -128,7 +128,7 @@ bool BaseApplication::create(String renderDevice,String audioDevice){
 		}
 	}
 	if(audioDevice!="null"){
-		if(audioDevice!=NULL || mAudioDevicePlugins.size()==0){
+		if(audioDevice!=(char*)NULL || mAudioDevicePlugins.size()==0){
 			createAudioDevice(audioDevice);
 		}
 		else if(mAudioDevicePreferences.size()==0){
