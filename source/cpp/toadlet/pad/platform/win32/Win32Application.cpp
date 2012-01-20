@@ -251,7 +251,7 @@ void Win32Application::runEventLoop(){
 				}
 
 				if(mWidth>0 && mHeight>0){
-					render(mRenderDevice);
+					render();
 				}
 			}
 
@@ -470,7 +470,7 @@ void Win32Application::destroyWindow(){
 		win32->mWnd=0;
 	}
 
-	if(win32->mClassName!=(char*)NULL){
+	if(win32->mClassName!=NULL){
 		UnregisterClass(win32->mClassName,win32->mInstance);
 		win32->mClassName=String();
 	}
@@ -593,7 +593,7 @@ void Win32Application::internal_resize(int width,int height){
 		update(0);
 
 		if(width>0 && height>0){
-			render(mRenderDevice);
+			render();
 		}
 	}
 }

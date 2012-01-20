@@ -28,8 +28,6 @@
 #include "JAudioBuffer.h"
 #include <toadlet/egg/Logger.h>
 
-extern "C" JNIEXPORT void Java_us_toadlet_ribbit(JNIEnv *env);
-
 namespace toadlet{
 namespace ribbit{
 
@@ -57,8 +55,6 @@ JAudioDevice::JAudioDevice(JNIEnv *jenv,jobject jobj){
 		env->ExceptionDescribe();
 		env->ExceptionClear();
 	}
-
-	Java_us_toadlet_ribbit(env);
 }
 
 JAudioDevice::~JAudioDevice(){

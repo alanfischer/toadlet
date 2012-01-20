@@ -31,7 +31,7 @@ int main(int argc,char **argv){
 	PlatformApplication *app=new PlatformApplication();
 	app->setSize(640,480);
 	app->setFullscreen(false);
-	app->defaultCreate();
+	app->create("gl","");
 
 	Viewer *viewer=new Viewer(app);
 	app->setApplet(viewer);
@@ -83,6 +83,7 @@ int main(int argc,char **argv){
 	viewer->setNode(meshNode);
 
 	app->start();
+	app->destroy();
 
 	delete viewer;
 	delete app;

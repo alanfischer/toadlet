@@ -62,7 +62,7 @@ public:
 	virtual void focusGained()						{if(mApplet!=NULL){mApplet->focusGained();}}
 	virtual void focusLost()						{if(mApplet!=NULL){mApplet->focusLost();}}
 	virtual void update(int dt)						{if(mApplet!=NULL){mApplet->update(dt);}}
-	virtual void render(RenderDevice *renderDevice)	{if(mApplet!=NULL){mApplet->render(renderDevice);}}
+	virtual void render()							{if(mApplet!=NULL){mApplet->render();}}
 
 	virtual void keyPressed(int key)				{if(mApplet!=NULL){mApplet->keyPressed(key);}}
 	virtual void keyReleased(int key)				{if(mApplet!=NULL){mApplet->keyReleased(key);}}
