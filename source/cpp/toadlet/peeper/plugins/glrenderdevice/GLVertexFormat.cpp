@@ -87,7 +87,7 @@ bool GLVertexFormat::addElement(int semantic,const String &name,int index,int fo
 	else{
 		mSemantics.add(semantic);
 	}
-	if(name==NULL){
+	if(name==(char*)NULL){
 		mNames.add(BackableVertexFormat::getNameFromSemantic(semantic));
 	}
 	else{

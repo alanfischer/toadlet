@@ -322,7 +322,7 @@ mxml_node_t *XMLMeshUtilities::saveMaterial(Material::ptr material,int version,P
 
 	mxml_node_t *materialNode=mxmlNewElement(MXML_NO_PARENT,"Material");
 
-	if(material->getName()!=NULL){
+	if(material->getName()!=(char*)NULL){
 		mxmlElementSetAttr(materialNode,"Name",material->getName());
 	}
 
@@ -734,7 +734,7 @@ mxml_node_t *XMLMeshUtilities::saveMesh(Mesh::ptr mesh,int version,ProgressListe
 		}
 
 		// Drop trailing ','
-		if(type!=NULL){
+		if(type!=(char*)NULL){
 			type=type.substr(0,type.length()-1);
 		}
 		mxmlElementSetAttr(vertexNode,"Type",type);
@@ -792,7 +792,7 @@ mxml_node_t *XMLMeshUtilities::saveMesh(Mesh::ptr mesh,int version,ProgressListe
 
 		mxml_node_t *subMeshNode=mxmlNewElement(meshNode,"SubMesh");
 		{
-			if(subMesh->name!=NULL){
+			if(subMesh->name!=(char*)NULL){
 				mxmlElementSetAttr(subMeshNode,"Name",subMesh->name);
 			}
 
@@ -907,7 +907,7 @@ mxml_node_t *XMLMeshUtilities::saveSkeleton(Skeleton::ptr skeleton,int version,P
 
 			mxmlElementSetAttr(boneNode,"Parent",makeInt(bone->parentIndex));
 
-			if(bone->name!=NULL){
+			if(bone->name!=(char*)NULL){
 				mxmlElementSetAttr(boneNode,"Name",bone->name);
 			}
 
@@ -1006,7 +1006,7 @@ TransformSequence::ptr XMLMeshUtilities::loadSequence(mxml_node_t *node,int vers
 mxml_node_t *XMLMeshUtilities::saveSequence(TransformSequence::ptr sequence,int version,ProgressListener *listener){
 	mxml_node_t *sequenceNode=mxmlNewElement(MXML_NO_PARENT,"Sequence");
 
-	if(sequence->getName()!=NULL){
+	if(sequence->getName()!=(char*)NULL){
 		mxmlElementSetAttr(sequenceNode,"Name",sequence->getName());
 	}
 
