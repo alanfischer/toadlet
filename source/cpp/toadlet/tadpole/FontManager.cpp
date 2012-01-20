@@ -38,7 +38,7 @@ FontManager::FontManager(Archive *archive):ResourceManager(archive){
 }
 
 Resource::ptr FontManager::manage(const Resource::ptr &resource,const String &name){
-	if(name!=(char*)NULL){
+	if(name!=NULL){
 		ResourceManager::manage(resource,name+String(":")+shared_static_cast<Font>(resource)->getPointSize());
 	}
 	else{
@@ -79,7 +79,7 @@ Resource::ptr FontManager::find(const String &name,ResourceData::ptr data){
 		return NULL;
 	}
 
-//	if(fontData->characterSet==(char*)NULL){
+//	if(fontData->characterSet==NULL){
 		fontData->characterSet=mDefaultCharacterSet;
 //	}
 

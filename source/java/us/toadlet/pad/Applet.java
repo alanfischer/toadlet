@@ -25,13 +25,11 @@
 
 package us.toadlet.pad;
 
-import us.toadlet.peeper.*;
-
 public interface Applet{
 	public void create();
 	public void destroy();
 	public void update(int dt);
-	public void render(RenderDevice renderDevice);
+	public void render();
 
 	public void resized(int width,int height);
 	public void focusGained();

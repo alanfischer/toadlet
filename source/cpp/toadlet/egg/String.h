@@ -219,6 +219,9 @@ public:
 	inline bool operator==(const String &string) const{return equals(string);}
 	bool operator!=(const String &string) const;
 
+	bool operator==(int null) const;
+	bool operator!=(int null) const;
+
 	bool equals(const char *text) const;
 	inline bool operator==(const char *text) const{return equals(text);}
 	bool operator!=(const char *text) const;

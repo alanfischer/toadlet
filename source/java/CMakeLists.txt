@@ -80,7 +80,12 @@ set (PEEPER_SRC
 	us/toadlet/peeper/GLRenderTarget.java
 	us/toadlet/peeper/EGLRenderTarget.java
 	us/toadlet/peeper/EGLWindowRenderTarget.java
+	us/toadlet/peeper/NGLRenderDevice.java
 	${CMAKE_CURRENT_BINARY_DIR}/us/toadlet/peeper/Version.java
+)
+
+set (PEEPER_H
+	us.toadlet.peeper.NGLRenderDevice
 )
 
 # Create the jar file with UseJava.cmake functions. See UseJava.cmake for details.
@@ -91,6 +96,11 @@ set (CMAKE_JAR_CLASSES_PREFIX us/toadlet/peeper)
 add_jar (jtoadlet_peeper ${PEEPER_SRC})
 get_property (JARFILE TARGET jtoadlet_peeper PROPERTY JAR_FILE)
 install (FILES ${JARFILE} DESTINATION lib)
+
+# Generate headers
+add_custom_command (TARGET jtoadlet_peeper POST_BUILD
+    COMMAND ${Java_JAVAH_EXECUTABLE} -classpath ${JARFILE} ${PEEPER_H}
+)
 
 
 # toadlet_ribbit
@@ -137,7 +147,6 @@ set (PAD_SRC
 	us/toadlet/pad/AndroidApplication.java
 	us/toadlet/pad/Engine.java
 	us/toadlet/pad/NApplet.java
-	us/toadlet/pad/NRenderDevice.java
 	${CMAKE_CURRENT_BINARY_DIR}/us/toadlet/pad/Version.java
 )
 
@@ -145,7 +154,6 @@ set (PAD_H
 	us.toadlet.pad.AndroidApplication
 	us.toadlet.pad.NEngine
 	us.toadlet.pad.NApplet
-	us.toadlet.pad.NRenderDevice
 )
 
 # Create the jar file with UseJava.cmake functions. See UseJava.cmake for details.

@@ -60,8 +60,6 @@ JInputDevice::JInputDevice(JNIEnv *jenv,jobject jobj){
 		env->ExceptionClear();
 		return;
 	}
-
-	Java_us_toadlet_flick(env);
 }
 
 JInputDevice::~JInputDevice(){

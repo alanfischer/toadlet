@@ -288,7 +288,7 @@ public abstract class AndroidApplication extends Activity implements RenderTarge
 					mAudioDevice.update((int)(currentTime-mLastTime));
 				}
 				if(mRenderDevice!=null){
-					render(mRenderDevice);
+					render();
 				}
 			}
 			mLastTime=currentTime;
@@ -313,7 +313,7 @@ public abstract class AndroidApplication extends Activity implements RenderTarge
 					resized(mWidth,mHeight);
 
 					if(mActive && mRenderDevice!=null){
-						render(mRenderDevice);
+						render();
 					}
 				}
 			}
@@ -491,7 +491,7 @@ public abstract class AndroidApplication extends Activity implements RenderTarge
 	public void mouseReleased(int x,int y,int button){if(mApplet!=null)mApplet.mouseReleased(x,y,button);}
 	public void mouseScrolled(int x,int y,int scroll){if(mApplet!=null)mApplet.mouseScrolled(x,y,scroll);}
 	public void update(int dt)						{if(mApplet!=null)mApplet.update(dt);}
-	public void render(RenderDevice renderDevice)	{if(mApplet!=null)mApplet.render(renderDevice);}
+	public void render()							{if(mApplet!=null)mApplet.render();}
 
 	public void surfaceCreated(SurfaceHolder holder){
 		System.out.println(
@@ -500,7 +500,7 @@ public abstract class AndroidApplication extends Activity implements RenderTarge
 		boolean result=false;
 		mRenderTarget=makeRenderTarget(holder);
 		if(mRenderTarget!=null){
-			mRenderDevice=new NRenderDevice();
+			mRenderDevice=new NGLRenderDevice();
 			result=mRenderDevice.create(this,null);
 			if(result==false){
 				mRenderDevice=null;
@@ -518,7 +518,6 @@ public abstract class AndroidApplication extends Activity implements RenderTarge
 		}
 
 		if(mRenderDevice!=null){
-			mRenderDevice.setRenderTarget(this);
 			mEngine.setRenderDevice(mRenderDevice);
 		}
 	}

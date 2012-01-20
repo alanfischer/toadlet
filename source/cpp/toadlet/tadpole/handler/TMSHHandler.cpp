@@ -402,20 +402,31 @@ Material::ptr TMSHHandler::readMaterial(DataStream *stream,int blockSize){
 	String name=stream->readNullTerminatedString();
 
 	Material::ptr material;
-	if(name.length()>0){
+	if(name!=NULL){
 		material=mEngine->getMaterialManager()->findMaterial(name);
 	}
-	else{
+	if(material==NULL){
 		material=mEngine->getMaterialManager()->createDiffuseMaterial(NULL);
 	}
+	if(name!=NULL){
+		material->setName(name);
+	}
 
-	RenderState::ptr renderState=material!=NULL?material->getRenderState():NULL;
+	RenderState::ptr renderState=material->getRenderState();
 
-	MaterialState materialState;
 	if(stream->readBool()){
+		MaterialState materialState;
 		stream->read((tbyte*)&materialState,sizeof(MaterialState));
 		if(renderState!=NULL){
 			renderState->setMaterialState(materialState);
+		}
+	}
+
+	if(stream->readBool()){
+		RasterizerState rasterizerState;
+		stream->read((tbyte*)&rasterizerState,sizeof(RasterizerState));
+		if(renderState!=NULL){
+			renderState->setRasterizerState(rasterizerState);
 		}
 	}
 
@@ -438,6 +449,15 @@ void TMSHHandler::writeMaterial(DataStream *stream,Material::ptr material){
 	if(renderState->getMaterialState(materialState)){
 		stream->writeBool(true);
 		stream->write((tbyte*)&materialState,sizeof(MaterialState));
+	}
+	else{
+		stream->writeBool(false);
+	}
+
+	RasterizerState rasterizerState;
+	if(renderState->getRasterizerState(rasterizerState)){
+		stream->writeBool(true);
+		stream->write((tbyte*)&rasterizerState,sizeof(RasterizerState));
 	}
 	else{
 		stream->writeBool(false);

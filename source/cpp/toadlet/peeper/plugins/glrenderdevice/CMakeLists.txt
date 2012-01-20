@@ -39,6 +39,8 @@ set (PEEPER_GLRENDERDEVICE_PLATFORM_GLX_SRC
 
 set (PEEPER_GLRENDERDEVICE_PLATFORM_JGL_SRC
 	platform/jgl/JGLWindowRenderTarget.cpp
+	platform/jgl/JGLWindowRenderTarget.cpp
+	platform/jgl/us_toadlet_peeper_NGLRenderDevice.cpp
 )
 
 set (PEEPER_GLRENDERDEVICE_PLATFORM_NSGL_SRC

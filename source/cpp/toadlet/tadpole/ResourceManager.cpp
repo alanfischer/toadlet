@@ -118,7 +118,7 @@ Resource::ptr ResourceManager::manage(const Resource::ptr &resource,const String
 		resource->setFullyReleasedListener(this);
 	}
 	else{
-		if(resource->getName()!=(char*)NULL){
+		if(resource->getName()!=NULL){
 			NameResourceMap::iterator it=mNameResourceMap.find(resource->getName());
 			if(it!=mNameResourceMap.end()){
 				mNameResourceMap.erase(it);
@@ -126,11 +126,11 @@ Resource::ptr ResourceManager::manage(const Resource::ptr &resource,const String
 		}
 	}
 
-	if(name!=(char*)NULL){
+	if(name!=NULL){
 		resource->setName(name);
 	}
 
-	if(resource->getName()!=(char*)NULL){
+	if(resource->getName()!=NULL){
 		mNameResourceMap.add(resource->getName(),resource);
 	}
 
@@ -152,7 +152,7 @@ void ResourceManager::unmanage(Resource *resource){
 		}
 	}
 
-	if(resource->getName()!=(char*)NULL){
+	if(resource->getName()!=NULL){
 		NameResourceMap::iterator it=mNameResourceMap.find(resource->getName());
 		if(it!=mNameResourceMap.end()){
 			mNameResourceMap.erase(it);
@@ -273,7 +273,7 @@ Resource::ptr ResourceManager::findFromFile(const String &name,ResourceData *dat
 		}
 	}
 
-	if(extension!=(char*)NULL){
+	if(extension!=NULL){
 		ResourceStreamer *streamer=getStreamer(extension);
 		if(streamer==NULL){
 			streamer=mDefaultStreamer;

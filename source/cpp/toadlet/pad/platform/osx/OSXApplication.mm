@@ -142,7 +142,7 @@ rect{
 	if(mApplication->isActive()){
 		mApplication->update(dt);
 		if(mApplication->getRenderDevice()!=NULL){
-			mApplication->render(mApplication->getRenderDevice());
+			mApplication->render();
 		}
 		if(mApplication->getAudioDevice()!=NULL){
 			mApplication->getAudioDevice()->update(dt);
@@ -166,7 +166,7 @@ rect{
 			mApplication->getEngine()->contextReset(mApplication->getRenderDevice());
 		}
 		mApplication->update(0);
-		mApplication->render(mApplication->getRenderDevice());
+		mApplication->render();
 	}
 }
 
