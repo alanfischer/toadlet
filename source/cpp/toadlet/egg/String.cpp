@@ -606,6 +606,16 @@ bool String::operator!=(const String &string) const{
 	return TOADLET_WCSCMP((wchar_t*)mData,(wchar_t*)string.mData)!=0;
 }
 
+bool String::operator==(int null) const{
+	TOADLET_ASSERT(null==NULL);
+	return mLength==0;
+}
+
+bool String::operator!=(int null) const{
+	TOADLET_ASSERT(null==NULL);
+	return mLength>0;
+}
+
 bool String::equals(const char *text) const{
 	if(text==NULL){
 		return mLength==0;

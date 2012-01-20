@@ -273,7 +273,7 @@ void AndroidApplication::run(){
 				mEngine->contextReset(mRenderDevice);
 			}
 
-			render(mRenderDevice);
+			render();
 		}
 
 		if(mAudioDevice!=NULL){
@@ -449,7 +449,7 @@ void AndroidApplication::windowResized(){
 		mHeight=mRenderTarget->getHeight();
 		resized(mWidth,mHeight);
 
-		render(mRenderDevice);
+		render();
 	}
 }
 

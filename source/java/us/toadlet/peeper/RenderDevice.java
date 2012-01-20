@@ -29,9 +29,7 @@ public interface RenderDevice{
 	public boolean create(RenderTarget target,int[] options);
 	public void destroy();
 
-	public boolean setRenderTarget(RenderTarget target);
-	
-	public void clear(int clearFlags,int clearColor);
-	
 	public void swap();
+	public void beginScene();
+	public void endScene();
 }
