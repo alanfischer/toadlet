@@ -31,9 +31,8 @@ bl_info={
 	"blender": (2, 5, 7),
 	"api": 35622,
 	"location": "File > Import-Export",
-	"description": "Export toadlet meshes and materials",
-	"warning": "Only triangle meshes supported, convert any quads. "
-		"Bones with identical names not supported.",
+	"description": "Export selected meshes, materials and armatures to toadlet XMSH version 4",
+	"warning": "Only triangle meshes supported, convert any quads.",
 	"wiki_url": "http://code.google.com/p/toadlet",
 	"tracker_url": "",
 	"support": 'COMMUNITY',
@@ -44,7 +43,6 @@ import os,sys,subprocess,time,mathutils
 import bpy
 from bpy.props import BoolProperty
 from bpy_extras.io_utils import ExportHelper
-
 
 class XMSHVertex:	
 	def __init__(self,index,co,no):
@@ -61,28 +59,15 @@ def doExport(context,props,filepath):
 	mBoneIndicies={}
 	mBoneCounter=0
 
-	# Try to find the tmshoptimizer executable
-	tmshoptimizer=None
-	path=os.environ['PATH']
-	paths=path.split(os.pathsep)
-	if sys.platform=='win32':
-		exe="tmshoptimizer.exe"
-	else:
-		exe="tmshoptimizer"
-	if os.path.isfile(os.path.join(os.curdir,exe)):
-		tmshoptimizer=os.path.join(os.curdir,exe)
-	else:
-		for p in paths:
-			f=os.path.join(p,exe)
-			if os.path.isfile(f):
-				tmshoptimizer=f
-				break
+	# Get all currently selected objects
+	objects = context.selected_objects
+	if len(objects)==0:
+		print("No objects selected for export.")
+		return False
 
 	# Write out the xmsh file
 	out = open(filepath, "w")
-	out.write('<XMSH Version="3">\n')
-
-	objects = context.selected_objects
+	out.write('<XMSH Version="4">\n')
 
 	# The XMSH format references bones by index, not by name as blender does.
 	# Find all armatures to create a name,index dictionary for all bones.
@@ -180,8 +165,10 @@ def doExport(context,props,filepath):
 						# No UVs mean no worrying about new vertices
 						xmshMatFaceIndicies[face.material_index].append(vert.index)
 
-			# Write out all xmsh vertices at once
+			# Start writing out the mesh
 			out.write('\t<Mesh>\n')
+
+			# Write out all xmsh vertices at once
 			out.write('\t\t<Vertexes Count=\"%d\" ' % (len(xmshVerts)))
 			out.write('Type=\"Position,Normal') 
 			if mesh.uv_textures:
@@ -189,6 +176,7 @@ def doExport(context,props,filepath):
 			if len(mBoneIndicies)>0:
 				out.write(',Bone')
 			out.write('\">\n')			
+
 			for vert in xmshVerts:
 				out.write('\t\t\t%f,%f,%f %f,%f,%f' % (vert.co.x,vert.co.y,vert.co.z,vert.no.x,vert.no.y,vert.no.z))
 				if len(mesh.uv_textures)>0:
@@ -202,6 +190,7 @@ def doExport(context,props,filepath):
 					out.write('%d,%f' % (bone[0], bone[1]))
 					first=False
 				out.write('\n')
+
 			out.write('\t\t</Vertexes>\n')
 
 			# Write out one submesh per mesh material
@@ -225,14 +214,18 @@ def doExport(context,props,filepath):
 					out.write('\t\t\t\t<Shininess>%f</Shininess>\n' % (mat.specular_intensity))
 					out.write('\t\t\t\t<Emmissive>%f,%f,%f,%f</Emmissive>\n' % (mat.emit,mat.emit,mat.emit,mat.alpha))
 
-					# TODO: Right now if a material is set to SHADELESS it is unlit, otherwise light affects it
+					# Shadeless materials in blender are unaffected by light
 					if mat.use_shadeless:
-						out.write('\t\t\t\t<Lighting>false</Lighting>\n')
+						out.write('\t\t\t\t<Light>false</Light>\n')
 					else:
-						out.write('\t\t\t\t<Lighting>true</Lighting>\n')
+						out.write('\t\t\t\t<Light>true</Light>\n')
 
-					# TODO: No idea with this one; how does blender determine culling?
-					out.write('\t\t\t\t<FaceCulling>back</FaceCulling>\n')
+					# Blender doesn't cull, specifically. Rather it either lights a mesh's faces doublesided or it does not.
+					# If double sided is not set, we assume backface culling.
+					if mesh.show_double_sided:
+						out.write('\t\t\t\t<Cull>none</Cull>\n')
+					else:
+						out.write('\t\t\t\t<Cull>back</Cull>\n')
 
 					# Export all texture images associated with this material, reversed makes topmost the highest priority
 					for mtex in reversed(mat.texture_slots):
@@ -245,13 +238,11 @@ def doExport(context,props,filepath):
 					out.write('\t\t\t</Material>\n')
 
 				out.write('\t\t</SubMesh>\n')
-				
+
 			out.write('\t</Mesh>\n')
 
 			# Clean up
 			bpy.data.meshes.remove(mesh)
-			# Undo the worldspace transforms, otherwise the model will remain transformed in the application
-			#mesh.transform(obMatrix.invert(),True)
 
 	# Export all selected armatures
 	for ob in objects:
@@ -290,6 +281,34 @@ def doExport(context,props,filepath):
 	out.write('</XMSH>\n')
 	out.close()
 
+	# tmshoptimizer currently disabled
+	#if props.xmsh_optimize:
+		# Try to find the tmshoptimizer executable
+		#tmshoptimizer=None
+		#path=os.environ['PATH']
+		#paths=path.split(os.pathsep)
+		#if sys.platform=='win32':
+		#	exe="tmshoptimizer.exe"
+		#else:
+		#	exe="tmshoptimizer"
+		#if os.path.isfile(os.path.join(os.curdir,exe)):
+		#	tmshoptimizer=os.path.join(os.curdir,exe)
+		#else:
+		#	for p in paths:
+		#		f=os.path.join(p,exe)
+		#		if os.path.isfile(f):
+		#			tmshoptimizer=f
+		#			break
+		#if tmshoptimizer:
+			#print('tmshoptimizer found, optimizing XMSH ...')
+			#startTime=time.time()
+			#args=[tmshoptimizer,filepath]
+			#text=subprocess.Popen(args,stdout=subprocess.PIPE).communicate()[0]
+			#texts=text.split("\n")
+			#print('tmshoptimizer finished in %s seconds' %((time.time() - startTime)))
+		#else:
+			#print('tmshoptimizer not found. Install toadlet to obtain the tmshoptimizer tool.')
+
 	return True
 
 
@@ -300,23 +319,10 @@ class ExportXMSH(bpy.types.Operator, ExportHelper):
 
 	filename_ext = ".xmsh"
 
-		# Call the mesh optimizer if requested
-	    # if tmshoptimizer and runOptimizer==1:
-		# TODO: This needs to be an option box available in the export dialog
-		#args=[tmshoptimizer,filename]
-		#text=subprocess.Popen(args,stdout=subprocess.PIPE).communicate()[0]
-		#texts=text.split("\n")
-		#Blender.Draw.PupBlock("Optimizer Done",texts)
-		# If available, give the user the option to optimize the xmsh
-	    # if tmshoptimizer:
-		# TODO: This needs to be an option box available in the export dialog
-		#runOptimizer=Blender.Draw.Create(1)
-		#options=[("Optimize XMSH",runOptimizer,"If tmshOptimizer is present, optimize the output xmsh")]
-		#Blender.Draw.PupBlock("Toadlet XMSH Exporter", options)
-
-	xmsh_optimize = BoolProperty(name="Optimize Mesh",
-		description="Run the tmshOptimizer tool, if found, on the exported mesh.",
-		default=False,)
+	# tmshOptimizer is disabled
+	#xmsh_optimize = BoolProperty(name="Optimize Mesh",
+		#description="Run the tmshOptimizer tool, if found, on the exported mesh.",
+		#default=False,)
     
 	def execute(self, context):
 		start_time = time.time()
@@ -328,7 +334,7 @@ class ExportXMSH(bpy.types.Operator, ExportHelper):
 		exported = doExport(context, props, filepath)
 		
 		if exported:
-			print('Export finished in %s seconds' %((time.time() - start_time)))
+			print('*** Export finished in %s seconds ***' %((time.time() - start_time)))
 			print(filepath)
 			
 		return {'FINISHED'}
