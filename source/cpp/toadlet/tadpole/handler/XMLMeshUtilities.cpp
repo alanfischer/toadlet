@@ -245,15 +245,14 @@ Material::ptr XMLMeshUtilities::loadMaterial(mxml_node_t *materialNode,int versi
 	const char *prop=mxmlElementGetAttr(materialNode,"Name");
 
 	Material::ptr material;
-	if(prop!=NULL && strlen(prop)>0){
+	if(prop!=NULL){
 		material=materialManager->findMaterial(prop);
 	}
-	else{
+	if(material==NULL){
 		material=materialManager->createDiffuseMaterial(NULL);
 	}
-
-	if(material==NULL){
-		return NULL;
+	if(prop!=NULL){
+		material->setName(prop);
 	}
 
 	RenderState::ptr renderState=material->getRenderState();
@@ -276,6 +275,11 @@ Material::ptr XMLMeshUtilities::loadMaterial(mxml_node_t *materialNode,int versi
 			materialState.specular=parseVector4(mxmlGetOpaque(specularNode->child));
 		}
 
+		mxml_node_t *shininessNode=mxmlFindChild(materialNode,"Shininess");
+		if(shininessNode!=NULL){
+			materialState.shininess=parseScalar(mxmlGetOpaque(shininessNode->child));
+		}
+
 		mxml_node_t *emissiveNode=mxmlFindChild(materialNode,"Emissive");
 		if(emissiveNode!=NULL){
 			materialState.emissive=parseVector4(mxmlGetOpaque(emissiveNode->child));
@@ -283,6 +287,28 @@ Material::ptr XMLMeshUtilities::loadMaterial(mxml_node_t *materialNode,int versi
 
 		if(ambientNode!=NULL || diffuseNode!=NULL || specularNode!=NULL || emissiveNode!=NULL){
 			renderState->setMaterialState(materialState);
+		}
+	}
+
+	RasterizerState rasterizerState;
+	renderState->getRasterizerState(rasterizerState);
+	{
+		mxml_node_t *cullNode=mxmlFindChild(materialNode,"Cull");
+		if(cullNode!=NULL){
+			String cull=String(mxmlGetOpaque(cullNode->child)).toLower();
+			if(cull=="front"){
+				rasterizerState.cull=RasterizerState::CullType_FRONT;
+			}
+			else if(cull=="back"){
+				rasterizerState.cull=RasterizerState::CullType_BACK;
+			}
+			else{
+				rasterizerState.cull=RasterizerState::CullType_NONE;
+			}
+		}
+
+		if(cullNode!=NULL){
+			renderState->setRasterizerState(rasterizerState);
 		}
 	}
 
@@ -296,7 +322,9 @@ mxml_node_t *XMLMeshUtilities::saveMaterial(Material::ptr material,int version,P
 
 	mxml_node_t *materialNode=mxmlNewElement(MXML_NO_PARENT,"Material");
 
-	mxmlElementSetAttr(materialNode,"Name",material->getName());
+	if(material->getName()!=NULL){
+		mxmlElementSetAttr(materialNode,"Name",material->getName());
+	}
 
 	RenderState::ptr renderState=material->getRenderState();
 
@@ -317,9 +345,32 @@ mxml_node_t *XMLMeshUtilities::saveMaterial(Material::ptr material,int version,P
 			mxmlNewOpaque(specularNode,makeVector4(materialState.specular));
 		}
 		
+		mxml_node_t *shininessNode=mxmlNewElement(materialNode,"Shininess");
+		{
+			mxmlNewOpaque(shininessNode,makeScalar(materialState.shininess));
+		}
+
 		mxml_node_t *emissiveNode=mxmlNewElement(materialNode,"Emissive");
 		{
 			mxmlNewOpaque(emissiveNode,makeVector4(materialState.emissive));
+		}
+	}
+
+	RasterizerState rasterizerState;
+	if(renderState->getRasterizerState(rasterizerState)){
+		mxml_node_t *cullNode=mxmlNewElement(materialNode,"Cull");
+		{
+			switch(rasterizerState.cull){
+				case RasterizerState::CullType_FRONT:
+					mxmlNewOpaque(cullNode,"Front");
+				break;
+				case RasterizerState::CullType_BACK:
+					mxmlNewOpaque(cullNode,"Back");
+				break;
+				case RasterizerState::CullType_NONE:
+					mxmlNewOpaque(cullNode,"None");
+				break;
+			}
 		}
 	}
 
@@ -683,7 +734,7 @@ mxml_node_t *XMLMeshUtilities::saveMesh(Mesh::ptr mesh,int version,ProgressListe
 		}
 
 		// Drop trailing ','
-		if(type!=(char*)NULL){
+		if(type!=NULL){
 			type=type.substr(0,type.length()-1);
 		}
 		mxmlElementSetAttr(vertexNode,"Type",type);
@@ -741,7 +792,7 @@ mxml_node_t *XMLMeshUtilities::saveMesh(Mesh::ptr mesh,int version,ProgressListe
 
 		mxml_node_t *subMeshNode=mxmlNewElement(meshNode,"SubMesh");
 		{
-			if(subMesh->name!=(char*)NULL){
+			if(subMesh->name!=NULL){
 				mxmlElementSetAttr(subMeshNode,"Name",subMesh->name);
 			}
 
@@ -856,7 +907,9 @@ mxml_node_t *XMLMeshUtilities::saveSkeleton(Skeleton::ptr skeleton,int version,P
 
 			mxmlElementSetAttr(boneNode,"Parent",makeInt(bone->parentIndex));
 
-			mxmlElementSetAttr(boneNode,"Name",bone->name);
+			if(bone->name!=NULL){
+				mxmlElementSetAttr(boneNode,"Name",bone->name);
+			}
 
 			mxml_node_t *translateNode=mxmlNewElement(boneNode,"Translate");
 			{
@@ -953,7 +1006,7 @@ TransformSequence::ptr XMLMeshUtilities::loadSequence(mxml_node_t *node,int vers
 mxml_node_t *XMLMeshUtilities::saveSequence(TransformSequence::ptr sequence,int version,ProgressListener *listener){
 	mxml_node_t *sequenceNode=mxmlNewElement(MXML_NO_PARENT,"Sequence");
 
-	if(sequence->getName()!=(char*)NULL){
+	if(sequence->getName()!=NULL){
 		mxmlElementSetAttr(sequenceNode,"Name",sequence->getName());
 	}
 

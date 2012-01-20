@@ -25,15 +25,13 @@
 
 package us.toadlet.pad;
 
-import us.toadlet.peeper.*;
-
 public class NApplet implements Applet{
 	public NApplet(int nativeHandle){mNativeHandle=nativeHandle;}
 
 	public native void create();
 	public native void destroy();
 	public native void update(int dt);
-	public native void render(RenderDevice renderDevice);
+	public native void render();
 
 	public native void resized(int width,int height);
 	public native void focusGained();

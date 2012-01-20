@@ -29,7 +29,6 @@
 #include <toadlet/pad/Types.h>
 
 namespace toadlet{
-namespace peeper{class RenderDevice;}
 namespace pad{
 
 class Applet{
@@ -39,7 +38,7 @@ public:
 	virtual void create()=0;
 	virtual void destroy()=0;
 	virtual void update(int dt)=0;
-	virtual void render(RenderDevice *renderDevice)=0;
+	virtual void render()=0;
 
 	/// @todo: Replace these with events, so I can just have 1 event method to override instead of many
 	virtual void resized(int width,int height)=0;

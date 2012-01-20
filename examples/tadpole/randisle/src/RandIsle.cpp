@@ -193,7 +193,8 @@ void RandIsle::resized(int width,int height){
 	}
 }
 
-void RandIsle::render(RenderDevice *renderDevice){
+void RandIsle::render(){
+	RenderDevice *renderDevice=mApp->getRenderDevice();
 /*
 float a=0,b=0,c=1;
 float k=(0*a + 0*b + 0*c);
@@ -247,16 +248,20 @@ mTerrain->setWaterMaterial(Resources::instance->waterMaterial);
 	renderDevice->swap();
 
 */
+	Matrix4x4 matrix;
+/*
 	mRefractCamera->setTransform(mCamera->getWorldTransform());
 	mRefractCamera->setProjectionMatrix(mCamera->getProjectionMatrix());
 	mRefractCamera->frameUpdate(0,-1);
-	mRefractCamera->setObliqueNearPlaneMatrix(mRefractCamera->getViewMatrix());
+	Math::setMatrix4x4FromTranslate(matrix,0,0,1);
+	Math::preMul(matrix,mRefractCamera->getViewMatrix());
+	mRefractCamera->setObliqueNearPlaneMatrix(matrix);
 	renderDevice->setRenderTarget(Resources::instance->refractTarget);
 	renderDevice->beginScene();
 		mRefractCamera->render(renderDevice);
 	renderDevice->endScene();
 	renderDevice->swap();
-
+*/
 
 	renderDevice->setRenderTarget(renderDevice->getPrimaryRenderTarget());
 	renderDevice->beginScene();

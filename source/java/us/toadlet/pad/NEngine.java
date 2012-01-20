@@ -44,6 +44,7 @@ public class NEngine implements Engine{
 
 	public native void hack_addNodes();
 	public native void hack_render();
+	public native void hack_update(int dt);
 	
 	private native void makeEngine(Context ctx);
 	

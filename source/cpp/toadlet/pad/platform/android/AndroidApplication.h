@@ -95,7 +95,7 @@ public:
 	void focusGained()						{if(mApplet!=NULL){mApplet->focusGained();}}
 	void focusLost()						{if(mApplet!=NULL){mApplet->focusLost();}}
 	void update(int dt)						{if(mApplet!=NULL){mApplet->update(dt);}}
-	void render(RenderDevice *renderDevice)	{if(mApplet!=NULL){mApplet->render(renderDevice);}}
+	void render()							{if(mApplet!=NULL){mApplet->render();}}
 
 	void keyPressed(int key)				{if(mApplet!=NULL){mApplet->keyPressed(key);}}
 	void keyReleased(int key)				{if(mApplet!=NULL){mApplet->keyReleased(key);}}

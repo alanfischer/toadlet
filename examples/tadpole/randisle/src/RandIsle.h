@@ -33,7 +33,7 @@ public:
 	void create();
 	void destroy();
 	void resized(int width,int height);
-	void render(RenderDevice *renderDevice);
+	void render();
 	void update(int dt);
 	void preLogicUpdate(int dt){}
 	void logicUpdate(int dt);
