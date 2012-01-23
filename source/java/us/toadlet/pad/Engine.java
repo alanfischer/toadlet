@@ -25,15 +25,28 @@
 
 package us.toadlet.pad;
 
+import android.content.*;
 import us.toadlet.peeper.*;
 import us.toadlet.ribbit.*;
 
-public interface Engine{	
-	public void destroy();
-
-	public void installHandlers();
-
-	public void setRenderDevice(RenderDevice device);
+public class Engine{
+	public Engine(Context ctx){
+		makeEngine(ctx);
+	}
 	
-	public void setAudioDevice(AudioDevice device);
+	public native void destroy();
+
+	public native void installHandlers();
+
+	public native void setRenderDevice(RenderDevice device);
+	
+	public native void setAudioDevice(AudioDevice device);
+
+	public native void hack_addNodes();
+	public native void hack_render();
+	public native void hack_update(int dt);
+	
+	private native void makeEngine(Context ctx);
+	
+	protected int mNativeHandle;
 }

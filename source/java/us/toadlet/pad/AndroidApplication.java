@@ -190,7 +190,7 @@ public abstract class AndroidApplication extends Activity implements RenderTarge
 	
 	public boolean create(){
 		if(mEngine==null){
-			mEngine=new NEngine(this);
+			mEngine=new Engine(this);
 			mEngine.installHandlers();
 		}
 

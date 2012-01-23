@@ -55,7 +55,7 @@ DiffuseMaterialCreator::DiffuseMaterialCreator(Engine *engine){
 		"uniform vec4 lightViewPosition;\n"
 		"uniform vec4 lightColor;\n"
 		"uniform vec4 ambientColor;\n"
-		"uniform float materialLighting;\n"
+		"uniform float materialLight;\n"
 		"uniform mat4 textureMatrix;\n"
 		"uniform float fogDensity;\n"
 		"uniform vec2 fogDistance;\n"
@@ -64,7 +64,7 @@ DiffuseMaterialCreator::DiffuseMaterialCreator(Engine *engine){
 			"gl_Position=modelViewProjectionMatrix * POSITION;\n"
 			"vec3 viewNormal=normalize(normalMatrix * vec4(NORMAL,0.0)).xyz;\n"
 			"float lightIntensity=clamp(-dot(lightViewPosition.xyz,viewNormal),0.0,1.0);\n"
-			"vec4 localLightColor=(lightIntensity*lightColor*materialLighting)+(1.0-materialLighting);\n"
+			"vec4 localLightColor=(lightIntensity*lightColor*materialLight)+(1.0-materialLight);\n"
 			"color=clamp(localLightColor*materialDiffuseColor + ambientColor*materialAmbientColor,0.0,1.0);\n"
 			"color=COLOR*materialTrackColor+color*(1.0-materialTrackColor);\n"
 			"texCoord=(textureMatrix * vec4(TEXCOORD0,0.0,1.0)).xy;\n"
@@ -94,7 +94,7 @@ DiffuseMaterialCreator::DiffuseMaterialCreator(Engine *engine){
 		"float4 lightViewPosition;\n"
 		"float4 lightColor;\n"
 		"float4 ambientColor;\n"
-		"float materialLighting;\n"
+		"float materialLight;\n"
 		"float4x4 textureMatrix;\n"
 		"float fogDensity;\n"
 		"float2 fogDistance;\n"
@@ -104,7 +104,7 @@ DiffuseMaterialCreator::DiffuseMaterialCreator(Engine *engine){
 			"vout.position=mul(modelViewProjectionMatrix,vin.position);\n"
 			"float3 viewNormal=normalize(mul(normalMatrix,vin.normal));\n"
 			"float lightIntensity=clamp(-dot(lightViewPosition,viewNormal),0.0,1.0);\n"
-			"float4 localLightColor=lightIntensity*lightColor*materialLighting+(1.0-materialLighting);\n"
+			"float4 localLightColor=lightIntensity*lightColor*materialLight+(1.0-materialLight);\n"
 			"vout.color=clamp(localLightColor*materialDiffuseColor + ambientColor*materialAmbientColor,0.0,1.0);\n"
 			"vout.color=vin.color*materialTrackColor+vout.color*(1.0-materialTrackColor);\n"
 			"vout.texCoord=mul(textureMatrix,float4(vin.texCoord,0.0,1.0));\n "
@@ -290,7 +290,7 @@ Material::ptr DiffuseMaterialCreator::createDiffuseMaterial(Texture::ptr texture
 		variables->addVariable("lightViewPosition",RenderVariable::ptr(new LightViewPositionVariable()),Material::Scope_MATERIAL);
 		variables->addVariable("lightColor",RenderVariable::ptr(new LightDiffuseVariable()),Material::Scope_MATERIAL);
 		variables->addVariable("ambientColor",RenderVariable::ptr(new AmbientVariable()),Material::Scope_RENDERABLE);
-		variables->addVariable("materialLighting",RenderVariable::ptr(new MaterialLightingVariable()),Material::Scope_MATERIAL);
+		variables->addVariable("materialLight",RenderVariable::ptr(new MaterialLightVariable()),Material::Scope_MATERIAL);
 		variables->addVariable("materialDiffuseColor",RenderVariable::ptr(new MaterialDiffuseVariable()),Material::Scope_MATERIAL);
 		variables->addVariable("materialAmbientColor",RenderVariable::ptr(new MaterialAmbientVariable()),Material::Scope_MATERIAL);
 		variables->addVariable("materialTrackColor",RenderVariable::ptr(new MaterialTrackColorVariable()),Material::Scope_MATERIAL);
@@ -344,7 +344,7 @@ Material::ptr DiffuseMaterialCreator::createPointSpriteMaterial(Texture::ptr tex
 		variables->addVariable("lightViewPosition",RenderVariable::ptr(new LightViewPositionVariable()),Material::Scope_MATERIAL);
 		variables->addVariable("lightColor",RenderVariable::ptr(new LightDiffuseVariable()),Material::Scope_MATERIAL);
 		variables->addVariable("ambientColor",RenderVariable::ptr(new AmbientVariable()),Material::Scope_RENDERABLE);
-		variables->addVariable("materialLighting",RenderVariable::ptr(new MaterialLightingVariable()),Material::Scope_MATERIAL);
+		variables->addVariable("materialLight",RenderVariable::ptr(new MaterialLightVariable()),Material::Scope_MATERIAL);
 		variables->addVariable("materialDiffuseColor",RenderVariable::ptr(new MaterialDiffuseVariable()),Material::Scope_MATERIAL);
 		variables->addVariable("materialAmbientColor",RenderVariable::ptr(new MaterialAmbientVariable()),Material::Scope_MATERIAL);
 		variables->addVariable("materialTrackColor",RenderVariable::ptr(new MaterialTrackColorVariable()),Material::Scope_MATERIAL);
@@ -410,7 +410,7 @@ Material::ptr DiffuseMaterialCreator::createFontMaterial(Font::ptr font){
 		variables->addVariable("lightViewPosition",RenderVariable::ptr(new LightViewPositionVariable()),Material::Scope_MATERIAL);
 		variables->addVariable("lightColor",RenderVariable::ptr(new LightDiffuseVariable()),Material::Scope_MATERIAL);
 		variables->addVariable("ambientColor",RenderVariable::ptr(new AmbientVariable()),Material::Scope_RENDERABLE);
-		variables->addVariable("materialLighting",RenderVariable::ptr(new MaterialLightingVariable()),Material::Scope_MATERIAL);
+		variables->addVariable("materialLight",RenderVariable::ptr(new MaterialLightVariable()),Material::Scope_MATERIAL);
 		variables->addVariable("materialDiffuseColor",RenderVariable::ptr(new MaterialDiffuseVariable()),Material::Scope_MATERIAL);
 		variables->addVariable("materialAmbientColor",RenderVariable::ptr(new MaterialAmbientVariable()),Material::Scope_MATERIAL);
 		variables->addVariable("materialTrackColor",RenderVariable::ptr(new MaterialTrackColorVariable()),Material::Scope_MATERIAL);

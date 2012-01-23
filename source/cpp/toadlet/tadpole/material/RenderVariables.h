@@ -194,13 +194,13 @@ public:
 	}
 };
 
-class MaterialLightingVariable:public RenderVariable{
+class MaterialLightVariable:public RenderVariable{
 public:
 	int getFormat(){return VariableBufferFormat::Format_TYPE_FLOAT_32|VariableBufferFormat::Format_COUNT_1;}
 
 	void update(tbyte *data,SceneParameters *parameters){
-		float &lighting=*(float*)data;
-		lighting=parameters->getMaterialState().lighting?1.0:0.0;
+		float &light=*(float*)data;
+		light=parameters->getMaterialState().light?1.0:0.0;
 	}
 };
 

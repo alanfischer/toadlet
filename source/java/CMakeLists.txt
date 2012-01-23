@@ -151,8 +151,7 @@ set (PAD_SRC
 )
 
 set (PAD_H
-	us.toadlet.pad.AndroidApplication
-	us.toadlet.pad.NEngine
+	us.toadlet.pad.Engine
 	us.toadlet.pad.NApplet
 )
 

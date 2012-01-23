@@ -80,7 +80,7 @@ protected:
 	JNIEnv *env;
 	jobject obj;
 	jmethodID createID,destroyID,startID,stopID,isRunningID,setTitleID,getTitleID,setDifferenceMouseID,getDifferenceMouseID,getWidthID,getHeightID,getEngineID,getRenderDeviceID,getAudioDeviceID,getInputDeviceID;
-	jfieldID NEngine_nativeHandle,NGLRenderDevice_nativeHandle;
+	jfieldID Engine_nativeHandle,NGLRenderDevice_nativeHandle;
 	
 	mutable Engine *mEngine;
 	mutable jobject mLastEngineObj;

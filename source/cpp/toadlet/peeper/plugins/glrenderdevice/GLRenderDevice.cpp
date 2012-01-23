@@ -986,7 +986,7 @@ void GLRenderDevice::setFogState(const FogState &state){
 }
 
 void GLRenderDevice::setMaterialState(const MaterialState &state){
-	if(state.lighting){
+	if(state.light){
 		// 12/19/10
 		// There appears to be a bug in at least:
 		// GL_VENDOR:NVIDIA Corporation

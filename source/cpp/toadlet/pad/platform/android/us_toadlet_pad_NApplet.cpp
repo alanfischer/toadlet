@@ -17,6 +17,8 @@ void Java_us_toadlet_pad_NApplet(JNIEnv *env){
 }
 
 JNIEXPORT void JNICALL Java_us_toadlet_pad_NApplet_create(JNIEnv *env,jobject obj){
+	Java_us_toadlet_pad_NApplet(env);
+
 	Applet *applet=(Applet*)env->GetIntField(obj,NApplet_nativeHandle);
 	applet->create();
 }

@@ -316,7 +316,7 @@ bool BACConverter::extractMeshData(Mesh::ptr mesh,bool useSubmeshes){
 
 				MaterialState materialState;
 				if(material->getPass()->getMaterialState(materialState)){
-					m->lighting=materialState.lighting;
+					m->lighting=materialState.light;
 				}
 
 				Texture *texture=material->getPass()->getTexture();

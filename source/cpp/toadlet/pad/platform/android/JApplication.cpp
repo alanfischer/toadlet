@@ -42,7 +42,7 @@ TOADLET_C_API void Java_us_toadlet_peeper_NGLRenderDevice(JNIEnv *env);
 TOADLET_C_API void Java_us_toadlet_ribbit_NAudioStream(JNIEnv *env);
 TOADLET_C_API void Java_us_toadlet_flick_NInputDeviceListener(JNIEnv *env);
 TOADLET_C_API void Java_us_toadlet_pad_NApplet(JNIEnv *env);
-TOADLET_C_API void Java_us_toadlet_pad_NEngine(JNIEnv *env);
+TOADLET_C_API void Java_us_toadlet_pad_Engine(JNIEnv *env);
 
 namespace toadlet{
 namespace pad{
@@ -58,11 +58,13 @@ JApplication::JApplication(JNIEnv *jenv,jobject jobj):
 	mAudioDevice(NULL),
 	mLastAudioDeviceObj(NULL)
 {
+Logger::alert("A");
+
 	Java_us_toadlet_peeper_NGLRenderDevice(jenv);
 	Java_us_toadlet_ribbit_NAudioStream(jenv);
 	Java_us_toadlet_flick_NInputDeviceListener(jenv);
 	Java_us_toadlet_pad_NApplet(jenv);
-	Java_us_toadlet_pad_NEngine(jenv);
+	Java_us_toadlet_pad_Engine(jenv);
 
 	env=jenv;
 	obj=env->NewGlobalRef(jobj);
@@ -87,9 +89,9 @@ JApplication::JApplication(JNIEnv *jenv,jobject jobj):
 	}
 	env->DeleteLocalRef(appClass);
 
-	jclass engineClass=env->FindClass("us/toadlet/tadpole/NEngine");
+	jclass engineClass=env->FindClass("us/toadlet/pad/Engine");
 	{
-		NEngine_nativeHandle=env->GetFieldID(engineClass,"mNativeHandle","I");
+		Engine_nativeHandle=env->GetFieldID(engineClass,"mNativeHandle","I");
 	}
 	env->DeleteLocalRef(engineClass);
 	
@@ -98,6 +100,7 @@ JApplication::JApplication(JNIEnv *jenv,jobject jobj):
 		NGLRenderDevice_nativeHandle=env->GetFieldID(renderDeviceClass,"mNativeHandle","I");
 	}
 	env->DeleteLocalRef(renderDeviceClass);
+Logger::alert("C");
 }
 
 JApplication::~JApplication(){
@@ -186,12 +189,7 @@ Engine *JApplication::getEngine() const{
 	jobject engineObj=env->CallObjectMethod(obj,getEngineID);
 
 	if(mEngine==NULL || mLastEngineObj!=engineObj){
-		//if(obj is NEngine){
-			mEngine=engineObj!=NULL?(Engine*)env->GetIntField(engineObj,NEngine_nativeHandle):NULL;
-		//}
-		//else{
-		//	mEngine=new JENgine(env,engineObj);
-		//
+		mEngine=engineObj!=NULL?(Engine*)env->GetIntField(engineObj,Engine_nativeHandle):NULL;
 
 		if(mLastEngineObj!=NULL){
 			env->DeleteGlobalRef(mLastEngineObj);

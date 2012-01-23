@@ -10,11 +10,7 @@ extern "C" JNIEXPORT void ANativeActivity_onCreate(ANativeActivity *activity,voi
 	app->setNativeActivity(activity);
 }
 #else
-extern "C" JNIEXPORT void Java_us_toadlet_pad(JNIEnv *env);
-
 extern "C" JNIEXPORT jobject JNICALL Java_us_toadlet_randisle_RandIsle_createApplet(JNIEnv *env,jobject obj){
-	Java_us_toadlet_pad(env);
-
 	Logger::alert("getting Application");
 	Application *app=new JApplication(env,obj);
 

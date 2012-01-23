@@ -107,7 +107,7 @@ void VertexLighter::lightMesh(Mesh *mesh){
 
 		MaterialState materialState;
 		material->getPass()->getMaterialState(materialState);
-		materialState.lighting=false;
+		materialState.light=false;
 		materialState.trackColor=true;
 		material->getPass()->setMaterialState(materialState);
 		if(materialState.diffuse!=Colors::BLACK){

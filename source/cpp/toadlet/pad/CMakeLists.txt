@@ -12,7 +12,7 @@ set (PAD_SRC
 set (PAD_PLATFORM_ANDROID_JAPPLICATION_SRC
 	platform/android/JApplication.cpp
 	platform/android/us_toadlet_pad_NApplet.cpp
-	platform/android/us_toadlet_pad_NEngine.cpp
+	platform/android/us_toadlet_pad_Engine.cpp
 )
 
 set (PAD_PLATFORM_ANDROID_ANDROIDAPPLICATION_SRC
