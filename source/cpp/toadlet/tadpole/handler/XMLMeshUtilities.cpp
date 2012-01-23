@@ -260,6 +260,11 @@ Material::ptr XMLMeshUtilities::loadMaterial(mxml_node_t *materialNode,int versi
 	MaterialState materialState;
 	renderState->getMaterialState(materialState);
 	{
+		mxml_node_t *lightNode=mxmlFindChild(materialNode,"Light");
+		if(lightNode!=NULL){
+			materialState.light=parseBool(mxmlGetOpaque(lightNode->child));
+		}
+
 		mxml_node_t *ambientNode=mxmlFindChild(materialNode,"Ambient");
 		if(ambientNode!=NULL){
 			materialState.ambient=parseVector4(mxmlGetOpaque(ambientNode->child));
@@ -330,6 +335,11 @@ mxml_node_t *XMLMeshUtilities::saveMaterial(Material::ptr material,int version,P
 
 	MaterialState materialState;
 	if(renderState->getMaterialState(materialState)){
+		mxml_node_t *lightNode=mxmlNewElement(materialNode,"Light");
+		{
+			mxmlNewOpaque(lightNode,makeBool(materialState.light));
+		}
+
 		mxml_node_t *ambientNode=mxmlNewElement(materialNode,"Ambient");
 		{
 			mxmlNewOpaque(ambientNode,makeVector4(materialState.ambient));

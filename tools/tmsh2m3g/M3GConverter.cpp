@@ -2111,7 +2111,7 @@ M3GObject3D *M3GConverter::buildSceneGraph(Mesh *toadletMesh,float scale,int for
 				appearance->polygonMode=polygonMode;
 			}
 
-			if(material->getPass()->getMaterialState(materialState) && materialState.lighting){
+			if(material->getPass()->getMaterialState(materialState) && materialState.light){
 				M3GMaterial *m3gMaterial=new M3GMaterial();
 
 				m3gMaterial->ambientColor=toM3GColor(materialState.ambient);

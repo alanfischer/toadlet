@@ -107,7 +107,9 @@ void Viewer::update(int dt){
 	mScene->update(dt);
 }
 
-void Viewer::render(RenderDevice *device){
+void Viewer::render(){
+	RenderDevice *device=mEngine->getRenderDevice();
+
 	device->beginScene();
 		mCamera->render(device);
 	device->endScene();

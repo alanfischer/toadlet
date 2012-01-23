@@ -14,7 +14,7 @@ public:
 	void setNode(MeshNode::ptr meshNode);
 
 	void update(int dt);
-	void render(RenderDevice *device);
+	void render();
 
 	void mouseMoved(int x,int y);
 	void mousePressed(int x,int y,int button);

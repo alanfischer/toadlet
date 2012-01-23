@@ -57,7 +57,7 @@ public:
 	};
 
 	MaterialState():
-		lighting(true),
+		light(true),
 		trackColor(false),
 		shade(ShadeType_GOURAUD),
 		normalize(NormalizeType_RESCALE),
@@ -74,7 +74,7 @@ public:
 		set(lightEffect);
 	}
 
-	MaterialState(bool lighting1,bool trackColor1=false,ShadeType shade1=ShadeType_GOURAUD,NormalizeType normalize1=NormalizeType_RESCALE):
+	MaterialState(bool light1,bool trackColor1=false,ShadeType shade1=ShadeType_GOURAUD,NormalizeType normalize1=NormalizeType_RESCALE):
 		ambient(Math::ONE_VECTOR4),
 		diffuse(Math::ONE_VECTOR4),
 		specular(Math::ONE_VECTOR4),
@@ -83,11 +83,11 @@ public:
 		alphaTest(AlphaTest_NEVER),
 		alphaCutoff(Math::HALF)
 	{
-		set(lighting1,trackColor1,shade1,normalize1);
+		set(light1,trackColor1,shade1,normalize1);
 	}
 
 	MaterialState(const Vector4 &color):
-		lighting(true),
+		light(true),
 		trackColor(false),
 		shade(ShadeType_GOURAUD),
 		normalize(NormalizeType_RESCALE),
@@ -99,7 +99,7 @@ public:
 	}
 
 	MaterialState(const Vector4 &ambient1,const Vector4 &diffuse1,const Vector4 &specular1,scalar shininess):
-		lighting(true),
+		light(true),
 		trackColor(false),
 		shade(ShadeType_GOURAUD),
 		normalize(NormalizeType_RESCALE),
@@ -111,7 +111,7 @@ public:
 	}
 
 	MaterialState(AlphaTest alphaTest1,scalar alphaCutoff1=Math::HALF):
-		lighting(false),
+		light(false),
 		trackColor(false),
 		shade(ShadeType_GOURAUD),
 		normalize(NormalizeType_RESCALE),
@@ -125,7 +125,7 @@ public:
 	}
 
 	MaterialState &set(const MaterialState &state){
-		lighting=state.lighting;
+		light=state.light;
 		trackColor=state.trackColor;
 		shade=state.shade;
 		normalize=state.normalize;
@@ -139,8 +139,8 @@ public:
 		return *this;
 	}
 
-	MaterialState &set(bool lighting1,bool trackColor1=false,ShadeType shade1=ShadeType_GOURAUD,NormalizeType normalize1=NormalizeType_RESCALE){
-		lighting=lighting1;
+	MaterialState &set(bool light1,bool trackColor1=false,ShadeType shade1=ShadeType_GOURAUD,NormalizeType normalize1=NormalizeType_RESCALE){
+		light=light1;
 		trackColor=trackColor1;
 		shade=shade1;
 		normalize=normalize1;
@@ -148,7 +148,7 @@ public:
 	}
 
 	MaterialState &set(const Vector4 &color){
-		lighting=true;
+		light=true;
 		ambient.set(color);
 		diffuse.set(color);
 		specular.set(color);
@@ -158,7 +158,7 @@ public:
 	}
 
 	MaterialState &set(const Vector4 &ambient1,const Vector4 &diffuse1,const Vector4 &specular1,scalar shininess1){
-		lighting=true;
+		light=true;
 		ambient.set(ambient1);
 		diffuse.set(diffuse1);
 		specular.set(specular1);
@@ -175,7 +175,7 @@ public:
 
 	inline bool equals(const MaterialState &state) const{
 		return
-			lighting==state.lighting && 
+			light==state.light && 
 			trackColor==state.trackColor &&
 			shade==state.shade &&
 			normalize==state.normalize &&
@@ -197,7 +197,7 @@ public:
 		return !equals(state);
 	}
 
-	bool lighting;
+	bool light;
 	bool trackColor;
 	ShadeType shade;
 	NormalizeType normalize;

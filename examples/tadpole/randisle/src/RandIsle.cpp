@@ -247,7 +247,7 @@ mTerrain->setWaterMaterial(Resources::instance->waterMaterial);
 	renderDevice->endScene();
 	renderDevice->swap();
 
-*/
+
 	Matrix4x4 matrix;
 /*
 	mRefractCamera->setTransform(mCamera->getWorldTransform());

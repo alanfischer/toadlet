@@ -630,7 +630,7 @@ void D3D9RenderDevice::setFogState(const FogState &state){
 void D3D9RenderDevice::setMaterialState(const MaterialState &state){
 	D3DMATERIAL9 material;
 
-	mD3DDevice->SetRenderState(D3DRS_LIGHTING,state.lighting);
+	mD3DDevice->SetRenderState(D3DRS_LIGHTING,state.light);
 
 	toD3DCOLORVALUE(material.Ambient,state.ambient);
 	toD3DCOLORVALUE(material.Diffuse,state.diffuse);
