@@ -131,7 +131,7 @@ void X11Application::runEventLoop(){
 		int dt=currentTime-lastTime;
 		update(dt);
 		if(mRenderDevice!=NULL){
-			render(mRenderDevice);
+			render();
 		}
 		if(mAudioDevice!=NULL){
 			mAudioDevice->update(dt);
@@ -566,7 +566,7 @@ void X11Application::configured(int x,int y,int width,int height){
 				mEngine->contextReset(mRenderDevice);
 			}
 			update(0);
-			render(mRenderDevice);
+			render();
 		}
 	}
 }
