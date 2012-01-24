@@ -42,11 +42,9 @@ public class Engine{
 	
 	public native void setAudioDevice(AudioDevice device);
 
-	public native void hack_addNodes();
-	public native void hack_render();
-	public native void hack_update(int dt);
+	public native Node createNode(Class type,Scene scene);
 	
 	private native void makeEngine(Context ctx);
-	
+
 	protected int mNativeHandle;
 }

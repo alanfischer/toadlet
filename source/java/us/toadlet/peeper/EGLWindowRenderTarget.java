@@ -74,7 +74,7 @@ public class EGLWindowRenderTarget extends EGLRenderTarget{
 			"EGL_VERSION:"+egl.eglQueryString(mDisplay,EGL_VERSION));
 		System.out.println(
 			"EGL_EXTENSIONS:"+egl.eglQueryString(mDisplay,EGL_EXTENSIONS));
-
+			
 		int pixelFormat=format.pixelFormat;
 		int redBits=TextureFormat.getRedBits(pixelFormat);
 		int greenBits=TextureFormat.getGreenBits(pixelFormat);

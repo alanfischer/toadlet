@@ -23,54 +23,13 @@
  *
  ********** Copyright header - do not remove **********/
 
-#include <toadlet/tadpole/Engine.h>
-#include <toadlet/tadpole/RenderableSet.h>
-#include <toadlet/tadpole/node/LightNode.h>
-#include <toadlet/tadpole/node/ParentNode.h>
+package us.toadlet.pad;
 
-namespace toadlet{
-namespace tadpole{
-namespace node{
-
-TOADLET_NODE_IMPLEMENT(LightNode,Categories::TOADLET_TADPOLE_NODE+".LightNode");
-
-LightNode::LightNode():super(),
-	mEnabled(true)
-	//mLightState
-{}
-
-Node *LightNode::create(Scene *scene){
-	super::create(scene);
-
-	mBound.setInfinite();
-
-	return this;
-}
-
-Node *LightNode::set(Node *node){
-	super::set(node);
-
-	LightNode *lightNode=(LightNode*)this;
-	setLightState(lightNode->mLightState);
-
-	return this;
-}
-
-void LightNode::frameUpdate(int dt,int scope){
-	super::frameUpdate(dt,scope);
-
-	mLightState.position.set(getWorldTranslate());
-	Math::mul(mLightState.direction,getWorldRotate(),mDirection);
-}
-
-void LightNode::gatherRenderables(CameraNode *node,RenderableSet *set){
-	super::gatherRenderables(node,set);
-
-	if(mEnabled){
-		set->queueLight(this);
+public class ParentNode extends Node{
+	public ParentNode(int nativeHandle){
+		super(nativeHandle);
 	}
-}
 
-}
-}
+	public native boolean attach(Node node);
+	public native boolean remove(Node node);
 }

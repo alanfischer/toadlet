@@ -26,7 +26,9 @@
 package us.toadlet.pad;
 
 public class NApplet implements Applet{
-	public NApplet(int nativeHandle){mNativeHandle=nativeHandle;}
+	public NApplet(int nativeHandle){
+		mNativeHandle=nativeHandle;
+	}
 
 	public native void create();
 	public native void destroy();

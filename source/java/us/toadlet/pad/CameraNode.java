@@ -23,54 +23,22 @@
  *
  ********** Copyright header - do not remove **********/
 
-#include <toadlet/tadpole/Engine.h>
-#include <toadlet/tadpole/RenderableSet.h>
-#include <toadlet/tadpole/node/LightNode.h>
-#include <toadlet/tadpole/node/ParentNode.h>
+package us.toadlet.pad;
 
-namespace toadlet{
-namespace tadpole{
-namespace node{
+import us.toadlet.peeper.*;
 
-TOADLET_NODE_IMPLEMENT(LightNode,Categories::TOADLET_TADPOLE_NODE+".LightNode");
-
-LightNode::LightNode():super(),
-	mEnabled(true)
-	//mLightState
-{}
-
-Node *LightNode::create(Scene *scene){
-	super::create(scene);
-
-	mBound.setInfinite();
-
-	return this;
-}
-
-Node *LightNode::set(Node *node){
-	super::set(node);
-
-	LightNode *lightNode=(LightNode*)this;
-	setLightState(lightNode->mLightState);
-
-	return this;
-}
-
-void LightNode::frameUpdate(int dt,int scope){
-	super::frameUpdate(dt,scope);
-
-	mLightState.position.set(getWorldTranslate());
-	Math::mul(mLightState.direction,getWorldRotate(),mDirection);
-}
-
-void LightNode::gatherRenderables(CameraNode *node,RenderableSet *set){
-	super::gatherRenderables(node,set);
-
-	if(mEnabled){
-		set->queueLight(this);
+public class CameraNode extends ParentNode{
+	public CameraNode(int nativeHandle){
+		super(nativeHandle);
 	}
-}
+	
+	public native void setClearColor(int color);
+	public native int getClearColor();
 
-}
-}
+	public native void setLookAt(float[] eye,float[] point,float[] up);
+
+	public native void setProjectionFovY(float fov,float ratio,float nearDist,float farDist);
+	public native void setProjectionFovX(float fov,float ratio,float nearDist,float farDist);
+
+	public native void render(RenderDevice renderDevice);
 }

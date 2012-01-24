@@ -60,6 +60,18 @@ JNIEXPORT void JNICALL Java_us_toadlet_peeper_NGLRenderDevice_clear(JNIEnv *env,
 	device->clear(clearFlags,Vector4(clearColor));
 }
 
+JNIEXPORT void JNICALL Java_us_toadlet_peeper_NGLRenderDevice_beginScene(JNIEnv *env,jobject obj){
+	RenderDevice *device=(RenderDevice*)env->GetIntField(obj,NGLRenderDevice_nativeHandle);
+
+	device->beginScene();
+}
+
+JNIEXPORT void JNICALL Java_us_toadlet_peeper_NGLRenderDevice_endScene(JNIEnv *env,jobject obj){
+	RenderDevice *device=(RenderDevice*)env->GetIntField(obj,NGLRenderDevice_nativeHandle);
+
+	device->endScene();
+}
+
 JNIEXPORT void JNICALL Java_us_toadlet_peeper_NGLRenderDevice_swap(JNIEnv *env,jobject obj){
 	RenderDevice *device=(RenderDevice*)env->GetIntField(obj,NGLRenderDevice_nativeHandle);
 
@@ -67,6 +79,8 @@ JNIEXPORT void JNICALL Java_us_toadlet_peeper_NGLRenderDevice_swap(JNIEnv *env,j
 }
 
 JNIEXPORT void JNICALL Java_us_toadlet_peeper_NGLRenderDevice_makeRenderDevice(JNIEnv *env,jobject obj){
+	Java_us_toadlet_peeper_NGLRenderDevice(env);
+
 	RenderDevice *device=new_GLRenderDevice();
 
 	env->SetIntField(obj,NGLRenderDevice_nativeHandle,(int)device);
