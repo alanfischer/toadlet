@@ -33,9 +33,11 @@ public class Scene{
 	public native void destroy();
 
 	public native ParentNode getRoot();
+
+	public native int getTime();
 	
 	public native void update(int dt);
-
+	
 	private native void makeScene(Engine engine);
 	
 	protected int mNativeHandle;

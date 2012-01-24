@@ -17,6 +17,16 @@ void Java_us_toadlet_pad_MeshNode(JNIEnv *env){
 	env->DeleteLocalRef(nodeClass);
 }
 
+JNIEXPORT void JNICALL Java_us_toadlet_pad_MeshNode_setRotate(JNIEnv *env,jobject obj,jfloatArray axisObj,jfloat angle){
+	MeshNode *node=(MeshNode*)env->GetIntField(obj,MeshNode_nativeHandle);
+
+	float *axis=env->GetFloatArrayElements(axisObj,NULL);
+	
+	node->setRotate(axis,angle);
+	
+	env->ReleaseFloatArrayElements(axisObj,axis,0);
+}
+
 JNIEXPORT void JNICALL Java_us_toadlet_pad_MeshNode_setMesh(JNIEnv *env,jobject obj,jstring nameObj){
 	Java_us_toadlet_pad_MeshNode(env); // hack
 
