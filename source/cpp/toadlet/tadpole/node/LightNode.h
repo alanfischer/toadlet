@@ -46,7 +46,7 @@ public:
 	inline bool getEnabled() const{return mEnabled;}
 
 	inline void setLightState(const LightState &state){mDirection.set(state.direction);mLightState.set(state);}
-	inline const LightState &getLightState(){return mLightState;}
+	inline void getLightState(LightState &state){state.set(mLightState);}
 
 	virtual void frameUpdate(int dt,int scope);
 

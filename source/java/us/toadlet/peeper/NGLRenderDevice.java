@@ -26,7 +26,9 @@
 package us.toadlet.peeper;
 
 public class NGLRenderDevice implements RenderDevice{
-	public NGLRenderDevice(){makeRenderDevice();}
+	public NGLRenderDevice(){
+		makeRenderDevice();
+	}
 
 	public native boolean create(RenderTarget target,int[] options);
 	public native void destroy();

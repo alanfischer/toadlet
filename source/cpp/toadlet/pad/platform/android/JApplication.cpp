@@ -58,8 +58,6 @@ JApplication::JApplication(JNIEnv *jenv,jobject jobj):
 	mAudioDevice(NULL),
 	mLastAudioDeviceObj(NULL)
 {
-Logger::alert("A");
-
 	Java_us_toadlet_peeper_NGLRenderDevice(jenv);
 	Java_us_toadlet_ribbit_NAudioStream(jenv);
 	Java_us_toadlet_flick_NInputDeviceListener(jenv);
@@ -100,7 +98,6 @@ Logger::alert("A");
 		NGLRenderDevice_nativeHandle=env->GetFieldID(renderDeviceClass,"mNativeHandle","I");
 	}
 	env->DeleteLocalRef(renderDeviceClass);
-Logger::alert("C");
 }
 
 JApplication::~JApplication(){

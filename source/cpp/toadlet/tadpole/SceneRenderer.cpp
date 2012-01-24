@@ -241,7 +241,10 @@ void SceneRenderer::setupViewport(CameraNode *camera,RenderDevice *device){
 void SceneRenderer::setupLights(const RenderableSet::LightQueue &lightQueue,RenderDevice *device){
 	if(lightQueue.size()>0){
 		LightNode *light=lightQueue[0].light;
-		mSceneParameters->setLightState(light->getLightState());
+
+		LightState state;
+		light->getLightState(state);
+		mSceneParameters->setLightState(state);
 	}
 
 	int i;
@@ -249,7 +252,10 @@ void SceneRenderer::setupLights(const RenderableSet::LightQueue &lightQueue,Rend
 	for(i=0;i<maxLights;++i){
 		if(i<lightQueue.size()){
 			LightNode *light=lightQueue[i].light;
-			device->setLightState(i,light->getLightState());
+
+			LightState state;
+			light->getLightState(state);
+			device->setLightState(i,state);
 			device->setLightEnabled(i,light->getEnabled());
 		}
 		else{

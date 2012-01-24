@@ -560,7 +560,12 @@ Node *Engine::createNode(BaseType<Node> *type,Scene *scene){
 Node *Engine::createNode(const String &fullName,Scene *scene){
 	Node *node=allocNode(fullName);
 	if(node!=NULL){
-		node->create(scene);
+		if(scene!=NULL){
+			node->create(scene);
+		}
+		else{
+			node->create(this);
+		}
 	}
 	return node;
 }
