@@ -17,6 +17,7 @@ set (PAD_PLATFORM_ANDROID_JAPPLICATION_SRC
 	platform/android/us_toadlet_pad_CameraNode.cpp
 	platform/android/us_toadlet_pad_LightNode.cpp
 	platform/android/us_toadlet_pad_MeshNode.cpp
+	platform/android/us_toadlet_pad_Node.cpp
 	platform/android/us_toadlet_pad_ParentNode.cpp
 )
 

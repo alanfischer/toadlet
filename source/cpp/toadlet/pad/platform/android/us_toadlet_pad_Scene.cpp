@@ -46,6 +46,12 @@ JNIEXPORT jobject JNICALL Java_us_toadlet_pad_Scene_getRoot(JNIEnv *env,jobject 
 	return nodeObj;
 }
 
+JNIEXPORT jint JNICALL Java_us_toadlet_pad_Scene_getTime(JNIEnv *env,jobject obj){
+	Scene *scene=(Scene*)env->GetIntField(obj,Scene_nativeHandle);
+
+	return scene->getTime();
+}
+
 JNIEXPORT void JNICALL Java_us_toadlet_pad_Scene_update(JNIEnv *env,jobject obj,jint dt){
 	Scene *scene=(Scene*)env->GetIntField(obj,Scene_nativeHandle);
 

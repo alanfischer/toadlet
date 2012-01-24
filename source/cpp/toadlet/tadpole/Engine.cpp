@@ -206,6 +206,7 @@ Engine::Engine(bool fixedBackable,bool shaderBackable):
 	#else
 		mIdealVertexFormatType=VertexFormat::Format_TYPE_FLOAT_32;
 	#endif
+
 	// Create initial BackableVertexFormats.  This doesn't need to be done, but without it, starting an application without a RenderDevice will crash.
 	updateVertexFormats();
 
@@ -430,10 +431,6 @@ bool Engine::setRenderDevice(RenderDevice *renderDevice){
 
 	if(renderDevice!=lastRenderDevice && renderDevice!=NULL){
 		contextActivate(renderDevice);
-	}
-
-	if(mRenderDevice!=NULL){
-		updateVertexFormats();
 	}
 
 	return true;
