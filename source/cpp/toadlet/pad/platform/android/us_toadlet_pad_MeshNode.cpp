@@ -39,4 +39,22 @@ JNIEXPORT void JNICALL Java_us_toadlet_pad_MeshNode_setMesh(JNIEnv *env,jobject 
 	node->setMesh(name);
 }
 
+JNIEXPORT void JNICALL Java_us_toadlet_pad_MeshNode_setAlpha(JNIEnv *env,jobject obj,jfloat alpha){
+	Java_us_toadlet_pad_MeshNode(env); // hack
+
+	MeshNode *node=(MeshNode*)env->GetIntField(obj,MeshNode_nativeHandle);
+	
+	RenderState *state=node->getSharedRenderState();
+	
+	MaterialState materialState;
+	state->getMaterialState(materialState);
+	materialState.ambient.w=alpha;
+	materialState.diffuse.w=alpha;
+	materialState.specular.w=alpha;
+	materialState.emissive.w=alpha;
+	state->setMaterialState(materialState);
+	
+	state->setBlendState(BlendState(BlendState::Combination_ALPHA));
+}
+
 }

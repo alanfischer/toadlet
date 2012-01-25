@@ -34,6 +34,16 @@ JNIEXPORT void JNICALL Java_us_toadlet_pad_Scene_destroy(JNIEnv *env,jobject obj
 	}
 }
 
+JNIEXPORT void JNICALL Java_us_toadlet_pad_Scene_setAmbientColor(JNIEnv *env,jobject obj,jfloatArray ambientObj){
+	Scene *scene=(Scene*)env->GetIntField(obj,Scene_nativeHandle);
+
+	float *ambient=env->GetFloatArrayElements(ambientObj,NULL);
+
+	scene->setAmbientColor(ambient);
+	
+	env->ReleaseFloatArrayElements(ambientObj,ambient,0);
+}
+
 JNIEXPORT jobject JNICALL Java_us_toadlet_pad_Scene_getRoot(JNIEnv *env,jobject obj){
 	Scene *scene=(Scene*)env->GetIntField(obj,Scene_nativeHandle);
 	

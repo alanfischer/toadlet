@@ -290,6 +290,20 @@ Material::ptr XMLMeshUtilities::loadMaterial(mxml_node_t *materialNode,int versi
 			materialState.emissive=parseVector4(mxmlGetOpaque(emissiveNode->child));
 		}
 
+		mxml_node_t *shadeNode=mxmlFindChild(materialNode,"Shade");
+		if(shadeNode!=NULL){
+			String shade=String(mxmlGetOpaque(shadeNode->child)).toLower();
+			if(shade=="flag"){
+				materialState.shade=MaterialState::ShadeType_FLAT;
+			}
+			else if(shade=="phong"){
+				materialState.shade=MaterialState::ShadeType_PHONG;
+			}
+			else{
+				materialState.shade=MaterialState::ShadeType_GOURAUD;
+			}
+		}
+
 		if(ambientNode!=NULL || diffuseNode!=NULL || specularNode!=NULL || emissiveNode!=NULL){
 			renderState->setMaterialState(materialState);
 		}

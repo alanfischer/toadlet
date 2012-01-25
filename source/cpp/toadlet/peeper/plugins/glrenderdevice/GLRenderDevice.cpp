@@ -115,7 +115,7 @@ bool GLRenderDevice::create(RenderTarget *target,int *options){
 	bool useFBOs=true;
 	bool useHardwareBuffers=true;
 	bool useFixedFunction=true;
-	bool useShaders=true;
+	bool useShaders=false;
 	if(options!=NULL){
 		int i=0;
 		while(options[i]!=0){
