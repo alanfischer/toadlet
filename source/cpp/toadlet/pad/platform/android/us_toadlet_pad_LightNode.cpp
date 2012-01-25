@@ -17,15 +17,20 @@ void Java_us_toadlet_pad_LightNode(JNIEnv *env){
 	env->DeleteLocalRef(nodeClass);
 }
 
-JNIEXPORT void JNICALL Java_us_toadlet_pad_LightNode_setLightState(JNIEnv *env,jobject obj,jboolean enabled){
+JNIEXPORT void JNICALL Java_us_toadlet_pad_LightNode_setLightDirection(JNIEnv *env,jobject obj,jfloatArray directionObj){
 	Java_us_toadlet_pad_LightNode(env); // hack
 
 	LightNode *node=(LightNode*)env->GetIntField(obj,LightNode_nativeHandle);
 
+	float *direction=env->GetFloatArrayElements(directionObj,NULL);
+
 	LightState state;
 	node->getLightState(state);
-	state.direction=Vector3(1,0,0);
+	state.direction=direction;
+	state.specularColor=Vector4(1,1,1,1);
 	node->setLightState(state);
+
+	env->ReleaseFloatArrayElements(directionObj,direction,0);
 }
 
 }

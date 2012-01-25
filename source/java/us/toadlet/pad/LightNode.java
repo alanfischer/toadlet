@@ -30,5 +30,5 @@ public class LightNode extends Node{
 		super(nativeHandle);
 	}
 	
-	public native void setLightState(boolean enabled);
+	public native void setLightDirection(float[] direction);
 }

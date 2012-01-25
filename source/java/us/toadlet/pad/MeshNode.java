@@ -33,4 +33,6 @@ public class MeshNode extends Node{
 	public native void setRotate(float[] axis,float angle);
 
 	public native void setMesh(String name);
+	
+	public native void setAlpha(float alpha);
 }
