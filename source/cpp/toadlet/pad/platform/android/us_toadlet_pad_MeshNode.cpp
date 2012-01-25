@@ -54,7 +54,12 @@ JNIEXPORT void JNICALL Java_us_toadlet_pad_MeshNode_setAlpha(JNIEnv *env,jobject
 	materialState.emissive.w=alpha;
 	state->setMaterialState(materialState);
 	
-	state->setBlendState(BlendState(BlendState::Combination_ALPHA));
+	if(alpha<1.0f){
+		state->setBlendState(BlendState(BlendState::Combination_ALPHA));
+	}
+	else{
+		state->setBlendState(BlendState());
+	}
 }
 
 }

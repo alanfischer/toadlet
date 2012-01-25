@@ -281,6 +281,9 @@ RenderState::ptr MeshNode::getSharedRenderState(){
 		mSharedRenderState=mEngine->getMaterialManager()->createRenderState();
 		int i;
 		for(i=0;i<mSubMeshes.size();++i){
+			if(i==0){
+				mEngine->getMaterialManager()->modifyRenderState(mSharedRenderState,mSubMeshes[i]->material->getRenderState());
+			}
 			Material::ptr material=mEngine->getMaterialManager()->createSharedMaterial(mSubMeshes[i]->material,mSharedRenderState);
 			mSubMeshes[i]->material->release();
 			mSubMeshes[i]->material=material;
