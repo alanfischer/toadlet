@@ -130,6 +130,8 @@ void SpriteNode::setAlignment(int alignment){
 RenderState::ptr SpriteNode::getSharedRenderState(){
 	if(mSharedRenderState==NULL){
 		mSharedRenderState=mEngine->getMaterialManager()->createRenderState();
+		mEngine->getMaterialManager()->modifyRenderState(mSharedRenderState,mMaterial->getRenderState());
+
 		Material::ptr material=mEngine->getMaterialManager()->createSharedMaterial(mMaterial,mSharedRenderState);
 		mMaterial->release();
 		mMaterial=material;
