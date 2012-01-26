@@ -35,6 +35,8 @@ public class Node{
 	
 	public native Node getParent();
 
+	public native void setRotate(float[] axis,float angle);
+
 	public native void setScope(int scope);
 	public native int getScope();
 	

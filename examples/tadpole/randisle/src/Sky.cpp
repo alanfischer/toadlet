@@ -271,7 +271,8 @@ void Sky::destroy(){
 }
 
 void Sky::updateLightDirection(const Vector3 &lightDir){
-	LightState state=mLight->getLightState();
+	LightState state;
+	mLight->getLightState(state);
 	state.direction=-lightDir;
 	mLight->setLightState(state);
 
