@@ -17,12 +17,32 @@ void Java_us_toadlet_pad_Node(JNIEnv *env){
 	env->DeleteLocalRef(nodeClass);
 }
 
+JNIEXPORT void JNICALL Java_us_toadlet_pad_Node_setRotate(JNIEnv *env,jobject obj,jfloatArray axisObj,jfloat angle){
+	Java_us_toadlet_pad_Node(env); // hack
+
+	Node *node=(Node*)env->GetIntField(obj,Node_nativeHandle);
+
+	float *axis=env->GetFloatArrayElements(axisObj,NULL);
+	
+	node->setRotate(axis,angle);
+	
+	env->ReleaseFloatArrayElements(axisObj,axis,0);
+}
+
 JNIEXPORT void JNICALL Java_us_toadlet_pad_Node_setScope(JNIEnv *env,jobject obj,jint scope){
 	Java_us_toadlet_pad_Node(env); // hack
 
 	Node *node=(Node*)env->GetIntField(obj,Node_nativeHandle);
 
 	node->setScope(scope);
+}
+
+JNIEXPORT jint JNICALL Java_us_toadlet_pad_Node_getScope(JNIEnv *env,jobject obj){
+	Java_us_toadlet_pad_Node(env); // hack
+
+	Node *node=(Node*)env->GetIntField(obj,Node_nativeHandle);
+
+	return node->getScope();
 }
 
 }
