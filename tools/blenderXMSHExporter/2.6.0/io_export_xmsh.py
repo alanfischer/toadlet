@@ -16,6 +16,8 @@
 #
 # ##### END GPL LICENSE BLOCK #####
 
+# <pep8 compliant>
+
 bl_info = {
     "name": "Toadlet XMSH Exporter",
     "author": "Andrew Fischer",
@@ -24,42 +26,38 @@ bl_info = {
     "api": 35622,
     "location": "File > Import-Export",
     "description": "Export selected meshes, materials and armatures to toadlet XMSH version 4",
-    "warning": "Only triangle meshes are supported, convert any quads."
-    "wiki_url": "http://wiki.blender.org/index.php/Extensions:2.6/Py/",
-        "Scripts/Import-Export/ToadletXMSH_Exporter",
+    "warning": "Only triangle meshes are supported, convert any quads.",
+    "wiki_url": "http://wiki.blender.org/index.php/Extensions:2.6/Py/Scripts/Import-Export/ToadletXMSH_Exporter",
     "tracker_url": "http://code.google.com/p/toadlet",
     "category": "Import-Export"}
 
 import os
 import time
-import mathutils.Vector
+import mathutils
 import bpy
 from bpy.props import BoolProperty
 from bpy_extras.io_utils import ExportHelper
 
 
-class XMSHVertex:    
-    def __init__(self,index,co,no):
+class XMSHVertex:
+    def __init__(self, index, co, no):
         self.index = index
         self.co = co
         self.no = no
 
         # A list of 2-element lists
         self.bones = []
-        
-    
-def export(context,props,filepath):
-    # Exporter specific variables
+
+
+def export(context, props, filepath):
     mBoneIndicies = {}
     mBoneCounter = 0
 
-    # Get all currently selected objects
     objects = context.selected_objects
     if len(objects) == 0:
         print("No objects selected for export.")
         return False
 
-    # Write out the xmsh file
     out = open(filepath, "w")
     out.write('<XMSH Version="4">\n')
 
@@ -78,10 +76,10 @@ def export(context,props,filepath):
 
     # Export all selected meshes
     for ob in objects:
-        if ob.type == 'MESH': 
-            mesh = ob.to_mesh(context.scene,True,'PREVIEW')
+        if ob.type == 'MESH':
+            mesh = ob.to_mesh(context.scene, True, 'PREVIEW')
             if len(mesh.vertices) == 0:
-                continue;
+                continue
 
             # Transform the mesh coordinates into worldspace, as suggested by the blender documentation:
             # http://www.blender.org/documentation/249PythonDoc/NMesh.NMesh-class.html#transform
@@ -89,23 +87,20 @@ def export(context,props,filepath):
             obMatrix = ob.matrix_world.copy()
             mesh.transform(obMatrix)
 
-            # Create our initial xmshVerts by referencing the existing mesh verts
+            # All blender vertices are packed into our own list of XMSHVertexs
             xmshVerts = []
             for vert in mesh.vertices:
-                xmshv = XMSHVertex(vert.index,vert.co,vert.normal)
+                xmshv = XMSHVertex(vert.index, vert.co, vert.normal)
 
-                # Assign bones if a skeleton is present
-                if len(mBoneIndicies)>0:
+                if len(mBoneIndicies) > 0:
                     # NOTE: Blender matches verts to bones for influences by having the VertexGroup named the same thing as the bone
-                    # The VertexGroup name is only accessible from object.vertex_groups, so loop through and match IDs 
+                    # The VertexGroup name is only accessible from object.vertex_groups, so loop through and match IDs
                     for obGroup in ob.vertex_groups:
                         for vertGroup in vert.groups:
                             if obGroup.index == vertGroup.group:
-                                # Only store the bone if it is present in one of the exported armatures
                                 if obGroup.name in mBoneIndicies:
-                                    xmshv.bones.append([mBoneIndicies[obGroup.name],vertGroup.weight])
+                                    xmshv.bones.append([mBoneIndicies[obGroup.name], vertGroup.weight])
 
-                # Add the new xmshVert
                 xmshVerts.append(xmshv)
 
             # Create a list of materials and face vertex indices by material; adding a dummy material if none exists
@@ -116,62 +111,52 @@ def export(context,props,filepath):
 
             # Loop through all mesh faces and fill up our vertex texture coordinates and our matFaceIndicies arrays
             # XMSH does not handle multiple UV coords per vertex
-            # Instead, we create additional vertices to handle this case, 
+            # Instead, we create additional vertices to handle this case,
             # and write out additional mesh vertices and face indices to handle them.
             # The xmshVertUVs dictionary helps us tell which vertices are duplicates
-            xmshVertUVs = {} 
+            xmshVertUVs = {}
             for face in mesh.faces:
                 for i in range(len(face.vertices)):
                     if i == 3:
                         print("Only tri faces are supported. Convert Quads to Tris before exporting to xmsh")
                         return False
-                    vert = mesh.vertices[face.vertices[i]];
-                    if len(mesh.uv_textures)>0:
-                        uvLayer = mesh.uv_textures.active.data
-                        # Having a uv layer means checking to see if a new vertex is required
-                        # For clarity define the uv coordinates for this vertex, in this face, as a Vector:
-                        uv = mathutils.Vector(uvLayer[face.index].uv[i])
-                        if vert.index in xmshVertUVs and (xmshVertUVs[vert.index].x != uv.x or xmshVertUVs[vert.index].y != uv.y):
+                    vert = mesh.vertices[face.vertices[i]]
 
-                            # Found a vertex with multiple UV coords
-                            # Create a new vertex, give it these UV coords, and bump it's index
-                            xmshv = XMSHVertex(vert.index,vert.co,vert.normal)
+                    if len(mesh.uv_textures) > 0:
+                        uvLayer = mesh.uv_textures.active.data
+                        uv = mathutils.Vector(uvLayer[face.index].uv[i])
+
+                        if vert.index in xmshVertUVs and (xmshVertUVs[vert.index].x != uv.x or xmshVertUVs[vert.index].y != uv.y):
+                            # A blender vertex with multiple UV coords requires a new xmsh vertex
+                            xmshv = XMSHVertex(vert.index, vert.co, vert.normal)
                             xmshv.bones = xmshVerts[vert.index].bones
                             xmshv.uv = uv
                             xmshv.index = len(xmshVerts)
-
-                            # This new vertex goes into our materialFaceIndex 
                             xmshMatFaceIndicies[face.material_index].append(xmshv.index)
-                            
-                            # Store 
                             xmshVerts.append(xmshv)
                         else:
-                            # Just a new vertex
-                            # Assign it's UV coords to an existing xmshVert
+                            # Otherwise these are uv coords for a vertex in our XMSHVertex array
                             xmshVerts[vert.index].uv = uv
 
-                            # Store the UVs for this vertex index and continue
+                            # Store the UVs and append to our face indices
                             xmshVertUVs[vert.index] = uv
                             xmshMatFaceIndicies[face.material_index].append(vert.index)
                     else:
-                        # No UVs mean no worrying about new vertices
                         xmshMatFaceIndicies[face.material_index].append(vert.index)
 
             # Start writing out the mesh
             out.write('\t<Mesh>\n')
-
-            # Write out all xmsh vertices at once
             out.write('\t\t<Vertexes Count=\"%d\" ' % (len(xmshVerts)))
-            out.write('Type=\"Position,Normal') 
-            if mesh.uv_textures:
+            out.write('Type=\"Position,Normal')
+            if len(mesh.uv_textures) > 0:
                 out.write(',TexCoord')
-            if len(mBoneIndicies)>0:
+            if len(mBoneIndicies) > 0:
                 out.write(',Bone')
-            out.write('\">\n')            
+            out.write('\">\n')
 
             for vert in xmshVerts:
-                out.write('\t\t\t%f,%f,%f %f,%f,%f' % (vert.co.x,vert.co.y,vert.co.z,vert.no.x,vert.no.y,vert.no.z))
-                if len(mesh.uv_textures)>0:
+                out.write('\t\t\t%f,%f,%f %f,%f,%f' % (vert.co.x, vert.co.y, vert.co.z, vert.no.x, vert.no.y, vert.no.z))
+                if len(mesh.uv_textures) > 0:
                     out.write(' %f,%f' % (vert.uv.x, vert.uv.y))
                 first = True
                 for bone in vert.bones:
@@ -200,11 +185,11 @@ def export(context,props,filepath):
                 mat = xmshMaterials[i]
                 if mat:
                     out.write('\t\t\t<Material Name=\"%s\">\n' % (mat.name))
-                    out.write('\t\t\t\t<Ambient>%f,%f,%f,%f</Ambient>\n' % (mat.ambient,mat.ambient,mat.ambient,mat.alpha))
-                    out.write('\t\t\t\t<Diffuse>%f,%f,%f,%f</Diffuse>\n' % (mat.diffuse_color[0],mat.diffuse_color[1],mat.diffuse_color[2],mat.alpha))
-                    out.write('\t\t\t\t<Specular>%f,%f,%f,%f</Specular>\n' % (mat.specular_color[0],mat.specular_color[1],mat.specular_color[2],mat.alpha))
+                    out.write('\t\t\t\t<Ambient>%f,%f,%f,%f</Ambient>\n' % (mat.ambient, mat.ambient, mat.ambient, mat.alpha))
+                    out.write('\t\t\t\t<Diffuse>%f,%f,%f,%f</Diffuse>\n' % (mat.diffuse_color[0], mat.diffuse_color[1], mat.diffuse_color[2], mat.alpha))
+                    out.write('\t\t\t\t<Specular>%f,%f,%f,%f</Specular>\n' % (mat.specular_color[0], mat.specular_color[1], mat.specular_color[2], mat.alpha))
                     out.write('\t\t\t\t<Shininess>%f</Shininess>\n' % (mat.specular_intensity))
-                    out.write('\t\t\t\t<Emmissive>%f,%f,%f,%f</Emmissive>\n' % (mat.emit,mat.emit,mat.emit,mat.alpha))
+                    out.write('\t\t\t\t<Emmissive>%f,%f,%f,%f</Emmissive>\n' % (mat.emit, mat.emit, mat.emit, mat.alpha))
 
                     # Shadeless materials in blender are unaffected by light
                     if mat.use_shadeless:
@@ -241,7 +226,7 @@ def export(context,props,filepath):
         if ob.type == 'ARMATURE':
             armature = ob.data
             out.write('\t<Skeleton>\n')
-            
+
             for bone in armature.bones:
                 out.write('\t\t<Bone')
                 out.write(' Index=\"%d\"' % (mBoneIndicies[bone.name]))
@@ -261,15 +246,15 @@ def export(context,props,filepath):
                     parentMat.invert()
                 else:
                     parentMat = ob.matrix_world.copy()
-                boneMat = bone.matrix_local*parentMat
+                boneMat = bone.matrix_local * parentMat
 
                 out.write('\t\t\t<Translate>%f,%f,%f</Translate>\n' % (boneMat.to_translation().x, boneMat.to_translation().y, boneMat.to_translation().z))
                 out.write('\t\t\t<Rotate>%f,%f,%f,%f</Rotate>\n' % (boneMat.to_quaternion().x, boneMat.to_quaternion().y, boneMat.to_quaternion().z, boneMat.to_quaternion().w))
                 out.write('\t\t\t<Scale>%f,%f,%f</Scale>\n' % (boneMat.to_scale().x, boneMat.to_scale().y, boneMat.to_scale().z))
                 out.write('\t\t</Bone>\n')
-                
+
             out.write('\t</Skeleton>\n')
-            
+
     out.write('</XMSH>\n')
     out.close()
 
@@ -291,16 +276,18 @@ class ExportXMSH(bpy.types.Operator, ExportHelper):
         filepath = bpy.path.ensure_ext(filepath, self.filename_ext)
 
         exported = export(context, props, filepath)
-        
+
         if exported:
-            print('*** Export finished in %s seconds ***' %((time.time() - start_time)))
+            print('*** Export finished in %s seconds ***' % ((time.time() - start_time)))
             print(filepath)
-            
+
         return {'FINISHED'}
 
     def invoke(self, context, event):
         wm = context.window_manager
-        wm.fileselect_add(self) # will run self.execute()
+
+        # This function calls self.execute()
+        wm.fileselect_add(self)
         return {'RUNNING_MODAL'}
 
 
@@ -320,4 +307,3 @@ def unregister():
 
 if __name__ == "__main__":
     register()
-
