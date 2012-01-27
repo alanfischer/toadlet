@@ -34,7 +34,7 @@
 #    ANDROID_NDK_TOOLCHAIN_ROOT=/opt/android-toolchain - path to standalone toolchain.
 #      Option is not used if full NDK is found. Can be set as environment variable.
 #
-#    ANDROID_NDK_API_LEVEL=android-8 - level of android NDK API to use.
+#    ANDROID_NDK_API_LEVEL=8 - level of android NDK API to use.
 #      Option is ignored when build uses stanalone toolchain.
 #
 #    ANDROID_SDK=no default - path to SDK root. Used to locate the ANDROID_JAR file.
@@ -210,8 +210,8 @@ if( EXISTS "${ANDROID_NDK}" )
  
  if( NOT ANDROID_NDK_API_LEVEL GREATER 2 )
   set( ANDROID_NDK_API_LEVEL 8)
-  message( STATUS "Using default android API level android-${ANDROID_NDK_API_LEVEL}" )
-  message( STATUS "If you prefer to use a different API level, please define the variable: ANDROID_NDK_API_LEVEL" )
+  message( STATUS "Using default android NDK API level ${ANDROID_NDK_API_LEVEL}" )
+  message( STATUS "If you prefer to use a different NDK API level, please define the variable: ANDROID_NDK_API_LEVEL" )
  endif( NOT ANDROID_NDK_API_LEVEL GREATER 2 )
  
  # Set the android SDK if defined
@@ -224,10 +224,10 @@ if( EXISTS "${ANDROID_NDK}" )
  set( ANDROID_SDK_API_LEVEL $ENV{ANDROID_SDK_API_LEVEL} )
  if( NOT DEFINED ANDROID_SDK_API_LEVEL )
   set( ANDROID_SDK_API_LEVEL 8)
-  if ( EXISTS ANDROID_SDK )
-   message( STATUS "Using default android SDK API level android-${ANDROID_SDK_API_LEVEL}" )
+  if ( EXISTS ${ANDROID_SDK} )
+   message( STATUS "Using default android SDK API level ${ANDROID_SDK_API_LEVEL}" )
    message( STATUS "If you prefer to use a different SDK API level, please define the variable: ANDROID_SDK_API_LEVEL" )
-  endif ( EXISTS ANDROID_SDK )
+  endif ( EXISTS ${ANDROID_SDK} )
  endif( NOT DEFINED ANDROID_SDK_API_LEVEL )
  set (ANDROID_SDK_API_LEVEL ${ANDROID_SDK_API_LEVEL} CACHE STRING "android SDK API level" FORCE)
 
@@ -320,6 +320,7 @@ if( ANDROID_ARCH STREQUAL "ARM" )
  endif( DEFINED ARM_TARGETS AND NOT DEFINED ARM_TARGET )
  if( NOT ARM_TARGET )
   set( ARM_TARGET armeabi )
+  message( STATUS "Using default ARM_TARGET=${ARM_TARGET}, valid options are: armeabi, armeabi-v7a, armeabi-v7a with NEON, armeabi-v7a with VFPV3.")
  endif( NOT ARM_TARGET )
  set( ARM_TARGET "${ARM_TARGET}" CACHE INTERNAL "the arm target for android, recommend armeabi-v7a for floating point support and NEON." )
  set_property( CACHE ARM_TARGET PROPERTY STRINGS ${PossibleArmTargets} )
