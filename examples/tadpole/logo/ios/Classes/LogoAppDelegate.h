@@ -1,10 +1,9 @@
 #import <UIKit/UIKit.h>
-
-class Logo;
+#include <toadlet/pad.h>
 
 @interface LogoAppDelegate : NSObject <UIApplicationDelegate> {
 	UIWindow *window;
-	Logo *app;
+	PlatformApplication *app;
 }
 
 @property (nonatomic, retain) IBOutlet UIWindow *window;

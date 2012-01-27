@@ -77,6 +77,7 @@ public:
 	void *getWindow();
 	void *getView(){return mView;}
 
+	void internal_mousePressed(int x,int y,int button);
 	void internal_mouseMoved(int x,int y);
 	
 protected:
@@ -85,6 +86,7 @@ protected:
 	int mWidth,mHeight;
 	bool mFullscreen;
 	bool mDifferenceMouse;
+	int mLastMouseX,mLastMouseY;
 
 	Archive::ptr mBundleArchive;
 	

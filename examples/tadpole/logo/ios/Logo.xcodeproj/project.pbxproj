@@ -18,9 +18,8 @@
 		8C29FA3510078B6C008DADF1 /* OpenGLES.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 8C29FA3110078B6C008DADF1 /* OpenGLES.framework */; };
 		8C29FA3610078B6C008DADF1 /* QuartzCore.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 8C29FA3210078B6C008DADF1 /* QuartzCore.framework */; };
 		8C32048C10C8775900E983CE /* Logo.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 8C32048810C8775900E983CE /* Logo.cpp */; };
-		8C4AA6F8139947D20086E1EC /* libmxml.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 8C4AA6F7139947D10086E1EC /* libmxml.a */; };
-		8C7B5FF913994A450095C5C5 /* lt.xmsh in Resources */ = {isa = PBXBuildFile; fileRef = 8C7B5FF813994A450095C5C5 /* lt.xmsh */; };
 		8C8E21B713D9DDBD00351C50 /* MainWindow-iPad.xib in Resources */ = {isa = PBXBuildFile; fileRef = 8C8E21B613D9DDBD00351C50 /* MainWindow-iPad.xib */; };
+		8CF2904314D2F4A9007F6CDB /* lt.tmsh in Resources */ = {isa = PBXBuildFile; fileRef = 8CF2904214D2F4A9007F6CDB /* lt.tmsh */; };
 		8CF6BE19105A74230001E399 /* SystemConfiguration.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 8CF6BE18105A74230001E399 /* SystemConfiguration.framework */; };
 /* End PBXBuildFile section */
 
@@ -40,9 +39,8 @@
 		8C29FA3210078B6C008DADF1 /* QuartzCore.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = QuartzCore.framework; path = System/Library/Frameworks/QuartzCore.framework; sourceTree = SDKROOT; };
 		8C32048810C8775900E983CE /* Logo.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = Logo.cpp; path = ../Logo.cpp; sourceTree = SOURCE_ROOT; };
 		8C32048910C8775900E983CE /* Logo.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = Logo.h; path = ../Logo.h; sourceTree = SOURCE_ROOT; };
-		8C4AA6F7139947D10086E1EC /* libmxml.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libmxml.a; path = ../../../../../iphone/lib/libmxml.a; sourceTree = SOURCE_ROOT; };
-		8C7B5FF813994A450095C5C5 /* lt.xmsh */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; name = lt.xmsh; path = ../../../data/lt.xmsh; sourceTree = SOURCE_ROOT; };
 		8C8E21B613D9DDBD00351C50 /* MainWindow-iPad.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = "MainWindow-iPad.xib"; sourceTree = "<group>"; };
+		8CF2904214D2F4A9007F6CDB /* lt.tmsh */ = {isa = PBXFileReference; lastKnownFileType = file; name = lt.tmsh; path = ../android/assets/lt.tmsh; sourceTree = SOURCE_ROOT; };
 		8CF6BE18105A74230001E399 /* SystemConfiguration.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = SystemConfiguration.framework; path = System/Library/Frameworks/SystemConfiguration.framework; sourceTree = SDKROOT; };
 		8D1107310486CEB800E47090 /* Logo-Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = "Logo-Info.plist"; plistStructureDefinitionIdentifier = "com.apple.xcode.plist.structure-definition.iphone.info-plist"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
@@ -60,7 +58,6 @@
 				8C29FA3510078B6C008DADF1 /* OpenGLES.framework in Frameworks */,
 				8C29FA3610078B6C008DADF1 /* QuartzCore.framework in Frameworks */,
 				8CF6BE19105A74230001E399 /* SystemConfiguration.framework in Frameworks */,
-				8C4AA6F8139947D20086E1EC /* libmxml.a in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -110,8 +107,8 @@
 		29B97317FDCFA39411CA2CEA /* Resources */ = {
 			isa = PBXGroup;
 			children = (
+				8CF2904214D2F4A9007F6CDB /* lt.tmsh */,
 				8C8E21B613D9DDBD00351C50 /* MainWindow-iPad.xib */,
-				8C7B5FF813994A450095C5C5 /* lt.xmsh */,
 				28AD733E0D9D9553002E5188 /* MainWindow.xib */,
 				8D1107310486CEB800E47090 /* Logo-Info.plist */,
 			);
@@ -121,7 +118,6 @@
 		29B97323FDCFA39411CA2CEA /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
-				8C4AA6F7139947D10086E1EC /* libmxml.a */,
 				8CF6BE18105A74230001E399 /* SystemConfiguration.framework */,
 				8C29FA2F10078B6C008DADF1 /* AudioToolbox.framework */,
 				8C29FA3010078B6C008DADF1 /* OpenAL.framework */,
@@ -184,8 +180,8 @@
 			buildActionMask = 2147483647;
 			files = (
 				28AD733F0D9D9553002E5188 /* MainWindow.xib in Resources */,
-				8C7B5FF913994A450095C5C5 /* lt.xmsh in Resources */,
 				8C8E21B713D9DDBD00351C50 /* MainWindow-iPad.xib in Resources */,
+				8CF2904314D2F4A9007F6CDB /* lt.tmsh in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -210,7 +206,7 @@
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
 				ARCHS = "$(ARCHS_STANDARD_32_BIT)";
-				BUNDLE_IDENTIFIER = com.lightningtoads.shovestuff;
+				BUNDLE_IDENTIFIER = com.lightningtoads.randisle;
 				COPY_PHASE_STRIP = NO;
 				GCC_DYNAMIC_NO_PIC = NO;
 				GCC_OPTIMIZATION_LEVEL = 0;
@@ -218,10 +214,7 @@
 				GCC_PREFIX_HEADER = Logo_Prefix.pch;
 				ICON_FILE = shovestuff.png;
 				INFOPLIST_FILE = "Logo-Info.plist";
-				LIBRARY_SEARCH_PATHS = (
-					"$(inherited)",
-					"\"$(SRCROOT)/../../../../../iphone/lib\"",
-				);
+				LIBRARY_SEARCH_PATHS = "$(inherited)";
 				PRODUCT_NAME = Logo;
 				SDKROOT = iphoneos;
 				TARGETED_DEVICE_FAMILY = "1,2";
@@ -314,9 +307,9 @@
 				GCC_INPUT_FILETYPE = sourcecode.cpp.objcpp;
 				GCC_WARN_ABOUT_RETURN_TYPE = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
-				HEADER_SEARCH_PATHS = "~/iphone/include";
+				HEADER_SEARCH_PATHS = "~/ios/include";
 				IPHONEOS_DEPLOYMENT_TARGET = 3.0;
-				LIBRARY_SEARCH_PATHS = "~/iphone/lib";
+				LIBRARY_SEARCH_PATHS = "~/ios/lib";
 				OTHER_CFLAGS = "-DTOADLET_DEBUG";
 				OTHER_LDFLAGS = (
 					"-ltoadlet_flick_iosmotiondevice_sd",

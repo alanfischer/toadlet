@@ -21,7 +21,7 @@ public:
 		skyColor=Colors::AZURE;
 		fadeColor=Vector4(0xB5C1C3FF);
 
-		#if defined(TOADLET_PLATFORM_ANDROID)
+		#if defined(TOADLET_PLATFORM_ANDROID) || defined(TOADLET_PLATFORM_IOS)
 			cloudSize=128;
 			patchSize=32;
 			tolerance=0.00005;

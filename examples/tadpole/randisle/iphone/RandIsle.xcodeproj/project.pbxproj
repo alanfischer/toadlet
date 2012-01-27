@@ -17,7 +17,7 @@
 		8C29FA3410078B6C008DADF1 /* OpenAL.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 8C29FA3010078B6C008DADF1 /* OpenAL.framework */; };
 		8C29FA3510078B6C008DADF1 /* OpenGLES.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 8C29FA3110078B6C008DADF1 /* OpenGLES.framework */; };
 		8C29FA3610078B6C008DADF1 /* QuartzCore.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 8C29FA3210078B6C008DADF1 /* QuartzCore.framework */; };
-		8C4AA6F8139947D20086E1EC /* libmxml.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 8C4AA6F7139947D10086E1EC /* libmxml.a */; };
+		8C35379114D20FF30068E9E0 /* frogskin1.png in Resources */ = {isa = PBXBuildFile; fileRef = 8C35379014D20FF30068E9E0 /* frogskin1.png */; };
 		8C7B604F13995EFD0095C5C5 /* Acorn.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 8C7B603C13995EFD0095C5C5 /* Acorn.cpp */; };
 		8C7B605013995EFD0095C5C5 /* HUD.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 8C7B604013995EFD0095C5C5 /* HUD.cpp */; };
 		8C7B605113995EFD0095C5C5 /* PathClimber.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 8C7B604213995EFD0095C5C5 /* PathClimber.cpp */; };
@@ -31,7 +31,6 @@
 		8C7B606D13995F6E0095C5C5 /* crunch.wav in Resources */ = {isa = PBXBuildFile; fileRef = 8C7B605D13995F6E0095C5C5 /* crunch.wav */; };
 		8C7B606E13995F6E0095C5C5 /* dog.wav in Resources */ = {isa = PBXBuildFile; fileRef = 8C7B605E13995F6E0095C5C5 /* dog.wav */; };
 		8C7B606F13995F6E0095C5C5 /* frog.xmsh in Resources */ = {isa = PBXBuildFile; fileRef = 8C7B605F13995F6E0095C5C5 /* frog.xmsh */; };
-		8C7B607013995F6E0095C5C5 /* frogskin1.bmp in Resources */ = {isa = PBXBuildFile; fileRef = 8C7B606013995F6E0095C5C5 /* frogskin1.bmp */; };
 		8C7B607113995F6E0095C5C5 /* grass.png in Resources */ = {isa = PBXBuildFile; fileRef = 8C7B606113995F6E0095C5C5 /* grass.png */; };
 		8C7B607213995F6E0095C5C5 /* leaf_bottom1_alpha.png in Resources */ = {isa = PBXBuildFile; fileRef = 8C7B606213995F6E0095C5C5 /* leaf_bottom1_alpha.png */; };
 		8C7B607313995F6E0095C5C5 /* leaf_bottom1_bump.png in Resources */ = {isa = PBXBuildFile; fileRef = 8C7B606313995F6E0095C5C5 /* leaf_bottom1_bump.png */; };
@@ -42,6 +41,9 @@
 		8C7B607813995F6E0095C5C5 /* rustle.wav in Resources */ = {isa = PBXBuildFile; fileRef = 8C7B606813995F6E0095C5C5 /* rustle.wav */; };
 		8C7B607913995F6E0095C5C5 /* shark.wav in Resources */ = {isa = PBXBuildFile; fileRef = 8C7B606913995F6E0095C5C5 /* shark.wav */; };
 		8C8E21F413D9F79000351C50 /* MainWindow-iPad.xib in Resources */ = {isa = PBXBuildFile; fileRef = 8C8E21F313D9F79000351C50 /* MainWindow-iPad.xib */; };
+		8CCB5E9814D2371E001D1018 /* frog.tmsh in Resources */ = {isa = PBXBuildFile; fileRef = 8CCB5E9514D2371E001D1018 /* frog.tmsh */; };
+		8CCB5E9914D2371E001D1018 /* rock.png in Resources */ = {isa = PBXBuildFile; fileRef = 8CCB5E9614D2371E001D1018 /* rock.png */; };
+		8CCB5E9A14D2371E001D1018 /* seafloor.png in Resources */ = {isa = PBXBuildFile; fileRef = 8CCB5E9714D2371E001D1018 /* seafloor.png */; };
 		8CF6BE19105A74230001E399 /* SystemConfiguration.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 8CF6BE18105A74230001E399 /* SystemConfiguration.framework */; };
 /* End PBXBuildFile section */
 
@@ -59,7 +61,7 @@
 		8C29FA3010078B6C008DADF1 /* OpenAL.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = OpenAL.framework; path = System/Library/Frameworks/OpenAL.framework; sourceTree = SDKROOT; };
 		8C29FA3110078B6C008DADF1 /* OpenGLES.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = OpenGLES.framework; path = System/Library/Frameworks/OpenGLES.framework; sourceTree = SDKROOT; };
 		8C29FA3210078B6C008DADF1 /* QuartzCore.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = QuartzCore.framework; path = System/Library/Frameworks/QuartzCore.framework; sourceTree = SDKROOT; };
-		8C4AA6F7139947D10086E1EC /* libmxml.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libmxml.a; path = ../../../../../iphone/lib/libmxml.a; sourceTree = SOURCE_ROOT; };
+		8C35379014D20FF30068E9E0 /* frogskin1.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = frogskin1.png; path = ../res/frogskin1.png; sourceTree = SOURCE_ROOT; };
 		8C7B603C13995EFD0095C5C5 /* Acorn.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = Acorn.cpp; path = ../src/Acorn.cpp; sourceTree = SOURCE_ROOT; };
 		8C7B603D13995EFD0095C5C5 /* Acorn.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = Acorn.h; path = ../src/Acorn.h; sourceTree = SOURCE_ROOT; };
 		8C7B603E13995EFD0095C5C5 /* BranchSystem.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = BranchSystem.h; path = ../src/BranchSystem.h; sourceTree = SOURCE_ROOT; };
@@ -85,7 +87,6 @@
 		8C7B605D13995F6E0095C5C5 /* crunch.wav */ = {isa = PBXFileReference; lastKnownFileType = audio.wav; name = crunch.wav; path = ../res/crunch.wav; sourceTree = SOURCE_ROOT; };
 		8C7B605E13995F6E0095C5C5 /* dog.wav */ = {isa = PBXFileReference; lastKnownFileType = audio.wav; name = dog.wav; path = ../res/dog.wav; sourceTree = SOURCE_ROOT; };
 		8C7B605F13995F6E0095C5C5 /* frog.xmsh */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; name = frog.xmsh; path = ../res/frog.xmsh; sourceTree = SOURCE_ROOT; };
-		8C7B606013995F6E0095C5C5 /* frogskin1.bmp */ = {isa = PBXFileReference; lastKnownFileType = image.bmp; name = frogskin1.bmp; path = ../res/frogskin1.bmp; sourceTree = SOURCE_ROOT; };
 		8C7B606113995F6E0095C5C5 /* grass.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = grass.png; path = ../res/grass.png; sourceTree = SOURCE_ROOT; };
 		8C7B606213995F6E0095C5C5 /* leaf_bottom1_alpha.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = leaf_bottom1_alpha.png; path = ../res/leaf_bottom1_alpha.png; sourceTree = SOURCE_ROOT; };
 		8C7B606313995F6E0095C5C5 /* leaf_bottom1_bump.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = leaf_bottom1_bump.png; path = ../res/leaf_bottom1_bump.png; sourceTree = SOURCE_ROOT; };
@@ -96,6 +97,9 @@
 		8C7B606813995F6E0095C5C5 /* rustle.wav */ = {isa = PBXFileReference; lastKnownFileType = audio.wav; name = rustle.wav; path = ../res/rustle.wav; sourceTree = SOURCE_ROOT; };
 		8C7B606913995F6E0095C5C5 /* shark.wav */ = {isa = PBXFileReference; lastKnownFileType = audio.wav; name = shark.wav; path = ../res/shark.wav; sourceTree = SOURCE_ROOT; };
 		8C8E21F313D9F79000351C50 /* MainWindow-iPad.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = "MainWindow-iPad.xib"; sourceTree = "<group>"; };
+		8CCB5E9514D2371E001D1018 /* frog.tmsh */ = {isa = PBXFileReference; lastKnownFileType = file; name = frog.tmsh; path = ../res/frog.tmsh; sourceTree = SOURCE_ROOT; };
+		8CCB5E9614D2371E001D1018 /* rock.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = rock.png; path = ../res/rock.png; sourceTree = SOURCE_ROOT; };
+		8CCB5E9714D2371E001D1018 /* seafloor.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = seafloor.png; path = ../res/seafloor.png; sourceTree = SOURCE_ROOT; };
 		8CF6BE18105A74230001E399 /* SystemConfiguration.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = SystemConfiguration.framework; path = System/Library/Frameworks/SystemConfiguration.framework; sourceTree = SDKROOT; };
 		8D1107310486CEB800E47090 /* RandIsle-Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = "RandIsle-Info.plist"; plistStructureDefinitionIdentifier = "com.apple.xcode.plist.structure-definition.iphone.info-plist"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
@@ -113,7 +117,6 @@
 				8C29FA3510078B6C008DADF1 /* OpenGLES.framework in Frameworks */,
 				8C29FA3610078B6C008DADF1 /* QuartzCore.framework in Frameworks */,
 				8CF6BE19105A74230001E399 /* SystemConfiguration.framework in Frameworks */,
-				8C4AA6F8139947D20086E1EC /* libmxml.a in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -180,6 +183,10 @@
 		29B97317FDCFA39411CA2CEA /* Resources */ = {
 			isa = PBXGroup;
 			children = (
+				8CCB5E9514D2371E001D1018 /* frog.tmsh */,
+				8CCB5E9614D2371E001D1018 /* rock.png */,
+				8CCB5E9714D2371E001D1018 /* seafloor.png */,
+				8C35379014D20FF30068E9E0 /* frogskin1.png */,
 				8C8E21F313D9F79000351C50 /* MainWindow-iPad.xib */,
 				8C7B605A13995F6E0095C5C5 /* acorn.png */,
 				8C7B605B13995F6E0095C5C5 /* bark.png */,
@@ -187,7 +194,6 @@
 				8C7B605D13995F6E0095C5C5 /* crunch.wav */,
 				8C7B605E13995F6E0095C5C5 /* dog.wav */,
 				8C7B605F13995F6E0095C5C5 /* frog.xmsh */,
-				8C7B606013995F6E0095C5C5 /* frogskin1.bmp */,
 				8C7B606113995F6E0095C5C5 /* grass.png */,
 				8C7B606213995F6E0095C5C5 /* leaf_bottom1_alpha.png */,
 				8C7B606313995F6E0095C5C5 /* leaf_bottom1_bump.png */,
@@ -206,7 +212,6 @@
 		29B97323FDCFA39411CA2CEA /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
-				8C4AA6F7139947D10086E1EC /* libmxml.a */,
 				8CF6BE18105A74230001E399 /* SystemConfiguration.framework */,
 				8C29FA2F10078B6C008DADF1 /* AudioToolbox.framework */,
 				8C29FA3010078B6C008DADF1 /* OpenAL.framework */,
@@ -275,7 +280,6 @@
 				8C7B606D13995F6E0095C5C5 /* crunch.wav in Resources */,
 				8C7B606E13995F6E0095C5C5 /* dog.wav in Resources */,
 				8C7B606F13995F6E0095C5C5 /* frog.xmsh in Resources */,
-				8C7B607013995F6E0095C5C5 /* frogskin1.bmp in Resources */,
 				8C7B607113995F6E0095C5C5 /* grass.png in Resources */,
 				8C7B607213995F6E0095C5C5 /* leaf_bottom1_alpha.png in Resources */,
 				8C7B607313995F6E0095C5C5 /* leaf_bottom1_bump.png in Resources */,
@@ -286,6 +290,10 @@
 				8C7B607813995F6E0095C5C5 /* rustle.wav in Resources */,
 				8C7B607913995F6E0095C5C5 /* shark.wav in Resources */,
 				8C8E21F413D9F79000351C50 /* MainWindow-iPad.xib in Resources */,
+				8C35379114D20FF30068E9E0 /* frogskin1.png in Resources */,
+				8CCB5E9814D2371E001D1018 /* frog.tmsh in Resources */,
+				8CCB5E9914D2371E001D1018 /* rock.png in Resources */,
+				8CCB5E9A14D2371E001D1018 /* seafloor.png in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -316,7 +324,7 @@
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
 				ARCHS = "$(ARCHS_STANDARD_32_BIT)";
-				BUNDLE_IDENTIFIER = com.lightningtoads.shovestuff;
+				BUNDLE_IDENTIFIER = com.lightningtoads.randisle;
 				COPY_PHASE_STRIP = NO;
 				GCC_DYNAMIC_NO_PIC = NO;
 				GCC_OPTIMIZATION_LEVEL = 0;
@@ -324,10 +332,7 @@
 				GCC_PREFIX_HEADER = RandIsle_Prefix.pch;
 				ICON_FILE = shovestuff.png;
 				INFOPLIST_FILE = "RandIsle-Info.plist";
-				LIBRARY_SEARCH_PATHS = (
-					"$(inherited)",
-					"\"$(SRCROOT)/../../../../../iphone/lib\"",
-				);
+				LIBRARY_SEARCH_PATHS = "$(inherited)";
 				PRODUCT_NAME = RandIsle;
 				SDKROOT = iphoneos;
 				TARGETED_DEVICE_FAMILY = "1,2";
@@ -339,20 +344,14 @@
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
 				ARCHS = "$(ARCHS_STANDARD_32_BIT)";
-				BUNDLE_IDENTIFIER = com.lightningtoads.shovestuff;
-				CODE_SIGN_IDENTITY = "";
-				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
+				BUNDLE_IDENTIFIER = com.lightningtoads.randisle;
 				COPY_PHASE_STRIP = YES;
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = RandIsle_Prefix.pch;
 				ICON_FILE = shovestuff.png;
 				INFOPLIST_FILE = "RandIsle-Info.plist";
-				LIBRARY_SEARCH_PATHS = (
-					"$(inherited)",
-					"\"$(SRCROOT)/../../../../../iphone/lib\"",
-				);
+				LIBRARY_SEARCH_PATHS = "$(inherited)";
 				PRODUCT_NAME = RandIsle;
-				"PROVISIONING_PROFILE[sdk=iphoneos*]" = "";
 				SDKROOT = iphoneos;
 				TARGETED_DEVICE_FAMILY = "1,2";
 			};
@@ -362,13 +361,10 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ARCHS = "$(ARCHS_STANDARD_32_BIT)";
-				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Distribution: Lightning Toads Productions, LLC";
 				GCC_C_LANGUAGE_STANDARD = c99;
 				GCC_INPUT_FILETYPE = sourcecode.cpp.objcpp;
 				GCC_WARN_ABOUT_RETURN_TYPE = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
-				HEADER_SEARCH_PATHS = "~/iphone/include";
-				LIBRARY_SEARCH_PATHS = "~/iphone/lib";
 				OTHER_CFLAGS = "";
 				OTHER_LDFLAGS = (
 					"-ltoadlet_pad_s",
@@ -383,7 +379,6 @@
 					"-ltoadlet_egg_s",
 				);
 				PREBINDING = NO;
-				"PROVISIONING_PROFILE[sdk=iphoneos*]" = "72772A42-2971-47C3-8684-A6544C14F592";
 				SDKROOT = iphoneos3.0;
 			};
 			name = Distribution;
@@ -393,19 +388,14 @@
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
 				ARCHS = "$(ARCHS_STANDARD_32_BIT)";
-				BUNDLE_IDENTIFIER = com.lightningtoads.shovestuff;
-				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Distribution";
+				BUNDLE_IDENTIFIER = com.lightningtoads.randisle;
 				COPY_PHASE_STRIP = YES;
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = RandIsle_Prefix.pch;
 				ICON_FILE = shovestuff.png;
 				INFOPLIST_FILE = "RandIsle-Info.plist";
-				LIBRARY_SEARCH_PATHS = (
-					"$(inherited)",
-					"\"$(SRCROOT)/../../../../../iphone/lib\"",
-				);
+				LIBRARY_SEARCH_PATHS = "$(inherited)";
 				PRODUCT_NAME = RandIsle;
-				"PROVISIONING_PROFILE[sdk=iphoneos*]" = "";
 				SDKROOT = iphoneos;
 				TARGETED_DEVICE_FAMILY = "1,2";
 			};
@@ -415,7 +405,8 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ARCHS = "$(ARCHS_STANDARD_32_BIT)";
-				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
+				CODE_SIGN_ENTITLEMENTS = "";
+				CODE_SIGN_IDENTITY = "iPhone Developer";
 				GCC_C_LANGUAGE_STANDARD = c99;
 				GCC_INPUT_FILETYPE = sourcecode.cpp.objcpp;
 				GCC_VERSION = com.apple.compilers.llvmgcc42;
@@ -440,6 +431,7 @@
 					"-ltoadlet_egg_sd",
 				);
 				PREBINDING = NO;
+				PROVISIONING_PROFILE = "";
 				SDKROOT = iphoneos4.2;
 			};
 			name = Debug;
@@ -448,7 +440,7 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ARCHS = "$(ARCHS_STANDARD_32_BIT)";
-				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer: Alan Fischer (FYP4N6S36H)";
+				CODE_SIGN_IDENTITY = "iPhone Developer";
 				GCC_C_LANGUAGE_STANDARD = c99;
 				GCC_INPUT_FILETYPE = sourcecode.cpp.objcpp;
 				GCC_VERSION = com.apple.compilers.llvmgcc42;
@@ -472,7 +464,7 @@
 					"-ltoadlet_egg_s",
 				);
 				PREBINDING = NO;
-				"PROVISIONING_PROFILE[sdk=iphoneos*]" = "91A94F03-26CF-4878-AAFB-452BDE355080";
+				PROVISIONING_PROFILE = "";
 				SDKROOT = iphoneos4.2;
 			};
 			name = Release;

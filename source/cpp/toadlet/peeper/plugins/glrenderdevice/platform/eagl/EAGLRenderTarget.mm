@@ -32,7 +32,7 @@
 namespace toadlet{
 namespace peeper{
 
-TOADLET_C_API RenderTarget *new_EAGLRenderTarget(void *layer,WindowRenderTargetFormat *format){
+TOADLET_C_API RenderTarget *new_EAGLRenderTarget(void *display,void *layer,WindowRenderTargetFormat *format){
 	return (GLRenderTarget*)(new EAGLRenderTarget((CAEAGLLayer*)layer,format));
 }
 
@@ -138,10 +138,12 @@ bool EAGLRenderTarget::destroyContext(){
 }
 
 bool EAGLRenderTarget::activate(){
+	GLFBORenderTarget::activate();
 	return [EAGLContext setCurrentContext:mContext];
 }
 
 bool EAGLRenderTarget::deactivate(){
+	GLFBORenderTarget::deactivate();
 	return [EAGLContext setCurrentContext:nil];
 }
 
