@@ -10,10 +10,10 @@
 		return;
 	}
 
-	app=new RandIsle();
-	
+	app=new PlatformApplication();
 	app->setWindow(mainWindow);
-	app->create("");
+	app->setApplet(new RandIsle(app,""));
+	app->defaultCreate();
 	app->start();
 }
 

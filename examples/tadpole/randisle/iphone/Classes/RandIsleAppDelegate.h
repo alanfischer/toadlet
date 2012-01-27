@@ -1,10 +1,9 @@
 #import <UIKit/UIKit.h>
-
-class RandIsle;
+#include <toadlet/pad.h>
 
 @interface RandIsleAppDelegate : NSObject <UIApplicationDelegate> {
 	UIWindow *window;
-	RandIsle *app;
+	PlatformApplication *app;
 }
 
 @property (nonatomic, retain) IBOutlet UIWindow *window;

@@ -25,7 +25,6 @@ RandIsle::~RandIsle(){
 }
 
 void RandIsle::create(){
-//	Logger::getInstance()->setMasterReportingLevel(Logger::Level_ALERT);
 	Logger::debug("RandIsle::create");
 
 	mEngine=mApp->getEngine();

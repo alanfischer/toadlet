@@ -87,11 +87,7 @@ void Logo::create(){
 	scene->getRoot()->attach(light);
 
  	meshNode=engine->createNodeType(MeshNode::type(),scene);
-	#if defined(TOADLET_PLATFORM_ANDROID)
-		meshNode->setMesh("lt.tmsh");
-	#else
-		meshNode->setMesh("lt.xmsh");
-	#endif
+	meshNode->setMesh("lt.tmsh");
 //	meshNode->getController()->start();
 //	meshNode->getController()->setCycling(Controller::Cycling_REFLECT);
 	scene->getRoot()->attach(meshNode);
@@ -105,8 +101,8 @@ void Logo::create(){
 #if 1
 	InputDevice *motionDevice=app->getInputDevice(InputDevice::InputType_MOTION);
 	if(motionDevice!=NULL){
-		cameraNode->addNodeListener(NodeListener::ptr(new GravityFollower(motionDevice)));
-		motionDevice->start();
+//		cameraNode->addNodeListener(NodeListener::ptr(new GravityFollower(motionDevice)));
+//		motionDevice->start();
 	}
 #endif
 }
@@ -127,7 +123,9 @@ void Logo::resized(int width,int height){
 	}
 }
 
-void Logo::render(RenderDevice *renderDevice){
+void Logo::render(){
+	RenderDevice *renderDevice=engine->getRenderDevice();
+
 	renderDevice->beginScene();
 		cameraNode->render(renderDevice);
 	renderDevice->endScene();

@@ -177,7 +177,7 @@ rect{
 	UITouch* touch=[[event touchesForView:self] anyObject];
 	CGPoint location=[touch locationInView:self];
 	mLastLocation=location;
-	mApplication->mousePressed(location.x,location.y,0);
+	mApplication->internal_mousePressed(location.x,location.y,0);
 }
 
 // Handles the continuation of a touch.
@@ -213,7 +213,7 @@ rect{
 #else
 /// @todo: There is a problem where (it seems) if the application is launched without a NIB file, you have to double click to get any click events to register.
 - (void) mouseDown:(NSEvent*)event{
-	mApplication->mousePressed(
+	mApplication->internal_mousePressed(
 		[event locationInWindow].x,
 		[self bounds].size.height-[event locationInWindow].y,
 		[event buttonNumber]
@@ -268,12 +268,11 @@ namespace pad{
 
 OSXApplication::OSXApplication():
 	//mTitle,
-	mPositionX(0),
-	mPositionY(0),
-	mWidth(-1),
-	mHeight(-1),
+	mPositionX(0),mPositionY(0),
+	mWidth(-1),mHeight(-1),
 	mFullscreen(false),
 	mDifferenceMouse(false),
+	mLastMouseX(0),mLastMouseY(0),
 
 	mRun(false),
 	mActive(false),
@@ -488,9 +487,18 @@ void OSXApplication::setDifferenceMouse(bool difference){
 	#endif
 }
 
+void OSXApplication::internal_mousePressed(int x,int y,int button){
+	mousePressed(x,y,button);
+
+	mLastMouseX=x;
+	mLastMouseY=y;
+}
+
 void OSXApplication::internal_mouseMoved(int x,int y){
 	if(mDifferenceMouse){
-		#if !defined(TOADLET_PLATFORM_IOS)
+		#if defined(TOADLET_PLATFORM_IOS)
+			mouseMoved(mLastMouseX-x,mLastMouseY-y);
+		#else
 			CGGetLastMouseDelta(&x,&y);
 
 			NSPoint npoint=NSMakePoint(getWidth()/2,getHeight()/2);
@@ -499,10 +507,16 @@ void OSXApplication::internal_mouseMoved(int x,int y){
 			npoint.y=[[NSScreen mainScreen] frame].size.height-npoint.y;
 			CGPoint cpoint=CGPointMake(npoint.x,npoint.y);
 			CGWarpMouseCursorPosition(cpoint);
+
+			mouseMoved(x,y);
 		#endif
 	}
+	else{
+		mouseMoved(x,y);
+	}
 
-	mouseMoved(x,y);
+	mLastMouseX=x;
+	mLastMouseY=y;
 }
 
 void *OSXApplication::getWindow(){

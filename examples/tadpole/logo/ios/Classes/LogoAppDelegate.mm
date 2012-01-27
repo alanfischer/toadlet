@@ -10,10 +10,10 @@
 		return;
 	}
 
-	app=new Logo();
-	
+	app=new PlatformApplication();
 	app->setWindow(mainWindow);
-	app->create();
+	app->setApplet(new Logo(app));
+	app->defaultCreate();
 	app->start();
 }
 
