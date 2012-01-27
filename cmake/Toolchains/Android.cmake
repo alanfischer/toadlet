@@ -47,7 +47,7 @@
 #    ANDROID_ARCH=ARM - target architecture for the android build, may be either ARM or X86. 
 #      The X86 architecture is only available with the ANDROID_NDK_API_LEVEL>=9
 #
-#    ARM_TARGET=armeabi-v7a - type of floating point support.
+#    ARM_TARGET=armeabi - type of floating point support.
 #      Other possible values are: "armeabi", "armeabi-v7a with NEON", "armeabi-v7a with VFPV3"
 #
 #    ANDROID_STL=(SYSTEM GNU_SHARED GNU_STATIC GABI_SHARED GABI_STATIC STLPORT_SHARED STLPORT_STATIC) - choose one
@@ -319,7 +319,7 @@ if( ANDROID_ARCH STREQUAL "ARM" )
   set( ARM_TARGET "${ARM_TARGETS}" )
  endif( DEFINED ARM_TARGETS AND NOT DEFINED ARM_TARGET )
  if( NOT ARM_TARGET )
-  set( ARM_TARGET armeabi-v7a )
+  set( ARM_TARGET armeabi )
  endif( NOT ARM_TARGET )
  set( ARM_TARGET "${ARM_TARGET}" CACHE INTERNAL "the arm target for android, recommend armeabi-v7a for floating point support and NEON." )
  set_property( CACHE ARM_TARGET PROPERTY STRINGS ${PossibleArmTargets} )
