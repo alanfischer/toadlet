@@ -33,6 +33,7 @@ import android.os.*;
 import us.toadlet.peeper.*;
 import us.toadlet.ribbit.*;
 import us.toadlet.flick.*;
+import us.toadlet.tadpole.*;
 
 class ApplicationView extends SurfaceView implements SurfaceHolder.Callback{
 	public ApplicationView(AndroidApplication application){

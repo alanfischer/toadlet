@@ -5,34 +5,34 @@ using namespace toadlet::tadpole;
 
 extern "C" {
 
-#include "us_toadlet_pad_CameraNode.h"
+#include "us_toadlet_tadpole_CameraNode.h"
 
 jfieldID CameraNode_nativeHandle=0;
 
-void Java_us_toadlet_pad_CameraNode(JNIEnv *env){
-	jclass nodeClass=env->FindClass("us/toadlet/pad/Node");
+void Java_us_toadlet_tadpole_CameraNode(JNIEnv *env){
+	jclass nodeClass=env->FindClass("us/toadlet/tadpole/Node");
 	{
 		CameraNode_nativeHandle=env->GetFieldID(nodeClass,"mNativeHandle","I");
 	}
 	env->DeleteLocalRef(nodeClass);
 }
 
-JNIEXPORT void JNICALL Java_us_toadlet_pad_CameraNode_setClearColor(JNIEnv *env,jobject obj,jint color){
-	Java_us_toadlet_pad_CameraNode(env); // hack
+JNIEXPORT void JNICALL Java_us_toadlet_tadpole_CameraNode_setClearColor(JNIEnv *env,jobject obj,jint color){
+	Java_us_toadlet_tadpole_CameraNode(env); // hack
 
 	CameraNode *node=(CameraNode*)env->GetIntField(obj,CameraNode_nativeHandle);
 
 	node->setClearColor(Vector4(color));
 }
 
-JNIEXPORT jint JNICALL Java_us_toadlet_pad_CameraNode_getClearColor(JNIEnv *env,jobject obj){
+JNIEXPORT jint JNICALL Java_us_toadlet_tadpole_CameraNode_getClearColor(JNIEnv *env,jobject obj){
 	CameraNode *node=(CameraNode*)env->GetIntField(obj,CameraNode_nativeHandle);
 
 	return node->getClearColor().getRGBA();
 }
 
-JNIEXPORT void JNICALL Java_us_toadlet_pad_CameraNode_setLookAt(JNIEnv *env,jobject obj,jfloatArray eyeObj,jfloatArray pointObj,jfloatArray upObj){
-	Java_us_toadlet_pad_CameraNode(env); // hack
+JNIEXPORT void JNICALL Java_us_toadlet_tadpole_CameraNode_setLookAt(JNIEnv *env,jobject obj,jfloatArray eyeObj,jfloatArray pointObj,jfloatArray upObj){
+	Java_us_toadlet_tadpole_CameraNode(env); // hack
 
 	CameraNode *node=(CameraNode*)env->GetIntField(obj,CameraNode_nativeHandle);
 
@@ -47,20 +47,20 @@ JNIEXPORT void JNICALL Java_us_toadlet_pad_CameraNode_setLookAt(JNIEnv *env,jobj
 	env->ReleaseFloatArrayElements(upObj,up,0);
 }
 
-JNIEXPORT void JNICALL Java_us_toadlet_pad_CameraNode_setProjectionFovY(JNIEnv *env,jobject obj,float fov,float ratio,float nearDist,float farDist){
+JNIEXPORT void JNICALL Java_us_toadlet_tadpole_CameraNode_setProjectionFovY(JNIEnv *env,jobject obj,float fov,float ratio,float nearDist,float farDist){
 	CameraNode *node=(CameraNode*)env->GetIntField(obj,CameraNode_nativeHandle);
 
 	node->setProjectionFovY(fov,ratio,nearDist,farDist);
 }
 
-JNIEXPORT void JNICALL Java_us_toadlet_pad_CameraNode_setProjectionFovX(JNIEnv *env,jobject obj,float fov,float ratio,float nearDist,float farDist){
+JNIEXPORT void JNICALL Java_us_toadlet_tadpole_CameraNode_setProjectionFovX(JNIEnv *env,jobject obj,float fov,float ratio,float nearDist,float farDist){
 	CameraNode *node=(CameraNode*)env->GetIntField(obj,CameraNode_nativeHandle);
 
 	node->setProjectionFovX(fov,ratio,nearDist,farDist);
 }
 		
 /// @todo: Eliminate the need to call this, or at least to specify the device, since we cheat and grab it from the Engine anyway
-JNIEXPORT void JNICALL Java_us_toadlet_pad_CameraNode_render(JNIEnv *env,jobject obj,jobject deviceObj){
+JNIEXPORT void JNICALL Java_us_toadlet_tadpole_CameraNode_render(JNIEnv *env,jobject obj,jobject deviceObj){
 	CameraNode *node=(CameraNode*)env->GetIntField(obj,CameraNode_nativeHandle);
 	RenderDevice *device=node->getEngine()->getRenderDevice();
 

@@ -70,7 +70,7 @@ void RandIsle::create(){
 
 	mReflectCamera=mEngine->createNodeType(CameraNode::type(),mScene);
 	mReflectCamera->setProjectionFovX(Math::degToRad(Math::fromInt(60)),Math::ONE,mCamera->getNearDist(),1024);
-	mReflectCamera->setScope(~Scope_HUD & ~Scope_BIT_MAIN_CAMERA & ~Scope_BIT_WATER);
+	mReflectCamera->setScope(~Scope_HUD & /*~Scope_BIT_MAIN_CAMERA & */~Scope_BIT_WATER);
 	mReflectCamera->setDefaultState(mEngine->getMaterialManager()->createRenderState());
 	mScene->getRoot()->attach(mReflectCamera);
 
@@ -194,7 +194,7 @@ void RandIsle::resized(int width,int height){
 
 void RandIsle::render(){
 	RenderDevice *renderDevice=mApp->getRenderDevice();
-/*
+
 float a=0,b=0,c=1;
 float k=(0*a + 0*b + 0*c);
 Matrix4x4 reflectionMatrix;
@@ -203,7 +203,7 @@ reflectionMatrix.set(
    -2*a*b  , 1-2*b*b, -2*b*c, 0,
    -2*a*c  , -2*b*c,  1-2*c*c, 0,
    2*a*k   , 2*b*k  , 2*c*k  , 1);
-
+/*
 Vector3 position=mCamera->getWorldTranslate();
 Vector3 forward=mCamera->getForward();
 
@@ -236,11 +236,21 @@ mTerrain->setWaterMaterial(Resources::instance->waterMaterial);
 */
 
 //	Math::setMatrix4x4FromX(rotate,Math::PI);
-/*
-	mReflectCamera->setTransform(mCamera->getTransform());
+
+Matrix4x4 transform;
+mCamera->getWorldTransform().getMatrix(transform);
+
+Matrix4x4 m2;Math::transpose(m2,reflectionMatrix);reflectionMatrix=m2;
+
+Matrix4x4 m;
+Math::invert(m,transform);
+Math::postMul(m,reflectionMatrix);	
+Math::invert(transform,m);
+	
+mReflectCamera->setMatrix4x4(transform);
 	mReflectCamera->setProjectionMatrix(mCamera->getProjectionMatrix());
-	mReflectCamera->setObliqueNearPlaneMatrix(mRefractCamera->getViewMatrix());
-	renderDevice->setRenderTarget(Resources::instance->reflectTarget);
+//	mReflectCamera->setObliqueNearPlaneMatrix(mRefractCamera->getViewMatrix());
+//	renderDevice->setRenderTarget(Resources::instance->reflectTarget);
 	renderDevice->beginScene();
 		mReflectCamera->render(renderDevice);
 	renderDevice->endScene();
@@ -261,13 +271,14 @@ mTerrain->setWaterMaterial(Resources::instance->waterMaterial);
 	renderDevice->endScene();
 	renderDevice->swap();
 */
-
+/*
 	renderDevice->setRenderTarget(renderDevice->getPrimaryRenderTarget());
 	renderDevice->beginScene();
 		mCamera->render(renderDevice);
 		mHUD->render(renderDevice);
 	renderDevice->endScene();
 	renderDevice->swap();
+*/
 }
 
 void RandIsle::update(int dt){

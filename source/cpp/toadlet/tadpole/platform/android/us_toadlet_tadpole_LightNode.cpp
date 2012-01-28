@@ -5,20 +5,20 @@ using namespace toadlet::tadpole;
 
 extern "C" {
 
-#include "us_toadlet_pad_LightNode.h"
+#include "us_toadlet_tadpole_LightNode.h"
 
 jfieldID LightNode_nativeHandle=0;
 
-void Java_us_toadlet_pad_LightNode(JNIEnv *env){
-	jclass nodeClass=env->FindClass("us/toadlet/pad/Node");
+void Java_us_toadlet_tadpole_LightNode(JNIEnv *env){
+	jclass nodeClass=env->FindClass("us/toadlet/tadpole/Node");
 	{
 		LightNode_nativeHandle=env->GetFieldID(nodeClass,"mNativeHandle","I");
 	}
 	env->DeleteLocalRef(nodeClass);
 }
 
-JNIEXPORT void JNICALL Java_us_toadlet_pad_LightNode_setLightDirection(JNIEnv *env,jobject obj,jfloatArray directionObj){
-	Java_us_toadlet_pad_LightNode(env); // hack
+JNIEXPORT void JNICALL Java_us_toadlet_tadpole_LightNode_setLightDirection(JNIEnv *env,jobject obj,jfloatArray directionObj){
+	Java_us_toadlet_tadpole_LightNode(env); // hack
 
 	LightNode *node=(LightNode*)env->GetIntField(obj,LightNode_nativeHandle);
 

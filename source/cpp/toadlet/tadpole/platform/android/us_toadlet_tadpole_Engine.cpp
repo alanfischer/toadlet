@@ -8,26 +8,26 @@ TOADLET_C_API AudioDevice *new_JAudioDevice(JNIEnv *env,jobject obj);
 
 extern "C" {
 
-#include "us_toadlet_pad_Engine.h"
+#include "us_toadlet_tadpole_Engine.h"
 
 jfieldID Engine_nativeHandle=0;
 jfieldID Engine_Scene_nativeHandle=0;
 
-void Java_us_toadlet_pad_Engine(JNIEnv *env){
-	jclass engineClass=env->FindClass("us/toadlet/pad/Engine");
+void Java_us_toadlet_tadpole_Engine(JNIEnv *env){
+	jclass engineClass=env->FindClass("us/toadlet/tadpole/Engine");
 	{
 		Engine_nativeHandle=env->GetFieldID(engineClass,"mNativeHandle","I");
 	}
 	env->DeleteLocalRef(engineClass);
 
-	jclass sceneClass=env->FindClass("us/toadlet/pad/Scene");
+	jclass sceneClass=env->FindClass("us/toadlet/tadpole/Scene");
 	{
 		Engine_Scene_nativeHandle=env->GetFieldID(sceneClass,"mNativeHandle","I");
 	}
 	env->DeleteLocalRef(sceneClass);
 }
 
-JNIEXPORT void JNICALL Java_us_toadlet_pad_Engine_destroy(JNIEnv *env,jobject obj){
+JNIEXPORT void JNICALL Java_us_toadlet_tadpole_Engine_destroy(JNIEnv *env,jobject obj){
 	Engine *engine=(Engine*)env->GetIntField(obj,Engine_nativeHandle);
 
 	if(engine!=NULL){
@@ -38,13 +38,13 @@ JNIEXPORT void JNICALL Java_us_toadlet_pad_Engine_destroy(JNIEnv *env,jobject ob
 	}
 }
 
-JNIEXPORT void JNICALL Java_us_toadlet_pad_Engine_installHandlers(JNIEnv *env,jobject obj){
+JNIEXPORT void JNICALL Java_us_toadlet_tadpole_Engine_installHandlers(JNIEnv *env,jobject obj){
 	Engine *engine=(Engine*)env->GetIntField(obj,Engine_nativeHandle);
 
 	engine->installHandlers();
 }
 
-JNIEXPORT void JNICALL Java_us_toadlet_pad_Engine_setRenderDevice(JNIEnv *env,jobject obj,jobject deviceObj){
+JNIEXPORT void JNICALL Java_us_toadlet_tadpole_Engine_setRenderDevice(JNIEnv *env,jobject obj,jobject deviceObj){
 	Engine *engine=(Engine*)env->GetIntField(obj,Engine_nativeHandle);
 
 	RenderDevice *device=NULL;
@@ -63,7 +63,7 @@ JNIEXPORT void JNICALL Java_us_toadlet_pad_Engine_setRenderDevice(JNIEnv *env,jo
 	engine->setRenderDevice(device);
 }
 
-JNIEXPORT void JNICALL Java_us_toadlet_pad_Engine_setAudioDevice(JNIEnv *env,jobject obj,jobject deviceObj){
+JNIEXPORT void JNICALL Java_us_toadlet_tadpole_Engine_setAudioDevice(JNIEnv *env,jobject obj,jobject deviceObj){
 	Engine *engine=(Engine*)env->GetIntField(obj,Engine_nativeHandle);
 
 	AudioDevice *device=NULL;
@@ -79,7 +79,7 @@ JNIEXPORT void JNICALL Java_us_toadlet_pad_Engine_setAudioDevice(JNIEnv *env,job
 	engine->setAudioDevice(device);
 }
 
-JNIEXPORT jobject JNICALL Java_us_toadlet_pad_Engine_createNode(JNIEnv *env,jobject obj,jclass nodeType,jobject sceneObj){
+JNIEXPORT jobject JNICALL Java_us_toadlet_tadpole_Engine_createNode(JNIEnv *env,jobject obj,jclass nodeType,jobject sceneObj){
 	Engine *engine=(Engine*)env->GetIntField(obj,Engine_nativeHandle);
 	Scene *scene=(sceneObj!=NULL)?(Scene*)env->GetIntField(sceneObj,Engine_Scene_nativeHandle):NULL;
 	
@@ -113,8 +113,8 @@ JNIEXPORT jobject JNICALL Java_us_toadlet_pad_Engine_createNode(JNIEnv *env,jobj
 	return nodeObj;
 }
 
-JNIEXPORT void JNICALL Java_us_toadlet_pad_Engine_makeEngine(JNIEnv *env,jobject obj,jobject contextObj){
-	Java_us_toadlet_pad_Engine(env);
+JNIEXPORT void JNICALL Java_us_toadlet_tadpole_Engine_makeEngine(JNIEnv *env,jobject obj,jobject contextObj){
+	Java_us_toadlet_tadpole_Engine(env);
 
 	Engine *engine=new Engine(true,false);	
 

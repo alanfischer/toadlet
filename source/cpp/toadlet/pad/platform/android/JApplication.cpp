@@ -41,8 +41,8 @@ TOADLET_C_API InputDevice* new_JInputDevice(JNIEnv *env,jobject obj);
 TOADLET_C_API void Java_us_toadlet_peeper_NGLRenderDevice(JNIEnv *env);
 TOADLET_C_API void Java_us_toadlet_ribbit_NAudioStream(JNIEnv *env);
 TOADLET_C_API void Java_us_toadlet_flick_NInputDeviceListener(JNIEnv *env);
+TOADLET_C_API void Java_us_toadlet_tadpole_Engine(JNIEnv *env);
 TOADLET_C_API void Java_us_toadlet_pad_NApplet(JNIEnv *env);
-TOADLET_C_API void Java_us_toadlet_pad_Engine(JNIEnv *env);
 
 namespace toadlet{
 namespace pad{
@@ -61,8 +61,8 @@ JApplication::JApplication(JNIEnv *jenv,jobject jobj):
 	Java_us_toadlet_peeper_NGLRenderDevice(jenv);
 	Java_us_toadlet_ribbit_NAudioStream(jenv);
 	Java_us_toadlet_flick_NInputDeviceListener(jenv);
+	Java_us_toadlet_tadpole_Engine(jenv);
 	Java_us_toadlet_pad_NApplet(jenv);
-	Java_us_toadlet_pad_Engine(jenv);
 
 	env=jenv;
 	obj=env->NewGlobalRef(jobj);
@@ -80,14 +80,14 @@ JApplication::JApplication(JNIEnv *jenv,jobject jobj):
 		getHeightID=env->GetMethodID(appClass,"getHeight","()I");
 		setDifferenceMouseID=env->GetMethodID(appClass,"setDifferenceMouse","(Z)V");
 		getDifferenceMouseID=env->GetMethodID(appClass,"getDifferenceMouse","()Z");
-		getEngineID=env->GetMethodID(appClass,"getEngine","()Lus/toadlet/pad/Engine;");
+		getEngineID=env->GetMethodID(appClass,"getEngine","()Lus/toadlet/tadpole/Engine;");
 		getRenderDeviceID=env->GetMethodID(appClass,"getRenderDevice","()Lus/toadlet/peeper/RenderDevice;");
 		getAudioDeviceID=env->GetMethodID(appClass,"getAudioDevice","()Lus/toadlet/ribbit/AudioDevice;");
 		getInputDeviceID=env->GetMethodID(appClass,"getInputDevice","(I)Lus/toadlet/flick/InputDevice;");
 	}
 	env->DeleteLocalRef(appClass);
 
-	jclass engineClass=env->FindClass("us/toadlet/pad/Engine");
+	jclass engineClass=env->FindClass("us/toadlet/tadpole/Engine");
 	{
 		Engine_nativeHandle=env->GetFieldID(engineClass,"mNativeHandle","I");
 	}
