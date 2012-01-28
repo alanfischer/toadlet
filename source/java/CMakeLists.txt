@@ -168,7 +168,7 @@ if (${BUILD_TYPE} STREQUAL "DEBUG")
     set (CMAKE_JAVA_TARGET_OUTPUT_NAME jtoadlet_tadpole_d)
 endif (${BUILD_TYPE} STREQUAL "DEBUG")
 set (CMAKE_JAR_CLASSES_PREFIX us/toadlet/tadpole)
-add_jar (jtoadlet_tadpole ${PAD_SRC})
+add_jar (jtoadlet_tadpole ${TADPOLE_SRC})
 get_property (JARFILE TARGET jtoadlet_tadpole PROPERTY JAR_FILE)
 install (FILES ${JARFILE} DESTINATION lib)
 
