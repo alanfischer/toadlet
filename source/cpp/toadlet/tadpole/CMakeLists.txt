@@ -176,6 +176,16 @@ set (TADPOLE_TERRAIN_SRC
 	terrain/TerrainPatchNode.cpp
 )
 
+set (TADPOLE_PLATFORM_ANDROID_SRC
+	platform/android/us_toadlet_tadpole_CameraNode.cpp
+	platform/android/us_toadlet_tadpole_Engine.cpp
+	platform/android/us_toadlet_tadpole_LightNode.cpp
+	platform/android/us_toadlet_tadpole_MeshNode.cpp
+	platform/android/us_toadlet_tadpole_Node.cpp
+	platform/android/us_toadlet_tadpole_ParentNode.cpp
+	platform/android/us_toadlet_tadpole_Scene.cpp
+)
+
 
 # Headers
 set (TADPOLE_HEADERS
@@ -639,9 +649,10 @@ endif (NOT FFMPEG_FOUND)
 
 # Platform specific files 
 if (TOADLET_PLATFORM_ANDROID)
-	source_group ("Source Files\\\\handler\\\\platform\\\\android" FILES ${TADPOLE_HANDLER_PLATFORM_ANDROID_SRC})
+	source_group ("Source Files\\\\handler\\\\platform\\\\android" FILES ${TADPOLE_HANDLER_PLATFORM_ANDROID_SRC} ${TADPOLE_PLATFORM_ANDROID_SRC})
 	source_group ("Header Files\\\\handler\\\\platform\\\\android" FILES ${TADPOLE_HANDLER_PLATFORM_ANDROID_HEADERS})
-	set (TADPOLE_SRC ${TADPOLE_SRC} ${TADPOLE_HANDLER_PLATFORM_ANDROID_SRC})
+	set (TADPOLE_SRC ${TADPOLE_SRC} ${TADPOLE_HANDLER_PLATFORM_ANDROID_SRC} ${TADPOLE_PLATFORM_ANDROID_SRC})
+	set (TADPOLE_LIBS ${TADPOLE_LIBS} toadlet_ribbit_jaudiodevice)
 elseif (TOADLET_PLATFORM_OSX)
 	source_group ("Source Files\\\\handler\\\\platform\\\\osx" FILES ${TADPOLE_HANDLER_PLATFORM_OSX_SRC})
 	source_group ("Header Files\\\\handler\\\\platform\\\\osx" FILES ${TADPOLE_HANDLER_PLATFORM_OSX_HEADERS})

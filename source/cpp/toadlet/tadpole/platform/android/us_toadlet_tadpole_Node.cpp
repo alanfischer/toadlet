@@ -5,20 +5,20 @@ using namespace toadlet::tadpole;
 
 extern "C" {
 
-#include "us_toadlet_pad_Node.h"
+#include "us_toadlet_tadpole_Node.h"
 
 jfieldID Node_nativeHandle=0;
 
-void Java_us_toadlet_pad_Node(JNIEnv *env){
-	jclass nodeClass=env->FindClass("us/toadlet/pad/Node");
+void Java_us_toadlet_tadpole_Node(JNIEnv *env){
+	jclass nodeClass=env->FindClass("us/toadlet/tadpole/Node");
 	{
 		Node_nativeHandle=env->GetFieldID(nodeClass,"mNativeHandle","I");
 	}
 	env->DeleteLocalRef(nodeClass);
 }
 
-JNIEXPORT void JNICALL Java_us_toadlet_pad_Node_setRotate(JNIEnv *env,jobject obj,jfloatArray axisObj,jfloat angle){
-	Java_us_toadlet_pad_Node(env); // hack
+JNIEXPORT void JNICALL Java_us_toadlet_tadpole_Node_setRotate(JNIEnv *env,jobject obj,jfloatArray axisObj,jfloat angle){
+	Java_us_toadlet_tadpole_Node(env); // hack
 
 	Node *node=(Node*)env->GetIntField(obj,Node_nativeHandle);
 
@@ -29,16 +29,16 @@ JNIEXPORT void JNICALL Java_us_toadlet_pad_Node_setRotate(JNIEnv *env,jobject ob
 	env->ReleaseFloatArrayElements(axisObj,axis,0);
 }
 
-JNIEXPORT void JNICALL Java_us_toadlet_pad_Node_setScope(JNIEnv *env,jobject obj,jint scope){
-	Java_us_toadlet_pad_Node(env); // hack
+JNIEXPORT void JNICALL Java_us_toadlet_tadpole_Node_setScope(JNIEnv *env,jobject obj,jint scope){
+	Java_us_toadlet_tadpole_Node(env); // hack
 
 	Node *node=(Node*)env->GetIntField(obj,Node_nativeHandle);
 
 	node->setScope(scope);
 }
 
-JNIEXPORT jint JNICALL Java_us_toadlet_pad_Node_getScope(JNIEnv *env,jobject obj){
-	Java_us_toadlet_pad_Node(env); // hack
+JNIEXPORT jint JNICALL Java_us_toadlet_tadpole_Node_getScope(JNIEnv *env,jobject obj){
+	Java_us_toadlet_tadpole_Node(env); // hack
 
 	Node *node=(Node*)env->GetIntField(obj,Node_nativeHandle);
 

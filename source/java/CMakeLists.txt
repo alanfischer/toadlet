@@ -139,6 +139,45 @@ add_custom_command (TARGET jtoadlet_ribbit POST_BUILD
 )
 
 
+# toadlet_tadpole
+configure_file (us/toadlet/tadpole/Version.java.cmake ${CMAKE_CURRENT_BINARY_DIR}/us/toadlet/tadpole/Version.java)
+
+set (TADPOLE_SRC
+	us/toadlet/tadpole/Engine.java
+	us/toadlet/tadpole/Scene.java
+	us/toadlet/tadpole/Node.java
+	us/toadlet/tadpole/CameraNode.java
+	us/toadlet/tadpole/LightNode.java
+	us/toadlet/tadpole/MeshNode.java
+	us/toadlet/tadpole/ParentNode.java
+	${CMAKE_CURRENT_BINARY_DIR}/us/toadlet/tadpole/Version.java
+)
+
+set (TADPOLE_H
+	us.toadlet.tadpole.Engine
+	us.toadlet.tadpole.Scene
+	us.toadlet.tadpole.Node
+	us.toadlet.tadpole.CameraNode
+	us.toadlet.tadpole.LightNode
+	us.toadlet.tadpole.MeshNode
+	us.toadlet.tadpole.ParentNode
+)
+
+# Create the jar file with UseJava.cmake functions. See UseJava.cmake for details.
+if (${BUILD_TYPE} STREQUAL "DEBUG")
+    set (CMAKE_JAVA_TARGET_OUTPUT_NAME jtoadlet_tadpole_d)
+endif (${BUILD_TYPE} STREQUAL "DEBUG")
+set (CMAKE_JAR_CLASSES_PREFIX us/toadlet/tadpole)
+add_jar (jtoadlet_tadpole ${PAD_SRC})
+get_property (JARFILE TARGET jtoadlet_tadpole PROPERTY JAR_FILE)
+install (FILES ${JARFILE} DESTINATION lib)
+
+# Generate headers
+add_custom_command (TARGET jtoadlet_tadpole POST_BUILD
+    COMMAND ${Java_JAVAH_EXECUTABLE} -classpath ${JARFILE} ${TADPOLE_H}
+)
+
+
 # toadlet_pad
 configure_file (us/toadlet/pad/Version.java.cmake ${CMAKE_CURRENT_BINARY_DIR}/us/toadlet/pad/Version.java)
 

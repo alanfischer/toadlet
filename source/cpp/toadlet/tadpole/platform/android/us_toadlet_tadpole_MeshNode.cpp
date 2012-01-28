@@ -5,20 +5,20 @@ using namespace toadlet::tadpole;
 
 extern "C" {
 
-#include "us_toadlet_pad_MeshNode.h"
+#include "us_toadlet_tadpole_MeshNode.h"
 
 jfieldID MeshNode_nativeHandle=0;
 
-void Java_us_toadlet_pad_MeshNode(JNIEnv *env){
-	jclass nodeClass=env->FindClass("us/toadlet/pad/Node");
+void Java_us_toadlet_tadpole_MeshNode(JNIEnv *env){
+	jclass nodeClass=env->FindClass("us/toadlet/tadpole/Node");
 	{
 		MeshNode_nativeHandle=env->GetFieldID(nodeClass,"mNativeHandle","I");
 	}
 	env->DeleteLocalRef(nodeClass);
 }
 
-JNIEXPORT void JNICALL Java_us_toadlet_pad_MeshNode_setMesh(JNIEnv *env,jobject obj,jstring nameObj){
-	Java_us_toadlet_pad_MeshNode(env); // hack
+JNIEXPORT void JNICALL Java_us_toadlet_tadpole_MeshNode_setMesh(JNIEnv *env,jobject obj,jstring nameObj){
+	Java_us_toadlet_tadpole_MeshNode(env); // hack
 
 	MeshNode *node=(MeshNode*)env->GetIntField(obj,MeshNode_nativeHandle);
 
@@ -29,8 +29,8 @@ JNIEXPORT void JNICALL Java_us_toadlet_pad_MeshNode_setMesh(JNIEnv *env,jobject 
 	node->setMesh(name);
 }
 
-JNIEXPORT void JNICALL Java_us_toadlet_pad_MeshNode_setAlpha(JNIEnv *env,jobject obj,jfloat alpha){
-	Java_us_toadlet_pad_MeshNode(env); // hack
+JNIEXPORT void JNICALL Java_us_toadlet_tadpole_MeshNode_setAlpha(JNIEnv *env,jobject obj,jfloat alpha){
+	Java_us_toadlet_tadpole_MeshNode(env); // hack
 
 	MeshNode *node=(MeshNode*)env->GetIntField(obj,MeshNode_nativeHandle);
 	

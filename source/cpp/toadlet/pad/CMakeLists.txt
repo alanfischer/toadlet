@@ -12,13 +12,6 @@ set (PAD_SRC
 set (PAD_PLATFORM_ANDROID_JAPPLICATION_SRC
 	platform/android/JApplication.cpp
 	platform/android/us_toadlet_pad_NApplet.cpp
-	platform/android/us_toadlet_pad_Engine.cpp
-	platform/android/us_toadlet_pad_Scene.cpp
-	platform/android/us_toadlet_pad_CameraNode.cpp
-	platform/android/us_toadlet_pad_LightNode.cpp
-	platform/android/us_toadlet_pad_MeshNode.cpp
-	platform/android/us_toadlet_pad_Node.cpp
-	platform/android/us_toadlet_pad_ParentNode.cpp
 )
 
 set (PAD_PLATFORM_ANDROID_ANDROIDAPPLICATION_SRC
