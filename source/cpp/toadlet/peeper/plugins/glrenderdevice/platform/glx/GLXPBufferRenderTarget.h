@@ -55,7 +55,8 @@ public:
 	void resetDestroy(){}
 
 	bool activate();
-	bool swap();
+	bool deactivate();
+	bool swap(){return false;}
 	bool activateAdditionalContext(){return false;}
 	void deactivateAdditionalContext(){}
 

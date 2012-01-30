@@ -114,14 +114,6 @@ bool GLFBORenderTarget::activate(){
 bool GLFBORenderTarget::deactivate(){
 	glBindFramebuffer(GL_FRAMEBUFFER,0);
 
-	TOADLET_CHECK_GLERROR("GLFBORenderTarget::deactivate");
-
-	return true;
-}
-
-bool GLFBORenderTarget::swap(){
-	glBindFramebuffer(GL_FRAMEBUFFER,0);
-
 	int i;
 	for(i=0;i<mBufferAttachments.size();++i){
 		if(mBufferAttachments[i]!=Attachment_DEPTH_STENCIL){
@@ -133,7 +125,7 @@ bool GLFBORenderTarget::swap(){
 		}
 	}
 
-	TOADLET_CHECK_GLERROR("GLFBORenderTarget::swap");
+	TOADLET_CHECK_GLERROR("GLFBORenderTarget::deactivate");
 
 	return true;
 }

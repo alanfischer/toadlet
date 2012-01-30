@@ -224,6 +224,7 @@ bool GLRenderDevice::create(RenderTarget *target,int *options){
 		mLastSamplerStates.resize(caps.maxTextureStages,NULL);
 		mLastTextureStates.resize(caps.maxTextureStages,NULL);
 		mLastTexTargets.resize(caps.maxTextureStages,0);
+		mLastTextureType.resize(caps.maxTextureStages,(Shader::ShaderType)0);
 		mTexCoordIndexes.resize(caps.maxTextureStages,-1);
 		mLastTexCoordIndexes.resize(caps.maxTextureStages,-1);
 
@@ -537,6 +538,8 @@ bool GLRenderDevice::setRenderTarget(RenderTarget *target){
 
 	TOADLET_CHECK_GLERROR("setRenderTarget");
 
+	setDefaultState();
+
 	return true;
 }
 
@@ -611,14 +614,18 @@ void GLRenderDevice::beginScene(){
 		mGLRenderTarget->activate();
 	}
 
-	// Without this, we have issues when changing from rendering to a PBuffer to the FrameBuffer
-	setDefaultState();
-
 	TOADLET_CHECK_GLERROR("beginScene");
 }
 
 void GLRenderDevice::endScene(){
 	setVertexData(NULL);
+	setShaderState(NULL);
+	int i;
+	for(i=0;i<mCaps.maxTextureStages;++i){
+		setSamplerState(i,NULL);
+		setTextureState(i,NULL);
+		setTexture((Shader::ShaderType)0,i,NULL);
+	}
 
 	#if defined(TOADLET_HAS_GLIBOS)
 		if(mIBOs){
@@ -645,15 +652,6 @@ void GLRenderDevice::endScene(){
 			glUseProgram(0);
 		}
 	#endif
-
-	int i;
-	for(i=0;i<mCaps.maxTextureStages;++i){
-		setSamplerState(i,NULL);
-		setTextureState(i,NULL);
-		setTexture((Shader::ShaderType)0,i,NULL);
-	}
-
-	mLastShaderState=NULL;
 
 	TOADLET_CHECK_GLERROR("endScene");
 }
@@ -848,6 +846,8 @@ void GLRenderDevice::setDefaultState(){
 	setMaterialState(MaterialState());
 	setAmbientColor(Math::ONE_VECTOR4);
 
+	setVertexData(NULL);
+	setShaderState(NULL);
 	int i;
 	for(i=0;i<mCaps.maxTextureStages;++i){
 		setSamplerState(i,NULL);
@@ -904,6 +904,7 @@ bool GLRenderDevice::setShaderState(ShaderState *shaderState){
 	#if defined(TOADLET_HAS_GLSL)
 		GLSLShaderState *glshaderState=shaderState!=NULL?(GLSLShaderState*)shaderState->getRootShaderState():NULL;
 		if(glshaderState==NULL){
+			mLastShaderState=NULL;
 			return false;
 		}
 
@@ -1361,6 +1362,11 @@ void GLRenderDevice::setTexture(Shader::ShaderType shaderType,int i,Texture *tex
 	if(i>=mCaps.maxTextureStages){
 		return;
 	}
+	// Skip the setTexture if it's a disable, and aimed at a different shaderType, since GL doesn't differentiate.
+	// Otherwise we can have problems where the texture ends up being disabled because it was affecting a different shaderType, and it shouldn't have been.
+	else if(texture==NULL && mLastTextureType[i]!=shaderType){
+		return;
+	}
 	else if(mMultiTexture){
 		glActiveTexture(GL_TEXTURE0+i);
 	}
@@ -1399,6 +1405,8 @@ void GLRenderDevice::setTexture(Shader::ShaderType shaderType,int i,Texture *tex
 			mLastTexTargets[i]=0;
 		}
 	}
+
+	mLastTextureType[i]=shaderType;
 
 	setSamplerStatePostTexture(i,mLastSamplerStates[i]);
 	setTextureStatePostTexture(i,mLastTextureStates[i]);

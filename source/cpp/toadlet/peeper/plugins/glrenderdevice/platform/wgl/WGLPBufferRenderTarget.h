@@ -55,8 +55,8 @@ public:
 	void resetDestroy(){}
 
 	bool activate();
-	bool deactivate(){return WGLRenderTarget::deactivate();}
-	bool swap();
+	bool deactivate();
+	bool swap(){return false;}
 	bool activateAdditionalContext(){return false;}
 	void deactivateAdditionalContext(){}
 

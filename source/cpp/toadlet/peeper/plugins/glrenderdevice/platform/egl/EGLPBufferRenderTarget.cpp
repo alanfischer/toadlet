@@ -95,10 +95,12 @@ bool EGLPBufferRenderTarget::activate(){
 	return true;
 }
 
-bool EGLPBufferRenderTarget::swap(){
+bool EGLPBufferRenderTarget::deactivate(){
 	glFlush();
 
 	bind();
+	
+	EGLRenderTarget::deactivate();
 
 	return true;
 }
@@ -272,6 +274,8 @@ void EGLPBufferRenderTarget::bind(){
 			eglBindTexImage(mDisplay,mSurface,EGL_BACK_BUFFER);
 			TOADLET_CHECK_EGLERROR("eglBindTexImage");
 		}
+
+		mTexture->generateMipLevels();
 	}
 }
 

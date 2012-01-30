@@ -25,6 +25,7 @@ RandIsle::~RandIsle(){
 }
 
 void RandIsle::create(){
+//	Logger::getInstance()->setMasterReportingLevel(Logger::Level_ALERT);
 	Logger::debug("RandIsle::create");
 
 	mEngine=mApp->getEngine();
@@ -66,18 +67,26 @@ void RandIsle::create(){
 	mCamera->setProjectionFovX(Math::degToRad(Math::fromInt(60)),Math::ONE,mCamera->getNearDist(),1024);
 	mCamera->setScope(~Scope_HUD | Scope_BIT_MAIN_CAMERA);
 	mCamera->setDefaultState(mEngine->getMaterialManager()->createRenderState());
+	mCamera->setClearColor(Resources::instance->fadeColor);
+	mCamera->getDefaultState()->setFogState(FogState(FogState::FogType_LINEAR,Math::ONE,mCamera->getFarDist()/2,mCamera->getFarDist(),mCamera->getClearColor()));
 	mFollowNode->attach(mCamera);
 
 	mReflectCamera=mEngine->createNodeType(CameraNode::type(),mScene);
-	mReflectCamera->setProjectionFovX(Math::degToRad(Math::fromInt(60)),Math::ONE,mCamera->getNearDist(),1024);
-	mReflectCamera->setScope(~Scope_HUD & /*~Scope_BIT_MAIN_CAMERA & */~Scope_BIT_WATER);
+	mReflectCamera->setRenderTarget(Resources::instance->reflectTarget);
+	mReflectCamera->setProjectionFovX(Math::degToRad(Math::fromInt(60)),Math::ONE,mCamera->getNearDist(),mCamera->getFarDist());
+	mReflectCamera->setScope(~Scope_HUD & ~Scope_BIT_MAIN_CAMERA & ~Scope_BIT_WATER);
 	mReflectCamera->setDefaultState(mEngine->getMaterialManager()->createRenderState());
+	mReflectCamera->setClearColor(Resources::instance->fadeColor);
+	mReflectCamera->getDefaultState()->setFogState(FogState(FogState::FogType_LINEAR,Math::ONE,mCamera->getFarDist()/2,mCamera->getFarDist(),mCamera->getClearColor()));
 	mScene->getRoot()->attach(mReflectCamera);
 
 	mRefractCamera=mEngine->createNodeType(CameraNode::type(),mScene);
-	mRefractCamera->setProjectionFovX(Math::degToRad(Math::fromInt(60)),Math::ONE,mCamera->getNearDist(),1024);
+	mRefractCamera->setRenderTarget(Resources::instance->refractTarget);
+	mRefractCamera->setProjectionFovX(Math::degToRad(Math::fromInt(60)),Math::ONE,mCamera->getNearDist(),mCamera->getFarDist());
 	mRefractCamera->setScope(~Scope_HUD & ~Scope_BIT_MAIN_CAMERA & ~Scope_BIT_WATER);
 	mRefractCamera->setDefaultState(mEngine->getMaterialManager()->createRenderState());
+	mRefractCamera->setClearColor(Resources::instance->fadeColor);
+	mRefractCamera->getDefaultState()->setFogState(FogState(FogState::FogType_LINEAR,Math::ONE,mCamera->getFarDist()/2,mCamera->getFarDist(),mCamera->getClearColor()));
 	mScene->getRoot()->attach(mRefractCamera);
 
 	mHUD=mEngine->createNodeType(HUD::type(),mScene);
@@ -172,10 +181,12 @@ void RandIsle::resized(int width,int height){
 		if(width>=height){
 			scalar ratio=Math::div(Math::fromInt(width),Math::fromInt(height));
 			mCamera->setProjectionFovY(Math::degToRad(Math::fromInt(75)),ratio,mCamera->getNearDist(),mCamera->getFarDist());
+			mReflectCamera->setProjectionFovY(Math::degToRad(Math::fromInt(75)),ratio,mCamera->getNearDist(),mCamera->getFarDist()*2);
 		}
 		else{
 			scalar ratio=Math::div(Math::fromInt(height),Math::fromInt(width));
 			mCamera->setProjectionFovX(Math::degToRad(Math::fromInt(75)),ratio,mCamera->getNearDist(),mCamera->getFarDist());
+			mReflectCamera->setProjectionFovX(Math::degToRad(Math::fromInt(75)),ratio,mCamera->getNearDist(),mCamera->getFarDist()*2);
 		}
 		mCamera->setViewport(0,0,width,height);
 	}
@@ -193,92 +204,45 @@ void RandIsle::resized(int width,int height){
 }
 
 void RandIsle::render(){
-	RenderDevice *renderDevice=mApp->getRenderDevice();
-
-float a=0,b=0,c=1;
-float k=(0*a + 0*b + 0*c);
-Matrix4x4 reflectionMatrix;
-reflectionMatrix.set(
-   1-2*a*a , -2*a*b , -2*a*c, 0,
-   -2*a*b  , 1-2*b*b, -2*b*c, 0,
-   -2*a*c  , -2*b*c,  1-2*c*c, 0,
-   2*a*k   , 2*b*k  , 2*c*k  , 1);
-/*
-Vector3 position=mCamera->getWorldTranslate();
-Vector3 forward=mCamera->getForward();
-
-Math::mulPoint3Fast(position,reflectionMatrix);
-Math::mulPoint3Fast(forward,reflectionMatrix);
-
-Matrix4x4 m,m2;
-Math::setMatrix4x4FromLookDir(m,position,forward,Vector3(0,0,-1),true);
-
-Math::invert(m,mCamera->getViewMatrix());
-Math::postMul(m,reflectionMatrix);
-Math::invert(m2,m);m=m2;
-mReflectCamera->setMatrix4x4(m);
-
-mReflectCamera->frameUpdate(0,-1);
-
-mTerrain->setWaterMaterial(NULL);
-
-	RenderTarget *oldTarget=renderDevice->getRenderTarget();
-	renderDevice->setRenderTarget(Resources::instance->reflectTarget);
-	renderDevice->beginScene();
-mCamera->setViewport(Viewport(0,0,Resources::instance->reflectTarget->getWidth(),Resources::instance->reflectTarget->getHeight()));
-		mReflectCamera->render(renderDevice);
-	renderDevice->endScene();
-	renderDevice->swap();
-	renderDevice->setRenderTarget(oldTarget);
-
-Resources::instance->waterMaterial->retain();
-mTerrain->setWaterMaterial(Resources::instance->waterMaterial);
-*/
-
-//	Math::setMatrix4x4FromX(rotate,Math::PI);
-
-Matrix4x4 transform;
-mCamera->getWorldTransform().getMatrix(transform);
-
-Matrix4x4 m2;Math::transpose(m2,reflectionMatrix);reflectionMatrix=m2;
-
-Matrix4x4 m;
-Math::invert(m,transform);
-Math::postMul(m,reflectionMatrix);	
-Math::invert(transform,m);
-	
-mReflectCamera->setMatrix4x4(transform);
-	mReflectCamera->setProjectionMatrix(mCamera->getProjectionMatrix());
-//	mReflectCamera->setObliqueNearPlaneMatrix(mRefractCamera->getViewMatrix());
-//	renderDevice->setRenderTarget(Resources::instance->reflectTarget);
-	renderDevice->beginScene();
-		mReflectCamera->render(renderDevice);
-	renderDevice->endScene();
-	renderDevice->swap();
-
-
 	Matrix4x4 matrix;
-/*
-	mRefractCamera->setTransform(mCamera->getWorldTransform());
-	mRefractCamera->setProjectionMatrix(mCamera->getProjectionMatrix());
-	mRefractCamera->frameUpdate(0,-1);
+
+	Vector3 position=mCamera->getWorldTranslate();
+	Vector3 forward=mCamera->getForward();
+	Vector3 up=mCamera->getUp();
+
+	mRefractCamera->setProjectionMatrix(mReflectCamera->getProjectionMatrix());
+	mRefractCamera->setLookDir(position,forward,up);
+	mRefractCamera->updateAllWorldTransforms();
+	matrix.reset();
 	Math::setMatrix4x4FromTranslate(matrix,0,0,1);
 	Math::preMul(matrix,mRefractCamera->getViewMatrix());
 	mRefractCamera->setObliqueNearPlaneMatrix(matrix);
-	renderDevice->setRenderTarget(Resources::instance->refractTarget);
-	renderDevice->beginScene();
-		mRefractCamera->render(renderDevice);
-	renderDevice->endScene();
-	renderDevice->swap();
-*/
-/*
-	renderDevice->setRenderTarget(renderDevice->getPrimaryRenderTarget());
-	renderDevice->beginScene();
-		mCamera->render(renderDevice);
-		mHUD->render(renderDevice);
-	renderDevice->endScene();
-	renderDevice->swap();
-*/
+
+	position.z*=-1;
+	forward.z*=-1;
+	up.z*=-1;
+
+	mReflectCamera->setLookDir(position,forward,up);
+	mReflectCamera->updateAllWorldTransforms();
+	matrix.reset();
+	Math::setMatrix4x4FromX(matrix,Math::PI);
+	Math::setMatrix4x4FromTranslate(matrix,0,0,-1);
+	Math::preMul(matrix,mReflectCamera->getViewMatrix());
+	mReflectCamera->setObliqueNearPlaneMatrix(matrix);
+
+	RenderDevice *device=mApp->getRenderDevice();
+	device->beginScene();
+	{
+		mRefractCamera->render(device);
+
+		mReflectCamera->render(device);
+
+		mCamera->render(device);
+
+		mHUD->render(device);
+	}
+	device->endScene();
+	device->swap();
 }
 
 void RandIsle::update(int dt){
@@ -407,20 +371,6 @@ void RandIsle::frameUpdate(int dt){
 
 	mScene->frameUpdate(dt);
 
-	// Water hacks
-	Vector3 position=mFollowNode->getTranslate();
-	if(position.z>0){
-		if(position.z<1) position.z=1;
-		mCamera->setClearColor(Resources::instance->fadeColor);
-		mCamera->getDefaultState()->setFogState(FogState());//FogState::FogType_LINEAR,Math::ONE,mCamera->getFarDist()/2,mCamera->getFarDist(),mCamera->getClearColor()));
-	}
-	else{
-		if(position.z>-1) position.z=-1;
-		mCamera->setClearColor(Colors::AZURE);
-		mCamera->getDefaultState()->setFogState(FogState(FogState::FogType_LINEAR,Math::ONE,0,512,mCamera->getClearColor()));
-	}
-	mFollowNode->setTranslate(position);
-	mFollowNode->frameUpdate(0,-1);
 /*
 	Material::ptr waterMaterial=Resources::instance->waterMaterial;
 	if(waterMaterial!=NULL){

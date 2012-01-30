@@ -98,10 +98,12 @@ bool GLXPBufferRenderTarget::activate(){
 	return true;
 }
 
-bool GLXPBufferRenderTarget::swap(){
+bool GLXPBufferRenderTarget::deactivate(){
 	glFlush();
 
 	bind();
+	
+	GLXRenderTarget::deactivate();
 	
 	return true;
 }
@@ -313,6 +315,8 @@ bool GLXPBufferRenderTarget::destroyBuffer(){
 void GLXPBufferRenderTarget::bind(){
 	glBindTexture(mTexture->getTarget(),mTexture->getHandle());
 	glCopyTexSubImage2D(mTexture->getTarget(),0,0,0,0,0,mWidth,mHeight);
+
+	mTexture->generateMipLevels();
 }
 
 void GLXPBufferRenderTarget::unbind(){
