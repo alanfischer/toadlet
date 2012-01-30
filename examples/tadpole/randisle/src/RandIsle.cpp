@@ -116,12 +116,12 @@ void RandIsle::create(){
 	mPlayer->addShape(Shape::ptr(new Shape(AABox(2))));
 	{
 		Segment segment;
-		segment.origin.set(50,0,1000);
+		segment.origin.set(10,0,1000);
 		segment.direction.set(0,0,-2000);
 		tadpole::Collision result;
 		mScene->traceSegment(result,segment,-1,mPlayer);
-		result.point.z-=mPlayer->getShape()->getAABox().mins.z*2 - 10;
-		mPlayer->setTranslate(result.point);
+		result.point.z+=mPlayer->getShape()->getSphere().radius;
+		mPlayer->setPosition(result.point);
 	}
 	mScene->getRoot()->attach(mPlayer);
 	mTerrain->setTarget(mPlayer);
@@ -214,7 +214,7 @@ void RandIsle::render(){
 	mRefractCamera->setLookDir(position,forward,up);
 	mRefractCamera->updateAllWorldTransforms();
 	matrix.reset();
-	Math::setMatrix4x4FromTranslate(matrix,0,0,1);
+	Math::setMatrix4x4FromTranslate(matrix,0,0,5);
 	Math::preMul(matrix,mRefractCamera->getViewMatrix());
 	mRefractCamera->setObliqueNearPlaneMatrix(matrix);
 
@@ -226,7 +226,7 @@ void RandIsle::render(){
 	mReflectCamera->updateAllWorldTransforms();
 	matrix.reset();
 	Math::setMatrix4x4FromX(matrix,Math::PI);
-	Math::setMatrix4x4FromTranslate(matrix,0,0,-1);
+	Math::setMatrix4x4FromTranslate(matrix,0,0,-5);
 	Math::preMul(matrix,mReflectCamera->getViewMatrix());
 	mReflectCamera->setObliqueNearPlaneMatrix(matrix);
 

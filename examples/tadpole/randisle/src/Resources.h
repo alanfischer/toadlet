@@ -56,6 +56,9 @@ public:
 			refractTexture->retain();
 			refractTarget=engine->getTextureManager()->createPixelBufferRenderTarget();
 			refractTarget->attach(refractTexture->getMipPixelBuffer(0,0),PixelBufferRenderTarget::Attachment_COLOR_0);
+
+			bumpTexture=engine->getTextureManager()->findTexture("water_bump.png");
+			bumpTexture->retain();
 		}
 
 		waterMaterial=engine->getMaterialManager()->createMaterial();
@@ -127,16 +130,19 @@ public:
 						"float fog: FOG;\n"
 						"float4 reflectPosition: TEXCOORD0;\n"
 						"float4 refractPosition: TEXCOORD1;\n"
+						"float2 bumpPosition: TEXCOORD2;\n"
+						"float refractFog: TEXCOORD3;\n"
 					"};\n"
 
 					"float4x4 modelViewProjectionMatrix;\n"
 					"float2 fogDistance;\n"
+					"float time;\n"
 
 					"VOUT main(VIN vin){\n"
 						"VOUT vout;\n"
 						"vout.position=mul(modelViewProjectionMatrix,vin.position);\n"
 
-						"vout.reflectPosition.x = -0.5 * (vout.position.w + vout.position.x);\n"
+						"vout.reflectPosition.x = 0.5 * (vout.position.w - vout.position.x);\n"
 						"vout.reflectPosition.y = 0.5 * (vout.position.w - vout.position.y);\n"
 						"vout.reflectPosition.z = vout.position.w;\n"
 						"vout.reflectPosition.w=1.0;\n"
@@ -146,7 +152,15 @@ public:
 						"vout.refractPosition.z = vout.position.w;\n"
 						"vout.refractPosition.w=1.0;\n"
 
+						"float2 moveVector=float2(0,1);"
+						"float waveLength=1.0;\n"
+						"float windForce=0.1;\n"
+						"vout.bumpPosition=vin.texCoord/waveLength + time*windForce*moveVector;\n"
+
 						"vout.fog=clamp(1.0-(vout.position.z-fogDistance.x)/(fogDistance.y-fogDistance.x),0.0,1.0);\n"
+						// We calcaulate a separate refractFog, since the refractTex shows artifacts closer than the far plane
+						//  due to not being able to use fog in an oblique frustum
+						"vout.refractFog=clamp(1.0-(vout.position.z-fogDistance.x/4)/(fogDistance.y/4-fogDistance.x/4),0.0,1.0);\n"
 
 						"return vout;\n"
 					"}"
@@ -173,21 +187,29 @@ public:
 						"float fog: FOG;\n"
 						"float4 reflectPosition: TEXCOORD0;\n"
 						"float4 refractPosition: TEXCOORD1;\n"
+						"float2 bumpPosition: TEXCOORD2;\n"
+						"float refractFog: TEXCOORD3;\n"
 					"};\n"
 
 					"float4 fogColor;\n"
 					"Texture2D reflectTex;\n"
 					"Texture2D refractTex;\n"
+					"Texture2D bumpTex;\n"
 					"SamplerState reflectSamp;\n"
 					"SamplerState refractSamp;\n"
+					"SamplerState bumpSamp;\n"
 
 					"float4 main(PIN pin): SV_TARGET{\n"
-						"float4 reflectColor = reflectTex.Sample(reflectSamp,(pin.reflectPosition.xy / pin.reflectPosition.z));\n"
-						"float4 refractColor = refractTex.Sample(refractSamp,(pin.refractPosition.xy / pin.refractPosition.z));\n"
+						"float4 bumpColor = bumpTex.Sample(bumpSamp,pin.bumpPosition);\n"
+						"float waveHeight=.25;\n"
+						"float2 perturbation = waveHeight*(bumpColor.rg - 0.5f);\n"
+
+						"float4 reflectColor = reflectTex.Sample(reflectSamp,(pin.reflectPosition.xy / pin.reflectPosition.z) + perturbation);\n"
+						"float4 refractColor = refractTex.Sample(refractSamp,(pin.refractPosition.xy / pin.refractPosition.z) + perturbation);\n"
+						"refractColor=lerp(reflectColor,refractColor,pin.refractFog);\n"
 						"float4 fragColor=(reflectColor+refractColor)*0.5f;\n"
 						"fragColor.w=1.0f;\n"
-						"float fog=clamp(pin.fog-0.5f,0,1);\n"
-						"return lerp(fogColor,fragColor,fog);\n"
+						"return lerp(fogColor,fragColor,pin.fog);\n"
 					"}"
 				};
 
@@ -200,9 +222,11 @@ public:
 				variables->addVariable("modelViewProjectionMatrix",RenderVariable::ptr(new MVPMatrixVariable()),Material::Scope_RENDERABLE);
 				variables->addVariable("fogDistance",RenderVariable::ptr(new FogDistanceVariable()),Material::Scope_MATERIAL);
 				variables->addVariable("fogColor",RenderVariable::ptr(new FogColorVariable()),Material::Scope_MATERIAL);
+				variables->addVariable("time",RenderVariable::ptr(new TimeVariable()),Material::Scope_MATERIAL);
 
-				variables->addTexture("reflectTex",reflectTexture,"reflectSamp",SamplerState(),TextureState());
-				variables->addTexture("refractTex",refractTexture,"refractSamp",SamplerState(),TextureState());
+				variables->addTexture("reflectTex",reflectTexture,"reflectSamp",SamplerState(SamplerState::FilterType_LINEAR,SamplerState::FilterType_LINEAR,SamplerState::FilterType_LINEAR,SamplerState::AddressType_CLAMP_TO_EDGE,SamplerState::AddressType_CLAMP_TO_EDGE),TextureState());
+				variables->addTexture("refractTex",refractTexture,"refractSamp",SamplerState(SamplerState::FilterType_LINEAR,SamplerState::FilterType_LINEAR,SamplerState::FilterType_LINEAR,SamplerState::AddressType_CLAMP_TO_EDGE,SamplerState::AddressType_CLAMP_TO_EDGE),TextureState());
+				variables->addTexture("bumpTex",bumpTexture,"bumpSamp",SamplerState(),TextureState());
 			}
 
 			if(engine->hasFixed(Shader::ShaderType_VERTEX) && engine->hasFixed(Shader::ShaderType_FRAGMENT)){
@@ -361,7 +385,7 @@ public:
 	scalar tolerance;
 	Vector4 skyColor,fadeColor;
 	DiffuseTerrainMaterialSource::ptr terrainMaterialSource;
-	Texture::ptr reflectTexture,refractTexture;
+	Texture::ptr reflectTexture,refractTexture,bumpTexture;
 	PixelBufferRenderTarget::ptr reflectTarget,refractTarget;
 	Material::ptr waterMaterial;
 	Mesh::ptr creature;
