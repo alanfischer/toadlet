@@ -1270,8 +1270,8 @@ bool TerrainPatchNode::blockVisibleByWater(const Block *block,const Vector3 &cam
 	scalar waterLevel=0; /// @todo: Make this a class variable, and have it come from the TerrainNodeDataSource
 	bool waterOpaque=false; /// @todo: Make this a class variable, and have it come from the TerrainNodeDataSource
 	return (water==false && waterOpaque==false) || 
-		(cameraTranslate.z>waterLevel && ((water==false && block->maxs.z>waterLevel) || (water==true && block->mins.z<=waterLevel)) ||
-		(cameraTranslate.z<waterLevel && block->mins.z<=waterLevel));
+		(cameraTranslate.z>waterLevel && ((water==false && block->maxs.z>waterLevel) || (water==true && block->mins.z<=waterLevel))) ||
+		(cameraTranslate.z<waterLevel && block->mins.z<=waterLevel);
 }
 
 int TerrainPatchNode::gatherBlocks(IndexBuffer *indexBuffer,CameraNode *camera,bool water) const{

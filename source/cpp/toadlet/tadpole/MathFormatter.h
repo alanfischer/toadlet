@@ -39,19 +39,19 @@ public:
 	static String formatScalar(scalar s);
 	static scalar parseScalar(const char *string);
 
-	static String formatVector2(const Vector2 &v,char *separator=",");
+	static String formatVector2(const Vector2 &v,const char *separator=",");
 	static Vector2 &parseVector2(Vector2 &r,const char *string);
 
-	static String formatVector3(const Vector3 &v,char *separator=",");
+	static String formatVector3(const Vector3 &v,const char *separator=",");
 	static Vector3 &parseVector3(Vector3 &r,const char *string);
 
-	static String formatVector4(const Vector4 &v,char *separator=",");
+	static String formatVector4(const Vector4 &v,const char *separator=",");
 	static Vector4 &parseVector4(Vector4 &r,const char *string);
 
-	static String formatQuaternion(const Quaternion &q,char *separator=",");
+	static String formatQuaternion(const Quaternion &q,const char *separator=",");
 	static Quaternion &parseQuaternion(Quaternion &r,const char *string);
 
-	static String formatByteColor(const Vector4 &c,char *separator=",");
+	static String formatByteColor(const Vector4 &c,const char *separator=",");
 	static Vector4 &parseByteColor(Vector4 &r,const char *string);
 };
 
