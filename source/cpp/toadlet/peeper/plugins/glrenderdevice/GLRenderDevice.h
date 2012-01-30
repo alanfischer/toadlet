@@ -193,6 +193,7 @@ protected:
 	Collection<GLTexture*> mLastTextures;
 	Collection<SamplerState*> mLastSamplerStates;
 	Collection<TextureState*> mLastTextureStates;
+	Collection<Shader::ShaderType> mLastTextureType;
 	short mMaxTexCoordIndex;
 	Collection<short> mTexCoordIndexes;
 	short mLastMaxTexCoordIndex;

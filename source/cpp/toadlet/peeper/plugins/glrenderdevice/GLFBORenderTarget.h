@@ -56,9 +56,9 @@ public:
 	void resetCreate(){}
 	void resetDestroy(){}
 
-	bool swap();
 	bool activate();
 	bool deactivate();
+	bool swap(){return false;}
 	bool share(GLRenderTarget *target){return true;}
 	bool activateAdditionalContext(){return false;}
 	void deactivateAdditionalContext(){}

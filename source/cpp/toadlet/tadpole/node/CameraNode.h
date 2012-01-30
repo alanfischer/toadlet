@@ -28,6 +28,7 @@
 
 #include <toadlet/peeper/Viewport.h>
 #include <toadlet/peeper/RenderDevice.h>
+#include <toadlet/peeper/RenderTarget.h>
 #include <toadlet/tadpole/material/Material.h>
 #include <toadlet/tadpole/node/ParentNode.h>
 #include <toadlet/tadpole/node/MeshNode.h>
@@ -83,6 +84,9 @@ public:
 	virtual void setLookDir(const Vector3 &eye,const Vector3 &dir,const Vector3 &up);
 	virtual void setWorldLookDir(const Vector3 &eye,const Vector3 &dir,const Vector3 &up);
 
+	virtual void setRenderTarget(RenderTarget::ptr target);
+	virtual RenderTarget::ptr getRenderTarget(){return mRenderTarget;}
+
 	virtual void setViewport(const Viewport &viewport);
 	virtual void setViewport(int x,int y,int width,int height);
 	inline bool getViewportSet() const{return mViewportSet;}
@@ -114,6 +118,7 @@ public:
 	inline const Matrix4x4 &getViewProjectionMatrix() const{return mViewProjectionMatrix;}
 	inline const Vector3 &getForward() const{return mForward;}
 	inline const Vector3 &getRight() const{return mRight;}
+	inline const Vector3 &getUp() const{return mUp;}
 
 	const Matrix4x4 &calculateInverseProjectionMatrix(){Math::invert(mInverseProjectionMatrix,mProjectionMatrix);return mInverseProjectionMatrix;}
 	const Matrix4x4 &calculateInverseViewMatrix(){Math::invert(mInverseViewMatrix,mViewMatrix);return mInverseViewMatrix;}
@@ -148,6 +153,8 @@ protected:
 	scalar mLeftDist,mRightDist;
 	scalar mBottomDist,mTopDist;
 	scalar mNearDist,mFarDist;
+
+	RenderTarget::ptr mRenderTarget;
 	bool mViewportSet;
 	Viewport mViewport;
 	int mClearFlags;
@@ -166,7 +173,7 @@ protected:
 	Matrix4x4 mInverseProjectionMatrix;
 	Matrix4x4 mInverseViewMatrix;
 	Plane mClipPlanes[6];
-	Vector3 mForward,mRight;
+	Vector3 mForward,mRight,mUp;
 
 	Matrix4x4 mOverlayMatrix;
 	VertexData::ptr mOverlayVertexData;

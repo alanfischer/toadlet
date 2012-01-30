@@ -45,7 +45,7 @@ public:
 
 		Logger::alert("Loading water");
 		{
-			TextureFormat::ptr waterFormat(new TextureFormat(TextureFormat::Dimension_D2,TextureFormat::Format_RGB_8,2048,2048,1,0));
+			TextureFormat::ptr waterFormat(new TextureFormat(TextureFormat::Dimension_D2,TextureFormat::Format_RGB_8,1024,1024,1,0));
 
 			reflectTexture=engine->getTextureManager()->createTexture(Texture::Usage_BIT_RENDERTARGET|Texture::Usage_BIT_AUTOGEN_MIPMAPS,waterFormat);
 			reflectTexture->retain();
@@ -63,13 +63,13 @@ public:
 			Vector4 color=Colors::AZURE*1.5;
 			color.w=0.5f;
 
-			TextureFormat::ptr noiseFormat(new TextureFormat(TextureFormat::Dimension_D2,TextureFormat::Format_RGBA_8,128,128,1,0));
-			tbyte *noise1Data=createNoise(noiseFormat,16,5,0.5,0.5);
-			tbyte *noise2Data=createNoise(noiseFormat,16,12,0.5,0.5);
-			Texture::ptr noise1=engine->getTextureManager()->createTexture(noiseFormat,noise1Data);
-			Texture::ptr noise2=engine->getTextureManager()->createTexture(noiseFormat,noise2Data);
-			delete[] noise1Data;
-			delete[] noise2Data;
+//			TextureFormat::ptr noiseFormat(new TextureFormat(TextureFormat::Dimension_D2,TextureFormat::Format_RGBA_8,128,128,1,0));
+//			tbyte *noise1Data=createNoise(noiseFormat,16,5,0.5,0.5);
+//			tbyte *noise2Data=createNoise(noiseFormat,16,12,0.5,0.5);
+//			Texture::ptr noise1=engine->getTextureManager()->createTexture(noiseFormat,noise1Data);
+//			Texture::ptr noise2=engine->getTextureManager()->createTexture(noiseFormat,noise2Data);
+//			delete[] noise1Data;
+//			delete[] noise2Data;
 
 			if(engine->hasShader(Shader::ShaderType_VERTEX) && engine->hasShader(Shader::ShaderType_FRAGMENT)){
 				RenderPath::ptr shaderPath=waterMaterial->addPath();
@@ -116,7 +116,7 @@ public:
 					"}",
 
 
-
+                                                                                  
 					"struct VIN{\n"
 						"float4 position : POSITION;\n"
 						"float3 normal : NORMAL;\n"
@@ -124,51 +124,30 @@ public:
 					"};\n"
 					"struct VOUT{\n"
 						"float4 position : SV_POSITION;\n"
-						"float4 color : COLOR;\n"
 						"float fog: FOG;\n"
-//						"float2 texCoord0: TEXCOORD0;\n"
-//						"float2 texCoord1: TEXCOORD1;\n"
-"float4 reflectionPosition: TEXCOORD0;\n"
-"float4 refractionPosition: TEXCOORD1;\n"
-"float3 some: TEXCOORD2;\n"
+						"float4 reflectPosition: TEXCOORD0;\n"
+						"float4 refractPosition: TEXCOORD1;\n"
 					"};\n"
 
 					"float4x4 modelViewProjectionMatrix;\n"
-					"float4x4 normalMatrix;\n"
-"float4x4 reflectionViewMatrix;\n"
-"float4x4 modelMatrix;\n"
-"float4x4 viewMatrix;\n"
-"float4x4 worldMatrix;\n"
-"float4x4 projectionMatrix;\n"
-
-					"float4 materialDiffuseColor;\n"
-					"float4 materialAmbientColor;\n"
-					"float4 lightViewPosition;\n"
-					"float4 lightColor;\n"
-					"float4 ambientColor;\n"
-					"float4x4 textureMatrix0,textureMatrix1;\n"
 					"float2 fogDistance;\n"
 
 					"VOUT main(VIN vin){\n"
 						"VOUT vout;\n"
 						"vout.position=mul(modelViewProjectionMatrix,vin.position);\n"
-						"float3 viewNormal=normalize(mul(normalMatrix,float4(vin.normal,0.0)));\n"
-						"float lightIntensity=clamp(-dot(lightViewPosition,viewNormal),0,1);\n"
-						"float4 localLightColor=lightIntensity*lightColor;\n"
-						"vout.color=localLightColor*materialDiffuseColor + ambientColor*materialAmbientColor;\n"
-//						"vout.texCoord0=mul(textureMatrix0,float4(vin.texCoord,0.0,1.0));\n "
-//						"vout.texCoord1=mul(textureMatrix1,float4(vin.texCoord,0.0,1.0));\n "
-"float4x4 preViewProjection= mul (viewMatrix, projectionMatrix);\n"
-"float4x4 preWorldViewProjection= mul (worldMatrix, preViewProjection);\n"
-"float4x4 preReflectionViewProjection=mul (reflectionViewMatrix, projectionMatrix);\n"
-"float4x4 preWorldReflectionViewProjection= mul (worldMatrix, preReflectionViewProjection);\n"
-"vout.reflectionPosition = mul(vin.position, preWorldReflectionViewProjection);\n"
-"vout.refractionPosition = mul(vin.position, preWorldViewProjection);\n"
-//"vout.refractionPosition = vin.position;\n"
-"vout.some.x = 0.5 * (vout.position.w + vout.position.x);\n"
-"vout.some.y = 0.5 * (vout.position.w - vout.position.y);\n"
-"vout.some.z = vout.position.w;\n"
+
+						"vout.reflectPosition.x = -0.5 * (vout.position.w + vout.position.x);\n"
+						"vout.reflectPosition.y = 0.5 * (vout.position.w - vout.position.y);\n"
+						"vout.reflectPosition.z = vout.position.w;\n"
+						"vout.reflectPosition.w=1.0;\n"
+
+						"vout.refractPosition.x = 0.5 * (vout.position.w + vout.position.x);\n"
+						"vout.refractPosition.y = 0.5 * (vout.position.w - vout.position.y);\n"
+						"vout.refractPosition.z = vout.position.w;\n"
+						"vout.refractPosition.w=1.0;\n"
+
 						"vout.fog=clamp(1.0-(vout.position.z-fogDistance.x)/(fogDistance.y-fogDistance.x),0.0,1.0);\n"
+
 						"return vout;\n"
 					"}"
 				};
@@ -191,31 +170,24 @@ public:
 
 					"struct PIN{\n"
 						"float4 position: SV_POSITION;\n"
-						"float4 color: COLOR;\n"
 						"float fog: FOG;\n"
-//						"float2 texCoord0: TEXCOORD0;\n"
-//						"float2 texCoord1: TEXCOORD1;\n"
-"float4 reflectionPosition: TEXCOORD0;\n"
-"float4 refractionPosition: TEXCOORD1;\n"
-"float4 some: TEXCOORD2;\n"
+						"float4 reflectPosition: TEXCOORD0;\n"
+						"float4 refractPosition: TEXCOORD1;\n"
 					"};\n"
 
 					"float4 fogColor;\n"
-//					"Texture2D tex0,tex1;\n"
-//					"SamplerState samp0,samp1;\n"
-"Texture2D reflectionTex;\n"
-"SamplerState reflectionSamp;\n"
+					"Texture2D reflectTex;\n"
+					"Texture2D refractTex;\n"
+					"SamplerState reflectSamp;\n"
+					"SamplerState refractSamp;\n"
 
 					"float4 main(PIN pin): SV_TARGET{\n"
-//						"float4 fragColor=pin.color*tex0.Sample(samp0,pin.texCoord0)*tex1.Sample(samp1,pin.texCoord1);\n"
-"float2 projectedTexCoord;\n"
-//"projectedTexCoord.x = pin.reflectionPosition.x/pin.refractionPosition.w/2.0f + 0.5f;\n"
-//"projectedTexCoord.y = pin.reflectionPosition.y/pin.refractionPosition.w/2.0f + 0.5f;\n"
-"projectedTexCoord=(pin.some.xy / pin.some.z);\n"
-
-"float4 fragColor = reflectionTex.Sample(reflectionSamp,projectedTexCoord);\n"
-"fragColor.w=1;\n"
-"return fragColor;//lerp(fogColor,fragColor,pin.fog);\n"
+						"float4 reflectColor = reflectTex.Sample(reflectSamp,(pin.reflectPosition.xy / pin.reflectPosition.z));\n"
+						"float4 refractColor = refractTex.Sample(refractSamp,(pin.refractPosition.xy / pin.refractPosition.z));\n"
+						"float4 fragColor=(reflectColor+refractColor)*0.5f;\n"
+						"fragColor.w=1.0f;\n"
+						"float fog=clamp(pin.fog-0.5f,0,1);\n"
+						"return lerp(fogColor,fragColor,fog);\n"
 					"}"
 				};
 
@@ -226,30 +198,11 @@ public:
 
 				RenderVariableSet::ptr variables=pass->makeVariables();
 				variables->addVariable("modelViewProjectionMatrix",RenderVariable::ptr(new MVPMatrixVariable()),Material::Scope_RENDERABLE);
-				variables->addVariable("normalMatrix",RenderVariable::ptr(new NormalMatrixVariable()),Material::Scope_RENDERABLE);
-				variables->addVariable("lightViewPosition",RenderVariable::ptr(new LightViewPositionVariable()),Material::Scope_MATERIAL);
-				variables->addVariable("lightColor",RenderVariable::ptr(new LightDiffuseVariable()),Material::Scope_MATERIAL);
-				variables->addVariable("ambientColor",RenderVariable::ptr(new AmbientVariable()),Material::Scope_RENDERABLE);
-				variables->addVariable("materialDiffuseColor",RenderVariable::ptr(new MaterialDiffuseVariable()),Material::Scope_MATERIAL);
-				variables->addVariable("materialAmbientColor",RenderVariable::ptr(new MaterialAmbientVariable()),Material::Scope_MATERIAL);
 				variables->addVariable("fogDistance",RenderVariable::ptr(new FogDistanceVariable()),Material::Scope_MATERIAL);
 				variables->addVariable("fogColor",RenderVariable::ptr(new FogColorVariable()),Material::Scope_MATERIAL);
-//				variables->addVariable("textureMatrix0",RenderVariable::ptr(new TextureMatrixVariable(variables,"tex0")),Material::Scope_MATERIAL);
-//				variables->addVariable("textureMatrix1",RenderVariable::ptr(new TextureMatrixVariable(variables,"tex1")),Material::Scope_MATERIAL);
-variables->addVariable("worldMatrix",RenderVariable::ptr(new ModelMatrixVariable()),Material::Scope_RENDERABLE);
-variables->addVariable("viewMatrix",RenderVariable::ptr(new ViewMatrixVariable()),Material::Scope_RENDERABLE);
-variables->addVariable("projectionMatrix",RenderVariable::ptr(new ProjectionMatrixVariable()),Material::Scope_RENDERABLE);
-variables->addVariable("reflectionViewMatrix",RenderVariable::ptr(new DataVariable(VariableBufferFormat::Format_TYPE_FLOAT_32|VariableBufferFormat::Format_COUNT_4X4,sizeof(Matrix4x4))),Material::Scope_RENDERABLE);
 
-//				TextureState textureState;
-//				textureState.calculation=TextureState::CalculationType_NORMAL;
-
-//				Math::setMatrix4x4FromScale(textureState.matrix,16,16,16);
-//				variables->addTexture("tex0",noise1,"samp0",SamplerState(),textureState);
-
-//				Math::setMatrix4x4FromScale(textureState.matrix,16,16,16);
-//				variables->addTexture("tex1",noise2,"samp1",SamplerState(),textureState);
-variables->addTexture("reflectionTex",refractTexture,"reflectionSamp",SamplerState(),TextureState());
+				variables->addTexture("reflectTex",reflectTexture,"reflectSamp",SamplerState(),TextureState());
+				variables->addTexture("refractTex",refractTexture,"refractSamp",SamplerState(),TextureState());
 			}
 
 			if(engine->hasFixed(Shader::ShaderType_VERTEX) && engine->hasFixed(Shader::ShaderType_FRAGMENT)){
@@ -267,8 +220,8 @@ variables->addTexture("reflectionTex",refractTexture,"reflectionSamp",SamplerSta
 				Math::setMatrix4x4FromScale(textureState.matrix,16,16,16);
 				pass->setTexture(Shader::ShaderType_FRAGMENT,0,reflectTexture,SamplerState(),textureState);
 
-				Math::setMatrix4x4FromScale(textureState.matrix,16,16,16);
-				pass->setTexture(Shader::ShaderType_FRAGMENT,0,reflectTexture,SamplerState(),textureState);
+//				Math::setMatrix4x4FromScale(textureState.matrix,16,16,16);
+//				pass->setTexture(Shader::ShaderType_FRAGMENT,0,reflectTexture,SamplerState(),textureState);
 			}
 
 			waterMaterial->setLayer(-1);

@@ -98,10 +98,12 @@ bool WGLPBufferRenderTarget::activate(){
 	return true;
 }
 
-bool WGLPBufferRenderTarget::swap(){
+bool WGLPBufferRenderTarget::deactivate(){
 	glFlush();
 
 	bind();
+
+	WGLRenderTarget::deactivate();
 
 	return true;
 }
@@ -312,6 +314,8 @@ void WGLPBufferRenderTarget::bind(){
 			wglBindTexImageARB(mPBuffer,WGL_FRONT_LEFT_ARB);
 			TOADLET_CHECK_WGLERROR("wglBindTexImageARB");
 		}
+
+		mTexture->generateMipLevels();
 	}
 }
 

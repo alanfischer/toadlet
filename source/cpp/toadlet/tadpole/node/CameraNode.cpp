@@ -54,7 +54,7 @@ CameraNode::CameraNode():super(),
 	mProjectionMirrorY(false),
 	//mFinalProjectionMatrix
 	//mViewMatrix,
-	//mForward,mRight,
+	//mForward,mRight,mUp,
 
 	//mOverlayMatrix,
 	//mOverlayVertexData,
@@ -317,6 +317,10 @@ void CameraNode::setWorldLookDir(const Vector3 &eye,const Vector3 &dir,const Vec
 	setRotate(rotate);
 }
 
+void CameraNode::setRenderTarget(RenderTarget::ptr target){
+	mRenderTarget=target;
+}
+
 void CameraNode::setViewport(const Viewport &viewport){
 	mViewportSet=true;
 	mViewport.set(viewport);
@@ -397,6 +401,7 @@ void CameraNode::updateWorldTransform(){
 
 	Math::mul(mForward,mWorldTransform.getRotate(),Math::NEG_Z_UNIT_VECTOR3);
 	Math::mul(mRight,mWorldTransform.getRotate(),Math::X_UNIT_VECTOR3);
+	Math::mul(mUp,mWorldTransform.getRotate(),Math::Y_UNIT_VECTOR3);
 
 	updateViewTransform();
 }

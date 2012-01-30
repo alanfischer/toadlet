@@ -54,8 +54,16 @@ void SceneRenderer::renderScene(RenderDevice *device,Node *node,CameraNode *came
 	mDevice=device;
 
 	mSceneParameters->setCamera(camera);
+
 	gatherRenderables(mRenderableSet,node,camera);
+
+	RenderTarget::ptr target=camera->getRenderTarget();
+	device->setRenderTarget(target!=NULL?target:device->getPrimaryRenderTarget());
+
+	setupViewport(camera,device);
+
 	renderRenderables(mRenderableSet,device,camera);
+
 	mSceneParameters->setCamera(NULL);
 
 	mLastPass=NULL;
@@ -112,8 +120,6 @@ void SceneRenderer::renderRenderables(RenderableSet *set,RenderDevice *device,Ca
 	if(listener!=NULL){
 		listener->preRenderRenderables(set,device,camera);
 	}
-
-	setupViewport(camera,device);
 
 	int clearFlags=camera->getClearFlags();
 	if(clearFlags!=0 && !camera->getSkipFirstClear()){
@@ -270,7 +276,7 @@ void SceneRenderer::setupTextures(RenderPass *pass,int scope,RenderDevice *devic
 		for(i=0;i<pass->getNumTextures((Shader::ShaderType)j);++i){
 			device->setTexture((Shader::ShaderType)j,i,pass->getTexture((Shader::ShaderType)j,i));
 		}
-		if(mLastPass!=NULL){
+		if(mLastPass!=NULL){ /// @todo: Only do this if we're rendering a fixed function pass
 			for(;i<mLastPass->getNumTextures((Shader::ShaderType)j);++i){
 				device->setTexture((Shader::ShaderType)j,i,NULL);
 			}
