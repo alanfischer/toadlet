@@ -574,7 +574,7 @@ void StudioModelNode::updateVertexes(StudioModel *model,int bodypartsIndex,int m
 
 		int vertexCount=mdata->vertexStart;
 		short *tricmds=(short*)(model->data+smesh->triindex);
-		while(l=*(tricmds++)){
+		while((l=*(tricmds++))!=0){
 			if(l<0){
 				l=-l;
 			}

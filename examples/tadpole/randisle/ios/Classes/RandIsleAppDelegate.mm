@@ -23,6 +23,13 @@
 	[window makeKeyAndVisible];
 }
 
+- (void)applciationDidEnterBackground:(UIApplication *)application {
+	app->stop();
+}
+
+- (void)applciationDidEnterForeground:(UIApplication *)application {
+	app->start();
+}
 
 - (void)dealloc {
 	app->destroy();
