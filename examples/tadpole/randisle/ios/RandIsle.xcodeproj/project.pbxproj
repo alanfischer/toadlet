@@ -44,6 +44,7 @@
 		8CCB5E9814D2371E001D1018 /* frog.tmsh in Resources */ = {isa = PBXBuildFile; fileRef = 8CCB5E9514D2371E001D1018 /* frog.tmsh */; };
 		8CCB5E9914D2371E001D1018 /* rock.png in Resources */ = {isa = PBXBuildFile; fileRef = 8CCB5E9614D2371E001D1018 /* rock.png */; };
 		8CCB5E9A14D2371E001D1018 /* seafloor.png in Resources */ = {isa = PBXBuildFile; fileRef = 8CCB5E9714D2371E001D1018 /* seafloor.png */; };
+		8CE1607D14D351FC00D78CBD /* icon.png in Resources */ = {isa = PBXBuildFile; fileRef = 8CE1607C14D351FC00D78CBD /* icon.png */; };
 		8CF6BE19105A74230001E399 /* SystemConfiguration.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 8CF6BE18105A74230001E399 /* SystemConfiguration.framework */; };
 /* End PBXBuildFile section */
 
@@ -100,6 +101,7 @@
 		8CCB5E9514D2371E001D1018 /* frog.tmsh */ = {isa = PBXFileReference; lastKnownFileType = file; name = frog.tmsh; path = ../res/frog.tmsh; sourceTree = SOURCE_ROOT; };
 		8CCB5E9614D2371E001D1018 /* rock.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = rock.png; path = ../res/rock.png; sourceTree = SOURCE_ROOT; };
 		8CCB5E9714D2371E001D1018 /* seafloor.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = seafloor.png; path = ../res/seafloor.png; sourceTree = SOURCE_ROOT; };
+		8CE1607C14D351FC00D78CBD /* icon.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = icon.png; sourceTree = "<group>"; };
 		8CF6BE18105A74230001E399 /* SystemConfiguration.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = SystemConfiguration.framework; path = System/Library/Frameworks/SystemConfiguration.framework; sourceTree = SDKROOT; };
 		8D1107310486CEB800E47090 /* RandIsle-Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = "RandIsle-Info.plist"; plistStructureDefinitionIdentifier = "com.apple.xcode.plist.structure-definition.iphone.info-plist"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
@@ -183,6 +185,7 @@
 		29B97317FDCFA39411CA2CEA /* Resources */ = {
 			isa = PBXGroup;
 			children = (
+				8CE1607C14D351FC00D78CBD /* icon.png */,
 				8CCB5E9514D2371E001D1018 /* frog.tmsh */,
 				8CCB5E9614D2371E001D1018 /* rock.png */,
 				8CCB5E9714D2371E001D1018 /* seafloor.png */,
@@ -294,6 +297,7 @@
 				8CCB5E9814D2371E001D1018 /* frog.tmsh in Resources */,
 				8CCB5E9914D2371E001D1018 /* rock.png in Resources */,
 				8CCB5E9A14D2371E001D1018 /* seafloor.png in Resources */,
+				8CE1607D14D351FC00D78CBD /* icon.png in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -330,7 +334,7 @@
 				GCC_OPTIMIZATION_LEVEL = 0;
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = RandIsle_Prefix.pch;
-				ICON_FILE = shovestuff.png;
+				ICON_FILE = icon.png;
 				INFOPLIST_FILE = "RandIsle-Info.plist";
 				LIBRARY_SEARCH_PATHS = "$(inherited)";
 				PRODUCT_NAME = RandIsle;
@@ -348,7 +352,7 @@
 				COPY_PHASE_STRIP = YES;
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = RandIsle_Prefix.pch;
-				ICON_FILE = shovestuff.png;
+				ICON_FILE = icon.png;
 				INFOPLIST_FILE = "RandIsle-Info.plist";
 				LIBRARY_SEARCH_PATHS = "$(inherited)";
 				PRODUCT_NAME = RandIsle;
@@ -392,7 +396,7 @@
 				COPY_PHASE_STRIP = YES;
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = RandIsle_Prefix.pch;
-				ICON_FILE = shovestuff.png;
+				ICON_FILE = icon.png;
 				INFOPLIST_FILE = "RandIsle-Info.plist";
 				LIBRARY_SEARCH_PATHS = "$(inherited)";
 				PRODUCT_NAME = RandIsle;
