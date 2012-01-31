@@ -352,7 +352,7 @@ cPlugIn::exportMesh(msModel *pModel,const String &name){
 			char texture[1024];
 			msMaterial_GetDiffuseTexture(msmat,texture,1024);
 			if(strlen(texture)>0){
-				material->getPass()->setTextureName(texture);
+//				material->getPass()->setTextureName(texture);
 			}
 
 			MaterialState materialState;
@@ -362,7 +362,7 @@ cPlugIn::exportMesh(msModel *pModel,const String &name){
 				msMaterial_GetSpecular(msmat,materialState.specular.getData());
 				msMaterial_GetEmissive(msmat,materialState.emissive.getData());
 				materialState.shininess=msMaterial_GetShininess(msmat);
-				materialState.lighting=true;
+				materialState.light=true;
 			}
 			material->getPass()->setMaterialState(materialState);
 

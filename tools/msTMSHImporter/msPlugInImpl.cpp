@@ -266,7 +266,7 @@ cPlugIn::importMesh(msModel *pModel,const String &name,int flags){
 					msMaterial_SetTransparency(msmat,1.0);
 				}
 
-				String textureName=material->getPass()->getTextureName(0);
+				String textureName;//=material->getPass()->getTextureName(0);
 				msMaterial_SetDiffuseTexture(msmat,textureName);
 
 				//msMaterial_SetAlphaTexture(msmat,szAlphaTexture);
