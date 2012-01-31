@@ -86,6 +86,8 @@ public:
 
 	static Error *getInstance();
 	static void destroy();
+    
+    virtual ~Error(){}
 
 	// General
 	TOADLET_MAKE_ERROR_FUNCTION(unknown,Type_UNKNOWN)

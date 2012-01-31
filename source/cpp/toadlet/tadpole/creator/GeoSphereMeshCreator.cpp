@@ -128,7 +128,7 @@ Mesh::ptr GeoSphereMeshCreator::createGeoSphereMesh(VertexBuffer::ptr vertexBuff
 		 */
 		for(i=0;i<old.size();++i){
 			int newi=i*4;
-			IndexTri oldt=old[i],newt=next[newi];
+			IndexTri oldt=old[i];
 
 			vba.get3(oldt.index[0],0,pt0);
 			vba.get3(oldt.index[1],0,pt1);

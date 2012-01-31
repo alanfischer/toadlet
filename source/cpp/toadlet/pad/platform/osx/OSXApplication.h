@@ -46,7 +46,7 @@ public:
 	virtual void runEventLoop(){}
 	virtual void stepEventLoop(){}
 	virtual void stop();
-	virtual bool isRunning() const{return mRun;}
+	virtual bool isRunning() const{return true;}
 
 	virtual void activate();
 	virtual void deactivate();
@@ -90,7 +90,6 @@ protected:
 
 	Archive::ptr mBundleArchive;
 	
-	bool mRun;
 	bool mActive;
 	bool mDestroyed;
 	void *mWindow;
