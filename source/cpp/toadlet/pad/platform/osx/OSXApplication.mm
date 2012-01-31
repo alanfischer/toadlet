@@ -111,9 +111,6 @@ rect{
 		mLastTime=System::mtime();
 
 		mApplication=application;
-
-		mTimer=[NSTimer scheduledTimerWithTimeInterval:0 target:self selector:@selector(update) userInfo:nil repeats:YES];
-		[[NSRunLoop currentRunLoop] addTimer:mTimer forMode:NSDefaultRunLoopMode];
 	}
 		
 	return self;
@@ -134,6 +131,20 @@ rect{
 #endif
 
 	[super dealloc];
+}
+
+- (void) start{
+	if(mTimer==nil){
+		mTimer=[NSTimer scheduledTimerWithTimeInterval:0 target:self selector:@selector(update) userInfo:nil repeats:YES];
+		[[NSRunLoop currentRunLoop] addTimer:mTimer forMode:NSDefaultRunLoopMode];
+	}
+}
+
+- (void) stop{
+	if(mTimer!=nil){
+		[mTimer invalidate];
+		mTimer=nil;
+	}
 }
 
 - (void) update{
@@ -274,7 +285,6 @@ OSXApplication::OSXApplication():
 	mDifferenceMouse(false),
 	mLastMouseX(0),mLastMouseY(0),
 
-	mRun(false),
 	mActive(false),
 	mDestroyed(false),
 	mWindow(nil),
@@ -394,8 +404,9 @@ void OSXApplication::destroy(){
 }
 	
 void OSXApplication::start(){
-	mRun=true;
 	resized([(ApplicationView*)mView bounds].size.width,[(ApplicationView*)mView bounds].size.height);
+
+	[(ApplicationView*)mView start];
 
 	if(mPool!=nil){
 		#if !defined(TOADLET_HAS_UIKIT)
@@ -409,7 +420,7 @@ void OSXApplication::start(){
 }
 
 void OSXApplication::stop(){
-	mRun=false;
+	[(ApplicationView*)mView stop];
 
 	#if !defined(TOADLET_HAS_UIKIT)
 		[[NSApplication sharedApplication] terminate:nil];

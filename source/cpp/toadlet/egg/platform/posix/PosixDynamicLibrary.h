@@ -47,7 +47,7 @@ public:
 	PosixDynamicLibrary();
 	~PosixDynamicLibrary();
 
-	bool load(const String &name,const String &directory=NULL,const String &prefix=TOADLET_EGG_DYNAMICLIBRARY_PREFIX,const String &extension=TOADLET_EGG_DYNAMICLIBRARY_EXTENSION);
+	bool load(const String &name,const String &directory=(char*)NULL,const String &prefix=TOADLET_EGG_DYNAMICLIBRARY_PREFIX,const String &extension=TOADLET_EGG_DYNAMICLIBRARY_EXTENSION);
 	void *getSymbol(const String &name);
 
 protected:

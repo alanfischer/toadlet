@@ -168,10 +168,10 @@
 
 #if defined(TOADLET_EXCEPTIONS)
 	#define TOADLET_TRY try{
-	#define TOADLET_CATCH(exception) 0;}catch(exception)
+	#define TOADLET_CATCH(exception) }catch(exception)
 #else
-	#define TOADLET_TRY
-	#define TOADLET_CATCH(exception) if(0)
+	#define TOADLET_TRY {
+	#define TOADLET_CATCH(exception) }if(0)
 #endif
 
 #if defined(TOADLET_FIXED_POINT)

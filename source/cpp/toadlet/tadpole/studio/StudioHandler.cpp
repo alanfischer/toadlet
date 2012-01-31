@@ -82,7 +82,7 @@ void StudioHandler::buildBuffers(StudioModel *model){
 			for(k=0;k<smodel->nummesh;++k){
 				studiomesh *smesh=model->mesh(smodel,k);
 				short *tricmds=(short*)(model->data+smesh->triindex);
-				while(l=*(tricmds++)){
+				while((l=*(tricmds++))!=0){
 					if(l<0){
 						l=-l;
 					}
@@ -114,7 +114,7 @@ void StudioHandler::buildBuffers(StudioModel *model){
 				model->meshdatas[meshCount].vertexStart=vertexCount;
 
 				short *tricmds=(short*)(model->data+smesh->triindex);
-				while(l=*(tricmds++)){
+				while((l=*(tricmds++))!=0){
 					IndexData::ptr indexData;
 					/// @todo: Pack all these indexes into 1 IndexBuffer to speed up rendering
 					if(l>0){

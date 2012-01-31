@@ -53,7 +53,7 @@ scalar MathFormatter::parseScalar(const char *string){
 	#endif
 }
 
-String MathFormatter::formatVector2(const Vector2 &v,char *separator){
+String MathFormatter::formatVector2(const Vector2 &v,const char *separator){
 	#if defined(TOADLET_FIXED_POINT)
 		return String()+Math::toFloat(v.x)+separator+Math::toFloat(v.y);
 	#else
@@ -73,7 +73,7 @@ Vector2 &MathFormatter::parseVector2(Vector2 &r,const char *string){
 	return r;
 }
 
-String MathFormatter::formatVector3(const Vector3 &v,char *separator){
+String MathFormatter::formatVector3(const Vector3 &v,const char *separator){
 	#if defined(TOADLET_FIXED_POINT)
 		return String()+Math::toFloat(v.x)+separator+Math::toFloat(v.y)+separator+Math::toFloat(v.z);
 	#else
@@ -93,7 +93,7 @@ Vector3 &MathFormatter::parseVector3(Vector3 &r,const char *string){
 	return r;
 }
 
-String MathFormatter::formatVector4(const Vector4 &v,char *separator){
+String MathFormatter::formatVector4(const Vector4 &v,const char *separator){
 	#if defined(TOADLET_FIXED_POINT)
 		return String()+Math::toFloat(v.x)+separator+Math::toFloat(v.y)+separator+Math::toFloat(v.z)+separator+Math::toFloat(v.w);
 	#else
@@ -113,7 +113,7 @@ Vector4 &MathFormatter::parseVector4(Vector4 &r,const char *string){
 	return r;
 }
 
-String MathFormatter::formatQuaternion(const Quaternion &q,char *separator){
+String MathFormatter::formatQuaternion(const Quaternion &q,const char *separator){
 	#if defined(TOADLET_FIXED_POINT)
 		return String()+Math::toFloat(q.x)+separator+Math::toFloat(q.y)+separator+Math::toFloat(q.z)+separator+Math::toFloat(q.w);
 	#else
@@ -133,7 +133,7 @@ Quaternion &MathFormatter::parseQuaternion(Quaternion &r,const char *string){
 	return r;
 }
 
-String MathFormatter::formatByteColor(const Vector4 &c,char *separator){
+String MathFormatter::formatByteColor(const Vector4 &c,const char *separator){
 	int r=Math::toInt(c.x*255),g=Math::toInt(c.y*255),b=Math::toInt(c.z*255),a=Math::toInt(c.w*255);
 	return String()+r+separator+g+separator+b+separator+a;
 }
