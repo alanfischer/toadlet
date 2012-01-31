@@ -39,7 +39,7 @@ void RandIsle::create(){
 	mScene=HopScene::ptr(new HopScene(mEngine));
 	mScene->setUpdateListener(this);
 	mScene->setRangeLogicDT(30,30);
-	mScene->setExcessiveDT(100);
+	mScene->setExcessiveDT(600);
 	mScene->setGravity(Vector3(0,0,-50));
 	mScene->setEpsilon(0.03125);
 	mScene->getSimulator()->setMicroCollisionThreshold(100);
