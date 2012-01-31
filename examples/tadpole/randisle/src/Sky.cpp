@@ -142,7 +142,7 @@ Node *Sky::create(Scene *scene,int cloudSize,const Vector4 &skyColor,const Vecto
 			RenderVariableSet::ptr variables=pass->makeVariables();
 			variables->addVariable("modelViewProjectionMatrix",RenderVariable::ptr(new MVPMatrixVariable()),Material::Scope_RENDERABLE);
 			variables->addVariable("textureMatrix",RenderVariable::ptr(new TextureMatrixVariable(Shader::ShaderType_VERTEX,0)),Material::Scope_MATERIAL);
-			variables->addVariable("skyColor",RenderVariable::ptr(new ConstantVariable(skyColor)),Material::Scope_MATERIAL);
+			variables->addVariable("skyColor",RenderVariable::ptr(new Vector4Variable(skyColor)),Material::Scope_MATERIAL);
 
 			variables->addTexture("bumpTex",bumpTexture,"bumpSamp",SamplerState(),TextureState());
 			variables->addTexture("cloudTex",cloudTexture,"cloudSamp",SamplerState(),TextureState());
@@ -252,6 +252,7 @@ Node *Sky::create(Scene *scene,int cloudSize,const Vector4 &skyColor,const Vecto
 	mLight=mEngine->createNodeType(LightNode::type(),mScene);
 	LightState lightState;
 	lightState.diffuseColor.set(Colors::WHITE);
+	lightState.specularColor.set(Colors::WHITE);
 	mLight->setLightState(lightState);
 	attach(mLight);
 
