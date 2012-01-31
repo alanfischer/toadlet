@@ -21,15 +21,15 @@ public:
 		skyColor=Colors::AZURE;
 		fadeColor=Vector4(0xB5C1C3FF);
 
-		#if defined(TOADLET_PLATFORM_ANDROID) || defined(TOADLET_PLATFORM_IOS)
+//		#if defined(TOADLET_PLATFORM_ANDROID) || defined(TOADLET_PLATFORM_IOS)
 			cloudSize=128;
 			patchSize=32;
 			tolerance=0.00005;
-		#else
-			cloudSize=256;
-			patchSize=128;
-			tolerance=0.000001;
-		#endif
+//		#else
+//			cloudSize=256;
+//			patchSize=128;
+//			tolerance=0.000001;
+//		#endif
 
 		Logger::alert("Loading terrain");
 
@@ -45,7 +45,7 @@ public:
 
 		Logger::alert("Loading water");
 		{
-			TextureFormat::ptr waterFormat(new TextureFormat(TextureFormat::Dimension_D2,TextureFormat::Format_RGB_8,1024,1024,1,0));
+			TextureFormat::ptr waterFormat(new TextureFormat(TextureFormat::Dimension_D2,TextureFormat::Format_RGB_8,512,512,1,0));
 
 			reflectTexture=engine->getTextureManager()->createTexture(Texture::Usage_BIT_RENDERTARGET|Texture::Usage_BIT_AUTOGEN_MIPMAPS,waterFormat);
 			reflectTexture->retain();
@@ -126,7 +126,7 @@ public:
 						"fog=clamp(1.0-(gl_Position.z-fogDistance.x)/(fogDistance.y-fogDistance.x),0.0,1.0);\n"
 						// We calcaulate a separate refractFog, stored in positionFull.w, since the refractTex shows artifacts closer than the far plane
 						//  due to not being able to use fog in an oblique frustum
-						"positionFull.w=clamp(1.0-(gl_Position.z-fogDistance.x/4)/(fogDistance.y/4-fogDistance.x/4),0.0,1.0);\n"
+						"positionFull.w=clamp(1.0-(gl_Position.z-fogDistance.x/4.0)/(fogDistance.y/4.0-fogDistance.x/4.0),0.0,1.0);\n"
 					"}",
 
 
@@ -172,7 +172,7 @@ public:
 						"vout.fog=clamp(1.0-(vout.position.z-fogDistance.x)/(fogDistance.y-fogDistance.x),0.0,1.0);\n"
 						// We calcaulate a separate refractFog, stored in positionFull.w, since the refractTex shows artifacts closer than the far plane
 						//  due to not being able to use fog in an oblique frustum
-						"vout.positionFull.w=clamp(1.0-(vout.position.z-fogDistance.x/4)/(fogDistance.y/4-fogDistance.x/4),0.0,1.0);\n"
+						"vout.positionFull.w=clamp(1.0-(vout.position.z-fogDistance.x/4.0)/(fogDistance.y/4.0-fogDistance.x/4.0),0.0,1.0);\n"
 
 						"return vout;\n"
 					"}"
