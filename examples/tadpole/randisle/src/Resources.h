@@ -209,8 +209,8 @@ public:
 						"float fresnelTerm = 0.02+0.67*pow((1.0-dot(eyeVector, bumpVector)),5.0);\n"
 						"fresnelTerm=clamp(fresnelTerm,0.0,1.0);\n"
 
-						"vec4 reflectColor = texture2D(reflectTex,(reflectMatrix * vec4((reflectPosition.xy / reflectPosition.z) + perturbation,0,0)).xy);\n"
-						"vec4 refractColor = texture2D(refractTex,(refractMatrix * vec4((refractPosition.xy / refractPosition.z) + perturbation,0,0)).xy);\n"
+						"vec4 reflectColor = texture2D(reflectTex,mod((reflectMatrix * vec4((reflectPosition.xy / reflectPosition.z) + perturbation,0,0)).xy,1.0));\n"
+						"vec4 refractColor = texture2D(refractTex,mod((refractMatrix * vec4((refractPosition.xy / refractPosition.z) + perturbation,0,0)).xy,1.0));\n"
 						"refractColor=mix(reflectColor,refractColor,positionFull.w);\n"
 
 						"vec4 fragColor=mix(reflectColor,refractColor,fresnelTerm);\n"
@@ -302,8 +302,8 @@ public:
 				variables->addVariable("materialSpecular",RenderVariable::ptr(new MaterialSpecularVariable()),Material::Scope_RENDERABLE);
 				variables->addVariable("materialShininess",RenderVariable::ptr(new MaterialShininessVariable()),Material::Scope_RENDERABLE);
 
-				variables->addTexture("reflectTex",reflectTexture,"reflectSamp",SamplerState(),TextureState());//SamplerState::FilterType_LINEAR,SamplerState::FilterType_LINEAR,SamplerState::FilterType_LINEAR,SamplerState::AddressType_CLAMP_TO_EDGE,SamplerState::AddressType_CLAMP_TO_EDGE),TextureState());
-				variables->addTexture("refractTex",refractTexture,"refractSamp",SamplerState(),TextureState());//\dsSamplerState::FilterType_LINEAR,SamplerState::FilterType_LINEAR,SamplerState::FilterType_LINEAR,SamplerState::AddressType_CLAMP_TO_EDGE,SamplerState::AddressType_CLAMP_TO_EDGE),TextureState());
+				variables->addTexture("reflectTex",reflectTexture,"reflectSamp",SamplerState(SamplerState::FilterType_LINEAR,SamplerState::FilterType_LINEAR,SamplerState::FilterType_LINEAR,SamplerState::AddressType_CLAMP_TO_EDGE,SamplerState::AddressType_CLAMP_TO_EDGE),TextureState());
+				variables->addTexture("refractTex",refractTexture,"refractSamp",SamplerState(SamplerState::FilterType_LINEAR,SamplerState::FilterType_LINEAR,SamplerState::FilterType_LINEAR,SamplerState::AddressType_CLAMP_TO_EDGE,SamplerState::AddressType_CLAMP_TO_EDGE),TextureState());
 				variables->addTexture("bumpTex",bumpTexture,"bumpSamp",SamplerState(),TextureState());
 				variables->addVariable("reflectMatrix",RenderVariable::ptr(new TextureMatrixVariable(variables,"reflectTex")),Material::Scope_MATERIAL);
 				variables->addVariable("refractMatrix",RenderVariable::ptr(new TextureMatrixVariable(variables,"refractTex")),Material::Scope_MATERIAL);
