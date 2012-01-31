@@ -161,6 +161,30 @@ protected:
 	Matrix4x4 mModelMatrix,mModelViewMatrix,mInverseMatrix,mNormalMatrix;
 };
 
+class CameraPositionVariable:public RenderVariable{
+public:
+	int getFormat(){return VariableBufferFormat::Format_TYPE_FLOAT_32|VariableBufferFormat::Format_COUNT_4;}
+
+	void update(tbyte *data,SceneParameters *parameters){
+		Vector4 &cameraPosition=*(Vector4*)data;
+		cameraPosition=Vector4(parameters->getCamera()->getWorldTranslate(),0);
+	}
+};
+
+class LightPositionVariable:public RenderVariable{
+public:
+	int getFormat(){return VariableBufferFormat::Format_TYPE_FLOAT_32|VariableBufferFormat::Format_COUNT_4;}
+
+	void update(tbyte *data,SceneParameters *parameters){
+		// This Vector4 isn't aligned, so we don't multiply directly into it.
+		Vector4 &finalLightPosition=*(Vector4*)data;
+		if(parameters->getRenderable()!=NULL){
+			Vector4 lightPosition(parameters->getLightState().direction,0);
+			finalLightPosition=lightPosition;
+		}
+	}
+};
+
 class LightViewPositionVariable:public RenderVariable{
 public:
 	int getFormat(){return VariableBufferFormat::Format_TYPE_FLOAT_32|VariableBufferFormat::Format_COUNT_4;}
@@ -182,6 +206,15 @@ public:
 
 	void update(tbyte *data,SceneParameters *parameters){
 		memcpy(data,parameters->getLightState().diffuseColor.getData(),sizeof(Vector4));
+	}
+};
+
+class LightSpecularVariable:public RenderVariable{
+public:
+	int getFormat(){return VariableBufferFormat::Format_TYPE_FLOAT_32|VariableBufferFormat::Format_COUNT_4;}
+
+	void update(tbyte *data,SceneParameters *parameters){
+		memcpy(data,parameters->getLightState().specularColor.getData(),sizeof(Vector4));
 	}
 };
 
@@ -210,6 +243,25 @@ public:
 	
 	void update(tbyte *data,SceneParameters *parameters){
 		memcpy(data,parameters->getMaterialState().diffuse.getData(),sizeof(Vector4));
+	}
+};
+
+class MaterialSpecularVariable:public RenderVariable{
+public:
+	int getFormat(){return VariableBufferFormat::Format_TYPE_FLOAT_32|VariableBufferFormat::Format_COUNT_4;}
+	
+	void update(tbyte *data,SceneParameters *parameters){
+		memcpy(data,parameters->getMaterialState().specular.getData(),sizeof(Vector4));
+	}
+};
+
+class MaterialShininessVariable:public RenderVariable{
+public:
+	int getFormat(){return VariableBufferFormat::Format_TYPE_FLOAT_32|VariableBufferFormat::Format_COUNT_1;}
+	
+	void update(tbyte *data,SceneParameters *parameters){
+		float &s=*(float*)data;
+		s=parameters->getMaterialState().shininess;
 	}
 };
 
@@ -360,19 +412,34 @@ public:
 	}
 };
 
-class ConstantVariable:public RenderVariable{
+class ScalarVariable:public RenderVariable{
 public:
-	ConstantVariable(const Vector4 &constant){mConstant=constant;}
+	ScalarVariable(scalar s){mScalar=s;}
+
+	int getFormat(){return VariableBufferFormat::Format_TYPE_FLOAT_32|VariableBufferFormat::Format_COUNT_1;}
+
+	void update(tbyte *data,SceneParameters *parameters){
+		float &s=*(float*)data;
+		s=mScalar;
+	}
+
+protected:
+	scalar mScalar;
+};
+
+class Vector4Variable:public RenderVariable{
+public:
+	Vector4Variable(const Vector4 &vector){mVector=vector;}
 
 	int getFormat(){return VariableBufferFormat::Format_TYPE_FLOAT_32|VariableBufferFormat::Format_COUNT_4;}
 
 	void update(tbyte *data,SceneParameters *parameters){
-		Vector4 &constant=*(Vector4*)data;
-		constant=mConstant;
+		Vector4 &vector=*(Vector4*)data;
+		vector=mVector;
 	}
 
 protected:
-	Vector4 mConstant;
+	Vector4 mVector;
 };
 
 }
