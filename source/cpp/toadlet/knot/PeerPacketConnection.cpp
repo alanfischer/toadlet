@@ -594,7 +594,6 @@ void PeerPacketConnection::updatePacketInfo(PeerPacket *packet){
 int PeerPacketConnection::sendPacketsToSocket(const Collection<PeerPacket::ptr> &packets,int numPackets){
 	int i=0;
 	PeerPacket *packet=packets[0];
-	int amount=0;
 
 	mDataOutPacket->writeBInt32(packet->getFrame());
 	mDataOutPacket->writeBInt32(packet->getFrameBits());
@@ -616,7 +615,7 @@ int PeerPacketConnection::sendPacketsToSocket(const Collection<PeerPacket::ptr> 
 	if(mDebugDropNextPacket==false && (mDebugPacketDropAmount==0 || mDebugRandom.nextFloat(0,1)>mDebugPacketDropAmount)){
 		Logger::excess(Categories::TOADLET_KNOT,String("sending frames : ")+frameNames+" size:"+mOutPacket->length());
 
-		amount=mSocket->send(mOutPacket->getOriginalDataPointer(),mOutPacket->length());
+		mSocket->send(mOutPacket->getOriginalDataPointer(),mOutPacket->length());
 	}
 	else{
 		Logger::excess(Categories::TOADLET_KNOT,String("dropping frames: ")+frameNames);
@@ -630,7 +629,6 @@ int PeerPacketConnection::sendPacketsToSocket(const Collection<PeerPacket::ptr> 
 
 int PeerPacketConnection::receivePacketsFromSocket(const Collection<PeerPacket::ptr> &packets,int maxNumPackets){
 	int i;
-	bool result=false;
 	int numPackets=0;
 	int amount=0;
 	int time=System::mtime();
@@ -655,8 +653,6 @@ int PeerPacketConnection::receivePacketsFromSocket(const Collection<PeerPacket::
 					packet->setFrameBits(frameBits,frameBitsReferenceFrame);
 					packet->setTimeHandled(time);
 				}
-
-				result=true;
 			}
 			mInPacket->reset();
 		}

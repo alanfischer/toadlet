@@ -101,7 +101,7 @@ bool GLVertexFormat::addElement(int semantic,const String &name,int index,int fo
 
 	mGLDataTypes.add(GLRenderDevice::getGLDataType(format));
 	mGLElementCounts.add(GLRenderDevice::getGLElementCount(format));
-	mSemanticBits|=1<<semantic;
+	mSemanticBits|=(1<<semantic);
 
 	return true;
 }

@@ -1375,7 +1375,6 @@ void Simulator::traceConvexSolid(Collision &c,const Segment &segment,const Conve
 					}
 					
 					// Either way, this also means we can quit now - we've found everything
-					j=convexSolid.planes.size();
 					i=convexSolid.planes.size();
 				}
 			}

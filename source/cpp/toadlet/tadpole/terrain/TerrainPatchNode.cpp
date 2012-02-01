@@ -285,7 +285,7 @@ bool TerrainPatchNode::setHeightData(scalar *data,int rowPitch,int width,int hei
 	mBlockQueueStart=0;
 	mBlockQueueEnd=0;
 
-	mInitialStride=1<<(sizeN-1);
+	mInitialStride=(1<<(sizeN-1));
 	initBlocks(&mBlocks[0],0,0,0,mInitialStride,true);
 
 	addBlockToBack(0);

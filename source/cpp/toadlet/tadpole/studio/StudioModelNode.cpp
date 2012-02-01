@@ -280,7 +280,7 @@ void StudioModelNode::setController(int controller,scalar v){
 		sbonecontroller=mModel->bonecontroller(i);
 		if(sbonecontroller->index==controller) break;
 	}
-	if(i==mModel->header->numbonecontrollers){
+	if(sbonecontroller==NULL){
 		return;
 	}
 

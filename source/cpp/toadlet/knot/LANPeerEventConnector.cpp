@@ -442,13 +442,12 @@ void LANPeerEventConnector::ipClientThread(int ip,int port){
 //  second instance change its server port.
 void LANPeerEventConnector::findLANGameThread(){
 	Socket::ptr broadcastSocket(Socket::createUDPSocket());
-	int amount=0;
 
 	broadcastSocket->bind(0);
 	broadcastSocket->setBroadcast(true);
 
 	String message=mUUID+":"+mServerPort;
-	amount+=broadcastSocket->sendTo((tbyte*)message.c_str(),message.length(),mBroadcastIP,mBroadcastPort);
+	broadcastSocket->sendTo((tbyte*)message.c_str(),message.length(),mBroadcastIP,mBroadcastPort);
 
 	broadcastSocket->close();
 
@@ -461,6 +460,7 @@ void LANPeerEventConnector::findLANGameThread(){
 	memset(receivedData,0,sizeof(receivedData));
 	uint32 ip=0;
 	int port=0;
+    int amount=0;
 	TOADLET_TRY
 		amount=mLANListenerSocket->receiveFrom((tbyte*)receivedData,sizeof(receivedData),ip,port);
 	TOADLET_CATCH(const Exception &){}
