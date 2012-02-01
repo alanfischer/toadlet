@@ -167,16 +167,14 @@ bool Font::updateVertexBufferForString(VertexBuffer::ptr vertexBuffer,const Stri
 		int i4=i*4;
 		Glyph *g=getGlyph(c);
 		if(g!=NULL){
-			scalar goffsety=0,gheight=0,gadvancey=0;
+			scalar goffsety=0,gheight=0;
 			if(flip==false){
 				goffsety=g->offsety;
 				gheight=g->height;
-				gadvancey=g->advancey;
 			}
 			else{
 				goffsety=-g->offsety;
 				gheight=-g->height;
-				gadvancey=-g->advancey;
 			}
 
 			if(pixelSpace){

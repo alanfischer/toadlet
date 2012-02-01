@@ -16,25 +16,25 @@ public:
 		mLastRotate.set(mRotate);
 
 		mMotionMutex.lock();
+			if(mMotionData.values.size()>0){
+				const Vector4 &accel=mMotionData.values[InputData::Semantic_MOTION_ACCELERATION];
+				Vector3 up;
+				// When the phone is vertical, we're at 0,1,0
+				// When the phone is horizontal, we're at 0,0,1
+				// Store the z component to use for calculating our eye height
+				up.set(-accel.x,-accel.y,-accel.z);
+				scalar z=up.z;
+				up.z=0;
+				if(Math::normalizeCarefully(up,0)){
+					Vector3 eye(0,z-Math::ONE,z);
+					Math::normalize(eye);
+					Math::mul(eye,Math::fromInt(150));
 
-			const Vector4 &accel=mMotionData.values[InputData::Semantic_MOTION_ACCELERATION];
-			Vector3 up;
-			// When the phone is vertical, we're at 0,1,0
-			// When the phone is horizontal, we're at 0,0,1
-			// Store the z component to use for calculating our eye height
-			up.set(-accel.x,-accel.y,-accel.z);
-			scalar z=up.z;
-			up.z=0;
-			if(Math::normalizeCarefully(up,0)){
-				Vector3 eye(0,z-Math::ONE,z);
-				Math::normalize(eye);
-				Math::mul(eye,Math::fromInt(150));
-
-				((CameraNode*)node)->setLookAt(eye,Math::ZERO_VECTOR3,up);
-				mTranslate.set(node->getTranslate());
-				mRotate.set(node->getRotate());
+					((CameraNode*)node)->setLookAt(eye,Math::ZERO_VECTOR3,up);
+					mTranslate.set(node->getTranslate());
+					mRotate.set(node->getRotate());
+				}
 			}
-
 		mMotionMutex.unlock();
 	}
 	
@@ -101,8 +101,8 @@ void Logo::create(){
 #if 1
 	InputDevice *motionDevice=app->getInputDevice(InputDevice::InputType_MOTION);
 	if(motionDevice!=NULL){
-//		cameraNode->addNodeListener(NodeListener::ptr(new GravityFollower(motionDevice)));
-//		motionDevice->start();
+		cameraNode->addNodeListener(NodeListener::ptr(new GravityFollower(motionDevice)));
+		motionDevice->start();
 	}
 #endif
 }

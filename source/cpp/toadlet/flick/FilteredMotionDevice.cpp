@@ -116,8 +116,6 @@ void FilteredMotionDevice::inputDetected(const InputData &data){
 		mRawVelocity.reset();
 	}
 	else{
-		mMotionData.time=data.time;
-
 		// Improved euler integration
 		// v = v + 0.5dt * (ao + a)
 		Math::add(vector,newAcceleration,lastAcceleration);
@@ -130,6 +128,7 @@ void FilteredMotionDevice::inputDetected(const InputData &data){
 		Math::add(vector,lastVelocity);
 		Math::mul(newVelocity,vector,mAlpha);
 
+		mMotionData.time=data.time;
 		mMotionData.values[InputData::Semantic_MOTION_VELOCITY].set(newVelocity);
 		
 		if(mListener!=NULL){

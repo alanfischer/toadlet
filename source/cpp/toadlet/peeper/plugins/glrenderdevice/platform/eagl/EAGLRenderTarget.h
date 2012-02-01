@@ -39,6 +39,7 @@
 namespace toadlet{
 namespace peeper{
 
+/// @todo: Currently we have to destroy and recreate the RenderTarget if the screen is resized.  Could we keep the RenderTarget and context and just recreate the FBO?  Could we do something similar on Android?
 class TOADLET_API EAGLRenderTarget:public GLFBORenderTarget{
 public:
 	EAGLRenderTarget();

@@ -195,7 +195,6 @@ void ParentNode::frameUpdate(int dt,int scope){
 	Node::ptr node,next;
 	for(node=getFirstChild();node!=NULL;node=next){
 		next=node->getNext();
-		bool dependent=false;
 		// This may not be in logicUpdate, but it solves an issue where a deactivated Node would not get updated if 
 		//  it only had frameUpdate called on it before a render
 		if(mActivateChildren){
@@ -205,7 +204,6 @@ void ParentNode::frameUpdate(int dt,int scope){
 			Node *depends=node->getDependsUpon();
 			if(depends!=NULL && depends->mLastFrame!=mScene->getFrame()){
 				mScene->queueDependent(node);
-				dependent=true;
 			}
 			else{
 				node->frameUpdate(dt,scope);

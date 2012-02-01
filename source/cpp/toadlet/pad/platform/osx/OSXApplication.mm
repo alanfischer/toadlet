@@ -184,7 +184,6 @@ rect{
 #if defined(TOADLET_HAS_UIKIT)
 // Handles the start of a touch
 - (void) touchesBegan:(NSSet*)touches withEvent:(UIEvent*)event{
-	CGRect bounds=[self bounds];
 	UITouch* touch=[[event touchesForView:self] anyObject];
 	CGPoint location=[touch locationInView:self];
 	mLastLocation=location;
@@ -193,7 +192,6 @@ rect{
 
 // Handles the continuation of a touch.
 - (void)touchesMoved:(NSSet*)touches withEvent:(UIEvent*)event{  
-	CGRect bounds=[self bounds];
 	UITouch* touch=[[event touchesForView:self] anyObject];
 	CGPoint location=[touch locationInView:self];
 	mLastLocation=location;
@@ -202,7 +200,6 @@ rect{
 
 // Handles the end of a touch event when the touch is a tap.
 - (void)touchesEnded:(NSSet*)touches withEvent:(UIEvent*)event{
-	CGRect bounds=[self bounds];
 	UITouch* touch=[[event touchesForView:self] anyObject];
 	CGPoint location=[touch locationInView:self];
 	if(location.x!=mLastLocation.x || location.y!=mLastLocation.y){
@@ -213,7 +210,6 @@ rect{
 
 // Handles the end of a touch event.
 - (void)touchesCancelled:(NSSet *)touches withEvent:(UIEvent *)event{
-	CGRect bounds=[self bounds];
 	UITouch* touch=[[event touchesForView:self] anyObject];
 	CGPoint location=[touch locationInView:self];
 	if(location.x!=mLastLocation.x || location.y!=mLastLocation.y){

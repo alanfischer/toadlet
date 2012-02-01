@@ -40,11 +40,12 @@ class IOSMotionDevice;
 }
 }
 
-@interface ToadletAccelerometerDelegate:NSObject<UIAccelerometerDelegate>;
+@interface ToadletAccelerometerDelegate:NSObject<UIAccelerometerDelegate>{
+    toadlet::flick::IOSMotionDevice *mMotionDevice;    
+}
 
 - (id) initWithMotionDevice:(toadlet::flick::IOSMotionDevice*)motionDevice;
 - (void) accelerometer:(UIAccelerometer*)accelerometer didAccelerate:(UIAcceleration*)acceleration;
-toadlet::flick::IOSMotionDevice *mMotionDevice;
 
 @end
 

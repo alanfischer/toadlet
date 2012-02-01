@@ -1365,7 +1365,7 @@ void Math::mulVector4Matrix4x4SSE(Vector4 &r,const Matrix4x4 &m){
 #elif defined(TOADLET_HAS_NEON)
 
 void Math::mulMatrix4x4NEON(Matrix4x4 &r,const Matrix4x4 &m1,const Matrix4x4 &m2){
-	_asm volatile(
+	asm volatile(
 		"vldmia %1, {q4-q7}\n"
 		"vldmia %2, {q8-q11}\n"
 
@@ -1397,7 +1397,7 @@ void Math::mulMatrix4x4NEON(Matrix4x4 &r,const Matrix4x4 &m1,const Matrix4x4 &m2
 }
 
 void Math::postMulMatrix4x4NEON(Matrix4x4 &m1,const Matrix4x4 &m2){
-	_asm volatile(
+	asm volatile(
 		"vldmia %1, {q4-q7}\n"
 		"vldmia %2, {q8-q11}\n"
 
@@ -1429,7 +1429,7 @@ void Math::postMulMatrix4x4NEON(Matrix4x4 &m1,const Matrix4x4 &m2){
 }
 
 void Math::preMulMatrix4x4NEON(Matrix4x4 &m2,const Matrix4x4 &m1){
-	_asm volatile(
+	asm volatile(
 		"vldmia %1, {q4-q7}\n"
 		"vldmia %2, {q8-q11}\n"
 
@@ -1461,7 +1461,7 @@ void Math::preMulMatrix4x4NEON(Matrix4x4 &m2,const Matrix4x4 &m1){
 }
 
 void Math::mulVector4Matrix4x4Vector4NEON(Vector4 &r,const Matrix4x4 &m,const Vector4 &v){
-	_asm volatile(
+	asm volatile(
 		"vldmia %1, {q1-q4}\n"
 		"vldmia %2, {q5}\n"
 
@@ -1481,7 +1481,7 @@ void Math::mulVector4Matrix4x4Vector4NEON(Vector4 &r,const Matrix4x4 &m,const Ve
 }
 
 void Math::mulVector4Matrix4x4NEON(Vector4 &r,const Matrix4x4 &m){
-	_asm volatile(
+	asm volatile(
 		"vldmia %1, {q1-q4}\n"
 		"vldmia %2, {q5}\n"
 
