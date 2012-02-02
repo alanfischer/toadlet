@@ -104,7 +104,7 @@ bool EAGLRenderTarget::createContext(CAEAGLLayer *drawable,WindowRenderTargetFor
 	}
 	glFramebufferRenderbuffer(GL_FRAMEBUFFER,GL_COLOR_ATTACHMENT0,GL_RENDERBUFFER,mRenderBufferHandle);
 
-	if(format->multisamples>0 && glRenderbufferStorageMultisampleAPPLE!=NULL){
+	if(format->multisamples>0){
 		mMSAARenderTarget=new GLFBORenderTarget(NULL);
 		mMSAARenderTarget->create();
 		glBindFramebuffer(GL_FRAMEBUFFER,mMSAARenderTarget->getHandle());
