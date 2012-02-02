@@ -227,7 +227,8 @@ void RandIsle::render(){
 	Math::setMatrix4x4FromX(matrix,Math::PI);
 	Math::setMatrix4x4FromTranslate(matrix,0,0,-5);
 	Math::preMul(matrix,mReflectCamera->getViewMatrix());
-	mReflectCamera->setObliqueNearPlaneMatrix(matrix);
+	/// @todo: Fix d3d10 obliqness
+	//mReflectCamera->setObliqueNearPlaneMatrix(matrix);
 
 	RenderDevice *device=mApp->getRenderDevice();
 	device->beginScene();

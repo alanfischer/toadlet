@@ -51,7 +51,8 @@ public:
 	void resetDestroy(){}
 
 	bool activate();
-	void swap();
+	bool deactivate();
+	void swap(){}
 	void reset(){}
 
 	bool attach(PixelBuffer::ptr buffer,Attachment attachment);
