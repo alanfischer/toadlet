@@ -72,6 +72,8 @@ public:
 	int getWidth() const{return mWidth;}
 	int getHeight() const{return mHeight;}
 
+	GLuint getHandle(){return mHandle;}
+	
 	static GLenum getGLAttachment(Attachment attachment);
 	static const char *getFBOMessage(GLenum status);
 
