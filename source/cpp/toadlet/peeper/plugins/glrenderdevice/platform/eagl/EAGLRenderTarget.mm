@@ -39,14 +39,22 @@ TOADLET_C_API RenderTarget *new_EAGLRenderTarget(void *display,void *layer,Windo
 EAGLRenderTarget::EAGLRenderTarget():GLFBORenderTarget(NULL),
 	mDrawable(nil),
 	mContext(nil),
-	mRenderBufferHandle(0)
+	mRenderBufferHandle(0),
+	
+	mMSAARenderTarget(NULL),
+	mMSAARenderBufferHandle(0),
+	mMSAADepthBufferHandle(0)
 {
 }
 
 EAGLRenderTarget::EAGLRenderTarget(CAEAGLLayer *drawable,WindowRenderTargetFormat *format,NSString *colorFormat):GLFBORenderTarget(NULL),
 	mDrawable(nil),
 	mContext(nil),
-	mRenderBufferHandle(0)
+	mRenderBufferHandle(0),
+	
+	mMSAARenderTarget(NULL),
+	mMSAARenderBufferHandle(0),
+	mMSAADepthBufferHandle(0)
 {
 	createContext(drawable,format,colorFormat);
 }
@@ -82,6 +90,7 @@ bool EAGLRenderTarget::createContext(CAEAGLLayer *drawable,WindowRenderTargetFor
 	int height=[drawable bounds].size.height;
 
 	GLFBORenderTarget::create();
+	glBindFramebuffer(GL_FRAMEBUFFER,mHandle);
 
 	// Manually create the Color Renderbuffer for now
 	//  We could add another Renderbuffer storage function for EAGL in
@@ -93,16 +102,33 @@ bool EAGLRenderTarget::createContext(CAEAGLLayer *drawable,WindowRenderTargetFor
 		destroyContext();
 		return false;
 	}
-	glBindFramebuffer(GL_FRAMEBUFFER,mHandle);
 	glFramebufferRenderbuffer(GL_FRAMEBUFFER,GL_COLOR_ATTACHMENT0,GL_RENDERBUFFER,mRenderBufferHandle);
 
-	if(format->depthBits!=0){
-		// No Depth-Stencil buffer, so add one
-		GLFBOPixelBuffer::ptr buffer(new GLFBOPixelBuffer(this));
-		TextureFormat::ptr bufferFormat(new TextureFormat(TextureFormat::Dimension_D2,TextureFormat::Format_DEPTH_16,width,height,1,1));
-		if(buffer->create(Buffer::Usage_NONE,Buffer::Access_NONE,bufferFormat)){
-			attach(buffer,Attachment_DEPTH_STENCIL);
-			mDepthBuffer=buffer;
+	if(format->multisamples>0 && glRenderbufferStorageMultisampleAPPLE!=NULL){
+		mMSAARenderTarget=new GLFBORenderTarget(NULL);
+		mMSAARenderTarget->create();
+		glBindFramebuffer(GL_FRAMEBUFFER,mMSAARenderTarget->getHandle());
+		
+		glGenRenderbuffers(1,&mMSAARenderBufferHandle);
+		glBindRenderbuffer(GL_RENDERBUFFER,mMSAARenderBufferHandle);
+		glRenderbufferStorageMultisampleAPPLE(GL_RENDERBUFFER,format->multisamples,GL_RGB5_A1_OES,width,height);
+		glFramebufferRenderbuffer(GL_FRAMEBUFFER,GL_COLOR_ATTACHMENT0,GL_RENDERBUFFER,mMSAARenderBufferHandle);
+		
+		glGenRenderbuffers(1,&mMSAADepthBufferHandle);
+		glBindRenderbuffer(GL_RENDERBUFFER,mMSAADepthBufferHandle);
+		glRenderbufferStorageMultisampleAPPLE(GL_RENDERBUFFER,format->multisamples,GL_DEPTH_COMPONENT16_OES,width,height);
+		glFramebufferRenderbuffer(GL_FRAMEBUFFER,GL_DEPTH_ATTACHMENT,GL_RENDERBUFFER,mMSAADepthBufferHandle);
+	}
+	else{
+		/// @todo: Lets change this to not use GLFBOPixelBuffer, since the MSAA stuff doesn't anyways
+		if(format->depthBits!=0){
+			// No Depth-Stencil buffer, so add one
+			GLFBOPixelBuffer::ptr buffer(new GLFBOPixelBuffer(this));
+			TextureFormat::ptr bufferFormat(new TextureFormat(TextureFormat::Dimension_D2,TextureFormat::Format_DEPTH_16,width,height,1,1));
+			if(buffer->create(Buffer::Usage_NONE,Buffer::Access_NONE,bufferFormat)){
+				attach(buffer,Attachment_DEPTH_STENCIL);
+				mDepthBuffer=buffer;
+			}
 		}
 	}
 
@@ -126,6 +152,21 @@ bool EAGLRenderTarget::destroyContext(){
 			mRenderBufferHandle=0;
 		}
 
+		if(mMSAARenderTarget!=NULL){
+			mMSAARenderTarget->destroy();
+			delete mMSAARenderTarget;
+			mMSAARenderTarget=NULL;
+
+			if(mMSAARenderBufferHandle!=0){
+				glDeleteRenderbuffers(1,&mMSAARenderBufferHandle);
+				mMSAARenderBufferHandle=0;
+			}
+			if(mMSAADepthBufferHandle!=0){
+				glDeleteRenderbuffers(1,&mMSAADepthBufferHandle);
+				mMSAADepthBufferHandle=0;
+			}
+		}
+
 		if(oldContext!=mContext){
 			[EAGLContext setCurrentContext:oldContext];
 		}
@@ -138,16 +179,38 @@ bool EAGLRenderTarget::destroyContext(){
 }
 
 bool EAGLRenderTarget::activate(){
-	GLFBORenderTarget::activate();
+	if(mMSAARenderTarget!=NULL){
+		mMSAARenderTarget->activate();
+	}
+	else{
+		GLFBORenderTarget::activate();
+	}
+	
 	return [EAGLContext setCurrentContext:mContext];
 }
 
 bool EAGLRenderTarget::deactivate(){
-	GLFBORenderTarget::deactivate();
+	if(mMSAARenderTarget!=NULL){
+		mMSAARenderTarget->deactivate();
+	}
+	else{
+		GLFBORenderTarget::deactivate();
+	}
+
 	return [EAGLContext setCurrentContext:nil];
 }
 
 bool EAGLRenderTarget::swap(){
+	if(mMSAARenderTarget!=NULL){
+		GLenum attachments[]={GL_DEPTH_ATTACHMENT};
+		glDiscardFramebufferEXT(GL_READ_FRAMEBUFFER_APPLE,1,attachments);
+	
+		glBindFramebuffer(GL_READ_FRAMEBUFFER_APPLE,mMSAARenderTarget->getHandle());
+		glBindFramebuffer(GL_DRAW_FRAMEBUFFER_APPLE,mHandle);
+	
+		glResolveMultisampleFramebufferAPPLE();
+	}
+
 	glBindRenderbuffer(GL_RENDERBUFFER,mRenderBufferHandle);
 	return [mContext presentRenderbuffer:GL_RENDERBUFFER];
 }

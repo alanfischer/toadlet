@@ -65,6 +65,9 @@ protected:
 	EAGLContext *mContext;
 	GLuint mRenderBufferHandle;
 	GLFBOPixelBuffer::ptr mDepthBuffer;
+
+	GLFBORenderTarget *mMSAARenderTarget;
+	GLuint mMSAARenderBufferHandle,mMSAADepthBufferHandle;
 };
 
 }
