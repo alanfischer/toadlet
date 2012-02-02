@@ -80,7 +80,7 @@ bool D3D10PixelBufferRenderTarget::activate(){
 	return D3D10RenderTarget::activate();
 }
 
-void D3D10PixelBufferRenderTarget::swap(){
+bool D3D10PixelBufferRenderTarget::deactivate(){
 	int i;
 	for(i=0;i<mBufferAttachments.size();++i){
 		if(mBufferAttachments[i]!=Attachment_DEPTH_STENCIL){
@@ -88,6 +88,8 @@ void D3D10PixelBufferRenderTarget::swap(){
 			buffer->getTexture()->generateMipLevels();
 		}
 	}
+
+	return D3D10RenderTarget::deactivate();
 }
 
 bool D3D10PixelBufferRenderTarget::attach(PixelBuffer::ptr buffer,Attachment attachment){
