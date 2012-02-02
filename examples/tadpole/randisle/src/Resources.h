@@ -21,15 +21,15 @@ public:
 		skyColor=Colors::AZURE;
 		fadeColor=Vector4(0xB5C1C3FF);
 
-//		#if defined(TOADLET_PLATFORM_ANDROID) || defined(TOADLET_PLATFORM_IOS)
+		#if defined(TOADLET_PLATFORM_ANDROID) || defined(TOADLET_PLATFORM_IOS)
 			cloudSize=128;
 			patchSize=32;
 			tolerance=0.00005;
-//		#else
-//			cloudSize=256;
-//			patchSize=128;
-//			tolerance=0.000001;
-//		#endif
+		#else
+			cloudSize=512;
+			patchSize=128;
+			tolerance=0.000001;
+		#endif
 
 		Logger::alert("Loading terrain");
 
@@ -88,7 +88,7 @@ public:
 					"glsl",
 					"hlsl"
 				};
-
+/// @todo: D3D10 oblique problem
 				String vertexCodes[]={
 					"attribute vec4 POSITION;\n"
 					"attribute vec3 NORMAL;\n"
