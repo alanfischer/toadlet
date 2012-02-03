@@ -185,25 +185,11 @@ set (PAD_SRC
 	us/toadlet/pad/Applet.java
 	us/toadlet/pad/AndroidApplication.java
 	us/toadlet/pad/NApplet.java
-	us/toadlet/pad/Engine.java
-	us/toadlet/pad/Scene.java
-	us/toadlet/pad/Node.java
-	us/toadlet/pad/CameraNode.java
-	us/toadlet/pad/LightNode.java
-	us/toadlet/pad/MeshNode.java
-	us/toadlet/pad/ParentNode.java
 	${CMAKE_CURRENT_BINARY_DIR}/us/toadlet/pad/Version.java
 )
 
 set (PAD_H
 	us.toadlet.pad.NApplet
-	us.toadlet.pad.Engine
-	us.toadlet.pad.Scene
-	us.toadlet.pad.Node
-	us.toadlet.pad.CameraNode
-	us.toadlet.pad.LightNode
-	us.toadlet.pad.MeshNode
-	us.toadlet.pad.ParentNode
 )
 
 # Create the jar file with UseJava.cmake functions. See UseJava.cmake for details.

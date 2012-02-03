@@ -6,3 +6,8 @@ since sometimes it doesn't change when you would expect using L R
 and sometimes you don't want to change you just want a different view
 gimme a change path key, and more squirrel top-end speed, and I'd love to try it out more
 so maybe on the phone, tilt L/R would just rotate, but pressing a button on the bottom center would be the branch button, to change which branch your headed for
+
+- Make water edges less defined
+- Let us use some sort of RenderVariable to change texture matrixes in fixed function?  or does that tie into the entity attribute stuff?  I want to have the FF water change texture matrix, based on time or some other Variable I define, without me doing it manually.
+- Use the leaf bump textures
+- Far plane gets distorted in oblique projections, maybe we can correct this somehow?

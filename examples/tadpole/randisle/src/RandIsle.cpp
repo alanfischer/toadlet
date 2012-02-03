@@ -6,9 +6,6 @@
 
 #define TREE_CAMERA_DISTANCE 80
 
-/// @todo: Use the leaf bump textures
-/// @todo: Optimize iPad rendering so we don't get a speedup from the 'manual path' in render()
-
 static const scalar epsilon=0.001f;
 
 RandIsle::RandIsle(Application *app,String path):
@@ -70,23 +67,27 @@ void RandIsle::create(){
 	mCamera->getDefaultState()->setFogState(FogState(FogState::FogType_LINEAR,Math::ONE,mCamera->getFarDist()/2,mCamera->getFarDist(),mCamera->getClearColor()));
 	mFollowNode->attach(mCamera);
 
-	mReflectCamera=mEngine->createNodeType(CameraNode::type(),mScene);
-	mReflectCamera->setRenderTarget(Resources::instance->reflectTarget);
-	mReflectCamera->setProjectionFovX(Math::degToRad(Math::fromInt(60)),Math::ONE,mCamera->getNearDist(),mCamera->getFarDist());
-	mReflectCamera->setScope(~Scope_HUD & ~Scope_BIT_MAIN_CAMERA & ~Scope_BIT_WATER);
-	mReflectCamera->setDefaultState(mEngine->getMaterialManager()->createRenderState());
-	mReflectCamera->setClearColor(Resources::instance->fadeColor);
-	mReflectCamera->getDefaultState()->setFogState(FogState(FogState::FogType_LINEAR,Math::ONE,mCamera->getFarDist()/2,mCamera->getFarDist(),mCamera->getClearColor()));
-	mScene->getRoot()->attach(mReflectCamera);
+	if(Resources::instance->reflectTarget!=NULL){
+		mReflectCamera=mEngine->createNodeType(CameraNode::type(),mScene);
+		mReflectCamera->setRenderTarget(Resources::instance->reflectTarget);
+		mReflectCamera->setProjectionFovX(Math::degToRad(Math::fromInt(60)),Math::ONE,mCamera->getNearDist(),mCamera->getFarDist());
+		mReflectCamera->setScope(~Scope_HUD & ~Scope_BIT_MAIN_CAMERA & ~Scope_BIT_WATER);
+		mReflectCamera->setDefaultState(mEngine->getMaterialManager()->createRenderState());
+		mReflectCamera->setClearColor(Resources::instance->fadeColor);
+		mReflectCamera->getDefaultState()->setFogState(FogState(FogState::FogType_LINEAR,Math::ONE,mCamera->getFarDist()/2,mCamera->getFarDist(),mCamera->getClearColor()));
+		mScene->getRoot()->attach(mReflectCamera);
+	}
 
-	mRefractCamera=mEngine->createNodeType(CameraNode::type(),mScene);
-	mRefractCamera->setRenderTarget(Resources::instance->refractTarget);
-	mRefractCamera->setProjectionFovX(Math::degToRad(Math::fromInt(60)),Math::ONE,mCamera->getNearDist(),mCamera->getFarDist());
-	mRefractCamera->setScope(~Scope_HUD & ~Scope_BIT_MAIN_CAMERA & ~Scope_BIT_WATER);
-	mRefractCamera->setDefaultState(mEngine->getMaterialManager()->createRenderState());
-	mRefractCamera->setClearColor(Resources::instance->fadeColor);
-	mRefractCamera->getDefaultState()->setFogState(FogState(FogState::FogType_LINEAR,Math::ONE,mCamera->getFarDist()/2,mCamera->getFarDist(),mCamera->getClearColor()));
-	mScene->getRoot()->attach(mRefractCamera);
+	if(Resources::instance->refractTarget!=NULL){
+		mRefractCamera=mEngine->createNodeType(CameraNode::type(),mScene);
+		mRefractCamera->setRenderTarget(Resources::instance->refractTarget);
+		mRefractCamera->setProjectionFovX(Math::degToRad(Math::fromInt(60)),Math::ONE,mCamera->getNearDist(),mCamera->getFarDist());
+		mRefractCamera->setScope(~Scope_HUD & ~Scope_BIT_MAIN_CAMERA & ~Scope_BIT_WATER);
+		mRefractCamera->setDefaultState(mEngine->getMaterialManager()->createRenderState());
+		mRefractCamera->setClearColor(Resources::instance->fadeColor);
+		mRefractCamera->getDefaultState()->setFogState(FogState(FogState::FogType_LINEAR,Math::ONE,mCamera->getFarDist()/2,mCamera->getFarDist(),mCamera->getClearColor()));
+		mScene->getRoot()->attach(mRefractCamera);
+	}
 
 	mHUD=mEngine->createNodeType(HUD::type(),mScene);
 	mHUD->setProjectionOrtho(-1,1,-1,1,-1,1);
@@ -180,12 +181,10 @@ void RandIsle::resized(int width,int height){
 		if(width>=height){
 			scalar ratio=Math::div(Math::fromInt(width),Math::fromInt(height));
 			mCamera->setProjectionFovY(Math::degToRad(Math::fromInt(75)),ratio,mCamera->getNearDist(),mCamera->getFarDist());
-			mReflectCamera->setProjectionFovY(Math::degToRad(Math::fromInt(75)),ratio,mCamera->getNearDist(),mCamera->getFarDist()*2);
 		}
 		else{
 			scalar ratio=Math::div(Math::fromInt(height),Math::fromInt(width));
 			mCamera->setProjectionFovX(Math::degToRad(Math::fromInt(75)),ratio,mCamera->getNearDist(),mCamera->getFarDist());
-			mReflectCamera->setProjectionFovX(Math::degToRad(Math::fromInt(75)),ratio,mCamera->getNearDist(),mCamera->getFarDist()*2);
 		}
 		mCamera->setViewport(0,0,width,height);
 	}
@@ -209,33 +208,42 @@ void RandIsle::render(){
 	Vector3 forward=mCamera->getForward();
 	Vector3 up=mCamera->getUp();
 
-	mRefractCamera->setProjectionMatrix(mReflectCamera->getProjectionMatrix());
-	mRefractCamera->setLookDir(position,forward,up);
-	mRefractCamera->updateAllWorldTransforms();
-	matrix.reset();
-	Math::setMatrix4x4FromTranslate(matrix,0,0,5);
-	Math::preMul(matrix,mRefractCamera->getViewMatrix());
-	mRefractCamera->setObliqueNearPlaneMatrix(matrix);
+	if(mRefractCamera!=NULL){
+		mRefractCamera->setProjectionMatrix(mCamera->getProjectionMatrix());
+		mRefractCamera->setLookDir(position,forward,up);
+		mRefractCamera->updateAllWorldTransforms();
+		matrix.reset();
+		Math::setMatrix4x4FromTranslate(matrix,0,0,5);
+		Math::preMul(matrix,mRefractCamera->getViewMatrix());
+		mRefractCamera->setObliqueNearPlaneMatrix(matrix);
+	}
 
 	position.z*=-1;
 	forward.z*=-1;
 	up.z*=-1;
 
-	mReflectCamera->setLookDir(position,forward,up);
-	mReflectCamera->updateAllWorldTransforms();
-	matrix.reset();
-	Math::setMatrix4x4FromX(matrix,Math::PI);
-	Math::setMatrix4x4FromTranslate(matrix,0,0,-5);
-	Math::preMul(matrix,mReflectCamera->getViewMatrix());
-	/// @todo: Fix d3d10 obliqness
-	//mReflectCamera->setObliqueNearPlaneMatrix(matrix);
+	if(mReflectCamera!=NULL){
+		mReflectCamera->setProjectionMatrix(mCamera->getProjectionMatrix());
+		mReflectCamera->setLookDir(position,forward,up);
+		mReflectCamera->updateAllWorldTransforms();
+		matrix.reset();
+		Math::setMatrix4x4FromX(matrix,Math::PI);
+		Math::setMatrix4x4FromTranslate(matrix,0,0,-5);
+		Math::preMul(matrix,mReflectCamera->getViewMatrix());
+		/// @todo: Fix d3d10 obliqness
+		//mReflectCamera->setObliqueNearPlaneMatrix(matrix);
+	}
 
 	RenderDevice *device=mApp->getRenderDevice();
 	device->beginScene();
 	{
-		mRefractCamera->render(device);
+		if(mRefractCamera!=NULL){
+			mRefractCamera->render(device);
+		}
 
-		mReflectCamera->render(device);
+		if(mReflectCamera!=NULL){
+			mReflectCamera->render(device);
+		}
 
 		mCamera->render(device);
 
@@ -371,19 +379,6 @@ void RandIsle::frameUpdate(int dt){
 
 	mScene->frameUpdate(dt);
 
-/*
-	Material::ptr waterMaterial=Resources::instance->waterMaterial;
-	if(waterMaterial!=NULL){
-		TextureState textureState;
-		waterMaterial->getPass()->getTextureState(Shader::ShaderType_FRAGMENT,0,textureState);
-		Math::setMatrix4x4FromTranslate(textureState.matrix,Math::sin(Math::fromMilli(mScene->getTime())/4)/4,0,0);
-		waterMaterial->getPass()->setTextureState(Shader::ShaderType_FRAGMENT,0,textureState);
-
-		waterMaterial->getPass()->getTextureState(Shader::ShaderType_FRAGMENT,1,textureState);
-		Math::setMatrix4x4FromTranslate(textureState.matrix,0,Math::sin(Math::fromMilli(mScene->getTime())/4)/4,0);
-		waterMaterial->getPass()->setTextureState(Shader::ShaderType_FRAGMENT,1,textureState);
-	}
-*/
 	if(mPlayer->getPath()!=NULL){
 		// In this case the listener is not attached, so we need to update it after the rest of the scene
 		mFollower->frameUpdated(mFollowNode,dt);

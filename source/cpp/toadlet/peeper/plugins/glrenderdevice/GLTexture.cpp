@@ -266,7 +266,6 @@ bool GLTexture::destroyContext(){
 		mHandle=0;
 		mTarget=0;
 
-		// Check this only if we had a handle, to eliminate errors at shutdown
 		TOADLET_CHECK_GLERROR("GLTexture::destroy");
 	}
 
