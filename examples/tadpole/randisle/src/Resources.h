@@ -44,37 +44,27 @@ public:
 		terrainMaterialSource->setDiffuseTexture(2,engine->getTextureManager()->findTexture("grass.png"));
 
 		Logger::alert("Loading water");
-		{
-			TextureFormat::ptr waterFormat(new TextureFormat(TextureFormat::Dimension_D2,TextureFormat::Format_RGB_8,512,512,1,0));
-
-			reflectTexture=engine->getTextureManager()->createTexture(Texture::Usage_BIT_RENDERTARGET|Texture::Usage_BIT_AUTOGEN_MIPMAPS,waterFormat);
-			reflectTexture->retain();
-			reflectTarget=engine->getTextureManager()->createPixelBufferRenderTarget();
-			reflectTarget->attach(reflectTexture->getMipPixelBuffer(0,0),PixelBufferRenderTarget::Attachment_COLOR_0);
-
-			refractTexture=engine->getTextureManager()->createTexture(Texture::Usage_BIT_RENDERTARGET|Texture::Usage_BIT_AUTOGEN_MIPMAPS,waterFormat);
-			refractTexture->retain();
-			refractTarget=engine->getTextureManager()->createPixelBufferRenderTarget();
-			refractTarget->attach(refractTexture->getMipPixelBuffer(0,0),PixelBufferRenderTarget::Attachment_COLOR_0);
-
-			bumpTexture=engine->getTextureManager()->findTexture("water_bump.png");
-			bumpTexture->retain();
-		}
-
 		waterMaterial=engine->getMaterialManager()->createMaterial();
 		if(waterMaterial!=NULL){
 			Vector4 color=Colors::AZURE*1.5;
 			color.w=0.5f;
 
-			TextureFormat::ptr noiseFormat(new TextureFormat(TextureFormat::Dimension_D2,TextureFormat::Format_RGBA_8,256,256,1,0));
-			tbyte *noise1Data=createNoise(noiseFormat,16,5,0.5,0.5);
-			tbyte *noise2Data=createNoise(noiseFormat,16,12,0.5,0.5);
-			Texture::ptr noise1=engine->getTextureManager()->createTexture(noiseFormat,noise1Data);
-			Texture::ptr noise2=engine->getTextureManager()->createTexture(noiseFormat,noise2Data);
-			delete[] noise1Data;
-			delete[] noise2Data;
-
 			if(engine->hasShader(Shader::ShaderType_VERTEX) && engine->hasShader(Shader::ShaderType_FRAGMENT)){
+				TextureFormat::ptr waterFormat(new TextureFormat(TextureFormat::Dimension_D2,TextureFormat::Format_RGB_8,512,512,1,0));
+
+				reflectTexture=engine->getTextureManager()->createTexture(Texture::Usage_BIT_RENDERTARGET|Texture::Usage_BIT_AUTOGEN_MIPMAPS,waterFormat);
+				reflectTexture->retain();
+				reflectTarget=engine->getTextureManager()->createPixelBufferRenderTarget();
+				reflectTarget->attach(reflectTexture->getMipPixelBuffer(0,0),PixelBufferRenderTarget::Attachment_COLOR_0);
+
+				refractTexture=engine->getTextureManager()->createTexture(Texture::Usage_BIT_RENDERTARGET|Texture::Usage_BIT_AUTOGEN_MIPMAPS,waterFormat);
+				refractTexture->retain();
+				refractTarget=engine->getTextureManager()->createPixelBufferRenderTarget();
+				refractTarget->attach(refractTexture->getMipPixelBuffer(0,0),PixelBufferRenderTarget::Attachment_COLOR_0);
+
+				bumpTexture=engine->getTextureManager()->findTexture("water_bump.png");
+				bumpTexture->retain();
+
 				RenderPath::ptr shaderPath=waterMaterial->addPath();
 				RenderPass::ptr pass=shaderPath->addPass();
 
@@ -88,7 +78,7 @@ public:
 					"glsl",
 					"hlsl"
 				};
-/// @todo: D3D10 oblique problem
+
 				String vertexCodes[]={
 					"attribute vec4 POSITION;\n"
 					"attribute vec3 NORMAL;\n"
@@ -310,11 +300,19 @@ public:
 			}
 
 			if(engine->hasFixed(Shader::ShaderType_VERTEX) && engine->hasFixed(Shader::ShaderType_FRAGMENT)){
+				TextureFormat::ptr noiseFormat(new TextureFormat(TextureFormat::Dimension_D2,TextureFormat::Format_RGB_8,128,128,1,0));
+				tbyte *noise1Data=createNoise(noiseFormat,16,5,0.5,0.5);
+				tbyte *noise2Data=createNoise(noiseFormat,16,12,0.5,0.5);
+				Texture::ptr noise1=engine->getTextureManager()->createTexture(noiseFormat,noise1Data);
+				Texture::ptr noise2=engine->getTextureManager()->createTexture(noiseFormat,noise2Data);
+				delete[] noise1Data;
+				delete[] noise2Data;
+
 				RenderPath::ptr fixedPath=waterMaterial->addPath();
 				RenderPass::ptr pass=fixedPath->addPass();
 
 				pass->setMaterialState(MaterialState(color));
-//				pass->setBlendState(BlendState::Combination_ALPHA);
+				pass->setBlendState(BlendState::Combination_ALPHA);
 				pass->setDepthState(DepthState(DepthState::DepthTest_LEQUAL,false));
 				pass->setRasterizerState(RasterizerState(RasterizerState::CullType_NONE));
 
@@ -322,10 +320,24 @@ public:
 				textureState.calculation=TextureState::CalculationType_NORMAL;
 
 				Math::setMatrix4x4FromScale(textureState.matrix,16,16,16);
-				pass->setTexture(Shader::ShaderType_FRAGMENT,0,reflectTexture,SamplerState(),textureState);
+				pass->setTexture(Shader::ShaderType_FRAGMENT,0,noise1,SamplerState(),textureState);
 
-//				Math::setMatrix4x4FromScale(textureState.matrix,16,16,16);
-//				pass->setTexture(Shader::ShaderType_FRAGMENT,0,reflectTexture,SamplerState(),textureState);
+				Math::setMatrix4x4FromScale(textureState.matrix,16,16,16);
+				pass->setTexture(Shader::ShaderType_FRAGMENT,1,noise2,SamplerState(),textureState);
+
+/*
+	Material::ptr waterMaterial=Resources::instance->waterMaterial;
+	if(waterMaterial!=NULL){
+		TextureState textureState;
+		waterMaterial->getPass()->getTextureState(Shader::ShaderType_FRAGMENT,0,textureState);
+		Math::setMatrix4x4FromTranslate(textureState.matrix,Math::sin(Math::fromMilli(mScene->getTime())/4)/4,0,0);
+		waterMaterial->getPass()->setTextureState(Shader::ShaderType_FRAGMENT,0,textureState);
+
+		waterMaterial->getPass()->getTextureState(Shader::ShaderType_FRAGMENT,1,textureState);
+		Math::setMatrix4x4FromTranslate(textureState.matrix,0,Math::sin(Math::fromMilli(mScene->getTime())/4)/4,0);
+		waterMaterial->getPass()->setTextureState(Shader::ShaderType_FRAGMENT,1,textureState);
+	}
+*/
 			}
 
 			waterMaterial->setLayer(-1);

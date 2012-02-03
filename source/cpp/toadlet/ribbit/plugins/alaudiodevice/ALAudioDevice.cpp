@@ -317,6 +317,15 @@ void ALAudioDevice::checkinSourceHandle(ALAudio *audio,ALuint source){
 	mAudios.remove(audio);
 }
 
+void ALAudioDevice::preDestroyBuffer(ALAudioBuffer *buffer){
+	int i;
+	for(i=0;i<mAudios.size();++i){
+		if(mAudios[i]->getAudioBuffer()==buffer){
+			mAudios[i]->destroy();
+		}
+	}
+}
+
 ALenum ALAudioDevice::getALFormat(AudioFormat *format){
 	int bps=format->getBitsPerSample(),channels=format->getChannels();
 	if(bps==8 && channels==1){

@@ -41,6 +41,7 @@ namespace toadlet{
 namespace ribbit{
 	
 class ALAudio;
+class ALAudioBuffer;
 
 typedef void (*proc_alBufferDataStatic)(ALuint buffer,ALenum format,ALvoid *data,ALsizei size,ALsizei freq);
 
@@ -81,6 +82,8 @@ public:
 	egg::math::Vector3 cacheVector3;
 	
 protected:
+	void preDestroyBuffer(ALAudioBuffer *buffer);
+
 	ALCdevice *mDevice;
 	static ALCcontext *mContext; // Only 1 Context is supported at a time in OpenAL, so we make it static
 	Collection<ALAudio*> mAudios;

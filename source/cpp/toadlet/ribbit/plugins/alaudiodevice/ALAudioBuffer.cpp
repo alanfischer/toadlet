@@ -84,16 +84,20 @@ bool ALAudioBuffer::create(AudioStream::ptr stream){
 
 void ALAudioBuffer::destroy(){
 	if(mHandle!=0){
+		if(mDevice!=NULL){
+			mDevice->preDestroyBuffer(this);
+		}
+
 		alDeleteBuffers(1,&mHandle);
 		mHandle=0;
+
+		TOADLET_CHECK_ALERROR("alDeleteBuffers::destroy");
 	}
 
 	if(mStaticData!=NULL){
 		delete[] mStaticData;
 		mStaticData=NULL;
 	}
-
-	TOADLET_CHECK_ALERROR("alDeleteBuffers::destroy");
 }
 
 }
