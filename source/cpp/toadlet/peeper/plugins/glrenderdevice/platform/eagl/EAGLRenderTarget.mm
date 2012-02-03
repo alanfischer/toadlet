@@ -89,6 +89,8 @@ bool EAGLRenderTarget::createContext(CAEAGLLayer *drawable,WindowRenderTargetFor
 	int width=[drawable bounds].size.width;
 	int height=[drawable bounds].size.height;
 
+	String extensions=glGetString(GL_EXTENSIONS);
+
 	GLFBORenderTarget::create();
 	glBindFramebuffer(GL_FRAMEBUFFER,mHandle);
 
@@ -104,14 +106,14 @@ bool EAGLRenderTarget::createContext(CAEAGLLayer *drawable,WindowRenderTargetFor
 	}
 	glFramebufferRenderbuffer(GL_FRAMEBUFFER,GL_COLOR_ATTACHMENT0,GL_RENDERBUFFER,mRenderBufferHandle);
 
-	if(format->multisamples>0){
+	if(format->multisamples>0 && extensions.find("GL_APPLE_framebuffer_multisample")>0){
 		mMSAARenderTarget=new GLFBORenderTarget(NULL);
 		mMSAARenderTarget->create();
 		glBindFramebuffer(GL_FRAMEBUFFER,mMSAARenderTarget->getHandle());
-		
+
 		glGenRenderbuffers(1,&mMSAARenderBufferHandle);
 		glBindRenderbuffer(GL_RENDERBUFFER,mMSAARenderBufferHandle);
-		glRenderbufferStorageMultisampleAPPLE(GL_RENDERBUFFER,format->multisamples,GL_RGB5_A1_OES,width,height);
+		glRenderbufferStorageMultisampleAPPLE(GL_RENDERBUFFER,format->multisamples,GL_RGBA4_OES,width,height);
 		glFramebufferRenderbuffer(GL_FRAMEBUFFER,GL_COLOR_ATTACHMENT0,GL_RENDERBUFFER,mMSAARenderBufferHandle);
 		
 		glGenRenderbuffers(1,&mMSAADepthBufferHandle);
