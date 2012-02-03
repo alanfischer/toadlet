@@ -234,7 +234,7 @@ void RandIsle::render(){
 		//mReflectCamera->setObliqueNearPlaneMatrix(matrix);
 	}
 
-	RenderDevice *device=mApp->getRenderDevice();
+	RenderDevice *device=mEngine->getRenderDevice();
 	device->beginScene();
 	{
 		if(mRefractCamera!=NULL){
