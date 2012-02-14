@@ -58,6 +58,8 @@ set (MXML_H
 
 # Static library
 add_library (mxml STATIC ${MXML_SRC} ${MXML_H})
+
+# Install
 install (TARGETS mxml DESTINATION ${LIB_INSTALL_DIR})
 install (FILES mxml.h DESTINATION include)
 

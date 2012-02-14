@@ -20,5 +20,7 @@ set (GLEW_H
 
 # Static library
 add_library (GLEW STATIC ${GLEW_SRC} ${GLEW_H})
-install (TARGETS GLEW DESTINATION lib)
 
+# Install
+install (TARGETS GLEW DESTINATION lib)
+install (DIRECTORY ${PROJECT_SOURCE_DIR}/include/GL/ DESTINATION include/GL FILES_MATCHING PATTERN "*.h")
