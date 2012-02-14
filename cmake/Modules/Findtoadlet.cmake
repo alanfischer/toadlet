@@ -4,11 +4,18 @@
 #  TOADLET_FOUND	- system has toadlet
 #  TOADLET_INCLUDE_DIR	- path to the toadlet include directory
 #  TOADLET_LIBRARY_DIR	- path to the toadlet library installation dir
-#  TOADLET_LIBRARIES	- sum of all toadlet libraries found for each type: dynamic (no suffix), static (_S), release (no suffix), debug (_D)
-#  TOADLET_DLLS	- WIN32 platforms only - sum of all toadlet dlls found for: release (no suffix), debug (_D)
+#  TOADLET_LIBRARIES_MIXED		- sum of all toadlet dynamic libraries in a special optimized/debug separated fashion
+#  TOADLET_LIBRARIES_S_MIXED	- sum of all toadlet static libraries in a special optimized/debug separated fashion
+#  TOADLET_LIBRARIES	- sum of all toadlet dynamic release libraries
+#  TOADLET_LIBRARIES_D	- sum of all toadlet dynamic debug libraries 
+#  TOADLET_LIBRARIES_S	- sum of all toadlet static release libraries 
+#  TOADLET_LIBRARIES_SD	- sum of all toadlet static debug 
+#  TOADLET_DLLS		- WIN32 platforms only - sum of all toadlet release dlls 
+#  TOADLET_DLLS_D	- WIN32 platforms only - sum of all toadlet debug dlls
 #
-# Define each toadlet library individually: dynamic (no suffix), static (_S), release (no suffix), debug (_D)
-# Each library, when at least one of the above is found, sets TOADLET_${LIBNAME}_FOUND = YES
+# Define each toadlet library individually.
+# Each define has 4 versions: dynamic release (no suffix), static release (_S), dynamic debug (_D), static debug (_SD)
+# Each library, when at least one of the version is found, sets TOADLET_${LIBNAME}_FOUND = YES
 #  TOADLET_EGG_LIB
 #  TOADLET_FLICK_LIB
 #  TOADLET_FLICK_IOSMOTIONDEVICE_LIB
@@ -181,46 +188,58 @@ foreach (TOADLET_LIB ${TOADLET_LIB_BASENAMES})
 			endif (${TOADLET_LIB_VAR}_LIB)
 		endif (NOT TOADLET_LIBRARY_DIR)
 
-		# If both versions are found, set configuration specific libraries
+		# If both versions are found, set both library types
 		if (${TOADLET_LIB_VAR}_LIB AND ${TOADLET_LIB_VAR}_LIB_D)
-			set (${TOADLET_LIB_VAR}_LIB optimized ${${TOADLET_LIB_VAR}_LIB} debug ${${TOADLET_LIB_VAR}_LIB_D} CACHE STRING "Both libraries" FORCE)
+			set (${TOADLET_LIB_VAR}_LIB ${${TOADLET_LIB_VAR}_LIB} CACHE FILEPATH "Path to dynamic release library" FORCE)
+			set (${TOADLET_LIB_VAR}_LIB_D ${${TOADLET_LIB_VAR}_LIB_D} CACHE FILEPATH "Path to dynamic debug library" FORCE)
 			set (${TOADLET_LIB_VAR}_FOUND "YES")
 			set (TOADLET_LIBRARIES ${TOADLET_LIBRARIES} ${${TOADLET_LIB_VAR}_LIB})
 			set (TOADLET_LIBRARIES_D ${TOADLET_LIBRARIES_D} ${${TOADLET_LIB_VAR}_LIB_D})
+			set (TOADLET_LIBRARIES_MIXED ${TOADLET_LIBRARIES_MIXED} optimized ${${TOADLET_LIB_VAR}_LIB} debug ${${TOADLET_LIB_VAR}_LIB_D})
 		endif (${TOADLET_LIB_VAR}_LIB AND ${TOADLET_LIB_VAR}_LIB_D)
 		if (${TOADLET_LIB_VAR}_LIB_S AND ${TOADLET_LIB_VAR}_LIB_SD)
-			set (${TOADLET_LIB_VAR}_LIB_S optimized ${${TOADLET_LIB_VAR}_LIB_S} debug ${${TOADLET_LIB_VAR}_LIB_SD} CACHE STRING "Both libraries" FORCE)
+			set (${TOADLET_LIB_VAR}_LIB_S ${${TOADLET_LIB_VAR}_LIB_S} CACHE FILEPATH "Path to static release library" FORCE)
+			set (${TOADLET_LIB_VAR}_LIB_SD ${${TOADLET_LIB_VAR}_LIB_SD} CACHE FILEPATH "Path to static debug library" FORCE)
 			set (${TOADLET_LIB_VAR}_FOUND "YES")
-			set (TOADLET_LIBRARIES_S ${TOADLET_LIBRARIES_S} ${${TOADLET_LIB_VAR}_LIB_S})
+			set (TOADLET_LIBRARIES_S ${TOADLET_LIBRARIES_S} ${${TOADLET_LIB_VAR}_LIBS_S})
 			set (TOADLET_LIBRARIES_SD ${TOADLET_LIBRARIES_SD} ${${TOADLET_LIB_VAR}_LIB_SD})
+			set (TOADLET_LIBRARIES_S_MIXED ${TOADLET_LIBRARIES_S_MIXED} optimized ${${TOADLET_LIB_VAR}_LIB_S} debug ${${TOADLET_LIB_VAR}_LIB_SD})
 		endif (${TOADLET_LIB_VAR}_LIB_S AND ${TOADLET_LIB_VAR}_LIB_SD)
 
 		# If only release libraries are found, assign them to the debug libraries
 		if (${TOADLET_LIB_VAR}_LIB AND NOT ${TOADLET_LIB_VAR}_LIB_D)
-			set (${TOADLET_LIB_VAR}_LIB_D ${${TOADLET_LIB_VAR}_LIB} CACHE FILEPATH "Path to a library" FORCE)
+			set (${TOADLET_LIB_VAR}_LIB ${${TOADLET_LIB_VAR}_LIB} CACHE FILEPATH "Path to dynamic release library" FORCE)
+			set (${TOADLET_LIB_VAR}_LIB_D ${${TOADLET_LIB_VAR}_LIB} CACHE FILEPATH "Path to dynamic release (no debug found) library" FORCE)
 			set (${TOADLET_LIB_VAR}_FOUND "YES")
 			set (TOADLET_LIBRARIES ${TOADLET_LIBRARIES} ${${TOADLET_LIB_VAR}_LIB})
 			set (TOADLET_LIBRARIES_D ${TOADLET_LIBRARIES_D} ${${TOADLET_LIB_VAR}_LIB_D})
+			set (TOADLET_LIBRARIES_MIXED ${TOADLET_LIBRARIES_MIXED} optimized ${${TOADLET_LIB_VAR}_LIB} debug ${${TOADLET_LIB_VAR}_LIB_D})
 		endif (${TOADLET_LIB_VAR}_LIB AND NOT ${TOADLET_LIB_VAR}_LIB_D)
 		if (${TOADLET_LIB_VAR}_LIB_S AND NOT ${TOADLET_LIB_VAR}_LIB_SD)
-			set (${TOADLET_LIB_VAR}_LIB_SD ${${TOADLET_LIB_VAR}_LIB_S} CACHE FILEPATH "Path to a library" FORCE)
+			set (${TOADLET_LIB_VAR}_LIB_S ${${TOADLET_LIB_VAR}_LIB_S} CACHE FILEPATH "Path to static release library" FORCE)
+			set (${TOADLET_LIB_VAR}_LIB_SD ${${TOADLET_LIB_VAR}_LIB_S} CACHE FILEPATH "Path to static release (no debug found) library" FORCE)
 			set (${TOADLET_LIB_VAR}_FOUND "YES")
 			set (TOADLET_LIBRARIES_S ${TOADLET_LIBRARIES_S} ${${TOADLET_LIB_VAR}_LIB_S})
 			set (TOADLET_LIBRARIES_SD ${TOADLET_LIBRARIES_SD} ${${TOADLET_LIB_VAR}_LIB_SD})
+			set (TOADLET_LIBRARIES_S_MIXED ${TOADLET_LIBRARIES_S_MIXED} optimized ${${TOADLET_LIB_VAR}_LIB_S} debug ${${TOADLET_LIB_VAR}_LIB_SD})
 		endif (${TOADLET_LIB_VAR}_LIB_S AND NOT ${TOADLET_LIB_VAR}_LIB_SD)
 		
 		# If only debug libraries are found, assign them to the release libraries
 		if (${TOADLET_LIB_VAR}_LIB_D AND NOT ${TOADLET_LIB_VAR}_LIB)
-			set (${TOADLET_LIB_VAR}_LIB ${${TOADLET_LIB_VAR}_LIB_D} CACHE FILEPATH "Path to a library" FORCE)
+			set (${TOADLET_LIB_VAR}_LIB_D ${${TOADLET_LIB_VAR}_LIB_D} CACHE FILEPATH "Path to dynamic debug library" FORCE)
+			set (${TOADLET_LIB_VAR}_LIB ${${TOADLET_LIB_VAR}_LIB_D} CACHE FILEPATH "Path to dynamic debug (no release found) library" FORCE)
 			set (${TOADLET_LIB_VAR}_FOUND "YES")
 			set (TOADLET_LIBRARIES ${TOADLET_LIBRARIES} ${${TOADLET_LIB_VAR}_LIB})
 			set (TOADLET_LIBRARIES_D ${TOADLET_LIBRARIES_D} ${${TOADLET_LIB_VAR}_LIB_D})
+			set (TOADLET_LIBRARIES_MIXED ${TOADLET_LIBRARIES_MIXED} optimized ${${TOADLET_LIB_VAR}_LIB} debug ${${TOADLET_LIB_VAR}_LIB_D})
 		endif (${TOADLET_LIB_VAR}_LIB_D AND NOT ${TOADLET_LIB_VAR}_LIB)
 		if (${TOADLET_LIB_VAR}_LIB_SD AND NOT ${TOADLET_LIB_VAR}_LIB_S)
-			set (${TOADLET_LIB_VAR}_LIB_S ${${TOADLET_LIB_VAR}_LIB_SD} CACHE FILEPATH "Path to a library" FORCE)
+			set (${TOADLET_LIB_VAR}_LIB_SD ${${TOADLET_LIB_VAR}_LIB_SD} CACHE FILEPATH "Path to dynamic debug library" FORCE)
+			set (${TOADLET_LIB_VAR}_LIB_S ${${TOADLET_LIB_VAR}_LIB_SD} CACHE FILEPATH "Path to dynamic debug (no release found) library" FORCE)
 			set (${TOADLET_LIB_VAR}_FOUND "YES")
 			set (TOADLET_LIBRARIES_S ${TOADLET_LIBRARIES_S} ${${TOADLET_LIB_VAR}_LIB_S})
 			set (TOADLET_LIBRARIES_SD ${TOADLET_LIBRARIES_SD} ${${TOADLET_LIB_VAR}_LIB_SD})
+			set (TOADLET_LIBRARIES_S_MIXED ${TOADLET_LIBRARIES_S_MIXED} optimized ${${TOADLET_LIB_VAR}_LIB_S} debug ${${TOADLET_LIB_VAR}_LIB_SD})
 		endif (${TOADLET_LIB_VAR}_LIB_SD AND NOT ${TOADLET_LIB_VAR}_LIB_S)
 		
 		if (WIN32)
@@ -234,20 +253,24 @@ foreach (TOADLET_LIB ${TOADLET_LIB_BASENAMES})
 			
 			# If both versions are found, set each to their own
 			if (${TOADLET_LIB_VAR}_LIB AND ${TOADLET_LIB_VAR}_LIB_D)
+				set (${TOADLET_LIB_VAR}_DLL ${${TOADLET_LIB_VAR}_DLL} CACHE FILEPATH "Path to release dll" FORCE)
+				set (${TOADLET_LIB_VAR}_DLL_D ${${TOADLET_LIB_VAR}_DLL_D} CACHE FILEPATH "Path to debug dll" FORCE)
 				set (TOADLET_DLLS ${TOADLET_DLLS} ${${TOADLET_LIB_VAR}_LIB})
 				set (TOADLET_DLL_D ${TOADLET_DLLS_D} ${${TOADLET_LIB_VAR}_LIB_D})
 			endif (${TOADLET_LIB_VAR}_LIB AND ${TOADLET_LIB_VAR}_LIB_D)
 			
 			# If only release dlls are found, assign them to the debug dlls
 			if (${TOADLET_LIB_VAR}_DLL AND NOT ${TOADLET_LIB_VAR}_DLL_D)
-				set (${TOADLET_LIB_VAR}_DLL_D ${${TOADLET_LIB_VAR}_DLL} CACHE FILEPATH "Path to a dll" FORCE)
+				set (${TOADLET_LIB_VAR}_DLL ${${TOADLET_LIB_VAR}_DLL} CACHE FILEPATH "Path to release dll" FORCE)
+				set (${TOADLET_LIB_VAR}_DLL_D ${${TOADLET_LIB_VAR}_DLL} CACHE FILEPATH "Path to release (no debug found) dll" FORCE)
 				set (TOADLET_DLLS ${TOADLET_DLLS} ${${TOADLET_LIB_VAR}_DLL})
 				set (TOADLET_DLLS_D ${TOADLET_DLLS_D} ${${TOADLET_LIB_VAR}_DLL_D})
 			endif (${TOADLET_LIB_VAR}_DLL AND NOT ${TOADLET_LIB_VAR}_DLL_D)
 			
 			# If only debug dlls are found, assign them to the release dlls
 			if (${TOADLET_LIB_VAR}_DLL_D AND NOT ${TOADLET_LIB_VAR}_DLL)
-				set (${TOADLET_LIB_VAR}_DLL ${${TOADLET_LIB_VAR}_DLL_D} CACHE FILEPATH "Path to a dll" FORCE)
+				set (${TOADLET_LIB_VAR}_DLL_D ${${TOADLET_LIB_VAR}_DLL_D} CACHE FILEPATH "Path to debug dll" FORCE)
+				set (${TOADLET_LIB_VAR}_DLL ${${TOADLET_LIB_VAR}_DLL_D} CACHE FILEPATH "Path to debug (no release found) dll" FORCE)
 				set (TOADLET_DLLS ${TOADLET_DLLS} ${${TOADLET_LIB_VAR}_DLL})
 				set (TOADLET_DLLS_D ${TOADLET_DLLS_D} ${${TOADLET_LIB_VAR}_DLL_D})
 			endif (${TOADLET_LIB_VAR}_DLL_D AND NOT ${TOADLET_LIB_VAR}_DLL)
@@ -264,12 +287,14 @@ foreach (TOADLET_LIB ${TOADLET_LIB_BASENAMES})
 endforeach (TOADLET_LIB)
 
 # Cache the toadlet libraries values
-set (TOADLET_LIBRARIES ${TOADLET_LIBRARIES} CACHE FILEPATH "Toadlet libraries" FORCE)
-set (TOADLET_LIBRARIES_S ${TOADLET_LIBRARIES_S} CACHE FILEPATH "Toadlet libraries (static)" FORCE)
-set (TOADLET_LIBRARIES_D ${TOADLET_LIBRARIES_D} CACHE FILEPATH "Toadlet libraries (debug)" FORCE)
+set (TOADLET_LIBRARIES_MIXED ${TOADLET_LIBRARIES_MIXED} CACHE FILEPATH "Toadlet libraries (dynamic mixed release/debug)" FORCE)
+set (TOADLET_LIBRARIES_S_MIXED ${TOADLET_LIBRARIES_S_MIXED} CACHE FILEPATH "Toadlet libraries (static mixed release/debug)" FORCE)
+set (TOADLET_LIBRARIES ${TOADLET_LIBRARIES} CACHE FILEPATH "Toadlet libraries (dynamic release)" FORCE)
+set (TOADLET_LIBRARIES_S ${TOADLET_LIBRARIES_S} CACHE FILEPATH "Toadlet libraries (static release)" FORCE)
+set (TOADLET_LIBRARIES_D ${TOADLET_LIBRARIES_D} CACHE FILEPATH "Toadlet libraries (dynamic debug)" FORCE)
 set (TOADLET_LIBRARIES_SD ${TOADLET_LIBRARIES_SD} CACHE FILEPATH "Toadlet libraries (static debug)" FORCE)
 if (WIN32)
-	set (TOADLET_DLLS ${TOADLET_DLLS} CACHE FILEPATH "Toadlet dlls" FORCE)
+	set (TOADLET_DLLS ${TOADLET_DLLS} CACHE FILEPATH "Toadlet dlls (release)" FORCE)
 	set (TOADLET_DLLS_D ${TOADLET_DLLS_D} CACHE FILEPATH "Toadlet dlls (debug)" FORCE)
 endif (WIN32)
 

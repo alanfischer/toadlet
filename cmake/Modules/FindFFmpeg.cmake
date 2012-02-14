@@ -29,15 +29,16 @@ endif (WIN32)
 find_program (FFMPEG_EXE NAMES ffmpeg ffmpeg.exe PATHS ${EXE_SEARCH_PATHS})
 find_path (FFMPEG_INCLUDE_DIR libavcodec/avcodec.h PATHS ${HDR_SEARCH_PATHS})
 
+# NOTE: These are listed in the order acceptable for static linking
 set (FFMPEG_LIBS
-	avcodec
 	avdevice
 	avfilter
 	avformat
-	avutil
+	avcodec
 	postproc
 	swresample
 	swscale
+	avutil
 )
 
 foreach (FFMPEG_LIB ${FFMPEG_LIBS})
@@ -91,7 +92,7 @@ set (FFMPEG_EXE ${FFMPEG_EXE} CACHE FILEPATH "FFmpeg executable" FORCE)
 set (FFMPEG_INCLUDE_DIR ${FFMPEG_INCLUDE_DIR} CACHE PATH "FFmpeg include folder" FORCE)
 set (FFMPEG_LIBRARIES ${FFMPEG_LIBRARIES} CACHE FILEPATH "All FFmpeg related libraries" FORCE)
 if (WIN32)
-	set (FFMPEG_DLLES ${FFMPEG_DLLS} CACHE FILEPATH "All FFmpeg related dlls" FORCE)
+	set (FFMPEG_DLLS ${FFMPEG_DLLS} CACHE FILEPATH "All FFmpeg related dlls" FORCE)
 endif (WIN32)
 
 if (FFMPEG_EXE AND FFMPEG_INCLUDE_DIR AND FFMPEG_LIBRARIES)
