@@ -454,7 +454,7 @@ public:
 			hudAcorn->retain();
 		}
 
-		hudWooden=engine->getFontManager()->findFont("Pinewood.ttf",100);
+		hudWooden=engine->getFontManager()->getDefaultFont();//findFont("Pinewood.ttf",100);
 		if(hudWooden!=NULL){
 			hudWooden->retain();
 		}
