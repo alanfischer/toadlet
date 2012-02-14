@@ -115,7 +115,7 @@ Resource::ptr OSXFontHandler::load(Stream::ptr in,ResourceData *resourceData,Pro
 	const wchar_t *wcharArray=fontData->characterSet.wc_str();
 	int numChars=fontData->characterSet.length();
 	UniChar charArray[numChars+1];
-	int i;
+	int i,j;
 	for(i=0;i<numChars+1;++i){
 		charArray[i]=wcharArray[i];
 	}
@@ -231,14 +231,19 @@ Resource::ptr OSXFontHandler::load(Stream::ptr in,ResourceData *resourceData,Pro
 	}
 
 	// Build texture
-	TextureFormat::ptr textureFormat(new TextureFormat(TextureFormat::Dimension_D2,TextureFormat::Format_A_8,textureWidth,textureHeight,1,0));
+	TextureFormat::ptr textureFormat(new TextureFormat(TextureFormat::Dimension_D2,TextureFormat::Format_LA_8,textureWidth,textureHeight,1,0));
 	tbyte *textureData=new tbyte[textureFormat->getDataSize()];
 	int textureStride=textureFormat->getXPitch();
-
+	int charmapStride=textureWidth;
+	
 	for(i=0;i<charmapHeight;++i){
-		memcpy(textureData+textureStride*(textureHeight-i-1),data+textureStride*i,textureStride);
+		for(j=0;j<textureWidth;++j){
+			uint8 *s=(uint8*)(data+charmapStride*i)+j;
+			uint16 *d=(uint16*)(textureData+textureStride*(textureHeight-i-1))+j;
+			*d=(int)((*s)<<8) | (int)(*s);
+		}
 	}
-
+	
 	Texture::ptr texture=mTextureManager->createTexture(textureFormat,textureData);
 	
 	delete[] textureData;
