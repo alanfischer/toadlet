@@ -23,19 +23,30 @@
  *
  ********** Copyright header - do not remove **********/
 
-#ifndef TOADLET_EGG_RESOURCEFULLYRELEASEDLISTENER_H
-#define TOADLET_EGG_RESOURCEFULLYRELEASEDLISTENER_H
+#ifndef TOADLET_TADPOLE_COMPONENT_H
+#define TOADLET_TADPOLE_COMPONENT_H
 
-#include <toadlet/egg/Resource.h>
+#include <toadlet/egg/Interface.h>
+#include <toadlet/tadpole/Types.h>
 
 namespace toadlet{
-namespace egg{
+namespace tadpole{
+namespace node{
+	class Node;
+}
 
-class ResourceFullyReleasedListener{
+class Component:public Interface{
 public:
-	virtual ~ResourceFullyReleasedListener(){}
+	TOADLET_INTRUSIVE_POINTERS(Component);
+	
+	virtual Node *isNode()=0;
+	
+	virtual void destroy()=0;
 
-	virtual void resourceFullyReleased(Resource *resource)=0;
+	virtual bool parentChanged(Node *node)=0;
+
+	virtual void logicUpdate(int dt,int scope)=0;
+	virtual void frameUpdate(int dt,int scope)=0;
 };
 
 }

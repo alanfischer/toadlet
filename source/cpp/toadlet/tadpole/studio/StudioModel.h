@@ -36,8 +36,7 @@ namespace studio{
 
 class TOADLET_API StudioModel:public BaseResource{
 public:
-	TOADLET_BASERESOURCE_PASSTHROUGH(BaseResource);
-	TOADLET_SHARED_POINTERS(StudioModel);
+	TOADLET_RESOURCE(StudioModel,StudioModel);
 
 	StudioModel():
 		data(NULL),
@@ -51,15 +50,7 @@ public:
 		}
 		header=NULL;
 
-		int i;
-		for(i=0;i<textures.size();++i){
-			textures[i]->release();
-		}
 		textures.clear();
-
-		for(i=0;i<materials.size();++i){
-			materials[i]->destroy();
-		}
 		materials.clear();
 	}
 

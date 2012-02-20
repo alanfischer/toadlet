@@ -48,7 +48,7 @@ public:
 		TOADLET_SHARED_POINTERS(SubModel);
 
 		SubModel(BSP30ModelNode *modelNode,BSP30Map *map);
-		void destroy(){if(material!=NULL){material->release();}}
+		void destroy(){material=NULL;}
 
 		Material *getRenderMaterial() const{return material;}
 		const Transform &getRenderTransform() const{return modelNode->getWorldTransform();}

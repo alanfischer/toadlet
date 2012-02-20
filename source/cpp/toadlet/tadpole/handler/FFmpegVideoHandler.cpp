@@ -351,10 +351,7 @@ bool FFmpegController::open(Stream::ptr stream){
 void FFmpegController::destroy(){
 	Logger::alert(Categories::TOADLET_TADPOLE,"FFmpegController::destroy");
 
-	if(mTexture!=NULL){
-		mTexture->release();
-		mTexture=NULL;
-	}
+	mTexture=NULL;
 
 	if(mAudio!=NULL){
 		mAudio->stop();
@@ -400,15 +397,7 @@ void FFmpegController::destroy(){
 }
 
 void FFmpegController::setTexture(Texture::ptr texture){
-	if(mTexture!=NULL){
-		mTexture->release();
-	}
-
 	mTexture=texture;
-
-	if(mTexture!=NULL){
-		mTexture->retain();
-	}
 
 	StreamData *videoStreamData=&mStreams[AVMEDIA_TYPE_VIDEO];
 	if(videoStreamData->codecCtx!=NULL && mVideoStream==NULL){

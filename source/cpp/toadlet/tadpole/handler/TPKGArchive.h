@@ -38,9 +38,8 @@ namespace tadpole{
 namespace handler{
 
 class TOADLET_API TPKGArchive:public Archive,public BaseResource{
-	TOADLET_BASERESOURCE_PASSTHROUGH(Archive);
 public:
-	TOADLET_SHARED_POINTERS(TPKGArchive);
+	TOADLET_RESOURCE(TPKGArchive,Archive);
 
 	TPKGArchive();
 	virtual ~TPKGArchive();

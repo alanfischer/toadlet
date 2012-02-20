@@ -36,9 +36,8 @@ namespace tadpole{
 namespace handler{
 
 class TOADLET_API WADArchive:public Archive,public BaseResource{
-	TOADLET_BASERESOURCE_PASSTHROUGH(Archive);
 public:
-	TOADLET_SHARED_POINTERS(WADArchive);
+	TOADLET_RESOURCE(WADArchive,Archive);
 
 	WADArchive(TextureManager *textureManager);
 	virtual ~WADArchive();

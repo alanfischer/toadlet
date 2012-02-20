@@ -49,7 +49,7 @@ public:
 		TOADLET_SHARED_POINTERS(SubMesh);
 
 		SubMesh(MeshNode *meshNode,Mesh::SubMesh *meshSubMesh);
-		void destroy(){if(material!=NULL){material->release();material=NULL;}}
+		void destroy(){material=NULL;}
 
 		Material *getRenderMaterial() const{return material;}
 		const Transform &getRenderTransform() const{return hasOwnTransform?worldTransform:meshNode->getWorldTransform();}
@@ -90,7 +90,6 @@ public:
 	Node *create(Scene *scene);
 	void destroy();
 	Node *set(Node *node);
-
 	void *hasInterface(int type);
 
 	void setMesh(const String &name);
@@ -103,8 +102,6 @@ public:
 
 	inline MeshNodeSkeleton::ptr getSkeleton() const{return mSkeleton;}
 	void setSkeleton(MeshNodeSkeleton::ptr skeleton);
-
-	MeshController::ptr getController();
 
 	void frameUpdate(int dt,int scope);
 	void updateWorldTransform();
@@ -134,8 +131,6 @@ protected:
 	RenderState::ptr mSharedRenderState;
 	MeshNodeSkeleton::ptr mSkeleton;
 	VertexData::ptr mDynamicVertexData;
-
-	MeshController::ptr mController;
 };
 
 }

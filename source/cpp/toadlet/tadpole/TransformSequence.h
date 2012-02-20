@@ -34,7 +34,7 @@ namespace tadpole{
 
 class TOADLET_API TransformSequence:public BaseResource{
 public:
-	TOADLET_SHARED_POINTERS(TransformSequence);
+	TOADLET_RESOURCE(TransformSequence,TransformSequence);
 
 	TransformSequence();
 	virtual ~TransformSequence();

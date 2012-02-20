@@ -70,7 +70,7 @@ protected:
 
 	D3D10RenderDevice *mDevice;
 	BufferDestroyedListener *mListener;
-	D3D10Texture *mTexture;
+	D3D10Texture::ptr mTexture;
 	ID3D10Resource *mD3DTexture;
 	ID3D10RenderTargetView *mD3DRenderTargetView;
 	ID3D10DepthStencilView *mD3DDepthStencilView;

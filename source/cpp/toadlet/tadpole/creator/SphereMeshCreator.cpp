@@ -109,7 +109,6 @@ Mesh::ptr SphereMeshCreator::createSphereMesh(const Sphere &sphere,int numSegmen
 	if(material==NULL){
 		material=mEngine->getMaterialManager()->createDiffuseMaterial(NULL);
 	}
-	material->retain();
 	mesh->getSubMesh(0)->material=material;
 
 	return mesh;

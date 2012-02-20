@@ -25,7 +25,6 @@
 
 #include <toadlet/tadpole/TransformKeyFrame.h>
 #include <toadlet/tadpole/node/Node.h>
-#include <toadlet/tadpole/node/ParentNode.h>
 
 namespace toadlet{
 namespace tadpole{

@@ -76,6 +76,8 @@ void BackableShader::destroy(){
 
 	mProfiles.clear();
 	mCodes.clear();
+
+	BaseResource::destroy();
 }
 
 void BackableShader::setBack(Shader::ptr back,RenderDevice *renderDevice){

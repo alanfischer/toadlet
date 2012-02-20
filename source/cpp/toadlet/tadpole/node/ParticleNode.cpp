@@ -30,7 +30,6 @@
 #include <toadlet/tadpole/RenderableSet.h>
 #include <toadlet/tadpole/Scene.h>
 #include <toadlet/tadpole/node/ParticleNode.h>
-#include <toadlet/tadpole/node/ParentNode.h>
 #include <toadlet/tadpole/node/CameraNode.h>
 
 namespace toadlet{
@@ -72,10 +71,7 @@ Node *ParticleNode::create(Scene *scene){
 void ParticleNode::destroy(){
 	mParticles.clear();
 
-	if(mMaterial!=NULL){
-		mMaterial->release();
-		mMaterial=NULL;
-	}
+	mMaterial=NULL;
 
 	if(mVertexData!=NULL){
 		mVertexData->destroy();
@@ -175,20 +171,10 @@ void ParticleNode::setWorldSpace(bool worldSpace){
 }
 
 void ParticleNode::setMaterial(Material::ptr material){
-	if(mMaterial!=NULL){
-		mMaterial->release();
-	}
-
 	mMaterial=material;
 
-	if(mMaterial!=NULL){
-		mMaterial->retain();
-	}
-
 	if(mSharedRenderState!=NULL){
-		Material::ptr material=mEngine->getMaterialManager()->createSharedMaterial(mMaterial,mSharedRenderState);
-		mMaterial->release();
-		mMaterial=material;
+		mMaterial=mEngine->getMaterialManager()->createSharedMaterial(mMaterial,mSharedRenderState);
 	}
 }
 
@@ -213,9 +199,7 @@ void ParticleNode::frameUpdate(int dt,int scope){
 RenderState::ptr ParticleNode::getSharedRenderState(){
 	if(mSharedRenderState==NULL){
 		mSharedRenderState=mEngine->getMaterialManager()->createRenderState();
-		Material::ptr material=mEngine->getMaterialManager()->createSharedMaterial(mMaterial,mSharedRenderState);
-		mMaterial->release();
-		mMaterial=material;
+		mMaterial=mEngine->getMaterialManager()->createSharedMaterial(mMaterial,mSharedRenderState);
 	}
 
 	return mSharedRenderState;

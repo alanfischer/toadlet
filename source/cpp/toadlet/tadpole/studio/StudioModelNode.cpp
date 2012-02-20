@@ -114,17 +114,14 @@ void StudioModelNode::destroy(){
 	}
 	mSubModels.clear();
 
-	if(mModel!=NULL){
-		mModel->release();
-		mModel=NULL;
-	}
-
 	if(mSkeletonMaterial!=NULL){
 		mSkeletonMaterial->destroy();
 		mSkeletonMaterial=NULL;
 
 		destroySkeletonBuffers();
 	}
+
+	mModel=NULL;
 
 	super::destroy();
 }
@@ -193,14 +190,10 @@ void StudioModelNode::setModel(const String &name){
 }
 
 void StudioModelNode::setModel(StudioModel::ptr model){
-	if(mModel!=NULL){
-		mModel->release();
-	}
-
 	mModel=model;
 
-	if(mModel!=NULL){
-		mModel->retain();
+	if(mModel==NULL){
+		return;
 	}
 
 	mBoneTranslates.resize(model->header->numbones);
@@ -378,11 +371,10 @@ void StudioModelNode::setLink(StudioModelNode::ptr link){
 		}
 	}
 }
-
+/*
 StudioModelController *StudioModelNode::getController(){
 	if(mController==NULL){
 		mController=StudioModelController::ptr(new StudioModelController(this,false));
-		addController(mController);
 	}
 	return (StudioModelController*)mController.get();
 }
@@ -390,11 +382,10 @@ StudioModelController *StudioModelNode::getController(){
 StudioModelController *StudioModelNode::getGaitController(){
 	if(mGaitController==NULL){
 		mGaitController=StudioModelController::ptr(new StudioModelController(this,true));
-		addController(mGaitController);
 	}
 	return (StudioModelController*)mGaitController.get();
 }
-
+*/
 void StudioModelNode::traceSegment(Collision &result,const Vector3 &position,const Segment &segment,const Vector3 &size){
 	Vector3 point,normal;
 	Segment localSegment,boxSegment;
@@ -433,9 +424,7 @@ RenderState::ptr StudioModelNode::getSharedRenderState(){
 		mSharedRenderState=mEngine->getMaterialManager()->createRenderState();
 		int i;
 		for(i=0;i<mSubModels.size();++i){
-			Material::ptr material=mEngine->getMaterialManager()->createSharedMaterial(mSubModels[i]->material,mSharedRenderState);
-			mSubModels[i]->material->release();
-			mSubModels[i]->material=material;
+			mSubModels[i]->material=mEngine->getMaterialManager()->createSharedMaterial(mSubModels[i]->material,mSharedRenderState);
 		}
 	}
 
@@ -819,9 +808,7 @@ void StudioModelNode::createSubModels(){
 	for(i=0;i<smodel->nummesh;++i){
 		SubModel::ptr subModel(new SubModel(this,mBodypartIndex,mModelIndex,i,mSkinIndex));
 		if(mSharedRenderState!=NULL){
-			Material::ptr material=mEngine->getMaterialManager()->createSharedMaterial(subModel->material,mSharedRenderState);
-			subModel->material->release();
-			subModel->material=material;
+			subModel->material=mEngine->getMaterialManager()->createSharedMaterial(subModel->material,mSharedRenderState);
 		}
 		mSubModels.add(subModel);
 	}

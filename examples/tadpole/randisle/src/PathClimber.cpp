@@ -1,13 +1,8 @@
 #include "PathClimber.h"
-#include "Resources.h"
-#include "Tree.h"
-#include "Acorn.h"
-
-TOADLET_NODE_IMPLEMENT(PathClimber,"PathClimber");
 
 static const scalar epsilon=0.001f;
 
-PathClimber::PathClimber():HopEntity(),
+PathClimber::PathClimber():BaseComponent(),
 	mPreviousPath(NULL),
 	mPath(NULL),
 	mPathTime(0),
@@ -17,12 +12,7 @@ PathClimber::PathClimber():HopEntity(),
 	mSpeed(0),
 	//mIdealRotation,
 	//mPreviousNormals,
-	mNormalIndex(0),
-
-	mAcornCount(0),
-	mGroundTime(0),
-	mDanger(0),
-	mHealth(0)
+	mNormalIndex(0)
 {
 	mPreviousNormals.resize(10);
 	int i;
@@ -31,34 +21,16 @@ PathClimber::PathClimber():HopEntity(),
 	}
 }
 
-Node *PathClimber::create(Scene *scene){
-	super::create(scene);
-
-	setCoefficientOfRestitution(0);
-
-	mPlayerMeshNode=mEngine->createNodeType(MeshNode::type(),mScene);
-	if(Resources::instance->creature!=NULL){
-		mPlayerMeshNode->setMesh(Resources::instance->creature);
-		mPlayerMeshNode->getController()->setSequenceIndex(1);
+bool PathClimber::parentChanged(Node *node){
+	mNode=(HopEntity*)node;
+	if(mNode!=NULL){
+		mScene=(HopScene*)mNode->getScene();
 	}
-	attach(mPlayerMeshNode);
-
-	mShadowMeshNode=mEngine->createNodeType(MeshNode::type(),mScene);
-	if(Resources::instance->shadow!=NULL){
-		mShadowMeshNode->setMesh(Resources::instance->shadow);
-	}
-	GroundProjector::ptr projector(new GroundProjector(this,20,0));
-	mShadowMeshNode->addNodeListener(projector);
-	attach(mShadowMeshNode);
-
-	mHealth=100;
-
-	mSensor=BoundingVolumeSensor::ptr(new BoundingVolumeSensor(mScene));
-
-	return this;
+	return true;
 }
 
 void PathClimber::logicUpdate(int dt,int scope){
+/*
 	if(Math::square(getVelocity().x)+Math::square(getVelocity().y)<0.05){
 		mPlayerMeshNode->getController()->setCycling(Controller::Cycling_NONE);
 	}
@@ -68,7 +40,7 @@ void PathClimber::logicUpdate(int dt,int scope){
 			mPlayerMeshNode->getController()->start();
 		}
 	}
-
+*/
 	if(mPath==NULL){
 		Quaternion rotate;
 		Vector3 right,forward,up;
@@ -76,9 +48,9 @@ void PathClimber::logicUpdate(int dt,int scope){
 		Math::mul(forward,mIdealRotation,Math::Y_UNIT_VECTOR3);
 
 		Segment segment;
-		segment.setStartDir(getPosition(),Vector3(0,0,-5));
+		segment.setStartDir(mNode->getTranslate(),Vector3(0,0,-5));
 		tadpole::Collision result;
-		mHopScene->traceSegment(result,segment,-1,this);
+		mScene->traceSegment(result,segment,-1,mNode);
 		if(result.time<Math::ONE){
 			up.set(result.normal);
 		}
@@ -97,18 +69,18 @@ void PathClimber::logicUpdate(int dt,int scope){
 		Math::normalizeCarefully(right,epsilon);
 		Math::cross(forward,up,right);
 		Math::setQuaternionFromAxes(rotate,right,forward,up);
-		setRotate(rotate);
+		mNode->setRotate(rotate);
 
-		forward.set(0,mSpeed,getVelocity().z);
-		if(mSpeed>0 && Math::length(getVelocity())==0){ // Check to see if we're stuck on the terrain
+		forward.set(0,mSpeed,mNode->getVelocity().z);
+		if(mSpeed>0 && Math::length(mNode->getVelocity())==0){ // Check to see if we're stuck on the terrain
 			forward.z=40;
 		}
 		Math::mul(forward,mIdealRotation);
-		setVelocity(forward);
+		mNode->setVelocity(forward);
 
-		if((mSolid->getTouching()!=NULL || getCoefficientOfGravity()==0) && mGroundTime==0){
-			mGroundTime=mScene->getLogicTime();
-		}
+//		if((mSolid->getTouching()!=NULL || getCoefficientOfGravity()==0) && mGroundTime==0){
+//			mGroundTime=mScene->getLogicTime();
+//		}
 	}
 	else{
 		scalar oldPathTime=mPathTime;
@@ -153,39 +125,22 @@ void PathClimber::logicUpdate(int dt,int scope){
 
 		Quaternion rotate;
 		findRotation(rotate,tangent,normal);
-		setRotate(rotate);
+		mNode->setRotate(rotate);
 
 		Math::add(result,mMounted->getTranslate());
-		Math::setAxesFromQuaternion(getRotate(),right,forward,up);
-		result=result+up*(Math::maxVal(0,scale.x-1)-mSolid->getLocalBound().mins.z);
-		setPosition(result);
+		Math::setAxesFromQuaternion(mNode->getRotate(),right,forward,up);
+		result=result+up*(Math::maxVal(0,scale.x-1)-mNode->getBound().mins.z);
+		mNode->setTranslate(result);
 	}
-
-	mSensor->setBound(getWorldBound());
-	SensorResults::ptr results=mSensor->sense();
-	int i;
-	for(i=0;i<results->getNumResults();++i){
-		Node *node=results->getResult(i);
-		if(node->getScope()==RandIsle::Scope_TREE){
-			ParentNode *tree=(ParentNode*)node;
-			for(node=tree->getFirstChild();node!=NULL;node=node->getNext()){
-				if(node->getScope()==RandIsle::Scope_ACORN && getWorldBound().testIntersection(node->getWorldBound())){
-					((Acorn*)node)->fade();
-				}
-			}
-		}
-	}
-
-	super::logicUpdate(dt,scope);
 }
 
-void PathClimber::mount(ParentNode *system,PathSystem::Path *path,const Vector3 &point){
+void PathClimber::mount(Node *system,PathSystem::Path *path,const Vector3 &point){
 	dismount();
 
 	mMounted=system;
 	mPreviousPath=NULL;
 	mPath=path;
-	setCoefficientOfGravity(0);
+	mNode->setCoefficientOfGravity(0);
 
 	Segment segment;
 	path->getPoint(segment.origin,0);
@@ -200,19 +155,19 @@ void PathClimber::mount(ParentNode *system,PathSystem::Path *path,const Vector3 
 	mPathTime=Math::length(localPoint,segment.origin);
 
 	bool flip=false;
-	if(mGroundTime>0){
-		flip=Math::dot(ndir,Math::Z_UNIT_VECTOR3)<0;
-	}
-	else{
+//	if(mGroundTime>0){
+//		flip=Math::dot(ndir,Math::Z_UNIT_VECTOR3)<0;
+//	}
+//	else{
 		flip=Math::dot(segment.direction,forward)<0;
-	}
+//	}
 	mPathDirection=flip?-1:1;
 
 	mPassedNeighbor=findPassedNeighbor(mPath,mPathDirection,mPathTime);
 
-	setVelocity(Math::ZERO_VECTOR3);
+	mNode->setVelocity(Math::ZERO_VECTOR3);
 
-	mGroundTime=0;
+//	mGroundTime=0;
 
 	if(mPathClimberListener!=NULL){
 		mPathClimberListener->pathMounted(this);
@@ -238,13 +193,13 @@ void PathClimber::dismount(){
 		Math::cross(right,forward,up);
 		Math::setQuaternionFromAxes(rotation,right,forward,up);
 		setIdealRotation(rotation);
-		setRotate(rotation);
+		mNode->setRotate(rotation);
 	}
-	setVelocity(forward*30+Vector3(0,0,40));
+	mNode->setVelocity(forward*30+Vector3(0,0,40));
 
 	mMounted=NULL;
 	mPath=NULL;
-	setCoefficientOfGravity(Math::ONE);
+	mNode->setCoefficientOfGravity(Math::ONE);
 	mNoClimbTime=mScene->getLogicTime()+500;
 }
 

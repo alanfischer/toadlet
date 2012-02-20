@@ -172,7 +172,7 @@ RenderState::ptr MaterialManager::createRenderState(){
 ShaderState::ptr MaterialManager::createShaderState(){
 	RenderDevice *renderDevice=mEngine->getRenderDevice();
 	ShaderState::ptr shaderState;
-	if(mEngine->hasShader(Shader::ShaderType_VERTEX)){
+	if(mEngine->isShaderBackable()){
 		Logger::debug(Categories::TOADLET_TADPOLE,"creating BackableShaderState");
 
 		BackableShaderState::ptr backableShaderState(new BackableShaderState());
@@ -276,7 +276,7 @@ void MaterialManager::contextActivate(RenderDevice *renderDevice){
 	}
 
 	for(i=0;i<mResources.size();++i){
-		Material *material=(Material*)mResources.at(i).get();
+		Material *material=(Material*)mResources[i];
 		if(material!=NULL){
 			compileMaterial(material);
 		}

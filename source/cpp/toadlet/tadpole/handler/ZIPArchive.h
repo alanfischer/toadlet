@@ -35,9 +35,8 @@ namespace tadpole{
 namespace handler{
 
 class TOADLET_API ZIPArchive:public Archive,public BaseResource{
-	TOADLET_BASERESOURCE_PASSTHROUGH(Archive);
 public:
-	TOADLET_SHARED_POINTERS(ZIPArchive);
+	TOADLET_RESOURCE(ZIPArchive,Archive);
 
 	ZIPArchive();
 	virtual ~ZIPArchive();

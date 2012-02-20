@@ -29,7 +29,7 @@
 #include <toadlet/tadpole/Types.h>
 #include <toadlet/egg/Map.h>
 #include <toadlet/egg/Resource.h>
-#include <toadlet/egg/ResourceFullyReleasedListener.h>
+#include <toadlet/egg/ResourceDestroyedListener.h>
 #include <toadlet/egg/io/Archive.h>
 #include <toadlet/egg/io/Stream.h>
 #include <toadlet/tadpole/ResourceCreator.h>
@@ -38,7 +38,7 @@
 namespace toadlet{
 namespace tadpole{
 
-class TOADLET_API ResourceManager:public ResourceFullyReleasedListener{
+class TOADLET_API ResourceManager:public ResourceDestroyedListener{
 public:
 	ResourceManager(Archive *archive);
 	virtual ~ResourceManager();
@@ -66,12 +66,14 @@ public:
 	virtual void setDefaultExtension(const String &extension){mDefaultExtension=extension;}
 	virtual const String &getDefaultExtension(){return mDefaultExtension;}
 
-	virtual void resourceFullyReleased(Resource *resource);
+	virtual void resourceDestroyed(Resource *resource);
+
+	virtual void logAllResources();
 
 	static String cleanFilename(const String &name);
 
 protected:
-	typedef Map<String,Resource::ptr> NameResourceMap;
+	typedef Map<String,Resource*> NameResourceMap;
 	typedef Map<String,ResourceStreamer::ptr> ExtensionStreamerMap;
 
 	virtual Resource::ptr unableToFindStreamer(const String &name,ResourceData *data);
@@ -85,7 +87,7 @@ protected:
 	int mMaxStreamLength;
 
 	Collection<int> mFreeHandles;
-	Collection<Resource::ptr> mResources;
+	Collection<Resource*> mResources;
 	NameResourceMap mNameResourceMap;
 
 	ExtensionStreamerMap mExtensionStreamerMap;

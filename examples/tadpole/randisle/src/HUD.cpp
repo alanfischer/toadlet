@@ -71,7 +71,7 @@ void HUD::frameUpdate(int dt,int scope){
 			mFadeSprite->getMaterial()->getPass()->getMaterialState(materialState);
 		}
 		Vector4 dangerColor=materialState.ambient;
-		dangerColor.w=mPlayer->getDanger();
+//		dangerColor.w=mPlayer->getDanger();
 
 		/// @todo:
 /*
@@ -113,6 +113,7 @@ void HUD::frameUpdate(int dt,int scope){
 }
 
 void HUD::logicUpdate(int dt,int scope){
+	/*
 	if(mPlayer!=NULL){
 		int newAcornCount=mPlayer->getAcornCount();
 		if(mAcornCount!=newAcornCount){
@@ -167,6 +168,7 @@ void HUD::logicUpdate(int dt,int scope){
 			mSharkSound->stop();
 		}
 	}
+	*/
 
 	/// @todo: Why isn't this working?
 //	mSystemLabel->setText(String("FPS:")+(int)getFramesPerSecond());
@@ -174,7 +176,7 @@ void HUD::logicUpdate(int dt,int scope){
 	super::logicUpdate(dt,scope);
 }
 
-void HUD::setTarget(PathClimber *player,CameraNode *camera){
+void HUD::setTarget(Node *player,CameraNode *camera){
 	mPlayer=player;
 	mCamera=camera;
 }

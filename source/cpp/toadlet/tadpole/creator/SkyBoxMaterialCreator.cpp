@@ -122,11 +122,11 @@ void SkyBoxMaterialCreator::createShaders(){
 
 void SkyBoxMaterialCreator::destroyShaders(){
 	if(mSkyBoxVertexShader!=NULL){
-		mSkyBoxVertexShader->release();
+		mSkyBoxVertexShader->destroy();
 		mSkyBoxVertexShader=NULL;
 	}
 	if(mSkyBoxFragmentShader!=NULL){
-		mSkyBoxFragmentShader->release();
+		mSkyBoxFragmentShader->destroy();
 		mSkyBoxFragmentShader=NULL;
 	}
 }

@@ -39,7 +39,7 @@ Tree::Tree():super(),
 	//mLowMeshNode
 {}
 
-Node *Tree::create(Scene *scene,int seed,ParentNode *parent,const Vector3 &translate){
+Node *Tree::create(Scene *scene,int seed,Node *parent,const Vector3 &translate){
 	super::create(scene);
 
 	Logger::alert("Tree::create");
@@ -57,14 +57,7 @@ Node *Tree::create(Scene *scene,int seed,ParentNode *parent,const Vector3 &trans
 	mLowDistance=300;
 
 	mBranchMaterial=Resources::instance->treeBranch;
-	if(mBranchMaterial!=NULL){
-		mBranchMaterial->retain();
-	}
-
 	mLeafMaterial=Resources::instance->treeLeaf;
-	if(mLeafMaterial!=NULL){
-		mLeafMaterial->retain();
-	}
 
 	mSystem=BranchSystem::ptr(new BranchSystem(seed));
 	mSystem->setBranchListener(this);
@@ -112,7 +105,6 @@ Node *Tree::create(Scene *scene,int seed,ParentNode *parent,const Vector3 &trans
 		Mesh::SubMesh::ptr subMesh(new Mesh::SubMesh());
 		subMesh->indexData=IndexData::ptr(new IndexData(IndexData::Primitive_TRISTRIP,mBranchIndexBuffer));
 		if(mBranchMaterial!=NULL){
-			mBranchMaterial->retain();
 			subMesh->material=mBranchMaterial;
 		}
 		mesh->addSubMesh(subMesh);
@@ -122,7 +114,6 @@ Node *Tree::create(Scene *scene,int seed,ParentNode *parent,const Vector3 &trans
 		subMesh->vertexData=VertexData::ptr(new VertexData(mLeafVertexBuffer));
 		subMesh->indexData=IndexData::ptr(new IndexData(IndexData::Primitive_TRIS,mLeafIndexBuffer));
 		if(mLeafMaterial!=NULL){
-			mLeafMaterial->retain();
 			subMesh->material=mLeafMaterial;
 		}
 		mesh->addSubMesh(subMesh);
@@ -136,7 +127,6 @@ Node *Tree::create(Scene *scene,int seed,ParentNode *parent,const Vector3 &trans
 		Mesh::SubMesh::ptr subMesh(new Mesh::SubMesh());
 		subMesh->indexData=IndexData::ptr(new IndexData(IndexData::Primitive_TRISTRIP,mLowBranchIndexBuffer));
 		if(mBranchMaterial!=NULL){
-			mBranchMaterial->retain();
 			subMesh->material=mBranchMaterial;
 		}
 		lowMesh->addSubMesh(subMesh);
@@ -146,7 +136,6 @@ Node *Tree::create(Scene *scene,int seed,ParentNode *parent,const Vector3 &trans
 		subMesh->vertexData=VertexData::ptr(new VertexData(mLeafVertexBuffer));
 		subMesh->indexData=IndexData::ptr(new IndexData(IndexData::Primitive_TRIS,mLeafIndexBuffer));
 		if(mLeafMaterial!=NULL){
-			mLeafMaterial->retain();
 			subMesh->material=mLeafMaterial;
 		}
 		lowMesh->addSubMesh(subMesh);
@@ -191,11 +180,11 @@ void Tree::destroy(){
 	}
 
 	if(mBranchMaterial!=NULL){
-		mBranchMaterial->release();
+		mBranchMaterial->destroy();
 		mBranchMaterial=NULL;
 	}
 	if(mLeafMaterial!=NULL){
-		mLeafMaterial->release();
+		mLeafMaterial->destroy();
 		mLeafMaterial=NULL;
 	}
 	

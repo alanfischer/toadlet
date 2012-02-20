@@ -23,45 +23,21 @@
  *
  ********** Copyright header - do not remove **********/
 
-#ifndef TOADLET_TADPOLE_NODE_NODEATTACHER_H
-#define TOADLET_TADPOLE_NODE_NODEATTACHER_H
+#ifndef TOADLET_EGG_RESOURCEDESTROYEDLISTENER_H
+#define TOADLET_EGG_RESOURCEDESTROYEDLISTENER_H
 
-#include <toadlet/tadpole/node/Node.h>
-#include <toadlet/tadpole/Attachable.h>
+#include <toadlet/egg/Resource.h>
 
 namespace toadlet{
-namespace tadpole{
-namespace node{
+namespace egg{
 
-// This currently requires that the attached Node have the same parent as the Attachable,
-//  due to it just using the LocalTransform of the Attachable Node
-class NodeAttacher:public NodeListener{
+class ResourceDestroyedListener{
 public:
-	TOADLET_SHARED_POINTERS(NodeAttacher);
+	virtual ~ResourceDestroyedListener(){}
 
-	NodeAttacher(Node::ptr node,Attachable *attachable,int index){
-		mNode=node;
-		mAttachable=attachable;
-		mIndex=index;
-	}
-	
-	void nodeDestroyed(Node *node){}
-	void logicUpdate(Node *node,int dt){updateAttachment(node);}
-	void frameUpdate(Node *node,int dt){updateAttachment(node);}
-	
-protected:
-	void updateAttachment(Node *node){
-		mAttachable->getAttachmentTransform(mTransform,mIndex);
-		node->setTransform(mTransform);
-	}
-
-	Node::ptr mNode;
-	Attachable *mAttachable;
-	int mIndex;
-	Transform mTransform;
+	virtual void resourceDestroyed(Resource *resource)=0;
 };
 
-}
 }
 }
 

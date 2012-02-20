@@ -59,20 +59,11 @@ Node *SpriteModelNode::create(Scene *scene){
 }
 
 void SpriteModelNode::destroy(){
-	int i;
-	for(i=0;i<mMaterials.size();++i){
-		mMaterials[i]->release();
-	}
 	mMaterials.clear();
 
 	if(mSharedRenderState!=NULL){
 		mSharedRenderState->destroy();
 		mSharedRenderState=NULL;
-	}
-
-	if(mModel!=NULL){
-		mModel->release();
-		mModel=NULL;
 	}
 
 	if(mVertexData!=NULL){
@@ -84,6 +75,8 @@ void SpriteModelNode::destroy(){
 		mIndexData->destroy();
 		mIndexData=NULL;
 	}
+
+	mModel=NULL;
 
 	super::destroy();
 }
@@ -122,35 +115,22 @@ void SpriteModelNode::setModel(const String &name){
 }
 
 void SpriteModelNode::setModel(SpriteModel::ptr model){
-	if(mModel!=NULL){
-		mModel->release();
-	}
-
 	mModel=model;
 
-	if(mModel!=NULL){
-		mModel->retain();
-	}
-	else{
+	if(mModel==NULL){
 		return;
 	}
 
 	mBound.set(mModel->header->boundingradius);
 
-	int i;
-	for(i=0;i<mMaterials.size();++i){
-		mMaterials[i]->release();
-	}
 	mMaterials.clear();
 
+	int i;
 	for(i=0;i<mModel->materials.size();++i){
 		mMaterials.add(mModel->materials[i]);
 		if(mSharedRenderState!=NULL){
-			Material::ptr material=mEngine->getMaterialManager()->createSharedMaterial(mMaterials[i],mSharedRenderState);
-			mMaterials[i]->release();
-			mMaterials[i]=material;
+			mMaterials[i]=mEngine->getMaterialManager()->createSharedMaterial(mMaterials[i],mSharedRenderState);
 		}
-		mMaterials[i]->retain();
 	}
 
 	if(mVertexData!=NULL){

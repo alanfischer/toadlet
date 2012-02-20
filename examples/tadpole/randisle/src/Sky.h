@@ -42,9 +42,9 @@ protected:
 	TextureState mTextureState;
 };
 
-class Sky:public ParentNode{
+class Sky:public Node{
 public:
-	TOADLET_NODE(Sky,ParentNode);
+	TOADLET_NODE(Sky,Node);
 
 	Sky():super(){}
 

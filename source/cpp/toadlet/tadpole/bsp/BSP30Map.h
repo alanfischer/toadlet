@@ -40,8 +40,7 @@ namespace bsp{
 
 class TOADLET_API BSP30Map:public BaseResource{
 public:
-	TOADLET_BASERESOURCE_PASSTHROUGH(BaseResource);
-	TOADLET_SHARED_POINTERS(BSP30Map);
+	TOADLET_RESOURCE(BSP30Map,BSP30Map);
 
 	const static int LIGHTMAP_SIZE=256;
 	struct facedata;

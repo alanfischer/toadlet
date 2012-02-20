@@ -40,6 +40,7 @@ Mesh::~Mesh(){
 void Mesh::destroy(){
 	if(mStaticVertexData!=NULL){
 		mStaticVertexData->destroy();
+		mStaticVertexData=NULL;
 	}
 
 	int i;
@@ -48,16 +49,12 @@ void Mesh::destroy(){
 		if(subMesh->indexData!=NULL){
 			subMesh->indexData->destroy();
 		}
-		if(subMesh->material!=NULL){
-			subMesh->material->release();
-		}
 	}
 	mSubMeshes.clear();
 
-	if(mSkeleton!=NULL){
-		mSkeleton->release();
-		mSkeleton=NULL;
-	}
+	mSkeleton=NULL;
+
+	BaseResource::destroy();
 }
 
 void Mesh::compile(){
@@ -102,15 +99,7 @@ void Mesh::setStaticVertexData(VertexData::ptr vertexData){
 }
 
 void Mesh::setSkeleton(Skeleton::ptr skeleton){
-	if(mSkeleton!=NULL){
-		mSkeleton->release();
-	}
-
 	mSkeleton=skeleton;
-
-	if(mSkeleton!=NULL){
-		mSkeleton->retain();
-	}
 }
 
 }

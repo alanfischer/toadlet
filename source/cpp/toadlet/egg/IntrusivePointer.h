@@ -31,7 +31,7 @@
 namespace toadlet{
 namespace egg{
 
-class DefaultIntrusiveSemantics{
+class PointerCountIntrusiveSemantics{
 public:
 	template<typename Type> static int retainReference(Type *type){
 		return type->pointerCounter()->incSharedCount();
@@ -49,6 +49,17 @@ public:
 	// Only necessary if you wish to use a WeakPointer with an IntrusivePointer
 	template<typename Type> static PointerCounter *getCount(Type *type){
 		return type->pointerCounter();
+	}
+};
+
+class DefaultIntrusiveSemantics{
+public:
+	template<typename Type> static int retainReference(Type *type){
+		return type->retain();
+	}
+
+	template<typename Type> static int releaseReference(Type *type){
+		return type->release();
 	}
 };
 
@@ -274,5 +285,8 @@ template<typename Type,typename Type2,typename PointerSemantics> inline Intrusiv
 
 }
 }
+
+#define TOADLET_INTRUSIVE_POINTERS(Class) \
+	typedef toadlet::egg::IntrusivePointer<Class> ptr;
 
 #endif

@@ -87,10 +87,7 @@ Node *TerrainPatchNode::create(Scene *scene){
 }
 
 void TerrainPatchNode::destroy(){
-	if(mMaterial!=NULL){
-		mMaterial->destroy();
-		mMaterial=NULL;
-	}
+	mMaterial=NULL;
 	if(mVertexBuffer!=NULL){
 		mVertexBuffer->destroy();
 		mVertexBuffer=NULL;
@@ -107,18 +104,9 @@ void TerrainPatchNode::destroy(){
 		mIndexData->destroy();
 		mIndexData=NULL;
 	}
-	int i;
-	for(i=0;i<mLayerTextures.size();++i){
-		if(mLayerTextures[i]!=NULL){
-			mLayerTextures[i]->release();
-			mLayerTextures[i]=NULL;
-		}
-	}
+	mLayerTextures.clear();
 
-	if(mWaterMaterial!=NULL){
-		mWaterMaterial->release();
-		mWaterMaterial=NULL;
-	} 
+	mWaterMaterial=NULL;
 	if(mWaterVertexBuffer!=NULL){
 		mWaterVertexBuffer->destroy();
 		mWaterVertexBuffer=NULL;
@@ -336,12 +324,7 @@ bool TerrainPatchNode::setLayerData(tbyte *data,int rowPitch,int width,int heigh
 	}
 
 	int i,j;
-	for(i=0;i<mLayerTextures.size();++i){
-		if(mLayerTextures[i]!=NULL){
-			mLayerTextures[i]->release();
-			mLayerTextures[i]=NULL;
-		}
-	}
+	mLayerTextures.clear();
 
 	int numLayers=0;
 	for(j=0;j<height;++j){
@@ -388,29 +371,13 @@ bool TerrainPatchNode::setLayerData(tbyte *data,int rowPitch,int width,int heigh
 }
 
 bool TerrainPatchNode::setMaterial(Material::ptr material){
-	if(mMaterial!=NULL){
-		mMaterial->release();
-	}
-
 	mMaterial=material;
-
-	if(mMaterial!=NULL){
-		mMaterial->retain();
-	}
 
 	return true;
 }
 
 bool TerrainPatchNode::setWaterMaterial(Material::ptr material){
-	if(mWaterMaterial!=NULL){
-		mWaterMaterial->release();
-	}
-
 	mWaterMaterial=material;
-
-	if(mWaterMaterial!=NULL){
-		mWaterMaterial->retain();
-	}
 
 	return true;
 }

@@ -149,8 +149,8 @@ bool D3D10Texture::createContext(int numMipDatas,byte *mipDatas[]){
 		for(i=0;i<numSubResources;++i){
 			TextureFormat::ptr format(new TextureFormat(mFormat,i));
 			sData[i].pSysMem=(i==0 || i<numMipDatas) ? mipDatas[i]:NULL;
-			sData[i].SysMemPitch=mFormat->getXPitch();
-			sData[i].SysMemSlicePitch=mFormat->getYPitch();
+			sData[i].SysMemPitch=format->getXPitch();
+			sData[i].SysMemSlicePitch=format->getYPitch();
 		}
 	}
 

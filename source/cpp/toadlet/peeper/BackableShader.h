@@ -34,9 +34,8 @@ namespace toadlet{
 namespace peeper{
 
 class TOADLET_API BackableShader:public BaseResource,public Shader{
-	TOADLET_BASERESOURCE_PASSTHROUGH(Shader);
 public:
-	TOADLET_SHARED_POINTERS(BackableShader);
+	TOADLET_RESOURCE(BackableShader,Shader);
 
 	BackableShader();
 	virtual ~BackableShader();

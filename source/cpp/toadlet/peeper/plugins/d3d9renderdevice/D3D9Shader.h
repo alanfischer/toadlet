@@ -36,8 +36,9 @@ namespace peeper{
 class D3D9RenderDevice;
 
 class TOADLET_API D3D9Shader:protected BaseResource,public Shader{
-	TOADLET_BASERESOURCE_PASSTHROUGH(Shader);
 public:
+	TOADLET_RESOURCE(D3D9Shader,Shader);
+
 	D3D9Shader(D3D9RenderDevice *renderDevice);
 
 	virtual ~D3D9Shader();
