@@ -23,32 +23,32 @@
  *
  ********** Copyright header - do not remove **********/
 
-#ifndef TOADLET_TADPOLE_NODE_NODERESOURCE_H
-#define TOADLET_TADPOLE_NODE_NODERESOURCE_H
+#ifndef TOADLET_TADPOLE_BASECOMPONENT_H
+#define TOADLET_TADPOLE_BASECOMPONENT_H
 
-#include <toadlet/egg/BaseResource.h>
-#include <toadlet/tadpole/node/Node.h>
+#include <toadlet/egg/Object.h>
+#include <toadlet/tadpole/Component.h>
 
 namespace toadlet{
 namespace tadpole{
-namespace node{
 
-class TOADLET_API NodeResource:public BaseResource{
+class BaseComponent:public Object,public Component{
 public:
-	TOADLET_RESOURCE(NodeResource,NodeResource);
+	TOADLET_INTRUSIVE_POINTERS(BaseComponent);
 
-	NodeResource(Node::ptr node=NULL):BaseResource(){setNode(node);}
-	virtual ~NodeResource(){}
-	void destroy(){mNode->destroy();}
+	virtual int retain(){return Object::retain();}
+	virtual int release(){return Object::release();}
 	
-	void setNode(Node::ptr node){mNode=node;}
-	Node::ptr getNode() const{return mNode;}
+	virtual Node *isNode(){return NULL;}
+	
+	virtual void destroy()=0;
 
-protected:
-	Node::ptr mNode;
+	virtual bool parentChanged(Node *node)=0;
+
+	virtual void logicUpdate(int dt,int scope)=0;
+	virtual void frameUpdate(int dt,int scope)=0;
 };
 
-}
 }
 }
 

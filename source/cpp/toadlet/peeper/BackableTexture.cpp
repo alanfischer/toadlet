@@ -83,6 +83,8 @@ void BackableTexture::destroy(){
 		delete[] mData;
 		mData=NULL;
 	}
+
+	BaseResource::destroy();
 }
 
 void BackableTexture::resetCreate(){

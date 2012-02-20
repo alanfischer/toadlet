@@ -249,19 +249,19 @@ DiffuseMaterialCreator::DiffuseMaterialCreator(Engine *engine){
 
 void DiffuseMaterialCreator::destroy(){
 	if(mDiffuseVertexShader!=NULL){
-		mDiffuseVertexShader->release();
+		mDiffuseVertexShader->destroy();
 		mDiffuseVertexShader=NULL;
 	}
 	if(mDiffuseFragmentShader!=NULL){
-		mDiffuseFragmentShader->release();
+		mDiffuseFragmentShader->destroy();
 		mDiffuseFragmentShader=NULL;
 	}
 	if(mPointSpriteGeometryShader!=NULL){
-		mPointSpriteGeometryShader->release();
+		mPointSpriteGeometryShader->destroy();
 		mPointSpriteGeometryShader=NULL;
 	}
 	if(mPointSpriteFragmentShader!=NULL){
-		mPointSpriteFragmentShader->release();
+		mPointSpriteFragmentShader->destroy();
 		mPointSpriteFragmentShader=NULL;
 	}
 }

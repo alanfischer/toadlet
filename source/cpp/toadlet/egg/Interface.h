@@ -23,33 +23,26 @@
  *
  ********** Copyright header - do not remove **********/
 
-#ifndef TOADLET_TADPOLE_NODE_NODERESOURCE_H
-#define TOADLET_TADPOLE_NODE_NODERESOURCE_H
+#ifndef TOADLET_EGG_INTERFACE_H
+#define TOADLET_EGG_INTERFACE_H
 
-#include <toadlet/egg/BaseResource.h>
-#include <toadlet/tadpole/node/Node.h>
+#include <toadlet/Types.h>
+#include <toadlet/egg/IntrusivePointer.h>
 
 namespace toadlet{
-namespace tadpole{
-namespace node{
+namespace egg{
 
-class TOADLET_API NodeResource:public BaseResource{
+class TOADLET_API Interface{
 public:
-	TOADLET_RESOURCE(NodeResource,NodeResource);
+	TOADLET_INTRUSIVE_POINTERS(Interface);
+	virtual ~Interface(){}
 
-	NodeResource(Node::ptr node=NULL):BaseResource(){setNode(node);}
-	virtual ~NodeResource(){}
-	void destroy(){mNode->destroy();}
-	
-	void setNode(Node::ptr node){mNode=node;}
-	Node::ptr getNode() const{return mNode;}
-
-protected:
-	Node::ptr mNode;
+	virtual int retain()=0;
+	virtual int release()=0;
 };
 
 }
 }
-}
 
 #endif
+

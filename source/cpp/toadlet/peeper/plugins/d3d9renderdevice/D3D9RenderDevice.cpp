@@ -755,7 +755,7 @@ void D3D9RenderDevice::setSamplerStatePostTexture(int i,SamplerState *state){
 
 	if(state!=NULL && texture!=NULL){
 		TextureFormat *format=texture->getFormat();
-		int d3dlevel=format->getMipMax()>0?format->getMipMaxPossible()-format->getMipMax():0;
+		int d3dlevel=format->getMipMin()>0?format->getMipMaxPossible()-format->getMipMin():0;
 		mD3DDevice->SetSamplerState(i,D3DSAMP_MAXMIPLEVEL,d3dlevel);
 	}
 	else{
@@ -955,7 +955,10 @@ void D3D9RenderDevice::setCapsFromD3DCAPS9(RenderCaps &caps,const D3DCAPS9 &d3dc
 	caps.hasFixed[Shader::ShaderType_FRAGMENT]=true;
 	caps.hasFixed[Shader::ShaderType_GEOMETRY]=caps.pointSprites;
 
-	#if !defined(TOADLET_FIXED_POINT)
+	#if defined(TOADLET_SET_D3DM)
+		caps.hasShader[Shader::ShaderType_VERTEX]=false;
+		caps.hasShader[Shader::ShaderType_FRAGMENT]=false;
+	#else
 		caps.hasShader[Shader::ShaderType_VERTEX]=d3dcaps.VertexShaderVersion>0;
 		caps.hasShader[Shader::ShaderType_FRAGMENT]=d3dcaps.PixelShaderVersion>0;
 	#endif

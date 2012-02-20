@@ -213,7 +213,6 @@ Node *Sky::create(Scene *scene,int cloudSize,const Vector4 &skyColor,const Vecto
 	}
 	mSkyMaterial=material;
 	mSkyMaterial->setLayer(-2);
-	mSkyMaterial->retain();
 
 	delete[] cloudData;
 	delete[] bumpData;
@@ -223,7 +222,6 @@ Node *Sky::create(Scene *scene,int cloudSize,const Vector4 &skyColor,const Vecto
 	transform.setScale(1,1,0.5f);
 	mesh->setTransform(transform);
 	mesh->getSubMesh(0)->material=mSkyMaterial;
-	mesh->getSubMesh(0)->material->retain();
 
 	mSkyDome=mEngine->createNodeType(MeshNode::type(),mScene);
 	mSkyDome->setMesh(mesh);
@@ -264,7 +262,7 @@ Node *Sky::create(Scene *scene,int cloudSize,const Vector4 &skyColor,const Vecto
 
 void Sky::destroy(){
 	if(mSkyMaterial!=NULL){
-		mSkyMaterial->release();
+		mSkyMaterial->destroy();
 		mSkyMaterial=NULL;
 	}
 

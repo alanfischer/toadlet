@@ -685,9 +685,6 @@ Mesh::ptr XMLMeshUtilities::loadMesh(mxml_node_t *node,int version,BufferManager
 			}
 
 			subMesh->material=material;
-			if(subMesh->material!=NULL){
-				subMesh->material->retain();
-			}
 		}
 
 		mesh->addSubMesh(subMesh);

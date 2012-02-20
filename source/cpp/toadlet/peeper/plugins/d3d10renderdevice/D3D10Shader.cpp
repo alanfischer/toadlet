@@ -84,6 +84,8 @@ void D3D10Shader::destroy(){
 		}
 	}
 	mLayouts.clear();
+
+	BaseResource::destroy();
 }
 
 bool D3D10Shader::createContext(){

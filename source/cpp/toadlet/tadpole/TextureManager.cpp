@@ -63,7 +63,7 @@ Texture::ptr TextureManager::createTexture(TextureFormat::ptr format,tbyte *data
 }
 
 Texture::ptr TextureManager::createTexture(TextureFormat::ptr format,tbyte *mipDatas[]){
-	return createTexture(Texture::Usage_BIT_STATIC|Texture::Usage_BIT_AUTOGEN_MIPMAPS,format,mipDatas);
+	return createTexture(Texture::Usage_BIT_STATIC,format,mipDatas);
 }
 
 Texture::ptr TextureManager::createTexture(int usage,TextureFormat::ptr format,tbyte *data){
@@ -150,10 +150,10 @@ Texture::ptr TextureManager::createNormalizationTexture(int size){
 void TextureManager::contextActivate(RenderDevice *renderDevice){
 	int i;
 	for(i=0;i<mResources.size();++i){
-		Texture::ptr texture=shared_static_cast<Texture>(mResources[i]);
+		Texture *texture=(Texture*)mResources[i];
 		if(texture!=NULL && texture->getRootTexture()!=texture){
 			Texture::ptr back(renderDevice->createTexture());
-			shared_static_cast<BackableTexture>(texture)->setBack(back,renderDevice);
+			((BackableTexture*)texture)->setBack(back,renderDevice);
 		}
 	}
 
@@ -169,9 +169,9 @@ void TextureManager::contextActivate(RenderDevice *renderDevice){
 void TextureManager::contextDeactivate(RenderDevice *renderDevice){
 	int i;
 	for(i=0;i<mResources.size();++i){
-		Texture::ptr texture=shared_static_cast<Texture>(mResources[i]);
+		Texture *texture=(Texture*)mResources[i];
 		if(texture!=NULL && texture->getRootTexture()!=texture){
-			shared_static_cast<BackableTexture>(texture)->setBack(NULL,NULL);
+			((BackableTexture*)texture)->setBack(NULL,NULL);
 		}
 	}
 
@@ -188,7 +188,7 @@ void TextureManager::preContextReset(peeper::RenderDevice *renderDevice){
 
 	int i;
 	for(i=0;i<mResources.size();++i){
-		Texture::ptr texture=shared_static_cast<Texture>(mResources[i]);
+		Texture *texture=(Texture*)mResources[i];
 		if(texture!=NULL){
 			texture->resetDestroy();
 		}
@@ -207,7 +207,7 @@ void TextureManager::postContextReset(peeper::RenderDevice *renderDevice){
 
 	int i;
 	for(i=0;i<mResources.size();++i){
-		Texture::ptr texture=shared_static_cast<Texture>(mResources[i]);
+		Texture *texture=(Texture*)mResources[i];
 		if(texture!=NULL){
 			texture->resetCreate();
 		}

@@ -4,7 +4,8 @@
 
 class TextureArchive:public Archive,public BaseResource{
 public:
-	TOADLET_SHARED_POINTERS(TextureArchive);
+	TOADLET_BASERESOURCE_PASSTHROUGH(Archive);
+	TOADLET_INTRUSIVE_POINTERS(TextureArchive);
 
 	TextureArchive(){}
 	void destroy(){}
@@ -49,8 +50,6 @@ public:
 	Resource::ptr openResource(const String &name){return NULL;}
 
 	Collection<String>::ptr getEntries(){return Collection<String>::ptr();}
-
-	TOADLET_BASERESOURCE_PASSTHROUGH(Archive);
 
 protected:
 	String mDirectory;

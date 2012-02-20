@@ -107,7 +107,6 @@ Mesh::ptr AABoxMeshCreator::createAABoxMesh(const AABox &box,Material::ptr mater
 	if(material==NULL){
 		material=mEngine->getMaterialManager()->createDiffuseMaterial(NULL);
 	}
-	material->retain();
 	subMesh->material=material;
 
 	Mesh::ptr mesh(new Mesh());

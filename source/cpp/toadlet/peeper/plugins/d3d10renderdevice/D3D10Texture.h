@@ -37,8 +37,9 @@ class D3D10RenderDevice;
 class D3D10TextureMipPixelBuffer;
 
 class TOADLET_API D3D10Texture:protected BaseResource,public Texture{
-	TOADLET_BASERESOURCE_PASSTHROUGH(Texture);
 public:
+	TOADLET_RESOURCE(D3D10Texture,Texture);
+
 	D3D10Texture(D3D10RenderDevice *renderDevice);
 	D3D10Texture(ID3D10Device *device);
 

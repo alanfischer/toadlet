@@ -39,9 +39,8 @@ class GLRenderDevice;
 class GLSLShaderState;
 
 class GLSLShader:protected BaseResource,public Shader{
-	TOADLET_BASERESOURCE_PASSTHROUGH(Shader);
 public:
-	TOADLET_SHARED_POINTERS(GLSLShader);
+	TOADLET_RESOURCE(GLSLShader,Shader);
 
 	GLSLShader(GLRenderDevice *renderDevice);
 	virtual ~GLSLShader();

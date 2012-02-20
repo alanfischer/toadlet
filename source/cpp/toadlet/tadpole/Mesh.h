@@ -40,7 +40,7 @@ namespace tadpole{
 
 class TOADLET_API Mesh:public BaseResource{
 public:
-	TOADLET_SHARED_POINTERS(Mesh);
+	TOADLET_RESOURCE(Mesh,Mesh);
 
 	class TOADLET_API SubMesh{
 	public:

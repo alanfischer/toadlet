@@ -142,9 +142,7 @@ void BSP30ModelNode::setModel(BSP30Map::ptr map,int index){
 			facedata->next=NULL;
 			subModel->faces=facedata;
 			if(mSharedRenderState!=NULL){
-				Material::ptr material=mEngine->getMaterialManager()->createSharedMaterial(subModel->material,mSharedRenderState);
-				subModel->material->release();
-				subModel->material=material;
+				subModel->material=mEngine->getMaterialManager()->createSharedMaterial(subModel->material,mSharedRenderState);
 			}
 			mSubModels.add(subModel);
 		}
@@ -160,9 +158,7 @@ RenderState::ptr BSP30ModelNode::getSharedRenderState(){
 		mSharedRenderState=mEngine->getMaterialManager()->createRenderState();
 		int i;
 		for(i=0;i<mSubModels.size();++i){
-			Material::ptr material=mEngine->getMaterialManager()->createSharedMaterial(mSubModels[i]->material,mSharedRenderState);
-			mSubModels[i]->material->release();
-			mSubModels[i]->material=material;
+			mSubModels[i]->material=mEngine->getMaterialManager()->createSharedMaterial(mSubModels[i]->material,mSharedRenderState);
 		}
 	}
 
@@ -316,8 +312,7 @@ void BSP30Node::setSkyTextures(const String &skyDown,const String &skyUp,const S
 				SamplerState samplerState;
 				samplerState.uAddress=SamplerState::AddressType_CLAMP_TO_EDGE;
 				samplerState.vAddress=SamplerState::AddressType_CLAMP_TO_EDGE;
-TOADLET_ASSERT(false && "BROKEN");
-//				material->getPass()->setSamplerState(0,samplerState);
+				material->getPass()->setSamplerState(Shader::ShaderType_FRAGMENT,0,samplerState);
 			}
 		}
 

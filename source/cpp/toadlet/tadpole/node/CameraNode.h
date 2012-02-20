@@ -30,16 +30,16 @@
 #include <toadlet/peeper/RenderDevice.h>
 #include <toadlet/peeper/RenderTarget.h>
 #include <toadlet/tadpole/material/Material.h>
-#include <toadlet/tadpole/node/ParentNode.h>
-#include <toadlet/tadpole/node/MeshNode.h>
+#include <toadlet/tadpole/Mesh.h>
+#include <toadlet/tadpole/node/Node.h>
 
 namespace toadlet{
 namespace tadpole{
 namespace node{
 
-class TOADLET_API CameraNode:public ParentNode{
+class TOADLET_API CameraNode:public Node{
 public:
-	TOADLET_NODE(CameraNode,ParentNode);
+	TOADLET_NODE(CameraNode,Node);
 
 	enum ProjectionType{
 		ProjectionType_FOVX=0,

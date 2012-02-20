@@ -23,33 +23,37 @@
  *
  ********** Copyright header - do not remove **********/
 
-#ifndef TOADLET_TADPOLE_NODE_NODERESOURCE_H
-#define TOADLET_TADPOLE_NODE_NODERESOURCE_H
+#ifndef TOADLET_EGG_OBJECT_H
+#define TOADLET_EGG_OBJECT_H
 
-#include <toadlet/egg/BaseResource.h>
-#include <toadlet/tadpole/node/Node.h>
+#include <toadlet/egg/Interface.h>
 
 namespace toadlet{
-namespace tadpole{
-namespace node{
+namespace egg{
 
-class TOADLET_API NodeResource:public BaseResource{
+class TOADLET_API Object:public Interface{
 public:
-	TOADLET_RESOURCE(NodeResource,NodeResource);
+	Object():mSharedCount(0){}
+	virtual ~Object(){}
 
-	NodeResource(Node::ptr node=NULL):BaseResource(){setNode(node);}
-	virtual ~NodeResource(){}
-	void destroy(){mNode->destroy();}
+	virtual int retain(){
+		return ++mSharedCount;
+	}
 	
-	void setNode(Node::ptr node){mNode=node;}
-	Node::ptr getNode() const{return mNode;}
-
+	virtual int release(){
+		int count=--mSharedCount;
+		if(mSharedCount<=0){
+			delete this;
+		}
+		return count;
+	}
+	
 protected:
-	Node::ptr mNode;
+	int mSharedCount;
 };
 
 }
 }
-}
 
 #endif
+

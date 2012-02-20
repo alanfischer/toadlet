@@ -28,16 +28,15 @@
 
 #include <toadlet/egg/MathConversion.h>
 #include <toadlet/tadpole/Traceable.h>
-#include <toadlet/tadpole/node/ParentNode.h>
 #include <toadlet/tadpole/node/MeshNode.h>
 #include <toadlet/tadpole/plugins/hop/HopScene.h>
 
 namespace toadlet{
 namespace tadpole{
 
-/// This ties a hop::Solid to a tadpole::node::ParentNode.  It will adjust its node transform based on the hop::Solid.
+/// This ties a hop::Solid to a tadpole::node::Node.  It will adjust its node transform based on the hop::Solid.
 ///  It's localBound is by default set to the localBound of the hop::Solid
-class TOADLET_API HopEntity:public ParentNode,public TraceCallback,public CollisionListener{
+class TOADLET_API HopEntity:public Node,public TraceCallback,public CollisionListener{
 public:
 	enum TriggerType{
 		TriggerType_TOGGLE,
@@ -45,7 +44,7 @@ public:
 		TriggerType_OFF,
 	};
 
-	TOADLET_NODE(HopEntity,ParentNode);
+	TOADLET_NODE(HopEntity,Node);
 
 	HopEntity();
 	virtual Node *create(Scene *scene);
@@ -130,7 +129,7 @@ public:
 
 	// Node callbacks
 	virtual void spacialUpdated();
-	virtual void parentChanged(ParentNode *parent);
+	virtual bool parentChanged(Node *node);
 	virtual void logicUpdate(int dt,int scope);
 	virtual void frameUpdate(int dt,int scope);
 
@@ -151,9 +150,9 @@ protected:
 	Shape::ptr mTraceableShape;
 	Traceable *mTraceable;
 	Node::ptr mTraceableNode;
-	ParentNode::ptr mVolumeNode;
+	Node::ptr mVolumeNode;
 	int mNextThink;
-	HopEntity::wptr mTriggerTarget;
+	HopEntity::ptr mTriggerTarget;
 
 	HopScene *mHopScene;
 

@@ -111,7 +111,6 @@ Mesh::ptr GridMeshCreator::createGridMesh(scalar width,scalar height,int numWidt
 	if(material==NULL){
 		material=mEngine->getMaterialManager()->createDiffuseMaterial(NULL);
 	}
-	material->retain();
 	mesh->getSubMesh(0)->material=material;
 
 	return mesh;

@@ -216,7 +216,6 @@ Engine::Engine(bool fixedBackable,bool shaderBackable):
 	registerNodeType(LightNode::type());
 	registerNodeType(MeshNode::type());
 	registerNodeType(Node::type());
-	registerNodeType(ParentNode::type());
 	registerNodeType(ParticleNode::type());
 	registerNodeType(SpriteNode::type());
 
@@ -522,9 +521,6 @@ Node *Engine::allocNode(BaseType<Node> *type){
 	TOADLET_TRY
 		node=type->newInstance();
 	TOADLET_CATCH(const Exception &){node=NULL;}
-	if(node!=NULL){
-		node->internal_setManaged(true);
-	}
 	return node;
 }
 
@@ -535,9 +531,6 @@ Node *Engine::allocNode(const String &fullName){
 	TOADLET_TRY
 		node=mNodeFactory.newInstance(fullName);
 	TOADLET_CATCH(const Exception &){node=NULL;}
-	if(node!=NULL){
-		node->internal_setManaged(true);
-	}
 	return node;
 }
 
@@ -605,9 +598,6 @@ void Engine::freeNode(Node *node){
 	if(node->created()){
 		Error::unknown("freeing undestroyed node");
 		return;
-	}
-	if(node->internal_getManaged()){
-		node->internal_setManaged(false);
 	}
 }
 

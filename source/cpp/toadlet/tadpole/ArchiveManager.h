@@ -34,8 +34,9 @@ namespace toadlet{
 namespace tadpole{
 
 class TOADLET_API ArchiveManager:public ResourceManager,public Archive,public BaseResource{
-	TOADLET_BASERESOURCE_PASSTHROUGH(Archive);
 public:
+	TOADLET_RESOURCE(ArchiveManager,Archive);
+
 	ArchiveManager();
 	virtual ~ArchiveManager();
 

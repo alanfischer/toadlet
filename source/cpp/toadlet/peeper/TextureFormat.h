@@ -319,6 +319,7 @@ public:
 			xMin/=div;yMin/=div;zMin/=div;
 			xMax/=div;yMax/=div;zMax/=div;
 			xMax=xMax>0?xMax:1;yMax=yMax>0?yMax:1;zMax=zMax>0?zMax:1;
+			updatePitch();
 		}
 	}
 

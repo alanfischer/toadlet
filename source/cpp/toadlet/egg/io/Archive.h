@@ -36,7 +36,7 @@ namespace io{
 
 class Archive:public Resource{
 public:
-	TOADLET_SHARED_POINTERS(Archive);
+	TOADLET_INTRUSIVE_POINTERS(Archive);
 
 	virtual Stream::ptr openStream(const String &name)=0;
 	virtual Resource::ptr openResource(const String &name)=0;

@@ -35,7 +35,7 @@ namespace peeper{
 
 class Shader:public Resource{
 public:
-	TOADLET_SHARED_POINTERS(Shader);
+	TOADLET_INTRUSIVE_POINTERS(Shader);
 
 	enum ShaderType{
 		ShaderType_VERTEX,

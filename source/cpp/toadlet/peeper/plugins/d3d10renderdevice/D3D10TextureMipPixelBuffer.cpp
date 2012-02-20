@@ -45,7 +45,6 @@ D3D10TextureMipPixelBuffer::D3D10TextureMipPixelBuffer(D3D10Texture *texture,int
 {
 	mDevice=texture->mDevice;
 	mTexture=texture;
-	mTexture->retain();
 	mD3DTexture=mTexture->mTexture;
 	mLevel=level;
 	mCubeSide=cubeSide;
@@ -96,7 +95,6 @@ bool D3D10TextureMipPixelBuffer::create(int usage,int access,TextureFormat::ptr 
 
 	mBufferTexture=Texture::ptr(mDevice->createTexture());
 	mTexture=shared_static_cast<D3D10Texture>(mBufferTexture);
-	mTexture->retain();
 	mTexture->create(usage|Texture::Usage_BIT_RENDERTARGET,mFormat,NULL);
 	mD3DTexture=mTexture->mTexture;
 	mLevel=0;
@@ -110,10 +108,7 @@ bool D3D10TextureMipPixelBuffer::create(int usage,int access,TextureFormat::ptr 
 }
 
 void D3D10TextureMipPixelBuffer::destroy(){
-	if(mTexture==NULL){
-		mTexture->release();
-		mTexture=NULL;
-	}
+	mTexture=NULL;
 
 	if(mListener!=NULL){
 		mListener->bufferDestroyed(this);

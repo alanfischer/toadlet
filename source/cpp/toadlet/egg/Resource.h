@@ -26,27 +26,21 @@
 #ifndef TOADLET_EGG_RESOURCE_H
 #define TOADLET_EGG_RESOURCE_H
 
-#include <toadlet/egg/WeakPointer.h>
+#include <toadlet/egg/Interface.h>
 #include <toadlet/egg/String.h>
 
 namespace toadlet{
 namespace egg{
 
-class ResourceFullyReleasedListener;
+class ResourceDestroyedListener;
 
-class Resource{
+class Resource:public Interface{
 public:
-	TOADLET_SHARED_POINTERS(Resource);
-
-	virtual ~Resource(){}
+	TOADLET_INTRUSIVE_POINTERS(Resource);
 
 	virtual void destroy()=0;
 
-	virtual void retain()=0;
-	virtual void release()=0;
-virtual PointerCounter *pointerCounter()=0;
-
-	virtual void setFullyReleasedListener(ResourceFullyReleasedListener *listener)=0;
+	virtual void setDestroyedListener(ResourceDestroyedListener *listener)=0;
 
 	virtual void setName(const String &name)=0;
 	virtual const String &getName() const=0;

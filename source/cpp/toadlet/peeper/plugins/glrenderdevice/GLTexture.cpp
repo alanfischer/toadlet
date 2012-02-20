@@ -71,6 +71,8 @@ void GLTexture::destroy(){
 	destroyContext();
 
 	mBuffers.clear();
+
+	BaseResource::destroy();
 }
 
 bool GLTexture::createContext(int mipLevels,tbyte *mipDatas[]){

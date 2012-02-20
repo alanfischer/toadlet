@@ -6,9 +6,9 @@
 #include "PathSystem.h"
 #include "BranchSystem.h"
 
-class Tree:public ParentNode,public PathSystem,public BranchSystem::BranchListener{
+class Tree:public Node,public PathSystem,public BranchSystem::BranchListener{
 public:
-	TOADLET_NODE(Tree,ParentNode);
+	TOADLET_NODE(Tree,Node);
 
 	class TreeBranch:public BranchSystem::Branch,public PathSystem::Path{
 	public:
@@ -104,7 +104,7 @@ public:
 
 	Tree();
 
-	node::Node *create(Scene *scene,int seed,ParentNode *parent,const Vector3 &translate);
+	node::Node *create(Scene *scene,int seed,Node *parent,const Vector3 &translate);
 	void destroy();
 
 	void frameUpdate(int dt,int scope);

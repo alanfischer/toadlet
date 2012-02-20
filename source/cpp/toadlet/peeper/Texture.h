@@ -38,7 +38,7 @@ namespace peeper{
 
 class Texture:public Resource{
 public:
-	TOADLET_SHARED_POINTERS(Texture);
+	TOADLET_INTRUSIVE_POINTERS(Texture);
 
 	enum Usage{
 		Usage_NONE=			0,

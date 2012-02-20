@@ -59,6 +59,8 @@ bool GLSLShader::create(ShaderType shaderType,const String &profile,const String
 
 void GLSLShader::destroy(){
 	destroyContext();
+
+	BaseResource::destroy();
 }
 
 bool GLSLShader::createContext(){

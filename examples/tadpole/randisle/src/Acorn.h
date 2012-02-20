@@ -4,9 +4,9 @@
 #include "RandIsle.h"
 #include "Resources.h"
 
-class Acorn:public ParentNode{
+class Acorn:public Node{
 public:
-	TOADLET_NODE(Acorn,ParentNode);
+	TOADLET_NODE(Acorn,Node);
 	
 	Acorn():super(),
 		mFadeTime(0)

@@ -10,7 +10,7 @@ public:
 	HUD();
 	Node *create(Scene *scene);
 
-	void setTarget(PathClimber *player,CameraNode *camera);
+	void setTarget(Node *player,CameraNode *camera);
 
 	void frameUpdate(int dt,int scope);
 	void logicUpdate(int dt,int scope);
@@ -22,7 +22,7 @@ public:
 	void updateAcornCount(int count);
 
 protected:
-	IntrusivePointer<PathClimber> mPlayer;
+	Node::ptr mPlayer;
 	CameraNode::ptr mCamera;
 	AudioNode::ptr mDogSound;
 	AudioNode::ptr mSharkSound;
