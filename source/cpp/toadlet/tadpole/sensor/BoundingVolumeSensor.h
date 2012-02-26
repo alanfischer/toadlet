@@ -34,7 +34,7 @@ namespace sensor{
 
 class TOADLET_API BoundingVolumeSensor:public Sensor{
 public:
-	TOADLET_SHARED_POINTERS(BoundingVolumeSensor);
+	TOADLET_SPTR(BoundingVolumeSensor);
 
 	BoundingVolumeSensor(Scene *scene);
 

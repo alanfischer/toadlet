@@ -36,7 +36,7 @@ namespace creator{
 
 class TOADLET_API SphereMeshCreator:public ResourceCreator{
 public:
-	TOADLET_SHARED_POINTERS(SphereMeshCreator);
+	TOADLET_SPTR(SphereMeshCreator);
 
 	SphereMeshCreator(Engine *engine){
 		mEngine=engine;

@@ -40,7 +40,7 @@ class HopEntity;
 
 class TOADLET_API HopScene:public Scene,public hop::Manager{
 public:
-	TOADLET_SHARED_POINTERS(HopScene);
+	TOADLET_SPTR(HopScene);
 
 	HopScene(Engine *engine);
 	virtual ~HopScene();
@@ -91,7 +91,7 @@ public:
 protected:
 	class SolidSensorResults:public SensorResultsListener{
 	public:
-		TOADLET_SHARED_POINTERS(SolidSensorResults);
+		TOADLET_SPTR(SolidSensorResults);
 
 		SolidSensorResults():
 			mSolids(NULL),

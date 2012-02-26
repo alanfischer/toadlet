@@ -38,7 +38,7 @@ namespace knot{
 
 class TOADLET_API SimpleServer:public ConnectionListener{
 public:
-	TOADLET_SHARED_POINTERS(SimpleServer);
+	TOADLET_SPTR(SimpleServer);
 
 	SimpleServer(EventFactory *eventFactory=NULL,Connector::ptr connector=Connector::ptr());
 	virtual ~SimpleServer();
@@ -68,7 +68,7 @@ public:
 protected:
 	class ServerClient:public SimpleEventConnection{
 	public:
-		TOADLET_SHARED_POINTERS(ServerClient);
+		TOADLET_SPTR(ServerClient);
 
 		ServerClient(SimpleServer *server,EventFactory *factory,Connection::ptr connection);
 

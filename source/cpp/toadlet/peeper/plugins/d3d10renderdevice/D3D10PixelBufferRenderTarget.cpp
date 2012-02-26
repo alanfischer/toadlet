@@ -32,7 +32,6 @@ namespace peeper{
 
 D3D10PixelBufferRenderTarget::D3D10PixelBufferRenderTarget(D3D10RenderDevice *renderDevice):D3D10RenderTarget(),
 	mDevice(NULL),
-	mListener(NULL),
 	mWidth(0),
 	mHeight(0),
 	mNeedsCompile(false)
@@ -66,10 +65,7 @@ void D3D10PixelBufferRenderTarget::destroy(){
 		mDepthBuffer=NULL;
 	}
 
-	if(mListener!=NULL){
-		mListener->renderTargetDestroyed((PixelBufferRenderTarget*)this);
-		mListener=NULL;
-	}
+	BaseResource::destroy();
 }
 
 bool D3D10PixelBufferRenderTarget::activate(){

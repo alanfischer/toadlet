@@ -34,7 +34,7 @@ namespace egg{
 
 class TOADLET_API Interface{
 public:
-	TOADLET_INTRUSIVE_POINTERS(Interface);
+	TOADLET_IPTR(Interface);
 	virtual ~Interface(){}
 
 	virtual int retain()=0;

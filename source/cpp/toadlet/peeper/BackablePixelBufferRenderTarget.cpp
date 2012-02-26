@@ -29,9 +29,7 @@
 namespace toadlet{
 namespace peeper{
 
-BackablePixelBufferRenderTarget::BackablePixelBufferRenderTarget():
-	mListener(NULL)
-
+BackablePixelBufferRenderTarget::BackablePixelBufferRenderTarget():BaseResource()
 	//mBack
 {}
 
@@ -53,6 +51,8 @@ void BackablePixelBufferRenderTarget::destroy(){
 		mBack->destroy();
 		mBack=NULL;
 	}
+
+	BaseResource::destroy();
 }
 
 bool BackablePixelBufferRenderTarget::attach(PixelBuffer::ptr buffer,Attachment attachment){

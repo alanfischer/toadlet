@@ -35,7 +35,7 @@ namespace creator{
 
 class TOADLET_API GridMeshCreator:public ResourceCreator{
 public:
-	TOADLET_SHARED_POINTERS(GridMeshCreator);
+	TOADLET_SPTR(GridMeshCreator);
 
 	GridMeshCreator(Engine *engine){
 		mEngine=engine;

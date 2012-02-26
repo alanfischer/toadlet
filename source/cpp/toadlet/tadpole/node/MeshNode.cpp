@@ -44,9 +44,6 @@ MeshNode::SubMesh::SubMesh(MeshNode *meshNode,Mesh::SubMesh *meshSubMesh):
 	this->indexData=meshSubMesh->indexData;
 	this->vertexData=meshSubMesh->vertexData;
 	this->material=meshSubMesh->material;
-	if(material!=NULL){
-		material->retain();
-	}
 }
 
 void MeshNode::SubMesh::render(SceneRenderer *renderer) const{
@@ -85,10 +82,6 @@ Node *MeshNode::create(Scene *scene){
 }
 
 void MeshNode::destroy(){
-	int i;
-	for(i=0;i<mSubMeshes.size();++i){
-		mSubMeshes[i]->destroy();
-	}
 	mSubMeshes.clear();
 
 	if(mSharedRenderState!=NULL){
@@ -137,10 +130,6 @@ void MeshNode::setMesh(Mesh::ptr mesh){
 	Logger::debug(Categories::TOADLET_TADPOLE,
 		"MeshNode::setMesh");
 
-	int i;
-	for(i=0;i<mSubMeshes.size();++i){
-		mSubMeshes[i]->destroy();
-	}
 	mSubMeshes.clear();
 
 	if(mDynamicVertexData!=NULL){
@@ -168,6 +157,7 @@ void MeshNode::setMesh(Mesh::ptr mesh){
 	}
 
 	mSubMeshes.resize(mMesh->getNumSubMeshes());
+	int i;
 	for(i=0;i<mSubMeshes.size();++i){
 		SubMesh::ptr subMesh(new SubMesh(this,mMesh->getSubMesh(i)));
 		mSubMeshes[i]=subMesh;

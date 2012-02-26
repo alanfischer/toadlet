@@ -34,8 +34,6 @@ namespace peeper{
 
 D3D9VariableBuffer::D3D9VariableBuffer(D3D9RenderDevice *renderDevice):
 	mDevice(NULL),
-
-	mListener(NULL),
 	mUsage(0),
 	mAccess(0),
 	//mVariableFormat,
@@ -74,10 +72,7 @@ void D3D9VariableBuffer::destroy(){
 		mData=NULL;
 	}
 
-	if(mListener!=NULL){
-		mListener->bufferDestroyed(this);
-		mListener=NULL;
-	}
+	BaseResource::destroy();
 }
 
 tbyte *D3D9VariableBuffer::lock(int lockAccess){

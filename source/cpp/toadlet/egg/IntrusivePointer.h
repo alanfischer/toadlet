@@ -286,7 +286,7 @@ template<typename Type,typename Type2,typename PointerSemantics> inline Intrusiv
 }
 }
 
-#define TOADLET_INTRUSIVE_POINTERS(Class) \
+#define TOADLET_IPTR(Class) \
 	typedef toadlet::egg::IntrusivePointer<Class> ptr;
 
 #endif

@@ -33,7 +33,7 @@ namespace ribbit{
 
 class TOADLET_API AudioFormat{
 public:
-	TOADLET_SHARED_POINTERS(AudioFormat);
+	TOADLET_SPTR(AudioFormat);
 
 	AudioFormat(int bps=0,int chan=0,int sps=0):
 		bitsPerSample(bps),

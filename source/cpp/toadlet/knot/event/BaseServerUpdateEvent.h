@@ -36,7 +36,7 @@ namespace event{
 //  The LastCounter could be replaced with a reliable packet sequence number, but that is not implemented yet
 class BaseServerUpdateEvent:public Event{
 public:
-	TOADLET_SHARED_POINTERS(BaseServerUpdateEvent);
+	TOADLET_SPTR(BaseServerUpdateEvent);
 
 	BaseServerUpdateEvent(int type):Event(type),
 		mServerFrameNumber(0),

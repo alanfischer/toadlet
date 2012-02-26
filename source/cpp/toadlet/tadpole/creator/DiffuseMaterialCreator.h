@@ -36,7 +36,7 @@ namespace creator{
 
 class TOADLET_API DiffuseMaterialCreator:public ResourceCreator{
 public:
-	TOADLET_SHARED_POINTERS(DiffuseMaterialCreator);
+	TOADLET_SPTR(DiffuseMaterialCreator);
 
 	DiffuseMaterialCreator(Engine *engine);
 

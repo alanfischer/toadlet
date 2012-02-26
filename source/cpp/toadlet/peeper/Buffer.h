@@ -27,14 +27,14 @@
 #define TOADLET_PEEPER_BUFFER_H
 
 #include <toadlet/egg/Resource.h>
-#include <toadlet/peeper/BufferDestroyedListener.h>
+#include <toadlet/peeper/Types.h>
 
 namespace toadlet{
 namespace peeper{
 
-class TOADLET_API Buffer{
+class Buffer:public Resource{
 public:
-	TOADLET_SHARED_POINTERS(Buffer);
+	TOADLET_IPTR(Buffer);
 
 	enum Usage{
 		Usage_NONE=			0,
@@ -52,8 +52,6 @@ public:
 	};
 
 	virtual ~Buffer(){}
-
-	virtual void setBufferDestroyedListener(BufferDestroyedListener *listener)=0;
 
 	virtual int getUsage() const=0;
 	virtual int getAccess() const=0;

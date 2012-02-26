@@ -46,7 +46,7 @@ class TCPConnector;
 */
 class TOADLET_API TCPConnection:public Connection{
 public:
-	TOADLET_SHARED_POINTERS(TCPConnection);
+	TOADLET_SPTR(TCPConnection);
 
 	TCPConnection(Socket::ptr socket=Socket::ptr()); // Supply a socket to use, this lets the socket be controlled externally
 	virtual ~TCPConnection();
@@ -76,7 +76,7 @@ protected:
 
 	class Packet{
 	public:
-		TOADLET_SHARED_POINTERS(Packet);
+		TOADLET_SPTR(Packet);
 
 		Packet():length(0),debugDeliverTime(0){}
 

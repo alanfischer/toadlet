@@ -32,11 +32,11 @@
 namespace toadlet{
 namespace peeper{
 
-class TOADLET_API BackableTextureMipPixelBuffer:public PixelBuffer{
+class TOADLET_API BackableTextureMipPixelBuffer:public BaseResource,public PixelBuffer{
 public:
-	TOADLET_SHARED_POINTERS(BackableTextureMipPixelBuffer);
+	TOADLET_RESOURCE(BackableTextureMipPixelBuffer,PixelBuffer);
 
-	BackableTextureMipPixelBuffer(BackableTexture *texture,int level,int cubeSide):
+	BackableTextureMipPixelBuffer(BackableTexture *texture,int level,int cubeSide):BaseResource(),
 		mTexture(texture),
 		mLevel(level),
 		mCubeSide(cubeSide),
@@ -46,11 +46,11 @@ public:
 		resetCreate();
 	}
 	
-	virtual ~BackableTextureMipPixelBuffer(){}
+	virtual ~BackableTextureMipPixelBuffer(){
+		destroy();
+	}
 
 	virtual PixelBuffer *getRootPixelBuffer(){return mBack;}
-
-	virtual void setBufferDestroyedListener(BufferDestroyedListener *listener){}
 
 	virtual bool create(int usage,int access,TextureFormat::ptr format){return false;}
 

@@ -37,7 +37,7 @@ namespace tadpole{
 
 class Engine;
 
-class TOADLET_API TextureManager:public ResourceManager,public RenderTargetDestroyedListener{
+class TOADLET_API TextureManager:public ResourceManager{
 public:
 	TextureManager(Engine *engine);
 	virtual ~TextureManager();
@@ -62,7 +62,7 @@ public:
 	void preContextReset(RenderDevice *renderDevice);
 	void postContextReset(RenderDevice *renderDevice);
 
-	void renderTargetDestroyed(RenderTarget *renderTarget);
+	void resourceDestroyed(Resource *resource);
 
 	void setVideoHandler(VideoHandler::ptr handler){mVideoHandler=handler;}
 	VideoHandler::ptr getVideoHandler() const{return mVideoHandler;}

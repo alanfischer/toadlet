@@ -36,7 +36,7 @@ namespace io{
 // This does not properly support both reading & writing of the same stream
 class TOADLET_API MemoryStream:public Stream{
 public:
-	TOADLET_SHARED_POINTERS(MemoryStream);
+	TOADLET_SPTR(MemoryStream);
 
 	MemoryStream(tbyte *data,int dataLength,int initialLength,bool ownsData);
 	MemoryStream(Stream::ptr stream); // Read all data from stream

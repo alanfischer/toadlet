@@ -39,12 +39,14 @@ namespace peeper{
 	TOADLET_C_API RenderTarget *new_D3D11WindowRenderTarget(void *display,void *window,WindowRenderTargetFormat *format);
 #endif
 
-class TOADLET_API D3D10WindowRenderTarget:public D3D10RenderTarget{
+class TOADLET_API D3D10WindowRenderTarget:public BaseResource,public D3D10RenderTarget{
 public:
+	TOADLET_RESOURCE(D3D10WindowRenderTarget,D3D10RenderTarget);
+
 	D3D10WindowRenderTarget();
 	D3D10WindowRenderTarget(HWND wnd,WindowRenderTargetFormat *format);
 	virtual ~D3D10WindowRenderTarget();
-	void destroy(){destroyContext();}
+	void destroy(){destroyContext();BaseResource::destroy();}
 
 	RenderTarget *getRootRenderTarget(){return this;}
 	bool isPrimary() const{return true;}

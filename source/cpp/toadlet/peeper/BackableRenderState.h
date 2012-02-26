@@ -27,21 +27,20 @@
 #define TOADLET_PEEPER_BACKABLERENDERSTATE_H
 
 #include <toadlet/egg/Collection.h>
+#include <toadlet/egg/BaseResource.h>
 #include <toadlet/peeper/RenderState.h>
 
 namespace toadlet{
 namespace peeper{
 
-class TOADLET_API BackableRenderState:public RenderState{
+class TOADLET_API BackableRenderState:public BaseResource,public RenderState{
 public:
-	TOADLET_SHARED_POINTERS(BackableRenderState);
+	TOADLET_RESOURCE(BackableRenderState,RenderState);
 
 	BackableRenderState();
-	virtual ~BackableRenderState(){}
+	virtual ~BackableRenderState();
 
 	virtual RenderState *getRootRenderState(){return mBack;}
-
-	virtual void setRenderStateDestroyedListener(RenderStateDestroyedListener *listener){mListener=listener;}
 
 	virtual bool create(){return true;}
 	virtual void destroy();
@@ -112,7 +111,6 @@ public:
 	virtual RenderState::ptr getBack(){return mBack;}
 
 protected:
-	RenderStateDestroyedListener *mListener;
 	BlendState *mBlendState;
 	DepthState *mDepthState;
 	RasterizerState *mRasterizerState;

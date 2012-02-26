@@ -33,7 +33,7 @@ namespace peeper{
 
 class TOADLET_API TextureFormat{
 public:
-	TOADLET_SHARED_POINTERS(TextureFormat);
+	TOADLET_SPTR(TextureFormat);
 
 	enum Dimension{
 		Dimension_UNKNOWN=0,

@@ -12,7 +12,7 @@ public:
 
 	class TreeBranch:public BranchSystem::Branch,public PathSystem::Path{
 	public:
-		TOADLET_SHARED_POINTERS(TreeBranch);
+		TOADLET_SPTR(TreeBranch);
 
 		TreeBranch():BranchSystem::Branch(),skipFirst(false),started(false),lastVertex(-1){}
 

@@ -27,26 +27,27 @@
 #define TOADLET_PEEPER_D3D10BUFFER_H
 
 #include "D3D10Includes.h"
+#include <toadlet/egg/Collection.h>
+#include <toadlet/egg/BaseResource.h>
 #include <toadlet/peeper/IndexBuffer.h>
 #include <toadlet/peeper/VertexBuffer.h>
 #include <toadlet/peeper/VariableBuffer.h>
-#include <toadlet/egg/Collection.h>
 
 namespace toadlet{
 namespace peeper{
 
 class D3D10RenderDevice;
 
-class TOADLET_API D3D10Buffer:public IndexBuffer,public VertexBuffer,public VariableBuffer{
+class TOADLET_API D3D10Buffer:public BaseResource,public IndexBuffer,public VertexBuffer,public VariableBuffer{
 public:
+	TOADLET_RESOURCE(D3D10Buffer,BaseResource);
+
 	D3D10Buffer(D3D10RenderDevice *renderDevice);
 	virtual ~D3D10Buffer();
 
 	IndexBuffer *getRootIndexBuffer(){return this;}
 	VertexBuffer *getRootVertexBuffer(){return this;}
 	VariableBuffer *getRootVariableBuffer(){return this;}
-
-	void setBufferDestroyedListener(BufferDestroyedListener *listener){mListener=listener;}
 
 	bool create(int usage,int access,IndexFormat indexFormat,int size);
 	bool create(int usage,int access,VertexFormat::ptr vertexFormat,int size);
@@ -77,7 +78,6 @@ protected:
 
 	D3D10RenderDevice *mDevice;
 
-	BufferDestroyedListener *mListener;
 	int mUsage;
 	int mAccess;
 	int mDataSize;

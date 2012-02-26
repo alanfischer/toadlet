@@ -72,6 +72,8 @@ bool MMAudio::create(AudioStream::ptr stream){
 
 void MMAudio::destroy(){
 	mDevice->internal_audioDestroy(this);
+
+	BaseResource::destroy();
 }
 
 int MMAudio::read(tbyte *data,int length){

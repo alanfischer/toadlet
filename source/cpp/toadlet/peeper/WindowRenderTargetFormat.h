@@ -33,7 +33,7 @@ namespace peeper{
 
 class TOADLET_API WindowRenderTargetFormat{
 public:
-	TOADLET_SHARED_POINTERS(WindowRenderTargetFormat);
+	TOADLET_SPTR(WindowRenderTargetFormat);
 
 	WindowRenderTargetFormat(int pixelFormat=0,int depthBits=0,int stencilBits=0,int multisamples=0,bool vsync=false,int threads=0,bool debug=false,int flags=0){
 		this->pixelFormat=pixelFormat;

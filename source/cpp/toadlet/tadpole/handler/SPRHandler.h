@@ -36,7 +36,7 @@ namespace handler{
 
 class TOADLET_API SPRHandler:public ResourceStreamer{
 public:
-	TOADLET_SHARED_POINTERS(SPRHandler);
+	TOADLET_SPTR(SPRHandler);
 
 	SPRHandler(Engine *engine):mHandler(engine){}
 

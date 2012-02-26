@@ -6,11 +6,11 @@
 
 class BranchSystem{
 public:
-	TOADLET_SHARED_POINTERS(BranchSystem);
+	TOADLET_SPTR(BranchSystem);
 
 	class Branch{
 	public:
-		TOADLET_SHARED_POINTERS(Branch);
+		TOADLET_SPTR(Branch);
 	
 		Branch():life(0),length(0),speed(0),scale(0),visibilityAmount(0),buildTime(0),barkTime(0){}
 

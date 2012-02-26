@@ -33,7 +33,6 @@ namespace peeper{
 
 D3D10TextureMipPixelBuffer::D3D10TextureMipPixelBuffer(D3D10Texture *texture,int level,int cubeSide):
 	mDevice(NULL),
-	mListener(NULL),
 	mTexture(NULL),
 	mD3DTexture(NULL),
 	mD3DRenderTargetView(NULL),
@@ -68,7 +67,6 @@ D3D10TextureMipPixelBuffer::D3D10TextureMipPixelBuffer(D3D10Texture *texture,int
 
 D3D10TextureMipPixelBuffer::D3D10TextureMipPixelBuffer(D3D10RenderDevice *renderDevice):
 	mDevice(NULL),
-	mListener(NULL),
 	mTexture(NULL),
 	mD3DTexture(NULL),
 	mD3DRenderTargetView(NULL),
@@ -110,10 +108,7 @@ bool D3D10TextureMipPixelBuffer::create(int usage,int access,TextureFormat::ptr 
 void D3D10TextureMipPixelBuffer::destroy(){
 	mTexture=NULL;
 
-	if(mListener!=NULL){
-		mListener->bufferDestroyed(this);
-		mListener=NULL;
-	}
+	BaseResource::destroy();
 }
 
 uint8 *D3D10TextureMipPixelBuffer::lock(int lockAccess){

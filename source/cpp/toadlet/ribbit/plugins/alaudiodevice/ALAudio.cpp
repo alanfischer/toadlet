@@ -115,6 +115,8 @@ void ALAudio::destroy(){
 		mDevice->checkinSourceHandle(this,mHandle);
 		mHandle=0;
 	}
+
+	BaseResource::destroy();
 }
 
 bool ALAudio::play(){

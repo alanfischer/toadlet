@@ -34,15 +34,15 @@ namespace toadlet{
 namespace peeper{
 
 /// @todo: Make the D3D10PixelBufferRenderTarget & the GLFBOSurfaceRenderTarget more strict about Surface sizes
-class TOADLET_API D3D10PixelBufferRenderTarget:public D3D10RenderTarget,public PixelBufferRenderTarget{
+class TOADLET_API D3D10PixelBufferRenderTarget:public BaseResource,public D3D10RenderTarget,public PixelBufferRenderTarget{
 public:
+	TOADLET_RESOURCE(D3D10PixelBufferRenderTarget,PixelBufferRenderTarget);
+
 	D3D10PixelBufferRenderTarget(D3D10RenderDevice *renderDevice);
 	virtual ~D3D10PixelBufferRenderTarget();
 
 	RenderTarget *getRootRenderTarget(){return (D3D10RenderTarget*)this;}
 	PixelBufferRenderTarget *getRootPixelBufferRenderTarget(){return this;}
-
-	void setRenderTargetDestroyedListener(RenderTargetDestroyedListener *listener){mListener=listener;}
 
 	bool create();
 	void destroy();
@@ -66,7 +66,6 @@ public:
 
 protected:
 	D3D10RenderDevice *mDevice;
-	RenderTargetDestroyedListener *mListener;
 	int mWidth;
 	int mHeight;
 	bool mNeedsCompile;

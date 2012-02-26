@@ -27,7 +27,6 @@
 #define TOADLET_KNOT_CONNECTION_H
 
 #include <toadlet/egg/SharedPointer.h>
-#include <toadlet/egg/WeakPointer.h>
 #include <toadlet/knot/Types.h>
 
 namespace toadlet{
@@ -40,7 +39,7 @@ namespace knot{
 /// A Connection sends and receives packets of data.
 class Connection{
 public:
-	TOADLET_SHARED_POINTERS(Connection);
+	TOADLET_SPTR(Connection);
 
 	virtual ~Connection(){}
 

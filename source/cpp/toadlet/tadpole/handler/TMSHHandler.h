@@ -40,7 +40,7 @@ namespace handler{
 
 class TOADLET_API TMSHHandler:public ResourceStreamer{
 public:
-	TOADLET_SHARED_POINTERS(TMSHHandler);
+	TOADLET_SPTR(TMSHHandler);
 
 	const static int VERSION=0x10000;
 	const static int TMSH=1414353736; // "TMSH"

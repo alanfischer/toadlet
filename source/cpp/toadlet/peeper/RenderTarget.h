@@ -26,14 +26,15 @@
 #ifndef TOADLET_PEEPER_RENDERTARGET_H
 #define TOADLET_PEEPER_RENDERTARGET_H
 
+#include <toadlet/egg/Resource.h>
 #include <toadlet/peeper/Types.h>
 
 namespace toadlet{
 namespace peeper{
 
-class RenderTarget{
+class RenderTarget:public Resource{
 public:
-	TOADLET_SHARED_POINTERS(RenderTarget);
+	TOADLET_IPTR(RenderTarget);
 
 	virtual ~RenderTarget(){}
 

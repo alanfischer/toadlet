@@ -38,7 +38,7 @@ namespace animation{
 /*
 class MaterialLightEffectAnimation:public Animatable{
 public:
-	TOADLET_SHARED_POINTERS(MaterialLightEffectAnimation);
+	TOADLET_SPTR(MaterialLightEffectAnimation);
 
 	MaterialLightEffectAnimation(Material::ptr target,const MaterialState &start,const MaterialState &end,scalar time){
 		mTarget=target;

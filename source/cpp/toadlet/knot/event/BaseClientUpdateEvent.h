@@ -37,7 +37,7 @@ namespace event{
 //  The Counter could be replaced with a reliable packet sequence number, but that is not implemented yet
 class BaseClientUpdateEvent:public Event{
 public:
-	TOADLET_SHARED_POINTERS(BaseClientUpdateEvent);
+	TOADLET_SPTR(BaseClientUpdateEvent);
 
 	BaseClientUpdateEvent(int type):Event(type),
 		mClientFrameNumber(0),

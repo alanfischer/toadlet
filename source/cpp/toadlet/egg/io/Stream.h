@@ -27,7 +27,7 @@
 #define TOADLET_EGG_IO_STREAM_H
 
 #include <toadlet/Types.h>
-#include <toadlet/egg/WeakPointer.h>
+#include <toadlet/egg/SharedPointer.h>
 
 namespace toadlet{
 namespace egg{
@@ -38,7 +38,7 @@ namespace io{
 
 class Stream{
 public:
-	TOADLET_SHARED_POINTERS(Stream);
+	TOADLET_SPTR(Stream);
 
 	virtual ~Stream(){}
 

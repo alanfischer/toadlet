@@ -8,7 +8,7 @@
 
 class PathClimber:public BaseComponent{
 public:
-	TOADLET_INTRUSIVE_POINTERS(PathClimber);
+	TOADLET_IPTR(PathClimber);
 
 	PathClimber();
 

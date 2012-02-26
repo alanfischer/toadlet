@@ -26,7 +26,6 @@
 #ifndef TOADLET_TADPOLE_ANIMATION_ANIMATABLE_H
 #define TOADLET_TADPOLE_ANIMATION_ANIMATABLE_H
 
-#include <toadlet/egg/WeakPointer.h>
 #include <toadlet/tadpole/Types.h>
 
 namespace toadlet{
@@ -35,7 +34,7 @@ namespace animation{
 
 class Animatable{
 public:
-	TOADLET_SHARED_POINTERS(Animatable);
+	TOADLET_SPTR(Animatable);
 
 	virtual ~Animatable(){}
 

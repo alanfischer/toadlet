@@ -38,7 +38,7 @@
 		typedef toadlet::egg::Type<Class,toadlet::tadpole::node::Node> ThisType; \
 		static ThisType *type(); \
 		virtual toadlet::egg::BaseType<toadlet::tadpole::node::Node> *getType(){return Class::type();} \
-		TOADLET_INTRUSIVE_POINTERS(Class)
+		TOADLET_IPTR(Class)
 #endif
 
 #ifndef TOADLET_NONINSTANCIABLENODE
@@ -47,7 +47,7 @@
 		typedef toadlet::egg::NonInstantiableType<Class,toadlet::tadpole::node::Node> ThisType; \
 		static ThisType *type(); \
 		virtual toadlet::egg::BaseType<toadlet::tadpole::node::Node> *getType(){return Class::type();} \
-		TOADLET_INTRUSIVE_POINTERS(Class)
+		TOADLET_IPTR(Class)
 #endif
 
 #ifndef TOADLET_NODE_IMPLEMENT

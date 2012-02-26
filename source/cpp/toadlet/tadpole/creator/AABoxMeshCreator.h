@@ -35,7 +35,7 @@ namespace creator{
 
 class TOADLET_API AABoxMeshCreator:public ResourceCreator{
 public:
-	TOADLET_SHARED_POINTERS(AABoxMeshCreator);
+	TOADLET_SPTR(AABoxMeshCreator);
 
 	AABoxMeshCreator(Engine *engine){
 		mEngine=engine;

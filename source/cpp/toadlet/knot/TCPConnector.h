@@ -37,7 +37,7 @@ namespace knot{
 
 class TOADLET_API TCPConnector:public Connector,public Runnable{
 public:
-	TOADLET_SHARED_POINTERS(TCPConnector);
+	TOADLET_SPTR(TCPConnector);
 
 	TCPConnector();
 	/// Start accepting on the port

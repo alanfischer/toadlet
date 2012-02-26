@@ -39,16 +39,16 @@ BufferManager::BufferManager(Engine *engine):
 BufferManager::~BufferManager(){
 	int i;
 	for(i=0;i<mVertexFormats.size();++i){
-		mVertexFormats[i]->setVertexFormatDestroyedListener(NULL);
+		mVertexFormats[i]->setDestroyedListener(NULL);
 	}
 	for(i=0;i<mIndexBuffers.size();++i){
-		mIndexBuffers[i]->setBufferDestroyedListener(NULL);
+		mIndexBuffers[i]->setDestroyedListener(NULL);
 	}
 	for(i=0;i<mVertexBuffers.size();++i){
-		mVertexBuffers[i]->setBufferDestroyedListener(NULL);
+		mVertexBuffers[i]->setDestroyedListener(NULL);
 	}
 	for(i=0;i<mPixelBuffers.size();++i){
-		mPixelBuffers[i]->setBufferDestroyedListener(NULL);
+		mPixelBuffers[i]->setDestroyedListener(NULL);
 	}
 }
 
@@ -56,35 +56,35 @@ void BufferManager::destroy(){
 	int i;
 	for(i=0;i<mVertexFormats.size();++i){
 		VertexFormat::ptr vertexFormat=mVertexFormats[i];
-		vertexFormat->setVertexFormatDestroyedListener(NULL);
+		vertexFormat->setDestroyedListener(NULL);
  		vertexFormat->destroy();
 	}
 	mVertexFormats.clear();
 
 	for(i=0;i<mIndexBuffers.size();++i){
 		IndexBuffer::ptr buffer=mIndexBuffers[i];
-		buffer->setBufferDestroyedListener(NULL);
+		buffer->setDestroyedListener(NULL);
 		buffer->destroy();
 	}
 	mIndexBuffers.clear();
 
 	for(i=0;i<mVertexBuffers.size();++i){
 		VertexBuffer::ptr buffer=mVertexBuffers[i];
-		buffer->setBufferDestroyedListener(NULL);
+		buffer->setDestroyedListener(NULL);
 		buffer->destroy();
 	}
 	mVertexBuffers.clear();
 
 	for(i=0;i<mPixelBuffers.size();++i){
 		PixelBuffer::ptr buffer=mPixelBuffers[i];
-		buffer->setBufferDestroyedListener(NULL);
+		buffer->setDestroyedListener(NULL);
 		buffer->destroy();
 	}
 	mPixelBuffers.clear();
 
 	for(i=0;i<mVariableBuffers.size();++i){
 		VariableBuffer::ptr buffer=mVariableBuffers[i];
-		buffer->setBufferDestroyedListener(NULL);
+		buffer->setDestroyedListener(NULL);
 		buffer->destroy();
 	}
 	mVariableBuffers.clear();
@@ -113,7 +113,7 @@ VertexFormat::ptr BufferManager::createVertexFormat(){
 	if(vertexFormat!=NULL){
 		mVertexFormats.add(vertexFormat);
 
-		vertexFormat->setVertexFormatDestroyedListener(this);
+		vertexFormat->setDestroyedListener(this);
 	}
 
 	return vertexFormat;
@@ -142,7 +142,7 @@ IndexBuffer::ptr BufferManager::createIndexBuffer(int usage,int access,IndexBuff
 	if(buffer!=NULL){
 		mIndexBuffers.add(buffer);
 
-		buffer->setBufferDestroyedListener(this);
+		buffer->setDestroyedListener(this);
 	}
 
 	return buffer;
@@ -171,7 +171,7 @@ VertexBuffer::ptr BufferManager::createVertexBuffer(int usage,int access,VertexF
 	if(buffer!=NULL){
 		mVertexBuffers.add(buffer);
 
-		buffer->setBufferDestroyedListener(this);
+		buffer->setDestroyedListener(this);
 	}
 
 	return buffer;
@@ -201,7 +201,7 @@ PixelBuffer::ptr BufferManager::createPixelBuffer(int usage,int access,int pixel
 	if(buffer!=NULL){
 		mPixelBuffers.add(buffer);
 
-		buffer->setBufferDestroyedListener(this);
+		buffer->setDestroyedListener(this);
 	}
 
 	return buffer;
@@ -230,7 +230,7 @@ VariableBuffer::ptr BufferManager::createVariableBuffer(int usage,int access,Var
 	if(buffer!=NULL){
 		mVariableBuffers.add(buffer);
 
-		buffer->setBufferDestroyedListener(this);
+		buffer->setDestroyedListener(this);
 	}
 
 	return buffer;
@@ -430,15 +430,16 @@ void BufferManager::postContextReset(RenderDevice *renderDevice){
 	}
 }
 
-void BufferManager::bufferDestroyed(Buffer *buffer){
-	mIndexBuffers.remove(buffer);
-	mVertexBuffers.remove(buffer);
-	mPixelBuffers.remove(buffer);
-	mVariableBuffers.remove(buffer);
-}
-
-void BufferManager::vertexFormatDestroyed(VertexFormat *vertexFormat){
-	mVertexFormats.remove(vertexFormat);
+void BufferManager::resourceDestroyed(Resource *resource){
+	if(mIndexBuffers.remove(resource)==false){
+		if(mVertexBuffers.remove(resource)==false){
+			if(mPixelBuffers.remove(resource)==false){
+				if(mVariableBuffers.remove(resource)==false){
+					mVertexFormats.remove(resource);
+				}
+			}
+		}
+	}
 }
 
 bool BufferManager::useTriFan(){

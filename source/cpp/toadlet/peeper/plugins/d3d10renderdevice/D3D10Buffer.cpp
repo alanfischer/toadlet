@@ -35,7 +35,6 @@ namespace peeper{
 D3D10Buffer::D3D10Buffer(D3D10RenderDevice *renderDevice):
 	mDevice(NULL),
 
-	mListener(NULL),
 	mUsage(0),
 	mAccess(0),
 	mDataSize(0),
@@ -155,15 +154,16 @@ void D3D10Buffer::destroy(){
 		mData=NULL;
 	}
 	
+	// Do not call BaseResource::destroy()
 	if(mListener!=NULL){
 		if(mIndexFormat!=(IndexFormat)0){
-			mListener->bufferDestroyed((IndexBuffer*)this);
+			mListener->resourceDestroyed((IndexBuffer*)this);
 		}
 		else if(mVertexFormat!=NULL){
-			mListener->bufferDestroyed((VertexBuffer*)this);
+			mListener->resourceDestroyed((VertexBuffer*)this);
 		}
 		else if(mVariableFormat!=NULL){
-			mListener->bufferDestroyed((VariableBuffer*)this);
+			mListener->resourceDestroyed((VariableBuffer*)this);
 		}
 		mListener=NULL;
 	}

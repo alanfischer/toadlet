@@ -27,6 +27,7 @@
 #define TOADLET_PEEPER_D3D9INDEXBUFFER_H
 
 #include "D3D9Includes.h"
+#include <toadlet/egg/BaseResource.h>
 #include <toadlet/peeper/IndexBuffer.h>
 
 namespace toadlet{
@@ -34,14 +35,14 @@ namespace peeper{
 
 class D3D9RenderDevice;
 
-class TOADLET_API D3D9IndexBuffer:public IndexBuffer{
+class TOADLET_API D3D9IndexBuffer:public BaseResource,public IndexBuffer{
 public:
+	TOADLET_RESOURCE(D3D9IndexBuffer,IndexBuffer);
+
 	D3D9IndexBuffer(D3D9RenderDevice *renderDevice);
 	virtual ~D3D9IndexBuffer();
 
 	IndexBuffer *getRootIndexBuffer(){return this;}
-
-	void setBufferDestroyedListener(BufferDestroyedListener *listener){mListener=listener;}
 
 	bool create(int usage,int access,IndexFormat indexFormat,int size);
 	void destroy();
@@ -69,7 +70,6 @@ protected:
 
 	D3D9RenderDevice *mDevice;
 
-	BufferDestroyedListener *mListener;
 	int mUsage;
 	int mAccess;
 	int mSize;

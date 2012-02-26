@@ -26,6 +26,7 @@
 #ifndef TOADLET_FLICK_INPUTDEVICE_H
 #define TOADLET_FLICK_INPUTDEVICE_H
 
+#include <toadlet/egg/Interface.h>
 #include <toadlet/flick/Types.h>
 
 namespace toadlet{
@@ -33,8 +34,10 @@ namespace flick{
 
 class InputDeviceListener;
 
-class InputDevice{
+class InputDevice:public Interface{
 public:
+	TOADLET_IPTR(InputDevice);
+
 	enum InputType{
 		InputType_JOY=0,
 		InputType_MOTION, /// @todo: Rename MOTION to LINEAR

@@ -36,7 +36,7 @@ namespace creator{
 
 class TOADLET_API SkyBoxMaterialCreator:public ResourceCreator{
 public:
-	TOADLET_SHARED_POINTERS(SkyBoxMaterialCreator);
+	TOADLET_SPTR(SkyBoxMaterialCreator);
 
 	SkyBoxMaterialCreator(Engine *engine);
 

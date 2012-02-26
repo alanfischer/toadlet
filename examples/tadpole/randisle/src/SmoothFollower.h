@@ -5,7 +5,7 @@
 
 class SmoothFollower:public BaseComponent{
 public:
-	TOADLET_INTRUSIVE_POINTERS(SmoothFollower);
+	TOADLET_IPTR(SmoothFollower);
 
 	SmoothFollower(int bufferSize):BaseComponent(){
 		mPositions.resize(bufferSize);

@@ -42,7 +42,7 @@ TextureManager::TextureManager(Engine *engine):ResourceManager(engine->getArchiv
 TextureManager::~TextureManager(){
 	int i;
 	for(i=0;i<mRenderTargets.size();++i){
-		mRenderTargets[i]->setRenderTargetDestroyedListener(NULL);
+		mRenderTargets[i]->setDestroyedListener(NULL);
 	}
 }
 
@@ -52,7 +52,7 @@ void TextureManager::destroy(){
 	int i;
 	for(i=0;i<mRenderTargets.size();++i){
 		PixelBufferRenderTarget::ptr renderTarget=mRenderTargets[i];
-		renderTarget->setRenderTargetDestroyedListener(NULL);
+		renderTarget->setDestroyedListener(NULL);
 		renderTarget->destroy();
 	}
 	mRenderTargets.clear();
@@ -121,7 +121,7 @@ PixelBufferRenderTarget::ptr TextureManager::createPixelBufferRenderTarget(){
 	if(renderTarget!=NULL){
 		mRenderTargets.add(renderTarget);
 
-		renderTarget->setRenderTargetDestroyedListener(this);
+		renderTarget->setDestroyedListener(this);
 	}
 
 	return renderTarget;
@@ -221,8 +221,10 @@ void TextureManager::postContextReset(peeper::RenderDevice *renderDevice){
 	}
 }
 
-void TextureManager::renderTargetDestroyed(RenderTarget *renderTarget){
-	mRenderTargets.remove(renderTarget);
+void TextureManager::resourceDestroyed(Resource *resource){
+	if(mRenderTargets.remove(resource)==false){
+		ResourceManager::resourceDestroyed(resource);
+	}
 }
 
 }

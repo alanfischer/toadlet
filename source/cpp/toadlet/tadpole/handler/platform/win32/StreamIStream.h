@@ -36,7 +36,7 @@ namespace handler{
 
 class StreamIStream:public Object,public IStream{
 public:
-	TOADLET_INTRUSIVE_POINTERS(StreamIStream);
+	TOADLET_IPTR(StreamIStream);
 	
 	StreamIStream(Stream::ptr base):Object(),
 		mBase(base)

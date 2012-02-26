@@ -314,4 +314,7 @@ template<typename Type,typename Type2,typename PointerSemantics> inline SharedPo
 }
 }
 
+#define TOADLET_SPTR(Class) \
+	typedef toadlet::egg::SharedPointer<Class> ptr;
+
 #endif

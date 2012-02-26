@@ -27,15 +27,15 @@
 #define TOADLET_PEEPER_VERTEXFORMAT_H
 
 #include <toadlet/egg/String.h>
+#include <toadlet/egg/Resource.h>
 #include <toadlet/peeper/Types.h>
-#include <toadlet/peeper/VertexFormatDestroyedListener.h>
 
 namespace toadlet{
 namespace peeper{
 
-class TOADLET_API VertexFormat{
+class TOADLET_API VertexFormat:public Resource{
 public:
-	TOADLET_SHARED_POINTERS(VertexFormat);
+	TOADLET_IPTR(VertexFormat);
 
 	enum Semantic{
 		Semantic_UNKNOWN=			-1,
@@ -102,8 +102,6 @@ public:
 	virtual ~VertexFormat(){}
 
 	virtual VertexFormat *getRootVertexFormat()=0;
-
-	virtual void setVertexFormatDestroyedListener(VertexFormatDestroyedListener *listener)=0;
 
 	virtual bool create()=0;
 	virtual void destroy()=0;
