@@ -37,9 +37,8 @@ namespace tadpole{
 namespace handler{
 
 class TOADLET_API OSXBundleArchive:public Archive,public BaseResource{
-	TOADLET_BASERESOURCE_PASSTHROUGH(Archive);
 public:
-	TOADLET_SHARED_POINTERS(OSXBundleArchive);
+	TOADLET_RESOURCE(OSXBundleArchive,Archive);
 
 	OSXBundleArchive();
 	virtual ~OSXBundleArchive();

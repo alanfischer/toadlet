@@ -238,9 +238,6 @@ void BSP30Handler::parseTextures(BSP30Map *map){
 			if(texture==NULL){
 				texture=mEngine->getTextureManager()->findTexture(miptex->name);
 			}
-			if(texture!=NULL){
-				texture->retain();
-			}
 		}
 		map->parsedTextures[i]=texture;
 	}
@@ -375,16 +372,14 @@ void BSP30Handler::buildMaterials(BSP30Map *map){
 		Material::ptr material=mEngine->getMaterialManager()->createDiffuseMaterial(map->parsedTextures[i]);
 		material->getPass()->setMaterialState(MaterialState(false,false,MaterialState::ShadeType_FLAT));
 		material->getPass()->setRasterizerState(RasterizerState(RasterizerState::CullType_FRONT));
-TOADLET_ASSERT(false && "BROKEN");
-//		material->getPass()->setSamplerState(1,SamplerState());
+		material->getPass()->setSamplerState(Shader::ShaderType_FRAGMENT,1,SamplerState());
 
 		TextureState lightmapState;
 		lightmapState.texCoordIndex=1;
 		lightmapState.colorOperation=TextureState::Operation_MODULATE;
 		lightmapState.colorSource1=TextureState::Source_PREVIOUS;
 		lightmapState.colorSource2=TextureState::Source_TEXTURE;
-TOADLET_ASSERT(false && "BROKEN");
-//		material->getPass()->setTextureState(1,lightmapState);
+		material->getPass()->setTextureState(Shader::ShaderType_FRAGMENT,1,lightmapState);
 
 		map->materials[i]=material;
 	}

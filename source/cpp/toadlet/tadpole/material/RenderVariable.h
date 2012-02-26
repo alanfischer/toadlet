@@ -37,7 +37,7 @@ class SceneParameters;
 
 class RenderVariable{
 public:
-	TOADLET_SHARED_POINTERS(RenderVariable);
+	TOADLET_SPTR(RenderVariable);
 
 	virtual ~RenderVariable(){}
 

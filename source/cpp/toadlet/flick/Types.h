@@ -30,7 +30,8 @@
 #include <toadlet/egg/mathfixed/Math.h>
 #include <toadlet/egg/math/Math.h>
 #include <toadlet/egg/SharedPointer.h>
-#include <toadlet/egg/WeakPointer.h>
+#include <toadlet/egg/IntrusivePointer.h>
+#include <toadlet/egg/Object.h>
 #include <toadlet/peeper/Types.h>
 
 namespace toadlet{

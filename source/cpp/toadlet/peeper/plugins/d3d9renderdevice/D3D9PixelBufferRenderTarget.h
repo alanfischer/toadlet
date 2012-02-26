@@ -34,15 +34,15 @@ namespace toadlet{
 namespace peeper{
 
 /// @todo: Make the D3D9SurfaceRenderTarget & the GLFBOSurfaceRenderTarget more strict about Surface sizes
-class TOADLET_API D3D9PixelBufferRenderTarget:public D3D9RenderTarget,public PixelBufferRenderTarget{
+class TOADLET_API D3D9PixelBufferRenderTarget:public BaseResource,public D3D9RenderTarget,public PixelBufferRenderTarget{
 public:
+	TOADLET_RESOURCE(D3D9PixelBufferRenderTarget,PixelBufferRenderTarget);
+
 	D3D9PixelBufferRenderTarget(D3D9RenderDevice *renderDevice);
 	virtual ~D3D9PixelBufferRenderTarget();
 
 	RenderTarget *getRootRenderTarget(){return (D3D9RenderTarget*)this;}
 	PixelBufferRenderTarget *getRootPixelBufferRenderTarget(){return this;}
-
-	void setRenderTargetDestroyedListener(RenderTargetDestroyedListener *listener){mListener=listener;}
 
 	bool create();
 	void destroy();
@@ -69,8 +69,6 @@ public:
 
 protected:
 	D3D9RenderDevice *mDevice;
-
-	RenderTargetDestroyedListener *mListener;
 	int mWidth;
 	int mHeight;
 	bool mNeedsCompile;

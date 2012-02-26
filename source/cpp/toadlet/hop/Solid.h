@@ -40,7 +40,7 @@ class Manager;
 
 class TOADLET_API Solid{
 public:
-	TOADLET_SHARED_POINTERS(Solid);
+	TOADLET_SPTR(Solid);
 
 	const static scalar INFINITE_MASS;	
 

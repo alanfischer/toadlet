@@ -34,7 +34,7 @@ namespace peeper{
 
 class TOADLET_API SamplerState{
 public:
-	TOADLET_SHARED_POINTERS(SamplerState);
+	TOADLET_SPTR(SamplerState);
 
 	enum FilterType{
 		FilterType_NONE,

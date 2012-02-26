@@ -35,7 +35,7 @@ namespace event{
 
 class BaseConnectionEvent:public Event{
 public:
-	TOADLET_SHARED_POINTERS(BaseConnectionEvent);
+	TOADLET_SPTR(BaseConnectionEvent);
 
 	BaseConnectionEvent(int type):Event(type),
 		mID(0)

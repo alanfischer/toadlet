@@ -51,19 +51,19 @@ public:
 
 			if(engine->hasShader(Shader::ShaderType_VERTEX) && engine->hasShader(Shader::ShaderType_FRAGMENT)){
 				TextureFormat::ptr waterFormat(new TextureFormat(TextureFormat::Dimension_D2,TextureFormat::Format_RGB_8,512,512,1,0));
+				TextureFormat::ptr depthFormat(new TextureFormat(TextureFormat::Dimension_D2,TextureFormat::Format_DEPTH_24,512,512,1,1));
 
 				reflectTexture=engine->getTextureManager()->createTexture(Texture::Usage_BIT_RENDERTARGET|Texture::Usage_BIT_AUTOGEN_MIPMAPS,waterFormat);
-				reflectTexture->retain();
+//				refractDepthTexture=engine->getTextureManager()->createTexture(Texture::Usage_BIT_RENDERTARGET,depthFormat);
 				reflectTarget=engine->getTextureManager()->createPixelBufferRenderTarget();
 				reflectTarget->attach(reflectTexture->getMipPixelBuffer(0,0),PixelBufferRenderTarget::Attachment_COLOR_0);
 
 				refractTexture=engine->getTextureManager()->createTexture(Texture::Usage_BIT_RENDERTARGET|Texture::Usage_BIT_AUTOGEN_MIPMAPS,waterFormat);
-				refractTexture->retain();
 				refractTarget=engine->getTextureManager()->createPixelBufferRenderTarget();
 				refractTarget->attach(refractTexture->getMipPixelBuffer(0,0),PixelBufferRenderTarget::Attachment_COLOR_0);
 
 				bumpTexture=engine->getTextureManager()->findTexture("water_bump.png");
-				bumpTexture->retain();
+engine->getTextureManager()->logAllResources();
 
 				RenderPath::ptr shaderPath=waterMaterial->addPath();
 				RenderPass::ptr pass=shaderPath->addPass();
@@ -299,12 +299,13 @@ public:
 				variables->addVariable("refractMatrix",RenderVariable::ptr(new TextureMatrixVariable(variables,"refractTex")),Material::Scope_MATERIAL);
 			}
 
-			if(engine->hasFixed(Shader::ShaderType_VERTEX) && engine->hasFixed(Shader::ShaderType_FRAGMENT)){
+			if(false && engine->hasFixed(Shader::ShaderType_VERTEX) && engine->hasFixed(Shader::ShaderType_FRAGMENT)){
 				TextureFormat::ptr noiseFormat(new TextureFormat(TextureFormat::Dimension_D2,TextureFormat::Format_RGB_8,128,128,1,0));
 				tbyte *noise1Data=createNoise(noiseFormat,16,5,0.5,0.5);
 				tbyte *noise2Data=createNoise(noiseFormat,16,12,0.5,0.5);
 				Texture::ptr noise1=engine->getTextureManager()->createTexture(noiseFormat,noise1Data);
 				Texture::ptr noise2=engine->getTextureManager()->createTexture(noiseFormat,noise2Data);
+
 				delete[] noise1Data;
 				delete[] noise2Data;
 
@@ -342,7 +343,6 @@ public:
 
 			waterMaterial->setLayer(-1);
 			waterMaterial->compile();
-			waterMaterial->retain();
 		}
 
 		Logger::alert("Loading frog");
@@ -353,7 +353,6 @@ public:
 			transform.setTranslate(0,0,-3.5);
 			transform.setRotate(Math::Z_UNIT_VECTOR3,Math::PI);
 			creature->setTransform(transform);
-			creature->retain();
 		}
 
 		Logger::alert("Loading shadow");
@@ -372,17 +371,12 @@ public:
 			// We want it rendered before the water, but on the water layer
 			material->setSort(Material::SortType_MATERIAL);
 			material->setLayer(-1);
-			material->retain();
 			shadow->getSubMesh(0)->material=material;
-			shadow->retain();
 		}
 
 		Logger::alert("Loading tree items");
 
 		treeBranch=engine->getMaterialManager()->findMaterial("bark.png");
-		if(treeBranch!=NULL){
-			treeBranch->retain();
-		}
 
 		treeLeaf=engine->getMaterialManager()->createMaterial();
 		if(treeLeaf!=NULL){
@@ -409,7 +403,6 @@ public:
 			}
 
 			treeLeaf->compile();
-			treeLeaf->retain();
 		}
 
 		Logger::alert("Loading sounds");
@@ -424,7 +417,6 @@ public:
 			acorn->getPass()->setMaterialState(MaterialState(false));
 			acorn->getPass()->setDepthState(DepthState(DepthState::DepthTest_LEQUAL,false));
 			acorn->getPass()->setBlendState(BlendState(BlendState::Combination_ALPHA));
-			acorn->retain();
 		}
 
 		// HUD
@@ -436,14 +428,13 @@ public:
 		hudFade->getPass()->setDepthState(DepthState(DepthState::DepthTest_NEVER,false));
 		hudFade->getPass()->setBlendState(BlendState::Combination_ALPHA);
 		hudFade->getPass()->setMaterialState(MaterialState(Colors::TRANSPARENT_RED));
-*/		hudFade->retain();
+*/
 		
 		hudCompass=engine->getMaterialManager()->findMaterial("compass.png");
 		if(hudCompass!=NULL){
 			hudCompass->getPass()->setMaterialState(MaterialState(false));
 			hudCompass->getPass()->setDepthState(DepthState(DepthState::DepthTest_NEVER,false));
 			hudCompass->getPass()->setBlendState(BlendState(BlendState::Operation_ZERO,BlendState::Operation_SOURCE_COLOR));
-			hudCompass->retain();
 		}
 
 		hudAcorn=engine->getMaterialManager()->findMaterial("acorn.png");
@@ -451,18 +442,11 @@ public:
 			hudAcorn->getPass()->setMaterialState(MaterialState(false));
 			hudAcorn->getPass()->setDepthState(DepthState(DepthState::DepthTest_NEVER,false));
 			hudAcorn->getPass()->setBlendState(BlendState(BlendState::Combination_ALPHA));
-			hudAcorn->retain();
 		}
 
 		hudWooden=engine->getFontManager()->findFont("Pinewood.ttf",100);
-		if(hudWooden!=NULL){
-			hudWooden->retain();
-		}
 
 		hudSystem=engine->getFontManager()->getDefaultFont();
-		if(hudSystem!=NULL){
-			hudSystem->retain();
-		}
 
 		return true;
 	}
@@ -477,7 +461,7 @@ public:
 	scalar tolerance;
 	Vector4 skyColor,fadeColor;
 	DiffuseTerrainMaterialSource::ptr terrainMaterialSource;
-	Texture::ptr reflectTexture,refractTexture,bumpTexture;
+	Texture::ptr reflectTexture,refractTexture,refractDepthTexture,bumpTexture;
 	PixelBufferRenderTarget::ptr reflectTarget,refractTarget;
 	Material::ptr waterMaterial;
 	Mesh::ptr creature;

@@ -84,10 +84,7 @@ Node *TerrainNode::create(Scene *scene){
 }
 
 void TerrainNode::destroy(){
-	if(mPatchMaterial!=NULL){
-		mPatchMaterial->release();
-		mPatchMaterial=NULL;
-	}
+	mPatchMaterial=NULL;
 
 	super::destroy();
 }
@@ -139,15 +136,7 @@ void TerrainNode::setMaterial(Material::ptr material){
 	setMaterialSource(NULL);
 
 	if(mPatchMaterial!=material){
-		if(mPatchMaterial!=NULL){
-			mPatchMaterial->release();
-		}
-
 		mPatchMaterial=material;
-
-		if(mPatchMaterial!=NULL){
-			mPatchMaterial->retain();
-		}
 	}
 	
 	int i;
@@ -178,17 +167,7 @@ void TerrainNode::setMaterialSource(TerrainNodeMaterialSource *materialSource){
 }
 
 void TerrainNode::setWaterMaterial(Material::ptr material){
-	if(mPatchWaterMaterial!=material){
-		if(mPatchWaterMaterial!=NULL){
-			mPatchWaterMaterial->release();
-		}
-
-		mPatchWaterMaterial=material;
-
-		if(mPatchWaterMaterial!=NULL){
-			mPatchWaterMaterial->retain();
-		}
-	}
+	mPatchWaterMaterial=material;
 
 	int i;
 	for(i=0;i<mPatchGrid.size();++i){

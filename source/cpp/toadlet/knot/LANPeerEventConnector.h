@@ -46,7 +46,7 @@ namespace knot{
 //  That would let us re-use the LANConnector in the server stuff to automatically find a server on the LAN
 class TOADLET_API LANPeerEventConnector:public Connector,public EventFactory{
 public:
-	TOADLET_SHARED_POINTERS(LANPeerEventConnector);
+	TOADLET_SPTR(LANPeerEventConnector);
 
 	static const int Event_CONNECTION=1;
 

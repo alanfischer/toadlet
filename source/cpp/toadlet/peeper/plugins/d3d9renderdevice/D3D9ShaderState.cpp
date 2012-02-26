@@ -33,9 +33,7 @@ namespace peeper{
 class D3D9RenderDevice;
 
 D3D9ShaderState::D3D9ShaderState(D3D9RenderDevice *renderDevice):
-	mDevice(NULL),
-	
-	mListener(NULL)
+	mDevice(NULL)
 	//mShaders
 {
 	mDevice=renderDevice;
@@ -47,6 +45,8 @@ D3D9ShaderState::~D3D9ShaderState(){
 
 void D3D9ShaderState::destroy(){
 	mShaders.clear();
+
+	BaseResource::destroy();
 }
 
 void D3D9ShaderState::setShader(Shader::ShaderType type,Shader::ptr shader){

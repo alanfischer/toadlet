@@ -85,7 +85,6 @@ void SpriteHandler::buildMaterials(SpriteModel *model){
 	int i;
 	for(i=1;i<model->header->numframes;i++){
 		model->materials[i]=mEngine->getMaterialManager()->createDiffuseMaterial(model->textures[i]);
-		model->materials[i]->retain();
 	}
 }
 

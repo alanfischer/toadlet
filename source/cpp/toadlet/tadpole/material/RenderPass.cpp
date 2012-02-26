@@ -75,14 +75,9 @@ void RenderPass::destroy(){
 	mRenderState=NULL;
 	mShaderState=NULL;
 
-	int i,j;
-	for(j=0;j<Shader::ShaderType_MAX;++j){
-		for(i=0;i<mTextures[j].size();++i){
-			if(mTextures[j][i]!=NULL){
-				mTextures[j][i]->release();
-			}
-		}
-		mTextures[j].clear();
+	int i;
+	for(i=0;i<Shader::ShaderType_MAX;++i){
+		mTextures[i].clear();
 	}
 
 	if(mVariables!=NULL){
@@ -95,13 +90,7 @@ void RenderPass::setTexture(Shader::ShaderType type,int i,Texture::ptr texture,c
 	if(i>=mTextures[type].size()){
 		mTextures[type].resize(i+1);
 	}
-	if(mTextures[type][i]!=NULL){
-		mTextures[type][i]->release();
-	}
 	mTextures[type][i]=texture;
-	if(mTextures[type][i]!=NULL){
-		mTextures[type][i]->retain();
-	}
 
 	mRenderState->setSamplerState(type,i,samplerState);
 	mRenderState->setTextureState(type,i,textureState);

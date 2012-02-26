@@ -59,14 +59,14 @@ void MaterialManager::destroy(){
 	int i;
 	for(i=0;i<mRenderStates.size();++i){
 		RenderState::ptr renderState=mRenderStates[i];
-		renderState->setRenderStateDestroyedListener(NULL);
+		renderState->setDestroyedListener(NULL);
 		renderState->destroy();
 	}
 	mRenderStates.clear();
 
 	for(i=0;i<mShaderStates.size();++i){
 		ShaderState::ptr shaderState=mShaderStates[i];
-		shaderState->setShaderStateDestroyedListener(NULL);
+		shaderState->setDestroyedListener(NULL);
 		shaderState->destroy();
 	}
 	mShaderStates.clear();
@@ -163,7 +163,7 @@ RenderState::ptr MaterialManager::createRenderState(){
 	if(renderState!=NULL){
 		mRenderStates.add(renderState);
 
-		renderState->setRenderStateDestroyedListener(this);
+		renderState->setDestroyedListener(this);
 	}
 
 	return renderState;
@@ -172,7 +172,7 @@ RenderState::ptr MaterialManager::createRenderState(){
 ShaderState::ptr MaterialManager::createShaderState(){
 	RenderDevice *renderDevice=mEngine->getRenderDevice();
 	ShaderState::ptr shaderState;
-	if(mEngine->hasShader(Shader::ShaderType_VERTEX)){
+	if(mEngine->isShaderBackable()){
 		Logger::debug(Categories::TOADLET_TADPOLE,"creating BackableShaderState");
 
 		BackableShaderState::ptr backableShaderState(new BackableShaderState());
@@ -200,7 +200,7 @@ ShaderState::ptr MaterialManager::createShaderState(){
 	if(shaderState!=NULL){
 		mShaderStates.add(shaderState);
 
-		shaderState->setShaderStateDestroyedListener(this);
+		shaderState->setDestroyedListener(this);
 	}
 
 	return shaderState;
@@ -276,7 +276,7 @@ void MaterialManager::contextActivate(RenderDevice *renderDevice){
 	}
 
 	for(i=0;i<mResources.size();++i){
-		Material *material=(Material*)mResources.at(i).get();
+		Material *material=(Material*)mResources[i];
 		if(material!=NULL){
 			compileMaterial(material);
 		}
@@ -300,12 +300,12 @@ void MaterialManager::contextDeactivate(RenderDevice *renderDevice){
 	}
 }
 
-void MaterialManager::renderStateDestroyed(RenderState *renderState){
-	mRenderStates.remove(renderState);
-}
-
-void MaterialManager::shaderStateDestroyed(ShaderState *shaderState){
-	mShaderStates.remove(shaderState);
+void MaterialManager::resourceDestroyed(Resource *resource){
+	if(mRenderStates.remove(resource)==false){
+		if(mShaderStates.remove(resource)==false){
+			ResourceManager::resourceDestroyed(resource);
+		}
+	}
 }
 
 Resource::ptr MaterialManager::unableToFindStreamer(const String &name,ResourceData *data){

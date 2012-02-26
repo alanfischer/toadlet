@@ -44,10 +44,13 @@ namespace peeper{
 
 class D3D9Texture;
 
-class D3D9RenderDevice:public RenderDevice{
+class D3D9RenderDevice:public Object,public RenderDevice{
 public:
 	D3D9RenderDevice();
 	virtual ~D3D9RenderDevice();
+
+	int retain(){return Object::retain();}
+	int release(){return Object::release();}
 
 	// Startup/Shutdown
 	bool create(RenderTarget *target,int *options);

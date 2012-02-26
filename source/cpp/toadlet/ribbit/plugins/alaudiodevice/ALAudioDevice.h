@@ -35,7 +35,7 @@
 #include <toadlet/egg/Collection.h>
 #include <toadlet/egg/Map.h>
 #include <toadlet/egg/Mutex.h>
-#include <toadlet/egg/Logger.h>
+#include <toadlet/egg/Object.h>
 
 namespace toadlet{
 namespace ribbit{
@@ -47,13 +47,16 @@ typedef void (*proc_alBufferDataStatic)(ALuint buffer,ALenum format,ALvoid *data
 
 // You can not use both the ALAUdioDevice and the MMAudioDevice simultaniously.
 // Whichever one you create second will be the useable device.
-class TOADLET_API ALAudioDevice:public AudioDevice{
+class TOADLET_API ALAudioDevice:protected Object,public AudioDevice{
 public:
 	// Options
 	const static int Option_BUFFER_FADE_TIME=1;
 	
 	ALAudioDevice();
 	virtual ~ALAudioDevice();
+
+	int retain(){return Object::retain();}
+	int release(){return Object::release();}
 
 	bool create(int *options);
 	void destroy();

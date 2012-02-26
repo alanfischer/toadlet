@@ -36,7 +36,7 @@ namespace tadpole{
 
 class ResourceStreamer{
 public:
-	TOADLET_SHARED_POINTERS(ResourceStreamer);
+	TOADLET_SPTR(ResourceStreamer);
 
 	virtual ~ResourceStreamer(){}
 

@@ -27,7 +27,7 @@
 #define TOADLET_EGG_COLLECTION_H
 
 #include <toadlet/Types.h>
-#include <toadlet/egg/WeakPointer.h>
+#include <toadlet/egg/SharedPointer.h>
 #include <toadlet/egg/Profile.h>
 
 namespace toadlet{
@@ -36,7 +36,7 @@ namespace egg{
 template<typename Type>
 class TOADLET_API Collection{
 public:
-	TOADLET_SHARED_POINTERS(Collection);
+	TOADLET_SPTR(Collection);
 
 	typedef Type* iterator;
 	typedef const Type* const_iterator;

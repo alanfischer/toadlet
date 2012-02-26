@@ -28,8 +28,7 @@
 namespace toadlet{
 namespace peeper{
 
-BackableRenderState::BackableRenderState():
-	mListener(NULL),
+BackableRenderState::BackableRenderState():BaseResource(),
 	mBlendState(NULL),
 	mDepthState(NULL),
 	mRasterizerState(NULL),
@@ -37,6 +36,10 @@ BackableRenderState::BackableRenderState():
 	mPointState(NULL),
 	mMaterialState(NULL)
 {}
+
+BackableRenderState::~BackableRenderState(){
+	destroy();
+}
 
 void BackableRenderState::destroy(){
 	if(mBack!=NULL){
@@ -80,10 +83,7 @@ void BackableRenderState::destroy(){
 		mTextureStates[j].clear();
 	}
 
-	if(mListener!=NULL){
-		mListener->renderStateDestroyed(this);
-		mListener=NULL;
-	}
+	BaseResource::destroy();
 }
 
 void BackableRenderState::setBack(RenderState::ptr back){

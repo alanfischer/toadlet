@@ -64,17 +64,14 @@ int Sensor::senseNodes(Node *node,SensorResultsListener *results){
 		}
 	}
 
-	ParentNode *parent=node->isParent();
-	if(parent!=NULL){
-		Node::ptr child;
-		for(child=parent->getFirstChild();child!=NULL;child=child->getNext()){
-			int r=senseNodes(child,results);
-			if(r<0){
-				return -1;
-			}
-			else if(r>0){
-				result=1;
-			}
+	Node::ptr child;
+	for(child=node->getFirstChild();child!=NULL;child=child->getNext()){
+		int r=senseNodes(child,results);
+		if(r<0){
+			return -1;
+		}
+		else if(r>0){
+			result=1;
 		}
 	}
 

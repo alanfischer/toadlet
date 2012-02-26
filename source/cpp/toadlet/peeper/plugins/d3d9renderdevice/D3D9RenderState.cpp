@@ -31,7 +31,6 @@ namespace peeper{
 class D3D9RenderDevice;
 
 D3D9RenderState::D3D9RenderState(D3D9RenderDevice *renderDevice):
-	mListener(NULL),
 	mBlendState(NULL),
 	mDepthState(NULL),
 	mRasterizerState(NULL),
@@ -80,10 +79,7 @@ void D3D9RenderState::destroy(){
 	}
 	mTextureStates.clear();
 
-	if(mListener!=NULL){
-		mListener->renderStateDestroyed(this);
-		mListener=NULL;
-	}
+	BaseResource::destroy();
 }
 
 }

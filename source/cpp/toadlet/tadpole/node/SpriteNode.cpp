@@ -25,7 +25,6 @@
 
 #include <toadlet/egg/Error.h>
 #include <toadlet/tadpole/node/CameraNode.h>
-#include <toadlet/tadpole/node/ParentNode.h>
 #include <toadlet/tadpole/node/SpriteNode.h>
 #include <toadlet/tadpole/Engine.h>
 #include <toadlet/tadpole/RenderableSet.h>
@@ -59,10 +58,7 @@ Node *SpriteNode::create(Scene *scene){
 }
 
 void SpriteNode::destroy(){
-	if(mMaterial!=NULL){
-		mMaterial->release();
-		mMaterial=NULL;
-	}
+	mMaterial=NULL;
 
 	if(mVertexData!=NULL){
 		mVertexData->destroy();
@@ -104,20 +100,10 @@ void *SpriteNode::hasInterface(int type){
 }
 
 void SpriteNode::setMaterial(Material::ptr material){
-	if(mMaterial!=NULL){
-		mMaterial->release();
-	}
-
 	mMaterial=material;
 
-	if(mMaterial!=NULL){
-		mMaterial->retain();
-	}
-
 	if(mSharedRenderState!=NULL){
-		Material::ptr material=mEngine->getMaterialManager()->createSharedMaterial(mMaterial,mSharedRenderState);
-		mMaterial->release();
-		mMaterial=material;
+		mMaterial=mEngine->getMaterialManager()->createSharedMaterial(mMaterial,mSharedRenderState);
 	}
 }
 
@@ -132,9 +118,7 @@ RenderState::ptr SpriteNode::getSharedRenderState(){
 		mSharedRenderState=mEngine->getMaterialManager()->createRenderState();
 		mEngine->getMaterialManager()->modifyRenderState(mSharedRenderState,mMaterial->getRenderState());
 
-		Material::ptr material=mEngine->getMaterialManager()->createSharedMaterial(mMaterial,mSharedRenderState);
-		mMaterial->release();
-		mMaterial=material;
+		mMaterial=mEngine->getMaterialManager()->createSharedMaterial(mMaterial,mSharedRenderState);
 	}
 
 	return mSharedRenderState;

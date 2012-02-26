@@ -27,7 +27,7 @@
 #define TOADLET_EGG_PROFILE_H
 
 #include <toadlet/egg/String.h>
-#include <toadlet/egg/WeakPointer.h>
+#include <toadlet/egg/SharedPointer.h>
 
 namespace toadlet{
 namespace egg{
@@ -38,7 +38,7 @@ class TOADLET_API Profile{
 public:
 	class ProfileNode{
 	public:
-		TOADLET_SHARED_POINTERS(ProfileNode);
+		TOADLET_SPTR(ProfileNode);
 
 		ProfileNode(const char *name);
 

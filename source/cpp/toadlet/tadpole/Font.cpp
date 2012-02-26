@@ -39,7 +39,6 @@ Font::Font(float pointSize,int innerSpace,Texture::ptr texture,const wchar *char
 	mPointSize=pointSize;
 	mInnerSpace=innerSpace;
 	mTexture=texture;
-	mTexture->retain();
 
 	mGlyphs.resize(Extents::MAX_UNSIGNED_CHAR,NULL);
 	int i;
@@ -65,10 +64,9 @@ Font::~Font(){
 }
 
 void Font::destroy(){
-	if(mTexture!=NULL){
-		mTexture->release();
-		mTexture=NULL;
-	}
+	mTexture=NULL;
+
+	BaseResource::destroy();
 }
 
 bool Font::updateVertexBufferForString(VertexBuffer::ptr vertexBuffer,const String &string,const Vector4 &color,int alignment,bool pixelSpace,bool flip){

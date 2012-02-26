@@ -33,7 +33,7 @@ namespace peeper{
 
 class TOADLET_API IndexData{
 public:
-	TOADLET_SHARED_POINTERS(IndexData);
+	TOADLET_SPTR(IndexData);
 
 	enum Primitive{
 		Primitive_POINTS=0,

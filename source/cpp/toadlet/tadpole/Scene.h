@@ -41,7 +41,7 @@ namespace tadpole{
 
 class TOADLET_API Scene:public ContextListener{
 public:
-	TOADLET_SHARED_POINTERS(Scene);
+	TOADLET_SPTR(Scene);
 
 	Scene(Engine *engine);
 	virtual ~Scene();

@@ -36,7 +36,7 @@ namespace animation{
 
 class TOADLET_API NodePathAnimation:public Animatable{
 public:
-	TOADLET_SHARED_POINTERS(NodePathAnimation);
+	TOADLET_SPTR(NodePathAnimation);
 
 	NodePathAnimation(Node::ptr target);
 	virtual ~NodePathAnimation(){}

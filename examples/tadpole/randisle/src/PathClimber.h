@@ -1,22 +1,25 @@
 #ifndef PATHCLIMBER_H
 #define PATHCLIMBER_H
 
-#include "RandIsle.h"
+#include <toadlet/toadlet.h>
+#include <toadlet/tadpole/plugins/hop/HopEntity.h>
+#include "PathSystem.h"
+#include "PathClimberListener.h"
 
-class PathClimber:public HopEntity{
+class PathClimber:public BaseComponent{
 public:
-	TOADLET_NODE(PathClimber,HopEntity);
+	TOADLET_IPTR(PathClimber);
 
 	PathClimber();
 
-	Node *create(Scene *scene);
+	void destroy(){}
 
-	void logicUpdate(int dt,int scope);
+	bool parentChanged(Node *node);
 
-	void mount(ParentNode *system,PathSystem::Path *path,const Vector3 &point);
+	void mount(Node *system,PathSystem::Path *path,const Vector3 &point);
 	void dismount();
 
-	ParentNode *getMounted(){return mMounted;}
+	Node *getMounted(){return mMounted;}
 	PathSystem::Path *getPath(){return mPath;}
 	int getPathDirection(){return mPathDirection;}
 	void setPathDirection(int direction);
@@ -37,23 +40,14 @@ public:
 	void findRotation(Quaternion &r,const Vector3 &tangent,const Vector3 &normal);
 	bool passedJunction(int direction,scalar oldTime,scalar newTime,scalar junctionTime);
 
-	// Player class
-	MeshNode::ptr getPlayerMeshNode(){return mPlayerMeshNode;}
-	MeshNode::ptr getShadowMeshNode(){return mShadowMeshNode;}
-	
-	int getAcornCount(){return mAcornCount;}
-
-	int getGroundTime(){return mGroundTime;}
-
-	void setDanger(scalar danger){mDanger=danger;}
-	scalar getDanger(){return mDanger;}
-
-	void setHealth(int health){mHealth=health;}
-	int getHealth(){return mHealth;}
+	void logicUpdate(int dt,int scope);
+	void frameUpdate(int dt,int scope){}
 
 protected:
+	HopScene *mScene;
+	HopEntity *mNode;
 	PathClimberListener *mPathClimberListener;
-	ParentNode::ptr mMounted;
+	Node::ptr mMounted;
 	PathSystem::Path *mPreviousPath;
 	PathSystem::Path *mPath;
 	float mPathTime;
@@ -64,15 +58,6 @@ protected:
 	Quaternion mIdealRotation;
 	Collection<Vector3> mPreviousNormals;
 	int mNormalIndex;
-
-	// Ideally this would be in a Player class
-	MeshNode::ptr mPlayerMeshNode;
-	MeshNode::ptr mShadowMeshNode;
-	int mAcornCount;
-	int mGroundTime;
-	scalar mDanger;
-	int mHealth;
-	BoundingVolumeSensor::ptr mSensor;
 };
 
 #endif

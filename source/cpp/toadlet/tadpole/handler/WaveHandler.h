@@ -35,7 +35,7 @@ namespace handler{
 
 class TOADLET_API WaveHandler:public AudioBufferHandler{
 public:
-	TOADLET_SHARED_POINTERS(WaveHandler);
+	TOADLET_SPTR(WaveHandler);
 
 	WaveHandler(AudioBufferManager *audioBufferManager):AudioBufferHandler(audioBufferManager){}
 

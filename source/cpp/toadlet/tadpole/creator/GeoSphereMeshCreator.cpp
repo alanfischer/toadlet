@@ -182,7 +182,6 @@ Mesh::ptr GeoSphereMeshCreator::createGeoSphereMesh(const Sphere &sphere,int dep
 	if(material==NULL){
 		material=mEngine->getMaterialManager()->createDiffuseMaterial(NULL);
 	}
-	material->retain();
 	mesh->getSubMesh(0)->material=material;
 
 	return mesh;

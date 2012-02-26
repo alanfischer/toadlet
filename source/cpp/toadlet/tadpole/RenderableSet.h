@@ -38,7 +38,7 @@ class Scene;
 
 class TOADLET_API RenderableSet{
 public:
-	TOADLET_SHARED_POINTERS(RenderableSet);
+	TOADLET_SPTR(RenderableSet);
 
 	class RenderableQueueItem{
 	public:

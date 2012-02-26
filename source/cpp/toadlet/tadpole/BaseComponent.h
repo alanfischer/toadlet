@@ -23,21 +23,30 @@
  *
  ********** Copyright header - do not remove **********/
 
-#ifndef TOADLET_PEEPER_RENDERSTATEDESTROYEDLISTENER_H
-#define TOADLET_PEEPER_RENDERSTATEDESTROYEDLISTENER_H
+#ifndef TOADLET_TADPOLE_BASECOMPONENT_H
+#define TOADLET_TADPOLE_BASECOMPONENT_H
 
-#include <toadlet/peeper/Types.h>
+#include <toadlet/egg/Object.h>
+#include <toadlet/tadpole/Component.h>
 
 namespace toadlet{
-namespace peeper{
+namespace tadpole{
 
-class RenderState;
-
-class RenderStateDestroyedListener{
+class BaseComponent:public Object,public Component{
 public:
-	virtual ~RenderStateDestroyedListener(){}
+	TOADLET_IPTR(BaseComponent);
 
-	virtual void renderStateDestroyed(RenderState *renderState)=0;
+	virtual int retain(){return Object::retain();}
+	virtual int release(){return Object::release();}
+	
+	virtual Node *isNode(){return NULL;}
+	
+	virtual void destroy()=0;
+
+	virtual bool parentChanged(Node *node)=0;
+
+	virtual void logicUpdate(int dt,int scope)=0;
+	virtual void frameUpdate(int dt,int scope)=0;
 };
 
 }

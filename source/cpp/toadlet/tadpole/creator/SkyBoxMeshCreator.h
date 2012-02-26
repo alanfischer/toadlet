@@ -35,7 +35,7 @@ namespace creator{
 
 class TOADLET_API SkyBoxMeshCreator:public ResourceCreator{
 public:
-	TOADLET_SHARED_POINTERS(SkyBoxMeshCreator);
+	TOADLET_SPTR(SkyBoxMeshCreator);
 
 	SkyBoxMeshCreator(Engine *engine){
 		mEngine=engine;

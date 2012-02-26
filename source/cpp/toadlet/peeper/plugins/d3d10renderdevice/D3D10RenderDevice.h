@@ -45,10 +45,13 @@ class D3D10Shader;
 class D3D10ShaderState;
 class D3D10VertexFormat;
 
-class D3D10RenderDevice:public RenderDevice{
+class D3D10RenderDevice:public Object,public RenderDevice{
 public:
 	D3D10RenderDevice();
 	virtual ~D3D10RenderDevice();
+
+	int retain(){return Object::retain();}
+	int release(){return Object::release();}
 
 	// Startup/Shutdown
 	bool create(RenderTarget *target,int *options);

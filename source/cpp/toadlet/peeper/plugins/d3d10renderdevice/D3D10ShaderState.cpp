@@ -31,9 +31,7 @@ namespace toadlet{
 namespace peeper{
 
 D3D10ShaderState::D3D10ShaderState(D3D10RenderDevice *renderDevice):
-	mDevice(NULL),
-
-	mListener(NULL)
+	mDevice(NULL)
 	//mShaders
 {
 	mDevice=renderDevice;
@@ -47,10 +45,7 @@ D3D10ShaderState::~D3D10ShaderState(){
 void D3D10ShaderState::destroy(){
 	mShaders.clear();
 
-	if(mListener!=NULL){
-		mListener->shaderStateDestroyed(this);
-		mListener=NULL;
-	}
+	BaseResource::destroy();
 }
 
 void D3D10ShaderState::setShader(Shader::ShaderType type,Shader::ptr shader){

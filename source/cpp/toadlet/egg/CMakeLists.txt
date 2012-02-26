@@ -87,6 +87,7 @@ set (EGG_HEADERS
 	EventFactory.h
 	Exception.h
 	Extents.h
+	Interface.h
 	IntrusivePointer.h
 	Logger.h
 	LoggerListener.h
@@ -94,11 +95,12 @@ set (EGG_HEADERS
 	MathConversion.h
 	Map.h
 	Mutex.h
+	Object.h
 	PointerCounter.h
 	Profile.h
 	Random.h
 	Resource.h
-	ResourceFullyReleasedListener.h
+	ResourceDestroyedListener.h
 	Runnable.h
 	SharedPointer.h
 	String.h

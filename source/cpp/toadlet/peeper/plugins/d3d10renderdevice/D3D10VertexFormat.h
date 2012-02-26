@@ -26,8 +26,9 @@
 #ifndef TOADLET_PEEPER_D3D10VERTEXFORMAT_H
 #define TOADLET_PEEPER_D3D10VERTEXFORMAT_H
 
-#include <toadlet/peeper/VertexFormat.h>
 #include "D3D10Includes.h"
+#include <toadlet/egg/BaseResource.h>
+#include <toadlet/peeper/VertexFormat.h>
 
 namespace toadlet{
 namespace peeper{
@@ -35,14 +36,14 @@ namespace peeper{
 class D3D10RenderDevice;
 class D3D10Shader;
 
-class TOADLET_API D3D10VertexFormat:public VertexFormat{
+class TOADLET_API D3D10VertexFormat:public BaseResource,public VertexFormat{
 public:
+	TOADLET_RESOURCE(D3D10VertexFormat,VertexFormat);
+
 	D3D10VertexFormat(D3D10RenderDevice *renderDevice);
 	virtual ~D3D10VertexFormat();
 
 	VertexFormat *getRootVertexFormat(){return this;}
-
-	void setVertexFormatDestroyedListener(VertexFormatDestroyedListener *listener){mListener=listener;}
 
 	bool create();
 	void destroy();
@@ -62,8 +63,6 @@ public:
 
 protected:
 	D3D10RenderDevice *mDevice;
-
-	VertexFormatDestroyedListener *mListener;
 	Collection<int> mSemantics;
 	Collection<String> mNames;
 	Collection<int> mIndexes;

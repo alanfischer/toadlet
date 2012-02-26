@@ -34,8 +34,6 @@ namespace peeper{
 
 D3D10VertexFormat::D3D10VertexFormat(D3D10RenderDevice *renderDevice):
 	mDevice(NULL),
-
-	mListener(NULL),
 	//mSemantics,
 	//mFormats,
 	//mOffsets,
@@ -67,9 +65,7 @@ void D3D10VertexFormat::destroy(){
 	mOffsets.clear();
 	mElements.clear();
 
-	if(mListener!=NULL){
-		mListener->vertexFormatDestroyed(this);
-	}
+	BaseResource::destroy();
 
 	if(mDevice!=NULL){
 		mDevice->vertexFormatDestroyed(this);

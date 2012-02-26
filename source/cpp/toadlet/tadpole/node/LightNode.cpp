@@ -26,7 +26,6 @@
 #include <toadlet/tadpole/Engine.h>
 #include <toadlet/tadpole/RenderableSet.h>
 #include <toadlet/tadpole/node/LightNode.h>
-#include <toadlet/tadpole/node/ParentNode.h>
 
 namespace toadlet{
 namespace tadpole{

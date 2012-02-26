@@ -34,7 +34,6 @@ namespace peeper{
 D3D9PixelBuffer::D3D9PixelBuffer(D3D9RenderDevice *renderDevice,bool renderTarget):
 	mDevice(NULL),
 
-	mListener(NULL),
 	mRenderTarget(false),
 	mSurface(NULL),
 	mVolume(NULL),
@@ -66,10 +65,7 @@ bool D3D9PixelBuffer::create(int usage,int access,TextureFormat::ptr format){
 void D3D9PixelBuffer::destroy(){
 	destroyContext(false);
 
-	if(mListener!=NULL){
-		mListener->bufferDestroyed(this);
-		mListener=NULL;
-	}
+	BaseResource::destroy();
 }
 
 void D3D9PixelBuffer::resetCreate(){

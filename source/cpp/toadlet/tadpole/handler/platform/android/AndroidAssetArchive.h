@@ -37,9 +37,8 @@ namespace tadpole{
 namespace handler{
 
 class TOADLET_API AndroidAssetArchive:public Archive,public BaseResource{
-	TOADLET_BASERESOURCE_PASSTHROUGH(Archive);
 public:
-	TOADLET_SHARED_POINTERS(AndroidAssetArchive);
+	TOADLET_RESOURCE(AndroidAssetArchive,Archive);
 
 	AndroidAssetArchive(JNIEnv *jenv,jobject jassetManager);
 	virtual ~AndroidAssetArchive();

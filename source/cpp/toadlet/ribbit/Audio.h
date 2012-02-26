@@ -26,14 +26,15 @@
 #ifndef TOADLET_RIBBIT_AUDIO_H
 #define TOADLET_RIBBIT_AUDIO_H
 
+#include <toadlet/egg/Resource.h>
 #include <toadlet/ribbit/AudioBuffer.h>
 
 namespace toadlet{
 namespace ribbit{
 
-class Audio{
+class Audio:public Resource{
 public:
-	TOADLET_SHARED_POINTERS(Audio);
+	TOADLET_IPTR(Audio);
 
 	virtual ~Audio(){}
 

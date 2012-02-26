@@ -26,22 +26,21 @@
 #ifndef TOADLET_PEEPER_BACKABLEPIXELBUFFERRENDERTARGET_H
 #define TOADLET_PEEPER_BACKABLEPIXELBUFFERRENDERTARGET_H
 
+#include <toadlet/egg/BaseResource.h>
 #include <toadlet/peeper/PixelBufferRenderTarget.h>
 
 namespace toadlet{
 namespace peeper{
 
-class TOADLET_API BackablePixelBufferRenderTarget:public PixelBufferRenderTarget{
+class TOADLET_API BackablePixelBufferRenderTarget:public BaseResource,public PixelBufferRenderTarget{
 public:
-	TOADLET_SHARED_POINTERS(BackablePixelBufferRenderTarget);
+	TOADLET_RESOURCE(BackablePixelBufferRenderTarget,PixelBufferRenderTarget);
 
 	BackablePixelBufferRenderTarget();
 	virtual ~BackablePixelBufferRenderTarget();
 
 	virtual RenderTarget *getRootRenderTarget(){return mBack!=NULL?mBack->getRootRenderTarget():NULL;}
 	virtual PixelBufferRenderTarget *getRootPixelBufferRenderTarget(){return mBack!=NULL?mBack->getRootPixelBufferRenderTarget():NULL;}
-
-	virtual void setRenderTargetDestroyedListener(RenderTargetDestroyedListener *listener){mListener=listener;}
 
 	virtual bool isPrimary() const{return mBack!=NULL?mBack->isPrimary():false;}
 	virtual bool isValid() const{return mBack!=NULL?mBack->isValid():false;}
@@ -61,8 +60,6 @@ public:
 	virtual PixelBufferRenderTarget::ptr getBack(){return mBack;}
 	
 protected:
-	RenderTargetDestroyedListener *mListener;
-
 	PixelBufferRenderTarget::ptr mBack;
 	Collection<PixelBuffer::ptr> mBuffers;
 	Collection<Attachment> mBufferAttachments;

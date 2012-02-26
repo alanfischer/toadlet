@@ -117,7 +117,6 @@ Mesh::ptr SkyDomeMeshCreator::createSkyDomeMesh(const Sphere &sphere,int numSegm
 	if(material==NULL){
 		material=mEngine->getMaterialManager()->createSkyBoxMaterial(NULL);
 	}
-	material->retain();
 	mesh->getSubMesh(0)->material=material;
 
 	return mesh;

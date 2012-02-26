@@ -35,7 +35,7 @@ class ConnectionListener;
 
 class TOADLET_API Connector{
 public:
-	TOADLET_SHARED_POINTERS(Connector);
+	TOADLET_SPTR(Connector);
 
 	virtual ~Connector(){}
 

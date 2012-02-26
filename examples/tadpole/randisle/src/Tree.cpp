@@ -39,7 +39,7 @@ Tree::Tree():super(),
 	//mLowMeshNode
 {}
 
-Node *Tree::create(Scene *scene,int seed,ParentNode *parent,const Vector3 &translate){
+Node *Tree::create(Scene *scene,int seed,Node *parent,const Vector3 &translate){
 	super::create(scene);
 
 	Logger::alert("Tree::create");
@@ -57,14 +57,7 @@ Node *Tree::create(Scene *scene,int seed,ParentNode *parent,const Vector3 &trans
 	mLowDistance=300;
 
 	mBranchMaterial=Resources::instance->treeBranch;
-	if(mBranchMaterial!=NULL){
-		mBranchMaterial->retain();
-	}
-
 	mLeafMaterial=Resources::instance->treeLeaf;
-	if(mLeafMaterial!=NULL){
-		mLeafMaterial->retain();
-	}
 
 	mSystem=BranchSystem::ptr(new BranchSystem(seed));
 	mSystem->setBranchListener(this);
@@ -111,20 +104,14 @@ Node *Tree::create(Scene *scene,int seed,ParentNode *parent,const Vector3 &trans
 	{
 		Mesh::SubMesh::ptr subMesh(new Mesh::SubMesh());
 		subMesh->indexData=IndexData::ptr(new IndexData(IndexData::Primitive_TRISTRIP,mBranchIndexBuffer));
-		if(mBranchMaterial!=NULL){
-			mBranchMaterial->retain();
-			subMesh->material=mBranchMaterial;
-		}
+		subMesh->material=mBranchMaterial;
 		mesh->addSubMesh(subMesh);
 	}
 	if(1){
 		Mesh::SubMesh::ptr subMesh(new Mesh::SubMesh());
 		subMesh->vertexData=VertexData::ptr(new VertexData(mLeafVertexBuffer));
 		subMesh->indexData=IndexData::ptr(new IndexData(IndexData::Primitive_TRIS,mLeafIndexBuffer));
-		if(mLeafMaterial!=NULL){
-			mLeafMaterial->retain();
-			subMesh->material=mLeafMaterial;
-		}
+		subMesh->material=mLeafMaterial;
 		mesh->addSubMesh(subMesh);
 	}
 	mesh=shared_static_cast<Mesh>(mEngine->getMeshManager()->manage(mesh));
@@ -135,20 +122,14 @@ Node *Tree::create(Scene *scene,int seed,ParentNode *parent,const Vector3 &trans
 	{
 		Mesh::SubMesh::ptr subMesh(new Mesh::SubMesh());
 		subMesh->indexData=IndexData::ptr(new IndexData(IndexData::Primitive_TRISTRIP,mLowBranchIndexBuffer));
-		if(mBranchMaterial!=NULL){
-			mBranchMaterial->retain();
-			subMesh->material=mBranchMaterial;
-		}
+		subMesh->material=mBranchMaterial;
 		lowMesh->addSubMesh(subMesh);
 	}
 	if(1){
 		Mesh::SubMesh::ptr subMesh(new Mesh::SubMesh());
 		subMesh->vertexData=VertexData::ptr(new VertexData(mLeafVertexBuffer));
 		subMesh->indexData=IndexData::ptr(new IndexData(IndexData::Primitive_TRIS,mLeafIndexBuffer));
-		if(mLeafMaterial!=NULL){
-			mLeafMaterial->retain();
-			subMesh->material=mLeafMaterial;
-		}
+		subMesh->material=mLeafMaterial;
 		lowMesh->addSubMesh(subMesh);
 	}
 	lowMesh=shared_static_cast<Mesh>(mEngine->getMeshManager()->manage(lowMesh));
@@ -190,14 +171,8 @@ void Tree::destroy(){
 		mLeafIndexBuffer=NULL;
 	}
 
-	if(mBranchMaterial!=NULL){
-		mBranchMaterial->release();
-		mBranchMaterial=NULL;
-	}
-	if(mLeafMaterial!=NULL){
-		mLeafMaterial->release();
-		mLeafMaterial=NULL;
-	}
+	mBranchMaterial=NULL;
+	mLeafMaterial=NULL;
 	
 	super::destroy();
 }

@@ -35,7 +35,7 @@ namespace tadpole{
 
 class TOADLET_API FontData:public ResourceData{
 public:
-	TOADLET_SHARED_POINTERS(FontData);
+	TOADLET_SPTR(FontData);
 
 	FontData(float pointSize1){
 		pointSize=pointSize1;

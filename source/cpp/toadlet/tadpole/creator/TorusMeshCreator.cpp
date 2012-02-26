@@ -88,7 +88,6 @@ Mesh::ptr TorusMeshCreator::createTorusMesh(scalar majorRadius,scalar minorRadiu
 	if(material==NULL){
 		material=mEngine->getMaterialManager()->createDiffuseMaterial(NULL);
 	}
-	material->retain();
 	mesh->getSubMesh(0)->material=material;
 
 	return mesh;

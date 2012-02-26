@@ -40,7 +40,7 @@ namespace animation{
 /// @todo: Controllers should have a general ControllerListener that can be implemented by Node, so when they are destroyed, the node can listen and remove the controller
 class TOADLET_API Controller{
 public:
-	TOADLET_SHARED_POINTERS(Controller);
+	TOADLET_SPTR(Controller);
 
 	enum Interpolation{
 		Interpolation_LINEAR,

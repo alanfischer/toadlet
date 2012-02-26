@@ -33,7 +33,7 @@ namespace peeper{
 
 class TOADLET_API TextureFormat{
 public:
-	TOADLET_SHARED_POINTERS(TextureFormat);
+	TOADLET_SPTR(TextureFormat);
 
 	enum Dimension{
 		Dimension_UNKNOWN=0,
@@ -319,6 +319,7 @@ public:
 			xMin/=div;yMin/=div;zMin/=div;
 			xMax/=div;yMax/=div;zMax/=div;
 			xMax=xMax>0?xMax:1;yMax=yMax>0?yMax:1;zMax=zMax>0?zMax:1;
+			updatePitch();
 		}
 	}
 

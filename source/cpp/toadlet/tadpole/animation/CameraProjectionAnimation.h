@@ -35,7 +35,7 @@ namespace animation{
 
 class TOADLET_API CameraProjectionAnimation:public Animatable{
 public:
-	TOADLET_SHARED_POINTERS(CameraProjectionAnimation);
+	TOADLET_SPTR(CameraProjectionAnimation);
 
 	CameraProjectionAnimation(CameraNode::ptr target);
 	virtual ~CameraProjectionAnimation(){}

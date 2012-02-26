@@ -37,7 +37,7 @@ class Simulator;
 	
 class TOADLET_API Shape{
 public:
-	TOADLET_SHARED_POINTERS(Shape);
+	TOADLET_SPTR(Shape);
 
 	enum Type{
 		Type_AABOX=			1<<0,

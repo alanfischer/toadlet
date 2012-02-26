@@ -37,8 +37,9 @@ namespace peeper{
 class GLRenderDevice;
 
 class TOADLET_API GLTexture:protected BaseResource,public Texture{
-	TOADLET_BASERESOURCE_PASSTHROUGH(Texture);
 public:
+	TOADLET_RESOURCE(GLTexture,Texture);
+
 	GLTexture(GLRenderDevice *renderDevice);
 	virtual ~GLTexture();
 

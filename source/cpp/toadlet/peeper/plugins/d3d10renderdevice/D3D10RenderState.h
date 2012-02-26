@@ -27,6 +27,7 @@
 #define TOADLET_PEEPER_D3D10RENDERSTATE_H
 
 #include "D3D10Includes.h"
+#include <toadlet/egg/BaseResource.h>
 #include <toadlet/peeper/RenderState.h>
 
 namespace toadlet{
@@ -34,14 +35,14 @@ namespace peeper{
 
 class D3D10RenderDevice;
 
-class TOADLET_API D3D10RenderState:public RenderState{
+class TOADLET_API D3D10RenderState:public BaseResource,public RenderState{
 public:
+	TOADLET_RESOURCE(D3D10RenderState,RenderState);
+
 	D3D10RenderState(D3D10RenderDevice *renderDevice);
 	virtual ~D3D10RenderState();
 
 	RenderState *getRootRenderState(){return this;}
-
-	void setRenderStateDestroyedListener(RenderStateDestroyedListener *listener){mListener=listener;}
 
 	bool create(){return true;}
 	void destroy();
@@ -75,8 +76,6 @@ public:
 protected:
 	D3D10RenderDevice *mDevice;
 	ID3D10Device *mD3DDevice;
-
-	RenderStateDestroyedListener *mListener;
 	BlendState *mBlendState;
 	DepthState *mDepthState;
 	RasterizerState *mRasterizerState;

@@ -35,7 +35,7 @@ namespace material{
 
 class TOADLET_API Material:public BaseResource{
 public:
-	TOADLET_SHARED_POINTERS(Material);
+	TOADLET_RESOURCE(Material,Material);
 
 	enum SortType{
 		SortType_AUTO,
@@ -53,9 +53,10 @@ public:
 
 	void destroy();
 
-	RenderPath::ptr addPath();
+	RenderPath::ptr addPath(const String name=(char*)NULL);
 	inline int getNumPaths() const{return mPaths.size();}
 	inline RenderPath::ptr getPath(int i) const{return mPaths[i];}
+	RenderPath::ptr getPath(const String name=(char*)NULL) const;
 	inline void setBestPath(RenderPath::ptr path){mBestPath=path;}
 	RenderPath::ptr getBestPath(){return mBestPath;}
 	RenderPass::ptr getPass(int path=-1,int pass=-1);

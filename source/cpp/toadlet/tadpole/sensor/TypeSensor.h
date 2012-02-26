@@ -34,7 +34,7 @@ namespace sensor{
 
 class TOADLET_API TypeSensor:public Sensor{
 public:
-	TOADLET_SHARED_POINTERS(TypeSensor);
+	TOADLET_SPTR(TypeSensor);
 
 	TypeSensor(Scene *scene);
 

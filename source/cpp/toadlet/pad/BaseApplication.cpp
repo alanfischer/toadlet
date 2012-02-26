@@ -173,7 +173,6 @@ void BaseApplication::destroy(){
 	for(i=0;i<mInputDevices.size();++i){
 		if(mInputDevices[i]!=NULL){
 			mInputDevices[i]->destroy();
-			delete mInputDevices[i];
 			mInputDevices[i]=NULL;
 		}
 	}
@@ -241,17 +240,16 @@ bool BaseApplication::createContextAndRenderDevice(const String &plugin){
 	bool result=false;
 	mRenderDevice=makeRenderDevice(plugin);
 	TOADLET_TRY
-		result=mRenderDevice->create(this,mRenderDeviceOptions);
+		result=mRenderDevice->create(mRenderTarget,mRenderDeviceOptions);
 	TOADLET_CATCH(const Exception &){result=false;}
 
 	if(result==false){
 		if(mRenderDevice!=NULL){
-			delete mRenderDevice;
+			mRenderDevice->destroy();
 			mRenderDevice=NULL;
 		}
 		if(mRenderTarget!=NULL){
 			mRenderTarget->destroy();
-			delete mRenderTarget;
 			mRenderTarget=NULL;
 		}
 
@@ -261,7 +259,7 @@ bool BaseApplication::createContextAndRenderDevice(const String &plugin){
 	}
 
 	if(mRenderTarget!=NULL && mRenderDevice!=NULL){
-		mRenderDevice->setRenderTarget(this);
+		mRenderDevice->setRenderTarget(mRenderTarget);
 		mEngine->setRenderDevice(mRenderDevice);
 	}
 
@@ -275,13 +273,11 @@ bool BaseApplication::destroyRenderDeviceAndContext(){
 	if(mRenderDevice!=NULL){
 		mEngine->setRenderDevice(NULL);
 		mRenderDevice->destroy();
-		delete mRenderDevice;
 		mRenderDevice=NULL;
 	}
 
 	if(mRenderTarget!=NULL){
 		mRenderTarget->destroy();
-		delete mRenderTarget;
 		mRenderTarget=NULL;
 	}
 
@@ -310,7 +306,6 @@ bool BaseApplication::createAudioDevice(const String &plugin){
 			result=mAudioDevice->create(mAudioDeviceOptions);
 		TOADLET_CATCH(const Exception &){result=false;}
 		if(result==false){
-			delete mAudioDevice;
 			mAudioDevice=NULL;
 		}
 	}
@@ -336,7 +331,6 @@ bool BaseApplication::destroyAudioDevice(){
 	if(mAudioDevice!=NULL){
 		mEngine->setAudioDevice(NULL);
 		mAudioDevice->destroy();
-		delete mAudioDevice;
 		mAudioDevice=NULL;
 	}
 	return true;

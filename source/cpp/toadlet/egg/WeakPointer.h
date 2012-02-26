@@ -273,12 +273,4 @@ protected:
 }
 }
 
-#define TOADLET_SHARED_POINTERS(Class) \
-	typedef toadlet::egg::SharedPointer<Class> ptr; \
-	typedef toadlet::egg::WeakPointer<Class,toadlet::egg::DefaultSharedSemantics> wptr
-
-#define TOADLET_INTRUSIVE_POINTERS(Class) \
-	typedef toadlet::egg::IntrusivePointer<Class> ptr; \
-	typedef toadlet::egg::WeakPointer<Class,toadlet::egg::DefaultIntrusiveSemantics> wptr
-
 #endif

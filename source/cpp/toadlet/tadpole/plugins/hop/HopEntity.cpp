@@ -32,7 +32,7 @@ namespace tadpole{
 
 TOADLET_NODE_IMPLEMENT(HopEntity,Categories::TOADLET_TADPOLE+".HopEntity");
 
-HopEntity::HopEntity():ParentNode(),
+HopEntity::HopEntity():Node(),
 	mSolid(new Solid()),
 	//mOldPosition,mNewPosition,mCurrentPosition,
 	mSkipNextPreSimulate(false),
@@ -179,7 +179,7 @@ void HopEntity::removeAllShapes(){
 void HopEntity::setCollisionVolumesVisible(bool visible){
 	if(visible){
 		if(mVolumeNode==NULL){
-			mVolumeNode=mEngine->createNodeType(ParentNode::type(),mScene);
+			mVolumeNode=mEngine->createNodeType(Node::type(),mScene);
 			attach(mVolumeNode);
 		}
 	}
@@ -235,9 +235,9 @@ void HopEntity::spacialUpdated(){
 	}
 }
 
-void HopEntity::parentChanged(ParentNode *parent){
+bool HopEntity::parentChanged(Node *node){
 	if(mHopScene!=NULL && mHopScene->getSimulator()!=NULL){
-		if(parent==mScene->getRoot()){
+		if(node==mScene->getRoot()){
 			mHopScene->getSimulator()->addSolid(getSolid());
 		}
 		else{
@@ -245,7 +245,7 @@ void HopEntity::parentChanged(ParentNode *parent){
 		}
 	}
 
-	super::parentChanged(parent);
+	return super::parentChanged(node);
 }
 
 void HopEntity::logicUpdate(int dt,int scope){

@@ -35,7 +35,7 @@ namespace sensor{
 
 class TOADLET_API SensorResults:public SensorResultsListener{
 public:
-	TOADLET_SHARED_POINTERS(SensorResults);
+	TOADLET_SPTR(SensorResults);
 
 	SensorResults();
 	virtual ~SensorResults();

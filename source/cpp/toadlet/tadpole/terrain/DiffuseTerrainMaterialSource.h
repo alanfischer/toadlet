@@ -35,7 +35,7 @@ namespace terrain{
 
 class TOADLET_API DiffuseTerrainMaterialSource:public TerrainNodeMaterialSource{
 public:
-	TOADLET_SHARED_POINTERS(DiffuseTerrainMaterialSource);
+	TOADLET_SPTR(DiffuseTerrainMaterialSource);
 	
 	DiffuseTerrainMaterialSource(Engine *engine);
 	

@@ -27,21 +27,20 @@
 #define TOADLET_PEEPER_BACKABLEVERTEXFORMAT_H
 
 #include <toadlet/egg/Collection.h>
+#include <toadlet/egg/BaseResource.h>
 #include <toadlet/peeper/VertexFormat.h>
 
 namespace toadlet{
 namespace peeper{
 
-class TOADLET_API BackableVertexFormat:public VertexFormat{
+class TOADLET_API BackableVertexFormat:public BaseResource,public VertexFormat{
 public:
-	TOADLET_SHARED_POINTERS(BackableVertexFormat);
+	TOADLET_RESOURCE(BackableVertexFormat,VertexFormat);
 
 	BackableVertexFormat();
 	virtual ~BackableVertexFormat();
 
 	virtual VertexFormat *getRootVertexFormat(){return mBack;}
-
-	virtual void setVertexFormatDestroyedListener(VertexFormatDestroyedListener *listener){mListener=listener;}
 
 	virtual bool create();
 	virtual void destroy();
@@ -66,7 +65,6 @@ public:
 	static String getNameFromSemantic(int semantic);
 
 protected:
-	VertexFormatDestroyedListener *mListener;
 	Collection<int> mSemantics;
 	Collection<String> mNames;
 	Collection<int> mIndexes;

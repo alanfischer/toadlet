@@ -43,7 +43,7 @@ class RenderPass;
 
 class SceneParameters{
 public:
-	TOADLET_SHARED_POINTERS(SceneParameters);
+	TOADLET_SPTR(SceneParameters);
 
 	SceneParameters():
 		mScene(NULL),

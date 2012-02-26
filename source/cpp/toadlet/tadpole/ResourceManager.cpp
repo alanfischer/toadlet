@@ -33,7 +33,7 @@ namespace tadpole{
 
 ResourceManager::ResourceManager(Archive *archive){
 	mArchive=archive;
-	mResources.resize(1); // Handle 0 is always NULL
+	mResources.add(NULL); // Handle 0 is always NULL
 	#if defined(TOADLET_PLATFORM_ANDROID)
 		mMaxStreamLength=256*256*4*2; // Twice the size of a 256x256 32bpp image
 	#else
@@ -50,7 +50,7 @@ void ResourceManager::destroy(){
 	for(i=0;i<mResources.size();++i){
 		Resource::ptr resource=mResources[i];
 		if(resource!=NULL){
-			resource->setFullyReleasedListener(NULL);
+			resource->setDestroyedListener(NULL);
 			resource->destroy();
 		}
 	}
@@ -115,7 +115,7 @@ Resource::ptr ResourceManager::manage(const Resource::ptr &resource,const String
 
 		mResources[handle]=resource;
 		resource->internal_setUniqueHandle(handle);
-		resource->setFullyReleasedListener(this);
+		resource->setDestroyedListener(this);
 	}
 	else{
 		if(resource->getName()!=(char*)NULL){
@@ -159,7 +159,7 @@ void ResourceManager::unmanage(Resource *resource){
 		}
 	}
 
-	resource->destroy();
+	resource->setDestroyedListener(NULL);
 }
 
 void ResourceManager::setStreamer(ResourceStreamer::ptr streamer,const String &extension){
@@ -195,8 +195,15 @@ ResourceStreamer::ptr ResourceManager::getStreamer(const String &extension){
 	}
 }
 
-void ResourceManager::resourceFullyReleased(Resource *resource){
+void ResourceManager::resourceDestroyed(Resource *resource){
 	unmanage(resource);
+}
+
+void ResourceManager::logAllResources(){
+	int i;
+	for(i=0;i<mResources.size();++i){
+		Logger::alert(String("Resource:")+i+" ptr:"+(int)mResources[i]+" name:"+(mResources[i]!=NULL?mResources[i]->getName():""));
+	}
 }
 
 String ResourceManager::cleanFilename(const String &name){
@@ -292,7 +299,8 @@ Resource::ptr ResourceManager::findFromFile(const String &name,ResourceData *dat
 				TOADLET_TRY
 					resource=Resource::ptr(streamer->load(stream,data,NULL));
 				TOADLET_CATCH(const Exception &){resource=Resource::ptr();}
-				stream->close();
+
+				// We do not close the stream, since the Streamer may hold on to it.  Instead we let it close itself
 
 				Logger::debug(Categories::TOADLET_TADPOLE,
 					"loaded resource");
