@@ -36,8 +36,7 @@ namespace studio{
 
 class TOADLET_API SpriteModel:public BaseResource{
 public:
-	TOADLET_BASERESOURCE_PASSTHROUGH(BaseResource);
-	TOADLET_SHARED_POINTERS(SpriteModel);
+	TOADLET_RESOURCE(SpriteModel,SpriteModel);
 
 	SpriteModel():
 		data(NULL),
@@ -52,15 +51,7 @@ public:
 		}
 		palette=NULL;
 
-		int i;
-		for(i=0;i<textures.size();++i){
-			textures[i]->release();
-		}
 		textures.clear();
-
-		for(i=0;i<materials.size();++i){
-			materials[i]->release();
-		}
 		materials.clear();
 	}
 

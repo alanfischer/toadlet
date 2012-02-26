@@ -30,7 +30,6 @@ namespace toadlet{
 namespace peeper{
 
 D3D10RenderState::D3D10RenderState(D3D10RenderDevice *renderDevice):
-	mListener(NULL),
 	mBlendState(NULL),
 	mDepthState(NULL),
 	mRasterizerState(NULL),
@@ -115,10 +114,7 @@ void D3D10RenderState::destroy(){
 		mD3DSamplerStates[j].clear();
 	}
 
-	if(mListener!=NULL){
-		mListener->renderStateDestroyed(this);
-		mListener=NULL;
-	}
+	BaseResource::destroy();
 }
 
 void D3D10RenderState::setBlendState(const BlendState &state){

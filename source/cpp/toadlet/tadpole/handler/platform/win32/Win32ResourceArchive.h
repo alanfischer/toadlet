@@ -36,9 +36,8 @@ namespace tadpole{
 namespace handler{
 
 class TOADLET_API Win32ResourceArchive:public Archive,public BaseResource{
-	TOADLET_BASERESOURCE_PASSTHROUGH(Archive);
 public:
-	TOADLET_SHARED_POINTERS(Win32ResourceArchive);
+	TOADLET_RESOURCE(Win32ResourceArchive,Archive);
 
 	Win32ResourceArchive(TextureManager *textureManager);
 	virtual ~Win32ResourceArchive();

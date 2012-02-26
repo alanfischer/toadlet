@@ -28,7 +28,6 @@
 #include <toadlet/tadpole/Engine.h>
 #include <toadlet/tadpole/Scene.h>
 #include <toadlet/tadpole/node/CameraNode.h>
-#include <toadlet/tadpole/node/ParentNode.h>
 
 namespace toadlet{
 namespace tadpole{
@@ -101,7 +100,6 @@ Node *CameraNode::create(Scene *scene){
 	mGammaMaterial=mEngine->getMaterialManager()->createMaterial();
 	mGammaMaterial->getPass()->setDepthState(DepthState(DepthState::DepthTest_NEVER,false));
 	mGammaMaterial->getPass()->setMaterialState(MaterialState(Math::ZERO_VECTOR4));
-	mGammaMaterial->retain();
 
 	mFPSLastTime=0;
 	mFPSFrameCount=0;
@@ -111,9 +109,15 @@ Node *CameraNode::create(Scene *scene){
 }
 
 void CameraNode::destroy(){
-	mGammaMaterial->release();
-	mOverlayVertexData->destroy();
-	mOverlayIndexData->destroy();
+	mGammaMaterial=NULL;
+	if(mOverlayVertexData!=NULL){
+		mOverlayVertexData->destroy();
+		mOverlayVertexData=NULL;
+	}
+	if(mOverlayIndexData!=NULL){
+		mOverlayIndexData->destroy();
+		mOverlayIndexData=NULL;
+	}
 
 	super::destroy();
 }

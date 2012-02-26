@@ -51,12 +51,26 @@ void Material::destroy(){
 		mPaths[i]->destroy();
 	}
 	mPaths.clear();
+
+	BaseResource::destroy();
 }
 
-RenderPath::ptr Material::addPath(){
+RenderPath::ptr Material::addPath(const String name){
 	RenderPath::ptr path(new RenderPath(mManager));
+	path->setName(name);
 	mPaths.add(path);
 	return path;
+}
+
+RenderPath::ptr Material::getPath(const String name) const{
+	int i;
+	for(i=0;i<mPaths.size();++i){
+		RenderPath::ptr path=mPaths[i];
+		if(path->getName()==name){
+			return path;
+		}
+	}
+	return NULL;
 }
 
 RenderPass::ptr Material::getPass(int pathIndex,int passIndex){

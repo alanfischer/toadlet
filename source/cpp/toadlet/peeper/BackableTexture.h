@@ -33,10 +33,9 @@
 namespace toadlet{
 namespace peeper{
 
-class TOADLET_API BackableTexture:public BaseResource,public Texture{
-	TOADLET_BASERESOURCE_PASSTHROUGH(Texture);
+class TOADLET_API BackableTexture:protected BaseResource,public Texture{
 public:
-	TOADLET_SHARED_POINTERS(BackableTexture);
+	TOADLET_RESOURCE(BackableTexture,Texture);
 
 	BackableTexture();
 	virtual ~BackableTexture();

@@ -27,6 +27,7 @@
 #define TOADLET_PEEPER_D3D9PIXELBUFFER_H
 
 #include "D3D9Includes.h"
+#include <toadlet/egg/BaseResource.h>
 #include <toadlet/peeper/PixelBuffer.h>
 
 namespace toadlet{
@@ -34,16 +35,14 @@ namespace peeper{
 
 class D3D9RenderDevice;
 
-class TOADLET_API D3D9PixelBuffer:public PixelBuffer{
+class TOADLET_API D3D9PixelBuffer:public BaseResource,public PixelBuffer{
 public:
-	TOADLET_SHARED_POINTERS(D3D9PixelBuffer);
+	TOADLET_RESOURCE(D3D9PixelBuffer,PixelBuffer);
 
 	D3D9PixelBuffer(D3D9RenderDevice *renderDevice,bool renderTarget);
 	virtual ~D3D9PixelBuffer();
 
 	PixelBuffer *getRootPixelBuffer(){return this;}
-
-	void setBufferDestroyedListener(BufferDestroyedListener *listener){mListener=listener;}
 
 	bool create(int usage,int access,TextureFormat::ptr format);
 	void destroy();
@@ -72,7 +71,6 @@ protected:
 
 	D3D9RenderDevice *mDevice;
 
-	BufferDestroyedListener *mListener;
 	bool mRenderTarget;
 	IDirect3DSurface9 *mSurface;
 	IDirect3DVolume9 *mVolume;

@@ -46,11 +46,11 @@ public:
 
 	class TOADLET_API SubModel:public Renderable{
 	public:
-		TOADLET_SHARED_POINTERS(SubModel);
+		TOADLET_SPTR(SubModel);
 
 		SubModel(StudioModelNode *modelNode,int bodypartIndex,int modelIndex,int meshIndex,int skinIndex);
-		void destroy(){if(material!=NULL){material->release();}}
-
+		void destroy(){material=NULL;}
+	
 		Material *getRenderMaterial() const{return material;}
 		const Transform &getRenderTransform() const{return modelNode->getWorldTransform();}
 		const Bound &getRenderBound() const{return modelNode->getRenderBound();}
@@ -170,7 +170,7 @@ protected:
 	scalar mBlenderValues[4],mAdjustedBlenderValues[4];
 	StudioModelNode::ptr mLink;
 	StudioModel::ptr mLinkModel;
-	Controller::ptr mController,mGaitController;
+//	Controller::ptr mController,mGaitController;
 
 	Vector3 mChromeForward,mChromeRight;
 	Collection<Vector3> mBoneTranslates;

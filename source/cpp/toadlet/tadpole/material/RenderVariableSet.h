@@ -41,7 +41,7 @@ class RenderPass;
 
 class TOADLET_API RenderVariableSet{
 public:
-	TOADLET_SHARED_POINTERS(RenderVariableSet);
+	TOADLET_SPTR(RenderVariableSet);
 
 	RenderVariableSet();
 	virtual ~RenderVariableSet();

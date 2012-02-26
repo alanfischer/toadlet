@@ -27,22 +27,23 @@
 #define TOADLET_PEEPER_D3D9VERTEXBUFFER_H
 
 #include "D3D9Includes.h"
-#include <toadlet/peeper/VertexBuffer.h>
 #include <toadlet/egg/Collection.h>
+#include <toadlet/egg/BaseResource.h>
+#include <toadlet/peeper/VertexBuffer.h>
 
 namespace toadlet{
 namespace peeper{
 
 class D3D9RenderDevice;
 
-class TOADLET_API D3D9VertexBuffer:public VertexBuffer{
+class TOADLET_API D3D9VertexBuffer:public BaseResource,public VertexBuffer{
 public:
+	TOADLET_RESOURCE(D3D9VertexBuffer,VertexBuffer);
+
 	D3D9VertexBuffer(D3D9RenderDevice *renderDevice);
 	virtual ~D3D9VertexBuffer();
 
 	VertexBuffer *getRootVertexBuffer(){return this;}
-
-	void setBufferDestroyedListener(BufferDestroyedListener *listener){mListener=listener;}
 
 	bool create(int usage,int access,VertexFormat::ptr vertexFormat,int size);
 	void destroy();
@@ -67,8 +68,6 @@ protected:
 	bool destroyContext(bool backup);
 
 	D3D9RenderDevice *mDevice;
-
-	BufferDestroyedListener *mListener;
 	int mUsage;
 	int mAccess;
 	int mSize;

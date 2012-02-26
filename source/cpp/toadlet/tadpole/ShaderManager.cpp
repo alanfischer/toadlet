@@ -39,7 +39,7 @@ ShaderManager::ShaderManager(Engine *engine):ResourceManager(engine->getArchiveM
 Shader::ptr ShaderManager::createShader(Shader::ShaderType type,const String profiles[],const String codes[],int numCodes){
 	RenderDevice *renderDevice=mEngine->getRenderDevice();
 	Shader::ptr shader;
-	if(mEngine->hasShader(type)){
+	if(mEngine->isShaderBackable()){
 		BackableShader::ptr backableShader(new BackableShader());
 		backableShader->create(type,profiles,codes,numCodes);
 		if(renderDevice!=NULL && mEngine->getRenderCaps().hasShader[type]){
@@ -75,14 +75,14 @@ Shader::ptr ShaderManager::createShader(Shader::ShaderType type,const String &pr
 void ShaderManager::contextActivate(RenderDevice *renderDevice){
 	int i;
 	for(i=0;i<mResources.size();++i){
-		Shader::ptr shader=shared_static_cast<Shader>(mResources[i]);
+		Shader *shader=(Shader*)mResources[i];
 		if(shader!=NULL && shader->getRootShader()!=shader){
 			Shader::ptr back;
 			TOADLET_TRY
-				back=Shader::ptr(renderDevice->createShader());
+				back=renderDevice->createShader();
 			TOADLET_CATCH(const Exception &){}
 			if(back!=NULL){
-				shared_static_cast<BackableShader>(shader)->setBack(back,renderDevice);
+				((BackableShader*)shader)->setBack(back,renderDevice);
 			}
 		}
 	}
@@ -91,9 +91,9 @@ void ShaderManager::contextActivate(RenderDevice *renderDevice){
 void ShaderManager::contextDeactivate(RenderDevice *renderDevice){
 	int i;
 	for(i=0;i<mResources.size();++i){
-		Shader::ptr shader=shared_static_cast<Shader>(mResources[i]);
+		Shader *shader=(Shader*)mResources[i];
 		if(shader!=NULL && shader->getRootShader()!=shader){
-			shared_static_cast<BackableShader>(shader)->setBack(NULL,NULL);
+			((BackableShader*)shader)->setBack(NULL,NULL);
 		}
 	}
 }

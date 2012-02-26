@@ -23,22 +23,26 @@
  *
  ********** Copyright header - do not remove **********/
 
-#ifndef TOADLET_EGG_RESOURCEFULLYRELEASEDLISTENER_H
-#define TOADLET_EGG_RESOURCEFULLYRELEASEDLISTENER_H
+#ifndef TOADLET_EGG_INTERFACE_H
+#define TOADLET_EGG_INTERFACE_H
 
-#include <toadlet/egg/Resource.h>
+#include <toadlet/Types.h>
+#include <toadlet/egg/IntrusivePointer.h>
 
 namespace toadlet{
 namespace egg{
 
-class ResourceFullyReleasedListener{
+class TOADLET_API Interface{
 public:
-	virtual ~ResourceFullyReleasedListener(){}
+	TOADLET_IPTR(Interface);
+	virtual ~Interface(){}
 
-	virtual void resourceFullyReleased(Resource *resource)=0;
+	virtual int retain()=0;
+	virtual int release()=0;
 };
 
 }
 }
 
 #endif
+

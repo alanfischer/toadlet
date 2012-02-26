@@ -66,6 +66,8 @@ bool D3D9Shader::create(ShaderType shaderType,const String &profile,const String
 
 void D3D9Shader::destroy(){
 	destroyContext();
+
+	BaseResource::destroy();
 }
 
 bool D3D9Shader::createContext(){

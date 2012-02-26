@@ -34,7 +34,7 @@ namespace material{
 
 class TOADLET_API RenderPath{
 public:
-	TOADLET_SHARED_POINTERS(RenderPath);
+	TOADLET_SPTR(RenderPath);
 
 	RenderPath(MaterialManager *manager);
 	virtual ~RenderPath();

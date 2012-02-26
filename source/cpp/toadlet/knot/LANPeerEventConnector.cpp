@@ -45,7 +45,7 @@ namespace knot{
 
 class ConnectionEvent:public Event{
 public:
-	TOADLET_SHARED_POINTERS(ConnectionEvent);
+	TOADLET_SPTR(ConnectionEvent);
 
 	ConnectionEvent(EventFactory *factory):Event(LANPeerEventConnector::Event_CONNECTION),
 		version(0),

@@ -57,12 +57,9 @@ MeshNodeSkeleton::MeshNodeSkeleton(MeshNode* node,Skeleton::ptr skeleton):
 }
 
 void MeshNodeSkeleton::destroy(){
-	if(mSkeletonMaterial!=NULL){
-		mSkeletonMaterial->release();
-		mSkeletonMaterial=NULL;
+	mSkeletonMaterial=NULL;
 
-		destroySkeletonBuffers();
-	}
+	destroySkeletonBuffers();
 }
 
 void MeshNodeSkeleton::updateBones(){

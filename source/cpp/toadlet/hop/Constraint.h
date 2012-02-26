@@ -34,7 +34,7 @@ namespace hop{
 
 class TOADLET_API Constraint{
 public:
-	TOADLET_SHARED_POINTERS(Constraint);
+	TOADLET_SPTR(Constraint);
 
 	Constraint();
 	Constraint(Solid::ptr startSolid,Solid::ptr endSolid);

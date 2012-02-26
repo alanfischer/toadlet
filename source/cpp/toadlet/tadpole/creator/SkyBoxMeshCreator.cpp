@@ -130,18 +130,12 @@ Mesh::ptr SkyBoxMeshCreator::createSkyBoxMesh(scalar size,bool unfolded,bool inv
 	}
 
 	mesh->getSubMesh(0)->material=bottom;
-	bottom->retain();
 	if(unfolded==false){
 		mesh->getSubMesh(1)->material=top;
-		top->retain();
 		mesh->getSubMesh(2)->material=left;
-		left->retain();
 		mesh->getSubMesh(3)->material=right;
-		right->retain();
 		mesh->getSubMesh(4)->material=back;
-		back->retain();
 		mesh->getSubMesh(5)->material=front;
-		front->retain();
 	}
 
 	return mesh;

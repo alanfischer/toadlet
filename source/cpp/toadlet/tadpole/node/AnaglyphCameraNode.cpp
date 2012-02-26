@@ -56,23 +56,28 @@ Node *AnaglyphCameraNode::create(Scene *scene){
 	mLeftMaterial=mEngine->getMaterialManager()->createDiffuseMaterial(mLeftTexture);
 	mLeftMaterial->getRenderState()->setDepthState(DepthState(DepthState::DepthTest_NEVER,false));
 	mLeftMaterial->getRenderState()->setMaterialState(MaterialState(Colors::RED));
-	mLeftMaterial->retain();
 
 	mRightMaterial=mEngine->getMaterialManager()->createDiffuseMaterial(mRightTexture);
 	mRightMaterial->getRenderState()->setDepthState(DepthState(DepthState::DepthTest_NEVER,false));
 	mRightMaterial->getRenderState()->setMaterialState(MaterialState(Colors::CYAN));
 	mRightMaterial->getRenderState()->setBlendState(BlendState::Combination_COLOR_ADDITIVE);
-	mRightMaterial->retain();
 
 	return this;
 }
 
 void AnaglyphCameraNode::destroy(){
-	mLeftRenderTarget->destroy();
-	mRightRenderTarget->destroy();
+	if(mLeftRenderTarget!=NULL){
+		mLeftRenderTarget->destroy();
+		mLeftRenderTarget=NULL;
+	}
 
-	mLeftMaterial->release();
-	mRightMaterial->release();
+	if(mRightRenderTarget!=NULL){
+		mRightRenderTarget->destroy();
+		mRightRenderTarget=NULL;
+	}
+
+	mLeftMaterial=NULL;
+	mRightMaterial=NULL;
 
 	super::destroy();
 }

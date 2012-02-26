@@ -87,6 +87,8 @@ void D3D9Texture::destroy(){
 	destroyContext(false);
 
 	mBuffers.clear();
+
+	BaseResource::destroy();
 }
 
 void D3D9Texture::resetCreate(){

@@ -27,26 +27,24 @@
 #define TOADLET_TADPOLE_HANDLER_STREAMISTREAM_H
 
 #include <toadlet/egg/io/Stream.h>
+#include <toadlet/egg/Object.h>
 #include <windows.h>
 
 namespace toadlet{
 namespace tadpole{
 namespace handler{
 
-class StreamIStream:public IStream{
+class StreamIStream:public Object,public IStream{
 public:
-	TOADLET_INTRUSIVE_POINTERS(StreamIStream);
+	TOADLET_IPTR(StreamIStream);
 	
-	StreamIStream(Stream::ptr base):
-		mPointerCounter(new PointerCounter(0)),
+	StreamIStream(Stream::ptr base):Object(),
 		mBase(base)
 	{}
 
-	PointerCounter *pointerCounter(){return mPointerCounter;}
-
 	HRESULT STDMETHODCALLTYPE QueryInterface(const IID &riid,void **ppvObject){return E_NOINTERFACE;}
-	ULONG STDMETHODCALLTYPE AddRef(){return mPointerCounter->incSharedCount();}
-	ULONG STDMETHODCALLTYPE Release(){return mPointerCounter->decSharedCount();}
+	ULONG STDMETHODCALLTYPE AddRef(){return retain();}
+	ULONG STDMETHODCALLTYPE Release(){return release();}
 
 	HRESULT STDMETHODCALLTYPE Read(void *pv,ULONG cb,ULONG *pcbRead){
 		int amount=mBase->read((byte*)pv,cb);
@@ -96,7 +94,6 @@ public:
 	HRESULT STDMETHODCALLTYPE Clone(IStream **ppstm){return E_NOTIMPL;}
 
 protected:
-	PointerCounter *mPointerCounter;
 	Stream::ptr mBase;
 };
 

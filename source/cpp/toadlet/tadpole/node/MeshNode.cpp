@@ -27,7 +27,6 @@
 #include <toadlet/tadpole/Engine.h>
 #include <toadlet/tadpole/Scene.h>
 #include <toadlet/tadpole/node/MeshNode.h>
-#include <toadlet/tadpole/node/ParentNode.h>
 #include <toadlet/tadpole/animation/SkeletonAnimation.h>
 
 namespace toadlet{
@@ -45,9 +44,6 @@ MeshNode::SubMesh::SubMesh(MeshNode *meshNode,Mesh::SubMesh *meshSubMesh):
 	this->indexData=meshSubMesh->indexData;
 	this->vertexData=meshSubMesh->vertexData;
 	this->material=meshSubMesh->material;
-	if(material!=NULL){
-		material->retain();
-	}
 }
 
 void MeshNode::SubMesh::render(SceneRenderer *renderer) const{
@@ -73,9 +69,7 @@ MeshNode::MeshNode():super(),
 	//mMesh,
 	//mSubMeshes,
 	//mSkeleton,
-	//mDynamicVertexData,
-
-	//mController
+	//mDynamicVertexData
 {}
 
 Node *MeshNode::create(Scene *scene){
@@ -88,10 +82,6 @@ Node *MeshNode::create(Scene *scene){
 }
 
 void MeshNode::destroy(){
-	int i;
-	for(i=0;i<mSubMeshes.size();++i){
-		mSubMeshes[i]->destroy();
-	}
 	mSubMeshes.clear();
 
 	if(mSharedRenderState!=NULL){
@@ -99,26 +89,17 @@ void MeshNode::destroy(){
 		mSharedRenderState=NULL;
 	}
 
-	if(mController!=NULL){
-		mController->stop();
-		removeController(mController);
-		mController=NULL;
-	}
-
 	if(mDynamicVertexData!=NULL){
 		mDynamicVertexData->destroy();
 		mDynamicVertexData=NULL;
-	}
-
-	if(mMesh!=NULL){
-		mMesh->release();
-		mMesh=NULL;
 	}
 
 	if(mSkeleton!=NULL){
 		mSkeleton->destroy();
 		mSkeleton=NULL;
 	}
+
+	mMesh=NULL;
 
 	super::destroy();
 }
@@ -149,26 +130,11 @@ void MeshNode::setMesh(Mesh::ptr mesh){
 	Logger::debug(Categories::TOADLET_TADPOLE,
 		"MeshNode::setMesh");
 
-	int i;
-	for(i=0;i<mSubMeshes.size();++i){
-		mSubMeshes[i]->destroy();
-	}
 	mSubMeshes.clear();
-
-	if(mController!=NULL){
-		mController->stop();
-		removeController(mController);
-		mController=NULL;
-	}
 
 	if(mDynamicVertexData!=NULL){
 		mDynamicVertexData->destroy();
 		mDynamicVertexData=NULL;
-	}
-
-	if(mMesh!=NULL){
-		mMesh->release();
-		mMesh=NULL;
 	}
 
 	if(mSkeleton!=NULL){
@@ -176,14 +142,11 @@ void MeshNode::setMesh(Mesh::ptr mesh){
 		mSkeleton=NULL;
 	}
 
-	if(mesh==NULL){
-		Error::invalidParameters(Categories::TOADLET_TADPOLE,
-			"invalid Mesh");
+	mMesh=mesh;
+
+	if(mMesh==NULL){
 		return;
 	}
-
-	mMesh=mesh;
-	mMesh->retain();
 
 	setTransform(mMesh->getTransform());
 	setBound(mMesh->getBound());
@@ -194,6 +157,7 @@ void MeshNode::setMesh(Mesh::ptr mesh){
 	}
 
 	mSubMeshes.resize(mMesh->getNumSubMeshes());
+	int i;
 	for(i=0;i<mSubMeshes.size();++i){
 		SubMesh::ptr subMesh(new SubMesh(this,mMesh->getSubMesh(i)));
 		mSubMeshes[i]=subMesh;
@@ -209,9 +173,7 @@ void MeshNode::setMesh(Mesh::ptr mesh){
 		subMesh->hasOwnTransform=subMesh->meshSubMesh->hasOwnTransform;
 
 		if(mSharedRenderState!=NULL){
-			Material::ptr material=mEngine->getMaterialManager()->createSharedMaterial(subMesh->material,mSharedRenderState);
-			subMesh->material->release();
-			subMesh->material=material;
+			subMesh->material=mEngine->getMaterialManager()->createSharedMaterial(subMesh->material,mSharedRenderState);
 		}
 	}
 }
@@ -233,19 +195,6 @@ MeshNode::SubMesh *MeshNode::getSubMesh(const String &name){
 
 void MeshNode::setSkeleton(MeshNodeSkeleton::ptr skeleton){
 	mSkeleton=skeleton;
-
-	if(mController!=NULL){
-		mController->skeletonChanged();
-	}
-}
-
-MeshNode::MeshController::ptr MeshNode::getController(){
-	if(mController==NULL){
-		mController=MeshController::ptr(new MeshController(this));
-		addController(mController);
-	}
-
-	return mController;
 }
 
 void MeshNode::frameUpdate(int dt,int scope){
@@ -284,9 +233,7 @@ RenderState::ptr MeshNode::getSharedRenderState(){
 			if(i==0){
 				mEngine->getMaterialManager()->modifyRenderState(mSharedRenderState,mSubMeshes[i]->material->getRenderState());
 			}
-			Material::ptr material=mEngine->getMaterialManager()->createSharedMaterial(mSubMeshes[i]->material,mSharedRenderState);
-			mSubMeshes[i]->material->release();
-			mSubMeshes[i]->material=material;
+			mSubMeshes[i]->material=mEngine->getMaterialManager()->createSharedMaterial(mSubMeshes[i]->material,mSharedRenderState);
 		}
 	}
 

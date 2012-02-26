@@ -24,7 +24,6 @@
  ********** Copyright header - do not remove **********/
 
 #include <toadlet/tadpole/node/AudioNode.h>
-#include <toadlet/tadpole/node/ParentNode.h>
 #include <toadlet/tadpole/Engine.h>
 
 namespace toadlet{

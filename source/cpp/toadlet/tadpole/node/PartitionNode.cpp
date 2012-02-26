@@ -23,7 +23,6 @@
  *
  ********** Copyright header - do not remove **********/
 
-#include <toadlet/tadpole/node/ParentNode.h>
 #include <toadlet/tadpole/node/PartitionNode.h>
 #include <toadlet/tadpole/Scene.h>
 

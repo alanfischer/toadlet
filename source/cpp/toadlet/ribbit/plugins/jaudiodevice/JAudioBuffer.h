@@ -34,9 +34,8 @@ namespace toadlet{
 namespace ribbit{
 
 class TOADLET_API JAudioBuffer:protected BaseResource,public AudioBuffer{
-	TOADLET_BASERESOURCE_PASSTHROUGH(AudioBuffer);
 public:
-	TOADLET_SHARED_POINTERS(JAudioBuffer);
+	TOADLET_RESOURCE(JAudioBuffer,AudioBuffer);
 
 	JAudioBuffer(JNIEnv *jenv,jobject jobj);
 	virtual ~JAudioBuffer();

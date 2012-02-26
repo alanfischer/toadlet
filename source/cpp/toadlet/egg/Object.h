@@ -23,22 +23,37 @@
  *
  ********** Copyright header - do not remove **********/
 
-#ifndef TOADLET_PEEPER_RENDERTARGETDESTROYEDLISTENER_H
-#define TOADLET_PEEPER_RENDERTARGETDESTROYEDLISTENER_H
+#ifndef TOADLET_EGG_OBJECT_H
+#define TOADLET_EGG_OBJECT_H
+
+#include <toadlet/egg/Interface.h>
 
 namespace toadlet{
-namespace peeper{
+namespace egg{
 
-class RenderTarget;
-
-class RenderTargetDestroyedListener{
+class TOADLET_API Object:public Interface{
 public:
-	virtual ~RenderTargetDestroyedListener(){}
+	Object():mSharedCount(0){}
+	virtual ~Object(){}
 
-	virtual void renderTargetDestroyed(RenderTarget *renderTarget)=0;
+	virtual int retain(){
+		return ++mSharedCount;
+	}
+	
+	virtual int release(){
+		int count=--mSharedCount;
+		if(mSharedCount<=0){
+			delete this;
+		}
+		return count;
+	}
+	
+protected:
+	int mSharedCount;
 };
 
 }
 }
 
 #endif
+

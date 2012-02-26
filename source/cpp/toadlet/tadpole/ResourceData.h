@@ -34,7 +34,7 @@ namespace tadpole{
 
 class ResourceData{
 public:
-	TOADLET_SHARED_POINTERS(ResourceData);
+	TOADLET_SPTR(ResourceData);
 
 	virtual ~ResourceData(){}
 };

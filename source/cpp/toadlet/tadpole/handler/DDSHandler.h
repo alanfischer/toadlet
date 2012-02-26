@@ -36,7 +36,7 @@ namespace handler{
 
 class TOADLET_API DDSHandler:public ResourceStreamer{
 public:
-	TOADLET_SHARED_POINTERS(DDSHandler);
+	TOADLET_SPTR(DDSHandler);
 
 	DDSHandler(TextureManager *textureManager){mTextureManager=textureManager;}
 

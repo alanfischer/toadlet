@@ -76,6 +76,8 @@ bool JAudioBuffer::create(AudioStream::ptr stream){
 
 void JAudioBuffer::destroy(){
 	env->CallVoidMethod(obj,destroyID);
+
+	BaseResource::destroy();
 }
 
 }

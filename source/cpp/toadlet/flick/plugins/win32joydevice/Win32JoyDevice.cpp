@@ -24,6 +24,7 @@
  ********** Copyright header - do not remove **********/
 
 #include <toadlet/egg/Error.h>
+#include <toadlet/egg/Logger.h>
 #include <toadlet/flick/InputDeviceListener.h>
 #include "Win32JoyDevice.h"
 #pragma comment(lib,"winmm.lib")

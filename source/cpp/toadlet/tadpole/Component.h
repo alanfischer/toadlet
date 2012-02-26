@@ -23,21 +23,30 @@
  *
  ********** Copyright header - do not remove **********/
 
-#ifndef TOADLET_PEEPER_BUFFERDESTROYEDLISTENER_H
-#define TOADLET_PEEPER_BUFFERDESTROYEDLISTENER_H
+#ifndef TOADLET_TADPOLE_COMPONENT_H
+#define TOADLET_TADPOLE_COMPONENT_H
 
-#include <toadlet/peeper/Types.h>
+#include <toadlet/egg/Interface.h>
+#include <toadlet/tadpole/Types.h>
 
 namespace toadlet{
-namespace peeper{
+namespace tadpole{
+namespace node{
+	class Node;
+}
 
-class Buffer;
-
-class BufferDestroyedListener{
+class Component:public Interface{
 public:
-	virtual ~BufferDestroyedListener(){}
+	TOADLET_IPTR(Component);
+	
+	virtual Node *isNode()=0;
+	
+	virtual void destroy()=0;
 
-	virtual void bufferDestroyed(Buffer *buffer)=0;
+	virtual bool parentChanged(Node *node)=0;
+
+	virtual void logicUpdate(int dt,int scope)=0;
+	virtual void frameUpdate(int dt,int scope)=0;
 };
 
 }

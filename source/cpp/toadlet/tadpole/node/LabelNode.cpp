@@ -29,7 +29,6 @@
 #include <toadlet/tadpole/SceneRenderer.h>
 #include <toadlet/tadpole/node/CameraNode.h>
 #include <toadlet/tadpole/node/LabelNode.h>
-#include <toadlet/tadpole/node/ParentNode.h>
 
 namespace toadlet{
 namespace tadpole{
@@ -78,20 +77,13 @@ void LabelNode::destroy(){
 		mIndexData=NULL;
 	}
 	
-	if(mMaterial!=NULL){
-		mMaterial->release();
-		mMaterial=NULL;
-	}
-
 	if(mSharedRenderState!=NULL){
 		mSharedRenderState->destroy();
 		mSharedRenderState=NULL;
 	}
 
-	if(mFont!=NULL){
-		mFont->release();
-		mFont=NULL;
-	}
+	mMaterial=NULL;
+	mFont=NULL;
 
 	super::destroy();
 }
@@ -110,28 +102,14 @@ Node *LabelNode::set(Node *node){
 }
 
 void LabelNode::setFont(const Font::ptr &font){
-	if(mFont!=NULL){
-		mFont->release();
-	}
 	mFont=font;
-	if(mFont!=NULL){
-		mFont->retain();
-	}
 
-	if(mMaterial!=NULL){
-		mMaterial->release();
-	}
 	if(mFont!=NULL){
 		mMaterial=getEngine()->getMaterialManager()->createFontMaterial(mFont);
 
 		if(mSharedRenderState!=NULL){
-			Material::ptr material=mEngine->getMaterialManager()->createSharedMaterial(mMaterial,mSharedRenderState);
-			mMaterial->release();
-			mMaterial=material;
+			mMaterial=mEngine->getMaterialManager()->createSharedMaterial(mMaterial,mSharedRenderState);
 		}
-	}
-	if(mMaterial!=NULL){
-		mMaterial->retain();
 	}
 
 	updateLabel();
@@ -166,9 +144,7 @@ RenderState::ptr LabelNode::getSharedRenderState(){
 		mSharedRenderState=mEngine->getMaterialManager()->createRenderState();
 		if(mMaterial!=NULL){
 			mEngine->getMaterialManager()->modifyRenderState(mSharedRenderState,mMaterial->getPass()->getRenderState());
-			Material::ptr material=mEngine->getMaterialManager()->createSharedMaterial(mMaterial,mSharedRenderState);
-			mMaterial->release();
-			mMaterial=material;
+			mMaterial=mEngine->getMaterialManager()->createSharedMaterial(mMaterial,mSharedRenderState);
 		}
 	}
 	return mSharedRenderState;

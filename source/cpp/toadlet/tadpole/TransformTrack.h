@@ -26,8 +26,8 @@
 #ifndef TOADLET_TADPOLE_TRANSFORMTRACK_H
 #define TOADLET_TADPOLE_TRANSFORMTRACK_H
 
-#include <toadlet/egg/WeakPointer.h>
 #include <toadlet/egg/Collection.h>
+#include <toadlet/tadpole/Types.h>
 #include <toadlet/tadpole/TransformKeyFrame.h>
 
 namespace toadlet{
@@ -35,7 +35,7 @@ namespace tadpole{
 
 class TOADLET_API TransformTrack{
 public:
-	TOADLET_SHARED_POINTERS(TransformTrack);
+	TOADLET_SPTR(TransformTrack);
 
 	TransformTrack();
 

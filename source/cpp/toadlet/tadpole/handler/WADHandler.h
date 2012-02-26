@@ -35,7 +35,7 @@ namespace handler{
 
 class TOADLET_API WADHandler:public ResourceStreamer{
 public:
-	TOADLET_SHARED_POINTERS(WADHandler);
+	TOADLET_SPTR(WADHandler);
 
 	WADHandler(TextureManager *textureManager){
 		mTextureManager=textureManager;

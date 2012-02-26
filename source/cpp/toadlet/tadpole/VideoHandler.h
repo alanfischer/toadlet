@@ -35,7 +35,7 @@ namespace tadpole{
 
 class VideoHandler{
 public:
-	TOADLET_SHARED_POINTERS(VideoHandler);
+	TOADLET_SPTR(VideoHandler);
 
 	virtual ~VideoHandler(){}
 

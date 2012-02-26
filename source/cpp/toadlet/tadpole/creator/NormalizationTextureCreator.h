@@ -36,7 +36,7 @@ namespace creator{
 
 class TOADLET_API NormalizationTextureCreator:public ResourceCreator{
 public:
-	TOADLET_SHARED_POINTERS(NormalizationTextureCreator);
+	TOADLET_SPTR(NormalizationTextureCreator);
 
 	NormalizationTextureCreator(Engine *engine){
 		mEngine=engine;

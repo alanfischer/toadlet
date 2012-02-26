@@ -5,7 +5,7 @@
 #include <toadlet/tadpole/plugins/hop/HopScene.h>
 #include <toadlet/tadpole/plugins/hop/HopEntity.h>
 #include "PathSystem.h"
-#include "PathClimberListener.h"
+#include "PathClimber.h"
 #include "SmoothFollower.h"
 #include "GroundProjector.h"
 #include "Sky.h"
@@ -51,18 +51,19 @@ public:
 	void mouseScrolled(int x,int y,int scroll){}
 	void inputDetected(const InputData &data);
 
-	void playerJump();
-	void playerMove(scalar dr,scalar ds);
+	void playerJump(PathClimber *climber);
+	void playerMove(PathClimber *climber,scalar dr,scalar ds);
 
 	float findPathSequence(egg::Collection<int> &sequence,PathClimber *player,PathSystem::Path *path,int direction,scalar time);
 	float findPathSequence(egg::Collection<int> &sequence,PathClimber *player,const Vector3 &forward,PathSystem::Path *previous,PathSystem::Path *path,int direction,scalar time,bool first);
 	void updateDanger(int dt);
-	void updatePredictedPath();
+	void updateClimber(PathClimber *climber,int dt);
+	void updatePredictedPath(PathClimber *climber,int dt);
 
 	void wiggleLeaves(Tree *tree,const Sphere &bound);
 
-	void pathMounted(PathClimber *climber);
-	void pathDismounted(PathClimber *climber);
+	void pathMounted(PathClimber *climber){}
+	void pathDismounted(PathClimber *climber){}
 	int atJunction(PathClimber *climber,PathSystem::Path *current,PathSystem::Path *next);
 
 	bool updatePopulatePatches();
@@ -104,9 +105,10 @@ protected:
 	HopScene::ptr mScene;
 	TerrainNode::ptr mTerrain;
 	SmoothFollower::ptr mFollower;
-	ParentNode::ptr mFollowNode;
+	Node::ptr mFollowNode;
 	CameraNode::ptr mCamera,mReflectCamera,mRefractCamera;
-	IntrusivePointer<PathClimber> mPlayer;
+	HopEntity::ptr mPlayer;
+	PathClimber::ptr mClimber;
 	int mMouseButtons;
 	scalar mXJoy,mYJoy;
 	egg::Collection<int> mPathSequence;

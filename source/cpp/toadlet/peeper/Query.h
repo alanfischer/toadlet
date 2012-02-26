@@ -26,14 +26,15 @@
 #ifndef TOADLET_PEEPER_QUERY_H
 #define TOADLET_PEEPER_QUERY_H
 
+#include <toadlet/egg/Resource.h>
 #include <toadlet/peeper/Types.h>
 
 namespace toadlet{
 namespace peeper{
 
-class TOADLET_API Query{
+class TOADLET_API Query:public Resource{
 public:
-	TOADLET_SHARED_POINTERS(Query);
+	TOADLET_IPTR(Query);
 
 	enum QueryType{
 		QueryType_UNKNOWN,

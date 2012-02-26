@@ -27,6 +27,7 @@
 #define TOADLET_PEEPER_D3D9SHADERSTATE_H
 
 #include "D3D9Includes.h"
+#include <toadlet/egg/BaseResource.h>
 #include <toadlet/peeper/ShaderState.h>
 
 namespace toadlet{
@@ -34,14 +35,14 @@ namespace peeper{
 
 class D3D9RenderDevice;
 
-class TOADLET_API D3D9ShaderState:public ShaderState{
+class TOADLET_API D3D9ShaderState:public BaseResource,public ShaderState{
 public:
+	TOADLET_RESOURCE(D3D9ShaderState,ShaderState);
+
 	D3D9ShaderState(D3D9RenderDevice *renderDevice);
 	virtual ~D3D9ShaderState();
 
 	ShaderState *getRootShaderState(){return this;}
-
-	void setShaderStateDestroyedListener(ShaderStateDestroyedListener *listener){mListener=listener;}
 
 	bool create(){return true;}
 	void destroy();
@@ -56,8 +57,6 @@ public:
 
 protected:
 	D3D9RenderDevice *mDevice;
-
-	ShaderStateDestroyedListener *mListener;
 	Collection<Shader::ptr> mShaders;
 	
 	friend class D3D9RenderDevice;

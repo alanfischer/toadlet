@@ -27,6 +27,7 @@
 #define TOADLET_PEEPER_D3D10SHADERSTATE_H
 
 #include "D3D10Includes.h"
+#include <toadlet/egg/BaseResource.h>
 #include <toadlet/peeper/ShaderState.h>
 
 namespace toadlet{
@@ -36,14 +37,14 @@ class D3D10RenderDevice;
 class D3D10VertexFormat;
 class D3D10VertexLayout;
 
-class TOADLET_API D3D10ShaderState:public ShaderState{
+class TOADLET_API D3D10ShaderState:public BaseResource,public ShaderState{
 public:
+	TOADLET_RESOURCE(D3D10ShaderState,ShaderState);
+
 	D3D10ShaderState(D3D10RenderDevice *renderDevice);
 	virtual ~D3D10ShaderState();
 
 	ShaderState *getRootShaderState(){return this;}
-
-	void setShaderStateDestroyedListener(ShaderStateDestroyedListener *listener){mListener=listener;}
 
 	bool create(){return true;}
 	void destroy();
@@ -58,8 +59,6 @@ public:
 
 protected:
 	D3D10RenderDevice *mDevice;
-
-	ShaderStateDestroyedListener *mListener;
 	Collection<Shader::ptr> mShaders;
 
 	friend class D3D10RenderDevice;

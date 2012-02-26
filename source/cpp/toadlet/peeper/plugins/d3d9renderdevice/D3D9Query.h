@@ -27,6 +27,7 @@
 #define TOADLET_PEEPER_D3D9QUERY_H
 
 #include "D3D9Includes.h"
+#include <toadlet/egg/BaseResource.h>
 #include <toadlet/peeper/Query.h>
 
 namespace toadlet{
@@ -34,8 +35,10 @@ namespace peeper{
 
 class D3D9RenderDevice;
 
-class TOADLET_API D3D9Query:public Query{
+class TOADLET_API D3D9Query:public BaseResource,public Query{
 public:
+	TOADLET_RESOURCE(D3D9Query,Query);
+
 	D3D9Query(D3D9RenderDevice *renderDevice);
 	virtual ~D3D9Query();
 

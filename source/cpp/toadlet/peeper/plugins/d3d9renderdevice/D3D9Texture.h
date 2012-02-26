@@ -38,8 +38,9 @@ class D3D9RenderDevice;
 class D3D9TextureMipPixelBuffer;
 
 class TOADLET_API D3D9Texture:protected BaseResource,public Texture{
-	TOADLET_BASERESOURCE_PASSTHROUGH(Texture);
 public:
+	TOADLET_RESOURCE(D3D9Texture,Texture);
+
 	D3D9Texture(D3D9RenderDevice *renderDevice);
 
 	virtual ~D3D9Texture();

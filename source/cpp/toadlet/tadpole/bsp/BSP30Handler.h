@@ -36,7 +36,7 @@ namespace bsp{
 
 class BSP30Handler:public ResourceStreamer{
 public:
-	TOADLET_SHARED_POINTERS(BSP30Handler);
+	TOADLET_SPTR(BSP30Handler);
 
 	BSP30Handler(Engine *engine);
 	virtual ~BSP30Handler();

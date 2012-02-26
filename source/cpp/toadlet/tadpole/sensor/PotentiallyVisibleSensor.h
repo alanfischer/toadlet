@@ -34,7 +34,7 @@ namespace sensor{
 
 class TOADLET_API PotentiallyVisibleSensor:public Sensor{
 public:
-	TOADLET_SHARED_POINTERS(PotentiallyVisibleSensor);
+	TOADLET_SPTR(PotentiallyVisibleSensor);
 
 	PotentiallyVisibleSensor(Scene *scene);
 

@@ -34,8 +34,10 @@ namespace ribbit{
 
 class AudioCaps;
 
-class AudioDevice{
+class AudioDevice:public Interface{
 public:
+	TOADLET_IPTR(AudioDevice);
+
 	virtual ~AudioDevice(){}
 
 	virtual bool create(int *options)=0;

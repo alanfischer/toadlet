@@ -35,7 +35,7 @@ namespace knot{
 
 class TOADLET_API SimpleClient:public SimpleEventConnection{
 public:
-	TOADLET_SHARED_POINTERS(SimpleClient);
+	TOADLET_SPTR(SimpleClient);
 
 	SimpleClient(EventFactory *eventFactory=NULL,Connector::ptr connector=Connector::ptr());
 	virtual ~SimpleClient();

@@ -93,6 +93,8 @@ void MMAudioBuffer::destroy(){
 		delete[] mData;
 		mData=NULL;
 	}
+
+	BaseResource::destroy();
 }
 
 }

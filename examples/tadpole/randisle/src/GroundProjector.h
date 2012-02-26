@@ -3,23 +3,24 @@
 
 #include <toadlet/toadlet.h>
 
-class GroundProjector:public NodeListener{
+class GroundProjector:public BaseComponent{
 public:
-	TOADLET_SHARED_POINTERS(GroundProjector);
-
-	GroundProjector(Node::ptr target,scalar distance,scalar offset){
+	GroundProjector(Node::ptr target,scalar distance,scalar offset):BaseComponent(){
 		mTarget=target;
 		mDistance=distance;
 		mOffset=offset;
 	}
 
-	void nodeDestroyed(Node *node){}
+	void destroy(){}
 
-	void transformUpdated(Node *node,int tu){}
+	bool parentChanged(Node *node){
+		mNode=node;
+		return true;
+	}
 
-	void logicUpdated(Node *node,int dt){}
+	void logicUpdate(int dt,int scope){}
 	
-	void frameUpdated(Node *node,int dt){
+	void frameUpdate(int dt,int scope){
 		Segment segment;
 		segment.origin.set(mTarget->getWorldTranslate());
 		Math::mul(segment.direction,Math::NEG_Z_UNIT_VECTOR3,mDistance);
@@ -28,8 +29,8 @@ public:
 
 		if(result.time<Math::ONE){
 			Math::madd(result.point,result.normal,mOffset,result.point);
-			node->getParent()->getWorldTransform().inverseTransform(result.point);
-			node->setTranslate(result.point);
+			mNode->getParent()->getWorldTransform().inverseTransform(result.point);
+			mNode->setTranslate(result.point);
 		
 			Vector3 right,forward,up;
 			Math::mul(forward,mTarget->getWorldRotate(),Math::Y_UNIT_VECTOR3);
@@ -39,15 +40,15 @@ public:
 			Math::cross(forward,up,right);
 			Quaternion rotate,invRotate;
 			Math::setQuaternionFromAxes(rotate,right,forward,up);
-			Math::invert(invRotate,node->getParent()->getWorldTransform().getRotate());
+			Math::invert(invRotate,mNode->getParent()->getWorldTransform().getRotate());
 			Math::postMul(rotate,invRotate);
-			node->setRotate(rotate);
+			mNode->setRotate(rotate);
 		}
-		node->setScale(Math::ONE-result.time);
+		mNode->setScale(Math::ONE-result.time);
 	}
 	
 protected:
-	Node::ptr mTarget;
+	Node::ptr mNode,mTarget;
 	scalar mDistance;
 	scalar mOffset;
 };

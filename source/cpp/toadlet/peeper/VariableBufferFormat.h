@@ -34,7 +34,7 @@ namespace peeper{
 
 class TOADLET_API VariableBufferFormat{
 public:
-	TOADLET_SHARED_POINTERS(VariableBufferFormat);
+	TOADLET_SPTR(VariableBufferFormat);
 
 	enum Format{
 		Format_UNKNOWN=				0,
@@ -86,7 +86,7 @@ public:
 
 	class Variable{
 	public:
-		TOADLET_SHARED_POINTERS(Variable);
+		TOADLET_SPTR(Variable);
 
 		Variable():
 			mFormat(0),

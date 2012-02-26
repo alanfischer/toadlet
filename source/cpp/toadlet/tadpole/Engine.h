@@ -96,6 +96,8 @@ public:
 	const VertexFormats &getVertexFormats() const{return mVertexFormats;}
 	const RenderCaps &getRenderCaps() const{return mRenderCaps;}
 	bool isBackable() const{return mFixedBackable || mShaderBackable;}
+	bool isShaderBackable() const{return mShaderBackable;}
+	bool isFixedBackable() const{return mFixedBackable;}
 	bool hasShader(Shader::ShaderType type){return mShaderBackable || mRenderCaps.hasShader[type];}
 	bool hasFixed(Shader::ShaderType type){return mFixedBackable || mRenderCaps.hasFixed[type];}
 

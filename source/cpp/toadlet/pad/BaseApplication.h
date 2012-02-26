@@ -31,9 +31,9 @@
 namespace toadlet{
 namespace pad{
 
-class TOADLET_API BaseApplication:public Application,public RenderTarget{
+class TOADLET_API BaseApplication:public Application{
 public:
-	TOADLET_SHARED_POINTERS(BaseApplication);
+	TOADLET_SPTR(BaseApplication);
 
 	static void mapKeyNames(Map<int,String> &keyToName,Map<String,int> &nameToKey);
 
@@ -43,10 +43,6 @@ public:
 	virtual bool defaultCreate(){return create("","");}
 	virtual bool create(String renderDevice,String audioDevice);
 	virtual void destroy();
-
-	virtual RenderTarget *getRootRenderTarget(){return mRenderTarget;}
-	virtual bool isPrimary() const{return mRenderTarget->isPrimary();}
-	virtual bool isValid() const{return mRenderTarget->isValid();}
 
 	virtual void setWindowRenderTargetFormat(const WindowRenderTargetFormat::ptr format){mFormat=format;}
 	virtual WindowRenderTargetFormat::ptr getWindowRenderTargetFormat() const{return mFormat;}
@@ -132,10 +128,10 @@ protected:
 	Map<int,String> mKeyToName;
 
 	Engine *mEngine;
-	RenderTarget *mRenderTarget;
-	RenderDevice *mRenderDevice;
-	AudioDevice *mAudioDevice;
-	Collection<InputDevice*> mInputDevices;
+	RenderTarget::ptr mRenderTarget;
+	RenderDevice::ptr mRenderDevice;
+	AudioDevice::ptr mAudioDevice;
+	Collection<InputDevice::ptr> mInputDevices;
 };
 
 }

@@ -32,6 +32,7 @@
 #include <toadlet/ribbit/AudioStream.h>
 #include <toadlet/ribbit/AudioCaps.h>
 #include <toadlet/egg/Collection.h>
+#include <toadlet/egg/Object.h>
 #include <windows.h>
 #include <mmsystem.h>
 
@@ -43,13 +44,16 @@ class MMAudioBuffer;
 
 // You can not use both the ALAUdioDevice and the MMAudioDevice simultaniously.
 // Whichever one you create second will be the useable device.
-class TOADLET_API MMAudioDevice:public AudioDevice{
+class TOADLET_API MMAudioDevice:protected Object,public AudioDevice{
 public:
 	// Options
 	const static int Option_BUFFER_FADE_TIME=1;
 	
 	MMAudioDevice();
 	virtual ~MMAudioDevice();
+
+	int retain(){return Object::retain();}
+	int release(){return Object::release();}
 
 	bool create(int *options);
 	void destroy();

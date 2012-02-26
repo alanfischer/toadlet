@@ -33,7 +33,6 @@ namespace toadlet{
 namespace peeper{
 
 BackableBuffer::BackableBuffer():
-	mListener(NULL),
 	mUsage(0),
 	mAccess(0),
 	mDataSize(0),
@@ -131,18 +130,19 @@ void BackableBuffer::destroy(){
 		mData=NULL;
 	}
 
+	// Do not call BaseResource::destroy()
 	if(mListener!=NULL){
 		if(mIndexFormat!=(IndexFormat)0){
-			mListener->bufferDestroyed((IndexBuffer*)this);
+			mListener->resourceDestroyed((IndexBuffer*)this);
 		}
 		else if(mVertexFormat!=NULL){
-			mListener->bufferDestroyed((VertexBuffer*)this);
+			mListener->resourceDestroyed((VertexBuffer*)this);
 		}
 		else if(mTextureFormat!=NULL){
-			mListener->bufferDestroyed((PixelBuffer*)this);
+			mListener->resourceDestroyed((PixelBuffer*)this);
 		}
 		else if(mVariableFormat!=NULL){
-			mListener->bufferDestroyed((VariableBuffer*)this);
+			mListener->resourceDestroyed((VariableBuffer*)this);
 		}
 		mListener=NULL;
 	}

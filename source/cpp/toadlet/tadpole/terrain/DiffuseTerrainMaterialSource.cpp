@@ -187,24 +187,18 @@ DiffuseTerrainMaterialSource::DiffuseTerrainMaterialSource(Engine *engine){
 }
 
 void DiffuseTerrainMaterialSource::destroy(){
-	int i;
-	for(i=0;i<mDiffuseTextures.size();++i){
-		if(mDiffuseTextures[i]!=NULL){
-			mDiffuseTextures[i]->release();
-			mDiffuseTextures[i]=NULL;
-		}
-	}
+	mDiffuseTextures.clear();
 
 	if(mDiffuseVertexShader!=NULL){
-		mDiffuseVertexShader->release();
+		mDiffuseVertexShader->destroy();
 		mDiffuseVertexShader=NULL;
 	}
 	if(mDiffuseBaseFragmentShader!=NULL){
-		mDiffuseBaseFragmentShader->release();
+		mDiffuseBaseFragmentShader->destroy();
 		mDiffuseBaseFragmentShader=NULL;
 	}
 	if(mDiffuseLayerFragmentShader!=NULL){
-		mDiffuseLayerFragmentShader->release();
+		mDiffuseLayerFragmentShader->destroy();
 		mDiffuseLayerFragmentShader=NULL;
 	}
 }
@@ -214,13 +208,7 @@ void DiffuseTerrainMaterialSource::setDiffuseTexture(int layer,Texture::ptr text
 		mDiffuseTextures.resize(layer+1);
 	}
 
-	if(mDiffuseTextures[layer]!=NULL){
-		mDiffuseTextures[layer]->release();
-	}
 	mDiffuseTextures[layer]=texture;
-	if(mDiffuseTextures[layer]!=NULL){
-		mDiffuseTextures[layer]->retain();
-	}
 }
 
 Material::ptr DiffuseTerrainMaterialSource::getMaterial(TerrainPatchNode *patch){

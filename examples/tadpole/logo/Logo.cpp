@@ -1,17 +1,22 @@
 #include "Logo.h"
 
-class GravityFollower:public NodeListener,InputDeviceListener{
+class GravityFollower:public BaseComponent,InputDeviceListener{
 public:
-	GravityFollower(InputDevice *device){
+	GravityFollower(InputDevice *device):BaseComponent(){
 		mDevice=device;
 		mDevice->setListener(this);
 	}
 
-	void nodeDestroyed(Node *node){
+	void destroy(){
 		mDevice->setListener(NULL);
 	}
 
-	void logicUpdated(Node *node,int dt){
+	bool parentChanged(Node *node){
+		mNode=node;
+		return true;
+	}
+
+	void logicUpdate(int dt,int scope){
 		mLastTranslate.set(mTranslate);
 		mLastRotate.set(mRotate);
 
@@ -30,21 +35,21 @@ public:
 					Math::normalize(eye);
 					Math::mul(eye,Math::fromInt(150));
 
-					((CameraNode*)node)->setLookAt(eye,Math::ZERO_VECTOR3,up);
-					mTranslate.set(node->getTranslate());
-					mRotate.set(node->getRotate());
+					((CameraNode*)mNode)->setLookAt(eye,Math::ZERO_VECTOR3,up);
+					mTranslate.set(mNode->getTranslate());
+					mRotate.set(mNode->getRotate());
 				}
 			}
 		mMotionMutex.unlock();
 	}
 	
-	void frameUpdated(Node *node,int dt){
+	void frameUpdate(int dt,int scope){
 		Vector3 translate;
-		Math::lerp(translate,mLastTranslate,mTranslate,node->getScene()->getLogicFraction());
-		node->setTranslate(translate);
+		Math::lerp(translate,mLastTranslate,mTranslate,mNode->getScene()->getLogicFraction());
+		mNode->setTranslate(translate);
 		Quaternion rotate;
-		Math::slerp(rotate,mLastRotate,mRotate,node->getScene()->getLogicFraction());
-		node->setRotate(rotate);
+		Math::slerp(rotate,mLastRotate,mRotate,mNode->getScene()->getLogicFraction());
+		mNode->setRotate(rotate);
 	}
 
 	void inputDetected(const InputData &data){
@@ -55,6 +60,7 @@ public:
 		}
 	}
 
+	Node *mNode;
 	InputDevice *mDevice;
 	Mutex mMotionMutex;
 	InputData mMotionData;
@@ -87,7 +93,7 @@ void Logo::create(){
 	scene->getRoot()->attach(light);
 
  	meshNode=engine->createNodeType(MeshNode::type(),scene);
-	meshNode->setMesh("lt.tmsh");
+	meshNode->setMesh("lt.xmsh");
 //	meshNode->getController()->start();
 //	meshNode->getController()->setCycling(Controller::Cycling_REFLECT);
 	scene->getRoot()->attach(meshNode);
@@ -101,7 +107,7 @@ void Logo::create(){
 #if 1
 	InputDevice *motionDevice=app->getInputDevice(InputDevice::InputType_MOTION);
 	if(motionDevice!=NULL){
-		cameraNode->addNodeListener(NodeListener::ptr(new GravityFollower(motionDevice)));
+		cameraNode->attach(new GravityFollower(motionDevice));
 		motionDevice->start();
 	}
 #endif

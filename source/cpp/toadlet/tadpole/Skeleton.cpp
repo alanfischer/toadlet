@@ -36,10 +36,6 @@ Skeleton::~Skeleton(){
 }
 
 void Skeleton::destroy(){
-	int i;
-	for(i=0;i<sequences.size();++i){
-		sequences[i]->release();
-	}
 	sequences.clear();
 }
 

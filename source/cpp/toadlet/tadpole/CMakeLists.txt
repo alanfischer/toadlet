@@ -147,7 +147,6 @@ set (TADPOLE_NODE_SRC
 	node/MeshNode.cpp
 	node/MeshNodeSkeleton.cpp
 	node/Node.cpp
-	node/ParentNode.cpp
 	node/ParticleNode.cpp
 	node/PartitionNode.cpp
 	node/SpriteNode.cpp
@@ -182,7 +181,6 @@ set (TADPOLE_PLATFORM_ANDROID_SRC
 	platform/android/us_toadlet_tadpole_LightNode.cpp
 	platform/android/us_toadlet_tadpole_MeshNode.cpp
 	platform/android/us_toadlet_tadpole_Node.cpp
-	platform/android/us_toadlet_tadpole_ParentNode.cpp
 	platform/android/us_toadlet_tadpole_Scene.cpp
 )
 
@@ -192,10 +190,12 @@ set (TADPOLE_HEADERS
 	Attachable.h
 	ArchiveManager.h
 	AudioBufferManager.h
+	BaseComponent.h
 	Bound.h
 	BufferManager.h
 	Collision.h
 	Colors.h
+	Component.h
 	ContextListener.h
 	DecalShadowSceneRenderer.h
 	Engine.h
@@ -213,6 +213,7 @@ set (TADPOLE_HEADERS
 	RenderListener.h
 	ResourceCreator.h
 	ResourceData.h
+	ResourceManager.h
 	ResourceStreamer.h
 	RenderableSet.h
 	Scene.h
@@ -362,10 +363,7 @@ set (TADPOLE_NODE_HEADERS
 	node/MeshNode.h
 	node/MeshNodeSkeleton.h
 	node/Node.h
-	node/NodeAttacher.h
-	node/NodeListener.h
 	node/NodeResource.h
-	node/ParentNode.h
 	node/ParticleNode.h
 	node/PartitionNode.h
 	node/SpriteNode.h

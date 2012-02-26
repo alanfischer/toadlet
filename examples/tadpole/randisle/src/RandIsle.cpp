@@ -52,11 +52,11 @@ void RandIsle::create(){
 	mTerrain->setWaterMaterial(Resources::instance->waterMaterial);
 	mTerrain->setDataSource(this);
 
-	mFollowNode=mEngine->createNodeType(ParentNode::type(),mScene);
+	mFollowNode=mEngine->createNodeType(Node::type(),mScene);
 	mFollower=SmoothFollower::ptr(new SmoothFollower(30));
 	mFollower->setOffset(Vector3(0,-20,5));
 	mFollower->setTargetOffset(Vector3(0,0,7.7));
-	mFollowNode->addNodeListener(mFollower);
+	mFollowNode->attach(mFollower);
 	mScene->getRoot()->attach(mFollowNode);
 
 	mCamera=mEngine->createNodeType(CameraNode::type(),mScene);
@@ -111,8 +111,11 @@ void RandIsle::create(){
 	mRustleSound->setAudioBuffer(Resources::instance->rustle);
 	mScene->getRoot()->attach(mRustleSound);
 	
-	mPlayer=mEngine->createNodeType(PathClimber::type(),mScene);
-	mPlayer->setPathClimberListener(this);
+	mPlayer=mEngine->createNodeType(HopEntity::type(),mScene);
+mClimber=PathClimber::ptr(new PathClimber());
+mClimber->setSpeed(40);
+	mPlayer->attach(mClimber);
+mClimber->setPathClimberListener(this);
 	mPlayer->addShape(Shape::ptr(new Shape(AABox(2))));
 	{
 		Segment segment;
@@ -124,6 +127,21 @@ void RandIsle::create(){
 		mPlayer->setPosition(result.point);
 	}
 	mScene->getRoot()->attach(mPlayer);
+
+	MeshNode::ptr playerMesh=mEngine->createNodeType(MeshNode::type(),mScene);
+	if(Resources::instance->creature!=NULL){
+		playerMesh->setMesh(Resources::instance->creature);
+//		mPlayerMeshNode->getController()->setSequenceIndex(1);
+	}
+	mPlayer->attach(playerMesh);
+
+	MeshNode::ptr shadowMesh=mEngine->createNodeType(MeshNode::type(),mScene);
+	if(Resources::instance->shadow!=NULL){
+		shadowMesh->setMesh(Resources::instance->shadow);
+	}
+	shadowMesh->attach(new GroundProjector(mPlayer,20,0));
+	mPlayer->attach(shadowMesh);
+
 	mTerrain->setTarget(mPlayer);
 
 	mHUD->setTarget(mPlayer,mCamera);
@@ -135,8 +153,6 @@ void RandIsle::create(){
 
 	Logger::alert("Updating terrain");
 	mTerrain->updatePatches(mCamera);
-
-	mPlayer->setSpeed(40);
 
 	InputDevice *joyDevice=mApp->getInputDevice(InputDevice::InputType_JOY);
 	if(joyDevice!=NULL){
@@ -167,7 +183,7 @@ void RandIsle::destroy(){
 		mPredictedIndexData=NULL;
 	}
 	if(mPredictedMaterial!=NULL){
-		mPredictedMaterial->release();
+		mPredictedMaterial->destroy();
 		mPredictedMaterial=NULL;
 	}
 
@@ -247,7 +263,7 @@ void RandIsle::render(){
 
 		mCamera->render(device);
 
-		mHUD->render(device);
+//		mHUD->render(device);
 	}
 	device->endScene();
 	device->swap();
@@ -258,73 +274,7 @@ void RandIsle::update(int dt){
 }
 
 void RandIsle::logicUpdate(int dt){
-	// Find graph
-	if(mPlayer->getPath()==NULL){
-		// TODO: Use sensor
-		if(mPlayer->getHealth()>0 && mPlayer->getNoClimbTime()<mScene->getLogicTime()){
-			// Find closest graph & mount point
-			float snapDistance=10;
-			Sphere playerSphere=Sphere(mPlayer->getPosition(),snapDistance);
-			ParentNode *closestSystem=NULL;
-			float closestDistance=1000;
-			PathSystem::Path *closestPath=NULL;
-			Vector3 closestPoint;
-			Node *node;
-			for(node=mScene->getRoot()->getFirstChild();node!=NULL;node=node->getNext()){
-				if((node->getScope()==Scope_TREE) && node->getWorldBound().testIntersection(playerSphere)){
-					Tree *system=(Tree*)node;
-					Vector3 point;
-					PathSystem::Path *path=system->getClosestPath(point,mPlayer->getPosition());
-					float distance=Math::length(point,mPlayer->getPosition());
-
-					if(path!=NULL && distance<closestDistance){
-						closestDistance=distance;
-						closestPath=path;
-						closestSystem=system;
-						closestPoint.set(point);
-					}
-				}
-			}
-
-			if(closestPath!=NULL && closestDistance<snapDistance){
-				mPlayer->mount(closestSystem,closestPath,closestPoint);
-				findPathSequence(mPathSequence,mPlayer,mPlayer->getPath(),mPlayer->getPathDirection(),mPlayer->getPathTime());
-			}
-		}
-	}
-
-	// Update graph prediction & camera
-	if(mPlayer->getPath()!=NULL){
-		PathSystem::Path *path=mPlayer->getPath();
-		int direction=mPlayer->getPathDirection();
-		scalar time=mPlayer->getPathTime();
-
-		if(mPathSequence.size()>0){
-			scalar neighborTime=path->getNeighborTime(mPathSequence[0]);
-			if(neighborTime>time && direction<0){
-				mPlayer->setPathDirection(1);
-			}
-			else if(neighborTime<time && direction>0){
-				mPlayer->setPathDirection(-1);
-			}
-		}
-
-		if(mPlayer->getSpeed()>=5){
-			wiggleLeaves((Tree*)mPlayer->getMounted(),mPlayer->getWorldBound().getSphere());
-		}
-
-		findPathSequence(mPathSequence,mPlayer,mPlayer->getPath(),mPlayer->getPathDirection(),mPlayer->getPathTime());
-
-		updatePredictedPath();
-
-		Vector3 position;
-		Math::mul(position,mPlayer->getIdealRotation(),Math::Y_UNIT_VECTOR3);
-		Math::mul(position,-TREE_CAMERA_DISTANCE);
-		Math::add(position,mPlayer->getMounted()->getWorldTranslate());
-		position.z+=mPlayer->getMounted()->getBound().getAABox().maxs.z/2;
-
-		mFollower->logicUpdated(position,dt);
-	}
+	updateClimber(mClimber,dt);
 
 //	updateDanger(dt);
 
@@ -351,45 +301,21 @@ void RandIsle::logicUpdate(int dt){
 
 	mScene->logicUpdate(dt);
 
-	playerMove(-mXJoy/8.0,-mYJoy*80);
+	playerMove(mClimber,-mXJoy/8.0,-mYJoy*80);
 
 	mApp->setTitle(String("FPS:")+mCamera->getFramesPerSecond()+" VISIBLE:"+mCamera->getVisibleCount()+" ACTIVE:"+mScene->countActiveNodes());
 }
 
 void RandIsle::frameUpdate(int dt){
-	Vector3 right,forward,up;
-	Math::setAxesFromQuaternion(mPlayer->getRotate(),right,forward,up);
-#if 0
-	if(tl || tr){
-		Matrix3x3 dr;
-		if(tl && !tr){
-			Math::setMatrix3x3FromZ(dr,Math::fromMilli(dt)*3);
-		}
-		else if(tr && !tl){
-			Math::setMatrix3x3FromZ(dr,-Math::fromMilli(dt)*3);
-		}
-		Quaternion q;
-		Math::setQuaternionFromMatrix3x3(q,dr);
-		Quaternion idealRotation=mPlayer->getIdealRotation();
-		Math::postMul(idealRotation,q);
-		Math::normalizeCarefully(idealRotation,epsilon);
-		mPlayer->setIdealRotation(idealRotation);
-	}
-#endif
-
 	mScene->frameUpdate(dt);
-
-	if(mPlayer->getPath()!=NULL){
-		// In this case the listener is not attached, so we need to update it after the rest of the scene
-		mFollower->frameUpdated(mFollowNode,dt);
-	}
 }
 
 void RandIsle::updateDanger(int dt){
+/*
 	int dangerDelayTime=0;
 	int dangerTime=5000;
 
-	scalar oldDanger=mPlayer->getDanger();
+	scalar oldDanger=mClimber->getDanger();
 	scalar danger=0;
 	if(mPlayer->getGroundTime()>0){
 		int time=mScene->getLogicTime()-mPlayer->getGroundTime();
@@ -408,14 +334,85 @@ void RandIsle::updateDanger(int dt){
 	danger=Math::clamp(0,Math::ONE,danger);
 
 	mPlayer->setDanger(danger);
+*/
 }
 
-void RandIsle::updatePredictedPath(){
-	if(mPlayer->getPath()!=NULL && mPathSequence.size()>0){
+void RandIsle::updateClimber(PathClimber *climber,int dt){
+	// Find graph
+	if(climber->getPath()==NULL){
+		// TODO: Use sensor
+		if(/*mPlayer->getHealth()>0 && */climber->getNoClimbTime()<mScene->getLogicTime()){
+			// Find closest graph & mount point
+			float snapDistance=10;
+			Sphere playerSphere=Sphere(mPlayer->getPosition(),snapDistance);
+			Node *closestSystem=NULL;
+			float closestDistance=1000;
+			PathSystem::Path *closestPath=NULL;
+			Vector3 closestPoint;
+			Node *node;
+			for(node=mScene->getRoot()->getFirstChild();node!=NULL;node=node->getNext()){
+				if((node->getScope()==Scope_TREE) && node->getWorldBound().testIntersection(playerSphere)){
+					Tree *system=(Tree*)node;
+					Vector3 point;
+					PathSystem::Path *path=system->getClosestPath(point,mPlayer->getPosition());
+					float distance=Math::length(point,mPlayer->getPosition());
+
+					if(path!=NULL && distance<closestDistance){
+						closestDistance=distance;
+						closestPath=path;
+						closestSystem=system;
+						closestPoint.set(point);
+					}
+				}
+			}
+
+			if(closestPath!=NULL && closestDistance<snapDistance){
+				climber->mount(closestSystem,closestPath,closestPoint);
+				findPathSequence(mPathSequence,climber,climber->getPath(),climber->getPathDirection(),climber->getPathTime());
+			}
+		}
+	}
+
+	// Update graph prediction & camera
+	if(climber->getPath()!=NULL){
+		PathSystem::Path *path=climber->getPath();
+		int direction=climber->getPathDirection();
+		scalar time=climber->getPathTime();
+
+		if(mPathSequence.size()>0){
+			scalar neighborTime=path->getNeighborTime(mPathSequence[0]);
+			if(neighborTime>time && direction<0){
+				climber->setPathDirection(1);
+			}
+			else if(neighborTime<time && direction>0){
+				climber->setPathDirection(-1);
+			}
+		}
+
+		if(climber->getSpeed()>=5){
+			wiggleLeaves((Tree*)climber->getMounted(),mPlayer->getWorldBound().getSphere());
+		}
+
+		findPathSequence(mPathSequence,climber,climber->getPath(),climber->getPathDirection(),climber->getPathTime());
+
+		updatePredictedPath(climber,dt);
+
+		Vector3 position;
+		Math::mul(position,climber->getIdealRotation(),Math::Y_UNIT_VECTOR3);
+		Math::mul(position,-TREE_CAMERA_DISTANCE);
+		Math::add(position,climber->getMounted()->getWorldTranslate());
+		position.z+=climber->getMounted()->getBound().getAABox().maxs.z/2;
+
+		mFollower->logicUpdate(position,dt);
+	}
+}
+
+void RandIsle::updatePredictedPath(PathClimber *climber,int dt){
+	if(climber->getPath()!=NULL && mPathSequence.size()>0){
 		// Update predicted path
-		PathSystem::Path *path=mPlayer->getPath();
-		scalar oldTime=0,time=mPlayer->getPathTime();
-		int direction=mPlayer->getPathDirection();
+		PathSystem::Path *path=climber->getPath();
+		scalar oldTime=0,time=climber->getPathTime();
+		int direction=climber->getPathDirection();
 
 		Vector3 point;
 		Vector3 forward,right,tangent,normal,scale;
@@ -430,7 +427,7 @@ void RandIsle::updatePredictedPath(){
 		int np=0,i=0;
 		for(i=0;i<vba.getSize()-2 && path!=NULL && predictTime>0;i+=2){
 			path->getPoint(point,time);
-			Math::add(point,mPlayer->getMounted()->getWorldTranslate());
+			Math::add(point,climber->getMounted()->getWorldTranslate());
 			path->getOrientation(tangent,normal,scale,time);
 
 			Math::sub(forward,point,mCamera->getWorldTranslate());
@@ -448,12 +445,12 @@ void RandIsle::updatePredictedPath(){
 			oldTime=time;
 			time+=dt*direction;
 
-			if(skipCheck==false && mPlayer->passedJunction(direction,oldTime,time,nextTime)){
+			if(skipCheck==false && climber->passedJunction(direction,oldTime,time,nextTime)){
 				// Make sure we get a point on extactly each junction
 				predictTime+=Math::abs(time-nextTime); 
 				time=nextTime;
 			}
-			else if(skipCheck==true || mPlayer->passedJunction(direction,oldTime,time,nextTime)){
+			else if(skipCheck==true || climber->passedJunction(direction,oldTime,time,nextTime)){
 				scalar extraTime=Math::abs(time-nextTime);
 				PathSystem::Path  *nextPath=path->getNeighbor(mPathSequence[np]);
 				np++;
@@ -480,7 +477,7 @@ void RandIsle::keyPressed(int key){
 		mApp->stop();
 	}
 	else if(key==' '){
-		playerJump();
+		playerJump(mClimber);
 	}
 }
 
@@ -504,14 +501,14 @@ void RandIsle::mouseMoved(int x,int y){
 	scalar yamount=(float)y/(float)mApp->getHeight();
 
 	if(mMouseButtons>0){
-		playerMove(-xamount*3,-yamount*80);
+		playerMove(mClimber,-xamount*3,-yamount*80);
 	}
 }
 
 void RandIsle::inputDetected(const InputData &data){
 	if(data.type==InputDevice::InputType_JOY){
 		if((data.valid&(1<<InputData::Semantic_JOY_BUTTON_PRESSED))!=0){
-			playerJump();
+			playerJump(mClimber);
 		}
 		if((data.valid&(1<<InputData::Semantic_JOY_DIRECTION))!=0){
 			mXJoy=data.values[InputData::Semantic_JOY_DIRECTION].x;
@@ -520,8 +517,8 @@ void RandIsle::inputDetected(const InputData &data){
 	}
 }
 
-void RandIsle::playerJump(){
-	if(mPlayer->getPath()==NULL){
+void RandIsle::playerJump(PathClimber *climber){
+	if(climber->getPath()==NULL){
 		Segment segment;
 		segment.setStartDir(mPlayer->getPosition(),Vector3(0,0,-5));
 		tadpole::Collision result;
@@ -532,24 +529,24 @@ void RandIsle::playerJump(){
 		}
 	}
 	else{
-		mPlayer->dismount();
+		climber->dismount();
 	}
 }
 
-void RandIsle::playerMove(scalar dr,scalar ds){
+void RandIsle::playerMove(PathClimber *climber,scalar dr,scalar ds){
 	Matrix3x3 drm;
 	Math::setMatrix3x3FromZ(drm,dr);
 	Quaternion q;
 	Math::setQuaternionFromMatrix3x3(q,drm);
-	Quaternion idealRotation=mPlayer->getIdealRotation();
+	Quaternion idealRotation=climber->getIdealRotation();
 	Math::postMul(idealRotation,q);
 	Math::normalizeCarefully(idealRotation,epsilon);
-	mPlayer->setIdealRotation(idealRotation);
+	climber->setIdealRotation(idealRotation);
 
-	scalar speed=mPlayer->getSpeed();
+	scalar speed=climber->getSpeed();
 	speed+=ds;
 	speed=Math::clamp(0,80,speed);
-	mPlayer->setSpeed(speed);
+	climber->setSpeed(speed);
 }
 
 float RandIsle::findPathSequence(Collection<int> &sequence,PathClimber *player,PathSystem::Path *path,int direction,scalar time){
@@ -609,18 +606,8 @@ void RandIsle::wiggleLeaves(Tree *tree,const Sphere &bound){
 	}
 }
 
-void RandIsle::pathMounted(PathClimber *climber){
-//	((Tree*)climber->getGraph())->setHighlight(true);
-	mFollowNode->removeNodeListener(mFollower);
-}
-
-void RandIsle::pathDismounted(PathClimber *climber){
-	mFollowNode->addNodeListener(mFollower);
-//	((Tree*)climber->getGraph())->setHighlight(false);
-}
-
 int RandIsle::atJunction(PathClimber *climber,PathSystem::Path *current,PathSystem::Path *next){
-	findPathSequence(mPathSequence,mPlayer,mPlayer->getPath(),mPlayer->getPathDirection(),mPlayer->getPathTime());
+	findPathSequence(mPathSequence,climber,climber->getPath(),climber->getPathDirection(),climber->getPathTime());
 
 	if(mPathSequence.size()>0 && current->getNeighbor(mPathSequence[0])==next){
 		mPathSequence.removeAt(0);

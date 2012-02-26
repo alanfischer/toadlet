@@ -27,14 +27,14 @@
 #define TOADLET_EGG_WIN32THREAD_H
 
 #include <toadlet/egg/Runnable.h>
-#include <toadlet/egg/WeakPointer.h>
+#include <toadlet/egg/SharedPointer.h>
 
 namespace toadlet{
 namespace egg{
 
 class TOADLET_API Win32Thread{
 public:
-	TOADLET_SHARED_POINTERS(Win32Thread);
+	TOADLET_SPTR(Win32Thread);
 
 	Win32Thread();
 	Win32Thread(Runnable *r);

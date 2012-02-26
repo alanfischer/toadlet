@@ -88,9 +88,6 @@ Resource::ptr TMSHHandler::load(Stream::ptr stream,ResourceData *data,ProgressLi
 		Mesh::SubMesh *subMesh=mesh->getSubMesh(i);
 		if(subMesh->materialName.length()==0 && j<materials.size()){
 			subMesh->material=materials[j++];
-			if(subMesh->material!=NULL){
-				subMesh->material->retain();
-			}
 		}
 	}
 

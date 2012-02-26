@@ -46,10 +46,9 @@ public:
 
 	class TOADLET_API SubMesh:public Renderable{
 	public:
-		TOADLET_SHARED_POINTERS(SubMesh);
+		TOADLET_SPTR(SubMesh);
 
 		SubMesh(MeshNode *meshNode,Mesh::SubMesh *meshSubMesh);
-		void destroy(){if(material!=NULL){material->release();material=NULL;}}
 
 		Material *getRenderMaterial() const{return material;}
 		const Transform &getRenderTransform() const{return hasOwnTransform?worldTransform:meshNode->getWorldTransform();}
@@ -71,7 +70,7 @@ public:
 	/// Specialization of the Controller that allows for easy access to playing single sequences.
 	class TOADLET_API MeshController:public Controller{
 	public:
-		TOADLET_SHARED_POINTERS(MeshController);
+		TOADLET_SPTR(MeshController);
 
 		MeshController(MeshNode *node);
 
@@ -90,7 +89,6 @@ public:
 	Node *create(Scene *scene);
 	void destroy();
 	Node *set(Node *node);
-
 	void *hasInterface(int type);
 
 	void setMesh(const String &name);
@@ -103,8 +101,6 @@ public:
 
 	inline MeshNodeSkeleton::ptr getSkeleton() const{return mSkeleton;}
 	void setSkeleton(MeshNodeSkeleton::ptr skeleton);
-
-	MeshController::ptr getController();
 
 	void frameUpdate(int dt,int scope);
 	void updateWorldTransform();
@@ -134,8 +130,6 @@ protected:
 	RenderState::ptr mSharedRenderState;
 	MeshNodeSkeleton::ptr mSkeleton;
 	VertexData::ptr mDynamicVertexData;
-
-	MeshController::ptr mController;
 };
 
 }

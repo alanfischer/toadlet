@@ -26,7 +26,7 @@
 #ifndef TOADLET_TADPOLE_NODE_PARTITIONNODE_H
 #define TOADLET_TADPOLE_NODE_PARTITIONNODE_H
 
-#include <toadlet/tadpole/node/ParentNode.h>
+#include <toadlet/tadpole/node/Node.h>
 #include <toadlet/tadpole/sensor/SensorResultsListener.h>
 
 namespace toadlet{
@@ -34,9 +34,9 @@ namespace tadpole{
 
 namespace node{
 
-class TOADLET_API PartitionNode:public ParentNode{
+class TOADLET_API PartitionNode:public Node{
 public:
-	TOADLET_NODE(PartitionNode,ParentNode);
+	TOADLET_NODE(PartitionNode,Node);
 
 	PartitionNode();
 	virtual Node *create(Scene *scene);

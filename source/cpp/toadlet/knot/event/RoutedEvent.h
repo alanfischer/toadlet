@@ -36,7 +36,7 @@ namespace event{
 /// @todo: Replace IDs with an Address structure
 class RoutedEvent:public Event{
 public:
-	TOADLET_SHARED_POINTERS(RoutedEvent);
+	TOADLET_SPTR(RoutedEvent);
 
 	RoutedEvent(Event::ptr event,int sourceID,int destinationID):Event(Type_ROUTED),mEvent(event),mSourceID(sourceID),mDestinationID(destinationID){}
 

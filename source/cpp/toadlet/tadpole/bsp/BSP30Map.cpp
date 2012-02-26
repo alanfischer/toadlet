@@ -74,31 +74,16 @@ void BSP30Map::destroy(){
 	if(lighting!=NULL){		free(lighting);		nlighting=0;}
 	if(entities!=NULL){		free(entities);		nentities=0;}
 
-	int i;
-	for(i=0;i<parsedTextures.size();++i){
-		parsedTextures[i]->release();
-	}
 	parsedTextures.clear();
-
-	for(i=0;i<materials.size();++i){
-		materials[i]->release();
-	}
 	materials.clear();
-
-	for(i=0;i<lightmapTextures.size();++i){
-		lightmapTextures[i]->release();
-	}
 	lightmapTextures.clear();
 	lightmapDirties.clear();
-
-	for(i=0;i<modelResources.size();++i){
-		modelResources[i]->release();
-	}
 	modelResources.clear();
 
 	delete[] lightmapData;
 	lightmapData=NULL;
 
+	int i;
 	for(i=0;i<lightmapDatas.size();++i){
 		delete[] lightmapDatas[i];
 	}
@@ -233,7 +218,6 @@ void BSP30Map::initLightmap(){
 
 void BSP30Map::uploadLightmap(){
 	Texture::ptr texture=engine->getTextureManager()->createTexture(Texture::Usage_BIT_STREAM|Texture::Usage_BIT_AUTOGEN_MIPMAPS,lightmapFormat,lightmapData);
-	texture->retain();
 	lightmapTextures.add(texture);
 	lightmapDirties.add(false);
 

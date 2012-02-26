@@ -35,7 +35,7 @@ namespace io{
 
 class TOADLET_API SocketStream:public Stream{
 public:
-	TOADLET_SHARED_POINTERS(SocketStream);
+	TOADLET_SPTR(SocketStream);
 
 	SocketStream(Socket::ptr socket);
 	virtual ~SocketStream();

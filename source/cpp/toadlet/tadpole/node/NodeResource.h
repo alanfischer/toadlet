@@ -35,7 +35,7 @@ namespace node{
 
 class TOADLET_API NodeResource:public BaseResource{
 public:
-	TOADLET_SHARED_POINTERS(NodeResource);
+	TOADLET_RESOURCE(NodeResource,NodeResource);
 
 	NodeResource(Node::ptr node=NULL):BaseResource(){setNode(node);}
 	virtual ~NodeResource(){}

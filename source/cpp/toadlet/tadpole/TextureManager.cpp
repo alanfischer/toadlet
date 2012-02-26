@@ -42,7 +42,7 @@ TextureManager::TextureManager(Engine *engine):ResourceManager(engine->getArchiv
 TextureManager::~TextureManager(){
 	int i;
 	for(i=0;i<mRenderTargets.size();++i){
-		mRenderTargets[i]->setRenderTargetDestroyedListener(NULL);
+		mRenderTargets[i]->setDestroyedListener(NULL);
 	}
 }
 
@@ -52,7 +52,7 @@ void TextureManager::destroy(){
 	int i;
 	for(i=0;i<mRenderTargets.size();++i){
 		PixelBufferRenderTarget::ptr renderTarget=mRenderTargets[i];
-		renderTarget->setRenderTargetDestroyedListener(NULL);
+		renderTarget->setDestroyedListener(NULL);
 		renderTarget->destroy();
 	}
 	mRenderTargets.clear();
@@ -63,7 +63,7 @@ Texture::ptr TextureManager::createTexture(TextureFormat::ptr format,tbyte *data
 }
 
 Texture::ptr TextureManager::createTexture(TextureFormat::ptr format,tbyte *mipDatas[]){
-	return createTexture(Texture::Usage_BIT_STATIC|Texture::Usage_BIT_AUTOGEN_MIPMAPS,format,mipDatas);
+	return createTexture(Texture::Usage_BIT_STATIC,format,mipDatas);
 }
 
 Texture::ptr TextureManager::createTexture(int usage,TextureFormat::ptr format,tbyte *data){
@@ -121,7 +121,7 @@ PixelBufferRenderTarget::ptr TextureManager::createPixelBufferRenderTarget(){
 	if(renderTarget!=NULL){
 		mRenderTargets.add(renderTarget);
 
-		renderTarget->setRenderTargetDestroyedListener(this);
+		renderTarget->setDestroyedListener(this);
 	}
 
 	return renderTarget;
@@ -150,10 +150,10 @@ Texture::ptr TextureManager::createNormalizationTexture(int size){
 void TextureManager::contextActivate(RenderDevice *renderDevice){
 	int i;
 	for(i=0;i<mResources.size();++i){
-		Texture::ptr texture=shared_static_cast<Texture>(mResources[i]);
+		Texture *texture=(Texture*)mResources[i];
 		if(texture!=NULL && texture->getRootTexture()!=texture){
 			Texture::ptr back(renderDevice->createTexture());
-			shared_static_cast<BackableTexture>(texture)->setBack(back,renderDevice);
+			((BackableTexture*)texture)->setBack(back,renderDevice);
 		}
 	}
 
@@ -169,9 +169,9 @@ void TextureManager::contextActivate(RenderDevice *renderDevice){
 void TextureManager::contextDeactivate(RenderDevice *renderDevice){
 	int i;
 	for(i=0;i<mResources.size();++i){
-		Texture::ptr texture=shared_static_cast<Texture>(mResources[i]);
+		Texture *texture=(Texture*)mResources[i];
 		if(texture!=NULL && texture->getRootTexture()!=texture){
-			shared_static_cast<BackableTexture>(texture)->setBack(NULL,NULL);
+			((BackableTexture*)texture)->setBack(NULL,NULL);
 		}
 	}
 
@@ -188,7 +188,7 @@ void TextureManager::preContextReset(peeper::RenderDevice *renderDevice){
 
 	int i;
 	for(i=0;i<mResources.size();++i){
-		Texture::ptr texture=shared_static_cast<Texture>(mResources[i]);
+		Texture *texture=(Texture*)mResources[i];
 		if(texture!=NULL){
 			texture->resetDestroy();
 		}
@@ -207,7 +207,7 @@ void TextureManager::postContextReset(peeper::RenderDevice *renderDevice){
 
 	int i;
 	for(i=0;i<mResources.size();++i){
-		Texture::ptr texture=shared_static_cast<Texture>(mResources[i]);
+		Texture *texture=(Texture*)mResources[i];
 		if(texture!=NULL){
 			texture->resetCreate();
 		}
@@ -221,8 +221,10 @@ void TextureManager::postContextReset(peeper::RenderDevice *renderDevice){
 	}
 }
 
-void TextureManager::renderTargetDestroyed(RenderTarget *renderTarget){
-	mRenderTargets.remove(renderTarget);
+void TextureManager::resourceDestroyed(Resource *resource){
+	if(mRenderTargets.remove(resource)==false){
+		ResourceManager::resourceDestroyed(resource);
+	}
 }
 
 }

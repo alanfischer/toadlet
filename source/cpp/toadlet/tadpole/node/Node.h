@@ -26,15 +26,11 @@
 #ifndef TOADLET_TADPOLE_NODE_NODE_H
 #define TOADLET_TADPOLE_NODE_NODE_H
 
-#include <toadlet/egg/Event.h>
-#include <toadlet/egg/IntrusivePointer.h>
-#include <toadlet/egg/WeakPointer.h>
-#include <toadlet/egg/Type.h>
 #include <toadlet/tadpole/Types.h>
+#include <toadlet/egg/Type.h>
 #include <toadlet/tadpole/Bound.h>
+#include <toadlet/tadpole/BaseComponent.h>
 #include <toadlet/tadpole/Transformable.h>
-#include <toadlet/tadpole/animation/Controller.h>
-#include <toadlet/tadpole/node/NodeListener.h>
 
 #ifndef TOADLET_NODE
 	#define TOADLET_NODE(Class,SuperClass) \
@@ -42,7 +38,7 @@
 		typedef toadlet::egg::Type<Class,toadlet::tadpole::node::Node> ThisType; \
 		static ThisType *type(); \
 		virtual toadlet::egg::BaseType<toadlet::tadpole::node::Node> *getType(){return Class::type();} \
-		TOADLET_INTRUSIVE_POINTERS(Class)
+		TOADLET_IPTR(Class)
 #endif
 
 #ifndef TOADLET_NONINSTANCIABLENODE
@@ -51,7 +47,7 @@
 		typedef toadlet::egg::NonInstantiableType<Class,toadlet::tadpole::node::Node> ThisType; \
 		static ThisType *type(); \
 		virtual toadlet::egg::BaseType<toadlet::tadpole::node::Node> *getType(){return Class::type();} \
-		TOADLET_INTRUSIVE_POINTERS(Class)
+		TOADLET_IPTR(Class)
 #endif
 
 #ifndef TOADLET_NODE_IMPLEMENT
@@ -69,9 +65,8 @@ class Scene;
 namespace node{
 
 class CameraNode;
-class ParentNode;
 
-class TOADLET_API Node:public Transformable{
+class TOADLET_API Node:public BaseComponent,public Transformable{
 public:
 	TOADLET_NODE(Node,Node);
 
@@ -100,31 +95,34 @@ public:
 	virtual Node *set(Node *node);
 	Node *clone(Scene *scene);
 
-	virtual ParentNode *isParent(){return NULL;}
+	virtual Node *isNode(){return this;}
 	virtual Node *isEntity(){return NULL;}
 	virtual void *hasInterface(int type);
 
 	inline int getUniqueHandle() const{return mUniqueHandle;}
 
-	virtual void addNodeListener(NodeListener::ptr listener);
-	virtual void removeNodeListener(NodeListener::ptr listener);
-	virtual void removeAllNodeListeners(){mNodeListeners=NULL;}
+	void destroyAllChildren();
 
-	virtual void addController(Controller::ptr controller);
-	virtual void removeController(Controller::ptr controller);
-	virtual void removeAllControllers(){mControllers=NULL;}
-
-	ParentNode *getParent() const{return (ParentNode*)(mParent.get());}
+	Node *getParent() const{return mParent;}
 	void *getParentData() const{return mParentData;}
-	virtual void parentChanged(ParentNode *parent){mParent=(Node*)parent;}
+	virtual bool parentChanged(Node *node);
 	virtual void parentDataChanged(void *parentData){mParentData=parentData;}
 	Node *getPrevious() const{return mPrevious;}
 	virtual void previousChanged(Node *previous){mPrevious=previous;}
 	Node *getNext() const{return mNext;}
 	virtual void nextChanged(Node *next){mNext=next;}
 
+	virtual bool attach(Component *component);
+	virtual void nodeAttached(Node *node){}
+	virtual bool remove(Component *component);
+	virtual void nodeRemoved(Node *node){}
+	Node *getFirstChild(){return mFirstChild;}
+	Node *getLastChild(){return mLastChild;}
+
 	virtual void setDependsUpon(Node *node){mDependsUpon=node;}
 	inline Node *getDependsUpon() const{return mDependsUpon;}
+
+	virtual void mergeWorldBound(Node *child,bool justAttached);
 
 	virtual void setTranslate(const Vector3 &translate);
 	virtual void setTranslate(scalar x,scalar y,scalar z);
@@ -154,8 +152,6 @@ public:
 	inline const Bound &getBound() const{return mBound;}
 	inline const Bound &getWorldBound() const{return mWorldBound;}
 
-	virtual void handleEvent(const Event::ptr &event){}
-
 	virtual void setScope(int scope){mScope=scope;}
 	inline int getScope() const{return mScope;}
 
@@ -164,7 +160,6 @@ public:
 
 	virtual void logicUpdate(int dt,int scope);
 	virtual void frameUpdate(int dt,int scope);
-	virtual void gatherRenderables(CameraNode *camera,RenderableSet *set){}
 
 	virtual void setStayActive(bool active);
 	inline bool getStayActive() const{return mDeactivateCount<0;}
@@ -177,37 +172,27 @@ public:
 	virtual void updateWorldTransform();
 	virtual void updateAllWorldTransforms();
 	virtual void spacialUpdated();
+	virtual void gatherRenderables(CameraNode *camera,RenderableSet *set);
 
 	inline Engine *getEngine() const{return mEngine;}
 	inline Scene *getScene() const{return mScene;}
 
-	inline PointerCounter *pointerCounter() const{return mPointerCounter;}
-	inline void internal_setManaged(bool managed){mManaged=managed;}
-	inline bool internal_getManaged() const{return mManaged;}
-
 protected:
-	virtual void logicUpdateListeners(int dt);
-	virtual void frameUpdateListeners(int dt);
-
-	// Allocation items
-	PointerCounter *mPointerCounter;
-	bool mManaged;
-
 	// Engine items
 	bool mCreated;
 	Engine *mEngine;
 	Scene *mScene;
 	int mUniqueHandle;
 
-	// Node items
-	Collection<NodeListener::ptr>::ptr mNodeListeners;
-	Collection<Controller::ptr>::ptr mControllers;
-
 	Node::ptr mParent,mPrevious,mNext;
 	void *mParentData;
-	
-	Node::ptr mDependsUpon;
 
+	Collection<Component::ptr> mComponents;
+	Node::ptr mFirstChild,mLastChild;
+	bool mChildrenActive;
+	bool mActivateChildren;
+
+	Node::ptr mDependsUpon;
 	bool mActive;
 	int mDeactivateCount;
 	int mLastLogicFrame;
@@ -220,8 +205,6 @@ protected:
 	Bound mWorldBound;
 	int mScope;
 	String mName;
-
-	friend class ParentNode;
 };
 
 }
