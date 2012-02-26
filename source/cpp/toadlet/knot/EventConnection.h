@@ -27,7 +27,6 @@
 #define TOADLET_KNOT_EVENTCONNECTION_H
 
 #include <toadlet/egg/SharedPointer.h>
-#include <toadlet/egg/WeakPointer.h>
 #include <toadlet/egg/Event.h>
 #include <toadlet/knot/Types.h>
 
@@ -43,7 +42,7 @@ namespace knot{
 ///  Non routed events just get sent to the end point of the connection, and then are to be dealt with.
 class EventConnection{
 public:
-	TOADLET_SHARED_POINTERS(EventConnection);
+	TOADLET_SPTR(EventConnection);
 
 	virtual ~EventConnection(){}
 

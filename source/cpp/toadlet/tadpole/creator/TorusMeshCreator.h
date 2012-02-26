@@ -36,7 +36,7 @@ namespace creator{
 
 class TOADLET_API TorusMeshCreator:public ResourceCreator{
 public:
-	TOADLET_SHARED_POINTERS(TorusMeshCreator);
+	TOADLET_SPTR(TorusMeshCreator);
 
 	TorusMeshCreator(Engine *engine){
 		mEngine=engine;

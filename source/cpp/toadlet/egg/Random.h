@@ -27,14 +27,14 @@
 #define TOADLET_EGG_RANDOM_H
 
 #include <toadlet/Types.h>
-#include <toadlet/egg/WeakPointer.h>
+#include <toadlet/egg/SharedPointer.h>
 
 namespace toadlet{
 namespace egg{
 
 class TOADLET_API Random{
 public:
-	TOADLET_SHARED_POINTERS(Random);
+	TOADLET_SPTR(Random);
 
 	Random();
 

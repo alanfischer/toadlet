@@ -29,10 +29,13 @@
 namespace toadlet{
 namespace peeper{
 
-BackableShaderState::BackableShaderState():
-	mListener(NULL)
+BackableShaderState::BackableShaderState():BaseResource()
 	//mShaders
 {}
+
+BackableShaderState::~BackableShaderState(){
+	destroy();
+}
 
 void BackableShaderState::destroy(){
 	if(mBack!=NULL){
@@ -41,11 +44,8 @@ void BackableShaderState::destroy(){
 	}
 
 	mShaders.clear();
-
-	if(mListener!=NULL){
-		mListener->shaderStateDestroyed(this);
-		mListener=NULL;
-	}
+	
+	BaseResource::destroy();
 }
 
 void BackableShaderState::setShader(Shader::ShaderType type,Shader::ptr shader){

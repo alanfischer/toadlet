@@ -36,7 +36,7 @@ namespace peeper{
 
 class TOADLET_API VariableBuffer:public Buffer{
 public:
-	TOADLET_SHARED_POINTERS(VariableBuffer);
+	TOADLET_IPTR(VariableBuffer);
 	
 	virtual ~VariableBuffer(){}
 

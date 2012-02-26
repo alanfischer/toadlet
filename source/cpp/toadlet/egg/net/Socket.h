@@ -29,7 +29,7 @@
 #include <toadlet/Types.h>
 #include <toadlet/egg/String.h>
 #include <toadlet/egg/Collection.h>
-#include <toadlet/egg/WeakPointer.h>
+#include <toadlet/egg/SharedPointer.h>
 
 #if defined(TOADLET_PLATFORM_WIN32)
 	#ifndef WIN32_LEAN_AND_MEAN
@@ -64,7 +64,7 @@ namespace net{
 
 class TOADLET_API Socket{
 public:
-	TOADLET_SHARED_POINTERS(Socket);
+	TOADLET_SPTR(Socket);
 
 	Socket();
 	Socket(int domain,int type,int protocol);

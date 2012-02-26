@@ -8,7 +8,7 @@
 /// @todo: Move these into toadlet somewhere, maybe just base of tadpole
 class Matrix4x4Accessor{
 public:
-	TOADLET_SHARED_POINTERS(Matrix4x4Accessor);
+	TOADLET_SPTR(Matrix4x4Accessor);
 
 	virtual void setMatrix4x4(const Matrix4x4 &matrix)=0;
 	virtual const Matrix4x4 &getMatrix4x4()=0;
@@ -16,7 +16,7 @@ public:
 
 class TextureStateMatrix4x4Accessor:public Matrix4x4Accessor{
 public:
-	TOADLET_SHARED_POINTERS(TextureStateMatrix4x4Accessor);
+	TOADLET_SPTR(TextureStateMatrix4x4Accessor);
 
 	TextureStateMatrix4x4Accessor(RenderPass::ptr pass,int state,TextureState::CalculationType calculation=TextureState::CalculationType_NORMAL):
 		mPass(pass),mState(state){

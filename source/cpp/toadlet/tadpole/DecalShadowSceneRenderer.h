@@ -33,7 +33,7 @@ namespace tadpole{
 
 class TOADLET_API DecalShadowSceneRenderer:public SceneRenderer{
 public:
-	TOADLET_SHARED_POINTERS(DecalShadowSceneRenderer);
+	TOADLET_SPTR(DecalShadowSceneRenderer);
 
 	DecalShadowSceneRenderer(Scene *scene);
 	virtual ~DecalShadowSceneRenderer();

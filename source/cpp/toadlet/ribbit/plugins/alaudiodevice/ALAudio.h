@@ -26,6 +26,7 @@
 #ifndef TOADLET_RIBBIT_ALAUDIO_H
 #define TOADLET_RIBBIT_ALAUDIO_H
 
+#include <toadlet/egg/BaseResource.h>
 #include <toadlet/ribbit/Types.h>
 #include <toadlet/ribbit/Audio.h>
 #include <toadlet/ribbit/AudioStream.h>
@@ -35,8 +36,10 @@ namespace ribbit{
 
 class ALAudioDevice;
 
-class TOADLET_API ALAudio:public Audio{
+class TOADLET_API ALAudio:public BaseResource,public Audio{
 public:
+	TOADLET_RESOURCE(ALAudio,Audio);
+
 	ALAudio(ALAudioDevice *audioDevice);
 	virtual ~ALAudio();
 

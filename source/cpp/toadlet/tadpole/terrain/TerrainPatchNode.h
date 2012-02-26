@@ -138,7 +138,7 @@ protected:
 	/// @todo: Could be replaced by a MeshNode for the Water & the Terrain
 	class WaterRenderable:public Renderable{
 	public:
-		TOADLET_SHARED_POINTERS(WaterRenderable);
+		TOADLET_SPTR(WaterRenderable);
 
 		WaterRenderable(TerrainPatchNode *terrain){mTerrain=terrain;}
 

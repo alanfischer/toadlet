@@ -36,7 +36,7 @@ namespace studio{
 
 class TOADLET_API StudioHandler:public ResourceStreamer{
 public:
-	TOADLET_SHARED_POINTERS(StudioHandler);
+	TOADLET_SPTR(StudioHandler);
 
 	StudioHandler(Engine *engine);
 	virtual ~StudioHandler();

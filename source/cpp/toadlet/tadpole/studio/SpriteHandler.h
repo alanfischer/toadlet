@@ -36,7 +36,7 @@ namespace studio{
 
 class TOADLET_API SpriteHandler:public ResourceStreamer{
 public:
-	TOADLET_SHARED_POINTERS(SpriteHandler);
+	TOADLET_SPTR(SpriteHandler);
 
 	SpriteHandler(Engine *engine);
 	virtual ~SpriteHandler();

@@ -66,7 +66,7 @@ protected:
 
 class StudioModelController:public Controller{
 public:
-	TOADLET_SHARED_POINTERS(StudioModelController);
+	TOADLET_SPTR(StudioModelController);
 
 	StudioModelController(StudioModelNode::ptr node,bool gait):Controller(){
 		mNode=node;

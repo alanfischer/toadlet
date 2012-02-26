@@ -34,11 +34,11 @@ namespace tadpole{
 
 class TOADLET_API Skeleton:public BaseResource{
 public:
-	TOADLET_SHARED_POINTERS(Skeleton);
+	TOADLET_SPTR(Skeleton);
 
 	class TOADLET_API Bone{
 	public:
-		TOADLET_SHARED_POINTERS(Bone);
+		TOADLET_SPTR(Bone);
 
 		Bone():
 			index(-1),

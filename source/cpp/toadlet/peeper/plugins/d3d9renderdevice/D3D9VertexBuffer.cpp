@@ -34,8 +34,6 @@ namespace peeper{
 
 D3D9VertexBuffer::D3D9VertexBuffer(D3D9RenderDevice *renderDevice):
 	mDevice(NULL),
-
-	mListener(NULL),
 	mUsage(0),
 	mAccess(0),
 	mSize(0),
@@ -81,9 +79,7 @@ void D3D9VertexBuffer::destroy(){
 		mBackingData=NULL;
 	}
 
-	if(mListener!=NULL){
-		mListener->bufferDestroyed(this);
-	}
+	BaseResource::destroy();
 }
 
 void D3D9VertexBuffer::resetCreate(){

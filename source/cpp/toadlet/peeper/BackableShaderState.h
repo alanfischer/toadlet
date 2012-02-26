@@ -27,21 +27,20 @@
 #define TOADLET_PEEPER_BACKABLESHADERSTATE_H
 
 #include <toadlet/egg/Collection.h>
+#include <toadlet/egg/BaseResource.h>
 #include <toadlet/peeper/ShaderState.h>
 
 namespace toadlet{
 namespace peeper{
 
-class TOADLET_API BackableShaderState:public ShaderState{
+class TOADLET_API BackableShaderState:public BaseResource,public ShaderState{
 public:
-	TOADLET_SHARED_POINTERS(BackableShaderState);
+	TOADLET_RESOURCE(BackableShaderState,ShaderState);
 
 	BackableShaderState();
-	virtual ~BackableShaderState(){}
+	virtual ~BackableShaderState();
 
 	virtual ShaderState *getRootShaderState(){return mBack;}
-
-	virtual void setShaderStateDestroyedListener(ShaderStateDestroyedListener *listener){mListener=listener;}
 
 	virtual bool create(){return true;}
 	virtual void destroy();
@@ -56,7 +55,6 @@ public:
 	virtual ShaderState::ptr getBack(){return mBack;}
 
 protected:
-	ShaderStateDestroyedListener *mListener;
 	Collection<Shader::ptr> mShaders;
 
 	ShaderState::ptr mBack;

@@ -38,7 +38,7 @@ namespace knot{
 
 class TOADLET_API SynchronizedPeerEventConnection:public EventConnection{
 public:
-	TOADLET_SHARED_POINTERS(SynchronizedPeerEventConnection);
+	TOADLET_SPTR(SynchronizedPeerEventConnection);
 
 	enum{
 		PeerStatus_FRAME_OK=0,
@@ -70,7 +70,7 @@ public:
 protected:
 	class EventGroup:public Collection<Event::ptr>{
 	public:
-		TOADLET_SHARED_POINTERS(EventGroup);
+		TOADLET_SPTR(EventGroup);
 
 		EventGroup():Collection<Event::ptr>(),
 			mFrameBuffer(0),

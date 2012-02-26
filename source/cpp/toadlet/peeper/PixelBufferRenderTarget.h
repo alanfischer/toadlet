@@ -28,14 +28,13 @@
 
 #include <toadlet/peeper/RenderTarget.h>
 #include <toadlet/peeper/PixelBuffer.h>
-#include <toadlet/peeper/RenderTargetDestroyedListener.h>
 
 namespace toadlet{
 namespace peeper{
 
 class PixelBufferRenderTarget:public RenderTarget{
 public:
-	TOADLET_SHARED_POINTERS(PixelBufferRenderTarget);
+	TOADLET_IPTR(PixelBufferRenderTarget);
 
 	enum Attachment{
 		Attachment_DEPTH_STENCIL,
@@ -48,8 +47,6 @@ public:
 	virtual ~PixelBufferRenderTarget(){}
 
 	virtual PixelBufferRenderTarget *getRootPixelBufferRenderTarget()=0;
-
-	virtual void setRenderTargetDestroyedListener(RenderTargetDestroyedListener *listener)=0;
 
 	virtual bool create()=0;
 	virtual void destroy()=0;

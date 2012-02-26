@@ -36,7 +36,7 @@ namespace creator{
 
 class TOADLET_API GeoSphereMeshCreator:public ResourceCreator{
 public:
-	TOADLET_SHARED_POINTERS(GeoSphereMeshCreator);
+	TOADLET_SPTR(GeoSphereMeshCreator);
 
 	GeoSphereMeshCreator(Engine *engine){
 		mEngine=engine;

@@ -46,7 +46,7 @@ public:
 
 	class TOADLET_API SubModel:public Renderable{
 	public:
-		TOADLET_SHARED_POINTERS(SubModel);
+		TOADLET_SPTR(SubModel);
 
 		SubModel(StudioModelNode *modelNode,int bodypartIndex,int modelIndex,int meshIndex,int skinIndex);
 		void destroy(){material=NULL;}

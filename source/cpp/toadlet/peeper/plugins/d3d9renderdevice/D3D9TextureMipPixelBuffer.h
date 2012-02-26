@@ -36,7 +36,7 @@ class D3D9RenderDevice;
 
 class TOADLET_API D3D9TextureMipPixelBuffer:public D3D9PixelBuffer{
 public:
-	TOADLET_SHARED_POINTERS(D3D9TextureMipPixelBuffer);
+	TOADLET_SPTR(D3D9TextureMipPixelBuffer);
 
 	D3D9TextureMipPixelBuffer(D3D9Texture *texture,int level,int cubeSide);
 	virtual ~D3D9TextureMipPixelBuffer();

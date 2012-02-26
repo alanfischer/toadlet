@@ -36,7 +36,7 @@ namespace handler{
 
 class TOADLET_API TGAHandler:public ResourceStreamer{
 public:
-	TOADLET_SHARED_POINTERS(TGAHandler);
+	TOADLET_SPTR(TGAHandler);
 
 	TGAHandler(TextureManager *textureManager){mTextureManager=textureManager;}
 

@@ -37,7 +37,7 @@ class Controller;
 
 class TOADLET_API SkeletonAnimation:public Animatable{
 public:
-	TOADLET_SHARED_POINTERS(SkeletonAnimation);
+	TOADLET_SPTR(SkeletonAnimation);
 
 	SkeletonAnimation();
 	virtual ~SkeletonAnimation();

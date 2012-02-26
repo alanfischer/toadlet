@@ -27,22 +27,20 @@
 #define TOADLET_PEEPER_SHADERSTATE_H
 
 #include <toadlet/egg/Collection.h>
-#include <toadlet/peeper/ShaderStateDestroyedListener.h>
+#include <toadlet/egg/Resource.h>
 #include <toadlet/peeper/Shader.h>
 #include <toadlet/peeper/Texture.h>
 
 namespace toadlet{
 namespace peeper{
 
-class TOADLET_API ShaderState{
+class TOADLET_API ShaderState:public Resource{
 public:
-	TOADLET_SHARED_POINTERS(ShaderState);
+	TOADLET_IPTR(ShaderState);
 
 	virtual ~ShaderState(){}
 
 	virtual ShaderState *getRootShaderState()=0;
-
-	virtual void setShaderStateDestroyedListener(ShaderStateDestroyedListener *listener)=0;
 
 	virtual bool create()=0;
 	virtual void destroy()=0;

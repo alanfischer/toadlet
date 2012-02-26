@@ -45,7 +45,7 @@ public:
 
 	class TOADLET_API SubModel:public Renderable{
 	public:
-		TOADLET_SHARED_POINTERS(SubModel);
+		TOADLET_SPTR(SubModel);
 
 		SubModel(BSP30ModelNode *modelNode,BSP30Map *map);
 		void destroy(){material=NULL;}

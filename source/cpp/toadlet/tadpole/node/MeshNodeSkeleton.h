@@ -42,7 +42,7 @@ class MeshNode;
 
 class TOADLET_API MeshNodeSkeleton:public Renderable,public Attachable{
 public:
-	TOADLET_SHARED_POINTERS(MeshNodeSkeleton);
+	TOADLET_SPTR(MeshNodeSkeleton);
 
 	// BoneSpaceUpdate flags
 	const static int BoneSpaceUpdate_NONE=				0;
@@ -61,7 +61,7 @@ public:
 
 	class TOADLET_API TOADLET_ALIGNED Bone{
 	public:
-		TOADLET_SHARED_POINTERS(Bone);
+		TOADLET_SPTR(Bone);
 
 		TOADLET_ALIGNED_NEW;
 

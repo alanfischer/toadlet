@@ -36,7 +36,7 @@ namespace tadpole{
 
 class Engine;
 
-class TOADLET_API BufferManager:public BufferDestroyedListener,public VertexFormatDestroyedListener{
+class TOADLET_API BufferManager:public ResourceDestroyedListener{
 public:
 	BufferManager(Engine *engine);
 	virtual ~BufferManager();
@@ -57,8 +57,7 @@ public:
 	void preContextReset(RenderDevice *renderDevice);
 	void postContextReset(RenderDevice *renderDevice);
 
-	void bufferDestroyed(Buffer *buffer);
-	void vertexFormatDestroyed(VertexFormat *vertexFormat);
+	void resourceDestroyed(Resource *buffer);
 
 	bool useTriFan();
 

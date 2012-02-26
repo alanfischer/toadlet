@@ -44,7 +44,7 @@ public:
 
 	class TOADLET_API SubMesh{
 	public:
-		TOADLET_SHARED_POINTERS(SubMesh);
+		TOADLET_SPTR(SubMesh);
 
 		SubMesh():hasOwnTransform(false){}
 		virtual ~SubMesh(){}

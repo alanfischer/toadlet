@@ -27,7 +27,7 @@
 #define TOADLET_EGG_WIN32MUTEX_H
 
 #include <toadlet/Types.h>
-#include <toadlet/egg/WeakPointer.h>
+#include <toadlet/egg/SharedPointer.h>
 
 namespace toadlet{
 namespace egg{
@@ -36,7 +36,7 @@ class Win32Event;
 
 class TOADLET_API Win32Mutex{
 public:
-	TOADLET_SHARED_POINTERS(Win32Mutex);
+	TOADLET_SPTR(Win32Mutex);
 
 	Win32Mutex();
 	~Win32Mutex();

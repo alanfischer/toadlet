@@ -57,6 +57,8 @@ void D3D9Query::destroy(){
 		mQuery->Release();
 		mQuery=NULL;
 	}
+
+	BaseResource::destroy();
 }
 
 void D3D9Query::beginQuery(){

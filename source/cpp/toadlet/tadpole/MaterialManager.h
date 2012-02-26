@@ -37,7 +37,7 @@ namespace tadpole{
 class Engine;
 class BufferManager;
 
-class TOADLET_API MaterialManager:public ResourceManager,public RenderStateDestroyedListener,public ShaderStateDestroyedListener{
+class TOADLET_API MaterialManager:public ResourceManager{
 public:
 	MaterialManager(Engine *engine);
 
@@ -69,8 +69,7 @@ public:
 	void contextActivate(RenderDevice *renderDevice);
 	void contextDeactivate(RenderDevice *renderDevice);
 
-	void renderStateDestroyed(RenderState *renderState);
-	void shaderStateDestroyed(ShaderState *shaderState);
+	void resourceDestroyed(Resource *resource);
 
 	Resource::ptr unableToFindStreamer(const String &name,ResourceData *data);
 

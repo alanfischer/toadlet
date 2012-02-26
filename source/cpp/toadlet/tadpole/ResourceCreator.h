@@ -35,7 +35,7 @@ namespace tadpole{
 
 class ResourceCreator{
 public:
-	TOADLET_SHARED_POINTERS(ResourceCreator);
+	TOADLET_SPTR(ResourceCreator);
 
 	virtual ~ResourceCreator(){}
 

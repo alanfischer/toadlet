@@ -33,7 +33,7 @@ namespace peeper{
 
 class TOADLET_API IndexBuffer:public Buffer{
 public:
-	TOADLET_SHARED_POINTERS(IndexBuffer);
+	TOADLET_IPTR(IndexBuffer);
 
 	// Conveniently equals size of index
 	enum IndexFormat{

@@ -27,6 +27,7 @@
 #define TOADLET_PEEPER_D3D9WINDOWRENDERTARGET_H
 
 #include "D3D9RenderTarget.h"
+#include <toadlet/egg/BaseResource.h>
 #include <toadlet/peeper/WindowRenderTargetFormat.h>
 
 namespace toadlet{
@@ -38,12 +39,14 @@ namespace peeper{
 	TOADLET_C_API RenderTarget *new_D3D9WindowRenderTarget(void *display,void *window,WindowRenderTargetFormat *format);
 #endif
 
-class TOADLET_API D3D9WindowRenderTarget:public D3D9RenderTarget{
+class TOADLET_API D3D9WindowRenderTarget:public BaseResource,public D3D9RenderTarget{
 public:
+	TOADLET_RESOURCE(D3D9WindowRenderTarget,D3D9RenderTarget);
+
 	D3D9WindowRenderTarget();
 	D3D9WindowRenderTarget(HWND wnd,WindowRenderTargetFormat *format);
 	virtual ~D3D9WindowRenderTarget();
-	void destroy(){destroyContext();}
+	void destroy(){destroyContext();BaseResource::destroy();}
 
 	RenderTarget *getRootRenderTarget(){return this;}
 	bool isPrimary() const{return true;}

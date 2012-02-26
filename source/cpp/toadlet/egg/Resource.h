@@ -36,7 +36,7 @@ class ResourceDestroyedListener;
 
 class Resource:public Interface{
 public:
-	TOADLET_INTRUSIVE_POINTERS(Resource);
+	TOADLET_IPTR(Resource);
 
 	virtual void destroy()=0;
 

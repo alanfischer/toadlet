@@ -46,10 +46,9 @@ public:
 
 	class TOADLET_API SubMesh:public Renderable{
 	public:
-		TOADLET_SHARED_POINTERS(SubMesh);
+		TOADLET_SPTR(SubMesh);
 
 		SubMesh(MeshNode *meshNode,Mesh::SubMesh *meshSubMesh);
-		void destroy(){material=NULL;}
 
 		Material *getRenderMaterial() const{return material;}
 		const Transform &getRenderTransform() const{return hasOwnTransform?worldTransform:meshNode->getWorldTransform();}
@@ -71,7 +70,7 @@ public:
 	/// Specialization of the Controller that allows for easy access to playing single sequences.
 	class TOADLET_API MeshController:public Controller{
 	public:
-		TOADLET_SHARED_POINTERS(MeshController);
+		TOADLET_SPTR(MeshController);
 
 		MeshController(MeshNode *node);
 

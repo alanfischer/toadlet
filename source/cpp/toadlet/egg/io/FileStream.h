@@ -36,7 +36,7 @@ namespace io{
 
 class TOADLET_API FileStream:public Stream{
 public:
-	TOADLET_SHARED_POINTERS(FileStream);
+	TOADLET_SPTR(FileStream);
 
 	enum Open{
 		Open_BIT_UNKNOWN=	0,

@@ -27,6 +27,7 @@
 #define TOADLET_PEEPER_D3D9VARIABLEBUFFER_H
 
 #include "D3D9Includes.h"
+#include <toadlet/egg/BaseResource.h>
 #include <toadlet/peeper/VariableBuffer.h>
 #include <toadlet/peeper/Shader.h>
 
@@ -35,14 +36,14 @@ namespace peeper{
 
 class D3D9RenderDevice;
 
-class TOADLET_API D3D9VariableBuffer:public VariableBuffer{
+class TOADLET_API D3D9VariableBuffer:public BaseResource,public VariableBuffer{
 public:
+	TOADLET_RESOURCE(D3D9VariableBuffer,VariableBuffer);
+
 	D3D9VariableBuffer(D3D9RenderDevice *renderDevice);
 	virtual ~D3D9VariableBuffer();
 
 	VariableBuffer *getRootVariableBuffer(){return this;}
-
-	void setBufferDestroyedListener(BufferDestroyedListener *listener){mListener=listener;}
 
 	bool create(int usage,int access,VariableBufferFormat::ptr variableFormat);
 	void destroy();
@@ -63,8 +64,6 @@ public:
 
 protected:
 	D3D9RenderDevice *mDevice;
-
-	BufferDestroyedListener *mListener;
 	int mUsage;
 	int mAccess;
 	VariableBufferFormat::ptr mVariableFormat;

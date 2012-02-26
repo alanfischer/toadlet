@@ -41,7 +41,7 @@ namespace material{
 
 class TOADLET_API RenderPass{
 public:
-	TOADLET_SHARED_POINTERS(RenderPass);
+	TOADLET_SPTR(RenderPass);
 
 	RenderPass(MaterialManager *manager,RenderState::ptr renderState=RenderState::ptr(),ShaderState::ptr shaderState=ShaderState::ptr());
 	virtual ~RenderPass();

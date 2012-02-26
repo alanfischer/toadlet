@@ -34,7 +34,7 @@ namespace tadpole{
 
 class BaseComponent:public Object,public Component{
 public:
-	TOADLET_INTRUSIVE_POINTERS(BaseComponent);
+	TOADLET_IPTR(BaseComponent);
 
 	virtual int retain(){return Object::retain();}
 	virtual int release(){return Object::release();}

@@ -41,7 +41,7 @@ namespace knot{
 
 class TOADLET_API SimpleEventConnection:public EventConnection,public ConnectionListener,public Runnable{
 public:
-	TOADLET_SHARED_POINTERS(SimpleEventConnection);
+	TOADLET_SPTR(SimpleEventConnection);
 
 	const static int CONTROL_EVENT_FLAG=0x4000; // Switch to 0x4000 from 0x8000 since setting the sign bit for a short ended up confusing the bit operations in java
 	const static int CONTROL_EVENT_ROUTE=1;

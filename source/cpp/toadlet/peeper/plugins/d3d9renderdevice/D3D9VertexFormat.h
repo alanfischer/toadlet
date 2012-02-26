@@ -26,22 +26,23 @@
 #ifndef TOADLET_PEEPER_D3D9VERTEXFORMAT_H
 #define TOADLET_PEEPER_D3D9VERTEXFORMAT_H
 
-#include <toadlet/peeper/VertexFormat.h>
 #include "D3D9Includes.h"
+#include <toadlet/egg/BaseResource.h>
+#include <toadlet/peeper/VertexFormat.h>
 
 namespace toadlet{
 namespace peeper{
 
 class D3D9RenderDevice;
 
-class TOADLET_API D3D9VertexFormat:public VertexFormat{
+class TOADLET_API D3D9VertexFormat:public BaseResource,public VertexFormat{
 public:
+	TOADLET_RESOURCE(D3D9VertexFormat,VertexFormat);
+
 	D3D9VertexFormat(D3D9RenderDevice *renderDevice);
 	virtual ~D3D9VertexFormat();
 
 	VertexFormat *getRootVertexFormat(){return this;}
-
-	void setVertexFormatDestroyedListener(VertexFormatDestroyedListener *listener){mListener=listener;}
 
 	bool addElement(int semantic,int index,int format){return addElement(semantic,(char*)NULL,index,format);}
 	bool addElement(const String &name,int index,int format){return addElement(Semantic_UNKNOWN,name,index,format);}
@@ -75,8 +76,6 @@ protected:
 	bool destroyContext();
 
 	D3D9RenderDevice *mDevice;
-
-	VertexFormatDestroyedListener *mListener;
 	Collection<int> mSemantics;
 	Collection<String> mNames;
 	Collection<int> mIndexes;

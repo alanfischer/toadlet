@@ -27,6 +27,7 @@
 #define TOADLET_PEEPER_RENDERDEVICE_H
 
 #include <toadlet/egg/Collection.h>
+#include <toadlet/egg/Interface.h>
 #include <toadlet/peeper/Types.h>
 #include <toadlet/peeper/IndexData.h>
 #include <toadlet/peeper/VertexData.h>
@@ -57,8 +58,10 @@ class VertexLayout;
 class VertexFormat;
 class Viewport;
 
-class RenderDevice{
+class RenderDevice:public Interface{
 public:
+	TOADLET_IPTR(RenderDevice);
+
 	enum ClearType{
 		ClearType_BIT_COLOR=	1<<0,
 		ClearType_BIT_DEPTH=	1<<1,

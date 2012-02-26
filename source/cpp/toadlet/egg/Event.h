@@ -33,7 +33,7 @@ namespace egg{
 
 class Event{
 public:
-	TOADLET_SHARED_POINTERS(Event);
+	TOADLET_SPTR(Event);
 
 	enum{
 		// General events

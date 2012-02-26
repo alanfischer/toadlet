@@ -34,7 +34,7 @@ namespace knot{
 
 class TOADLET_API DebugListener:public ConnectionListener{
 public:
-	TOADLET_SHARED_POINTERS(DebugListener);
+	TOADLET_SPTR(DebugListener);
 
 	DebugListener();
 	virtual ~DebugListener();

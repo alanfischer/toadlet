@@ -38,7 +38,7 @@ namespace io{
 /// @todo: This should be implemented cleaner and more optimized, with more direct writing of structures and then converting if necessary
 class TOADLET_API DataStream:public Stream{
 public:
-	TOADLET_SHARED_POINTERS(DataStream);
+	TOADLET_SPTR(DataStream);
 
 	DataStream(Stream *stream);
 	DataStream(Stream::ptr stream);

@@ -28,16 +28,19 @@
 
 #include <toadlet/flick/InputDevice.h>
 #include <toadlet/egg/System.h>
-#include <toadlet/egg/Logger.h>
+#include <toadlet/egg/Object.h>
 #include <windows.h>
 
 namespace toadlet{
 namespace flick{
 
-class Win32JoyDevice:public InputDevice{
+class Win32JoyDevice:protected Object,public InputDevice{
 public:
 	Win32JoyDevice();
 	virtual ~Win32JoyDevice();
+
+	int retain(){return Object::retain();}
+	int release(){return Object::release();}
 
 	bool create();
 	void destroy();

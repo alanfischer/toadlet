@@ -37,7 +37,7 @@ namespace node{
 
 class Component:public Interface{
 public:
-	TOADLET_INTRUSIVE_POINTERS(Component);
+	TOADLET_IPTR(Component);
 	
 	virtual Node *isNode()=0;
 	

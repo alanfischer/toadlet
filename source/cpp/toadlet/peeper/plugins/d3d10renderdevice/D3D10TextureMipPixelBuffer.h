@@ -34,17 +34,15 @@ namespace peeper{
 
 class D3D10RenderDevice;
 
-class TOADLET_API D3D10TextureMipPixelBuffer:public PixelBuffer{
+class TOADLET_API D3D10TextureMipPixelBuffer:public BaseResource,public PixelBuffer{
 public:
-	TOADLET_SHARED_POINTERS(D3D10TextureMipPixelBuffer);
+	TOADLET_RESOURCE(D3D10TextureMipPixelBuffer,PixelBuffer);
 
 	D3D10TextureMipPixelBuffer(D3D10Texture *texture,int level,int cubeSide);
 	D3D10TextureMipPixelBuffer(D3D10RenderDevice *renderDevice);
 	virtual ~D3D10TextureMipPixelBuffer();
 
 	PixelBuffer *getRootPixelBuffer(){return this;}
-
-	void setBufferDestroyedListener(BufferDestroyedListener *listener){mListener=listener;}
 
 	bool create(int usage,int access,TextureFormat::ptr textureFormat);
 	void destroy();
@@ -69,7 +67,6 @@ protected:
 	bool createViews(int dimension,int pixelFormat,int level);
 
 	D3D10RenderDevice *mDevice;
-	BufferDestroyedListener *mListener;
 	D3D10Texture::ptr mTexture;
 	ID3D10Resource *mD3DTexture;
 	ID3D10RenderTargetView *mD3DRenderTargetView;

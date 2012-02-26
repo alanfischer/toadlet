@@ -34,7 +34,7 @@ namespace tadpole{
 
 class TOADLET_API ShadowMappedSceneRenderer:public SceneRenderer{
 public:
-	TOADLET_SHARED_POINTERS(ShadowMappedSceneRenderer);
+	TOADLET_SPTR(ShadowMappedSceneRenderer);
 
 	ShadowMappedSceneRenderer(Scene *scene);
 	virtual ~ShadowMappedSceneRenderer();

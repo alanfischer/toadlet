@@ -35,7 +35,7 @@ namespace handler{
 
 class TOADLET_API TPKGHandler:public ResourceStreamer{
 public:
-	TOADLET_SHARED_POINTERS(TPKGHandler);
+	TOADLET_SPTR(TPKGHandler);
 
 	TPKGHandler(){}
 

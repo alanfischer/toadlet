@@ -41,7 +41,7 @@ namespace pad{
 
 class TOADLET_API Application{
 public:
-	TOADLET_SHARED_POINTERS(Application);
+	TOADLET_SPTR(Application);
 
 	enum Key{
 		Key_ENTER=10,

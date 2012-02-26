@@ -27,7 +27,7 @@
 #define TOADLET_EGG_WIN32DYNAMICLIBRARY_H
 
 #include <toadlet/egg/String.h>
-#include <toadlet/egg/WeakPointer.h>
+#include <toadlet/egg/SharedPointer.h>
 #ifndef WIN32_LEAN_AND_MEAN
 #	define WIN32_LEAN_AND_MEAN 1
 #endif
@@ -38,7 +38,7 @@ namespace egg{
 
 class TOADLET_API Win32DynamicLibrary{
 public:
-	TOADLET_SHARED_POINTERS(Win32DynamicLibrary);
+	TOADLET_SPTR(Win32DynamicLibrary);
 
 	Win32DynamicLibrary();
 	~Win32DynamicLibrary();
