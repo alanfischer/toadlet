@@ -34,7 +34,6 @@ set (PEEPER_HEADERS
 	BackableTexture.h
 	BlendState.h
 	Buffer.h
-	BufferDestroyedListener.h
 	VariableBuffer.h
 	VariableBufferFormat.h
 	DepthState.h
@@ -52,12 +51,10 @@ set (PEEPER_HEADERS
 	RenderDevice.h
 	RenderCaps.h
 	RenderState.h
-	RenderStateDestroyedListener.h
 	RenderTarget.h
 	SamplerState.h
 	Shader.h
 	ShaderState.h
-	ShaderStateDestroyedListener.h
 	Texture.h
 	TextureFormat.h
 	TextureFormatConversion.h
