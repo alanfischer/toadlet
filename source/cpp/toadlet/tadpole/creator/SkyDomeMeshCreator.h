@@ -33,9 +33,9 @@ namespace toadlet{
 namespace tadpole{
 namespace creator{
 
-class TOADLET_API SkyDomeMeshCreator:public ResourceCreator{
+class TOADLET_API SkyDomeMeshCreator:protected Object,public ResourceCreator{
 public:
-	TOADLET_SPTR(SkyDomeMeshCreator);
+	TOADLET_OBJECT(SkyDomeMeshCreator);
 
 	SkyDomeMeshCreator(Engine *engine){
 		mEngine=engine;

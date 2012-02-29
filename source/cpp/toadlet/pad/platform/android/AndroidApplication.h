@@ -142,9 +142,9 @@ protected:
 
 	WindowRenderTargetFormat::ptr mFormat;
 	Engine *mEngine;
-	RenderTarget *mRenderTarget;
-	RenderDevice *mRenderDevice;
-	AudioDevice *mAudioDevice;
+	RenderTarget::ptr mRenderTarget;
+	RenderDevice::ptr mRenderDevice;
+	AudioDevice::ptr mAudioDevice;
 	Applet *mApplet;
 };
 

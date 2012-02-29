@@ -43,7 +43,7 @@ Node::ptr NodeManager::createNode(NodeResource *resource,Scene *scene){
 }
 
 NodeResource::ptr NodeManager::createNodeResource(Node *node,const String &name){
-	return shared_static_cast<NodeResource>(manage(NodeResource::ptr(new NodeResource(node)),name));
+	return shared_static_cast<NodeResource>(manage(new NodeResource(node),name));
 }
 
 }

@@ -50,7 +50,6 @@ bool WGLPBufferRenderTarget::available(GLRenderDevice *renderDevice){
 
 WGLPBufferRenderTarget::WGLPBufferRenderTarget(GLRenderDevice *renderDevice):WGLRenderTarget(),
 	mDevice(NULL),
-	mListener(NULL),
 	mCopy(false),
 	mTexture(NULL),
 	mPBuffer(NULL),
@@ -78,11 +77,8 @@ bool WGLPBufferRenderTarget::create(){
 
 void WGLPBufferRenderTarget::destroy(){
 	destroyBuffer();
-
-	if(mListener!=NULL){
-		mListener->renderTargetDestroyed((PixelBufferRenderTarget*)this);
-		mListener=NULL;
-	}
+	
+	BaseResource::destroy();
 }
 
 bool WGLPBufferRenderTarget::activate(){

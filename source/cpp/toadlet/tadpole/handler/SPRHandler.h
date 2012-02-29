@@ -34,11 +34,11 @@ namespace toadlet{
 namespace tadpole{
 namespace handler{
 
-class TOADLET_API SPRHandler:public ResourceStreamer{
+class TOADLET_API SPRHandler:protected Object,public ResourceStreamer{
 public:
-	TOADLET_SPTR(SPRHandler);
+	TOADLET_OBJECT(SPRHandler);
 
-	SPRHandler(Engine *engine):mHandler(engine){}
+	SPRHandler(Engine *engine):Object(),mHandler(engine){}
 
 	Resource::ptr load(Stream::ptr stream,ResourceData *data,ProgressListener *listener){
 		studio::SpriteModel::ptr sprite=shared_static_cast<studio::SpriteModel>(mHandler.load(stream,NULL,NULL));

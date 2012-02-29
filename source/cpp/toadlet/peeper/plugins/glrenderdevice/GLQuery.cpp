@@ -67,6 +67,8 @@ void GLQuery::destroy(){
 		// Check this only if we had a handle, to eliminate errors at shutdown
 		TOADLET_CHECK_GLERROR("GLQuery::destroy");
 	}
+
+	BaseResource::destroy();
 }
 
 void GLQuery::beginQuery(){

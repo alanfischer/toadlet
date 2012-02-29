@@ -103,12 +103,12 @@ protected:
 	virtual void preEngineCreate(){}
 	virtual void postEngineCreate(){}
 
-	virtual RenderTarget *makeRenderTarget(const String &plugin);
-	virtual RenderDevice *makeRenderDevice(const String &plugin);
+	virtual RenderTarget::ptr makeRenderTarget(const String &plugin);
+	virtual RenderDevice::ptr makeRenderDevice(const String &plugin);
 	virtual bool createContextAndRenderDevice(const String &plugin);
 	virtual bool destroyRenderDeviceAndContext();
 
-	virtual AudioDevice *makeAudioDevice(const String &plugin);
+	virtual AudioDevice::ptr makeAudioDevice(const String &plugin);
 	virtual bool createAudioDevice(const String &plugin);
 	virtual bool destroyAudioDevice();
 

@@ -46,14 +46,13 @@ class MMAudioBuffer;
 // Whichever one you create second will be the useable device.
 class TOADLET_API MMAudioDevice:protected Object,public AudioDevice{
 public:
+	TOADLET_OBJECT(MMAudioDevice);
+
 	// Options
 	const static int Option_BUFFER_FADE_TIME=1;
 	
 	MMAudioDevice();
 	virtual ~MMAudioDevice();
-
-	int retain(){return Object::retain();}
-	int release(){return Object::release();}
 
 	bool create(int *options);
 	void destroy();

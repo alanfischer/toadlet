@@ -35,8 +35,10 @@ namespace tadpole{
 namespace handler{
 
 /// @brief  A lighter weight texture handling class for the Win32 platform
-class TOADLET_API Win32TextureHandler:public ResourceStreamer{
+class TOADLET_API Win32TextureHandler:protected Object,public ResourceStreamer{
 public:
+	TOADLET_OBJECT(Win32TextureHandler);
+
 	Win32TextureHandler(TextureManager *textureManager);
 	virtual ~Win32TextureHandler();
 	bool valid();

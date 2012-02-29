@@ -34,9 +34,9 @@ namespace toadlet{
 namespace tadpole{
 namespace creator{
 
-class TOADLET_API NormalizationTextureCreator:public ResourceCreator{
+class TOADLET_API NormalizationTextureCreator:protected Object,public ResourceCreator{
 public:
-	TOADLET_SPTR(NormalizationTextureCreator);
+	TOADLET_OBJECT(NormalizationTextureCreator);
 
 	NormalizationTextureCreator(Engine *engine){
 		mEngine=engine;

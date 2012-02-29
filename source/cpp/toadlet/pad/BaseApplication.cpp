@@ -201,8 +201,8 @@ void BaseApplication::setAudioDeviceOptions(int *options,int length){
 	memcpy(mAudioDeviceOptions,options,length*sizeof(int));
 }
 
-RenderTarget *BaseApplication::makeRenderTarget(const String &plugin){
-	RenderTarget *target=NULL;
+RenderTarget::ptr BaseApplication::makeRenderTarget(const String &plugin){
+	RenderTarget::ptr target;
 
 	Map<String,RenderDevicePlugin>::iterator it=mRenderDevicePlugins.find(plugin);
 	if(it!=mRenderDevicePlugins.end()){
@@ -211,21 +211,20 @@ RenderTarget *BaseApplication::makeRenderTarget(const String &plugin){
 		TOADLET_CATCH(const Exception &){target=NULL;}
 	}
 	if(target!=NULL && target->isValid()==false){
-		delete target;
 		target=NULL;
 	}
 	return target;
 }
 
-RenderDevice *BaseApplication::makeRenderDevice(const String &plugin){
-	RenderDevice *renderDevice=NULL;
+RenderDevice::ptr BaseApplication::makeRenderDevice(const String &plugin){
+	RenderDevice::ptr device;
 	Map<String,RenderDevicePlugin>::iterator it=mRenderDevicePlugins.find(plugin);
 	if(it!=mRenderDevicePlugins.end()){
 		TOADLET_TRY
-			renderDevice=it->second.createRenderDevice();
-		TOADLET_CATCH(const Exception &){renderDevice=NULL;}
+			device=it->second.createRenderDevice();
+		TOADLET_CATCH(const Exception &){device=NULL;}
 	}
-	return renderDevice;
+	return device;
 }
 
 bool BaseApplication::createContextAndRenderDevice(const String &plugin){
@@ -284,15 +283,15 @@ bool BaseApplication::destroyRenderDeviceAndContext(){
 	return true;
 }
 
-AudioDevice *BaseApplication::makeAudioDevice(const String &plugin){
-	AudioDevice *audioDevice=NULL;
+AudioDevice::ptr BaseApplication::makeAudioDevice(const String &plugin){
+	AudioDevice::ptr device;
 	Map<String,AudioDevicePlugin>::iterator it=mAudioDevicePlugins.find(plugin);
 	if(it!=mAudioDevicePlugins.end()){
 		TOADLET_TRY
-			audioDevice=it->second.createAudioDevice();
-		TOADLET_CATCH(const Exception &){audioDevice=NULL;}
+			device=it->second.createAudioDevice();
+		TOADLET_CATCH(const Exception &){device=NULL;}
 	}
-	return audioDevice;
+	return device;
 }
 
 bool BaseApplication::createAudioDevice(const String &plugin){

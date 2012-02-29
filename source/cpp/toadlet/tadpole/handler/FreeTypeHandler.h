@@ -43,9 +43,9 @@ namespace toadlet{
 namespace tadpole{
 namespace handler{
 
-class FreeTypeHandler:public ResourceStreamer{
+class FreeTypeHandler:protected Object,public ResourceStreamer{
 public:
-	TOADLET_SHARED_POINTERS(FreeTypeHandler);
+	TOADLET_OBJECT(FreeTypeHandler);
 
 	FreeTypeHandler(TextureManager *textureManager);
 	virtual ~FreeTypeHandler();

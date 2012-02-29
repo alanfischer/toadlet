@@ -36,7 +36,6 @@ namespace peeper{
 GLSLShaderState::GLSLShaderState(GLRenderDevice *renderDevice):
 	mDevice(NULL),
 
-	mListener(NULL),
 	mHandle(0),
 	mNeedsLink(false)
 	//mShaders
@@ -77,10 +76,7 @@ void GLSLShaderState::destroy(){
 	}
 	mLayouts.clear();
 
-	if(mListener!=NULL){
-		mListener->shaderStateDestroyed(this);
-		mListener=NULL;
-	}
+	BaseResource::destroy();
 }
 
 void GLSLShaderState::setShader(Shader::ShaderType type,Shader::ptr shader){

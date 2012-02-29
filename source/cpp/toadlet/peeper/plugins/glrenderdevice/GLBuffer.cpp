@@ -35,10 +35,9 @@
 namespace toadlet{
 namespace peeper{
 
-GLBuffer::GLBuffer(GLRenderDevice *renderDevice):
+GLBuffer::GLBuffer(GLRenderDevice *renderDevice):BaseResource(),
 	mDevice(NULL),
 
-	mListener(NULL),
 	mUsage(0),
 	mAccess(0),
 	mDataSize(0),
@@ -177,18 +176,19 @@ void GLBuffer::destroy(){
 
 	mElementOffsets.clear();
 
+	// Don't call BaseResource::destroy()
 	if(mListener!=NULL){
 		if(mIndexFormat>0){
-			mListener->bufferDestroyed((IndexBuffer*)this);
+			mListener->resourceDestroyed((IndexBuffer*)this);
 		}
 		else if(mVertexFormat!=NULL){
-			mListener->bufferDestroyed((VertexBuffer*)this);
+			mListener->resourceDestroyed((VertexBuffer*)this);
 		}
 		else if(mTextureFormat!=NULL){
-			mListener->bufferDestroyed((PixelBuffer*)this);
+			mListener->resourceDestroyed((PixelBuffer*)this);
 		}
 		else{
-			mListener->bufferDestroyed((VariableBuffer*)this);
+			mListener->resourceDestroyed((VariableBuffer*)this);
 		}
 		mListener=NULL;
 	}

@@ -36,11 +36,10 @@ namespace flick{
 
 class Win32JoyDevice:protected Object,public InputDevice{
 public:
+	TOADLET_OBJECT(Win32JoyDevice);
+
 	Win32JoyDevice();
 	virtual ~Win32JoyDevice();
-
-	int retain(){return Object::retain();}
-	int release(){return Object::release();}
 
 	bool create();
 	void destroy();

@@ -27,6 +27,7 @@
 #define TOADLET_PEEPER_GLQUERY_H
 
 #include "GLIncludes.h"
+#include <toadlet/egg/BaseResource.h>
 #include <toadlet/peeper/Query.h>
 
 #if defined(TOADLET_HAS_GLQUERY)
@@ -36,8 +37,10 @@ namespace peeper{
 
 class GLRenderDevice;
 
-class GLQuery:public Query{
+class GLQuery:public BaseResource,public Query{
 public:
+	TOADLET_RESOURCE(GLQuery,Query);
+
 	GLQuery(GLRenderDevice *renderDevice);
 	virtual ~GLQuery();
 

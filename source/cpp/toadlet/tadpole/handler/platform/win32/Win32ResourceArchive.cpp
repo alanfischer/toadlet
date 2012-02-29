@@ -60,6 +60,8 @@ Win32ResourceArchive::~Win32ResourceArchive(){
 
 void Win32ResourceArchive::destroy(){
 	mModule=0;
+
+	BaseResource::destroy();
 }
 
 bool Win32ResourceArchive::open(void *module){

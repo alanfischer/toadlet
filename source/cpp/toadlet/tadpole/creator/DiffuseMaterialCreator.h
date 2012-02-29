@@ -34,9 +34,9 @@ namespace toadlet{
 namespace tadpole{
 namespace creator{
 
-class TOADLET_API DiffuseMaterialCreator:public ResourceCreator{
+class TOADLET_API DiffuseMaterialCreator:protected Object,public ResourceCreator{
 public:
-	TOADLET_SPTR(DiffuseMaterialCreator);
+	TOADLET_OBJECT(DiffuseMaterialCreator);
 
 	DiffuseMaterialCreator(Engine *engine);
 

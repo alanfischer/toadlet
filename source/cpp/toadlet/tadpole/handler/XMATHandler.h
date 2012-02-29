@@ -36,9 +36,9 @@ namespace toadlet{
 namespace tadpole{
 namespace handler{
 
-class TOADLET_API XMATHandler:public ResourceStreamer{
+class TOADLET_API XMATHandler:protected Object,public ResourceStreamer{
 public:
-	TOADLET_SHARED_POINTERS(XMATHandler);
+	TOADLET_OBJECT(XMATHandler);
 
 	XMATHandler(Engine *engine);
 

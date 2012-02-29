@@ -44,9 +44,8 @@ bool GLFBORenderTarget::available(GLRenderDevice *renderDevice){
 	#endif
 }
 
-GLFBORenderTarget::GLFBORenderTarget(GLRenderDevice *renderDevice):GLRenderTarget(),
+GLFBORenderTarget::GLFBORenderTarget(GLRenderDevice *renderDevice):BaseResource(),
 	mDevice(NULL),
-	mListener(NULL),
 	mWidth(0),
 	mHeight(0),
 	mHandle(0),
@@ -93,10 +92,7 @@ void GLFBORenderTarget::destroy(){
 		TOADLET_CHECK_GLERROR("GLFBORenderTarget::destroy");
 	}
 
-	if(mListener!=NULL){
-		mListener->renderTargetDestroyed((PixelBufferRenderTarget*)this);
-		mListener=NULL;
-	}
+	BaseResource::destroy();
 }
 
 bool GLFBORenderTarget::activate(){

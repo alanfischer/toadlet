@@ -27,6 +27,7 @@
 #define TOADLET_PEEPER_WGLWINDOWRENDERTARGET_H
 
 #include "WGLRenderTarget.h"
+#include <toadlet/egg/BaseResource.h>
 #include <toadlet/peeper/WindowRenderTargetFormat.h>
 
 namespace toadlet{
@@ -34,12 +35,14 @@ namespace peeper{
 
 TOADLET_C_API RenderTarget *new_WGLWindowRenderTarget(void *display,void *window,WindowRenderTargetFormat *format);
 
-class TOADLET_API WGLWindowRenderTarget:public WGLRenderTarget{
+class TOADLET_API WGLWindowRenderTarget:protected BaseResource,public WGLRenderTarget{
 public:
+	TOADLET_RESOURCE(WGLWindowRenderTarget,WGLRenderTarget);
+
 	WGLWindowRenderTarget();
 	WGLWindowRenderTarget(HWND wnd,WindowRenderTargetFormat *format);
 	virtual ~WGLWindowRenderTarget();
-	void destroy(){destroyContext();}
+	void destroy(){destroyContext();BaseResource::destroy();}
 
 	RenderTarget *getRootRenderTarget(){return (GLRenderTarget*)this;}
 

@@ -38,8 +38,10 @@ namespace peeper{
 class GLRenderDevice;
 
 /// @todo: Make the D3D9PixelBufferRenderTarget & the GLFBORenderTarget more strict about sizes
-class TOADLET_API GLFBORenderTarget:public GLRenderTarget,public PixelBufferRenderTarget{
+class TOADLET_API GLFBORenderTarget:public BaseResource,public GLRenderTarget,public PixelBufferRenderTarget{
 public:
+	TOADLET_RESOURCE(GLFBORenderTarget,PixelBufferRenderTarget);
+
 	static bool available(GLRenderDevice *renderDevice);
 
 	GLFBORenderTarget(GLRenderDevice *renderDevice);
@@ -47,8 +49,6 @@ public:
 
 	RenderTarget *getRootRenderTarget(){return (GLRenderTarget*)this;}
 	PixelBufferRenderTarget *getRootPixelBufferRenderTarget(){return this;}
-
-	void setRenderTargetDestroyedListener(RenderTargetDestroyedListener *listener){mListener=listener;}
 
 	bool create();
 	void destroy();
@@ -79,7 +79,6 @@ public:
 
 protected:
 	GLRenderDevice *mDevice;
-	RenderTargetDestroyedListener *mListener;
 	int mWidth;
 	int mHeight;
 	GLuint mHandle;

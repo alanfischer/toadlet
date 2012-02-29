@@ -297,8 +297,8 @@ Resource::ptr ResourceManager::findFromFile(const String &name,ResourceData *dat
 
 				Resource::ptr resource;
 				TOADLET_TRY
-					resource=Resource::ptr(streamer->load(stream,data,NULL));
-				TOADLET_CATCH(const Exception &){resource=Resource::ptr();}
+					resource=streamer->load(stream,data,NULL);
+				TOADLET_CATCH(const Exception &){resource=NULL;}
 
 				// We do not close the stream, since the Streamer may hold on to it.  Instead we let it close itself
 
@@ -314,7 +314,7 @@ Resource::ptr ResourceManager::findFromFile(const String &name,ResourceData *dat
 			}
 		}
 		else{
-			return Resource::ptr(unableToFindStreamer(name,data));
+			return unableToFindStreamer(name,data);
 		}
 	}
 	else{

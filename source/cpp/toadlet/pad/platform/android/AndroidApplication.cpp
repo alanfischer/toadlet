@@ -392,7 +392,7 @@ void AndroidApplication::stepEventLoop(){
 void AndroidApplication::windowCreated(ANativeWindow *window){
 	mWindow=window;
 
-	RenderTarget *target=NULL;
+	RenderTarget::ptr target;
 	TOADLET_TRY
 		int nativeFormat=ANativeWindow_getFormat(window);
 		if(nativeFormat==WINDOW_FORMAT_RGB_565){
@@ -405,16 +405,14 @@ void AndroidApplication::windowCreated(ANativeWindow *window){
 	TOADLET_CATCH(const Exception &){target=NULL;}
 	
 	if(target!=NULL && target->isValid()==false){
-		delete target;
 		target=NULL;
 	}
 	mRenderTarget=target;
 
-	RenderDevice *device=NULL;
+	RenderDevice::ptr device;
 	if(target!=NULL){
 		device=new_GLRenderDevice();
 		if(device->create(target,NULL)==false){
-			delete device;
 			device=NULL;
 		}
 	}
@@ -430,13 +428,11 @@ void AndroidApplication::windowDestroyed(ANativeWindow *window){
 	if(mRenderDevice!=NULL){
 		mEngine->setRenderDevice(NULL);
 		mRenderDevice->destroy();
-		delete mRenderDevice;
 		mRenderDevice=NULL;
 	}
 
 	if(mRenderTarget!=NULL){
 		mRenderTarget->destroy();
-		delete mRenderTarget;
 		mRenderTarget=NULL;
 	}
 

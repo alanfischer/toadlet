@@ -50,8 +50,10 @@ class GLSLShaderState;
 class GLTexture;
 class GLVertexFormat;
 
-class TOADLET_API GLRenderDevice:public RenderDevice{
+class TOADLET_API GLRenderDevice:protected Object,public RenderDevice{
 public:
+	TOADLET_OBJECT(GLRenderDevice);
+
 	int gl_version;
 
 	// Options

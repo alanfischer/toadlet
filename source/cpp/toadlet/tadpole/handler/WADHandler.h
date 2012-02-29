@@ -33,9 +33,9 @@ namespace toadlet{
 namespace tadpole{
 namespace handler{
 
-class TOADLET_API WADHandler:public ResourceStreamer{
+class TOADLET_API WADHandler:protected Object,public ResourceStreamer{
 public:
-	TOADLET_SPTR(WADHandler);
+	TOADLET_OBJECT(WADHandler);
 
 	WADHandler(TextureManager *textureManager){
 		mTextureManager=textureManager;

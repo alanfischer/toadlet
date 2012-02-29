@@ -37,16 +37,14 @@ namespace peeper{
 
 class GLVertexFormat;
 
-class GLSLShaderState:public ShaderState{
+class GLSLShaderState:protected BaseResource,public ShaderState{
 public:
-	TOADLET_SHARED_POINTERS(GLSLShaderState);
+	TOADLET_RESOURCE(GLSLShaderState,ShaderState);
 
 	GLSLShaderState(GLRenderDevice *renderDevice);
 	virtual ~GLSLShaderState();
 
 	ShaderState *getRootShaderState(){return this;}
-
-	void setShaderStateDestroyedListener(ShaderStateDestroyedListener *listener){mListener=listener;}
 
 	bool create();
 	void destroy();
@@ -70,7 +68,6 @@ protected:
 
 	GLRenderDevice *mDevice;
 
-	ShaderStateDestroyedListener *mListener;
 	GLuint mHandle;
 	bool mNeedsLink;
 	Collection<Shader::ptr> mShaders;

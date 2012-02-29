@@ -34,9 +34,9 @@ namespace toadlet{
 namespace tadpole{
 namespace creator{
 
-class TOADLET_API GeoSphereMeshCreator:public ResourceCreator{
+class TOADLET_API GeoSphereMeshCreator:protected Object,public ResourceCreator{
 public:
-	TOADLET_SPTR(GeoSphereMeshCreator);
+	TOADLET_OBJECT(GeoSphereMeshCreator);
 
 	GeoSphereMeshCreator(Engine *engine){
 		mEngine=engine;

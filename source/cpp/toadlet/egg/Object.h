@@ -55,5 +55,10 @@ protected:
 }
 }
 
+#define TOADLET_OBJECT(Class)\
+	TOADLET_IPTR(Class); \
+	virtual int retain(){return toadlet::egg::Object::retain();} \
+	virtual int release(){return toadlet::egg::Object::release();}
+
 #endif
 

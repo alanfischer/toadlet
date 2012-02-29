@@ -36,8 +36,10 @@ namespace tadpole{
 namespace handler{
 
 /// @brief  A lighter weight font handling class for the Win32 platform
-class TOADLET_API Win32FontHandler:public ResourceStreamer{
+class TOADLET_API Win32FontHandler:protected Object,public ResourceStreamer{
 public:
+	TOADLET_OBJECT(Win32FontHandler);
+
 	Win32FontHandler(TextureManager *textureManager);
 	virtual ~Win32FontHandler();
 	bool valid();

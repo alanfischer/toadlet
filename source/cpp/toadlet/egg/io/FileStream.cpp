@@ -53,7 +53,7 @@ FileStream::~FileStream(){
 }
 
 void FileStream::close(){
-	if(mFile && mAutoClose){
+	if(mFile!=NULL && mAutoClose){
 		fclose(mFile);
 		mFile=NULL;
 	} 

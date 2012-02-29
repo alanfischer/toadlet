@@ -27,6 +27,7 @@
 #define TOADLET_PEEPER_GLRENDERSTATE_H
 
 #include "GLIncludes.h"
+#include <toadlet/egg/BaseResource.h>
 #include <toadlet/peeper/RenderState.h>
 
 namespace toadlet{
@@ -34,14 +35,14 @@ namespace peeper{
 
 class GLRenderDevice;
 
-class TOADLET_API GLRenderState:public RenderState{
+class TOADLET_API GLRenderState:protected BaseResource,public RenderState{
 public:
+	TOADLET_RESOURCE(GLRenderState,RenderState);
+
 	GLRenderState(GLRenderDevice *renderDevice);
 	virtual ~GLRenderState();
 
 	RenderState *getRootRenderState(){return this;}
-
-	void setRenderStateDestroyedListener(RenderStateDestroyedListener *listener){mListener=listener;}
 
 	bool create(){return true;}
 
@@ -94,7 +95,6 @@ public:
 	bool getTextureState(Shader::ShaderType type,int i,TextureState &state) const{if(mTextureStates.size()<=i || mTextureStates[i]==NULL){return false;}else{state.set(*mTextureStates[i]);return true;}}
 
 protected:
-	RenderStateDestroyedListener *mListener;
 	BlendState *mBlendState;
 	DepthState *mDepthState;
 	RasterizerState *mRasterizerState;

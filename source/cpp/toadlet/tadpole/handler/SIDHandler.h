@@ -33,9 +33,9 @@ namespace toadlet{
 namespace tadpole{
 namespace handler{
 
-class TOADLET_API SIDHandler:public AudioBufferHandler{
+class TOADLET_API SIDHandler:protected Object,public AudioBufferHandler{
 public:
-	TOADLET_SHARED_POINTERS(SIDHandler);
+	TOADLET_OBJECT(SIDHandler);
 
 	SIDHandler(AudioBufferManager *audioBufferManager):AudioBufferHandler(audioBufferManager){}
 

@@ -38,9 +38,9 @@ namespace toadlet{
 namespace tadpole{
 namespace handler{
 
-class TOADLET_API TMSHHandler:public ResourceStreamer{
+class TOADLET_API TMSHHandler:protected Object,public ResourceStreamer{
 public:
-	TOADLET_SPTR(TMSHHandler);
+	TOADLET_OBJECT(TMSHHandler);
 
 	const static int VERSION=0x10000;
 	const static int TMSH=1414353736; // "TMSH"

@@ -33,9 +33,9 @@
 namespace toadlet{
 namespace tadpole{
 
-class ResourceCreator{
+class ResourceCreator:public Interface{
 public:
-	TOADLET_SPTR(ResourceCreator);
+	TOADLET_IPTR(ResourceCreator);
 
 	virtual ~ResourceCreator(){}
 

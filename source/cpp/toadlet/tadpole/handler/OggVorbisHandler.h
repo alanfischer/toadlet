@@ -33,9 +33,9 @@ namespace toadlet{
 namespace tadpole{
 namespace handler{
 
-class TOADLET_API OggVorbisHandler:public AudioBufferHandler{
+class TOADLET_API OggVorbisHandler:protected Object,public AudioBufferHandler{
 public:
-	TOADLET_SHARED_POINTERS(OggVorbisHandler);
+	TOADLET_OBJECT(OggVorbisHandler);
 
 	OggVorbisHandler(AudioBufferManager *audioBufferManager):AudioBufferHandler(audioBufferManager){}
 

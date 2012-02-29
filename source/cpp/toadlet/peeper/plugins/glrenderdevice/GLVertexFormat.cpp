@@ -33,7 +33,6 @@ namespace peeper{
 GLVertexFormat::GLVertexFormat(GLRenderDevice *renderDevice):
 	mDevice(NULL),
 
-	mListener(NULL),
 	//mSemantics,
 	//mNames,
 	//mIndexes,
@@ -70,9 +69,7 @@ void GLVertexFormat::destroy(){
 	mGLDataTypes.clear();
 	mGLElementCounts.clear();
 
-	if(mListener!=NULL){
-		mListener->vertexFormatDestroyed(this);
-	}
+	BaseResource::destroy();
 
 	if(mDevice!=NULL){
 		mDevice->vertexFormatDestroyed(this);

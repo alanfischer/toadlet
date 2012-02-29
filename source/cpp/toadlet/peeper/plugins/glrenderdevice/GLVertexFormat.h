@@ -26,6 +26,7 @@
 #ifndef TOADLET_PEEPER_GLVERTEXFORMAT_H
 #define TOADLET_PEEPER_GLVERTEXFORMAT_H
 
+#include <toadlet/egg/BaseResource.h>
 #include <toadlet/peeper/VertexFormat.h>
 #include "GLIncludes.h"
 
@@ -34,14 +35,14 @@ namespace peeper{
 
 class GLRenderDevice;
 
-class TOADLET_API GLVertexFormat:public VertexFormat{
+class TOADLET_API GLVertexFormat:protected BaseResource,public VertexFormat{
 public:
+	TOADLET_RESOURCE(GLVertexFormat,VertexFormat);
+
 	GLVertexFormat(GLRenderDevice *renderDevice);
 	virtual ~GLVertexFormat();
 
 	VertexFormat *getRootVertexFormat(){return this;}
-
-	void setVertexFormatDestroyedListener(VertexFormatDestroyedListener *listener){mListener=listener;}
 
 	bool create();
 	void destroy();
@@ -62,7 +63,6 @@ public:
 protected:
 	GLRenderDevice *mDevice;
 
-	VertexFormatDestroyedListener *mListener;
 	Collection<int> mSemantics;
 	Collection<String> mNames;
 	Collection<int> mIndexes;

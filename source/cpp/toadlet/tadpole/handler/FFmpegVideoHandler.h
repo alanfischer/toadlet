@@ -27,13 +27,13 @@ namespace handler{
 class FFmpegAudioStream;
 class FFmpegVideoStream;
 
-class FFmpegController:public VideoController{
+class FFmpegController:protected Object,public VideoController{
 public:
-	TOADLET_SHARED_POINTERS(FFmpegController);
+	TOADLET_OBJECT(FFmpegController);
 
 	class PacketQueue{
 	public:
-		TOADLET_SHARED_POINTERS(PacketQueue);
+		TOADLET_SPTR(PacketQueue);
 
 		enum{
 			QueueResult_ERROR=-1,
@@ -135,7 +135,7 @@ protected:
 
 class FFmpegAudioStream:public AudioStream{
 public:
-	TOADLET_SHARED_POINTERS(FFmpegAudioStream);
+	TOADLET_SPTR(FFmpegAudioStream);
 
 	FFmpegAudioStream(FFmpegController *controller,FFmpegController::StreamData *streamData);
 	virtual ~FFmpegAudioStream();
@@ -169,7 +169,7 @@ protected:
 
 class FFmpegVideoStream{
 public:
-	TOADLET_SHARED_POINTERS(FFmpegVideoStream);
+	TOADLET_SPTR(FFmpegVideoStream);
 
 	FFmpegVideoStream(FFmpegController *controller,FFmpegController::StreamData *streamData,Texture::ptr texture);
 	virtual ~FFmpegVideoStream();
@@ -192,9 +192,9 @@ protected:
 	friend class FFmpegController;
 };
 
-class FFmpegVideoHandler:public VideoHandler{
+class FFmpegVideoHandler:protected Object,public VideoHandler{
 public:
-	TOADLET_SHARED_POINTERS(FFmpegVideoHandler);
+	TOADLET_OBJECT(FFmpegVideoHandler);
 
 	FFmpegVideoHandler(Engine *engine);
 	virtual ~FFmpegVideoHandler();

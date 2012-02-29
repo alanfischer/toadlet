@@ -35,9 +35,9 @@ namespace toadlet{
 namespace tadpole{
 namespace handler{
 
-class TOADLET_API XMSHHandler:public ResourceStreamer{
+class TOADLET_API XMSHHandler:protected Object,public ResourceStreamer{
 public:
-	TOADLET_SHARED_POINTERS(XMSHHandler);
+	TOADLET_OBJECT(XMSHHandler);
 
 	XMSHHandler(Engine *engine);
 

@@ -34,9 +34,9 @@ namespace toadlet{
 namespace tadpole{
 namespace creator{
 
-class TOADLET_API SkyBoxMaterialCreator:public ResourceCreator{
+class TOADLET_API SkyBoxMaterialCreator:protected Object,public ResourceCreator{
 public:
-	TOADLET_SPTR(SkyBoxMaterialCreator);
+	TOADLET_OBJECT(SkyBoxMaterialCreator);
 
 	SkyBoxMaterialCreator(Engine *engine);
 

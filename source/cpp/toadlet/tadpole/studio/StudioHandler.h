@@ -34,9 +34,9 @@ namespace toadlet{
 namespace tadpole{
 namespace studio{
 
-class TOADLET_API StudioHandler:public ResourceStreamer{
+class TOADLET_API StudioHandler:protected Object,public ResourceStreamer{
 public:
-	TOADLET_SPTR(StudioHandler);
+	TOADLET_OBJECT(StudioHandler);
 
 	StudioHandler(Engine *engine);
 	virtual ~StudioHandler();

@@ -34,9 +34,9 @@ namespace toadlet{
 namespace tadpole{
 namespace bsp{
 
-class BSP30Handler:public ResourceStreamer{
+class BSP30Handler:protected Object,public ResourceStreamer{
 public:
-	TOADLET_SPTR(BSP30Handler);
+	TOADLET_OBJECT(BSP30Handler);
 
 	BSP30Handler(Engine *engine);
 	virtual ~BSP30Handler();

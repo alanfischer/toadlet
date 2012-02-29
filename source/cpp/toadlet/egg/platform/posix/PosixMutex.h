@@ -37,7 +37,7 @@ class PosixEvent;
 
 class PosixMutex{
 public:
-	TOADLET_SHARED_POINTERS(PosixMutex);
+	TOADLET_SPTR(PosixMutex);
 
 	PosixMutex();
 	~PosixMutex();
