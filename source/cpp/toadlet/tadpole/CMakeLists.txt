@@ -260,6 +260,7 @@ set (TADPOLE_CREATOR_HEADERS
 	creator/AABoxMeshCreator.h
 	creator/GridMeshCreator.h
 	creator/GeoSphereMeshCreator.h
+	creator/NormalizationTextureCreator.h
 	creator/SkyBoxMeshCreator.h
 	creator/SkyDomeMeshCreator.h
 	creator/TorusMeshCreator.h

@@ -38,8 +38,6 @@ class GLBuffer;
 
 class GLPixelBuffer:public PixelBuffer{
 public:
-	TOADLET_SHARED_POINTERS(GLPixelBuffer);
-
 	virtual ~GLPixelBuffer(){}
 
 	virtual GLTextureMipPixelBuffer *castToGLTextureMipPixelBuffer()=0;

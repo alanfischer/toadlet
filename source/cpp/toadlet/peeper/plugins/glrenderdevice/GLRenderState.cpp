@@ -29,7 +29,6 @@ namespace toadlet{
 namespace peeper{
 
 GLRenderState::GLRenderState(GLRenderDevice *renderDevice):
-	mListener(NULL),
 	mBlendState(NULL),
 	mDepthState(NULL),
 	mRasterizerState(NULL),
@@ -78,10 +77,7 @@ void GLRenderState::destroy(){
 	}
 	mTextureStates.clear();
 
-	if(mListener!=NULL){
-		mListener->renderStateDestroyed(this);
-		mListener=NULL;
-	}
+	BaseResource::destroy();
 }
 
 }

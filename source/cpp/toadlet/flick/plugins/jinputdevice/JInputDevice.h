@@ -32,22 +32,25 @@
 namespace toadlet{
 namespace flick{
 
-class TOADLET_API JInputDevice:public InputDevice{
+class TOADLET_API JInputDevice:protected Object,public InputDevice{
 public:
 	JInputDevice(JNIEnv *jenv,jobject jobj);
 	virtual ~JInputDevice();
 
-	virtual bool create();
-	virtual void destroy();
+	int retain(){return Object::retain();}
+	int release(){return Object::release();}
+	
+	bool create();
+	void destroy();
 
-	virtual InputType getType();
-	virtual bool start();
-	virtual void update(int dt);
-	virtual void stop();
+	InputType getType();
+	bool start();
+	void update(int dt);
+	void stop();
 
-	virtual void setListener(InputDeviceListener *listener);
-	virtual void setSampleTime(int dt);
-	virtual void setAlpha(scalar alpha);
+	void setListener(InputDeviceListener *listener);
+	void setSampleTime(int dt);
+	void setAlpha(scalar alpha);
 	
 protected:
 	JNIEnv *env;

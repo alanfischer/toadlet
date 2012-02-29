@@ -28,18 +28,21 @@
 
 #include "GLIncludes.h"
 #include "GLPixelBuffer.h"
+#include <toadlet/egg/BaseResource.h>
+#include <toadlet/egg/Collection.h>
 #include <toadlet/peeper/IndexBuffer.h>
 #include <toadlet/peeper/VertexBuffer.h>
 #include <toadlet/peeper/VariableBuffer.h>
-#include <toadlet/egg/Collection.h>
 
 namespace toadlet{
 namespace peeper{
 
 class GLRenderDevice;
 
-class TOADLET_API GLBuffer:public IndexBuffer,public VertexBuffer,public GLPixelBuffer,public VariableBuffer{
+class TOADLET_API GLBuffer:protected BaseResource,public IndexBuffer,public VertexBuffer,public GLPixelBuffer,public VariableBuffer{
 public:
+	TOADLET_RESOURCE(GLBuffer,BaseResource);
+
 	GLBuffer(GLRenderDevice *renderDevice);
 	virtual ~GLBuffer();
 
@@ -51,8 +54,6 @@ public:
 	GLTextureMipPixelBuffer *castToGLTextureMipPixelBuffer(){return NULL;}
 	GLFBOPixelBuffer *castToGLFBOPixelBuffer(){return NULL;}
 	GLBuffer *castToGLBuffer(){return this;}
-
-	void setBufferDestroyedListener(BufferDestroyedListener *listener){mListener=listener;}
 
 	bool create(int usage,int access,IndexFormat indexFormat,int size);
 	bool create(int usage,int access,VertexFormat::ptr vertexFormat,int size);
@@ -90,7 +91,6 @@ protected:
 
 	GLRenderDevice *mDevice;
 
-	BufferDestroyedListener *mListener;
 	int mUsage;
 	int mAccess;
 	int mDataSize;

@@ -46,11 +46,10 @@ class D3D9Texture;
 
 class D3D9RenderDevice:public Object,public RenderDevice{
 public:
+	TOADLET_OBJECT(D3D9RenderDevice);
+
 	D3D9RenderDevice();
 	virtual ~D3D9RenderDevice();
-
-	int retain(){return Object::retain();}
-	int release(){return Object::release();}
 
 	// Startup/Shutdown
 	bool create(RenderTarget *target,int *options);

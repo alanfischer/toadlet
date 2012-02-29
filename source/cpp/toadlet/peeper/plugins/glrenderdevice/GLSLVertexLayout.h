@@ -39,7 +39,7 @@ class GLSLShaderState;
 
 class TOADLET_API GLSLVertexLayout{
 public:
-	TOADLET_SHARED_POINTERS(GLSLVertexLayout);
+	TOADLET_SPTR(GLSLVertexLayout);
 
 	GLSLVertexLayout(GLRenderDevice *renderDevice);
 	virtual ~GLSLVertexLayout();

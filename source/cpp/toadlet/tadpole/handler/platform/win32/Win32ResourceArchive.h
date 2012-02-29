@@ -35,7 +35,7 @@ namespace toadlet{
 namespace tadpole{
 namespace handler{
 
-class TOADLET_API Win32ResourceArchive:public Archive,public BaseResource{
+class TOADLET_API Win32ResourceArchive:protected BaseResource,public Archive{
 public:
 	TOADLET_RESOURCE(Win32ResourceArchive,Archive);
 

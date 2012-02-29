@@ -34,10 +34,7 @@ namespace tadpole{
 
 class BaseComponent:public Object,public Component{
 public:
-	TOADLET_IPTR(BaseComponent);
-
-	virtual int retain(){return Object::retain();}
-	virtual int release(){return Object::release();}
+	TOADLET_OBJECT(BaseComponent);
 	
 	virtual Node *isNode(){return NULL;}
 	

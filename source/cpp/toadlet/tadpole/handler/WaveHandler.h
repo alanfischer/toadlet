@@ -33,9 +33,9 @@ namespace toadlet{
 namespace tadpole{
 namespace handler{
 
-class TOADLET_API WaveHandler:public AudioBufferHandler{
+class TOADLET_API WaveHandler:protected Object,public AudioBufferHandler{
 public:
-	TOADLET_SPTR(WaveHandler);
+	TOADLET_OBJECT(WaveHandler);
 
 	WaveHandler(AudioBufferManager *audioBufferManager):AudioBufferHandler(audioBufferManager){}
 

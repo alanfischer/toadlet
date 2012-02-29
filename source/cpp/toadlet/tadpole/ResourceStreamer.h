@@ -26,6 +26,7 @@
 #ifndef TOADLET_TADPOLE_RESOURCESTREAMER_H
 #define TOADLET_TADPOLE_RESOURCESTREAMER_H
 
+#include <toadlet/egg/Interface.h>
 #include <toadlet/egg/Resource.h>
 #include <toadlet/egg/io/Stream.h>
 #include <toadlet/tadpole/ResourceData.h>
@@ -34,9 +35,9 @@
 namespace toadlet{
 namespace tadpole{
 
-class ResourceStreamer{
+class ResourceStreamer:public Interface{
 public:
-	TOADLET_SPTR(ResourceStreamer);
+	TOADLET_IPTR(ResourceStreamer);
 
 	virtual ~ResourceStreamer(){}
 

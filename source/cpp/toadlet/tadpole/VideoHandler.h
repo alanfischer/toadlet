@@ -33,9 +33,9 @@
 namespace toadlet{
 namespace tadpole{
 
-class VideoHandler{
+class VideoHandler:public Interface{
 public:
-	TOADLET_SPTR(VideoHandler);
+	TOADLET_IPTR(VideoHandler);
 
 	virtual ~VideoHandler(){}
 

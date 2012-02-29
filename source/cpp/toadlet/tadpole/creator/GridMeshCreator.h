@@ -33,9 +33,9 @@ namespace toadlet{
 namespace tadpole{
 namespace creator{
 
-class TOADLET_API GridMeshCreator:public ResourceCreator{
+class TOADLET_API GridMeshCreator:protected Object,public ResourceCreator{
 public:
-	TOADLET_SPTR(GridMeshCreator);
+	TOADLET_OBJECT(GridMeshCreator);
 
 	GridMeshCreator(Engine *engine){
 		mEngine=engine;

@@ -26,6 +26,7 @@
 #ifndef TOADLET_PEEPER_GLTEXTUREMIPPIXELBUFFER_H
 #define TOADLET_PEEPER_GLTEXTUREMIPPIXELBUFFER_H
 
+#include <toadlet/egg/BaseResource.h>
 #include "GLIncludes.h"
 #include "GLPixelBuffer.h"
 
@@ -35,17 +36,14 @@ namespace peeper{
 class GLTexture;
 class GLRenderDevice;
 
-class TOADLET_API GLTextureMipPixelBuffer:public GLPixelBuffer{
-public:
-	TOADLET_SHARED_POINTERS(GLTextureMipPixelBuffer);
-
+class TOADLET_API GLTextureMipPixelBuffer:protected BaseResource,public GLPixelBuffer{
 protected:
 	GLTextureMipPixelBuffer(GLTexture *texture,GLuint level,GLuint cubeSide);
 
 public:
-	virtual ~GLTextureMipPixelBuffer(){}
+	TOADLET_RESOURCE(GLTextureMipPixelBuffer,GLPixelBuffer);
 
-	void setBufferDestroyedListener(BufferDestroyedListener *listener){}
+	virtual ~GLTextureMipPixelBuffer(){}
 
 	PixelBuffer *getRootPixelBuffer(){return this;}
 
@@ -54,7 +52,7 @@ public:
 	GLBuffer *castToGLBuffer(){return NULL;}
 
 	bool create(int usage,int access,TextureFormat::ptr format){return false;}
-	void destroy(){}
+	void destroy(){BaseResource::destroy();}
 
 	void resetCreate(){}
 	void resetDestroy(){}

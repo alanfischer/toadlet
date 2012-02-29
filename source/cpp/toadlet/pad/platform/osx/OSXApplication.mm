@@ -376,9 +376,8 @@ void OSXApplication::preEngineCreate(){
 
 void OSXApplication::postEngineCreate(){
 #if defined(TOADLET_PLATFORM_IOS)
-	InputDevice *motionDevice=new_IOSMotionDevice();
+	InputDevice::ptr motionDevice=new_IOSMotionDevice();
 	if(motionDevice->create()==false){
-		delete motionDevice;
 		motionDevice=NULL;
 	}
 	else{

@@ -36,10 +36,8 @@ namespace toadlet{
 namespace tadpole{
 namespace handler{
 
-class TOADLET_API GIFHandler:public ResourceStreamer{
+class TOADLET_API GIFHandler:protected Object,public ResourceStreamer{
 public:
-	TOADLET_SHARED_POINTERS(GIFHandler);
-
 	GIFHandler(TextureManager *textureManager){mTextureManager=textureManager;}
 
 	Resource::ptr load(Stream::ptr stream,ResourceData *data,ProgressListener *listener);

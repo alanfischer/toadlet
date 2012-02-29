@@ -35,8 +35,10 @@ namespace peeper{
 
 class GLRenderDevice;
 
-class WGLPBufferRenderTarget:public WGLRenderTarget,public PixelBufferRenderTarget{
+class WGLPBufferRenderTarget:protected BaseResource,public WGLRenderTarget,public PixelBufferRenderTarget{
 public:
+	TOADLET_RESOURCE(WGLPBufferRenderTarget,PixelBufferRenderTarget);
+
 	static bool available(GLRenderDevice *renderDevice);
 
 	WGLPBufferRenderTarget(GLRenderDevice *renderDevice);
@@ -44,8 +46,6 @@ public:
 
 	RenderTarget *getRootRenderTarget(){return (GLRenderTarget*)this;}
 	PixelBufferRenderTarget *getRootPixelBufferRenderTarget(){return this;}
-
-	void setRenderTargetDestroyedListener(RenderTargetDestroyedListener *listener){mListener=listener;}
 
 	bool create();
 	void destroy();
@@ -76,7 +76,6 @@ protected:
 	void unbind();
 
 	GLRenderDevice *mDevice;
-	RenderTargetDestroyedListener *mListener;
 	bool mCopy;
 	GLTexture *mTexture;
 	HPBUFFERARB mPBuffer;

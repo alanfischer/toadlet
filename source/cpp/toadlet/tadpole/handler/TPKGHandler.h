@@ -33,9 +33,9 @@ namespace toadlet{
 namespace tadpole{
 namespace handler{
 
-class TOADLET_API TPKGHandler:public ResourceStreamer{
+class TOADLET_API TPKGHandler:protected Object,public ResourceStreamer{
 public:
-	TOADLET_SPTR(TPKGHandler);
+	TOADLET_OBJECT(TPKGHandler);
 
 	TPKGHandler(){}
 

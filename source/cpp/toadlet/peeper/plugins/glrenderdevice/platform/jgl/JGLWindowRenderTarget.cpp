@@ -34,7 +34,7 @@ TOADLET_C_API RenderTarget *new_JGLWindowRenderTarget(JNIEnv *jenv,jobject jobj)
 	return new JGLWindowRenderTarget(jenv,jobj);
 }
 
-JGLWindowRenderTarget::JGLWindowRenderTarget(JNIEnv *jenv,jobject jobj):GLRenderTarget(),
+JGLWindowRenderTarget::JGLWindowRenderTarget(JNIEnv *jenv,jobject jobj):BaseResource(),
 	env(NULL),
 	obj(NULL)
 {

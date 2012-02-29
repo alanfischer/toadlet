@@ -40,7 +40,7 @@ const int OGGPACKETSIZE=4096;
 
 class TOADLET_API OggVorbisDecoder:public AudioStream{
 public:
-	TOADLET_SHARED_POINTERS(OggVorbisDecoder);
+	TOADLET_SPTR(OggVorbisDecoder);
 
 	OggVorbisDecoder();
 	virtual ~OggVorbisDecoder();

@@ -33,9 +33,9 @@ namespace toadlet{
 namespace tadpole{
 namespace handler{
 
-class TOADLET_API ZIPHandler:public ResourceStreamer{
+class TOADLET_API ZIPHandler:protected Object,public ResourceStreamer{
 public:
-	TOADLET_SHARED_POINTERS(ZIPHandler);
+	TOADLET_OBJECT(ZIPHandler);
 
 	ZIPHandler(){}
 

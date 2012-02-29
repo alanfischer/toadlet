@@ -27,6 +27,7 @@
 #define TOADLET_PEEPER_GLFBOPIXELBUFFER_H
 
 #include "GLPixelBuffer.h"
+#include <toadlet/egg/BaseResource.h>
 
 #if defined(TOADLET_HAS_GLFBOS)
 
@@ -35,9 +36,9 @@ namespace peeper{
 
 class GLFBORenderTarget;
 
-class GLFBOPixelBuffer:public GLPixelBuffer{
+class GLFBOPixelBuffer:protected BaseResource,public GLPixelBuffer{
 public:
-	TOADLET_SHARED_POINTERS(GLFBOPixelBuffer);
+	TOADLET_RESOURCE(GLFBOPixelBuffer,GLPixelBuffer);
 
 	GLFBOPixelBuffer(GLFBORenderTarget *target);
 
@@ -47,8 +48,6 @@ public:
 	GLTextureMipPixelBuffer *castToGLTextureMipPixelBuffer(){return NULL;}
 	GLFBOPixelBuffer *castToGLFBOPixelBuffer(){return this;}
 	GLBuffer *castToGLBuffer(){return NULL;}
-
-	void setBufferDestroyedListener(BufferDestroyedListener *listener){mListener=listener;}
 
 	bool create(int usage,int access,TextureFormat::ptr format);
 	void destroy();
@@ -70,7 +69,6 @@ public:
 	inline GLuint getHandle() const{return mHandle;}
 
 protected:
-	BufferDestroyedListener *mListener;
 	GLFBORenderTarget *mTarget;
 	GLuint mHandle;
 	int mUsage;
