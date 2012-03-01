@@ -90,8 +90,7 @@ set (TOADLET_LIB_BASENAMES
 	toadlet_peeper_d3d10renderdevice
 	toadlet_peeper_d3d11renderdevice
 	toadlet_peeper_glrenderdevice
-	toadlet_peeper_glesrenderdevice
-	toadlet_peeper_gles2renderdevice
+	toadlet_peeper_gles1renderdevice
 	toadlet_peeper
 	toadlet_knot
 	toadlet_hop

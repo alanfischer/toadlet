@@ -175,7 +175,9 @@ public:
 
 protected:
 	void setVertexData(const VertexData *vertexData);
-	void setFixedVertexData(const VertexData *vertexData);
+	#if defined(TOADLET_HAS_GLFIXED)
+		void setFixedVertexData(const VertexData *vertexData);
+	#endif
 	#if defined(TOADLET_HAS_GLSHADERS)
 		void setShaderVertexData(const VertexData *vertexData);
 	#endif

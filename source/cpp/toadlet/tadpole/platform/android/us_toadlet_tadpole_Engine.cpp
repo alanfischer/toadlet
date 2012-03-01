@@ -128,10 +128,10 @@ JNIEXPORT void JNICALL Java_us_toadlet_tadpole_Engine_makeEngine(JNIEnv *env,job
 	}
 	env->DeleteLocalRef(contextClass);
 
-	AndroidAssetArchive::ptr assetArchive=AndroidAssetArchive::ptr(new AndroidAssetArchive(env,assetManagerObj));
-	engine->getArchiveManager()->manage(shared_static_cast<Archive>(assetArchive));
+	AndroidAssetArchive::ptr assetArchive=new AndroidAssetArchive(env,assetManagerObj);
+	engine->getArchiveManager()->manageArchive(assetArchive);
 
-	AndroidTextureHandler::ptr textureHandler=AndroidTextureHandler::ptr(new AndroidTextureHandler(engine->getTextureManager(),env));
+	AndroidTextureHandler::ptr textureHandler=new AndroidTextureHandler(engine->getTextureManager(),env);
 	engine->getTextureManager()->setDefaultStreamer(textureHandler);
 }
 

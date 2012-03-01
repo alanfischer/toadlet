@@ -89,23 +89,25 @@ bool GLTexture::createContext(int mipLevels,tbyte *mipDatas[]){
 
 	bool onlyFirstLevel=false;
 	mManuallyGenerateMipLevels=(mUsage&Usage_BIT_AUTOGEN_MIPMAPS)!=0;
-	if(mManuallyGenerateMipLevels &&
-		#if defined(TOADLET_HAS_GLES)
-			mDevice->gl_version>=11
-		#else
-			mDevice->gl_version>=14
-		#endif
-		#if defined(TOADLET_HAS_GLEW) && defined(GL_EXT_framebuffer_object)
-			&& GLEW_EXT_framebuffer_object==false
-		#endif
-	){
-		glTexParameteri(mTarget,GL_GENERATE_MIPMAP,GL_TRUE);
-		mManuallyGenerateMipLevels=false;
-		// RenderTargets need all levels specified
-		if((mUsage&Usage_BIT_RENDERTARGET)==0){
-			onlyFirstLevel=true;
+	#if !defined(TOADLET_HAS_GLES) || defined(TOADLET_HAS_GL_11)
+		if(mManuallyGenerateMipLevels &&
+			#if defined(TOADLET_HAS_GLES)
+				mDevice->gl_version>=11
+			#else
+				mDevice->gl_version>=14
+			#endif
+			#if defined(TOADLET_HAS_GLEW) && defined(GL_EXT_framebuffer_object)
+				&& GLEW_EXT_framebuffer_object==false
+			#endif
+		){
+			glTexParameteri(mTarget,GL_GENERATE_MIPMAP,GL_TRUE);
+			mManuallyGenerateMipLevels=false;
+			// RenderTargets need all levels specified
+			if((mUsage&Usage_BIT_RENDERTARGET)==0){
+				onlyFirstLevel=true;
+			}
 		}
-	}
+	#endif
 
 	int specifiedMipLevels=mipLevels>0?mipLevels:mFormat->getMipMaxPossible();
 
@@ -172,9 +174,11 @@ bool GLTexture::createContext(int mipLevels,tbyte *mipDatas[]){
 				break;
 				#if defined(GL_TEXTURE_CUBE_MAP)
 					case GL_TEXTURE_CUBE_MAP:{
-						glTexParameteri(mTarget,GL_TEXTURE_WRAP_S,GL_CLAMP);
-						glTexParameteri(mTarget,GL_TEXTURE_WRAP_T,GL_CLAMP);
-						glTexParameteri(mTarget,GL_TEXTURE_WRAP_R,GL_CLAMP);
+						glTexParameteri(mTarget,GL_TEXTURE_WRAP_S,GL_CLAMP_TO_EDGE);
+						glTexParameteri(mTarget,GL_TEXTURE_WRAP_T,GL_CLAMP_TO_EDGE);
+						#if !defined(TOADLET_HAS_GLES)
+							glTexParameteri(mTarget,GL_TEXTURE_WRAP_R,GL_CLAMP_TO_EDGE);
+						#endif
 						glTexParameteri(mTarget,GL_TEXTURE_MAG_FILTER,GL_LINEAR);
 						glTexParameteri(mTarget,GL_TEXTURE_MIN_FILTER,GL_LINEAR);
 					
@@ -210,9 +214,11 @@ bool GLTexture::createContext(int mipLevels,tbyte *mipDatas[]){
 				break;
 				#if defined(GL_TEXTURE_CUBE_MAP)
 					case GL_TEXTURE_CUBE_MAP:{
-						glTexParameteri(mTarget,GL_TEXTURE_WRAP_S,GL_CLAMP);
-						glTexParameteri(mTarget,GL_TEXTURE_WRAP_T,GL_CLAMP);
-						glTexParameteri(mTarget,GL_TEXTURE_WRAP_R,GL_CLAMP);
+						glTexParameteri(mTarget,GL_TEXTURE_WRAP_S,GL_CLAMP_TO_EDGE);
+						glTexParameteri(mTarget,GL_TEXTURE_WRAP_T,GL_CLAMP_TO_EDGE);
+						#if !defined(TOADLET_HAS_GLES)
+							glTexParameteri(mTarget,GL_TEXTURE_WRAP_R,GL_CLAMP_TO_EDGE);
+						#endif
 						glTexParameteri(mTarget,GL_TEXTURE_MAG_FILTER,GL_LINEAR);
 						glTexParameteri(mTarget,GL_TEXTURE_MIN_FILTER,GL_LINEAR);
 					

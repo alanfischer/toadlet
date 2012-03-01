@@ -35,8 +35,10 @@
 namespace toadlet{
 namespace ribbit{
 
-class TOADLET_API JAudioDevice:public AudioDevice{
+class TOADLET_API JAudioDevice:protected Object,public AudioDevice{
 public:
+	TOADLET_OBJECT(JAudioDevice);
+
 	JAudioDevice(JNIEnv *jenv,jobject jobj);
 	virtual ~JAudioDevice();
 

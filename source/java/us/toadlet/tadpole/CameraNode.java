@@ -27,7 +27,7 @@ package us.toadlet.tadpole;
 
 import us.toadlet.peeper.*;
 
-public class CameraNode extends ParentNode{
+public class CameraNode extends Node{
 	public CameraNode(int nativeHandle){
 		super(nativeHandle);
 	}

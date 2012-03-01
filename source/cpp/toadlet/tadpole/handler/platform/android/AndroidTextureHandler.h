@@ -34,8 +34,10 @@ namespace toadlet{
 namespace tadpole{
 namespace handler{
 
-class TOADLET_API AndroidTextureHandler:public ResourceStreamer{
+class TOADLET_API AndroidTextureHandler:protected Object,public ResourceStreamer{
 public:
+	TOADLET_OBJECT(AndroidTextureHandler);
+
 	AndroidTextureHandler(TextureManager *textureManager,JNIEnv *env);
 	virtual ~AndroidTextureHandler();
 

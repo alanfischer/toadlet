@@ -39,6 +39,9 @@ public class Node{
 
 	public native void setScope(int scope);
 	public native int getScope();
+
+	public native boolean attach(Node node);
+	public native boolean remove(Node node);
 	
 	private int mNativeHandle;
 }
