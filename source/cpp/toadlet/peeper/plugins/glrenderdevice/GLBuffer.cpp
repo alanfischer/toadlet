@@ -412,24 +412,26 @@ bool GLBuffer::activateUniforms(){
 			case VariableBufferFormat::Format_TYPE_FLOAT_32|VariableBufferFormat::Format_COUNT_4X4:
 				glUniformMatrix4fv(index,1,transpose,(float*)data);
 			break;
-			case VariableBufferFormat::Format_TYPE_FLOAT_32|VariableBufferFormat::Format_COUNT_2X3:
-				glUniformMatrix2x3fv(index,1,transpose,(float*)data);
-			break;
-			case VariableBufferFormat::Format_TYPE_FLOAT_32|VariableBufferFormat::Format_COUNT_3X2:
-				glUniformMatrix3x2fv(index,1,transpose,(float*)data);
-			break;
-			case VariableBufferFormat::Format_TYPE_FLOAT_32|VariableBufferFormat::Format_COUNT_2X4:
-				glUniformMatrix2x4fv(index,1,transpose,(float*)data);
-			break;
-			case VariableBufferFormat::Format_TYPE_FLOAT_32|VariableBufferFormat::Format_COUNT_4X2:
-				glUniformMatrix4x2fv(index,1,transpose,(float*)data);
-			break;
-			case VariableBufferFormat::Format_TYPE_FLOAT_32|VariableBufferFormat::Format_COUNT_3X4:
-				glUniformMatrix3x4fv(index,1,transpose,(float*)data);
-			break;
-			case VariableBufferFormat::Format_TYPE_FLOAT_32|VariableBufferFormat::Format_COUNT_4X3:
-				glUniformMatrix4x3fv(index,1,transpose,(float*)data);
-			break;
+			#if !defined(TOADLET_HAS_GLES)
+				case VariableBufferFormat::Format_TYPE_FLOAT_32|VariableBufferFormat::Format_COUNT_2X3:
+					glUniformMatrix2x3fv(index,1,transpose,(float*)data);
+				break;
+				case VariableBufferFormat::Format_TYPE_FLOAT_32|VariableBufferFormat::Format_COUNT_3X2:
+					glUniformMatrix3x2fv(index,1,transpose,(float*)data);
+				break;
+				case VariableBufferFormat::Format_TYPE_FLOAT_32|VariableBufferFormat::Format_COUNT_2X4:
+					glUniformMatrix2x4fv(index,1,transpose,(float*)data);
+				break;
+				case VariableBufferFormat::Format_TYPE_FLOAT_32|VariableBufferFormat::Format_COUNT_4X2:
+					glUniformMatrix4x2fv(index,1,transpose,(float*)data);
+				break;
+				case VariableBufferFormat::Format_TYPE_FLOAT_32|VariableBufferFormat::Format_COUNT_3X4:
+					glUniformMatrix3x4fv(index,1,transpose,(float*)data);
+				break;
+				case VariableBufferFormat::Format_TYPE_FLOAT_32|VariableBufferFormat::Format_COUNT_4X3:
+					glUniformMatrix4x3fv(index,1,transpose,(float*)data);
+				break;
+			#endif
 
 			case VariableBufferFormat::Format_TYPE_RESOURCE:
 				glUniform1i(index,variable->getResourceIndex());

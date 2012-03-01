@@ -36,7 +36,7 @@ namespace handler{
 
 class TOADLET_API JStream:public Stream{
 public:
-	TOADLET_SHARED_POINTERS(JStream);
+	TOADLET_SPTR(JStream);
 
 	JStream(JNIEnv *env,jobject streamObj=NULL);
 	virtual ~JStream();

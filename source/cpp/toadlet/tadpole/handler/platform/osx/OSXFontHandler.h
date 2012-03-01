@@ -38,8 +38,10 @@ namespace handler{
 /// @brief  A lighter weight font handling class for the OSX platform
 ///  If the FreeTypeHandler is unavailable or too heavy weight to include, this class may be used.
 
-class TOADLET_API OSXFontHandler:public ResourceStreamer{
+class TOADLET_API OSXFontHandler:protected Object,public ResourceStreamer{
 public:
+	TOADLET_OBJECT(OSXFontHandler);
+
 	OSXFontHandler(TextureManager *textureManager);
 	virtual ~OSXFontHandler(){}
 

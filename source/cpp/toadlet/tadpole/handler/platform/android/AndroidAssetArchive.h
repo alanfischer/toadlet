@@ -36,7 +36,7 @@ namespace toadlet{
 namespace tadpole{
 namespace handler{
 
-class TOADLET_API AndroidAssetArchive:public Archive,public BaseResource{
+class TOADLET_API AndroidAssetArchive:protected BaseResource,public Archive{
 public:
 	TOADLET_RESOURCE(AndroidAssetArchive,Archive);
 

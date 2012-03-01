@@ -34,9 +34,9 @@ namespace toadlet{
 namespace tadpole{
 namespace handler{
 
-class TOADLET_API BMPHandler:public ResourceStreamer{
+class TOADLET_API BMPHandler:protected Object,public ResourceStreamer{
 public:
-	TOADLET_SPTR(BMPHandler);
+	TOADLET_OBJECT(BMPHandler);
 
 	BMPHandler(TextureManager *textureManager){mTextureManager=textureManager;}
 

@@ -31,64 +31,35 @@
 #include <toadlet/egg/MathConversion.h>
 #include <toadlet/peeper/Types.h>
 
-#if defined(TOADLET_PLATFORM_WINCE)
-	#include "platform/egl/glesem/glesem.h"
-	// Has defines
-	#define TOADLET_HAS_GLESEM
-	#define TOADLET_HAS_EGL
-	#if GLESEM_EGL_BUILD_VERSION>=120
-		#define TOADLET_HAS_EGL_12
-	#endif
-	#if GLESEM_EGL_BUILD_VERSION>=110
-		#define TOADLET_HAS_EGL_11
-	#endif
-	#if GLESEM_EGL_BUILD_VERSION>110
-		#define TOADLET_HAS_EGL_11
-	#endif
-	#define TOADLET_HAS_GLES
-	#if GLESEM_GL_BUILD_VERSION>=120
-		#define TOADLET_HAS_GL_12
-	#endif
-	#if GLESEM_GL_BUILD_VERSION>=110
-		#define TOADLET_HAS_GL_11
-	#endif
-	#if GLESEM_GL_BUILD_VERSION>110
-		#define TOADLET_HAS_GL_11
-	#endif
-	#define GL_POINT_SPRITE GL_POINT_SPRITE_OES 
-	#define GL_COORD_REPLACE GL_COORD_REPLACE_OES
-#elif defined(TOADLET_PLATFORM_ANDROID)
+#if defined(TOADLET_PLATFORM_ANDROID)
 	#if ANDROID_NDK_API_LEVEL>=9
 		#include <EGL/egl.h>
 		#define TOADLET_HAS_GLPBUFFERS
+		#define TOADLET_HAS_EGL
+		#define TOADLET_HAS_EGL_11
 	#else
 		// PBuffers would be possible to implement, but it wouldn't be that clean since they tie into Textures and PixelBuffers.  Since NDK 8 is a minimum target, we will not support render to texture there
 	#endif
-	
-	#include <GLES/gl.h>
-	// Has defines
-	#define TOADLET_HAS_EGL
-	#define TOADLET_HAS_EGL_11
-	#define TOADLET_HAS_GLES
-	#define TOADLET_HAS_GL_11
+
+	#if defined(TOADLET_HAS_GL_11)
+		#include <GLES/gl.h>
+	#elif defined(TOADLET_HAS_GL_20)
+		#include <GLES2/gl2.h>
+	#endif
+	typedef char GLchar;
 #elif defined(TOADLET_PLATFORM_IOS)
-	#if 1
+	#if defined(TOADLET_HAS_GL_11)
 		#include <OpenGLES/ES1/gl.h>
 		#include <OpenGLES/ES1/glext.h>
-		// Has defines
 		#define TOADLET_HAS_EAGL
 		#define TOADLET_HAS_EGL
 		#define TOADLET_HAS_EGL_11
-		#define TOADLET_HAS_GLES
-		#define TOADLET_HAS_GL_11
-	#else
+	#elif defined(TOADLET_HAS_GL_20)
 		#include <OpenGLES/ES2/gl.h>
 		#include <OpenGLES/ES2/glext.h>
 		#define TOADLET_HAS_EAGL
 		#define TOADLET_HAS_EGL
 		#define TOADLET_HAS_EGL_20
-		#define TOADLET_HAS_GLES
-		#define TOADLET_HAS_GL_20
 	#endif
 #else
 	#if defined(TOADLET_PLATFORM_WIN32)
@@ -136,7 +107,7 @@
 	#endif
 #endif
 
-#if defined(TOADLET_HAS_GLES)
+#if defined(TOADLET_HAS_GLES) && defined(TOADLET_HAS_GL_11)
 	#define glTexEnvi glTexEnvx
 	#define glTexParameteri glTexParameterx
 #endif
@@ -153,7 +124,7 @@
 	#define GL_SRC2_RGB GL_SOURCE2_RGB 
 #endif
 
-#if defined(TOADLET_HAS_EGL) && !defined(TOADLET_HAS_GL_20)
+#if defined(TOADLET_HAS_GLES) && defined(TOADLET_HAS_GL_11)
 	#define GL_RENDERBUFFER GL_RENDERBUFFER_OES
 	#define GL_COLOR_ATTACHMENT0 GL_COLOR_ATTACHMENT0_OES
 	#define GL_DEPTH_ATTACHMENT GL_DEPTH_ATTACHMENT_OES

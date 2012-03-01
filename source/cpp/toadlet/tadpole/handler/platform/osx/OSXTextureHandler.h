@@ -36,8 +36,10 @@ namespace handler{
 
 /// @brief  A lighter weight texture handling class for the OSX platform
 
-class TOADLET_API OSXTextureHandler:public ResourceStreamer{
+class TOADLET_API OSXTextureHandler:protected Object,public ResourceStreamer{
 public:
+	TOADLET_OBJECT(OSXTextureHandler);
+
 	OSXTextureHandler(TextureManager *textureManager);
 	virtual ~OSXTextureHandler(){}
 

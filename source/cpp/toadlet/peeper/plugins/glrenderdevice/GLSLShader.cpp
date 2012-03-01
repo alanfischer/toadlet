@@ -72,9 +72,11 @@ bool GLSLShader::createContext(){
 		case ShaderType_FRAGMENT:
 			mTarget=GL_FRAGMENT_SHADER;
 		break;
-		case ShaderType_GEOMETRY:
-			mTarget=GL_GEOMETRY_SHADER_EXT;
-		break;
+		#if defined(GL_GEOMETRY_SHADER_EXT)
+			case ShaderType_GEOMETRY:
+				mTarget=GL_GEOMETRY_SHADER_EXT;
+			break;
+		#endif
 		default:
 			return false;
 		break;

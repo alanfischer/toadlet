@@ -59,9 +59,21 @@ namespace peeper{
 	extern PixelBufferRenderTarget *new_GLPBufferRenderTarget(GLRenderDevice *renderDevice);
 #endif
 
-TOADLET_C_API RenderDevice* new_GLRenderDevice(){
-	return new GLRenderDevice();
-}
+#if defined(TOADLET_HAS_GLES)
+	#if defined(TOADLET_HAS_GL_20)
+		TOADLET_C_API RenderDevice* new_GLES2RenderDevice(){
+			return new GLRenderDevice();
+		}
+	#else
+		TOADLET_C_API RenderDevice* new_GLES1RenderDevice(){
+			return new GLRenderDevice();
+		}
+	#endif
+#else
+	TOADLET_C_API RenderDevice* new_GLRenderDevice(){
+		return new GLRenderDevice();
+	}
+#endif
 
 #if defined(TOADLET_BUILD_DYNAMIC)
 	TOADLET_C_API RenderDevice* new_RenderDevice(){
@@ -206,7 +218,11 @@ bool GLRenderDevice::create(RenderTarget *target,int *options){
 	{
 		GLint maxTextureStages=0;
 		if(gl_version>10){ // 1.0 doesn't support multitexturing
-			glGetIntegerv(GL_MAX_TEXTURE_UNITS,&maxTextureStages);
+			#if defined(GL_MAX_TEXTURE_UNITS)
+				glGetIntegerv(GL_MAX_TEXTURE_UNITS,&maxTextureStages);
+			#elif defined(GL_MAX_TEXTURE_IMAGE_UNITS)
+				glGetIntegerv(GL_MAX_TEXTURE_IMAGE_UNITS,&maxTextureStages);
+			#endif
 		}
 		if(maxTextureStages<=0){
 			maxTextureStages=1;
@@ -276,12 +292,14 @@ bool GLRenderDevice::create(RenderTarget *target,int *options){
 		}
 		caps.maxTextureSize=maxTextureSize;
 
-		GLint maxLights=0;
-		glGetIntegerv(GL_MAX_LIGHTS,&maxLights);
-		if(maxLights<=0){
-			maxLights=8;
-		}
-		caps.maxLights=maxLights;
+		#if defined(TOADLET_HAS_GLFIXED)
+			GLint maxLights=0;
+			glGetIntegerv(GL_MAX_LIGHTS,&maxLights);
+			if(maxLights<=0){
+				maxLights=8;
+			}
+			caps.maxLights=maxLights;
+		#endif
 
 		caps.renderToTexture=mPBuffers || mFBOs;
 
@@ -957,6 +975,7 @@ void GLRenderDevice::setDepthState(const DepthState &state){
 }
 
 void GLRenderDevice::setFogState(const FogState &state){
+#if defined(TOADLET_HAS_GLFIXED)
 	if(state.fog==FogState::FogType_NONE){
 		glDisable(GL_FOG);
 	}
@@ -984,9 +1003,11 @@ void GLRenderDevice::setFogState(const FogState &state){
 	}
 
 	TOADLET_CHECK_GLERROR("setFogParameters");
+#endif
 }
 
 void GLRenderDevice::setMaterialState(const MaterialState &state){
+#if defined(TOADLET_HAS_GLFIXED)
 	if(state.light){
 		// 12/19/10
 		// There appears to be a bug in at least:
@@ -1068,6 +1089,7 @@ void GLRenderDevice::setMaterialState(const MaterialState &state){
 	}
 
 	TOADLET_CHECK_GLERROR("setMaterialState");
+#endif
 }
 
 void GLRenderDevice::setSamplerState(int i,SamplerState *state){
@@ -1121,7 +1143,7 @@ void GLRenderDevice::setSamplerStatePostTexture(int i,SamplerState *state){
 		*/
 
 		if(i==0){
-			#if defined(TOADLET_HAS_GLES)
+			#if defined(TOADLET_HAS_GLES) && defined(TOADLET_HAS_GL_11)
 				glHint(GL_PERSPECTIVE_CORRECTION_HINT,state->perspective?GL_NICEST:GL_FASTEST);
 			#endif
 		}
@@ -1131,6 +1153,7 @@ void GLRenderDevice::setSamplerStatePostTexture(int i,SamplerState *state){
 }
 
 void GLRenderDevice::setTextureStatePostTexture(int i,TextureState *state){
+#if defined(TOADLET_HAS_GLFIXED)
 	if(i>=mCaps.maxTextureStages){
 		return;
 	}
@@ -1335,6 +1358,7 @@ void GLRenderDevice::setTextureStatePostTexture(int i,TextureState *state){
 	}
 
 	TOADLET_CHECK_GLERROR("setTextureState");
+#endif
 }
 
 void GLRenderDevice::setBuffer(Shader::ShaderType shaderType,int i,VariableBuffer *buffer){
@@ -1415,6 +1439,7 @@ void GLRenderDevice::setTexture(Shader::ShaderType shaderType,int i,Texture *tex
 }
 
 void GLRenderDevice::setPointState(const PointState &state){
+#if defined(TOADLET_HAS_GLFIXED)
 	mPointState.set(state);
 
 	// pointsize = size / sqrt(constant + linear*d + quadratic*d*d)
@@ -1489,6 +1514,7 @@ void GLRenderDevice::setPointState(const PointState &state){
 	}
 
 	TOADLET_CHECK_GLERROR("setPointState");
+#endif
 }
 
 void GLRenderDevice::setRasterizerState(const RasterizerState &state){
@@ -1518,12 +1544,14 @@ void GLRenderDevice::setRasterizerState(const RasterizerState &state){
 		glEnable(GL_POLYGON_OFFSET_FILL);
 	}
 
-	if(state.multisample){
-		glEnable(GL_MULTISAMPLE);
-	}
-	else{
-		glDisable(GL_MULTISAMPLE);
-	}
+	#if defined(TOADLET_HAS_GLFIXED)
+		if(state.multisample){
+			glEnable(GL_MULTISAMPLE);
+		}
+		else{
+			glDisable(GL_MULTISAMPLE);
+		}
+	#endif
 
 	if(state.dither){
 		glEnable(GL_DITHER);
@@ -1538,6 +1566,7 @@ void GLRenderDevice::setRasterizerState(const RasterizerState &state){
 }
 
 void GLRenderDevice::setLightState(int i,const LightState &state){
+#if defined(TOADLET_HAS_GLFIXED)
 	GLenum l=GL_LIGHT0+i;
 
 	glMatrixMode(GL_MODELVIEW);
@@ -1625,9 +1654,11 @@ void GLRenderDevice::setLightState(int i,const LightState &state){
 	#endif
 
 	TOADLET_CHECK_GLERROR("setLight");
+#endif
 }
 
 void GLRenderDevice::setLightEnabled(int i,bool enable){
+#if defined(TOADLET_HAS_GLFIXED)
 	if(enable){
 		glEnable(GL_LIGHT0+i);
 	}
@@ -1636,9 +1667,11 @@ void GLRenderDevice::setLightEnabled(int i,bool enable){
 	}
 
 	TOADLET_CHECK_GLERROR("setLightEnabled");
+#endif
 }
 
 void GLRenderDevice::setAmbientColor(const Vector4 &ambient){
+#if defined(TOADLET_HAS_GLFIXED)
 	#if defined(TOADLET_FIXED_POINT)
 		#if defined(TOADLET_HAS_GLES)
 			glLightModelxv(GL_LIGHT_MODEL_AMBIENT,ambient.getData());
@@ -1650,6 +1683,7 @@ void GLRenderDevice::setAmbientColor(const Vector4 &ambient){
 	#endif
 
 	TOADLET_CHECK_GLERROR("setAmbientColor");
+#endif
 }
 
 void GLRenderDevice::getShadowBiasMatrix(const Texture *shadowTexture,Matrix4x4 &result){
@@ -1756,6 +1790,7 @@ void GLRenderDevice::setVertexData(const VertexData *vertexData){
 	}
 }
 
+#if defined(TOADLET_HAS_GLFIXED)
 void GLRenderDevice::setFixedVertexData(const VertexData *vertexData){
 	int numVertexBuffers=0;
 	int semanticBits=0,lastSemanticBits=mLastFixedSemanticBits,texCoordSemanticBits=0,lastTexCoordSemanticBits=mLastFixedTexCoordSemanticBits;
@@ -1881,9 +1916,15 @@ void GLRenderDevice::setFixedVertexData(const VertexData *vertexData){
 
 	TOADLET_CHECK_GLERROR("setFixedVertexData");
 }
+#endif
 
 #if defined(TOADLET_HAS_GLSHADERS)
 void GLRenderDevice::setShaderVertexData(const VertexData *vertexData){
+	if(mLastShaderState==NULL){
+		Error::unknown(Categories::TOADLET_PEEPER,"no ShaderState set");
+		return;
+	}
+
 	int numVertexBuffers=0;
 	int semanticBits=0,lastSemanticBits=mLastShaderSemanticBits;
 
@@ -2065,6 +2106,7 @@ GLenum GLRenderDevice::getGLPolygonMode(RasterizerState::FillType type){
 	#endif
 }
 
+#if defined(TOADLET_HAS_GLFIXED)
 GLenum GLRenderDevice::getGLFogType(FogState::FogType type){
 	switch(type){
 		case FogState::FogType_LINEAR:
@@ -2079,7 +2121,9 @@ GLenum GLRenderDevice::getGLFogType(FogState::FogType type){
 			return 0;
 	}
 }
+#endif
 
+#if defined(TOADLET_HAS_GLFIXED)
 GLenum GLRenderDevice::getGLShadeModel(MaterialState::ShadeType type){
 	switch(type){
 		case MaterialState::ShadeType_FLAT:
@@ -2093,6 +2137,7 @@ GLenum GLRenderDevice::getGLShadeModel(MaterialState::ShadeType type){
 			return 0;
 	}
 }
+#endif
 
 GLint GLRenderDevice::getGLElementCount(int format){
 	if(format==VertexFormat::Format_TYPE_COLOR_RGBA){
@@ -2329,6 +2374,7 @@ GLuint GLRenderDevice::getGLMagFilter(SamplerState::FilterType magFilter){
 	}
 }
 
+#if defined(TOADLET_HAS_GLFIXED)
 GLuint GLRenderDevice::getGLTextureBlendSource(TextureState::Source source){
 	switch(source){
 		case TextureState::Source_PREVIOUS:
@@ -2345,7 +2391,9 @@ GLuint GLRenderDevice::getGLTextureBlendSource(TextureState::Source source){
 			return 0;
 	}
 }
+#endif
 
+#if defined(TOADLET_HAS_GLFIXED)
 GLuint GLRenderDevice::getGLTextureBlendOperation(TextureState::Operation operation){
 	switch(operation){
 		case TextureState::Operation_REPLACE:
@@ -2364,7 +2412,9 @@ GLuint GLRenderDevice::getGLTextureBlendOperation(TextureState::Operation operat
 			return 0;
 	}
 }
+#endif
 
+#if defined(TOADLET_HAS_GLFIXED)
 float GLRenderDevice::getGLTextureBlendScale(TextureState::Operation operation){
 	switch(operation){
 		case TextureState::Operation_MODULATE:
@@ -2377,6 +2427,7 @@ float GLRenderDevice::getGLTextureBlendScale(TextureState::Operation operation){
 			return 1.0f;
 	}
 }
+#endif
 
 GLuint GLRenderDevice::getGLDepthTextureMode(TextureState::ShadowResult shadow){
 	switch(shadow){
@@ -2413,6 +2464,7 @@ int GLRenderDevice::getFixedAttribFromSemantic(int semantic,int index){
 	}
 }
 
+#if defined(TOADLET_HAS_GLFIXED)
 GLuint GLRenderDevice::getClientStateFromSemantic(int semantic,int index){
 	switch(semantic){
 		case VertexFormat::Semantic_POSITION:
@@ -2434,6 +2486,7 @@ GLuint GLRenderDevice::getClientStateFromSemantic(int semantic,int index){
 			return 0;
 	}
 };
+#endif
 
 #if defined(TOADLET_HAS_GLSHADERS)
 int GLRenderDevice::getVariableFormat(GLuint type){
@@ -2468,24 +2521,28 @@ int GLRenderDevice::getVariableFormat(GLuint type){
 			return VariableBufferFormat::Format_TYPE_FLOAT_32|VariableBufferFormat::Format_COUNT_3X3;
 		case GL_FLOAT_MAT4:
 			return VariableBufferFormat::Format_TYPE_FLOAT_32|VariableBufferFormat::Format_COUNT_4X4;
-		case GL_FLOAT_MAT2x3:
-			return VariableBufferFormat::Format_TYPE_FLOAT_32|VariableBufferFormat::Format_COUNT_2X3;
-		case GL_FLOAT_MAT2x4:
-			return VariableBufferFormat::Format_TYPE_FLOAT_32|VariableBufferFormat::Format_COUNT_2X4;
-		case GL_FLOAT_MAT3x2:
-			return VariableBufferFormat::Format_TYPE_FLOAT_32|VariableBufferFormat::Format_COUNT_3X2;
-		case GL_FLOAT_MAT3x4:
-			return VariableBufferFormat::Format_TYPE_FLOAT_32|VariableBufferFormat::Format_COUNT_3X4;
-		case GL_FLOAT_MAT4x2:
-			return VariableBufferFormat::Format_TYPE_FLOAT_32|VariableBufferFormat::Format_COUNT_4X2;
-		case GL_FLOAT_MAT4x3:
-			return VariableBufferFormat::Format_TYPE_FLOAT_32|VariableBufferFormat::Format_COUNT_4X3;
-		case GL_SAMPLER_1D:
+		#if !defined(TOADLET_HAS_GLES)
+			case GL_FLOAT_MAT2x3:
+				return VariableBufferFormat::Format_TYPE_FLOAT_32|VariableBufferFormat::Format_COUNT_2X3;
+			case GL_FLOAT_MAT2x4:
+				return VariableBufferFormat::Format_TYPE_FLOAT_32|VariableBufferFormat::Format_COUNT_2X4;
+			case GL_FLOAT_MAT3x2:
+				return VariableBufferFormat::Format_TYPE_FLOAT_32|VariableBufferFormat::Format_COUNT_3X2;
+			case GL_FLOAT_MAT3x4:
+				return VariableBufferFormat::Format_TYPE_FLOAT_32|VariableBufferFormat::Format_COUNT_3X4;
+			case GL_FLOAT_MAT4x2:
+				return VariableBufferFormat::Format_TYPE_FLOAT_32|VariableBufferFormat::Format_COUNT_4X2;
+			case GL_FLOAT_MAT4x3:
+				return VariableBufferFormat::Format_TYPE_FLOAT_32|VariableBufferFormat::Format_COUNT_4X3;
+		#endif
 		case GL_SAMPLER_2D:
-		case GL_SAMPLER_3D:
 		case GL_SAMPLER_CUBE:
-		case GL_SAMPLER_1D_SHADOW:
-		case GL_SAMPLER_2D_SHADOW:
+		#if !defined(TOADLET_HAS_GLES)
+			case GL_SAMPLER_1D:
+			case GL_SAMPLER_3D:
+			case GL_SAMPLER_1D_SHADOW:
+			case GL_SAMPLER_2D_SHADOW:
+		#endif
 			return VariableBufferFormat::Format_TYPE_RESOURCE;
 		default:
 			return 0;
@@ -2493,7 +2550,7 @@ int GLRenderDevice::getVariableFormat(GLuint type){
 }
 #endif
 
-#if !defined(TOADLET_HAS_GLES)
+#if !defined(TOADLET_HAS_GLES) || defined(TOADLET_HAS_GL_20)
 	GLuint GLRenderDevice::GLCubeFaces[6]={
 		GL_TEXTURE_CUBE_MAP_POSITIVE_X,
 		GL_TEXTURE_CUBE_MAP_NEGATIVE_X,

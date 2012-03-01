@@ -5,7 +5,8 @@
 using namespace toadlet::peeper;
 
 TOADLET_C_API RenderTarget *new_JGLWindowRenderTarget(JNIEnv *env,jobject obj);
-TOADLET_C_API RenderDevice *new_GLRenderDevice();
+TOADLET_C_API RenderDevice *new_GLES1RenderDevice();
+TOADLET_C_API RenderDevice *new_GLES2RenderDevice();
 
 extern "C" {
 
@@ -81,7 +82,11 @@ JNIEXPORT void JNICALL Java_us_toadlet_peeper_NGLRenderDevice_swap(JNIEnv *env,j
 JNIEXPORT void JNICALL Java_us_toadlet_peeper_NGLRenderDevice_makeRenderDevice(JNIEnv *env,jobject obj){
 	Java_us_toadlet_peeper_NGLRenderDevice(env);
 
-	RenderDevice *device=new_GLRenderDevice();
+	#if defined(TOADLET_HAS_GL_20)
+		RenderDevice *device=new_GLES2RenderDevice();
+	#else
+		RenderDevice *device=new_GLES1RenderDevice();
+	#endif
 
 	env->SetIntField(obj,NGLRenderDevice_nativeHandle,(int)device);
 }

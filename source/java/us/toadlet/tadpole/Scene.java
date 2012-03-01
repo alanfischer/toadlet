@@ -34,7 +34,7 @@ public class Scene{
 
 	public native void setAmbientColor(float[] color);
 
-	public native ParentNode getRoot();
+	public native Node getRoot();
 
 	public native int getTime();
 	

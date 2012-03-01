@@ -52,12 +52,11 @@ SceneRenderer::~SceneRenderer(){
 
 void SceneRenderer::renderScene(RenderDevice *device,Node *node,CameraNode *camera){
 	mDevice=device;
-
 	mSceneParameters->setCamera(camera);
 
 	gatherRenderables(mRenderableSet,node,camera);
 
-	RenderTarget::ptr target=camera->getRenderTarget();
+	RenderTarget *target=camera->getRenderTarget();
 	device->setRenderTarget(target!=NULL?target:device->getPrimaryRenderTarget());
 
 	setupViewport(camera,device);

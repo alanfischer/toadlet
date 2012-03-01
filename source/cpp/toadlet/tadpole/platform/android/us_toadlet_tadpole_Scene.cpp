@@ -47,9 +47,9 @@ JNIEXPORT void JNICALL Java_us_toadlet_tadpole_Scene_setAmbientColor(JNIEnv *env
 JNIEXPORT jobject JNICALL Java_us_toadlet_tadpole_Scene_getRoot(JNIEnv *env,jobject obj){
 	Scene *scene=(Scene*)env->GetIntField(obj,Scene_nativeHandle);
 	
-	ParentNode *node=scene->getRoot();
+	Node *node=scene->getRoot();
 	
-	jclass nodeType=env->FindClass("us/toadlet/tadpole/ParentNode");
+	jclass nodeType=env->FindClass("us/toadlet/tadpole/Node");
 	jmethodID initID=env->GetMethodID(nodeType,"<init>","(I)V");
 	jobject nodeObj=env->NewObject(nodeType,initID,node);
 

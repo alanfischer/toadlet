@@ -149,7 +149,6 @@ set (TADPOLE_SRC
 	us/toadlet/tadpole/CameraNode.java
 	us/toadlet/tadpole/LightNode.java
 	us/toadlet/tadpole/MeshNode.java
-	us/toadlet/tadpole/ParentNode.java
 	${CMAKE_CURRENT_BINARY_DIR}/us/toadlet/tadpole/Version.java
 )
 

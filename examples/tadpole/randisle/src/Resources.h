@@ -299,7 +299,7 @@ engine->getTextureManager()->logAllResources();
 				variables->addVariable("refractMatrix",RenderVariable::ptr(new TextureMatrixVariable(variables,"refractTex")),Material::Scope_MATERIAL);
 			}
 
-			if(false && engine->hasFixed(Shader::ShaderType_VERTEX) && engine->hasFixed(Shader::ShaderType_FRAGMENT)){
+			if(engine->hasFixed(Shader::ShaderType_VERTEX) && engine->hasFixed(Shader::ShaderType_FRAGMENT)){
 				TextureFormat::ptr noiseFormat(new TextureFormat(TextureFormat::Dimension_D2,TextureFormat::Format_RGB_8,128,128,1,0));
 				tbyte *noise1Data=createNoise(noiseFormat,16,5,0.5,0.5);
 				tbyte *noise2Data=createNoise(noiseFormat,16,12,0.5,0.5);

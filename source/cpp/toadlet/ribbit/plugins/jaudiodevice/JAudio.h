@@ -33,8 +33,10 @@
 namespace toadlet{
 namespace ribbit{
 
-class TOADLET_API JAudio:public Audio{
+class TOADLET_API JAudio:protected BaseResource,public Audio{
 public:
+	TOADLET_RESOURCE(JAudio,Audio);
+
 	JAudio(JNIEnv *jenv,jobject jobj);
 	virtual ~JAudio();
 
