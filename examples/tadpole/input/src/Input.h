@@ -10,7 +10,7 @@ public:
 
 	void create();
 	void destroy();
-	void render(RenderDevice *renderDevice);
+	void render();
 	void update(int dt);
 
 	void resized(int width,int height);

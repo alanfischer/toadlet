@@ -8,7 +8,6 @@ Input::~Input(){
 }
 
 void Input::create(){
-
 	engine=app->getEngine();
 	engine->setDirectory("../res");
 
@@ -100,11 +99,13 @@ void Input::resized(int width,int height){
 	}
 }
 
-void Input::render(RenderDevice *renderDevice){
-	renderDevice->beginScene();
-		cameraNode->render(renderDevice);
-	renderDevice->endScene();
-	renderDevice->swap();
+void Input::render(){
+	RenderDevice *device=engine->getRenderDevice();
+	
+	device->beginScene();
+		cameraNode->render(device);
+	device->endScene();
+	device->swap();
 }
 
 void Input::update(int dt){
@@ -119,7 +120,7 @@ Node::ptr Input::makeLabel(const String &name){
 }
 
 Node::ptr Input::makeNeedle(){
-	ParentNode::ptr node=engine->createNodeType(ParentNode::type(),scene);
+	Node::ptr node=engine->createNodeType(Node::type(),scene);
 
 	MeshNode::ptr eye=engine->createNodeType(MeshNode::type(),scene);
 	eye->setMesh(engine->getMeshManager()->createSphereMesh(Sphere(1)));
