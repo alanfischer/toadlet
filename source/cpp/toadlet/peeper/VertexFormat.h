@@ -109,11 +109,11 @@ public:
 	virtual bool addElement(int semantic,int index,int format)=0;
 	virtual bool addElement(const String &name,int index,int format)=0;
 	virtual int getNumElements() const=0;
-	virtual int getSemantic(int i) const=0;
-	virtual String getName(int i) const=0;
-	virtual int getIndex(int i) const=0;
-	virtual int getFormat(int i) const=0;
-	virtual int getOffset(int i) const=0;
+	virtual int getElementSemantic(int i) const=0;
+	virtual String getElementName(int i) const=0;
+	virtual int getElementIndex(int i) const=0;
+	virtual int getElementFormat(int i) const=0;
+	virtual int getElementOffset(int i) const=0;
 	virtual int getVertexSize() const=0;
 	virtual int findElement(int semantic)=0;
 	virtual int findElement(const String &name)=0;

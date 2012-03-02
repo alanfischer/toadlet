@@ -34,12 +34,14 @@ namespace peeper{
 
 TOADLET_C_API RenderTarget *new_GLXWindowRenderTarget(void *display,void *window,WindowRenderTargetFormat *format);
 
-class TOADLET_API GLXWindowRenderTarget:public GLXRenderTarget{
+class TOADLET_API GLXWindowRenderTarget:protected BaseResource,public GLXRenderTarget{
 public:
+	TOADLET_RESOURCE(GLXWindowRenderTarget,GLXRenderTarget);
+
 	GLXWindowRenderTarget();
 	GLXWindowRenderTarget(Display *display,Window window,WindowRenderTargetFormat *format);
 	virtual ~GLXWindowRenderTarget();
-	void destroy(){destroyContext();}
+	void destroy(){destroyContext();BaseResource::destroy();}
 
 	RenderTarget *getRootRenderTarget(){return (GLRenderTarget*)this;}
 

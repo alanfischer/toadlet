@@ -63,10 +63,10 @@ void VertexBufferAccessor::lock(VertexBuffer *vertexBuffer,int access){
 	int numElements=vertexFormat->getNumElements();
 	TOADLET_ASSERT(numElements>0 && numElements<16);
 	for(int i=0;i<numElements;++i){
-		mElementOffsets32[i]=vertexFormat->getOffset(i)/sizeof(int32);
+		mElementOffsets32[i]=vertexFormat->getElementOffset(i)/sizeof(int32);
 	}
 
-	if((vertexFormat->getFormat(0)&VertexFormat::Format_MASK_TYPES)==VertexFormat::Format_TYPE_FIXED_32){
+	if((vertexFormat->getElementFormat(0)&VertexFormat::Format_MASK_TYPES)==VertexFormat::Format_TYPE_FIXED_32){
 		mNativeFixed=true;
 	}
 	else{

@@ -103,10 +103,10 @@ bool GLBuffer::create(int usage,int access,VertexFormat::ptr vertexFormat,int si
 	int i;
 	for(i=0;i<mVertexFormat->getNumElements();++i){
 		if(mHandle!=0){
-			mElementOffsets.add(reinterpret_cast<uint8*>(mVertexFormat->getOffset(i)));
+			mElementOffsets.add(reinterpret_cast<uint8*>(mVertexFormat->getElementOffset(i)));
 		}
 		else{
-			mElementOffsets.add(mData+mVertexFormat->getOffset(i));
+			mElementOffsets.add(mData+mVertexFormat->getElementOffset(i));
 		}
 	}
 
@@ -260,8 +260,8 @@ uint8 *GLBuffer::lock(int lockAccess){
 			int vertexSize=mVertexFormat->getVertexSize();
 			int i,j;
 			for(i=0;i<mVertexFormat->getNumElements();++i){
-				if(mVertexFormat->getFormat(i)==VertexFormat::Format_TYPE_COLOR_RGBA){
-					tbyte *data=mData+mVertexFormat->getOffset(i);
+				if(mVertexFormat->getElementFormat(i)==VertexFormat::Format_TYPE_COLOR_RGBA){
+					tbyte *data=mData+mVertexFormat->getElementOffset(i);
 					for(j=0;j<mSize;++j){
 						swap4(*(uint32*)(data+vertexSize*j));
 					}
@@ -290,8 +290,8 @@ bool GLBuffer::unlock(){
 			int vertexSize=mVertexFormat->getVertexSize();
 			int i,j;
 			for(i=0;i<mVertexFormat->getNumElements();++i){
-				if(mVertexFormat->getFormat(i)==VertexFormat::Format_TYPE_COLOR_RGBA){
-					tbyte *data=mData+mVertexFormat->getOffset(i);
+				if(mVertexFormat->getElementFormat(i)==VertexFormat::Format_TYPE_COLOR_RGBA){
+					tbyte *data=mData+mVertexFormat->getElementOffset(i);
 					for(j=0;j<mSize;++j){
 						swap4(*(uint32*)(data+vertexSize*j));
 					}

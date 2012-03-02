@@ -384,9 +384,9 @@ void TMSHHandler::writeVertexFormat(DataStream *stream,VertexFormat::ptr vertexF
 
 	int i;
 	for(i=0;i<numElements;++i){
-		stream->writeUInt32(vertexFormat->getSemantic(i));
-		stream->writeUInt32(vertexFormat->getIndex(i));
-		stream->writeUInt32(vertexFormat->getFormat(i));
+		stream->writeUInt32(vertexFormat->getElementSemantic(i));
+		stream->writeUInt32(vertexFormat->getElementIndex(i));
+		stream->writeUInt32(vertexFormat->getElementFormat(i));
 	}
 };
 

@@ -49,11 +49,11 @@ public:
 	virtual bool addElement(const String &name,int index,int format){return addElement(Semantic_UNKNOWN,name,index,format);}
 	virtual bool addElement(int semantic,const String &name,int index,int format);
 	virtual int getNumElements() const{return mSemantics.size();}
-	virtual int getSemantic(int i) const{return mSemantics[i];}
-	virtual String getName(int i) const{return mNames[i];}
-	virtual int getIndex(int i) const{return mIndexes[i];}
-	virtual int getFormat(int i) const{return mFormats[i];}
-	virtual int getOffset(int i) const{return mOffsets[i];}
+	virtual int getElementSemantic(int i) const{return mSemantics[i];}
+	virtual String getElementName(int i) const{return mNames[i];}
+	virtual int getElementIndex(int i) const{return mIndexes[i];}
+	virtual int getElementFormat(int i) const{return mFormats[i];}
+	virtual int getElementOffset(int i) const{return mOffsets[i];}
 	virtual int getVertexSize() const{return mVertexSize;}
 	virtual int findElement(int semantic);
 	virtual int findElement(const String &name);

@@ -50,9 +50,8 @@ bool GLXPBufferRenderTarget::available(GLRenderDevice *renderDevice){
 	#endif
 }
 
-GLXPBufferRenderTarget::GLXPBufferRenderTarget(GLRenderDevice *renderDevice):GLXRenderTarget(),
+GLXPBufferRenderTarget::GLXPBufferRenderTarget(GLRenderDevice *renderDevice):BaseResource(),
 	mDevice(NULL),
-	mListener(NULL),
 	mTexture(NULL),
 	mPBuffer(0),
 	mWidth(0),
@@ -79,10 +78,7 @@ bool GLXPBufferRenderTarget::create(){
 void GLXPBufferRenderTarget::destroy(){
 	destroyBuffer();
 
-	if(mListener!=NULL){
-		mListener->renderTargetDestroyed((PixelBufferRenderTarget*)this);
-		mListener=NULL;
-	}
+	BaseResource::destroy();
 }
 
 bool GLXPBufferRenderTarget::activate(){
