@@ -246,8 +246,8 @@ uint8 *D3D10Buffer::lock(int lockAccess){
 		if(mVertexFormat!=NULL){
 			int vertexSize=mVertexFormat->getVertexSize();
 			for(i=0;i<mVertexFormat->getNumElements();++i){
-				if(mVertexFormat->getFormat(i)==VertexFormat::Format_TYPE_COLOR_RGBA){
-					tbyte *data=mData+mVertexFormat->getOffset(i);
+				if(mVertexFormat->getElementFormat(i)==VertexFormat::Format_TYPE_COLOR_RGBA){
+					tbyte *data=mData+mVertexFormat->getElementOffset(i);
 					for(j=0;j<mSize;++j){
 						uint32 &color=*(uint32*)(data+vertexSize*j);
 						swap4(color);
@@ -283,8 +283,8 @@ bool D3D10Buffer::unlock(){
 		if(mVertexFormat!=NULL){
 			int vertexSize=mVertexFormat->getVertexSize();
 			for(i=0;i<mVertexFormat->getNumElements();++i){
-				if(mVertexFormat->getFormat(i)==VertexFormat::Format_TYPE_COLOR_RGBA){
-					tbyte *data=mData+mVertexFormat->getOffset(i);
+				if(mVertexFormat->getElementFormat(i)==VertexFormat::Format_TYPE_COLOR_RGBA){
+					tbyte *data=mData+mVertexFormat->getElementOffset(i);
 					for(j=0;j<mSize;++j){
 						uint32 &color=*(uint32*)(data+vertexSize*j);
 						swap4(color);

@@ -176,8 +176,8 @@ uint8 *D3D9VertexBuffer::lock(int lockAccess){
 		if(mVertexFormat!=NULL){
 			int vertexSize=mVertexFormat->getVertexSize();
 			for(i=0;i<mVertexFormat->getNumElements();++i){
-				if(mVertexFormat->getFormat(i)==VertexFormat::Format_TYPE_COLOR_RGBA){
-					tbyte *data=mData+mVertexFormat->getOffset(i);
+				if(mVertexFormat->getElementFormat(i)==VertexFormat::Format_TYPE_COLOR_RGBA){
+					tbyte *data=mData+mVertexFormat->getElementOffset(i);
 					for(j=0;j<mSize;++j){
 						uint32 &color=*(uint32*)(data+vertexSize*j);
 						color=Math::argbToRGBA(color);
@@ -201,8 +201,8 @@ bool D3D9VertexBuffer::unlock(){
 		if(mVertexFormat!=NULL){
 			int vertexSize=mVertexFormat->getVertexSize();
 			for(i=0;i<mVertexFormat->getNumElements();++i){
-				if(mVertexFormat->getFormat(i)==VertexFormat::Format_TYPE_COLOR_RGBA){
-					tbyte *data=mData+mVertexFormat->getOffset(i);
+				if(mVertexFormat->getElementFormat(i)==VertexFormat::Format_TYPE_COLOR_RGBA){
+					tbyte *data=mData+mVertexFormat->getElementOffset(i);
 					for(j=0;j<mSize;++j){
 						uint32 &color=*(uint32*)(data+vertexSize*j);
 						color=Math::rgbaToARGB(color);

@@ -1387,9 +1387,9 @@ DWORD D3D9RenderDevice::getFVF(VertexFormat *vertexFormat){
 	int i;
 	int texCoordCount=0;
 	for(i=0;i<vertexFormat->getNumElements();++i){
-		int semantic=vertexFormat->getSemantic(i);
-		int index=vertexFormat->getIndex(i);
-		int format=vertexFormat->getFormat(i);
+		int semantic=vertexFormat->getElementSemantic(i);
+		int index=vertexFormat->getElementIndex(i);
+		int format=vertexFormat->getElementFormat(i);
 		#if defined(TOADLET_SET_D3DM)
 			if(semantic==VertexFormat::Semantic_POSITION && format==(VertexFormat::Format_TYPE_FIXED_32|VertexFormat::Format_COUNT_3)){
 				fvf|=D3DMFVF_XYZ_FIXED;

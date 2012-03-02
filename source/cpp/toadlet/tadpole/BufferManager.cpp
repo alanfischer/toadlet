@@ -272,8 +272,8 @@ VertexBuffer::ptr BufferManager::cloneVertexBuffer(VertexBuffer::ptr oldVertexBu
 		for(i=0;i<vertexFormat->getNumElements();++i){
 			int oldElementIndex=oldVertexFormat->findElement(vertexFormat->findElement(i));
 			if(oldElementIndex>=0){
-				int dstElementSize=VertexFormat::getFormatSize(vertexFormat->getFormat(i));
-				int srcElementSize=VertexFormat::getFormatSize(oldVertexFormat->getFormat(oldElementIndex));
+				int dstElementSize=VertexFormat::getFormatSize(vertexFormat->getElementFormat(i));
+				int srcElementSize=VertexFormat::getFormatSize(oldVertexFormat->getElementFormat(oldElementIndex));
 				if(dstElementSize!=srcElementSize){
 					Error::invalidParameters(Categories::TOADLET_TADPOLE,
 						"cloneVertexBuffer does not support changing size of elements");
@@ -292,11 +292,11 @@ VertexBuffer::ptr BufferManager::cloneVertexBuffer(VertexBuffer::ptr oldVertexBu
 	int srcVertSize=oldVertexFormat->getVertexSize();
 	int dstVertSize=vertexFormat->getVertexSize();
 	for(i=0;i<vertexFormat->getNumElements();++i){
-		int oldElementIndex=oldVertexFormat->findElement(vertexFormat->getSemantic(i));
+		int oldElementIndex=oldVertexFormat->findElement(vertexFormat->getElementSemantic(i));
 		if(oldElementIndex>0){
-			int elementSize=VertexFormat::getFormatSize(vertexFormat->getFormat(i));
-			int srcOffset=oldVertexFormat->getOffset(oldElementIndex);
-			int dstOffset=vertexFormat->getOffset(i);
+			int elementSize=VertexFormat::getFormatSize(vertexFormat->getElementFormat(i));
+			int srcOffset=oldVertexFormat->getElementOffset(oldElementIndex);
+			int dstOffset=vertexFormat->getElementOffset(i);
 			for(j=0;j<numVerts;++j){
 				memcpy(dstData+dstVertSize*j+dstOffset,srcData+srcVertSize*j+srcOffset,elementSize);
 			}

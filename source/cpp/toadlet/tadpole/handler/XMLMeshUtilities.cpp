@@ -551,7 +551,7 @@ Mesh::ptr XMLMeshUtilities::loadMesh(mxml_node_t *node,int version,BufferManager
 						String element=line.substr(j,space);
 						int semantic=-1;
 						if(c<vertexFormat->getNumElements()){
-							semantic=vertexFormat->getSemantic(c);
+							semantic=vertexFormat->getElementSemantic(c);
 						}
 						if(semantic==VertexFormat::Semantic_POSITION){
 							Vector3 position=parseVector3(element);

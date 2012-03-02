@@ -66,15 +66,11 @@ void NSGLRenderTarget::destroy(){
 
 bool NSGLRenderTarget::createContext(NSView *view,WindowRenderTargetFormat *format,NSOpenGLPixelFormat *pixelFormat){
 	if(pixelFormat==nil){
-		
-		
 		NSOpenGLPixelFormatAttribute attrs[]={
 			NSOpenGLPFADoubleBuffer,
 			NSOpenGLPFADepthSize,32,
 			(NSOpenGLPixelFormatAttribute)nil
 		};
-		
-
 		
 		mPixelFormat=[[NSOpenGLPixelFormat alloc] initWithAttributes:attrs];
 

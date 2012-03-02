@@ -51,11 +51,11 @@ public:
 	void destroy();
 
 	int getNumElements() const{return mSemantics.size();}
-	int getSemantic(int i) const{return mSemantics[i];}
-	String getName(int i) const{return mNames[i];}
-	int getIndex(int i) const{return mIndexes[i];}
-	int getFormat(int i) const{return mFormats[i];}
-	int getOffset(int i) const{return mOffsets[i];}
+	int getElementSemantic(int i) const{return mSemantics[i];}
+	String getElementName(int i) const{return mNames[i];}
+	int getElementIndex(int i) const{return mIndexes[i];}
+	int getElementFormat(int i) const{return mFormats[i];}
+	int getElementOffset(int i) const{return mOffsets[i];}
 	int findElement(int semantic);
 	int findElement(const String &name);
 	int getVertexSize() const{return mVertexSize;}

@@ -28,15 +28,16 @@
 
 #include "../../GLIncludes.h"
 #include "../../GLRenderTarget.h"
-#include <toadlet/peeper/WindowRenderTargetFormat.h>
+#include <toadlet/egg/BaseResource.h>
 #include <toadlet/egg/Error.h>
+#include <toadlet/peeper/WindowRenderTargetFormat.h>
 
 #import <Cocoa/Cocoa.h>
 
 namespace toadlet{
 namespace peeper{
 
-class TOADLET_API NSGLRenderTarget:protected Resource,public GLRenderTarget{
+class TOADLET_API NSGLRenderTarget:protected BaseResource,public GLRenderTarget{
 public:
 	TOADLET_RESOURCE(NSGLRenderTarget,GLRenderTarget);
 
