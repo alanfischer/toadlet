@@ -76,7 +76,6 @@ protected:
 	void unbind();
 
 	GLRenderDevice *mDevice;
-	RenderTargetDestroyedListener *mListener;
 	GLTexture *mTexture;
 	GLXPbuffer mPBuffer;
 	int mWidth;
