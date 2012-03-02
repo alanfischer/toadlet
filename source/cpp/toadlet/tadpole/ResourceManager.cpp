@@ -202,7 +202,7 @@ void ResourceManager::resourceDestroyed(Resource *resource){
 void ResourceManager::logAllResources(){
 	int i;
 	for(i=0;i<mResources.size();++i){
-		Logger::alert(String("Resource:")+i+" ptr:"+(int)mResources[i]+" name:"+(mResources[i]!=NULL?mResources[i]->getName():""));
+		Logger::alert(String("Resource:")+i+" name:"+(mResources[i]!=NULL?mResources[i]->getName():""));
 	}
 }
 
