@@ -43,9 +43,8 @@ bool EGLPBufferRenderTarget::available(GLRenderDevice *renderDevice){
 	return true;
 }
 
-EGLPBufferRenderTarget::EGLPBufferRenderTarget(GLRenderDevice *renderDevice):EGLRenderTarget(),
+EGLPBufferRenderTarget::EGLPBufferRenderTarget(GLRenderDevice *renderDevice):BaseResource(),
 	mDevice(NULL),
-	mListener(NULL),
 	mCopy(false),
 	mSeparateContext(false),
 	mTexture(NULL),
@@ -76,10 +75,7 @@ bool EGLPBufferRenderTarget::create(){
 void EGLPBufferRenderTarget::destroy(){
 	destroyBuffer();
 
-	if(mListener!=NULL){
-		mListener->renderTargetDestroyed((PixelBufferRenderTarget*)this);
-		mListener=NULL;
-	}
+	BaseResource::destroy();
 }
 
 bool EGLPBufferRenderTarget::activate(){

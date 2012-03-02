@@ -36,8 +36,10 @@
 namespace toadlet{
 namespace peeper{
 
-class TOADLET_API NSGLRenderTarget:public GLRenderTarget{
+class TOADLET_API NSGLRenderTarget:protected Resource,public GLRenderTarget{
 public:
+	TOADLET_RESOURCE(NSGLRenderTarget,GLRenderTarget);
+
 	NSGLRenderTarget();
 	NSGLRenderTarget(NSView *view,WindowRenderTargetFormat *format,NSOpenGLPixelFormat *pixelFormat=nil);
 	NSGLRenderTarget(NSOpenGLContext *context);

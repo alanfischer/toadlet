@@ -10,19 +10,9 @@ extern "C" JNIEXPORT void ANativeActivity_onCreate(ANativeActivity *activity,voi
 	app->setNativeActivity(activity);
 }
 #else
-extern "C" JNIEXPORT void Java_us_toadlet_pad(JNIEnv *env);
-
 extern "C" JNIEXPORT jobject JNICALL Java_us_toadlet_input_Input_createApplet(JNIEnv *env,jobject obj){
-	Java_us_toadlet_pad(env);
-
 	Logger::alert("getting Application");
-	Application *app=NULL;
-	jclass appClass=env->GetObjectClass(obj);
-	{
-		jmethodID getNativeHandleID=env->GetMethodID(appClass,"getNativeHandle","()I");
-		app=(Application*)env->CallIntMethod(obj,getNativeHandleID);
-	}
-	env->DeleteLocalRef(appClass);
+	Application *app=new JApplication(env,obj);
 
 	Logger::alert("creating applet");
 	Applet *applet=new Input(app);
@@ -46,14 +36,6 @@ extern "C" JNIEXPORT void JNICALL Java_us_toadlet_input_Input_destroyApplet(JNIE
 }
 
 extern "C" JNIEXPORT void JNICALL Java_us_toadlet_input_Input_startLogging(JNIEnv *env,jobject obj,jobject appletObj,jobject streamObj){
-	Application *app=NULL;
-	jclass appClass=env->GetObjectClass(obj);
-	{
-		jmethodID getNativeHandleID=env->GetMethodID(appClass,"getNativeHandle","()I");
-		app=(Application*)env->CallIntMethod(obj,getNativeHandleID);
-	}
-	env->DeleteLocalRef(appClass);
-
 	Applet *applet=NULL;
 	jclass appletClass=env->GetObjectClass(appletObj);
 	{
@@ -62,7 +44,7 @@ extern "C" JNIEXPORT void JNICALL Java_us_toadlet_input_Input_startLogging(JNIEn
 	}
 	env->DeleteLocalRef(appletClass);
 
-	Stream::ptr stream=((JApplication*)app)->makeStream(env,streamObj);
+	Stream::ptr stream=((JApplication*)((Input*)applet)->app)->makeStream(env,streamObj);
 
 	((Input*)applet)->startLogging(stream);
 }

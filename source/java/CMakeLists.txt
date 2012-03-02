@@ -159,7 +159,6 @@ set (TADPOLE_H
 	us.toadlet.tadpole.CameraNode
 	us.toadlet.tadpole.LightNode
 	us.toadlet.tadpole.MeshNode
-	us.toadlet.tadpole.ParentNode
 )
 
 # Create the jar file with UseJava.cmake functions. See UseJava.cmake for details.
