@@ -167,7 +167,7 @@ elseif (TOADLET_PLATFORM_WIN32)
 elseif (TOADLET_PLATFORM_IOS)
 	# Both iPhoneOS and iPhoneSimulator always have gles
 	set (TOADLET_HAS_OPENGL ON PARENT_SCOPE)
-	add_subdirectory (plugins/glesr1renderdevice)
+	add_subdirectory (plugins/gles1renderdevice)
 elseif (TOADLET_PLATFORM_OSX)
 	# OSX requires we find OpenGL and GLEW
 	find_package (OPENGL)
