@@ -38,6 +38,8 @@ namespace handler{
 
 class TOADLET_API GIFHandler:protected Object,public ResourceStreamer{
 public:
+	TOADLET_OBJECT(GIFHandler);
+
 	GIFHandler(TextureManager *textureManager){mTextureManager=textureManager;}
 
 	Resource::ptr load(Stream::ptr stream,ResourceData *data,ProgressListener *listener);
