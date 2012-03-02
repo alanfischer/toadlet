@@ -27,6 +27,7 @@
 #define TOADLET_PEEPER_GLXWINDOWRENDERTARGET_H
 
 #include "GLXRenderTarget.h"
+#include <toadlet/egg/BaseResource.h>
 #include <toadlet/peeper/WindowRenderTargetFormat.h>
 
 namespace toadlet{
