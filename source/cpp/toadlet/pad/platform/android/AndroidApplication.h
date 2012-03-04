@@ -108,7 +108,7 @@ public:
 	Engine *getEngine() const{return mEngine;}
 	RenderDevice *getRenderDevice() const{return mRenderDevice;}
 	AudioDevice *getAudioDevice() const{return mAudioDevice;}
-	InputDevice *getInputDevice(InputDevice::InputType type) const{return NULL;}
+	InputDevice *getInputDevice(InputDevice::InputType type) const{return mInputDevices[type];}
 
 	void setNativeActivity(ANativeActivity *activity);
 
@@ -145,6 +145,7 @@ protected:
 	RenderTarget::ptr mRenderTarget;
 	RenderDevice::ptr mRenderDevice;
 	AudioDevice::ptr mAudioDevice;
+	InputDevice::ptr mInputDevices[InputDevice::InputType_MAX];
 	Applet *mApplet;
 };
 

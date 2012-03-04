@@ -29,6 +29,7 @@
 #include <toadlet/egg/System.h>
 #include <toadlet/tadpole/handler/platform/android/AndroidAssetArchive.h>
 #include <toadlet/tadpole/handler/platform/android/AndroidTextureHandler.h>
+#include <android/sensor.h>
 
 using namespace toadlet::egg;
 using namespace toadlet::peeper;
@@ -40,6 +41,7 @@ using namespace toadlet::pad;
 TOADLET_C_API RenderTarget *new_EGLWindowRenderTarget(void *display,void *window,WindowRenderTargetFormat *format);
 TOADLET_C_API RenderDevice *new_GLES1RenderDevice();
 TOADLET_C_API AudioDevice *new_JAudioDevice(JNIEnv *env,jobject obj);
+TOADLET_C_API InputDevice *new_AndroidSensorDevice(int type);
 
 namespace toadlet{
 namespace pad{
@@ -95,12 +97,37 @@ bool AndroidApplication::create(String renderDevice,String audioDevice){
 	}
 	env->DeleteLocalRef(contextClass);
 
-	AndroidAssetArchive::ptr assetArchive=AndroidAssetArchive::ptr(new AndroidAssetArchive(env,assetManagerObj));
-	mEngine->getArchiveManager()->manage(shared_static_cast<Archive>(assetArchive));
+	AndroidAssetArchive::ptr assetArchive=new AndroidAssetArchive(env,assetManagerObj);
+	mEngine->getArchiveManager()->manageArchive(shared_static_cast<Archive>(assetArchive));
 
-	AndroidTextureHandler::ptr textureHandler=AndroidTextureHandler::ptr(new AndroidTextureHandler(mEngine->getTextureManager(),env));
+	AndroidTextureHandler::ptr textureHandler=new AndroidTextureHandler(mEngine->getTextureManager(),env);
 	mEngine->getTextureManager()->setDefaultStreamer(textureHandler);
 	
+	InputDevice::ptr motionDevice=new_AndroidSensorDevice(ASENSOR_TYPE_ACCELEROMETER);
+	if(motionDevice->create()){
+		mInputDevices[motionDevice->getType()]=motionDevice;
+	}
+
+	InputDevice::ptr angularDevice=new_AndroidSensorDevice(ASENSOR_TYPE_GYROSCOPE);
+	if(angularDevice->create()){
+		mInputDevices[angularDevice->getType()]=angularDevice;
+	}
+
+	InputDevice::ptr lightDevice=new_AndroidSensorDevice(ASENSOR_TYPE_LIGHT);
+	if(lightDevice->create()){
+		mInputDevices[lightDevice->getType()]=lightDevice;
+	}
+
+	InputDevice::ptr proximityDevice=new_AndroidSensorDevice(ASENSOR_TYPE_PROXIMITY);
+	if(proximityDevice->create()){
+		mInputDevices[proximityDevice->getType()]=proximityDevice;
+	}
+
+	InputDevice::ptr magneticDevice=new_AndroidSensorDevice(ASENSOR_TYPE_MAGNETIC_FIELD);
+	if(magneticDevice->create()){
+		mInputDevices[magneticDevice->getType()]=magneticDevice;
+	}
+
 	if(mApplet!=NULL){
 		mApplet->create();
 	}
@@ -123,6 +150,14 @@ void AndroidApplication::destroy(){
 	if(mEngine!=NULL){
 		delete mEngine;
 		mEngine=NULL;
+	}
+
+	int i;
+	for(i=0;i<InputDevice::InputType_MAX;++i){
+		if(mInputDevices[i]!=NULL){
+			mInputDevices[i]->destroy();
+			mInputDevices[i]=NULL;
+		}
 	}
 
 	if(mQueue!=NULL){
