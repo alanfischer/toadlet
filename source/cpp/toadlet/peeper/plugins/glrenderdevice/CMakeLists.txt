@@ -17,6 +17,7 @@ set (PEEPER_GLRENDERDEVICE_SRC
 	GLTexture.cpp
 	GLTextureMipPixelBuffer.cpp
 	GLVertexFormat.cpp
+	platform/jgl/us_toadlet_peeper_NGLRenderDevice.cpp
 )
 
 
