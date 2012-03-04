@@ -29,6 +29,10 @@
 namespace toadlet{
 namespace flick{
 
+TOADLET_C_API InputDevice *new_AndroidSensorDevice(int type){
+	return new AndroidSensorDevice(type);
+}
+
 AndroidSensorDevice::AndroidSensorDevice(int type):Object(),
 	mSensorManager(NULL),
 	mEventQueue(NULL),
