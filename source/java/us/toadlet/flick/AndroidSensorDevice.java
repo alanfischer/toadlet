@@ -53,7 +53,7 @@ public class AndroidSensorDevice implements InputDevice,SensorEventListener{
 	public boolean start(){
 		mRunning=false;
 		if(mSensor!=null){
-			mRunning=mSensorManager.registerListener(this,mSensor,SensorManager.SENSOR_DELAY_GAME);
+			mRunning=mSensorManager.registerListener(this,mSensor,mSampleTime);
 		}
 		return mRunning;
 	}
@@ -68,7 +68,7 @@ public class AndroidSensorDevice implements InputDevice,SensorEventListener{
 	}
 	
 	public void setListener(InputDeviceListener listener){mListener=listener;}
-	public void setSampleTime(int dt){}
+	public void setSampleTime(int dt){mSampleTime=dt*1000;}
 	public void setAlpha(float alpha){}
 
 	public void onAccuracyChanged(Sensor sensor,int accuracy){}
@@ -126,6 +126,7 @@ public class AndroidSensorDevice implements InputDevice,SensorEventListener{
 
 	Context mContext;
 	SensorManager mSensorManager;
+	int mSampleTime=SensorManager.SENSOR_DELAY_GAME;
 	int mSensorType;
 	Sensor mSensor;
 	int mInputType;
