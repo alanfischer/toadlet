@@ -38,6 +38,7 @@ public:
 	TOADLET_SHARED_POINTERS(DiffuseTerrainMaterialSource);
 	
 	DiffuseTerrainMaterialSource(Engine *engine);
+	virtual ~DiffuseTerrainMaterialSource(){}
 	
 	void destroy();
 

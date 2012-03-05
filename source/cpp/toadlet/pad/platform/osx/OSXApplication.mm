@@ -327,12 +327,13 @@ void OSXApplication::preEngineCreate(){
 		mPool=[[NSAutoreleasePool alloc] init];
 		#if defined(TOADLET_HAS_UIKIT)
 			[UIApplication sharedApplication];
+			mPool=[[NSAutoreleasePool alloc] init];
+			CGRect rect=[[UIScreen mainScreen] applicationFrame];
 			if(mWidth==-1 && mHeight==-1){
-				CGRect rect=[[UIScreen mainScreen] applicationFrame];
 				mWidth=rect.size.width;
 				mHeight=rect.size.height;
 			}
-			mPool=[[NSAutoreleasePool alloc] init];
+			mWindow=[[UIWindow alloc] initWithFrame:rect];
 		#else
 			NSApplicationLoad();
 			if(mWidth==-1 && mHeight==-1){
@@ -345,17 +346,21 @@ void OSXApplication::preEngineCreate(){
 				backing:NSBackingStoreBuffered defer:FALSE];
 		#endif
 	}
-
+	else{
+		#if defined(TOADLET_HAS_UIKIT)
+			mWidth=[(UIWindow*)mWindow bounds].size.width;
+			mHeight=[(UIWindow*)mWindow bounds].size.height;
+		#else
+			NSView *view=[(NSWindow*)mWindow contentView];
+			if(view!=nil){
+				mWidth=[view bounds].size.width;
+				mHeight=[view bounds].size.height;
+			}
+		#endif
+	}
 	#if defined(TOADLET_HAS_UIKIT)
-		mWidth=[(UIWindow*)mWindow bounds].size.width;
-		mHeight=[(UIWindow*)mWindow bounds].size.height;
 		CGRect rect;
 	#else
-		NSView *view=[(NSWindow*)mWindow contentView];
-		if(view!=nil){
-			mWidth=[view bounds].size.width;
-			mHeight=[view bounds].size.height;
-		}
 		NSRect rect;
 	#endif
 	rect.origin.x=mPositionX;
