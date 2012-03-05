@@ -49,7 +49,7 @@ public:
 			Vector4 color=Colors::AZURE*1.5;
 			color.w=0.5f;
 
-			if(engine->hasShader(Shader::ShaderType_VERTEX) && engine->hasShader(Shader::ShaderType_FRAGMENT)){
+			if(false && engine->hasShader(Shader::ShaderType_VERTEX) && engine->hasShader(Shader::ShaderType_FRAGMENT)){
 				TextureFormat::ptr waterFormat(new TextureFormat(TextureFormat::Dimension_D2,TextureFormat::Format_RGB_8,512,512,1,0));
 				TextureFormat::ptr depthFormat(new TextureFormat(TextureFormat::Dimension_D2,TextureFormat::Format_DEPTH_24,512,512,1,1));
 

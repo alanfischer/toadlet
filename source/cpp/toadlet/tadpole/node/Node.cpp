@@ -393,12 +393,12 @@ void Node::activate(){
 }
 
 void Node::deactivate(){
-	mActive=false;
-	mDeactivateCount=0;
-
 	if(mActive==false){
 		return;
 	}
+
+	mActive=false;
+	mDeactivateCount=0;
 
 	super::deactivate();
 	Node::ptr node;

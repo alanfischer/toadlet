@@ -131,7 +131,7 @@ IndexBuffer::ptr BufferManager::createIndexBuffer(int usage,int access,IndexBuff
 		}
 		buffer=backableBuffer;
 	}
-	else{
+	else if(renderDevice!=NULL){
 		buffer=IndexBuffer::ptr(renderDevice->createIndexBuffer());
 		if(buffer==NULL){
 			return NULL;

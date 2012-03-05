@@ -279,9 +279,9 @@ bool FFmpegController::open(Stream::ptr stream){
 	mIOCtx=(ByteIOContext*)av_mallocz(sizeof(ByteIOContext));
 	int bufferSize=4096;
 	unsigned char *buffer=(unsigned char*)av_mallocz(bufferSize+FF_INPUT_BUFFER_PADDING_SIZE);
-	int result=init_put_byte(mIOCtx,buffer,bufferSize,0,stream,toadlet_read_packet,toadlet_write_packet,toadlet_seek);
+	init_put_byte(mIOCtx,buffer,bufferSize,0,stream,toadlet_read_packet,toadlet_write_packet,toadlet_seek);
 
-	result=av_open_input_stream(&mFormatCtx,mIOCtx,name,av_find_input_format(name),NULL);
+	int result=av_open_input_stream(&mFormatCtx,mIOCtx,name,av_find_input_format(name),NULL);
 	if(result<0){
 		Error::unknown("av_open_input_stream failed");
         return false;
@@ -448,7 +448,7 @@ void FFmpegController::updateDecode(int dt){
 	AVPacket pkt;
 	PacketQueue *videoQueue=mStreams[AVMEDIA_TYPE_VIDEO].queue;
 	PacketQueue *audioQueue=mStreams[AVMEDIA_TYPE_AUDIO].queue;
-	int minQueueSize=4,maxQueueSize=100;
+	int maxQueueSize=100;
 
 	if((videoQueue==NULL || videoQueue->count>=4) && (audioQueue==NULL || audioQueue->count>=1)){
 		return;
