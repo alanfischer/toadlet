@@ -34,7 +34,7 @@ public:
 		Logger::alert("Loading terrain");
 
 		terrainMaterialSource=DiffuseTerrainMaterialSource::ptr(new DiffuseTerrainMaterialSource(engine));
-		#if defined(TOADLET_ANDROID)
+		#if defined(TOADLET_PLATFORM_ANDROID)
 			terrainMaterialSource->setDiffuseTexture(0,engine->getTextureManager()->findTexture("rock.png"));
 			terrainMaterialSource->setDiffuseTexture(1,NULL);
 		#else
@@ -63,7 +63,6 @@ public:
 				refractTarget->attach(refractTexture->getMipPixelBuffer(0,0),PixelBufferRenderTarget::Attachment_COLOR_0);
 
 				bumpTexture=engine->getTextureManager()->findTexture("water_bump.png");
-engine->getTextureManager()->logAllResources();
 
 				RenderPath::ptr shaderPath=waterMaterial->addPath();
 				RenderPass::ptr pass=shaderPath->addPass();

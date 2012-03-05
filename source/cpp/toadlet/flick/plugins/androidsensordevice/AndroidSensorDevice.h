@@ -56,7 +56,7 @@ protected:
 	void onSensorChanged();
 
 	static InputType getInputTypeFromSensorType(int sensorType);
-	static int sensorChanged(int fd,int events,void  *data){((AndroidSensorDevice*)data)->onSensorChanged();return 0;}
+	static int sensorChanged(int fd,int events,void  *data){((AndroidSensorDevice*)data)->onSensorChanged();return 1;}
 
 	ASensorManager *mSensorManager;
 	ASensorEventQueue *mEventQueue;
