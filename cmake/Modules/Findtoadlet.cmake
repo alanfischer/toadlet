@@ -94,6 +94,7 @@ set (TOADLET_LIB_BASENAMES
 	toadlet_peeper
 	toadlet_knot
 	toadlet_hop
+	toadlet_flick_androidsensordevice
 	toadlet_flick_iosmotiondevice
 	toadlet_flick_jinputdevice
 	toadlet_flick_mfvideodevice

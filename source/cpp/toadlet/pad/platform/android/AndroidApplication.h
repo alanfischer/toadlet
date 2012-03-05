@@ -38,17 +38,15 @@ namespace pad{
 
 /// @todo: There is still a problem where the native window doesn't resize correctly on rotation
 /// @todo: And the rest of the input keys need to be handled besides space
-class AndroidApplication:public Application,public RenderTarget,public Runnable{
+class AndroidApplication:protected Object,public Application,public Runnable{
 public:
+	TOADLET_OBJECT(AndroidApplication);
+
 	AndroidApplication();
 	virtual ~AndroidApplication();
 
 	bool create(String renderDevice,String audioDevice);
 	void destroy();
-
-	RenderTarget *getRootRenderTarget(){return mRenderTarget;}
-	bool isPrimary() const{return mRenderTarget->isPrimary();}
-	bool isValid() const{return mRenderTarget->isValid();}
 
 	void setApplet(Applet *applet){mApplet=applet;}
 	Applet *getApplet() const{return mApplet;}
