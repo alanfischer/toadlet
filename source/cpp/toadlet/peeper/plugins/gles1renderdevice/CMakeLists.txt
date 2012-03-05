@@ -40,6 +40,14 @@ if (TOADLET_PLATFORM_ANDROID)
 	endif (ANDROID_NDK_API_LEVEL LESS 9)
 	set (PEEPER_GLRENDERDEVICE_LIBS ${GLESV1_LIBS})
 elseif (TOADLET_PLATFORM_IOS)
+	set (PEEPER_GLRENDERDEVICE_H ${PEEPER_GLRENDERDEVICE_H}
+		../glrenderdevice/GLFBORenderTarget.h
+		../glrenderdevice/GLFBOPixelBuffer.h
+	)
+	set (PEEPER_GLRENDERDEVICE_SRC ${PEEPER_GLRENDERDEVICE_SRC}
+		../glrenderdevice/GLFBORenderTarget.cpp
+		../glrenderdevice/GLFBOPixelBuffer.cpp
+	)
 	find_library (UIKIT_LIBS UIKit)
 	set (PEEPER_GLRENDERDEVICE_LIBS objc ${UIKIT_LIBS})
 endif (TOADLET_PLATFORM_ANDROID)

@@ -49,10 +49,11 @@ using namespace toadlet::tadpole::handler;
 using namespace toadlet::pad;
 
 #if defined(TOADLET_HAS_OPENGL)
-	extern "C" RenderDevice *new_GLRenderDevice();
 	#if defined(TOADLET_HAS_UIKIT)
+		extern "C" RenderDevice *new_GLES1RenderDevice();
 		extern "C" RenderTarget *new_EAGLRenderTarget(void *display,void *layer,WindowRenderTargetFormat *format);
 	#else
+		extern "C" RenderDevice *new_GLRenderDevice();
 		extern "C" RenderTarget *new_NSGLRenderTarget(void *display,void *view,WindowRenderTargetFormat *format);
 	#endif
 #endif
@@ -289,7 +290,7 @@ OSXApplication::OSXApplication():
 {
 	#if defined(TOADLET_HAS_OPENGL)
 		#if defined(TOADLET_HAS_UIKIT)
-			mRenderDevicePlugins.add("gl",RenderDevicePlugin(new_EAGLRenderTarget,new_GLRenderDevice));
+			mRenderDevicePlugins.add("gl",RenderDevicePlugin(new_EAGLRenderTarget,new_GLES1RenderDevice));
 		#else
 			mRenderDevicePlugins.add("gl",RenderDevicePlugin(new_NSGLRenderTarget,new_GLRenderDevice));
 		#endif
