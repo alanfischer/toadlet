@@ -46,7 +46,10 @@ D3D9WindowRenderTarget::D3D9WindowRenderTarget():D3D9RenderTarget(),
 	mD3DDevice(NULL),
 	mColorSurface(NULL),
 	mDepthSurface(NULL),
-	mWindow(0)
+	mWindow(0),
+
+	CreateSymbol(NULL),
+	CompileShaderSymbol(NULL)
 {
 }
 
@@ -56,7 +59,10 @@ D3D9WindowRenderTarget::D3D9WindowRenderTarget(HWND wnd,WindowRenderTargetFormat
 	mD3DDevice(NULL),
 	mColorSurface(NULL),
 	mDepthSurface(NULL),
-	mWindow(0)
+	mWindow(0),
+
+	CreateSymbol(NULL),
+	CompileShaderSymbol(NULL)
 {
 	createContext(wnd,format);
 }
