@@ -34,12 +34,12 @@ TOADLET_C_API RenderTarget *new_EGLWindowRenderTarget(void *display,void *window
 	return new EGLWindowRenderTarget(display,window,format);
 }
 
-EGLWindowRenderTarget::EGLWindowRenderTarget():EGLRenderTarget(),
+EGLWindowRenderTarget::EGLWindowRenderTarget():BaseResource(),EGLRenderTarget(),
 	mConfig(0),
 	mPixmap(false)
 {}
 
-EGLWindowRenderTarget::EGLWindowRenderTarget(void *display,void *window,WindowRenderTargetFormat *format,bool pixmap):EGLRenderTarget(),
+EGLWindowRenderTarget::EGLWindowRenderTarget(void *display,void *window,WindowRenderTargetFormat *format,bool pixmap):BaseResource(),EGLRenderTarget(),
 	mConfig(0),
 	mPixmap(false)
 {
@@ -220,6 +220,8 @@ bool EGLWindowRenderTarget::createContext(void *display,void *window,WindowRende
 
 bool EGLWindowRenderTarget::destroyContext(){
 	if(mDisplay!=EGL_NO_DISPLAY){
+		Logger::debug("destroying EGL context");
+
 		eglMakeCurrent(mDisplay,EGL_NO_SURFACE,EGL_NO_SURFACE,EGL_NO_CONTEXT);
 
 		if(mContext!=EGL_NO_CONTEXT){

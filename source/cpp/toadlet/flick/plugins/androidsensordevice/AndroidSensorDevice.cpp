@@ -24,6 +24,7 @@
  ********** Copyright header - do not remove **********/
 
 #include "AndroidSensorDevice.h"
+#include <toadlet/egg/Logger.h>
 #include <toadlet/flick/InputDeviceListener.h>
 
 namespace toadlet{
@@ -57,6 +58,9 @@ bool AndroidSensorDevice::create(){
 	mEventQueue=ASensorManager_createEventQueue(mSensorManager,looper,0,sensorChanged,this);
 
 	mSensor=ASensorManager_getDefaultSensor(mSensorManager,mSensorType);
+	
+	setSampleTime(20);
+
 	return mSensor!=NULL;
 }
 
@@ -74,7 +78,7 @@ void AndroidSensorDevice::destroy(){
 bool AndroidSensorDevice::start(){
 	mRunning=false;
 	if(mSensor!=NULL){
-		mRunning=ASensorEventQueue_enableSensor(mEventQueue,mSensor)>0;
+		mRunning=ASensorEventQueue_enableSensor(mEventQueue,mSensor)>=0;
 	}
 	return mRunning;
 }

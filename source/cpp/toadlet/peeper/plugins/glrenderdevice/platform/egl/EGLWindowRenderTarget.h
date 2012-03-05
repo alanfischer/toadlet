@@ -46,17 +46,17 @@ public:
 
 	virtual RenderTarget *getRootRenderTarget(){return (GLRenderTarget*)this;}
 
+	bool isPrimary() const{return true;}
+	bool isValid() const{return mContext!=NULL && mSurface!=NULL;}
+	int getWidth() const;
+	int getHeight() const;
+
 	bool createContext(void *display,void *window,WindowRenderTargetFormat *format,bool pixmap=false);
 	bool destroyContext();
 	bool activateAdditionalContext(){return false;}
 	void deactivateAdditionalContext(){}
 
 	bool swap();
-
-	bool isPrimary() const{return true;}
-	bool isValid() const{return mContext!=NULL && mSurface!=NULL;}
-	int getWidth() const;
-	int getHeight() const;
 
 protected:
 	EGLConfig mConfig;

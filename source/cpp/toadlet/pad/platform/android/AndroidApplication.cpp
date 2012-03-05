@@ -82,7 +82,7 @@ AndroidApplication::~AndroidApplication(){
 bool AndroidApplication::create(String renderDevice,String audioDevice){
 	mConfig=AConfiguration_new();
 
-	mEngine=new Engine(true);
+	mEngine=new Engine(true,false);
 	
 	mEngine->installHandlers();
 
