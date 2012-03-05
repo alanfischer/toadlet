@@ -454,7 +454,7 @@ void AndroidApplication::windowCreated(ANativeWindow *window){
 	
 	if(device!=NULL){
 		mRenderDevice=device;
-		mRenderDevice->setRenderTarget(this);
+		mRenderDevice->setRenderTarget(mRenderTarget);
 		mEngine->setRenderDevice(mRenderDevice);
 	}
 }

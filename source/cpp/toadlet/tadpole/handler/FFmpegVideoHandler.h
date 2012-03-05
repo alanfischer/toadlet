@@ -88,7 +88,7 @@ public:
 
 	void start();
 	void pause();
-	bool paused(){return mState==State_PAUSE;}
+	bool paused(){return mState==State_STOP || mState==State_PAUSE;}
 	void stop();
 	void update(int dt);
 
