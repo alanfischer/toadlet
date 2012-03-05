@@ -9,6 +9,7 @@
 class Matrix4x4Accessor{
 public:
 	TOADLET_SHARED_POINTERS(Matrix4x4Accessor);
+	virtual ~Matrix4x4Accessor(){}
 
 	virtual void setMatrix4x4(const Matrix4x4 &matrix)=0;
 	virtual const Matrix4x4 &getMatrix4x4()=0;
