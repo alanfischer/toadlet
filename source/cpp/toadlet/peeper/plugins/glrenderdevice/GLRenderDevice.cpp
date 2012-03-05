@@ -1921,7 +1921,6 @@ void GLRenderDevice::setFixedVertexData(const VertexData *vertexData){
 #if defined(TOADLET_HAS_GLSHADERS)
 void GLRenderDevice::setShaderVertexData(const VertexData *vertexData){
 	if(mLastShaderState==NULL){
-		Error::unknown(Categories::TOADLET_PEEPER,"no ShaderState set");
 		return;
 	}
 
