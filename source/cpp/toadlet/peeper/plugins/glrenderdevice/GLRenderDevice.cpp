@@ -2234,10 +2234,10 @@ GLuint GLRenderDevice::getGLFormat(int textureFormat,bool internal){
 				if(internal && formatType==TextureFormat::Format_TYPE_UINT_16){
 					return GL_DEPTH_COMPONENT16;
 				}
-				else if(internal && formatType==TextureFormat::Format_TYPE_UINT_24){
-					return GL_DEPTH_COMPONENT24;
-				}
 				#if !defined(TOADLET_HAS_EAGL)
+					else if(internal && formatType==TextureFormat::Format_TYPE_UINT_24){
+						return GL_DEPTH_COMPONENT24;
+					}
 					else if(internal && formatType==TextureFormat::Format_TYPE_UINT_32){
 						return GL_DEPTH_COMPONENT32;
 					}

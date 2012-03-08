@@ -72,7 +72,6 @@ Stream::ptr ArchiveManager::openStream(const String &name){
 		}
 	}
 
-Logger::alert(String("STREAM:")+(int)stream.get());
 	return stream;
 }
 
