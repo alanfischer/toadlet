@@ -26,6 +26,7 @@
 #ifndef TOADLET_PEEPER_GLRENDERTARGET_H
 #define TOADLET_PEEPER_GLRENDERTARGET_H
 
+#include "GLIncludes.h"
 #include <toadlet/peeper/RenderTarget.h>
 
 namespace toadlet{

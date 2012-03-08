@@ -31,7 +31,15 @@ extern "C" JNIEXPORT jobject JNICALL Java_us_toadlet_randisle_RandIsle_createApp
 	return appletObj;
 }
 
-extern "C" JNIEXPORT void JNICALL Java_us_toadlet_randisle_RandIsle_destroyApplet(JNIEnv *env,jobject obj,jobject applet){
-//	delete applet;
+extern "C" JNIEXPORT void JNICALL Java_us_toadlet_randisle_RandIsle_destroyApplet(JNIEnv *env,jobject obj,jobject appletObj){
+	Applet *applet=NULL;
+	
+	jclass appletClass=env->FindClass("us/toadlet/pad/NApplet");
+	{
+		jfieldID nativeHandleID=env->GetFieldID(appletClass,"mNativeHandle","I");
+		applet=(Applet*)env->GetIntField(appletObj,nativeHandleID);
+	}
+
+	delete applet;
 }
 #endif

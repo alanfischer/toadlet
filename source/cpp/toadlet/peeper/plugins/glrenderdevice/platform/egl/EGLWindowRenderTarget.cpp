@@ -155,6 +155,7 @@ bool EGLWindowRenderTarget::createContext(void *display,void *window,WindowRende
 	int depthBits=format->depthBits;
 	int stencilBits=format->stencilBits;
 	int multisamples=format->multisamples;
+	int contextVersion=format->flags;
 
 	mConfig=chooseEGLConfig(mDisplay,redBits,greenBits,blueBits,alphaBits,depthBits,stencilBits,!pixmap,pixmap,false,multisamples);
 	TOADLET_CHECK_EGLERROR("chooseEGLConfig");
@@ -166,7 +167,7 @@ bool EGLWindowRenderTarget::createContext(void *display,void *window,WindowRende
 
 	Logger::debug(Categories::TOADLET_PEEPER,
 		String("chooseEGLConfig config:")+(int)mConfig);
-
+		
 	TOADLET_TRY
 		if(!pixmap){
 			mSurface=eglCreateWindowSurface(mDisplay,mConfig,(NativeWindowType)window,NULL);
@@ -183,8 +184,20 @@ bool EGLWindowRenderTarget::createContext(void *display,void *window,WindowRende
 		return false;
 	}
 
+    EGLint configOptions[32];
+	int i=0;
+
+	if(contextVersion>0){
+		configOptions[i++]=EGL_CONTEXT_CLIENT_VERSION;
+		configOptions[i++]=contextVersion;
+	Logger::alert(String("Making context with options:")+contextVersion);
+	}
+	
+	// Terminate the list with EGL_NONE
+	configOptions[i++]=EGL_NONE;
+
 	TOADLET_TRY
-		mContext=eglCreateContext(mDisplay,mConfig,EGL_NO_CONTEXT,NULL);
+		mContext=eglCreateContext(mDisplay,mConfig,EGL_NO_CONTEXT,configOptions);
 		TOADLET_CHECK_EGLERROR("eglCreateContext");
 	TOADLET_CATCH(...){mContext=EGL_NO_CONTEXT;}
 	if(mContext==EGL_NO_CONTEXT){

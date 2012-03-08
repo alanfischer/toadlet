@@ -26,9 +26,9 @@
 #ifndef TOADLET_PEEPER_GLTEXTUREMIPPIXELBUFFER_H
 #define TOADLET_PEEPER_GLTEXTUREMIPPIXELBUFFER_H
 
-#include <toadlet/egg/BaseResource.h>
 #include "GLIncludes.h"
 #include "GLPixelBuffer.h"
+#include <toadlet/egg/BaseResource.h>
 
 namespace toadlet{
 namespace peeper{

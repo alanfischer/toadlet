@@ -501,7 +501,8 @@ public abstract class AndroidApplication extends Activity implements RenderTarge
 		boolean result=false;
 		mRenderTarget=makeRenderTarget(holder);
 		if(mRenderTarget!=null){
-			mRenderDevice=new NGLRenderDevice();
+			// Until I can determine otherwise, only a GLES1 context may be made from java
+			mRenderDevice=new NGLES1RenderDevice();
 			result=mRenderDevice.create(this,null);
 			if(result==false){
 				mRenderDevice=null;

@@ -80,7 +80,6 @@ set (PEEPER_SRC
 	us/toadlet/peeper/GLRenderTarget.java
 	us/toadlet/peeper/EGLRenderTarget.java
 	us/toadlet/peeper/EGLWindowRenderTarget.java
-	us/toadlet/peeper/NGLRenderDevice.java
 	us/toadlet/peeper/NGLES1RenderDevice.java
 	us/toadlet/peeper/NGLES2RenderDevice.java
 	${CMAKE_CURRENT_BINARY_DIR}/us/toadlet/peeper/Version.java

@@ -45,4 +45,22 @@ JNIEXPORT jint JNICALL Java_us_toadlet_tadpole_Node_getScope(JNIEnv *env,jobject
 	return node->getScope();
 }
 
+JNIEXPORT jboolean JNICALL Java_us_toadlet_tadpole_Node_attach(JNIEnv *env,jobject obj,jobject childObj){
+	Java_us_toadlet_tadpole_Node(env); // hack
+
+	Node *node=(Node*)env->GetIntField(obj,Node_nativeHandle);
+	Node *child=(Node*)env->GetIntField(childObj,Node_nativeHandle);
+
+	return node->attach(child);
+}
+
+JNIEXPORT jboolean JNICALL Java_us_toadlet_tadpole_Node_remove(JNIEnv *env,jobject obj,jobject childObj){
+	Java_us_toadlet_tadpole_Node(env); // hack
+
+	Node *node=(Node*)env->GetIntField(obj,Node_nativeHandle);
+	Node *child=(Node*)env->GetIntField(childObj,Node_nativeHandle);
+
+	return node->remove(child);
+}
+
 }
