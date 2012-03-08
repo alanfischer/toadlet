@@ -265,6 +265,35 @@
 	#define TOADLET_HAS_GLSL
 #endif
 
+#if defined(TOADLET_HAS_GLES)
+	#if defined(TOADLET_HAS_GL_20)
+		#define GLBuffer			GLES2Buffer
+		#define GLFBOPixelBuffer	GLES2FBOPixelBuffer
+		#define GLFBORenderTarget	GLES2FBORenderTarget
+		#define GLPixelBuffer		GLES2PixelBuffer
+		#define GLRenderDevice		GLES2RenderDevice
+		#define GLRenderState		GLES2RenderState
+		#define GLRenderTarget		GLES2RenderTarget
+		#define GLSLShader			GLES2SLShader
+		#define GLSLShaderState		GLES2SLShaderState
+		#define GLSLVertexLayout	GLES2SLVertexLayout
+		#define GLTexture			GLES2Texture
+		#define GLTextureMipPixelBuffer	GLES2TextureMipPixelBuffer
+		#define GLVertexFormat		GLES2VertexFormat
+	#else
+		#define GLBuffer			GLES1Buffer
+		#define GLFBOPixelBuffer	GLES1FBOPixelBuffer
+		#define GLFBORenderTarget	GLES1FBORenderTarget
+		#define GLPixelBuffer		GLES1PixelBuffer
+		#define GLRenderDevice		GLES1RenderDevice
+		#define GLRenderState		GLES1RenderState
+		#define GLRenderTarget		GLES1RenderTarget
+		#define GLTexture			GLES1Texture
+		#define GLTextureMipPixelBuffer	GLES1TextureMipPixelBuffer
+		#define GLVertexFormat		GLES1VertexFormat
+	#endif
+#endif
+
 #if defined(TOADLET_DEBUG)
 	#define TOADLET_CHECK_GLERROR(function) \
 		{ int error=glGetError(); \

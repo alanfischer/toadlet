@@ -26,9 +26,9 @@
 #ifndef TOADLET_PEEPER_GLSLSHADERSTATE_H
 #define TOADLET_PEEPER_GLSLSHADERSTATE_H
 
-#include <toadlet/peeper/ShaderState.h>
 #include "GLSLShader.h"
 #include "GLSLVertexLayout.h"
+#include <toadlet/peeper/ShaderState.h>
 
 #if defined(TOADLET_HAS_GLSL)
 

@@ -100,11 +100,6 @@ bool BackableShader::convertCreate(Shader::ptr shader,RenderDevice *renderDevice
 	int i;
 	for(i=0;i<numCodes;++i){
 		if(renderDevice->getShaderProfileSupported(profiles[i])){
-			if(codes[i]==(char*)NULL){
-				Logger::debug(Categories::TOADLET_PEEPER,
-					"no code for shader");
-				return false;
-			}
 			if(shader->create(shaderType,profiles[i],codes[i])==false){
 				return false;
 			}

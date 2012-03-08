@@ -196,6 +196,8 @@ bool GLSLShaderState::link(){
 		return false;
 	}
 
+	mNeedsLink=false;
+
 	glLinkProgram(mHandle);
 
 	GLint status=0;
@@ -217,8 +219,6 @@ bool GLSLShaderState::link(){
 	TOADLET_CHECK_GLERROR("GLSLShaderState::link");
 
 	reflect();
-
-	mNeedsLink=false;
 
 	return true;
 }

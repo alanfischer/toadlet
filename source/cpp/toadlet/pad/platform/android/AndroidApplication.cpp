@@ -40,6 +40,7 @@ using namespace toadlet::pad;
 
 TOADLET_C_API RenderTarget *new_EGLWindowRenderTarget(void *display,void *window,WindowRenderTargetFormat *format);
 TOADLET_C_API RenderDevice *new_GLES1RenderDevice();
+TOADLET_C_API RenderDevice *new_GLES2RenderDevice();
 TOADLET_C_API AudioDevice *new_JAudioDevice(JNIEnv *env,jobject obj);
 TOADLET_C_API InputDevice *new_AndroidSensorDevice(int type);
 
@@ -82,7 +83,7 @@ AndroidApplication::~AndroidApplication(){
 bool AndroidApplication::create(String renderDevice,String audioDevice){
 	mConfig=AConfiguration_new();
 
-	mEngine=new Engine(true,false);
+	mEngine=new Engine(true,true);
 	
 	mEngine->installHandlers();
 
@@ -436,6 +437,7 @@ void AndroidApplication::windowCreated(ANativeWindow *window){
 		else{
 			mFormat->pixelFormat=TextureFormat::Format_RGBA_8;
 		}
+		mFormat->flags=2; //gles2
 		target=new_EGLWindowRenderTarget(0,mWindow,mFormat);
 	TOADLET_CATCH(const Exception &){target=NULL;}
 	
@@ -446,7 +448,7 @@ void AndroidApplication::windowCreated(ANativeWindow *window){
 
 	RenderDevice::ptr device;
 	if(target!=NULL){
-		device=new_GLES1RenderDevice();
+		device=new_GLES2RenderDevice();
 		if(device->create(target,NULL)==false){
 			device=NULL;
 		}

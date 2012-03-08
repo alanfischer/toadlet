@@ -27,16 +27,16 @@
 			>
 		<!-- <activity android:name="RandIsle" -->
 		<activity android:name="android.app.NativeActivity"
-                android:theme="@android:style/Theme.NoTitleBar.Fullscreen"
-            	android:launchMode="singleTask"
-            	android:configChanges="orientation|keyboardHidden">
-            <meta-data android:name="android.app.lib_name"
-                    android:value="randisle" />
-            <intent-filter>
-                <action android:name="android.intent.action.MAIN" />
-                <category android:name="android.intent.category.LAUNCHER" />
-            </intent-filter>
-        </activity>
-    </application>
-    <uses-sdk android:minSdkVersion="7"/>
+				android:theme="@android:style/Theme.NoTitleBar.Fullscreen"
+				android:launchMode="singleTask"
+				android:configChanges="orientation|keyboardHidden">
+			<meta-data android:name="android.app.lib_name"
+					android:value="randisle" />
+			<intent-filter>
+				<action android:name="android.intent.action.MAIN" />
+				<category android:name="android.intent.category.LAUNCHER" />
+			</intent-filter>
+		</activity>
+	</application>
+	<uses-sdk android:minSdkVersion="7"/>
 </manifest>

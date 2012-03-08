@@ -49,7 +49,7 @@ JNIEXPORT void JNICALL Java_us_toadlet_tadpole_Engine_setRenderDevice(JNIEnv *en
 
 	RenderDevice *device=NULL;
 	if(deviceObj!=NULL){
-		jclass deviceClass=env->FindClass("us/toadlet/peeper/NGLRenderDevice");
+		jclass deviceClass=env->FindClass("us/toadlet/peeper/NGLES1RenderDevice");
 		if(env->IsInstanceOf(deviceObj,deviceClass)){
 			jfieldID deviceNativeHandleID=env->GetFieldID(deviceClass,"mNativeHandle","I");
 			device=(RenderDevice*)env->GetIntField(deviceObj,deviceNativeHandleID);
