@@ -39,6 +39,8 @@ class Engine;
 
 class TOADLET_API TextureManager:public ResourceManager{
 public:
+	TOADLET_OBJECT(TextureManager);
+
 	TextureManager(Engine *engine);
 	virtual ~TextureManager();
 
@@ -68,8 +70,6 @@ public:
 	VideoHandler::ptr getVideoHandler() const{return mVideoHandler;}
 
 protected:
-	Engine *mEngine;
-
 	Collection<PixelBufferRenderTarget::ptr> mRenderTargets;
 	VideoHandler::ptr mVideoHandler;
 

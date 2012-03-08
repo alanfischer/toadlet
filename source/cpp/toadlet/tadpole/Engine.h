@@ -125,15 +125,15 @@ protected:
 	VertexFormats mVertexFormats;
 	RenderCaps mRenderCaps;
 
-	ArchiveManager *mArchiveManager;
-	TextureManager *mTextureManager;
-	BufferManager *mBufferManager;
-	ShaderManager *mShaderManager;
-	MaterialManager *mMaterialManager;
-	FontManager *mFontManager;
-	MeshManager *mMeshManager;
-	AudioBufferManager *mAudioBufferManager;
-	NodeManager *mNodeManager;
+	ArchiveManager::ptr mArchiveManager;
+	TextureManager::ptr mTextureManager;
+	BufferManager::ptr mBufferManager;
+	ShaderManager::ptr mShaderManager;
+	MaterialManager::ptr mMaterialManager;
+	FontManager::ptr mFontManager;
+	MeshManager::ptr mMeshManager;
+	AudioBufferManager::ptr mAudioBufferManager;
+	NodeManager::ptr mNodeManager;
 	Collection<int> mFreeHandles;
 	Collection<Node*> mHandles;
 

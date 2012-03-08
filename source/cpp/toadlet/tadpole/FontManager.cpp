@@ -33,7 +33,7 @@
 namespace toadlet{
 namespace tadpole{
 
-FontManager::FontManager(Archive *archive):ResourceManager(archive){
+FontManager::FontManager(Engine *engine):ResourceManager(engine){
 	mDefaultCharacterSet=String("ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789~!@#$%^&*()_+|{}:\"'<>?`-=\\/[];,. \t");
 }
 

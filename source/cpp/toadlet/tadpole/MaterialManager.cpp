@@ -37,15 +37,12 @@
 namespace toadlet{
 namespace tadpole{
 
-MaterialManager::MaterialManager(Engine *engine):ResourceManager(engine->getArchiveManager()),
-	mEngine(NULL),
-
+MaterialManager::MaterialManager(Engine *engine):ResourceManager(engine),
 	//mRenderStates,
 	//mShaderStates,
 
 	mRenderPathChooser(NULL)
 {
-	mEngine=engine;
 }
 
 void MaterialManager::destroy(){

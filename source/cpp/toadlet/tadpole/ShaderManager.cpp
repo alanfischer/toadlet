@@ -30,10 +30,7 @@
 namespace toadlet{
 namespace tadpole{
 
-ShaderManager::ShaderManager(Engine *engine):ResourceManager(engine->getArchiveManager()),
-	mEngine(NULL)
-{
-	mEngine=engine;
+ShaderManager::ShaderManager(Engine *engine):ResourceManager(engine){
 }
 
 Shader::ptr ShaderManager::createShader(Shader::ShaderType type,const String profiles[],const String codes[],int numCodes){

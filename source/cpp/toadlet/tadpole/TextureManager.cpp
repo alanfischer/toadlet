@@ -33,10 +33,7 @@
 namespace toadlet{
 namespace tadpole{
 
-TextureManager::TextureManager(Engine *engine):ResourceManager(engine->getArchiveManager()),
-	mEngine(NULL)
-{
-	mEngine=engine;
+TextureManager::TextureManager(Engine *engine):ResourceManager(engine){
 }
 
 TextureManager::~TextureManager(){

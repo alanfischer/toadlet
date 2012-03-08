@@ -37,6 +37,8 @@ class Engine;
 
 class TOADLET_API AudioBufferManager:public ResourceManager{
 public:
+	TOADLET_OBJECT(AudioBufferManager);
+
 	AudioBufferManager(Engine *engine);
 
 	AudioBuffer::ptr createAudioBuffer(AudioStream::ptr stream);
@@ -45,9 +47,6 @@ public:
 	AudioBuffer::ptr findAudioBuffer(const String &name){return shared_static_cast<AudioBuffer>(ResourceManager::find(name));}
 
 	AudioDevice *getAudioDevice();
-
-protected:
-	Engine *mEngine;
 };
 
 }

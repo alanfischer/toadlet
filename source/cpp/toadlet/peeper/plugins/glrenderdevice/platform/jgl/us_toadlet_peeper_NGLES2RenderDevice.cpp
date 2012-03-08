@@ -33,6 +33,7 @@ JNIEXPORT jboolean JNICALL Java_us_toadlet_peeper_NGLES2RenderDevice_create(JNIE
 
 	jobject rootTargetObj=env->CallObjectMethod(targetObj,NGLES2RenderDevice_getRootRenderTarget);
 	RenderTarget *renderTarget=new_JGLWindowRenderTarget(env,rootTargetObj);
+	renderTarget->retain();
 	return device->create(renderTarget,NULL);
 }
 
@@ -43,11 +44,11 @@ JNIEXPORT void JNICALL Java_us_toadlet_peeper_NGLES2RenderDevice_destroy(JNIEnv 
 		RenderTarget *renderTarget=device->getPrimaryRenderTarget();
 
 		device->destroy();
-		delete device;
+		device->release();
 
 		if(renderTarget!=NULL){
 			renderTarget->destroy();
-			delete renderTarget;
+			renderTarget->release();
 		}
 
 		env->SetIntField(obj,NGLES2RenderDevice_nativeHandle,(jint)NULL);

@@ -23,16 +23,17 @@
  *
  ********** Copyright header - do not remove **********/
 
-#include <toadlet/tadpole/ResourceManager.h>
 #include <toadlet/egg/Error.h>
 #include <toadlet/egg/Logger.h>
 #include <toadlet/egg/Extents.h>
+#include <toadlet/tadpole/Engine.h>
+#include <toadlet/tadpole/ResourceManager.h>
 
 namespace toadlet{
 namespace tadpole{
 
-ResourceManager::ResourceManager(Archive *archive){
-	mArchive=archive;
+ResourceManager::ResourceManager(Engine *engine){
+	mEngine=engine;
 	mResources.add(NULL); // Handle 0 is always NULL
 	#if defined(TOADLET_PLATFORM_ANDROID)
 		mMaxStreamLength=256*256*4*2; // Twice the size of a 256x256 32bpp image
@@ -286,7 +287,7 @@ Resource::ptr ResourceManager::findFromFile(const String &name,ResourceData *dat
 			streamer=mDefaultStreamer;
 		}
 		if(streamer!=NULL){
-			Stream::ptr stream=mArchive->openStream(filename);
+			Stream::ptr stream=mEngine->openStream(filename);
 			if(stream!=NULL){
 				if(stream->length()>mMaxStreamLength){
 					stream->close();

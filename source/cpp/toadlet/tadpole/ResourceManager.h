@@ -38,15 +38,16 @@
 namespace toadlet{
 namespace tadpole{
 
-class TOADLET_API ResourceManager:public ResourceDestroyedListener{
+class Engine;
+
+class TOADLET_API ResourceManager:public Object,public ResourceDestroyedListener{
 public:
-	ResourceManager(Archive *archive);
+	TOADLET_OBJECT(ResourceManager);
+
+	ResourceManager(Engine *engine);
 	virtual ~ResourceManager();
 
 	virtual void destroy();
-
-	virtual void setArchive(Archive *archive){mArchive=archive;}
-	virtual Archive *getArchive() const{return mArchive;}
 
 	virtual void addResourceArchive(Archive::ptr archive);
 	virtual void removeResourceArchive(Archive::ptr archive);
@@ -82,7 +83,7 @@ protected:
 	virtual void resourceLoaded(const Resource::ptr &resource){}
 	virtual void resourceUnloaded(const Resource::ptr &resource){}
 
-	Archive *mArchive;
+	Engine *mEngine;
 	Collection<Archive::ptr> mResourceArchives;
 	int mMaxStreamLength;
 

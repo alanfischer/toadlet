@@ -36,6 +36,8 @@ class Engine;
 
 class TOADLET_API ShaderManager:public ResourceManager{
 public:
+	TOADLET_OBJECT(ShaderManager);
+
 	ShaderManager(Engine *engine);
 
 	Shader::ptr createShader(Shader::ShaderType type,const String profiles[],const String codes[],int numCodes);
@@ -43,9 +45,6 @@ public:
 
 	void contextActivate(RenderDevice *renderDevice);
 	void contextDeactivate(RenderDevice *renderDevice);
-
-protected:
-	Engine *mEngine;
 };
 
 }

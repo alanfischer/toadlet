@@ -17,6 +17,14 @@ void Java_us_toadlet_tadpole_Node(JNIEnv *env){
 	env->DeleteLocalRef(nodeClass);
 }
 
+JNIEXPORT void JNICALL Java_us_toadlet_tadpole_Node_destroy(JNIEnv *env,jobject obj){
+	Java_us_toadlet_tadpole_Node(env); // hack
+
+	Node *node=(Node*)env->GetIntField(obj,Node_nativeHandle);
+	
+	node->destroy();
+}
+
 JNIEXPORT void JNICALL Java_us_toadlet_tadpole_Node_setRotate(JNIEnv *env,jobject obj,jfloatArray axisObj,jfloat angle){
 	Java_us_toadlet_tadpole_Node(env); // hack
 
