@@ -113,12 +113,12 @@ bool EAGLRenderTarget::createContext(CAEAGLLayer *drawable,WindowRenderTargetFor
 
 		glGenRenderbuffers(1,&mMSAARenderBufferHandle);
 		glBindRenderbuffer(GL_RENDERBUFFER,mMSAARenderBufferHandle);
-		glRenderbufferStorageMultisampleAPPLE(GL_RENDERBUFFER,format->multisamples,GL_RGBA4_OES,width,height);
+		glRenderbufferStorageMultisampleAPPLE(GL_RENDERBUFFER,format->multisamples,GL_RGBA4,width,height);
 		glFramebufferRenderbuffer(GL_FRAMEBUFFER,GL_COLOR_ATTACHMENT0,GL_RENDERBUFFER,mMSAARenderBufferHandle);
 		
 		glGenRenderbuffers(1,&mMSAADepthBufferHandle);
 		glBindRenderbuffer(GL_RENDERBUFFER,mMSAADepthBufferHandle);
-		glRenderbufferStorageMultisampleAPPLE(GL_RENDERBUFFER,format->multisamples,GL_DEPTH_COMPONENT16_OES,width,height);
+		glRenderbufferStorageMultisampleAPPLE(GL_RENDERBUFFER,format->multisamples,GL_DEPTH_COMPONENT16,width,height);
 		glFramebufferRenderbuffer(GL_FRAMEBUFFER,GL_DEPTH_ATTACHMENT,GL_RENDERBUFFER,mMSAADepthBufferHandle);
 	}
 	else{
