@@ -33,16 +33,12 @@
 namespace toadlet{
 namespace tadpole{
 
-class TOADLET_API ArchiveManager:public ResourceManager,public Archive,public BaseResource{
+class TOADLET_API ArchiveManager:public ResourceManager{
 public:
-	TOADLET_RESOURCE(ArchiveManager,Archive);
+	TOADLET_OBJECT(ArchiveManager);
 
-	ArchiveManager();
+	ArchiveManager(Engine *engine);
 	virtual ~ArchiveManager();
-
-	void destroy();
-
-	bool open(Stream::ptr stream){return true;}
 
 	Archive::ptr findArchive(const String &name){return shared_static_cast<Archive>(ResourceManager::find(name));}
 

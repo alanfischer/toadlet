@@ -29,8 +29,7 @@
 namespace toadlet{
 namespace tadpole{
 
-NodeManager::NodeManager(Engine *engine):ResourceManager(engine->getArchiveManager()){
-	mEngine=engine;
+NodeManager::NodeManager(Engine *engine):ResourceManager(engine){
 }
 
 Node::ptr NodeManager::createNode(NodeResource *resource,Scene *scene){

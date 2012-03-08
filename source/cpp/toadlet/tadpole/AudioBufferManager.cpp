@@ -30,10 +30,7 @@
 namespace toadlet{
 namespace tadpole{
 
-AudioBufferManager::AudioBufferManager(Engine *engine):ResourceManager(engine->getArchiveManager()),
-	mEngine(NULL)
-{
-	mEngine=engine;
+AudioBufferManager::AudioBufferManager(Engine *engine):ResourceManager(engine){
 }
 
 AudioBuffer::ptr AudioBufferManager::createAudioBuffer(AudioStream::ptr stream){
@@ -78,7 +75,7 @@ AudioStream::ptr AudioBufferManager::findAudioStream(const String &name){
 		streamer=mDefaultStreamer;
 	}
 	if(streamer!=NULL){
-		Stream::ptr stream=mArchive->openStream(filename);
+		Stream::ptr stream=mEngine->openStream(filename);
 		if(stream!=NULL){
 			return shared_static_cast<AudioBufferHandler>(streamer)->createAudioStream(stream);
 		}

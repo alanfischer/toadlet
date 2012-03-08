@@ -39,6 +39,8 @@ class BufferManager;
 
 class TOADLET_API MaterialManager:public ResourceManager{
 public:
+	TOADLET_OBJECT(MaterialManager);
+
 	MaterialManager(Engine *engine);
 
 	void destroy();
@@ -76,12 +78,9 @@ public:
 	bool isPathUseable(RenderPath *path,const RenderCaps &caps);
 	bool compileMaterial(Material *material);
 
-	inline Engine *getEngine(){return mEngine;}
 	BufferManager *getBufferManager();
 
 protected:
-	Engine *mEngine;
-
 	Collection<RenderState::ptr> mRenderStates;
 	Collection<ShaderState::ptr> mShaderStates;
 

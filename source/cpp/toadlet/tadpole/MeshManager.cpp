@@ -34,8 +34,7 @@
 namespace toadlet{
 namespace tadpole{
 
-MeshManager::MeshManager(Engine *engine):ResourceManager(engine->getArchiveManager()){
-	mEngine=engine;
+MeshManager::MeshManager(Engine *engine):ResourceManager(engine){
 }
 
 Resource::ptr MeshManager::manage(const Resource::ptr &resource,const String &name){

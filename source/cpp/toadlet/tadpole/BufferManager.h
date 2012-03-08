@@ -36,8 +36,10 @@ namespace tadpole{
 
 class Engine;
 
-class TOADLET_API BufferManager:public ResourceDestroyedListener{
+class TOADLET_API BufferManager:public Object,public ResourceDestroyedListener{
 public:
+	TOADLET_OBJECT(BufferManager);
+
 	BufferManager(Engine *engine);
 	virtual ~BufferManager();
 
@@ -65,13 +67,13 @@ public:
 	void outputVariable(VariableBufferFormat::Variable *variable,const String &tabs);
 
 protected:
+	Engine *mEngine;
+
 	Collection<VertexFormat::ptr> mVertexFormats;
 	Collection<VertexBuffer::ptr> mVertexBuffers;
 	Collection<IndexBuffer::ptr> mIndexBuffers;
 	Collection<PixelBuffer::ptr> mPixelBuffers;
 	Collection<VariableBuffer::ptr> mVariableBuffers;
-
-	Engine *mEngine;
 };
 
 }

@@ -186,12 +186,12 @@ Engine::Engine(bool fixedBackable,bool shaderBackable):
 	mFixedBackable=fixedBackable;
 	mShaderBackable=shaderBackable;
 
-	mArchiveManager=new ArchiveManager();
+	mArchiveManager=new ArchiveManager(this);
 	mTextureManager=new TextureManager(this);
 	mBufferManager=new BufferManager(this);
 	mShaderManager=new ShaderManager(this);
 	mMaterialManager=new MaterialManager(this);
-	mFontManager=new FontManager(this->getArchiveManager());
+	mFontManager=new FontManager(this);
 	mMeshManager=new MeshManager(this);
 	mAudioBufferManager=new AudioBufferManager(this);
 	mNodeManager=new NodeManager(this);
@@ -234,50 +234,15 @@ Engine::~Engine(){
 
 	destroy();
 
-	if(mNodeManager!=NULL){
-		delete mNodeManager;
-		mNodeManager=NULL;
-	}
-
-	if(mAudioBufferManager!=NULL){
-		delete mAudioBufferManager;
-		mAudioBufferManager=NULL;
-	}
-
-	if(mMeshManager!=NULL){
-		delete mMeshManager;
-		mMeshManager=NULL;
-	}
-
-	if(mShaderManager!=NULL){
-		delete mShaderManager;
-		mShaderManager=NULL;
-	}
-
-	if(mMaterialManager!=NULL){
-		delete mMaterialManager;
-		mMaterialManager=NULL;
-	}
-
-	if(mFontManager!=NULL){
-		delete mFontManager;
-		mFontManager=NULL;
-	}
-
-	if(mBufferManager!=NULL){
-		delete mBufferManager;
-		mBufferManager=NULL;
-	}
-
-	if(mTextureManager!=NULL){
-		delete mTextureManager;
-		mTextureManager=NULL;
-	}
-
-	if(mArchiveManager!=NULL){
-		delete mArchiveManager;
-		mArchiveManager=NULL;
-	}
+	mNodeManager=NULL;
+	mAudioBufferManager=NULL;
+	mMeshManager=NULL;
+	mShaderManager=NULL;
+	mMaterialManager=NULL;
+	mFontManager=NULL;
+	mBufferManager=NULL;
+	mTextureManager=NULL;
+	mArchiveManager=NULL;
 }
 
 void Engine::destroy(){

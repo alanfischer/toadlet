@@ -38,6 +38,8 @@ class Engine;
 
 class TOADLET_API MeshManager:public ResourceManager{
 public:
+	TOADLET_OBJECT(MeshManager);
+
 	MeshManager(Engine *engine);
 
 	Mesh::ptr findMesh(const String &name){return shared_static_cast<Mesh>(ResourceManager::find(name));}
@@ -56,8 +58,6 @@ public:
 	Mesh::ptr createGridMesh(scalar width,scalar height,int numWidth,int numHeight,Material::ptr material=Material::ptr());
 
 protected:
-	Engine *mEngine;
-
 	ResourceCreator::ptr mAABoxCreator,mSkyBoxCreator,mSkyDomeCreator,mSphereCreator,mGridCreator;
 };
 

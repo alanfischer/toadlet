@@ -24,6 +24,7 @@
  ********** Copyright header - do not remove **********/
 
 #include <toadlet/egg/System.h>
+#include <toadlet/egg/Logger.h>
 #include <toadlet/egg/io/Stream.h>
 #include <toadlet/egg/io/FileStream.h>
 #include <toadlet/tadpole/ArchiveManager.h>
@@ -31,15 +32,11 @@
 namespace toadlet{
 namespace tadpole{
 
-ArchiveManager::ArchiveManager():ResourceManager(NULL){
-	setArchive(this);
+ArchiveManager::ArchiveManager(Engine *engine):ResourceManager(engine){
 }
 
 ArchiveManager::~ArchiveManager(){
 	destroy();
-}
-
-void ArchiveManager::destroy(){
 }
 
 void ArchiveManager::setDirectory(const String &directory){
@@ -75,6 +72,7 @@ Stream::ptr ArchiveManager::openStream(const String &name){
 		}
 	}
 
+Logger::alert(String("STREAM:")+(int)stream.get());
 	return stream;
 }
 

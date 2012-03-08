@@ -36,6 +36,8 @@ class Engine;
 
 class TOADLET_API NodeManager:public ResourceManager{
 public:
+	TOADLET_OBJECT(NodeManager);
+
 	NodeManager(Engine *engine);
 
 	NodeResource::ptr getNodeResource(int handle){return shared_static_cast<NodeResource>(ResourceManager::get(handle));}
@@ -45,9 +47,6 @@ public:
 	Node::ptr createNode(int handle,Scene *scene){return createNode(getNodeResource(handle),scene);}
 	Node::ptr createNode(const String &name,Scene *scene){return createNode(findNodeResource(name),scene);}
 	Node::ptr createNode(NodeResource *resource,Scene *scene);
-
-protected:
-	Engine *mEngine;
 };
 
 }
