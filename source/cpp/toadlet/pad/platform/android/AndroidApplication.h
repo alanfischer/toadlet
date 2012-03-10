@@ -139,7 +139,7 @@ protected:
 	bool mRun;
 
 	WindowRenderTargetFormat::ptr mFormat;
-	Engine *mEngine;
+	Engine::ptr mEngine;
 	RenderTarget::ptr mRenderTarget;
 	RenderDevice::ptr mRenderDevice;
 	AudioDevice::ptr mAudioDevice;

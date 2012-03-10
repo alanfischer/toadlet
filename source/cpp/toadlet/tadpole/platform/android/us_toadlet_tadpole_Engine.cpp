@@ -32,7 +32,7 @@ JNIEXPORT void JNICALL Java_us_toadlet_tadpole_Engine_destroy(JNIEnv *env,jobjec
 
 	if(engine!=NULL){
 		engine->destroy();
-		delete engine;
+		engine->release();
 
 		env->SetIntField(obj,Engine_nativeHandle,(jint)NULL);
 	}
@@ -117,6 +117,7 @@ JNIEXPORT void JNICALL Java_us_toadlet_tadpole_Engine_makeEngine(JNIEnv *env,job
 	Java_us_toadlet_tadpole_Engine(env);
 
 	Engine *engine=new Engine(true,false);	
+	engine->retain();
 
 	env->SetIntField(obj,Engine_nativeHandle,(jint)engine);
 	
