@@ -177,10 +177,7 @@ void BaseApplication::destroy(){
 		}
 	}
 
-	if(mEngine!=NULL){
-		delete mEngine;
-		mEngine=NULL;
-	}
+	mEngine=NULL;
 }
 
 void BaseApplication::setRenderDeviceOptions(int *options,int length){

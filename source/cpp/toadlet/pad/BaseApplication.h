@@ -127,7 +127,7 @@ protected:
 	Map<String,int> mNameToKey;
 	Map<int,String> mKeyToName;
 
-	Engine *mEngine;
+	Engine::ptr mEngine;
 	RenderTarget::ptr mRenderTarget;
 	RenderDevice::ptr mRenderDevice;
 	AudioDevice::ptr mAudioDevice;

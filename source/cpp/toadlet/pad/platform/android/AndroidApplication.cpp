@@ -148,10 +148,7 @@ void AndroidApplication::destroy(){
 		mApplet=NULL;
 	}
 
-	if(mEngine!=NULL){
-		delete mEngine;
-		mEngine=NULL;
-	}
+	mEngine=NULL;
 
 	int i;
 	for(i=0;i<InputDevice::InputType_MAX;++i){

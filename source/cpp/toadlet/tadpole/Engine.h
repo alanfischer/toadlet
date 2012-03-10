@@ -49,8 +49,10 @@
 namespace toadlet{
 namespace tadpole{
 
-class TOADLET_API Engine{
+class TOADLET_API Engine:public Object{
 public:
+	TOADLET_OBJECT(Engine);
+
 	Engine(bool fixedBackable=true,bool shaderBackable=true);
 	virtual ~Engine();
 
