@@ -59,7 +59,7 @@ Node *HopEntity::create(Scene *scene){
 	mTriggerTarget=HopEntity::ptr();
 
 	/// @todo: I need to remove the mScene casting here, its pretty dirty
-	mHopScene=(HopScene*)(mScene);
+	mHopScene=(HopScene*)(mScene.get());
 	if(mHopScene==NULL){
 		Error::unknown(Categories::TOADLET_TADPOLE,
 			"Invalid scene");

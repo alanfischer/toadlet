@@ -69,7 +69,7 @@ Viewer::Viewer(Application *app):
 	mCamera->setClearColor(Colors::ORANGE);
 	mScene->getRoot()->attach(mCamera);
 
-	mParent=mEngine->createNodeType(ParentNode::type(),mScene);
+	mParent=mEngine->createNodeType(Node::type(),mScene);
 	mScene->getRoot()->attach(mParent);
 
 	mScene->setAmbientColor(Vector4(Math::QUARTER,Math::QUARTER,Math::QUARTER,Math::ONE));

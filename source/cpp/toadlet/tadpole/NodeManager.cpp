@@ -32,7 +32,7 @@ namespace tadpole{
 NodeManager::NodeManager(Engine *engine):ResourceManager(engine){
 }
 
-Node::ptr NodeManager::createNode(NodeResource *resource,Scene *scene){
+Node *NodeManager::createNode(NodeResource *resource,Scene *scene){
 	if(resource!=NULL){
 		return resource->getNode()->clone(scene);
 	}

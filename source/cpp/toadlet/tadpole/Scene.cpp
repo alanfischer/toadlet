@@ -35,7 +35,7 @@
 namespace toadlet{
 namespace tadpole{
 
-Scene::Scene(Engine *engine):
+Scene::Scene(Engine *engine):Object(),
 	mUpdateListener(NULL),
 	mRenderListener(NULL),
 

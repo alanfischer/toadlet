@@ -71,6 +71,7 @@ BOOL safe_wglDeleteContext(HGLRC glrc){
 }
 
 TOADLET_C_API RenderTarget *new_WGLWindowRenderTarget(void *display,void *window,WindowRenderTargetFormat *format){
+Logger::alert("asdf");
 	return new WGLWindowRenderTarget((HWND)window,format);
 }
 
@@ -89,7 +90,7 @@ WGLWindowRenderTarget::WGLWindowRenderTarget(HWND wnd,WindowRenderTargetFormat *
 {
 	int winPixelFormat=0;
 
-	if(format->multisamples>1){
+	if(format!=NULL && format->multisamples>1){
 		HWND tmpWnd=CreateWindow(TEXT("Static"),NULL,0,0,0,0,0,0,0,0,0);
 		bool result=false;
 		TOADLET_TRY
@@ -101,6 +102,9 @@ WGLWindowRenderTarget::WGLWindowRenderTarget(HWND wnd,WindowRenderTargetFormat *
 		PFNWGLCHOOSEPIXELFORMATARBPROC wglChoosePixelFormatARB=NULL;
 		if(result && wglIsExtensionSupported("WGL_ARB_multisample") && (wglChoosePixelFormatARB=(PFNWGLCHOOSEPIXELFORMATARBPROC)wglGetProcAddress("wglChoosePixelFormatARB"))!=NULL){
 			int pixelFormat=format->pixelFormat;
+			int depthBits=format->depthBits;
+			int stencilBits=format->stencilBits;
+	
 			int redBits=TextureFormat::getRedBits(pixelFormat);
 			int greenBits=TextureFormat::getGreenBits(pixelFormat);
 			int blueBits=TextureFormat::getBlueBits(pixelFormat);
@@ -115,8 +119,8 @@ WGLWindowRenderTarget::WGLWindowRenderTarget(HWND wnd,WindowRenderTargetFormat *
 				WGL_ACCELERATION_ARB,	WGL_FULL_ACCELERATION_ARB,
 				WGL_COLOR_BITS_ARB,		colorBits,
 				WGL_ALPHA_BITS_ARB,		alphaBits,
-				WGL_DEPTH_BITS_ARB,		format->depthBits,
-				WGL_STENCIL_BITS_ARB,	format->stencilBits,
+				WGL_DEPTH_BITS_ARB,		depthBits,
+				WGL_STENCIL_BITS_ARB,	stencilBits,
 				WGL_DOUBLE_BUFFER_ARB,	GL_TRUE,
 				WGL_SAMPLE_BUFFERS_ARB,	GL_TRUE,
 				WGL_SAMPLES_ARB,		format->multisamples,
@@ -156,7 +160,10 @@ bool WGLWindowRenderTarget::createContext(HWND wnd,WindowRenderTargetFormat *for
 		return false;
 	}
 	if(winPixelFormat==0){
-		int pixelFormat=format->pixelFormat;
+		int pixelFormat=format==NULL?TextureFormat::Format_RGB_5_6_5:format->pixelFormat;
+		int depthBits=format==NULL?16:format->depthBits;
+		int stencilBits=format==NULL?0:format->stencilBits;
+
 		int redBits=TextureFormat::getRedBits(pixelFormat);
 		int greenBits=TextureFormat::getGreenBits(pixelFormat);
 		int blueBits=TextureFormat::getBlueBits(pixelFormat);
@@ -170,8 +177,8 @@ bool WGLWindowRenderTarget::createContext(HWND wnd,WindowRenderTargetFormat *for
 		pfd.iPixelType=PFD_TYPE_RGBA;
 		pfd.cColorBits=colorBits;
 		pfd.cAlphaBits=alphaBits;
-		pfd.cDepthBits=format->depthBits;
-		pfd.cStencilBits=format->stencilBits;
+		pfd.cDepthBits=depthBits;
+		pfd.cStencilBits=stencilBits;
 		pfd.iLayerType=PFD_MAIN_PLANE;
 		mPFD=pfd;
 
@@ -207,7 +214,7 @@ bool WGLWindowRenderTarget::createContext(HWND wnd,WindowRenderTargetFormat *for
 			(PFNWGLSWAPINTERVALEXTPROC)wglGetProcAddress("wglSwapIntervalEXT");
 
 		if(wglSwapIntervalEXT!=NULL){
-			wglSwapIntervalEXT((int)format->vsync);
+			wglSwapIntervalEXT((int)format==NULL?0:format->vsync);
 		}
 	}
 
@@ -220,7 +227,7 @@ bool WGLWindowRenderTarget::createContext(HWND wnd,WindowRenderTargetFormat *for
 		return false;
 	}
 
-	int numThreads=format->threads<=1?0:format->threads-1;
+	int numThreads=(format==NULL||format->threads<=1)?0:format->threads-1;
 	mThreadContexts.resize(numThreads,0);
 	mThreadIDs.resize(numThreads,0);
 	int i;
