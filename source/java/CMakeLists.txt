@@ -86,7 +86,6 @@ set (PEEPER_SRC
 )
 
 set (PEEPER_H
-	us.toadlet.peeper.NGLRenderDevice
 	us.toadlet.peeper.NGLES1RenderDevice
 	us.toadlet.peeper.NGLES2RenderDevice
 )
