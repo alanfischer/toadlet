@@ -49,8 +49,8 @@ void VertexLighter::lightMesh(Mesh *mesh){
 
 	VertexFormat::ptr newVertexFormat=mEngine->getBufferManager()->createVertexFormat();
 	for(i=0;i<vertexFormat->getNumElements();++i){
-		if(vertexFormat->getSemantic(i)!=VertexFormat::Semantic_NORMAL || mKeepNormals){
-			newVertexFormat->addElement(vertexFormat->getSemantic(i),vertexFormat->getIndex(i),vertexFormat->getFormat(i));
+		if(vertexFormat->getElementSemantic(i)!=VertexFormat::Semantic_NORMAL || mKeepNormals){
+			newVertexFormat->addElement(vertexFormat->getElementSemantic(i),vertexFormat->getElementIndex(i),vertexFormat->getElementFormat(i));
 		}
 	}
 	if(vertexFormat->findElement(VertexFormat::Semantic_COLOR)<0){

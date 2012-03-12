@@ -64,7 +64,9 @@ Node::Node():BaseComponent(),
 }
 
 Node::~Node(){
+	Logger::alert("~NODE!");
 	TOADLET_ASSERT(!mCreated);
+	Logger::alert("whoa");
 }
 
 Node *Node::create(Scene *scene){

@@ -44,23 +44,23 @@ Resource::ptr MeshManager::manage(const Resource::ptr &resource,const String &na
 }
 
 Mesh::ptr MeshManager::createAABoxMesh(const AABox &box,Material::ptr material){
-	return shared_static_cast<AABoxMeshCreator>(mAABoxCreator)->createAABoxMesh(box,material);
+	return mAABoxCreator==NULL?NULL:shared_static_cast<AABoxMeshCreator>(mAABoxCreator)->createAABoxMesh(box,material);
 }
 
 Mesh::ptr MeshManager::createSkyBoxMesh(scalar size,bool unfolded,bool invert,Material::ptr bottom,Material::ptr top,Material::ptr left,Material::ptr right,Material::ptr back,Material::ptr front){
-	return shared_static_cast<SkyBoxMeshCreator>(mSkyBoxCreator)->createSkyBoxMesh(size,unfolded,invert,bottom,top,left,right,back,front);
+	return mSkyBoxCreator==NULL?NULL:shared_static_cast<SkyBoxMeshCreator>(mSkyBoxCreator)->createSkyBoxMesh(size,unfolded,invert,bottom,top,left,right,back,front);
 }
 
 Mesh::ptr MeshManager::createSkyDomeMesh(const Sphere &sphere,int numSegments,int numRings,scalar fade,Material::ptr material){
-	return shared_static_cast<SkyDomeMeshCreator>(mSkyDomeCreator)->createSkyDomeMesh(sphere,numSegments,numRings,fade,material);
+	return mSkyDomeCreator==NULL?NULL:shared_static_cast<SkyDomeMeshCreator>(mSkyDomeCreator)->createSkyDomeMesh(sphere,numSegments,numRings,fade,material);
 }
 
 Mesh::ptr MeshManager::createSphereMesh(const Sphere &sphere,Material::ptr material){
-	return shared_static_cast<SphereMeshCreator>(mSphereCreator)->createSphereMesh(sphere,16,16,material);
+	return mSphereCreator==NULL?NULL:shared_static_cast<SphereMeshCreator>(mSphereCreator)->createSphereMesh(sphere,16,16,material);
 }
 
 Mesh::ptr MeshManager::createGridMesh(scalar width,scalar height,int numWidth,int numHeight,Material::ptr material){
-	return shared_static_cast<GridMeshCreator>(mGridCreator)->createGridMesh(width,height,numWidth,numHeight,material);
+	return mGridCreator==NULL?NULL:shared_static_cast<GridMeshCreator>(mGridCreator)->createGridMesh(width,height,numWidth,numHeight,material);
 }
 
 }

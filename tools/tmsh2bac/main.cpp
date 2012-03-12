@@ -2,10 +2,9 @@
 #include <iostream>
 #include <sstream>
 
-class TextureArchive:public Archive,public BaseResource{
+class TextureArchive:protected BaseResource,public Archive{
 public:
-	TOADLET_BASERESOURCE_PASSTHROUGH(Archive);
-	TOADLET_INTRUSIVE_POINTERS(TextureArchive);
+	TOADLET_RESOURCE(TextureArchive,Archive);
 
 	TextureArchive(){}
 	void destroy(){}
@@ -141,12 +140,12 @@ int main(int argc,char **argv){
 	Logger::getInstance()->setCategoryReportingLevel(Categories::TOADLET_EGG_LOGGER,Logger::Level_DISABLED);
 	Logger::getInstance()->setCategoryReportingLevel(Categories::TOADLET_EGG,Logger::Level_WARNING);
 	Logger::getInstance()->setCategoryReportingLevel(Categories::TOADLET_TADPOLE,Logger::Level_WARNING);
-	Engine *engine=new Engine();
+	Engine::ptr engine=new Engine();
 	engine->installHandlers();
 	TextureArchive::ptr textureArchive(new TextureArchive());
 
 	textureArchive->setDirectory(texDir);
-	engine->getTextureManager()->setArchive(textureArchive);
+	engine->getArchiveManager()->manageArchive(textureArchive);
 
 	std::cout << "Compiling a version " << version << " file" << std::endl;
 
@@ -174,8 +173,6 @@ int main(int argc,char **argv){
 			std::cerr << "Error loading \"" << (const char*)mshFileName << "\" failed!  File invalid or not found." << std::endl;
 			continue;
 		}
-
-		mesh->retain();
 
 		// Prepare the output file
 		int loc=mshFileName.rfind('.');
@@ -218,11 +215,7 @@ int main(int argc,char **argv){
 				}
 			}
 		}
-
-		mesh->release();
 	}
-
-	delete engine;
 
 	std::cout << "complete" << std::endl;
 

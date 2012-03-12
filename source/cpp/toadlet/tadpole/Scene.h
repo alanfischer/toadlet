@@ -29,6 +29,7 @@
 #include <toadlet/peeper/RenderTarget.h>
 #include <toadlet/tadpole/Collision.h>
 #include <toadlet/tadpole/ContextListener.h>
+#include <toadlet/tadpole/Engine.h>
 #include <toadlet/tadpole/Mesh.h>
 #include <toadlet/tadpole/RenderListener.h>
 #include <toadlet/tadpole/RenderableSet.h>
@@ -39,9 +40,9 @@
 namespace toadlet{
 namespace tadpole{
 
-class TOADLET_API Scene:public ContextListener{
+class TOADLET_API Scene:protected Object,public ContextListener{
 public:
-	TOADLET_SPTR(Scene);
+	TOADLET_OBJECT(Scene);
 
 	Scene(Engine *engine);
 	virtual ~Scene();
@@ -120,7 +121,7 @@ protected:
 	Collection<Node::ptr> mDependents;
 	bool mResetFrame;
 
-	Engine *mEngine;
+	Engine::ptr mEngine;
 	PartitionNode::ptr mBackground;
 	PartitionNode::ptr mRoot;
 

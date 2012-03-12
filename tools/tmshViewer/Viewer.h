@@ -36,7 +36,7 @@ protected:
 	Application *mApp;
 	Engine *mEngine;
 	Scene::ptr mScene;
-	ParentNode::ptr mParent;
+	Node::ptr mParent;
 	CameraNode::ptr mCamera;
 	LightNode::ptr mLight;
  	int mMouseX,mMouseY;

@@ -66,6 +66,18 @@ namespace node{
 
 class CameraNode;
 
+// The same as DefaultIntrusiveSemantics, but casts to an Object so we can still reference forward declared items
+class ObjectSemantics{
+public:
+	template<typename Type> static int retainReference(Type *type){
+		return ((Object*)type)->retain();
+	}
+
+	template<typename Type> static int releaseReference(Type *type){
+		return ((Object*)type)->release();
+	}
+};
+
 class TOADLET_API Node:public BaseComponent,public Transformable{
 public:
 	TOADLET_NODE(Node,Node);
@@ -174,14 +186,14 @@ public:
 	virtual void spacialUpdated();
 	virtual void gatherRenderables(CameraNode *camera,RenderableSet *set);
 
-	inline Engine *getEngine() const{return mEngine;}
-	inline Scene *getScene() const{return mScene;}
+	inline Engine *getEngine() const{return (Engine*)mEngine;}
+	inline Scene *getScene() const{return (Scene*)mScene;}
 
 protected:
 	// Engine items
 	bool mCreated;
-	Engine *mEngine;
-	Scene *mScene;
+	IntrusivePointer<Engine,ObjectSemantics> mEngine;
+	IntrusivePointer<Scene,ObjectSemantics> mScene;
 	int mUniqueHandle;
 
 	Node::ptr mParent,mPrevious,mNext;

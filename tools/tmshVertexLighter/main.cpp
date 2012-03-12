@@ -97,7 +97,7 @@ int main(int argc,char **argv){
 	Logger::getInstance()->setCategoryReportingLevel(Categories::TOADLET_EGG,Logger::Level_DISABLED);
 	Logger::getInstance()->setCategoryReportingLevel(Categories::TOADLET_EGG,Logger::Level_WARNING);
 	Logger::getInstance()->setCategoryReportingLevel(Categories::TOADLET_TADPOLE,Logger::Level_WARNING);
-	Engine *engine=new Engine();
+	Engine::ptr engine=new Engine();
 	engine->installHandlers();
 
 	VertexLighter lighter(engine);
@@ -165,8 +165,6 @@ int main(int argc,char **argv){
 			std::cerr << "Error saving \"" << (const char*)mshFileName << "\"" << std::endl;
 		}
 	}
-
-	delete engine;
 
 	if(result){
 		std::cout << "complete" << std::endl;

@@ -58,7 +58,7 @@ int main(int argc,char **argv){
 	Logger::getInstance()->setCategoryReportingLevel(Categories::TOADLET_EGG,Logger::Level_WARNING);
 	Logger::getInstance()->setCategoryReportingLevel(Categories::TOADLET_TADPOLE,Logger::Level_WARNING);
 
-	Engine *engine=new Engine();
+	Engine::ptr engine=new Engine();
 	engine->installHandlers();
 
 	// Load each file
@@ -101,8 +101,6 @@ int main(int argc,char **argv){
 		std::cout << "error loading file" << std::endl;
 	}
 	
-	delete engine;
-
 	return 1;
 }
 

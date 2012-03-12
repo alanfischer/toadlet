@@ -114,16 +114,16 @@ DiffuseMaterialCreator::DiffuseMaterialCreator(Engine *engine){
 	};
 
 	String diffuseFragmentCode[]={
-		"varying mediump vec4 color;\n"
-		"varying mediump vec2 texCoord;\n"
-		"varying mediump float fog;\n"
+		"varying vec4 color;\n"
+		"varying vec2 texCoord;\n"
+		"varying float fog;\n"
 
-		"uniform mediump float textureSet;\n"
-		"uniform mediump vec4 fogColor;\n"
-		"uniform mediump sampler2D tex;\n"
+		"uniform float textureSet;\n"
+		"uniform vec4 fogColor;\n"
+		"uniform sampler2D tex;\n"
 
 		"void main(){\n"
-			"vec4 fragColor=color*(texture2D(tex,texCoord))+(1.0-textureSet));\n"
+			"vec4 fragColor=color*(texture2D(tex,texCoord)+(1.0-textureSet));\n"
 			"gl_FragColor=mix(fogColor,fragColor,fog);\n"
 		"}",
 
@@ -196,15 +196,15 @@ DiffuseMaterialCreator::DiffuseMaterialCreator(Engine *engine){
 
 	String pointSpriteFragmentCode[]={
 		"#version 120\n"
-		"varying mediump vec4 color;\n"
-		"varying mediump float fog;\n"
+		"varying vec4 color;\n"
+		"varying float fog;\n"
 
-		"uniform mediump float textureSet;\n"
-		"uniform mediump vec4 fogColor;\n"
+		"uniform float textureSet;\n"
+		"uniform vec4 fogColor;\n"
 		"uniform sampler2D tex;\n"
 
 		"void main(){\n"
-		"vec4 fragColor=color*(texture2D(tex,gl_PointCoord)+(1.0-textureSet));\n"
+			"vec4 fragColor=color*(texture2D(tex,gl_PointCoord)+(1.0-textureSet));\n"
 			"gl_FragColor=mix(fogColor,fragColor,fog);\n"
 		"}",
 

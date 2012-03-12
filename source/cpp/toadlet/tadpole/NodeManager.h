@@ -44,9 +44,9 @@ public:
 	NodeResource::ptr findNodeResource(const String &name){return shared_static_cast<NodeResource>(ResourceManager::find(name));}
 	NodeResource::ptr createNodeResource(Node *node,const String &name=(char*)NULL);
 
-	Node::ptr createNode(int handle,Scene *scene){return createNode(getNodeResource(handle),scene);}
-	Node::ptr createNode(const String &name,Scene *scene){return createNode(findNodeResource(name),scene);}
-	Node::ptr createNode(NodeResource *resource,Scene *scene);
+	Node *createNode(int handle,Scene *scene){return createNode(getNodeResource(handle),scene);}
+	Node *createNode(const String &name,Scene *scene){return createNode(findNodeResource(name),scene);}
+	Node *createNode(NodeResource *resource,Scene *scene);
 };
 
 }

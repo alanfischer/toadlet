@@ -1799,11 +1799,11 @@ M3GObject3D *M3GConverter::buildSceneGraph(Mesh *toadletMesh,float scale,int for
 		VertexBuffer::ptr vertexBuffer=toadletMesh->getStaticVertexData()->getVertexBuffer(0);
 		VertexFormat::ptr vertexFormat=vertexBuffer->getVertexFormat();
 		int positionIndex=vertexFormat->findElement(VertexFormat::Semantic_POSITION);
-		int positionOffset=positionIndex>=0?vertexFormat->getOffset(positionIndex):0;
+		int positionOffset=positionIndex>=0?vertexFormat->getElementOffset(positionIndex):0;
 		int normalIndex=vertexFormat->findElement(VertexFormat::Semantic_NORMAL);
 		int colorIndex=vertexFormat->findElement(VertexFormat::Semantic_COLOR);
 		int texCoordIndex=vertexFormat->findElement(VertexFormat::Semantic_TEXCOORD);
-		int texCoordOffset=texCoordIndex>=0?vertexFormat->getOffset(texCoordIndex):0;
+		int texCoordOffset=texCoordIndex>=0?vertexFormat->getElementOffset(texCoordIndex):0;
 
 		int numVertexes=vertexBuffer->getSize();
 		VertexBufferAccessor vba(vertexBuffer);
