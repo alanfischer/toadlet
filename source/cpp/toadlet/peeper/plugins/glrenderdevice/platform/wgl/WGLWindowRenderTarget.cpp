@@ -71,7 +71,6 @@ BOOL safe_wglDeleteContext(HGLRC glrc){
 }
 
 TOADLET_C_API RenderTarget *new_WGLWindowRenderTarget(void *display,void *window,WindowRenderTargetFormat *format){
-Logger::alert("asdf");
 	return new WGLWindowRenderTarget((HWND)window,format);
 }
 
