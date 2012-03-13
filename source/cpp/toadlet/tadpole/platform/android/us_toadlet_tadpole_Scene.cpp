@@ -28,7 +28,7 @@ JNIEXPORT void JNICALL Java_us_toadlet_tadpole_Scene_destroy(JNIEnv *env,jobject
 
 	if(scene!=NULL){
 		scene->destroy();
-		delete scene;
+		scene->release();
 
 		env->SetIntField(obj,Scene_nativeHandle,(jint)NULL);
 	}
@@ -74,6 +74,7 @@ JNIEXPORT void JNICALL Java_us_toadlet_tadpole_Scene_makeScene(JNIEnv *env,jobje
 	Engine *engine=(Engine*)env->GetIntField(engineObj,Scene_Engine_nativeHandle);
 
 	Scene *scene=new Scene(engine);
+	scene->retain();
 
 	env->SetIntField(obj,Scene_nativeHandle,(jint)scene);
 }
