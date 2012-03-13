@@ -38,8 +38,8 @@ public:
 	TOADLET_RESOURCE(NodeResource,NodeResource);
 
 	NodeResource(Node::ptr node=NULL):BaseResource(){setNode(node);}
-	virtual ~NodeResource(){}
-	void destroy(){mNode->destroy();}
+	virtual ~NodeResource(){destroy();}
+	void destroy(){mNode->destroy();BaseResource::destroy();}
 	
 	void setNode(Node::ptr node){mNode=node;}
 	Node::ptr getNode() const{return mNode;}
