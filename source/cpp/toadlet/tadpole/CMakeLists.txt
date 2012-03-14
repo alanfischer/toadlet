@@ -1,6 +1,5 @@
 # Setup Versions
 configure_file (${CMAKE_CURRENT_SOURCE_DIR}/Version.h.cmake ${CMAKE_CURRENT_BINARY_DIR}/Version.h)
-install (FILES  ${CMAKE_CURRENT_BINARY_DIR}/Version.h DESTINATION include/toadlet/tadpole)
 
 
 # Source files for toadlet_tadpole

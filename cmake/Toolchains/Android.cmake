@@ -50,6 +50,9 @@
 #    ARM_TARGET=armeabi - type of floating point support.
 #      Other possible values are: "armeabi", "armeabi-v7a with NEON", "armeabi-v7a with VFPV3"
 #
+#    INSTALL_JAVA_ONLY=OFF - If ON, will install jars and libraries to libs subdir, and usually indicates to the project not to install headers.
+#      Mostly useful for installing directly into the libs/ folder of an existing android project.
+#
 #    ANDROID_STL=(SYSTEM GNU_SHARED GNU_STATIC GABI_SHARED GABI_STATIC STLPORT_SHARED STLPORT_STATIC) - choose one
 #      Select from among any of the android STL versions, shared or static. SYSTEM is the default
 #
@@ -349,21 +352,17 @@ elseif( ANDROID_ARCH STREQUAL "X86" )
  set( NDK_NAME_ARCH "x86" )
 endif( ANDROID_ARCH STREQUAL "ARM" )
 
-# Eliminate the automatic assignment of output directories, for now.
-#setup output directories
-#set( LIBRARY_OUTPUT_PATH_ROOT ${CMAKE_SOURCE_DIR} CACHE PATH "root for library output, set this to change where android libs are installed to" )
-
-#SET( DO_NOT_CHANGE_OUTPUT_PATHS_ON_FIRST_PASS OFF CACHE BOOL "")
-#if( DO_NOT_CHANGE_OUTPUT_PATHS_ON_FIRST_PASS )
-# if( EXISTS "${CMAKE_SOURCE_DIR}/jni/CMakeLists.txt" )
-#  set( EXECUTABLE_OUTPUT_PATH "${LIBRARY_OUTPUT_PATH_ROOT}/bin/${NDK_NAME_ARCH}" CACHE PATH "Output directory for applications")
-# else()
-#  set( EXECUTABLE_OUTPUT_PATH "${LIBRARY_OUTPUT_PATH_ROOT}/bin" CACHE PATH "Output directory for applications")
-# endif()
-# set( LIBRARY_OUTPUT_PATH "${LIBRARY_OUTPUT_PATH_ROOT}/libs/${NDK_NAME_ARCH}" CACHE PATH "path for android libs")
-# set( CMAKE_INSTALL_PREFIX "${ANDROID_NDK_TOOLCHAIN_ROOT}/user" CACHE STRING "path for installing" )
-#endif()
-#SET( DO_NOT_CHANGE_OUTPUT_PATHS_ON_FIRST_PASS ON CACHE INTERNAL "" FORCE)
+# Installing java only will place the libraries (no headers) into the libs/ subdir, for direct use in an android project.
+if( INSTALL_JAVA_ONLY )
+ if( NOT DEFINED JAVA_LIB_INSTALL_DIR )
+  message( STATUS "INSTALL_JAVA_ONLY=${INSTALL_JAVA_ONLY}, only toadlet jars and libs will be installed" )
+ endif( NOT DEFINED JAVA_LIB_INSTALL_DIR )
+ set( JAVA_LIB_INSTALL_DIR libs )
+else( INSTALL_JAVA_ONLY )
+ set( JAVA_LIB_INSTALL_DIR lib )
+endif( INSTALL_JAVA_ONLY )
+set( INSTALL_JAVA_ONLY ${INSTALL_JAVA_ONLY} CACHE BOOL "Only install java libraries and jards" FORCE )
+set( JAVA_LIB_INSTALL_DIR ${JAVA_LIB_INSTALL_DIR} CACHE STRING "java library installation suffix" FORCE )
 
 # Set find root path to the target environment, plus the user defined search path
 set( CMAKE_FIND_ROOT_PATH "${ANDROID_NDK_TOOLCHAIN_ROOT}/bin" "${ANDROID_NDK_TOOLCHAIN_ROOT}/${ANDROID_NDK_TOOLCHAIN_ARCH}" "${ANDROID_NDK_SYSROOT}" "${CMAKE_PREFIX_PATH}")
