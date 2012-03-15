@@ -15,7 +15,7 @@ public:
 
 	Node *getParent();
 
-	void setRotate(float* axis,float angle);
+	void setRotate(float axis[3],float angle);
 
 	void setScope(int scope);
 	int getScope();
