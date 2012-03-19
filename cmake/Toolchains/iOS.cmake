@@ -20,10 +20,17 @@
 
 # Standard settings
 set (CMAKE_SYSTEM_NAME Darwin)
-set (CMAKE_SYSTEM_VERSION 1 )
+set (CMAKE_SYSTEM_VERSION 1)
 set (UNIX True)
 set (APPLE True)
 set (IOS True)
+
+# Determine the cmake host system version so we know where to find the iOS SDKs
+find_program (CMAKE_UNAME uname /bin /usr/bin /usr/local/bin)
+if (CMAKE_UNAME)
+	exec_program(uname ARGS -r OUTPUT_VARIABLE CMAKE_HOST_SYSTEM_VERSION)
+	string (REGEX REPLACE "^([0-9]+)\\.([0-9]+).*$" "\\1" DARWIN_MAJOR_VERSION "${CMAKE_HOST_SYSTEM_VERSION}")
+endif (CMAKE_UNAME)
 
 # Force the compilers to gcc for iOS
 include (CMakeForceCompiler)
@@ -90,9 +97,13 @@ else (${IOS_PLATFORM} STREQUAL "OS")
 	message (FATAL_ERROR "Unsupported IOS_PLATFORM value selected. Please choose OS or SIMULATOR")
 endif (${IOS_PLATFORM} STREQUAL "OS")
 
-# Setup iOS developer location
+# Setup iOS developer location, which changed for OSX Lion (Darwin 11)
 if (NOT DEFINED CMAKE_IOS_DEVELOPER_ROOT)
-	set (CMAKE_IOS_DEVELOPER_ROOT "/Developer/Platforms/${IOS_PLATFORM_LOCATION}/Developer")
+	if (${DARWIN_MAJOR_VERSION} GREATER "10")
+		set (CMAKE_IOS_DEVELOPER_ROOT "/Applications/Xcode.app/Contents/Developer/Platforms/${IOS_PLATFORM_LOCATION}/Developer")
+	else (${DARWIN_MAJOR_VERSION} GREATER "10")
+		set (CMAKE_IOS_DEVELOPER_ROOT "/Developer/Platforms/${IOS_PLATFORM_LOCATION}/Developer")
+	endif (${DARWIN_MAJOR_VERSION} GREATER "10")
 endif (NOT DEFINED CMAKE_IOS_DEVELOPER_ROOT)
 set (CMAKE_IOS_DEVELOPER_ROOT ${CMAKE_IOS_DEVELOPER_ROOT} CACHE PATH "Location of iOS Platform")
 
@@ -134,4 +145,5 @@ set (CMAKE_SYSTEM_FRAMEWORK_PATH
 set (CMAKE_FIND_ROOT_PATH_MODE_PROGRAM ONLY)
 set (CMAKE_FIND_ROOT_PATH_MODE_LIBRARY ONLY)
 set (CMAKE_FIND_ROOT_PATH_MODE_INCLUDE ONLY)
+
 
