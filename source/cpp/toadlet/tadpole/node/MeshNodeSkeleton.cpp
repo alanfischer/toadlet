@@ -79,6 +79,8 @@ void MeshNodeSkeleton::updateBones(){
 		updateSkeletonBuffers();
 	}
 
+	mNode->activate();
+
 	if(mNode!=NULL){
 		mLastUpdateFrame=mNode->getScene()->getFrame();
 	}

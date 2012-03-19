@@ -47,6 +47,8 @@ public:
 
 	virtual void logicUpdate(int dt,int scope)=0;
 	virtual void frameUpdate(int dt,int scope)=0;
+
+	virtual bool getActive() const=0;
 };
 
 }

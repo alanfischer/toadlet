@@ -23,45 +23,22 @@
  *
  ********** Copyright header - do not remove **********/
 
-#ifndef TOADLET_TADPOLE_STUDIO_STUDIOMODELCONTROLLER_H
-#define TOADLET_TADPOLE_STUDIO_STUDIOMODELCONTROLLER_H
+#ifndef TOADLET_TADPOLE_ANIMATION_ANIMATIONLISTENER_H
+#define TOADLET_TADPOLE_ANIMATION_ANIMATIONLISTENER_H
 
-#include <toadlet/tadpole/animation/Controller.h>
-#include <toadlet/tadpole/studio/StudioModelNode.h>
+#include <toadlet/tadpole/Types.h>
 
 namespace toadlet{
 namespace tadpole{
-namespace studio{
+namespace animation{
 
-class StudioModelAnimation:public Animation{
+class Animation;
+
+class AnimationListener{
 public:
-	StudioModelAnimation(StudioModelNode::ptr node,bool gait){
-		mNode=node;
-		mGait=gait;
-	}
+	virtual ~AnimationListener(){}
 
-	void set(scalar value){
-		studioseqdesc *sseqdesc=seqdesc();
-		if(sseqdesc==NULL) return;
-		value=value*sseqdesc->fps;
-		if(mGait==false){mNode->setSequenceTime(value);}
-		else{mNode->setGaitSequenceTime(value);}
-	}
-	scalar getMin() const{return 0;}
-	scalar getMax() const{
-		studioseqdesc *sseqdesc=seqdesc();
-		if(sseqdesc==NULL || sseqdesc->numframes<=1) return 0;
-		return (sseqdesc->numframes-1)/sseqdesc->fps;
-	}
-
-protected:
-	studioseqdesc *seqdesc() const{
-		if(mNode->getModel()==NULL) return NULL;
-		return mNode->getModel()->seqdesc(mGait==false?mNode->getSequence():mNode->getGaitSequence());
-	}
-
-	StudioModelNode::ptr mNode;
-	bool mGait;
+	virtual void animationExtentsChanged(Animation *animation)=0;
 };
 
 }

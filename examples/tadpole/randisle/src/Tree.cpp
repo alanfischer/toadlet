@@ -294,7 +294,7 @@ void Tree::branchBuild(BranchSystem::Branch *branch){
 		segment.origin=branch->position + getWorldTranslate();
 		segment.direction=branch->position-treeBranch->points[treeBranch->points.size()-1];
 		toadlet::tadpole::Collision result;
-		((HopScene*)mScene)->traceSegment(result,segment,-1,NULL);
+		((HopScene*)mScene.get())->traceSegment(result,segment,-1,NULL);
 		if(result.time<Math::ONE){
 			branch->life=0;
 		}

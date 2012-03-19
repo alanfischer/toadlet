@@ -30,17 +30,6 @@ bool PathClimber::parentChanged(Node *node){
 }
 
 void PathClimber::logicUpdate(int dt,int scope){
-/*
-	if(Math::square(getVelocity().x)+Math::square(getVelocity().y)<0.05){
-		mPlayerMeshNode->getController()->setCycling(Controller::Cycling_NONE);
-	}
-	else{
-		mPlayerMeshNode->getController()->setCycling(Controller::Cycling_LOOP);
-		if(mPlayerMeshNode->getController()->isRunning()==false){
-			mPlayerMeshNode->getController()->start();
-		}
-	}
-*/
 	if(mPath==NULL){
 		Quaternion rotate;
 		Vector3 right,forward,up;

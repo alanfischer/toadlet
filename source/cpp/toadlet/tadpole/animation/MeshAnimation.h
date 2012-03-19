@@ -23,44 +23,48 @@
  *
  ********** Copyright header - do not remove **********/
 
-#ifndef TOADLET_TADPOLE_ANIMATION_NODEPATHANIMATION_H
-#define TOADLET_TADPOLE_ANIMATION_NODEPATHANIMATION_H
+#ifndef TOADLET_TADPOLE_ANIMATION_MESHANIMATION_H
+#define TOADLET_TADPOLE_ANIMATION_MESHANIMATION_H
 
-#include <toadlet/tadpole/TransformTrack.h>
+#include <toadlet/egg/Object.h>
 #include <toadlet/tadpole/animation/Animation.h>
-#include <toadlet/tadpole/node/Node.h>
+#include <toadlet/tadpole/node/MeshNode.h>
 
 namespace toadlet{
 namespace tadpole{
 namespace animation{
 
-class TOADLET_API NodePathAnimation:protected Object,public Animation{
+class Controller;
+
+// A simple animation for a Mesh
+class TOADLET_API MeshAnimation:protected Object,public Animation{
 public:
-	TOADLET_OBJECT(NodePathAnimation);
+	TOADLET_OBJECT(MeshAnimation);
 
-	NodePathAnimation(Node::ptr target);
-	virtual ~NodePathAnimation(){}
+	MeshAnimation(MeshNode *target,int sequenceIndex);
+	virtual ~MeshAnimation();
 
-	void setTarget(Node::ptr target);
-	inline Node::ptr getTarget() const{return mTarget;}
+	void setTarget(MeshNode *target);
+	inline MeshNode *getTarget() const{return mTarget;}
 
-	void setTrack(TransformTrack::ptr track);
-	inline TransformTrack::ptr getTrack() const{return mTrack;}
-
-	void setLookAt(const Vector3 &lookAt);
-	inline const Vector3 &getLookAt() const{return mLookAt;}
+	void setSequenceIndex(int sequenceIndex);
+	inline int getSequenceIndex() const{return mSequenceIndex;}
 
 	void setValue(scalar value);
-	scalar getValue(){return mValue;}
+	scalar getValue() const{return mValue;}
 	scalar getMinValue() const{return 0;}
-	scalar getMaxValue() const{return mTrack->length;}
+	scalar getMaxValue() const{return mTarget->getSkeleton()->getSkeleton()->sequences[mSequenceIndex]->length;}
+
+	void setWeight(scalar weight){}
+	scalar getWeight() const{return Math::ONE;}
+
+	void setAnimationListener(AnimationListener *listener){mListener=listener;}
+	AnimationListener *getAnimationListener() const{return mListener;}
 
 protected:
-	Node::ptr mTarget;
-	TransformTrack::ptr mTrack;
-	bool mUseLookAt;
-	Vector3 mLookAt;
-	int mHint;
+	AnimationListener *mListener;
+	MeshNode::ptr mTarget;
+	int mSequenceIndex;
 	scalar mValue;
 };
 
@@ -69,4 +73,3 @@ protected:
 }
 
 #endif
-

@@ -48,7 +48,7 @@ void CameraProjectionAnimation::setStart(scalar left,scalar right,scalar bottom,
 	mStartFar=fard;
 }
 
-void CameraProjectionAnimation::setEnd(scalar left,scalar right,scalar bottom,scalar top,scalar neard,scalar fard,scalar time){
+void CameraProjectionAnimation::setEnd(scalar left,scalar right,scalar bottom,scalar top,scalar neard,scalar fard,scalar length){
 	mEndLeft=left;
 	mEndRight=right;
 	mEndBottom=bottom;
@@ -56,11 +56,12 @@ void CameraProjectionAnimation::setEnd(scalar left,scalar right,scalar bottom,sc
 	mEndNear=neard;
 	mEndFar=fard;
 
-	mEndTime=time;
+	mMaxValue=length;
 }
 
-void CameraProjectionAnimation::set(scalar value){
-	scalar t=Math::div(value,mEndTime);
+void CameraProjectionAnimation::setValue(scalar value){
+	mValue=value;
+	scalar t=Math::div(mValue,mMaxValue);
 
 	mTarget->setProjectionFrustum(
 		Math::lerp(mStartLeft,mEndLeft,t),

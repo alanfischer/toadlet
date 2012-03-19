@@ -31,8 +31,6 @@
 #include <toadlet/tadpole/Mesh.h>
 #include <toadlet/tadpole/Renderable.h>
 #include <toadlet/tadpole/Visible.h>
-#include <toadlet/tadpole/animation/Controller.h>
-#include <toadlet/tadpole/animation/SkeletonAnimation.h>
 #include <toadlet/tadpole/node/MeshNodeSkeleton.h>
 #include <toadlet/tadpole/node/CameraAlignedNode.h>
 
@@ -65,24 +63,6 @@ public:
 		Transform worldTransform;
 		Bound worldBound;
 		int scope;
-	};
-
-	/// Specialization of the Controller that allows for easy access to playing single sequences.
-	class TOADLET_API MeshController:public Controller{
-	public:
-		TOADLET_SPTR(MeshController);
-
-		MeshController(MeshNode *node);
-
-		void setSequenceIndex(int index){mAnimation->setSequenceIndex(index);}
-		int getSequenceIndex() const{return mAnimation->getSequenceIndex();}
-
-		void skeletonChanged();
-
-	protected:
-		MeshNode *mMeshNode;
-		SkeletonAnimation::ptr mAnimation;
-		int mStartingFrame;
 	};
 
 	MeshNode();

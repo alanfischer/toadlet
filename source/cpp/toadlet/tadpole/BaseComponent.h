@@ -38,12 +38,14 @@ public:
 	
 	virtual Node *isNode(){return NULL;}
 	
-	virtual void destroy()=0;
+	virtual void destroy(){}
 
-	virtual bool parentChanged(Node *node)=0;
+	virtual bool parentChanged(Node *node){return true;}
 
-	virtual void logicUpdate(int dt,int scope)=0;
-	virtual void frameUpdate(int dt,int scope)=0;
+	virtual void logicUpdate(int dt,int scope){}
+	virtual void frameUpdate(int dt,int scope){}
+
+	virtual bool getActive() const{return true;}
 };
 
 }
