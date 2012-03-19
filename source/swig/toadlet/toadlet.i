@@ -34,10 +34,14 @@ using namespace toadlet::peeper;
 
 %include <toadlet/tadpole/Engine.i>
 %include <toadlet/tadpole/Scene.i>
+%include <toadlet/tadpole/Component.i>
+%include <toadlet/tadpole/animation/Animation.i>
+%include <toadlet/tadpole/animation/Controller.i>
 %include <toadlet/tadpole/Node.i>
 %include <toadlet/tadpole/CameraNode.i>
 %include <toadlet/tadpole/MeshNode.i>
 %{
 using namespace toadlet::tadpole;
+using namespace toadlet::tadpole::animation;
 using namespace toadlet::tadpole::node;
 %}

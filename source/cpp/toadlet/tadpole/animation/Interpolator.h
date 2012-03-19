@@ -23,24 +23,20 @@
  *
  ********** Copyright header - do not remove **********/
 
-#ifndef TOADLET_TADPOLE_ANIMATION_ANIMATABLE_H
-#define TOADLET_TADPOLE_ANIMATION_ANIMATABLE_H
+#ifndef TOADLET_TADPOLE_ANIMATION_INTERPOLATOR_H
+#define TOADLET_TADPOLE_ANIMATION_INTERPOLATOR_H
 
-#include <toadlet/tadpole/Types.h>
+#include <toadlet/tadpole/animation/Animation.h>
 
 namespace toadlet{
 namespace tadpole{
 namespace animation{
 
-class Animatable{
+class TOADLET_API Interpolator:public Interface{
 public:
-	TOADLET_SPTR(Animatable);
+	TOADLET_IPTR(Interpolator);
 
-	virtual ~Animatable(){}
-
-	virtual void set(scalar value)=0;
-	virtual scalar getMin() const=0;
-	virtual scalar getMax() const=0;
+	virtual scalar interpolate(scalar value)=0;
 };
 
 }

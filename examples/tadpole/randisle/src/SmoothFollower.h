@@ -5,13 +5,11 @@
 
 class SmoothFollower:public BaseComponent{
 public:
-	TOADLET_IPTR(SmoothFollower);
+	TOADLET_OBJECT(SmoothFollower);
 
 	SmoothFollower(int bufferSize):BaseComponent(){
 		mPositions.resize(bufferSize);
 	}
-
-	void destroy(){}
 
 	bool parentChanged(Node *node){
 		mNode=node;

@@ -40,7 +40,7 @@ class HopEntity;
 
 class TOADLET_API HopScene:public Scene,public hop::Manager{
 public:
-	TOADLET_SPTR(HopScene);
+	TOADLET_OBJECT(HopScene);
 
 	HopScene(Engine *engine);
 	virtual ~HopScene();

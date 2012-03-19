@@ -16,6 +16,8 @@ public:
 		return true;
 	}
 
+	bool getActive() const{return true;}
+
 	void logicUpdate(int dt,int scope){
 		mLastTranslate.set(mTranslate);
 		mLastRotate.set(mRotate);
@@ -92,22 +94,30 @@ void Logo::create(){
 	light->setLightState(state);
 	scene->getRoot()->attach(light);
 
- 	meshNode=engine->createNodeType(MeshNode::type(),scene);
-	meshNode->setMesh("lt.xmsh");
-//	meshNode->getController()->start();
-//	meshNode->getController()->setCycling(Controller::Cycling_REFLECT);
-	scene->getRoot()->attach(meshNode);
+	Node::ptr lt=engine->createNodeType(LightNode::type(),scene);
+	{
+ 		MeshNode::ptr mesh=engine->createNodeType(MeshNode::type(),scene);
+		mesh->setMesh("lt.xmsh");
+		lt->attach(mesh);
 
-	cameraNode=engine->createNodeType(CameraNode::type(),scene);
-	cameraNode->setLookAt(Vector3(0,-Math::fromInt(150),0),Math::ZERO_VECTOR3,Math::Z_UNIT_VECTOR3);
-	cameraNode->setClearColor(Colors::BLUE);
-	scene->getRoot()->attach(cameraNode);
+		Controller::ptr controller=new Controller();
+		controller->attach(new SkeletonAnimation(mesh->getSkeleton(),0));
+		controller->setCycling(Controller::Cycling_REFLECT);
+		controller->start();
+		lt->attach(controller);
+	}
+	scene->getRoot()->attach(lt);
+
+	camera=engine->createNodeType(CameraNode::type(),scene);
+	camera->setLookAt(Vector3(0,-Math::fromInt(150),0),Math::ZERO_VECTOR3,Math::Z_UNIT_VECTOR3);
+	camera->setClearColor(Colors::BLUE);
+	scene->getRoot()->attach(camera);
 
 // Only looks good if running on device, in simulator its always a top down view
 #if 1
 	InputDevice *motionDevice=app->getInputDevice(InputDevice::InputType_MOTION);
 	if(motionDevice!=NULL){
-		cameraNode->attach(new GravityFollower(motionDevice));
+		camera->attach(new GravityFollower(motionDevice));
 		motionDevice->start();
 	}
 #endif
@@ -118,14 +128,14 @@ void Logo::destroy(){
 }
 
 void Logo::resized(int width,int height){
-	if(cameraNode!=NULL && width>0 && height>0){
+	if(camera!=NULL && width>0 && height>0){
 		if(width>=height){
-			cameraNode->setProjectionFovY(Math::degToRad(Math::fromInt(45)),Math::div(Math::fromInt(width),Math::fromInt(height)),Math::fromInt(1),Math::fromInt(200));
+			camera->setProjectionFovY(Math::degToRad(Math::fromInt(45)),Math::div(Math::fromInt(width),Math::fromInt(height)),Math::fromInt(1),Math::fromInt(200));
 		}
 		else{
-			cameraNode->setProjectionFovX(Math::degToRad(Math::fromInt(45)),Math::div(Math::fromInt(height),Math::fromInt(width)),Math::fromInt(1),Math::fromInt(200));
+			camera->setProjectionFovX(Math::degToRad(Math::fromInt(45)),Math::div(Math::fromInt(height),Math::fromInt(width)),Math::fromInt(1),Math::fromInt(200));
 		}
-		cameraNode->setViewport(Viewport(0,0,width,height));
+		camera->setViewport(Viewport(0,0,width,height));
 	}
 }
 
@@ -133,7 +143,7 @@ void Logo::render(){
 	RenderDevice *renderDevice=engine->getRenderDevice();
 
 	renderDevice->beginScene();
-		cameraNode->render(renderDevice);
+		camera->render(renderDevice);
 	renderDevice->endScene();
 	renderDevice->swap();
 }

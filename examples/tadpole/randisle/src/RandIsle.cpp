@@ -1,5 +1,7 @@
 #include "RandIsle.h"
 #include "PathClimber.h"
+#include "AnimationController.h"
+#include "GroundProjector.h"
 #include "Tree.h"
 #include "HUD.h"
 #include "Resources.h"
@@ -53,7 +55,7 @@ void RandIsle::create(){
 	mTerrain->setDataSource(this);
 
 	mFollowNode=mEngine->createNodeType(Node::type(),mScene);
-	mFollower=SmoothFollower::ptr(new SmoothFollower(30));
+	mFollower=new SmoothFollower(30);
 	mFollower->setOffset(Vector3(0,-20,5));
 	mFollower->setTargetOffset(Vector3(0,0,7.7));
 	mFollowNode->attach(mFollower);
@@ -112,7 +114,7 @@ void RandIsle::create(){
 	mScene->getRoot()->attach(mRustleSound);
 	
 	mPlayer=mEngine->createNodeType(HopEntity::type(),mScene);
-mClimber=PathClimber::ptr(new PathClimber());
+mClimber=new PathClimber();
 mClimber->setSpeed(40);
 	mPlayer->attach(mClimber);
 mClimber->setPathClimberListener(this);
@@ -131,16 +133,16 @@ mClimber->setPathClimberListener(this);
 	MeshNode::ptr playerMesh=mEngine->createNodeType(MeshNode::type(),mScene);
 	if(Resources::instance->creature!=NULL){
 		playerMesh->setMesh(Resources::instance->creature);
-//		mPlayerMeshNode->getController()->setSequenceIndex(1);
 	}
 	mPlayer->attach(playerMesh);
+	mPlayer->attach(new AnimationController(mPlayer,playerMesh));
 
 	MeshNode::ptr shadowMesh=mEngine->createNodeType(MeshNode::type(),mScene);
 	if(Resources::instance->shadow!=NULL){
 		shadowMesh->setMesh(Resources::instance->shadow);
 	}
-	shadowMesh->attach(new GroundProjector(mPlayer,20,0));
 	mPlayer->attach(shadowMesh);
+	mPlayer->attach(new GroundProjector(mPlayer,shadowMesh,20,0));
 
 	mTerrain->setTarget(mPlayer);
 
@@ -172,7 +174,10 @@ void RandIsle::destroy(){
 		joyDevice->setListener(NULL);
 	}
 
-	mScene->destroy();
+	if(mScene!=NULL){
+		mScene->destroy();
+		mScene=NULL;
+	}
 
 	if(mPredictedVertexData!=NULL){
 		mPredictedVertexData->destroy();

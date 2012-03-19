@@ -23,7 +23,7 @@
  *
  ********** Copyright header - do not remove **********/
 
-#include <toadlet/tadpole/animation/SkeletonAnimation.h>
+#include <toadlet/tadpole/animation/MeshAnimation.h>
 #include <toadlet/tadpole/animation/Controller.h>
 #include <toadlet/tadpole/node/MeshNodeSkeleton.h>
 #include <toadlet/egg/Error.h>
@@ -32,58 +32,36 @@ namespace toadlet{
 namespace tadpole{
 namespace animation{
 
-SkeletonAnimation::SkeletonAnimation():
-	mController(NULL),
-	//mTarget,
-	mSequenceIndex(0)
+MeshAnimation::MeshAnimation(MeshNode *target,int sequenceIndex):
+	mListener(NULL),
+	mTarget(target),
+	mSequenceIndex(sequenceIndex),
+	mValue(0)
 {}
 
-SkeletonAnimation::~SkeletonAnimation(){
+MeshAnimation::~MeshAnimation(){
 }
 
-void SkeletonAnimation::setTarget(MeshNodeSkeleton::ptr target){
+void MeshAnimation::setTarget(MeshNode *target){
 	mTarget=target;
+
+	if(mListener!=NULL){
+		mListener->animationExtentsChanged(this);
+	}
 }
 
-void SkeletonAnimation::setSequenceIndex(int index){
+void MeshAnimation::setSequenceIndex(int index){
 	mSequenceIndex=index;
 
-	if(mController!=NULL){
-		mController->extentsChanged();
+	if(mListener!=NULL){
+		mListener->animationExtentsChanged(this);
 	}
 }
 
-void SkeletonAnimation::set(scalar value){
-	if(mTarget!=NULL){
-		mTarget->updateBones(mSequenceIndex,value);
+void MeshAnimation::setValue(scalar value){
+	if(mTarget!=NULL && mTarget->getSkeleton()){
+		mTarget->getSkeleton()->updateBones(mSequenceIndex,value);
 	}
-}
-
-scalar SkeletonAnimation::getMin() const{
-	return 0;
-}
-
-scalar SkeletonAnimation::getMax() const{
-	if(mTarget!=NULL){
-		return mTarget->getSkeleton()->sequences[mSequenceIndex]->length;
-	}
-	else{
-		return 0;
-	}
-}
-
-void SkeletonAnimation::attached(Controller *controller){
-	if(mController!=NULL){
-		Error::unknown(Categories::TOADLET_TADPOLE,
-			"cannot attach animation to more than one controller");
-		return;
-	}
-
-	mController=controller;
-}
-
-void SkeletonAnimation::removed(Controller *controller){
-	mController=NULL;
 }
 
 }

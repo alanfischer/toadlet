@@ -178,7 +178,7 @@ bool Node::attach(Component *component){
 		nodeAttached(node);
 	}
 
-	if(active()==false){
+	if(getActive()==false){
 		activate();
 	}
 
@@ -218,7 +218,7 @@ bool Node::remove(Component *component){
 		nodeRemoved(node);
 	}
 
-	if(active()==false){
+	if(getActive()==false){
 		activate();
 	}
 
@@ -287,13 +287,18 @@ void Node::setBound(const Bound &bound){
 
 void Node::logicUpdate(int dt,int scope){
 	mLastLogicFrame=mScene->getLogicFrame();
+	bool anyActive=false;
 
 	/// @todo: Use a linked list for the Components, and NOT check to see if they are a node here
 	int i;
 	for(i=0;i<mComponents.size();++i){
 		if(mComponents[i]->isNode()==NULL){
 			mComponents[i]->logicUpdate(dt,scope);
+			anyActive|=mComponents[i]->getActive();
 		}
+	}
+	if(anyActive){
+		activate();
 	}
 
 	updateWorldTransform();
@@ -306,7 +311,7 @@ void Node::logicUpdate(int dt,int scope){
 		if(mActivateChildren){
 			node->activate();
 		}
-		if(node->active() && (node->getScope()&scope)!=0){
+		if(node->getActive() && (node->getScope()&scope)!=0){
 			Node *depends=node->getDependsUpon();
 			if(depends!=NULL && depends->mLastLogicFrame!=mScene->getLogicFrame()){
 				mScene->queueDependent(node);
@@ -346,7 +351,7 @@ void Node::frameUpdate(int dt,int scope){
 		if(mActivateChildren){
 			node->activate();
 		}
-		if(node->active() && (node->getScope()&scope)!=0){
+		if(node->getActive() && (node->getScope()&scope)!=0){
 			Node *depends=node->getDependsUpon();
 			if(depends!=NULL && depends->mLastFrame!=mScene->getFrame()){
 				mScene->queueDependent(node);
@@ -386,7 +391,7 @@ void Node::activate(){
 	}
 	if(mActive==false){
 		mActive=true;
-		if(mParent!=NULL && mParent->active()==false){
+		if(mParent!=NULL && mParent->getActive()==false){
 			mParent->activate();
 		}
 	}

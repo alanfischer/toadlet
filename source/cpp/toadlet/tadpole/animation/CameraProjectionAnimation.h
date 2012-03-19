@@ -26,16 +26,16 @@
 #ifndef TOADLET_TADPOLE_ANIMATION_CAMERAPROJECTIONANIMATION_H
 #define TOADLET_TADPOLE_ANIMATION_CAMERAPROJECTIONANIMATION_H
 
-#include <toadlet/tadpole/animation/Animatable.h>
+#include <toadlet/tadpole/animation/Animation.h>
 #include <toadlet/tadpole/node/CameraNode.h>
 
 namespace toadlet{
 namespace tadpole{
 namespace animation{
 
-class TOADLET_API CameraProjectionAnimation:public Animatable{
+class TOADLET_API CameraProjectionAnimation:protected Object,public Animation{
 public:
-	TOADLET_SPTR(CameraProjectionAnimation);
+	TOADLET_OBJECT(CameraProjectionAnimation);
 
 	CameraProjectionAnimation(CameraNode::ptr target);
 	virtual ~CameraProjectionAnimation(){}
@@ -45,18 +45,18 @@ public:
 
 	// HACK: Until we introduce a proper ProjectionKeyFrame, this will have to do
 	void setStart(scalar left,scalar right,scalar bottom,scalar top,scalar neard,scalar fard);
-	void setEnd(scalar left,scalar right,scalar bottom,scalar top,scalar neard,scalar fard,scalar time);
+	void setEnd(scalar left,scalar right,scalar bottom,scalar top,scalar neard,scalar fard,scalar length);
 
-	void set(scalar value);
-
-	scalar getMin() const{return 0;}
-	scalar getMax() const{return mEndTime;}
+	void setValue(scalar value);
+	scalar getMinValue() const{return 0;}
+	scalar getMaxValue() const{return mMaxValue;}
+	scalar getValue() const{return mValue;}
 
 protected:
 	CameraNode::ptr mTarget;
 	scalar mStartLeft,mStartRight,mStartBottom,mStartTop,mStartNear,mStartFar;
 	scalar mEndLeft,mEndRight,mEndBottom,mEndTop,mEndNear,mEndFar;
-	scalar mEndTime;
+	scalar mValue,mMaxValue;
 };
 
 }

@@ -24,6 +24,7 @@
  ********** Copyright header - do not remove **********/
 
 #include <toadlet/egg/Logger.h>
+#include <toadlet/egg/Error.h>
 #include <toadlet/peeper/BackableShader.h>
 #include <toadlet/peeper/RenderCaps.h>
 
@@ -100,7 +101,11 @@ bool BackableShader::convertCreate(Shader::ptr shader,RenderDevice *renderDevice
 	int i;
 	for(i=0;i<numCodes;++i){
 		if(renderDevice->getShaderProfileSupported(profiles[i])){
-			if(shader->create(shaderType,profiles[i],codes[i])==false){
+			bool result=false;
+			TOADLET_TRY
+				result=shader->create(shaderType,profiles[i],codes[i]);
+			TOADLET_CATCH(const Exception &){result=false;}
+			if(result==false){
 				return false;
 			}
 		}

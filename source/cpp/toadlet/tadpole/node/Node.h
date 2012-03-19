@@ -87,12 +87,11 @@ public:
 
 	enum InterfaceType{
 		InterfaceType_ATTACHABLE,
-		InterfaceType_DETAILTRACEABLE,
-		InterfaceType_MATERIALABLE,
 		InterfaceType_RENDERABLE,
-		InterfaceType_TRACEABLE,
 		InterfaceType_TRANSFORMABLE,
 		InterfaceType_VISIBLE,
+		InterfaceType_TRACEABLE,
+		InterfaceType_DETAILTRACEABLE,
 	};
 
 	TOADLET_ALIGNED_NEW;
@@ -178,7 +177,7 @@ public:
 	virtual void activate();
 	virtual void deactivate();
 	virtual void tryDeactivate();
-	inline bool active() const{return mActive;}
+	virtual bool getActive() const{return mActive;}
 	bool getTransformUpdated();
 
 	virtual void updateWorldTransform();

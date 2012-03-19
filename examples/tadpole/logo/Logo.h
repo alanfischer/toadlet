@@ -26,10 +26,9 @@ public:
 	void mouseScrolled(int x,int y,int scroll){}
 	
 	Application *app;
-	Engine *engine;
+	Engine::ptr engine;
 	Scene::ptr scene;
-	CameraNode::ptr cameraNode;
-	MeshNode::ptr meshNode;
+	CameraNode::ptr camera;
 };
 
 #endif

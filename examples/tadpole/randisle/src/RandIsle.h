@@ -7,7 +7,6 @@
 #include "PathSystem.h"
 #include "PathClimber.h"
 #include "SmoothFollower.h"
-#include "GroundProjector.h"
 #include "Sky.h"
 #include "Tree.h"
 
@@ -101,7 +100,7 @@ protected:
 
 	Application *mApp;
 	String mPath;
-	Engine *mEngine;
+	Engine::ptr mEngine;
 	HopScene::ptr mScene;
 	TerrainNode::ptr mTerrain;
 	SmoothFollower::ptr mFollower;
