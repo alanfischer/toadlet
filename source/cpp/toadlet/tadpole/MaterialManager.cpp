@@ -323,7 +323,9 @@ bool MaterialManager::isPathUseable(RenderPath *path,const RenderCaps &caps){
 
 		if(state!=NULL){
 			for(j=0;j<Shader::ShaderType_MAX;++j){
-				if(state->getShader((Shader::ShaderType)j)!=NULL && caps.hasShader[j]==false){
+				/// @todo: I believe this wont currently detect a shader path that didn't load properly.  so FIX IT
+				Shader *shader=state->getShader((Shader::ShaderType)j);
+				if(shader!=NULL && (shader->getRootShader()==NULL || caps.hasShader[j]==false)){
 					break;
 				}
 			}
