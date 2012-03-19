@@ -201,7 +201,7 @@ void HopEntity::preSimulate(){
 		return;
 	}
 
-	if(active()==true && mNewPosition.equals(mSolid->getPosition())==false){
+	if(getActive()==true && mNewPosition.equals(mSolid->getPosition())==false){
 		mSolid->setPosition(mNewPosition);
 	}
 }

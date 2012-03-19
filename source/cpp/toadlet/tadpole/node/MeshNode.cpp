@@ -27,7 +27,6 @@
 #include <toadlet/tadpole/Engine.h>
 #include <toadlet/tadpole/Scene.h>
 #include <toadlet/tadpole/node/MeshNode.h>
-#include <toadlet/tadpole/animation/SkeletonAnimation.h>
 
 namespace toadlet{
 namespace tadpole{
@@ -48,20 +47,6 @@ MeshNode::SubMesh::SubMesh(MeshNode *meshNode,Mesh::SubMesh *meshSubMesh):
 
 void MeshNode::SubMesh::render(SceneRenderer *renderer) const{
 	renderer->getDevice()->renderPrimitive(vertexData,indexData);
-}
-
-MeshNode::MeshController::MeshController(MeshNode *node):Controller(),
-	mMeshNode(NULL)
-	//mAnimation
-{
-	mMeshNode=node;
-	mAnimation=SkeletonAnimation::ptr(new SkeletonAnimation());
-	mAnimation->setTarget(mMeshNode->getSkeleton());
-	attach(mAnimation);
-}
-
-void MeshNode::MeshController::skeletonChanged(){
-	mAnimation->setTarget(mMeshNode->getSkeleton());
 }
 
 MeshNode::MeshNode():super(),

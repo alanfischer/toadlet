@@ -5,10 +5,7 @@
 namespace toadlet{
 namespace tadpole{
 
-%refobject Node "$this->retain();"
-%unrefobject Node "$this->release();"
-
-class Node{
+class Node:public Component{
 public:
 	Node *create(Scene *scene);
 	void destroy();
@@ -20,8 +17,8 @@ public:
 	void setScope(int scope);
 	int getScope();
 
-	bool attach(Node *node);
-	bool remove(Node *node);
+	bool attach(Component *node);
+	bool remove(Component *node);
 };
 
 }
