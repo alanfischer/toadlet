@@ -169,11 +169,11 @@ bool D3D9WindowRenderTarget::createContext(HWND wnd,WindowRenderTargetFormat *fo
 				Logger::warning(Categories::TOADLET_PEEPER,
 					String("D3D9WindowRenderTarget: Error finding ")+compileShaderName);
 			}
-		}		
+		}
 	}
 	if(mD3DXLibrary==0){
 		Logger::warning(Categories::TOADLET_PEEPER,
-		String("D3D9WindowRenderTarget: Error loading ")+d3dxName);
+			"D3D9WindowRenderTarget: Error loading "+d3dxName);
 	}
 	else{
 		Logger::alert(Categories::TOADLET_PEEPER,
