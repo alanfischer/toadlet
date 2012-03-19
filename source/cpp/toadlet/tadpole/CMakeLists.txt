@@ -35,7 +35,7 @@ set (TADPOLE_ANIMATION_SRC
 	animation/Controller.cpp
 	animation/CameraProjectionAnimation.cpp
 	animation/NodePathAnimation.cpp
-	animation/SkeletonAnimation.cpp
+	animation/MeshAnimation.cpp
 )
 
 set (TADPOLE_BSP_SRC
@@ -237,13 +237,13 @@ set (TADPOLE_HEADERS
 )
 
 set (TADPOLE_ANIMATION_HEADERS
-	animation/Animatable.h
+	animation/Animation.h
+	animation/AnimationListener.h
 	animation/Controller.h
-	animation/ControllerFinishedListener.h
+	animation/ControllerListener.h
 	animation/CameraProjectionAnimation.h
-	animation/MaterialLightEffectAnimation.h
 	animation/NodePathAnimation.h
-	animation/SkeletonAnimation.h
+	animation/MeshAnimation.h
 )
 
 set (TADPOLE_BSP_HEADERS

@@ -8,11 +8,9 @@
 
 class PathClimber:public BaseComponent{
 public:
-	TOADLET_IPTR(PathClimber);
+	TOADLET_OBJECT(PathClimber);
 
 	PathClimber();
-
-	void destroy(){}
 
 	bool parentChanged(Node *node);
 
@@ -41,7 +39,6 @@ public:
 	bool passedJunction(int direction,scalar oldTime,scalar newTime,scalar junctionTime);
 
 	void logicUpdate(int dt,int scope);
-	void frameUpdate(int dt,int scope){}
 
 protected:
 	HopScene *mScene;

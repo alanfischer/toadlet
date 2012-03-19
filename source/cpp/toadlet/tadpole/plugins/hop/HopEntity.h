@@ -38,13 +38,13 @@ namespace tadpole{
 ///  It's localBound is by default set to the localBound of the hop::Solid
 class TOADLET_API HopEntity:public Node,public TraceCallback,public CollisionListener{
 public:
+	TOADLET_NODE(HopEntity,Node);
+
 	enum TriggerType{
 		TriggerType_TOGGLE,
 		TriggerType_ON,
 		TriggerType_OFF,
 	};
-
-	TOADLET_NODE(HopEntity,Node);
 
 	HopEntity();
 	virtual Node *create(Scene *scene);

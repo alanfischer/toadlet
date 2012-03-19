@@ -23,43 +23,22 @@
  *
  ********** Copyright header - do not remove **********/
 
-#ifndef TOADLET_TADPOLE_ANIMATION_SKELETONANIMATION_H
-#define TOADLET_TADPOLE_ANIMATION_SKELETONANIMATION_H
+#ifndef TOADLET_TADPOLE_ANIMATION_COSINTERPOLATOR_H
+#define TOADLET_TADPOLE_ANIMATION_COSINTERPOLATOR_H
 
-#include <toadlet/tadpole/animation/Animatable.h>
-#include <toadlet/tadpole/node/MeshNodeSkeleton.h>
+#include <toadlet/tadpole/animation/Interpolator.h>
 
 namespace toadlet{
 namespace tadpole{
 namespace animation{
 
-class Controller;
-
-class TOADLET_API SkeletonAnimation:public Animatable{
+class TOADLET_API CosInterpolator:protected Object,public Interpolator{
 public:
-	TOADLET_SPTR(SkeletonAnimation);
+	TOADLET_OBJECT(CosInterpolator);
 
-	SkeletonAnimation();
-	virtual ~SkeletonAnimation();
-
-	void setTarget(MeshNodeSkeleton::ptr target);
-	inline MeshNodeSkeleton::ptr getTarget() const{return mTarget;}
-
-	void setSequenceIndex(int sequenceIndex);
-	inline int getSequenceIndex() const{return mSequenceIndex;}
-
-	void set(scalar value);
-
-	scalar getMin() const;
-	scalar getMax() const;
-
-	void attached(Controller *controller);
-	void removed(Controller *controller);
-
-protected:
-	Controller *mController;
-	MeshNodeSkeleton::ptr mTarget;
-	int mSequenceIndex;
+	virtual scalar interpolate(scalar value){
+		return Math::div(Math::ONE-Math::cos(Math::mul(value,Math::PI)),Math::TWO);
+	}
 };
 
 }

@@ -152,7 +152,12 @@ bool D3D9WindowRenderTarget::createContext(HWND wnd,WindowRenderTargetFormat *fo
 	}
 
 	String d3dxName;
-	int maxD3DX=43,minD3DX=24;
+	// 43 is most recent, and use 37 instead of 24 as minimum, since we get:
+	//  HLSL error: error X5796: Dest register type for LRP must be temp (r#).
+	//  DLL: D3DX9_36.DLL
+	//  Driver:igdumdx32.dll 
+	//  Description:Intel(R) HD Graphics Family 
+	int maxD3DX=43,minD3DX=37;
 	int i;
 	for(i=maxD3DX;i>=minD3DX && mD3DXLibrary==0;i--){
 		d3dxName=(format->debug?String("D3DX9D_"):String("D3DX9_"))+i+".DLL";

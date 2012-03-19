@@ -23,34 +23,31 @@
  *
  ********** Copyright header - do not remove **********/
 
-#ifndef TOADLET_TADPOLE_ANIMATION_CONTROLLERFINISHEDLISTENER_H
-#define TOADLET_TADPOLE_ANIMATION_CONTROLLERFINISHEDLISTENER_H
+#ifndef TOADLET_TADPOLE_ANIMATION_ANIMATION_H
+#define TOADLET_TADPOLE_ANIMATION_ANIMATION_H
 
 #include <toadlet/tadpole/Types.h>
+#include <toadlet/tadpole/animation/AnimationListener.h>
 
 namespace toadlet{
 namespace tadpole{
 namespace animation{
 
-class Controller;
-
-class ControllerFinishedListener{
+class Animation:public Interface{
 public:
-	virtual ~ControllerFinishedListener(){}
+	TOADLET_IPTR(Animation);
 
-	virtual void controllerFinished(Controller *controller)=0;
-};
+	virtual ~Animation(){}
 
-template<class Type>
-class ControllerFinishedFunctor:public ControllerFinishedListener{
-public:
-	ControllerFinishedFunctor(Type *obj,void (Type::*func)(void)):mObject(obj),mFunction(func){}
+	virtual void setValue(scalar value)=0;
+	virtual scalar getMinValue() const=0;
+	virtual scalar getMaxValue() const=0;
+	virtual scalar getValue() const=0;
 
-	virtual void controllerFinished(Controller *controller){(mObject->*mFunction)();}
-
-protected:
-	Type *mObject;
-	void (Type::*mFunction)(void);
+	virtual void setWeight(scalar weight)=0;
+	virtual scalar getWeight() const=0;
+	
+	virtual void setAnimationListener(AnimationListener *listener)=0;
 };
 
 }

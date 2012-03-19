@@ -277,7 +277,7 @@ int Scene::countActiveNodes(Node *node){
 		return countActiveNodes(mRoot);
 	}
 	
-	int count=node->active()?1:0;
+	int count=node->getActive()?1:0;
 	Node *child;
 	for(child=node->getFirstChild();child!=NULL;child=child->getNext()){
 		count+=countActiveNodes(child);

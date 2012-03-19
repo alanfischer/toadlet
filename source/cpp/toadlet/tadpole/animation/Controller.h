@@ -27,25 +27,19 @@
 #define TOADLET_TADPOLE_ANIMATION_CONTROLLER_H
 
 #include <toadlet/egg/Collection.h>
-#include <toadlet/tadpole/animation/Animatable.h>
-#include <toadlet/tadpole/animation/ControllerFinishedListener.h>
+#include <toadlet/tadpole/BaseComponent.h>
+#include <toadlet/tadpole/animation/Animation.h>
+#include <toadlet/tadpole/animation/ControllerListener.h>
+#include <toadlet/tadpole/animation/Interpolator.h>
+#include <toadlet/tadpole/animation/CosInterpolator.h>
 
 namespace toadlet{
 namespace tadpole{
 namespace animation{
 
-/// @todo: A nice feature would be the ability for Controllers to be run by a Thread pool, so a central ControllerManager would take
-//   care of the updating.  But perhaps this would be better suited by having Nodes update their Animations as we do now, and then the
-//   whole scenegraph be updated by a ThreadPool, taking into account dependencies
-/// @todo: Controllers should have a general ControllerListener that can be implemented by Node, so when they are destroyed, the node can listen and remove the controller
-class TOADLET_API Controller{
+class TOADLET_API Controller:public BaseComponent,public AnimationListener{
 public:
-	TOADLET_SPTR(Controller);
-
-	enum Interpolation{
-		Interpolation_LINEAR,
-		Interpolation_COS,
-	};
+	TOADLET_OBJECT(Controller);
 
 	enum Cycling{
 		Cycling_NONE,
@@ -56,20 +50,27 @@ public:
 	Controller();
 	virtual ~Controller();
 
-	virtual void setTime(int time,bool setagain=true);
+	virtual bool parentChanged(Node *node){mNode=node;return true;}
+
+	virtual void logicUpdate(int dt,int scope){}
+	virtual void frameUpdate(int dt,int scope);
+
+	virtual bool getActive() const{return mRunning;}
+
+	virtual void setTime(int time);
 	inline int getTime() const{return mTime;}
-
-	virtual void setCycling(Cycling cycling);
-	inline Cycling getCycling() const{return mCycling;}
-
-	virtual void setInterpolation(Interpolation interpolation);
-	inline Interpolation getInterpolation() const{return mInterpolation;}
 
 	virtual void setTimeScale(scalar scale);
 	inline scalar getTimeScale() const{return mTimeScale;}
 
-	virtual void setControllerFinishedListener(ControllerFinishedListener *listener,bool owns);
-	inline ControllerFinishedListener *getControllerFinishedListener() const{return mFinishedListener;}
+	virtual void setCycling(Cycling cycling);
+	inline Cycling getCycling() const{return mCycling;}
+
+	virtual void setInterpolator(Interpolator *interpolator);
+	inline Interpolator *getInterpolator() const{return mInterpolator;}
+
+	virtual void setControllerListener(ControllerListener *listener);
+	inline ControllerListener *getControllerListener() const{return mListener;}
 
 	virtual void setMinMaxValue(scalar minValue,scalar maxValue){mMinValue=minValue;mMaxValue=maxValue;}
 	inline scalar getMinValue() const{return mMinValue;}
@@ -77,31 +78,28 @@ public:
 
 	virtual void start();
 	virtual void stop();
-	inline bool isRunning() const{return mRunning;}
 
-	virtual void update(int dt);
+	virtual void setValue(scalar value);
 
-	virtual void set(scalar value);
+	virtual void attach(Animation *animation);
+	virtual void remove(Animation *animation);
 
-	virtual void extentsChanged();
-
-	virtual void attach(Animatable::ptr animatable);
-	virtual void remove(Animatable::ptr animatable);
+	virtual void animationExtentsChanged(Animation *animation);
 
 protected:
-	Collection<Animatable::ptr> mAnimatables;
+	Collection<Animation::ptr> mAnimations;
 
+	Node *mNode;
 	int mTime;
 	scalar mMinValue;
 	scalar mMaxValue;
 	int mMinTime;
 	int mMaxTime;
 	Cycling mCycling;
-	Interpolation mInterpolation;
+	Interpolator::ptr mInterpolator;
 	scalar mTimeScale;
 	bool mRunning;
-	ControllerFinishedListener *mFinishedListener;
-	bool mOwnsFinishedListener;
+	ControllerListener *mListener;
 };
 
 }
