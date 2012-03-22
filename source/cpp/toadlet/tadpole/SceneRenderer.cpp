@@ -230,13 +230,10 @@ void SceneRenderer::renderQueueItems(Material *material,const RenderableSet::Ren
 }
 
 void SceneRenderer::setupViewport(CameraNode *camera,RenderDevice *device){
-	Viewport viewport;
-	if(camera->getViewportSet()){
-		viewport=camera->getViewport();
-	}
-	else{
-		RenderTarget *renderTarget=device->getRenderTarget();
-		viewport=Viewport(0,0,renderTarget->getWidth(),renderTarget->getHeight());
+	Viewport viewport=camera->getViewport();
+	if(viewport.x==0 && viewport.y==0 && viewport.width==0 && viewport.height==0){
+		viewport.width=device->getRenderTarget()->getWidth();
+		viewport.height=device->getRenderTarget()->getHeight();
 	}
 	device->setViewport(viewport);
 	mSceneParameters->setViewport(viewport);

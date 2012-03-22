@@ -36,12 +36,11 @@ namespace node{
 TOADLET_NODE_IMPLEMENT(CameraNode,Categories::TOADLET_TADPOLE_NODE+".CameraNode");
 
 CameraNode::CameraNode():super(),
-	mProjectionType(ProjectionType_FOVX),
+	mProjectionType(ProjectionType_FOV),
 	mFov(0),mAspect(0),
 	mLeftDist(0),mRightDist(0),
 	mBottomDist(0),mTopDist(0),
 	mNearDist(0),mFarDist(0),
-	mViewportSet(false),
 	//mViewport,
 	mClearFlags(0),
 	//mClearColor,
@@ -69,8 +68,7 @@ CameraNode::CameraNode():super(),
 Node *CameraNode::create(Scene *scene){
 	super::create(scene);
 
-	setProjectionFovX(Math::HALF_PI,Math::ONE,Math::ONE,Math::fromInt(1000));
-	mViewportSet=false;
+	setAutoProjectionFov(Math::QUARTER_PI,Math::ONE,Math::fromInt(1000));
 	mViewport.reset();
 	mClearFlags=RenderDevice::ClearType_BIT_COLOR|RenderDevice::ClearType_BIT_DEPTH;
 	mClearColor.reset();
@@ -127,6 +125,9 @@ Node *CameraNode::set(Node *node){
 	
 	CameraNode *cameraNode=(CameraNode*)node;
 	switch(cameraNode->getProjectionType()){
+		case ProjectionType_FOV:
+			setAutoProjectionFov(cameraNode->getFov(),cameraNode->getNearDist(),cameraNode->getFarDist());
+		break;
 		case ProjectionType_FOVX:
 			setProjectionFovX(cameraNode->getFov(),cameraNode->getAspect(),cameraNode->getNearDist(),cameraNode->getFarDist());
 		break;
@@ -151,6 +152,14 @@ Node *CameraNode::set(Node *node){
 	setGamma(cameraNode->getGamma());
 
 	return this;
+}
+
+void CameraNode::setAutoProjectionFov(scalar fov,scalar nearDist,scalar farDist){
+	mProjectionType=ProjectionType_FOV;
+	mFov=fov;mAspect=Math::ONE;
+	mLeftDist=0;mRightDist=0;
+	mBottomDist=0;mTopDist=0;
+	mNearDist=nearDist;mFarDist=farDist;
 }
 
 void CameraNode::setProjectionFovX(scalar fovx,scalar aspect,scalar nearDist,scalar farDist){
@@ -236,6 +245,9 @@ void CameraNode::setNearAndFarDist(scalar nearDist,scalar farDist){
 	mFarDist=farDist;
 
 	switch(mProjectionType){
+		case(ProjectionType_FOV):
+			setAutoProjectionFov(mFov,mNearDist,mFarDist);
+		break;
 		case(ProjectionType_FOVX):
 			setProjectionFovX(mFov,mAspect,mNearDist,mFarDist);
 		break;
@@ -323,15 +335,14 @@ void CameraNode::setWorldLookDir(const Vector3 &eye,const Vector3 &dir,const Vec
 
 void CameraNode::setRenderTarget(RenderTarget::ptr target){
 	mRenderTarget=target;
+	mViewport.set(0,0,target->getWidth(),target->getHeight());
 }
 
 void CameraNode::setViewport(const Viewport &viewport){
-	mViewportSet=true;
 	mViewport.set(viewport);
 }
 
 void CameraNode::setViewport(int x,int y,int width,int height){
-	mViewportSet=true;
 	mViewport.set(x,y,width,height);
 }
 
@@ -411,6 +422,19 @@ void CameraNode::updateWorldTransform(){
 }
 
 void CameraNode::render(RenderDevice *device,Node *node){
+	if(mProjectionType==ProjectionType_FOV){
+		RenderTarget *target=mRenderTarget!=NULL?mRenderTarget:device->getPrimaryRenderTarget();
+		int width=target->getWidth(),height=target->getHeight();
+		mViewport.set(0,0,width,height);
+		if(width>=height){
+			Math::setMatrix4x4FromPerspectiveY(mProjectionMatrix,mFov,Math::div(Math::fromInt(width),Math::fromInt(height)),mNearDist,mFarDist);
+		}
+		else{
+			Math::setMatrix4x4FromPerspectiveX(mProjectionMatrix,mFov,Math::div(Math::fromInt(height),Math::fromInt(width)),mNearDist,mFarDist);
+		}
+		projectionUpdated();
+	}
+
 	updateFramesPerSecond();
 
 	mVisibleCount=0;

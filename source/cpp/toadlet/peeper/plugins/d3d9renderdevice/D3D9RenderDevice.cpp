@@ -484,7 +484,11 @@ bool D3D9RenderDevice::copySurface(IDirect3DSurface9 *dst,IDirect3DSurface9 *src
 		HRESULT result2=dst->LockRect(&dstRect,NULL,0);
 
 		if(result==S_OK && result2==S_OK){
-			memcpy(dstRect.pBits,srcRect.pBits,srcRect.Pitch*srcdesc.Height);
+			int i;
+			int pitch=dstRect.Pitch<srcRect.Pitch?dstRect.Pitch:srcRect.Pitch;
+			for(i=0;i<rect.bottom;++i){
+				memcpy((tbyte*)dstRect.pBits+dstRect.Pitch*i,(tbyte*)srcRect.pBits+srcRect.Pitch*i,pitch);
+			}
 		}
 
 		dst->UnlockRect();
