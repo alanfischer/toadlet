@@ -31,7 +31,7 @@ public:
 
 	void create();
 	void destroy();
-	void resized(int width,int height);
+	void resized(int width,int height){}
 	void render();
 	void update(int dt);
 	void preLogicUpdate(int dt){}

@@ -62,7 +62,7 @@ void RandIsle::create(){
 	mScene->getRoot()->attach(mFollowNode);
 
 	mCamera=mEngine->createNodeType(CameraNode::type(),mScene);
-	mCamera->setProjectionFovX(Math::degToRad(Math::fromInt(60)),Math::ONE,mCamera->getNearDist(),1024);
+	mCamera->setAutoProjectionFov(Math::degToRad(Math::fromInt(60)),mCamera->getNearDist(),1024);
 	mCamera->setScope(~Scope_HUD | Scope_BIT_MAIN_CAMERA);
 	mCamera->setDefaultState(mEngine->getMaterialManager()->createRenderState());
 	mCamera->setClearColor(Resources::instance->fadeColor);
@@ -72,7 +72,7 @@ void RandIsle::create(){
 	if(Resources::instance->reflectTarget!=NULL){
 		mReflectCamera=mEngine->createNodeType(CameraNode::type(),mScene);
 		mReflectCamera->setRenderTarget(Resources::instance->reflectTarget);
-		mReflectCamera->setProjectionFovX(Math::degToRad(Math::fromInt(60)),Math::ONE,mCamera->getNearDist(),mCamera->getFarDist());
+		mReflectCamera->setAutoProjectionFov(Math::degToRad(Math::fromInt(60)),mCamera->getNearDist(),mCamera->getFarDist());
 		mReflectCamera->setScope(~Scope_HUD & ~Scope_BIT_MAIN_CAMERA & ~Scope_BIT_WATER);
 		mReflectCamera->setDefaultState(mEngine->getMaterialManager()->createRenderState());
 		mReflectCamera->setClearColor(Resources::instance->fadeColor);
@@ -83,7 +83,7 @@ void RandIsle::create(){
 	if(Resources::instance->refractTarget!=NULL){
 		mRefractCamera=mEngine->createNodeType(CameraNode::type(),mScene);
 		mRefractCamera->setRenderTarget(Resources::instance->refractTarget);
-		mRefractCamera->setProjectionFovX(Math::degToRad(Math::fromInt(60)),Math::ONE,mCamera->getNearDist(),mCamera->getFarDist());
+		mRefractCamera->setAutoProjectionFov(Math::degToRad(Math::fromInt(60)),mCamera->getNearDist(),mCamera->getFarDist());
 		mRefractCamera->setScope(~Scope_HUD & ~Scope_BIT_MAIN_CAMERA & ~Scope_BIT_WATER);
 		mRefractCamera->setDefaultState(mEngine->getMaterialManager()->createRenderState());
 		mRefractCamera->setClearColor(Resources::instance->fadeColor);
@@ -195,31 +195,6 @@ void RandIsle::destroy(){
 	Resources::destroy();
 
 	Logger::debug("RandIsle::destroy finished");
-}
-
-void RandIsle::resized(int width,int height){
-	if(mCamera!=NULL && width>0 && height>0){
-		if(width>=height){
-			scalar ratio=Math::div(Math::fromInt(width),Math::fromInt(height));
-			mCamera->setProjectionFovY(Math::degToRad(Math::fromInt(75)),ratio,mCamera->getNearDist(),mCamera->getFarDist());
-		}
-		else{
-			scalar ratio=Math::div(Math::fromInt(height),Math::fromInt(width));
-			mCamera->setProjectionFovX(Math::degToRad(Math::fromInt(75)),ratio,mCamera->getNearDist(),mCamera->getFarDist());
-		}
-		mCamera->setViewport(0,0,width,height);
-	}
-	if(mHUD!=NULL && width>0 && height>0){
-		if(width>=height){
-			scalar ratio=Math::div(Math::fromInt(width),Math::fromInt(height));
-			mHUD->setProjectionOrtho(-ratio,ratio,-Math::ONE,Math::ONE,-Math::ONE,Math::ONE);
-		}
-		else{
-			scalar ratio=Math::div(Math::fromInt(height),Math::fromInt(width));
-			mHUD->setProjectionOrtho(-Math::ONE,Math::ONE,-ratio,ratio,-Math::ONE,Math::ONE);
-		}
-		mHUD->setViewport(0,0,width,height);
-	}
 }
 
 void RandIsle::render(){
