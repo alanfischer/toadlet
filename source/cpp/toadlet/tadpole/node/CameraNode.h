@@ -42,7 +42,8 @@ public:
 	TOADLET_NODE(CameraNode,Node);
 
 	enum ProjectionType{
-		ProjectionType_FOVX=0,
+		ProjectionType_FOV=0,
+		ProjectionType_FOVX,
 		ProjectionType_FOVY,
 		ProjectionType_ORTHO,
 		ProjectionType_FRUSTUM,
@@ -56,6 +57,9 @@ public:
 
 	inline ProjectionType getProjectionType() const{return mProjectionType;}
 
+	// Automatically adjust fov for the RenderTarget size
+	virtual void setAutoProjectionFov(scalar fov,scalar nearDist,scalar farDist);
+
 	virtual void setProjectionFovX(scalar fovx,scalar aspect,scalar nearDist,scalar farDist);
 	virtual void setProjectionFovY(scalar fovy,scalar aspect,scalar nearDist,scalar farDist);
 	virtual void setProjectionOrtho(scalar leftDist,scalar rightDist,scalar bottomDist,scalar topDist,scalar nearDist,scalar farDist);
@@ -68,7 +72,7 @@ public:
 	inline scalar getTopDist() const{return mTopDist;}
 	inline scalar getNearDist() const{return mNearDist;}
 	inline scalar getFarDist() const{return mFarDist;}
-
+	
 	virtual void setProjectionMatrix(const Matrix4x4 &matrix);
 	inline const Matrix4x4 &getProjectionMatrix() const{return mFinalProjectionMatrix;}
 
@@ -89,7 +93,6 @@ public:
 
 	virtual void setViewport(const Viewport &viewport);
 	virtual void setViewport(int x,int y,int width,int height);
-	inline bool getViewportSet() const{return mViewportSet;}
 	inline const Viewport &getViewport() const{return mViewport;}
 	inline int getViewportX() const{return mViewport.x;}
 	inline int getViewportY() const{return mViewport.y;}
@@ -155,7 +158,6 @@ protected:
 	scalar mNearDist,mFarDist;
 
 	RenderTarget::ptr mRenderTarget;
-	bool mViewportSet;
 	Viewport mViewport;
 	int mClearFlags;
 	Vector4 mClearColor;

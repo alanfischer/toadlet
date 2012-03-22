@@ -13,7 +13,7 @@ public:
 	void render();
 	void update(int dt);
 
-	void resized(int width,int height);
+	void resized(int width,int height){}
 	void focusGained(){}
 	void focusLost(){}
 

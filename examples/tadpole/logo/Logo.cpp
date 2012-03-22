@@ -1,75 +1,5 @@
 #include "Logo.h"
 
-class GravityFollower:public BaseComponent,InputDeviceListener{
-public:
-	GravityFollower(InputDevice *device):BaseComponent(){
-		mDevice=device;
-		mDevice->setListener(this);
-	}
-
-	void destroy(){
-		mDevice->setListener(NULL);
-	}
-
-	bool parentChanged(Node *node){
-		mNode=node;
-		return true;
-	}
-
-	bool getActive() const{return true;}
-
-	void logicUpdate(int dt,int scope){
-		mLastTranslate.set(mTranslate);
-		mLastRotate.set(mRotate);
-
-		mMotionMutex.lock();
-			if(mMotionData.values.size()>0){
-				const Vector4 &accel=mMotionData.values[InputData::Semantic_MOTION_ACCELERATION];
-				Vector3 up;
-				// When the phone is vertical, we're at 0,1,0
-				// When the phone is horizontal, we're at 0,0,1
-				// Store the z component to use for calculating our eye height
-				up.set(-accel.x,-accel.y,-accel.z);
-				scalar z=up.z;
-				up.z=0;
-				if(Math::normalizeCarefully(up,0)){
-					Vector3 eye(0,z-Math::ONE,z);
-					Math::normalize(eye);
-					Math::mul(eye,Math::fromInt(150));
-
-					((CameraNode*)mNode)->setLookAt(eye,Math::ZERO_VECTOR3,up);
-					mTranslate.set(mNode->getTranslate());
-					mRotate.set(mNode->getRotate());
-				}
-			}
-		mMotionMutex.unlock();
-	}
-	
-	void frameUpdate(int dt,int scope){
-		Vector3 translate;
-		Math::lerp(translate,mLastTranslate,mTranslate,mNode->getScene()->getLogicFraction());
-		mNode->setTranslate(translate);
-		Quaternion rotate;
-		Math::slerp(rotate,mLastRotate,mRotate,mNode->getScene()->getLogicFraction());
-		mNode->setRotate(rotate);
-	}
-
-	void inputDetected(const InputData &data){
-		if(data.type==InputDevice::InputType_MOTION){
-			mMotionMutex.lock();
-			mMotionData.set(data);
-			mMotionMutex.unlock();
-		}
-	}
-
-	Node *mNode;
-	InputDevice *mDevice;
-	Mutex mMotionMutex;
-	InputData mMotionData;
-	Vector3 mTranslate,mLastTranslate;
-	Quaternion mRotate,mLastRotate;
-};
-
 Logo::Logo(Application *app){
 	this->app=app;
 }
@@ -101,7 +31,7 @@ void Logo::create(){
 		lt->attach(mesh);
 
 		Controller::ptr controller=new Controller();
-		controller->attach(new SkeletonAnimation(mesh->getSkeleton(),0));
+		controller->attach(new MeshAnimation(mesh,0));
 		controller->setCycling(Controller::Cycling_REFLECT);
 		controller->start();
 		lt->attach(controller);
@@ -112,31 +42,10 @@ void Logo::create(){
 	camera->setLookAt(Vector3(0,-Math::fromInt(150),0),Math::ZERO_VECTOR3,Math::Z_UNIT_VECTOR3);
 	camera->setClearColor(Colors::BLUE);
 	scene->getRoot()->attach(camera);
-
-// Only looks good if running on device, in simulator its always a top down view
-#if 1
-	InputDevice *motionDevice=app->getInputDevice(InputDevice::InputType_MOTION);
-	if(motionDevice!=NULL){
-		camera->attach(new GravityFollower(motionDevice));
-		motionDevice->start();
-	}
-#endif
 }
 
 void Logo::destroy(){
 	scene->destroy();
-}
-
-void Logo::resized(int width,int height){
-	if(camera!=NULL && width>0 && height>0){
-		if(width>=height){
-			camera->setProjectionFovY(Math::degToRad(Math::fromInt(45)),Math::div(Math::fromInt(width),Math::fromInt(height)),Math::fromInt(1),Math::fromInt(200));
-		}
-		else{
-			camera->setProjectionFovX(Math::degToRad(Math::fromInt(45)),Math::div(Math::fromInt(height),Math::fromInt(width)),Math::fromInt(1),Math::fromInt(200));
-		}
-		camera->setViewport(Viewport(0,0,width,height));
-	}
 }
 
 void Logo::render(){

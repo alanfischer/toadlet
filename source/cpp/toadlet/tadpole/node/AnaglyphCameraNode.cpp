@@ -125,14 +125,7 @@ void AnaglyphCameraNode::render(RenderDevice *device,Node *node){
 	setTranslate(translate);
 	updateWorldTransform();
 
-	if(getViewportSet()){
-		device->setViewport(getViewport());
-	}
-	else{
-		RenderTarget *renderTarget=device->getRenderTarget();
-		Viewport viewport;
-		device->setViewport(viewport.set(0,0,renderTarget->getWidth(),renderTarget->getHeight()));
-	}
+	device->setViewport(getViewport());
 
 	device->setMatrix(RenderDevice::MatrixType_PROJECTION,mOverlayMatrix);
 	device->setMatrix(RenderDevice::MatrixType_VIEW,Math::IDENTITY_MATRIX4X4);
