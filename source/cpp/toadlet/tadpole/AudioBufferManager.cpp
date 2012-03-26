@@ -24,7 +24,7 @@
  ********** Copyright header - do not remove **********/
 
 #include <toadlet/tadpole/AudioBufferManager.h>
-#include <toadlet/tadpole/handler/AudioBufferHandler.h>
+#include <toadlet/tadpole/AudioBufferStreamer.h>
 #include <toadlet/tadpole/Engine.h>
 
 namespace toadlet{
@@ -77,7 +77,7 @@ AudioStream::ptr AudioBufferManager::findAudioStream(const String &name){
 	if(streamer!=NULL){
 		Stream::ptr stream=mEngine->openStream(filename);
 		if(stream!=NULL){
-			return shared_static_cast<AudioBufferHandler>(streamer)->createAudioStream(stream);
+			return shared_static_cast<AudioBufferStreamer>(streamer)->createAudioStream(stream);
 		}
 		else{
 			Error::unknown(Categories::TOADLET_TADPOLE,
@@ -87,7 +87,7 @@ AudioStream::ptr AudioBufferManager::findAudioStream(const String &name){
 	}
 	else{
 		Error::unknown(Categories::TOADLET_TADPOLE,
-			"handler for \""+name+"\" not found");
+			"streamer for \""+name+"\" not found");
 		return NULL;
 	}
 }

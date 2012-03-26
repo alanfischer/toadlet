@@ -27,8 +27,8 @@
 #include <toadlet/egg/Error.h>
 #include <toadlet/egg/Logger.h>
 #include <toadlet/egg/System.h>
-#include <toadlet/tadpole/handler/platform/android/AndroidAssetArchive.h>
-#include <toadlet/tadpole/handler/platform/android/AndroidTextureHandler.h>
+#include <toadlet/tadpole/platform/android/AndroidAssetArchive.h>
+#include <toadlet/tadpole/platform/android/AndroidTextureStreamer.h>
 #include <android/sensor.h>
 
 using namespace toadlet::egg;
@@ -101,8 +101,8 @@ bool AndroidApplication::create(String renderDevice,String audioDevice){
 	AndroidAssetArchive::ptr assetArchive=new AndroidAssetArchive(env,assetManagerObj);
 	mEngine->getArchiveManager()->manageArchive(shared_static_cast<Archive>(assetArchive));
 
-	AndroidTextureHandler::ptr textureHandler=new AndroidTextureHandler(mEngine->getTextureManager(),env);
-	mEngine->getTextureManager()->setDefaultStreamer(textureHandler);
+	AndroidTextureStreamer::ptr textureStreamer=new AndroidTextureStreamer(mEngine->getTextureManager(),env);
+	mEngine->getTextureManager()->setDefaultStreamer(textureStreamer);
 	
 	InputDevice::ptr motionDevice=new_AndroidSensorDevice(ASENSOR_TYPE_ACCELEROMETER);
 	if(motionDevice->create()){

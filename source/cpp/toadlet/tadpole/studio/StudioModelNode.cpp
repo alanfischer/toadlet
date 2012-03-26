@@ -29,7 +29,7 @@
 #include <toadlet/tadpole/Scene.h>
 #include <toadlet/tadpole/studio/StudioModelNode.h>
 #include <toadlet/tadpole/studio/StudioModelController.h>
-#include <toadlet/tadpole/studio/StudioHandler.h>
+#include <toadlet/tadpole/studio/StudioStreamer.h>
 
 namespace toadlet{
 namespace tadpole{
@@ -183,8 +183,8 @@ void StudioModelNode::setModel(const String &name){
 		return;
 	}
 
-	StudioHandler::ptr handler(new StudioHandler(mEngine));
-	StudioModel::ptr model=shared_static_cast<StudioModel>(handler->load(stream,NULL,NULL));
+	StudioStreamer::ptr streamer=new StudioStreamer(mEngine);
+	StudioModel::ptr model=shared_static_cast<StudioModel>(streamer->load(stream,NULL,NULL));
 	model->setName(name);
 	setModel(model);
 }

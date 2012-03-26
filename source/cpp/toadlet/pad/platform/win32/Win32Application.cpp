@@ -58,7 +58,6 @@
 using namespace toadlet::peeper;
 using namespace toadlet::ribbit;
 using namespace toadlet::flick;
-using namespace toadlet::tadpole::handler;
 
 #if defined(TOADLET_HAS_OPENGL)
 	#pragma comment(lib,"toadlet_peeper_glrenderdevice" TOADLET_LIBRARY_EXTENSION)

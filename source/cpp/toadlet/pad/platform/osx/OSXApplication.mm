@@ -31,7 +31,7 @@
  
 #include <toadlet/egg/System.h>
 #include <toadlet/egg/Error.h>
-#include <toadlet/tadpole/handler/platform/osx/OSXBundleArchive.h>
+#include <toadlet/tadpole/platform/osx/OSXBundleArchive.h>
 #include <toadlet/pad/platform/osx/OSXApplication.h>
 
 #import <QuartzCore/QuartzCore.h>
@@ -45,7 +45,6 @@ using namespace toadlet::peeper;
 using namespace toadlet::ribbit;
 using namespace toadlet::flick;
 using namespace toadlet::tadpole;
-using namespace toadlet::tadpole::handler;
 using namespace toadlet::pad;
 
 #if defined(TOADLET_HAS_OPENGL)

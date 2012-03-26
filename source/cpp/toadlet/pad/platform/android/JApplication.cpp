@@ -26,7 +26,7 @@
 #include "JApplication.h"
 #include <toadlet/egg/Error.h>
 #include <toadlet/egg/Logger.h>
-#include <toadlet/tadpole/handler/platform/android/JStream.h>
+#include <toadlet/tadpole/platform/android/JStream.h>
 
 using namespace toadlet::egg;
 using namespace toadlet::peeper;
