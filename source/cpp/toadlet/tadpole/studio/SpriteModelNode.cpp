@@ -28,7 +28,7 @@
 #include <toadlet/tadpole/RenderableSet.h>
 #include <toadlet/tadpole/Scene.h>
 #include <toadlet/tadpole/studio/SpriteModelNode.h>
-#include <toadlet/tadpole/studio/SpriteHandler.h>
+#include <toadlet/tadpole/studio/SpriteStreamer.h>
 
 namespace toadlet{
 namespace tadpole{
@@ -108,8 +108,8 @@ void SpriteModelNode::setModel(const String &name){
 		return;
 	}
 
-	SpriteHandler::ptr handler(new SpriteHandler(mEngine));
-	SpriteModel::ptr model=shared_static_cast<SpriteModel>(handler->load(stream,NULL,NULL));
+	SpriteStreamer::ptr streamer=new SpriteStreamer(mEngine);
+	SpriteModel::ptr model=shared_static_cast<SpriteModel>(streamer->load(stream,NULL,NULL));
 	model->setName(name);
 	setModel(model);
 }

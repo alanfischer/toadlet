@@ -1,6 +1,6 @@
 #include <toadlet/tadpole/Engine.h>
-#include <toadlet/tadpole/handler/platform/android/AndroidAssetArchive.h>
-#include <toadlet/tadpole/handler/platform/android/AndroidTextureHandler.h>
+#include <toadlet/tadpole/platform/android/AndroidAssetArchive.h>
+#include <toadlet/tadpole/platform/android/AndroidTextureStreamer.h>
 
 using namespace toadlet::tadpole;
 
@@ -132,8 +132,8 @@ JNIEXPORT void JNICALL Java_us_toadlet_tadpole_Engine_makeEngine(JNIEnv *env,job
 	AndroidAssetArchive::ptr assetArchive=new AndroidAssetArchive(env,assetManagerObj);
 	engine->getArchiveManager()->manageArchive(assetArchive);
 
-	AndroidTextureHandler::ptr textureHandler=new AndroidTextureHandler(engine->getTextureManager(),env);
-	engine->getTextureManager()->setDefaultStreamer(textureHandler);
+	AndroidTextureStreamer::ptr textureStreamer=new AndroidTextureStreamer(engine->getTextureManager(),env);
+	engine->getTextureManager()->setDefaultStreamer(textureStreamer);
 }
 
 }

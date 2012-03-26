@@ -92,62 +92,62 @@
 #include <toadlet/tadpole/creator/DiffuseMaterialCreator.h>
 #include <toadlet/tadpole/creator/SkyBoxMaterialCreator.h>
 
-#include <toadlet/tadpole/handler/BMPHandler.h>
-#include <toadlet/tadpole/handler/DDSHandler.h>
-#include <toadlet/tadpole/handler/TGAHandler.h>
-#include <toadlet/tadpole/handler/TMSHHandler.h>
-#include <toadlet/tadpole/handler/TPKGHandler.h>
-#include <toadlet/tadpole/handler/WADHandler.h>
-#include <toadlet/tadpole/handler/WaveHandler.h>
+#include <toadlet/tadpole/plugins/BMPStreamer.h>
+#include <toadlet/tadpole/plugins/DDSStreamer.h>
+#include <toadlet/tadpole/plugins/TGAStreamer.h>
+#include <toadlet/tadpole/plugins/TMSHStreamer.h>
+#include <toadlet/tadpole/plugins/TPKGStreamer.h>
+#include <toadlet/tadpole/plugins/WADStreamer.h>
+#include <toadlet/tadpole/plugins/WaveStreamer.h>
 
 #if defined(TOADLET_HAS_GDIPLUS)
-	#include <toadlet/tadpole/handler/platform/win32/Win32TextureHandler.h>
+	#include <toadlet/tadpole/platform/win32/Win32TextureStreamer.h>
 #endif
 #if defined(TOADLET_PLATFORM_OSX)
-	#include <toadlet/tadpole/handler/platform/osx/OSXTextureHandler.h>
+	#include <toadlet/tadpole/platform/osx/OSXTextureStreamer.h>
 #endif
 #if defined(TOADLET_HAS_GIF)
-	#include <toadlet/tadpole/handler/GIFHandler.h>
+	#include <toadlet/tadpole/plugins/GIFStreamer.h>
 #endif
 #if defined(TOADLET_HAS_JPEG)
-	#include <toadlet/tadpole/handler/JPEGHandler.h>
+	#include <toadlet/tadpole/plugins/JPEGStreamer.h>
 #endif
 #if defined(TOADLET_HAS_PNG)
-	#include <toadlet/tadpole/handler/PNGHandler.h>
+	#include <toadlet/tadpole/plugins/PNGStreamer.h>
 #endif
 #if defined(TOADLET_HAS_FFMPEG)
-	#include <toadlet/tadpole/handler/FFmpegVideoHandler.h>
+	#include <toadlet/tadpole/plugins/FFmpegVideoHandler.h>
 #endif
 
 #if defined(TOADLET_HAS_GDIPLUS)
-	#include <toadlet/tadpole/handler/platform/win32/Win32FontHandler.h>
+	#include <toadlet/tadpole/platform/win32/Win32FontStreamer.h>
 #endif
 #if defined(TOADLET_PLATFORM_OSX)
-	#include <toadlet/tadpole/handler/platform/osx/OSXFontHandler.h>
+	#include <toadlet/tadpole/platform/osx/OSXFontStreamer.h>
 #endif
 #if defined(TOADLET_HAS_FREETYPE)
-	#include <toadlet/tadpole/handler/FreeTypeHandler.h>
+	#include <toadlet/tadpole/plugins/FreeTypeStreamer.h>
 #endif
 
 #if defined(TOADLET_HAS_ZZIP)
-	#include <toadlet/tadpole/handler/ZIPHandler.h>
+	#include <toadlet/tadpole/plugins/ZIPStreamer.h>
 #endif
 
 #if defined(TOADLET_HAS_MXML)
-	#include <toadlet/tadpole/handler/XANMHandler.h>
-	#include <toadlet/tadpole/handler/XMATHandler.h>
-	#include <toadlet/tadpole/handler/XMSHHandler.h>
+	#include <toadlet/tadpole/plugins/XANMStreamer.h>
+	#include <toadlet/tadpole/plugins/XMATStreamer.h>
+	#include <toadlet/tadpole/plugins/XMSHStreamer.h>
 #endif
 
 #if defined(TOADLET_HAS_OGGVORBIS)
-	#include <toadlet/tadpole/handler/OggVorbisHandler.h>
+	#include <toadlet/tadpole/plugins/OggVorbisStreamer.h>
 #endif
 #if defined(TOADLET_HAS_SIDPLAY)
-	#include <toadlet/tadpole/handler/SIDHandler.h>
+	#include <toadlet/tadpole/plugins/SIDStreamer.h>
 #endif
 
 #if !defined(TOADLET_FIXED_POINT)
-	#include <toadlet/tadpole/handler/SPRHandler.h>
+	#include <toadlet/tadpole/plugins/SPRStreamer.h>
 	#include <toadlet/tadpole/bsp/BSP30Node.h>
 	#include <toadlet/tadpole/studio/StudioModelNode.h>
 	#include <toadlet/tadpole/studio/SpriteModelNode.h>
@@ -268,83 +268,83 @@ void Engine::installHandlers(){
 	Logger::debug(Categories::TOADLET_TADPOLE,
 		"Engine: installing handlers");
 
-	// Archive handlers
-	mArchiveManager->setStreamer(TPKGHandler::ptr(new TPKGHandler()),"tpkg");
-	mArchiveManager->setStreamer(WADHandler::ptr(new WADHandler(mTextureManager)),"wad");
+	// Archive streamers
+	mArchiveManager->setStreamer(new TPKGStreamer(),"tpkg");
+	mArchiveManager->setStreamer(new WADStreamer(mTextureManager),"wad");
 	#if defined(TOADLET_HAS_ZZIP)
-		mArchiveManager->setStreamer(ZIPHandler::ptr(new ZIPHandler()),"zip");
+		mArchiveManager->setStreamer(new ZIPStreamer(),"zip");
 	#endif
 
-	// Texture handlers
-	mTextureManager->setStreamer(DDSHandler::ptr(new DDSHandler(mTextureManager)),"dds");
+	// Texture streamers
+	mTextureManager->setStreamer(new DDSStreamer(mTextureManager),"dds");
 	#if defined(TOADLET_HAS_GDIPLUS)
-		mTextureManager->setDefaultStreamer(Win32TextureHandler::ptr(new Win32TextureHandler(mTextureManager)));
+		mTextureManager->setDefaultStreamer(new Win32TextureStreamer(mTextureManager));
 	#elif defined(TOADLET_PLATFORM_OSX)
-		mTextureManager->setStreamer(BMPHandler::ptr(new BMPHandler(mTextureManager)),"bmp"); // OSXTextureHandler only handles jpgs & pngs currently, so add our own bmp handler
-		mTextureManager->setDefaultStreamer(OSXTextureHandler::ptr(new OSXTextureHandler(mTextureManager)));
+		mTextureManager->setStreamer(new BMPStreamer(mTextureManager),"bmp"); // OSXTextureStreamer only handles jpgs & pngs currently, so add our own bmp streamer
+		mTextureManager->setDefaultStreamer(new OSXTextureStreamer(mTextureManager));
 	#else
-		mTextureManager->setStreamer(BMPHandler::ptr(new BMPHandler(mTextureManager)),"bmp");
+		mTextureManager->setStreamer(new BMPStreamer(mTextureManager),"bmp");
 		#if defined(TOADLET_HAS_GIF)
-			mTextureManager->setStreamer(GIFHandler::ptr(new GIFHandler(mTextureManager)),"gif");
+			mTextureManager->setStreamer(new GIFStreamer(mTextureManager),"gif");
 		#endif
 		#if defined(TOADLET_HAS_JPEG)
-			JPEGHandler::ptr jpegHandler(new JPEGHandler(mTextureManager));
-			mTextureManager->setStreamer(jpegHandler,"jpeg");
-			mTextureManager->setStreamer(jpegHandler,"jpg");
+			JPEGStreamer::ptr jpegStreamer(new JPEGStreamer(mTextureManager));
+			mTextureManager->setStreamer(jpegStreamer,"jpeg");
+			mTextureManager->setStreamer(jpegStreamer,"jpg");
 		#endif
 		#if defined(TOADLET_HAS_PNG)
-			mTextureManager->setStreamer(PNGHandler::ptr(new PNGHandler(mTextureManager)),"png");
+			mTextureManager->setStreamer(new PNGStreamer(mTextureManager),"png");
 		#endif
 	#endif
-	mTextureManager->setStreamer(TGAHandler::ptr(new TGAHandler(mTextureManager)),"tga");
+	mTextureManager->setStreamer(new TGAStreamer(mTextureManager),"tga");
 	#if defined(TOADLET_HAS_FFMPEG)
 		mTextureManager->setVideoHandler(FFmpegVideoHandler::ptr(new FFmpegVideoHandler(this)));
 	#endif
 
-	// Font handlers, try for freetype first, since it currently looks best.  This can be changed back once the others look as nice
+	// Font streamers, try for freetype first, since it currently looks best.  This can be changed back once the others look as nice
 	#if defined(TOADLET_HAS_FREETYPE)
-		mFontManager->setDefaultStreamer(FreeTypeHandler::ptr(new FreeTypeHandler(mTextureManager)));
+		mFontManager->setDefaultStreamer(new FreeTypeStreamer(mTextureManager));
 	#elif defined(TOADLET_HAS_GDIPLUS)
-		mFontManager->setDefaultStreamer(Win32FontHandler::ptr(new Win32FontHandler(mTextureManager)));
+		mFontManager->setDefaultStreamer(new Win32FontStreamer(mTextureManager));
 	#elif defined(TOADLET_PLATFORM_OSX)
-		mFontManager->setDefaultStreamer(OSXFontHandler::ptr(new OSXFontHandler(mTextureManager)));
+		mFontManager->setDefaultStreamer(new OSXFontStreamer(mTextureManager));
 	#endif
 
-	// Material handlers
+	// Material streamers
 	#if defined(TOADLET_HAS_MXML)
-		mMaterialManager->setStreamer(XMATHandler::ptr(new XMATHandler(this)),"xmat");
+		mMaterialManager->setStreamer(new XMATStreamer(this),"xmat");
 	#endif
 
-	// Mesh handlers
+	// Mesh streamers
 	#if defined(TOADLET_HAS_MXML)
-		mMeshManager->setStreamer(XMSHHandler::ptr(new XMSHHandler(this)),"xmsh");
+		mMeshManager->setStreamer(new XMSHStreamer(this),"xmsh");
 	#endif
-	mMeshManager->setStreamer(TMSHHandler::ptr(new TMSHHandler(this)),"tmsh");
+	mMeshManager->setStreamer(new TMSHStreamer(this),"tmsh");
 
-	// AudioBuffer handlers
-	mAudioBufferManager->setStreamer(WaveHandler::ptr(new WaveHandler(mAudioBufferManager)),"wav");
+	// AudioBuffer streamers
+	mAudioBufferManager->setStreamer(new WaveStreamer(mAudioBufferManager),"wav");
 	#if defined(TOADLET_HAS_OGGVORBIS)
-		mAudioBufferManager->setStreamer(OggVorbisHandler::ptr(new OggVorbisHandler(mAudioBufferManager)),"ogg");
+		mAudioBufferManager->setStreamer(new OggVorbisStreamer(mAudioBufferManager),"ogg");
 	#endif
 	#if defined(TOADLET_HAS_SIDPLAY)
-		mAudioBufferManager->setStreamer(SIDHandler::ptr(new SIDHandler(mAudioBufferManager)),"sid");
+		mAudioBufferManager->setStreamer(new SIDStreamer(mAudioBufferManager),"sid");
 	#endif
 
 	// Plugin types, should be removed from here somehow
 	#if !defined(TOADLET_FIXED_POINT)
-		mTextureManager->setStreamer(SPRHandler::ptr(new SPRHandler(this)),"spr");
+		mTextureManager->setStreamer(new SPRStreamer(this),"spr");
 	#endif
 
-	mTextureManager->setNormalizationCreator(ResourceCreator::ptr(new NormalizationTextureCreator(this)));
+	mTextureManager->setNormalizationCreator(new NormalizationTextureCreator(this));
 
-	mMeshManager->setAABoxCreator(ResourceCreator::ptr(new AABoxMeshCreator(this)));
-	mMeshManager->setSkyBoxCreator(ResourceCreator::ptr(new SkyBoxMeshCreator(this)));
-	mMeshManager->setSkyDomeCreator(ResourceCreator::ptr(new SkyDomeMeshCreator(this)));
-	mMeshManager->setSphereCreator(ResourceCreator::ptr(new SphereMeshCreator(this)));
-	mMeshManager->setGridCreator(ResourceCreator::ptr(new GridMeshCreator(this)));
+	mMeshManager->setAABoxCreator(new AABoxMeshCreator(this));
+	mMeshManager->setSkyBoxCreator(new SkyBoxMeshCreator(this));
+	mMeshManager->setSkyDomeCreator(new SkyDomeMeshCreator(this));
+	mMeshManager->setSphereCreator(new SphereMeshCreator(this));
+	mMeshManager->setGridCreator(new GridMeshCreator(this));
 
-	mMaterialManager->setDiffuseCreator(ResourceCreator::ptr(new DiffuseMaterialCreator(this)));
-	mMaterialManager->setSkyBoxCreator(ResourceCreator::ptr(new SkyBoxMaterialCreator(this)));
+	mMaterialManager->setDiffuseCreator(new DiffuseMaterialCreator(this));
+	mMaterialManager->setSkyBoxCreator(new SkyBoxMaterialCreator(this));
 }
 
 bool Engine::setRenderDevice(RenderDevice *renderDevice){

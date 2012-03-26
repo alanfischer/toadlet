@@ -41,7 +41,6 @@ namespace egg{}
 namespace tadpole{
 namespace animation{}
 namespace creator{}
-namespace handler{}
 namespace material{}
 namespace node{}
 namespace sensor{}
@@ -57,7 +56,6 @@ using namespace toadlet::peeper;
 using namespace toadlet::ribbit;
 using namespace toadlet::tadpole::animation;
 using namespace toadlet::tadpole::creator;
-using namespace toadlet::tadpole::handler;
 using namespace toadlet::tadpole::material;
 using namespace toadlet::tadpole::node;
 using namespace toadlet::tadpole::sensor;

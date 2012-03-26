@@ -28,7 +28,7 @@
 #include <toadlet/tadpole/RenderableSet.h>
 #include <toadlet/tadpole/Scene.h>
 #include <toadlet/tadpole/bsp/BSP30Node.h>
-#include <toadlet/tadpole/bsp/BSP30Handler.h>
+#include <toadlet/tadpole/bsp/BSP30Streamer.h>
 
 namespace toadlet{
 namespace tadpole{
@@ -246,8 +246,8 @@ void BSP30Node::setMap(const String &name){
 		return;
 	}
 
-	BSP30Handler::ptr handler(new BSP30Handler(mEngine));
-	BSP30Map::ptr map=shared_static_cast<BSP30Map>(handler->load(stream,NULL,NULL));
+	BSP30Streamer::ptr streamer=new BSP30Streamer(mEngine);
+	BSP30Map::ptr map=shared_static_cast<BSP30Map>(streamer->load(stream,NULL,NULL));
 	map->setName(name);
 	setMap(map);
 }

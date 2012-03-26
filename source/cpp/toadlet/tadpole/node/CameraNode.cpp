@@ -423,7 +423,11 @@ void CameraNode::updateWorldTransform(){
 
 void CameraNode::render(RenderDevice *device,Node *node){
 	if(mProjectionType==ProjectionType_FOV){
-		RenderTarget *target=mRenderTarget!=NULL?mRenderTarget:device->getPrimaryRenderTarget();
+		RenderTarget *target=mRenderTarget;
+		if(target==NULL){
+			target=device->getPrimaryRenderTarget();
+		}
+		
 		int width=target->getWidth(),height=target->getHeight();
 		mViewport.set(0,0,width,height);
 		if(width>=height){
