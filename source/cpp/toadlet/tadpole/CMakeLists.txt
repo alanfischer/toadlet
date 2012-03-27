@@ -154,15 +154,18 @@ set (TADPOLE_TERRAIN_SRC
 )
 
 set (TADPOLE_PLATFORM_ANDROID_SRC
+	platform/android/AndroidAssetArchive.cpp
+	platform/android/AndroidTextureStreamer.cpp
+	platform/android/JStream.cpp
+)
+
+set (TADPOLE_PLATFORM_ANDROID_8_SRC
 	platform/android/us_toadlet_tadpole_CameraNode.cpp
 	platform/android/us_toadlet_tadpole_Engine.cpp
 	platform/android/us_toadlet_tadpole_LightNode.cpp
 	platform/android/us_toadlet_tadpole_MeshNode.cpp
 	platform/android/us_toadlet_tadpole_Node.cpp
 	platform/android/us_toadlet_tadpole_Scene.cpp
-	platform/android/AndroidAssetArchive.cpp
-	platform/android/AndroidTextureStreamer.cpp
-	platform/android/JStream.cpp
 )
 
 set (TADPOLE_PLATFORM_OSX_SRC
@@ -645,6 +648,8 @@ if (TOADLET_PLATFORM_ANDROID)
 	source_group ("Header Files\\\\platform\\\\android" FILES ${TADPOLE_PLATFORM_ANDROID_HEADERS})
 	set (TADPOLE_SRC ${TADPOLE_SRC} ${TADPOLE_PLATFORM_ANDROID_SRC})
 	if (ANDROID_NDK_API_LEVEL LESS 9)
+		source_group ("Source Files\\\\platform\\\\android" FILES ${TADPOLE_PLATFORM_ANDROID_8_SRC})
+		set (TADPOLE_SRC ${TADPOLE_SRC} ${TADPOLE_PLATFORM_ANDROID_8_SRC})
 		set (TADPOLE_LIBS ${TADPOLE_LIBS} toadlet_ribbit_jaudiodevice)
 	endif (ANDROID_NDK_API_LEVEL LESS 9)
 elseif (TOADLET_PLATFORM_OSX)
