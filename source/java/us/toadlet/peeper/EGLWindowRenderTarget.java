@@ -83,6 +83,7 @@ public class EGLWindowRenderTarget extends EGLRenderTarget{
 		int depthBits=format.depthBits;
 		int stencilBits=format.stencilBits;
 		int multisamples=format.multisamples;
+		int contextVersion=format.flags;
 
 		mConfig=chooseEGLConfig(mDisplay,redBits,greenBits,blueBits,alphaBits,depthBits,stencilBits,!pixmap,pixmap,false,multisamples);
 		TOADLET_CHECK_EGLERROR("chooseEGLConfig");
@@ -109,7 +110,18 @@ public class EGLWindowRenderTarget extends EGLRenderTarget{
 			return false;
 		}
 
-		mContext=egl.eglCreateContext(mDisplay,mConfig,EGL_NO_CONTEXT,null);
+		int[] configOptions=new int[32];
+		int i=0;
+
+		if(contextVersion>0){
+			configOptions[i++]=EGL_CONTEXT_CLIENT_VERSION;
+			configOptions[i++]=contextVersion;
+		}
+		
+		// Terminate the list with EGL_NONE
+		configOptions[i++]=EGL_NONE;
+	
+		mContext=egl.eglCreateContext(mDisplay,mConfig,EGL_NO_CONTEXT,configOptions);
 		TOADLET_CHECK_EGLERROR("eglCreateContext");
 		if(mContext==EGL_NO_CONTEXT){
 			System.out.println(

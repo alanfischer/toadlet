@@ -31,6 +31,9 @@ import javax.microedition.khronos.egl.*;
 import static javax.microedition.khronos.egl.EGL11.*;
 
 public abstract class EGLRenderTarget implements GLRenderTarget{
+	final static int EGL_BIND_TO_TEXTURE_RGB=0x3039;
+	final static int EGL_CONTEXT_CLIENT_VERSION=0x3098;
+
 	public EGL10 egl;
 	public EGL11 egl11;
 	public int egl_version=0;
@@ -114,13 +117,10 @@ public abstract class EGLRenderTarget implements GLRenderTarget{
 			i++;
 		}
 
-		// Not available on android last I checked
-		/*
 		if(egl_version>=11 && pbuffer){
 			configOptions[i++]=EGL_BIND_TO_TEXTURE_RGB;
 			configOptions[i++]=1;
 		}
-		*/
 
 		// Append number of number buffers depending on FSAA mode selected
 		switch(fsaaCount){
