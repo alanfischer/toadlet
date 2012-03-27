@@ -190,7 +190,6 @@ bool EGLWindowRenderTarget::createContext(void *display,void *window,WindowRende
 	if(contextVersion>0){
 		configOptions[i++]=EGL_CONTEXT_CLIENT_VERSION;
 		configOptions[i++]=contextVersion;
-	Logger::alert(String("Making context with options:")+contextVersion);
 	}
 	
 	// Terminate the list with EGL_NONE
