@@ -91,6 +91,10 @@ void SkyBoxMaterialCreator::createShaders(){
 	};
 
 	String skyBoxFragmentCode[]={
+		"#if defined(GL_ES)\n"
+			"precision mediump float;\n"
+		"#endif\n"
+
 		"varying vec4 color;\n"
 		"varying vec2 texCoord;\n"
 		
@@ -163,7 +167,7 @@ Material::ptr SkyBoxMaterialCreator::createSkyBoxMaterial(Texture::ptr texture,b
 
 		RenderVariableSet::ptr variables=pass->makeVariables();
 		variables->addVariable("modelViewProjectionMatrix",RenderVariable::ptr(new MVPMatrixVariable()),Material::Scope_RENDERABLE);
-		variables->addVariable("textureMatrix",RenderVariable::ptr(new TextureMatrixVariable(variables,"tex")),Material::Scope_MATERIAL);
+		variables->addVariable("textureMatrix",RenderVariable::ptr(new TextureMatrixVariable("tex")),Material::Scope_MATERIAL);
 		variables->addVariable("materialTrackColor",RenderVariable::ptr(new MaterialTrackColorVariable()),Material::Scope_MATERIAL);
 
 		variables->addTexture("tex",texture,"samp",samplerState,TextureState());

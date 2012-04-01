@@ -74,7 +74,11 @@ bool EAGLRenderTarget::createContext(CAEAGLLayer *drawable,WindowRenderTargetFor
 		nil
 	];
 
-	mContext=[[EAGLContext alloc] initWithAPI:kEAGLRenderingAPIOpenGLES1];
+	EAGLRenderingAPI api=kEAGLRenderingAPIOpenGLES1;
+	if(format->flags==2){
+		api=kEAGLRenderingAPIOpenGLES2;
+	}
+	mContext=[[EAGLContext alloc] initWithAPI:api];
 	if(mContext==nil){
 		Error::unknown(Categories::TOADLET_PEEPER,
 			"Failed to create EAGLContext");

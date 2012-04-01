@@ -39,6 +39,7 @@ TOADLET_C_API AudioDevice* new_JAudioDevice(JNIEnv *env,jobject obj);
 TOADLET_C_API InputDevice* new_JInputDevice(JNIEnv *env,jobject obj);
 
 TOADLET_C_API void Java_us_toadlet_peeper_NGLES1RenderDevice(JNIEnv *env);
+TOADLET_C_API void Java_us_toadlet_peeper_NGLES2RenderDevice(JNIEnv *env);
 TOADLET_C_API void Java_us_toadlet_ribbit_NAudioStream(JNIEnv *env);
 TOADLET_C_API void Java_us_toadlet_flick_NInputDeviceListener(JNIEnv *env);
 TOADLET_C_API void Java_us_toadlet_tadpole_Engine(JNIEnv *env);
@@ -59,6 +60,7 @@ JApplication::JApplication(JNIEnv *jenv,jobject jobj):
 	mLastAudioDeviceObj(NULL)
 {
 	Java_us_toadlet_peeper_NGLES1RenderDevice(jenv);
+	Java_us_toadlet_peeper_NGLES2RenderDevice(jenv);
 	Java_us_toadlet_ribbit_NAudioStream(jenv);
 	Java_us_toadlet_flick_NInputDeviceListener(jenv);
 	Java_us_toadlet_tadpole_Engine(jenv);
@@ -93,7 +95,7 @@ JApplication::JApplication(JNIEnv *jenv,jobject jobj):
 	}
 	env->DeleteLocalRef(engineClass);
 	
-	jclass renderDeviceClass=env->FindClass("us/toadlet/peeper/NGLES1RenderDevice");
+	jclass renderDeviceClass=env->FindClass("us/toadlet/peeper/NRenderDevice");
 	{
 		NGLRenderDevice_nativeHandle=env->GetFieldID(renderDeviceClass,"mNativeHandle","I");
 	}

@@ -168,6 +168,10 @@ public:
 				};
 
 				String fragmentCodes[]={
+					"#if defined(GL_ES)\n"
+						"precision mediump float;\n"
+					"#endif\n"
+					
 					"varying float fog;\n"
 					"varying vec4 reflectPosition;\n"
 					"varying vec4 refractPosition;\n"
@@ -294,8 +298,8 @@ public:
 				variables->addTexture("reflectTex",reflectTexture,"reflectSamp",SamplerState(SamplerState::FilterType_LINEAR,SamplerState::FilterType_LINEAR,SamplerState::FilterType_LINEAR,SamplerState::AddressType_CLAMP_TO_EDGE,SamplerState::AddressType_CLAMP_TO_EDGE),TextureState());
 				variables->addTexture("refractTex",refractTexture,"refractSamp",SamplerState(SamplerState::FilterType_LINEAR,SamplerState::FilterType_LINEAR,SamplerState::FilterType_LINEAR,SamplerState::AddressType_CLAMP_TO_EDGE,SamplerState::AddressType_CLAMP_TO_EDGE),TextureState());
 				variables->addTexture("bumpTex",bumpTexture,"bumpSamp",SamplerState(),TextureState());
-				variables->addVariable("reflectMatrix",RenderVariable::ptr(new TextureMatrixVariable(variables,"reflectTex")),Material::Scope_MATERIAL);
-				variables->addVariable("refractMatrix",RenderVariable::ptr(new TextureMatrixVariable(variables,"refractTex")),Material::Scope_MATERIAL);
+				variables->addVariable("reflectMatrix",RenderVariable::ptr(new TextureMatrixVariable("reflectTex")),Material::Scope_MATERIAL);
+				variables->addVariable("refractMatrix",RenderVariable::ptr(new TextureMatrixVariable("refractTex")),Material::Scope_MATERIAL);
 			}
 
 			if(engine->hasFixed(Shader::ShaderType_VERTEX) && engine->hasFixed(Shader::ShaderType_FRAGMENT)){

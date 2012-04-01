@@ -66,6 +66,13 @@ bool RenderPath::isDepthSorted() const{
 	return false;
 }
 
+void RenderPath::compile(){
+	int i;
+	for(i=0;i<mPasses.size();++i){
+		mPasses[i]->compile();
+	}
+}
+
 }
 }
 }

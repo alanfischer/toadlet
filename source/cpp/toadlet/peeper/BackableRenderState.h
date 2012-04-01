@@ -84,7 +84,9 @@ public:
 	virtual int getNumSamplerStates(Shader::ShaderType type) const{return mSamplerStates[type].size();}
 	virtual void setSamplerState(Shader::ShaderType type,int i,const SamplerState &state){
 		if(mSamplerStates[type].size()<=i){
-			mSamplerStates[type].resize(i+1);
+			mSamplerStates[type].resize(i+1,NULL);
+		}
+		if(mSamplerStates[type][i]==NULL){
 			mSamplerStates[type][i]=new SamplerState(state);
 		}
 		else{
@@ -97,7 +99,9 @@ public:
 	virtual int getNumTextureStates(Shader::ShaderType type) const{return mTextureStates[type].size();}
 	virtual void setTextureState(Shader::ShaderType type,int i,const TextureState &state){
 		if(mTextureStates[type].size()<=i){
-			mTextureStates[type].resize(i+1);
+			mTextureStates[type].resize(i+1,NULL);
+		}
+		if(mTextureStates[type][i]==NULL){
 			mTextureStates[type][i]=new TextureState(state);
 		}
 		else{

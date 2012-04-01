@@ -92,8 +92,9 @@ bool D3D9Shader::createContext(){
 		return false;
 	}
 
-	HRESULT result=E_FAIL;
-	result=renderTarget->CompileShaderSymbol(mCode,mCode.length(),NULL,NULL,function,targetProfile,0,&mBytecode,&mLog,&mConstantTable);
+	D3DXMACRO defines[1]={0};
+
+	HRESULT result=renderTarget->CompileShaderSymbol(mCode,mCode.length(),defines,NULL,function,targetProfile,0,&mBytecode,&mLog,&mConstantTable);
 	if(FAILED(result)){
 		Error::unknown(Categories::TOADLET_PEEPER,(LPCSTR)mLog->GetBufferPointer());
 		return false;

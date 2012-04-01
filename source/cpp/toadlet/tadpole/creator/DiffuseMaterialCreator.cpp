@@ -114,6 +114,10 @@ DiffuseMaterialCreator::DiffuseMaterialCreator(Engine *engine){
 	};
 
 	String diffuseFragmentCode[]={
+		"#if defined(GL_ES)\n"
+			"precision mediump float;\n"
+		"#endif\n"
+		
 		"varying vec4 color;\n"
 		"varying vec2 texCoord;\n"
 		"varying float fog;\n"
@@ -196,6 +200,11 @@ DiffuseMaterialCreator::DiffuseMaterialCreator(Engine *engine){
 
 	String pointSpriteFragmentCode[]={
 		"#version 120\n"
+
+		"#if defined(GL_ES)\n"
+			"precision mediump float;\n"
+		"#endif\n"
+		
 		"varying vec4 color;\n"
 		"varying float fog;\n"
 
@@ -297,8 +306,8 @@ Material::ptr DiffuseMaterialCreator::createDiffuseMaterial(Texture::ptr texture
 		variables->addVariable("fogDensity",RenderVariable::ptr(new FogDensityVariable()),Material::Scope_MATERIAL);
 		variables->addVariable("fogDistance",RenderVariable::ptr(new FogDistanceVariable()),Material::Scope_MATERIAL);
 		variables->addVariable("fogColor",RenderVariable::ptr(new FogColorVariable()),Material::Scope_MATERIAL);
-		variables->addVariable("textureMatrix",RenderVariable::ptr(new TextureMatrixVariable(variables,"tex")),Material::Scope_MATERIAL);
-		variables->addVariable("textureSet",RenderVariable::ptr(new TextureSetVariable(variables,"tex")),Material::Scope_MATERIAL);
+		variables->addVariable("textureMatrix",RenderVariable::ptr(new TextureMatrixVariable("tex")),Material::Scope_MATERIAL);
+		variables->addVariable("textureSet",RenderVariable::ptr(new TextureSetVariable("tex")),Material::Scope_MATERIAL);
 
 		variables->addTexture("tex",texture,"samp",mEngine->getMaterialManager()->getDefaultSamplerState(),TextureState());
 	}
@@ -351,8 +360,8 @@ Material::ptr DiffuseMaterialCreator::createPointSpriteMaterial(Texture::ptr tex
 		variables->addVariable("fogDensity",RenderVariable::ptr(new FogDensityVariable()),Material::Scope_MATERIAL);
 		variables->addVariable("fogDistance",RenderVariable::ptr(new FogDistanceVariable()),Material::Scope_MATERIAL);
 		variables->addVariable("fogColor",RenderVariable::ptr(new FogColorVariable()),Material::Scope_MATERIAL);
-		variables->addVariable("textureMatrix",RenderVariable::ptr(new TextureMatrixVariable(variables,"tex")),Material::Scope_MATERIAL);
-		variables->addVariable("textureSet",RenderVariable::ptr(new TextureSetVariable(variables,"tex")),Material::Scope_MATERIAL);
+		variables->addVariable("textureMatrix",RenderVariable::ptr(new TextureMatrixVariable("tex")),Material::Scope_MATERIAL);
+		variables->addVariable("textureSet",RenderVariable::ptr(new TextureSetVariable("tex")),Material::Scope_MATERIAL);
 		variables->addVariable("pointSize",RenderVariable::ptr(new PointSizeVariable()),Material::Scope_MATERIAL);
 		variables->addVariable("viewport",RenderVariable::ptr(new ViewportVariable()),Material::Scope_MATERIAL);
 
@@ -417,8 +426,8 @@ Material::ptr DiffuseMaterialCreator::createFontMaterial(Font::ptr font){
 		variables->addVariable("fogDensity",RenderVariable::ptr(new FogDensityVariable()),Material::Scope_MATERIAL);
 		variables->addVariable("fogDistance",RenderVariable::ptr(new FogDistanceVariable()),Material::Scope_MATERIAL);
 		variables->addVariable("fogColor",RenderVariable::ptr(new FogColorVariable()),Material::Scope_MATERIAL);
-		variables->addVariable("textureMatrix",RenderVariable::ptr(new TextureMatrixVariable(variables,"tex")),Material::Scope_MATERIAL);
-		variables->addVariable("textureSet",RenderVariable::ptr(new TextureSetVariable(variables,"tex")),Material::Scope_MATERIAL);
+		variables->addVariable("textureMatrix",RenderVariable::ptr(new TextureMatrixVariable("tex")),Material::Scope_MATERIAL);
+		variables->addVariable("textureSet",RenderVariable::ptr(new TextureSetVariable("tex")),Material::Scope_MATERIAL);
 
 		variables->addTexture("tex",texture,"samp",mEngine->getMaterialManager()->getDefaultSamplerState(),TextureState());
 	}

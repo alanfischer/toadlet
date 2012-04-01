@@ -89,6 +89,8 @@ public:
 
 	bool isDepthSorted() const;
 
+	void compile(); 
+
 protected:
 	MaterialManager *mManager;
 	RenderState::ptr mRenderState,mOwnRenderState;

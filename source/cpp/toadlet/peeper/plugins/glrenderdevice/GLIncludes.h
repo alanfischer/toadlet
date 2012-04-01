@@ -234,7 +234,7 @@
 	(defined(TOADLET_PLATFORM_POSIX) && !defined(TOADLET_PLATFORM_ANDROID) && !defined(TOADLET_PLATFORM_OSX) && !defined(TOADLET_PLATFORM_IOS))
 	#define TOADLET_HAS_GLPBUFFERS
 #endif
-#if defined(TOADLET_HAS_GLEW) || defined(TOADLET_HAS_EAGL)
+#if defined(TOADLET_HAS_GLEW) || defined(TOADLET_HAS_EAGL) || (defined(TOADLET_HAS_GLES) && defined(TOADLET_HAS_GL_20))
 	#define TOADLET_HAS_GLFBOS
 #endif
 #if defined(TOADLET_HAS_GLEW)
@@ -280,6 +280,10 @@
 		#define GLTexture			GLES2Texture
 		#define GLTextureMipPixelBuffer	GLES2TextureMipPixelBuffer
 		#define GLVertexFormat		GLES2VertexFormat
+
+		#define EGLWindowRenderTarget EGL2WindowRenderTarget
+		#define EGLRenderTarget		EGL2RenderTarget
+		#define EGLPBufferRenderTarget EGL2PBufferRenderTarget
 	#else
 		#define GLBuffer			GLES1Buffer
 		#define GLFBOPixelBuffer	GLES1FBOPixelBuffer

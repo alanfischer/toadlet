@@ -90,7 +90,11 @@ Node *Sky::create(Scene *scene,int cloudSize,const Vector4 &skyColor,const Vecto
 				"}"
 			};
 
-			String fragmentCodes[]={
+			String fragmentCodes[]={\
+				"#if defined(GL_ES)\n"
+					"precision mediump float;\n"
+				"#endif\n"
+				
 				"varying vec4 color;\n"
 				"varying vec2 texCoord0;\n"
 				"varying vec2 texCoord1;\n"

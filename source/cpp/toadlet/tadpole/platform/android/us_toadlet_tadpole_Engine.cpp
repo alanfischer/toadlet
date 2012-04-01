@@ -49,7 +49,7 @@ JNIEXPORT void JNICALL Java_us_toadlet_tadpole_Engine_setRenderDevice(JNIEnv *en
 
 	RenderDevice *device=NULL;
 	if(deviceObj!=NULL){
-		jclass deviceClass=env->FindClass("us/toadlet/peeper/NGLES1RenderDevice");
+		jclass deviceClass=env->FindClass("us/toadlet/peeper/NRenderDevice");
 		if(env->IsInstanceOf(deviceObj,deviceClass)){
 			jfieldID deviceNativeHandleID=env->GetFieldID(deviceClass,"mNativeHandle","I");
 			device=(RenderDevice*)env->GetIntField(deviceObj,deviceNativeHandleID);
@@ -59,7 +59,6 @@ JNIEXPORT void JNICALL Java_us_toadlet_tadpole_Engine_setRenderDevice(JNIEnv *en
 //		}
 		env->DeleteLocalRef(deviceClass);
 	}
-	
 	engine->setRenderDevice(device);
 }
 
@@ -116,7 +115,7 @@ JNIEXPORT jobject JNICALL Java_us_toadlet_tadpole_Engine_createNode(JNIEnv *env,
 JNIEXPORT void JNICALL Java_us_toadlet_tadpole_Engine_makeEngine(JNIEnv *env,jobject obj,jobject contextObj){
 	Java_us_toadlet_tadpole_Engine(env);
 
-	Engine *engine=new Engine(true,false);	
+	Engine *engine=new Engine(true,true);	
 	engine->retain();
 
 	env->SetIntField(obj,Engine_nativeHandle,(jint)engine);

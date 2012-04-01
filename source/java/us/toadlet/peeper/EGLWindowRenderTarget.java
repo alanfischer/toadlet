@@ -119,8 +119,8 @@ public class EGLWindowRenderTarget extends EGLRenderTarget{
 		}
 		
 		// Terminate the list with EGL_NONE
-		configOptions[i++]=EGL_NONE;
-	
+		while(i<configOptions.length) configOptions[i++]=EGL_NONE;
+
 		mContext=egl.eglCreateContext(mDisplay,mConfig,EGL_NO_CONTEXT,configOptions);
 		TOADLET_CHECK_EGLERROR("eglCreateContext");
 		if(mContext==EGL_NO_CONTEXT){

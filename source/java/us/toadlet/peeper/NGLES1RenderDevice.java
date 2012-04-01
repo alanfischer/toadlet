@@ -25,7 +25,7 @@
 
 package us.toadlet.peeper;
 
-public class NGLES1RenderDevice implements RenderDevice{
+public class NGLES1RenderDevice extends NRenderDevice{
 	public NGLES1RenderDevice(){
 		makeRenderDevice();
 	}
@@ -38,6 +38,4 @@ public class NGLES1RenderDevice implements RenderDevice{
 	public native void endScene();	
 	
 	private native void makeRenderDevice();
-	
-	protected int mNativeHandle;
 }
