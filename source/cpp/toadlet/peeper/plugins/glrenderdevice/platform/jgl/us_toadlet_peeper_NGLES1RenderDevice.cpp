@@ -15,7 +15,7 @@ jfieldID NGLES1RenderDevice_nativeHandle=0;
 jmethodID NGLES1RenderDevice_getRootRenderTarget=0;
 
 void Java_us_toadlet_peeper_NGLES1RenderDevice(JNIEnv *env){
-	jclass deviceClass=env->FindClass("us/toadlet/peeper/NGLES1RenderDevice");
+	jclass deviceClass=env->FindClass("us/toadlet/peeper/NRenderDevice");
 	{
 		NGLES1RenderDevice_nativeHandle=env->GetFieldID(deviceClass,"mNativeHandle","I");
 	}

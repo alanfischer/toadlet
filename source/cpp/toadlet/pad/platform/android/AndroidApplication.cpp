@@ -68,8 +68,6 @@ AndroidApplication::AndroidApplication():
 {
 	mFormat=WindowRenderTargetFormat::ptr(new WindowRenderTargetFormat());
 	mFormat->depthBits=16;
-	mFormat->multisamples=0;
-	mFormat->threads=0;
 	#if defined(TOADLET_DEBUG)
 		mFormat->debug=true;
 	#else
@@ -425,35 +423,48 @@ void AndroidApplication::stepEventLoop(){
 void AndroidApplication::windowCreated(ANativeWindow *window){
 	mWindow=window;
 
-	RenderTarget::ptr target;
-	TOADLET_TRY
-		int nativeFormat=ANativeWindow_getFormat(window);
-		if(nativeFormat==WINDOW_FORMAT_RGB_565){
-			mFormat->pixelFormat=TextureFormat::Format_RGB_5_6_5;
-		}
-		else{
-			mFormat->pixelFormat=TextureFormat::Format_RGBA_8;
-		}
-		mFormat->flags=2; //gles2
-		target=new_EGLWindowRenderTarget(0,mWindow,mFormat);
-	TOADLET_CATCH(const Exception &){target=NULL;}
-	
-	if(target!=NULL && target->isValid()==false){
-		target=NULL;
+	int nativeFormat=ANativeWindow_getFormat(window);
+	if(nativeFormat==WINDOW_FORMAT_RGB_565){
+		mFormat->pixelFormat=TextureFormat::Format_RGB_5_6_5;
 	}
-	mRenderTarget=target;
+	else{
+		mFormat->pixelFormat=TextureFormat::Format_RGBA_8;
+	}
 
-	RenderDevice::ptr device;
-	if(target!=NULL){
-		device=new_GLES2RenderDevice();
-		if(device->create(target,NULL)==false){
-			device=NULL;
+	// Start with gles2 and then try gles
+	for(mFormat->flags=2;mFormat->flags>=0 && mRenderDevice==NULL;mFormat->flags-=2){
+		RenderTarget::ptr target;
+		TOADLET_TRY
+			target=new_EGLWindowRenderTarget(0,mWindow,mFormat);
+		TOADLET_CATCH(const Exception &){target=NULL;}
+		if(target!=NULL && target->isValid()==false){
+			target->destroy();
+			target=NULL;
 		}
+
+		RenderDevice::ptr device;
+		if(target!=NULL){
+			TOADLET_TRY
+				if(mFormat->flags==2){
+					device=new_GLES2RenderDevice();
+				}
+				else{
+					device=new_GLES1RenderDevice();
+				}
+			TOADLET_CATCH(const Exception &){device=NULL;}
+			if(device!=NULL && device->create(target,NULL)==false){
+				device->destroy();
+				target->destroy();
+				device=NULL;
+				target=NULL;
+			}
+		}
+		
+		mRenderTarget=target;
+		mRenderDevice=device;
 	}
 	
-	if(device!=NULL){
-		mRenderDevice=device;
-		mRenderDevice->setRenderTarget(mRenderTarget);
+	if(mRenderDevice!=NULL){
 		mEngine->setRenderDevice(mRenderDevice);
 	}
 }

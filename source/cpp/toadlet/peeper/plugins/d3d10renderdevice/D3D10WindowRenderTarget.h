@@ -70,7 +70,7 @@ public:
 	typedef HRESULT(WINAPI *D3D10ReflectShader)(void*,SIZE_T,ID3D10ShaderReflection**);
 	D3D10ReflectShader ReflectShaderSymbol;
 
-	typedef HRESULT(WINAPI *D3DX10CompileFromMemory)(LPCSTR,SIZE_T,LPCSTR,struct _D3D_SHADER_MACRO*,interface ID3DInclude*,LPCSTR,LPCSTR,UINT,UINT,interface ID3DX10ThreadPump*,interface ID3D10Blob**,interface ID3D10Blob**,HRESULT*);
+	typedef HRESULT(WINAPI *D3DX10CompileFromMemory)(LPCSTR,SIZE_T,LPCSTR,D3D10_SHADER_MACRO*,interface ID3DInclude*,LPCSTR,LPCSTR,UINT,UINT,interface ID3DX10ThreadPump*,interface ID3D10Blob**,interface ID3D10Blob**,HRESULT*);
 	D3DX10CompileFromMemory CompileFromMemorySymbol;
 
 protected:

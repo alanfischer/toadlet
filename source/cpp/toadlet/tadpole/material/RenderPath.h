@@ -52,6 +52,8 @@ public:
 
 	bool isDepthSorted() const;
 
+	void compile();
+
 protected:
 	MaterialManager *mManager;
 	String mName;

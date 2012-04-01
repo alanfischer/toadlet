@@ -110,7 +110,7 @@ bool BaseApplication::create(String renderDevice,String audioDevice){
 
 	preEngineCreate();
 
-	mEngine=new Engine(false,false);
+	mEngine=new Engine(true,true);//false,false);
 
 	/// @todo: Unify the plugin framework a bit so we dont have as much code duplication for this potion, and the creating of the plugin
 	mNewRenderDevicePlugin=mCurrentRenderDevicePlugin=renderDevice;
@@ -255,7 +255,6 @@ bool BaseApplication::createContextAndRenderDevice(const String &plugin){
 	}
 
 	if(mRenderTarget!=NULL && mRenderDevice!=NULL){
-		mRenderDevice->setRenderTarget(mRenderTarget);
 		mEngine->setRenderDevice(mRenderDevice);
 	}
 

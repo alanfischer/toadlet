@@ -347,8 +347,8 @@ public:
 
 class TextureMatrixVariable:public RenderVariable{
 public:
-	TextureMatrixVariable(RenderVariableSet *variables,const String &name){
-		variables->findTexture(name,mType,mIndex);
+	TextureMatrixVariable(const String &name){
+		mName=name;
 	}
 
 	TextureMatrixVariable(Shader::ShaderType type,int index){
@@ -357,7 +357,11 @@ public:
 	}
 
 	int getFormat(){return VariableBufferFormat::Format_TYPE_FLOAT_32|VariableBufferFormat::Format_COUNT_4X4|((mIndex+1)<<VariableBufferFormat::Format_SHIFT_SAMPLER_MATRIX);}
-	
+
+	void linked(RenderVariableSet *variables){
+		variables->findTexture(mName,mType,mIndex);
+	}
+
 	void update(tbyte *data,SceneParameters *parameters){
 		TextureState state;
 		parameters->getRenderPass()->getRenderState()->getTextureState(mType,mIndex,state);
@@ -365,14 +369,15 @@ public:
 	}
 
 protected:
+	String mName;
 	Shader::ShaderType mType;
 	int mIndex;
 };
 
 class TextureSetVariable:public RenderVariable{
 public:
-	TextureSetVariable(RenderVariableSet *variables,const String &name){
-		variables->findTexture(name,mType,mIndex);
+	TextureSetVariable(const String &name){
+		mName=name;
 	}
 
 	TextureSetVariable(Shader::ShaderType type,int index){
@@ -382,12 +387,17 @@ public:
 
 	int getFormat(){return VariableBufferFormat::Format_TYPE_FLOAT_32|VariableBufferFormat::Format_COUNT_1;}
 
+	void linked(RenderVariableSet *variables){
+		variables->findTexture(mName,mType,mIndex);
+	}
+
 	void update(tbyte *data,SceneParameters *parameters){
 		float &textureSet=*(float*)data;
 		textureSet=parameters->getRenderPass()->getTexture(mType,mIndex)!=NULL?1.0:0.0;
 	}
 
 protected:
+	String mName;
 	Shader::ShaderType mType;
 	int mIndex;
 };

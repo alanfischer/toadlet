@@ -23,7 +23,6 @@
  *
  ********** Copyright header - do not remove **********/
 
-#include <toadlet/egg/Logger.h>
 #include <toadlet/peeper/BackableRenderState.h>
 #include <toadlet/peeper/BackableShaderState.h>
 #include <toadlet/tadpole/BufferManager.h>
@@ -126,6 +125,12 @@ void RenderPass::updateVariables(int scope,SceneParameters *parameters){
 bool RenderPass::isDepthSorted() const{
 	DepthState state;
 	return mRenderState->getDepthState(state) && state.write==false;
+}
+
+void RenderPass::compile(){
+	if(mVariables!=NULL){
+		mVariables->buildBuffers(mManager->getBufferManager(),this);
+	}
 }
 
 }

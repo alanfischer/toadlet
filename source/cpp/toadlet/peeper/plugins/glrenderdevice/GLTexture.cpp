@@ -444,8 +444,13 @@ bool GLTexture::generateMipLevels(){
 		return false;
 	}
 
-	#if defined(TOADLET_HAS_GLEW) && defined(GL_EXT_framebuffer_object)
+	#if (defined(TOADLET_HAS_GLEW) && defined(GL_EXT_framebuffer_object)) || \
+		(defined(TOADLET_HAS_GLES) && defined(TOADLET_HAS_GL_20))
+	#if defined(GL_EXT_framebuffer_object)
 	if(GLEW_EXT_framebuffer_object){
+	#else
+	if(true){
+	#endif
 		glBindTexture(mTarget,mHandle);
 		// Set some items to make ATI cards happier
 		glEnable(mTarget);

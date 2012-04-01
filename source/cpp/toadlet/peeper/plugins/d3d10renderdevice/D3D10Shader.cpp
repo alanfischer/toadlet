@@ -108,7 +108,9 @@ bool D3D10Shader::createContext(){
 		break;
 	}
 
-	HRESULT result=((D3D10WindowRenderTarget*)mDevice->getPrimaryRenderTarget()->getRootRenderTarget())->CompileFromMemorySymbol(mCode,mCode.length(),NULL,NULL,NULL,function,targetProfile,0,0,NULL,&mBytecode,&mLog,NULL);
+	D3D10_SHADER_MACRO defines[1]={0};
+	
+	HRESULT result=((D3D10WindowRenderTarget*)mDevice->getPrimaryRenderTarget()->getRootRenderTarget())->CompileFromMemorySymbol(mCode,mCode.length(),NULL,defines,NULL,function,targetProfile,0,0,NULL,&mBytecode,&mLog,NULL);
 	if(FAILED(result)){
 		Error::unknown(Categories::TOADLET_PEEPER,(LPCSTR)mLog->GetBufferPointer());
 		return false;

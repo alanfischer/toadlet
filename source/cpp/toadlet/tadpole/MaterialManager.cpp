@@ -357,6 +357,11 @@ bool MaterialManager::compileMaterial(Material *material){
 	}
 
 	material->setBestPath(bestPath);
+
+	if(bestPath!=NULL){
+		bestPath->compile();
+	}
+
 	return bestPath!=NULL;
 }
 

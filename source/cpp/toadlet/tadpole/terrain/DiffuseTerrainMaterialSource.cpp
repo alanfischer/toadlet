@@ -115,6 +115,10 @@ DiffuseTerrainMaterialSource::DiffuseTerrainMaterialSource(Engine *engine){
 	};
 
 	String diffuseBaseFragmentCode[]={
+		"#if defined(GL_ES)\n"
+			"precision mediump float;\n"
+		"#endif\n"
+
 		"varying vec4 color;\n"
 		"varying vec2 texCoord;\n"
 		"varying float fog;\n"
@@ -147,6 +151,10 @@ DiffuseTerrainMaterialSource::DiffuseTerrainMaterialSource(Engine *engine){
 	};
 
 	String diffuseLayerFragmentCode[]={
+		"#if defined(GL_ES)\n"
+			"precision mediump float;\n"
+		"#endif\n"
+
 		"varying vec4 color;\n"
 		"varying vec2 texCoord,texCoord2;\n"
 		"varying float fog;\n"

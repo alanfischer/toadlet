@@ -37,7 +37,7 @@ namespace peeper{
 bool GLFBORenderTarget::available(GLRenderDevice *renderDevice){
 	#if defined(TOADLET_HAS_GLEW)
 		return GLEW_EXT_framebuffer_object>0;
-	#elif defined(TOADLET_HAS_EAGL)
+	#elif defined(TOADLET_HAS_GLES) && defined(TOADLET_HAS_GL_20)
 		return true;
 	#else
 		return false;
@@ -265,7 +265,7 @@ GLenum GLFBORenderTarget::getGLAttachment(Attachment attachment){
 			return GL_DEPTH_ATTACHMENT;
 		case Attachment_COLOR_0:
 			return GL_COLOR_ATTACHMENT0;
-		#if !defined(TOADLET_HAS_EAGL)
+		#if !defined(TOADLET_HAS_GLES)
 			case Attachment_COLOR_1:
 				return GL_COLOR_ATTACHMENT1;
 			case Attachment_COLOR_2:

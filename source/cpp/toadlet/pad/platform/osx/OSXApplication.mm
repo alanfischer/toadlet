@@ -289,11 +289,14 @@ OSXApplication::OSXApplication():
 {
 	#if defined(TOADLET_HAS_OPENGL)
 		#if defined(TOADLET_HAS_UIKIT)
-			mRenderDevicePlugins.add("gl",RenderDevicePlugin(new_EAGLRenderTarget,new_GLES1RenderDevice));
+			mRenderDevicePlugins.add("gles1",RenderDevicePlugin(new_EAGLRenderTarget,new_GLES1RenderDevice));
+			mRenderDevicePlugins.add("gles2",RenderDevicePlugin(new_EAGLRenderTarget,new_GLES2RenderDevice));
+			mRenderDevicePreferences.add("gles2");
+			mRenderDevicePreferences.add("gles1");
 		#else
 			mRenderDevicePlugins.add("gl",RenderDevicePlugin(new_NSGLRenderTarget,new_GLRenderDevice));
+			mRenderDevicePreferences.add("gl");
 		#endif
-		mRenderDevicePreferences.add("gl");
 	#endif
 	
 	#if defined(TOADLET_HAS_OPENAL)

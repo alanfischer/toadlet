@@ -39,6 +39,7 @@ namespace material{
 
 class RenderPass;
 
+/// @todo: This should be merged into RenderPass
 class TOADLET_API RenderVariableSet{
 public:
 	TOADLET_SPTR(RenderVariableSet);
@@ -80,6 +81,15 @@ protected:
 		RenderVariable::ptr variable;
 	};
 
+	class ResourceInfo{
+	public:
+		String name;
+		Texture::ptr texture;
+		String samplerName;
+		SamplerState samperState;
+		TextureState textureState;
+	};
+
 	class BufferInfo{
 	public:
 		VariableBuffer::ptr buffer;
@@ -101,6 +111,8 @@ protected:
 	VariableBufferFormat::Variable *findResourceVariable(const String &name,Shader::ShaderType &type);
 
 	Collection<BufferInfo> mBuffers;
+	Collection<VariableInfo> mUnassignedVariables;
+	Collection<ResourceInfo> mUnassignedResources;
 	RenderPass *mRenderPass;
 	RenderState *mRenderState;
 	ShaderState *mShaderState;

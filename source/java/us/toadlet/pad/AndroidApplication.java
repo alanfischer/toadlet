@@ -90,7 +90,7 @@ class ApplicationView extends SurfaceView implements SurfaceHolder.Callback{
 	AndroidApplication mApplication;
 }
 
-public abstract class AndroidApplication extends Activity implements RenderTarget,Runnable{
+public abstract class AndroidApplication extends Activity implements Runnable{
 	// Keys
 	final static int Key_ENTER=	10;
 	final static int Key_TAB=	8;
@@ -119,6 +119,8 @@ public abstract class AndroidApplication extends Activity implements RenderTarge
 
 	public AndroidApplication(){
 		super();
+
+		mFormat.depthBits=16;
 	}
 
 	protected void onCreate(Bundle bundle){
@@ -473,10 +475,6 @@ public abstract class AndroidApplication extends Activity implements RenderTarge
 	public void setApplet(Applet applet){mApplet=applet;}
 	public Applet getApplet(){return mApplet;}
 
-	public RenderTarget getRootRenderTarget(){return mRenderTarget;}
-	public boolean isPrimary(){return mRenderTarget.isPrimary();}
-	public boolean isValid(){return mRenderTarget.isValid();}
-
 	public Engine getEngine(){return mEngine;}
 	public RenderDevice getRenderDevice(){return mRenderDevice;}
 	public AudioDevice getAudioDevice(){return mAudioDevice;}
@@ -498,25 +496,41 @@ public abstract class AndroidApplication extends Activity implements RenderTarge
 		System.out.println(
 			"AndroidApplication.surfaceCreated");
 
-		boolean result=false;
-		mRenderTarget=makeRenderTarget(holder);
-		if(mRenderTarget!=null){
-			// Until I can determine otherwise, only a GLES1 context may be made from java
-			mRenderDevice=new NGLES1RenderDevice();
-			result=mRenderDevice.create(this,null);
-			if(result==false){
-				mRenderDevice=null;
-			}
-		}
-		if(result==false){
-			mRenderTarget=null;
+		// Can not appear to get the current Surface format
+		mFormat.pixelFormat=TextureFormat.Format_RGB_5_6_5;
 
-			System.out.println(
-				"Error creating RenderTarget");
-		}
-		else if(mRenderDevice==null){
-			System.out.println(
-				"error creating RenderDevice");
+		// Start with gles2 and then try gles
+		for(mFormat.flags=2;mFormat.flags>=0 && mRenderDevice==null;mFormat.flags-=2){
+			RenderTarget target=null;
+			try{
+				target=new EGLWindowRenderTarget(null,holder,mFormat);
+			}catch(Exception ex){ex.printStackTrace();}
+			if(target!=null && target.isValid()==false){
+				target.destroy();
+				target=null;
+			}
+
+			RenderDevice device=null;
+			if(target!=null){
+				try{
+					if(mFormat.flags==2){
+						device=new NGLES2RenderDevice();
+					}
+					else{
+						device=new NGLES1RenderDevice();
+					}
+				}
+				catch(Exception ex){ex.printStackTrace();}
+				if(device!=null && device.create(target,null)==false){
+					device.destroy();
+					target.destroy();
+					device=null;
+					target=null;
+				}
+			}
+			
+			mRenderTarget=target;
+			mRenderDevice=device;
 		}
 
 		if(mRenderDevice!=null){
@@ -538,22 +552,6 @@ public abstract class AndroidApplication extends Activity implements RenderTarge
 			mRenderTarget.destroy();
 			mRenderTarget=null;
 		}
-	}
-
-	protected RenderTarget makeRenderTarget(SurfaceHolder holder){
-		System.out.println("AndroidApplication.makeRenderTarget");
-
-		WindowRenderTargetFormat format=new WindowRenderTargetFormat();
-		format.pixelFormat=TextureFormat.Format_RGB_5_6_5;
-		format.depthBits=16;
-		format.multisamples=0;
-		format.threads=0;
-		RenderTarget target=new EGLWindowRenderTarget(null,holder,format);
-		if(target!=null && target.isValid()==false){
-			target=null;
-		}
-
-		return target;
 	}
 
 	public int keyEventToKey(KeyEvent event){
@@ -581,6 +579,7 @@ public abstract class AndroidApplication extends Activity implements RenderTarge
 	protected String mTitle;
 	protected boolean mDifferenceMouse;
 	protected int mLastMouseX,mLastMouseY;
+	protected WindowRenderTargetFormat mFormat=new WindowRenderTargetFormat();
 	protected RenderTarget mRenderTarget;
 	protected RenderDevice mRenderDevice;
 	protected AudioDevice mAudioDevice;

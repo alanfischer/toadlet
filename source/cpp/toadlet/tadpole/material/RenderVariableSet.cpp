@@ -72,26 +72,38 @@ void RenderVariableSet::removeBuffer(VariableBuffer::ptr buffer){
 	}
 }
 
-bool RenderVariableSet::addTexture(const String &name,Texture::ptr texture,const String &sampName,const SamplerState &samplerState,const TextureState &textureState){
+bool RenderVariableSet::addTexture(const String &name,Texture::ptr texture,const String &samplerName,const SamplerState &samplerState,const TextureState &textureState){
 	Shader::ShaderType type;
 	VariableBufferFormat::Variable *formatVariable=findResourceVariable(name,type);
 	if(formatVariable==NULL){
 		// If not found, then search for the d3d9 style appended name
-		formatVariable=findResourceVariable(sampName+"+"+name,type);
+		formatVariable=findResourceVariable(samplerName+"+"+name,type);
 	}
-	if(formatVariable==NULL){
-		Logger::warning(Categories::TOADLET_TADPOLE,
-			"RenderVariable not found with name:"+name);
-		return false;
-	}
-	if((formatVariable->getFormat()&VariableBufferFormat::Format_MASK_TYPES)!=VariableBufferFormat::Format_TYPE_RESOURCE){
-		Logger::warning(Categories::TOADLET_TADPOLE,
-			String("RenderVariable:")+name+" format does not match format:"+formatVariable->getFormat()+"!="+(int)VariableBufferFormat::Format_TYPE_RESOURCE);
-		return false;
-	}
+	if(formatVariable!=NULL){
+		if((formatVariable->getFormat()&VariableBufferFormat::Format_MASK_TYPES)!=VariableBufferFormat::Format_TYPE_RESOURCE){
+			Logger::warning(Categories::TOADLET_TADPOLE,
+				String("RenderVariable:")+name+" format does not match format:"+formatVariable->getFormat()+"!="+(int)VariableBufferFormat::Format_TYPE_RESOURCE);
+			return false;
+		}
 
-	/// @todo: Set the sampler by name also
-	mRenderPass->setTexture(type,formatVariable->getResourceIndex(),texture,samplerState,textureState);
+		/// @todo: Set the sampler by name also
+		mRenderPass->setTexture(type,formatVariable->getResourceIndex(),texture,samplerState,textureState);
+	}
+	else{
+		if(mBuffers.size()>0){
+			Logger::warning(Categories::TOADLET_TADPOLE,
+				"RenderVariable not found with name:"+name);
+			return false;
+		}
+
+		ResourceInfo r;
+		r.name=name;
+		r.texture=texture;
+		r.samplerName=samplerName;
+		r.samperState=samplerState;
+		r.textureState=textureState;
+		mUnassignedResources.add(r);
+	}
 
 	return true;
 }
@@ -109,29 +121,41 @@ bool RenderVariableSet::findTexture(const String &name,Shader::ShaderType &type,
 
 // Search for the correct buffer and correct index
 bool RenderVariableSet::addVariable(const String &name,RenderVariable::ptr variable,int scope){
+	int offset=0;
 	BufferInfo *bufferInfo=NULL;
 	VariableBufferFormat::Variable *formatVariable=findFormatVariable(name,bufferInfo);
-	if(formatVariable==NULL){
-		Logger::warning(Categories::TOADLET_TADPOLE,
-			"RenderVariable not found with name:"+name);
-		return false;
+	if(formatVariable!=NULL){
+		if((formatVariable->getFormat()&~VariableBufferFormat::Format_MASK_OPTIONS)!=(variable->getFormat()&~VariableBufferFormat::Format_MASK_OPTIONS)){
+			Logger::warning(Categories::TOADLET_TADPOLE,
+				String("RenderVariable:")+name+" format does not match format:"+formatVariable->getFormat()+"!="+variable->getFormat());
+			return false;
+		}
+
+		// Combine the two format, not sure this is ideal, but it will let us transfer information about the RenderVariable to the Buffer for items like Format_SAMPLER_MATRIX
+		formatVariable->setFormat(formatVariable->getFormat()|variable->getFormat());
 	}
-	if((formatVariable->getFormat()&~VariableBufferFormat::Format_MASK_OPTIONS)!=(variable->getFormat()&~VariableBufferFormat::Format_MASK_OPTIONS)){
-		Logger::warning(Categories::TOADLET_TADPOLE,
-			String("RenderVariable:")+name+" format does not match format:"+formatVariable->getFormat()+"!="+variable->getFormat());
-		return false;
-	}
-	// Combine the two format, not sure this is ideal, but it will let us transfer information about the RenderVariable to the Buffer for items like Format_SAMPLER_MATRIX
-	formatVariable->setFormat(formatVariable->getFormat()|variable->getFormat());
 
 	VariableInfo v;
 	v.name=name;
-	v.location=formatVariable->getOffset();
+	v.location=0;
 	v.scope=scope;
 	v.variable=variable;
-	bufferInfo->variables.add(v);
 
-	bufferInfo->scope|=scope;
+	if(formatVariable==NULL){
+		if(mBuffers.size()>0){
+			Logger::warning(Categories::TOADLET_TADPOLE,
+				"RenderVariable not found with name:"+name);
+			return false;
+		}
+
+		mUnassignedVariables.add(v);
+	}
+	else{
+		v.location=formatVariable->getOffset();
+		variable->linked(this);
+		bufferInfo->variables.add(v);
+		bufferInfo->scope|=scope;
+	}
 	
 	return true;
 }
@@ -144,10 +168,17 @@ void RenderVariableSet::removeVariable(RenderVariable::ptr variable){
 		for(j=0;j<buffer->variables.size();++j){
 			if(buffer->variables[j].variable==variable){
 				buffer->variables.removeAt(j);
+				j--;
 			}
 			else{
 				buffer->scope|=buffer->variables[j].scope;
 			}
+		}
+	}
+	for(i=0;i<mUnassignedVariables.size();++i){
+		if(mUnassignedVariables[i].variable==variable){
+			mUnassignedVariables.removeAt(i);
+			i--;
 		}
 	}
 }
@@ -160,6 +191,11 @@ RenderVariable::ptr RenderVariableSet::findVariable(const String &name){
 			if(buffer->variables[j].name==name){
 				return buffer->variables[j].variable;
 			}
+		}
+	}
+	for(i=0;i<mUnassignedVariables.size();++i){
+		if(mUnassignedVariables[i].name==name){
+			return mUnassignedVariables[i].variable;
 		}
 	}
 	return NULL;
@@ -232,8 +268,12 @@ VariableBufferFormat::Variable *RenderVariableSet::findResourceVariable(const St
 }
 
 void RenderVariableSet::buildBuffers(BufferManager *manager,RenderPass *pass){
-	Collection<VariableInfo> variables;
 	int i,j;
+	Collection<VariableInfo> variables=mUnassignedVariables;
+	mUnassignedVariables.clear();
+
+	Collection<ResourceInfo> resources=mUnassignedResources;
+	mUnassignedResources.clear();
 
 	mRenderPass=pass;
 	mRenderState=pass->getRenderState();
@@ -244,7 +284,6 @@ void RenderVariableSet::buildBuffers(BufferManager *manager,RenderPass *pass){
 		for(j=0;j<buffer->variables.size();++j){
 			variables.add(buffer->variables[j]);
 		}
-		buffer->buffer->destroy();
 		mBuffers.removeAt(0);
 	}
 
@@ -253,13 +292,15 @@ void RenderVariableSet::buildBuffers(BufferManager *manager,RenderPass *pass){
 			VariableBufferFormat::ptr format=mShaderState->getVariableBufferFormat((Shader::ShaderType)i,j);
 			VariableBuffer::ptr buffer=manager->createVariableBuffer(Buffer::Usage_BIT_DYNAMIC,Buffer::Access_BIT_WRITE,format);
 			addBuffer((Shader::ShaderType)i,j,buffer);
-
-			Logger::debug(Categories::TOADLET_TADPOLE,
-				"\n"+format->toString());
 		}
 	}
+
 	for(i=0;i<variables.size();++i){
 		addVariable(variables[i].name,variables[i].variable,variables[i].scope);
+	}
+
+	for(i=0;i<resources.size();++i){
+		addTexture(resources[i].name,resources[i].texture,resources[i].samplerName,resources[i].samperState,resources[i].textureState);
 	}
 }
 
