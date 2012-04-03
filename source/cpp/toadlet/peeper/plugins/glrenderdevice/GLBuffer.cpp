@@ -366,7 +366,7 @@ bool GLBuffer::activateUniforms(){
 		tbyte *data=mData+offset;
 		int samplerMatrix=((format&VariableBufferFormat::Format_MASK_SAMPLER_MATRIX)>>VariableBufferFormat::Format_SHIFT_SAMPLER_MATRIX)-1;
 		if(samplerMatrix>=0){
-			GLTexture *texture=mDevice->mLastTextures[samplerMatrix];
+			GLTexture *texture=mDevice->mLastTextures.size()<=samplerMatrix?NULL:mDevice->mLastTextures[samplerMatrix];
 			matrix.set((float*)data);
 			if(texture!=NULL){
 				MathConversion::scalarToFloat(textureMatrix,texture->getMatrix());

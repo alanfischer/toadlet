@@ -349,6 +349,7 @@ class TextureMatrixVariable:public RenderVariable{
 public:
 	TextureMatrixVariable(const String &name){
 		mName=name;
+		mIndex=-1;
 	}
 
 	TextureMatrixVariable(Shader::ShaderType type,int index){
@@ -363,9 +364,11 @@ public:
 	}
 
 	void update(tbyte *data,SceneParameters *parameters){
-		TextureState state;
-		parameters->getRenderPass()->getRenderState()->getTextureState(mType,mIndex,state);
-		memcpy(data,state.matrix.getData(),sizeof(Matrix4x4));
+		if(mIndex>=0){
+			TextureState state;
+			parameters->getRenderPass()->getRenderState()->getTextureState(mType,mIndex,state);
+			memcpy(data,state.matrix.getData(),sizeof(Matrix4x4));
+		}
 	}
 
 protected:
@@ -378,6 +381,7 @@ class TextureSetVariable:public RenderVariable{
 public:
 	TextureSetVariable(const String &name){
 		mName=name;
+		mIndex=-1;
 	}
 
 	TextureSetVariable(Shader::ShaderType type,int index){
@@ -392,8 +396,10 @@ public:
 	}
 
 	void update(tbyte *data,SceneParameters *parameters){
-		float &textureSet=*(float*)data;
-		textureSet=parameters->getRenderPass()->getTexture(mType,mIndex)!=NULL?1.0:0.0;
+		if(mIndex>=0){
+			float &textureSet=*(float*)data;
+			textureSet=parameters->getRenderPass()->getTexture(mType,mIndex)!=NULL?1.0:0.0;
+		}
 	}
 
 protected:
