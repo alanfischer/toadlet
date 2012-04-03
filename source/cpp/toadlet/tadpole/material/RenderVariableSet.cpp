@@ -130,9 +130,6 @@ bool RenderVariableSet::addVariable(const String &name,RenderVariable::ptr varia
 				String("RenderVariable:")+name+" format does not match format:"+formatVariable->getFormat()+"!="+variable->getFormat());
 			return false;
 		}
-
-		// Combine the two format, not sure this is ideal, but it will let us transfer information about the RenderVariable to the Buffer for items like Format_SAMPLER_MATRIX
-		formatVariable->setFormat(formatVariable->getFormat()|variable->getFormat());
 	}
 
 	VariableInfo v;
@@ -155,6 +152,9 @@ bool RenderVariableSet::addVariable(const String &name,RenderVariable::ptr varia
 		variable->linked(this);
 		bufferInfo->variables.add(v);
 		bufferInfo->scope|=scope;
+
+		// Combine the two format, not sure this is ideal, but it will let us transfer information about the RenderVariable to the Buffer for items like Format_SAMPLER_MATRIX
+		formatVariable->setFormat(formatVariable->getFormat()|variable->getFormat());
 	}
 	
 	return true;

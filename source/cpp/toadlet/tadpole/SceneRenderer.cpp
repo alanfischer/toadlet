@@ -212,7 +212,6 @@ void SceneRenderer::renderQueueItems(Material *material,const RenderableSet::Ren
 				mSceneParameters->setAmbient(item.ambient);
 
 				pass->updateVariables(Material::Scope_RENDERABLE,mSceneParameters);
-
 				setupVariableBuffers(pass,Material::Scope_RENDERABLE,mDevice);
 	
 				mSceneParameters->setRenderable(NULL);
