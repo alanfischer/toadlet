@@ -37,9 +37,9 @@ namespace peeper{
 class GLRenderDevice;
 class GLSLShaderState;
 
-class TOADLET_API GLSLVertexLayout{
+class TOADLET_API GLSLVertexLayout:public Object{
 public:
-	TOADLET_SPTR(GLSLVertexLayout);
+	TOADLET_OBJECT(GLSLVertexLayout);
 
 	GLSLVertexLayout(GLRenderDevice *renderDevice);
 	virtual ~GLSLVertexLayout();

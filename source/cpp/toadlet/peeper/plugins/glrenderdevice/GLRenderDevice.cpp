@@ -560,7 +560,12 @@ bool GLRenderDevice::setRenderTarget(RenderTarget *target){
 	mGLRenderTarget=gltarget;
 
 	if(mGLRenderTarget!=NULL){
-		mGLRenderTarget->activate();
+		bool result=mGLRenderTarget->activate();
+		if(result==false){
+			Error::unknown("unable to activate context");
+			return false;
+		}
+
 	}
 
 	TOADLET_CHECK_GLERROR("setRenderTarget");
@@ -2229,12 +2234,12 @@ GLuint GLRenderDevice::getGLFormat(int textureFormat,bool internal){
 				}
 			#endif
 			return GL_RGBA;
-		#if !defined(TOADLET_HAS_GLES) || defined(TOADLET_HAS_EAGL)
+		#if defined(TOADLET_HAS_GLFBOS)
 			case TextureFormat::Format_SEMANTIC_DEPTH:
 				if(internal && formatType==TextureFormat::Format_TYPE_UINT_16){
 					return GL_DEPTH_COMPONENT16;
 				}
-				#if !defined(TOADLET_HAS_EAGL)
+				#if !defined(TOADLET_HAS_GLES)
 					else if(internal && formatType==TextureFormat::Format_TYPE_UINT_24){
 						return GL_DEPTH_COMPONENT24;
 					}
