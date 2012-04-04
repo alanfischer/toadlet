@@ -560,12 +560,7 @@ bool GLRenderDevice::setRenderTarget(RenderTarget *target){
 	mGLRenderTarget=gltarget;
 
 	if(mGLRenderTarget!=NULL){
-		bool result=mGLRenderTarget->activate();
-		if(result==false){
-			Error::unknown("unable to activate context");
-			return false;
-		}
-
+		mGLRenderTarget->activate();
 	}
 
 	TOADLET_CHECK_GLERROR("setRenderTarget");
