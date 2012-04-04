@@ -205,13 +205,6 @@ bool EGLWindowRenderTarget::createContext(void *display,void *window,WindowRende
 		return false;
 	}
 
-	#if defined(TOADLET_HAS_EGL_12)
-	if(egl_version>=12){
-		eglBindAPI(EGL_OPENGL_ES_API);
-		TOADLET_CHECK_EGLERROR("eglBindAPI");
-	}
-	#endif
-
 	TOADLET_TRY
 		eglMakeCurrent(mDisplay,mSurface,mSurface,mContext);
 		TOADLET_CHECK_EGLERROR("eglMakeCurrent");

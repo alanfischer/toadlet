@@ -163,7 +163,7 @@ GLSLVertexLayout *GLSLShaderState::findVertexLayout(GLVertexFormat *vertexFormat
 		mLayouts.resize(handle+1,NULL);
 	}
 	if(mLayouts[handle]==NULL){
-		mLayouts[handle]=GLSLVertexLayout::ptr(new GLSLVertexLayout(mDevice));
+		mLayouts[handle]=new GLSLVertexLayout(mDevice);
 		mLayouts[handle]->create(vertexFormat,this);
 	}
 	return mLayouts[handle];

@@ -189,7 +189,6 @@ bool EGLPBufferRenderTarget::createBuffer(){
 
 	mSurface=eglCreatePbufferSurface(mDisplay,config,attribList);
 	TOADLET_CHECK_EGLERROR("eglCreatePbufferSurface");
-
 	if(mSurface==EGL_NO_SURFACE){
 		destroyBuffer();
 
@@ -213,11 +212,6 @@ bool EGLPBufferRenderTarget::createBuffer(){
 	}
 	else{
 		mContext=context;
-	}
-
-	if(eglBindAPI!=NULL){
-		eglBindAPI(EGL_OPENGL_ES_API);
-		TOADLET_CHECK_EGLERROR("eglBindAPI");
 	}
 
 	eglQuerySurface(mDisplay,mSurface,EGL_WIDTH,(int*)&mWidth);
@@ -264,7 +258,7 @@ void EGLPBufferRenderTarget::bind(){
 		TOADLET_CHECK_GLERROR("glBindTexture");
 		if(mCopy){
 			glCopyTexSubImage2D(mTexture->getTarget(),0,0,0,0,0,mWidth,mHeight);
-			TOADLET_CHECK_GLERROR("glBindTexture");
+			TOADLET_CHECK_GLERROR("glCopyTexSubImage2D");
 		}
 		else{
 			eglBindTexImage(mDisplay,mSurface,EGL_BACK_BUFFER);
