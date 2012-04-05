@@ -103,7 +103,7 @@ Resource::ptr AndroidTextureStreamer::load(Stream::ptr stream,ResourceData *data
 		return NULL;
 	}
 
-	TextureFormat::ptr textureFormat(new TextureFormat(TextureFormat::Dimension_D2,TextureFormat::Format_RGBA_8,width,height,1,0));
+	TextureFormat::ptr textureFormat(new TextureFormat(TextureFormat::Dimension_D2,TextureFormat::Format_BGRA_8,width,height,1,0));
 	tbyte *textureData=new tbyte[textureFormat->getDataSize()];
 
 	env->GetIntArrayRegion(pixels,0,width*height,(jint*)textureData);
