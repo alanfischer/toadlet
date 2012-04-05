@@ -27,6 +27,7 @@
 #define TOADLET_HOP_SOLID_H
 
 #include <toadlet/egg/Collection.h>
+#include <toadlet/egg/Object.h>
 #include <toadlet/hop/Types.h>
 #include <toadlet/hop/CollisionListener.h>
 #include <toadlet/hop/Shape.h>
@@ -38,9 +39,9 @@ class Constraint;
 class Simulator;
 class Manager;
 
-class TOADLET_API Solid{
+class TOADLET_API Solid:public Object{
 public:
-	TOADLET_SPTR(Solid);
+	TOADLET_OBJECT(Solid);
 
 	const static scalar INFINITE_MASS;	
 
@@ -96,10 +97,10 @@ public:
 	void setCoefficientOfEffectiveDrag(scalar coeff){mCoefficientOfEffectiveDrag=coeff;}
 	scalar getCoefficientOfEffectiveDrag() const{return mCoefficientOfEffectiveDrag;}
 
-	void addShape(Shape::ptr shape);
+	void addShape(Shape *shape);
 	void removeShape(Shape *shape);
 	void removeAllShapes();
-	Shape::ptr getShape(int i) const{return mShapes[i];}
+	Shape *getShape(int i) const{return mShapes[i];}
 	int getNumShapes() const{return mShapes.size();}
 	int getShapeTypes() const{return mShapeTypes;}
 

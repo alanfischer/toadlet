@@ -26,6 +26,7 @@
 #ifndef TOADLET_HOP_SHAPE_H
 #define TOADLET_HOP_SHAPE_H
 
+#include <toadlet/egg/Object.h>
 #include <toadlet/hop/Types.h>
 #include <toadlet/hop/TraceCallback.h>
 
@@ -35,9 +36,9 @@ namespace hop{
 class Solid;
 class Simulator;
 	
-class TOADLET_API Shape{
+class TOADLET_API Shape:public Object{
 public:
-	TOADLET_SPTR(Shape);
+	TOADLET_OBJECT(Shape);
 
 	enum Type{
 		Type_AABOX=			1<<0,

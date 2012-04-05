@@ -26,29 +26,30 @@
 #ifndef TOADLET_HOP_CONSTRAINT_H
 #define TOADLET_HOP_CONSTRAINT_H
 
+#include <toadlet/egg/Object.h>
 #include <toadlet/hop/Types.h>
 #include <toadlet/hop/Solid.h>
 
 namespace toadlet{
 namespace hop{
 
-class TOADLET_API Constraint{
+class TOADLET_API Constraint:public Object{
 public:
-	TOADLET_SPTR(Constraint);
+	TOADLET_OBJECT(Constraint);
 
 	Constraint();
-	Constraint(Solid::ptr startSolid,Solid::ptr endSolid);
-	Constraint(Solid::ptr startSolid,const Vector3 &endPoint);
+	Constraint(Solid *startSolid,Solid *endSolid);
+	Constraint(Solid *startSolid,const Vector3 &endPoint);
 	virtual ~Constraint();
 	void destroy();
 
 	void reset();
 
-	void setStartSolid(Solid::ptr startSolid);
-	Solid::ptr getStartSolid() const{return mStartSolid;}
+	void setStartSolid(Solid *startSolid);
+	Solid *getStartSolid() const{return mStartSolid;}
 
-	void setEndSolid(Solid::ptr endSolid);
-	Solid::ptr getEndSolid() const{return mEndSolid;}
+	void setEndSolid(Solid *endSolid);
+	Solid *getEndSolid() const{return mEndSolid;}
 
 	void setEndPoint(const Vector3 &endPoint);
 	const Vector3 &getEndPoint() const{return mEndPoint;}
