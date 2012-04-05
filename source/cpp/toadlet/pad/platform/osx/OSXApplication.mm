@@ -50,6 +50,7 @@ using namespace toadlet::pad;
 #if defined(TOADLET_HAS_OPENGL)
 	#if defined(TOADLET_HAS_UIKIT)
 		extern "C" RenderDevice *new_GLES1RenderDevice();
+		extern "C" RenderDevice *new_GLES2RenderDevice();
 		extern "C" RenderTarget *new_EAGLRenderTarget(void *display,void *layer,WindowRenderTargetFormat *format);
 	#else
 		extern "C" RenderDevice *new_GLRenderDevice();

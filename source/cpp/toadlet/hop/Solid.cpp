@@ -176,7 +176,7 @@ void Solid::addForce(const Vector3 &force){
 	activate();
 }
 
-void Solid::addShape(Shape::ptr shape){
+void Solid::addShape(Shape *shape){
 	mShapes.add(shape);
 	shape->mSolid=this;
 	updateLocalBound();

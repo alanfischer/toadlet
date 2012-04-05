@@ -43,7 +43,7 @@ Constraint::Constraint():
 	reset();
 }
 
-Constraint::Constraint(Solid::ptr startSolid,Solid::ptr endSolid):
+Constraint::Constraint(Solid *startSolid,Solid *endSolid):
 	//mStartSolid,
 	//mEndSolid,
 	//mEndPoint,
@@ -60,7 +60,7 @@ Constraint::Constraint(Solid::ptr startSolid,Solid::ptr endSolid):
 	setEndSolid(endSolid);
 }
 
-Constraint::Constraint(Solid::ptr startSolid,const Vector3 &endPoint):
+Constraint::Constraint(Solid *startSolid,const Vector3 &endPoint):
 	//mStartSolid,
 	//mEndSolid,
 	//mEndPoint,
@@ -105,7 +105,7 @@ void Constraint::destroy(){
 	}
 }
 
-void Constraint::setStartSolid(Solid::ptr startSolid){
+void Constraint::setStartSolid(Solid *startSolid){
 	if(mEndSolid!=NULL){
 		mEndSolid->activate();
 	}
@@ -123,7 +123,7 @@ void Constraint::setStartSolid(Solid::ptr startSolid){
 	}
 }
 
-void Constraint::setEndSolid(Solid::ptr endSolid){
+void Constraint::setEndSolid(Solid *endSolid){
 	if(mStartSolid!=NULL){
 		mStartSolid->activate();
 	}

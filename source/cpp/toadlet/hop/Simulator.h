@@ -27,6 +27,7 @@
 #define TOADLET_HOP_SIMULATOR_H
 
 #include <toadlet/egg/Collection.h>
+#include <toadlet/egg/Object.h>
 #include <toadlet/hop/Types.h>
 #include <toadlet/hop/Constraint.h>
 #include <toadlet/hop/Solid.h>
@@ -36,8 +37,10 @@
 namespace toadlet{
 namespace hop{
 
-class TOADLET_API Simulator{
+class TOADLET_API Simulator:public Object{
 public:
+	TOADLET_OBJECT(Simulator);
+
 	enum Integrator{
 		Integrator_EULER,
 		Integrator_IMPROVED,
@@ -93,15 +96,15 @@ public:
 	void setDeactivateSpeed(scalar speed){mDeactivateSpeed=speed;}
 	void setDeactivateCount(int count){mDeactivateCount=count;}
 
-	void addSolid(Solid::ptr solid);
+	void addSolid(Solid *solid);
 	void removeSolid(Solid *solid);
 	int getNumSolids() const{return mSolids.size();}
-	Solid::ptr getSolid(int i) const{return mSolids[i];}
+	Solid *getSolid(int i) const{return mSolids[i];}
 
-	void addConstraint(Constraint::ptr constraint);
+	void addConstraint(Constraint *constraint);
 	void removeConstraint(Constraint *constraint);
 	int getNumConstraints() const{return mConstraints.size();}
-	Constraint::ptr getConstraint(int i) const{return mConstraints[i];}
+	Constraint *getConstraint(int i) const{return mConstraints[i];}
 
 	void update(int dt,int scope=0,Solid *solid=NULL); // milliseconds
 

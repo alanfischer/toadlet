@@ -119,7 +119,7 @@ void Simulator::setGravity(const Vector3 &gravity){
 	}
 }
 
-void Simulator::addSolid(Solid::ptr solid){
+void Simulator::addSolid(Solid *solid){
 	if(mSolids.contains(solid)){
 		return;
 	}
@@ -172,7 +172,7 @@ void Simulator::removeSolid(Solid *solid){
 	mSolids.remove(solid);
 }
 
-void Simulator::addConstraint(Constraint::ptr constraint){
+void Simulator::addConstraint(Constraint *constraint){
 	if(mConstraints.contains(constraint)){
 		return;
 	}
