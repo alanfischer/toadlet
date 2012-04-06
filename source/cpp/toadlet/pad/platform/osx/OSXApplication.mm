@@ -51,7 +51,8 @@ using namespace toadlet::pad;
 	#if defined(TOADLET_HAS_UIKIT)
 		extern "C" RenderDevice *new_GLES1RenderDevice();
 		extern "C" RenderDevice *new_GLES2RenderDevice();
-		extern "C" RenderTarget *new_EAGLRenderTarget(void *display,void *layer,WindowRenderTargetFormat *format);
+		extern "C" RenderTarget *new_EAGL1RenderTarget(void *display,void *layer,WindowRenderTargetFormat *format);
+		extern "C" RenderTarget *new_EAGL2RenderTarget(void *display,void *layer,WindowRenderTargetFormat *format);
 	#else
 		extern "C" RenderDevice *new_GLRenderDevice();
 		extern "C" RenderTarget *new_NSGLRenderTarget(void *display,void *view,WindowRenderTargetFormat *format);
@@ -290,8 +291,8 @@ OSXApplication::OSXApplication():
 {
 	#if defined(TOADLET_HAS_OPENGL)
 		#if defined(TOADLET_HAS_UIKIT)
-			mRenderDevicePlugins.add("gles1",RenderDevicePlugin(new_EAGLRenderTarget,new_GLES1RenderDevice));
-			mRenderDevicePlugins.add("gles2",RenderDevicePlugin(new_EAGLRenderTarget,new_GLES2RenderDevice));
+			mRenderDevicePlugins.add("gles1",RenderDevicePlugin(new_EAGL1RenderTarget,new_GLES1RenderDevice));
+			mRenderDevicePlugins.add("gles2",RenderDevicePlugin(new_EAGL2RenderTarget,new_GLES2RenderDevice));
 			mRenderDevicePreferences.add("gles2");
 			mRenderDevicePreferences.add("gles1");
 		#else

@@ -36,6 +36,18 @@ TOADLET_C_API RenderTarget *new_EAGLRenderTarget(void *display,void *layer,Windo
 	return (GLRenderTarget*)(new EAGLRenderTarget((CAEAGLLayer*)layer,format));
 }
 
+#if defined(TOADLET_HAS_GL_11)
+	TOADLET_C_API RenderTarget *new_EAGL1RenderTarget(void *display,void *layer,WindowRenderTargetFormat *format){
+		format->flags=1;
+		return (GLRenderTarget*)(new EAGLRenderTarget((CAEAGLLayer*)layer,format));
+	}
+#elif defined(TOADLET_HAS_GL_20)
+	TOADLET_C_API RenderTarget *new_EAGL2RenderTarget(void *display,void *layer,WindowRenderTargetFormat *format){
+		format->flags=2;
+		return (GLRenderTarget*)(new EAGLRenderTarget((CAEAGLLayer*)layer,format));
+	}
+#endif
+
 EAGLRenderTarget::EAGLRenderTarget():GLFBORenderTarget(NULL),
 	mDrawable(nil),
 	mContext(nil),

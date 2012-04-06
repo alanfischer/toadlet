@@ -51,7 +51,7 @@ public:
 	inline const Vector3 &getLookAt() const{return mLookAt;}
 
 	void setValue(scalar value);
-	scalar getValue(){return mValue;}
+	scalar getValue() const{return mValue;}
 	scalar getMinValue() const{return 0;}
 	scalar getMaxValue() const{return mTrack->length;}
 

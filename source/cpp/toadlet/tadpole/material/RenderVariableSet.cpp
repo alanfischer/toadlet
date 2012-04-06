@@ -121,7 +121,6 @@ bool RenderVariableSet::findTexture(const String &name,Shader::ShaderType &type,
 
 // Search for the correct buffer and correct index
 bool RenderVariableSet::addVariable(const String &name,RenderVariable::ptr variable,int scope){
-	int offset=0;
 	BufferInfo *bufferInfo=NULL;
 	VariableBufferFormat::Variable *formatVariable=findFormatVariable(name,bufferInfo);
 	if(formatVariable!=NULL){

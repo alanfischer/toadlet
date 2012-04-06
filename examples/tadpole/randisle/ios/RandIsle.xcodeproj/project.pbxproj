@@ -18,6 +18,12 @@
 		8C29FA3510078B6C008DADF1 /* OpenGLES.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 8C29FA3110078B6C008DADF1 /* OpenGLES.framework */; };
 		8C29FA3610078B6C008DADF1 /* QuartzCore.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 8C29FA3210078B6C008DADF1 /* QuartzCore.framework */; };
 		8C35379114D20FF30068E9E0 /* frogskin1.png in Resources */ = {isa = PBXBuildFile; fileRef = 8C35379014D20FF30068E9E0 /* frogskin1.png */; };
+		8C5E7F94152F9B02005BBD2F /* bark_bump.png in Resources */ = {isa = PBXBuildFile; fileRef = 8C5E7F8F152F9B02005BBD2F /* bark_bump.png */; };
+		8C5E7F95152F9B02005BBD2F /* frogskin1_bump.png in Resources */ = {isa = PBXBuildFile; fileRef = 8C5E7F90152F9B02005BBD2F /* frogskin1_bump.png */; };
+		8C5E7F96152F9B02005BBD2F /* grass_bump.png in Resources */ = {isa = PBXBuildFile; fileRef = 8C5E7F91152F9B02005BBD2F /* grass_bump.png */; };
+		8C5E7F97152F9B02005BBD2F /* rock_bump.png in Resources */ = {isa = PBXBuildFile; fileRef = 8C5E7F92152F9B02005BBD2F /* rock_bump.png */; };
+		8C5E7F98152F9B02005BBD2F /* seafloor_bump.png in Resources */ = {isa = PBXBuildFile; fileRef = 8C5E7F93152F9B02005BBD2F /* seafloor_bump.png */; };
+		8C5E7F9A152F9B69005BBD2F /* water_bump.png in Resources */ = {isa = PBXBuildFile; fileRef = 8C5E7F99152F9B69005BBD2F /* water_bump.png */; };
 		8C7B604F13995EFD0095C5C5 /* Acorn.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 8C7B603C13995EFD0095C5C5 /* Acorn.cpp */; };
 		8C7B605013995EFD0095C5C5 /* HUD.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 8C7B604013995EFD0095C5C5 /* HUD.cpp */; };
 		8C7B605113995EFD0095C5C5 /* PathClimber.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 8C7B604213995EFD0095C5C5 /* PathClimber.cpp */; };
@@ -63,6 +69,12 @@
 		8C29FA3110078B6C008DADF1 /* OpenGLES.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = OpenGLES.framework; path = System/Library/Frameworks/OpenGLES.framework; sourceTree = SDKROOT; };
 		8C29FA3210078B6C008DADF1 /* QuartzCore.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = QuartzCore.framework; path = System/Library/Frameworks/QuartzCore.framework; sourceTree = SDKROOT; };
 		8C35379014D20FF30068E9E0 /* frogskin1.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = frogskin1.png; path = ../res/frogskin1.png; sourceTree = SOURCE_ROOT; };
+		8C5E7F8F152F9B02005BBD2F /* bark_bump.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = bark_bump.png; path = ../res/bark_bump.png; sourceTree = "<group>"; };
+		8C5E7F90152F9B02005BBD2F /* frogskin1_bump.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = frogskin1_bump.png; path = ../res/frogskin1_bump.png; sourceTree = "<group>"; };
+		8C5E7F91152F9B02005BBD2F /* grass_bump.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = grass_bump.png; path = ../res/grass_bump.png; sourceTree = "<group>"; };
+		8C5E7F92152F9B02005BBD2F /* rock_bump.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = rock_bump.png; path = ../res/rock_bump.png; sourceTree = "<group>"; };
+		8C5E7F93152F9B02005BBD2F /* seafloor_bump.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = seafloor_bump.png; path = ../res/seafloor_bump.png; sourceTree = "<group>"; };
+		8C5E7F99152F9B69005BBD2F /* water_bump.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = water_bump.png; path = ../res/water_bump.png; sourceTree = "<group>"; };
 		8C7B603C13995EFD0095C5C5 /* Acorn.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = Acorn.cpp; path = ../src/Acorn.cpp; sourceTree = SOURCE_ROOT; };
 		8C7B603D13995EFD0095C5C5 /* Acorn.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = Acorn.h; path = ../src/Acorn.h; sourceTree = SOURCE_ROOT; };
 		8C7B603E13995EFD0095C5C5 /* BranchSystem.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = BranchSystem.h; path = ../src/BranchSystem.h; sourceTree = SOURCE_ROOT; };
@@ -185,6 +197,12 @@
 		29B97317FDCFA39411CA2CEA /* Resources */ = {
 			isa = PBXGroup;
 			children = (
+				8C5E7F99152F9B69005BBD2F /* water_bump.png */,
+				8C5E7F8F152F9B02005BBD2F /* bark_bump.png */,
+				8C5E7F90152F9B02005BBD2F /* frogskin1_bump.png */,
+				8C5E7F91152F9B02005BBD2F /* grass_bump.png */,
+				8C5E7F92152F9B02005BBD2F /* rock_bump.png */,
+				8C5E7F93152F9B02005BBD2F /* seafloor_bump.png */,
 				8CE1607C14D351FC00D78CBD /* icon.png */,
 				8CCB5E9514D2371E001D1018 /* frog.tmsh */,
 				8CCB5E9614D2371E001D1018 /* rock.png */,
@@ -301,6 +319,12 @@
 				8CCB5E9914D2371E001D1018 /* rock.png in Resources */,
 				8CCB5E9A14D2371E001D1018 /* seafloor.png in Resources */,
 				8CE1607D14D351FC00D78CBD /* icon.png in Resources */,
+				8C5E7F94152F9B02005BBD2F /* bark_bump.png in Resources */,
+				8C5E7F95152F9B02005BBD2F /* frogskin1_bump.png in Resources */,
+				8C5E7F96152F9B02005BBD2F /* grass_bump.png in Resources */,
+				8C5E7F97152F9B02005BBD2F /* rock_bump.png in Resources */,
+				8C5E7F98152F9B02005BBD2F /* seafloor_bump.png in Resources */,
+				8C5E7F9A152F9B69005BBD2F /* water_bump.png in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -429,6 +453,7 @@
 				OTHER_LDFLAGS = (
 					"-ltoadlet_flick_iosmotiondevice_sd",
 					"-ltoadlet_ribbit_alaudiodevice_sd",
+					"-ltoadlet_peeper_gles2renderdevice_sd",
 					"-ltoadlet_peeper_gles1renderdevice_sd",
 					"-ltoadlet_tadpole_hop_sd",
 					"-ltoadlet_pad_sd",
@@ -462,6 +487,7 @@
 					"-ltoadlet_flick_iosmotiondevice_s",
 					"-ltoadlet_pad_s",
 					"-ltoadlet_ribbit_alaudiodevice_s",
+					"-ltoadlet_peeper_gles2renderdevice_s",
 					"-ltoadlet_peeper_gles1renderdevice_s",
 					"-ltoadlet_tadpole_hop_s",
 					"-ltoadlet_tadpole_s",
