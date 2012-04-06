@@ -216,7 +216,7 @@ bool GLRenderDevice::create(RenderTarget *target,int *options){
 		String("GL_RENDERER:") + glGetString(GL_RENDERER));
 	Logger::alert(Categories::TOADLET_PEEPER,
 		String("GL_VERSION:") + glGetString(GL_VERSION));
-	#if defined(TOADLET_HAS_GLSHADERS)
+	#if defined(TOADLET_HAS_GLSL)
 		Logger::alert(Categories::TOADLET_PEEPER,
 			String("GL_SHADING_LANGUAGE_VERSION:") + glGetString(GL_SHADING_LANGUAGE_VERSION));
 	#endif
@@ -334,10 +334,12 @@ bool GLRenderDevice::create(RenderTarget *target,int *options){
 			caps.pointSprites=(gl_version>=11);
 		#endif
 
-		caps.hasFixed[Shader::ShaderType_VERTEX]=useFixedFunction;
-		caps.hasFixed[Shader::ShaderType_FRAGMENT]=useFixedFunction;
-		caps.hasFixed[Shader::ShaderType_GEOMETRY]=useFixedFunction;
-
+		#if defined(TOADLET_HAS_GLFIXED)
+			caps.hasFixed[Shader::ShaderType_VERTEX]=useFixedFunction;
+			caps.hasFixed[Shader::ShaderType_FRAGMENT]=useFixedFunction;
+			caps.hasFixed[Shader::ShaderType_GEOMETRY]=useFixedFunction;
+		#endif
+		
 		#if !defined(TOADLET_FIXED_POINT) && defined(TOADLET_HAS_GLSL)
 			caps.hasShader[Shader::ShaderType_VERTEX]=useShaders;
 			caps.hasShader[Shader::ShaderType_FRAGMENT]=useShaders;
