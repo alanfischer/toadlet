@@ -32,18 +32,20 @@
 namespace toadlet{
 namespace peeper{
 
-TOADLET_C_API RenderTarget *new_EAGLRenderTarget(void *display,void *layer,WindowRenderTargetFormat *format){
-	return (GLRenderTarget*)(new EAGLRenderTarget((CAEAGLLayer*)layer,format));
-}
-
-#if defined(TOADLET_HAS_GL_11)
-	TOADLET_C_API RenderTarget *new_EAGL1RenderTarget(void *display,void *layer,WindowRenderTargetFormat *format){
-		format->flags=1;
-		return (GLRenderTarget*)(new EAGLRenderTarget((CAEAGLLayer*)layer,format));
-	}
-#elif defined(TOADLET_HAS_GL_20)
-	TOADLET_C_API RenderTarget *new_EAGL2RenderTarget(void *display,void *layer,WindowRenderTargetFormat *format){
-		format->flags=2;
+#if defined(TOADLET_HAS_GLES)
+	#if defined(TOADLET_HAS_GL_20)
+		TOADLET_C_API RenderTarget *new_EAGL2RenderTarget(void *display,void *layer,WindowRenderTargetFormat *format){
+			format->flags=2;
+			return (GLRenderTarget*)(new EAGLRenderTarget((CAEAGLLayer*)layer,format));
+		}
+	#else
+		TOADLET_C_API RenderTarget *new_EAGL1RenderTarget(void *display,void *layer,WindowRenderTargetFormat *format){
+			format->flags=1;
+			return (GLRenderTarget*)(new EAGLRenderTarget((CAEAGLLayer*)layer,format));
+		}
+	#endif
+#else
+	TOADLET_C_API RenderTarget *new_EAGLRenderTarget(void *display,void *layer,WindowRenderTargetFormat *format){
 		return (GLRenderTarget*)(new EAGLRenderTarget((CAEAGLLayer*)layer,format));
 	}
 #endif
