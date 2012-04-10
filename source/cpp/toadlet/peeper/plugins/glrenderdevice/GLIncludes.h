@@ -284,6 +284,9 @@
 		#define EGLWindowRenderTarget EGL2WindowRenderTarget
 		#define EGLRenderTarget		EGL2RenderTarget
 		#define EGLPBufferRenderTarget EGL2PBufferRenderTarget
+
+		#define EAGLWindowRenderTarget EAGL2WindowRenderTarget
+		#define EAGLRenderTarget	EAGL2RenderTarget
 	#else
 		#define GLBuffer			GLES1Buffer
 		#define GLFBOPixelBuffer	GLES1FBOPixelBuffer
