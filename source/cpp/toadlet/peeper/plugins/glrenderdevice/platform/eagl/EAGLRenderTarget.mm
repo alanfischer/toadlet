@@ -27,6 +27,7 @@
 #include "../../GLTexture.h"
 #include <toadlet/egg/Error.h>
 #include <toadlet/peeper/Texture.h>
+#include <toadlet/peeper/TextureFormat.h>
 #import <QuartzCore/QuartzCore.h>
 
 namespace toadlet{
@@ -83,7 +84,7 @@ bool EAGLRenderTarget::createContext(CAEAGLLayer *drawable,WindowRenderTargetFor
 	mDrawable.drawableProperties=[NSDictionary dictionaryWithObjectsAndKeys:
 		[NSNumber numberWithBool:YES],
 		kEAGLDrawablePropertyRetainedBacking,
-		kEAGLColorFormatRGBA8,
+		format->pixelFormat==TextureFormat::Format_RGB_5_6_5?kEAGLColorFormatRGB565:kEAGLColorFormatRGBA8,
 		kEAGLDrawablePropertyColorFormat,
 		nil
 	];
@@ -131,15 +132,21 @@ bool EAGLRenderTarget::createContext(CAEAGLLayer *drawable,WindowRenderTargetFor
 
 		glGenRenderbuffers(1,&mMSAARenderBufferHandle);
 		glBindRenderbuffer(GL_RENDERBUFFER,mMSAARenderBufferHandle);
-		glRenderbufferStorageMultisampleAPPLE(GL_RENDERBUFFER,format->multisamples,GL_RGBA4,width,height);
+		glRenderbufferStorageMultisampleAPPLE(GL_RENDERBUFFER,format->multisamples,getGLFormatSize(format->pixelFormat),width,height);
 		glFramebufferRenderbuffer(GL_FRAMEBUFFER,GL_COLOR_ATTACHMENT0,GL_RENDERBUFFER,mMSAARenderBufferHandle);
 		
 		glGenRenderbuffers(1,&mMSAADepthBufferHandle);
 		glBindRenderbuffer(GL_RENDERBUFFER,mMSAADepthBufferHandle);
 		glRenderbufferStorageMultisampleAPPLE(GL_RENDERBUFFER,format->multisamples,GL_DEPTH_COMPONENT16,width,height);
 		glFramebufferRenderbuffer(GL_FRAMEBUFFER,GL_DEPTH_ATTACHMENT,GL_RENDERBUFFER,mMSAADepthBufferHandle);
+		
+		GLenum status=glCheckFramebufferStatus(GL_FRAMEBUFFER);
+		if(status!=GL_FRAMEBUFFER_COMPLETE){
+			Logger::warning(Categories::TOADLET_PEEPER,String("FBO Warning:")+GLFBORenderTarget::getFBOMessage(status));
+			mMSAARenderTarget=NULL;
+		}
 	}
-	else{
+	if(mMSAARenderTarget==NULL){
 		/// @todo: Lets change this to not use GLFBOPixelBuffer, since the MSAA stuff doesn't anyways
 		if(format->depthBits!=0){
 			// No Depth-Stencil buffer, so add one
@@ -174,7 +181,6 @@ bool EAGLRenderTarget::destroyContext(){
 
 		if(mMSAARenderTarget!=NULL){
 			mMSAARenderTarget->destroy();
-			delete mMSAARenderTarget;
 			mMSAARenderTarget=NULL;
 
 			if(mMSAARenderBufferHandle!=0){
@@ -243,6 +249,22 @@ int EAGLRenderTarget::getHeight() const{
 	return [mDrawable bounds].size.height;
 }
 
+GLuint EAGLRenderTarget::getGLFormatSize(int textureFormat){
+	switch(textureFormat){
+		case TextureFormat::Format_RGB_8:
+			return GL_RGB8;
+		case TextureFormat::Format_RGB_5_6_5:
+			return GL_RGB565;
+		case TextureFormat::Format_RGBA_8:
+			return GL_RGBA8;
+		case TextureFormat::Format_RGBA_5_5_5_1:
+			return GL_RGB5_A1;
+		case TextureFormat::Format_RGBA_4_4_4_4:
+			return GL_RGBA4;
+	}
+	return 0;		
+}
+	
 }
 }
 

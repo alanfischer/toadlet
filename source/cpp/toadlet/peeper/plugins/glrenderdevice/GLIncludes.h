@@ -124,6 +124,14 @@
 	#define GL_SRC2_RGB GL_SOURCE2_RGB 
 #endif
 
+#if !defined(GL_RGB8) && defined(GL_RGB8_OES)
+	#define GL_RGB8 GL_RGB8_OES
+#endif
+
+#if !defined(GL_RGBA8) && defined(GL_RGBA8_OES)
+	#define GL_RGBA8 GL_RGBA8_OES
+#endif
+
 #if defined(TOADLET_HAS_GLES) && defined(TOADLET_HAS_GL_11)
 	#define GL_RENDERBUFFER GL_RENDERBUFFER_OES
 	#define GL_COLOR_ATTACHMENT0 GL_COLOR_ATTACHMENT0_OES

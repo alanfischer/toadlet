@@ -60,13 +60,15 @@ public:
 	int getWidth() const;
 	int getHeight() const;
 
+	static GLuint getGLFormatSize(int textureFormat);
+	
 protected:
 	CAEAGLLayer *mDrawable;
 	EAGLContext *mContext;
 	GLuint mRenderBufferHandle;
 	GLFBOPixelBuffer::ptr mDepthBuffer;
 
-	GLFBORenderTarget *mMSAARenderTarget;
+	GLFBORenderTarget::ptr mMSAARenderTarget;
 	GLuint mMSAARenderBufferHandle,mMSAADepthBufferHandle;
 };
 
