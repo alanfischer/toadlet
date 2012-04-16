@@ -282,9 +282,6 @@ bool D3D9WindowRenderTarget::createContext(HWND wnd,WindowRenderTargetFormat *fo
 	#endif
 	mD3DDevice->GetDepthStencilSurface(&mDepthSurface);
 
-	Logger::alert(Categories::TOADLET_PEEPER,
-		"context created");
-
 	return true;
 }
 

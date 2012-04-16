@@ -23,38 +23,19 @@
  *
  ********** Copyright header - do not remove **********/
 
-#ifndef TOADLET_TADPOLE_BASECOMPONENT_H
-#define TOADLET_TADPOLE_BASECOMPONENT_H
-
-#include <toadlet/egg/Object.h>
-#include <toadlet/tadpole/Component.h>
+#include <toadlet/tadpole/animation/BaseAnimation.h>
 
 namespace toadlet{
 namespace tadpole{
+namespace animation{
 
-class BaseComponent:public Object,public Component{
-public:
-	TOADLET_OBJECT(BaseComponent);
-	
-	virtual Node *isNode(){return NULL;}
-	
-	virtual void destroy(){}
+BaseAnimation::BaseAnimation():
+	mListener(NULL)
+{}
 
-	virtual void setName(const String &name){mName=name;}
-	inline const String &getName() const{return mName;}
-
-	virtual bool parentChanged(Node *node){return true;}
-
-	virtual void logicUpdate(int dt,int scope){}
-	virtual void frameUpdate(int dt,int scope){}
-
-	virtual bool getActive() const{return true;}
-
-protected:
-	String mName;
-};
+BaseAnimation::~BaseAnimation(){
+}
 
 }
 }
-
-#endif
+}

@@ -218,8 +218,6 @@ bool EGLWindowRenderTarget::createContext(void *display,void *window,WindowRende
 		}
 	#endif
 
-	Logger::debug("EGL context created");
-
 	return true;
 }
 

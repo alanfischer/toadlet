@@ -27,14 +27,14 @@
 #define TOADLET_TADPOLE_ANIMATION_NODEPATHANIMATION_H
 
 #include <toadlet/tadpole/TransformTrack.h>
-#include <toadlet/tadpole/animation/Animation.h>
+#include <toadlet/tadpole/animation/BaseAnimation.h>
 #include <toadlet/tadpole/node/Node.h>
 
 namespace toadlet{
 namespace tadpole{
 namespace animation{
 
-class TOADLET_API NodePathAnimation:protected Object,public Animation{
+class TOADLET_API NodePathAnimation:public BaseAnimation{
 public:
 	TOADLET_OBJECT(NodePathAnimation);
 

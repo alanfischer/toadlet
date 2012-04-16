@@ -23,37 +23,39 @@
  *
  ********** Copyright header - do not remove **********/
 
-#ifndef TOADLET_TADPOLE_BASECOMPONENT_H
-#define TOADLET_TADPOLE_BASECOMPONENT_H
+#ifndef TOADLET_TADPOLE_ANIMATION_BASEANIMATION_H
+#define TOADLET_TADPOLE_ANIMATION_BASEANIMATION_H
 
 #include <toadlet/egg/Object.h>
-#include <toadlet/tadpole/Component.h>
+#include <toadlet/tadpole/animation/Animation.h>
 
 namespace toadlet{
 namespace tadpole{
+namespace animation{
 
-class BaseComponent:public Object,public Component{
+class TOADLET_API BaseAnimation:protected Object,public Animation{
 public:
-	TOADLET_OBJECT(BaseComponent);
-	
-	virtual Node *isNode(){return NULL;}
-	
-	virtual void destroy(){}
+	TOADLET_OBJECT(BaseAnimation);
 
-	virtual void setName(const String &name){mName=name;}
-	inline const String &getName() const{return mName;}
+	BaseAnimation();
+	virtual ~BaseAnimation();
 
-	virtual bool parentChanged(Node *node){return true;}
+	void setValue(scalar value){}
+	scalar getMinValue() const{return 0;}
+	scalar getMaxValue() const{return 0;}
+	scalar getValue() const{return 0;}
 
-	virtual void logicUpdate(int dt,int scope){}
-	virtual void frameUpdate(int dt,int scope){}
+	void setWeight(scalar weight){}
+	scalar getWeight() const{return Math::ONE;}
 
-	virtual bool getActive() const{return true;}
+	void setAnimationListener(AnimationListener *listener){mListener=listener;}
+	AnimationListener *getAnimationListener() const{return mListener;}
 
 protected:
-	String mName;
+	AnimationListener *mListener;
 };
 
+}
 }
 }
 

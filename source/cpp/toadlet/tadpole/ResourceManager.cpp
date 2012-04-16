@@ -303,9 +303,6 @@ Resource::ptr ResourceManager::findFromFile(const String &name,ResourceData *dat
 
 				// We do not close the stream, since the Streamer may hold on to it.  Instead we let it close itself
 
-				Logger::debug(Categories::TOADLET_TADPOLE,
-					"loaded resource");
-
 				return resource;
 			}
 			else{

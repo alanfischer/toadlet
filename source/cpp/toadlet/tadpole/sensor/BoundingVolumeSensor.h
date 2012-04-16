@@ -26,15 +26,16 @@
 #ifndef TOADLET_TADPOLE_SENSOR_BOUNDINGVOLUMESENSOR_H
 #define TOADLET_TADPOLE_SENSOR_BOUNDINGVOLUMESENSOR_H
 
+#include <toadlet/egg/Object.h>
 #include <toadlet/tadpole/sensor/Sensor.h>
 
 namespace toadlet{
 namespace tadpole{
 namespace sensor{
 
-class TOADLET_API BoundingVolumeSensor:public Sensor{
+class TOADLET_API BoundingVolumeSensor:public Object,public Sensor{
 public:
-	TOADLET_SPTR(BoundingVolumeSensor);
+	TOADLET_OBJECT(BoundingVolumeSensor);
 
 	BoundingVolumeSensor(Scene *scene);
 

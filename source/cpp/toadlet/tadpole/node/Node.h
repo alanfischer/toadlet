@@ -106,7 +106,6 @@ public:
 	virtual Node *set(Node *node);
 	Node *clone(Scene *scene);
 
-	virtual Node *isNode(){return this;}
 	virtual Node *isEntity(){return NULL;}
 	virtual void *hasInterface(int type);
 
@@ -124,14 +123,11 @@ public:
 	virtual void nextChanged(Node *next){mNext=next;}
 
 	virtual bool attach(Component *component);
-	virtual void nodeAttached(Node *node){}
+	virtual void nodeAttached(Node *node);
 	virtual bool remove(Component *component);
-	virtual void nodeRemoved(Node *node){}
-	Node *getFirstChild(){return mFirstChild;}
-	Node *getLastChild(){return mLastChild;}
-
-	virtual void setDependsUpon(Node *node){mDependsUpon=node;}
-	inline Node *getDependsUpon() const{return mDependsUpon;}
+	virtual void nodeRemoved(Node *node);
+	virtual Node *getFirstChild() const{return mFirstChild;}
+	virtual Node *getLastChild() const{return mLastChild;}
 
 	virtual void mergeWorldBound(Node *child,bool justAttached);
 
@@ -166,9 +162,6 @@ public:
 	virtual void setScope(int scope){mScope=scope;}
 	inline int getScope() const{return mScope;}
 
-	virtual void setName(const String &name){mName=name;}
-	inline const String &getName() const{return mName;}
-
 	virtual void logicUpdate(int dt,int scope);
 	virtual void frameUpdate(int dt,int scope);
 
@@ -197,13 +190,12 @@ protected:
 
 	Node::ptr mParent,mPrevious,mNext;
 	void *mParentData;
+	Node::ptr mFirstChild,mLastChild;
 
 	Collection<Component::ptr> mComponents;
-	Node::ptr mFirstChild,mLastChild;
 	bool mChildrenActive;
 	bool mActivateChildren;
 
-	Node::ptr mDependsUpon;
 	bool mActive;
 	int mDeactivateCount;
 	int mLastLogicFrame;
@@ -215,7 +207,6 @@ protected:
 	Transform mWorldTransform;
 	Bound mWorldBound;
 	int mScope;
-	String mName;
 };
 
 }

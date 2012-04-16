@@ -98,7 +98,7 @@ bool TPKGArchive::open(Stream::ptr stream){
 
 Stream::ptr TPKGArchive::openStream(const String &name){
 	Logger::debug(Categories::TOADLET_TADPOLE,
-		"Creating InputStream for "+name);
+		"creating InputStream for "+name);
 
 	if(mStream==NULL){
 		Error::unknown(Categories::TOADLET_TADPOLE,

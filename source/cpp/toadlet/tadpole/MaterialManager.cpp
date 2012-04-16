@@ -138,8 +138,6 @@ RenderState::ptr MaterialManager::createRenderState(){
 	RenderDevice *renderDevice=mEngine->getRenderDevice();
 	RenderState::ptr renderState;
 	if(mEngine->isBackable()){
-		Logger::debug(Categories::TOADLET_TADPOLE,"creating BackableRenderState");
-
 		BackableRenderState::ptr backableRenderState(new BackableRenderState());
 		backableRenderState->create();
 		if(renderDevice!=NULL){
@@ -149,8 +147,6 @@ RenderState::ptr MaterialManager::createRenderState(){
 		renderState=backableRenderState;
 	}
 	else if(renderDevice!=NULL){
-		Logger::debug(Categories::TOADLET_TADPOLE,"creating RenderState");
-
 		renderState=RenderState::ptr(renderDevice->createRenderState());
 		if(renderState==NULL || renderState->create()==false){
 			return NULL;
@@ -170,8 +166,6 @@ ShaderState::ptr MaterialManager::createShaderState(){
 	RenderDevice *renderDevice=mEngine->getRenderDevice();
 	ShaderState::ptr shaderState;
 	if(mEngine->isShaderBackable()){
-		Logger::debug(Categories::TOADLET_TADPOLE,"creating BackableShaderState");
-
 		BackableShaderState::ptr backableShaderState(new BackableShaderState());
 		backableShaderState->create();
 		if(renderDevice!=NULL){
@@ -184,8 +178,6 @@ ShaderState::ptr MaterialManager::createShaderState(){
 		shaderState=backableShaderState;
 	}
 	else if(renderDevice!=NULL){
-		Logger::debug(Categories::TOADLET_TADPOLE,"creating ShaderState");
-
 		TOADLET_TRY
 			shaderState=ShaderState::ptr(renderDevice->createShaderState());
 		TOADLET_CATCH(const Exception &){}

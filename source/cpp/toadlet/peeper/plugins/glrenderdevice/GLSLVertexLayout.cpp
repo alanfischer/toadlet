@@ -41,9 +41,6 @@ GLSLVertexLayout::~GLSLVertexLayout(){
 }
 
 bool GLSLVertexLayout::create(GLVertexFormat *vertexFormat,GLSLShaderState *shaderState){
-	Logger::excess(Categories::TOADLET_PEEPER,
-		"GLSLVertexLayout::create");
-
 	mSemanticIndexes.resize(vertexFormat->getNumElements());
 
 	int i;

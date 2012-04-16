@@ -58,8 +58,6 @@ Shader::ptr ShaderManager::createShader(Shader::ShaderType type,const String pro
 
 	if(shader!=NULL){
 		manage(shared_static_cast<Shader>(shader));
-
-		Logger::debug(Categories::TOADLET_TADPOLE,"shader created");
 	}
 
 	return shader;

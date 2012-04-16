@@ -11,13 +11,13 @@ namespace animation{
 
 class Animation{
 public:
-	void setValue(float value)=0;
-	float getMinValue()=0;
-	float getMaxValue()=0;
-	float getValue()=0;
+	virtual void setValue(scalar value)=0;
+	virtual scalar getMinValue() const=0;
+	virtual scalar getMaxValue() const=0;
+	virtual scalar getValue() const=0;
 
-	void setWeight(float weight)=0;
-	float getWeight() const=0;
+	virtual void setWeight(scalar weight)=0;
+	virtual scalar getWeight() const=0;
 };
 
 }

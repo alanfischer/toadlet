@@ -49,9 +49,6 @@ JAudioBuffer::~JAudioBuffer(){
 }
 
 bool JAudioBuffer::create(AudioStream::ptr stream){
-	Logger::alert(Categories::TOADLET_RIBBIT,
-		"JAudioBuffer::create");
-
 	mAudioStream=stream; // Store the pointer until we have reference counting
 	jobject streamObj=NULL;
 

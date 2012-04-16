@@ -6,15 +6,36 @@ namespace toadlet{
 namespace tadpole{
 namespace animation{
 
+%feature("director") ControllerListener;
+
+class ControllerListener{
+public:
+	virtual void controllerFinished(toadlet::tadpole::animation::Controller *controller)=0;
+};
+
 class Controller:public Component{
 public:
-	Controller();
+	enum Cycling{
+		Cycling_NONE,
+		Cycling_LOOP,
+		Cycling_REFLECT,
+	};
+
+	void destroy();
+
+	void setName(String name);
+	String getName() const;
 
 	void setTime(int time);
-	int getTime();
+	int getTime() const;
 
-	void setTimeScale(float scale);
-	float getTimeScale();
+	void setTimeScale(scalar scale);
+	scalar getTimeScale() const;
+
+	void setCycling(Cycling cycling);
+	Cycling getCycling() const;
+
+	void setControllerListener(ControllerListener *listener);
 
 	void start();
 	void stop();

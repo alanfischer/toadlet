@@ -287,7 +287,7 @@ void BSP30Node::setSkyName(const String &skyName){
 }
 
 void BSP30Node::setSkyTextures(const String &skyDown,const String &skyUp,const String &skyWest,const String &skyEast,const String &skySouth,const String &skyNorth){
-	Logger::debug(Categories::TOADLET_TADPOLE,"Creating sky box");
+	Logger::debug(Categories::TOADLET_TADPOLE,"creating sky box");
 
 	if(mSkyNode!=NULL){
 		mSkyNode->destroy();

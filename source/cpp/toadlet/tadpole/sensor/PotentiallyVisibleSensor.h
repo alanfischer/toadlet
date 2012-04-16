@@ -26,15 +26,16 @@
 #ifndef TOADLET_TADPOLE_SENSOR_POTENTIALLYVISIBLESENSOR_H
 #define TOADLET_TADPOLE_SENSOR_POTENTIALLYVISIBLESENSOR_H
 
+#include <toadlet/egg/Object.h>
 #include <toadlet/tadpole/sensor/Sensor.h>
 
 namespace toadlet{
 namespace tadpole{
 namespace sensor{
 
-class TOADLET_API PotentiallyVisibleSensor:public Sensor{
+class TOADLET_API PotentiallyVisibleSensor:protected Object,public Sensor{
 public:
-	TOADLET_SPTR(PotentiallyVisibleSensor);
+	TOADLET_OBJECT(PotentiallyVisibleSensor);
 
 	PotentiallyVisibleSensor(Scene *scene);
 

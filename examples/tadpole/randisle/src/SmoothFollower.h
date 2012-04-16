@@ -20,7 +20,6 @@ public:
 	}
 
 	void setTarget(Node *parent,Node *target){
-		parent->setDependsUpon(target);
 		mTarget=target;
 
 		Vector3 position;

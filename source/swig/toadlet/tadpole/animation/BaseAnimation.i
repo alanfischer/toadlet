@@ -1,15 +1,15 @@
 %{
-#include <toadlet/tadpole/animation/MeshAnimation.h>
+#include <toadlet/tadpole/animation/BaseAnimation.h>
 %}
 
 namespace toadlet{
 namespace tadpole{
 namespace animation{
 
-class MeshAnimation:public Animation{
-public:
-	MeshAnimation(MeshNode *target,int sequenceIndex);
+%feature("director") BaseAnimation;
 
+class BaseAnimation:public Animation{
+public:
 	virtual void setValue(scalar value);
 	virtual scalar getMinValue() const;
 	virtual scalar getMaxValue() const;
