@@ -26,14 +26,14 @@
 #ifndef TOADLET_TADPOLE_ANIMATION_CAMERAPROJECTIONANIMATION_H
 #define TOADLET_TADPOLE_ANIMATION_CAMERAPROJECTIONANIMATION_H
 
-#include <toadlet/tadpole/animation/Animation.h>
+#include <toadlet/tadpole/animation/BaseAnimation.h>
 #include <toadlet/tadpole/node/CameraNode.h>
 
 namespace toadlet{
 namespace tadpole{
 namespace animation{
 
-class TOADLET_API CameraProjectionAnimation:protected Object,public Animation{
+class TOADLET_API CameraProjectionAnimation:public BaseAnimation{
 public:
 	TOADLET_OBJECT(CameraProjectionAnimation);
 

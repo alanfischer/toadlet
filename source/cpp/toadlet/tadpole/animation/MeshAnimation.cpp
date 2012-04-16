@@ -33,7 +33,6 @@ namespace tadpole{
 namespace animation{
 
 MeshAnimation::MeshAnimation(MeshNode *target,int sequenceIndex):
-	mListener(NULL),
 	mTarget(target),
 	mSequenceIndex(sequenceIndex),
 	mValue(0)

@@ -26,15 +26,16 @@
 #ifndef TOADLET_TADPOLE_SENSOR_TYPESENSOR_H
 #define TOADLET_TADPOLE_SENSOR_TYPESENSOR_H
 
+#include <toadlet/egg/Object.h>
 #include <toadlet/tadpole/sensor/Sensor.h>
 
 namespace toadlet{
 namespace tadpole{
 namespace sensor{
 
-class TOADLET_API TypeSensor:public Sensor{
+class TOADLET_API TypeSensor:protected Object,public Sensor{
 public:
-	TOADLET_SPTR(TypeSensor);
+	TOADLET_OBJECT(TypeSensor);
 
 	TypeSensor(Scene *scene);
 

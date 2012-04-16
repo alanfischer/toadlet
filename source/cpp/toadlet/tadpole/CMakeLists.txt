@@ -32,6 +32,7 @@ set (TADPOLE_SRC
 )
 
 set (TADPOLE_ANIMATION_SRC
+	animation/BaseAnimation.cpp
 	animation/Controller.cpp
 	animation/CameraProjectionAnimation.cpp
 	animation/NodePathAnimation.cpp
@@ -240,6 +241,7 @@ set (TADPOLE_HEADERS
 set (TADPOLE_ANIMATION_HEADERS
 	animation/Animation.h
 	animation/AnimationListener.h
+	animation/BaseAnimation.h
 	animation/Controller.h
 	animation/ControllerListener.h
 	animation/CameraProjectionAnimation.h

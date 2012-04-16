@@ -39,11 +39,12 @@ class Component:public Interface{
 public:
 	TOADLET_IPTR(Component);
 	
-	virtual Node *isNode()=0;
-	
 	virtual void destroy()=0;
 
 	virtual bool parentChanged(Node *node)=0;
+
+	virtual const String &getName() const=0;
+	virtual void setName(const String &name)=0;
 
 	virtual void logicUpdate(int dt,int scope)=0;
 	virtual void frameUpdate(int dt,int scope)=0;

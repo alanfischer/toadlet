@@ -23,6 +23,7 @@
  *
  ********** Copyright header - do not remove **********/
 
+#include <toadlet/egg/Logger.h>
 #include <toadlet/tadpole/animation/Controller.h>
 #include <toadlet/tadpole/Engine.h>
 
@@ -163,7 +164,7 @@ void Controller::setValue(scalar value){
 
 void Controller::attach(Animation *animation){
 	mAnimations.add(animation);
-	
+
 	animation->setAnimationListener(this);
 
 	animationExtentsChanged(animation);
@@ -184,7 +185,7 @@ void Controller::animationExtentsChanged(Animation *animation){
 	int i;
 	for(i=0;i<mAnimations.size();++i){
 		Animation *animation=mAnimations[i];
-		
+
 		scalar minValue=animation->getMinValue();
 		if(mMinValue<minValue){
 			mMinValue=minValue;

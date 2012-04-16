@@ -236,7 +236,7 @@ bool GLXPBufferRenderTarget::createBuffer(){
 	if(mPBuffer==None){
 		destroyBuffer();
 		Error::unknown(Categories::TOADLET_PEEPER,
-			"Error creating pbuffer");
+			"error creating pbuffer");
 		return false;
 	}
 	

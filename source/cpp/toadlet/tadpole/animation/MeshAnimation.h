@@ -27,7 +27,7 @@
 #define TOADLET_TADPOLE_ANIMATION_MESHANIMATION_H
 
 #include <toadlet/egg/Object.h>
-#include <toadlet/tadpole/animation/Animation.h>
+#include <toadlet/tadpole/animation/BaseAnimation.h>
 #include <toadlet/tadpole/node/MeshNode.h>
 
 namespace toadlet{
@@ -37,7 +37,7 @@ namespace animation{
 class Controller;
 
 // A simple animation for a Mesh
-class TOADLET_API MeshAnimation:protected Object,public Animation{
+class TOADLET_API MeshAnimation:public BaseAnimation{
 public:
 	TOADLET_OBJECT(MeshAnimation);
 
@@ -58,11 +58,7 @@ public:
 	void setWeight(scalar weight){}
 	scalar getWeight() const{return Math::ONE;}
 
-	void setAnimationListener(AnimationListener *listener){mListener=listener;}
-	AnimationListener *getAnimationListener() const{return mListener;}
-
 protected:
-	AnimationListener *mListener;
 	MeshNode::ptr mTarget;
 	int mSequenceIndex;
 	scalar mValue;

@@ -222,8 +222,6 @@ bool EGLPBufferRenderTarget::createBuffer(){
 		return false;
 	}
 
-	Logger::debug("EGL context created");
-
 	return true;
 }
 

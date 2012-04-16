@@ -47,7 +47,6 @@ Node::Node():BaseComponent(),
 	mChildrenActive(false),
 	mActivateChildren(false),
 
-	//mDependsUpon,
 	mActive(false),
 	mDeactivateCount(0),
 	mLastLogicFrame(0),
@@ -59,7 +58,6 @@ Node::Node():BaseComponent(),
 	//mWorldTransform,
 	//mWorldBound,
 	mScope(0)
-	//mName,
 {
 }
 
@@ -88,7 +86,6 @@ Node *Node::create(Scene *scene){
 	mChildrenActive=false;
 	mActivateChildren=true;
 
-	mDependsUpon=NULL;
 	mActive=true;
 	mDeactivateCount=0;
 	mTransformUpdatedFrame=-1;
@@ -98,7 +95,6 @@ Node *Node::create(Scene *scene){
 	mWorldTransform.reset();
 	mWorldBound.reset();
 	mScope=-1;
-	mName="";
 
 	return this;
 }
@@ -118,8 +114,6 @@ void Node::destroy(){
 		mParent->remove(this);
 		mParent=NULL;
 	}
-
-	mDependsUpon=NULL;
 
 	if(mEngine!=NULL){
 		mEngine->internal_deregisterNode(this);
@@ -156,26 +150,14 @@ void Node::destroyAllChildren(){
 }
 
 bool Node::attach(Component *component){
-	if(component->parentChanged(this)==false){
-		return false;
-	}
+	Component::ptr reference(component); // To make sure that the object is not released early
 
 	mComponents.add(component);
 
-	Node *node=component->isNode();
-	if(node!=NULL){
-		Node *previous=mLastChild;
-		node->previousChanged(previous);
-		if(previous!=NULL){
-			previous->nextChanged(node);
-		}
-		else{
-			mFirstChild=node;
-		}
-		mLastChild=node;
+	if(component->parentChanged(this)==false){
+		mComponents.remove(component);
 
-		node->nextChanged(NULL);
-		nodeAttached(node);
+		return false;
 	}
 
 	if(getActive()==false){
@@ -185,8 +167,24 @@ bool Node::attach(Component *component){
 	return true;
 }
 
+void Node::nodeAttached(Node *node){
+	mComponents.remove(node);
+
+	Node *previous=mLastChild;
+	node->previousChanged(previous);
+	if(previous!=NULL){
+		previous->nextChanged(node);
+	}
+	else{
+		mFirstChild=node;
+	}
+	mLastChild=node;
+
+	node->nextChanged(NULL);
+}
+
 bool Node::remove(Component *component){
-	Component::ptr reference(component); // To make sure that the object is not deleted until we can call parentChanged
+	Component::ptr reference(component); // To make sure that the object is not released early
 
 	if(component->parentChanged(NULL)==false){
 		return false;
@@ -194,30 +192,6 @@ bool Node::remove(Component *component){
 
 	mComponents.remove(component);
 
-	Node *node=component->isNode();
-	if(node!=NULL){
-		Node *previous=node->getPrevious();
-		Node *next=node->getNext();
-		if(previous!=NULL){
-			previous->nextChanged(next);
-		}
-		if(next!=NULL){
-			next->previousChanged(previous);
-		}
-
-		if(mFirstChild==node){
-			mFirstChild=next;
-		}
-		if(mLastChild==node){
-			mLastChild=previous;
-		}
-
-		node->previousChanged(NULL);
-		// Leave node->next so traversals can continue
-
-		nodeRemoved(node);
-	}
-
 	if(getActive()==false){
 		activate();
 	}
@@ -225,12 +199,41 @@ bool Node::remove(Component *component){
 	return true;
 }
 
+void Node::nodeRemoved(Node *node){
+	Node *previous=node->getPrevious();
+	Node *next=node->getNext();
+	if(previous!=NULL){
+		previous->nextChanged(next);
+	}
+	if(next!=NULL){
+		next->previousChanged(previous);
+	}
+
+	if(mFirstChild==node){
+		mFirstChild=next;
+	}
+	if(mLastChild==node){
+		mLastChild=previous;
+	}
+
+	node->previousChanged(NULL);
+	// Leave node->next so traversals can continue
+}
+
 bool Node::parentChanged(Node *node){
 	if(node!=NULL && mParent!=NULL){
 		mParent->remove(this);
 	}
 
+	if(mParent!=NULL){
+		mParent->nodeRemoved(this);
+	}
+
 	mParent=node;
+
+	if(mParent!=NULL){
+		mParent->nodeAttached(this);
+	}
 
 	return true;
 }
@@ -292,10 +295,8 @@ void Node::logicUpdate(int dt,int scope){
 	/// @todo: Use a linked list for the Components, and NOT check to see if they are a node here
 	int i;
 	for(i=0;i<mComponents.size();++i){
-		if(mComponents[i]->isNode()==NULL){
-			mComponents[i]->logicUpdate(dt,scope);
-			anyActive|=mComponents[i]->getActive();
-		}
+		mComponents[i]->logicUpdate(dt,scope);
+		anyActive|=mComponents[i]->getActive();
 	}
 	if(anyActive){
 		activate();
@@ -312,15 +313,9 @@ void Node::logicUpdate(int dt,int scope){
 			node->activate();
 		}
 		if(node->getActive() && (node->getScope()&scope)!=0){
-			Node *depends=node->getDependsUpon();
-			if(depends!=NULL && depends->mLastLogicFrame!=mScene->getLogicFrame()){
-				mScene->queueDependent(node);
-			}
-			else{
-				node->logicUpdate(dt,scope);
-				node->tryDeactivate();
-				mChildrenActive=true;
-			}
+			node->logicUpdate(dt,scope);
+			node->tryDeactivate();
+			mChildrenActive=true;
 		}
 		else{
 			mergeWorldBound(node,false);
@@ -336,9 +331,7 @@ void Node::frameUpdate(int dt,int scope){
 	/// @todo: Use a linked list for the Components, and NOT check to see if they are a node here
 	int i;
 	for(i=0;i<mComponents.size();++i){
-		if(mComponents[i]->isNode()==NULL){
-			mComponents[i]->frameUpdate(dt,scope);
-		}
+		mComponents[i]->frameUpdate(dt,scope);
 	}
 
 	updateWorldTransform();
@@ -352,13 +345,7 @@ void Node::frameUpdate(int dt,int scope){
 			node->activate();
 		}
 		if(node->getActive() && (node->getScope()&scope)!=0){
-			Node *depends=node->getDependsUpon();
-			if(depends!=NULL && depends->mLastFrame!=mScene->getFrame()){
-				mScene->queueDependent(node);
-			}
-			else{
-				node->frameUpdate(dt,scope);
-			}
+			node->frameUpdate(dt,scope);
 		}
 		else{
 			mergeWorldBound(node,false);

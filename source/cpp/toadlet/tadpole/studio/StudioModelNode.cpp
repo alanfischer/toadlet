@@ -346,8 +346,6 @@ void StudioModelNode::setSkin(int skin){
 void StudioModelNode::setLink(StudioModelNode::ptr link){
 	mLink=link;
 
-	setDependsUpon(mLink);
-
 	if(mLink==NULL){
 		return;
 	}

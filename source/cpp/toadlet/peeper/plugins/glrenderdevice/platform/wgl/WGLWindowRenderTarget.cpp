@@ -248,9 +248,6 @@ bool WGLWindowRenderTarget::createContext(HWND wnd,WindowRenderTargetFormat *for
 		}
 	}
 
-	Logger::alert(Categories::TOADLET_PEEPER,
-		"context created");
-
 	return true;
 }
 

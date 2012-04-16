@@ -88,7 +88,6 @@ public:
 	virtual void frameUpdate(int dt){frameUpdate(dt,-1);}
 	virtual void frameUpdate(int dt,int scope);
 	virtual void postFrameUpdate(int dt){}
-	virtual void queueDependent(Node *dependent);
 
 	virtual void render(RenderDevice *renderDevice,CameraNode *camera,Node *node);
 
@@ -118,7 +117,6 @@ protected:
 	int mLogicFrame;
 	int mAccumulatedDT;
 	int mFrame;
-	Collection<Node::ptr> mDependents;
 	bool mResetFrame;
 
 	Engine::ptr mEngine;

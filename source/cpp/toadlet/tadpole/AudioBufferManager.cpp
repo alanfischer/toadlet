@@ -34,8 +34,6 @@ AudioBufferManager::AudioBufferManager(Engine *engine):ResourceManager(engine){
 }
 
 AudioBuffer::ptr AudioBufferManager::createAudioBuffer(AudioStream::ptr stream){
-	Logger::debug(Categories::TOADLET_TADPOLE,"AudioBufferManager::createAudioBuffer");
-
 	AudioDevice *audioDevice=getAudioDevice();
 
 	if(audioDevice==NULL){
