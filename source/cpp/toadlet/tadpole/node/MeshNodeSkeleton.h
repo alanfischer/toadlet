@@ -40,9 +40,9 @@ namespace node{
 
 class MeshNode;
 
-class TOADLET_API MeshNodeSkeleton:public Renderable,public Attachable{
+class TOADLET_API MeshNodeSkeleton:protected Object,public Renderable,public Attachable{
 public:
-	TOADLET_SPTR(MeshNodeSkeleton);
+	TOADLET_OBJECT(MeshNodeSkeleton);
 
 	// BoneSpaceUpdate flags
 	const static int BoneSpaceUpdate_NONE=				0;

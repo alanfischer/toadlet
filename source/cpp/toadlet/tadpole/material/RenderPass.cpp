@@ -43,14 +43,24 @@ RenderPass::RenderPass(MaterialManager *manager,RenderState::ptr renderState,Sha
 {
 	mManager=manager;
 	if(renderState==NULL){
-		mRenderState=manager->createRenderState();
+		if(manager!=NULL){
+			mRenderState=manager->createRenderState();
+		}
+		else{
+			mRenderState=new BackableRenderState();
+		}
 		mOwnRenderState=mRenderState;
 	}
 	else{
 		mRenderState=renderState;
 	}
 	if(shaderState==NULL){
-		mShaderState=manager->createShaderState();
+		if(manager!=NULL){
+			mShaderState=manager->createShaderState();
+		}
+		else{
+			mShaderState=new BackableShaderState();
+		}
 		mOwnShaderState=mShaderState;
 	}
 	else{

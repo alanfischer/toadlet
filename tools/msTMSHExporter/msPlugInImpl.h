@@ -5,20 +5,19 @@
 #include "msLib.h"
 #include <toadlet/egg/io/FileStream.h>
 #include <toadlet/tadpole/Mesh.h>
-#include <toadlet/tadpole/handler/XMSHHandler.h>
-#include <toadlet/tadpole/handler/XANMHandler.h>
+#include <toadlet/tadpole/plugins/XMSHStreamer.h>
+#include <toadlet/tadpole/plugins/XANMStreamer.h>
 
 using namespace toadlet::egg;
 using namespace toadlet::egg::io;
 using namespace toadlet::tadpole;
-using namespace toadlet::tadpole::handler;
 
 struct msModel;
 class cPlugIn : public cMsPlugIn,public ProgressListener
 {
     char szTitle[64];
 	HWND hwndProgress;
-	Engine *engine;
+	Engine::ptr engine;
 
 	class Frame{
 	public:

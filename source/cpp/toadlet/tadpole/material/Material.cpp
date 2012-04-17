@@ -148,7 +148,7 @@ RenderPath::ptr Material::findFixedPath(){
 }
 
 bool Material::compile(){
-	return mManager->compileMaterial(this);
+	return mManager!=NULL?mManager->compileMaterial(this):NULL;
 }
 
 }
