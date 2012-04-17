@@ -41,7 +41,7 @@ void MeshPreprocess::adjustTexCoords(Mesh *mesh,float texCoordAdjust){
 
 	VertexBufferAccessor vba(vertexBuffer);
 	if(texCoordAdjust>0 && texCoordIndex>=0){
-		TOADLET_ASSERT(vertexFormat->getFormat(texCoordIndex)==(VertexFormat::Format_TYPE_FLOAT_32|VertexFormat::Format_COUNT_2));
+		TOADLET_ASSERT(vertexFormat->getElementFormat(texCoordIndex)==(VertexFormat::Format_TYPE_FLOAT_32|VertexFormat::Format_COUNT_2));
 
 		Collection<Collection<int> > texCoordFriends;
 		texCoordFriends.resize(vertexBuffer->getSize());

@@ -1,6 +1,6 @@
 #include <toadlet/toadlet.h>
-#include <toadlet/tadpole/handler/XANMHandler.h>
-#include <toadlet/tadpole/handler/XMSHHandler.h>
+#include <toadlet/tadpole/plugins/XANMStreamer.h>
+#include <toadlet/tadpole/plugins/XMSHStreamer.h>
 #include <iostream>
 
 int main(int argc,char **argv){
@@ -84,8 +84,8 @@ int main(int argc,char **argv){
 				std::cout << "Error opening " << (const char*)name << std::endl;
 				return 0;
 			}
-			XANMHandler::ptr handler(new XANMHandler());
-			handler->save(stream,sequence,NULL,NULL);
+			XANMStreamer::ptr streamer(new XANMStreamer());
+			streamer->save(stream,sequence,NULL,NULL);
 		}
 	}
 
@@ -105,8 +105,8 @@ int main(int argc,char **argv){
 				std::cout << "Error opening " << argv[i] << std::endl;
 				return 0;
 			}
-			XANMHandler::ptr handler(new XANMHandler());
-			TransformSequence::ptr sequence=shared_static_cast<TransformSequence>(handler->load(stream,NULL,NULL));
+			XANMStreamer::ptr streamer(new XANMStreamer());
+			TransformSequence::ptr sequence=shared_static_cast<TransformSequence>(streamer->load(stream,NULL,NULL));
 			skeleton->sequences.add(sequence);
 		}
 
@@ -115,8 +115,9 @@ int main(int argc,char **argv){
 			std::cout << "Error opening " << (const char*)mshFileName << std::endl;
 			return 0;
 		}
-		XMSHHandler::ptr handler(new XMSHHandler(NULL));
-		handler->save(stream,mesh,NULL,NULL);
+
+		XMSHStreamer::ptr streamer(new XMSHStreamer(NULL));
+		streamer->save(stream,mesh,NULL,NULL);
 	}
 
 	if(scale!=1.0f){
@@ -153,8 +154,9 @@ int main(int argc,char **argv){
 			std::cout << "Error opening " << (const char*)mshFileName << std::endl;
 			return 0;
 		}
-		XMSHHandler::ptr handler(new XMSHHandler(NULL));
-		handler->save(stream,mesh,NULL,NULL);
+
+		XMSHStreamer::ptr streamer(new XMSHStreamer(NULL));
+		streamer->save(stream,mesh,NULL,NULL);
 	}
 
 	std::cout << "complete" << std::endl;

@@ -244,12 +244,19 @@ Material::ptr XMLMeshUtilities::loadMaterial(mxml_node_t *materialNode,int versi
 	const char *prop=mxmlElementGetAttr(materialNode,"Name");
 
 	Material::ptr material;
-	if(prop!=NULL){
-		material=materialManager->findMaterial(prop);
+	if(materialManager!=NULL){
+		if(prop!=NULL){
+			material=materialManager->findMaterial(prop);
+		}
+		if(material==NULL){
+			material=materialManager->createDiffuseMaterial(NULL);
+		}
 	}
-	if(material==NULL){
-		material=materialManager->createDiffuseMaterial(NULL);
+	else{
+		material=new Material(NULL);
+		material->addPath()->addPass();
 	}
+
 	if(prop!=NULL){
 		material->setName(prop);
 	}

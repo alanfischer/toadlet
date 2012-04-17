@@ -1,5 +1,5 @@
 #include "VertexLighter.h"
-#include <toadlet/tadpole/handler/XMSHHandler.h>
+#include <toadlet/tadpole/plugins/XMSHStreamer.h>
 #include <iostream>
 
 int main(int argc,char **argv){
@@ -158,8 +158,8 @@ int main(int argc,char **argv){
 		int index=mshFileName.rfind('.');
 		if(index!=String::npos) extension=mshFileName.substr(index+1,mshFileName.length()).toLower();
 		if(extension=="xmsh"){
-			XMSHHandler handler(NULL);
-			handler.save(fout,mesh,NULL,NULL);
+			XMSHStreamer::ptr streamer=new XMSHStreamer(NULL);
+			streamer->save(fout,mesh,NULL,NULL);
 		}
 		else{
 			std::cerr << "Error saving \"" << (const char*)mshFileName << "\"" << std::endl;

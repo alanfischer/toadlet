@@ -1,7 +1,7 @@
 #include <toadlet/egg/String.h>
 #include <toadlet/egg/io/FileStream.h>
 #include <toadlet/tadpole/Engine.h>
-#include <toadlet/tadpole/handler/XMSHHandler.h>
+#include <toadlet/tadpole/plugins/XMSHStreamer.h>
 
 #include <iostream>
 
@@ -11,7 +11,6 @@ using namespace toadlet::egg;
 using namespace toadlet::egg::io;
 using namespace toadlet::egg::math;
 using namespace toadlet::tadpole;
-using namespace toadlet::tadpole::handler;
 
 int main(int argc,char **argv){
 	String arg;
@@ -65,8 +64,8 @@ int main(int argc,char **argv){
 		std::cout << "Error opening " << (const char*)mshFileName << std::endl;
 		return 0;
 	}
-	XMSHHandler::ptr handler(new XMSHHandler(NULL));
-	handler->save(stream,mesh,NULL,NULL);
+	XMSHStreamer::ptr streamer(new XMSHStreamer(NULL));
+	streamer->save(stream,mesh,NULL,NULL);
 
 	if(result){
 		std::cout << "complete" << std::endl;

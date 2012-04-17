@@ -1,6 +1,6 @@
 #include <toadlet/toadlet.h>
-#include <toadlet/tadpole/handler/TMSHHandler.h>
-#include <toadlet/tadpole/handler/XMSHHandler.h>
+#include <toadlet/tadpole/plugins/TMSHStreamer.h>
+#include <toadlet/tadpole/plugins/XMSHStreamer.h>
 #include <iostream>
 
 int main(int argc,char **argv){
@@ -67,12 +67,12 @@ int main(int argc,char **argv){
 	// Write to desired format
 	bool result=false;
 	if(xmsh){
-		XMSHHandler handler(engine);
-		result=handler.save(stream,mesh,NULL,NULL);
+		XMSHStreamer::ptr streamer=new XMSHStreamer(engine);
+		result=streamer->save(stream,mesh,NULL,NULL);
 	}
 	else{
-		TMSHHandler handler(engine);
-		result=handler.save(stream,mesh,NULL,NULL);
+		TMSHStreamer::ptr streamer=new TMSHStreamer(engine);
+		result=streamer->save(stream,mesh,NULL,NULL);
 	}
 
 	if(result){

@@ -289,7 +289,14 @@ void RenderVariableSet::buildBuffers(BufferManager *manager,RenderPass *pass){
 	for(i=0;i<Shader::ShaderType_MAX;++i){
 		for(j=0;j<mShaderState->getNumVariableBuffers((Shader::ShaderType)i);++j){
 			VariableBufferFormat::ptr format=mShaderState->getVariableBufferFormat((Shader::ShaderType)i,j);
-			VariableBuffer::ptr buffer=manager->createVariableBuffer(Buffer::Usage_BIT_DYNAMIC,Buffer::Access_BIT_WRITE,format);
+			VariableBuffer::ptr buffer;
+			if(manager!=NULL){
+				buffer=manager->createVariableBuffer(Buffer::Usage_BIT_DYNAMIC,Buffer::Access_BIT_WRITE,format);
+			}
+			else{
+				buffer=new BackableBuffer();
+				buffer->create(Buffer::Usage_BIT_DYNAMIC,Buffer::Access_BIT_WRITE,format);
+			}
 			addBuffer((Shader::ShaderType)i,j,buffer);
 		}
 	}

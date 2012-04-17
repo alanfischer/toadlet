@@ -280,7 +280,7 @@ Resource::ptr DiffuseMaterialCreator::create(const String &name,ResourceData *da
 }
 
 Material::ptr DiffuseMaterialCreator::createDiffuseMaterial(Texture::ptr texture){
-	Material::ptr material(new Material(mEngine->getMaterialManager()));
+	Material::ptr material=new Material(mEngine->getMaterialManager());
 
 	RenderState::ptr renderState=mEngine->getMaterialManager()->createRenderState();
 	renderState->setBlendState(BlendState());

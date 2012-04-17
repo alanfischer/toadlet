@@ -44,6 +44,7 @@ cPlugIn::cPlugIn ()
     strcpy (szTitle, "Toadlet Mesh/Animation...");
 
 	engine=new Engine(true);
+	engine->installHandlers();
 }
 
 
@@ -380,9 +381,9 @@ cPlugIn::exportMesh(msModel *pModel,const String &name){
 	}
 
 	FileStream::ptr stream(new FileStream(name,FileStream::Open_WRITE_BINARY));
-	XMSHHandler::ptr handler(new XMSHHandler(NULL));
+	XMSHStreamer::ptr streamer(new XMSHStreamer(engine));
 
-	handler->save(stream,mesh,NULL,this);
+	streamer->save(stream,mesh,NULL,this);
 
 	return 0;
 }
@@ -664,9 +665,9 @@ cPlugIn::exportAnimation(msModel *pModel,const String &name){
 	sequence->length=maxTime/fps;
 
 	FileStream::ptr stream(new FileStream(name,FileStream::Open_WRITE_BINARY));
-	XANMHandler::ptr handler(new XANMHandler());
+	XANMStreamer::ptr streamer(new XANMStreamer());
 
-	handler->save(stream,sequence,NULL,this);
+	streamer->save(stream,sequence,NULL,this);
 
 	return 0;
 }
