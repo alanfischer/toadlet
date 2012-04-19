@@ -141,9 +141,9 @@ int main(int argc,char **argv){
 				skeleton->bones[i]->worldToBoneTranslate*=scale;
 			}
 			for(i=0;i<skeleton->sequences.size();++i){
-				for(j=0;j<skeleton->sequences[i]->tracks.size();++j){
-					for(k=0;k<skeleton->sequences[i]->tracks[j]->keyFrames.size();++k){
-						skeleton->sequences[i]->tracks[j]->keyFrames[k].translate*=scale;
+				for(j=0;j<skeleton->sequences[i]->getNumTracks();++j){
+					for(k=0;k<skeleton->sequences[i]->getTrack(j)->keyFrames.size();++k){
+						skeleton->sequences[i]->getTrack(j)->keyFrames[k].translate*=scale;
 					}
 				}
 			}

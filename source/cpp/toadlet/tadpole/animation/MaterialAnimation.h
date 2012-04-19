@@ -23,38 +23,49 @@
  *
  ********** Copyright header - do not remove **********/
 
-#ifndef TOADLET_TADPOLE_BASECOMPONENT_H
-#define TOADLET_TADPOLE_BASECOMPONENT_H
+#ifndef TOADLET_TADPOLE_ANIMATION_MATERIALANIMATION_H
+#define TOADLET_TADPOLE_ANIMATION_MATERIALANIMATION_H
 
 #include <toadlet/egg/Object.h>
-#include <toadlet/tadpole/Component.h>
+#include <toadlet/tadpole/animation/BaseAnimation.h>
+#include <toadlet/tadpole/material/Material.h>
+#include <toadlet/tadpole/ColorSequence.h>
 
 namespace toadlet{
 namespace tadpole{
+namespace animation{
 
-class BaseComponent:public Object,public Component{
+class Controller;
+
+class TOADLET_API MaterialAnimation:public BaseAnimation{
 public:
-	TOADLET_OBJECT(BaseComponent);
-	
-	BaseComponent(){}
-	BaseComponent(const String &name){mName=name;}
+	TOADLET_OBJECT(MaterialAnimation);
 
-	virtual void destroy(){}
+	MaterialAnimation(Material *target,ColorSequence *sequence,int trackIndex=0);
+	virtual ~MaterialAnimation();
 
-	virtual void setName(const String &name){mName=name;}
-	inline const String &getName() const{return mName;}
+	void setTarget(Material *target);
+	inline Material *getTarget() const{return mTarget;}
 
-	virtual bool parentChanged(Node *node){return true;}
+	void setSequence(ColorSequence *sequence,int trackIndex);
+	inline ColorSequence *getSequence() const{return mSequence;}
 
-	virtual void logicUpdate(int dt,int scope){}
-	virtual void frameUpdate(int dt,int scope){}
+	void setValue(scalar value);
+	scalar getValue() const{return mValue;}
+	scalar getMinValue() const{return 0;}
+	scalar getMaxValue() const{return mSequence->getLength();}
 
-	virtual bool getActive() const{return true;}
+	void setWeight(scalar weight){}
+	scalar getWeight() const{return Math::ONE;}
 
 protected:
-	String mName;
+	Material::ptr mTarget;
+	ColorSequence::ptr mSequence;
+	ColorTrack::ptr mTrack;
+	scalar mValue;
 };
 
+}
 }
 }
 

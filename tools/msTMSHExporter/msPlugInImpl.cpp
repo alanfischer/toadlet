@@ -358,12 +358,14 @@ cPlugIn::exportMesh(msModel *pModel,const String &name){
 
 			MaterialState materialState;
 			{
+				materialState.light=true;
 				msMaterial_GetAmbient(msmat,materialState.ambient.getData());
 				msMaterial_GetDiffuse(msmat,materialState.diffuse.getData());
 				msMaterial_GetSpecular(msmat,materialState.specular.getData());
 				msMaterial_GetEmissive(msmat,materialState.emissive.getData());
 				materialState.shininess=msMaterial_GetShininess(msmat);
-				materialState.light=true;
+				float transparency=msMaterial_GetTransparency(msmat);
+				materialState.ambient.w=materialState.diffuse.w=materialState.specular.w=transparency;
 			}
 			material->getPass()->setMaterialState(materialState);
 
@@ -490,7 +492,7 @@ cPlugIn::exportAnimation(msModel *pModel,const String &name){
 		msBone *msbone=msModel_GetBoneAt(pModel,i);
 
 		TransformTrack::ptr track(new TransformTrack());
-		sequence->tracks.add(track);
+		sequence->addTrack(track);
 
 		track->index=newi;
 
@@ -658,11 +660,11 @@ cPlugIn::exportAnimation(msModel *pModel,const String &name){
 
 		// Cut track if it has no keyframes
 		if(track->keyFrames.size()==0){
-			sequence->tracks.erase(sequence->tracks.begin()+sequence->tracks.size()-1);
+			sequence->removeTrack(sequence->getNumTracks()-1);
 		}
 	}
 
-	sequence->length=maxTime/fps;
+	sequence->setLength(maxTime/fps);
 
 	FileStream::ptr stream(new FileStream(name,FileStream::Open_WRITE_BINARY));
 	XANMStreamer::ptr streamer(new XANMStreamer());

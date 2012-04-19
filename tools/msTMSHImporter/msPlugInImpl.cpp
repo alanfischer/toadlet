@@ -266,7 +266,8 @@ cPlugIn::importMesh(msModel *pModel,const String &name,int flags){
 					msMaterial_SetSpecular(msmat,(float*)materialState.specular.getData());
 					msMaterial_SetEmissive(msmat,(float*)materialState.emissive.getData());
 					msMaterial_SetShininess(msmat,materialState.shininess);
-					msMaterial_SetTransparency(msmat,1.0);
+					float transparency=(materialState.ambient.w+materialState.diffuse.w+materialState.specular.w)/3.0;
+					msMaterial_SetTransparency(msmat,transparency);
 				}
 
 				String textureName;//=material->getPass()->getTextureName(0);
@@ -409,7 +410,7 @@ cPlugIn::importAnimation(msModel *pModel,const String &name,int flags){
 		return -1;
 	}
 
-	if(sequence->tracks.size()>msModel_GetBoneCount(pModel)){
+	if(sequence->getNumTracks()>msModel_GetBoneCount(pModel)){
 		::MessageBox(NULL,"Toadlet Mesh/Animation Import","Invalid number of tracks vs bone count",MB_OK);
 		return -1;
 	}
@@ -417,8 +418,8 @@ cPlugIn::importAnimation(msModel *pModel,const String &name,int flags){
 	float fps=30.0f;
 
 	int i;
-	for(i=0;i<sequence->tracks.size();++i){
-		TransformTrack::ptr track=sequence->tracks[i];
+	for(i=0;i<sequence->getNumTracks();++i){
+		TransformTrack::ptr track=sequence->getTrack(i);
 
 		msBone *msbone=msModel_GetBoneAt(pModel,i);
 

@@ -26,6 +26,7 @@
 #include <toadlet/egg/Error.h>
 #include <toadlet/tadpole/Engine.h>
 #include <toadlet/tadpole/Scene.h>
+#include <toadlet/tadpole/Action.h>
 #include <toadlet/tadpole/node/Node.h>
 #include <toadlet/tadpole/node/CameraNode.h>
 
@@ -167,22 +168,6 @@ bool Node::attach(Component *component){
 	return true;
 }
 
-void Node::nodeAttached(Node *node){
-	mComponents.remove(node);
-
-	Node *previous=mLastChild;
-	node->previousChanged(previous);
-	if(previous!=NULL){
-		previous->nextChanged(node);
-	}
-	else{
-		mFirstChild=node;
-	}
-	mLastChild=node;
-
-	node->nextChanged(NULL);
-}
-
 bool Node::remove(Component *component){
 	Component::ptr reference(component); // To make sure that the object is not released early
 
@@ -197,6 +182,22 @@ bool Node::remove(Component *component){
 	}
 
 	return true;
+}
+
+void Node::nodeAttached(Node *node){
+	mComponents.remove(node);
+
+	Node *previous=mLastChild;
+	node->previousChanged(previous);
+	if(previous!=NULL){
+		previous->nextChanged(node);
+	}
+	else{
+		mFirstChild=node;
+	}
+	mLastChild=node;
+
+	node->nextChanged(NULL);
 }
 
 void Node::nodeRemoved(Node *node){
@@ -218,6 +219,33 @@ void Node::nodeRemoved(Node *node){
 
 	node->previousChanged(NULL);
 	// Leave node->next so traversals can continue
+}
+
+void Node::actionAttached(Action *action){
+	mActions.add(action);
+}
+
+void Node::actionRemoved(Action *action){
+	mActions.remove(action);
+}
+
+void Node::playAction(const String &action){
+	int i;
+	for(i=0;i<mActions.size();++i){
+		if(mActions[i]->getName()==action){
+			mActions[i]->start();
+		}
+	}
+}
+
+bool Node::getActionActive(const String &action){
+	int i;
+	for(i=0;i<mActions.size();++i){
+		if(mActions[i]->getName()==action){
+			return mActions[i]->getActive();
+		}
+	}
+	return false;
 }
 
 bool Node::parentChanged(Node *node){

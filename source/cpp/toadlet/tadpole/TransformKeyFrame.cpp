@@ -24,7 +24,6 @@
  ********** Copyright header - do not remove **********/
 
 #include <toadlet/tadpole/TransformKeyFrame.h>
-#include <toadlet/tadpole/node/Node.h>
 
 namespace toadlet{
 namespace tadpole{

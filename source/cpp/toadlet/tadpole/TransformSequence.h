@@ -42,9 +42,21 @@ public:
 	void destroy();
 	void compile();
 
-	Collection<TransformTrack::ptr> tracks;
-	scalar length; // calculated by compile
-	bool hasScale; // calculated by compile
+	int getNumTracks() const{return mTracks.size();}
+	void addTrack(TransformTrack::ptr track){mTracks.add(track);}
+	void removeTrack(int i){mTracks.removeAt(i);}
+	TransformTrack::ptr getTrack(int i){return mTracks[i];}
+
+	scalar getLength() const{return mLength;}
+	void setLength(scalar length){mLength=length;}
+	bool getScaled() const{return mScaled;}
+	void setScaled(bool scaled){mScaled=scaled;}
+	
+protected:
+	Collection<TransformTrack::ptr> mTracks;
+	// Calculated by compile
+	scalar mLength;
+	bool mScaled;
 };
 
 }

@@ -23,39 +23,37 @@
  *
  ********** Copyright header - do not remove **********/
 
-#ifndef TOADLET_TADPOLE_BASECOMPONENT_H
-#define TOADLET_TADPOLE_BASECOMPONENT_H
-
-#include <toadlet/egg/Object.h>
-#include <toadlet/tadpole/Component.h>
+#include <toadlet/tadpole/ColorSequence.h>
 
 namespace toadlet{
 namespace tadpole{
 
-class BaseComponent:public Object,public Component{
-public:
-	TOADLET_OBJECT(BaseComponent);
-	
-	BaseComponent(){}
-	BaseComponent(const String &name){mName=name;}
+ColorSequence::ColorSequence():
+	mLength(0)
+{
+}
 
-	virtual void destroy(){}
+ColorSequence::~ColorSequence(){
+	destroy();
+}
 
-	virtual void setName(const String &name){mName=name;}
-	inline const String &getName() const{return mName;}
+void ColorSequence::destroy(){
+}
 
-	virtual bool parentChanged(Node *node){return true;}
+void ColorSequence::compile(){
+	int i,j;
 
-	virtual void logicUpdate(int dt,int scope){}
-	virtual void frameUpdate(int dt,int scope){}
+	mLength=0;
+	for(i=0;i<mTracks.size();++i){
+		ColorTrack *track=mTracks[i];
 
-	virtual bool getActive() const{return true;}
+		track->compile();
 
-protected:
-	String mName;
-};
+		if(mLength<track->length){
+			mLength=track->length;
+		}
+	}
+}
 
 }
 }
-
-#endif

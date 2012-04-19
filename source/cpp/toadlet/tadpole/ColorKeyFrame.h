@@ -23,36 +23,21 @@
  *
  ********** Copyright header - do not remove **********/
 
-#ifndef TOADLET_TADPOLE_BASECOMPONENT_H
-#define TOADLET_TADPOLE_BASECOMPONENT_H
+#ifndef TOADLET_TADPOLE_COLORKEYFRAME_H
+#define TOADLET_TADPOLE_COLORKEYFRAME_H
 
-#include <toadlet/egg/Object.h>
-#include <toadlet/tadpole/Component.h>
+#include <toadlet/tadpole/Types.h>
+#include <toadlet/tadpole/Colors.h>
 
 namespace toadlet{
 namespace tadpole{
 
-class BaseComponent:public Object,public Component{
+class TOADLET_API ColorKeyFrame{
 public:
-	TOADLET_OBJECT(BaseComponent);
-	
-	BaseComponent(){}
-	BaseComponent(const String &name){mName=name;}
+	ColorKeyFrame(scalar time1=0,const Vector4 &color=Colors::WHITE);
 
-	virtual void destroy(){}
-
-	virtual void setName(const String &name){mName=name;}
-	inline const String &getName() const{return mName;}
-
-	virtual bool parentChanged(Node *node){return true;}
-
-	virtual void logicUpdate(int dt,int scope){}
-	virtual void frameUpdate(int dt,int scope){}
-
-	virtual bool getActive() const{return true;}
-
-protected:
-	String mName;
+	scalar time;
+	Vector4 color;
 };
 
 }

@@ -1598,21 +1598,21 @@ M3GObject3D *M3GConverter::buildSceneGraph(Mesh *toadletMesh,float scale,int for
 			// Here we are storing the length of the animation in milliseconds in the active interval
 			// We don't use it, and it will be ignored if start==end
 
-			animationController->activeIntervalStart=sequence->length;
-			animationController->activeIntervalEnd=sequence->length;
+			animationController->activeIntervalStart=sequence->getLength();
+			animationController->activeIntervalEnd=sequence->getLength();
 
 			animationController->userID=i+1;
 
 			skinnedMesh->userParameters[i].id=i+1;
 			skinnedMesh->userParameters[i].value.add(i+1);
 
-			for(j=0;j<sequence->tracks.size();++j){
-				TransformTrack *track=sequence->tracks[j];
+			for(j=0;j<sequence->getNumTracks();++j){
+				TransformTrack *track=sequence->getTrack(j);
 
 				M3GKeyframeSequence *translationSequence=new M3GKeyframeSequence();
 				translationSequence->repeatMode=M3GKeyframeSequence::CONSTANT;
 				translationSequence->interpolation=M3GKeyframeSequence::LINEAR;
-				translationSequence->duration=sequence->length;
+				translationSequence->duration=sequence->getLength();
 				translationSequence->validRangeFirst=0;
 				translationSequence->validRangeLast=track->keyFrames.size()-1;
 				translationSequence->componentCount=3;
@@ -1652,7 +1652,7 @@ M3GObject3D *M3GConverter::buildSceneGraph(Mesh *toadletMesh,float scale,int for
 				M3GKeyframeSequence *rotationSequence=new M3GKeyframeSequence();
 				rotationSequence->repeatMode=M3GKeyframeSequence::CONSTANT;
 				rotationSequence->interpolation=M3GKeyframeSequence::SLERP;
-				rotationSequence->duration=sequence->length;
+				rotationSequence->duration=sequence->getLength();
 				rotationSequence->validRangeFirst=0;
 				rotationSequence->validRangeLast=track->keyFrames.size()-1;
 				rotationSequence->componentCount=4;

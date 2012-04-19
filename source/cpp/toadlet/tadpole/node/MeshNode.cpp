@@ -35,6 +35,7 @@ namespace node{
 TOADLET_NODE_IMPLEMENT(MeshNode,Categories::TOADLET_TADPOLE_NODE+".MeshNode");
 
 MeshNode::SubMesh::SubMesh(MeshNode *meshNode,Mesh::SubMesh *meshSubMesh):
+	rendered(true),
 	hasOwnTransform(false),
 	scope(-1)
 {
@@ -235,7 +236,7 @@ void MeshNode::gatherRenderables(CameraNode *camera,RenderableSet *set){
 	int i;
 	for(i=0;i<mSubMeshes.size();++i){
 		SubMesh *subMesh=mSubMeshes[i];
-		if((subMesh->scope&camera->getScope())!=0 && (subMesh->hasOwnTransform==false || camera->culled(subMesh->worldBound)==false)){
+		if(subMesh->rendered && (subMesh->scope&camera->getScope())!=0 && (subMesh->hasOwnTransform==false || camera->culled(subMesh->worldBound)==false)){
 			set->queueRenderable(subMesh);
 		}
 	}
