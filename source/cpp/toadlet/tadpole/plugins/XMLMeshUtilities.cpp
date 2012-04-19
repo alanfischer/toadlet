@@ -980,7 +980,7 @@ TransformSequence::ptr XMLMeshUtilities::loadSequence(mxml_node_t *node,int vers
 		}
 
 		TransformTrack::ptr track(new TransformTrack());
-		sequence->tracks.add(track);
+		sequence->addTrack(track);
 
 		if(version<=2){
 			prop=mxmlElementGetAttr(trackNode,"Bone");
@@ -1037,15 +1037,15 @@ mxml_node_t *XMLMeshUtilities::saveSequence(TransformSequence::ptr sequence,int 
 		mxmlElementSetAttr(sequenceNode,"Name",sequence->getName());
 	}
 
-	mxmlElementSetAttr(sequenceNode,"Length",makeScalar(sequence->length));
+	mxmlElementSetAttr(sequenceNode,"Length",makeScalar(sequence->getLength()));
 
 	int j;
-	for(j=0;j<sequence->tracks.size();++j){
+	for(j=0;j<sequence->getNumTracks();++j){
 		if(listener!=NULL){
-			listener->progressUpdated((float)j/(float)sequence->tracks.size());
+			listener->progressUpdated((float)j/(float)sequence->getNumTracks());
 		}
 
-		TransformTrack::ptr track=sequence->tracks[j];
+		TransformTrack::ptr track=sequence->getTrack(j);
 
 		mxml_node_t *trackNode=mxmlNewElement(sequenceNode,"Track");
 

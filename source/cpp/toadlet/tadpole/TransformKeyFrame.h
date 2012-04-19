@@ -31,6 +31,7 @@
 namespace toadlet{
 namespace tadpole{
 
+/// @todo: Replace TransformKeyFrame/Track/Sequence with just KeyFrame/Track/Sequence that store a buffer of values, like a VertexFormat.
 class TOADLET_API TransformKeyFrame{
 public:
 	TransformKeyFrame(scalar time1=0,const Vector3 &translate1=Math::ZERO_VECTOR3,const Quaternion &rotate1=Math::IDENTITY_QUATERNION,const Vector3 &scale1=Math::ONE_VECTOR3);

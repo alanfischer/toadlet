@@ -23,39 +23,33 @@
  *
  ********** Copyright header - do not remove **********/
 
-#ifndef TOADLET_TADPOLE_BASECOMPONENT_H
-#define TOADLET_TADPOLE_BASECOMPONENT_H
+#ifndef TOADLET_TADPOLE_COLORTRACK_H
+#define TOADLET_TADPOLE_COLORTRACK_H
 
-#include <toadlet/egg/Object.h>
-#include <toadlet/tadpole/Component.h>
+#include <toadlet/egg/Collection.h>
+#include <toadlet/tadpole/Types.h>
+#include <toadlet/tadpole/ColorKeyFrame.h>
 
 namespace toadlet{
 namespace tadpole{
 
-class BaseComponent:public Object,public Component{
+class TOADLET_API ColorTrack{
 public:
-	TOADLET_OBJECT(BaseComponent);
-	
-	BaseComponent(){}
-	BaseComponent(const String &name){mName=name;}
+	TOADLET_SPTR(ColorTrack);
 
-	virtual void destroy(){}
+	ColorTrack();
 
-	virtual void setName(const String &name){mName=name;}
-	inline const String &getName() const{return mName;}
+	scalar getKeyFramesAtTime(scalar time,const ColorKeyFrame *&f1,const ColorKeyFrame *&f2,int &trackHint) const;
 
-	virtual bool parentChanged(Node *node){return true;}
+	void compile();
 
-	virtual void logicUpdate(int dt,int scope){}
-	virtual void frameUpdate(int dt,int scope){}
-
-	virtual bool getActive() const{return true;}
-
-protected:
-	String mName;
+	int index;
+	scalar length; // calculated by compile
+	Collection<ColorKeyFrame> keyFrames;
 };
 
 }
 }
 
 #endif
+

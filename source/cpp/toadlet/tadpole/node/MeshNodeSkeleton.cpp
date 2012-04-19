@@ -120,7 +120,7 @@ String MeshNodeSkeleton::getBoneName(int index) const{
 
 int MeshNodeSkeleton::updateBoneTransformation(Bone *bone){
 	if(mSequence!=NULL){
-		TransformTrack *track=mSequence->tracks[bone->index];
+		TransformTrack *track=mSequence->getTrack(bone->index);
 		scalar time=mSequenceTime;
 		if(track!=NULL){
 			const TransformKeyFrame *f1=NULL,*f2=NULL;

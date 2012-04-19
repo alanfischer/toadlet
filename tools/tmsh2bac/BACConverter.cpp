@@ -1153,10 +1153,10 @@ bool BACConverter::convertAnimation(Mesh::ptr mesh,TransformSequence *animation,
 void BACConverter::extractAnimationData(Mesh *mesh,TransformSequence *animation){
 	int i,j;
 
-	mTotalFrame=(animation->length*EXPORT_FPS)+1; // Must add 1 so we are above the max keyFrame.time*EXPORT_FPS
+	mTotalFrame=(animation->getLength()*EXPORT_FPS)+1; // Must add 1 so we are above the max keyFrame.time*EXPORT_FPS
 
-	for(i=0;i<animation->tracks.size();++i){
-		TransformTrack *track=animation->tracks[i];
+	for(i=0;i<animation->getNumTracks();++i){
+		TransformTrack *track=animation->getTrack(i);
 
 		int boneIndex=track->index;
 		Skeleton::Bone *meshbone=mesh->getSkeleton()->bones[boneIndex];

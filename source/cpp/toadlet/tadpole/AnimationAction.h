@@ -23,10 +23,11 @@
  *
  ********** Copyright header - do not remove **********/
 
-#ifndef TOADLET_TADPOLE_ANIMATION_CONTROLLER_H
-#define TOADLET_TADPOLE_ANIMATION_CONTROLLER_H
+#ifndef TOADLET_TADPOLE_ANIMATIONACTION_H
+#define TOADLET_TADPOLE_ANIMATIONACTION_H
 
 #include <toadlet/egg/Collection.h>
+#include <toadlet/tadpole/Action.h>
 #include <toadlet/tadpole/BaseComponent.h>
 #include <toadlet/tadpole/animation/Animation.h>
 #include <toadlet/tadpole/animation/ControllerListener.h>
@@ -35,12 +36,10 @@
 
 namespace toadlet{
 namespace tadpole{
-namespace animation{
 
-/// @todo: Remove this in favor of AnimationAction
-class TOADLET_API Controller:public BaseComponent,public AnimationListener{
+class TOADLET_API AnimationAction:public Action,public AnimationListener{
 public:
-	TOADLET_OBJECT(Controller);
+	TOADLET_OBJECT(AnimationAction);
 
 	enum Cycling{
 		Cycling_NONE,
@@ -48,12 +47,11 @@ public:
 		Cycling_REFLECT,
 	};
 
-	Controller();
-	virtual ~Controller();
+	AnimationAction(const String &name);
+	virtual ~AnimationAction();
 
-	virtual bool parentChanged(Node *node){mNode=node;return true;}
+	virtual void destroy(){}
 
-	virtual void logicUpdate(int dt,int scope){}
 	virtual void frameUpdate(int dt,int scope);
 
 	virtual bool getActive() const{return mRunning;}
@@ -70,8 +68,8 @@ public:
 	virtual void setInterpolator(Interpolator *interpolator);
 	inline Interpolator *getInterpolator() const{return mInterpolator;}
 
-	virtual void setControllerListener(ControllerListener *listener);
-	inline ControllerListener *getControllerListener() const{return mListener;}
+//	virtual void setControllerListener(ControllerListener *listener);
+//	inline ControllerListener *getControllerListener() const{return mListener;}
 
 	virtual void setMinMaxValue(scalar minValue,scalar maxValue){mMinValue=minValue;mMaxValue=maxValue;}
 	inline scalar getMinValue() const{return mMinValue;}
@@ -100,10 +98,9 @@ protected:
 	Interpolator::ptr mInterpolator;
 	scalar mTimeScale;
 	bool mRunning;
-	ControllerListener *mListener;
+//	AnimationListener *mListener;
 };
 
-}
 }
 }
 

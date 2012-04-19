@@ -23,36 +23,37 @@
  *
  ********** Copyright header - do not remove **********/
 
-#ifndef TOADLET_TADPOLE_BASECOMPONENT_H
-#define TOADLET_TADPOLE_BASECOMPONENT_H
+#ifndef TOADLET_TADPOLE_COLORSEQUENCE_H
+#define TOADLET_TADPOLE_COLORSEQUENCE_H
 
-#include <toadlet/egg/Object.h>
-#include <toadlet/tadpole/Component.h>
+#include <toadlet/egg/BaseResource.h>
+#include <toadlet/tadpole/ColorTrack.h>
 
 namespace toadlet{
 namespace tadpole{
 
-class BaseComponent:public Object,public Component{
+class TOADLET_API ColorSequence:public BaseResource{
 public:
-	TOADLET_OBJECT(BaseComponent);
+	TOADLET_RESOURCE(ColorSequence,ColorSequence);
+
+	ColorSequence();
+	virtual ~ColorSequence();
+
+	void destroy();
+	void compile();
+
+	int getNumTracks() const{return mTracks.size();}
+	void addTrack(ColorTrack::ptr track){mTracks.add(track);}
+	void removeTrack(int i){mTracks.removeAt(i);}
+	ColorTrack::ptr getTrack(int i){return mTracks[i];}
+
+	scalar getLength() const{return mLength;}
+	void setLength(scalar length){mLength=length;}
 	
-	BaseComponent(){}
-	BaseComponent(const String &name){mName=name;}
-
-	virtual void destroy(){}
-
-	virtual void setName(const String &name){mName=name;}
-	inline const String &getName() const{return mName;}
-
-	virtual bool parentChanged(Node *node){return true;}
-
-	virtual void logicUpdate(int dt,int scope){}
-	virtual void frameUpdate(int dt,int scope){}
-
-	virtual bool getActive() const{return true;}
-
 protected:
-	String mName;
+	Collection<ColorTrack::ptr> mTracks;
+	// Calculated by compile
+	scalar mLength;
 };
 
 }

@@ -29,8 +29,8 @@ namespace toadlet{
 namespace tadpole{
 
 TransformSequence::TransformSequence():
-	length(0),
-	hasScale(false)
+	mLength(0),
+	mScaled(false)
 {
 }
 
@@ -44,20 +44,20 @@ void TransformSequence::destroy(){
 void TransformSequence::compile(){
 	int i,j;
 
-	hasScale=false;
-	length=0;
-	for(i=0;i<tracks.size();++i){
-		TransformTrack *track=tracks[i];
+	mScaled=false;
+	mLength=0;
+	for(i=0;i<mTracks.size();++i){
+		TransformTrack *track=mTracks[i];
 
 		track->compile();
 
-		if(length<track->length){
-			length=track->length;
+		if(mLength<track->length){
+			mLength=track->length;
 		}
 
 		for(j=0;j<track->keyFrames.size();++j){
 			const Vector3 &scale=track->keyFrames[j].scale;
-			hasScale|=(scale.x!=Math::ONE || scale.y!=Math::ONE || scale.z!=Math::ONE);
+			mScaled|=(scale.x!=Math::ONE || scale.y!=Math::ONE || scale.z!=Math::ONE);
 		}
 	}
 }

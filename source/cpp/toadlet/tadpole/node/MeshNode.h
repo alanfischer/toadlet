@@ -53,6 +53,7 @@ public:
 		const Bound &getRenderBound() const{return hasOwnTransform?worldBound:meshNode->getWorldBound();}
 		void render(SceneRenderer *renderer) const;
 
+		bool rendered;
 		Material::ptr material;
 		IndexData::ptr indexData;
 		VertexData::ptr vertexData;

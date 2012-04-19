@@ -84,7 +84,7 @@ void SMDConverter::load(Engine *engine,Stream *in,const String &fileName){
 					mSkeleton->sequences.add(mSequence);
 
 					for(int i=0;i<mSkeleton->bones.size();++i){
-						mSequence->tracks.add(TransformTrack::ptr(new TransformTrack()));
+						mSequence->addTrack(TransformTrack::ptr(new TransformTrack()));
 					}
 				}
 			}
@@ -156,7 +156,7 @@ void SMDConverter::load(Engine *engine,Stream *in,const String &fileName){
 						setQuaternionFromXYZ(bone->rotate,MathConversion::floatToScalar(rx),MathConversion::floatToScalar(ry),MathConversion::floatToScalar(rz));
 					}
 					else{
-						TransformTrack::ptr track=mSequence->tracks.at(id);
+						TransformTrack::ptr track=mSequence->getTrack(id);
 
 						TransformKeyFrame keyFrame;
 						keyFrame.time=Math::fromInt(time)/mFPS;

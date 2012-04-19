@@ -4,9 +4,13 @@ configure_file (${CMAKE_CURRENT_SOURCE_DIR}/Version.h.cmake ${CMAKE_CURRENT_BINA
 
 # Source files for toadlet_tadpole
 set (TADPOLE_SRC
+	AnimationAction.cpp
 	ArchiveManager.cpp
 	AudioBufferManager.cpp
 	BufferManager.cpp
+	ColorKeyFrame.cpp
+	ColorSequence.cpp
+	ColorTrack.cpp
 	DecalShadowSceneRenderer.cpp
 	Engine.cpp
 	Font.cpp
@@ -36,6 +40,7 @@ set (TADPOLE_ANIMATION_SRC
 	animation/Controller.cpp
 	animation/CameraProjectionAnimation.cpp
 	animation/NodePathAnimation.cpp
+	animation/MaterialAnimation.cpp
 	animation/MeshAnimation.cpp
 )
 
@@ -187,6 +192,8 @@ set (TADPOLE_PLATFORM_WIN32_GDIPLUS_SRC
 
 # Headers
 set (TADPOLE_HEADERS
+	Action.h
+	AnimationAction.h
 	Attachable.h
 	ArchiveManager.h
 	AudioBufferStreamer.h
@@ -196,6 +203,9 @@ set (TADPOLE_HEADERS
 	BufferManager.h
 	Collision.h
 	Colors.h
+	ColorKeyFrame.h
+	ColorSequence.h
+	ColorTrack.h
 	Component.h
 	ContextListener.h
 	DecalShadowSceneRenderer.h
@@ -246,6 +256,7 @@ set (TADPOLE_ANIMATION_HEADERS
 	animation/ControllerListener.h
 	animation/CameraProjectionAnimation.h
 	animation/NodePathAnimation.h
+	animation/MaterialAnimation.h
 	animation/MeshAnimation.h
 )
 

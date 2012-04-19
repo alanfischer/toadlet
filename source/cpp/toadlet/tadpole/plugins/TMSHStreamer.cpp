@@ -515,12 +515,12 @@ void TMSHStreamer::writeSkeleton(DataStream *stream,Skeleton::ptr skeleton){
 TransformSequence::ptr TMSHStreamer::readSequence(egg::io::DataStream *stream,int blockSize){
 	TransformSequence::ptr sequence(new TransformSequence());
 
-	sequence->tracks.resize(stream->readInt32());
+	int numTracks=stream->readInt32();
 
 	int i,j;
-	for(i=0;i<sequence->tracks.size();++i){
+	for(i=0;i<numTracks;++i){
 		TransformTrack::ptr track(new TransformTrack());
-		sequence->tracks[i]=track;
+		sequence->addTrack(track);
 
 		track->index=stream->readInt32();
 		track->length=stream->readFloat();
@@ -536,18 +536,18 @@ TransformSequence::ptr TMSHStreamer::readSequence(egg::io::DataStream *stream,in
 		}
 	}
 
-	sequence->length=stream->readFloat();
-	sequence->hasScale=stream->readBool();
+	sequence->setLength(stream->readFloat());
+	sequence->setScaled(stream->readBool());
 
 	return sequence;
 }
 
 void TMSHStreamer::writeSequence(egg::io::DataStream *stream,TransformSequence::ptr sequence){
-	stream->writeInt32(sequence->tracks.size());
+	stream->writeInt32(sequence->getNumTracks());
 
 	int i,j;
-	for(i=0;i<sequence->tracks.size();++i){
-		TransformTrack *track=sequence->tracks[i];
+	for(i=0;i<sequence->getNumTracks();++i){
+		TransformTrack *track=sequence->getTrack(i);
 
 		stream->writeInt32(track->index);
 		stream->writeFloat(track->length);
@@ -562,8 +562,8 @@ void TMSHStreamer::writeSequence(egg::io::DataStream *stream,TransformSequence::
 		}
 	}
 
-	stream->writeFloat(sequence->length);
-	stream->writeBool(sequence->hasScale);
+	stream->writeFloat(sequence->getLength());
+	stream->writeBool(sequence->getScaled());
 }
 
 }

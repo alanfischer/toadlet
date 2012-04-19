@@ -61,6 +61,7 @@ namespace tadpole{
 class Engine;
 class RenderableSet;
 class Scene;
+class Action;
 
 namespace node{
 
@@ -123,11 +124,17 @@ public:
 	virtual void nextChanged(Node *next){mNext=next;}
 
 	virtual bool attach(Component *component);
-	virtual void nodeAttached(Node *node);
 	virtual bool remove(Component *component);
+
+	virtual void nodeAttached(Node *node);
 	virtual void nodeRemoved(Node *node);
 	virtual Node *getFirstChild() const{return mFirstChild;}
 	virtual Node *getLastChild() const{return mLastChild;}
+
+	virtual void actionAttached(Action *action);
+	virtual void actionRemoved(Action *action);
+	virtual void playAction(const String &name);
+	virtual bool getActionActive(const String &name);
 
 	virtual void mergeWorldBound(Node *child,bool justAttached);
 
@@ -195,6 +202,8 @@ protected:
 	Collection<Component::ptr> mComponents;
 	bool mChildrenActive;
 	bool mActivateChildren;
+
+	Collection<Action*> mActions;
 
 	bool mActive;
 	int mDeactivateCount;
