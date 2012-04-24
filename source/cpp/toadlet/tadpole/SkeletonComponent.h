@@ -23,26 +23,21 @@
  *
  ********** Copyright header - do not remove **********/
 
-#ifndef TOADLET_TADPOLE_NODE_MESHNODESKELETON_H
-#define TOADLET_TADPOLE_NODE_MESHNODESKELETON_H
+#ifndef TOADLET_TADPOLE_SKELETONCOMPONENT_H
+#define TOADLET_TADPOLE_SKELETONCOMPONENT_H
 
 #include <toadlet/tadpole/Attachable.h>
 #include <toadlet/tadpole/Renderable.h>
+#include <toadlet/tadpole/Engine.h>
 #include <toadlet/tadpole/Skeleton.h>
 #include <toadlet/tadpole/material/Material.h>
 
 namespace toadlet{
 namespace tadpole{
 
-class Engine;
-
-namespace node{
-
-class MeshNode;
-
-class TOADLET_API MeshNodeSkeleton:protected Object,public Renderable,public Attachable{
+class TOADLET_API SkeletonComponent:public BaseComponent,public Renderable,public Attachable{
 public:
-	TOADLET_OBJECT(MeshNodeSkeleton);
+	TOADLET_OBJECT(SkeletonComponent);
 
 	// BoneSpaceUpdate flags
 	const static int BoneSpaceUpdate_NONE=				0;
@@ -107,9 +102,11 @@ public:
 		bool useMatrixTransforms;
 	};
 
-	MeshNodeSkeleton(MeshNode *node,Skeleton::ptr skeleton);
+	SkeletonComponent(Skeleton *skeleton);
 	void destroy();
 
+	bool parentChanged(Node *node);
+	
 	void updateBones();
 	void updateBones(int sequenceIndex,scalar sequenceTime);
 	inline int getLastUpdateFrame() const{return mLastUpdateFrame;}
@@ -126,7 +123,7 @@ public:
 
 	const AABox &getBound(){return mBound;}
 
-	inline Skeleton::ptr getSkeleton() const{return mSkeleton;}
+	inline Skeleton *getSkeleton() const{return mSkeleton;}
 
 	void setRenderSkeleton(bool skeleton);
 	bool getRenderSkeleton() const{return mSkeletonMaterial!=NULL;}
@@ -152,7 +149,6 @@ protected:
 	void updateBone(Bone *bone);
 
 	Engine *mEngine;
-	MeshNode *mNode;
 	Skeleton::ptr mSkeleton;
 	Collection<Bone::ptr> mBones;
 	AABox mBound;
@@ -172,7 +168,6 @@ protected:
 	IndexData::ptr mHitBoxIndexData;
 };
 
-}
 }
 }
 

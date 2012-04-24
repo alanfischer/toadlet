@@ -30,7 +30,7 @@
 namespace toadlet{
 namespace tadpole{
 
-AnimationAction::AnimationAction(const String &name):Action(name),
+AnimationAction::AnimationAction(const String &name):BaseAction(name),
 	mNode(NULL),
 	mTime(0),
 	mMinValue(0),

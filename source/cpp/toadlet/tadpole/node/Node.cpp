@@ -249,21 +249,18 @@ bool Node::getActionActive(const String &action){
 }
 
 bool Node::parentChanged(Node *node){
-	if(node!=NULL && mParent!=NULL){
-		mParent->remove(this);
+	Node *parent=mParent;
+	
+	if(BaseComponent::parentChanged(node)){	
+		if(parent!=NULL){
+			parent->nodeRemoved(this);
+		}
+		if(mParent!=NULL){
+			mParent->nodeAttached(this);
+		}
+		return true;
 	}
-
-	if(mParent!=NULL){
-		mParent->nodeRemoved(this);
-	}
-
-	mParent=node;
-
-	if(mParent!=NULL){
-		mParent->nodeAttached(this);
-	}
-
-	return true;
+	return false;
 }
 
 void Node::setTranslate(const Vector3 &translate){

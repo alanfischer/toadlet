@@ -31,7 +31,7 @@
 #include <toadlet/tadpole/Mesh.h>
 #include <toadlet/tadpole/Renderable.h>
 #include <toadlet/tadpole/Visible.h>
-#include <toadlet/tadpole/node/MeshNodeSkeleton.h>
+#include <toadlet/tadpole/SkeletonComponent.h>
 #include <toadlet/tadpole/node/CameraAlignedNode.h>
 
 namespace toadlet{
@@ -73,15 +73,15 @@ public:
 	void *hasInterface(int type);
 
 	void setMesh(const String &name);
-	void setMesh(Mesh::ptr mesh);
-	const Mesh::ptr &getMesh() const{return mMesh;}
+	void setMesh(Mesh *mesh);
+	Mesh *getMesh() const{return mMesh;}
 
 	inline int getNumSubMeshes() const{return mSubMeshes.size();}
 	SubMesh *getSubMesh(int i){return mSubMeshes[i];}
 	SubMesh *getSubMesh(const String &name);
 
-	inline MeshNodeSkeleton::ptr getSkeleton() const{return mSkeleton;}
-	void setSkeleton(MeshNodeSkeleton::ptr skeleton);
+	inline SkeletonComponent *getSkeleton() const{return mSkeleton;}
+	void setSkeleton(SkeletonComponent *skeleton);
 
 	void frameUpdate(int dt,int scope);
 	void updateWorldTransform();
@@ -109,7 +109,7 @@ protected:
 	Mesh::ptr mMesh;
 	Collection<SubMesh::ptr> mSubMeshes;
 	RenderState::ptr mSharedRenderState;
-	MeshNodeSkeleton::ptr mSkeleton;
+	SkeletonComponent::ptr mSkeleton;
 	VertexData::ptr mDynamicVertexData;
 };
 

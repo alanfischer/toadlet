@@ -7,6 +7,7 @@ set (TADPOLE_SRC
 	AnimationAction.cpp
 	ArchiveManager.cpp
 	AudioBufferManager.cpp
+	BaseComponent.cpp
 	BufferManager.cpp
 	ColorKeyFrame.cpp
 	ColorSequence.cpp
@@ -28,6 +29,7 @@ set (TADPOLE_SRC
 	ShaderManager.cpp
 	ShadowMappedSceneRenderer.cpp
 	Skeleton.cpp
+	SkeletonComponent.cpp
 	TransformKeyFrame.cpp
 	TransformSequence.cpp
 	TransformTrack.cpp
@@ -129,7 +131,6 @@ set (TADPOLE_NODE_SRC
 	node/LabelNode.cpp
 	node/LightNode.cpp
 	node/MeshNode.cpp
-	node/MeshNodeSkeleton.cpp
 	node/Node.cpp
 	node/ParticleNode.cpp
 	node/PartitionNode.cpp
@@ -198,6 +199,7 @@ set (TADPOLE_HEADERS
 	ArchiveManager.h
 	AudioBufferStreamer.h
 	AudioBufferManager.h
+	BaseAction.h
 	BaseComponent.h
 	Bound.h
 	BufferManager.h
@@ -232,6 +234,7 @@ set (TADPOLE_HEADERS
 	ShaderManager.h
 	ShadowMappedSceneRenderer.h
 	Skeleton.h
+	SkeletonComponent.h
 	TextureManager.h
 	Traceable.h
 	Transform.h
@@ -352,7 +355,6 @@ set (TADPOLE_NODE_HEADERS
 	node/LabelNode.h
 	node/LightNode.h
 	node/MeshNode.h
-	node/MeshNodeSkeleton.h
 	node/Node.h
 	node/NodeResource.h
 	node/ParticleNode.h

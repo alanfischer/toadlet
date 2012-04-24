@@ -112,7 +112,7 @@ void MeshNode::setMesh(const String &name){
 	setMesh(mEngine->getMeshManager()->findMesh(name));
 }
 
-void MeshNode::setMesh(Mesh::ptr mesh){
+void MeshNode::setMesh(Mesh *mesh){
 	Logger::debug(Categories::TOADLET_TADPOLE,
 		"MeshNode::setMesh");
 
@@ -138,7 +138,8 @@ void MeshNode::setMesh(Mesh::ptr mesh){
 	setBound(mMesh->getBound());
 
 	if(mMesh->getSkeleton()!=NULL){
-		mSkeleton=MeshNodeSkeleton::ptr(new MeshNodeSkeleton(this,mMesh->getSkeleton()));
+		mSkeleton=new SkeletonComponent(mMesh->getSkeleton());
+		attach(mSkeleton);
 		createVertexBuffer();
 	}
 
@@ -179,7 +180,7 @@ MeshNode::SubMesh *MeshNode::getSubMesh(const String &name){
 	return NULL;
 }
 
-void MeshNode::setSkeleton(MeshNodeSkeleton::ptr skeleton){
+void MeshNode::setSkeleton(SkeletonComponent *skeleton){
 	mSkeleton=skeleton;
 }
 
@@ -293,7 +294,7 @@ void MeshNode::updateVertexBuffer(){
 					positionResult.reset();normalResult.reset();
 					const Mesh::VertexBoneAssignmentList &vba=vbas[i];
 					for(j=0;j<vba.size();++j){
-						MeshNodeSkeleton::Bone *bone=mSkeleton->getBone(vba[j].bone);
+						SkeletonComponent::Bone *bone=mSkeleton->getBone(vba[j].bone);
 
 						/// @todo: Move these ifs out to separate loops
 						if(bone->useMatrixTransforms){
@@ -332,7 +333,7 @@ void MeshNode::updateVertexBuffer(){
 					positionResult.reset();
 					const Mesh::VertexBoneAssignmentList &vba=vbas[i];
 					for(j=0;j<vba.size();++j){
-						MeshNodeSkeleton::Bone *bone=mSkeleton->getBone(vba[j].bone);
+						SkeletonComponent::Bone *bone=mSkeleton->getBone(vba[j].bone);
 
 						if(bone->useMatrixTransforms){
 							Math::mulPoint3Full(temp,bone->boneSpaceMatrix,positionInitial);

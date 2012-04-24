@@ -25,7 +25,7 @@
 
 #include <toadlet/tadpole/animation/MeshAnimation.h>
 #include <toadlet/tadpole/animation/Controller.h>
-#include <toadlet/tadpole/node/MeshNodeSkeleton.h>
+#include <toadlet/tadpole/SkeletonComponent.h>
 #include <toadlet/egg/Error.h>
 
 namespace toadlet{

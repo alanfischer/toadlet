@@ -27,8 +27,7 @@
 #define TOADLET_TADPOLE_ANIMATIONACTION_H
 
 #include <toadlet/egg/Collection.h>
-#include <toadlet/tadpole/Action.h>
-#include <toadlet/tadpole/BaseComponent.h>
+#include <toadlet/tadpole/BaseAction.h>
 #include <toadlet/tadpole/animation/Animation.h>
 #include <toadlet/tadpole/animation/ControllerListener.h>
 #include <toadlet/tadpole/animation/Interpolator.h>
@@ -37,9 +36,9 @@
 namespace toadlet{
 namespace tadpole{
 
-class TOADLET_API AnimationAction:public Action,public AnimationListener{
+class TOADLET_API AnimationAction:public BaseAction,public AnimationListener{
 public:
-	TOADLET_OBJECT(AnimationAction);
+	TOADLET_IPTR(AnimationAction);
 
 	enum Cycling{
 		Cycling_NONE,
@@ -49,8 +48,6 @@ public:
 
 	AnimationAction(const String &name);
 	virtual ~AnimationAction();
-
-	virtual void destroy(){}
 
 	virtual void frameUpdate(int dt,int scope);
 
