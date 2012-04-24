@@ -41,7 +41,7 @@ void ColorSequence::destroy(){
 }
 
 void ColorSequence::compile(){
-	int i,j;
+	int i;
 
 	mLength=0;
 	for(i=0;i<mTracks.size();++i){

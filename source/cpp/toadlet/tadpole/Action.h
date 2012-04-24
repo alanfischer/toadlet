@@ -26,21 +26,15 @@
 #ifndef TOADLET_TADPOLE_ACTION_H
 #define TOADLET_TADPOLE_ACTION_H
 
-#include <toadlet/tadpole/BaseComponent.h>
-#include <toadlet/tadpole/node/Node.h>
+#include <toadlet/tadpole/Component.h>
 
 namespace toadlet{
 namespace tadpole{
 
-class Action:public BaseComponent{
+class Action:public Component{
 public:
-	TOADLET_OBJECT(Action);
+	TOADLET_IPTR(Action);
 	
-	Action():BaseComponent(){}
-	Action(const String &name):BaseComponent(name){}
-
-	virtual bool parentChanged(Node *node){node->actionAttached(this);return true;}
-
 	virtual void start()=0;
 	virtual void stop()=0;
 	

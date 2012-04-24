@@ -26,14 +26,13 @@
 #include <toadlet/tadpole/Colors.h>
 #include <toadlet/tadpole/Engine.h>
 #include <toadlet/tadpole/Scene.h>
-#include <toadlet/tadpole/node/MeshNodeSkeleton.h>
-#include <toadlet/tadpole/node/MeshNode.h>
+#include <toadlet/tadpole/SkeletonComponent.h>
 
 namespace toadlet{
 namespace tadpole{
-namespace node{
 
-MeshNodeSkeleton::MeshNodeSkeleton(MeshNode* node,Skeleton::ptr skeleton):
+SkeletonComponent::SkeletonComponent(Skeleton *skeleton):
+	mEngine(NULL),
 	//mSkeleton,
 	//mBones,
 	mLastUpdateFrame(-1),
@@ -41,8 +40,6 @@ MeshNodeSkeleton::MeshNodeSkeleton(MeshNode* node,Skeleton::ptr skeleton):
 	//mSequence,
 	mSequenceTime(0)
 {
-	mEngine=node->getEngine();
-	mNode=node;
 	mSkeleton=skeleton;
 
 	mBones.resize(skeleton->bones.size());
@@ -56,13 +53,21 @@ MeshNodeSkeleton::MeshNodeSkeleton(MeshNode* node,Skeleton::ptr skeleton):
 	updateBones();
 }
 
-void MeshNodeSkeleton::destroy(){
+void SkeletonComponent::destroy(){
 	mSkeletonMaterial=NULL;
 
 	destroySkeletonBuffers();
 }
 
-void MeshNodeSkeleton::updateBones(){
+bool SkeletonComponent::parentChanged(Node *node){
+	if(BaseComponent::parentChanged(node)){
+		mEngine=node->getEngine();
+		return true;
+	}
+	return false;
+}
+
+void SkeletonComponent::updateBones(){
 	int i;
 	for(i=0;i<mBones.size();++i){
 		updateBone(mBones[i]);
@@ -79,17 +84,16 @@ void MeshNodeSkeleton::updateBones(){
 		updateSkeletonBuffers();
 	}
 
-	mNode->activate();
-
-	if(mNode!=NULL){
-		mLastUpdateFrame=mNode->getScene()->getFrame();
+	if(mParent!=NULL){
+		mParent->activate();
+		mLastUpdateFrame=mParent->getScene()->getFrame();
 	}
 	else{
 		mLastUpdateFrame=-1;
 	}
 }
 
-void MeshNodeSkeleton::updateBones(int sequenceIndex,scalar sequenceTime){
+void SkeletonComponent::updateBones(int sequenceIndex,scalar sequenceTime){
 	if(sequenceIndex>=0 && sequenceIndex<mSkeleton->sequences.size()){
 		mSequence=mSkeleton->sequences[sequenceIndex];
 		mSequenceTime=sequenceTime;
@@ -98,7 +102,7 @@ void MeshNodeSkeleton::updateBones(int sequenceIndex,scalar sequenceTime){
 	updateBones();
 }
 
-int MeshNodeSkeleton::getBoneIndex(const String &name) const{
+int SkeletonComponent::getBoneIndex(const String &name) const{
 	int i;
 	for(i=0;i<mSkeleton->bones.size();++i){
 		if(mSkeleton->bones[i]->name.equals(name)){
@@ -109,7 +113,7 @@ int MeshNodeSkeleton::getBoneIndex(const String &name) const{
 	return -1;
 }
 
-String MeshNodeSkeleton::getBoneName(int index) const{
+String SkeletonComponent::getBoneName(int index) const{
 	if(index>=0 && index<mSkeleton->bones.size()){
 		return mSkeleton->bones[index]->name;
 	}
@@ -118,7 +122,7 @@ String MeshNodeSkeleton::getBoneName(int index) const{
 	}
 }
 
-int MeshNodeSkeleton::updateBoneTransformation(Bone *bone){
+int SkeletonComponent::updateBoneTransformation(Bone *bone){
 	if(mSequence!=NULL){
 		TransformTrack *track=mSequence->getTrack(bone->index);
 		scalar time=mSequenceTime;
@@ -142,7 +146,7 @@ int MeshNodeSkeleton::updateBoneTransformation(Bone *bone){
 	return bone->dontUpdateFlags;
 }
 
-void MeshNodeSkeleton::updateBone(Bone *bone){
+void SkeletonComponent::updateBone(Bone *bone){
 	int updateFlags=BoneSpaceUpdate_NONE;
 
 	Skeleton::Bone *sbone=mSkeleton->bones[bone->index];
@@ -241,7 +245,7 @@ void MeshNodeSkeleton::updateBone(Bone *bone){
 	}
 }
 
-void MeshNodeSkeleton::setRenderSkeleton(bool skeleton){
+void SkeletonComponent::setRenderSkeleton(bool skeleton){
 	if(skeleton){
 		if(mSkeletonMaterial==NULL){
 			mSkeletonMaterial=mEngine->getMaterialManager()->createMaterial();
@@ -262,7 +266,7 @@ void MeshNodeSkeleton::setRenderSkeleton(bool skeleton){
 	}
 }
 
-void MeshNodeSkeleton::createSkeletonBuffers(){
+void SkeletonComponent::createSkeletonBuffers(){
 	int i;
 
 	IndexBuffer::ptr skeletonIndexBuffer=mEngine->getBufferManager()->createIndexBuffer(Buffer::Usage_BIT_STATIC,Buffer::Access_BIT_WRITE,IndexBuffer::IndexFormat_UINT16,(mBones.size()-1)*2);
@@ -287,7 +291,7 @@ void MeshNodeSkeleton::createSkeletonBuffers(){
 	updateSkeletonBuffers();
 }
 
-void MeshNodeSkeleton::updateSkeletonBuffers(){
+void SkeletonComponent::updateSkeletonBuffers(){
 	Vector3 v;
 	VertexBufferAccessor vba;
 	vba.lock(mSkeletonVertexBuffer,Buffer::Access_BIT_WRITE);
@@ -314,7 +318,7 @@ void MeshNodeSkeleton::updateSkeletonBuffers(){
 	vba.unlock();
 }
 
-void MeshNodeSkeleton::destroySkeletonBuffers(){
+void SkeletonComponent::destroySkeletonBuffers(){
 	if(mSkeletonVertexData!=NULL){
 		mSkeletonVertexData->destroy();
 		mSkeletonIndexData->destroy();
@@ -332,21 +336,21 @@ void MeshNodeSkeleton::destroySkeletonBuffers(){
 	}
 }
 
-const Transform &MeshNodeSkeleton::getRenderTransform() const{
-	return mNode!=NULL?mNode->getWorldTransform():Node::identityTransform();
+const Transform &SkeletonComponent::getRenderTransform() const{
+	return mParent!=NULL?mParent->getWorldTransform():Node::identityTransform();
 }
 
-const Bound &MeshNodeSkeleton::getRenderBound() const{
-	return mNode!=NULL?mNode->getWorldBound():Node::zeroBound();
+const Bound &SkeletonComponent::getRenderBound() const{
+	return mParent!=NULL?mParent->getWorldBound():Node::zeroBound();
 }
 
-void MeshNodeSkeleton::render(SceneRenderer *renderer) const{
+void SkeletonComponent::render(SceneRenderer *renderer) const{
 	renderer->getDevice()->renderPrimitive(mSkeletonVertexData,mSkeletonIndexData);
 
 	renderer->getDevice()->renderPrimitive(mHitBoxVertexData,mHitBoxIndexData);
 }
 
-bool MeshNodeSkeleton::getAttachmentTransform(Transform &result,int index){
+bool SkeletonComponent::getAttachmentTransform(Transform &result,int index){
 	if(index>=0 && index<mBones.size()){
 		Bone *bone=mBones[index];
 		result.setTranslate(bone->worldTranslate);
@@ -358,6 +362,5 @@ bool MeshNodeSkeleton::getAttachmentTransform(Transform &result,int index){
 	}
 }
 
-}
 }
 }

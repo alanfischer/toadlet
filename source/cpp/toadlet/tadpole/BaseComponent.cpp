@@ -23,41 +23,38 @@
  *
  ********** Copyright header - do not remove **********/
 
-#ifndef TOADLET_TADPOLE_BASECOMPONENT_H
-#define TOADLET_TADPOLE_BASECOMPONENT_H
-
-#include <toadlet/egg/Object.h>
-#include <toadlet/tadpole/Component.h>
+#include <toadlet/tadpole/BaseComponent.h>
+#include <toadlet/tadpole/node/Node.h>
 
 namespace toadlet{
 namespace tadpole{
 
-class TOADLET_API BaseComponent:public Object,public Component{
-public:
-	TOADLET_OBJECT(BaseComponent);
-	
-	BaseComponent();
-	BaseComponent(const String &name);
+BaseComponent::BaseComponent():
+	mParent(NULL)
+{
+}
 
-	virtual void destroy();
+BaseComponent::BaseComponent(const String &name):
+	mParent(NULL)
+{
+	mName=name;
+}
 
-	virtual void setName(const String &name){mName=name;}
-	inline const String &getName() const{return mName;}
+void BaseComponent::destroy(){
+	if(mParent!=NULL){
+		mParent->remove(this);
+	}
+}
 
-	virtual bool parentChanged(Node *node);
-	virtual Node *getParent(){return mParent;}
+bool BaseComponent::parentChanged(Node *node){
+	if(node!=NULL && mParent!=NULL){
+		mParent->remove(this);
+	}
 
-	virtual void logicUpdate(int dt,int scope){}
-	virtual void frameUpdate(int dt,int scope){}
+	mParent=node;
 
-	virtual bool getActive() const{return true;}
-
-protected:
-	String mName;
-	Node *mParent;
-};
+	return true;
+}
 
 }
 }
-
-#endif

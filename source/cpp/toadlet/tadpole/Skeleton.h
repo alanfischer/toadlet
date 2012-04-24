@@ -34,7 +34,7 @@ namespace tadpole{
 
 class TOADLET_API Skeleton:public BaseResource{
 public:
-	TOADLET_SPTR(Skeleton);
+	TOADLET_RESOURCE(Skeleton,Skeleton);
 
 	class TOADLET_API Bone{
 	public:

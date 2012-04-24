@@ -41,15 +41,6 @@
 		TOADLET_IPTR(Class)
 #endif
 
-#ifndef TOADLET_NONINSTANCIABLENODE
-	#define TOADLET_NONINSTANCIABLENODE(Class,SuperClass) \
-		typedef SuperClass super; \
-		typedef toadlet::egg::NonInstantiableType<Class,toadlet::tadpole::node::Node> ThisType; \
-		static ThisType *type(); \
-		virtual toadlet::egg::BaseType<toadlet::tadpole::node::Node> *getType(){return Class::type();} \
-		TOADLET_IPTR(Class)
-#endif
-
 #ifndef TOADLET_NODE_IMPLEMENT
 	#define TOADLET_NODE_IMPLEMENT(Class,FullName) \
 		Class::ThisType *Class::type(){static ThisType t(FullName);return &t;}
@@ -114,7 +105,6 @@ public:
 
 	void destroyAllChildren();
 
-	Node *getParent() const{return mParent;}
 	void *getParentData() const{return mParentData;}
 	virtual bool parentChanged(Node *node);
 	virtual void parentDataChanged(void *parentData){mParentData=parentData;}
@@ -195,7 +185,7 @@ protected:
 	IntrusivePointer<Scene,ObjectSemantics> mScene;
 	int mUniqueHandle;
 
-	Node::ptr mParent,mPrevious,mNext;
+	Node::ptr mPrevious,mNext;
 	void *mParentData;
 	Node::ptr mFirstChild,mLastChild;
 
