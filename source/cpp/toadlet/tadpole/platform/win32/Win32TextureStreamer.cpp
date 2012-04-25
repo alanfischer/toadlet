@@ -189,6 +189,7 @@ Resource::ptr Win32TextureStreamer::load(Stream::ptr in,ResourceData *data,Progr
 			}
 		}
 
+		delete bitmap;
 		delete dimensionIDs;
 		free(propertyItem);
 
