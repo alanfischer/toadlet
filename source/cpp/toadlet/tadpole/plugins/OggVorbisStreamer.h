@@ -26,17 +26,17 @@
 #ifndef TOADLET_TADPOLE_OGGVORBISSTREAMER_H
 #define TOADLET_TADPOLE_OGGVORBISSTREAMER_H
 
-#include <toadlet/tadpole/AudioBufferStreamer.h>
+#include <toadlet/tadpole/AudioStreamer.h>
 #include "OggVorbisDecoder.h"
 
 namespace toadlet{
 namespace tadpole{
 
-class TOADLET_API OggVorbisStreamer:protected Object,public AudioBufferStreamer{
+class TOADLET_API OggVorbisStreamer:protected Object,public AudioStreamer{
 public:
 	TOADLET_OBJECT(OggVorbisStreamer);
 
-	OggVorbisStreamer(AudioBufferManager *audioBufferManager):AudioBufferStreamer(audioBufferManager){}
+	OggVorbisStreamer(AudioManager *audioManager):AudioStreamer(audioManager){}
 
 	AudioStream::ptr createAudioStream(Stream *stream){
 		OggVorbisDecoder::ptr audioStream=new OggVorbisDecoder();
