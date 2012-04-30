@@ -85,12 +85,12 @@ Stream::ptr AndroidAssetArchive::openStream(const String &name){
 		stream=mStream; // Reuse our stream if its closed
 	}
 	else{
-		stream=JStream::ptr(new JStream(env));
+		stream=new JStream(env);
 	}
 	stream->open(streamObj);
 	env->DeleteLocalRef(streamObj);
 	if(stream->closed()){
-		stream=JStream::ptr();
+		stream=NULL;
 	}
 	return stream;
 }

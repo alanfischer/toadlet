@@ -26,20 +26,20 @@
 #ifndef TOADLET_TADPOLE_WAVESTREAMER_H
 #define TOADLET_TADPOLE_WAVESTREAMER_H
 
-#include <toadlet/tadpole/AudioBufferStreamer.h>
+#include <toadlet/tadpole/AudioStreamer.h>
 #include "WaveDecoder.h"
 
 namespace toadlet{
 namespace tadpole{
 
-class TOADLET_API WaveStreamer:protected Object,public AudioBufferStreamer{
+class TOADLET_API WaveStreamer:protected Object,public AudioStreamer{
 public:
 	TOADLET_OBJECT(WaveStreamer);
 
-	WaveStreamer(AudioBufferManager *audioBufferManager):AudioBufferStreamer(audioBufferManager){}
+	WaveStreamer(AudioManager *audioManager):AudioStreamer(audioManager){}
 
-	AudioStream::ptr createAudioStream(Stream::ptr stream){
-		WaveDecoder::ptr audioStream(new WaveDecoder());
+	AudioStream::ptr createAudioStream(Stream *stream){
+		WaveDecoder::ptr audioStream=new WaveDecoder();
 		if(audioStream->startStream(stream)==false){
 			audioStream=NULL;
 		}

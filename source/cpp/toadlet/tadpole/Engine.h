@@ -34,7 +34,7 @@
 #include <toadlet/ribbit/AudioDevice.h>
 #include <toadlet/tadpole/Types.h>
 #include <toadlet/tadpole/ArchiveManager.h>
-#include <toadlet/tadpole/AudioBufferManager.h>
+#include <toadlet/tadpole/AudioManager.h>
 #include <toadlet/tadpole/FontManager.h>
 #include <toadlet/tadpole/VertexFormats.h>
 #include <toadlet/tadpole/BufferManager.h>
@@ -59,6 +59,7 @@ public:
 	void destroy();
 
 	void installHandlers();
+	
 	bool setRenderDevice(RenderDevice *renderDevice);
 	RenderDevice *getRenderDevice() const;
 	void updateVertexFormats();
@@ -72,16 +73,12 @@ public:
 
 	// Node methods
 	void registerNodeType(BaseType<Node> *type);
-	Node *allocNode(BaseType<Node> *type);
-	Node *allocNode(const String &fullName);
 	Node *createNode(BaseType<Node> *type,Scene *scene);
 	Node *createNode(const String &fullName,Scene *scene);
+	void nodeCreated(Node *node);
+	void nodeDestroyed(Node *node);
 	int internal_registerNode(Node *node);
-	void internal_deregisterNode(Node *node);
-	void destroyNode(Node *node);
-	void freeNode(Node *node);
 
-	template<typename Type> Type *allocNodeType(egg::Type<Type,Node> *type){return (Type*)allocNode(type);}
 	template<typename Type> Type *createNodeType(egg::Type<Type,Node> *type,Scene *scene){return (Type*)createNode(type,scene);}
 
 	inline Node *getNodeByHandle(int handle){return (handle>=0 && handle<mHandles.size())?mHandles[handle]:NULL;}
@@ -111,7 +108,7 @@ public:
 	inline FontManager *getFontManager() const{return mFontManager;}
 	inline MeshManager *getMeshManager() const{return mMeshManager;}
 	inline NodeManager *getNodeManager() const{return mNodeManager;}
-	inline AudioBufferManager *getAudioBufferManager() const{return mAudioBufferManager;}
+	inline AudioManager *getAudioManager() const{return mAudioManager;}
 
 protected:
 	bool mFixedBackable,mShaderBackable;
@@ -134,7 +131,7 @@ protected:
 	MaterialManager::ptr mMaterialManager;
 	FontManager::ptr mFontManager;
 	MeshManager::ptr mMeshManager;
-	AudioBufferManager::ptr mAudioBufferManager;
+	AudioManager::ptr mAudioManager;
 	NodeManager::ptr mNodeManager;
 	Collection<int> mFreeHandles;
 	Collection<Node*> mHandles;

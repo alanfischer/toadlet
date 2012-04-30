@@ -3,12 +3,15 @@ from pytoadlet import *
 from time import *
 
 window=Tk()
-target=new_WGLWindowRenderTarget(0,window.winfo_id(),0)
-device=new_GLRenderDevice()
-device.create(target,None)
+renderDevice=new_GLRenderDevice()
+renderDevice.create(new_WGLWindowRenderTarget(0,window.winfo_id(),0),None)
+
+audioDevice=new_ALAudioDevice()
+audioDevice.create(None)
 
 engine=Engine()
-engine.setRenderDevice(device)
+engine.setRenderDevice(renderDevice)
+engine.setAudioDevice(audioDevice)
 engine.installHandlers()
 scene=Scene(engine)
 
@@ -17,16 +20,20 @@ camera.create(scene)
 camera.setLookAt((25,-150,0),(25,0,0),(0,0,1))
 scene.getRoot().attach(camera)
 
+audio=AudioComponent(engine)
+audio.setAudioBuffer("C:\\users\\siralanf\\toadlet\\examples\\data\\boing.wav")
+camera.attach(audio);
+
 mesh=MeshNode()
 mesh.create(scene)
 mesh.setMesh("c:\\users\\siralanf\\toadlet\\examples\\tadpole\\python\\lt.tmsh")
 scene.getRoot().attach(mesh)
 
-controller=Controller()
-controller.attach(MeshAnimation(mesh,0))
-controller.setCycling(Controller.Cycling_REFLECT);
-controller.start();
-mesh.attach(controller)
+animate=AnimationActionComponent("animate")
+animate.attach(MeshAnimation(mesh,0))
+animate.setCycling(AnimationActionComponent.Cycling_REFLECT);
+animate.start();
+mesh.attach(animate)
 
 class MoveAnimation(BaseAnimation):
 	def setValue(self,value):
@@ -40,7 +47,7 @@ class MoveAnimation(BaseAnimation):
 	def getWeight(self):
 		return 0.0
 animation=MoveAnimation()
-controller.attach(animation)
+animate.attach(animation)
 
 mesh.totalRotate=0.0
 		
@@ -68,9 +75,9 @@ while window.run:
 	window.update()
 	scene.update(int(dt+0.5))
 
-	device.beginScene()
-	camera.render(device)
-	device.endScene()
-	device.swap()
+	renderDevice.beginScene()
+	camera.render(renderDevice)
+	renderDevice.endScene()
+	renderDevice.swap()
 	
 	lastTime=newTime

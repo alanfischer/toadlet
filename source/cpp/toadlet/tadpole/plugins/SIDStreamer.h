@@ -38,8 +38,8 @@ public:
 
 	SIDStreamer(AudioBufferManager *audioBufferManager):AudioBufferStreamer(audioBufferManager){}
 
-	AudioStream::ptr createAudioStream(Stream::ptr stream){
-		SIDDecoder::ptr audioStream(new SIDDecoder());
+	AudioStream::ptr createAudioStream(Stream *stream){
+		SIDDecoder::ptr audioStream=new SIDDecoder();
 		if(audioStream->startStream(stream)==false){
 			audioStream=NULL;
 		}

@@ -4,9 +4,10 @@ configure_file (${CMAKE_CURRENT_SOURCE_DIR}/Version.h.cmake ${CMAKE_CURRENT_BINA
 
 # Source files for toadlet_tadpole
 set (TADPOLE_SRC
-	AnimationAction.cpp
+	AnimationActionComponent.cpp
+	AudioComponent.cpp
 	ArchiveManager.cpp
-	AudioBufferManager.cpp
+	AudioManager.cpp
 	BaseComponent.cpp
 	BufferManager.cpp
 	ColorKeyFrame.cpp
@@ -39,7 +40,6 @@ set (TADPOLE_SRC
 
 set (TADPOLE_ANIMATION_SRC
 	animation/BaseAnimation.cpp
-	animation/Controller.cpp
 	animation/CameraProjectionAnimation.cpp
 	animation/NodePathAnimation.cpp
 	animation/MaterialAnimation.cpp
@@ -125,7 +125,6 @@ set (TADPOLE_MATERIAL_SRC
 
 set (TADPOLE_NODE_SRC
 	node/AnaglyphCameraNode.cpp
-	node/AudioNode.cpp
 	node/CameraNode.cpp
 	node/CameraAlignedNode.cpp
 	node/LabelNode.cpp
@@ -193,13 +192,14 @@ set (TADPOLE_PLATFORM_WIN32_GDIPLUS_SRC
 
 # Headers
 set (TADPOLE_HEADERS
-	Action.h
-	AnimationAction.h
+	AnimationActionComponent.h
+	ActionComponent.h
 	Attachable.h
 	ArchiveManager.h
-	AudioBufferStreamer.h
-	AudioBufferManager.h
-	BaseAction.h
+	AudioStreamer.h
+	AudioManager.h
+	AudioComponent.h
+	BaseActionComponent.h
 	BaseComponent.h
 	Bound.h
 	BufferManager.h
@@ -255,8 +255,6 @@ set (TADPOLE_ANIMATION_HEADERS
 	animation/Animation.h
 	animation/AnimationListener.h
 	animation/BaseAnimation.h
-	animation/Controller.h
-	animation/ControllerListener.h
 	animation/CameraProjectionAnimation.h
 	animation/NodePathAnimation.h
 	animation/MaterialAnimation.h
@@ -349,7 +347,6 @@ set (TADPOLE_MATERIAL_HEADERS
 
 set (TADPOLE_NODE_HEADERS
 	node/AnaglyphCameraNode.h
-	node/AudioNode.h
 	node/CameraNode.h
 	node/CameraAlignedNode.h
 	node/LabelNode.h

@@ -1,19 +1,11 @@
 %{
-#include <toadlet/tadpole/animation/Controller.h>
+#include <toadlet/tadpole/AnimationActionComponent.h>
 %}
 
 namespace toadlet{
 namespace tadpole{
-namespace animation{
 
-%feature("director") ControllerListener;
-
-class ControllerListener{
-public:
-	virtual void controllerFinished(toadlet::tadpole::animation::Controller *controller)=0;
-};
-
-class Controller:public Component{
+class AnimationActionComponent:public Component{
 public:
 	enum Cycling{
 		Cycling_NONE,
@@ -21,6 +13,7 @@ public:
 		Cycling_REFLECT,
 	};
 
+	AnimationActionComponent(String name);
 	void destroy();
 
 	void setName(String name);
@@ -35,15 +28,12 @@ public:
 	void setCycling(Cycling cycling);
 	Cycling getCycling() const;
 
-	void setControllerListener(ControllerListener *listener);
-
 	void start();
 	void stop();
 	
-	void attach(Animation *animation);
-	void remove(Animation *animation);
+	void attach(toadlet::tadpole::animation::Animation *animation);
+	void remove(toadlet::tadpole::animation::Animation *animation);
 };
 
-}
 }
 }

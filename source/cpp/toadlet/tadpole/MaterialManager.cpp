@@ -138,16 +138,16 @@ RenderState::ptr MaterialManager::createRenderState(){
 	RenderDevice *renderDevice=mEngine->getRenderDevice();
 	RenderState::ptr renderState;
 	if(mEngine->isBackable()){
-		BackableRenderState::ptr backableRenderState(new BackableRenderState());
+		BackableRenderState::ptr backableRenderState=new BackableRenderState();
 		backableRenderState->create();
 		if(renderDevice!=NULL){
-			RenderState::ptr back(renderDevice->createRenderState());
+			RenderState::ptr back=renderDevice->createRenderState();
 			backableRenderState->setBack(back);
 		}
 		renderState=backableRenderState;
 	}
 	else if(renderDevice!=NULL){
-		renderState=RenderState::ptr(renderDevice->createRenderState());
+		renderState=renderDevice->createRenderState();
 		if(renderState==NULL || renderState->create()==false){
 			return NULL;
 		}
@@ -166,12 +166,12 @@ ShaderState::ptr MaterialManager::createShaderState(){
 	RenderDevice *renderDevice=mEngine->getRenderDevice();
 	ShaderState::ptr shaderState;
 	if(mEngine->isShaderBackable()){
-		BackableShaderState::ptr backableShaderState(new BackableShaderState());
+		BackableShaderState::ptr backableShaderState=new BackableShaderState();
 		backableShaderState->create();
 		if(renderDevice!=NULL){
 			ShaderState::ptr back;
 			TOADLET_TRY
-				back=ShaderState::ptr(renderDevice->createShaderState());
+				back=renderDevice->createShaderState();
 			TOADLET_CATCH(const Exception &){}
 			backableShaderState->setBack(back);
 		}
@@ -179,7 +179,7 @@ ShaderState::ptr MaterialManager::createShaderState(){
 	}
 	else if(renderDevice!=NULL){
 		TOADLET_TRY
-			shaderState=ShaderState::ptr(renderDevice->createShaderState());
+			shaderState=renderDevice->createShaderState();
 		TOADLET_CATCH(const Exception &){}
 		if(shaderState==NULL || shaderState->create()==false){
 			return NULL;
@@ -243,7 +243,7 @@ void MaterialManager::contextActivate(RenderDevice *renderDevice){
 		if(renderState!=NULL && renderState->getRootRenderState()!=renderState){
 			RenderState::ptr back;
 			TOADLET_TRY
-				back=RenderState::ptr(renderDevice->createRenderState());
+				back=renderDevice->createRenderState();
 			TOADLET_CATCH(const Exception &){}
 			if(back!=NULL){
 				shared_static_cast<BackableRenderState>(renderState)->setBack(back);
@@ -256,7 +256,7 @@ void MaterialManager::contextActivate(RenderDevice *renderDevice){
 		if(shaderState!=NULL && shaderState->getRootShaderState()!=shaderState){
 			ShaderState::ptr back;
 			TOADLET_TRY
-				back=ShaderState::ptr(renderDevice->createShaderState());
+				back=renderDevice->createShaderState();
 			TOADLET_CATCH(const Exception &){}
 			if(back!=NULL){
 				shared_static_cast<BackableShaderState>(shaderState)->setBack(back);

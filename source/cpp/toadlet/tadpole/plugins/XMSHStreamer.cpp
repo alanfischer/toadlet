@@ -190,10 +190,10 @@ Mesh::ptr XMSHStreamer::loadMeshVersion1(mxml_node_t *root){
 			mesh=XMLMeshUtilities::loadMesh(block,1,mEngine!=NULL?mEngine->getBufferManager():NULL,mEngine!=NULL?mEngine->getMaterialManager():NULL,mEngine!=NULL?mEngine->getTextureManager():NULL);
 		}
 		else if(strcmp(mxmlGetElementName(block),"SkeletonData")==0){
-			mesh->setSkeleton(Skeleton::ptr(XMLMeshUtilities::loadSkeleton(block,1)));
+			mesh->setSkeleton(XMLMeshUtilities::loadSkeleton(block,1));
 		}
 		else if(strcmp(mxmlGetElementName(block),"AnimationData")==0){
-			mesh->getSkeleton()->sequences.add(TransformSequence::ptr(XMLMeshUtilities::loadSequence(block,1)));
+			mesh->getSkeleton()->sequences.add(XMLMeshUtilities::loadSequence(block,1));
 		}
 	}
 
@@ -209,10 +209,10 @@ Mesh::ptr XMSHStreamer::loadMeshVersion2Up(mxml_node_t *root,int version){
 			mesh=XMLMeshUtilities::loadMesh(block,version,mEngine!=NULL?mEngine->getBufferManager():NULL,mEngine!=NULL?mEngine->getMaterialManager():NULL,mEngine!=NULL?mEngine->getTextureManager():NULL);
 		}
 		else if(strcmp(mxmlGetElementName(block),"Skeleton")==0){
-			mesh->setSkeleton(Skeleton::ptr(XMLMeshUtilities::loadSkeleton(block,version)));
+			mesh->setSkeleton(XMLMeshUtilities::loadSkeleton(block,version));
 		}
 		else if(strcmp(mxmlGetElementName(block),"Sequence")==0){
-			mesh->getSkeleton()->sequences.add(TransformSequence::ptr(XMLMeshUtilities::loadSequence(block,version)));
+			mesh->getSkeleton()->sequences.add(XMLMeshUtilities::loadSequence(block,version));
 		}
 	}
 

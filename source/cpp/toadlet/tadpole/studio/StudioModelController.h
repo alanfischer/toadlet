@@ -23,10 +23,10 @@
  *
  ********** Copyright header - do not remove **********/
 
-#ifndef TOADLET_TADPOLE_STUDIO_STUDIOMODELCONTROLLER_H
-#define TOADLET_TADPOLE_STUDIO_STUDIOMODELCONTROLLER_H
+#ifndef TOADLET_TADPOLE_STUDIO_STUDIOMODELANIMATION_H
+#define TOADLET_TADPOLE_STUDIO_STUDIOMODELANIMATION_H
 
-#include <toadlet/tadpole/animation/Controller.h>
+#include <toadlet/tadpole/animation/Animation.h>
 #include <toadlet/tadpole/studio/StudioModelNode.h>
 
 namespace toadlet{

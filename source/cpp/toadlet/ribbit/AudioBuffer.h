@@ -42,7 +42,7 @@ public:
 
 	virtual AudioBuffer *getRootAudioBuffer()=0;
 
-	virtual bool create(AudioStream::ptr stream)=0;
+	virtual bool create(AudioStream *stream)=0;
 	virtual void destroy()=0;
 };
 

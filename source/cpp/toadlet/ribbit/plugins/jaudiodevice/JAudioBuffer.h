@@ -42,7 +42,7 @@ public:
 
 	AudioBuffer *getRootAudioBuffer(){return this;}
 
-	bool create(AudioStream::ptr stream);
+	bool create(AudioStream *stream);
 	void destroy();
 
 	inline jobject getJObject(){return obj;}

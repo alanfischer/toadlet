@@ -23,54 +23,20 @@
  *
  ********** Copyright header - do not remove **********/
 
-#ifndef TOADLET_TADPOLE_BASEACTION_H
-#define TOADLET_TADPOLE_BASEACTION_H
+#ifndef TOADLET_TADPOLE_ACTIONCOMPONENT_H
+#define TOADLET_TADPOLE_ACTIONCOMPONENT_H
 
-#include <toadlet/egg/Object.h>
-#include <toadlet/tadpole/Action.h>
-#include <toadlet/tadpole/node/Node.h>
+#include <toadlet/tadpole/Component.h>
 
 namespace toadlet{
 namespace tadpole{
 
-class BaseAction:protected Object,public Action{
+class ActionComponent:public Component{
 public:
-	TOADLET_OBJECT(BaseAction);
+	TOADLET_IPTR(ActionComponent);
 	
-	BaseAction(){}
-	BaseAction(const String &name){mName=name;}
-
-	virtual void destroy(){
-		if(mParent!=NULL){
-			mParent->remove(this);
-		}
-	}
-
-	virtual void setName(const String &name){mName=name;}
-	inline const String &getName() const{return mName;}
-
-	virtual bool parentChanged(Node *node){
-		if(node!=NULL && mParent!=NULL){
-			mParent->remove(this);
-		}
-
-		mParent=node;
-		
-		if(mParent!=NULL){
-			mParent->actionAttached(this);
-		}
-
-		return true;
-	}
-	
-	virtual void logicUpdate(int dt,int scope){}
-	virtual void frameUpdate(int dt,int scope){}
-
-	virtual bool getActive() const{return true;}
-
-protected:
-	String mName;
-	Node::ptr mParent;
+	virtual void start()=0;
+	virtual void stop()=0;
 };
 
 }

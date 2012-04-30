@@ -71,15 +71,15 @@ Texture::ptr TextureManager::createTexture(int usage,TextureFormat::ptr format,t
 	RenderDevice *renderDevice=mEngine->getRenderDevice();
 	Texture::ptr texture;
 	if(mEngine->isBackable()){
-		BackableTexture::ptr backableTexture(new BackableTexture());
+		BackableTexture::ptr backableTexture=new BackableTexture();
 		backableTexture->create(usage,format,mipDatas);
 		if(renderDevice!=NULL){
-			backableTexture->setBack(Texture::ptr(renderDevice->createTexture()),renderDevice);
+			backableTexture->setBack(renderDevice->createTexture(),renderDevice);
 		}
 		texture=backableTexture;
 	}
 	else if(renderDevice!=NULL){
-		texture=Texture::ptr(renderDevice->createTexture());
+		texture=renderDevice->createTexture();
 		if(BackableTexture::convertCreate(texture,renderDevice,usage,format,mipDatas)==false){
 			Logger::error(Categories::TOADLET_TADPOLE,"Error in texture convertCreate");
 			return NULL;
@@ -97,16 +97,16 @@ PixelBufferRenderTarget::ptr TextureManager::createPixelBufferRenderTarget(){
 	RenderDevice *renderDevice=mEngine->getRenderDevice();
 	PixelBufferRenderTarget::ptr renderTarget;
 	if(mEngine->isBackable()){
-		BackablePixelBufferRenderTarget::ptr backableRenderTarget(new BackablePixelBufferRenderTarget());
+		BackablePixelBufferRenderTarget::ptr backableRenderTarget=new BackablePixelBufferRenderTarget();
 		backableRenderTarget->create();
 		if(renderDevice!=NULL){
-			PixelBufferRenderTarget::ptr back(renderDevice->createPixelBufferRenderTarget());
+			PixelBufferRenderTarget::ptr back=renderDevice->createPixelBufferRenderTarget();
 			backableRenderTarget->setBack(back);
 		}
 		renderTarget=backableRenderTarget;
 	}
 	else if(renderDevice!=NULL){
-		renderTarget=PixelBufferRenderTarget::ptr(renderDevice->createPixelBufferRenderTarget());
+		renderTarget=renderDevice->createPixelBufferRenderTarget();
 		if(renderTarget->create()==false){
 			return NULL;
 		}
@@ -154,7 +154,7 @@ void TextureManager::contextActivate(RenderDevice *renderDevice){
 	for(i=0;i<mRenderTargets.size();++i){
 		PixelBufferRenderTarget::ptr renderTarget=mRenderTargets[i];
 		if(renderTarget!=NULL && renderTarget->getRootRenderTarget()!=renderTarget){
-			PixelBufferRenderTarget::ptr back(renderDevice->createPixelBufferRenderTarget());
+			PixelBufferRenderTarget::ptr back=renderDevice->createPixelBufferRenderTarget();
 			shared_static_cast<BackablePixelBufferRenderTarget>(renderTarget)->setBack(back);
 		}
 	}

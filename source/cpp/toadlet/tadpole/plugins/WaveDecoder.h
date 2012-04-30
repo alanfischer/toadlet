@@ -32,9 +32,9 @@
 namespace toadlet{
 namespace tadpole{
 
-class TOADLET_API WaveDecoder:public AudioStream{
+class TOADLET_API WaveDecoder:protected Object,public AudioStream{
 public:
-	TOADLET_SPTR(WaveDecoder);
+	TOADLET_OBJECT(WaveDecoder);
 
 	WaveDecoder();
 	virtual ~WaveDecoder();

@@ -26,6 +26,7 @@
 #ifndef TOADLET_EGG_IO_SOCKETSTREAM_H
 #define TOADLET_EGG_IO_SOCKETSTREAM_H
 
+#include <toadlet/egg/Object.h>
 #include <toadlet/egg/io/Stream.h>
 #include <toadlet/egg/net/Socket.h>
 
@@ -33,9 +34,9 @@ namespace toadlet{
 namespace egg{
 namespace io{
 
-class TOADLET_API SocketStream:public Stream{
+class TOADLET_API SocketStream:protected Object,public Stream{
 public:
-	TOADLET_SPTR(SocketStream);
+	TOADLET_OBJECT(SocketStream);
 
 	SocketStream(Socket::ptr socket);
 	virtual ~SocketStream();

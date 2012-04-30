@@ -400,7 +400,7 @@ void FFmpegController::setTexture(Texture::ptr texture){
 
 	StreamData *videoStreamData=&mStreams[AVMEDIA_TYPE_VIDEO];
 	if(videoStreamData->codecCtx!=NULL && mVideoStream==NULL){
-		mVideoStream=FFmpegVideoStream::ptr(new FFmpegVideoStream(this,videoStreamData,mTexture));
+		mVideoStream=new FFmpegVideoStream(this,videoStreamData,mTexture);
 	}
 }
 
@@ -409,7 +409,7 @@ void FFmpegController::setAudio(Audio::ptr audio){
 
 	StreamData *audioStreamData=&mStreams[AVMEDIA_TYPE_AUDIO];
 	if(audioStreamData->codecCtx!=NULL && mAudioStream==NULL){
-		mAudioStream=FFmpegAudioStream::ptr(new FFmpegAudioStream(this,audioStreamData));
+		mAudioStream=new FFmpegAudioStream(this,audioStreamData);
 
 		if(mAudio!=NULL){
 			mAudio->create(shared_static_cast<AudioStream>(mAudioStream));

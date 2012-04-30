@@ -58,7 +58,7 @@ void SMDConverter::load(Engine *engine,Stream *in,const String &fileName){
 	Collection<Triangle> triangles;
 
 	if(mMesh==NULL){
-		mMesh=Mesh::ptr(new Mesh());
+		mMesh=new Mesh();
 		mMesh->setName(resourceName);
 	}
 
@@ -79,7 +79,7 @@ void SMDConverter::load(Engine *engine,Stream *in,const String &fileName){
 			else if(s.startsWith("skeleton")){
 				block=Block_SKELETON;
 				if(reference==false && mSkeleton!=NULL){
-					mSequence=TransformSequence::ptr(new TransformSequence());
+					mSequence=new TransformSequence();
 					mSequence->setName(resourceName);
 					mSkeleton->sequences.add(mSequence);
 
@@ -118,7 +118,7 @@ void SMDConverter::load(Engine *engine,Stream *in,const String &fileName){
 				}
 
 				if(mSkeleton==NULL){
-					mSkeleton=Skeleton::ptr(new Skeleton());
+					mSkeleton=new Skeleton();
 					mMesh->setSkeleton(mSkeleton);
 					reference=true;
 				}

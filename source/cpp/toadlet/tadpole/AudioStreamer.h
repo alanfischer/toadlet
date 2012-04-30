@@ -23,29 +23,29 @@
  *
  ********** Copyright header - do not remove **********/
 
-#ifndef TOADLET_TADPOLE_AUDIOBUFFERSTREAMER_H
-#define TOADLET_TADPOLE_AUDIOBUFFERSTREAMER_H
+#ifndef TOADLET_TADPOLE_AUDIOSTREAMER_H
+#define TOADLET_TADPOLE_AUDIOSTREAMER_H
 
 #include <toadlet/tadpole/ResourceStreamer.h>
-#include <toadlet/tadpole/AudioBufferManager.h>
+#include <toadlet/tadpole/AudioManager.h>
 
 namespace toadlet{
 namespace tadpole{
 
-class TOADLET_API AudioBufferStreamer:public ResourceStreamer{
+class TOADLET_API AudioStreamer:public ResourceStreamer{
 public:
-	TOADLET_SPTR(AudioBufferStreamer);
+	TOADLET_IPTR(AudioStreamer);
 
-	AudioBufferStreamer(AudioBufferManager *manager){mAudioBufferManager=manager;}
+	AudioStreamer(AudioManager *manager){mAudioManager=manager;}
 
-	virtual AudioStream::ptr createAudioStream(Stream::ptr stream)=0;
+	virtual AudioStream::ptr createAudioStream(Stream *stream)=0;
 
 	Resource::ptr load(Stream::ptr stream,ResourceData *data,ProgressListener *listener){
-		return mAudioBufferManager->createAudioBuffer(createAudioStream(stream));
+		return mAudioManager->createAudioBuffer(createAudioStream(stream));
 	}
 
 protected:
-	AudioBufferManager *mAudioBufferManager;
+	AudioManager *mAudioManager;
 };
 
 }

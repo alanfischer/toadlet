@@ -268,7 +268,7 @@ InputDevice *JApplication::getInputDevice(InputDevice::InputType i) const{
 }
 
 Stream::ptr JApplication::makeStream(JNIEnv *env,jobject obj){
-	return Stream::ptr(new JStream(env,obj));
+	return new JStream(env,obj);
 }
 
 }

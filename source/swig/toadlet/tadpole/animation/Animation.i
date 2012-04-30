@@ -11,6 +11,8 @@ namespace animation{
 
 class Animation{
 public:
+	virtual ~Animation(){}
+
 	virtual void setValue(scalar value)=0;
 	virtual scalar getMinValue() const=0;
 	virtual scalar getMaxValue() const=0;

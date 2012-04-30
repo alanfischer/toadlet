@@ -34,6 +34,8 @@ namespace peeper{
 
 class GLRenderTarget:public RenderTarget{
 public:
+	TOADLET_IPTR(GLRenderTarget);
+
 	virtual ~GLRenderTarget(){}
 
 	virtual bool swap()=0;

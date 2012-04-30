@@ -43,7 +43,7 @@ MMAudioBuffer::~MMAudioBuffer(){
 	destroy();
 }
 
-bool MMAudioBuffer::create(AudioStream::ptr stream){
+bool MMAudioBuffer::create(AudioStream *stream){
 	AudioFormat::ptr format=stream->getAudioFormat();
 	tbyte *buffer=NULL;
 	int length=0;

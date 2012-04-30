@@ -24,14 +24,12 @@
  ********** Copyright header - do not remove **********/
 
 #include <toadlet/egg/Logger.h>
-#include <toadlet/tadpole/animation/Controller.h>
-#include <toadlet/tadpole/Engine.h>
+#include <toadlet/tadpole/AnimationActionComponent.h>
 
 namespace toadlet{
 namespace tadpole{
-namespace animation{
 
-Controller::Controller():
+AnimationActionComponent::AnimationActionComponent(const String &name):BaseActionComponent(name),
 	mNode(NULL),
 	mTime(0),
 	mMinValue(0),
@@ -41,36 +39,32 @@ Controller::Controller():
 	mCycling(Cycling_NONE),
 	//mInterpolator,
 	mTimeScale(Math::ONE),
-	mRunning(false),
-	mListener(NULL)
+	mRunning(false)
+//	mListener(NULL)
 {}
 
-Controller::~Controller(){
+AnimationActionComponent::~AnimationActionComponent(){
 }
 
-void Controller::setTime(int time){
+void AnimationActionComponent::setTime(int time){
 	mTime=time;
 
 	setValue(Math::fromMilli(mTime));
 }
 
-void Controller::setCycling(Cycling cycling){
+void AnimationActionComponent::setCycling(Cycling cycling){
 	mCycling=cycling;
 }
 
-void Controller::setInterpolator(Interpolator *interpolator){
+void AnimationActionComponent::setInterpolator(Interpolator *interpolator){
 	mInterpolator=interpolator;
 }
 
-void Controller::setTimeScale(scalar scale){
+void AnimationActionComponent::setTimeScale(scalar scale){
 	mTimeScale=scale;
 }
 
-void Controller::setControllerListener(ControllerListener *listener){
-	mListener=listener;
-}
-
-void Controller::start(){
+void AnimationActionComponent::start(){
 	if(mNode!=NULL){
 		mNode->activate();
 	}
@@ -80,7 +74,7 @@ void Controller::start(){
 	mTime=0;
 }
 
-void Controller::stop(){
+void AnimationActionComponent::stop(){
 	mRunning=false;
 
 	mTime=0;
@@ -88,7 +82,7 @@ void Controller::stop(){
 	setValue(0);
 }
 
-void Controller::frameUpdate(int dt,int scope){
+void AnimationActionComponent::frameUpdate(int dt,int scope){
 	if(mRunning==false){
 		return;
 	}
@@ -113,9 +107,6 @@ void Controller::frameUpdate(int dt,int scope){
 			}
 			else{
 				mRunning=false;
-				if(mListener!=NULL){
-					mListener->controllerFinished(this); // Must be last since it may delete this
-				}
 			}
 		}
 		else{
@@ -138,9 +129,6 @@ void Controller::frameUpdate(int dt,int scope){
 			}
 			else{
 				mRunning=false;
-				if(mListener!=NULL){
-					mListener->controllerFinished(this); // Must be last since it may delete this
-				}
 			}
 		}
 		else{
@@ -149,7 +137,7 @@ void Controller::frameUpdate(int dt,int scope){
 	}
 }
 
-void Controller::setValue(scalar value){
+void AnimationActionComponent::setValue(scalar value){
 	if(mInterpolator!=NULL){
 		value=Math::div(value-mMinValue,mMaxValue-mMinValue);
 		value=mInterpolator->interpolate(value);
@@ -162,7 +150,7 @@ void Controller::setValue(scalar value){
 	}
 }
 
-void Controller::attach(Animation *animation){
+void AnimationActionComponent::attach(Animation *animation){
 	mAnimations.add(animation);
 
 	animation->setAnimationListener(this);
@@ -170,7 +158,7 @@ void Controller::attach(Animation *animation){
 	animationExtentsChanged(animation);
 }
 
-void Controller::remove(Animation *animation){
+void AnimationActionComponent::remove(Animation *animation){
 	animation->setAnimationListener(NULL);
 
 	mAnimations.remove(animation);
@@ -178,7 +166,7 @@ void Controller::remove(Animation *animation){
 	animationExtentsChanged(NULL);
 }
 
-void Controller::animationExtentsChanged(Animation *animation){
+void AnimationActionComponent::animationExtentsChanged(Animation *animation){
 	mMinValue=0;
 	mMaxValue=0;
 
@@ -201,6 +189,5 @@ void Controller::animationExtentsChanged(Animation *animation){
 	mMaxTime=Math::toMilli(mMaxValue);
 }
 
-}
 }
 }

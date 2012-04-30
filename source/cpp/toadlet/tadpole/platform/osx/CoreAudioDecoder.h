@@ -33,9 +33,9 @@ namespace toadlet{
 namespace ribbit{
 namespace decoder{
 
-class CoreAudioDecoder:public AudioStream{
+class CoreAudioDecoder:protected Object,public AudioStream{
 public:
-	TOADLET_SHARED_POINTERS(CoreAudioDecoder);
+	TOADLET_OBJECT(CoreAudioDecoder);
 
 	CoreAudioDecoder();
 	virtual ~CoreAudioDecoder();

@@ -43,12 +43,12 @@ public:
 	ALAudio(ALAudioDevice *audioDevice);
 	virtual ~ALAudio();
 
-	bool create(AudioBuffer::ptr buffer);
-	bool create(AudioStream::ptr stream);
+	bool create(AudioBuffer *buffer);
+	bool create(AudioStream *stream);
 	void destroy();
 
-	AudioBuffer::ptr getAudioBuffer(){return mAudioBuffer;}
-	AudioStream::ptr getAudioStream(){return mAudioStream;}
+	AudioBuffer *getAudioBuffer(){return mAudioBuffer;}
+	AudioStream *getAudioStream(){return mAudioStream;}
 
 	bool play();
 	bool stop();

@@ -40,12 +40,12 @@ public:
 	MMAudio(MMAudioDevice *player);
 	virtual ~MMAudio();
 
-	bool create(AudioBuffer::ptr audioBuffer);
-	bool create(AudioStream::ptr stream);
+	bool create(AudioBuffer *audioBuffer);
+	bool create(AudioStream *stream);
 	void destroy();
 
-	AudioBuffer::ptr getAudioBuffer(){return mAudioBuffer;}
-	AudioStream::ptr getAudioStream(){return mAudioStream;}
+	AudioBuffer *getAudioBuffer(){return mAudioBuffer;}
+	AudioStream *getAudioStream(){return mAudioStream;}
 
 	bool play(){mPosition=0;mPlaying=true;return true;}
 	bool stop(){mPlaying=false;return false;}

@@ -115,9 +115,9 @@ protected:
 	void updateVideo(int dt);
 
 	Texture::ptr mTexture;
-	SharedPointer<FFmpegVideoStream> mVideoStream;
+	IntrusivePointer<FFmpegVideoStream> mVideoStream;
 	Audio::ptr mAudio;
-	SharedPointer<FFmpegAudioStream> mAudioStream;
+	IntrusivePointer<FFmpegAudioStream> mAudioStream;
 
 	Engine *mEngine;
 	Stream::ptr mStream;
@@ -132,9 +132,9 @@ protected:
 	uint64 mTime,mMaxTime;
 };
 
-class FFmpegAudioStream:public AudioStream{
+class FFmpegAudioStream:protected Object,public AudioStream{
 public:
-	TOADLET_SPTR(FFmpegAudioStream);
+	TOADLET_OBJECT(FFmpegAudioStream);
 
 	FFmpegAudioStream(FFmpegController *controller,FFmpegController::StreamData *streamData);
 	virtual ~FFmpegAudioStream();
@@ -166,9 +166,9 @@ protected:
 	friend class FFmpegController;
 };
 
-class FFmpegVideoStream{
+class FFmpegVideoStream:public Object{
 public:
-	TOADLET_SPTR(FFmpegVideoStream);
+	TOADLET_OBJECT(FFmpegVideoStream);
 
 	FFmpegVideoStream(FFmpegController *controller,FFmpegController::StreamData *streamData,Texture::ptr texture);
 	virtual ~FFmpegVideoStream();

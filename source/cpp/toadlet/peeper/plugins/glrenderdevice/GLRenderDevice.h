@@ -225,10 +225,10 @@ protected:
 	bool mMultiTexture;
 	bool mHasClampToEdge;
 
-	RenderTarget *mPrimaryRenderTarget;
-	GLRenderTarget *mGLPrimaryRenderTarget;
-	RenderTarget *mRenderTarget;
-	GLRenderTarget *mGLRenderTarget;
+	RenderTarget::ptr mPrimaryRenderTarget;
+	GLRenderTarget::ptr mGLPrimaryRenderTarget;
+	RenderTarget::ptr mRenderTarget;
+	GLRenderTarget::ptr mGLRenderTarget;
 
 	friend class GLBuffer;
 	friend class GLTexture;

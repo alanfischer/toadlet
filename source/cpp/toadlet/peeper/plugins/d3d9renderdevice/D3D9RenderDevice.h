@@ -150,10 +150,10 @@ protected:
 	D3DDEVTYPE mD3DDevType;
 	D3DFORMAT mD3DAdapterFormat;
 	D3DCAPS9 mD3DCaps;
-	RenderTarget *mPrimaryRenderTarget;
-	D3D9RenderTarget *mD3DPrimaryRenderTarget;
-	RenderTarget *mRenderTarget;
-	D3D9RenderTarget *mD3DRenderTarget;
+	RenderTarget::ptr mPrimaryRenderTarget;
+	D3D9RenderTarget::ptr mD3DPrimaryRenderTarget;
+	RenderTarget::ptr mRenderTarget;
+	D3D9RenderTarget::ptr mD3DRenderTarget;
 	RenderState *mLastRenderState;
 	Collection<D3D9Texture*> mLastTextures;
 	Collection<SamplerState*> mLastSamplerStates;

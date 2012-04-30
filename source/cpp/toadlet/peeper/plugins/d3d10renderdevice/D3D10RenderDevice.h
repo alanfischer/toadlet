@@ -129,10 +129,10 @@ protected:
 	void shaderDestroyed(D3D10Shader *shader);
 
 	ID3D10Device *mD3DDevice;
-	RenderTarget *mPrimaryRenderTarget;
-	D3D10RenderTarget *mD3DPrimaryRenderTarget;
-	RenderTarget *mRenderTarget;
-	D3D10RenderTarget *mD3DRenderTarget;
+	RenderTarget::ptr mPrimaryRenderTarget;
+	D3D10RenderTarget::ptr mD3DPrimaryRenderTarget;
+	RenderTarget::ptr mRenderTarget;
+	D3D10RenderTarget::ptr mD3DRenderTarget;
 
 	D3D10ShaderState *mLastShaderState;
 	Collection<D3D10Shader*> mVertexShaders;

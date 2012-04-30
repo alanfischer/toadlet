@@ -28,15 +28,16 @@
 
 #include <toadlet/egg/io/Stream.h>
 #include <toadlet/egg/Collection.h>
+#include <toadlet/egg/Object.h>
 
 namespace toadlet{
 namespace egg{
 namespace io{
 
 // This does not properly support both reading & writing of the same stream
-class TOADLET_API MemoryStream:public Stream{
+class TOADLET_API MemoryStream:protected Object,public Stream{
 public:
-	TOADLET_SPTR(MemoryStream);
+	TOADLET_OBJECT(MemoryStream);
 
 	MemoryStream(tbyte *data,int dataLength,int initialLength,bool ownsData);
 	MemoryStream(Stream::ptr stream); // Read all data from stream
