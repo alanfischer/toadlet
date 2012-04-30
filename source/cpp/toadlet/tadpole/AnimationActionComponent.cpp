@@ -37,6 +37,8 @@ AnimationActionComponent::AnimationActionComponent(const String &name):BaseActio
 	mMinTime(0),
 	mMaxTime(0),
 	mCycling(Cycling_NONE),
+	mActualCycling(Cycling_NONE),
+	mStopGently(false),
 	//mInterpolator,
 	mTimeScale(Math::ONE),
 	mRunning(false)
@@ -72,9 +74,16 @@ void AnimationActionComponent::start(){
 	mRunning=true;
 
 	mTime=0;
+
+	mActualCycling=mCycling;
 }
 
 void AnimationActionComponent::stop(){
+	if(mStopGently){
+		mActualCycling=Cycling_NONE;
+		return;
+	}
+
 	mRunning=false;
 
 	mTime=0;
@@ -99,10 +108,10 @@ void AnimationActionComponent::frameUpdate(int dt,int scope){
 
 			setValue(Math::fromMilli(mTime));
 
-			if(mCycling==Cycling_LOOP){
+			if(mActualCycling==Cycling_LOOP){
 				mTime=0;
 			}
-			else if(mCycling==Cycling_REFLECT){
+			else if(mActualCycling==Cycling_REFLECT){
 				mTimeScale*=-1;
 			}
 			else{
@@ -121,10 +130,10 @@ void AnimationActionComponent::frameUpdate(int dt,int scope){
 
 			setValue(Math::fromMilli(0));
 
-			if(mCycling==Cycling_LOOP){
+			if(mActualCycling==Cycling_LOOP){
 				mTime=mMaxTime;
 			}
-			else if(mCycling==Cycling_REFLECT){
+			else if(mActualCycling==Cycling_REFLECT){
 				mTimeScale*=-1;
 			}
 			else{

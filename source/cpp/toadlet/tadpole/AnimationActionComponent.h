@@ -61,6 +61,9 @@ public:
 	virtual void setCycling(Cycling cycling);
 	inline Cycling getCycling() const{return mCycling;}
 
+	virtual void setStopGently(bool stop){mStopGently=stop;}
+	inline bool getStopGently() const{return mStopGently;}
+
 	virtual void setInterpolator(Interpolator *interpolator);
 	inline Interpolator *getInterpolator() const{return mInterpolator;}
 
@@ -88,6 +91,8 @@ protected:
 	int mMinTime;
 	int mMaxTime;
 	Cycling mCycling;
+	Cycling mActualCycling;
+	bool mStopGently;
 	Interpolator::ptr mInterpolator;
 	scalar mTimeScale;
 	bool mRunning;

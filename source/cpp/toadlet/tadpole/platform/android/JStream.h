@@ -33,9 +33,9 @@
 namespace toadlet{
 namespace tadpole{
 
-class TOADLET_API JStream:public Stream{
+class TOADLET_API JStream:protected Object,public Stream{
 public:
-	TOADLET_SPTR(JStream);
+	TOADLET_OBJECT(JStream);
 
 	JStream(JNIEnv *env,jobject streamObj=NULL);
 	virtual ~JStream();

@@ -26,17 +26,17 @@
 #ifndef TOADLET_TADPOLE_SIDSTREAMER_H
 #define TOADLET_TADPOLE_SIDSTREAMER_H
 
-#include <toadlet/tadpole/AudioBufferStreamer.h>
+#include <toadlet/tadpole/AudioStreamer.h>
 #include "SIDDecoder.h"
 
 namespace toadlet{
 namespace tadpole{
 
-class TOADLET_API SIDStreamer:protected Object,public AudioBufferStreamer{
+class TOADLET_API SIDStreamer:protected Object,public AudioStreamer{
 public:
 	TOADLET_OBJECT(SIDStreamer);
 
-	SIDStreamer(AudioBufferManager *audioBufferManager):AudioBufferStreamer(audioBufferManager){}
+	SIDStreamer(AudioManager *audioManager):AudioStreamer(audioManager){}
 
 	AudioStream::ptr createAudioStream(Stream *stream){
 		SIDDecoder::ptr audioStream=new SIDDecoder();

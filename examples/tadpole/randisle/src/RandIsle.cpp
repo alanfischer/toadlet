@@ -139,6 +139,7 @@ void RandIsle::create(){
 	AnimationActionComponent::ptr jumpAction=new AnimationActionComponent("jump");
 	jumpAction->attach(new MeshAnimation(playerMesh,1));
 	jumpAction->setCycling(AnimationActionComponent::Cycling_LOOP);
+	jumpAction->setStopGently(true);
 	mPlayer->attach(jumpAction);
 
 	MeshNode::ptr shadowMesh=mEngine->createNodeType(MeshNode::type(),mScene);
@@ -280,10 +281,11 @@ void RandIsle::logicUpdate(int dt){
 	}
 
 	if(Math::square(mPlayer->getVelocity().x)+Math::square(mPlayer->getVelocity().y)<0.05){
-		((AnimationActionComponent*)mPlayer->getAction("jump"))->setCycling(AnimationActionComponent::Cycling_NONE);
+		if(mPlayer->getActionActive("jump")){
+			mPlayer->stopAction("jump");
+		}
 	}
 	else{
-		((AnimationActionComponent*)mPlayer->getAction("jump"))->setCycling(AnimationActionComponent::Cycling_LOOP);
 		if(mPlayer->getActionActive("jump")==false){
 			mPlayer->startAction("jump");
 		}
