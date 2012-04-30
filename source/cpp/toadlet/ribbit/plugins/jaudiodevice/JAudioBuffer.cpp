@@ -57,7 +57,7 @@ bool JAudioBuffer::create(AudioStream *stream){
 		jmethodID initID=env->GetMethodID(streamClass,"<init>","(III)V");
 		int length=2048;
 		tbyte *buffer=new tbyte[length]; 
-		streamObj=env->NewObject(streamClass,initID,(int)stream.get(),buffer,length);
+		streamObj=env->NewObject(streamClass,initID,(int)stream,buffer,length);
 	}
 	env->DeleteLocalRef(streamClass);
 

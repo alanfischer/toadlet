@@ -246,6 +246,15 @@ void Node::startAction(const String &action){
 	}
 }
 
+void Node::stopAction(const String &action){
+	int i;
+	for(i=0;i<mActions.size();++i){
+		if(mActions[i]->getName()==action){
+			mActions[i]->stop();
+		}
+	}
+}
+
 bool Node::getActionActive(const String &action){
 	int i;
 	for(i=0;i<mActions.size();++i){

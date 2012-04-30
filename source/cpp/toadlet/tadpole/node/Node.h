@@ -113,6 +113,7 @@ public:
 	virtual void actionRemoved(ActionComponent *action);
 	virtual ActionComponent *getAction(const String &name);
 	virtual void startAction(const String &name);
+	virtual void stopAction(const String &name);
 	virtual bool getActionActive(const String &name);
 
 	virtual void mergeWorldBound(Node *child,bool justAttached);
