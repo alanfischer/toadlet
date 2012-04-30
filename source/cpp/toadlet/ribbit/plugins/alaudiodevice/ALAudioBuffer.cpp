@@ -45,7 +45,7 @@ ALAudioBuffer::~ALAudioBuffer(){
 	destroy();
 }
 
-bool ALAudioBuffer::create(AudioStream::ptr stream){
+bool ALAudioBuffer::create(AudioStream *stream){
 	tbyte *buffer=0;
 	int length=0;
 	AudioFormat::ptr format=stream->getAudioFormat();

@@ -410,10 +410,10 @@ public:
 
 		Logger::alert("Loading sounds");
 
- 		dog=engine->getAudioBufferManager()->findAudioBuffer("dog.wav");
-		shark=engine->getAudioBufferManager()->findAudioBuffer("shark.wav");
-		rustle=engine->getAudioBufferManager()->findAudioBuffer("rustle.wav");
-		crunch=engine->getAudioBufferManager()->findAudioBuffer("crunch.wav");
+ 		dog=engine->getAudioManager()->findAudioBuffer("dog.wav");
+		shark=engine->getAudioManager()->findAudioBuffer("shark.wav");
+		rustle=engine->getAudioManager()->findAudioBuffer("rustle.wav");
+		crunch=engine->getAudioManager()->findAudioBuffer("crunch.wav");
 
 		acorn=engine->getMaterialManager()->findMaterial("acorn.png");
 		if(acorn!=NULL){

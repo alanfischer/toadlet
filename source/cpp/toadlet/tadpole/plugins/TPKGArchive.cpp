@@ -56,7 +56,7 @@ bool TPKGArchive::open(MemoryStream::ptr memoryStream){
 }
 
 bool TPKGArchive::open(Stream::ptr stream){
-	mStream=DataStream::ptr(new DataStream(stream));
+	mStream=new DataStream(stream);
 
 	mDataOffset=0;
 
@@ -119,12 +119,12 @@ Stream::ptr TPKGArchive::openStream(const String &name){
 
 	if(mMemoryStream!=NULL){
 		tbyte *data=mMemoryStream->getCurrentDataPointer();
-		return MemoryStream::ptr(new MemoryStream(data,length,length,false));
+		return new MemoryStream(data,length,length,false);
 	}
 	else{
 		tbyte *data=new tbyte[length];
 		mStream->read(data,length);
-		return MemoryStream::ptr(new MemoryStream(data,length,length,true));
+		return new MemoryStream(data,length,length,true);
 	}
 }
 

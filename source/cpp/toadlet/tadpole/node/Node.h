@@ -52,23 +52,11 @@ namespace tadpole{
 class Engine;
 class RenderableSet;
 class Scene;
-class Action;
+class ActionComponent;
 
 namespace node{
 
 class CameraNode;
-
-// The same as DefaultIntrusiveSemantics, but casts to an Object so we can still reference forward declared items
-class ObjectSemantics{
-public:
-	template<typename Type> static int retainReference(Type *type){
-		return ((Object*)type)->retain();
-	}
-
-	template<typename Type> static int releaseReference(Type *type){
-		return ((Object*)type)->release();
-	}
-};
 
 class TOADLET_API Node:public BaseComponent,public Transformable{
 public:
@@ -90,7 +78,6 @@ public:
 
 	Node();
 	virtual ~Node();
-	inline Node *create(Engine *engine){mEngine=engine;return create((Scene*)NULL);}
 	virtual Node *create(Scene *scene);
 	inline bool created() const{return mCreated;}
 	virtual void destroy();
@@ -101,7 +88,8 @@ public:
 	virtual Node *isEntity(){return NULL;}
 	virtual void *hasInterface(int type);
 
-	inline int getUniqueHandle() const{return mUniqueHandle;}
+	void internal_setUniqueHandle(int handle){mUniqueHandle=handle;}
+	int getUniqueHandle() const{return mUniqueHandle;}
 
 	void destroyAllChildren();
 
@@ -121,9 +109,10 @@ public:
 	virtual Node *getFirstChild() const{return mFirstChild;}
 	virtual Node *getLastChild() const{return mLastChild;}
 
-	virtual void actionAttached(Action *action);
-	virtual void actionRemoved(Action *action);
-	virtual void playAction(const String &name);
+	virtual void actionAttached(ActionComponent *action);
+	virtual void actionRemoved(ActionComponent *action);
+	virtual ActionComponent *getAction(const String &name);
+	virtual void startAction(const String &name);
 	virtual bool getActionActive(const String &name);
 
 	virtual void mergeWorldBound(Node *child,bool justAttached);
@@ -193,7 +182,7 @@ protected:
 	bool mChildrenActive;
 	bool mActivateChildren;
 
-	Collection<Action*> mActions;
+	Collection<ActionComponent*> mActions;
 
 	bool mActive;
 	int mDeactivateCount;

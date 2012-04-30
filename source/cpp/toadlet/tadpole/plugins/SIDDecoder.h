@@ -34,9 +34,9 @@ namespace tadpole{
 
 class SIDAttributes;
 
-class TOADLET_API SIDDecoder:public AudioStream{
+class TOADLET_API SIDDecoder:protected Object,public AudioStream{
 public:
-	TOADLET_SPTR(SIDDecoder);
+	TOADLET_OBJECT(SIDDecoder);
 
 	SIDDecoder();
 	virtual ~SIDDecoder();

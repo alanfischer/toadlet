@@ -58,7 +58,7 @@ ALAudio::~ALAudio(){
 	destroy();
 }
 
-bool ALAudio::create(AudioBuffer::ptr audioBuffer){
+bool ALAudio::create(AudioBuffer *audioBuffer){
 	if(audioBuffer==NULL){
 		Logger::warning(Categories::TOADLET_RIBBIT,"invalid audioBuffer");
 		return false;
@@ -84,7 +84,7 @@ bool ALAudio::create(AudioBuffer::ptr audioBuffer){
 	return true;
 }
 
-bool ALAudio::create(AudioStream::ptr stream){
+bool ALAudio::create(AudioStream *stream){
 	mDevice->activate();
 
 	mHandle=mDevice->checkoutSourceHandle(this);

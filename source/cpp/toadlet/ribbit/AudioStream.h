@@ -35,7 +35,7 @@ namespace ribbit{
 
 class AudioStream:public Stream{
 public:
-	TOADLET_SPTR(AudioStream);
+	TOADLET_IPTR(AudioStream);
 
 	virtual ~AudioStream(){}
 

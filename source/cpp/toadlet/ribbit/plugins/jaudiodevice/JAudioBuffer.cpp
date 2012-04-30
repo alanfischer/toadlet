@@ -48,7 +48,7 @@ JAudioBuffer::~JAudioBuffer(){
 	env=NULL;
 }
 
-bool JAudioBuffer::create(AudioStream::ptr stream){
+bool JAudioBuffer::create(AudioStream *stream){
 	mAudioStream=stream; // Store the pointer until we have reference counting
 	jobject streamObj=NULL;
 

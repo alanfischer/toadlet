@@ -27,6 +27,7 @@
 #define TOADLET_EGG_IO_FILESTREAM_H
 
 #include <toadlet/egg/io/Stream.h>
+#include <toadlet/egg/Object.h>
 #include <toadlet/egg/String.h>
 #include <stdio.h>
 
@@ -34,9 +35,9 @@ namespace toadlet{
 namespace egg{
 namespace io{
 
-class TOADLET_API FileStream:public Stream{
+class TOADLET_API FileStream:protected Object,public Stream{
 public:
-	TOADLET_SPTR(FileStream);
+	TOADLET_OBJECT(FileStream);
 
 	enum Open{
 		Open_BIT_UNKNOWN=	0,

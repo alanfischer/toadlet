@@ -52,7 +52,7 @@ MMAudio::~MMAudio(){
 	destroy();
 }
 
-bool MMAudio::create(AudioBuffer::ptr audioBuffer){
+bool MMAudio::create(AudioBuffer *audioBuffer){
 	mDevice->internal_audioCreate(this);
 
 	mAudioStream=NULL;
@@ -61,7 +61,7 @@ bool MMAudio::create(AudioBuffer::ptr audioBuffer){
 	return true;
 }
 
-bool MMAudio::create(AudioStream::ptr stream){
+bool MMAudio::create(AudioStream *stream){
 	mDevice->internal_audioCreate(this);
 
 	mAudioStream=stream;

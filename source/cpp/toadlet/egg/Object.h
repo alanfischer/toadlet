@@ -52,6 +52,13 @@ protected:
 	int mSharedCount;
 };
 
+// The same as DefaultIntrusiveSemantics, but casts to an Object so we can still reference forward declared items
+class ObjectSemantics{
+public:
+	template<typename Type> static int retainReference(Type *type){return ((Object*)type)->retain();}
+	template<typename Type> static int releaseReference(Type *type){return ((Object*)type)->release();}
+};
+
 }
 }
 

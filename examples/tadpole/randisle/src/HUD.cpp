@@ -15,10 +15,10 @@ HUD::HUD():super(),
 Node *HUD::create(Scene *scene){
 	super::create(scene);
 
-	mDogSound=mEngine->createNodeType(AudioNode::type(),mScene);
+	mDogSound=new AudioComponent(mEngine);
 	mDogSound->setAudioBuffer(Resources::instance->dog);
 	mScene->getRoot()->attach(mDogSound);
-	mSharkSound=mEngine->createNodeType(AudioNode::type(),mScene);
+	mSharkSound=new AudioComponent(mEngine);
 	mSharkSound->setAudioBuffer(Resources::instance->shark);
 	mScene->getRoot()->attach(mSharkSound);
 

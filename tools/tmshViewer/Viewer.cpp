@@ -63,7 +63,7 @@ Viewer::Viewer(Application *app):
 	mApp=app;
 	mEngine=mApp->getEngine();
 
- 	mScene=Scene::ptr(new Scene(mEngine));
+ 	mScene=new Scene(mEngine);
 
 	mCamera=mEngine->createNodeType(CameraNode::type(),mScene);
 	mCamera->setClearColor(Colors::ORANGE);

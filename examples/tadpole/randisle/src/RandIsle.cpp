@@ -1,6 +1,5 @@
 #include "RandIsle.h"
 #include "PathClimber.h"
-#include "AnimationController.h"
 #include "GroundProjector.h"
 #include "Tree.h"
 #include "HUD.h"
@@ -97,7 +96,8 @@ void RandIsle::create(){
 	mHUD->setScope(Scope_HUD);
 	mScene->getRoot()->attach(mHUD);
 
-	mSky=(Sky*)mEngine->allocNodeType(Sky::type())->create(mScene,Resources::instance->cloudSize,Resources::instance->skyColor,Resources::instance->fadeColor);
+	mSky=new Sky();
+	mSky->create(mScene,Resources::instance->cloudSize,Resources::instance->skyColor,Resources::instance->fadeColor);
 	mScene->getBackground()->attach(mSky);
 
 	VertexBuffer::ptr predictedVertexBuffer=mEngine->getBufferManager()->createVertexBuffer(Buffer::Usage_BIT_STREAM,Buffer::Access_BIT_WRITE,mEngine->getVertexFormats().POSITION_COLOR,512);
@@ -109,15 +109,15 @@ void RandIsle::create(){
 	mPredictedMaterial->getPass()->setMaterialState(MaterialState(true));
 	mPredictedMaterial->getPass()->setBlendState(BlendState::Combination_ALPHA);
 
-	mRustleSound=mEngine->createNodeType(AudioNode::type(),mScene);
+	mRustleSound=new AudioComponent(mEngine);
 	mRustleSound->setAudioBuffer(Resources::instance->rustle);
 	mScene->getRoot()->attach(mRustleSound);
 	
 	mPlayer=mEngine->createNodeType(HopEntity::type(),mScene);
-mClimber=new PathClimber();
-mClimber->setSpeed(40);
+	mClimber=new PathClimber();
+	mClimber->setSpeed(40);
+	mClimber->setPathClimberListener(this);
 	mPlayer->attach(mClimber);
-mClimber->setPathClimberListener(this);
 	mPlayer->addShape(Shape::ptr(new Shape(AABox(2))));
 	{
 		Segment segment;
@@ -135,7 +135,11 @@ mClimber->setPathClimberListener(this);
 		playerMesh->setMesh(Resources::instance->creature);
 	}
 	mPlayer->attach(playerMesh);
-	mPlayer->attach(new AnimationController(mPlayer,playerMesh));
+
+	AnimationActionComponent::ptr jumpAction=new AnimationActionComponent("jump");
+	jumpAction->attach(new MeshAnimation(playerMesh,1));
+	jumpAction->setCycling(AnimationActionComponent::Cycling_LOOP);
+	mPlayer->attach(jumpAction);
 
 	MeshNode::ptr shadowMesh=mEngine->createNodeType(MeshNode::type(),mScene);
 	if(Resources::instance->shadow!=NULL){
@@ -272,6 +276,16 @@ void RandIsle::logicUpdate(int dt){
 			Vector3 position=mPlayer->getPosition();
 			position.z=-offset;
 			mPlayer->setPosition(position);
+		}
+	}
+
+	if(Math::square(mPlayer->getVelocity().x)+Math::square(mPlayer->getVelocity().y)<0.05){
+		((AnimationActionComponent*)mPlayer->getAction("jump"))->setCycling(AnimationActionComponent::Cycling_NONE);
+	}
+	else{
+		((AnimationActionComponent*)mPlayer->getAction("jump"))->setCycling(AnimationActionComponent::Cycling_LOOP);
+		if(mPlayer->getActionActive("jump")==false){
+			mPlayer->startAction("jump");
 		}
 	}
 

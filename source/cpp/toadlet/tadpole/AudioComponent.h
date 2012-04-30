@@ -23,34 +23,31 @@
  *
  ********** Copyright header - do not remove **********/
 
-#ifndef TOADLET_TADPOLE_NODE_AUDIONODE_H
-#define TOADLET_TADPOLE_NODE_AUDIONODE_H
+#ifndef TOADLET_TADPOLE_AUDIOCOMPONENT_H
+#define TOADLET_TADPOLE_AUDIOCOMPONENT_H
 
-#include <toadlet/tadpole/node/Node.h>
 #include <toadlet/ribbit/Audio.h>
+#include <toadlet/tadpole/BaseComponent.h>
+#include <toadlet/tadpole/Engine.h>
 
 namespace toadlet{
 namespace tadpole{
-namespace node{
 
-/// @todo: Add proper world position & direction updating of the Audio, same with LightNode
-class TOADLET_API AudioNode:public Node{
+class TOADLET_API AudioComponent:public BaseComponent{
 public:
-	TOADLET_NODE(AudioNode,Node);
+	TOADLET_IPTR(AudioComponent);
 
-	AudioNode();
-	virtual Node *create(Scene *scene);
+	AudioComponent(Engine *engine);
 	virtual void destroy();
-	virtual Node *set(Node *node);
 
 	bool setAudioBuffer(const String &name);
-	bool setAudioBuffer(const AudioBuffer::ptr &audioBuffer);
+	bool setAudioBuffer(AudioBuffer *audioBuffer);
 
 	bool setAudioStream(const String &name);
-	bool setAudioStream(AudioStream::ptr stream);
+	bool setAudioStream(AudioStream *stream);
 
-	AudioBuffer::ptr getAudioBuffer(){return mAudio->getAudioBuffer();}
-	AudioStream::ptr getAudioStream(){return mAudio->getAudioStream();}
+	AudioBuffer *getAudioBuffer(){return mAudio->getAudioBuffer();}
+	AudioStream *getAudioStream(){return mAudio->getAudioStream();}
 	
 	inline bool play(){if(mAudio!=NULL){return mAudio->play();}else{return false;}}
 	inline bool stop(){if(mAudio!=NULL){return mAudio->stop();}else{return false;}}
@@ -77,10 +74,10 @@ public:
 	inline void setVelocity(const Vector3 &velocity){if(mAudio!=NULL){mAudio->setVelocity(velocity);}}
 
 protected:
+	Engine *mEngine;
 	Audio::ptr mAudio;
 };
 
-}
 }
 }
 

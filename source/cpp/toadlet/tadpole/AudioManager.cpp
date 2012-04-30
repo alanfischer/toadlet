@@ -23,17 +23,17 @@
  *
  ********** Copyright header - do not remove **********/
 
-#include <toadlet/tadpole/AudioBufferManager.h>
-#include <toadlet/tadpole/AudioBufferStreamer.h>
+#include <toadlet/tadpole/AudioManager.h>
+#include <toadlet/tadpole/AudioStreamer.h>
 #include <toadlet/tadpole/Engine.h>
 
 namespace toadlet{
 namespace tadpole{
 
-AudioBufferManager::AudioBufferManager(Engine *engine):ResourceManager(engine){
+AudioManager::AudioManager(Engine *engine):ResourceManager(engine){
 }
 
-AudioBuffer::ptr AudioBufferManager::createAudioBuffer(AudioStream::ptr stream){
+AudioBuffer::ptr AudioManager::createAudioBuffer(AudioStream::ptr stream){
 	AudioDevice *audioDevice=getAudioDevice();
 
 	if(audioDevice==NULL){
@@ -45,14 +45,14 @@ AudioBuffer::ptr AudioBufferManager::createAudioBuffer(AudioStream::ptr stream){
 		Error::nullPointer("createAudioBuffer called with a null stream");
 		return NULL;
 	}
-	AudioBuffer::ptr audioBuffer=AudioBuffer::ptr(audioDevice->createAudioBuffer());
+	AudioBuffer::ptr audioBuffer=audioDevice->createAudioBuffer();
 	if(audioBuffer!=NULL && audioBuffer->create(stream)==false){
 		audioBuffer=NULL;
 	}
 	return audioBuffer;
 }
 
-AudioStream::ptr AudioBufferManager::findAudioStream(const String &name){
+AudioStream::ptr AudioManager::findAudioStream(const String &name){
 	Logger::debug(Categories::TOADLET_TADPOLE,
 		"finding audio stream:"+name);
 
@@ -75,7 +75,7 @@ AudioStream::ptr AudioBufferManager::findAudioStream(const String &name){
 	if(streamer!=NULL){
 		Stream::ptr stream=mEngine->openStream(filename);
 		if(stream!=NULL){
-			return shared_static_cast<AudioBufferStreamer>(streamer)->createAudioStream(stream);
+			return shared_static_cast<AudioStreamer>(streamer)->createAudioStream(stream);
 		}
 		else{
 			Error::unknown(Categories::TOADLET_TADPOLE,
@@ -90,7 +90,7 @@ AudioStream::ptr AudioBufferManager::findAudioStream(const String &name){
 	}
 }
 
-AudioDevice *AudioBufferManager::getAudioDevice(){return mEngine->getAudioDevice();}
+AudioDevice *AudioManager::getAudioDevice(){return mEngine->getAudioDevice();}
 
 }
 }

@@ -26,7 +26,7 @@
 #include <toadlet/egg/Error.h>
 #include <toadlet/tadpole/Engine.h>
 #include <toadlet/tadpole/Scene.h>
-#include <toadlet/tadpole/Action.h>
+#include <toadlet/tadpole/ActionComponent.h>
 #include <toadlet/tadpole/node/Node.h>
 #include <toadlet/tadpole/node/CameraNode.h>
 
@@ -78,7 +78,7 @@ Node *Node::create(Scene *scene){
 	}
 
 	if(mEngine!=NULL){
-		mUniqueHandle=mEngine->internal_registerNode(this);
+		mEngine->nodeCreated(this);
 	}
 
 	mParent=NULL;
@@ -117,11 +117,9 @@ void Node::destroy(){
 	}
 
 	if(mEngine!=NULL){
-		mEngine->internal_deregisterNode(this);
-		mUniqueHandle=0;
+		mEngine->nodeDestroyed(this);
 	}
 
-	mEngine->freeNode(this);
 	mEngine=NULL;
 	mScene=NULL;
 }
@@ -221,15 +219,25 @@ void Node::nodeRemoved(Node *node){
 	// Leave node->next so traversals can continue
 }
 
-void Node::actionAttached(Action *action){
+void Node::actionAttached(ActionComponent *action){
 	mActions.add(action);
 }
 
-void Node::actionRemoved(Action *action){
+void Node::actionRemoved(ActionComponent *action){
 	mActions.remove(action);
 }
 
-void Node::playAction(const String &action){
+ActionComponent *Node::getAction(const String &name){
+	int i;
+	for(i=0;i<mActions.size();++i){
+		if(mActions[i]->getName()==name){
+			return mActions[i];
+		}
+	}
+	return NULL;
+}
+
+void Node::startAction(const String &action){
 	int i;
 	for(i=0;i<mActions.size();++i){
 		if(mActions[i]->getName()==action){

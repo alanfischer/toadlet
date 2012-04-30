@@ -23,30 +23,54 @@
  *
  ********** Copyright header - do not remove **********/
 
-#ifndef TOADLET_TADPOLE_AUDIOBUFFERMANAGER_H
-#define TOADLET_TADPOLE_AUDIOBUFFERMANAGER_H
+#ifndef TOADLET_TADPOLE_BASEACTIONCOMPONENT_H
+#define TOADLET_TADPOLE_BASEACTIONCOMPONENT_H
 
-#include <toadlet/tadpole/ResourceManager.h>
-#include <toadlet/ribbit/AudioDevice.h>
-#include <toadlet/tadpole/Types.h>
+#include <toadlet/egg/Object.h>
+#include <toadlet/tadpole/ActionComponent.h>
+#include <toadlet/tadpole/node/Node.h>
 
 namespace toadlet{
 namespace tadpole{
 
-class Engine;
-
-class TOADLET_API AudioBufferManager:public ResourceManager{
+class BaseActionComponent:protected Object,public ActionComponent{
 public:
-	TOADLET_OBJECT(AudioBufferManager);
+	TOADLET_OBJECT(BaseActionComponent);
+	
+	BaseActionComponent(){}
+	BaseActionComponent(const String &name){mName=name;}
 
-	AudioBufferManager(Engine *engine);
+	virtual void destroy(){
+		if(mParent!=NULL){
+			mParent->remove(this);
+		}
+	}
 
-	AudioBuffer::ptr createAudioBuffer(AudioStream::ptr stream);
+	virtual void setName(const String &name){mName=name;}
+	inline const String &getName() const{return mName;}
 
-	AudioStream::ptr findAudioStream(const String &name);
-	AudioBuffer::ptr findAudioBuffer(const String &name){return shared_static_cast<AudioBuffer>(ResourceManager::find(name));}
+	virtual bool parentChanged(Node *node){
+		if(node!=NULL && mParent!=NULL){
+			mParent->remove(this);
+		}
 
-	AudioDevice *getAudioDevice();
+		mParent=node;
+		
+		if(mParent!=NULL){
+			mParent->actionAttached(this);
+		}
+
+		return true;
+	}
+	
+	virtual void logicUpdate(int dt,int scope){}
+	virtual void frameUpdate(int dt,int scope){}
+
+	virtual bool getActive() const{return true;}
+
+protected:
+	String mName;
+	Node::ptr mParent;
 };
 
 }

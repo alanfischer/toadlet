@@ -123,16 +123,16 @@ IndexBuffer::ptr BufferManager::createIndexBuffer(int usage,int access,IndexBuff
 	RenderDevice *renderDevice=mEngine->getRenderDevice();
 	IndexBuffer::ptr buffer;
 	if(mEngine->isBackable()){
-		BackableBuffer::ptr backableBuffer(new BackableBuffer());
+		BackableBuffer::ptr backableBuffer=new BackableBuffer();
 		backableBuffer->create(usage,access,indexFormat,size);
 		if(renderDevice!=NULL){
-			IndexBuffer::ptr back(renderDevice->createIndexBuffer());
+			IndexBuffer::ptr back=renderDevice->createIndexBuffer();
 			backableBuffer->setBack(back);
 		}
 		buffer=backableBuffer;
 	}
 	else if(renderDevice!=NULL){
-		buffer=IndexBuffer::ptr(renderDevice->createIndexBuffer());
+		buffer=renderDevice->createIndexBuffer();
 		if(buffer==NULL){
 			return NULL;
 		}
@@ -152,16 +152,16 @@ VertexBuffer::ptr BufferManager::createVertexBuffer(int usage,int access,VertexF
 	RenderDevice *renderDevice=mEngine->getRenderDevice();
 	VertexBuffer::ptr buffer;
 	if(mEngine->isBackable()){
-		BackableBuffer::ptr backableBuffer(new BackableBuffer());
+		BackableBuffer::ptr backableBuffer=new BackableBuffer();
 		backableBuffer->create(usage,access,vertexFormat,size);
 		if(renderDevice!=NULL){
-			VertexBuffer::ptr back(renderDevice->createVertexBuffer());
+			VertexBuffer::ptr back=renderDevice->createVertexBuffer();
 			backableBuffer->setBack(back);
 		}
 		buffer=backableBuffer;
 	}
 	else if(renderDevice!=NULL){
-		buffer=VertexBuffer::ptr(renderDevice->createVertexBuffer());
+		buffer=renderDevice->createVertexBuffer();
 		if(buffer==NULL){
 			return NULL;
 		}
@@ -182,16 +182,16 @@ PixelBuffer::ptr BufferManager::createPixelBuffer(int usage,int access,int pixel
 	TextureFormat::ptr textureFormat(new TextureFormat(TextureFormat::Dimension_D2,pixelFormat,width,height,depth,1));
 	PixelBuffer::ptr buffer;
 	if(mEngine->isBackable()){
-		BackableBuffer::ptr backableBuffer(new BackableBuffer());
+		BackableBuffer::ptr backableBuffer=new BackableBuffer();
 		backableBuffer->create(usage,access,textureFormat);
 		if(renderDevice!=NULL){
-			PixelBuffer::ptr back(renderDevice->createPixelBuffer());
+			PixelBuffer::ptr back=renderDevice->createPixelBuffer();
 			backableBuffer->setBack(back,renderDevice);
 		}
 		buffer=backableBuffer;
 	}
 	else if(renderDevice!=NULL){
-		buffer=PixelBuffer::ptr(renderDevice->createPixelBuffer());
+		buffer=renderDevice->createPixelBuffer();
 		if(buffer==NULL){
 			return NULL;
 		}

@@ -61,14 +61,14 @@ JAudio::~JAudio(){
 	env=NULL;
 }
 
-bool JAudio::create(AudioBuffer::ptr audioBuffer){
+bool JAudio::create(AudioBuffer *audioBuffer){
 	mAudioBuffer=audioBuffer; // Store the pointer until we have reference counting
 	jobject audioBufferObj=(audioBuffer!=NULL)?((JAudioBuffer*)audioBuffer->getRootAudioBuffer())->getJObject():NULL;
 
 	return env->CallBooleanMethod(obj,createAudioBufferID,audioBufferObj);
 }
 
-bool JAudio::create(AudioStream::ptr audioStream){
+bool JAudio::create(AudioStream *audioStream){
 	mAudioStream=audioStream; // Store the pointer until we have reference counting
 	jobject audioStreamObj=NULL;
 	jclass streamClass=env->FindClass("us/toadlet/ribbit/NAudioStream");

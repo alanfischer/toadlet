@@ -37,18 +37,19 @@ Shader::ptr ShaderManager::createShader(Shader::ShaderType type,const String pro
 	RenderDevice *renderDevice=mEngine->getRenderDevice();
 	Shader::ptr shader;
 	if(mEngine->isShaderBackable()){
-		BackableShader::ptr backableShader(new BackableShader());
+		BackableShader::ptr backableShader=new BackableShader()
+			;
 		backableShader->create(type,profiles,codes,numCodes);
 		if(renderDevice!=NULL && mEngine->getRenderCaps().hasShader[type]){
 			TOADLET_TRY
-				backableShader->setBack(Shader::ptr(renderDevice->createShader()),renderDevice);
+				backableShader->setBack(renderDevice->createShader(),renderDevice);
 			TOADLET_CATCH(Exception &){}
 		}
 		shader=backableShader;
 	}
 	else if(renderDevice!=NULL && mEngine->getRenderCaps().hasShader[type]){
 		TOADLET_TRY
-			shader=Shader::ptr(renderDevice->createShader());
+			shader=renderDevice->createShader();
 		TOADLET_CATCH(Exception &){shader=NULL;}
 		if(BackableShader::convertCreate(shader,renderDevice,type,profiles,codes,numCodes)==false){
 			Logger::error(Categories::TOADLET_TADPOLE,"Error in shader convertCreate");

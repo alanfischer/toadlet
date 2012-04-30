@@ -24,8 +24,8 @@ public:
 protected:
 	Node::ptr mPlayer;
 	CameraNode::ptr mCamera;
-	AudioNode::ptr mDogSound;
-	AudioNode::ptr mSharkSound;
+	AudioComponent::ptr mDogSound;
+	AudioComponent::ptr mSharkSound;
 	egg::Random mRandom;
 
 	SpriteNode::ptr mFadeSprite;

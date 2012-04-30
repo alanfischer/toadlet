@@ -23,25 +23,32 @@
  *
  ********** Copyright header - do not remove **********/
 
-#ifndef TOADLET_TADPOLE_ANIMATION_CONTROLLERLISTENER_H
-#define TOADLET_TADPOLE_ANIMATION_CONTROLLERLISTENER_H
+#ifndef TOADLET_TADPOLE_AUDIOMANAGER_H
+#define TOADLET_TADPOLE_AUDIOMANAGER_H
 
+#include <toadlet/tadpole/ResourceManager.h>
+#include <toadlet/ribbit/AudioDevice.h>
 #include <toadlet/tadpole/Types.h>
 
 namespace toadlet{
 namespace tadpole{
-namespace animation{
 
-class Controller;
+class Engine;
 
-class ControllerListener{
+class TOADLET_API AudioManager:public ResourceManager{
 public:
-	virtual ~ControllerListener(){}
+	TOADLET_OBJECT(AudioManager);
 
-	virtual void controllerFinished(Controller *controller)=0;
+	AudioManager(Engine *engine);
+
+	AudioBuffer::ptr createAudioBuffer(AudioStream::ptr stream);
+
+	AudioStream::ptr findAudioStream(const String &name);
+	AudioBuffer::ptr findAudioBuffer(const String &name){return shared_static_cast<AudioBuffer>(ResourceManager::find(name));}
+
+	AudioDevice *getAudioDevice();
 };
 
-}
 }
 }
 

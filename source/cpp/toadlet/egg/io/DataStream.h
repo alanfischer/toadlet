@@ -27,6 +27,7 @@
 #define TOADLET_EGG_IO_DATASTREAMS_H
 
 #include <toadlet/egg/io/Stream.h>
+#include <toadlet/egg/Object.h>
 #include <toadlet/egg/String.h>
 #include <toadlet/egg/math/Math.h>
 #include <toadlet/egg/mathfixed/Math.h>
@@ -36,9 +37,9 @@ namespace egg{
 namespace io{
 
 /// @todo: This should be implemented cleaner and more optimized, with more direct writing of structures and then converting if necessary
-class TOADLET_API DataStream:public Stream{
+class TOADLET_API DataStream:protected Object,public Stream{
 public:
-	TOADLET_SPTR(DataStream);
+	TOADLET_OBJECT(DataStream);
 
 	DataStream(Stream *stream);
 	DataStream(Stream::ptr stream);

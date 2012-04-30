@@ -76,7 +76,6 @@
 #include <toadlet/tadpole/TextureManager.h>
 #include <toadlet/tadpole/Version.h>
 
-#include <toadlet/tadpole/node/AudioNode.h>
 #include <toadlet/tadpole/node/LabelNode.h>
 #include <toadlet/tadpole/node/LightNode.h>
 #include <toadlet/tadpole/node/MeshNode.h>
@@ -193,7 +192,7 @@ Engine::Engine(bool fixedBackable,bool shaderBackable):
 	mMaterialManager=new MaterialManager(this);
 	mFontManager=new FontManager(this);
 	mMeshManager=new MeshManager(this);
-	mAudioBufferManager=new AudioBufferManager(this);
+	mAudioManager=new AudioManager(this);
 	mNodeManager=new NodeManager(this);
 	
 	mHandles.resize(1); // Handle 0 is always NULL
@@ -210,7 +209,6 @@ Engine::Engine(bool fixedBackable,bool shaderBackable):
 	// Create initial BackableVertexFormats.  This doesn't need to be done, but without it, starting an application without a RenderDevice will crash.
 	updateVertexFormats();
 
-	registerNodeType(AudioNode::type());
 	registerNodeType(CameraNode::type());
 	registerNodeType(LabelNode::type());
 	registerNodeType(LightNode::type());
@@ -235,7 +233,7 @@ Engine::~Engine(){
 	destroy();
 
 	mNodeManager=NULL;
-	mAudioBufferManager=NULL;
+	mAudioManager=NULL;
 	mMeshManager=NULL;
 	mShaderManager=NULL;
 	mMaterialManager=NULL;
@@ -254,7 +252,7 @@ void Engine::destroy(){
 	}
 
 	mNodeManager->destroy();
-	mAudioBufferManager->destroy();
+	mAudioManager->destroy();
 	mMeshManager->destroy();
 	mShaderManager->destroy();
 	mMaterialManager->destroy();
@@ -322,12 +320,12 @@ void Engine::installHandlers(){
 	mMeshManager->setStreamer(new TMSHStreamer(this),"tmsh");
 
 	// AudioBuffer streamers
-	mAudioBufferManager->setStreamer(new WaveStreamer(mAudioBufferManager),"wav");
+	mAudioManager->setStreamer(new WaveStreamer(mAudioManager),"wav");
 	#if defined(TOADLET_HAS_OGGVORBIS)
-		mAudioBufferManager->setStreamer(new OggVorbisStreamer(mAudioBufferManager),"ogg");
+		mAudioManager->setStreamer(new OggVorbisStreamer(mAudioManager),"ogg");
 	#endif
 	#if defined(TOADLET_HAS_SIDPLAY)
-		mAudioBufferManager->setStreamer(new SIDStreamer(mAudioBufferManager),"sid");
+		mAudioManager->setStreamer(new SIDStreamer(mAudioManager),"sid");
 	#endif
 
 	// Plugin types, should be removed from here somehow
@@ -478,56 +476,34 @@ void Engine::registerNodeType(BaseType<Node> *type){
 	mNodeFactory.registerType(type);
 }
 
-/// @todo: Use a pool for these entities
-Node *Engine::allocNode(BaseType<Node> *type){
-	Logger::excess(Categories::TOADLET_TADPOLE,String("Allocating: ")+type->getFullName());
-
+Node *Engine::createNode(BaseType<Node> *type,Scene *scene){
 	Node *node=NULL;
 	TOADLET_TRY
 		node=type->newInstance();
 	TOADLET_CATCH(const Exception &){node=NULL;}
-	return node;
-}
-
-Node *Engine::allocNode(const String &fullName){
-	Logger::excess(Categories::TOADLET_TADPOLE,String("Allocating: ")+fullName);
-
-	Node *node=NULL;
-	TOADLET_TRY
-		node=mNodeFactory.newInstance(fullName);
-	TOADLET_CATCH(const Exception &){node=NULL;}
-	return node;
-}
-
-Node *Engine::createNode(BaseType<Node> *type,Scene *scene){
-	Node *node=allocNode(type);
 	if(node!=NULL){
 		if(scene!=NULL){
 			node->create(scene);
-		}
-		else{
-			node->create(this);
 		}
 	}
 	return node;
 }
 
 Node *Engine::createNode(const String &fullName,Scene *scene){
-	Node *node=allocNode(fullName);
+	Node *node=NULL;
+	TOADLET_TRY
+		node=mNodeFactory.newInstance(fullName);
+	TOADLET_CATCH(const Exception &){node=NULL;}
 	if(node!=NULL){
 		if(scene!=NULL){
 			node->create(scene);
-		}
-		else{
-			node->create(this);
 		}
 	}
 	return node;
 }
 
-int Engine::internal_registerNode(Node *node){
+void Engine::nodeCreated(Node *node){
 	int handle=node->getUniqueHandle();
-
 	if(handle<=0){
 		int size=mFreeHandles.size();
 		if(size>0){
@@ -539,30 +515,16 @@ int Engine::internal_registerNode(Node *node){
 			mHandles.resize(handle+1);
 		}
 		mHandles[handle]=node;
+		node->internal_setUniqueHandle(handle);
 	}
-
-	return handle;
 }
 
-void Engine::internal_deregisterNode(Node *node){
+void Engine::nodeDestroyed(Node *node){
 	int handle=node->getUniqueHandle();
-
 	if(handle>0){
 		mHandles[handle]=NULL;
 		mFreeHandles.add(handle);
-	}
-}
-
-void Engine::destroyNode(Node *node){
-	if(node->created()){
-		node->destroy();
-	}
-}
-
-void Engine::freeNode(Node *node){
-	if(node->created()){
-		Error::unknown("freeing undestroyed node");
-		return;
+		node->internal_setUniqueHandle(0);
 	}
 }
 

@@ -50,7 +50,7 @@ void WADArchive::destroy(){
 bool WADArchive::open(Stream::ptr stream){
 	destroy();
 
-	mStream=DataStream::ptr(new DataStream(stream));
+	mStream=new DataStream(stream);
 	mStream->read((tbyte*)mHeader.identification,sizeof(mHeader.identification));
 	mHeader.numlumps=mStream->readLInt32();
 	mHeader.infotableofs=mStream->readLInt32();

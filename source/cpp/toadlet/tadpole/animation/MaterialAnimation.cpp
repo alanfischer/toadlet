@@ -24,7 +24,6 @@
  ********** Copyright header - do not remove **********/
 
 #include <toadlet/tadpole/animation/MaterialAnimation.h>
-#include <toadlet/tadpole/animation/Controller.h>
 #include <toadlet/egg/Error.h>
 #include <toadlet/egg/Logger.h>
 

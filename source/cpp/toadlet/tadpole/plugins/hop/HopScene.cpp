@@ -48,7 +48,7 @@ HopScene::HopScene(Engine *engine):Scene(engine),
 
 	mEngine->registerNodeType(HopEntity::type());
 
-	mVolumeSensor=BoundingVolumeSensor::ptr(new BoundingVolumeSensor(this));
+	mVolumeSensor=new BoundingVolumeSensor(this);
 	mSensorResults=SolidSensorResults::ptr(new SolidSensorResults());
 }
 

@@ -503,7 +503,7 @@ Mesh::ptr XMLMeshUtilities::loadMesh(mxml_node_t *node,int version,BufferManager
 			}
 		}
 		else{
-			vertexBuffer=VertexBuffer::ptr(new BackableBuffer());
+			vertexBuffer=new BackableBuffer();
 			vertexBuffer->create(Buffer::Usage_BIT_STATIC,Buffer::Access_BIT_WRITE,vertexFormat,count);
 		}
 
@@ -635,7 +635,7 @@ Mesh::ptr XMLMeshUtilities::loadMesh(mxml_node_t *node,int version,BufferManager
 				indexBuffer=bufferManager->createIndexBuffer(Buffer::Usage_BIT_STATIC,Buffer::Access_BIT_WRITE,IndexBuffer::IndexFormat_UINT16,count);
 			}
 			else{
-				indexBuffer=IndexBuffer::ptr(new BackableBuffer());
+				indexBuffer=new BackableBuffer();
 				indexBuffer->create(Buffer::Usage_BIT_STATIC,Buffer::Access_BIT_WRITE,IndexBuffer::IndexFormat_UINT16,count);
 			}
 
@@ -687,7 +687,7 @@ Mesh::ptr XMLMeshUtilities::loadMesh(mxml_node_t *node,int version,BufferManager
 				}
 			}
 			else{
-				material=Material::ptr(loadMaterial(materialNode,version,materialManager,textureManager));
+				material=loadMaterial(materialNode,version,materialManager,textureManager);
 			}
 
 			subMesh->material=material;

@@ -113,7 +113,6 @@ Resource::ptr ResourceManager::manage(const Resource::ptr &resource,const String
 			handle=mResources.size();
 			mResources.resize(handle+1);
 		}
-
 		mResources[handle]=resource;
 		resource->internal_setUniqueHandle(handle);
 		resource->setDestroyedListener(this);

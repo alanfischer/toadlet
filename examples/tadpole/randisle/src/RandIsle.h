@@ -122,7 +122,7 @@ protected:
 	Vector3 mPatchScale;
 	Noise mPatchNoise;
 	Sky::ptr mSky;
-	AudioNode::ptr mRustleSound;
+	AudioComponent::ptr mRustleSound;
 
 	IntrusivePointer<HUD> mHUD;
 };

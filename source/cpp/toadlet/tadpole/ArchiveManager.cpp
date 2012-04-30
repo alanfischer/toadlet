@@ -62,10 +62,10 @@ Stream::ptr ArchiveManager::openStream(const String &name){
 	if(stream==NULL){
 		FileStream::ptr fileStream;
 		if(System::absolutePath(name)==false){
-			fileStream=FileStream::ptr(new FileStream(mDirectory+name,FileStream::Open_READ_BINARY));
+			fileStream=new FileStream(mDirectory+name,FileStream::Open_READ_BINARY);
 		}
 		else{
-			fileStream=FileStream::ptr(new FileStream(name,FileStream::Open_READ_BINARY));
+			fileStream=new FileStream(name,FileStream::Open_READ_BINARY);
 		}
 		if(fileStream->closed()==false){
 			stream=fileStream;
