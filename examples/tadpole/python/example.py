@@ -32,8 +32,17 @@ scene.getRoot().attach(mesh)
 animate=AnimationActionComponent("animate")
 animate.attach(MeshAnimation(mesh,0))
 animate.setCycling(AnimationActionComponent.Cycling_REFLECT);
+animate.setStopGently(True)
 animate.start();
 mesh.attach(animate)
+
+class BoingListener(ActionListener):
+        def actionStarted(self,action):
+                audio.play()
+        def actionStopped(self,action):
+                return
+boing=BoingListener()
+animate.setActionListener(boing)
 
 class MoveAnimation(BaseAnimation):
 	def setValue(self,value):
@@ -50,7 +59,7 @@ animation=MoveAnimation()
 animate.attach(animation)
 
 mesh.totalRotate=0.0
-		
+
 def close():
 	window.run=False
 	window.destroy()
@@ -66,18 +75,27 @@ def drag(event):
 	window.lastx=event.x;
 window.bind("<B1-Motion>",drag)
 
+def key(event):
+	if animate.getActive():
+		animate.stop()
+	else:
+		animate.start()
+window.bind("<Key>",key)
+
 lastTime=time()
 window.run=True
 while window.run:
 	newTime=time();
-	dt=(newTime-lastTime)*1000;
+	dt=int((newTime-lastTime)*1000+0.5);
 
 	window.update()
-	scene.update(int(dt+0.5))
+	scene.update(dt)
 
 	renderDevice.beginScene()
 	camera.render(renderDevice)
 	renderDevice.endScene()
 	renderDevice.swap()
+
+	audioDevice.update(dt)
 	
 	lastTime=newTime

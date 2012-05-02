@@ -309,7 +309,7 @@ void MeshNode::updateVertexBuffer(){
 
 						/// @todo: Move these ifs out to separate loops
 						if(bone->useMatrixTransforms){
-							Math::mul(temp,bone->boneSpaceMatrix,normalInitial);
+							Math::mulVector3(temp,bone->boneSpaceMatrix,normalInitial);
 						}
 						else{
 							Math::mul(temp,bone->boneSpaceRotate,normalInitial);

@@ -13,6 +13,8 @@ public:
 	void setName(String name);
 	String getName() const;
 
+	bool getActive() const;
+	
 	bool setAudioBuffer(char *name);
 	
 	void play();

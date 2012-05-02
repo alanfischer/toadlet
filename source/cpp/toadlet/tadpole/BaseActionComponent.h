@@ -28,6 +28,7 @@
 
 #include <toadlet/egg/Object.h>
 #include <toadlet/tadpole/ActionComponent.h>
+#include <toadlet/tadpole/ActionListener.h>
 #include <toadlet/tadpole/node/Node.h>
 
 namespace toadlet{
@@ -37,8 +38,8 @@ class BaseActionComponent:protected Object,public ActionComponent{
 public:
 	TOADLET_OBJECT(BaseActionComponent);
 	
-	BaseActionComponent(){}
-	BaseActionComponent(const String &name){mName=name;}
+	BaseActionComponent():mListener(NULL){}
+	BaseActionComponent(const String &name):mListener(NULL){mName=name;}
 
 	virtual void destroy(){
 		if(mParent!=NULL){
@@ -68,9 +69,13 @@ public:
 
 	virtual bool getActive() const{return true;}
 
+	virtual void setActionListener(ActionListener *listener){mListener=listener;}
+	virtual ActionListener *getActionListener() const{return mListener;}
+
 protected:
 	String mName;
 	Node::ptr mParent;
+	ActionListener *mListener;
 };
 
 }

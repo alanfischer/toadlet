@@ -42,7 +42,6 @@ AnimationActionComponent::AnimationActionComponent(const String &name):BaseActio
 	//mInterpolator,
 	mTimeScale(Math::ONE),
 	mRunning(false)
-//	mListener(NULL)
 {}
 
 AnimationActionComponent::~AnimationActionComponent(){
@@ -73,8 +72,6 @@ void AnimationActionComponent::start(){
 
 	mRunning=true;
 
-	mTime=0;
-
 	mActualCycling=mCycling;
 }
 
@@ -85,10 +82,6 @@ void AnimationActionComponent::stop(){
 	}
 
 	mRunning=false;
-
-	mTime=0;
-
-	setValue(0);
 }
 
 void AnimationActionComponent::frameUpdate(int dt,int scope){
@@ -97,10 +90,6 @@ void AnimationActionComponent::frameUpdate(int dt,int scope){
 	}
 
 	if(mTimeScale>0){
-		if(mMaxTime>0 && mTime>=mMaxTime){
-			return;
-		}
-
 		mTime+=Math::toMilli(Math::mul(Math::fromMilli(dt),mTimeScale));
 
 		if(mMaxTime!=0 && mTime>=mMaxTime){
@@ -108,10 +97,22 @@ void AnimationActionComponent::frameUpdate(int dt,int scope){
 
 			setValue(Math::fromMilli(mTime));
 
+			if(mListener!=NULL){
+				mListener->actionStopped(this);
+			}
+
 			if(mActualCycling==Cycling_LOOP){
+				if(mListener!=NULL){
+					mListener->actionStarted(this);
+				}
+
 				mTime=0;
 			}
 			else if(mActualCycling==Cycling_REFLECT){
+				if(mListener!=NULL){
+					mListener->actionStarted(this);
+				}
+
 				mTimeScale*=-1;
 			}
 			else{
@@ -130,10 +131,22 @@ void AnimationActionComponent::frameUpdate(int dt,int scope){
 
 			setValue(Math::fromMilli(0));
 
+			if(mListener!=NULL){
+				mListener->actionStopped(this);
+			}
+
 			if(mActualCycling==Cycling_LOOP){
+				if(mListener!=NULL){
+					mListener->actionStarted(this);
+				}
+
 				mTime=mMaxTime;
 			}
 			else if(mActualCycling==Cycling_REFLECT){
+				if(mListener!=NULL){
+					mListener->actionStarted(this);
+				}
+
 				mTimeScale*=-1;
 			}
 			else{

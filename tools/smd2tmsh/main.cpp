@@ -5,6 +5,7 @@
 int main(int argc,char **argv){
 	String arg;
 	Collection<String> files;
+	Collection<float> fpses;
 	int i;
 
 	SMDConverter smd;
@@ -27,7 +28,7 @@ int main(int argc,char **argv){
 				smd.setTexCoordEpsilon(arg.substr(j+1,arg.length()).toFloat());
 			}
 			if(arg.substr(j,1)=="f"){
-				smd.setFPS(arg.substr(j+1,arg.length()).toFloat());
+				fpses.add(arg.substr(j+1,arg.length()).toFloat());
 			}
 			if(arg.substr(j,1)=="k"){
 				smd.setRemoveSkeleton(true);
@@ -66,6 +67,10 @@ int main(int argc,char **argv){
 		String fileName=files[i];
 
 		std::cout << "Loading " << (const char*)fileName << std::endl;
+
+		if(i-1>=0 && i-1<fpses.size()){
+			smd.setFPS(fpses[i-1]);
+		}
 
 		FileStream::ptr stream(new FileStream(fileName,FileStream::Open_READ_BINARY));
 		if(stream->closed()==false){

@@ -13,6 +13,8 @@ class Component{
 	
 	virtual void setName(String name)=0;
 	virtual String getName() const=0;
+	
+	virtual bool getActive() const=0;
 };
 
 }

@@ -155,6 +155,39 @@
 	#if defined(__ARM_NEON__)
 		#define TOADLET_HAS_NEON 1
 	#endif
+#elif defined(TOADLET_PLATFORM_EMSCRIPTEN)
+	#include <stdlib.h>
+	#include <endian.h>
+	#include <string.h>
+	#if defined(__BYTE_ORDER)
+		#if __BYTE_ORDER == __LITTLE_ENDIAN
+			#define TOADLET_LITTLE_ENDIAN 1
+		#elif __BYTE_ORDER == __BIG_ENDIAN
+			#define TOADLET_BIG_ENDIAN 1
+		#else
+			#error "Unknown byte order!"
+		#endif
+	#elif defined(BYTE_ORDER)
+		#if BYTE_ORDER == LITTLE_ENDIAN
+			#define TOADLET_LITTLE_ENDIAN 1
+		#elif BYTE_ORDER == BIG_ENDIAN
+			#define TOADLET_BIG_ENDIAN 1
+		#else
+			#error "Unknown byte order!"
+		#endif
+	#else
+		#error "Unknown byte order!"
+	#endif
+	#define TOADLET_C_API extern "C"
+	#define TOADLET_API
+	namespace toadlet{
+		typedef wchar_t wchar;
+		template<typename T> struct alignment_trick{char c; T member;};
+	}
+	#define TOADLET_SIZEOF_WCHAR 32
+	#define TOADLET_ALIGNOF(Type) offsetof(alignment_trick<Type>,member)
+	#define TOADLET_ALIGN(a) __attribute__((aligned(a)))
+	#define TOADLET_NO_THREADS
 #else
 	#error "Unknown platform"
 #endif

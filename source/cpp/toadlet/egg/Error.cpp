@@ -50,7 +50,9 @@ Error::Error(){
 	mLastError=Type_NONE;
 	memset(mLastDescription,0,sizeof(mLastDescription));
 
-	mErrorHandler.setStackTraceListener(this);
+	#if defined(TOADLET_EGG_ERRORHANDLER_H)
+		mErrorHandler.setStackTraceListener(this);
+	#endif
 }
 
 void Error::setError(int error){
@@ -94,11 +96,15 @@ void Error::errorLog(const String &categoryName,const String &text){
 }
 
 void Error::installHandler(){
-	mErrorHandler.installHandler();
+	#if defined(TOADLET_EGG_ERRORHANDLER_H)
+		mErrorHandler.installHandler();
+	#endif
 }
 	
 void Error::uninstallHandler(){
-	mErrorHandler.uninstallHandler();
+	#if defined(TOADLET_EGG_ERRORHANDLER_H)
+		mErrorHandler.uninstallHandler();
+	#endif
 }
 
 void Error::startTrace(){

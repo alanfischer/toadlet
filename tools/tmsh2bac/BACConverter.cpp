@@ -368,14 +368,14 @@ bool BACConverter::extractMeshData(Mesh::ptr mesh,bool useSubmeshes){
 		mBones.add(bone);
 	}
 	else{
-		MeshNodeSkeleton::ptr skeleton(new MeshNodeSkeleton(NULL,mesh->getSkeleton()));
+		SkeletonComponent::ptr skeleton=new SkeletonComponent(mesh->getSkeleton());
 		buildBones(mesh,skeleton,0);
 	}
 
 	return true;
 }
 
-void BACConverter::buildBones(Mesh *mesh,MeshNodeSkeleton *nodeSkeleton,int bone){
+void BACConverter::buildBones(Mesh *mesh,SkeletonComponent *nodeSkeleton,int bone){
 	Skeleton *skeleton=mesh->getSkeleton();
 	Skeleton::Bone *meshBone=skeleton->bones[bone];
 	int i;

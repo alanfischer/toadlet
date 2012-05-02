@@ -29,7 +29,9 @@
 #include <toadlet/egg/Categories.h>
 #include <toadlet/egg/String.h>
 #include <toadlet/egg/StackTraceListener.h>
-#include <toadlet/egg/ErrorHandler.h>
+#if !defined(TOADLET_PLATFORM_EMSCRIPTEN)
+	#include <toadlet/egg/ErrorHandler.h>
+#endif
 
 #if defined(TOADLET_EXCEPTIONS)
 	#include <toadlet/egg/Exception.h>
@@ -139,7 +141,9 @@ protected:
 	int mLastError;
 	char mLastDescription[MAX_DESCRIPTION_LENGTH+1];
 
-	ErrorHandler mErrorHandler;
+	#if defined(TOADLET_EGG_ERRORHANDLER_H)
+		ErrorHandler mErrorHandler;
+	#endif
 };
 
 }

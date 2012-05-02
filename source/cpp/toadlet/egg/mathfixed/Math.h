@@ -654,6 +654,8 @@ namespace Math{
 		r.y=TOADLET_MUL_XX(m.data[1+0*3],v.x) + TOADLET_MUL_XX(m.data[1+1*3],v.y) + TOADLET_MUL_XX(m.data[1+2*3],v.z);
 		r.z=TOADLET_MUL_XX(m.data[2+0*3],v.x) + TOADLET_MUL_XX(m.data[2+1*3],v.y) + TOADLET_MUL_XX(m.data[2+2*3],v.z);
 	}
+	inline void mulPoint3(Vector3 &r,const Matrix3x3 &m,const Vector3 &v){mul(r,m,v);}
+	inline void mulVector3(Vector3 &r,const Matrix3x3 &m,const Vector3 &v){mul(r,m,v);}
 
 	inline void mul(Vector3 &r,const Matrix3x3 &m){
 		fixed tx=TOADLET_MUL_XX(m.data[0+0*3],r.x) + TOADLET_MUL_XX(m.data[0+1*3],r.y) + TOADLET_MUL_XX(m.data[0+2*3],r.z);
@@ -663,6 +665,8 @@ namespace Math{
 		r.y=ty;
 		r.z=tz;
 	}
+	inline void mulPoint3(Vector3 &v,const Matrix3x3 &m){mul(v,m);}
+	inline void mulVector3(Vector3 &v,const Matrix3x3 &m){mul(v,m);}
 
 	TOADLET_API void transpose(Matrix3x3 &r,const Matrix3x3 &m);
 
@@ -744,6 +748,11 @@ namespace Math{
 		r.y=TOADLET_MUL_XX(ty,iw);
 		r.z=TOADLET_MUL_XX(tz,iw);
 	}
+
+	inline void mulPoint3(Vector3 &r,const Matrix4x4 &m,const Vector3 &v){mulPoint3Fast(r,m,v);}
+	inline void mulVector3(Vector3 &r,const Matrix4x4 &m,const Vector3 &v){mul(r,m,v);}
+	inline void mulPoint3(Vector3 &r,const Matrix4x4 &m){mulPoint3Fast(r,m);}
+	inline void mulVector3(Vector3 &r,const Matrix4x4 &m){mul(r,m);}
 
 	TOADLET_API void transpose(Matrix4x4 &r,const Matrix4x4 &m);
 
@@ -1156,17 +1165,6 @@ namespace Math{
 		q2.w=w;
 	}
 
-	inline void mul(Vector3 &r,const Quaternion &q){
-		fixed x=TOADLET_MUL_XX(+q.y,r.z)-TOADLET_MUL_XX(q.z,r.y)+TOADLET_MUL_XX(q.w,r.x);
-		fixed y=TOADLET_MUL_XX(-q.x,r.z)+TOADLET_MUL_XX(q.z,r.x)+TOADLET_MUL_XX(q.w,r.y);
-		fixed z=TOADLET_MUL_XX(+q.x,r.y)-TOADLET_MUL_XX(q.y,r.x)+TOADLET_MUL_XX(q.w,r.z);
-		fixed w=TOADLET_MUL_XX(-q.x,r.x)-TOADLET_MUL_XX(q.y,r.y)-TOADLET_MUL_XX(q.z,r.z);
-
-		r.x=TOADLET_MUL_XX(+x,+q.w)+TOADLET_MUL_XX(y,-q.z)-TOADLET_MUL_XX(z,-q.y)+TOADLET_MUL_XX(w,-q.x);
-		r.y=TOADLET_MUL_XX(-x,-q.z)+TOADLET_MUL_XX(y,+q.w)+TOADLET_MUL_XX(z,-q.x)+TOADLET_MUL_XX(w,-q.y);
-		r.z=TOADLET_MUL_XX(+x,-q.y)-TOADLET_MUL_XX(y,-q.x)+TOADLET_MUL_XX(z,+q.w)+TOADLET_MUL_XX(w,-q.z);
-	}
-
 	inline void mul(Vector3 &r,const Quaternion &q,const Vector3 &v){
 		fixed x=TOADLET_MUL_XX(+q.y,v.z)-TOADLET_MUL_XX(q.z,v.y)+TOADLET_MUL_XX(q.w,v.x);
 		fixed y=TOADLET_MUL_XX(-q.x,v.z)+TOADLET_MUL_XX(q.z,v.x)+TOADLET_MUL_XX(q.w,v.y);
@@ -1177,7 +1175,21 @@ namespace Math{
 		r.y=TOADLET_MUL_XX(-x,-q.z)+TOADLET_MUL_XX(y,+q.w)+TOADLET_MUL_XX(z,-q.x)+TOADLET_MUL_XX(w,-q.y);
 		r.z=TOADLET_MUL_XX(+x,-q.y)-TOADLET_MUL_XX(y,-q.x)+TOADLET_MUL_XX(z,+q.w)+TOADLET_MUL_XX(w,-q.z);
 	}
+	inline void mulPoint3(Vector3 &r,const Quaternion &q,const Vector3 &v){mul(r,q,v);}
+	inline void mulVector3(Vector3 &r,const Quaternion &q,const Vector3 &v){mul(r,q,v);}
 
+	inline void mul(Vector3 &r,const Quaternion &q){
+		fixed x=TOADLET_MUL_XX(+q.y,r.z)-TOADLET_MUL_XX(q.z,r.y)+TOADLET_MUL_XX(q.w,r.x);
+		fixed y=TOADLET_MUL_XX(-q.x,r.z)+TOADLET_MUL_XX(q.z,r.x)+TOADLET_MUL_XX(q.w,r.y);
+		fixed z=TOADLET_MUL_XX(+q.x,r.y)-TOADLET_MUL_XX(q.y,r.x)+TOADLET_MUL_XX(q.w,r.z);
+		fixed w=TOADLET_MUL_XX(-q.x,r.x)-TOADLET_MUL_XX(q.y,r.y)-TOADLET_MUL_XX(q.z,r.z);
+
+		r.x=TOADLET_MUL_XX(+x,+q.w)+TOADLET_MUL_XX(y,-q.z)-TOADLET_MUL_XX(z,-q.y)+TOADLET_MUL_XX(w,-q.x);
+		r.y=TOADLET_MUL_XX(-x,-q.z)+TOADLET_MUL_XX(y,+q.w)+TOADLET_MUL_XX(z,-q.x)+TOADLET_MUL_XX(w,-q.y);
+		r.z=TOADLET_MUL_XX(+x,-q.y)-TOADLET_MUL_XX(y,-q.x)+TOADLET_MUL_XX(z,+q.w)+TOADLET_MUL_XX(w,-q.z);
+	}
+	inline void mulPoint3(Vector3 &r,const Quaternion &q){mul(r,q);}
+	inline void mulVector3(Vector3 &r,const Quaternion &q){mul(r,q);}
 
 	inline fixed lengthSquared(const Quaternion &q){
 		fixed r=TOADLET_MUL_XX(q.x,q.x) + TOADLET_MUL_XX(q.y,q.y) + TOADLET_MUL_XX(q.z,q.z) + TOADLET_MUL_XX(q.w,q.w);
@@ -1449,7 +1461,7 @@ namespace Math{
 		b.getVertexes(buffer);
 
 		for(i=0;i<8;++i){
-			Math::mul(temp,transform,buffer[i]);
+			Math::mulPoint3(temp,transform,buffer[i]);
 			if(i==0){
 				r.mins.set(temp);
 				r.maxs.set(temp);

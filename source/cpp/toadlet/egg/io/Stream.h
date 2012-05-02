@@ -31,8 +31,11 @@
 
 namespace toadlet{
 namespace egg{
+/// @todo: These should be put in an egg Types.h file
 namespace io{};
 using namespace io;
+namespace net{};
+using namespace net;
 
 namespace io{
 

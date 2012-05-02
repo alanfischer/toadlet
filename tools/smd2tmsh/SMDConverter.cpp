@@ -56,10 +56,16 @@ void SMDConverter::load(Engine *engine,Stream *in,const String &fileName){
 	int vertindex=0;
 	Vertex triverts[3];
 	Collection<Triangle> triangles;
+	Skeleton::ptr skeleton=new Skeleton();
 
 	if(mMesh==NULL){
 		mMesh=new Mesh();
 		mMesh->setName(resourceName);
+
+		mSkeleton=skeleton;
+		mMesh->setSkeleton(skeleton);
+
+		reference=true;
 	}
 
 	String s;
@@ -117,23 +123,14 @@ void SMDConverter::load(Engine *engine,Stream *in,const String &fileName){
 					sscanf(s.c_str(),"%d %s %d",&id,name,&pid);
 				}
 
-				if(mSkeleton==NULL){
-					mSkeleton=new Skeleton();
-					mMesh->setSkeleton(mSkeleton);
-					reference=true;
+				Skeleton::Bone::ptr bone(new Skeleton::Bone());
+				bone->index=id;
+				bone->parentIndex=pid;
+				bone->name=name;
+				if(skeleton->bones.size()<=bone->index){
+					skeleton->bones.resize(bone->index+1);
 				}
-
-				if(reference && mSkeleton!=NULL){
-					Skeleton::Bone::ptr bone(new Skeleton::Bone());
-					bone->index=id;
-					bone->parentIndex=pid;
-					bone->name=name;
-
-					if(mSkeleton->bones.size()<=bone->index){
-						mSkeleton->bones.resize(bone->index+1);
-					}
-					mSkeleton->bones.setAt(bone->index,bone);
-				}
+				skeleton->bones.setAt(bone->index,bone);
 			}
 		}
 		else if(block==Block_SKELETON){
@@ -149,14 +146,15 @@ void SMDConverter::load(Engine *engine,Stream *in,const String &fileName){
 				float rx=0,ry=0,rz=0;
 				sscanf(s.c_str(),"%d %f %f %f %f %f %f",&id,&px,&py,&pz,&rx,&ry,&rz);
 
-				if(mSkeleton!=NULL){
-					if(reference){
-						Skeleton::Bone::ptr bone=mSkeleton->bones.at(id);
-						bone->translate.set(MathConversion::floatToScalar(px),MathConversion::floatToScalar(py),MathConversion::floatToScalar(pz));
-						setQuaternionFromXYZ(bone->rotate,MathConversion::floatToScalar(rx),MathConversion::floatToScalar(ry),MathConversion::floatToScalar(rz));
-					}
-					else{
-						TransformTrack::ptr track=mSequence->getTrack(id);
+				if(reference){
+					Skeleton::Bone::ptr bone=skeleton->bones.at(id);
+					bone->translate.set(MathConversion::floatToScalar(px),MathConversion::floatToScalar(py),MathConversion::floatToScalar(pz));
+					setQuaternionFromXYZ(bone->rotate,MathConversion::floatToScalar(rx),MathConversion::floatToScalar(ry),MathConversion::floatToScalar(rz));
+				}
+				else{
+					Skeleton::Bone::ptr bone=mSkeleton->getBone(skeleton->bones.at(id)->name);
+					if(bone!=NULL){
+						TransformTrack::ptr track=mSequence->getTrack(bone->index);
 
 						TransformKeyFrame keyFrame;
 						keyFrame.time=Math::fromInt(time)/mFPS;
@@ -204,7 +202,7 @@ void SMDConverter::load(Engine *engine,Stream *in,const String &fileName){
 		int i,j,k;
 
 		if(mRemoveSkeleton==false && mSkeleton!=NULL){
-			MeshNodeSkeleton::ptr skeleton(new MeshNodeSkeleton(NULL,mSkeleton));
+			SkeletonComponent::ptr skeleton=new SkeletonComponent(mSkeleton);
 			skeleton->updateBones();
 			for(i=0;i<skeleton->getNumBones();++i){
 				Vector3 wtbTranslation(skeleton->getBone(i)->worldTranslate);
