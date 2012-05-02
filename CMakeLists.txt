@@ -55,6 +55,8 @@ elseif (UNIX)
 			set (TOADLET_PLATFORM_IOS ON CACHE BOOL "Toadlet for iOS")
 		endif (IOS)
 	endif (APPLE)
+elseif (EMSCRIPTEN)
+	set (TOADLET_PLATFORM_EMSCRIPTEN ON CACHE BOOL "Toadlet for emscripten")
 endif (WIN32)
 
 

@@ -144,7 +144,7 @@ protected:
 	};
 
 	bool extractMeshData(Mesh::ptr mesh,bool submeshes=true);
-	void buildBones(Mesh *mesh,MeshNodeSkeleton *nodeSkeleton,int bone);
+	void buildBones(Mesh *mesh,SkeletonComponent *nodeSkeleton,int bone);
 	void constructQuads();
 	void rewindTriangles();
 	void adjustVertexes(float amount);

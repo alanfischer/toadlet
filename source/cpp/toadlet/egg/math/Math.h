@@ -641,6 +641,8 @@ namespace Math{
 		r.y=m.data[1+0*3]*v.x + m.data[1+1*3]*v.y + m.data[1+2*3]*v.z;
 		r.z=m.data[2+0*3]*v.x + m.data[2+1*3]*v.y + m.data[2+2*3]*v.z;
 	}
+	inline void mulPoint3(Vector3 &r,const Matrix3x3 &m,const Vector3 &v){mul(r,m,v);}
+	inline void mulVector3(Vector3 &r,const Matrix3x3 &m,const Vector3 &v){mul(r,m,v);}
 
 	inline void mul(Vector3 &v,const Matrix3x3 &m){
 		real tx=m.data[0+0*3]*v.x + m.data[0+1*3]*v.y + m.data[0+2*3]*v.z;
@@ -650,6 +652,8 @@ namespace Math{
 		v.y=ty;
 		v.z=tz;
 	}
+	inline void mulPoint3(Vector3 &v,const Matrix3x3 &m){mul(v,m);}
+	inline void mulVector3(Vector3 &v,const Matrix3x3 &m){mul(v,m);}
 
 	TOADLET_API void transpose(Matrix3x3 &r,const Matrix3x3 &m);
 
@@ -732,6 +736,11 @@ namespace Math{
 		r.y=ty*iw;
 		r.z=tz*iw;
 	}
+
+	inline void mulPoint3(Vector3 &r,const Matrix4x4 &m,const Vector3 &v){mulPoint3Fast(r,m,v);}
+	inline void mulVector3(Vector3 &r,const Matrix4x4 &m,const Vector3 &v){mul(r,m,v);}
+	inline void mulPoint3(Vector3 &r,const Matrix4x4 &m){mulPoint3Fast(r,m);}
+	inline void mulVector3(Vector3 &r,const Matrix4x4 &m){mul(r,m);}
 
 	TOADLET_API void transpose(Matrix4x4 &r,const Matrix4x4 &m);
 
@@ -1144,17 +1153,6 @@ namespace Math{
 		q2.w=w;
 	}
 
-	inline void mul(Vector3 &r,const Quaternion &q){
-		real x=+q.y*r.z-q.z*r.y+q.w*r.x;
-		real y=-q.x*r.z+q.z*r.x+q.w*r.y;
-		real z=+q.x*r.y-q.y*r.x+q.w*r.z;
-		real w=-q.x*r.x-q.y*r.y-q.z*r.z;
-
-		r.x=+x*+q.w+y*-q.z-z*-q.y+w*-q.x;
-		r.y=-x*-q.z+y*+q.w+z*-q.x+w*-q.y;
-		r.z=+x*-q.y-y*-q.x+z*+q.w+w*-q.z;
-	}
-
 	inline void mul(Vector3 &r,const Quaternion &q,const Vector3 &v){
 		real x=+q.y*v.z-q.z*v.y+q.w*v.x;
 		real y=-q.x*v.z+q.z*v.x+q.w*v.y;
@@ -1165,6 +1163,21 @@ namespace Math{
 		r.y=-x*-q.z+y*+q.w+z*-q.x+w*-q.y;
 		r.z=+x*-q.y-y*-q.x+z*+q.w+w*-q.z;
 	}
+	inline void mulPoint3(Vector3 &r,const Quaternion &q,const Vector3 &v){mul(r,q,v);}
+	inline void mulVector3(Vector3 &r,const Quaternion &q,const Vector3 &v){mul(r,q,v);}
+
+	inline void mul(Vector3 &r,const Quaternion &q){
+		real x=+q.y*r.z-q.z*r.y+q.w*r.x;
+		real y=-q.x*r.z+q.z*r.x+q.w*r.y;
+		real z=+q.x*r.y-q.y*r.x+q.w*r.z;
+		real w=-q.x*r.x-q.y*r.y-q.z*r.z;
+
+		r.x=+x*+q.w+y*-q.z-z*-q.y+w*-q.x;
+		r.y=-x*-q.z+y*+q.w+z*-q.x+w*-q.y;
+		r.z=+x*-q.y-y*-q.x+z*+q.w+w*-q.z;
+	}
+	inline void mulPoint3(Vector3 &r,const Quaternion &q){mul(r,q);}
+	inline void mulVector3(Vector3 &r,const Quaternion &q){mul(r,q);}
 
 	inline real lengthSquared(const Quaternion &q){
 		return q.x*q.x + q.y*q.y + q.z*q.z + q.w*q.w;
@@ -1431,7 +1444,7 @@ namespace Math{
 		b.getVertexes(buffer);
 
 		for(i=0;i<8;++i){
-			Math::mul(temp,transform,buffer[i]);
+			Math::mulPoint3(temp,transform,buffer[i]);
 			if(i==0){
 				r.mins.set(temp);
 				r.maxs.set(temp);

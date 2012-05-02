@@ -73,5 +73,15 @@ void Skeleton::compile(){
 	}
 }
 
+Skeleton::Bone::ptr Skeleton::getBone(const String &name){
+	int i;
+	for(i=0;i<bones.size();++i){
+		if(bones[i]->name==name){
+			return bones[i];
+		}
+	}
+	return NULL;
+}
+
 }
 }

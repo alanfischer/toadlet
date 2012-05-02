@@ -139,7 +139,7 @@ int SkeletonComponent::updateBoneTransformation(Bone *bone){
 				Math::lerp(bone->localRotate,f1->rotate,f2->rotate,t);
 				Math::normalizeCarefully(bone->localRotate,0);
 			}
-			return BoneSpaceUpdate_FLAG_MATRIX|BoneSpaceUpdate_FLAG_TRANSLATE|BoneSpaceUpdate_FLAG_ROTATE;
+			return BoneSpaceUpdate_FLAG_TRANSLATE|BoneSpaceUpdate_FLAG_ROTATE;
 		}
 	}
 
@@ -232,7 +232,7 @@ void SkeletonComponent::updateBone(Bone *bone){
 		Math::mulPoint3Fast(vector,bone->worldMatrix,sbone->worldToBoneTranslate);
 		Math::setMatrix4x4FromTranslate(bone->boneSpaceMatrix,vector);
 
-		Math::mul(bone->worldBound,bone->boneSpaceMatrix,sbone->bound);
+		Math::mul(bone->worldBound,bone->worldMatrix,sbone->bound);
 	}
 	else{
 		Math::mul(bone->boneSpaceRotate,bone->worldRotate,sbone->worldToBoneRotate);

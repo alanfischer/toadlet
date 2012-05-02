@@ -35,7 +35,7 @@
 		typedef Win32System System;
 	}
 	}
-#elif defined(TOADLET_PLATFORM_POSIX)
+#elif defined(TOADLET_PLATFORM_POSIX) || defined(TOADLET_PLATFORM_EMSCRIPTEN)
 	#include "platform/posix/PosixSystem.h"
 	namespace toadlet{
 	namespace egg{

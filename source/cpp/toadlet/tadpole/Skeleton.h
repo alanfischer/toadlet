@@ -66,6 +66,9 @@ public:
 	void destroy();
 	void compile();
 
+	Bone::ptr getBone(int i){return bones[i];}
+	Bone::ptr getBone(const String &name);
+
 	Collection<Bone::ptr> bones;
 	Collection<TransformSequence::ptr> sequences;
 };

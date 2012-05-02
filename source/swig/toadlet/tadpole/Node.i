@@ -15,6 +15,8 @@ public:
 	void setName(String name);
 	String getName() const;
 
+	bool getActive() const;
+
 	void setTranslate(float x,float y,float z);
 	void setRotate(float axis[3],float angle);
 
