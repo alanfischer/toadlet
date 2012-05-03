@@ -92,6 +92,26 @@ void SceneRenderer::setupPass(RenderPass *pass){
 	mLastPass=pass;
 }
 
+void SceneRenderer::setupPassForRenderable(RenderPass *pass,Renderable *renderable,const Vector4 &ambient){
+	Matrix4x4 matrix;
+	renderable->getRenderTransform().getMatrix(matrix);
+
+	// Fixed states
+	mDevice->setAmbientColor(ambient);
+	mDevice->setMatrix(RenderDevice::MatrixType_MODEL,matrix);
+
+	// Shader states
+	if(pass!=NULL){
+		mSceneParameters->setRenderable(renderable);
+		mSceneParameters->setAmbient(ambient);
+
+		pass->updateVariables(Material::Scope_RENDERABLE,mSceneParameters);
+		setupVariableBuffers(pass,Material::Scope_RENDERABLE,mDevice);
+	
+		mSceneParameters->setRenderable(NULL);
+	}
+}
+
 void SceneRenderer::gatherRenderables(RenderableSet *set,Node *node,CameraNode *camera){
 	RenderListener *listener=mScene->getRenderListener();
 
@@ -187,7 +207,6 @@ void SceneRenderer::renderDepthSortedRenderables(const RenderableSet::Renderable
 /// @todo: We should see if the Pass is a Fixed or Shader pass, in which case we either set Fixed states, or setupRenderVariables
 ///  And then maybe set Fixed states should be moved the pass, like setupRenderVariables
 void SceneRenderer::renderQueueItems(Material *material,const RenderableSet::RenderableQueueItem *items,int numItems){
-	Matrix4x4 matrix;
 	RenderPath *path=(material!=NULL)?material->getBestPath():NULL;
 	int numPasses=(path!=NULL?path->getNumPasses():1);
 	int i,j;
@@ -199,25 +218,10 @@ void SceneRenderer::renderQueueItems(Material *material,const RenderableSet::Ren
 
 		for(j=0;j<numItems;++j){
 			const RenderableSet::RenderableQueueItem &item=items[j];
-			Renderable *renderable=item.renderable;
-			renderable->getRenderTransform().getMatrix(matrix);
-
-			// Fixed states
-			mDevice->setAmbientColor(item.ambient);
-			mDevice->setMatrix(RenderDevice::MatrixType_MODEL,matrix);
-
-			// Shader states
 			if(pass!=NULL){
-				mSceneParameters->setRenderable(renderable);
-				mSceneParameters->setAmbient(item.ambient);
-
-				pass->updateVariables(Material::Scope_RENDERABLE,mSceneParameters);
-				setupVariableBuffers(pass,Material::Scope_RENDERABLE,mDevice);
-	
-				mSceneParameters->setRenderable(NULL);
+				setupPassForRenderable(pass,item.renderable,item.ambient);
 			}
-
-			renderable->render(this);
+			item.renderable->render(this);
 		}
 
 		if(mSceneParameters->getCamera()->getDefaultState()!=NULL){

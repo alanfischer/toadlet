@@ -42,6 +42,7 @@ public:
 	virtual void renderScene(RenderDevice *device,Node *node,CameraNode *camera);
 	virtual RenderDevice *getDevice(){return mDevice;}
 	virtual void setupPass(RenderPass *pass);
+	virtual void setupPassForRenderable(RenderPass *pass,Renderable *renderable,const Vector4 &ambient);
 
 protected:
 	virtual void gatherRenderables(RenderableSet *set,Node *node,CameraNode *camera);
