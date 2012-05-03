@@ -1,11 +1,7 @@
 #include "../../Logo.h"
 #include <jni.h>
 
-extern "C" JNIEXPORT void Java_us_toadlet_pad(JNIEnv *env);
-
 extern "C" JNIEXPORT jobject JNICALL Java_us_toadlet_logo_Logo_createApplet(JNIEnv *env,jobject obj){
-	Java_us_toadlet_pad(env);
-
 	Logger::alert("getting Application");
 	Application *app=new JApplication(env,obj);
 
@@ -26,6 +22,14 @@ extern "C" JNIEXPORT jobject JNICALL Java_us_toadlet_logo_Logo_createApplet(JNIE
 	return appletObj;
 }
 
-extern "C" JNIEXPORT void JNICALL Java_us_toadlet_logo_Logo_destroyApplet(JNIEnv *env,jobject obj,jobject applet){
-//	delete applet;
+extern "C" JNIEXPORT void JNICALL Java_us_toadlet_logo_Logo_destroyApplet(JNIEnv *env,jobject obj,jobject appletObj){
+	Applet *applet=NULL;
+	
+	jclass appletClass=env->FindClass("us/toadlet/pad/NApplet");
+	{
+		jfieldID nativeHandleID=env->GetFieldID(appletClass,"mNativeHandle","I");
+		applet=(Applet*)env->GetIntField(appletObj,nativeHandleID);
+	}
+
+	delete applet;
 }
