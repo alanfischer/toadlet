@@ -585,6 +585,7 @@ void BSP30Node::render(SceneRenderer *renderer) const{
 		RenderPath *path=mMap->materials[i]->getBestPath();
 		for(j=0;j<path->getNumPasses();++j){
 			renderer->setupPass(path->getPass(j));
+			renderer->setupPassForRenderable(path->getPass(j),(Renderable*)this,Math::ZERO_VECTOR4);
 			mMap->renderFaces(renderer->getDevice(),mVisibleMaterialFaces[i]);
 		}
 	}
