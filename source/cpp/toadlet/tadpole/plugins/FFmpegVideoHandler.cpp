@@ -275,24 +275,37 @@ bool FFmpegController::open(Stream::ptr stream){
 	String name;
 
 	mStream=stream;
-	mIOCtx=(ByteIOContext*)av_mallocz(sizeof(ByteIOContext));
 	int bufferSize=4096;
 	unsigned char *buffer=(unsigned char*)av_mallocz(bufferSize+FF_INPUT_BUFFER_PADDING_SIZE);
-	init_put_byte(mIOCtx,buffer,bufferSize,0,stream,toadlet_read_packet,toadlet_write_packet,toadlet_seek);
-
-	int result=av_open_input_stream(&mFormatCtx,mIOCtx,name,av_find_input_format(name),NULL);
-	if(result<0){
-		Error::unknown("av_open_input_stream failed");
+	mIOCtx=avio_alloc_context(buffer,bufferSize,0,stream,toadlet_read_packet,toadlet_write_packet,toadlet_seek);
+	
+	mFormatCtx=avformat_alloc_context();
+	if(mFormatCtx==NULL){
+		Error::unknown("avformat_alloc_context failed");
         return false;
     }
 
-    result=av_find_stream_info(mFormatCtx);
+	mFormatCtx->pb=mIOCtx;
+
+	int result=av_probe_input_buffer(mIOCtx,&mFormatCtx->iformat,name,NULL,0,0);
+	if(result<0){
+		Error::unknown("av_probe_input_buffer failed");
+        return false;
+	}
+
+	result=avformat_open_input(&mFormatCtx,name,mFormatCtx->iformat,NULL);
+	if(result<0){
+		Error::unknown("avformat_open_input failed");
+		return false;
+	}
+
+	result=avformat_find_stream_info(mFormatCtx,NULL);
 	if(result<0){
 		Error::unknown("av_find_stream_info failed");
-        return false;
-    }
+		return false;
+	}
 
-    dump_format(mFormatCtx,0,name,0);
+	av_dump_format(mFormatCtx,0,name,0);
 
 //	if(mFormatCtx->start_time!=AV_NOPTS_VALUE){
 //		mStartTime=mFormatCtx->start_time;
@@ -318,7 +331,7 @@ bool FFmpegController::open(Stream::ptr stream){
 				return false;
 			}
 
-			if(avcodec_open(stream.codecCtx,stream.codec)<0){
+			if(avcodec_open2(stream.codecCtx,stream.codec,NULL)<0){
 				Error::unknown(
 					String("unable to open stream codec for type:")+type);
 				return false;
