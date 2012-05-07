@@ -121,7 +121,7 @@ protected:
 
 	Engine *mEngine;
 	Stream::ptr mStream;
-	ByteIOContext *mIOCtx;
+	AVIOContext *mIOCtx;
 	tbyte *mIOBuffer;
     AVFormatContext *mFormatCtx;
 	StreamData mStreams[AVMEDIA_TYPE_NB];
