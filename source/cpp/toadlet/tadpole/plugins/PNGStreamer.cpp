@@ -44,9 +44,10 @@ void toadlet_png_read_data(png_structp png_ptr,png_bytep data,png_size_t length)
 	}
 }
 
-Resource::ptr PNGStreamer::load(Stream::ptr stream,ResourceData *resourceData,ProgressListener *listener){
+Resource::ptr PNGStreamer::load(Stream::ptr stream,ResourceData *data,ProgressListener *listener){
 	png_byte header[8];
 	int y;
+	int usage=(data!=NULL)?((TextureData*)data)->usage:0;
 
 	if(stream==NULL){
 		Error::nullPointer(Categories::TOADLET_TADPOLE,
@@ -201,7 +202,7 @@ Resource::ptr PNGStreamer::load(Stream::ptr stream,ResourceData *resourceData,Pr
 
 	png_destroy_read_struct(&png_ptr,&info_ptr,NULL);
 
-	Texture::ptr texture=mTextureManager->createTexture(textureFormat,textureData);
+	Texture::ptr texture=mTextureManager->createTexture(usage,textureFormat,textureData);
 
 	delete[] textureData;
 

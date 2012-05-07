@@ -37,6 +37,7 @@ namespace egg{
 class BaseResource:public Object,public Resource{
 public:
 	BaseResource():Object(),mListener(NULL),mName(),mUniqueHandle(0){}
+	virtual ~BaseResource(){}
 
 	virtual int retain(){return Object::retain();}
 

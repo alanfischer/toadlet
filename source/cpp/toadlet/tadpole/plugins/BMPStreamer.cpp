@@ -66,6 +66,7 @@ Resource::ptr BMPStreamer::load(Stream::ptr stream,ResourceData *data,ProgressLi
 	int i,j;
 	BITMAPINFOHEADER bmih={0};
 	BITMAPFILEHEADER bmfh={0};
+	int usage=(data!=NULL)?((TextureData*)data)->usage:0;
 
 	if(stream==NULL){
 		Error::nullPointer(Categories::TOADLET_TADPOLE,
@@ -195,7 +196,7 @@ Resource::ptr BMPStreamer::load(Stream::ptr stream,ResourceData *data,ProgressLi
 		}
 	}
 
-	Texture::ptr texture=mTextureManager->createTexture(textureFormat,textureData);
+	Texture::ptr texture=mTextureManager->createTexture(usage,textureFormat,textureData);
 
 	delete[] textureData;
 

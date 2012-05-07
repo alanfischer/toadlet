@@ -47,6 +47,8 @@ enum Encoding{
 };
 
 Resource::ptr TGAStreamer::load(Stream::ptr stream,ResourceData *data,ProgressListener *listener){
+	int usage=(data!=NULL)?((TextureData*)data)->usage:0;
+
 	if(stream==NULL){
 		Error::nullPointer(Categories::TOADLET_TADPOLE,
 			"Stream is NULL");
@@ -159,7 +161,7 @@ Resource::ptr TGAStreamer::load(Stream::ptr stream,ResourceData *data,ProgressLi
 		}break;
 	}
 
-	Texture::ptr texture=mTextureManager->createTexture(textureFormat,textureData);
+	Texture::ptr texture=mTextureManager->createTexture(usage,textureFormat,textureData);
 
 	delete[] textureData;
 

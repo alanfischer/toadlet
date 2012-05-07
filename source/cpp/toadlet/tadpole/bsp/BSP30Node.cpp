@@ -271,6 +271,8 @@ void BSP30Node::setMap(BSP30Map::ptr map){
 		findBoundLeafs(indexes,node);
 		insertNodeLeafIndexes(indexes,node);
 	}
+
+	mBound.set(mMap->models[0].mins,mMap->models[0].maxs);
 }
 
 void BSP30Node::setSkyName(const String &skyName){

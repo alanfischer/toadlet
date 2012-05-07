@@ -63,6 +63,8 @@ AndroidTextureStreamer::~AndroidTextureStreamer(){
 }
 
 Resource::ptr AndroidTextureStreamer::load(Stream::ptr stream,ResourceData *data,ProgressListener *listener){
+	int usage=(data!=NULL)?((TextureData*)data)->usage:0;
+
 	Logger::debug(Categories::TOADLET_TADPOLE,"AndroidTextureStreamer::load");
 
 	jvm->AttachCurrentThread(&env,NULL);
@@ -120,7 +122,7 @@ Resource::ptr AndroidTextureStreamer::load(Stream::ptr stream,ResourceData *data
 	}
 	delete[] line;
 
-	Texture::ptr texture=mTextureManager->createTexture(textureFormat,textureData);
+	Texture::ptr texture=mTextureManager->createTexture(usage,textureFormat,textureData);
 	
 	delete[] textureData;
 	

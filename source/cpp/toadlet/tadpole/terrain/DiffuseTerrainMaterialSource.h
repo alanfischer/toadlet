@@ -33,16 +33,19 @@ namespace toadlet{
 namespace tadpole{
 namespace terrain{
 
-class TOADLET_API DiffuseTerrainMaterialSource:public TerrainNodeMaterialSource{
+class TOADLET_API DiffuseTerrainMaterialSource:protected Object,public TerrainNodeMaterialSource{
 public:
-	TOADLET_SPTR(DiffuseTerrainMaterialSource);
+	TOADLET_OBJECT(DiffuseTerrainMaterialSource);
 	
-	DiffuseTerrainMaterialSource(Engine *engine);
+	DiffuseTerrainMaterialSource(Engine *engine,const Vector3 &scale,const String &name);
+	DiffuseTerrainMaterialSource(Engine *engine,const Vector3 &scale,Texture *texture=NULL);
 	virtual ~DiffuseTerrainMaterialSource(){}
-	
+
+	void createShaders();
 	void destroy();
 
-	void setDiffuseTexture(int layer,Texture::ptr texture);
+	bool setDiffuseTexture(int layer,const String &name);
+	bool setDiffuseTexture(int layer,Texture *texture);
 	Texture::ptr getDiffuseTexture(int layer){return mDiffuseTextures.size()>layer?mDiffuseTextures[layer]:NULL;}
 
 	Material::ptr getMaterial(TerrainPatchNode *patch);
@@ -50,6 +53,7 @@ public:
 protected:
 	Engine *mEngine;
 	Shader::ptr mDiffuseVertexShader,mDiffuseBaseFragmentShader,mDiffuseLayerFragmentShader;
+	Vector3 mTextureScale;
 	Collection<Texture::ptr> mDiffuseTextures;
 };
 

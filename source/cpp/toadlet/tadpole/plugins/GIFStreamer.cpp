@@ -305,6 +305,8 @@ int GIFStreamer::closeFile(GifFileType *file){
 }
 
 Resource::ptr GIFStreamer::load(Stream::ptr stream,ResourceData *data,ProgressListener *listener){
+	int usage=(data!=NULL)?((TextureData*)data)->usage:0;
+
 	if(stream==NULL){
 		Error::nullPointer(Categories::TOADLET_TADPOLE,
 			"Stream is NULL");
@@ -343,7 +345,7 @@ Resource::ptr GIFStreamer::load(Stream::ptr stream,ResourceData *data,ProgressLi
 	Texture::ptr texture;
 	TextureFormat::ptr textureFormat(format);
 	if(result!=GIF_ERROR){
-		texture=mTextureManager->createTexture(textureFormat,images[0]);
+		texture=mTextureManager->createTexture(usage,textureFormat,images[0]);
 	}
 	
 	delete[] base;

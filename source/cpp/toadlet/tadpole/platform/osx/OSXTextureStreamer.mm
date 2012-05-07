@@ -56,6 +56,7 @@ OSXTextureStreamer::OSXTextureStreamer(TextureManager *textureManager){
 }
 
 Resource::ptr OSXTextureStreamer::load(Stream::ptr in,ResourceData *data,ProgressListener *listener){
+	int usage=(data!=NULL)?((TextureData*)data)->usage:0;
 	CGDataProviderSequentialCallbacks callbacks={0};
 	callbacks.version=0;
 	callbacks.getBytes=TextureStreamGetBytes;
@@ -107,7 +108,7 @@ Resource::ptr OSXTextureStreamer::load(Stream::ptr in,ResourceData *data,Progres
 		memcpy(textureData+textureStride*(textureHeight-i-1),bitmapData+textureStride*i,textureStride);
 	}
 
-	Texture::ptr texture=mTextureManager->createTexture(textureFormat,textureData);
+	Texture::ptr texture=mTextureManager->createTexture(usage,textureFormat,textureData);
 
 	delete[] textureData;
 

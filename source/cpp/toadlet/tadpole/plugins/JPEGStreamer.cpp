@@ -167,6 +167,8 @@ void toadlet_error_exit(j_common_ptr cinfo){
 }
 
 Resource::ptr JPEGStreamer::load(Stream::ptr stream,ResourceData *data,ProgressListener *listener){
+	int usage=(data!=NULL)?((TextureData*)data)->usage:0;
+
 	struct jpeg_decompress_struct cinfo;
 	struct toadlet_error_mgr jerr;
 	JSAMPARRAY buffer;
@@ -240,7 +242,7 @@ Resource::ptr JPEGStreamer::load(Stream::ptr stream,ResourceData *data,ProgressL
 
 	jpeg_destroy_decompress(&cinfo);
 
-	Texture::ptr texture=mTextureManager->createTexture(textureFormat,textureData);
+	Texture::ptr texture=mTextureManager->createTexture(usage,textureFormat,textureData);
 	
 	delete[] textureData;
 	

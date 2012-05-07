@@ -12,8 +12,10 @@
 
 class HUD;
 
-class RandIsle:public Applet,public TerrainNodeDataSource,public UpdateListener,public TerrainNodeListener,public InputDeviceListener,public PathClimberListener{
+class RandIsle:protected Object,public Applet,public TerrainNodeDataSource,public UpdateListener,public TerrainNodeListener,public InputDeviceListener,public PathClimberListener{
 public:
+	TOADLET_OBJECT(RandIsle);
+
 	enum{
 		Scope_BIT_TREE=			1<<1,
 		Scope_BIT_ACORN=		1<<2,

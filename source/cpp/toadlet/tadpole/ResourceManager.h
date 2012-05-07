@@ -54,7 +54,7 @@ public:
 
 	virtual Resource::ptr get(int handle);
 	virtual Resource::ptr get(const String &name);
-	virtual Resource::ptr find(const String &name,ResourceData::ptr data=ResourceData::ptr());
+	virtual Resource::ptr find(const String &name,ResourceData *data=NULL);
 	virtual Resource::ptr manage(const Resource::ptr &resource,const String &name=(char*)NULL);
 	virtual void unmanage(Resource *resource);
 

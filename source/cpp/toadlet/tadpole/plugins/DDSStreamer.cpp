@@ -135,6 +135,8 @@ typedef struct{
 } DDS_HEADER;
 
 Resource::ptr DDSStreamer::load(Stream::ptr stream,ResourceData *data,ProgressListener *listener){
+	int usage=(data!=NULL)?((TextureData*)data)->usage:0;
+
 	if(stream==NULL){
 		Error::nullPointer(Categories::TOADLET_EGG,
 			"Stream is NULL");
@@ -256,7 +258,7 @@ Resource::ptr DDSStreamer::load(Stream::ptr stream,ResourceData *data,ProgressLi
 		Logger::alert("Other type");
 	}
 
-	Texture::ptr texture=mTextureManager->createTexture(textureFormat,mipDatas);
+	Texture::ptr texture=mTextureManager->createTexture(usage,textureFormat,mipDatas);
 
 	for(i=0;i<mipCount;++i){
 		delete[] mipDatas[i];

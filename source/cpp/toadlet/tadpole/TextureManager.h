@@ -30,6 +30,7 @@
 #include <toadlet/peeper/BackableTexture.h>
 #include <toadlet/peeper/PixelBufferRenderTarget.h>
 #include <toadlet/tadpole/ResourceManager.h>
+#include <toadlet/tadpole/TextureData.h>
 #include <toadlet/tadpole/VideoHandler.h>
 
 namespace toadlet{
@@ -51,6 +52,7 @@ public:
 	Texture::ptr createTexture(int usage,TextureFormat::ptr format,tbyte *data=NULL);
 	Texture::ptr createTexture(int usage,TextureFormat::ptr format,tbyte *mipDatas[]);
 	Texture::ptr findTexture(const String &name){return shared_static_cast<Texture>(ResourceManager::find(name));}
+	Texture::ptr findTexture(const String &name,ResourceData::ptr data){return shared_static_cast<Texture>(ResourceManager::find(name,data));}
 
 	PixelBufferRenderTarget::ptr createPixelBufferRenderTarget();
 
