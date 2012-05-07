@@ -31,10 +31,27 @@ namespace toadlet{
 namespace tadpole{
 namespace terrain{
 
-DiffuseTerrainMaterialSource::DiffuseTerrainMaterialSource(Engine *engine){
+DiffuseTerrainMaterialSource::DiffuseTerrainMaterialSource(Engine *engine,const Vector3 &scale,const String &name){
 	mEngine=engine;
+	mTextureScale=scale;
 
+	createShaders();
 
+	setDiffuseTexture(0,name);
+}
+
+DiffuseTerrainMaterialSource::DiffuseTerrainMaterialSource(Engine *engine,const Vector3 &scale,Texture *texture){
+	mEngine=engine;
+	mTextureScale=scale;
+
+	createShaders();
+
+	if(texture!=NULL){
+		setDiffuseTexture(0,texture);
+	}
+}
+
+void DiffuseTerrainMaterialSource::createShaders(){
 	String profiles[]={
 		"glsl",
 		"hlsl"
@@ -57,6 +74,7 @@ DiffuseTerrainMaterialSource::DiffuseTerrainMaterialSource(Engine *engine){
 		"uniform vec4 lightColor;\n"
 		"uniform vec4 ambientColor;\n"
 		"uniform float materialLight;\n"
+		"uniform mat4 textureMatrix;\n"
 		"uniform float fogDensity;\n"
 		"uniform vec2 fogDistance;\n"
 
@@ -67,7 +85,7 @@ DiffuseTerrainMaterialSource::DiffuseTerrainMaterialSource(Engine *engine){
 			"vec4 localLightColor=(lightIntensity*lightColor*materialLight)+(1.0-materialLight);\n"
 			"color=clamp(localLightColor*materialDiffuseColor + ambientColor*materialAmbientColor,0.0,1.0);\n"
 			"color=materialTrackColor+color*(1.0-materialTrackColor);\n"
-			"texCoord=vec4(TEXCOORD0,0.0,1.0).xy * 16.0;\n"
+			"texCoord=(textureMatrix * vec4(TEXCOORD0,0.0,1.0)).xy;\n"
 			"texCoord2=vec4(TEXCOORD0,0.0,1.0).xy;\n"
 			"fog=clamp(1.0-fogDensity*(gl_Position.z-fogDistance.x)/(fogDistance.y-fogDistance.x),0.0,1.0);\n"
 		"}",
@@ -96,6 +114,7 @@ DiffuseTerrainMaterialSource::DiffuseTerrainMaterialSource(Engine *engine){
 		"float4 lightColor;\n"
 		"float4 ambientColor;\n"
 		"float materialLight;\n"
+		"float4x4 textureMatrix;\n"
 		"float fogDensity;\n"
 		"float2 fogDistance;\n"
 
@@ -107,7 +126,7 @@ DiffuseTerrainMaterialSource::DiffuseTerrainMaterialSource(Engine *engine){
 			"float4 localLightColor=lightIntensity*lightColor*materialLight+(1.0-materialLight);\n"
 			"vout.color=clamp(localLightColor*materialDiffuseColor + ambientColor*materialAmbientColor,0.0,1.0);\n"
 			"vout.color=materialTrackColor+vout.color*(1.0-materialTrackColor);\n"
-			"vout.texCoord=float4(vin.texCoord,0.0,1.0) * 16.0;\n "
+			"vout.texCoord=mul(textureMatrix,float4(vin.texCoord,0.0,1.0));\n "
 			"vout.texCoord2=float4(vin.texCoord,0.0,1.0);\n "
 			"vout.fog=clamp(1.0-fogDensity*(vout.position.z-fogDistance.x)/(fogDistance.y-fogDistance.x),0.0,1.0);\n"
 			"return vout;\n"
@@ -211,12 +230,18 @@ void DiffuseTerrainMaterialSource::destroy(){
 	}
 }
 
-void DiffuseTerrainMaterialSource::setDiffuseTexture(int layer,Texture::ptr texture){
+bool DiffuseTerrainMaterialSource::setDiffuseTexture(int layer,const String &name){
+	return setDiffuseTexture(layer,mEngine->getTextureManager()->findTexture(name));
+}
+
+bool DiffuseTerrainMaterialSource::setDiffuseTexture(int layer,Texture *texture){
 	if(mDiffuseTextures.size()<=layer){
 		mDiffuseTextures.resize(layer+1);
 	}
 
 	mDiffuseTextures[layer]=texture;
+
+	return true;
 }
 
 Material::ptr DiffuseTerrainMaterialSource::getMaterial(TerrainPatchNode *patch){
@@ -224,7 +249,7 @@ Material::ptr DiffuseTerrainMaterialSource::getMaterial(TerrainPatchNode *patch)
 
 	TextureState scaleState;
 	scaleState.calculation=TextureState::CalculationType_NORMAL;
-	Math::setMatrix4x4FromScale(scaleState.matrix,16,16,16);
+	Math::setMatrix4x4FromScale(scaleState.matrix,mTextureScale);
 
 	TextureState layerState;
 	layerState.colorOperation=TextureState::Operation_REPLACE;
@@ -263,11 +288,12 @@ Material::ptr DiffuseTerrainMaterialSource::getMaterial(TerrainPatchNode *patch)
 			variables->addVariable("materialDiffuseColor",RenderVariable::ptr(new MaterialDiffuseVariable()),Material::Scope_MATERIAL);
 			variables->addVariable("materialAmbientColor",RenderVariable::ptr(new MaterialAmbientVariable()),Material::Scope_MATERIAL);
 			variables->addVariable("materialTrackColor",RenderVariable::ptr(new MaterialTrackColorVariable()),Material::Scope_MATERIAL);
+			variables->addVariable("textureMatrix",RenderVariable::ptr(new TextureMatrixVariable(Shader::ShaderType_FRAGMENT,0)),Material::Scope_MATERIAL);
 			variables->addVariable("fogDensity",RenderVariable::ptr(new FogDensityVariable()),Material::Scope_MATERIAL);
 			variables->addVariable("fogDistance",RenderVariable::ptr(new FogDistanceVariable()),Material::Scope_MATERIAL);
 			variables->addVariable("fogColor",RenderVariable::ptr(new FogColorVariable()),Material::Scope_MATERIAL);
 
-			variables->addTexture("tex",mDiffuseTextures.size()>0?mDiffuseTextures[0]:NULL,"samp",SamplerState(),TextureState());
+			variables->addTexture("tex",mDiffuseTextures.size()>0?mDiffuseTextures[0]:NULL,"samp",SamplerState(),scaleState);
 		}
 
 		int i;
@@ -293,12 +319,13 @@ Material::ptr DiffuseTerrainMaterialSource::getMaterial(TerrainPatchNode *patch)
 			variables->addVariable("materialDiffuseColor",RenderVariable::ptr(new MaterialDiffuseVariable()),Material::Scope_MATERIAL);
 			variables->addVariable("materialAmbientColor",RenderVariable::ptr(new MaterialAmbientVariable()),Material::Scope_MATERIAL);
 			variables->addVariable("materialTrackColor",RenderVariable::ptr(new MaterialTrackColorVariable()),Material::Scope_MATERIAL);
+			variables->addVariable("textureMatrix",RenderVariable::ptr(new TextureMatrixVariable(Shader::ShaderType_FRAGMENT,0)),Material::Scope_MATERIAL);
 			variables->addVariable("fogDensity",RenderVariable::ptr(new FogDensityVariable()),Material::Scope_MATERIAL);
 			variables->addVariable("fogDistance",RenderVariable::ptr(new FogDistanceVariable()),Material::Scope_MATERIAL);
 			variables->addVariable("fogColor",RenderVariable::ptr(new FogColorVariable()),Material::Scope_MATERIAL);
 
-			variables->addTexture("tex",mDiffuseTextures[i],"samp",SamplerState(),TextureState());
-			variables->addTexture("layerTex",patch->getLayerTexture(i),"layerSamp",clampState,TextureState());
+			variables->addTexture("tex",mDiffuseTextures[i],"samp",SamplerState(),scaleState);
+			variables->addTexture("layerTex",patch->getLayerTexture(i),"layerSamp",clampState,layerState);
 		}
 	}
 

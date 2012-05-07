@@ -37,6 +37,7 @@ class ResourceDestroyedListener;
 class Resource:public Interface{
 public:
 	TOADLET_IPTR(Resource);
+	virtual ~Resource(){}
 
 	virtual void destroy()=0;
 

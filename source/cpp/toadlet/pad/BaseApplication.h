@@ -113,7 +113,7 @@ protected:
 	virtual bool destroyAudioDevice();
 
 	WindowRenderTargetFormat::ptr mFormat;
-	Applet *mApplet;
+	Applet::ptr mApplet;
 
 	Map<String,RenderDevicePlugin> mRenderDevicePlugins;
 	Collection<String> mRenderDevicePreferences;

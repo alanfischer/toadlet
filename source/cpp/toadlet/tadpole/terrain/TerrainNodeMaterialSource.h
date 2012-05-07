@@ -34,8 +34,10 @@ namespace terrain{
 
 class TerrainPatchNode;
 
-class TerrainNodeMaterialSource{
+class TerrainNodeMaterialSource:public Interface{
 public:
+	TOADLET_IPTR(TerrainNodeMaterialSource);
+
 	virtual Material::ptr getMaterial(TerrainPatchNode *patch)=0;
 };
 

@@ -127,8 +127,8 @@ protected:
 
 	TerrainNodeListener *mListener;
 	Node::ptr mTarget;
-	TerrainNodeDataSource *mDataSource;
-	TerrainNodeMaterialSource *mMaterialSource;
+	TerrainNodeDataSource::ptr mDataSource;
+	TerrainNodeMaterialSource::ptr mMaterialSource;
 	int mSize,mHalfSize;
 	int mTerrainX,mTerrainY;
 	Collection<TerrainPatchNode::ptr> mUnactivePatches;

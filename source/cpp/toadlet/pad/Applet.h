@@ -31,8 +31,10 @@
 namespace toadlet{
 namespace pad{
 
-class Applet{
+class Applet:public Interface{
 public:
+	TOADLET_IPTR(Applet);
+
 	virtual ~Applet(){}
 
 	virtual void create()=0;

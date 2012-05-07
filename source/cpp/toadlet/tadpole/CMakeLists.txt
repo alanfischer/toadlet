@@ -157,6 +157,7 @@ set (TADPOLE_TERRAIN_SRC
 	terrain/DiffuseTerrainMaterialSource.cpp
 	terrain/TerrainNode.cpp
 	terrain/TerrainPatchNode.cpp
+	terrain/TextureDataSource.cpp
 )
 
 set (TADPOLE_PLATFORM_ANDROID_SRC
@@ -235,6 +236,7 @@ set (TADPOLE_HEADERS
 	ShadowMappedSceneRenderer.h
 	Skeleton.h
 	SkeletonComponent.h
+	TextureData.h
 	TextureManager.h
 	Traceable.h
 	Transform.h
@@ -388,6 +390,7 @@ set (TADPOLE_TERRAIN_HEADERS
 	terrain/TerrainNodeListener.h
 	terrain/TerrainNode.h
 	terrain/TerrainPatchNode.h
+	terrain/TextureDataSource.h
 )
 
 set (TADPOLE_PLATFORM_ANDROID_HEADERS

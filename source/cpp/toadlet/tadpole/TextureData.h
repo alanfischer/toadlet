@@ -23,26 +23,27 @@
  *
  ********** Copyright header - do not remove **********/
 
-#ifndef TOADLET_TADPOLE_TERRAIN_TERRAINNODEDATASOURCE_H
-#define TOADLET_TADPOLE_TERRAIN_TERRAINNODEDATASOURCE_H
+#ifndef TOADLET_TADPOLE_TEXTUREDATA_H
+#define TOADLET_TADPOLE_TEXTUREDATA_H
 
 #include <toadlet/tadpole/Types.h>
+#include <toadlet/egg/String.h>
+#include <toadlet/tadpole/ResourceData.h>
 
 namespace toadlet{
 namespace tadpole{
-namespace terrain{
 
-class TerrainNodeDataSource:public Interface{
+class TOADLET_API TextureData:public ResourceData{
 public:
-	TOADLET_IPTR(TerrainNodeDataSource);
+	TOADLET_SPTR(TextureData);
 
-	virtual int getPatchSize()=0;
-	virtual const Vector3 &getPatchScale()=0;
-	virtual bool getPatchHeightData(scalar *data,int px,int py)=0;
-	virtual bool getPatchLayerData(tbyte *data,int px,int py)=0;
+	TextureData(int usage1){
+		usage=usage1;
+	}
+
+	int usage;
 };
 
-}
 }
 }
 

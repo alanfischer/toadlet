@@ -90,6 +90,7 @@ Resource::ptr Win32TextureStreamer::load(Stream::ptr in,ResourceData *data,Progr
 	Logger::debug(Categories::TOADLET_TADPOLE,"Win32TextureStreamer::load");
 
 	Texture::ptr texture=NULL;
+	int usage=(data!=NULL)?((TextureData*)data)->usage:0;
 
 	StreamIStream::ptr stream(new StreamIStream(in));
 	HRESULT hr=0;
@@ -120,17 +121,17 @@ Resource::ptr Win32TextureStreamer::load(Stream::ptr in,ResourceData *data,Progr
 		RECT rect={0};
 		rect.right=size.cx;
 		rect.bottom=size.cy;
-		BitmapData data;
-		bitmap->LockBits(&rect,ImageLockModeRead,gdiformat,&data);
+		BitmapData bitmapData;
+		bitmap->LockBits(&rect,ImageLockModeRead,gdiformat,&bitmapData);
 
 		int i;
 		for(i=0;i<textureFormat->getHeight();++i){
-			memcpy(textureData+textureFormat->getXPitch()*i,((uint8*)data.Scan0)+data.Stride*(size.cy-i-1),textureFormat->getXPitch());
+			memcpy(textureData+textureFormat->getXPitch()*i,((uint8*)bitmapData.Scan0)+bitmapData.Stride*(size.cy-i-1),textureFormat->getXPitch());
 		}
 
-		bitmap->UnlockBits(&data);
+		bitmap->UnlockBits(&bitmapData);
 
-		texture=mTextureManager->createTexture(textureFormat,textureData);
+		texture=mTextureManager->createTexture(usage,textureFormat,textureData);
 
 		delete[] textureData;
 	#else
@@ -170,15 +171,15 @@ Resource::ptr Win32TextureStreamer::load(Stream::ptr in,ResourceData *data,Progr
 			bitmap->SelectActiveFrame(&dimensionIDs[0],i);
 			
 			Rect rect(0,0,bitmap->GetWidth(),bitmap->GetHeight());
-			BitmapData data;
-			bitmap->LockBits(&rect,ImageLockModeRead,gdiformat,&data);
+			BitmapData bitmapData;
+			bitmap->LockBits(&rect,ImageLockModeRead,gdiformat,&bitmapData);
 
 			int j;
 			for(j=0;j<textureFormat->getHeight();++j){
-				memcpy(textureData+textureFormat->getXPitch()*j,((uint8*)data.Scan0)+data.Stride*(textureFormat->getHeight()-j-1),textureFormat->getXPitch());
+				memcpy(textureData+textureFormat->getXPitch()*j,((uint8*)bitmapData.Scan0)+bitmapData.Stride*(textureFormat->getHeight()-j-1),textureFormat->getXPitch());
 			}
 
-			bitmap->UnlockBits(&data);
+			bitmap->UnlockBits(&bitmapData);
 
 			int delay=0;
 			if(propertyItem!=NULL){
@@ -193,7 +194,7 @@ Resource::ptr Win32TextureStreamer::load(Stream::ptr in,ResourceData *data,Progr
 		delete dimensionIDs;
 		free(propertyItem);
 
-		texture=mTextureManager->createTexture(textureFormat,textureData);
+		texture=mTextureManager->createTexture(usage,textureFormat,textureData);
 
 		delete[] textureData;
 	#endif

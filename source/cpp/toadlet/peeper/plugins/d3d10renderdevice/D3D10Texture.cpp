@@ -99,6 +99,8 @@ void D3D10Texture::destroy(){
 	destroyContext();
 
 	mBuffers.clear();
+
+	BaseResource::destroy();
 }
 
 bool D3D10Texture::createContext(int numMipDatas,byte *mipDatas[]){
@@ -275,12 +277,73 @@ bool D3D10Texture::load(TextureFormat *format,tbyte *data){
 		return false;
 	}
 
-	ID3D10Device *device=mD3DDevice;
-
-	D3D10_BOX box;
-	setD3D10_BOX(box,format);
 	int subresource=D3D10CalcSubresource(format->getMipMin(),0,0);
-	device->UpdateSubresource(mTexture,subresource,&box,data,format->getXPitch(),format->getYPitch());
+
+	if((mUsage&Usage_BIT_STAGING)==0){
+		D3D10_BOX box;
+		setD3D10_BOX(box,format);
+		mD3DDevice->UpdateSubresource(mTexture,subresource,&box,data,format->getXPitch(),format->getYPitch());
+	}
+	else{
+		D3D10_MAP mapType=D3D10_MAP_WRITE;
+		UINT mapFlags=0;
+
+		int xPitch=format->getXPitch(),yPitch=format->getYPitch();
+		tbyte *mapData=NULL;
+		int mapXPitch=xPitch,mapYPitch=yPitch;
+		HRESULT result=S_OK;
+		switch(mFormat->getDimension()){
+			case TextureFormat::Dimension_D1:{
+				ID3D10Texture1D *texture=(ID3D10Texture1D*)mTexture;
+				result=texture->Map(subresource,mapType,mapFlags,(void**)&mapData);
+			}break;
+			case TextureFormat::Dimension_D2:{
+				D3D10_MAPPED_TEXTURE2D mappedTex;
+				ID3D10Texture2D *texture=(ID3D10Texture2D*)mTexture;
+				result=texture->Map(subresource,mapType,mapFlags,&mappedTex);
+				mapData=(tbyte*)mappedTex.pData;
+				mapXPitch=mappedTex.RowPitch;
+			}break;
+			case TextureFormat::Dimension_D3:{
+				D3D10_MAPPED_TEXTURE3D mappedTex;
+				ID3D10Texture3D *texture=(ID3D10Texture3D*)mTexture;
+				result=texture->Map(subresource,mapType,mapFlags,&mappedTex);
+				mapData=(tbyte*)mappedTex.pData;
+				mapXPitch=mappedTex.RowPitch;
+				mapYPitch=mappedTex.DepthPitch;
+			}break;
+		}
+
+		if(SUCCEEDED(result)){
+			int i,j;
+			for(j=0;j<format->getDepth();++j){
+				for(i=0;i<format->getHeight();++i){
+					memcpy(mapData+mapYPitch*j+mapXPitch*i,data+yPitch*j+xPitch*i,xPitch);
+				}
+			}
+
+			switch(mFormat->getDimension()){
+				case TextureFormat::Dimension_D1:{
+					ID3D10Texture1D *texture=(ID3D10Texture1D*)mTexture;
+					texture->Unmap(subresource);
+				}break;
+				case TextureFormat::Dimension_D2:{
+					ID3D10Texture2D *texture=(ID3D10Texture2D*)mTexture;
+					texture->Unmap(subresource);
+				}break;
+				case TextureFormat::Dimension_D3:{
+					ID3D10Texture3D *texture=(ID3D10Texture3D*)mTexture;
+					texture->Unmap(subresource);
+				}break;
+			}
+		}
+
+		if(FAILED(result)){
+			Error::unknown(Categories::TOADLET_PEEPER,
+				"failed to load texture");
+			return false;
+		}
+	}
 
 	generateMipLevels();
 
@@ -288,66 +351,75 @@ bool D3D10Texture::load(TextureFormat *format,tbyte *data){
 }
 
 bool D3D10Texture::read(TextureFormat *format,tbyte *data){
+	if(format->getPixelFormat()!=mFormat->getPixelFormat()){
+		Error::unknown(Categories::TOADLET_PEEPER,
+			"data of incorrect format");
+		return false;
+	}
+
 	TOADLET_ASSERT(format->getMipMin()==format->getMipMax());
 
 	int subresource=D3D10CalcSubresource(format->getMipMin(),0,0);
-	D3D10_MAP mapType=D3D10_MAP_READ;
-	UINT mapFlags=0;
 
-	int xPitch=format->getXPitch(),yPitch=format->getYPitch();
-	tbyte *mapData=NULL;
-	int mapXPitch=xPitch,mapYPitch=yPitch;
-	HRESULT result=S_OK;
-	switch(mFormat->getDimension()){
-		case TextureFormat::Dimension_D1:{
-			ID3D10Texture1D *texture=(ID3D10Texture1D*)mTexture;
-			result=texture->Map(subresource,mapType,mapFlags,(void**)&mapData);
-		}break;
-		case TextureFormat::Dimension_D2:{
-			D3D10_MAPPED_TEXTURE2D mappedTex;
-			ID3D10Texture2D *texture=(ID3D10Texture2D*)mTexture;
-			result=texture->Map(subresource,mapType,mapFlags,&mappedTex);
-			mapData=(tbyte*)mappedTex.pData;
-			mapXPitch=mappedTex.RowPitch;
-		}break;
-		case TextureFormat::Dimension_D3:{
-			D3D10_MAPPED_TEXTURE3D mappedTex;
-			ID3D10Texture3D *texture=(ID3D10Texture3D*)mTexture;
-			result=texture->Map(subresource,mapType,mapFlags,&mappedTex);
-			mapData=(tbyte*)mappedTex.pData;
-			mapXPitch=mappedTex.RowPitch;
-			mapYPitch=mappedTex.DepthPitch;
-		}break;
-	}
+	if((mUsage&Usage_BIT_STAGING)>0){
+		D3D10_MAP mapType=D3D10_MAP_READ;
+		UINT mapFlags=0;
 
-	if(SUCCEEDED(result)){
-		int i,j;
-		for(j=0;j<format->getDepth();++j){
-			for(i=0;i<format->getHeight();++i){
-				memcpy(data+yPitch*j+xPitch*i,mapData+mapYPitch*j+mapXPitch*i,xPitch);
-			}
-		}
-
+		int xPitch=format->getXPitch(),yPitch=format->getYPitch();
+		tbyte *mapData=NULL;
+		int mapXPitch=xPitch,mapYPitch=yPitch;
+		HRESULT result=S_OK;
 		switch(mFormat->getDimension()){
 			case TextureFormat::Dimension_D1:{
 				ID3D10Texture1D *texture=(ID3D10Texture1D*)mTexture;
-				texture->Unmap(subresource);
+				result=texture->Map(subresource,mapType,mapFlags,(void**)&mapData);
 			}break;
 			case TextureFormat::Dimension_D2:{
+				D3D10_MAPPED_TEXTURE2D mappedTex;
 				ID3D10Texture2D *texture=(ID3D10Texture2D*)mTexture;
-				texture->Unmap(subresource);
+				result=texture->Map(subresource,mapType,mapFlags,&mappedTex);
+				mapData=(tbyte*)mappedTex.pData;
+				mapXPitch=mappedTex.RowPitch;
 			}break;
 			case TextureFormat::Dimension_D3:{
+				D3D10_MAPPED_TEXTURE3D mappedTex;
 				ID3D10Texture3D *texture=(ID3D10Texture3D*)mTexture;
-				texture->Unmap(subresource);
+				result=texture->Map(subresource,mapType,mapFlags,&mappedTex);
+				mapData=(tbyte*)mappedTex.pData;
+				mapXPitch=mappedTex.RowPitch;
+				mapYPitch=mappedTex.DepthPitch;
 			}break;
 		}
-	}
 
-	if(FAILED(result)){
-		Error::unknown(Categories::TOADLET_PEEPER,
-			"failed to read texture");
-		return false;
+		if(SUCCEEDED(result)){
+			int i,j;
+			for(j=0;j<format->getDepth();++j){
+				for(i=0;i<format->getHeight();++i){
+					memcpy(data+yPitch*j+xPitch*i,mapData+mapYPitch*j+mapXPitch*i,xPitch);
+				}
+			}
+
+			switch(mFormat->getDimension()){
+				case TextureFormat::Dimension_D1:{
+					ID3D10Texture1D *texture=(ID3D10Texture1D*)mTexture;
+					texture->Unmap(subresource);
+				}break;
+				case TextureFormat::Dimension_D2:{
+					ID3D10Texture2D *texture=(ID3D10Texture2D*)mTexture;
+					texture->Unmap(subresource);
+				}break;
+				case TextureFormat::Dimension_D3:{
+					ID3D10Texture3D *texture=(ID3D10Texture3D*)mTexture;
+					texture->Unmap(subresource);
+				}break;
+			}
+		}
+
+		if(FAILED(result)){
+			Error::unknown(Categories::TOADLET_PEEPER,
+				"failed to read texture");
+			return false;
+		}
 	}
 
 	return true;

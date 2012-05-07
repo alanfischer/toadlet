@@ -76,20 +76,15 @@ float fromEm(float e,float pointSize,float unitsPerEm){
 }
 
 Resource::ptr OSXFontStreamer::load(Stream::ptr in,ResourceData *resourceData,ProgressListener *listener){
+	FontData *resdata=(FontData*)resourceData;
+
 	if(!CGFontGetGlyphsForUnichars){
 		Error::nullPointer(Categories::TOADLET_TADPOLE,
 			"error finding CGFontGetGlyphsForUnichars");
 		return NULL;
 	}
 
-	FontData *fontData=(FontData*)resourceData;
-	if(fontData==NULL){
-		Error::nullPointer(Categories::TOADLET_TADPOLE,
-			"invalid FontData");
-		return NULL;
-	}
-
-	float pointSize=fontData->pointSize;
+	float pointSize=resdata->pointSize;
 
 	CGDataProviderSequentialCallbacks callbacks={0};
 	callbacks.version=0;
@@ -111,8 +106,8 @@ Resource::ptr OSXFontStreamer::load(Stream::ptr in,ResourceData *resourceData,Pr
 	int unitsPerEm=CGFontGetUnitsPerEm(cgfont);
 	int pad=3;
 	
-	const wchar_t *wcharArray=fontData->characterSet.wc_str();
-	int numChars=fontData->characterSet.length();
+	const wchar_t *wcharArray=resdata->characterSet.wc_str();
+	int numChars=resdata->characterSet.length();
 	UniChar charArray[numChars+1];
 	int i,j;
 	for(i=0;i<numChars+1;++i){
@@ -248,7 +243,7 @@ Resource::ptr OSXFontStreamer::load(Stream::ptr in,ResourceData *resourceData,Pr
 	delete[] textureData;
 
 	// Build font
-	Font::ptr font(new Font(fontData->pointSize,0,texture,wcharArray,glyphs.begin(),glyphs.size()));
+	Font::ptr font(new Font(resdata->pointSize,0,texture,wcharArray,glyphs.begin(),glyphs.size()));
 
 	CGContextRelease(context);
 	free(data);

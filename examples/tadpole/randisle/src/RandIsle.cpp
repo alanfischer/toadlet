@@ -749,5 +749,3 @@ Applet *createApplet(Application *app){
 
 	return new RandIsle(app,path);
 }
-
-void destroyApplet(Applet *applet){delete applet;}

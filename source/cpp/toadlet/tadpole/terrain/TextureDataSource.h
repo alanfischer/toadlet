@@ -23,23 +23,40 @@
  *
  ********** Copyright header - do not remove **********/
 
-#ifndef TOADLET_TADPOLE_TERRAIN_TERRAINNODEDATASOURCE_H
-#define TOADLET_TADPOLE_TERRAIN_TERRAINNODEDATASOURCE_H
+#ifndef TOADLET_TADPOLE_TERRAIN_TEXTUREDATASOURCE_H
+#define TOADLET_TADPOLE_TERRAIN_TEXTUREDATASOURCE_H
 
 #include <toadlet/tadpole/Types.h>
+#include <toadlet/tadpole/Engine.h>
+#include <toadlet/tadpole/terrain/TerrainNodeDataSource.h>
 
 namespace toadlet{
 namespace tadpole{
 namespace terrain{
 
-class TerrainNodeDataSource:public Interface{
+class TOADLET_API TextureDataSource:protected Object,public TerrainNodeDataSource{
 public:
-	TOADLET_IPTR(TerrainNodeDataSource);
+	TOADLET_OBJECT(TextureDataSource);
 
-	virtual int getPatchSize()=0;
-	virtual const Vector3 &getPatchScale()=0;
-	virtual bool getPatchHeightData(scalar *data,int px,int py)=0;
-	virtual bool getPatchLayerData(tbyte *data,int px,int py)=0;
+	TextureDataSource(Engine *engine,const Vector3 &scale,const String &name);
+	TextureDataSource(Engine *engine,const Vector3 &scale,Texture *texture=NULL);
+	virtual ~TextureDataSource();
+	
+	bool setTexture(const String &name,int px,int py);
+	bool setTexture(Texture *texture,int px,int py);
+
+	int getPatchSize(){return mPatchSize;}
+	const Vector3 &getPatchScale(){return mPatchScale;}
+	bool getPatchHeightData(scalar *data,int px,int py);
+	bool getPatchLayerData(tbyte *data,int px,int py);
+	
+protected:
+	Engine *mEngine;
+	int mPatchSize;
+	Vector3 mPatchScale;
+	TextureFormat::ptr mTextureFormat,mFormat;
+	tbyte *mTextureData,*mData;
+	Map<int,Map<int,Texture::ptr> > mTexture;
 };
 
 }

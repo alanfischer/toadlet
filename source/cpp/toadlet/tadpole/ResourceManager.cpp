@@ -86,7 +86,7 @@ Resource::ptr ResourceManager::get(const String &name){
 	}
 }
 
-Resource::ptr ResourceManager::find(const egg::String &name,ResourceData::ptr data){
+Resource::ptr ResourceManager::find(const egg::String &name,ResourceData *data){
 	Resource::ptr resource=get(name);
 	if(resource==NULL){
 		TOADLET_TRY

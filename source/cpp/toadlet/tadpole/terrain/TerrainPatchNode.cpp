@@ -155,7 +155,7 @@ bool TerrainPatchNode::setHeightData(scalar *data,int rowPitch,int width,int hei
 	for(sizeN=0;(1<<(sizeN+1))<=width;sizeN++);
 
 	if(width!=(1<<sizeN)){
-		Error::invalidParameters(Categories::TOADLET_TADPOLE_TERRAIN,"width & height not a power of 2");
+		Error::invalidParameters(Categories::TOADLET_TADPOLE_TERRAIN,String("width & height not a power of 2:")+width+","+height);
 		return false;
 	}
 

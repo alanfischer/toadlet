@@ -64,7 +64,7 @@ Texture::ptr TextureManager::createTexture(TextureFormat::ptr format,tbyte *mipD
 }
 
 Texture::ptr TextureManager::createTexture(int usage,TextureFormat::ptr format,tbyte *data){
-	return createTexture(usage,format,data!=NULL?&data:NULL);
+	return createTexture(usage==0?(Texture::Usage_BIT_STATIC|Texture::Usage_BIT_AUTOGEN_MIPMAPS):usage,format,data!=NULL?&data:NULL);
 }
 
 Texture::ptr TextureManager::createTexture(int usage,TextureFormat::ptr format,tbyte *mipDatas[]){
