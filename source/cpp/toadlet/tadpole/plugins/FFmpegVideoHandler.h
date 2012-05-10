@@ -8,11 +8,6 @@
 #include <toadlet/tadpole/VideoHandler.h>
 #include <toadlet/tadpole/Engine.h>
 
-#ifndef INT64_C
-#define INT64_C(c) TOADLET_MAKE_INT64(c)
-#define UINT64_C(c) TOADLET_MAKE_UINT64(c)
-#endif
-
 extern "C"{
 	#include <libavutil/avutil.h>
 	#include <libavcodec/avcodec.h>

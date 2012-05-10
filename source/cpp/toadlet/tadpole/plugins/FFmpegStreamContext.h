@@ -3,11 +3,6 @@
 
 #include <toadlet/egg/io/Stream.h>
 
-#ifndef INT64_C
-#define INT64_C(c) TOADLET_MAKE_INT64(c)
-#define UINT64_C(c) TOADLET_MAKE_UINT64(c)
-#endif
-
 extern "C"{
 	#include <libavformat/avformat.h>
 }
