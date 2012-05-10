@@ -11,7 +11,7 @@ namespace tadpole{
 
 AVRational avTimeBaseQ={1,AV_TIME_BASE};
 
-static int ffmpegLockManager(void **mtx,enum AVLockOp op){
+TOADLET_C_API int toadlet_ffmpegLockManager(void **mtx,enum AVLockOp op){
 	switch(op){
 		case AV_LOCK_CREATE:
 			*mtx=new Mutex();
@@ -28,7 +28,7 @@ static int ffmpegLockManager(void **mtx,enum AVLockOp op){
 	}
 }
 
-static Logger::Level ffmpegGetLogLevel(int level){
+TOADLET_C_API Logger::Level toadlet_ffmpegGetLogLevel(int level){
 	switch(level){
 		case AV_LOG_DEBUG:
 			return Logger::Level_EXCESS;
@@ -47,15 +47,30 @@ static Logger::Level ffmpegGetLogLevel(int level){
 	}
 }
 
-static void ffmpegLogCallback(void *ptr,int level,const char *fmt,va_list vl){
+TOADLET_C_API void toadlet_ffmpegLogCallback(void *ptr,int level,const char *fmt,va_list vl){
 	char buffer[1024];
 	int amt=vsnprintf(buffer,sizeof(buffer),fmt,vl);
 	if(amt>0 && buffer[amt-1]=='\n'){
 		buffer[amt-1]=0; // Trim off the trailing newline
 	}
-	Logger::getInstance()->addLogEntry("ffmpeg",ffmpegGetLogLevel(level),buffer);
+	Logger::getInstance()->addLogEntry("ffmpeg",toadlet_ffmpegGetLogLevel(level),buffer);
 }
 
+TOADLET_C_API void toadlet_ffmpegRegisterLogCallback(){
+	av_log_set_callback(toadlet_ffmpegLogCallback);
+}
+
+TOADLET_C_API void toadlet_ffmpegUnregisterLogCallback(){
+	av_log_set_callback(NULL);
+}
+
+TOADLET_C_API int toadlet_ffmpegRegisterLockManager(){
+	return av_lockmgr_register(toadlet_ffmpegLockManager);
+}
+
+TOADLET_C_API int toadlet_ffmpegUnregisterLockManager(){
+	return av_lockmgr_register(NULL);
+}
 
 FFmpegAudioStream::FFmpegAudioStream(FFmpegController *controller,FFmpegController::StreamData *streamData):
 	mDecodeLength(0),
@@ -396,7 +411,7 @@ void FFmpegController::destroy(){
 			}
 		}
 
-		av_close_input_stream(mFormatCtx);
+		avformat_close_input(&mFormatCtx);
 		mFormatCtx=NULL;
 	}
 
@@ -566,11 +581,8 @@ bool FFmpegController::seek(int64 time){
 FFmpegVideoHandler::FFmpegVideoHandler(Engine *engine){
 	mEngine=engine;
 
-	av_log_set_callback(ffmpegLogCallback);
-
-	if(av_lockmgr_register(ffmpegLockManager)){
-		Error::unknown("Unable to register lock manager");
-	}
+	toadlet_ffmpegRegisterLogCallback();
+	toadlet_ffmpegRegisterLockManager();
 
 	av_register_all();
 }
@@ -580,9 +592,8 @@ FFmpegVideoHandler::~FFmpegVideoHandler(){
 }
 
 void FFmpegVideoHandler::destroy(){
-	av_lockmgr_register(NULL);
-
-	av_log_set_callback(NULL);
+	toadlet_ffmpegUnregisterLockManager();
+	toadlet_ffmpegUnregisterLogCallback();
 }
 
 VideoController::ptr FFmpegVideoHandler::open(Stream::ptr stream){
