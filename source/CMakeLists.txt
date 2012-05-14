@@ -1,3 +1,16 @@
+# Add the swig bindings first
+if (TOADLET_PLATFORM_ANDROID OR TOADLET_PLATFORM_IOS)
+	add_subdirectory (swig)
+endif (TOADLET_PLATFORM_ANDROID OR TOADLET_PLATFORM_IOS)
+
+# Add the c++ source code
+add_subdirectory (cpp)
+
+# Python requries the swig bindings be added later
+if (TOADLET_PLATFORM_PYTHON)
+	add_subdirectory (swig)
+endif (TOADLET_PLATFORM_PYTHON)
+
 # Older versions of android require shell java libraries
 if (TOADLET_PLATFORM_ANDROID AND ANDROID_NDK_API_LEVEL LESS 9)
 	if (NOT EXISTS ${ANDROID_JAR})
@@ -6,7 +19,4 @@ if (TOADLET_PLATFORM_ANDROID AND ANDROID_NDK_API_LEVEL LESS 9)
 
 	add_subdirectory (java)
 endif (TOADLET_PLATFORM_ANDROID AND ANDROID_NDK_API_LEVEL LESS 9)
-
-# Add the c++ source code
-add_subdirectory (cpp)
 
