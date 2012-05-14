@@ -59,6 +59,12 @@ JApplication::JApplication(JNIEnv *jenv,jobject jobj):
 	mAudioDevice(NULL),
 	mLastAudioDeviceObj(NULL)
 {
+	int i;
+	for(i=0;i<InputDevice::InputType_MAX;++i){
+		mInputDevices[i]=NULL;
+		mLastInputDeviceObjs[i]=NULL;
+	}
+
 	Java_us_toadlet_peeper_NGLES1RenderDevice(jenv);
 	Java_us_toadlet_peeper_NGLES2RenderDevice(jenv);
 	Java_us_toadlet_ribbit_NAudioStream(jenv);
