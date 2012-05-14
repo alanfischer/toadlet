@@ -27,14 +27,14 @@ void Logo::create(){
 	Node::ptr lt=engine->createNodeType(LightNode::type(),scene);
 	{
  		MeshNode::ptr mesh=engine->createNodeType(MeshNode::type(),scene);
-		mesh->setMesh("lt.xmsh");
+		mesh->setMesh("lt.tmsh");
 		lt->attach(mesh);
 
-		Controller::ptr controller=new Controller();
-		controller->attach(new MeshAnimation(mesh,0));
-		controller->setCycling(Controller::Cycling_REFLECT);
-		controller->start();
-		lt->attach(controller);
+		AnimationActionComponent::ptr animation=new AnimationActionComponent("animation");
+		animation->attach(new MeshAnimation(mesh,0));
+		animation->setCycling(AnimationActionComponent::Cycling_REFLECT);
+		animation->start();
+		lt->attach(animation);
 	}
 	scene->getRoot()->attach(lt);
 
