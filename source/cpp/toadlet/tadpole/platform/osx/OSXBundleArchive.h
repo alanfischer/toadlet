@@ -23,8 +23,8 @@
  *
  ********** Copyright header - do not remove **********/
 
-#ifndef TOADLET_TADPOLE_WIN32RESOURCEARCHIVE_H
-#define TOADLET_TADPOLE_WIN32RESOURCEARCHIVE_H
+#ifndef TOADLET_TADPOLE_OSXBUNDLEARCHIVE_H
+#define TOADLET_TADPOLE_OSXBUNDLEARCHIVE_H
 
 #include <toadlet/egg/BaseResource.h>
 #include <toadlet/egg/Map.h>
