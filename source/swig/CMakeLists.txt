@@ -1,5 +1,5 @@
 # Swig is required
-find_package(SWIG REQUIRED)
+find_host_package(SWIG REQUIRED)
 include(${SWIG_USE_FILE})
 
 # Interface files for each library
@@ -61,14 +61,14 @@ else (TOADLET_PLATFORM_PYTHON)
 	endif (TOADLET_PLATFORM_ANDROID)
 
 	# Create the wrapper objects
-	add_custom_command (OUTPUT toadlet_peeper_wrap
-		COMMAND ${SWIG_EXECUTABLE} -${SWIG_LANGUAGE} -c++ -o toadlet_peeper_wrap.o ${TOADLET_PEEPER_INT}
+	add_custom_command (OUTPUT toadlet_peeper_wrap.cpp
+		COMMAND ${SWIG_EXECUTABLE} -${SWIG_LANGUAGE} -c++ -o toadlet_peeper_wrap.cpp ${TOADLET_PEEPER_INT}
 	)
 	add_custom_command (OUTPUT toadlet_ribbit_wrap
-		COMMAND ${SWIG_EXECUTABLE} -${SWIG_LANGUAGE} -c++ -o toadlet_ribbit_wrap.o ${TOADLET_RIBBIT_INT}
+		COMMAND ${SWIG_EXECUTABLE} -${SWIG_LANGUAGE} -c++ -o toadlet_ribbit_wrap.cpp ${TOADLET_RIBBIT_INT}
 	)
 	add_custom_command (OUTPUT toadlet_tadpole_wrap
-		COMMAND ${SWIG_EXECUTABLE} -${SWIG_LANGUAGE} -c++ -o toadlet_tadpole_wrap.o ${TOADLET_TADPOLE_INT}
+		COMMAND ${SWIG_EXECUTABLE} -${SWIG_LANGUAGE} -c++ -o toadlet_tadpole_wrap.cpp ${TOADLET_TADPOLE_INT}
 	)
-elseif (TOADLET_PLATFORM_PYTHON)
+endif (TOADLET_PLATFORM_PYTHON)
 
