@@ -27,6 +27,13 @@ set (FLICK_HEADERS ${FLICK_HEADERS} PARENT_SCOPE)
 set (FLICK_NAMESPACES ${FLICK_NAMESPACES} PARENT_SCOPE)
 
 
+# If we are using swig create the wrapper file from the interface files
+if (SWIG_FOUND)
+	swig_wrap_files (flick_wrap.cpp "${TOADLET_FLICK_INT}")	
+	set (FLICK_SRC ${FLICK_SRC} flick_wrap.cpp)
+endif (SWIG_FOUND)
+
+
 # Dynamic library
 if (NOT TOADLET_PLATFORM_IOS)
 	add_library (toadlet_flick SHARED ${FLICK_SRC} ${FLICK_HEADERS})
