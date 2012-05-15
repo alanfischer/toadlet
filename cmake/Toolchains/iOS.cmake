@@ -24,7 +24,7 @@
 #  A convenience macro for setting xcode specific properties on targets
 #  example: set_xcode_property (myioslib IPHONEOS_DEPLOYMENT_TARGET "3.1")
 #
-# find_host_program (PROGRAM ARGS)
+# find_host_package (PROGRAM ARGS)
 #  A macro used to find executable programs on the host system, not within the iOS environment.
 #  Thanks to the android-cmake project for providing the command
 
@@ -169,26 +169,17 @@ endmacro (set_xcode_property)
 
 
 # This macro lets you find executable programs on the host system
-macro (find_host_program)
+macro (find_host_package)
 	set (CMAKE_FIND_ROOT_PATH_MODE_PROGRAM NEVER)
 	set (CMAKE_FIND_ROOT_PATH_MODE_LIBRARY NEVER)
 	set (CMAKE_FIND_ROOT_PATH_MODE_INCLUDE NEVER)
+	set (IOS FALSE)
 
-	if (CMAKE_HOST_WIN32)
-		set (WIN32 1)
-		set (UNIX )
-	elseif( CMAKE_HOST_APPLE )
-		set (APPLE 1)
-		set (UNIX)
-	endif(CMAKE_HOST_WIN32)
+	find_package(${ARGN})
 
-	find_program(${ARGN})
-
-	set (WIN32)
-	set (APPLE)
-	set (UNIX 1)
+	set (IOS TRUE)
 	set (CMAKE_FIND_ROOT_PATH_MODE_PROGRAM ONLY)
 	set (CMAKE_FIND_ROOT_PATH_MODE_LIBRARY ONLY)
 	set (CMAKE_FIND_ROOT_PATH_MODE_INCLUDE ONLY)
-endmacro (find_host_program)
+endmacro (find_host_package)
 
