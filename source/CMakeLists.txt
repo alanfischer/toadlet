@@ -8,7 +8,7 @@ if (TOADLET_PLATFORM_ANDROID OR TOADLET_PLATFORM_IOS)
 
 	# Find swig and include our swig wrapper macro
 	find_host_package (SWIG REQUIRED)
-	include (SwigWrapper)
+	include (SwigWrapFiles)
 
 	# Add the swig package
 	add_subdirectory (swig)
