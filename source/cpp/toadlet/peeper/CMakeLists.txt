@@ -76,7 +76,7 @@ set (PEEPER_NAMESPACES ${PEEPER_NAMESPACES} PARENT_SCOPE)
 
 # If we are using swig create the wrapper file from the interface files
 if (SWIG_FOUND AND TOADLET_PEEPER_INT)
-	swig_wrap_files (peeper_wrap.cpp "${TOADLET_PEEPER_INT}")	
+	swig_wrap_files (peeper_wrap.cpp peeper "${TOADLET_PEEPER_INT}")	
 	set (PEEPER_SRC ${PEEPER_SRC} peeper_wrap.cpp)
 endif (SWIG_FOUND AND TOADLET_PEEPER_INT)
 
