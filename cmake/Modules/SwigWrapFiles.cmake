@@ -8,7 +8,7 @@
 # NOTE: When you call this script, make sure you quote the argument to FILES if it is a list!
 # NOTE: Both SWIG_EXECUTABLE and SWIG_LANGUAGE must be set to use this macro
 
-macro (SWIG_WRAP_FILES OUTPUT SWIG LANGUAGE FILES)
+macro (SWIG_WRAP_FILES OUTPUT FILES)
 	add_custom_command (OUTPUT ${OUTPUT}
 		COMMAND ${SWIG_EXECUTABLE} -${SWIG_LANGUAGE} -c++ -o ${OUTPUT} ${FILES}
 	)
