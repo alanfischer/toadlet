@@ -256,10 +256,10 @@ set (EGG_NAMESPACES ${EGG_NAMESPACES} PARENT_SCOPE)
 
 
 # If we are using swig create the wrapper file from the interface files
-if (SWIG_FOUND)
+if (SWIG_FOUND AND TOADLET_EGG_INT)
 	swig_wrap_files (egg_wrap.cpp "${TOADLET_EGG_INT}")	
 	set (EGG_SRC ${EGG_SRC} egg_wrap.cpp)
-endif (SWIG_FOUND)
+endif (SWIG_FOUND AND TOADLET_EGG_INT)
 
 
 # Dynamic library

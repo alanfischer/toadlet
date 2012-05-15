@@ -701,10 +701,10 @@ set (TADPOLE_SRC_S ${TADPOLE_SRC} ${TADPOLE_PLUGINS_SRC_S})
 
 
 # If we are using swig create the wrapper file from the interface files
-if (SWIG_FOUND)
+if (SWIG_FOUND AND TOADLET_TADPOLE_INT)
 	swig_wrap_files (tadpole_wrap.cpp "${TOADLET_TADPOLE_INT}")	
 	set (TADPOLE_SRC ${TADPOLE_SRC} tadpole_wrap.cpp)
-endif (SWIG_FOUND)
+endif (SWIG_FOUND AND TOADLET_TADPOLE_INT)
 
 
 # Dynamic library

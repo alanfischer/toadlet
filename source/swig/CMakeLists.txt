@@ -1,28 +1,28 @@
 # List the interface files for each library
 set (TOADLET_PEEPER_INT
-	toadlet/peeper/RenderDevice.i
-	toadlet/peeper/RenderTarget.i
+	${CMAKE_CURRENT_SOURCE_DIR}/toadlet/peeper/RenderDevice.i
+	${CMAKE_CURRENT_SOURCE_DIR}/toadlet/peeper/RenderTarget.i
 	PARENT_SCOPE
 )
 
 set (TOADLET_RIBBIT_INT
-	toadlet/ribbit/AudioDevice.i
+	${CMAKE_CURRENT_SOURCE_DIR}/toadlet/ribbit/AudioDevice.i
 	PARENT_SCOPE
 )
 
 set (TOADLET_TADPOLE_INT
-	toadlet/tadpole/AnimationActionComponent.i
-	toadlet/tadpole/AudioComponent.i
-	toadlet/tadpole/CameraNode.i
-	toadlet/tadpole/Component.i
-	toadlet/tadpole/Engine.i
-	toadlet/tadpole/LightNode.i
-	toadlet/tadpole/MeshNode.i
-	toadlet/tadpole/Node.i
-	toadlet/tadpole/Scene.i
-	toadlet/tadpole/animation/Animation.i
-	toadlet/tadpole/animation/BaseAnimation.i
-	toadlet/tadpole/animation/MeshAnimation.i
+	${CMAKE_CURRENT_SOURCE_DIR}/toadlet/tadpole/AnimationActionComponent.i
+	${CMAKE_CURRENT_SOURCE_DIR}/toadlet/tadpole/AudioComponent.i
+	${CMAKE_CURRENT_SOURCE_DIR}/toadlet/tadpole/CameraNode.i
+	${CMAKE_CURRENT_SOURCE_DIR}/toadlet/tadpole/Component.i
+	${CMAKE_CURRENT_SOURCE_DIR}/toadlet/tadpole/Engine.i
+	${CMAKE_CURRENT_SOURCE_DIR}/toadlet/tadpole/LightNode.i
+	${CMAKE_CURRENT_SOURCE_DIR}/toadlet/tadpole/MeshNode.i
+	${CMAKE_CURRENT_SOURCE_DIR}/toadlet/tadpole/Node.i
+	${CMAKE_CURRENT_SOURCE_DIR}/toadlet/tadpole/Scene.i
+	${CMAKE_CURRENT_SOURCE_DIR}/toadlet/tadpole/animation/Animation.i
+	${CMAKE_CURRENT_SOURCE_DIR}/toadlet/tadpole/animation/BaseAnimation.i
+	${CMAKE_CURRENT_SOURCE_DIR}/toadlet/tadpole/animation/MeshAnimation.i
 	PARENT_SCOPE
 )
 
