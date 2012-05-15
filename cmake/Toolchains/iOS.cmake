@@ -23,6 +23,10 @@
 # set_xcode_property (TARGET XCODE_PROPERTY XCODE_VALUE)
 #  A convenience macro for setting xcode specific properties on targets
 #  example: set_xcode_property (myioslib IPHONEOS_DEPLOYMENT_TARGET "3.1")
+#
+# find_host_program (PROGRAM ARGS)
+#  A macro used to find executable programs on the host system, not within the iOS environment.
+#  Thanks to the android-cmake project for providing the command
 
 
 # Standard settings
