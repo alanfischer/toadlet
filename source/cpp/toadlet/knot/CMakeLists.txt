@@ -43,6 +43,13 @@ set (KNOT_HEADERS
 set (KNOT_HEADERS ${KNOT_HEADERS} PARENT_SCOPE)
 
 
+# If we are using swig create the wrapper file from the interface files
+if (SWIG_FOUND)
+	swig_wrap_files (knot_wrap.cpp "${TOADLET_KNOT_INT}")	
+	set (KNOT_SRC ${KNOT_SRC} knot_wrap.cpp)
+endif (SWIG_FOUND)
+
+
 # Dynamic library
 if (NOT TOADLET_PLATFORM_IOS)
 	add_library (toadlet_knot SHARED ${KNOT_SRC} ${KNOT_HEADERS})
