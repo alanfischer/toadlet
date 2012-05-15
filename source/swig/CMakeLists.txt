@@ -1,40 +1,25 @@
 # List the interface files for each library
 set (TOADLET_PEEPER_INT
-	${CMAKE_CURRENT_SOURCE_DIR}/toadlet/peeper/RenderDevice.i
-	${CMAKE_CURRENT_SOURCE_DIR}/toadlet/peeper/RenderTarget.i
+	${CMAKE_CURRENT_SOURCE_DIR}/toadlet/peeper/peeper.i
 	PARENT_SCOPE
 )
 
 set (TOADLET_RIBBIT_INT
-	${CMAKE_CURRENT_SOURCE_DIR}/toadlet/ribbit/AudioDevice.i
+	${CMAKE_CURRENT_SOURCE_DIR}/toadlet/ribbit/ribbit.i
 	PARENT_SCOPE
 )
 
 set (TOADLET_TADPOLE_INT
-	${CMAKE_CURRENT_SOURCE_DIR}/toadlet/tadpole/AnimationActionComponent.i
-	${CMAKE_CURRENT_SOURCE_DIR}/toadlet/tadpole/AudioComponent.i
-	${CMAKE_CURRENT_SOURCE_DIR}/toadlet/tadpole/CameraNode.i
-	${CMAKE_CURRENT_SOURCE_DIR}/toadlet/tadpole/Component.i
-	${CMAKE_CURRENT_SOURCE_DIR}/toadlet/tadpole/Engine.i
-	${CMAKE_CURRENT_SOURCE_DIR}/toadlet/tadpole/LightNode.i
-	${CMAKE_CURRENT_SOURCE_DIR}/toadlet/tadpole/MeshNode.i
-	${CMAKE_CURRENT_SOURCE_DIR}/toadlet/tadpole/Node.i
-	${CMAKE_CURRENT_SOURCE_DIR}/toadlet/tadpole/Scene.i
-	${CMAKE_CURRENT_SOURCE_DIR}/toadlet/tadpole/animation/Animation.i
-	${CMAKE_CURRENT_SOURCE_DIR}/toadlet/tadpole/animation/BaseAnimation.i
-	${CMAKE_CURRENT_SOURCE_DIR}/toadlet/tadpole/animation/MeshAnimation.i
+	${CMAKE_CURRENT_SOURCE_DIR}/toadlet/tadpole/tadpole.i
 	PARENT_SCOPE
 )
 
 
 # Platform specific settings
 if (TOADLET_PLATFORM_PYTHON)
-	# Python needs an extra interface file
+	# Python needs a global interface file
 	set (TOADLET_INT
 		toadlet/toadlet.i
-		${TOADLET_PEEPER_INT}
-		${TOADLET_RIBBIT_INT}
-		${TOADLET_TADPOLE_INT}
 	)
 
 	# Python swig setup
