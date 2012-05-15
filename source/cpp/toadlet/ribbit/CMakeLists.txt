@@ -30,7 +30,7 @@ set (RIBBIT_NAMESPACES ${RIBBIT_NAMESPACES} PARENT_SCOPE)
 
 # If we are using swig create the wrapper file from the interface files
 if (SWIG_FOUND AND TOADLET_RIBBIT_INT)
-	swig_wrap_files (ribbit_wrap.cpp "${TOADLET_RIBBIT_INT}")	
+	swig_wrap_files (ribbit_wrap.cpp ribbit "${TOADLET_RIBBIT_INT}")	
 	set (RIBBIT_SRC ${RIBBIT_SRC} ribbit_wrap.cpp)
 endif (SWIG_FOUND AND TOADLET_RIBBIT_INT)
 
