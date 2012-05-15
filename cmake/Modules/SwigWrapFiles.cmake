@@ -10,7 +10,7 @@
 
 macro (SWIG_WRAP_FILES OUTPUT FILES)
 	add_custom_command (OUTPUT ${OUTPUT}
-		COMMAND ${SWIG_EXECUTABLE} -${SWIG_LANGUAGE} -c++ -o ${OUTPUT} ${FILES}
+		COMMAND ${SWIG_EXECUTABLE} -${SWIG_LANGUAGE} -c++ -outcurrentdir -o ${OUTPUT} ${FILES}
 	)
 endmacro (SWIG_WRAP_FILES)
 

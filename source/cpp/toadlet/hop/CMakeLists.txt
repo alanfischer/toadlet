@@ -33,10 +33,10 @@ set (HOP_NAMESPACES ${HOP_NAMESPACES} PARENT_SCOPE)
 
 
 # If we are using swig create the wrapper file from the interface files
-if (SWIG_FOUND)
+if (SWIG_FOUND AND TOADLET_FLICK_INT)
 	swig_wrap_files (hop_wrap.cpp "${TOADLET_HOP_INT}")	
 	set (HOP_SRC ${HOP_SRC} hop_wrap.cpp)
-endif (SWIG_FOUND)
+endif (SWIG_FOUND AND TOADLET_FLICK_INT)
 
 
 # Dynamic library
