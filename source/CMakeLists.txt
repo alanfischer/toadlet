@@ -1,15 +1,34 @@
-# Add the swig bindings first
+# These platforms require swig to generate bindings before compilation
 if (TOADLET_PLATFORM_ANDROID OR TOADLET_PLATFORM_IOS)
+	if (TOADLET_PLATFORM_ANDROID)
+		set (SWIG_LANGUAGE java)
+	else (TOADLET_PLATFORM_IOS)
+		set (SWIG_LANGUAGE objc)
+	endif (TOADLET_PLATFORM_ANDROID)
+
+	# Find swig and include our swig wrapper macro
+	find_host_package (SWIG REQUIRED)
+	include (SwigWrapper)
+
+	# Add the swig package
 	add_subdirectory (swig)
 endif (TOADLET_PLATFORM_ANDROID OR TOADLET_PLATFORM_IOS)
+
 
 # Add the c++ source code
 add_subdirectory (cpp)
 
-# Python requries the swig bindings be added later
+
+# Python requries the swig bindings be added as a separate module
 if (TOADLET_PLATFORM_PYTHON)
+	# Find swig and include cmake's swig package
+	find_package (SWIG REQUIRED)
+	include (UseSwig)
+	
+	# Add the swig package
 	add_subdirectory (swig)
 endif (TOADLET_PLATFORM_PYTHON)
+
 
 # Older versions of android require shell java libraries
 if (TOADLET_PLATFORM_ANDROID AND ANDROID_NDK_API_LEVEL LESS 9)

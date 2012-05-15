@@ -28,6 +28,13 @@ set (RIBBIT_HEADERS ${RIBBIT_HEADERS} PARENT_SCOPE)
 set (RIBBIT_NAMESPACES ${RIBBIT_NAMESPACES} PARENT_SCOPE)
 
 
+# If we are using swig create the wrapper file from the interface files
+if (SWIG_FOUND)
+	swig_wrap_files (ribbit_wrap.cpp "${TOADLET_RIBBIT_INT}")	
+	set (RIBBIT_SRC ${RIBBIT_SRC} ribbit_wrap.cpp)
+endif (SWIG_FOUND)
+
+
 # Dynamic library
 if (NOT TOADLET_PLATFORM_IOS)
 	add_library (toadlet_ribbit SHARED ${RIBBIT_SRC} ${RIBBIT_HEADERS})

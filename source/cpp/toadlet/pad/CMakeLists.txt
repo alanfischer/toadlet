@@ -173,6 +173,13 @@ set (PAD_HEADERS ${PAD_HEADERS} PARENT_SCOPE)
 set (PAD_NAMESPACES ${PAD_NAMESPACES} PARENT_SCOPE)
 
 
+# If we are using swig create the wrapper file from the interface files
+if (SWIG_FOUND)
+	swig_wrap_files (pad_wrap.cpp "${TOADLET_PAD_INT}")	
+	set (PAD_SRC ${PAD_SRC} pad_wrap.cpp)
+endif (SWIG_FOUND)
+
+
 # Dynamic Library
 if (NOT TOADLET_PLATFORM_IOS)
 	add_library (toadlet_pad SHARED ${PAD_SRC} ${PAD_HEADERS})

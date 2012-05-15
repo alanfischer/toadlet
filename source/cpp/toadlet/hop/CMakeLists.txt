@@ -32,6 +32,13 @@ set (HOP_HEADERS ${HOP_HEADERS} PARENT_SCOPE)
 set (HOP_NAMESPACES ${HOP_NAMESPACES} PARENT_SCOPE)
 
 
+# If we are using swig create the wrapper file from the interface files
+if (SWIG_FOUND)
+	swig_wrap_files (hop_wrap.cpp "${TOADLET_HOP_INT}")	
+	set (HOP_SRC ${HOP_SRC} hop_wrap.cpp)
+endif (SWIG_FOUND)
+
+
 # Dynamic library
 if (NOT TOADLET_PLATFORM_IOS)
 	add_library (toadlet_hop SHARED ${HOP_SRC} ${HOP_HEADERS})
