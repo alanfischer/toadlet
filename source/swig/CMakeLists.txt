@@ -1,3 +1,7 @@
+# Add this directory to the swing include path
+set (SWIG_INCLUDES ${CMAKE_CURRENT_SOURCE_DIR} PARENT_SCOPE)
+
+
 # List the interface files for each library
 set (TOADLET_PEEPER_INT
 	${CMAKE_CURRENT_SOURCE_DIR}/toadlet/peeper/peeper.i
