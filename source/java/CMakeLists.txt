@@ -39,11 +39,14 @@ set (CMAKE_JAVA_COMPILE_FLAGS -Xlint:unchecked)
 configure_file (us/toadlet/flick/Version.java.cmake ${CMAKE_CURRENT_BINARY_DIR}/us/toadlet/flick/Version.java)
 
 set (FLICK_SRC
-	us/toadlet/flick/InputDevice.java
-	us/toadlet/flick/InputDeviceListener.java
-	us/toadlet/flick/NInputDeviceListener.java
 	us/toadlet/flick/AndroidSensorDevice.java
 	${CMAKE_CURRENT_BINARY_DIR}/us/toadlet/flick/Version.java
+	${CMAKE_CURRENT_BINARY_DIR}/us/toadlet/flick/BaseInputDevice.java
+	${CMAKE_CURRENT_BINARY_DIR}/us/toadlet/flick/InputData.java
+	${CMAKE_CURRENT_BINARY_DIR}/us/toadlet/flick/InputDevice.java
+	${CMAKE_CURRENT_BINARY_DIR}/us/toadlet/flick/InputDeviceListener.java
+	${CMAKE_CURRENT_BINARY_DIR}/us/toadlet/flick/flick.java
+	${CMAKE_CURRENT_BINARY_DIR}/us/toadlet/flick/flickJNI.java
 )
 
 set (FLICK_H
@@ -208,4 +211,5 @@ add_custom_command (TARGET jtoadlet_pad POST_BUILD
 if (${NDKSYSTEM} STREQUAL "windows" AND ${CMAKE_GENERATOR} STREQUAL "NMake Makefiles")
     unset (WIN32)
 endif (${NDKSYSTEM} STREQUAL "windows" AND ${CMAKE_GENERATOR} STREQUAL "NMake Makefiles")
+
 

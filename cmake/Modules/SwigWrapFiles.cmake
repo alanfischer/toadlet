@@ -32,7 +32,7 @@ macro (SWIG_WRAP_SETUP LANGUAGE PREFIX OUTPUT_BASEDIR INCLUDES )
 			set (PKG_PREFIX "${PKG_PREFIX}.")
 		endif (NOT ${PL} EQUAL ${PD})
 		
-		set (SWIG_WRAP_PREFIX ${PREFIX} CACHE INTERNAL "Swig wrap package prefix" FORCE)
+		set (SWIG_WRAP_PREFIX ${PKG_PREFIX} CACHE INTERNAL "Swig wrap package prefix" FORCE)
 		
 		# Turn the prefix into a path
 		string (REPLACE "." "/" PATH_PREFIX ${PKG_PREFIX})
