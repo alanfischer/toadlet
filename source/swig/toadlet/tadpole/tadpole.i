@@ -1,6 +1,6 @@
 %module tadpole
 
-%module(directors="1") tadpole
+//%module(directors="1") tadpole
 
 %include <toadlet/tadpole/Engine.i>
 %include <toadlet/tadpole/Scene.i>
@@ -15,7 +15,10 @@
 %include <toadlet/tadpole/animation/BaseAnimation.i>
 %include <toadlet/tadpole/animation/MeshAnimation.i>
 %{
+using namespace toadlet;
 using namespace toadlet::tadpole;
 using namespace toadlet::tadpole::animation;
 using namespace toadlet::tadpole::node;
 %}
+
+typedef float scalar;

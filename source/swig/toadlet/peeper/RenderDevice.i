@@ -20,7 +20,8 @@ public:
 
 }
 }
-
+/*
 %inline %{
 extern "C" toadlet::peeper::RenderDevice *new_GLRenderDevice();
 %}
+*/

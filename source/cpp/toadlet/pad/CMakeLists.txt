@@ -10,7 +10,6 @@ set (PAD_SRC
 
 set (PAD_PLATFORM_ANDROID_JAPPLICATION_SRC
 	platform/android/JApplication.cpp
-	platform/android/us_toadlet_pad_NApplet.cpp
 )
 
 set (PAD_PLATFORM_ANDROID_ANDROIDAPPLICATION_SRC
