@@ -1,14 +1,6 @@
 # These platforms require swig to generate bindings before compilation
 if (TOADLET_PLATFORM_ANDROID OR TOADLET_PLATFORM_IOS)
-	if (TOADLET_PLATFORM_ANDROID)
-		set (SWIG_LANGUAGE java)
-		set (SWIG_PACKAGE_PREFIX us.toadlet.)
-	else (TOADLET_PLATFORM_IOS)
-		set (SWIG_LANGUAGE objc)
-		set (SWIG_PACKAGE_PREFIX)
-	endif (TOADLET_PLATFORM_ANDROID)
-
-	# Find swig and include our swig wrapper macro
+	# Find swig on our host and include our swig wrapper macro
 	find_host_package (SWIG REQUIRED)
 	include (SwigWrapFiles)
 

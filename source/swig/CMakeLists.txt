@@ -1,31 +1,35 @@
-# Add this directory to the swing include path
-set (SWIG_INCLUDES ${CMAKE_CURRENT_SOURCE_DIR} PARENT_SCOPE)
+# Swig is used very differently for python and non-python platforms
+# This is because python creates a separate shared library after compilation and links to the existing toadlet build,
+# otherwise the swig wrapper files are generated first and compiled directly into the toadlet libraries.
+if (NOT TOADLET_PLATFORM_PYTHON)
+	# Setup the swig wrap macro
+	if (TOADLET_PLATFORM_ANDROID)
+		swig_wrap_setup (java us.toadlet. ${CMAKE_CURRENT_SOURCE_DIR})
+	else (TOADLET_PLATFORM_IOS)
+		swig_wrap_setup (objc NO ${CMAKE_CURRENT_SOURCE_DIR})
+	endif (TOADLET_PLATFORM_ANDROID)
 
+	# List the interface files for each library
+	set (TOADLET_FLICK_INT
+		${CMAKE_CURRENT_SOURCE_DIR}/toadlet/flick/flick.i
+		PARENT_SCOPE
+	)
 
-# List the interface files for each library
-set (TOADLET_FLICK_INT
-	${CMAKE_CURRENT_SOURCE_DIR}/toadlet/flick/flick.i
-	PARENT_SCOPE
-)
+	set (TOADLET_PEEPER_INT
+		${CMAKE_CURRENT_SOURCE_DIR}/toadlet/peeper/peeper.i
+		PARENT_SCOPE
+	)
 
-set (TOADLET_PEEPER_INT
-	${CMAKE_CURRENT_SOURCE_DIR}/toadlet/peeper/peeper.i
-	PARENT_SCOPE
-)
+	set (TOADLET_RIBBIT_INT
+		${CMAKE_CURRENT_SOURCE_DIR}/toadlet/ribbit/ribbit.i
+		PARENT_SCOPE
+	)
 
-set (TOADLET_RIBBIT_INT
-	${CMAKE_CURRENT_SOURCE_DIR}/toadlet/ribbit/ribbit.i
-	PARENT_SCOPE
-)
-
-set (TOADLET_TADPOLE_INT
-	${CMAKE_CURRENT_SOURCE_DIR}/toadlet/tadpole/tadpole.i
-	PARENT_SCOPE
-)
-
-
-# Platform specific settings
-if (TOADLET_PLATFORM_PYTHON)
+	set (TOADLET_TADPOLE_INT
+		${CMAKE_CURRENT_SOURCE_DIR}/toadlet/tadpole/tadpole.i
+		PARENT_SCOPE
+	)
+else (NOT TOADLET_PLATFORM_PYTHON)
 	# Python needs a global interface file
 	set (TOADLET_INT
 		toadlet/toadlet.i
@@ -48,5 +52,5 @@ if (TOADLET_PLATFORM_PYTHON)
 	install (FILES ${pytoadlet_BINARY_DIR}/pytoadlet.py DESTINATION ${CMAKE_INSTALL_PREFIX}/Lib)
 	install (FILES ${pytoadlet_BINARY_DIR}/Release/_pytoadlet.pyd DESTINATION ${CMAKE_INSTALL_PREFIX}/Lib CONFIGURATIONS Release)
 	install (FILES ${pytoadlet_BINARY_DIR}/Debug/_pytoadlet.pyd DESTINATION ${CMAKE_INSTALL_PREFIX}/Lib CONFIGURATIONS Debug)
-endif (TOADLET_PLATFORM_PYTHON)
+endif (NOT TOADLET_PLATFORM_PYTHON)
 
