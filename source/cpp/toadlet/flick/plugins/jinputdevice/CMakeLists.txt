@@ -1,7 +1,6 @@
 # Source files for toadlet_flick_jinputdevice
 set (FLICK_JINPUTDEVICE_SRC
 	JInputDevice.cpp
-	us_toadlet_flick_NInputDeviceListener.cpp
 )
 
 

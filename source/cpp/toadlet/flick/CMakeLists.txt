@@ -11,6 +11,7 @@ set (FLICK_SRC
 
 # Header files for flick
 set (FLICK_HEADERS
+	BaseInputDevice.h
 	FilteredMotionDevice.h
 	InputData.h
 	InputDevice.h

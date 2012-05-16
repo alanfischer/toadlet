@@ -26,7 +26,7 @@
 #ifndef TOADLET_FLICK_IOSMOTIONDEVICE_H
 #define TOADLET_FLICK_IOSMOTIONDEVICE_H
 
-#include <toadlet/flick/InputDevice.h>
+#include <toadlet/flick/BaseInputDevice.h>
 #include <toadlet/flick/InputData.h>
 #include <toadlet/egg/System.h>
 #include <toadlet/egg/Logger.h>
@@ -52,7 +52,7 @@ class IOSMotionDevice;
 namespace toadlet{
 namespace flick{
 
-class IOSMotionDevice:protected Object,public InputDevice{
+class IOSMotionDevice:public BaseInputDevice{
 public:
 	TOADLET_OBJECT(IOSMotionDevice);
 	

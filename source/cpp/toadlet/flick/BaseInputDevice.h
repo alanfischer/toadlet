@@ -23,48 +23,34 @@
  *
  ********** Copyright header - do not remove **********/
 
-#ifndef TOADLET_FLICK_WIN32JOYDEVICE_H
-#define TOADLET_FLICK_WIN32JOYDEVICE_H
+#ifndef TOADLET_FLICK_BASEINPUTDEVICE_H
+#define TOADLET_FLICK_BASEINPUTDEVICE_H
 
-#include <toadlet/flick/BaseInputDevice.h>
-#include <toadlet/egg/System.h>
-#include <toadlet/egg/Object.h>
-#include <windows.h>
+#include <toadlet/flick/InputDevice.h>
 
 namespace toadlet{
 namespace flick{
 
-class Win32JoyDevice:public BaseInputDevice{
+class BaseInputDevice:protected Object,public InputDevice{
 public:
-	TOADLET_OBJECT(Win32JoyDevice);
+	TOADLET_OBJECT(BaseInputDevice);
 
-	Win32JoyDevice();
-	virtual ~Win32JoyDevice();
+	virtual ~BaseInputDevice(){}
 
-	bool create();
-	void destroy();
+	bool create(){return true;}
+	void destroy(){}
 
-	InputType getType(){return InputType_JOY;}
-	bool start();
-	void update(int dt);
-	void stop();
+	InputType getType(){return (InputType)0;}
+	bool start(){return true;}
+	void update(int dt){}
+	void stop(){}
 
-	void setListener(InputDeviceListener *listener){mListener=listener;}
+	void setListener(InputDeviceListener *listener){}
 	void setSampleTime(int dt){}
-	void setAlpha(scalar alpha){}
-
-	scalar joyToScalar(int joy);
-
-protected:
-	bool mRunning;
-	InputDeviceListener *mListener;
-	int mJoyID;
-	JOYINFOEX mJoyInfo,mLastJoyInfo;
-	InputData mJoyData;
+	void setAlpha(float alpha){}
 };
 
 }
 }
 
 #endif
-
