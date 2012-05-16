@@ -1,4 +1,4 @@
-# On Android NDK API levels < 9, toadlet uses java shim libraries for flick, peeper, ribbit, and pad.
+# On toadlet uses java shim libraries for flick, peeper, ribbit, and pad.
 
 # Special settings for debug builds
 string (TOUPPER ${CMAKE_BUILD_TYPE} BUILD_TYPE)
@@ -34,10 +34,6 @@ set (CMAKE_JAVA_INCLUDE_PATH ${ANDROID_JAR})
 
 # Compiler flags
 set (CMAKE_JAVA_COMPILE_FLAGS -Xlint:unchecked)
-
-# Used by the cpp classes to locate the javah generated headers
-set (TOADLET_JAVA_BASEDIR ${CMAKE_CURRENT_BINARY_DIR} PARENT_SCOPE)
-
 
 # toadlet_flick
 configure_file (us/toadlet/flick/Version.java.cmake ${CMAKE_CURRENT_BINARY_DIR}/us/toadlet/flick/Version.java)
