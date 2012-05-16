@@ -38,13 +38,6 @@ using namespace toadlet::pad;
 TOADLET_C_API AudioDevice* new_JAudioDevice(JNIEnv *env,jobject obj);
 TOADLET_C_API InputDevice* new_JInputDevice(JNIEnv *env,jobject obj);
 
-TOADLET_C_API void Java_us_toadlet_peeper_NGLES1RenderDevice(JNIEnv *env);
-TOADLET_C_API void Java_us_toadlet_peeper_NGLES2RenderDevice(JNIEnv *env);
-TOADLET_C_API void Java_us_toadlet_ribbit_NAudioStream(JNIEnv *env);
-TOADLET_C_API void Java_us_toadlet_flick_NInputDeviceListener(JNIEnv *env);
-TOADLET_C_API void Java_us_toadlet_tadpole_Engine(JNIEnv *env);
-TOADLET_C_API void Java_us_toadlet_pad_NApplet(JNIEnv *env);
-
 namespace toadlet{
 namespace pad{
 
@@ -64,13 +57,6 @@ JApplication::JApplication(JNIEnv *jenv,jobject jobj):
 		mInputDevices[i]=NULL;
 		mLastInputDeviceObjs[i]=NULL;
 	}
-
-	Java_us_toadlet_peeper_NGLES1RenderDevice(jenv);
-	Java_us_toadlet_peeper_NGLES2RenderDevice(jenv);
-	Java_us_toadlet_ribbit_NAudioStream(jenv);
-	Java_us_toadlet_flick_NInputDeviceListener(jenv);
-	Java_us_toadlet_tadpole_Engine(jenv);
-	Java_us_toadlet_pad_NApplet(jenv);
 
 	env=jenv;
 	obj=env->NewGlobalRef(jobj);

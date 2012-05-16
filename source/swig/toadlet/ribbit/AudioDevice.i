@@ -18,8 +18,9 @@ public:
 
 }
 }
-
+/*
 %inline %{
 extern "C" toadlet::ribbit::AudioDevice *new_ALAudioDevice();
 extern "C" toadlet::ribbit::AudioDevice *new_MMAudioDevice();
 %}
+*/

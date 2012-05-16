@@ -9,6 +9,8 @@ namespace tadpole{
 
 class ActionListener{
 public:
+	virtual ~ActionListener(){}
+
 	virtual void actionStarted(ActionComponent *component)=0;
 	virtual void actionStopped(ActionComponent *component)=0;
 };
