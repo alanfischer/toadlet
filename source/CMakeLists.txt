@@ -4,7 +4,7 @@ if (TOADLET_PLATFORM_ANDROID OR TOADLET_PLATFORM_IOS)
 	find_host_package (SWIG REQUIRED)
 	include (SwigWrapFiles)
 
-	# Add the swig package
+	# Add the swig files
 	add_subdirectory (swig)
 endif (TOADLET_PLATFORM_ANDROID OR TOADLET_PLATFORM_IOS)
 
@@ -19,7 +19,7 @@ if (TOADLET_PLATFORM_PYTHON)
 	find_package (SWIG REQUIRED)
 	include (UseSwig)
 	
-	# Add the swig package
+	# Add the swig files
 	add_subdirectory (swig)
 endif (TOADLET_PLATFORM_PYTHON)
 

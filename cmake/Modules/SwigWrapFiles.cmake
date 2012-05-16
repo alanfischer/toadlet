@@ -6,13 +6,14 @@
 #  Arguments:
 #   LANGUAGE - language of the bindings being generated (ex: java/objc)
 #   PREFIX - a package prefix (ex: my.package.is.) NOTE: set to NO if empty
+#   OUTPUT_BASEDIR - the location to write out language files, it will be appended with the PREFIX converted to a path
 #   INCLUDES - a list of include directories for the bindings
 #
 #  Examples:
-#   SWIG_WRAP_SETUP(java com.my. /path/to/binding/includes)
-#   SWIG_WRAP_SETUP(objc NO /path/to/binding/includes)
+#   SWIG_WRAP_SETUP(java com.my.pkg ${CMAKE_CURRENT_BINARY_DIR} /path/to/binding/includes)
+#   SWIG_WRAP_SETUP(objc NO ${CMAKE_CURRENT_BINARY_DIR}/objc /path/to/binding/includes)
 
-macro (SWIG_WRAP_SETUP LANGUAGE PREFIX INCLUDES)
+macro (SWIG_WRAP_SETUP LANGUAGE PREFIX OUTPUT_BASEDIR INCLUDES )
 	if (NOT SWIG_EXECUTABLE)
 		message (FATAL_ERROR "The SWIG_EXECUTABLE is not set. Did using find_package(SWIG) fail?")
 	endif (NOT SWIG_EXECUTABLE)
@@ -21,10 +22,24 @@ macro (SWIG_WRAP_SETUP LANGUAGE PREFIX INCLUDES)
 	set (SWIG_WRAP_INCLUDES ${INCLUDES} CACHE INTERNAL "Swig wrap include path" FORCE)
 	
 	# The prefix may be empty, and we must redefine prefix for this comparison to work properly
-	set (PREFIX ${PREFIX})
-	if (PREFIX)
+	set (PKG_PREFIX ${PREFIX})
+	if (PKG_PREFIX)
+		# Append the trailing dot (if needed) so that paths and packages work out
+		string(LENGTH ${PKG_PREFIX} PL)
+		math (EXPR PL "${PL}-1")
+		string(FIND ${PKG_PREFIX} "." PD REVERSE)
+		if (NOT ${PL} EQUAL ${PD})
+			set (PKG_PREFIX "${PKG_PREFIX}.")
+		endif (NOT ${PL} EQUAL ${PD})
+		
 		set (SWIG_WRAP_PREFIX ${PREFIX} CACHE INTERNAL "Swig wrap package prefix" FORCE)
-	endif (PREFIX)
+		
+		# Turn the prefix into a path
+		string (REPLACE "." "/" PATH_PREFIX ${PKG_PREFIX})
+	endif (PKG_PREFIX)
+	
+	# The output directory is the basedir with the PATH_PREFIX appended, if defined
+	set (SWIG_WRAP_OUTDIR ${OUTPUT_BASEDIR}/${PATH_PREFIX} CACHE INTERNAL "Swig wrap language specific output basedir" FORCE)
 	
 	set (SWIG_WRAP_FILES_SETUP ON CACHE INTERNAL "Swig wrap files is setup" FORCE)
 	message (STATUS "SWIG_WRAP_FILES() has been setup")
@@ -49,6 +64,6 @@ macro (SWIG_WRAP_FILES OUTPUT PACKAGE INTERFACE)
 	endif (NOT SWIG_WRAP_FILES_SETUP)
 	
 	add_custom_command (OUTPUT ${OUTPUT}
-		COMMAND ${SWIG_EXECUTABLE} -${SWIG_WRAP_LANGUAGE} -I${SWIG_WRAP_INCLUDES} -package ${SWIG_WRAP_PREFIX}${PACKAGE} -c++ -outcurrentdir -o ${OUTPUT} ${INTERFACE}
+		COMMAND ${SWIG_EXECUTABLE} -${SWIG_WRAP_LANGUAGE} -I${SWIG_WRAP_INCLUDES} -package ${SWIG_WRAP_PREFIX}${PACKAGE} -c++ -outcurrentdir -outdir ${SWIG_WRAP_OUTDIR}${PACKAGE} -o ${OUTPUT} ${INTERFACE}
 	)
 endmacro (SWIG_WRAP_FILES)

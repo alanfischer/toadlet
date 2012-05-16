@@ -2,11 +2,13 @@
 # This is because python creates a separate shared library after compilation and links to the existing toadlet build,
 # otherwise the swig wrapper files are generated first and compiled directly into the toadlet libraries.
 if (NOT TOADLET_PLATFORM_PYTHON)
-	# Setup the swig wrap macro
+	# Setup the swig wrap macro and include the header output folder
 	if (TOADLET_PLATFORM_ANDROID)
-		swig_wrap_setup (java us.toadlet. ${CMAKE_CURRENT_SOURCE_DIR})
+		include_directories (${PROJECT_BINARY_DIR}/source/java)
+		swig_wrap_setup (java us.toadlet ${PROJECT_BINARY_DIR}/source/java ${CMAKE_CURRENT_SOURCE_DIR})
 	else (TOADLET_PLATFORM_IOS)
-		swig_wrap_setup (objc NO ${CMAKE_CURRENT_SOURCE_DIR})
+		include_directories (${PROJECT_BINARY_DIR}/source/objc)
+		swig_wrap_setup (objc NO ${PROJECT_BINARY_DIR}/source/objc ${CMAKE_CURRENT_SOURCE_DIR})
 	endif (TOADLET_PLATFORM_ANDROID)
 
 	# List the interface files for each library
