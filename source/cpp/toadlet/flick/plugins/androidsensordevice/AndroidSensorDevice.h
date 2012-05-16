@@ -26,14 +26,14 @@
 #ifndef TOADLET_FLICK_ANDROIDSENSORDEVICE_H
 #define TOADLET_FLICK_ANDROIDSENSORDEVICE_H
 
-#include <toadlet/flick/InputDevice.h>
+#include <toadlet/flick/BaseInputDevice.h>
 #include <toadlet/flick/InputData.h>
 #include <android/sensor.h>
 
 namespace toadlet{
 namespace flick{
 
-class TOADLET_API AndroidSensorDevice:protected Object,public InputDevice{
+class TOADLET_API AndroidSensorDevice:public BaseInputDevice{
 public:
 	TOADLET_OBJECT(AndroidSensorDevice);
 
