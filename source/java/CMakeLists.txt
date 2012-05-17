@@ -1,4 +1,4 @@
-# On toadlet uses java shim libraries for flick, peeper, ribbit, and pad.
+# Android toadlet uses java libraries for flick, peeper, ribbit, tadpole and pad.
 
 # Special settings for debug builds
 string (TOUPPER ${CMAKE_BUILD_TYPE} BUILD_TYPE)
@@ -35,18 +35,16 @@ set (CMAKE_JAVA_INCLUDE_PATH ${ANDROID_JAR})
 # Compiler flags
 set (CMAKE_JAVA_COMPILE_FLAGS -Xlint:unchecked)
 
+
+# Compile jars for each library
+
 # toadlet_flick
 configure_file (us/toadlet/flick/Version.java.cmake ${CMAKE_CURRENT_BINARY_DIR}/us/toadlet/flick/Version.java)
 
 set (FLICK_SRC
 	us/toadlet/flick/AndroidSensorDevice.java
+	${FLICK_SWIG_INT_OUTPUTS}
 	${CMAKE_CURRENT_BINARY_DIR}/us/toadlet/flick/Version.java
-	${CMAKE_CURRENT_BINARY_DIR}/us/toadlet/flick/BaseInputDevice.java
-	${CMAKE_CURRENT_BINARY_DIR}/us/toadlet/flick/InputData.java
-	${CMAKE_CURRENT_BINARY_DIR}/us/toadlet/flick/InputDevice.java
-	${CMAKE_CURRENT_BINARY_DIR}/us/toadlet/flick/InputDeviceListener.java
-	${CMAKE_CURRENT_BINARY_DIR}/us/toadlet/flick/flick.java
-	${CMAKE_CURRENT_BINARY_DIR}/us/toadlet/flick/flickJNI.java
 )
 
 set (FLICK_H
@@ -59,6 +57,7 @@ endif (${BUILD_TYPE} STREQUAL "DEBUG")
 set (CMAKE_JAR_CLASSES_PREFIX us/toadlet/flick)
 add_jar (jtoadlet_flick ${FLICK_SRC})
 get_property (JARFILE TARGET jtoadlet_flick PROPERTY JAR_FILE)
+add_dependencies(jtoadlet_flick toadlet_flick)
 install (FILES ${JARFILE} DESTINATION ${JAVA_LIB_INSTALL_DIR})
 
 # Generate headers
@@ -96,6 +95,7 @@ endif (${BUILD_TYPE} STREQUAL "DEBUG")
 set (CMAKE_JAR_CLASSES_PREFIX us/toadlet/peeper)
 add_jar (jtoadlet_peeper ${PEEPER_SRC})
 get_property (JARFILE TARGET jtoadlet_peeper PROPERTY JAR_FILE)
+add_dependencies(jtoadlet_peeper toadlet_peeper)
 install (FILES ${JARFILE} DESTINATION ${JAVA_LIB_INSTALL_DIR})
 
 # Generate headers
@@ -124,6 +124,7 @@ endif (${BUILD_TYPE} STREQUAL "DEBUG")
 set (CMAKE_JAR_CLASSES_PREFIX us/toadlet/ribbit)
 add_jar (jtoadlet_ribbit ${RIBBIT_SRC})
 get_property (JARFILE TARGET jtoadlet_ribbit PROPERTY JAR_FILE)
+add_dependencies(jtoadlet_ribbit toadlet_ribbit)
 install (FILES ${JARFILE} DESTINATION ${JAVA_LIB_INSTALL_DIR})
 
 # Generate headers
@@ -161,6 +162,7 @@ endif (${BUILD_TYPE} STREQUAL "DEBUG")
 set (CMAKE_JAR_CLASSES_PREFIX us/toadlet/tadpole)
 add_jar (jtoadlet_tadpole ${TADPOLE_SRC})
 get_property (JARFILE TARGET jtoadlet_tadpole PROPERTY JAR_FILE)
+add_dependencies(jtoadlet_tadpole toadlet_tadpole)
 install (FILES ${JARFILE} DESTINATION ${JAVA_LIB_INSTALL_DIR})
 
 # Generate headers
@@ -189,6 +191,7 @@ endif (${BUILD_TYPE} STREQUAL "DEBUG")
 set (CMAKE_JAR_CLASSES_PREFIX us/toadlet/pad)
 add_jar (jtoadlet_pad ${PAD_SRC})
 get_property (JARFILE TARGET jtoadlet_pad PROPERTY JAR_FILE)
+add_dependencies(jtoadlet_pad toadlet_pad)
 install (FILES ${JARFILE} DESTINATION ${JAVA_LIB_INSTALL_DIR})
 
 # Generate headers
