@@ -58,12 +58,13 @@ endmacro (SWIG_WRAP_SETUP)
 #  Example:
 #   SWIG_WRAP_FILES(my_wrap.cpp packagename /path/to/my/interface.i)
 
-macro (SWIG_WRAP_FILES OUTPUT PACKAGE INTERFACE)
+macro (SWIG_WRAP_FILES OUTPUT PACKAGE INTERFACE DEPS)
 	if (NOT SWIG_WRAP_FILES_SETUP)
 		message (FATAL_ERROR "The SWIG_WRAP_SETUP() macro has not been called. You must setup before using SWIG_WRAP_FILES().")
 	endif (NOT SWIG_WRAP_FILES_SETUP)
 	
 	add_custom_command (OUTPUT ${OUTPUT}
-		COMMAND ${SWIG_EXECUTABLE} -${SWIG_WRAP_LANGUAGE} -I${SWIG_WRAP_INCLUDES} -package ${SWIG_WRAP_PREFIX}${PACKAGE} -c++ -outcurrentdir -outdir ${SWIG_WRAP_OUTDIR}${PACKAGE} -o ${OUTPUT} ${INTERFACE} DEPENDS ${INTERFACE}
+		COMMAND ${SWIG_EXECUTABLE} -${SWIG_WRAP_LANGUAGE} -I${SWIG_WRAP_INCLUDES} -package ${SWIG_WRAP_PREFIX}${PACKAGE} -c++ -outcurrentdir -outdir ${SWIG_WRAP_OUTDIR}${PACKAGE} -o ${OUTPUT} ${INTERFACE} 
+		DEPENDS ${INTERFACE} ${DEPS}
 	)
 endmacro (SWIG_WRAP_FILES)
