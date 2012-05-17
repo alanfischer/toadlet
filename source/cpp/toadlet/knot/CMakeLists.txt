@@ -45,7 +45,7 @@ set (KNOT_HEADERS ${KNOT_HEADERS} PARENT_SCOPE)
 
 # If we are using swig create the wrapper file from the interface files
 if (SWIG_FOUND AND TOADLET_KNOT_INT)
-	swig_wrap_files (knot_wrap.cpp knot "${TOADLET_KNOT_INT}")	
+	swig_wrap_files (knot_wrap.cpp knot ${TOADLET_KNOT_INT} "${TOADLET_KNOT_INT_DEPS}")
 	set (KNOT_SRC ${KNOT_SRC} knot_wrap.cpp)
 endif (SWIG_FOUND AND TOADLET_KNOT_INT)
 

@@ -11,14 +11,28 @@ if (NOT TOADLET_PLATFORM_PYTHON)
 		swig_wrap_setup (objc NO ${PROJECT_BINARY_DIR}/source/objc ${CMAKE_CURRENT_SOURCE_DIR})
 	endif (TOADLET_PLATFORM_ANDROID)
 
-	# List the interface files for each library
-	set (TOADLET_FLICK_INT
-		${CMAKE_CURRENT_SOURCE_DIR}/toadlet/flick/flick.i
+	# List the main and dependent interface files for each library
+	set (TOADLET_FLICK_INT 
+		${CMAKE_CURRENT_SOURCE_DIR}/toadlet/flick/flick.i 
+		PARENT_SCOPE
+	)
+	
+	set (TOADLET_FLICK_INT_DEPS
+		${CMAKE_CURRENT_SOURCE_DIR}/toadlet/flick/BaseInputDevice.i
+		${CMAKE_CURRENT_SOURCE_DIR}/toadlet/flick/InputData.i
+		${CMAKE_CURRENT_SOURCE_DIR}/toadlet/flick/InputDevice.i
+		${CMAKE_CURRENT_SOURCE_DIR}/toadlet/flick/InputDeviceListener.i
 		PARENT_SCOPE
 	)
 
 	set (TOADLET_PEEPER_INT
-		${CMAKE_CURRENT_SOURCE_DIR}/toadlet/peeper/peeper.i
+		${CMAKE_CURRENT_SOURCE_DIR}/toadlet/peeper/peeper.i 
+		PARENT_SCOPE
+	)
+	
+	set (TOADLET_PEEPER_INT_DEPS
+		${CMAKE_CURRENT_SOURCE_DIR}/toadlet/peeper/RenderDevice.i
+		${CMAKE_CURRENT_SOURCE_DIR}/toadlet/peeper/RenderTarget.i
 		PARENT_SCOPE
 	)
 
@@ -26,9 +40,31 @@ if (NOT TOADLET_PLATFORM_PYTHON)
 		${CMAKE_CURRENT_SOURCE_DIR}/toadlet/ribbit/ribbit.i
 		PARENT_SCOPE
 	)
+	
+	set (TOADLET_RIBBIT_INT_DEPS
+		${CMAKE_CURRENT_SOURCE_DIR}/toadlet/ribbit/AudioDevice.i
+		PARENT_SCOPE
+	)
 
 	set (TOADLET_TADPOLE_INT
 		${CMAKE_CURRENT_SOURCE_DIR}/toadlet/tadpole/tadpole.i
+		PARENT_SCOPE
+	)
+	
+	set (TOADLET_TADPOLE_INT_DEPS
+		${CMAKE_CURRENT_SOURCE_DIR}/toadlet/tadpole/ActionComponent.i
+		${CMAKE_CURRENT_SOURCE_DIR}/toadlet/tadpole/AnimationActionComponent.i
+		${CMAKE_CURRENT_SOURCE_DIR}/toadlet/tadpole/AudioComponent.i
+		${CMAKE_CURRENT_SOURCE_DIR}/toadlet/tadpole/CameraNode.i
+		${CMAKE_CURRENT_SOURCE_DIR}/toadlet/tadpole/Component.i
+		${CMAKE_CURRENT_SOURCE_DIR}/toadlet/tadpole/Engine.i
+		${CMAKE_CURRENT_SOURCE_DIR}/toadlet/tadpole/LightNode.i
+		${CMAKE_CURRENT_SOURCE_DIR}/toadlet/tadpole/MeshNode.i
+		${CMAKE_CURRENT_SOURCE_DIR}/toadlet/tadpole/Node.i
+		${CMAKE_CURRENT_SOURCE_DIR}/toadlet/tadpole/Scene.i
+		${CMAKE_CURRENT_SOURCE_DIR}/toadlet/tadpole/animation/Animation.i
+		${CMAKE_CURRENT_SOURCE_DIR}/toadlet/tadpole/animation/BaseAnimation.i
+		${CMAKE_CURRENT_SOURCE_DIR}/toadlet/tadpole/animation/MeshAnimation.i
 		PARENT_SCOPE
 	)
 else (NOT TOADLET_PLATFORM_PYTHON)
@@ -55,4 +91,5 @@ else (NOT TOADLET_PLATFORM_PYTHON)
 	install (FILES ${pytoadlet_BINARY_DIR}/Release/_pytoadlet.pyd DESTINATION ${CMAKE_INSTALL_PREFIX}/Lib CONFIGURATIONS Release)
 	install (FILES ${pytoadlet_BINARY_DIR}/Debug/_pytoadlet.pyd DESTINATION ${CMAKE_INSTALL_PREFIX}/Lib CONFIGURATIONS Debug)
 endif (NOT TOADLET_PLATFORM_PYTHON)
+
 
