@@ -11,47 +11,77 @@ if (NOT TOADLET_PLATFORM_PYTHON)
 		swig_wrap_setup (objc NO ${PROJECT_BINARY_DIR}/source/objc ${CMAKE_CURRENT_SOURCE_DIR})
 	endif (TOADLET_PLATFORM_ANDROID)
 
-	# List the main and dependent interface files for each library
-	set (TOADLET_FLICK_INT 
+	# List the main and dependent interface files and the output language-specific files for each library
+
+	# Toadlet Flick
+	set (FLICK_SWIG_INT 
 		${CMAKE_CURRENT_SOURCE_DIR}/toadlet/flick/flick.i 
 		PARENT_SCOPE
 	)
-	
-	set (TOADLET_FLICK_INT_DEPS
+	set (FLICK_SWIG_INT_DEPS
 		${CMAKE_CURRENT_SOURCE_DIR}/toadlet/flick/BaseInputDevice.i
 		${CMAKE_CURRENT_SOURCE_DIR}/toadlet/flick/InputData.i
 		${CMAKE_CURRENT_SOURCE_DIR}/toadlet/flick/InputDevice.i
 		${CMAKE_CURRENT_SOURCE_DIR}/toadlet/flick/InputDeviceListener.i
 		PARENT_SCOPE
 	)
+	if (TOADLET_PLATFORM_ANDROID)
+		set (FLICK_SWIG_INT_OUTPUTS
+			${PROJECT_BINARY_DIR}/source/java/us/toadlet/flick/Version.java
+			${PROJECT_BINARY_DIR}/source/java/us/toadlet/flick/BaseInputDevice.java
+			${PROJECT_BINARY_DIR}/source/java/us/toadlet/flick/InputData.java
+			${PROJECT_BINARY_DIR}/source/java/us/toadlet/flick/InputDevice.java
+			${PROJECT_BINARY_DIR}/source/java/us/toadlet/flick/InputDeviceListener.java
+			${PROJECT_BINARY_DIR}/source/java/us/toadlet/flick/flick.java
+			${PROJECT_BINARY_DIR}/source/java/us/toadlet/flick/flickJNI.java
+			PARENT_SCOPE
+		)	
+	elseif (TOADLET_PLATFORM_IOS)
+		set (FLICK_SWIG_INT_OUTPUTS
+		)
+	endif (TOADLET_PLATFORM_ANDROID)
 
-	set (TOADLET_PEEPER_INT
+	# Toadlet Peeper
+	set (PEEPER_SWIG_INT
 		${CMAKE_CURRENT_SOURCE_DIR}/toadlet/peeper/peeper.i 
 		PARENT_SCOPE
 	)
-	
-	set (TOADLET_PEEPER_INT_DEPS
+	set (PEEPER_SWIG_INT_DEPS
 		${CMAKE_CURRENT_SOURCE_DIR}/toadlet/peeper/RenderDevice.i
 		${CMAKE_CURRENT_SOURCE_DIR}/toadlet/peeper/RenderTarget.i
 		PARENT_SCOPE
 	)
+	if (TOADLET_PLATFORM_ANDROID)
+		set (PEEPER_SWIG_INT_OUTPUTS
+		)
+	elseif (TOADLET_PLATFORM_IOS)
+		set (PEEPER_SWIG_INT_OUTPUTS
+		)
+	endif (TOADLET_PLATFORM_ANDROID)
 
-	set (TOADLET_RIBBIT_INT
+	# Toadlet Ribbit
+	set (RIBBIT_SWIG_INT
 		${CMAKE_CURRENT_SOURCE_DIR}/toadlet/ribbit/ribbit.i
 		PARENT_SCOPE
 	)
-	
-	set (TOADLET_RIBBIT_INT_DEPS
+	set (RIBBIT_SWIG_INT_DEPS
 		${CMAKE_CURRENT_SOURCE_DIR}/toadlet/ribbit/AudioDevice.i
 		PARENT_SCOPE
 	)
+	if (TOADLET_PLATFORM_ANDROID)
+		set (RIBBIT_SWIG_INT_OUTPUTS
+		)
+	elseif (TOADLET_PLATFORM_IOS)
+		set (RIBBIT_SWIG_INT_OUTPUTS
+		)
+	endif (TOADLET_PLATFORM_ANDROID)
 
-	set (TOADLET_TADPOLE_INT
+	# Toadlet Tadpole
+	set (TADPOLE_SWIG_INT
 		${CMAKE_CURRENT_SOURCE_DIR}/toadlet/tadpole/tadpole.i
 		PARENT_SCOPE
 	)
-	
-	set (TOADLET_TADPOLE_INT_DEPS
+	set (TADPOLE_SWIG_INT_DEPS
 		${CMAKE_CURRENT_SOURCE_DIR}/toadlet/tadpole/ActionComponent.i
 		${CMAKE_CURRENT_SOURCE_DIR}/toadlet/tadpole/AnimationActionComponent.i
 		${CMAKE_CURRENT_SOURCE_DIR}/toadlet/tadpole/AudioComponent.i
@@ -67,9 +97,16 @@ if (NOT TOADLET_PLATFORM_PYTHON)
 		${CMAKE_CURRENT_SOURCE_DIR}/toadlet/tadpole/animation/MeshAnimation.i
 		PARENT_SCOPE
 	)
+	if (TOADLET_PLATFORM_ANDROID)
+		set (TADPOLE_SWIG_INT_OUTPUTS
+		)
+	elseif (TOADLET_PLATFORM_IOS)
+		set (TADPOLE_SWIG_INT_OUTPUTS
+		)
+	endif (TOADLET_PLATFORM_ANDROID)
 else (NOT TOADLET_PLATFORM_PYTHON)
 	# Python needs a global interface file
-	set (TOADLET_INT
+	set (TOADLET_SWIG_INT
 		toadlet/toadlet.i
 	)
 
@@ -79,11 +116,11 @@ else (NOT TOADLET_PLATFORM_PYTHON)
 	include_directories(${PYTHON_INCLUDE_PATH})
 	include_directories(${PROJECT_SOURCE_DIR}/source/swig)
 	include_directories(${PROJECT_SOURCE_DIR}/source/cpp)
-	set_source_files_properties(${TOADLET_INT} PROPERTIES CPLUSPLUS ON)
-	set_source_files_properties(${TOADLET_INT} PROPERTIES SWIG_FLAGS "-includeall")
+	set_source_files_properties(${TOADLET_SWIG_INT} PROPERTIES CPLUSPLUS ON)
+	set_source_files_properties(${TOADLET_SWIG_INT} PROPERTIES SWIG_FLAGS "-includeall")
 
 	# Create the python swig library
-	swig_add_module(pytoadlet python ${TOADLET_INT})
+	swig_add_module(pytoadlet python ${TOADLET_SWIG_INT})
 	swig_link_libraries(pytoadlet ${PYTHON_LIBRARIES} ${TOADLET_LIBRARIES})
 
 	# Install the python library
