@@ -73,6 +73,19 @@ public:
 		values=data.values;
 	}
 	
+	void setType(int type){this->type=type;}
+	int getType(){return type;}
+	
+	void setTime(uint64 time){this->time=time;}
+	uint64 getTime(){return time;}
+	
+	void setValid(int valid){this->valid=valid;}
+	int getValid(){return valid;}
+	
+	void setValue(int i,const Vector4 &value){values[i]=value;}
+	const Vector4 &getValue(int i){return values[i];}
+	void getValue(Vector4 &value,int i){value.set(values[i]);}
+	
 	int type;
 	uint64 time;
 	int valid;

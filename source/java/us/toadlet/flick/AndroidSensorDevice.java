@@ -29,7 +29,7 @@ import android.content.Context;
 import android.hardware.*;
 import java.util.List;
 
-public class AndroidSensorDevice implements InputDevice,SensorEventListener{
+public class AndroidSensorDevice extends BaseInputDevice implements SensorEventListener{
 	public AndroidSensorDevice(Context context,int type){
 		mContext=context;
 		mSensorManager=(SensorManager)mContext.getSystemService(Context.SENSOR_SERVICE);
@@ -74,31 +74,29 @@ public class AndroidSensorDevice implements InputDevice,SensorEventListener{
 	public void onAccuracyChanged(Sensor sensor,int accuracy){}
  
 	public void onSensorChanged(SensorEvent event){
-		mData.time=event.timestamp/1000;
+		mData.setTime(event.timestamp/1000);
 
+		/// @todo: Change InputData so setValid does not need to be called if setValue is called
 		switch(mInputType){
 			case InputType_MOTION:
-				mData.valid=(1<<InputData.Semantic_MOTION_ACCELERATION);
-				System.arraycopy(event.values,0,mData.values[InputData.Semantic_MOTION_ACCELERATION],0,event.values.length);
+				mData.setValid(1<<InputData.Semantic_MOTION_ACCELERATION);
+				mData.setValue(InputData.Semantic_MOTION_ACCELERATION,event.values);
 			break;
 			case InputType_ANGULAR:
-				mData.valid=(1<<InputData.Semantic_ANGULAR);
-				System.arraycopy(event.values,0,mData.values[InputData.Semantic_ANGULAR],0,event.values.length);
+				mData.setValid(1<<InputData.Semantic_ANGULAR);
+				mData.setValue(InputData.Semantic_ANGULAR,event.values);
 			break;
 			case InputType_LIGHT:
-				mData.valid=(1<<InputData.Semantic_LIGHT);
-				System.arraycopy(event.values,0,mData.values[InputData.Semantic_LIGHT],0,event.values.length);
+				mData.setValid(1<<InputData.Semantic_LIGHT);
+				mData.setValue(InputData.Semantic_LIGHT,event.values);
 			break;
 			case InputType_PROXIMITY:
-				mData.valid=(1<<InputData.Semantic_PROXIMITY);
-				System.arraycopy(event.values,0,mData.values[InputData.Semantic_PROXIMITY],0,event.values.length);
+				mData.setValid(1<<InputData.Semantic_PROXIMITY);
+				mData.setValue(InputData.Semantic_PROXIMITY,event.values);
 			break;
 			case InputType_MAGNETIC:
-				mData.valid=(1<<InputData.Semantic_MAGNETIC);
-				System.arraycopy(event.values,0,mData.values[InputData.Semantic_MAGNETIC],0,event.values.length);
-			break;
-			default:
-				System.arraycopy(event.values,0,mData.values[0],0,event.values.length);
+				mData.setValid(1<<InputData.Semantic_MAGNETIC);
+				mData.setValue(InputData.Semantic_MAGNETIC,event.values);
 			break;
 		}
 
