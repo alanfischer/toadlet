@@ -50,7 +50,6 @@ set (FLICK_SRC
 )
 
 set (FLICK_H
-	us.toadlet.flick.NInputDeviceListener
 )
 
 # Create the jar file with UseJava.cmake functions. See UseJava.cmake for details.
@@ -63,9 +62,9 @@ get_property (JARFILE TARGET jtoadlet_flick PROPERTY JAR_FILE)
 install (FILES ${JARFILE} DESTINATION ${JAVA_LIB_INSTALL_DIR})
 
 # Generate headers
-add_custom_command (TARGET jtoadlet_flick POST_BUILD
-	COMMAND ${Java_JAVAH_EXECUTABLE} -classpath ${JARFILE} ${FLICK_H}
-)
+#add_custom_command (TARGET jtoadlet_flick POST_BUILD
+#	COMMAND ${Java_JAVAH_EXECUTABLE} -classpath ${JARFILE} ${FLICK_H}
+#)
 
 
 # toadlet_peeper
@@ -100,30 +99,22 @@ get_property (JARFILE TARGET jtoadlet_peeper PROPERTY JAR_FILE)
 install (FILES ${JARFILE} DESTINATION ${JAVA_LIB_INSTALL_DIR})
 
 # Generate headers
-add_custom_command (TARGET jtoadlet_peeper POST_BUILD
-    COMMAND ${Java_JAVAH_EXECUTABLE} -classpath ${JARFILE} ${PEEPER_H}
-)
+#add_custom_command (TARGET jtoadlet_peeper POST_BUILD
+#    COMMAND ${Java_JAVAH_EXECUTABLE} -classpath ${JARFILE} ${PEEPER_H}
+#)
 
 
 # toadlet_ribbit
 configure_file (us/toadlet/ribbit/Version.java.cmake ${CMAKE_CURRENT_BINARY_DIR}/us/toadlet/ribbit/Version.java)
 
 set (RIBBIT_SRC
-	us/toadlet/ribbit/AudioFormat.java
-	us/toadlet/ribbit/AudioStream.java
-	us/toadlet/ribbit/AudioBuffer.java
-	us/toadlet/ribbit/Audio.java
-	us/toadlet/ribbit/AudioCaps.java
-	us/toadlet/ribbit/AudioDevice.java
 	us/toadlet/ribbit/ATAudioBuffer.java
 	us/toadlet/ribbit/ATAudio.java
 	us/toadlet/ribbit/ATAudioDevice.java
-	us/toadlet/ribbit/NAudioStream.java
 	${CMAKE_CURRENT_BINARY_DIR}/us/toadlet/ribbit/Version.java
 )
 
 set (RIBBIT_H
-	us.toadlet.ribbit.NAudioStream
 )
 
 # Create the jar file with UseJava.cmake functions. See UseJava.cmake for details.
@@ -136,9 +127,9 @@ get_property (JARFILE TARGET jtoadlet_ribbit PROPERTY JAR_FILE)
 install (FILES ${JARFILE} DESTINATION ${JAVA_LIB_INSTALL_DIR})
 
 # Generate headers
-add_custom_command (TARGET jtoadlet_ribbit POST_BUILD
-    COMMAND ${Java_JAVAH_EXECUTABLE} -classpath ${JARFILE} ${RIBBIT_H}
-)
+#add_custom_command (TARGET jtoadlet_ribbit POST_BUILD
+#    COMMAND ${Java_JAVAH_EXECUTABLE} -classpath ${JARFILE} ${RIBBIT_H}
+#)
 
 
 # toadlet_tadpole
@@ -189,7 +180,6 @@ set (PAD_SRC
 )
 
 set (PAD_H
-	us.toadlet.pad.NApplet
 )
 
 # Create the jar file with UseJava.cmake functions. See UseJava.cmake for details.
@@ -202,9 +192,9 @@ get_property (JARFILE TARGET jtoadlet_pad PROPERTY JAR_FILE)
 install (FILES ${JARFILE} DESTINATION ${JAVA_LIB_INSTALL_DIR})
 
 # Generate headers
-add_custom_command (TARGET jtoadlet_pad POST_BUILD
-    COMMAND ${Java_JAVAH_EXECUTABLE} -classpath ${JARFILE} ${PAD_H}
-)
+#add_custom_command (TARGET jtoadlet_pad POST_BUILD
+#    COMMAND ${Java_JAVAH_EXECUTABLE} -classpath ${JARFILE} ${PAD_H}
+#)
 
 
 # Undo the forcing of WIN32
