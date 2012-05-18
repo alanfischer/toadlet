@@ -18,6 +18,9 @@ set (RIBBIT_HEADERS
 	AudioFormatConversion.h
 	AudioDevice.h
 	AudioStream.h
+	BaseAudio.h
+	BaseAudioBuffer.h
+	BaseAudioDevice.h
 	Types.h
 	Version.h
 )

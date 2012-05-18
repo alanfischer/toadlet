@@ -23,52 +23,41 @@
  *
  ********** Copyright header - do not remove **********/
 
-#ifndef TOADLET_RIBBIT_JAUDIODEVICE_H
-#define TOADLET_RIBBIT_JAUDIODEVICE_H
+#ifndef TOADLET_RIBBIT_BASEAUDIODEVICE_H
+#define TOADLET_RIBBIT_BASEAUDIODEVICE_H
 
-#include <toadlet/ribbit/Audio.h>
-#include <toadlet/ribbit/BaseAudioDevice.h>
-#include <toadlet/ribbit/AudioBuffer.h>
-#include <toadlet/ribbit/AudioCaps.h>
-#include <jni.h>
+#include <toadlet/ribbit/AudioDevice.h>
 
 namespace toadlet{
 namespace ribbit{
 
-class TOADLET_API JAudioDevice:public BaseAudioDevice{
+class BaseAudioDevice:public Object,public AudioDevice{
 public:
-	TOADLET_OBJECT(JAudioDevice);
+	TOADLET_OBJECT(BaseAudioDevice);
 
-	JAudioDevice(JNIEnv *jenv,jobject jobj);
-	virtual ~JAudioDevice();
+	virtual ~BaseAudioDevice(){}
 
-	bool create(int *options);
-	void destroy();
+	virtual bool create(int *options=NULL){return false;}
+	virtual void destroy(){}
 
-	void activate(){}
-	void deactivate(){}
+	virtual void activate(){}
+	virtual void deactivate(){}
 
-	AudioBuffer *createAudioBuffer();
-	Audio *createAudio();
+	virtual AudioBuffer *createAudioBuffer(){return NULL;}
+	virtual Audio *createAudio(){return NULL;}
 
-	void setListenerTranslate(const Vector3 &translate){}
-	void setListenerRotate(const Matrix3x3 &rotate){}
-	void setListenerVelocity(const Vector3 &velocity){}
-	void setListenerGain(scalar gain){}
+	virtual void setListenerTranslate(const Vector3 &translate){}
+	virtual void setListenerRotate(const Matrix3x3 &rotate){}
+	virtual void setListenerVelocity(const Vector3 &velocity){}
+	virtual void setListenerGain(scalar gain){}
 
-	void update(int dt);
+	virtual void update(int dt){}
 
-	bool getAudioCaps(AudioCaps &caps){caps.set(mCaps);return true;}
-
-protected:
-	JNIEnv *env;
-	jobject obj;
-	jmethodID createID,destroyID,createAudioBufferID,createAudioID,updateID;
-
-	AudioCaps mCaps;
+	virtual bool getAudioCaps(AudioCaps &caps){return false;}
 };
 
 }
 }
 
 #endif
+

@@ -28,12 +28,12 @@ package us.toadlet.ribbit;
 import android.os.Handler;
 import android.os.Looper;
 
-public class ATAudioDevice implements AudioDevice,Runnable{
+public class ATAudioDevice extends BaseAudioDevice implements Runnable{
 	public ATAudioDevice(){
-		mCaps=new AudioCaps();
-		mCaps.maxSources=16;
-		mCaps.streaming=true;
-		mCaps.positional=false;
+//		mCaps=new AudioCaps();
+//		mCaps.maxSources=16;
+//		mCaps.streaming=true;
+//		mCaps.positional=false;
 
 		// All AudioTrack commands need to be issued from the main thread, or else they may crash.
 		// Since we can not post Messages or Runnables from code called from JNI, we start a handler that reposts itself every 50ms, and update our ATAudios that way
@@ -78,7 +78,7 @@ public class ATAudioDevice implements AudioDevice,Runnable{
 		}
 	}
 
-	public boolean getAudioCaps(AudioCaps caps){caps.set(mCaps);return true;}
+//	public boolean getAudioCaps(AudioCaps caps){caps.set(mCaps);return true;}
 
 	public void registerAudio(Audio audio){
 		mAudios.add((ATAudio)audio);
@@ -89,7 +89,7 @@ public class ATAudioDevice implements AudioDevice,Runnable{
 	}
 	
 	int mMaxBufferSize;
-	AudioCaps mCaps;
+//	AudioCaps mCaps;
 	Handler mHandler;
 	java.util.Vector<ATAudio> mAudios=new java.util.Vector<ATAudio>();
 }

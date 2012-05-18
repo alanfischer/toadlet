@@ -23,42 +23,29 @@
  *
  ********** Copyright header - do not remove **********/
 
-#ifndef TOADLET_RIBBIT_ALAUDIOBUFFER_H
-#define TOADLET_RIBBIT_ALAUDIOBUFFER_H
+#ifndef TOADLET_RIBBIT_BASEAUDIOBUFFER_H
+#define TOADLET_RIBBIT_BASEAUDIOBUFFER_H
 
-#include "ALIncludes.h"
-#include <toadlet/ribbit/BaseAudioBuffer.h>
+#include <toadlet/egg/BaseResource.h>
+#include <toadlet/ribbit/AudioBuffer.h>
 
 namespace toadlet{
 namespace ribbit{
 
-class ALAudioDevice;
-
-class TOADLET_API ALAudioBuffer:public BaseAudioBuffer{
+class BaseAudioBuffer:public BaseResource,public AudioBuffer{
 public:
-	TOADLET_RESOURCE(ALAudioBuffer,BaseAudioBuffer);
+	TOADLET_RESOURCE(BaseAudioBuffer,AudioBuffer);
 
-	ALAudioBuffer(ALAudioDevice *device);
-	virtual ~ALAudioBuffer();
+	virtual ~BaseAudioBuffer(){}
 
-	AudioBuffer *getRootAudioBuffer(){return this;}
+	virtual AudioBuffer *getRootAudioBuffer(){return this;}
 
-	bool create(AudioStream *stream);
-	void destroy();
-
-	inline ALuint getHandle() const{return mHandle;}
-
-protected:
-	ALAudioDevice *mDevice;
-	ALuint mHandle;
-	tbyte *mStaticData;
-	int mLengthTime;
-
-	friend class ALAudioDevice;
-	friend class ALAudio;
+	virtual bool create(AudioStream *stream){return false;}
+	virtual void destroy(){}
 };
 
 }
 }
 
 #endif
+

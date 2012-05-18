@@ -27,7 +27,7 @@
 #define TOADLET_RIBBIT_MMAUDIODEVICE_H
 
 #include <toadlet/ribbit/Audio.h>
-#include <toadlet/ribbit/AudioDevice.h>
+#include <toadlet/ribbit/BaseAudioDevice.h>
 #include <toadlet/ribbit/AudioBuffer.h>
 #include <toadlet/ribbit/AudioStream.h>
 #include <toadlet/ribbit/AudioCaps.h>
@@ -44,7 +44,7 @@ class MMAudioBuffer;
 
 // You can not use both the ALAUdioDevice and the MMAudioDevice simultaniously.
 // Whichever one you create second will be the useable device.
-class TOADLET_API MMAudioDevice:protected Object,public AudioDevice{
+class TOADLET_API MMAudioDevice:public BaseAudioDevice{
 public:
 	TOADLET_OBJECT(MMAudioDevice);
 
