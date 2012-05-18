@@ -127,22 +127,10 @@ install (FILES ${JARFILE} DESTINATION ${JAVA_LIB_INSTALL_DIR})
 configure_file (us/toadlet/tadpole/Version.java.cmake ${CMAKE_CURRENT_BINARY_DIR}/us/toadlet/tadpole/Version.java)
 
 set (TADPOLE_SRC
-	us/toadlet/tadpole/Engine.java
-	us/toadlet/tadpole/Scene.java
-	us/toadlet/tadpole/Node.java
-	us/toadlet/tadpole/CameraNode.java
-	us/toadlet/tadpole/LightNode.java
-	us/toadlet/tadpole/MeshNode.java
 	${CMAKE_CURRENT_BINARY_DIR}/us/toadlet/tadpole/Version.java
 )
 
 set (TADPOLE_H
-	us.toadlet.tadpole.Engine
-	us.toadlet.tadpole.Scene
-	us.toadlet.tadpole.Node
-	us.toadlet.tadpole.CameraNode
-	us.toadlet.tadpole.LightNode
-	us.toadlet.tadpole.MeshNode
 )
 
 # Create the jar file with UseJava.cmake functions. See UseJava.cmake for details.
