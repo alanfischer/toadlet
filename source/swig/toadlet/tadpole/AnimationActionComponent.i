@@ -5,7 +5,7 @@
 namespace toadlet{
 namespace tadpole{
 
-%feature("director") ActionListener;
+#%feature("director") ActionListener;
 
 class ActionListener{
 public:
