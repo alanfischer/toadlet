@@ -36,8 +36,6 @@ public class EGLWindowRenderTarget extends EGLRenderTarget{
 	public EGLWindowRenderTarget(Object display,Object window,WindowRenderTargetFormat format,boolean pixmap){createContext(display,window,format,pixmap);}
 	public void destroy(){destroyContext();}
 
-	public RenderTarget getRootRenderTarget(){return this;}
-
 	public boolean createContext(Object display,Object window,WindowRenderTargetFormat format){return createContext(display,window,format,false);}
 	public boolean createContext(Object display,Object window,WindowRenderTargetFormat format,boolean pixmap){
 		if(mContext!=EGL_NO_CONTEXT){
@@ -67,7 +65,6 @@ public class EGLWindowRenderTarget extends EGLRenderTarget{
 		System.out.println(
 			"CALCULATED EGL VERSION:"+(egl_version/10)+"."+(egl_version%10));
 
-		// Crashes on Android 1.1
 		System.out.println(
 			"EGL_VENDOR:"+egl.eglQueryString(mDisplay,EGL_VENDOR));
 		System.out.println(
@@ -75,15 +72,35 @@ public class EGLWindowRenderTarget extends EGLRenderTarget{
 		System.out.println(
 			"EGL_EXTENSIONS:"+egl.eglQueryString(mDisplay,EGL_EXTENSIONS));
 			
-		int pixelFormat=format.pixelFormat;
-		int redBits=TextureFormat.getRedBits(pixelFormat);
-		int greenBits=TextureFormat.getGreenBits(pixelFormat);
-		int blueBits=TextureFormat.getBlueBits(pixelFormat);
-		int alphaBits=TextureFormat.getAlphaBits(pixelFormat);
-		int depthBits=format.depthBits;
-		int stencilBits=format.stencilBits;
-		int multisamples=format.multisamples;
-		int contextVersion=format.flags;
+		int pixelFormat=format.getPixelFormat();
+		/// @todo: Expose the TextureFormat and use that to get the bits
+		int redBits=0;//TextureFormat.getRedBits(pixelFormat);
+		int greenBits=0;//TextureFormat.getGreenBits(pixelFormat);
+		int blueBits=0;//TextureFormat.getBlueBits(pixelFormat);
+		int alphaBits=0;//TextureFormat.getAlphaBits(pixelFormat);
+
+		int Format_SHIFT_TYPES=			8;
+		int Format_MASK_TYPES=			0xFF00;
+		int Format_TYPE_UINT_5_6_5=		7<<Format_SHIFT_TYPES;
+		int Format_TYPE_UINT_5_5_5_1=	8<<Format_SHIFT_TYPES;
+		int Format_TYPE_UINT_4_4_4_4=	9<<Format_SHIFT_TYPES;
+		if((pixelFormat&Format_MASK_TYPES)==Format_TYPE_UINT_5_6_5){
+			redBits=5;greenBits=6;blueBits=5;alphaBits=0;
+		}
+		else if((pixelFormat&Format_MASK_TYPES)==Format_TYPE_UINT_5_5_5_1){
+			redBits=5;greenBits=5;blueBits=5;alphaBits=1;
+		}
+		else if((pixelFormat&Format_MASK_TYPES)==Format_TYPE_UINT_4_4_4_4){
+			redBits=4;greenBits=4;blueBits=4;alphaBits=4;
+		}
+		else{
+			redBits=8;greenBits=8;blueBits=8;alphaBits=0;
+		}
+
+		int depthBits=format.getDepthBits();
+		int stencilBits=format.getStencilBits();
+		int multisamples=format.getMultisamples();
+		int contextVersion=format.getFlags();
 
 		mConfig=chooseEGLConfig(mDisplay,redBits,greenBits,blueBits,alphaBits,depthBits,stencilBits,!pixmap,pixmap,false,multisamples);
 		TOADLET_CHECK_EGLERROR("chooseEGLConfig");

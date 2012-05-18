@@ -70,22 +70,12 @@ install (FILES ${JARFILE} DESTINATION ${JAVA_LIB_INSTALL_DIR})
 configure_file (us/toadlet/peeper/Version.java.cmake ${CMAKE_CURRENT_BINARY_DIR}/us/toadlet/peeper/Version.java)
 
 set (PEEPER_SRC
-	us/toadlet/peeper/TextureFormat.java
-	us/toadlet/peeper/WindowRenderTargetFormat.java
-	us/toadlet/peeper/RenderTarget.java
-	us/toadlet/peeper/RenderDevice.java
-	us/toadlet/peeper/GLRenderTarget.java
 	us/toadlet/peeper/EGLRenderTarget.java
 	us/toadlet/peeper/EGLWindowRenderTarget.java
-	us/toadlet/peeper/NRenderDevice.java
-	us/toadlet/peeper/NGLES1RenderDevice.java
-	us/toadlet/peeper/NGLES2RenderDevice.java
 	${CMAKE_CURRENT_BINARY_DIR}/us/toadlet/peeper/Version.java
 )
 
 set (PEEPER_H
-	us.toadlet.peeper.NGLES1RenderDevice
-	us.toadlet.peeper.NGLES2RenderDevice
 )
 
 # Create the jar file with UseJava.cmake functions. See UseJava.cmake for details.
