@@ -72,6 +72,7 @@ configure_file (us/toadlet/peeper/Version.java.cmake ${CMAKE_CURRENT_BINARY_DIR}
 set (PEEPER_SRC
 	us/toadlet/peeper/EGLRenderTarget.java
 	us/toadlet/peeper/EGLWindowRenderTarget.java
+	${PEEPER_SWIG_INT_OUTPUTS}
 	${CMAKE_CURRENT_BINARY_DIR}/us/toadlet/peeper/Version.java
 )
 
@@ -101,6 +102,7 @@ set (RIBBIT_SRC
 	us/toadlet/ribbit/ATAudioBuffer.java
 	us/toadlet/ribbit/ATAudio.java
 	us/toadlet/ribbit/ATAudioDevice.java
+	${RIBBIT_SWIG_INT_OUTPUTS}
 	${CMAKE_CURRENT_BINARY_DIR}/us/toadlet/ribbit/Version.java
 )
 
@@ -127,6 +129,7 @@ install (FILES ${JARFILE} DESTINATION ${JAVA_LIB_INSTALL_DIR})
 configure_file (us/toadlet/tadpole/Version.java.cmake ${CMAKE_CURRENT_BINARY_DIR}/us/toadlet/tadpole/Version.java)
 
 set (TADPOLE_SRC
+	${TADPOLE_SWIG_INT_OUTPUTS}
 	${CMAKE_CURRENT_BINARY_DIR}/us/toadlet/tadpole/Version.java
 )
 

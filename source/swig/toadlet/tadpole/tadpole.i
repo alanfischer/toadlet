@@ -1,6 +1,6 @@
 %module tadpole
 
-//%module(directors="1") tadpole
+%module(directors="1") tadpole
 
 %include <toadlet/tadpole/Engine.i>
 %include <toadlet/tadpole/Scene.i>

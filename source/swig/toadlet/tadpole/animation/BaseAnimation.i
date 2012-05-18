@@ -6,7 +6,7 @@ namespace toadlet{
 namespace tadpole{
 namespace animation{
 
-%feature("director") BaseAnimation;
+#%feature("director") BaseAnimation;
 
 class BaseAnimation:public Animation{
 public:
