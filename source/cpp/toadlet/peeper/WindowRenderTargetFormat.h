@@ -46,6 +46,15 @@ public:
 		this->flags=flags;
 	}
 
+	int getPixelFormat(){return pixelFormat;}
+	int getDepthBits(){return depthBits;}
+	int getStencilBits(){return stencilBits;}
+	int getMultisamples(){return multisamples;}
+	bool getVSync(){return vsync;}
+	int getThreads(){return threads;}
+	bool getDebug(){return debug;}
+	int getFlags(){return flags;}
+
 	int pixelFormat;
 	int depthBits;
 	int stencilBits;

@@ -10,7 +10,9 @@ namespace peeper{
 
 class RenderDevice{
 public:
-	virtual bool create(RenderTarget *target,int *options)=0;
+	virtual ~RenderDevice();
+
+	virtual bool create(RenderTarget *target)=0;
 	virtual void destroy()=0;
 
 	virtual void swap()=0;

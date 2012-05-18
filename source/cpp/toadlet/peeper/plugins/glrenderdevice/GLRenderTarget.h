@@ -27,23 +27,33 @@
 #define TOADLET_PEEPER_GLRENDERTARGET_H
 
 #include "GLIncludes.h"
+#include <toadlet/egg/BaseResource.h>
 #include <toadlet/peeper/RenderTarget.h>
 
 namespace toadlet{
 namespace peeper{
 
-class GLRenderTarget:public RenderTarget{
+class GLRenderTarget:public BaseResource,public RenderTarget{
 public:
-	TOADLET_IPTR(GLRenderTarget);
+	TOADLET_RESOURCE(GLRenderTarget,RenderTarget);
 
 	virtual ~GLRenderTarget(){}
 
-	virtual bool swap()=0;
+	virtual RenderTarget *getRootRenderTarget(){return this;}
+
+	virtual void destroy(){}
+
+	virtual bool isPrimary() const{return 0;}
+	virtual bool isValid() const{return 0;}
+	virtual int getWidth() const{return 0;}
+	virtual int getHeight() const{return 0;}
+
+	virtual bool swap(){}
 	virtual void reset(){} // Mostly unused except for NSGLRenderTarget
-	virtual bool activate()=0;
-	virtual bool deactivate()=0;
-	virtual bool activateAdditionalContext()=0;
-	virtual void deactivateAdditionalContext()=0;
+	virtual bool activate(){}
+	virtual bool deactivate(){}
+	virtual bool activateAdditionalContext(){}
+	virtual void deactivateAdditionalContext(){}
 };
 
 }

@@ -50,7 +50,7 @@ bool GLXPBufferRenderTarget::available(GLRenderDevice *renderDevice){
 	#endif
 }
 
-GLXPBufferRenderTarget::GLXPBufferRenderTarget(GLRenderDevice *renderDevice):BaseResource(),
+GLXPBufferRenderTarget::GLXPBufferRenderTarget(GLRenderDevice *renderDevice):
 	mDevice(NULL),
 	mTexture(NULL),
 	mPBuffer(0),

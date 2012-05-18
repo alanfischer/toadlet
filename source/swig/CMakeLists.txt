@@ -49,6 +49,8 @@ if (NOT TOADLET_PLATFORM_PYTHON)
 	set (PEEPER_SWIG_INT_DEPS
 		${CMAKE_CURRENT_SOURCE_DIR}/toadlet/peeper/RenderDevice.i
 		${CMAKE_CURRENT_SOURCE_DIR}/toadlet/peeper/RenderTarget.i
+		${CMAKE_CURRENT_SOURCE_DIR}/toadlet/peeper/GLRenderTarget.i
+		${CMAKE_CURRENT_SOURCE_DIR}/toadlet/peeper/WindowRenderTargetFormat.i
 		PARENT_SCOPE
 	)
 	if (TOADLET_PLATFORM_ANDROID)

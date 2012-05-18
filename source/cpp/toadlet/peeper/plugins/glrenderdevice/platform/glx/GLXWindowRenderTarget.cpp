@@ -36,12 +36,12 @@ TOADLET_C_API RenderTarget *new_GLXWindowRenderTarget(void *display,void *window
 	return new GLXWindowRenderTarget((Display*)display,(Window)window,format);
 }
 
-GLXWindowRenderTarget::GLXWindowRenderTarget():BaseResource()
+GLXWindowRenderTarget::GLXWindowRenderTarget()
 	//mThreadContexts,
 	//mThreadIDs
 {}
 
-GLXWindowRenderTarget::GLXWindowRenderTarget(Display *display,Window window,WindowRenderTargetFormat *format):BaseResource()
+GLXWindowRenderTarget::GLXWindowRenderTarget(Display *display,Window window,WindowRenderTargetFormat *format)
 	//mThreadContexts,
 	//mThreadIDs
 {
