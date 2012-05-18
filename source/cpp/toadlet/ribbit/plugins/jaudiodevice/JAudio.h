@@ -28,15 +28,13 @@
 
 #include "JAudioDevice.h"
 #include "JAudioBuffer.h"
-#include <toadlet/ribbit/Audio.h>
+#include <toadlet/ribbit/BaseAudio.h>
 
 namespace toadlet{
 namespace ribbit{
 
-class TOADLET_API JAudio:protected BaseResource,public Audio{
+class TOADLET_API JAudio:public BaseAudio{
 public:
-	TOADLET_RESOURCE(JAudio,Audio);
-
 	JAudio(JNIEnv *jenv,jobject jobj);
 	virtual ~JAudio();
 

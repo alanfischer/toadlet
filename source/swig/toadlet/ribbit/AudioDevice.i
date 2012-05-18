@@ -10,9 +10,12 @@ namespace ribbit{
 
 class AudioDevice{
 public:
-	virtual bool create(int *options)=0;
+	virtual bool create()=0;
 	virtual void destroy()=0;
 
+	virtual AudioBuffer *createAudioBuffer()=0;
+	virtual Audio *createAudio()=0;
+	
 	virtual void update(int dt)=0;
 };
 

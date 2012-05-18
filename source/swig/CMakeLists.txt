@@ -65,7 +65,14 @@ if (NOT TOADLET_PLATFORM_PYTHON)
 		PARENT_SCOPE
 	)
 	set (RIBBIT_SWIG_INT_DEPS
+		${CMAKE_CURRENT_SOURCE_DIR}/toadlet/ribbit/AudioFormat.i
+		${CMAKE_CURRENT_SOURCE_DIR}/toadlet/ribbit/AudioBuffer.i
+		${CMAKE_CURRENT_SOURCE_DIR}/toadlet/ribbit/AudioStream.i
+		${CMAKE_CURRENT_SOURCE_DIR}/toadlet/ribbit/Audio.i
 		${CMAKE_CURRENT_SOURCE_DIR}/toadlet/ribbit/AudioDevice.i
+		${CMAKE_CURRENT_SOURCE_DIR}/toadlet/ribbit/BaseAudio.i
+		${CMAKE_CURRENT_SOURCE_DIR}/toadlet/ribbit/BaseAudioBuffer.i
+		${CMAKE_CURRENT_SOURCE_DIR}/toadlet/ribbit/BaseAudioDevice.i
 		PARENT_SCOPE
 	)
 	if (TOADLET_PLATFORM_ANDROID)
