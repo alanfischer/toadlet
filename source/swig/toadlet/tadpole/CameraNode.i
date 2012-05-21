@@ -1,5 +1,5 @@
 %{
-#include <toadlet/tadpole/Node/CameraNode.h>
+#include <toadlet/tadpole/node/CameraNode.h>
 %}
 
 namespace toadlet{
