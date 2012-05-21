@@ -173,10 +173,10 @@ set (PAD_NAMESPACES ${PAD_NAMESPACES} PARENT_SCOPE)
 
 
 # If we are using swig create the wrapper file from the interface files
-if (SWIG_FOUND AND TOADLET_PAD_INT)
-	swig_wrap_files (pad_wrap.cpp pad ${TOADLET_PAD_INT} "${TOADLET_PAD_INT_DEPS}")	
+if (SWIG_FOUND AND PAD_SWIG_INT)
+	swig_wrap_files (pad_wrap.cpp pad ${PAD_SWIG_INT} "${PAD_SWIG_INT_DEPS}" "${PAD_SWIG_INT_OUTPUTS}")	
 	set (PAD_SRC ${PAD_SRC} pad_wrap.cpp)
-endif (SWIG_FOUND AND TOADLET_PAD_INT)
+endif (SWIG_FOUND AND PAD_SWIG_INT)
 
 
 # Dynamic Library

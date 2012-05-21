@@ -3,8 +3,10 @@
 
 #include <toadlet/toadlet.h>
 
-class Logo:public Applet{
+class Logo:public Object,public Applet{
 public:
+	TOADLET_OBJECT(Logo);
+
 	Logo(Application *app);
 	virtual ~Logo();
 

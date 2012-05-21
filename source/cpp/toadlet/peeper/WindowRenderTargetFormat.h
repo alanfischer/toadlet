@@ -46,13 +46,28 @@ public:
 		this->flags=flags;
 	}
 
+	void setPixelFormat(int format){pixelFormat=format;}
 	int getPixelFormat(){return pixelFormat;}
+	
+	void setDepthBits(int bits){depthBits=bits;}
 	int getDepthBits(){return depthBits;}
+	
+	void setStencilBits(int bits){stencilBits=bits;}
 	int getStencilBits(){return stencilBits;}
+	
+	void setMultisamples(int samples){multisamples=samples;}
 	int getMultisamples(){return multisamples;}
+	
+	void setVSync(bool sync){vsync=sync;}
 	bool getVSync(){return vsync;}
+	
+	void setThreads(int threads){this->threads=threads;}
 	int getThreads(){return threads;}
+	
+	void setDebug(bool debug){this->debug=debug;}
 	bool getDebug(){return debug;}
+	
+	void setFlags(int flags){this->flags=flags;}
 	int getFlags(){return flags;}
 
 	int pixelFormat;

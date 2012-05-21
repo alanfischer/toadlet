@@ -17,7 +17,7 @@ public:
 	void setProjectionFovY(float fov,float ratio,float nearDist,float farDist);
 	void setProjectionFovX(float fov,float ratio,float nearDist,float farDist);
 
-	void render(peeper::RenderDevice *renderDevice);
+	void render(RenderDevice *renderDevice);
 };
 
 }
