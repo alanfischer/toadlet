@@ -72,35 +72,47 @@ public class EGLWindowRenderTarget extends EGLRenderTarget{
 		System.out.println(
 			"EGL_EXTENSIONS:"+egl.eglQueryString(mDisplay,EGL_EXTENSIONS));
 			
-		int pixelFormat=format.getPixelFormat();
-		/// @todo: Expose the TextureFormat and use that to get the bits
-		int redBits=0;//TextureFormat.getRedBits(pixelFormat);
-		int greenBits=0;//TextureFormat.getGreenBits(pixelFormat);
-		int blueBits=0;//TextureFormat.getBlueBits(pixelFormat);
-		int alphaBits=0;//TextureFormat.getAlphaBits(pixelFormat);
-
-		int Format_SHIFT_TYPES=			8;
-		int Format_MASK_TYPES=			0xFF00;
-		int Format_TYPE_UINT_5_6_5=		7<<Format_SHIFT_TYPES;
-		int Format_TYPE_UINT_5_5_5_1=	8<<Format_SHIFT_TYPES;
-		int Format_TYPE_UINT_4_4_4_4=	9<<Format_SHIFT_TYPES;
-		if((pixelFormat&Format_MASK_TYPES)==Format_TYPE_UINT_5_6_5){
-			redBits=5;greenBits=6;blueBits=5;alphaBits=0;
-		}
-		else if((pixelFormat&Format_MASK_TYPES)==Format_TYPE_UINT_5_5_5_1){
-			redBits=5;greenBits=5;blueBits=5;alphaBits=1;
-		}
-		else if((pixelFormat&Format_MASK_TYPES)==Format_TYPE_UINT_4_4_4_4){
-			redBits=4;greenBits=4;blueBits=4;alphaBits=4;
-		}
-		else{
-			redBits=8;greenBits=8;blueBits=8;alphaBits=0;
+		int pixelFormat=0;
+		int redBits=5;
+		int greenBits=6;
+		int blueBits=7;
+		int alphaBits=0;
+		int depthBits=16;
+		int stencilBits=0;
+		int multisamples=0;
+		int contextVersion=0;
+		if(format!=null){
+			pixelFormat=format.getPixelFormat();
+			/// @todo: Expose the TextureFormat and use that to get the bits
+			//redBits=TextureFormat.getRedBits(pixelFormat);
+			//greenBits=TextureFormat.getGreenBits(pixelFormat);
+			//blueBits=TextureFormat.getBlueBits(pixelFormat);
+			//alphaBits=TextureFormat.getAlphaBits(pixelFormat);
+			depthBits=format.getDepthBits();
+			stencilBits=format.getStencilBits();
+			multisamples=format.getMultisamples();
+			contextVersion=format.getFlags();
 		}
 
-		int depthBits=format.getDepthBits();
-		int stencilBits=format.getStencilBits();
-		int multisamples=format.getMultisamples();
-		int contextVersion=format.getFlags();
+		if(pixelFormat!=0){
+			int Format_SHIFT_TYPES=			8;
+			int Format_MASK_TYPES=			0xFF00;
+			int Format_TYPE_UINT_5_6_5=		7<<Format_SHIFT_TYPES;
+			int Format_TYPE_UINT_5_5_5_1=	8<<Format_SHIFT_TYPES;
+			int Format_TYPE_UINT_4_4_4_4=	9<<Format_SHIFT_TYPES;
+			if((pixelFormat&Format_MASK_TYPES)==Format_TYPE_UINT_5_6_5){
+				redBits=5;greenBits=6;blueBits=5;alphaBits=0;
+			}
+			else if((pixelFormat&Format_MASK_TYPES)==Format_TYPE_UINT_5_5_5_1){
+				redBits=5;greenBits=5;blueBits=5;alphaBits=1;
+			}
+			else if((pixelFormat&Format_MASK_TYPES)==Format_TYPE_UINT_4_4_4_4){
+				redBits=4;greenBits=4;blueBits=4;alphaBits=4;
+			}
+			else{
+				redBits=8;greenBits=8;blueBits=8;alphaBits=0;
+			}
+		}
 
 		mConfig=chooseEGLConfig(mDisplay,redBits,greenBits,blueBits,alphaBits,depthBits,stencilBits,!pixmap,pixmap,false,multisamples);
 		TOADLET_CHECK_EGLERROR("chooseEGLConfig");

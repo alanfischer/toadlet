@@ -53,7 +53,7 @@ class TOADLET_API Engine:public Object{
 public:
 	TOADLET_OBJECT(Engine);
 
-	Engine(bool fixedBackable=true,bool shaderBackable=true);
+	Engine(void *env=NULL,void *ctx=NULL);//bool fixedBackable=true,bool shaderBackable=true);
 	virtual ~Engine();
 
 	void destroy();
@@ -111,6 +111,7 @@ public:
 	inline AudioManager *getAudioManager() const{return mAudioManager;}
 
 protected:
+	void *mEnv,*mCtx;
 	bool mFixedBackable,mShaderBackable;
 	String mDirectory;
 	RenderDevice *mRenderDevice;

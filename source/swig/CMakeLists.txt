@@ -55,6 +55,12 @@ if (NOT TOADLET_PLATFORM_PYTHON)
 	)
 	if (TOADLET_PLATFORM_ANDROID)
 		set (PEEPER_SWIG_INT_OUTPUTS
+			${PROJECT_BINARY_DIR}/source/java/us/toadlet/peeper/RenderDevice.i
+			${PROJECT_BINARY_DIR}/source/java/us/toadlet/peeper/RenderTarget.i
+			${PROJECT_BINARY_DIR}/source/java/us/toadlet/peeper/GLRenderTarget.i
+			${PROJECT_BINARY_DIR}/source/java/us/toadlet/peeper/WindowRenderTargetFormat.i
+			${PROJECT_BINARY_DIR}/source/java/us/toadlet/peeper/peeper.java
+			${PROJECT_BINARY_DIR}/source/java/us/toadlet/peeper/peeperJNI.java
 		)
 	elseif (TOADLET_PLATFORM_IOS)
 		set (PEEPER_SWIG_INT_OUTPUTS
@@ -135,6 +141,28 @@ if (NOT TOADLET_PLATFORM_PYTHON)
 		)
 	elseif (TOADLET_PLATFORM_IOS)
 		set (TADPOLE_SWIG_INT_OUTPUTS
+		)
+	endif (TOADLET_PLATFORM_ANDROID)
+	
+	# Toadlet Pad
+	set (PAD_SWIG_INT
+		${CMAKE_CURRENT_SOURCE_DIR}/toadlet/pad/pad.i
+		PARENT_SCOPE
+	)
+	set (PAD_SWIG_INT_DEPS
+		${CMAKE_CURRENT_SOURCE_DIR}/toadlet/pad/Applet.i
+		PARENT_SCOPE
+	)
+	if (TOADLET_PLATFORM_ANDROID)
+		set (PAD_SWIG_INT_OUTPUTS
+			${PROJECT_BINARY_DIR}/source/java/us/toadlet/pad/Version.java
+			${PROJECT_BINARY_DIR}/source/java/us/toadlet/pad/Applet.java
+			${PROJECT_BINARY_DIR}/source/java/us/toadlet/pad/pad.java
+			${PROJECT_BINARY_DIR}/source/java/us/toadlet/pad/padJNI.java
+			PARENT_SCOPE
+		)
+	elseif (TOADLET_PLATFORM_IOS)
+		set (PAD_SWIG_INT_OUTPUTS
 		)
 	endif (TOADLET_PLATFORM_ANDROID)
 else (NOT TOADLET_PLATFORM_PYTHON)

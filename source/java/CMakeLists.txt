@@ -44,7 +44,7 @@ configure_file (us/toadlet/flick/Version.java.cmake ${CMAKE_CURRENT_BINARY_DIR}/
 set (FLICK_SRC
 	us/toadlet/flick/AndroidSensorDevice.java
 	${FLICK_SWIG_INT_OUTPUTS}
-	${CMAKE_CURRENT_BINARY_DIR}/us/toadlet/flick/Version.java
+#	${CMAKE_CURRENT_BINARY_DIR}/us/toadlet/flick/Version.java
 )
 
 set (FLICK_H
@@ -73,7 +73,7 @@ set (PEEPER_SRC
 	us/toadlet/peeper/EGLRenderTarget.java
 	us/toadlet/peeper/EGLWindowRenderTarget.java
 	${PEEPER_SWIG_INT_OUTPUTS}
-	${CMAKE_CURRENT_BINARY_DIR}/us/toadlet/peeper/Version.java
+#	${CMAKE_CURRENT_BINARY_DIR}/us/toadlet/peeper/Version.java
 )
 
 set (PEEPER_H
@@ -103,7 +103,7 @@ set (RIBBIT_SRC
 	us/toadlet/ribbit/ATAudio.java
 	us/toadlet/ribbit/ATAudioDevice.java
 	${RIBBIT_SWIG_INT_OUTPUTS}
-	${CMAKE_CURRENT_BINARY_DIR}/us/toadlet/ribbit/Version.java
+#	${CMAKE_CURRENT_BINARY_DIR}/us/toadlet/ribbit/Version.java
 )
 
 set (RIBBIT_H
@@ -130,7 +130,7 @@ configure_file (us/toadlet/tadpole/Version.java.cmake ${CMAKE_CURRENT_BINARY_DIR
 
 set (TADPOLE_SRC
 	${TADPOLE_SWIG_INT_OUTPUTS}
-	${CMAKE_CURRENT_BINARY_DIR}/us/toadlet/tadpole/Version.java
+#	${CMAKE_CURRENT_BINARY_DIR}/us/toadlet/tadpole/Version.java
 )
 
 set (TADPOLE_H
@@ -147,19 +147,18 @@ add_dependencies(jtoadlet_tadpole toadlet_tadpole)
 install (FILES ${JARFILE} DESTINATION ${JAVA_LIB_INSTALL_DIR})
 
 # Generate headers
-add_custom_command (TARGET jtoadlet_tadpole POST_BUILD
-    COMMAND ${Java_JAVAH_EXECUTABLE} -classpath ${JARFILE} ${TADPOLE_H}
-)
+#add_custom_command (TARGET jtoadlet_tadpole POST_BUILD
+#    COMMAND ${Java_JAVAH_EXECUTABLE} -classpath ${JARFILE} ${TADPOLE_H}
+#)
 
 
 # toadlet_pad
 configure_file (us/toadlet/pad/Version.java.cmake ${CMAKE_CURRENT_BINARY_DIR}/us/toadlet/pad/Version.java)
 
 set (PAD_SRC
-	us/toadlet/pad/Applet.java
 	us/toadlet/pad/AndroidApplication.java
-	us/toadlet/pad/NApplet.java
-	${CMAKE_CURRENT_BINARY_DIR}/us/toadlet/pad/Version.java
+	${PAD_SWIG_INT_OUTPUTS}
+#	${CMAKE_CURRENT_BINARY_DIR}/us/toadlet/pad/Version.java
 )
 
 set (PAD_H

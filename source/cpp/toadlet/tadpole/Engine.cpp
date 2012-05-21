@@ -105,6 +105,10 @@
 #if defined(TOADLET_PLATFORM_OSX)
 	#include <toadlet/tadpole/platform/osx/OSXTextureStreamer.h>
 #endif
+#if defined(TOADLET_PLATFORM_ANDROID)
+	#include <toadlet/tadpole/platform/android/AndroidAssetArchive.h>
+	#include <toadlet/tadpole/platform/android/AndroidTextureStreamer.h>
+#endif
 #if defined(TOADLET_HAS_GIF)
 	#include <toadlet/tadpole/plugins/GIFStreamer.h>
 #endif
@@ -155,7 +159,7 @@
 namespace toadlet{
 namespace tadpole{
 
-Engine::Engine(bool fixedBackable,bool shaderBackable):
+Engine::Engine(void *env,void *ctx)://bool fixedBackable,bool shaderBackable):
 	mFixedBackable(false),
 	mShaderBackable(false),
 	//mDirectory,
@@ -166,6 +170,8 @@ Engine::Engine(bool fixedBackable,bool shaderBackable):
 
 	//mContextListeners
 {
+	bool fixedBackable=true,shaderBackable=true;
+	
 	Logger *logger=Logger::getInstance();
 	logger->addCategory(Categories::TOADLET_EGG_LOGGER);
 	logger->addCategory(Categories::TOADLET_EGG_NET);
@@ -182,6 +188,7 @@ Engine::Engine(bool fixedBackable,bool shaderBackable):
 	Logger::debug(Categories::TOADLET_TADPOLE,
 		String("allocating ")+Categories::TOADLET_TADPOLE+".Engine:"+Version::STRING);
 
+	mEnv=env,mCtx=ctx;
 	mFixedBackable=fixedBackable;
 	mShaderBackable=shaderBackable;
 
@@ -272,6 +279,16 @@ void Engine::installHandlers(){
 	#if defined(TOADLET_HAS_ZZIP)
 		mArchiveManager->setStreamer(new ZIPStreamer(),"zip");
 	#endif
+	#if defined(TOADLET_PLATFORM_ANDROID)
+		jobject assetManagerObj=NULL;
+		jclass contextClass=((JNIEnv*)mEnv)->GetObjectClass((jobject)mCtx);
+		{
+			jmethodID getAssetsID=((JNIEnv*)mEnv)->GetMethodID(contextClass,"getAssets","()Landroid/content/res/AssetManager;");
+			assetManagerObj=((JNIEnv*)mEnv)->CallObjectMethod((jobject)mCtx,getAssetsID);
+		}
+		((JNIEnv*)mEnv)->DeleteLocalRef(contextClass);
+		mArchiveManager->manageArchive(new AndroidAssetArchive((JNIEnv*)mEnv,assetManagerObj));
+	#endif
 
 	// Texture streamers
 	mTextureManager->setStreamer(new DDSStreamer(mTextureManager),"dds");
@@ -280,6 +297,8 @@ void Engine::installHandlers(){
 	#elif defined(TOADLET_PLATFORM_OSX)
 		mTextureManager->setStreamer(new BMPStreamer(mTextureManager),"bmp"); // OSXTextureStreamer only handles jpgs & pngs currently, so add our own bmp streamer
 		mTextureManager->setDefaultStreamer(new OSXTextureStreamer(mTextureManager));
+	#elif defined(TOADLET_PLATFORM_ANDROID)
+		mTextureManager->setDefaultStreamer(new AndroidTextureStreamer(mTextureManager,(JNIEnv*)mEnv));
 	#else
 		mTextureManager->setStreamer(new BMPStreamer(mTextureManager),"bmp");
 		#if defined(TOADLET_HAS_GIF)

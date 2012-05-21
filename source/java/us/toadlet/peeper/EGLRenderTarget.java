@@ -39,7 +39,7 @@ public abstract class EGLRenderTarget extends GLRenderTarget{
 	public int egl_version=0;
 
 	public EGLRenderTarget(){
-		super();
+		super(0,false);
 		egl=(EGL10)EGLContext.getEGL();
 		try{egl11=(EGL11)EGLContext.getEGL();}catch(Exception ex){}
 	}
