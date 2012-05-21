@@ -33,7 +33,7 @@
 namespace toadlet{
 namespace peeper{
 
-class TOADLET_API BackableTexture:protected BaseResource,public Texture{
+class TOADLET_API BackableTexture:public BaseResource,public Texture{
 public:
 	TOADLET_RESOURCE(BackableTexture,Texture);
 

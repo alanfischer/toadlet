@@ -37,7 +37,7 @@
 namespace toadlet{
 namespace peeper{
 
-class TOADLET_API NSGLRenderTarget:protected BaseResource,public GLRenderTarget{
+class TOADLET_API NSGLRenderTarget:public BaseResource,public GLRenderTarget{
 public:
 	TOADLET_RESOURCE(NSGLRenderTarget,GLRenderTarget);
 

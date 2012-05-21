@@ -37,7 +37,7 @@ namespace peeper{
 class D3D9RenderDevice;
 class D3D9TextureMipPixelBuffer;
 
-class TOADLET_API D3D9Texture:protected BaseResource,public Texture{
+class TOADLET_API D3D9Texture:public BaseResource,public Texture{
 public:
 	TOADLET_RESOURCE(D3D9Texture,Texture);
 

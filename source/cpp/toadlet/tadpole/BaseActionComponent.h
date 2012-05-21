@@ -34,7 +34,7 @@
 namespace toadlet{
 namespace tadpole{
 
-class BaseActionComponent:protected Object,public ActionComponent{
+class BaseActionComponent:public Object,public ActionComponent{
 public:
 	TOADLET_OBJECT(BaseActionComponent);
 	

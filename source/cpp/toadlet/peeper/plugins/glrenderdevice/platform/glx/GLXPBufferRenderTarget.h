@@ -35,7 +35,7 @@ namespace peeper{
 
 class GLRenderDevice;
 
-class GLXPBufferRenderTarget:protected BaseResource,public GLXRenderTarget,public PixelBufferRenderTarget{
+class GLXPBufferRenderTarget:public BaseResource,public GLXRenderTarget,public PixelBufferRenderTarget{
 public:
 	TOADLET_RESOURCE(GLXPBufferRenderTarget,PixelBufferRenderTarget);
 

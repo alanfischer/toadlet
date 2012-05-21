@@ -33,7 +33,7 @@
 namespace toadlet{
 namespace tadpole{
 
-class TOADLET_API JPEGStreamer:protected Object,public ResourceStreamer{
+class TOADLET_API JPEGStreamer:public Object,public ResourceStreamer{
 public:
 	TOADLET_OBJECT(JPEGStreamer);
 

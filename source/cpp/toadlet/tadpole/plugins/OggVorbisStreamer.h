@@ -32,7 +32,7 @@
 namespace toadlet{
 namespace tadpole{
 
-class TOADLET_API OggVorbisStreamer:protected Object,public AudioStreamer{
+class TOADLET_API OggVorbisStreamer:public Object,public AudioStreamer{
 public:
 	TOADLET_OBJECT(OggVorbisStreamer);
 

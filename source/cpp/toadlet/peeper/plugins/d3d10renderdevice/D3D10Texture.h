@@ -36,7 +36,7 @@ namespace peeper{
 class D3D10RenderDevice;
 class D3D10TextureMipPixelBuffer;
 
-class TOADLET_API D3D10Texture:protected BaseResource,public Texture{
+class TOADLET_API D3D10Texture:public BaseResource,public Texture{
 public:
 	TOADLET_RESOURCE(D3D10Texture,Texture);
 

@@ -36,7 +36,7 @@ namespace peeper{
 
 class GLFBORenderTarget;
 
-class GLFBOPixelBuffer:protected BaseResource,public GLPixelBuffer{
+class GLFBOPixelBuffer:public BaseResource,public GLPixelBuffer{
 public:
 	TOADLET_RESOURCE(GLFBOPixelBuffer,GLPixelBuffer);
 

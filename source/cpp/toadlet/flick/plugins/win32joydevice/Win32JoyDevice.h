@@ -34,7 +34,7 @@
 namespace toadlet{
 namespace flick{
 
-class Win32JoyDevice:protected Object,public InputDevice{
+class Win32JoyDevice:public Object,public InputDevice{
 public:
 	TOADLET_OBJECT(Win32JoyDevice);
 

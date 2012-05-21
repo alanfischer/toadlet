@@ -32,7 +32,7 @@ namespace toadlet{
 namespace tadpole{
 namespace animation{
 
-class TOADLET_API CosInterpolator:protected Object,public Interpolator{
+class TOADLET_API CosInterpolator:public Object,public Interpolator{
 public:
 	TOADLET_OBJECT(CosInterpolator);
 

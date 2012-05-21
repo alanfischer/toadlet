@@ -38,7 +38,7 @@ class D3D10RenderDevice;
 class D3D10ShaderState;
 class D3D10VertexFormat;
 
-class TOADLET_API D3D10Shader:protected BaseResource,public Shader{
+class TOADLET_API D3D10Shader:public BaseResource,public Shader{
 public:
 	TOADLET_RESOURCE(D3D10Shader,Shader);
 

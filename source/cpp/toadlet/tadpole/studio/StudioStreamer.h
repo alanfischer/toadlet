@@ -34,7 +34,7 @@ namespace toadlet{
 namespace tadpole{
 namespace studio{
 
-class TOADLET_API StudioStreamer:protected Object,public ResourceStreamer{
+class TOADLET_API StudioStreamer:public Object,public ResourceStreamer{
 public:
 	TOADLET_OBJECT(StudioStreamer);
 

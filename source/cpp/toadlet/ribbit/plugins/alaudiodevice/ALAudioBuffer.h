@@ -35,7 +35,7 @@ namespace ribbit{
 
 class ALAudioDevice;
 
-class TOADLET_API ALAudioBuffer:protected BaseResource,public AudioBuffer{
+class TOADLET_API ALAudioBuffer:public BaseResource,public AudioBuffer{
 public:
 	TOADLET_RESOURCE(ALAudioBuffer,AudioBuffer);
 

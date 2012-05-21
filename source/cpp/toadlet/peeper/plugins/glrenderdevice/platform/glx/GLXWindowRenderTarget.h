@@ -35,7 +35,7 @@ namespace peeper{
 
 TOADLET_C_API RenderTarget *new_GLXWindowRenderTarget(void *display,void *window,WindowRenderTargetFormat *format);
 
-class TOADLET_API GLXWindowRenderTarget:protected BaseResource,public GLXRenderTarget{
+class TOADLET_API GLXWindowRenderTarget:public BaseResource,public GLXRenderTarget{
 public:
 	TOADLET_RESOURCE(GLXWindowRenderTarget,GLXRenderTarget);
 

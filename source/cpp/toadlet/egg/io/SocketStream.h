@@ -34,7 +34,7 @@ namespace toadlet{
 namespace egg{
 namespace io{
 
-class TOADLET_API SocketStream:protected Object,public Stream{
+class TOADLET_API SocketStream:public Object,public Stream{
 public:
 	TOADLET_OBJECT(SocketStream);
 

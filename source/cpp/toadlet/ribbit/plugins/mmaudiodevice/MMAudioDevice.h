@@ -44,7 +44,7 @@ class MMAudioBuffer;
 
 // You can not use both the ALAUdioDevice and the MMAudioDevice simultaniously.
 // Whichever one you create second will be the useable device.
-class TOADLET_API MMAudioDevice:protected Object,public AudioDevice{
+class TOADLET_API MMAudioDevice:public Object,public AudioDevice{
 public:
 	TOADLET_OBJECT(MMAudioDevice);
 

@@ -52,7 +52,7 @@ class IOSMotionDevice;
 namespace toadlet{
 namespace flick{
 
-class IOSMotionDevice:protected Object,public InputDevice{
+class IOSMotionDevice:public Object,public InputDevice{
 public:
 	TOADLET_OBJECT(IOSMotionDevice);
 	

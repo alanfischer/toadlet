@@ -37,7 +37,7 @@ namespace peeper{
 
 class GLVertexFormat;
 
-class GLSLShaderState:protected BaseResource,public ShaderState{
+class GLSLShaderState:public BaseResource,public ShaderState{
 public:
 	TOADLET_RESOURCE(GLSLShaderState,ShaderState);
 

@@ -34,7 +34,7 @@ namespace toadlet{
 namespace tadpole{
 namespace terrain{
 
-class TOADLET_API TextureDataSource:protected Object,public TerrainNodeDataSource{
+class TOADLET_API TextureDataSource:public Object,public TerrainNodeDataSource{
 public:
 	TOADLET_OBJECT(TextureDataSource);
 

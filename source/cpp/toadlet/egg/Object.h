@@ -33,6 +33,9 @@ namespace egg{
 
 class TOADLET_API Object:public Interface{
 public:
+	static void *operator new(size_t size);
+	static void operator delete(void *p);
+
 	Object():mSharedCount(0){}
 	virtual ~Object(){}
 
@@ -47,7 +50,7 @@ public:
 		}
 		return count;
 	}
-	
+
 protected:
 	int mSharedCount;
 };

@@ -33,7 +33,7 @@
 namespace toadlet{
 namespace tadpole{
 
-class TOADLET_API TGAStreamer:protected Object,public ResourceStreamer{
+class TOADLET_API TGAStreamer:public Object,public ResourceStreamer{
 public:
 	TOADLET_OBJECT(TGAStreamer);
 

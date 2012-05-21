@@ -33,7 +33,7 @@
 namespace toadlet{
 namespace tadpole{
 
-class TOADLET_API JStream:protected Object,public Stream{
+class TOADLET_API JStream:public Object,public Stream{
 public:
 	TOADLET_OBJECT(JStream);
 

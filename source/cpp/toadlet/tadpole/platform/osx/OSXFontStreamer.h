@@ -37,7 +37,7 @@ namespace tadpole{
 /// @brief  A lighter weight font handling class for the OSX platform
 ///  If the FreeTypeStreamer is unavailable or too heavy weight to include, this class may be used.
 
-class TOADLET_API OSXFontStreamer:protected Object,public ResourceStreamer{
+class TOADLET_API OSXFontStreamer:public Object,public ResourceStreamer{
 public:
 	TOADLET_OBJECT(OSXFontStreamer);
 

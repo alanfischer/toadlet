@@ -37,7 +37,7 @@
 namespace toadlet{
 namespace tadpole{
 
-class TOADLET_API TMSHStreamer:protected Object,public ResourceStreamer{
+class TOADLET_API TMSHStreamer:public Object,public ResourceStreamer{
 public:
 	TOADLET_OBJECT(TMSHStreamer);
 

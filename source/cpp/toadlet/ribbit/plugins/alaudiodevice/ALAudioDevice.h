@@ -47,7 +47,7 @@ typedef void (*proc_alBufferDataStatic)(ALuint buffer,ALenum format,ALvoid *data
 
 // You can not use both the ALAUdioDevice and the MMAudioDevice simultaniously.
 // Whichever one you create second will be the useable device.
-class TOADLET_API ALAudioDevice:protected Object,public AudioDevice{
+class TOADLET_API ALAudioDevice:public Object,public AudioDevice{
 public:
 	TOADLET_OBJECT(ALAudioDevice);
 

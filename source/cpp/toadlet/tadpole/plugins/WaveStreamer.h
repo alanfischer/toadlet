@@ -32,7 +32,7 @@
 namespace toadlet{
 namespace tadpole{
 
-class TOADLET_API WaveStreamer:protected Object,public AudioStreamer{
+class TOADLET_API WaveStreamer:public Object,public AudioStreamer{
 public:
 	TOADLET_OBJECT(WaveStreamer);
 

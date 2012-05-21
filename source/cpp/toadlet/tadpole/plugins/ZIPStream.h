@@ -33,7 +33,7 @@ namespace toadlet{
 namespace tadpole{
 
 /// @todo: Ideally the zlib usage would be replaced with zziplib, but zziplib does not support writing
-class TOADLET_API ZIPStream:protected Object,public Stream{
+class TOADLET_API ZIPStream:public Object,public Stream{
 public:
 	TOADLET_OBJECT(ZIPStream);
 

@@ -35,7 +35,7 @@ namespace peeper{
 
 TOADLET_C_API RenderTarget *new_WGLWindowRenderTarget(void *display,void *window,WindowRenderTargetFormat *format);
 
-class TOADLET_API WGLWindowRenderTarget:protected BaseResource,public WGLRenderTarget{
+class TOADLET_API WGLWindowRenderTarget:public BaseResource,public WGLRenderTarget{
 public:
 	TOADLET_RESOURCE(WGLWindowRenderTarget,WGLRenderTarget);
 
