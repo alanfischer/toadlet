@@ -31,7 +31,7 @@
 namespace toadlet{
 namespace flick{
 
-class BaseInputDevice:protected Object,public InputDevice{
+class BaseInputDevice:public Object,public InputDevice{
 public:
 	TOADLET_OBJECT(BaseInputDevice);
 
