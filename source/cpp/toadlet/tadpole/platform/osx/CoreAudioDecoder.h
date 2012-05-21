@@ -33,7 +33,7 @@ namespace toadlet{
 namespace ribbit{
 namespace decoder{
 
-class CoreAudioDecoder:protected Object,public AudioStream{
+class CoreAudioDecoder:public Object,public AudioStream{
 public:
 	TOADLET_OBJECT(CoreAudioDecoder);
 

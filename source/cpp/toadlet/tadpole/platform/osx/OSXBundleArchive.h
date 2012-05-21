@@ -35,7 +35,7 @@
 namespace toadlet{
 namespace tadpole{
 
-class TOADLET_API OSXBundleArchive:protected BaseResource,public Archive{
+class TOADLET_API OSXBundleArchive:public BaseResource,public Archive{
 public:
 	TOADLET_RESOURCE(OSXBundleArchive,Archive);
 

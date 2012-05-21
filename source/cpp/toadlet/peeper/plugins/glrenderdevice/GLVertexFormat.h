@@ -35,7 +35,7 @@ namespace peeper{
 
 class GLRenderDevice;
 
-class TOADLET_API GLVertexFormat:protected BaseResource,public VertexFormat{
+class TOADLET_API GLVertexFormat:public BaseResource,public VertexFormat{
 public:
 	TOADLET_RESOURCE(GLVertexFormat,VertexFormat);
 

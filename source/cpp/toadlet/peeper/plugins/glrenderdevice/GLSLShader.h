@@ -38,7 +38,7 @@ namespace peeper{
 class GLRenderDevice;
 class GLSLShaderState;
 
-class GLSLShader:protected BaseResource,public Shader{
+class GLSLShader:public BaseResource,public Shader{
 public:
 	TOADLET_RESOURCE(GLSLShader,Shader);
 

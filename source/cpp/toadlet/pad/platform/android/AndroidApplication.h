@@ -38,7 +38,7 @@ namespace pad{
 
 /// @todo: There is still a problem where the native window doesn't resize correctly on rotation
 /// @todo: And the rest of the input keys need to be handled besides space
-class AndroidApplication:protected Object,public Application,public Runnable{
+class AndroidApplication:public Object,public Application,public Runnable{
 public:
 	TOADLET_OBJECT(AndroidApplication);
 

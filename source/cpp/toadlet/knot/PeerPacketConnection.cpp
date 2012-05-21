@@ -119,10 +119,10 @@ PeerPacketConnection::PeerPacketConnection(Socket::ptr socket):
 	mSocket=socket;
 
 	int maxSize=1024;
-	mOutPacket=MemoryStream::ptr(new MemoryStream(new tbyte[maxSize],maxSize,0,true));
-	mDataOutPacket=DataStream::ptr(new DataStream(Stream::ptr(mOutPacket)));
-	mInPacket=MemoryStream::ptr(new MemoryStream(new tbyte[maxSize],maxSize,maxSize,true));
-	mDataInPacket=DataStream::ptr(new DataStream(Stream::ptr(mInPacket)));
+	mOutPacket=new MemoryStream(new tbyte[maxSize],maxSize,0,true);
+	mDataOutPacket=new DataStream(Stream::ptr(mOutPacket));
+	mInPacket=new MemoryStream(new tbyte[maxSize],maxSize,maxSize,true);
+	mDataInPacket=new DataStream(Stream::ptr(mInPacket));
 
 	mWindowSize=32;
 	mHalfWindowSize=mWindowSize>>1;

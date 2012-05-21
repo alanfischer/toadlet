@@ -39,7 +39,7 @@ namespace peeper{
 
 class GLRenderDevice;
 
-class TOADLET_API GLBuffer:protected BaseResource,public IndexBuffer,public VertexBuffer,public GLPixelBuffer,public VariableBuffer{
+class TOADLET_API GLBuffer:public BaseResource,public IndexBuffer,public VertexBuffer,public GLPixelBuffer,public VariableBuffer{
 public:
 	TOADLET_RESOURCE(GLBuffer,BaseResource);
 

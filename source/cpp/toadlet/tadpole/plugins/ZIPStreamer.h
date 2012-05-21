@@ -32,7 +32,7 @@
 namespace toadlet{
 namespace tadpole{
 
-class TOADLET_API ZIPStreamer:protected Object,public ResourceStreamer{
+class TOADLET_API ZIPStreamer:public Object,public ResourceStreamer{
 public:
 	TOADLET_OBJECT(ZIPStreamer);
 

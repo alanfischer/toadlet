@@ -40,7 +40,7 @@
 namespace toadlet{
 namespace tadpole{
 
-class TOADLET_API Scene:protected Object,public ContextListener{
+class TOADLET_API Scene:public Object,public ContextListener{
 public:
 	TOADLET_OBJECT(Scene);
 

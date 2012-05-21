@@ -33,7 +33,7 @@
 namespace toadlet{
 namespace ribbit{
 
-class TOADLET_API MMAudio:protected BaseResource,public Audio{
+class TOADLET_API MMAudio:public BaseResource,public Audio{
 public:
 	TOADLET_RESOURCE(MMAudio,Audio);
 

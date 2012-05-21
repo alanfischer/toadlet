@@ -33,7 +33,7 @@ namespace toadlet{
 namespace tadpole{
 namespace sensor{
 
-class TOADLET_API InterfaceSensor:protected Object,public Sensor{
+class TOADLET_API InterfaceSensor:public Object,public Sensor{
 public:
 	TOADLET_OBJECT(InterfaceSensor);
 

@@ -33,7 +33,7 @@
 namespace toadlet{
 namespace peeper{
 
-class TOADLET_API JGLWindowRenderTarget:protected BaseResource,public GLRenderTarget{
+class TOADLET_API JGLWindowRenderTarget:public BaseResource,public GLRenderTarget{
 public:
 	TOADLET_RESOURCE(JGLWindowRenderTarget,GLRenderTarget);
 

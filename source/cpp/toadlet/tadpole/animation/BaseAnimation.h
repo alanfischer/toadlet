@@ -33,7 +33,7 @@ namespace toadlet{
 namespace tadpole{
 namespace animation{
 
-class TOADLET_API BaseAnimation:protected Object,public Animation{
+class TOADLET_API BaseAnimation:public Object,public Animation{
 public:
 	TOADLET_OBJECT(BaseAnimation);
 

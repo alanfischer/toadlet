@@ -37,7 +37,7 @@ namespace tadpole{
 
 const int OGGPACKETSIZE=4096;
 
-class TOADLET_API OggVorbisDecoder:protected Object,public AudioStream{
+class TOADLET_API OggVorbisDecoder:public Object,public AudioStream{
 public:
 	TOADLET_OBJECT(OggVorbisDecoder);
 

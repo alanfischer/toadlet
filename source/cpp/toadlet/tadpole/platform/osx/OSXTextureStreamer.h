@@ -35,7 +35,7 @@ namespace tadpole{
 
 /// @brief  A lighter weight texture handling class for the OSX platform
 
-class TOADLET_API OSXTextureStreamer:protected Object,public ResourceStreamer{
+class TOADLET_API OSXTextureStreamer:public Object,public ResourceStreamer{
 public:
 	TOADLET_OBJECT(OSXTextureStreamer);
 

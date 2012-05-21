@@ -37,7 +37,7 @@ namespace egg{
 namespace io{
 
 /// @todo: This should be implemented cleaner and more optimized, with more direct writing of structures and then converting if necessary
-class TOADLET_API DataStream:protected Object,public Stream{
+class TOADLET_API DataStream:public Object,public Stream{
 public:
 	TOADLET_OBJECT(DataStream);
 

@@ -33,7 +33,7 @@ namespace toadlet{
 namespace tadpole{
 namespace terrain{
 
-class TOADLET_API DiffuseTerrainMaterialSource:protected Object,public TerrainNodeMaterialSource{
+class TOADLET_API DiffuseTerrainMaterialSource:public Object,public TerrainNodeMaterialSource{
 public:
 	TOADLET_OBJECT(DiffuseTerrainMaterialSource);
 	

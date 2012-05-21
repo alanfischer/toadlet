@@ -35,7 +35,7 @@
 namespace toadlet{
 namespace ribbit{
 
-class TOADLET_API JAudioDevice:protected Object,public AudioDevice{
+class TOADLET_API JAudioDevice:public Object,public AudioDevice{
 public:
 	TOADLET_OBJECT(JAudioDevice);
 

@@ -34,7 +34,7 @@ typedef struct mxml_node_s mxml_node_t;
 namespace toadlet{
 namespace tadpole{
 
-class TOADLET_API XMSHStreamer:protected Object,public ResourceStreamer{
+class TOADLET_API XMSHStreamer:public Object,public ResourceStreamer{
 public:
 	TOADLET_OBJECT(XMSHStreamer);
 

@@ -34,7 +34,7 @@ namespace toadlet{
 namespace tadpole{
 namespace bsp{
 
-class BSP30Streamer:protected Object,public ResourceStreamer{
+class BSP30Streamer:public Object,public ResourceStreamer{
 public:
 	TOADLET_OBJECT(BSP30Streamer);
 

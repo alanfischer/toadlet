@@ -33,7 +33,7 @@
 namespace toadlet{
 namespace tadpole{
 
-class TOADLET_API AndroidTextureStreamer:protected Object,public ResourceStreamer{
+class TOADLET_API AndroidTextureStreamer:public Object,public ResourceStreamer{
 public:
 	TOADLET_OBJECT(AndroidTextureStreamer);
 

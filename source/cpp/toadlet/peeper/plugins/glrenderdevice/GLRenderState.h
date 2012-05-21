@@ -35,7 +35,7 @@ namespace peeper{
 
 class GLRenderDevice;
 
-class TOADLET_API GLRenderState:protected BaseResource,public RenderState{
+class TOADLET_API GLRenderState:public BaseResource,public RenderState{
 public:
 	TOADLET_RESOURCE(GLRenderState,RenderState);
 

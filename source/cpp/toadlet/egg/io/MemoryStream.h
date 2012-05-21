@@ -35,7 +35,7 @@ namespace egg{
 namespace io{
 
 // This does not properly support both reading & writing of the same stream
-class TOADLET_API MemoryStream:protected Object,public Stream{
+class TOADLET_API MemoryStream:public Object,public Stream{
 public:
 	TOADLET_OBJECT(MemoryStream);
 

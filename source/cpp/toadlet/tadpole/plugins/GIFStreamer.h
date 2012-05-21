@@ -35,7 +35,7 @@ struct GifFileType;
 namespace toadlet{
 namespace tadpole{
 
-class TOADLET_API GIFStreamer:protected Object,public ResourceStreamer{
+class TOADLET_API GIFStreamer:public Object,public ResourceStreamer{
 public:
 	TOADLET_OBJECT(GIFStreamer);
 

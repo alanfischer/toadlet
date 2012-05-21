@@ -21,7 +21,7 @@ namespace tadpole{
 class FFmpegAudioStream;
 class FFmpegVideoStream;
 
-class FFmpegController:protected Object,public VideoController{
+class FFmpegController:public Object,public VideoController{
 public:
 	TOADLET_OBJECT(FFmpegController);
 
@@ -127,7 +127,7 @@ protected:
 	uint64 mTime,mMaxTime;
 };
 
-class FFmpegAudioStream:protected Object,public AudioStream{
+class FFmpegAudioStream:public Object,public AudioStream{
 public:
 	TOADLET_OBJECT(FFmpegAudioStream);
 
@@ -186,7 +186,7 @@ protected:
 	friend class FFmpegController;
 };
 
-class FFmpegVideoHandler:protected Object,public VideoHandler{
+class FFmpegVideoHandler:public Object,public VideoHandler{
 public:
 	TOADLET_OBJECT(FFmpegVideoHandler);
 

@@ -36,7 +36,7 @@ namespace peeper{
 class GLTexture;
 class GLRenderDevice;
 
-class TOADLET_API GLTextureMipPixelBuffer:protected BaseResource,public GLPixelBuffer{
+class TOADLET_API GLTextureMipPixelBuffer:public BaseResource,public GLPixelBuffer{
 protected:
 	GLTextureMipPixelBuffer(GLTexture *texture,GLuint level,GLuint cubeSide);
 

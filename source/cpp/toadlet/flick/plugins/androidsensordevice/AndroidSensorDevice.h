@@ -33,7 +33,7 @@
 namespace toadlet{
 namespace flick{
 
-class TOADLET_API AndroidSensorDevice:protected Object,public InputDevice{
+class TOADLET_API AndroidSensorDevice:public Object,public InputDevice{
 public:
 	TOADLET_OBJECT(AndroidSensorDevice);
 

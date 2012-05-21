@@ -42,7 +42,7 @@ extern "C" {
 namespace toadlet{
 namespace tadpole{
 
-class FreeTypeStreamer:protected Object,public ResourceStreamer{
+class FreeTypeStreamer:public Object,public ResourceStreamer{
 public:
 	TOADLET_OBJECT(FreeTypeStreamer);
 

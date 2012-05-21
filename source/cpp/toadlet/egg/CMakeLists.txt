@@ -9,6 +9,7 @@ set (EGG_SRC
 	Exception.cpp
 	Logger.cpp
 #	HTTPLoggerListener.cpp
+	Object.cpp
 	Profile.cpp
 	Random.cpp
 	String.cpp
