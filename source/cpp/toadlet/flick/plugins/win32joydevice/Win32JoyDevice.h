@@ -26,7 +26,7 @@
 #ifndef TOADLET_FLICK_WIN32JOYDEVICE_H
 #define TOADLET_FLICK_WIN32JOYDEVICE_H
 
-#include <toadlet/flick/InputDevice.h>
+#include <toadlet/flick/BaseInputDevice.h>
 #include <toadlet/egg/System.h>
 #include <toadlet/egg/Object.h>
 #include <windows.h>
@@ -34,7 +34,7 @@
 namespace toadlet{
 namespace flick{
 
-class Win32JoyDevice:public Object,public InputDevice{
+class Win32JoyDevice:public BaseInputDevice{
 public:
 	TOADLET_OBJECT(Win32JoyDevice);
 

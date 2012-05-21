@@ -166,14 +166,6 @@ set (TADPOLE_PLATFORM_ANDROID_SRC
 	platform/android/JStream.cpp
 )
 
-set (TADPOLE_PLATFORM_ANDROID_8_SRC
-	platform/android/us_toadlet_tadpole_CameraNode.cpp
-	platform/android/us_toadlet_tadpole_Engine.cpp
-	platform/android/us_toadlet_tadpole_LightNode.cpp
-	platform/android/us_toadlet_tadpole_MeshNode.cpp
-	platform/android/us_toadlet_tadpole_Node.cpp
-	platform/android/us_toadlet_tadpole_Scene.cpp
-)
 
 set (TADPOLE_PLATFORM_OSX_SRC
 	platform/osx/OSXBundleArchive.mm
@@ -663,8 +655,6 @@ if (TOADLET_PLATFORM_ANDROID)
 	source_group ("Header Files\\\\platform\\\\android" FILES ${TADPOLE_PLATFORM_ANDROID_HEADERS})
 	set (TADPOLE_SRC ${TADPOLE_SRC} ${TADPOLE_PLATFORM_ANDROID_SRC})
 	if (ANDROID_NDK_API_LEVEL LESS 9)
-		source_group ("Source Files\\\\platform\\\\android" FILES ${TADPOLE_PLATFORM_ANDROID_8_SRC})
-		set (TADPOLE_SRC ${TADPOLE_SRC} ${TADPOLE_PLATFORM_ANDROID_8_SRC})
 		set (TADPOLE_LIBS ${TADPOLE_LIBS} toadlet_ribbit_jaudiodevice)
 	endif (ANDROID_NDK_API_LEVEL LESS 9)
 elseif (TOADLET_PLATFORM_OSX)
@@ -698,6 +688,13 @@ source_group ("Source Files\\\\plugins" FILES ${TADPOLE_PLUGINS_SRC})
 source_group ("Header Files\\\\plugins" FILES ${TADPOLE_PLUGINS_HEADERS})
 set (TADPOLE_SRC ${TADPOLE_SRC} ${TADPOLE_PLUGINS_SRC})
 set (TADPOLE_SRC_S ${TADPOLE_SRC} ${TADPOLE_PLUGINS_SRC_S})
+
+
+# If we are using swig create the wrapper file from the interface files
+if (SWIG_FOUND AND TADPOLE_SWIG_INT)
+	swig_wrap_files (tadpole_wrap.cpp tadpole ${TADPOLE_SWIG_INT} "${TADPOLE_SWIG_INT_DEPS}" "${TADPOLE_SWIG_INT_OUTPUTS}")
+	set (TADPOLE_SRC ${TADPOLE_SRC} tadpole_wrap.cpp)
+endif (SWIG_FOUND AND TADPOLE_SWIG_INT)
 
 
 # Dynamic library

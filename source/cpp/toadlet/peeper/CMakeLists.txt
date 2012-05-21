@@ -74,6 +74,13 @@ set (PEEPER_HEADERS ${PEEPER_HEADERS} PARENT_SCOPE)
 set (PEEPER_NAMESPACES ${PEEPER_NAMESPACES} PARENT_SCOPE)
 
 
+# If we are using swig create the wrapper file from the interface files
+if (SWIG_FOUND AND PEEPER_SWIG_INT)
+	swig_wrap_files (peeper_wrap.cpp peeper ${PEEPER_SWIG_INT} "${PEEPER_SWIG_INT_DEPS}" "${PEEPER_SWIG_INT_OUTPUTS}")
+	set (PEEPER_SRC ${PEEPER_SRC} peeper_wrap.cpp plugins/glrenderdevice/platform/jgl/JGLWindowRenderTarget.cpp)
+endif (SWIG_FOUND AND PEEPER_SWIG_INT)
+
+
 # Dynamic library
 if (NOT TOADLET_PLATFORM_IOS)
 	add_library (toadlet_peeper SHARED ${PEEPER_SRC} ${PEEPER_HEADERS})

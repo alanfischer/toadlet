@@ -29,7 +29,7 @@ import android.media.AudioTrack;
 import android.media.AudioFormat;
 import android.media.AudioManager;
 
-public class ATAudio implements Audio,AudioTrack.OnPlaybackPositionUpdateListener{
+public class ATAudio extends BaseAudio implements AudioTrack.OnPlaybackPositionUpdateListener{
 	public ATAudio(ATAudioDevice device){
 		mGain=1.0f;
 		mAudioGain=1.0f;
@@ -39,7 +39,7 @@ public class ATAudio implements Audio,AudioTrack.OnPlaybackPositionUpdateListene
 
 	public boolean create(AudioBuffer buffer){
 		mAudioStream=null;
-		mAudioBuffer=(buffer!=null)?(ATAudioBuffer)buffer.getRootAudioBuffer():null;
+		mAudioBuffer=(ATAudioBuffer)buffer;
 
 		if(mAudioBuffer==null){
 			return false;
@@ -80,7 +80,7 @@ public class ATAudio implements Audio,AudioTrack.OnPlaybackPositionUpdateListene
 			try{
 				mAudioStream.close();
 			}
-			catch(java.io.IOException ex){}
+			catch(Exception ex){}
 			mAudioStream=null;
 		}
 		
@@ -163,7 +163,7 @@ public class ATAudio implements Audio,AudioTrack.OnPlaybackPositionUpdateListene
 				mBufferPosition+=amount;
 			}
 			if(mAudioStream!=null){
-				amount=mAudioStream.read(mStreamData,0,mStreamData.length);
+				amount=mAudioStream.read(mStreamData,mStreamData.length);
 			}
 
 			if(amount>=0 && amount<mStreamData.length){
@@ -228,15 +228,15 @@ public class ATAudio implements Audio,AudioTrack.OnPlaybackPositionUpdateListene
 			format=mAudioStream.getAudioFormat();
 		}
 
-		int sps=format.samplesPerSecond;
-		int chan=(format.channels==2?AudioFormat.CHANNEL_OUT_STEREO:AudioFormat.CHANNEL_OUT_MONO);
-		int bps=(format.bitsPerSample==8?AudioFormat.ENCODING_PCM_8BIT:AudioFormat.ENCODING_PCM_16BIT);
+		int sps=format.getSamplesPerSecond();
+		int chan=(format.getChannels()==2?AudioFormat.CHANNEL_OUT_STEREO:AudioFormat.CHANNEL_OUT_MONO);
+		int bps=(format.getBitsPerSample()==8?AudioFormat.ENCODING_PCM_8BIT:AudioFormat.ENCODING_PCM_16BIT);
 		int available=AudioTrack.getMinBufferSize(sps,chan,bps);
 
 		mStreamData=new byte[available];
 		mAudioTrack=new AudioTrack(AudioManager.STREAM_MUSIC,sps,chan,bps,available,AudioTrack.MODE_STREAM);
 		mAudioTrack.setPlaybackPositionUpdateListener(this);
-		mAudioTrack.setPositionNotificationPeriod(available/format.frameSize());
+		mAudioTrack.setPositionNotificationPeriod(available/format.getFrameSize());
 	}
 	
 	ATAudioDevice mDevice;

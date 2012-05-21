@@ -32,7 +32,7 @@
 namespace toadlet{
 namespace peeper{
 
-GLFBOPixelBuffer::GLFBOPixelBuffer(GLFBORenderTarget *target):BaseResource(),
+GLFBOPixelBuffer::GLFBOPixelBuffer(GLFBORenderTarget *target):
 	mTarget(NULL),
 	mHandle(0),
 	mUsage(0),

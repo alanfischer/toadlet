@@ -10,7 +10,6 @@ set (PAD_SRC
 
 set (PAD_PLATFORM_ANDROID_JAPPLICATION_SRC
 	platform/android/JApplication.cpp
-	platform/android/us_toadlet_pad_NApplet.cpp
 )
 
 set (PAD_PLATFORM_ANDROID_ANDROIDAPPLICATION_SRC
@@ -171,6 +170,13 @@ endif (TOADLET_PLATFORM_ANDROID)
 # Give the headers and namespaces parent scope for inclusion into the master pad.h file
 set (PAD_HEADERS ${PAD_HEADERS} PARENT_SCOPE)
 set (PAD_NAMESPACES ${PAD_NAMESPACES} PARENT_SCOPE)
+
+
+# If we are using swig create the wrapper file from the interface files
+if (SWIG_FOUND AND PAD_SWIG_INT)
+	swig_wrap_files (pad_wrap.cpp pad ${PAD_SWIG_INT} "${PAD_SWIG_INT_DEPS}" "${PAD_SWIG_INT_OUTPUTS}")	
+	set (PAD_SRC ${PAD_SRC} pad_wrap.cpp)
+endif (SWIG_FOUND AND PAD_SWIG_INT)
 
 
 # Dynamic Library

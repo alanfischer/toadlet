@@ -30,7 +30,7 @@
 namespace toadlet{
 namespace ribbit{
 
-JAudioBuffer::JAudioBuffer(JNIEnv *jenv,jobject jobj):BaseResource(){
+JAudioBuffer::JAudioBuffer(JNIEnv *jenv,jobject jobj){
 	env=jenv;
 	obj=env->NewGlobalRef(jobj);
 

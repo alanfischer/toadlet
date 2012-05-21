@@ -23,14 +23,41 @@
  *
  ********** Copyright header - do not remove **********/
 
-package us.toadlet.flick;
+#ifndef TOADLET_RIBBIT_BASEAUDIODEVICE_H
+#define TOADLET_RIBBIT_BASEAUDIODEVICE_H
 
-public class NInputDeviceListener implements InputDeviceListener{
-	public NInputDeviceListener(int nativeHandle){
-		mNativeHandle=nativeHandle;
-	}
+#include <toadlet/ribbit/AudioDevice.h>
 
-	public native void inputDetected(InputData data);
+namespace toadlet{
+namespace ribbit{
 
-	private int mNativeHandle;
+class BaseAudioDevice:public Object,public AudioDevice{
+public:
+	TOADLET_OBJECT(BaseAudioDevice);
+
+	virtual ~BaseAudioDevice(){}
+
+	virtual bool create(int *options=NULL){return false;}
+	virtual void destroy(){}
+
+	virtual void activate(){}
+	virtual void deactivate(){}
+
+	virtual AudioBuffer *createAudioBuffer(){return NULL;}
+	virtual Audio *createAudio(){return NULL;}
+
+	virtual void setListenerTranslate(const Vector3 &translate){}
+	virtual void setListenerRotate(const Matrix3x3 &rotate){}
+	virtual void setListenerVelocity(const Vector3 &velocity){}
+	virtual void setListenerGain(scalar gain){}
+
+	virtual void update(int dt){}
+
+	virtual bool getAudioCaps(AudioCaps &caps){return false;}
+};
+
 }
+}
+
+#endif
+

@@ -393,7 +393,9 @@ void GLRenderDevice::destroy(){
 }
 
 RenderDevice::DeviceStatus GLRenderDevice::activate(){
+Logger::alert(String("ACTIVATE!!!"));
 	if(mGLPrimaryRenderTarget!=NULL){
+Logger::alert(String("ACTIVATE AzCTIVATESSS!!!"));
 		mGLPrimaryRenderTarget->activate();
 	}
 	return DeviceStatus_OK;

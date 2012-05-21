@@ -35,10 +35,8 @@ namespace peeper{
 
 class GLRenderDevice;
 
-class EGLPBufferRenderTarget:public BaseResource,public EGLRenderTarget,public PixelBufferRenderTarget{
+class EGLPBufferRenderTarget:public EGLRenderTarget,public PixelBufferRenderTarget{
 public:
-	TOADLET_RESOURCE(EGLPBufferRenderTarget,PixelBufferRenderTarget);
-
 	static bool available(GLRenderDevice *renderDevice);
 
 	EGLPBufferRenderTarget(GLRenderDevice *renderDevice);

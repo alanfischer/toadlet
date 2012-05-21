@@ -8,7 +8,9 @@ Logo::~Logo(){
 }
 
 void Logo::create(){
+Logger::alert("CREATE er");
 	engine=app->getEngine();
+Logger::alert("CREATE era");
 	engine->setDirectory("../../../data");
 
 	scene=Scene::ptr(new Scene(engine));
@@ -30,11 +32,13 @@ void Logo::create(){
 		mesh->setMesh("lt.tmsh");
 		lt->attach(mesh);
 
-		AnimationActionComponent::ptr animation=new AnimationActionComponent("animation");
-		animation->attach(new MeshAnimation(mesh,0));
-		animation->setCycling(AnimationActionComponent::Cycling_REFLECT);
-		animation->start();
-		lt->attach(animation);
+		if(mesh!=NULL){
+			AnimationActionComponent::ptr animation=new AnimationActionComponent("animation");
+			animation->attach(new MeshAnimation(mesh,0));
+			animation->setCycling(AnimationActionComponent::Cycling_REFLECT);
+			animation->start();
+			lt->attach(animation);
+		}
 	}
 	scene->getRoot()->attach(lt);
 

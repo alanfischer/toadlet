@@ -5,10 +5,12 @@
 namespace toadlet{
 namespace tadpole{
 
-%feature("director") ActionListener;
+#%feature("director") ActionListener;
 
 class ActionListener{
 public:
+	virtual ~ActionListener(){}
+
 	virtual void actionStarted(ActionComponent *component)=0;
 	virtual void actionStopped(ActionComponent *component)=0;
 };

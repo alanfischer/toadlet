@@ -38,7 +38,7 @@ namespace peeper{
 class GLRenderDevice;
 
 /// @todo: Make the D3D9PixelBufferRenderTarget & the GLFBORenderTarget more strict about sizes
-class TOADLET_API GLFBORenderTarget:public BaseResource,public GLRenderTarget,public PixelBufferRenderTarget{
+class TOADLET_API GLFBORenderTarget:public GLRenderTarget,public PixelBufferRenderTarget{
 public:
 	TOADLET_RESOURCE(GLFBORenderTarget,PixelBufferRenderTarget);
 

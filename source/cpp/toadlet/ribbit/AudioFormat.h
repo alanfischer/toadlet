@@ -41,9 +41,15 @@ public:
 		samplesPerSecond(sps)
 	{}
 
-	inline int getBitsPerSample(){return bitsPerSample;}
-	inline int getChannels(){return channels;}
-	inline int getSamplesPerSecond(){return samplesPerSecond;}
+	void setBitsPerSample(int bps){bitsPerSample=bps;}
+	int getBitsPerSample(){return bitsPerSample;}
+	
+	void setChannels(int chan){channels=chan;}
+	int getChannels(){return channels;}
+	
+	void setSamplesPerSecond(int sps){samplesPerSecond=sps;}
+	int getSamplesPerSecond(){return samplesPerSecond;}
+	
 	int getFrameSize() const{return channels*bitsPerSample/8;}
 
 	bool equals(AudioFormat *audioFormat) const{

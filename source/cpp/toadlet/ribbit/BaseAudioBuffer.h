@@ -23,19 +23,29 @@
  *
  ********** Copyright header - do not remove **********/
 
-package us.toadlet.peeper;
+#ifndef TOADLET_RIBBIT_BASEAUDIOBUFFER_H
+#define TOADLET_RIBBIT_BASEAUDIOBUFFER_H
 
-public class NGLES1RenderDevice extends NRenderDevice{
-	public NGLES1RenderDevice(){
-		makeRenderDevice();
-	}
+#include <toadlet/egg/BaseResource.h>
+#include <toadlet/ribbit/AudioBuffer.h>
 
-	public native boolean create(RenderTarget target,int[] options);
-	public native void destroy();
+namespace toadlet{
+namespace ribbit{
 
-	public native void swap();
-	public native void beginScene();
-	public native void endScene();	
-	
-	private native void makeRenderDevice();
+class BaseAudioBuffer:public BaseResource,public AudioBuffer{
+public:
+	TOADLET_RESOURCE(BaseAudioBuffer,AudioBuffer);
+
+	virtual ~BaseAudioBuffer(){}
+
+	virtual AudioBuffer *getRootAudioBuffer(){return this;}
+
+	virtual bool create(AudioStream *stream){return false;}
+	virtual void destroy(){}
+};
+
 }
+}
+
+#endif
+

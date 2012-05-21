@@ -27,7 +27,7 @@
 #define TOADLET_RIBBIT_JAUDIODEVICE_H
 
 #include <toadlet/ribbit/Audio.h>
-#include <toadlet/ribbit/AudioDevice.h>
+#include <toadlet/ribbit/BaseAudioDevice.h>
 #include <toadlet/ribbit/AudioBuffer.h>
 #include <toadlet/ribbit/AudioCaps.h>
 #include <jni.h>
@@ -35,7 +35,7 @@
 namespace toadlet{
 namespace ribbit{
 
-class TOADLET_API JAudioDevice:public Object,public AudioDevice{
+class TOADLET_API JAudioDevice:public BaseAudioDevice{
 public:
 	TOADLET_OBJECT(JAudioDevice);
 

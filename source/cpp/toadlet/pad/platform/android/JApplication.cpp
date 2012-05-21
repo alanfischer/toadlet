@@ -38,13 +38,6 @@ using namespace toadlet::pad;
 TOADLET_C_API AudioDevice* new_JAudioDevice(JNIEnv *env,jobject obj);
 TOADLET_C_API InputDevice* new_JInputDevice(JNIEnv *env,jobject obj);
 
-TOADLET_C_API void Java_us_toadlet_peeper_NGLES1RenderDevice(JNIEnv *env);
-TOADLET_C_API void Java_us_toadlet_peeper_NGLES2RenderDevice(JNIEnv *env);
-TOADLET_C_API void Java_us_toadlet_ribbit_NAudioStream(JNIEnv *env);
-TOADLET_C_API void Java_us_toadlet_flick_NInputDeviceListener(JNIEnv *env);
-TOADLET_C_API void Java_us_toadlet_tadpole_Engine(JNIEnv *env);
-TOADLET_C_API void Java_us_toadlet_pad_NApplet(JNIEnv *env);
-
 namespace toadlet{
 namespace pad{
 
@@ -59,18 +52,12 @@ JApplication::JApplication(JNIEnv *jenv,jobject jobj):
 	mAudioDevice(NULL),
 	mLastAudioDeviceObj(NULL)
 {
+Logger::alert("STARTING JAPPLICATION");
 	int i;
 	for(i=0;i<InputDevice::InputType_MAX;++i){
 		mInputDevices[i]=NULL;
 		mLastInputDeviceObjs[i]=NULL;
 	}
-
-	Java_us_toadlet_peeper_NGLES1RenderDevice(jenv);
-	Java_us_toadlet_peeper_NGLES2RenderDevice(jenv);
-	Java_us_toadlet_ribbit_NAudioStream(jenv);
-	Java_us_toadlet_flick_NInputDeviceListener(jenv);
-	Java_us_toadlet_tadpole_Engine(jenv);
-	Java_us_toadlet_pad_NApplet(jenv);
 
 	env=jenv;
 	obj=env->NewGlobalRef(jobj);
@@ -97,15 +84,16 @@ JApplication::JApplication(JNIEnv *jenv,jobject jobj):
 
 	jclass engineClass=env->FindClass("us/toadlet/tadpole/Engine");
 	{
-		Engine_nativeHandle=env->GetFieldID(engineClass,"mNativeHandle","I");
+		Engine_nativeHandle=env->GetFieldID(engineClass,"swigCPtr","J");
 	}
 	env->DeleteLocalRef(engineClass);
 	
-	jclass renderDeviceClass=env->FindClass("us/toadlet/peeper/NRenderDevice");
+	jclass renderDeviceClass=env->FindClass("us/toadlet/peeper/RenderDevice");
 	{
-		NGLRenderDevice_nativeHandle=env->GetFieldID(renderDeviceClass,"mNativeHandle","I");
+		RenderDevice_nativeHandle=env->GetFieldID(renderDeviceClass,"swigCPtr","J");
 	}
 	env->DeleteLocalRef(renderDeviceClass);
+Logger::alert("ENDING  JAPPLICATION");
 }
 
 JApplication::~JApplication(){
@@ -194,7 +182,7 @@ Engine *JApplication::getEngine() const{
 	jobject engineObj=env->CallObjectMethod(obj,getEngineID);
 
 	if(mEngine==NULL || mLastEngineObj!=engineObj){
-		mEngine=engineObj!=NULL?(Engine*)env->GetIntField(engineObj,Engine_nativeHandle):NULL;
+		mEngine=engineObj!=NULL?(Engine*)env->GetLongField(engineObj,Engine_nativeHandle):NULL;
 
 		if(mLastEngineObj!=NULL){
 			env->DeleteGlobalRef(mLastEngineObj);
@@ -212,7 +200,7 @@ RenderDevice *JApplication::getRenderDevice() const{
 
 	if(mRenderDevice==NULL || mLastRenderDeviceObj!=deviceObj){
 		//if(jobject is NRenderDevice){
-			mRenderDevice=deviceObj!=NULL?(RenderDevice*)env->GetIntField(deviceObj,NGLRenderDevice_nativeHandle):NULL;
+			mRenderDevice=deviceObj!=NULL?(RenderDevice*)env->GetLongField(deviceObj,RenderDevice_nativeHandle):NULL;
 		//}
 		//else{
 		//	mRenderDevice=new JRenderDevice(env,deviceObj);
