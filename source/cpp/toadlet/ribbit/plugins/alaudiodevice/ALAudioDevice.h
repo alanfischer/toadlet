@@ -28,7 +28,7 @@
 
 #include "ALIncludes.h"
 #include <toadlet/ribbit/Audio.h>
-#include <toadlet/ribbit/AudioDevice.h>
+#include <toadlet/ribbit/BaseAudioDevice.h>
 #include <toadlet/ribbit/AudioBuffer.h>
 #include <toadlet/ribbit/AudioStream.h>
 #include <toadlet/ribbit/AudioCaps.h>
@@ -47,7 +47,7 @@ typedef void (*proc_alBufferDataStatic)(ALuint buffer,ALenum format,ALvoid *data
 
 // You can not use both the ALAUdioDevice and the MMAudioDevice simultaniously.
 // Whichever one you create second will be the useable device.
-class TOADLET_API ALAudioDevice:public Object,public AudioDevice{
+class TOADLET_API ALAudioDevice:public BaseAudioDevice{
 public:
 	TOADLET_OBJECT(ALAudioDevice);
 

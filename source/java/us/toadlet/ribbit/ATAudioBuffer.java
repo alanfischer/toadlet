@@ -27,7 +27,7 @@ package us.toadlet.ribbit;
 import android.media.AudioFormat;
 import android.media.AudioTrack;
 
-public class ATAudioBuffer implements AudioBuffer{
+public class ATAudioBuffer extends BaseAudioBuffer{
 	public ATAudioBuffer(){
 		mAudioFormat=new us.toadlet.ribbit.AudioFormat(0,0,0);
 	}
@@ -41,21 +41,23 @@ public class ATAudioBuffer implements AudioBuffer{
 			return false;
 		}
 		us.toadlet.ribbit.AudioFormat format=stream.getAudioFormat();
-		mAudioFormat.set(format);
+		mAudioFormat.setBitsPerSample(format.getBitsPerSample());
+		mAudioFormat.setChannels(format.getChannels());
+		mAudioFormat.setSamplesPerSecond(format.getSamplesPerSecond());
 
 		try{
-			int available=stream.available();
+			int available=stream.length();
 			// Adjust available to by a multiple of MinBuffer
-			int sps=format.samplesPerSecond;
-			int chan=(format.channels==2?AudioFormat.CHANNEL_OUT_STEREO:AudioFormat.CHANNEL_OUT_MONO);
-			int bps=(format.bitsPerSample==8?AudioFormat.ENCODING_PCM_8BIT:AudioFormat.ENCODING_PCM_16BIT);
-			int min=AudioTrack.getMinBufferSize(format.samplesPerSecond,format.channels,format.bitsPerSample);
+			int sps=format.getSamplesPerSecond();
+			int chan=(format.getChannels()==2?AudioFormat.CHANNEL_OUT_STEREO:AudioFormat.CHANNEL_OUT_MONO);
+			int bps=(format.getBitsPerSample()==8?AudioFormat.ENCODING_PCM_8BIT:AudioFormat.ENCODING_PCM_16BIT);
+			int min=AudioTrack.getMinBufferSize(sps,chan,bps);
 			available=((int)(available/min)+1)*(min);
 
 			mData=new byte[available];
-			stream.read(mData,0,available);
+			stream.read(mData,available);
 		}
-		catch(java.io.IOException ex){
+		catch(Exception ex){
 			return false;
 		}
 		catch(OutOfMemoryError er){

@@ -27,16 +27,13 @@
 #define TOADLET_PEEPER_JGLWINDOWRENDERTARGET_H
 
 #include "../../GLRenderTarget.h"
-#include <toadlet/egg/BaseResource.h>
 #include <jni.h>
 
 namespace toadlet{
 namespace peeper{
 
-class TOADLET_API JGLWindowRenderTarget:public BaseResource,public GLRenderTarget{
+class TOADLET_API JGLWindowRenderTarget:public GLRenderTarget{
 public:
-	TOADLET_RESOURCE(JGLWindowRenderTarget,GLRenderTarget);
-
 	JGLWindowRenderTarget(JNIEnv *env,jobject obj);
 	virtual ~JGLWindowRenderTarget();
 	void destroy();

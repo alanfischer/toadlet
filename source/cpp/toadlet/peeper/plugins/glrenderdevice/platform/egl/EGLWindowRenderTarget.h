@@ -27,7 +27,6 @@
 #define TOADLET_PEEPER_EGLWINDOWRENDERTARGET_H
 
 #include "EGLRenderTarget.h"
-#include <toadlet/egg/BaseResource.h>
 #include <toadlet/peeper/WindowRenderTargetFormat.h>
 
 namespace toadlet{
@@ -35,10 +34,8 @@ namespace peeper{
 
 TOADLET_C_API RenderTarget *new_EGLWindowRenderTarget(void *display,void *window,WindowRenderTargetFormat *format);
 
-class TOADLET_API EGLWindowRenderTarget:public BaseResource,public EGLRenderTarget{
+class TOADLET_API EGLWindowRenderTarget:public EGLRenderTarget{
 public:
-	TOADLET_RESOURCE(EGLWindowRenderTarget,EGLRenderTarget);
-
 	EGLWindowRenderTarget();
 	EGLWindowRenderTarget(void *display,void *window,WindowRenderTargetFormat *format,bool pixmap=false);
 	virtual ~EGLWindowRenderTarget();

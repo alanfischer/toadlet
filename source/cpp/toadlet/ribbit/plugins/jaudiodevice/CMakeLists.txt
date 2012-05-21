@@ -3,7 +3,6 @@ set (RIBBIT_JAUDIODEVICE_SRC
 	JAudioBuffer.cpp
 	JAudio.cpp
 	JAudioDevice.cpp
-	us_toadlet_ribbit_NAudioStream.cpp
 )
 
 

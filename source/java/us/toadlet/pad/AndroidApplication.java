@@ -119,8 +119,6 @@ public abstract class AndroidApplication extends Activity implements Runnable{
 
 	public AndroidApplication(){
 		super();
-
-		mFormat.depthBits=16;
 	}
 
 	protected void onCreate(Bundle bundle){
@@ -314,7 +312,6 @@ public abstract class AndroidApplication extends Activity implements Runnable{
 				if(mNotifySizeChanged){
 					mNotifySizeChanged=false;
 					resized(mWidth,mHeight);
-
 					if(mActive && mRenderDevice!=null){
 						render();
 					}
@@ -496,11 +493,18 @@ public abstract class AndroidApplication extends Activity implements Runnable{
 		System.out.println(
 			"AndroidApplication.surfaceCreated");
 
+		mFormat=new WindowRenderTargetFormat();
+		mFormat.setDepthBits(16);
+
 		// Can not appear to get the current Surface format
-		mFormat.pixelFormat=TextureFormat.Format_RGB_5_6_5;
+		int Format_SEMANTIC_RGB=6;
+		int Format_SHIFT_TYPES=8;
+		int Format_TYPE_UINT_5_6_5=7<<Format_SHIFT_TYPES;
+		int Format_RGB_5_6_5=Format_SEMANTIC_RGB|Format_TYPE_UINT_5_6_5;
+		mFormat.setPixelFormat(Format_RGB_5_6_5);
 
 		// Start with gles2 and then try gles
-		for(mFormat.flags=2;mFormat.flags>=0 && mRenderDevice==null;mFormat.flags-=2){
+		for(mFormat.setFlags(2);mFormat.getFlags()>=0 && mRenderDevice==null;mFormat.setFlags(mFormat.getFlags()-2)){
 			RenderTarget target=null;
 			try{
 				target=new EGLWindowRenderTarget(null,holder,mFormat);
@@ -513,15 +517,15 @@ public abstract class AndroidApplication extends Activity implements Runnable{
 			RenderDevice device=null;
 			if(target!=null){
 				try{
-					if(mFormat.flags==2){
-						device=new NGLES2RenderDevice();
+					if(mFormat.getFlags()==2){
+						device=pad.new_GLES2RenderDevice();
 					}
 					else{
-						device=new NGLES1RenderDevice();
+						device=pad.new_GLES1RenderDevice();
 					}
 				}
 				catch(Exception ex){ex.printStackTrace();}
-				if(device!=null && device.create(target,null)==false){
+				if(device!=null && device.create(target)==false){
 					device.destroy();
 					target.destroy();
 					device=null;
@@ -579,7 +583,7 @@ public abstract class AndroidApplication extends Activity implements Runnable{
 	protected String mTitle;
 	protected boolean mDifferenceMouse;
 	protected int mLastMouseX,mLastMouseY;
-	protected WindowRenderTargetFormat mFormat=new WindowRenderTargetFormat();
+	protected WindowRenderTargetFormat mFormat;
 	protected RenderTarget mRenderTarget;
 	protected RenderDevice mRenderDevice;
 	protected AudioDevice mAudioDevice;

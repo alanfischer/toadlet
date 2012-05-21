@@ -11,6 +11,7 @@ set (FLICK_SRC
 
 # Header files for flick
 set (FLICK_HEADERS
+	BaseInputDevice.h
 	FilteredMotionDevice.h
 	InputData.h
 	InputDevice.h
@@ -25,6 +26,13 @@ set (FLICK_HEADERS
 # Give the headers and namespaces parent scope for inclusion into the master flick.h file
 set (FLICK_HEADERS ${FLICK_HEADERS} PARENT_SCOPE)
 set (FLICK_NAMESPACES ${FLICK_NAMESPACES} PARENT_SCOPE)
+
+
+# If we are using swig create the wrapper file from the interface files
+if (SWIG_FOUND AND FLICK_SWIG_INT)
+	swig_wrap_files (flick_wrap.cpp flick ${FLICK_SWIG_INT} "${FLICK_SWIG_INT_DEPS}" "${FLICK_SWIG_INT_OUTPUTS}")
+	set (FLICK_SRC ${FLICK_SRC} flick_wrap.cpp)
+endif (SWIG_FOUND AND FLICK_SWIG_INT)
 
 
 # Dynamic library

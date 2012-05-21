@@ -10,14 +10,20 @@ namespace peeper{
 
 class RenderTarget{
 public:
-	void destroy()=0;
+	virtual ~RenderTarget();
 
-	bool isValid()=0;
+	virtual void destroy()=0;
+
+	virtual bool isPrimary()=0;
+	virtual bool isValid()=0;
+	virtual int getWidth()=0;
+	virtual int getHeight()=0;
 };
 
 }
 }
-
+/*
 %inline %{
 extern "C" toadlet::peeper::RenderTarget *new_WGLWindowRenderTarget(int display,int window,int format);
 %}
+*/

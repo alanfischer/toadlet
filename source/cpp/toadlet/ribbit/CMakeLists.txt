@@ -18,6 +18,9 @@ set (RIBBIT_HEADERS
 	AudioFormatConversion.h
 	AudioDevice.h
 	AudioStream.h
+	BaseAudio.h
+	BaseAudioBuffer.h
+	BaseAudioDevice.h
 	Types.h
 	Version.h
 )
@@ -26,6 +29,13 @@ set (RIBBIT_HEADERS
 # Give the headers and namespaces parent scope for inclusion into the master ribbit.h file
 set (RIBBIT_HEADERS ${RIBBIT_HEADERS} PARENT_SCOPE)
 set (RIBBIT_NAMESPACES ${RIBBIT_NAMESPACES} PARENT_SCOPE)
+
+
+# If we are using swig create the wrapper file from the interface files
+if (SWIG_FOUND AND RIBBIT_SWIG_INT)
+	swig_wrap_files (ribbit_wrap.cpp ribbit ${RIBBIT_SWIG_INT} "${RIBBIT_SWIG_INT_DEPS}" "${RIBBIT_SWIG_INT_OUTPUTS}")
+	set (RIBBIT_SRC ${RIBBIT_SRC} ribbit_wrap.cpp)
+endif (SWIG_FOUND AND RIBBIT_SWIG_INT)
 
 
 # Dynamic library

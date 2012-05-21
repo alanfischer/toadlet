@@ -30,7 +30,7 @@ import static javax.microedition.khronos.opengles.GL11.*;
 import javax.microedition.khronos.egl.*;
 import static javax.microedition.khronos.egl.EGL11.*;
 
-public abstract class EGLRenderTarget implements GLRenderTarget{
+public abstract class EGLRenderTarget extends GLRenderTarget{
 	final static int EGL_BIND_TO_TEXTURE_RGB=0x3039;
 	final static int EGL_CONTEXT_CLIENT_VERSION=0x3098;
 
@@ -39,7 +39,7 @@ public abstract class EGLRenderTarget implements GLRenderTarget{
 	public int egl_version=0;
 
 	public EGLRenderTarget(){
-		super();
+		super(0,false);
 		egl=(EGL10)EGLContext.getEGL();
 		try{egl11=(EGL11)EGLContext.getEGL();}catch(Exception ex){}
 	}

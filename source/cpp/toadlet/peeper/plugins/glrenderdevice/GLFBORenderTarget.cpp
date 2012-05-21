@@ -44,7 +44,7 @@ bool GLFBORenderTarget::available(GLRenderDevice *renderDevice){
 	#endif
 }
 
-GLFBORenderTarget::GLFBORenderTarget(GLRenderDevice *renderDevice):BaseResource(),
+GLFBORenderTarget::GLFBORenderTarget(GLRenderDevice *renderDevice):
 	mDevice(NULL),
 	mWidth(0),
 	mHeight(0),

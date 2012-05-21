@@ -26,17 +26,14 @@
 #ifndef TOADLET_RIBBIT_JAUDIOBUFFER_H
 #define TOADLET_RIBBIT_JAUDIOBUFFER_H
 
-#include <toadlet/egg/BaseResource.h>
-#include <toadlet/ribbit/AudioBuffer.h>
+#include <toadlet/ribbit/BaseAudioBuffer.h>
 #include <jni.h>
 
 namespace toadlet{
 namespace ribbit{
 
-class TOADLET_API JAudioBuffer:public BaseResource,public AudioBuffer{
+class TOADLET_API JAudioBuffer:public BaseAudioBuffer{
 public:
-	TOADLET_RESOURCE(JAudioBuffer,AudioBuffer);
-
 	JAudioBuffer(JNIEnv *jenv,jobject jobj);
 	virtual ~JAudioBuffer();
 

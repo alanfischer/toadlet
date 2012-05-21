@@ -27,15 +27,14 @@
 #define TOADLET_RIBBIT_MMAUDIOBUFFER_H
 
 #include "MMAudioDevice.h"
-#include <toadlet/egg/BaseResource.h>
-#include <toadlet/ribbit/AudioBuffer.h>
+#include <toadlet/ribbit/BaseAudioBuffer.h>
 
 namespace toadlet{
 namespace ribbit{
 
-class TOADLET_API MMAudioBuffer:public BaseResource,public AudioBuffer{
+class TOADLET_API MMAudioBuffer:public BaseAudioBuffer{
 public:
-	TOADLET_RESOURCE(MMAudioBuffer,AudioBuffer);
+	TOADLET_RESOURCE(MMAudioBuffer,BaseAudioBuffer);
 
 	MMAudioBuffer(MMAudioDevice *device);
 	virtual ~MMAudioBuffer();

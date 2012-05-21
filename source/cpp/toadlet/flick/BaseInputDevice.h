@@ -23,28 +23,34 @@
  *
  ********** Copyright header - do not remove **********/
 
-package us.toadlet.tadpole;
+#ifndef TOADLET_FLICK_BASEINPUTDEVICE_H
+#define TOADLET_FLICK_BASEINPUTDEVICE_H
 
-import android.content.*;
-import us.toadlet.peeper.*;
-import us.toadlet.ribbit.*;
+#include <toadlet/flick/InputDevice.h>
 
-public class Engine{
-	public Engine(Context ctx){
-		makeEngine(ctx);
-	}
-	
-	public native void destroy();
+namespace toadlet{
+namespace flick{
 
-	public native void installHandlers();
+class BaseInputDevice:protected Object,public InputDevice{
+public:
+	TOADLET_OBJECT(BaseInputDevice);
 
-	public native void setRenderDevice(RenderDevice device);
-	
-	public native void setAudioDevice(AudioDevice device);
+	virtual ~BaseInputDevice(){}
 
-	public native Node createNode(Class type,Scene scene);
-	
-	private native void makeEngine(Context ctx);
+	bool create(){return true;}
+	void destroy(){}
 
-	protected int mNativeHandle;
+	InputType getType(){return (InputType)0;}
+	bool start(){return true;}
+	void update(int dt){}
+	void stop(){}
+
+	void setListener(InputDeviceListener *listener){}
+	void setSampleTime(int dt){}
+	void setAlpha(float alpha){}
+};
+
 }
+}
+
+#endif

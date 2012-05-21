@@ -256,7 +256,14 @@ set (EGG_HEADERS ${EGG_HEADERS} PARENT_SCOPE)
 set (EGG_NAMESPACES ${EGG_NAMESPACES} PARENT_SCOPE)
 
 
-#  Dynamic library
+# If we are using swig create the wrapper file from the interface files
+if (SWIG_FOUND AND TOADLET_EGG_INT)
+	swig_wrap_files (egg_wrap.cpp egg ${TOADLET_EGG_INT} "${TOADLET_EGG_INT_DEPS}")	
+	set (EGG_SRC ${EGG_SRC} egg_wrap.cpp)
+endif (SWIG_FOUND AND TOADLET_EGG_INT)
+
+
+# Dynamic library
 if (NOT TOADLET_PLATFORM_IOS)
 	add_library (toadlet_egg SHARED ${EGG_SRC} ${EGG_HEADERS})
 	set_target_properties (toadlet_egg PROPERTIES ${DYNAMIC_LIB_PROPS})

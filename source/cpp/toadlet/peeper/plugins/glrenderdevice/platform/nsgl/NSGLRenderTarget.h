@@ -28,7 +28,6 @@
 
 #include "../../GLIncludes.h"
 #include "../../GLRenderTarget.h"
-#include <toadlet/egg/BaseResource.h>
 #include <toadlet/egg/Error.h>
 #include <toadlet/peeper/WindowRenderTargetFormat.h>
 
@@ -37,10 +36,8 @@
 namespace toadlet{
 namespace peeper{
 
-class TOADLET_API NSGLRenderTarget:public BaseResource,public GLRenderTarget{
+class TOADLET_API NSGLRenderTarget:public GLRenderTarget{
 public:
-	TOADLET_RESOURCE(NSGLRenderTarget,GLRenderTarget);
-
 	NSGLRenderTarget();
 	NSGLRenderTarget(NSView *view,WindowRenderTargetFormat *format,NSOpenGLPixelFormat *pixelFormat=nil);
 	NSGLRenderTarget(NSOpenGLContext *context);

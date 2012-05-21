@@ -28,14 +28,14 @@
 
 #include "MMAudioDevice.h"
 #include "MMAudioBuffer.h"
-#include <toadlet/ribbit/Audio.h>
+#include <toadlet/ribbit/BaseAudio.h>
 
 namespace toadlet{
 namespace ribbit{
 
-class TOADLET_API MMAudio:public BaseResource,public Audio{
+class TOADLET_API MMAudio:public BaseAudio{
 public:
-	TOADLET_RESOURCE(MMAudio,Audio);
+	TOADLET_RESOURCE(MMAudio,BaseAudio);
 
 	MMAudio(MMAudioDevice *player);
 	virtual ~MMAudio();
