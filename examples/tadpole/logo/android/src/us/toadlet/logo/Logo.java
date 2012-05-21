@@ -9,7 +9,6 @@ public class Logo extends AndroidApplication{
 		System.loadLibrary("toadlet_hop");
 		System.loadLibrary("toadlet_flick");
 		System.loadLibrary("toadlet_flick_jinputdevice");
-		System.loadLibrary("toadlet_flick_androidsensordevice");
 		System.loadLibrary("toadlet_knot");
 		System.loadLibrary("toadlet_peeper");
 		System.loadLibrary("toadlet_peeper_gles1renderdevice");
@@ -39,6 +38,18 @@ public class Logo extends AndroidApplication{
 
         super.onDestroy();
     }
+	
+	protected void onStart(){
+		System.out.println("onStart");
+		
+		super.onStart();
+	}
+
+	protected void onStop(){
+		System.out.println("onStop");
+		
+		super.onStop();
+	}
 	
 	protected native Applet createApplet(AndroidApplication app);
 	protected native void destroyApplet(Applet applet);

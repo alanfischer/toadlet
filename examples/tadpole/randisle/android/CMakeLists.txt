@@ -12,7 +12,7 @@ find_package (toadlet REQUIRED)
 include_directories (${randisle_SOURCE_DIR} ${TOADLET_INCLUDE_DIR})
 
 # Libraries
-set (LIBS ${TOADLET_LIBRARIES_S} GLESv1_CM GLESv2 log)
+set (LIBS ${TOADLET_LIBRARIES} GLESv1_CM GLESv2 log)
 if (${ANDROID_NDK_API_LEVEL} GREATER 8)
 	set (LIBS ${LIBS} EGL android)
 endif (${ANDROID_NDK_API_LEVEL} GREATER 8)
@@ -38,6 +38,7 @@ set (H
 add_library (randisle SHARED ${SRC} ${H})
 target_link_libraries (randisle ${LIBS})
 install (TARGETS randisle DESTINATION ${randisle_SOURCE_DIR}/libs/${NDK_NAME_ARCH})
+install (FILES ${TOADLET_LIBRARIES} DESTINATION ${randisle_SOURCE_DIR}/libs/${NDK_NAME_ARCH})
 if (${ANDROID_NDK_API_LEVEL} LESS 9)
 	install (FILES ${JTOADLET_FLICK_JAR} ${JTOADLET_PEEPER_JAR} ${JTOADLET_RIBBIT_JAR} ${JTOADLET_TADPOLE_JAR} ${JTOADLET_PAD_JAR} DESTINATION ${randisle_SOURCE_DIR}/libs)
 endif (${ANDROID_NDK_API_LEVEL} LESS 9)

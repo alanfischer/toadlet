@@ -12,7 +12,7 @@
 
 class HUD;
 
-class RandIsle:protected Object,public Applet,public TerrainNodeDataSource,public UpdateListener,public TerrainNodeListener,public InputDeviceListener,public PathClimberListener{
+class RandIsle:public Object,public Applet,public TerrainNodeDataSource,public UpdateListener,public TerrainNodeListener,public InputDeviceListener,public PathClimberListener{
 public:
 	TOADLET_OBJECT(RandIsle);
 

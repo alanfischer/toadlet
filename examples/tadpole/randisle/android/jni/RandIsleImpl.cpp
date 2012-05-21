@@ -18,28 +18,16 @@ extern "C" JNIEXPORT jobject JNICALL Java_us_toadlet_randisle_RandIsle_createApp
 	Applet *applet=new RandIsle(app,"");
 
 	jobject appletObj=NULL;
-
-	Logger::alert("allocating NApplet");
-	jclass appletClass=env->FindClass("us/toadlet/pad/NApplet");
+	jclass appletClass=env->FindClass("us/toadlet/pad/Applet");
 	{
-		jmethodID initID=env->GetMethodID(appletClass,"<init>","(I)V");
-		appletObj=env->NewObject(appletClass,initID,applet);
+		jmethodID initID=env->GetMethodID(appletClass,"<init>","(JZ)V");
+		appletObj=env->NewObject(appletClass,initID,(jlong)applet,true);
 	}
 	env->DeleteLocalRef(appletClass);
-	Logger::alert("allocated NApplet");
 
 	return appletObj;
 }
 
 extern "C" JNIEXPORT void JNICALL Java_us_toadlet_randisle_RandIsle_destroyApplet(JNIEnv *env,jobject obj,jobject appletObj){
-	Applet *applet=NULL;
-	
-	jclass appletClass=env->FindClass("us/toadlet/pad/NApplet");
-	{
-		jfieldID nativeHandleID=env->GetFieldID(appletClass,"mNativeHandle","I");
-		applet=(Applet*)env->GetIntField(appletObj,nativeHandleID);
-	}
-
-	delete applet;
 }
 #endif
