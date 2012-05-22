@@ -36,8 +36,6 @@ class ALAudioDevice;
 
 class TOADLET_API ALAudio:public BaseAudio{
 public:
-	TOADLET_RESOURCE(ALAudio,BaseAudio);
-
 	ALAudio(ALAudioDevice *audioDevice);
 	virtual ~ALAudio();
 

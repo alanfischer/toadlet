@@ -42,9 +42,9 @@ class TOADLET_API Mesh:public BaseResource{
 public:
 	TOADLET_RESOURCE(Mesh,Mesh);
 
-	class TOADLET_API SubMesh{
+	class TOADLET_API SubMesh:public BaseResource{
 	public:
-		TOADLET_SPTR(SubMesh);
+		TOADLET_RESOURCE(SubMesh,SubMesh);
 
 		SubMesh():hasOwnTransform(false){}
 		virtual ~SubMesh(){}
@@ -54,8 +54,6 @@ public:
 		
 		Material::ptr material;
 		String materialName;
-
-		String name;
 
 		bool hasOwnTransform;
 		Transform transform;
@@ -86,25 +84,25 @@ public:
 	void compile();
 	void compileBoneBounds();
 
-	void setTransform(const Transform &transform){mTransform.set(transform);}
+	virtual void setTransform(const Transform &transform){mTransform.set(transform);}
 	const Transform &getTransform() const{return mTransform;}
 
-	void setBound(const Bound &bound){mBound.set(bound);}
+	virtual void setBound(const Bound &bound){mBound.set(bound);}
 	const Bound &getBound() const{return mBound;}
 
-	void addSubMesh(SubMesh::ptr subMesh){mSubMeshes.add(subMesh);}
-	void removeSubMesh(SubMesh::ptr subMesh){mSubMeshes.remove(subMesh);}
+	virtual void addSubMesh(SubMesh::ptr subMesh){mSubMeshes.add(subMesh);}
+	virtual void removeSubMesh(SubMesh::ptr subMesh){mSubMeshes.remove(subMesh);}
 	int getNumSubMeshes() const{return mSubMeshes.size();}
 	SubMesh::ptr getSubMesh(int i){return mSubMeshes[i];}
 	SubMesh::ptr getSubMesh(const String &name);
 
-	void setStaticVertexData(VertexData::ptr vertexData);
+	virtual void setStaticVertexData(VertexData::ptr vertexData);
 	VertexData::ptr getStaticVertexData(){return mStaticVertexData;}
 
-	void setSkeleton(Skeleton::ptr skeleton);
+	virtual void setSkeleton(Skeleton::ptr skeleton);
 	Skeleton::ptr getSkeleton() const{return mSkeleton;}
 
-	void setVertexBoneAssignments(const Collection<VertexBoneAssignmentList> &assignments){mVertexBoneAssignments=assignments;}
+	virtual void setVertexBoneAssignments(const Collection<VertexBoneAssignmentList> &assignments){mVertexBoneAssignments=assignments;}
 	const Collection<VertexBoneAssignmentList> &getVertexBoneAssignments() const{return mVertexBoneAssignments;}
 
 protected:

@@ -42,11 +42,12 @@ class TOADLET_API MeshNode:public CameraAlignedNode,public Visible,public Attach
 public:
 	TOADLET_NODE(MeshNode,CameraAlignedNode);
 
-	class TOADLET_API SubMesh:public Renderable{
+	class TOADLET_API SubMesh:public Object,public Renderable{
 	public:
-		TOADLET_SPTR(SubMesh);
+		TOADLET_OBJECT(SubMesh);
 
 		SubMesh(MeshNode *meshNode,Mesh::SubMesh *meshSubMesh);
+		virtual ~SubMesh(){}
 
 		Material *getRenderMaterial() const{return material;}
 		const Transform &getRenderTransform() const{return hasOwnTransform?worldTransform:meshNode->getWorldTransform();}

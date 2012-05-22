@@ -48,11 +48,11 @@ public:
 	virtual int getWidth() const{return 0;}
 	virtual int getHeight() const{return 0;}
 
-	virtual bool swap(){}
+	virtual bool swap(){return false;}
 	virtual void reset(){} // Mostly unused except for NSGLRenderTarget
-	virtual bool activate(){}
-	virtual bool deactivate(){}
-	virtual bool activateAdditionalContext(){}
+	virtual bool activate(){return false;}
+	virtual bool deactivate(){return false;}
+	virtual bool activateAdditionalContext(){return false;}
 	virtual void deactivateAdditionalContext(){}
 };
 

@@ -31,7 +31,7 @@
 namespace toadlet{
 namespace ribbit{
 
-MMAudioBuffer::MMAudioBuffer(MMAudioDevice *device):BaseResource(),
+MMAudioBuffer::MMAudioBuffer(MMAudioDevice *device):
 	mDevice(NULL),
 	mData(NULL),
 	mLength(0)

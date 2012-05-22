@@ -52,7 +52,9 @@ void Mesh::destroy(){
 	}
 	mSubMeshes.clear();
 
+	mStaticVertexData=NULL;
 	mSkeleton=NULL;
+	mVertexBoneAssignments.clear();
 
 	BaseResource::destroy();
 }

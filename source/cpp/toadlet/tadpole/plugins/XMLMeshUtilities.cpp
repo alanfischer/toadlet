@@ -618,7 +618,7 @@ Mesh::ptr XMLMeshUtilities::loadMesh(mxml_node_t *node,int version,BufferManager
 
 		prop=mxmlElementGetAttr(subMeshNode,"Name");
 		if(prop!=NULL){
-			subMesh->name=prop;
+			subMesh->setName(prop);
 		}
 
 		mxml_node_t *indexesNode=mxmlFindChild(subMeshNode,"Indexes");
@@ -819,8 +819,8 @@ mxml_node_t *XMLMeshUtilities::saveMesh(Mesh::ptr mesh,int version,ProgressListe
 
 		mxml_node_t *subMeshNode=mxmlNewElement(meshNode,"SubMesh");
 		{
-			if(subMesh->name!=(char*)NULL){
-				mxmlElementSetAttr(subMeshNode,"Name",subMesh->name);
+			if(subMesh->getName()!=(char*)NULL){
+				mxmlElementSetAttr(subMeshNode,"Name",subMesh->getName());
 			}
 
 			const IndexData::ptr &indexData=subMesh->indexData;
