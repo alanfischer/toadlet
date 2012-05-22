@@ -1,5 +1,5 @@
 %{
-#include <toadlet/tadpole/sg/LightEntity.h>
+#include <toadlet/tadpole/node/LightNode.h>
 %}
 
 namespace toadlet{
@@ -10,7 +10,7 @@ public:
 	Node *create(Scene *scene);
 	void destroy();
 
-	void setDirection(float *direction);
+	void setDirection(float direction[3]);
 };
 
 }

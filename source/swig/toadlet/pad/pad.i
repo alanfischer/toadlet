@@ -2,6 +2,8 @@
 
 %module(directors="1") pad
 
+
+// Peeper accessors
 namespace toadlet{
 namespace peeper{
 class RenderDevice;
@@ -11,6 +13,7 @@ class RenderDevice;
 }
 }
 using namespace toadlet::peeper;
+
 
 %include <toadlet/pad/Applet.i>
 

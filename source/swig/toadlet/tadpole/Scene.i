@@ -19,6 +19,8 @@ public:
 	toadlet::tadpole::Node *getRoot();
 
 	void update(int dt);
+
+	void setAmbientColor(float ambientColor[4]);
 };
 
 }

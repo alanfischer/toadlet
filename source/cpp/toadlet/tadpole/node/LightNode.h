@@ -48,6 +48,9 @@ public:
 	inline void setLightState(const LightState &state){mDirection.set(state.direction);mLightState.set(state);}
 	inline void getLightState(LightState &state){state.set(mLightState);}
 
+	inline void setDirection(const Vector3 &direction){mDirection.set(direction);mLightState.direction.set(direction);}
+	inline const Vector3 &getDirection(){return mDirection;}
+
 	virtual void frameUpdate(int dt,int scope);
 
 	virtual void gatherRenderables(CameraNode *camera,RenderableSet *set);

@@ -11,6 +11,8 @@ public:
 	void destroy();
 
 	void setMesh(char *name);
+	
+	RenderState *getSharedRenderState();
 };
 
 }
