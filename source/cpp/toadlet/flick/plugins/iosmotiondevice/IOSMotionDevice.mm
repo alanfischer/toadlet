@@ -53,7 +53,7 @@ TOADLET_C_API InputDevice *new_IOSMotionDevice(){
 	}
 #endif
 
-IOSMotionDevice::IOSMotionDevice():Object(),
+IOSMotionDevice::IOSMotionDevice():
 	mRunning(false),
 	mListener(NULL),
 	mAccelerometerDelegate(nil)
