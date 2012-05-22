@@ -48,6 +48,7 @@ if (NOT TOADLET_PLATFORM_PYTHON)
 	)
 	set (PEEPER_SWIG_INT_DEPS
 		${CMAKE_CURRENT_SOURCE_DIR}/toadlet/peeper/RenderDevice.i
+		${CMAKE_CURRENT_SOURCE_DIR}/toadlet/peeper/RenderState.i
 		${CMAKE_CURRENT_SOURCE_DIR}/toadlet/peeper/RenderTarget.i
 		${CMAKE_CURRENT_SOURCE_DIR}/toadlet/peeper/GLRenderTarget.i
 		${CMAKE_CURRENT_SOURCE_DIR}/toadlet/peeper/WindowRenderTargetFormat.i
@@ -55,10 +56,11 @@ if (NOT TOADLET_PLATFORM_PYTHON)
 	)
 	if (TOADLET_PLATFORM_ANDROID)
 		set (PEEPER_SWIG_INT_OUTPUTS
-			${PROJECT_BINARY_DIR}/source/java/us/toadlet/peeper/RenderDevice.i
-			${PROJECT_BINARY_DIR}/source/java/us/toadlet/peeper/RenderTarget.i
-			${PROJECT_BINARY_DIR}/source/java/us/toadlet/peeper/GLRenderTarget.i
-			${PROJECT_BINARY_DIR}/source/java/us/toadlet/peeper/WindowRenderTargetFormat.i
+			${PROJECT_BINARY_DIR}/source/java/us/toadlet/peeper/RenderDevice.java
+			${PROJECT_BINARY_DIR}/source/java/us/toadlet/peeper/RenderState.java
+			${PROJECT_BINARY_DIR}/source/java/us/toadlet/peeper/RenderTarget.java
+			${PROJECT_BINARY_DIR}/source/java/us/toadlet/peeper/GLRenderTarget.java
+			${PROJECT_BINARY_DIR}/source/java/us/toadlet/peeper/WindowRenderTargetFormat.java
 			${PROJECT_BINARY_DIR}/source/java/us/toadlet/peeper/peeper.java
 			${PROJECT_BINARY_DIR}/source/java/us/toadlet/peeper/peeperJNI.java
 		)
@@ -118,6 +120,7 @@ if (NOT TOADLET_PLATFORM_PYTHON)
 		${CMAKE_CURRENT_SOURCE_DIR}/toadlet/tadpole/Node.i
 		${CMAKE_CURRENT_SOURCE_DIR}/toadlet/tadpole/CameraNode.i
 		${CMAKE_CURRENT_SOURCE_DIR}/toadlet/tadpole/MeshNode.i
+		${CMAKE_CURRENT_SOURCE_DIR}/toadlet/tadpole/LightNode.i
 		${CMAKE_CURRENT_SOURCE_DIR}/toadlet/tadpole/animation/Animation.i
 		${CMAKE_CURRENT_SOURCE_DIR}/toadlet/tadpole/animation/BaseAnimation.i
 		${CMAKE_CURRENT_SOURCE_DIR}/toadlet/tadpole/animation/MeshAnimation.i
@@ -135,6 +138,7 @@ if (NOT TOADLET_PLATFORM_PYTHON)
 			${PROJECT_BINARY_DIR}/source/java/us/toadlet/tadpole/Node.java
 			${PROJECT_BINARY_DIR}/source/java/us/toadlet/tadpole/CameraNode.java
 			${PROJECT_BINARY_DIR}/source/java/us/toadlet/tadpole/MeshNode.java
+			${PROJECT_BINARY_DIR}/source/java/us/toadlet/tadpole/LightNode.java
 			${PROJECT_BINARY_DIR}/source/java/us/toadlet/tadpole/tadpole.java
 			${PROJECT_BINARY_DIR}/source/java/us/toadlet/tadpole/tadpoleJNI.java
 			PARENT_SCOPE

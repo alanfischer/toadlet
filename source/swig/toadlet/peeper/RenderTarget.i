@@ -22,8 +22,3 @@ public:
 
 }
 }
-/*
-%inline %{
-extern "C" toadlet::peeper::RenderTarget *new_WGLWindowRenderTarget(int display,int window,int format);
-%}
-*/

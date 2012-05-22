@@ -58,6 +58,7 @@ typedef float scalar;
 %include <toadlet/tadpole/Node.i>
 %include <toadlet/tadpole/CameraNode.i>
 %include <toadlet/tadpole/MeshNode.i>
+%include <toadlet/tadpole/LightNode.i>
 %include <toadlet/tadpole/animation/Animation.i>
 %include <toadlet/tadpole/animation/BaseAnimation.i>
 %include <toadlet/tadpole/animation/MeshAnimation.i>
