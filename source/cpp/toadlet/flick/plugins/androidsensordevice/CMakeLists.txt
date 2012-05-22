@@ -17,15 +17,19 @@ set (FLICK_ANDROIDSENSORDEVICE_HEADERS ${FLICK_ANDROIDSENSORDEVICE_HEADERS})
 
 
 # Dynamic library
-add_library (toadlet_flick_androidsensordevice SHARED ${FLICK_ANDROIDSENSORDEVICE_SRC} ${FLICK_ANDROIDSENSORDEVICE_HEADERS})
-set_target_properties (toadlet_flick_androidsensordevice PROPERTIES ${DYNAMIC_LIB_PROPS})
-target_link_libraries (toadlet_flick_androidsensordevice android toadlet_flick)
-install (TARGETS toadlet_flick_androidsensordevice DESTINATION ${LIB_INSTALL_DIR})
+if (TOADLET_BUILD_DYNAMIC)
+	add_library (toadlet_flick_androidsensordevice SHARED ${FLICK_ANDROIDSENSORDEVICE_SRC} ${FLICK_ANDROIDSENSORDEVICE_HEADERS})
+	set_target_properties (toadlet_flick_androidsensordevice PROPERTIES ${DYNAMIC_LIB_PROPS})
+	target_link_libraries (toadlet_flick_androidsensordevice android toadlet_flick)
+	install (TARGETS toadlet_flick_androidsensordevice DESTINATION ${LIB_INSTALL_DIR})
+endif (TOADLET_BUILD_DYNAMIC)
 
 
 # Static library
-add_library (toadlet_flick_androidsensordevice_s STATIC ${FLICK_ANDROIDSENSORDEVICE_SRC} ${FLICK_ANDROIDSENSORDEVICE_HEADERS})
-set_target_properties (toadlet_flick_androidsensordevice_s PROPERTIES ${STATIC_LIB_PROPS})
-target_link_libraries (toadlet_flick_androidsensordevice_s android toadlet_flick_s)
-install (TARGETS toadlet_flick_androidsensordevice_s DESTINATION ${LIB_INSTALL_DIR})
+if (TOADLET_BUILD_STATIC)
+	add_library (toadlet_flick_androidsensordevice_s STATIC ${FLICK_ANDROIDSENSORDEVICE_SRC} ${FLICK_ANDROIDSENSORDEVICE_HEADERS})
+	set_target_properties (toadlet_flick_androidsensordevice_s PROPERTIES ${STATIC_LIB_PROPS})
+	target_link_libraries (toadlet_flick_androidsensordevice_s android toadlet_flick_s)
+	install (TARGETS toadlet_flick_androidsensordevice_s DESTINATION ${LIB_INSTALL_DIR})
+endif (TOADLET_BUILD_STATIC)
 
