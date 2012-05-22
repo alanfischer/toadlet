@@ -36,24 +36,26 @@ endif (SWIG_FOUND AND FLICK_SWIG_INT)
 
 
 # Dynamic library
-if (NOT TOADLET_PLATFORM_IOS)
+if (TOADLET_BUILD_DYNAMIC)
 	add_library (toadlet_flick SHARED ${FLICK_SRC} ${FLICK_HEADERS})
 	set_target_properties (toadlet_flick PROPERTIES ${DYNAMIC_LIB_PROPS})
 	target_link_libraries (toadlet_flick toadlet_egg)
 	install (TARGETS toadlet_flick DESTINATION ${LIB_INSTALL_DIR})
-endif (NOT TOADLET_PLATFORM_IOS)
+endif (TOADLET_BUILD_DYNAMIC)
 
 
 # Static library
-add_library (toadlet_flick_s STATIC ${FLICK_SRC} ${FLICK_HEADERS})
-set_target_properties (toadlet_flick_s PROPERTIES ${STATIC_LIB_PROPS})
-target_link_libraries (toadlet_flick_s toadlet_egg_s)
-install (TARGETS toadlet_flick_s DESTINATION ${LIB_INSTALL_DIR})
+if (TOADLET_BUILD_STATIC)
+	add_library (toadlet_flick_s STATIC ${FLICK_SRC} ${FLICK_HEADERS})
+	set_target_properties (toadlet_flick_s PROPERTIES ${STATIC_LIB_PROPS})
+	target_link_libraries (toadlet_flick_s toadlet_egg_s)
+	install (TARGETS toadlet_flick_s DESTINATION ${LIB_INSTALL_DIR})
 
-# HACK: install the library on iOS. This will disappear once cmake issue:0012506 is resolved. 
-if (TOADLET_PLATFORM_IOS)
-    install (DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/\$ENV{CONFIGURATION}\$ENV{EFFECTIVE_PLATFORM_NAME}/ DESTINATION ${LIB_INSTALL_DIR} FILES_MATCHING PATTERN "*.a")
-endif (TOADLET_PLATFORM_IOS)
+	# HACK: install the library on iOS. This will disappear once cmake issue:0012506 is resolved. 
+	if (TOADLET_PLATFORM_IOS)
+	    install (DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/\$ENV{CONFIGURATION}\$ENV{EFFECTIVE_PLATFORM_NAME}/ DESTINATION ${LIB_INSTALL_DIR} FILES_MATCHING PATTERN "*.a")
+	endif (TOADLET_PLATFORM_IOS)
+endif (TOADLET_BUILD_STATIC)
 
 
 # Platform specific modules
@@ -64,11 +66,8 @@ if (TOADLET_PLATFORM_WIN32)
 		add_subdirectory (plugins/mfvideodevice)
 	endif (MEDIAFOUNDATION_FOUND)
 elseif (TOADLET_PLATFORM_ANDROID)
-	if (ANDROID_NDK_API_LEVEL LESS 9)
-		add_subdirectory (plugins/jinputdevice)
-	else (ANDROID_NDK_API_LEVEL LESS 9)
-		add_subdirectory (plugins/androidsensordevice)
-	endif (ANDROID_NDK_API_LEVEL LESS 9)
+	add_subdirectory (plugins/jinputdevice)
+	add_subdirectory (plugins/androidsensordevice)
 elseif (TOADLET_PLATFORM_IOS)
 	add_subdirectory (plugins/iosmotiondevice)
 endif (TOADLET_PLATFORM_WIN32)

@@ -48,15 +48,18 @@ include_directories (${D3D9_INCLUDE_PATH})
 
 
 # Dynamic library
-add_library (toadlet_peeper_d3d9renderdevice SHARED ${PEEPER_D3D9RENDERDEVICE_SRC} ${PEEPER_D3D9RENDERDEVICE_HEADERS})
-set_target_properties (toadlet_peeper_d3d9renderdevice PROPERTIES ${DYNAMIC_LIB_PROPS})
-target_link_libraries (toadlet_peeper_d3d9renderdevice toadlet_peeper ${PEEPER_D3D9RENDERDEVICE_LIBS})
-install (TARGETS toadlet_peeper_d3d9renderdevice DESTINATION ${LIB_INSTALL_DIR})
+if (TOADLET_BUILD_DYNAMIC)
+	add_library (toadlet_peeper_d3d9renderdevice SHARED ${PEEPER_D3D9RENDERDEVICE_SRC} ${PEEPER_D3D9RENDERDEVICE_HEADERS})
+	set_target_properties (toadlet_peeper_d3d9renderdevice PROPERTIES ${DYNAMIC_LIB_PROPS})
+	target_link_libraries (toadlet_peeper_d3d9renderdevice toadlet_peeper ${PEEPER_D3D9RENDERDEVICE_LIBS})
+	install (TARGETS toadlet_peeper_d3d9renderdevice DESTINATION ${LIB_INSTALL_DIR})
+endif (TOADLET_BUILD_DYNAMIC)
 
 
 # Static library
-add_library (toadlet_peeper_d3d9renderdevice_s STATIC ${PEEPER_D3D9RENDERDEVICE_SRC} ${PEEPER_D3D9RENDERDEVICE_HEADERS})
-set_target_properties (toadlet_peeper_d3d9renderdevice_s PROPERTIES ${STATIC_LIB_PROPS})
-target_link_libraries (toadlet_peeper_d3d9renderdevice_s toadlet_peeper_s ${PEEPER_D3D9RENDERDEVICE_LIBS})
-install (TARGETS toadlet_peeper_d3d9renderdevice_s DESTINATION ${LIB_INSTALL_DIR})
-
+if (TOADLET_BUILD_STATIC)
+	add_library (toadlet_peeper_d3d9renderdevice_s STATIC ${PEEPER_D3D9RENDERDEVICE_SRC} ${PEEPER_D3D9RENDERDEVICE_HEADERS})
+	set_target_properties (toadlet_peeper_d3d9renderdevice_s PROPERTIES ${STATIC_LIB_PROPS})
+	target_link_libraries (toadlet_peeper_d3d9renderdevice_s toadlet_peeper_s ${PEEPER_D3D9RENDERDEVICE_LIBS})
+	install (TARGETS toadlet_peeper_d3d9renderdevice_s DESTINATION ${LIB_INSTALL_DIR})
+endif (TOADLET_BUILD_STATIC)

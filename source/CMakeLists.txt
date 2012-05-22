@@ -1,12 +1,15 @@
 # These platforms require swig to generate bindings before compilation
-if (TOADLET_PLATFORM_ANDROID OR TOADLET_PLATFORM_IOS)
+# TODO: Once swig's gsoc 2012 project finishes, let iOS use swig as well
+#if (TOADLET_PLATFORM_ANDROID OR TOADLET_PLATFORM_IOS)
+if (TOADLET_PLATFORM_ANDROID)
 	# Find swig on our host and include our swig wrapper macro
 	find_host_package (SWIG REQUIRED)
 	include (SwigWrapFiles)
 
 	# Add the swig files
 	add_subdirectory (swig)
-endif (TOADLET_PLATFORM_ANDROID OR TOADLET_PLATFORM_IOS)
+#endif (TOADLET_PLATFORM_ANDROID OR TOADLET_PLATFORM_IOS)
+endif (TOADLET_PLATFORM_ANDROID)
 
 
 # Add the c++ source code
@@ -24,12 +27,12 @@ if (TOADLET_PLATFORM_PYTHON)
 endif (TOADLET_PLATFORM_PYTHON)
 
 
-# Older versions of android require shell java libraries
-if (TOADLET_PLATFORM_ANDROID AND ANDROID_NDK_API_LEVEL LESS 9)
+# Android requires java libraries
+if (TOADLET_PLATFORM_ANDROID)
 	if (NOT EXISTS ${ANDROID_JAR})
-		message (FATAL_ERROR "ANDROID_JAR not found. Toadlet with Android NDK API levels < 9 requires the ANDROID_SDK variable to be set to your install of the Android SDK" )
+		message (FATAL_ERROR "ANDROID_JAR not found")
 	endif (NOT EXISTS ${ANDROID_JAR})
 
 	add_subdirectory (java)
-endif (TOADLET_PLATFORM_ANDROID AND ANDROID_NDK_API_LEVEL LESS 9)
+endif (TOADLET_PLATFORM_ANDROID)
 

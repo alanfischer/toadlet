@@ -13,10 +13,18 @@ include (LocateStaticLibraries)
 include (MergeStaticLibraries)
 
 
+# By default we always build static and dynamic libraries
+option (TOADLET_BUILD_DYNAMIC "Build dynamic libraries" ON)
+option (TOADLET_BUILD_STATIC "Build static libraries" ON)
+
+
 # Setup all platform specific options
 if (TOADLET_PLATFORM_ANDROID)
 	# Android libraries install to an architecture specific subdirectory
 	set (LIB_INSTALL_DIR ${JAVA_LIB_INSTALL_DIR}/${NDK_NAME_ARCH})
+
+	# Android does not use static libraries
+	set (TOADLET_BUILD_STATIC OFF CACHE BOOL "Build static libraries" FORCE)
 
 	# Set defaults 
 	option (TOADLET_RTTI "Enable Run Time Type Information" OFF)
@@ -51,6 +59,8 @@ if (TOADLET_PLATFORM_ANDROID)
 	endif (STATIC_LIB_FLAGS)
 elseif (TOADLET_PLATFORM_IOS)
 	# iOS does not permit dynamic libraries
+	set (TOADLET_BUILD_DYNAMIC OFF CACHE BOOL "Build dynamic libraries" FORCE)
+
 	if (STATIC_LIB_FLAGS)
 		set (STATIC_LIB_PROPS ${STATIC_LIB_PROPS} COMPILE_FLAGS ${STATIC_LIB_FLAGS})
 	endif (STATIC_LIB_FLAGS)
