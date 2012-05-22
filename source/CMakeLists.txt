@@ -1,12 +1,15 @@
 # These platforms require swig to generate bindings before compilation
-if (TOADLET_PLATFORM_ANDROID OR TOADLET_PLATFORM_IOS)
+# TODO: Once swig's gsoc 2012 project finishes, let iOS use swig as well
+#if (TOADLET_PLATFORM_ANDROID OR TOADLET_PLATFORM_IOS)
+if (TOADLET_PLATFORM_ANDROID)
 	# Find swig on our host and include our swig wrapper macro
 	find_host_package (SWIG REQUIRED)
 	include (SwigWrapFiles)
 
 	# Add the swig files
 	add_subdirectory (swig)
-endif (TOADLET_PLATFORM_ANDROID OR TOADLET_PLATFORM_IOS)
+#endif (TOADLET_PLATFORM_ANDROID OR TOADLET_PLATFORM_IOS)
+endif (TOADLET_PLATFORM_ANDROID)
 
 
 # Add the c++ source code
