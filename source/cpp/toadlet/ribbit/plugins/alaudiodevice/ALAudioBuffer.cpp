@@ -32,7 +32,7 @@
 namespace toadlet{
 namespace ribbit{
 
-ALAudioBuffer::ALAudioBuffer(ALAudioDevice *device):BaseResource(),
+ALAudioBuffer::ALAudioBuffer(ALAudioDevice *device):
 	mDevice(NULL),
 	mHandle(0),
 	mStaticData(NULL),

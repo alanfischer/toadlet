@@ -32,9 +32,9 @@
 namespace toadlet{
 namespace peeper{
 
-class TOADLET_API VertexData{
+class TOADLET_API VertexData:public Object{
 public:
-	TOADLET_SPTR(VertexData);
+	TOADLET_OBJECT(VertexData);
 
 	VertexData(VertexFormat::ptr vertexFormat);
 	VertexData(VertexBuffer::ptr vertexBuffer);

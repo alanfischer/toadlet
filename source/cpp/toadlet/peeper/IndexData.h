@@ -31,9 +31,9 @@
 namespace toadlet{
 namespace peeper{
 
-class TOADLET_API IndexData{
+class TOADLET_API IndexData:public Object{
 public:
-	TOADLET_SPTR(IndexData);
+	TOADLET_OBJECT(IndexData);
 
 	enum Primitive{
 		Primitive_POINTS=0,

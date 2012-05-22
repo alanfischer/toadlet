@@ -27,7 +27,6 @@
 #define TOADLET_PEEPER_WGLWINDOWRENDERTARGET_H
 
 #include "WGLRenderTarget.h"
-#include <toadlet/egg/BaseResource.h>
 #include <toadlet/peeper/WindowRenderTargetFormat.h>
 
 namespace toadlet{

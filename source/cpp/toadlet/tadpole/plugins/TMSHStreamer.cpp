@@ -181,7 +181,7 @@ Mesh::ptr TMSHStreamer::readMesh(DataStream *stream,int blockSize){
 
 		subMesh->materialName=stream->readNullTerminatedString();
 		
-		subMesh->name=stream->readNullTerminatedString();
+		subMesh->setName(stream->readNullTerminatedString());
 
 		subMesh->hasOwnTransform=stream->readBool();
 		stream->read((tbyte*)&subMesh->transform,sizeof(Transform));
@@ -300,7 +300,7 @@ void TMSHStreamer::writeMesh(DataStream *stream,Mesh::ptr mesh){
 
 		stream->writeNullTerminatedString(subMesh->materialName);
 
-		stream->writeNullTerminatedString(subMesh->name);
+		stream->writeNullTerminatedString(subMesh->getName());
 
 		stream->writeBool(subMesh->hasOwnTransform);
 		stream->write((tbyte*)&subMesh->transform,sizeof(Transform));

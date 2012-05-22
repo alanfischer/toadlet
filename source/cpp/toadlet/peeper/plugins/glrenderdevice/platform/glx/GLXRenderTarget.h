@@ -28,7 +28,6 @@
 
 #include "../../GLIncludes.h"
 #include "../../GLRenderTarget.h"
-#include <toadlet/egg/Error.h>
 #include <X11/Xlib.h>
 
 namespace toadlet{

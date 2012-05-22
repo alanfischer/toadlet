@@ -37,6 +37,8 @@ class GLRenderDevice;
 
 class GLXPBufferRenderTarget:public GLXRenderTarget,public PixelBufferRenderTarget{
 public:
+	TOADLET_RESOURCE(GLXPBufferRenderTarget,PixelBufferRenderTarget);
+
 	static bool available(GLRenderDevice *renderDevice);
 
 	GLXPBufferRenderTarget(GLRenderDevice *renderDevice);

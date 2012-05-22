@@ -35,8 +35,6 @@ namespace ribbit{
 
 class TOADLET_API MMAudio:public BaseAudio{
 public:
-	TOADLET_RESOURCE(MMAudio,BaseAudio);
-
 	MMAudio(MMAudioDevice *player);
 	virtual ~MMAudio();
 

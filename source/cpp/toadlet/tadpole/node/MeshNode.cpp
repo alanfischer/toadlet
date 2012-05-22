@@ -146,7 +146,7 @@ void MeshNode::setMesh(Mesh *mesh){
 	mSubMeshes.resize(mMesh->getNumSubMeshes());
 	int i;
 	for(i=0;i<mSubMeshes.size();++i){
-		SubMesh::ptr subMesh(new SubMesh(this,mMesh->getSubMesh(i)));
+		SubMesh::ptr subMesh=new SubMesh(this,mMesh->getSubMesh(i));
 		mSubMeshes[i]=subMesh;
 		if(subMesh->vertexData==NULL){
 			if(mDynamicVertexData!=NULL){
@@ -172,7 +172,7 @@ MeshNode::SubMesh *MeshNode::getSubMesh(const String &name){
 
 	int i;
 	for(i=0;i<mSubMeshes.size();++i){
-		if(mSubMeshes[i]->meshSubMesh->name.equals(name)){
+		if(mSubMeshes[i]->meshSubMesh->getName().equals(name)){
 			return mSubMeshes[i];
 		}
 	}
