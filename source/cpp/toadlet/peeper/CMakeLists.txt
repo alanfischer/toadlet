@@ -82,42 +82,41 @@ endif (SWIG_FOUND AND PEEPER_SWIG_INT)
 
 
 # Dynamic library
-if (NOT TOADLET_PLATFORM_IOS)
+if (TOADLET_BUILD_DYNAMIC)
 	add_library (toadlet_peeper SHARED ${PEEPER_SRC} ${PEEPER_HEADERS})
 	set_target_properties (toadlet_peeper PROPERTIES ${DYNAMIC_LIB_PROPS})
 	target_link_libraries (toadlet_peeper toadlet_egg)
 	install (TARGETS toadlet_peeper DESTINATION ${LIB_INSTALL_DIR})
-endif (NOT TOADLET_PLATFORM_IOS)
+endif (TOADLET_BUILD_DYNAMIC)
 
 
 # Static library
-add_library (toadlet_peeper_s STATIC ${PEEPER_SRC} ${PEEPER_HEADERS})
-set_target_properties (toadlet_peeper_s PROPERTIES ${STATIC_LIB_PROPS})
-target_link_libraries (toadlet_peeper_s toadlet_egg_s)
-install (TARGETS toadlet_peeper_s DESTINATION ${LIB_INSTALL_DIR})
+if (TOADLET_BUILD_STATIC)
+	add_library (toadlet_peeper_s STATIC ${PEEPER_SRC} ${PEEPER_HEADERS})
+	set_target_properties (toadlet_peeper_s PROPERTIES ${STATIC_LIB_PROPS})
+	target_link_libraries (toadlet_peeper_s toadlet_egg_s)
+	install (TARGETS toadlet_peeper_s DESTINATION ${LIB_INSTALL_DIR})
 
-# HACK: install the library on iOS. This will disappear once cmake issue:0012506 is resolved. 
-if (TOADLET_PLATFORM_IOS)
-    install (DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/\$ENV{CONFIGURATION}\$ENV{EFFECTIVE_PLATFORM_NAME}/ DESTINATION ${LIB_INSTALL_DIR} FILES_MATCHING PATTERN "*.a")
-endif (TOADLET_PLATFORM_IOS)
+	# HACK: install the library on iOS. This will disappear once cmake issue:0012506 is resolved. 
+	if (TOADLET_PLATFORM_IOS)
+	    install (DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/\$ENV{CONFIGURATION}\$ENV{EFFECTIVE_PLATFORM_NAME}/ DESTINATION ${LIB_INSTALL_DIR} FILES_MATCHING PATTERN "*.a")
+	endif (TOADLET_PLATFORM_IOS)
+endif (TOADLET_BUILD_STATIC)
 
 
 # Platform specific modules
 if (TOADLET_PLATFORM_ANDROID)
-	find_library (EGL EGL)
 	find_library (GLESV1 GLESv1_CM)
+	find_library (EGL EGL)
 	find_library (GLESV2 GLESv2)
-	if (ANDROID_NDK_API_LEVEL LESS 9)
-		if (GLESV1)
-			set (GLESV1_LIBS ${GLESV1})
-			set (GLESV2_LIBS ${GLESV2})
-		endif (GLESV1)
-	else (ANDROID_NDK_API_LEVEL LESS 9)
-		if (GLESV1 AND EGL)
-			set (GLESV1_LIBS ${GLESV1} ${EGL})
-			set (GLESV2_LIBS ${GLESV2} ${EGL})
-		endif (GLESV1 AND EGL)
-	endif (ANDROID_NDK_API_LEVEL LESS 9)
+	if (GLESV1)
+		set (GLESV1_LIBS ${GLESV1})
+		set (GLESV2_LIBS ${GLESV2})
+	endif (GLESV1)
+	if (EGL)
+		set (GLESV1_LIBS ${GLESV1_LIBS} ${EGL})
+		set (GLESV2_LIBS ${GLESV2_LIBS} ${EGL})
+	endif (EGL)
 	if (GLESV1_LIBS)
 		set (TOADLET_HAS_OPENGL ON PARENT_SCOPE)
 		add_subdirectory (plugins/gles1renderdevice)

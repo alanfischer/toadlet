@@ -51,24 +51,27 @@ endif (TOADLET_PLATFORM_ANDROID)
 
 
 # Dynamic library
-if (NOT TOADLET_PLATFORM_IOS)
+if (TOADLET_BUILD_DYNAMIC)
 	add_library (toadlet_peeper_gles2renderdevice SHARED ${PEEPER_GLRENDERDEVICE_SRC} ${PEEPER_GLRENDERDEVICE_HEADERS})
 	set_target_properties (toadlet_peeper_gles2renderdevice PROPERTIES ${DYNAMIC_LIB_PROPS})
 	set_property (TARGET toadlet_peeper_gles2renderdevice APPEND PROPERTY COMPILE_DEFINITIONS ${PEEPER_GLRENDERDEVICE_DEFS})
 	target_link_libraries (toadlet_peeper_gles2renderdevice toadlet_peeper ${PEEPER_GLRENDERDEVICE_LIBS})
 	install (TARGETS toadlet_peeper_gles2renderdevice DESTINATION ${LIB_INSTALL_DIR})
-endif (NOT TOADLET_PLATFORM_IOS)
+endif (TOADLET_BUILD_DYNAMIC)
 
 
 # Static library
-add_library (toadlet_peeper_gles2renderdevice_s STATIC ${PEEPER_GLRENDERDEVICE_SRC} ${PEEPER_GLRENDERDEVICE_HEADERS})
-set_target_properties (toadlet_peeper_gles2renderdevice_s PROPERTIES ${STATIC_LIB_PROPS})
-set_property (TARGET toadlet_peeper_gles2renderdevice_s APPEND PROPERTY COMPILE_DEFINITIONS ${PEEPER_GLRENDERDEVICE_DEFS})
-target_link_libraries (toadlet_peeper_gles2renderdevice_s toadlet_peeper_s ${PEEPER_GLRENDERDEVICE_LIBS})
-MERGE_STATIC_LIBRARIES (toadlet_peeper_gles2renderdevice_s "${PEEPER_GLRENDERDEVICE_LIBS_S}")
-install (TARGETS toadlet_peeper_gles2renderdevice_s DESTINATION ${LIB_INSTALL_DIR})
+if (TOADLET_BUILD_STATIC)
+	add_library (toadlet_peeper_gles2renderdevice_s STATIC ${PEEPER_GLRENDERDEVICE_SRC} ${PEEPER_GLRENDERDEVICE_HEADERS})
+	set_target_properties (toadlet_peeper_gles2renderdevice_s PROPERTIES ${STATIC_LIB_PROPS})
+	set_property (TARGET toadlet_peeper_gles2renderdevice_s APPEND PROPERTY COMPILE_DEFINITIONS ${PEEPER_GLRENDERDEVICE_DEFS})
+	target_link_libraries (toadlet_peeper_gles2renderdevice_s toadlet_peeper_s ${PEEPER_GLRENDERDEVICE_LIBS})
+	MERGE_STATIC_LIBRARIES (toadlet_peeper_gles2renderdevice_s "${PEEPER_GLRENDERDEVICE_LIBS_S}")
+	install (TARGETS toadlet_peeper_gles2renderdevice_s DESTINATION ${LIB_INSTALL_DIR})
 
-# HACK: install the library on iOS. This will disappear once cmake issue:0012506 is resolved. 
-if (TOADLET_PLATFORM_IOS)
-    install (DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/\$ENV{CONFIGURATION}\$ENV{EFFECTIVE_PLATFORM_NAME}/ DESTINATION ${LIB_INSTALL_DIR} FILES_MATCHING PATTERN "*.a")
-endif (TOADLET_PLATFORM_IOS)
+	# HACK: install the library on iOS. This will disappear once cmake issue:0012506 is resolved. 
+	if (TOADLET_PLATFORM_IOS)
+	    install (DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/\$ENV{CONFIGURATION}\$ENV{EFFECTIVE_PLATFORM_NAME}/ DESTINATION ${LIB_INSTALL_DIR} FILES_MATCHING PATTERN "*.a")
+	endif (TOADLET_PLATFORM_IOS)
+endif (TOADLET_BUILD_STATIC)
+

@@ -39,33 +39,33 @@ endif (SWIG_FOUND AND RIBBIT_SWIG_INT)
 
 
 # Dynamic library
-if (NOT TOADLET_PLATFORM_IOS)
+if (TOADLET_BUILD_DYNAMIC)
 	add_library (toadlet_ribbit SHARED ${RIBBIT_SRC} ${RIBBIT_HEADERS})
 	set_target_properties (toadlet_ribbit PROPERTIES ${DYNAMIC_LIB_PROPS})
 	set_property (TARGET toadlet_ribbit APPEND PROPERTY COMPILE_DEFINITIONS ${RIBBIT_DEFS})
 	target_link_libraries (toadlet_ribbit toadlet_egg)
 	install (TARGETS toadlet_ribbit DESTINATION ${LIB_INSTALL_DIR})
-endif (NOT TOADLET_PLATFORM_IOS)
+endif (TOADLET_BUILD_DYNAMIC)
 
 
 # Static library
-add_library (toadlet_ribbit_s STATIC ${RIBBIT_SRC} ${RIBBIT_HEADERS})
-set_target_properties (toadlet_ribbit_s PROPERTIES ${STATIC_LIB_PROPS})
-set_property (TARGET toadlet_ribbit_s APPEND PROPERTY COMPILE_DEFINITIONS ${RIBBIT_DEFS_S})
-target_link_libraries (toadlet_ribbit_s toadlet_egg_s)
-install (TARGETS toadlet_ribbit_s DESTINATION ${LIB_INSTALL_DIR})
+if (TOADLET_BUILD_STATIC)
+	add_library (toadlet_ribbit_s STATIC ${RIBBIT_SRC} ${RIBBIT_HEADERS})
+	set_target_properties (toadlet_ribbit_s PROPERTIES ${STATIC_LIB_PROPS})
+	set_property (TARGET toadlet_ribbit_s APPEND PROPERTY COMPILE_DEFINITIONS ${RIBBIT_DEFS_S})
+	target_link_libraries (toadlet_ribbit_s toadlet_egg_s)
+	install (TARGETS toadlet_ribbit_s DESTINATION ${LIB_INSTALL_DIR})
 
-# HACK: install the library on iOS. This will disappear once cmake issue:0012506 is resolved. 
-if (TOADLET_PLATFORM_IOS)
-    install (DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/\$ENV{CONFIGURATION}\$ENV{EFFECTIVE_PLATFORM_NAME}/ DESTINATION ${LIB_INSTALL_DIR} FILES_MATCHING PATTERN "*.a")
-endif (TOADLET_PLATFORM_IOS)
+	# HACK: install the library on iOS. This will disappear once cmake issue:0012506 is resolved. 
+	if (TOADLET_PLATFORM_IOS)
+	    install (DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/\$ENV{CONFIGURATION}\$ENV{EFFECTIVE_PLATFORM_NAME}/ DESTINATION ${LIB_INSTALL_DIR} FILES_MATCHING PATTERN "*.a")
+	endif (TOADLET_PLATFORM_IOS)
+endif (TOADLET_BUILD_STATIC)
 
 
 # Platform specific modules
 if (TOADLET_PLATFORM_ANDROID)
-	if (ANDROID_NDK_API_LEVEL LESS 9)
-		add_subdirectory (plugins/jaudiodevice)
-	endif (ANDROID_NDK_API_LEVEL LESS 9)
+	add_subdirectory (plugins/jaudiodevice)
 elseif (TOADLET_PLATFORM_WINCE)
 	add_subdirectory (plugins/mmaudiodevice)
 elseif (TOADLET_PLATFORM_IOS)
