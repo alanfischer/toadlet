@@ -654,9 +654,7 @@ if (TOADLET_PLATFORM_ANDROID)
 	source_group ("Source Files\\\\platform\\\\android" FILES ${TADPOLE_PLATFORM_ANDROID_SRC})
 	source_group ("Header Files\\\\platform\\\\android" FILES ${TADPOLE_PLATFORM_ANDROID_HEADERS})
 	set (TADPOLE_SRC ${TADPOLE_SRC} ${TADPOLE_PLATFORM_ANDROID_SRC})
-	if (ANDROID_NDK_API_LEVEL LESS 9)
-		set (TADPOLE_LIBS ${TADPOLE_LIBS} toadlet_ribbit_jaudiodevice)
-	endif (ANDROID_NDK_API_LEVEL LESS 9)
+	set (TADPOLE_LIBS ${TADPOLE_LIBS} toadlet_ribbit_jaudiodevice)
 elseif (TOADLET_PLATFORM_OSX)
 	source_group ("Source Files\\\\platform\\\\osx" FILES ${TADPOLE_PLATFORM_OSX_SRC})
 	source_group ("Header Files\\\\platform\\\\osx" FILES ${TADPOLE_PLATFORM_OSX_HEADERS})
@@ -698,25 +696,27 @@ endif (SWIG_FOUND AND TADPOLE_SWIG_INT)
 
 
 # Dynamic library
-if (NOT TOADLET_PLATFORM_IOS)
+if (TOADLET_BUILD_DYNAMIC)
 	add_library (toadlet_tadpole SHARED ${TADPOLE_SRC} ${TADPOLE_HEADERS})
 	set_target_properties (toadlet_tadpole PROPERTIES ${DYNAMIC_LIB_PROPS})
 	target_link_libraries (toadlet_tadpole toadlet_egg toadlet_peeper toadlet_ribbit ${TADPOLE_LIBS} ${TADPOLE_PLUGINS_LIBS})
 	install (TARGETS toadlet_tadpole DESTINATION ${LIB_INSTALL_DIR})
-endif (NOT TOADLET_PLATFORM_IOS)
+endif (TOADLET_BUILD_DYNAMIC)
 
 
 # Static library
-add_library (toadlet_tadpole_s STATIC ${TADPOLE_SRC_S} ${TADPOLE_HEADERS_S})
-set_target_properties (toadlet_tadpole_s PROPERTIES ${STATIC_LIB_PROPS})
-target_link_libraries (toadlet_tadpole_s toadlet_egg_s toadlet_peeper_s toadlet_ribbit_s ${TADPOLE_LIBS})
-MERGE_STATIC_LIBRARIES (toadlet_tadpole_s "${TADPOLE_PLUGINS_LIBS_S}")
-install (TARGETS toadlet_tadpole_s DESTINATION ${LIB_INSTALL_DIR})
+if (TOADLET_BUILD_STATIC)
+	add_library (toadlet_tadpole_s STATIC ${TADPOLE_SRC_S} ${TADPOLE_HEADERS_S})
+	set_target_properties (toadlet_tadpole_s PROPERTIES ${STATIC_LIB_PROPS})
+	target_link_libraries (toadlet_tadpole_s toadlet_egg_s toadlet_peeper_s toadlet_ribbit_s ${TADPOLE_LIBS})
+	MERGE_STATIC_LIBRARIES (toadlet_tadpole_s "${TADPOLE_PLUGINS_LIBS_S}")
+	install (TARGETS toadlet_tadpole_s DESTINATION ${LIB_INSTALL_DIR})
 
-# HACK: install the library on iOS. This will disappear once cmake issue:0012506 is resolved. 
-if (TOADLET_PLATFORM_IOS)
-    install (DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/\$ENV{CONFIGURATION}\$ENV{EFFECTIVE_PLATFORM_NAME}/ DESTINATION ${LIB_INSTALL_DIR} FILES_MATCHING PATTERN "*.a")
-endif (TOADLET_PLATFORM_IOS)
+	# HACK: install the library on iOS. This will disappear once cmake issue:0012506 is resolved. 
+	if (TOADLET_PLATFORM_IOS)
+	    install (DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/\$ENV{CONFIGURATION}\$ENV{EFFECTIVE_PLATFORM_NAME}/ DESTINATION ${LIB_INSTALL_DIR} FILES_MATCHING PATTERN "*.a")
+	endif (TOADLET_PLATFORM_IOS)
+endif (TOADLET_BUILD_STATIC)
 
 
 # Add plugins

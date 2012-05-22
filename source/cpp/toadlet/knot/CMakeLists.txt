@@ -51,22 +51,24 @@ endif (SWIG_FOUND AND TOADLET_KNOT_INT)
 
 
 # Dynamic library
-if (NOT TOADLET_PLATFORM_IOS)
+if (TOADLET_BUILD_DYNAMIC)
 	add_library (toadlet_knot SHARED ${KNOT_SRC} ${KNOT_HEADERS})
 	set_target_properties (toadlet_knot PROPERTIES ${DYNAMIC_LIB_PROPS})
 	target_link_libraries (toadlet_knot toadlet_egg)
 	install (TARGETS toadlet_knot DESTINATION ${LIB_INSTALL_DIR})
-endif (NOT TOADLET_PLATFORM_IOS)
+endif (TOADLET_BUILD_DYNAMIC)
 
 
 # Static library
-add_library (toadlet_knot_s STATIC ${KNOT_SRC} ${KNOT_HEADERS})
-set_target_properties (toadlet_knot_s PROPERTIES ${STATIC_LIB_PROPS})
-target_link_libraries (toadlet_knot_s toadlet_egg_s)
-install (TARGETS toadlet_knot_s DESTINATION ${LIB_INSTALL_DIR})
+if (TOADLET_BUILD_STATIC)
+	add_library (toadlet_knot_s STATIC ${KNOT_SRC} ${KNOT_HEADERS})
+	set_target_properties (toadlet_knot_s PROPERTIES ${STATIC_LIB_PROPS})
+	target_link_libraries (toadlet_knot_s toadlet_egg_s)
+	install (TARGETS toadlet_knot_s DESTINATION ${LIB_INSTALL_DIR})
 
-# HACK: install the library on iOS. This will disappear once cmake issue:0012506 is resolved. 
-if (TOADLET_PLATFORM_IOS)
-    install (DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/\$ENV{CONFIGURATION}\$ENV{EFFECTIVE_PLATFORM_NAME}/ DESTINATION ${LIB_INSTALL_DIR} FILES_MATCHING PATTERN "*.a")
-endif (TOADLET_PLATFORM_IOS)
+	# HACK: install the library on iOS. This will disappear once cmake issue:0012506 is resolved. 
+	if (TOADLET_PLATFORM_IOS)
+	    install (DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/\$ENV{CONFIGURATION}\$ENV{EFFECTIVE_PLATFORM_NAME}/ DESTINATION ${LIB_INSTALL_DIR} FILES_MATCHING PATTERN "*.a")
+	endif (TOADLET_PLATFORM_IOS)
+endif (TOADLET_BUILD_STATIC)
 

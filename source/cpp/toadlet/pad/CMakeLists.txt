@@ -61,17 +61,15 @@ set (PAD_PLATFORM_X11_HEADERS
 
 # Platform specific files
 if (TOADLET_PLATFORM_ANDROID)
-	if (ANDROID_NDK_API_LEVEL LESS 9)
-		source_group ("Source Files\\\\platform\\\\android" FILES ${PAD_PLATFORM_ANDROID_JAPPLICATION_SRC})
-		source_group ("Header Files\\\\platform\\\\android" FILES ${PAD_PLATFORM_ANDROID_JAPPLICATION_HEADERS})
-		set (PAD_SRC ${PAD_SRC} ${PAD_PLATFORM_ANDROID_JAPPLICATION_SRC})
-		set (PAD_HEADERS ${PAD_HEADERS} ${PAD_PLATFORM_ANDROID_JAPPLICATION_HEADERS})
-	else (ANDROID_NDK_API_LEVEL LESS 9)
-		source_group ("Source Files\\\\platform\\\\android" FILES ${PAD_PLATFORM_ANDROID_ANDROIDAPPLICATION_SRC})
-		source_group ("Header Files\\\\platform\\\\android" FILES ${PAD_PLATFORM_ANDROID_ANDROIDAPPLICATION_HEADERS})
-		set (PAD_SRC ${PAD_SRC} ${PAD_PLATFORM_ANDROID_ANDROIDAPPLICATION_SRC})
-		set (PAD_HEADERS ${PAD_HEADERS} ${PAD_PLATFORM_ANDROID_ANDROIDAPPLICATION_HEADERS})
-	endif (ANDROID_NDK_API_LEVEL LESS 9)
+	source_group ("Source Files\\\\platform\\\\android" FILES ${PAD_PLATFORM_ANDROID_JAPPLICATION_SRC})
+	source_group ("Header Files\\\\platform\\\\android" FILES ${PAD_PLATFORM_ANDROID_JAPPLICATION_HEADERS})
+	set (PAD_SRC ${PAD_SRC} ${PAD_PLATFORM_ANDROID_JAPPLICATION_SRC})
+	set (PAD_HEADERS ${PAD_HEADERS} ${PAD_PLATFORM_ANDROID_JAPPLICATION_HEADERS})
+
+	source_group ("Source Files\\\\platform\\\\android" FILES ${PAD_PLATFORM_ANDROID_ANDROIDAPPLICATION_SRC})
+	source_group ("Header Files\\\\platform\\\\android" FILES ${PAD_PLATFORM_ANDROID_ANDROIDAPPLICATION_HEADERS})
+	set (PAD_SRC ${PAD_SRC} ${PAD_PLATFORM_ANDROID_ANDROIDAPPLICATION_SRC})
+	set (PAD_HEADERS ${PAD_HEADERS} ${PAD_PLATFORM_ANDROID_ANDROIDAPPLICATION_HEADERS})
 elseif (TOADLET_PLATFORM_WIN32)
 	source_group ("Source Files\\\\platform\\\\win32" FILES ${PAD_PLATFORM_WIN32_SRC})
 	source_group ("Header Files\\\\platform\\\\win32" FILES ${PAD_PLATFORM_WIN32_HEADERS})
@@ -94,13 +92,12 @@ endif (TOADLET_PLATFORM_ANDROID)
 if (TOADLET_PLATFORM_ANDROID)
 	set (PAD_LIBS ${PAD_LIBS} toadlet_peeper_gles1renderdevice toadlet_peeper_gles2renderdevice)
 	set (PAD_LIBS_S ${PAD_LIBS_S} toadlet_peeper_gles1renderdevice_s toadlet_peeper_gles2renderdevice_s)
-	if (ANDROID_NDK_API_LEVEL LESS 9)
-		set (PAD_LIBS ${PAD_LIBS} toadlet_ribbit_jaudiodevice toadlet_flick_jinputdevice)
-		set (PAD_LIBS_S ${PAD_LIBS_S} toadlet_ribbit_jaudiodevice_s toadlet_flick_jinputdevice_s)
-	else (ANDROID_NDK_API_LEVEL LESS 9)
-		set (PAD_LIBS ${PAD_LIBS} android toadlet_flick_androidsensordevice)
-		set (PAD_LIBS_S ${PAD_LIBS_S} android toadlet_flick_androidsensordevice_s)
-	endif (ANDROID_NDK_API_LEVEL LESS 9)
+
+	set (PAD_LIBS ${PAD_LIBS} toadlet_ribbit_jaudiodevice toadlet_flick_jinputdevice)
+	set (PAD_LIBS_S ${PAD_LIBS_S} toadlet_ribbit_jaudiodevice_s toadlet_flick_jinputdevice_s)
+
+	set (PAD_LIBS ${PAD_LIBS} android toadlet_flick_androidsensordevice)
+	set (PAD_LIBS_S ${PAD_LIBS_S} android toadlet_flick_androidsensordevice_s)
 elseif (TOADLET_PLATFORM_WINCE)
 	if (TOADLET_HAS_D3DM)
 		set (PAD_LIBS ${PAD_LIBS} toadlet_peeper_d3dmrenderdevice)
@@ -180,22 +177,24 @@ endif (SWIG_FOUND AND PAD_SWIG_INT)
 
 
 # Dynamic Library
-if (NOT TOADLET_PLATFORM_IOS)
+if (TOADLET_BUILD_DYNAMIC)
 	add_library (toadlet_pad SHARED ${PAD_SRC} ${PAD_HEADERS})
 	set_target_properties (toadlet_pad PROPERTIES ${DYNAMIC_LIB_PROPS})
 	target_link_libraries (toadlet_pad toadlet_flick toadlet_tadpole ${PAD_LIBS})
 	install (TARGETS toadlet_pad DESTINATION ${LIB_INSTALL_DIR})
-endif (NOT TOADLET_PLATFORM_IOS)
+endif (TOADLET_BUILD_DYNAMIC)
 
 
 # Static Library
-add_library (toadlet_pad_s STATIC ${PAD_SRC} ${PAD_HEADERS})
-set_target_properties (toadlet_pad_s PROPERTIES ${STATIC_LIB_PROPS})
-target_link_libraries (toadlet_pad_s toadlet_flick_s toadlet_tadpole_s ${PAD_LIBS_S})
-install (TARGETS toadlet_pad_s DESTINATION ${LIB_INSTALL_DIR})
+if (TOADLET_BUILD_STATIC)
+	add_library (toadlet_pad_s STATIC ${PAD_SRC} ${PAD_HEADERS})
+	set_target_properties (toadlet_pad_s PROPERTIES ${STATIC_LIB_PROPS})
+	target_link_libraries (toadlet_pad_s toadlet_flick_s toadlet_tadpole_s ${PAD_LIBS_S})
+	install (TARGETS toadlet_pad_s DESTINATION ${LIB_INSTALL_DIR})
 
-# HACK: install the library on iOS. This will disappear once cmake issue:0012506 is resolved. 
-if (TOADLET_PLATFORM_IOS)
-    install (DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/\$ENV{CONFIGURATION}\$ENV{EFFECTIVE_PLATFORM_NAME}/ DESTINATION ${LIB_INSTALL_DIR} FILES_MATCHING PATTERN "*.a")
-endif (TOADLET_PLATFORM_IOS)
+	# HACK: install the library on iOS. This will disappear once cmake issue:0012506 is resolved. 
+	if (TOADLET_PLATFORM_IOS)
+	    install (DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/\$ENV{CONFIGURATION}\$ENV{EFFECTIVE_PLATFORM_NAME}/ DESTINATION ${LIB_INSTALL_DIR} FILES_MATCHING PATTERN "*.a")
+	endif (TOADLET_PLATFORM_IOS)
+endif (TOADLET_BUILD_STATIC)
 

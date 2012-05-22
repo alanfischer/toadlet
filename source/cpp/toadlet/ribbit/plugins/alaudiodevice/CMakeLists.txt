@@ -45,24 +45,26 @@ endif (TOADLET_PLATFORM_OSX OR TOADLET_PLATFORM_IOS)
 
 
 # Dynamic library
-if (NOT TOADLET_PLATFORM_IOS)
+if (TOADLET_BUILD_DYNAMIC)
 	add_library (toadlet_ribbit_alaudiodevice SHARED ${RIBBIT_ALAUDIODEVICE_SRC} ${RIBBIT_ALAUDIODEVICE_HEADERS})
 	set_target_properties (toadlet_ribbit_alaudiodevice PROPERTIES ${DYNAMIC_LIB_PROPS})
 	set_property (TARGET toadlet_ribbit_alaudiodevice APPEND PROPERTY COMPILE_DEFINITIONS ${RIBBIT_ALAUDIODEVICE_DEFS})
 	target_link_libraries (toadlet_ribbit_alaudiodevice toadlet_ribbit ${RIBBIT_ALAUDIODEVICE_LIBS})
 	install (TARGETS toadlet_ribbit_alaudiodevice DESTINATION ${LIB_INSTALL_DIR})
-endif (NOT TOADLET_PLATFORM_IOS)
+endif (TOADLET_BUILD_DYNAMIC)
 
 
 # Static library
-add_library (toadlet_ribbit_alaudiodevice_s STATIC ${RIBBIT_ALAUDIODEVICE_SRC} ${RIBBIT_ALAUDIODEVICE_HEADERS})
-set_target_properties (toadlet_ribbit_alaudiodevice_s PROPERTIES ${STATIC_LIB_PROPS})
-set_property (TARGET toadlet_ribbit_alaudiodevice_s APPEND PROPERTY COMPILE_DEFINITIONS ${RIBBIT_ALAUDIODEVICE_DEFS_S})
-target_link_libraries (toadlet_ribbit_alaudiodevice_s toadlet_ribbit_s ${RIBBIT_ALAUDIODEVICE_LIBS})
-install (TARGETS toadlet_ribbit_alaudiodevice_s DESTINATION ${LIB_INSTALL_DIR})
+if (TOADLET_BUILD_STATIC)
+	add_library (toadlet_ribbit_alaudiodevice_s STATIC ${RIBBIT_ALAUDIODEVICE_SRC} ${RIBBIT_ALAUDIODEVICE_HEADERS})
+	set_target_properties (toadlet_ribbit_alaudiodevice_s PROPERTIES ${STATIC_LIB_PROPS})
+	set_property (TARGET toadlet_ribbit_alaudiodevice_s APPEND PROPERTY COMPILE_DEFINITIONS ${RIBBIT_ALAUDIODEVICE_DEFS_S})
+	target_link_libraries (toadlet_ribbit_alaudiodevice_s toadlet_ribbit_s ${RIBBIT_ALAUDIODEVICE_LIBS})
+	install (TARGETS toadlet_ribbit_alaudiodevice_s DESTINATION ${LIB_INSTALL_DIR})
 
-# HACK: install the library on iOS. This will disappear once cmake issue:0012506 is resolved. 
-if (TOADLET_PLATFORM_IOS)
-    install (DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/\$ENV{CONFIGURATION}\$ENV{EFFECTIVE_PLATFORM_NAME}/ DESTINATION ${LIB_INSTALL_DIR} FILES_MATCHING PATTERN "*.a")
-endif (TOADLET_PLATFORM_IOS)
+	# HACK: install the library on iOS. This will disappear once cmake issue:0012506 is resolved. 
+	if (TOADLET_PLATFORM_IOS)
+	    install (DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/\$ENV{CONFIGURATION}\$ENV{EFFECTIVE_PLATFORM_NAME}/ DESTINATION ${LIB_INSTALL_DIR} FILES_MATCHING PATTERN "*.a")
+	endif (TOADLET_PLATFORM_IOS)
+endif (TOADLET_BUILD_STATIC)
 
