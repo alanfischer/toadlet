@@ -24,7 +24,7 @@ if (TOADLET_PLATFORM_ANDROID)
 	set (LIB_INSTALL_DIR ${JAVA_LIB_INSTALL_DIR}/${NDK_NAME_ARCH})
 
 	# Android does not use static libraries
-	set (TOADLET_BUILD_STATIC OFF CACHE INTERNAL "Build static libraries" FORCE)
+	set (TOADLET_BUILD_STATIC OFF CACHE BOOL "Build static libraries" FORCE)
 
 	# Set defaults 
 	option (TOADLET_RTTI "Enable Run Time Type Information" OFF)
@@ -59,7 +59,7 @@ if (TOADLET_PLATFORM_ANDROID)
 	endif (STATIC_LIB_FLAGS)
 elseif (TOADLET_PLATFORM_IOS)
 	# iOS does not permit dynamic libraries
-	set (TOADLET_BUILD_DYNAMIC OFF CACHE INTERNAL "Build dynamic libraries" FORCE)
+	set (TOADLET_BUILD_DYNAMIC OFF CACHE BOOL "Build dynamic libraries" FORCE)
 
 	if (STATIC_LIB_FLAGS)
 		set (STATIC_LIB_PROPS ${STATIC_LIB_PROPS} COMPILE_FLAGS ${STATIC_LIB_FLAGS})

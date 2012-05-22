@@ -269,7 +269,7 @@ if (TOADLET_BUILD_DYNAMIC)
 	set_target_properties (toadlet_egg PROPERTIES ${DYNAMIC_LIB_PROPS})
 	target_link_libraries (toadlet_egg ${EGG_LIBS})
 	install (TARGETS toadlet_egg DESTINATION ${LIB_INSTALL_DIR})
-endif (TOADET_BUILD_DYNAMIC)
+endif (TOADLET_BUILD_DYNAMIC)
 
 
 # Static library
