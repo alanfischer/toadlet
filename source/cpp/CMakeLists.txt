@@ -205,6 +205,8 @@ elseif (TOADLET_PLATFORM_WIN32)
 	)
 else (TOADLET_PLATFORM_EMSCRIPTEN)
 	# emscripten does not handle dynamic libraries
+	set (TOADLET_BUILD_DYNAMIC OFF CACHE BOOL "Build dynamic libraries" FORCE)
+
 	if (STATIC_LIB_FLAGS)
 		set (STATIC_LIB_PROPS ${STATIC_LIB_PROPS} COMPILE_FLAGS ${STATIC_LIB_FLAGS})
 	endif (STATIC_LIB_FLAGS)
