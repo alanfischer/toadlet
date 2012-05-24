@@ -21,7 +21,7 @@ option (TOADLET_BUILD_STATIC "Build static libraries" ON)
 # Setup all platform specific options
 if (TOADLET_PLATFORM_ANDROID)
 	# Android libraries install to an architecture specific subdirectory
-	set (LIB_INSTALL_DIR ${JAVA_LIB_INSTALL_DIR}/${NDK_NAME_ARCH})
+	set (LIB_INSTALL_DIR libs/${NDK_NAME_ARCH})
 
 	# Android does not use static libraries
 	set (TOADLET_BUILD_STATIC OFF CACHE BOOL "Build static libraries" FORCE)
