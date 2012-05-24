@@ -66,17 +66,15 @@ file (APPEND ${HEADER_FILE} "#endif\n")
 configure_file (${CMAKE_CURRENT_SOURCE_DIR}/Config.h.cmake ${CMAKE_CURRENT_BINARY_DIR}/Config.h)
 
 
-# Install header files, not necessary for pure android java projects
-if (NOT INSTALL_JAVA_ONLY)
-	install (FILES ${toadlet_SOURCE_DIR}/source/cpp/toadlet/Types.h DESTINATION include/toadlet)
-	install (FILES ${toadlet_BINARY_DIR}/source/cpp/toadlet/Config.h DESTINATION include/toadlet)
-	foreach (TOADLET_LIBRARY ${TOADLET_LIBRARY_LIST})
-		install (DIRECTORY ${toadlet_SOURCE_DIR}/source/cpp/toadlet/${TOADLET_LIBRARY}  DESTINATION include/toadlet FILES_MATCHING PATTERN "*.h")
-		install (FILES ${toadlet_BINARY_DIR}/source/cpp/toadlet/${TOADLET_LIBRARY}.h DESTINATION include/toadlet)
+# Install header files
+install (FILES ${toadlet_SOURCE_DIR}/source/cpp/toadlet/Types.h DESTINATION include/toadlet)
+install (FILES ${toadlet_BINARY_DIR}/source/cpp/toadlet/Config.h DESTINATION include/toadlet)
+foreach (TOADLET_LIBRARY ${TOADLET_LIBRARY_LIST})
+	install (DIRECTORY ${toadlet_SOURCE_DIR}/source/cpp/toadlet/${TOADLET_LIBRARY}  DESTINATION include/toadlet FILES_MATCHING PATTERN "*.h")
+	install (FILES ${toadlet_BINARY_DIR}/source/cpp/toadlet/${TOADLET_LIBRARY}.h DESTINATION include/toadlet)
 
-		# Each library's version file is configured by that library and installed here
-		install (FILES  ${toadlet_BINARY_DIR}/source/cpp/toadlet/${TOADLET_LIBRARY}/Version.h DESTINATION include/toadlet/${TOADLET_LIBRARY})
-	endforeach (TOADLET_LIBRARY)
-	install (FILES ${toadlet_BINARY_DIR}/source/cpp/toadlet/toadlet.h DESTINATION include/toadlet)
-endif (NOT INSTALL_JAVA_ONLY)
+	# Each library's version file is configured by that library and installed here
+	install (FILES  ${toadlet_BINARY_DIR}/source/cpp/toadlet/${TOADLET_LIBRARY}/Version.h DESTINATION include/toadlet/${TOADLET_LIBRARY})
+endforeach (TOADLET_LIBRARY)
+install (FILES ${toadlet_BINARY_DIR}/source/cpp/toadlet/toadlet.h DESTINATION include/toadlet)
 

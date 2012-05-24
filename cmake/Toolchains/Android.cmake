@@ -50,9 +50,6 @@
 #    ARM_TARGET=armeabi - type of floating point support.
 #      Other possible values are: "armeabi", "armeabi-v7a with NEON", "armeabi-v7a with VFPV3"
 #
-#    INSTALL_JAVA_ONLY=OFF - If ON, will install jars and libraries to libs subdir, and usually indicates to the project not to install headers.
-#      Mostly useful for installing directly into the libs/ folder of an existing android project.
-#
 #    ANDROID_STL=(SYSTEM GNU_SHARED GNU_STATIC GABI_SHARED GABI_STATIC STLPORT_SHARED STLPORT_STATIC) - choose one
 #      Select from among any of the android STL versions, shared or static. SYSTEM is the default
 #
@@ -351,18 +348,6 @@ if( ANDROID_ARCH STREQUAL "ARM" )
 elseif( ANDROID_ARCH STREQUAL "X86" )
  set( NDK_NAME_ARCH "x86" )
 endif( ANDROID_ARCH STREQUAL "ARM" )
-
-# Installing java only will place the libraries (no headers) into the libs/ subdir, for direct use in an android project.
-if( INSTALL_JAVA_ONLY )
- if( NOT DEFINED JAVA_LIB_INSTALL_DIR )
-  message( STATUS "INSTALL_JAVA_ONLY=${INSTALL_JAVA_ONLY}, only toadlet jars and libs will be installed" )
- endif( NOT DEFINED JAVA_LIB_INSTALL_DIR )
- set( JAVA_LIB_INSTALL_DIR libs )
-else( INSTALL_JAVA_ONLY )
- set( JAVA_LIB_INSTALL_DIR lib )
-endif( INSTALL_JAVA_ONLY )
-set( INSTALL_JAVA_ONLY ${INSTALL_JAVA_ONLY} CACHE BOOL "Only install java libraries and jards" FORCE )
-set( JAVA_LIB_INSTALL_DIR ${JAVA_LIB_INSTALL_DIR} CACHE STRING "java library installation suffix" FORCE )
 
 # Set find root path to the target environment, plus the user defined search path
 set( CMAKE_FIND_ROOT_PATH "${ANDROID_NDK_TOOLCHAIN_ROOT}/bin" "${ANDROID_NDK_TOOLCHAIN_ROOT}/${ANDROID_NDK_TOOLCHAIN_ARCH}" "${ANDROID_NDK_SYSROOT}" "${CMAKE_PREFIX_PATH}")
