@@ -59,7 +59,7 @@ macro (SWIG_WRAP_SETUP LANGUAGE PREFIX OUTPUT_BASEDIR INCLUDES )
 	
 	# The output directory is the basedir with the PATH_PREFIX appended, if defined
 	set (SWIG_WRAP_OUTDIR ${OUTPUT_BASEDIR}/${PATH_PREFIX} CACHE INTERNAL "Swig wrap language specific output basedir" FORCE)
-	
+
 	set (SWIG_WRAP_FILES_SETUP ON CACHE INTERNAL "Swig wrap files is setup" FORCE)
 	message (STATUS "SWIG_WRAP_FILES() has been setup")
 endmacro (SWIG_WRAP_SETUP)
@@ -69,6 +69,11 @@ macro (SWIG_WRAP_FILES WRAP PACKAGE INTERFACE DEPS OUTPUTS)
 	if (NOT SWIG_WRAP_FILES_SETUP)
 		message (FATAL_ERROR "The SWIG_WRAP_SETUP() macro has not been called. You must setup before using SWIG_WRAP_FILES().")
 	endif (NOT SWIG_WRAP_FILES_SETUP)
+
+	# Swig does not create output directories by itself
+	if (NOT EXISTS ${SWIG_WRAP_OUTDIR}${PACKAGE})
+		file (MAKE_DIRECTORY ${SWIG_WRAP_OUTDIR}${PACKAGE})
+	endif (NOT EXISTS ${SWIG_WRAP_OUTDIR}${PACKAGE})
 	
 	add_custom_command (
 		OUTPUT ${WRAP} ${OUTPUTS}
