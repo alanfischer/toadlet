@@ -210,7 +210,7 @@ PixelBuffer::ptr BufferManager::createPixelBuffer(int usage,int access,int pixel
 VariableBuffer::ptr BufferManager::createVariableBuffer(int usage,int access,VariableBufferFormat::ptr format){
 	RenderDevice *renderDevice=mEngine->getRenderDevice();
 	VariableBuffer::ptr buffer;
-	if(mEngine->hasShader(Shader::ShaderType_VERTEX)){
+	if(mEngine->isBackable()){
 		BackableBuffer::ptr backableBuffer(new BackableBuffer());
 		backableBuffer->create(usage,access,format);
 		if(renderDevice!=NULL){

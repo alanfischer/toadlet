@@ -48,6 +48,9 @@ public:
 
 	void destroy();
 
+	void setName(const String &name){mName=name;}
+	const String &getName(){return mName;}
+
 	void setBlendState(const BlendState &state){mRenderState->setBlendState(state);}
 	bool getBlendState(BlendState &state) const{return mRenderState->getBlendState(state);}
 
@@ -93,6 +96,7 @@ public:
 
 protected:
 	MaterialManager *mManager;
+	String mName;
 	RenderState::ptr mRenderState,mOwnRenderState;
 	ShaderState::ptr mShaderState,mOwnShaderState;
 	Collection<Texture::ptr> mTextures[Shader::ShaderType_MAX];
