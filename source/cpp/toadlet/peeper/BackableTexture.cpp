@@ -138,7 +138,7 @@ bool BackableTexture::load(TextureFormat *format,tbyte *data){
 		result=convertLoad(mBack,format,data);
 	}
 	
-	if(format->getMipMax()<=1 && mData!=NULL){
+	if(format->getMipMin()==0 && mData!=NULL){
 		if(format->getWidth()!=mFormat->getWidth() || format->getHeight()!=mFormat->getHeight() || format->getDepth()!=mFormat->getDepth()){
 			TextureFormat *tempFormat=format;
 			tbyte *tempData=data;

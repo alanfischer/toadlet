@@ -109,8 +109,6 @@ bool RenderVariableSet::addTexture(const String &name,Texture::ptr texture,const
 }
 
 bool RenderVariableSet::findTexture(const String &name,Shader::ShaderType &type,int &index){
-	type=(Shader::ShaderType)0;
-	index=0;
 	VariableBufferFormat::Variable *formatVariable=findResourceVariable(name,type);
 	if(formatVariable!=NULL){
 		index=formatVariable->getResourceIndex();
