@@ -279,7 +279,7 @@ Resource::ptr DiffuseMaterialCreator::create(const String &name,ResourceData *da
 	return mEngine->getMaterialManager()->find(name);
 }
 
-Material::ptr DiffuseMaterialCreator::createDiffuseMaterial(Texture::ptr texture){
+Material::ptr DiffuseMaterialCreator::createDiffuseMaterial(Texture *texture){
 	Material::ptr material=new Material(mEngine->getMaterialManager());
 
 	RenderState::ptr renderState=mEngine->getMaterialManager()->createRenderState();
@@ -309,7 +309,9 @@ Material::ptr DiffuseMaterialCreator::createDiffuseMaterial(Texture::ptr texture
 		variables->addVariable("textureMatrix",RenderVariable::ptr(new TextureMatrixVariable("tex")),Material::Scope_MATERIAL);
 		variables->addVariable("textureSet",RenderVariable::ptr(new TextureSetVariable("tex")),Material::Scope_MATERIAL);
 
-		variables->addTexture("tex",texture,"samp",mEngine->getMaterialManager()->getDefaultSamplerState(),TextureState());
+		if(texture!=NULL){
+			variables->addTexture("tex",texture,"samp",mEngine->getMaterialManager()->getDefaultSamplerState(),TextureState());
+		}
 	}
 
 	if(mEngine->hasFixed(Shader::ShaderType_VERTEX) && mEngine->hasFixed(Shader::ShaderType_FRAGMENT)){
@@ -317,7 +319,9 @@ Material::ptr DiffuseMaterialCreator::createDiffuseMaterial(Texture::ptr texture
 
 		RenderPass::ptr pass=fixedPath->addPass(renderState);
 
-		pass->setTexture(Shader::ShaderType_FRAGMENT,0,texture,mEngine->getMaterialManager()->getDefaultSamplerState(),TextureState());
+		if(texture!=NULL){
+			pass->setTexture(Shader::ShaderType_FRAGMENT,0,texture,mEngine->getMaterialManager()->getDefaultSamplerState(),TextureState());
+		}
 	}
 
 	mEngine->getMaterialManager()->manage(material);
@@ -327,7 +331,7 @@ Material::ptr DiffuseMaterialCreator::createDiffuseMaterial(Texture::ptr texture
 	return material;
 }
 
-Material::ptr DiffuseMaterialCreator::createPointSpriteMaterial(Texture::ptr texture,scalar size,bool attenuated){
+Material::ptr DiffuseMaterialCreator::createPointSpriteMaterial(Texture *texture,scalar size,bool attenuated){
 	Material::ptr material(new Material(mEngine->getMaterialManager()));
 
 	RenderState::ptr renderState=mEngine->getMaterialManager()->createRenderState();
@@ -365,7 +369,9 @@ Material::ptr DiffuseMaterialCreator::createPointSpriteMaterial(Texture::ptr tex
 		variables->addVariable("pointSize",RenderVariable::ptr(new PointSizeVariable()),Material::Scope_MATERIAL);
 		variables->addVariable("viewport",RenderVariable::ptr(new ViewportVariable()),Material::Scope_MATERIAL);
 
-		variables->addTexture("tex",texture,"samp",mEngine->getMaterialManager()->getDefaultSamplerState(),TextureState());
+		if(texture!=NULL){
+			variables->addTexture("tex",texture,"samp",mEngine->getMaterialManager()->getDefaultSamplerState(),TextureState());
+		}
 	}
 
 	if(	mEngine->hasFixed(Shader::ShaderType_VERTEX) &&
@@ -376,7 +382,9 @@ Material::ptr DiffuseMaterialCreator::createPointSpriteMaterial(Texture::ptr tex
 
 		RenderPass::ptr pass=fixedPath->addPass(renderState);
 
-		pass->setTexture(Shader::ShaderType_FRAGMENT,0,texture,mEngine->getMaterialManager()->getDefaultSamplerState(),TextureState());
+		if(texture!=NULL){
+			pass->setTexture(Shader::ShaderType_FRAGMENT,0,texture,mEngine->getMaterialManager()->getDefaultSamplerState(),TextureState());
+		}
 	}
 
 	mEngine->getMaterialManager()->manage(material);
@@ -386,7 +394,7 @@ Material::ptr DiffuseMaterialCreator::createPointSpriteMaterial(Texture::ptr tex
 	return material;
 }
 
-Material::ptr DiffuseMaterialCreator::createFontMaterial(Font::ptr font){
+Material::ptr DiffuseMaterialCreator::createFontMaterial(Font *font){
 	if(font==NULL){
 		return NULL;
 	}

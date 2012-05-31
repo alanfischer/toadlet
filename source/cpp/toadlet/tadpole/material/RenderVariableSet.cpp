@@ -72,7 +72,7 @@ void RenderVariableSet::removeBuffer(VariableBuffer::ptr buffer){
 	}
 }
 
-bool RenderVariableSet::addTexture(const String &name,Texture::ptr texture,const String &samplerName,const SamplerState &samplerState,const TextureState &textureState){
+bool RenderVariableSet::addTexture(const String &name,Texture *texture,const String &samplerName,const SamplerState &samplerState,const TextureState &textureState){
 	Shader::ShaderType type;
 	VariableBufferFormat::Variable *formatVariable=findResourceVariable(name,type);
 	if(formatVariable==NULL){
