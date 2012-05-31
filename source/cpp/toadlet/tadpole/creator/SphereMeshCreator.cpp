@@ -32,7 +32,6 @@ namespace creator{
 
 // Thanks to Ogre3D for this sphere routine
 Mesh::ptr SphereMeshCreator::createSphereMesh(VertexBuffer::ptr vertexBuffer,IndexBuffer::ptr indexBuffer,const Sphere &sphere,int numSegments,int numRings){
-Logger::alert("SphereMesh create");
 	{
 		vba.lock(vertexBuffer,Buffer::Access_BIT_WRITE);
 		iba.lock(indexBuffer,Buffer::Access_BIT_WRITE);
@@ -91,17 +90,14 @@ Logger::alert("SphereMesh create");
 		vba.unlock();
 	}
 
-Logger::alert("SphereMesh sub");
 	Mesh::SubMesh::ptr subMesh(new Mesh::SubMesh());
 	subMesh->indexData=IndexData::ptr(new IndexData(IndexData::Primitive_TRIS,indexBuffer));
 
-Logger::alert("SphereMesh mesh");
 	Mesh::ptr mesh(new Mesh());
 	mesh->addSubMesh(subMesh);
 	mesh->setStaticVertexData(VertexData::ptr(new VertexData(vertexBuffer)));
 	mesh->setBound(Bound(sphere));
 
-Logger::alert("SphereMesh done");
 	return mesh;
 }
 

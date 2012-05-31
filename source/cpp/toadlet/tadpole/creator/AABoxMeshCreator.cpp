@@ -31,7 +31,6 @@ namespace tadpole{
 namespace creator{
 
 Mesh::ptr AABoxMeshCreator::createAABoxMesh(const AABox &box,Material::ptr material){
-Logger::alert("Mesh creator");
 	VertexBuffer::ptr vertexBuffer=mEngine->getBufferManager()->createVertexBuffer(Buffer::Usage_BIT_STATIC,Buffer::Access_BIT_WRITE,mEngine->getVertexFormats().POSITION_NORMAL_TEX_COORD,24);
 	{
 		vba.lock(vertexBuffer,Buffer::Access_BIT_WRITE);
@@ -103,7 +102,6 @@ Logger::alert("Mesh creator");
 		iba.unlock();
 	}
 
-Logger::alert("Mesh creator sub");
 	Mesh::SubMesh::ptr subMesh(new Mesh::SubMesh());
 	subMesh->indexData=IndexData::ptr(new IndexData(IndexData::Primitive_TRIS,indexBuffer));
 	if(material==NULL){
@@ -116,7 +114,6 @@ Logger::alert("Mesh creator sub");
 	mesh->setBound(Bound(box));
 	mesh->setStaticVertexData(VertexData::ptr(new VertexData(vertexBuffer)));
 
-Logger::alert("Mesh creator done");
 	return mesh;
 }
 
