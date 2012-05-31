@@ -58,7 +58,7 @@ public:
 	inline Shader::ShaderType getBufferShaderType(int i){return mBuffers[i].shaderType;}
 	inline int getBufferIndex(int i){return mBuffers[i].index;}
 
-	bool addTexture(const String &name,Texture::ptr texture,const String &samplerName,const SamplerState &samplerState,const TextureState &textureState);
+	bool addTexture(const String &name,Texture *texture,const String &samplerName,const SamplerState &samplerState,const TextureState &textureState);
 	bool findTexture(const String &name,Shader::ShaderType &type,int &index);
 
 	bool addVariable(const String &name,RenderVariable::ptr variable,int scope);

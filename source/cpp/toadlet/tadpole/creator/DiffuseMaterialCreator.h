@@ -43,9 +43,9 @@ public:
 	void destroy();
 
 	Resource::ptr create(const String &name,ResourceData *data,ProgressListener *listener);
-	Material::ptr createDiffuseMaterial(Texture::ptr texture);
-	Material::ptr createPointSpriteMaterial(Texture::ptr texture,scalar size,bool attenuated);
-	Material::ptr createFontMaterial(Font::ptr font);
+	Material::ptr createDiffuseMaterial(Texture *texture);
+	Material::ptr createPointSpriteMaterial(Texture *texture,scalar size,bool attenuated);
+	Material::ptr createFontMaterial(Font *font);
 
 protected:
 	Engine *mEngine;
