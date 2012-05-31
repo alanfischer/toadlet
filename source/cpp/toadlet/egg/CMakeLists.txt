@@ -9,6 +9,7 @@ set (EGG_SRC
 	Exception.cpp
 	Logger.cpp
 #	HTTPLoggerListener.cpp
+	SOSLoggerListener.cpp
 	Object.cpp
 	Profile.cpp
 	Random.cpp
@@ -103,6 +104,7 @@ set (EGG_HEADERS
 	ResourceDestroyedListener.h
 	Runnable.h
 	SharedPointer.h
+	SOSLoggerListener.h
 	String.h
 	System.h
 	Thread.h
