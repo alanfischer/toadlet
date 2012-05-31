@@ -56,26 +56,20 @@ Scene::Scene(Engine *engine):Object(),
 
 	//mBoundMesh
 {
-Logger::alert("Scene create");
 	mEngine=engine;
 	mEngine->addContextListener(this);
-Logger::alert("Scene set");
+
 	setExcessiveDT(500);
 	setRangeLogicDT(0,0);
 	setAmbientColor(Colors::GREY);
 
-Logger::alert("Scene node");
 	mBackground=mEngine->createNodeType(PartitionNode::type(),this);
 	mRoot=mEngine->createNodeType(PartitionNode::type(),this);
 
-Logger::alert("Scene renderer");
 	mSceneRenderer=SceneRenderer::ptr(new SceneRenderer(this));
 
-Logger::alert("Scene meshes");
 	mSphereMesh=mEngine->getMeshManager()->createSphereMesh(Sphere(Math::ONE));
-Logger::alert("Scene sphere done");
 	mAABoxMesh=mEngine->getMeshManager()->createAABoxMesh(AABox(-Math::ONE,-Math::ONE,-Math::ONE,Math::ONE,Math::ONE,Math::ONE));
-Logger::alert("Scene done");
 }
 
 Scene::~Scene(){

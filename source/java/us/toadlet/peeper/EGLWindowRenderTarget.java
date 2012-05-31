@@ -75,7 +75,7 @@ public class EGLWindowRenderTarget extends EGLRenderTarget{
 		int pixelFormat=0;
 		int redBits=5;
 		int greenBits=6;
-		int blueBits=7;
+		int blueBits=5;
 		int alphaBits=0;
 		int depthBits=16;
 		int stencilBits=0;
