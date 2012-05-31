@@ -20,6 +20,13 @@ if (NOT EXISTS ${Java_JAR_EXECUTABLE})
 endif (NOT EXISTS ${Java_JAR_EXECUTABLE})
 set (Java_FOUND TRUE)
 
+# Android applications expect the libs subdir
+if (TOADLET_INSTALL_ANDROID_APP)
+	set (JAR_INSTALL_DIR libs)
+else (TOADLET_INSTALL_ANDROID_APP)
+	set (JAR_INSTALL_DIR lib)
+endif (TOADLET_INSTALL_ANDROID_APP)
+
 # Cmake wants to use always use posix path separators due to the android ndk toolchain
 # This does not work with nmake on windows, so force the proper ones here
 if (${NDKSYSTEM} STREQUAL "windows" AND ${CMAKE_GENERATOR} STREQUAL "NMake Makefiles")
@@ -58,7 +65,7 @@ set (CMAKE_JAR_CLASSES_PREFIX us/toadlet/flick)
 add_jar (jtoadlet_flick ${FLICK_SRC})
 get_property (JARFILE TARGET jtoadlet_flick PROPERTY JAR_FILE)
 add_dependencies(jtoadlet_flick toadlet_flick)
-install (FILES ${JARFILE} DESTINATION libs)
+install (FILES ${JARFILE} DESTINATION ${JAR_INSTALL_DIR})
 
 # Generate headers
 #add_custom_command (TARGET jtoadlet_flick POST_BUILD
@@ -87,7 +94,7 @@ set (CMAKE_JAR_CLASSES_PREFIX us/toadlet/peeper)
 add_jar (jtoadlet_peeper ${PEEPER_SRC})
 get_property (JARFILE TARGET jtoadlet_peeper PROPERTY JAR_FILE)
 add_dependencies(jtoadlet_peeper toadlet_peeper)
-install (FILES ${JARFILE} DESTINATION libs)
+install (FILES ${JARFILE} DESTINATION ${JAR_INSTALL_DIR})
 
 # Generate headers
 #add_custom_command (TARGET jtoadlet_peeper POST_BUILD
@@ -117,7 +124,7 @@ set (CMAKE_JAR_CLASSES_PREFIX us/toadlet/ribbit)
 add_jar (jtoadlet_ribbit ${RIBBIT_SRC})
 get_property (JARFILE TARGET jtoadlet_ribbit PROPERTY JAR_FILE)
 add_dependencies(jtoadlet_ribbit toadlet_ribbit)
-install (FILES ${JARFILE} DESTINATION libs)
+install (FILES ${JARFILE} DESTINATION ${JAR_INSTALL_DIR})
 
 # Generate headers
 #add_custom_command (TARGET jtoadlet_ribbit POST_BUILD
@@ -144,7 +151,7 @@ set (CMAKE_JAR_CLASSES_PREFIX us/toadlet/tadpole)
 add_jar (jtoadlet_tadpole ${TADPOLE_SRC})
 get_property (JARFILE TARGET jtoadlet_tadpole PROPERTY JAR_FILE)
 add_dependencies(jtoadlet_tadpole toadlet_tadpole)
-install (FILES ${JARFILE} DESTINATION libs)
+install (FILES ${JARFILE} DESTINATION ${JAR_INSTALL_DIR})
 
 # Generate headers
 #add_custom_command (TARGET jtoadlet_tadpole POST_BUILD
@@ -172,7 +179,7 @@ set (CMAKE_JAR_CLASSES_PREFIX us/toadlet/pad)
 add_jar (jtoadlet_pad ${PAD_SRC})
 get_property (JARFILE TARGET jtoadlet_pad PROPERTY JAR_FILE)
 add_dependencies(jtoadlet_pad toadlet_pad)
-install (FILES ${JARFILE} DESTINATION libs)
+install (FILES ${JARFILE} DESTINATION ${JAR_INSTALL_DIR})
 
 # Generate headers
 #add_custom_command (TARGET jtoadlet_pad POST_BUILD
