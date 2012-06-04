@@ -20,13 +20,13 @@ option (TOADLET_BUILD_STATIC "Build static libraries" ON)
 
 # Setup all platform specific options
 if (TOADLET_PLATFORM_ANDROID)
-	if (TOADLET_INSTALL_ANDROID_APP)
+	if (INSTALL_ANDROID_APP)
 		# Android applications expect the libs subdir
 		set (LIB_INSTALL_DIR libs/${NDK_NAME_ARCH})
-	else (TOADLET_INSTALL_ANDROID_APP)
+	else (INSTALL_ANDROID_APP)
 		# Android libraries still need an architecture specific subdirectory
 		set (LIB_INSTALL_DIR lib/${NDK_NAME_ARCH})
-	endif (TOADLET_INSTALL_ANDROID_APP)
+	endif (INSTALL_ANDROID_APP)
 
 	# Android does not use static libraries
 	set (TOADLET_BUILD_STATIC OFF CACHE BOOL "Build static libraries" FORCE)
