@@ -23,37 +23,42 @@
  *
  ********** Copyright header - do not remove **********/
 
-#ifndef TOADLET_TADPOLE_OSXBUNDLEARCHIVE_H
-#define TOADLET_TADPOLE_OSXBUNDLEARCHIVE_H
+#ifndef TOADLET_EGG_WIN32RESOURCEARCHIVE_H
+#define TOADLET_EGG_WIN32RESOURCEARCHIVE_H
 
 #include <toadlet/egg/BaseResource.h>
 #include <toadlet/egg/Map.h>
 #include <toadlet/egg/io/Archive.h>
-#include <toadlet/tadpole/Types.h>
-#include <Foundation/NSBundle.h>
 
 namespace toadlet{
-namespace tadpole{
+namespace egg{
 
-class TOADLET_API OSXBundleArchive:public BaseResource,public Archive{
+class TOADLET_API Win32ResourceArchive:public BaseResource,public Archive{
 public:
-	TOADLET_RESOURCE(OSXBundleArchive,Archive);
+	TOADLET_RESOURCE(Win32ResourceArchive,Archive);
 
-	OSXBundleArchive();
-	virtual ~OSXBundleArchive();
+	Win32ResourceArchive();
+	virtual ~Win32ResourceArchive();
 
 	void destroy();
 
-	bool open(NSBundle *bundle);
+	virtual bool open(void *module);
+	void setMap(Map<String,int>::ptr idMap);
 
 	Stream::ptr openStream(const String &name);
 	Resource::ptr openResource(const String &name){return NULL;}
 
 	Collection<String>::ptr getEntries();
 
+	void resourceFound(const String &name);
+
 protected:
-	NSBundle *mBundle;
+	void *findResourceName(const String &name);
+	bool findResources(LPSTR type);
+
+	void *mModule;
 	Collection<String>::ptr mEntries;
+	Map<String,int>::ptr mIDMap;
 };
 
 }

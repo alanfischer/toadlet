@@ -22,6 +22,11 @@ public:
 	void setTarget(Node *parent,Node *target){
 		mTarget=target;
 
+		// Attach target to last as a temporary hack until update layers are added
+		Node::ptr parentParent=parent->getParent();
+		parentParent->remove(parent);
+		parentParent->attach(parent);
+
 		Vector3 position;
 		Math::mul(position,mTarget->getWorldRotate(),mOffset);
 		Math::add(position,mTarget->getWorldTranslate());

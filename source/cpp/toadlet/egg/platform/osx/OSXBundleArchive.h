@@ -23,44 +23,36 @@
  *
  ********** Copyright header - do not remove **********/
 
-#ifndef TOADLET_TADPOLE_WIN32RESOURCEARCHIVE_H
-#define TOADLET_TADPOLE_WIN32RESOURCEARCHIVE_H
+#ifndef TOADLET_EGG_OSXBUNDLEARCHIVE_H
+#define TOADLET_EGG_OSXBUNDLEARCHIVE_H
 
 #include <toadlet/egg/BaseResource.h>
 #include <toadlet/egg/Map.h>
 #include <toadlet/egg/io/Archive.h>
-#include <toadlet/tadpole/TextureManager.h>
+#include <Foundation/NSBundle.h>
 
 namespace toadlet{
-namespace tadpole{
+namespace egg{
 
-class TOADLET_API Win32ResourceArchive:public BaseResource,public Archive{
+class TOADLET_API OSXBundleArchive:public BaseResource,public Archive{
 public:
-	TOADLET_RESOURCE(Win32ResourceArchive,Archive);
+	TOADLET_RESOURCE(OSXBundleArchive,Archive);
 
-	Win32ResourceArchive(TextureManager *textureManager);
-	virtual ~Win32ResourceArchive();
+	OSXBundleArchive();
+	virtual ~OSXBundleArchive();
 
 	void destroy();
 
-	bool open(void *module);
-	void setMap(Map<String,int>::ptr idMap);
+	bool open(NSBundle *bundle);
 
 	Stream::ptr openStream(const String &name);
-	Resource::ptr openResource(const String &name);
+	Resource::ptr openResource(const String &name){return NULL;}
 
 	Collection<String>::ptr getEntries();
 
-	void resourceFound(const String &name);
-
 protected:
-	void *findResourceName(const String &name);
-
-	void *mModule;
+	NSBundle *mBundle;
 	Collection<String>::ptr mEntries;
-	Map<String,int>::ptr mIDMap;
-
-	TextureManager *mTextureManager;
 };
 
 }

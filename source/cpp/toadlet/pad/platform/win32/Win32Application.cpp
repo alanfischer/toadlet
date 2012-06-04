@@ -209,7 +209,7 @@ void Win32Application::postEngineCreate(){
 		mInputDevices[joyDevice->getType()]=joyDevice;
 	}
 
-	mResourceArchive=Win32ResourceArchive::ptr(new Win32ResourceArchive(mEngine->getTextureManager()));
+	mResourceArchive=new Win32TextureResourceArchive(mEngine->getTextureManager());
 	mResourceArchive->open(win32->mInstance);
 	mEngine->getArchiveManager()->manageArchive(shared_static_cast<Archive>(mResourceArchive));
 	mEngine->getTextureManager()->addResourceArchive(mResourceArchive);

@@ -31,7 +31,7 @@
  
 #include <toadlet/egg/System.h>
 #include <toadlet/egg/Error.h>
-#include <toadlet/tadpole/platform/osx/OSXBundleArchive.h>
+#include <toadlet/egg/platform/osx/OSXBundleArchive.h>
 #include <toadlet/pad/platform/osx/OSXApplication.h>
 
 #import <QuartzCore/QuartzCore.h>
@@ -395,7 +395,7 @@ void OSXApplication::postEngineCreate(){
 	}
 #endif
 	
-	mBundleArchive=OSXBundleArchive::ptr(new OSXBundleArchive());
+	mBundleArchive=new OSXBundleArchive();
 	shared_static_cast<OSXBundleArchive>(mBundleArchive)->open([NSBundle mainBundle]);
 	mEngine->getArchiveManager()->manage(shared_static_cast<Archive>(mBundleArchive));
 }
