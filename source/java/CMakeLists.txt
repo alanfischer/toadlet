@@ -21,11 +21,11 @@ endif (NOT EXISTS ${Java_JAR_EXECUTABLE})
 set (Java_FOUND TRUE)
 
 # Android applications expect the libs subdir
-if (TOADLET_INSTALL_ANDROID_APP)
+if (INSTALL_ANDROID_APP)
 	set (JAR_INSTALL_DIR libs)
-else (TOADLET_INSTALL_ANDROID_APP)
+else (INSTALL_ANDROID_APP)
 	set (JAR_INSTALL_DIR lib)
-endif (TOADLET_INSTALL_ANDROID_APP)
+endif (INSTALL_ANDROID_APP)
 
 # Cmake wants to use always use posix path separators due to the android ndk toolchain
 # This does not work with nmake on windows, so force the proper ones here
