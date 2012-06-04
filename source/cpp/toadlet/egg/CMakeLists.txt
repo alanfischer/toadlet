@@ -8,7 +8,6 @@ set (EGG_SRC
 	Error.cpp
 	Exception.cpp
 	Logger.cpp
-#	HTTPLoggerListener.cpp
 	SOSLoggerListener.cpp
 	Object.cpp
 	Profile.cpp
@@ -61,7 +60,13 @@ set (EGG_PLATFORM_POSIX_SRC
 	platform/posix/PosixWaitCondition.cpp
 )
 
-set (EGG_PLATFORM_POSIX_OSX_SRC
+set (EGG_PLATFORM_ANDROID_SRC
+	platform/android/AndroidAssetArchive.cpp
+	platform/android/JStream.cpp
+)
+
+set (EGG_PLATFORM_OSX_SRC
+	platform/osx/OSXBundleArchive.mm
 	platform/posix/PosixErrorHandler_osx.mm
 )
 
@@ -69,6 +74,7 @@ set (EGG_PLATFORM_WIN32_SRC
 	platform/win32/Win32DynamicLibrary.cpp
 	platform/win32/Win32ErrorHandler.cpp
 	platform/win32/Win32Mutex.cpp
+	platform/win32/Win32ResourceArchive.cpp
 	platform/win32/Win32System.cpp
 	platform/win32/Win32Thread.cpp
 	platform/win32/Win32WaitCondition.cpp
@@ -92,7 +98,6 @@ set (EGG_HEADERS
 	IntrusivePointer.h
 	Logger.h
 	LoggerListener.h
-#	HTTPLoggerListener.h
 	MathConversion.h
 	Map.h
 	Mutex.h
@@ -175,13 +180,20 @@ set (EGG_PLATFORM_POSIX_HEADERS
 	platform/posix/PosixWaitCondition.h
 )
 
-set (EGG_PLATFORM_POSIX_OSX_HEADERS
+set (EGG_PLATFORM_ANDROID_HEADERS
+	platform/android/AndroidAssetArchive.h
+	platform/android/JStream.h
+)
+
+set (EGG_PLATFORM_OSX_HEADERS
+	platform/osx/OSXBundleArchive.h
 )
 
 set (EGG_PLATFORM_WIN32_HEADERS
 	platform/win32/Win32DynamicLibrary.h
 	platform/win32/Win32ErrorHandler.h
 	platform/win32/Win32Mutex.h
+	platform/win32/Win32ResourceArchive.h
 	platform/win32/Win32System.h
 	platform/win32/Win32Thread.h
 	platform/win32/Win32WaitCondition.h
@@ -236,15 +248,19 @@ elseif (TOADLET_PLATFORM_POSIX)
 	set (EGG_HEADERS ${EGG_HEADERS} ${EGG_PLATFORM_POSIX_HEADERS})
 
 	if (TOADLET_PLATFORM_OSX)
-		source_group ("Source Files\\\\platform\\\\posix" FILES ${EGG_PLATFORM_POSIX_OSX_SRC})
-		source_group ("Header Files\\\\platform\\\\posix" FILES ${EGG_PLATFORM_POSIX_OSX_HEADERS})
-		set (EGG_SRC ${EGG_SRC} ${EGG_PLATFORM_POSIX_OSX_SRC})
-		set (EGG_HEADERS ${EGG_HEADERS} ${EGG_PLATFORM_POSIX_OSX_HEADERS})
+		source_group ("Source Files\\\\platform\\\\osx" FILES ${EGG_PLATFORM_OSX_SRC})
+		source_group ("Header Files\\\\platform\\\\osx" FILES ${EGG_PLATFORM_OSX_HEADERS})
+		set (EGG_SRC ${EGG_SRC} ${EGG_PLATFORM_OSX_SRC})
+		set (EGG_HEADERS ${EGG_HEADERS} ${EGG_PLATFORM_OSX_HEADERS})
 		find_library (FOUNDATION_LIBS Foundation)
 		set (EGG_LIBS objc ${EGG_LIBS} ${FOUNDATION_LIBS})
 	endif (TOADLET_PLATFORM_OSX)
 
 	if (TOADLET_PLATFORM_ANDROID)
+		source_group ("Source Files\\\\platform\\\\android" FILES ${EGG_PLATFORM_ANDROID_SRC})
+		source_group ("Header Files\\\\platform\\\\android" FILES ${EGG_PLATFORM_ANDROID_HEADERS})
+		set (EGG_SRC ${EGG_SRC} ${EGG_PLATFORM_ANDROID_SRC})
+		set (EGG_HEADERS ${EGG_HEADERS} ${EGG_PLATFORM_ANDROID_HEADERS})
 		set (EGG_LIBS ${EGG_LIBS} log)
 	else (TOADLET_PLATFORM_ANDROID)
 		# Android does not have a separate pthread library

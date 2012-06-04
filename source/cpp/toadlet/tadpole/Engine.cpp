@@ -106,7 +106,7 @@
 	#include <toadlet/tadpole/platform/osx/OSXTextureStreamer.h>
 #endif
 #if defined(TOADLET_PLATFORM_ANDROID)
-	#include <toadlet/tadpole/platform/android/AndroidAssetArchive.h>
+	#include <toadlet/egg/platform/android/AndroidAssetArchive.h>
 	#include <toadlet/tadpole/platform/android/AndroidTextureStreamer.h>
 #endif
 #if defined(TOADLET_HAS_GIF)

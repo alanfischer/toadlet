@@ -26,7 +26,7 @@
 #ifndef TOADLET_PAD_WIN32APPLICATION_H
 #define TOADLET_PAD_WIN32APPLICATION_H
 
-#include <toadlet/tadpole/platform/win32/Win32ResourceArchive.h>
+#include <toadlet/tadpole/platform/win32/Win32TextureResourceArchive.h>
 #include <toadlet/pad/BaseApplication.h>
 
 namespace toadlet{
@@ -70,7 +70,7 @@ public:
 	void setDifferenceMouse(bool difference);
 	bool getDifferenceMouse() const{return mDifferenceMouse;}
 
-	tadpole::Win32ResourceArchive::ptr getResourceArchive() const{return mResourceArchive;}
+	Win32TextureResourceArchive::ptr getResourceArchive() const{return mResourceArchive;}
 
 	void *getDisplay(){return 0;}
 	void *getWindow(){return getHWND();}
@@ -100,7 +100,7 @@ protected:
 	int mLastXMouse,mLastYMouse;
 	bool mSkipNextMove;
 	
-	tadpole::Win32ResourceArchive::ptr mResourceArchive;
+	Win32TextureResourceArchive::ptr mResourceArchive;
 
 	bool mRun;
 	bool mActive;

@@ -28,7 +28,7 @@
 #include "JStream.h"
 
 namespace toadlet{
-namespace tadpole{
+namespace egg{
 
 JStream::JStream(JNIEnv *env1,jobject streamObj):
 	istreamClass(NULL),ostreamClass(NULL),

@@ -161,20 +161,17 @@ set (TADPOLE_TERRAIN_SRC
 )
 
 set (TADPOLE_PLATFORM_ANDROID_SRC
-	platform/android/AndroidAssetArchive.cpp
 	platform/android/AndroidTextureStreamer.cpp
-	platform/android/JStream.cpp
 )
 
 
 set (TADPOLE_PLATFORM_OSX_SRC
-	platform/osx/OSXBundleArchive.mm
 	platform/osx/OSXFontStreamer.mm
 	platform/osx/OSXTextureStreamer.mm
 )
 
 set (TADPOLE_PLATFORM_WIN32_SRC
-	platform/win32/Win32ResourceArchive.cpp
+	platform/win32/Win32TextureResourceArchive.cpp
 )
 
 set (TADPOLE_PLATFORM_WIN32_GDIPLUS_SRC
@@ -386,19 +383,16 @@ set (TADPOLE_TERRAIN_HEADERS
 )
 
 set (TADPOLE_PLATFORM_ANDROID_HEADERS
-	platform/android/AndroidAssetArchive.h
 	platform/android/AndroidTextureStreamer.h
-	platform/android/JStream.h
 )
 
 set (TADPOLE_PLATFORM_OSX_HEADERS
-	platform/osx/OSXBundleArchive.h
 	platform/osx/OSXFontStreamer.h
 	platform/osx/OSXTextureStreamer.h
 ) 
 
 set (TADPOLE_PLATFORM_WIN32_HEADERS
-	platform/win32/Win32ResourceArchive.h
+	platform/win32/Win32TextureResourceArchive.h
 )
 
 set (TADPOLE_PLATFORM_WIN32_GDIPLUS_HEADERS

@@ -103,6 +103,7 @@ bool RenderVariableSet::addTexture(const String &name,Texture *texture,const Str
 		r.samperState=samplerState;
 		r.textureState=textureState;
 		mUnassignedResources.add(r);
+		Logger::alert("Adding unassigned texture");
 	}
 
 	return true;
@@ -114,7 +115,11 @@ bool RenderVariableSet::findTexture(const String &name,Shader::ShaderType &type,
 		index=formatVariable->getResourceIndex();
 		return true;
 	}
-	return false;
+	else{
+		type=(Shader::ShaderType)0;
+		index=0;
+		return false;
+	}
 }
 
 // Search for the correct buffer and correct index

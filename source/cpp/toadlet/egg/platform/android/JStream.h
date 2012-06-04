@@ -23,39 +23,50 @@
  *
  ********** Copyright header - do not remove **********/
 
-#ifndef TOADLET_TADPOLE_ANDROIDASSETARCHIVE_H
-#define TOADLET_TADPOLE_ANDROIDASSETARCHIVE_H
+#ifndef TOADLET_EGG_JSTREAM_H
+#define TOADLET_EGG_JSTREAM_H
 
-#include <toadlet/egg/BaseResource.h>
-#include <toadlet/egg/io/Archive.h>
-#include <toadlet/tadpole/Types.h>
-#include "JStream.h"
+#include <toadlet/egg/Object.h>
+#include <toadlet/egg/io/Stream.h>
 #include <jni.h>
 
 namespace toadlet{
-namespace tadpole{
+namespace egg{
 
-class TOADLET_API AndroidAssetArchive:public BaseResource,public Archive{
+class TOADLET_API JStream:public Object,public Stream{
 public:
-	TOADLET_RESOURCE(AndroidAssetArchive,Archive);
+	TOADLET_OBJECT(JStream);
 
-	AndroidAssetArchive(JNIEnv *jenv,jobject jassetManager);
-	virtual ~AndroidAssetArchive();
+	JStream(JNIEnv *env,jobject streamObj=NULL);
+	virtual ~JStream();
 
-	void destroy();
+	bool open(jobject streamObj);
+	void close();
+	bool closed(){return istreamObj==NULL && ostreamObj==NULL;}
+	
+	bool readable(){return istreamObj!=NULL;}
+	int read(tbyte *buffer,int length);
 
-	Stream::ptr openStream(const String &name);
-	Resource::ptr openResource(const String &name){return NULL;}
+	bool writeable(){return ostreamObj!=NULL;}
+	int write(const tbyte *buffer,int length);
 
-	Collection<String>::ptr getEntries();
+	bool reset();
+	int length();
+	int position();
+	bool seek(int offs);
 
 protected:
-	JStream::ptr mStream;
-	Collection<String>::ptr mEntries;
 	JNIEnv *env;
-	JavaVM *jvm;
-	jobject assetManagerObj;
-	jmethodID closeManagerID,openManagerID,availableStreamID,readStreamID,closeStreamID;
+	jclass istreamClass,ostreamClass;
+	jobject istreamObj,ostreamObj;
+	jmethodID closeIStreamID,readIStreamID,availableIStreamID,resetIStreamID,skipIStreamID;
+	jmethodID closeOStreamID,writeOStreamID;
+
+	int bufferLength;
+	jbyteArray bufferObj;
+	jmethodID closeID,availableID,readID,writeID;
+	
+	int current;
 };
 
 }

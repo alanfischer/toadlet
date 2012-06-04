@@ -30,7 +30,7 @@
 #include "AndroidAssetArchive.h"
 
 namespace toadlet{
-namespace tadpole{
+namespace egg{
 
 AndroidAssetArchive::AndroidAssetArchive(JNIEnv *env1,jobject assetManagerObj1):
 	env(NULL),
@@ -47,7 +47,7 @@ AndroidAssetArchive::AndroidAssetArchive(JNIEnv *env1,jobject assetManagerObj1):
 	env->DeleteLocalRef(managerClass);
 
 	mEntries=Collection<String>::ptr(new Collection<String>());
-	mStream=JStream::ptr(new JStream(env));
+	mStream=new JStream(env);
 }
 
 AndroidAssetArchive::~AndroidAssetArchive(){
@@ -64,7 +64,7 @@ void AndroidAssetArchive::destroy(){
 }
 
 Stream::ptr AndroidAssetArchive::openStream(const String &name){
-	Logger::debug(Categories::TOADLET_TADPOLE,"AndroidAssetArchive::openStream:"+name);
+	Logger::debug(Categories::TOADLET_EGG,"AndroidAssetArchive::openStream:"+name);
 
 	jvm->AttachCurrentThread(&env,NULL);
 
