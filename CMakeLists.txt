@@ -40,7 +40,7 @@ set (CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${PROJECT_SOURCE_DIR}/cmake/Modules
 if (ANDROID)
 	set (TOADLET_PLATFORM_ANDROID ON CACHE BOOL "Toadlet for Android")
 
-	option (TOADLET_INSTALL_ANDROID_APP "Install just the libs for use by an android application" OFF)
+	option (INSTALL_ANDROID_APP "Install just the libs for use by an android application" OFF)
 endif (ANDROID)
 if (WIN32)
 	set (TOADLET_PLATFORM_WIN32 ON CACHE BOOL "Toadlet for windows platforms")
