@@ -28,6 +28,7 @@
 #include <toadlet/egg/io/FileStream.h>
 #include "OSXBundleArchive.h"
 #include <Foundation/Foundation.h>
+#include <Foundation/NSBundle.h>
 
 namespace toadlet{
 namespace egg{
@@ -45,7 +46,7 @@ void OSXBundleArchive::destroy(){
 	mBundle=nil;
 }
 
-bool OSXBundleArchive::open(NSBundle *bundle){
+bool OSXBundleArchive::open(void *bundle){
 	mBundle=bundle;
 
 	mEntries=egg::Collection<String>::ptr(new egg::Collection<String>());
@@ -55,7 +56,7 @@ bool OSXBundleArchive::open(NSBundle *bundle){
 }
 
 Stream::ptr OSXBundleArchive::openStream(const String &name){
-	NSString *filePath=[[NSBundle mainBundle] pathForResource:name ofType:nil];
+	NSString *filePath=[((NSBundle*)mBundle) pathForResource:name ofType:nil];
 	FileStream::ptr stream(new FileStream(filePath,FileStream::Open_READ_BINARY));
 	if(stream->closed()){
 		stream=NULL;

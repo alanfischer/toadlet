@@ -29,7 +29,6 @@
 #include <toadlet/egg/BaseResource.h>
 #include <toadlet/egg/Map.h>
 #include <toadlet/egg/io/Archive.h>
-#include <Foundation/NSBundle.h>
 
 namespace toadlet{
 namespace egg{
@@ -43,7 +42,7 @@ public:
 
 	void destroy();
 
-	bool open(NSBundle *bundle);
+	bool open(void *bundle);
 
 	Stream::ptr openStream(const String &name);
 	Resource::ptr openResource(const String &name){return NULL;}
@@ -51,7 +50,7 @@ public:
 	Collection<String>::ptr getEntries();
 
 protected:
-	NSBundle *mBundle;
+	void *mBundle;
 	Collection<String>::ptr mEntries;
 };
 
