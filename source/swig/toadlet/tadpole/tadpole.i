@@ -13,6 +13,7 @@ class AudioDevice;
 %typemap(jstype) AudioDevice * "us.toadlet.ribbit.AudioDevice"
 %typemap(in) AudioDevice * "$1=*(toadlet::ribbit::AudioDevice**)&$input;"
 %typemap(javain) AudioDevice * "us.toadlet.ribbit.AudioDevice.getCPtr($javainput)"
+%typemap(javaout) AudioDevice * "{return new us.toadlet.ribbit.AudioDevice($jnicall, $owner);}"
 }
 }
 using namespace toadlet::ribbit;
@@ -26,6 +27,7 @@ class RenderDevice;
 %typemap(jstype) RenderDevice * "us.toadlet.peeper.RenderDevice"
 %typemap(in) RenderDevice * "$1=*(toadlet::peeper::RenderDevice**)&$input;"
 %typemap(javain) RenderDevice * "us.toadlet.peeper.RenderDevice.getCPtr($javainput)"
+%typemap(javaout) RenderDevice * "{return new us.toadlet.peeper.RenderDevice($jnicall, $owner);}"
 }
 }
 using namespace toadlet::peeper;
@@ -63,3 +65,34 @@ using namespace toadlet::tadpole::node;
 %}
 
 typedef float scalar;
+
+%inline %{
+#include <toadlet/egg/Collection.h>
+#include <toadlet/egg/DynamicLibrary.h>
+#include <toadlet/peeper/RenderDevice.h>
+#include <toadlet/ribbit/AudioDevice.h>
+
+Collection<DynamicLibrary::ptr> libraries;
+toadlet::peeper::RenderDevice *new_RenderDevice(char *name){
+	DynamicLibrary::ptr library(new DynamicLibrary());
+	if(library->load(name,(char*)NULL,(char*)NULL)){
+		libraries.add(library);
+		RenderDevice *(*creator)()=(RenderDevice*(*)())library->getSymbol("new_RenderDevice");
+		if(creator!=NULL){
+			return creator();
+		}
+	}
+	return NULL;
+}
+toadlet::ribbit::AudioDevice *new_AudioDevice(char *name){
+	DynamicLibrary::ptr library(new DynamicLibrary());
+	if(library->load(name,(char*)NULL,(char*)NULL)){
+		libraries.add(library);
+		AudioDevice *(*creator)()=(AudioDevice*(*)())library->getSymbol("new_AudioDevice");
+		if(creator!=NULL){
+			return creator();
+		}
+	}
+	return NULL;
+}
+%}
