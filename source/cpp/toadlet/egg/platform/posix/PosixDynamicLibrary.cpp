@@ -25,6 +25,7 @@
 
 #include <toadlet/egg/platform/posix/PosixDynamicLibrary.h>
 #include <toadlet/egg/Error.h>
+#include <toadlet/egg/Logger.h>
 
 namespace toadlet{
 namespace egg{
@@ -44,24 +45,22 @@ bool PosixDynamicLibrary::load(const String &name,const String &directory,const 
 		dlclose(mLibrary);
 	}
 
+	dlerror();
 	mLibrary=dlopen(directory+prefix+name+extension,RTLD_LAZY);
 	const char *err=dlerror();
-	if(err){
-		mLibrary=NULL;
-
-		Error::libraryNotFound(Categories::TOADLET_EGG,
-			"library not found");
+	if(mLibrary==NULL){
+		Error::libraryNotFound(Categories::TOADLET_EGG,err);
 		return false;
 	}
 	return true;
 }
 
 void *PosixDynamicLibrary::getSymbol(const String &name){
+	dlerror();
 	void *symbol=dlsym(mLibrary,name);
 	const char *err=dlerror();
-	if(err){
-		Error::symbolNotFound(Categories::TOADLET_EGG,
-			"symbol not found");
+	if(symbol==NULL){
+		Error::symbolNotFound(Categories::TOADLET_EGG,err);
 		return NULL;
 	}
 	return symbol;
