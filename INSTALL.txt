@@ -2,444 +2,202 @@
 
 =Introduction=
 
-
-
 Toadlet is built with the cmake build system. It has a number of optional dependencies, all of which are searched for or set using cmake. Toadlet also has a number of different configuration options available. 
 
-
-
 =Contents=
-
   * [#Dependencies]
-
   * [#Setup]
-
   * [#Options]
-
   * [#Building]
-
     * [#Windows]
-
-    * [#WinCE]
-
     * [#Posix_Systems]
-
     * [#OSX]
-
     * [#iOS]
-
     * [#Android]
-
     * [#Doxygen]
-
-
-
 
 
 =Dependencies=
 
-
-
 ==Required==
-
-  * cmake 2.8.4 or greater
-
-
+  * cmake 2.8.7 or greater
 
 ==Optional==
 
-
-
 toadlet-peeper:
-
   * OpenGL
-
   * GLEW
-
-  * Direct3D Mobile (WinCE only)
-
   * Direct3D 9 (Windows only)
-
   * DirectX 10 (Windows only)
-
   * DirectX 11 (Windows only)
 
-
-
 toadlet-ribbit:
-
   * OpenAL
 
-
-
 toadlet-tadpole:
-
   * libpng
-
   * libjpeg
-
   * libgif
-
   * libzlib
-
   * libzzip
-
   * Freetype
-
   * MiniXML
-
   * Gdiplus (Windows only)
-
   * Ogg Vorbis
-
   * Sidplay
-
-
+  * FFMpeg
 
 toadlet-pad:
-
   * X11 (posix only)
-
-
-
 
 
 =Setup=
 
-
-
 Toadlet uses CMake to greatly simplify the task of building it for the large number of supported platforms. If you are unfamiliar with CMake, better read up on it first: http://www.cmake.org
-
-
 
 We recommend using out of source builds with toadlet. Simply create a subdirectory within the toadlet project (eg build.win when building for Windows) and enter that directory. You should create separate build subdirectories for each platform specific build of toadlet. (eg build.wince or build.osx).
 
-
-
 Also, toadlet supports some additional options, such as fixed point math,
-
-TOADLET_FIXED_POINT, that you might want to use in your build directory naming, eg: build.wince.fixed
-
-
+TOADLET_FIXED_POINT, that you might want to use in your build directory naming, eg: build.win32.fixed
 
 On Windows platforms, cmake needs to be aware of your Visual Studio installation to create project files. Typically, it is best to open up a  Visual Studio console to enter the cmake commands that follow. (eg. Start-> Programs->Visual Studio->Tools->Console or something similar.)
 
 
-
-
-
 =Options= 
-
-
 
 The following options may be set using cmake to control the build of toadlet. Many of these are platform specific, default options are listed first.
 
-
-
 *TOADLET_BUILD_DOXYGEN* OFF/ON _Add Doxygen documentation to build_
-
-
 
 *TOADLET_BUILD_DOXYGEN_ONLY* OFF/ON _Only build Doyxgen documentation_
 
-
-
 *TOADLET_FIXED_POINT* OFF/ON _Switches to fixed point math in toadlet_
-
-
 
 *TOADLET_USE_BLUETOOTH* ON/OFF _Enables Bluetooth support_
 
-
-
 *TOADLET_DYNAMIC_MULTITHREAD_DYNAMIC* ON/OFF _Uses the /MD compile switch with dynamic libraries (Windows only)_
-
-
 
 *TOADLET_STATIC_MULTITHREAD_DYNAMIC* OFF/ON _Uses the /MD compile switch with static libraries (Windows only)_
 
-
-
 *TOADLET_RTTI* ON/OFF _Enable Run Time Type Information_
-
-
 
 *TOADLET_EXCEPTIONS* ON/OFF _Enable Exception handling_
 
-
-
-
+*INSTALL_ANDROID_APP* ON/OFF _Installs just the .jar and .so files (no headers) into a libs/ subdirectory. Useful for installing toadlet directly into an existing android project._
 
 =Building=
 
-
-
 The minimum arguments to CMake for toadlet are (where .. is the location of  the base of the toadlet project):
-
-
 
   cmake ..
 
-
-
 This will build and install toadlet into the default install locations. We STRONGLY recommend specifiying your header and library installation path via the following:
-
-
 
   cmake -DCMAKE_INSTALL_PREFIX=path/to/wherever ..
 
-
-
 This way you can place different platform builds of toadlet into different locations. 
-
-
 
 Sometimes the toadlet dependices will be installed into non-standard paths which CMake does not autmatically find. (This is typical on Windows platforms). You can instruct CMake to seach additional directories for the dependencies with the following:
 
-
-
   cmake -DCMAKE_PREFIX_PATH=additional/directories/to/search ..
-
-
 
 You can specify multiple paths my separating them with a colon : between each one on windows systems or by separating with a ; on posix systems.
 
-
-
 Finally, on certain systems (like posix) CMake requires you to determine the type of build (debug/release/etc) when calling CMake. You can set this up by calling:
 
-
-
   cmake -DCMAKE_BUILD_TYPE=Buildtype ..
-
-
 
 Where Buildtype can be either Debug or Release.
 
 
-
-
-
 ==Windows==
-
-
 
 On windows systems, toadlet usually needs to be told where to find the dependencies. Otherwise the setup is straightforward:
 
-
-
   cmake -DCMAKE_INSTALL_PREFIX="C:\home\users\toadlet\win32" -DCMAKE_PREFIX_PATH="C:\Program Files\toadlet" ..
-
-
 
 Open up Visual Studio on toadlet.sln and build it.
 
 
-
-
-
-==WinCE==
-
-
-
-Toadlet also builds for WinCE using cmake toolchain files. In addition, you have to do a 2 step process since cmake cannot yet change the platform build type in Visual Studio 8 and up. 
-
-
-
-First you call a cmake build normally with the toolchain file and the special UPDATE_WINCE variable off. Then you call cmake again with UPDATE_WINCE on. Ignore the complaints it makes, you're ready to go. Otherwise the WinCE build is similar to the win32 build:
-
-   
-
-  cmake -DCMAKE_TOOLCHAIN_FILE=..\cmake\Toolchains\WindowsCE.cmake -DCMAKE_INSTALL_PREFIX=%HOME%\toadlet\wince -DCMAKE_PREFIX_PATH="C:\Program Files\Microsoft Visual Studio 8\SmartDevices\SDK\PocketPC2003" -DUPDATE_WINCE=OFF ..
-
-
-
-  cmake -DUPDATE_WINCE=ON ..
-
-
-
-Now the visual studio project is setup for the proper platform build.
-
-
-
-
-
 ==Posix Systems==
-
-
 
 On posix systems don't forget to set the build type if you are using makefiles. A typical command might look like:
 
-
-
   cmake -DCMAKE_INSTALL_PREFIX=$HOME/toadlet/posix -DCMAKE_BUILD_TYPE=Release ..
-
-
 
 Now the standard 'make install' command will do the rest.
 
 
-
-
-
 ==OSX==
-
-
 
 Toadlet for OSX is easy to build using Xcode Projects. You only need to make sure you tell cmake to use the Xcode generator with the -G switch as follows:
 
-
-
   cmake -GXcode -DCMAKE_INSTALL_PREFIX=$HOME/toadlet ..
-
-
 
 If you wish to build a universal binary, you may specify additional architectures as such:
 
-
-
   cmake -GXcode -DCMAKE_OSX_ARCHITECTURES="i386;ppc" -GDCMAKE_INSTALL_PREFIX=$HOME/toadlet ..
-
-
 
 Valid options for architectures are: i386, ppc, x86_64, ppc64
 
-
-
 If you are building universal binaries and encounter link issues with regards to the dependencies mxml or glew, use the included CMakeLists.txt files in cmake/Dependencies to build these projects using Xcode, again specifying all the architectures you wish to use. Or, you can follow the instructions below to manually tweak their existing build systems.
-
-
 
 ===OSX Dependencies===
 
-
-
 To build GLEW as a universal binary, you must edit glew/config/Makefile.darwin Change the CC and LD lines as follows:
 
-
-
   CC = cc -arch i386 -arch ppc
-
   LD = cc -arch i386 -arch ppc
-
-
 
 To build MiniXML as a universal binary, run it's configure script as follows:
 
-
-
   CFLAGS="-arch i386 -arch ppc" LDFLAGS="-arch i386 -arch ppc" ./configure --prefix=$HOME/mxml
-
-
 
 The same valid architectures are as above is OSX
 
 
-
-
-
 ==iOS==
 
-
-
-Toadlet is available for the iOS platform using the included Toolchain files. Simply point cmake to the iOS toolchain and enable the Xcode generator. It also pays to install your iOS libraries in a separate folder.
-
-
+Toadlet is avaialble for the iOS platform using the included Toolchain files. Simply point cmake to the proper iOS toolchain and enable the Xcode generator. It also pays to install your iOS libraries in a separate folder.
 
   cmake -GXcode -DCMAKE_TOOLCHAIN_FILE=../cmake/Toolchains/iOS.cmake -DCMAKE_INSTALL_PREFIX=$HOME/iOS ..
 
+You can build for the iOS Simulator from the same toolchain used above. Simply call the toolchain file with the IOS_PLATFORM option set to SIMULATOR. 
 
+  cmake -GXcode -DCMAKE_TOOLCHAIN_FILE=../cmake/Toolchains/iOS.cmake -DIOS_PLATFORM=SIMULATOR -DCMAKE_INSTALL_PREFIX=$HOME/iOSsimulator ..
 
-You can build for the iOS Simulator from the same toolchain used above. Just change your build target in XCode. However, it's best to install the libraries into a different location to avoid confusion. 
-
-
-
-  cmake -GXcode -DCMAKE_TOOLCHAIN_FILE=../cmake/Toolchains/iOS.cmake -DCMAKE_INSTALL_PREFIX=$HOME/iOSsimulator..
-
-
-
-NOTE: CMake will automatically search for your installed iOS SDKs and choose the most recent. You will have to alter your output XCode project if you wish to use a different SDK.
-
-
-
+NOTE: CMake will automatically search for your installed iOS SDKs and choose the most recent. You will have to alter your XCode project if you wish to use a different SDK.
 
 
 ==Android==
 
+When building for android, you need to specify the locations of the android sdk and ndk development kits using the ANDROID_SDK and ANDROID_NDK variables. 
 
-
-Full support for toadlet on Android uses the Android NDK with api level 9 or newer. Toadlet builds against the Android NDK using the included Toolchain file. When building for android, you need to specify the location of the Android NDK you wish to build against, using the ANDROID_NDK variable. 
-
-
-
-A complete list of Android build options (such as ANDROID_ARCH=ARM or X86) is available in the Android.cmake toolchain file, located at cmake/Toolchains/Android.cmake.
-
-
-
-On Posix and OSX systems, the process is straightforward.
-
-
-
-  cmake -DCMAKE_TOOLCHAIN_FILE=../cmake/Toolchains/Android.cmake -DANDROID_NDK=$HOME/androidNdkDir -DCMAKE_INSTALL_PREFIX=path/to/install/dir ..
-
+  cmake -DCMAKE_TOOLCHAIN_FILE=../cmake/Toolchains/Android.cmake -DANDROID_SDK=$HOME/androidSdkDir -DANDROID_NDK=$HOME/androidNdkDir DCMAKE_INSTALL_PREFIX=$HOME/android ..
 	
+On Windows systems, the Visual Studio generators will not work for android compilation Instead, use the nmake generators an run command line builds, and a separate editor for the .java sources. It is so much nicer to use.
 
-On Windows systems, the android-ndk needs some type of make system to build. If you have Visual Studio, the nmake program works well. Just be sure to request nmake makefiles from cmake:
+  cmake -G"NMake Makefiles" -DCMAKE_TOOLCHAIN_FILE=../cmake/Toolchains/Android.cmake -DANDROID_SDK=$HOME/androidSdkDir -DANDROID_NDK=$HOME/androidNdkDir DCMAKE_INSTALL_PREFIX=$HOME/android ..
 
+Don't forget, if you want to install a build of toadlet directly into your android project, you can use the INSTALL_ANDROID_APP=ON option to install just the output .jar and .so files into a libs/ subdirectory
 
-
-  cmake.exe -G"NMake Makefiles" -DCMAKE_TOOLCHAIN_FILE=../cmake/Toolchains/Android.cmake -DANDROID_NDK=path/to/androidNdkDir -DCMAKE_INSTALL_PREFIX=path/to/install/dir ..
-
-
-
-Another windows make option is the gnuwin32 build of make, available here: http://gnuwin32.sourceforge.net/packages/make.htm
-
-
-
-===Android 2.2 and older===
-
-
-
-Android versions 2.2 and older that still support the Android NDK do not support all features of the NDK required to build the toadlet peeper and pad libraries. You may use the Android SDK and a small set of toadlet java shim files to get full toadlet functionality in this case.  
-
-
-
-To build for Android 2.2 and lower be sure to specify the Android NDK API level as 8 (or lower) and add the ANDROID_SDK variable to your cmake command. An example for windows platforms follows:
-
-
-
-  cmake.exe -G"NMake Makefiles" -DCMAKE_TOOLCHAIN_FILE=../cmake/Toolchains/Android.cmake -DANDROID_NDK=path/to/androidNdkDir -DANDROID_NDK_API_LEVEL=8 -DANDROID_SDK=path/to/androidSdkDir -DARM_TARGET=armeabi -DCMAKE_INSTALL_PREFIX=path/to/install/dir ..
-
-
-
+  cmake -DCMAKE_TOOLCHAIN_FILE=../cmake/Toolchains/Android.cmake -DANDROID_SDK=$HOME/androidSdkDir -DANDROID_NDK=$HOME/androidNdkDir -DINSTALL_ANDROID_APP=ON -DCMAKE_INSTALL_PREFIX=$HOME/myAndroidProject ..
 
 
 ==Doxygen==
 
-
-
-You have the option to build the toadlet Doxygen documentation when creating your project. You can either add the doxygen build with the TOADLET_BUILD_DOXYGEN flag:
-
-
+Optionally, you can build the toadlet Doxygen documentation when creating your project. You can either add the doxygen build with the TOADLET_BUILD_DOXYGEN flag:
 
   cmake -DTOADLET_BUILD_DOXYGEN=ON <rest of your cmake commands> ..
 
-
-
 Or, you can only build the doxygen files by themselves using TOADLET_BUILD_DOXYGEN_ONLY. Useful if you don't want to rebuild the whole library.
-
-
 
   cmake -DTOADLET_BUILD_DOXYGEN_ONLY=ON ..
 
-
-
-Note: You'll need the Doxygen tool installed, and we recommend the Graphviz package for the dot graph generator.
-
-
+Note: You'll need the Doxygen tool installed, and
+we recommend the Graphviz package for the dot graph
+generator.
 
 http://www.stack.nl/~dimitri/doxygen/
-
-
 
 http://www.graphviz.org
