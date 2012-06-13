@@ -27,7 +27,7 @@
 #define TOADLET_TADPOLE_SKELETON_H
 
 #include <toadlet/egg/BaseResource.h>
-#include <toadlet/tadpole/TransformSequence.h>
+#include <toadlet/tadpole/Sequence.h>
 
 namespace toadlet{
 namespace tadpole{
@@ -70,7 +70,7 @@ public:
 	Bone::ptr getBone(const String &name);
 
 	Collection<Bone::ptr> bones;
-	Collection<TransformSequence::ptr> sequences;
+	Collection<Sequence::ptr> sequences;
 };
 
 }

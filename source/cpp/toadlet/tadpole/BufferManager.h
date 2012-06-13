@@ -30,6 +30,7 @@
 #include <toadlet/peeper/BackableVertexFormat.h>
 #include <toadlet/peeper/RenderDevice.h>
 #include <toadlet/tadpole/Types.h>
+#include <toadlet/tadpole/Track.h>
 
 namespace toadlet{
 namespace tadpole{
@@ -53,6 +54,8 @@ public:
 	IndexBuffer::ptr cloneIndexBuffer(IndexBuffer::ptr oldIndexBuffer,int usage,int access,IndexBuffer::IndexFormat indexFormat,int size);
 	VertexBuffer::ptr cloneVertexBuffer(VertexBuffer::ptr oldVertexBuffer,int usage,int access,VertexFormat::ptr vertexFormat,int size);
 	/// @todo: clonePixelBuffer,cloneVariableBuffer
+
+	Track *createColorTrack();
 
 	void contextActivate(RenderDevice *renderDevice);
 	void contextDeactivate(RenderDevice *renderDevice);

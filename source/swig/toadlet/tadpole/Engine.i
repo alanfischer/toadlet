@@ -13,6 +13,7 @@ namespace tadpole{
 
 %refobject Engine "$this->retain();"
 %unrefobject Engine "$this->release();"
+%newobject Engine::createNode;
 
 class Engine{
 public:

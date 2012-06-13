@@ -46,6 +46,8 @@ public:
 		Semantic_NORMAL=			3,
 		Semantic_COLOR=				4,
 		Semantic_TEXCOORD=			5,
+		Semantic_SCALE=				6,
+		Semantic_ROTATE=			7,
 	};
 
 	enum Format{

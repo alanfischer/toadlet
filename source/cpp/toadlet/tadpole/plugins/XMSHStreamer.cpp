@@ -193,7 +193,7 @@ Mesh::ptr XMSHStreamer::loadMeshVersion1(mxml_node_t *root){
 			mesh->setSkeleton(XMLMeshUtilities::loadSkeleton(block,1));
 		}
 		else if(strcmp(mxmlGetElementName(block),"AnimationData")==0){
-			mesh->getSkeleton()->sequences.add(XMLMeshUtilities::loadSequence(block,1));
+			mesh->getSkeleton()->sequences.add(XMLMeshUtilities::loadSequence(block,1,mEngine!=NULL?mEngine->getBufferManager():NULL));
 		}
 	}
 
@@ -212,7 +212,7 @@ Mesh::ptr XMSHStreamer::loadMeshVersion2Up(mxml_node_t *root,int version){
 			mesh->setSkeleton(XMLMeshUtilities::loadSkeleton(block,version));
 		}
 		else if(strcmp(mxmlGetElementName(block),"Sequence")==0){
-			mesh->getSkeleton()->sequences.add(XMLMeshUtilities::loadSequence(block,version));
+			mesh->getSkeleton()->sequences.add(XMLMeshUtilities::loadSequence(block,version,mEngine!=NULL?mEngine->getBufferManager():NULL));
 		}
 	}
 
@@ -233,7 +233,7 @@ bool XMSHStreamer::saveMeshVersion1(mxml_node_t *root,Mesh::ptr mesh,ProgressLis
 
 		int i;
 		for(i=0;i<skeleton->sequences.size();++i){
-			TransformSequence::ptr sequence=skeleton->sequences[i];
+			Sequence::ptr sequence=skeleton->sequences[i];
 			mxml_node_t *node=XMLMeshUtilities::saveSequence(sequence,1,listener);
 			mxmlSetElement(node,"AnimationData");
 			mxmlAddChild(root,node);
@@ -257,7 +257,7 @@ bool XMSHStreamer::saveMeshVersion2Up(mxml_node_t *root,Mesh::ptr mesh,int versi
 
 		int i;
 		for(i=0;i<skeleton->sequences.size();++i){
-			TransformSequence::ptr sequence=skeleton->sequences[i];
+			Sequence::ptr sequence=skeleton->sequences[i];
 			mxml_node_t *node=XMLMeshUtilities::saveSequence(sequence,version,listener);
 			mxmlSetElement(node,"Sequence");
 			mxmlAddChild(root,node);

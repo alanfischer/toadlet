@@ -31,10 +31,11 @@ namespace toadlet{
 namespace tadpole{
 namespace animation{
 
-MaterialAnimation::MaterialAnimation(Material *target,ColorSequence *sequence,int trackIndex):
+MaterialAnimation::MaterialAnimation(Material *target,Sequence *sequence,int trackIndex):
 	mTarget(target),
 //	mSequence,
 //	mTrack,
+	mElement(0),
 	mValue(0)
 {
 	setSequence(sequence,trackIndex);
@@ -47,22 +48,35 @@ void MaterialAnimation::setTarget(Material *target){
 	mTarget=target;
 }
 
-void MaterialAnimation::setSequence(ColorSequence *sequence,int trackIndex){
+bool MaterialAnimation::setSequence(Sequence *sequence,int trackIndex){
 	mSequence=sequence;
 	mTrack=mSequence->getTrack(trackIndex);
+	mElement=mTrack->getElementIndex(VertexFormat::Semantic_COLOR);
+	if(mElement<0){
+		Error::invalidParameters(Categories::TOADLET_TADPOLE,
+			"no Semantic_COLOR in Track");
+		return false;
+	}
 
 	if(mListener!=NULL){
 		mListener->animationExtentsChanged(this);
 	}
+
+	return true;
 }
 
 void MaterialAnimation::setValue(scalar value){
 	if(mTarget!=NULL){
-		Vector4 color;
-		const ColorKeyFrame *f0=NULL,*f1=NULL;
+		int f1=-1,f2=-1;
 		int hint=0;
-		scalar time=mTrack->getKeyFramesAtTime(value,f0,f1,hint);
-		Math::lerp(color,f0->color,f1->color,time);
+		scalar time=mTrack->getKeyFramesAtTime(value,f1,f2,hint);
+
+		VertexBufferAccessor &vba=mTrack->getAccessor();
+
+		Vector4 c1,c2,color;
+		vba.get4(f1,mElement,c1);
+		vba.get4(f2,mElement,c2);
+		Math::lerp(color,c1,c2,time);
 
 		MaterialState state;
 		mTarget->getRenderState()->getMaterialState(state);

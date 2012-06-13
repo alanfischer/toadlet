@@ -10,13 +10,13 @@ class MeshAnimation:public Animation{
 public:
 	MeshAnimation(MeshNode *target,int sequenceIndex);
 
-	virtual void setValue(scalar value);
-	virtual scalar getMinValue() const;
-	virtual scalar getMaxValue() const;
-	virtual scalar getValue() const;
+	void setValue(scalar value);
+	scalar getMinValue() const;
+	scalar getMaxValue() const;
+	scalar getValue() const;
 
-	virtual void setWeight(scalar weight);
-	virtual scalar getWeight() const;
+	void setWeight(scalar weight);
+	scalar getWeight() const;
 };
 
 }

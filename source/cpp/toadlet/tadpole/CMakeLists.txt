@@ -10,9 +10,6 @@ set (TADPOLE_SRC
 	AudioManager.cpp
 	BaseComponent.cpp
 	BufferManager.cpp
-	ColorKeyFrame.cpp
-	ColorSequence.cpp
-	ColorTrack.cpp
 	DecalShadowSceneRenderer.cpp
 	Engine.cpp
 	Font.cpp
@@ -27,13 +24,12 @@ set (TADPOLE_SRC
 	ResourceManager.cpp
 	Scene.cpp
 	SceneRenderer.cpp
+	Sequence.cpp
 	ShaderManager.cpp
 	ShadowMappedSceneRenderer.cpp
 	Skeleton.cpp
 	SkeletonComponent.cpp
-	TransformKeyFrame.cpp
-	TransformSequence.cpp
-	TransformTrack.cpp
+	Track.cpp
 	TextureManager.cpp
 	Version.cpp
 )
@@ -195,9 +191,6 @@ set (TADPOLE_HEADERS
 	BufferManager.h
 	Collision.h
 	Colors.h
-	ColorKeyFrame.h
-	ColorSequence.h
-	ColorTrack.h
 	Component.h
 	ContextListener.h
 	DecalShadowSceneRenderer.h
@@ -221,6 +214,7 @@ set (TADPOLE_HEADERS
 	RenderableSet.h
 	Scene.h
 	SceneRenderer.h
+	Sequence.h
 	ShaderManager.h
 	ShadowMappedSceneRenderer.h
 	Skeleton.h
@@ -228,11 +222,9 @@ set (TADPOLE_HEADERS
 	TextureData.h
 	TextureManager.h
 	Traceable.h
+	Track.h
 	Transform.h
 	Transformable.h
-	TransformKeyFrame.h
-	TransformSequence.h
-	TransformTrack.h
 	Types.h
 	UpdateListener.h
 	VertexFormats.h

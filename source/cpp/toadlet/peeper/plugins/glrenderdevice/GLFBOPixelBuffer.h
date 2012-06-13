@@ -58,6 +58,7 @@ public:
 	int getUsage() const{return mUsage;}
 	int getAccess() const{return mAccess;}
 	int getDataSize() const{return mDataSize;}
+	int getSize() const{return mFormat->getSize();}
 
 	TextureFormat::ptr getTextureFormat() const{return mFormat;}
 	

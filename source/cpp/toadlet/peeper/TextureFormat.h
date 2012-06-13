@@ -375,7 +375,8 @@ public:
 	inline int getZPitch() const{return zPitch;}
 	inline int getMipMin() const{return mipMin;}
 	inline int getMipMax() const{return mipMax;}
-	inline int getDataSize(){return zPitch;}
+	inline int getDataSize() const{return zPitch;}
+	inline int getSize() const{return getWidth()*getHeight()*getDepth();}
 
 	inline bool isPowerOf2(){
 		return Math::isPowerOf2(xMax) && Math::isPowerOf2(yMax) && (dimension==Dimension_CUBE || Math::isPowerOf2(zMax));

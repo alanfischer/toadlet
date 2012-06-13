@@ -69,8 +69,8 @@ protected:
 	Skeleton::ptr readSkeleton(DataStream *stream,int blockSize);
 	void writeSkeleton(DataStream *stream,Skeleton::ptr skeleton);
 
-	TransformSequence::ptr readSequence(DataStream *stream,int blockSize);
-	void writeSequence(DataStream *stream,TransformSequence::ptr sequence);
+	Sequence::ptr readSequence(DataStream *stream,int blockSize);
+	void writeSequence(DataStream *stream,Sequence::ptr sequence);
 
 	// Blocks for the tmsh format
 	enum Block{

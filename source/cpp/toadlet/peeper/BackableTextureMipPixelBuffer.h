@@ -74,6 +74,7 @@ public:
 	virtual int getUsage() const{return mBack!=NULL?mBack->getUsage():mUsage;}
 	virtual int getAccess() const{return mBack!=NULL?mBack->getAccess():mAccess;}
 	virtual int getDataSize() const{return mBack!=NULL?mBack->getDataSize():(mFormat!=NULL?mFormat->getDataSize():0);}
+	virtual int getSize() const{return mBack!=NULL?mBack->getSize():(mFormat!=NULL?mFormat->getSize():0);}
 	virtual TextureFormat::ptr getTextureFormat() const{return mBack!=NULL?mBack->getTextureFormat():mFormat;}
 
 	virtual tbyte *lock(int lockAccess){return mBack!=NULL?mBack->lock(lockAccess):NULL;}

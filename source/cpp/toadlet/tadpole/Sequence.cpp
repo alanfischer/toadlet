@@ -23,34 +23,34 @@
  *
  ********** Copyright header - do not remove **********/
 
-#include <toadlet/tadpole/ColorSequence.h>
+#include <toadlet/tadpole/Sequence.h>
 
 namespace toadlet{
 namespace tadpole{
 
-ColorSequence::ColorSequence():
+Sequence::Sequence():
 	mLength(0)
 {
 }
 
-ColorSequence::~ColorSequence(){
+Sequence::~Sequence(){
 	destroy();
 }
 
-void ColorSequence::destroy(){
+void Sequence::destroy(){
 }
 
-void ColorSequence::compile(){
+void Sequence::compile(){
 	int i;
 
 	mLength=0;
 	for(i=0;i<mTracks.size();++i){
-		ColorTrack *track=mTracks[i];
+		Track *track=mTracks[i];
 
 		track->compile();
 
-		if(mLength<track->length){
-			mLength=track->length;
+		if(mLength<track->getLength()){
+			mLength=track->getLength();
 		}
 	}
 }

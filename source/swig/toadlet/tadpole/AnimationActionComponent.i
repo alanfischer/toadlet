@@ -23,11 +23,10 @@ public:
 		Cycling_REFLECT,
 	};
 
-	AnimationActionComponent(String name);
+	AnimationActionComponent(char *name);
 	void destroy();
 
-	void setName(String name);
-	String getName() const;
+	void setName(char *name);
 
 	bool getActive() const;
 	

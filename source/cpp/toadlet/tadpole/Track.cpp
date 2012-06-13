@@ -23,22 +23,67 @@
  *
  ********** Copyright header - do not remove **********/
 
-#include <toadlet/tadpole/ColorTrack.h>
+#include <toadlet/tadpole/Track.h>
 
 namespace toadlet{
 namespace tadpole{
 
-ColorTrack::ColorTrack():
-	index(0),
-	length(0)
-{}
+Track::Track(VertexFormat *format):
+	//mFormat,
+	mIndex(0),
+	mData(NULL),
+	//mTimes,
+	mLength(0)
+{
 
-scalar ColorTrack::getKeyFramesAtTime(scalar time,const ColorKeyFrame *&f1,const ColorKeyFrame *&f2,int &trackHint) const{
-	int numKeyFrames=keyFrames.size();
+	mFormat=format;
+	int i;
+	for(i=0;i<mFormat->getNumElements();++i){
+		int semantic=mFormat->getElementSemantic(i);
+		if(semantic>=mSemantics.size()){
+			mSemantics.resize(semantic+1,-1);
+		}
+		mSemantics[semantic]=i;
+	}
+}
+
+int Track::addKeyFrame(scalar time,void *frame){
+	int size=mFormat->getVertexSize();
+	int index=mTimes.size();
+Logger::alert("ADDING FRAME");
+	mTimes.resize(mTimes.size()+1);
+	mTimes[index]=time;
+	mData.resize(mData.size()+size);
+Logger::alert("ADDING FRAME2");
+	if(frame!=NULL){
+Logger::alert("ADDING FRAME3");
+		memcpy(&mData[size*index],frame,size);
+Logger::alert("ADDING FRAME4");
+	}
+
+Logger::alert("ADDING FRAME5");
+	mVBA.unlock();
+	mVBA.lock(this,mFormat);
+
+	return index;
+}
+
+bool Track::getKeyFrame(void *frame,int index){
+	if(index<0 || index>=mTimes.size()){
+		return false;
+	}
+
+	int size=mFormat->getVertexSize();
+	memcpy(frame,&mData[size*index],size);
+	return true;
+}
+
+scalar Track::getKeyFramesAtTime(scalar time,int &f1,int &f2,int &trackHint) const{
+	int numKeyFrames=mTimes.size();
 	if(numKeyFrames<2){
 		if(numKeyFrames==1){
-			f1=&keyFrames.at(0);
-			f2=&keyFrames.at(0);
+			f1=0;
+			f2=0;
 		}
 		return 0;
 	}
@@ -49,15 +94,15 @@ scalar ColorTrack::getKeyFramesAtTime(scalar time,const ColorKeyFrame *&f1,const
 
 	int it=trackHint;
 	int it2=0;
-	if(keyFrames.at(it).time>=time){
+	if(mTimes.at(it)>=time){
 		// Search backwards
-		while(it!=0 && keyFrames.at(it).time>time){
+		while(it!=0 && mTimes.at(it)>time){
 			--it;
 		}
 	}
 	else{
 		// Search forwards
-		while(it!=numKeyFrames && keyFrames.at(it).time<time){
+		while(it!=numKeyFrames && mTimes.at(it)<time){
 			++it;
 		}
 
@@ -73,17 +118,17 @@ scalar ColorTrack::getKeyFramesAtTime(scalar time,const ColorKeyFrame *&f1,const
 		it2=it+1;
 	}
 
-	f1=&keyFrames.at(it);
-	f2=&keyFrames.at(it2);
+	f1=it;
+	f2=it2;
 
-	if(f1->time<f2->time){
-		time=Math::div(time-f1->time,f2->time-f1->time);
+	if(mTimes[f1]<mTimes[f2]){
+		time=Math::div(time-mTimes[f1],mTimes[f2]-mTimes[f1]);
 	}
 	// This code is removed, I'm not sure what purpose its supposed to serve
 	//  and it introduced a dependency on mParent, which I'd like to remove
 	//  -back in for now, cause i added length to here
-	else if(f1->time>f2->time){
-		time=Math::div(time-f1->time,length-f1->time);
+	else if(mTimes[f1]>mTimes[f2]){
+		time=Math::div(time-mTimes[f1],mLength-mTimes[f1]);
 	}
 	else{
 		time=0;
@@ -92,12 +137,12 @@ scalar ColorTrack::getKeyFramesAtTime(scalar time,const ColorKeyFrame *&f1,const
 	return time;
 }
 
-void ColorTrack::compile(){
-	length=0;
+void Track::compile(){
+	mLength=0;
 	int i;
-	for(i=0;i<keyFrames.size();++i){
-		if(length<keyFrames[i].time){
-			length=keyFrames[i].time;
+	for(i=0;i<mTimes.size();++i){
+		if(mLength<mTimes[i]){
+			mLength=mTimes[i];
 		}
 	}
 }

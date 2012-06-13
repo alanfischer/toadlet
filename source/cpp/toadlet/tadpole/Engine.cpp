@@ -469,6 +469,16 @@ void Engine::updateVertexFormats(){
 	format->addElement(VertexFormat::Semantic_COLOR,0,VertexFormat::Format_TYPE_COLOR_RGBA);
 	format->addElement(VertexFormat::Semantic_TEXCOORD,0,formatType|VertexFormat::Format_COUNT_2);
 	mVertexFormats.POSITION_NORMAL_COLOR_TEX_COORD=format;
+
+	format=mBufferManager->createVertexFormat();
+	format->addElement(VertexFormat::Semantic_POSITION,0,formatType|VertexFormat::Format_COUNT_3);
+	format->addElement(VertexFormat::Semantic_ROTATE,0,formatType|VertexFormat::Format_COUNT_4);
+	format->addElement(VertexFormat::Semantic_SCALE,0,formatType|VertexFormat::Format_COUNT_3);
+	mVertexFormats.POSITION_ROTATE_SCALE=format;
+
+	format=mBufferManager->createVertexFormat();
+	format->addElement(VertexFormat::Semantic_COLOR,0,formatType|VertexFormat::Format_COUNT_4);
+	mVertexFormats.COLOR=format;
 }
 
 bool Engine::setAudioDevice(AudioDevice *audioDevice){

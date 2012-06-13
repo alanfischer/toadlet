@@ -29,36 +29,32 @@
 namespace toadlet{
 namespace peeper{
 
-IndexBufferAccessor::IndexBufferAccessor():
-	mIndexBuffer(NULL),
-	mIndexFormat(IndexBuffer::IndexFormat_UINT8),
-	mData(NULL)
-{}
-
-IndexBufferAccessor::IndexBufferAccessor(IndexBuffer *indexBuffer,int access):
-	mIndexBuffer(NULL),
-	mIndexFormat(IndexBuffer::IndexFormat_UINT8),
+IndexBufferAccessor::IndexBufferAccessor(IndexBuffer *buffer,int access):
+	mBuffer(NULL),
+	mFormat(IndexBuffer::IndexFormat_UINT8),
 	mData(NULL)
 {
-	lock(indexBuffer,access);
+	if(buffer!=NULL){
+		lock(buffer,access);
+	}
 }
 
 IndexBufferAccessor::~IndexBufferAccessor(){
 	unlock();
 }
 
-void IndexBufferAccessor::lock(IndexBuffer *indexBuffer,int access){
+void IndexBufferAccessor::lock(Buffer *buffer,IndexBuffer::IndexFormat format,int access){
 	unlock();
 
-	mIndexBuffer=indexBuffer;
-	mIndexFormat=mIndexBuffer->getIndexFormat();
-	mData=mIndexBuffer->lock(access);
+	mBuffer=buffer;
+	mFormat=format;
+	mData=mBuffer->lock(access);
 }
 
 void IndexBufferAccessor::unlock(){
-	if(mIndexBuffer!=NULL){
-		mIndexBuffer->unlock();
-		mIndexBuffer=NULL;
+	if(mBuffer!=NULL){
+		mBuffer->unlock();
+		mBuffer=NULL;
 		mData=NULL;
 	}
 }

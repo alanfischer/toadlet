@@ -47,7 +47,6 @@ public:
 	virtual void resetDestroy()=0;
 
 	virtual VertexFormat::ptr getVertexFormat() const=0;
-	virtual int getSize() const=0;
 };
 
 }

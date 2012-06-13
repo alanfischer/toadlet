@@ -30,11 +30,12 @@
 namespace toadlet{
 namespace tadpole{
 
-XANMStreamer::XANMStreamer(){
+XANMStreamer::XANMStreamer(Engine *engine){
+	mEngine=engine;
 }
 
 Resource::ptr XANMStreamer::load(Stream::ptr stream,ResourceData *data,ProgressListener *listener){
-	TransformSequence::ptr sequence=NULL;
+	Sequence::ptr sequence=NULL;
 
 	/// @todo: Replace the following when mxml implements custom load/save callbacks
 	char buffer[1025];
@@ -74,7 +75,7 @@ Resource::ptr XANMStreamer::load(Stream::ptr stream,ResourceData *data,ProgressL
 }
 
 bool XANMStreamer::save(Stream::ptr stream,Resource::ptr resource,ResourceData *data,ProgressListener *listener){
-	TransformSequence::ptr sequence=shared_static_cast<TransformSequence>(resource);
+	Sequence::ptr sequence=shared_static_cast<Sequence>(resource);
 	if(sequence==NULL){
 		return false;
 	}
@@ -106,33 +107,33 @@ bool XANMStreamer::save(Stream::ptr stream,Resource::ptr resource,ResourceData *
 	return true;
 }
 
-TransformSequence::ptr XANMStreamer::loadSequenceVersion1(mxml_node_t *root){
-	TransformSequence::ptr sequence=NULL;
+Sequence::ptr XANMStreamer::loadSequenceVersion1(mxml_node_t *root){
+	Sequence::ptr sequence=NULL;
 
 	mxml_node_t *block=root->child;
 	while((block=block->next)!=NULL){
 		if(strcmp(mxmlGetElementName(block),"AnimationData")==0){
-			sequence=XMLMeshUtilities::loadSequence(block,1);
+			sequence=XMLMeshUtilities::loadSequence(block,1,mEngine!=NULL?mEngine->getBufferManager():NULL);
 		}
 	}
 
 	return sequence;
 }
 
-TransformSequence::ptr XANMStreamer::loadSequenceVersion2Up(mxml_node_t *root,int version){
-	TransformSequence::ptr sequence=NULL;
+Sequence::ptr XANMStreamer::loadSequenceVersion2Up(mxml_node_t *root,int version){
+	Sequence::ptr sequence=NULL;
 
 	mxml_node_t *block=root->child;
 	while((block=block->next)!=NULL){
 		if(strcmp(mxmlGetElementName(block),"Sequence")==0){
-			sequence=XMLMeshUtilities::loadSequence(block,version);
+			sequence=XMLMeshUtilities::loadSequence(block,version,mEngine!=NULL?mEngine->getBufferManager():NULL);
 		}
 	}
 
 	return sequence;
 }
 
-bool XANMStreamer::saveSequenceVersion1(mxml_node_t *root,TransformSequence::ptr sequence,ProgressListener *listener){
+bool XANMStreamer::saveSequenceVersion1(mxml_node_t *root,Sequence::ptr sequence,ProgressListener *listener){
 	if(sequence!=NULL){
 		mxml_node_t *node=XMLMeshUtilities::saveSequence(sequence,1,listener);
 		mxmlSetElement(node,"AnimationData");
@@ -142,7 +143,7 @@ bool XANMStreamer::saveSequenceVersion1(mxml_node_t *root,TransformSequence::ptr
 	return true;
 }
 
-bool XANMStreamer::saveSequenceVersion2Up(mxml_node_t *root,TransformSequence::ptr sequence,int version,ProgressListener *listener){
+bool XANMStreamer::saveSequenceVersion2Up(mxml_node_t *root,Sequence::ptr sequence,int version,ProgressListener *listener){
 	if(sequence!=NULL){
 		mxml_node_t *node=XMLMeshUtilities::saveSequence(sequence,version,listener);
 		mxmlSetElement(node,"Sequence");

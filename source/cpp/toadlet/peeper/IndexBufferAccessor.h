@@ -31,38 +31,36 @@
 
 // Check for the correct access bits or if it's a backable buffer
 #define TOADLET_CHECK_READ() TOADLET_ASSERT( \
-	(mIndexBuffer->getAccess()&toadlet::peeper::Buffer::Access_BIT_READ)!=0 || \
-	(mIndexBuffer->getRootIndexBuffer()!=mIndexBuffer));
+	(mBuffer->getAccess()&toadlet::peeper::Buffer::Access_BIT_READ)!=0);
 
 #define TOADLET_CHECK_WRITE() TOADLET_ASSERT( \
-	(mIndexBuffer->getAccess()&toadlet::peeper::Buffer::Access_BIT_WRITE)!=0 || \
-	(mIndexBuffer->getRootIndexBuffer()!=mIndexBuffer));
+	(mBuffer->getAccess()&toadlet::peeper::Buffer::Access_BIT_WRITE)!=0);
 
 namespace toadlet{
 namespace peeper{
 
 class TOADLET_API IndexBufferAccessor{
 public:
-	IndexBufferAccessor();
-	IndexBufferAccessor(IndexBuffer *indexBuffer,int access=Buffer::Access_READ_WRITE);
+	IndexBufferAccessor(IndexBuffer *buffer=NULL,int access=Buffer::Access_READ_WRITE);
 
 	virtual ~IndexBufferAccessor();
 
-	void lock(IndexBuffer *indexBuffer,int access=Buffer::Access_READ_WRITE);
+	void lock(IndexBuffer *buffer,int access=Buffer::Access_READ_WRITE){lock(buffer,buffer->getIndexFormat(),access);}
+	void lock(Buffer *buffer,IndexBuffer::IndexFormat format,int access=Buffer::Access_READ_WRITE);
 	void unlock();
 
-	inline int getSize() const{return mIndexBuffer->getSize();}
+	inline int getSize() const{return mBuffer->getSize();}
 
 	inline uint8 *getData(){return mData;}
 
 	inline void set(int i,uint32 x){
 		TOADLET_CHECK_WRITE();
 		TOADLET_ASSERT(i>=0 && i<=getSize()); // "index out of bounds"
-		if(mIndexFormat==IndexBuffer::IndexFormat_UINT8){
+		if(mFormat==IndexBuffer::IndexFormat_UINT8){
 			TOADLET_ASSERT(x<Extents::MAX_UINT8); // "out of datatype range"
 			((uint8*)mData)[i]=x;
 		}
-		else if(mIndexFormat==IndexBuffer::IndexFormat_UINT16){
+		else if(mFormat==IndexBuffer::IndexFormat_UINT16){
 			TOADLET_ASSERT(x<Extents::MAX_UINT16); // "out of datatype range"
 			((uint16*)mData)[i]=x;
 		}
@@ -75,10 +73,10 @@ public:
 	inline uint32 get(int i){
 		TOADLET_CHECK_WRITE();
 		TOADLET_ASSERT(i>=0 && i<=getSize()); // "index out of bounds"
-		if(mIndexFormat==IndexBuffer::IndexFormat_UINT8){
+		if(mFormat==IndexBuffer::IndexFormat_UINT8){
 			return ((uint8*)mData)[i];
 		}
-		else if(mIndexFormat==IndexBuffer::IndexFormat_UINT16){
+		else if(mFormat==IndexBuffer::IndexFormat_UINT16){
 			return ((uint16*)mData)[i];
 		}
 		else{ // IndexBuffer::IndexFormat_UINT32
@@ -87,8 +85,8 @@ public:
 	}
 
 protected:
-	IndexBuffer *mIndexBuffer;
-	IndexBuffer::IndexFormat mIndexFormat;
+	Buffer *mBuffer;
+	IndexBuffer::IndexFormat mFormat;
 	uint8 *mData;
 };
 

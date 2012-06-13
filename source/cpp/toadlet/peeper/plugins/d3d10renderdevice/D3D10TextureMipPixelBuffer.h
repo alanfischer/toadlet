@@ -54,6 +54,7 @@ public:
 	int getAccess() const{return 0;}
 	TextureFormat::ptr getTextureFormat() const{return mFormat;}
 	int getDataSize() const{return mDataSize;}
+	int getSize() const{return mFormat->getSize();}
 
 	tbyte *lock(int lockAccess);
 	bool unlock();

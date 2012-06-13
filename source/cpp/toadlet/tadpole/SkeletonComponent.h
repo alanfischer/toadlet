@@ -154,7 +154,7 @@ protected:
 	AABox mBound;
 	int mLastUpdateFrame;
 
-	TransformSequence::ptr mSequence;
+	Sequence::ptr mSequence;
 	scalar mSequenceTime;
 	Collection<int> mTrackHints;
 
