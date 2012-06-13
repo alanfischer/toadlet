@@ -31,7 +31,7 @@ namespace tadpole{
 Track::Track(VertexFormat *format):
 	//mFormat,
 	mIndex(0),
-	mData(NULL),
+	//mData,
 	//mTimes,
 	mLength(0)
 {
@@ -50,18 +50,14 @@ Track::Track(VertexFormat *format):
 int Track::addKeyFrame(scalar time,void *frame){
 	int size=mFormat->getVertexSize();
 	int index=mTimes.size();
-Logger::alert("ADDING FRAME");
+
 	mTimes.resize(mTimes.size()+1);
 	mTimes[index]=time;
 	mData.resize(mData.size()+size);
-Logger::alert("ADDING FRAME2");
 	if(frame!=NULL){
-Logger::alert("ADDING FRAME3");
 		memcpy(&mData[size*index],frame,size);
-Logger::alert("ADDING FRAME4");
 	}
 
-Logger::alert("ADDING FRAME5");
 	mVBA.unlock();
 	mVBA.lock(this,mFormat);
 
