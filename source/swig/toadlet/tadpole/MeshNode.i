@@ -11,6 +11,9 @@ public:
 	void destroy();
 
 	void setMesh(char *name);
+
+	Material *getSubMaterial(int i);
+	Material *getSubMaterial(char *name);
 	
 	RenderState *getSharedRenderState();
 };

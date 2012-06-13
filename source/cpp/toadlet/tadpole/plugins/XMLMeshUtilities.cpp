@@ -336,6 +336,25 @@ Material::ptr XMLMeshUtilities::loadMaterial(mxml_node_t *materialNode,int versi
 			renderState->setRasterizerState(rasterizerState);
 		}
 	}
+	
+	BlendState blendState;
+	renderState->getBlendState(blendState);
+	{
+		mxml_node_t *blendNode=mxmlFindChild(materialNode,"Blend");
+		if(blendNode!=NULL){
+			String blend=String(mxmlGetOpaque(blendNode->child)).toLower();
+			if(blend=="alpha"){
+				blendState.set(BlendState::Combination_ALPHA);
+			}
+			else if(blend=="color"){
+				blendState.set(BlendState::Combination_COLOR);
+			}
+		}
+
+		if(blendNode!=NULL){
+			renderState->setBlendState(blendState);
+		}
+	}
 
 	return material;
 }
@@ -404,6 +423,21 @@ mxml_node_t *XMLMeshUtilities::saveMaterial(Material::ptr material,int version,P
 		}
 	}
 
+	BlendState blendState;
+	if(renderState->getBlendState(blendState)){
+		mxml_node_t *blendNode=mxmlNewElement(materialNode,"Blend");
+		{
+			switch(blendState.dest){
+				case BlendState::Operation_ONE_MINUS_SOURCE_ALPHA:
+					mxmlNewOpaque(blendNode,"Alpha");
+				break;
+				case BlendState::Operation_ONE_MINUS_SOURCE_COLOR:
+					mxmlNewOpaque(blendNode,"Color");
+				break;
+			}
+		}
+	}
+
 	return materialNode;
 }
 
@@ -440,7 +474,7 @@ Mesh::ptr XMLMeshUtilities::loadMesh(mxml_node_t *node,int version,BufferManager
 			vertexFormat=bufferManager->createVertexFormat();
 		}
 		else{
-			vertexFormat=VertexFormat::ptr(new BackableVertexFormat());
+			vertexFormat=new BackableVertexFormat();
 		}
 		Collection<Mesh::VertexBoneAssignmentList> vbas;
 
@@ -958,8 +992,8 @@ mxml_node_t *XMLMeshUtilities::saveSkeleton(Skeleton::ptr skeleton,int version,P
 	return skeletonNode;
 }
 
-TransformSequence::ptr XMLMeshUtilities::loadSequence(mxml_node_t *node,int version){
-	TransformSequence::ptr sequence(new TransformSequence());
+Sequence::ptr XMLMeshUtilities::loadSequence(mxml_node_t *node,int version,BufferManager *bufferManager){
+	Sequence::ptr sequence=new Sequence();
 
 	const char *prop=NULL;
 	prop=mxmlElementGetAttr(node,"Name");
@@ -979,7 +1013,18 @@ TransformSequence::ptr XMLMeshUtilities::loadSequence(mxml_node_t *node,int vers
 			continue;
 		}
 
-		TransformTrack::ptr track(new TransformTrack());
+		VertexFormat::ptr format;
+		if(bufferManager!=NULL){
+			format=bufferManager->createVertexFormat();
+		}
+		else{
+			format=new BackableVertexFormat();
+		}
+		format->addElement(VertexFormat::Semantic_POSITION,0,VertexFormat::Format_TYPE_FLOAT_32|VertexFormat::Format_COUNT_3);
+		format->addElement(VertexFormat::Semantic_ROTATE,0,VertexFormat::Format_TYPE_FLOAT_32|VertexFormat::Format_COUNT_4);
+		format->addElement(VertexFormat::Semantic_SCALE,0,VertexFormat::Format_TYPE_FLOAT_32|VertexFormat::Format_COUNT_3);
+
+		Track::ptr track=new Track(format);
 		sequence->addTrack(track);
 
 		if(version<=2){
@@ -989,39 +1034,38 @@ TransformSequence::ptr XMLMeshUtilities::loadSequence(mxml_node_t *node,int vers
 			prop=mxmlElementGetAttr(trackNode,"Index");
 		}
 		if(prop!=NULL){
-			track->index=parseInt(prop);
+			track->setIndex(parseInt(prop));
 		}
 
-		track->length=sequenceLength;
+		track->setLength(sequenceLength);
 
+		VertexBufferAccessor &vba=track->getAccessor();
 		mxml_node_t *keyFrameNode=trackNode->child;
 		while((keyFrameNode=keyFrameNode->next)!=NULL){
 			if(strcmp(mxmlGetElementName(keyFrameNode),"KeyFrame")!=0){
 				continue;
 			}
 
-			TransformKeyFrame keyFrame;
+			int index=0;
 			prop=mxmlElementGetAttr(keyFrameNode,"Time");
 			if(prop!=NULL){
-				keyFrame.time=parseScalar(prop);
+				index=track->addKeyFrame(parseScalar(prop));
 			}
 
 			mxml_node_t *translateNode=mxmlFindChild(keyFrameNode,"Translate");
 			if(translateNode!=NULL){
-				keyFrame.translate=parseVector3(mxmlGetOpaque(translateNode->child));
+				vba.set3(index,0,parseVector3(mxmlGetOpaque(translateNode->child)));
 			}
 
 			mxml_node_t *rotateNode=mxmlFindChild(keyFrameNode,"Rotate");
 			if(rotateNode!=NULL){
-				keyFrame.rotate=parseQuaternion(mxmlGetOpaque(rotateNode->child));
+				vba.set4(index,1,parseQuaternion(mxmlGetOpaque(rotateNode->child)));
 			}
 
 			mxml_node_t *scaleNode=mxmlFindChild(keyFrameNode,"Scale");
 			if(scaleNode!=NULL){
-				keyFrame.scale=parseVector3(mxmlGetOpaque(scaleNode->child));
+				vba.set3(index,2,parseVector3(mxmlGetOpaque(scaleNode->child)));
 			}
-
-			track->keyFrames.add(keyFrame);
 		}
 	}
 
@@ -1030,7 +1074,7 @@ TransformSequence::ptr XMLMeshUtilities::loadSequence(mxml_node_t *node,int vers
 	return sequence;
 }
 
-mxml_node_t *XMLMeshUtilities::saveSequence(TransformSequence::ptr sequence,int version,ProgressListener *listener){
+mxml_node_t *XMLMeshUtilities::saveSequence(Sequence::ptr sequence,int version,ProgressListener *listener){
 	mxml_node_t *sequenceNode=mxmlNewElement(MXML_NO_PARENT,"Sequence");
 
 	if(sequence->getName()!=(char*)NULL){
@@ -1045,33 +1089,38 @@ mxml_node_t *XMLMeshUtilities::saveSequence(TransformSequence::ptr sequence,int 
 			listener->progressUpdated((float)j/(float)sequence->getNumTracks());
 		}
 
-		TransformTrack::ptr track=sequence->getTrack(j);
+		Track::ptr track=sequence->getTrack(j);
 
 		mxml_node_t *trackNode=mxmlNewElement(sequenceNode,"Track");
 
-		mxmlElementSetAttr(trackNode,"Bone",makeInt(track->index));
+		mxmlElementSetAttr(trackNode,"Index",makeInt(track->getIndex()));
 
+		VertexBufferAccessor &vba=track->getAccessor();
 		int k;
-		for(k=0;k<track->keyFrames.size();++k){
-			const TransformKeyFrame keyFrame=track->keyFrames[k];
-
+		for(k=0;k<track->getNumKeyFrames();++k){
 			mxml_node_t *keyFrameNode=mxmlNewElement(trackNode,"KeyFrame");
 
-			mxmlElementSetAttr(keyFrameNode,"Time",makeScalar(keyFrame.time));
+			mxmlElementSetAttr(keyFrameNode,"Time",makeScalar(track->getTime(k)));
 
 			mxml_node_t *translateNode=mxmlNewElement(keyFrameNode,"Translate");
 			{
-				mxmlNewOpaque(translateNode,makeVector3(keyFrame.translate));
+				Vector3 translate;
+				vba.get3(k,0,translate);
+				mxmlNewOpaque(translateNode,makeVector3(translate));
 			}
 
 			mxml_node_t *rotateNode=mxmlNewElement(keyFrameNode,"Rotate");
 			{
-				mxmlNewOpaque(rotateNode,makeQuaternion(keyFrame.rotate));
+				Quaternion rotate;
+				vba.get4(k,1,rotate);
+				mxmlNewOpaque(rotateNode,makeQuaternion(rotate));
 			}
 
 			mxml_node_t *scaleNode=mxmlNewElement(keyFrameNode,"Scale");
 			{
-				mxmlNewOpaque(scaleNode,makeVector3(keyFrame.scale));
+				Vector3 scale;
+				vba.get3(k,2,scale);
+				mxmlNewOpaque(scaleNode,makeVector3(scale));
 			}
 		}
 	}

@@ -59,7 +59,7 @@ Resource::ptr TMSHStreamer::load(Stream::ptr stream,ResourceData *data,ProgressL
 	Mesh::ptr mesh;
 	Collection<Material::ptr> materials;
 	Skeleton::ptr skeleton;
-	Collection<TransformSequence::ptr> sequences;
+	Collection<Sequence::ptr> sequences;
 	while(stream->position()<stream->length()){
 		int blockType=dataStream->readInt32();
 		int blockSize=dataStream->readInt32();
@@ -143,7 +143,7 @@ bool TMSHStreamer::save(Stream::ptr stream,Resource::ptr resource,ResourceData *
 		memoryStream->reset();
 
 		for(i=0;i<skeleton->sequences.size();++i){
-			TransformSequence::ptr sequence=skeleton->sequences[i];
+			Sequence::ptr sequence=skeleton->sequences[i];
 			writeSequence(dataMemoryStream,sequence);
 			dataStream->writeInt32(Block_SEQUENCE);
 			dataStream->writeInt32(memoryStream->length());
@@ -426,6 +426,14 @@ Material::ptr TMSHStreamer::readMaterial(DataStream *stream,int blockSize){
 		}
 	}
 
+	if(stream->readBool()){
+		BlendState blendState;
+		stream->read((tbyte*)&blendState,sizeof(BlendState));
+		if(renderState!=NULL){
+			renderState->setBlendState(blendState);
+		}
+	}
+
 	return material;
 }
 
@@ -454,6 +462,15 @@ void TMSHStreamer::writeMaterial(DataStream *stream,Material::ptr material){
 	if(renderState->getRasterizerState(rasterizerState)){
 		stream->writeBool(true);
 		stream->write((tbyte*)&rasterizerState,sizeof(RasterizerState));
+	}
+	else{
+		stream->writeBool(false);
+	}
+
+	BlendState blendState;
+	if(renderState->getBlendState(blendState)){
+		stream->writeBool(true);
+		stream->write((tbyte*)&blendState,sizeof(BlendState));
 	}
 	else{
 		stream->writeBool(false);
@@ -512,58 +529,72 @@ void TMSHStreamer::writeSkeleton(DataStream *stream,Skeleton::ptr skeleton){
 	}
 }
 
-TransformSequence::ptr TMSHStreamer::readSequence(egg::io::DataStream *stream,int blockSize){
-	TransformSequence::ptr sequence(new TransformSequence());
+Sequence::ptr TMSHStreamer::readSequence(DataStream *stream,int blockSize){
+	Sequence::ptr sequence=new Sequence();
 
 	int numTracks=stream->readInt32();
 
 	int i,j;
 	for(i=0;i<numTracks;++i){
-		TransformTrack::ptr track(new TransformTrack());
-		sequence->addTrack(track);
+		Track::ptr track=new Track(mEngine->getVertexFormats().POSITION_ROTATE_SCALE);
+		VertexBufferAccessor &vba=track->getAccessor();
 
-		track->index=stream->readInt32();
-		track->length=stream->readFloat();
-		track->keyFrames.resize(stream->readInt32());
+		track->setIndex(stream->readInt32());
+		track->setLength(stream->readFloat());
 
-		for(j=0;j<track->keyFrames.size();++j){
-			TransformKeyFrame frame;
-			frame.time=stream->readFloat();
-			stream->readVector3(frame.translate);
-			stream->readQuaternion(frame.rotate);
-			stream->readVector3(frame.scale);
-			track->keyFrames[j]=frame;
+		int numKeyFrames=stream->readInt32();
+		for(j=0;j<numKeyFrames;++j){
+			int index=track->addKeyFrame(stream->readFloat());
+
+			Vector3 translate;
+			Quaternion rotate;
+			Vector3 scale;
+			stream->readVector3(translate);
+			stream->readQuaternion(rotate);
+			stream->readVector3(scale);
+			vba.set3(index,0,translate);
+			vba.set4(index,1,rotate);
+			vba.set3(index,2,scale);
 		}
+
+		sequence->addTrack(track);
 	}
 
 	sequence->setLength(stream->readFloat());
-	sequence->setScaled(stream->readBool());
+	bool oldScaled=stream->readBool();
 
 	return sequence;
 }
 
-void TMSHStreamer::writeSequence(egg::io::DataStream *stream,TransformSequence::ptr sequence){
+void TMSHStreamer::writeSequence(DataStream *stream,Sequence::ptr sequence){
 	stream->writeInt32(sequence->getNumTracks());
 
 	int i,j;
 	for(i=0;i<sequence->getNumTracks();++i){
-		TransformTrack *track=sequence->getTrack(i);
+		Track *track=sequence->getTrack(i);
+		VertexBufferAccessor &vba=track->getAccessor();
 
-		stream->writeInt32(track->index);
-		stream->writeFloat(track->length);
-		stream->writeInt32(track->keyFrames.size());
+		stream->writeInt32(track->getIndex());
+		stream->writeFloat(track->getLength());
+		stream->writeInt32(track->getNumKeyFrames());
 
-		for(j=0;j<track->keyFrames.size();++j){
-			const TransformKeyFrame &frame=track->keyFrames[j];
-			stream->writeFloat(frame.time);
-			stream->writeVector3(frame.translate);
-			stream->writeQuaternion(frame.rotate);
-			stream->writeVector3(frame.scale);
+		for(j=0;j<track->getNumKeyFrames();++j){
+			stream->writeFloat(track->getTime(j));
+
+			Vector3 translate;
+			Quaternion rotate;
+			Vector3 scale;
+			vba.get3(j,0,translate);
+			vba.get4(j,1,rotate);
+			vba.get3(j,2,scale);
+			stream->writeVector3(translate);
+			stream->writeQuaternion(rotate);
+			stream->writeVector3(scale);
 		}
 	}
 
 	stream->writeFloat(sequence->getLength());
-	stream->writeBool(sequence->getScaled());
+	stream->writeBool(false);
 }
 
 }

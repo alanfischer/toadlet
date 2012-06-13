@@ -7,7 +7,7 @@ namespace tadpole{
 
 %refobject Scene "$this->retain();"
 %unrefobject Scene "$this->release();"
-%newobject Scene::getRoot();
+%newobject Scene::getRoot;
 
 class Scene{
 public:

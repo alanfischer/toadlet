@@ -124,19 +124,27 @@ String SkeletonComponent::getBoneName(int index) const{
 
 int SkeletonComponent::updateBoneTransformation(Bone *bone){
 	if(mSequence!=NULL){
-		TransformTrack *track=mSequence->getTrack(bone->index);
+		Track *track=mSequence->getTrack(bone->index);
 		scalar time=mSequenceTime;
 		if(track!=NULL){
-			const TransformKeyFrame *f1=NULL,*f2=NULL;
+			int f1=-1,f2=-1;
 			scalar t=track->getKeyFramesAtTime(time,f1,f2,mTrackHints[bone->index]);
-			if(f1==NULL || f2==NULL){
+			if(f1==-1 || f2==-1){
 				return bone->dontUpdateFlags;
 			}
+
+			VertexBufferAccessor &vba=track->getAccessor();
 			if((bone->dontUpdateFlags&BoneSpaceUpdate_FLAG_TRANSLATE)==0){
-				Math::lerp(bone->localTranslate,f1->translate,f2->translate,t);
+				Vector3 t1,t2;
+				vba.get3(f1,0,t1);
+				vba.get3(f1,0,t2);
+				Math::lerp(bone->localTranslate,t1,t2,t);
 			}
 			if((bone->dontUpdateFlags&BoneSpaceUpdate_FLAG_ROTATE)==0){
-				Math::lerp(bone->localRotate,f1->rotate,f2->rotate,t);
+				Quaternion r1,r2;
+				vba.get4(f1,1,r1);
+				vba.get4(f1,1,r2);
+				Math::lerp(bone->localRotate,r1,r2,t);
 				Math::normalizeCarefully(bone->localRotate,0);
 			}
 			return BoneSpaceUpdate_FLAG_TRANSLATE|BoneSpaceUpdate_FLAG_ROTATE;

@@ -26,8 +26,8 @@
 #ifndef TOADLET_TADPOLE_XANMSTREAMER_H
 #define TOADLET_TADPOLE_XANMSTREAMER_H
 
-#include <toadlet/tadpole/ResourceStreamer.h>
-#include <toadlet/tadpole/TransformSequence.h>
+#include <toadlet/tadpole/Engine.h>
+#include <toadlet/tadpole/Sequence.h>
 
 typedef struct mxml_node_s mxml_node_t;
 
@@ -38,16 +38,18 @@ class TOADLET_API XANMStreamer:public Object,public ResourceStreamer{
 public:
 	TOADLET_OBJECT(XANMStreamer);
 
-	XANMStreamer();
+	XANMStreamer(Engine *engine);
 
 	Resource::ptr load(Stream::ptr stream,ResourceData *data,ProgressListener *listener);
 	bool save(Stream::ptr stream,Resource::ptr resource,ResourceData *data,ProgressListener *listener);
 
 protected:
-	TransformSequence::ptr loadSequenceVersion1(mxml_node_t *root);
-	TransformSequence::ptr loadSequenceVersion2Up(mxml_node_t *root,int version);
-	bool saveSequenceVersion1(mxml_node_t *root,TransformSequence::ptr sequence,ProgressListener *listener);
-	bool saveSequenceVersion2Up(mxml_node_t *root,TransformSequence::ptr sequence,int version,ProgressListener *listener);
+	Sequence::ptr loadSequenceVersion1(mxml_node_t *root);
+	Sequence::ptr loadSequenceVersion2Up(mxml_node_t *root,int version);
+	bool saveSequenceVersion1(mxml_node_t *root,Sequence::ptr sequence,ProgressListener *listener);
+	bool saveSequenceVersion2Up(mxml_node_t *root,Sequence::ptr sequence,int version,ProgressListener *listener);
+
+	Engine *mEngine;
 };
 
 }

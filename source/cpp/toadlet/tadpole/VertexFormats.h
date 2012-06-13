@@ -44,6 +44,8 @@ public:
 	VertexFormat::ptr POSITION_NORMAL_TEX_COORD;
 	VertexFormat::ptr POSITION_COLOR_TEX_COORD;
 	VertexFormat::ptr POSITION_NORMAL_COLOR_TEX_COORD;
+	VertexFormat::ptr POSITION_ROTATE_SCALE;
+	VertexFormat::ptr COLOR;
 };
 
 }

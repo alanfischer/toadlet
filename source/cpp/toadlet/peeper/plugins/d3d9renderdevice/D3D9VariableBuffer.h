@@ -55,6 +55,7 @@ public:
 	int getAccess() const{return mAccess;}
 	VariableBufferFormat::ptr getVariableBufferFormat() const{return mVariableFormat;}
 	int getDataSize() const{return mDataSize;}
+	int getSize() const{return mVariableFormat->getSize();}
 
 	tbyte *lock(int lockAccess);
 	bool unlock();

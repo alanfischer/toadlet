@@ -45,13 +45,9 @@ set (CMAKE_JAVA_COMPILE_FLAGS -Xlint:unchecked)
 
 # Compile jars for each library
 
-# toadlet_flick
-configure_file (us/toadlet/flick/Version.java.cmake ${CMAKE_CURRENT_BINARY_DIR}/us/toadlet/flick/Version.java)
-
 set (FLICK_SRC
 	us/toadlet/flick/AndroidSensorDevice.java
 	${FLICK_SWIG_INT_OUTPUTS}
-#	${CMAKE_CURRENT_BINARY_DIR}/us/toadlet/flick/Version.java
 )
 
 set (FLICK_H
@@ -72,15 +68,10 @@ install (FILES ${JARFILE} DESTINATION ${JAR_INSTALL_DIR})
 #	COMMAND ${Java_JAVAH_EXECUTABLE} -classpath ${JARFILE} ${FLICK_H}
 #)
 
-
-# toadlet_peeper
-configure_file (us/toadlet/peeper/Version.java.cmake ${CMAKE_CURRENT_BINARY_DIR}/us/toadlet/peeper/Version.java)
-
 set (PEEPER_SRC
 	us/toadlet/peeper/EGLRenderTarget.java
 	us/toadlet/peeper/EGLWindowRenderTarget.java
 	${PEEPER_SWIG_INT_OUTPUTS}
-#	${CMAKE_CURRENT_BINARY_DIR}/us/toadlet/peeper/Version.java
 )
 
 set (PEEPER_H
@@ -102,15 +93,11 @@ install (FILES ${JARFILE} DESTINATION ${JAR_INSTALL_DIR})
 #)
 
 
-# toadlet_ribbit
-configure_file (us/toadlet/ribbit/Version.java.cmake ${CMAKE_CURRENT_BINARY_DIR}/us/toadlet/ribbit/Version.java)
-
 set (RIBBIT_SRC
 	us/toadlet/ribbit/ATAudioBuffer.java
 	us/toadlet/ribbit/ATAudio.java
 	us/toadlet/ribbit/ATAudioDevice.java
 	${RIBBIT_SWIG_INT_OUTPUTS}
-#	${CMAKE_CURRENT_BINARY_DIR}/us/toadlet/ribbit/Version.java
 )
 
 set (RIBBIT_H
@@ -132,12 +119,8 @@ install (FILES ${JARFILE} DESTINATION ${JAR_INSTALL_DIR})
 #)
 
 
-# toadlet_tadpole
-configure_file (us/toadlet/tadpole/Version.java.cmake ${CMAKE_CURRENT_BINARY_DIR}/us/toadlet/tadpole/Version.java)
-
 set (TADPOLE_SRC
 	${TADPOLE_SWIG_INT_OUTPUTS}
-#	${CMAKE_CURRENT_BINARY_DIR}/us/toadlet/tadpole/Version.java
 )
 
 set (TADPOLE_H
@@ -159,13 +142,9 @@ install (FILES ${JARFILE} DESTINATION ${JAR_INSTALL_DIR})
 #)
 
 
-# toadlet_pad
-configure_file (us/toadlet/pad/Version.java.cmake ${CMAKE_CURRENT_BINARY_DIR}/us/toadlet/pad/Version.java)
-
 set (PAD_SRC
 	us/toadlet/pad/AndroidApplication.java
 	${PAD_SWIG_INT_OUTPUTS}
-#	${CMAKE_CURRENT_BINARY_DIR}/us/toadlet/pad/Version.java
 )
 
 set (PAD_H

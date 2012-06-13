@@ -45,27 +45,26 @@
 
 // Check for the correct access bits or if it's a backable buffer
 #define TOADLET_CHECK_READ() TOADLET_ASSERT( \
-	(mVertexBuffer->getAccess()&toadlet::peeper::Buffer::Access_BIT_READ)!=0 || \
-	(mVertexBuffer->getRootVertexBuffer()!=mVertexBuffer));
+	(mBuffer->getAccess()&toadlet::peeper::Buffer::Access_BIT_READ)!=0);
 
 #define TOADLET_CHECK_WRITE() TOADLET_ASSERT( \
-	(mVertexBuffer->getAccess()&toadlet::peeper::Buffer::Access_BIT_WRITE)!=0 || \
-	(mVertexBuffer->getRootVertexBuffer()!=mVertexBuffer));
+	(mBuffer->getAccess()&toadlet::peeper::Buffer::Access_BIT_WRITE)!=0);
 
 namespace toadlet{
 namespace peeper{
 
 class TOADLET_API VertexBufferAccessor{
 public:
-	VertexBufferAccessor();
-	VertexBufferAccessor(VertexBuffer *vertexBuffer,int access=Buffer::Access_READ_WRITE);
+	VertexBufferAccessor(VertexBuffer *buffer=NULL,int access=Buffer::Access_READ_WRITE);
+	VertexBufferAccessor(Buffer *buffer,VertexFormat *format,int access=Buffer::Access_READ_WRITE);
 
 	virtual ~VertexBufferAccessor();
 
-	void lock(VertexBuffer *vertexBuffer,int access=Buffer::Access_READ_WRITE);
+	void lock(VertexBuffer *buffer,int access=Buffer::Access_READ_WRITE){lock(buffer,buffer->getVertexFormat(),access);}
+	void lock(Buffer *buffer,VertexFormat *format,int access=Buffer::Access_READ_WRITE);
 	void unlock();
 
-	inline int getSize() const{return mVertexBuffer->getSize();}
+	inline int getSize() const{return mBuffer->getSize();}
 
 	inline uint8 *getData(){return mData;}
 
@@ -215,6 +214,23 @@ public:
 		}
 	}
 
+	inline void set4(int i,int e,const Quaternion &v){
+		TOADLET_CHECK_WRITE();
+		i=offset(i,e);
+		if(mNativeFixed){
+			mFixedData[i]=TOADLET_TOFIXED(v.x);
+			mFixedData[i+1]=TOADLET_TOFIXED(v.y);
+			mFixedData[i+2]=TOADLET_TOFIXED(v.z);
+			mFixedData[i+3]=TOADLET_TOFIXED(v.w);
+		}
+		else{
+			mFloatData[i]=TOADLET_TOFLOAT(v.x);
+			mFloatData[i+1]=TOADLET_TOFLOAT(v.y);
+			mFloatData[i+2]=TOADLET_TOFLOAT(v.z);
+			mFloatData[i+3]=TOADLET_TOFLOAT(v.w);
+		}
+	}
+
 	inline void setRGBA(int i,int e,uint32 c){
 		TOADLET_CHECK_WRITE();
 		mColorData[offset(i,e)]=c;
@@ -326,6 +342,23 @@ public:
 		}
 	}
 
+	inline void get4(int i,int e,Quaternion &v){
+		TOADLET_CHECK_READ();
+		i=offset(i,e);
+		if(mNativeFixed){
+			v.x=TOADLET_FROMFIXED(mFixedData[i]);
+			v.y=TOADLET_FROMFIXED(mFixedData[i+1]);
+			v.z=TOADLET_FROMFIXED(mFixedData[i+2]);
+			v.w=TOADLET_FROMFIXED(mFixedData[i+3]);
+		}
+		else{
+			v.x=TOADLET_FROMFLOAT(mFloatData[i]);
+			v.y=TOADLET_FROMFLOAT(mFloatData[i+1]);
+			v.z=TOADLET_FROMFLOAT(mFloatData[i+2]);
+			v.w=TOADLET_FROMFLOAT(mFloatData[i+3]);
+		}
+	}
+
 	inline uint32 getRGBA(int i,int e){
 		TOADLET_CHECK_READ();
 		return mColorData[offset(i,e)];
@@ -338,11 +371,11 @@ public:
 
 protected:
 	inline int offset(int vertex,int element){
-		TOADLET_ASSERT(vertex>=0 && element>=0 && (vertex*mVertexSize32 + mElementOffsets32[element])*sizeof(int32)<(uint32)mVertexBuffer->getDataSize()); // "vertex out of bounds"
+		TOADLET_ASSERT(vertex>=0 && element>=0 && (vertex*mVertexSize32 + mElementOffsets32[element])*sizeof(int32)<(uint32)mBuffer->getDataSize()); // "vertex out of bounds"
 		return vertex*mVertexSize32 + mElementOffsets32[element];
 	}
 
-	VertexBuffer *mVertexBuffer;
+	Buffer *mBuffer;
 	int mVertexSize32;
 	int mElementOffsets32[16];
 

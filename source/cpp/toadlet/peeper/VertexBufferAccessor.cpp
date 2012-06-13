@@ -28,18 +28,8 @@
 namespace toadlet{
 namespace peeper{
 
-VertexBufferAccessor::VertexBufferAccessor():
-	mVertexBuffer(NULL),
-	mVertexSize32(0),
-	mNativeFixed(false),
-	mData(NULL),
-	mFixedData(NULL),
-	mFloatData(NULL),
-	mColorData(NULL)
-{}
-
-VertexBufferAccessor::VertexBufferAccessor(VertexBuffer *vertexBuffer,int access):
-	mVertexBuffer(NULL),
+VertexBufferAccessor::VertexBufferAccessor(VertexBuffer *buffer,int access):
+	mBuffer(NULL),
 	mVertexSize32(0),
 	mNativeFixed(false),
 	mData(NULL),
@@ -47,48 +37,61 @@ VertexBufferAccessor::VertexBufferAccessor(VertexBuffer *vertexBuffer,int access
 	mFloatData(NULL),
 	mColorData(NULL)
 {
-	lock(vertexBuffer,access);
+	if(buffer!=NULL){
+		lock(buffer,access);
+	}
+}
+
+VertexBufferAccessor::VertexBufferAccessor(Buffer *buffer,VertexFormat *format,int access):
+	mBuffer(NULL),
+	mVertexSize32(0),
+	mNativeFixed(false),
+	mData(NULL),
+	mFixedData(NULL),
+	mFloatData(NULL),
+	mColorData(NULL)
+{
+	lock(buffer,format,access);
 }
 
 VertexBufferAccessor::~VertexBufferAccessor(){
 	unlock();
 }
 
-void VertexBufferAccessor::lock(VertexBuffer *vertexBuffer,int access){
+void VertexBufferAccessor::lock(Buffer *buffer,VertexFormat *format,int access){
 	unlock();
 
-	mVertexBuffer=vertexBuffer;
-	VertexFormat *vertexFormat=mVertexBuffer->getVertexFormat();
-	mVertexSize32=vertexFormat->getVertexSize()/sizeof(int32);
-	int numElements=vertexFormat->getNumElements();
+	mBuffer=buffer;
+	mVertexSize32=format->getVertexSize()/sizeof(int32);
+	int numElements=format->getNumElements();
 	TOADLET_ASSERT(numElements>0 && numElements<16);
 	for(int i=0;i<numElements;++i){
-		mElementOffsets32[i]=vertexFormat->getElementOffset(i)/sizeof(int32);
+		mElementOffsets32[i]=format->getElementOffset(i)/sizeof(int32);
 	}
 
-	if((vertexFormat->getElementFormat(0)&VertexFormat::Format_MASK_TYPES)==VertexFormat::Format_TYPE_FIXED_32){
+	if((format->getElementFormat(0)&VertexFormat::Format_MASK_TYPES)==VertexFormat::Format_TYPE_FIXED_32){
 		mNativeFixed=true;
 	}
 	else{
 		mNativeFixed=false;
 	}
 
-	mData=mVertexBuffer->lock(access);
+	mData=mBuffer->lock(access);
 	if(mNativeFixed){
 		mFixedData=(int32*)mData;
 	}
 	else{
 		mFloatData=(float*)mData;
 	}
-	if(vertexFormat->findElement(VertexFormat::Semantic_COLOR)>0){
+	if(format->findElement(VertexFormat::Semantic_COLOR)>0){
 		mColorData=(uint32*)mData;
 	}
 }
 
 void VertexBufferAccessor::unlock(){
-	if(mVertexBuffer!=NULL){
-		mVertexBuffer->unlock();
-		mVertexBuffer=NULL;
+	if(mBuffer!=NULL){
+		mBuffer->unlock();
+		mBuffer=NULL;
 		mData=NULL;
 		mFixedData=NULL;
 		mFloatData=NULL;

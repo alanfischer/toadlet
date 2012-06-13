@@ -44,6 +44,8 @@ class RenderState;
 using namespace toadlet::peeper;
 
 
+%include <toadlet/tadpole/Track.i>
+%include <toadlet/tadpole/Sequence.i>
 %include <toadlet/tadpole/Engine.i>
 %include <toadlet/tadpole/Scene.i>
 %include <toadlet/tadpole/Component.i>
@@ -57,6 +59,7 @@ using namespace toadlet::peeper;
 %include <toadlet/tadpole/animation/Animation.i>
 %include <toadlet/tadpole/animation/BaseAnimation.i>
 %include <toadlet/tadpole/animation/MeshAnimation.i>
+%include <toadlet/tadpole/animation/MaterialAnimation.i>
 %{
 using namespace toadlet;
 using namespace toadlet::tadpole;
@@ -65,6 +68,13 @@ using namespace toadlet::tadpole::node;
 %}
 
 typedef float scalar;
+
+%newobject createColorTrack;
+%inline %{
+toadlet::tadpole::Track *createColorTrack(toadlet::tadpole::Engine *engine){
+	return engine->getBufferManager()->createColorTrack();
+}
+%}
 
 %inline %{
 #include <toadlet/egg/Collection.h>

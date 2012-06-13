@@ -12,8 +12,8 @@ public:
 
 	Node *getParent();
 
-	void setName(String name);
-	String getName() const;
+	void setName(char *name);
+//	String getName() const;
 
 	bool getActive() const;
 
@@ -25,6 +25,10 @@ public:
 
 	bool attach(Component *node);
 	bool remove(Component *node);
+
+	void startAction(char *name);
+	void stopAction(char *name);
+	bool getActionActive(char *name);
 };
 
 }

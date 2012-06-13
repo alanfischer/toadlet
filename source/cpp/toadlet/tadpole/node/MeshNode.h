@@ -80,6 +80,8 @@ public:
 	inline int getNumSubMeshes() const{return mSubMeshes.size();}
 	SubMesh *getSubMesh(int i){return mSubMeshes[i];}
 	SubMesh *getSubMesh(const String &name);
+	Material *getSubMaterial(int i){return getSubMesh(i)->material;}
+	Material *getSubMaterial(const String &name){return getSubMesh(name)->material;}
 
 	inline SkeletonComponent *getSkeleton() const{return mSkeleton;}
 	void setSkeleton(SkeletonComponent *skeleton);

@@ -309,6 +309,10 @@ VertexBuffer::ptr BufferManager::cloneVertexBuffer(VertexBuffer::ptr oldVertexBu
 	return vertexBuffer;
 }
 
+Track *BufferManager::createColorTrack(){
+	return new Track(mEngine->getVertexFormats().COLOR);
+}
+
 void BufferManager::contextActivate(RenderDevice *renderDevice){
 	Logger::debug("BufferManager::contextActivate");
 

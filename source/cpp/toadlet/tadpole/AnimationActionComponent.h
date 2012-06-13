@@ -92,6 +92,7 @@ protected:
 	int mMaxTime;
 	Cycling mCycling;
 	Cycling mActualCycling;
+	bool mResetOnStart;
 	bool mStopGently;
 	Interpolator::ptr mInterpolator;
 	scalar mTimeScale;

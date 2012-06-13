@@ -44,7 +44,7 @@ void NodePathAnimation::setTarget(Node::ptr target){
 	mTarget=target;
 }
 
-void NodePathAnimation::setTrack(TransformTrack::ptr track){
+void NodePathAnimation::setTrack(Track::ptr track){
 	mTrack=track;
 }
 
@@ -54,12 +54,16 @@ void NodePathAnimation::setLookAt(const Vector3 &lookAt){
 }
 
 void NodePathAnimation::setValue(scalar value){
-	const TransformKeyFrame *f1=NULL,*f2=NULL;
+	int f1=-1,f2=-1;
 	mValue=value;
 	scalar t=mTrack->getKeyFramesAtTime(mValue,f1,f2,mHint);
 
-	Vector3 translate;
-	Math::lerp(translate,f1->translate,f2->translate,t);
+	VertexBufferAccessor &vba=mTrack->getAccessor();
+
+	Vector3 t1,t2,translate;
+	vba.get3(f1,0,t1);
+	vba.get3(f2,0,t2);
+	Math::lerp(translate,t1,t2,t);
 
 	if(mUseLookAt){
 		Matrix4x4 lookAt;
@@ -71,8 +75,10 @@ void NodePathAnimation::setValue(scalar value){
 		mTarget->setTranslate(translate);
 	}
 	else{
-		Quaternion rotate;
-		Math::slerp(rotate,f1->rotate,f2->rotate,t);
+		Quaternion r1,r2,rotate;
+		vba.get4(f1,1,r1);
+		vba.get4(f2,1,r2);
+		Math::slerp(rotate,r1,r2,t);
 
 		mTarget->setRotate(rotate);
 		mTarget->setTranslate(translate);

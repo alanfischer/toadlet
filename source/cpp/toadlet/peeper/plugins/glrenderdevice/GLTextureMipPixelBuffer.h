@@ -62,6 +62,7 @@ public:
 	int getAccess() const{return 0;}
 	TextureFormat::ptr getTextureFormat() const{return mFormat;}
 	int getDataSize() const{return mDataSize;}
+	int getSize() const{return mFormat->getSize();}
 
 	inline GLTexture *getTexture() const{return mTexture;}
 	inline GLuint getLevel() const{return mLevel;}

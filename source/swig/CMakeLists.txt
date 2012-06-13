@@ -27,7 +27,6 @@ if (NOT TOADLET_PLATFORM_PYTHON)
 	)
 	if (TOADLET_PLATFORM_ANDROID)
 		set (FLICK_SWIG_INT_OUTPUTS
-			${PROJECT_BINARY_DIR}/source/java/us/toadlet/flick/Version.java
 			${PROJECT_BINARY_DIR}/source/java/us/toadlet/flick/BaseInputDevice.java
 			${PROJECT_BINARY_DIR}/source/java/us/toadlet/flick/InputData.java
 			${PROJECT_BINARY_DIR}/source/java/us/toadlet/flick/InputDevice.java
@@ -87,7 +86,6 @@ if (NOT TOADLET_PLATFORM_PYTHON)
 	)
 	if (TOADLET_PLATFORM_ANDROID)
 		set (RIBBIT_SWIG_INT_OUTPUTS
-			${PROJECT_BINARY_DIR}/source/java/us/toadlet/ribbit/Version.java
 			${PROJECT_BINARY_DIR}/source/java/us/toadlet/ribbit/AudioFormat.java
 			${PROJECT_BINARY_DIR}/source/java/us/toadlet/ribbit/AudioBuffer.java
 			${PROJECT_BINARY_DIR}/source/java/us/toadlet/ribbit/AudioStream.java
@@ -114,6 +112,8 @@ if (NOT TOADLET_PLATFORM_PYTHON)
 		${CMAKE_CURRENT_SOURCE_DIR}/toadlet/tadpole/Engine.i
 		${CMAKE_CURRENT_SOURCE_DIR}/toadlet/tadpole/Scene.i
 		${CMAKE_CURRENT_SOURCE_DIR}/toadlet/tadpole/Component.i
+		${CMAKE_CURRENT_SOURCE_DIR}/toadlet/tadpole/Track.i
+		${CMAKE_CURRENT_SOURCE_DIR}/toadlet/tadpole/Sequence.i
 		${CMAKE_CURRENT_SOURCE_DIR}/toadlet/tadpole/ActionComponent.i
 		${CMAKE_CURRENT_SOURCE_DIR}/toadlet/tadpole/AnimationActionComponent.i
 		${CMAKE_CURRENT_SOURCE_DIR}/toadlet/tadpole/AudioComponent.i
@@ -124,14 +124,16 @@ if (NOT TOADLET_PLATFORM_PYTHON)
 		${CMAKE_CURRENT_SOURCE_DIR}/toadlet/tadpole/animation/Animation.i
 		${CMAKE_CURRENT_SOURCE_DIR}/toadlet/tadpole/animation/BaseAnimation.i
 		${CMAKE_CURRENT_SOURCE_DIR}/toadlet/tadpole/animation/MeshAnimation.i
+		${CMAKE_CURRENT_SOURCE_DIR}/toadlet/tadpole/animation/MaterialAnimation.i
 		PARENT_SCOPE
 	)
 	if (TOADLET_PLATFORM_ANDROID)
 		set (TADPOLE_SWIG_INT_OUTPUTS
-			${PROJECT_BINARY_DIR}/source/java/us/toadlet/tadpole/Version.java
 			${PROJECT_BINARY_DIR}/source/java/us/toadlet/tadpole/Engine.java
 			${PROJECT_BINARY_DIR}/source/java/us/toadlet/tadpole/Scene.java
 			${PROJECT_BINARY_DIR}/source/java/us/toadlet/tadpole/Component.java
+			${PROJECT_BINARY_DIR}/source/java/us/toadlet/tadpole/Track.java
+			${PROJECT_BINARY_DIR}/source/java/us/toadlet/tadpole/Sequence.java
 			${PROJECT_BINARY_DIR}/source/java/us/toadlet/tadpole/ActionComponent.java
 			${PROJECT_BINARY_DIR}/source/java/us/toadlet/tadpole/AnimationActionComponent.java
 			${PROJECT_BINARY_DIR}/source/java/us/toadlet/tadpole/AudioComponent.java
@@ -159,7 +161,6 @@ if (NOT TOADLET_PLATFORM_PYTHON)
 	)
 	if (TOADLET_PLATFORM_ANDROID)
 		set (PAD_SWIG_INT_OUTPUTS
-			${PROJECT_BINARY_DIR}/source/java/us/toadlet/pad/Version.java
 			${PROJECT_BINARY_DIR}/source/java/us/toadlet/pad/Applet.java
 			${PROJECT_BINARY_DIR}/source/java/us/toadlet/pad/pad.java
 			${PROJECT_BINARY_DIR}/source/java/us/toadlet/pad/padJNI.java

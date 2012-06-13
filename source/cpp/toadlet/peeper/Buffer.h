@@ -56,6 +56,7 @@ public:
 	virtual int getUsage() const=0;
 	virtual int getAccess() const=0;
 	virtual int getDataSize() const=0;
+	virtual int getSize() const=0;
 
 	virtual tbyte *lock(int lockAccess)=0;
 	virtual bool unlock()=0;

@@ -26,10 +26,9 @@
 #ifndef TOADLET_TADPOLE_ANIMATION_MATERIALANIMATION_H
 #define TOADLET_TADPOLE_ANIMATION_MATERIALANIMATION_H
 
-#include <toadlet/egg/Object.h>
 #include <toadlet/tadpole/animation/BaseAnimation.h>
 #include <toadlet/tadpole/material/Material.h>
-#include <toadlet/tadpole/ColorSequence.h>
+#include <toadlet/tadpole/Sequence.h>
 
 namespace toadlet{
 namespace tadpole{
@@ -41,14 +40,14 @@ class TOADLET_API MaterialAnimation:public BaseAnimation{
 public:
 	TOADLET_OBJECT(MaterialAnimation);
 
-	MaterialAnimation(Material *target,ColorSequence *sequence,int trackIndex=0);
+	MaterialAnimation(Material *target,Sequence *sequence,int trackIndex=0);
 	virtual ~MaterialAnimation();
 
 	void setTarget(Material *target);
 	inline Material *getTarget() const{return mTarget;}
 
-	void setSequence(ColorSequence *sequence,int trackIndex);
-	inline ColorSequence *getSequence() const{return mSequence;}
+	bool setSequence(Sequence *sequence,int trackIndex);
+	inline Sequence *getSequence() const{return mSequence;}
 
 	void setValue(scalar value);
 	scalar getValue() const{return mValue;}
@@ -60,8 +59,9 @@ public:
 
 protected:
 	Material::ptr mTarget;
-	ColorSequence::ptr mSequence;
-	ColorTrack::ptr mTrack;
+	Sequence::ptr mSequence;
+	Track::ptr mTrack;
+	int mElement;
 	scalar mValue;
 };
 

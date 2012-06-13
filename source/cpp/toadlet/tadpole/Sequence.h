@@ -23,15 +23,39 @@
  *
  ********** Copyright header - do not remove **********/
 
-#include <toadlet/tadpole/ColorKeyFrame.h>
+#ifndef TOADLET_TADPOLE_SEQUENCE_H
+#define TOADLET_TADPOLE_SEQUENCE_H
+
+#include <toadlet/egg/BaseResource.h>
+#include <toadlet/tadpole/Track.h>
 
 namespace toadlet{
 namespace tadpole{
 
-ColorKeyFrame::ColorKeyFrame(scalar time1,const Vector4 &color1):
-	time(time1),
-	color(color1){}
+class TOADLET_API Sequence:public BaseResource{
+public:
+	TOADLET_RESOURCE(Sequence,Sequence);
+
+	Sequence();
+	virtual ~Sequence();
+
+	void destroy();
+	void compile();
+
+	int getNumTracks() const{return mTracks.size();}
+	void addTrack(Track *track){mTracks.add(track);}
+	void removeTrack(int i){mTracks.removeAt(i);}
+	Track *getTrack(int i){return mTracks[i];}
+
+	scalar getLength() const{return mLength;}
+	void setLength(scalar length){mLength=length;}
+
+protected:
+	Collection<Track::ptr> mTracks;
+	scalar mLength;
+};
 
 }
 }
 
+#endif

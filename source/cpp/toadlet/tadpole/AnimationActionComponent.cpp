@@ -38,6 +38,7 @@ AnimationActionComponent::AnimationActionComponent(const String &name):BaseActio
 	mMaxTime(0),
 	mCycling(Cycling_NONE),
 	mActualCycling(Cycling_NONE),
+	mResetOnStart(true),
 	mStopGently(false),
 	//mInterpolator,
 	mTimeScale(Math::ONE),
@@ -71,6 +72,10 @@ void AnimationActionComponent::start(){
 	}
 
 	mRunning=true;
+
+	if(mResetOnStart){
+		mTime=0;
+	}
 
 	mActualCycling=mCycling;
 }

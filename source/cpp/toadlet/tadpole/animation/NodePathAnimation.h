@@ -26,9 +26,9 @@
 #ifndef TOADLET_TADPOLE_ANIMATION_NODEPATHANIMATION_H
 #define TOADLET_TADPOLE_ANIMATION_NODEPATHANIMATION_H
 
-#include <toadlet/tadpole/TransformTrack.h>
 #include <toadlet/tadpole/animation/BaseAnimation.h>
 #include <toadlet/tadpole/node/Node.h>
+#include <toadlet/tadpole/Track.h>
 
 namespace toadlet{
 namespace tadpole{
@@ -44,8 +44,8 @@ public:
 	void setTarget(Node::ptr target);
 	inline Node::ptr getTarget() const{return mTarget;}
 
-	void setTrack(TransformTrack::ptr track);
-	inline TransformTrack::ptr getTrack() const{return mTrack;}
+	void setTrack(Track::ptr track);
+	inline Track::ptr getTrack() const{return mTrack;}
 
 	void setLookAt(const Vector3 &lookAt);
 	inline const Vector3 &getLookAt() const{return mLookAt;}
@@ -53,11 +53,11 @@ public:
 	void setValue(scalar value);
 	scalar getValue() const{return mValue;}
 	scalar getMinValue() const{return 0;}
-	scalar getMaxValue() const{return mTrack->length;}
+	scalar getMaxValue() const{return mTrack->getLength();}
 
 protected:
 	Node::ptr mTarget;
-	TransformTrack::ptr mTrack;
+	Track::ptr mTrack;
 	bool mUseLookAt;
 	Vector3 mLookAt;
 	int mHint;

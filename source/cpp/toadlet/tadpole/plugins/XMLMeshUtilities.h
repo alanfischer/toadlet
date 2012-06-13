@@ -60,8 +60,8 @@ public:
 	static Skeleton::ptr loadSkeleton(mxml_node_t *node,int version);
 	static mxml_node_t *saveSkeleton(Skeleton::ptr skeleton,int version,ProgressListener *listener);
 
-	static TransformSequence::ptr loadSequence(mxml_node_t *node,int version);
-	static mxml_node_t *saveSequence(TransformSequence::ptr sequence,int version,ProgressListener *listener);
+	static Sequence::ptr loadSequence(mxml_node_t *node,int version,BufferManager *bufferManager);
+	static mxml_node_t *saveSequence(Sequence::ptr sequence,int version,ProgressListener *listener);
 };
 
 }
