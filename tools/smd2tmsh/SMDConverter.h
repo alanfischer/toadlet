@@ -47,7 +47,7 @@ protected:
 
 	Mesh::ptr mMesh;
 	Skeleton::ptr mSkeleton;
-	TransformSequence::ptr mSequence;
+	Sequence::ptr mSequence;
 
 	scalar mPositionEpsilon;
 	scalar mNormalEpsilon;

@@ -1583,7 +1583,7 @@ M3GObject3D *M3GConverter::buildSceneGraph(Mesh *toadletMesh,float scale,int for
 		skinnedMesh->userParameters.resize(toadletSkeleton->sequences.size());
 
 		for(i=0;i<toadletSkeleton->sequences.size();++i){
-			TransformSequence *sequence=toadletSkeleton->sequences[i];
+			Sequence *sequence=toadletSkeleton->sequences[i];
 
 			M3GAnimationController *animationController=new M3GAnimationController();
 			animationController->speed=1.0f;
@@ -1607,46 +1607,48 @@ M3GObject3D *M3GConverter::buildSceneGraph(Mesh *toadletMesh,float scale,int for
 			skinnedMesh->userParameters[i].value.add(i+1);
 
 			for(j=0;j<sequence->getNumTracks();++j){
-				TransformTrack *track=sequence->getTrack(j);
+				Track *track=sequence->getTrack(j);
+				VertexBufferAccessor &vba=track->getAccessor();
 
 				M3GKeyframeSequence *translationSequence=new M3GKeyframeSequence();
 				translationSequence->repeatMode=M3GKeyframeSequence::CONSTANT;
 				translationSequence->interpolation=M3GKeyframeSequence::LINEAR;
 				translationSequence->duration=sequence->getLength();
 				translationSequence->validRangeFirst=0;
-				translationSequence->validRangeLast=track->keyFrames.size()-1;
+				translationSequence->validRangeLast=track->getNumKeyFrames()-1;
 				translationSequence->componentCount=3;
 
 				bool keepTranslationSequence=true;
-				Collection<Vector3> translation(track->keyFrames.size());
-				for(k=0;k<track->keyFrames.size();++k){
-					translation[k]=track->keyFrames[k].translate*scale;
+				Collection<Vector3> translation(track->getNumKeyFrames());
+				for(k=0;k<track->getNumKeyFrames();++k){
+					vba.get3(k,0,translation[k]);
+					translation[k]*=scale;
 				}
 				int translationBytes=forceBytes;
 				if(forceBytes==0){
-					translationBytes=VertexCompression::getSuggestedArrayBytes(3,track->keyFrames.size(),(float*)&translation[0],sizeof(Vector3));
+					translationBytes=VertexCompression::getSuggestedArrayBytes(3,track->getNumKeyFrames(),(float*)&translation[0],sizeof(Vector3));
 					Logger::alert(String("Animation Translation bytes:")+translationBytes);
 				}
 				if(translationBytes==1){
-					VertexCompression::calculateArrayBiasAndScale(3,track->keyFrames.size(),
+					VertexCompression::calculateArrayBiasAndScale(3,track->getNumKeyFrames(),
 						(float*)&translation[0],sizeof(Vector3),
 						(float*)&translationSequence->vectorBias,(float*)&translationSequence->vectorScale,0);
 
 					translationSequence->encoding=M3GKeyframeSequence::ENCODING_BYTE;
-					translationSequence->byteKeyframes.resize(track->keyFrames.size());
+					translationSequence->byteKeyframes.resize(track->getNumKeyFrames());
 				}
 				else if(translationBytes==2){
-					VertexCompression::calculateArrayBiasAndScale(3,track->keyFrames.size(),
+					VertexCompression::calculateArrayBiasAndScale(3,track->getNumKeyFrames(),
 						(float*)&translation[0],sizeof(Vector3),
 						(float*)&translationSequence->vectorBias,(float*)&translationSequence->vectorScale,0);
 
 					translationSequence->encoding=M3GKeyframeSequence::ENCODING_SHORT;
-					translationSequence->shortKeyframes.resize(track->keyFrames.size());
+					translationSequence->shortKeyframes.resize(track->getNumKeyFrames());
 				}
 				else{
 					// If it's telling us to use full precision, that means there is enough data that we don't want to cut the keyframe
 					translationSequence->encoding=M3GKeyframeSequence::ENCODING_FULL;
-					translationSequence->fullKeyframes.resize(track->keyFrames.size());
+					translationSequence->fullKeyframes.resize(track->getNumKeyFrames());
 				}
 
 				M3GKeyframeSequence *rotationSequence=new M3GKeyframeSequence();
@@ -1654,39 +1656,39 @@ M3GObject3D *M3GConverter::buildSceneGraph(Mesh *toadletMesh,float scale,int for
 				rotationSequence->interpolation=M3GKeyframeSequence::SLERP;
 				rotationSequence->duration=sequence->getLength();
 				rotationSequence->validRangeFirst=0;
-				rotationSequence->validRangeLast=track->keyFrames.size()-1;
+				rotationSequence->validRangeLast=track->getNumKeyFrames()-1;
 				rotationSequence->componentCount=4;
 
 				bool keepRotationSequence=true;
-				Collection<Quaternion> quaternions(track->keyFrames.size());
-				for(k=0;k<track->keyFrames.size();++k){
-					quaternions[k]=track->keyFrames[k].rotate;
+				Collection<Quaternion> quaternions(track->getNumKeyFrames());
+				for(k=0;k<track->getNumKeyFrames();++k){
+					vba.get4(k,1,quaternions[k]);
 				}
 				int rotationBytes=forceBytes;
 				if(forceBytes==0){
-					rotationBytes=VertexCompression::getSuggestedArrayBytes(4,track->keyFrames.size(),(float*)&quaternions[0],sizeof(Quaternion));
+					rotationBytes=VertexCompression::getSuggestedArrayBytes(4,track->getNumKeyFrames(),(float*)&quaternions[0],sizeof(Quaternion));
 					Logger::alert(String("Animation Rotation bytes:")+rotationBytes);
 				}
 				if(rotationBytes==1){
-					VertexCompression::calculateArrayBiasAndScale(4,track->keyFrames.size(),
+					VertexCompression::calculateArrayBiasAndScale(4,track->getNumKeyFrames(),
 						(float*)&quaternions[0],sizeof(Quaternion),
 						(float*)&rotationSequence->vectorBias,(float*)&rotationSequence->vectorScale,0);
 
 					rotationSequence->encoding=M3GKeyframeSequence::ENCODING_BYTE;
-					rotationSequence->byteKeyframes.resize(track->keyFrames.size());
+					rotationSequence->byteKeyframes.resize(track->getNumKeyFrames());
 				}
 				else if(rotationBytes==2){
-					VertexCompression::calculateArrayBiasAndScale(4,track->keyFrames.size(),
+					VertexCompression::calculateArrayBiasAndScale(4,track->getNumKeyFrames(),
 						(float*)&quaternions[0],sizeof(Quaternion),
 						(float*)&rotationSequence->vectorBias,(float*)&rotationSequence->vectorScale,0);
 
 					rotationSequence->encoding=M3GKeyframeSequence::ENCODING_SHORT;
-					rotationSequence->shortKeyframes.resize(track->keyFrames.size());
+					rotationSequence->shortKeyframes.resize(track->getNumKeyFrames());
 				}
 				else{
 					// If it's telling us to use full precision, that means there is enough data that we don't want to cut the keyframe
 					rotationSequence->encoding=M3GKeyframeSequence::ENCODING_FULL;
-					rotationSequence->fullKeyframes.resize(track->keyFrames.size());
+					rotationSequence->fullKeyframes.resize(track->getNumKeyFrames());
 				}
 
 				// Check to see if we can just cut out the translation sequence
@@ -1712,11 +1714,11 @@ M3GObject3D *M3GConverter::buildSceneGraph(Mesh *toadletMesh,float scale,int for
 					keepRotationSequence=false;
 				}
 
-				for(k=0;k<track->keyFrames.size();++k){
-					const TransformKeyFrame &keyFrame=track->keyFrames[k];
+				for(k=0;k<track->getNumKeyFrames();++k){
+					scalar time=track->getTime(k);
 
 					if(translationBytes==1){
-						translationSequence->byteKeyframes[k].time=(unsigned int)(keyFrame.time*1000);
+						translationSequence->byteKeyframes[k].time=(unsigned int)(time*1000);
 
 						int l;
 						for(l=0;l<3;++l){
@@ -1725,7 +1727,7 @@ M3GObject3D *M3GConverter::buildSceneGraph(Mesh *toadletMesh,float scale,int for
 						}
 					}
 					else if(translationBytes==2){
-						translationSequence->shortKeyframes[k].time=(unsigned int)(keyFrame.time*1000);
+						translationSequence->shortKeyframes[k].time=(unsigned int)(time*1000);
 
 						int l;
 						for(l=0;l<3;++l){
@@ -1734,7 +1736,7 @@ M3GObject3D *M3GConverter::buildSceneGraph(Mesh *toadletMesh,float scale,int for
 						}
 					}
 					else{
-						translationSequence->fullKeyframes[k].time=(unsigned int)(keyFrame.time*1000);
+						translationSequence->fullKeyframes[k].time=(unsigned int)(time*1000);
 
 						int l;
 						for(l=0;l<3;++l){
@@ -1743,7 +1745,7 @@ M3GObject3D *M3GConverter::buildSceneGraph(Mesh *toadletMesh,float scale,int for
 					}
 
 					if(rotationBytes==1){
-						rotationSequence->byteKeyframes[k].time=(unsigned int)(keyFrame.time*1000);
+						rotationSequence->byteKeyframes[k].time=(unsigned int)(time*1000);
 
 						int l;
 						for(l=0;l<4;++l){
@@ -1752,7 +1754,7 @@ M3GObject3D *M3GConverter::buildSceneGraph(Mesh *toadletMesh,float scale,int for
 						}
 					}
 					else if(rotationBytes==2){
-						rotationSequence->shortKeyframes[k].time=(unsigned int)(keyFrame.time*1000);
+						rotationSequence->shortKeyframes[k].time=(unsigned int)(time*1000);
 
 						int l;
 						for(l=0;l<4;++l){
@@ -1761,7 +1763,7 @@ M3GObject3D *M3GConverter::buildSceneGraph(Mesh *toadletMesh,float scale,int for
 						}
 					}
 					else{
-						rotationSequence->fullKeyframes[k].time=(unsigned int)(keyFrame.time*1000);
+						rotationSequence->fullKeyframes[k].time=(unsigned int)(time*1000);
 
 						int l;
 						for(l=0;l<4;++l){

@@ -108,7 +108,7 @@ public:
 	virtual ~BACConverter();
 
 	bool convertMesh(Mesh::ptr mesh,Stream *stream,bool submeshes=true,bool quads=true,float adjust=0,int version=6);
-	bool convertAnimation(Mesh::ptr mesh,TransformSequence *animation,Stream *stream,int version=4);
+	bool convertAnimation(Mesh::ptr mesh,Sequence *animation,Stream *stream,int version=4);
 
 	void setPositionEpsilon(float epsilon){mPositionEpsilon=epsilon;}
 	float getPositionEpsilon() const{return mPositionEpsilon;}
@@ -151,7 +151,7 @@ protected:
 	void writeOutModelVersion6(Stream *stream);
 	void writeOutModelVersion5(Stream *stream);
 
-	void extractAnimationData(Mesh *mesh,TransformSequence *animation);
+	void extractAnimationData(Mesh *mesh,Sequence *animation);
 	void writeOutAnimationVersion4(Stream *stream);
 	void writeOutAnimationVersion3(Stream *stream);
 	void clean();

@@ -83,6 +83,26 @@ public:
 		}
 	}
 
+	template<typename Type2> Collection(const Collection<Type2> &c){
+		mSize=c.mSize;
+		mCapacity=c.mCapacity;
+		mData=new Type[mCapacity+1];
+		int i;
+		for(i=0;i<mSize;++i){
+			mData[i]=c.mData[i];
+		}
+	}
+
+	template<typename Type2> Collection(const Collection<Type2> *c){
+		mSize=c->mSize;
+		mCapacity=c->mCapacity;
+		mData=new Type[mCapacity+1];
+		int i;
+		for(i=0;i<mSize;++i){
+			mData[i]=c->mData[i];
+		}
+	}
+
 	~Collection(){
 		if(mData!=NULL){
 			delete[] mData;

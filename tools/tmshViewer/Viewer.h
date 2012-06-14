@@ -4,8 +4,10 @@
 #include <toadlet/tadpole.h>
 #include <toadlet/pad.h>
 
-class Viewer:public Applet{
+class Viewer:public Object,public Applet{
 public:
+	TOADLET_OBJECT(Viewer);
+
 	Viewer(Application *app);
 	virtual ~Viewer();
 

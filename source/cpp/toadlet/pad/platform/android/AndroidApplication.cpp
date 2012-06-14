@@ -41,7 +41,6 @@ using namespace toadlet::pad;
 TOADLET_C_API RenderTarget *new_EGLWindowRenderTarget(void *display,void *window,WindowRenderTargetFormat *format);
 TOADLET_C_API RenderDevice *new_GLES1RenderDevice();
 TOADLET_C_API RenderDevice *new_GLES2RenderDevice();
-TOADLET_C_API AudioDevice *new_JAudioDevice(JNIEnv *env,jobject obj);
 TOADLET_C_API InputDevice *new_AndroidSensorDevice(int type);
 
 namespace toadlet{

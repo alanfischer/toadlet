@@ -67,7 +67,7 @@ int main(int argc,char **argv){
 		}
 
 		for(i=0;i<skeleton->sequences.size();++i){
-			TransformSequence::ptr sequence=skeleton->sequences[i];
+			Sequence::ptr sequence=skeleton->sequences[i];
 
 			String name;
 			if(sequence->getName().length()>0){
@@ -79,12 +79,12 @@ int main(int argc,char **argv){
 
 			std::cout << "Extracting " << (const char*)name << std::endl;
 
-			FileStream::ptr stream(new FileStream(name,FileStream::Open_WRITE_BINARY));
+			FileStream::ptr stream=new FileStream(name,FileStream::Open_WRITE_BINARY);
 			if(stream->closed()){
 				std::cout << "Error opening " << (const char*)name << std::endl;
 				return 0;
 			}
-			XANMStreamer::ptr streamer(new XANMStreamer());
+			XANMStreamer::ptr streamer=new XANMStreamer(engine);
 			streamer->save(stream,sequence,NULL,NULL);
 		}
 	}
@@ -105,8 +105,8 @@ int main(int argc,char **argv){
 				std::cout << "Error opening " << argv[i] << std::endl;
 				return 0;
 			}
-			XANMStreamer::ptr streamer(new XANMStreamer());
-			TransformSequence::ptr sequence=shared_static_cast<TransformSequence>(streamer->load(stream,NULL,NULL));
+			XANMStreamer::ptr streamer=new XANMStreamer(engine);
+			Sequence::ptr sequence=shared_static_cast<Sequence>(streamer->load(stream,NULL,NULL));
 			skeleton->sequences.add(sequence);
 		}
 
@@ -116,7 +116,7 @@ int main(int argc,char **argv){
 			return 0;
 		}
 
-		XMSHStreamer::ptr streamer(new XMSHStreamer(NULL));
+		XMSHStreamer::ptr streamer=new XMSHStreamer(engine);
 		streamer->save(stream,mesh,NULL,NULL);
 	}
 
@@ -141,9 +141,15 @@ int main(int argc,char **argv){
 				skeleton->bones[i]->worldToBoneTranslate*=scale;
 			}
 			for(i=0;i<skeleton->sequences.size();++i){
-				for(j=0;j<skeleton->sequences[i]->getNumTracks();++j){
-					for(k=0;k<skeleton->sequences[i]->getTrack(j)->keyFrames.size();++k){
-						skeleton->sequences[i]->getTrack(j)->keyFrames[k].translate*=scale;
+				Sequence *sequence=skeleton->sequences[i];
+				for(j=0;j<sequence->getNumTracks();++j){
+					Track *track=sequence->getTrack(j);
+					VertexBufferAccessor &vba=track->getAccessor();
+					for(k=0;k<track->getNumKeyFrames();++k){
+						Vector3 translate;
+						vba.get3(k,0,translate);
+						translate*=scale;
+						vba.set3(k,0,translate);
 					}
 				}
 			}
