@@ -2,7 +2,7 @@
 #include <iostream>
 #include <sstream>
 
-class TextureArchive:protected BaseResource,public Archive{
+class TextureArchive:public BaseResource,public Archive{
 public:
 	TOADLET_RESOURCE(TextureArchive,Archive);
 

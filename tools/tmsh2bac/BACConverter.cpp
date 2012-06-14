@@ -1135,7 +1135,7 @@ void BACConverter::writeOutModelVersion5(Stream *tout){
 	delete out;
 }
 
-bool BACConverter::convertAnimation(Mesh::ptr mesh,TransformSequence *animation,Stream *out,int version){
+bool BACConverter::convertAnimation(Mesh::ptr mesh,Sequence *animation,Stream *out,int version){
 	extractAnimationData(mesh,animation);
 
 	if(version==4){
@@ -1150,18 +1150,19 @@ bool BACConverter::convertAnimation(Mesh::ptr mesh,TransformSequence *animation,
 	return true;
 }
 
-void BACConverter::extractAnimationData(Mesh *mesh,TransformSequence *animation){
+void BACConverter::extractAnimationData(Mesh *mesh,Sequence *animation){
 	int i,j;
 
 	mTotalFrame=(animation->getLength()*EXPORT_FPS)+1; // Must add 1 so we are above the max keyFrame.time*EXPORT_FPS
 
 	for(i=0;i<animation->getNumTracks();++i){
-		TransformTrack *track=animation->getTrack(i);
+		Track *track=animation->getTrack(i);
+		VertexBufferAccessor &vba=track->getAccessor();
 
-		int boneIndex=track->index;
+		int boneIndex=track->getIndex();
 		Skeleton::Bone *meshbone=mesh->getSkeleton()->bones[boneIndex];
 
-		if(track->keyFrames.size()>0){
+		if(track->getNumKeyFrames()>0){
 			BACAnimationBone *bacbone=new BACAnimationBone();
 			if(meshbone->name.length()==0){
 				std::stringstream ss;
@@ -1176,25 +1177,29 @@ void BACConverter::extractAnimationData(Mesh *mesh,TransformSequence *animation)
 			// To fix this I would need to find the minimum keyframe time difference
 			// And use that as '1' for the time values
 
-			for(j=0;j<track->keyFrames.size();++j){
-				const TransformKeyFrame &keyFrame=track->keyFrames[j];
-
-				int frame=keyFrame.time*EXPORT_FPS;
+			for(j=0;j<track->getNumKeyFrames();++j){
+				int frame=track->getTime(j)*EXPORT_FPS;
+				Vector3 translate;
+				Quaternion rotate;
+				Vector3 scale;
+				vba.get3(j,0,translate);
+				vba.get4(j,1,rotate);
+				vba.get3(j,2,scale);
 
 				Matrix3x3 boneRotate; Math::setMatrix3x3FromQuaternion(boneRotate,meshbone->rotate);
 				Matrix3x3 invBoneRotate; Math::invert(invBoneRotate,boneRotate);
 
-				Vector3 translate=invBoneRotate*(keyFrame.translate-meshbone->translate);
-				bacbone->translatex.add(Pair<int,float>(frame,translate.x));
-				bacbone->translatey.add(Pair<int,float>(frame,translate.y));
-				bacbone->translatez.add(Pair<int,float>(frame,translate.z));
+				Vector3 keyframeTranslate=invBoneRotate*(translate-meshbone->translate);
+				bacbone->translatex.add(Pair<int,float>(frame,keyframeTranslate.x));
+				bacbone->translatey.add(Pair<int,float>(frame,keyframeTranslate.y));
+				bacbone->translatez.add(Pair<int,float>(frame,keyframeTranslate.z));
 
-				bacbone->scalex.add(Pair<int,float>(frame,(keyFrame.scale.x/meshbone->scale.x)*100.0f));
-				bacbone->scaley.add(Pair<int,float>(frame,(keyFrame.scale.y/meshbone->scale.y)*100.0f));
-				bacbone->scalez.add(Pair<int,float>(frame,(keyFrame.scale.z/meshbone->scale.z)*100.0f));
+				bacbone->scalex.add(Pair<int,float>(frame,(scale.x/meshbone->scale.x)*100.0f));
+				bacbone->scaley.add(Pair<int,float>(frame,(scale.y/meshbone->scale.y)*100.0f));
+				bacbone->scalez.add(Pair<int,float>(frame,(scale.z/meshbone->scale.z)*100.0f));
 
 				Vector3 zAxis=Vector3(0,0,1);
-				Matrix3x3 keyframeRotate; Math::setMatrix3x3FromQuaternion(keyframeRotate,keyFrame.rotate);
+				Matrix3x3 keyframeRotate; Math::setMatrix3x3FromQuaternion(keyframeRotate,rotate);
 				Matrix3x3 matrix=invBoneRotate*keyframeRotate;
 				zAxis=matrix*zAxis;
 				Math::normalize(zAxis);

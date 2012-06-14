@@ -85,12 +85,12 @@ void SMDConverter::load(Engine *engine,Stream *in,const String &fileName){
 			else if(s.startsWith("skeleton")){
 				block=Block_SKELETON;
 				if(reference==false && mSkeleton!=NULL){
-					mSequence=new TransformSequence();
+					mSequence=new Sequence();
 					mSequence->setName(resourceName);
 					mSkeleton->sequences.add(mSequence);
 
 					for(int i=0;i<mSkeleton->bones.size();++i){
-						mSequence->addTrack(TransformTrack::ptr(new TransformTrack()));
+						mSequence->addTrack(new Track(engine->getVertexFormats().POSITION_ROTATE_SCALE));
 					}
 				}
 			}
@@ -154,14 +154,16 @@ void SMDConverter::load(Engine *engine,Stream *in,const String &fileName){
 				else{
 					Skeleton::Bone::ptr bone=mSkeleton->getBone(skeleton->bones.at(id)->name);
 					if(bone!=NULL){
-						TransformTrack::ptr track=mSequence->getTrack(bone->index);
+						Track::ptr track=mSequence->getTrack(bone->index);
 
-						TransformKeyFrame keyFrame;
-						keyFrame.time=Math::fromInt(time)/mFPS;
-						keyFrame.translate.set(MathConversion::floatToScalar(px),MathConversion::floatToScalar(py),MathConversion::floatToScalar(pz));
-						setQuaternionFromXYZ(keyFrame.rotate,MathConversion::floatToScalar(rx),MathConversion::floatToScalar(ry),MathConversion::floatToScalar(rz));
-
-						track->keyFrames.add(keyFrame);
+						VertexBufferAccessor &vba=track->getAccessor();
+						Vector3 translate;
+						Quaternion rotate;
+						int index=track->addKeyFrame(Math::fromInt(time)/mFPS);
+						translate.set(MathConversion::floatToScalar(px),MathConversion::floatToScalar(py),MathConversion::floatToScalar(pz));
+						setQuaternionFromXYZ(rotate,MathConversion::floatToScalar(rx),MathConversion::floatToScalar(ry),MathConversion::floatToScalar(rz));
+						vba.set3(index,0,translate);
+						vba.set4(index,1,rotate);
 					}
 				}
 			}

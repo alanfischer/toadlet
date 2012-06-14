@@ -273,9 +273,9 @@ bool MeshOptimizer::optimizeMesh(Mesh *mesh,Engine *engine){
 	Skeleton::ptr skeleton=mesh->getSkeleton();
 	if(skeleton!=NULL){
 		for(i=0;i<skeleton->sequences.size();++i){
-			TransformSequence::ptr sequence=skeleton->sequences[i];
+			Sequence::ptr sequence=skeleton->sequences[i];
 			for(j=0;j<sequence->getNumTracks();++j){
-				if(sequence->getTrack(j)->keyFrames.size()==0){
+				if(sequence->getTrack(j)->getNumKeyFrames()==0){
 					sequence->removeTrack(j);
 					j--;
 				}
