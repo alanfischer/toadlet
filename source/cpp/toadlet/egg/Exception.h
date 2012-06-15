@@ -30,27 +30,34 @@
 #include <toadlet/egg/String.h>
 
 #if defined(TOADLET_EXCEPTIONS)
-
-#include <stdexcept>
+	#include <stdexcept>
+#endif
 
 namespace toadlet{
 namespace egg{
 
-class TOADLET_API Exception:public std::runtime_error{
+class TOADLET_API Exception
+	#if defined(TOADLET_EXCEPTIONS)
+		:public std::runtime_error
+	#endif
+{
+
 public:
 	Exception(int type);
 	Exception(int type,const char *description);
+	virtual ~Exception();
 
 	int getError();
 	const char *getDescription();
 
 protected:
 	int mError;
+	#if !defined(TOADLET_EXCEPTIONS)
+		char *mDescription;
+	#endif
 };
 
 }
 }
-
-#endif
 
 #endif

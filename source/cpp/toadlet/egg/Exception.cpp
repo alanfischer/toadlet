@@ -26,17 +26,33 @@
 #include <toadlet/egg/Exception.h>
 #include <toadlet/egg/Error.h>
 
-#if defined(TOADLET_EXCEPTIONS)
-
 namespace toadlet{
 namespace egg{
 
-Exception::Exception(int error):std::runtime_error("unknown"){
+Exception::Exception(int error)
+	#if defined(TOADLET_EXCEPTIONS)
+		:std::runtime_error("unknown")
+	#endif
+{
 	mError=error;
 }
 
-Exception::Exception(int error,const char *description):std::runtime_error(description){
+Exception::Exception(int error,const char *description)
+	#if defined(TOADLET_EXCEPTIONS)
+		:std::runtime_error(description)
+	#endif
+{
 	mError=error;
+	#if !defined(TOADLET_EXCEPTIONS)
+		mDescription=new char[strlen(description)+1];
+		strcpy(1,description);
+	#endif
+}
+
+Exception::~Exception(){
+	#if !defined(TOADLET_EXCEPTIONS)
+		delete mDescription;
+	#endif
 }
 
 int Exception::getError(){
@@ -44,10 +60,12 @@ int Exception::getError(){
 }
 
 const char *Exception::getDescription(){
-	return what();
+	#if defined(TOADLET_EXCEPTIONS)
+		return what();
+	#else
+		return mDescription;
+	#endif
 }
 
 }
 }
-
-#endif
