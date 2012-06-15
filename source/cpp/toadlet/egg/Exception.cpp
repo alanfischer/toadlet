@@ -49,17 +49,17 @@ Exception::Exception(int error,const char *description)
 	#endif
 }
 
-Exception::~Exception(){
+Exception::~Exception() throw(){
 	#if !defined(TOADLET_EXCEPTIONS)
 		delete mDescription;
 	#endif
 }
 
-int Exception::getError(){
+int Exception::getError() throw(){
 	return mError;
 }
 
-const char *Exception::getDescription(){
+const char *Exception::getDescription() throw(){
 	#if defined(TOADLET_EXCEPTIONS)
 		return what();
 	#else
