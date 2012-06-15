@@ -45,10 +45,10 @@ class TOADLET_API Exception
 public:
 	Exception(int type);
 	Exception(int type,const char *description);
-	virtual ~Exception();
+	virtual ~Exception() throw();
 
-	int getError();
-	const char *getDescription();
+	int getError() throw();
+	const char *getDescription()  throw();
 
 protected:
 	int mError;
