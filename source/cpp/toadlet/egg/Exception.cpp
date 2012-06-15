@@ -37,6 +37,18 @@ Exception::Exception(int error)
 	mError=error;
 }
 
+Exception::Exception(const char *description)
+#if defined(TOADLET_EXCEPTIONS)
+	:std::runtime_error(description)
+#endif
+	{
+		mError=Error::Type_UNKNOWN ;
+#if !defined(TOADLET_EXCEPTIONS)
+		mDescription=new char[strlen(description)+1];
+		strcpy(mDescription,description);
+#endif
+	}
+
 Exception::Exception(int error,const char *description)
 	#if defined(TOADLET_EXCEPTIONS)
 		:std::runtime_error(description)
