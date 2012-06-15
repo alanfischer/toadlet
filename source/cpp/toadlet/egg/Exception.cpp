@@ -45,7 +45,7 @@ Exception::Exception(int error,const char *description)
 	mError=error;
 	#if !defined(TOADLET_EXCEPTIONS)
 		mDescription=new char[strlen(description)+1];
-		strcpy(1,description);
+		strcpy(mDescription,description);
 	#endif
 }
 
