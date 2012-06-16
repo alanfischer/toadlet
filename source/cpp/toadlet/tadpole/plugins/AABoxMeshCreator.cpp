@@ -24,11 +24,10 @@
  ********** Copyright header - do not remove **********/
 
 #include <toadlet/tadpole/Engine.h>
-#include <toadlet/tadpole/creator/AABoxMeshCreator.h>
+#include "AABoxMeshCreator.h"
 
 namespace toadlet{
 namespace tadpole{
-namespace creator{
 
 Mesh::ptr AABoxMeshCreator::createAABoxMesh(const AABox &box,Material::ptr material){
 	VertexBuffer::ptr vertexBuffer=mEngine->getBufferManager()->createVertexBuffer(Buffer::Usage_BIT_STATIC,Buffer::Access_BIT_WRITE,mEngine->getVertexFormats().POSITION_NORMAL_TEX_COORD,24);
@@ -105,7 +104,7 @@ Mesh::ptr AABoxMeshCreator::createAABoxMesh(const AABox &box,Material::ptr mater
 	Mesh::SubMesh::ptr subMesh(new Mesh::SubMesh());
 	subMesh->indexData=IndexData::ptr(new IndexData(IndexData::Primitive_TRIS,indexBuffer));
 	if(material==NULL){
-		material=mEngine->getMaterialManager()->createDiffuseMaterial(NULL);
+		material=mEngine->createDiffuseMaterial(NULL);
 	}
 	subMesh->material=material;
 
@@ -117,6 +116,5 @@ Mesh::ptr AABoxMeshCreator::createAABoxMesh(const AABox &box,Material::ptr mater
 	return mesh;
 }
 
-}
 }
 }

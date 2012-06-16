@@ -23,8 +23,8 @@
  *
  ********** Copyright header - do not remove **********/
 
-#ifndef TOADLET_TADPOLE_CREATOR_TORUSMESHCREATOR
-#define TOADLET_TADPOLE_CREATOR_TORUSMESHCREATOR
+#ifndef TOADLET_TADPOLE_SPHEREMESHCREATOR_H
+#define TOADLET_TADPOLE_SPHEREMESHCREATOR_H
 
 #include <toadlet/tadpole/Engine.h>
 #include <toadlet/tadpole/ResourceCreator.h>
@@ -32,35 +32,35 @@
 
 namespace toadlet{
 namespace tadpole{
-namespace creator{
 
-class TOADLET_API TorusMeshCreator:public Object,public ResourceCreator{
+class TOADLET_API SphereMeshCreator:public Object,public ResourceCreator{
 public:
-	TOADLET_OBJECT(TorusMeshCreator);
+	TOADLET_OBJECT(SphereMeshCreator);
 
-	TorusMeshCreator(Engine *engine){
+	SphereMeshCreator(Engine *engine){
 		mEngine=engine;
 	}
 
 	void destroy(){}
 
 	Resource::ptr create(const String &name,ResourceData *data,ProgressListener *listener){
-		Resource::ptr resource=createTorusMesh(Math::ONE,Math::HALF,16,16,Material::ptr());
+		Resource::ptr resource=createSphereMesh(Sphere(Math::ONE),8,8,Material::ptr());
 		resource->setName(name);
 		return resource;
 	}
 
-	int getTorusVertexCount(int numMajor,int numMinor){return numMajor*(numMinor+1)*2;}
+	int getSphereVertexCount(int numSegments,int numRings){return (numRings+1)*(numSegments+1);}
+	int getSphereIndexCount(int numSegments,int numRings){return 6*numRings*(numSegments+1);}
 
-	Mesh::ptr createTorusMesh(VertexBuffer::ptr vertexBuffer,scalar majorRadius,scalar minorRadius,int numMajor,int numMinor);
-	Mesh::ptr createTorusMesh(scalar majorRadius,scalar minorRadius,int numMajor,int numMinor,Material::ptr material);
+	Mesh::ptr createSphereMesh(VertexBuffer::ptr vertexBuffer,IndexBuffer::ptr indexBuffer,const Sphere &sphere,int numSegments,int numRings);
+	Mesh::ptr createSphereMesh(const Sphere &sphere,int numSegments,int numRings,Material::ptr material);
 
 protected:
 	Engine *mEngine;
 	VertexBufferAccessor vba;
+	IndexBufferAccessor iba;
 };
 
-}
 }
 }
 

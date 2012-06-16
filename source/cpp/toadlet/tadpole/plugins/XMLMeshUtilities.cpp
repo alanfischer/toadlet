@@ -25,6 +25,7 @@
 
 #include "XMLMeshUtilities.h"
 #include <toadlet/tadpole/material/Material.h>
+#include <toadlet/tadpole/Engine.h>
 #include <toadlet/peeper/VertexBufferAccessor.h>
 #include <toadlet/peeper/IndexBufferAccessor.h>
 #include <toadlet/egg/MathConversion.h>
@@ -249,7 +250,7 @@ Material::ptr XMLMeshUtilities::loadMaterial(mxml_node_t *materialNode,int versi
 			material=materialManager->findMaterial(prop);
 		}
 		if(material==NULL){
-			material=materialManager->createDiffuseMaterial(NULL);
+			material=materialManager->getEngine()->createDiffuseMaterial(NULL);
 		}
 	}
 	else{

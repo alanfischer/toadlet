@@ -24,11 +24,10 @@
  ********** Copyright header - do not remove **********/
 
 #include <toadlet/tadpole/Engine.h>
-#include <toadlet/tadpole/creator/TorusMeshCreator.h>
+#include "TorusMeshCreator.h"
 
 namespace toadlet{
 namespace tadpole{
-namespace creator{
 
 Mesh::ptr TorusMeshCreator::createTorusMesh(VertexBuffer::ptr vertexBuffer,scalar majorRadius,scalar minorRadius,int numMajor,int numMinor){
 	{
@@ -86,13 +85,12 @@ Mesh::ptr TorusMeshCreator::createTorusMesh(scalar majorRadius,scalar minorRadiu
 
 	Mesh::ptr mesh=createTorusMesh(vertexBuffer,majorRadius,minorRadius,numMajor,numMinor);
 	if(material==NULL){
-		material=mEngine->getMaterialManager()->createDiffuseMaterial(NULL);
+		material=mEngine->createDiffuseMaterial(NULL);
 	}
 	mesh->getSubMesh(0)->material=material;
 
 	return mesh;
 }
 
-}
 }
 }

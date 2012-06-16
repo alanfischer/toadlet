@@ -28,7 +28,7 @@
 #include <toadlet/peeper/TextureFormatConversion.h>
 #include <toadlet/tadpole/TextureManager.h>
 #include <toadlet/tadpole/Engine.h>
-#include <toadlet/tadpole/creator/NormalizationTextureCreator.h>
+#include <toadlet/tadpole/plugins/NormalizationTextureCreator.h>
 
 namespace toadlet{
 namespace tadpole{
@@ -135,10 +135,6 @@ bool TextureManager::textureLoad(Texture::ptr texture,TextureFormat *format,tbyt
 		delete[] newData;
 	}
 	return result;
-}
-
-Texture::ptr TextureManager::createNormalizationTexture(int size){
-	return shared_static_cast<NormalizationTextureCreator>(mNormalizationCreator)->createNormalizationTexture(size);
 }
 
 void TextureManager::contextActivate(RenderDevice *renderDevice){

@@ -23,38 +23,42 @@
  *
  ********** Copyright header - do not remove **********/
 
-#ifndef TOADLET_TADPOLE_CREATOR_DIFFUSEMATERIALCREATOR_H
-#define TOADLET_TADPOLE_CREATOR_DIFFUSEMATERIALCREATOR_H
+#ifndef TOADLET_TADPOLE_TORUSMESHCREATOR_H
+#define TOADLET_TADPOLE_TORUSMESHCREATOR_H
 
 #include <toadlet/tadpole/Engine.h>
-#include <toadlet/tadpole/ResourceManager.h>
-#include <toadlet/tadpole/material/Material.h>
+#include <toadlet/tadpole/ResourceCreator.h>
+#include <toadlet/tadpole/Mesh.h>
 
 namespace toadlet{
 namespace tadpole{
-namespace creator{
 
-class TOADLET_API DiffuseMaterialCreator:public Object,public ResourceCreator{
+class TOADLET_API TorusMeshCreator:public Object,public ResourceCreator{
 public:
-	TOADLET_OBJECT(DiffuseMaterialCreator);
+	TOADLET_OBJECT(TorusMeshCreator);
 
-	DiffuseMaterialCreator(Engine *engine);
+	TorusMeshCreator(Engine *engine){
+		mEngine=engine;
+	}
 
-	void destroy();
+	void destroy(){}
 
-	Resource::ptr create(const String &name,ResourceData *data,ProgressListener *listener);
-	Material::ptr createDiffuseMaterial(Texture *texture);
-	Material::ptr createPointSpriteMaterial(Texture *texture,scalar size,bool attenuated);
-	Material::ptr createFontMaterial(Font *font);
+	Resource::ptr create(const String &name,ResourceData *data,ProgressListener *listener){
+		Resource::ptr resource=createTorusMesh(Math::ONE,Math::HALF,16,16,Material::ptr());
+		resource->setName(name);
+		return resource;
+	}
+
+	int getTorusVertexCount(int numMajor,int numMinor){return numMajor*(numMinor+1)*2;}
+
+	Mesh::ptr createTorusMesh(VertexBuffer::ptr vertexBuffer,scalar majorRadius,scalar minorRadius,int numMajor,int numMinor);
+	Mesh::ptr createTorusMesh(scalar majorRadius,scalar minorRadius,int numMajor,int numMinor,Material::ptr material);
 
 protected:
 	Engine *mEngine;
-	Shader::ptr mDiffuseVertexShader,mDiffuseFragmentShader;
-	Shader::ptr mPointSpriteGeometryShader,mPointSpriteFragmentShader;
-	ShaderState::ptr mDiffuseShaderState,mPointShaderState;
+	VertexBufferAccessor vba;
 };
 
-}
 }
 }
 

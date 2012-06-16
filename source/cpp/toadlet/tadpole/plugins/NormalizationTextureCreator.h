@@ -23,8 +23,8 @@
  *
  ********** Copyright header - do not remove **********/
 
-#ifndef TOADLET_TADPOLE_CREATOR_NORMALIZATIONTEXTURECREATOR_H
-#define TOADLET_TADPOLE_CREATOR_NORMALIZATIONTEXTURECREATOR_H
+#ifndef TOADLET_TADPOLE_NORMALIZATIONTEXTURECREATOR_H
+#define TOADLET_TADPOLE_NORMALIZATIONTEXTURECREATOR_H
 
 #include <toadlet/tadpole/Engine.h>
 #include <toadlet/tadpole/ResourceManager.h>
@@ -32,7 +32,6 @@
 
 namespace toadlet{
 namespace tadpole{
-namespace creator{
 
 class TOADLET_API NormalizationTextureCreator:public Object,public ResourceCreator{
 public:
@@ -56,7 +55,6 @@ protected:
 	Engine *mEngine;
 };
 
-}
 }
 }
 

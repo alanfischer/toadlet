@@ -110,6 +110,19 @@ public:
 	inline NodeManager *getNodeManager() const{return mNodeManager;}
 	inline AudioManager *getAudioManager() const{return mAudioManager;}
 
+	Texture::ptr createNormalizationTexture(int size);
+
+	Material::ptr createDiffuseMaterial(Texture *texture);
+	Material::ptr createPointSpriteMaterial(Texture *texture,scalar size,bool attenuated);
+	Material::ptr createFontMaterial(Font *font);
+	Material::ptr createSkyBoxMaterial(Texture *texture,bool clamp=true);
+
+	Mesh::ptr createAABoxMesh(const AABox &box,Material::ptr material=Material::ptr());
+	Mesh::ptr createSkyBoxMesh(scalar size,bool unfolded,bool invert,Material::ptr bottom,Material::ptr top,Material::ptr left,Material::ptr right,Material::ptr back,Material::ptr front);
+	Mesh::ptr createSkyDomeMesh(const Sphere &sphere,int numSegments,int numRings,scalar fade,Material::ptr material=Material::ptr());
+	Mesh::ptr createSphereMesh(const Sphere &sphere,Material::ptr material=Material::ptr());
+	Mesh::ptr createGridMesh(scalar width,scalar height,int numWidth,int numHeight,Material::ptr material=Material::ptr());
+
 protected:
 	void *mEnv,*mCtx;
 	bool mFixedBackable,mShaderBackable;
@@ -134,6 +147,11 @@ protected:
 	MeshManager::ptr mMeshManager;
 	AudioManager::ptr mAudioManager;
 	NodeManager::ptr mNodeManager;
+
+	ResourceCreator::ptr mNormalizationCreator;
+	ResourceCreator::ptr mDiffuseCreator,mSkyBoxMaterialCreator;
+	ResourceCreator::ptr mAABoxCreator,mSkyBoxCreator,mSkyDomeCreator,mSphereCreator,mGridCreator;
+
 	Collection<int> mFreeHandles;
 	Collection<Node*> mHandles;
 

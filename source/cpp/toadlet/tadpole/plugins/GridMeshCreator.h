@@ -23,33 +23,36 @@
  *
  ********** Copyright header - do not remove **********/
 
-#ifndef TOADLET_TADPOLE_CREATOR_AABOXMESHCREATOR
-#define TOADLET_TADPOLE_CREATOR_AABOXMESHCREATOR
+#ifndef TOADLET_TADPOLE_GRIDMESHCREATOR_H
+#define TOADLET_TADPOLE_GRIDMESHCREATOR_H
 
 #include <toadlet/tadpole/ResourceCreator.h>
 #include <toadlet/tadpole/Mesh.h>
 
 namespace toadlet{
 namespace tadpole{
-namespace creator{
 
-class TOADLET_API AABoxMeshCreator:public Object,public ResourceCreator{
+class TOADLET_API GridMeshCreator:public Object,public ResourceCreator{
 public:
-	TOADLET_OBJECT(AABoxMeshCreator);
+	TOADLET_OBJECT(GridMeshCreator);
 
-	AABoxMeshCreator(Engine *engine){
+	GridMeshCreator(Engine *engine){
 		mEngine=engine;
 	}
 
 	void destroy(){}
 
 	Resource::ptr create(const String &name,ResourceData *data,ProgressListener *listener){
-		Resource::ptr resource=createAABoxMesh(AABox(-Math::ONE,-Math::ONE,-Math::ONE,Math::ONE,Math::ONE,Math::ONE),Material::ptr());
+		Resource::ptr resource=createGridMesh(Math::ONE,Math::ONE,4,4,Material::ptr());
 		resource->setName(name);
 		return resource;
 	}
 
-	Mesh::ptr createAABoxMesh(const AABox &box,Material::ptr material);
+	int getGridVertexCount(int numWidth,int numHeight){return numWidth*numHeight;}
+	int getGridIndexCount(int numWidth,int numHeight){return (numWidth*2) * (numHeight-1) + (numHeight-2);}
+
+	Mesh::ptr createGridMesh(VertexBuffer::ptr vertexBuffer,IndexBuffer::ptr indexBuffer,scalar width,scalar height,int numWidth,int numHeight);
+	Mesh::ptr createGridMesh(scalar width,scalar height,int numWidth,int numHeight,Material::ptr material);
 
 protected:
 	Engine *mEngine;
@@ -57,7 +60,6 @@ protected:
 	IndexBufferAccessor iba;
 };
 
-}
 }
 }
 

@@ -402,7 +402,7 @@ Material::ptr TMSHStreamer::readMaterial(DataStream *stream,int blockSize){
 		material=mEngine->getMaterialManager()->findMaterial(name);
 	}
 	if(material==NULL){
-		material=mEngine->getMaterialManager()->createDiffuseMaterial(NULL);
+		material=mEngine->createDiffuseMaterial(NULL);
 	}
 	if(name!=(char*)NULL){
 		material->setName(name);

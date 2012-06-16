@@ -23,12 +23,11 @@
  *
  ********** Copyright header - do not remove **********/
 
-#include <toadlet/tadpole/creator/DiffuseMaterialCreator.h>
+#include "DiffuseMaterialCreator.h"
 #include <toadlet/tadpole/material/RenderVariables.h>
 
 namespace toadlet{
 namespace tadpole{
-namespace creator{
 
 DiffuseMaterialCreator::DiffuseMaterialCreator(Engine *engine){
 	mEngine=engine;
@@ -457,6 +456,5 @@ Material::ptr DiffuseMaterialCreator::createFontMaterial(Font *font){
 	return material;
 }
 
-}
 }
 }

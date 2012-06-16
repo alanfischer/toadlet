@@ -71,6 +71,8 @@ public:
 
 	virtual void logAllResources();
 
+	inline Engine *getEngine(){return mEngine;}
+
 	static String cleanFilename(const String &name);
 
 protected:

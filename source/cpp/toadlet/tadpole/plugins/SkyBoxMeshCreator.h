@@ -23,37 +23,32 @@
  *
  ********** Copyright header - do not remove **********/
 
-#ifndef TOADLET_TADPOLE_CREATOR_GRIDMESHCREATOR
-#define TOADLET_TADPOLE_CREATOR_GRIDMESHCREATOR
+#ifndef TOADLET_TADPOLE_SKYBOXMESHCREATOR_H
+#define TOADLET_TADPOLE_SKYBOXMESHCREATOR_H
 
 #include <toadlet/tadpole/ResourceCreator.h>
 #include <toadlet/tadpole/Mesh.h>
 
 namespace toadlet{
 namespace tadpole{
-namespace creator{
 
-class TOADLET_API GridMeshCreator:public Object,public ResourceCreator{
+class TOADLET_API SkyBoxMeshCreator:public Object,public ResourceCreator{
 public:
-	TOADLET_OBJECT(GridMeshCreator);
+	TOADLET_OBJECT(SkyBoxMeshCreator);
 
-	GridMeshCreator(Engine *engine){
+	SkyBoxMeshCreator(Engine *engine){
 		mEngine=engine;
 	}
 
 	void destroy(){}
 
 	Resource::ptr create(const String &name,ResourceData *data,ProgressListener *listener){
-		Resource::ptr resource=createGridMesh(Math::ONE,Math::ONE,4,4,Material::ptr());
+		Resource::ptr resource=createSkyBoxMesh(Math::ONE,false,false,Material::ptr(),Material::ptr(),Material::ptr(),Material::ptr(),Material::ptr(),Material::ptr());
 		resource->setName(name);
 		return resource;
 	}
 
-	int getGridVertexCount(int numWidth,int numHeight){return numWidth*numHeight;}
-	int getGridIndexCount(int numWidth,int numHeight){return (numWidth*2) * (numHeight-1) + (numHeight-2);}
-
-	Mesh::ptr createGridMesh(VertexBuffer::ptr vertexBuffer,IndexBuffer::ptr indexBuffer,scalar width,scalar height,int numWidth,int numHeight);
-	Mesh::ptr createGridMesh(scalar width,scalar height,int numWidth,int numHeight,Material::ptr material);
+	Mesh::ptr createSkyBoxMesh(scalar size,bool unfolded,bool invert,Material::ptr bottom,Material::ptr top,Material::ptr left,Material::ptr right,Material::ptr back,Material::ptr front);
 
 protected:
 	Engine *mEngine;
@@ -61,7 +56,6 @@ protected:
 	IndexBufferAccessor iba;
 };
 
-}
 }
 }
 

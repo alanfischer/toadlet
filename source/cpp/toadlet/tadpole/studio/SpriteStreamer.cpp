@@ -84,7 +84,7 @@ void SpriteStreamer::buildMaterials(SpriteModel *model){
 
 	int i;
 	for(i=1;i<model->header->numframes;i++){
-		model->materials[i]=mEngine->getMaterialManager()->createDiffuseMaterial(model->textures[i]);
+		model->materials[i]=mEngine->createDiffuseMaterial(model->textures[i]);
 	}
 }
 

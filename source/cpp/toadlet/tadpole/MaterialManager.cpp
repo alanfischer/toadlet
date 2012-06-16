@@ -31,8 +31,6 @@
 #include <toadlet/tadpole/Colors.h>
 #include <toadlet/tadpole/Engine.h>
 #include <toadlet/tadpole/MaterialManager.h>
-#include <toadlet/tadpole/creator/DiffuseMaterialCreator.h>
-#include <toadlet/tadpole/creator/SkyBoxMaterialCreator.h>
 
 namespace toadlet{
 namespace tadpole{
@@ -47,11 +45,6 @@ MaterialManager::MaterialManager(Engine *engine):ResourceManager(engine),
 
 void MaterialManager::destroy(){
 	ResourceManager::destroy();
-
-	if(mDiffuseCreator!=NULL){
-		mDiffuseCreator->destroy();
-		mDiffuseCreator=NULL;
-	}
 
 	int i;
 	for(i=0;i<mRenderStates.size();++i){
@@ -116,22 +109,6 @@ Material::ptr MaterialManager::createSharedMaterial(Material::ptr source,RenderS
 	material->compile();
 
 	return material;
-}
-
-Material::ptr MaterialManager::createDiffuseMaterial(Texture *texture){
-	return shared_static_cast<DiffuseMaterialCreator>(mDiffuseCreator)->createDiffuseMaterial(texture);
-}
-
-Material::ptr MaterialManager::createPointSpriteMaterial(Texture *texture,scalar size,bool attenuated){
-	return shared_static_cast<DiffuseMaterialCreator>(mDiffuseCreator)->createPointSpriteMaterial(texture,size,attenuated);
-}
-
-Material::ptr MaterialManager::createFontMaterial(Font *font){
-	return shared_static_cast<DiffuseMaterialCreator>(mDiffuseCreator)->createFontMaterial(font);
-}
-
-Material::ptr MaterialManager::createSkyBoxMaterial(Texture *texture,bool clamp){
-	return shared_static_cast<SkyBoxMaterialCreator>(mSkyBoxCreator)->createSkyBoxMaterial(texture,clamp);
 }
 
 RenderState::ptr MaterialManager::createRenderState(){
@@ -300,7 +277,7 @@ void MaterialManager::resourceDestroyed(Resource *resource){
 Resource::ptr MaterialManager::unableToFindStreamer(const String &name,ResourceData *data){
 	Texture::ptr texture=mEngine->getTextureManager()->findTexture(name);
 	if(texture!=NULL){
-		return createDiffuseMaterial(texture);
+		return mEngine->createDiffuseMaterial(texture);
 	}
 	else{
 		return ResourceManager::unableToFindStreamer(name,data);
