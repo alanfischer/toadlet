@@ -24,11 +24,10 @@
  ********** Copyright header - do not remove **********/
 
 #include <toadlet/tadpole/Engine.h>
-#include <toadlet/tadpole/creator/GeoSphereMeshCreator.h>
+#include "GeoSphereMeshCreator.h"
 
 namespace toadlet{
 namespace tadpole{
-namespace creator{
 
 Mesh::ptr GeoSphereMeshCreator::createGeoSphereMesh(VertexBuffer::ptr vertexBuffer,IndexBuffer::ptr indexBuffer,const Sphere &sphere,int depth,bool icosahedron){
 	currentSphere=sphere;
@@ -180,7 +179,7 @@ Mesh::ptr GeoSphereMeshCreator::createGeoSphereMesh(const Sphere &sphere,int dep
 
 	Mesh::ptr mesh=createGeoSphereMesh(vertexBuffer,indexBuffer,sphere,depth,icosahedron);
 	if(material==NULL){
-		material=mEngine->getMaterialManager()->createDiffuseMaterial(NULL);
+		material=mEngine->createDiffuseMaterial(NULL);
 	}
 	mesh->getSubMesh(0)->material=material;
 
@@ -204,6 +203,5 @@ void GeoSphereMeshCreator::geoSet(int vertexIndex,const Vector3 &vec){
 	vba.set2(vertexIndex,2,tx,ty);
 }
 
-}
 }
 }

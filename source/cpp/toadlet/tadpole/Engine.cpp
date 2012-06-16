@@ -82,15 +82,14 @@
 #include <toadlet/tadpole/node/ParticleNode.h>
 #include <toadlet/tadpole/node/SpriteNode.h>
 
-#include <toadlet/tadpole/creator/AABoxMeshCreator.h>
-#include <toadlet/tadpole/creator/SkyBoxMeshCreator.h>
-#include <toadlet/tadpole/creator/SkyDomeMeshCreator.h>
-#include <toadlet/tadpole/creator/SphereMeshCreator.h>
-#include <toadlet/tadpole/creator/GridMeshCreator.h>
-#include <toadlet/tadpole/creator/NormalizationTextureCreator.h>
-#include <toadlet/tadpole/creator/DiffuseMaterialCreator.h>
-#include <toadlet/tadpole/creator/SkyBoxMaterialCreator.h>
-
+#include <toadlet/tadpole/plugins/AABoxMeshCreator.h>
+#include <toadlet/tadpole/plugins/SkyBoxMeshCreator.h>
+#include <toadlet/tadpole/plugins/SkyDomeMeshCreator.h>
+#include <toadlet/tadpole/plugins/SphereMeshCreator.h>
+#include <toadlet/tadpole/plugins/GridMeshCreator.h>
+#include <toadlet/tadpole/plugins/NormalizationTextureCreator.h>
+#include <toadlet/tadpole/plugins/DiffuseMaterialCreator.h>
+#include <toadlet/tadpole/plugins/SkyBoxMaterialCreator.h>
 #include <toadlet/tadpole/plugins/BMPStreamer.h>
 #include <toadlet/tadpole/plugins/DDSStreamer.h>
 #include <toadlet/tadpole/plugins/TGAStreamer.h>
@@ -352,16 +351,16 @@ void Engine::installHandlers(){
 		mTextureManager->setStreamer(new SPRStreamer(this),"spr");
 	#endif
 
-	mTextureManager->setNormalizationCreator(new NormalizationTextureCreator(this));
+	mNormalizationCreator=new NormalizationTextureCreator(this);
 
-	mMeshManager->setAABoxCreator(new AABoxMeshCreator(this));
-	mMeshManager->setSkyBoxCreator(new SkyBoxMeshCreator(this));
-	mMeshManager->setSkyDomeCreator(new SkyDomeMeshCreator(this));
-	mMeshManager->setSphereCreator(new SphereMeshCreator(this));
-	mMeshManager->setGridCreator(new GridMeshCreator(this));
+	mSkyBoxMaterialCreator=new SkyBoxMaterialCreator(this);
+	mDiffuseCreator=new DiffuseMaterialCreator(this);
 
-	mMaterialManager->setDiffuseCreator(new DiffuseMaterialCreator(this));
-	mMaterialManager->setSkyBoxCreator(new SkyBoxMaterialCreator(this));
+	mAABoxCreator=new AABoxMeshCreator(this);
+	mSkyBoxCreator=new SkyBoxMeshCreator(this);
+	mSkyDomeCreator=new SkyDomeMeshCreator(this);
+	mSphereCreator=new SphereMeshCreator(this);
+	mGridCreator=new GridMeshCreator(this);
 }
 
 bool Engine::setRenderDevice(RenderDevice *renderDevice){
@@ -617,6 +616,46 @@ void Engine::contextDeactivate(RenderDevice *renderDevice){
 	for(i=0;i<mContextListeners.size();++i){
 		mContextListeners[i]->postContextDeactivate(renderDevice);
 	}
+}
+
+Texture::ptr Engine::createNormalizationTexture(int size){
+	return shared_static_cast<NormalizationTextureCreator>(mNormalizationCreator)->createNormalizationTexture(size);
+}
+
+Material::ptr Engine::createDiffuseMaterial(Texture *texture){
+	return shared_static_cast<DiffuseMaterialCreator>(mDiffuseCreator)->createDiffuseMaterial(texture);
+}
+
+Material::ptr Engine::createPointSpriteMaterial(Texture *texture,scalar size,bool attenuated){
+	return shared_static_cast<DiffuseMaterialCreator>(mDiffuseCreator)->createPointSpriteMaterial(texture,size,attenuated);
+}
+
+Material::ptr Engine::createFontMaterial(Font *font){
+	return shared_static_cast<DiffuseMaterialCreator>(mDiffuseCreator)->createFontMaterial(font);
+}
+
+Material::ptr Engine::createSkyBoxMaterial(Texture *texture,bool clamp){
+	return shared_static_cast<SkyBoxMaterialCreator>(mSkyBoxMaterialCreator)->createSkyBoxMaterial(texture,clamp);
+}
+
+Mesh::ptr Engine::createAABoxMesh(const AABox &box,Material::ptr material){
+	return shared_static_cast<AABoxMeshCreator>(mAABoxCreator)->createAABoxMesh(box,material);
+}
+
+Mesh::ptr Engine::createSkyBoxMesh(scalar size,bool unfolded,bool invert,Material::ptr bottom,Material::ptr top,Material::ptr left,Material::ptr right,Material::ptr back,Material::ptr front){
+	return shared_static_cast<SkyBoxMeshCreator>(mSkyBoxCreator)->createSkyBoxMesh(size,unfolded,invert,bottom,top,left,right,back,front);
+}
+
+Mesh::ptr Engine::createSkyDomeMesh(const Sphere &sphere,int numSegments,int numRings,scalar fade,Material::ptr material){
+	return shared_static_cast<SkyDomeMeshCreator>(mSkyDomeCreator)->createSkyDomeMesh(sphere,numSegments,numRings,fade,material);
+}
+
+Mesh::ptr Engine::createSphereMesh(const Sphere &sphere,Material::ptr material){
+	return shared_static_cast<SphereMeshCreator>(mSphereCreator)->createSphereMesh(sphere,16,16,material);
+}
+
+Mesh::ptr Engine::createGridMesh(scalar width,scalar height,int numWidth,int numHeight,Material::ptr material){
+	return shared_static_cast<GridMeshCreator>(mGridCreator)->createGridMesh(width,height,numWidth,numHeight,material);
 }
 
 }

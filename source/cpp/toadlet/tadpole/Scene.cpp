@@ -68,8 +68,8 @@ Scene::Scene(Engine *engine):Object(),
 
 	mSceneRenderer=SceneRenderer::ptr(new SceneRenderer(this));
 
-	mSphereMesh=mEngine->getMeshManager()->createSphereMesh(Sphere(Math::ONE));
-	mAABoxMesh=mEngine->getMeshManager()->createAABoxMesh(AABox(-Math::ONE,-Math::ONE,-Math::ONE,Math::ONE,Math::ONE,Math::ONE));
+	mSphereMesh=mEngine->createSphereMesh(Sphere(Math::ONE));
+	mAABoxMesh=mEngine->createAABoxMesh(AABox(-Math::ONE,-Math::ONE,-Math::ONE,Math::ONE,Math::ONE,Math::ONE));
 }
 
 Scene::~Scene(){

@@ -23,41 +23,36 @@
  *
  ********** Copyright header - do not remove **********/
 
-#ifndef TOADLET_TADPOLE_CREATOR_SKYBOXMESHCREATOR
-#define TOADLET_TADPOLE_CREATOR_SKYBOXMESHCREATOR
+#ifndef TOADLET_TADPOLE_DIFFUSEMATERIALCREATOR_H
+#define TOADLET_TADPOLE_DIFFUSEMATERIALCREATOR_H
 
-#include <toadlet/tadpole/ResourceCreator.h>
-#include <toadlet/tadpole/Mesh.h>
+#include <toadlet/tadpole/Engine.h>
+#include <toadlet/tadpole/ResourceManager.h>
+#include <toadlet/tadpole/material/Material.h>
 
 namespace toadlet{
 namespace tadpole{
-namespace creator{
 
-class TOADLET_API SkyBoxMeshCreator:public Object,public ResourceCreator{
+class TOADLET_API DiffuseMaterialCreator:public Object,public ResourceCreator{
 public:
-	TOADLET_OBJECT(SkyBoxMeshCreator);
+	TOADLET_OBJECT(DiffuseMaterialCreator);
 
-	SkyBoxMeshCreator(Engine *engine){
-		mEngine=engine;
-	}
+	DiffuseMaterialCreator(Engine *engine);
 
-	void destroy(){}
+	void destroy();
 
-	Resource::ptr create(const String &name,ResourceData *data,ProgressListener *listener){
-		Resource::ptr resource=createSkyBoxMesh(Math::ONE,false,false,Material::ptr(),Material::ptr(),Material::ptr(),Material::ptr(),Material::ptr(),Material::ptr());
-		resource->setName(name);
-		return resource;
-	}
-
-	Mesh::ptr createSkyBoxMesh(scalar size,bool unfolded,bool invert,Material::ptr bottom,Material::ptr top,Material::ptr left,Material::ptr right,Material::ptr back,Material::ptr front);
+	Resource::ptr create(const String &name,ResourceData *data,ProgressListener *listener);
+	Material::ptr createDiffuseMaterial(Texture *texture);
+	Material::ptr createPointSpriteMaterial(Texture *texture,scalar size,bool attenuated);
+	Material::ptr createFontMaterial(Font *font);
 
 protected:
 	Engine *mEngine;
-	VertexBufferAccessor vba;
-	IndexBufferAccessor iba;
+	Shader::ptr mDiffuseVertexShader,mDiffuseFragmentShader;
+	Shader::ptr mPointSpriteGeometryShader,mPointSpriteFragmentShader;
+	ShaderState::ptr mDiffuseShaderState,mPointShaderState;
 };
 
-}
 }
 }
 

@@ -24,11 +24,10 @@
  ********** Copyright header - do not remove **********/
 
 #include <toadlet/tadpole/Engine.h>
-#include <toadlet/tadpole/creator/GridMeshCreator.h>
+#include "GridMeshCreator.h"
 
 namespace toadlet{
 namespace tadpole{
-namespace creator{
 
 Mesh::ptr GridMeshCreator::createGridMesh(VertexBuffer::ptr vertexBuffer,IndexBuffer::ptr indexBuffer,scalar width,scalar height,int numWidth,int numHeight){
 	if(numWidth<=1 || numHeight<=0){
@@ -109,13 +108,12 @@ Mesh::ptr GridMeshCreator::createGridMesh(scalar width,scalar height,int numWidt
 
 	Mesh::ptr mesh=createGridMesh(vertexBuffer,indexBuffer,width,height,numWidth,numHeight);
 	if(material==NULL){
-		material=mEngine->getMaterialManager()->createDiffuseMaterial(NULL);
+		material=mEngine->createDiffuseMaterial(NULL);
 	}
 	mesh->getSubMesh(0)->material=material;
 
 	return mesh;
 }
 
-}
 }
 }

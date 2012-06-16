@@ -105,7 +105,7 @@ void LabelNode::setFont(const Font::ptr &font){
 	mFont=font;
 
 	if(mFont!=NULL){
-		mMaterial=getEngine()->getMaterialManager()->createFontMaterial(mFont);
+		mMaterial=getEngine()->createFontMaterial(mFont);
 
 		if(mSharedRenderState!=NULL){
 			mMaterial=mEngine->getMaterialManager()->createSharedMaterial(mMaterial,mSharedRenderState);

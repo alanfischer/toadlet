@@ -23,38 +23,32 @@
  *
  ********** Copyright header - do not remove **********/
 
-#ifndef TOADLET_TADPOLE_CREATOR_SPHEREMESHCREATOR
-#define TOADLET_TADPOLE_CREATOR_SPHEREMESHCREATOR
+#ifndef TOADLET_TADPOLE_AABOXMESHCREATOR
+#define TOADLET_TADPOLE_AABOXMESHCREATOR
 
-#include <toadlet/tadpole/Engine.h>
 #include <toadlet/tadpole/ResourceCreator.h>
 #include <toadlet/tadpole/Mesh.h>
 
 namespace toadlet{
 namespace tadpole{
-namespace creator{
 
-class TOADLET_API SphereMeshCreator:public Object,public ResourceCreator{
+class TOADLET_API AABoxMeshCreator:public Object,public ResourceCreator{
 public:
-	TOADLET_OBJECT(SphereMeshCreator);
+	TOADLET_OBJECT(AABoxMeshCreator);
 
-	SphereMeshCreator(Engine *engine){
+	AABoxMeshCreator(Engine *engine){
 		mEngine=engine;
 	}
 
 	void destroy(){}
 
 	Resource::ptr create(const String &name,ResourceData *data,ProgressListener *listener){
-		Resource::ptr resource=createSphereMesh(Sphere(Math::ONE),8,8,Material::ptr());
+		Resource::ptr resource=createAABoxMesh(AABox(-Math::ONE,-Math::ONE,-Math::ONE,Math::ONE,Math::ONE,Math::ONE),Material::ptr());
 		resource->setName(name);
 		return resource;
 	}
 
-	int getSphereVertexCount(int numSegments,int numRings){return (numRings+1)*(numSegments+1);}
-	int getSphereIndexCount(int numSegments,int numRings){return 6*numRings*(numSegments+1);}
-
-	Mesh::ptr createSphereMesh(VertexBuffer::ptr vertexBuffer,IndexBuffer::ptr indexBuffer,const Sphere &sphere,int numSegments,int numRings);
-	Mesh::ptr createSphereMesh(const Sphere &sphere,int numSegments,int numRings,Material::ptr material);
+	Mesh::ptr createAABoxMesh(const AABox &box,Material::ptr material);
 
 protected:
 	Engine *mEngine;
@@ -62,7 +56,6 @@ protected:
 	IndexBufferAccessor iba;
 };
 
-}
 }
 }
 

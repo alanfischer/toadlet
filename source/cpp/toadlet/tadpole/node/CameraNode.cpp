@@ -526,7 +526,7 @@ Mesh::ptr CameraNode::renderToSkyBox(RenderDevice *device,int format,int size,sc
 			device->copyFrameBufferToPixelBuffer(skyBoxTexture[i]->getMipPixelBuffer(0,0));
 		}
 
-		skyBoxMaterial[i]=mEngine->getMaterialManager()->createSkyBoxMaterial(skyBoxTexture[i]);
+		skyBoxMaterial[i]=mEngine->createSkyBoxMaterial(skyBoxTexture[i]);
 	}
 
 	setAlignmentCalculationsUseOrigin(oldAlignment);
@@ -538,7 +538,7 @@ Mesh::ptr CameraNode::renderToSkyBox(RenderDevice *device,int format,int size,sc
 		renderTarget->destroy();
 	}
 
-	return getEngine()->getMeshManager()->createSkyBoxMesh(scale,false,true,skyBoxMaterial[0],skyBoxMaterial[1],skyBoxMaterial[2],skyBoxMaterial[3],skyBoxMaterial[4],skyBoxMaterial[5]);
+	return getEngine()->createSkyBoxMesh(scale,false,true,skyBoxMaterial[0],skyBoxMaterial[1],skyBoxMaterial[2],skyBoxMaterial[3],skyBoxMaterial[4],skyBoxMaterial[5]);
 }
 
 bool CameraNode::culled(Node *node) const{

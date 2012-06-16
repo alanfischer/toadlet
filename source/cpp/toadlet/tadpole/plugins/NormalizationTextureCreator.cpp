@@ -23,11 +23,10 @@
  *
  ********** Copyright header - do not remove **********/
 
-#include <toadlet/tadpole/creator/NormalizationTextureCreator.h>
+#include "NormalizationTextureCreator.h"
 
 namespace toadlet{
 namespace tadpole{
-namespace creator{
 
 Texture::ptr NormalizationTextureCreator::createNormalizationTexture(int size){
 	TextureFormat::ptr format(new TextureFormat(TextureFormat::Dimension_CUBE,TextureFormat::Format_RGB_8,size,size,TextureFormat::CubeSide_MAX,1));
@@ -127,6 +126,5 @@ Texture::ptr NormalizationTextureCreator::createNormalizationTexture(int size){
 	return mEngine->getTextureManager()->createTexture(Texture::Usage_BIT_STATIC,format,data);
 }
 
-}
 }
 }

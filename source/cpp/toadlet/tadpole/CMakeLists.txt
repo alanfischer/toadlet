@@ -48,20 +48,17 @@ set (TADPOLE_BSP_SRC
 	bsp/BSP30Streamer.cpp
 )
 
-set (TADPOLE_CREATOR_SRC
-	creator/DiffuseMaterialCreator.cpp
-	creator/SkyBoxMaterialCreator.cpp
-	creator/AABoxMeshCreator.cpp
-	creator/GridMeshCreator.cpp
-	creator/GeoSphereMeshCreator.cpp
-	creator/NormalizationTextureCreator.cpp
-	creator/SkyBoxMeshCreator.cpp
-	creator/SkyDomeMeshCreator.cpp
-	creator/SphereMeshCreator.cpp
-	creator/TorusMeshCreator.cpp
-)
-
 set (TADPOLE_PLUGINS_SRC
+	plugins/DiffuseMaterialCreator.cpp
+	plugins/SkyBoxMaterialCreator.cpp
+	plugins/AABoxMeshCreator.cpp
+	plugins/GridMeshCreator.cpp
+	plugins/GeoSphereMeshCreator.cpp
+	plugins/NormalizationTextureCreator.cpp
+	plugins/SkyBoxMeshCreator.cpp
+	plugins/SkyDomeMeshCreator.cpp
+	plugins/SphereMeshCreator.cpp
+	plugins/TorusMeshCreator.cpp
 	plugins/BMPStreamer.cpp
 	plugins/DDSStreamer.cpp
 	plugins/TGAStreamer.cpp
@@ -251,20 +248,17 @@ set (TADPOLE_BSP_HEADERS
 	bsp/BSP30Types.h
 )
 
-set (TADPOLE_CREATOR_HEADERS
-	creator/DiffuseMaterialCreator.h
-	creator/SkyBoxMaterialCreator.h
-	creator/AABoxMeshCreator.h
-	creator/GridMeshCreator.h
-	creator/GeoSphereMeshCreator.h
-	creator/NormalizationTextureCreator.h
-	creator/SkyBoxMeshCreator.h
-	creator/SkyDomeMeshCreator.h
-	creator/TorusMeshCreator.h
-	creator/SphereMeshCreator.h
-)
-
 set (TADPOLE_PLUGINS_HEADERS
+	plugins/DiffuseMaterialCreator.h
+	plugins/SkyBoxMaterialCreator.h
+	plugins/AABoxMeshCreator.h
+	plugins/GridMeshCreator.h
+	plugins/GeoSphereMeshCreator.h
+	plugins/NormalizationTextureCreator.h
+	plugins/SkyBoxMeshCreator.h
+	plugins/SkyDomeMeshCreator.h
+	plugins/TorusMeshCreator.h
+	plugins/SphereMeshCreator.h
 	plugins/BMPStreamer.h
 	plugins/TMSHStreamer.h
 	plugins/PNGStreamer.h
@@ -396,7 +390,6 @@ set (TADPOLE_PLATFORM_WIN32_GDIPLUS_HEADERS
 
 # Bundle source
 source_group ("Source Files\\\\animation" FILES ${TADPOLE_ANIMATION_SRC})
-source_group ("Source Files\\\\creator" FILES ${TADPOLE_CREATOR_SRC})
 source_group ("Source Files\\\\material" FILES ${TADPOLE_MATERIAL_SRC})
 source_group ("Source Files\\\\node" FILES ${TADPOLE_NODE_SRC})
 source_group ("Source Files\\\\sensor" FILES ${TADPOLE_SENSOR_SRC})
@@ -405,7 +398,6 @@ source_group ("Source Files\\\\terrain" FILES ${TADPOLE_TERRAIN_SRC})
 
 # Bundle headers
 source_group ("Header Files\\\\animation" FILES ${TADPOLE_ANIMATION_HEADERS})
-source_group ("Header Files\\\\creator" FILES ${TADPOLE_CREATOR_HEADERS})
 source_group ("Header Files\\\\material" FILES ${TADPOLE_MATERIAL_HEADERS})
 source_group ("Header Files\\\\node" FILES ${TADPOLE_NODE_HEADERS})
 source_group ("Header Files\\\\sensor" FILES ${TADPOLE_SENSOR_HEADERS})
@@ -413,9 +405,9 @@ source_group ("Header Files\\\\terrain" FILES ${TADPOLE_TERRAIN_HEADERS})
 
 
 # Sources, headers and namespaces
-set (TADPOLE_SRC ${TADPOLE_SRC} ${TADPOLE_ANIMATION_SRC} ${TADPOLE_CREATOR_SRC} ${TADPOLE_PLUGINS_SRC} ${TADPOLE_MATERIAL_SRC} ${TADPOLE_NODE_SRC} ${TADPOLE_SENSOR_SRC} ${TADPOLE_TERRAIN_SRC})
-set (TADPOLE_HEADERS ${TADPOLE_HEADERS} ${TADPOLE_ANIMATION_HEADERS} ${TADPOLE_CREATOR_HEADERS} ${TADPOLE_MATERIAL_HEADERS} ${TADPOLE_NODE_HEADERS} ${TADPOLE_SENSOR_HEADERS} ${TADPOLE_TERRAIN_HEADERS})
-set (TADPOLE_NAMESPACES ${TADPOLE_NAMESPACES} animation creator material node sensor terrain)
+set (TADPOLE_SRC ${TADPOLE_SRC} ${TADPOLE_ANIMATION_SRC} ${TADPOLE_PLUGINS_SRC} ${TADPOLE_MATERIAL_SRC} ${TADPOLE_NODE_SRC} ${TADPOLE_SENSOR_SRC} ${TADPOLE_TERRAIN_SRC})
+set (TADPOLE_HEADERS ${TADPOLE_HEADERS} ${TADPOLE_ANIMATION_HEADERS} ${TADPOLE_MATERIAL_HEADERS} ${TADPOLE_NODE_HEADERS} ${TADPOLE_SENSOR_HEADERS} ${TADPOLE_TERRAIN_HEADERS})
+set (TADPOLE_NAMESPACES ${TADPOLE_NAMESPACES} animation material node sensor terrain)
 
 
 # Fixed point builds use fewer features

@@ -58,9 +58,6 @@ public:
 
 	bool textureLoad(Texture::ptr texture,TextureFormat *format,tbyte *mipData);
 
-	inline void setNormalizationCreator(ResourceCreator::ptr creator){mNormalizationCreator=creator;}
-	Texture::ptr createNormalizationTexture(int size);
-
 	void contextActivate(RenderDevice *renderDevice);
 	void contextDeactivate(RenderDevice *renderDevice);
 	void preContextReset(RenderDevice *renderDevice);
@@ -74,8 +71,6 @@ public:
 protected:
 	Collection<PixelBufferRenderTarget::ptr> mRenderTargets;
 	VideoHandler::ptr mVideoHandler;
-
-	ResourceCreator::ptr mNormalizationCreator;
 };
 
 }

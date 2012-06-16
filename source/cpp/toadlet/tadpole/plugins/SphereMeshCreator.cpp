@@ -24,11 +24,10 @@
  ********** Copyright header - do not remove **********/
 
 #include <toadlet/tadpole/Engine.h>
-#include <toadlet/tadpole/creator/SphereMeshCreator.h>
+#include "SphereMeshCreator.h"
 
 namespace toadlet{
 namespace tadpole{
-namespace creator{
 
 // Thanks to Ogre3D for this sphere routine
 Mesh::ptr SphereMeshCreator::createSphereMesh(VertexBuffer::ptr vertexBuffer,IndexBuffer::ptr indexBuffer,const Sphere &sphere,int numSegments,int numRings){
@@ -107,13 +106,12 @@ Mesh::ptr SphereMeshCreator::createSphereMesh(const Sphere &sphere,int numSegmen
 
 	Mesh::ptr mesh=createSphereMesh(vertexBuffer,indexBuffer,sphere,numSegments,numRings);
 	if(material==NULL){
-		material=mEngine->getMaterialManager()->createDiffuseMaterial(NULL);
+		material=mEngine->createDiffuseMaterial(NULL);
 	}
 	mesh->getSubMesh(0)->material=material;
 
 	return mesh;
 }
 
-}
 }
 }

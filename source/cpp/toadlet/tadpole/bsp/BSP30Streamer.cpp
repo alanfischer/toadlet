@@ -369,7 +369,7 @@ void BSP30Streamer::buildMaterials(BSP30Map *map){
 	map->materials.resize(map->miptexlump->nummiptex);
 	int i;
 	for(i=0;i<map->miptexlump->nummiptex;i++){
-		Material::ptr material=mEngine->getMaterialManager()->createDiffuseMaterial(map->parsedTextures[i]);
+		Material::ptr material=mEngine->createDiffuseMaterial(map->parsedTextures[i]);
 		material->getPass()->setMaterialState(MaterialState(false,false,MaterialState::ShadeType_FLAT));
 		material->getPass()->setRasterizerState(RasterizerState(RasterizerState::CullType_FRONT));
 		material->getPass()->setSamplerState(Shader::ShaderType_FRAGMENT,1,SamplerState());
