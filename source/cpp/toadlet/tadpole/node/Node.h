@@ -38,7 +38,7 @@
 		typedef toadlet::egg::Type<Class,toadlet::tadpole::node::Node> ThisType; \
 		static ThisType *type(); \
 		virtual toadlet::egg::BaseType<toadlet::tadpole::node::Node> *getType(){return Class::type();} \
-		TOADLET_IPTR(Class)
+		TOADLET_INTERFACE(Class)
 #endif
 
 #ifndef TOADLET_NODE_IMPLEMENT

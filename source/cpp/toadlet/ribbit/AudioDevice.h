@@ -36,7 +36,7 @@ class AudioCaps;
 
 class AudioDevice:public Interface{
 public:
-	TOADLET_IPTR(AudioDevice);
+	TOADLET_INTERFACE(AudioDevice);
 
 	virtual ~AudioDevice(){}
 

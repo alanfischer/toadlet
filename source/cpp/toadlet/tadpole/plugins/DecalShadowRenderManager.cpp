@@ -24,24 +24,24 @@
  ********** Copyright header - do not remove **********/
 
 #include <toadlet/egg/Logger.h>
-#include <toadlet/tadpole/DecalShadowSceneRenderer.h>
 #include <toadlet/tadpole/Engine.h>
 #include <toadlet/tadpole/Scene.h>
+#include "DecalShadowRenderManager.h"
 
 namespace toadlet{
 namespace tadpole{
 
-DecalShadowSceneRenderer::DecalShadowSceneRenderer(Scene *scene):
-	SceneRenderer(scene)
+DecalShadowRenderManager::DecalShadowRenderManager(Scene *scene):
+	SimpleRenderManager(scene)
 {
 	mShadowMaterial=mScene->getEngine()->getMaterialManager()->createMaterial();
 	mPlane.set(Math::Z_UNIT_VECTOR3,0);
 }
 
-DecalShadowSceneRenderer::~DecalShadowSceneRenderer(){
+DecalShadowRenderManager::~DecalShadowRenderManager(){
 }
 
-void DecalShadowSceneRenderer::renderScene(RenderDevice *device,Node *node,CameraNode *camera){
+void DecalShadowRenderManager::renderScene(RenderDevice *device,Node *node,CameraNode *camera){
 /// @todo:
 /*
 	gatherRenderables(mRenderableSet,node,camera);

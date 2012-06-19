@@ -44,5 +44,7 @@ public:
 }
 }
 
+#define TOADLET_INTERFACE(Class) TOADLET_IPTR(Class);
+
 #endif
 

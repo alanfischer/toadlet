@@ -81,7 +81,7 @@ protected:
 //  Since I can't just call BaseResource::release(), since it will use a different base pointer
 //  This issue doesn't exist in other languages (Java)
 #define TOADLET_RESOURCE(Class,BaseClass)\
-	TOADLET_IPTR(Class); \
+	TOADLET_INTERFACE(Class); \
 	int retain(){return toadlet::egg::BaseResource::retain();} \
 	int release(){return toadlet::egg::BaseResource::release();} \
 	toadlet::egg::Resource *resourceThis(){return (BaseClass*)this;} \

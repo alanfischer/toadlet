@@ -23,22 +23,21 @@
  *
  ********** Copyright header - do not remove **********/
 
-#ifndef TOADLET_TADPOLE_SCENERENDERER_H
-#define TOADLET_TADPOLE_SCENERENDERER_H
+#ifndef TOADLET_TADPOLE_SIMPLERENDERMANAGER_H
+#define TOADLET_TADPOLE_SIMPLERENDERMANAGER_H
 
+#include <toadlet/tadpole/RenderManager.h>
 #include <toadlet/tadpole/RenderableSet.h>
-#include <toadlet/tadpole/node/CameraNode.h>
 
 namespace toadlet{
 namespace tadpole{
 
-/// @todo: Rename to RenderManager?
-class TOADLET_API SceneRenderer{
+class TOADLET_API SimpleRenderManager:public Object,public RenderManager{
 public:
-	TOADLET_SPTR(SceneRenderer);
+	TOADLET_OBJECT(SimpleRenderManager);
 
-	SceneRenderer(Scene *scene);
-	virtual ~SceneRenderer();
+	SimpleRenderManager(Scene *scene);
+	virtual ~SimpleRenderManager();
 
 	virtual void renderScene(RenderDevice *device,Node *node,CameraNode *camera);
 	virtual RenderDevice *getDevice(){return mDevice;}

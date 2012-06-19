@@ -40,7 +40,7 @@ namespace sensor{
 /// @todo: perhaps sensors should be components, so they can easily be attached to the scene and then their transforms will be relative, just like opal
 class TOADLET_API Sensor:public Interface{
 public:
-	TOADLET_IPTR(Sensor);
+	TOADLET_INTERFACE(Sensor);
 
 	Sensor(Scene *scene);
 	virtual ~Sensor();

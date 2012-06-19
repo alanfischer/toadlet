@@ -29,8 +29,10 @@
 #include <toadlet/tadpole/Colors.h>
 #include <toadlet/tadpole/Engine.h>
 #include <toadlet/tadpole/Scene.h>
-#include <toadlet/tadpole/SceneRenderer.h>
 #include <toadlet/tadpole/node/CameraNode.h>
+
+/// @todo: Somehow the selection of RenderManager and PhysicsManager should be moved into the Engine I think?  The Engine handles all other plugins currently.
+#include <toadlet/tadpole/plugins/SimpleRenderManager.h>
 
 namespace toadlet{
 namespace tadpole{
@@ -52,7 +54,7 @@ Scene::Scene(Engine *engine):Object(),
 	//mRoot,
 	//mAmbientColor,
 
-	//mSceneRenderer,
+	//mRenderManager,
 
 	//mBoundMesh
 {
@@ -66,7 +68,7 @@ Scene::Scene(Engine *engine):Object(),
 	mBackground=mEngine->createNodeType(PartitionNode::type(),this);
 	mRoot=mEngine->createNodeType(PartitionNode::type(),this);
 
-	mSceneRenderer=SceneRenderer::ptr(new SceneRenderer(this));
+	mRenderManager=new SimpleRenderManager(this);
 
 	mSphereMesh=mEngine->createSphereMesh(Sphere(Math::ONE));
 	mAABoxMesh=mEngine->createAABoxMesh(AABox(-Math::ONE,-Math::ONE,-Math::ONE,Math::ONE,Math::ONE,Math::ONE));
@@ -229,7 +231,7 @@ void Scene::render(RenderDevice *device,CameraNode *camera,Node *node){
 	mBackground->setTranslate(camera->getWorldTranslate());
 	mBackground->updateAllWorldTransforms();
 
-	mSceneRenderer->renderScene(device,node,camera);
+	mRenderManager->renderScene(device,node,camera);
 
 	if(mRenderListener!=NULL){
 		mRenderListener->postRender(device,camera,node);

@@ -46,8 +46,8 @@ MeshNode::SubMesh::SubMesh(MeshNode *meshNode,Mesh::SubMesh *meshSubMesh):
 	this->material=meshSubMesh->material;
 }
 
-void MeshNode::SubMesh::render(SceneRenderer *renderer) const{
-	renderer->getDevice()->renderPrimitive(vertexData,indexData);
+void MeshNode::SubMesh::render(RenderManager *manager) const{
+	manager->getDevice()->renderPrimitive(vertexData,indexData);
 }
 
 MeshNode::MeshNode():super(),

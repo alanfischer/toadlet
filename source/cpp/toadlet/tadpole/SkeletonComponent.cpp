@@ -355,10 +355,10 @@ const Bound &SkeletonComponent::getRenderBound() const{
 	return mParent!=NULL?mParent->getWorldBound():Node::zeroBound();
 }
 
-void SkeletonComponent::render(SceneRenderer *renderer) const{
-	renderer->getDevice()->renderPrimitive(mSkeletonVertexData,mSkeletonIndexData);
+void SkeletonComponent::render(RenderManager *manager) const{
+	manager->getDevice()->renderPrimitive(mSkeletonVertexData,mSkeletonIndexData);
 
-	renderer->getDevice()->renderPrimitive(mHitBoxVertexData,mHitBoxIndexData);
+	manager->getDevice()->renderPrimitive(mHitBoxVertexData,mHitBoxIndexData);
 }
 
 bool SkeletonComponent::getAttachmentTransform(Transform &result,int index){

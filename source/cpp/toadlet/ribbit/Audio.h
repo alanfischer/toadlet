@@ -34,7 +34,7 @@ namespace ribbit{
 
 class Audio:public Resource{
 public:
-	TOADLET_IPTR(Audio);
+	TOADLET_INTERFACE(Audio);
 
 	virtual ~Audio(){}
 

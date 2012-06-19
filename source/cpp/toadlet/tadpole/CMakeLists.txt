@@ -10,7 +10,6 @@ set (TADPOLE_SRC
 	AudioManager.cpp
 	BaseComponent.cpp
 	BufferManager.cpp
-	DecalShadowSceneRenderer.cpp
 	Engine.cpp
 	Font.cpp
 	FontManager.cpp
@@ -23,10 +22,8 @@ set (TADPOLE_SRC
 	RenderableSet.cpp
 	ResourceManager.cpp
 	Scene.cpp
-	SceneRenderer.cpp
 	Sequence.cpp
 	ShaderManager.cpp
-	ShadowMappedSceneRenderer.cpp
 	Skeleton.cpp
 	SkeletonComponent.cpp
 	Track.cpp
@@ -49,6 +46,9 @@ set (TADPOLE_BSP_SRC
 )
 
 set (TADPOLE_PLUGINS_SRC
+	plugins/SimpleRenderManager.cpp
+	plugins/DecalShadowRenderManager.cpp
+	plugins/ShadowMappedRenderManager.cpp
 	plugins/DiffuseMaterialCreator.cpp
 	plugins/SkyBoxMaterialCreator.cpp
 	plugins/AABoxMeshCreator.cpp
@@ -190,7 +190,6 @@ set (TADPOLE_HEADERS
 	Colors.h
 	Component.h
 	ContextListener.h
-	DecalShadowSceneRenderer.h
 	Engine.h
 	Font.h
 	FontData.h
@@ -208,12 +207,11 @@ set (TADPOLE_HEADERS
 	ResourceData.h
 	ResourceManager.h
 	ResourceStreamer.h
+	RenderManager.h
 	RenderableSet.h
 	Scene.h
-	SceneRenderer.h
 	Sequence.h
 	ShaderManager.h
-	ShadowMappedSceneRenderer.h
 	Skeleton.h
 	SkeletonComponent.h
 	TextureData.h
@@ -249,6 +247,9 @@ set (TADPOLE_BSP_HEADERS
 )
 
 set (TADPOLE_PLUGINS_HEADERS
+	plugins/SimpleRenderManager.h
+	plugins/DecalShadowRenderManager.h
+	plugins/ShadowMappedRenderManager.h
 	plugins/DiffuseMaterialCreator.h
 	plugins/SkyBoxMaterialCreator.h
 	plugins/AABoxMeshCreator.h

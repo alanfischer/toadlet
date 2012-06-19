@@ -33,7 +33,7 @@ namespace tadpole{
 
 class ActionComponent:public Component{
 public:
-	TOADLET_IPTR(ActionComponent);
+	TOADLET_INTERFACE(ActionComponent);
 	
 	virtual void start()=0;
 	virtual void stop()=0;

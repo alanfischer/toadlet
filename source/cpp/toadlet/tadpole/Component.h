@@ -37,7 +37,7 @@ namespace node{
 
 class Component:public Interface{
 public:
-	TOADLET_IPTR(Component);
+	TOADLET_INTERFACE(Component);
 	
 	virtual void destroy()=0;
 

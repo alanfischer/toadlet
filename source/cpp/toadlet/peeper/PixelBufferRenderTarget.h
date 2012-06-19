@@ -34,7 +34,7 @@ namespace peeper{
 
 class PixelBufferRenderTarget:public RenderTarget{
 public:
-	TOADLET_IPTR(PixelBufferRenderTarget);
+	TOADLET_INTERFACE(PixelBufferRenderTarget);
 
 	enum Attachment{
 		Attachment_DEPTH_STENCIL,

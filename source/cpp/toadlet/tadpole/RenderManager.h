@@ -23,27 +23,26 @@
  *
  ********** Copyright header - do not remove **********/
 
-#ifndef TOADLET_TADPOLE_DECALSHADOWSCENERENDERER_H
-#define TOADLET_TADPOLE_DECALSHADOWSCENERENDERER_H
+#ifndef TOADLET_TADPOLE_RENDERMANAGER_H
+#define TOADLET_TADPOLE_RENDERMANAGER_H
 
-#include <toadlet/tadpole/SceneRenderer.h>
+#include <toadlet/peeper/RenderDevice.h>
+#include <toadlet/tadpole/node/CameraNode.h>
 
 namespace toadlet{
 namespace tadpole{
 
-class TOADLET_API DecalShadowSceneRenderer:public SceneRenderer{
+class RenderManager:public Interface{
 public:
-	TOADLET_SPTR(DecalShadowSceneRenderer);
+	TOADLET_INTERFACE(RenderManager);
 
-	DecalShadowSceneRenderer(Scene *scene);
-	virtual ~DecalShadowSceneRenderer();
+	virtual ~RenderManager(){}
 
-	void renderScene(RenderDevice *renderDevice,Node *node,CameraNode *camera);
-	void setPlane(const Plane &p){mPlane.set(p);}
+	virtual void renderScene(RenderDevice *device,Node *node,CameraNode *camera)=0;
+	virtual void setupPass(RenderPass *pass)=0;
+	virtual void setupPassForRenderable(RenderPass *pass,Renderable *renderable,const Vector4 &ambient)=0;
 
-protected:
-	Material::ptr mShadowMaterial;
-	Plane mPlane;
+	virtual RenderDevice *getDevice()=0;
 };
 
 }

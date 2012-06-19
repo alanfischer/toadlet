@@ -36,7 +36,7 @@ class TerrainPatchNode;
 
 class TerrainNodeMaterialSource:public Interface{
 public:
-	TOADLET_IPTR(TerrainNodeMaterialSource);
+	TOADLET_INTERFACE(TerrainNodeMaterialSource);
 
 	virtual Material::ptr getMaterial(TerrainPatchNode *patch)=0;
 };

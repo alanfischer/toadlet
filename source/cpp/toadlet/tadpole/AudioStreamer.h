@@ -34,7 +34,7 @@ namespace tadpole{
 
 class TOADLET_API AudioStreamer:public ResourceStreamer{
 public:
-	TOADLET_IPTR(AudioStreamer);
+	TOADLET_INTERFACE(AudioStreamer);
 
 	AudioStreamer(AudioManager *manager){mAudioManager=manager;}
 

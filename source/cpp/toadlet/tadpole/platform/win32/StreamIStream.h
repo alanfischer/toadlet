@@ -35,7 +35,7 @@ namespace tadpole{
 
 class StreamIStream:public Object,public IStream{
 public:
-	TOADLET_IPTR(StreamIStream);
+	TOADLET_INTERFACE(StreamIStream);
 	
 	StreamIStream(Stream::ptr base):Object(),
 		mBase(base)

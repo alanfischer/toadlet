@@ -35,7 +35,7 @@ namespace peeper{
 
 class TOADLET_API VertexFormat:public Resource{
 public:
-	TOADLET_IPTR(VertexFormat);
+	TOADLET_INTERFACE(VertexFormat);
 
 	enum Semantic{
 		Semantic_UNKNOWN=			-1,

@@ -34,7 +34,7 @@ namespace peeper{
 
 class Buffer:public Resource{
 public:
-	TOADLET_IPTR(Buffer);
+	TOADLET_INTERFACE(Buffer);
 
 	enum Usage{
 		Usage_NONE=			0,

@@ -34,7 +34,7 @@ namespace terrain{
 
 class TerrainNodeDataSource:public Interface{
 public:
-	TOADLET_IPTR(TerrainNodeDataSource);
+	TOADLET_INTERFACE(TerrainNodeDataSource);
 
 	virtual int getPatchSize()=0;
 	virtual const Vector3 &getPatchScale()=0;

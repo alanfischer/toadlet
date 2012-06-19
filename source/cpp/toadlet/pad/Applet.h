@@ -33,7 +33,7 @@ namespace pad{
 
 class Applet:public Interface{
 public:
-	TOADLET_IPTR(Applet);
+	TOADLET_INTERFACE(Applet);
 
 	virtual ~Applet(){}
 

@@ -24,7 +24,7 @@
 #include <toadlet/peeper/VertexBuffer.h>
 #include <toadlet/tadpole/Renderable.h>
 #include <toadlet/tadpole/Traceable.h>
-#include <toadlet/tadpole/SceneRenderer.h>
+#include <toadlet/tadpole/RenderManager.h>
 #include <toadlet/tadpole/node/Node.h>
 
 namespace toadlet{
@@ -118,7 +118,7 @@ public:
 	Material *getRenderMaterial() const{return mMaterial;}
 	const Transform &getRenderTransform() const{return getWorldTransform();}
 	const Bound &getRenderBound() const{return getWorldBound();}
-	void render(SceneRenderer *renderer) const;
+	void render(RenderManager *manager) const;
 
 	const Bound &getBound() const{return super::getBound();}
 	void traceSegment(Collision &result,const Vector3 &position,const Segment &segment,const Vector3 &size);
@@ -145,7 +145,7 @@ protected:
 		Material *getRenderMaterial() const{return mTerrain->mWaterMaterial;}
 		const Transform &getRenderTransform() const{return mTerrain->getWorldTransform();}
 		const Bound &getRenderBound() const{return mTerrain->getRenderBound();}
-		void render(SceneRenderer *renderer) const{renderer->getDevice()->renderPrimitive(mTerrain->mWaterVertexData,mTerrain->mWaterIndexData);}
+		void render(RenderManager *manager) const{manager->getDevice()->renderPrimitive(mTerrain->mWaterVertexData,mTerrain->mWaterIndexData);}
 
 	protected:
 		TerrainPatchNode *mTerrain;

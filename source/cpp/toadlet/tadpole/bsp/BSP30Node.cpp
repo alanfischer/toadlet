@@ -40,8 +40,8 @@ BSP30ModelNode::SubModel::SubModel(BSP30ModelNode *modelNode,BSP30Map *map){
 	this->faces=NULL;
 }
 
-void BSP30ModelNode::SubModel::render(SceneRenderer *renderer) const{
-	map->renderFaces(renderer->getDevice(),faces);
+void BSP30ModelNode::SubModel::render(RenderManager *manager) const{
+	map->renderFaces(manager->getDevice(),faces);
 }
 
 TOADLET_NODE_IMPLEMENT(BSP30ModelNode,Categories::TOADLET_TADPOLE_BSP+".BSP30ModelNode");
@@ -581,14 +581,14 @@ void BSP30Node::traceSegment(Collision &result,const Vector3 &position,const Seg
 	}
 }
 
-void BSP30Node::render(SceneRenderer *renderer) const{
+void BSP30Node::render(RenderManager *manager) const{
 	int i,j;
 	for(i=0;i<mVisibleMaterialFaces.size();i++){
 		RenderPath *path=mMap->materials[i]->getBestPath();
 		for(j=0;j<path->getNumPasses();++j){
-			renderer->setupPass(path->getPass(j));
-			renderer->setupPassForRenderable(path->getPass(j),(Renderable*)this,Math::ZERO_VECTOR4);
-			mMap->renderFaces(renderer->getDevice(),mVisibleMaterialFaces[i]);
+			manager->setupPass(path->getPass(j));
+			manager->setupPassForRenderable(path->getPass(j),(Renderable*)this,Math::ZERO_VECTOR4);
+			mMap->renderFaces(manager->getDevice(),mVisibleMaterialFaces[i]);
 		}
 	}
 }
