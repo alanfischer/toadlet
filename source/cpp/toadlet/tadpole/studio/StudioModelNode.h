@@ -54,7 +54,7 @@ public:
 		Material *getRenderMaterial() const{return material;}
 		const Transform &getRenderTransform() const{return modelNode->getWorldTransform();}
 		const Bound &getRenderBound() const{return modelNode->getRenderBound();}
-		void render(SceneRenderer *renderer) const;
+		void render(RenderManager *manager) const;
 
 		StudioModelNode *modelNode;
 		StudioModel::ptr model;
@@ -132,7 +132,7 @@ public:
 	Material *getRenderMaterial() const{return mSkeletonMaterial;}
 	const Transform &getRenderTransform() const{return getWorldTransform();}
 	const Bound &getRenderBound() const{return getWorldBound();}
-	void render(SceneRenderer *renderer) const;
+	void render(RenderManager *manager) const;
 
 	// Attachable
 	int getNumAttachments(){return mModel->header->numattachments;}

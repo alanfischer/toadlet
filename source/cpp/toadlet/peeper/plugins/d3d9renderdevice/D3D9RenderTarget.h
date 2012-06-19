@@ -34,7 +34,7 @@ namespace peeper{
 
 class TOADLET_API D3D9RenderTarget:public RenderTarget{
 public:
-	TOADLET_IPTR(D3D9RenderTarget);
+	TOADLET_INTERFACE(D3D9RenderTarget);
 
 	virtual ~D3D9RenderTarget(){}
 

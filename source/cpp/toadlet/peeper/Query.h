@@ -34,7 +34,7 @@ namespace peeper{
 
 class TOADLET_API Query:public Resource{
 public:
-	TOADLET_IPTR(Query);
+	TOADLET_INTERFACE(Query);
 
 	enum QueryType{
 		QueryType_UNKNOWN,

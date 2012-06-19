@@ -36,7 +36,7 @@ namespace tadpole{
 
 class VideoController:public Interface{
 public:
-	TOADLET_IPTR(VideoController);
+	TOADLET_INTERFACE(VideoController);
 
 	virtual ~VideoController(){}
 

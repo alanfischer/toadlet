@@ -23,15 +23,15 @@
  *
  ********** Copyright header - do not remove **********/
 
-#include <toadlet/tadpole/ShadowMappedSceneRenderer.h>
 #include <toadlet/tadpole/Engine.h>
 #include <toadlet/tadpole/Scene.h>
+#include "ShadowMappedRenderManager.h"
 
 namespace toadlet{
 namespace tadpole{
 
-ShadowMappedSceneRenderer::ShadowMappedSceneRenderer(Scene *scene):
-	SceneRenderer(scene)
+ShadowMappedRenderManager::ShadowMappedRenderManager(Scene *scene):
+	SimpleRenderManager(scene)
 {
 	Engine *engine=scene->getEngine();
 
@@ -49,12 +49,12 @@ ShadowMappedSceneRenderer::ShadowMappedSceneRenderer(Scene *scene):
 	mLightState=engine->getMaterialManager()->createRenderState();
 }
 
-ShadowMappedSceneRenderer::~ShadowMappedSceneRenderer(){
+ShadowMappedRenderManager::~ShadowMappedRenderManager(){
 }
 
-void ShadowMappedSceneRenderer::renderScene(RenderDevice *renderDevice,Node *node,CameraNode *camera){
+void ShadowMappedRenderManager::renderScene(RenderDevice *renderDevice,Node *node,CameraNode *camera){
 	if(mLight==NULL){
-		SceneRenderer::renderScene(renderDevice,node,camera);
+		SimpleRenderManager::renderScene(renderDevice,node,camera);
 		return;
 	}
 

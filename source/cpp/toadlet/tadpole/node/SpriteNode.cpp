@@ -28,7 +28,7 @@
 #include <toadlet/tadpole/node/SpriteNode.h>
 #include <toadlet/tadpole/Engine.h>
 #include <toadlet/tadpole/RenderableSet.h>
-#include <toadlet/tadpole/SceneRenderer.h>
+#include <toadlet/tadpole/RenderManager.h>
 
 namespace toadlet{
 namespace tadpole{
@@ -138,8 +138,8 @@ void SpriteNode::gatherRenderables(CameraNode *camera,RenderableSet *set){
 #endif
 }
 
-void SpriteNode::render(SceneRenderer *renderer) const{
-	renderer->getDevice()->renderPrimitive(mVertexData,mIndexData);
+void SpriteNode::render(RenderManager *manager) const{
+	manager->getDevice()->renderPrimitive(mVertexData,mIndexData);
 }
 
 void SpriteNode::updateSprite(){

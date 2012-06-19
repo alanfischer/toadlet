@@ -23,33 +23,27 @@
  *
  ********** Copyright header - do not remove **********/
 
-#ifndef TOADLET_TADPOLE_SHADOWMAPPEDSCENERENDERER_H
-#define TOADLET_TADPOLE_SHADOWMAPPEDSCENERENDERER_H
+#ifndef TOADLET_TADPOLE_DECALSHADOWRENDERMANAGER_H
+#define TOADLET_TADPOLE_DECALSHADOWRENDERMANAGER_H
 
-#include <toadlet/peeper/PixelBufferRenderTarget.h>
-#include <toadlet/tadpole/SceneRenderer.h>
+#include "SimpleRenderManager.h"
 
 namespace toadlet{
 namespace tadpole{
 
-class TOADLET_API ShadowMappedSceneRenderer:public SceneRenderer{
+class TOADLET_API DecalShadowRenderManager:public SimpleRenderManager{
 public:
-	TOADLET_SPTR(ShadowMappedSceneRenderer);
+	TOADLET_OBJECT(DecalShadowRenderManager);
 
-	ShadowMappedSceneRenderer(Scene *scene);
-	virtual ~ShadowMappedSceneRenderer();
-
-	void setLight(LightNode *light){mLight=light;}
-	LightNode *getLight() const{return mLight;}
+	DecalShadowRenderManager(Scene *scene);
+	virtual ~DecalShadowRenderManager();
 
 	void renderScene(RenderDevice *renderDevice,Node *node,CameraNode *camera);
+	void setPlane(const Plane &p){mPlane.set(p);}
 
 protected:
-	Texture::ptr mShadowTexture;
-	PixelBufferRenderTarget::ptr mShadowTarget;
-	RenderState::ptr mShadowState,mLightState;
-	CameraNode::ptr mLightCamera;
-	LightNode::ptr mLight;
+	Material::ptr mShadowMaterial;
+	Plane mPlane;
 };
 
 }

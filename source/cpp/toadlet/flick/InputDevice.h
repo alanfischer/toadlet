@@ -36,7 +36,7 @@ class InputDeviceListener;
 
 class InputDevice:public Interface{
 public:
-	TOADLET_IPTR(InputDevice);
+	TOADLET_INTERFACE(InputDevice);
 
 	enum InputType{
 		InputType_JOY=0,

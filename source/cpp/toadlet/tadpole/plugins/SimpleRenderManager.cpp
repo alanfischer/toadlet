@@ -27,13 +27,13 @@
 #include <toadlet/peeper/RenderCaps.h>
 #include <toadlet/tadpole/Engine.h>
 #include <toadlet/tadpole/Scene.h>
-#include <toadlet/tadpole/SceneRenderer.h>
 #include <toadlet/tadpole/RenderListener.h>
+#include "SimpleRenderManager.h"
 
 namespace toadlet{
 namespace tadpole{
 
-SceneRenderer::SceneRenderer(Scene *scene):
+SimpleRenderManager::SimpleRenderManager(Scene *scene):
 	mScene(scene),
 	mDevice(NULL),
 	//mSceneParameters,
@@ -47,10 +47,10 @@ SceneRenderer::SceneRenderer(Scene *scene):
 	mSceneParameters->setScene(scene);
 }
 
-SceneRenderer::~SceneRenderer(){
+SimpleRenderManager::~SimpleRenderManager(){
 }
 
-void SceneRenderer::renderScene(RenderDevice *device,Node *node,CameraNode *camera){
+void SimpleRenderManager::renderScene(RenderDevice *device,Node *node,CameraNode *camera){
 	mDevice=device;
 	mSceneParameters->setCamera(camera);
 
@@ -71,7 +71,7 @@ void SceneRenderer::renderScene(RenderDevice *device,Node *node,CameraNode *came
 	mDevice=NULL;
 }
 
-void SceneRenderer::setupPass(RenderPass *pass){
+void SimpleRenderManager::setupPass(RenderPass *pass){
 	mSceneParameters->setRenderPass(pass);
 
 	pass->updateVariables(Material::Scope_MATERIAL,mSceneParameters);
@@ -92,7 +92,7 @@ void SceneRenderer::setupPass(RenderPass *pass){
 	mLastPass=pass;
 }
 
-void SceneRenderer::setupPassForRenderable(RenderPass *pass,Renderable *renderable,const Vector4 &ambient){
+void SimpleRenderManager::setupPassForRenderable(RenderPass *pass,Renderable *renderable,const Vector4 &ambient){
 	Matrix4x4 matrix;
 	renderable->getRenderTransform().getMatrix(matrix);
 
@@ -112,7 +112,7 @@ void SceneRenderer::setupPassForRenderable(RenderPass *pass,Renderable *renderab
 	}
 }
 
-void SceneRenderer::gatherRenderables(RenderableSet *set,Node *node,CameraNode *camera){
+void SimpleRenderManager::gatherRenderables(RenderableSet *set,Node *node,CameraNode *camera){
 	RenderListener *listener=mScene->getRenderListener();
 
 	if(listener!=NULL){
@@ -133,7 +133,7 @@ void SceneRenderer::gatherRenderables(RenderableSet *set,Node *node,CameraNode *
 	}
 }
 
-void SceneRenderer::renderRenderables(RenderableSet *set,RenderDevice *device,CameraNode *camera,bool useMaterials){
+void SimpleRenderManager::renderRenderables(RenderableSet *set,RenderDevice *device,CameraNode *camera,bool useMaterials){
 	RenderListener *listener=mScene->getRenderListener();
 
 	if(listener!=NULL){
@@ -195,7 +195,7 @@ void SceneRenderer::renderRenderables(RenderableSet *set,RenderDevice *device,Ca
 	}
 }
 
-void SceneRenderer::renderDepthSortedRenderables(const RenderableSet::RenderableQueue &queue,bool useMaterials){
+void SimpleRenderManager::renderDepthSortedRenderables(const RenderableSet::RenderableQueue &queue,bool useMaterials){
 	int i;
 	for(i=0;i<queue.size();++i){
 		const RenderableSet::RenderableQueueItem &item=queue[i];
@@ -206,7 +206,7 @@ void SceneRenderer::renderDepthSortedRenderables(const RenderableSet::Renderable
 
 /// @todo: We should see if the Pass is a Fixed or Shader pass, in which case we either set Fixed states, or setupRenderVariables
 ///  And then maybe set Fixed states should be moved the pass, like setupRenderVariables
-void SceneRenderer::renderQueueItems(Material *material,const RenderableSet::RenderableQueueItem *items,int numItems){
+void SimpleRenderManager::renderQueueItems(Material *material,const RenderableSet::RenderableQueueItem *items,int numItems){
 	RenderPath *path=(material!=NULL)?material->getBestPath():NULL;
 	int numPasses=(path!=NULL?path->getNumPasses():1);
 	int i,j;
@@ -232,7 +232,7 @@ void SceneRenderer::renderQueueItems(Material *material,const RenderableSet::Ren
 	}
 }
 
-void SceneRenderer::setupViewport(CameraNode *camera,RenderDevice *device){
+void SimpleRenderManager::setupViewport(CameraNode *camera,RenderDevice *device){
 	Viewport viewport=camera->getViewport();
 	if(viewport.x==0 && viewport.y==0 && viewport.width==0 && viewport.height==0){
 		viewport.width=device->getRenderTarget()->getWidth();
@@ -243,7 +243,7 @@ void SceneRenderer::setupViewport(CameraNode *camera,RenderDevice *device){
 }
 
 /// @todo: Clean this up to handle multiple lights in shader passes
-void SceneRenderer::setupLights(const RenderableSet::LightQueue &lightQueue,RenderDevice *device){
+void SimpleRenderManager::setupLights(const RenderableSet::LightQueue &lightQueue,RenderDevice *device){
 	if(lightQueue.size()>0){
 		LightNode *light=lightQueue[0].light;
 
@@ -269,7 +269,7 @@ void SceneRenderer::setupLights(const RenderableSet::LightQueue &lightQueue,Rend
 	}
 }
 
-void SceneRenderer::setupTextures(RenderPass *pass,int scope,RenderDevice *device){
+void SimpleRenderManager::setupTextures(RenderPass *pass,int scope,RenderDevice *device){
 	int i,j;
 	for(j=0;j<Shader::ShaderType_MAX;++j){
 		for(i=0;i<pass->getNumTextures((Shader::ShaderType)j);++i){
@@ -283,7 +283,7 @@ void SceneRenderer::setupTextures(RenderPass *pass,int scope,RenderDevice *devic
 	}
 }
 
-void SceneRenderer::setupVariableBuffers(RenderPass *pass,int scope,RenderDevice *device){
+void SimpleRenderManager::setupVariableBuffers(RenderPass *pass,int scope,RenderDevice *device){
 	RenderVariableSet::ptr variables=pass->getVariables();
 	if(variables!=NULL){
 		int i;

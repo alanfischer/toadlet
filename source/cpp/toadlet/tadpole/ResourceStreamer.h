@@ -37,7 +37,7 @@ namespace tadpole{
 
 class ResourceStreamer:public Interface{
 public:
-	TOADLET_IPTR(ResourceStreamer);
+	TOADLET_INTERFACE(ResourceStreamer);
 
 	virtual ~ResourceStreamer(){}
 

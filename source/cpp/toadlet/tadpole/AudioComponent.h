@@ -35,7 +35,7 @@ namespace tadpole{
 
 class TOADLET_API AudioComponent:public BaseComponent{
 public:
-	TOADLET_IPTR(AudioComponent);
+	TOADLET_INTERFACE(AudioComponent);
 
 	AudioComponent(Engine *engine);
 	virtual void destroy();

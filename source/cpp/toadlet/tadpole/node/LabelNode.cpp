@@ -26,7 +26,7 @@
 #include <toadlet/egg/Error.h>
 #include <toadlet/tadpole/Engine.h>
 #include <toadlet/tadpole/RenderableSet.h>
-#include <toadlet/tadpole/SceneRenderer.h>
+#include <toadlet/tadpole/RenderManager.h>
 #include <toadlet/tadpole/node/CameraNode.h>
 #include <toadlet/tadpole/node/LabelNode.h>
 
@@ -164,8 +164,8 @@ void LabelNode::gatherRenderables(CameraNode *camera,RenderableSet *set){
 #endif
 }
 
-void LabelNode::render(SceneRenderer *renderer) const{
-	renderer->getDevice()->renderPrimitive(mVertexData,mIndexData);
+void LabelNode::render(RenderManager *manager) const{
+	manager->getDevice()->renderPrimitive(mVertexData,mIndexData);
 }
 
 void LabelNode::updateLabel(){

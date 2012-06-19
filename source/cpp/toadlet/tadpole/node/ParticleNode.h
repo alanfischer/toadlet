@@ -112,7 +112,7 @@ public:
 	Material *getRenderMaterial() const{return mMaterial;}
 	const Transform &getRenderTransform() const{return mWorldSpace==false?getWorldTransform():Node::identityTransform();}
 	const Bound &getRenderBound() const{return getWorldBound();}
-	void render(SceneRenderer *renderer) const;
+	void render(RenderManager *manager) const;
 
 	void updateVertexBuffer(CameraNode *camera);
 

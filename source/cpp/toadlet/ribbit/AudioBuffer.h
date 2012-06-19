@@ -36,7 +36,7 @@ namespace ribbit{
 
 class AudioBuffer:public Resource{
 public:
-	TOADLET_IPTR(AudioBuffer);
+	TOADLET_INTERFACE(AudioBuffer);
 
 	virtual ~AudioBuffer(){}
 

@@ -52,10 +52,10 @@ StudioModelNode::SubModel::SubModel(StudioModelNode *modelNode,int bodypartIndex
 	material->retain();
 }
 
-void StudioModelNode::SubModel::render(SceneRenderer *renderer) const{
+void StudioModelNode::SubModel::render(RenderManager *manager) const{
 	int i;
 	for(i=0;i<mdata->indexDatas.size();++i){
-		renderer->getDevice()->renderPrimitive(modelNode->mVertexData,mdata->indexDatas[i]);
+		manager->getDevice()->renderPrimitive(modelNode->mVertexData,mdata->indexDatas[i]);
 	}
 }
 
@@ -458,14 +458,14 @@ void StudioModelNode::gatherRenderables(CameraNode *camera,RenderableSet *set){
 	}
 }
 
-void StudioModelNode::render(SceneRenderer *renderer) const{
-	renderer->getDevice()->renderPrimitive(mSkeletonVertexData,mSkeletonIndexData);
+void StudioModelNode::render(RenderManager *manager) const{
+	manager->getDevice()->renderPrimitive(mSkeletonVertexData,mSkeletonIndexData);
 
 	mSkeletonIndexData->primitive=IndexData::Primitive_POINTS;
-	renderer->getDevice()->renderPrimitive(mSkeletonVertexData,mSkeletonIndexData);
+	manager->getDevice()->renderPrimitive(mSkeletonVertexData,mSkeletonIndexData);
 	mSkeletonIndexData->primitive=IndexData::Primitive_LINES;
 
-	renderer->getDevice()->renderPrimitive(mHitBoxVertexData,mHitBoxIndexData);
+	manager->getDevice()->renderPrimitive(mHitBoxVertexData,mHitBoxIndexData);
 }
 
 int StudioModelNode::getAttachmentIndex(const String &name){

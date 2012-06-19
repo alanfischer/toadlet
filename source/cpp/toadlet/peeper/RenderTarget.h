@@ -34,7 +34,7 @@ namespace peeper{
 
 class RenderTarget:public Resource{
 public:
-	TOADLET_IPTR(RenderTarget);
+	TOADLET_INTERFACE(RenderTarget);
 
 	virtual ~RenderTarget(){}
 

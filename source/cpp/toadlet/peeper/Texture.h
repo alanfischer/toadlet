@@ -38,7 +38,7 @@ namespace peeper{
 
 class Texture:public Resource{
 public:
-	TOADLET_IPTR(Texture);
+	TOADLET_INTERFACE(Texture);
 
 	enum Usage{
 		Usage_NONE=			0,

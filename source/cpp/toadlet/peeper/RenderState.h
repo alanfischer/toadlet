@@ -42,7 +42,7 @@ namespace peeper{
 
 class TOADLET_API RenderState:public Resource{
 public:
-	TOADLET_IPTR(RenderState);
+	TOADLET_INTERFACE(RenderState);
 
 	virtual ~RenderState(){}
 

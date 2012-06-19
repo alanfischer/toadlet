@@ -34,7 +34,7 @@ namespace peeper{
 
 class TOADLET_API PixelBuffer:public Buffer{
 public:
-	TOADLET_IPTR(PixelBuffer);
+	TOADLET_INTERFACE(PixelBuffer);
 
 	virtual ~PixelBuffer(){}
 

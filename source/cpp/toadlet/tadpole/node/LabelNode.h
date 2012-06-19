@@ -77,7 +77,7 @@ public:
 	Material *getRenderMaterial() const{return mMaterial;}
 	const Transform &getRenderTransform() const{return getWorldTransform();}
 	const Bound &getRenderBound() const{return getWorldBound();}
-	void render(SceneRenderer *renderer) const;
+	void render(RenderManager *manager) const;
 
 	VertexBufferAccessor vba;
 

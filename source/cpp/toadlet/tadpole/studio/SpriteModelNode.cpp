@@ -186,8 +186,8 @@ void SpriteModelNode::gatherRenderables(CameraNode *camera,RenderableSet *set){
 #endif
 }
 
-void SpriteModelNode::render(SceneRenderer *renderer) const{
-	renderer->getDevice()->renderPrimitive(mVertexData,mIndexData);
+void SpriteModelNode::render(RenderManager *manager) const{
+	manager->getDevice()->renderPrimitive(mVertexData,mIndexData);
 }
 
 }

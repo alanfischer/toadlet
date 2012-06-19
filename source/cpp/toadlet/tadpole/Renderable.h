@@ -33,7 +33,7 @@ namespace tadpole{
 namespace material{class Material;}
 
 class Bound;
-class SceneRenderer;
+class RenderManager;
 class Transform;
 
 class Renderable{
@@ -43,7 +43,7 @@ public:
 	virtual Material *getRenderMaterial() const=0;
 	virtual const Transform &getRenderTransform() const=0;
 	virtual const Bound &getRenderBound() const=0;
-	virtual void render(SceneRenderer *renderer) const=0;
+	virtual void render(RenderManager *manager) const=0;
 };
 	
 #if defined(TOADLET_GCC_INHERITANCE_BUG)
@@ -55,7 +55,7 @@ public:
 	Material *getRenderMaterial() const{return renderable->getRenderMaterial();}
 	const Transform &getRenderTransform() const{return renderable->getRenderTransform();}
 	const Bound &getRenderBound() const{return renderable->getRenderBound();}
-	void render(SceneRenderer *renderer) const{renderable->render(renderer);}
+	void render(RenderManager *manager) const{renderable->render(manager);}
 };
 #define TOADLET_GIB_DEFINE(type) toadlet::tadpole::RenderableWorkaround<type> renderable;
 #define TOADLET_GIB_IMPLEMENT() renderable(this),

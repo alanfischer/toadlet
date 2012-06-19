@@ -34,7 +34,7 @@ namespace peeper{
 
 class TOADLET_API VertexBuffer:public Buffer{
 public:
-	TOADLET_IPTR(VertexBuffer);
+	TOADLET_INTERFACE(VertexBuffer);
 
 	virtual ~VertexBuffer(){}
 

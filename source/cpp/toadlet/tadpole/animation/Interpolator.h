@@ -34,7 +34,7 @@ namespace animation{
 
 class TOADLET_API Interpolator:public Interface{
 public:
-	TOADLET_IPTR(Interpolator);
+	TOADLET_INTERFACE(Interpolator);
 
 	virtual scalar interpolate(scalar value)=0;
 };

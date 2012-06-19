@@ -37,7 +37,7 @@ namespace tadpole{
 
 class TOADLET_API AnimationActionComponent:public BaseActionComponent,public AnimationListener{
 public:
-	TOADLET_IPTR(AnimationActionComponent);
+	TOADLET_INTERFACE(AnimationActionComponent);
 
 	enum Cycling{
 		Cycling_NONE,

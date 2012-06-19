@@ -41,7 +41,7 @@ namespace io{
 
 class Stream:public Interface{
 public:
-	TOADLET_IPTR(Stream);
+	TOADLET_INTERFACE(Stream);
 
 	virtual ~Stream(){}
 

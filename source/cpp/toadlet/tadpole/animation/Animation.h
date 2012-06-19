@@ -35,7 +35,7 @@ namespace animation{
 
 class Animation:public Interface{
 public:
-	TOADLET_IPTR(Animation);
+	TOADLET_INTERFACE(Animation);
 
 	virtual ~Animation(){}
 

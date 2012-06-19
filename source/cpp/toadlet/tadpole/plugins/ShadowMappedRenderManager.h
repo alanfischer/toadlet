@@ -23,25 +23,33 @@
  *
  ********** Copyright header - do not remove **********/
 
-#ifndef TOADLET_TADPOLE_RESOURCECREATOR_H
-#define TOADLET_TADPOLE_RESOURCECREATOR_H
+#ifndef TOADLET_TADPOLE_SHADOWMAPPEDRENDERMANAGER_H
+#define TOADLET_TADPOLE_SHADOWMAPPEDRENDERMANAGER_H
 
-#include <toadlet/egg/Resource.h>
-#include <toadlet/tadpole/ResourceData.h>
-#include <toadlet/tadpole/ProgressListener.h>
+#include <toadlet/peeper/PixelBufferRenderTarget.h>
+#include "SimpleRenderManager.h"
 
 namespace toadlet{
 namespace tadpole{
 
-class ResourceCreator:public Interface{
+class TOADLET_API ShadowMappedRenderManager:public SimpleRenderManager{
 public:
-	TOADLET_INTERFACE(ResourceCreator);
+	TOADLET_OBJECT(ShadowMappedRenderManager);
 
-	virtual ~ResourceCreator(){}
+	ShadowMappedRenderManager(Scene *scene);
+	virtual ~ShadowMappedRenderManager();
 
-	virtual void destroy(){}
+	void setLight(LightNode *light){mLight=light;}
+	LightNode *getLight() const{return mLight;}
 
-	virtual Resource::ptr create(const String &name,ResourceData *data,ProgressListener *listener)=0;
+	void renderScene(RenderDevice *renderDevice,Node *node,CameraNode *camera);
+
+protected:
+	Texture::ptr mShadowTexture;
+	PixelBufferRenderTarget::ptr mShadowTarget;
+	RenderState::ptr mShadowState,mLightState;
+	CameraNode::ptr mLightCamera;
+	LightNode::ptr mLight;
 };
 
 }

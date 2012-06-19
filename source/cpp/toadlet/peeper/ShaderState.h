@@ -36,7 +36,7 @@ namespace peeper{
 
 class TOADLET_API ShaderState:public Resource{
 public:
-	TOADLET_IPTR(ShaderState);
+	TOADLET_INTERFACE(ShaderState);
 
 	virtual ~ShaderState(){}
 

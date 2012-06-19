@@ -688,8 +688,8 @@ void TerrainPatchNode::updateWaterIndexBuffers(CameraNode *camera){
 	mWaterIndexData->setCount(indexCount);
 }
 
-void TerrainPatchNode::render(SceneRenderer *renderer) const{
-	renderer->getDevice()->renderPrimitive(mVertexData,mIndexData);
+void TerrainPatchNode::render(RenderManager *manager) const{
+	manager->getDevice()->renderPrimitive(mVertexData,mIndexData);
 }
 
 void TerrainPatchNode::traceSegment(Collision &result,const Vector3 &position,const Segment &segment,const Vector3 &size){

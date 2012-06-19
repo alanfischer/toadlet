@@ -60,7 +60,7 @@ class Viewport;
 
 class RenderDevice:public Interface{
 public:
-	TOADLET_IPTR(RenderDevice);
+	TOADLET_INTERFACE(RenderDevice);
 
 	enum ClearType{
 		ClearType_BIT_COLOR=	1<<0,

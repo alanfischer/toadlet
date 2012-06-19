@@ -48,8 +48,8 @@ public:
 	Exception(int type,const char *description);
 	virtual ~Exception() throw();
 
-	int getError() throw();
-	const char *getDescription()  throw();
+	int getError() const throw();
+	const char *getDescription() const throw();
 
 protected:
 	int mError;

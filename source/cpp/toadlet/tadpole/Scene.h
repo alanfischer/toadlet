@@ -33,7 +33,7 @@
 #include <toadlet/tadpole/Mesh.h>
 #include <toadlet/tadpole/RenderListener.h>
 #include <toadlet/tadpole/RenderableSet.h>
-#include <toadlet/tadpole/SceneRenderer.h>
+#include <toadlet/tadpole/RenderManager.h>
 #include <toadlet/tadpole/UpdateListener.h>
 #include <toadlet/tadpole/node/PartitionNode.h>
 
@@ -74,8 +74,8 @@ public:
 	virtual void setRenderListener(RenderListener *renderListener){mRenderListener=renderListener;}
 	virtual RenderListener *getRenderListener() const{return mRenderListener;}
 
-	virtual void setSceneRenderer(SceneRenderer::ptr sceneRenderer){mSceneRenderer=sceneRenderer;}
-	virtual SceneRenderer::ptr getSceneRenderer() const{return mSceneRenderer;}
+	virtual void setRenderManager(RenderManager *renderManager){mRenderManager=renderManager;}
+	virtual RenderManager *getRenderManager() const{return mRenderManager;}
 
 	virtual scalar getEpsilon() const{return Math::fromMilli(1);}
 
@@ -124,7 +124,7 @@ protected:
 	PartitionNode::ptr mRoot;
 
 	Vector4 mAmbientColor;
-	SceneRenderer::ptr mSceneRenderer;
+	RenderManager::ptr mRenderManager;
 
 	Mesh::ptr mSphereMesh,mAABoxMesh;
 };

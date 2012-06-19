@@ -67,11 +67,11 @@ Exception::~Exception() throw(){
 	#endif
 }
 
-int Exception::getError() throw(){
+int Exception::getError() const throw(){
 	return mError;
 }
 
-const char *Exception::getDescription() throw(){
+const char *Exception::getDescription() const throw(){
 	#if defined(TOADLET_EXCEPTIONS)
 		return what();
 	#else
