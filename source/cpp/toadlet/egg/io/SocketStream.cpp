@@ -29,7 +29,7 @@ namespace toadlet{
 namespace egg{
 namespace io{
 
-SocketStream::SocketStream(Socket::ptr socket)
+SocketStream::SocketStream(Socket *socket)
 	//mSocket
 {
 	mSocket=socket;

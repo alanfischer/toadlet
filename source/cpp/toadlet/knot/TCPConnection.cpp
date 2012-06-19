@@ -37,7 +37,7 @@ const char *TCPConnection::CONNECTION_PACKET="toadlet::knot::tcp";
 const int TCPConnection::CONNECTION_PACKET_LENGTH=18;
 const int TCPConnection::CONNECTION_VERSION=1;
 
-TCPConnection::TCPConnection(Socket::ptr socket):
+TCPConnection::TCPConnection(Socket *socket):
 	mClient(false),
 	//mSocket,
 	//mOutPacket,
@@ -71,7 +71,7 @@ TCPConnection::~TCPConnection(){
 bool TCPConnection::connect(uint32 remoteHost,int remotePort){
 	Socket::ptr socket;
 	if(mSocket==NULL){
-		socket=Socket::ptr(Socket::createTCPSocket());
+		socket=Socket::createTCPSocket();
 	}
 	else{
 		socket=mSocket;
@@ -88,7 +88,7 @@ bool TCPConnection::connect(uint32 remoteHost,int remotePort){
 	return result;
 }
 
-bool TCPConnection::connect(Socket::ptr socket){
+bool TCPConnection::connect(Socket *socket){
 	mSocket=socket;
 
 	Logger::debug(Categories::TOADLET_KNOT,
@@ -138,7 +138,7 @@ bool TCPConnection::connect(Socket::ptr socket){
 bool TCPConnection::accept(int localPort){
 	Socket::ptr socket;
 	if(mSocket==NULL){
-		socket=Socket::ptr(Socket::createTCPSocket());
+		socket=Socket::createTCPSocket();
 	}
 	else{
 		socket=mSocket;
@@ -152,7 +152,7 @@ bool TCPConnection::accept(int localPort){
 			socket->bind(localPort);
 		}
 		socket->listen(1);
-		clientSocket=Socket::ptr(socket->accept());
+		clientSocket=socket->accept();
 	TOADLET_CATCH(const Exception &){clientSocket=NULL;}
 	bool result=false;
 	if(clientSocket!=NULL){
@@ -162,7 +162,7 @@ bool TCPConnection::accept(int localPort){
 	return result;
 }
 
-bool TCPConnection::accept(Socket::ptr socket){
+bool TCPConnection::accept(Socket *socket){
 	mSocket=socket;
 
 	Logger::debug(Categories::TOADLET_KNOT,

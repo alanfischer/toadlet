@@ -29,7 +29,7 @@
 #include <toadlet/Types.h>
 #include <toadlet/egg/String.h>
 #include <toadlet/egg/Collection.h>
-#include <toadlet/egg/SharedPointer.h>
+#include <toadlet/egg/Object.h>
 
 #if defined(TOADLET_PLATFORM_WIN32)
 	#ifndef WIN32_LEAN_AND_MEAN
@@ -62,9 +62,9 @@ using namespace net;
 
 namespace net{
 
-class TOADLET_API Socket{
+class TOADLET_API Socket:public Object{
 public:
-	TOADLET_SPTR(Socket);
+	TOADLET_OBJECT(Socket);
 
 	Socket();
 	Socket(int domain,int type,int protocol);

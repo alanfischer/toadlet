@@ -38,7 +38,7 @@ class TOADLET_API SocketStream:public Object,public Stream{
 public:
 	TOADLET_OBJECT(SocketStream);
 
-	SocketStream(Socket::ptr socket);
+	SocketStream(Socket *socket);
 	virtual ~SocketStream();
 
 	virtual void close(){mSocket->close();}

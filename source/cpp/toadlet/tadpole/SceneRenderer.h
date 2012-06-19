@@ -32,6 +32,7 @@
 namespace toadlet{
 namespace tadpole{
 
+/// @todo: Rename to RenderManager?
 class TOADLET_API SceneRenderer{
 public:
 	TOADLET_SPTR(SceneRenderer);

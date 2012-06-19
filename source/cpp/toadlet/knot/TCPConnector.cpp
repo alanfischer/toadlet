@@ -69,7 +69,7 @@ TCPConnector::~TCPConnector(){
 bool TCPConnector::accept(int localPort){
 	close();
 
-	mServerSocket=Socket::ptr(Socket::createTCPSocket());
+	mServerSocket=Socket::createTCPSocket();
 	mServerSocket->bind(localPort);
 	bool result=mServerSocket->listen(32);
 	if(result){
@@ -180,7 +180,7 @@ void TCPConnector::run(){
 	while(mRun){
 		Socket::ptr clientSocket;
 		TOADLET_TRY
-			clientSocket=Socket::ptr(mServerSocket->accept());
+			clientSocket=mServerSocket->accept();
 		TOADLET_CATCH(const Exception &){clientSocket=NULL;}
 		if(clientSocket!=NULL){
 			TCPConnection::ptr connection(new TCPConnection(NULL));
