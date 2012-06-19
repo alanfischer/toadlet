@@ -90,7 +90,7 @@ const char *PeerPacketConnection::CONNECTION_PACKET="toadlet::knot::ppp";
 const int PeerPacketConnection::CONNECTION_PACKET_LENGTH=18;
 const int PeerPacketConnection::CONNECTION_VERSION=1;
 
-PeerPacketConnection::PeerPacketConnection(Socket::ptr socket):
+PeerPacketConnection::PeerPacketConnection(Socket *socket):
 	//mMutex,
 	//mThread,
 	mRun(false),

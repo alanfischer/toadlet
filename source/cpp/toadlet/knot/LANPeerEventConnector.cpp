@@ -296,10 +296,10 @@ bool LANPeerEventConnector::startIPServer(int port){
 		String("Starting IPServer:")+port);
 
 	if(mUDP){
-		mIPServerSocket=Socket::ptr(Socket::createUDPSocket());
+		mIPServerSocket=Socket::createUDPSocket();
 	}
 	else{
-		mIPServerSocket=Socket::ptr(Socket::createTCPSocket());
+		mIPServerSocket=Socket::createTCPSocket();
 	}
 
 	// The reason we do the binding before starting the thread & Connection is due to the following:
@@ -375,10 +375,10 @@ bool LANPeerEventConnector::startIPClient(int ip,int port){
 		String("Starting IPClient:")+ip+":"+port);
 
 	if(mUDP){
-		mIPClientSocket=Socket::ptr(Socket::createUDPSocket());
+		mIPClientSocket=Socket::createUDPSocket();
 	}
 	else{
-		mIPClientSocket=Socket::ptr(Socket::createTCPSocket());
+		mIPClientSocket=Socket::createTCPSocket();
 	}
 
 	if(mIPClientSocket->bind(0)==false){
@@ -441,7 +441,7 @@ void LANPeerEventConnector::ipClientThread(int ip,int port){
 //  to itself.  This could be aleviated by not allowing sockets to bind to the same port, and then having the
 //  second instance change its server port.
 void LANPeerEventConnector::findLANGameThread(){
-	Socket::ptr broadcastSocket(Socket::createUDPSocket());
+	Socket::ptr broadcastSocket=Socket::createUDPSocket();
 
 	broadcastSocket->bind(0);
 	broadcastSocket->setBroadcast(true);
@@ -452,7 +452,7 @@ void LANPeerEventConnector::findLANGameThread(){
 	broadcastSocket->close();
 
 	mConnectionMutex.lock();
-		mLANListenerSocket=Socket::ptr(Socket::createUDPSocket());
+		mLANListenerSocket=Socket::createUDPSocket();
 	mConnectionMutex.unlock();
 	mLANListenerSocket->bind(mBroadcastPort);
 

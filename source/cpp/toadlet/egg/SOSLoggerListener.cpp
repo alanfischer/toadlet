@@ -29,7 +29,7 @@ SOSLoggerListener::SOSLoggerListener(String serverAddress){
 	
 	mTermination = 0;
 	
-	mSocket = Socket::ptr(Socket::createTCPSocket());
+	mSocket = Socket::createTCPSocket();
 	
 	bool result = mSocket->connect(mServerAddress,4444);
 	

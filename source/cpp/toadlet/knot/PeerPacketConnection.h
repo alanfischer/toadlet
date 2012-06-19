@@ -48,7 +48,7 @@ class TOADLET_API PeerPacketConnection:public Connection,Runnable{
 public:
 	TOADLET_SPTR(PeerPacketConnection);
 
-	PeerPacketConnection(Socket::ptr socket);
+	PeerPacketConnection(Socket *socket);
 	virtual ~PeerPacketConnection();
 
 	/// This is the amount of time(ms) that the Connection will wait before it assumes a packet is lost

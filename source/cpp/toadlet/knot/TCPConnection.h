@@ -48,13 +48,13 @@ class TOADLET_API TCPConnection:public Connection{
 public:
 	TOADLET_SPTR(TCPConnection);
 
-	TCPConnection(Socket::ptr socket=Socket::ptr()); // Supply a socket to use, this lets the socket be controlled externally
+	TCPConnection(Socket *socket=NULL); // Supply a socket to use, this lets the socket be controlled externally
 	virtual ~TCPConnection();
 
 	bool connect(uint32 remoteHost,int remotePort);
-	bool connect(Socket::ptr socket);
+	bool connect(Socket *socket);
 	bool accept(int localPort);
-	bool accept(Socket::ptr socket);
+	bool accept(Socket *socket);
 
 	void close();
 	bool closed(){return mSocket->closed();}
@@ -62,7 +62,7 @@ public:
 	int send(const tbyte *data,int length);
 	int receive(tbyte *data,int length);
 
-	Socket::ptr getSocket(){return mSocket;}
+	Socket *getSocket(){return mSocket;}
 
 	// Due to the use of unintrusive smart pointers, we don't actually expose a setConnectionListener(ConnectionListener*) method
 	//  Instead that is left to the Connectors, since they can figure out which smart pointer cooresponds to a raw pointer
