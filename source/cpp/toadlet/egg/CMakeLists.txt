@@ -47,10 +47,6 @@ set (EGG_NET_SRC
 	net/Socket.cpp
 )
 
-set (EGG_NET_PLATFORM_WINCE_SRC
-	net/platform/wince/WinCEConnectionManager.cpp
-)
-
 set (EGG_PLATFORM_POSIX_SRC
 	platform/posix/PosixDynamicLibrary.cpp
 	platform/posix/PosixErrorHandler.cpp
@@ -163,12 +159,7 @@ set (EGG_MATHFIXED_HEADERS
 )
 
 set (EGG_NET_HEADERS
-	net/ConnectionManager.h
 	net/Socket.h
-)
-
-set (EGG_NET_PLATFORM_WINCE_HEADERS
-	net/platform/wince/WinCEConnectionManager.h
 )
 
 set (EGG_PLATFORM_POSIX_HEADERS
@@ -234,13 +225,6 @@ if (TOADLET_PLATFORM_WIN32)
 	source_group ("Header Files\\\\platform\\\\win32" FILES ${EGG_PLATFORM_WIN32_HEADERS})
 	set (EGG_SRC ${EGG_SRC} ${EGG_PLATFORM_WIN32_SRC})
 	set (EGG_HEADERS ${EGG_HEADERS} ${EGG_PLATFORM_WIN32_HEADERS})
-
-	if (TOADLET_PLATFORM_WINCE)
-		source_group ("Source Files\\\\net\\\\platform\\\\wince" FILES ${EGG_NET_PLATFORM_WINCE_SRC})
-		source_group ("Header Files\\\\net\\\\platform\\\\wince" FILES ${EGG_NET_PLATFORM_WINCE_HEADERS})
-		set (EGG_SRC ${EGG_SRC} ${EGG_NET_PLATFORM_WINCE_SRC})
-		set (EGG_HEADERS ${EGG_HEADERS} ${EGG_NET_PLATFORM_WINCE_HEADERS})
-	endif (TOADLET_PLATFORM_WINCE)
 elseif (TOADLET_PLATFORM_POSIX) 
 	source_group ("Source Files\\\\platform\\\\posix" FILES ${EGG_PLATFORM_POSIX_SRC})
 	source_group ("Header Files\\\\platform\\\\posix" FILES ${EGG_PLATFORM_POSIX_HEADERS})
