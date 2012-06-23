@@ -109,6 +109,11 @@ set (TADPOLE_PLUGINS_ZIP_SRC
 	plugins/ZIPStream.cpp
 )
 
+set (TADPOLE_PLUGINS_HOP_SRC
+	plugins/HopComponent.cpp
+	plugins/HopManager.cpp
+)
+
 set (TADPOLE_MATERIAL_SRC
 	material/Material.cpp
 	material/RenderPass.cpp
@@ -311,6 +316,11 @@ set (TADPOLE_PLUGINS_SIDDECODER_HEADERS
 set (TADPOLE_PLUGINS_ZIP_HEADERS
 	plugins/ZIPArchive.h
 	plugins/ZIPStream.h
+)
+
+set (TADPOLE_PLUGINS_HOP_HEADERS
+	plugins/HopComponent.h
+	plugins/HopManager.h
 )
 
 set (TADPOLE_MATERIAL_HEADERS
@@ -636,6 +646,10 @@ if (NOT FFMPEG_FOUND)
 	endif (OGGVORBIS_FOUND)
 endif (NOT FFMPEG_FOUND)
 
+# Hop
+set (TADPOLE_PLUGINS_HEADERS ${TADPOLE_PLUGINS_HEADERS} ${TADPOLE_PLUGINS_HOP_HEADERS})
+set (TADPOLE_PLUGINS_SRC ${TADPOLE_PLUGINS_SRC} ${TADPOLE_PLUGINS_HOP_SRC})
+
 
 # Platform specific files 
 if (TOADLET_PLATFORM_ANDROID)
@@ -686,6 +700,7 @@ endif (SWIG_FOUND AND TADPOLE_SWIG_INT)
 if (TOADLET_BUILD_DYNAMIC)
 	add_library (toadlet_tadpole SHARED ${TADPOLE_SRC} ${TADPOLE_HEADERS})
 	set_target_properties (toadlet_tadpole PROPERTIES ${DYNAMIC_LIB_PROPS})
+
 	target_link_libraries (toadlet_tadpole toadlet_egg toadlet_peeper toadlet_ribbit ${TADPOLE_LIBS} ${TADPOLE_PLUGINS_LIBS})
 	install (TARGETS toadlet_tadpole DESTINATION ${LIB_INSTALL_DIR})
 endif (TOADLET_BUILD_DYNAMIC)

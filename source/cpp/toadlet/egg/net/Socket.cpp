@@ -255,6 +255,19 @@ int Socket::getTimeout() const{
 	return value.tv_sec*1000 + value.tv_usec/1000;
 }
 
+bool Socket::addMembership(uint32 ipAddress){
+	struct ip_mreq mreq={0};
+	mreq.imr_multiaddr.s_addr=ipAddress;
+	mreq.imr_interface.s_addr=htonl(INADDR_ANY);
+
+	int result=setsockopt(mHandle,IPPROTO_IP,IP_ADD_MEMBERSHIP,(const char *)&mreq,sizeof(struct ip_mreq));
+	if(result==TOADLET_SOCKET_ERROR){
+		error("setsockopt");
+		return false;
+	}
+	return true;
+}
+
 bool Socket::pollRead(int millis){
 	fd_set fd;
 	FD_ZERO(&fd);

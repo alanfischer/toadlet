@@ -105,6 +105,8 @@ public:
 	virtual bool setTimeout(int millis);
 	virtual int getTimeout() const;
 
+	virtual bool addMembership(uint32 ipAddress);
+
 	virtual bool pollRead(int millis);
 	virtual bool pollWrite(int millis);
 

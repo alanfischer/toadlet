@@ -365,9 +365,9 @@ public:
 		Texture::ptr pointTexture=engine->getTextureManager()->createTexture(pointFormat,pointData);
 		delete[] pointData;
 
-		shadow=engine->getMeshManager()->createAABoxMesh(AABox(-4,-4,0,4,4,0));
+		shadow=engine->createAABoxMesh(AABox(-4,-4,0,4,4,0));
 		{
-			Material::ptr material=engine->getMaterialManager()->createDiffuseMaterial(pointTexture);
+			Material::ptr material=engine->createDiffuseMaterial(pointTexture);
 			material->getPass()->setBlendState(BlendState(BlendState::Operation_ONE_MINUS_SOURCE_ALPHA,BlendState::Operation_SOURCE_ALPHA));
 			material->getPass()->setDepthState(DepthState(DepthState::DepthTest_LEQUAL,false));
 			material->getPass()->setMaterialState(MaterialState(Colors::BLACK));
@@ -423,7 +423,7 @@ public:
 		}
 
 		// HUD
-		hudFade=engine->getMaterialManager()->createDiffuseMaterial(pointTexture);
+		hudFade=engine->createDiffuseMaterial(pointTexture);
 		/// TODO
 /*		hudFade->getPass()->setSamplerState(0,SamplerState(
 			SamplerState::FilterType_LINEAR,SamplerState::FilterType_LINEAR,SamplerState::FilterType_LINEAR,

@@ -1,4 +1,5 @@
 #include "Sky.h"
+#include <toadlet/tadpole/plugins/SkyDomeMeshCreator.h>
 
 TOADLET_NODE_IMPLEMENT(Sky,"Sky");
 
@@ -11,7 +12,7 @@ Node *Sky::create(Scene *scene,int cloudSize,const Vector4 &skyColor,const Vecto
 
 	Logger::alert("Allocating Sky resources");
 
-	SkyDomeMeshCreator::ptr skyDomeCreator(new SkyDomeMeshCreator(mEngine));
+	SkyDomeMeshCreator::ptr skyDomeCreator=new SkyDomeMeshCreator(mEngine);
  	int numSegments=16,numRings=16;
 	VertexBuffer::ptr vertexBuffer=mEngine->getBufferManager()->createVertexBuffer(Buffer::Usage_BIT_STREAM,Buffer::Access_READ_WRITE,mEngine->getVertexFormats().POSITION_COLOR_TEX_COORD,skyDomeCreator->getSkyDomeVertexCount(numSegments,numRings));
 	IndexBuffer::ptr indexBuffer=mEngine->getBufferManager()->createIndexBuffer(Buffer::Usage_BIT_STATIC,Buffer::Access_BIT_WRITE,IndexBuffer::IndexFormat_UINT16,skyDomeCreator->getSkyDomeIndexCount(numSegments,numRings));
@@ -210,7 +211,7 @@ Node *Sky::create(Scene *scene,int cloudSize,const Vector4 &skyColor,const Vecto
 		Texture::ptr compositeTexture=mEngine->getTextureManager()->createTexture(compositeFormat,compositeData);
 		delete[] compositeData;
 
-		material=mEngine->getMaterialManager()->createSkyBoxMaterial(compositeTexture,false);
+		material=mEngine->createSkyBoxMaterial(compositeTexture,false);
 		mCompositeAccessor=Matrix4x4Accessor::ptr(new TextureStateMatrix4x4Accessor(material->getPass(),0));
 		material->getPass()->setBlendState(BlendState::Combination_ALPHA);
 		material->getPass()->setMaterialState(MaterialState(false,true));
@@ -236,7 +237,7 @@ Node *Sky::create(Scene *scene,int cloudSize,const Vector4 &skyColor,const Vecto
 	Texture::ptr glowTexture=mEngine->getTextureManager()->createTexture(glowFormat,glowData);
 	delete[] glowData;
 
-	Material::ptr sunMaterial=mEngine->getMaterialManager()->createDiffuseMaterial(glowTexture);
+	Material::ptr sunMaterial=mEngine->createDiffuseMaterial(glowTexture);
 	sunMaterial->setLayer(-1);
 	sunMaterial->setSort(Material::SortType_MATERIAL);
 	sunMaterial->getPass()->setBlendState(BlendState::Combination_COLOR_ADDITIVE);
