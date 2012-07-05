@@ -24,9 +24,9 @@
  ********** Copyright header - do not remove **********/
 
 #include <toadlet/egg/platform/posix/PosixSystem.h>
-#include <sys/time.h>
 #include <unistd.h>
 #include <pthread.h>
+#include <sys/time.h>
 #if defined(TOADLET_HAS_NEON)
 	#include <arm/arch.h>
 #endif
@@ -98,6 +98,21 @@ bool PosixSystem::absolutePath(const String &path){
 
 String PosixSystem::getEnv(const String &name){
 	return getenv(name);
+}
+
+UUID PosixSystem::generateUUID(){
+	tbyte uuid[16];
+	
+	srand(utime());
+	int i;
+	for(i=0;i<sizeof(uuid);++i){
+		uuid[i]=rand()%0xFF;
+	}
+
+	uuid[6]=(uuid[6] & 0x0F) | 0x40;
+	uuid[8]=(uuid[8] & 0x3F) | 0x80;
+	
+	return UUID(uuid);
 }
 
 void PosixSystem::testSSE(SystemCaps &caps){
