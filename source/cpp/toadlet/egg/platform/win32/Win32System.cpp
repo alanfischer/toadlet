@@ -30,6 +30,8 @@
 #include <windows.h>
 #include <stdio.h>
 #include <intrin.h> // __cpuid()
+#include <rpc.h>
+#pragma comment(lib,"rpcrt4.lib")
 
 namespace toadlet{
 namespace egg{
@@ -87,13 +89,17 @@ bool Win32System::absolutePath(const String &path){
 			(length>2 && ((path.at(0)=='/' && path.at(1)=='/') || (path.at(0)=='\\' && path.at(1)=='\\')));
 }
 
-#if !defined(TOADLET_PLATFORM_WINCE)
-	String Win32System::getEnv(const String &name){
-		TCHAR result[1024];
-		GetEnvironmentVariable(name,result,sizeof(result)/sizeof(TCHAR));
-		return result;
-	}
-#endif
+String Win32System::getEnv(const String &name){
+	TCHAR result[1024];
+	GetEnvironmentVariable(name,result,sizeof(result)/sizeof(TCHAR));
+	return result;
+}
+
+UUID Win32System::generateUUID(){
+	::UUID uuid;
+	UuidCreate(&uuid);
+	return UUID((tbyte*)&uuid);
+}
 
 void Win32System::testSSE(SystemCaps &caps){
 	int result[4];

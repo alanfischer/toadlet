@@ -23,45 +23,62 @@
  *
  ********** Copyright header - do not remove **********/
 
-#ifndef TOADLET_EGG_POSIXSYSTEM_H
-#define TOADLET_EGG_POSIXSYSTEM_H
-
-#include <toadlet/Types.h>
-#include <toadlet/egg/String.h>
-#include <toadlet/egg/SystemCaps.h>
-#include <toadlet/egg/UUID.h>
+#include <toadlet/egg/Random.h>
 
 namespace toadlet{
 namespace egg{
 
-class PosixSystem{
-public:
-	static void usleep(uint64 microseconds);
-	static void msleep(uint64 milliseconds);
+Random::Random(){
+	setSeed(0);
+}
 
-	static uint64 utime();
-	static uint64 mtime();
+Random::Random(int64 seed){
+	setSeed(seed);
+}
 
-	static String mtimeToString(uint64 time);
-	
-	static int threadID();
+void Random::setSeed(int64 seed){
+	mSeed=(seed ^ TOADLET_MAKE_INT64(0x5DEECE66D)) & ((int64(1) << 48) - 1);
+}
 
-	static bool getSystemCaps(SystemCaps &caps);
+int Random::next(int bits){
+	mSeed=(mSeed * TOADLET_MAKE_INT64(0x5DEECE66D) + int64(0xB)) & ((int64(1) << 48) - 1);
+	return (int)(((uint64)mSeed)>>(48-bits));
+}
 
-	static bool absolutePath(const String &path);
+int Random::nextInt(){
+	return next(32);
+}
 
-	static String getEnv(const String &name);
+int Random::nextInt(int n){
+	if(n<=0){
+		return 0;
+	}
 
-	static UUID generateUUID();
-	
-protected:
-	static void testSSE(SystemCaps &caps);
-	static void testNEON(SystemCaps &caps);
-	static void read_node(tbyte *node);
-	static uint64 read_time();
-};
+	if((n&-n)==n){
+		return (int)((n*(int64)next(31))>>31);
+	}
+
+	int bits,val;
+	do{
+		bits=next(31);
+		val=bits%n;
+	}while(bits-val+(n-1)<0);
+
+	return val;
+}
+
+int Random::nextInt(int lower,int upper){
+	return nextInt(upper-lower)+lower;
+}
+
+float Random::nextFloat(){
+	return next(24) / ((float)(1<<24));
+}
+
+float Random::nextFloat(float lower,float upper){
+	return (nextFloat()*(upper-lower))+lower;
+}
 
 }
 }
 
-#endif

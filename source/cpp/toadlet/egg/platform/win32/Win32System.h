@@ -28,6 +28,7 @@
 
 #include <toadlet/egg/String.h>
 #include <toadlet/egg/SystemCaps.h>
+#include <toadlet/egg/UUID.h>
 
 namespace toadlet{
 namespace egg{
@@ -43,14 +44,14 @@ public:
 	static String mtimeToString(uint64 time);
 
 	static int threadID();
-
+	
 	static bool getSystemCaps(SystemCaps &caps);
 
 	static bool absolutePath(const String &path);
 
-	#if !defined(TOADLET_PLATFORM_WINCE)
-		static String getEnv(const String &name);
-	#endif
+	static String getEnv(const String &name);
+
+	static UUID generateUUID();
 
 protected:
 	static const uint64 DELTA_EPOC_MICROSECONDS;
