@@ -28,7 +28,6 @@
 
 #include <toadlet/egg/String.h>
 #include <toadlet/egg/SystemCaps.h>
-#include <toadlet/egg/UUID.h>
 
 namespace toadlet{
 namespace egg{
@@ -50,8 +49,6 @@ public:
 	static bool absolutePath(const String &path);
 
 	static String getEnv(const String &name);
-
-	static UUID generateUUID();
 
 protected:
 	static const uint64 DELTA_EPOC_MICROSECONDS;
