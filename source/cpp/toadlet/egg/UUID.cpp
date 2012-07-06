@@ -23,60 +23,57 @@
  *
  ********** Copyright header - do not remove **********/
 
-#include <toadlet/egg/Random.h>
+#include <toadlet/egg/UUID.h>
+#include <stdio.h>
 
 namespace toadlet{
 namespace egg{
 
-Random::Random(){
-	setSeed(0);
-}
-
-Random::Random(int64 seed){
-	setSeed(seed);
-}
-
-void Random::setSeed(int64 seed){
-	mSeed=(seed ^ TOADLET_MAKE_INT64(0x5DEECE66D)) & ((int64(1) << 48) - 1);
-}
-
-int Random::next(int bits){
-	mSeed=(mSeed * TOADLET_MAKE_INT64(0x5DEECE66D) + int64(0xB)) & ((int64(1) << 48) - 1);
-	return (int)(((uint64)mSeed)>>(48-bits));
-}
-
-int Random::nextInt(){
-	return next(32);
-}
-
-int Random::nextInt(int n){
-	if(n<=0){
-		return 0;
+bool UUID::fromRandom(){
+	tbyte *uu=(tbyte*)&highBits;
+	
+	srand(utime());
+	int i;
+	for(i=0;i<sizeof(uuid);++i){
+		uu[i]=rand()%0xFF;
 	}
 
-	if((n&-n)==n){
-		return (int)((n*(int64)next(31))>>31);
-	}
-
-	int bits,val;
-	do{
-		bits=next(31);
-		val=bits%n;
-	}while(bits-val+(n-1)<0);
-
-	return val;
+	uu[6]=(uu[6] & 0x0F) | 0x40;
+	uu[8]=(uu[8] & 0x3F) | 0x80;
+	
+	return true;
 }
 
-int Random::nextInt(int lower,int upper){
-	return nextInt(upper-lower)+lower;
+bool UUID::fromString(const String &string){
+	tbyte *uu=(tbyte*)&highBits;
+	int n=0;
+	sscanf(string.c_str(),	"%2hhx%2hhx%2hhx%2hhx-"
+							"%2hhx%2hhx-"
+							"%2hhx%2hhx-"
+							"%2hhx%2hhx-"
+							"%2hhx%2hhx%2hhx%2hhx%2hhx%2hhx%n",
+							&uu[0], &uu[1], &uu[2], &uu[3],
+							&uu[4], &uu[5],
+							&uu[6], &uu[7],
+							&uu[8], &uu[9],
+							&uu[10], &uu[11], &uu[12], &uu[13], &uu[14], &uu[15], &n);
+	return n==36 && string[n]=='\0';
 }
 
-float Random::nextFloat(){
-	return next(24) / ((float)(1<<24));
-}
-
-float Random::nextFloat(float lower,float upper){
-	return (nextFloat()*(upper-lower))+lower;
+String UUID::toString(){
+	tbyte *uu=(tbyte*)&highBits;
+	char string[128];
+	sprintf(string,	"%02x%02x%02x%02x-"
+					"%02x%02x-"
+					"%02x%02x-"
+					"%02x%02x-"
+					"%02x%02x%02x%02x%02x%02x",
+					uu[0], uu[1], uu[2], uu[3],
+					uu[4], uu[5],
+					uu[6], uu[7],
+					uu[8], uu[9],
+					uu[10], uu[11], uu[12], uu[13], uu[14], uu[15]);
+	return string;
 }
 
 }

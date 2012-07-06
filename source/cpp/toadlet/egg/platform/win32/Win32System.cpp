@@ -30,8 +30,6 @@
 #include <windows.h>
 #include <stdio.h>
 #include <intrin.h> // __cpuid()
-#include <rpc.h>
-#pragma comment(lib,"rpcrt4.lib")
 
 namespace toadlet{
 namespace egg{
@@ -93,12 +91,6 @@ String Win32System::getEnv(const String &name){
 	TCHAR result[1024];
 	GetEnvironmentVariable(name,result,sizeof(result)/sizeof(TCHAR));
 	return result;
-}
-
-UUID Win32System::generateUUID(){
-	::UUID uuid;
-	UuidCreate(&uuid);
-	return UUID((tbyte*)&uuid);
 }
 
 void Win32System::testSSE(SystemCaps &caps){
