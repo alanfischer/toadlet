@@ -31,11 +31,11 @@ if (TOADLET_PLATFORM_ANDROID)
 	# Android does not use static libraries
 	set (TOADLET_BUILD_STATIC OFF CACHE BOOL "Build static libraries" FORCE)
 
-	# Set defaults 
+	# Set defaults
 	option (TOADLET_RTTI "Enable Run Time Type Information" OFF)
 	option (TOADLET_EXCEPTIONS "Enable Exception handling" OFF)
 
-	# Enable/Disable RTTI	
+	# Enable/Disable RTTI
 	if (TOADLET_RTTI)
 		message (STATUS "RTTI enabled")
 	else (TOADLET_RTTI)
@@ -66,15 +66,43 @@ elseif (TOADLET_PLATFORM_IOS)
 	# iOS does not permit dynamic libraries
 	set (TOADLET_BUILD_DYNAMIC OFF CACHE BOOL "Build dynamic libraries" FORCE)
 
+	# Set defaults
+	option (TOADLET_RTTI "Enable Run Time Type Information" OFF)
+	option (TOADLET_EXCEPTIONS "Enable Exception handling" OFF)
+
+	# Enable/Disable RTTI
+	if (TOADLET_RTTI)
+		message (STATUS "RTTI enabled")
+	else (TOADLET_RTTI)
+		set (DYNAMIC_LIB_FLAGS "${DYNAMIC_LIB_FLAGS} -fno-rtti")
+		set (STATIC_LIB_FLAGS "${STATIC_LIB_FLAGS} -fno-rtti")
+		message (STATUS "RTTI disabled")
+	endif (TOADLET_RTTI)
+
+	# Enable/Disable Exceptions
+	if (TOADLET_EXCEPTIONS)
+		set (DYNAMIC_LIB_FLAGS "${DYNAMIC_LIB_FLAGS} -fexceptions")
+		set (STATIC_LIB_FLAGS "${STATIC_LIB_FLAGS} -fexceptions")
+		message (STATUS "Exceptions enabled")
+	else (TOADLET_EXCEPTIONS)
+		set (DYNAMIC_LIB_FLAGS "${DYNAMIC_LIB_FLAGS} -fno-exceptions")
+		set (STATIC_LIB_FLAGS "${STATIC_LIB_FLAGS} -fno-exceptions")
+		message (STATUS "Exceptions disabled")
+	endif (TOADLET_EXCEPTIONS)
+
+	# Append the compile flags to the properties
+	if (DYNAMIC_LIB_FLAGS)
+		set (DYNAMIC_LIB_PROPS ${DYNAMIC_LIB_PROPS} COMPILE_FLAGS ${DYNAMIC_LIB_FLAGS})
+	endif (DYNAMIC_LIB_FLAGS)
 	if (STATIC_LIB_FLAGS)
 		set (STATIC_LIB_PROPS ${STATIC_LIB_PROPS} COMPILE_FLAGS ${STATIC_LIB_FLAGS})
 	endif (STATIC_LIB_FLAGS)
 elseif (TOADLET_PLATFORM_POSIX)
-	# Set defaults 
+	# Set defaults
 	option (TOADLET_RTTI "Enable Run Time Type Information" ON)
 	option (TOADLET_EXCEPTIONS "Enable Exception handling" ON)
 
-	# Enable/Disable RTTI	
+	# Enable/Disable RTTI
 	if (TOADLET_RTTI)
 		message (STATUS "RTTI enabled")
 	else (TOADLET_RTTI)
@@ -152,7 +180,7 @@ elseif (TOADLET_PLATFORM_WIN32)
 		set (STATIC_LIB_LINK_RELEASE "/NODEFAULTLIB:LIBCMTd.lib,MSVCRT.lib,MSVCRTd.lib")
 	endif (TOADLET_STATIC_MULTITHREAD_DYNAMIC)
 
-	# Enable/Disable RTTI	
+	# Enable/Disable RTTI
 	if (TOADLET_RTTI)
 		set (DYNAMIC_LIB_FLAGS "${DYNAMIC_LIB_FLAGS} /GR")
 		set (STATIC_LIB_FLAGS "${STATIC_LIB_FLAGS} /GR")
