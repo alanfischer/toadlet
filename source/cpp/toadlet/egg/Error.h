@@ -27,6 +27,7 @@
 #define TOADLET_EGG_ERROR_H
 
 #include <toadlet/egg/Categories.h>
+#include <toadlet/egg/Exception.h>
 #include <toadlet/egg/String.h>
 #include <toadlet/egg/StackTraceListener.h>
 #if !defined(TOADLET_PLATFORM_EMSCRIPTEN)
@@ -34,14 +35,14 @@
 #endif
 
 #if defined(TOADLET_EXCEPTIONS)
-	#include <toadlet/egg/Exception.h>
-
 	#define TOADLET_MAKE_ERROR_FUNCTION(name,type) \
 		static void name(const String &text){name((char*)NULL,true,text);} \
 		static void name(const String &categoryName,const String &text){name(categoryName,true,text);} \
 		static void name(const String &categoryName,bool report,const String &text){ \
 			if(report){errorLog(categoryName,text);} \
-			throw toadlet::egg::Exception(type,text); \
+			toadlet::egg::Exception ex(type,text); \
+			Error::getInstance()->setException(ex); \
+			throw ex;\
 		}
 #else
 	#define TOADLET_MAKE_ERROR_FUNCTION(name,type) \
@@ -49,7 +50,8 @@
 		static void name(const String &categoryName,const String &text){name(categoryName,true,text);} \
 		static void name(const String &categoryName,bool report,const String &text){ \
 			if(report){errorLog(categoryName,text);} \
-			Error::getInstance()->setError(type,text); \
+			toadlet::egg::Exception ex(type,text); \
+			Error::getInstance()->setException(ex); \
 		}
 #endif
 
@@ -116,12 +118,12 @@ public:
 	void setError(int error);
 	void setError(int error,const char *description);
 	void setError(int error,const String &description);
+	void setException(const Exception &ex);
 
 	int getError();
-
-	// The result of getErrorDescription() is only valid if getError() returned
-	// a value other than ERROR_NONE
+	// The result of getErrorDescription() is only valid if getError() returned a value other than ERROR_NONE
 	const char *getDescription();
+	const Exception &getException();
 
 	void installHandler();
 	void uninstallHandler();
@@ -140,6 +142,7 @@ protected:
 	static const int MAX_DESCRIPTION_LENGTH=1024;
 	int mLastError;
 	char mLastDescription[MAX_DESCRIPTION_LENGTH+1];
+	Exception mException;
 
 	#if defined(TOADLET_EGG_ERRORHANDLER_H)
 		ErrorHandler mErrorHandler;
