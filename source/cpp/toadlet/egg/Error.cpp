@@ -81,6 +81,11 @@ void Error::setError(int error,const String &description){
 	mLastDescription[c]=0;
 }
 
+void Error::setException(const Exception &ex){
+	setError(ex.getError(),ex.getDescription());
+	mException=ex;
+}
+
 int Error::getError(){
 	int error=mLastError;
 	mLastError=Type_NONE;
@@ -89,6 +94,10 @@ int Error::getError(){
 
 const char *Error::getDescription(){
 	return mLastDescription;
+}
+
+const Exception &Error::getException(){
+	return mException;
 }
 
 void Error::errorLog(const String &categoryName,const String &text){
