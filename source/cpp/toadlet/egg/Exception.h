@@ -43,7 +43,7 @@ class TOADLET_API Exception
 {
 
 public:
-	Exception(int type);
+	Exception(int type=0);
 	Exception(const char *description);
 	Exception(int type,const char *description);
 	virtual ~Exception() throw();
