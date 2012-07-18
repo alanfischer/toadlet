@@ -36,6 +36,17 @@ set (TOADLET_BUILD_VERSION_PAD_MICRO 0)
 set (CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${PROJECT_SOURCE_DIR}/cmake/Modules/")
 
 
+# Get the current hg revision
+if (ANDROID OR IOS)
+	find_host_package (Mercurial)
+else (ANDROID OR IOS)
+	find_package (Mercurial)
+endif (ANDROID OR IOS)
+if (MERCURIAL_FOUND)
+	MERCURIAL_HG_INFO(${PROJECT_SOURCE_DIR} TOADLET)
+endif (MERCURIAL_FOUND)
+
+
 # Assign the TOADLET_PLATFORM_X value, used throughout toadlet for consistency
 if (ANDROID)
 	set (TOADLET_PLATFORM_ANDROID ON CACHE BOOL "Toadlet for Android")
