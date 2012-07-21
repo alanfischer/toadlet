@@ -78,12 +78,8 @@ protected:
 }
 
 // Help to work around an issue with c++ multiple inheritance issues
-//  Since I can't just call BaseResource::release(), since it will use a different base pointer
-//  This issue doesn't exist in other languages (Java)
 #define TOADLET_RESOURCE(Class,BaseClass)\
-	TOADLET_INTERFACE(Class); \
-	int retain(){return toadlet::egg::BaseResource::retain();} \
-	int release(){return toadlet::egg::BaseResource::release();} \
+	TOADLET_OBJECT(Class); \
 	toadlet::egg::Resource *resourceThis(){return (BaseClass*)this;} \
 	void setDestroyedListener(toadlet::egg::ResourceDestroyedListener *listener){toadlet::egg::BaseResource::setDestroyedListener(listener);} \
 	void setName(const toadlet::egg::String &name){toadlet::egg::BaseResource::setName(name);}\

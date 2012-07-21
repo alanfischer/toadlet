@@ -27,8 +27,8 @@
 #define TOADLET_TADPOLE_RENDERABLESET_H
 
 #include <toadlet/tadpole/Renderable.h>
-#include <toadlet/tadpole/node/CameraNode.h>
-#include <toadlet/tadpole/node/LightNode.h>
+#include <toadlet/tadpole/Camera.h>
+#include <toadlet/tadpole/LightComponent.h>
 #include <toadlet/tadpole/node/PartitionNode.h>
 
 namespace toadlet{
@@ -66,11 +66,11 @@ public:
 			light(NULL),
 			depth(0){}
 	
-		LightQueueItem(LightNode *l,scalar d):
+		LightQueueItem(LightComponent *l,scalar d):
 			light(l),
 			depth(d){}
 
-		LightNode *light;
+		LightComponent *light;
 		scalar depth;
 	};
 
@@ -83,11 +83,11 @@ public:
 	RenderableSet(Scene *scene);
 	virtual ~RenderableSet();
 
-	virtual void setCamera(CameraNode *camera){mCamera=camera;}
+	virtual void setCamera(Camera *camera){mCamera=camera;}
 	virtual void startQueuing();
 	virtual void endQueuing();
 	virtual void queueRenderable(Renderable *renderable);
-	virtual void queueLight(LightNode *light);
+	virtual void queueLight(LightComponent *light);
 
 	inline const RenderableQueue &getRenderableQueue(int i) const{return mRenderableQueues[i];}
 	inline int getNumRenderableQueues() const{return mRenderableQueues.size();}
@@ -99,7 +99,7 @@ public:
 protected:
 	Scene *mScene;
 	PartitionNode *mRoot;
-	CameraNode::ptr mCamera;
+	Camera *mCamera;
 	Collection<RenderableQueue> mRenderableQueues;
 	int mRenderableQueueCount;
 	MaterialToQueueIndexMap mMaterialToQueueIndexMap;

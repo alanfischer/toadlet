@@ -2,7 +2,7 @@
 #define HUD_H
 
 #include "RandIsle.h"
-
+/*
 class HUD:public CameraNode{
 public:
 	TOADLET_NODE(HUD,CameraNode);
@@ -39,5 +39,5 @@ protected:
 
 	LabelNode::ptr mSystemLabel;
 };
-
+*/
 #endif

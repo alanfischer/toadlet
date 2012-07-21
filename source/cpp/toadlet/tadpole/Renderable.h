@@ -26,6 +26,7 @@
 #ifndef TOADLET_TADPOLE_RENDERABLE_H
 #define TOADLET_TADPOLE_RENDERABLE_H
 
+#include <toadlet/egg/Interface.h>
 #include <toadlet/tadpole/Types.h>
 
 namespace toadlet{
@@ -36,33 +37,17 @@ class Bound;
 class RenderManager;
 class Transform;
 
-class Renderable{
+class Renderable/*:public Interface*/{
 public:
+//	TOADLET_INTERFACE(Renderable);
+
 	virtual ~Renderable(){}
 
 	virtual Material *getRenderMaterial() const=0;
 	virtual const Transform &getRenderTransform() const=0;
-	virtual const Bound &getRenderBound() const=0;
+	virtual Bound *getRenderBound() const=0;
 	virtual void render(RenderManager *manager) const=0;
 };
-	
-#if defined(TOADLET_GCC_INHERITANCE_BUG)
-template<typename RenderableType>
-class RenderableWorkaround:public Renderable{
-public:
-	RenderableType *renderable;
-	RenderableWorkaround(RenderableType *type):renderable(type){}
-	Material *getRenderMaterial() const{return renderable->getRenderMaterial();}
-	const Transform &getRenderTransform() const{return renderable->getRenderTransform();}
-	const Bound &getRenderBound() const{return renderable->getRenderBound();}
-	void render(RenderManager *manager) const{renderable->render(manager);}
-};
-#define TOADLET_GIB_DEFINE(type) toadlet::tadpole::RenderableWorkaround<type> renderable;
-#define TOADLET_GIB_IMPLEMENT() renderable(this),
-#else
-#define TOADLET_GIB_DEFINE(type)
-#define TOADLET_GIB_IMPLEMENT()
-#endif	
 
 }
 }

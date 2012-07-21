@@ -31,90 +31,29 @@
 #include <toadlet/tadpole/Traceable.h>
 #include <toadlet/tadpole/Renderable.h>
 #include <toadlet/tadpole/Visible.h>
+#include <toadlet/tadpole/MeshComponent.h>
 #include <toadlet/tadpole/node/PartitionNode.h>
-#include <toadlet/tadpole/node/MeshNode.h>
 #include <toadlet/tadpole/bsp/BSP30Map.h>
 
 namespace toadlet{
 namespace tadpole{
 namespace bsp{
 
-class TOADLET_API BSP30ModelNode:public Node,public Traceable,public Visible{
-public:
-	TOADLET_NODE(BSP30ModelNode,Node);
-
-	class TOADLET_API SubModel:public Renderable{
-	public:
-		TOADLET_SPTR(SubModel);
-
-		SubModel(BSP30ModelNode *modelNode,BSP30Map *map);
-		void destroy(){material=NULL;}
-
-		Material *getRenderMaterial() const{return material;}
-		const Transform &getRenderTransform() const{return modelNode->getWorldTransform();}
-		const Bound &getRenderBound() const{return modelNode->getWorldBound();}
-		void render(RenderManager *manager) const;
-
-		BSP30ModelNode *modelNode;
-		BSP30Map *map;
-		Material::ptr material;
-		BSP30Map::facedata *faces;
-	};
-
-	BSP30ModelNode();
-	virtual ~BSP30ModelNode();
-	Node *create(Scene *scene);
-	void destroy();
-	virtual Node *set(Node *node);
-
-	void *hasInterface(int type);
-
-	void setModel(BSP30Map::ptr map,const String &name);
-	void setModel(BSP30Map::ptr map,int index);
-	int getModel() const{return mModelIndex;}
-	BSP30Map::ptr getMap(){return mMap;}
-
-	inline int getNumSubModels() const{return mSubModels.size();}
-	SubModel *getSubModel(int i){return mSubModels[i];}
-
-	void showPlanarFaces(int plane);
-
-	// Visible
-	bool getRendered() const{return mRendered;}
-	void setRendered(bool rendered){mRendered=rendered;}
-	RenderState::ptr getSharedRenderState();
-	void gatherRenderables(CameraNode *camera,RenderableSet *set);
-
-	// Traceable interface
-	const Bound &getBound() const{return super::getBound();}
-	void traceSegment(Collision &result,const Vector3 &position,const Segment &segment,const Vector3 &size);
-
-protected:
-	BSP30Map::ptr mMap;
-	int mModelIndex;
-	Collection<SubModel::ptr> mSubModels;
-	RenderState::ptr mSharedRenderState;
-	bool mRendered;
-};
-
 class TOADLET_API BSP30Node:public PartitionNode,public Traceable,public Renderable{
 public:
-	TOADLET_NODE(BSP30Node,PartitionNode);
+	TOADLET_OBJECT(BSP30Node);
 
-	BSP30Node();
+	BSP30Node(Scene *scene);
 	virtual ~BSP30Node();
-	virtual Node *set(Node *node);
-
-	void *hasInterface(int type){return type==InterfaceType_TRACEABLE?(Traceable*)this:NULL;}
 
 	void setMap(const String &name);
-	void setMap(BSP30Map::ptr map);
-	BSP30Map::ptr getMap() const{return mMap;}
+	void setMap(BSP30Map *map);
+	BSP30Map *getMap() const{return mMap;}
 
 	void setSkyName(const String &skyName);
 	const String &getSkyName() const{return mSkyName;}
 	void setSkyTextures(const String &skyDown,const String &skyUp,const String &skyWest,const String &skyEast,const String &skySouth,const String &skyNorth);
-	MeshNode *getSkyNode() const{return mSkyNode;}
+	MeshComponent *getSkyMesh() const{return mSkyMesh;}
 
 	void setStyleIntensity(int style,scalar intensity){mMap->styleIntensities[style]=255*intensity;}
 	scalar getStyleIntensity(int style){return (float)mMap->styleIntensities[style]/255.0;}
@@ -126,30 +65,30 @@ public:
 	void removeNodeLeafIndexes(const Collection<int> &indexes,Node *node);
 
 	void mergeWorldBound(Node *child,bool justAttached);
-	void gatherRenderables(CameraNode *camera,RenderableSet *set);
+	void gatherRenderables(Camera *camera,RenderableSet *set);
 
-	bool senseBoundingVolumes(SensorResultsListener *listener,const Bound &bound);
+	bool senseBoundingVolumes(SensorResultsListener *listener,Bound *bound);
 	bool sensePotentiallyVisible(SensorResultsListener *listener,const Vector3 &point);
 	bool findAmbientForPoint(Vector4 &r,const Vector3 &point);
 
 	// Traceable items
-	const Bound &getBound() const{return super::getBound();}
+	Bound *getTraceableBound() const{return Node::getBound();}
 	void traceSegment(Collision &result,const Vector3 &position,const Segment &segment,const Vector3 &size);
 
 	// Renderable items
 	Material *getRenderMaterial() const{return NULL;}
 	const Transform &getRenderTransform() const{return mWorldTransform;}
-	const Bound &getRenderBound() const{return mWorldBound;}
+	Bound *getRenderBound() const{return mWorldBound;}
 	void render(RenderManager *manager) const;
 
 protected:
 	void childTransformUpdated(Node *child);
-	void addLeafToVisible(bleaf *leaf,CameraNode *camera);
+	void addLeafToVisible(bleaf *leaf,Camera *camera);
 	void findBoundLeafs(Collection<int> &leafs,Node *node);
 
 	BSP30Map::ptr mMap;
 	String mSkyName;
-	MeshNode::ptr mSkyNode;
+	MeshComponent::ptr mSkyMesh;
 
 	class childdata{
 	public:

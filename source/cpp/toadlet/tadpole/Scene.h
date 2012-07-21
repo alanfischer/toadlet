@@ -31,9 +31,9 @@
 #include <toadlet/tadpole/ContextListener.h>
 #include <toadlet/tadpole/Engine.h>
 #include <toadlet/tadpole/Mesh.h>
-#include <toadlet/tadpole/RenderListener.h>
 #include <toadlet/tadpole/RenderableSet.h>
 #include <toadlet/tadpole/RenderManager.h>
+#include <toadlet/tadpole/PhysicsManager.h>
 #include <toadlet/tadpole/UpdateListener.h>
 #include <toadlet/tadpole/node/PartitionNode.h>
 
@@ -71,11 +71,11 @@ public:
 	virtual void setUpdateListener(UpdateListener *updateListener){mUpdateListener=updateListener;}
 	virtual UpdateListener *getUpdateListener() const{return mUpdateListener;}
 
-	virtual void setRenderListener(RenderListener *renderListener){mRenderListener=renderListener;}
-	virtual RenderListener *getRenderListener() const{return mRenderListener;}
-
 	virtual void setRenderManager(RenderManager *renderManager){mRenderManager=renderManager;}
 	virtual RenderManager *getRenderManager() const{return mRenderManager;}
+
+	virtual void setPhysicsManager(PhysicsManager *physicsManager){mPhysicsManager=physicsManager;}
+	virtual PhysicsManager *getPhysicsManager() const{return mPhysicsManager;}
 
 	virtual scalar getEpsilon() const{return Math::fromMilli(1);}
 
@@ -89,9 +89,11 @@ public:
 	virtual void frameUpdate(int dt,int scope);
 	virtual void postFrameUpdate(int dt){}
 
-	virtual void render(RenderDevice *renderDevice,CameraNode *camera,Node *node);
+	virtual void render(RenderDevice *renderDevice,Camera *camera,Node *node=NULL);
 
-	virtual void traceSegment(Collision &result,const Segment &segment,int collideWithBits=-1,Node *ignore=NULL){result.time=Math::ONE;}
+	virtual void traceSegment(Collision &result,const Segment &segment,int collideWithBits=-1,Node *ignore=NULL);
+
+	virtual void destroy(Component *component);
 
 	void setAmbientColor(const Vector4 &ambientColor){mAmbientColor.set(ambientColor);}
 	inline const Vector4 &getAmbientColor() const{return mAmbientColor;}
@@ -108,7 +110,6 @@ public:
 
 protected:
 	UpdateListener *mUpdateListener;
-	RenderListener *mRenderListener;
 
 	int mExcessiveDT;
 	int mMinLogicDT;
@@ -125,6 +126,10 @@ protected:
 
 	Vector4 mAmbientColor;
 	RenderManager::ptr mRenderManager;
+
+	PhysicsManager::ptr mPhysicsManager;
+
+	Collection<Component::ptr> mDestroyComponents;
 
 	Mesh::ptr mSphereMesh,mAABoxMesh;
 };

@@ -1660,6 +1660,8 @@ namespace Math{
 	TOADLET_API bool testIntersection(const AABox &box1,const AABox &box2);
 	TOADLET_API bool testIntersection(const Sphere &sphere1,const Sphere &sphere2);
 	TOADLET_API bool testIntersection(const Sphere &sphere,const AABox &box);
+	TOADLET_API bool testIntersection(const Sphere &sphere,const Plane *planes,int numPlanes);
+	TOADLET_API bool testIntersection(const AABox &box,const Plane *planes,int numPlanes);
 
 	TOADLET_API real findIntersection(const Segment &segment,const Plane &plane,Vector3 &point,Vector3 &normal);
 	TOADLET_API real findIntersection(const Segment &segment,const Sphere &sphere,Vector3 &point,Vector3 &normal);

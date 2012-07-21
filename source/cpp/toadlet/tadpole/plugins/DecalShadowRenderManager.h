@@ -38,7 +38,7 @@ public:
 	DecalShadowRenderManager(Scene *scene);
 	virtual ~DecalShadowRenderManager();
 
-	void renderScene(RenderDevice *renderDevice,Node *node,CameraNode *camera);
+	void renderScene(RenderDevice *renderDevice,Node *node,Camera *camera);
 	void setPlane(const Plane &p){mPlane.set(p);}
 
 protected:

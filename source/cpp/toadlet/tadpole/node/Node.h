@@ -32,61 +32,29 @@
 #include <toadlet/tadpole/BaseComponent.h>
 #include <toadlet/tadpole/Transformable.h>
 
-#ifndef TOADLET_NODE
-	#define TOADLET_NODE(Class,SuperClass) \
-		typedef SuperClass super; \
-		typedef toadlet::egg::Type<Class,toadlet::tadpole::node::Node> ThisType; \
-		static ThisType *type(); \
-		virtual toadlet::egg::BaseType<toadlet::tadpole::node::Node> *getType(){return Class::type();} \
-		TOADLET_INTERFACE(Class)
-#endif
-
-#ifndef TOADLET_NODE_IMPLEMENT
-	#define TOADLET_NODE_IMPLEMENT(Class,FullName) \
-		Class::ThisType *Class::type(){static ThisType t(FullName);return &t;}
-#endif
-
 namespace toadlet{
 namespace tadpole{
 
 class Engine;
 class RenderableSet;
 class Scene;
-class ActionComponent;
+class Camera;
+class Action;
+class LightComponent;
+class Visible;
+class PhysicsComponent;
 
 namespace node{
 
-class CameraNode;
-
 class TOADLET_API Node:public BaseComponent,public Transformable{
 public:
-	TOADLET_NODE(Node,Node);
+	TOADLET_OBJECT(Node);
 
 	static const Transform &identityTransform(){static Transform transform;return transform;}
-	static const Bound &zeroBound(){static Bound bound;return bound;}
 
-	enum InterfaceType{
-		InterfaceType_ATTACHABLE,
-		InterfaceType_RENDERABLE,
-		InterfaceType_TRANSFORMABLE,
-		InterfaceType_VISIBLE,
-		InterfaceType_TRACEABLE,
-		InterfaceType_DETAILTRACEABLE,
-	};
-
-	TOADLET_ALIGNED_NEW;
-
-	Node();
+	Node(Scene *scene);
 	virtual ~Node();
-	virtual Node *create(Scene *scene);
-	inline bool created() const{return mCreated;}
 	virtual void destroy();
-	inline bool destroyed() const{return !mCreated;}
-	virtual Node *set(Node *node);
-	Node *clone(Scene *scene);
-
-	virtual Node *isEntity(){return NULL;}
-	virtual void *hasInterface(int type);
 
 	void internal_setUniqueHandle(int handle){mUniqueHandle=handle;}
 	int getUniqueHandle() const{return mUniqueHandle;}
@@ -96,25 +64,32 @@ public:
 	void *getParentData() const{return mParentData;}
 	virtual bool parentChanged(Node *node);
 	virtual void parentDataChanged(void *parentData){mParentData=parentData;}
-	Node *getPrevious() const{return mPrevious;}
-	virtual void previousChanged(Node *previous){mPrevious=previous;}
-	Node *getNext() const{return mNext;}
-	virtual void nextChanged(Node *next){mNext=next;}
 
 	virtual bool attach(Component *component);
 	virtual bool remove(Component *component);
+	virtual Component *getChild(const String &name);
 
 	virtual void nodeAttached(Node *node);
 	virtual void nodeRemoved(Node *node);
-	virtual Node *getFirstChild() const{return mFirstChild;}
-	virtual Node *getLastChild() const{return mLastChild;}
+	virtual int getNumNodes() const{return mNodes.size();}
+	virtual Node *getNode(int i) const{return mNodes[i];}
 
-	virtual void actionAttached(ActionComponent *action);
-	virtual void actionRemoved(ActionComponent *action);
-	virtual ActionComponent *getAction(const String &name);
+	virtual void actionAttached(Action *action);
+	virtual void actionRemoved(Action *action);
+	virtual Action *getAction(const String &name);
 	virtual void startAction(const String &name);
 	virtual void stopAction(const String &name);
 	virtual bool getActionActive(const String &name);
+
+	virtual void lightAttached(LightComponent *light){mLights.add(light);}
+	virtual void lightRemoved(LightComponent *light){mLights.remove(light);}
+
+	virtual void visibleAttached(Visible *visible){mVisibles.add(visible);}
+	virtual void visibleRemoved(Visible *visible){mVisibles.remove(visible);}
+
+	virtual void physicsAttached(PhysicsComponent *physics){mPhysics=physics;}
+	virtual void physicsRemoved(PhysicsComponent *physics){mPhysics=NULL;}
+	virtual PhysicsComponent *getPhysics(){return mPhysics;}
 
 	virtual void mergeWorldBound(Node *child,bool justAttached);
 
@@ -142,9 +117,9 @@ public:
 	virtual const Transform &getTransform() const{return mTransform;}
 	inline const Transform &getWorldTransform() const{return mWorldTransform;}
 
-	virtual void setBound(const Bound &bound);
-	inline const Bound &getBound() const{return mBound;}
-	inline const Bound &getWorldBound() const{return mWorldBound;}
+	virtual void setBound(Bound *bound);
+	inline Bound *getBound() const{return mBound;}
+	inline Bound *getWorldBound() const{return mWorldBound;}
 
 	virtual void setScope(int scope){mScope=scope;}
 	inline int getScope() const{return mScope;}
@@ -161,40 +136,39 @@ public:
 	bool getTransformUpdated();
 
 	virtual void updateWorldTransform();
-	virtual void updateAllWorldTransforms();
 	virtual void spacialUpdated();
-	virtual void gatherRenderables(CameraNode *camera,RenderableSet *set);
+	virtual void gatherRenderables(Camera *camera,RenderableSet *set);
 
 	inline Engine *getEngine() const{return (Engine*)mEngine;}
 	inline Scene *getScene() const{return (Scene*)mScene;}
 
 protected:
 	// Engine items
-	bool mCreated;
 	IntrusivePointer<Engine,ObjectSemantics> mEngine;
 	IntrusivePointer<Scene,ObjectSemantics> mScene;
 	int mUniqueHandle;
-
-	Node::ptr mPrevious,mNext;
 	void *mParentData;
-	Node::ptr mFirstChild,mLastChild;
 
 	Collection<Component::ptr> mComponents;
+	Collection<Node::ptr> mNodes;
 	bool mChildrenActive;
 	bool mActivateChildren;
 
-	Collection<ActionComponent*> mActions;
+	Collection<Action*> mActions;
+	Collection<LightComponent*> mLights;
+	Collection<Visible*> mVisibles;
+	PhysicsComponent *mPhysics;
 
 	bool mActive;
 	int mDeactivateCount;
-	int mLastLogicFrame;
-	int mLastFrame;
 	int mTransformUpdatedFrame;
 
 	Transform mTransform;
-	Bound mBound;
+	Bound::ptr mBound;
 	Transform mWorldTransform;
-	Bound mWorldBound;
+	Bound::ptr mWorldBound;
+	Bound::ptr mComponentBound;
+	Bound::ptr mComponentWorldBound;
 	int mScope;
 };
 

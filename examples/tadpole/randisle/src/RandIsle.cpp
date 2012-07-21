@@ -4,6 +4,8 @@
 #include "Tree.h"
 #include "HUD.h"
 #include "Resources.h"
+#include <toadlet/tadpole/plugins/HopManager.h>
+#include <toadlet/tadpole/plugins/HopComponent.h>
 
 #define TREE_CAMERA_DISTANCE 80
 
@@ -34,17 +36,19 @@ void RandIsle::create(){
 	scalar scale=16*64/mPatchSize;
 	mPatchScale.set(scale,scale,64);
 
-	mScene=HopScene::ptr(new HopScene(mEngine));
+	mScene=new Scene(mEngine);
 	mScene->setUpdateListener(this);
 	mScene->setRangeLogicDT(30,30);
 	mScene->setExcessiveDT(600);
-	mScene->setGravity(Vector3(0,0,-50));
-	mScene->setEpsilon(0.03125);
-	mScene->getSimulator()->setMicroCollisionThreshold(100);
 
-	mTerrain=mEngine->createNodeType(TerrainNode::type(),mScene);
+	Simulator *simulator=((HopManager*)mScene->getPhysicsManager())->getSimulator();
+	simulator->setGravity(Vector3(0,0,-50));
+	simulator->setEpsilon(0.03125);
+	simulator->setMicroCollisionThreshold(100);
+
+	mTerrain=new TerrainNode(mScene);
 	mScene->setRoot(mTerrain);
-	mScene->setTraceable(mTerrain);
+	((HopManager*)mScene->getPhysicsManager())->setTraceable(mTerrain);
 	mTerrain->setListener(this);
 	mTerrain->setTolerance(Resources::instance->tolerance);
 	mTerrain->setCameraUpdateScope(Scope_BIT_MAIN_CAMERA);
@@ -53,51 +57,48 @@ void RandIsle::create(){
 	mTerrain->setWaterMaterial(Resources::instance->waterMaterial);
 	mTerrain->setDataSource(this);
 
-	mFollowNode=mEngine->createNodeType(Node::type(),mScene);
+	mFollowNode=new Node(mScene);
 	mFollower=new SmoothFollower(30);
 	mFollower->setOffset(Vector3(0,-20,5));
 	mFollower->setTargetOffset(Vector3(0,0,7.7));
 	mFollowNode->attach(mFollower);
 	mScene->getRoot()->attach(mFollowNode);
 
-	mCamera=mEngine->createNodeType(CameraNode::type(),mScene);
+	mCamera=new Camera();
 	mCamera->setAutoProjectionFov(Math::degToRad(Math::fromInt(60)),mCamera->getNearDist(),1024);
 	mCamera->setScope(~Scope_HUD | Scope_BIT_MAIN_CAMERA);
 	mCamera->setDefaultState(mEngine->getMaterialManager()->createRenderState());
 	mCamera->setClearColor(Resources::instance->fadeColor);
 	mCamera->getDefaultState()->setFogState(FogState(FogState::FogType_LINEAR,Math::ONE,mCamera->getFarDist()/2,mCamera->getFarDist(),mCamera->getClearColor()));
-	mFollowNode->attach(mCamera);
+	mFollowNode->attach(new CameraComponent(mCamera));
 
 	if(Resources::instance->reflectTarget!=NULL){
-		mReflectCamera=mEngine->createNodeType(CameraNode::type(),mScene);
+		mReflectCamera=new Camera();
 		mReflectCamera->setRenderTarget(Resources::instance->reflectTarget);
 		mReflectCamera->setAutoProjectionFov(Math::degToRad(Math::fromInt(60)),mCamera->getNearDist(),mCamera->getFarDist());
 		mReflectCamera->setScope(~Scope_HUD & ~Scope_BIT_MAIN_CAMERA & ~Scope_BIT_WATER);
 		mReflectCamera->setDefaultState(mEngine->getMaterialManager()->createRenderState());
 		mReflectCamera->setClearColor(Resources::instance->fadeColor);
 		mReflectCamera->getDefaultState()->setFogState(FogState(FogState::FogType_LINEAR,Math::ONE,mCamera->getFarDist()/2,mCamera->getFarDist(),mCamera->getClearColor()));
-		mScene->getRoot()->attach(mReflectCamera);
 	}
 
 	if(Resources::instance->refractTarget!=NULL){
-		mRefractCamera=mEngine->createNodeType(CameraNode::type(),mScene);
+		mRefractCamera=new Camera();
 		mRefractCamera->setRenderTarget(Resources::instance->refractTarget);
 		mRefractCamera->setAutoProjectionFov(Math::degToRad(Math::fromInt(60)),mCamera->getNearDist(),mCamera->getFarDist());
 		mRefractCamera->setScope(~Scope_HUD & ~Scope_BIT_MAIN_CAMERA & ~Scope_BIT_WATER);
 		mRefractCamera->setDefaultState(mEngine->getMaterialManager()->createRenderState());
 		mRefractCamera->setClearColor(Resources::instance->fadeColor);
 		mRefractCamera->getDefaultState()->setFogState(FogState(FogState::FogType_LINEAR,Math::ONE,mCamera->getFarDist()/2,mCamera->getFarDist(),mCamera->getClearColor()));
-		mScene->getRoot()->attach(mRefractCamera);
 	}
-
+/*
 	mHUD=mEngine->createNodeType(HUD::type(),mScene);
 	mHUD->setProjectionOrtho(-1,1,-1,1,-1,1);
 	mHUD->setClearFlags(0);
 	mHUD->setScope(Scope_HUD);
 	mScene->getRoot()->attach(mHUD);
-
-	mSky=new Sky();
-	mSky->create(mScene,Resources::instance->cloudSize,Resources::instance->skyColor,Resources::instance->fadeColor);
+*/
+	mSky=new Sky(mScene,Resources::instance->cloudSize,Resources::instance->skyColor,Resources::instance->fadeColor);
 	mScene->getBackground()->attach(mSky);
 
 	VertexBuffer::ptr predictedVertexBuffer=mEngine->getBufferManager()->createVertexBuffer(Buffer::Usage_BIT_STREAM,Buffer::Access_BIT_WRITE,mEngine->getVertexFormats().POSITION_COLOR,512);
@@ -113,24 +114,33 @@ void RandIsle::create(){
 	mRustleSound->setAudioBuffer(Resources::instance->rustle);
 	mScene->getRoot()->attach(mRustleSound);
 	
-	mPlayer=mEngine->createNodeType(HopEntity::type(),mScene);
-	mClimber=new PathClimber();
-	mClimber->setSpeed(40);
-	mClimber->setPathClimberListener(this);
-	mPlayer->attach(mClimber);
-	mPlayer->addShape(Shape::ptr(new Shape(AABox(2))));
+	mPlayer=new Node(mScene);
 	{
-		Segment segment;
-		segment.origin.set(10,0,1000);
-		segment.direction.set(0,0,-2000);
-		tadpole::Collision result;
-		mScene->traceSegment(result,segment,-1,mPlayer);
-		result.point.z+=mPlayer->getShape()->getSphere().radius;
-		mPlayer->setPosition(result.point);
-	}
-	mScene->getRoot()->attach(mPlayer);
+		PathClimber *climber=new PathClimber();
+		{
+			climber->setName("climber");
+			climber->setSpeed(40);
+			climber->setPathClimberListener(this);
+		}
+		mPlayer->attach(climber);
 
-	MeshNode::ptr playerMesh=mEngine->createNodeType(MeshNode::type(),mScene);
+		PhysicsComponent *physics=mScene->getPhysicsManager()->createPhysicsComponent();
+		{
+			physics->setBound(new Bound(AABox(2)));
+
+			Segment segment;
+			segment.origin.set(10,0,1000);
+			segment.direction.set(0,0,-2000);
+			tadpole::Collision result;
+			mScene->traceSegment(result,segment,-1,mPlayer);
+			result.point.z+=mPlayer->getBound()->getSphere().radius;
+			physics->setPosition(result.point);
+		}
+		mPlayer->attach(physics);
+	}
+ 	mScene->getRoot()->attach(mPlayer);
+
+	MeshComponent::ptr playerMesh=new MeshComponent(mEngine);
 	if(Resources::instance->creature!=NULL){
 		playerMesh->setMesh(Resources::instance->creature);
 	}
@@ -142,16 +152,20 @@ void RandIsle::create(){
 	jumpAction->setStopGently(true);
 	mPlayer->attach(jumpAction);
 
-	MeshNode::ptr shadowMesh=mEngine->createNodeType(MeshNode::type(),mScene);
-	if(Resources::instance->shadow!=NULL){
-		shadowMesh->setMesh(Resources::instance->shadow);
+	Node::ptr shadow=new Node(mScene);
+	{
+		MeshComponent::ptr shadowMesh=new MeshComponent(mEngine);
+		if(Resources::instance->shadow!=NULL){
+			shadowMesh->setMesh(Resources::instance->shadow);
+		}
+		shadow->attach(shadowMesh);
+		shadow->attach(new GroundProjector(mPlayer,20,0));
 	}
-	mPlayer->attach(shadowMesh);
-	mPlayer->attach(new GroundProjector(mPlayer,shadowMesh,20,0));
+	mPlayer->attach(shadow);
 
 	mTerrain->setTarget(mPlayer);
 
-	mHUD->setTarget(mPlayer,mCamera);
+//	mHUD->setTarget(mPlayer,mCamera);
 	mFollower->setTarget(mFollowNode,mPlayer);
 	mTerrain->setUpdateTargetBias(128/(getPatchSize()*getPatchScale().x));
 
@@ -205,14 +219,13 @@ void RandIsle::destroy(){
 void RandIsle::render(){
 	Matrix4x4 matrix;
 
-	Vector3 position=mCamera->getWorldTranslate();
+	Vector3 position=mCamera->getPosition();
 	Vector3 forward=mCamera->getForward();
 	Vector3 up=mCamera->getUp();
 
 	if(mRefractCamera!=NULL){
 		mRefractCamera->setProjectionMatrix(mCamera->getProjectionMatrix());
 		mRefractCamera->setLookDir(position,forward,up);
-		mRefractCamera->updateAllWorldTransforms();
 		matrix.reset();
 		Math::setMatrix4x4FromTranslate(matrix,0,0,5);
 		Math::preMul(matrix,mRefractCamera->getViewMatrix());
@@ -226,7 +239,6 @@ void RandIsle::render(){
 	if(mReflectCamera!=NULL){
 		mReflectCamera->setProjectionMatrix(mCamera->getProjectionMatrix());
 		mReflectCamera->setLookDir(position,forward,up);
-		mReflectCamera->updateAllWorldTransforms();
 		matrix.reset();
 		Math::setMatrix4x4FromX(matrix,Math::PI);
 		Math::setMatrix4x4FromTranslate(matrix,0,0,-5);
@@ -239,14 +251,14 @@ void RandIsle::render(){
 	device->beginScene();
 	{
 		if(mRefractCamera!=NULL){
-			mRefractCamera->render(device);
+			mRefractCamera->render(device,mScene);
 		}
 
 		if(mReflectCamera!=NULL){
-			mReflectCamera->render(device);
+			mReflectCamera->render(device,mScene);
 		}
 
-		mCamera->render(device);
+		mCamera->render(device,mScene);
 
 //		mHUD->render(device);
 	}
@@ -259,28 +271,31 @@ void RandIsle::update(int dt){
 }
 
 void RandIsle::logicUpdate(int dt){
-	updateClimber(mClimber,dt);
+	PathClimber *climber=(PathClimber*)mPlayer->getChild("climber");
+	PhysicsComponent *physics=mPlayer->getPhysics();
+
+	updateClimber(climber,dt);
 
 //	updateDanger(dt);
 
-	scalar offset=mPlayer->getBound().getMins().z-2;
-	bool inWater=(mPlayer->getPosition().z+offset)<=0;
-	if(!inWater && mPlayer->getCoefficientOfGravity()==0){
-		mPlayer->setCoefficientOfGravity(Math::ONE);
+	scalar offset=mPlayer->getBound()->getAABox().getMins().z-2;
+	bool inWater=(physics->getPosition().z+offset)<=0;
+	if(!inWater && physics->getGravity()==0){
+		physics->setGravity(Math::ONE);
 	}
 	else if(inWater){
-		Vector3 velocity=mPlayer->getVelocity();
+		Vector3 velocity=physics->getVelocity();
 		velocity.z=0;
-		mPlayer->setVelocity(velocity);
-		mPlayer->setCoefficientOfGravity(0);
-		if(mPlayer->getPosition().z+offset<0){
-			Vector3 position=mPlayer->getPosition();
+		physics->setVelocity(velocity);
+		physics->setGravity(0);
+		if(physics->getPosition().z+offset<0){
+			Vector3 position=physics->getPosition();
 			position.z=-offset;
-			mPlayer->setPosition(position);
+			physics->setPosition(position);
 		}
 	}
 
-	if(Math::square(mPlayer->getVelocity().x)+Math::square(mPlayer->getVelocity().y)<0.05){
+	if(Math::square(physics->getVelocity().x)+Math::square(physics->getVelocity().y)<0.05 && climber->getMounted()==NULL){
 		if(mPlayer->getActionActive("jump")){
 			mPlayer->stopAction("jump");
 		}
@@ -297,7 +312,7 @@ void RandIsle::logicUpdate(int dt){
 
 	mScene->logicUpdate(dt);
 
-	playerMove(mClimber,-mXJoy/8.0,-mYJoy*80);
+	playerMove(mPlayer,-mXJoy/8.0,-mYJoy*80);
 
 	mApp->setTitle(String("FPS:")+mCamera->getFramesPerSecond()+" VISIBLE:"+mCamera->getVisibleCount()+" ACTIVE:"+mScene->countActiveNodes());
 }
@@ -340,18 +355,20 @@ void RandIsle::updateClimber(PathClimber *climber,int dt){
 		if(/*mPlayer->getHealth()>0 && */climber->getNoClimbTime()<mScene->getLogicTime()){
 			// Find closest graph & mount point
 			float snapDistance=10;
-			Sphere playerSphere=Sphere(mPlayer->getPosition(),snapDistance);
+			Bound::ptr playerSphere=new Bound(Sphere(mPlayer->getTranslate(),snapDistance));
 			Node *closestSystem=NULL;
 			float closestDistance=1000;
 			PathSystem::Path *closestPath=NULL;
 			Vector3 closestPoint;
-			Node *node;
-			for(node=mScene->getRoot()->getFirstChild();node!=NULL;node=node->getNext()){
-				if((node->getScope()==Scope_TREE) && node->getWorldBound().testIntersection(playerSphere)){
+			Node *root=mScene->getRoot();
+			int i;
+			for(i=0;i<root->getNumNodes();++i){
+				Node *node=root->getNode(i);
+				if((node->getScope()==Scope_TREE) && node->getWorldBound()->testIntersection(playerSphere)){
 					Tree *system=(Tree*)node;
 					Vector3 point;
-					PathSystem::Path *path=system->getClosestPath(point,mPlayer->getPosition());
-					float distance=Math::length(point,mPlayer->getPosition());
+					PathSystem::Path *path=system->getClosestPath(point,mPlayer->getTranslate());
+					float distance=Math::length(point,mPlayer->getTranslate());
 
 					if(path!=NULL && distance<closestDistance){
 						closestDistance=distance;
@@ -386,7 +403,7 @@ void RandIsle::updateClimber(PathClimber *climber,int dt){
 		}
 
 		if(climber->getSpeed()>=5){
-			wiggleLeaves((Tree*)climber->getMounted(),mPlayer->getWorldBound().getSphere());
+			wiggleLeaves((Tree*)climber->getMounted(),mPlayer->getWorldBound()->getSphere());
 		}
 
 		findPathSequence(mPathSequence,climber,climber->getPath(),climber->getPathDirection(),climber->getPathTime());
@@ -397,7 +414,7 @@ void RandIsle::updateClimber(PathClimber *climber,int dt){
 		Math::mul(position,climber->getIdealRotation(),Math::Y_UNIT_VECTOR3);
 		Math::mul(position,-TREE_CAMERA_DISTANCE);
 		Math::add(position,climber->getMounted()->getWorldTranslate());
-		position.z+=climber->getMounted()->getBound().getAABox().maxs.z/2;
+		position.z+=climber->getMounted()->getBound()->getAABox().maxs.z/2;
 
 		mFollower->logicUpdate(position,dt);
 	}
@@ -426,7 +443,7 @@ void RandIsle::updatePredictedPath(PathClimber *climber,int dt){
 			Math::add(point,climber->getMounted()->getWorldTranslate());
 			path->getOrientation(tangent,normal,scale,time);
 
-			Math::sub(forward,point,mCamera->getWorldTranslate());
+			Math::sub(forward,point,mCamera->getPosition());
 			Math::cross(right,forward,tangent);Math::normalizeCarefully(right,epsilon);
 
 			vba.set3(i+0,0,point-right);
@@ -473,7 +490,7 @@ void RandIsle::keyPressed(int key){
 		mApp->stop();
 	}
 	else if(key==' '){
-		playerJump(mClimber);
+		playerJump(mPlayer);
 	}
 }
 
@@ -497,14 +514,14 @@ void RandIsle::mouseMoved(int x,int y){
 	scalar yamount=(float)y/(float)mApp->getHeight();
 
 	if(mMouseButtons>0){
-		playerMove(mClimber,-xamount*3,-yamount*80);
+		playerMove(mPlayer,-xamount*3,-yamount*80);
 	}
 }
 
 void RandIsle::inputDetected(const InputData &data){
 	if(data.type==InputDevice::InputType_JOY){
 		if((data.valid&(1<<InputData::Semantic_JOY_BUTTON_PRESSED))!=0){
-			playerJump(mClimber);
+			playerJump(mPlayer);
 		}
 		if((data.valid&(1<<InputData::Semantic_JOY_DIRECTION))!=0){
 			mXJoy=data.values[InputData::Semantic_JOY_DIRECTION].x;
@@ -513,15 +530,17 @@ void RandIsle::inputDetected(const InputData &data){
 	}
 }
 
-void RandIsle::playerJump(PathClimber *climber){
+void RandIsle::playerJump(Node *player){
+	PathClimber *climber=(PathClimber*)player->getChild("climber");
+
 	if(climber->getPath()==NULL){
 		Segment segment;
-		segment.setStartDir(mPlayer->getPosition(),Vector3(0,0,-5));
+		segment.setStartDir(mPlayer->getTranslate(),Vector3(0,0,-5));
 		tadpole::Collision result;
-		mScene->traceSegment(result,segment,-1,mPlayer);
+		mScene->traceSegment(result,segment,-1,player);
 		if(result.time<Math::ONE){
 			Math::mul(result.normal,40);
-			mPlayer->setVelocity(mPlayer->getVelocity()+result.normal);
+			player->getPhysics()->setVelocity(player->getPhysics()->getVelocity()+result.normal);
 		}
 	}
 	else{
@@ -529,7 +548,9 @@ void RandIsle::playerJump(PathClimber *climber){
 	}
 }
 
-void RandIsle::playerMove(PathClimber *climber,scalar dr,scalar ds){
+void RandIsle::playerMove(Node *player,scalar dr,scalar ds){
+	PathClimber *climber=(PathClimber*)player->getChild("climber");
+
 	Matrix3x3 drm;
 	Math::setMatrix3x3FromZ(drm,dr);
 	Quaternion q;
@@ -545,17 +566,17 @@ void RandIsle::playerMove(PathClimber *climber,scalar dr,scalar ds){
 	climber->setSpeed(speed);
 }
 
-float RandIsle::findPathSequence(Collection<int> &sequence,PathClimber *player,PathSystem::Path *path,int direction,scalar time){
+float RandIsle::findPathSequence(Collection<int> &sequence,PathClimber *climber,PathSystem::Path *path,int direction,scalar time){
 	Vector3 right,forward,up;
-	Math::setAxesFromQuaternion(player->getIdealRotation(),right,forward,up);
+	Math::setAxesFromQuaternion(climber->getIdealRotation(),right,forward,up);
 	forward.z+=0.25;
 	Math::normalizeCarefully(forward,epsilon);
 	sequence.clear();
-	scalar result=findPathSequence(sequence,player,forward,NULL,path,direction,time,true);
+	scalar result=findPathSequence(sequence,climber,forward,NULL,path,direction,time,true);
 	return result;
 }
 
-float RandIsle::findPathSequence(Collection<int> &sequence,PathClimber *player,const Vector3 &forward,PathSystem::Path *previous,PathSystem::Path *path,int direction,scalar time,bool first){
+float RandIsle::findPathSequence(Collection<int> &sequence,PathClimber *climber,const Vector3 &forward,PathSystem::Path *previous,PathSystem::Path *path,int direction,scalar time,bool first){
 	if(path==NULL){
 		return 0;
 	}
@@ -578,7 +599,7 @@ float RandIsle::findPathSequence(Collection<int> &sequence,PathClimber *player,c
 		scalar d=0;
 		Collection<int> p;
 		d=Math::dot(tangent,forward);
-		d+=findPathSequence(p,player,forward,path,next,0,next!=NULL?next->getNeighborTime(path):0,false);
+		d+=findPathSequence(p,climber,forward,path,next,0,next!=NULL?next->getNeighborTime(path):0,false);
 
 		p.insert(p.begin(),i);
 
@@ -651,9 +672,10 @@ bool RandIsle::updatePopulatePatches(){
 		segment.direction.set(0,0,-2000);
 		tadpole::Collision result;
 		mScene->traceSegment(result,segment,-1,NULL);
-		if(result.time<Math::ONE && patch->bound.testIntersection(result.point)){
+		if(result.time<Math::ONE && patch->bound->testIntersection(result.point)){
 			result.point.z-=5;
-			Tree::ptr tree=(Tree*)(new Tree())->create(mScene,wx+wy,mScene->getRoot(),result.point);
+			/// @todo: Make this not auto attach
+			Tree::ptr tree=new Tree(mScene,wx+wy,mScene->getRoot(),result.point);
 		}
 
 		if(patch->dy>=0){
@@ -672,16 +694,18 @@ bool RandIsle::updatePopulatePatches(){
 	return mPopulatePatches.size()>0;
 }
 
-void RandIsle::terrainPatchCreated(int px,int py,const Bound &bound){
+void RandIsle::terrainPatchCreated(int px,int py,Bound *bound){
 	mPopulatePatches.add(PopulatePatch(px,py,px-mTerrain->getTerrainX(),py-mTerrain->getTerrainY(),bound));
 }
 
-void RandIsle::terrainPatchDestroyed(int px,int py,const Bound &bound){
+void RandIsle::terrainPatchDestroyed(int px,int py,Bound *bound){
 	// TODO: Use bounding volume sensor
-	Node::ptr node;
-	for(node=mScene->getRoot()->getFirstChild();node!=NULL;node=node->getNext()){
-		if((node->getScope()==Scope_TREE) && Math::testInside(bound.getAABox(),node->getWorldTranslate())){
-			node->destroy();
+	Node *root=mScene->getRoot();
+	int i;
+	for(i=0;i<root->getNumNodes();++i){
+		Node *node=root->getNode(i);
+		if((node->getScope()==Scope_TREE) && Math::testInside(bound->getAABox(),node->getWorldTranslate())){
+			mScene->destroy(node);
 		}
 	}
 }

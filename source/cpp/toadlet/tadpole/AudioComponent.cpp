@@ -55,9 +55,7 @@ bool AudioComponent::setAudioBuffer(AudioBuffer *audioBuffer){
 		mAudio->destroy();
 	}
 
-	if(mEngine->getAudioDevice()!=NULL){
-		mAudio=mEngine->getAudioDevice()->createAudio();
-	}
+	mAudio=mEngine->getAudioManager()->createAudio();
 	if(mAudio!=NULL){
 		mAudio->create(audioBuffer);
 		return true;
@@ -80,7 +78,7 @@ bool AudioComponent::setAudioStream(AudioStream *stream){
 		mAudio->destroy();
 	}
 
-	mAudio=mEngine->getAudioDevice()->createAudio();
+	mAudio=mEngine->getAudioManager()->createAudio();
 	if(mAudio!=NULL){
 		mAudio->create(stream);
 		return true;

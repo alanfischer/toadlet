@@ -45,11 +45,23 @@ AudioBuffer::ptr AudioManager::createAudioBuffer(AudioStream::ptr stream){
 		Error::nullPointer("createAudioBuffer called with a null stream");
 		return NULL;
 	}
+
 	AudioBuffer::ptr audioBuffer=audioDevice->createAudioBuffer();
 	if(audioBuffer!=NULL && audioBuffer->create(stream)==false){
 		audioBuffer=NULL;
 	}
 	return audioBuffer;
+}
+
+Audio::ptr AudioManager::createAudio(){
+	AudioDevice *audioDevice=getAudioDevice();
+
+	if(audioDevice==NULL){
+		Error::nullPointer("createAudioBuffer called without a valid AudioDevice");
+		return NULL;
+	}
+	
+	return audioDevice->createAudio();
 }
 
 AudioStream::ptr AudioManager::findAudioStream(const String &name){

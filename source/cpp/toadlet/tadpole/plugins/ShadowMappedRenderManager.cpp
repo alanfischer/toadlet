@@ -39,9 +39,9 @@ ShadowMappedRenderManager::ShadowMappedRenderManager(Scene *scene):
 	mShadowTarget=engine->getTextureManager()->createPixelBufferRenderTarget();
 	mShadowTarget->attach(mShadowTexture->getMipPixelBuffer(0,0),PixelBufferRenderTarget::Attachment_DEPTH_STENCIL);
 
-	mLightCamera=engine->createNodeType(CameraNode::type(),scene);
-	mLightCamera->setProjectionFovX(Math::PI/4,1,30,60);
-	scene->getRoot()->attach(mLightCamera);
+//	mLightCamera=engine->createNodeType(CameraNode::type(),scene);
+//	mLightCamera->setProjectionFovX(Math::PI/4,1,30,60);
+//	scene->getRoot()->attach(mLightCamera);
 
 	mShadowState=engine->getMaterialManager()->createRenderState();
 	mShadowState->setRasterizerState(RasterizerState(RasterizerState::CullType_FRONT,RasterizerState::FillType_SOLID,0,0.1));
@@ -52,13 +52,13 @@ ShadowMappedRenderManager::ShadowMappedRenderManager(Scene *scene):
 ShadowMappedRenderManager::~ShadowMappedRenderManager(){
 }
 
-void ShadowMappedRenderManager::renderScene(RenderDevice *renderDevice,Node *node,CameraNode *camera){
-	if(mLight==NULL){
+void ShadowMappedRenderManager::renderScene(RenderDevice *renderDevice,Node *node,Camera *camera){
+/*	if(mLight==NULL){
 		SimpleRenderManager::renderScene(renderDevice,node,camera);
 		return;
 	}
 
-	mLightCamera->setTransform(mLight->getTransform());
+	mLightCamera->setTransform(mLight->getParent()->getTransform());
 
 	gatherRenderables(mRenderableSet,node,mLightCamera);
 
@@ -95,7 +95,7 @@ TOADLET_ASSERT(false && "BROKEN!");
 //		renderDevice->setTexture(0,mShadowTexture);
 
 		renderRenderables(mRenderableSet,renderDevice,camera,false);
-	}
+	}*/
 }
 
 }

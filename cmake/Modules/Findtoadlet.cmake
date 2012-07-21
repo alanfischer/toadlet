@@ -33,7 +33,6 @@
 #  TOADLET_PEEPER_DLL
 #  TOADLET_RIBBIT_DLL
 #  TOADLET_TADPOLE_DLL
-#  TOADLET_TADPOLE_HOP_DLL
 #  TOADLET_PAD_DLL
 # Android builds with ndk api level < 9 only
 #  TOADLET_PEEPER_JAR
@@ -79,7 +78,6 @@ find_path (TOADLET_INCLUDE_DIR toadlet/toadlet.h PATHS ${HEADER_SEARCH_PATHS})
 # NOTE: These are listed in the order acceptable for static linking
 set (TOADLET_LIB_BASENAMES
 	toadlet_pad
-	toadlet_tadpole_hop
 	toadlet_tadpole
 	toadlet_ribbit_jaudiodevice
 	toadlet_ribbit_mmaudiodevice

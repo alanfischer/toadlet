@@ -48,13 +48,13 @@ void RenderPath::destroy(){
 	mPasses.clear();
 }
 
-RenderPass::ptr RenderPath::addPass(RenderState::ptr renderState,ShaderState::ptr shaderState){
-	RenderPass::ptr pass(new RenderPass(mManager,renderState,shaderState));
+RenderPass *RenderPath::addPass(RenderState *renderState,ShaderState *shaderState){
+	RenderPass::ptr pass=new RenderPass(mManager,renderState,shaderState);
 	mPasses.add(pass);
 	return pass;
 }
 
-RenderPass::ptr RenderPath::addPass(RenderPass::ptr pass){
+RenderPass *RenderPath::addPass(RenderPass *pass){
 	mPasses.add(pass);
 	return pass;
 }

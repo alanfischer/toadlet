@@ -31,7 +31,7 @@
 namespace toadlet{
 namespace tadpole{
 
-SkeletonComponent::SkeletonComponent(Skeleton *skeleton):
+SkeletonComponent::SkeletonComponent(Engine *engine,Skeleton *skeleton):
 	mEngine(NULL),
 	//mSkeleton,
 	//mBones,
@@ -40,6 +40,7 @@ SkeletonComponent::SkeletonComponent(Skeleton *skeleton):
 	//mSequence,
 	mSequenceTime(0)
 {
+	mEngine=engine;
 	mSkeleton=skeleton;
 
 	mBones.resize(skeleton->bones.size());
@@ -57,14 +58,8 @@ void SkeletonComponent::destroy(){
 	mSkeletonMaterial=NULL;
 
 	destroySkeletonBuffers();
-}
 
-bool SkeletonComponent::parentChanged(Node *node){
-	if(BaseComponent::parentChanged(node)){
-		mEngine=node->getEngine();
-		return true;
-	}
-	return false;
+	BaseComponent::destroy();
 }
 
 void SkeletonComponent::updateBones(){
@@ -351,8 +346,8 @@ const Transform &SkeletonComponent::getRenderTransform() const{
 	return mParent!=NULL?mParent->getWorldTransform():Node::identityTransform();
 }
 
-const Bound &SkeletonComponent::getRenderBound() const{
-	return mParent!=NULL?mParent->getWorldBound():Node::zeroBound();
+Bound *SkeletonComponent::getRenderBound() const{
+	return mParent!=NULL?mParent->getWorldBound():NULL;
 }
 
 void SkeletonComponent::render(RenderManager *manager) const{

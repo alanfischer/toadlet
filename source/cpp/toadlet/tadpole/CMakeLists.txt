@@ -4,21 +4,28 @@ configure_file (${CMAKE_CURRENT_SOURCE_DIR}/Version.h.cmake ${CMAKE_CURRENT_BINA
 
 # Source files for toadlet_tadpole
 set (TADPOLE_SRC
+	AnaglyphCamera.cpp
 	AnimationActionComponent.cpp
 	AudioComponent.cpp
 	ArchiveManager.cpp
 	AudioManager.cpp
 	BaseComponent.cpp
 	BufferManager.cpp
+	Camera.cpp
+	CameraComponent.cpp
 	Engine.cpp
 	Font.cpp
 	FontManager.cpp
+	LabelComponent.cpp
+	LightComponent.cpp
 	MaterialManager.cpp
 	MathFormatter.cpp
 	Mesh.cpp
+	MeshComponent.cpp
 	MeshManager.cpp
 	NodeManager.cpp
 	Noise.cpp
+	ParticleComponent.cpp
 	RenderableSet.cpp
 	ResourceManager.cpp
 	Scene.cpp
@@ -26,6 +33,7 @@ set (TADPOLE_SRC
 	ShaderManager.cpp
 	Skeleton.cpp
 	SkeletonComponent.cpp
+	SpriteComponent.cpp
 	Track.cpp
 	TextureManager.cpp
 	Version.cpp
@@ -41,6 +49,7 @@ set (TADPOLE_ANIMATION_SRC
 
 set (TADPOLE_BSP_SRC
 	bsp/BSP30Map.cpp
+	bsp/BSP30ModelComponent.cpp
 	bsp/BSP30Node.cpp
 	bsp/BSP30Streamer.cpp
 )
@@ -122,16 +131,8 @@ set (TADPOLE_MATERIAL_SRC
 )
 
 set (TADPOLE_NODE_SRC
-	node/AnaglyphCameraNode.cpp
-	node/CameraNode.cpp
-	node/CameraAlignedNode.cpp
-	node/LabelNode.cpp
-	node/LightNode.cpp
-	node/MeshNode.cpp
 	node/Node.cpp
-	node/ParticleNode.cpp
 	node/PartitionNode.cpp
-	node/SpriteNode.cpp
 )
 
 set (TADPOLE_SENSOR_SRC
@@ -146,15 +147,15 @@ set (TADPOLE_SENSOR_SRC
 
 set (TADPOLE_STUDIO_SRC
 	studio/SpriteStreamer.cpp
-	studio/SpriteModelNode.cpp
+	studio/SpriteModelComponent.cpp
 	studio/StudioStreamer.cpp
-	studio/StudioModelNode.cpp
+	studio/StudioModelComponent.cpp
 )
 
 set (TADPOLE_TERRAIN_SRC
 	terrain/DiffuseTerrainMaterialSource.cpp
 	terrain/TerrainNode.cpp
-	terrain/TerrainPatchNode.cpp
+	terrain/TerrainPatchComponent.cpp
 	terrain/TextureDataSource.cpp
 )
 
@@ -180,17 +181,19 @@ set (TADPOLE_PLATFORM_WIN32_GDIPLUS_SRC
 
 # Headers
 set (TADPOLE_HEADERS
+	AnaglyphCamera.h
 	AnimationActionComponent.h
-	ActionComponent.h
+	Action.h
 	Attachable.h
 	ArchiveManager.h
 	AudioStreamer.h
 	AudioManager.h
 	AudioComponent.h
-	BaseActionComponent.h
 	BaseComponent.h
 	Bound.h
 	BufferManager.h
+	Camera.h
+	CameraComponent.h
 	Collision.h
 	Colors.h
 	Component.h
@@ -199,15 +202,20 @@ set (TADPOLE_HEADERS
 	Font.h
 	FontData.h
 	FontManager.h
+	LabelComponent.h
+	LightComponent.h
 	MaterialManager.h
 	MathFormatter.h
 	Mesh.h
 	MeshManager.h
+	MeshCOmponent.h
 	NodeManager.h
 	Noise.h
+	ParticleComponent.h
 	ProgressListener.h
+	PhysicsComponent.h
+	PhysicsManager.h
 	Renderable.h
-	RenderListener.h
 	ResourceCreator.h
 	ResourceData.h
 	ResourceManager.h
@@ -219,6 +227,7 @@ set (TADPOLE_HEADERS
 	ShaderManager.h
 	Skeleton.h
 	SkeletonComponent.h
+	SpriteComponent.h
 	TextureData.h
 	TextureManager.h
 	Traceable.h
@@ -247,6 +256,7 @@ set (TADPOLE_ANIMATION_HEADERS
 set (TADPOLE_BSP_HEADERS
 	bsp/BSP30Streamer.h
 	bsp/BSP30Map.h
+	bsp/BSP30ModelComponent.h
 	bsp/BSP30Node.h
 	bsp/BSP30Types.h
 )
@@ -334,17 +344,9 @@ set (TADPOLE_MATERIAL_HEADERS
 )
 
 set (TADPOLE_NODE_HEADERS
-	node/AnaglyphCameraNode.h
-	node/CameraNode.h
-	node/CameraAlignedNode.h
-	node/LabelNode.h
-	node/LightNode.h
-	node/MeshNode.h
 	node/Node.h
 	node/NodeResource.h
-	node/ParticleNode.h
 	node/PartitionNode.h
-	node/SpriteNode.h
 )
 
 set (TADPOLE_SENSOR_HEADERS
@@ -361,11 +363,11 @@ set (TADPOLE_SENSOR_HEADERS
 set (TADPOLE_STUDIO_HEADERS
 	studio/SpriteStreamer.h
 	studio/SpriteModel.h
-	studio/SpriteModelNode.h
+	studio/SpriteModelComponent.h
 	studio/SpriteTypes.h
 	studio/StudioStreamer.h
 	studio/StudioModel.h
-	studio/StudioModelNode.h
+	studio/StudioModelComponent.h
 	studio/StudioTypes.h
 )
 
@@ -375,7 +377,7 @@ set (TADPOLE_TERRAIN_HEADERS
 	terrain/TerrainNodeMaterialSource.h
 	terrain/TerrainNodeListener.h
 	terrain/TerrainNode.h
-	terrain/TerrainPatchNode.h
+	terrain/TerrainPatchComponent.h
 	terrain/TextureDataSource.h
 )
 
@@ -646,11 +648,6 @@ if (NOT FFMPEG_FOUND)
 	endif (OGGVORBIS_FOUND)
 endif (NOT FFMPEG_FOUND)
 
-# Hop
-set (TADPOLE_PLUGINS_HEADERS ${TADPOLE_PLUGINS_HEADERS} ${TADPOLE_PLUGINS_HOP_HEADERS})
-set (TADPOLE_PLUGINS_SRC ${TADPOLE_PLUGINS_SRC} ${TADPOLE_PLUGINS_HOP_SRC})
-
-
 # Platform specific files 
 if (TOADLET_PLATFORM_ANDROID)
 	source_group ("Source Files\\\\platform\\\\android" FILES ${TADPOLE_PLATFORM_ANDROID_SRC})
@@ -680,6 +677,12 @@ elseif (TOADLET_PLATFORM_WIN32)
 	source_group ("Header Files\\\\platform\\\\win32" FILES ${TADPOLE_PLATFORM_WIN32_HEADERS})
 	set (TADPOLE_SRC ${TADPOLE_SRC} ${TADPOLE_PLATFORM_WIN32_SRC})
 endif (TOADLET_PLATFORM_ANDROID)
+
+# Hop
+set (TADPOLE_PLUGINS_SRC ${TADPOLE_PLUGINS_SRC} ${TADPOLE_PLUGINS_HOP_SRC})
+set (TADPOLE_PLUGINS_HEADERS ${TADPOLE_PLUGINS_HEADERS} ${TADPOLE_PLUGINS_HOP_HEADERS})
+set (TADPOLE_PLUGINS_LIBS ${TADPOLE_PLUGINS_LIBS} toadlet_hop)
+#set (TADPOLE_PLUGINS_LIBS_S ${TADPOLE_PLUGINS_LIBS_S} toadlet_hop_s)
 
 
 # Bring in dependency results
@@ -719,8 +722,4 @@ if (TOADLET_BUILD_STATIC)
 	    install (DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/\$ENV{CONFIGURATION}\$ENV{EFFECTIVE_PLATFORM_NAME}/ DESTINATION ${LIB_INSTALL_DIR} FILES_MATCHING PATTERN "*.a")
 	endif (TOADLET_PLATFORM_IOS)
 endif (TOADLET_BUILD_STATIC)
-
-
-# Add plugins
-add_subdirectory (plugins/hop)
 

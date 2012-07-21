@@ -72,9 +72,6 @@ public:
 	Stream::ptr openStream(const String &name){return mArchiveManager->openStream(name);}
 
 	// Node methods
-	void registerNodeType(BaseType<Node> *type);
-	Node *createNode(BaseType<Node> *type,Scene *scene);
-	Node *createNode(const String &fullName,Scene *scene);
 	void nodeCreated(Node *node);
 	void nodeDestroyed(Node *node);
 	int internal_registerNode(Node *node);
@@ -154,8 +151,6 @@ protected:
 
 	Collection<int> mFreeHandles;
 	Collection<Node*> mHandles;
-
-	TypeFactory<Node> mNodeFactory;
 };
 
 }

@@ -118,9 +118,9 @@ if (NOT TOADLET_PLATFORM_PYTHON)
 		${CMAKE_CURRENT_SOURCE_DIR}/toadlet/tadpole/AnimationActionComponent.i
 		${CMAKE_CURRENT_SOURCE_DIR}/toadlet/tadpole/AudioComponent.i
 		${CMAKE_CURRENT_SOURCE_DIR}/toadlet/tadpole/Node.i
-		${CMAKE_CURRENT_SOURCE_DIR}/toadlet/tadpole/CameraNode.i
-		${CMAKE_CURRENT_SOURCE_DIR}/toadlet/tadpole/MeshNode.i
-		${CMAKE_CURRENT_SOURCE_DIR}/toadlet/tadpole/LightNode.i
+		${CMAKE_CURRENT_SOURCE_DIR}/toadlet/tadpole/CameraComponent.i
+		${CMAKE_CURRENT_SOURCE_DIR}/toadlet/tadpole/MeshComponent.i
+		${CMAKE_CURRENT_SOURCE_DIR}/toadlet/tadpole/LightComponent.i
 		${CMAKE_CURRENT_SOURCE_DIR}/toadlet/tadpole/animation/Animation.i
 		${CMAKE_CURRENT_SOURCE_DIR}/toadlet/tadpole/animation/BaseAnimation.i
 		${CMAKE_CURRENT_SOURCE_DIR}/toadlet/tadpole/animation/MeshAnimation.i
@@ -138,9 +138,9 @@ if (NOT TOADLET_PLATFORM_PYTHON)
 			${PROJECT_BINARY_DIR}/source/java/us/toadlet/tadpole/AnimationActionComponent.java
 			${PROJECT_BINARY_DIR}/source/java/us/toadlet/tadpole/AudioComponent.java
 			${PROJECT_BINARY_DIR}/source/java/us/toadlet/tadpole/Node.java
-			${PROJECT_BINARY_DIR}/source/java/us/toadlet/tadpole/CameraNode.java
-			${PROJECT_BINARY_DIR}/source/java/us/toadlet/tadpole/MeshNode.java
-			${PROJECT_BINARY_DIR}/source/java/us/toadlet/tadpole/LightNode.java
+			${PROJECT_BINARY_DIR}/source/java/us/toadlet/tadpole/CameraComponent.java
+			${PROJECT_BINARY_DIR}/source/java/us/toadlet/tadpole/MeshComponent.java
+			${PROJECT_BINARY_DIR}/source/java/us/toadlet/tadpole/LightComponent.java
 			${PROJECT_BINARY_DIR}/source/java/us/toadlet/tadpole/tadpole.java
 			${PROJECT_BINARY_DIR}/source/java/us/toadlet/tadpole/tadpoleJNI.java
 			PARENT_SCOPE

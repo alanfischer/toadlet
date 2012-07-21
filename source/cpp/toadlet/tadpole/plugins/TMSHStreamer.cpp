@@ -163,9 +163,7 @@ Mesh::ptr TMSHStreamer::readMesh(DataStream *stream,int blockSize){
 	stream->read((tbyte*)&transform,sizeof(Transform));
 	mesh->setTransform(transform);
 
-	Bound bound;
-	stream->read((tbyte*)&bound,sizeof(Bound));
-	mesh->setBound(bound);
+	mesh->setBound(readBound(stream));
 
 	int numSubMeshes=stream->readUInt32();
 	if(numSubMeshes>Extents::MAX_SHORT){
@@ -185,7 +183,8 @@ Mesh::ptr TMSHStreamer::readMesh(DataStream *stream,int blockSize){
 
 		subMesh->hasOwnTransform=stream->readBool();
 		stream->read((tbyte*)&subMesh->transform,sizeof(Transform));
-		stream->read((tbyte*)&subMesh->bound,sizeof(Bound));
+
+		subMesh->bound=readBound(stream);
 
 		mesh->addSubMesh(subMesh);
 	}
@@ -203,6 +202,73 @@ Mesh::ptr TMSHStreamer::readMesh(DataStream *stream,int blockSize){
 	mesh->setVertexBoneAssignments(vbas);
 
 	return mesh;
+}
+
+void TMSHStreamer::writeMesh(DataStream *stream,Mesh::ptr mesh){
+	stream->write((tbyte*)&mesh->getTransform(),sizeof(Transform));
+
+	writeBound(stream,mesh->getBound());
+	
+	stream->writeUInt32(mesh->getNumSubMeshes());
+	int i;
+	for(i=0;i<mesh->getNumSubMeshes();++i){
+		Mesh::SubMesh::ptr subMesh=mesh->getSubMesh(i);
+
+		writeVertexData(stream,subMesh->vertexData);
+		writeIndexData(stream,subMesh->indexData);
+
+		stream->writeNullTerminatedString(subMesh->materialName);
+
+		stream->writeNullTerminatedString(subMesh->getName());
+
+		stream->writeBool(subMesh->hasOwnTransform);
+		stream->write((tbyte*)&subMesh->transform,sizeof(Transform));
+
+		writeBound(stream,subMesh->bound);
+	}
+	writeVertexData(stream,mesh->getStaticVertexData());
+
+	const Collection<Mesh::VertexBoneAssignmentList> &vbas=mesh->getVertexBoneAssignments();
+	stream->writeUInt32(vbas.size());
+	for(i=0;i<vbas.size();++i){
+		const Mesh::VertexBoneAssignmentList &list=vbas[i];
+		int numAssignments=list.size();
+		stream->writeUInt8(numAssignments);
+		stream->write((tbyte*)list.begin(),numAssignments*sizeof(Mesh::VertexBoneAssignment));
+	}
+}
+
+/// @todo: This format should only store an AABox for each mesh bound, not a full thing
+Bound::ptr TMSHStreamer::readBound(DataStream *stream){
+	Bound::Type type;
+	AABox box;
+	Sphere sphere;
+
+	type=(Bound::Type)stream->readInt32();
+	stream->readVector3(box.mins);
+	stream->readVector3(box.maxs);
+	stream->readVector3(sphere.origin);
+	sphere.radius=stream->readFloat();
+
+	Bound::ptr bound;
+	if(type==Bound::Type_AABOX){
+		bound=new Bound(box);
+	}
+	else if(type==Bound::Type_SPHERE){
+		bound=new Bound(sphere);
+	}
+	else{
+		bound=new Bound(type);
+	}
+	return bound;
+}
+
+void TMSHStreamer::writeBound(DataStream *stream,Bound::ptr bound){
+	stream->writeInt32(bound->getType());
+	stream->writeVector3(bound->getAABox().mins);
+	stream->writeVector3(bound->getAABox().maxs);
+	stream->writeVector3(bound->getSphere().origin);
+	stream->writeFloat(bound->getSphere().radius);
 }
 
 IndexData::ptr TMSHStreamer::readIndexData(DataStream *stream){
@@ -284,39 +350,6 @@ VertexFormat::ptr TMSHStreamer::readVertexFormat(DataStream *stream){
 
 	return vertexFormat;
 };
-
-
-void TMSHStreamer::writeMesh(DataStream *stream,Mesh::ptr mesh){
-	stream->write((tbyte*)&mesh->getTransform(),sizeof(Transform));
-	stream->write((tbyte*)&mesh->getBound(),sizeof(Bound));
-	
-	stream->writeUInt32(mesh->getNumSubMeshes());
-	int i;
-	for(i=0;i<mesh->getNumSubMeshes();++i){
-		Mesh::SubMesh::ptr subMesh=mesh->getSubMesh(i);
-
-		writeVertexData(stream,subMesh->vertexData);
-		writeIndexData(stream,subMesh->indexData);
-
-		stream->writeNullTerminatedString(subMesh->materialName);
-
-		stream->writeNullTerminatedString(subMesh->getName());
-
-		stream->writeBool(subMesh->hasOwnTransform);
-		stream->write((tbyte*)&subMesh->transform,sizeof(Transform));
-		stream->write((tbyte*)&subMesh->bound,sizeof(Bound));
-	}
-	writeVertexData(stream,mesh->getStaticVertexData());
-
-	const Collection<Mesh::VertexBoneAssignmentList> &vbas=mesh->getVertexBoneAssignments();
-	stream->writeUInt32(vbas.size());
-	for(i=0;i<vbas.size();++i){
-		const Mesh::VertexBoneAssignmentList &list=vbas[i];
-		int numAssignments=list.size();
-		stream->writeUInt8(numAssignments);
-		stream->write((tbyte*)list.begin(),numAssignments*sizeof(Mesh::VertexBoneAssignment));
-	}
-}
 
 void TMSHStreamer::writeIndexData(DataStream *stream,IndexData::ptr indexData){
 	if(indexData==NULL){

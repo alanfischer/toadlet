@@ -23,14 +23,14 @@
  *
  ********** Copyright header - do not remove **********/
 
-#include <toadlet/egg/Logger.h>
 #include <toadlet/tadpole/AnimationActionComponent.h>
+#include <toadlet/tadpole/node/Node.h>
 
 namespace toadlet{
 namespace tadpole{
 
-AnimationActionComponent::AnimationActionComponent(const String &name):BaseActionComponent(name),
-	mNode(NULL),
+AnimationActionComponent::AnimationActionComponent(const String &name):BaseComponent(name),
+	mListener(NULL),
 	mTime(0),
 	mMinValue(0),
 	mMaxValue(0),
@@ -46,6 +46,20 @@ AnimationActionComponent::AnimationActionComponent(const String &name):BaseActio
 {}
 
 AnimationActionComponent::~AnimationActionComponent(){
+}
+
+bool AnimationActionComponent::parentChanged(Node *node){
+	if(mParent!=NULL){
+		mParent->actionRemoved(this);
+	}
+
+	BaseComponent::parentChanged(node);
+	
+	if(mParent!=NULL){
+		mParent->actionAttached(this);
+	}
+
+	return true;
 }
 
 void AnimationActionComponent::setTime(int time){
@@ -67,8 +81,8 @@ void AnimationActionComponent::setTimeScale(scalar scale){
 }
 
 void AnimationActionComponent::start(){
-	if(mNode!=NULL){
-		mNode->activate();
+	if(mParent!=NULL){
+		mParent->activate();
 	}
 
 	mRunning=true;

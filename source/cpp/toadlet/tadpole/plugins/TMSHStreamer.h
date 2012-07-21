@@ -51,12 +51,16 @@ public:
 
 protected:
 	Mesh::ptr readMesh(DataStream *stream,int blockSize);
+	void writeMesh(DataStream *stream,Mesh::ptr mesh);
+
+	Bound::ptr readBound(DataStream *stream);
+	void writeBound(DataStream *stream,Bound::ptr bound);
+
 	IndexData::ptr readIndexData(DataStream *stream);
 	IndexBuffer::ptr readIndexBuffer(DataStream *stream);
 	VertexData::ptr readVertexData(DataStream *stream);
 	VertexBuffer::ptr readVertexBuffer(DataStream *stream);
 	VertexFormat::ptr readVertexFormat(DataStream *stream);
-	void writeMesh(DataStream *stream,Mesh::ptr mesh);
 	void writeIndexData(DataStream *stream,IndexData::ptr indexData);
 	void writeIndexBuffer(DataStream *stream,IndexBuffer::ptr buffer);
 	void writeVertexData(DataStream *stream,VertexData::ptr vertexData);

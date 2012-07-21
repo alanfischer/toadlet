@@ -33,13 +33,13 @@ namespace toadlet{
 namespace tadpole{
 namespace material{
 
-RenderPass::RenderPass(MaterialManager *manager,RenderState::ptr renderState,ShaderState::ptr shaderState):
-	mManager(NULL)
+RenderPass::RenderPass(MaterialManager *manager,RenderState *renderState,ShaderState *shaderState):
+	mManager(NULL),
 	//mRenderState,
 	//mShaderState,
 	//mTextures,
-	//mTextureNames,
-	//mVariables
+	mModelMatrixFlags(0)
+	//mVariables,
 {
 	mManager=manager;
 	if(renderState==NULL){
@@ -95,7 +95,23 @@ void RenderPass::destroy(){
 	}
 }
 
-void RenderPass::setTexture(Shader::ShaderType type,int i,Texture::ptr texture,const SamplerState &samplerState,const TextureState &textureState){
+void RenderPass::setTexture(const String &name,Texture *texture,const String &samplerName,const SamplerState &samplerState,const TextureState &textureState){
+	if(mVariables!=NULL){
+		mVariables->addTexture(name,texture,samplerName,samplerState,textureState);
+	}
+	else{
+		int i,j;
+		for(j=0;j<Shader::ShaderType_MAX;++j){
+			for(i=0;i<mTextureLocationNames[j].size();++i){
+				if(mTextureLocationNames[j][i]==name){
+					setTexture((Shader::ShaderType)j,i,texture,samplerState,textureState);
+				}
+			}
+		}
+	}
+}
+
+void RenderPass::setTexture(Shader::ShaderType type,int i,Texture *texture,const SamplerState &samplerState,const TextureState &textureState){
 	if(i>=mTextures[type].size()){
 		mTextures[type].resize(i+1);
 	}
@@ -105,7 +121,7 @@ void RenderPass::setTexture(Shader::ShaderType type,int i,Texture::ptr texture,c
 	mRenderState->setTextureState(type,i,textureState);
 }
 
-void RenderPass::setShader(Shader::ShaderType type,Shader::ptr shader){
+void RenderPass::setShader(Shader::ShaderType type,Shader *shader){
 	if(mShaderState==NULL){
 		return;
 	}
@@ -130,6 +146,13 @@ void RenderPass::updateVariables(int scope,SceneParameters *parameters){
 	if(mVariables!=NULL){
 		mVariables->update(scope,parameters);
 	}
+}
+
+void RenderPass::setTextureLocationName(Shader::ShaderType type,int i,const String &name){
+	if(i>=mTextureLocationNames[type].size()){
+		mTextureLocationNames[type].resize(i+1);
+	}
+	mTextureLocationNames[type][i]=name;
 }
 
 bool RenderPass::isDepthSorted() const{

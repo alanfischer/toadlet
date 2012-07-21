@@ -26,15 +26,13 @@
 #include <toadlet/tadpole/Engine.h>
 #include <toadlet/tadpole/Scene.h>
 #include <toadlet/tadpole/terrain/TerrainNode.h>
-#include <toadlet/tadpole/terrain/TerrainPatchNode.h>
+#include <toadlet/tadpole/terrain/TerrainPatchComponent.h>
 
 namespace toadlet{
 namespace tadpole{
 namespace terrain{
 
-TOADLET_NODE_IMPLEMENT(TerrainNode,Categories::TOADLET_TADPOLE_TERRAIN+".TerrainNode");
-
-TerrainNode::TerrainNode():super(),
+TerrainNode::TerrainNode(Scene *scene):PartitionNode(scene),
 	mListener(NULL),
 	//mTarget,
 	mDataSource(NULL),
@@ -53,13 +51,7 @@ TerrainNode::TerrainNode():super(),
 	//mPatchHeightData,
 	//mPatchLayerData,
 	mUpdateTargetBias(0)
-{}
-
-TerrainNode::~TerrainNode(){}
-
-Node *TerrainNode::create(Scene *scene){
-	super::create(scene);
-
+{
 	mSize=3;
 	mHalfSize=mSize/2;
 	mPatchGrid.resize(mSize*mSize);
@@ -72,28 +64,35 @@ Node *TerrainNode::create(Scene *scene){
 	int i,j;
 	for(j=0;j<mSize;++j){
 		for(i=0;i<mSize;++i){
-			TerrainPatchNode::ptr patch=mEngine->createNodeType(TerrainPatchNode::type(),mScene);
+			TerrainPatchComponent::ptr patch=new TerrainPatchComponent(mScene);
 			mUnactivePatches.add(patch);
+
+			Node::ptr node=new Node(mScene);
+			node->attach(patch);
+			mPatchNodes.add(node);
 		}
 	}
 
 	mTerrainX=0;
 	mTerrainY=0;
+}
 
-	return this;
+TerrainNode::~TerrainNode(){
+	destroy();
 }
 
 void TerrainNode::destroy(){
 	mPatchMaterial=NULL;
 
-	super::destroy();
-}
+	int i;
+	for(i=0;i<mUnactivePatches.size();++i){
+		mUnactivePatches[i]->getParent()->destroy();
+	}
+	for(i=0;i<mPatchGrid.size();++i){
+		mPatchGrid[i]->getParent()->destroy();
+	}
 
-Node *TerrainNode::set(Node *node){
-	super::set(node);
-
-	Error::unimplemented("TerrainNode::set is unimplemented");
-	return NULL;
+	Node::destroy();
 }
 
 void TerrainNode::setTarget(Node *target){
@@ -221,16 +220,16 @@ void TerrainNode::setTolerance(scalar tolerance){
 	}	
 }
 
-void TerrainNode::gatherRenderables(CameraNode *camera,RenderableSet *set){
+void TerrainNode::gatherRenderables(Camera *camera,RenderableSet *set){
 	if((camera->getScope()&mPatchCameraUpdateScope)!=0){
 		updatePatches(camera);
 	}
 
-	super::gatherRenderables(camera,set);
+	Node::gatherRenderables(camera,set);
 }
 
 void TerrainNode::logicUpdate(int dt,int scope){
-	super::logicUpdate(dt,scope);
+	Node::logicUpdate(dt,scope);
 
 	updateTarget();
 }
@@ -243,7 +242,7 @@ void TerrainNode::traceSegment(Collision &result,const Vector3 &position,const S
 	for(i=0;i<mPatchGrid.size();++i){
 		r.reset();
 		if(mPatchGrid[i]!=NULL){
-			mPatchGrid[i]->traceSegment(r,mPatchGrid[i]->getWorldTranslate(),segment,size);
+			mPatchGrid[i]->traceSegment(r,mPatchGrid[i]->getParent()->getWorldTranslate(),segment,size);
 		}
 		if(r.time<result.time){
 			result.set(r);
@@ -297,8 +296,8 @@ void TerrainNode::updateTarget(){
 				}
 			}
 
-			Collection<TerrainPatchNode::ptr> newPatchGrid(mPatchGrid.size());
-			Collection<TerrainPatchNode::ptr> &oldPatchGrid=mPatchGrid;
+			Collection<TerrainPatchComponent::ptr> newPatchGrid(mPatchGrid.size());
+			Collection<TerrainPatchComponent::ptr> &oldPatchGrid=mPatchGrid;
 			for(y=newTerrainY-halfSize;y<=newTerrainY+halfSize;++y){
 				for(x=newTerrainX-halfSize;x<=newTerrainX+halfSize;++x){
 					bool inOld=Math::abs(x-oldTerrainX)<=halfSize && Math::abs(y-oldTerrainY)<=halfSize;
@@ -332,11 +331,11 @@ void TerrainNode::updateTarget(){
 }
 
 void TerrainNode::createPatch(int x,int y){
-	TerrainPatchNode::ptr patch=mUnactivePatches.back();mUnactivePatches.pop_back();
+	TerrainPatchComponent::ptr patch=mUnactivePatches.back();mUnactivePatches.pop_back();
 	setPatchAt(x,y,patch);
 
-	patch->setScale(mPatchScale);
-	patch->setTranslate(toWorldXi(x)-mPatchSize*mPatchScale.x/2,toWorldYi(y)-mPatchSize*mPatchScale.y/2,0);
+	patch->getParent()->setScale(mPatchScale);
+	patch->getParent()->setTranslate(toWorldXi(x)-mPatchSize*mPatchScale.x/2,toWorldYi(y)-mPatchSize*mPatchScale.y/2,0);
 	patch->setTolerance(mPatchTolerance);
 	patch->setCameraUpdateScope(mPatchCameraUpdateScope);
 	patch->setTerrainScope(mPatchTerrainScope);
@@ -355,7 +354,7 @@ void TerrainNode::createPatch(int x,int y){
 	}
 	patch->setWaterMaterial(mPatchWaterMaterial);
 
-	attach(patch);
+	attach(patch->getParent());
 	if(patchAt(x-1,y)!=NULL){
 		patchAt(x-1,y)->stitchToRight(patch);
 	}
@@ -369,15 +368,15 @@ void TerrainNode::createPatch(int x,int y){
 		patch->stitchToBottom(patchAt(x,y+1));
 	}
 
-	patch->updateWorldTransform();
+	patch->getParent()->updateWorldTransform();
 
 	if(mListener!=NULL){
-		mListener->terrainPatchCreated(x,y,patch->getWorldBound());
+		mListener->terrainPatchCreated(x,y,patch->getParent()->getWorldBound());
 	}
 }
 
 void TerrainNode::destroyPatch(int x,int y){
-	TerrainPatchNode::ptr patch=patchAt(x,y);
+	TerrainPatchComponent::ptr patch=patchAt(x,y);
 
 	if(patchAt(x-1,y)!=NULL){
 		patchAt(x-1,y)->unstitchFromRight(patch);
@@ -392,10 +391,10 @@ void TerrainNode::destroyPatch(int x,int y){
 		patch->unstitchFromBottom(patchAt(x,y+1));
 	}
 
-	remove(patch);
+	remove(patch->getParent());
 
 	if(mListener!=NULL){
-		mListener->terrainPatchDestroyed(x,y,patch->getWorldBound());
+		mListener->terrainPatchDestroyed(x,y,patch->getParent()->getWorldBound());
 	}
 
 	mUnactivePatches.add(patch);
@@ -405,12 +404,12 @@ void TerrainNode::destroyPatch(int x,int y){
 void TerrainNode::updateBound(){
 	int i;
 	for(i=0;i<mPatchGrid.size();++i){
-		if(i==0) mBound.set(mPatchGrid[i]->getWorldBound());
-		else mBound.merge(mPatchGrid[i]->getWorldBound(),mScene->getEpsilon());
+		if(i==0) mBound->set(mPatchGrid[i]->getParent()->getWorldBound());
+		else mBound->merge(mPatchGrid[i]->getParent()->getWorldBound(),mScene->getEpsilon());
 	}
 }
 
-void TerrainNode::updatePatches(CameraNode *camera){
+void TerrainNode::updatePatches(Camera *camera){
 	int i;
 	for(i=0;i<mPatchGrid.size();++i){
 		mPatchGrid[i]->updateBlocks(camera);

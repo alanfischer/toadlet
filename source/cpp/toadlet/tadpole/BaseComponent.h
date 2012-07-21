@@ -36,28 +36,42 @@ class TOADLET_API BaseComponent:public Object,public Component{
 public:
 	TOADLET_OBJECT(BaseComponent);
 	
-	BaseComponent();
-	BaseComponent(const String &name);
+	BaseComponent():mParent(NULL){}
+	BaseComponent(const String &name):mParent(NULL){mName=name;}
 
 	virtual void destroy();
+
+	virtual Component *componentThis(){return this;}
 
 	virtual void setName(const String &name){mName=name;}
 	inline const String &getName() const{return mName;}
 
 	virtual bool parentChanged(Node *node);
+
 	virtual Node *getParent(){return mParent;}
 
 	virtual void logicUpdate(int dt,int scope){}
 	virtual void frameUpdate(int dt,int scope){}
 
 	virtual bool getActive() const{return true;}
+	virtual Bound *getBound() const{return NULL;}
+	
+	virtual void transformChanged(){}
 
 protected:
-	String mName;
 	Node *mParent;
+	String mName;
 };
 
 }
 }
+
+// Help to work around an issue with c++ multiple inheritance issues
+#define TOADLET_COMPONENT(Class,BaseClass)\
+	TOADLET_OBJECT(Class); \
+	toadlet::tadpole::Component *componentThis(){return (BaseClass*)this;} \
+	void setName(const String &name){toadlet::tadpole::BaseComponent::setName(name);}\
+	inline const String &getName() const{return toadlet::tadpole::BaseComponent::getName();}\
+	Node *getParent(){return toadlet::tadpole::BaseComponent::getParent();}
 
 #endif

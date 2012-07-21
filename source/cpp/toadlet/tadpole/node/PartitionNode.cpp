@@ -30,28 +30,18 @@ namespace toadlet{
 namespace tadpole{
 namespace node{
 
-TOADLET_NODE_IMPLEMENT(PartitionNode,Categories::TOADLET_TADPOLE_NODE+".PartitionNode");
-
-PartitionNode::PartitionNode():super(){
+PartitionNode::PartitionNode(Scene *scene):Node(scene){
 }
 
-Node *PartitionNode::create(Scene *scene){
-	super::create(scene);
-
-	return this;
-}
-
-void PartitionNode::destroy(){
-	super::destroy();
-}
-
-bool PartitionNode::senseBoundingVolumes(SensorResultsListener *listener,const Bound &bound){
+bool PartitionNode::senseBoundingVolumes(SensorResultsListener *listener,Bound *bound){
 	bool result=false;
-	Node::ptr node;
-	for(node=getFirstChild();node!=NULL;node=node->getNext()){
-		if(node->getWorldBound().testIntersection(bound)){
+
+	int i;
+	for(i=0;i<mNodes.size();++i){
+		Node *node=mNodes[i];
+		if(bound->testIntersection(node->getWorldBound())){
 			result|=true;
-			if(listener->resultFound(node,Math::lengthSquared(bound.getSphere().origin,node->getWorldTranslate()))==false){
+			if(listener->resultFound(node,Math::lengthSquared(bound->getSphere().origin,node->getWorldTranslate()))==false){
 				return true;
 			}
 		}
@@ -62,8 +52,10 @@ bool PartitionNode::senseBoundingVolumes(SensorResultsListener *listener,const B
 
 bool PartitionNode::sensePotentiallyVisible(SensorResultsListener *listener,const Vector3 &point){
 	bool result=false;
-	Node::ptr node;
-	for(node=getFirstChild();node!=NULL;node=node->getNext()){
+
+	int i;
+	for(i=0;i<mNodes.size();++i){
+		Node *node=mNodes[i];
 		result|=true;
 		if(listener->resultFound(node,Math::lengthSquared(point,node->getWorldTranslate()))==false){
 			return true;

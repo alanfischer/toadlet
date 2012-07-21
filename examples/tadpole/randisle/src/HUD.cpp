@@ -1,7 +1,7 @@
 #include "HUD.h"
 #include "PathClimber.h"
 #include "Resources.h"
-
+#if 0
 TOADLET_NODE_IMPLEMENT(HUD,"HUD");
 
 HUD::HUD():super(),
@@ -198,3 +198,4 @@ void HUD::updateAcornCount(int count){
 	if(count>0) text=text+count;
 	mAcornLabel->setText(text);
 }
+#endif

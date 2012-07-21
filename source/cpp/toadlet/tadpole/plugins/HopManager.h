@@ -36,21 +36,24 @@ namespace toadlet{
 using namespace hop;
 namespace tadpole{
 
-class TOADLET_API HopManager:public PhysicsManager,public hop::Manager{
+class HopComponent;
+
+class TOADLET_API HopManager:public Object,public PhysicsManager,public hop::Manager{
 public:
 	TOADLET_OBJECT(HopManager);
 
-	HopManager(Engine *engine);
+	HopManager(Scene *scene);
+	virtual ~HopManager(){}
 
 	PhysicsComponent *createPhysicsComponent();
-	
-	void traceSegment(Collision &result,const Segment &segment,int collideWithBits,Node *ignore);
-	void traceEntity(Collision &result,HopEntity *entity,const Segment &segment,int collideWithBits);
-	void testEntity(Collision &result,HopEntity *entity1,const Segment &segment,HopEntity *entity2);
 
-	void logicUpdate(int dt){Scene::logicUpdate(dt);}
+	void traceSegment(Collision &result,const Segment &segment,int collideWithBits,Node *ignore);
+/*	void traceEntity(Collision &result,HopEntity *entity,const Segment &segment,int collideWithBits);
+	void testEntity(Collision &result,HopEntity *entity1,const Segment &segment,HopEntity *entity2);
+*/
 	void logicUpdate(int dt,int scope){logicUpdate(dt,scope,NULL);}
-	void logicUpdate(int dt,int scope,HopEntity *entity);
+	void logicUpdate(int dt,int scope,HopComponent *component);
+	void frameUpdate(int dt,int scope);
 
 	Solid *getSolid(){return mSolid;}
 
@@ -101,7 +104,7 @@ protected:
 		int mCounter;
 	};
 
-	Engine *mEngine;
+	Scene::ptr mScene;
 	Simulator::ptr mSimulator;
 	Traceable *mTraceable;
 	Solid::ptr mSolid;

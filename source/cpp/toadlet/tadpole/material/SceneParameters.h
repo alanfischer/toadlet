@@ -35,15 +35,15 @@ namespace tadpole{
 
 class Renderable;
 class Scene;
-namespace node{class CameraNode;}
+class Camera;
 
 namespace material{
 
 class RenderPass;
 
-class SceneParameters{
+class SceneParameters:public Object{
 public:
-	TOADLET_SPTR(SceneParameters);
+	TOADLET_OBJECT(SceneParameters);
 
 	SceneParameters():
 		mScene(NULL),
@@ -54,12 +54,15 @@ public:
 	inline void setScene(Scene *scene){mScene=scene;}
 	inline Scene *getScene() const{return mScene;}
 
-	inline void setCamera(CameraNode *camera){mCamera=camera;}
-	inline CameraNode *getCamera() const{return mCamera;}
+	inline void setCamera(Camera *camera){mCamera=camera;}
+	inline Camera *getCamera() const{return mCamera;}
 
 	inline void setViewport(Viewport viewport){mViewport=viewport;}
 	inline const Viewport &getViewport() const{return mViewport;}
 
+	inline void setModelMatrix(const Matrix4x4 &matrix){mModelMatrix.set(matrix);}
+	inline const Matrix4x4 &getModelMatrix() const{return mModelMatrix;}
+	
 	inline void setRenderable(Renderable *renderable){mRenderable=renderable;}
 	inline Renderable *getRenderable() const{return mRenderable;}
 
@@ -72,7 +75,7 @@ public:
 		renderState->getFogState(mFogState);
 	}
 
-	/// @TODO :Texture states!
+	///@todo: Texture states!
 
 	inline const MaterialState &getMaterialState() const{return mMaterialState;}
 	inline const PointState &getPointState() const{return mPointState;}
@@ -86,8 +89,9 @@ public:
 
 protected:
 	Scene *mScene;
-	CameraNode *mCamera;
+	Camera *mCamera;
 	Viewport mViewport;
+	Matrix4x4 mModelMatrix;
 	Renderable *mRenderable;
 	RenderPass *mRenderPass;
 

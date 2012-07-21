@@ -27,7 +27,7 @@
 #define TOADLET_TADPOLE_STUDIO_STUDIOMODELANIMATION_H
 
 #include <toadlet/tadpole/animation/Animation.h>
-#include <toadlet/tadpole/studio/StudioModelNode.h>
+#include <toadlet/tadpole/studio/StudioModelComponent.h>
 
 namespace toadlet{
 namespace tadpole{
@@ -35,8 +35,8 @@ namespace studio{
 
 class StudioModelAnimation:public Animation{
 public:
-	StudioModelAnimation(StudioModelNode::ptr node,bool gait){
-		mNode=node;
+	StudioModelAnimation(StudioModelComponent *model,bool gait){
+		mModel=model;
 		mGait=gait;
 	}
 
@@ -44,8 +44,8 @@ public:
 		studioseqdesc *sseqdesc=seqdesc();
 		if(sseqdesc==NULL) return;
 		value=value*sseqdesc->fps;
-		if(mGait==false){mNode->setSequenceTime(value);}
-		else{mNode->setGaitSequenceTime(value);}
+		if(mGait==false){mModel->setSequenceTime(value);}
+		else{mModel->setGaitSequenceTime(value);}
 	}
 	scalar getMin() const{return 0;}
 	scalar getMax() const{
@@ -56,11 +56,11 @@ public:
 
 protected:
 	studioseqdesc *seqdesc() const{
-		if(mNode->getModel()==NULL) return NULL;
-		return mNode->getModel()->seqdesc(mGait==false?mNode->getSequence():mNode->getGaitSequence());
+		if(mModel->getModel()==NULL) return NULL;
+		return mModel->getModel()->seqdesc(mGait==false?mModel->getSequence():mModel->getGaitSequence());
 	}
 
-	StudioModelNode::ptr mNode;
+	StudioModelComponent::ptr mModel;
 	bool mGait;
 };
 

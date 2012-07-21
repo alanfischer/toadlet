@@ -48,6 +48,11 @@ public:
 		Scope_RENDERABLE=1<<1,
 	};
 
+	enum MatrixFlags{
+		MatrixFlag_CAMERA_ALIGNED=1<<0,
+		MatrixFlag_NO_PERSPECTIVE=1<<1,
+	};
+
 	Material(MaterialManager *manager);
 	virtual ~Material();
 
@@ -70,9 +75,9 @@ public:
 	inline void setLayer(int layer){mLayer=layer;}
 	inline int getLayer() const{return mLayer;}
 
-	bool isDepthSorted() const;
+	void setModelMatrixFlags(int flags);
 
-	RenderPath::ptr findFixedPath();
+	bool isDepthSorted() const;
 
 	bool compile();
 

@@ -39,18 +39,18 @@ public:
 	SimpleRenderManager(Scene *scene);
 	virtual ~SimpleRenderManager();
 
-	virtual void renderScene(RenderDevice *device,Node *node,CameraNode *camera);
+	virtual void renderScene(RenderDevice *device,Node *node,Camera *camera);
 	virtual RenderDevice *getDevice(){return mDevice;}
 	virtual void setupPass(RenderPass *pass);
 	virtual void setupPassForRenderable(RenderPass *pass,Renderable *renderable,const Vector4 &ambient);
 
 protected:
-	virtual void gatherRenderables(RenderableSet *set,Node *node,CameraNode *camera);
-	virtual void renderRenderables(RenderableSet *set,RenderDevice *device,CameraNode *camera,bool useMaterials=true);
+	virtual void gatherRenderables(RenderableSet *set,Node *node,Camera *camera);
+	virtual void renderRenderables(RenderableSet *set,RenderDevice *device,Camera *camera,bool useMaterials=true);
 	virtual void renderDepthSortedRenderables(const RenderableSet::RenderableQueue &queue,bool useMaterials);
 	virtual void renderQueueItems(Material *material,const RenderableSet::RenderableQueueItem *items,int numItems);
 
-	void setupViewport(CameraNode *camera,RenderDevice *device);
+	void setupViewport(Camera *camera,RenderDevice *device);
 	void setupLights(const RenderableSet::LightQueue &lightQueue,RenderDevice *device);
 	void setupTextures(RenderPass *pass,int scope,RenderDevice *device);
 	void setupVariableBuffers(RenderPass *pass,int scope,RenderDevice *device);

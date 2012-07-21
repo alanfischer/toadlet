@@ -72,10 +72,10 @@ Mesh::ptr TorusMeshCreator::createTorusMesh(VertexBuffer::ptr vertexBuffer,scala
 	Mesh::SubMesh::ptr subMesh(new Mesh::SubMesh());
 	subMesh->indexData=IndexData::ptr(new IndexData(IndexData::Primitive_TRISTRIP,NULL,0,vertexBuffer->getSize()));
 
-	Mesh::ptr mesh(new Mesh());
+	Mesh::ptr mesh=new Mesh();
 	mesh->addSubMesh(subMesh);
 	mesh->setStaticVertexData(VertexData::ptr(new VertexData(vertexBuffer)));
-	mesh->setBound(Bound(Sphere(majorRadius)));
+	mesh->setBound(new Bound(Sphere(majorRadius)));
 
 	return mesh;
 }

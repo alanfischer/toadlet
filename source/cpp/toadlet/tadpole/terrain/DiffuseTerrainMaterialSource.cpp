@@ -24,7 +24,7 @@
  ********** Copyright header - do not remove **********/
 
 #include <toadlet/tadpole/terrain/DiffuseTerrainMaterialSource.h>
-#include <toadlet/tadpole/terrain/TerrainPatchNode.h>
+#include <toadlet/tadpole/terrain/TerrainPatchComponent.h>
 #include <toadlet/tadpole/material/RenderVariables.h>
 
 namespace toadlet{
@@ -244,7 +244,7 @@ bool DiffuseTerrainMaterialSource::setDiffuseTexture(int layer,Texture *texture)
 	return true;
 }
 
-Material::ptr DiffuseTerrainMaterialSource::getMaterial(TerrainPatchNode *patch){
+Material::ptr DiffuseTerrainMaterialSource::getMaterial(TerrainPatchComponent *patch){
 	Material::ptr material(new Material(mEngine->getMaterialManager()));
 
 	TextureState scaleState;

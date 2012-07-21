@@ -48,7 +48,7 @@ public:
 	bool setDiffuseTexture(int layer,Texture *texture);
 	Texture::ptr getDiffuseTexture(int layer){return mDiffuseTextures.size()>layer?mDiffuseTextures[layer]:NULL;}
 
-	Material::ptr getMaterial(TerrainPatchNode *patch);
+	Material::ptr getMaterial(TerrainPatchComponent *patch);
 	
 protected:
 	Engine *mEngine;

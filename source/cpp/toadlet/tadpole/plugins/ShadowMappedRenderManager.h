@@ -39,17 +39,17 @@ public:
 	ShadowMappedRenderManager(Scene *scene);
 	virtual ~ShadowMappedRenderManager();
 
-	void setLight(LightNode *light){mLight=light;}
-	LightNode *getLight() const{return mLight;}
+	void setLight(LightComponent *light){mLight=light;}
+	LightComponent *getLight() const{return mLight;}
 
-	void renderScene(RenderDevice *renderDevice,Node *node,CameraNode *camera);
+	void renderScene(RenderDevice *renderDevice,Node *node,Camera *camera);
 
 protected:
 	Texture::ptr mShadowTexture;
 	PixelBufferRenderTarget::ptr mShadowTarget;
 	RenderState::ptr mShadowState,mLightState;
-	CameraNode::ptr mLightCamera;
-	LightNode::ptr mLight;
+//	CameraNode::ptr mLightCamera;
+	LightComponent::ptr mLight;
 };
 
 }

@@ -30,7 +30,6 @@
 #include <toadlet/tadpole/Scene.h>
 #include <toadlet/tadpole/material/RenderVariable.h>
 #include <toadlet/tadpole/material/SceneParameters.h>
-#include <toadlet/tadpole/node/CameraNode.h>
 
 namespace toadlet{
 namespace tadpole{
@@ -72,11 +71,8 @@ public:
 	int getFormat(){return VariableBufferFormat::Format_TYPE_FLOAT_32|VariableBufferFormat::Format_COUNT_4X4|VariableBufferFormat::Format_BIT_PROJECTION;}
 
 	void update(tbyte *data,SceneParameters *parameters){
-		if(parameters->getRenderable()!=NULL){
-			parameters->getRenderable()->getRenderTransform().getMatrix(mModelMatrix);
-			Math::mul(mMVPMatrix,parameters->getCamera()->getViewProjectionMatrix(),mModelMatrix);
-			memcpy(data,mMVPMatrix.getData(),sizeof(Matrix4x4));
-		}
+		Math::mul(mMVPMatrix,parameters->getCamera()->getViewProjectionMatrix(),parameters->getModelMatrix());
+		memcpy(data,mMVPMatrix.getData(),sizeof(Matrix4x4));
 	}
 
 protected:
@@ -90,11 +86,8 @@ public:
 	int getFormat(){return VariableBufferFormat::Format_TYPE_FLOAT_32|VariableBufferFormat::Format_COUNT_4X4;}
 
 	void update(tbyte *data,SceneParameters *parameters){
-		if(parameters->getRenderable()!=NULL){
-			parameters->getRenderable()->getRenderTransform().getMatrix(mModelMatrix);
-			Math::mul(mMVMatrix,parameters->getCamera()->getViewMatrix(),mModelMatrix);
-			memcpy(data,mMVMatrix.getData(),sizeof(Matrix4x4));
-		}
+		Math::mul(mMVMatrix,parameters->getCamera()->getViewMatrix(),parameters->getModelMatrix());
+		memcpy(data,mMVMatrix.getData(),sizeof(Matrix4x4));
 	}
 
 protected:
@@ -108,10 +101,7 @@ public:
 	int getFormat(){return VariableBufferFormat::Format_TYPE_FLOAT_32|VariableBufferFormat::Format_COUNT_4X4;}
 
 	void update(tbyte *data,SceneParameters *parameters){
-		if(parameters->getRenderable()!=NULL){
-			parameters->getRenderable()->getRenderTransform().getMatrix(mModelMatrix);
-			memcpy(data,mModelMatrix.getData(),sizeof(Matrix4x4));
-		}
+		memcpy(data,parameters->getModelMatrix().getData(),sizeof(Matrix4x4));
 	}
 
 protected:
@@ -147,14 +137,11 @@ public:
 	int getFormat(){return VariableBufferFormat::Format_TYPE_FLOAT_32|VariableBufferFormat::Format_COUNT_4X4;}
 
 	void update(tbyte *data,SceneParameters *parameters){
-		if(parameters->getRenderable()!=NULL){
-			parameters->getRenderable()->getRenderTransform().getMatrix(mModelMatrix);
-			Math::mul(mNormalMatrix,parameters->getCamera()->getViewMatrix(),mModelMatrix);
-			Math::zeroTranslateSheer(mNormalMatrix);
-			Math::invert(mInverseMatrix,mNormalMatrix);
-			Math::transpose(mNormalMatrix,mInverseMatrix);
-			memcpy(data,mNormalMatrix.getData(),sizeof(Matrix4x4));
-		}
+		Math::mul(mNormalMatrix,parameters->getCamera()->getViewMatrix(),parameters->getModelMatrix());
+		Math::zeroTranslateSheer(mNormalMatrix);
+		Math::invert(mInverseMatrix,mNormalMatrix);
+		Math::transpose(mNormalMatrix,mInverseMatrix);
+		memcpy(data,mNormalMatrix.getData(),sizeof(Matrix4x4));
 	}
 
 protected:
@@ -167,7 +154,7 @@ public:
 
 	void update(tbyte *data,SceneParameters *parameters){
 		Vector4 &cameraPosition=*(Vector4*)data;
-		cameraPosition=Vector4(parameters->getCamera()->getWorldTranslate(),0);
+		cameraPosition=Vector4(parameters->getCamera()->getPosition(),0);
 	}
 };
 
@@ -178,10 +165,8 @@ public:
 	void update(tbyte *data,SceneParameters *parameters){
 		// This Vector4 isn't aligned, so we don't multiply directly into it.
 		Vector4 &finalLightPosition=*(Vector4*)data;
-		if(parameters->getRenderable()!=NULL){
-			Vector4 lightPosition(parameters->getLightState().direction,0);
-			finalLightPosition=lightPosition;
-		}
+		Vector4 lightPosition(parameters->getLightState().direction,0);
+		finalLightPosition=lightPosition;
 	}
 };
 
@@ -192,11 +177,9 @@ public:
 	void update(tbyte *data,SceneParameters *parameters){
 		// This Vector4 isn't aligned, so we don't multiply directly into it.
 		Vector4 &finalLightPosition=*(Vector4*)data;
-		if(parameters->getRenderable()!=NULL){
-			Vector4 lightPosition(parameters->getLightState().direction,0);
-			Math::mul(lightPosition,parameters->getCamera()->getViewMatrix());
-			finalLightPosition=lightPosition;
-		}
+		Vector4 lightPosition(parameters->getLightState().direction,0);
+		Math::mul(lightPosition,parameters->getCamera()->getViewMatrix());
+		finalLightPosition=lightPosition;
 	}
 };
 

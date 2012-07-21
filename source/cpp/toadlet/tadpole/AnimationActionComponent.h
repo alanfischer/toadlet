@@ -27,7 +27,8 @@
 #define TOADLET_TADPOLE_ANIMATIONACTIONCOMPONENT_H
 
 #include <toadlet/egg/Collection.h>
-#include <toadlet/tadpole/BaseActionComponent.h>
+#include <toadlet/tadpole/Action.h>
+#include <toadlet/tadpole/BaseComponent.h>
 #include <toadlet/tadpole/animation/Animation.h>
 #include <toadlet/tadpole/animation/Interpolator.h>
 #include <toadlet/tadpole/animation/CosInterpolator.h>
@@ -35,9 +36,9 @@
 namespace toadlet{
 namespace tadpole{
 
-class TOADLET_API AnimationActionComponent:public BaseActionComponent,public AnimationListener{
+class TOADLET_API AnimationActionComponent:public BaseComponent,public Action,public AnimationListener{
 public:
-	TOADLET_INTERFACE(AnimationActionComponent);
+	TOADLET_OBJECT(AnimationActionComponent);
 
 	enum Cycling{
 		Cycling_NONE,
@@ -48,7 +49,11 @@ public:
 	AnimationActionComponent(const String &name);
 	virtual ~AnimationActionComponent();
 
+	virtual bool parentChanged(Node *node);
+	
 	virtual void frameUpdate(int dt,int scope);
+
+	virtual const String &getName() const{return BaseComponent::getName();}
 
 	virtual bool getActive() const{return mRunning;}
 
@@ -71,6 +76,9 @@ public:
 	inline scalar getMinValue() const{return mMinValue;}
 	inline scalar getMaxValue() const{return mMaxValue;}
 
+	virtual void setActionListener(ActionListener *listener){mListener=listener;}
+	virtual ActionListener *getActionListener(){return mListener;}
+
 	virtual void start();
 	virtual void stop();
 
@@ -84,7 +92,7 @@ public:
 protected:
 	Collection<Animation::ptr> mAnimations;
 
-	Node *mNode;
+	ActionListener *mListener;
 	int mTime;
 	scalar mMinValue;
 	scalar mMaxValue;

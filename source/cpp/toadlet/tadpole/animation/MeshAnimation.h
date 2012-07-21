@@ -28,7 +28,7 @@
 
 #include <toadlet/egg/Object.h>
 #include <toadlet/tadpole/animation/BaseAnimation.h>
-#include <toadlet/tadpole/node/MeshNode.h>
+#include <toadlet/tadpole/MeshComponent.h>
 
 namespace toadlet{
 namespace tadpole{
@@ -41,11 +41,11 @@ class TOADLET_API MeshAnimation:public BaseAnimation{
 public:
 	TOADLET_OBJECT(MeshAnimation);
 
-	MeshAnimation(MeshNode *target,int sequenceIndex);
+	MeshAnimation(MeshComponent *target,int sequenceIndex);
 	virtual ~MeshAnimation();
 
-	void setTarget(MeshNode *target);
-	inline MeshNode *getTarget() const{return mTarget;}
+	void setTarget(MeshComponent *target);
+	inline MeshComponent *getTarget() const{return mTarget;}
 
 	void setSequenceIndex(int sequenceIndex);
 	inline int getSequenceIndex() const{return mSequenceIndex;}
@@ -59,7 +59,7 @@ public:
 	scalar getWeight() const{return Math::ONE;}
 
 protected:
-	MeshNode::ptr mTarget;
+	MeshComponent::ptr mTarget;
 	int mSequenceIndex;
 	scalar mValue;
 };

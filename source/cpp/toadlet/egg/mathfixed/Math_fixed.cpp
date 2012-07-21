@@ -905,6 +905,29 @@ bool Math::testIntersection(const Sphere &sphere,const AABox &box){
 	return d<=square(sphere.radius);
 }
 
+bool Math::testIntersection(const Sphere &sphere,const Plane *planes,int numPlanes){
+	if(sphere.radius<0) return true;
+	scalar distance=0;
+	int i;
+	for(i=0;i<numPlanes;++i){
+		distance=Math::dot(planes[i].normal,sphere.origin)+planes[i].distance;
+		if(distance<-sphere.radius){
+			return false;
+		}
+	}
+	return true;
+}
+
+bool Math::testIntersection(const AABox &box,const Plane *planes,int numPlanes){
+	int i;
+	for(i=0;i<numPlanes;i++){
+		if(box.findPVertexLength(planes[i])<0){
+			return false;
+		}
+	}
+	return true;
+}
+
 fixed Math::findIntersection(const Segment &segment,const Plane &plane,Vector3 &point,Vector3 &normal){
 	fixed d=dot(plane.normal,segment.direction);
 	if(d!=0){

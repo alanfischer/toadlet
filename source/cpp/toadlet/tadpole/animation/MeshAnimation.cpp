@@ -31,7 +31,7 @@ namespace toadlet{
 namespace tadpole{
 namespace animation{
 
-MeshAnimation::MeshAnimation(MeshNode *target,int sequenceIndex):
+MeshAnimation::MeshAnimation(MeshComponent *target,int sequenceIndex):
 	mTarget(target),
 	mSequenceIndex(sequenceIndex),
 	mValue(0)
@@ -40,7 +40,7 @@ MeshAnimation::MeshAnimation(MeshNode *target,int sequenceIndex):
 MeshAnimation::~MeshAnimation(){
 }
 
-void MeshAnimation::setTarget(MeshNode *target){
+void MeshAnimation::setTarget(MeshComponent *target){
 	mTarget=target;
 
 	if(mListener!=NULL){

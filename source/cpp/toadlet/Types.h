@@ -135,9 +135,6 @@
 	#else
 		#define TOADLET_API
 	#endif
-	#if defined(TOADLET_PLATFORM_IOS)
-		#define TOADLET_GCC_INHERITANCE_BUG
-	#endif
 	namespace toadlet{
 		typedef wchar_t wchar;
 		template<typename T> struct alignment_trick{char c; T member;};

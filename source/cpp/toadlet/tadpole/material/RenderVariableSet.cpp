@@ -51,7 +51,7 @@ void RenderVariableSet::destroy(){
 	mBuffers.clear();
 }
 
-bool RenderVariableSet::addBuffer(Shader::ShaderType shaderType,int index,VariableBuffer::ptr buffer){
+bool RenderVariableSet::addBuffer(Shader::ShaderType shaderType,int index,VariableBuffer *buffer){
 	BufferInfo set;
 	set.buffer=buffer;
 	set.scope=0;
@@ -62,7 +62,7 @@ bool RenderVariableSet::addBuffer(Shader::ShaderType shaderType,int index,Variab
 	return true;
 }
 
-void RenderVariableSet::removeBuffer(VariableBuffer::ptr buffer){
+void RenderVariableSet::removeBuffer(VariableBuffer *buffer){
 	int i;
 	for(i=0;i<mBuffers.size();++i){
 		if(mBuffers[i].buffer==buffer){
@@ -86,6 +86,8 @@ bool RenderVariableSet::addTexture(const String &name,Texture *texture,const Str
 			return false;
 		}
 
+		mRenderPass->setTextureLocationName(type,formatVariable->getResourceIndex(),name);
+
 		/// @todo: Set the sampler by name also
 		mRenderPass->setTexture(type,formatVariable->getResourceIndex(),texture,samplerState,textureState);
 	}
@@ -96,6 +98,14 @@ bool RenderVariableSet::addTexture(const String &name,Texture *texture,const Str
 			return false;
 		}
 
+		int i;
+		for(i=0;i<mUnassignedResources.size();++i){
+			if(mUnassignedResources[i].name==name){
+				mUnassignedResources.removeAt(i);
+				break;
+			}
+		}
+
 		ResourceInfo r;
 		r.name=name;
 		r.texture=texture;
@@ -103,6 +113,7 @@ bool RenderVariableSet::addTexture(const String &name,Texture *texture,const Str
 		r.samperState=samplerState;
 		r.textureState=textureState;
 		mUnassignedResources.add(r);
+
 		Logger::alert("Adding unassigned texture");
 	}
 

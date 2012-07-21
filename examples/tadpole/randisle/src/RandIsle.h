@@ -2,8 +2,6 @@
 #define RANDISLE_H
 
 #include <toadlet/toadlet.h>
-#include <toadlet/tadpole/plugins/hop/HopScene.h>
-#include <toadlet/tadpole/plugins/hop/HopEntity.h>
 #include "PathSystem.h"
 #include "PathClimber.h"
 #include "SmoothFollower.h"
@@ -52,11 +50,11 @@ public:
 	void mouseScrolled(int x,int y,int scroll){}
 	void inputDetected(const InputData &data);
 
-	void playerJump(PathClimber *climber);
-	void playerMove(PathClimber *climber,scalar dr,scalar ds);
+	void playerJump(Node *player);
+	void playerMove(Node *player,scalar dr,scalar ds);
 
-	float findPathSequence(egg::Collection<int> &sequence,PathClimber *player,PathSystem::Path *path,int direction,scalar time);
-	float findPathSequence(egg::Collection<int> &sequence,PathClimber *player,const Vector3 &forward,PathSystem::Path *previous,PathSystem::Path *path,int direction,scalar time,bool first);
+	float findPathSequence(egg::Collection<int> &sequence,PathClimber *climber,PathSystem::Path *path,int direction,scalar time);
+	float findPathSequence(egg::Collection<int> &sequence,PathClimber *climber,const Vector3 &forward,PathSystem::Path *previous,PathSystem::Path *path,int direction,scalar time,bool first);
 	void updateDanger(int dt);
 	void updateClimber(PathClimber *climber,int dt);
 	void updatePredictedPath(PathClimber *climber,int dt);
@@ -69,8 +67,8 @@ public:
 
 	bool updatePopulatePatches();
 	void terrainUpdated(int oldX,int oldY,int newX,int newY){}
-	void terrainPatchCreated(int x,int y,const Bound &bound);
-	void terrainPatchDestroyed(int x,int y,const Bound &bound);
+	void terrainPatchCreated(int x,int y,Bound *bound);
+	void terrainPatchDestroyed(int x,int y,Bound *bound);
 
 	int getPatchSize(){return mPatchSize;}
 	const Vector3 &getPatchScale(){return mPatchScale;}
@@ -78,38 +76,35 @@ public:
 	bool getPatchLayerData(tbyte *data,int px,int py);
 	scalar terrainValue(float tx,float ty);
 	scalar pathValue(float ty);
-	Material::ptr getMaterial(TerrainPatchNode *patch);
 
 	RenderPath::ptr chooseBestPath(Material *material);
 
 protected:
 	class PopulatePatch{
 	public:
-		PopulatePatch():px(0),py(0),dx(0),dy(0),y(-1)
-		{}
+		PopulatePatch():px(0),py(0),dx(0),dy(0),y(-1){}
 
-		PopulatePatch(int px,int py,int dx,int dy,const Bound &bound):y(-1){
+		PopulatePatch(int px,int py,int dx,int dy,Bound *bound):y(-1){
 			this->px=px,this->py=py;
 			this->dx=dx,this->dy=dy;
-			this->bound.set(bound);
+			this->bound=bound;
 		}
 
 		int px,py;
 		int dx,dy;
-		Bound bound;
+		Bound::ptr bound;
 		int y;
 	};
 
 	Application *mApp;
 	String mPath;
 	Engine::ptr mEngine;
-	HopScene::ptr mScene;
+	Scene::ptr mScene;
 	TerrainNode::ptr mTerrain;
 	SmoothFollower::ptr mFollower;
 	Node::ptr mFollowNode;
-	CameraNode::ptr mCamera,mReflectCamera,mRefractCamera;
-	HopEntity::ptr mPlayer;
-	PathClimber::ptr mClimber;
+	Camera::ptr mCamera,mReflectCamera,mRefractCamera;
+	Node::ptr mPlayer;
 	int mMouseButtons;
 	scalar mXJoy,mYJoy;
 	egg::Collection<int> mPathSequence;
@@ -126,7 +121,7 @@ protected:
 	Sky::ptr mSky;
 	AudioComponent::ptr mRustleSound;
 
-	IntrusivePointer<HUD> mHUD;
+//	IntrusivePointer<HUD> mHUD;
 };
 
 #endif

@@ -68,7 +68,7 @@ void RenderableSet::endQueuing(){
 void RenderableSet::queueRenderable(Renderable *renderable){
 	Material *material=renderable->getRenderMaterial();
 	const Transform &transform=renderable->getRenderTransform();
-	const Bound &bound=renderable->getRenderBound();
+	Bound *bound=renderable->getRenderBound();
 
 	/// @todo: Add a flag to skip this, for shadow calculations
 	Vector4 ambient;
@@ -102,7 +102,7 @@ void RenderableSet::queueRenderable(Renderable *renderable){
 		}
 
 		/// @todo: Real sorting algorithm, clean this up
-		scalar depth=Math::lengthSquared(bound.getSphere().origin,mCamera->getWorldTranslate());
+		scalar depth=Math::lengthSquared(bound->getSphere().origin,mCamera->getPosition());
 		RenderableQueue &queue=mRenderableQueues[queueIndex];
 		int numRenderables=queue.size();
 		int i;
@@ -140,8 +140,8 @@ void RenderableSet::queueRenderable(Renderable *renderable){
 	}
 }
 
-void RenderableSet::queueLight(node::LightNode *light){
-	scalar depth=Math::lengthSquared(light->getWorldTranslate(),mCamera->getWorldTranslate());
+void RenderableSet::queueLight(LightComponent *light){
+	scalar depth=Math::lengthSquared(light->getParent()->getWorldTranslate(),mCamera->getPosition());
 
 	int numLights=mLightQueue.size();
 	int i;

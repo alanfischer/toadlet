@@ -39,15 +39,15 @@ public:
 
 	BoundingVolumeSensor(Scene *scene);
 
-	void setBound(const Bound &bound){mBound.set(bound);}
-	void setSphere(const Sphere &sphere){mBound.set(sphere);}
-	void setBox(const AABox &box){mBound.set(box);}
+	void setBound(Bound *bound){mBound->set(bound);}
+	void setSphere(const Sphere &sphere){mBound->set(sphere);}
+	void setBox(const AABox &box){mBound->set(box);}
 
 	virtual bool sense(SensorResultsListener *results);
 	SensorResults::ptr sense(){return Sensor::sense();}
 
 protected:
-	Bound mBound;
+	Bound::ptr mBound;
 };
 
 }

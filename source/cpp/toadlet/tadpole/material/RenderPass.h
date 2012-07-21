@@ -39,11 +39,11 @@ class MaterialManager;
 
 namespace material{
 
-class TOADLET_API RenderPass{
+class TOADLET_API RenderPass:public Object{
 public:
-	TOADLET_SPTR(RenderPass);
+	TOADLET_OBJECT(RenderPass);
 
-	RenderPass(MaterialManager *manager,RenderState::ptr renderState=RenderState::ptr(),ShaderState::ptr shaderState=ShaderState::ptr());
+	RenderPass(MaterialManager *manager,RenderState *renderState=NULL,ShaderState *shaderState=NULL);
 	virtual ~RenderPass();
 
 	void destroy();
@@ -75,20 +75,27 @@ public:
 	void setTextureState(Shader::ShaderType type,int i,const TextureState &state){mRenderState->setTextureState(type,i,state);}
 	bool getTextureState(Shader::ShaderType type,int i,TextureState &state){return mRenderState->getTextureState(type,i,state);}
 
-	void setShader(Shader::ShaderType type,Shader::ptr shader);
-	Shader::ptr getShader(Shader::ShaderType type){return mShaderState->getShader(type);}
+	void setShader(Shader::ShaderType type,Shader *shader);
+	Shader *getShader(Shader::ShaderType type){return mShaderState->getShader(type);}
 
 	int getNumTextures(Shader::ShaderType type=Shader::ShaderType_FRAGMENT) const{return mTextures[type].size();}
-	inline void setTexture(Texture::ptr texture,const SamplerState &samplerState,const TextureState &textureState){setTexture(Shader::ShaderType_FRAGMENT,0,texture,samplerState,textureState);}
-	void setTexture(Shader::ShaderType type,int i,Texture::ptr texture,const SamplerState &samplerState,const TextureState &textureState);
-	Texture::ptr getTexture(Shader::ShaderType type=Shader::ShaderType_FRAGMENT,int i=0) const{return i<mTextures[type].size()?mTextures[type][i]:NULL;}
+	void setTexture(const String &name,Texture *texture,const String &samplerName,const SamplerState &samplerState,const TextureState &textureState);
+	void setTexture(Shader::ShaderType type,int i,Texture *texture,const SamplerState &samplerState,const TextureState &textureState);
+	Texture *getTexture(Shader::ShaderType type=Shader::ShaderType_FRAGMENT,int i=0) const{return i<mTextures[type].size()?mTextures[type][i]:NULL;}
 
-	inline RenderState::ptr getRenderState() const{return mRenderState;}
-	inline ShaderState::ptr getShaderState() const{return mShaderState;}
+	inline RenderState *getRenderState() const{return mRenderState;}
+	inline ShaderState *getShaderState() const{return mShaderState;}
 
+	void setModelMatrixFlags(int flags){mModelMatrixFlags=flags;}
+	int getModelMatrixFlags() const{return mModelMatrixFlags;}
+
+	// Shader
 	RenderVariableSet::ptr makeVariables();
 	inline RenderVariableSet::ptr getVariables() const{return mVariables;}
 	void updateVariables(int scope,SceneParameters *parameters);
+
+	// Fixed
+	void setTextureLocationName(Shader::ShaderType type,int i,const String &name);
 
 	bool isDepthSorted() const;
 
@@ -100,7 +107,11 @@ protected:
 	RenderState::ptr mRenderState,mOwnRenderState;
 	ShaderState::ptr mShaderState,mOwnShaderState;
 	Collection<Texture::ptr> mTextures[Shader::ShaderType_MAX];
+	int mModelMatrixFlags;
+
 	RenderVariableSet::ptr mVariables;
+
+	Collection<String> mTextureLocationNames[Shader::ShaderType_MAX];
 };
 
 }

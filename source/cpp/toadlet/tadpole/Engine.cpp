@@ -76,12 +76,6 @@
 #include <toadlet/tadpole/TextureManager.h>
 #include <toadlet/tadpole/Version.h>
 
-#include <toadlet/tadpole/node/LabelNode.h>
-#include <toadlet/tadpole/node/LightNode.h>
-#include <toadlet/tadpole/node/MeshNode.h>
-#include <toadlet/tadpole/node/ParticleNode.h>
-#include <toadlet/tadpole/node/SpriteNode.h>
-
 #include <toadlet/tadpole/plugins/AABoxMeshCreator.h>
 #include <toadlet/tadpole/plugins/SkyBoxMeshCreator.h>
 #include <toadlet/tadpole/plugins/SkyDomeMeshCreator.h>
@@ -150,9 +144,6 @@
 
 #if !defined(TOADLET_FIXED_POINT)
 	#include <toadlet/tadpole/plugins/SPRStreamer.h>
-	#include <toadlet/tadpole/bsp/BSP30Node.h>
-	#include <toadlet/tadpole/studio/StudioModelNode.h>
-	#include <toadlet/tadpole/studio/SpriteModelNode.h>
 #endif
 
 namespace toadlet{
@@ -214,22 +205,6 @@ Engine::Engine(void *env,void *ctx)://bool fixedBackable,bool shaderBackable):
 
 	// Create initial BackableVertexFormats.  This doesn't need to be done, but without it, starting an application without a RenderDevice will crash.
 	updateVertexFormats();
-
-	registerNodeType(CameraNode::type());
-	registerNodeType(LabelNode::type());
-	registerNodeType(LightNode::type());
-	registerNodeType(MeshNode::type());
-	registerNodeType(Node::type());
-	registerNodeType(ParticleNode::type());
-	registerNodeType(SpriteNode::type());
-
-	// Plugin types, should be removed from here somehow
-	#if !defined(TOADLET_FIXED_POINT)
-		registerNodeType(bsp::BSP30Node::type());
-		registerNodeType(bsp::BSP30ModelNode::type());
-		registerNodeType(studio::StudioModelNode::type());
-		registerNodeType(studio::SpriteModelNode::type());
-	#endif
 }
 
 Engine::~Engine(){
@@ -498,36 +473,6 @@ bool Engine::setAudioDevice(AudioDevice *audioDevice){
 
 AudioDevice *Engine::getAudioDevice() const{
 	return mAudioDevice;
-}
-
-void Engine::registerNodeType(BaseType<Node> *type){
-	mNodeFactory.registerType(type);
-}
-
-Node *Engine::createNode(BaseType<Node> *type,Scene *scene){
-	Node *node=NULL;
-	TOADLET_TRY
-		node=type->newInstance();
-	TOADLET_CATCH(const Exception &){node=NULL;}
-	if(node!=NULL){
-		if(scene!=NULL){
-			node->create(scene);
-		}
-	}
-	return node;
-}
-
-Node *Engine::createNode(const String &fullName,Scene *scene){
-	Node *node=NULL;
-	TOADLET_TRY
-		node=mNodeFactory.newInstance(fullName);
-	TOADLET_CATCH(const Exception &){node=NULL;}
-	if(node!=NULL){
-		if(scene!=NULL){
-			node->create(scene);
-		}
-	}
-	return node;
 }
 
 void Engine::nodeCreated(Node *node){

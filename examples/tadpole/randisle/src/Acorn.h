@@ -6,23 +6,15 @@
 
 class Acorn:public Node{
 public:
-	TOADLET_NODE(Acorn,Node);
-	
-	Acorn():super(),
+	Acorn(Scene *scene):Node(scene),
 		mFadeTime(0)
-	{}
-	
-	Node *create(Scene *scene){
-		super::create(scene);
-
+	{
 		setScope(RandIsle::Scope_ACORN);
 
-		SpriteNode::ptr sprite=mEngine->createNodeType(SpriteNode::type(),mScene);
+		SpriteComponent::ptr sprite=new SpriteComponent(mEngine);
 		sprite->setMaterial(Resources::instance->acorn);
-		sprite->setScale(10);
+	//	sprite->setScale(10);
 		attach(sprite);
-
-		return this;
 	}
 
 	bool fading(){return mFadeTime>0;}
@@ -35,7 +27,7 @@ public:
 	}
 
 	void logicUpdate(int dt,int scope){
-		super::logicUpdate(dt,scope);
+		Node::logicUpdate(dt,scope);
 
 		if(mFadeTime>0){
 			scalar size=Math::ONE-Math::fromMilli(mScene->getLogicTime()-mFadeTime)*4;

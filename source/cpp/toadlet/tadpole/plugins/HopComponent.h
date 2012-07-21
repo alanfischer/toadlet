@@ -26,19 +26,60 @@
 #ifndef TOADLET_TADPOLE_HOPCOMPONENT_H
 #define TOADLET_TADPOLE_HOPCOMPONENT_H
 
-#include <toadlet/tadpole/Component.h>
+#include <toadlet/tadpole/PhysicsComponent.h>
+#include <toadlet/tadpole/BaseComponent.h>
+#include "HopManager.h"
 
 namespace toadlet{
 namespace tadpole{
 
-class TOADLET_API HopComponent:public Component{
+class TOADLET_API HopComponent:public BaseComponent,public PhysicsComponent{
 public:
-	TOADLET_OBJECT(HopComponent);
+	TOADLET_COMPONENT(HopComponent,PhysicsComponent);
+
+	HopComponent(HopManager *manager);
+
+	void destroy();
 
 	bool parentChanged(Node *node);
 
-	void setVelocity(const Vector3 &velocitgy);
-	const Vector3 &getVelocity() const;
+	void setPosition(const Vector3 &position);
+	const Vector3 &getPosition() const{return mSolid->getPosition();}
+
+	void setVelocity(const Vector3 &velocity){mSolid->setVelocity(velocity);}
+	const Vector3 &getVelocity() const{return mSolid->getVelocity();}
+
+	void setGravity(scalar gravity){mSolid->setCoefficientOfGravity(gravity);}
+	scalar getGravity() const{return mSolid->getCoefficientOfGravity();}
+
+	void setBound(Bound *bound);
+
+	void addShape(Shape *shape);
+	void removeShape(Shape *shape);
+
+	void transformChanged();
+
+	void logicUpdate(int dt,int scope){}
+	void frameUpdate(int dt,int scope){}
+
+	bool getActive() const{return mSolid->active();}
+	Bound *getBound() const{return mBound;}
+
+	inline Solid *getSolid(){return mSolid;}
+
+protected:
+	friend class HopManager;
+
+	void preSimulate();
+	void postSimulate();
+	void updatePosition(const Vector3 &position);
+	void lerpPosition(scalar fraction);
+
+	HopManager *mManager;
+	Solid::ptr mSolid;
+	Vector3 mOldPosition,mNewPosition,mCurrentPosition;
+	bool mSkipNextPreSimulate;
+	Bound::ptr mBound;
 };
 
 }

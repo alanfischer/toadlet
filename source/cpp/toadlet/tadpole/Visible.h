@@ -31,18 +31,18 @@
 
 namespace toadlet{
 namespace tadpole{
-namespace node{class CameraNode;}
 
 class RenderableSet;
+class Camera;
 
-class Visible{
+class Visible/*:public Interface*/{
 public:
 	virtual ~Visible(){}
 
 	virtual bool getRendered() const=0;
 	virtual void setRendered(bool visible)=0;
 	virtual RenderState::ptr getSharedRenderState()=0;
-	virtual void gatherRenderables(CameraNode *camera,RenderableSet *set)=0;
+	virtual void gatherRenderables(Camera *camera,RenderableSet *set)=0;
 };
 
 }

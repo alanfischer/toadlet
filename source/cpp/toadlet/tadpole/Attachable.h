@@ -32,7 +32,7 @@
 namespace toadlet{
 namespace tadpole{
 
-class Attachable{
+class Attachable/*:public Interface*/{
 public:
 	virtual ~Attachable(){}
 

@@ -29,20 +29,9 @@
 namespace toadlet{
 namespace tadpole{
 
-BaseComponent::BaseComponent():
-	mParent(NULL)
-{
-}
-
-BaseComponent::BaseComponent(const String &name):
-	mParent(NULL)
-{
-	mName=name;
-}
-
 void BaseComponent::destroy(){
 	if(mParent!=NULL){
-		mParent->remove(this);
+		mParent->remove(componentThis());
 	}
 }
 

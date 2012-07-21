@@ -27,7 +27,6 @@
 #include <toadlet/peeper/RenderCaps.h>
 #include <toadlet/tadpole/Engine.h>
 #include <toadlet/tadpole/Scene.h>
-#include <toadlet/tadpole/RenderListener.h>
 #include "SimpleRenderManager.h"
 
 namespace toadlet{
@@ -43,14 +42,14 @@ SimpleRenderManager::SimpleRenderManager(Scene *scene):
 	mLastShaderState(NULL)
 {
 	mRenderableSet=RenderableSet::ptr(new RenderableSet(scene));
-	mSceneParameters=SceneParameters::ptr(new SceneParameters());
+	mSceneParameters=new SceneParameters();
 	mSceneParameters->setScene(scene);
 }
 
 SimpleRenderManager::~SimpleRenderManager(){
 }
 
-void SimpleRenderManager::renderScene(RenderDevice *device,Node *node,CameraNode *camera){
+void SimpleRenderManager::renderScene(RenderDevice *device,Node *node,Camera *camera){
 	mDevice=device;
 	mSceneParameters->setCamera(camera);
 
@@ -95,13 +94,48 @@ void SimpleRenderManager::setupPass(RenderPass *pass){
 void SimpleRenderManager::setupPassForRenderable(RenderPass *pass,Renderable *renderable,const Vector4 &ambient){
 	Matrix4x4 matrix;
 	renderable->getRenderTransform().getMatrix(matrix);
+	Camera *camera=mSceneParameters->getCamera();
+
+	// This should exist as a RenderVariable, but to support fixed devices it is calculated here
+	int flags=pass->getModelMatrixFlags();
+	if(flags!=0){
+		Vector3 translate;
+		Quaternion rotate;
+		Vector3 scale;
+		Math::setTranslateFromMatrix4x4(translate,matrix);
+		Math::setQuaternionFromMatrix4x4(rotate,matrix);
+		Math::setScaleFromMatrix4x4(scale,matrix);
+
+		if((flags&Material::MatrixFlag_CAMERA_ALIGNED)!=0){
+			if(mSceneParameters->getCamera()->getAlignmentCalculationsUseOrigin()){
+				Matrix4x4 lookAtCamera;
+				Math::setMatrix4x4FromLookAt(lookAtCamera,camera->getPosition(),translate,Math::Z_UNIT_VECTOR3,false);
+				Math::setQuaternionFromMatrix4x4(rotate,lookAtCamera);
+			}
+			else{
+				Math::setQuaternionFromMatrix4x4(rotate,camera->getViewMatrix());
+			}
+			Math::invert(rotate);
+		}
+
+		if((flags&Material::MatrixFlag_NO_PERSPECTIVE)!=0){
+			Vector4 point;
+			point.set(translate,Math::ONE);
+			Math::mul(point,camera->getViewMatrix());
+			Math::mul(point,camera->getProjectionMatrix());
+			Math::mul(scale,point.w);
+		}
+
+		Math::setMatrix4x4FromTranslateRotateScale(matrix,translate,rotate,scale);
+	}
 
 	// Fixed states
-	mDevice->setAmbientColor(ambient);
 	mDevice->setMatrix(RenderDevice::MatrixType_MODEL,matrix);
+	mDevice->setAmbientColor(ambient);
 
 	// Shader states
 	if(pass!=NULL){
+		mSceneParameters->setModelMatrix(matrix);
 		mSceneParameters->setRenderable(renderable);
 		mSceneParameters->setAmbient(ambient);
 
@@ -112,13 +146,7 @@ void SimpleRenderManager::setupPassForRenderable(RenderPass *pass,Renderable *re
 	}
 }
 
-void SimpleRenderManager::gatherRenderables(RenderableSet *set,Node *node,CameraNode *camera){
-	RenderListener *listener=mScene->getRenderListener();
-
-	if(listener!=NULL){
-		listener->preGatherRenderables(set,node,camera);
-	}
-
+void SimpleRenderManager::gatherRenderables(RenderableSet *set,Node *node,Camera *camera){
 	set->setCamera(camera);
 
 	set->startQueuing();
@@ -127,19 +155,9 @@ void SimpleRenderManager::gatherRenderables(RenderableSet *set,Node *node,Camera
 	}
 	node->gatherRenderables(camera,set);
 	set->endQueuing();
-
-	if(listener!=NULL){
-		listener->postGatherRenderables(set,node,camera);
-	}
 }
 
-void SimpleRenderManager::renderRenderables(RenderableSet *set,RenderDevice *device,CameraNode *camera,bool useMaterials){
-	RenderListener *listener=mScene->getRenderListener();
-
-	if(listener!=NULL){
-		listener->preRenderRenderables(set,device,camera);
-	}
-
+void SimpleRenderManager::renderRenderables(RenderableSet *set,RenderDevice *device,Camera *camera,bool useMaterials){
 	int clearFlags=camera->getClearFlags();
 	if(clearFlags!=0 && !camera->getSkipFirstClear()){
 		device->clear(clearFlags,camera->getClearColor());
@@ -190,8 +208,9 @@ void SimpleRenderManager::renderRenderables(RenderableSet *set,RenderDevice *dev
 		depthIndex++;
 	}
 
-	if(listener!=NULL){
-		listener->postRenderRenderables(set,device,camera);
+	if(useMaterials){
+		// This seems redundant, but it solves some issues with fixed function materials
+		device->setDefaultState();
 	}
 }
 
@@ -232,7 +251,7 @@ void SimpleRenderManager::renderQueueItems(Material *material,const RenderableSe
 	}
 }
 
-void SimpleRenderManager::setupViewport(CameraNode *camera,RenderDevice *device){
+void SimpleRenderManager::setupViewport(Camera *camera,RenderDevice *device){
 	Viewport viewport=camera->getViewport();
 	if(viewport.x==0 && viewport.y==0 && viewport.width==0 && viewport.height==0){
 		viewport.width=device->getRenderTarget()->getWidth();
@@ -245,7 +264,7 @@ void SimpleRenderManager::setupViewport(CameraNode *camera,RenderDevice *device)
 /// @todo: Clean this up to handle multiple lights in shader passes
 void SimpleRenderManager::setupLights(const RenderableSet::LightQueue &lightQueue,RenderDevice *device){
 	if(lightQueue.size()>0){
-		LightNode *light=lightQueue[0].light;
+		LightComponent *light=lightQueue[0].light;
 
 		LightState state;
 		light->getLightState(state);
@@ -256,7 +275,7 @@ void SimpleRenderManager::setupLights(const RenderableSet::LightQueue &lightQueu
 	int maxLights=mScene->getEngine()->getRenderCaps().maxLights;
 	for(i=0;i<maxLights;++i){
 		if(i<lightQueue.size()){
-			LightNode *light=lightQueue[i].light;
+			LightComponent *light=lightQueue[i].light;
 
 			LightState state;
 			light->getLightState(state);

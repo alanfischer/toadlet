@@ -49,10 +49,6 @@ VertexData::~VertexData(){
 }
 
 void VertexData::destroy(){
-	int i;
-	for(i=0;i<vertexBuffers.size();++i){
-		vertexBuffers[i]->destroy();
-	}
 	vertexBuffers.clear();
 }
 
