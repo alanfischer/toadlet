@@ -8,8 +8,6 @@
 
 class Tree:public Node,public PathSystem,public BranchSystem::BranchListener{
 public:
-	TOADLET_NODE(Tree,Node);
-
 	class TreeBranch:public BranchSystem::Branch,public PathSystem::Path{
 	public:
 		TOADLET_SPTR(TreeBranch);
@@ -102,13 +100,14 @@ public:
 		scalar wiggleOffset;
 	};
 
-	Tree();
-
-	node::Node *create(Scene *scene,int seed,Node *parent,const Vector3 &translate);
+	Tree(Scene *scene,int seed,Node *parent,const Vector3 &translate);
+	virtual ~Tree(){destroy();}
 	void destroy();
 
+	void logicUpdate(int dt,int scope){
+		Node::logicUpdate(dt,scope);
+	}
 	void frameUpdate(int dt,int scope);
-	void gatherRenderables(CameraNode *camera,RenderableSet *set);
 
 	BranchSystem::Branch::ptr branchCreated(BranchSystem::Branch *parent);
 	void branchDestroyed(BranchSystem::Branch *branch);
@@ -119,11 +118,13 @@ public:
 	void mergeBounds(TreeBranch *branch);
 	bool wiggleLeaves(const Sphere &bound,TreeBranch *branch=NULL);
 
+	void gatherRenderables(Camera *camera,RenderableSet *set);
+
 	PathSystem::Path *getClosestPath(Vector3 &closestPoint,const Vector3 &point);
 	PathSystem::Path *getClosestPath(Vector3 &closestPoint,const Sphere &bound,TreeBranch *path);
 
-	inline MeshNode::ptr getMeshNode(){return mMeshNode;}
-	inline MeshNode::ptr getLowMeshNode(){return mLowMeshNode;}
+	inline MeshComponent *getMesh(){return mMesh;}
+	inline MeshComponent *getLowMesh(){return mLowMesh;}
 
 	VertexBufferAccessor bvba,lvba;
 	IndexBufferAccessor biba,lbiba,liba;
@@ -168,8 +169,8 @@ protected:
 
 	int mLowMod;
 	scalar mLowDistance;
-	MeshNode::ptr mMeshNode;
-	MeshNode::ptr mLowMeshNode;
+	MeshComponent::ptr mMesh;
+	MeshComponent::ptr mLowMesh;
 };
 
 #endif

@@ -105,9 +105,9 @@ Mesh::ptr SkyBoxMeshCreator::createSkyBoxMesh(scalar size,bool unfolded,bool inv
 		vba.unlock();
 	}
 
-	Mesh::ptr mesh(new Mesh());
+	Mesh::ptr mesh=new Mesh();
 	mesh->setStaticVertexData(VertexData::ptr(new VertexData(vertexBuffer)));
-	mesh->setBound(Bound(AABox(-size,-size,-size,size,size,size)));
+	mesh->setBound(new Bound(AABox(-size,-size,-size,size,size,size)));
 
 	if(unfolded){
 		mesh->addSubMesh(Mesh::SubMesh::ptr(new Mesh::SubMesh()));

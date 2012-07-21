@@ -47,10 +47,7 @@ IndexData::~IndexData(){
 }
 
 void IndexData::destroy(){
-	if(indexBuffer!=NULL){
-		indexBuffer->destroy();
-		indexBuffer=NULL;
-	}
+	indexBuffer=NULL;
 }
 
 }

@@ -33,12 +33,7 @@ NodeManager::NodeManager(Engine *engine):ResourceManager(engine){
 }
 
 Node *NodeManager::createNode(NodeResource *resource,Scene *scene){
-	if(resource!=NULL){
-		return resource->getNode()->clone(scene);
-	}
-	else{
-		return NULL;
-	}
+	return NULL;
 }
 
 NodeResource::ptr NodeManager::createNodeResource(Node *node,const String &name){

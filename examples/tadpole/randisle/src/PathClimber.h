@@ -2,7 +2,6 @@
 #define PATHCLIMBER_H
 
 #include <toadlet/toadlet.h>
-#include <toadlet/tadpole/plugins/hop/HopEntity.h>
 #include "PathSystem.h"
 #include "PathClimberListener.h"
 
@@ -41,8 +40,7 @@ public:
 	void logicUpdate(int dt,int scope);
 
 protected:
-	HopScene *mScene;
-	HopEntity *mNode;
+	Scene *mScene;
 	PathClimberListener *mPathClimberListener;
 	Node::ptr mMounted;
 	PathSystem::Path *mPreviousPath;

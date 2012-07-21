@@ -31,14 +31,14 @@
 namespace toadlet{
 namespace tadpole{
 
-class ActionComponent;
+class Action;
 
 class ActionListener{
 public:
 	virtual ~ActionListener(){}
 
-	virtual void actionStarted(ActionComponent *component)=0;
-	virtual void actionStopped(ActionComponent *component)=0;
+	virtual void actionStarted(Action *component)=0;
+	virtual void actionStopped(Action *component)=0;
 };
 
 }

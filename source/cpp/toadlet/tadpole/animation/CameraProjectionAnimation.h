@@ -27,7 +27,7 @@
 #define TOADLET_TADPOLE_ANIMATION_CAMERAPROJECTIONANIMATION_H
 
 #include <toadlet/tadpole/animation/BaseAnimation.h>
-#include <toadlet/tadpole/node/CameraNode.h>
+#include <toadlet/tadpole/Camera.h>
 
 namespace toadlet{
 namespace tadpole{
@@ -37,11 +37,11 @@ class TOADLET_API CameraProjectionAnimation:public BaseAnimation{
 public:
 	TOADLET_OBJECT(CameraProjectionAnimation);
 
-	CameraProjectionAnimation(CameraNode::ptr target);
+	CameraProjectionAnimation(Camera *target);
 	virtual ~CameraProjectionAnimation(){}
 
-	void setTarget(CameraNode::ptr target);
-	inline CameraNode::ptr getTarget() const{return mTarget;}
+	void setTarget(Camera *target);
+	inline Camera *getTarget() const{return mTarget;}
 
 	// HACK: Until we introduce a proper ProjectionKeyFrame, this will have to do
 	void setStart(scalar left,scalar right,scalar bottom,scalar top,scalar neard,scalar fard);
@@ -53,7 +53,7 @@ public:
 	scalar getValue() const{return mValue;}
 
 protected:
-	CameraNode::ptr mTarget;
+	Camera::ptr mTarget;
 	scalar mStartLeft,mStartRight,mStartBottom,mStartTop,mStartNear,mStartFar;
 	scalar mEndLeft,mEndRight,mEndBottom,mEndTop,mEndNear,mEndFar;
 	scalar mValue,mMaxValue;

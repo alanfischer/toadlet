@@ -102,11 +102,9 @@ public:
 		bool useMatrixTransforms;
 	};
 
-	SkeletonComponent(Skeleton *skeleton);
+	SkeletonComponent(Engine *engine,Skeleton *skeleton);
 	void destroy();
 
-	bool parentChanged(Node *node);
-	
 	void updateBones();
 	void updateBones(int sequenceIndex,scalar sequenceTime);
 	inline int getLastUpdateFrame() const{return mLastUpdateFrame;}
@@ -131,7 +129,7 @@ public:
 	// Renderable
 	Material *getRenderMaterial() const{return mSkeletonMaterial;}
 	const Transform &getRenderTransform() const;
-	const Bound &getRenderBound() const;
+	Bound *getRenderBound() const;
 	void render(RenderManager *manager) const;
 
 	// Attachable

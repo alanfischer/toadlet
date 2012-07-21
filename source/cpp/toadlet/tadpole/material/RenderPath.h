@@ -32,9 +32,9 @@ namespace toadlet{
 namespace tadpole{
 namespace material{
 
-class TOADLET_API RenderPath{
+class TOADLET_API RenderPath:public Object{
 public:
-	TOADLET_SPTR(RenderPath);
+	TOADLET_OBJECT(RenderPath);
 
 	RenderPath(MaterialManager *manager);
 	virtual ~RenderPath();
@@ -45,10 +45,10 @@ public:
 	inline const String &getName() const{return mName;}
 
 	inline int getNumPasses() const{return mPasses.size();}
-	inline RenderPass::ptr getPass(int i) const{return mPasses[i];}
+	inline RenderPass *getPass(int i) const{return mPasses[i];}
 	RenderPass::ptr takePass(int i){RenderPass::ptr pass=mPasses[i];mPasses.removeAt(i);return pass;}
-	RenderPass::ptr addPass(RenderState::ptr renderState=RenderState::ptr(),ShaderState::ptr shaderState=ShaderState::ptr());
-	RenderPass::ptr addPass(RenderPass::ptr pass);
+	RenderPass *addPass(RenderState *renderState=NULL,ShaderState *shaderState=NULL);
+	RenderPass *addPass(RenderPass *pass);
 
 	bool isDepthSorted() const;
 

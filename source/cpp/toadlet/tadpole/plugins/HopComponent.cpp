@@ -23,8 +23,6 @@
  *
  ********** Copyright header - do not remove **********/
 
-#if 0
-
 #include "HopComponent.h"
 #include <toadlet/tadpole/Engine.h>
 
@@ -32,28 +30,44 @@ namespace toadlet{
 namespace tadpole{
 
 HopComponent::HopComponent(HopManager *manager):
-	mManager(manager),
-	mSolid(new Solid()),
+	//mManager,
+	//mSolid,
 	//mOldPosition,mNewPosition,mCurrentPosition,
-	mSkipNextPreSimulate(false),
+	mSkipNextPreSimulate(false)
 	//mTraceableShape,
-	mTraceable(NULL),
-	//mTraceableNode,
-	//mVolumeNode,
-	mNextThink(0)
-	//mTriggerTarget
+//	mTraceable(NULL)
 {
+	mManager=manager;
 
-	mSolid->reset();
+	mSolid=new Solid();
 	mSolid->setUserData(this);
-	mSolid->setCollisionListener(this);
+//	mSolid->setCollisionListener(this);
 
-	mTraceableShape=NULL;
-	mTraceable=NULL;
-	mTraceableNode=NULL;
-	mVolumeNode=NULL;
-	mNextThink=0;
-	mTriggerTarget=HopEntity::ptr();
+	mManager->getSimulator()->addSolid(mSolid);
+
+	mBound=new Bound();
+}
+
+void HopComponent::destroy(){
+	mManager->getSimulator()->removeSolid(mSolid);
+
+	BaseComponent::destroy();
+}
+
+bool HopComponent::parentChanged(Node *node){
+	if(mParent!=NULL){
+		mParent->physicsRemoved(this);
+	}
+
+	if(BaseComponent::parentChanged(node)==false){
+		return false;
+	}
+
+	if(mParent!=NULL){
+		mParent->physicsAttached(this);
+	}
+
+	return true;
 }
 
 void HopComponent::setPosition(const Vector3 &position){
@@ -61,25 +75,21 @@ void HopComponent::setPosition(const Vector3 &position){
 	mSkipNextPreSimulate=true;
 }
 
-void HopComponent::setPositionDirect(const Vector3 &position){
-	mSolid->setPositionDirect(position);
-	mSkipNextPreSimulate=true;
-}
-
-void HopComponent::setVelocity(const Vector3 &velocity){
-	mSolid->setVelocity(velocity);
-}
-
-void HopComponent::setNextThink(int think){
-	if(think>0){
-		mNextThink=mScene->getLogicTime()+think;
+void HopComponent::setBound(Bound *bound){
+	mSolid->removeAllShapes();
+	Shape *shape=NULL;
+	if(bound->getType()==Bound::Type_AABOX){
+		shape=new Shape(bound->getAABox());
 	}
-	else{
-		mNextThink=0;
+	else if(bound->getType()==Bound::Type_SPHERE){
+		shape=new Shape(bound->getSphere());
 	}
-	setStayActive(mNextThink>0);
+	if(shape!=NULL){
+		mSolid->addShape(shape);
+	}
 }
 
+/*
 void HopComponent::setTraceableShape(Traceable *traceable,Node *traceableNode){
 	if(mTraceable!=NULL){
 		removeShape(mTraceableShape);
@@ -90,46 +100,17 @@ void HopComponent::setTraceableShape(Traceable *traceable,Node *traceableNode){
 	mTraceableNode=traceableNode;
 
 	if(mTraceable!=NULL){
-		mTraceableShape=Shape::ptr(new Shape(this));
+		mTraceableShape=new Shape(this);
 		addShape(mTraceableShape);
 	}
 }
-
-void HopComponent::addShape(hop::Shape::ptr shape){
+*/
+void HopComponent::addShape(Shape *shape){
 	mSolid->addShape(shape);
-
-	setBound(Bound(mSolid->getLocalBound()));
-
-	updateCollisionVolumes();
 }
 
 void HopComponent::removeShape(Shape *shape){
 	mSolid->removeShape(shape);
-
-	updateCollisionVolumes();
-}
-
-void HopComponent::removeAllShapes(){
-	mSolid->removeAllShapes();
-
-	updateCollisionVolumes();
-}
-
-void HopComponent::setCollisionVolumesVisible(bool visible){
-	if(visible){
-		if(mVolumeNode==NULL){
-			mVolumeNode=mEngine->createNodeType(Node::type(),mScene);
-			attach(mVolumeNode);
-		}
-	}
-	else{
-		if(mVolumeNode!=NULL){
-			mVolumeNode->destroy();
-			mVolumeNode=NULL;
-		}
-	}
-
-	updateCollisionVolumes();
 }
 
 // Update solids with new node positions if moved
@@ -140,7 +121,7 @@ void HopComponent::preSimulate(){
 		return;
 	}
 
-	if(getActive()==true && mNewPosition.equals(mSolid->getPosition())==false){
+	if(mParent->getActive()==true && mNewPosition.equals(mSolid->getPosition())==false){
 		mSolid->setPosition(mNewPosition);
 	}
 }
@@ -148,8 +129,11 @@ void HopComponent::preSimulate(){
 // Update nodes with new solid positions if active
 void HopComponent::postSimulate(){
 	if(mSolid->active()==true){
-		activate();
+		mParent->activate();
+
 		updatePosition(mSolid->getPosition());
+
+		mBound->set(mSolid->getLocalBound());
 	}
 }
 
@@ -159,14 +143,12 @@ void HopComponent::updatePosition(const Vector3 &position){
 }
 
 void HopComponent::lerpPosition(scalar fraction){
-	Math::lerp(mCurrentPosition,mOldPosition,mNewPosition,mScene->getLogicFraction());
-	setTranslate(mCurrentPosition);
+	Math::lerp(mCurrentPosition,mOldPosition,mNewPosition,mParent->getScene()->getLogicFraction());
+	mParent->setTranslate(mCurrentPosition);
 }
 
-void HopComponent::spacialUpdated(){
-	super::spacialUpdated();
-
-	const Vector3 &translate=mTransform.getTranslate();
+void HopComponent::transformChanged(){
+	const Vector3 &translate=mParent->getTranslate();
 	if(mCurrentPosition.equals(translate)==false){
 		mOldPosition.set(translate);
 		mNewPosition.set(translate);
@@ -174,36 +156,7 @@ void HopComponent::spacialUpdated(){
 	}
 }
 
-bool HopComponent::parentChanged(Node *node){
-	if(mHopScene!=NULL && mHopScene->getSimulator()!=NULL){
-		if(node==mScene->getRoot()){
-			mHopScene->getSimulator()->addSolid(getSolid());
-		}
-		else{
-			mHopScene->getSimulator()->removeSolid(getSolid());
-		}
-	}
-
-	return super::parentChanged(node);
-}
-
-void HopComponent::logicUpdate(int dt,int scope){
-	if(mNextThink>0 && mNextThink<=mScene->getLogicTime()){
-		setNextThink(0);
-		think();
-	}
-
-	super::logicUpdate(dt,scope);
-}
-
-void HopComponent::frameUpdate(int dt,int scope){
-	if(mSolid->active()){
-		lerpPosition(mScene->getLogicFraction());
-	}
-
-	super::frameUpdate(dt,scope);
-}
-
+/*
 void HopComponent::getBound(AABox &result){
 	if(mTraceable!=NULL){
 		result.set(mTraceable->getBound().getAABox());
@@ -214,7 +167,7 @@ void HopComponent::traceSegment(hop::Collision &result,const Vector3 &position,c
 	if(mTraceable!=NULL){
 		tadpole::Collision collision;
 		mTraceable->traceSegment(collision,position,segment,Math::ZERO_VECTOR3);
-		HopScene::set(result,collision,getSolid(),NULL);
+		HopScene::set(result,collision,mSolid,NULL);
 	}
 }
 
@@ -225,7 +178,7 @@ void HopComponent::traceSolid(hop::Collision &result,hop::Solid *solid,const Vec
 		Vector3 size;
 		Math::sub(size,bound.maxs,bound.mins);
 		mTraceable->traceSegment(collision,position,segment,size);
-		HopScene::set(result,collision,getSolid(),solid);
+		HopScene::set(result,collision,mSolid,solid);
 	}
 }
 
@@ -234,45 +187,6 @@ void HopComponent::collision(const hop::Collision &c){
 	HopScene::set(collision,c);
 	touch(collision);
 }
-
-void HopComponent::updateCollisionVolumes(){
-	if(mVolumeNode!=NULL){
-		mVolumeNode->destroyAllChildren();
-
-		int i;
-		for(i=0;i<mSolid->getNumShapes();++i){
-			Mesh::ptr mesh;
-
-			Shape *shape=mSolid->getShape(i);
-			switch(shape->getType()){
-				case Shape::Type_AABOX:
-					mesh=mEngine->createAABoxMesh(shape->getAABox());
-				break;
-				case Shape::Type_SPHERE:
-					mesh=mEngine->createSphereMesh(shape->getSphere());
-				break;
-				default:{
-					AABox box;
-					shape->getBound(box);
-					mesh=mEngine->createAABoxMesh(box);
-				}break;
-			}
-
-			/// @todo: Use LINES for bounding volumes
-			Mesh::SubMesh::ptr subMesh=mesh->getSubMesh(0);
-			IndexBuffer::ptr indexBuffer=subMesh->indexData->indexBuffer;
-			subMesh->indexData->setIndexBuffer(NULL);
-			subMesh->indexData->destroy();
-			subMesh->indexData=IndexData::ptr(new IndexData(IndexData::Primitive_LINES,indexBuffer));
-			subMesh->material->getPass()->setMaterialState(MaterialState(false));
-			MeshNode *meshNode=mEngine->createNodeType(MeshNode::type(),mScene);
-			meshNode->setMesh(mesh);
-			mVolumeNode->attach(meshNode);
-		}
-	}
-}
-
+*/
 }
 }
-
-#endif

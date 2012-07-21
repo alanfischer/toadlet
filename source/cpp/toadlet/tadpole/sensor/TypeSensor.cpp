@@ -34,12 +34,13 @@ TypeSensor::TypeSensor(Scene *scene):Sensor(scene){
 }
 
 bool TypeSensor::senseNode(Node *node){
-	if(mType!=NULL){
-		return node->getType()==mType;
-	}
-	else{
-		return node->getType()->getFullName().equals(mTypeName);
-	}
+//	if(mType!=NULL){
+//		return node->getType()==mType;
+//	}
+//	else{
+//		return node->getType()->getFullName().equals(mTypeName);
+//	}
+	return false;
 }
 
 }

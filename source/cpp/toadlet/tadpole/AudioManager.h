@@ -43,6 +43,8 @@ public:
 
 	AudioBuffer::ptr createAudioBuffer(AudioStream::ptr stream);
 
+	Audio::ptr createAudio();
+
 	AudioStream::ptr findAudioStream(const String &name);
 	AudioBuffer::ptr findAudioBuffer(const String &name){return shared_static_cast<AudioBuffer>(ResourceManager::find(name));}
 

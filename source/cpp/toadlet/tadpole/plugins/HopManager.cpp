@@ -23,53 +23,52 @@
  *
  ********** Copyright header - do not remove **********/
 
-#if 0
-
 #include <toadlet/egg/Logger.h>
 #include <toadlet/egg/Error.h>
 #include <toadlet/egg/Profile.h>
 #include <toadlet/tadpole/Engine.h>
 #include <toadlet/tadpole/Collision.h>
 #include <toadlet/tadpole/Scene.h>
-#include <toadlet/tadpole/plugins/hop/HopScene.h>
-#include <toadlet/tadpole/plugins/hop/HopEntity.h>
+#include "HopManager.h"
+#include "HopComponent.h"
 
 namespace toadlet{
 namespace tadpole{
 
-HopManager::HopManager(Engine *engine):
+HopManager::HopManager(Scene *scene):
 	mSimulator(NULL),
 	mTraceable(NULL)
 {
+	mScene=scene;
+
 	mSimulator=new Simulator();
 	mSimulator->setManager(this);
 
-	mSolid=Solid::ptr(new Solid());
+	mSolid=new Solid();
 	mSolid->setCoefficientOfGravity(0);
 	mSolid->setInfiniteMass();
 
-	mEngine->registerNodeType(HopEntity::type());
-
-	mVolumeSensor=new BoundingVolumeSensor(this);
+	mVolumeSensor=new BoundingVolumeSensor(mScene);
 	mSensorResults=SolidSensorResults::ptr(new SolidSensorResults());
 }
 
-HopManager::~HopManager(){
+PhysicsComponent *HopManager::createPhysicsComponent(){
+	return new HopComponent(this);
 }
 
 void HopManager::traceSegment(Collision &result,const Segment &segment,int collideWithBits,Node *ignore){
 	result.reset();
 
 	Solid *ignoreSolid=NULL;
-	if(ignore!=NULL && ignore->isEntity()!=NULL){
-		ignoreSolid=((HopEntity*)ignore)->getSolid();
+	if(ignore!=NULL && ignore->getPhysics()!=NULL){
+		ignoreSolid=((HopComponent*)ignore->getPhysics())->getSolid();
 	}
 
-	hop::Collision &collision=cache_traceSegment_collision.reset();
+	hop::Collision collision;
 	mSimulator->traceSegment(collision,segment,collideWithBits,ignoreSolid);
 	set(result,collision);
 }
-
+/*
 void HopManager::traceEntity(Collision &result,HopEntity *entity,const Segment &segment,int collideWithBits){
 	result.reset();
 
@@ -93,23 +92,23 @@ void HopManager::testEntity(Collision &result,HopEntity *entity1,const Segment &
 	mSimulator->testSolid(collision,solid1,segment,solid2);
 	set(result,collision);
 }
-
-void HopManager::logicUpdate(int dt,int scope,HopEntity *entity){
-	if(entity!=NULL){
-		entity->preSimulate();
+*/
+void HopManager::logicUpdate(int dt,int scope,HopComponent *component){
+	if(component!=NULL){
+		component->preSimulate();
 		TOADLET_PROFILE_BEGINSECTION(Simulator::update);
 		mSimulator->update(dt,scope);
 		TOADLET_PROFILE_ENDSECTION(Simulator::update);
-		entity->postSimulate();
+		component->postSimulate();
 
-		entity->logicUpdate(dt,scope);
+		component->logicUpdate(dt,scope);
 	}
 	else{
 		int i;
 		for(i=mSimulator->getNumSolids()-1;i>=0;--i){
 			Solid *solid=mSimulator->getSolid(i);
-			HopEntity *entity=(HopEntity*)(solid->getUserData());
-			entity->preSimulate();
+			HopComponent *component=(HopComponent*)(solid->getUserData());
+			component->preSimulate();
 		}
 
 		TOADLET_PROFILE_BEGINSECTION(Simulator::update);
@@ -118,11 +117,20 @@ void HopManager::logicUpdate(int dt,int scope,HopEntity *entity){
 
 		for(i=mSimulator->getNumSolids()-1;i>=0;--i){
 			Solid *solid=mSimulator->getSolid(i);
-			HopEntity *entity=(HopEntity*)(solid->getUserData());
-			entity->postSimulate();
+			HopComponent *component=(HopComponent*)(solid->getUserData());
+			component->postSimulate();
 		}
+	}
+}
 
-		Scene::logicUpdate(dt,scope);
+void HopManager::frameUpdate(int dt,int scope){
+	int i;
+	for(i=mSimulator->getNumSolids()-1;i>=0;--i){
+		Solid *solid=mSimulator->getSolid(i);
+		if(solid->active()){
+			HopComponent *component=(HopComponent*)(solid->getUserData());
+			component->lerpPosition(mScene->getLogicFraction());
+		}
 	}
 }
 
@@ -159,7 +167,7 @@ void HopManager::set(tadpole::Collision &r,const hop::Collision &c){
 	r.time=c.time;
 	r.point.set(c.point);
 	r.normal.set(c.normal);
-	if(c.collider!=NULL){r.collider=(HopEntity*)c.collider->getUserData();};
+	if(c.collider!=NULL && c.collider->getUserData()!=NULL){r.collider=((HopComponent*)c.collider->getUserData())->getParent();}
 	r.scope=c.scope;
 }
 
@@ -174,14 +182,12 @@ void HopManager::set(hop::Collision &r,const tadpole::Collision &c,Solid *collid
 }
 
 bool HopManager::SolidSensorResults::resultFound(Node *result,scalar distance){
-	HopEntity *entity=(HopEntity*)result->isEntity();
-	if(entity!=NULL && mCounter<mMaxSolids && entity->getNumShapes()>0){
-		mSolids[mCounter++]=entity->getSolid();
+	HopComponent *component=(HopComponent*)result->getPhysics();
+	if(component!=NULL && mCounter<mMaxSolids && component->getSolid()->getNumShapes()>0){
+		mSolids[mCounter++]=component->getSolid();
 	}
 	return mCounter<mMaxSolids;
 }
 
 }
 }
-
-#endif

@@ -56,9 +56,9 @@ typedef float scalar;
 %include <toadlet/tadpole/AnimationActionComponent.i>
 %include <toadlet/tadpole/AudioComponent.i>
 %include <toadlet/tadpole/Node.i>
-%include <toadlet/tadpole/CameraNode.i>
-%include <toadlet/tadpole/MeshNode.i>
-%include <toadlet/tadpole/LightNode.i>
+%include <toadlet/tadpole/CameraComponent.i>
+%include <toadlet/tadpole/MeshComponent.i>
+%include <toadlet/tadpole/LightComponent.i>
 %include <toadlet/tadpole/animation/Animation.i>
 %include <toadlet/tadpole/animation/BaseAnimation.i>
 %include <toadlet/tadpole/animation/MeshAnimation.i>

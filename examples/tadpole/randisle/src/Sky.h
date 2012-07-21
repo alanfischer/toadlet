@@ -45,21 +45,19 @@ protected:
 
 class Sky:public Node{
 public:
-	TOADLET_NODE(Sky,Node);
+	Sky(Scene *scene,int cloudSize,const Vector4 &skyColor,const Vector4 &fadeColor);
+	virtual ~Sky(){destroy();}
 
-	Sky():super(){}
-
-	Node *create(Scene *scene,int cloudSize,const Vector4 &skyColor,const Vector4 &fadeColor);
 	void destroy();
 
 	void updateLightDirection(const Vector3 &lightDir);
 
 	void frameUpdate(int dt,int scope);
 
-	inline LightNode ::ptr getLight(){return mLight;}
-	inline MeshNode::ptr getSkyDome(){return mSkyDome;}
-	inline Material::ptr getSkyMaterial(){return mSkyMaterial;}
-	inline SpriteNode::ptr getSun(){return mSun;}
+	inline LightComponent *getLight(){return mLight;}
+	inline SpriteComponent *getSun(){return mSun;}
+	inline MeshComponent *getSkyDome(){return mSkyDome;}
+	inline Material *getSkyMaterial(){return mSkyMaterial;}
 
 protected:
 	static tbyte *createCloud(TextureFormat *format,int scale,int seed,float cover,float sharpness,float brightness);
@@ -68,9 +66,11 @@ protected:
 	static tbyte *createFade(TextureFormat *format,const Vector4 &start,const Vector4 &end,float falloff,float sharpness);
 	static tbyte *createGlow(TextureFormat *format);
 
-	LightNode::ptr mLight;
-	MeshNode::ptr mSkyDome;
-	SpriteNode::ptr mSun;
+	LightComponent::ptr mLight;
+	Node::ptr mLightNode;
+	SpriteComponent::ptr mSun;
+	Node::ptr mSunNode;
+	MeshComponent::ptr mSkyDome;
 	
 	Matrix4x4Accessor::ptr mShaderAccessor,mBumpAccessor,mCloudAccessor,mColorAccessor,mFadeAccessor;
 	Matrix4x4Accessor::ptr mCompositeAccessor;

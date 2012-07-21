@@ -649,11 +649,14 @@ void GLRenderDevice::beginScene(){
 void GLRenderDevice::endScene(){
 	setVertexData(NULL);
 	setShaderState(NULL);
-	int i;
+	int i,j;
 	for(i=0;i<mCaps.maxTextureStages;++i){
 		setSamplerState(i,NULL);
 		setTextureState(i,NULL);
-		setTexture((Shader::ShaderType)0,i,NULL);
+		// Reset all shader types, since setTexture remembers the previous type used
+		for(j=0;j<Shader::ShaderType_MAX;++j){
+			setTexture((Shader::ShaderType)j,i,NULL);
+		}
 	}
 
 	#if defined(TOADLET_HAS_GLIBOS)
@@ -877,11 +880,14 @@ void GLRenderDevice::setDefaultState(){
 
 	setVertexData(NULL);
 	setShaderState(NULL);
-	int i;
+	int i,j;
 	for(i=0;i<mCaps.maxTextureStages;++i){
 		setSamplerState(i,NULL);
 		setTextureState(i,NULL);
-		setTexture((Shader::ShaderType)0,i,NULL);
+		// Reset all shader types, since setTexture remembers the previous type used
+		for(j=0;j<Shader::ShaderType_MAX;++j){
+			setTexture((Shader::ShaderType)j,i,NULL);
+		}
 	}
 
 	// GL specific states

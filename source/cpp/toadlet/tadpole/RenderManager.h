@@ -27,7 +27,7 @@
 #define TOADLET_TADPOLE_RENDERMANAGER_H
 
 #include <toadlet/peeper/RenderDevice.h>
-#include <toadlet/tadpole/node/CameraNode.h>
+#include <toadlet/tadpole/CameraComponent.h>
 
 namespace toadlet{
 namespace tadpole{
@@ -38,7 +38,7 @@ public:
 
 	virtual ~RenderManager(){}
 
-	virtual void renderScene(RenderDevice *device,Node *node,CameraNode *camera)=0;
+	virtual void renderScene(RenderDevice *device,Node *node,Camera *camera)=0;
 	virtual void setupPass(RenderPass *pass)=0;
 	virtual void setupPassForRenderable(RenderPass *pass,Renderable *renderable,const Vector4 &ambient)=0;
 

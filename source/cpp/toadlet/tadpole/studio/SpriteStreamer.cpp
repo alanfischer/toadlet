@@ -83,8 +83,9 @@ void SpriteStreamer::buildMaterials(SpriteModel *model){
 	model->materials.resize(model->header->numframes);
 
 	int i;
-	for(i=1;i<model->header->numframes;i++){
+	for(i=0;i<model->header->numframes;i++){
 		model->materials[i]=mEngine->createDiffuseMaterial(model->textures[i]);
+		model->materials[i]->setModelMatrixFlags(Material::MatrixFlag_CAMERA_ALIGNED);
 	}
 }
 

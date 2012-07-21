@@ -22,11 +22,13 @@ PathClimber::PathClimber():BaseComponent(),
 }
 
 bool PathClimber::parentChanged(Node *node){
-	mNode=(HopEntity*)node;
-	if(mNode!=NULL){
-		mScene=(HopScene*)mNode->getScene();
+	bool result=BaseComponent::parentChanged(node);
+
+	if(mParent!=NULL){
+		mScene=mParent->getScene();
 	}
-	return true;
+
+	return result;
 }
 
 void PathClimber::logicUpdate(int dt,int scope){
@@ -37,9 +39,9 @@ void PathClimber::logicUpdate(int dt,int scope){
 		Math::mul(forward,mIdealRotation,Math::Y_UNIT_VECTOR3);
 
 		Segment segment;
-		segment.setStartDir(mNode->getTranslate(),Vector3(0,0,-5));
+		segment.setStartDir(mParent->getTranslate(),Vector3(0,0,-5));
 		tadpole::Collision result;
-		mScene->traceSegment(result,segment,-1,mNode);
+		mScene->traceSegment(result,segment,-1,mParent);
 		if(result.time<Math::ONE){
 			up.set(result.normal);
 		}
@@ -58,14 +60,14 @@ void PathClimber::logicUpdate(int dt,int scope){
 		Math::normalizeCarefully(right,epsilon);
 		Math::cross(forward,up,right);
 		Math::setQuaternionFromAxes(rotate,right,forward,up);
-		mNode->setRotate(rotate);
+		mParent->setRotate(rotate);
 
-		forward.set(0,mSpeed,mNode->getVelocity().z);
-		if(mSpeed>0 && Math::length(mNode->getVelocity())==0){ // Check to see if we're stuck on the terrain
+		forward.set(0,mSpeed,mParent->getPhysics()->getVelocity().z);
+		if(mSpeed>0 && Math::length(mParent->getPhysics()->getVelocity())==0){ // Check to see if we're stuck on the terrain
 			forward.z=40;
 		}
 		Math::mul(forward,mIdealRotation);
-		mNode->setVelocity(forward);
+		mParent->getPhysics()->setVelocity(forward);
 
 //		if((mSolid->getTouching()!=NULL || getCoefficientOfGravity()==0) && mGroundTime==0){
 //			mGroundTime=mScene->getLogicTime();
@@ -114,12 +116,12 @@ void PathClimber::logicUpdate(int dt,int scope){
 
 		Quaternion rotate;
 		findRotation(rotate,tangent,normal);
-		mNode->setRotate(rotate);
+		mParent->setRotate(rotate);
 
 		Math::add(result,mMounted->getTranslate());
-		Math::setAxesFromQuaternion(mNode->getRotate(),right,forward,up);
-		result=result+up*(Math::maxVal(0,scale.x-1)-mNode->getBound().mins.z);
-		mNode->setTranslate(result);
+		Math::setAxesFromQuaternion(mParent->getRotate(),right,forward,up);
+		result=result+up*(scale.x-mParent->getPhysics()->getBound()->getAABox().mins.z+1);
+		mParent->setTranslate(result);
 	}
 }
 
@@ -129,7 +131,7 @@ void PathClimber::mount(Node *system,PathSystem::Path *path,const Vector3 &point
 	mMounted=system;
 	mPreviousPath=NULL;
 	mPath=path;
-	mNode->setCoefficientOfGravity(0);
+	mParent->getPhysics()->setGravity(0);
 
 	Segment segment;
 	path->getPoint(segment.origin,0);
@@ -154,7 +156,7 @@ void PathClimber::mount(Node *system,PathSystem::Path *path,const Vector3 &point
 
 	mPassedNeighbor=findPassedNeighbor(mPath,mPathDirection,mPathTime);
 
-	mNode->setVelocity(Math::ZERO_VECTOR3);
+	mParent->getPhysics()->setVelocity(Math::ZERO_VECTOR3);
 
 //	mGroundTime=0;
 
@@ -182,13 +184,13 @@ void PathClimber::dismount(){
 		Math::cross(right,forward,up);
 		Math::setQuaternionFromAxes(rotation,right,forward,up);
 		setIdealRotation(rotation);
-		mNode->setRotate(rotation);
+		mParent->setRotate(rotation);
 	}
-	mNode->setVelocity(forward*30+Vector3(0,0,40));
+	mParent->getPhysics()->setVelocity(forward*30+Vector3(0,0,40));
 
 	mMounted=NULL;
 	mPath=NULL;
-	mNode->setCoefficientOfGravity(Math::ONE);
+	mParent->getPhysics()->setGravity(Math::ONE);
 	mNoClimbTime=mScene->getLogicTime()+500;
 }
 
@@ -241,13 +243,13 @@ void PathClimber::findRotation(Quaternion &r,const Vector3 &tangent,const Vector
 			Math::cross(up,right,tangent);
 		}
 		else{
-			Math::cross(right,tangent,normal);
+			Math::cross(right,normal,tangent);
 			Math::normalizeCarefully(right,epsilon);
 			Math::cross(up,right,tangent);
 		}
 	}
 	else{
-		Math::cross(right,tangent,normal);
+		Math::cross(right,normal,tangent);
 		Math::normalizeCarefully(right,epsilon);
 		Math::cross(up,right,tangent);
 	}

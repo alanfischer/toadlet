@@ -32,13 +32,13 @@ namespace toadlet{
 namespace tadpole{
 namespace terrain{
 
-class TerrainPatchNode;
+class TerrainPatchComponent;
 
 class TerrainNodeMaterialSource:public Interface{
 public:
 	TOADLET_INTERFACE(TerrainNodeMaterialSource);
 
-	virtual Material::ptr getMaterial(TerrainPatchNode *patch)=0;
+	virtual Material::ptr getMaterial(TerrainPatchComponent *patch)=0;
 };
 
 }

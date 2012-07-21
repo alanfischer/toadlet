@@ -11,14 +11,6 @@ public:
 		mPositions.resize(bufferSize);
 	}
 
-	bool parentChanged(Node *node){
-		mNode=node;
-		if(mNode!=NULL){
-			mScene=mNode->getScene();
-		}
-		return true;
-	}
-
 	void setTarget(Node *parent,Node *target){
 		mTarget=target;
 
@@ -65,7 +57,7 @@ public:
 			return;
 		}
 
-		float fraction=mScene->getLogicFraction();
+		float fraction=mTarget->getScene()->getLogicFraction();
 		Vector3 position;
 		int numPositions=mPositions.size();
 		int i;
@@ -78,27 +70,26 @@ public:
 		}
 		position/=(float)numPositions/2;
 
-		mNode->setTranslate(position);
+		mParent->setTranslate(position);
 
 		if(mTarget!=NULL){
-			mNode->updateWorldTransform();
+			mParent->updateWorldTransform();
 
 			Quaternion rotate,invrot;
 			Matrix4x4 transform;
-			Math::setMatrix4x4FromLookAt(transform,mNode->getWorldTranslate(),mTarget->getWorldTranslate()+mTargetOffset,toadlet::tadpole::Math::Z_UNIT_VECTOR3,true);
+			Math::setMatrix4x4FromLookAt(transform,mParent->getWorldTranslate(),mTarget->getWorldTranslate()+mTargetOffset,toadlet::tadpole::Math::Z_UNIT_VECTOR3,true);
 			Math::setQuaternionFromMatrix4x4(rotate,transform);
-			if(mNode->getParent()!=NULL){
-				Math::invert(invrot,mNode->getParent()->getWorldRotate());
+			if(mParent->getParent()!=NULL){
+				Math::invert(invrot,mParent->getParent()->getWorldRotate());
 				Math::preMul(rotate,invrot);
 			}
-			mNode->setRotate(rotate);
+			mParent->setRotate(rotate);
 		}
 
-		mNode->updateWorldTransform();
+		mParent->updateWorldTransform();
 	}
 
-	Scene *mScene;
-	Node::ptr mNode,mTarget;
+	Node::ptr mTarget;
 	Vector3 mOffset;
 	Vector3 mTargetOffset;
 	egg::Collection<Vector3> mPositions;

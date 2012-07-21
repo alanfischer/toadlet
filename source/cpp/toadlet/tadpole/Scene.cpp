@@ -29,17 +29,16 @@
 #include <toadlet/tadpole/Colors.h>
 #include <toadlet/tadpole/Engine.h>
 #include <toadlet/tadpole/Scene.h>
-#include <toadlet/tadpole/node/CameraNode.h>
 
 /// @todo: Somehow the selection of RenderManager and PhysicsManager should be moved into the Engine I think?  The Engine handles all other plugins currently.
 #include <toadlet/tadpole/plugins/SimpleRenderManager.h>
+#include <toadlet/tadpole/plugins/HopManager.h>
 
 namespace toadlet{
 namespace tadpole{
 
 Scene::Scene(Engine *engine):Object(),
 	mUpdateListener(NULL),
-	mRenderListener(NULL),
 
 	mExcessiveDT(0),
 	mMinLogicDT(0),
@@ -55,8 +54,6 @@ Scene::Scene(Engine *engine):Object(),
 	//mAmbientColor,
 
 	//mRenderManager,
-
-	//mBoundMesh
 {
 	mEngine=engine;
 	mEngine->addContextListener(this);
@@ -65,10 +62,13 @@ Scene::Scene(Engine *engine):Object(),
 	setRangeLogicDT(0,0);
 	setAmbientColor(Colors::GREY);
 
-	mBackground=mEngine->createNodeType(PartitionNode::type(),this);
-	mRoot=mEngine->createNodeType(PartitionNode::type(),this);
+	mBackground=new PartitionNode(this);
+
+	mRoot=new PartitionNode(this);
 
 	mRenderManager=new SimpleRenderManager(this);
+
+	mPhysicsManager=new HopManager(this);
 
 	mSphereMesh=mEngine->createSphereMesh(Sphere(Math::ONE));
 	mAABoxMesh=mEngine->createAABoxMesh(AABox(-Math::ONE,-Math::ONE,-Math::ONE,Math::ONE,Math::ONE,Math::ONE));
@@ -209,33 +209,51 @@ void Scene::update(int dt){
 }
 
 void Scene::logicUpdate(int dt,int scope){
+	if(mPhysicsManager!=NULL){
+		mPhysicsManager->logicUpdate(dt,scope);
+	}
+
 	mBackground->logicUpdate(dt,scope);
 	mRoot->logicUpdate(dt,scope);
+
+	int i;
+	for(i=0;i<mDestroyComponents.size();++i){
+		mDestroyComponents[i]->destroy();
+	}
+	mDestroyComponents.clear();
 }
 
 void Scene::frameUpdate(int dt,int scope){
+	if(mPhysicsManager!=NULL){
+		mPhysicsManager->frameUpdate(dt,scope);
+	}
+
 	mBackground->frameUpdate(dt,scope);
 	mRoot->frameUpdate(dt,scope);
 }
 
-void Scene::render(RenderDevice *device,CameraNode *camera,Node *node){
-	if(mRenderListener!=NULL){
-		mRenderListener->preRender(device,camera,node);
-	}
-
+void Scene::render(RenderDevice *device,Camera *camera,Node *node){
 	if(node==NULL){
 		node=mRoot;
 	}
 
 	// Reposition our background node & update it to update the world positions
-	mBackground->setTranslate(camera->getWorldTranslate());
-	mBackground->updateAllWorldTransforms();
+	mBackground->setTranslate(camera->getPosition());
+	mBackground->logicUpdate(0,-1);
+	mBackground->frameUpdate(0,-1);
 
 	mRenderManager->renderScene(device,node,camera);
+}
 
-	if(mRenderListener!=NULL){
-		mRenderListener->postRender(device,camera,node);
+void Scene::traceSegment(Collision &result,const Segment &segment,int collideWithBits,Node *ignore){
+	result.time=Math::ONE;
+	if(mPhysicsManager!=NULL){
+		mPhysicsManager->traceSegment(result,segment,collideWithBits,ignore);
 	}
+}
+
+void Scene::destroy(Component *component){
+	mDestroyComponents.add(component);
 }
 
 int Scene::countActiveNodes(Node *node){
@@ -244,52 +262,14 @@ int Scene::countActiveNodes(Node *node){
 	}
 	
 	int count=node->getActive()?1:0;
-	Node *child;
-	for(child=node->getFirstChild();child!=NULL;child=child->getNext()){
-		count+=countActiveNodes(child);
+	int i;
+	for(i=0;i<node->getNumNodes();++i){
+		count+=countActiveNodes(node->getNode(i));
 	}
-	
+
 	return count;
 }
-/// @todo
-/*
-void Scene::renderBoundingVolumes(RenderDevice *device,Node *node){
-	if(node==NULL){
-		mSphereMesh->getSubMesh(0)->material->setupRenderDevice(device);
-		renderBoundingVolumes(device,mRoot);
-		return;
-	}
 
-	Matrix4x4 transform;
-	const Bound &bound=node->getWorldBound();
-	switch(bound.getType()){
-		case Bound::Type_SPHERE:{
-			const Sphere &sphere=bound.getSphere();
-			Math::setMatrix4x4FromTranslate(transform,sphere.origin);
-			Math::setMatrix4x4FromScale(transform,sphere.radius,sphere.radius,sphere.radius);
-			device->setMatrix(RenderDevice::MatrixType_MODEL,transform);
-			device->renderPrimitive(mSphereMesh->getStaticVertexData(),mSphereMesh->getSubMesh(0)->indexData);
-		}break;
-		case Bound::Type_AABOX:{
-			const AABox &box=bound.getAABox();
-			Vector3 origin=(box.maxs - box.mins)/2 + box.mins;
-			Math::setMatrix4x4FromTranslate(transform,origin);
-			Math::setMatrix4x4FromScale(transform,origin.x-box.mins.x,origin.y-box.mins.y,origin.z-box.mins.z);
-			device->setMatrix(RenderDevice::MatrixType_MODEL,transform);
-			device->renderPrimitive(mAABoxMesh->getStaticVertexData(),mAABoxMesh->getSubMesh(0)->indexData);
-		}break;
-		default:
-		break;
-	}
-
-	ParentNode *parent=node->isParent();
-	if(parent!=NULL){
-		for(node=parent->getFirstChild();node!=NULL;node=node->getNext()){
-			renderBoundingVolumes(device,node);
-		}
-	}
-}
-*/
 void Scene::postContextActivate(RenderDevice *device){
 	mResetFrame=true;
 	mRoot->activate();

@@ -41,7 +41,7 @@ DecalShadowRenderManager::DecalShadowRenderManager(Scene *scene):
 DecalShadowRenderManager::~DecalShadowRenderManager(){
 }
 
-void DecalShadowRenderManager::renderScene(RenderDevice *device,Node *node,CameraNode *camera){
+void DecalShadowRenderManager::renderScene(RenderDevice *device,Node *node,Camera *camera){
 /// @todo:
 /*
 	gatherRenderables(mRenderableSet,node,camera);

@@ -113,6 +113,16 @@ RenderPass::ptr Material::getPass(int pathIndex,int passIndex){
 	}
 }
 
+void Material::setModelMatrixFlags(int flags){
+	int i,j;
+	for(i=0;i<mPaths.size();++i){
+		RenderPath *path=mPaths[i];
+		for(j=0;j<path->getNumPasses();++j){
+			path->getPass(j)->setModelMatrixFlags(flags);
+		}
+	}
+}
+
 bool Material::isDepthSorted() const{
 	switch(mSort){
 		case SortType_DEPTH:
@@ -123,28 +133,6 @@ bool Material::isDepthSorted() const{
 			return mBestPath!=NULL?mBestPath->isDepthSorted():false;
 		}
 	}
-}
-
-RenderPath::ptr Material::findFixedPath(){
-	int i,j,k;
-	for(i=0;i<mPaths.size();++i){
-		RenderPath::ptr path=mPaths[i];
-		for(j=0;j<path->getNumPasses();++j){
-			ShaderState *state=path->getPass(j)->getShaderState();
-			for(k=0;k<Shader::ShaderType_MAX;++k){
-				if(state->getShader((Shader::ShaderType)k)!=NULL){
-					break;
-				}
-			}
-			if(k<Shader::ShaderType_MAX){
-				break;
-			}
-		}
-		if(j==path->getNumPasses()){
-			return path;
-		}
-	}
-	return NULL;
 }
 
 bool Material::compile(){

@@ -632,7 +632,7 @@ Mesh::ptr XMLMeshUtilities::loadMesh(mxml_node_t *node,int version,BufferManager
 
 		mesh->setVertexBoneAssignments(vbas);
 
-		mesh->setBound(bound);
+		mesh->setBound(new Bound(bound));
 		mesh->setStaticVertexData(VertexData::ptr(new VertexData(vertexBuffer)));
 	}
 

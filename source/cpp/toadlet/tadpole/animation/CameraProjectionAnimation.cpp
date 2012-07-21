@@ -29,13 +29,13 @@ namespace toadlet{
 namespace tadpole{
 namespace animation{
 
-CameraProjectionAnimation::CameraProjectionAnimation(CameraNode::ptr target)
+CameraProjectionAnimation::CameraProjectionAnimation(Camera *target)
 	//mTarget
 {
 	mTarget=target;
 }
 
-void CameraProjectionAnimation::setTarget(CameraNode::ptr target){
+void CameraProjectionAnimation::setTarget(Camera *target){
 	mTarget=target;
 }
 

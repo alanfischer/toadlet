@@ -16,7 +16,6 @@ public class RandIsle extends AndroidApplication{
 		System.loadLibrary("toadlet_ribbit");
 		System.loadLibrary("toadlet_ribbit_jaudiodevice");
 		System.loadLibrary("toadlet_tadpole");
-		System.loadLibrary("toadlet_tadpole_hop");
 		System.loadLibrary("toadlet_pad");
 		System.loadLibrary("randisle");
 	}

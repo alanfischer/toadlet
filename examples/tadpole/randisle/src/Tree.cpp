@@ -3,11 +3,9 @@
 #include "Acorn.h"
 #include "Resources.h"
 
-TOADLET_NODE_IMPLEMENT(Tree,"Tree");
-
 static const scalar epsilon=0.001f;
 
-Tree::Tree():super(),
+Tree::Tree(Scene *scene,int seed,Node *parent,const Vector3 &translate):Node(scene),
 	mSections(0),
 	mCountMode(false),
 
@@ -35,13 +33,7 @@ Tree::Tree():super(),
 
 	mLowMod(0),
 	mLowDistance(0)
-	//mMeshNode,
-	//mLowMeshNode
-{}
-
-Node *Tree::create(Scene *scene,int seed,Node *parent,const Vector3 &translate){
-	super::create(scene);
-
+{
 	Logger::alert("Tree::create");
 
 	setScope(RandIsle::Scope_TREE);
@@ -96,7 +88,7 @@ Node *Tree::create(Scene *scene,int seed,Node *parent,const Vector3 &translate){
 
 	mergeBounds(mTreeBranches[0]);
 
-	mBound.set(mTreeBranches[0]->bound);
+	mBound->set(mTreeBranches[0]->bound);
 
 	Mesh::ptr mesh=new Mesh();
 	mesh->setStaticVertexData(new VertexData(mBranchVertexBuffer));
@@ -107,7 +99,7 @@ Node *Tree::create(Scene *scene,int seed,Node *parent,const Vector3 &translate){
 		subMesh->material=mBranchMaterial;
 		mesh->addSubMesh(subMesh);
 	}
-	if(1){
+	{
 		Mesh::SubMesh::ptr subMesh=new Mesh::SubMesh();
 		subMesh->vertexData=new VertexData(mLeafVertexBuffer);
 		subMesh->indexData=new IndexData(IndexData::Primitive_TRIS,mLeafIndexBuffer);
@@ -125,7 +117,7 @@ Node *Tree::create(Scene *scene,int seed,Node *parent,const Vector3 &translate){
 		subMesh->material=mBranchMaterial;
 		lowMesh->addSubMesh(subMesh);
 	}
-	if(1){
+	{
 		Mesh::SubMesh::ptr subMesh=new Mesh::SubMesh();
 		subMesh->vertexData=new VertexData(mLeafVertexBuffer);
 		subMesh->indexData=new IndexData(IndexData::Primitive_TRIS,mLeafIndexBuffer);
@@ -136,17 +128,15 @@ Node *Tree::create(Scene *scene,int seed,Node *parent,const Vector3 &translate){
 
 	alignLeaves(Math::ZERO_VECTOR3,Math::X_UNIT_VECTOR3,true);
 
-	mMeshNode=mEngine->createNodeType(MeshNode::type(),mScene);
-	mMeshNode->setMesh(mesh);
-	attach(mMeshNode);
+	mMesh=new MeshComponent(mEngine);
+	mMesh->setMesh(mesh);
+	attach(mMesh);
 
-	mLowMeshNode=mEngine->createNodeType(MeshNode::type(),mScene);
-	mLowMeshNode->setMesh(lowMesh);
-	attach(mLowMeshNode);
+	mLowMesh=new MeshComponent(mEngine);
+	mLowMesh->setMesh(lowMesh);
+	attach(mLowMesh);
 
 	Logger::alert("tree created");
-
-	return this;
 }
 
 void Tree::destroy(){
@@ -178,11 +168,14 @@ void Tree::destroy(){
 	mTreeBranches.clear();
 	mLeaves.clear();
 
-	super::destroy();
+	mMesh->destroy();
+	mLowMesh->destroy();
+
+	Node::destroy();
 }
 
 void Tree::frameUpdate(int dt,int scope){
-	super::frameUpdate(dt,scope);
+	Node::frameUpdate(dt,scope);
 
 	if(mHasWiggleLeaves){
 		mHasWiggleLeaves=false; // Gets reset each run through
@@ -234,31 +227,6 @@ void Tree::frameUpdate(int dt,int scope){
 	}
 }
 
-void Tree::gatherRenderables(CameraNode *camera,RenderableSet *set){
-	if(Math::lengthSquared(camera->getWorldTranslate(),getWorldTranslate())<Math::square(mLowDistance)){
-		mLowMeshNode->setScope(0);
-	}
-	else{
-		mMeshNode->setScope(0);
-	}
-
-	super::gatherRenderables(camera,set);
-
-	mMeshNode->setScope(-1);
-	mLowMeshNode->setScope(-1);
-
-#if 0
-	Segment seg;seg.setStartDir(camera->getWorldTranslate(),camera->getForward());
-	Quaternion invrot;Math::invert(invrot,getWorldRotate());
-	Math::sub(seg.origin,getWorldTranslate());
-	Math::mul(seg.origin,invrot);
-	Math::mul(seg.direction,invrot);
-	Math::div(seg.origin,getWorldScale());
-
-	alignLeaves(seg.origin,seg.direction,false);
-#endif
-}
-
 BranchSystem::Branch::ptr Tree::branchCreated(BranchSystem::Branch *parent){
 	TreeBranch *parentTreeBranch=(TreeBranch*)parent;
 
@@ -298,7 +266,7 @@ void Tree::branchBuild(BranchSystem::Branch *branch){
 		segment.origin=branch->position + getWorldTranslate();
 		segment.direction=branch->position-treeBranch->points[treeBranch->points.size()-1];
 		toadlet::tadpole::Collision result;
-		((HopScene*)mScene.get())->traceSegment(result,segment,-1,NULL);
+		mScene->traceSegment(result,segment,-1,NULL);
 		if(result.time<Math::ONE){
 			branch->life=0;
 		}
@@ -573,6 +541,15 @@ bool Tree::wiggleLeaves(const Sphere &bound,Tree::TreeBranch *branch){
 	}
 
 	return result;
+}
+
+void Tree::gatherRenderables(Camera *camera,RenderableSet *set){
+	if(Math::lengthSquared(camera->getPosition(),getWorldTranslate())<Math::square(mLowDistance)){
+		mMesh->gatherRenderables(camera,set);
+	}
+	else{
+		mLowMesh->gatherRenderables(camera,set);
+	}
 }
 
 PathSystem::Path *Tree::getClosestPath(Vector3 &closestPoint,const Vector3 &point){

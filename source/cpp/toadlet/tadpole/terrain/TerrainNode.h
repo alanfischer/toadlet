@@ -30,7 +30,7 @@
 #include <toadlet/tadpole/terrain/TerrainNodeDataSource.h>
 #include <toadlet/tadpole/terrain/TerrainNodeMaterialSource.h>
 #include <toadlet/tadpole/terrain/TerrainNodeListener.h>
-#include <toadlet/tadpole/terrain/TerrainPatchNode.h>
+#include <toadlet/tadpole/terrain/TerrainPatchComponent.h>
 
 namespace toadlet{
 namespace tadpole{
@@ -39,14 +39,12 @@ namespace terrain{
 /// @todo: Use the quadtree to store child nodes and implement the commented out methods
 class TOADLET_API TerrainNode:public PartitionNode,public Traceable{
 public:
-	TOADLET_NODE(TerrainNode,PartitionNode);
+	TOADLET_OBJECT(TerrainNode);
 
-	TerrainNode();
+	TerrainNode(Scene *scene);
 	virtual ~TerrainNode();
-	Node *create(Scene *scene);
+
 	void destroy();
-	Node *set(Node *node);
-	void *hasInterface(int type){return type==InterfaceType_TRACEABLE?(Traceable*)this:NULL;}
 
 	void setListener(TerrainNodeListener *listener){mListener=listener;}
 	TerrainNodeListener *getListener(){return mListener;}
@@ -75,12 +73,12 @@ public:
 	void setTolerance(scalar tolerance);
 
 	int localPatchIndex(int x,int y){return (y+mHalfSize)*mSize+(x+mHalfSize);}
-	TerrainPatchNode *patchAt(int x,int y){
+	TerrainPatchComponent *patchAt(int x,int y){
 		int index=localPatchIndex(x-mTerrainX,y-mTerrainY);
 		if(index>=0 && index<mPatchGrid.size()) return mPatchGrid[index];
 		else return NULL;
 	}
-	void setPatchAt(int x,int y,TerrainPatchNode::ptr patch){
+	void setPatchAt(int x,int y,TerrainPatchComponent::ptr patch){
 		int index=localPatchIndex(x-mTerrainX,y-mTerrainY);
 		if(index>=0 && index<mPatchGrid.size()) mPatchGrid[index]=patch;
 	}
@@ -97,12 +95,12 @@ public:
 	scalar toWorldXf(scalar x){return Math::mul(x,mPatchSize*mPatchScale.x);}
 	scalar toWorldYf(scalar y){return Math::mul(y,mPatchSize*mPatchScale.y);}
 
-	void gatherRenderables(CameraNode *camera,RenderableSet *set);
+	void gatherRenderables(Camera *camera,RenderableSet *set);
 
 	void logicUpdate(int dt,int scope);
 
 	// Traceable
-	const Bound &getBound() const{return super::getBound();}
+	Bound *getTraceableBound() const{return Node::getBound();}
 	void traceSegment(Collision &result,const Vector3 &position,const Segment &segment,const Vector3 &size);
 
 	void updateTarget();
@@ -110,7 +108,7 @@ public:
 	void destroyPatch(int x,int y);
 	void updateBound();
 
-	void updatePatches(CameraNode *camer);
+	void updatePatches(Camera *camera);
 
 	// Node items
 /*	void nodeAttached(Node *node);
@@ -131,8 +129,9 @@ protected:
 	TerrainNodeMaterialSource::ptr mMaterialSource;
 	int mSize,mHalfSize;
 	int mTerrainX,mTerrainY;
-	Collection<TerrainPatchNode::ptr> mUnactivePatches;
-	Collection<TerrainPatchNode::ptr> mPatchGrid;
+	Collection<TerrainPatchComponent::ptr> mUnactivePatches;
+	Collection<TerrainPatchComponent::ptr> mPatchGrid;
+	Collection<Node::ptr> mPatchNodes;
 	int mPatchSize;
 	Material::ptr mPatchMaterial;
 	Material::ptr mPatchWaterMaterial;

@@ -36,13 +36,11 @@ namespace node{
 
 class TOADLET_API PartitionNode:public Node{
 public:
-	TOADLET_NODE(PartitionNode,Node);
+	TOADLET_OBJECT(PartitionNode);
 
-	PartitionNode();
-	virtual Node *create(Scene *scene);
-	virtual void destroy();
+	PartitionNode(Scene *scene);
 
-	virtual bool senseBoundingVolumes(SensorResultsListener *listener,const Bound &bound);
+	virtual bool senseBoundingVolumes(SensorResultsListener *listener,Bound *bound);
 	virtual bool sensePotentiallyVisible(SensorResultsListener *listener,const Vector3 &point);
 	virtual bool findAmbientForPoint(Vector4 &r,const Vector3 &point);
 };

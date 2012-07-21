@@ -5,9 +5,8 @@
 
 class GroundProjector:public BaseComponent{
 public:
-	GroundProjector(HopEntity *node,MeshNode *mesh,scalar distance,scalar offset):BaseComponent(){
+	GroundProjector(Node *node,scalar distance,scalar offset):BaseComponent(){
 		mNode=node;
-		mMesh=mesh;
 		mDistance=distance;
 		mOffset=offset;
 	}
@@ -21,9 +20,9 @@ public:
 
 		if(result.time<Math::ONE){
 			Math::madd(result.point,result.normal,mOffset,result.point);
-			mMesh->getParent()->getWorldTransform().inverseTransform(result.point);
-			mMesh->setTranslate(result.point);
-		
+			mParent->getParent()->getWorldTransform().inverseTransform(result.point);
+			mParent->setTranslate(result.point);
+	
 			Vector3 right,forward,up;
 			Math::mul(forward,mNode->getWorldRotate(),Math::Y_UNIT_VECTOR3);
 			up.set(result.normal);
@@ -32,16 +31,15 @@ public:
 			Math::cross(forward,up,right);
 			Quaternion rotate,invRotate;
 			Math::setQuaternionFromAxes(rotate,right,forward,up);
-			Math::invert(invRotate,mMesh->getParent()->getWorldTransform().getRotate());
+			Math::invert(invRotate,mParent->getParent()->getWorldTransform().getRotate());
 			Math::postMul(rotate,invRotate);
-			mMesh->setRotate(rotate);
+			mParent->setRotate(rotate);
 		}
-		mMesh->setScale(Math::ONE-result.time);
+		mParent->setScale(Math::ONE-result.time);
 	}
 
 protected:
-	HopEntity::ptr mNode;
-	MeshNode::ptr mMesh;
+	Node::ptr mNode;
 	scalar mDistance;
 	scalar mOffset;
 };

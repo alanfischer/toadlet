@@ -26,19 +26,16 @@
 #include <toadlet/egg/Error.h>
 #include <toadlet/tadpole/Engine.h>
 #include <toadlet/tadpole/Scene.h>
-#include <toadlet/tadpole/ActionComponent.h>
+#include <toadlet/tadpole/Action.h>
+#include <toadlet/tadpole/LightComponent.h>
+#include <toadlet/tadpole/Visible.h>
 #include <toadlet/tadpole/node/Node.h>
-#include <toadlet/tadpole/node/CameraNode.h>
 
 namespace toadlet{
 namespace tadpole{
 namespace node{
 
-TOADLET_NODE_IMPLEMENT(Node,Categories::TOADLET_TADPOLE_NODE+".Node");
-
-Node::Node():BaseComponent(),
-	mCreated(false),
-	mEngine(NULL),
+Node::Node(Scene *scene):BaseComponent(),
 	mScene(NULL),
 	mUniqueHandle(0),
 
@@ -48,10 +45,11 @@ Node::Node():BaseComponent(),
 	mChildrenActive(false),
 	mActivateChildren(false),
 
+	//mActions,
+	mPhysics(NULL),
+
 	mActive(false),
 	mDeactivateCount(0),
-	mLastLogicFrame(0),
-	mLastFrame(0),
 	mTransformUpdatedFrame(0),
 
 	//mTransform,
@@ -60,26 +58,8 @@ Node::Node():BaseComponent(),
 	//mWorldBound,
 	mScope(0)
 {
-}
-
-Node::~Node(){
-	destroy();
-}
-
-Node *Node::create(Scene *scene){
-	if(mCreated){
-		return this;
-	}
-
-	mCreated=true;
-	if(scene!=NULL){
-		mScene=scene;
-		mEngine=mScene->getEngine();
-	}
-
-	if(mEngine!=NULL){
-		mEngine->nodeCreated(this);
-	}
+	mScene=scene;
+	mEngine=mScene->getEngine();
 
 	mParent=NULL;
 	mParentData=NULL;
@@ -92,59 +72,27 @@ Node *Node::create(Scene *scene){
 	mTransformUpdatedFrame=-1;
 
 	mTransform.reset();
-	mBound.reset();
+	mBound=new Bound();
 	mWorldTransform.reset();
-	mWorldBound.reset();
+	mWorldBound=new Bound();
+	mComponentBound=new Bound();
+	mComponentWorldBound=new Bound();
 	mScope=-1;
+}
 
-	return this;
+Node::~Node(){
+	destroy();
 }
 
 void Node::destroy(){
-	if(mCreated==false){
-		return;
-	}
-
 	destroyAllChildren();
 
-	Node::ptr reference(this); // To make sure that the object is not deleted right away
-
-	mCreated=false;
-
-	if(mParent!=NULL){
-		mParent->remove(this);
-		mParent=NULL;
-	}
-
-	if(mEngine!=NULL){
-		mEngine->nodeDestroyed(this);
-	}
-
-	mEngine=NULL;
-	mScene=NULL;
-}
-
-Node *Node::set(Node *node){
-	TOADLET_ASSERT(getType()==node->getType());
-
-	setTransform(node->mTransform);
-	setBound(node->mBound);
-	setScope(node->mScope);
-	setName(node->mName);
-
-	return node;
-}
-
-Node *Node::clone(Scene *scene){return mEngine->createNode(getType(),scene)->set(this);}
-
-void *Node::hasInterface(int type){
-	if(type==InterfaceType_TRANSFORMABLE) return (Transformable*)this;
-	return NULL;
+	BaseComponent::destroy();
 }
 
 void Node::destroyAllChildren(){
-	while(mFirstChild!=NULL){
-		mFirstChild->destroy();
+	while(mComponents.size()>0){
+		mComponents[0]->destroy();
 	}
 }
 
@@ -183,51 +131,32 @@ bool Node::remove(Component *component){
 }
 
 void Node::nodeAttached(Node *node){
-	mComponents.remove(node);
-
-	Node *previous=mLastChild;
-	node->previousChanged(previous);
-	if(previous!=NULL){
-		previous->nextChanged(node);
-	}
-	else{
-		mFirstChild=node;
-	}
-	mLastChild=node;
-
-	node->nextChanged(NULL);
+	mNodes.add(node);
 }
 
 void Node::nodeRemoved(Node *node){
-	Node *previous=node->getPrevious();
-	Node *next=node->getNext();
-	if(previous!=NULL){
-		previous->nextChanged(next);
-	}
-	if(next!=NULL){
-		next->previousChanged(previous);
-	}
-
-	if(mFirstChild==node){
-		mFirstChild=next;
-	}
-	if(mLastChild==node){
-		mLastChild=previous;
-	}
-
-	node->previousChanged(NULL);
-	// Leave node->next so traversals can continue
+	mNodes.remove(node);
 }
 
-void Node::actionAttached(ActionComponent *action){
+void Node::actionAttached(Action *action){
 	mActions.add(action);
 }
 
-void Node::actionRemoved(ActionComponent *action){
+void Node::actionRemoved(Action *action){
 	mActions.remove(action);
 }
 
-ActionComponent *Node::getAction(const String &name){
+Component *Node::getChild(const String &name){
+	int i;
+	for(i=0;i<mComponents.size();++i){
+		if(mComponents[i]->getName()==name){
+			return mComponents[i];
+		}
+	}
+	return NULL;
+}
+
+Action *Node::getAction(const String &name){
 	int i;
 	for(i=0;i<mActions.size();++i){
 		if(mActions[i]->getName()==name){
@@ -325,81 +254,64 @@ void Node::setTransform(const Transform &transform){
 	spacialUpdated();
 }
 
-void Node::setBound(const Bound &bound){
-	mBound.set(bound);
+void Node::setBound(Bound *bound){
+	mBound->set(bound);
 	spacialUpdated();
 }
 
 void Node::logicUpdate(int dt,int scope){
-	mLastLogicFrame=mScene->getLogicFrame();
-	bool anyActive=false;
-
-	/// @todo: Use a linked list for the Components, and NOT check to see if they are a node here
 	int i;
-	for(i=0;i<mComponents.size();++i){
-		mComponents[i]->logicUpdate(dt,scope);
-		anyActive|=mComponents[i]->getActive();
-	}
-	if(anyActive){
-		activate();
-	}
 
 	updateWorldTransform();
 
-	mChildrenActive=false;
-
-	Node::ptr node,next;
-	for(node=getFirstChild();node!=NULL;node=next){
-		next=node->getNext();
-		if(mActivateChildren){
+	if(mActivateChildren){
+		for(i=0;i<mNodes.size();++i){
+			Node *node=mNodes[i];
 			node->activate();
 		}
+		mActivateChildren=false;
+	}
+
+	mChildrenActive=false;
+	for(i=0;i<mComponents.size();++i){
+		Component *component=mComponents[i];
+		component->logicUpdate(dt,scope);
+		mChildrenActive|=component->getActive();
+	}
+
+	for(i=0;i<mNodes.size();++i){
+		Node *node=mNodes[i];
 		if(node->getActive() && (node->getScope()&scope)!=0){
-			node->logicUpdate(dt,scope);
 			node->tryDeactivate();
-			mChildrenActive=true;
 		}
 		else{
 			mergeWorldBound(node,false);
 		}
 	}
-
-	mActivateChildren=false;
 }
 
 void Node::frameUpdate(int dt,int scope){
-	mLastFrame=mScene->getFrame();
-
-	/// @todo: Use a linked list for the Components, and NOT check to see if they are a node here
 	int i;
-	for(i=0;i<mComponents.size();++i){
-		mComponents[i]->frameUpdate(dt,scope);
-	}
 
 	updateWorldTransform();
 
-	Node::ptr node,next;
-	for(node=getFirstChild();node!=NULL;node=next){
-		next=node->getNext();
-		// This may not be in logicUpdate, but it solves an issue where a deactivated Node would not get updated if 
-		//  it only had frameUpdate called on it before a render
-		if(mActivateChildren){
-			node->activate();
-		}
+	for(i=0;i<mComponents.size();++i){
+		Component *component=mComponents[i];
+		component->frameUpdate(dt,scope);
+	}
+
+	for(i=0;i<mNodes.size();++i){
+		Node *node=mNodes[i];
 		if(node->getActive() && (node->getScope()&scope)!=0){
-			node->frameUpdate(dt,scope);
 		}
 		else{
 			mergeWorldBound(node,false);
 		}
 	}
-
-	// See the comment above on child->activate() in frameUpdate()
-	mActivateChildren=false;
 }
 
 void Node::mergeWorldBound(Node *child,bool justAttached){
-	mWorldBound.merge(child->getWorldBound(),mScene->getEpsilon());
+	mWorldBound->merge(child->getWorldBound(),mScene->getEpsilon());
 }
 
 void Node::setStayActive(bool active){
@@ -434,9 +346,9 @@ void Node::deactivate(){
 	mActive=false;
 	mDeactivateCount=0;
 
-	super::deactivate();
-	Node::ptr node;
-	for(node=getFirstChild();node!=NULL;node=node->getNext()){
+	int i;
+	for(i=0;i<mNodes.size();++i){
+		Node *node=mNodes[i];
 		node->deactivate();
 	}
 }
@@ -467,8 +379,19 @@ void Node::updateWorldTransform(){
 	else{
 		mWorldTransform.setTransform(mParent->mWorldTransform,mTransform);
 	}
+	mWorldBound->transform(mBound,mWorldTransform);
 
-	mWorldBound.transform(mBound,mWorldTransform);
+	mComponentBound->reset();
+	int i;
+	for(i=0;i<mComponents.size();++i){
+		Component *component=mComponents[i];
+		Bound *bound=component->getBound();
+		if(bound!=NULL){
+			mComponentBound->merge(bound,mScene->getEpsilon());
+		}
+	}
+	mComponentWorldBound->transform(mComponentBound,mWorldTransform);
+	mWorldBound->merge(mComponentWorldBound,mScene->getEpsilon());
 
 	if(mParent!=NULL){
 		mParent->mergeWorldBound(this,false);
@@ -479,24 +402,34 @@ void Node::spacialUpdated(){
 	if(mScene!=NULL){
 		mTransformUpdatedFrame=mScene->getFrame();
 	}
+
+	int i;
+	for(i=0;i<mComponents.size();++i){
+		Component *component=mComponents[i];
+		component->transformChanged();
+	}
+
 	activate();
 }
 
-void Node::updateAllWorldTransforms(){
-	updateWorldTransform();
+void Node::gatherRenderables(Camera *camera,RenderableSet *set){
+	int i;
 
-	Node *node;
-	for(node=getFirstChild();node!=NULL;node=node->getNext()){
-		node->updateAllWorldTransforms();
-	}
-}
-
-void Node::gatherRenderables(CameraNode *camera,RenderableSet *set){
-	Node *node;
-	for(node=getFirstChild();node!=NULL;node=node->getNext()){
-		if(camera->culled(node)==false){
+	for(i=0;i<mNodes.size();++i){
+		Node *node=mNodes[i];
+		if((camera->getScope()&node->getScope())!=0 && camera->culled(node->getWorldBound())==false){
 			node->gatherRenderables(camera,set);
 		}
+	}
+	
+	for(i=0;i<mLights.size();++i){
+		if(mLights[i]->getEnabled()){
+			set->queueLight(mLights[i]);
+		}
+	}
+
+	for(i=0;i<mVisibles.size();++i){
+		mVisibles[i]->gatherRenderables(camera,set);
 	}
 }
 

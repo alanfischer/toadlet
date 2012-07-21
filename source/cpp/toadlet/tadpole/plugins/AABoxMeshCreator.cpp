@@ -108,9 +108,9 @@ Mesh::ptr AABoxMeshCreator::createAABoxMesh(const AABox &box,Material::ptr mater
 	}
 	subMesh->material=material;
 
-	Mesh::ptr mesh(new Mesh());
+	Mesh::ptr mesh=new Mesh();
 	mesh->addSubMesh(subMesh);
-	mesh->setBound(Bound(box));
+	mesh->setBound(new Bound(box));
 	mesh->setStaticVertexData(VertexData::ptr(new VertexData(vertexBuffer)));
 
 	return mesh;

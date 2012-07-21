@@ -25,7 +25,7 @@
 
 #include <toadlet/egg/Error.h>
 #include <toadlet/tadpole/bsp/BSP30Streamer.h>
-#include <toadlet/tadpole/bsp/BSP30Node.h>
+#include <toadlet/tadpole/bsp/BSP30ModelComponent.h>
 #include <toadlet/tadpole/plugins/WADArchive.h>
 
 namespace toadlet{
@@ -387,15 +387,16 @@ void BSP30Streamer::buildMaterials(BSP30Map *map){
 
 void BSP30Streamer::buildModels(BSP30Map::ptr map){
 	map->modelResources.resize(map->nmodels-1);
-	int i;
+/*	int i;
 	for(i=1;i<map->nmodels;++i){
-		BSP30ModelNode *modelNode=mEngine->createNodeType(BSP30ModelNode::type(),NULL);
-		modelNode->setModel(map,i);
+		BSP30ModelComponent *model=new BSP30ModelComponent(mEngine);
+		model->setModel(map,i);
 		NodeResource::ptr model(new NodeResource());
 		model->setNode(modelNode);
 		mEngine->getNodeManager()->manage(model,String("*")+i);
 		map->modelResources[i-1]=model;
 	}
+*/
 }
 
 tbyte Quake1Palette[]={

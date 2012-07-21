@@ -57,7 +57,7 @@ public:
 
 		bool hasOwnTransform;
 		Transform transform;
-		Bound bound;
+		Bound::ptr bound;
 	};
 
 	class TOADLET_API VertexBoneAssignment{
@@ -87,8 +87,8 @@ public:
 	virtual void setTransform(const Transform &transform){mTransform.set(transform);}
 	const Transform &getTransform() const{return mTransform;}
 
-	virtual void setBound(const Bound &bound){mBound.set(bound);}
-	const Bound &getBound() const{return mBound;}
+	virtual void setBound(Bound *bound){mBound=bound;}
+	Bound *getBound() const{return mBound;}
 
 	virtual void addSubMesh(SubMesh::ptr subMesh){mSubMeshes.add(subMesh);}
 	virtual void removeSubMesh(SubMesh::ptr subMesh){mSubMeshes.remove(subMesh);}
@@ -107,7 +107,7 @@ public:
 
 protected:
 	Transform mTransform;
-	Bound mBound;
+	Bound::ptr mBound;
 	Collection<SubMesh::ptr> mSubMeshes;
 	VertexData::ptr mStaticVertexData;
 	Skeleton::ptr mSkeleton;

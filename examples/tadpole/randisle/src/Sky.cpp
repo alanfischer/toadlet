@@ -1,13 +1,10 @@
 #include "Sky.h"
 #include <toadlet/tadpole/plugins/SkyDomeMeshCreator.h>
 
-TOADLET_NODE_IMPLEMENT(Sky,"Sky");
-
-Node *Sky::create(Scene *scene,int cloudSize,const Vector4 &skyColor,const Vector4 &fadeColor){
-	super::create(scene);
-
+Sky::Sky(Scene *scene,int cloudSize,const Vector4 &skyColor,const Vector4 &fadeColor):Node(scene)
+{
 	Sphere sphere(Vector3(0,0,0),512);
-	Vector3 lightDir(1,1,0.5);
+	Vector3 lightDir(1,-1,0.5);
 	bool advanced=false; // Use realtime bumpmapping, or precalculated
 
 	Logger::alert("Allocating Sky resources");
@@ -127,7 +124,7 @@ Node *Sky::create(Scene *scene,int cloudSize,const Vector4 &skyColor,const Vecto
 				"Texture2D bumpTex,cloudTex,fadeTex;\n"
 				"SamplerState bumpSamp,cloudSamp,fadeSamp;\n"
 
-				"float4 main(PIN pin): SV_TARGET{\n"
+				"float4 main(PIN pin): SV_TARGET{\n`"
 					"float4 bump=bumpTex.Sample(bumpSamp,pin.texCoord0);\n"
 					"float4 cloud=cloudTex.Sample(cloudSamp,pin.texCoord0);\n"
 					"float4 fade=fadeTex.Sample(fadeSamp,pin.texCoord1);\n"
@@ -171,7 +168,7 @@ Node *Sky::create(Scene *scene,int cloudSize,const Vector4 &skyColor,const Vecto
 			bumpState.colorSource2=TextureState::Source_TEXTURE;
 			pass->setTexture(Shader::ShaderType_FRAGMENT,state,bumpTexture,SamplerState(),bumpState);
 			mBumpAccessor=Matrix4x4Accessor::ptr(new TextureStateMatrix4x4Accessor(pass,state++));
-
+/*
 			TextureState cloudState;
 			cloudState.colorOperation=TextureState::Operation_ADD;
 			cloudState.colorSource1=TextureState::Source_PREVIOUS;
@@ -201,6 +198,7 @@ Node *Sky::create(Scene *scene,int cloudSize,const Vector4 &skyColor,const Vecto
 			fadeState.alphaSource1=TextureState::Source_TEXTURE;
 			pass->setTexture(Shader::ShaderType_FRAGMENT,state,fadeTexture,SamplerState(),fadeState);
 			mFadeAccessor=Matrix4x4Accessor::ptr(new TextureStateMatrix4x4Accessor(pass,state++));
+*/
 		}
 
 		material->compile();
@@ -228,7 +226,7 @@ Node *Sky::create(Scene *scene,int cloudSize,const Vector4 &skyColor,const Vecto
 	mesh->setTransform(transform);
 	mesh->getSubMesh(0)->material=mSkyMaterial;
 
-	mSkyDome=mEngine->createNodeType(MeshNode::type(),mScene);
+	mSkyDome=new MeshComponent(mEngine);
 	mSkyDome->setMesh(mesh);
 	attach(mSkyDome);
 
@@ -245,24 +243,30 @@ Node *Sky::create(Scene *scene,int cloudSize,const Vector4 &skyColor,const Vecto
 	sunMaterial->getPass()->setDepthState(DepthState(DepthState::DepthTest_ALWAYS,false));
 	sunMaterial->compile();
 
-	mSun=mEngine->createNodeType(SpriteNode::type(),mScene);
-	mSun->setMaterial(sunMaterial);
-	mSun->setScale(128,128,128);
-	attach(mSun);
+	mSunNode=new Node(mScene);
+	{
+		mSun=new SpriteComponent(mEngine);
+		mSun->setMaterial(sunMaterial);
+		mSunNode->attach(mSun);
+	}
+	mSunNode->setScale(128,128,128);
+	attach(mSunNode);
 
 	Logger::alert("Done allocating Sky resources");
 
-	mLight=mEngine->createNodeType(LightNode::type(),mScene);
-	LightState lightState;
-	lightState.diffuseColor.set(Colors::WHITE);
-	lightState.specularColor.set(Colors::WHITE);
-	mLight->setLightState(lightState);
-	attach(mLight);
+	mLightNode=new Node(mScene);
+	{
+		mLight=new LightComponent();
+		LightState lightState;
+		lightState.diffuseColor.set(Colors::WHITE);
+		lightState.specularColor.set(Colors::WHITE/4);
+		mLight->setLightState(lightState);
+		mLightNode->attach(mLight);
+	}
+	attach(mLightNode);
 
 	Math::normalize(lightDir);
 	updateLightDirection(lightDir);
-
-	return this;
 }
 
 void Sky::destroy(){
@@ -271,7 +275,7 @@ void Sky::destroy(){
 		mSkyMaterial=NULL;
 	}
 
-	super::destroy();
+	Node::destroy();
 }
 
 void Sky::updateLightDirection(const Vector3 &lightDir){
@@ -280,7 +284,7 @@ void Sky::updateLightDirection(const Vector3 &lightDir){
 	state.direction=-lightDir;
 	mLight->setLightState(state);
 
-	mSun->setTranslate(lightDir*256);
+	mSunNode->setTranslate(lightDir*256);
 
 	VertexBuffer *buffer=mSkyDome->getMesh()->getStaticVertexData()->getVertexBuffer(0);
 	VertexBufferAccessor vba(buffer,Buffer::Access_READ_WRITE);
@@ -306,7 +310,7 @@ void Sky::updateLightDirection(const Vector3 &lightDir){
 }
 
 void Sky::frameUpdate(int dt,int scope){
-	super::frameUpdate(dt,scope);
+	Node::frameUpdate(dt,scope);
 
 	Vector3 offset;
 	Math::mul(offset,getWorldTranslate(),0.0001); // Since the sky is in the background, it's world translate will be the viewer's world translate

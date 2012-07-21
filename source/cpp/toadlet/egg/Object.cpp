@@ -29,11 +29,11 @@ namespace toadlet{
 namespace egg{
 
 void *Object::operator new(size_t size){
-	return malloc(size);
+	return TOADLET_ALIGNED_MALLOC(size,TOADLET_ALIGNED_SIZE);
 }
 
 void Object::operator delete(void *p){
-	free(p);
+	TOADLET_ALIGNED_FREE(p);
 }
 
 }

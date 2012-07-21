@@ -49,11 +49,11 @@ public:
 	
 	void destroy();
 
-	bool addBuffer(Shader::ShaderType shaderType,int index,VariableBuffer::ptr buffer);
-	void removeBuffer(VariableBuffer::ptr buffer);
+	bool addBuffer(Shader::ShaderType shaderType,int index,VariableBuffer *buffer);
+	void removeBuffer(VariableBuffer *buffer);
 	int findBuffer(const String &name);
 	inline int getNumBuffers() const{return mBuffers.size();}
-	inline VariableBuffer::ptr getBuffer(int i){return mBuffers[i].buffer;}
+	inline VariableBuffer *getBuffer(int i){return mBuffers[i].buffer;}
 	inline int getBufferScope(int i){return mBuffers[i].scope;}
 	inline Shader::ShaderType getBufferShaderType(int i){return mBuffers[i].shaderType;}
 	inline int getBufferIndex(int i){return mBuffers[i].index;}
