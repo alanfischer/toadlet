@@ -386,8 +386,8 @@ void BSP30Streamer::buildMaterials(BSP30Map *map){
 }
 
 void BSP30Streamer::buildModels(BSP30Map::ptr map){
-	map->modelResources.resize(map->nmodels-1);
-/*	int i;
+/*	map->modelResources.resize(map->nmodels-1);
+	int i;
 	for(i=1;i<map->nmodels;++i){
 		BSP30ModelComponent *model=new BSP30ModelComponent(mEngine);
 		model->setModel(map,i);

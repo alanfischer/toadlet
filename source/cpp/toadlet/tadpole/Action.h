@@ -40,7 +40,7 @@ public:
 	virtual bool getActive() const=0;
 
 	virtual void setActionListener(ActionListener *listener)=0;
-	virtual ActionListener *getActionListener()=0;
+	virtual ActionListener *getActionListener() const=0;
 };
 
 }

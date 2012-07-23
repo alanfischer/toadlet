@@ -32,9 +32,8 @@
 
 namespace toadlet{
 namespace tadpole{
-namespace node{
-	class Node;
-}
+
+class Node;
 
 class Component:public Interface{
 public:

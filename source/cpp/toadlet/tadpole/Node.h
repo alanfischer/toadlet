@@ -23,8 +23,8 @@
  *
  ********** Copyright header - do not remove **********/
 
-#ifndef TOADLET_TADPOLE_NODE_NODE_H
-#define TOADLET_TADPOLE_NODE_NODE_H
+#ifndef TOADLET_TADPOLE_NODE_H
+#define TOADLET_TADPOLE_NODE_H
 
 #include <toadlet/tadpole/Types.h>
 #include <toadlet/egg/Type.h>
@@ -43,8 +43,6 @@ class Action;
 class LightComponent;
 class Visible;
 class PhysicsComponent;
-
-namespace node{
 
 class TOADLET_API Node:public BaseComponent,public Transformable{
 public:
@@ -172,7 +170,6 @@ protected:
 	int mScope;
 };
 
-}
 }
 }
 

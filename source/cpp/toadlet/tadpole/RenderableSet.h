@@ -29,7 +29,7 @@
 #include <toadlet/tadpole/Renderable.h>
 #include <toadlet/tadpole/Camera.h>
 #include <toadlet/tadpole/LightComponent.h>
-#include <toadlet/tadpole/node/PartitionNode.h>
+#include <toadlet/tadpole/PartitionNode.h>
 
 namespace toadlet{
 namespace tadpole{

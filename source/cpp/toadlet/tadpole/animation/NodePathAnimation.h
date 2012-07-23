@@ -27,7 +27,7 @@
 #define TOADLET_TADPOLE_ANIMATION_NODEPATHANIMATION_H
 
 #include <toadlet/tadpole/animation/BaseAnimation.h>
-#include <toadlet/tadpole/node/Node.h>
+#include <toadlet/tadpole/Node.h>
 #include <toadlet/tadpole/Track.h>
 
 namespace toadlet{

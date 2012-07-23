@@ -78,7 +78,7 @@ void BSP30Map::destroy(){
 	materials.clear();
 	lightmapTextures.clear();
 	lightmapDirties.clear();
-	modelResources.clear();
+//	modelResources.clear();
 
 	delete[] lightmapData;
 	lightmapData=NULL;

@@ -23,30 +23,50 @@
  *
  ********** Copyright header - do not remove **********/
 
-#ifndef TOADLET_TADPOLE_NODE_PARTITIONNODE_H
-#define TOADLET_TADPOLE_NODE_PARTITIONNODE_H
-
-#include <toadlet/tadpole/node/Node.h>
-#include <toadlet/tadpole/sensor/SensorResultsListener.h>
+#include <toadlet/tadpole/PartitionNode.h>
+#include <toadlet/tadpole/Scene.h>
 
 namespace toadlet{
 namespace tadpole{
 
-namespace node{
+PartitionNode::PartitionNode(Scene *scene):Node(scene){
+}
 
-class TOADLET_API PartitionNode:public Node{
-public:
-	TOADLET_OBJECT(PartitionNode);
+bool PartitionNode::senseBoundingVolumes(SensorResultsListener *listener,Bound *bound){
+	bool result=false;
 
-	PartitionNode(Scene *scene);
+	int i;
+	for(i=0;i<mNodes.size();++i){
+		Node *node=mNodes[i];
+		if(bound->testIntersection(node->getWorldBound())){
+			result|=true;
+			if(listener->resultFound(node,Math::lengthSquared(bound->getSphere().origin,node->getWorldTranslate()))==false){
+				return true;
+			}
+		}
+	}
+	
+	return result;
+}
 
-	virtual bool senseBoundingVolumes(SensorResultsListener *listener,Bound *bound);
-	virtual bool sensePotentiallyVisible(SensorResultsListener *listener,const Vector3 &point);
-	virtual bool findAmbientForPoint(Vector4 &r,const Vector3 &point);
-};
+bool PartitionNode::sensePotentiallyVisible(SensorResultsListener *listener,const Vector3 &point){
+	bool result=false;
+
+	int i;
+	for(i=0;i<mNodes.size();++i){
+		Node *node=mNodes[i];
+		result|=true;
+		if(listener->resultFound(node,Math::lengthSquared(point,node->getWorldTranslate()))==false){
+			return true;
+		}
+	}
+	
+	return result;
+}
+
+bool PartitionNode::findAmbientForPoint(Vector4 &r,const Vector3 &point){
+	return false;
+}
 
 }
 }
-}
-
-#endif

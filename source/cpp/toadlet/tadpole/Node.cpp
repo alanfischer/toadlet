@@ -29,11 +29,10 @@
 #include <toadlet/tadpole/Action.h>
 #include <toadlet/tadpole/LightComponent.h>
 #include <toadlet/tadpole/Visible.h>
-#include <toadlet/tadpole/node/Node.h>
+#include <toadlet/tadpole/Node.h>
 
 namespace toadlet{
 namespace tadpole{
-namespace node{
 
 Node::Node(Scene *scene):BaseComponent(),
 	mScene(NULL),
@@ -433,6 +432,5 @@ void Node::gatherRenderables(Camera *camera,RenderableSet *set){
 	}
 }
 
-}
 }
 }

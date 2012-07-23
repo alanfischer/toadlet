@@ -190,7 +190,6 @@ Engine::Engine(void *env,void *ctx)://bool fixedBackable,bool shaderBackable):
 	mFontManager=new FontManager(this);
 	mMeshManager=new MeshManager(this);
 	mAudioManager=new AudioManager(this);
-	mNodeManager=new NodeManager(this);
 	
 	mHandles.resize(1); // Handle 0 is always NULL
 
@@ -213,7 +212,6 @@ Engine::~Engine(){
 
 	destroy();
 
-	mNodeManager=NULL;
 	mAudioManager=NULL;
 	mMeshManager=NULL;
 	mShaderManager=NULL;
@@ -232,7 +230,6 @@ void Engine::destroy(){
 		mRenderDevice->activate();
 	}
 
-	mNodeManager->destroy();
 	mAudioManager->destroy();
 	mMeshManager->destroy();
 	mShaderManager->destroy();

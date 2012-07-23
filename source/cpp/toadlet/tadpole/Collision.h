@@ -30,11 +30,8 @@
 
 namespace toadlet{
 namespace tadpole{
-namespace node{
 
 class Node;
-
-}
 
 class Collision{
 public:
