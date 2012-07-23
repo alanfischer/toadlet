@@ -120,7 +120,7 @@ public:
 	Collection<tbyte*> lightmapDatas; /// @todo: Just modify portions of the texture
 	int lightmapAllocated[LIGHTMAP_SIZE];
 	uint8 styleIntensities[256];
-	Collection<NodeResource::ptr> modelResources;
+//	Collection<NodeResource::ptr> modelResources;
 };
 
 }

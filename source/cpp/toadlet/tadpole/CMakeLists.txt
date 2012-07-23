@@ -23,9 +23,10 @@ set (TADPOLE_SRC
 	Mesh.cpp
 	MeshComponent.cpp
 	MeshManager.cpp
-	NodeManager.cpp
+	Node.cpp
 	Noise.cpp
 	ParticleComponent.cpp
+	PartitionNode.cpp
 	RenderableSet.cpp
 	ResourceManager.cpp
 	Scene.cpp
@@ -130,11 +131,6 @@ set (TADPOLE_MATERIAL_SRC
 	material/RenderVariableSet.cpp
 )
 
-set (TADPOLE_NODE_SRC
-	node/Node.cpp
-	node/PartitionNode.cpp
-)
-
 set (TADPOLE_SENSOR_SRC
 	sensor/BoundingVolumeSensor.cpp
 	sensor/InterfaceSensor.cpp
@@ -209,9 +205,10 @@ set (TADPOLE_HEADERS
 	Mesh.h
 	MeshManager.h
 	MeshCOmponent.h
-	NodeManager.h
+	Node.h
 	Noise.h
 	ParticleComponent.h
+	PartitionNode.h
 	ProgressListener.h
 	PhysicsComponent.h
 	PhysicsManager.h
@@ -343,12 +340,6 @@ set (TADPOLE_MATERIAL_HEADERS
 	material/SceneParameters.h
 )
 
-set (TADPOLE_NODE_HEADERS
-	node/Node.h
-	node/NodeResource.h
-	node/PartitionNode.h
-)
-
 set (TADPOLE_SENSOR_HEADERS
 	sensor/BoundingVolumeSensor.h
 	sensor/InterfaceSensor.h
@@ -404,7 +395,6 @@ set (TADPOLE_PLATFORM_WIN32_GDIPLUS_HEADERS
 # Bundle source
 source_group ("Source Files\\\\animation" FILES ${TADPOLE_ANIMATION_SRC})
 source_group ("Source Files\\\\material" FILES ${TADPOLE_MATERIAL_SRC})
-source_group ("Source Files\\\\node" FILES ${TADPOLE_NODE_SRC})
 source_group ("Source Files\\\\sensor" FILES ${TADPOLE_SENSOR_SRC})
 source_group ("Source Files\\\\terrain" FILES ${TADPOLE_TERRAIN_SRC})
 
@@ -412,14 +402,13 @@ source_group ("Source Files\\\\terrain" FILES ${TADPOLE_TERRAIN_SRC})
 # Bundle headers
 source_group ("Header Files\\\\animation" FILES ${TADPOLE_ANIMATION_HEADERS})
 source_group ("Header Files\\\\material" FILES ${TADPOLE_MATERIAL_HEADERS})
-source_group ("Header Files\\\\node" FILES ${TADPOLE_NODE_HEADERS})
 source_group ("Header Files\\\\sensor" FILES ${TADPOLE_SENSOR_HEADERS})
 source_group ("Header Files\\\\terrain" FILES ${TADPOLE_TERRAIN_HEADERS})
 
 
 # Sources, headers and namespaces
-set (TADPOLE_SRC ${TADPOLE_SRC} ${TADPOLE_ANIMATION_SRC} ${TADPOLE_PLUGINS_SRC} ${TADPOLE_MATERIAL_SRC} ${TADPOLE_NODE_SRC} ${TADPOLE_SENSOR_SRC} ${TADPOLE_TERRAIN_SRC})
-set (TADPOLE_HEADERS ${TADPOLE_HEADERS} ${TADPOLE_ANIMATION_HEADERS} ${TADPOLE_MATERIAL_HEADERS} ${TADPOLE_NODE_HEADERS} ${TADPOLE_SENSOR_HEADERS} ${TADPOLE_TERRAIN_HEADERS})
+set (TADPOLE_SRC ${TADPOLE_SRC} ${TADPOLE_ANIMATION_SRC} ${TADPOLE_PLUGINS_SRC} ${TADPOLE_MATERIAL_SRC} ${TADPOLE_SENSOR_SRC} ${TADPOLE_TERRAIN_SRC})
+set (TADPOLE_HEADERS ${TADPOLE_HEADERS} ${TADPOLE_ANIMATION_HEADERS} ${TADPOLE_MATERIAL_HEADERS} ${TADPOLE_SENSOR_HEADERS} ${TADPOLE_TERRAIN_HEADERS})
 set (TADPOLE_NAMESPACES ${TADPOLE_NAMESPACES} animation material node sensor terrain)
 
 

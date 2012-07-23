@@ -35,7 +35,7 @@
 #include <toadlet/tadpole/RenderManager.h>
 #include <toadlet/tadpole/PhysicsManager.h>
 #include <toadlet/tadpole/UpdateListener.h>
-#include <toadlet/tadpole/node/PartitionNode.h>
+#include <toadlet/tadpole/PartitionNode.h>
 
 namespace toadlet{
 namespace tadpole{

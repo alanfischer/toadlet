@@ -26,7 +26,7 @@
 #ifndef TOADLET_TADPOLE_TERRAIN_TERRAINNODE_H
 #define TOADLET_TADPOLE_TERRAIN_TERRAINNODE_H
 
-#include <toadlet/tadpole/node/PartitionNode.h>
+#include <toadlet/tadpole/PartitionNode.h>
 #include <toadlet/tadpole/terrain/TerrainNodeDataSource.h>
 #include <toadlet/tadpole/terrain/TerrainNodeMaterialSource.h>
 #include <toadlet/tadpole/terrain/TerrainNodeListener.h>

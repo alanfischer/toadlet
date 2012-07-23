@@ -1,5 +1,5 @@
 %{
-#include <toadlet/tadpole/node/Node.h>
+#include <toadlet/tadpole/Node.h>
 %}
 
 namespace toadlet{

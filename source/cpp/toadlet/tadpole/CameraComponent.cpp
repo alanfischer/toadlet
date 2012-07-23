@@ -25,7 +25,7 @@
 
 #include <toadlet/egg/Logger.h>
 #include <toadlet/tadpole/CameraComponent.h>
-#include <toadlet/tadpole/node/Node.h>
+#include <toadlet/tadpole/Node.h>
 
 namespace toadlet{
 namespace tadpole{

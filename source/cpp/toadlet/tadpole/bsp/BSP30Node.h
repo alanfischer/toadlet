@@ -32,7 +32,7 @@
 #include <toadlet/tadpole/Renderable.h>
 #include <toadlet/tadpole/Visible.h>
 #include <toadlet/tadpole/MeshComponent.h>
-#include <toadlet/tadpole/node/PartitionNode.h>
+#include <toadlet/tadpole/PartitionNode.h>
 #include <toadlet/tadpole/bsp/BSP30Map.h>
 
 namespace toadlet{

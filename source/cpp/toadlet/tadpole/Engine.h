@@ -41,10 +41,9 @@
 #include <toadlet/tadpole/TextureManager.h>
 #include <toadlet/tadpole/MaterialManager.h>
 #include <toadlet/tadpole/MeshManager.h>
-#include <toadlet/tadpole/NodeManager.h>
 #include <toadlet/tadpole/ShaderManager.h>
 #include <toadlet/tadpole/ContextListener.h>
-#include <toadlet/tadpole/node/Node.h>
+#include <toadlet/tadpole/Node.h>
 
 namespace toadlet{
 namespace tadpole{
@@ -104,7 +103,6 @@ public:
 	inline MaterialManager *getMaterialManager() const{return  mMaterialManager;}
 	inline FontManager *getFontManager() const{return mFontManager;}
 	inline MeshManager *getMeshManager() const{return mMeshManager;}
-	inline NodeManager *getNodeManager() const{return mNodeManager;}
 	inline AudioManager *getAudioManager() const{return mAudioManager;}
 
 	Texture::ptr createNormalizationTexture(int size);
@@ -143,7 +141,6 @@ protected:
 	FontManager::ptr mFontManager;
 	MeshManager::ptr mMeshManager;
 	AudioManager::ptr mAudioManager;
-	NodeManager::ptr mNodeManager;
 
 	ResourceCreator::ptr mNormalizationCreator;
 	ResourceCreator::ptr mDiffuseCreator,mSkyBoxMaterialCreator;

@@ -24,7 +24,7 @@
  ********** Copyright header - do not remove **********/
 
 #include <toadlet/tadpole/BaseComponent.h>
-#include <toadlet/tadpole/node/Node.h>
+#include <toadlet/tadpole/Node.h>
 
 namespace toadlet{
 namespace tadpole{
