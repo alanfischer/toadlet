@@ -7,13 +7,13 @@ namespace tadpole{
 
 class Node:public Component{
 public:
-	Node *create(Scene *scene);
+	Node(Scene *scene);
 	void destroy();
 
 	Node *getParent();
 
-	void setName(char *name);
-//	String getName() const;
+	void setName(String name);
+	String getName() const;
 
 	bool getActive() const;
 
@@ -26,9 +26,9 @@ public:
 	bool attach(Component *node);
 	bool remove(Component *node);
 
-	void startAction(char *name);
-	void stopAction(char *name);
-	bool getActionActive(char *name);
+	void startAction(String name);
+	void stopAction(String name);
+	bool getActionActive(String name);
 };
 
 }

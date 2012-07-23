@@ -114,7 +114,6 @@ if (NOT TOADLET_PLATFORM_PYTHON)
 		${CMAKE_CURRENT_SOURCE_DIR}/toadlet/tadpole/Component.i
 		${CMAKE_CURRENT_SOURCE_DIR}/toadlet/tadpole/Track.i
 		${CMAKE_CURRENT_SOURCE_DIR}/toadlet/tadpole/Sequence.i
-		${CMAKE_CURRENT_SOURCE_DIR}/toadlet/tadpole/ActionComponent.i
 		${CMAKE_CURRENT_SOURCE_DIR}/toadlet/tadpole/AnimationActionComponent.i
 		${CMAKE_CURRENT_SOURCE_DIR}/toadlet/tadpole/AudioComponent.i
 		${CMAKE_CURRENT_SOURCE_DIR}/toadlet/tadpole/Node.i
@@ -134,7 +133,6 @@ if (NOT TOADLET_PLATFORM_PYTHON)
 			${PROJECT_BINARY_DIR}/source/java/us/toadlet/tadpole/Component.java
 			${PROJECT_BINARY_DIR}/source/java/us/toadlet/tadpole/Track.java
 			${PROJECT_BINARY_DIR}/source/java/us/toadlet/tadpole/Sequence.java
-			${PROJECT_BINARY_DIR}/source/java/us/toadlet/tadpole/ActionComponent.java
 			${PROJECT_BINARY_DIR}/source/java/us/toadlet/tadpole/AnimationActionComponent.java
 			${PROJECT_BINARY_DIR}/source/java/us/toadlet/tadpole/AudioComponent.java
 			${PROJECT_BINARY_DIR}/source/java/us/toadlet/tadpole/Node.java

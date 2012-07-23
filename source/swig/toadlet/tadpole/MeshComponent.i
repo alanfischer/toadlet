@@ -9,10 +9,10 @@ class MeshComponent:public Component{
 public:
 	void destroy();
 
-	void setMesh(char *name);
+	void setMesh(String name);
 
 	Material *getSubMaterial(int i);
-	Material *getSubMaterial(char *name);
+	Material *getSubMaterial(String name);
 	
 	RenderState *getSharedRenderState();
 };

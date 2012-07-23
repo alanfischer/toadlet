@@ -7,15 +7,17 @@ namespace tadpole{
 
 #%feature("director") ActionListener;
 
+class AnimationActionComponent;
+
 class ActionListener{
 public:
 	virtual ~ActionListener(){}
 
-	virtual void actionStarted(ActionComponent *component)=0;
-	virtual void actionStopped(ActionComponent *component)=0;
+	virtual void actionStarted(AnimationActionComponent *component)=0;
+	virtual void actionStopped(AnimationActionComponent *component)=0;
 };
 
-class AnimationActionComponent:public ActionComponent{
+class AnimationActionComponent:public Component{
 public:
 	enum Cycling{
 		Cycling_NONE,
