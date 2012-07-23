@@ -28,6 +28,10 @@
 
 // CMake fills in this file with the proper values for our build
 
+// Revision information
+#cmakedefine TOADLET_HG_REVNUMBER "${TOADLET_HG_REVNUMBER}"
+#cmakedefine TOADLET_HG_DATE "${TOADLET_HG_DATE}"
+
 // Setup the platform
 #cmakedefine TOADLET_PLATFORM_WIN32
 #cmakedefine TOADLET_PLATFORM_WINCE
