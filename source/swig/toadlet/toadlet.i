@@ -52,7 +52,6 @@ typedef float scalar;
 %include <toadlet/tadpole/Engine.i>
 %include <toadlet/tadpole/Scene.i>
 %include <toadlet/tadpole/Component.i>
-%include <toadlet/tadpole/ActionComponent.i>
 %include <toadlet/tadpole/AnimationActionComponent.i>
 %include <toadlet/tadpole/AudioComponent.i>
 %include <toadlet/tadpole/Node.i>

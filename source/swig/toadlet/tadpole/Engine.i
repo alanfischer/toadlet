@@ -26,8 +26,6 @@ public:
 	bool setRenderDevice(RenderDevice *renderDevice);
 
 	bool setAudioDevice(AudioDevice * audioDevice);
-
-	toadlet::tadpole::Node *createNode(char *fullName,toadlet::tadpole::Scene *scene);
 };
 
 }

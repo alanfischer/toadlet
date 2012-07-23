@@ -77,7 +77,7 @@ public:
 	inline scalar getMaxValue() const{return mMaxValue;}
 
 	virtual void setActionListener(ActionListener *listener){mListener=listener;}
-	virtual ActionListener *getActionListener(){return mListener;}
+	virtual ActionListener *getActionListener() const{return mListener;}
 
 	virtual void start();
 	virtual void stop();
