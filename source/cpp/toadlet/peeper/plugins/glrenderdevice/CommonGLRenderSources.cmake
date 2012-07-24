@@ -1,4 +1,4 @@
-# Source files
+# Source files for the different glrenderdevices
 set (PEEPER_GLRENDERDEVICE_PLATFORM_EAGL_SRC
 	../glrenderdevice/platform/eagl/EAGLRenderTarget.mm
 )
@@ -73,18 +73,16 @@ set (PEEPER_GLRENDERDEVICE_PLATFORM_WGL_HEADERS
 
 # Platform specific files
 if (TOADLET_PLATFORM_ANDROID)
-	# Android NDK api levels less than 9 require the java Android SDK, and thus use jgl
-	if (ANDROID_NDK_API_LEVEL LESS 9)
-		source_group ("Source Files\\\\platform\\\\jgl" FILES ${PEEPER_GLRENDERDEVICE_PLATFORM_JGL_SRC})
-		source_group ("Header Files\\\\platform\\\\jgl" FILES ${PEEPER_GLRENDERDEVICE_PLATFORM_JGL_HEADERS})
-		set (PEEPER_GLRENDERDEVICE_SRC ${PEEPER_GLRENDERDEVICE_PLATFORM_JGL_SRC})
-		set (PEEPER_GLRENDERDEVICE_HEADERS ${PEEPER_GLRENDERDEVICE_PLATFORM_JGL_HEADERS})
-	else (ANDROID_NDK_API_LEVEL LESS 9)
+	source_group ("Source Files\\\\platform\\\\jgl" FILES ${PEEPER_GLRENDERDEVICE_PLATFORM_JGL_SRC})
+	source_group ("Header Files\\\\platform\\\\jgl" FILES ${PEEPER_GLRENDERDEVICE_PLATFORM_JGL_HEADERS})
+	set (PEEPER_GLRENDERDEVICE_SRC ${PEEPER_GLRENDERDEVICE_PLATFORM_JGL_SRC})
+	set (PEEPER_GLRENDERDEVICE_HEADERS ${PEEPER_GLRENDERDEVICE_PLATFORM_JGL_HEADERS})
+	if(EGL)
 		source_group ("Source Files\\\\platform\\\\egl" FILES ${PEEPER_GLRENDERDEVICE_PLATFORM_EGL_SRC})
 		source_group ("Header Files\\\\platform\\\\egl" FILES ${PEEPER_GLRENDERDEVICE_PLATFORM_EGL_HEADERS})
 		set (PEEPER_GLRENDERDEVICE_SRC ${PEEPER_GLRENDERDEVICE_PLATFORM_EGL_SRC})
 		set (PEEPER_GLRENDERDEVICE_HEADERS ${PEEPER_GLRENDERDEVICE_PLATFORM_EGL_HEADERS})
-	endif (ANDROID_NDK_API_LEVEL LESS 9)
+	endif (EGL)
 elseif (TOADLET_PLATFORM_IOS)
 	source_group ("Source Files\\\\platform\\\\eagl" FILES ${PEEPER_GLRENDERDEVICE_PLATFORM_EAGL_SRC})
 	source_group ("Header Files\\\\platform\\\\eagl" FILES ${PEEPER_GLRENDERDEVICE_PLATFORM_EAGL_HEADERS})
