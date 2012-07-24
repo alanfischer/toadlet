@@ -31,20 +31,20 @@
 #include <toadlet/egg/MathConversion.h>
 #include <toadlet/peeper/Types.h>
 
-#if defined(TOADLET_PLATFORM_ANDROID)
-	#if defined(TOADLET_HAS_GL_11)
-		// PBuffers would be possible using jgl, but is not implemented
-
-		#include <GLES/gl.h>
-	#elif defined(TOADLET_HAS_GL_20)
+ #if defined(TOADLET_PLATFORM_ANDROID)
+	#if defined(TOADLET_HAS_EGL)
 		#include <EGL/egl.h>
 		#define TOADLET_HAS_GLPBUFFERS
-		#define TOADLET_HAS_EGL
-		#define TOADLET_HAS_EGL_11
-
-		#include <GLES2/gl2.h>
+	#else
+		// PBuffers would be possible to implement, but it wouldn't be that clean since they tie into Textures and PixelBuffers.  Since NDK 8 is a minimum target, we will not support render to texture there
 	#endif
-	typedef char GLchar;
+ 
+	#if defined(TOADLET_HAS_GL_11)
+		#include <GLES/gl.h>
+	#elif defined(TOADLET_HAS_GL_20)
+ 		#include <GLES2/gl2.h>
+ 	#endif
+ 	typedef char GLchar;
 #elif defined(TOADLET_PLATFORM_IOS)
 	#if defined(TOADLET_HAS_GL_11)
 		#include <OpenGLES/ES1/gl.h>

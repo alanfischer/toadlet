@@ -34,12 +34,12 @@ TOADLET_C_API RenderTarget *new_EGLWindowRenderTarget(void *display,void *window
 	return new EGLWindowRenderTarget(display,window,format);
 }
 
-EGLWindowRenderTarget::EGLWindowRenderTarget():BaseResource(),EGLRenderTarget(),
+EGLWindowRenderTarget::EGLWindowRenderTarget():
 	mConfig(0),
 	mPixmap(false)
 {}
 
-EGLWindowRenderTarget::EGLWindowRenderTarget(void *display,void *window,WindowRenderTargetFormat *format,bool pixmap):BaseResource(),EGLRenderTarget(),
+EGLWindowRenderTarget::EGLWindowRenderTarget(void *display,void *window,WindowRenderTargetFormat *format,bool pixmap):
 	mConfig(0),
 	mPixmap(false)
 {

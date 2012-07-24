@@ -43,7 +43,7 @@ bool EGLPBufferRenderTarget::available(GLRenderDevice *renderDevice){
 	return true;
 }
 
-EGLPBufferRenderTarget::EGLPBufferRenderTarget(GLRenderDevice *renderDevice):BaseResource(),
+EGLPBufferRenderTarget::EGLPBufferRenderTarget(GLRenderDevice *renderDevice):
 	mDevice(NULL),
 	mCopy(false),
 	mSeparateContext(false),

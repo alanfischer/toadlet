@@ -1,5 +1,5 @@
 # Make all platform specific decisions for glrenderdevice
-include (CMakeListsPlatform.txt)
+include (CommonGLRenderSources.cmake)
 
 
 # Source files
