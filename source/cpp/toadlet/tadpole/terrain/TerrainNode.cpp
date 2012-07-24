@@ -88,9 +88,12 @@ void TerrainNode::destroy(){
 	for(i=0;i<mUnactivePatches.size();++i){
 		mUnactivePatches[i]->getParent()->destroy();
 	}
+	mUnactivePatches.clear();
+
 	for(i=0;i<mPatchGrid.size();++i){
 		mPatchGrid[i]->getParent()->destroy();
 	}
+	mPatchGrid.clear();
 
 	Node::destroy();
 }
