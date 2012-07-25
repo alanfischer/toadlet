@@ -27,6 +27,7 @@
 #define TOADLET_EGG_UUID_H
 
 #include <toadlet/Types.h>
+#include <toadlet/egg/String.h>
 
 namespace toadlet{
 namespace egg{
@@ -36,6 +37,7 @@ public:
 	UUID():highBits(0),lowBits(0){}
 	UUID(tbyte bytes[]){highBits=*(uint64*)(bytes+0);lowBits=*(uint64*)(bytes+8);}
 	UUID(uint64 highBits1,uint64 lowBits1):highBits(highBits1),lowBits(lowBits1){}
+	UUID(const String &string){fromString(string);}
 
 	bool fromRandom();
 	bool fromString(const String &string);
