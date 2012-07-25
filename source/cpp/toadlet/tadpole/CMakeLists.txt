@@ -204,7 +204,7 @@ set (TADPOLE_HEADERS
 	MathFormatter.h
 	Mesh.h
 	MeshManager.h
-	MeshCOmponent.h
+	MeshComponent.h
 	Node.h
 	Noise.h
 	ParticleComponent.h
