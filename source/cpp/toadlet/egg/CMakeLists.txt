@@ -13,6 +13,7 @@ set (EGG_SRC
 	Profile.cpp
 	Random.cpp
 	String.cpp
+	UUID.cpp
 	Version.cpp
 )
 
@@ -112,6 +113,7 @@ set (EGG_HEADERS
 	Type.h
 	WaitCondition.h
 	WeakPointer.h
+	UUID.h
 	Version.h
 )
 

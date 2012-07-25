@@ -24,6 +24,8 @@
  ********** Copyright header - do not remove **********/
 
 #include <toadlet/egg/UUID.h>
+#include <toadlet/egg/Random.h>
+#include <toadlet/egg/System.h>
 #include <stdio.h>
 
 namespace toadlet{
@@ -31,11 +33,11 @@ namespace egg{
 
 bool UUID::fromRandom(){
 	tbyte *uu=(tbyte*)&highBits;
-	
-	srand(utime());
+
+	Random random(System::utime());
 	int i;
-	for(i=0;i<sizeof(uuid);++i){
-		uu[i]=rand()%0xFF;
+	for(i=0;i<16;++i){
+		uu[i]=random.nextInt()%0xFF;
 	}
 
 	uu[6]=(uu[6] & 0x0F) | 0x40;
