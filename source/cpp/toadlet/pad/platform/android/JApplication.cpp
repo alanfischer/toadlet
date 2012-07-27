@@ -52,7 +52,6 @@ JApplication::JApplication(JNIEnv *jenv,jobject jobj):
 	mAudioDevice(NULL),
 	mLastAudioDeviceObj(NULL)
 {
-Logger::alert("STARTING JAPPLICATION");
 	int i;
 	for(i=0;i<InputDevice::InputType_MAX;++i){
 		mInputDevices[i]=NULL;
@@ -93,7 +92,6 @@ Logger::alert("STARTING JAPPLICATION");
 		RenderDevice_nativeHandle=env->GetFieldID(renderDeviceClass,"swigCPtr","J");
 	}
 	env->DeleteLocalRef(renderDeviceClass);
-Logger::alert("ENDING  JAPPLICATION");
 }
 
 JApplication::~JApplication(){

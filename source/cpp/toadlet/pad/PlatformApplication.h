@@ -29,13 +29,15 @@
 #include <toadlet/Types.h>
 
 #if defined(TOADLET_PLATFORM_ANDROID)
-	#if ANDROID_NDK_API_LEVEL>=9
+/*	#if ANDROID_NDK_API_LEVEL>=9
 		#include <toadlet/pad/platform/android/AndroidApplication.h>
 		namespace toadlet{
 		namespace pad{
 			typedef AndroidApplication PlatformApplication;
 		}
 		}
+*/
+#if 0
 	#else
 		#include <toadlet/pad/platform/android/JApplication.h>
 		namespace toadlet{
