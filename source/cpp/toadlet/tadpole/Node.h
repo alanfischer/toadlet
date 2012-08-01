@@ -32,6 +32,11 @@
 #include <toadlet/tadpole/BaseComponent.h>
 #include <toadlet/tadpole/Transformable.h>
 
+#define TOADLET_NODE(Class,TypeName)\
+	TOADLET_OBJECT(Class); \
+	static toadlet::egg::Type<toadlet::tadpole::Node> *type(){static toadlet::egg::InstantiableType<Class,toadlet::tadpole::Node> thisType(TypeName);return &thisType;} \
+	virtual toadlet::egg::Type<toadlet::tadpole::Node> *getType() const{return type();}
+
 namespace toadlet{
 namespace tadpole{
 
@@ -46,13 +51,13 @@ class PhysicsComponent;
 
 class TOADLET_API Node:public BaseComponent,public Transformable{
 public:
-	TOADLET_OBJECT(Node);
+	TOADLET_NODE(Node,"toadlet.tadpole.Node");
 
-	static const Transform &identityTransform(){static Transform transform;return transform;}
-
-	Node(Scene *scene);
+	Node(Scene *scene=NULL);
 	virtual ~Node();
 	virtual void destroy();
+
+	virtual void create(Scene *scene);
 
 	void internal_setUniqueHandle(int handle){mUniqueHandle=handle;}
 	int getUniqueHandle() const{return mUniqueHandle;}
@@ -124,6 +129,8 @@ public:
 
 	virtual void logicUpdate(int dt,int scope);
 	virtual void frameUpdate(int dt,int scope);
+
+	virtual bool setProperty(const String &name,const String &value);
 
 	virtual void setStayActive(bool active);
 	inline bool getStayActive() const{return mDeactivateCount<0;}

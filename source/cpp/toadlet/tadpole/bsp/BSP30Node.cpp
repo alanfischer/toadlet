@@ -195,10 +195,16 @@ void BSP30Node::gatherRenderables(Camera *camera,RenderableSet *set){
 
 	set->queueRenderable(this);
 
+	bool transformed=true;//(getWorldTransform()!=Node::identityTransform());
+	Matrix4x4 worldMatrix;
+	mWorldTransform.getMatrix(worldMatrix);
+	Vector3 cameraPosition;
+	mWorldTransform.inverseTransform(cameraPosition,camera->getPosition());
+
 	// Queue up the visible faces and nodes
 	memset(mMarkedFaces,0,(mMap->nfaces+7)>>3);
 	memset(&mVisibleMaterialFaces[0],0,sizeof(BSP30Map::facedata*)*mVisibleMaterialFaces.size());
-	int leaf=mMap->findPointLeaf(mMap->planes,mMap->nodes,sizeof(bnode),0,camera->getPosition());
+	int leaf=mMap->findPointLeaf(mMap->planes,mMap->nodes,sizeof(bnode),0,cameraPosition);
 	if(leaf==0 || mMap->nvisibility==0){
 		bmodel *world=&mMap->models[0];
 		// Instead of enumerating all leaves, we just enumerate all faces
@@ -215,29 +221,31 @@ void BSP30Node::gatherRenderables(Camera *camera,RenderableSet *set){
 
 		for(i=0;i<getNumNodes();++i){
 			Node *node=getNode(i);
-			if((camera->getScope()&node->getScope())!=0 && camera->culled(node->getBound())==false){
+			if((camera->getScope()&node->getScope())!=0 && camera->culled(node->getWorldBound())==false){
 				node->gatherRenderables(camera,set);
 			}
 		}
 	}
 	else{
-		for(i=0;i<mMap->parsedVisibility[leaf].size();i++){
-			addLeafToVisible(&mMap->leafs[mMap->parsedVisibility[leaf][i]],camera);
-		}
-
 		mCounter++;
 		const Collection<int> &leafvis=mMap->parsedVisibility[leaf];
+
 		for(i=0;i<leafvis.size();i++){
 			bleaf *leaf=mMap->leafs+leafvis[i];
 			AABox box(leaf->mins[0],leaf->mins[1],leaf->mins[2],leaf->maxs[0],leaf->maxs[1],leaf->maxs[2]);
+			if(transformed){
+				Math::mul(box,worldMatrix);
+			}
 			if(camera->culled(box)==false){
+				addLeafToVisible(leaf,cameraPosition);
+
 				const Collection<Node*> &occupants=mLeafData[leafvis[i]].occupants;
 				for(j=0;j<occupants.size();++j){
 					Node *node=occupants[j];
 					childdata *data=(childdata*)node->getParentData();
 					if(data->counter!=mCounter){
 						data->counter=mCounter;
-						if((camera->getScope()&node->getScope())!=0 && camera->culled(node->getBound())==false){
+						if((camera->getScope()&node->getScope())!=0 && camera->culled(node->getWorldBound())==false){
 							node->gatherRenderables(camera,set);
 						}
 					}
@@ -248,7 +256,7 @@ void BSP30Node::gatherRenderables(Camera *camera,RenderableSet *set){
 		const Collection<Node*> &occupants=mGlobalLeafData.occupants;
 		for(j=0;j<occupants.size();++j){
 			Node *node=occupants[j];
-			if((camera->getScope()&node->getScope())!=0 && camera->culled(node->getBound())==false){
+			if((camera->getScope()&node->getScope())!=0 && camera->culled(node->getWorldBound())==false){
 				node->gatherRenderables(camera,set);
 			}
 		}
@@ -379,11 +387,27 @@ bool BSP30Node::findAmbientForPoint(Vector4 &r,const Vector3 &point){
 }
 
 void BSP30Node::traceSegment(Collision &result,const Vector3 &position,const Segment &segment,const Vector3 &size){
+	Segment localSegment=segment;
+	Transform transform;
+
+	bool transformed=true;//(getWorldTransform()!=Node::identityTransform());
+	if(transformed){
+		transform.set(position,mWorldTransform.getScale(),mWorldTransform.getRotate());
+		transform.inverseTransform(localSegment);
+	}
+
 	result.time=Math::ONE;
-	segment.getEndPoint(result.point);
+	localSegment.getEndPoint(result.point);
 	if(mMap!=NULL){
-		int contents=mMap->modelCollisionTrace(result,0,size,segment.origin,result.point);
-		if(contents!=CONTENTS_EMPTY) result.scope|=(-1-contents)<<1;
+		int contents=mMap->modelCollisionTrace(result,0,size,localSegment.origin,result.point);
+		if(contents!=CONTENTS_EMPTY){
+			result.scope|=(-1-contents)<<1;
+		}
+	}
+
+	if(transformed && result.time<Math::ONE){
+		transform.transform(result.point);
+		transform.transformNormal(result.normal);
 	}
 }
 
@@ -424,36 +448,33 @@ void BSP30Node::childTransformUpdated(Node *child){
 	memcpy(&oldIndexes[0],&newIndexes[0],newIndexes.size()*sizeof(int));
 }
 
-void BSP30Node::addLeafToVisible(bleaf *leaf,Camera *camera){
-	AABox bound(leaf->mins[0],leaf->mins[1],leaf->mins[2],leaf->maxs[0],leaf->maxs[1],leaf->maxs[2]);
-	if(camera->culled(bound)==false){
-		const bmarksurface *p=&mMap->marksurfaces[leaf->firstmarksurface];
+void BSP30Node::addLeafToVisible(bleaf *leaf,const Vector3 &cameraPosition){
+	const bmarksurface *p=&mMap->marksurfaces[leaf->firstmarksurface];
 
-		for(int x=0;x<leaf->nummarksurfaces;x++){
-			int faceIndex=*p++;
+	for(int x=0;x<leaf->nummarksurfaces;x++){
+		int faceIndex=*p++;
 
-			// Check the proper markedfaces bit
-			if(!(mMarkedFaces[faceIndex>>3]&(1<<(faceIndex&7)))){
-				bface *face=&mMap->faces[faceIndex];
+		// Check the proper markedfaces bit
+		if(!(mMarkedFaces[faceIndex>>3]&(1<<(faceIndex&7)))){
+			bface *face=&mMap->faces[faceIndex];
 
-				float d=Math::length(*(Plane*)&mMap->planes[face->planenum],camera->getPosition());
-				if(face->side){
-					if(d>0) continue;
-				}
-				else{
-					if(d<0) continue;
-				}
+			float d=Math::length(*(Plane*)&mMap->planes[face->planenum],cameraPosition);
+			if(face->side){
+				if(d>0) continue;
+			}
+			else{
+				if(d<0) continue;
+			}
 
-				mMarkedFaces[faceIndex>>3]|=(1<<(faceIndex&7));
+			mMarkedFaces[faceIndex>>3]|=(1<<(faceIndex&7));
 
-				btexinfo *texinfo=&mMap->texinfos[face->texinfo];
+			btexinfo *texinfo=&mMap->texinfos[face->texinfo];
 
-				if((texinfo->flags&TEX_SPECIAL)==0){
-					BSP30Map::facedata *facedata=&mMap->facedatas[faceIndex];
-					facedata->next=mVisibleMaterialFaces[texinfo->miptex];
-					mVisibleMaterialFaces[texinfo->miptex]=facedata;
-					mMap->updateFaceLights(faceIndex);
-				}
+			if((texinfo->flags&TEX_SPECIAL)==0){
+				BSP30Map::facedata *facedata=&mMap->facedatas[faceIndex];
+				facedata->next=mVisibleMaterialFaces[texinfo->miptex];
+				mVisibleMaterialFaces[texinfo->miptex]=facedata;
+				mMap->updateFaceLights(faceIndex);
 			}
 		}
 	}

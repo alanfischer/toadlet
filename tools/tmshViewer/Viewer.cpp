@@ -65,16 +65,17 @@ Viewer::Viewer(Application *app):
 
  	mScene=new Scene(mEngine);
 
-	mCamera=mEngine->createNodeType(CameraNode::type(),mScene);
+	mCamera=new CameraComponent(new Camera());
 	mCamera->setClearColor(Colors::ORANGE);
+	mCamera->setAutoProjectionFov(Math::degToRad(Math::fromInt(45)),0.01,1000);
 	mScene->getRoot()->attach(mCamera);
 
-	mParent=mEngine->createNodeType(Node::type(),mScene);
+	mParent=new Node(mScene);
 	mScene->getRoot()->attach(mParent);
 
 	mScene->setAmbientColor(Vector4(Math::QUARTER,Math::QUARTER,Math::QUARTER,Math::ONE));
 
-	mLight=mEngine->createNodeType(LightNode::type(),mScene);
+	mLight=new LightComponent();
 	LightState state;
 	state.type=LightState::Type_DIRECTION;
 	state.direction.set(Math::Y_UNIT_VECTOR3);
@@ -88,10 +89,10 @@ Viewer::~Viewer(){
 	destroy();
 }
 
-void Viewer::setNode(MeshNode::ptr node){
+void Viewer::setNode(Node *node){
 	mParent->attach(node);
 
-	mDistance=Math::length(node->getBound().getSphere().origin)+node->getBound().getSphere().radius*2;
+	mDistance=Math::length(node->getBound()->getSphere().origin)+node->getBound()->getSphere().radius*2;
 
 	updateCamera();
 }
@@ -111,7 +112,7 @@ void Viewer::render(){
 	RenderDevice *device=mEngine->getRenderDevice();
 
 	device->beginScene();
-		mCamera->render(device);
+		mCamera->getCamera()->render(device,mScene);
 	device->endScene();
 	device->swap();
 }
@@ -160,24 +161,6 @@ void Viewer::mouseReleased(int x,int y,int button){
 	}
 	else if(button==2){
 		mZoom=false;
-	}
-}
-
-void Viewer::resized(int width,int height){
-	scalar radius=mParent!=NULL?Math::length(mParent->getWorldBound().getSphere().origin)+mParent->getWorldBound().getSphere().radius*2:0;
-	scalar epsilon=0.001;
-	scalar nearDistance=1;
-	scalar farDistance=1000;
-	if(nearDistance<epsilon){nearDistance=epsilon;}
-	if(farDistance<nearDistance+epsilon){farDistance=nearDistance+epsilon;}
-	if(mCamera!=NULL && width!=0 && height!=0){
-		if(width>=height){
-			mCamera->setProjectionFovY(Math::degToRad(Math::fromInt(45)),Math::div(Math::fromInt(width),Math::fromInt(height)),nearDistance,farDistance);
-		}
-		else{
-			mCamera->setProjectionFovX(Math::degToRad(Math::fromInt(45)),Math::div(Math::fromInt(height),Math::fromInt(width)),nearDistance,farDistance);
-		}
-		mCamera->setViewport(Viewport(0,0,width,height));
 	}
 }
 

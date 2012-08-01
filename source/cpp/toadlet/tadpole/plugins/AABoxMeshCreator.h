@@ -23,8 +23,8 @@
  *
  ********** Copyright header - do not remove **********/
 
-#ifndef TOADLET_TADPOLE_AABOXMESHCREATOR
-#define TOADLET_TADPOLE_AABOXMESHCREATOR
+#ifndef TOADLET_TADPOLE_AABOXMESHCREATOR_H
+#define TOADLET_TADPOLE_AABOXMESHCREATOR_H
 
 #include <toadlet/tadpole/ResourceCreator.h>
 #include <toadlet/tadpole/Mesh.h>

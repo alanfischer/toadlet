@@ -34,6 +34,8 @@ namespace tadpole{
 
 class TOADLET_API CameraComponent:public BaseComponent{
 public:
+	TOADLET_OBJECT(CameraComponent);
+
 	CameraComponent(Camera *camera);
 
 	void setCamera(Camera *camera){mCamera=camera;}

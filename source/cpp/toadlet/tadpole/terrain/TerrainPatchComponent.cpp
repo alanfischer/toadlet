@@ -49,7 +49,7 @@ TerrainPatchComponent::TerrainPatchComponent(Scene *scene):
 	mTerrainScope(-1),
 	mWaterScope(-1),
 	mTolerance(0),
-	mS1(0),mS2(0)
+	mWaterLevel(0)
 {
 	mScene=scene;
 	mEngine=scene->getEngine();
@@ -62,7 +62,6 @@ TerrainPatchComponent::TerrainPatchComponent(Scene *scene):
 	mCellEpsilon=0.03125*4;
 
 	mTolerance=0.00001f;
-	mS1=Math::HALF;mS2=Math::ONE;
 }
 
 TerrainPatchComponent::~TerrainPatchComponent(){
@@ -618,6 +617,11 @@ bool TerrainPatchComponent::unstitchFromBottom(TerrainPatchComponent *terrain){
 	return true;
 }
 
+void TerrainPatchComponent::setWaterLevel(scalar level){
+	mWaterLevel=level;
+	mWaterTransform.setTranslate(0,0,level);
+}
+
 void TerrainPatchComponent::gatherRenderables(Camera *camera,RenderableSet *set){
 	if((camera->getScope()&mCameraUpdateScope)!=0){
 		updateBlocks(camera);
@@ -659,6 +663,8 @@ void TerrainPatchComponent::updateIndexBuffers(Camera *camera){
 }
 
 void TerrainPatchComponent::updateWaterIndexBuffers(Camera *camera){
+	mWaterWorldTransform.setTransform(mParent->getWorldTransform(),mWaterTransform);
+
 	int indexCount=gatherBlocks(mWaterIndexBuffer,camera,true);
 	mWaterIndexData->setCount(indexCount);
 }
@@ -671,7 +677,7 @@ void TerrainPatchComponent::traceSegment(Collision &result,const Vector3 &positi
 	const Transform &worldTransform=mParent->getWorldTransform();
 
 	Segment localSegment;
-	scalar sizeAdjust=Math::div(size.z,worldTransform.getScale().z);
+	scalar sizeAdjust=Math::div(size.z/2,worldTransform.getScale().z);
 	Transform transform;
 
 	transform.set(position,worldTransform.getScale(),worldTransform.getRotate());
@@ -1200,8 +1206,8 @@ bool TerrainPatchComponent::blockIntersectsCamera(const Block *block,Camera *cam
 	AABox box(block->mins,block->maxs);
 
 	if(water){
-		box.mins.z=0;
-		box.maxs.z=0;
+		box.mins.z=mWaterLevel;
+		box.maxs.z=mWaterLevel;
 	}
 
 	mParent->getTransform().transform(box.mins);

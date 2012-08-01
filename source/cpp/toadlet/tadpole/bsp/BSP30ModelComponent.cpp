@@ -191,12 +191,14 @@ void BSP30ModelComponent::gatherRenderables(Camera*camera,RenderableSet *set){
 }
 
 void BSP30ModelComponent::traceSegment(Collision &result,const Vector3 &position,const Segment &segment,const Vector3 &size){
-	const Transform &worldTransform=mParent->getWorldTransform();
-	Segment localSegment;
+	Segment localSegment=segment;
 	Transform transform;
 
-	transform.set(position,worldTransform.getScale(),worldTransform.getRotate());
-	transform.inverseTransform(localSegment,segment);
+	bool transformed=true;//(getWorldTransform()!=Node::identityTransform());
+	if(transformed){
+		transform.set(position,mParent->getWorldTransform().getScale(),mParent->getWorldTransform().getRotate());
+		transform.inverseTransform(localSegment);
+	}
 
 	result.time=Math::ONE;
 	localSegment.getEndPoint(result.point);
@@ -207,7 +209,7 @@ void BSP30ModelComponent::traceSegment(Collision &result,const Vector3 &position
 		}
 	}
 
-	if(result.time<Math::ONE){
+	if(transformed && result.time<Math::ONE){
 		transform.transform(result.point);
 		transform.transformNormal(result.normal);
 	}

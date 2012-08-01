@@ -106,8 +106,7 @@ public:
 	void setTerrainScope(int scope){mTerrainScope=scope;}
 	void setWaterScope(int scope){mWaterScope=scope;}
 	void setTolerance(scalar tolerance){mTolerance=tolerance;}
-	void setScale1(float s1){mS1=s1;}
-	void setScale2(float s2){mS2=s2;}
+	void setWaterLevel(scalar level);
 
 	void updateBlocks(Camera *camera);
 	void updateVertexes();
@@ -146,7 +145,7 @@ protected:
 		WaterRenderable(TerrainPatchComponent *terrain){mTerrain=terrain;}
 
 		Material *getRenderMaterial() const{return mTerrain->mWaterMaterial;}
-		const Transform &getRenderTransform() const{return mTerrain->getRenderTransform();}
+		const Transform &getRenderTransform() const{return mTerrain->mWaterWorldTransform;}
 		Bound *getRenderBound() const{return mTerrain->getRenderBound();}
 		void render(RenderManager *manager) const{manager->getDevice()->renderPrimitive(mTerrain->mWaterVertexData,mTerrain->mWaterIndexData);}
 
@@ -248,7 +247,7 @@ protected:
 	int mTerrainScope;
 	int mWaterScope;
 	scalar mTolerance;
-	scalar mS1,mS2;
+	scalar mWaterLevel;
 
 	Material::ptr mMaterial;
 	VertexBuffer::ptr mVertexBuffer;
@@ -257,6 +256,8 @@ protected:
 	IndexData::ptr mIndexData;
 	Collection<Texture::ptr> mLayerTextures;
 
+	Transform mWaterTransform;
+	Transform mWaterWorldTransform;
 	Material::ptr mWaterMaterial;
 	VertexBuffer::ptr mWaterVertexBuffer;
 	IndexBuffer::ptr mWaterIndexBuffer;

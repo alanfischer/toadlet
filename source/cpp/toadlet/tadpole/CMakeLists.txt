@@ -75,6 +75,7 @@ set (TADPOLE_PLUGINS_SRC
 	plugins/TMSHStreamer.cpp
 	plugins/TPKGArchive.cpp
 	plugins/WADArchive.cpp
+	plugins/WaterMaterialCreator.cpp
 	plugins/WaveDecoder.cpp
 )
 
@@ -282,6 +283,7 @@ set (TADPOLE_PLUGINS_HEADERS
 	plugins/WADArchive.h
 	plugins/WADStreamer.h
 	plugins/WaveDecoder.h
+	plugins/WaterMaterialCreator.h
 )
 
 set (TADPOLE_PLUGINS_XML_HEADERS

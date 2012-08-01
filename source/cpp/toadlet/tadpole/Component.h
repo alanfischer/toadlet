@@ -52,7 +52,7 @@ public:
 	virtual bool getActive() const=0;
 	virtual Bound *getBound() const=0;
 
-	virtual void transformChanged()=0;
+	virtual bool setProperty(const String &name,const String &value)=0;
 };
 
 }

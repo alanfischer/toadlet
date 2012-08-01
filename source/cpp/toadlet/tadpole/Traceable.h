@@ -33,8 +33,10 @@
 namespace toadlet{
 namespace tadpole{
 
-class Traceable{
+class Traceable:public Interface{
 public:
+	TOADLET_INTERFACE(Traceable);
+
 	virtual ~Traceable(){}
 
 	virtual Bound *getTraceableBound() const=0;

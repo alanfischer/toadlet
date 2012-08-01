@@ -13,7 +13,7 @@ public:
 
 	void create(){}
 	void destroy();
-	void setNode(MeshNode::ptr meshNode);
+	void setNode(Node *node);
 
 	void update(int dt);
 	void render();
@@ -23,7 +23,7 @@ public:
 	void mouseReleased(int x,int y,int button);
 	void mouseScrolled(int x,int y,int scroll){}
 
-	void resized(int width,int height);
+	void resized(int width,int height){}
 	void focusGained(){}
 	void focusLost();
 
@@ -39,8 +39,8 @@ protected:
 	Engine *mEngine;
 	Scene::ptr mScene;
 	Node::ptr mParent;
-	CameraNode::ptr mCamera;
-	LightNode::ptr mLight;
+	CameraComponent::ptr mCamera;
+	LightComponent::ptr mLight;
  	int mMouseX,mMouseY;
 	bool mDrag;
 	toadlet::scalar mDistance;

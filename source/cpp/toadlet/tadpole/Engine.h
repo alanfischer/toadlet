@@ -66,16 +66,12 @@ public:
 	bool setAudioDevice(AudioDevice *audioDevice);
 	AudioDevice *getAudioDevice() const;
 
-	void setDirectory(const String &directory){mArchiveManager->setDirectory(directory);}
-	const String &getDirectory() const{return mArchiveManager->getDirectory();}
 	Stream::ptr openStream(const String &name){return mArchiveManager->openStream(name);}
 
 	// Node methods
 	void nodeCreated(Node *node);
 	void nodeDestroyed(Node *node);
 	int internal_registerNode(Node *node);
-
-	template<typename Type> Type *createNodeType(egg::Type<Type,Node> *type,Scene *scene){return (Type*)createNode(type,scene);}
 
 	inline Node *getNodeByHandle(int handle){return (handle>=0 && handle<mHandles.size())?mHandles[handle]:NULL;}
 
@@ -111,6 +107,7 @@ public:
 	Material::ptr createPointSpriteMaterial(Texture *texture,scalar size,bool attenuated);
 	Material::ptr createFontMaterial(Font *font);
 	Material::ptr createSkyBoxMaterial(Texture *texture,bool clamp=true);
+	Material::ptr createWaterMaterial(Texture *reflectTexture,Texture *refractTexture,Texture *bumpTexture,const Vector4 &color);
 
 	Mesh::ptr createAABoxMesh(const AABox &box,Material::ptr material=Material::ptr());
 	Mesh::ptr createSkyBoxMesh(scalar size,bool unfolded,bool invert,Material::ptr bottom,Material::ptr top,Material::ptr left,Material::ptr right,Material::ptr back,Material::ptr front);
@@ -121,7 +118,6 @@ public:
 protected:
 	void *mEnv,*mCtx;
 	bool mFixedBackable,mShaderBackable;
-	String mDirectory;
 	RenderDevice *mRenderDevice;
 	bool mRenderDeviceChanged;
 	AudioDevice *mAudioDevice;
@@ -143,7 +139,7 @@ protected:
 	AudioManager::ptr mAudioManager;
 
 	ResourceCreator::ptr mNormalizationCreator;
-	ResourceCreator::ptr mDiffuseCreator,mSkyBoxMaterialCreator;
+	ResourceCreator::ptr mDiffuseCreator,mSkyBoxMaterialCreator,mWaterMaterialCreator;
 	ResourceCreator::ptr mAABoxCreator,mSkyBoxCreator,mSkyDomeCreator,mSphereCreator,mGridCreator;
 
 	Collection<int> mFreeHandles;

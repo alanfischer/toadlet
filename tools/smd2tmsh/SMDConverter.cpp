@@ -32,7 +32,8 @@ SMDConverter::SMDConverter():
 	mTexCoordEpsilon(Math::fromMilli(10)),
 	mFPS(30),
 	mRemoveSkeleton(false),
-	mInvertFaces(false)
+	mInvertFaces(false),
+	mScale(Math::ONE)
 {
 }
 
@@ -149,6 +150,7 @@ void SMDConverter::load(Engine *engine,Stream *in,const String &fileName){
 				if(reference){
 					Skeleton::Bone::ptr bone=skeleton->bones.at(id);
 					bone->translate.set(MathConversion::floatToScalar(px),MathConversion::floatToScalar(py),MathConversion::floatToScalar(pz));
+					Math::mul(bone->translate,mScale);
 					setQuaternionFromXYZ(bone->rotate,MathConversion::floatToScalar(rx),MathConversion::floatToScalar(ry),MathConversion::floatToScalar(rz));
 				}
 				else{
@@ -161,6 +163,7 @@ void SMDConverter::load(Engine *engine,Stream *in,const String &fileName){
 						Quaternion rotate;
 						int index=track->addKeyFrame(Math::fromInt(time)/mFPS);
 						translate.set(MathConversion::floatToScalar(px),MathConversion::floatToScalar(py),MathConversion::floatToScalar(pz));
+						Math::mul(translate,mScale);
 						setQuaternionFromXYZ(rotate,MathConversion::floatToScalar(rx),MathConversion::floatToScalar(ry),MathConversion::floatToScalar(rz));
 						vba.set3(index,0,translate);
 						vba.set4(index,1,rotate);
@@ -187,6 +190,7 @@ void SMDConverter::load(Engine *engine,Stream *in,const String &fileName){
 				Vertex v;
 				v.bone=bone;
 				v.position.set(MathConversion::floatToScalar(px),MathConversion::floatToScalar(py),MathConversion::floatToScalar(pz));
+				Math::mul(v.position,mScale);
 				v.normal.set(MathConversion::floatToScalar(nx),MathConversion::floatToScalar(ny),MathConversion::floatToScalar(nz));
 				v.texCoord.set(MathConversion::floatToScalar(tu),MathConversion::floatToScalar(tv));
 				triverts[vertindex-1]=v;
@@ -204,7 +208,7 @@ void SMDConverter::load(Engine *engine,Stream *in,const String &fileName){
 		int i,j,k;
 
 		if(mRemoveSkeleton==false && mSkeleton!=NULL){
-			SkeletonComponent::ptr skeleton=new SkeletonComponent(mSkeleton);
+			SkeletonComponent::ptr skeleton=new SkeletonComponent(mEngine,mSkeleton);
 			skeleton->updateBones();
 			for(i=0;i<skeleton->getNumBones();++i){
 				Vector3 wtbTranslation(skeleton->getBone(i)->worldTranslate);

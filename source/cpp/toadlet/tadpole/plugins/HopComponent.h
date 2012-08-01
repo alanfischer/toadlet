@@ -33,7 +33,7 @@
 namespace toadlet{
 namespace tadpole{
 
-class TOADLET_API HopComponent:public BaseComponent,public PhysicsComponent{
+class TOADLET_API HopComponent:public BaseComponent,public PhysicsComponent,public TraceCallback{
 public:
 	TOADLET_COMPONENT(HopComponent,PhysicsComponent);
 
@@ -49,11 +49,17 @@ public:
 	void setVelocity(const Vector3 &velocity){mSolid->setVelocity(velocity);}
 	const Vector3 &getVelocity() const{return mSolid->getVelocity();}
 
+	virtual void setMass(scalar mass){mSolid->setMass(mass);}
+	virtual scalar getMass() const{return mSolid->getMass();}
+
 	void setGravity(scalar gravity){mSolid->setCoefficientOfGravity(gravity);}
 	scalar getGravity() const{return mSolid->getCoefficientOfGravity();}
 
-	void setBound(Bound *bound);
+	void setSolid(bool solid){mSolid->setCollisionBits(0);}
+	bool getSolid() const{return mSolid->getCollisionBits()==0;}
 
+	void setBound(Bound *bound);
+	void setTraceable(Traceable *traceable);
 	void addShape(Shape *shape);
 	void removeShape(Shape *shape);
 
@@ -66,6 +72,11 @@ public:
 	Bound *getBound() const{return mBound;}
 
 	inline Solid *getSolid(){return mSolid;}
+
+	// TraceCallback
+	void getBound(AABox &result);
+	void traceSegment(hop::Collision &result,const Vector3 &position,const Segment &segment);
+	void traceSolid(hop::Collision &result,hop::Solid *solid,const Vector3 &position,const Segment &segment);
 
 protected:
 	friend class HopManager;
@@ -80,6 +91,8 @@ protected:
 	Vector3 mOldPosition,mNewPosition,mCurrentPosition;
 	bool mSkipNextPreSimulate;
 	Bound::ptr mBound;
+	Traceable::ptr mTraceable;
+	Shape::ptr mTraceableShape;
 };
 
 }

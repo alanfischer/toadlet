@@ -28,6 +28,7 @@
 #include <toadlet/tadpole/Scene.h>
 #include <toadlet/tadpole/Action.h>
 #include <toadlet/tadpole/LightComponent.h>
+#include <toadlet/tadpole/PhysicsComponent.h>
 #include <toadlet/tadpole/Visible.h>
 #include <toadlet/tadpole/Node.h>
 
@@ -57,9 +58,6 @@ Node::Node(Scene *scene):BaseComponent(),
 	//mWorldBound,
 	mScope(0)
 {
-	mScene=scene;
-	mEngine=mScene->getEngine();
-
 	mParent=NULL;
 	mParentData=NULL;
 
@@ -77,6 +75,10 @@ Node::Node(Scene *scene):BaseComponent(),
 	mComponentBound=new Bound();
 	mComponentWorldBound=new Bound();
 	mScope=-1;
+
+	if(scene!=NULL){
+		create(scene);
+	}
 }
 
 Node::~Node(){
@@ -87,6 +89,11 @@ void Node::destroy(){
 	destroyAllChildren();
 
 	BaseComponent::destroy();
+}
+
+void Node::create(Scene *scene){
+	mScene=scene;
+	mEngine=mScene->getEngine();
 }
 
 void Node::destroyAllChildren(){
@@ -309,6 +316,16 @@ void Node::frameUpdate(int dt,int scope){
 	}
 }
 
+bool Node::setProperty(const String &name,const String &value){
+	int i=0;
+	bool result=false;
+	for(i=0;i<mComponents.size();++i){
+		Component *component=mComponents[i];
+		result|=component->setProperty(name,value);
+	}
+	return result;
+}
+
 void Node::mergeWorldBound(Node *child,bool justAttached){
 	mWorldBound->merge(child->getWorldBound(),mScene->getEpsilon());
 }
@@ -402,10 +419,8 @@ void Node::spacialUpdated(){
 		mTransformUpdatedFrame=mScene->getFrame();
 	}
 
-	int i;
-	for(i=0;i<mComponents.size();++i){
-		Component *component=mComponents[i];
-		component->transformChanged();
+	if(mPhysics!=NULL){
+		mPhysics->transformChanged();
 	}
 
 	activate();

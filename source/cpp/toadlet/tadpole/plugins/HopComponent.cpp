@@ -89,22 +89,20 @@ void HopComponent::setBound(Bound *bound){
 	}
 }
 
-/*
-void HopComponent::setTraceableShape(Traceable *traceable,Node *traceableNode){
+void HopComponent::setTraceable(Traceable *traceable){
 	if(mTraceable!=NULL){
 		removeShape(mTraceableShape);
 		mTraceableShape=NULL;
 	}
 
 	mTraceable=traceable;
-	mTraceableNode=traceableNode;
 
 	if(mTraceable!=NULL){
 		mTraceableShape=new Shape(this);
 		addShape(mTraceableShape);
 	}
 }
-*/
+
 void HopComponent::addShape(Shape *shape){
 	mSolid->addShape(shape);
 }
@@ -156,10 +154,9 @@ void HopComponent::transformChanged(){
 	}
 }
 
-/*
 void HopComponent::getBound(AABox &result){
 	if(mTraceable!=NULL){
-		result.set(mTraceable->getBound().getAABox());
+		result.set(mTraceable->getTraceableBound()->getAABox());
 	}
 }
 
@@ -167,7 +164,7 @@ void HopComponent::traceSegment(hop::Collision &result,const Vector3 &position,c
 	if(mTraceable!=NULL){
 		tadpole::Collision collision;
 		mTraceable->traceSegment(collision,position,segment,Math::ZERO_VECTOR3);
-		HopScene::set(result,collision,mSolid,NULL);
+		HopManager::set(result,collision,mSolid,NULL);
 	}
 }
 
@@ -175,13 +172,25 @@ void HopComponent::traceSolid(hop::Collision &result,hop::Solid *solid,const Vec
 	if(mTraceable!=NULL){
 		tadpole::Collision collision;
 		const AABox &bound=solid->getLocalBound();
+
 		Vector3 size;
 		Math::sub(size,bound.maxs,bound.mins);
-		mTraceable->traceSegment(collision,position,segment,size);
-		HopScene::set(result,collision,mSolid,solid);
+
+		Vector3 origin;
+		Math::add(origin,bound.maxs,bound.mins);
+		Math::mul(origin,Math::HALF);
+
+		Segment adjustedSegment(segment);
+		Math::add(adjustedSegment.origin,origin);
+
+		mTraceable->traceSegment(collision,position,adjustedSegment,size);
+
+		Math::sub(collision.point,origin);
+
+		HopManager::set(result,collision,mSolid,solid);
 	}
 }
-
+/*
 void HopComponent::collision(const hop::Collision &c){
 	tadpole::Collision collision;
 	HopScene::set(collision,c);

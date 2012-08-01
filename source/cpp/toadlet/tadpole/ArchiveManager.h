@@ -46,8 +46,10 @@ public:
 	Archive::ptr manageArchive(const Archive::ptr &resource,const String &name=(char*)NULL){mArchives.add(resource);return shared_static_cast<Archive>(ResourceManager::manage(resource,name));}
 	void unmanageArchive(const Archive::ptr &resource){mArchives.remove(resource);ResourceManager::unmanage(resource);}
 
-	void setDirectory(const String &directory);
-	const String &getDirectory() const{return mDirectory;}
+	void addDirectory(const String &directory);
+	void removeDirectory(const String &directory);
+	int getNumDirectories() const{return mDirectories.size();}
+	String getDirectory(int i) const{return mDirectories[i];}
 
 	// Searches through all archives for the file
 	Stream::ptr openStream(const String &name);
@@ -56,7 +58,7 @@ public:
 	Collection<String>::ptr getEntries(){return NULL;}
 
 protected:
-	String mDirectory;
+	Collection<String> mDirectories;
 	Collection<Archive::ptr> mArchives;
 };
 

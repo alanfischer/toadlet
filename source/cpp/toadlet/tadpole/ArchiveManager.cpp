@@ -39,13 +39,12 @@ ArchiveManager::~ArchiveManager(){
 	destroy();
 }
 
-void ArchiveManager::setDirectory(const String &directory){
-	if(directory.length()>0){
-		mDirectory=directory+"/";
-	}
-	else{
-		mDirectory=directory;
-	}
+void ArchiveManager::addDirectory(const String &directory){
+	mDirectories.add(cleanPath(directory,true));
+}
+
+void ArchiveManager::removeDirectory(const String &directory){
+	mDirectories.remove(cleanPath(directory,true));
 }
 
 Stream::ptr ArchiveManager::openStream(const String &name){
@@ -62,7 +61,12 @@ Stream::ptr ArchiveManager::openStream(const String &name){
 	if(stream==NULL){
 		FileStream::ptr fileStream;
 		if(System::absolutePath(name)==false){
-			fileStream=new FileStream(mDirectory+name,FileStream::Open_READ_BINARY);
+			for(i=0;i<mDirectories.size();++i){
+				fileStream=new FileStream(mDirectories[i]+name,FileStream::Open_READ_BINARY);
+				if(fileStream->closed()==false){
+					break;
+				}
+			}
 		}
 		else{
 			fileStream=new FileStream(name,FileStream::Open_READ_BINARY);
