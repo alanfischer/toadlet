@@ -56,7 +56,7 @@ public:
 	virtual bool getActive() const{return true;}
 	virtual Bound *getBound() const{return NULL;}
 	
-	virtual void transformChanged(){}
+	virtual bool setProperty(const String &name,const String &value){return false;}
 
 protected:
 	Node *mParent;
@@ -72,6 +72,7 @@ protected:
 	toadlet::tadpole::Component *componentThis(){return (BaseClass*)this;} \
 	void setName(const String &name){toadlet::tadpole::BaseComponent::setName(name);}\
 	inline const String &getName() const{return toadlet::tadpole::BaseComponent::getName();}\
-	Node *getParent(){return toadlet::tadpole::BaseComponent::getParent();}
+	Node *getParent(){return toadlet::tadpole::BaseComponent::getParent();} \
+	bool setProperty(const String &name,const String &value){return toadlet::tadpole::BaseComponent::setProperty(name,value);}
 
 #endif

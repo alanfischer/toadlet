@@ -343,11 +343,11 @@ void SkeletonComponent::destroySkeletonBuffers(){
 }
 
 const Transform &SkeletonComponent::getRenderTransform() const{
-	return mParent!=NULL?mParent->getWorldTransform():Node::identityTransform();
+	return mParent->getWorldTransform();
 }
 
 Bound *SkeletonComponent::getRenderBound() const{
-	return mParent!=NULL?mParent->getWorldBound():NULL;
+	return mParent->getWorldBound();
 }
 
 void SkeletonComponent::render(RenderManager *manager) const{

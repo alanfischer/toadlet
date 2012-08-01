@@ -30,10 +30,11 @@ namespace toadlet{
 namespace tadpole{
 namespace terrain{
 
-TextureDataSource::TextureDataSource(Engine *engine,const Vector3 &scale,const String &name):
+TextureDataSource::TextureDataSource(Engine *engine,const Vector3 &scale,scalar offset,const String &name):
 	mEngine(NULL),
 	mPatchSize(0),
 	mPatchScale(scale),
+	mOffset(offset),
 	//mTextureFormat
 	//mFormat
 	mTextureData(NULL),
@@ -43,10 +44,11 @@ TextureDataSource::TextureDataSource(Engine *engine,const Vector3 &scale,const S
 	setTexture(name,0,0);
 }
 
-TextureDataSource::TextureDataSource(Engine *engine,const Vector3 &scale,Texture *texture):
+TextureDataSource::TextureDataSource(Engine *engine,const Vector3 &scale,scalar offset,Texture *texture):
 	mEngine(NULL),
 	mPatchSize(0),
 	mPatchScale(scale),
+	mOffset(offset),
 	//mTextureFormat
 	//mFormat
 	mTextureData(NULL),
@@ -90,7 +92,13 @@ bool TextureDataSource::setTexture(Texture *texture,int px,int py){
 
 bool TextureDataSource::getPatchHeightData(scalar *data,int px,int py){
 	if(mTexture[px][py]==NULL){
-		return false;
+		int i,j;
+		for(i=0;i<mPatchSize;++i){
+			for(j=0;j<mPatchSize;++j){
+				data[i*mPatchSize+j]=mOffset/mPatchScale.z;
+			}
+		}
+		return true;
 	}
 
 	bool result=mTexture[px][py]->read(mTextureFormat,mTextureData);
@@ -101,7 +109,7 @@ bool TextureDataSource::getPatchHeightData(scalar *data,int px,int py){
 		int i,j;
 		for(i=0;i<mPatchSize;++i){
 			for(j=0;j<mPatchSize;++j){
-				data[j*mPatchSize+i]=((float)mData[j*mPatchSize+i])/255.0;
+				data[j*mPatchSize+i]=((float)mData[j*mPatchSize+i])/255.0 + mOffset/mPatchScale.z;
 			}
 		}
 	}

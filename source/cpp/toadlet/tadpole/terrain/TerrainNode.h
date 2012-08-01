@@ -71,6 +71,7 @@ public:
 	void setTerrainScope(int scope);
 	void setWaterScope(int scope);
 	void setTolerance(scalar tolerance);
+	void setWaterLevel(scalar level);
 
 	int localPatchIndex(int x,int y){return (y+mHalfSize)*mSize+(x+mHalfSize);}
 	TerrainPatchComponent *patchAt(int x,int y){
@@ -139,6 +140,7 @@ protected:
 	int mPatchTerrainScope;
 	int mPatchWaterScope;
 	scalar mPatchTolerance;
+	scalar mPatchWaterLevel;
 	Vector3 mPatchScale;
 	Collection<scalar> mPatchHeightData;
 	Collection<tbyte> mPatchLayerData;

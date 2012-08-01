@@ -34,32 +34,19 @@ namespace toadlet{
 namespace egg{
 
 template<typename Class>
-class BaseType{
+class Type{
 public:
-	virtual ~BaseType(){}
+	virtual ~Type(){}
 	virtual const String &getFullName() const=0;
 	virtual Class *newInstance() const=0;
 };
 
-template<typename Class,typename BaseClass>
-class TOADLET_API Type:public BaseType<BaseClass>{
+template<typename Class,typename SuperClass>
+class TOADLET_API InstantiableType:public Type<SuperClass>{
 public:
-	Type(const char *fullName):mFullName(fullName){}
-
+	InstantiableType(const char *fullName):mFullName(fullName){}
 	const String &getFullName() const{return mFullName;}
-	BaseClass *newInstance() const{return new Class();}
-
-protected:
-	String mFullName;
-};
-
-template<typename Class,typename BaseClass>
-class TOADLET_API NonInstantiableType:public BaseType<BaseClass>{
-public:
-	NonInstantiableType(const char *fullName):mFullName(fullName){}
-
-	const String &getFullName() const{return mFullName;}
-	BaseClass *newInstance() const{return NULL;}
+	SuperClass *newInstance() const{return new Class();}
 
 protected:
 	String mFullName;
@@ -70,16 +57,16 @@ class TypeFactory{
 public:
 	TypeFactory(){}
 	
-	void registerType(BaseType<Class> *type){
+	void registerType(Type<Class> *type){
 		mTypes[type->getFullName()]=type;
 	}
 	
-	void unregisterType(BaseType<Class> *type){
+	void unregisterType(Type<Class> *type){
 		mTypes.erase(type);
 	}
 	
 	Class *newInstance(const String &fullName){
-		typename Map<String,const BaseType<Class>*>::iterator i=mTypes.find(fullName);
+		typename Map<String,const Type<Class>*>::iterator i=mTypes.find(fullName);
 		if(i==mTypes.end()){
 			Error::unknown("unknown type: "+fullName);
 			return NULL;
@@ -90,7 +77,7 @@ public:
 	}
 
 protected:
-	Map<String,const BaseType<Class>*> mTypes;
+	Map<String,const Type<Class>*> mTypes;
 };
 
 }

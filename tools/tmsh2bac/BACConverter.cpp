@@ -368,7 +368,7 @@ bool BACConverter::extractMeshData(Mesh::ptr mesh,bool useSubmeshes){
 		mBones.add(bone);
 	}
 	else{
-		SkeletonComponent::ptr skeleton=new SkeletonComponent(mesh->getSkeleton());
+		SkeletonComponent::ptr skeleton=new SkeletonComponent(mEngine,mesh->getSkeleton());
 		buildBones(mesh,skeleton,0);
 	}
 

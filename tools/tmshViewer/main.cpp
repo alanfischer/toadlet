@@ -36,12 +36,12 @@ int main(int argc,char **argv){
 	Viewer *viewer=new Viewer(app);
 	app->setApplet(viewer);
 	Engine *engine=app->getEngine();
-	Scene::ptr scene=viewer->getScene();
+	Scene *scene=viewer->getScene();
 
 	String meshName=argv[1];
 	int loc=meshName.rfind('\\');
 	if(loc!=std::string::npos){
-		engine->setDirectory(meshName.substr(0,loc));
+		engine->getArchiveManager()->addDirectory(meshName.substr(0,loc));
 		meshName=meshName.substr(loc+1,meshName.length());
 	}
 
@@ -55,13 +55,14 @@ int main(int argc,char **argv){
 		return -1;
 	}
 
-	MeshNode::ptr meshNode=engine->createNodeType(MeshNode::type(),scene);
-	meshNode->setMesh(mesh);
-
-	if(mesh->getSkeleton()!=NULL){
+	Node::ptr node=new Node(scene);
+	MeshComponent::ptr meshComponent=new MeshComponent(engine);
+	meshComponent->setMesh(mesh);
+	node->attach(meshComponent);
+	if(meshComponent->getSkeleton()!=NULL){
 		std::cout << "Has skeleton" << std::endl;
 
-		meshNode->getSkeleton()->setRenderSkeleton(true);
+		meshComponent->getSkeleton()->setRenderSkeleton(true);
 
 		int numSequences=mesh->getSkeleton()->sequences.size();
 		std::cout << "Number of sequences:" << numSequences << std::endl;
@@ -70,10 +71,10 @@ int main(int argc,char **argv){
 			int sequence=atoi(argv[2]);
 			if(sequence>=0 && sequence<numSequences){
 				AnimationActionComponent::ptr animation=new AnimationActionComponent("animation");
-				animation->attach(new MeshAnimation(meshNode,sequence));
+				animation->attach(new MeshAnimation(meshComponent,sequence));
 				animation->setCycling(AnimationActionComponent::Cycling_LOOP);
 				animation->start();
-				meshNode->attach(animation);
+				node->attach(animation);
 			}
 			else{
 				std::cout << "Invalid sequence number:" << sequence << std::endl;
@@ -81,7 +82,7 @@ int main(int argc,char **argv){
 		}
 	}
 
-	viewer->setNode(meshNode);
+	viewer->setNode(node);
 
 	app->start();
 	app->destroy();

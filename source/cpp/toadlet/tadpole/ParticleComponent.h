@@ -36,6 +36,7 @@
 #include <toadlet/tadpole/Camera.h>
 #include <toadlet/tadpole/Renderable.h>
 #include <toadlet/tadpole/Visible.h>
+#include <toadlet/tadpole/Scene.h>
 #include <toadlet/tadpole/material/Material.h>
 
 namespace toadlet{
@@ -107,7 +108,7 @@ public:
 
 	// Renderable
 	Material *getRenderMaterial() const{return mMaterial;}
-	const Transform &getRenderTransform() const{return mWorldSpace==false?mParent->getWorldTransform():Node::identityTransform();}
+	const Transform &getRenderTransform() const{return mWorldSpace==false?mParent->getWorldTransform():mScene->getRoot()->getWorldTransform();}
 	Bound *getRenderBound() const{return mParent->getWorldBound();}
 	void render(RenderManager *manager) const;
 

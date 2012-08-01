@@ -47,6 +47,7 @@ TerrainNode::TerrainNode(Scene *scene):PartitionNode(scene),
 	mPatchTerrainScope(0),
 	mPatchWaterScope(0),
 	mPatchTolerance(0),
+	mPatchWaterLevel(0),
 	//mPatchScale,
 	//mPatchHeightData,
 	//mPatchLayerData,
@@ -223,6 +224,17 @@ void TerrainNode::setTolerance(scalar tolerance){
 	}	
 }
 
+void TerrainNode::setWaterLevel(scalar level){
+	mPatchWaterLevel=level;
+	
+	int i;
+	for(i=0;i<mPatchGrid.size();++i){
+		if(mPatchGrid[i]!=NULL){
+			mPatchGrid[i]->setWaterLevel(level);
+		}
+	}	
+}
+
 void TerrainNode::gatherRenderables(Camera *camera,RenderableSet *set){
 	if((camera->getScope()&mPatchCameraUpdateScope)!=0){
 		updatePatches(camera);
@@ -340,6 +352,7 @@ void TerrainNode::createPatch(int x,int y){
 	patch->getParent()->setScale(mPatchScale);
 	patch->getParent()->setTranslate(toWorldXi(x)-mPatchSize*mPatchScale.x/2,toWorldYi(y)-mPatchSize*mPatchScale.y/2,0);
 	patch->setTolerance(mPatchTolerance);
+	patch->setWaterLevel(mPatchWaterLevel);
 	patch->setCameraUpdateScope(mPatchCameraUpdateScope);
 	patch->setTerrainScope(mPatchTerrainScope);
 	patch->setWaterScope(mPatchWaterScope);

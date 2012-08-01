@@ -69,7 +69,7 @@ AudioStream::ptr AudioManager::findAudioStream(const String &name){
 		"finding audio stream:"+name);
 
 	/// @todo: Unify this with ResourceManager::findFromFile
-	String filename=cleanFilename(name);
+	String filename=cleanPath(name);
 	String extension;
 	int i=filename.rfind('.');
 	if(i!=String::npos){

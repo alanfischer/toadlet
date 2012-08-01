@@ -206,9 +206,9 @@ void ResourceManager::logAllResources(){
 	}
 }
 
-String ResourceManager::cleanFilename(const String &name){
-	char *temp=new char[name.length()+1];
-	memcpy(temp,name.c_str(),name.length()+1);
+String ResourceManager::cleanPath(const String &name,bool directory){
+	char *temp=new char[name.length()+2];
+	memcpy(temp,name.c_str(),name.length()+2);
 
 	// Eliminate all ".." from the name
 	char *p=0;
@@ -245,6 +245,13 @@ String ResourceManager::cleanFilename(const String &name){
 		}
 	}
 
+	if(directory){
+		int len=strlen(temp);
+		if(len>0 && temp[len-1]!='/'){
+			strcat(temp,"/");
+		}
+	}
+
 	String cleanName=temp;
 
 	delete[] temp;
@@ -262,7 +269,7 @@ Resource::ptr ResourceManager::findFromFile(const String &name,ResourceData *dat
 	Logger::debug(Categories::TOADLET_TADPOLE,
 		"ResourceManager::findFromFile:"+name);
 
-	String filename=cleanFilename(name);
+	String filename=cleanPath(name);
 	String extension;
 	int i=filename.rfind('.');
 	if(i!=String::npos){
@@ -295,10 +302,27 @@ Resource::ptr ResourceManager::findFromFile(const String &name,ResourceData *dat
 					return NULL;
 				}
 
+				String tempPath;
+				int slash=filename.rfind('/');
+				if(slash>0){
+					tempPath=filename.substr(0,slash);
+					if(mEngine->getArchiveManager()->getNumDirectories()>0){
+						tempPath=mEngine->getArchiveManager()->getDirectory(i)+tempPath;
+					}
+				}
+
+				if(tempPath.length()>0){
+					mEngine->getArchiveManager()->addDirectory(tempPath);
+				}
+
 				Resource::ptr resource;
 				TOADLET_TRY
 					resource=streamer->load(stream,data,NULL);
 				TOADLET_CATCH(const Exception &){resource=NULL;}
+
+				if(tempPath.length()>0){
+					mEngine->getArchiveManager()->removeDirectory(tempPath);
+				}
 
 				// We do not close the stream, since the Streamer may hold on to it.  Instead we let it close itself
 

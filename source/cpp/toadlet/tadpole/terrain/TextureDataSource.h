@@ -38,8 +38,8 @@ class TOADLET_API TextureDataSource:public Object,public TerrainNodeDataSource{
 public:
 	TOADLET_OBJECT(TextureDataSource);
 
-	TextureDataSource(Engine *engine,const Vector3 &scale,const String &name);
-	TextureDataSource(Engine *engine,const Vector3 &scale,Texture *texture=NULL);
+	TextureDataSource(Engine *engine,const Vector3 &scale,scalar offset,const String &name);
+	TextureDataSource(Engine *engine,const Vector3 &scale,scalar offset,Texture *texture=NULL);
 	virtual ~TextureDataSource();
 	
 	bool setTexture(const String &name,int px,int py);
@@ -54,6 +54,7 @@ protected:
 	Engine *mEngine;
 	int mPatchSize;
 	Vector3 mPatchScale;
+	scalar mOffset;
 	TextureFormat::ptr mTextureFormat,mFormat;
 	tbyte *mTextureData,*mData;
 	Map<int,Map<int,Texture::ptr> > mTexture;

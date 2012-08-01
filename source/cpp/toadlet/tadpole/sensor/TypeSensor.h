@@ -39,8 +39,8 @@ public:
 
 	TypeSensor(Scene *scene);
 
-	void setType(BaseType<Node> *type){mType=type;}
-	BaseType<Node> *getType() const{return mType;}
+	void setType(Type<Node> *type){mType=type;}
+	Type<Node> *getType() const{return mType;}
 
 	void setTypeName(const String &typeName){mTypeName=typeName;}
 	const String &getTypeName() const{return mTypeName;}
@@ -48,7 +48,7 @@ public:
 protected:
 	bool senseNode(Node *node);
 
-	BaseType<Node> *mType;
+	Type<Node> *mType;
 	String mTypeName;
 };
 

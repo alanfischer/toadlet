@@ -31,24 +31,10 @@ namespace toadlet{
 namespace tadpole{
 namespace terrain{
 
-DiffuseTerrainMaterialSource::DiffuseTerrainMaterialSource(Engine *engine,const Vector3 &scale,const String &name){
+DiffuseTerrainMaterialSource::DiffuseTerrainMaterialSource(Engine *engine){
 	mEngine=engine;
-	mTextureScale=scale;
 
 	createShaders();
-
-	setDiffuseTexture(0,name);
-}
-
-DiffuseTerrainMaterialSource::DiffuseTerrainMaterialSource(Engine *engine,const Vector3 &scale,Texture *texture){
-	mEngine=engine;
-	mTextureScale=scale;
-
-	createShaders();
-
-	if(texture!=NULL){
-		setDiffuseTexture(0,texture);
-	}
 }
 
 void DiffuseTerrainMaterialSource::createShaders(){
@@ -63,7 +49,7 @@ void DiffuseTerrainMaterialSource::createShaders(){
 		"attribute vec2 TEXCOORD0;\n"
 		"varying vec4 color;\n"
 		"varying float fog;\n"
-		"varying vec2 texCoord,texCoord2;\n"
+		"varying vec2 texCoord,detailTexCoord,layerTexCoord;\n"
 
 		"uniform mat4 modelViewProjectionMatrix;\n"
 		"uniform mat4 normalMatrix;\n"
@@ -75,6 +61,7 @@ void DiffuseTerrainMaterialSource::createShaders(){
 		"uniform vec4 ambientColor;\n"
 		"uniform float materialLight;\n"
 		"uniform mat4 textureMatrix;\n"
+		"uniform mat4 detailTextureMatrix;\n"
 		"uniform float fogDensity;\n"
 		"uniform vec2 fogDistance;\n"
 
@@ -86,7 +73,8 @@ void DiffuseTerrainMaterialSource::createShaders(){
 			"color=clamp(localLightColor*materialDiffuseColor + ambientColor*materialAmbientColor,0.0,1.0);\n"
 			"color=materialTrackColor+color*(1.0-materialTrackColor);\n"
 			"texCoord=(textureMatrix * vec4(TEXCOORD0,0.0,1.0)).xy;\n"
-			"texCoord2=vec4(TEXCOORD0,0.0,1.0).xy;\n"
+			"detailTexCoord=(detailTextureMatrix * vec4(TEXCOORD0,0.0,1.0)).xy;\n"
+			"layerTexCoord=vec4(TEXCOORD0,0.0,1.0).xy;\n"
 			"fog=clamp(1.0-fogDensity*(gl_Position.z-fogDistance.x)/(fogDistance.y-fogDistance.x),0.0,1.0);\n"
 		"}",
 
@@ -102,7 +90,8 @@ void DiffuseTerrainMaterialSource::createShaders(){
 			"float4 color : COLOR;\n"
 			"float fog: FOG;\n"
 			"float2 texCoord: TEXCOORD0;\n"
-			"float2 texCoord2: TEXCOORD1;\n"
+			"float2 detailTexCoord: TEXCOORD1;\n"
+			"float2 layerTexCoord: TEXCOORD2;\n"
 		"};\n"
 
 		"float4x4 modelViewProjectionMatrix;\n"
@@ -115,6 +104,7 @@ void DiffuseTerrainMaterialSource::createShaders(){
 		"float4 ambientColor;\n"
 		"float materialLight;\n"
 		"float4x4 textureMatrix;\n"
+		"float4x4 detailTextureMatrix;\n"
 		"float fogDensity;\n"
 		"float2 fogDistance;\n"
 
@@ -127,7 +117,8 @@ void DiffuseTerrainMaterialSource::createShaders(){
 			"vout.color=clamp(localLightColor*materialDiffuseColor + ambientColor*materialAmbientColor,0.0,1.0);\n"
 			"vout.color=materialTrackColor+vout.color*(1.0-materialTrackColor);\n"
 			"vout.texCoord=mul(textureMatrix,float4(vin.texCoord,0.0,1.0));\n "
-			"vout.texCoord2=float4(vin.texCoord,0.0,1.0);\n "
+			"vout.detailTexCoord=mul(detailTextureMatrix,float4(vin.texCoord,0.0,1.0));\n "
+			"vout.layerTexCoord=float4(vin.texCoord,0.0,1.0);\n "
 			"vout.fog=clamp(1.0-fogDensity*(vout.position.z-fogDistance.x)/(fogDistance.y-fogDistance.x),0.0,1.0);\n"
 			"return vout;\n"
 		"}"
@@ -139,14 +130,14 @@ void DiffuseTerrainMaterialSource::createShaders(){
 		"#endif\n"
 
 		"varying vec4 color;\n"
-		"varying vec2 texCoord;\n"
+		"varying vec2 texCoord,detailTexCoord;\n"
 		"varying float fog;\n"
 
 		"uniform vec4 fogColor;\n"
-		"uniform sampler2D tex;\n"
+		"uniform sampler2D tex,detailTex;\n"
 
 		"void main(){\n"
-			"vec4 fragColor=color*(texture2D(tex,texCoord));\n"
+			"vec4 fragColor=color*texture2D(tex,texCoord)*texture2D(detailTex,detailTexCoord);\n"
 			"gl_FragColor=mix(fogColor,fragColor,fog);\n"
 		"}",
 
@@ -157,14 +148,15 @@ void DiffuseTerrainMaterialSource::createShaders(){
 			"float4 color: COLOR;\n"
 			"float fog: FOG;\n"
 			"float2 texCoord: TEXCOORD0;\n"
+			"float2 detailTexCoord: TEXCOORD1;\n"
 		"};\n"
 
 		"float4 fogColor;\n"
-		"Texture2D tex;\n"
-		"SamplerState samp;\n"
+		"Texture2D tex,detailTex;\n"
+		"SamplerState samp,detailSamp;\n"
 
 		"float4 main(PIN pin): SV_TARGET{\n"
-			"float4 fragColor=pin.color*(tex.Sample(samp,pin.texCoord));\n"
+			"float4 fragColor=pin.color*tex.Sample(samp,pin.texCoord)*detailTex.Sample(detailSamp,pin.detailTexCoord);\n"
 			"return lerp(fogColor,fragColor,pin.fog);\n"
 		"}"
 	};
@@ -175,15 +167,15 @@ void DiffuseTerrainMaterialSource::createShaders(){
 		"#endif\n"
 
 		"varying vec4 color;\n"
-		"varying vec2 texCoord,texCoord2;\n"
+		"varying vec2 texCoord,detailTexCoord,layerTexCoord;\n"
 		"varying float fog;\n"
 
 		"uniform vec4 fogColor;\n"
-		"uniform sampler2D tex,layerTex;\n"
+		"uniform sampler2D tex,detailTex,layerTex;\n"
 
 		"void main(){\n"
-			"vec4 fragColor=color*(texture2D(tex,texCoord));\n"
-			"fragColor.w=texture2D(layerTex,texCoord2).w;\n"
+			"vec4 fragColor=color*texture2D(tex,texCoord)*texture2D(detailTex,detailTexCoord);\n"
+			"fragColor.w=texture2D(layerTex,layerTexCoord).w;\n"
 			"gl_FragColor=mix(fogColor,fragColor,fog);\n"
 		"}",
 
@@ -194,16 +186,17 @@ void DiffuseTerrainMaterialSource::createShaders(){
 			"float4 color: COLOR;\n"
 			"float fog: FOG;\n"
 			"float2 texCoord: TEXCOORD0;\n"
-			"float2 texCoord2: TEXCOORD1;\n"
+			"float2 detailTexCoord: TEXCOORD1;\n"
+			"float2 layerTexCoord: TEXCOORD2;\n"
 		"};\n"
 
 		"float4 fogColor;\n"
-		"Texture2D tex,layerTex;\n"
-		"SamplerState samp,layerSamp;\n"
+		"Texture2D tex,detailTex,layerTex;\n"
+		"SamplerState samp,detailSamp,layerSamp;\n"
 
 		"float4 main(PIN pin): SV_TARGET{\n"
-			"float4 fragColor=pin.color*(tex.Sample(samp,pin.texCoord));\n"
-			"fragColor.w=layerTex.Sample(layerSamp,pin.texCoord2).w;\n"
+			"float4 fragColor=pin.color*tex.Sample(samp,pin.texCoord)*detailTex.Sample(detailSamp,pin.detailTexCoord);\n"
+			"fragColor.w=layerTex.Sample(layerSamp,pin.layerTexCoord).w;\n"
 			"return lerp(fogColor,fragColor,pin.fog);\n"
 		"}"
 	};
@@ -244,12 +237,26 @@ bool DiffuseTerrainMaterialSource::setDiffuseTexture(int layer,Texture *texture)
 	return true;
 }
 
+bool DiffuseTerrainMaterialSource::setDetailTexture(const String &name){
+	return setDetailTexture(mEngine->getTextureManager()->findTexture(name));
+}
+
+bool DiffuseTerrainMaterialSource::setDetailTexture(Texture *texture){
+	mDetailTexture=texture;
+
+	return true;
+}
+
 Material::ptr DiffuseTerrainMaterialSource::getMaterial(TerrainPatchComponent *patch){
 	Material::ptr material(new Material(mEngine->getMaterialManager()));
 
-	TextureState scaleState;
-	scaleState.calculation=TextureState::CalculationType_NORMAL;
-	Math::setMatrix4x4FromScale(scaleState.matrix,mTextureScale);
+	TextureState diffuseState;
+	diffuseState.calculation=TextureState::CalculationType_NORMAL;
+	Math::setMatrix4x4FromScale(diffuseState.matrix,mDiffuseScale);
+
+	TextureState detailState;
+	detailState.calculation=TextureState::CalculationType_NORMAL;
+	Math::setMatrix4x4FromScale(detailState.matrix,mDetailScale);
 
 	TextureState layerState;
 	layerState.colorOperation=TextureState::Operation_REPLACE;
@@ -289,11 +296,13 @@ Material::ptr DiffuseTerrainMaterialSource::getMaterial(TerrainPatchComponent *p
 			variables->addVariable("materialAmbientColor",RenderVariable::ptr(new MaterialAmbientVariable()),Material::Scope_MATERIAL);
 			variables->addVariable("materialTrackColor",RenderVariable::ptr(new MaterialTrackColorVariable()),Material::Scope_MATERIAL);
 			variables->addVariable("textureMatrix",RenderVariable::ptr(new TextureMatrixVariable("tex")),Material::Scope_MATERIAL);
+			variables->addVariable("detailTextureMatrix",RenderVariable::ptr(new TextureMatrixVariable("detailTex")),Material::Scope_MATERIAL);
 			variables->addVariable("fogDensity",RenderVariable::ptr(new FogDensityVariable()),Material::Scope_MATERIAL);
 			variables->addVariable("fogDistance",RenderVariable::ptr(new FogDistanceVariable()),Material::Scope_MATERIAL);
 			variables->addVariable("fogColor",RenderVariable::ptr(new FogColorVariable()),Material::Scope_MATERIAL);
 
-			variables->addTexture("tex",mDiffuseTextures.size()>0?mDiffuseTextures[0]:NULL,"samp",SamplerState(),scaleState);
+			variables->addTexture("tex",mDiffuseTextures.size()>0?mDiffuseTextures[0]:NULL,"samp",SamplerState(),diffuseState);
+			variables->addTexture("detailTex",mDetailTexture,"detailSamp",SamplerState(),detailState);
 		}
 
 		int i;
@@ -320,11 +329,13 @@ Material::ptr DiffuseTerrainMaterialSource::getMaterial(TerrainPatchComponent *p
 			variables->addVariable("materialAmbientColor",RenderVariable::ptr(new MaterialAmbientVariable()),Material::Scope_MATERIAL);
 			variables->addVariable("materialTrackColor",RenderVariable::ptr(new MaterialTrackColorVariable()),Material::Scope_MATERIAL);
 			variables->addVariable("textureMatrix",RenderVariable::ptr(new TextureMatrixVariable("tex")),Material::Scope_MATERIAL);
+			variables->addVariable("detailTextureMatrix",RenderVariable::ptr(new TextureMatrixVariable("detailTex")),Material::Scope_MATERIAL);
 			variables->addVariable("fogDensity",RenderVariable::ptr(new FogDensityVariable()),Material::Scope_MATERIAL);
 			variables->addVariable("fogDistance",RenderVariable::ptr(new FogDistanceVariable()),Material::Scope_MATERIAL);
 			variables->addVariable("fogColor",RenderVariable::ptr(new FogColorVariable()),Material::Scope_MATERIAL);
 
-			variables->addTexture("tex",mDiffuseTextures[i],"samp",SamplerState(),scaleState);
+			variables->addTexture("tex",mDiffuseTextures[i],"samp",SamplerState(),diffuseState);
+			variables->addTexture("detailTex",mDetailTexture,"detailSamp",clampState,detailState);
 			variables->addTexture("layerTex",patch->getLayerTexture(i),"layerSamp",clampState,layerState);
 		}
 	}
@@ -340,7 +351,7 @@ Material::ptr DiffuseTerrainMaterialSource::getMaterial(TerrainPatchComponent *p
 			pass->setRasterizerState(RasterizerState());
 			pass->setMaterialState(MaterialState(true,false,MaterialState::ShadeType_GOURAUD));
 
-			pass->setTexture(Shader::ShaderType_FRAGMENT,0,mDiffuseTextures.size()>0?mDiffuseTextures[0]:NULL,SamplerState(),scaleState);
+			pass->setTexture(Shader::ShaderType_FRAGMENT,0,mDiffuseTextures.size()>0?mDiffuseTextures[0]:NULL,SamplerState(),diffuseState);
 		}
 
 		int i;
@@ -354,7 +365,7 @@ Material::ptr DiffuseTerrainMaterialSource::getMaterial(TerrainPatchComponent *p
 			pass->setRasterizerState(RasterizerState());
 			pass->setMaterialState(MaterialState(true,false,MaterialState::ShadeType_GOURAUD));
 
-			pass->setTexture(Shader::ShaderType_FRAGMENT,0,mDiffuseTextures[i],SamplerState(),scaleState);
+			pass->setTexture(Shader::ShaderType_FRAGMENT,0,mDiffuseTextures[i],SamplerState(),diffuseState);
 			pass->setTexture(Shader::ShaderType_FRAGMENT,1,patch->getLayerTexture(i),clampState,layerState);
 		}
 	}

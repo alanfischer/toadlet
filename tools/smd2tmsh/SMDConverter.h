@@ -38,6 +38,9 @@ public:
 	void setInvertFaces(bool invertFaces){mInvertFaces=invertFaces;}
 	bool getInvertFaces() const{return mInvertFaces;}
 
+	void setScale(scalar scale){mScale=scale;}
+	scalar getScale() const{return mScale;}
+
 protected:
 	String readLine(Stream *in);
 	void setQuaternionFromXYZ(Quaternion &r,scalar x,scalar y,scalar z);
@@ -55,6 +58,7 @@ protected:
 	scalar mFPS;
 	bool mRemoveSkeleton;
 	bool mInvertFaces;
+	scalar mScale;
 };
 
 #endif

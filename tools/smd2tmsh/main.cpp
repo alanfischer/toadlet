@@ -36,6 +36,9 @@ int main(int argc,char **argv){
 			if(arg.substr(j,1)=="i"){
 				smd.setInvertFaces(true);
 			}
+			if(arg.substr(j,1)=="s"){
+				smd.setScale(arg.substr(j+1,arg.length()).toFloat());
+			}
             if(arg.substr(j,1)=="h"){
                 std::cout << "Options for " << argv[0] << ": "<< std::endl;
                 std::cout << "-h \thelp - print this message"<< std::endl;
@@ -43,6 +46,7 @@ int main(int argc,char **argv){
 				std::cout << "-namt \tepsilon - set normal epsilon" << std::endl;
 				std::cout << "-tamt \tepsilon - set texCoord epsilon" << std::endl;
 				std::cout << "-famt \tfps - set animation framerate" << std::endl;
+				std::cout << "-samt \tscale - set model scale" << std::endl;
 				std::cout << "-i \tinvert - invert faces" << std::endl;
                 return 1;
             }

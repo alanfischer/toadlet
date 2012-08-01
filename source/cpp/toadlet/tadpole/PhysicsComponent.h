@@ -28,6 +28,7 @@
 
 #include <toadlet/tadpole/Component.h>
 #include <toadlet/tadpole/Bound.h>
+#include <toadlet/tadpole/Traceable.h>
 
 namespace toadlet{
 namespace tadpole{
@@ -37,8 +38,10 @@ public:
 	TOADLET_INTERFACE(PhysicsComponent);
 
 	virtual bool parentChanged(Node *node)=0;
+	virtual void transformChanged()=0;
 
 	virtual void setBound(Bound *bound)=0;
+	virtual void setTraceable(Traceable *traceable)=0;
 
 	virtual void setPosition(const Vector3 &position)=0;
 	virtual const Vector3 &getPosition() const=0;
@@ -46,8 +49,14 @@ public:
 	virtual void setVelocity(const Vector3 &velocity)=0;
 	virtual const Vector3 &getVelocity() const=0;
 
+	virtual void setMass(scalar mass)=0;
+	virtual scalar getMass() const=0;
+
 	virtual void setGravity(scalar gravity)=0;
 	virtual scalar getGravity() const=0;
+
+	virtual void setSolid(bool solid)=0;
+	virtual bool getSolid() const=0;
 };
 
 }

@@ -84,6 +84,7 @@
 #include <toadlet/tadpole/plugins/NormalizationTextureCreator.h>
 #include <toadlet/tadpole/plugins/DiffuseMaterialCreator.h>
 #include <toadlet/tadpole/plugins/SkyBoxMaterialCreator.h>
+#include <toadlet/tadpole/plugins/WaterMaterialCreator.h>
 #include <toadlet/tadpole/plugins/BMPStreamer.h>
 #include <toadlet/tadpole/plugins/DDSStreamer.h>
 #include <toadlet/tadpole/plugins/TGAStreamer.h>
@@ -152,7 +153,6 @@ namespace tadpole{
 Engine::Engine(void *env,void *ctx)://bool fixedBackable,bool shaderBackable):
 	mFixedBackable(false),
 	mShaderBackable(false),
-	//mDirectory,
 	mRenderDevice(NULL),
 	mRenderDeviceChanged(false),
 	mAudioDevice(NULL),
@@ -325,8 +325,9 @@ void Engine::installHandlers(){
 
 	mNormalizationCreator=new NormalizationTextureCreator(this);
 
-	mSkyBoxMaterialCreator=new SkyBoxMaterialCreator(this);
 	mDiffuseCreator=new DiffuseMaterialCreator(this);
+	mSkyBoxMaterialCreator=new SkyBoxMaterialCreator(this);
+	mWaterMaterialCreator=new WaterMaterialCreator(this);
 
 	mAABoxCreator=new AABoxMeshCreator(this);
 	mSkyBoxCreator=new SkyBoxMeshCreator(this);
@@ -578,6 +579,10 @@ Material::ptr Engine::createFontMaterial(Font *font){
 
 Material::ptr Engine::createSkyBoxMaterial(Texture *texture,bool clamp){
 	return shared_static_cast<SkyBoxMaterialCreator>(mSkyBoxMaterialCreator)->createSkyBoxMaterial(texture,clamp);
+}
+
+Material::ptr Engine::createWaterMaterial(Texture *reflectTexture,Texture *refractTexture,Texture *bumpTexture,const Vector4 &color){
+	return shared_static_cast<WaterMaterialCreator>(mWaterMaterialCreator)->createWaterMaterial(reflectTexture,refractTexture,bumpTexture,color);
 }
 
 Mesh::ptr Engine::createAABoxMesh(const AABox &box,Material::ptr material){

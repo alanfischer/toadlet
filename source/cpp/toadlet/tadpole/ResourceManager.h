@@ -73,7 +73,7 @@ public:
 
 	inline Engine *getEngine(){return mEngine;}
 
-	static String cleanFilename(const String &name);
+	static String cleanPath(const String &name,bool directory=false);
 
 protected:
 	typedef Map<String,Resource*> NameResourceMap;

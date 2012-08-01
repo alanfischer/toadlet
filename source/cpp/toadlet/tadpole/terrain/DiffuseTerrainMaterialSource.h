@@ -37,24 +37,29 @@ class TOADLET_API DiffuseTerrainMaterialSource:public Object,public TerrainNodeM
 public:
 	TOADLET_OBJECT(DiffuseTerrainMaterialSource);
 	
-	DiffuseTerrainMaterialSource(Engine *engine,const Vector3 &scale,const String &name);
-	DiffuseTerrainMaterialSource(Engine *engine,const Vector3 &scale,Texture *texture=NULL);
+	DiffuseTerrainMaterialSource(Engine *engine);
 	virtual ~DiffuseTerrainMaterialSource(){}
 
 	void createShaders();
 	void destroy();
 
+	void setDiffuseScale(const Vector3 &scale){mDiffuseScale=scale;}
 	bool setDiffuseTexture(int layer,const String &name);
 	bool setDiffuseTexture(int layer,Texture *texture);
 	Texture::ptr getDiffuseTexture(int layer){return mDiffuseTextures.size()>layer?mDiffuseTextures[layer]:NULL;}
+
+	void setDetailScale(const Vector3 &scale){mDetailScale=scale;}
+	bool setDetailTexture(const String &name);
+	bool setDetailTexture(Texture *texture);
 
 	Material::ptr getMaterial(TerrainPatchComponent *patch);
 	
 protected:
 	Engine *mEngine;
 	Shader::ptr mDiffuseVertexShader,mDiffuseBaseFragmentShader,mDiffuseLayerFragmentShader;
-	Vector3 mTextureScale;
+	Vector3 mDiffuseScale,mDetailScale;
 	Collection<Texture::ptr> mDiffuseTextures;
+	Texture::ptr mDetailTexture;
 };
 
 }

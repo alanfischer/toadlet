@@ -83,7 +83,7 @@ public:
 
 protected:
 	void childTransformUpdated(Node *child);
-	void addLeafToVisible(bleaf *leaf,Camera *camera);
+	void addLeafToVisible(bleaf *leaf,const Vector3 &cameraPosition);
 	void findBoundLeafs(Collection<int> &leafs,Node *node);
 
 	BSP30Map::ptr mMap;
