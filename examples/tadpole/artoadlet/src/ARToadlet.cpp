@@ -1,6 +1,8 @@
 #include "ARToadlet.h"
 
-#pragma comment(lib,"C:\\Users\\siralanf\\lib\\ARToolKitPlus.lib")
+#pragma comment(lib,"c://users//siralanf//lib//aruco124.lib")
+#pragma comment(lib,"c://users//siralanf//lib//opencv_core242.lib")
+#pragma comment(lib,"c://users//siralanf//lib//opencv_highgui242.lib")
 
 extern "C" VideoDevice *new_MFVideoDevice();
 
@@ -10,67 +12,38 @@ ARToadlet::ARToadlet(Application *app){
 
 void ARToadlet::create(){
 	mEngine=mApp->getEngine();
-	mScene=Scene::ptr(new Scene(mEngine));
+	mScene=new Scene(mEngine);
 
-	mVideoDevice=new_MFVideoDevice();
-	mVideoDevice->create();
-	mVideoDevice->setListener(this);
-	mTextureFormat=TextureFormat::ptr(new TextureFormat(mVideoDevice->getTextureFormat()));
-mVideoDevice->getTextureFormat()->setPitches(-mVideoDevice->getTextureFormat()->getXPitch(),mVideoDevice->getTextureFormat()->getYPitch(),mVideoDevice->getTextureFormat()->getZPitch());
-	mTextureFormat->setPixelFormat(TextureFormat::Format_RGBA_8);
-
-//	Texture::ptr texture=mEngine->getTextureManager()->findTexture("data/image_320_240_8_marker_id_simple_nr031.jpg");
-//	mTextureFormat=TextureFormat::ptr(new TextureFormat(texture->getFormat()));
-//	mTextureFormat->setPixelFormat(TextureFormat::Format_RGBA_8);
-//	mTextureFormat->setPitches(-mTextureFormat->getXPitch(),mTextureFormat->getYPitch(),mTextureFormat->getZPitch());
-	mTextureData=new tbyte[mTextureFormat->getDataSize()];
-//tbyte *data=new tbyte[texture->getFormat()->getDataSize()];
-//texture->read(texture->getFormat(),data);
-//TextureFormatConversion::convert(data,texture->getFormat(),mTextureData,mTextureFormat);
-
-	mTracker=SharedPointer<TrackerSingleMarker>(new TrackerSingleMarker(mTextureFormat->getWidth(),mTextureFormat->getHeight(),8,6,6,6,0));
-    mTracker->setPixelFormat(getARPixelFormatFromPixelFormat(mTextureFormat->getPixelFormat()));
-	bool result=mTracker->init("data/PGR_M12x0.5_2.5mm.cal", 1.0f, 1000.0f);
-	if(result==false){
-		Error::unknown("unable to load tracker");
+	mVideoCapture=SharedPointer<cv::VideoCapture>(new cv::VideoCapture());
+	mVideoCapture->open(0);
+	if(mVideoCapture->isOpened()==false){
+		Error::unknown("unable to open VideoCapture");
 		return;
 	}
 
-    mTracker->getCamera()->printSettings();
-	bool useBCH=false;
+	int width=mVideoCapture->get(CV_CAP_PROP_FRAME_WIDTH);
+	int height=mVideoCapture->get(CV_CAP_PROP_FRAME_HEIGHT);
+	int format=mVideoCapture->get(CV_CAP_PROP_FORMAT);
 
-    // define size of the marker in OpenGL units
-    mTracker->setPatternWidth(2.0);
+	mTextureFormat=TextureFormat::ptr(new TextureFormat(TextureFormat::Dimension_D2,TextureFormat::Format_BGR_8,width,height,1,1));
+//	mTextureData=cv::Mat(mTextureFormat->getWidth(),mTextureFormat->getHeight(),CV_8UC3);
 
-    // the marker in the BCH test image has a thin border...
-    mTracker->setBorderWidth(useBCH ? 0.125 : 0.25);
+	mDetector=SharedPointer<aruco::MarkerDetector>(new aruco::MarkerDetector());
+	mDetector->setCornerRefinementMethod(aruco::MarkerDetector::LINES);
 
-    // set a threshold. alternatively we could also activate automatic thresholding
-    mTracker->setThreshold(150);
-
-    // let's use lookup-table undistortion for high-speed
-    // note: LUT only works with images up to 1024x1024
-    mTracker->setUndistortionMode(ARToolKitPlus::UNDIST_LUT);
-
-    // switch to simple ID based markers
-    // use the tool in tools/IdPatGen to generate markers
-    mTracker->setMarkerMode(useBCH ? ARToolKitPlus::MARKER_ID_BCH : ARToolKitPlus::MARKER_ID_SIMPLE);
-
-
-	mCamera=mEngine->createNodeType(CameraNode::type(),mScene);
+	mCamera=new Camera();
 	// Mainly set our near & far distances here, so we can check them later on
 	mCamera->setProjectionFovY(Math::HALF_PI,Math::ONE,1,1000);
 	mCamera->setScope(1);
+	mCamera->setClearColor(Colors::RED);
 	mCamera->setClearFlags(RenderDevice::ClearType_BIT_DEPTH);
-	mScene->getRoot()->attach(mCamera);
 
-	mEngine->setDirectory("../data/");
+	mEngine->getArchiveManager()->addDirectory("../data/");
 
-	mElco=mEngine->createNodeType(ParentNode::type(),mScene);
+	mElco=new Node(mScene);
 	{
-		MeshNode::ptr mesh=mEngine->createNodeType(MeshNode::type(),mScene);
-		mesh->setMesh(mEngine->getMeshManager()->createAABoxMesh(AABox(-10,-10,-10,10,10,10)));//findMesh("elco.xmsh"));
-		mesh->setTranslate(0,0,mesh->getMesh()->getBound().getSphere().radius/2);
+		MeshComponent::ptr mesh=new MeshComponent(mEngine);
+		mesh->setMesh(mEngine->createAABoxMesh(AABox(-10,-10,-10,10,10,10)));//findMesh("elco.xmsh"));
 //		mesh->getAnimationController()->setSequenceIndex(1);
 //		mesh->getAnimationController()->setCycling(AnimationController::Cycling_LOOP);
 //		mesh->getAnimationController()->start();
@@ -79,11 +52,10 @@ mVideoDevice->getTextureFormat()->setPitches(-mVideoDevice->getTextureFormat()->
 	mElco->setScope(2);
 	mScene->getRoot()->attach(mElco);
 
-	mMerv=mEngine->createNodeType(ParentNode::type(),mScene);
+	mMerv=new Node(mScene);
 	{
-		MeshNode::ptr mesh=mEngine->createNodeType(MeshNode::type(),mScene);
-		mesh->setMesh(mEngine->getMeshManager()->createAABoxMesh(AABox(-10,-10,-10,10,10,10)));//findMesh("merv.xmsh"));
-		mesh->setTranslate(0,0,mesh->getMesh()->getBound().getSphere().radius/2);
+		MeshComponent::ptr mesh=new MeshComponent(mEngine);
+		mesh->setMesh(mEngine->createAABoxMesh(AABox(-10,-10,-10,10,10,10)));//findMesh("elco.xmsh"));
 //		mesh->getAnimationController()->setSequenceIndex(1);
 //		mesh->getAnimationController()->setCycling(AnimationController::Cycling_LOOP);
 //		mesh->getAnimationController()->start();
@@ -92,30 +64,30 @@ mVideoDevice->getTextureFormat()->setPitches(-mVideoDevice->getTextureFormat()->
 	mMerv->setScope(2);
 	mScene->getRoot()->attach(mMerv);
 
-	mLight=mEngine->createNodeType(LightNode::type(),mScene);
+	mLight=new LightComponent();
 	LightState state;
 	state.type=LightState::Type_DIRECTION;
 	state.direction=Math::NEG_Z_UNIT_VECTOR3;
 	mLight->setLightState(state);
 	mScene->getRoot()->attach(mLight);
 
-	mOrthoCamera=mEngine->createNodeType(CameraNode::type(),mScene);
-	mOrthoCamera->setProjectionOrtho(-1,1,-1,1,-10,10);
-	mOrthoCamera->setScope(4);
-	mOrthoCamera->setClearColor(Colors::RED);
-	mCamera->setClearFlags(RenderDevice::ClearType_BIT_DEPTH);
-	mScene->getRoot()->attach(mOrthoCamera);
+	mBackgroundCamera=new toadlet::tadpole::Camera();
+	mBackgroundCamera->setProjectionOrtho(1,-1,1,-1,-10,10);
+	mBackgroundCamera->setScope(4);
+	mBackgroundCamera->setClearColor(Colors::RED);
+	mBackgroundCamera->setClearFlags(RenderDevice::ClearType_BIT_DEPTH);
 
 	mBackgroundTexture=mEngine->getTextureManager()->createTexture(Texture::Usage_BIT_STREAM,mTextureFormat);
 
-	mBackground=mEngine->createNodeType(MeshNode::type(),mScene);
-	Material::ptr material=mEngine->getMaterialManager()->createDiffuseMaterial(mBackgroundTexture);
-	Mesh::ptr mesh=mEngine->getMeshManager()->createGridMesh(2,2,2,2,material);
-	mBackground->setMesh(mesh);
-	mBackground->setScale(1,1,1);
-	mOrthoCamera->attach(mBackground);
-
-	mVideoDevice->start();
+	mBackground=new Node(mScene);
+	{
+		MeshComponent::ptr mesh=new MeshComponent(mEngine);
+		Material::ptr material=mEngine->createDiffuseMaterial(mBackgroundTexture);
+		mesh->setMesh(mEngine->createGridMesh(2,2,2,2,material));
+		mBackground->attach(mesh);
+	}
+	mBackground->setScope(4);
+	mScene->getRoot()->attach(mBackground);
 }
 
 void ARToadlet::destroy(){
@@ -123,40 +95,34 @@ void ARToadlet::destroy(){
 		mScene->destroy();
 		mScene=NULL;
 	}
-
-	if(mVideoDevice!=NULL){
-		mVideoDevice->destroy();
-		delete mVideoDevice;
-		mVideoDevice=NULL;
-	}
 }
 
-void ARToadlet::frameReceived(TextureFormat::ptr format,tbyte *data){
-	mMutex.lock();
-
-	TextureFormatConversion::convert(data,format,mTextureData,mTextureFormat);
-
-	mMutex.unlock();
-}
-	
 void ARToadlet::update(int dt){
-	mMutex.lock();
+	if(mVideoCapture->grab()){
+		mVideoCapture->retrieve(mTextureData);
 
-	updateMarkers();
-
-	mMutex.unlock();
+		updateMarkers();
+	}
 
 	mScene->update(dt);
 }
 
 void ARToadlet::updateMarkers(){
-    std::vector<int> markerId=mTracker->calc(mTextureData);
-    mTracker->selectBestMarkerByCf();
-    float conf=mTracker->getConfidence();
+	std::vector<aruco::Marker> markers;
 
-	Logger::alert(String("confidence:")+conf);
+	try{
+		mDetector->detect(mTextureData,markers,mCameraParams);
+	}catch(const std::exception &ex){
+		Logger::alert(String("ERROR:")+ex.what());
+	}
+	Logger::alert(String("MARKERS:")+markers.size());
+
+//    std::vector<int> markerId=mTracker->calc(mTextureData);
+//    mTracker->selectBestMarkerByCf();
+//    float conf=mTracker->getConfidence();
+
+//	Logger::alert(String("confidence:")+conf);
 /*
-
 		double patternTransform[3][4];
 		Matrix4x4 transform;
 		int numMarkers=0;
@@ -210,16 +176,16 @@ void ARToadlet::updateMarkers(){
 */
 }
 
-void ARToadlet::render(RenderDevice *device){
-	mMutex.lock();
+void ARToadlet::render(){
+	RenderDevice *device=mEngine->getRenderDevice();
 
-	mEngine->getTextureManager()->textureLoad(mBackgroundTexture,mTextureFormat,mTextureData);
-
-	mMutex.unlock();
+	if(mTextureData.data!=NULL){
+		mEngine->getTextureManager()->textureLoad(mBackgroundTexture,mTextureFormat,mTextureData.data);
+	}
 
 	device->beginScene();
-		mOrthoCamera->render(device);
-		mCamera->render(device);
+		mBackgroundCamera->render(device,mScene);
+		mCamera->render(device,mScene);
 	device->endScene();
 	device->swap();
 }
@@ -236,27 +202,9 @@ void ARToadlet::resized(int width,int height){
 	}
 }
 
-PIXEL_FORMAT ARToadlet::getARPixelFormatFromPixelFormat(int format){
-	switch(format){
-		case TextureFormat::Format_ABGR_8:
-			return PIXEL_FORMAT_ABGR;
-		case TextureFormat::Format_BGRA_8:
-			return PIXEL_FORMAT_BGRA;
-		case TextureFormat::Format_BGR_8:
-			return PIXEL_FORMAT_BGR;
-		case TextureFormat::Format_RGBA_8:
-			return PIXEL_FORMAT_BGRA; /// @todo: There seems to be some issue with RGBA, so we just use BGRA
-		case TextureFormat::Format_RGB_8:
-			return PIXEL_FORMAT_RGB;
-		case TextureFormat::Format_RGB_5_6_5:
-			return PIXEL_FORMAT_RGB565;
-		case TextureFormat::Format_L_8:
-			return PIXEL_FORMAT_LUM;
-		default:
-			Error::unknown("unknown pixel format");
-			return (PIXEL_FORMAT)0;
-	}
+void ARToadlet::keyPressed(int key){
 }
+
 /*
 void ARToadlet::setMatrix4x4FromARProjection(Matrix4x4 &r,ARParam *cparam,const double minDistance,const double maxDistance){
 	double   icpara[3][4];
@@ -316,5 +264,5 @@ void ARToadlet::setMatrix4x4FromARMatrix(Matrix4x4 &r,const double para[3][4]){
 	r.setAt(3,0,0);				r.setAt(3,1,0);				r.setAt(3,2,0);				r.setAt(3,3,Math::ONE);
 }
 */
+
 Applet *createApplet(Application *app){return new ARToadlet(app);}
-void destroyApplet(Applet *applet){delete applet;}

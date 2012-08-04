@@ -1,50 +1,45 @@
+#include <aruco/aruco.h>
 #include <toadlet/toadlet.h>
-#include <ARToolKitPlus/TrackerSingleMarker.h>
+#include <opencv2/core/core.hpp>
 
-using namespace ARToolKitPlus;
-
-class ARToadlet:public Applet,public VideoDeviceListener{
+class ARToadlet:public Object,public Applet{
 public:
+	TOADLET_OBJECT(ARToadlet);
+
 	ARToadlet(Application *app);
 
 	void create();	
 	void destroy();
-	
-	void frameReceived(TextureFormat::ptr format,tbyte *data);
 
 	void update(int dt);
 	void updateMarkers();
-	void render(RenderDevice *device);
+	void render();
 	void resized(int width,int height);
 
 	void focusGained(){}
 	void focusLost(){}
-	void keyPressed(int key){}
+	void keyPressed(int key);
 	void keyReleased(int key){}
 	void mousePressed(int x,int y,int button){}
 	void mouseMoved(int x,int y){}
 	void mouseReleased(int x,int y,int button){}
 	void mouseScrolled(int x,int y,int scroll){}
 
-	static PIXEL_FORMAT getARPixelFormatFromPixelFormat(int format);
-	
 protected:
 	TextureFormat::ptr mTextureFormat;
-	uint8 *mTextureData;
-	VideoDevice *mVideoDevice;
-
-	SharedPointer<TrackerSingleMarker> mTracker;
+	cv::Mat mTextureData;
+	SharedPointer<cv::VideoCapture> mVideoCapture;
+	aruco::CameraParameters mCameraParams;
+	SharedPointer<aruco::MarkerDetector> mDetector;
 
 	Application *mApp;
-	Engine *mEngine;
+	Engine::ptr mEngine;
 	Scene::ptr mScene;
-	CameraNode::ptr mOrthoCamera;
+	Camera::ptr mBackgroundCamera;
 	Texture::ptr mBackgroundTexture;
-	MeshNode::ptr mBackground;
-	CameraNode::ptr mCamera;
-	ParentNode::ptr mElco;
-	ParentNode::ptr mMerv;
-	LightNode::ptr mLight;
-
-	Mutex mMutex;
+	Node::ptr mBackground;
+	Camera::ptr mCamera;
+	Node::ptr mElco;
+	Node::ptr mMerv;
+	LightComponent::ptr mLight;
 };

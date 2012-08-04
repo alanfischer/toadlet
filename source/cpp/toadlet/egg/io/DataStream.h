@@ -63,9 +63,13 @@ public:
 	bool readBool();
 	uint8 readUInt8();
 	int8 readInt8();
+	int readAll(tbyte *&resultBuffer);
 
 	int readNullTerminatedString(String &s);
 	String readNullTerminatedString();
+
+	int readAllString(String &s);
+	String readAllString();
 
 	// read Big
 	uint16 readBUInt16();

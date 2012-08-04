@@ -38,15 +38,8 @@ XMSHStreamer::XMSHStreamer(Engine *engine){
 Resource::ptr XMSHStreamer::load(Stream::ptr stream,ResourceData *data,ProgressListener *listener){
 	Mesh::ptr mesh;
 
-	/// @todo: Replace the following when mxml implements custom load/save callbacks
-	char buffer[1025];
-	int amount=0;
-	String string;
-	while((amount=stream->read((tbyte*)buffer,1024))>0){
-		buffer[amount]=0;
-		string+=buffer;
-	}
-
+	DataStream::ptr dataStream=new DataStream(stream);
+	String string=dataStream->readAllString();
 	mxml_node_t *root=mxmlLoadString(NULL,string,MXML_OPAQUE_CALLBACK);
 
 	if(root==NULL){

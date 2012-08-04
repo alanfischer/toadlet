@@ -39,9 +39,9 @@
 namespace toadlet{
 namespace pad{
 
-class TOADLET_API Application{
+class TOADLET_API Application:public Interface{
 public:
-	TOADLET_SPTR(Application);
+	TOADLET_INTERFACE(Application);
 
 	enum Key{
 		Key_ENTER=10,

@@ -41,7 +41,8 @@ public:
 	SIDDecoder();
 	virtual ~SIDDecoder();
 
-	bool startStream(Stream::ptr stream);
+	bool openStream(Stream *stream);
+	bool startSong(int song);
 
 	AudioFormat::ptr getAudioFormat() const{return mFormat;}
 

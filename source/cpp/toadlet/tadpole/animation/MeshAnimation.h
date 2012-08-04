@@ -42,6 +42,7 @@ public:
 	TOADLET_OBJECT(MeshAnimation);
 
 	MeshAnimation(MeshComponent *target,int sequenceIndex);
+	MeshAnimation(MeshComponent *target,const String &sequenceName);
 	virtual ~MeshAnimation();
 
 	void setTarget(MeshComponent *target);

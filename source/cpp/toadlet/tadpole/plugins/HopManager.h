@@ -48,9 +48,9 @@ public:
 	PhysicsComponent *createPhysicsComponent();
 
 	void traceSegment(Collision &result,const Segment &segment,int collideWithBits,Node *ignore);
-/*	void traceEntity(Collision &result,HopEntity *entity,const Segment &segment,int collideWithBits);
-	void testEntity(Collision &result,HopEntity *entity1,const Segment &segment,HopEntity *entity2);
-*/
+	void traceNode(Collision &result,Node *entity,const Segment &segment,int collideWithBits);
+	void testNode(Collision &result,Node *entity1,const Segment &segment,Node *entity2);
+
 	void logicUpdate(int dt,int scope){logicUpdate(dt,scope,NULL);}
 	void logicUpdate(int dt,int scope,HopComponent *component);
 	void frameUpdate(int dt,int scope);
