@@ -32,8 +32,10 @@
 namespace toadlet{
 namespace pad{
 
-class JApplication:public Application{
+class JApplication:public Object,public Application{
 public:
+	TOADLET_OBJECT(JAppliation);
+
 	JApplication(JNIEnv *jenv,jobject jobj);
 	virtual ~JApplication();
 

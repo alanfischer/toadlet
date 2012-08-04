@@ -63,52 +63,52 @@ public:
 		scalar getEpsilon() const{return mEpsilon;}
 	#endif
 
-	void setIntegrator(Integrator integrator){mIntegrator=integrator;}
-	Integrator getIntegrator() const{return mIntegrator;}
+	virtual void setIntegrator(Integrator integrator){mIntegrator=integrator;}
+	virtual Integrator getIntegrator() const{return mIntegrator;}
 
-	void setSnapToGrid(bool snap){mSnapToGrid=snap;}
-	bool getSnapToGrid() const{return mSnapToGrid;}
+	virtual void setSnapToGrid(bool snap){mSnapToGrid=snap;}
+	virtual bool getSnapToGrid() const{return mSnapToGrid;}
 
-	void setAverageNormals(bool average){mAverageNormals=average;}
-	bool getAverageNormals() const{return mAverageNormals;}
+	virtual void setAverageNormals(bool average){mAverageNormals=average;}
+	virtual bool getAverageNormals() const{return mAverageNormals;}
 
-	void setMaxPositionComponent(scalar maxPositionComponent){mMaxPositionComponent=maxPositionComponent;}
-	scalar getMaxPositionComponent() const{return mMaxPositionComponent;}
+	virtual void setMaxPositionComponent(scalar maxPositionComponent){mMaxPositionComponent=maxPositionComponent;}
+	virtual scalar getMaxPositionComponent() const{return mMaxPositionComponent;}
 
-	void setMaxVelocityComponent(scalar maxVelocityComponent){mMaxVelocityComponent=maxVelocityComponent;}
-	scalar getMaxVelocityComponent() const{return mMaxVelocityComponent;}
+	virtual void setMaxVelocityComponent(scalar maxVelocityComponent){mMaxVelocityComponent=maxVelocityComponent;}
+	virtual scalar getMaxVelocityComponent() const{return mMaxVelocityComponent;}
 
-	void setMaxForceComponent(scalar maxForceComponent){mMaxForceComponent=maxForceComponent;}
-	scalar getMaxForceComponent() const{return mMaxForceComponent;}
+	virtual void setMaxForceComponent(scalar maxForceComponent){mMaxForceComponent=maxForceComponent;}
+	virtual scalar getMaxForceComponent() const{return mMaxForceComponent;}
 
-	void setFluidVelocity(const Vector3 &fluidVelocity){mFluidVelocity.set(fluidVelocity);}
-	const Vector3 &getFluidVelocity() const{return mFluidVelocity;}
+	virtual void setFluidVelocity(const Vector3 &fluidVelocity){mFluidVelocity.set(fluidVelocity);}
+	virtual const Vector3 &getFluidVelocity() const{return mFluidVelocity;}
 
-	void setGravity(const Vector3 &gravity);
-	const Vector3 &getGravity() const{return mGravity;}
+	virtual void setGravity(const Vector3 &gravity);
+	virtual const Vector3 &getGravity() const{return mGravity;}
 
-	void setManager(Manager *manager){mManager=manager;}
-	Manager *getManager() const{return mManager;}
+	virtual void setManager(Manager *manager){mManager=manager;}
+	virtual Manager *getManager() const{return mManager;}
 
-	void setMicroCollisionThreshold(scalar threshold){mMicroCollisionThreshold=threshold;}
-	scalar getMicroCollisionThreshold() const{return mMicroCollisionThreshold;}
+	virtual void setMicroCollisionThreshold(scalar threshold){mMicroCollisionThreshold=threshold;}
+	virtual scalar getMicroCollisionThreshold() const{return mMicroCollisionThreshold;}
 
-	void setDeactivateSpeed(scalar speed){mDeactivateSpeed=speed;}
-	void setDeactivateCount(int count){mDeactivateCount=count;}
+	virtual void setDeactivateSpeed(scalar speed){mDeactivateSpeed=speed;}
+	virtual void setDeactivateCount(int count){mDeactivateCount=count;}
 
-	void addSolid(Solid *solid);
-	void removeSolid(Solid *solid);
-	int getNumSolids() const{return mSolids.size();}
-	Solid *getSolid(int i) const{return mSolids[i];}
+	virtual void addSolid(Solid *solid);
+	virtual void removeSolid(Solid *solid);
+	virtual int getNumSolids() const{return mSolids.size();}
+	virtual Solid *getSolid(int i) const{return mSolids[i];}
 
-	void addConstraint(Constraint *constraint);
-	void removeConstraint(Constraint *constraint);
-	int getNumConstraints() const{return mConstraints.size();}
-	Constraint *getConstraint(int i) const{return mConstraints[i];}
+	virtual void addConstraint(Constraint *constraint);
+	virtual void removeConstraint(Constraint *constraint);
+	virtual int getNumConstraints() const{return mConstraints.size();}
+	virtual Constraint *getConstraint(int i) const{return mConstraints[i];}
 
-	void update(int dt,int scope=0,Solid *solid=NULL); // milliseconds
+	virtual void update(int dt,int scope=0,Solid *solid=NULL); // milliseconds
 
-	int findSolidsInAABox(const AABox &box,Solid *solids[],int maxSolids) const;
+	virtual int findSolidsInAABox(const AABox &box,Solid *solids[],int maxSolids) const;
 
 	void traceSegment(Collision &result,const Segment &segment,int collideWithBits=-1,Solid *ignore=NULL);
 	void traceSolid(Collision &result,Solid *solid,const Segment &segment,int collideWithBits=-1);

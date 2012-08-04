@@ -27,63 +27,16 @@
 #include <toadlet/egg/Logger.h>
 #include <toadlet/egg/Extents.h>
 #include <toadlet/egg/EndianConversion.h>
+#include <toadlet/egg/io/DataStream.h>
 #include <toadlet/ribbit/AudioFormatConversion.h>
 
 namespace toadlet{
 namespace ribbit{
 
-bool AudioFormatConversion::decode(Stream *stream,tbyte *&finalBuffer,int &finalLength){
-	const static int bufferSize=4096;
-	Collection<tbyte*> buffers;
-	int amount=0,total=0;
-	int i=0;
-
-	finalBuffer=NULL;
-	finalLength=0;
-
-	if(stream->length()<=0){
-		return false;
-	}
-
-	while(true){
-		tbyte *buffer=new tbyte[bufferSize];
-		if(buffer==NULL){
-			int i;
-			for(i=0;i<buffers.size();++i){
-				delete[] buffers[i];
-			}
-			return false;
-		}
-
-		amount=stream->read(buffer,bufferSize);
-		if(amount<=0){
-			delete[] buffer;
-			break;
-		}
-		else{
-			total+=amount;
-			buffers.add(buffer);
-		}
-	}
-
-	finalBuffer=new tbyte[total];
-	finalLength=total;
-
-	for(i=0;i<buffers.size();++i){
-		int thing=bufferSize;
-		if(total<thing){
-			thing=total;
-		}
-		memcpy(finalBuffer+i*bufferSize,buffers[i],thing);
-		total-=bufferSize;
-		delete[] buffers[i];
-	}
-
-	return true;
-}
-
 bool AudioFormatConversion::decode(AudioStream *stream,tbyte *&finalBuffer,int &finalLength){
-	bool result=decode((Stream*)stream,finalBuffer,finalLength);
+	DataStream dataStream(stream);
+
+	finalLength=dataStream.readAll(finalBuffer);
 
 	#if !defined(TOADLET_NATIVE_FORMAT)
 		if(stream->getAudioFormat()->getBitsPerSample()==16){
@@ -95,7 +48,7 @@ bool AudioFormatConversion::decode(AudioStream *stream,tbyte *&finalBuffer,int &
 		}
 	#endif
 
-	return result;
+	return finalLength>0;
 }
 
 bool AudioFormatConversion::convert(tbyte *src,int srcLength,AudioFormat *srcFormat,tbyte *dst,int dstLength,AudioFormat *dstFormat){

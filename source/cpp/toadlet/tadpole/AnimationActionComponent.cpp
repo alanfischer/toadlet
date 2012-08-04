@@ -92,12 +92,20 @@ void AnimationActionComponent::start(){
 	}
 
 	mActualCycling=mCycling;
+
+	if(mListener!=NULL){
+		mListener->actionStarted(this);
+	}
 }
 
 void AnimationActionComponent::stop(){
 	if(mStopGently){
 		mActualCycling=Cycling_NONE;
 		return;
+	}
+
+	if(mListener!=NULL){
+		mListener->actionStopped(this);
 	}
 
 	mRunning=false;

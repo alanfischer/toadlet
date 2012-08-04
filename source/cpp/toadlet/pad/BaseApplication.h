@@ -31,9 +31,9 @@
 namespace toadlet{
 namespace pad{
 
-class TOADLET_API BaseApplication:public Application{
+class TOADLET_API BaseApplication:public Object,public Application{
 public:
-	TOADLET_SPTR(BaseApplication);
+	TOADLET_OBJECT(BaseApplication);
 
 	static void mapKeyNames(Map<int,String> &keyToName,Map<String,int> &nameToKey);
 

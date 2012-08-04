@@ -25,6 +25,7 @@
 
 #include <toadlet/egg/Error.h>
 #include <toadlet/egg/Logger.h>
+#include <toadlet/egg/io/DataStream.h>
 #include <toadlet/ribbit/AudioFormatConversion.h>
 #include "SIDDecoder.h"
 
@@ -77,16 +78,17 @@ SIDDecoder::SIDDecoder():
 }
 
 SIDDecoder::~SIDDecoder(){
-	delete sid->player;
+	#if SIDPLAY_VERSION==2
+		delete sid->player;
+	#endif
 	delete sid->tune;
 	delete sid;
 }
 
-bool SIDDecoder::startStream(Stream::ptr stream){
+bool SIDDecoder::openStream(Stream *stream){
 	bool result=false;
 	tbyte *tuneBuffer=NULL;
 	int tuneBufferLength=0;
-	int song=0;
 
 	tbyte type[4];
 	int amount=stream->read(type,4);
@@ -98,7 +100,8 @@ bool SIDDecoder::startStream(Stream::ptr stream){
 		return false;
 	}
 
-	AudioFormatConversion::decode(stream,tuneBuffer,tuneBufferLength);
+	DataStream::ptr dataStream=new DataStream(stream);
+	tuneBufferLength=dataStream->readAll(tuneBuffer);
 #if SIDPLAY_VERSION==1
 	result=sid->tune->load(tuneBuffer,tuneBufferLength);
 #elif SIDPLAY_VERSION==2
@@ -118,12 +121,6 @@ bool SIDDecoder::startStream(Stream::ptr stream){
 	mFormat=AudioFormat::ptr(new AudioFormat(sid->config.bitsPerSample,sid->config.channels,sid->config.frequency));
 
 	sid->player->setConfig(sid->config);
-
-	result=sidEmuInitializeSong(sid->player,sid->tune,song);
-	if(result==false){
-		Error::unknown(Categories::TOADLET_RIBBIT,"Error initializing song");
-		return false;
-	}
 #elif SIDPLAY_VERSION==2
 	sid->config=sid->player->config();
 	sid->info=sid->player->info();
@@ -137,7 +134,21 @@ bool SIDDecoder::startStream(Stream::ptr stream){
 	sid->config.playback=(sid->info.channels==2?sid2_stereo:sid2_mono);
 
 	sid->player->config(sid->config);
+#endif
 
+	return result;
+}
+
+bool SIDDecoder::startSong(int song){
+	bool result=false;
+
+#if SIDPLAY_VERSION==1
+	result=sidEmuInitializeSong(sid->player,sid->tune,song);
+	if(result==false){
+		Error::unknown(Categories::TOADLET_RIBBIT,"Error initializing song");
+		return false;
+	}
+#elif SIDPLAY_VERSION==2
 	sid->tune->selectSong(song);
 
 	result=(sid->player->load(sid->tune)>=0);

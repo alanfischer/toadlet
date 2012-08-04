@@ -35,8 +35,10 @@ namespace flick{
 class VideoDeviceListener;
 
 /// @todo: We need to refactor this so the FFmpegVideoHandler and VideoDevice plugins have the same interface.
-class VideoDevice{
+class VideoDevice:public Interface{
 public:
+	TOADLET_INTERFACE(VideoDevice);
+
 	virtual ~VideoDevice(){}
 
 	virtual bool create()=0;

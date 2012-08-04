@@ -28,6 +28,7 @@
 
 #include <toadlet/flick/VideoDevice.h>
 #include <toadlet/flick/VideoDeviceListener.h>
+#include <toadlet/egg/WaitCondition.h>
 #include <mfapi.h>
 #include <mfidl.h>
 #include <mfreadwrite.h>
@@ -35,8 +36,10 @@
 namespace toadlet{
 namespace flick{
 
-class TOADLET_API MFVideoDevice:public VideoDevice,public IMFSourceReaderCallback{
+class TOADLET_API MFVideoDevice:public Object,public VideoDevice,public IMFSourceReaderCallback{
 public:
+	TOADLET_OBJECT(MFVideoDevice);
+
     STDMETHODIMP QueryInterface(REFIID iid, void** ppv);
     STDMETHODIMP_(ULONG) AddRef();
     STDMETHODIMP_(ULONG) Release();
@@ -69,6 +72,8 @@ protected:
 	TextureFormat::ptr mFormat;
 	int mRef;
 	bool mRunning;
+	Mutex mMutex;
+	WaitCondition mCondition;
 };
 
 }

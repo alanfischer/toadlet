@@ -68,31 +68,36 @@ void HopManager::traceSegment(Collision &result,const Segment &segment,int colli
 	mSimulator->traceSegment(collision,segment,collideWithBits,ignoreSolid);
 	set(result,collision);
 }
-/*
-void HopManager::traceEntity(Collision &result,HopEntity *entity,const Segment &segment,int collideWithBits){
+
+void HopManager::traceNode(Collision &result,Node *node,const Segment &segment,int collideWithBits){
 	result.reset();
 
 	Solid *solid=NULL;
-	if(entity!=NULL){
-		solid=entity->getSolid();
+	if(node!=NULL && node->getPhysics()!=NULL){
+		solid=((HopComponent*)node->getPhysics())->getSolid();
 	}
 
-	hop::Collision &collision=cache_traceSegment_collision.reset();
+	hop::Collision collision;
 	mSimulator->traceSolid(collision,solid,segment,collideWithBits);
 	set(result,collision);
 }
 
-void HopManager::testEntity(Collision &result,HopEntity *entity1,const Segment &segment,HopEntity *entity2){
+void HopManager::testNode(Collision &result,Node *node1,const Segment &segment,Node *node2){
 	result.reset();
 
-	Solid *solid1=entity1->getSolid();
-	Solid *solid2=entity2->getSolid();
+	Solid *solid1=NULL,*solid2=NULL;
+	if(node1!=NULL && node1->getPhysics()!=NULL){
+		solid1=((HopComponent*)node1->getPhysics())->getSolid();
+	}
+	if(node2!=NULL && node2->getPhysics()!=NULL){
+		solid1=((HopComponent*)node2->getPhysics())->getSolid();
+	}
 
-	hop::Collision &collision=cache_traceSegment_collision.reset();
+	hop::Collision collision;
 	mSimulator->testSolid(collision,solid1,segment,solid2);
 	set(result,collision);
 }
-*/
+
 void HopManager::logicUpdate(int dt,int scope,HopComponent *component){
 	if(component!=NULL){
 		component->preSimulate();

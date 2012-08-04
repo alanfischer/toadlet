@@ -40,7 +40,10 @@ public:
 
 	AudioStream::ptr createAudioStream(Stream *stream){
 		SIDDecoder::ptr audioStream=new SIDDecoder();
-		if(audioStream->startStream(stream)==false){
+		if(audioStream && audioStream->openStream(stream)==false){
+			audioStream=NULL;
+		}
+		if(audioStream && audioStream->startSong(0)==false){
 			audioStream=NULL;
 		}
 		return audioStream;

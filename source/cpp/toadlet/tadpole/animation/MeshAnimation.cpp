@@ -37,6 +37,21 @@ MeshAnimation::MeshAnimation(MeshComponent *target,int sequenceIndex):
 	mValue(0)
 {}
 
+MeshAnimation::MeshAnimation(MeshComponent *target,const String &sequenceName):
+	mTarget(target),
+	mSequenceIndex(0),
+	mValue(0)
+{
+	Skeleton *skeleton=target->getMesh()->getSkeleton();
+	int i;
+	for(i=0;i<skeleton->sequences.size();++i){
+		if(skeleton->sequences[i]->getName()==sequenceName){
+			mSequenceIndex=i;
+			break;
+		}
+	}
+}
+
 MeshAnimation::~MeshAnimation(){
 }
 
@@ -47,6 +62,7 @@ void MeshAnimation::setTarget(MeshComponent *target){
 		mListener->animationExtentsChanged(this);
 	}
 }
+
 
 void MeshAnimation::setSequenceIndex(int index){
 	mSequenceIndex=index;

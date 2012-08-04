@@ -24,7 +24,9 @@
  ********** Copyright header - do not remove **********/
 
 #define INITGUID
+
 #include "MFVideoDevice.h"
+
 const GUID GUID_NULL = { 0, 0, 0, { 0, 0, 0, 0, 0, 0, 0, 0 } }; 
 
 namespace toadlet{
@@ -58,10 +60,14 @@ bool MFVideoDevice::create(){
 		return false;
 	}
 
+	CoInitialize(NULL);
+	MFStartup(0);
+
 	bool result=false;
 	IMFActivate *device=findDevice();
 	if(device!=NULL){
 		result=create(device);
+		device->Release();
 	}
 	return result;
 }
@@ -69,9 +75,6 @@ bool MFVideoDevice::create(){
 bool MFVideoDevice::create(IMFActivate *device){
     IMFMediaSource *source=NULL;
     IMFAttributes *attributes=NULL;
-
-	CoInitialize(NULL);
-	MFStartup(0);
 
 	HRESULT hr=device->ActivateObject(__uuidof(IMFMediaSource),(void**)&source);
 	if(SUCCEEDED(hr)){
@@ -114,6 +117,8 @@ bool MFVideoDevice::create(IMFActivate *device){
 }
 
 void MFVideoDevice::destroy(){
+	stop();
+
 	if(mReader!=NULL){
 		mReader->Release();
 		mReader=NULL;
@@ -122,18 +127,37 @@ void MFVideoDevice::destroy(){
 		mType->Release();
 		mType=NULL;
 	}
+
+	MFShutdown();
+	CoUninitialize();
 }
 
 bool MFVideoDevice::start(){
 	HRESULT hr=E_FAIL;
+	
+	mMutex.lock();
+
 	if(mRunning==false && mReader!=NULL){
 		hr=mReader->ReadSample((DWORD)MF_SOURCE_READER_FIRST_VIDEO_STREAM,0,NULL,NULL,NULL,NULL);
+
+		mRunning=SUCCEEDED(hr);
 	}
+
+	mMutex.unlock();
+
 	return SUCCEEDED(hr);
 }
 
 void MFVideoDevice::stop(){
-	mRunning=false;
+	mMutex.lock();
+
+	if(mRunning){
+		mRunning=false;
+
+		mCondition.wait(&mMutex);
+	}
+
+	mMutex.unlock();
 }
 
 HRESULT MFVideoDevice::OnReadSample(HRESULT hrStatus,DWORD dwStreamIndex,DWORD dwStreamFlags,LONGLONG llTimestamp,IMFSample *pSample){
@@ -160,9 +184,19 @@ HRESULT MFVideoDevice::OnReadSample(HRESULT hrStatus,DWORD dwStreamIndex,DWORD d
 		}
 	}
 
-	if(SUCCEEDED(hr)){
+	mMutex.lock();
+
+	if(mRunning && SUCCEEDED(hr)){
 		hr=mReader->ReadSample((DWORD)MF_SOURCE_READER_FIRST_VIDEO_STREAM,0,NULL,NULL,NULL,NULL);
+
+		mRunning=SUCCEEDED(hr);
 	}
+
+	if(mRunning==false){
+		mCondition.notify();
+	}
+
+	mMutex.unlock();
 
 	return hr;
 }

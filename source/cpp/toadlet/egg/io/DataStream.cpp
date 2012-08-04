@@ -24,6 +24,7 @@
  ********** Copyright header - do not remove **********/
 
 #include <toadlet/egg/io/DataStream.h>
+#include <toadlet/egg/Collection.h>
 #include <toadlet/egg/Extents.h>
 #include <toadlet/egg/EndianConversion.h>
 #include <toadlet/egg/Error.h>
@@ -62,6 +63,59 @@ int8 DataStream::readInt8(){
 	return i;
 }
 
+int DataStream::readAll(tbyte *&resultBuffer){
+	const static int bufferSize=4096;
+	Collection<tbyte*> buffers;
+	int amount=0,total=0;
+	int i=0;
+
+	resultBuffer=NULL;
+	int resultAmount=0;
+
+	if(length()<=0){
+		return -1;
+	}
+
+	while(true){
+		tbyte *buffer=new tbyte[bufferSize];
+		if(buffer==NULL){
+			int i;
+			for(i=0;i<buffers.size();++i){
+				delete[] buffers[i];
+			}
+			Error::insufficientMemory(Categories::TOADLET_EGG,"unable to allocate buffer");
+			return total;
+		}
+
+		amount=read(buffer,bufferSize);
+		if(amount<=0){
+			delete[] buffer;
+			break;
+		}
+		else{
+			total+=amount;
+			buffers.add(buffer);
+		}
+	}
+
+	// Null terminate it just in case its used for a string
+	resultBuffer=new tbyte[total+1];
+	resultBuffer[total]=0;
+	resultAmount=total;
+
+	for(i=0;i<buffers.size();++i){
+		int thing=bufferSize;
+		if(total<thing){
+			thing=total;
+		}
+		memcpy(resultBuffer+i*bufferSize,buffers[i],thing);
+		total-=bufferSize;
+		delete[] buffers[i];
+	}
+
+	return resultAmount;
+}
+
 int DataStream::readNullTerminatedString(String &s){
 	int amt=0,total=0;
 	char string[1024];
@@ -87,6 +141,20 @@ int DataStream::readNullTerminatedString(String &s){
 String DataStream::readNullTerminatedString(){
 	String s;
 	readNullTerminatedString(s);
+	return s;
+}
+
+int DataStream::readAllString(String &s){
+	tbyte *data=NULL;
+	int length=readAll(data);
+	s=data;
+	delete[] data;
+	return length;
+}
+
+String DataStream::readAllString(){
+	String s;
+	readAllString(s);
 	return s;
 }
 
