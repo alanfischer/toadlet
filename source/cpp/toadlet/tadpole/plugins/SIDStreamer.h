@@ -43,7 +43,7 @@ public:
 		if(audioStream && audioStream->openStream(stream)==false){
 			audioStream=NULL;
 		}
-		if(audioStream && audioStream->startSong(0)==false){
+		if(audioStream && audioStream->startTrack(0)==false){
 			audioStream=NULL;
 		}
 		return audioStream;

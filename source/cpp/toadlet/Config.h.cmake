@@ -65,6 +65,7 @@
 #cmakedefine TOADLET_HAS_OPENAL
 #cmakedefine TOADLET_HAS_OGGVORBIS
 #cmakedefine TOADLET_HAS_SIDPLAY
+#cmakedefine TOADLET_HAS_GME
 #cmakedefine TOADLET_HAS_GDIPLUS
 
 #endif

@@ -27,6 +27,7 @@
 #define TOADLET_PAD_JAPPLICATION_H
 
 #include <toadlet/pad/Application.h>
+#include <toadlet/egg/Object.h>
 #include <jni.h>
 
 namespace toadlet{
@@ -34,7 +35,7 @@ namespace pad{
 
 class JApplication:public Object,public Application{
 public:
-	TOADLET_OBJECT(JAppliation);
+	TOADLET_OBJECT(JApplication);
 
 	JApplication(JNIEnv *jenv,jobject jobj);
 	virtual ~JApplication();
