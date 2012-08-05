@@ -23,49 +23,35 @@
  *
  ********** Copyright header - do not remove **********/
 
-#ifndef TOADLET_TADPOLE_SIDDECODER_H
-#define TOADLET_TADPOLE_SIDDECODER_H
+#ifndef TOADLET_TADPOLE_GMESTREAMER_H
+#define TOADLET_TADPOLE_GMESTREAMER_H
 
-#include <toadlet/ribbit/AudioStream.h>
-#include <toadlet/tadpole/Types.h>
+#include <toadlet/tadpole/AudioStreamer.h>
+#include "GMEDecoder.h"
 
 namespace toadlet{
 namespace tadpole{
 
-class SIDAttributes;
-
-class TOADLET_API SIDDecoder:public Object,public AudioStream{
+class TOADLET_API GMEStreamer:public Object,public AudioStreamer{
 public:
-	TOADLET_OBJECT(SIDDecoder);
+	TOADLET_OBJECT(GMEStreamer);
 
-	SIDDecoder();
-	virtual ~SIDDecoder();
+	GMEStreamer(AudioManager *audioManager):AudioStreamer(audioManager){}
 
-	bool openStream(Stream *stream);
-	int getNumTracks();
-	bool startTrack(int track);
-
-	AudioFormat::ptr getAudioFormat() const{return mFormat;}
-
-	void close(){}
-	bool closed(){return false;}
-	bool readable(){return true;}
-	int read(tbyte *buffer,int length);
-
-	bool writeable(){return false;}
-	int write(const tbyte *buffer,int length){return -1;}
-
-	bool reset(){return false;}
-	int length(){return -1;}
-	int position(){return -1;}
-	bool seek(int offs){return false;}
-
-protected:
-	AudioFormat::ptr mFormat;
-	SIDAttributes *sid;
+	AudioStream::ptr createAudioStream(Stream *stream){
+		GMEDecoder::ptr audioStream=new GMEDecoder();
+		if(audioStream && audioStream->openStream(stream)==false){
+			audioStream=NULL;
+		}
+		if(audioStream && audioStream->startTrack(0)==false){
+			audioStream=NULL;
+		}
+		return audioStream;
+	}
 };
 
 }
 }
 
 #endif
+

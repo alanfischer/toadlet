@@ -90,13 +90,13 @@ bool SIDDecoder::openStream(Stream *stream){
 	tbyte *tuneBuffer=NULL;
 	int tuneBufferLength=0;
 
-	tbyte type[4];
-	int amount=stream->read(type,4);
+	tbyte header[4];
+	int amount=stream->read(header,4);
 	stream->reset();
 
-	if(amount<4 || (memcmp(type,"PSID",4)!=0 && memcmp(type,"RSID",4)!=0)){
+	if(amount<4 || (memcmp(header,"PSID",4)!=0 && memcmp(header,"RSID",4)!=0)){
 		Error::unknown(Categories::TOADLET_RIBBIT,
-			"not PSID or RSID type");
+			"not PSID or RSID header");
 		return false;
 	}
 
@@ -139,17 +139,27 @@ bool SIDDecoder::openStream(Stream *stream){
 	return result;
 }
 
-bool SIDDecoder::startSong(int song){
+int SIDDecoder::getNumTracks(){
+	int numTracks=0;
+#if SIDPLAY_VERFSION==1
+	numTracks=1;
+#elif SIDPLAY_VERSION==2
+	numTracks=sid->info.tuneInfo!=NULL?sid->info.tuneInfo->songs:1;
+#endif
+	return numTracks;
+}
+
+bool SIDDecoder::startTrack(int track){
 	bool result=false;
 
 #if SIDPLAY_VERSION==1
-	result=sidEmuInitializeSong(sid->player,sid->tune,song);
+	result=sidEmuInitializeSong(sid->player,sid->tune,track);
 	if(result==false){
 		Error::unknown(Categories::TOADLET_RIBBIT,"Error initializing song");
 		return false;
 	}
 #elif SIDPLAY_VERSION==2
-	sid->tune->selectSong(song);
+	sid->tune->selectSong(track);
 
 	result=(sid->player->load(sid->tune)>=0);
 	if(result==false){

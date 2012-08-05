@@ -23,23 +23,22 @@
  *
  ********** Copyright header - do not remove **********/
 
-#ifndef TOADLET_TADPOLE_SIDDECODER_H
-#define TOADLET_TADPOLE_SIDDECODER_H
+#ifndef TOADLET_TADPOLE_GMEDECODER_H
+#define TOADLET_TADPOLE_GMEDECODER_H
 
 #include <toadlet/ribbit/AudioStream.h>
 #include <toadlet/tadpole/Types.h>
+#include <gme/gme.h>
 
 namespace toadlet{
 namespace tadpole{
 
-class SIDAttributes;
-
-class TOADLET_API SIDDecoder:public Object,public AudioStream{
+class TOADLET_API GMEDecoder:public Object,public AudioStream{
 public:
-	TOADLET_OBJECT(SIDDecoder);
+	TOADLET_OBJECT(GMEDecoder);
 
-	SIDDecoder();
-	virtual ~SIDDecoder();
+	GMEDecoder();
+	virtual ~GMEDecoder();
 
 	bool openStream(Stream *stream);
 	int getNumTracks();
@@ -60,9 +59,11 @@ public:
 	int position(){return -1;}
 	bool seek(int offs){return false;}
 
+	static gme_err_t reader(void *data,void *buffer,int length);
+
 protected:
 	AudioFormat::ptr mFormat;
-	SIDAttributes *sid;
+	Music_Emu *emu;
 };
 
 }

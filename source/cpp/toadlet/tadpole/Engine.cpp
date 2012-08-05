@@ -142,6 +142,9 @@
 #if defined(TOADLET_HAS_SIDPLAY)
 	#include <toadlet/tadpole/plugins/SIDStreamer.h>
 #endif
+#if defined(TOADLET_HAS_GME)
+	#include <toadlet/tadpole/plugins/GMEStreamer.h>
+#endif
 
 #if !defined(TOADLET_FIXED_POINT)
 	#include <toadlet/tadpole/plugins/SPRStreamer.h>
@@ -316,6 +319,20 @@ void Engine::installHandlers(){
 	#endif
 	#if defined(TOADLET_HAS_SIDPLAY)
 		mAudioManager->setStreamer(new SIDStreamer(mAudioManager),"sid");
+	#endif
+	#if defined(TOADLET_HAS_GME)
+		GMEStreamer::ptr gmeStreamer=new GMEStreamer(mAudioManager);
+		mAudioManager->setStreamer(gmeStreamer,"ay");
+		mAudioManager->setStreamer(gmeStreamer,"gbs");
+		mAudioManager->setStreamer(gmeStreamer,"gym");
+		mAudioManager->setStreamer(gmeStreamer,"hes");
+		mAudioManager->setStreamer(gmeStreamer,"kss");
+		mAudioManager->setStreamer(gmeStreamer,"nsf");
+		mAudioManager->setStreamer(gmeStreamer,"nsfe");
+		mAudioManager->setStreamer(gmeStreamer,"sap");
+		mAudioManager->setStreamer(gmeStreamer,"spc");
+		mAudioManager->setStreamer(gmeStreamer,"vgm");
+		mAudioManager->setStreamer(gmeStreamer,"vgz");
 	#endif
 
 	// Plugin types, should be removed from here somehow
