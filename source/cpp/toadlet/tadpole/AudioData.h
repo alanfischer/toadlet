@@ -23,42 +23,26 @@
  *
  ********** Copyright header - do not remove **********/
 
-#ifndef TOADLET_EGG_POSIXTHREAD_H
-#define TOADLET_EGG_POSIXTHREAD_H
+#ifndef TOADLET_TADPOLE_AUDIODATA_H
+#define TOADLET_TADPOLE_AUDIODATA_H
 
-#include <toadlet/egg/WeakPointer.h>
-#include <pthread.h>
+#include <toadlet/tadpole/ResourceData.h>
 
 namespace toadlet{
-namespace egg{
+namespace tadpole{
 
-class PosixThread{
+class TOADLET_API AudioData:public ResourceData{
 public:
-	TOADLET_SPTR(PosixThread);
+	TOADLET_OBJECT(AudioData);
 
-	PosixThread();
-	PosixThread(Runnable *r);
-	virtual ~PosixThread();
+	AudioData(int track1){
+		track=track1;
+	}
 
-	virtual void start();
-
-	virtual bool join();
-	
-	virtual void run();
-
-	inline bool isAlive() const{return mAlive;}
-
-private:
-	void startRun();
-	static void *startThread(void *thread);
-
-	Runnable *mRunner;
-	pthread_t mThread;
-	bool mAlive;
+	int track;
 };
 
 }
 }
 
 #endif
-

@@ -26,8 +26,6 @@
 #ifndef TOADLET_TADPOLE_FONTDATA_H
 #define TOADLET_TADPOLE_FONTDATA_H
 
-#include <toadlet/tadpole/Types.h>
-#include <toadlet/egg/String.h>
 #include <toadlet/tadpole/ResourceData.h>
 
 namespace toadlet{
@@ -35,7 +33,7 @@ namespace tadpole{
 
 class TOADLET_API FontData:public ResourceData{
 public:
-	TOADLET_SPTR(FontData);
+	TOADLET_OBJECT(FontData);
 
 	FontData(float pointSize1){
 		pointSize=pointSize1;

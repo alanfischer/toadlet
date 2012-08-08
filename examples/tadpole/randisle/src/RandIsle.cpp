@@ -28,7 +28,7 @@ void RandIsle::create(){
 	Logger::debug("RandIsle::create");
 
 	mEngine=mApp->getEngine();
-	mEngine->setDirectory(mPath);
+	mEngine->getArchiveManager()->addDirectory(mPath);
 
 	Resources::init(mEngine);
 

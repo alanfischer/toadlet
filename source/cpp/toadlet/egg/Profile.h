@@ -49,6 +49,7 @@ public:
 
 		inline const char *getName() const{return mName;}
 		inline uint64 getTotal() const{return mTotal;}
+		inline int getCount() const{return mCount;}
 		inline ProfileNode *getParent() const{return mParent;}
 		inline ProfileNode *getFirstChild() const{return mFirstChild;}
 		inline ProfileNode *getNext() const{return mNext;}
@@ -56,6 +57,7 @@ public:
 	protected:
 		const char *mName;
 		uint64 mCurrent,mTotal;
+		int mCount;
 		ProfileNode *mParent;
 		ProfileNode::ptr mFirstChild,mNext;
 	};
@@ -66,14 +68,14 @@ public:
 	void endSection(const char *name);
 
 	ProfileNode *getRoot(){return mRoot;}
-	void outputTimings(){outputTimings(mRoot,0);}
+	void outputTimings(){outputTimings(mRoot,0,0);}
 	void clearTimings(){clearTimings(mRoot);}
 
 protected:
 	Profile();
 	~Profile();
 
-	void outputTimings(ProfileNode *node,int depth);
+	void outputTimings(ProfileNode *node,int depth,int total);
 	void clearTimings(ProfileNode *node);
 
 	static Profile *mTheProfile;

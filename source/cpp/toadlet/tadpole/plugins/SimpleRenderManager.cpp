@@ -50,6 +50,8 @@ SimpleRenderManager::~SimpleRenderManager(){
 }
 
 void SimpleRenderManager::renderScene(RenderDevice *device,Node *node,Camera *camera){
+	TOADLET_PROFILE_AUTOSCOPE();
+
 	mDevice=device;
 	mSceneParameters->setCamera(camera);
 
@@ -147,6 +149,8 @@ void SimpleRenderManager::setupPassForRenderable(RenderPass *pass,Renderable *re
 }
 
 void SimpleRenderManager::gatherRenderables(RenderableSet *set,Node *node,Camera *camera){
+	TOADLET_PROFILE_AUTOSCOPE();
+
 	set->setCamera(camera);
 
 	set->startQueuing();
@@ -158,6 +162,8 @@ void SimpleRenderManager::gatherRenderables(RenderableSet *set,Node *node,Camera
 }
 
 void SimpleRenderManager::renderRenderables(RenderableSet *set,RenderDevice *device,Camera *camera,bool useMaterials){
+	TOADLET_PROFILE_AUTOSCOPE();
+
 	int clearFlags=camera->getClearFlags();
 	if(clearFlags!=0 && !camera->getSkipFirstClear()){
 		device->clear(clearFlags,camera->getClearColor());

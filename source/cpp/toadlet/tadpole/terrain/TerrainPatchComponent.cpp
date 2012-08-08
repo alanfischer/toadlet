@@ -62,6 +62,8 @@ TerrainPatchComponent::TerrainPatchComponent(Scene *scene):
 	mCellEpsilon=0.03125*4;
 
 	mTolerance=0.00001f;
+
+	mLocalCamera=new Camera();
 }
 
 TerrainPatchComponent::~TerrainPatchComponent(){
@@ -623,6 +625,8 @@ void TerrainPatchComponent::setWaterLevel(scalar level){
 }
 
 void TerrainPatchComponent::gatherRenderables(Camera *camera,RenderableSet *set){
+	TOADLET_PROFILE_AUTOSCOPE();
+
 	if((camera->getScope()&mCameraUpdateScope)!=0){
 		updateBlocks(camera);
 		updateVertexes();
@@ -645,27 +649,45 @@ void TerrainPatchComponent::gatherRenderables(Camera *camera,RenderableSet *set)
 }
 
 void TerrainPatchComponent::updateBlocks(Camera *camera){
+	TOADLET_PROFILE_AUTOSCOPE();
+
 	if(mScene->getFrame()==mLastBlockUpdateFrame){
 		return;
 	}
 
-	Vector3 cameraTranslate;
-	mParent->getWorldTransform().inverseTransform(cameraTranslate,camera->getPosition());
+	Matrix4x4 matrix;
+	mParent->getWorldTransform().inverseTransform(matrix,camera->getWorldMatrix());
+	mLocalCamera->setWorldMatrix(matrix);
+	mLocalCamera->setProjectionMatrix(camera->getProjectionMatrix());
 
 	resetBlocks();
-	simplifyBlocks(cameraTranslate,camera);
+	simplifyBlocks(mLocalCamera);
 	mLastBlockUpdateFrame=mScene->getFrame();
 }
 
 void TerrainPatchComponent::updateIndexBuffers(Camera *camera){
-	int indexCount=gatherBlocks(mIndexBuffer,camera,false);
+	TOADLET_PROFILE_AUTOSCOPE();
+
+	Matrix4x4 matrix;
+	mParent->getWorldTransform().inverseTransform(matrix,camera->getWorldMatrix());
+	mLocalCamera->setWorldMatrix(matrix);
+	mLocalCamera->setProjectionMatrix(camera->getProjectionMatrix());
+
+	int indexCount=gatherBlocks(mIndexBuffer,mLocalCamera,false);
 	mIndexData->setCount(indexCount);
 }
 
 void TerrainPatchComponent::updateWaterIndexBuffers(Camera *camera){
+	TOADLET_PROFILE_AUTOSCOPE();
+
 	mWaterWorldTransform.setTransform(mParent->getWorldTransform(),mWaterTransform);
 
-	int indexCount=gatherBlocks(mWaterIndexBuffer,camera,true);
+	Matrix4x4 matrix;
+	mParent->getWorldTransform().inverseTransform(matrix,camera->getWorldMatrix());
+	mLocalCamera->setWorldMatrix(matrix);
+	mLocalCamera->setProjectionMatrix(camera->getProjectionMatrix());
+
+	int indexCount=gatherBlocks(mWaterIndexBuffer,mLocalCamera,true);
 	mWaterIndexData->setCount(indexCount);
 }
 
@@ -1006,7 +1028,7 @@ void TerrainPatchComponent::disableVertex(Vertex *v){
 	}
 }
 
-void TerrainPatchComponent::simplifyBlocks(const Vector3 &cameraTranslate,Camera *camera){
+void TerrainPatchComponent::simplifyBlocks(Camera *camera){
 	int blockNum;
 	int i;
 
@@ -1024,7 +1046,7 @@ void TerrainPatchComponent::simplifyBlocks(const Vector3 &cameraTranslate,Camera
 					bool replaceParent=true;
 					
 					for(i=0;i<4;i++){
-						if(blockShouldSubdivide(&mBlocks[blockNum+i],cameraTranslate,camera)){
+						if(blockShouldSubdivide(&mBlocks[blockNum+i],camera)){
 							replaceParent=false;
 						}
 					}
@@ -1053,7 +1075,7 @@ void TerrainPatchComponent::simplifyBlocks(const Vector3 &cameraTranslate,Camera
 				bool shouldSubdivide=false;
 
 				for(i=0;i<4;i++){
-					if(blockShouldSubdivide(mBlocks[blockNum].children[i],cameraTranslate,camera)){
+					if(blockShouldSubdivide(mBlocks[blockNum].children[i],camera)){
 						shouldSubdivide=true;
 					}
 				}
@@ -1074,15 +1096,15 @@ void TerrainPatchComponent::simplifyBlocks(const Vector3 &cameraTranslate,Camera
 	}
 }
 
-bool TerrainPatchComponent::blockShouldSubdivide(Block *block,const Vector3 &cameraTranslate,Camera *camera){
-	if(blockVisibleByWater(block,cameraTranslate,false)==false){
+bool TerrainPatchComponent::blockShouldSubdivide(Block *block,Camera *camera){
+	if(blockVisibleByWater(block,camera,false)==false){
 		return false;
 	}
 	if(blockIntersectsCamera(block,camera,false)==false){
 		return false;
 	}
 
-	computeDelta(block,cameraTranslate,mTolerance);
+	computeDelta(block,camera->getPosition(),mTolerance);
 
 	return (block->deltaMax>block->delta0);
 }
@@ -1174,6 +1196,8 @@ void TerrainPatchComponent::computeDelta(Block *block,const Vector3 &cameraTrans
 }
 
 void TerrainPatchComponent::updateVertexes(){
+	TOADLET_PROFILE_AUTOSCOPE();
+
 	if(mScene->getFrame()==mLastVertexesUpdateFrame){
 		return;
 	}
@@ -1210,21 +1234,20 @@ bool TerrainPatchComponent::blockIntersectsCamera(const Block *block,Camera *cam
 		box.maxs.z=mWaterLevel;
 	}
 
-	mParent->getTransform().transform(box.mins);
-	mParent->getTransform().transform(box.maxs);
-
 	return camera->culled(box)==false;
 }
 
-bool TerrainPatchComponent::blockVisibleByWater(const Block *block,const Vector3 &cameraTranslate,bool water) const{
-	scalar waterLevel=0; /// @todo: Make this a class variable, and have it come from the TerrainNodeDataSource
+bool TerrainPatchComponent::blockVisibleByWater(const Block *block,Camera *camera,bool water) const{
+	const Vector3 &cameraPosition=camera->getPosition();
 	bool waterOpaque=false; /// @todo: Make this a class variable, and have it come from the TerrainNodeDataSource
 	return (water==false && waterOpaque==false) || 
-		(cameraTranslate.z>waterLevel && ((water==false && block->maxs.z>waterLevel) || (water==true && block->mins.z<=waterLevel))) ||
-		(cameraTranslate.z<waterLevel && block->mins.z<=waterLevel);
+		(cameraPosition.z>mWaterLevel && ((water==false && block->maxs.z>mWaterLevel) || (water==true && block->mins.z<=mWaterLevel))) ||
+		(cameraPosition.z<mWaterLevel && block->mins.z<=mWaterLevel);
 }
 
 int TerrainPatchComponent::gatherBlocks(IndexBuffer *indexBuffer,Camera *camera,bool water) const{
+	TOADLET_PROFILE_AUTOSCOPE();
+
 	int indexCount=0;
 	const Block *block=NULL;
 
@@ -1234,7 +1257,7 @@ int TerrainPatchComponent::gatherBlocks(IndexBuffer *indexBuffer,Camera *camera,
 	for(i=0;i<mNumBlocksInQueue;i++){
 		block=getBlockNumber(i);
 
-		if(blockIntersectsCamera(block,camera,water) && blockVisibleByWater(block,camera->getPosition(),water)){
+		if(blockIntersectsCamera(block,camera,water) && blockVisibleByWater(block,camera,water)){
 			int x0=block->xOrigin;
 			int y0=block->yOrigin;
 			int x1=block->xOrigin+block->stride*2;

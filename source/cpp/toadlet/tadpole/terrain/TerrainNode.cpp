@@ -236,6 +236,8 @@ void TerrainNode::setWaterLevel(scalar level){
 }
 
 void TerrainNode::gatherRenderables(Camera *camera,RenderableSet *set){
+	TOADLET_PROFILE_AUTOSCOPE();
+
 	if((camera->getScope()&mPatchCameraUpdateScope)!=0){
 		updatePatches(camera);
 	}

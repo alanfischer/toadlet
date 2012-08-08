@@ -131,11 +131,13 @@ bool ALAudio::play(){
 		int i;
 		for(i=0;i<numBuffers;++i){
 			int amount=readAudioData(buffer,bufferSize);
-			total=total+amount;
-			alBufferData(mStreamingBuffers[i],
-				ALAudioDevice::getALFormat(mAudioStream->getAudioFormat()),
-				buffer,amount,mAudioStream->getAudioFormat()->getSamplesPerSecond());
-			TOADLET_CHECK_ALERROR("alBufferData");
+			if(amount>0){
+				total=total+amount;
+				alBufferData(mStreamingBuffers[i],
+					ALAudioDevice::getALFormat(mAudioStream->getAudioFormat()),
+					buffer,amount,mAudioStream->getAudioFormat()->getSamplesPerSecond());
+				TOADLET_CHECK_ALERROR("alBufferData");
+			}
 		}
 
 		mTotalBuffersPlayed=numBuffers;
@@ -180,9 +182,7 @@ bool ALAudio::getPlaying() const{
 }
 
 bool ALAudio::getFinished() const{
-	// First check the saved looping, in case the source is invalid
-	// Also never stop until our stream is depleated
-	if(mLooping==true || mAudioStream!=NULL){
+	if(mLooping==true){
 		return false;
 	}
 
@@ -314,8 +314,8 @@ void ALAudio::updateStreaming(int dt){
 				TOADLET_CHECK_ALERROR("update::alSourceUnqueueBuffers");
 
 				int amount=readAudioData(buffer,bufferSize);
-				total=total+amount;
 				if(amount>0){
+					total=total+amount;
 					alBufferData(bufferID,
 						ALAudioDevice::getALFormat(mAudioStream->getAudioFormat()),
 						buffer,amount,mAudioStream->getAudioFormat()->getSamplesPerSecond());

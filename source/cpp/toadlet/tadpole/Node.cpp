@@ -190,6 +190,15 @@ void Node::stopAction(const String &action){
 	}
 }
 
+void Node::stopAllActions(){
+	int i;
+	for(i=0;i<mActions.size();++i){
+		if(mActions[i]->getActive()){
+			mActions[i]->stop();
+		}
+	}
+}
+
 bool Node::getActionActive(const String &action){
 	int i;
 	for(i=0;i<mActions.size();++i){

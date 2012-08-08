@@ -30,6 +30,9 @@
 
 #if !defined(TOADLET_DEBUG) && (defined(DEBUG) || defined(_DEBUG))
 	#define TOADLET_DEBUG 1
+#endif
+
+#if defined(TOADLET_DEBUG)
 	#define TOADLET_PROFILE 1
 #endif
 

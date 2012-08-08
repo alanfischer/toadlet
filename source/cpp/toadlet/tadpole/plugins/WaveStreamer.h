@@ -38,7 +38,7 @@ public:
 
 	WaveStreamer(AudioManager *audioManager):AudioStreamer(audioManager){}
 
-	AudioStream::ptr createAudioStream(Stream *stream){
+	AudioStream::ptr createAudioStream(Stream *stream,ResourceData *data){
 		WaveDecoder::ptr audioStream=new WaveDecoder();
 		if(audioStream->startStream(stream)==false){
 			audioStream=NULL;

@@ -37,6 +37,7 @@ namespace bsp{
 BSP30Node::BSP30Node(Scene *scene):PartitionNode(scene),
 	mCounter(1)
 {
+	mLocalCamera=new Camera();
 }
 
 BSP30Node::~BSP30Node(){
@@ -186,6 +187,8 @@ void BSP30Node::mergeWorldBound(Node *child,bool justAttached){
 }
 
 void BSP30Node::gatherRenderables(Camera *camera,RenderableSet *set){
+	TOADLET_PROFILE_AUTOSCOPE();
+
 	int i,j;
 
 	if(mMap==NULL){
@@ -195,16 +198,15 @@ void BSP30Node::gatherRenderables(Camera *camera,RenderableSet *set){
 
 	set->queueRenderable(this);
 
-	bool transformed=true;//(getWorldTransform()!=Node::identityTransform());
-	Matrix4x4 worldMatrix;
-	mWorldTransform.getMatrix(worldMatrix);
-	Vector3 cameraPosition;
-	mWorldTransform.inverseTransform(cameraPosition,camera->getPosition());
+	Matrix4x4 matrix;
+	mWorldTransform.inverseTransform(matrix,camera->getWorldMatrix());
+	mLocalCamera->setWorldMatrix(matrix);
+	mLocalCamera->setProjectionMatrix(camera->getProjectionMatrix());
 
 	// Queue up the visible faces and nodes
 	memset(mMarkedFaces,0,(mMap->nfaces+7)>>3);
 	memset(&mVisibleMaterialFaces[0],0,sizeof(BSP30Map::facedata*)*mVisibleMaterialFaces.size());
-	int leaf=mMap->findPointLeaf(mMap->planes,mMap->nodes,sizeof(bnode),0,cameraPosition);
+	int leaf=mMap->findPointLeaf(mMap->planes,mMap->nodes,sizeof(bnode),0,mLocalCamera->getPosition());
 	if(leaf==0 || mMap->nvisibility==0){
 		bmodel *world=&mMap->models[0];
 		// Instead of enumerating all leaves, we just enumerate all faces
@@ -233,11 +235,8 @@ void BSP30Node::gatherRenderables(Camera *camera,RenderableSet *set){
 		for(i=0;i<leafvis.size();i++){
 			bleaf *leaf=mMap->leafs+leafvis[i];
 			AABox box(leaf->mins[0],leaf->mins[1],leaf->mins[2],leaf->maxs[0],leaf->maxs[1],leaf->maxs[2]);
-			if(transformed){
-				Math::mul(box,worldMatrix);
-			}
-			if(camera->culled(box)==false){
-				addLeafToVisible(leaf,cameraPosition);
+			if(mLocalCamera->culled(box)==false){
+				addLeafToVisible(leaf,mLocalCamera->getPosition());
 
 				const Collection<Node*> &occupants=mLeafData[leafvis[i]].occupants;
 				for(j=0;j<occupants.size();++j){

@@ -181,11 +181,11 @@ protected:
 	void resetBlocks();
 	void enableVertex(Vertex *v);
 	void disableVertex(Vertex *v);
-	void simplifyBlocks(const Vector3 &cameraTranslate,Camera *camera);
-	bool blockShouldSubdivide(Block *block,const Vector3 &cameraTranslate,Camera *camera);
+	void simplifyBlocks(Camera *camera);
+	bool blockShouldSubdivide(Block *block,Camera *camera);
 	void computeDelta(Block *block,const Vector3 &cameraTranslate,float tolerance);
 	bool blockIntersectsCamera(const Block *block,Camera *camera,bool water) const;
-	bool blockVisibleByWater(const Block *block,const Vector3 &cameraTranslate,bool water) const;
+	bool blockVisibleByWater(const Block *block,Camera *camera,bool water) const;
 	int gatherBlocks(IndexBuffer *indexBuffer,Camera *camera,bool water) const;
 	int gatherTriangle(IndexBufferAccessor &iba,int indexCount,int x0,int y0,int x1,int y1,int x2,int y2) const;
 	scalar calculateLayerWeight(int layer,int i,int j,scalar io,scalar jo);
@@ -251,10 +251,12 @@ protected:
 
 	Material::ptr mMaterial;
 	VertexBuffer::ptr mVertexBuffer;
-	IndexBuffer::ptr mIndexBuffer;
 	VertexData::ptr mVertexData;
-	IndexData::ptr mIndexData;
 	Collection<Texture::ptr> mLayerTextures;
+
+	Camera::ptr mLocalCamera;
+	IndexBuffer::ptr mIndexBuffer;
+	IndexData::ptr mIndexData;
 
 	Transform mWaterTransform;
 	Transform mWaterWorldTransform;

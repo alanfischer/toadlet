@@ -6,6 +6,7 @@ configure_file (${CMAKE_CURRENT_SOURCE_DIR}/Version.h.cmake ${CMAKE_CURRENT_BINA
 set (TADPOLE_SRC
 	AnaglyphCamera.cpp
 	AnimationActionComponent.cpp
+	AudioActionComponent.cpp
 	AudioComponent.cpp
 	ArchiveManager.cpp
 	AudioManager.cpp
@@ -184,12 +185,14 @@ set (TADPOLE_PLATFORM_WIN32_GDIPLUS_SRC
 set (TADPOLE_HEADERS
 	AnaglyphCamera.h
 	AnimationActionComponent.h
+	AudioActionComponent.h
 	Action.h
 	Attachable.h
 	ArchiveManager.h
 	AudioStreamer.h
 	AudioManager.h
 	AudioComponent.h
+	AudioData.h
 	BaseComponent.h
 	Bound.h
 	BufferManager.h

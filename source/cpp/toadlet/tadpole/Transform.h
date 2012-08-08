@@ -165,6 +165,12 @@ public:
 		Math::div(r.direction,mScale);
 	}
 
+	void inverseTransform(Matrix4x4 &r,const Matrix4x4 &m) const{
+		Matrix4x4 matrix; getMatrix(matrix);
+		Matrix4x4 invxform;	Math::invert(invxform,matrix);
+		Math::mul(r,invxform,m);
+	}
+
 protected:
 	Vector3 mTranslate;
 	Vector3 mScale;

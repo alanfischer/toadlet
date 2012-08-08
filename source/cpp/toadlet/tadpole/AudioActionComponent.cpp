@@ -23,37 +23,43 @@
  *
  ********** Copyright header - do not remove **********/
 
-#ifndef TOADLET_TADPOLE_GMESTREAMER_H
-#define TOADLET_TADPOLE_GMESTREAMER_H
-
-#include <toadlet/tadpole/AudioStreamer.h>
-#include "GMEDecoder.h"
+#include <toadlet/tadpole/AudioActionComponent.h>
 
 namespace toadlet{
 namespace tadpole{
 
-class TOADLET_API GMEStreamer:public Object,public AudioStreamer{
-public:
-	TOADLET_OBJECT(GMEStreamer);
+AudioActionComponent::AudioActionComponent(const String &name):BaseComponent(name){}
 
-	GMEStreamer(AudioManager *audioManager):AudioStreamer(audioManager){}
-
-	AudioStream::ptr createAudioStream(Stream *stream,ResourceData *data){
-		AudioData *audioData=(AudioData*)data;
-
-		GMEDecoder::ptr audioStream=new GMEDecoder();
-		if(audioStream && audioStream->openStream(stream)==false){
-			audioStream=NULL;
-		}
-		if(audioStream && audioStream->startTrack(audioData!=NULL?audioData->track:0)==false){
-			audioStream=NULL;
-		}
-		return audioStream;
+bool AudioActionComponent::parentChanged(Node *node){
+	if(mParent!=NULL){
+		mParent->actionRemoved(this);
 	}
-};
+
+	BaseComponent::parentChanged(node);
+
+	if(mParent!=NULL){
+		mParent->actionAttached(this);
+	}
+
+	return true;
+}
+
+void AudioActionComponent::setAudio(AudioComponent *audio){
+	mAudio=audio;
+}
+
+void AudioActionComponent::setAudioStream(const String &stream){
+	mAudioStream=stream;
+}
+
+void AudioActionComponent::start(){
+	mAudio->setAudioStream(mAudioStream);
+	mAudio->play();
+}
+
+void AudioActionComponent::stop(){
+	mAudio->stop();
+}
 
 }
 }
-
-#endif
-
