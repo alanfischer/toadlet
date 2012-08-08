@@ -32,9 +32,9 @@
 namespace toadlet{
 namespace tadpole{
 
-class ResourceData{
+class ResourceData:public Object{
 public:
-	TOADLET_SPTR(ResourceData);
+	TOADLET_OBJECT(ResourceData);
 
 	virtual ~ResourceData(){}
 };

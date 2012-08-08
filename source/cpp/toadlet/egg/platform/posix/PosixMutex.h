@@ -35,7 +35,7 @@ namespace egg{
 
 class PosixEvent;
 
-class PosixMutex{
+class PosixMutex:public Runnable{
 public:
 	TOADLET_SPTR(PosixMutex);
 

@@ -38,12 +38,14 @@ public:
 
 	SIDStreamer(AudioManager *audioManager):AudioStreamer(audioManager){}
 
-	AudioStream::ptr createAudioStream(Stream *stream){
+	AudioStream::ptr createAudioStream(Stream *stream,ResourceData *data){
+		AudioData *audioData=(AudioData*)data;
+
 		SIDDecoder::ptr audioStream=new SIDDecoder();
 		if(audioStream && audioStream->openStream(stream)==false){
 			audioStream=NULL;
 		}
-		if(audioStream && audioStream->startTrack(0)==false){
+		if(audioStream && audioStream->startTrack(audioData!=NULL?audioData->track:0)==false){
 			audioStream=NULL;
 		}
 		return audioStream;

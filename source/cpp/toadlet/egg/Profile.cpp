@@ -66,11 +66,13 @@ void Profile::ProfileNode::start(){
 void Profile::ProfileNode::stop(){
 	uint64 time=System::utime();
 	mTotal+=time-mCurrent;
+	mCount++;
 }
 
 void Profile::ProfileNode::clear(){
 	mCurrent=0;
 	mTotal=0;
+	mCount=0;
 }
 
 Profile *Profile::getInstance(){
@@ -106,18 +108,18 @@ void Profile::endSection(const char *name){
 	TOADLET_ASSERT(mCurrent!=NULL);
 }
 
-void Profile::outputTimings(ProfileNode *node,int depth){
+void Profile::outputTimings(ProfileNode *node,int depth,int total){
 	String spaces;
 	for(int i=0;i<depth;++i){
 		spaces+="\t";
 	}
 
 	if(node->getTotal()>0){
-		Logger::alert(Categories::TOADLET_EGG_PROFILE,spaces+node->getName()+":"+node->getTotal());
+		Logger::alert(Categories::TOADLET_EGG_PROFILE,spaces+node->getName()+":"+node->getTotal()+":%"+(float)node->getTotal()*100/(float)total);
 	}
 
 	for(node=node->getFirstChild();node!=NULL;node=node->getNext()){
-		outputTimings(node,depth+1);
+		outputTimings(node,depth+1,total>0?total:node->getTotal());
 	}
 }
 

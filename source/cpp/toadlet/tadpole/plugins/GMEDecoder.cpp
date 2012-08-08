@@ -79,7 +79,10 @@ bool GMEDecoder::startTrack(int track){
 
 int GMEDecoder::read(tbyte *buffer,int length){
 	gme_err_t result=gme_play(emu,length/2,(short*)buffer);
-	return result==NULL?length:0;
+	if(result!=NULL || gme_track_ended(emu)){
+		length=-1;
+	}
+	return length;
 }
 
 gme_err_t GMEDecoder::reader(void *data,void *buffer,int length){

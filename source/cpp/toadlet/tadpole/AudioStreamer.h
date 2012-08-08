@@ -38,10 +38,10 @@ public:
 
 	AudioStreamer(AudioManager *manager){mAudioManager=manager;}
 
-	virtual AudioStream::ptr createAudioStream(Stream *stream)=0;
+	virtual AudioStream::ptr createAudioStream(Stream *stream,ResourceData *data)=0;
 
 	Resource::ptr load(Stream::ptr stream,ResourceData *data,ProgressListener *listener){
-		return mAudioManager->createAudioBuffer(createAudioStream(stream));
+		return mAudioManager->createAudioBuffer(createAudioStream(stream,data));
 	}
 
 protected:

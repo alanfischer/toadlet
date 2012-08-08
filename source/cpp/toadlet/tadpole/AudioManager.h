@@ -27,8 +27,8 @@
 #define TOADLET_TADPOLE_AUDIOMANAGER_H
 
 #include <toadlet/tadpole/ResourceManager.h>
+#include <toadlet/tadpole/AudioData.h>
 #include <toadlet/ribbit/AudioDevice.h>
-#include <toadlet/tadpole/Types.h>
 
 namespace toadlet{
 namespace tadpole{
@@ -41,12 +41,14 @@ public:
 
 	AudioManager(Engine *engine);
 
-	AudioBuffer::ptr createAudioBuffer(AudioStream::ptr stream);
+	AudioBuffer::ptr createAudioBuffer(AudioStream *stream);
 
 	Audio::ptr createAudio();
 
-	AudioStream::ptr findAudioStream(const String &name);
-	AudioBuffer::ptr findAudioBuffer(const String &name){return shared_static_cast<AudioBuffer>(ResourceManager::find(name));}
+	AudioStream::ptr findAudioStream(const String &name,int track=0){return findAudioStream(name,AudioData::ptr(new AudioData(track)));}
+	AudioBuffer::ptr findAudioBuffer(const String &name,int track=0){return shared_static_cast<AudioBuffer>(ResourceManager::find(name,AudioData::ptr(new AudioData(track))));}
+
+	AudioStream::ptr findAudioStream(const String &name,ResourceData *data);
 
 	AudioDevice *getAudioDevice();
 };

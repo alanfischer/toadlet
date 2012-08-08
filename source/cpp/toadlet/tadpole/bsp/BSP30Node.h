@@ -104,6 +104,8 @@ protected:
 
 	Collection<leafdata> mLeafData;
 	leafdata mGlobalLeafData;
+
+	Camera::ptr mLocalCamera;
 	uint8 *mMarkedFaces;
 	Collection<BSP30Map::facedata*> mVisibleMaterialFaces;
 

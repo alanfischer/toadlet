@@ -33,7 +33,7 @@ namespace tadpole{
 AudioManager::AudioManager(Engine *engine):ResourceManager(engine){
 }
 
-AudioBuffer::ptr AudioManager::createAudioBuffer(AudioStream::ptr stream){
+AudioBuffer::ptr AudioManager::createAudioBuffer(AudioStream *stream){
 	AudioDevice *audioDevice=getAudioDevice();
 
 	if(audioDevice==NULL){
@@ -64,7 +64,7 @@ Audio::ptr AudioManager::createAudio(){
 	return audioDevice->createAudio();
 }
 
-AudioStream::ptr AudioManager::findAudioStream(const String &name){
+AudioStream::ptr AudioManager::findAudioStream(const String &name,ResourceData *data){
 	Logger::debug(Categories::TOADLET_TADPOLE,
 		"finding audio stream:"+name);
 
@@ -87,7 +87,7 @@ AudioStream::ptr AudioManager::findAudioStream(const String &name){
 	if(streamer!=NULL){
 		Stream::ptr stream=mEngine->openStream(filename);
 		if(stream!=NULL){
-			return shared_static_cast<AudioStreamer>(streamer)->createAudioStream(stream);
+			return shared_static_cast<AudioStreamer>(streamer)->createAudioStream(stream,data);
 		}
 		else{
 			Error::unknown(Categories::TOADLET_TADPOLE,

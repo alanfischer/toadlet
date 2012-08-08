@@ -23,37 +23,45 @@
  *
  ********** Copyright header - do not remove **********/
 
-#ifndef TOADLET_TADPOLE_GMESTREAMER_H
-#define TOADLET_TADPOLE_GMESTREAMER_H
+#ifndef TOADLET_TADPOLE_AUDIOACTIONCOMPONENT_H
+#define TOADLET_TADPOLE_AUDIOACTIONCOMPONENT_H
 
-#include <toadlet/tadpole/AudioStreamer.h>
-#include "GMEDecoder.h"
+#include <toadlet/egg/Collection.h>
+#include <toadlet/tadpole/Action.h>
+#include <toadlet/tadpole/BaseComponent.h>
+#include <toadlet/tadpole/AudioComponent.h>
 
 namespace toadlet{
 namespace tadpole{
 
-class TOADLET_API GMEStreamer:public Object,public AudioStreamer{
+class TOADLET_API AudioActionComponent:public BaseComponent,public Action{
 public:
-	TOADLET_OBJECT(GMEStreamer);
+	TOADLET_OBJECT(AudioActionComponent);
 
-	GMEStreamer(AudioManager *audioManager):AudioStreamer(audioManager){}
+	AudioActionComponent(const String &name);
+	virtual ~AudioActionComponent(){}
 
-	AudioStream::ptr createAudioStream(Stream *stream,ResourceData *data){
-		AudioData *audioData=(AudioData*)data;
+	virtual bool parentChanged(Node *node);
 
-		GMEDecoder::ptr audioStream=new GMEDecoder();
-		if(audioStream && audioStream->openStream(stream)==false){
-			audioStream=NULL;
-		}
-		if(audioStream && audioStream->startTrack(audioData!=NULL?audioData->track:0)==false){
-			audioStream=NULL;
-		}
-		return audioStream;
-	}
+	virtual const String &getName() const{return BaseComponent::getName();}
+
+	virtual bool getActive() const{return false;}
+
+	virtual void setActionListener(ActionListener *listener){}
+	virtual ActionListener *getActionListener() const{return NULL;}
+
+	void setAudio(AudioComponent *audio);
+	void setAudioStream(const String &stream);
+
+	virtual void start();
+	virtual void stop();
+
+protected:
+	AudioComponent::ptr mAudio;
+	String mAudioStream;
 };
 
 }
 }
 
 #endif
-

@@ -26,8 +26,6 @@
 #ifndef TOADLET_TADPOLE_TEXTUREDATA_H
 #define TOADLET_TADPOLE_TEXTUREDATA_H
 
-#include <toadlet/tadpole/Types.h>
-#include <toadlet/egg/String.h>
 #include <toadlet/tadpole/ResourceData.h>
 
 namespace toadlet{
@@ -35,7 +33,7 @@ namespace tadpole{
 
 class TOADLET_API TextureData:public ResourceData{
 public:
-	TOADLET_SPTR(TextureData);
+	TOADLET_OBJECT(TextureData);
 
 	TextureData(int usage1){
 		usage=usage1;

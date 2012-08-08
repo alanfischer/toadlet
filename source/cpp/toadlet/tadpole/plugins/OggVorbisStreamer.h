@@ -38,7 +38,7 @@ public:
 
 	OggVorbisStreamer(AudioManager *audioManager):AudioStreamer(audioManager){}
 
-	AudioStream::ptr createAudioStream(Stream *stream){
+	AudioStream::ptr createAudioStream(Stream *stream,ResourceData *data){
 		OggVorbisDecoder::ptr audioStream=new OggVorbisDecoder();
 		if(audioStream->startStream(stream)==false){
 			audioStream=NULL;

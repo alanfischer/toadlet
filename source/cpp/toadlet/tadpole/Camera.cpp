@@ -412,8 +412,12 @@ void Camera::updateWorldTransform(){
 
 	Math::invert(mViewMatrix,mWorldMatrix);
 
-	// Update frustum planes
  	Math::mul(mViewProjectionMatrix,mFinalProjectionMatrix,mViewMatrix);
+
+	updateClippingPlanes();
+}
+
+void Camera::updateClippingPlanes(){
 	scalar *vpt=mViewProjectionMatrix.data;
 	// Right clipping plane.
 	Math::normalize(mClipPlanes[0].set(vpt[3]-vpt[0], vpt[7]-vpt[4], vpt[11]-vpt[8], vpt[15]-vpt[12]));

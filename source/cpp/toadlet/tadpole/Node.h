@@ -82,6 +82,7 @@ public:
 	virtual Action *getAction(const String &name);
 	virtual void startAction(const String &name);
 	virtual void stopAction(const String &name);
+	virtual void stopAllActions();
 	virtual bool getActionActive(const String &name);
 
 	virtual void lightAttached(LightComponent *light){mLights.add(light);}
