@@ -32,7 +32,7 @@
 namespace toadlet{
 namespace egg{
 
-class TOADLET_API Win32Thread{
+class TOADLET_API Win32Thread:public Runnable{
 public:
 	TOADLET_SPTR(Win32Thread);
 

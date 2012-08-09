@@ -26,7 +26,8 @@
 #ifndef TOADLET_EGG_POSIXTHREAD_H
 #define TOADLET_EGG_POSIXTHREAD_H
 
-#include <toadlet/egg/WeakPointer.h>
+#include <toadlet/egg/Runnable.h>
+#include <toadlet/egg/SharedPointer.h>
 #include <pthread.h>
 
 namespace toadlet{
