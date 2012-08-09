@@ -40,7 +40,9 @@ unsigned long WINAPI startThread(void *thread){
 Win32Thread::Win32Thread():
 	mRunner(NULL),
 	mThread(0)
-{}
+{
+	mRunner=this;
+}
 
 Win32Thread::Win32Thread(Runnable *r):
 	mRunner(NULL),
