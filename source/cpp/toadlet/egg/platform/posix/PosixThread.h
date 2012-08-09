@@ -33,7 +33,7 @@
 namespace toadlet{
 namespace egg{
 
-class PosixThread{
+class PosixThread:public Runnable{
 public:
 	TOADLET_SPTR(PosixThread);
 
