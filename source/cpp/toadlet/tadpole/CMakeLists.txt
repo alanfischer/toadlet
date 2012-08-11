@@ -199,6 +199,7 @@ set (TADPOLE_HEADERS
 	Camera.h
 	CameraComponent.h
 	Collision.h
+	CollisionListener.h
 	Colors.h
 	Component.h
 	ContextListener.h

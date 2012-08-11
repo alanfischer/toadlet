@@ -33,7 +33,7 @@
 namespace toadlet{
 namespace tadpole{
 
-class TOADLET_API HopComponent:public BaseComponent,public PhysicsComponent,public TraceCallback{
+class TOADLET_API HopComponent:public BaseComponent,public PhysicsComponent,public hop::CollisionListener,public hop::TraceCallback{
 public:
 	TOADLET_COMPONENT(HopComponent,PhysicsComponent);
 
@@ -42,6 +42,9 @@ public:
 	void destroy();
 
 	bool parentChanged(Node *node);
+
+	void addCollisionListener(tadpole::CollisionListener *listener){mListeners.add(listener);}
+	void removeCollisionListener(tadpole::CollisionListener *listener){mListeners.remove(listener);}
 
 	void setPosition(const Vector3 &position);
 	const Vector3 &getPosition() const{return mSolid->getPosition();}
@@ -60,8 +63,8 @@ public:
 
 	void setBound(Bound *bound);
 	void setTraceable(Traceable *traceable);
-	void addShape(Shape *shape);
-	void removeShape(Shape *shape);
+	void addShape(hop::Shape *shape);
+	void removeShape(hop::Shape *shape);
 
 	void transformChanged();
 
@@ -71,8 +74,11 @@ public:
 	bool getActive() const{return mSolid->active();}
 	Bound *getBound() const{return mBound;}
 
-	inline Solid *getSolid(){return mSolid;}
+	inline hop::Solid *getSolid(){return mSolid;}
 
+	// CollisionListener
+	void collision(const hop::Collision &c);
+	
 	// TraceCallback
 	void getBound(AABox &result);
 	void traceSegment(hop::Collision &result,const Vector3 &position,const Segment &segment);
@@ -87,12 +93,13 @@ protected:
 	void lerpPosition(scalar fraction);
 
 	HopManager *mManager;
-	Solid::ptr mSolid;
+	hop::Solid::ptr mSolid;
+	Collection<tadpole::CollisionListener*> mListeners;
 	Vector3 mOldPosition,mNewPosition,mCurrentPosition;
 	bool mSkipNextPreSimulate;
 	Bound::ptr mBound;
 	Traceable::ptr mTraceable;
-	Shape::ptr mTraceableShape;
+	hop::Shape::ptr mTraceableShape;
 };
 
 }

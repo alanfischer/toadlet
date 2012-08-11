@@ -77,6 +77,8 @@ public:
 	virtual int getNumNodes() const{return mNodes.size();}
 	virtual Node *getNode(int i) const{return mNodes[i];}
 
+	// Attached Interface methods
+	/// @todo: Replace these with finding Components by Interface, even if that Interface has to extend Component
 	virtual void actionAttached(Action *action);
 	virtual void actionRemoved(Action *action);
 	virtual Action *getAction(const String &name);
@@ -85,16 +87,18 @@ public:
 	virtual void stopAllActions();
 	virtual bool getActionActive(const String &name);
 
-	virtual void lightAttached(LightComponent *light){mLights.add(light);}
-	virtual void lightRemoved(LightComponent *light){mLights.remove(light);}
-
 	virtual void visibleAttached(Visible *visible){mVisibles.add(visible);}
 	virtual void visibleRemoved(Visible *visible){mVisibles.remove(visible);}
-
+	
+	// Attached Component methods
+	virtual void lightAttached(LightComponent *light){mLights.add(light);}
+	virtual void lightRemoved(LightComponent *light){mLights.remove(light);}
+	
 	virtual void physicsAttached(PhysicsComponent *physics){mPhysics=physics;}
 	virtual void physicsRemoved(PhysicsComponent *physics){mPhysics=NULL;}
 	virtual PhysicsComponent *getPhysics(){return mPhysics;}
 
+	// Spacial methods
 	virtual void mergeWorldBound(Node *child,bool justAttached);
 
 	virtual void setTranslate(const Vector3 &translate);
@@ -133,6 +137,7 @@ public:
 
 	virtual bool setProperty(const String &name,const String &value);
 
+	// Activation methods
 	virtual void setStayActive(bool active);
 	inline bool getStayActive() const{return mDeactivateCount<0;}
 	virtual void activate();
@@ -161,8 +166,8 @@ protected:
 	bool mActivateChildren;
 
 	Collection<Action*> mActions;
-	Collection<LightComponent*> mLights;
 	Collection<Visible*> mVisibles;
+	Collection<LightComponent*> mLights;
 	PhysicsComponent *mPhysics;
 
 	bool mActive;

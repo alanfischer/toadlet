@@ -33,7 +33,6 @@
 #include <toadlet/tadpole/sensor/BoundingVolumeSensor.h>
 
 namespace toadlet{
-using namespace hop;
 namespace tadpole{
 
 class HopComponent;
@@ -55,24 +54,24 @@ public:
 	void logicUpdate(int dt,int scope,HopComponent *component);
 	void frameUpdate(int dt,int scope);
 
-	Solid *getSolid(){return mSolid;}
+	hop::Solid *getSolid(){return mSolid;}
 
 	// Hop items
-	inline Simulator *getSimulator(){return mSimulator;}
+	inline hop::Simulator *getSimulator(){return mSimulator;}
 
 	void setTraceable(Traceable *traceable){mTraceable=traceable;}
-	int findSolidsInAABox(const AABox &box,Solid *solids[],int maxSolids);
+	int findSolidsInAABox(const AABox &box,hop::Solid *solids[],int maxSolids);
 	void traceSegment(hop::Collision &result,const Segment &segment,int collideWithBits);
-	void traceSolid(hop::Collision &result,Solid *solid,const Segment &segment,int collideWithBits);
+	void traceSolid(hop::Collision &result,hop::Solid *solid,const Segment &segment,int collideWithBits);
 	void preUpdate(int dt,scalar fdt){}
 	void postUpdate(int dt,scalar fdt){}
-	void preUpdate(Solid *solid,int dt,scalar fdt){}
-	void intraUpdate(Solid *solid,int dt,scalar fdt){}
-	bool collisionResponse(Solid *solid,Vector3 &position,Vector3 &remainder,hop::Collision &collision){return false;}
-	void postUpdate(Solid *solid,int dt,scalar fdt){}
+	void preUpdate(hop::Solid *solid,int dt,scalar fdt){}
+	void intraUpdate(hop::Solid *solid,int dt,scalar fdt){}
+	bool collisionResponse(hop::Solid *solid,Vector3 &position,Vector3 &remainder,hop::Collision &collision){return false;}
+	void postUpdate(hop::Solid *solid,int dt,scalar fdt){}
 
-	static void set(tadpole::Collision &r,const hop::Collision &c);
-	static void set(hop::Collision &r,const tadpole::Collision &c,Solid *collider,Solid *collidee);
+	static void set(Collision &r,const hop::Collision &c);
+	static void set(hop::Collision &r,const Collision &c,hop::Solid *collider,hop::Solid *collidee);
 
 protected:
 	class SolidSensorResults:public SensorResultsListener{
@@ -85,7 +84,7 @@ protected:
 			mCounter(0)
 		{}
 			
-		void setSolids(Solid *solids[],int maxSolids){
+		void setSolids(hop::Solid *solids[],int maxSolids){
 			mSolids=solids;
 			mMaxSolids=maxSolids;
 		}
@@ -99,15 +98,15 @@ protected:
 		void sensingEnding(){}
 
 	protected:
-		Solid **mSolids;
+		hop::Solid **mSolids;
 		int mMaxSolids;
 		int mCounter;
 	};
 
 	Scene::ptr mScene;
-	Simulator::ptr mSimulator;
+	hop::Simulator::ptr mSimulator;
 	Traceable *mTraceable;
-	Solid::ptr mSolid;
+	hop::Solid::ptr mSolid;
 
 	BoundingVolumeSensor::ptr mVolumeSensor;
 	SolidSensorResults::ptr mSensorResults;

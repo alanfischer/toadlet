@@ -29,6 +29,7 @@
 #include <toadlet/tadpole/Component.h>
 #include <toadlet/tadpole/Bound.h>
 #include <toadlet/tadpole/Traceable.h>
+#include <toadlet/tadpole/CollisionListener.h>
 
 namespace toadlet{
 namespace tadpole{
@@ -39,6 +40,9 @@ public:
 
 	virtual bool parentChanged(Node *node)=0;
 	virtual void transformChanged()=0;
+
+	virtual void addCollisionListener(CollisionListener *listener)=0;
+	virtual void removeCollisionListener(CollisionListener *listener)=0;
 
 	virtual void setBound(Bound *bound)=0;
 	virtual void setTraceable(Traceable *traceable)=0;
