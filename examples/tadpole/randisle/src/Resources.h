@@ -84,7 +84,7 @@ public:
 		creature=engine->getMeshManager()->findMesh("frog.tmsh");
 		if(creature!=NULL){
 			Transform transform;
-			transform.setTranslate(0,0,-3.5);
+			transform.setTranslate(0,0,-2.0);
 			transform.setRotate(Math::Z_UNIT_VECTOR3,Math::PI);
 			creature->setTransform(transform);
 		}

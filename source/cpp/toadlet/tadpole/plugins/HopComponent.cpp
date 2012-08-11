@@ -39,9 +39,9 @@ HopComponent::HopComponent(HopManager *manager):
 {
 	mManager=manager;
 
-	mSolid=new Solid();
+	mSolid=new hop::Solid();
 	mSolid->setUserData(this);
-//	mSolid->setCollisionListener(this);
+	mSolid->setCollisionListener(this);
 
 	mManager->getSimulator()->addSolid(mSolid);
 
@@ -77,12 +77,12 @@ void HopComponent::setPosition(const Vector3 &position){
 
 void HopComponent::setBound(Bound *bound){
 	mSolid->removeAllShapes();
-	Shape *shape=NULL;
+	hop::Shape *shape=NULL;
 	if(bound->getType()==Bound::Type_AABOX){
-		shape=new Shape(bound->getAABox());
+		shape=new hop::Shape(bound->getAABox());
 	}
 	else if(bound->getType()==Bound::Type_SPHERE){
-		shape=new Shape(bound->getSphere());
+		shape=new hop::Shape(bound->getSphere());
 	}
 	if(shape!=NULL){
 		mSolid->addShape(shape);
@@ -98,16 +98,16 @@ void HopComponent::setTraceable(Traceable *traceable){
 	mTraceable=traceable;
 
 	if(mTraceable!=NULL){
-		mTraceableShape=new Shape(this);
+		mTraceableShape=new hop::Shape(this);
 		addShape(mTraceableShape);
 	}
 }
 
-void HopComponent::addShape(Shape *shape){
+void HopComponent::addShape(hop::Shape *shape){
 	mSolid->addShape(shape);
 }
 
-void HopComponent::removeShape(Shape *shape){
+void HopComponent::removeShape(hop::Shape *shape){
 	mSolid->removeShape(shape);
 }
 
@@ -154,6 +154,15 @@ void HopComponent::transformChanged(){
 	}
 }
 
+void HopComponent::collision(const hop::Collision &c){
+	Collision collision;
+	HopManager::set(collision,c);
+	int i;
+	for(i=0;i<mListeners.size();++i){
+		mListeners[i]->collision(collision);
+	}
+}
+
 void HopComponent::getBound(AABox &result){
 	if(mTraceable!=NULL){
 		result.set(mTraceable->getTraceableBound()->getAABox());
@@ -190,12 +199,6 @@ void HopComponent::traceSolid(hop::Collision &result,hop::Solid *solid,const Vec
 		HopManager::set(result,collision,mSolid,solid);
 	}
 }
-/*
-void HopComponent::collision(const hop::Collision &c){
-	tadpole::Collision collision;
-	HopScene::set(collision,c);
-	touch(collision);
-}
-*/
+
 }
 }

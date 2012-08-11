@@ -517,7 +517,7 @@ bool TerrainPatchComponent::stitchToBottom(TerrainPatchComponent *terrain,bool r
 
 		Vertex *ttv=tt->vertexAt(x,mSize-1);
 		if(x<mSize){
-			ttv->normal.set(ttv->height-tt->vertexAt(x,mSize)->height,ttv->height-tt->vertexAt(x+1,mSize-1)->height,Math::ONE);
+			ttv->normal.set(ttv->height-tt->vertexAt(x+1,mSize-1)->height,ttv->height-tt->vertexAt(x,mSize)->height,Math::ONE);
 			Math::normalize(ttv->normal);
 		}
 

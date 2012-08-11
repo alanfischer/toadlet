@@ -137,31 +137,33 @@ void RandIsle::create(){
 			physics->setPosition(result.point);
 		}
 		mPlayer->attach(physics);
+
+		MeshComponent *mesh=new MeshComponent(mEngine);
+		if(Resources::instance->creature!=NULL){
+			mesh->setMesh(Resources::instance->creature);
+		}
+		mPlayer->attach(mesh);
+
+		AnimationActionComponent *jumpAction=new AnimationActionComponent("jump");
+		{
+			jumpAction->attach(new MeshAnimation(mesh,1));
+			jumpAction->setCycling(AnimationActionComponent::Cycling_LOOP);
+			jumpAction->setStopGently(true);
+		}
+		mPlayer->attach(jumpAction);
+
+		Node::ptr shadow=new Node(mScene);
+		{
+			MeshComponent *shadowMesh=new MeshComponent(mEngine);
+			if(Resources::instance->shadow!=NULL){
+				shadowMesh->setMesh(Resources::instance->shadow);
+			}
+			shadow->attach(shadowMesh);
+			shadow->attach(new GroundProjector(mPlayer,20,0));
+		}
+		mPlayer->attach(shadow);
 	}
  	mScene->getRoot()->attach(mPlayer);
-
-	MeshComponent::ptr playerMesh=new MeshComponent(mEngine);
-	if(Resources::instance->creature!=NULL){
-		playerMesh->setMesh(Resources::instance->creature);
-	}
-	mPlayer->attach(playerMesh);
-
-	AnimationActionComponent::ptr jumpAction=new AnimationActionComponent("jump");
-	jumpAction->attach(new MeshAnimation(playerMesh,1));
-	jumpAction->setCycling(AnimationActionComponent::Cycling_LOOP);
-	jumpAction->setStopGently(true);
-	mPlayer->attach(jumpAction);
-
-	Node::ptr shadow=new Node(mScene);
-	{
-		MeshComponent::ptr shadowMesh=new MeshComponent(mEngine);
-		if(Resources::instance->shadow!=NULL){
-			shadowMesh->setMesh(Resources::instance->shadow);
-		}
-		shadow->attach(shadowMesh);
-		shadow->attach(new GroundProjector(mPlayer,20,0));
-	}
-	mPlayer->attach(shadow);
 
 	mTerrain->setTarget(mPlayer);
 

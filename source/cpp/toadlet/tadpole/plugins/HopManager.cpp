@@ -41,10 +41,10 @@ HopManager::HopManager(Scene *scene):
 {
 	mScene=scene;
 
-	mSimulator=new Simulator();
+	mSimulator=new hop::Simulator();
 	mSimulator->setManager(this);
 
-	mSolid=new Solid();
+	mSolid=new hop::Solid();
 	mSolid->setCoefficientOfGravity(0);
 	mSolid->setInfiniteMass();
 
@@ -59,7 +59,7 @@ PhysicsComponent *HopManager::createPhysicsComponent(){
 void HopManager::traceSegment(Collision &result,const Segment &segment,int collideWithBits,Node *ignore){
 	result.reset();
 
-	Solid *ignoreSolid=NULL;
+	hop::Solid *ignoreSolid=NULL;
 	if(ignore!=NULL && ignore->getPhysics()!=NULL){
 		ignoreSolid=((HopComponent*)ignore->getPhysics())->getSolid();
 	}
@@ -72,7 +72,7 @@ void HopManager::traceSegment(Collision &result,const Segment &segment,int colli
 void HopManager::traceNode(Collision &result,Node *node,const Segment &segment,int collideWithBits){
 	result.reset();
 
-	Solid *solid=NULL;
+	hop::Solid *solid=NULL;
 	if(node!=NULL && node->getPhysics()!=NULL){
 		solid=((HopComponent*)node->getPhysics())->getSolid();
 	}
@@ -85,7 +85,7 @@ void HopManager::traceNode(Collision &result,Node *node,const Segment &segment,i
 void HopManager::testNode(Collision &result,Node *node1,const Segment &segment,Node *node2){
 	result.reset();
 
-	Solid *solid1=NULL,*solid2=NULL;
+	hop::Solid *solid1=NULL,*solid2=NULL;
 	if(node1!=NULL && node1->getPhysics()!=NULL){
 		solid1=((HopComponent*)node1->getPhysics())->getSolid();
 	}
@@ -111,7 +111,7 @@ void HopManager::logicUpdate(int dt,int scope,HopComponent *component){
 	else{
 		int i;
 		for(i=mSimulator->getNumSolids()-1;i>=0;--i){
-			Solid *solid=mSimulator->getSolid(i);
+			hop::Solid *solid=mSimulator->getSolid(i);
 			HopComponent *component=(HopComponent*)(solid->getUserData());
 			component->preSimulate();
 		}
@@ -121,7 +121,7 @@ void HopManager::logicUpdate(int dt,int scope,HopComponent *component){
 		TOADLET_PROFILE_ENDSECTION(Simulator::update);
 
 		for(i=mSimulator->getNumSolids()-1;i>=0;--i){
-			Solid *solid=mSimulator->getSolid(i);
+			hop::Solid *solid=mSimulator->getSolid(i);
 			HopComponent *component=(HopComponent*)(solid->getUserData());
 			component->postSimulate();
 		}
@@ -131,7 +131,7 @@ void HopManager::logicUpdate(int dt,int scope,HopComponent *component){
 void HopManager::frameUpdate(int dt,int scope){
 	int i;
 	for(i=mSimulator->getNumSolids()-1;i>=0;--i){
-		Solid *solid=mSimulator->getSolid(i);
+		hop::Solid *solid=mSimulator->getSolid(i);
 		if(solid->active()){
 			HopComponent *component=(HopComponent*)(solid->getUserData());
 			component->lerpPosition(mScene->getLogicFraction());
@@ -139,7 +139,7 @@ void HopManager::frameUpdate(int dt,int scope){
 	}
 }
 
-int HopManager::findSolidsInAABox(const AABox &box,Solid *solids[],int maxSolids){
+int HopManager::findSolidsInAABox(const AABox &box,hop::Solid *solids[],int maxSolids){
 	mSensorResults->setSolids(solids,maxSolids);
 	mVolumeSensor->setBox(box);
 	mVolumeSensor->sense(mSensorResults);
@@ -148,7 +148,7 @@ int HopManager::findSolidsInAABox(const AABox &box,Solid *solids[],int maxSolids
 
 void HopManager::traceSegment(hop::Collision &result,const Segment &segment,int collideWithBits){
 	if(mTraceable!=NULL && (collideWithBits&mSolid->getCollisionBits())!=0){
-		tadpole::Collision collision;
+		Collision collision;
 		mTraceable->traceSegment(collision,Math::ZERO_VECTOR3,segment,Math::ZERO_VECTOR3);
 		set(result,collision,NULL,NULL);
 		result.collider=mSolid;
@@ -157,8 +157,8 @@ void HopManager::traceSegment(hop::Collision &result,const Segment &segment,int 
 
 void HopManager::traceSolid(hop::Collision &result,hop::Solid *solid,const Segment &segment,int collideWithBits){
 	// Only trace shapes that aren't a callback
-	if(mTraceable!=NULL && (collideWithBits&mSolid->getCollisionBits())!=0 && (solid->getShapeTypes()&Shape::Type_CALLBACK)==0){
-		tadpole::Collision collision;
+	if(mTraceable!=NULL && (collideWithBits&mSolid->getCollisionBits())!=0 && (solid->getShapeTypes()&hop::Shape::Type_CALLBACK)==0){
+		Collision collision;
 		const AABox &bound=solid->getLocalBound();
 		Vector3 size;
 		Math::sub(size,bound.maxs,bound.mins);
@@ -168,7 +168,7 @@ void HopManager::traceSolid(hop::Collision &result,hop::Solid *solid,const Segme
 	}
 }
 
-void HopManager::set(tadpole::Collision &r,const hop::Collision &c){
+void HopManager::set(Collision &r,const hop::Collision &c){
 	r.time=c.time;
 	r.point.set(c.point);
 	r.normal.set(c.normal);
@@ -176,7 +176,7 @@ void HopManager::set(tadpole::Collision &r,const hop::Collision &c){
 	r.scope=c.scope;
 }
 
-void HopManager::set(hop::Collision &r,const tadpole::Collision &c,Solid *collider,Solid *collidee){
+void HopManager::set(hop::Collision &r,const Collision &c,hop::Solid *collider,hop::Solid *collidee){
 	r.time=c.time;
 	r.point.set(c.point);
 	r.normal.set(c.normal);
