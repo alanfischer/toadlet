@@ -23,14 +23,14 @@
  *
  ********** Copyright header - do not remove **********/
 
-#include <toadlet/tadpole/AnimationActionComponent.h>
+#include <toadlet/tadpole/AnimationAction.h>
 #include <toadlet/tadpole/Node.h>
 
 namespace toadlet{
 namespace tadpole{
 
-AnimationActionComponent::AnimationActionComponent(const String &name):BaseComponent(name),
-	mListener(NULL),
+AnimationAction::AnimationAction(Animation *animation):
+	//mListeners,
 	mTime(0),
 	mMinValue(0),
 	mMaxValue(0),
@@ -43,75 +43,65 @@ AnimationActionComponent::AnimationActionComponent(const String &name):BaseCompo
 	//mInterpolator,
 	mTimeScale(Math::ONE),
 	mRunning(false)
-{}
-
-AnimationActionComponent::~AnimationActionComponent(){
+{
+	if(animation!=NULL){
+		attach(animation);
+	}
 }
 
-bool AnimationActionComponent::parentChanged(Node *node){
-	if(mParent!=NULL){
-		mParent->actionRemoved(this);
-	}
-
-	BaseComponent::parentChanged(node);
-	
-	if(mParent!=NULL){
-		mParent->actionAttached(this);
-	}
-
-	return true;
+AnimationAction::~AnimationAction(){
 }
 
-void AnimationActionComponent::setTime(int time){
+void AnimationAction::setTime(int time){
 	mTime=time;
 
 	setValue(Math::fromMilli(mTime));
 }
 
-void AnimationActionComponent::setCycling(Cycling cycling){
+void AnimationAction::setCycling(Cycling cycling){
 	mCycling=cycling;
 }
 
-void AnimationActionComponent::setInterpolator(Interpolator *interpolator){
+void AnimationAction::setInterpolator(Interpolator *interpolator){
 	mInterpolator=interpolator;
 }
 
-void AnimationActionComponent::setTimeScale(scalar scale){
+void AnimationAction::setTimeScale(scalar scale){
 	mTimeScale=scale;
 }
 
-void AnimationActionComponent::start(){
-	if(mParent!=NULL){
-		mParent->activate();
-	}
-
-	mRunning=true;
-
+void AnimationAction::start(){
 	if(mResetOnStart){
 		mTime=0;
 	}
 
 	mActualCycling=mCycling;
 
-	if(mListener!=NULL){
-		mListener->actionStarted(this);
+	mRunning=true;
+
+	int i;
+	for(i=0;i<mListeners.size();++i){
+		mListeners[i]->actionStarted(this);
 	}
 }
 
-void AnimationActionComponent::stop(){
+void AnimationAction::stop(){
 	if(mStopGently){
 		mActualCycling=Cycling_NONE;
 		return;
 	}
 
-	if(mListener!=NULL){
-		mListener->actionStopped(this);
-	}
-
 	mRunning=false;
+
+	int i;
+	for(i=0;i<mListeners.size();++i){
+		mListeners[i]->actionStopped(this);
+	}
 }
 
-void AnimationActionComponent::frameUpdate(int dt,int scope){
+void AnimationAction::update(int dt){
+	int i;
+
 	if(mRunning==false){
 		return;
 	}
@@ -124,26 +114,18 @@ void AnimationActionComponent::frameUpdate(int dt,int scope){
 
 			setValue(Math::fromMilli(mTime));
 
-			if(mListener!=NULL){
-				mListener->actionStopped(this);
-			}
-
 			if(mActualCycling==Cycling_LOOP){
-				if(mListener!=NULL){
-					mListener->actionStarted(this);
-				}
-
 				mTime=0;
 			}
 			else if(mActualCycling==Cycling_REFLECT){
-				if(mListener!=NULL){
-					mListener->actionStarted(this);
-				}
-
 				mTimeScale*=-1;
 			}
 			else{
 				mRunning=false;
+
+				for(i=0;i<mListeners.size();++i){
+					mListeners[i]->actionStopped(this);
+				}
 			}
 		}
 		else{
@@ -158,26 +140,18 @@ void AnimationActionComponent::frameUpdate(int dt,int scope){
 
 			setValue(Math::fromMilli(0));
 
-			if(mListener!=NULL){
-				mListener->actionStopped(this);
-			}
-
 			if(mActualCycling==Cycling_LOOP){
-				if(mListener!=NULL){
-					mListener->actionStarted(this);
-				}
-
 				mTime=mMaxTime;
 			}
 			else if(mActualCycling==Cycling_REFLECT){
-				if(mListener!=NULL){
-					mListener->actionStarted(this);
-				}
-
 				mTimeScale*=-1;
 			}
 			else{
 				mRunning=false;
+
+				for(i=0;i<mListeners.size();++i){
+					mListeners[i]->actionStopped(this);
+				}
 			}
 		}
 		else{
@@ -186,7 +160,7 @@ void AnimationActionComponent::frameUpdate(int dt,int scope){
 	}
 }
 
-void AnimationActionComponent::setValue(scalar value){
+void AnimationAction::setValue(scalar value){
 	if(mInterpolator!=NULL){
 		value=Math::div(value-mMinValue,mMaxValue-mMinValue);
 		value=mInterpolator->interpolate(value);
@@ -199,7 +173,7 @@ void AnimationActionComponent::setValue(scalar value){
 	}
 }
 
-void AnimationActionComponent::attach(Animation *animation){
+void AnimationAction::attach(Animation *animation){
 	mAnimations.add(animation);
 
 	animation->setAnimationListener(this);
@@ -207,7 +181,7 @@ void AnimationActionComponent::attach(Animation *animation){
 	animationExtentsChanged(animation);
 }
 
-void AnimationActionComponent::remove(Animation *animation){
+void AnimationAction::remove(Animation *animation){
 	animation->setAnimationListener(NULL);
 
 	mAnimations.remove(animation);
@@ -215,7 +189,7 @@ void AnimationActionComponent::remove(Animation *animation){
 	animationExtentsChanged(NULL);
 }
 
-void AnimationActionComponent::animationExtentsChanged(Animation *animation){
+void AnimationAction::animationExtentsChanged(Animation *animation){
 	mMinValue=0;
 	mMaxValue=0;
 

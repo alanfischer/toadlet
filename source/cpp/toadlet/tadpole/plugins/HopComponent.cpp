@@ -155,7 +155,7 @@ void HopComponent::transformChanged(){
 }
 
 void HopComponent::collision(const hop::Collision &c){
-	Collision collision;
+	PhysicsCollision collision;
 	HopManager::set(collision,c);
 	int i;
 	for(i=0;i<mListeners.size();++i){
@@ -171,7 +171,7 @@ void HopComponent::getBound(AABox &result){
 
 void HopComponent::traceSegment(hop::Collision &result,const Vector3 &position,const Segment &segment){
 	if(mTraceable!=NULL){
-		tadpole::Collision collision;
+		PhysicsCollision collision;
 		mTraceable->traceSegment(collision,position,segment,Math::ZERO_VECTOR3);
 		HopManager::set(result,collision,mSolid,NULL);
 	}
@@ -179,7 +179,7 @@ void HopComponent::traceSegment(hop::Collision &result,const Vector3 &position,c
 
 void HopComponent::traceSolid(hop::Collision &result,hop::Solid *solid,const Vector3 &position,const Segment &segment){
 	if(mTraceable!=NULL){
-		tadpole::Collision collision;
+		PhysicsCollision collision;
 		const AABox &bound=solid->getLocalBound();
 
 		Vector3 size;

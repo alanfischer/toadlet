@@ -29,8 +29,8 @@
 #include <toadlet/egg/BaseResource.h>
 #include <toadlet/egg/Logger.h>
 #include <toadlet/tadpole/bsp/BSP30Types.h>
-#include <toadlet/tadpole/Collision.h>
 #include <toadlet/tadpole/Engine.h>
+#include <toadlet/tadpole/PhysicsCollision.h>
 #include <toadlet/tadpole/TextureManager.h>
 #include <toadlet/tadpole/material/Material.h>
 
@@ -48,7 +48,7 @@ public:
 	BSP30Map(Engine *engine);	
 	void destroy();
 
-	int modelCollisionTrace(Collision &result,int model,const Vector3 &size,const Vector3 &start,const Vector3 &end);
+	int modelCollisionTrace(PhysicsCollision &result,int model,const Vector3 &size,const Vector3 &start,const Vector3 &end);
 	bool modelLightTrace(Vector4 &result,int model,const Vector3 &start,const Vector3 &end);
 	void findSurfaceExtents(bface *face,int *mins,int *maxs);
 
@@ -61,7 +61,7 @@ public:
 	void renderFaces(RenderDevice *renderDevice,facedata *faces);
 
 	static int findPointLeaf(bplane *planes,void *hull,int hullStride,int index,const Vector3 &point);
-	static bool hullTrace(Collision &result,bplane *planes,bleaf *leafs,void *hull,int hullStride,int index,scalar p1t,scalar p2t,const Vector3 &p1,const Vector3 &p2,scalar epsilon,int stopContentsBits,int *lastIndex);
+	static bool hullTrace(PhysicsCollision &result,bplane *planes,bleaf *leafs,void *hull,int hullStride,int index,scalar p1t,scalar p2t,const Vector3 &p1,const Vector3 &p2,scalar epsilon,int stopContentsBits,int *lastIndex);
 	static void findBoundLeafs(Collection<int> &leafs,bnode *hull,int index,const AABox &box);
 
 	static bool testIntersection(bnode *node,const AABox &box){

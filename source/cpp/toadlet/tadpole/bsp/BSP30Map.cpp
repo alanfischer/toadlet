@@ -90,7 +90,7 @@ void BSP30Map::destroy(){
 	lightmapDatas.clear();
 }
 
-int BSP30Map::modelCollisionTrace(Collision &result,int model,const Vector3 &size,const Vector3 &start,const Vector3 &end){
+int BSP30Map::modelCollisionTrace(PhysicsCollision &result,int model,const Vector3 &size,const Vector3 &start,const Vector3 &end){
 	int hullIndex=0;
 	if(header.version==Q1BSPVERSION){
 		if(size[0]<3){
@@ -145,7 +145,7 @@ bool BSP30Map::modelLightTrace(Vector4 &result,int model,const Vector3 &start,co
 		return false;
 	}
 
-	Collision collision;
+	PhysicsCollision collision;
 	int lastNode=-1;
 	hullTrace(collision,planes,leafs,nodes,sizeof(bnode),headNode,0,Math::ONE,start,end,0.03125,(-1-CONTENTS_SOLID)<<1,&lastNode);
 	if(lastNode>=0){
@@ -340,7 +340,7 @@ int BSP30Map::findPointLeaf(bplane *planes,void *hull,int hullStride,int index,c
 	return -1-index;
 }
 
-bool BSP30Map::hullTrace(Collision &result,bplane *planes,bleaf *leafs,void *hull,int hullStride,int index,scalar p1t,scalar p2t,const Vector3 &p1,const Vector3 &p2,scalar epsilon,int stopContentsBits,int *lastIndex){
+bool BSP30Map::hullTrace(PhysicsCollision &result,bplane *planes,bleaf *leafs,void *hull,int hullStride,int index,scalar p1t,scalar p2t,const Vector3 &p1,const Vector3 &p2,scalar epsilon,int stopContentsBits,int *lastIndex){
 	bclipnode *node=NULL;
 	bplane *plane=NULL;
 	scalar t1=0,t2=0;

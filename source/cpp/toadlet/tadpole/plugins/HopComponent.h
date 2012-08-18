@@ -43,8 +43,8 @@ public:
 
 	bool parentChanged(Node *node);
 
-	void addCollisionListener(tadpole::CollisionListener *listener){mListeners.add(listener);}
-	void removeCollisionListener(tadpole::CollisionListener *listener){mListeners.remove(listener);}
+	void addCollisionListener(PhysicsCollisionListener *listener){mListeners.add(listener);}
+	void removeCollisionListener(PhysicsCollisionListener *listener){mListeners.remove(listener);}
 
 	void setPosition(const Vector3 &position);
 	const Vector3 &getPosition() const{return mSolid->getPosition();}
@@ -94,7 +94,7 @@ protected:
 
 	HopManager *mManager;
 	hop::Solid::ptr mSolid;
-	Collection<tadpole::CollisionListener*> mListeners;
+	Collection<PhysicsCollisionListener*> mListeners;
 	Vector3 mOldPosition,mNewPosition,mCurrentPosition;
 	bool mSkipNextPreSimulate;
 	Bound::ptr mBound;

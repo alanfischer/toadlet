@@ -23,24 +23,51 @@
  *
  ********** Copyright header - do not remove **********/
 
-#ifndef TOADLET_TADPOLE_CONTEXTLISTENER_H
-#define TOADLET_TADPOLE_CONTEXTLISTENER_H
+#ifndef TOADLET_TADPOLE_PHYSICSCOLLISION_H
+#define TOADLET_TADPOLE_PHYSICSCOLLISION_H
 
 #include <toadlet/tadpole/Types.h>
 
 namespace toadlet{
-namespace peeper{class RenderDevice;}
 namespace tadpole{
 
-class ContextListener{
+class Node;
+
+class PhysicsCollision{
 public:
-	virtual void preContextReset(RenderDevice *renderDevice)=0;
-	virtual void postContextReset(RenderDevice *renderDevice)=0;
-	
-	virtual void preContextActivate(RenderDevice *renderDevice)=0;
-	virtual void postContextActivate(RenderDevice *renderDevice)=0;
-	virtual void preContextDeactivate(RenderDevice *renderDevice)=0;
-	virtual void postContextDeactivate(RenderDevice *renderDevice)=0;
+	PhysicsCollision():
+		time(Math::ONE),
+		//point,
+		//normal,
+		collider(NULL),
+		scope(0),
+		index(0)
+	{}
+
+	inline void set(const PhysicsCollision &c){
+		time=c.time;
+		point.set(c.point);
+		normal.set(c.normal);
+		collider=c.collider;
+		scope=c.scope;
+		index=c.index;
+	}
+
+	inline void reset(){
+		time=Math::ONE;
+		point.set(Math::ZERO_VECTOR3);
+		normal.set(Math::ZERO_VECTOR3);
+		collider=NULL;
+		scope=0;
+		index=0;
+	}
+
+	scalar time;
+	Vector3 point; // This is the point at which the tracing node would stop
+	Vector3 normal;
+	Node *collider; // The node that blocked the trace
+	int scope; // The OR'd scope of the collision point
+	int index; // A sub index of which part of the node was hit
 };
 
 }

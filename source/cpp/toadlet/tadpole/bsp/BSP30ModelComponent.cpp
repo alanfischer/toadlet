@@ -190,7 +190,7 @@ void BSP30ModelComponent::gatherRenderables(Camera*camera,RenderableSet *set){
 	}
 }
 
-void BSP30ModelComponent::traceSegment(Collision &result,const Vector3 &position,const Segment &segment,const Vector3 &size){
+void BSP30ModelComponent::traceSegment(PhysicsCollision &result,const Vector3 &position,const Segment &segment,const Vector3 &size){
 	Segment localSegment=segment;
 	Transform transform;
 

@@ -44,7 +44,7 @@ class Engine;
 class RenderableSet;
 class Scene;
 class Camera;
-class Action;
+class ActionComponent;
 class LightComponent;
 class Visible;
 class PhysicsComponent;
@@ -79,9 +79,9 @@ public:
 
 	// Attached Interface methods
 	/// @todo: Replace these with finding Components by Interface, even if that Interface has to extend Component
-	virtual void actionAttached(Action *action);
-	virtual void actionRemoved(Action *action);
-	virtual Action *getAction(const String &name);
+	virtual void actionAttached(ActionComponent *action);
+	virtual void actionRemoved(ActionComponent *action);
+	virtual ActionComponent *getAction(const String &name);
 	virtual void startAction(const String &name);
 	virtual void stopAction(const String &name);
 	virtual void stopAllActions();
@@ -165,7 +165,7 @@ protected:
 	bool mChildrenActive;
 	bool mActivateChildren;
 
-	Collection<Action*> mActions;
+	Collection<ActionComponent*> mActions;
 	Collection<Visible*> mVisibles;
 	Collection<LightComponent*> mLights;
 	PhysicsComponent *mPhysics;

@@ -132,9 +132,9 @@ public:
 
 	// Traceable
 	Bound *getTraceableBound() const{return mBound;}
-	void traceSegment(Collision &result,const Vector3 &position,const Segment &segment,const Vector3 &size);
-	void traceLocalSegment(Collision &result,const Segment &segment,scalar epsilon,scalar cellEpsilon);
-	bool traceCell(Collision &result,int x,int y,const Segment &segment,scalar epsilon,scalar cellEpsilon);
+	void traceSegment(PhysicsCollision &result,const Vector3 &position,const Segment &segment,const Vector3 &size);
+	void traceLocalSegment(PhysicsCollision &result,const Segment &segment,scalar epsilon,scalar cellEpsilon);
+	bool traceCell(PhysicsCollision &result,int x,int y,const Segment &segment,scalar epsilon,scalar cellEpsilon);
 
 protected:
 	/// @todo: Could be replaced by a Mesh for the Water & the Terrain
@@ -262,9 +262,11 @@ protected:
 	Transform mWaterWorldTransform;
 	Material::ptr mWaterMaterial;
 	VertexBuffer::ptr mWaterVertexBuffer;
-	IndexBuffer::ptr mWaterIndexBuffer;
 	VertexData::ptr mWaterVertexData;
+
+	IndexBuffer::ptr mWaterIndexBuffer;
 	IndexData::ptr mWaterIndexData;
+
 	WaterRenderable::ptr mWaterRenderable;
 	friend class WaterRenderable;
 };

@@ -132,8 +132,6 @@ public:
 
 	void updateLocalBound();
 
-	String name;
-
 protected:
 	void internal_setSimulator(Simulator *s);
 	void internal_addConstraint(Constraint *constraint){mConstraints.add(constraint);}

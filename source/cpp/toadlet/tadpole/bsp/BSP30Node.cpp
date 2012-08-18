@@ -385,7 +385,7 @@ bool BSP30Node::findAmbientForPoint(Vector4 &r,const Vector3 &point){
 	return false;
 }
 
-void BSP30Node::traceSegment(Collision &result,const Vector3 &position,const Segment &segment,const Vector3 &size){
+void BSP30Node::traceSegment(PhysicsCollision &result,const Vector3 &position,const Segment &segment,const Vector3 &size){
 	Segment localSegment=segment;
 	Transform transform;
 

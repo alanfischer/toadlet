@@ -89,7 +89,7 @@ public:
 
 	// Traceable
 	Bound *getTraceableBound() const{return mBound;}
-	void traceSegment(Collision &result,const Vector3 &position,const Segment &segment,const Vector3 &size);
+	void traceSegment(PhysicsCollision &result,const Vector3 &position,const Segment &segment,const Vector3 &size);
 
 protected:
 	Engine *mEngine;

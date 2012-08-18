@@ -27,12 +27,12 @@
 #define TOADLET_TADPOLE_SCENE_H
 
 #include <toadlet/peeper/RenderTarget.h>
-#include <toadlet/tadpole/Collision.h>
 #include <toadlet/tadpole/ContextListener.h>
 #include <toadlet/tadpole/Engine.h>
 #include <toadlet/tadpole/Mesh.h>
 #include <toadlet/tadpole/RenderableSet.h>
 #include <toadlet/tadpole/RenderManager.h>
+#include <toadlet/tadpole/PhysicsCollision.h>
 #include <toadlet/tadpole/PhysicsManager.h>
 #include <toadlet/tadpole/UpdateListener.h>
 #include <toadlet/tadpole/PartitionNode.h>
@@ -91,7 +91,7 @@ public:
 
 	virtual void render(RenderDevice *renderDevice,Camera *camera,Node *node=NULL);
 
-	virtual void traceSegment(Collision &result,const Segment &segment,int collideWithBits=-1,Node *ignore=NULL);
+	virtual void traceSegment(PhysicsCollision &result,const Segment &segment,int collideWithBits=-1,Node *ignore=NULL);
 
 	virtual void destroy(Component *component);
 

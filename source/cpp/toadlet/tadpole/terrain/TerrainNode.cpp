@@ -251,10 +251,10 @@ void TerrainNode::logicUpdate(int dt,int scope){
 	updateTarget();
 }
 
-void TerrainNode::traceSegment(Collision &result,const Vector3 &position,const Segment &segment,const Vector3 &size){
+void TerrainNode::traceSegment(PhysicsCollision &result,const Vector3 &position,const Segment &segment,const Vector3 &size){
 	result.time=Math::ONE;
 
-	Collision r;
+	PhysicsCollision r;
 	int i;
 	for(i=0;i<mPatchGrid.size();++i){
 		r.reset();

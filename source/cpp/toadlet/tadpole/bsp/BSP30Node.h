@@ -73,7 +73,7 @@ public:
 
 	// Traceable items
 	Bound *getTraceableBound() const{return Node::getBound();}
-	void traceSegment(Collision &result,const Vector3 &position,const Segment &segment,const Vector3 &size);
+	void traceSegment(PhysicsCollision &result,const Vector3 &position,const Segment &segment,const Vector3 &size);
 
 	// Renderable items
 	Material *getRenderMaterial() const{return NULL;}
