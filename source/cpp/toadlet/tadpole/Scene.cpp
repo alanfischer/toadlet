@@ -245,7 +245,7 @@ void Scene::render(RenderDevice *device,Camera *camera,Node *node){
 	mRenderManager->renderScene(device,node,camera);
 }
 
-void Scene::traceSegment(Collision &result,const Segment &segment,int collideWithBits,Node *ignore){
+void Scene::traceSegment(PhysicsCollision &result,const Segment &segment,int collideWithBits,Node *ignore){
 	result.time=Math::ONE;
 	if(mPhysicsManager!=NULL){
 		mPhysicsManager->traceSegment(result,segment,collideWithBits,ignore);

@@ -102,7 +102,7 @@ public:
 
 	// Traceable
 	Bound *getTraceableBound() const{return Node::getBound();}
-	void traceSegment(Collision &result,const Vector3 &position,const Segment &segment,const Vector3 &size);
+	void traceSegment(PhysicsCollision &result,const Vector3 &position,const Segment &segment,const Vector3 &size);
 
 	void updateTarget();
 	void createPatch(int x,int y);

@@ -28,7 +28,7 @@
 
 #include <toadlet/tadpole/Types.h>
 #include <toadlet/tadpole/Bound.h>
-#include <toadlet/tadpole/Collision.h>
+#include <toadlet/tadpole/PhysicsCollision.h>
 
 namespace toadlet{
 namespace tadpole{
@@ -40,7 +40,7 @@ public:
 	virtual ~Traceable(){}
 
 	virtual Bound *getTraceableBound() const=0;
-	virtual void traceSegment(Collision &result,const Vector3 &position,const Segment &segment,const Vector3 &size)=0;
+	virtual void traceSegment(PhysicsCollision &result,const Vector3 &position,const Segment &segment,const Vector3 &size)=0;
 };
 
 }

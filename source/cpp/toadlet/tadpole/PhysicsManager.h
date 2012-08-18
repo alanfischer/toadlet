@@ -27,7 +27,7 @@
 #define TOADLET_TADPOLE_PHYSICSMANAGER_H
 
 #include <toadlet/tadpole/Types.h>
-#include <toadlet/tadpole/Collision.h>
+#include <toadlet/tadpole/PhysicsCollision.h>
 
 namespace toadlet{
 namespace tadpole{
@@ -40,7 +40,7 @@ public:
 
 	virtual PhysicsComponent *createPhysicsComponent()=0;
 	
-	virtual void traceSegment(Collision &result,const Segment &segment,int collideWithBits,Node *ignore)=0;
+	virtual void traceSegment(PhysicsCollision &result,const Segment &segment,int collideWithBits,Node *ignore)=0;
 
 	virtual void logicUpdate(int dt,int scope)=0;
 	virtual void frameUpdate(int dt,int scope)=0;

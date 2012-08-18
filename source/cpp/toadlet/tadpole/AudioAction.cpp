@@ -23,45 +23,59 @@
  *
  ********** Copyright header - do not remove **********/
 
-#ifndef TOADLET_TADPOLE_AUDIOACTIONCOMPONENT_H
-#define TOADLET_TADPOLE_AUDIOACTIONCOMPONENT_H
-
-#include <toadlet/egg/Collection.h>
-#include <toadlet/tadpole/Action.h>
-#include <toadlet/tadpole/BaseComponent.h>
-#include <toadlet/tadpole/AudioComponent.h>
+#include <toadlet/tadpole/AudioAction.h>
 
 namespace toadlet{
 namespace tadpole{
 
-class TOADLET_API AudioActionComponent:public BaseComponent,public Action{
-public:
-	TOADLET_OBJECT(AudioActionComponent);
+AudioAction::AudioAction():
+	//mListeners,
+	//mAudio,
+	//mAudioStream,
+	mRunning(false)
+{
+}
 
-	AudioActionComponent(const String &name);
-	virtual ~AudioActionComponent(){}
+void AudioAction::setAudio(AudioComponent *audio){
+	mAudio=audio;
+}
 
-	virtual bool parentChanged(Node *node);
+void AudioAction::setAudioStream(const String &stream){
+	mAudioStream=stream;
+}
 
-	virtual const String &getName() const{return BaseComponent::getName();}
+void AudioAction::start(){
+	mAudio->setAudioStream(mAudioStream);
+	mAudio->play();
 
-	virtual bool getActive() const{return false;}
+	mRunning=true;
 
-	virtual void setActionListener(ActionListener *listener){}
-	virtual ActionListener *getActionListener() const{return NULL;}
+	int i;
+	for(i=0;i<mListeners.size();++i){
+		mListeners[i]->actionStarted(this);
+	}
+}
 
-	void setAudio(AudioComponent *audio);
-	void setAudioStream(const String &stream);
+void AudioAction::stop(){
+	mAudio->stop();
 
-	virtual void start();
-	virtual void stop();
+	mRunning=false;
 
-protected:
-	AudioComponent::ptr mAudio;
-	String mAudioStream;
-};
+	int i;
+	for(i=0;i<mListeners.size();++i){
+		mListeners[i]->actionStopped(this);
+	}
+}
+
+void AudioAction::update(int dt){
+	if(mRunning==false){
+		return;
+	}
+
+	if(mRunning && mAudio->getFinished()){
+		stop();
+	}
+}
 
 }
 }
-
-#endif

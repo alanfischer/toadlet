@@ -23,23 +23,43 @@
  *
  ********** Copyright header - do not remove **********/
 
-#ifndef TOADLET_TADPOLE_COLLISIONLISTENER_H
-#define TOADLET_TADPOLE_COLLISIONLISTENER_H
+#ifndef TOADLET_TADPOLE_ACTIONCOMPONENT_H
+#define TOADLET_TADPOLE_ACTIONCOMPONENT_H
 
-#include <toadlet/tadpole/Collision.h>
+#include <toadlet/egg/Collection.h>
+#include <toadlet/tadpole/Action.h>
+#include <toadlet/tadpole/BaseComponent.h>
 
 namespace toadlet{
 namespace tadpole{
 
-class CollisionListener{
+class TOADLET_API ActionComponent:public BaseComponent,public ActionListener{
 public:
-	virtual ~CollisionListener(){}
+	TOADLET_OBJECT(ActionComponent);
 
-	virtual void collision(const Collision &c)=0;
+	ActionComponent(const String &name,Action *action=NULL);
+	virtual ~ActionComponent();
+
+	bool parentChanged(Node *node);
+	
+	void attach(Action *action);
+	void remove(Action *action);
+
+	void start();
+	void stop();
+
+	void frameUpdate(int dt,int scope);
+
+	bool getActive() const;
+
+	void actionStarted(Action *component);
+	void actionStopped(Action *component);
+
+protected:
+	Collection<Action::ptr> mActions;
 };
 
 }
 }
 
 #endif
-

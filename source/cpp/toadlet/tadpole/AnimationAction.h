@@ -23,12 +23,11 @@
  *
  ********** Copyright header - do not remove **********/
 
-#ifndef TOADLET_TADPOLE_ANIMATIONACTIONCOMPONENT_H
-#define TOADLET_TADPOLE_ANIMATIONACTIONCOMPONENT_H
+#ifndef TOADLET_TADPOLE_ANIMATIONACTION_H
+#define TOADLET_TADPOLE_ANIMATIONACTION_H
 
 #include <toadlet/egg/Collection.h>
 #include <toadlet/tadpole/Action.h>
-#include <toadlet/tadpole/BaseComponent.h>
 #include <toadlet/tadpole/animation/Animation.h>
 #include <toadlet/tadpole/animation/Interpolator.h>
 #include <toadlet/tadpole/animation/CosInterpolator.h>
@@ -36,9 +35,9 @@
 namespace toadlet{
 namespace tadpole{
 
-class TOADLET_API AnimationActionComponent:public BaseComponent,public Action,public AnimationListener{
+class TOADLET_API AnimationAction:public Object,public Action,public AnimationListener{
 public:
-	TOADLET_OBJECT(AnimationActionComponent);
+	TOADLET_OBJECT(AnimationAction);
 
 	enum Cycling{
 		Cycling_NONE,
@@ -46,53 +45,48 @@ public:
 		Cycling_REFLECT,
 	};
 
-	AnimationActionComponent(const String &name);
-	virtual ~AnimationActionComponent();
+	AnimationAction(Animation *animation=NULL);
+	virtual ~AnimationAction();
 
-	virtual bool parentChanged(Node *node);
-	
-	virtual void frameUpdate(int dt,int scope);
+	void update(int dt);
 
-	virtual const String &getName() const{return BaseComponent::getName();}
+	bool getActive() const{return mRunning;}
 
-	virtual bool getActive() const{return mRunning;}
-
-	virtual void setTime(int time);
+	void setTime(int time);
 	inline int getTime() const{return mTime;}
 
-	virtual void setTimeScale(scalar scale);
+	void setTimeScale(scalar scale);
 	inline scalar getTimeScale() const{return mTimeScale;}
 
-	virtual void setCycling(Cycling cycling);
+	void setCycling(Cycling cycling);
 	inline Cycling getCycling() const{return mCycling;}
 
-	virtual void setStopGently(bool stop){mStopGently=stop;}
+	void setStopGently(bool stop){mStopGently=stop;}
 	inline bool getStopGently() const{return mStopGently;}
 
-	virtual void setInterpolator(Interpolator *interpolator);
+	void setInterpolator(Interpolator *interpolator);
 	inline Interpolator *getInterpolator() const{return mInterpolator;}
 
-	virtual void setMinMaxValue(scalar minValue,scalar maxValue){mMinValue=minValue;mMaxValue=maxValue;}
+	void setMinMaxValue(scalar minValue,scalar maxValue){mMinValue=minValue;mMaxValue=maxValue;}
 	inline scalar getMinValue() const{return mMinValue;}
 	inline scalar getMaxValue() const{return mMaxValue;}
 
-	virtual void setActionListener(ActionListener *listener){mListener=listener;}
-	virtual ActionListener *getActionListener() const{return mListener;}
+	void addActionListener(ActionListener *listener){mListeners.add(listener);}
+	void removeActionListener(ActionListener *listener){mListeners.remove(listener);}
 
-	virtual void start();
-	virtual void stop();
+	void start();
+	void stop();
 
-	virtual void setValue(scalar value);
+	void setValue(scalar value);
 
-	virtual void attach(Animation *animation);
-	virtual void remove(Animation *animation);
+	void attach(Animation *animation);
+	void remove(Animation *animation);
 
-	virtual void animationExtentsChanged(Animation *animation);
+	void animationExtentsChanged(Animation *animation);
 
 protected:
+	Collection<ActionListener*> mListeners;
 	Collection<Animation::ptr> mAnimations;
-
-	ActionListener *mListener;
 	int mTime;
 	scalar mMinValue;
 	scalar mMaxValue;

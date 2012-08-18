@@ -27,8 +27,8 @@
 #define TOADLET_TADPOLE_HOPMANAGER_H
 
 #include <toadlet/hop/Simulator.h>
+#include <toadlet/tadpole/PhysicsCollision.h>
 #include <toadlet/tadpole/PhysicsManager.h>
-#include <toadlet/tadpole/Collision.h>
 #include <toadlet/tadpole/Traceable.h>
 #include <toadlet/tadpole/sensor/BoundingVolumeSensor.h>
 
@@ -46,9 +46,9 @@ public:
 
 	PhysicsComponent *createPhysicsComponent();
 
-	void traceSegment(Collision &result,const Segment &segment,int collideWithBits,Node *ignore);
-	void traceNode(Collision &result,Node *entity,const Segment &segment,int collideWithBits);
-	void testNode(Collision &result,Node *entity1,const Segment &segment,Node *entity2);
+	void traceSegment(PhysicsCollision &result,const Segment &segment,int collideWithBits,Node *ignore);
+	void traceNode(PhysicsCollision &result,Node *entity,const Segment &segment,int collideWithBits);
+	void testNode(PhysicsCollision &result,Node *entity1,const Segment &segment,Node *entity2);
 
 	void logicUpdate(int dt,int scope){logicUpdate(dt,scope,NULL);}
 	void logicUpdate(int dt,int scope,HopComponent *component);
@@ -70,8 +70,8 @@ public:
 	bool collisionResponse(hop::Solid *solid,Vector3 &position,Vector3 &remainder,hop::Collision &collision){return false;}
 	void postUpdate(hop::Solid *solid,int dt,scalar fdt){}
 
-	static void set(Collision &r,const hop::Collision &c);
-	static void set(hop::Collision &r,const Collision &c,hop::Solid *collider,hop::Solid *collidee);
+	static void set(PhysicsCollision &r,const hop::Collision &c);
+	static void set(hop::Collision &r,const PhysicsCollision &c,hop::Solid *collider,hop::Solid *collidee);
 
 protected:
 	class SolidSensorResults:public SensorResultsListener{

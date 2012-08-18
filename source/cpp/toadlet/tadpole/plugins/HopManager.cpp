@@ -27,7 +27,6 @@
 #include <toadlet/egg/Error.h>
 #include <toadlet/egg/Profile.h>
 #include <toadlet/tadpole/Engine.h>
-#include <toadlet/tadpole/Collision.h>
 #include <toadlet/tadpole/Scene.h>
 #include "HopManager.h"
 #include "HopComponent.h"
@@ -56,7 +55,7 @@ PhysicsComponent *HopManager::createPhysicsComponent(){
 	return new HopComponent(this);
 }
 
-void HopManager::traceSegment(Collision &result,const Segment &segment,int collideWithBits,Node *ignore){
+void HopManager::traceSegment(PhysicsCollision &result,const Segment &segment,int collideWithBits,Node *ignore){
 	result.reset();
 
 	hop::Solid *ignoreSolid=NULL;
@@ -69,7 +68,7 @@ void HopManager::traceSegment(Collision &result,const Segment &segment,int colli
 	set(result,collision);
 }
 
-void HopManager::traceNode(Collision &result,Node *node,const Segment &segment,int collideWithBits){
+void HopManager::traceNode(PhysicsCollision &result,Node *node,const Segment &segment,int collideWithBits){
 	result.reset();
 
 	hop::Solid *solid=NULL;
@@ -82,7 +81,7 @@ void HopManager::traceNode(Collision &result,Node *node,const Segment &segment,i
 	set(result,collision);
 }
 
-void HopManager::testNode(Collision &result,Node *node1,const Segment &segment,Node *node2){
+void HopManager::testNode(PhysicsCollision &result,Node *node1,const Segment &segment,Node *node2){
 	result.reset();
 
 	hop::Solid *solid1=NULL,*solid2=NULL;
@@ -148,7 +147,7 @@ int HopManager::findSolidsInAABox(const AABox &box,hop::Solid *solids[],int maxS
 
 void HopManager::traceSegment(hop::Collision &result,const Segment &segment,int collideWithBits){
 	if(mTraceable!=NULL && (collideWithBits&mSolid->getCollisionBits())!=0){
-		Collision collision;
+		PhysicsCollision collision;
 		mTraceable->traceSegment(collision,Math::ZERO_VECTOR3,segment,Math::ZERO_VECTOR3);
 		set(result,collision,NULL,NULL);
 		result.collider=mSolid;
@@ -158,7 +157,7 @@ void HopManager::traceSegment(hop::Collision &result,const Segment &segment,int 
 void HopManager::traceSolid(hop::Collision &result,hop::Solid *solid,const Segment &segment,int collideWithBits){
 	// Only trace shapes that aren't a callback
 	if(mTraceable!=NULL && (collideWithBits&mSolid->getCollisionBits())!=0 && (solid->getShapeTypes()&hop::Shape::Type_CALLBACK)==0){
-		Collision collision;
+		PhysicsCollision collision;
 		const AABox &bound=solid->getLocalBound();
 		Vector3 size;
 		Math::sub(size,bound.maxs,bound.mins);
@@ -168,7 +167,7 @@ void HopManager::traceSolid(hop::Collision &result,hop::Solid *solid,const Segme
 	}
 }
 
-void HopManager::set(Collision &r,const hop::Collision &c){
+void HopManager::set(PhysicsCollision &r,const hop::Collision &c){
 	r.time=c.time;
 	r.point.set(c.point);
 	r.normal.set(c.normal);
@@ -176,11 +175,10 @@ void HopManager::set(Collision &r,const hop::Collision &c){
 	r.scope=c.scope;
 }
 
-void HopManager::set(hop::Collision &r,const Collision &c,hop::Solid *collider,hop::Solid *collidee){
+void HopManager::set(hop::Collision &r,const PhysicsCollision &c,hop::Solid *collider,hop::Solid *collidee){
 	r.time=c.time;
 	r.point.set(c.point);
 	r.normal.set(c.normal);
-	// Since the c.collider passed in could be any Node, not necessarily a HopEntity, we force a passing in of a Collider
 	if(collider!=NULL){r.collider=collider;}
 	if(collidee!=NULL){r.collidee=collidee;}
 	r.scope=c.scope;

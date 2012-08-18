@@ -26,21 +26,23 @@
 #ifndef TOADLET_TADPOLE_ACTION_H
 #define TOADLET_TADPOLE_ACTION_H
 
+#include <toadlet/egg/Interface.h>
 #include <toadlet/tadpole/ActionListener.h>
 
 namespace toadlet{
 namespace tadpole{
 
-class Action{
+class Action:public Interface{
 public:
-	virtual const String &getName() const=0;
+	TOADLET_INTERFACE(Action);
 
 	virtual void start()=0;
 	virtual void stop()=0;
+	virtual void update(int dt)=0;
 	virtual bool getActive() const=0;
 
-	virtual void setActionListener(ActionListener *listener)=0;
-	virtual ActionListener *getActionListener() const=0;
+	virtual void addActionListener(ActionListener *listener)=0;
+	virtual void removeActionListener(ActionListener *listener)=0;
 };
 
 }

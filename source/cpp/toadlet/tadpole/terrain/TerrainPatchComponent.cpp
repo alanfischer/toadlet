@@ -695,7 +695,7 @@ void TerrainPatchComponent::render(RenderManager *manager) const{
 	manager->getDevice()->renderPrimitive(mVertexData,mIndexData);
 }
 
-void TerrainPatchComponent::traceSegment(Collision &result,const Vector3 &position,const Segment &segment,const Vector3 &size){
+void TerrainPatchComponent::traceSegment(PhysicsCollision &result,const Vector3 &position,const Segment &segment,const Vector3 &size){
 	const Transform &worldTransform=mParent->getWorldTransform();
 
 	Segment localSegment;
@@ -727,7 +727,7 @@ void TerrainPatchComponent::traceSegment(Collision &result,const Vector3 &positi
 	}
 }
 
-void TerrainPatchComponent::traceLocalSegment(Collision &result,const Segment &segment,scalar epsilon,scalar cellEpsilon){
+void TerrainPatchComponent::traceLocalSegment(PhysicsCollision &result,const Segment &segment,scalar epsilon,scalar cellEpsilon){
 	scalar x0=segment.origin.x,y0=segment.origin.y;
 	scalar x1=segment.origin.x+segment.direction.x,y1=segment.origin.y+segment.direction.y;
 
@@ -789,7 +789,7 @@ void TerrainPatchComponent::traceLocalSegment(Collision &result,const Segment &s
 	}while(((stepX>0 && (int)(x-cellEpsilon)<=(int)x1) || (stepX<0 && (int)(x+cellEpsilon)>=(int)x1)) && ((stepY>0 && (int)(y-cellEpsilon)<=(int)y1) || (stepY<0 && (int)(y+cellEpsilon)>=(int)y1)));
 }
 
-bool TerrainPatchComponent::traceCell(Collision &result,int x,int y,const Segment &segment,scalar epsilon,scalar cellEpsilon){
+bool TerrainPatchComponent::traceCell(PhysicsCollision &result,int x,int y,const Segment &segment,scalar epsilon,scalar cellEpsilon){
 	Vertex *vxy=vertexAt(x,y),*vx1y=vertexAt(x+1,y),*vxy1=vertexAt(x,y+1),*vx1y1=vertexAt(x+1,y+1);
 
 	Plane p1,p2;
@@ -826,7 +826,7 @@ bool TerrainPatchComponent::traceCell(Collision &result,int x,int y,const Segmen
 	}
 	else{
 		result.time=Math::ONE;
-		Collision result2;
+		PhysicsCollision result2;
 
 		if(d1o>0 && d1e<0){
 			if(d1o<0){

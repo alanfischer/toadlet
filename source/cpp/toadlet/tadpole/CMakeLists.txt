@@ -5,8 +5,9 @@ configure_file (${CMAKE_CURRENT_SOURCE_DIR}/Version.h.cmake ${CMAKE_CURRENT_BINA
 # Source files for toadlet_tadpole
 set (TADPOLE_SRC
 	AnaglyphCamera.cpp
-	AnimationActionComponent.cpp
-	AudioActionComponent.cpp
+	AnimationAction.cpp
+	AudioAction.cpp
+	ActionComponent.cpp
 	AudioComponent.cpp
 	ArchiveManager.cpp
 	AudioManager.cpp
@@ -184,8 +185,9 @@ set (TADPOLE_PLATFORM_WIN32_GDIPLUS_SRC
 # Headers
 set (TADPOLE_HEADERS
 	AnaglyphCamera.h
-	AnimationActionComponent.h
-	AudioActionComponent.h
+	AnimationAction.h
+	AudioAction.h
+	ActionComponent.h
 	Action.h
 	Attachable.h
 	ArchiveManager.h
@@ -198,8 +200,6 @@ set (TADPOLE_HEADERS
 	BufferManager.h
 	Camera.h
 	CameraComponent.h
-	Collision.h
-	CollisionListener.h
 	Colors.h
 	Component.h
 	ContextListener.h
@@ -219,6 +219,8 @@ set (TADPOLE_HEADERS
 	ParticleComponent.h
 	PartitionNode.h
 	ProgressListener.h
+	PhysicsCollision.h
+	PhysicsCollisionListener.h
 	PhysicsComponent.h
 	PhysicsManager.h
 	Renderable.h

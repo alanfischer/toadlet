@@ -26,7 +26,7 @@
 #include <toadlet/egg/Error.h>
 #include <toadlet/tadpole/Engine.h>
 #include <toadlet/tadpole/Scene.h>
-#include <toadlet/tadpole/Action.h>
+#include <toadlet/tadpole/ActionComponent.h>
 #include <toadlet/tadpole/LightComponent.h>
 #include <toadlet/tadpole/PhysicsComponent.h>
 #include <toadlet/tadpole/Visible.h>
@@ -144,11 +144,11 @@ void Node::nodeRemoved(Node *node){
 	mNodes.remove(node);
 }
 
-void Node::actionAttached(Action *action){
+void Node::actionAttached(ActionComponent *action){
 	mActions.add(action);
 }
 
-void Node::actionRemoved(Action *action){
+void Node::actionRemoved(ActionComponent *action){
 	mActions.remove(action);
 }
 
@@ -162,7 +162,7 @@ Component *Node::getChild(const String &name){
 	return NULL;
 }
 
-Action *Node::getAction(const String &name){
+ActionComponent *Node::getAction(const String &name){
 	int i;
 	for(i=0;i<mActions.size();++i){
 		if(mActions[i]->getName()==name){
