@@ -63,7 +63,10 @@ public:
 	virtual bool getGlobal() const=0;
 
 	virtual void setPosition(const Vector3 &position)=0;
+	virtual Vector3 getPosition() const=0;
+
 	virtual void setVelocity(const Vector3 &velocity)=0;
+	virtual Vector3 getVelocity() const=0;
 
 	virtual void setRolloffFactor(scalar f)=0;
 	virtual scalar getRolloffFactor() const=0;

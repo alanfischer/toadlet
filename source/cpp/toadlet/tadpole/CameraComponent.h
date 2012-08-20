@@ -49,14 +49,14 @@ public:
 	void setClearColor(const Vector4 &clearColor){mCamera->setClearColor(clearColor);}
 	const Vector4 &getClearColor() const{return mCamera->getClearColor();}
 
-	void setLookAt(const Vector3 &eye,const Vector3 &point,const Vector3 &up){mCamera->setLookAt(eye,point,up);setParentTransformFromCamera();}
-	void setLookDir(const Vector3 &eye,const Vector3 &dir,const Vector3 &up){mCamera->setLookDir(eye,dir,up);setParentTransformFromCamera();}
+	void setLookAt(const Vector3 &eye,const Vector3 &point,const Vector3 &up){mCamera->setLookAt(eye,point,up);setTransformFromCamera();}
+	void setLookDir(const Vector3 &eye,const Vector3 &dir,const Vector3 &up){mCamera->setLookDir(eye,dir,up);setTransformFromCamera();}
 
 	void frameUpdate(int dt,int scope);
 
 protected:
-	void setParentTransformFromCamera();
-	void setCameraTransformFromParent();
+	void setTransformFromCamera();
+	void setCameraFromTransform();
 
 	Camera::ptr mCamera;
 };

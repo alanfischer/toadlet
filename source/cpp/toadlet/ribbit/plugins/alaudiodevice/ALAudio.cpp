@@ -278,6 +278,15 @@ void ALAudio::setPosition(const Vector3 &position){
 	}
 }
 
+Vector3 ALAudio::getPosition() const{
+	Vector3 position;
+	if(alIsSource(mHandle)){
+		alGetSourcefv(mHandle,AL_POSITION,(ALfloat*)mDevice->cacheVector3.getData());
+		MathConversion::scalarToFloat(position,mDevice->cacheVector3);
+	}
+	return position;
+}
+
 void ALAudio::setVelocity(const Vector3 &velocity){
 	if(alIsSource(mHandle)){
 		if(mGlobal){
@@ -288,6 +297,15 @@ void ALAudio::setVelocity(const Vector3 &velocity){
 		}
 		alSourcefv(mHandle,AL_VELOCITY,(ALfloat*)mDevice->cacheVector3.getData());
 	}
+}
+
+Vector3 ALAudio::getVelocity() const{
+	Vector3 velocity;
+	if(alIsSource(mHandle)){
+		alGetSourcefv(mHandle,AL_VELOCITY,(ALfloat*)mDevice->cacheVector3.getData());
+		MathConversion::scalarToFloat(velocity,mDevice->cacheVector3);
+	}
+	return velocity;
 }
 
 void ALAudio::update(int dt){

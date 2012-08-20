@@ -247,27 +247,30 @@ void ALAudioDevice::setListenerTranslate(const Vector3 &translate){
 
 	// Not sure if this belongs here, but we'll just just in case
 	// NAN values will lock the computer
-	if(Extents::isNAN(cacheVector3.x)==false){
+	if(Extents::isNAN(cacheVector3.x)){
 		return;
 	}
 
 	alListenerfv(AL_POSITION,cacheVector3.getData());
 }
 
-void ALAudioDevice::setListenerRotate(const Matrix3x3 &rotate){
+void ALAudioDevice::setListenerRotate(const Quaternion &rotate){
+	Matrix3x3 matrix;
 	ALfloat final[6];
 
-	final[0]=MathConversion::scalarToFloat(rotate.at(0,1));
-	final[1]=MathConversion::scalarToFloat(rotate.at(1,1));
-	final[2]=MathConversion::scalarToFloat(rotate.at(2,1));
+	Math::setMatrix3x3FromQuaternion(matrix,rotate);
 
-	final[3]=MathConversion::scalarToFloat(rotate.at(0,2));
-	final[4]=MathConversion::scalarToFloat(rotate.at(1,2));
-	final[5]=MathConversion::scalarToFloat(rotate.at(2,2));
+	final[0]=MathConversion::scalarToFloat(matrix.at(0,1));
+	final[1]=MathConversion::scalarToFloat(matrix.at(1,1));
+	final[2]=MathConversion::scalarToFloat(matrix.at(2,1));
+
+	final[3]=MathConversion::scalarToFloat(matrix.at(0,2));
+	final[4]=MathConversion::scalarToFloat(matrix.at(1,2));
+	final[5]=MathConversion::scalarToFloat(matrix.at(2,2));
 
 	// Not sure if this belongs here, but we'll just just in case
 	// NAN values will lock the computer
-	if(Extents::isNAN(final[0])==false){
+	if(Extents::isNAN(final[0])){
 		return;
 	}
 
@@ -277,21 +280,20 @@ void ALAudioDevice::setListenerRotate(const Matrix3x3 &rotate){
 }
 
 void ALAudioDevice::setListenerVelocity(const Vector3 &velocity){
-
 	// Doppler effect doesnt work on other platforms...  bad OpenAL?
 	#if defined(TOADLET_PLATFORM_WIN32)
 		MathConversion::scalarToFloat(cacheVector3,velocity);
 
 		// Not sure if this belongs here, but we'll just just in case
 		// NAN values will lock the computer
-		if(Extents::isNAN(cacheVector3.x)==false){
+		if(Extents::isNAN(cacheVector3.x)){
 			return;
 		}
 
 		alListenerfv(AL_VELOCITY,cacheVector3.getData());
 	#endif
 
-	TOADLET_CHECK_ALERROR("end setListenerVelocity");
+	TOADLET_CHECK_ALERROR("setListenerVelocity");
 }
 
 void ALAudioDevice::setListenerGain(scalar gain){

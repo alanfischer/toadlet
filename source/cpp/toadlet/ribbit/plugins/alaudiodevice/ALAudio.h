@@ -68,7 +68,10 @@ public:
 	scalar getPitch() const;
 
 	void setPosition(const Vector3 &position);
+	Vector3 getPosition() const;
+
 	void setVelocity(const Vector3 &velocity);
+	Vector3 getVelocity() const;
 
 	inline ALuint getHandle() const{return mHandle;}
 

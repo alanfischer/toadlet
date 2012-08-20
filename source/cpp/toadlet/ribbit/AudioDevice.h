@@ -50,7 +50,7 @@ public:
 	virtual Audio *createAudio()=0;
 
 	virtual void setListenerTranslate(const Vector3 &translate)=0;
-	virtual void setListenerRotate(const Matrix3x3 &rotate)=0;
+	virtual void setListenerRotate(const Quaternion &rotate)=0;
 	virtual void setListenerVelocity(const Vector3 &velocity)=0;
 	virtual void setListenerGain(scalar gain)=0;
 

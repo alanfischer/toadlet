@@ -36,26 +36,32 @@ PosixThread::PosixThread():
 	//mThread(NULL),
 	mAlive(false)
 {
-	mRunner=this;
 	memset(&mThread,0,sizeof(mThread));
+	mRunner=this;
 }
 
 PosixThread::PosixThread(Runnable *r):
 	mRunner(NULL),
 	//mThread(NULL),
-	mAlive(false)
+	mAlive(false),
 {
-	mRunner=r;
 	memset(&mThread,0,sizeof(mThread));
+	mRunner=r;
 }
 
 PosixThread::~PosixThread(){
 	TOADLET_ASSERT(mAlive==false);
+	
+	pthread_t empty;
+	memset(&empty,0,sizeof(empty));
+	if(memcmp(&mThread,&empty,sizeof(mThread))!=0){
+		pthread_detach(mThread);
+	}
 }
 
 void PosixThread::start(){
 	if(mAlive==false){
-		mAlive=true;
+		mAlive=true;		
 		pthread_attr_t attrib;
 		pthread_attr_init(&attrib);
 		#if defined(TOADLET_PLATFORM_IRIX)
@@ -74,6 +80,7 @@ void PosixThread::start(){
 
 bool PosixThread::join(){
 	if(pthread_join(mThread,NULL)==0){
+		memset(&mThread,0,sizeof(mThread));
 		return true;
 	}
 	else{
@@ -89,8 +96,6 @@ void PosixThread::run(){
 
 void PosixThread::startRun(){
 	run();
-
-	pthread_detach(mThread);
 	mAlive=false;
 }
 

@@ -35,16 +35,16 @@ CameraComponent::CameraComponent(Camera *camera){
 }
 
 void CameraComponent::frameUpdate(int dt,int scope){
-	setCameraTransformFromParent();
+	setCameraFromTransform();
 }
 
-void CameraComponent::setCameraTransformFromParent(){
+void CameraComponent::setCameraFromTransform(){
 	Matrix4x4 matrix;
 	mParent->getWorldTransform().getMatrix(matrix);
 	mCamera->setWorldMatrix(matrix);
 }
 
-void CameraComponent::setParentTransformFromCamera(){
+void CameraComponent::setTransformFromCamera(){
 	mParent->setMatrix4x4(mCamera->getWorldMatrix());
 }
 
