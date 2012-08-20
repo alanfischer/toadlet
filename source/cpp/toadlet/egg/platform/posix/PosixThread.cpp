@@ -43,7 +43,7 @@ PosixThread::PosixThread():
 PosixThread::PosixThread(Runnable *r):
 	mRunner(NULL),
 	//mThread(NULL),
-	mAlive(false),
+	mAlive(false)
 {
 	memset(&mThread,0,sizeof(mThread));
 	mRunner=r;
