@@ -54,28 +54,37 @@ public:
 	inline bool getPlaying() const{if(mAudio!=NULL){return mAudio->getPlaying();}else{return false;}}
 	inline bool getFinished() const{if(mAudio!=NULL){return mAudio->getFinished();}else{return false;}}
 
-	inline void setGain(scalar gain){if(mAudio!=NULL){mAudio->setGain(gain);}}
-	inline scalar getGain() const{if(mAudio!=NULL){return mAudio->getGain();}else{return 0;}}
+	inline void setGain(scalar gain){mGain=gain;if(mAudio!=NULL){mAudio->setGain(gain);}}
+	inline scalar getGain() const{if(mAudio!=NULL){return mAudio->getGain();}else{return mGain;}}
 
-	inline void setLooping(bool looping){if(mAudio!=NULL){mAudio->setLooping(looping);}}
-	inline bool getLooping() const{if(mAudio!=NULL){return mAudio->getLooping();}else{return false;}}
+	inline void setPitch(scalar pitch){mPitch=pitch;if(mAudio!=NULL){mAudio->setPitch(pitch);}}
+	inline scalar getPitch() const{if(mAudio!=NULL){return mAudio->getPitch();}else{return mPitch;}}
 
-	inline void setPitch(scalar pitch){if(mAudio!=NULL){mAudio->setPitch(pitch);}}
-	inline scalar getPitch() const{if(mAudio!=NULL){return mAudio->getPitch();}else{return 0;}}
+	inline void setRolloffFactor(scalar rolloff){mRolloff=rolloff;if(mAudio!=NULL){mAudio->setRolloffFactor(rolloff);}}
+	inline scalar getRolloffFactor() const{if(mAudio!=NULL){return mAudio->getRolloffFactor();}else{return mRolloff;}}
 
-	inline void setGlobal(bool global){if(mAudio!=NULL){mAudio->setGlobal(global);}}
-	inline bool getGlobal() const{if(mAudio!=NULL){return mAudio->getGlobal();}else{return false;}}
+	inline void setLooping(bool looping){mLooping=looping;if(mAudio!=NULL){mAudio->setLooping(looping);}}
+	inline bool getLooping() const{if(mAudio!=NULL){return mAudio->getLooping();}else{return mLooping;}}
 
-	inline void setRolloffFactor(scalar f){if(mAudio!=NULL){mAudio->setRolloffFactor(f);}}
-	inline scalar getRolloffFactor() const{if(mAudio!=NULL){return mAudio->getRolloffFactor();}else{return 0;}}
+	inline void setGlobal(bool global){mGlobal=global;if(mAudio!=NULL){mAudio->setGlobal(global);}}
+	inline bool getGlobal() const{if(mAudio!=NULL){return mAudio->getGlobal();}else{return mGlobal;}}
+
+	void frameUpdate(int dt,int scope);
 
 	/// @todo: This needs to be integrated into the tadpole plugin
-	/// @todo: Also we need to set the Audio position on a position update
 	inline void setVelocity(const Vector3 &velocity){if(mAudio!=NULL){mAudio->setVelocity(velocity);}}
 
 protected:
+	void setAudioFromTransform();
+	void setAudioParameters();
+
 	Engine *mEngine;
 	Audio::ptr mAudio;
+	scalar mGain;
+	scalar mPitch;
+	scalar mRolloff;
+	bool mLooping;
+	bool mGlobal;
 };
 
 }

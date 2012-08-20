@@ -67,7 +67,7 @@ public:
 	Audio *createAudio();
 
 	void setListenerTranslate(const Vector3 &translate);
-	void setListenerRotate(const Matrix3x3 &rotate);
+	void setListenerRotate(const Quaternion &rotate);
 	void setListenerVelocity(const Vector3 &velocity);
 	void setListenerGain(scalar gain);
 
@@ -82,7 +82,7 @@ public:
 	static ALenum getALFormat(AudioFormat *format);
 
 	egg::math::Vector3 cacheVector3;
-	
+
 protected:
 	void preDestroyBuffer(ALAudioBuffer *buffer);
 

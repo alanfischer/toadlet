@@ -47,7 +47,7 @@ public:
 	virtual Audio *createAudio(){return NULL;}
 
 	virtual void setListenerTranslate(const Vector3 &translate){}
-	virtual void setListenerRotate(const Matrix3x3 &rotate){}
+	virtual void setListenerRotate(const Quaternion &rotate){}
 	virtual void setListenerVelocity(const Vector3 &velocity){}
 	virtual void setListenerGain(scalar gain){}
 
