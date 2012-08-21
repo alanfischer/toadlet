@@ -40,7 +40,7 @@ void PathClimber::logicUpdate(int dt,int scope){
 
 		Segment segment;
 		segment.setStartDir(mParent->getTranslate(),Vector3(0,0,-5));
-		tadpole::Collision result;
+		PhysicsCollision result;
 		mScene->traceSegment(result,segment,-1,mParent);
 		if(result.time<Math::ONE){
 			up.set(result.normal);

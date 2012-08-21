@@ -15,7 +15,7 @@ public:
 		Segment segment;
 		segment.origin.set(mNode->getWorldTranslate());
 		Math::mul(segment.direction,Math::NEG_Z_UNIT_VECTOR3,mDistance);
-		tadpole::Collision result;
+		PhysicsCollision result;
 		mNode->getScene()->traceSegment(result,segment,-1,mNode);
 
 		if(result.time<Math::ONE){

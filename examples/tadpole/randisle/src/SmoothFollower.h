@@ -36,7 +36,7 @@ public:
 			Vector3 position;
 			Math::mul(position,mTarget->getWorldRotate(),mOffset);
 			Math::add(position,mTarget->getWorldTranslate());
-			tadpole::Collision result;
+			PhysicsCollision result;
 			Segment segment;
 			segment.origin.set(mTarget->getWorldTranslate());
 			Math::sub(segment.direction,position,segment.origin);

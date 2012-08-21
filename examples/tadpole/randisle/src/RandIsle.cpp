@@ -131,7 +131,7 @@ void RandIsle::create(){
 			Segment segment;
 			segment.origin.set(10,0,1000);
 			segment.direction.set(0,0,-2000);
-			tadpole::Collision result;
+			PhysicsCollision result;
 			mScene->traceSegment(result,segment,-1,mPlayer);
 			result.point.z+=mPlayer->getBound()->getSphere().radius;
 			physics->setPosition(result.point);
@@ -144,13 +144,13 @@ void RandIsle::create(){
 		}
 		mPlayer->attach(mesh);
 
-		AnimationActionComponent *jumpAction=new AnimationActionComponent("jump");
+		AnimationAction *jumpAction=new AnimationAction();
 		{
 			jumpAction->attach(new MeshAnimation(mesh,1));
-			jumpAction->setCycling(AnimationActionComponent::Cycling_LOOP);
+			jumpAction->setCycling(AnimationAction::Cycling_LOOP);
 			jumpAction->setStopGently(true);
 		}
-		mPlayer->attach(jumpAction);
+		mPlayer->attach(new ActionComponent("jump",jumpAction));
 
 		Node::ptr shadow=new Node(mScene);
 		{
@@ -538,7 +538,7 @@ void RandIsle::playerJump(Node *player){
 	if(climber->getPath()==NULL){
 		Segment segment;
 		segment.setStartDir(mPlayer->getTranslate(),Vector3(0,0,-5));
-		tadpole::Collision result;
+		PhysicsCollision result;
 		mScene->traceSegment(result,segment,-1,player);
 		if(result.time<Math::ONE){
 			Math::mul(result.normal,40);
@@ -672,7 +672,7 @@ bool RandIsle::updatePopulatePatches(){
 		Segment segment;
 		segment.origin.set(wx,wy,1000);
 		segment.direction.set(0,0,-2000);
-		tadpole::Collision result;
+		PhysicsCollision result;
 		mScene->traceSegment(result,segment,-1,NULL);
 		if(result.time<Math::ONE && patch->bound->testIntersection(result.point)){
 			result.point.z-=5;
