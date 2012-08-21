@@ -59,18 +59,6 @@ public:
 	void setPitch(scalar pitch){mPitch=pitch;}
 	scalar getPitch() const{return mPitch;}
 
-	void setGlobal(bool global){}
-	bool getGlobal() const{return false;}
-
-	void setRolloffFactor(scalar r){}
-	scalar getRolloffFactor() const{return 0;}
-
-	void setPosition(const Vector3 &position){}
-	Vector3 getPosition() const{return Math::ZERO_VECTOR3;}
-
-	void setVelocity(const Vector3 &velocity){}
-	Vector3 getVelocity() const{return Math::ZERO_VECTOR3;}
-
 protected:
 	int read(tbyte *data,int length);
 

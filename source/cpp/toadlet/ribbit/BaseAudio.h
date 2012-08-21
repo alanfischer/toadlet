@@ -54,16 +54,19 @@ public:
 	virtual bool getLooping() const{return false;}
 
 	virtual void setGain(scalar gain){}
-	virtual scalar getGain() const{return 0;}
+	virtual scalar getGain() const{return Math::ONE;}
 
 	virtual void setPitch(scalar pitch){}
-	virtual scalar getPitch() const{return 0;}
+	virtual scalar getPitch() const{return Math::ONE;}
 
 	virtual void setGlobal(bool global){}
 	virtual bool getGlobal() const{return false;}
 
 	virtual void setPosition(const Vector3 &position){}
+	virtual Vector3 getPosition() const{return Math::ZERO_VECTOR3;} 
+	
 	virtual void setVelocity(const Vector3 &velocity){}
+	virtual Vector3 getVelocity() const{return Math::ZERO_VECTOR3;}
 
 	virtual void setRolloffFactor(scalar f){}
 	virtual scalar getRolloffFactor() const{return 0;}
