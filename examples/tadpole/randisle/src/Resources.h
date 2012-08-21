@@ -36,7 +36,7 @@ public:
 		terrainMaterialSource=new DiffuseTerrainMaterialSource(engine);
 		terrainMaterialSource->setDiffuseScale(Vector3(16,16,16));
 		terrainMaterialSource->setDetailScale(Vector3(128,128,128));
-		terrainMaterialSource->setDetailTexture("detail.bmp");
+		terrainMaterialSource->setDetailTexture("detail.png");
 		#if defined(TOADLET_PLATFORM_ANDROID)
 			terrainMaterialSource->setDiffuseTexture(0,"rock.png");
 			terrainMaterialSource->setDiffuseTexture(1,NULL);
