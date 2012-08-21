@@ -56,21 +56,6 @@ public:
 	void setGain(scalar gain);
 	scalar getGain() const;
 
-	void setPitch(scalar pitch){}
-	scalar getPitch() const{return Math::ONE;}
-
-	void setGlobal(bool global){}
-	bool getGlobal() const{return false;}
-
-	void setRolloffFactor(scalar r){}
-	scalar getRolloffFactor() const{return 0;}
-
-	void setPosition(const Vector3 &position){}
-	const Vector3 &getPosition() const{return Math::ZERO_VECTOR3;}
-
-	void setVelocity(const Vector3 &velocity){}
-	const Vector3 &getVelocity() const{return Math::ZERO_VECTOR3;}
-
 protected:
 	JNIEnv *env;
 	jobject obj;
