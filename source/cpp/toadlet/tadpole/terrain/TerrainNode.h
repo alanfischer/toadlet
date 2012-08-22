@@ -68,10 +68,19 @@ public:
 	Material::ptr getWaterMaterial() const{return mPatchWaterMaterial;}
 
 	void setCameraUpdateScope(int scope);
+	int getCameraUpdateScope() const{return mPatchCameraUpdateScope;}
+
 	void setTerrainScope(int scope);
+	int getTerrainScope() const{return mPatchTerrainScope;}
+
 	void setWaterScope(int scope);
+	int getWaterScope() const{return mPatchWaterScope;}
+
 	void setTolerance(scalar tolerance);
+	scalar getTolerance() const{return mPatchTolerance;}
+
 	void setWaterLevel(scalar level);
+	scalar getWaterLevel() const{return mPatchWaterLevel*mPatchScale.z;}
 
 	int localPatchIndex(int x,int y){return (y+mHalfSize)*mSize+(x+mHalfSize);}
 	TerrainPatchComponent *patchAt(int x,int y){

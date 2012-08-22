@@ -12,6 +12,8 @@ public:
 	void setLookAt(float eye[3],float point[3],float up[3]);
 
 	void setAutoProjectionFov(float fov,float nearDist,float farDist);
+
+	void render(toadlet::peeper::RenderDevice *device,Scene *scene);
 };
 
 }

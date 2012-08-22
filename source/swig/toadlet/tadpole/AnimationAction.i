@@ -14,8 +14,6 @@ public:
 	};
 
 	AnimationAction();
-
-	bool getActive() const;
 	
 	void setTime(int time);
 	int getTime() const;
@@ -28,12 +26,15 @@ public:
 
 	void setStopGently(bool stop);
 	
+	void attach(toadlet::tadpole::animation::Animation *animation);
+	void remove(toadlet::tadpole::animation::Animation *animation);
+
 	void start();
 	void stop();
 	
-	void attach(toadlet::tadpole::animation::Animation *animation);
-	void remove(toadlet::tadpole::animation::Animation *animation);
-	
+	void update(int dt);
+	bool getActive() const;
+		
 	void addActionListener(ActionListener *listener);
 	void removeActionListener(ActionListener *listener);
 };

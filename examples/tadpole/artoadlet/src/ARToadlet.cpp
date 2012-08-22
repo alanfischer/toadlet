@@ -85,6 +85,8 @@ void ARToadlet::create(){
 	}
 	mBackground->setScope(4);
 	mScene->getRoot()->attach(mBackground);
+
+	mMarkers.reserve(16);
 }
 
 void ARToadlet::destroy(){
@@ -92,6 +94,16 @@ void ARToadlet::destroy(){
 		mScene->destroy();
 		mScene=NULL;
 	}
+
+	try{
+		mDetector->detect(cv::Mat(),mMarkers,mCameraParams);
+	}catch(const std::exception &ex){
+		Logger::alert(String("ERROR:")+ex.what());
+	}
+
+	mVideoCapture=NULL;
+
+	mDetector=NULL;
 }
 
 void ARToadlet::update(int dt){
@@ -105,14 +117,13 @@ void ARToadlet::update(int dt){
 }
 
 void ARToadlet::updateMarkers(){
-	std::vector<aruco::Marker> markers;
-
 	try{
-		mDetector->detect(mTextureData,markers,mCameraParams);
+		mDetector->detect(mTextureData,mMarkers,mCameraParams);
 	}catch(const std::exception &ex){
 		Logger::alert(String("ERROR:")+ex.what());
 	}
-	Logger::alert(String("MARKERS:")+markers.size());
+	Logger::alert(String("MARKERS:")+mMarkers.size());
+
 
 //    std::vector<int> markerId=mTracker->calc(mTextureData);
 //    mTracker->selectBestMarkerByCf();

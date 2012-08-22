@@ -31,6 +31,7 @@ protected:
 	SharedPointer<cv::VideoCapture> mVideoCapture;
 	aruco::CameraParameters mCameraParams;
 	SharedPointer<aruco::MarkerDetector> mDetector;
+	std::vector<aruco::Marker> mMarkers;
 
 	Application *mApp;
 	Engine::ptr mEngine;

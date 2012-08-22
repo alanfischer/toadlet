@@ -248,7 +248,6 @@ Material::ptr WaterMaterialCreator::createWaterMaterial(Texture *reflectTexture,
 		RenderPass::ptr pass=shaderPath->addPass();
 
 		pass->setMaterialState(MaterialState(color));
-		pass->setBlendState(BlendState::Combination_ALPHA);
 		pass->setDepthState(DepthState(DepthState::DepthTest_LEQUAL,false));
 		pass->setRasterizerState(RasterizerState(RasterizerState::CullType_NONE));
 		pass->setMaterialState(MaterialState(Math::ZERO_VECTOR4,Math::ONE_VECTOR4,Math::ONE_VECTOR4,128));
@@ -295,7 +294,6 @@ Material::ptr WaterMaterialCreator::createWaterMaterial(Texture *reflectTexture,
 //		pass->setTexture(Shader::ShaderType_FRAGMENT,1,noise2,SamplerState(),textureState);
 	}
 	
-	waterMaterial->setLayer(-1);
 	waterMaterial->compile();
 	
 	return waterMaterial;

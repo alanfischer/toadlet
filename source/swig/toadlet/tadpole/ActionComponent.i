@@ -9,10 +9,11 @@ namespace tadpole{
 
 class ActionComponent:public Component{
 public:
-	ActionComponent(char *name);
+	ActionComponent(String name,Action *action=NULL);
 	void destroy();
 
-	void setName(char *name);
+	void setName(String name);
+	String getName() const;
 
 	bool getActive() const;
 	
