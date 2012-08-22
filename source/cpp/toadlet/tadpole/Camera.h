@@ -137,7 +137,7 @@ public:
 	inline scalar getFramesPerSecond() const{return mFPS;}
 	inline int getVisibleCount() const{return mVisibleCount;}
 
-//protected:
+protected:
 	void projectionUpdated();
 	void updateWorldTransform();
 	void updateClippingPlanes();

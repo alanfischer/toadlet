@@ -61,6 +61,7 @@ TerrainNode::TerrainNode(Scene *scene):PartitionNode(scene),
 	mPatchTerrainScope=-1;
 	mPatchWaterScope=-1;
 	mPatchTolerance=0.00001f;
+	mPatchScale.set(1,1,1);
 
 	int i,j;
 	for(j=0;j<mSize;++j){
@@ -113,7 +114,9 @@ void TerrainNode::setDataSource(TerrainNodeDataSource *dataSource){
 	mDataSource=dataSource;
 
 	mPatchSize=mDataSource->getPatchSize();
+	mPatchWaterLevel/=mPatchScale.z;
 	mPatchScale.set(mDataSource->getPatchScale());
+	mPatchWaterLevel*=mPatchScale.z;
 	mPatchHeightData.resize(mPatchSize*mPatchSize);
 	mPatchLayerData.resize(mPatchSize*mPatchSize);
 
@@ -186,7 +189,7 @@ void TerrainNode::setCameraUpdateScope(int scope){
 	int i;
 	for(i=0;i<mPatchGrid.size();++i){
 		if(mPatchGrid[i]!=NULL){
-			mPatchGrid[i]->setCameraUpdateScope(scope);
+			mPatchGrid[i]->setCameraUpdateScope(mPatchCameraUpdateScope);
 		}
 	}
 }
@@ -197,7 +200,7 @@ void TerrainNode::setTerrainScope(int scope){
 	int i;
 	for(i=0;i<mPatchGrid.size();++i){
 		if(mPatchGrid[i]!=NULL){
-			mPatchGrid[i]->setTerrainScope(scope);
+			mPatchGrid[i]->setTerrainScope(mPatchTerrainScope);
 		}
 	}	
 }
@@ -208,7 +211,7 @@ void TerrainNode::setWaterScope(int scope){
 	int i;
 	for(i=0;i<mPatchGrid.size();++i){
 		if(mPatchGrid[i]!=NULL){
-			mPatchGrid[i]->setWaterScope(scope);
+			mPatchGrid[i]->setWaterScope(mPatchWaterScope);
 		}
 	}	
 }
@@ -219,18 +222,18 @@ void TerrainNode::setTolerance(scalar tolerance){
 	int i;
 	for(i=0;i<mPatchGrid.size();++i){
 		if(mPatchGrid[i]!=NULL){
-			mPatchGrid[i]->setTolerance(tolerance);
+			mPatchGrid[i]->setTolerance(mPatchTolerance);
 		}
 	}	
 }
 
 void TerrainNode::setWaterLevel(scalar level){
-	mPatchWaterLevel=level;
+	mPatchWaterLevel=level/mPatchScale.z;
 	
 	int i;
 	for(i=0;i<mPatchGrid.size();++i){
 		if(mPatchGrid[i]!=NULL){
-			mPatchGrid[i]->setWaterLevel(level);
+			mPatchGrid[i]->setWaterLevel(mPatchWaterLevel);
 		}
 	}	
 }

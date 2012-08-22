@@ -119,6 +119,7 @@ if (NOT TOADLET_PLATFORM_PYTHON)
 		${CMAKE_CURRENT_SOURCE_DIR}/toadlet/tadpole/ActionComponent.i
 		${CMAKE_CURRENT_SOURCE_DIR}/toadlet/tadpole/AudioComponent.i
 		${CMAKE_CURRENT_SOURCE_DIR}/toadlet/tadpole/Node.i
+		${CMAKE_CURRENT_SOURCE_DIR}/toadlet/tadpole/Camera.i
 		${CMAKE_CURRENT_SOURCE_DIR}/toadlet/tadpole/CameraComponent.i
 		${CMAKE_CURRENT_SOURCE_DIR}/toadlet/tadpole/MeshComponent.i
 		${CMAKE_CURRENT_SOURCE_DIR}/toadlet/tadpole/LightComponent.i
@@ -140,6 +141,7 @@ if (NOT TOADLET_PLATFORM_PYTHON)
 			${PROJECT_BINARY_DIR}/source/java/us/toadlet/tadpole/ActionComponent.java
 			${PROJECT_BINARY_DIR}/source/java/us/toadlet/tadpole/AudioComponent.java
 			${PROJECT_BINARY_DIR}/source/java/us/toadlet/tadpole/Node.java
+			${PROJECT_BINARY_DIR}/source/java/us/toadlet/tadpole/Camera.java
 			${PROJECT_BINARY_DIR}/source/java/us/toadlet/tadpole/CameraComponent.java
 			${PROJECT_BINARY_DIR}/source/java/us/toadlet/tadpole/MeshComponent.java
 			${PROJECT_BINARY_DIR}/source/java/us/toadlet/tadpole/LightComponent.java

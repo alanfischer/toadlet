@@ -5,7 +5,7 @@ extern void destroyApplet(Applet *applet);
 
 int toadletMain(int argc,char **argv){
 	PlatformApplication app;
-	Applet::ptr applet=createApplet(&app);
+	Applet *applet=createApplet(&app);
 	app.setApplet(applet);
 	app.setSize(400,400);
 	app.defaultCreate();

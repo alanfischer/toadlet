@@ -234,7 +234,7 @@ void RandIsle::render(){
 		mRefractCamera->setObliqueNearPlaneMatrix(matrix);
 	}
 
-	position.z*=-1;
+	position.z=mTerrain->getWaterLevel()*2-position.z;
 	forward.z*=-1;
 	up.z*=-1;
 
