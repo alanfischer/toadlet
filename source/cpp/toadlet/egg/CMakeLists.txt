@@ -8,6 +8,7 @@ set (EGG_SRC
 	Error.cpp
 	Exception.cpp
 	Logger.cpp
+	MathFormatting.cpp
 	SOSLoggerListener.cpp
 	Object.cpp
 	Profile.cpp
@@ -96,6 +97,7 @@ set (EGG_HEADERS
 	Logger.h
 	LoggerListener.h
 	MathConversion.h
+	MathFormatting.h
 	Map.h
 	Mutex.h
 	Object.h

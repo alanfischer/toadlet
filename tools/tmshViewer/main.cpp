@@ -70,11 +70,11 @@ int main(int argc,char **argv){
 		if(argc>=3 && numSequences>0){
 			int sequence=atoi(argv[2]);
 			if(sequence>=0 && sequence<numSequences){
-				AnimationActionComponent::ptr animation=new AnimationActionComponent("animation");
+				AnimationAction::ptr animation=new AnimationAction();
 				animation->attach(new MeshAnimation(meshComponent,sequence));
-				animation->setCycling(AnimationActionComponent::Cycling_LOOP);
+				animation->setCycling(AnimationAction::Cycling_LOOP);
 				animation->start();
-				node->attach(animation);
+				node->attach(new ActionComponent("animation",animation));
 			}
 			else{
 				std::cout << "Invalid sequence number:" << sequence << std::endl;
