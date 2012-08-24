@@ -25,8 +25,11 @@
 
 #include <toadlet/egg/Error.h>
 #include <toadlet/egg/Logger.h>
+#include <toadlet/egg/MathFormatting.h>
 #include "XMSHStreamer.h"
 #include "XMLMeshUtilities.h"
+
+using namespace toadlet::egg::MathFormatting;
 
 namespace toadlet{
 namespace tadpole{
@@ -50,7 +53,7 @@ Resource::ptr XMSHStreamer::load(Stream::ptr stream,ResourceData *data,ProgressL
 		int version=0;
 		const char *versionProp=mxmlElementGetAttr(root,"Version");
 		if(versionProp!=NULL){
-			version=XMLMeshUtilities::parseInt(versionProp);
+			version=parseInt(versionProp);
 		}
 
 		if(version==1){
@@ -150,7 +153,7 @@ bool XMSHStreamer::save(Stream::ptr stream,Resource::ptr resource,ResourceData *
 	mxml_node_t *root=mxmlNewElement(MXML_NO_PARENT,"XMSH");
 
 	int version=XMLMeshUtilities::version;
-	mxmlElementSetAttr(root,"Version",XMLMeshUtilities::makeInt(version));
+	mxmlElementSetAttr(root,"Version",formatInt(version));
 
 	if(version==1){
 		saveMeshVersion1(root,mesh,listener);

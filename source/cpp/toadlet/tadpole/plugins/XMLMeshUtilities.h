@@ -48,9 +48,6 @@ public:
 
 	static const char *mxmlSaveCallback(mxml_node_t *node,int ws);
 
-	static int parseInt(const char *string);
-	static String makeInt(int i);
-
 	static Material::ptr loadMaterial(mxml_node_t *node,int version,MaterialManager *materialManager,TextureManager *textureManager);
 	static mxml_node_t *saveMaterial(Material::ptr material,int version,ProgressListener *listener);
 

@@ -21,7 +21,6 @@ set (TADPOLE_SRC
 	LabelComponent.cpp
 	LightComponent.cpp
 	MaterialManager.cpp
-	MathFormatter.cpp
 	Mesh.cpp
 	MeshComponent.cpp
 	MeshManager.cpp
@@ -210,7 +209,6 @@ set (TADPOLE_HEADERS
 	LabelComponent.h
 	LightComponent.h
 	MaterialManager.h
-	MathFormatter.h
 	Mesh.h
 	MeshManager.h
 	MeshComponent.h

@@ -29,10 +29,12 @@
 #include <toadlet/peeper/VertexBufferAccessor.h>
 #include <toadlet/peeper/IndexBufferAccessor.h>
 #include <toadlet/egg/MathConversion.h>
+#include <toadlet/egg/MathFormatting.h>
 #include <toadlet/egg/Error.h>
 #include <stdio.h>
 
 using namespace toadlet::egg::MathConversion;
+using namespace toadlet::egg::MathFormatting;
 
 namespace toadlet{
 namespace tadpole{
@@ -86,103 +88,6 @@ const char *XMLMeshUtilities::mxmlSaveCallback(mxml_node_t *node,int ws){
 	return NULL;
 }
 
-bool parseBool(const String &string){
-	if(string.find("true")>=0 || string.find("TRUE")>=0 || string.find("True")>=0){
-		return true;
-	}
-	else{
-		return false;
-	}
-}
-
-const char *makeBool(bool b){
-	if(b){
-		return "true";
-	}
-	else{
-		return "false";
-	}
-}
-
-int XMLMeshUtilities::parseInt(const char *string){
-	int i=0;
-	sscanf(string,"%d",&i);
-	return i;
-}
-
-String XMLMeshUtilities::makeInt(int i){
-	return String()+i;
-}
-
-scalar parseScalar(const char *string){
-	float f=0;
-	sscanf(string,"%f",&f);
-	return floatToScalar(f);
-}
-
-String makeScalar(scalar s){
-	return String()+scalarToFloat(s);
-}
-
-Vector2 parseVector2(const char *string){
-	float x=0,y=0;
-	sscanf(string,"%f,%f",&x,&y);
-	return Vector2(floatToScalar(x),floatToScalar(y));
-}
-
-String makeVector2(const Vector2 &v){
-	return String()+scalarToFloat(v.x)+','+scalarToFloat(v.y);
-}
-
-const char *makeVector2(char *buffer,const Vector2 &v){
-	sprintf(buffer,"%f,%f ",scalarToFloat(v.x),scalarToFloat(v.y));
-	return buffer;
-}
-
-Vector3 parseVector3(const char *string){
-	float x=0,y=0,z=0;
-	sscanf(string,"%f,%f,%f",&x,&y,&z);
-	return Vector3(floatToScalar(x),floatToScalar(y),floatToScalar(z));
-}
-
-String makeVector3(const Vector3 &v){
-	return String()+scalarToFloat(v.x)+','+scalarToFloat(v.y)+','+scalarToFloat(v.z);
-}
-
-const char *makeVector3(char *buffer,const Vector3 &v){
-	sprintf(buffer,"%f,%f,%f ",scalarToFloat(v.x),scalarToFloat(v.y),scalarToFloat(v.z));
-	return buffer;
-}
-
-Vector4 parseVector4(const char *string){
-	float x=0,y=0,z=0,w=0;
-	sscanf(string,"%f,%f,%f,%f",&x,&y,&z,&w);
-	return Vector4(floatToScalar(x),floatToScalar(y),floatToScalar(z),floatToScalar(w));
-}
-
-String makeVector4(const Vector4 &v){
-	return String()+scalarToFloat(v.x)+','+scalarToFloat(v.y)+','+scalarToFloat(v.z)+','+scalarToFloat(v.w);
-}
-
-const char *makeVector4(char *buffer,const Vector4 &v){
-	sprintf(buffer,"%f,%f,%f,%f ",scalarToFloat(v.x),scalarToFloat(v.y),scalarToFloat(v.z),scalarToFloat(v.w));
-	return buffer;
-}
-
-Quaternion parseQuaternion(const char *string){
-	float x=0,y=0,z=0,w=0;
-	sscanf(string,"%f,%f,%f,%f",&x,&y,&z,&w);
-	return Quaternion(floatToScalar(x),floatToScalar(y),floatToScalar(z),floatToScalar(w));
-}
-
-String makeQuaternion(const Quaternion &q){
-	return String()+scalarToFloat(q.x)+','+scalarToFloat(q.y)+','+scalarToFloat(q.z)+','+scalarToFloat(q.w);
-}
-
-String parseString(const char *string){
-	return String(string).trimLeft().trimRight();
-}
-
 Mesh::VertexBoneAssignmentList parseBoneAssignment(const String &string){
 	int i=0;
 	int c=0;
@@ -197,7 +102,7 @@ Mesh::VertexBoneAssignmentList parseBoneAssignment(const String &string){
 		}
 
 		if(c%2==0){
-			vba.bone=XMLMeshUtilities::parseInt(string.substr(i,comma-i));
+			vba.bone=parseInt(string.substr(i,comma-i));
 		}
 		else{
 			vba.weight=parseScalar(string.substr(i,comma-i));
@@ -221,7 +126,9 @@ Mesh::VertexBoneAssignmentList parseBoneAssignment(const String &string){
 	return vbaList;
 }
 
-const char *makeBoneAssignment(char *buffer,const Mesh::VertexBoneAssignmentList &vbaList){
+String makeBoneAssignment(const Mesh::VertexBoneAssignmentList &vbaList){
+	char buffer[128];
+
 	int offset=0;
 
 	int i;
@@ -237,7 +144,7 @@ const char *makeBoneAssignment(char *buffer,const Mesh::VertexBoneAssignmentList
 		}
 	}
 
-	return buffer;
+	return String(buffer);
 }
 
 /// @todo: Support loading all of the material, instead of starting with a DiffuseMaterial
@@ -377,32 +284,32 @@ mxml_node_t *XMLMeshUtilities::saveMaterial(Material::ptr material,int version,P
 	if(renderState->getMaterialState(materialState)){
 		mxml_node_t *lightNode=mxmlNewElement(materialNode,"Light");
 		{
-			mxmlNewOpaque(lightNode,makeBool(materialState.light));
+			mxmlNewOpaque(lightNode,formatBool(materialState.light));
 		}
 
 		mxml_node_t *ambientNode=mxmlNewElement(materialNode,"Ambient");
 		{
-			mxmlNewOpaque(ambientNode,makeVector4(materialState.ambient));
+			mxmlNewOpaque(ambientNode,formatVector4(materialState.ambient));
 		}
 
 		mxml_node_t *diffuseNode=mxmlNewElement(materialNode,"Diffuse");
 		{
-			mxmlNewOpaque(diffuseNode,makeVector4(materialState.diffuse));
+			mxmlNewOpaque(diffuseNode,formatVector4(materialState.diffuse));
 		}
 
 		mxml_node_t *specularNode=mxmlNewElement(materialNode,"Specular");
 		{
-			mxmlNewOpaque(specularNode,makeVector4(materialState.specular));
+			mxmlNewOpaque(specularNode,formatVector4(materialState.specular));
 		}
 		
 		mxml_node_t *shininessNode=mxmlNewElement(materialNode,"Shininess");
 		{
-			mxmlNewOpaque(shininessNode,makeScalar(materialState.shininess));
+			mxmlNewOpaque(shininessNode,formatScalar(materialState.shininess));
 		}
 
 		mxml_node_t *emissiveNode=mxmlNewElement(materialNode,"Emissive");
 		{
-			mxmlNewOpaque(emissiveNode,makeVector4(materialState.emissive));
+			mxmlNewOpaque(emissiveNode,formatVector4(materialState.emissive));
 		}
 	}
 
@@ -745,17 +652,17 @@ mxml_node_t *XMLMeshUtilities::saveMesh(Mesh::ptr mesh,int version,ProgressListe
 
 		mxml_node_t *translateNode=mxmlNewElement(transformNode,"Translate");
 		{
-			mxmlNewOpaque(translateNode,makeVector3(transform.getTranslate()));
+			mxmlNewOpaque(translateNode,formatVector3(transform.getTranslate()));
 		}
 
 		mxml_node_t *rotateNode=mxmlNewElement(transformNode,"Rotate");
 		{
-			mxmlNewOpaque(rotateNode,makeQuaternion(transform.getRotate()));
+			mxmlNewOpaque(rotateNode,formatQuaternion(transform.getRotate()));
 		}
 
 		mxml_node_t *scaleNode=mxmlNewElement(transformNode,"Scale");
 		{
-			mxmlNewOpaque(scaleNode,makeVector3(transform.getScale()));
+			mxmlNewOpaque(scaleNode,formatVector3(transform.getScale()));
 		}
 	}
 
@@ -768,7 +675,7 @@ mxml_node_t *XMLMeshUtilities::saveMesh(Mesh::ptr mesh,int version,ProgressListe
 	{
 		const VertexBuffer::ptr &vertexBuffer=vertexData->getVertexBuffer(0);
 
-		mxmlElementSetAttr(vertexNode,"Count",makeInt(vertexBuffer->getSize()));
+		mxmlElementSetAttr(vertexNode,"Count",formatInt(vertexBuffer->getSize()));
 
 		VertexFormat::ptr vertexFormat=vertexBuffer->getVertexFormat();
 		String type;
@@ -807,7 +714,6 @@ mxml_node_t *XMLMeshUtilities::saveMesh(Mesh::ptr mesh,int version,ProgressListe
 		Vector3 v3;
 		Vector2 v2;
 		char line[1024];
-		char buffer[128];
 		String data;
 		int i;
 		for(i=0;i<vertexBuffer->getSize();++i){
@@ -816,25 +722,24 @@ mxml_node_t *XMLMeshUtilities::saveMesh(Mesh::ptr mesh,int version,ProgressListe
 			}
 
 			line[0]=0;
-			buffer[0]=0;
 
 			if(i==0) strcat(line,"\n");
 			strcat(line,"\t\t\t");
 
 			if(pi>=0){
-				vba.get3(i,pi,v3); strcat(line,makeVector3(buffer,v3));
+				vba.get3(i,pi,v3); strcat(line,formatVector3(v3));
 			}
 			if(ni>=0){
-				vba.get3(i,ni,v3); strcat(line,makeVector3(buffer,v3));
+				vba.get3(i,ni,v3); strcat(line,formatVector3(v3));
 			}
 			if(ti>=0){
-				vba.get2(i,ti,v2); strcat(line,makeVector2(buffer,v2));
+				vba.get2(i,ti,v2); strcat(line,formatVector2(v2));
 			}
 			if(ci>=0){
-				strcat(line,makeVector4(buffer,Vector4(vba.getRGBA(i,ci))));
+				strcat(line,formatVector4(Vector4(vba.getRGBA(i,ci))));
 			}
 			if(vbas.size()>0){
-				strcat(line,makeBoneAssignment(buffer,vbas[i]));
+				strcat(line,makeBoneAssignment(vbas[i]));
 			}
 
 			strcat(line,LF);
@@ -866,12 +771,12 @@ mxml_node_t *XMLMeshUtilities::saveMesh(Mesh::ptr mesh,int version,ProgressListe
 
 			mxml_node_t *indexNode=mxmlNewElement(subMeshNode,"Indexes");
 			{
-				mxmlElementSetAttr(indexNode,"Count",makeInt(indexBuffer->getSize()));
+				mxmlElementSetAttr(indexNode,"Count",formatInt(indexBuffer->getSize()));
 
 				String line;
 				int j;
 				for(j=0;j<indexBuffer->getSize();++j){
-					line+=makeInt(iba.get(j));
+					line+=formatInt(iba.get(j));
 
 					if(j<indexBuffer->getSize()-1){
 						line+=" ";
@@ -965,9 +870,9 @@ mxml_node_t *XMLMeshUtilities::saveSkeleton(Skeleton::ptr skeleton,int version,P
 
 		mxml_node_t *boneNode=mxmlNewElement(skeletonNode,"Bone");
 		{
-			mxmlElementSetAttr(boneNode,"Index",makeInt(bone->index));
+			mxmlElementSetAttr(boneNode,"Index",formatInt(bone->index));
 
-			mxmlElementSetAttr(boneNode,"Parent",makeInt(bone->parentIndex));
+			mxmlElementSetAttr(boneNode,"Parent",formatInt(bone->parentIndex));
 
 			if(bone->name!=(char*)NULL){
 				mxmlElementSetAttr(boneNode,"Name",bone->name);
@@ -975,17 +880,17 @@ mxml_node_t *XMLMeshUtilities::saveSkeleton(Skeleton::ptr skeleton,int version,P
 
 			mxml_node_t *translateNode=mxmlNewElement(boneNode,"Translate");
 			{
-				mxmlNewOpaque(translateNode,makeVector3(bone->translate));
+				mxmlNewOpaque(translateNode,formatVector3(bone->translate));
 			}
 
 			mxml_node_t *rotateNode=mxmlNewElement(boneNode,"Rotate");
 			{
-				mxmlNewOpaque(rotateNode,makeQuaternion(bone->rotate));
+				mxmlNewOpaque(rotateNode,formatQuaternion(bone->rotate));
 			}
 
 			mxml_node_t *scaleNode=mxmlNewElement(boneNode,"Scale");
 			{
-				mxmlNewOpaque(scaleNode,makeVector3(bone->scale));
+				mxmlNewOpaque(scaleNode,formatVector3(bone->scale));
 			}
 		}
 	}
@@ -1082,7 +987,7 @@ mxml_node_t *XMLMeshUtilities::saveSequence(Sequence::ptr sequence,int version,P
 		mxmlElementSetAttr(sequenceNode,"Name",sequence->getName());
 	}
 
-	mxmlElementSetAttr(sequenceNode,"Length",makeScalar(sequence->getLength()));
+	mxmlElementSetAttr(sequenceNode,"Length",formatScalar(sequence->getLength()));
 
 	int j;
 	for(j=0;j<sequence->getNumTracks();++j){
@@ -1094,34 +999,34 @@ mxml_node_t *XMLMeshUtilities::saveSequence(Sequence::ptr sequence,int version,P
 
 		mxml_node_t *trackNode=mxmlNewElement(sequenceNode,"Track");
 
-		mxmlElementSetAttr(trackNode,"Index",makeInt(track->getIndex()));
+		mxmlElementSetAttr(trackNode,"Index",formatInt(track->getIndex()));
 
 		VertexBufferAccessor &vba=track->getAccessor();
 		int k;
 		for(k=0;k<track->getNumKeyFrames();++k){
 			mxml_node_t *keyFrameNode=mxmlNewElement(trackNode,"KeyFrame");
 
-			mxmlElementSetAttr(keyFrameNode,"Time",makeScalar(track->getTime(k)));
+			mxmlElementSetAttr(keyFrameNode,"Time",formatScalar(track->getTime(k)));
 
 			mxml_node_t *translateNode=mxmlNewElement(keyFrameNode,"Translate");
 			{
 				Vector3 translate;
 				vba.get3(k,0,translate);
-				mxmlNewOpaque(translateNode,makeVector3(translate));
+				mxmlNewOpaque(translateNode,formatVector3(translate));
 			}
 
 			mxml_node_t *rotateNode=mxmlNewElement(keyFrameNode,"Rotate");
 			{
 				Quaternion rotate;
 				vba.get4(k,1,rotate);
-				mxmlNewOpaque(rotateNode,makeQuaternion(rotate));
+				mxmlNewOpaque(rotateNode,formatQuaternion(rotate));
 			}
 
 			mxml_node_t *scaleNode=mxmlNewElement(keyFrameNode,"Scale");
 			{
 				Vector3 scale;
 				vba.get3(k,2,scale);
-				mxmlNewOpaque(scaleNode,makeVector3(scale));
+				mxmlNewOpaque(scaleNode,formatVector3(scale));
 			}
 		}
 	}

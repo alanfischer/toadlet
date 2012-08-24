@@ -43,7 +43,6 @@
 #include <toadlet/tadpole/MeshManager.h>
 #include <toadlet/tadpole/ShaderManager.h>
 #include <toadlet/tadpole/ContextListener.h>
-#include <toadlet/tadpole/MathFormatter.h>
 #include <toadlet/tadpole/Node.h>
 
 namespace toadlet{
