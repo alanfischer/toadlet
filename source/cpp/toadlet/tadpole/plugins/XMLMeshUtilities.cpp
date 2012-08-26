@@ -42,20 +42,6 @@ namespace tadpole{
 const char LF[]={0xA,0x0};
 const char CRLF[]={0xD,0xA,0x0};
 
-const int MAX_TABS=10;
-const char *TABS[MAX_TABS]={
-	"",
-	"\t",
-	"\t\t",
-	"\t\t\t",
-	"\t\t\t\t",
-	"\t\t\t\t\t",
-	"\t\t\t\t\t\t",
-	"\t\t\t\t\t\t\t",
-	"\t\t\t\t\t\t\t\t",
-	"\t\t\t\t\t\t\t\t\t",
-};
-
 // For version 2
 const int MAX_MAP_NAMES=8;
 const char *MAP_NAMES[MAX_MAP_NAMES]={
@@ -68,25 +54,6 @@ const char *MAP_NAMES[MAX_MAP_NAMES]={
 	"Reflection",
 	"Refraction",
 };
-
-const char *XMLMeshUtilities::mxmlSaveCallback(mxml_node_t *node,int ws){
-	bool oneLiner=false;
-
-	if(node->child!=NULL && node->child==node->last_child && node->child->type!=MXML_ELEMENT){
-		oneLiner=true;
-	}
-
-	if(ws==MXML_WS_BEFORE_OPEN || (oneLiner==false && ws==MXML_WS_BEFORE_CLOSE)){
-		int count=0;
-		while((node=node->parent)!=NULL) count++;
-		if(count>MAX_TABS-1){count=MAX_TABS-1;}
-		return TABS[count];
-	}
-	else if((oneLiner==false && ws==MXML_WS_AFTER_OPEN) || ws==MXML_WS_AFTER_CLOSE){
-		return "\n";
-	}
-	return NULL;
-}
 
 Mesh::VertexBoneAssignmentList parseBoneAssignment(const String &string){
 	int i=0;

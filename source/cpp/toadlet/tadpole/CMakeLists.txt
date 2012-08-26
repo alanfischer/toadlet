@@ -81,6 +81,7 @@ set (TADPOLE_PLUGINS_SRC
 )
 
 set (TADPOLE_PLUGINS_XML_SRC
+	plugins/toadlet_mxml.cpp
 	plugins/XANMStreamer.cpp
 	plugins/XMLMeshUtilities.cpp
 	plugins/XMATStreamer.cpp
@@ -295,6 +296,7 @@ set (TADPOLE_PLUGINS_HEADERS
 )
 
 set (TADPOLE_PLUGINS_XML_HEADERS
+	plugins/toadlet_mxml.h
 	plugins/XANMStreamer.h
 	plugins/XMLMeshUtilities.h
 	plugins/XMATStreamer.h
