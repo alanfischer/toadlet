@@ -89,7 +89,7 @@ bool XMATStreamer::save(Stream::ptr stream,Resource::ptr resource,ResourceData *
 		return false;
 	}
 
-	char *string=mxmlSaveAllocString(root,XMLMeshUtilities::mxmlSaveCallback);
+	char *string=mxmlSaveAllocString(root,mxmlSaveCallback);
 	stream->write((tbyte*)string,strlen(string));
 	free(string);
 
