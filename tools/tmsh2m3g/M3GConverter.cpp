@@ -1513,7 +1513,7 @@ M3GObject3D *M3GConverter::buildSceneGraph(Mesh *toadletMesh,float scale,int for
 		const Collection<Mesh::VertexBoneAssignmentList> &vbas=toadletMesh->getVertexBoneAssignments();
 
 		Collection<Collection<int> > boneverts;
-		boneverts.resize(toadletSkeleton->bones.size());
+		boneverts.resize(toadletSkeleton->getNumBones());
 
 		// Here we calculate a vertexBuffer reordering so that bones can reference their vertexes sequentially
 		int count=0;
@@ -1524,7 +1524,7 @@ M3GObject3D *M3GConverter::buildSceneGraph(Mesh *toadletMesh,float scale,int for
 				count++;
 			}
 		}
-		for(i=0;i<toadletSkeleton->bones.size();++i){
+		for(i=0;i<toadletSkeleton->getNumBones();++i){
 			for(j=0;j<vbas.size();++j){
 				const Mesh::VertexBoneAssignmentList &assignments=vbas[j];
 				if(assignments.size()>0 && assignments[0].bone==i){
@@ -1538,8 +1538,8 @@ M3GObject3D *M3GConverter::buildSceneGraph(Mesh *toadletMesh,float scale,int for
 		M3GSkinnedMesh *skinnedMesh=new M3GSkinnedMesh();
 
 		Collection<M3GGroup*> bones;
-		for(i=0;i<toadletSkeleton->bones.size();++i){
-			Skeleton::Bone *toadletBone=toadletSkeleton->bones[i];
+		for(i=0;i<toadletSkeleton->getNumBones();++i){
+			Skeleton::Bone *toadletBone=toadletSkeleton->getBone(i);
 			M3GGroup *bone=new M3GGroup();
 			bones.add(bone);
 
@@ -1580,11 +1580,11 @@ M3GObject3D *M3GConverter::buildSceneGraph(Mesh *toadletMesh,float scale,int for
 			bone->scale=toadletBone->scale;
 		}
 
-		skinnedMesh->userParameters.resize(toadletSkeleton->sequences.size());
+		skinnedMesh->userParameters.resize(toadletSkeleton->getNumSequences());
 
-		for(i=0;i<toadletSkeleton->sequences.size();++i){
-			Sequence *sequence=toadletSkeleton->sequences[i];
-
+		for(i=0;i<toadletSkeleton->getNumSequences();++i){
+			Sequence *sequence=toadletSkeleton->getSequence(i);
+		
 			M3GAnimationController *animationController=new M3GAnimationController();
 			animationController->speed=1.0f;
 			if(i==activeAnimation){

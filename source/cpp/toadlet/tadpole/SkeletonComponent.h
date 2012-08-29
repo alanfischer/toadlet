@@ -117,7 +117,7 @@ public:
 	int getBoneIndex(Bone *bone) const{return bone->index;}
 
 	String getBoneName(int index) const;
-	String getBoneName(Bone *bone) const{return mSkeleton->bones[bone->index]->name;}
+	String getBoneName(Bone *bone) const{return mSkeleton->getBone(bone->index)->name;}
 
 	const AABox &getBound(){return mBound;}
 

@@ -36,9 +36,9 @@ class TOADLET_API Skeleton:public BaseResource{
 public:
 	TOADLET_RESOURCE(Skeleton,Skeleton);
 
-	class TOADLET_API Bone{
+	class TOADLET_API Bone:public Object{
 	public:
-		TOADLET_SPTR(Bone);
+		TOADLET_OBJECT(Bone);
 
 		Bone():
 			index(-1),
@@ -66,11 +66,20 @@ public:
 	void destroy();
 	void compile();
 
-	Bone::ptr getBone(int i){return bones[i];}
+	int getNumBones() const{return mBones.size();}
+	virtual void addBone(Bone *bone){mBones.add(bone);}
+	virtual void removeBone(int i){mBones.removeAt(i);}
+	Bone::ptr getBone(int i){return mBones[i];}
 	Bone::ptr getBone(const String &name);
 
-	Collection<Bone::ptr> bones;
-	Collection<Sequence::ptr> sequences;
+	int getNumSequences() const{return mSequences.size();}
+	virtual void addSequence(Sequence *sequence){mSequences.add(sequence);}
+	virtual void removeSequence(int i){mSequences.removeAt(i);}
+	Sequence *getSequence(int i){return mSequences[i];}
+
+protected:
+	Collection<Bone::ptr> mBones;
+	Collection<Sequence::ptr> mSequences;
 };
 
 }

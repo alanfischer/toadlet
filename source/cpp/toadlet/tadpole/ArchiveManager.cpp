@@ -68,10 +68,10 @@ Stream::ptr ArchiveManager::openStream(const String &name){
 				}
 			}
 		}
-		else{
+		if(fileStream==NULL || fileStream->closed()==true){
 			fileStream=new FileStream(name,FileStream::Open_READ_BINARY);
 		}
-		if(fileStream->closed()==false){
+		if(fileStream!=NULL && fileStream->closed()==false){
 			stream=fileStream;
 		}
 	}

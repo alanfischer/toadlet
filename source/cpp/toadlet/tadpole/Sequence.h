@@ -43,8 +43,8 @@ public:
 	void compile();
 
 	int getNumTracks() const{return mTracks.size();}
-	void addTrack(Track *track){mTracks.add(track);}
-	void removeTrack(int i){mTracks.removeAt(i);}
+	virtual void addTrack(Track *track){mTracks.add(track);}
+	virtual void removeTrack(int i){mTracks.removeAt(i);}
 	Track *getTrack(int i){return mTracks[i];}
 
 	scalar getLength() const{return mLength;}

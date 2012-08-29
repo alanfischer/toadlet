@@ -33,7 +33,8 @@ namespace toadlet{
 namespace tadpole{
 
 GMEDecoder::GMEDecoder():
-	emu(NULL)
+	emu(NULL),
+	mTrack(0)
 {
 	mFormat=AudioFormat::ptr(new AudioFormat(16,2,22050));
 }
@@ -73,6 +74,7 @@ int GMEDecoder::getNumTracks(){
 }
 
 bool GMEDecoder::startTrack(int track){
+	mTrack=track;
 	gme_err_t result=gme_start_track(emu,track);
 	return result==NULL;
 }
@@ -83,6 +85,10 @@ int GMEDecoder::read(tbyte *buffer,int length){
 		length=-1;
 	}
 	return length;
+}
+
+bool GMEDecoder::reset(){
+	return startTrack(mTrack);
 }
 
 gme_err_t GMEDecoder::reader(void *data,void *buffer,int length){

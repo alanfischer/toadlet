@@ -16,6 +16,11 @@ if (WIN32)
 		"C:/Program Files/MilkShape 3D 1.8.3"
 		"C:/Program Files/MilkShape 3D 1.8.2"
 		"C:/Program Files/MilkShape 3D 1.8.1"
+		"C:/Program Files (x86)/MilkShape 3D 1.8.5"
+		"C:/Program Files (x86)/MilkShape 3D 1.8.4"
+		"C:/Program Files (x86)/MilkShape 3D 1.8.3"
+		"C:/Program Files (x86)/MilkShape 3D 1.8.2"
+		"C:/Program Files (x86)/MilkShape 3D 1.8.1"
 	)
 	
 	set (MS_HEADERS
@@ -27,7 +32,7 @@ if (WIN32)
 
 	get_filename_component (MS3D_DIR ${MS3D_EXE} PATH)
 	
-	find_path (MS3D_SDK_DIR ${MS_HEADERS} PATHS ${MS3D_DIR}/msLib)
+	find_path (MS3D_SDK_DIR ${MS_HEADERS} PATHS ${MS3D_DIR} ${MS3D_DIR}/msLib)
 
 	find_library (MS3D_SDK_LIB msModelLib PATHS ${MS3D_SDK_DIR} ${MS3D_SDK_DIR}/lib)
 

@@ -377,7 +377,7 @@ bool BACConverter::extractMeshData(Mesh::ptr mesh,bool useSubmeshes){
 
 void BACConverter::buildBones(Mesh *mesh,SkeletonComponent *nodeSkeleton,int bone){
 	Skeleton *skeleton=mesh->getSkeleton();
-	Skeleton::Bone *meshBone=skeleton->bones[bone];
+	Skeleton::Bone *meshBone=skeleton->getBone(bone);
 	int i;
 
 	int nextChild=-1;
@@ -408,8 +408,8 @@ void BACConverter::buildBones(Mesh *mesh,SkeletonComponent *nodeSkeleton,int bon
 	bacBone->rotate=worldTranslate+worldRotate;
 	bacBone->handle=worldTranslate+worldHandle;
 
-	for(i=0;i<skeleton->bones.size();++i) if(skeleton->bones[i]->parentIndex==bone) break;
-	if(i!=skeleton->bones.size()){
+	for(i=0;i<skeleton->getNumBones();++i) if(skeleton->getBone(i)->parentIndex==bone) break;
+	if(i!=skeleton->getNumBones()){
 		bacBone->hasChild=true;
 		nextChild=i;
 	}
@@ -418,9 +418,9 @@ void BACConverter::buildBones(Mesh *mesh,SkeletonComponent *nodeSkeleton,int bon
 	}
 
 	if(meshBone->parentIndex!=-1){
-		Skeleton::Bone *parentBone=skeleton->bones[meshBone->parentIndex];
-		for(i=bone+1;i<skeleton->bones.size();++i) if(skeleton->bones[i]->parentIndex==meshBone->parentIndex) break;
-		if(i<skeleton->bones.size()){
+		Skeleton::Bone *parentBone=skeleton->getBone(meshBone->parentIndex);
+		for(i=bone+1;i<skeleton->getNumBones();++i) if(skeleton->getBone(i)->parentIndex==meshBone->parentIndex) break;
+		if(i<skeleton->getNumBones()){
 			bacBone->hasBrother=true;
 			nextBrother=i;
 		}
@@ -1160,7 +1160,7 @@ void BACConverter::extractAnimationData(Mesh *mesh,Sequence *animation){
 		VertexBufferAccessor &vba=track->getAccessor();
 
 		int boneIndex=track->getIndex();
-		Skeleton::Bone *meshbone=mesh->getSkeleton()->bones[boneIndex];
+		Skeleton::Bone *meshbone=mesh->getSkeleton()->getBone(boneIndex);
 
 		if(track->getNumKeyFrames()>0){
 			BACAnimationBone *bacbone=new BACAnimationBone();

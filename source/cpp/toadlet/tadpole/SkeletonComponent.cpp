@@ -43,9 +43,9 @@ SkeletonComponent::SkeletonComponent(Engine *engine,Skeleton *skeleton):
 	mEngine=engine;
 	mSkeleton=skeleton;
 
-	mBones.resize(skeleton->bones.size());
+	mBones.resize(skeleton->getNumBones());
 	int i;
-	for(i=0;i<skeleton->bones.size();++i){
+	for(i=0;i<skeleton->getNumBones();++i){
 		mBones[i]=Bone::ptr(new Bone(i));
 	}
 
@@ -89,8 +89,8 @@ void SkeletonComponent::updateBones(){
 }
 
 void SkeletonComponent::updateBones(int sequenceIndex,scalar sequenceTime){
-	if(sequenceIndex>=0 && sequenceIndex<mSkeleton->sequences.size()){
-		mSequence=mSkeleton->sequences[sequenceIndex];
+	if(sequenceIndex>=0 && sequenceIndex<mSkeleton->getNumSequences()){
+		mSequence=mSkeleton->getSequence(sequenceIndex);
 		mSequenceTime=sequenceTime;
 	}
 
@@ -99,8 +99,8 @@ void SkeletonComponent::updateBones(int sequenceIndex,scalar sequenceTime){
 
 int SkeletonComponent::getBoneIndex(const String &name) const{
 	int i;
-	for(i=0;i<mSkeleton->bones.size();++i){
-		if(mSkeleton->bones[i]->name.equals(name)){
+	for(i=0;i<mSkeleton->getNumBones();++i){
+		if(mSkeleton->getBone(i)->name.equals(name)){
 			return i;
 		}
 	}
@@ -109,8 +109,8 @@ int SkeletonComponent::getBoneIndex(const String &name) const{
 }
 
 String SkeletonComponent::getBoneName(int index) const{
-	if(index>=0 && index<mSkeleton->bones.size()){
-		return mSkeleton->bones[index]->name;
+	if(index>=0 && index<mSkeleton->getNumBones()){
+		return mSkeleton->getBone(index)->name;
 	}
 	else{
 		return (char*)NULL;
@@ -155,7 +155,7 @@ int SkeletonComponent::updateBoneTransformation(Bone *bone){
 void SkeletonComponent::updateBone(Bone *bone){
 	int updateFlags=BoneSpaceUpdate_NONE;
 
-	Skeleton::Bone *sbone=mSkeleton->bones[bone->index];
+	Skeleton::Bone *sbone=mSkeleton->getBone(bone->index);
 
 	if(bone->controller==NULL){
 		updateFlags=updateBoneTransformation(bone);
@@ -280,7 +280,7 @@ void SkeletonComponent::createSkeletonBuffers(){
 	{
 		iba.lock(skeletonIndexBuffer,Buffer::Access_BIT_WRITE);
 		for(i=1;i<mBones.size();++i){
-			iba.set((i-1)*2+0,mSkeleton->bones[i]->parentIndex<0?0:mSkeleton->bones[i]->parentIndex);
+			iba.set((i-1)*2+0,mSkeleton->getBone(i)->parentIndex<0?0:mSkeleton->getBone(i)->parentIndex);
 			iba.set((i-1)*2+1,i);
 		}
 		iba.unlock();

@@ -66,14 +66,14 @@ void Mesh::compileBoneBounds(){
 	if(mSkeleton!=NULL){
 		VertexBufferAccessor vba(mStaticVertexData->getVertexBuffer(0),Buffer::Access_BIT_READ);
 
-		Collection<bool> touched(mSkeleton->bones.size(),false);
+		Collection<bool> touched(mSkeleton->getNumBones(),false);
 
 		Vector3 v;
 		int i,j;
 		for(i=0;i<mVertexBoneAssignments.size();++i){
 			const VertexBoneAssignmentList &vbal=mVertexBoneAssignments[i];
 			for(j=0;j<vbal.size();++j){
-				Skeleton::Bone *bone=mSkeleton->bones[vbal[j].bone];
+				Skeleton::Bone *bone=mSkeleton->getBone(vbal[j].bone);
 				vba.get3(i,0,v);
 				Math::mul(v,bone->worldToBoneRotate);
 				Math::add(v,bone->worldToBoneTranslate);

@@ -29,6 +29,7 @@
 #include <toadlet/egg/MathConversion.h>
 #include <toadlet/egg/EndianConversion.h>
 #include <toadlet/egg/System.h>
+#include <toadlet/ribbit/AudioFormatConversion.h>
 
 namespace toadlet{
 namespace ribbit{
@@ -70,6 +71,7 @@ bool ALAudio::create(AudioBuffer *audioBuffer){
 
 	mAudioStream=NULL;
 	mAudioBuffer=audioBuffer;
+	mAudioFormat=NULL;
 
 	ALAudioBuffer *alaudioBuffer=((ALAudioBuffer*)audioBuffer->getRootAudioBuffer());
 
@@ -91,6 +93,8 @@ bool ALAudio::create(AudioStream *stream){
 
 	mAudioStream=stream;
 	mAudioBuffer=NULL;
+	mAudioFormat=AudioFormat::ptr(new AudioFormat(stream->getAudioFormat()->getBitsPerSample(),stream->getAudioFormat()->getChannels(),stream->getAudioFormat()->getSamplesPerSecond()));
+	mAudioFormat->setChannels(mGlobal?mAudioStream->getAudioFormat()->getChannels():1);
 
 	update(0);
 
@@ -121,7 +125,7 @@ void ALAudio::destroy(){
 
 bool ALAudio::play(){
 	if(mAudioStream!=NULL && mStreamingBuffers==NULL){
-		unsigned char buffer[bufferSize];
+		tbyte buffer[bufferSize];
 		int total=0;
 
 		mStreamingBuffers=new ALuint[numBuffers];
@@ -134,8 +138,8 @@ bool ALAudio::play(){
 			if(amount>0){
 				total=total+amount;
 				alBufferData(mStreamingBuffers[i],
-					ALAudioDevice::getALFormat(mAudioStream->getAudioFormat()),
-					buffer,amount,mAudioStream->getAudioFormat()->getSamplesPerSecond());
+					ALAudioDevice::getALFormat(mAudioFormat),
+					buffer,amount,mAudioFormat->getSamplesPerSecond());
 				TOADLET_CHECK_ALERROR("alBufferData");
 			}
 		}
@@ -240,6 +244,9 @@ scalar ALAudio::getRolloffFactor() const{
 
 void ALAudio::setGlobal(bool global){
 	mGlobal=global;
+	if(mAudioStream!=NULL){
+		mAudioFormat->setChannels(mGlobal?mAudioStream->getAudioFormat()->getChannels():1);
+	}
 	if(alIsSource(mHandle)){
 		if(mGlobal){
 			ALfloat zero[]={0,0,0};
@@ -335,8 +342,8 @@ void ALAudio::updateStreaming(int dt){
 				if(amount>0){
 					total=total+amount;
 					alBufferData(bufferID,
-						ALAudioDevice::getALFormat(mAudioStream->getAudioFormat()),
-						buffer,amount,mAudioStream->getAudioFormat()->getSamplesPerSecond());
+						ALAudioDevice::getALFormat(mAudioFormat),
+						buffer,amount,mAudioFormat->getSamplesPerSecond());
 					TOADLET_CHECK_ALERROR("update::alBufferData");
 					alSourceQueueBuffers(mHandle,1,&bufferID);
 					TOADLET_CHECK_ALERROR("update::alSourceQueueBuffers");
@@ -370,8 +377,17 @@ int ALAudio::readAudioData(tbyte *buffer,int bsize){
 		memset(buffer,0,4);
 	}
 
+	if(amount>0 && mAudioStream->getAudioFormat()->getChannels()!=mAudioFormat->getChannels()){
+		int newAmount=AudioFormatConversion::findConvertedLength(amount,mAudioStream->getAudioFormat(),mAudioFormat,true);
+		tbyte *newBuffer=new tbyte[newAmount];
+		AudioFormatConversion::convert(buffer,amount,mAudioStream->getAudioFormat(),newBuffer,newAmount,mAudioFormat);
+		memcpy(buffer,newBuffer,newAmount);
+		delete[] newBuffer;
+		amount=newAmount;
+	}
+
 	#if !defined(TOADLET_NATIVE_FORMAT)
-		if(mAudioStream->getAudioFormat()->bitsPerSample==16){
+		if(mAudioFormat->getBitsPerSample()==16){
 			int j=0;
 			while(j<amount){
 				littleInt16InPlace((int16&)buffer[j]);

@@ -46,7 +46,7 @@ cPlugIn::cPlugIn ()
 {
     strcpy (szTitle, "Toadlet Mesh/Animation ...");
 
-	engine=new Engine(true);
+	engine=new Engine();
 	engine->installHandlers();
 }
 
@@ -133,13 +133,13 @@ int
 cPlugIn::importMesh(msModel *pModel,const String &name,int flags){
     int i,j,k;
 
-	FileStream::ptr stream(new FileStream(name,FileStream::Open_READ_BINARY));
+	FileStream::ptr stream=new FileStream(name,FileStream::Open_READ_BINARY);
 	if(stream->closed()){
 		::MessageBox(NULL,"Toadlet Mesh/Animation Import","Error opening file",MB_OK);
 		return -1;
 	}
 
-	XMSHStreamer::ptr streamer(new XMSHStreamer(engine));
+	XMSHStreamer::ptr streamer=new XMSHStreamer(engine);
 	Mesh::ptr mesh=shared_static_cast<Mesh>(streamer->load(stream,NULL,NULL));
 	if(mesh==NULL){
 		::MessageBox(NULL,"Toadlet Mesh/Animation Import","Error loading file",MB_OK);
@@ -158,7 +158,7 @@ cPlugIn::importMesh(msModel *pModel,const String &name,int flags){
 		if(flags & eMeshes){
 			msmesh=msModel_GetMeshAt(pModel,msModel_AddMesh(pModel));
 
-			String meshName=subMesh->name;
+			String meshName=subMesh->getName();
 			if(meshName.length()==0){
 				meshName=String("Mesh:")+i;
 			}
@@ -298,8 +298,8 @@ cPlugIn::importMesh(msModel *pModel,const String &name,int flags){
 		
 		msVec3 position;
 		msVec3 rotation;
-		for(i=0;i<skeleton->bones.size();++i){
-			Skeleton::Bone::ptr bone=skeleton->bones[i];
+		for(i=0;i<skeleton->getNumBones();++i){
+			Skeleton::Bone::ptr bone=skeleton->getBone(i);
 			msBone *msbone=msModel_GetBoneAt(pModel,msModel_AddBone(pModel));
 
 			String boneName=bone->name;
@@ -309,7 +309,7 @@ cPlugIn::importMesh(msModel *pModel,const String &name,int flags){
 			msBone_SetName(msbone,boneName);
 
 			if(bone->parentIndex!=-1){
-				String parentName=skeleton->bones[bone->parentIndex]->name;
+				String parentName=skeleton->getBone(bone->parentIndex)->name;
 				if(parentName.length()==0){
 					parentName=String("Bone:")+bone->parentIndex;
 				}
@@ -328,17 +328,30 @@ cPlugIn::importMesh(msModel *pModel,const String &name,int flags){
 }
 
 Skeleton::ptr
-cPlugIn::buildSkeleton(msModel *pModel){
-	Skeleton::ptr skeleton(new Skeleton());
+cPlugIn::buildSkeleton(msModel *pModel,const Collection<int> &emptyBones){
+	Skeleton::ptr skeleton=new Skeleton();
 
-	int i;
+	int i,j;
 	for(i=0;i<msModel_GetBoneCount(pModel);++i){
-		Skeleton::Bone::ptr bone(new Skeleton::Bone());
-		skeleton->bones.add(bone);
+		int newi=i;
+		for(j=0;j<emptyBones.size();++j){
+			if(i==emptyBones[j]){
+				break;
+			}
+			else if(emptyBones[j]<newi){
+				newi--;
+			}
+		}
+		if(j!=emptyBones.size()){
+			continue;
+		}
 
+		Skeleton::Bone::ptr bone(new Skeleton::Bone());
+		skeleton->addBone(bone);
+	
 		msBone *msbone=msModel_GetBoneAt(pModel,i);
 
-		bone->index=i;
+		bone->index=newi;
 
 		char name[1024];
 		strcpy(name,"");
@@ -349,6 +362,11 @@ cPlugIn::buildSkeleton(msModel *pModel){
 		msBone_GetParentName(msbone,name,1024);
 		if(strlen(name)>0){
 			bone->parentIndex=msModel_FindBoneByName(pModel,name);
+			for(j=0;j<emptyBones.size();++j){
+				if(emptyBones[j]<bone->parentIndex){
+					bone->parentIndex--;
+				}
+			}
 		}
 		else{
 			bone->parentIndex=-1;
@@ -361,50 +379,25 @@ cPlugIn::buildSkeleton(msModel *pModel){
 		msVec3 rotation;
 		msBone_GetRotation(msbone,rotation);
 		convertMSVec3ToQuaternion(rotation,bone->rotate,bone->parentIndex==-1);
-
-		Vector3 wtbtranslation(bone->translate);
-		Quaternion wtbrotation(bone->rotate);
-		Skeleton::Bone::ptr parentBone=bone;
-		while(parentBone!=NULL){
-			if(parentBone->parentIndex==-1){
-				parentBone=NULL;
-			}
-			else{
-				parentBone=skeleton->bones[parentBone->parentIndex];
-				Matrix3x3 rotate;
-				Math::setMatrix3x3FromQuaternion(rotate,parentBone->rotate);
-				Math::mul(wtbtranslation,rotate);
-				Math::add(wtbtranslation,parentBone->translate);
-				Math::preMul(wtbrotation,parentBone->rotate);
-			}
-		}
-
-		Math::neg(wtbtranslation);
-		Math::invert(wtbrotation);
-
-		Matrix3x3 rotate;
-		Math::setMatrix3x3FromQuaternion(rotate,wtbrotation);
-		Math::mul(wtbtranslation,rotate);
-
-		bone->worldToBoneTranslate.set(wtbtranslation);
-		bone->worldToBoneRotate.set(wtbrotation);
 	}
+
+	skeleton->compile();
 
 	return skeleton;
 }
 
 int
 cPlugIn::importAnimation(msModel *pModel,const String &name,int flags){
-	Skeleton::ptr skeleton=buildSkeleton(pModel);
+	Skeleton::ptr skeleton=buildSkeleton(pModel,Collection<int>());
 
-	FileStream::ptr stream(new FileStream(name,FileStream::Open_READ_BINARY));
+	FileStream::ptr stream=new FileStream(name,FileStream::Open_READ_BINARY);
 	if(stream->closed()){
 		::MessageBox(NULL,"Toadlet Mesh/Animation Import","Error opening file",MB_OK);
 		return -1;
 	}
 
-	XANMStreamer::ptr streamer(new XANMStreamer());
-	TransformSequence::ptr sequence=shared_static_cast<TransformSequence>(streamer->load(stream,NULL,NULL));
+	XANMStreamer::ptr streamer=new XANMStreamer(engine);
+	Sequence::ptr sequence=shared_static_cast<Sequence>(streamer->load(stream,NULL,NULL));
 	if(sequence==NULL){
 		::MessageBox(NULL,"Toadlet Mesh/Animation Import","Error loading file",MB_OK);
 		return -1;
@@ -419,30 +412,31 @@ cPlugIn::importAnimation(msModel *pModel,const String &name,int flags){
 
 	int i;
 	for(i=0;i<sequence->getNumTracks();++i){
-		TransformTrack::ptr track=sequence->getTrack(i);
+		Track::ptr track=sequence->getTrack(i);
 
 		msBone *msbone=msModel_GetBoneAt(pModel,i);
 
+		VertexBufferAccessor &vba=track->getAccessor();
+	
 		int j;
-		for(j=0;j<track->keyFrames.size();++j){
+		for(j=0;j<track->getNumKeyFrames();++j){
 			msVec3 msvec;
-			Vector3 vec;
-			Quaternion quat;
+			Vector3 translate;
+			Quaternion rotate,invBoneRotate;
 
-			Math::sub(vec,track->keyFrames[j].translate,skeleton->bones[i]->translate);
-			Matrix3x3 rotate;
-			Math::setMatrix3x3FromQuaternion(rotate,skeleton->bones[i]->rotate);
-			Matrix3x3 invrot;
-			Math::invert(invrot,rotate);
-			Math::mul(vec,invrot);
-			convertVector3ToMSVec3(vec,msvec,false);
-			msBone_AddPositionKey(msbone,track->keyFrames[j].time*fps,msvec);
+			vba.get3(j,0,translate);
+			vba.get4(j,1,rotate);
 
-			Quaternion invqrot;
-			Math::invert(invqrot,skeleton->bones[i]->rotate);
-			Math::mul(quat,invqrot,track->keyFrames[j].rotate);
-			convertQuaternionToMSVec3(quat,msvec,false);
-			msBone_AddRotationKey(msbone,track->keyFrames[j].time*fps,msvec);
+			Math::invert(invBoneRotate,skeleton->getBone(i)->rotate);
+			Math::sub(translate,skeleton->getBone(i)->translate);
+
+			Math::mul(translate,invBoneRotate);
+			convertVector3ToMSVec3(translate,msvec,false);
+			msBone_AddPositionKey(msbone,track->getTime(j)*fps,msvec);
+
+			Math::postMul(rotate,invBoneRotate);
+			convertQuaternionToMSVec3(rotate,msvec,false);
+			msBone_AddRotationKey(msbone,track->getTime(j)*fps,msvec);
 		}
 	}
 

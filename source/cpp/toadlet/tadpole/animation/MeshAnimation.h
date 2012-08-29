@@ -54,7 +54,7 @@ public:
 	void setValue(scalar value);
 	scalar getValue() const{return mValue;}
 	scalar getMinValue() const{return 0;}
-	scalar getMaxValue() const{return mTarget->getSkeleton()->getSkeleton()->sequences[mSequenceIndex]->getLength();}
+	scalar getMaxValue() const{return mTarget->getSkeleton()->getSkeleton()->getSequence(mSequenceIndex)->getLength();}
 
 	void setWeight(scalar weight){}
 	scalar getWeight() const{return Math::ONE;}

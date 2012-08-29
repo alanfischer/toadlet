@@ -92,7 +92,7 @@ Resource::ptr TMSHStreamer::load(Stream::ptr stream,ResourceData *data,ProgressL
 
 	if(skeleton!=NULL){
 		for(i=0;i<sequences.size();++i){
-			skeleton->sequences.add(sequences[i]);
+			skeleton->addSequence(sequences[i]);
 		}
 	}
 
@@ -142,8 +142,8 @@ bool TMSHStreamer::save(Stream::ptr stream,Resource::ptr resource,ResourceData *
 		dataStream->write(memoryStream->getOriginalDataPointer(),memoryStream->length());
 		memoryStream->reset();
 
-		for(i=0;i<skeleton->sequences.size();++i){
-			Sequence::ptr sequence=skeleton->sequences[i];
+		for(i=0;i<skeleton->getNumSequences();++i){
+			Sequence::ptr sequence=skeleton->getSequence(i);
 			writeSequence(dataMemoryStream,sequence);
 			dataStream->writeInt32(Block_SEQUENCE);
 			dataStream->writeInt32(memoryStream->length());
@@ -157,7 +157,7 @@ bool TMSHStreamer::save(Stream::ptr stream,Resource::ptr resource,ResourceData *
 
 Mesh::ptr TMSHStreamer::readMesh(DataStream *stream,int blockSize){
 	int i;
-	Mesh::ptr mesh(new Mesh());
+	Mesh::ptr mesh=new Mesh();
 	
 	Transform transform;
 	stream->read((tbyte*)&transform,sizeof(Transform));
@@ -511,12 +511,12 @@ void TMSHStreamer::writeMaterial(DataStream *stream,Material::ptr material){
 }
 
 Skeleton::ptr TMSHStreamer::readSkeleton(DataStream *stream,int blockSize){
-	Skeleton::ptr skeleton(new Skeleton());
+	Skeleton::ptr skeleton=new Skeleton();
 
-	skeleton->bones.resize(stream->readInt32());
+	int numBones=stream->readInt32();
 
 	int i;
-	for(i=0;i<skeleton->bones.size();++i){
+	for(i=0;i<numBones;++i){
 		Skeleton::Bone::ptr bone(new Skeleton::Bone());
 
 		bone->index=stream->readInt32();
@@ -533,19 +533,19 @@ Skeleton::ptr TMSHStreamer::readSkeleton(DataStream *stream,int blockSize){
 
 		stream->readNullTerminatedString(bone->name);
 
-		skeleton->bones[i]=bone;
+		skeleton->addBone(bone);
 	}
 
 	return skeleton;
 }
 
 void TMSHStreamer::writeSkeleton(DataStream *stream,Skeleton::ptr skeleton){
-	stream->writeInt32(skeleton->bones.size());
+	stream->writeInt32(skeleton->getNumBones());
 
 	int i;
-	for(i=0;i<skeleton->bones.size();++i){
-		Skeleton::Bone *bone=skeleton->bones[i];
-
+	for(i=0;i<skeleton->getNumBones();++i){
+		Skeleton::Bone *bone=skeleton->getBone(i);
+	
 		stream->writeInt32(bone->index);
 		stream->writeInt32(bone->parentIndex);
 
