@@ -55,7 +55,7 @@ public:
 	bool writeable(){return false;}
 	int write(const tbyte *buffer,int length){return -1;}
 
-	bool reset(){return false;}
+	bool reset();
 	int length(){return -1;}
 	int position(){return -1;}
 	bool seek(int offs){return false;}
@@ -63,6 +63,7 @@ public:
 protected:
 	AudioFormat::ptr mFormat;
 	SIDAttributes *sid;
+	int mTrack;
 };
 
 }

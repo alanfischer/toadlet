@@ -773,7 +773,7 @@ mxml_node_t *XMLMeshUtilities::saveMesh(Mesh::ptr mesh,int version,ProgressListe
 }
 
 Skeleton::ptr XMLMeshUtilities::loadSkeleton(mxml_node_t *node,int version){
-	Skeleton::ptr skeleton(new Skeleton());
+	Skeleton::ptr skeleton=new Skeleton();
 
 	const char *prop=NULL;
 	mxml_node_t *boneNode=node->child;
@@ -814,10 +814,7 @@ Skeleton::ptr XMLMeshUtilities::loadSkeleton(mxml_node_t *node,int version){
 			bone->scale=parseVector3(mxmlGetOpaque(scaleNode->child));
 		}
 
-		if(skeleton->bones.size()<=bone->index){
-			skeleton->bones.resize(bone->index+1);
-		}
-		skeleton->bones[bone->index]=bone;
+		skeleton->addBone(bone);
 	}
 
 	skeleton->compile();
@@ -829,11 +826,11 @@ mxml_node_t *XMLMeshUtilities::saveSkeleton(Skeleton::ptr skeleton,int version,P
 	mxml_node_t *skeletonNode=mxmlNewElement(MXML_NO_PARENT,"Skeleton");
 
 	int i;
-	for(i=0;i<skeleton->bones.size();++i){
+	for(i=0;i<skeleton->getNumBones();++i){
 		if(listener!=NULL){
-			listener->progressUpdated((float)i/(float)skeleton->bones.size());
+			listener->progressUpdated((float)i/(float)skeleton->getNumBones());
 		}
-		Skeleton::Bone::ptr bone=skeleton->bones[i];
+		Skeleton::Bone::ptr bone=skeleton->getBone(i);
 
 		mxml_node_t *boneNode=mxmlNewElement(skeletonNode,"Bone");
 		{

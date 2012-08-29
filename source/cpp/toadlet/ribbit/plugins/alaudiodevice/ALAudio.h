@@ -90,6 +90,7 @@ protected:
 	scalar mGain;
 	AudioBuffer::ptr mAudioBuffer;
 	AudioStream::ptr mAudioStream;
+	AudioFormat::ptr mAudioFormat;
 
 	friend class ALAudioDevice;
 };

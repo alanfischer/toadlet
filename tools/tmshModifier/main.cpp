@@ -66,8 +66,8 @@ int main(int argc,char **argv){
 			return 0;
 		}
 
-		for(i=0;i<skeleton->sequences.size();++i){
-			Sequence::ptr sequence=skeleton->sequences[i];
+		for(i=0;i<skeleton->getNumSequences();++i){
+			Sequence::ptr sequence=skeleton->getSequence(i);
 
 			String name;
 			if(sequence->getName().length()>0){
@@ -96,8 +96,10 @@ int main(int argc,char **argv){
 			return 0;
 		}
 
-		skeleton->sequences.clear();
-
+		while(skeleton->getNumSequences()>0){
+			skeleton->removeSequence(0);
+		}
+	
 		for(i=3;i<argc;++i){
 			std::cout << "Inserting " << argv[i] << std::endl;
 			FileStream::ptr stream(new FileStream(argv[i],FileStream::Open_READ_BINARY));
@@ -107,10 +109,10 @@ int main(int argc,char **argv){
 			}
 			XANMStreamer::ptr streamer=new XANMStreamer(engine);
 			Sequence::ptr sequence=shared_static_cast<Sequence>(streamer->load(stream,NULL,NULL));
-			skeleton->sequences.add(sequence);
+			skeleton->addSequence(sequence);
 		}
 
-		FileStream::ptr stream(new FileStream(mshFileName,FileStream::Open_WRITE_BINARY));
+		FileStream::ptr stream=new FileStream(mshFileName,FileStream::Open_WRITE_BINARY);
 		if(stream->closed()){
 			std::cout << "Error opening " << (const char*)mshFileName << std::endl;
 			return 0;
@@ -136,12 +138,12 @@ int main(int argc,char **argv){
 
 		Skeleton::ptr skeleton=mesh->getSkeleton();
 		if(skeleton!=NULL){
-			for(i=0;i<skeleton->bones.size();++i){
-				skeleton->bones[i]->translate*=scale;
-				skeleton->bones[i]->worldToBoneTranslate*=scale;
+			for(i=0;i<skeleton->getNumBones();++i){
+				skeleton->getBone(i)->translate*=scale;
+				skeleton->getBone(i)->worldToBoneTranslate*=scale;
 			}
-			for(i=0;i<skeleton->sequences.size();++i){
-				Sequence *sequence=skeleton->sequences[i];
+			for(i=0;i<skeleton->getNumSequences();++i){
+				Sequence *sequence=skeleton->getSequence(i);
 				for(j=0;j<sequence->getNumTracks();++j){
 					Track *track=sequence->getTrack(j);
 					VertexBufferAccessor &vba=track->getAccessor();
@@ -155,13 +157,13 @@ int main(int argc,char **argv){
 			}
 		}
 
-		FileStream::ptr stream(new FileStream(mshFileName,FileStream::Open_WRITE_BINARY));
+		FileStream::ptr stream=new FileStream(mshFileName,FileStream::Open_WRITE_BINARY);
 		if(stream->closed()){
 			std::cout << "Error opening " << (const char*)mshFileName << std::endl;
 			return 0;
 		}
 
-		XMSHStreamer::ptr streamer(new XMSHStreamer(NULL));
+		XMSHStreamer::ptr streamer=new XMSHStreamer(NULL);
 		streamer->save(stream,mesh,NULL,NULL);
 	}
 

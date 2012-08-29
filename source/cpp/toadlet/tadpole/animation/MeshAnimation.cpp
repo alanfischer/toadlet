@@ -44,8 +44,8 @@ MeshAnimation::MeshAnimation(MeshComponent *target,const String &sequenceName):
 {
 	Skeleton *skeleton=target->getMesh()->getSkeleton();
 	int i;
-	for(i=0;i<skeleton->sequences.size();++i){
-		if(skeleton->sequences[i]->getName()==sequenceName){
+	for(i=0;i<skeleton->getNumSequences();++i){
+		if(skeleton->getSequence(i)->getName()==sequenceName){
 			mSequenceIndex=i;
 			break;
 		}

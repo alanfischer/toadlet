@@ -77,37 +77,37 @@ Resource::ptr XMSHStreamer::load(Stream::ptr stream,ResourceData *data,ProgressL
 
 		// Clean up skeleton
 		int i,j;
-		for(i=0;i<skeleton->bones.size();++i){
-			if(skeleton->bones[i]->parentIndex>i) break;
+		for(i=0;i<skeleton->getNumBones();++i){
+			if(skeleton->getBone(i)->parentIndex>i) break;
 		}
-		if(i<skeleton->bones.size()){
+		if(i<skeleton->getNumBones()){
 			// Reorder Bones
 			Skeleton::ptr unordered=skeleton;
-			Skeleton::ptr ordered(new Skeleton());
+			Skeleton::ptr ordered=new Skeleton();
 			// Pull all root bones
-			for(i=0;i<unordered->bones.size();++i){
-				if(unordered->bones[i]->parentIndex==-1){
-					ordered->bones.add(unordered->bones[i]);
-					unordered->bones.removeAt(i);
+			for(i=0;i<unordered->getNumBones();++i){
+				if(unordered->getBone(i)->parentIndex==-1){
+					ordered->addBone(unordered->getBone(i));
+					unordered->removeBone(i);
 					i--;
 				}
 			}
 			// Pull all bones that depend on a bone in the ordered bones
-			for(j=0;j<ordered->bones.size();++j){
-				Skeleton::Bone::ptr bone=ordered->bones[j];
-				for(i=0;i<unordered->bones.size();++i){
-					if(unordered->bones[i]->parentIndex==bone->index){
-						ordered->bones.add(unordered->bones[i]);
-						unordered->bones.removeAt(i);
+			for(j=0;j<ordered->getNumBones();++j){
+				Skeleton::Bone::ptr bone=ordered->getBone(j);
+				for(i=0;i<unordered->getNumBones();++i){
+					if(unordered->getBone(i)->parentIndex==bone->index){
+						ordered->addBone(unordered->getBone(i));
+						unordered->removeBone(i);
 						i--;
 					}
 				}
 			}
 
 			// Reassign the vertexBoneAssignments
-			Collection<int> oldIndexes(ordered->bones.size(),-1);
-			for(i=0;i<ordered->bones.size();++i){
-				oldIndexes[ordered->bones[i]->index]=i;
+			Collection<int> oldIndexes(ordered->getNumBones(),-1);
+			for(i=0;i<ordered->getNumBones();++i){
+				oldIndexes[ordered->getBone(i)->index]=i;
 			}
 			Collection<Mesh::VertexBoneAssignmentList> vbas=mesh->getVertexBoneAssignments();
 			for(i=0;i<vbas.size();++i){
@@ -119,18 +119,18 @@ Resource::ptr XMSHStreamer::load(Stream::ptr stream,ResourceData *data,ProgressL
 			mesh->setVertexBoneAssignments(vbas);
 
 			// Reindex the ordered bones
-			Collection<int> newParentIndexes(ordered->bones.size(),-1);
-			for(j=0;j<ordered->bones.size();++j){
-				int oldIndex=ordered->bones[j]->index;
-				ordered->bones[j]->index=j;
-				for(i=0;i<ordered->bones.size();++i){
-					if(ordered->bones[i]->parentIndex==oldIndex){
+			Collection<int> newParentIndexes(ordered->getNumBones(),-1);
+			for(j=0;j<ordered->getNumBones();++j){
+				int oldIndex=ordered->getBone(j)->index;
+				ordered->getBone(j)->index=j;
+				for(i=0;i<ordered->getNumBones();++i){
+					if(ordered->getBone(i)->parentIndex==oldIndex){
 						newParentIndexes[i]=j;
 					}
 				}
 			}
-			for(j=0;j<ordered->bones.size();++j){
-				ordered->bones[j]->parentIndex=newParentIndexes[j];
+			for(j=0;j<ordered->getNumBones();++j){
+				ordered->getBone(j)->parentIndex=newParentIndexes[j];
 			}
 
 			ordered->compile();
@@ -189,7 +189,7 @@ Mesh::ptr XMSHStreamer::loadMeshVersion1(mxml_node_t *root){
 			mesh->setSkeleton(XMLMeshUtilities::loadSkeleton(block,1));
 		}
 		else if(strcmp(mxmlGetElementName(block),"AnimationData")==0){
-			mesh->getSkeleton()->sequences.add(XMLMeshUtilities::loadSequence(block,1,mEngine!=NULL?mEngine->getBufferManager():NULL));
+			mesh->getSkeleton()->addSequence(XMLMeshUtilities::loadSequence(block,1,mEngine!=NULL?mEngine->getBufferManager():NULL));
 		}
 	}
 
@@ -208,7 +208,7 @@ Mesh::ptr XMSHStreamer::loadMeshVersion2Up(mxml_node_t *root,int version){
 			mesh->setSkeleton(XMLMeshUtilities::loadSkeleton(block,version));
 		}
 		else if(strcmp(mxmlGetElementName(block),"Sequence")==0){
-			mesh->getSkeleton()->sequences.add(XMLMeshUtilities::loadSequence(block,version,mEngine!=NULL?mEngine->getBufferManager():NULL));
+			mesh->getSkeleton()->addSequence(XMLMeshUtilities::loadSequence(block,version,mEngine!=NULL?mEngine->getBufferManager():NULL));
 		}
 	}
 
@@ -228,8 +228,8 @@ bool XMSHStreamer::saveMeshVersion1(mxml_node_t *root,Mesh::ptr mesh,ProgressLis
 		mxmlAddChild(root,node);
 
 		int i;
-		for(i=0;i<skeleton->sequences.size();++i){
-			Sequence::ptr sequence=skeleton->sequences[i];
+		for(i=0;i<skeleton->getNumSequences();++i){
+			Sequence::ptr sequence=skeleton->getSequence(i);
 			mxml_node_t *node=XMLMeshUtilities::saveSequence(sequence,1,listener);
 			mxmlSetElement(node,"AnimationData");
 			mxmlAddChild(root,node);
@@ -252,8 +252,8 @@ bool XMSHStreamer::saveMeshVersion2Up(mxml_node_t *root,Mesh::ptr mesh,int versi
 		mxmlAddChild(root,node);
 
 		int i;
-		for(i=0;i<skeleton->sequences.size();++i){
-			Sequence::ptr sequence=skeleton->sequences[i];
+		for(i=0;i<skeleton->getNumSequences();++i){
+			Sequence::ptr sequence=skeleton->getSequence(i);
 			mxml_node_t *node=XMLMeshUtilities::saveSequence(sequence,version,listener);
 			mxmlSetElement(node,"Sequence");
 			mxmlAddChild(root,node);

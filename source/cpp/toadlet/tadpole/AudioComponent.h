@@ -40,10 +40,10 @@ public:
 	AudioComponent(Engine *engine);
 	virtual void destroy();
 
-	bool setAudioBuffer(const String &name);
+	bool setAudioBuffer(const String &name,int track=0);
 	bool setAudioBuffer(AudioBuffer *audioBuffer);
 
-	bool setAudioStream(const String &name);
+	bool setAudioStream(const String &name,int track=0);
 	bool setAudioStream(AudioStream *stream);
 
 	AudioBuffer *getAudioBuffer(){return mAudio->getAudioBuffer();}

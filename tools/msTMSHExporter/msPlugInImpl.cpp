@@ -43,7 +43,7 @@ cPlugIn::cPlugIn ()
 {
     strcpy (szTitle, "Toadlet Mesh/Animation...");
 
-	engine=new Engine(true);
+	engine=new Engine();
 	engine->installHandlers();
 }
 
@@ -205,7 +205,7 @@ cPlugIn::findEmptyBones(msModel *pModel,Collection<int> &emptyBones){
 
 int
 cPlugIn::exportMesh(msModel *pModel,const String &name){
-	Mesh::ptr mesh(new Mesh());
+	Mesh::ptr mesh=new Mesh();
 
 	Collection<Vertex> vertexes;
 	Collection<String> meshNames;
@@ -289,15 +289,15 @@ cPlugIn::exportMesh(msModel *pModel,const String &name){
 		}
 	}
 
-	VertexFormat::ptr vertexFormat(new BackableVertexFormat());
+	VertexFormat::ptr vertexFormat=new BackableVertexFormat();
 	vertexFormat->create();
 	vertexFormat->addElement(VertexFormat::Semantic_POSITION,0,VertexFormat::Format_TYPE_FLOAT_32|VertexFormat::Format_COUNT_3);
 	vertexFormat->addElement(VertexFormat::Semantic_NORMAL,0,VertexFormat::Format_TYPE_FLOAT_32|VertexFormat::Format_COUNT_3);
 	vertexFormat->addElement(VertexFormat::Semantic_TEXCOORD,0,VertexFormat::Format_TYPE_FLOAT_32|VertexFormat::Format_COUNT_2);
 
-	VertexBuffer::ptr vertexBuffer(new BackableBuffer());
+	VertexBuffer::ptr vertexBuffer=new BackableBuffer();
 	vertexBuffer->create(Buffer::Usage_BIT_STATIC,Buffer::Access_READ_WRITE,vertexFormat,vertexes.size());
-	mesh->setStaticVertexData(VertexData::ptr(new VertexData(vertexBuffer)));
+	mesh->setStaticVertexData(new VertexData(vertexBuffer));
 
 	Collection<Mesh::VertexBoneAssignmentList> vbas;
 
@@ -323,14 +323,14 @@ cPlugIn::exportMesh(msModel *pModel,const String &name){
     for(i=0;i<indexCount;++i){
 		progressUpdated((float)i/(float)indexCount);
 
-		Mesh::SubMesh::ptr sub(new Mesh::SubMesh());
+		Mesh::SubMesh::ptr sub=new Mesh::SubMesh();
 		mesh->addSubMesh(sub);
 
-		sub->name=meshNames[i];
+		sub->setName(meshNames[i]);
 
-		IndexBuffer::ptr indexBuffer(new BackableBuffer());
+		IndexBuffer::ptr indexBuffer=new BackableBuffer();
 		indexBuffer->create(Buffer::Usage_BIT_STATIC,Buffer::Access_READ_WRITE,IndexBuffer::IndexFormat_UINT16,indexes[i].size());
-		sub->indexData=IndexData::ptr(new IndexData(IndexData::Primitive_TRIS,indexBuffer,0,indexes[i].size()));
+		sub->indexData=new IndexData(IndexData::Primitive_TRIS,indexBuffer,0,indexes[i].size());
 
 		{
 			IndexBufferAccessor iba(indexBuffer);
@@ -344,7 +344,7 @@ cPlugIn::exportMesh(msModel *pModel,const String &name){
 		if(materialIndex>=0){
 			msMaterial *msmat=msModel_GetMaterialAt(pModel,materialIndex);
 
-			Material::ptr material=engine->getMaterialManager()->createDiffuseMaterial(NULL);
+			Material::ptr material=engine->createDiffuseMaterial(NULL);
 
 			char name[256];
 			msMaterial_GetName(msmat,name,256);
@@ -382,8 +382,8 @@ cPlugIn::exportMesh(msModel *pModel,const String &name){
 		mesh->setSkeleton(buildSkeleton(pModel,emptyBones));
 	}
 
-	FileStream::ptr stream(new FileStream(name,FileStream::Open_WRITE_BINARY));
-	XMSHStreamer::ptr streamer(new XMSHStreamer(engine));
+	FileStream::ptr stream=new FileStream(name,FileStream::Open_WRITE_BINARY);
+	XMSHStreamer::ptr streamer=new XMSHStreamer(engine);
 
 	streamer->save(stream,mesh,NULL,this);
 
@@ -392,7 +392,7 @@ cPlugIn::exportMesh(msModel *pModel,const String &name){
 
 Skeleton::ptr
 cPlugIn::buildSkeleton(msModel *pModel,const Collection<int> &emptyBones){
-	Skeleton::ptr skeleton(new Skeleton());
+	Skeleton::ptr skeleton=new Skeleton();
 
 	int i,j;
 	for(i=0;i<msModel_GetBoneCount(pModel);++i){
@@ -410,7 +410,7 @@ cPlugIn::buildSkeleton(msModel *pModel,const Collection<int> &emptyBones){
 		}
 
 		Skeleton::Bone::ptr bone(new Skeleton::Bone());
-		skeleton->bones.add(bone);
+		skeleton->addBone(bone);
 
 		msBone *msbone=msModel_GetBoneAt(pModel,i);
 
@@ -454,7 +454,7 @@ cPlugIn::exportAnimation(msModel *pModel,const String &name){
 	Collection<int> emptyBones;
 	findEmptyBones(pModel,emptyBones);
 
-	TransformSequence::ptr sequence(new TransformSequence());
+	Sequence::ptr sequence=new Sequence();
 
 	int s1=name.rfind('/');
 	if(s1==String::npos){s1=0;}
@@ -491,10 +491,10 @@ cPlugIn::exportAnimation(msModel *pModel,const String &name){
 
 		msBone *msbone=msModel_GetBoneAt(pModel,i);
 
-		TransformTrack::ptr track(new TransformTrack());
+		Track::ptr track=new Track(engine->getVertexFormats().POSITION_ROTATE_SCALE);
 		sequence->addTrack(track);
 
-		track->index=newi;
+		track->setIndex(newi);
 
 		Collection<Frame> frames;
 
@@ -510,9 +510,9 @@ cPlugIn::exportAnimation(msModel *pModel,const String &name){
 				if(frames[k].time==positionKey->fTime){
 					convertMSVec3ToVector3(positionKey->Position,frames[k].translate,false);
 					Matrix3x3 rotate;
-					Math::setMatrix3x3FromQuaternion(rotate,skeleton->bones[newi]->rotate);
+					Math::setMatrix3x3FromQuaternion(rotate,skeleton->getBone(newi)->rotate);
 					Math::mul(frames[k].translate,rotate);
-					Math::add(frames[k].translate,skeleton->bones[newi]->translate);
+					Math::add(frames[k].translate,skeleton->getBone(newi)->translate);
 					frames[k].translateSet=true;
 					break;
 				}
@@ -525,9 +525,9 @@ cPlugIn::exportAnimation(msModel *pModel,const String &name){
 				frame.time=positionKey->fTime;
 				convertMSVec3ToVector3(positionKey->Position,frame.translate,false);
 				Matrix3x3 rotate;
-				Math::setMatrix3x3FromQuaternion(rotate,skeleton->bones[newi]->rotate);
+				Math::setMatrix3x3FromQuaternion(rotate,skeleton->getBone(newi)->rotate);
 				Math::mul(frame.translate,rotate);
-				Math::add(frame.translate,skeleton->bones[newi]->translate);
+				Math::add(frame.translate,skeleton->getBone(newi)->translate);
 				frame.translateSet=true;
 				if(insertAfter==-1){
 					frames.add(frame);
@@ -549,7 +549,7 @@ cPlugIn::exportAnimation(msModel *pModel,const String &name){
 			for(k=0;k<frames.size();++k){
 				if(frames[k].time==rotationKey->fTime){
 					convertMSVec3ToQuaternion(rotationKey->Rotation,frames[k].rotate,false);
-					Math::preMul(frames[k].rotate,skeleton->bones[newi]->rotate);
+					Math::preMul(frames[k].rotate,skeleton->getBone(newi)->rotate);
 					frames[k].rotateSet=true;
 					break;
 				}
@@ -561,7 +561,7 @@ cPlugIn::exportAnimation(msModel *pModel,const String &name){
 				Frame frame;
 				frame.time=rotationKey->fTime;
 				convertMSVec3ToQuaternion(rotationKey->Rotation,frame.rotate,false);
-				Math::preMul(frame.rotate,skeleton->bones[newi]->rotate);
+				Math::preMul(frame.rotate,skeleton->getBone(newi)->rotate);
 				frame.rotateSet=true;
 				if(insertAfter==-1){
 					frames.add(frame);
@@ -649,25 +649,24 @@ cPlugIn::exportAnimation(msModel *pModel,const String &name){
 			}
 		}
 
-		track->keyFrames.resize(frames.size());
+		VertexBufferAccessor &vba=track->getAccessor();
 		for(j=0;j<frames.size();++j){
-			TransformKeyFrame keyFrame;
-			keyFrame.translate=frames[j].translate;
-			keyFrame.rotate=frames[j].rotate;
-			keyFrame.time=frames[j].time/fps;
-			track->keyFrames[j]=keyFrame;
+			track->addKeyFrame(frames[j].time/fps);
+
+			vba.set3(j,0,frames[j].translate);
+			vba.set4(j,1,frames[j].rotate);
 		}
 
 		// Cut track if it has no keyframes
-		if(track->keyFrames.size()==0){
+		if(track->getNumKeyFrames()==0){
 			sequence->removeTrack(sequence->getNumTracks()-1);
 		}
 	}
 
 	sequence->setLength(maxTime/fps);
 
-	FileStream::ptr stream(new FileStream(name,FileStream::Open_WRITE_BINARY));
-	XANMStreamer::ptr streamer(new XANMStreamer());
+	FileStream::ptr stream=new FileStream(name,FileStream::Open_WRITE_BINARY);
+	XANMStreamer::ptr streamer=new XANMStreamer(engine);
 
 	streamer->save(stream,sequence,NULL,this);
 

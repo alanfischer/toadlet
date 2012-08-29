@@ -194,12 +194,12 @@ int main(int argc,char **argv){
 
 		// Output animations, if available
 		Skeleton::ptr skeleton=mesh->getSkeleton();
-		if(skeleton!=NULL && skeleton->sequences.size()>0){
+		if(skeleton!=NULL && skeleton->getNumSequences()>0){
 			int j;
-			for(j=0;j<skeleton->sequences.size();++j){
+			for(j=0;j<skeleton->getNumSequences();++j){
 				String traFileName;
-				if(forceAnimationNumbers==false && skeleton->sequences[j]->getName().length()>0){
-					traFileName=skeleton->sequences[j]->getName()+String(".tra");
+				if(forceAnimationNumbers==false && skeleton->getSequence(j)->getName().length()>0){
+					traFileName=skeleton->getSequence(j)->getName()+String(".tra");
 				}
 				else{
 					std::stringstream ss;
@@ -209,7 +209,7 @@ int main(int argc,char **argv){
 				std::cout << "Writing animation " << (const char*)traFileName << std::endl;
 				FileStream::ptr stream(new FileStream(traFileName,FileStream::Open_WRITE_BINARY));
 
-				if(bac.convertAnimation(mesh,skeleton->sequences[j],stream,(version==3)?4:3)==false){
+				if(bac.convertAnimation(mesh,skeleton->getSequence(j),stream,(version==3)?4:3)==false){
 					std::cout << "Error converting animation" << std::endl;
 					return -1;
 				}

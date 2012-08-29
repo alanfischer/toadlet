@@ -36,13 +36,13 @@ Skeleton::~Skeleton(){
 }
 
 void Skeleton::destroy(){
-	sequences.clear();
+	mSequences.clear();
 }
 
 void Skeleton::compile(){
 	int i;
-	for(i=0;i<bones.size();++i){
-		Bone *bone=bones[i];
+	for(i=0;i<mBones.size();++i){
+		Bone *bone=mBones[i];
 
 		Vector3 wtbtranslation(bone->translate);
 		Quaternion wtbrotation(bone->rotate);
@@ -52,7 +52,7 @@ void Skeleton::compile(){
 				parentBone=NULL;
 			}
 			else{
-				parentBone=bones[parentBone->parentIndex];
+				parentBone=mBones[parentBone->parentIndex];
 				Matrix3x3 rotate;
 				Math::setMatrix3x3FromQuaternion(rotate,parentBone->rotate);
 				Math::mul(wtbtranslation,rotate);
@@ -75,9 +75,9 @@ void Skeleton::compile(){
 
 Skeleton::Bone::ptr Skeleton::getBone(const String &name){
 	int i;
-	for(i=0;i<bones.size();++i){
-		if(bones[i]->name==name){
-			return bones[i];
+	for(i=0;i<mBones.size();++i){
+		if(mBones[i]->name==name){
+			return mBones[i];
 		}
 	}
 	return NULL;

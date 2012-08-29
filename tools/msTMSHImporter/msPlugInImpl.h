@@ -19,7 +19,7 @@ class cPlugIn : public cMsPlugIn
 	Engine::ptr engine;
 
 	int importMesh(msModel *pModel,const String &name,int flags);
-	Skeleton::ptr buildSkeleton(msModel *pModel);
+	Skeleton::ptr buildSkeleton(msModel *pModel,const Collection<int> &emptyBones);
 	int importAnimation(msModel *pModel,const String &name,int flags);
 
 public:

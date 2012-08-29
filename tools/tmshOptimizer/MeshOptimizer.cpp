@@ -272,8 +272,8 @@ bool MeshOptimizer::optimizeMesh(Mesh *mesh,Engine *engine){
 	// Remove empty tracks
 	Skeleton::ptr skeleton=mesh->getSkeleton();
 	if(skeleton!=NULL){
-		for(i=0;i<skeleton->sequences.size();++i){
-			Sequence::ptr sequence=skeleton->sequences[i];
+		for(i=0;i<skeleton->getNumSequences();++i){
+			Sequence::ptr sequence=skeleton->getSequence(i);
 			for(j=0;j<sequence->getNumTracks();++j){
 				if(sequence->getTrack(j)->getNumKeyFrames()==0){
 					sequence->removeTrack(j);

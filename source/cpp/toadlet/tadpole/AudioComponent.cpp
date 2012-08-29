@@ -48,8 +48,8 @@ void AudioComponent::destroy(){
 	BaseComponent::destroy();
 }
 
-bool AudioComponent::setAudioBuffer(const String &name){
-	return setAudioBuffer(mEngine->getAudioManager()->findAudioBuffer(name));
+bool AudioComponent::setAudioBuffer(const String &name,int track){
+	return setAudioBuffer(mEngine->getAudioManager()->findAudioBuffer(name,track));
 }
 
 bool AudioComponent::setAudioBuffer(AudioBuffer *audioBuffer){
@@ -74,8 +74,8 @@ bool AudioComponent::setAudioBuffer(AudioBuffer *audioBuffer){
 	}
 }
 
-bool AudioComponent::setAudioStream(const String &name){
-	return setAudioStream(mEngine->getAudioManager()->findAudioStream(name));
+bool AudioComponent::setAudioStream(const String &name,int track){
+	return setAudioStream(mEngine->getAudioManager()->findAudioStream(name,track));
 }
 
 bool AudioComponent::setAudioStream(AudioStream *stream){

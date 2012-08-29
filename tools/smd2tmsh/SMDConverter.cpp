@@ -88,9 +88,9 @@ void SMDConverter::load(Engine *engine,Stream *in,const String &fileName){
 				if(reference==false && mSkeleton!=NULL){
 					mSequence=new Sequence();
 					mSequence->setName(resourceName);
-					mSkeleton->sequences.add(mSequence);
+					mSkeleton->addSequence(mSequence);
 
-					for(int i=0;i<mSkeleton->bones.size();++i){
+					for(int i=0;i<mSkeleton->getNumBones();++i){
 						mSequence->addTrack(new Track(engine->getVertexFormats().POSITION_ROTATE_SCALE));
 					}
 				}
@@ -104,8 +104,8 @@ void SMDConverter::load(Engine *engine,Stream *in,const String &fileName){
 				// Bone sanity check
 				if(reference){
 					int i;
-					for(i=0;i<mSkeleton->bones.size();++i){
-						if(mSkeleton->bones[i]==NULL){
+					for(i=0;i<mSkeleton->getNumBones();++i){
+						if(mSkeleton->getBone(i)==NULL){
 							Error::unknown("invalid skeleton");
 							return;
 						}
@@ -128,10 +128,7 @@ void SMDConverter::load(Engine *engine,Stream *in,const String &fileName){
 				bone->index=id;
 				bone->parentIndex=pid;
 				bone->name=name;
-				if(skeleton->bones.size()<=bone->index){
-					skeleton->bones.resize(bone->index+1);
-				}
-				skeleton->bones.setAt(bone->index,bone);
+				skeleton->addBone(bone);
 			}
 		}
 		else if(block==Block_SKELETON){
@@ -148,13 +145,13 @@ void SMDConverter::load(Engine *engine,Stream *in,const String &fileName){
 				sscanf(s.c_str(),"%d %f %f %f %f %f %f",&id,&px,&py,&pz,&rx,&ry,&rz);
 
 				if(reference){
-					Skeleton::Bone::ptr bone=skeleton->bones.at(id);
+					Skeleton::Bone::ptr bone=skeleton->getBone(id);
 					bone->translate.set(MathConversion::floatToScalar(px),MathConversion::floatToScalar(py),MathConversion::floatToScalar(pz));
 					Math::mul(bone->translate,mScale);
 					setQuaternionFromXYZ(bone->rotate,MathConversion::floatToScalar(rx),MathConversion::floatToScalar(ry),MathConversion::floatToScalar(rz));
 				}
 				else{
-					Skeleton::Bone::ptr bone=mSkeleton->getBone(skeleton->bones.at(id)->name);
+					Skeleton::Bone::ptr bone=mSkeleton->getBone(skeleton->getBone(id)->name);
 					if(bone!=NULL){
 						Track::ptr track=mSequence->getTrack(bone->index);
 
@@ -218,8 +215,8 @@ void SMDConverter::load(Engine *engine,Stream *in,const String &fileName){
 				Math::conjugate(wtbRotation);
 				Math::mul(wtbTranslation,wtbRotation);
 
-				mSkeleton->bones[i]->worldToBoneTranslate.set(wtbTranslation);
-				mSkeleton->bones[i]->worldToBoneRotate.set(wtbRotation);
+				mSkeleton->getBone(i)->worldToBoneTranslate.set(wtbTranslation);
+				mSkeleton->getBone(i)->worldToBoneRotate.set(wtbRotation);
 			}
 		}
 		else{

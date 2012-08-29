@@ -64,7 +64,7 @@ int main(int argc,char **argv){
 
 		meshComponent->getSkeleton()->setRenderSkeleton(true);
 
-		int numSequences=mesh->getSkeleton()->sequences.size();
+		int numSequences=mesh->getSkeleton()->getNumSequences();
 		std::cout << "Number of sequences:" << numSequences << std::endl;
 
 		if(argc>=3 && numSequences>0){

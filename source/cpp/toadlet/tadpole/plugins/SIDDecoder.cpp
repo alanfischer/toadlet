@@ -64,7 +64,8 @@ public:
 };
 
 SIDDecoder::SIDDecoder():
-	sid(NULL)
+	sid(NULL),
+	mTrack(0)
 {
 	mFormat=AudioFormat::ptr(new AudioFormat());
 	sid=new SIDAttributes();
@@ -150,6 +151,8 @@ int SIDDecoder::getNumTracks(){
 }
 
 bool SIDDecoder::startTrack(int track){
+	mTrack=track;
+
 	bool result=false;
 
 #if SIDPLAY_VERSION==1
@@ -180,6 +183,10 @@ int SIDDecoder::read(tbyte *buffer,int length){
 	length=sid->player->play(buffer,length);
 #endif
 	return length;
+}
+
+bool SIDDecoder::reset(){
+	return startTrack(mTrack);
 }
 
 }
