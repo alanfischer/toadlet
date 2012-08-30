@@ -55,6 +55,14 @@ PhysicsComponent *HopManager::createPhysicsComponent(){
 	return new HopComponent(this);
 }
 
+void HopManager::setGravity(const Vector3 &gravity){
+	mSimulator->setGravity(gravity);
+}
+
+void HopManager::setTraceable(Traceable *traceable){
+	mTraceable=traceable;
+}
+
 void HopManager::traceSegment(PhysicsCollision &result,const Segment &segment,int collideWithBits,Node *ignore){
 	result.reset();
 
