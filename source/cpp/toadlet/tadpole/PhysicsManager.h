@@ -41,6 +41,8 @@ public:
 
 	virtual PhysicsComponent *createPhysicsComponent()=0;
 	
+	virtual void setGravity(const Vector3 &gravity)=0;
+
 	virtual void setTraceable(Traceable *traceable)=0;
 
 	virtual void traceSegment(PhysicsCollision &result,const Segment &segment,int collideWithBits,Node *ignore)=0;

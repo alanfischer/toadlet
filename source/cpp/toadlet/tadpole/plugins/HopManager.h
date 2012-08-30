@@ -46,7 +46,9 @@ public:
 
 	PhysicsComponent *createPhysicsComponent();
 
-	void setTraceable(Traceable *traceable){mTraceable=traceable;}
+	void setGravity(const Vector3 &gravity);
+
+	void setTraceable(Traceable *traceable);
 
 	void traceSegment(PhysicsCollision &result,const Segment &segment,int collideWithBits,Node *ignore);
 	void traceNode(PhysicsCollision &result,Node *entity,const Segment &segment,int collideWithBits);
