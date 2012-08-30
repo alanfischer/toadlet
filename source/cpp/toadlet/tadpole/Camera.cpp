@@ -368,6 +368,9 @@ Mesh::ptr Camera::renderToSkyBox(RenderDevice *device,int format,int size,scalar
 bool Camera::culled(Bound *bound) const{
 	bool result=false;
 	switch(bound->getType()){
+		case Bound::Type_EMPTY:
+			result=true;
+		break;
 		case Bound::Type_INFINITE:
 			result=false;
 		break;
