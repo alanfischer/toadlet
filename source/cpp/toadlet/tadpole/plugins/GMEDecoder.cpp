@@ -74,6 +74,10 @@ int GMEDecoder::getNumTracks(){
 }
 
 bool GMEDecoder::startTrack(int track){
+	if(track<0 || track>=getNumTracks()){
+		return false;
+	}
+
 	mTrack=track;
 	gme_err_t result=gme_start_track(emu,track);
 	return result==NULL;

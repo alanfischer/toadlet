@@ -98,10 +98,10 @@ void BSP30Node::setSkyName(const String &skyName){
 void BSP30Node::setSkyTextures(const String &skyDown,const String &skyUp,const String &skyWest,const String &skyEast,const String &skySouth,const String &skyNorth){
 	Logger::debug(Categories::TOADLET_TADPOLE,"creating sky box");
 
-//	if(mSkyNode!=NULL){
-//		mSkyNode->destroy();
-//		mSkyNode=NULL;
-//	}
+	if(mSkyMesh!=NULL){
+		mSkyMesh->destroy();
+		mSkyMesh=NULL;
+	}
 
 	Material::ptr down=mEngine->getMaterialManager()->findMaterial(skyDown);
 	Material::ptr up=mEngine->getMaterialManager()->findMaterial(skyUp);
@@ -122,6 +122,7 @@ void BSP30Node::setSkyTextures(const String &skyDown,const String &skyUp,const S
 				samplerState.uAddress=SamplerState::AddressType_CLAMP_TO_EDGE;
 				samplerState.vAddress=SamplerState::AddressType_CLAMP_TO_EDGE;
 				material->getPass()->setSamplerState(Shader::ShaderType_FRAGMENT,0,samplerState);
+				material->setLayer(-1);
 			}
 		}
 

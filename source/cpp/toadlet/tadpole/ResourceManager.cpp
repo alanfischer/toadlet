@@ -307,7 +307,7 @@ Resource::ptr ResourceManager::findFromFile(const String &name,ResourceData *dat
 				if(slash>0){
 					tempPath=filename.substr(0,slash);
 					if(mEngine->getArchiveManager()->getNumDirectories()>0){
-						tempPath=mEngine->getArchiveManager()->getDirectory(i)+tempPath;
+						tempPath=mEngine->getArchiveManager()->getDirectory(0)+tempPath;
 					}
 				}
 
