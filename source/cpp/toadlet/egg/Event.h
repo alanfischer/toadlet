@@ -26,37 +26,23 @@
 #ifndef TOADLET_EGG_EVENT_H
 #define TOADLET_EGG_EVENT_H
 
-#include <toadlet/egg/io/DataStream.h>
+#include <toadlet/egg/Interface.h>
 
 namespace toadlet{
 namespace egg{
 
-class Event{
+class Event:public Interface{
 public:
-	TOADLET_SPTR(Event);
+	TOADLET_INTERFACE(Event);
 
 	enum{
 		// General events
 		Type_UNKNOWN=0,
-
-		// Knot events
-		Type_ROUTED=100,
-		Type_PING,
 	};
 	
-	Event():mType(Type_UNKNOWN){}
-	Event(int type):mType(type){}
 	virtual ~Event(){}
 
-	virtual Event *getRootEvent(){return this;}
-
-	inline int getType() const{return mType;}
-
-	virtual int read(DataStream *stream){return 0;}
-	virtual int write(DataStream *stream){return 0;}
-
-protected:
-	int mType;
+	virtual int getType() const=0;
 };
 
 }

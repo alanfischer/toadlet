@@ -3,7 +3,6 @@ set (TOADLET_LIBRARY_LIST
 	egg
 	flick
 	hop
-	knot
 	peeper
 	ribbit
 	tadpole

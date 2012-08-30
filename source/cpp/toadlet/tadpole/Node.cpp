@@ -335,6 +335,16 @@ bool Node::setProperty(const String &name,const String &value){
 	return result;
 }
 
+bool Node::handleEvent(Event *event){
+	int i=0;
+	bool result=false;
+	for(i=0;i<mComponents.size();++i){
+		Component *component=mComponents[i];
+		result|=component->handleEvent(event);
+	}
+	return result;
+}
+
 void Node::mergeWorldBound(Node *child,bool justAttached){
 	mWorldBound->merge(child->getWorldBound(),mScene->getEpsilon());
 }

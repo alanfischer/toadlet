@@ -27,6 +27,7 @@
 #define TOADLET_TADPOLE_COMPONENT_H
 
 #include <toadlet/egg/Interface.h>
+#include <toadlet/egg/Event.h>
 #include <toadlet/tadpole/Types.h>
 #include <toadlet/tadpole/Bound.h>
 
@@ -53,6 +54,7 @@ public:
 	virtual Bound *getBound() const=0;
 
 	virtual bool setProperty(const String &name,const String &value)=0;
+	virtual bool handleEvent(Event *event)=0;
 };
 
 }
