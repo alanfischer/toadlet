@@ -136,6 +136,7 @@ public:
 	virtual void frameUpdate(int dt,int scope);
 
 	virtual bool setProperty(const String &name,const String &value);
+	virtual bool handleEvent(Event *event);
 
 	// Activation methods
 	virtual void setStayActive(bool active);

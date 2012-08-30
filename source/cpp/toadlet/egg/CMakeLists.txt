@@ -89,7 +89,6 @@ set (EGG_HEADERS
 	EndianConversion.h
 	Error.h
 	Event.h
-	EventFactory.h
 	Exception.h
 	Extents.h
 	Interface.h
