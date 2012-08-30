@@ -40,20 +40,20 @@ public:
 	ActionComponent(const String &name,Action *action=NULL);
 	virtual ~ActionComponent();
 
-	bool parentChanged(Node *node);
+	virtual bool parentChanged(Node *node);
 	
-	void attach(Action *action);
-	void remove(Action *action);
+	virtual void attach(Action *action);
+	virtual void remove(Action *action);
 
-	void start();
-	void stop();
+	virtual void start();
+	virtual void stop();
 
-	void frameUpdate(int dt,int scope);
+	virtual void frameUpdate(int dt,int scope);
 
-	bool getActive() const;
+	virtual bool getActive() const;
 
-	void actionStarted(Action *component);
-	void actionStopped(Action *component);
+	virtual void actionStarted(Action *component);
+	virtual void actionStopped(Action *component);
 
 protected:
 	Collection<Action::ptr> mActions;

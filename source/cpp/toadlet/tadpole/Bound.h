@@ -37,13 +37,14 @@ public:
 	TOADLET_OBJECT(Bound);
 
 	enum Type{
-		Type_AABOX=			1<<0,
-		Type_SPHERE=		1<<1,
-		Type_INFINITE=		1<<2,
+		Type_EMPTY,
+		Type_AABOX,
+		Type_SPHERE,
+		Type_INFINITE,
 	};
 
 	Bound():
-		mType(Type_AABOX)
+		mType(Type_EMPTY)
 	{}
 
 	Bound(Type type):
@@ -71,7 +72,7 @@ public:
 	}
 	
 	void reset(){
-		mType=Type_AABOX;
+		mType=Type_EMPTY;
 		mSphere.reset();
 		mBox.reset();
 	}
@@ -121,7 +122,10 @@ public:
 	}
 
 	void merge(Bound *b,scalar epsilon){
-		if(mType==Type_INFINITE || b->mType==Type_INFINITE){
+		if(mType==Type_EMPTY){
+			set(b);
+		}
+		else if(mType==Type_INFINITE || b->mType==Type_INFINITE){
 			mType=Type_INFINITE;
 		}
 		else if(mType==Type_AABOX && b->mType==Type_AABOX){
