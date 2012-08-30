@@ -46,6 +46,8 @@ public:
 
 	PhysicsComponent *createPhysicsComponent();
 
+	void setTraceable(Traceable *traceable){mTraceable=traceable;}
+
 	void traceSegment(PhysicsCollision &result,const Segment &segment,int collideWithBits,Node *ignore);
 	void traceNode(PhysicsCollision &result,Node *entity,const Segment &segment,int collideWithBits);
 	void testNode(PhysicsCollision &result,Node *entity1,const Segment &segment,Node *entity2);
@@ -59,7 +61,6 @@ public:
 	// Hop items
 	inline hop::Simulator *getSimulator(){return mSimulator;}
 
-	void setTraceable(Traceable *traceable){mTraceable=traceable;}
 	int findSolidsInAABox(const AABox &box,hop::Solid *solids[],int maxSolids);
 	void traceSegment(hop::Collision &result,const Segment &segment,int collideWithBits);
 	void traceSolid(hop::Collision &result,hop::Solid *solid,const Segment &segment,int collideWithBits);

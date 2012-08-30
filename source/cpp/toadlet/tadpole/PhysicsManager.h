@@ -28,6 +28,7 @@
 
 #include <toadlet/tadpole/Types.h>
 #include <toadlet/tadpole/PhysicsCollision.h>
+#include <toadlet/tadpole/Traceable.h>
 
 namespace toadlet{
 namespace tadpole{
@@ -40,6 +41,8 @@ public:
 
 	virtual PhysicsComponent *createPhysicsComponent()=0;
 	
+	virtual void setTraceable(Traceable *traceable)=0;
+
 	virtual void traceSegment(PhysicsCollision &result,const Segment &segment,int collideWithBits,Node *ignore)=0;
 
 	virtual void logicUpdate(int dt,int scope)=0;

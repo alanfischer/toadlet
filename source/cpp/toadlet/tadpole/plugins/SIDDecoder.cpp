@@ -151,6 +151,10 @@ int SIDDecoder::getNumTracks(){
 }
 
 bool SIDDecoder::startTrack(int track){
+	if(track<0 || track>=getNumTracks()){
+		return false;
+	}
+
 	mTrack=track;
 
 	bool result=false;
