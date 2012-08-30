@@ -179,6 +179,7 @@ void HopManager::set(PhysicsCollision &r,const hop::Collision &c){
 	r.time=c.time;
 	r.point.set(c.point);
 	r.normal.set(c.normal);
+	r.velocity.set(c.velocity);
 	if(c.collider!=NULL && c.collider->getUserData()!=NULL){r.collider=((HopComponent*)c.collider->getUserData())->getParent();}
 	r.scope=c.scope;
 }
@@ -187,6 +188,7 @@ void HopManager::set(hop::Collision &r,const PhysicsCollision &c,hop::Solid *col
 	r.time=c.time;
 	r.point.set(c.point);
 	r.normal.set(c.normal);
+	r.velocity.set(c.velocity);
 	if(collider!=NULL){r.collider=collider;}
 	if(collidee!=NULL){r.collidee=collidee;}
 	r.scope=c.scope;
