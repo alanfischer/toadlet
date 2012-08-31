@@ -71,7 +71,6 @@ public:
 	// Node methods
 	void nodeCreated(Node *node);
 	void nodeDestroyed(Node *node);
-	int internal_registerNode(Node *node);
 
 	inline Node *getNodeByHandle(int handle){return (handle>=0 && handle<mHandles.size())?mHandles[handle]:NULL;}
 
