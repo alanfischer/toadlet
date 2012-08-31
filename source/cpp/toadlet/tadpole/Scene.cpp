@@ -208,28 +208,46 @@ void Scene::update(int dt){
 	}
 }
 
-void Scene::logicUpdate(int dt,int scope){
-	if(mPhysicsManager!=NULL){
-		mPhysicsManager->logicUpdate(dt,scope);
-	}
+void Scene::logicUpdate(int dt,int scope,Node *node){
+	if(node!=NULL){
+		if(mPhysicsManager!=NULL){
+			mPhysicsManager->logicUpdate(dt,scope,node);
+		}
 
-	mBackground->logicUpdate(dt,scope);
-	mRoot->logicUpdate(dt,scope);
-
-	int i;
-	for(i=0;i<mDestroyComponents.size();++i){
-		mDestroyComponents[i]->destroy();
+		node->logicUpdate(dt,scope);
 	}
-	mDestroyComponents.clear();
+	else{
+		if(mPhysicsManager!=NULL){
+			mPhysicsManager->logicUpdate(dt,scope,NULL);
+		}
+
+		mBackground->logicUpdate(dt,scope);
+		mRoot->logicUpdate(dt,scope);
+
+		int i;
+		for(i=0;i<mDestroyComponents.size();++i){
+			mDestroyComponents[i]->destroy();
+		}
+		mDestroyComponents.clear();
+	}
 }
 
-void Scene::frameUpdate(int dt,int scope){
-	if(mPhysicsManager!=NULL){
-		mPhysicsManager->frameUpdate(dt,scope);
-	}
+void Scene::frameUpdate(int dt,int scope,Node *node){
+	if(node!=NULL){
+		if(mPhysicsManager!=NULL){
+			mPhysicsManager->frameUpdate(dt,scope,node);
+		}
 
-	mBackground->frameUpdate(dt,scope);
-	mRoot->frameUpdate(dt,scope);
+		node->frameUpdate(dt,scope);
+	}
+	else{
+		if(mPhysicsManager!=NULL){
+			mPhysicsManager->frameUpdate(dt,scope,NULL);
+		}
+
+		mBackground->frameUpdate(dt,scope);
+		mRoot->frameUpdate(dt,scope);
+	}
 }
 
 void Scene::render(RenderDevice *device,Camera *camera,Node *node){
