@@ -49,7 +49,6 @@ HopComponent::HopComponent(HopManager *manager):
 }
 
 void HopComponent::destroy(){
-	Logger::alert("DESTROYING HOP COMPONENT");
 	mManager->getSimulator()->removeSolid(mSolid);
 
 	BaseComponent::destroy();
