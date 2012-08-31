@@ -19,7 +19,6 @@
 #  TOADLET_EGG_LIB
 #  TOADLET_FLICK_LIB
 #  TOADLET_HOP_LIB
-#  TOADLET_KNOT_LIB
 #  TOADLET_PEEPER_LIB
 #  TOADLET_RIBBIT_LIB
 #  TOADLET_TADPOLE_LIB
@@ -29,7 +28,6 @@
 #  TOADLET_EGG_DLL
 #  TOADLET_FLICK_DLL
 #  TOADLET_HOP_DLL
-#  TOADLET_KNOT_DLL
 #  TOADLET_PEEPER_DLL
 #  TOADLET_RIBBIT_DLL
 #  TOADLET_TADPOLE_DLL
@@ -91,7 +89,6 @@ set (TOADLET_LIB_BASENAMES
 	toadlet_peeper_gles2renderdevice
 	toadlet_peeper_glrenderdevice
 	toadlet_peeper
-	toadlet_knot
 	toadlet_hop
 #	toadlet_flick_androidsensordevice
 	toadlet_flick_iosmotiondevice
