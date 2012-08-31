@@ -358,7 +358,7 @@ Socket *Socket::accept(){
 
 	int clientHandle=::accept(mHandle,(struct sockaddr*)&clientAddress,&clientAddressLength);
 	if(clientHandle==TOADLET_SOCKET_ERROR){
-		error("accept");
+//		error("accept");
 		return NULL;
 	}
 	else{
