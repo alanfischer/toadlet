@@ -211,6 +211,14 @@ bool Node::getActionActive(const String &action){
 	return false;
 }
 
+void Node::physicsAttached(PhysicsComponent *physics){
+	mPhysics=physics;
+}
+
+void Node::physicsRemoved(PhysicsComponent *physics){
+	mPhysics=NULL;
+}
+
 bool Node::parentChanged(Node *node){
 	Node *parent=mParent;
 	

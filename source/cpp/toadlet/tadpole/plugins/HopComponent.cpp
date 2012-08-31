@@ -49,6 +49,7 @@ HopComponent::HopComponent(HopManager *manager):
 }
 
 void HopComponent::destroy(){
+	Logger::alert("DESTROYING HOP COMPONENT");
 	mManager->getSimulator()->removeSolid(mSolid);
 
 	BaseComponent::destroy();
@@ -118,6 +119,9 @@ void HopComponent::preSimulate(){
 		mSkipNextPreSimulate=false;
 		return;
 	}
+
+	/// @todo: Should this be elsewhere?
+	mSolid->setScope(mParent->getScope());
 
 	if(mParent->getActive()==true && mNewPosition.equals(mSolid->getPosition())==false){
 		mSolid->setPosition(mNewPosition);
