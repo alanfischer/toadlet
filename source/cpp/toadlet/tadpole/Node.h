@@ -94,8 +94,8 @@ public:
 	virtual void lightAttached(LightComponent *light){mLights.add(light);}
 	virtual void lightRemoved(LightComponent *light){mLights.remove(light);}
 	
-	virtual void physicsAttached(PhysicsComponent *physics){mPhysics=physics;}
-	virtual void physicsRemoved(PhysicsComponent *physics){mPhysics=NULL;}
+	virtual void physicsAttached(PhysicsComponent *physics);
+	virtual void physicsRemoved(PhysicsComponent *physics);
 	virtual PhysicsComponent *getPhysics(){return mPhysics;}
 
 	// Spacial methods
