@@ -81,12 +81,10 @@ public:
 
 	virtual void update(int dt);
 	virtual void preLogicUpdate(int dt){}
-	virtual void logicUpdate(int dt){logicUpdate(dt,-1);}
-	virtual void logicUpdate(int dt,int scope);
+	virtual void logicUpdate(int dt,int scope=-1,Node *node=NULL);
 	virtual void postLogicUpdate(int dt){}
 	virtual void preFrameUpdate(int dt){}
-	virtual void frameUpdate(int dt){frameUpdate(dt,-1);}
-	virtual void frameUpdate(int dt,int scope);
+	virtual void frameUpdate(int dt,int scope=-1,Node *node=NULL);
 	virtual void postFrameUpdate(int dt){}
 
 	virtual void render(RenderDevice *renderDevice,Camera *camera,Node *node=NULL);

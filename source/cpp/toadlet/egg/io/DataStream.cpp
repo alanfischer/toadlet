@@ -37,11 +37,6 @@ DataStream::DataStream(Stream *stream){
 	mStream=stream;
 }
 
-DataStream::DataStream(Stream::ptr stream){
-	mStream=stream;
-	mStreamPtr=stream;
-}
-
 DataStream::~DataStream(){
 }
 

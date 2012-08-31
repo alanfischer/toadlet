@@ -54,9 +54,8 @@ public:
 	void traceNode(PhysicsCollision &result,Node *entity,const Segment &segment,int collideWithBits);
 	void testNode(PhysicsCollision &result,Node *entity1,const Segment &segment,Node *entity2);
 
-	void logicUpdate(int dt,int scope){logicUpdate(dt,scope,NULL);}
-	void logicUpdate(int dt,int scope,HopComponent *component);
-	void frameUpdate(int dt,int scope);
+	void logicUpdate(int dt,int scope,Node *node);
+	void frameUpdate(int dt,int scope,Node *node);
 
 	hop::Solid *getSolid(){return mSolid;}
 

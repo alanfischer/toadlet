@@ -47,8 +47,8 @@ public:
 
 	virtual void traceSegment(PhysicsCollision &result,const Segment &segment,int collideWithBits,Node *ignore)=0;
 
-	virtual void logicUpdate(int dt,int scope)=0;
-	virtual void frameUpdate(int dt,int scope)=0;
+	virtual void logicUpdate(int dt,int scope,Node *node)=0;
+	virtual void frameUpdate(int dt,int scope,Node *node)=0;
 };
 
 }

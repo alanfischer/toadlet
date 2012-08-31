@@ -42,7 +42,6 @@ public:
 	TOADLET_OBJECT(DataStream);
 
 	DataStream(Stream *stream);
-	DataStream(Stream::ptr stream);
 	virtual ~DataStream();
 
 	virtual void close(){mStream->close();}
@@ -292,8 +291,7 @@ public:
 #endif
 
 protected:
-	Stream *mStream;
-	Stream::ptr mStreamPtr;
+	Stream::ptr mStream;
 };
 
 }

@@ -105,15 +105,15 @@ void HopManager::testNode(PhysicsCollision &result,Node *node1,const Segment &se
 	set(result,collision);
 }
 
-void HopManager::logicUpdate(int dt,int scope,HopComponent *component){
+void HopManager::logicUpdate(int dt,int scope,Node *node){
+	HopComponent *component=node!=NULL?(HopComponent*)node->getPhysics():NULL;
+
 	if(component!=NULL){
 		component->preSimulate();
 		TOADLET_PROFILE_BEGINSECTION(Simulator::update);
-		mSimulator->update(dt,scope);
+		mSimulator->update(dt,scope,component->getSolid());
 		TOADLET_PROFILE_ENDSECTION(Simulator::update);
 		component->postSimulate();
-
-		component->logicUpdate(dt,scope);
 	}
 	else{
 		int i;
@@ -135,13 +135,20 @@ void HopManager::logicUpdate(int dt,int scope,HopComponent *component){
 	}
 }
 
-void HopManager::frameUpdate(int dt,int scope){
-	int i;
-	for(i=mSimulator->getNumSolids()-1;i>=0;--i){
-		hop::Solid *solid=mSimulator->getSolid(i);
-		if(solid->active()){
-			HopComponent *component=(HopComponent*)(solid->getUserData());
-			component->lerpPosition(mScene->getLogicFraction());
+void HopManager::frameUpdate(int dt,int scope,Node *node){
+	HopComponent *component=node!=NULL?(HopComponent*)node->getPhysics():NULL;
+
+	if(component!=NULL){
+		component->lerpPosition(mScene->getLogicFraction());
+	}
+	else{
+		int i;
+		for(i=mSimulator->getNumSolids()-1;i>=0;--i){
+			hop::Solid *solid=mSimulator->getSolid(i);
+			if(solid->active()){
+				HopComponent *component=(HopComponent*)(solid->getUserData());
+				component->lerpPosition(mScene->getLogicFraction());
+			}
 		}
 	}
 }
