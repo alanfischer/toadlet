@@ -73,6 +73,8 @@ public:
 	StudioModelComponent(Engine *engine);
 	void destroy();
 
+	bool parentChanged(Node *node);
+
 	void logicUpdate(int dt,int scope);
 	void frameUpdate(int dt,int scope);
 
@@ -157,7 +159,7 @@ protected:
 	void destroySkeletonBuffers();
 
 	Engine *mEngine;
-	Bound *mBound;
+	Bound::ptr mBound;
 	bool mRendered;
 	StudioModel::ptr mModel;
 	Collection<SubModel::ptr> mSubModels;
