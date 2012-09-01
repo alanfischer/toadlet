@@ -97,6 +97,7 @@ StudioModelComponent::StudioModelComponent(Engine *engine):
 	memset(mAdjustedControllerValues,0,sizeof(mAdjustedControllerValues));
 	mRendered=true;
 	mEngine=engine;
+	mBound=new Bound();
 }
 
 void StudioModelComponent::destroy(){
@@ -116,6 +117,22 @@ void StudioModelComponent::destroy(){
 	mModel=NULL;
 
 	BaseComponent::destroy();
+}
+
+bool StudioModelComponent::parentChanged(Node *node){
+	if(mParent!=NULL){
+		mParent->visibleRemoved(this);
+	}
+
+	if(BaseComponent::parentChanged(node)==false){
+		return false;
+	}
+	
+	if(mParent!=NULL){
+		mParent->visibleAttached(this);
+	}
+
+	return true;
 }
 
 void StudioModelComponent::logicUpdate(int dt,int scope){
@@ -155,7 +172,7 @@ void StudioModelComponent::setModel(StudioModel *model){
 	mTransformedChromes.resize(MAXSTUDIOVERTS);
 
 	mVertexBuffer=mEngine->getBufferManager()->createVertexBuffer(Buffer::Usage_BIT_STREAM,Buffer::Access_BIT_WRITE,mEngine->getVertexFormats().POSITION_NORMAL_TEX_COORD,model->vertexCount);
-	mVertexData=VertexData::ptr(new VertexData(mVertexBuffer));
+	mVertexData=new VertexData(mVertexBuffer);
 
 	createSubModels();
 
@@ -792,12 +809,12 @@ void StudioModelComponent::createSkeletonBuffers(){
 	iba.unlock();
 
 	mSkeletonVertexBuffer=skeletonVertexBuffer;
-	mSkeletonVertexData=VertexData::ptr(new VertexData(mSkeletonVertexBuffer));
-	mSkeletonIndexData=IndexData::ptr(new IndexData(IndexData::Primitive_LINES,skeletonIndexBuffer));
+	mSkeletonVertexData=new VertexData(mSkeletonVertexBuffer);
+	mSkeletonIndexData=new IndexData(IndexData::Primitive_LINES,skeletonIndexBuffer);
 
 	mHitBoxVertexBuffer=mEngine->getBufferManager()->createVertexBuffer(Buffer::Usage_BIT_STREAM,Buffer::Access_BIT_WRITE,mEngine->getVertexFormats().POSITION,mModel->header->numhitboxes*8);
-	mHitBoxVertexData=VertexData::ptr(new VertexData(mHitBoxVertexBuffer));
-	mHitBoxIndexData=IndexData::ptr(new IndexData(IndexData::Primitive_LINES,NULL,0,mHitBoxVertexBuffer->getSize()));
+	mHitBoxVertexData=new VertexData(mHitBoxVertexBuffer);
+	mHitBoxIndexData=new IndexData(IndexData::Primitive_LINES,NULL,0,mHitBoxVertexBuffer->getSize());
 }
 
 void StudioModelComponent::updateSkeletonBuffers(){
