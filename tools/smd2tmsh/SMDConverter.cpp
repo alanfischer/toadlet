@@ -1,5 +1,7 @@
 #include "SMDConverter.h"
 
+using namespace MathConversion;
+
 class Vertex{
 public:
 	Vertex(){}
@@ -91,7 +93,9 @@ void SMDConverter::load(Engine *engine,Stream *in,const String &fileName){
 					mSkeleton->addSequence(mSequence);
 
 					for(int i=0;i<mSkeleton->getNumBones();++i){
-						mSequence->addTrack(new Track(engine->getVertexFormats().POSITION_ROTATE_SCALE));
+						Track::ptr track=new Track(engine->getVertexFormats().POSITION_ROTATE_SCALE);
+						track->setIndex(i);
+						mSequence->addTrack(track);
 					}
 				}
 			}
@@ -146,9 +150,9 @@ void SMDConverter::load(Engine *engine,Stream *in,const String &fileName){
 
 				if(reference){
 					Skeleton::Bone::ptr bone=skeleton->getBone(id);
-					bone->translate.set(MathConversion::floatToScalar(px),MathConversion::floatToScalar(py),MathConversion::floatToScalar(pz));
+					bone->translate.set(floatToScalar(px),floatToScalar(py),floatToScalar(pz));
 					Math::mul(bone->translate,mScale);
-					setQuaternionFromXYZ(bone->rotate,MathConversion::floatToScalar(rx),MathConversion::floatToScalar(ry),MathConversion::floatToScalar(rz));
+					Math::setQuaternionFromEulerAngleZXY(bone->rotate,EulerAngle(floatToScalar(rx),floatToScalar(ry),floatToScalar(rz)));
 				}
 				else{
 					Skeleton::Bone::ptr bone=mSkeleton->getBone(skeleton->getBone(id)->name);
@@ -158,12 +162,14 @@ void SMDConverter::load(Engine *engine,Stream *in,const String &fileName){
 						VertexBufferAccessor &vba=track->getAccessor();
 						Vector3 translate;
 						Quaternion rotate;
+						Vector3 scale(Math::ONE_VECTOR3);
 						int index=track->addKeyFrame(Math::fromInt(time)/mFPS);
-						translate.set(MathConversion::floatToScalar(px),MathConversion::floatToScalar(py),MathConversion::floatToScalar(pz));
+						translate.set(floatToScalar(px),floatToScalar(py),floatToScalar(pz));
 						Math::mul(translate,mScale);
-						setQuaternionFromXYZ(rotate,MathConversion::floatToScalar(rx),MathConversion::floatToScalar(ry),MathConversion::floatToScalar(rz));
+						Math::setQuaternionFromEulerAngleZXY(rotate,EulerAngle(floatToScalar(rx),floatToScalar(ry),floatToScalar(rz)));
 						vba.set3(index,0,translate);
 						vba.set4(index,1,rotate);
+						vba.set3(index,2,scale);
 					}
 				}
 			}
@@ -186,10 +192,10 @@ void SMDConverter::load(Engine *engine,Stream *in,const String &fileName){
 
 				Vertex v;
 				v.bone=bone;
-				v.position.set(MathConversion::floatToScalar(px),MathConversion::floatToScalar(py),MathConversion::floatToScalar(pz));
+				v.position.set(floatToScalar(px),floatToScalar(py),floatToScalar(pz));
 				Math::mul(v.position,mScale);
-				v.normal.set(MathConversion::floatToScalar(nx),MathConversion::floatToScalar(ny),MathConversion::floatToScalar(nz));
-				v.texCoord.set(MathConversion::floatToScalar(tu),MathConversion::floatToScalar(tv));
+				v.normal.set(floatToScalar(nx),floatToScalar(ny),floatToScalar(nz));
+				v.texCoord.set(floatToScalar(tu),floatToScalar(tv));
 				triverts[vertindex-1]=v;
 
 				if(++vertindex>3){
@@ -256,7 +262,7 @@ void SMDConverter::load(Engine *engine,Stream *in,const String &fileName){
 				vba.set2(i,2,v.texCoord);
 			}
 		}
-		mMesh->setStaticVertexData(VertexData::ptr(new VertexData(vertexBuffer)));
+		mMesh->setStaticVertexData(new VertexData(vertexBuffer));
 
 		if(mSkeleton!=NULL){
 			Collection<Mesh::VertexBoneAssignmentList> vbas(verts.size());
@@ -291,10 +297,10 @@ void SMDConverter::load(Engine *engine,Stream *in,const String &fileName){
 					}
 				}
 			}
-			Mesh::SubMesh::ptr subMesh(new Mesh::SubMesh());
+			Mesh::SubMesh::ptr subMesh=new Mesh::SubMesh();
 			mMesh->addSubMesh(subMesh);
 
-			subMesh->indexData=IndexData::ptr(new IndexData(IndexData::Primitive_TRIS,indexBuffer));
+			subMesh->indexData=new IndexData(IndexData::Primitive_TRIS,indexBuffer);
 			subMesh->materialName=materialName;
 		}
 	}

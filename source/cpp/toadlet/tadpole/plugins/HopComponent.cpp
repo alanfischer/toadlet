@@ -33,7 +33,7 @@ HopComponent::HopComponent(HopManager *manager):
 	//mManager,
 	//mSolid,
 	//mOldPosition,mNewPosition,mCurrentPosition,
-	mSkipNextPreSimulate(false)
+	mTransformChanged(false)
 	//mTraceableShape,
 //	mTraceable(NULL)
 {
@@ -72,7 +72,6 @@ bool HopComponent::parentChanged(Node *node){
 
 void HopComponent::setPosition(const Vector3 &position){
 	mSolid->setPosition(position);
-	mSkipNextPreSimulate=true;
 }
 
 void HopComponent::setBound(Bound *bound){
@@ -114,15 +113,11 @@ void HopComponent::removeShape(hop::Shape *shape){
 // Update solids with new node positions if moved
 // We dont just check active nodes, because then the solids would never deactivate, so the nodes would never deactivate
 void HopComponent::preSimulate(){
-	if(mSkipNextPreSimulate){
-		mSkipNextPreSimulate=false;
-		return;
-	}
-
 	/// @todo: Should this be elsewhere?
 	mSolid->setScope(mParent->getScope());
 
-	if(mParent->getActive()==true && mNewPosition.equals(mSolid->getPosition())==false){
+	if(mTransformChanged){
+		mTransformChanged=false;
 		mSolid->setPosition(mNewPosition);
 	}
 }
@@ -132,7 +127,13 @@ void HopComponent::postSimulate(){
 	if(mSolid->active()==true){
 		mParent->activate();
 
-		updatePosition(mSolid->getPosition());
+		if(mTransformChanged){
+			mTransformChanged=false;
+			mSolid->setPosition(mNewPosition);
+		}
+		else{
+			updatePosition(mSolid->getPosition());
+		}
 
 		mBound->set(mSolid->getLocalBound());
 	}
@@ -154,6 +155,8 @@ void HopComponent::transformChanged(){
 		mOldPosition.set(translate);
 		mNewPosition.set(translate);
 		mCurrentPosition.set(translate);
+
+		mTransformChanged=true;
 	}
 }
 

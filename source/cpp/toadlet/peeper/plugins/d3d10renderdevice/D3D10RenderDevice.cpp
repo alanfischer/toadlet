@@ -598,38 +598,37 @@ DXGI_FORMAT D3D10RenderDevice::getTextureDXGI_FORMAT(int format){
 }
 
 D3D10_MAP D3D10RenderDevice::getD3D10_MAP(int access,int usage){
-	if((usage&Buffer::Usage_BIT_STAGING)>0){
+	if((usage&Buffer::Usage_BIT_STAGING)!=0){
 		return D3D10_MAP_READ_WRITE;
 	}
 
-	switch(access){
-		case Buffer::Access_BIT_READ:
-			return D3D10_MAP_READ;
-		break;
-		case Buffer::Access_BIT_WRITE:
-			return D3D10_MAP_WRITE_DISCARD;
-		break;
-		case Buffer::Access_READ_WRITE:
-			return D3D10_MAP_READ_WRITE;
-		break;
-		default:
-			Error::unknown(Categories::TOADLET_PEEPER,
-				"D3D10RenderDevice::getD3D10_MAP: Invalid type");
-			return (D3D10_MAP)0;
+	if((access&Buffer::Access_READ_WRITE)==Buffer::Access_READ_WRITE){
+		return D3D10_MAP_READ_WRITE;
+	}
+	else if((access&Buffer::Access_BIT_READ)!=0){
+		return D3D10_MAP_READ;
+	}
+	else if((access&Buffer::Access_BIT_WRITE)!=0){
+		return D3D10_MAP_WRITE_DISCARD;
+	}
+	else{
+		Error::unknown(Categories::TOADLET_PEEPER,
+			"D3D10RenderDevice::getD3D10_MAP: Invalid type");
+		return (D3D10_MAP)0;
 	}
 }
 
 D3D10_USAGE D3D10RenderDevice::getD3D10_USAGE(int usage){
-	if((usage&Buffer::Usage_BIT_STATIC)>0){
+	if((usage&Buffer::Usage_BIT_STATIC)!=0){
 		return D3D10_USAGE_IMMUTABLE;
 	}
-	else if((usage&Buffer::Usage_BIT_STREAM)>0){
+	else if((usage&Buffer::Usage_BIT_STREAM)!=0){
 		return D3D10_USAGE_DEFAULT;
 	}
-	else if((usage&Buffer::Usage_BIT_DYNAMIC)>0){
+	else if((usage&Buffer::Usage_BIT_DYNAMIC)!=0){
 		return D3D10_USAGE_DYNAMIC;
 	}
-	else if((usage&Buffer::Usage_BIT_STAGING)>0){
+	else if((usage&Buffer::Usage_BIT_STAGING)!=0){
 		return D3D10_USAGE_STAGING;
 	}
 	else{

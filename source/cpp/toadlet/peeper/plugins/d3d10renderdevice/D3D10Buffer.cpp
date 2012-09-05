@@ -184,11 +184,11 @@ bool D3D10Buffer::createContext(){
 
 	desc.Usage=D3D10RenderDevice::getD3D10_USAGE(mUsage);
 
-	if((mUsage&(Usage_BIT_DYNAMIC|Usage_BIT_STAGING))>0){
-		if((mAccess&Access_BIT_READ)>0){
+	if((mUsage&(Usage_BIT_DYNAMIC|Usage_BIT_STAGING))!=0){
+		if((mAccess&Access_BIT_READ)!=0){
 			desc.CPUAccessFlags|=D3D10_CPU_ACCESS_READ;
 		}
-		if((mAccess&Access_BIT_WRITE)>0){
+		if((mAccess&Access_BIT_WRITE)!=0){
 			desc.CPUAccessFlags|=D3D10_CPU_ACCESS_WRITE;
 		}
 	}
@@ -310,7 +310,7 @@ bool D3D10Buffer::unlock(){
 		if(mBuffer==NULL){
 			createContext();
 		}
-		else if((mLockAccess&Access_BIT_WRITE)>0){
+		else if((mLockAccess&Access_BIT_WRITE)!=0){
 			mDevice->getD3D10Device()->UpdateSubresource(mBuffer,0,NULL,mData,0,0);
 		}
 

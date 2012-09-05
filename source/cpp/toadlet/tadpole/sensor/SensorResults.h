@@ -33,9 +33,10 @@ namespace toadlet{
 namespace tadpole{
 namespace sensor{
 
-class TOADLET_API SensorResults:public SensorResultsListener{
+/// @todo: Change to have a unified Collection<Node> Interface, and move Collection to Vector?
+class TOADLET_API SensorResults:public Object,public SensorResultsListener{
 public:
-	TOADLET_SPTR(SensorResults);
+	TOADLET_OBJECT(SensorResults);
 
 	SensorResults();
 	virtual ~SensorResults();
@@ -52,6 +53,8 @@ public:
 	int getNumResults() const{return mResults.size();}
 	Node *getResult(int i){return mResults[i];}
 	Node *getNextResult(Node *result);
+
+	bool contains(Node *node);
 
 	virtual void sensingBeginning();
 	

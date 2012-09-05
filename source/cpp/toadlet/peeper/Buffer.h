@@ -48,6 +48,7 @@ public:
 		Access_NONE=		0,		// Data is inaccessable
 		Access_BIT_READ=	1<<0,	// Data is readable
 		Access_BIT_WRITE=	1<<1,	// Data is writeable
+		Access_BIT_BACKED=	1<<2,	// Data is backed
 		Access_READ_WRITE=	Access_BIT_READ|Access_BIT_WRITE,
 	};
 

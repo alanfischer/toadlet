@@ -122,6 +122,44 @@ Vector4 &parseVector4(Vector4 &r,const char *string){
 	return r;
 }
 
+String formatEulerAngle(const EulerAngle &e,const char *separator,bool degrees){
+	if(degrees){
+		#if defined(TOADLET_FIXED_POINT)
+			return String()+Math::toFloat(Math::radToDeg(e.x))+separator+Math::toFloat(Math::radToDeg(e.y))+separator+Math::toFloat(Math::radToDeg(e.z));
+		#else
+			return String()+Math::radToDeg(e.x)+separator+Math::radToDeg(e.y)+separator+Math::radToDeg(e.z);
+		#endif
+	}
+	else{
+		#if defined(TOADLET_FIXED_POINT)
+			return String()+Math::toFloat(e.x)+separator+Math::toFloat(e.y)+separator+Math::toFloat(e.z);
+		#else
+			return String()+e.x+separator+e.y+separator+e.z;
+		#endif
+	}
+}
+
+EulerAngle &parseEulerAngle(EulerAngle &r,const char *string,bool degrees){
+	const char *parse=strchr(string,',')!=NULL?"%f,%f,%f":"%f %f %f";
+	float x=0,y=0,z=0;
+	sscanf(string,parse,&x,&y,&z);
+	if(degrees){
+		#if defined(TOADLET_FIXED_POINT)
+			r.x=Math::degToRad(Math::fromFloat(x));r.y=Math::degToRad(Math::fromFloat(y));r.z=Math::degToRad(Math::fromFloat(z));
+		#else
+			r.x=Math::degToRad(x);r.y=Math::degToRad(y);r.z=Math::degToRad(z);
+		#endif
+	}
+	else{
+		#if defined(TOADLET_FIXED_POINT)
+			r.x=Math::fromFloat(x);r.y=Math::fromFloat(y);r.z=Math::fromFloat(z);
+		#else
+			r.x=x;r.y=y;r.z=z;
+		#endif
+	}
+	return r;
+}
+
 String formatQuaternion(const Quaternion &q,const char *separator){
 	#if defined(TOADLET_FIXED_POINT)
 		return String()+Math::toFloat(q.x)+separator+Math::toFloat(q.y)+separator+Math::toFloat(q.z)+separator+Math::toFloat(q.w);

@@ -31,10 +31,10 @@
 
 // Check for the correct access bits or if it's a backable buffer
 #define TOADLET_CHECK_READ() TOADLET_ASSERT( \
-	(mBuffer->getAccess()&toadlet::peeper::Buffer::Access_BIT_READ)!=0);
+	(mBuffer->getAccess()&(toadlet::peeper::Buffer::Access_BIT_READ|toadlet::peeper::Buffer::Access_BIT_BACKED))!=0);
 
 #define TOADLET_CHECK_WRITE() TOADLET_ASSERT( \
-	(mBuffer->getAccess()&toadlet::peeper::Buffer::Access_BIT_WRITE)!=0);
+	(mBuffer->getAccess()&(toadlet::peeper::Buffer::Access_BIT_WRITE|toadlet::peeper::Buffer::Access_BIT_BACKED))!=0);
 
 namespace toadlet{
 namespace peeper{

@@ -60,7 +60,7 @@ public:
 	virtual void resetDestroy();
 
 	virtual int getUsage() const{return mUsage;}
-	virtual int getAccess() const{return mAccess;}
+	virtual int getAccess() const{return mAccess|Access_BIT_BACKED;}
 	virtual int getDataSize() const{return mDataSize;}
 	virtual int getSize() const{return mSize;}
 

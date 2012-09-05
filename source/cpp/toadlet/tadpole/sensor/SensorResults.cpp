@@ -76,6 +76,10 @@ Node *SensorResults::getNextResult(Node *result){
 	}
 }
 
+bool SensorResults::contains(Node *node){
+	return mResults.contains(node);
+}
+
 void SensorResults::sensingBeginning(){
 	mResults.clear();
 	mMaxDistance=0;
