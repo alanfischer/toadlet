@@ -96,7 +96,7 @@ protected:
 	hop::Solid::ptr mSolid;
 	Collection<PhysicsCollisionListener*> mListeners;
 	Vector3 mOldPosition,mNewPosition,mCurrentPosition;
-	bool mSkipNextPreSimulate;
+	bool mTransformChanged;
 	Bound::ptr mBound;
 	Traceable::ptr mTraceable;
 	hop::Shape::ptr mTraceableShape;

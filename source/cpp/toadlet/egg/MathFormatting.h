@@ -61,6 +61,10 @@ namespace MathFormatting{
 	TOADLET_API Vector4 &parseVector4(Vector4 &r,const char *string);
 	inline Vector4 parseVector4(const char *string){Vector4 r;parseVector4(r,string);return r;}
 
+	TOADLET_API String formatEulerAngle(const EulerAngle &e,const char *separator=",",bool degrees=false);
+	TOADLET_API EulerAngle &parseEulerAngle(EulerAngle &r,const char *string,bool degrees=false);
+	inline EulerAngle parseEulerAngle(const char *string,bool degrees=false){EulerAngle r;parseEulerAngle(r,string,degrees);return r;}
+
 	TOADLET_API String formatQuaternion(const Quaternion &q,const char *separator=",");
 	TOADLET_API Quaternion &parseQuaternion(Quaternion &r,const char *string);
 	inline Quaternion parseQuaternion(const char *string){Quaternion r;parseQuaternion(r,string);return r;}

@@ -239,6 +239,27 @@ bool Math::setEulerAngleXYZFromQuaternion(EulerAngle &r,const Quaternion &q,real
 	}
 }
 
+bool Math::setEulerAngleZXYFromMatrix3x3(EulerAngle &r,const Matrix3x3 &m,real epsilon){
+	if(m.at(2,1)>1-epsilon){ // North Pole singularity
+		r.x=HALF_PI;
+		r.z=atan2(m.at(0,2),m.at(0,0));
+		r.y=0;
+		return false;
+	}
+	else if(m.at(1,0)<-(1-epsilon)){ // South Pole singularity
+		r.x=-HALF_PI;
+		r.z=atan2(m.at(0,2),m.at(0,0));
+		r.y=0;
+		return false;
+	}
+	else{
+		r.x=asin(m.at(2,1));
+		r.z=atan2(-m.at(0,1),m.at(1,1));
+		r.y=atan2(-m.at(2,0),m.at(2,2));
+		return true;
+	}
+}
+
 void Math::transpose(Matrix3x3 &r,const Matrix3x3 &m){
 	r.data[0+0*3]=m.data[0+0*3]; r.data[0+1*3]=m.data[1+0*3]; r.data[0+2*3]=m.data[2+0*3];
 	r.data[1+0*3]=m.data[0+1*3]; r.data[1+1*3]=m.data[1+1*3]; r.data[1+2*3]=m.data[2+1*3];
@@ -523,6 +544,48 @@ void setQuaternionFromMatrix(Quaternion &r,const Matrix &m){
 void Math::setQuaternionFromMatrix3x3(Quaternion &r,const Matrix3x3 &m){ setQuaternionFromMatrix(r,m); }
 
 void Math::setQuaternionFromMatrix4x4(Quaternion &r,const Matrix4x4 &m){ setQuaternionFromMatrix(r,m); }
+
+void Math::setQuaternionFromEulerAngleXYZ(Quaternion &r,const EulerAngle &euler){
+	real sx=euler.x/2;
+	real cx=cos(sx);
+	sx=sin(sx);
+	real sy=euler.y/2;
+	real cy=cos(sy);
+	sy=sin(sy);
+	real sz=euler.z/2;
+	real cz=cos(sz);
+	sz=sin(sz);
+	real cxcy=cx*cy;
+	real sxsy=sx*sy;
+	real cxsy=cx*sy;
+	real sxcy=sx*cy;
+
+	r.w=(cxcy*cz) - (sxsy*sz);
+  	r.x=(cxcy*sz) + (sxsy*cz);
+	r.y=(sxcy*cz) + (cxsy*sz);
+	r.z=(cxsy*cz) - (sxcy*sz);
+}
+
+void Math::setQuaternionFromEulerAngleZXY(Quaternion &r,const EulerAngle &euler){
+	real sx=euler.x/2;
+	real cx=cos(sx);
+	sx=sin(sx);
+	real sy=euler.y/2;
+	real cy=cos(sy);
+	sy=sin(sy);
+	real sz=euler.z/2;
+	real cz=cos(sz);
+	sz=sin(sz);
+	real cxcy=cx*cy;
+	real sxsy=sx*sy;
+	real cxsy=cx*sy;
+	real sxcy=sx*cy;
+
+	r.x=(sxcy*cz) - (cxsy*sz);
+	r.y=(cxsy*cz) + (sxcy*sz);
+	r.z=(cxcy*sz) - (sxsy*cz);
+	r.w=(cxcy*cz) + (sxsy*sz);
+}
 
 void Math::lerp(Quaternion &r,const Quaternion &q1,const Quaternion &q2,real t){
 	real cosom=dot(q1,q2);

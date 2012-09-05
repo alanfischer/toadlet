@@ -627,6 +627,8 @@ namespace Math{
 	// EulerAngle operations
 	TOADLET_API bool setEulerAngleXYZFromMatrix3x3(EulerAngle &r,const Matrix3x3 &m,real epsilon);
 
+	TOADLET_API bool setEulerAngleZXYFromMatrix3x3(EulerAngle &r,const Matrix3x3 &m,real epsilon);
+
 	TOADLET_API bool setEulerAngleXYZFromQuaternion(EulerAngle &r,const Quaternion &q,real epsilon);
 
 	// Matrix3x3 basic operations
@@ -1300,26 +1302,9 @@ namespace Math{
 		r.w=cos(halfAngle);
 	}
 
-	inline void setQuaternionFromEulerAngleXYZ(Quaternion &r,const EulerAngle &euler){
-		real sx=euler.x/2;
-		real cx=cos(sx);
-		sx=sin(sx);
-		real sy=euler.y/2;
-		real cy=cos(sy);
-		sy=sin(sy);
-		real sz=euler.z/2;
-		real cz=cos(sz);
-		sz=sin(sz);
-		real cxcy=cx*cy;
-		real sxsy=sx*sy;
-		real cxsy=cx*sy;
-		real sxcy=sx*cy;
+	TOADLET_API void setQuaternionFromEulerAngleXYZ(Quaternion &r,const EulerAngle &euler);
 
-		r.w=(cxcy*cz) - (sxsy*sz);
-  		r.x=(cxcy*sz) + (sxsy*cz);
-		r.y=(sxcy*cz) + (cxsy*sz);
-		r.z=(cxsy*cz) - (sxcy*sz);
-	}
+	TOADLET_API void setQuaternionFromEulerAngleZXY(Quaternion &r,const EulerAngle &euler);
 
 	TOADLET_API void lerp(Quaternion &r,const Quaternion &q1,const Quaternion &q2,real t);
 

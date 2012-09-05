@@ -144,8 +144,6 @@ public:
 	int getAttachmentIndex(const String &name);
 	bool getAttachmentTransform(Transform &result,int index);
 
-	static void setQuaternionFromEulerAngleStudio(Quaternion &r,const EulerAngle &euler);
-
 protected:
 	void updateSkeleton();
 	void findBoneTransforms(Vector3 *translates,Quaternion *rotates,StudioModel *model,studioseqdesc *sseqdesc,studioanim *sanim,float t);

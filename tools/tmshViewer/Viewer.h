@@ -39,7 +39,7 @@ protected:
 	Engine *mEngine;
 	Scene::ptr mScene;
 	Node::ptr mParent;
-	CameraComponent::ptr mCamera;
+	Camera::ptr mCamera;
 	LightComponent::ptr mLight;
  	int mMouseX,mMouseY;
 	bool mDrag;

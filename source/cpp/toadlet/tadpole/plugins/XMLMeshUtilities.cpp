@@ -507,7 +507,7 @@ Mesh::ptr XMLMeshUtilities::loadMesh(mxml_node_t *node,int version,BufferManager
 		mesh->setVertexBoneAssignments(vbas);
 
 		mesh->setBound(new Bound(bound));
-		mesh->setStaticVertexData(VertexData::ptr(new VertexData(vertexBuffer)));
+		mesh->setStaticVertexData(new VertexData(vertexBuffer));
 	}
 
 	mxml_node_t *subMeshNode=node->child;
@@ -694,19 +694,19 @@ mxml_node_t *XMLMeshUtilities::saveMesh(Mesh::ptr mesh,int version,ProgressListe
 			strcat(line,"\t\t\t");
 
 			if(pi>=0){
-				vba.get3(i,pi,v3); strcat(line,formatVector3(v3));
+				vba.get3(i,pi,v3); strcat(line,formatVector3(v3)); strcat(line," ");
 			}
 			if(ni>=0){
-				vba.get3(i,ni,v3); strcat(line,formatVector3(v3));
+				vba.get3(i,ni,v3); strcat(line,formatVector3(v3)); strcat(line," ");
 			}
 			if(ti>=0){
-				vba.get2(i,ti,v2); strcat(line,formatVector2(v2));
+				vba.get2(i,ti,v2); strcat(line,formatVector2(v2)); strcat(line," ");
 			}
 			if(ci>=0){
-				strcat(line,formatVector4(Vector4(vba.getRGBA(i,ci))));
+				strcat(line,formatVector4(Vector4(vba.getRGBA(i,ci)))); strcat(line," ");
 			}
 			if(vbas.size()>0){
-				strcat(line,makeBoneAssignment(vbas[i]));
+				strcat(line,makeBoneAssignment(vbas[i])); strcat(line," ");
 			}
 
 			strcat(line,LF);

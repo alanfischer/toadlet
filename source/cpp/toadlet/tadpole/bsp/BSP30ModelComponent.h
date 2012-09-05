@@ -79,6 +79,7 @@ public:
 
 	void showPlanarFaces(int plane);
 
+	bool getActive() const{return false;}
 	Bound *getBound() const{return mBound;}
 
 	// Visible

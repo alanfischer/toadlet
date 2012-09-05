@@ -464,27 +464,6 @@ bool StudioModelComponent::getAttachmentTransform(Transform &result,int index){
 	return true;
 }
 
-void StudioModelComponent::setQuaternionFromEulerAngleStudio(Quaternion &r,const EulerAngle &euler){
-	real sx=euler.x/2;
-	real cx=cos(sx);
-	sx=sin(sx);
-	real sy=euler.y/2;
-	real cy=cos(sy);
-	sy=sin(sy);
-	real sz=euler.z/2;
-	real cz=cos(sz);
-	sz=sin(sz);
-	real cxcy=cx*cy;
-	real sxsy=sx*sy;
-	real cxsy=cx*sy;
-	real sxcy=sx*cy;
-
-	r.x=(sxcy*cz) - (cxsy*sz);
-	r.y=(cxsy*cz) + (sxcy*sz);
-	r.z=(cxcy*sz) - (sxsy*cz);
-	r.w=(cxcy*cz) + (sxsy*sz);
-}
-
 void StudioModelComponent::updateVertexes(StudioModel *model,int bodypartsIndex,int modelIndex){
 	int i,l;
 
@@ -744,12 +723,12 @@ void StudioModelComponent::findBoneRotate(Quaternion &r,int frame,float s,studio
 	}
 
 	if(angle1.equals(angle2)==false){
-		setQuaternionFromEulerAngleStudio(q1,angle1);
-		setQuaternionFromEulerAngleStudio(q2,angle2);
+		Math::setQuaternionFromEulerAngleZXY(q1,angle1);
+		Math::setQuaternionFromEulerAngleZXY(q2,angle2);
 		Math::slerp(r,q1,q2,s);
 	}
 	else{
-		setQuaternionFromEulerAngleStudio(r,angle1);
+		Math::setQuaternionFromEulerAngleZXY(r,angle1);
 	}
 }
 

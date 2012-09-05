@@ -28,12 +28,12 @@ int main(int argc,char **argv){
 		}
 	}
 
-	PlatformApplication *app=new PlatformApplication();
+	PlatformApplication::ptr app=new PlatformApplication();
 	app->setSize(640,480);
 	app->setFullscreen(false);
-	app->create("gl","");
+	app->create("d3d10","al");
 
-	Viewer *viewer=new Viewer(app);
+	Viewer::ptr viewer=new Viewer(app);
 	app->setApplet(viewer);
 	Engine *engine=app->getEngine();
 	Scene *scene=viewer->getScene();
@@ -48,9 +48,6 @@ int main(int argc,char **argv){
 	Mesh::ptr mesh=engine->getMeshManager()->findMesh(meshName);
 	if(mesh==NULL){
 		std::cout << "Error loading " << (const char*)meshName << std::endl;
-
-		delete viewer;
-		delete app;
 
 		return -1;
 	}
@@ -86,9 +83,6 @@ int main(int argc,char **argv){
 
 	app->start();
 	app->destroy();
-
-	delete viewer;
-	delete app;
 
 	return 1;
 }

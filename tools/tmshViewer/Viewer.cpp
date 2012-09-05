@@ -65,10 +65,9 @@ Viewer::Viewer(Application *app):
 
  	mScene=new Scene(mEngine);
 
-	mCamera=new CameraComponent(new Camera());
+	mCamera=new Camera();
 	mCamera->setClearColor(Colors::ORANGE);
 	mCamera->setAutoProjectionFov(Math::degToRad(Math::fromInt(45)),0.01,1000);
-	mScene->getRoot()->attach(mCamera);
 
 	mParent=new Node(mScene);
 	mScene->getRoot()->attach(mParent);
@@ -112,7 +111,7 @@ void Viewer::render(){
 	RenderDevice *device=mEngine->getRenderDevice();
 
 	device->beginScene();
-		mCamera->getCamera()->render(device,mScene);
+		mCamera->render(device,mScene);
 	device->endScene();
 	device->swap();
 }

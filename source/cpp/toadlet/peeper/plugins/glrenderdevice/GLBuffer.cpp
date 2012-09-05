@@ -228,18 +228,14 @@ uint8 *GLBuffer::lock(int lockAccess){
 	#if !defined(TOADLET_HAS_GLES)
 		if(mMapping){
 			GLenum gllock=0;
-			switch(mLockAccess){
-				case Access_BIT_READ:
-					gllock=GL_READ_ONLY;
-				break;
-				case Access_BIT_WRITE:
-					gllock=GL_WRITE_ONLY;
-				break;
-				case Access_READ_WRITE:
-					gllock=GL_READ_WRITE;
-				break;
-				default:
-				break;
+			if((mLockAccess&Access_READ_WRITE)==Access_READ_WRITE){
+				gllock=GL_READ_WRITE;
+			}
+			else if((mLockAccess&Access_BIT_READ)!=0){
+				gllock=GL_READ_ONLY;
+			}
+			else if((mLockAccess&Access_BIT_WRITE)!=0){
+				gllock=GL_WRITE_ONLY;
 			}
 
 			glBindBuffer(mTarget,mHandle);
@@ -451,17 +447,14 @@ GLenum GLBuffer::getBufferUsage(int usage,int access){
 			#if defined(TOADLET_HAS_GLES)
 				glusage=GL_STATIC_DRAW;
 			#else
-				switch(access){
-					case Access_BIT_READ:
-						glusage=GL_STATIC_READ;
-					break;
-					case Access_BIT_WRITE:
-					case Access_READ_WRITE:
-						glusage=GL_STATIC_DRAW;
-					break;
-					case 0:
-						glusage=GL_STATIC_COPY;
-					break;
+				if((access&Access_BIT_WRITE)!=0){
+					glusage=GL_STATIC_DRAW;
+				}
+				else if((access&Access_BIT_READ)!=0){
+					glusage=GL_STATIC_READ;
+				}
+				else{
+					glusage=GL_STATIC_COPY;
 				}
 			#endif
 		break;
@@ -469,17 +462,14 @@ GLenum GLBuffer::getBufferUsage(int usage,int access){
 			#if defined(TOADLET_HAS_GLES)
 				glusage=GL_DYNAMIC_DRAW;
 			#else
-				switch(access){
-					case Access_BIT_READ:
-						glusage=GL_STREAM_READ;
-					break;
-					case Access_BIT_WRITE:
-					case Access_READ_WRITE:
-						glusage=GL_STREAM_DRAW;
-					break;
-					case 0:
-						glusage=GL_STREAM_COPY;
-					break;
+				if((access&Access_BIT_WRITE)!=0){
+					glusage=GL_STREAM_DRAW;
+				}
+				else if((access&Access_BIT_READ)!=0){
+					glusage=GL_STREAM_READ;
+				}
+				else{
+					glusage=GL_STREAM_COPY;
 				}
 			#endif
 		break;
@@ -488,17 +478,14 @@ GLenum GLBuffer::getBufferUsage(int usage,int access){
 			#if defined(TOADLET_HAS_GLES)
 				glusage=GL_DYNAMIC_DRAW;
 			#else
-				switch(access){
-					case Access_BIT_READ:
-						glusage=GL_DYNAMIC_READ;
-					break;
-					case Access_BIT_WRITE:
-					case Access_READ_WRITE:
-						glusage=GL_DYNAMIC_DRAW;
-					break;
-					case 0:
-						glusage=GL_DYNAMIC_COPY;
-					break;
+				if((access&Access_BIT_WRITE)!=0){
+					glusage=GL_DYNAMIC_DRAW;
+				}
+				else if((access&Access_BIT_READ)!=0){
+					glusage=GL_DYNAMIC_READ;
+				}
+				else{
+					glusage=GL_DYNAMIC_COPY;
 				}
 			#endif
 		break;

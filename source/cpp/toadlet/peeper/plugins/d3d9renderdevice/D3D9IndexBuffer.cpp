@@ -94,10 +94,10 @@ void D3D9IndexBuffer::resetDestroy(){
 
 bool D3D9IndexBuffer::createContext(bool restore){
 	mD3DUsage=0;
-	if((mUsage&Usage_BIT_DYNAMIC)>0){
+	if((mUsage&Usage_BIT_DYNAMIC)!=0){
 		mD3DUsage|=D3DUSAGE_DYNAMIC;
 	}
-	if(mAccess==Access_BIT_WRITE){
+	if((mAccess&Access_BIT_WRITE)!=0 && (mAccess&Access_BIT_READ)==0){
 		mD3DUsage|=D3DUSAGE_WRITEONLY;
 	}
 
@@ -145,7 +145,7 @@ uint8 *D3D9IndexBuffer::lock(int lockAccess){
 		return NULL;
 	}
 
-	if(mAccess==0 || (mAccess==Access_BIT_READ && lockAccess==Access_BIT_WRITE) || (mAccess==Access_BIT_WRITE && lockAccess==Access_BIT_READ)){
+	if(mAccess==0 || ((mAccess&Access_BIT_WRITE)==0 && lockAccess==Access_BIT_WRITE) || ((mAccess&Access_BIT_READ)==0 && lockAccess==Access_BIT_READ)){
 		Logger::error(Categories::TOADLET_PEEPER,"invalid lock type on buffer");
 		return NULL;
 	}
@@ -155,7 +155,7 @@ uint8 *D3D9IndexBuffer::lock(int lockAccess){
 	DWORD d3dflags=0;
 	switch(mLockAccess){
 		case Access_BIT_WRITE:
-			if((mUsage&Usage_BIT_DYNAMIC)>0){
+			if((mUsage&Usage_BIT_DYNAMIC)!=0){
 				d3dflags|=D3DLOCK_DISCARD;
 			}
 		break;
