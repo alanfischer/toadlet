@@ -25,7 +25,7 @@
 
 #include <toadlet/egg/Error.h>
 #include <toadlet/tadpole/bsp/BSP30Streamer.h>
-#include <toadlet/tadpole/bsp/BSP30ModelComponent.h>
+#include <toadlet/tadpole/bsp/BSP30MaterialCreator.h>
 #include <toadlet/tadpole/plugins/WADArchive.h>
 
 namespace toadlet{
@@ -43,7 +43,7 @@ BSP30Streamer::BSP30Streamer(Engine *engine):
 BSP30Streamer::~BSP30Streamer(){}
 
 Resource::ptr BSP30Streamer::load(Stream::ptr stream,ResourceData *data,ProgressListener *listener){
-	DataStream::ptr dataStream(new DataStream(stream));
+	DataStream::ptr dataStream=new DataStream(stream);
 	int version=dataStream->readLInt32();
 	dataStream->reset();
 
@@ -56,7 +56,7 @@ Resource::ptr BSP30Streamer::load(Stream::ptr stream,ResourceData *data,Progress
 
 	Logger::debug(Categories::TOADLET_TADPOLE,"Reading map");
 
-	BSP30Map::ptr map(new BSP30Map(mEngine));
+	BSP30Map::ptr map=new BSP30Map(mEngine);
 
 	stream->read((tbyte*)&map->header,sizeof(map->header));
 
@@ -84,7 +84,6 @@ Resource::ptr BSP30Streamer::load(Stream::ptr stream,ResourceData *data,Progress
 	parseTextures(map);
 	buildBuffers(map);
 	buildMaterials(map);
-	buildModels(map);
 
 	Logger::debug(Categories::TOADLET_TADPOLE,"Reading map finished");
 
@@ -309,7 +308,7 @@ void BSP30Streamer::buildBuffers(BSP30Map *map){
 
 		IndexData::ptr indexData;
 		if(mEngine->getBufferManager()->useTriFan()){
-			indexData=IndexData::ptr(new IndexData(IndexData::Primitive_TRIFAN,NULL,face->firstedge,face->numedges));
+			indexData=new IndexData(IndexData::Primitive_TRIFAN,NULL,face->firstedge,face->numedges);
 		}
 		else{
 			/// @todo: Pack all these indexes into 1 IndexBuffer to speed up rendering
@@ -322,7 +321,7 @@ void BSP30Streamer::buildBuffers(BSP30Map *map){
 				iba.set((edge-1)*3+2,face->firstedge+edge+1);
 			}
 			iba.unlock();
-			indexData=IndexData::ptr(new IndexData(IndexData::Primitive_TRIS,indexBuffer,0,indexes));
+			indexData=new IndexData(IndexData::Primitive_TRIS,indexBuffer,0,indexes);
 		}
 		faced->indexData=indexData;
 
@@ -360,43 +359,19 @@ void BSP30Streamer::buildBuffers(BSP30Map *map){
 
 	map->uploadLightmap();
 
-	map->vertexData=VertexData::ptr(new VertexData(vertexBuffer));
+	map->vertexData=new VertexData(vertexBuffer);
 }
 
 void BSP30Streamer::buildMaterials(BSP30Map *map){
 	Logger::debug(Categories::TOADLET_TADPOLE,"Building materials");
 
+	BSP30MaterialCreator::ptr creator=new BSP30MaterialCreator(mEngine);
+
 	map->materials.resize(map->miptexlump->nummiptex);
 	int i;
 	for(i=0;i<map->miptexlump->nummiptex;i++){
-		Material::ptr material=mEngine->createDiffuseMaterial(map->parsedTextures[i]);
-		material->getPass()->setMaterialState(MaterialState(false,false,MaterialState::ShadeType_FLAT));
-		material->getPass()->setRasterizerState(RasterizerState(RasterizerState::CullType_FRONT));
-		material->getPass()->setSamplerState(Shader::ShaderType_FRAGMENT,1,SamplerState());
-
-		TextureState lightmapState;
-		lightmapState.texCoordIndex=1;
-		lightmapState.colorOperation=TextureState::Operation_MODULATE;
-		lightmapState.colorSource1=TextureState::Source_PREVIOUS;
-		lightmapState.colorSource2=TextureState::Source_TEXTURE;
-		material->getPass()->setTextureState(Shader::ShaderType_FRAGMENT,1,lightmapState);
-
-		map->materials[i]=material;
+		map->materials[i]=creator->createBSP30Material(map->parsedTextures[i]);
 	}
-}
-
-void BSP30Streamer::buildModels(BSP30Map::ptr map){
-/*	map->modelResources.resize(map->nmodels-1);
-	int i;
-	for(i=1;i<map->nmodels;++i){
-		BSP30ModelComponent *model=new BSP30ModelComponent(mEngine);
-		model->setModel(map,i);
-		NodeResource::ptr model(new NodeResource());
-		model->setNode(modelNode);
-		mEngine->getNodeManager()->manage(model,String("*")+i);
-		map->modelResources[i-1]=model;
-	}
-*/
 }
 
 tbyte Quake1Palette[]={

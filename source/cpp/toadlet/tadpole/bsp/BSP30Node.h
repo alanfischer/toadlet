@@ -28,6 +28,7 @@
 
 #include <toadlet/peeper/IndexData.h>
 #include <toadlet/peeper/VertexData.h>
+#include <toadlet/tadpole/Camera.h>
 #include <toadlet/tadpole/Traceable.h>
 #include <toadlet/tadpole/Renderable.h>
 #include <toadlet/tadpole/Visible.h>
@@ -55,8 +56,8 @@ public:
 	void setSkyTextures(const String &skyDown,const String &skyUp,const String &skyWest,const String &skyEast,const String &skySouth,const String &skyNorth);
 	MeshComponent *getSkyMesh() const{return mSkyMesh;}
 
-	void setStyleIntensity(int style,scalar intensity){mMap->styleIntensities[style]=255*intensity;}
-	scalar getStyleIntensity(int style){return (float)mMap->styleIntensities[style]/255.0;}
+	void setStyleIntensity(int style,scalar intensity){if(mMap!=NULL){mMap->styleIntensities[style]=255*intensity;}}
+	scalar getStyleIntensity(int style){return mMap!=NULL?(float)mMap->styleIntensities[style]/255.0:0;}
 
 	// Node items
 	void nodeAttached(Node *node);
