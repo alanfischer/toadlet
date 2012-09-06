@@ -23,40 +23,53 @@
  *
  ********** Copyright header - do not remove **********/
 
-#ifndef TOADLET_TADPOLE_BSP_BSP30STREAMER_H
-#define TOADLET_TADPOLE_BSP_BSP30STREAMER_H
-
 #include <toadlet/tadpole/Engine.h>
-#include <toadlet/tadpole/ResourceStreamer.h>
-#include <toadlet/tadpole/bsp/BSP30Map.h>
+#include <toadlet/tadpole/Scene.h>
+#include <toadlet/tadpole/bsp/BSP30StyleComponent.h>
 
 namespace toadlet{
 namespace tadpole{
 namespace bsp{
 
-class BSP30Streamer:public Object,public ResourceStreamer{
-public:
-	TOADLET_OBJECT(BSP30Streamer);
+BSP30StyleComponent::BSP30StyleComponent():
+	//mBSPNode,
+	mStyle(0),
+	mIntensity(0)
+{
+	mIntensity=Math::ONE;
+}
 
-	BSP30Streamer(Engine *engine);
-	virtual ~BSP30Streamer();
+bool BSP30StyleComponent::parentChanged(Node *node){
+	BaseComponent::parentChanged(node);
+	
+	if(mParent!=NULL && mParent->getScene()->getRoot()->getType()==BSP30Node::type()){
+		setNode((BSP30Node*)mParent->getScene()->getRoot());
+	}
 
-	virtual Resource::ptr load(Stream::ptr stream,ResourceData *data,ProgressListener *listener);
+	return true;
+}
 
-protected:
-	void readLump(Stream *stream,blump *lump,void **data,int size,int *count);
-	void parseVisibility(BSP30Map *map);
-	void parseEntities(BSP30Map *map);
-	void parseWADs(BSP30Map *map);
-	void parseTextures(BSP30Map *map);
-	void buildBuffers(BSP30Map *map);
-	void buildMaterials(BSP30Map *map);
+void BSP30StyleComponent::setNode(BSP30Node *node){
+	mNode=node;
+	update();
+}
 
-	Engine *mEngine;
-};
+void BSP30StyleComponent::setStyle(int style){
+	mStyle=style;
+	update();
+}
+
+void BSP30StyleComponent::setIntensity(scalar intensity){
+	mIntensity=intensity;
+	update();
+}
+
+void BSP30StyleComponent::update(){
+	if(mNode!=NULL){
+		mNode->setStyleIntensity(mStyle,mIntensity);
+	}
+}
 
 }
 }
 }
-
-#endif

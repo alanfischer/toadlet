@@ -323,8 +323,6 @@ Material::ptr DiffuseMaterialCreator::createDiffuseMaterial(Texture *texture){
 		}
 	}
 
-	mEngine->getMaterialManager()->manage(material);
-
 	material->compile();
 
 	return material;
@@ -385,8 +383,6 @@ Material::ptr DiffuseMaterialCreator::createPointSpriteMaterial(Texture *texture
 			pass->setTexture(Shader::ShaderType_FRAGMENT,0,texture,mEngine->getMaterialManager()->getDefaultSamplerState(),TextureState());
 		}
 	}
-
-	mEngine->getMaterialManager()->manage(material);
 
 	material->compile();
 

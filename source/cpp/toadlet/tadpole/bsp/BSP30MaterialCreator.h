@@ -23,39 +23,35 @@
  *
  ********** Copyright header - do not remove **********/
 
-#ifndef TOADLET_TADPOLE_BSP_BSP30STREAMER_H
-#define TOADLET_TADPOLE_BSP_BSP30STREAMER_H
+#ifndef TOADLET_TADPOLE_BSP30MATERIALCREATOR_H
+#define TOADLET_TADPOLE_BSP30MATERIALCREATOR_H
 
-#include <toadlet/tadpole/Engine.h>
-#include <toadlet/tadpole/ResourceStreamer.h>
-#include <toadlet/tadpole/bsp/BSP30Map.h>
+#include <toadlet/tadpole/ResourceCreator.h>
+#include <toadlet/tadpole/material/Material.h>
 
 namespace toadlet{
 namespace tadpole{
-namespace bsp{
 
-class BSP30Streamer:public Object,public ResourceStreamer{
+class TOADLET_API BSP30MaterialCreator:public Object,public ResourceCreator{
 public:
-	TOADLET_OBJECT(BSP30Streamer);
+	TOADLET_OBJECT(BSP30MaterialCreator);
 
-	BSP30Streamer(Engine *engine);
-	virtual ~BSP30Streamer();
+	BSP30MaterialCreator(Engine *engine);
+	void destroy(){}
 
-	virtual Resource::ptr load(Stream::ptr stream,ResourceData *data,ProgressListener *listener);
+	Resource::ptr create(const String &name,ResourceData *data,ProgressListener *listener){
+		Resource::ptr resource=createBSP30Material(NULL);
+		resource->setName(name);
+		return resource;
+	}
+
+	Material::ptr createBSP30Material(Texture *diffuseTexture);
 
 protected:
-	void readLump(Stream *stream,blump *lump,void **data,int size,int *count);
-	void parseVisibility(BSP30Map *map);
-	void parseEntities(BSP30Map *map);
-	void parseWADs(BSP30Map *map);
-	void parseTextures(BSP30Map *map);
-	void buildBuffers(BSP30Map *map);
-	void buildMaterials(BSP30Map *map);
-
 	Engine *mEngine;
+	Shader::ptr mVertexShader,mFragmentShader;
 };
 
-}
 }
 }
 

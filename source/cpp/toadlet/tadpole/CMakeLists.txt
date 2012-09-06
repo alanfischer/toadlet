@@ -51,9 +51,11 @@ set (TADPOLE_ANIMATION_SRC
 
 set (TADPOLE_BSP_SRC
 	bsp/BSP30Map.cpp
+	bsp/BSP30MaterialCreator.cpp
 	bsp/BSP30ModelComponent.cpp
 	bsp/BSP30Node.cpp
 	bsp/BSP30Streamer.cpp
+	bsp/BSP30StyleComponent.cpp
 )
 
 set (TADPOLE_PLUGINS_SRC
@@ -261,10 +263,12 @@ set (TADPOLE_ANIMATION_HEADERS
 )
 
 set (TADPOLE_BSP_HEADERS
-	bsp/BSP30Streamer.h
 	bsp/BSP30Map.h
+	bsp/BSP30MaterialCreator.h
 	bsp/BSP30ModelComponent.h
 	bsp/BSP30Node.h
+	bsp/BSP30Streamer.h
+	bsp/BSP30StyleComponent.h
 	bsp/BSP30Types.h
 )
 

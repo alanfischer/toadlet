@@ -38,11 +38,11 @@ const uint64 Win32System::DELTA_EPOC_MICROSECONDS=TOADLET_MAKE_UINT64(1164447360
 
 void Win32System::usleep(uint64 microseconds){
 	// Poorly implemented
-	Sleep(microseconds/1000);
+	Sleep((DWORD)(microseconds/1000));
 }
 
 void Win32System::msleep(uint64 milliseconds){
-	Sleep(milliseconds);
+	Sleep((DWORD)milliseconds);
 }
 
 uint64 Win32System::utime(){
