@@ -193,71 +193,60 @@ void Math::mulVector4Matrix4x4Traditional(Vector4 &r,const Matrix4x4 &m){
 	r.w=tw;
 }
 
-bool Math::setEulerAngleXYZFromMatrix3x3(EulerAngle &r,const Matrix3x3 &m,real epsilon){
-	if(m.at(1,0)>1-epsilon){ // North Pole singularity
-		r.x=atan2(m.at(0,2),m.at(2,2));
-		r.y=HALF_PI;
-		r.z=0;
-		return false;
+// Algorithm from the GMTL: http://ggt.sf.net
+template<class Matrix>
+bool setMatrixFromEulerAngle(Matrix &r,const EulerAngle &a,real epsilon){
+	const real x=(a.order==EulerAngle::EulerOrder_XYZ)?a.x:((a.order==EulerAngle::EulerOrder_ZXY)?a.y:a.z);
+	const real y=(a.order==EulerAngle::EulerOrder_XYZ)?a.y:((a.order==EulerAngle::EulerOrder_ZXY)?a.z:a.y);
+	const real z=(a.order==EulerAngle::EulerOrder_XYZ)?a.z:((a.order==EulerAngle::EulerOrder_ZXY)?a.x:a.x);
+
+	real sx=sin(x),cx=cos(x);
+	real sy=sin(y),cy=cos(y);
+	real sz=sin(z),cz=cos(z);
+
+	switch(a.order){
+		case EulerAngle::EulerOrder_XYZ:
+			r.setAt(0,0,cy*cz);
+			r.setAt(0,1,-cy*sz);
+			r.setAt(0,2,sy);
+			r.setAt(1,0,sx*sy*cz + cx*sz);
+			r.setAt(1,1,-sx*sy*sz + cx*cz);
+			r.setAt(1,2,-sx*cy);
+			r.setAt(2,0,-cx*sy*cz + sx*sz);
+			r.setAt(2,1,cx*sy*sz + sx*cz);
+			r.setAt(2,2,cx*cy);
+		break;
+		case EulerAngle::EulerOrder_ZYX:
+			r.setAt(0,0,cy*cz);
+			r.setAt(0,1,-cx*sz + sx*sy*cz);
+			r.setAt(0,2,sx*sz + cx*sy*cz);
+			r.setAt(1,0,cy*sz);
+			r.setAt(1,1,cx*cz + sx*sy*sz);
+			r.setAt(1,2,-sx*cz + cx*sy*sz);
+			r.setAt(2,0,-sy);
+			r.setAt(2,1,sx*cy);
+			r.setAt(2,2,cx*cy);
+		break;
+		case EulerAngle::EulerOrder_ZXY:
+			r.setAt(0,0,cy*cz - sx*sy*sz);
+			r.setAt(0,1,-cx*sz);
+			r.setAt(0,2,sy*cz + sx*cy*sz);
+			r.setAt(1,0,cy*sz + sx*sy*cz);
+			r.setAt(1,1,cx*cz);
+			r.setAt(1,2,sy*sz - sx*cy*cz);
+			r.setAt(2,0,-cx*sy);
+			r.setAt(2,1,sx);
+			r.setAt(2,2,cx*cy);
+		break;
+		default:
+			return false;
 	}
-	else if(m.at(1,0)<-(1-epsilon)){ // South Pole singularity
-		r.x=atan2(m.at(0,2),m.at(2,2));
-		r.y=-HALF_PI;
-		r.z=0;
-		return false;
-	}
-	else{
-		r.x=atan2(-m.at(2,0),m.at(0,0));
-		r.y=asin(m.at(1,0));
-		r.z=atan2(-m.at(1,2),m.at(1,1));
-		return true;
-	}
+
+	return true;
 }
 
-bool Math::setEulerAngleXYZFromQuaternion(EulerAngle &r,const Quaternion &q,real epsilon){
-	real test=q.x*q.y + q.z*q.w;
-	if(test>0.5-epsilon){ // North Pole singularity
-		r.x=2*atan2(q.x,q.w);
-		r.y=HALF_PI;
-		r.z=0;
-		return false;
-	}
-	else if(test<-(0.5-epsilon)){ // South Pole singularity
-		r.x=-2*atan2(q.x,q.w);
-		r.y=-HALF_PI;
-		r.z=0;
-		return false;
-	}
-	else{
-		real sqx=q.x*q.x;
-		real sqy=q.y*q.y;
-		real sqz=q.z*q.z;
-		r.x=atan2(2*q.y*q.w-2*q.x*q.z, 1 - 2*sqy - 2*sqz);
-		r.y=asin(2*test);
-		r.z=atan2(2*q.x*q.w-2*q.y*q.z, 1 - 2*sqx - 2*sqz);
-		return true;
-	}
-}
-
-bool Math::setEulerAngleZXYFromMatrix3x3(EulerAngle &r,const Matrix3x3 &m,real epsilon){
-	if(m.at(2,1)>1-epsilon){ // North Pole singularity
-		r.x=HALF_PI;
-		r.z=atan2(m.at(0,2),m.at(0,0));
-		r.y=0;
-		return false;
-	}
-	else if(m.at(1,0)<-(1-epsilon)){ // South Pole singularity
-		r.x=-HALF_PI;
-		r.z=atan2(m.at(0,2),m.at(0,0));
-		r.y=0;
-		return false;
-	}
-	else{
-		r.x=asin(m.at(2,1));
-		r.z=atan2(-m.at(0,1),m.at(1,1));
-		r.y=atan2(-m.at(2,0),m.at(2,2));
-		return true;
-	}
+void Math::setMatrix3x3FromEulerAngle(Matrix3x3 &r,const EulerAngle &a,real epsilon){
+	setMatrixFromEulerAngle(r,a,epsilon);
 }
 
 void Math::transpose(Matrix3x3 &r,const Matrix3x3 &m){
@@ -293,6 +282,10 @@ bool Math::invert(Matrix3x3 &r,const Matrix3x3 &m){
 		
 		return true;
 	}
+}
+
+void Math::setMatrix4x4FromEulerAngle(Matrix4x4 &r,const EulerAngle &a,real epsilon){
+	setMatrixFromEulerAngle(r,a,epsilon);
 }
 
 void Math::transpose(Matrix4x4 &r,const Matrix4x4 &m){
@@ -545,46 +538,40 @@ void Math::setQuaternionFromMatrix3x3(Quaternion &r,const Matrix3x3 &m){ setQuat
 
 void Math::setQuaternionFromMatrix4x4(Quaternion &r,const Matrix4x4 &m){ setQuaternionFromMatrix(r,m); }
 
-void Math::setQuaternionFromEulerAngleXYZ(Quaternion &r,const EulerAngle &euler){
-	real sx=euler.x/2;
-	real cx=cos(sx);
-	sx=sin(sx);
-	real sy=euler.y/2;
-	real cy=cos(sy);
-	sy=sin(sy);
-	real sz=euler.z/2;
-	real cz=cos(sz);
-	sz=sin(sz);
-	real cxcy=cx*cy;
-	real sxsy=sx*sy;
-	real cxsy=cx*sy;
-	real sxcy=sx*cy;
+// Algorithm from the GMTL: http://ggt.sf.net
+bool Math::setQuaternionFromEulerAngle(Quaternion &r,const EulerAngle &a){
+	const real x=(a.order==EulerAngle::EulerOrder_XYZ)?a.x:((a.order==EulerAngle::EulerOrder_ZXY)?a.y:a.z);
+	const real y=(a.order==EulerAngle::EulerOrder_XYZ)?a.y:((a.order==EulerAngle::EulerOrder_ZXY)?a.z:a.y);
+	const real z=(a.order==EulerAngle::EulerOrder_XYZ)?a.z:((a.order==EulerAngle::EulerOrder_ZXY)?a.x:a.x);
 
-	r.w=(cxcy*cz) - (sxsy*sz);
-  	r.x=(cxcy*sz) + (sxsy*cz);
-	r.y=(sxcy*cz) + (cxsy*sz);
-	r.z=(cxsy*cz) - (sxcy*sz);
-}
+	real hx=x*0.5,hy=y*0.5,hz=z*0.5;
 
-void Math::setQuaternionFromEulerAngleZXY(Quaternion &r,const EulerAngle &euler){
-	real sx=euler.x/2;
-	real cx=cos(sx);
-	sx=sin(sx);
-	real sy=euler.y/2;
-	real cy=cos(sy);
-	sy=sin(sy);
-	real sz=euler.z/2;
-	real cz=cos(sz);
-	sz=sin(sz);
-	real cxcy=cx*cy;
-	real sxsy=sx*sy;
-	real cxsy=cx*sy;
-	real sxcy=sx*cy;
+	Quaternion qx,qy,qz;
 
-	r.x=(sxcy*cz) - (cxsy*sz);
-	r.y=(cxsy*cz) + (sxcy*sz);
-	r.z=(cxcy*sz) - (sxsy*cz);
-	r.w=(cxcy*cz) + (sxsy*sz);
+	qx.x=sin(hx);
+	qx.w=cos(hx);
+
+	qy.y=sin(hy);
+	qy.w=cos(hy);
+
+	qz.z=sin(hz);
+	qz.w=cos(hz);
+
+	switch(a.order){
+		case EulerAngle::EulerOrder_XYZ:
+			r=qx*qy*qz;
+		break;
+		case EulerAngle::EulerOrder_ZYX:
+			r=qz*qy*qx;
+		break;
+		case EulerAngle::EulerOrder_ZXY:
+			r=qz*qx*qy;
+		break;
+		default:
+			return false;
+	}
+
+	return true;
 }
 
 void Math::lerp(Quaternion &r,const Quaternion &q1,const Quaternion &q2,real t){
@@ -635,6 +622,92 @@ void Math::slerp(Quaternion &r,const Quaternion &q1,const Quaternion &q2,real t)
 	r.y=scl1*q1.y + scl2*q2.y;
 	r.z=scl1*q1.z + scl2*q2.z;
 	r.w=scl1*q1.w + scl2*q2.w;
+}
+
+// Algorithm from the GMTL: http://ggt.sf.net
+template<class Matrix>
+bool setEulerAngleFromMatrix(EulerAngle &r,const Matrix &m,real epsilon){
+	real x,y,z;
+	switch(r.order){
+		case EulerAngle::EulerOrder_XYZ:
+			y=Math::asin(m.at(0,2));
+			if(y<Math::HALF_PI){
+				if(y>-Math::HALF_PI){
+					x=Math::atan2(-m.at(1,2),m.at(2,2));
+					z=Math::atan2(-m.at(0,1),m.at(0,0));
+				}
+				else{
+					x=-Math::atan2(m.at(1,0),m.at(1,1));
+					z=0;
+				}
+			}
+			else{
+				x=-Math::atan2(m.at(1,0),m.at(1,1));
+				z=0;
+			}
+			r.x=x;
+			r.y=y;
+			r.z=z;
+		break;
+		case EulerAngle::EulerOrder_ZYX:
+			y=Math::asin(-m.at(2,0));
+			if(y<Math::HALF_PI){
+				if(y>-Math::HALF_PI){
+					z=Math::atan2(m.at(1,0),m.at(0,0));
+					x=Math::atan2(m.at(2,1),m.at(2,2));
+				}
+				else{
+					z=Math::atan2(-m.at(0,1),-m.at(0,2));
+					x=0;
+				}
+			}
+			else{
+				z=-atan2(m.at(0,1),m.at(0,2));
+				x=0;
+			}
+			r.x=z;
+			r.y=y;
+			r.z=x;
+		break;
+		case EulerAngle::EulerOrder_ZXY:
+			x=Math::asin(m.at(2,1));
+			if(x<Math::HALF_PI){
+				if(x>-Math::HALF_PI){
+					z=Math::atan2(-m.at(0,1),m.at(1,1));
+					y=Math::atan2(-m.at(2,0),m.at(2,2));
+				}
+				else{
+					z=-Math::atan2(m.at(0,2),m.at(0,0));
+					y=0;
+				}
+			}
+			else{
+				z=Math::atan2(m.at(0,2),m.at(0,0));
+				y=0;
+			}
+			r.x=z;
+			r.y=x;
+			r.z=y;
+		break;
+		default:
+			return false;
+	}
+
+	return true;
+}
+
+bool Math::setEulerAngleFromMatrix3x3(EulerAngle &r,const Matrix3x3 &m,real epsilon){
+	return setEulerAngleFromMatrix(r,m,epsilon);
+}
+
+bool Math::setEulerAngleFromMatrix4x4(EulerAngle &r,const Matrix3x3 &m,real epsilon){
+	return setEulerAngleFromMatrix(r,m,epsilon);
+}
+
+bool Math::setEulerAngleFromQuaternion(EulerAngle &r,const Quaternion &q,real epsilon){
+	Matrix3x3 matrix;
+	setMatrix3x3FromQuaternion(matrix,q);
+	return setEulerAngleFromMatrix3x3(r,matrix,epsilon);
 }
 
 void Math::project(Vector3 &result,const Segment &segment,const Vector3 &point,bool limitToSegment){
@@ -807,7 +880,7 @@ void Math::getLineOfIntersection(Segment &result,const Plane &plane1,const Plane
 }
 
 void Math::findBoundingBox(AABox &r,const Sphere &sphere){
-	scalar radius=sphere.radius;
+	real radius=sphere.radius;
 	r.mins.x=-radius;
 	r.mins.y=-radius;
 	r.mins.z=-radius;
@@ -818,7 +891,7 @@ void Math::findBoundingBox(AABox &r,const Sphere &sphere){
 }
 
 void Math::findBoundingBox(AABox &r,const Capsule &capsule){
-	scalar radius=capsule.radius;
+	real radius=capsule.radius;
 	const Vector3 &direction=capsule.direction;
 
 	if(direction.x<0){
@@ -1006,7 +1079,7 @@ bool Math::testIntersection(const Sphere &sphere,const AABox &box){
 
 bool Math::testIntersection(const Sphere &sphere,const Plane *planes,int numPlanes){
 	if(sphere.radius<0) return true;
-	scalar distance=0;
+	real distance=0;
 	int i;
 	for(i=0;i<numPlanes;++i){
 		distance=Math::dot(planes[i].normal,sphere.origin)+planes[i].distance;
@@ -1609,6 +1682,8 @@ void Math::init(){
 	mulVector4Matrix4x4=mulVector4Matrix4x4Traditional;
 }
 
+extern bool testMath();
+
 void Math::optimize(int o){
 	SystemCaps caps;
 	System::getSystemCaps(caps);
@@ -1789,6 +1864,8 @@ void Math::optimize(int o){
 
 		init();
 	}
+
+	testMath();
 }
 
 }

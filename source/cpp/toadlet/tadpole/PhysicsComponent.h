@@ -59,8 +59,8 @@ public:
 	virtual void setGravity(scalar gravity)=0;
 	virtual scalar getGravity() const=0;
 
-	virtual void setSolid(bool solid)=0;
-	virtual bool getSolid() const=0;
+	virtual void setCollisionScope(int scope)=0;
+	virtual int getCollisionScope() const=0;
 };
 
 }

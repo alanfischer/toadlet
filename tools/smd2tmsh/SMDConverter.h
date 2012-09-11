@@ -41,8 +41,6 @@ public:
 	void setScale(scalar scale){mScale=scale;}
 	scalar getScale() const{return mScale;}
 
-	void setQuaternionFromXYZ(Quaternion &r,scalar x,scalar y,scalar z);
-
 protected:
 	String readLine(Stream *in);
 	bool vertsEqual(const Vertex &v1,const Vertex &v2);

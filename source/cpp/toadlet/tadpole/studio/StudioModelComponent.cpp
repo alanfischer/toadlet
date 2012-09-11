@@ -675,7 +675,7 @@ void StudioModelComponent::findBoneTranslate(Vector3 &r,int frame,float s,studio
 
 void StudioModelComponent::findBoneRotate(Quaternion &r,int frame,float s,studiobone *sbone,studioanim *sanim){
 	Quaternion q1,q2;
-	EulerAngle angle1,angle2;
+	EulerAngle angle1(EulerAngle::EulerOrder_ZXY),angle2(EulerAngle::EulerOrder_ZXY);
 	studioanimvalue *sanimvalue=NULL;
 	int j,k;
 
@@ -723,12 +723,12 @@ void StudioModelComponent::findBoneRotate(Quaternion &r,int frame,float s,studio
 	}
 
 	if(angle1.equals(angle2)==false){
-		Math::setQuaternionFromEulerAngleZXY(q1,angle1);
-		Math::setQuaternionFromEulerAngleZXY(q2,angle2);
+		Math::setQuaternionFromEulerAngle(q1,angle1);
+		Math::setQuaternionFromEulerAngle(q2,angle2);
 		Math::slerp(r,q1,q2,s);
 	}
 	else{
-		Math::setQuaternionFromEulerAngleZXY(r,angle1);
+		Math::setQuaternionFromEulerAngle(r,angle1);
 	}
 }
 

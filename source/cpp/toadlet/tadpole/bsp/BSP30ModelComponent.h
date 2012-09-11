@@ -72,6 +72,7 @@ public:
 	void setModel(BSP30Map *map,const String &name);
 	void setModel(BSP30Map *map,int index);
 	int getModel() const{return mModelIndex;}
+	String getModelName() const{return String("*")+mModelIndex;}
 	BSP30Map *getMap(){return mMap;}
 
 	inline int getNumSubModels() const{return mSubModels.size();}

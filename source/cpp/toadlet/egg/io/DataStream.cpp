@@ -112,6 +112,7 @@ int DataStream::readAll(tbyte *&resultBuffer){
 }
 
 int DataStream::readNullTerminatedString(String &s){
+	s=String();
 	int amt=0,total=0;
 	char string[1024];
 	int i=0;

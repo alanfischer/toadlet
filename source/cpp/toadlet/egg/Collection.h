@@ -268,14 +268,18 @@ public:
 		}
 	}
 
-	template<typename Type2> bool contains(const Type2 &type){
+	template<typename Type2> int indexOf(const Type2 &type){
 		int i;
 		for(i=0;i<mSize;++i){
 			if(mData[i]==type){
-				return true;
+				return i;
 			}
 		}
-		return false;
+		return -1;
+	}
+
+	template<typename Type2> bool contains(const Type2 &type){
+		return indexOf(type)>=0;
 	}
 
 	void reserve(int s){

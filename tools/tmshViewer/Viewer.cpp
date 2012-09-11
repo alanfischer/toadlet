@@ -91,7 +91,7 @@ Viewer::~Viewer(){
 void Viewer::setNode(Node *node){
 	mParent->attach(node);
 
-	mDistance=Math::length(node->getBound()->getSphere().origin)+node->getBound()->getSphere().radius*2;
+	mDistance=200;//Math::length(node->getBound()->getSphere().origin)+node->getBound()->getSphere().radius*2;
 
 	updateCamera();
 }
@@ -124,9 +124,9 @@ void Viewer::mouseMoved(int x,int y){
 		scalar dx=Math::fromInt(diffx)/100;
 		scalar dy=Math::fromInt(diffy)/100;
 
-		EulerAngle ex(0,-dx,-dy);
+		EulerAngle ex(EulerAngle::EulerOrder_ZXY,-dx,-dy,0);
 		Quaternion r;
-		Math::setQuaternionFromEulerAngleXYZ(r,ex);
+		Math::setQuaternionFromEulerAngle(r,ex);
 		Math::postMul(r,mParent->getRotate());
 		mParent->setRotate(r);
 	}

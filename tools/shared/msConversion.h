@@ -31,7 +31,7 @@ inline void convertMSVec3ToVector3(const msVec3 &msvec,Vector3 &tvec,bool rotate
 	if(rotate){ Math::mul(tvec,milkshapeToToadlet); }
 }
 
-// Till we finalize the EulerAngle stuff in toadlet, and add in conversion for all possible rotation types,
+/// @todo: Till we finalize the EulerAngle stuff in toadlet, and add in conversion for all possible rotation types,
 //  we're just going to have some custom MS math routines
 
 inline void setMatrix3x3FromEulerAngleMS(Matrix3x3 &r,const EulerAngle &euler){
@@ -105,7 +105,7 @@ inline void convertQuaternionToMSVec3(const Quaternion &quat,msVec3 msvec,bool r
 }
 
 inline void convertMSVec3ToQuaternion(const msVec3 &msvec,Quaternion &quat,bool rotate){
-	EulerAngle angle(-msvec[0],-msvec[1],-msvec[2]);
+	EulerAngle angle(EulerAngle::EulerOrder_XYZ,-msvec[0],-msvec[1],-msvec[2]);
 
 	Matrix3x3 matrix;
 	setMatrix3x3FromEulerAngleMS(matrix,angle);
