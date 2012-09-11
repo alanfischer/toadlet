@@ -625,11 +625,11 @@ namespace Math{
 	}
 
 	// EulerAngle operations
-	TOADLET_API bool setEulerAngleXYZFromMatrix3x3(EulerAngle &r,const Matrix3x3 &m,real epsilon);
+	TOADLET_API bool setEulerAngleFromMatrix3x3(EulerAngle &r,const Matrix3x3 &m,real epsilon);
 
-	TOADLET_API bool setEulerAngleZXYFromMatrix3x3(EulerAngle &r,const Matrix3x3 &m,real epsilon);
+	TOADLET_API bool setEulerAngleFromMatrix4x4(EulerAngle &r,const Matrix3x3 &m,real epsilon);
 
-	TOADLET_API bool setEulerAngleXYZFromQuaternion(EulerAngle &r,const Quaternion &q,real epsilon);
+	TOADLET_API bool setEulerAngleFromQuaternion(EulerAngle &r,const Quaternion &q,real epsilon);
 
 	// Matrix3x3 basic operations
 	TOADLET_API void mul(Matrix3x3 &r,const Matrix3x3 &m1,const Matrix3x3 &m2);
@@ -899,28 +899,6 @@ namespace Math{
 		}
 	}
 
-	template<class Matrix>
-	void setMatrixFromEulerAngleXYZ(Matrix &r,const EulerAngle &euler){
-		real cx=cos(euler.x);
-		real sx=sin(euler.x);
-		real cy=cos(euler.y);
-		real sy=sin(euler.y);
-		real cz=cos(euler.z);
-		real sz=sin(euler.z);
-		real cxsy=(cx*sy);
-		real sxsy=(sx*sy);
-		
-		r.setAt(0,0,(cx*cy));
-		r.setAt(0,1,(sx*sz) - (cxsy*cz));
-		r.setAt(0,2,(cxsy*sz) + (sx*cz));
-		r.setAt(1,0,sy);
-		r.setAt(1,1,(cy*cz));
-		r.setAt(1,2,-(cy*sz));
-		r.setAt(2,0,-(sx*cy));
-		r.setAt(2,1,(sxsy*cz) + (cx*sz));
-		r.setAt(2,2,-(sxsy*sz) + (cx*cz));
-	}
-
 	// Matrix3x3 advanced operations
 	inline void setAxesFromMatrix3x3(const Matrix3x3 &m,Vector3 &xAxis,Vector3 &yAxis,Vector3 &zAxis){ setAxesFromMatrix(m,xAxis,yAxis,zAxis); }
 
@@ -936,7 +914,7 @@ namespace Math{
 
 	inline void setMatrix3x3FromQuaternion(Matrix3x3 &r,const Quaternion &q){ setMatrixFromQuaternion(r,q); }
 
-	inline void setMatrix3x3FromEulerAngleXYZ(Matrix3x3 &r,const EulerAngle &euler){ setMatrixFromEulerAngleXYZ(r,euler); }
+	TOADLET_API void setMatrix3x3FromEulerAngle(Matrix3x3 &r,const EulerAngle &a,real epsilon);
 
 	inline void setMatrix3x3FromVector3ToVector3(Matrix3x3 &r,const Vector3 &from,const Vector3 &to,real epsilon){ setMatrixFromVector3ToVector3(r,from,to,epsilon); }
 
@@ -972,7 +950,7 @@ namespace Math{
 
 	inline void setMatrix4x4FromQuaternion(Matrix4x4 &r,const Quaternion &q){ setMatrixFromQuaternion(r,q); }
 
-	inline void setMatrix4x4FromEulerAngleXYZ(Matrix4x4 &r,const EulerAngle &euler){ setMatrixFromEulerAngleXYZ(r,euler); }
+	TOADLET_API void setMatrix4x4FromEulerAngle(Matrix4x4 &r,const EulerAngle &a,real epsilon);
 
 	inline void setMatrix4x4FromVector3ToVector3(Matrix4x4 &r,const Vector3 &from,const Vector3 &to,real epsilon){ setMatrixFromVector3ToVector3(r,from,to,epsilon); }
 
@@ -1302,9 +1280,7 @@ namespace Math{
 		r.w=cos(halfAngle);
 	}
 
-	TOADLET_API void setQuaternionFromEulerAngleXYZ(Quaternion &r,const EulerAngle &euler);
-
-	TOADLET_API void setQuaternionFromEulerAngleZXY(Quaternion &r,const EulerAngle &euler);
+	TOADLET_API bool setQuaternionFromEulerAngle(Quaternion &r,const EulerAngle &a);
 
 	TOADLET_API void lerp(Quaternion &r,const Quaternion &q1,const Quaternion &q2,real t);
 
@@ -1564,7 +1540,7 @@ namespace Math{
 			((c&0x000000FF)<<8 ) ;
 	}
 
-	inline uint32 lerpColor(uint32 c1,uint32 c2,scalar t){
+	inline uint32 lerpColor(uint32 c1,uint32 c2,real t){
 		return
 			(((int)lerp((c1&0xFF000000)>>24,(c2&0xFF000000)>>24,t))<<24) |
 			(((int)lerp((c1&0x00FF0000)>>16,(c2&0x00FF0000)>>16,t))<<16) |
@@ -1573,14 +1549,14 @@ namespace Math{
 	}
 
 	inline void setHSVA(Vector4 &rgba,const Vector4 &hsva){
-		scalar h=hsva.x,s=hsva.y,v=hsva.z;
-		scalar r=0,g=0,b=0;
+		real h=hsva.x,s=hsva.y,v=hsva.z;
+		real r=0,g=0,b=0;
 
-		scalar hi=Math::floor(h*6);
-		scalar f=(h*6)-hi;
-		scalar p=Math::mul(v,Math::ONE-s);
-		scalar q=Math::mul(v,Math::ONE-Math::mul(f,s));
-		scalar t=Math::mul(v,Math::ONE-Math::mul(Math::ONE-f,s));
+		real hi=Math::floor(h*6);
+		real f=(h*6)-hi;
+		real p=Math::mul(v,Math::ONE-s);
+		real q=Math::mul(v,Math::ONE-Math::mul(f,s));
+		real t=Math::mul(v,Math::ONE-Math::mul(Math::ONE-f,s));
 		switch(Math::toInt(hi)){
 			case(0):
 				r=v;g=t;b=p;
@@ -1606,11 +1582,11 @@ namespace Math{
 	}
 
 	inline void getHSVA(Vector4 &hsva,const Vector4 &rgba){
-		scalar r=rgba.x,g=rgba.y,b=rgba.z;
-		scalar h=0,s=0,v=0;
+		real r=rgba.x,g=rgba.y,b=rgba.z;
+		real h=0,s=0,v=0;
 
-		scalar mx=Math::maxVal(Math::maxVal(r,g),b);
-		scalar mn=Math::minVal(Math::minVal(r,g),b);
+		real mx=Math::maxVal(Math::maxVal(r,g),b);
+		real mn=Math::minVal(Math::minVal(r,g),b);
 
 		if(mx==mn){
 			h=0;

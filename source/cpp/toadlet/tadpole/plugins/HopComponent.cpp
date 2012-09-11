@@ -46,6 +46,8 @@ HopComponent::HopComponent(HopManager *manager):
 	mManager->getSimulator()->addSolid(mSolid);
 
 	mBound=new Bound();
+
+	setName("physics");
 }
 
 void HopComponent::destroy(){
@@ -113,7 +115,7 @@ void HopComponent::removeShape(hop::Shape *shape){
 // Update solids with new node positions if moved
 // We dont just check active nodes, because then the solids would never deactivate, so the nodes would never deactivate
 void HopComponent::preSimulate(){
-	/// @todo: Should this be elsewhere?
+	/// @todo: Should this be elsewhere, or at least optional
 	mSolid->setScope(mParent->getScope());
 
 	if(mTransformChanged){

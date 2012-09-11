@@ -58,8 +58,8 @@ public:
 	void setGravity(scalar gravity){mSolid->setCoefficientOfGravity(gravity);}
 	scalar getGravity() const{return mSolid->getCoefficientOfGravity();}
 
-	void setSolid(bool solid){mSolid->setCollisionBits(0);}
-	bool getSolid() const{return mSolid->getCollisionBits()==0;}
+	void setCollisionScope(int scope){mSolid->setCollisionBits(scope);mSolid->setCollideWithBits(scope);}
+	int getCollisionScope() const{return mSolid->getCollisionBits();}
 
 	void setBound(Bound *bound);
 	void setTraceable(Traceable *traceable);

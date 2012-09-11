@@ -34,21 +34,30 @@ namespace math{
 
 class TOADLET_API EulerAngle{
 public:
+	enum EulerOrder{
+		EulerOrder_XYZ,
+		EulerOrder_ZXY,
+		EulerOrder_ZYX,
+	};
+
+	EulerOrder order;
 	real x,y,z;
 
-	inline EulerAngle():x(0),y(0),z(0){}
+	inline EulerAngle():order(EulerOrder_XYZ),x(0),y(0),z(0){}
 
-	inline EulerAngle(real x1,real y1,real z1):x(x1),y(y1),z(z1){}
+	inline EulerAngle(EulerOrder order1,real x1=0,real y1=0,real z1=0):order(order1),x(x1),y(y1),z(z1){}
 
-	inline EulerAngle &set(const EulerAngle &v){
-		x=v.x;
-		y=v.y;
-		z=v.z;
+	inline EulerAngle &set(const EulerAngle &a){
+		order=a.order;
+		x=a.x;
+		y=a.y;
+		z=a.z;
 
 		return *this;
 	}
 
-	inline EulerAngle &set(real x1,real y1,real z1){
+	inline EulerAngle &set(EulerOrder order1,real x1,real y1,real z1){
+		order=order1;
 		x=x1;
 		y=y1;
 		z=z1;
@@ -57,6 +66,7 @@ public:
 	}
 
 	inline EulerAngle &reset(){
+		order=EulerOrder_XYZ;
 		x=0;
 		y=0;
 		z=0;
@@ -65,7 +75,7 @@ public:
 	}
 
 	inline bool equals(const EulerAngle &angle) const{
-		return (angle.x==x && angle.y==y && angle.z==z);
+		return (angle.order==order && angle.x==x && angle.y==y && angle.z==z);
 	}
 
 	inline bool operator==(const EulerAngle &angle) const{

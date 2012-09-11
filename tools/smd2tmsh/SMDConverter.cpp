@@ -151,8 +151,9 @@ void SMDConverter::load(Engine *engine,Stream *in,const String &fileName){
 				if(reference){
 					Skeleton::Bone::ptr bone=skeleton->getBone(id);
 					bone->translate.set(floatToScalar(px),floatToScalar(py),floatToScalar(pz));
+					EulerAngle angle(EulerAngle::EulerOrder_XYZ,floatToScalar(rx),floatToScalar(ry),floatToScalar(rz));
+					Math::setQuaternionFromEulerAngle(bone->rotate,EulerAngle(EulerAngle::EulerOrder_ZYX,floatToScalar(rz),floatToScalar(ry),floatToScalar(rx)));
 					Math::mul(bone->translate,mScale);
-					Math::setQuaternionFromEulerAngleZXY(bone->rotate,EulerAngle(floatToScalar(rx),floatToScalar(ry),floatToScalar(rz)));
 				}
 				else{
 					Skeleton::Bone::ptr bone=mSkeleton->getBone(skeleton->getBone(id)->name);
@@ -166,7 +167,7 @@ void SMDConverter::load(Engine *engine,Stream *in,const String &fileName){
 						int index=track->addKeyFrame(Math::fromInt(time)/mFPS);
 						translate.set(floatToScalar(px),floatToScalar(py),floatToScalar(pz));
 						Math::mul(translate,mScale);
-						Math::setQuaternionFromEulerAngleZXY(rotate,EulerAngle(floatToScalar(rx),floatToScalar(ry),floatToScalar(rz)));
+						Math::setQuaternionFromEulerAngle(rotate,EulerAngle(EulerAngle::EulerOrder_ZYX,floatToScalar(rz),floatToScalar(ry),floatToScalar(rx)));
 						vba.set3(index,0,translate);
 						vba.set4(index,1,rotate);
 						vba.set3(index,2,scale);
@@ -321,19 +322,6 @@ String SMDConverter::readLine(Stream *stream){
 		}
 	}
 	return string;
-}
-
-void SMDConverter::setQuaternionFromXYZ(Quaternion &r,scalar x,scalar y,scalar z){
-	Matrix3x3 matrix;
-
-	Matrix3x3 xmat,ymat,zmat;
-	Math::setMatrix3x3FromX(xmat,x);
-	Math::setMatrix3x3FromY(ymat,y);
-	Math::setMatrix3x3FromZ(zmat,z);
-	Math::mul(matrix,zmat,ymat);
-	zmat.set(matrix);
-	Math::mul(matrix,zmat,xmat);
-	Math::setQuaternionFromMatrix3x3(r,matrix);
 }
 
 bool SMDConverter::vertsEqual(const Vertex &v1,const Vertex &v2){

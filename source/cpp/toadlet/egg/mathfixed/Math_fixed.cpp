@@ -157,52 +157,6 @@ void Math::preMul(Matrix4x4 &m2,const Matrix4x4 &m1){
 	m2.data[3+0*4]=d30; m2.data[3+1*4]=d31; m2.data[3+2*4]=d32; m2.data[3+3*4]=d33;
 }
 
-bool Math::setEulerAngleXYZFromMatrix3x3(EulerAngle &r,const Matrix3x3 &m,fixed epsilon){
-	if(m.at(1,0)>ONE-epsilon){ // North Pole singularity
-		r.x=atan2(m.at(0,2),m.at(2,2));
-		r.y=HALF_PI;
-		r.z=0;
-		return false;
-	}
-	else if(m.at(1,0)<-(ONE-epsilon)){ // South Pole singularity
-		r.x=atan2(m.at(0,2),m.at(2,2));
-		r.y=-HALF_PI;
-		r.z=0;
-		return false;
-	}
-	else{
-		r.x=atan2(-m.at(2,0),m.at(0,0));
-		r.y=asin(m.at(1,0));
-		r.z=atan2(-m.at(1,2),m.at(1,1));
-		return true;
-	}
-}
-
-bool Math::setEulerAngleXYZFromQuaternion(EulerAngle &r,const Quaternion &q,fixed epsilon){
-	fixed test=TOADLET_MUL_XX(q.x,q.y) + TOADLET_MUL_XX(q.z,q.w);
-	if(test>HALF-epsilon){ // North Pole singularity
-		r.x=atan2(q.x,q.w)<<1;
-		r.y=HALF_PI;
-		r.z=0;
-		return false;
-	}
-	else if(test<-(HALF-epsilon)){ // South Pole singularity
-		r.x=-atan2(q.x,q.w)<<1;
-		r.y=-HALF_PI;
-		r.z=0;
-		return false;
-	}
-	else{
-		fixed sqx=TOADLET_MUL_XX(q.x,q.x);
-		fixed sqy=TOADLET_MUL_XX(q.y,q.y);
-		fixed sqz=TOADLET_MUL_XX(q.z,q.z);
-		r.x=atan2((TOADLET_MUL_XX(q.y,q.w)<<1)-(TOADLET_MUL_XX(q.x,q.z)<<1), ONE - (sqy<<1) - (sqz<<1));
-		r.y=asin(test<<1);
-		r.z=atan2((TOADLET_MUL_XX(q.x,q.w)<<1)-(TOADLET_MUL_XX(q.y,q.z)<<1), ONE - (sqx<<1) - (sqz<<1));
-		return true;
-	}
-}
-
 void Math::transpose(Matrix3x3 &r,const Matrix3x3 &m){
 	r.data[0+0*3]=m.data[0+0*3]; r.data[0+1*3]=m.data[1+0*3]; r.data[0+2*3]=m.data[2+0*3];
 	r.data[1+0*3]=m.data[0+1*3]; r.data[1+1*3]=m.data[1+1*3]; r.data[1+2*3]=m.data[2+1*3];

@@ -144,10 +144,18 @@ Texture::ptr WADArchive::createTexture(toadlet::tadpole::TextureManager *texture
 
 				j3=j*4;
 				k3=k*3;
-				*(data+j3+0)=*(pal+k3+0);
-				*(data+j3+1)=*(pal+k3+1);
-				*(data+j3+2)=*(pal+k3+2);
-				*(data+j3+3)=(*(data+j3+0)==0 && *(data+j3+1)==0 && *(data+j3+2)==255)?0:255;
+				if(*(pal+k3+0)==0 && *(pal+k3+1)==0 && *(pal+k3+2)==255){
+					*(data+j3+0)=0;
+					*(data+j3+1)=0;
+					*(data+j3+2)=0;
+					*(data+j3+3)=0;
+				}
+				else{
+					*(data+j3+0)=*(pal+k3+0);
+					*(data+j3+1)=*(pal+k3+1);
+					*(data+j3+2)=*(pal+k3+2);
+					*(data+j3+3)=255;
+				}
 			}
 		}
 	}
