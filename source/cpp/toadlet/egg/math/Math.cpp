@@ -1682,8 +1682,6 @@ void Math::init(){
 	mulVector4Matrix4x4=mulVector4Matrix4x4Traditional;
 }
 
-extern bool testMath();
-
 void Math::optimize(int o){
 	SystemCaps caps;
 	System::getSystemCaps(caps);
@@ -1864,8 +1862,6 @@ void Math::optimize(int o){
 
 		init();
 	}
-
-	testMath();
 }
 
 }

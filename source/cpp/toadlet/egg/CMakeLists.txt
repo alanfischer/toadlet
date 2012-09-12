@@ -33,6 +33,8 @@ set (EGG_MATH_SRC
 	math/Plane.cpp
 	math/Quaternion.cpp
 	math/Sphere.cpp
+
+	math/Math.test.cpp
 )
 
 set (EGG_MATHFIXED_SRC
