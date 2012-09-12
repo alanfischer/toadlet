@@ -251,3 +251,6 @@ endif (TOADLET_PLATFORM_ANDROID)
 # add the toadlet source code subdirectory
 add_subdirectory (toadlet)
 
+
+# add the unit tests
+add_subdirectory (test)

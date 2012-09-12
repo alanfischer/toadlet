@@ -32,6 +32,10 @@ set (TOADLET_BUILD_VERSION_PAD_MINOR 9)
 set (TOADLET_BUILD_VERSION_PAD_MICRO 0)
 
 
+# Setup CTest
+enable_testing()
+
+
 # Custom cmake scripts
 set (CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${PROJECT_SOURCE_DIR}/cmake/Modules/")
 
