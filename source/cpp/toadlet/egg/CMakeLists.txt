@@ -33,7 +33,7 @@ set (EGG_MATH_SRC
 	math/Plane.cpp
 	math/Quaternion.cpp
 	math/Sphere.cpp
-
+)
 
 set (EGG_MATHFIXED_SRC
 	mathfixed/Capsule_fixed.cpp
