@@ -89,16 +89,7 @@ bool SpriteModelComponent::parentChanged(Node *node){
 }
 
 void SpriteModelComponent::setModel(const String &name){
-	Stream::ptr stream=mEngine->openStream(name);
-	if(stream==NULL){
-		Error::unknown("Unable to find model");
-		return;
-	}
-
-	SpriteStreamer::ptr streamer=new SpriteStreamer(mEngine);
-	SpriteModel::ptr model=shared_static_cast<SpriteModel>(streamer->load(stream,NULL,NULL));
-	model->setName(name);
-	setModel(model);
+	setModel(shared_static_cast<SpriteModel>(mEngine->getSpriteModelManager()->find(name)));
 }
 
 void SpriteModelComponent::setModel(SpriteModel *model){
@@ -152,6 +143,9 @@ RenderState::ptr SpriteModelComponent::getSharedRenderState(){
 		mSharedRenderState=mEngine->getMaterialManager()->createRenderState();
 		int i;
 		for(i=0;i<mMaterials.size();++i){
+			if(i==0){
+				mEngine->getMaterialManager()->modifyRenderState(mSharedRenderState,mMaterials[i]->getRenderState());
+			}
 			mMaterials[i]=mEngine->getMaterialManager()->createSharedMaterial(mMaterials[i],mSharedRenderState);
 		}
 	}

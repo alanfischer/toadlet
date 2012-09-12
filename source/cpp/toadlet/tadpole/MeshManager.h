@@ -36,6 +36,8 @@ namespace tadpole{
 
 class Engine;
 
+/// @todo: This does nothing but cast a mesh in findMesh.  This manager should be replace with just a ResourceManager.
+/// @todo: Look for other managers in a similar state
 class TOADLET_API MeshManager:public ResourceManager{
 public:
 	TOADLET_OBJECT(MeshManager);
@@ -43,7 +45,6 @@ public:
 	MeshManager(Engine *engine);
 
 	Mesh::ptr findMesh(const String &name){return shared_static_cast<Mesh>(ResourceManager::find(name));}
-	Resource::ptr manage(const Resource::ptr &resource,const String &name=(char*)NULL);
 };
 
 }

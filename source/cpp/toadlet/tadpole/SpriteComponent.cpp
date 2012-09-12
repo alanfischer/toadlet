@@ -43,7 +43,7 @@ SpriteComponent::SpriteComponent(Engine *engine):
 	mEngine=engine;
 	mBound=new Bound();
 	mRendered=true;
-	mIndexData=IndexData::ptr(new IndexData(IndexData::Primitive_TRISTRIP,NULL,0,4));
+	mIndexData=new IndexData(IndexData::Primitive_TRISTRIP,NULL,0,4);
 
 	setAlignment(Font::Alignment_BIT_HCENTER|Font::Alignment_BIT_VCENTER);
 }
@@ -144,7 +144,7 @@ void SpriteComponent::updateSprite(){
 	}
 
 	VertexBuffer::ptr vertexBuffer=mEngine->getBufferManager()->createVertexBuffer(Buffer::Usage_BIT_STATIC,Buffer::Access_BIT_WRITE,mEngine->getVertexFormats().POSITION_TEX_COORD,4);
-	mVertexData=VertexData::ptr(new VertexData(vertexBuffer));
+	mVertexData=new VertexData(vertexBuffer);
 	{
 		VertexBufferAccessor vba(vertexBuffer,Buffer::Access_BIT_WRITE);
 

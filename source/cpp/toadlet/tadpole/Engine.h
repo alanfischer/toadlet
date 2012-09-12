@@ -100,6 +100,10 @@ public:
 	inline MeshManager *getMeshManager() const{return mMeshManager;}
 	inline AudioManager *getAudioManager() const{return mAudioManager;}
 
+	/// @todo: These managers need to be optionally created upon BSP plugin loading
+	inline ResourceManager *getStudioModelManager() const{return mStudioModelManager;}
+	inline ResourceManager *getSpriteModelManager() const{return mSpriteModelManager;}
+
 	Texture::ptr createNormalizationTexture(int size);
 
 	Material::ptr createDiffuseMaterial(Texture *texture);
@@ -136,6 +140,9 @@ protected:
 	FontManager::ptr mFontManager;
 	MeshManager::ptr mMeshManager;
 	AudioManager::ptr mAudioManager;
+
+	ResourceManager::ptr mStudioModelManager;
+	ResourceManager::ptr mSpriteModelManager;
 
 	ResourceCreator::ptr mNormalizationCreator;
 	ResourceCreator::ptr mDiffuseCreator,mSkyBoxMaterialCreator,mWaterMaterialCreator;

@@ -63,14 +63,14 @@ void MaterialManager::destroy(){
 }
 
 Material::ptr MaterialManager::createMaterial(){
-	Material::ptr material(new Material(this));
+	Material::ptr material=new Material(this);
 	material->compile();
 	manage(material);
 	return material;
 }
 
 Material::ptr MaterialManager::createSharedMaterial(Material::ptr source,RenderState::ptr renderState){
-	Material::ptr material(new Material(this));
+	Material::ptr material=new Material(this);
 
 	int i,j,k,l;
 	for(j=0;j<source->getNumPaths();++j){
@@ -91,6 +91,8 @@ Material::ptr MaterialManager::createSharedMaterial(Material::ptr source,RenderS
 					dstPass->setTexture(type,l,texture,samplerState,textureState);
 				}
 			}
+
+			dstPass->setModelMatrixFlags(srcPass->getModelMatrixFlags());
 
 			// Don't set Buffers, since those are currently constructed upon variable accessing.
 			/// @todo: Should we share buffers instead?
