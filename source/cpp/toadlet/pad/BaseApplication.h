@@ -50,7 +50,7 @@ public:
 	virtual void setApplet(Applet *applet){mApplet=applet;}
 	virtual Applet *getApplet() const{return mApplet;}
 
-	virtual void changeRenderDevicePlugin(const String &plugin)=0;
+	virtual void changeRenderDevicePlugin(const String &plugin){}
 	virtual void setRenderDeviceOptions(int *options,int length);
 	virtual void setAudioDeviceOptions(int *options,int length);
 
@@ -76,8 +76,8 @@ public:
 	virtual String getKeyName(int key){Map<int,String>::iterator it=mKeyToName.find(key);return it!=mKeyToName.end()?it->second:(char*)NULL;}
 	virtual int getKeyValue(const String &name){Map<String,int>::iterator it=mNameToKey.find(name);return it!=mNameToKey.end()?it->second:0;}
 
-	virtual void *getDisplay()=0;
-	virtual void *getWindow()=0;
+	virtual void *getDisplay(){return NULL;}
+	virtual void *getWindow(){return NULL;}
 
 protected:
 	class RenderDevicePlugin{

@@ -5,6 +5,7 @@ configure_file (${CMAKE_CURRENT_SOURCE_DIR}/Version.h.cmake ${CMAKE_CURRENT_BINA
 # Source files for toadlet_pad
 set (PAD_SRC
 	BaseApplication.cpp
+	ConsoleApplication.cpp
 	Version.cpp
 )
 
@@ -32,8 +33,9 @@ set (PAD_PLATFORM_X11_SRC
 # Headers
 set (PAD_HEADERS
 	Applet.h
-	BaseApplication.h
 	Application.h
+	BaseApplication.h
+	ConsoleApplication.h
 	PlatformApplication.h
 	Version.h
 )
