@@ -43,7 +43,7 @@ Resource::ptr SpriteStreamer::load(Stream::ptr stream,ResourceData *data,Progres
 		return NULL;
 	}
 
-	DataStream::ptr dataStream(new DataStream(stream));
+	DataStream::ptr dataStream=new DataStream(stream);
 	int ident=dataStream->readLInt32();
 	int version=dataStream->readLInt32();
 	dataStream->reset();
@@ -54,7 +54,7 @@ Resource::ptr SpriteStreamer::load(Stream::ptr stream,ResourceData *data,Progres
 		return NULL;
 	}
 
-	SpriteModel::ptr model(new SpriteModel());
+	SpriteModel::ptr model=new SpriteModel();
 
 	int length=dataStream->length();
 	model->data=new tbyte[length];

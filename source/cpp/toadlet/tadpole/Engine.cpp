@@ -148,6 +148,8 @@
 
 #if !defined(TOADLET_FIXED_POINT)
 	#include <toadlet/tadpole/plugins/SPRStreamer.h>
+	#include <toadlet/tadpole/studio/SpriteStreamer.h>
+	#include <toadlet/tadpole/studio/StudioStreamer.h>
 #endif
 
 namespace toadlet{
@@ -193,7 +195,10 @@ Engine::Engine(void *env,void *ctx)://bool fixedBackable,bool shaderBackable):
 	mFontManager=new FontManager(this);
 	mMeshManager=new MeshManager(this);
 	mAudioManager=new AudioManager(this);
-	
+
+	mStudioModelManager=new ResourceManager(this);
+	mSpriteModelManager=new ResourceManager(this);
+
 	mHandles.resize(1); // Handle 0 is always NULL
 
 	Math::optimize();
@@ -214,15 +219,6 @@ Engine::~Engine(){
 		"Engine::~Engine");
 
 	destroy();
-
-	mAudioManager=NULL;
-	mMeshManager=NULL;
-	mShaderManager=NULL;
-	mMaterialManager=NULL;
-	mFontManager=NULL;
-	mBufferManager=NULL;
-	mTextureManager=NULL;
-	mArchiveManager=NULL;
 }
 
 void Engine::destroy(){
@@ -232,6 +228,9 @@ void Engine::destroy(){
 	if(mRenderDevice!=NULL){
 		mRenderDevice->activate();
 	}
+
+	mStudioModelManager->destroy();
+	mSpriteModelManager->destroy();
 
 	mAudioManager->destroy();
 	mMeshManager->destroy();
@@ -338,6 +337,9 @@ void Engine::installHandlers(){
 	// Plugin types, should be removed from here somehow
 	#if !defined(TOADLET_FIXED_POINT)
 		mTextureManager->setStreamer(new SPRStreamer(this),"spr");
+
+		mSpriteModelManager->setStreamer(new studio::SpriteStreamer(this),"spr");
+		mStudioModelManager->setStreamer(new studio::StudioStreamer(this),"mdl");
 	#endif
 
 	mNormalizationCreator=new NormalizationTextureCreator(this);

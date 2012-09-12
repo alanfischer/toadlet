@@ -32,12 +32,6 @@ namespace tadpole{
 MeshManager::MeshManager(Engine *engine):ResourceManager(engine){
 }
 
-Resource::ptr MeshManager::manage(const Resource::ptr &resource,const String &name){
-	Mesh::ptr mesh=shared_static_cast<Mesh>(resource);
-	ResourceManager::manage(mesh,name);
-	return mesh;
-}
-
 }
 }
 

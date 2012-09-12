@@ -43,7 +43,7 @@ Resource::ptr StudioStreamer::load(Stream::ptr stream,ResourceData *data,Progres
 		return NULL;
 	}
 
-	DataStream::ptr dataStream(new DataStream(stream));
+	DataStream::ptr dataStream=new DataStream(stream);
 	int id=dataStream->readLInt32();
 	dataStream->reset();
 
@@ -53,7 +53,7 @@ Resource::ptr StudioStreamer::load(Stream::ptr stream,ResourceData *data,Progres
 		return NULL;
 	}
 
-	StudioModel::ptr model(new StudioModel());
+	StudioModel::ptr model=new StudioModel();
 
 	int length=dataStream->length();
 	model->data=new tbyte[length];
@@ -118,14 +118,14 @@ void StudioStreamer::buildBuffers(StudioModel *model){
 					IndexData::ptr indexData;
 					/// @todo: Pack all these indexes into 1 IndexBuffer to speed up rendering
 					if(l>0){
-						indexData=IndexData::ptr(new IndexData(IndexData::Primitive_TRISTRIP,NULL,vertexCount,l));
+						indexData=new IndexData(IndexData::Primitive_TRISTRIP,NULL,vertexCount,l);
 					}
 					else{
 						l=-l;
 						int numedges=l;
 						int firstedge=vertexCount;
 						if(mEngine->getBufferManager()->useTriFan()){
-							indexData=IndexData::ptr(new IndexData(IndexData::Primitive_TRIFAN,NULL,firstedge,numedges));
+							indexData=new IndexData(IndexData::Primitive_TRIFAN,NULL,firstedge,numedges);
 						}
 						else{
 							int indexes=(numedges-2)*3;
@@ -137,7 +137,7 @@ void StudioStreamer::buildBuffers(StudioModel *model){
 								iba.set((edge-1)*3+2,firstedge+edge+1);
 							}
 							iba.unlock();
-							indexData=IndexData::ptr(new IndexData(IndexData::Primitive_TRIS,indexBuffer,0,indexes));
+							indexData=new IndexData(IndexData::Primitive_TRIS,indexBuffer,0,indexes);
 						}
 					}
 

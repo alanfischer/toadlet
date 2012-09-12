@@ -144,16 +144,7 @@ void StudioModelComponent::frameUpdate(int dt,int scope){
 }
 
 void StudioModelComponent::setModel(const String &name){
-	Stream::ptr stream=mEngine->openStream(name);
-	if(stream==NULL){
-		Error::unknown("Unable to find model");
-		return;
-	}
-
-	StudioStreamer::ptr streamer=new StudioStreamer(mEngine);
-	StudioModel::ptr model=shared_static_cast<StudioModel>(streamer->load(stream,NULL,NULL));
-	model->setName(name);
-	setModel(model);
+	setModel(shared_static_cast<StudioModel>(mEngine->getStudioModelManager()->find(name)));
 }
 
 void StudioModelComponent::setModel(StudioModel *model){
@@ -389,6 +380,9 @@ RenderState::ptr StudioModelComponent::getSharedRenderState(){
 		mSharedRenderState=mEngine->getMaterialManager()->createRenderState();
 		int i;
 		for(i=0;i<mSubModels.size();++i){
+			if(i==0){
+				mEngine->getMaterialManager()->modifyRenderState(mSharedRenderState,mSubModels[i]->mMaterial->getRenderState());
+			}
 			mSubModels[i]->mMaterial=mEngine->getMaterialManager()->createSharedMaterial(mSubModels[i]->mMaterial,mSharedRenderState);
 		}
 	}
