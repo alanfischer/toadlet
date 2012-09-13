@@ -58,7 +58,7 @@ public:
 	void setGravity(scalar gravity){mSolid->setCoefficientOfGravity(gravity);}
 	scalar getGravity() const{return mSolid->getCoefficientOfGravity();}
 
-	void setCollisionScope(int scope){mSolid->setCollisionBits(scope);mSolid->setCollideWithBits(scope);}
+	void setCollisionScope(int scope){mSolid->setCollisionBits(scope);mSolid->setCollideWithBits(scope);mSolid->setInternalScope(scope);}
 	int getCollisionScope() const{return mSolid->getCollisionBits();}
 
 	void setBound(Bound *bound);
