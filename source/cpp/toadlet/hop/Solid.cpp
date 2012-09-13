@@ -35,8 +35,8 @@ const scalar Solid::INFINITE_MASS=-Math::ONE;
 Solid::Solid():
 	mScope(0),
 	mInternalScope(0),
-	mCollisionBits(0),
-	mCollideWithBits(0),
+	mCollisionScope(0),
+	mCollideWithScope(0),
 	mMass(0),
 	mInvMass(0),
 	//mPosition,
@@ -86,8 +86,8 @@ void Solid::reset(){
 
 	mScope=-1;
 	mInternalScope=0;
-	mCollisionBits=-1;
-	mCollideWithBits=-1;
+	mCollisionScope=-1;
+	mCollideWithScope=-1;
 	mMass=Math::ONE;
 	mInvMass=Math::ONE;
 	mPosition.reset();

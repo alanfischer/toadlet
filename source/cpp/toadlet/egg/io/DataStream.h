@@ -48,8 +48,8 @@ public:
 	virtual bool closed(){return mStream->closed();}
 
 	virtual bool readable(){return mStream->readable();}
-	virtual int read(tbyte *buffer,int length){return mStream->read(buffer,length);}
-
+	virtual int read(tbyte *buffer,int length);
+	
 	virtual bool writeable(){return mStream->writeable();}
 	virtual int write(const tbyte *buffer,int length){return mStream->write(buffer,length);}
 

@@ -50,8 +50,8 @@ public:
 
 	void setTraceable(Traceable *traceable);
 
-	void traceSegment(PhysicsCollision &result,const Segment &segment,int collideWithBits,Node *ignore);
-	void traceNode(PhysicsCollision &result,Node *entity,const Segment &segment,int collideWithBits);
+	void traceSegment(PhysicsCollision &result,const Segment &segment,int collideWithScope,Node *ignore);
+	void traceNode(PhysicsCollision &result,Node *entity,const Segment &segment,int collideWithScope);
 	void testNode(PhysicsCollision &result,Node *entity1,const Segment &segment,Node *entity2);
 
 	void logicUpdate(int dt,int scope,Node *node);
@@ -63,8 +63,8 @@ public:
 	inline hop::Simulator *getSimulator(){return mSimulator;}
 
 	int findSolidsInAABox(const AABox &box,hop::Solid *solids[],int maxSolids);
-	void traceSegment(hop::Collision &result,const Segment &segment,int collideWithBits);
-	void traceSolid(hop::Collision &result,hop::Solid *solid,const Segment &segment,int collideWithBits);
+	void traceSegment(hop::Collision &result,const Segment &segment,int collideWithScope);
+	void traceSolid(hop::Collision &result,hop::Solid *solid,const Segment &segment,int collideWithScope);
 	void preUpdate(int dt,scalar fdt){}
 	void postUpdate(int dt,scalar fdt){}
 	void preUpdate(hop::Solid *solid,int dt,scalar fdt){}
