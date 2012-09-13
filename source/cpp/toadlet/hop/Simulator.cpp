@@ -362,7 +362,7 @@ void Simulator::update(int dt,int scope,Solid *solid){
 		capVector3(newPosition,mMaxPositionComponent);
 
 		// Collect all possible solids in the whole movement area
-		if(solid->mCollideWithBits!=0){
+		if(solid->mCollideWithScope!=0){
 			sub(temp,newPosition,oldPosition);
 
 			/// @todo: Calculate this 0.5f from the coefficient of static friction between solid & mTouching
@@ -411,7 +411,7 @@ void Simulator::update(int dt,int scope,Solid *solid){
 
 			path.setStartEnd(oldPosition,newPosition);
 
-			traceSolidWithCurrentSpacials(c,solid,path,solid->mCollideWithBits);
+			traceSolidWithCurrentSpacials(c,solid,path,solid->mCollideWithScope);
 			if(c.time<ONE){
 				// Calculate offset vector, and then resulting position
 				snapToGrid(c.point);
@@ -528,7 +528,7 @@ void Simulator::update(int dt,int scope,Solid *solid){
 					}
 
 					// Only affect hitSolid if hitSolid would have collided with solid.
-					if(hitSolid!=NULL && (hitSolid->mCollideWithBits&solid->mCollisionBits)!=0 &&
+					if(hitSolid!=NULL && (hitSolid->mCollideWithScope&solid->mCollisionScope)!=0 &&
 						(Math::abs(temp.x)>=mDeactivateSpeed || Math::abs(temp.y)>=mDeactivateSpeed || Math::abs(temp.z)>=mDeactivateSpeed))
 					{
 						hitSolid->activate();
@@ -649,13 +649,13 @@ void Simulator::reportCollisions(){
 		// We must do these as 2 separate ifs, because the collision functions may destroy the solids they are hitting
 		if(col.collidee!=NULL){
 			CollisionListener *listener=col.collidee->mCollisionListener;
-			if(listener!=NULL && col.collider!=NULL && (col.collidee->mCollideWithBits&col.collider->mCollisionBits)!=0){
+			if(listener!=NULL && col.collider!=NULL && (col.collidee->mCollideWithScope&col.collider->mCollisionScope)!=0){
 				listener->collision(col);
 			}
 		}
 		if(col.collider!=NULL){
 			CollisionListener *listener=col.collider->mCollisionListener;
-			if(listener!=NULL && col.collidee!=NULL && (col.collider->mCollideWithBits&col.collidee->mCollisionBits)!=0){
+			if(listener!=NULL && col.collidee!=NULL && (col.collider->mCollideWithScope&col.collidee->mCollisionScope)!=0){
 				col.invert();
 				listener->collision(col);
 			}
@@ -697,17 +697,17 @@ int Simulator::findSolidsInAABox(const AABox &box,Solid *solids[],int maxSolids)
 	return amount;
 }
 
-void Simulator::traceSegment(Collision &result,const Segment &segment,int collideWithBits,Solid *ignore){
+void Simulator::traceSegment(Collision &result,const Segment &segment,int collideWithScope,Solid *ignore){
 	Vector3 endPoint=cache_traceSegment_endPoint;
 	segment.getEndPoint(endPoint);
 	AABox total=cache_traceSegment_total.set(segment.origin,segment.origin);
 	total.merge(endPoint);
 	mNumSpacialCollection=findSolidsInAABox(total,mSpacialCollection,mSpacialCollection.size());
 
-	traceSegmentWithCurrentSpacials(result,segment,collideWithBits,ignore);
+	traceSegmentWithCurrentSpacials(result,segment,collideWithScope,ignore);
 }
 
-void Simulator::traceSolid(Collision &result,Solid *solid,const Segment &segment,int collideWithBits){
+void Simulator::traceSolid(Collision &result,Solid *solid,const Segment &segment,int collideWithScope){
 	Vector3 &end=segment.getEndPoint(cache_testSolid_origin);
 	AABox &box=cache_testSolid_box.set(segment.origin,segment.origin);
 	box.merge(end);
@@ -716,7 +716,7 @@ void Simulator::traceSolid(Collision &result,Solid *solid,const Segment &segment
 
 	mNumSpacialCollection=findSolidsInAABox(box,mSpacialCollection,mSpacialCollection.size());
 
-	traceSolidWithCurrentSpacials(result,solid,segment,collideWithBits);
+	traceSolidWithCurrentSpacials(result,solid,segment,collideWithScope);
 }
 
 void Simulator::testSegment(Collision &result,const Segment &segment,Solid *solid){
@@ -1106,7 +1106,7 @@ bool Simulator::toSmall(const Vector3 &value,scalar epsilon) const{
 	return (value.x<epsilon && value.x>-epsilon && value.y<epsilon && value.y>-epsilon && value.z<epsilon && value.z>-epsilon);
 }
 
-void Simulator::traceSegmentWithCurrentSpacials(Collision &result,const Segment &segment,int collideWithBits,Solid *ignore){
+void Simulator::traceSegmentWithCurrentSpacials(Collision &result,const Segment &segment,int collideWithScope,Solid *ignore){
 	result.time=ONE;
 	result.scope=0;
 
@@ -1116,7 +1116,7 @@ void Simulator::traceSegmentWithCurrentSpacials(Collision &result,const Segment 
 	int i;
 	for(i=0;i<mNumSpacialCollection;++i){
 		solid2=mSpacialCollection[i];
-		if(solid2!=ignore && (collideWithBits&solid2->mCollisionBits)!=0){
+		if(solid2!=ignore && (collideWithScope&solid2->mCollisionScope)!=0){
 			collision.time=ONE;
 			testSegment(collision,segment,solid2);
 			int scope=result.scope;
@@ -1138,7 +1138,7 @@ void Simulator::traceSegmentWithCurrentSpacials(Collision &result,const Segment 
 
 	if(mManager!=NULL){
 		collision.time=ONE;
-		mManager->traceSegment(collision,segment,collideWithBits);
+		mManager->traceSegment(collision,segment,collideWithScope);
 		int scope=result.scope;
 		if(collision.time<ONE){
 			if(collision.time<result.time){
@@ -1160,10 +1160,10 @@ void Simulator::traceSegmentWithCurrentSpacials(Collision &result,const Segment 
 	}
 }
 
-void Simulator::traceSolidWithCurrentSpacials(Collision &result,Solid *solid,const Segment &segment,int collideWithBits){
+void Simulator::traceSolidWithCurrentSpacials(Collision &result,Solid *solid,const Segment &segment,int collideWithScope){
 	result.time=ONE;
 
-	if(collideWithBits==0){
+	if(collideWithScope==0){
 		return;
 	}
 
@@ -1173,7 +1173,7 @@ void Simulator::traceSolidWithCurrentSpacials(Collision &result,Solid *solid,con
 	int i;
 	for(i=0;i<mNumSpacialCollection;++i){
 		solid2=mSpacialCollection[i];
-		if(solid!=solid2 && (collideWithBits&solid2->mCollisionBits)!=0){
+		if(solid!=solid2 && (collideWithScope&solid2->mCollisionScope)!=0){
 			collision.time=ONE;
 			testSolid(collision,solid,segment,solid2);
 			int scope=result.scope;
@@ -1195,7 +1195,7 @@ void Simulator::traceSolidWithCurrentSpacials(Collision &result,Solid *solid,con
 
 	if(mManager!=NULL){
 		collision.time=ONE;
-		mManager->traceSolid(collision,solid,segment,collideWithBits);
+		mManager->traceSolid(collision,solid,segment,collideWithScope);
 		int scope=result.scope;
 		if(collision.time<ONE){
 			if(collision.time<result.time){

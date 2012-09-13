@@ -40,21 +40,36 @@ DataStream::DataStream(Stream *stream){
 DataStream::~DataStream(){
 }
 
+int DataStream::read(tbyte *buffer,int length){
+	int amount=0,total=0;
+
+	while(length>0){
+		amount=mStream->read(buffer,length);
+		if(amount<0){
+			return amount;
+		}
+		length-=amount;
+		total+=amount;
+	}
+
+	return total;
+}
+
 bool DataStream::readBool(){
 	bool b=false;
-	mStream->read((tbyte*)&b,1);
+	read((tbyte*)&b,1);
 	return b;
 }
 
 uint8 DataStream::readUInt8(){
 	tbyte i=0;
-	mStream->read((tbyte*)&i,sizeof(i));
+	read((tbyte*)&i,sizeof(i));
 	return i;
 }
 
 int8 DataStream::readInt8(){
 	int8 i=0;
-	mStream->read((tbyte*)&i,sizeof(i));
+	read((tbyte*)&i,sizeof(i));
 	return i;
 }
 
@@ -117,7 +132,7 @@ int DataStream::readNullTerminatedString(String &s){
 	char string[1024];
 	int i=0;
 	while(true){
-		amt=mStream->read((tbyte*)string+i,1);
+		amt=read((tbyte*)string+i,1);
 		if(amt==0 || string[i]==0){
 			break;
 		}
@@ -156,56 +171,56 @@ String DataStream::readAllString(){
 
 uint16 DataStream::readBUInt16(){
 	uint16 i=0;
-	mStream->read((tbyte*)&i,sizeof(i));
+	read((tbyte*)&i,sizeof(i));
 	bigUInt16InPlace(i);
 	return i;
 }
 
 int16 DataStream::readBInt16(){
 	int16 i=0;
-	mStream->read((tbyte*)&i,sizeof(i));
+	read((tbyte*)&i,sizeof(i));
 	bigInt16InPlace(i);
 	return i;
 }
 
 uint32 DataStream::readBUInt32(){
 	uint32 i=0;
-	mStream->read((tbyte*)&i,sizeof(i));
+	read((tbyte*)&i,sizeof(i));
 	bigUInt32InPlace(i);
 	return i;
 }
 
 int32 DataStream::readBInt32(){
 	int32 i=0;
-	mStream->read((tbyte*)&i,sizeof(i));
+	read((tbyte*)&i,sizeof(i));
 	bigInt32InPlace(i);
 	return i;
 }
 
 uint64 DataStream::readBUInt64(){
 	uint64 i=0;
-	mStream->read((tbyte*)&i,sizeof(i));
+	read((tbyte*)&i,sizeof(i));
 	bigUInt64InPlace(i);
 	return i;
 }
 
 int64 DataStream::readBInt64(){
 	int64 i=0;
-	mStream->read((tbyte*)&i,sizeof(i));
+	read((tbyte*)&i,sizeof(i));
 	bigInt64InPlace(i);
 	return i;
 }
 
 float DataStream::readBFloat(){
 	float f=0;
-	mStream->read((tbyte*)&f,sizeof(f));
+	read((tbyte*)&f,sizeof(f));
 	bigFloatInPlace(f);
 	return f;
 }
 
 double DataStream::readBDouble(){
 	double d=0;
-	mStream->read((tbyte*)&d,sizeof(d));
+	read((tbyte*)&d,sizeof(d));
 	bigDoubleInPlace(d);
 	return d;
 }
@@ -301,7 +316,7 @@ int DataStream::readBInt16String(String &s){
 	int16 len=readBInt16();
 	int amt=2;
 	char *string=new char[len+1];
-	amt+=mStream->read((tbyte*)string,len);
+	amt+=read((tbyte*)string,len);
 	string[len]=0;
 	s=string;
 	delete[] string;
@@ -316,56 +331,56 @@ String DataStream::readBInt16String(){
 
 uint16 DataStream::readLUInt16(){
 	uint16 i=0;
-	mStream->read((tbyte*)&i,sizeof(i));
+	read((tbyte*)&i,sizeof(i));
 	littleUInt16InPlace(i);
 	return i;
 }
 
 int16 DataStream::readLInt16(){
 	int16 i=0;
-	mStream->read((tbyte*)&i,sizeof(i));
+	read((tbyte*)&i,sizeof(i));
 	littleInt16InPlace(i);
 	return i;
 }
 
 uint32 DataStream::readLUInt32(){
 	uint32 i=0;
-	mStream->read((tbyte*)&i,sizeof(i));
+	read((tbyte*)&i,sizeof(i));
 	littleUInt32InPlace(i);
 	return i;
 }
 
 int32 DataStream::readLInt32(){
 	int32 i=0;
-	mStream->read((tbyte*)&i,sizeof(i));
+	read((tbyte*)&i,sizeof(i));
 	littleInt32InPlace(i);
 	return i;
 }
 
 uint64 DataStream::readLUInt64(){
 	uint64 i=0;
-	mStream->read((tbyte*)&i,sizeof(i));
+	read((tbyte*)&i,sizeof(i));
 	littleUInt64InPlace(i);
 	return i;
 }
 
 int64 DataStream::readLInt64(){
 	int64 i=0;
-	mStream->read((tbyte*)&i,sizeof(i));
+	read((tbyte*)&i,sizeof(i));
 	littleInt64InPlace(i);
 	return i;
 }
 
 float DataStream::readLFloat(){
 	float f=0;
-	mStream->read((tbyte*)&f,sizeof(f));
+	read((tbyte*)&f,sizeof(f));
 	littleFloatInPlace(f);
 	return f;
 }
 
 double DataStream::readLDouble(){
 	double d=0;
-	mStream->read((tbyte*)&d,sizeof(d));
+	read((tbyte*)&d,sizeof(d));
 	littleDoubleInPlace(d);
 	return d;
 }
@@ -460,7 +475,7 @@ int DataStream::readLInt16String(String &s){
 	int16 len=readLInt16();
 	int amt=2;
 	char *string=new char[len+1];
-	amt+=mStream->read((tbyte*)string,len);
+	amt+=read((tbyte*)string,len);
 	string[len]=0;
 	s=string;
 	delete[] string;
@@ -474,59 +489,59 @@ String DataStream::readLInt16String(){
 }
 
 int DataStream::writeBool(bool b){
-	return mStream->write((tbyte*)&b,1);
+	return write((tbyte*)&b,1);
 }
 
 int DataStream::writeUInt8(uint8 i){
-	return mStream->write((tbyte*)&i,sizeof(i));
+	return write((tbyte*)&i,sizeof(i));
 }
 
 int DataStream::writeInt8(int8 i){
-	return mStream->write((tbyte*)&i,sizeof(i));
+	return write((tbyte*)&i,sizeof(i));
 }
 
 int DataStream::writeNullTerminatedString(const String &s){
-	return mStream->write((tbyte*)s.c_str(),s.length()+1);
+	return write((tbyte*)s.c_str(),s.length()+1);
 }
 
 int DataStream::writeBUInt16(uint16 i){
 	bigUInt16InPlace(i);
-	return mStream->write((tbyte*)&i,sizeof(i));
+	return write((tbyte*)&i,sizeof(i));
 }
 
 int DataStream::writeBInt16(int16 i){
 	bigInt16InPlace(i);
-	return mStream->write((tbyte*)&i,sizeof(i));
+	return write((tbyte*)&i,sizeof(i));
 }
 
 int DataStream::writeBUInt32(uint32 i){
 	bigUInt32InPlace(i);
-	return mStream->write((tbyte*)&i,sizeof(i));
+	return write((tbyte*)&i,sizeof(i));
 }
 
 int DataStream::writeBInt32(int32 i){
 	bigInt32InPlace(i);
-	return mStream->write((tbyte*)&i,sizeof(i));
+	return write((tbyte*)&i,sizeof(i));
 }
 
 int DataStream::writeBUInt64(uint64 i){
 	bigUInt64InPlace(i);
-	return mStream->write((tbyte*)&i,sizeof(i));
+	return write((tbyte*)&i,sizeof(i));
 }
 
 int DataStream::writeBInt64(int64 i){
 	bigInt64InPlace(i);
-	return mStream->write((tbyte*)&i,sizeof(i));
+	return write((tbyte*)&i,sizeof(i));
 }
 
 int DataStream::writeBFloat(float f){
 	bigFloatInPlace(f);
-	return mStream->write((tbyte*)&f,sizeof(f));
+	return write((tbyte*)&f,sizeof(f));
 }
 
 int DataStream::writeBDouble(double d){
 	bigDoubleInPlace(d);
-	return mStream->write((tbyte*)&d,sizeof(d));
+	return write((tbyte*)&d,sizeof(d));
 }
 
 int DataStream::writeBVector2(const math::Vector2 &v){
@@ -631,48 +646,48 @@ int DataStream::writeBInt16String(const String &s){
 		return 0;
 	}
 	int amt=writeBInt16(len);
-	amt+=mStream->write((tbyte*)s.c_str(),len);
+	amt+=write((tbyte*)s.c_str(),len);
 	return amt;
 }
 
 int DataStream::writeLUInt16(uint16 i){
 	littleUInt16InPlace(i);
-	return mStream->write((tbyte*)&i,sizeof(i));
+	return write((tbyte*)&i,sizeof(i));
 }
 
 int DataStream::writeLInt16(int16 i){
 	littleInt16InPlace(i);
-	return mStream->write((tbyte*)&i,sizeof(i));
+	return write((tbyte*)&i,sizeof(i));
 }
 
 int DataStream::writeLUInt32(uint32 i){
 	littleUInt32InPlace(i);
-	return mStream->write((tbyte*)&i,sizeof(i));
+	return write((tbyte*)&i,sizeof(i));
 }
 
 int DataStream::writeLInt32(int32 i){
 	littleInt32InPlace(i);
-	return mStream->write((tbyte*)&i,sizeof(i));
+	return write((tbyte*)&i,sizeof(i));
 }
 
 int DataStream::writeLUInt64(uint64 i){
 	littleUInt64InPlace(i);
-	return mStream->write((tbyte*)&i,sizeof(i));
+	return write((tbyte*)&i,sizeof(i));
 }
 
 int DataStream::writeLInt64(int64 i){
 	littleInt64InPlace(i);
-	return mStream->write((tbyte*)&i,sizeof(i));
+	return write((tbyte*)&i,sizeof(i));
 }
 
 int DataStream::writeLFloat(float f){
 	littleFloatInPlace(f);
-	return mStream->write((tbyte*)&f,sizeof(f));
+	return write((tbyte*)&f,sizeof(f));
 }
 
 int DataStream::writeLDouble(double d){
 	littleDoubleInPlace(d);
-	return mStream->write((tbyte*)&d,sizeof(d));
+	return write((tbyte*)&d,sizeof(d));
 }
 
 int DataStream::writeLVector2(const math::Vector2 &v){
@@ -777,7 +792,7 @@ int DataStream::writeLInt16String(const String &s){
 		return 0;
 	}
 	int amt=writeLInt16(len);
-	amt+=mStream->write((tbyte*)s.c_str(),len);
+	amt+=write((tbyte*)s.c_str(),len);
 	return amt;
 }
 

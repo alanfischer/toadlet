@@ -63,7 +63,7 @@ void HopManager::setTraceable(Traceable *traceable){
 	mTraceable=traceable;
 }
 
-void HopManager::traceSegment(PhysicsCollision &result,const Segment &segment,int collideWithBits,Node *ignore){
+void HopManager::traceSegment(PhysicsCollision &result,const Segment &segment,int collideWithScope,Node *ignore){
 	result.reset();
 
 	hop::Solid *ignoreSolid=NULL;
@@ -72,11 +72,11 @@ void HopManager::traceSegment(PhysicsCollision &result,const Segment &segment,in
 	}
 
 	hop::Collision collision;
-	mSimulator->traceSegment(collision,segment,collideWithBits,ignoreSolid);
+	mSimulator->traceSegment(collision,segment,collideWithScope,ignoreSolid);
 	set(result,collision);
 }
 
-void HopManager::traceNode(PhysicsCollision &result,Node *node,const Segment &segment,int collideWithBits){
+void HopManager::traceNode(PhysicsCollision &result,Node *node,const Segment &segment,int collideWithScope){
 	result.reset();
 
 	hop::Solid *solid=NULL;
@@ -85,7 +85,7 @@ void HopManager::traceNode(PhysicsCollision &result,Node *node,const Segment &se
 	}
 
 	hop::Collision collision;
-	mSimulator->traceSolid(collision,solid,segment,collideWithBits);
+	mSimulator->traceSolid(collision,solid,segment,collideWithScope);
 	set(result,collision);
 }
 
@@ -160,8 +160,8 @@ int HopManager::findSolidsInAABox(const AABox &box,hop::Solid *solids[],int maxS
 	return mSensorResults->getCount();
 }
 
-void HopManager::traceSegment(hop::Collision &result,const Segment &segment,int collideWithBits){
-	if(mTraceable!=NULL && (collideWithBits&mSolid->getCollisionBits())!=0){
+void HopManager::traceSegment(hop::Collision &result,const Segment &segment,int collideWithScope){
+	if(mTraceable!=NULL && (collideWithScope&mSolid->getCollisionScope())!=0){
 		PhysicsCollision collision;
 		mTraceable->traceSegment(collision,Math::ZERO_VECTOR3,segment,Math::ZERO_VECTOR3);
 		set(result,collision,NULL,NULL);
@@ -169,9 +169,9 @@ void HopManager::traceSegment(hop::Collision &result,const Segment &segment,int 
 	}
 }
 
-void HopManager::traceSolid(hop::Collision &result,hop::Solid *solid,const Segment &segment,int collideWithBits){
+void HopManager::traceSolid(hop::Collision &result,hop::Solid *solid,const Segment &segment,int collideWithScope){
 	// Only trace shapes that aren't a callback
-	if(mTraceable!=NULL && (collideWithBits&mSolid->getCollisionBits())!=0 && (solid->getShapeTypes()&hop::Shape::Type_CALLBACK)==0){
+	if(mTraceable!=NULL && (collideWithScope&mSolid->getCollisionScope())!=0 && (solid->getShapeTypes()&hop::Shape::Type_CALLBACK)==0){
 		PhysicsCollision collision;
 		const AABox &bound=solid->getLocalBound();
 		Vector3 size;

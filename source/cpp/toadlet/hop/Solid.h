@@ -57,11 +57,11 @@ public:
 	void setInternalScope(int scope){mInternalScope=scope;}
 	int getInternalScope() const{return mInternalScope;}
 
-	void setCollisionBits(int bits){mCollisionBits=bits;}
-	int getCollisionBits() const{return mCollisionBits;}
+	void setCollisionScope(int scope){mCollisionScope=scope;}
+	int getCollisionScope() const{return mCollisionScope;}
 
-	void setCollideWithBits(int bits){mCollideWithBits=bits;}
-	int getCollideWithBits() const{return mCollideWithBits;}
+	void setCollideWithScope(int scope){mCollideWithScope=scope;}
+	int getCollideWithScope() const{return mCollideWithScope;}
 
 	void setMass(scalar mass);
 	scalar getMass() const{return mMass;}
@@ -139,8 +139,8 @@ protected:
 
 	int mScope;
 	int mInternalScope;
-	int mCollisionBits;
-	int mCollideWithBits;
+	int mCollisionScope;
+	int mCollideWithScope;
 	scalar mMass;
 	scalar mInvMass;
 	Vector3 mPosition;
