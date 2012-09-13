@@ -59,11 +59,11 @@ void ResourceManager::destroy(){
 	mNameResourceMap.clear();
 }
 
-void ResourceManager::addResourceArchive(egg::io::Archive::ptr archive){
+void ResourceManager::addResourceArchive(Archive::ptr archive){
 	mResourceArchives.add(archive);
 }
 
-void ResourceManager::removeResourceArchive(egg::io::Archive::ptr archive){
+void ResourceManager::removeResourceArchive(Archive::ptr archive){
 	mResourceArchives.remove(archive);
 }
 
@@ -86,7 +86,7 @@ Resource::ptr ResourceManager::get(const String &name){
 	}
 }
 
-Resource::ptr ResourceManager::find(const egg::String &name,ResourceData *data){
+Resource::ptr ResourceManager::find(const String &name,ResourceData *data){
 	Resource::ptr resource=get(name);
 	if(resource==NULL){
 		TOADLET_TRY

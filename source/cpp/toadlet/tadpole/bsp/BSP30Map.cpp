@@ -87,6 +87,8 @@ void BSP30Map::destroy(){
 		delete[] lightmapDatas[i];
 	}
 	lightmapDatas.clear();
+
+	BaseResource::destroy();
 }
 
 int BSP30Map::modelCollisionTrace(PhysicsCollision &result,int model,const Vector3 &size,const Vector3 &start,const Vector3 &end){

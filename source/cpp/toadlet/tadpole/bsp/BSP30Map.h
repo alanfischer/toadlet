@@ -45,7 +45,8 @@ public:
 	const static int LIGHTMAP_SIZE=256;
 	struct facedata;
 
-	BSP30Map(Engine *engine);	
+	BSP30Map(Engine *engine);
+	virtual ~BSP30Map(){}
 	void destroy();
 
 	int modelCollisionTrace(PhysicsCollision &result,int model,const Vector3 &size,const Vector3 &start,const Vector3 &end);

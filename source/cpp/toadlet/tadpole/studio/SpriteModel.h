@@ -43,6 +43,8 @@ public:
 		paletteSize(0),
 		palette(NULL)
 	{}
+
+	virtual ~SpriteModel(){}
 	
 	void destroy(){
 		if(data!=NULL){
@@ -53,6 +55,8 @@ public:
 
 		textures.clear();
 		materials.clear();
+
+		BaseResource::destroy();
 	}
 
 	spriteframetype *frameType(int i){

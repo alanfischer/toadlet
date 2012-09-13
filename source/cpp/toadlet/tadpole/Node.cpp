@@ -105,7 +105,7 @@ void Node::destroyAllChildren(){
 }
 
 bool Node::attach(Component *component){
-	Component::ptr reference(component); // To make sure that the object is not released early
+	Component::ptr reference=component; // To make sure that the object is not released early
 
 	mComponents.add(component);
 
@@ -123,7 +123,7 @@ bool Node::attach(Component *component){
 }
 
 bool Node::remove(Component *component){
-	Component::ptr reference(component); // To make sure that the object is not released early
+	Component::ptr reference=component; // To make sure that the object is not released early
 
 	if(component->parentChanged(NULL)==false){
 		return false;

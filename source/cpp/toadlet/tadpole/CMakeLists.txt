@@ -23,7 +23,6 @@ set (TADPOLE_SRC
 	MaterialManager.cpp
 	Mesh.cpp
 	MeshComponent.cpp
-	MeshManager.cpp
 	Node.cpp
 	Noise.cpp
 	ParticleComponent.cpp
@@ -213,7 +212,6 @@ set (TADPOLE_HEADERS
 	LightComponent.h
 	MaterialManager.h
 	Mesh.h
-	MeshManager.h
 	MeshComponent.h
 	Node.h
 	Noise.h

@@ -42,6 +42,8 @@ public:
 		data(NULL),
 		header(NULL)
 	{}
+
+	virtual ~StudioModel(){}
 	
 	void destroy(){
 		if(data!=NULL){
@@ -52,6 +54,8 @@ public:
 
 		textures.clear();
 		materials.clear();
+
+		BaseResource::destroy();
 	}
 
 	studiobodyparts *bodyparts(int i){return &((studiobodyparts*)(data+header->bodypartindex))[i];}
