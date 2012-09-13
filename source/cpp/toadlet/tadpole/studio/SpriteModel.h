@@ -44,7 +44,9 @@ public:
 		palette(NULL)
 	{}
 
-	virtual ~SpriteModel(){}
+	virtual ~SpriteModel(){
+		destroy();
+	}
 	
 	void destroy(){
 		if(data!=NULL){
