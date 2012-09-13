@@ -152,6 +152,9 @@ RenderState::ptr BSP30ModelComponent::getSharedRenderState(){
 		mSharedRenderState=mEngine->getMaterialManager()->createRenderState();
 		int i;
 		for(i=0;i<mSubModels.size();++i){
+			if(i==0){
+				mEngine->getMaterialManager()->modifyRenderState(mSharedRenderState,mSubModels[i]->mMaterial->getRenderState());
+			}
 			mSubModels[i]->mMaterial=mEngine->getMaterialManager()->createSharedMaterial(mSubModels[i]->mMaterial,mSharedRenderState);
 		}
 	}
