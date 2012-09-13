@@ -47,7 +47,6 @@ StudioModelComponent::SubModel::SubModel(StudioModelComponent *parent,int bodypa
 	mSMesh=mModel->mesh(mSModel,mMeshIndex);
 	mData=mModel->findmeshdata(mBodypartIndex,mModelIndex,mMeshIndex);
 	mMaterial=mModel->materials[mModel->skin(mModel->header->numskinref*skinIndex+mSMesh->skinref)];
-	mMaterial->retain();
 }
 
 void StudioModelComponent::SubModel::render(RenderManager *manager) const{

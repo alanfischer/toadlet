@@ -163,6 +163,8 @@ void HopComponent::transformChanged(){
 }
 
 void HopComponent::collision(const hop::Collision &c){
+	HopComponent::ptr reference=this;
+
 	PhysicsCollision collision;
 	HopManager::set(collision,c);
 	int i;

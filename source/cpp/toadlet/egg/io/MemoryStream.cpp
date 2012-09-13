@@ -29,7 +29,7 @@ namespace toadlet{
 namespace egg{
 namespace io{
 
-MemoryStream::MemoryStream(Stream::ptr stream):
+MemoryStream::MemoryStream(Stream *stream):
 	mData(NULL),
 	mDataLength(0),
 	mInternalData(NULL),
