@@ -29,7 +29,9 @@
 #include <toadlet/egg/Categories.h>
 #include <toadlet/peeper/RenderDevice.h>
 #include <toadlet/peeper/IndexBuffer.h>
+#include <toadlet/peeper/IndexBufferAccessor.h>
 #include <toadlet/peeper/VertexBuffer.h>
+#include <toadlet/peeper/VertexBufferAccessor.h>
 #include <toadlet/peeper/RenderCaps.h>
 #include <toadlet/ribbit/AudioDevice.h>
 #include <toadlet/tadpole/Types.h>
@@ -40,8 +42,8 @@
 #include <toadlet/tadpole/BufferManager.h>
 #include <toadlet/tadpole/TextureManager.h>
 #include <toadlet/tadpole/MaterialManager.h>
-#include <toadlet/tadpole/MeshManager.h>
 #include <toadlet/tadpole/ShaderManager.h>
+#include <toadlet/tadpole/Mesh.h>
 #include <toadlet/tadpole/ContextListener.h>
 #include <toadlet/tadpole/Node.h>
 
@@ -97,7 +99,7 @@ public:
 	inline ShaderManager *getShaderManager() const{return mShaderManager;}
 	inline MaterialManager *getMaterialManager() const{return  mMaterialManager;}
 	inline FontManager *getFontManager() const{return mFontManager;}
-	inline MeshManager *getMeshManager() const{return mMeshManager;}
+	inline ResourceManager *getMeshManager() const{return mMeshManager;}
 	inline AudioManager *getAudioManager() const{return mAudioManager;}
 
 	/// @todo: These managers need to be optionally created upon BSP plugin loading
@@ -138,7 +140,7 @@ protected:
 	ShaderManager::ptr mShaderManager;
 	MaterialManager::ptr mMaterialManager;
 	FontManager::ptr mFontManager;
-	MeshManager::ptr mMeshManager;
+	ResourceManager::ptr mMeshManager;
 	AudioManager::ptr mAudioManager;
 
 	ResourceManager::ptr mStudioModelManager;

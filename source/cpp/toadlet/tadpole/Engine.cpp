@@ -72,7 +72,6 @@
 #include <toadlet/tadpole/Types.h>
 #include <toadlet/tadpole/Engine.h>
 #include <toadlet/tadpole/MaterialManager.h>
-#include <toadlet/tadpole/MeshManager.h>
 #include <toadlet/tadpole/TextureManager.h>
 #include <toadlet/tadpole/Version.h>
 
@@ -193,7 +192,7 @@ Engine::Engine(void *env,void *ctx)://bool fixedBackable,bool shaderBackable):
 	mShaderManager=new ShaderManager(this);
 	mMaterialManager=new MaterialManager(this);
 	mFontManager=new FontManager(this);
-	mMeshManager=new MeshManager(this);
+	mMeshManager=new ResourceManager(this);
 	mAudioManager=new AudioManager(this);
 
 	mStudioModelManager=new ResourceManager(this);
