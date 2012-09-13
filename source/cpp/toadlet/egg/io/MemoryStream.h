@@ -40,7 +40,7 @@ public:
 	TOADLET_OBJECT(MemoryStream);
 
 	MemoryStream(tbyte *data,int dataLength,int initialLength,bool ownsData);
-	MemoryStream(Stream::ptr stream); // Read all data from stream
+	MemoryStream(Stream *stream); // Read all data from stream
 	MemoryStream();
 	virtual ~MemoryStream();
 

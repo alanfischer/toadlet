@@ -136,7 +136,7 @@ bool Material::isDepthSorted() const{
 }
 
 bool Material::compile(){
-	return mManager!=NULL?mManager->compileMaterial(this):NULL;
+	return mManager!=NULL?mManager->compileMaterial(this):false;
 }
 
 }
