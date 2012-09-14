@@ -550,8 +550,8 @@ void StudioModelComponent::updateSkeleton(){
 	}
 
 	/// @todo: Move these to member variables?
-	static Collection<Vector3> boneTranslates(mModel->header->numbones);
-	static Collection<Quaternion> boneRotates(mModel->header->numbones);
+	Collection<Vector3> boneTranslates(mModel->header->numbones);
+	Collection<Quaternion> boneRotates(mModel->header->numbones);
 
 	studioseqdesc *sseqdesc=mModel->seqdesc(mSequenceIndex);
 	studioanim *sanim=mModel->anim(sseqdesc);

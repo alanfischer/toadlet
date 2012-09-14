@@ -33,7 +33,7 @@ namespace tadpole{
 namespace studio{
 
 typedef float vec3_t[3];
-typedef void *cache_user_t;
+typedef int cache_user_t;
 
 static const int IDST=1414743113; // "IDST"
 static const int IDSQ=1364411465; // "IDSQ"
