@@ -45,7 +45,6 @@ public:
 	TOADLET_OBJECT(Scene);
 
 	Scene(Engine *engine);
-	virtual ~Scene();
 	virtual void destroy();
 
 	virtual Engine *getEngine(){return mEngine;}

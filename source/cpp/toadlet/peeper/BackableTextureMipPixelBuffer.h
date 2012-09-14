@@ -45,10 +45,6 @@ public:
 	{
 		resetCreate();
 	}
-	
-	virtual ~BackableTextureMipPixelBuffer(){
-		destroy();
-	}
 
 	virtual PixelBuffer *getRootPixelBuffer(){return mBack;}
 

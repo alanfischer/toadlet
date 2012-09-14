@@ -61,10 +61,6 @@ WGLPBufferRenderTarget::WGLPBufferRenderTarget(GLRenderDevice *renderDevice):WGL
 	mDevice=renderDevice;
 }
 
-WGLPBufferRenderTarget::~WGLPBufferRenderTarget(){
-	destroy();
-}
-
 bool WGLPBufferRenderTarget::create(){
 	mCopy=true;
 	mWidth=0;

@@ -37,10 +37,6 @@ TPKGArchive::TPKGArchive():
 	//mMemoryStream
 {}
 
-TPKGArchive::~TPKGArchive(){
-	destroy();
-}
-
 void TPKGArchive::destroy(){
 	if(mStream!=NULL){
 		mStream->close();

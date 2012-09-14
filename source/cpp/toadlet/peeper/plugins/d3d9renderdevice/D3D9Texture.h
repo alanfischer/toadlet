@@ -43,8 +43,6 @@ public:
 
 	D3D9Texture(D3D9RenderDevice *renderDevice);
 
-	virtual ~D3D9Texture();
-
 	Texture *getRootTexture(){return this;}
 
 	bool create(int usage,TextureFormat::ptr format,byte *mipDatas[]);

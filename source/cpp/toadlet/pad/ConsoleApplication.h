@@ -34,7 +34,6 @@ namespace pad{
 class TOADLET_API ConsoleApplication:public BaseApplication{
 public:
 	ConsoleApplication();
-	virtual ~ConsoleApplication();
 
 	void start();
 	void stop();

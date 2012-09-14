@@ -64,7 +64,6 @@ public:
 	const static int Option_USE_SHADERS=5;
 
 	GLRenderDevice();
-	virtual ~GLRenderDevice();
 
 	// Startup/Shutdown
 	bool create(RenderTarget *target,int *options);

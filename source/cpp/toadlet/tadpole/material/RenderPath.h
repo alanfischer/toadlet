@@ -37,7 +37,6 @@ public:
 	TOADLET_OBJECT(RenderPath);
 
 	RenderPath(MaterialManager *manager);
-	virtual ~RenderPath();
 
 	void destroy();
 

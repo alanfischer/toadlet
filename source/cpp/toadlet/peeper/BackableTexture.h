@@ -38,7 +38,6 @@ public:
 	TOADLET_RESOURCE(BackableTexture,Texture);
 
 	BackableTexture();
-	virtual ~BackableTexture();
 
 	virtual Texture *getRootTexture(){return mBack!=NULL?mBack->getRootTexture():NULL;}
 

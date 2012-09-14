@@ -42,10 +42,6 @@ ResourceManager::ResourceManager(Engine *engine){
 	#endif
 }
 
-ResourceManager::~ResourceManager(){
-	destroy();
-}
-
 void ResourceManager::destroy(){
 	int i;
 	for(i=0;i<mResources.size();++i){

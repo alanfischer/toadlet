@@ -44,10 +44,6 @@ GLSLShaderState::GLSLShaderState(GLRenderDevice *renderDevice):
 	mNeedsLink=true;
 }
 
-GLSLShaderState::~GLSLShaderState(){
-	destroy();
-}
-
 bool GLSLShaderState::create(){
 	bool result=createContext();
 

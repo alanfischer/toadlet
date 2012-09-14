@@ -81,7 +81,7 @@ public:
 
 		Logger::alert("Loading frog");
 
-		creature=engine->getMeshManager()->findMesh("frog.tmsh");
+		creature=shared_static_cast<Mesh>(engine->getMeshManager()->find("frog.tmsh"));
 		if(creature!=NULL){
 			Transform transform;
 			transform.setTranslate(0,0,-2.0);

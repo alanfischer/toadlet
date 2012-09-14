@@ -48,8 +48,10 @@ GLXWindowRenderTarget::GLXWindowRenderTarget(Display *display,Window window,Wind
 	createContext(display,window,format);
 }
 
-GLXWindowRenderTarget::~GLXWindowRenderTarget(){
-	destroy();
+void GLXWindowRenderTarget::destroy(){
+	destroyContext();
+	
+	BaseResource::destroy();
 }
 
 bool GLXWindowRenderTarget::createContext(Display *display,Window window,WindowRenderTargetFormat *format){

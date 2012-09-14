@@ -43,10 +43,6 @@ D3D10PixelBufferRenderTarget::D3D10PixelBufferRenderTarget(D3D10RenderDevice *re
 	mD3DDevice=mDevice->getD3D10Device();
 }
 
-D3D10PixelBufferRenderTarget::~D3D10PixelBufferRenderTarget(){
-	destroy();
-}
-
 bool D3D10PixelBufferRenderTarget::create(){
 	mWidth=0;
 	mHeight=0;

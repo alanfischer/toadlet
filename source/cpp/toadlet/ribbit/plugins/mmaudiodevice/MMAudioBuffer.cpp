@@ -39,10 +39,6 @@ MMAudioBuffer::MMAudioBuffer(MMAudioDevice *device):
 	mDevice=device;
 }
 
-MMAudioBuffer::~MMAudioBuffer(){
-	destroy();
-}
-
 bool MMAudioBuffer::create(AudioStream *stream){
 	AudioFormat::ptr format=stream->getAudioFormat();
 	tbyte *buffer=NULL;

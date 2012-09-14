@@ -40,10 +40,6 @@ GLQuery::GLQuery(GLRenderDevice *renderDevice):
 	mDevice=renderDevice;
 }
 
-GLQuery::~GLQuery(){
-	destroy();
-}
-
 bool GLQuery::create(QueryType queryType){
 	if(queryType!=QueryType_OCCLUSION){
 		Error::unknown("GLQuery only supports QueryType_OCCLUSION");

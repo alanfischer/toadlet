@@ -40,9 +40,8 @@ public:
 	Constraint();
 	Constraint(Solid *startSolid,Solid *endSolid);
 	Constraint(Solid *startSolid,const Vector3 &endPoint);
-	virtual ~Constraint();
-	void destroy();
 
+	void destroy();
 	void reset();
 
 	void setStartSolid(Solid *startSolid);

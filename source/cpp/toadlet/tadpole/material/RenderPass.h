@@ -44,7 +44,6 @@ public:
 	TOADLET_OBJECT(RenderPass);
 
 	RenderPass(MaterialManager *manager,RenderState *renderState=NULL,ShaderState *shaderState=NULL);
-	virtual ~RenderPass();
 
 	void destroy();
 

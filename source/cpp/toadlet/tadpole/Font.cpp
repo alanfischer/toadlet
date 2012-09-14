@@ -52,8 +52,6 @@ Font::Font(float pointSize,int innerSpace,Texture::ptr texture,const wchar *char
 }
 
 Font::~Font(){
-	destroy();
-
 	int i;
 	for(i=0;i<mGlyphs.size();++i){
 		if(mGlyphs[i]!=NULL){

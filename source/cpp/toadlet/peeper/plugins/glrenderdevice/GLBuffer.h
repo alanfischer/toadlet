@@ -44,7 +44,6 @@ public:
 	TOADLET_RESOURCE(GLBuffer,BaseResource);
 
 	GLBuffer(GLRenderDevice *renderDevice);
-	virtual ~GLBuffer();
 
 	IndexBuffer *getRootIndexBuffer(){return this;}
 	VertexBuffer *getRootVertexBuffer(){return this;}

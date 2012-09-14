@@ -41,7 +41,6 @@ public:
 	TOADLET_RESOURCE(TPKGArchive,Archive);
 
 	TPKGArchive();
-	virtual ~TPKGArchive();
 
 	void destroy();
 

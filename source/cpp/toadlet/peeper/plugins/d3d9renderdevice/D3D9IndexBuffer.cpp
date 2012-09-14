@@ -51,10 +51,6 @@ D3D9IndexBuffer::D3D9IndexBuffer(D3D9RenderDevice *renderDevice):
 	mDevice=renderDevice;
 }
 
-D3D9IndexBuffer::~D3D9IndexBuffer(){
-	destroy();
-}
-
 bool D3D9IndexBuffer::create(int usage,int access,IndexFormat indexFormat,int size){
 	mUsage=usage;
 	mAccess=access;

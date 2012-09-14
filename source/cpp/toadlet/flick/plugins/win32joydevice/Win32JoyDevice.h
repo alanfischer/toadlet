@@ -39,7 +39,6 @@ public:
 	TOADLET_OBJECT(Win32JoyDevice);
 
 	Win32JoyDevice();
-	virtual ~Win32JoyDevice();
 
 	bool create();
 	void destroy();

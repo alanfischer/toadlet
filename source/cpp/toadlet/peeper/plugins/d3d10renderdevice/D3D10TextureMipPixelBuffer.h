@@ -40,7 +40,6 @@ public:
 
 	D3D10TextureMipPixelBuffer(D3D10Texture *texture,int level,int cubeSide);
 	D3D10TextureMipPixelBuffer(D3D10RenderDevice *renderDevice);
-	virtual ~D3D10TextureMipPixelBuffer();
 
 	PixelBuffer *getRootPixelBuffer(){return this;}
 

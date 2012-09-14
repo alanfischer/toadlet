@@ -41,7 +41,6 @@ public:
 	NSGLRenderTarget();
 	NSGLRenderTarget(NSView *view,WindowRenderTargetFormat *format,NSOpenGLPixelFormat *pixelFormat=nil);
 	NSGLRenderTarget(NSOpenGLContext *context);
-	virtual ~NSGLRenderTarget();
 	void destroy();
 
 	RenderTarget *getRootRenderTarget(){return (GLRenderTarget*)this;}

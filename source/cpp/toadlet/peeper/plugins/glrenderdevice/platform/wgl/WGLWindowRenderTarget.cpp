@@ -142,8 +142,10 @@ WGLWindowRenderTarget::WGLWindowRenderTarget(HWND wnd,WindowRenderTargetFormat *
 	TOADLET_CATCH(const Exception &){}
 }
 
-WGLWindowRenderTarget::~WGLWindowRenderTarget(){
-	destroy();
+void WGLWindowRenderTarget::destroy(){
+	destroyContext();
+	
+	BaseResource::destroy();
 }
 
 bool WGLWindowRenderTarget::createContext(HWND wnd,WindowRenderTargetFormat *format,int winPixelFormat){

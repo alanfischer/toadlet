@@ -39,10 +39,6 @@ RenderVariableSet::RenderVariableSet():
 {
 }
 
-RenderVariableSet::~RenderVariableSet(){
-	destroy();
-}
-
 void RenderVariableSet::destroy(){
 	int i;
 	for(i=0;i<mBuffers.size();++i){

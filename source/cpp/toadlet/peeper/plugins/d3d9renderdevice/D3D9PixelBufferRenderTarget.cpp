@@ -42,10 +42,6 @@ D3D9PixelBufferRenderTarget::D3D9PixelBufferRenderTarget(D3D9RenderDevice *rende
 	mDevice=renderDevice;
 }
 
-D3D9PixelBufferRenderTarget::~D3D9PixelBufferRenderTarget(){
-	destroy();
-}
-
 bool D3D9PixelBufferRenderTarget::create(){
 	mWidth=0;
 	mHeight=0;

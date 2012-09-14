@@ -77,7 +77,6 @@ public:
 	typedef Collection<VertexBoneAssignment> VertexBoneAssignmentList;
 
 	Mesh();
-	virtual ~Mesh();
 
 	void destroy();
 

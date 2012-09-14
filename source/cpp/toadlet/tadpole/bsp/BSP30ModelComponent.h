@@ -64,7 +64,6 @@ public:
 	};
 
 	BSP30ModelComponent(Engine *engine);
-	virtual ~BSP30ModelComponent();
 	void destroy();
 
 	bool parentChanged(Node *node);

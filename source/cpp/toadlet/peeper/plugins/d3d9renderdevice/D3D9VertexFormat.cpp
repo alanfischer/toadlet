@@ -50,10 +50,6 @@ D3D9VertexFormat::D3D9VertexFormat(D3D9RenderDevice *renderDevice):
 	mDevice=renderDevice;
 }
 
-D3D9VertexFormat::~D3D9VertexFormat(){
-	destroy();
-}
-
 bool D3D9VertexFormat::create(){
 	return true;
 }

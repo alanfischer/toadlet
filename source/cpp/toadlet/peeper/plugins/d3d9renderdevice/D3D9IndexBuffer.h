@@ -40,7 +40,6 @@ public:
 	TOADLET_RESOURCE(D3D9IndexBuffer,IndexBuffer);
 
 	D3D9IndexBuffer(D3D9RenderDevice *renderDevice);
-	virtual ~D3D9IndexBuffer();
 
 	IndexBuffer *getRootIndexBuffer(){return this;}
 

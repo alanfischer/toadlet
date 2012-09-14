@@ -69,7 +69,6 @@ public:
 	};
 
 	MeshComponent(Engine *engine);
-	virtual ~MeshComponent();
 	void destroy();
 
 	bool parentChanged(Node *node);

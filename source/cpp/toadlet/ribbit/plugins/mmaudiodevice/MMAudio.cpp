@@ -48,10 +48,6 @@ MMAudio::MMAudio(MMAudioDevice *device):
 	mDevice=device;
 }
 
-MMAudio::~MMAudio(){
-	destroy();
-}
-
 bool MMAudio::create(AudioBuffer *audioBuffer){
 	mDevice->internal_audioCreate(this);
 

@@ -38,7 +38,6 @@ public:
 	TOADLET_OBJECT(ArchiveManager);
 
 	ArchiveManager(Engine *engine);
-	virtual ~ArchiveManager();
 
 	Archive::ptr findArchive(const String &name){return shared_static_cast<Archive>(ResourceManager::find(name));}
 

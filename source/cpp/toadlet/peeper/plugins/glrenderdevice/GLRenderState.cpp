@@ -37,10 +37,6 @@ GLRenderState::GLRenderState(GLRenderDevice *renderDevice):
 	mMaterialState(NULL)
 {}
 
-GLRenderState::~GLRenderState(){
-	destroy();
-}
-
 void GLRenderState::destroy(){
 	if(mBlendState!=NULL){
 		delete mBlendState;

@@ -52,7 +52,6 @@ public:
 	const static int Option_BUFFER_FADE_TIME=1;
 	
 	MMAudioDevice();
-	virtual ~MMAudioDevice();
 
 	bool create(int *options);
 	void destroy();

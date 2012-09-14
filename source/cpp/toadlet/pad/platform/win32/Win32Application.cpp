@@ -185,8 +185,6 @@ Win32Application::Win32Application():
 }
 
 Win32Application::~Win32Application(){
-	destroy();
-
 	delete[] mRenderDeviceOptions;
 	delete[] mAudioDeviceOptions;
 

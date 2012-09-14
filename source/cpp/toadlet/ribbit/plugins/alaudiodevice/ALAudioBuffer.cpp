@@ -41,10 +41,6 @@ ALAudioBuffer::ALAudioBuffer(ALAudioDevice *device):
 	mDevice=device;
 }
 
-ALAudioBuffer::~ALAudioBuffer(){
-	destroy();
-}
-
 bool ALAudioBuffer::create(AudioStream *stream){
 	tbyte *buffer=0;
 	int length=0;

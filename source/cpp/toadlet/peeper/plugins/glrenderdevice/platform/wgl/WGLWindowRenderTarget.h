@@ -38,8 +38,7 @@ class TOADLET_API WGLWindowRenderTarget:public WGLRenderTarget{
 public:
 	WGLWindowRenderTarget();
 	WGLWindowRenderTarget(HWND wnd,WindowRenderTargetFormat *format);
-	virtual ~WGLWindowRenderTarget();
-	void destroy(){destroyContext();BaseResource::destroy();}
+	void destroy();
 
 	RenderTarget *getRootRenderTarget(){return (GLRenderTarget*)this;}
 

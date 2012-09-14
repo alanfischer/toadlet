@@ -46,10 +46,6 @@ D3D9PixelBuffer::D3D9PixelBuffer(D3D9RenderDevice *renderDevice,bool renderTarge
 	mRenderTarget=renderTarget;
 }
 
-D3D9PixelBuffer::~D3D9PixelBuffer(){
-	destroy();
-}
-
 bool D3D9PixelBuffer::create(int usage,int access,TextureFormat::ptr format){
 	mUsage=usage;
 	mAccess=access;

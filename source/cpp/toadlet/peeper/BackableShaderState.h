@@ -38,7 +38,6 @@ public:
 	TOADLET_RESOURCE(BackableShaderState,ShaderState);
 
 	BackableShaderState();
-	virtual ~BackableShaderState();
 
 	virtual ShaderState *getRootShaderState(){return mBack;}
 

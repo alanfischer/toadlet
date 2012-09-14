@@ -46,9 +46,6 @@ public:
 
 	IndexData(Primitive primitive,IndexBuffer::ptr indexBuffer);
 	IndexData(Primitive primitive,IndexBuffer::ptr indexBuffer,int start,int count);
-	virtual ~IndexData();
-
-	void destroy();
 
 	inline void setPrimitive(Primitive primitive1){primitive=primitive1;}
 	inline Primitive getPrimitive() const{return primitive;}

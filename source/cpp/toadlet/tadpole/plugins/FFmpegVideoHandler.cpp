@@ -274,10 +274,6 @@ FFmpegController::FFmpegController(Engine *engine):
 	mEngine=engine;
 }
 
-FFmpegController::~FFmpegController(){
-	destroy();
-}
-
 bool FFmpegController::open(Stream::ptr stream){
 	Logger::alert(Categories::TOADLET_TADPOLE,"FFmpegController::open");
 
@@ -585,10 +581,6 @@ FFmpegVideoHandler::FFmpegVideoHandler(Engine *engine){
 	toadlet_ffmpegRegisterLockManager();
 
 	av_register_all();
-}
-
-FFmpegVideoHandler::~FFmpegVideoHandler(){
-	destroy();
 }
 
 void FFmpegVideoHandler::destroy(){

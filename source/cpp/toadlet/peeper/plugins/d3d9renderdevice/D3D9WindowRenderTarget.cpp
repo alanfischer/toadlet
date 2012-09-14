@@ -67,8 +67,10 @@ D3D9WindowRenderTarget::D3D9WindowRenderTarget(HWND wnd,WindowRenderTargetFormat
 	createContext(wnd,format);
 }
 
-D3D9WindowRenderTarget::~D3D9WindowRenderTarget(){
-	destroy();
+void D3D9WindowRenderTarget::destroy(){
+	destroyContext();
+	
+	BaseResource::destroy();
 }
 
 bool D3D9WindowRenderTarget::activate(){

@@ -43,7 +43,6 @@ public:
 	TOADLET_RESOURCE(BackableBuffer,BaseResource);
 
 	BackableBuffer();
-	virtual ~BackableBuffer();
 
 	virtual IndexBuffer *getRootIndexBuffer(){return (mIndexFormat!=(IndexFormat)0)?(IndexBuffer*)mBack.get():NULL;}
 	virtual VertexBuffer *getRootVertexBuffer(){return (mVertexFormat!=NULL)?(VertexBuffer*)mBack.get():NULL;}

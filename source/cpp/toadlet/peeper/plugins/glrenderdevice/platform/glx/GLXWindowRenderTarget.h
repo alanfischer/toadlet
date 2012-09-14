@@ -38,8 +38,7 @@ class TOADLET_API GLXWindowRenderTarget:public GLXRenderTarget{
 public:
 	GLXWindowRenderTarget();
 	GLXWindowRenderTarget(Display *display,Window window,WindowRenderTargetFormat *format);
-	virtual ~GLXWindowRenderTarget();
-	void destroy(){destroyContext();BaseResource::destroy();}
+	void destroy();
 
 	RenderTarget *getRootRenderTarget(){return (GLRenderTarget*)this;}
 

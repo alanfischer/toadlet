@@ -39,10 +39,6 @@ D3D9RenderState::D3D9RenderState(D3D9RenderDevice *renderDevice):
 	mMaterialState(NULL)
 {}
 
-D3D9RenderState::~D3D9RenderState(){
-	destroy();
-}
-
 void D3D9RenderState::destroy(){
 	if(mBlendState!=NULL){
 		delete mBlendState;

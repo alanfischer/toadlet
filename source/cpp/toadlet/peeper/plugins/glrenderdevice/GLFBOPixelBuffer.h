@@ -42,8 +42,6 @@ public:
 
 	GLFBOPixelBuffer(GLFBORenderTarget *target);
 
-	virtual ~GLFBOPixelBuffer();
-
 	PixelBuffer *getRootPixelBuffer(){return this;}
 	GLTextureMipPixelBuffer *castToGLTextureMipPixelBuffer(){return NULL;}
 	GLFBOPixelBuffer *castToGLFBOPixelBuffer(){return this;}

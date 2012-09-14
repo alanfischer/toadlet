@@ -35,7 +35,6 @@ namespace ribbit{
 class TOADLET_API MMAudioBuffer:public BaseAudioBuffer{
 public:
 	MMAudioBuffer(MMAudioDevice *device);
-	virtual ~MMAudioBuffer();
 
 	AudioBuffer *getRootAudioBuffer(){return this;}
 

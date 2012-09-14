@@ -77,10 +77,6 @@ Solid::Solid():
 	reset();
 }
 
-Solid::~Solid(){
-	destroy();
-}
-
 void Solid::reset(){
 	destroy();
 

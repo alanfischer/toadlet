@@ -42,7 +42,6 @@ public:
 	TOADLET_OBJECT(TerrainNode);
 
 	TerrainNode(Scene *scene);
-	virtual ~TerrainNode();
 
 	void destroy();
 

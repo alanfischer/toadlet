@@ -71,7 +71,6 @@ public:
 	};
 
 	FFmpegController(Engine *engine);
-	virtual ~FFmpegController();
 
 	bool open(Stream::ptr stream);
 	void destroy();
@@ -191,7 +190,6 @@ public:
 	TOADLET_OBJECT(FFmpegVideoHandler);
 
 	FFmpegVideoHandler(Engine *engine);
-	virtual ~FFmpegVideoHandler();
 
 	void destroy();
 

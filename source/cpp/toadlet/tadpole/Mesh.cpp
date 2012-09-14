@@ -33,10 +33,6 @@ namespace tadpole{
 Mesh::Mesh():BaseResource(){
 }
 
-Mesh::~Mesh(){
-	destroy();
-}
-
 void Mesh::destroy(){
 	if(mStaticVertexData!=NULL){
 		mStaticVertexData->destroy();

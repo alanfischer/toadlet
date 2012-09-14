@@ -42,7 +42,6 @@ public:
 	TOADLET_RESOURCE(GLQuery,Query);
 
 	GLQuery(GLRenderDevice *renderDevice);
-	virtual ~GLQuery();
 
 	Query *getRootQuery(){return this;}
 

@@ -41,7 +41,6 @@ public:
 	TOADLET_RESOURCE(GLTexture,Texture);
 
 	GLTexture(GLRenderDevice *renderDevice);
-	virtual ~GLTexture();
 
 	Texture *getRootTexture(){return this;}
 

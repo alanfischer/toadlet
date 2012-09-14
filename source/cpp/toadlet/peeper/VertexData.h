@@ -38,9 +38,6 @@ public:
 
 	VertexData(VertexFormat::ptr vertexFormat);
 	VertexData(VertexBuffer::ptr vertexBuffer);
-	virtual ~VertexData();
-
-	void destroy();
 
 	bool addVertexBuffer(const VertexBuffer::ptr &vertexBuffer);
 

@@ -39,7 +39,6 @@ public:
 	TOADLET_RESOURCE(WADArchive,Archive);
 
 	WADArchive(TextureManager *textureManager);
-	virtual ~WADArchive();
 
 	void destroy();
 

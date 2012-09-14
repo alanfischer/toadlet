@@ -38,10 +38,6 @@ D3D9Query::D3D9Query(D3D9RenderDevice *renderDevice):
 	mDevice=renderDevice;
 }
 
-D3D9Query::~D3D9Query(){
-	destroy();
-}
-
 bool D3D9Query::create(QueryType queryType){
 	mQueryType=queryType;
 	D3DQUERYTYPE d3dQueryType=getD3DQUERYTYPE(mQueryType);

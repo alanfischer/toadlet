@@ -49,7 +49,6 @@ public:
     STDMETHODIMP OnFlush(DWORD){return S_OK;}
 
 	MFVideoDevice();
-	virtual ~MFVideoDevice();
 
 	bool create();
 	bool create(IMFActivate *device);

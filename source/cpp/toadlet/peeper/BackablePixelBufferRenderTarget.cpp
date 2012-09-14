@@ -33,10 +33,6 @@ BackablePixelBufferRenderTarget::BackablePixelBufferRenderTarget():BaseResource(
 	//mBack
 {}
 
-BackablePixelBufferRenderTarget::~BackablePixelBufferRenderTarget(){
-	destroy();
-}
-
 bool BackablePixelBufferRenderTarget::create(){
 	if(mBack!=NULL){
 		return mBack->create();

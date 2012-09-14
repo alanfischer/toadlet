@@ -41,7 +41,6 @@ public:
 	TOADLET_RESOURCE(D3D9VertexBuffer,VertexBuffer);
 
 	D3D9VertexBuffer(D3D9RenderDevice *renderDevice);
-	virtual ~D3D9VertexBuffer();
 
 	VertexBuffer *getRootVertexBuffer(){return this;}
 

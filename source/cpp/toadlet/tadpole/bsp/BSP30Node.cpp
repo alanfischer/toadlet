@@ -40,10 +40,6 @@ BSP30Node::BSP30Node(Scene *scene):PartitionNode(scene),
 	mLocalCamera=new Camera();
 }
 
-BSP30Node::~BSP30Node(){
-	destroy();
-}
-
 void BSP30Node::setMap(const String &name){
 	Stream::ptr stream=mEngine->openStream(name);
 	if(stream==NULL){

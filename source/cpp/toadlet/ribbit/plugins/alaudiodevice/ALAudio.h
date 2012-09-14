@@ -37,7 +37,6 @@ class ALAudioDevice;
 class TOADLET_API ALAudio:public BaseAudio{
 public:
 	ALAudio(ALAudioDevice *audioDevice);
-	virtual ~ALAudio();
 
 	bool create(AudioBuffer *buffer);
 	bool create(AudioStream *stream);

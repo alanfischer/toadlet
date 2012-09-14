@@ -59,10 +59,6 @@ ParticleComponent::ParticleComponent(Scene *scene):
 	mBound=new Bound();
 }
 
-ParticleComponent::~ParticleComponent(){
-	destroy();
-}
-
 void ParticleComponent::destroy(){
 	mParticles.clear();
 

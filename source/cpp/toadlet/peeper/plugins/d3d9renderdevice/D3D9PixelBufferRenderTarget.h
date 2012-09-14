@@ -39,7 +39,6 @@ public:
 	TOADLET_RESOURCE(D3D9PixelBufferRenderTarget,PixelBufferRenderTarget);
 
 	D3D9PixelBufferRenderTarget(D3D9RenderDevice *renderDevice);
-	virtual ~D3D9PixelBufferRenderTarget();
 
 	RenderTarget *getRootRenderTarget(){return (D3D9RenderTarget*)this;}
 	PixelBufferRenderTarget *getRootPixelBufferRenderTarget(){return this;}

@@ -31,12 +31,10 @@ namespace tadpole{
 Skeleton::Skeleton():BaseResource(){
 }
 
-Skeleton::~Skeleton(){
-	destroy();
-}
-
 void Skeleton::destroy(){
 	mSequences.clear();
+
+	BaseResource::destroy();
 }
 
 void Skeleton::compile(){

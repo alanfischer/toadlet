@@ -40,12 +40,11 @@ namespace material{
 class RenderPass;
 
 /// @todo: This should be merged into RenderPass
-class TOADLET_API RenderVariableSet{
+class TOADLET_API RenderVariableSet:public Object{
 public:
-	TOADLET_SPTR(RenderVariableSet);
+	TOADLET_OBJECT(RenderVariableSet);
 
 	RenderVariableSet();
-	virtual ~RenderVariableSet();
 	
 	void destroy();
 

@@ -81,10 +81,6 @@ Node::Node(Scene *scene):BaseComponent(),
 	}
 }
 
-Node::~Node(){
-	destroy();
-}
-
 void Node::destroy(){
 	destroyAllChildren();
 	mEngine->nodeDestroyed(this);

@@ -36,10 +36,6 @@ RenderPath::RenderPath(MaterialManager *manager):
 	mManager=manager;
 }
 
-RenderPath::~RenderPath(){
-	destroy();
-}
-
 void RenderPath::destroy(){
 	int i;
 	for(i=0;i<mPasses.size();++i){

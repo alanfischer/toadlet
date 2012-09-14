@@ -74,10 +74,6 @@ Scene::Scene(Engine *engine):Object(),
 	mAABoxMesh=mEngine->createAABoxMesh(AABox(-Math::ONE,-Math::ONE,-Math::ONE,Math::ONE,Math::ONE,Math::ONE));
 }
 
-Scene::~Scene(){
-	destroy();
-}
-
 void Scene::destroy(){
 	if(mBackground!=NULL){
 		mBackground->destroy();

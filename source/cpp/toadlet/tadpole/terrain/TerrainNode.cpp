@@ -79,10 +79,6 @@ TerrainNode::TerrainNode(Scene *scene):PartitionNode(scene),
 	mTerrainY=0;
 }
 
-TerrainNode::~TerrainNode(){
-	destroy();
-}
-
 void TerrainNode::destroy(){
 	mPatchMaterial=NULL;
 

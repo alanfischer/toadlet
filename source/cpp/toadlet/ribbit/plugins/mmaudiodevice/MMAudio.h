@@ -36,7 +36,6 @@ namespace ribbit{
 class TOADLET_API MMAudio:public BaseAudio{
 public:
 	MMAudio(MMAudioDevice *player);
-	virtual ~MMAudio();
 
 	bool create(AudioBuffer *audioBuffer);
 	bool create(AudioStream *stream);

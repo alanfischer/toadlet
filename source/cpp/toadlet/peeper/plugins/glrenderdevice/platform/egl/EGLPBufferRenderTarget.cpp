@@ -57,10 +57,6 @@ EGLPBufferRenderTarget::EGLPBufferRenderTarget(GLRenderDevice *renderDevice):
 	egl_version=((EGLRenderTarget*)mDevice->getPrimaryRenderTarget()->getRootRenderTarget())->egl_version;
 }
 
-EGLPBufferRenderTarget::~EGLPBufferRenderTarget(){
-	destroy();
-}
-
 bool EGLPBufferRenderTarget::create(){
 	mCopy=true;
 	mSeparateContext=false;

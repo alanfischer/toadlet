@@ -41,10 +41,6 @@ BackableVertexFormat::BackableVertexFormat():
 	//mBack
 {}
 
-BackableVertexFormat::~BackableVertexFormat(){
-	destroy();
-}
-
 bool BackableVertexFormat::create(){
 	bool result=true;
 	if(mBack!=NULL){

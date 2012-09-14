@@ -57,10 +57,6 @@ AnaglyphCamera::AnaglyphCamera(Engine *engine):
 	mRightMaterial->getRenderState()->setBlendState(BlendState::Combination_COLOR_ADDITIVE);
 }
 
-AnaglyphCamera::~AnaglyphCamera(){
-	destroy();
-}
-
 void AnaglyphCamera::destroy(){
 	if(mLeftRenderTarget!=NULL){
 		mLeftRenderTarget->destroy();

@@ -59,10 +59,6 @@ BSP30ModelComponent::BSP30ModelComponent(Engine *engine):
 	mRendered=true;
 }
 
-BSP30ModelComponent::~BSP30ModelComponent(){
-	destroy();
-}
-
 void BSP30ModelComponent::destroy(){
 	int i;
 	for(i=0;i<mSubModels.size();++i){

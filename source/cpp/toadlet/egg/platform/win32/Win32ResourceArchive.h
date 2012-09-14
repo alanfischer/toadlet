@@ -38,7 +38,6 @@ public:
 	TOADLET_RESOURCE(Win32ResourceArchive,Archive);
 
 	Win32ResourceArchive();
-	virtual ~Win32ResourceArchive();
 
 	void destroy();
 
