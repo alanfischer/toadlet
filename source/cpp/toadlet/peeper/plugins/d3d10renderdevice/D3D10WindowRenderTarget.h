@@ -45,8 +45,7 @@ public:
 
 	D3D10WindowRenderTarget();
 	D3D10WindowRenderTarget(HWND wnd,WindowRenderTargetFormat *format);
-	virtual ~D3D10WindowRenderTarget();
-	void destroy(){destroyContext();BaseResource::destroy();}
+	void destroy();
 
 	RenderTarget *getRootRenderTarget(){return this;}
 	bool isPrimary() const{return true;}

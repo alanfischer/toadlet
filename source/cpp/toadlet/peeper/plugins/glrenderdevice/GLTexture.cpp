@@ -46,10 +46,6 @@ GLTexture::GLTexture(GLRenderDevice *renderDevice):BaseResource(),
 	mDevice=renderDevice;
 }
 
-GLTexture::~GLTexture(){
-	destroy();
-}
-
 bool GLTexture::create(int usage,TextureFormat::ptr format,tbyte *mipDatas[]){
 	if(format->isPowerOf2()==false &&
 		mDevice->mNPOT==false && (mDevice->mNPOTR==false || (usage&Usage_BIT_NPOT_RESTRICTED)==0))

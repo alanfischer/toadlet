@@ -56,10 +56,6 @@ D3D10Buffer::D3D10Buffer(D3D10RenderDevice *renderDevice):
 	mDevice=renderDevice;
 }
 
-D3D10Buffer::~D3D10Buffer(){
-	destroy();
-}
-
 bool D3D10Buffer::create(int usage,int access,IndexFormat indexFormat,int size){
 	if((usage&Usage_BIT_STATIC)>0 && (access&Access_BIT_READ)>0){
 		Error::invalidParameters(Categories::TOADLET_PEEPER,

@@ -40,10 +40,6 @@ BackableTexture::BackableTexture():BaseResource(),
 	//mBack
 {}
 
-BackableTexture::~BackableTexture(){
-	destroy();
-}
-
 bool BackableTexture::create(int usage,TextureFormat::ptr format,tbyte *mipDatas[]){
 	mUsage=usage;
 	mFormat=TextureFormat::ptr(new TextureFormat(format));

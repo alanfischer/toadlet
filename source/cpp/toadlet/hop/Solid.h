@@ -46,9 +46,8 @@ public:
 	const static scalar INFINITE_MASS;	
 
 	Solid();
-	virtual ~Solid();
-	virtual void destroy();
 
+	void destroy();
 	void reset();
 
 	void setScope(int scope){mScope=scope;}

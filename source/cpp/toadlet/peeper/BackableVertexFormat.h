@@ -38,7 +38,6 @@ public:
 	TOADLET_RESOURCE(BackableVertexFormat,VertexFormat);
 
 	BackableVertexFormat();
-	virtual ~BackableVertexFormat();
 
 	virtual VertexFormat *getRootVertexFormat(){return mBack;}
 

@@ -38,7 +38,6 @@ public:
 	TOADLET_RESOURCE(BackableShader,Shader);
 
 	BackableShader();
-	virtual ~BackableShader();
 
 	virtual Shader *getRootShader(){return mBack!=NULL?mBack->getRootShader():NULL;}
 

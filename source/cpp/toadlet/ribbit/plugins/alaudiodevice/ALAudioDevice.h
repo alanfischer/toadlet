@@ -55,7 +55,6 @@ public:
 	const static int Option_BUFFER_FADE_TIME=1;
 	
 	ALAudioDevice();
-	virtual ~ALAudioDevice();
 
 	bool create(int *options);
 	void destroy();

@@ -43,7 +43,6 @@ public:
 	TOADLET_RESOURCE(D3D10Buffer,BaseResource);
 
 	D3D10Buffer(D3D10RenderDevice *renderDevice);
-	virtual ~D3D10Buffer();
 
 	IndexBuffer *getRootIndexBuffer(){return this;}
 	VertexBuffer *getRootVertexBuffer(){return this;}
@@ -101,10 +100,6 @@ protected:
 			mD3DState(NULL){}
 
 		~TextureData(){
-			destroy();
-		}
-
-		void destroy(){
 			if(mD3DState!=NULL){
 				mD3DState->Release();
 				mD3DState=NULL;

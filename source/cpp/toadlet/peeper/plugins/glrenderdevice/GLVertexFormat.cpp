@@ -48,10 +48,6 @@ GLVertexFormat::GLVertexFormat(GLRenderDevice *renderDevice):
 	mDevice=renderDevice;
 }
 
-GLVertexFormat::~GLVertexFormat(){
-	destroy();
-}
-
 bool GLVertexFormat::create(){
 	if(mDevice!=NULL){
 		mDevice->vertexFormatCreated(this);

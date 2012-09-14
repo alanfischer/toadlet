@@ -57,10 +57,6 @@ GLBuffer::GLBuffer(GLRenderDevice *renderDevice):BaseResource(),
 	mDevice=renderDevice;
 }
 
-GLBuffer::~GLBuffer(){
-	destroy();
-}
-
 bool GLBuffer::create(int usage,int access,IndexFormat indexFormat,int size){
 	mUsage=usage;
 	mAccess=access;

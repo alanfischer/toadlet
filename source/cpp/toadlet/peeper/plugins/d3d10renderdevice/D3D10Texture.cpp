@@ -61,12 +61,6 @@ D3D10Texture::D3D10Texture(D3D10RenderDevice *renderDevice):BaseResource(),
 	mD3DDevice=mDevice->getD3D10Device();
 }
 
-D3D10Texture::~D3D10Texture(){
-	if(mTexture!=NULL){
-		destroy();
-	}
-}
-
 bool D3D10Texture::create(int usage,TextureFormat::ptr format,byte *mipDatas[]){
 	mUsage=usage;
 	mFormat=format;

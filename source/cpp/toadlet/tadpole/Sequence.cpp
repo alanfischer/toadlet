@@ -33,11 +33,8 @@ Sequence::Sequence():
 {
 }
 
-Sequence::~Sequence(){
-	destroy();
-}
-
 void Sequence::destroy(){
+	BaseResource::destroy();
 }
 
 void Sequence::compile(){

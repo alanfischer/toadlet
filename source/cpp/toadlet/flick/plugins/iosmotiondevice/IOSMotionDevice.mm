@@ -60,10 +60,6 @@ IOSMotionDevice::IOSMotionDevice():
 
 {}
 
-IOSMotionDevice::~IOSMotionDevice(){
-	destroy();
-}
-
 bool IOSMotionDevice::create(){
 	mAccelerometerDelegate=[[ToadletAccelerometerDelegate alloc] initWithMotionDevice:this];
 

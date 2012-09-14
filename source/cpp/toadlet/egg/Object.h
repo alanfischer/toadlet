@@ -46,10 +46,13 @@ public:
 	virtual int release(){
 		int count=--mSharedCount;
 		if(mSharedCount<=0){
+			destroy();
 			delete this;
 		}
 		return count;
 	}
+
+	virtual void destroy(){}
 
 protected:
 	int mSharedCount;

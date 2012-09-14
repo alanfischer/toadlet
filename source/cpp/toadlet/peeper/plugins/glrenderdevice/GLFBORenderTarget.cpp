@@ -57,10 +57,6 @@ GLFBORenderTarget::GLFBORenderTarget(GLRenderDevice *renderDevice):
 	mDevice=renderDevice;
 }
 
-GLFBORenderTarget::~GLFBORenderTarget(){
-	destroy();
-}
-
 bool GLFBORenderTarget::create(){
 	mWidth=0;
 	mHeight=0;

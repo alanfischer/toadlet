@@ -49,7 +49,6 @@ public:
 	TOADLET_OBJECT(D3D9RenderDevice);
 
 	D3D9RenderDevice();
-	virtual ~D3D9RenderDevice();
 
 	// Startup/Shutdown
 	bool create(RenderTarget *target,int *options);

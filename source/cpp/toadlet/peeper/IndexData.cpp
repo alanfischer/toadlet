@@ -42,13 +42,5 @@ IndexData::IndexData(Primitive primitive1,IndexBuffer::ptr indexBuffer1,int star
 	count(count1)
 {}
 
-IndexData::~IndexData(){
-	destroy();
-}
-
-void IndexData::destroy(){
-	indexBuffer=NULL;
-}
-
 }
 }

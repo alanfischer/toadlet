@@ -39,7 +39,6 @@ public:
 	TOADLET_RESOURCE(AndroidAssetArchive,Archive);
 
 	AndroidAssetArchive(JNIEnv *jenv,jobject jassetManager);
-	virtual ~AndroidAssetArchive();
 
 	void destroy();
 

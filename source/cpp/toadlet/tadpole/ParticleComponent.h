@@ -75,7 +75,6 @@ public:
 	};
 
 	ParticleComponent(Scene *scene);
-	virtual ~ParticleComponent();
 	void destroy();
 
 	bool parentChanged(Node *node);

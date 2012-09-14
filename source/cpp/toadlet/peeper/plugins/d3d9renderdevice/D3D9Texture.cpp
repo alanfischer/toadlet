@@ -50,12 +50,6 @@ D3D9Texture::D3D9Texture(D3D9RenderDevice *renderDevice):BaseResource(),
 	mDevice=renderDevice;
 }
 
-D3D9Texture::~D3D9Texture(){
-	if(mTexture!=NULL){
-		destroy();
-	}
-}
-
 bool D3D9Texture::create(int usage,TextureFormat::ptr format,byte *mipDatas[]){
 	if(format->isPowerOf2()==false &&
 		mDevice->getCaps().textureNonPowerOf2==false &&

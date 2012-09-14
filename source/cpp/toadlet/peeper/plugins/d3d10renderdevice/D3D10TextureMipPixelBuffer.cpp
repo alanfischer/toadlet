@@ -79,10 +79,6 @@ D3D10TextureMipPixelBuffer::D3D10TextureMipPixelBuffer(D3D10RenderDevice *render
 	mDevice=renderDevice;
 }
 
-D3D10TextureMipPixelBuffer::~D3D10TextureMipPixelBuffer(){
-	destroy();
-}
-
 bool D3D10TextureMipPixelBuffer::create(int usage,int access,TextureFormat::ptr format){
 	if(mTexture!=NULL){
 		// We are a D3D10Texture backed PixelBuffer, so we can not be created

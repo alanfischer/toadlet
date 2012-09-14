@@ -45,7 +45,6 @@ public:
 	TOADLET_OBJECT(BSP30Node);
 
 	BSP30Node(Scene *scene);
-	virtual ~BSP30Node();
 
 	void setMap(const String &name);
 	void setMap(BSP30Map *map);

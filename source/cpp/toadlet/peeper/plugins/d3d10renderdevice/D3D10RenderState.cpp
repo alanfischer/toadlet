@@ -45,10 +45,6 @@ D3D10RenderState::D3D10RenderState(D3D10RenderDevice *renderDevice):
 	mD3DDevice=mDevice->getD3D10Device();
 }
 
-D3D10RenderState::~D3D10RenderState(){
-	destroy();
-}
-
 void D3D10RenderState::destroy(){
 	if(mBlendState!=NULL){
 		delete mBlendState;

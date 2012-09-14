@@ -51,10 +51,6 @@ Win32ResourceArchive::Win32ResourceArchive():
 	mModule(0)
 {}
 
-Win32ResourceArchive::~Win32ResourceArchive(){
-	destroy();
-}
-
 void Win32ResourceArchive::destroy(){
 	mModule=0;
 

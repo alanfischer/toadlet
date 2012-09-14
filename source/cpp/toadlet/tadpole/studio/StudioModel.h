@@ -42,10 +42,6 @@ public:
 		data(NULL),
 		header(NULL)
 	{}
-
-	virtual ~StudioModel(){
-		destroy();
-	}
 	
 	void destroy(){
 		if(data!=NULL){

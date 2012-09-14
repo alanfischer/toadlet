@@ -50,10 +50,6 @@ D3D9VertexBuffer::D3D9VertexBuffer(D3D9RenderDevice *renderDevice):
 	mDevice=renderDevice;
 }
 
-D3D9VertexBuffer::~D3D9VertexBuffer(){
-	destroy();
-}
-
 bool D3D9VertexBuffer::create(int usage,int access,VertexFormat::ptr vertexFormat,int size){
 	mUsage=usage;
 	mAccess=access;

@@ -52,10 +52,6 @@ Win32JoyDevice::Win32JoyDevice():
 	memset(&mLastJoyInfo,0,sizeof(JOYINFOEX));
 }
 
-Win32JoyDevice::~Win32JoyDevice(){
-	destroy();
-}
-
 bool Win32JoyDevice::create(){
 	mJoyInfo.dwSize=sizeof(JOYINFOEX);
 	mJoyInfo.dwFlags=JOY_RETURNALL;

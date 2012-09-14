@@ -44,8 +44,6 @@ public:
 
 	D3D10Shader(D3D10RenderDevice *renderDevice);
 
-	virtual ~D3D10Shader();
-
 	Shader *getRootShader(){return this;}
 
 	bool create(ShaderType shaderType,const String &profile,const String &code);

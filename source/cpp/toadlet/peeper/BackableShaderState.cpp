@@ -33,10 +33,6 @@ BackableShaderState::BackableShaderState():BaseResource()
 	//mShaders
 {}
 
-BackableShaderState::~BackableShaderState(){
-	destroy();
-}
-
 void BackableShaderState::destroy(){
 	if(mBack!=NULL){
 		mBack->destroy();

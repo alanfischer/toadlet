@@ -43,10 +43,6 @@ GLFBOPixelBuffer::GLFBOPixelBuffer(GLFBORenderTarget *target):
 	mTarget=target;
 }
 
-GLFBOPixelBuffer::~GLFBOPixelBuffer(){
-	destroy();
-}
-
 bool GLFBOPixelBuffer::create(int usage,int access,TextureFormat::ptr format){
 	TOADLET_CHECK_GLERROR("entering GLFBOPixelBuffer::create");
 

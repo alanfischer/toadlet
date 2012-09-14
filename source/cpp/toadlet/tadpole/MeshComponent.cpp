@@ -81,10 +81,6 @@ void MeshComponent::destroy(){
 	BaseComponent::destroy();
 }
 
-MeshComponent::~MeshComponent(){
-	destroy();
-}
-
 bool MeshComponent::parentChanged(Node *node){
 	if(mParent!=NULL){
 		mParent->visibleRemoved(this);

@@ -92,10 +92,6 @@ D3D9RenderDevice::D3D9RenderDevice():
 {
 }
 
-D3D9RenderDevice::~D3D9RenderDevice(){
-	destroy();
-}
-
 bool D3D9RenderDevice::create(RenderTarget *target,int *options){
 	Logger::alert(Categories::TOADLET_PEEPER,
 		"creating "+Categories::TOADLET_PEEPER+".D3D9RenderDevice");

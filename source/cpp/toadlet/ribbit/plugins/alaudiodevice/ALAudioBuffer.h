@@ -37,7 +37,6 @@ class ALAudioDevice;
 class TOADLET_API ALAudioBuffer:public BaseAudioBuffer{
 public:
 	ALAudioBuffer(ALAudioDevice *device);
-	virtual ~ALAudioBuffer();
 
 	AudioBuffer *getRootAudioBuffer(){return this;}
 

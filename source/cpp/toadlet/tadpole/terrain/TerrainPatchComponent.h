@@ -80,7 +80,6 @@ public:
 	};
 
 	TerrainPatchComponent(Scene *scene);
-	virtual ~TerrainPatchComponent();
 	void destroy();
 
 	bool parentChanged(Node *node);

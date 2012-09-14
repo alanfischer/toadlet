@@ -41,8 +41,6 @@ public:
 
 	D3D9Shader(D3D9RenderDevice *renderDevice);
 
-	virtual ~D3D9Shader();
-
 	Shader *getRootShader(){return this;}
 
 	bool create(ShaderType shaderType,const String &profile,const String &code);

@@ -43,8 +43,6 @@ public:
 	D3D10Texture(D3D10RenderDevice *renderDevice);
 	D3D10Texture(ID3D10Device *device);
 
-	virtual ~D3D10Texture();
-
 	Texture *getRootTexture(){return this;}
 
 	bool create(int usageFlags,TextureFormat::ptr format,byte *mipDatas[]);

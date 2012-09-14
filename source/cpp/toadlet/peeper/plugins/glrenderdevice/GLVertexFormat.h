@@ -40,7 +40,6 @@ public:
 	TOADLET_RESOURCE(GLVertexFormat,VertexFormat);
 
 	GLVertexFormat(GLRenderDevice *renderDevice);
-	virtual ~GLVertexFormat();
 
 	VertexFormat *getRootVertexFormat(){return this;}
 

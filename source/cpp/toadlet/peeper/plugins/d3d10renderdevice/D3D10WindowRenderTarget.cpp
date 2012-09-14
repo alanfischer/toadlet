@@ -66,8 +66,10 @@ D3D10WindowRenderTarget::D3D10WindowRenderTarget(HWND wnd,WindowRenderTargetForm
 	createContext(wnd,format);
 }
 
-D3D10WindowRenderTarget::~D3D10WindowRenderTarget(){
-	destroy();
+void D3D10WindowRenderTarget::destroy(){
+	destroyContext();
+	
+	BaseResource::destroy();
 }
 
 void D3D10WindowRenderTarget::swap(){

@@ -37,7 +37,6 @@ namespace tadpole{
 class AnaglyphCamera:public Camera{
 public:
 	AnaglyphCamera(Engine *engine);
-	virtual ~AnaglyphCamera();
 
 	void destroy();
 

@@ -43,7 +43,6 @@ public:
 	TOADLET_RESOURCE(GLSLShader,Shader);
 
 	GLSLShader(GLRenderDevice *renderDevice);
-	virtual ~GLSLShader();
 	
 	Shader *getRootShader(){return this;}
 

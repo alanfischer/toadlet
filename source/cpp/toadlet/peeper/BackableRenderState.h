@@ -38,7 +38,6 @@ public:
 	TOADLET_RESOURCE(BackableRenderState,RenderState);
 
 	BackableRenderState();
-	virtual ~BackableRenderState();
 
 	virtual RenderState *getRootRenderState(){return mBack;}
 

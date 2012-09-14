@@ -125,8 +125,6 @@ ZIPArchive::ZIPArchive():
 }
 
 ZIPArchive::~ZIPArchive(){
-	destroy();
-
 	delete (zzip_plugin_io_handlers*)mIO;
 }
 

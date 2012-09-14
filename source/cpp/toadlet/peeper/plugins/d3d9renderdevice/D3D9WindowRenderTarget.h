@@ -45,8 +45,7 @@ public:
 
 	D3D9WindowRenderTarget();
 	D3D9WindowRenderTarget(HWND wnd,WindowRenderTargetFormat *format);
-	virtual ~D3D9WindowRenderTarget();
-	void destroy(){destroyContext();BaseResource::destroy();}
+	void destroy();
 
 	RenderTarget *getRootRenderTarget(){return this;}
 	bool isPrimary() const{return true;}

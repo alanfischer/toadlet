@@ -45,7 +45,6 @@ public:
 	static bool available(GLRenderDevice *renderDevice);
 
 	GLFBORenderTarget(GLRenderDevice *renderDevice);
-	virtual ~GLFBORenderTarget();
 
 	RenderTarget *getRootRenderTarget(){return (GLRenderTarget*)this;}
 	PixelBufferRenderTarget *getRootPixelBufferRenderTarget(){return this;}

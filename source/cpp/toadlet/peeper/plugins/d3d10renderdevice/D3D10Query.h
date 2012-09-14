@@ -40,7 +40,6 @@ public:
 	TOADLET_RESOURCE(D3D10Query,Query);
 
 	D3D10Query(D3D10RenderDevice *renderDevice);
-	virtual ~D3D10Query();
 
 	Query *getRootQuery(){return this;}
 

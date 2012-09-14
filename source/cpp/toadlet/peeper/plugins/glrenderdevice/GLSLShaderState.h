@@ -42,7 +42,6 @@ public:
 	TOADLET_RESOURCE(GLSLShaderState,ShaderState);
 
 	GLSLShaderState(GLRenderDevice *renderDevice);
-	virtual ~GLSLShaderState();
 
 	ShaderState *getRootShaderState(){return this;}
 

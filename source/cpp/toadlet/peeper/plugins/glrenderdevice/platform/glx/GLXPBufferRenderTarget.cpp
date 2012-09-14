@@ -62,10 +62,6 @@ GLXPBufferRenderTarget::GLXPBufferRenderTarget(GLRenderDevice *renderDevice):
 	mDevice=renderDevice;
 }
 
-GLXPBufferRenderTarget::~GLXPBufferRenderTarget(){
-	destroy();
-}
-
 bool GLXPBufferRenderTarget::create(){
 	mWidth=0;
 	mHeight=0;

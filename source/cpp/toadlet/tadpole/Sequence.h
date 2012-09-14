@@ -37,7 +37,6 @@ public:
 	TOADLET_RESOURCE(Sequence,Sequence);
 
 	Sequence();
-	virtual ~Sequence();
 
 	void destroy();
 	void compile();

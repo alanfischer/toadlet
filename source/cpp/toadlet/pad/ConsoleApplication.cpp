@@ -39,10 +39,6 @@ ConsoleApplication::ConsoleApplication():
 	mRun(false)
 {}
 
-ConsoleApplication::~ConsoleApplication(){
-	destroy();
-}
-
 void ConsoleApplication::start(){
 	mRun=true;
 	

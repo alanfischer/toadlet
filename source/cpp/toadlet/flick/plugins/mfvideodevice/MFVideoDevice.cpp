@@ -51,10 +51,6 @@ MFVideoDevice::MFVideoDevice():
 	mRef(0)
 {}
 
-MFVideoDevice::~MFVideoDevice(){
-	destroy();
-}
-
 bool MFVideoDevice::create(){
 	if(mReader!=NULL){
 		return false;

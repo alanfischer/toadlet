@@ -39,10 +39,6 @@ D3D9ShaderState::D3D9ShaderState(D3D9RenderDevice *renderDevice):
 	mDevice=renderDevice;
 }
 
-D3D9ShaderState::~D3D9ShaderState(){
-	destroy();
-}
-
 void D3D9ShaderState::destroy(){
 	mShaders.clear();
 

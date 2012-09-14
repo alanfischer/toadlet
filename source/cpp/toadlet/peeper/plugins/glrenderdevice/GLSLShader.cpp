@@ -44,10 +44,6 @@ GLSLShader::GLSLShader(GLRenderDevice *renderDevice):
 	mDevice=renderDevice;
 }
 
-GLSLShader::~GLSLShader(){
-	destroy();
-}
-
 bool GLSLShader::create(ShaderType shaderType,const String &profile,const String &code){
 	mShaderType=shaderType;
 	mProfile=profile;

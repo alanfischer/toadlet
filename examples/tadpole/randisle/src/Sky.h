@@ -46,7 +46,6 @@ protected:
 class Sky:public Node{
 public:
 	Sky(Scene *scene,int cloudSize,const Vector4 &skyColor,const Vector4 &fadeColor);
-	virtual ~Sky(){destroy();}
 
 	void destroy();
 

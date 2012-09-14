@@ -68,10 +68,6 @@ RenderPass::RenderPass(MaterialManager *manager,RenderState *renderState,ShaderS
 	}
 }
 
-RenderPass::~RenderPass(){
-	destroy();
-}
-
 void RenderPass::destroy(){
 	if(mOwnRenderState!=NULL){
 		mOwnRenderState->destroy();

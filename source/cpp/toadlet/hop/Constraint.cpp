@@ -77,10 +77,6 @@ Constraint::Constraint(Solid *startSolid,const Vector3 &endPoint):
 	setEndPoint(endPoint);
 }
 
-Constraint::~Constraint(){
-	destroy();
-}
-
 void Constraint::reset(){
 	destroy();
 

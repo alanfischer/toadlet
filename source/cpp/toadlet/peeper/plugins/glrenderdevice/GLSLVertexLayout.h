@@ -42,7 +42,6 @@ public:
 	TOADLET_OBJECT(GLSLVertexLayout);
 
 	GLSLVertexLayout(GLRenderDevice *renderDevice);
-	virtual ~GLSLVertexLayout();
 
 	bool create(GLVertexFormat *vertexFormat,GLSLShaderState *shaderState);
 	void destroy();

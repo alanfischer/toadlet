@@ -101,12 +101,8 @@ public:
 	};
 
 	Tree(Scene *scene,int seed,Node *parent,const Vector3 &translate);
-	virtual ~Tree(){destroy();}
 	void destroy();
 
-	void logicUpdate(int dt,int scope){
-		Node::logicUpdate(dt,scope);
-	}
 	void frameUpdate(int dt,int scope);
 
 	BranchSystem::Branch::ptr branchCreated(BranchSystem::Branch *parent);

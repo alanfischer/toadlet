@@ -41,7 +41,6 @@ public:
 	TOADLET_RESOURCE(D3D9VariableBuffer,VariableBuffer);
 
 	D3D9VariableBuffer(D3D9RenderDevice *renderDevice);
-	virtual ~D3D9VariableBuffer();
 
 	VariableBuffer *getRootVariableBuffer(){return this;}
 

@@ -66,10 +66,6 @@ TerrainPatchComponent::TerrainPatchComponent(Scene *scene):
 	mLocalCamera=new Camera();
 }
 
-TerrainPatchComponent::~TerrainPatchComponent(){
-	destroy();
-}
-
 void TerrainPatchComponent::destroy(){
 	mMaterial=NULL;
 	if(mVertexBuffer!=NULL){

@@ -50,7 +50,6 @@ public:
 	TOADLET_OBJECT(D3D10RenderDevice);
 
 	D3D10RenderDevice();
-	virtual ~D3D10RenderDevice();
 
 	// Startup/Shutdown
 	bool create(RenderTarget *target,int *options);

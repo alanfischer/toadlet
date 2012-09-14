@@ -45,10 +45,6 @@ D3D10VertexFormat::D3D10VertexFormat(D3D10RenderDevice *renderDevice):
 	mDevice=renderDevice;
 }
 
-D3D10VertexFormat::~D3D10VertexFormat(){
-	destroy();
-}
-
 bool D3D10VertexFormat::create(){
 	if(mDevice!=NULL){
 		mDevice->vertexFormatCreated(this);

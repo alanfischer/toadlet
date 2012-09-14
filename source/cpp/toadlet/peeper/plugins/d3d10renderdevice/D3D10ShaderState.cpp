@@ -38,10 +38,6 @@ D3D10ShaderState::D3D10ShaderState(D3D10RenderDevice *renderDevice):
 	mShaders.resize(Shader::ShaderType_MAX);
 }
 
-D3D10ShaderState::~D3D10ShaderState(){
-	destroy();
-}
-
 void D3D10ShaderState::destroy(){
 	mShaders.clear();
 

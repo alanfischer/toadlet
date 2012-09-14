@@ -55,10 +55,6 @@ ALAudio::ALAudio(ALAudioDevice *audioDevice):
 	mGain=Math::ONE;
 }
 
-ALAudio::~ALAudio(){
-	destroy();
-}
-
 bool ALAudio::create(AudioBuffer *audioBuffer){
 	if(audioBuffer==NULL){
 		Logger::warning(Categories::TOADLET_RIBBIT,"invalid audioBuffer");

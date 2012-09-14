@@ -46,10 +46,6 @@ BackableBuffer::BackableBuffer():
 	//mBack
 {}
 
-BackableBuffer::~BackableBuffer(){
-	destroy();
-}
-
 bool BackableBuffer::create(int usage,int access,IndexFormat indexFormat,int size){
 	mUsage=usage;
 	mAccess=access;

@@ -74,10 +74,6 @@ ALAudioDevice::ALAudioDevice():
 	mBufferFadeTime=100;
 }
 
-ALAudioDevice::~ALAudioDevice(){
-	destroy();
-}
-
 bool ALAudioDevice::create(int *options){
 	Logger::alert(Categories::TOADLET_RIBBIT,
 		"creating ALAudioDevice");

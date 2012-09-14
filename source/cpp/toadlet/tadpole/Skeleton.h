@@ -61,7 +61,6 @@ public:
 	};
 
 	Skeleton();
-	virtual ~Skeleton();
 
 	void destroy();
 	void compile();

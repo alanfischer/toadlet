@@ -50,12 +50,6 @@ AndroidAssetArchive::AndroidAssetArchive(JNIEnv *env1,jobject assetManagerObj1):
 	mStream=new JStream(env);
 }
 
-AndroidAssetArchive::~AndroidAssetArchive(){
-	destroy();
-
-	env=NULL;
-}
-
 void AndroidAssetArchive::destroy(){
 	if(assetManagerObj!=NULL){
 		env->DeleteGlobalRef(assetManagerObj);

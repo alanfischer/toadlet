@@ -59,10 +59,6 @@ MMAudioDevice::MMAudioDevice():
 {
 }
 
-MMAudioDevice::~MMAudioDevice(){
-	destroy();
-}
-
 bool MMAudioDevice::create(int *options){
 	Logger::alert(Categories::TOADLET_RIBBIT,
 		"creating MMAudioDevice");

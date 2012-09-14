@@ -40,7 +40,6 @@ public:
 	TOADLET_RESOURCE(D3D10RenderState,RenderState);
 
 	D3D10RenderState(D3D10RenderDevice *renderDevice);
-	virtual ~D3D10RenderState();
 
 	RenderState *getRootRenderState(){return this;}
 

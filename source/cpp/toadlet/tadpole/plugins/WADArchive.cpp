@@ -36,10 +36,6 @@ WADArchive::WADArchive(TextureManager *textureManager){
 	mTextureManager=textureManager;
 };
 
-WADArchive::~WADArchive(){
-	destroy();
-}
-
 void WADArchive::destroy(){
 	if(mStream!=NULL){
 		mStream->close();

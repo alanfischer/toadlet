@@ -38,10 +38,6 @@ BackableShader::BackableShader():BaseResource(),
 	//mBack
 {}
 
-BackableShader::~BackableShader(){
-	destroy();
-}
-
 bool BackableShader::create(ShaderType shaderType,const String &profile,const String &code){
 	mShaderType=shaderType;
 	

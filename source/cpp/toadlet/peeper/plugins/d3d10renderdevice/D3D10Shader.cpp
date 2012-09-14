@@ -49,12 +49,6 @@ D3D10Shader::D3D10Shader(D3D10RenderDevice *renderDevice):BaseResource(),
 	mD3DDevice=mDevice->getD3D10Device();
 }
 
-D3D10Shader::~D3D10Shader(){
-	if(mShader!=NULL){
-		destroy();
-	}
-}
-
 bool D3D10Shader::create(ShaderType shaderType,const String &profile,const String &code){
 	mShaderType=shaderType;
 	mProfile=profile;

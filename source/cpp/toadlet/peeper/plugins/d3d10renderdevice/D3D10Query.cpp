@@ -38,10 +38,6 @@ D3D10Query::D3D10Query(D3D10RenderDevice *renderDevice):
 	mDevice=renderDevice;
 }
 
-D3D10Query::~D3D10Query(){
-	destroy();
-}
-
 bool D3D10Query::create(QueryType queryType){
 	mQueryType=queryType;
 	

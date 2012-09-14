@@ -45,7 +45,6 @@ public:
 	TOADLET_OBJECT(ResourceManager);
 
 	ResourceManager(Engine *engine);
-	virtual ~ResourceManager();
 
 	virtual void destroy();
 

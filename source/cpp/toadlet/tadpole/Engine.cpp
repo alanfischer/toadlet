@@ -216,8 +216,6 @@ Engine::Engine(void *env,void *ctx)://bool fixedBackable,bool shaderBackable):
 Engine::~Engine(){
 	Logger::debug(Categories::TOADLET_TADPOLE,
 		"Engine::~Engine");
-
-	destroy();
 }
 
 void Engine::destroy(){

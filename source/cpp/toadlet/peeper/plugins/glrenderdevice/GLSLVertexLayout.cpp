@@ -36,10 +36,6 @@ GLSLVertexLayout::GLSLVertexLayout(GLRenderDevice *renderDevice){
 	mDevice=renderDevice;
 }
 
-GLSLVertexLayout::~GLSLVertexLayout(){
-	destroy();
-}
-
 bool GLSLVertexLayout::create(GLVertexFormat *vertexFormat,GLSLShaderState *shaderState){
 	mSemanticIndexes.resize(vertexFormat->getNumElements());
 

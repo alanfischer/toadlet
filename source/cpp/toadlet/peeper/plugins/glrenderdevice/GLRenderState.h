@@ -30,6 +30,7 @@
 #include <toadlet/egg/BaseResource.h>
 #include <toadlet/peeper/RenderState.h>
 
+
 namespace toadlet{
 namespace peeper{
 
@@ -40,7 +41,6 @@ public:
 	TOADLET_RESOURCE(GLRenderState,RenderState);
 
 	GLRenderState(GLRenderDevice *renderDevice);
-	virtual ~GLRenderState();
 
 	RenderState *getRootRenderState(){return this;}
 

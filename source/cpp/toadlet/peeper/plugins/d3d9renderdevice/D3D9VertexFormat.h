@@ -40,7 +40,6 @@ public:
 	TOADLET_RESOURCE(D3D9VertexFormat,VertexFormat);
 
 	D3D9VertexFormat(D3D9RenderDevice *renderDevice);
-	virtual ~D3D9VertexFormat();
 
 	VertexFormat *getRootVertexFormat(){return this;}
 

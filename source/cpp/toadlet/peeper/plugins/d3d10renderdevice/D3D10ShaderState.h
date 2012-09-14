@@ -42,7 +42,6 @@ public:
 	TOADLET_RESOURCE(D3D10ShaderState,ShaderState);
 
 	D3D10ShaderState(D3D10RenderDevice *renderDevice);
-	virtual ~D3D10ShaderState();
 
 	ShaderState *getRootShaderState(){return this;}
 

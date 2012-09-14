@@ -113,7 +113,6 @@ public:
 	TOADLET_OBJECT(AndroidSensorDevice);
 
 	AndroidSensorDevice(int type);
-	virtual ~AndroidSensorDevice();
 
 	virtual bool create();
 	virtual void destroy();

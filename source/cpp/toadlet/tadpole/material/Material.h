@@ -54,7 +54,6 @@ public:
 	};
 
 	Material(MaterialManager *manager);
-	virtual ~Material();
 
 	void destroy();
 

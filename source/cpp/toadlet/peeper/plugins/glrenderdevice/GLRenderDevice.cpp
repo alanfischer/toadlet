@@ -109,10 +109,6 @@ GLRenderDevice::GLRenderDevice():
 	mGLRenderTarget(NULL)
 {}
 
-GLRenderDevice::~GLRenderDevice(){
-	destroy();
-}
-
 bool GLRenderDevice::create(RenderTarget *target,int *options){
 	Logger::alert(Categories::TOADLET_PEEPER,
 		"creating "+Categories::TOADLET_PEEPER+".GLRenderDevice");

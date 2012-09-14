@@ -39,18 +39,6 @@ public:
 	BaseResource():Object(),mListener(NULL),mName(),mUniqueHandle(0){}
 	virtual ~BaseResource(){}
 
-	virtual int retain(){return Object::retain();}
-
-	virtual int release(){
-		int count=--mSharedCount;
-		if(mSharedCount<=0){
-			destroy();
-			TOADLET_ASSERT(mListener==NULL);
-			delete this;
-		}
-		return count;
-	}
-
 	virtual void destroy(){
 		if(mListener!=NULL){
 			mListener->resourceDestroyed(resourceThis());

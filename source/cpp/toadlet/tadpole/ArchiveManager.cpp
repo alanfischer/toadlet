@@ -35,10 +35,6 @@ namespace tadpole{
 ArchiveManager::ArchiveManager(Engine *engine):ResourceManager(engine){
 }
 
-ArchiveManager::~ArchiveManager(){
-	destroy();
-}
-
 void ArchiveManager::addDirectory(const String &directory){
 	mDirectories.add(cleanPath(directory,true));
 }

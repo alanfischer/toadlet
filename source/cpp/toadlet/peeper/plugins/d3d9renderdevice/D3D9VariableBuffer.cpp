@@ -45,10 +45,6 @@ D3D9VariableBuffer::D3D9VariableBuffer(D3D9RenderDevice *renderDevice):
 	mDevice=renderDevice;
 }
 
-D3D9VariableBuffer::~D3D9VariableBuffer(){
-	destroy();
-}
-
 bool D3D9VariableBuffer::create(int usage,int access,VariableBufferFormat::ptr variableFormat){
 	mUsage=usage;
 	mAccess=access;

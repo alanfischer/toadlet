@@ -37,10 +37,6 @@ BackableRenderState::BackableRenderState():BaseResource(),
 	mMaterialState(NULL)
 {}
 
-BackableRenderState::~BackableRenderState(){
-	destroy();
-}
-
 void BackableRenderState::destroy(){
 	if(mBack!=NULL){
 		mBack->destroy();

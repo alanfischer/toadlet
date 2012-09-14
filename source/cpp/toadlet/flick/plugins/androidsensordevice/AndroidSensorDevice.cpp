@@ -46,9 +46,11 @@ AndroidSensorDevice::AndroidSensorDevice(int type):
 	mData(getInputTypeFromSensorType(type),0,2)
 {
 	DynamicLibrary::ptr library(new DynamicLibrary());
-	library->load("android");
+bool r=	library->load("android");
+Logger::alert(String("android?:")+r);
 	{
 		mALooper_forThread=(TALooper_forThread)library->getSymbol("ALooper_forThread");
+Logger::alert(String("mALooper_forThread?:")+(int)mALooper_forThread);
 		mALooper_prepare=(TALooper_prepare)library->getSymbol("ALooper_prepare");
 		
 		mASensorManager_getInstance=(TASensorManager_getInstance)library->getSymbol("ASensorManager_getInstance");
@@ -67,17 +69,15 @@ AndroidSensorDevice::AndroidSensorDevice(int type):
 	mInputType=getInputTypeFromSensorType(mSensorType);
 }
 
-AndroidSensorDevice::~AndroidSensorDevice(){
-	destroy();
-}
-
 bool AndroidSensorDevice::create(){
 	ALooper *looper=mALooper_forThread();
 	if(looper==NULL){
 		looper=mALooper_prepare(ALOOPER_PREPARE_ALLOW_NON_CALLBACKS);
 	}
-	
+
+Logger::alert("CREATED");
 	mEventQueue=mASensorManager_createEventQueue(mSensorManager,looper,0,sensorChanged,this);
+Logger::alert(String("QUEUE:")+mEventQueue);
 
 	mSensor=mASensorManager_getDefaultSensor(mSensorManager,mSensorType);
 	
@@ -119,6 +119,7 @@ void AndroidSensorDevice::setSampleTime(int dt){
 }
 
 void AndroidSensorDevice::onSensorChanged(){
+Logger::alert("CHANGED");
 	ASensorEvent event;
 	int numEvents=0;
 	while((numEvents=mASensorEventQueue_getEvents(mEventQueue,&event,1))>0){
