@@ -61,7 +61,6 @@ Resource::ptr StudioStreamer::load(Stream::ptr stream,ResourceData *data,Progres
 	dataStream->read(model->data,length);
 
 	model->header=(studiohdr*)model->data;
-
 	buildBuffers(model);
 	buildTextures(model);
 	buildMaterials(model);
