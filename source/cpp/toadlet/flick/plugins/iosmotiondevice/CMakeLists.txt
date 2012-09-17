@@ -5,7 +5,7 @@ set (IOSMOTIONDEVICE_SRC
 
 
 # Headers
-set (IOSMOTIONDEVICE_HEADERS
+set (IOSMOTIONDEVICE_HDR
 	IOSMotionDevice.h
 )
 
@@ -13,7 +13,7 @@ set (IOSMOTIONDEVICE_HEADERS
 # Static library
 if (TOADLET_BUILD_STATIC)
 	find_library (UIKIT_LIBS UIKit)
-	add_library (toadlet_flick_iosmotiondevice_s STATIC ${IOSMOTIONDEVICE_SRC} ${IOSMOTIONDEVICE_HEADERS})
+	add_library (toadlet_flick_iosmotiondevice_s STATIC ${IOSMOTIONDEVICE_SRC} ${IOSMOTIONDEVICE_HDR})
 	set_target_properties (toadlet_flick_iosmotiondevice_s PROPERTIES ${STATIC_LIB_PROPS})
 	target_link_libraries (toadlet_flick_iosmotiondevice_s objc ${UIKIT_LIBS} toadlet_flick_s)
 	install (TARGETS toadlet_flick_iosmotiondevice_s DESTINATION ${LIB_INSTALL_DIR})

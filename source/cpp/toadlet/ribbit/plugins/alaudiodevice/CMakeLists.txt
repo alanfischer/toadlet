@@ -11,14 +11,14 @@ set (RIBBIT_ALAUDIODEVICE_ALEM_SRC
 
 
 # Headers
-set (RIBBIT_ALAUDIODEVICE_HEADERS
+set (RIBBIT_ALAUDIODEVICE_HDR
 	ALAudioBuffer.h
 	ALAudio.h
 	ALIncludes.h
 	ALAudioDevice.h
 )
 
-set (RIBBIT_ALAUDIODEVICE_ALEM_HEADERS
+set (RIBBIT_ALAUDIODEVICE_ALEM_HDR
 	alem/alem.h
 )
 
@@ -38,15 +38,15 @@ elseif (TOADLET_PLATFORM_WIN32 OR TOADLET_PLATFORM_POSIX)
 	set (RIBBIT_ALAUDIODEVICE_DEFS "ALEM_BUILD")
 	set (RIBBIT_ALAUDIODEVICE_DEFS_S "ALEM_BUILD" "ALEM_STATIC")
 	source_group ("Source Files\\\\alem" FILES ${RIBBIT_ALAUDIODEVICE_ALEM_SRC})
-	source_group ("Header Files\\\\alem" FILES ${RIBBIT_ALAUDIODEVICE_ALEM_HEADERS})
+	source_group ("Header Files\\\\alem" FILES ${RIBBIT_ALAUDIODEVICE_ALEM_HDR})
 	set (RIBBIT_ALAUDIODEVICE_SRC ${RIBBIT_ALAUDIODEVICE_SRC} ${RIBBIT_ALAUDIODEVICE_ALEM_SRC})
-	set (RIBBIT_ALAUDIODEVICE_HEADERS ${RIBBIT_ALAUDIODEVICE_HEADERS} ${RIBBIT_ALAUDIODEVICE_ALEM_HEADERS})
+	set (RIBBIT_ALAUDIODEVICE_HDR ${RIBBIT_ALAUDIODEVICE_HDR} ${RIBBIT_ALAUDIODEVICE_ALEM_HDR})
 endif (TOADLET_PLATFORM_OSX OR TOADLET_PLATFORM_IOS)
 
 
 # Dynamic library
 if (TOADLET_BUILD_DYNAMIC)
-	add_library (toadlet_ribbit_alaudiodevice SHARED ${RIBBIT_ALAUDIODEVICE_SRC} ${RIBBIT_ALAUDIODEVICE_HEADERS})
+	add_library (toadlet_ribbit_alaudiodevice SHARED ${RIBBIT_ALAUDIODEVICE_SRC} ${RIBBIT_ALAUDIODEVICE_HDR})
 	set_target_properties (toadlet_ribbit_alaudiodevice PROPERTIES ${DYNAMIC_LIB_PROPS})
 	set_property (TARGET toadlet_ribbit_alaudiodevice APPEND PROPERTY COMPILE_DEFINITIONS ${RIBBIT_ALAUDIODEVICE_DEFS})
 	target_link_libraries (toadlet_ribbit_alaudiodevice toadlet_ribbit ${RIBBIT_ALAUDIODEVICE_LIBS})
@@ -56,7 +56,7 @@ endif (TOADLET_BUILD_DYNAMIC)
 
 # Static library
 if (TOADLET_BUILD_STATIC)
-	add_library (toadlet_ribbit_alaudiodevice_s STATIC ${RIBBIT_ALAUDIODEVICE_SRC} ${RIBBIT_ALAUDIODEVICE_HEADERS})
+	add_library (toadlet_ribbit_alaudiodevice_s STATIC ${RIBBIT_ALAUDIODEVICE_SRC} ${RIBBIT_ALAUDIODEVICE_HDR})
 	set_target_properties (toadlet_ribbit_alaudiodevice_s PROPERTIES ${STATIC_LIB_PROPS})
 	set_property (TARGET toadlet_ribbit_alaudiodevice_s APPEND PROPERTY COMPILE_DEFINITIONS ${RIBBIT_ALAUDIODEVICE_DEFS_S})
 	target_link_libraries (toadlet_ribbit_alaudiodevice_s toadlet_ribbit_s ${RIBBIT_ALAUDIODEVICE_LIBS})

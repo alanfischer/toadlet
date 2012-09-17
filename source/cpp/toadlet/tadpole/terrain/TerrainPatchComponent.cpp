@@ -107,20 +107,16 @@ void TerrainPatchComponent::destroy(){
 	BaseComponent::destroy();
 }
 
-bool TerrainPatchComponent::parentChanged(Node *node){
+void TerrainPatchComponent::parentChanged(Node *node){
 	if(mParent!=NULL){
 		mParent->visibleRemoved(this);
 	}
 
-	if(BaseComponent::parentChanged(node)==false){
-		return false;
-	}
-	
+	BaseComponent::parentChanged(node);
+
 	if(mParent!=NULL){
 		mParent->visibleAttached(this);
 	}
-
-	return true;
 }
 
 bool TerrainPatchComponent::setHeightData(scalar *data,int rowPitch,int width,int height,bool water){

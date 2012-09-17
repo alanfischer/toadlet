@@ -10,7 +10,7 @@ set (FLICK_SRC
 
 
 # Header files for flick
-set (FLICK_HEADERS
+set (FLICK_HDR
 	BaseInputDevice.h
 	FilteredMotionDevice.h
 	InputData.h
@@ -24,7 +24,7 @@ set (FLICK_HEADERS
 
 
 # Give the headers and namespaces parent scope for inclusion into the master flick.h file
-set (FLICK_HEADERS ${FLICK_HEADERS} PARENT_SCOPE)
+set (FLICK_HDR ${FLICK_HDR} PARENT_SCOPE)
 set (FLICK_NAMESPACES ${FLICK_NAMESPACES} PARENT_SCOPE)
 
 
@@ -37,7 +37,7 @@ endif (SWIG_FOUND AND FLICK_SWIG_INT)
 
 # Dynamic library
 if (TOADLET_BUILD_DYNAMIC)
-	add_library (toadlet_flick SHARED ${FLICK_SRC} ${FLICK_HEADERS})
+	add_library (toadlet_flick SHARED ${FLICK_SRC} ${FLICK_HDR})
 	set_target_properties (toadlet_flick PROPERTIES ${DYNAMIC_LIB_PROPS})
 	target_link_libraries (toadlet_flick toadlet_egg)
 	install (TARGETS toadlet_flick DESTINATION ${LIB_INSTALL_DIR})
@@ -46,7 +46,7 @@ endif (TOADLET_BUILD_DYNAMIC)
 
 # Static library
 if (TOADLET_BUILD_STATIC)
-	add_library (toadlet_flick_s STATIC ${FLICK_SRC} ${FLICK_HEADERS})
+	add_library (toadlet_flick_s STATIC ${FLICK_SRC} ${FLICK_HDR})
 	set_target_properties (toadlet_flick_s PROPERTIES ${STATIC_LIB_PROPS})
 	target_link_libraries (toadlet_flick_s toadlet_egg_s)
 	install (TARGETS toadlet_flick_s DESTINATION ${LIB_INSTALL_DIR})

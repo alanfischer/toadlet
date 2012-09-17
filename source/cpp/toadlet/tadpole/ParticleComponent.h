@@ -77,7 +77,7 @@ public:
 	ParticleComponent(Scene *scene);
 	void destroy();
 
-	bool parentChanged(Node *node);
+	void parentChanged(Node *node);
 	
 	bool setNumParticles(int numParticles,int particleType,scalar scale=Math::ONE,const Vector3 positions[]=NULL);
 	inline int getNumParticles() const{return mParticles.size();}

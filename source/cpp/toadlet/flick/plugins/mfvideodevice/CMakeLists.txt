@@ -5,7 +5,7 @@ set (MFVIDEODEVICE_SRC
 
 
 # Headers
-set (MFVIDEODEVICE_HEADERS
+set (MFVIDEODEVICE_HDR
 	MFVideoDevice.h
 )
 
@@ -13,7 +13,7 @@ include_directories (${MEDIAFOUNDATION_INCLUDE_DIR})
 
 # Dynamic library
 if (TOADLET_BUILD_DYNAMIC)
-	add_library (toadlet_flick_mfvideodevice SHARED ${MFVIDEODEVICE_SRC} ${MFVIDEODEVICE_HEADERS})
+	add_library (toadlet_flick_mfvideodevice SHARED ${MFVIDEODEVICE_SRC} ${MFVIDEODEVICE_HDR})
 	set_target_properties (toadlet_flick_mfvideodevice PROPERTIES ${DYNAMIC_LIB_PROPS})
 	set_property (TARGET toadlet_flick_mfvideodevice APPEND PROPERTY COMPILE_DEFINITIONS ${MFVIDEODEVICE_DEFS})
 	target_link_libraries (toadlet_flick_mfvideodevice toadlet_flick ${MEDIAFOUNDATION_LIBRARIES})
@@ -22,7 +22,7 @@ endif (TOADLET_BUILD_DYNAMIC)
 
 # Static library
 if (TOADLET_BUILD_STATIC)
-	add_library (toadlet_flick_mfvideodevice_s STATIC ${MFVIDEODEVICE_SRC} ${MFVIDEODEVICE_HEADERS})
+	add_library (toadlet_flick_mfvideodevice_s STATIC ${MFVIDEODEVICE_SRC} ${MFVIDEODEVICE_HDR})
 	set_target_properties (toadlet_flick_mfvideodevice_s PROPERTIES ${STATIC_LIB_PROPS})
 	target_link_libraries (toadlet_flick_mfvideodevice_s toadlet_flick_s)
 	install (TARGETS toadlet_flick_mfvideodevice_s DESTINATION ${LIB_INSTALL_DIR})

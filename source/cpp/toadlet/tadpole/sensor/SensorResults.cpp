@@ -31,48 +31,16 @@ namespace tadpole{
 namespace sensor{
 
 SensorResults::SensorResults():
-	mMaxResults(-1),
-	mSortByHandle(false),
+	mMaxSize(-1),
 	mScope(-1),
 	//mResults,
 	mMaxDistance(0)
 {}
 
-SensorResults::~SensorResults(){
-}
-
-void SensorResults::setMaxNumResults(int num){
-	mMaxResults=num;
-	if(num>=0){
-		mResults.reserve(num);
-	}
-}
-
-// This could be optimized by storing some 'sensor data' into the node, which would be an index into our array
-//  It would avoid the initial lookup, but I'm not sure I want to do that
-Node *SensorResults::getNextResult(Node *result){
-	if(result==NULL){
-		if(mResults.size()==0){
-			return NULL;
-		}
-		else{
-			return mResults[0];
-		}
-	}
-
-	int i;
-	for(i=0;i<mResults.size();++i){
-		if(mResults[i]==result){
-			++i;
-			break;
-		}
-	}
-
-	if(i>=mResults.size()){
-		return NULL;
-	}
-	else{
-		return mResults[i];
+void SensorResults::setMaxSize(int size){
+	mMaxSize=size;
+	if(size>=0){
+		mResults.reserve(size);
 	}
 }
 
@@ -90,40 +58,11 @@ bool SensorResults::resultFound(Node *result,scalar distance){
 		return true;
 	}
 
-	if(mMaxResults>0 && mResults.size()>=mMaxResults && distance>mMaxDistance){
+	if(mMaxSize>0 && mResults.size()>=mMaxSize && distance>mMaxDistance){
 		return mMaxDistance>0; // If 0, then we can't find anything closer, so stop searching
 	}
 
-	/// @todo: Implement SortByHandle and closest results
-	// if(results full, but result is closer){
-	//   remove farthest result (stored as member variable)
-	// }
-	// if(sorted){
-	//   insert at sorted place
-	// }
-	// else{
-	//   insert at end
-	// }
-	// if(had farthest result){
-	//   remember farthest result
-	// }
-
-	if(mSortByHandle){
-		int handle=result->getUniqueHandle();
-		int i;
-		for(i=0;i<mResults.size();++i){
-			if(mResults[i]->getUniqueHandle()>=handle){
-				mResults.insert(mResults.begin()+i,result);
-				break;
-			}
-		}
-		if(i==mResults.size()){
-			mResults.add(result);
-		}
-	}
-	else{
-		mResults.add(result);
-	}
+	mResults.add(result);
 
 	return true;
 }

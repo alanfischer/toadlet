@@ -39,7 +39,7 @@ public:
 
 	BSP30StyleComponent();
 
-	bool parentChanged(Node *node);
+	void parentChanged(Node *node);
 
 	bool getActive() const{return false;}
 

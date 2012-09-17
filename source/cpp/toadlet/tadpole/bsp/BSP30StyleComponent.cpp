@@ -39,14 +39,12 @@ BSP30StyleComponent::BSP30StyleComponent():
 	mIntensity=Math::ONE;
 }
 
-bool BSP30StyleComponent::parentChanged(Node *node){
+void BSP30StyleComponent::parentChanged(Node *node){
 	BaseComponent::parentChanged(node);
 	
 	if(mParent!=NULL && mParent->getScene()->getRoot()->getType()==BSP30Node::type()){
 		setNode((BSP30Node*)mParent->getScene()->getRoot());
 	}
-
-	return true;
 }
 
 void BSP30StyleComponent::setNode(BSP30Node *node){

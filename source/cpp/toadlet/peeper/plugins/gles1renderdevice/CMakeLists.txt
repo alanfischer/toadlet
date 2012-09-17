@@ -14,8 +14,8 @@ set (PEEPER_GLES1RENDERDEVICE_SRC
 
 
 # Headers
-set (PEEPER_GLES1RENDERDEVICE_HEADERS
-	${PEEPER_GLRENDERDEVICE_HEADERS}
+set (PEEPER_GLES1RENDERDEVICE_HDR
+	${PEEPER_GLRENDERDEVICE_HDR}
 	../glrenderdevice/GLBuffer.h
 	../glrenderdevice/GLIncludes.h
 	../glrenderdevice/GLPixelBuffer.h
@@ -53,7 +53,7 @@ endif (TOADLET_PLATFORM_ANDROID)
 
 # Dynamic library
 if (TOADLET_BUILD_DYNAMIC)
-	add_library (toadlet_peeper_gles1renderdevice SHARED ${PEEPER_GLES1RENDERDEVICE_SRC} ${PEEPER_GLES1RENDERDEVICE_HEADERS})
+	add_library (toadlet_peeper_gles1renderdevice SHARED ${PEEPER_GLES1RENDERDEVICE_SRC} ${PEEPER_GLES1RENDERDEVICE_HDR})
 	set_target_properties (toadlet_peeper_gles1renderdevice PROPERTIES ${DYNAMIC_LIB_PROPS})
 	set_property (TARGET toadlet_peeper_gles1renderdevice APPEND PROPERTY COMPILE_DEFINITIONS ${PEEPER_GLES1RENDERDEVICE_DEFS})
 	target_link_libraries (toadlet_peeper_gles1renderdevice toadlet_peeper ${PEEPER_GLES1RENDERDEVICE_LIBS})
@@ -63,7 +63,7 @@ endif (TOADLET_BUILD_DYNAMIC)
 
 # Static library
 if (TOADLET_BUILD_STATIC)
-	add_library (toadlet_peeper_gles1renderdevice_s STATIC ${PEEPER_GLES1RENDERDEVICE_SRC} ${PEEPER_GLES1RENDERDEVICE_HEADERS})
+	add_library (toadlet_peeper_gles1renderdevice_s STATIC ${PEEPER_GLES1RENDERDEVICE_SRC} ${PEEPER_GLES1RENDERDEVICE_HDR})
 	set_target_properties (toadlet_peeper_gles1renderdevice_s PROPERTIES ${STATIC_LIB_PROPS})
 	set_property (TARGET toadlet_peeper_gles1renderdevice_s APPEND PROPERTY COMPILE_DEFINITIONS ${PEEPER_GLES1RENDERDEVICE_DEFS})
 	target_link_libraries (toadlet_peeper_gles1renderdevice_s toadlet_peeper_s ${PEEPER_GLES1RENDERDEVICE_LIBS})

@@ -51,8 +51,8 @@ public:
 	void setTraceable(Traceable *traceable);
 
 	void traceSegment(PhysicsCollision &result,const Segment &segment,int collideWithScope,Node *ignore);
-	void traceNode(PhysicsCollision &result,Node *entity,const Segment &segment,int collideWithScope);
-	void testNode(PhysicsCollision &result,Node *entity1,const Segment &segment,Node *entity2);
+	void traceNode(PhysicsCollision &result,Node *node,const Segment &segment,int collideWithScope);
+	void testNode(PhysicsCollision &result,Node *node,const Segment &segment,Node *node2);
 
 	void logicUpdate(int dt,int scope,Node *node);
 	void frameUpdate(int dt,int scope,Node *node);

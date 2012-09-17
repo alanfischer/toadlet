@@ -73,7 +73,7 @@ public:
 	StudioModelComponent(Engine *engine);
 	void destroy();
 
-	bool parentChanged(Node *node);
+	void parentChanged(Node *node);
 
 	void logicUpdate(int dt,int scope);
 	void frameUpdate(int dt,int scope);

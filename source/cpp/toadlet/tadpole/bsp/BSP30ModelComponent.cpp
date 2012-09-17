@@ -74,20 +74,16 @@ void BSP30ModelComponent::destroy(){
 	BaseComponent::destroy();
 }
 
-bool BSP30ModelComponent::parentChanged(Node *node){
+void BSP30ModelComponent::parentChanged(Node *node){
 	if(mParent!=NULL){
 		mParent->visibleRemoved(this);
 	}
 
-	if(BaseComponent::parentChanged(node)==false){
-		return false;
-	}
-	
+	BaseComponent::parentChanged(node);
+
 	if(mParent!=NULL){
 		mParent->visibleAttached(this);
 	}
-
-	return true;
 }
 
 void BSP30ModelComponent::setModel(BSP30Map *map,const String &name){

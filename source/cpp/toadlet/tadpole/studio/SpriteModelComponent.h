@@ -44,7 +44,7 @@ public:
 	SpriteModelComponent(Engine *engine);
 	void destroy();
 
-	bool parentChanged(Node *node);
+	void parentChanged(Node *node);
 
 	void setModel(const String &name);
 	void setModel(SpriteModel *model);

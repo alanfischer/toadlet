@@ -17,7 +17,7 @@ endforeach (TOADLET_LIBRARY)
 
 
 # Create the aggregate toadlet include files
-# This uses the libraryname_HEADERS variable from each base library 
+# This uses the libraryname_HDR variable from each base library 
 # As well as the libraryname_NAMESPACES variable for the namespaces
 foreach (TOADLET_LIBRARY ${TOADLET_LIBRARY_LIST})
 	string (TOUPPER ${TOADLET_LIBRARY} UPPERNAME)
@@ -28,7 +28,7 @@ foreach (TOADLET_LIBRARY ${TOADLET_LIBRARY_LIST})
 	file (APPEND ${HEADER_FILE} "#define TOADLET_${UPPERNAME}_H\n")
 	file (APPEND ${HEADER_FILE} ""\n)
 
-	foreach (H_FILE ${${UPPERNAME}_HEADERS})
+	foreach (H_FILE ${${UPPERNAME}_HDR})
 		file (APPEND ${HEADER_FILE} "#include <toadlet/${TOADLET_LIBRARY}/${H_FILE}>\n")
 	endforeach (H_FILE)
 

@@ -82,20 +82,16 @@ void ParticleComponent::destroy(){
 	BaseComponent::destroy();
 }
 
-bool ParticleComponent::parentChanged(Node *node){
+void ParticleComponent::parentChanged(Node *node){
 	if(mParent!=NULL){
 		mParent->visibleRemoved(this);
 	}
 
-	if(BaseComponent::parentChanged(node)==false){
-		return false;
-	}
-	
+	BaseComponent::parentChanged(node);
+
 	if(mParent!=NULL){
 		mParent->visibleAttached(this);
 	}
-
-	return true;
 }
 
 bool ParticleComponent::setNumParticles(int numParticles,int particleType,scalar scale,const Vector3 positions[]){

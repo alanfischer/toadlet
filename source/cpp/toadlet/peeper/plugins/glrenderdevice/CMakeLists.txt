@@ -21,8 +21,8 @@ set (PEEPER_GLRENDERDEVICE_SRC
 
 
 # Headers
-set (PEEPER_GLRENDERDEVICE_HEADERS
-	${PEEPER_GLRENDERDEVICE_HEADERS}
+set (PEEPER_GLRENDERDEVICE_HDR
+	${PEEPER_GLRENDERDEVICE_HDR}
 	GLBuffer.h
 	GLFBORenderTarget.h
 	GLFBOPixelBuffer.h
@@ -62,7 +62,7 @@ endif (GLEW_FOUND)
 
 # Dynamic library
 if (TOADLET_BUILD_DYNAMIC)
-	add_library (toadlet_peeper_glrenderdevice SHARED ${PEEPER_GLRENDERDEVICE_SRC} ${PEEPER_GLRENDERDEVICE_HEADERS})
+	add_library (toadlet_peeper_glrenderdevice SHARED ${PEEPER_GLRENDERDEVICE_SRC} ${PEEPER_GLRENDERDEVICE_HDR})
 	set_target_properties (toadlet_peeper_glrenderdevice PROPERTIES ${DYNAMIC_LIB_PROPS})
 	set_property (TARGET toadlet_peeper_glrenderdevice APPEND PROPERTY COMPILE_DEFINITIONS ${PEEPER_GLRENDERDEVICE_DEFS})
 	target_link_libraries (toadlet_peeper_glrenderdevice toadlet_peeper ${PEEPER_GLRENDERDEVICE_LIBS})
@@ -82,7 +82,7 @@ endif (GLEW_FOUND AND NOT GLEW_LIBRARY_S)
 
 # Static library
 if (TOADLET_BUILD_STATIC)
-	add_library (toadlet_peeper_glrenderdevice_s STATIC ${PEEPER_GLRENDERDEVICE_SRC} ${PEEPER_GLRENDERDEVICE_HEADERS})
+	add_library (toadlet_peeper_glrenderdevice_s STATIC ${PEEPER_GLRENDERDEVICE_SRC} ${PEEPER_GLRENDERDEVICE_HDR})
 	set_target_properties (toadlet_peeper_glrenderdevice_s PROPERTIES ${STATIC_LIB_PROPS})
 	set_property (TARGET toadlet_peeper_glrenderdevice_s APPEND PROPERTY COMPILE_DEFINITIONS ${PEEPER_GLRENDERDEVICE_DEFS_S})
 	target_link_libraries (toadlet_peeper_glrenderdevice_s toadlet_peeper_s ${PEEPER_GLRENDERDEVICE_LIBS})

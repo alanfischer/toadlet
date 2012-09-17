@@ -5,20 +5,20 @@ set (FLICK_JINPUTDEVICE_SRC
 
 
 # Headers
-set (FLICK_JINPUTDEVICE_HEADERS
+set (FLICK_JINPUTDEVICE_HDR
 	JInputDevice.h
 )
 
 
 source_group ("Source Files\\\\plugins\\\\jinputdevice" FILES ${FLICK_JINPUTDEVICE_SRC})
-source_group ("Header Files\\\\plugins\\\\jinputdevice" FILES ${FLICK_JINPUTDEVICE_HEADERS})
+source_group ("Header Files\\\\plugins\\\\jinputdevice" FILES ${FLICK_JINPUTDEVICE_HDR})
 set (FLICK_JINPUTDEVICE_SRC ${FLICK_JINPUTDEVICE_SRC})
-set (FLICK_JINPUTDEVICE_HEADERS ${FLICK_JINPUTDEVICE_HEADERS})
+set (FLICK_JINPUTDEVICE_HDR ${FLICK_JINPUTDEVICE_HDR})
 
 
 # Dynamic library
 if (TOADLET_BUILD_DYNAMIC)
-	add_library (toadlet_flick_jinputdevice SHARED ${FLICK_JINPUTDEVICE_SRC} ${FLICK_JINPUTDEVICE_HEADERS})
+	add_library (toadlet_flick_jinputdevice SHARED ${FLICK_JINPUTDEVICE_SRC} ${FLICK_JINPUTDEVICE_HDR})
 	set_target_properties (toadlet_flick_jinputdevice PROPERTIES ${DYNAMIC_LIB_PROPS})
 	target_link_libraries (toadlet_flick_jinputdevice toadlet_flick)
 	install (TARGETS toadlet_flick_jinputdevice DESTINATION ${LIB_INSTALL_DIR})
@@ -26,7 +26,7 @@ endif (TOADLET_BUILD_DYNAMIC)
 
 # Static library
 if (TOADLET_BUILD_STATIC)
-	add_library (toadlet_flick_jinputdevice_s STATIC ${FLICK_JINPUTDEVICE_SRC} ${FLICK_JINPUTDEVICE_HEADERS})
+	add_library (toadlet_flick_jinputdevice_s STATIC ${FLICK_JINPUTDEVICE_SRC} ${FLICK_JINPUTDEVICE_HDR})
 	set_target_properties (toadlet_flick_jinputdevice_s PROPERTIES ${STATIC_LIB_PROPS})
 	target_link_libraries (toadlet_flick_jinputdevice_s toadlet_flick_s)
 	install (TARGETS toadlet_flick_jinputdevice_s DESTINATION ${LIB_INSTALL_DIR})

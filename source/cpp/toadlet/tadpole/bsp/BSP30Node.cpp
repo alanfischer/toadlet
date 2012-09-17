@@ -131,7 +131,7 @@ void BSP30Node::setSkyTextures(const String &skyDown,const String &skyUp,const S
 void BSP30Node::nodeAttached(Node *node){
 	Node::nodeAttached(node);
 
-	node->parentDataChanged(new childdata());
+	node->setParentData(new childdata());
 
 	if(mMap!=NULL){
 		Collection<int> &newIndexes=((childdata*)node->getParentData())->leafs;
@@ -149,7 +149,7 @@ void BSP30Node::nodeRemoved(Node *node){
 	}
 
 	delete (childdata*)node->getParentData();
-	node->parentDataChanged(NULL);
+	node->setParentData(NULL);
 }
 
 void BSP30Node::insertNodeLeafIndexes(const Collection<int> &indexes,Node *node){

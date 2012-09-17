@@ -105,10 +105,10 @@ bool Node::attach(Component *component){
 
 	mComponents.add(component);
 
-	if(component->parentChanged(this)==false){
-		mComponents.remove(component);
+	component->parentChanged(this);
 
-		return false;
+	if(mRoot!=NULL){
+		component->rootChanged(mRoot);
 	}
 
 	if(getActive()==false){
@@ -121,11 +121,13 @@ bool Node::attach(Component *component){
 bool Node::remove(Component *component){
 	Component::ptr reference=component; // To make sure that the object is not released early
 
-	if(component->parentChanged(NULL)==false){
-		return false;
-	}
+	component->parentChanged(NULL);
 
 	mComponents.remove(component);
+
+	if(mRoot!=NULL){
+		component->rootChanged(NULL);
+	}
 
 	if(getActive()==false){
 		activate();
@@ -215,19 +217,27 @@ void Node::physicsRemoved(PhysicsComponent *physics){
 	mPhysics=NULL;
 }
 
-bool Node::parentChanged(Node *node){
+void Node::parentChanged(Node *node){
 	Node *parent=mParent;
 	
-	if(BaseComponent::parentChanged(node)){	
-		if(parent!=NULL){
-			parent->nodeRemoved(this);
-		}
-		if(mParent!=NULL){
-			mParent->nodeAttached(this);
-		}
-		return true;
+	BaseComponent::parentChanged(node);
+
+	if(parent!=NULL){
+		parent->nodeRemoved(this);
 	}
-	return false;
+	if(mParent!=NULL){
+		mParent->nodeAttached(this);
+	}
+}
+
+void Node::rootChanged(Node *root){
+	BaseComponent::rootChanged(root);
+
+	int i;
+	for(i=0;i<mComponents.size();++i){
+		Component *component=mComponents[i];
+		component->rootChanged(root);
+	}
 }
 
 void Node::setTranslate(const Vector3 &translate){
@@ -329,16 +339,6 @@ void Node::frameUpdate(int dt,int scope){
 			mergeWorldBound(node,false);
 		}
 	}
-}
-
-bool Node::setProperty(const String &name,const String &value){
-	int i=0;
-	bool result=false;
-	for(i=0;i<mComponents.size();++i){
-		Component *component=mComponents[i];
-		result|=component->setProperty(name,value);
-	}
-	return result;
 }
 
 bool Node::handleEvent(Event *event){

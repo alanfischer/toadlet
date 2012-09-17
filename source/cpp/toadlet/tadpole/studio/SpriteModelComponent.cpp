@@ -72,20 +72,16 @@ void SpriteModelComponent::destroy(){
 	BaseComponent::destroy();
 }
 
-bool SpriteModelComponent::parentChanged(Node *node){
+void SpriteModelComponent::parentChanged(Node *node){
 	if(mParent!=NULL){
 		mParent->visibleRemoved(this);
 	}
 
-	if(BaseComponent::parentChanged(node)==false){
-		return false;
-	}
-	
+	BaseComponent::parentChanged(node);
+
 	if(mParent!=NULL){
 		mParent->visibleAttached(this);
 	}
-
-	return true;
 }
 
 void SpriteModelComponent::setModel(const String &name){

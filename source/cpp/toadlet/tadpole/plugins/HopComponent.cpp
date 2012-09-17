@@ -43,33 +43,34 @@ HopComponent::HopComponent(HopManager *manager):
 	mSolid->setUserData(this);
 	mSolid->setCollisionListener(this);
 
-	mManager->getSimulator()->addSolid(mSolid);
-
 	mBound=new Bound();
 
 	setName("physics");
 }
 
 void HopComponent::destroy(){
-	mManager->getSimulator()->removeSolid(mSolid);
-
 	BaseComponent::destroy();
 }
 
-bool HopComponent::parentChanged(Node *node){
+void HopComponent::parentChanged(Node *node){
 	if(mParent!=NULL){
 		mParent->physicsRemoved(this);
 	}
 
-	if(BaseComponent::parentChanged(node)==false){
-		return false;
-	}
+	BaseComponent::parentChanged(node);
 
 	if(mParent!=NULL){
 		mParent->physicsAttached(this);
 	}
+}
 
-	return true;
+void HopComponent::rootChanged(Node *root){
+	if(root!=NULL){
+		mManager->getSimulator()->addSolid(mSolid);
+	}
+	else{
+		mManager->getSimulator()->removeSolid(mSolid);
+	}
 }
 
 void HopComponent::setPosition(const Vector3 &position){
@@ -102,6 +103,8 @@ void HopComponent::setTraceable(Traceable *traceable){
 		mTraceableShape=new hop::Shape(this);
 		addShape(mTraceableShape);
 	}
+
+	mBound->set(mSolid->getLocalBound());
 }
 
 void HopComponent::addShape(hop::Shape *shape){
@@ -158,19 +161,26 @@ void HopComponent::transformChanged(){
 		mNewPosition.set(translate);
 		mCurrentPosition.set(translate);
 
+		mBound->set(mSolid->getLocalBound());
+
 		mTransformChanged=true;
+	}
+}
+
+void HopComponent::collision(const PhysicsCollision &collision){
+	int i;
+	for(i=0;i<mListeners.size();++i){
+		mListeners[i]->collision(collision);
 	}
 }
 
 void HopComponent::collision(const hop::Collision &c){
 	HopComponent::ptr reference=this;
 
-	PhysicsCollision collision;
-	HopManager::set(collision,c);
-	int i;
-	for(i=0;i<mListeners.size();++i){
-		mListeners[i]->collision(collision);
-	}
+	PhysicsCollision pc;
+	HopManager::set(pc,c);
+
+	collision(pc);
 }
 
 void HopComponent::getBound(AABox &result){

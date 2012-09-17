@@ -31,7 +31,7 @@ set (PAD_PLATFORM_X11_SRC
 
 
 # Headers
-set (PAD_HEADERS
+set (PAD_HDR
 	Applet.h
 	Application.h
 	BaseApplication.h
@@ -40,23 +40,23 @@ set (PAD_HEADERS
 	Version.h
 )
 
-set (PAD_PLATFORM_ANDROID_JAPPLICATION_HEADERS
+set (PAD_PLATFORM_ANDROID_JAPPLICATION_HDR
 	platform/android/JApplication.h
 )
 
-set (PAD_PLATFORM_ANDROID_ANDROIDAPPLICATION_HEADERS
+set (PAD_PLATFORM_ANDROID_ANDROIDAPPLICATION_HDR
 	platform/android/AndroidApplication.h
 )
 
-set (PAD_PLATFORM_WIN32_HEADERS
+set (PAD_PLATFORM_WIN32_HDR
 	platform/win32/Win32Application.h
 )
 
-set (PAD_PLATFORM_OSX_HEADERS
+set (PAD_PLATFORM_OSX_HDR
 	platform/osx/OSXApplication.h
 )
 
-set (PAD_PLATFORM_X11_HEADERS
+set (PAD_PLATFORM_X11_HDR
 	platform/x11/X11Application.h
 )
 
@@ -64,29 +64,29 @@ set (PAD_PLATFORM_X11_HEADERS
 # Platform specific files
 if (TOADLET_PLATFORM_ANDROID)
 	source_group ("Source Files\\\\platform\\\\android" FILES ${PAD_PLATFORM_ANDROID_JAPPLICATION_SRC})
-	source_group ("Header Files\\\\platform\\\\android" FILES ${PAD_PLATFORM_ANDROID_JAPPLICATION_HEADERS})
+	source_group ("Header Files\\\\platform\\\\android" FILES ${PAD_PLATFORM_ANDROID_JAPPLICATION_HDR})
 	set (PAD_SRC ${PAD_SRC} ${PAD_PLATFORM_ANDROID_JAPPLICATION_SRC})
-	set (PAD_HEADERS ${PAD_HEADERS} ${PAD_PLATFORM_ANDROID_JAPPLICATION_HEADERS})
+	set (PAD_HDR ${PAD_HDR} ${PAD_PLATFORM_ANDROID_JAPPLICATION_HDR})
 
 #	source_group ("Source Files\\\\platform\\\\android" FILES ${PAD_PLATFORM_ANDROID_ANDROIDAPPLICATION_SRC})
-#	source_group ("Header Files\\\\platform\\\\android" FILES ${PAD_PLATFORM_ANDROID_ANDROIDAPPLICATION_HEADERS})
+#	source_group ("Header Files\\\\platform\\\\android" FILES ${PAD_PLATFORM_ANDROID_ANDROIDAPPLICATION_HDR})
 #	set (PAD_SRC ${PAD_SRC} ${PAD_PLATFORM_ANDROID_ANDROIDAPPLICATION_SRC})
-#	set (PAD_HEADERS ${PAD_HEADERS} ${PAD_PLATFORM_ANDROID_ANDROIDAPPLICATION_HEADERS})
+#	set (PAD_HDR ${PAD_HDR} ${PAD_PLATFORM_ANDROID_ANDROIDAPPLICATION_HDR})
 elseif (TOADLET_PLATFORM_WIN32)
 	source_group ("Source Files\\\\platform\\\\win32" FILES ${PAD_PLATFORM_WIN32_SRC})
-	source_group ("Header Files\\\\platform\\\\win32" FILES ${PAD_PLATFORM_WIN32_HEADERS})
+	source_group ("Header Files\\\\platform\\\\win32" FILES ${PAD_PLATFORM_WIN32_HDR})
 	set (PAD_SRC ${PAD_SRC} ${PAD_PLATFORM_WIN32_SRC})
-	set (PAD_HEADERS ${PAD_HEADERS} ${PAD_PLATFORM_WIN32_HEADERS})
+	set (PAD_HDR ${PAD_HDR} ${PAD_PLATFORM_WIN32_HDR})
 elseif (TOADLET_PLATFORM_OSX)
 	source_group ("Source Files\\\\platform\\\\osx" FILES ${PAD_PLATFORM_OSX_SRC})
-	source_group ("Header Files\\\\platform\\\\osx" FILES ${PAD_PLATFORM_OSX_HEADERS})
+	source_group ("Header Files\\\\platform\\\\osx" FILES ${PAD_PLATFORM_OSX_HDR})
 	set (PAD_SRC ${PAD_SRC} ${PAD_PLATFORM_OSX_SRC})
-	set (PAD_HEADERS ${PAD_HEADERS} ${PAD_PLATFORM_OSX_HEADERS})	
+	set (PAD_HDR ${PAD_HDR} ${PAD_PLATFORM_OSX_HDR})	
 elseif (TOADLET_PLATFORM_POSIX)
 	source_group ("Source Files\\\\platform\\\\posix" FILES ${PAD_PLATFORM_POSIX_SRC})
-	source_group ("Header Files\\\\platform\\\\posix" FILES ${PAD_PLATFORM_POSIX_HEADERS})
+	source_group ("Header Files\\\\platform\\\\posix" FILES ${PAD_PLATFORM_POSIX_HDR})
 	set (PAD_SRC ${PAD_SRC} ${PAD_PLATFORM_X11_SRC})
-	set (PAD_HEADERS ${PAD_HEADERS} ${PAD_PLATFORM_X11_HEADERS})
+	set (PAD_HDR ${PAD_HDR} ${PAD_PLATFORM_X11_HDR})
 endif (TOADLET_PLATFORM_ANDROID)
 
 
@@ -167,7 +167,7 @@ endif (TOADLET_PLATFORM_ANDROID)
 
 
 # Give the headers and namespaces parent scope for inclusion into the master pad.h file
-set (PAD_HEADERS ${PAD_HEADERS} PARENT_SCOPE)
+set (PAD_HDR ${PAD_HDR} PARENT_SCOPE)
 set (PAD_NAMESPACES ${PAD_NAMESPACES} PARENT_SCOPE)
 
 
@@ -180,7 +180,7 @@ endif (SWIG_FOUND AND PAD_SWIG_INT)
 
 # Dynamic Library
 if (TOADLET_BUILD_DYNAMIC)
-	add_library (toadlet_pad SHARED ${PAD_SRC} ${PAD_HEADERS})
+	add_library (toadlet_pad SHARED ${PAD_SRC} ${PAD_HDR})
 	set_target_properties (toadlet_pad PROPERTIES ${DYNAMIC_LIB_PROPS})
 	target_link_libraries (toadlet_pad toadlet_flick toadlet_tadpole ${PAD_LIBS})
 	install (TARGETS toadlet_pad DESTINATION ${LIB_INSTALL_DIR})
@@ -189,7 +189,7 @@ endif (TOADLET_BUILD_DYNAMIC)
 
 # Static Library
 if (TOADLET_BUILD_STATIC)
-	add_library (toadlet_pad_s STATIC ${PAD_SRC} ${PAD_HEADERS})
+	add_library (toadlet_pad_s STATIC ${PAD_SRC} ${PAD_HDR})
 	set_target_properties (toadlet_pad_s PROPERTIES ${STATIC_LIB_PROPS})
 	target_link_libraries (toadlet_pad_s toadlet_flick_s toadlet_tadpole_s ${PAD_LIBS_S})
 	install (TARGETS toadlet_pad_s DESTINATION ${LIB_INSTALL_DIR})

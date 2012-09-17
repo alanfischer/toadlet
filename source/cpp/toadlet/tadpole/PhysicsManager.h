@@ -45,7 +45,9 @@ public:
 
 	virtual void setTraceable(Traceable *traceable)=0;
 
-	virtual void traceSegment(PhysicsCollision &result,const Segment &segment,int collideWithBits,Node *ignore)=0;
+	virtual void traceSegment(PhysicsCollision &result,const Segment &segment,int collideWithScope,Node *ignore)=0;
+	virtual void traceNode(PhysicsCollision &result,Node *node,const Segment &segment,int collideWithScope)=0;
+	virtual void testNode(PhysicsCollision &result,Node *node,const Segment &segment,Node *ndoe2)=0;
 
 	virtual void logicUpdate(int dt,int scope,Node *node)=0;
 	virtual void frameUpdate(int dt,int scope,Node *node)=0;

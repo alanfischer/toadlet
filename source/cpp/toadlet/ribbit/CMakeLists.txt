@@ -10,7 +10,7 @@ set (RIBBIT_SRC
 
 
 # Headers
-set (RIBBIT_HEADERS
+set (RIBBIT_HDR
 	Audio.h
 	AudioBuffer.h
 	AudioCaps.h
@@ -27,7 +27,7 @@ set (RIBBIT_HEADERS
 
 
 # Give the headers and namespaces parent scope for inclusion into the master ribbit.h file
-set (RIBBIT_HEADERS ${RIBBIT_HEADERS} PARENT_SCOPE)
+set (RIBBIT_HDR ${RIBBIT_HDR} PARENT_SCOPE)
 set (RIBBIT_NAMESPACES ${RIBBIT_NAMESPACES} PARENT_SCOPE)
 
 
@@ -40,7 +40,7 @@ endif (SWIG_FOUND AND RIBBIT_SWIG_INT)
 
 # Dynamic library
 if (TOADLET_BUILD_DYNAMIC)
-	add_library (toadlet_ribbit SHARED ${RIBBIT_SRC} ${RIBBIT_HEADERS})
+	add_library (toadlet_ribbit SHARED ${RIBBIT_SRC} ${RIBBIT_HDR})
 	set_target_properties (toadlet_ribbit PROPERTIES ${DYNAMIC_LIB_PROPS})
 	set_property (TARGET toadlet_ribbit APPEND PROPERTY COMPILE_DEFINITIONS ${RIBBIT_DEFS})
 	target_link_libraries (toadlet_ribbit toadlet_egg)
@@ -50,7 +50,7 @@ endif (TOADLET_BUILD_DYNAMIC)
 
 # Static library
 if (TOADLET_BUILD_STATIC)
-	add_library (toadlet_ribbit_s STATIC ${RIBBIT_SRC} ${RIBBIT_HEADERS})
+	add_library (toadlet_ribbit_s STATIC ${RIBBIT_SRC} ${RIBBIT_HDR})
 	set_target_properties (toadlet_ribbit_s PROPERTIES ${STATIC_LIB_PROPS})
 	set_property (TARGET toadlet_ribbit_s APPEND PROPERTY COMPILE_DEFINITIONS ${RIBBIT_DEFS_S})
 	target_link_libraries (toadlet_ribbit_s toadlet_egg_s)
