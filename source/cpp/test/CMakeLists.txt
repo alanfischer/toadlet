@@ -6,7 +6,7 @@ if (NOT TOADLET_PLATFORM_ANDROID AND NOT TOADLET_PLATFORM_IOS)
 	
 	add_executable (unitTest ${UNIT_SRC})
 	
-	#Platform specific libraries
+	# Platform specific libraries
 	if (TOADLET_PLATFORM_WIN32)
 		target_link_libraries (unitTest toadlet_egg_s)
 	elseif (TOADLET_PLATFORM_OSX)
@@ -14,6 +14,18 @@ if (NOT TOADLET_PLATFORM_ANDROID AND NOT TOADLET_PLATFORM_IOS)
 	elseif (TOADLET_PLATFORM_POSIX)
 		target_link_libraries (unitTest toadlet_egg_s -lpthread)
 	endif (TOADLET_PLATFORM_WIN32)	
-	
+
 	add_test (NAME toadletUnitTests COMMAND unitTest)
+	
+	# Valgrind if available
+	if (TOADLET_RUN_MEMCHECK)
+		find_program (MEMCHECK_EXE valgrind)
+
+		if (MEMCHECK_EXE)
+			add_test (NAME memcheck_toadletUnitTests COMMAND ${MEMCHECK_EXE} "--leak-check=yes" ./unitTest)
+		else (MEMCHECK_EXE)
+			message (FATAL_ERROR "No program found for MEMCHECK_EXE, memcheck cannot be run")
+		endif (MEMCHECK_EXE)
+	endif (TOADLET_RUN_MEMCHECK)
 endif (NOT TOADLET_PLATFORM_ANDROID AND NOT TOADLET_PLATFORM_IOS)
+
