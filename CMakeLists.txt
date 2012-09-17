@@ -77,7 +77,8 @@ elseif (EMSCRIPTEN)
 endif (WIN32)
 
 
-# Doxygen options
+# Toadlet options
+option (TOADLET_RUN_MEMCHECK "Run memory check operations on unit tests" OFF)
 option (TOADLET_BUILD_DOXYGEN "Build doxygen documentation along with source files" OFF)
 option (TOADLET_BUILD_DOXYGEN_ONLY "Build ONLY the doxygen documentation" OFF)
 
