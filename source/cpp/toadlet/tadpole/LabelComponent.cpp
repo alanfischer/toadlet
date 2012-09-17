@@ -78,20 +78,16 @@ void LabelComponent::destroy(){
 	BaseComponent::destroy();
 }
 
-bool LabelComponent::parentChanged(Node *node){
+void LabelComponent::parentChanged(Node *node){
 	if(mParent!=NULL){
 		mParent->visibleRemoved(this);
 	}
 
-	if(BaseComponent::parentChanged(node)==false){
-		return false;
-	}
+	BaseComponent::parentChanged(node);
 	
 	if(mParent!=NULL){
 		mParent->visibleAttached(this);
 	}
-
-	return true;
 }
 
 void LabelComponent::setFont(Font *font){

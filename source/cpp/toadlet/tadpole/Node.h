@@ -63,9 +63,11 @@ public:
 
 	void destroyAllChildren();
 
+	virtual void parentChanged(Node *node);
+	virtual void rootChanged(Node *root);
+
 	void *getParentData() const{return mParentData;}
-	virtual bool parentChanged(Node *node);
-	virtual void parentDataChanged(void *parentData){mParentData=parentData;}
+	void setParentData(void *parentData){mParentData=parentData;}
 
 	virtual bool attach(Component *component);
 	virtual bool remove(Component *component);
@@ -134,7 +136,6 @@ public:
 	virtual void logicUpdate(int dt,int scope);
 	virtual void frameUpdate(int dt,int scope);
 
-	virtual bool setProperty(const String &name,const String &value);
 	virtual bool handleEvent(Event *event);
 
 	// Activation methods

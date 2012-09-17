@@ -89,15 +89,15 @@ void HopManager::traceNode(PhysicsCollision &result,Node *node,const Segment &se
 	set(result,collision);
 }
 
-void HopManager::testNode(PhysicsCollision &result,Node *node1,const Segment &segment,Node *node2){
+void HopManager::testNode(PhysicsCollision &result,Node *node,const Segment &segment,Node *node2){
 	result.reset();
 
 	hop::Solid *solid1=NULL,*solid2=NULL;
-	if(node1!=NULL && node1->getPhysics()!=NULL){
-		solid1=((HopComponent*)node1->getPhysics())->getSolid();
+	if(node!=NULL && node->getPhysics()!=NULL){
+		solid1=((HopComponent*)node->getPhysics())->getSolid();
 	}
 	if(node2!=NULL && node2->getPhysics()!=NULL){
-		solid1=((HopComponent*)node2->getPhysics())->getSolid();
+		solid2=((HopComponent*)node2->getPhysics())->getSolid();
 	}
 
 	hop::Collision collision;

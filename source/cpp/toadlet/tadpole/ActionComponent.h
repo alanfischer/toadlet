@@ -40,7 +40,7 @@ public:
 	ActionComponent(const String &name,Action *action=NULL);
 	virtual ~ActionComponent();
 
-	virtual bool parentChanged(Node *node);
+	virtual void parentChanged(Node *node);
 	
 	virtual void attach(Action *action);
 	virtual void remove(Action *action);

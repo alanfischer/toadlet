@@ -35,14 +35,16 @@ void BaseComponent::destroy(){
 	}
 }
 
-bool BaseComponent::parentChanged(Node *node){
+void BaseComponent::parentChanged(Node *node){
 	if(node!=NULL && mParent!=NULL){
 		mParent->remove(this);
 	}
 
 	mParent=node;
+}
 
-	return true;
+void BaseComponent::rootChanged(Node *root){
+	mRoot=root;
 }
 
 }

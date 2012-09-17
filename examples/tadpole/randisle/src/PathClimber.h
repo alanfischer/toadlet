@@ -11,8 +11,6 @@ public:
 
 	PathClimber();
 
-	bool parentChanged(Node *node);
-
 	void mount(Node *system,PathSystem::Path *path,const Vector3 &point);
 	void dismount();
 
@@ -40,7 +38,6 @@ public:
 	void logicUpdate(int dt,int scope);
 
 protected:
-	Scene *mScene;
 	PathClimberListener *mPathClimberListener;
 	Node::ptr mMounted;
 	PathSystem::Path *mPreviousPath;

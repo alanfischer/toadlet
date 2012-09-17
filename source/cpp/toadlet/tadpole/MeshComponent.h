@@ -71,7 +71,7 @@ public:
 	MeshComponent(Engine *engine);
 	void destroy();
 
-	bool parentChanged(Node *node);
+	void parentChanged(Node *node);
 
 	void setMesh(const String &name);
 	void setMesh(Mesh *mesh);

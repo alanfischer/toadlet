@@ -69,20 +69,16 @@ void SpriteComponent::destroy(){
 	BaseComponent::destroy();
 }
 
-bool SpriteComponent::parentChanged(Node *node){
+void SpriteComponent::parentChanged(Node *node){
 	if(mParent!=NULL){
 		mParent->visibleRemoved(this);
 	}
 
-	if(BaseComponent::parentChanged(node)==false){
-		return false;
-	}
-	
+	BaseComponent::parentChanged(node);
+
 	if(mParent!=NULL){
 		mParent->visibleAttached(this);
 	}
-
-	return true;
 }
 
 void SpriteComponent::setMaterial(Material *material){

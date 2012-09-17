@@ -118,20 +118,16 @@ void StudioModelComponent::destroy(){
 	BaseComponent::destroy();
 }
 
-bool StudioModelComponent::parentChanged(Node *node){
+void StudioModelComponent::parentChanged(Node *node){
 	if(mParent!=NULL){
 		mParent->visibleRemoved(this);
 	}
 
-	if(BaseComponent::parentChanged(node)==false){
-		return false;
-	}
-	
+	BaseComponent::parentChanged(node);
+
 	if(mParent!=NULL){
 		mParent->visibleAttached(this);
 	}
-
-	return true;
 }
 
 void StudioModelComponent::logicUpdate(int dt,int scope){

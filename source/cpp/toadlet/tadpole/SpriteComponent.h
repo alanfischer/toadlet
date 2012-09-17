@@ -43,7 +43,7 @@ public:
 	SpriteComponent(Engine *engine);
 	void destroy();
 
-	bool parentChanged(Node *node);
+	void parentChanged(Node *node);
 
 	void setMaterial(Material *material);
 	Material *getMaterial() const{return mMaterial;}

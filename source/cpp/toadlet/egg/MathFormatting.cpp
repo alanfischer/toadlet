@@ -139,7 +139,8 @@ String formatEulerAngle(const EulerAngle &e,const char *separator,bool degrees){
 	}
 }
 
-EulerAngle &parseEulerAngle(EulerAngle &r,const char *string,bool degrees){
+EulerAngle &parseEulerAngle(EulerAngle &r,const char *string,EulerAngle::EulerOrder order,bool degrees){
+	r.order=order;	
 	const char *parse=strchr(string,',')!=NULL?"%f,%f,%f":"%f %f %f";
 	float x=0,y=0,z=0;
 	sscanf(string,parse,&x,&y,&z);

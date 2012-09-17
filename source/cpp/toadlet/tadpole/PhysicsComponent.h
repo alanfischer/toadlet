@@ -38,7 +38,6 @@ class TOADLET_API PhysicsComponent:public Component{
 public:
 	TOADLET_INTERFACE(PhysicsComponent);
 
-	virtual bool parentChanged(Node *node)=0;
 	virtual void transformChanged()=0;
 
 	virtual void addCollisionListener(PhysicsCollisionListener *listener)=0;
@@ -61,6 +60,8 @@ public:
 
 	virtual void setCollisionScope(int scope)=0;
 	virtual int getCollisionScope() const=0;
+
+	virtual void collision(const PhysicsCollision &collision)=0;
 };
 
 }

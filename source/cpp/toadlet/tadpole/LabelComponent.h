@@ -46,7 +46,7 @@ public:
 	LabelComponent(Engine *engine);
 	void destroy();
 
-	bool parentChanged(Node *node);
+	void parentChanged(Node *node);
 
 	void setFont(Font *font);
 	Font *getFont() const{return mFont;}

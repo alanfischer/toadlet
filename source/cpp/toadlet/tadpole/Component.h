@@ -42,7 +42,8 @@ public:
 	
 	virtual void destroy()=0;
 
-	virtual bool parentChanged(Node *node)=0;
+	virtual void parentChanged(Node *node)=0;
+	virtual void rootChanged(Node *root)=0;
 
 	virtual const String &getName() const=0;
 	virtual void setName(const String &name)=0;
@@ -53,7 +54,6 @@ public:
 	virtual bool getActive() const=0;
 	virtual Bound *getBound() const=0;
 
-	virtual bool setProperty(const String &name,const String &value)=0;
 	virtual bool handleEvent(Event *event)=0;
 };
 

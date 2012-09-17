@@ -81,7 +81,7 @@ void MeshComponent::destroy(){
 	BaseComponent::destroy();
 }
 
-bool MeshComponent::parentChanged(Node *node){
+void MeshComponent::parentChanged(Node *node){
 	if(mParent!=NULL){
 		mParent->visibleRemoved(this);
 
@@ -90,9 +90,7 @@ bool MeshComponent::parentChanged(Node *node){
 		}
 	}
 
-	if(BaseComponent::parentChanged(node)==false){
-		return false;
-	}
+	BaseComponent::parentChanged(node);
 	
 	if(mParent!=NULL){
 		mParent->visibleAttached(this);
@@ -101,8 +99,6 @@ bool MeshComponent::parentChanged(Node *node){
 			mParent->attach(mSkeleton);
 		}
 	}
-
-	return true;
 }
 
 void MeshComponent::setMesh(const String &name){

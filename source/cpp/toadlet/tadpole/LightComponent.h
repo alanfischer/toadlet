@@ -47,7 +47,7 @@ public:
 	inline void setDirection(const Vector3 &direction){mDirection.set(direction);mLightState.direction.set(direction);}
 	inline const Vector3 &getDirection(){return mDirection;}
 
-	bool parentChanged(Node *node);
+	void parentChanged(Node *node);
 
 	void frameUpdate(int dt,int scope);
 

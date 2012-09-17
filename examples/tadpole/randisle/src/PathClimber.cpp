@@ -21,16 +21,6 @@ PathClimber::PathClimber():BaseComponent(),
 	}
 }
 
-bool PathClimber::parentChanged(Node *node){
-	bool result=BaseComponent::parentChanged(node);
-
-	if(mParent!=NULL){
-		mScene=mParent->getScene();
-	}
-
-	return result;
-}
-
 void PathClimber::logicUpdate(int dt,int scope){
 	if(mPath==NULL){
 		Quaternion rotate;
@@ -41,7 +31,7 @@ void PathClimber::logicUpdate(int dt,int scope){
 		Segment segment;
 		segment.setStartDir(mParent->getTranslate(),Vector3(0,0,-5));
 		PhysicsCollision result;
-		mScene->traceSegment(result,segment,-1,mParent);
+		mParent->getScene()->traceSegment(result,segment,-1,mParent);
 		if(result.time<Math::ONE){
 			up.set(result.normal);
 		}
@@ -70,7 +60,7 @@ void PathClimber::logicUpdate(int dt,int scope){
 		mParent->getPhysics()->setVelocity(forward);
 
 //		if((mSolid->getTouching()!=NULL || getCoefficientOfGravity()==0) && mGroundTime==0){
-//			mGroundTime=mScene->getLogicTime();
+//			mGroundTime=mParent->getScene()->getLogicTime();
 //		}
 	}
 	else{
@@ -191,7 +181,7 @@ void PathClimber::dismount(){
 	mMounted=NULL;
 	mPath=NULL;
 	mParent->getPhysics()->setGravity(Math::ONE);
-	mNoClimbTime=mScene->getLogicTime()+500;
+	mNoClimbTime=mParent->getScene()->getLogicTime()+500;
 }
 
 void PathClimber::setPathDirection(int direction){

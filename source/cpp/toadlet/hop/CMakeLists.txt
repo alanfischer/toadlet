@@ -13,7 +13,7 @@ set (HOP_SRC
 
 
 # Headers
-set (HOP_HEADERS
+set (HOP_HDR
 	Collision.h
 	CollisionListener.h
 	Constraint.h
@@ -28,7 +28,7 @@ set (HOP_HEADERS
 
 
 # Give the headers and namespaces parent scope for inclusion into the master hop.h file
-set (HOP_HEADERS ${HOP_HEADERS} PARENT_SCOPE)
+set (HOP_HDR ${HOP_HDR} PARENT_SCOPE)
 set (HOP_NAMESPACES ${HOP_NAMESPACES} PARENT_SCOPE)
 
 
@@ -41,7 +41,7 @@ endif (SWIG_FOUND AND TOADLET_HOP_INT)
 
 # Dynamic library
 if (TOADLET_BUILD_DYNAMIC)
-	add_library (toadlet_hop SHARED ${HOP_SRC} ${HOP_HEADERS})
+	add_library (toadlet_hop SHARED ${HOP_SRC} ${HOP_HDR})
 	set_target_properties (toadlet_hop PROPERTIES ${DYNAMIC_LIB_PROPS})
 	target_link_libraries (toadlet_hop toadlet_egg)
 	install (TARGETS toadlet_hop DESTINATION ${LIB_INSTALL_DIR})
@@ -50,7 +50,7 @@ endif (TOADLET_BUILD_DYNAMIC)
 
 # Static library
 if (TOADLET_BUILD_STATIC)
-	add_library (toadlet_hop_s STATIC ${HOP_SRC} ${HOP_HEADERS})
+	add_library (toadlet_hop_s STATIC ${HOP_SRC} ${HOP_HDR})
 	set_target_properties (toadlet_hop_s PROPERTIES ${STATIC_LIB_PROPS})
 	target_link_libraries (toadlet_hop_s toadlet_egg_s)
 	install (TARGETS toadlet_hop_s DESTINATION ${LIB_INSTALL_DIR})

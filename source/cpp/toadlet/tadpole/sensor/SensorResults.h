@@ -39,32 +39,24 @@ public:
 	TOADLET_OBJECT(SensorResults);
 
 	SensorResults();
-	virtual ~SensorResults();
 
-	void setMaxNumResults(int num);
-	int getMaxNumResults() const{return mMaxResults;}
-
-	void setSortResultsByHandle(bool sort){mSortByHandle=sort;}
-	bool getSortResultsByHandle() const{return mSortByHandle;}
+	void setMaxSize(int size);
+	int getMaxSize() const{return mMaxSize;}
 
 	void setScope(int scope){mScope=scope;}
 	int getScope() const{return mScope;}
 
-	int getNumResults() const{return mResults.size();}
-	Node *getResult(int i){return mResults[i];}
-	Node *getNextResult(Node *result);
+	int size() const{return mResults.size();}
+	Node *at(int i){return mResults[i];}
 
 	bool contains(Node *node);
 
-	virtual void sensingBeginning();
-	
-	virtual bool resultFound(Node *result,scalar distance);
-
-	virtual void sensingEnding();
+	void sensingBeginning();
+	bool resultFound(Node *result,scalar distance);
+	void sensingEnding();
 	
 protected:
-	int mMaxResults;
-	bool mSortByHandle;
+	int mMaxSize;
 	int mScope;
 	Collection<Node*> mResults;
 	scalar mMaxDistance;

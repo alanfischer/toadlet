@@ -22,7 +22,7 @@ set (PEEPER_SRC
 
 
 # Headers
-set (PEEPER_HEADERS
+set (PEEPER_HDR
 	BackableBuffer.h
 	BackableVertexFormat.h
 	BackablePixelBufferRenderTarget.h
@@ -70,7 +70,7 @@ set (PEEPER_HEADERS
 
 
 # Give the headers and namespaces parent scope for inclusion into the master peeper.h file
-set (PEEPER_HEADERS ${PEEPER_HEADERS} PARENT_SCOPE)
+set (PEEPER_HDR ${PEEPER_HDR} PARENT_SCOPE)
 set (PEEPER_NAMESPACES ${PEEPER_NAMESPACES} PARENT_SCOPE)
 
 
@@ -83,7 +83,7 @@ endif (SWIG_FOUND AND PEEPER_SWIG_INT)
 
 # Dynamic library
 if (TOADLET_BUILD_DYNAMIC)
-	add_library (toadlet_peeper SHARED ${PEEPER_SRC} ${PEEPER_HEADERS})
+	add_library (toadlet_peeper SHARED ${PEEPER_SRC} ${PEEPER_HDR})
 	set_target_properties (toadlet_peeper PROPERTIES ${DYNAMIC_LIB_PROPS})
 	target_link_libraries (toadlet_peeper toadlet_egg)
 	install (TARGETS toadlet_peeper DESTINATION ${LIB_INSTALL_DIR})
@@ -92,7 +92,7 @@ endif (TOADLET_BUILD_DYNAMIC)
 
 # Static library
 if (TOADLET_BUILD_STATIC)
-	add_library (toadlet_peeper_s STATIC ${PEEPER_SRC} ${PEEPER_HEADERS})
+	add_library (toadlet_peeper_s STATIC ${PEEPER_SRC} ${PEEPER_HDR})
 	set_target_properties (toadlet_peeper_s PROPERTIES ${STATIC_LIB_PROPS})
 	target_link_libraries (toadlet_peeper_s toadlet_egg_s)
 	install (TARGETS toadlet_peeper_s DESTINATION ${LIB_INSTALL_DIR})

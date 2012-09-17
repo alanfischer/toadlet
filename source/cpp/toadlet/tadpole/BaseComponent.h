@@ -46,7 +46,8 @@ public:
 	virtual void setName(const String &name){mName=name;}
 	inline const String &getName() const{return mName;}
 
-	virtual bool parentChanged(Node *node);
+	virtual void parentChanged(Node *node);
+	virtual void rootChanged(Node *root);
 
 	virtual Node *getParent(){return mParent;}
 
@@ -56,11 +57,11 @@ public:
 	virtual bool getActive() const{return true;}
 	virtual Bound *getBound() const{return NULL;}
 	
-	virtual bool setProperty(const String &name,const String &value){return false;}
 	virtual bool handleEvent(Event *event){return false;}
 
 protected:
 	Node *mParent;
+	Node *mRoot;
 	String mName;
 };
 
@@ -74,7 +75,6 @@ protected:
 	void setName(const String &name){toadlet::tadpole::BaseComponent::setName(name);}\
 	inline const String &getName() const{return toadlet::tadpole::BaseComponent::getName();}\
 	Node *getParent(){return toadlet::tadpole::BaseComponent::getParent();} \
-	bool setProperty(const String &name,const String &value){return toadlet::tadpole::BaseComponent::setProperty(name,value);} \
 	bool handleEvent(Event *event){return toadlet::tadpole::BaseComponent::handleEvent(event);}
 
 #endif

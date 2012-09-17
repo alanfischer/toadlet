@@ -41,7 +41,8 @@ public:
 
 	void destroy();
 
-	bool parentChanged(Node *node);
+	void parentChanged(Node *node);
+	void rootChanged(Node *root);
 
 	void addCollisionListener(PhysicsCollisionListener *listener){mListeners.add(listener);}
 	void removeCollisionListener(PhysicsCollisionListener *listener){mListeners.remove(listener);}
@@ -76,9 +77,11 @@ public:
 
 	inline hop::Solid *getSolid(){return mSolid;}
 
+	void collision(const PhysicsCollision &collision);
+
 	// CollisionListener
 	void collision(const hop::Collision &c);
-	
+
 	// TraceCallback
 	void getBound(AABox &result);
 	void traceSegment(hop::Collision &result,const Vector3 &position,const Segment &segment);

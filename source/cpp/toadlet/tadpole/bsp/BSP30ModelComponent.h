@@ -66,7 +66,7 @@ public:
 	BSP30ModelComponent(Engine *engine);
 	void destroy();
 
-	bool parentChanged(Node *node);
+	void parentChanged(Node *node);
 
 	void setModel(BSP30Map *map,const String &name);
 	void setModel(BSP30Map *map,int index);

@@ -37,7 +37,7 @@ LightComponent::LightComponent():
 	mBound=new Bound(Bound::Type_INFINITE);
 }
 
-bool LightComponent::parentChanged(Node *node){
+void LightComponent::parentChanged(Node *node){
 	if(mParent!=NULL){
 		mParent->lightRemoved(this);
 	}
@@ -47,8 +47,6 @@ bool LightComponent::parentChanged(Node *node){
 	if(mParent!=NULL){
 		mParent->lightAttached(this);
 	}
-
-	return true;
 }
 
 void LightComponent::frameUpdate(int dt,int scope){

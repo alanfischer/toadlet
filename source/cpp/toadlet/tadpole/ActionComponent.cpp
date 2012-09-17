@@ -40,7 +40,7 @@ ActionComponent::ActionComponent(const String &name,Action *action):BaseComponen
 ActionComponent::~ActionComponent(){
 }
 
-bool ActionComponent::parentChanged(Node *node){
+void ActionComponent::parentChanged(Node *node){
 	if(mParent!=NULL){
 		mParent->actionRemoved(this);
 	}
@@ -50,8 +50,6 @@ bool ActionComponent::parentChanged(Node *node){
 	if(mParent!=NULL){
 		mParent->actionAttached(this);
 	}
-
-	return true;
 }
 
 void ActionComponent::attach(Action *action){

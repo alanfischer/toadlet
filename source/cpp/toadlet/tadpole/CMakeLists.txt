@@ -184,7 +184,7 @@ set (TADPOLE_PLATFORM_WIN32_GDIPLUS_SRC
 
 
 # Headers
-set (TADPOLE_HEADERS
+set (TADPOLE_HDR
 	AnaglyphCamera.h
 	AnimationAction.h
 	AudioAction.h
@@ -250,7 +250,7 @@ set (TADPOLE_HEADERS
 	Visible.h
 )
 
-set (TADPOLE_ANIMATION_HEADERS
+set (TADPOLE_ANIMATION_HDR
 	animation/Animation.h
 	animation/AnimationListener.h
 	animation/BaseAnimation.h
@@ -260,7 +260,7 @@ set (TADPOLE_ANIMATION_HEADERS
 	animation/MeshAnimation.h
 )
 
-set (TADPOLE_BSP_HEADERS
+set (TADPOLE_BSP_HDR
 	bsp/BSP30Map.h
 	bsp/BSP30MaterialCreator.h
 	bsp/BSP30ModelComponent.h
@@ -270,7 +270,7 @@ set (TADPOLE_BSP_HEADERS
 	bsp/BSP30Types.h
 )
 
-set (TADPOLE_PLUGINS_HEADERS
+set (TADPOLE_PLUGINS_HDR
 	plugins/SimpleRenderManager.h
 	plugins/DecalShadowRenderManager.h
 	plugins/ShadowMappedRenderManager.h
@@ -297,7 +297,7 @@ set (TADPOLE_PLUGINS_HEADERS
 	plugins/WaterMaterialCreator.h
 )
 
-set (TADPOLE_PLUGINS_XML_HEADERS
+set (TADPOLE_PLUGINS_XML_HDR
 	plugins/toadlet_mxml.h
 	plugins/XANMStreamer.h
 	plugins/XMLMeshUtilities.h
@@ -305,52 +305,52 @@ set (TADPOLE_PLUGINS_XML_HEADERS
 	plugins/XMSHStreamer.h
 )
 
-set (TADPOLE_PLUGINS_GIF_HEADERS
+set (TADPOLE_PLUGINS_GIF_HDR
 	plugins/GIFStreamer.h
 )
 
-set (TADPOLE_PLUGINS_JPEG_HEADERS
+set (TADPOLE_PLUGINS_JPEG_HDR
 	plugins/JPEGStreamer.h
 )
 
-set (TADPOLE_PLUGINS_PNG_HEADERS
+set (TADPOLE_PLUGINS_PNG_HDR
 	plugins/PNGStreamer.h
 )
 
-set (TADPOLE_PLUGINS_FREETYPE_HEADERS
+set (TADPOLE_PLUGINS_FREETYPE_HDR
 	plugins/FreeTypeStreamer.h
 )
 
-set (TADPOLE_PLUGINS_FFMPEG_HEADERS
+set (TADPOLE_PLUGINS_FFMPEG_HDR
 	plugins/FFmpegStreamContext.h
 	plugins/FFmpegVideoHandler.h
 )
 
-set (TADPOLE_PLUGINS_GMEDECODER_HEADERS
+set (TADPOLE_PLUGINS_GMEDECODER_HDR
 	plugins/GMEDecoder.h
 	plugins/GMEStreamer.h
 )
 
-set (TADPOLE_PLUGINS_OGGVORBISDECODER_HEADERS
+set (TADPOLE_PLUGINS_OGGVORBISDECODER_HDR
 	plugins/OggVorbisDecoder.h
 )
 
-set (TADPOLE_PLUGINS_SIDDECODER_HEADERS
+set (TADPOLE_PLUGINS_SIDDECODER_HDR
 	plugins/SIDDecoder.h
 	plugins/SIDStreamer.h
 )
 
-set (TADPOLE_PLUGINS_ZIP_HEADERS
+set (TADPOLE_PLUGINS_ZIP_HDR
 	plugins/ZIPArchive.h
 	plugins/ZIPStream.h
 )
 
-set (TADPOLE_PLUGINS_HOP_HEADERS
+set (TADPOLE_PLUGINS_HOP_HDR
 	plugins/HopComponent.h
 	plugins/HopManager.h
 )
 
-set (TADPOLE_MATERIAL_HEADERS
+set (TADPOLE_MATERIAL_HDR
 	material/Material.h
 	material/RenderPass.h
 	material/RenderPath.h
@@ -360,7 +360,7 @@ set (TADPOLE_MATERIAL_HEADERS
 	material/SceneParameters.h
 )
 
-set (TADPOLE_SENSOR_HEADERS
+set (TADPOLE_SENSOR_HDR
 	sensor/BoundingVolumeSensor.h
 	sensor/InterfaceSensor.h
 	sensor/NameSensor.h
@@ -371,7 +371,7 @@ set (TADPOLE_SENSOR_HEADERS
 	sensor/TypeSensor.h
 )
 
-set (TADPOLE_STUDIO_HEADERS
+set (TADPOLE_STUDIO_HDR
 	studio/SpriteStreamer.h
 	studio/SpriteModel.h
 	studio/SpriteModelComponent.h
@@ -382,7 +382,7 @@ set (TADPOLE_STUDIO_HEADERS
 	studio/StudioTypes.h
 )
 
-set (TADPOLE_TERRAIN_HEADERS
+set (TADPOLE_TERRAIN_HDR
 	terrain/DiffuseTerrainMaterialSource.h
 	terrain/TerrainNodeDataSource.h
 	terrain/TerrainNodeMaterialSource.h
@@ -392,20 +392,20 @@ set (TADPOLE_TERRAIN_HEADERS
 	terrain/TextureDataSource.h
 )
 
-set (TADPOLE_PLATFORM_ANDROID_HEADERS
+set (TADPOLE_PLATFORM_ANDROID_HDR
 	platform/android/AndroidTextureStreamer.h
 )
 
-set (TADPOLE_PLATFORM_OSX_HEADERS
+set (TADPOLE_PLATFORM_OSX_HDR
 	platform/osx/OSXFontStreamer.h
 	platform/osx/OSXTextureStreamer.h
 ) 
 
-set (TADPOLE_PLATFORM_WIN32_HEADERS
+set (TADPOLE_PLATFORM_WIN32_HDR
 	platform/win32/Win32TextureResourceArchive.h
 )
 
-set (TADPOLE_PLATFORM_WIN32_GDIPLUS_HEADERS
+set (TADPOLE_PLATFORM_WIN32_GDIPLUS_HDR
 	platform/win32/StreamIStream.h
 	platform/win32/Win32FontStreamer.h
 	platform/win32/Win32TextureStreamer.h
@@ -420,32 +420,32 @@ source_group ("Source Files\\\\terrain" FILES ${TADPOLE_TERRAIN_SRC})
 
 
 # Bundle headers
-source_group ("Header Files\\\\animation" FILES ${TADPOLE_ANIMATION_HEADERS})
-source_group ("Header Files\\\\material" FILES ${TADPOLE_MATERIAL_HEADERS})
-source_group ("Header Files\\\\sensor" FILES ${TADPOLE_SENSOR_HEADERS})
-source_group ("Header Files\\\\terrain" FILES ${TADPOLE_TERRAIN_HEADERS})
+source_group ("Header Files\\\\animation" FILES ${TADPOLE_ANIMATION_HDR})
+source_group ("Header Files\\\\material" FILES ${TADPOLE_MATERIAL_HDR})
+source_group ("Header Files\\\\sensor" FILES ${TADPOLE_SENSOR_HDR})
+source_group ("Header Files\\\\terrain" FILES ${TADPOLE_TERRAIN_HDR})
 
 
 # Sources, headers and namespaces
 set (TADPOLE_SRC ${TADPOLE_SRC} ${TADPOLE_ANIMATION_SRC} ${TADPOLE_PLUGINS_SRC} ${TADPOLE_MATERIAL_SRC} ${TADPOLE_SENSOR_SRC} ${TADPOLE_TERRAIN_SRC})
-set (TADPOLE_HEADERS ${TADPOLE_HEADERS} ${TADPOLE_ANIMATION_HEADERS} ${TADPOLE_MATERIAL_HEADERS} ${TADPOLE_SENSOR_HEADERS} ${TADPOLE_TERRAIN_HEADERS})
+set (TADPOLE_HDR ${TADPOLE_HDR} ${TADPOLE_ANIMATION_HDR} ${TADPOLE_MATERIAL_HDR} ${TADPOLE_SENSOR_HDR} ${TADPOLE_TERRAIN_HDR})
 set (TADPOLE_NAMESPACES ${TADPOLE_NAMESPACES} animation material node sensor terrain)
 
 
 # Fixed point builds use fewer features
 if (NOT TOADLET_FIXED_POINT)
 	source_group ("Source Files\\\\bsp" FILES ${TADPOLE_BSP_SRC})
-	source_group ("Header Files\\\\bsp" FILES ${TADPOLE_BSP_HEADERS})
+	source_group ("Header Files\\\\bsp" FILES ${TADPOLE_BSP_HDR})
 	source_group ("Source Files\\\\studio" FILES ${TADPOLE_STUDIO_SRC})
-	source_group ("Header Files\\\\studio" FILES ${TADPOLE_STUDIO_HEADERS})
+	source_group ("Header Files\\\\studio" FILES ${TADPOLE_STUDIO_HDR})
 	set (TADPOLE_SRC ${TADPOLE_SRC} ${TADPOLE_BSP_SRC} ${TADPOLE_STUDIO_SRC})
-	set (TADPOLE_HEADERS ${TADPOLE_HEADERS} ${TADPOLE_BSP_HEADERS} ${TADPOLE_STUDIO_HEADERS})
+	set (TADPOLE_HDR ${TADPOLE_HDR} ${TADPOLE_BSP_HDR} ${TADPOLE_STUDIO_HDR})
 	set (TADPOLE_NAMESPACES ${TADPOLE_NAMESPACES} bsp studio)
 endif (NOT TOADLET_FIXED_POINT)
 
 
 # Give the headers and namespaces parent scope for inclusion into the master tadpole.h file
-set (TADPOLE_HEADERS ${TADPOLE_HEADERS} PARENT_SCOPE)
+set (TADPOLE_HDR ${TADPOLE_HDR} PARENT_SCOPE)
 set (TADPOLE_NAMESPACES ${TADPOLE_NAMESPACES} PARENT_SCOPE)
 
 
@@ -456,7 +456,7 @@ find_package (Freetype)
 if (FREETYPE_FOUND)
 	set (TOADLET_HAS_FREETYPE ON PARENT_SCOPE)
 	include_directories (${FREETYPE_INCLUDE_DIRS})
-	set (TADPOLE_PLUGINS_HEADERS ${TADPOLE_PLUGINS_HEADERS} ${TADPOLE_PLUGINS_FREETYPE_HEADERS})
+	set (TADPOLE_PLUGINS_HDR ${TADPOLE_PLUGINS_HDR} ${TADPOLE_PLUGINS_FREETYPE_HDR})
 
 	# Dynamic Library
 	set (TADPOLE_PLUGINS_SRC ${TADPOLE_PLUGINS_SRC} ${TADPOLE_PLUGINS_FREETYPE_SRC})
@@ -474,7 +474,7 @@ find_package (MXML)
 if (MXML_FOUND)
 	set (TOADLET_HAS_MXML ON PARENT_SCOPE)
 	include_directories (${MXML_INCLUDE_DIR})
-	set (TADPOLE_PLUGINS_HEADERS ${TADPOLE_PLUGINS_HEADERS} ${TADPOLE_PLUGINS_XML_HEADERS})
+	set (TADPOLE_PLUGINS_HDR ${TADPOLE_PLUGINS_HDR} ${TADPOLE_PLUGINS_XML_HDR})
 
 	# Dynamic Library
 	set (TADPOLE_PLUGINS_SRC ${TADPOLE_PLUGINS_SRC} ${TADPOLE_PLUGINS_XML_SRC})
@@ -492,7 +492,7 @@ find_package (GIF)
 if (GIF_FOUND)
 	set (TOADLET_HAS_GIF ON PARENT_SCOPE)
 	include_directories (${GIF_INCLUDE_DIR})
-	set (TADPOLE_PLUGINS_HEADERS ${TADPOLE_PLUGINS_HEADERS} ${TADPOLE_PLUGINS_GIF_HEADERS})
+	set (TADPOLE_PLUGINS_HDR ${TADPOLE_PLUGINS_HDR} ${TADPOLE_PLUGINS_GIF_HDR})
 
 	# Dynamic Library
 	set (TADPOLE_PLUGINS_SRC ${TADPOLE_PLUGINS_SRC} ${TADPOLE_PLUGINS_GIF_SRC})
@@ -510,7 +510,7 @@ find_package (JPEG)
 if (JPEG_FOUND)
 	set (TOADLET_HAS_JPEG ON PARENT_SCOPE)
 	include_directories (${JPEG_INCLUDE_DIR})
-	set (TADPOLE_PLUGINS_HEADERS ${TADPOLE_PLUGINS_HEADERS} ${TADPOLE_PLUGINS_JPEG_HEADERS})
+	set (TADPOLE_PLUGINS_HDR ${TADPOLE_PLUGINS_HDR} ${TADPOLE_PLUGINS_JPEG_HDR})
 	
 	# Dynamic Library
 	set (TADPOLE_PLUGINS_SRC ${TADPOLE_PLUGINS_SRC} ${TADPOLE_PLUGINS_JPEG_SRC})
@@ -528,7 +528,7 @@ find_package (PNG)
 if (PNG_FOUND)
 	set (TOADLET_HAS_PNG ON PARENT_SCOPE)
 	include_directories (${PNG_INCLUDE_DIR})
-	set (TADPOLE_PLUGINS_HEADERS ${TADPOLE_PLUGINS_HEADERS} ${TADPOLE_PLUGINS_PNG_HEADERS})
+	set (TADPOLE_PLUGINS_HDR ${TADPOLE_PLUGINS_HDR} ${TADPOLE_PLUGINS_PNG_HDR})
 	
 	# Dynamic Library
 	set (TADPOLE_PLUGINS_SRC ${TADPOLE_PLUGINS_SRC} ${TADPOLE_PLUGINS_PNG_SRC})
@@ -561,7 +561,7 @@ find_package (ZZIP)
 if (ZZIP_FOUND)
 	set (TOADLET_HAS_ZZIP ON PARENT_SCOPE)
 	include_directories (${ZZIP_INCLUDE_DIR})
-	set (TADPOLE_PLUGINS_HEADERS ${TADPOLE_PLUGINS_HEADERS} ${TADPOLE_PLUGINS_ZIP_HEADERS})
+	set (TADPOLE_PLUGINS_HDR ${TADPOLE_PLUGINS_HDR} ${TADPOLE_PLUGINS_ZIP_HDR})
 	
 	# Dynamic Library
 	set (TADPOLE_PLUGINS_SRC ${TADPOLE_PLUGINS_SRC} ${TADPOLE_PLUGINS_ZIP_SRC})
@@ -580,7 +580,7 @@ if (SIDPLAY_FOUND)
 	set (TOADLET_HAS_SIDPLAY ON PARENT_SCOPE)
 	include_directories (${SIDPLAY_INCLUDES})
 	add_definitions(-DSIDPLAY_VERSION=${SIDPLAY_VERSION})
-	set (TADPOLE_PLUGINS_HEADERS ${TADPOLE_PLUGINS_HEADERS} ${TADPOLE_PLUGINS_SIDDECODER_HEADERS})
+	set (TADPOLE_PLUGINS_HDR ${TADPOLE_PLUGINS_HDR} ${TADPOLE_PLUGINS_SIDDECODER_HDR})
 
 	# Dynamic Library
 	set (TADPOLE_PLUGINS_SRC ${TADPOLE_PLUGINS_SRC} ${TADPOLE_PLUGINS_SIDDECODER_SRC})
@@ -630,7 +630,7 @@ find_package (FFmpeg)
 if (FFMPEG_FOUND)
 	set (TOADLET_HAS_FFMPEG ON PARENT_SCOPE)
 	include_directories (${FFMPEG_INCLUDE_DIR})
-	set (TADPOLE_PLUGINS_HEADERS ${TADPOLE_PLUGINS_HEADERS} ${TADPOLE_PLUGINS_FFMPEG_HEADERS})
+	set (TADPOLE_PLUGINS_HDR ${TADPOLE_PLUGINS_HDR} ${TADPOLE_PLUGINS_FFMPEG_HDR})
 
 	# Dynamic Library
 	set (TADPOLE_PLUGINS_SRC ${TADPOLE_PLUGINS_SRC} ${TADPOLE_PLUGINS_FFMPEG_SRC})
@@ -664,7 +664,7 @@ if (NOT FFMPEG_FOUND)
 	if (OGGVORBIS_FOUND)
 		set (TOADLET_HAS_OGGVORBIS ON PARENT_SCOPE)
 		include_directories (${OGGVORBIS_INCLUDES})
-		set (TADPOLE_PLUGINS_HEADERS ${TADPOLE_PLUGINS_HEADERS} ${TADPOLE_PLUGINS_OGGVORBISDECODER_HEADERS})
+		set (TADPOLE_PLUGINS_HDR ${TADPOLE_PLUGINS_HDR} ${TADPOLE_PLUGINS_OGGVORBISDECODER_HDR})
 
 		# Dynamic Library
 		set (TADPOLE_PLUGINS_SRC ${TADPOLE_PLUGINS_SRC} ${TADPOLE_PLUGINS_OGGVORBISDECODER_SRC})
@@ -682,11 +682,11 @@ endif (NOT FFMPEG_FOUND)
 # Platform specific files 
 if (TOADLET_PLATFORM_ANDROID)
 	source_group ("Source Files\\\\platform\\\\android" FILES ${TADPOLE_PLATFORM_ANDROID_SRC})
-	source_group ("Header Files\\\\platform\\\\android" FILES ${TADPOLE_PLATFORM_ANDROID_HEADERS})
+	source_group ("Header Files\\\\platform\\\\android" FILES ${TADPOLE_PLATFORM_ANDROID_HDR})
 	set (TADPOLE_SRC ${TADPOLE_SRC} ${TADPOLE_PLATFORM_ANDROID_SRC})
 elseif (TOADLET_PLATFORM_OSX)
 	source_group ("Source Files\\\\platform\\\\osx" FILES ${TADPOLE_PLATFORM_OSX_SRC})
-	source_group ("Header Files\\\\platform\\\\osx" FILES ${TADPOLE_PLATFORM_OSX_HEADERS})
+	source_group ("Header Files\\\\platform\\\\osx" FILES ${TADPOLE_PLATFORM_OSX_HDR})
 	set (TADPOLE_SRC ${TADPOLE_SRC} ${TADPOLE_PLATFORM_OSX_SRC})
 	if (TOADLET_PLATFORM_IOS)
 		find_library (UIKIT_LIBS UIKit)
@@ -701,24 +701,24 @@ elseif (TOADLET_PLATFORM_WIN32)
 		set (TOADLET_HAS_GDIPLUS ON PARENT_SCOPE)
 		include_directories (${GDIPLUS_INCLUDE_PATH})
 		source_group ("Source Files\\\\platform\\\\win32" FILES ${TADPOLE_PLATFORM_WIN32_GDIPLUS_SRC})
-		source_group ("Header Files\\\\platform\\\\win32" FILES ${TADPOLE_PLATFORM_WIN32_GDIPLUS_HEADERS})
+		source_group ("Header Files\\\\platform\\\\win32" FILES ${TADPOLE_PLATFORM_WIN32_GDIPLUS_HDR})
 		set (TADPOLE_SRC ${TADPOLE_SRC} ${TADPOLE_PLATFORM_WIN32_GDIPLUS_SRC})
 	endif (GDIPLUS_FOUND)
 	source_group ("Source Files\\\\platform\\\\win32" FILES ${TADPOLE_PLATFORM_WIN32_SRC})
-	source_group ("Header Files\\\\platform\\\\win32" FILES ${TADPOLE_PLATFORM_WIN32_HEADERS})
+	source_group ("Header Files\\\\platform\\\\win32" FILES ${TADPOLE_PLATFORM_WIN32_HDR})
 	set (TADPOLE_SRC ${TADPOLE_SRC} ${TADPOLE_PLATFORM_WIN32_SRC})
 endif (TOADLET_PLATFORM_ANDROID)
 
 # Hop
 set (TADPOLE_PLUGINS_SRC ${TADPOLE_PLUGINS_SRC} ${TADPOLE_PLUGINS_HOP_SRC})
-set (TADPOLE_PLUGINS_HEADERS ${TADPOLE_PLUGINS_HEADERS} ${TADPOLE_PLUGINS_HOP_HEADERS})
+set (TADPOLE_PLUGINS_HDR ${TADPOLE_PLUGINS_HDR} ${TADPOLE_PLUGINS_HOP_HDR})
 set (TADPOLE_PLUGINS_LIBS ${TADPOLE_PLUGINS_LIBS} toadlet_hop)
 #set (TADPOLE_PLUGINS_LIBS_S ${TADPOLE_PLUGINS_LIBS_S} toadlet_hop_s)
 
 
 # Bring in dependency results
 source_group ("Source Files\\\\plugins" FILES ${TADPOLE_PLUGINS_SRC})
-source_group ("Header Files\\\\plugins" FILES ${TADPOLE_PLUGINS_HEADERS})
+source_group ("Header Files\\\\plugins" FILES ${TADPOLE_PLUGINS_HDR})
 set (TADPOLE_SRC ${TADPOLE_SRC} ${TADPOLE_PLUGINS_SRC})
 set (TADPOLE_SRC_S ${TADPOLE_SRC} ${TADPOLE_PLUGINS_SRC_S})
 
@@ -732,7 +732,7 @@ endif (SWIG_FOUND AND TADPOLE_SWIG_INT)
 
 # Dynamic library
 if (TOADLET_BUILD_DYNAMIC)
-	add_library (toadlet_tadpole SHARED ${TADPOLE_SRC} ${TADPOLE_HEADERS})
+	add_library (toadlet_tadpole SHARED ${TADPOLE_SRC} ${TADPOLE_HDR})
 	set_target_properties (toadlet_tadpole PROPERTIES ${DYNAMIC_LIB_PROPS})
 
 	target_link_libraries (toadlet_tadpole toadlet_egg toadlet_peeper toadlet_ribbit ${TADPOLE_LIBS} ${TADPOLE_PLUGINS_LIBS})
@@ -742,7 +742,7 @@ endif (TOADLET_BUILD_DYNAMIC)
 
 # Static library
 if (TOADLET_BUILD_STATIC)
-	add_library (toadlet_tadpole_s STATIC ${TADPOLE_SRC_S} ${TADPOLE_HEADERS_S})
+	add_library (toadlet_tadpole_s STATIC ${TADPOLE_SRC_S} ${TADPOLE_HDR_S})
 	set_target_properties (toadlet_tadpole_s PROPERTIES ${STATIC_LIB_PROPS})
 	target_link_libraries (toadlet_tadpole_s toadlet_egg_s toadlet_peeper_s toadlet_ribbit_s ${TADPOLE_LIBS})
 	MERGE_STATIC_LIBRARIES (toadlet_tadpole_s "${TADPOLE_PLUGINS_LIBS_S}")

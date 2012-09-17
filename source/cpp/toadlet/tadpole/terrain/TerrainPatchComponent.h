@@ -82,7 +82,7 @@ public:
 	TerrainPatchComponent(Scene *scene);
 	void destroy();
 
-	bool parentChanged(Node *node);
+	void parentChanged(Node *node);
 
 	bool setHeightData(scalar *data,int rowPitch,int width,int height,bool water);
 	bool setLayerData(tbyte *data,int rowPitch,int width,int height);
