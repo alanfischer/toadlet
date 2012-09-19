@@ -45,7 +45,10 @@ int DataStream::read(tbyte *buffer,int length){
 
 	while(length>0){
 		amount=mStream->read(buffer+total,length);
-		if(amount<0){
+		if(amount==0){
+			return total;
+		}
+		else if(amount<0){
 			return amount;
 		}
 		length-=amount;

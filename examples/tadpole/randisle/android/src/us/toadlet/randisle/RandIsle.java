@@ -9,7 +9,6 @@ public class RandIsle extends AndroidApplication{
 		System.loadLibrary("toadlet_hop");
 		System.loadLibrary("toadlet_flick");
 		System.loadLibrary("toadlet_flick_jinputdevice");
-		System.loadLibrary("toadlet_knot");
 		System.loadLibrary("toadlet_peeper");
 		System.loadLibrary("toadlet_peeper_gles1renderdevice");
 		System.loadLibrary("toadlet_peeper_gles2renderdevice");

@@ -6,6 +6,17 @@ import java.io.*;
 
 public class Input extends AndroidApplication{
 	static{
+		System.loadLibrary("toadlet_egg");
+		System.loadLibrary("toadlet_hop");
+		System.loadLibrary("toadlet_flick");
+		System.loadLibrary("toadlet_flick_jinputdevice");
+		System.loadLibrary("toadlet_peeper");
+		System.loadLibrary("toadlet_peeper_gles1renderdevice");
+		System.loadLibrary("toadlet_peeper_gles2renderdevice");
+		System.loadLibrary("toadlet_ribbit");
+		System.loadLibrary("toadlet_ribbit_jaudiodevice");
+		System.loadLibrary("toadlet_tadpole");
+		System.loadLibrary("toadlet_pad");
 		System.loadLibrary("input");
 	}
 
@@ -29,33 +40,16 @@ public class Input extends AndroidApplication{
 	
 	protected void onStart(){
 		System.out.println("onStart");
-		
-		OutputStream out=null;
-		try{
-			File file=new File(getExternalFilesDir(null),"log.txt");
-			out=new FileOutputStream(file);
-		}
-		catch(IOException ex){
-			out=null;
-		}
-		if(out!=null){
-			startLogging(mApplet,out);
-		}
-		
+
 		super.onStart();
 	}
 
 	protected void onStop(){
 		System.out.println("onStop");
-		
-		stopLogging(mApplet);
-		
+	
 		super.onStop();
 	}
 
 	protected native Applet createApplet(AndroidApplication app);
 	protected native void destroyApplet(Applet applet);
-	
-	protected native void startLogging(Applet applet,OutputStream out);
-	protected native void stopLogging(Applet applet);
 }

@@ -76,27 +76,29 @@ public class AndroidSensorDevice extends BaseInputDevice implements SensorEventL
 	public void onSensorChanged(SensorEvent event){
 		mData.setTime(event.timestamp/1000);
 
+		System.arraycopy(event.values,0,mValues,0,event.values.length<mValues.length?event.values.length:mValues.length);
+		
 		/// @todo: Change InputData so setValid does not need to be called if setValue is called
 		switch(mInputType){
 			case InputType_MOTION:
 				mData.setValid(1<<InputData.Semantic_MOTION_ACCELERATION);
-				mData.setValue(InputData.Semantic_MOTION_ACCELERATION,event.values);
+				mData.setValue(InputData.Semantic_MOTION_ACCELERATION,mValues);
 			break;
 			case InputType_ANGULAR:
 				mData.setValid(1<<InputData.Semantic_ANGULAR);
-				mData.setValue(InputData.Semantic_ANGULAR,event.values);
+				mData.setValue(InputData.Semantic_ANGULAR,mValues);
 			break;
 			case InputType_LIGHT:
 				mData.setValid(1<<InputData.Semantic_LIGHT);
-				mData.setValue(InputData.Semantic_LIGHT,event.values);
+				mData.setValue(InputData.Semantic_LIGHT,mValues);
 			break;
 			case InputType_PROXIMITY:
 				mData.setValid(1<<InputData.Semantic_PROXIMITY);
-				mData.setValue(InputData.Semantic_PROXIMITY,event.values);
+				mData.setValue(InputData.Semantic_PROXIMITY,mValues);
 			break;
 			case InputType_MAGNETIC:
 				mData.setValid(1<<InputData.Semantic_MAGNETIC);
-				mData.setValue(InputData.Semantic_MAGNETIC,event.values);
+				mData.setValue(InputData.Semantic_MAGNETIC,mValues);
 			break;
 		}
 
@@ -131,4 +133,5 @@ public class AndroidSensorDevice extends BaseInputDevice implements SensorEventL
 	boolean mRunning;
 	InputDeviceListener mListener;
 	InputData mData;
+	float[] mValues=new float[4];
 }
