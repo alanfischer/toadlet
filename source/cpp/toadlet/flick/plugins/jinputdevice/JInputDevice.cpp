@@ -101,10 +101,10 @@ void JInputDevice::stop(){
 void JInputDevice::setListener(InputDeviceListener *listener){
 	jobject listenerObj=NULL;
 	if(listener!=NULL){
-		jclass listenerClass=env->FindClass("us/toadlet/flick/NInputDeviceListener");
+		jclass listenerClass=env->FindClass("us/toadlet/flick/BaseInputDeviceListener");
 		{
-			jmethodID initID=env->GetMethodID(listenerClass,"<init>","(I)V");
-			listenerObj=env->NewObject(listenerClass,initID,(int)listener);
+			jmethodID initID=env->GetMethodID(listenerClass,"<init>","(JZ)V");
+			listenerObj=env->NewObject(listenerClass,initID,(jlong)listener,false);
 		}
 		env->DeleteLocalRef(listenerClass);
 		

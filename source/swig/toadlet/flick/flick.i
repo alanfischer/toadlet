@@ -6,7 +6,7 @@
 
 %include <toadlet/flick/InputData.i>
 %include <toadlet/flick/InputDevice.i>
-%include <toadlet/flick/InputDeviceListener.i>
+%include <toadlet/flick/BaseInputDeviceListener.i>
 %include <toadlet/flick/BaseInputDevice.i>
 %{
 using namespace toadlet;

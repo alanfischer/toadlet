@@ -36,6 +36,7 @@
 namespace toadlet{
 namespace tadpole{
 
+/// @todo: This class should really take an array of Materials, so they can be animated, much like the SpriteModelComponent
 class TOADLET_API SpriteComponent:public BaseComponent,public Renderable,public Visible{
 public:
 	TOADLET_OBJECT(SpriteComponent);
