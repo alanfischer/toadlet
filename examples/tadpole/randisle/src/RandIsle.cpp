@@ -133,7 +133,7 @@ void RandIsle::create(){
 			segment.direction.set(0,0,-2000);
 			PhysicsCollision result;
 			mScene->traceSegment(result,segment,-1,mPlayer);
-			result.point.z+=mPlayer->getBound()->getSphere().radius;
+			result.point.z+=mPlayer->getBound()->getSphere().radius + 5;
 			physics->setPosition(result.point);
 		}
 		mPlayer->attach(physics);
