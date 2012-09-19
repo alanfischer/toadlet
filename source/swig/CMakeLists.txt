@@ -20,17 +20,17 @@ if (NOT TOADLET_PLATFORM_PYTHON)
 	)
 	set (FLICK_SWIG_INT_DEPS
 		${CMAKE_CURRENT_SOURCE_DIR}/toadlet/flick/BaseInputDevice.i
+		${CMAKE_CURRENT_SOURCE_DIR}/toadlet/flick/BaseInputDeviceListener.i
 		${CMAKE_CURRENT_SOURCE_DIR}/toadlet/flick/InputData.i
 		${CMAKE_CURRENT_SOURCE_DIR}/toadlet/flick/InputDevice.i
-		${CMAKE_CURRENT_SOURCE_DIR}/toadlet/flick/InputDeviceListener.i
 		PARENT_SCOPE
 	)
 	if (TOADLET_PLATFORM_ANDROID)
 		set (FLICK_SWIG_INT_OUTPUTS
 			${PROJECT_BINARY_DIR}/source/java/us/toadlet/flick/BaseInputDevice.java
+			${PROJECT_BINARY_DIR}/source/java/us/toadlet/flick/BaseInputDeviceListener.java
 			${PROJECT_BINARY_DIR}/source/java/us/toadlet/flick/InputData.java
 			${PROJECT_BINARY_DIR}/source/java/us/toadlet/flick/InputDevice.java
-			${PROJECT_BINARY_DIR}/source/java/us/toadlet/flick/InputDeviceListener.java
 			${PROJECT_BINARY_DIR}/source/java/us/toadlet/flick/flick.java
 			${PROJECT_BINARY_DIR}/source/java/us/toadlet/flick/flickJNI.java
 			PARENT_SCOPE

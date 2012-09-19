@@ -3,8 +3,10 @@
 
 #include <toadlet/toadlet.h>
 
-class Input:public Applet,public InputDeviceListener{
+class Input:public Object,public Applet,public InputDeviceListener{
 public:
+	TOADLET_OBJECT(Input);
+
 	Input(Application *app);
 	virtual ~Input();
 
@@ -13,7 +15,7 @@ public:
 	void render();
 	void update(int dt);
 
-	void resized(int width,int height);
+	void resized(int width,int height){}
 	void focusGained(){}
 	void focusLost(){}
 
@@ -37,11 +39,9 @@ public:
 	Application *app;
 	Engine *engine;
 	Scene::ptr scene;
-	CameraNode::ptr cameraNode;
+	Camera::ptr camera;
 	Node::ptr motionLabel,proximityLabel,lightLabel;
 	Node::ptr motionNeedle[3],proximityNeedle,lightNeedle;
-	Stream::ptr logStream;
-	Socket::ptr serverSocket,socket;
 };
 
 #endif

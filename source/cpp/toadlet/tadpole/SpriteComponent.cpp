@@ -46,6 +46,10 @@ SpriteComponent::SpriteComponent(Engine *engine):
 	mIndexData=new IndexData(IndexData::Primitive_TRISTRIP,NULL,0,4);
 
 	setAlignment(Font::Alignment_BIT_HCENTER|Font::Alignment_BIT_VCENTER);
+
+	// Trigger the generation of a shared state, which will cause us to store our own material, which can be safely set to be aligned
+	/// @todo: The best way for this to work would be to have a specialized makeSpriteMaterial function in the MaterialManager which would generate an aligned material
+	getSharedRenderState();
 }
 
 void SpriteComponent::destroy(){
@@ -83,11 +87,12 @@ void SpriteComponent::parentChanged(Node *node){
 
 void SpriteComponent::setMaterial(Material *material){
 	mMaterial=material;
-	mMaterial->setModelMatrixFlags(Material::MatrixFlag_CAMERA_ALIGNED);
 
 	if(mSharedRenderState!=NULL){
 		mMaterial=mEngine->getMaterialManager()->createSharedMaterial(mMaterial,mSharedRenderState);
 	}
+
+	mMaterial->setModelMatrixFlags(Material::MatrixFlag_CAMERA_ALIGNED);
 }
 
 void SpriteComponent::setAlignment(int alignment){
@@ -99,9 +104,11 @@ void SpriteComponent::setAlignment(int alignment){
 RenderState::ptr SpriteComponent::getSharedRenderState(){
 	if(mSharedRenderState==NULL){
 		mSharedRenderState=mEngine->getMaterialManager()->createRenderState();
-		mEngine->getMaterialManager()->modifyRenderState(mSharedRenderState,mMaterial->getRenderState());
+		if(mMaterial!=NULL){
+			mEngine->getMaterialManager()->modifyRenderState(mSharedRenderState,mMaterial->getRenderState());
 
-		mMaterial=mEngine->getMaterialManager()->createSharedMaterial(mMaterial,mSharedRenderState);
+			mMaterial=mEngine->getMaterialManager()->createSharedMaterial(mMaterial,mSharedRenderState);
+		}
 	}
 
 	return mSharedRenderState;
