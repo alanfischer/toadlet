@@ -26,7 +26,7 @@ if (NOT TOADLET_PLATFORM_ANDROID AND NOT TOADLET_PLATFORM_IOS)
 				set (UNITTEST_EXE ./unitTest)
 			endif (${CMAKE_GENERATOR} STREQUAL "Xcode")
 
-			add_test (NAME memcheck_toadletUnitTests COMMAND ${MEMCHECK_EXE} "--leak-check=yes" "--error-exitcode=1"  ${UNITTEST_EXE})
+			add_test (NAME memcheck_toadletUnitTests COMMAND ${MEMCHECK_EXE} "--leak-check=yes" "--dsymutil=yes" "--error-exitcode=1"  ${UNITTEST_EXE})
 		else (MEMCHECK_EXE)
 			message (FATAL_ERROR "No program found for MEMCHECK_EXE, memcheck cannot be run")
 		endif (MEMCHECK_EXE)
