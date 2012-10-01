@@ -95,8 +95,6 @@ X11Application::X11Application():
 }
 
 X11Application::~X11Application(){
-	delete[] mRenderDeviceOptions;
-
 	delete x11;
 }
 

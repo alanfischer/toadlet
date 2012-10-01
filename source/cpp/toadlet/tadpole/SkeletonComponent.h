@@ -119,7 +119,7 @@ public:
 	String getBoneName(int index) const;
 	String getBoneName(Bone *bone) const{return mSkeleton->getBone(bone->index)->name;}
 
-	const AABox &getBound(){return mBound;}
+	Bound *getBound() const{return mBound;}
 
 	inline Skeleton *getSkeleton() const{return mSkeleton;}
 
@@ -149,7 +149,7 @@ protected:
 	Engine *mEngine;
 	Skeleton::ptr mSkeleton;
 	Collection<Bone::ptr> mBones;
-	AABox mBound;
+	Bound::ptr mBound;
 	int mLastUpdateFrame;
 
 	Sequence::ptr mSequence;
