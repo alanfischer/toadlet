@@ -216,7 +216,7 @@ protected:
 			case Type_SPHERE:
 				Math::findBoundingBox(mBox,mSphere);
 			break;
-			case Type_INFINITE:
+			default:
 				// Nothing
 			break;
 		}

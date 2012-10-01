@@ -51,6 +51,8 @@ SkeletonComponent::SkeletonComponent(Engine *engine,Skeleton *skeleton):
 
 	mTrackHints.resize(mBones.size());
 
+	mBound=new Bound();
+	
 	updateBones();
 }
 
@@ -63,18 +65,22 @@ void SkeletonComponent::destroy(){
 }
 
 void SkeletonComponent::updateBones(){
+	AABox bound;
+
 	int i;
 	for(i=0;i<mBones.size();++i){
 		updateBone(mBones[i]);
 
 		if(i==0){
-			mBound.set(mBones[i]->worldBound);
+			bound.set(mBones[i]->worldBound);
 		}
 		else{
-			mBound.merge(mBones[i]->worldBound);
+			bound.merge(mBones[i]->worldBound);
 		}
 	}
 
+	mBound->set(bound);
+	
 	if(mSkeletonMaterial!=NULL){
 		updateSkeletonBuffers();
 	}

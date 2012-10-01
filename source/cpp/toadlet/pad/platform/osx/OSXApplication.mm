@@ -305,16 +305,10 @@ OSXApplication::OSXApplication():
 		mAudioDevicePlugins.add("al",AudioDevicePlugin(new_ALAudioDevice));
 		mAudioDevicePreferences.add("al");
 	#endif
-	
-	// Fade in buffers over 100 ms, reduces popping
-	int options[]={1,100,0};
-	setAudioDeviceOptions(options,3);
 }
 
 OSXApplication::~OSXApplication(){
 	destroy();
-
-	delete[] mRenderDeviceOptions;
 
 	if(mView!=nil){
 		[(ApplicationView*)mView release];
