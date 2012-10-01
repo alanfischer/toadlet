@@ -24,7 +24,7 @@ public:
 		#if defined(TOADLET_PLATFORM_ANDROID) || defined(TOADLET_PLATFORM_IOS)
 			cloudSize=128;
 			patchSize=32;
-			tolerance=0.00005;
+			tolerance=0.0001;
 		#else
 			cloudSize=512;
 			patchSize=128;
@@ -53,18 +53,20 @@ public:
 
 		TextureFormat::ptr waterFormat(new TextureFormat(TextureFormat::Dimension_D2,TextureFormat::Format_RGB_8,512,512,1,0));
 
-		reflectTexture=engine->getTextureManager()->createTexture(Texture::Usage_BIT_RENDERTARGET|Texture::Usage_BIT_AUTOGEN_MIPMAPS,waterFormat);
-		reflectTarget=engine->getTextureManager()->createPixelBufferRenderTarget();
-		reflectTarget->attach(reflectTexture->getMipPixelBuffer(0,0),PixelBufferRenderTarget::Attachment_COLOR_0);
+		if(engine->isShaderAllowed()){
+			reflectTexture=engine->getTextureManager()->createTexture(Texture::Usage_BIT_RENDERTARGET|Texture::Usage_BIT_AUTOGEN_MIPMAPS,waterFormat);
+			reflectTarget=engine->getTextureManager()->createPixelBufferRenderTarget();
+			reflectTarget->attach(reflectTexture->getMipPixelBuffer(0,0),PixelBufferRenderTarget::Attachment_COLOR_0);
 
-		refractTexture=engine->getTextureManager()->createTexture(Texture::Usage_BIT_RENDERTARGET|Texture::Usage_BIT_AUTOGEN_MIPMAPS,waterFormat);
-		refractTarget=engine->getTextureManager()->createPixelBufferRenderTarget();
-		refractTarget->attach(refractTexture->getMipPixelBuffer(0,0),PixelBufferRenderTarget::Attachment_COLOR_0);
+			refractTexture=engine->getTextureManager()->createTexture(Texture::Usage_BIT_RENDERTARGET|Texture::Usage_BIT_AUTOGEN_MIPMAPS,waterFormat);
+			refractTarget=engine->getTextureManager()->createPixelBufferRenderTarget();
+			refractTarget->attach(refractTexture->getMipPixelBuffer(0,0),PixelBufferRenderTarget::Attachment_COLOR_0);
+		}
 
 		bumpTexture=engine->getTextureManager()->findTexture("water_bump.png");
-
 		waterMaterial=engine->createWaterMaterial(reflectTexture,refractTexture,bumpTexture,color);
 
+		/// @todo: Change the water shader so the bump time is replaced with a texture matrix offset, then we can animate it properly both fixed and shader
 /*
 	Material::ptr waterMaterial=Resources::instance->waterMaterial;
 	if(waterMaterial!=NULL){
@@ -108,6 +110,26 @@ public:
 			shadow->getSubMesh(0)->material=material;
 		}
 
+		Logger::alert("Loading grass");
+
+		grass=shared_static_cast<Mesh>(engine->getMeshManager()->find("tall_grass.tmsh"));
+		if(creature!=NULL){
+			Transform transform;
+			transform.setScale(0.1,0.1,0.1);
+			grass->setTransform(transform);
+
+			for(int i=0;i<grass->getNumSubMeshes();++i){
+				Mesh::SubMesh *subMesh=grass->getSubMesh(i);
+				for(int j=0;j<subMesh->material->getNumPaths();++j){
+					RenderPath *path=subMesh->material->getPath(j);
+					RenderPass *pass=path->getPass(0);
+
+					pass->setBlendState(BlendState(BlendState::Combination_ALPHA));
+					pass->setDepthState(DepthState(DepthState::DepthTest_LEQUAL,false));
+				}
+			}
+		}
+
 		Logger::alert("Loading tree items");
 
 		treeBranch=engine->getMaterialManager()->findMaterial("bark.png");
@@ -118,21 +140,20 @@ public:
 			Material::ptr treeLeafBottom=engine->getMaterialManager()->findMaterial("leaf_bottom1_alpha.png");
 
 			if(treeLeafTop!=NULL && treeLeafBottom!=NULL){
-				int i;
-				for(i=0;i<treeLeafTop->getNumPaths();++i){
+				for(int i=0;i<treeLeafTop->getNumPaths();++i){
 					RenderPath::ptr path=treeLeaf->addPath();
 					RenderPath::ptr topPath=treeLeafTop->getPath(i);
 					RenderPath::ptr bottomPath=treeLeafBottom->getPath(i);
 
 					RenderPass::ptr topPass=path->addPass(topPath->takePass(0));
 					topPass->setRasterizerState(RasterizerState(RasterizerState::CullType_BACK));
-					topPass->setDepthState(DepthState(DepthState::DepthTest_LEQUAL,false));
 					topPass->setBlendState(BlendState::Combination_ALPHA);
+					topPass->setDepthState(DepthState(DepthState::DepthTest_LEQUAL,false));
 
 					RenderPass::ptr bottomPass=path->addPass(bottomPath->takePass(0));
 					bottomPass->setRasterizerState(RasterizerState(RasterizerState::CullType_FRONT));
-					bottomPass->setDepthState(DepthState(DepthState::DepthTest_LEQUAL,false));
 					bottomPass->setBlendState(BlendState::Combination_ALPHA);
+					bottomPass->setDepthState(DepthState(DepthState::DepthTest_LEQUAL,false));
 				}
 			}
 
@@ -200,6 +221,7 @@ public:
 	Material::ptr waterMaterial;
 	Mesh::ptr creature;
 	Mesh::ptr shadow;
+	Mesh::ptr grass;
 	Material::ptr treeBranch;
 	Material::ptr treeLeaf;
 	Material::ptr acorn;

@@ -30,7 +30,8 @@ namespace toadlet{
 namespace tadpole{
 namespace sensor{
 
-PotentiallyVisibleSensor::PotentiallyVisibleSensor(Scene *scene):Sensor(scene){
+PotentiallyVisibleSensor::PotentiallyVisibleSensor(Scene *scene,const Vector3 &point):Sensor(scene){
+	mPoint.set(point);
 }
 
 bool PotentiallyVisibleSensor::sense(SensorResultsListener *results){

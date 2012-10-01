@@ -15,9 +15,14 @@ RandIsle::RandIsle(Application *app,String path):
 	mMouseButtons(0),
 	mXJoy(0),mYJoy(0),
 
+	mLastPredictedTime(0),
+
 	mPatchNoise(4,4,1,1,256)
 {
 	mApp=app;
+	#if defined(TOADLET_PLATFORM_ANDROID)
+		mApp->setEngineOptions(mApp->getEngineOptions() | Engine::Option_BIT_NOSHADER);
+	#endif
 	mPath=path;
 }
 
@@ -38,7 +43,7 @@ void RandIsle::create(){
 
 	mScene=new Scene(mEngine);
 	mScene->setUpdateListener(this);
-	mScene->setRangeLogicDT(30,30);
+	mScene->setRangeLogicDT(50,50);
 	mScene->setExcessiveDT(600);
 
 	Simulator *simulator=((HopManager*)mScene->getPhysicsManager())->getSimulator();
@@ -48,7 +53,7 @@ void RandIsle::create(){
 
 	mTerrain=new TerrainNode(mScene);
 	mScene->setRoot(mTerrain);
-	((HopManager*)mScene->getPhysicsManager())->setTraceable(mTerrain);
+	mScene->getPhysicsManager()->setTraceable(mTerrain);
 	mTerrain->setListener(this);
 	mTerrain->setTolerance(Resources::instance->tolerance);
 	mTerrain->setCameraUpdateScope(Scope_BIT_MAIN_CAMERA);
@@ -58,7 +63,7 @@ void RandIsle::create(){
 	mTerrain->setDataSource(this);
 
 	mFollowNode=new Node(mScene);
-	mFollower=new SmoothFollower(30);
+	mFollower=new SmoothFollower(20);
 	mFollower->setOffset(Vector3(0,-20,5));
 	mFollower->setTargetOffset(Vector3(0,0,7.7));
 	mFollowNode->attach(mFollower);
@@ -167,8 +172,11 @@ void RandIsle::create(){
 
 	mTerrain->setTarget(mPlayer);
 
+	mMountBound=new Bound();
+	mBoundSensor=new BoundingVolumeSensor(mScene);
+
 //	mHUD->setTarget(mPlayer,mCamera);
-	mFollower->setTarget(mFollowNode,mPlayer);
+	mFollower->setTarget(mPlayer);
 	mTerrain->setUpdateTargetBias(128/(getPatchSize()*getPatchScale().x));
 
 	Logger::alert("Populating terrain");
@@ -282,7 +290,7 @@ void RandIsle::logicUpdate(int dt){
 
 	scalar offset=mPlayer->getBound()->getAABox().getMins().z-2;
 	bool inWater=(physics->getPosition().z+offset)<=0;
-	if(!inWater && physics->getGravity()==0){
+	if(!inWater && !climber->getMounted() && physics->getGravity()==0){
 		physics->setGravity(Math::ONE);
 	}
 	else if(inWater){
@@ -353,20 +361,21 @@ void RandIsle::updateDanger(int dt){
 void RandIsle::updateClimber(PathClimber *climber,int dt){
 	// Find graph
 	if(climber->getPath()==NULL){
-		// TODO: Use sensor
-		if(/*mPlayer->getHealth()>0 && */climber->getNoClimbTime()<mScene->getLogicTime()){
+		if(climber->getNoClimbTime()<mScene->getLogicTime()){
 			// Find closest graph & mount point
 			float snapDistance=10;
-			Bound::ptr playerSphere=new Bound(Sphere(mPlayer->getTranslate(),snapDistance));
 			Node *closestSystem=NULL;
 			float closestDistance=1000;
 			PathSystem::Path *closestPath=NULL;
 			Vector3 closestPoint;
-			Node *root=mScene->getRoot();
-			int i;
-			for(i=0;i<root->getNumNodes();++i){
-				Node *node=root->getNode(i);
-				if((node->getScope()==Scope_TREE) && node->getWorldBound()->testIntersection(playerSphere)){
+
+			mMountBound->set(mPlayer->getTranslate(),snapDistance);
+			mBoundSensor->setBound(mMountBound);
+			SensorResults::ptr results=mBoundSensor->sense();
+
+			for(int i=0;i<results->size();++i){
+				Node *node=results->at(i);
+				if((node->getScope()==Scope_TREE)){
 					Tree *system=(Tree*)node;
 					Vector3 point;
 					PathSystem::Path *path=system->getClosestPath(point,mPlayer->getTranslate());
@@ -408,9 +417,12 @@ void RandIsle::updateClimber(PathClimber *climber,int dt){
 			wiggleLeaves((Tree*)climber->getMounted(),mPlayer->getWorldBound()->getSphere());
 		}
 
-		findPathSequence(mPathSequence,climber,climber->getPath(),climber->getPathDirection(),climber->getPathTime());
-
-		updatePredictedPath(climber,dt);
+		if(Math::length(mLastPredictedRotation,climber->getIdealRotation())>epsilon || mLastPredictedTime+250<mScene->getLogicTime()){
+			mLastPredictedRotation=climber->getIdealRotation();
+			mLastPredictedTime=mScene->getLogicTime();
+			findPathSequence(mPathSequence,climber,climber->getPath(),climber->getPathDirection(),climber->getPathTime());
+			updatePredictedPath(climber,dt);
+		}
 
 		Vector3 position;
 		Math::mul(position,climber->getIdealRotation(),Math::Y_UNIT_VECTOR3);
@@ -619,10 +631,10 @@ void RandIsle::wiggleLeaves(Tree *tree,const Sphere &bound){
 	Sphere localBound;
 	Math::sub(localBound,bound,tree->getWorldTranslate());
 	localBound.radius=20.0f;
-	if(tree->wiggleLeaves(localBound) && mRustleSound->getPlaying()==false){
-		mRustleSound->setGain(Math::ONE);
-		mRustleSound->play();
-	}
+//	if(tree->wiggleLeaves(localBound) && mRustleSound->getPlaying()==false){
+//		mRustleSound->setGain(Math::ONE);
+//		mRustleSound->play();
+//	}
 }
 
 int RandIsle::atJunction(PathClimber *climber,PathSystem::Path *current,PathSystem::Path *next){
@@ -648,8 +660,7 @@ int RandIsle::atJunction(PathClimber *climber,PathSystem::Path *current,PathSyst
 }
 
 bool RandIsle::updatePopulatePatches(){
-	int i;
-	for(i=0;i<mPopulatePatches.size();i++){
+	for(int i=0;i<mPopulatePatches.size();i++){
 		PopulatePatch *patch=&mPopulatePatches[i];
 		int step=12;
 
@@ -662,7 +673,7 @@ bool RandIsle::updatePopulatePatches(){
 			}
 		}
 
-		// TODO: Could I replace some of this math with Terrain->toWorldXY()?
+		/// @todo: Could I replace some of this math with Terrain->toWorldXY()?
 		float ty=(float)(patch->py*mPatchSize+patch->y - mPatchSize/2)/(float)mPatchSize;
 		float tx=pathValue(ty);
 
@@ -676,9 +687,31 @@ bool RandIsle::updatePopulatePatches(){
 		mScene->traceSegment(result,segment,-1,NULL);
 		if(result.time<Math::ONE && patch->bound->testIntersection(result.point)){
 			result.point.z-=5;
-			/// @todo: Make this not auto attach
-			Tree::ptr tree=new Tree(mScene,wx+wy,mScene->getRoot(),result.point);
-		}
+			Tree::ptr tree=new Tree(mScene,wx+wy);
+			tree->setTranslate(result.point);
+			mScene->getRoot()->attach(tree);
+
+/*			/// @todo: Make the amount of props Resource dependent so it can scale
+			Random r; /// @todo: Replace with perlin noise
+			for(int j=0;j<10;++j){
+				Vector3 offset(r.nextFloat(-1,1),r.nextFloat(-1,1),0); /// @todo: Replace with random AxisAngle around Z + weighted distance
+				Math::normalize(offset);
+				offset=offset*20;
+
+				Segment segment;
+				segment.origin=tree->getTranslate() + offset;
+				segment.origin.z=1000;
+				segment.direction.set(0,0,-2000);
+				mScene->traceSegment(result,segment);
+
+				Node::ptr grass=new Node(mScene);
+				MeshComponent *mesh=new MeshComponent(mEngine);
+				mesh->setMesh(Resources::instance->grass);
+				grass->attach(mesh);
+				grass->setTranslate(result.point);
+				mScene->getRoot()->attach(grass);
+			}
+*/		}
 
 		if(patch->dy>=0){
 			patch->y+=step;
@@ -701,13 +734,12 @@ void RandIsle::terrainPatchCreated(int px,int py,Bound *bound){
 }
 
 void RandIsle::terrainPatchDestroyed(int px,int py,Bound *bound){
-	// TODO: Use bounding volume sensor
-	Node *root=mScene->getRoot();
-	int i;
-	for(i=0;i<root->getNumNodes();++i){
-		Node *node=root->getNode(i);
+	mBoundSensor->setBound(bound);
+	SensorResults::ptr results=mBoundSensor->sense();
+	for(int i=0;i<results->size();++i){
+		Node *node=results->at(i);
 		if((node->getScope()==Scope_TREE) && Math::testInside(bound->getAABox(),node->getWorldTranslate())){
-			mScene->destroy(node);
+			node->destroy();
 		}
 	}
 }

@@ -238,15 +238,16 @@ Sky::Sky(Scene *scene,int cloudSize,const Vector4 &skyColor,const Vector4 &fadeC
 	Material::ptr sunMaterial=mEngine->createDiffuseMaterial(glowTexture);
 	sunMaterial->setLayer(-1);
 	sunMaterial->setSort(Material::SortType_MATERIAL);
-	sunMaterial->getPass()->setBlendState(BlendState::Combination_COLOR_ADDITIVE);
-	sunMaterial->getPass()->setMaterialState(MaterialState(false));
-	sunMaterial->getPass()->setDepthState(DepthState(DepthState::DepthTest_ALWAYS,false));
 	sunMaterial->compile();
 
 	mSunNode=new Node(mScene);
 	{
 		mSun=new SpriteComponent(mEngine);
 		mSun->setMaterial(sunMaterial);
+		mSun->getSharedRenderState()->setBlendState(BlendState::Combination_COLOR_ADDITIVE);
+		mSun->getSharedRenderState()->setMaterialState(MaterialState(false));
+		mSun->getSharedRenderState()->setDepthState(DepthState(DepthState::DepthTest_ALWAYS,false));
+
 		mSunNode->attach(mSun);
 	}
 	mSunNode->setScale(128,128,128);

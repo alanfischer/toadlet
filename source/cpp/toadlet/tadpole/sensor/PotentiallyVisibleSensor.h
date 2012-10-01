@@ -37,7 +37,7 @@ class TOADLET_API PotentiallyVisibleSensor:public Object,public Sensor{
 public:
 	TOADLET_OBJECT(PotentiallyVisibleSensor);
 
-	PotentiallyVisibleSensor(Scene *scene);
+	PotentiallyVisibleSensor(Scene *scene,const Vector3 &point=Math::ZERO_VECTOR3);
 
 	void setPoint(const Vector3 &point){mPoint.set(point);}
 	const Vector3 &getPoint() const{return mPoint;}

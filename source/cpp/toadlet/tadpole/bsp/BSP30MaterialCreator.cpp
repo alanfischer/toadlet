@@ -46,10 +46,11 @@ BSP30MaterialCreator::BSP30MaterialCreator(Engine *engine){
 		"varying vec2 texCoord1;\n"
 
 		"uniform mat4 modelViewProjectionMatrix;\n"
+		"uniform mat4 textureMatrix;\n"
 
 		"void main(){\n"
 			"gl_Position=modelViewProjectionMatrix * POSITION;\n"
-			"texCoord0=TEXCOORD0;\n"
+			"texCoord=(textureMatrix * vec4(TEXCOORD0,0.0,1.0)).xy;\n"
 			"texCoord1=TEXCOORD1;\n"
 		"}",
 
@@ -67,11 +68,12 @@ BSP30MaterialCreator::BSP30MaterialCreator(Engine *engine){
 		"};\n"
 
 		"float4x4 modelViewProjectionMatrix;\n"
+		"float4x4 textureMatrix;\n"
 
 		"VOUT main(VIN vin){\n"
 			"VOUT vout;\n"
 			"vout.position=mul(modelViewProjectionMatrix,vin.position);\n"
-			"vout.texCoord0=vin.texCoord0;\n "
+			"vout.texCoord0=mul(textureMatrix,float4(vin.texCoord0,0.0,1.0));\n "
 			"vout.texCoord1=vin.texCoord1;\n "
 			"return vout;\n"
 		"}"
@@ -134,6 +136,7 @@ Material::ptr BSP30MaterialCreator::createBSP30Material(Texture *diffuseTexture)
 
 		RenderVariableSet::ptr variables=pass->makeVariables();
 		variables->addVariable("modelViewProjectionMatrix",RenderVariable::ptr(new MVPMatrixVariable()),Material::Scope_RENDERABLE);
+		variables->addVariable("textureMatrix",RenderVariable::ptr(new TextureMatrixVariable("tex")),Material::Scope_MATERIAL);
 
 		variables->addTexture("diffuseTex",diffuseTexture,"diffuseSamp",mEngine->getMaterialManager()->getDefaultSamplerState(),TextureState());
 		variables->addTexture("lightmapTex",NULL,"lightmapSamp",mEngine->getMaterialManager()->getDefaultSamplerState(),TextureState());

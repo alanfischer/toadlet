@@ -11,10 +11,11 @@ public:
 		mPositions.resize(bufferSize);
 	}
 
-	void setTarget(Node *parent,Node *target){
+	void setTarget(Node *target){
 		mTarget=target;
 
 		// Attach target to last as a temporary hack until update layers are added
+		Node::ptr parent=mParent;
 		Node::ptr parentParent=parent->getParent();
 		parentParent->remove(parent);
 		parentParent->attach(parent);
@@ -73,11 +74,9 @@ public:
 		mParent->setTranslate(position);
 
 		if(mTarget!=NULL){
-			mParent->updateWorldTransform();
-
 			Quaternion rotate,invrot;
 			Matrix4x4 transform;
-			Math::setMatrix4x4FromLookAt(transform,mParent->getWorldTranslate(),mTarget->getWorldTranslate()+mTargetOffset,toadlet::tadpole::Math::Z_UNIT_VECTOR3,true);
+			Math::setMatrix4x4FromLookAt(transform,mParent->getTranslate(),mTarget->getWorldTranslate()+mTargetOffset,toadlet::tadpole::Math::Z_UNIT_VECTOR3,true);
 			Math::setQuaternionFromMatrix4x4(rotate,transform);
 			if(mParent->getParent()!=NULL){
 				Math::invert(invrot,mParent->getParent()->getWorldRotate());
@@ -85,8 +84,6 @@ public:
 			}
 			mParent->setRotate(rotate);
 		}
-
-		mParent->updateWorldTransform();
 	}
 
 	Node::ptr mTarget;

@@ -54,7 +54,14 @@ class TOADLET_API Engine:public Object{
 public:
 	TOADLET_OBJECT(Engine);
 
-	Engine(void *env=NULL,void *ctx=NULL);//bool fixedBackable=true,bool shaderBackable=true);
+	enum{
+		Option_BIT_FIXEDBACKABLE=	1<<0,
+		Option_BIT_SHADERBACKABLE=	1<<1,
+		Option_BIT_NOFIXED=			1<<2,
+		Option_BIT_NOSHADER=		1<<3,
+	};
+
+	Engine(void *env=NULL,void *ctx=NULL,int options=0);
 	virtual ~Engine();
 
 	void destroy();
@@ -87,11 +94,14 @@ public:
 	int getIdealVertexFormatType() const{return mIdealVertexFormatType;}
 	const VertexFormats &getVertexFormats() const{return mVertexFormats;}
 	const RenderCaps &getRenderCaps() const{return mRenderCaps;}
-	bool isBackable() const{return mFixedBackable || mShaderBackable;}
-	bool isShaderBackable() const{return mShaderBackable;}
-	bool isFixedBackable() const{return mFixedBackable;}
-	bool hasShader(Shader::ShaderType type){return mShaderBackable || mRenderCaps.hasShader[type];}
-	bool hasFixed(Shader::ShaderType type){return mFixedBackable || mRenderCaps.hasFixed[type];}
+
+	bool isFixedBackable() const{return isFixedAllowed() && (mOptions&Option_BIT_FIXEDBACKABLE)!=0;}
+	bool isShaderBackable() const{return isShaderAllowed() && (mOptions&Option_BIT_SHADERBACKABLE)!=0;}
+	bool isFixedAllowed() const{return (mOptions&Option_BIT_NOFIXED)==0;}
+	bool isShaderAllowed() const{return (mOptions&Option_BIT_NOSHADER)==0;}
+	bool isBackable() const{return isFixedBackable() || isShaderBackable();}
+	bool hasFixed(Shader::ShaderType type){return isFixedAllowed() && (isFixedBackable() || mRenderCaps.hasFixed[type]);}
+	bool hasShader(Shader::ShaderType type){return isShaderAllowed() && (isShaderBackable() || mRenderCaps.hasShader[type]);}
 
 	inline ArchiveManager *getArchiveManager() const{return mArchiveManager;}
 	inline TextureManager *getTextureManager() const{return mTextureManager;}
@@ -114,15 +124,15 @@ public:
 	Material::ptr createSkyBoxMaterial(Texture *texture,bool clamp=true);
 	Material::ptr createWaterMaterial(Texture *reflectTexture,Texture *refractTexture,Texture *bumpTexture,const Vector4 &color);
 
-	Mesh::ptr createAABoxMesh(const AABox &box,Material::ptr material=Material::ptr());
-	Mesh::ptr createSkyBoxMesh(scalar size,bool unfolded,bool invert,Material::ptr bottom,Material::ptr top,Material::ptr left,Material::ptr right,Material::ptr back,Material::ptr front);
-	Mesh::ptr createSkyDomeMesh(const Sphere &sphere,int numSegments,int numRings,scalar fade,Material::ptr material=Material::ptr());
-	Mesh::ptr createSphereMesh(const Sphere &sphere,Material::ptr material=Material::ptr());
-	Mesh::ptr createGridMesh(scalar width,scalar height,int numWidth,int numHeight,Material::ptr material=Material::ptr());
+	Mesh::ptr createAABoxMesh(const AABox &box,Material *material=NULL);
+	Mesh::ptr createSkyBoxMesh(scalar size,bool unfolded,bool invert,Material *bottom,Material *top,Material *left,Material *right,Material *back,Material *front);
+	Mesh::ptr createSkyDomeMesh(const Sphere &sphere,int numSegments,int numRings,scalar fade,Material *material=NULL);
+	Mesh::ptr createSphereMesh(const Sphere &sphere,Material *material=NULL);
+	Mesh::ptr createGridMesh(scalar width,scalar height,int numWidth,int numHeight,Material *material=NULL);
 
 protected:
 	void *mEnv,*mCtx;
-	bool mFixedBackable,mShaderBackable;
+	int mOptions;
 	RenderDevice *mRenderDevice;
 	bool mRenderDeviceChanged;
 	AudioDevice *mAudioDevice;

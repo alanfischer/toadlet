@@ -32,7 +32,6 @@ TerrainPatchComponent::TerrainPatchComponent(Scene *scene):
 	//mVertexes,
 	//mBlocks,
 	//mBlockQueue,
-	mBlockQueueSize(0),
 	mBlockQueueStart(0),
 	mBlockQueueEnd(0),
 	mNumBlocksInQueue(0),
@@ -49,6 +48,7 @@ TerrainPatchComponent::TerrainPatchComponent(Scene *scene):
 	mTerrainScope(-1),
 	mWaterScope(-1),
 	mTolerance(0),
+	mWaterOpaque(false),
 	mWaterLevel(0)
 {
 	mScene=scene;
@@ -236,12 +236,13 @@ bool TerrainPatchComponent::setHeightData(scalar *data,int rowPitch,int width,in
 	}
 
 	// Build blocks
-	mNumBlocks=1<<(2*sizeN);
-	mNumBlocks=(int)((mNumBlocks-1)/3) + 1;
+	int numBlocks=1<<(2*sizeN);
+	numBlocks=(int)((numBlocks-1)/3) + 1;
 
-	mBlocks.resize(mNumBlocks);
-	mBlockQueueSize=mNumBlocks;
-	mBlockQueue.resize(mBlockQueueSize);
+	mBlocks.resize(numBlocks);
+	mBlockQueue.resize(numBlocks);
+	mBlocksVisible.resize(numBlocks);
+	mWaterBlocksVisible.resize(numBlocks);
 
 	mNumBlocksInQueue=0;
 	mBlockQueueStart=0;
@@ -352,6 +353,10 @@ bool TerrainPatchComponent::setMaterial(Material *material){
 
 bool TerrainPatchComponent::setWaterMaterial(Material *material){
 	mWaterMaterial=material;
+
+	if(mWaterMaterial!=NULL){
+		mWaterOpaque=mWaterMaterial->isDepthSorted();
+	}
 
 	return true;
 }
@@ -630,6 +635,8 @@ void TerrainPatchComponent::gatherRenderables(Camera *camera,RenderableSet *set)
 	}
 
 	if((camera->getScope()&mWaterScope)!=0 && mWaterRenderable!=NULL && mWaterMaterial!=NULL){
+		mWaterWorldTransform.setTransform(mParent->getWorldTransform(),mWaterTransform);
+
 		if((camera->getScope()&mCameraUpdateScope)!=0){
 			updateWaterIndexBuffers(camera);
 		}
@@ -665,22 +672,26 @@ void TerrainPatchComponent::updateIndexBuffers(Camera *camera){
 	mLocalCamera->setWorldMatrix(matrix);
 	mLocalCamera->setProjectionMatrix(camera->getProjectionMatrix());
 
-	int indexCount=gatherBlocks(mIndexBuffer,mLocalCamera,false);
-	mIndexData->setCount(indexCount);
+	bool changed=gatherVisibleBlocks(mBlocksVisible,mLocalCamera,false);
+	if(changed){
+		int indexCount=gatherIndexes(mIndexBuffer,mBlocksVisible);
+		mIndexData->setCount(indexCount);
+	}
 }
 
 void TerrainPatchComponent::updateWaterIndexBuffers(Camera *camera){
 	TOADLET_PROFILE_AUTOSCOPE();
-
-	mWaterWorldTransform.setTransform(mParent->getWorldTransform(),mWaterTransform);
 
 	Matrix4x4 matrix;
 	mParent->getWorldTransform().inverseTransform(matrix,camera->getWorldMatrix());
 	mLocalCamera->setWorldMatrix(matrix);
 	mLocalCamera->setProjectionMatrix(camera->getProjectionMatrix());
 
-	int indexCount=gatherBlocks(mWaterIndexBuffer,mLocalCamera,true);
-	mWaterIndexData->setCount(indexCount);
+	bool changed=gatherVisibleBlocks(mWaterBlocksVisible,mLocalCamera,true);
+	if(changed){
+		int indexCount=gatherIndexes(mWaterIndexBuffer,mWaterBlocksVisible);
+		mWaterIndexData->setCount(indexCount);
+	}
 }
 
 void TerrainPatchComponent::render(RenderManager *manager) const{
@@ -1231,13 +1242,31 @@ bool TerrainPatchComponent::blockIntersectsCamera(const Block *block,Camera *cam
 
 bool TerrainPatchComponent::blockVisibleByWater(const Block *block,Camera *camera,bool water) const{
 	const Vector3 &cameraPosition=camera->getPosition();
-	bool waterOpaque=false; /// @todo: Make this a class variable, and have it come from the TerrainNodeDataSource
+	bool waterOpaque=mWaterOpaque;
 	return (water==false && waterOpaque==false) || 
 		(cameraPosition.z>mWaterLevel && ((water==false && block->maxs.z>mWaterLevel) || (water==true && block->mins.z<=mWaterLevel))) ||
 		(cameraPosition.z<mWaterLevel && block->mins.z<=mWaterLevel);
 }
 
-int TerrainPatchComponent::gatherBlocks(IndexBuffer *indexBuffer,Camera *camera,bool water) const{
+bool TerrainPatchComponent::gatherVisibleBlocks(Collection<bool> &blocksVisible,Camera *camera,bool water) const{
+	bool changed=false;
+	const Block *block=NULL;
+
+	int i;
+	for(i=0;i<mNumBlocksInQueue;i++){
+		block=getBlockNumber(i);
+
+		bool visible=(blockIntersectsCamera(block,camera,water) && blockVisibleByWater(block,camera,water));
+		if(blocksVisible[i]!=visible){
+			changed=true;
+			blocksVisible[i]=visible;
+		}
+	}
+
+	return changed;
+}
+
+int TerrainPatchComponent::gatherIndexes(IndexBuffer *indexBuffer,const Collection<bool> &blocksVisible) const{
 	TOADLET_PROFILE_AUTOSCOPE();
 
 	int indexCount=0;
@@ -1247,21 +1276,21 @@ int TerrainPatchComponent::gatherBlocks(IndexBuffer *indexBuffer,Camera *camera,
 
 	int i;
 	for(i=0;i<mNumBlocksInQueue;i++){
-		block=getBlockNumber(i);
+		if(blocksVisible[i]){
+			block=getBlockNumber(i);
 
-		if(blockIntersectsCamera(block,camera,water) && blockVisibleByWater(block,camera,water)){
 			int x0=block->xOrigin;
 			int y0=block->yOrigin;
 			int x1=block->xOrigin+block->stride*2;
 			int y1=block->yOrigin+block->stride*2;
 
 			if(block->even==true){
-				indexCount=gatherTriangle(iba,indexCount,x0,y0,x0,y1,x1,y0);
-				indexCount=gatherTriangle(iba,indexCount,x1,y1,x1,y0,x0,y1);
+				indexCount=gatherTriangleIndexes(iba,indexCount,x0,y0,x0,y1,x1,y0);
+				indexCount=gatherTriangleIndexes(iba,indexCount,x1,y1,x1,y0,x0,y1);
 			}
 			else{
-				indexCount=gatherTriangle(iba,indexCount,x1,y0,x0,y0,x1,y1);
-				indexCount=gatherTriangle(iba,indexCount,x0,y1,x1,y1,x0,y0);
+				indexCount=gatherTriangleIndexes(iba,indexCount,x1,y0,x0,y0,x1,y1);
+				indexCount=gatherTriangleIndexes(iba,indexCount,x0,y1,x1,y1,x0,y0);
 			}
 		}
 	}
@@ -1271,7 +1300,7 @@ int TerrainPatchComponent::gatherBlocks(IndexBuffer *indexBuffer,Camera *camera,
 	return indexCount;
 }
 
-int TerrainPatchComponent::gatherTriangle(IndexBufferAccessor &iba,int indexCount,int x0,int y0,int x1,int y1,int x2,int y2) const{
+int TerrainPatchComponent::gatherTriangleIndexes(IndexBufferAccessor &iba,int indexCount,int x0,int y0,int x1,int y1,int x2,int y2) const{
 	if(Math::abs(x0-x1)>1 || Math::abs(x2-x1)>1 || Math::abs(y0-y1)>1 || Math::abs(y2-y1)>1){
 		int mx,my;
 
@@ -1279,8 +1308,8 @@ int TerrainPatchComponent::gatherTriangle(IndexBufferAccessor &iba,int indexCoun
 		my=(y1+y2)/2;
 
 		if(vertexAt(mx,my)->enabled){
-			indexCount=gatherTriangle(iba,indexCount,mx,my,x0,y0,x1,y1);
-			indexCount=gatherTriangle(iba,indexCount,mx,my,x2,y2,x0,y0);
+			indexCount=gatherTriangleIndexes(iba,indexCount,mx,my,x0,y0,x1,y1);
+			indexCount=gatherTriangleIndexes(iba,indexCount,mx,my,x2,y2,x0,y0);
 			return indexCount;
 		}
 	}

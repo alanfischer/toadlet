@@ -4,13 +4,13 @@
 #include <toadlet/egg.h>
 #include <toadlet/tadpole.h>
 
-class BranchSystem{
+class BranchSystem:public Object{
 public:
-	TOADLET_SPTR(BranchSystem);
+	TOADLET_OBJECT(BranchSystem);
 
-	class Branch{
+	class Branch:public Object{
 	public:
-		TOADLET_SPTR(Branch);
+		TOADLET_OBJECT(Branch);
 	
 		Branch():life(0),length(0),speed(0),scale(0),visibilityAmount(0),buildTime(0),barkTime(0){}
 

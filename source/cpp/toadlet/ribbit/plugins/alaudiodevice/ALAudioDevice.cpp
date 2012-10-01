@@ -74,7 +74,7 @@ ALAudioDevice::ALAudioDevice():
 	mBufferFadeTime=100;
 }
 
-bool ALAudioDevice::create(int *options){
+bool ALAudioDevice::create(int options){
 	Logger::alert(Categories::TOADLET_RIBBIT,
 		"creating ALAudioDevice");
 
@@ -82,19 +82,6 @@ bool ALAudioDevice::create(int *options){
 		Error::unknown(Categories::TOADLET_RIBBIT,
 			"only 1 OpenAL context available at a time");
 		return false;
-	}
-
-	if(options!=NULL){
-		int i=0;
-		while(options[i]!=0){
-			switch(options[i++]){
-				case Option_BUFFER_FADE_TIME:
-					mBufferFadeTime=options[i++];
-					Logger::alert(Categories::TOADLET_PEEPER,
-						String("Setting BufferFadeTime to:")+mBufferFadeTime);
-					break;
-			}
-		}
 	}
 
 	#if defined(TOADLET_HAS_ALEM)

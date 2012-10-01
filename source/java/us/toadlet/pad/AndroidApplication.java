@@ -119,13 +119,19 @@ public abstract class AndroidApplication extends Activity implements Runnable{
 
 	public AndroidApplication(){
 		super();
+		
+		mEngineOptions=Engine.Option_BIT_FIXEDBACKABLE | Engine.Option_BIT_SHADERBACKABLE;
+		
+		mFormat=new WindowRenderTargetFormat();
+		mFormat.setDepthBits(16);
+		mFormat.setFlags(2);
 	}
 
 	protected void onCreate(Bundle bundle){
 		super.onCreate(bundle);
 
 		System.out.println("Free memory on create:"+Runtime.getRuntime().freeMemory());
-
+		
 		create();
 	}
 
@@ -190,8 +196,12 @@ public abstract class AndroidApplication extends Activity implements Runnable{
 	}
 	
 	public boolean create(){
+		if(mApplet==null){
+			mApplet=createApplet(this);
+		}
+
 		if(mEngine==null){
-			mEngine=new Engine(this);
+			mEngine=new Engine(this,mEngineOptions);
 			mEngine.installHandlers();
 		}
 
@@ -228,8 +238,7 @@ public abstract class AndroidApplication extends Activity implements Runnable{
 			mInputDevices[magneticDevice.getType()]=magneticDevice;
 		}
 		
-		if(mApplet==null){
-			mApplet=createApplet(this);
+		if(mApplet!=null){
 			mApplet.create();
 		}
 
@@ -466,8 +475,18 @@ public abstract class AndroidApplication extends Activity implements Runnable{
 	public void setDifferenceMouse(boolean difference){mDifferenceMouse=difference;}
 	public boolean getDifferenceMouse(){return mDifferenceMouse;}
 
+	public void setEngineOptions(int options){mEngineOptions=options;}
+	public int getEngineOptions(){return mEngineOptions;}
+
 	public void setFullscreen(boolean fullscreen){mFullscreen=fullscreen;}
 	public boolean getFullscreen(){return mFullscreen;}
+
+	public void setWindowRenderTargetFormat(WindowRenderTargetFormat format){mFormat=format;}
+	public WindowRenderTargetFormat getWindowRenderTargetFormat(){return mFormat;}
+	
+	public void setBackable(boolean fixed,boolean shader){mFixedBackable=fixed;mShaderBackable=shader;}
+	public boolean getFixedBackable(){return mFixedBackable;}
+	public boolean getShaderbackable(){return mShaderBackable;}
 	
 	public void setApplet(Applet applet){mApplet=applet;}
 	public Applet getApplet(){return mApplet;}
@@ -493,9 +512,6 @@ public abstract class AndroidApplication extends Activity implements Runnable{
 		System.out.println(
 			"AndroidApplication.surfaceCreated");
 
-		mFormat=new WindowRenderTargetFormat();
-		mFormat.setDepthBits(16);
-
 		// Can not appear to get the current Surface format
 		int Format_SEMANTIC_RGB=6;
 		int Format_SHIFT_TYPES=8;
@@ -503,8 +519,15 @@ public abstract class AndroidApplication extends Activity implements Runnable{
 		int Format_RGB_5_6_5=Format_SEMANTIC_RGB|Format_TYPE_UINT_5_6_5;
 		mFormat.setPixelFormat(Format_RGB_5_6_5);
 
+		if((mEngineOptions&Engine.Option_BIT_NOFIXED)!=0){
+			mFormat.setFlags(2);
+		}
+		else if((mEngineOptions&Engine.Option_BIT_NOSHADER)!=0){
+			mFormat.setFlags(0);
+		}
+		
 		// Start with gles2 and then try gles
-		for(mFormat.setFlags(2);mFormat.getFlags()>=0 && mRenderDevice==null;mFormat.setFlags(mFormat.getFlags()-2)){
+		for(;mFormat.getFlags()>=0 && mRenderDevice==null;mFormat.setFlags(mFormat.getFlags()-2)){
 			RenderTarget target=null;
 			try{
 				target=new EGLWindowRenderTarget(null,holder,mFormat);
@@ -580,10 +603,11 @@ public abstract class AndroidApplication extends Activity implements Runnable{
 	protected boolean mRun;
 	protected Object mSurfaceMutex=new Object();
 	protected long mLastTime=0;
-	protected String mTitle;
 	protected boolean mDifferenceMouse;
+	protected int mEngineOptions;
 	protected int mLastMouseX,mLastMouseY;
 	protected WindowRenderTargetFormat mFormat;
+	protected boolean mFixedBackable=true,mShaderBackable=true;
 	protected RenderTarget mRenderTarget;
 	protected RenderDevice mRenderDevice;
 	protected AudioDevice mAudioDevice;

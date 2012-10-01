@@ -68,6 +68,12 @@ public:
 	void setDifferenceMouse(bool difference);
 	bool getDifferenceMouse() const;
 
+	void setWindowRenderTargetFormat(WindowRenderTargetFormat::ptr format){}
+	WindowRenderTargetFormat::ptr getWindowRenderTargetFormat() const{return WindowRenderTargetFormat::ptr();}
+
+	void setEngineOptions(int options);
+	int getEngineOptions() const;
+
 	// Integrate a JApplet class here
 	void setApplet(Applet *applet){}
 	Applet *getApplet() const{return NULL;}
@@ -82,7 +88,7 @@ public:
 protected:
 	JNIEnv *env;
 	jobject obj;
-	jmethodID createID,destroyID,startID,stopID,isRunningID,setTitleID,getTitleID,setDifferenceMouseID,getDifferenceMouseID,getWidthID,getHeightID,getEngineID,getRenderDeviceID,getAudioDeviceID,getInputDeviceID;
+	jmethodID createID,destroyID,startID,stopID,isRunningID,setTitleID,getTitleID,setDifferenceMouseID,getDifferenceMouseID,setEngineOptionsID,getEngineOptionsID,getWidthID,getHeightID,getEngineID,getRenderDeviceID,getAudioDeviceID,getInputDeviceID;
 	jfieldID Engine_nativeHandle,RenderDevice_nativeHandle;
 	
 	mutable Engine *mEngine;

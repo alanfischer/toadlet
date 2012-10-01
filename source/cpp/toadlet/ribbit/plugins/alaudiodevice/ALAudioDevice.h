@@ -51,12 +51,9 @@ class TOADLET_API ALAudioDevice:public BaseAudioDevice{
 public:
 	TOADLET_OBJECT(ALAudioDevice);
 
-	// Options
-	const static int Option_BUFFER_FADE_TIME=1;
-	
 	ALAudioDevice();
 
-	bool create(int *options);
+	bool create(int options);
 	void destroy();
 
 	void activate();

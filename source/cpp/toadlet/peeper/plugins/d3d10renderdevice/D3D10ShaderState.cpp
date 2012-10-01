@@ -66,7 +66,7 @@ int D3D10ShaderState::getNumVariableBuffers(Shader::ShaderType type){
 	}
 
 	D3D10Shader *d3dshader=(D3D10Shader*)mShaders[type]->getRootShader();
-	return d3dshader->getNumVariableBuffers();
+	return d3dshader!=NULL?d3dshader->getNumVariableBuffers():0;
 }
 
 VariableBufferFormat::ptr D3D10ShaderState::getVariableBufferFormat(Shader::ShaderType type,int i){
@@ -75,7 +75,7 @@ VariableBufferFormat::ptr D3D10ShaderState::getVariableBufferFormat(Shader::Shad
 	}
 
 	D3D10Shader *d3dshader=(D3D10Shader*)mShaders[type]->getRootShader();
-	return d3dshader->getVariableBufferFormat(i);
+	return d3dshader!=NULL?d3dshader->getVariableBufferFormat(i):NULL;
 }
 
 bool D3D10ShaderState::activate(){
