@@ -317,7 +317,7 @@ mxml_node_t *XMLMeshUtilities::saveMaterial(Material::ptr material,int version,P
 }
 
 Mesh::ptr XMLMeshUtilities::loadMesh(mxml_node_t *node,int version,BufferManager *bufferManager,MaterialManager *materialManager,TextureManager *textureManager){
-	Mesh::ptr mesh(new Mesh());
+	Mesh::ptr mesh=new Mesh();
 	const char *prop=NULL;
 
 	mxml_node_t *transformNode=mxmlFindChild(node,"Transform");
@@ -348,7 +348,7 @@ Mesh::ptr XMLMeshUtilities::loadMesh(mxml_node_t *node,int version,BufferManager
 		if(bufferManager!=NULL){
 			vertexFormat=bufferManager->createVertexFormat();
 		}
-		else{
+		if(vertexFormat==NULL){
 			vertexFormat=new BackableVertexFormat();
 		}
 		Collection<Mesh::VertexBoneAssignmentList> vbas;
@@ -411,7 +411,7 @@ Mesh::ptr XMLMeshUtilities::loadMesh(mxml_node_t *node,int version,BufferManager
 				vertexBuffer=bufferManager->createVertexBuffer(Buffer::Usage_BIT_STATIC,Buffer::Access_BIT_WRITE,vertexFormat,count);
 			}
 		}
-		else{
+		if(vertexBuffer==NULL){
 			vertexBuffer=new BackableBuffer();
 			vertexBuffer->create(Buffer::Usage_BIT_STATIC,Buffer::Access_BIT_WRITE,vertexFormat,count);
 		}
@@ -523,7 +523,7 @@ Mesh::ptr XMLMeshUtilities::loadMesh(mxml_node_t *node,int version,BufferManager
 			}
 		}
 
-		Mesh::SubMesh::ptr subMesh=Mesh::SubMesh::ptr(new Mesh::SubMesh());
+		Mesh::SubMesh::ptr subMesh=new Mesh::SubMesh();
 
 		prop=mxmlElementGetAttr(subMeshNode,"Name");
 		if(prop!=NULL){
@@ -543,7 +543,7 @@ Mesh::ptr XMLMeshUtilities::loadMesh(mxml_node_t *node,int version,BufferManager
 			if(bufferManager!=NULL){
 				indexBuffer=bufferManager->createIndexBuffer(Buffer::Usage_BIT_STATIC,Buffer::Access_BIT_WRITE,IndexBuffer::IndexFormat_UINT16,count);
 			}
-			else{
+			if(indexBuffer==NULL){
 				indexBuffer=new BackableBuffer();
 				indexBuffer->create(Buffer::Usage_BIT_STATIC,Buffer::Access_BIT_WRITE,IndexBuffer::IndexFormat_UINT16,count);
 			}
@@ -633,14 +633,14 @@ mxml_node_t *XMLMeshUtilities::saveMesh(Mesh::ptr mesh,int version,ProgressListe
 		}
 	}
 
-	const VertexData::ptr &vertexData=mesh->getStaticVertexData();
+	VertexData::ptr vertexData=mesh->getStaticVertexData();
 	if(vertexData==NULL){
 		return meshNode;
 	}
 
 	mxml_node_t *vertexNode=mxmlNewElement(meshNode,"Vertexes");
 	{
-		const VertexBuffer::ptr &vertexBuffer=vertexData->getVertexBuffer(0);
+		VertexBuffer::ptr vertexBuffer=vertexData->getVertexBuffer(0);
 
 		mxmlElementSetAttr(vertexNode,"Count",formatInt(vertexBuffer->getSize()));
 
@@ -730,8 +730,8 @@ mxml_node_t *XMLMeshUtilities::saveMesh(Mesh::ptr mesh,int version,ProgressListe
 				mxmlElementSetAttr(subMeshNode,"Name",subMesh->getName());
 			}
 
-			const IndexData::ptr &indexData=subMesh->indexData;
-			const IndexBuffer::ptr &indexBuffer=indexData->getIndexBuffer();
+			IndexData::ptr indexData=subMesh->indexData;
+			IndexBuffer::ptr indexBuffer=indexData->getIndexBuffer();
 
 			IndexBufferAccessor iba;
 			iba.lock(indexBuffer,Buffer::Access_BIT_WRITE);
@@ -887,7 +887,7 @@ Sequence::ptr XMLMeshUtilities::loadSequence(mxml_node_t *node,int version,Buffe
 		if(bufferManager!=NULL){
 			format=bufferManager->createVertexFormat();
 		}
-		else{
+		if(format==NULL){
 			format=new BackableVertexFormat();
 		}
 		format->addElement(VertexFormat::Semantic_POSITION,0,VertexFormat::Format_TYPE_FLOAT_32|VertexFormat::Format_COUNT_3);

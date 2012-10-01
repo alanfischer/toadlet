@@ -36,7 +36,7 @@ class TOADLET_API NameSensor:public Object,public Sensor{
 public:
 	TOADLET_OBJECT(NameSensor);
 
-	NameSensor(Scene *scene);
+	NameSensor(Scene *scene,const String &name=(char*)NULL);
 
 	void setName(const String &name){mName=name;}
 	const String &getName() const{return mName;}

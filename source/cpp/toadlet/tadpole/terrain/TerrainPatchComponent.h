@@ -185,8 +185,9 @@ protected:
 	void computeDelta(Block *block,const Vector3 &cameraTranslate,float tolerance);
 	bool blockIntersectsCamera(const Block *block,Camera *camera,bool water) const;
 	bool blockVisibleByWater(const Block *block,Camera *camera,bool water) const;
-	int gatherBlocks(IndexBuffer *indexBuffer,Camera *camera,bool water) const;
-	int gatherTriangle(IndexBufferAccessor &iba,int indexCount,int x0,int y0,int x1,int y1,int x2,int y2) const;
+	bool gatherVisibleBlocks(Collection<bool> &blocksVisible,Camera *camera,bool water) const;
+	int gatherIndexes(IndexBuffer *indexBuffer,const Collection<bool> &blocksVisible) const;
+	int gatherTriangleIndexes(IndexBufferAccessor &iba,int indexCount,int x0,int y0,int x1,int y1,int x2,int y2) const;
 	scalar calculateLayerWeight(int layer,int i,int j,scalar io,scalar jo);
 
 	// BlockQueue methods
@@ -197,16 +198,16 @@ protected:
 
 	inline int getBlockNumberInQueue(int blockNum) const{
 		blockNum=blockNum+mBlockQueueStart;
-		if(blockNum>=mBlockQueueSize)
-			blockNum=blockNum-mBlockQueueSize;
+		if(blockNum>=mBlockQueue.size())
+			blockNum=blockNum-mBlockQueue.size();
 		return mBlockQueue[blockNum];
 	}
 
 	inline int popBlockFromFront(){
 		int block=mBlockQueue[mBlockQueueStart];
 		mBlockQueueStart++;
-		if(mBlockQueueStart>=mBlockQueueSize)
-			mBlockQueueStart=mBlockQueueStart-mBlockQueueSize;
+		if(mBlockQueueStart>=mBlockQueue.size())
+			mBlockQueueStart=mBlockQueueStart-mBlockQueue.size();
 		mNumBlocksInQueue--;
 		return block;
 	}
@@ -214,8 +215,8 @@ protected:
 	inline void addBlockToBack(int block){
 		mBlockQueue[mBlockQueueEnd]=block;
 		mBlockQueueEnd++;
-		if(mBlockQueueEnd>=mBlockQueueSize)
-			mBlockQueueEnd=mBlockQueueEnd-mBlockQueueSize;
+		if(mBlockQueueEnd>=mBlockQueue.size())
+			mBlockQueueEnd=mBlockQueueEnd-mBlockQueue.size();
 		mNumBlocksInQueue++;
 	}
 
@@ -227,9 +228,7 @@ protected:
 	Collection<Vertex> mVertexes;
 	Collection<Block> mBlocks;
 	Collection<int> mBlockQueue;
-	int mNumBlocks;
 	int mInitialStride;
-	int mBlockQueueSize;
 	int mBlockQueueStart;
 	int mBlockQueueEnd;
 	int mNumBlocksInQueue;
@@ -246,23 +245,25 @@ protected:
 	int mTerrainScope;
 	int mWaterScope;
 	scalar mTolerance;
+	bool mWaterOpaque;
 	scalar mWaterLevel;
+	Transform mWaterTransform;
+	Transform mWaterWorldTransform;
 
+	Collection<Texture::ptr> mLayerTextures;
 	Material::ptr mMaterial;
 	VertexBuffer::ptr mVertexBuffer;
 	VertexData::ptr mVertexData;
-	Collection<Texture::ptr> mLayerTextures;
-
-	Camera::ptr mLocalCamera;
-	IndexBuffer::ptr mIndexBuffer;
-	IndexData::ptr mIndexData;
-
-	Transform mWaterTransform;
-	Transform mWaterWorldTransform;
 	Material::ptr mWaterMaterial;
 	VertexBuffer::ptr mWaterVertexBuffer;
 	VertexData::ptr mWaterVertexData;
 
+	// Camera specific
+	Camera::ptr mLocalCamera;
+	Collection<bool> mBlocksVisible;
+	Collection<bool> mWaterBlocksVisible;
+	IndexBuffer::ptr mIndexBuffer;
+	IndexData::ptr mIndexData;
 	IndexBuffer::ptr mWaterIndexBuffer;
 	IndexData::ptr mWaterIndexData;
 

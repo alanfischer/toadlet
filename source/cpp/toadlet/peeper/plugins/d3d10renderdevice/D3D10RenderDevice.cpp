@@ -74,7 +74,7 @@ D3D10RenderDevice::D3D10RenderDevice():
 	//mVertexFormats
 {}
 
-bool D3D10RenderDevice::create(RenderTarget *target,int *options){
+bool D3D10RenderDevice::create(RenderTarget *target,int options){
 	Logger::alert(Categories::TOADLET_PEEPER,
 		"creating "+Categories::TOADLET_PEEPER+".D3D10RenderDevice");
 

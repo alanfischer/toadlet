@@ -122,6 +122,7 @@ void PathClimber::mount(Node *system,PathSystem::Path *path,const Vector3 &point
 	mPreviousPath=NULL;
 	mPath=path;
 	mParent->getPhysics()->setGravity(0);
+	mParent->getPhysics()->setVelocity(Math::ZERO_VECTOR3);
 
 	Segment segment;
 	path->getPoint(segment.origin,0);
@@ -145,8 +146,6 @@ void PathClimber::mount(Node *system,PathSystem::Path *path,const Vector3 &point
 	mPathDirection=flip?-1:1;
 
 	mPassedNeighbor=findPassedNeighbor(mPath,mPathDirection,mPathTime);
-
-	mParent->getPhysics()->setVelocity(Math::ZERO_VECTOR3);
 
 //	mGroundTime=0;
 

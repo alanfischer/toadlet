@@ -13,11 +13,15 @@ namespace tadpole{
 
 %refobject Engine "$this->retain();"
 %unrefobject Engine "$this->release();"
-%newobject Engine::createNode;
 
 class Engine{
 public:
-	Engine(JNIEnv *env,void *context);
+	Engine(JNIEnv *env,void *context,int options);
+
+	static const int Option_BIT_FIXEDBACKABLE=	1<<0;
+	static const int Option_BIT_SHADERBACKABLE=	1<<1;
+	static const int Option_BIT_NOFIXED=		1<<2;
+	static const int Option_BIT_NOSHADER=		1<<3;
 
 	void destroy();
 

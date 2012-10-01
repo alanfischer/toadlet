@@ -108,6 +108,10 @@ void RenderPass::setTexture(const String &name,Texture *texture,const String &sa
 }
 
 void RenderPass::setTexture(Shader::ShaderType type,int i,Texture *texture,const SamplerState &samplerState,const TextureState &textureState){
+	if(mRenderState==NULL){
+		return;
+	}
+
 	if(i>=mTextures[type].size()){
 		mTextures[type].resize(i+1);
 	}
@@ -153,7 +157,7 @@ void RenderPass::setTextureLocationName(Shader::ShaderType type,int i,const Stri
 
 bool RenderPass::isDepthSorted() const{
 	DepthState state;
-	return mRenderState->getDepthState(state) && state.write==false;
+	return mRenderState!=NULL && mRenderState->getDepthState(state) && state.write==false;
 }
 
 void RenderPass::compile(){

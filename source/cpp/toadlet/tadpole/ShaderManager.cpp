@@ -37,8 +37,7 @@ Shader::ptr ShaderManager::createShader(Shader::ShaderType type,const String pro
 	RenderDevice *renderDevice=mEngine->getRenderDevice();
 	Shader::ptr shader;
 	if(mEngine->isShaderBackable()){
-		BackableShader::ptr backableShader=new BackableShader()
-			;
+		BackableShader::ptr backableShader=new BackableShader();
 		backableShader->create(type,profiles,codes,numCodes);
 		if(renderDevice!=NULL && mEngine->getRenderCaps().hasShader[type]){
 			TOADLET_TRY

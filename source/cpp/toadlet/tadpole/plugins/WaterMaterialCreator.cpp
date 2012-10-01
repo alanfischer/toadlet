@@ -280,7 +280,7 @@ Material::ptr WaterMaterialCreator::createWaterMaterial(Texture *reflectTexture,
 		RenderPass::ptr pass=fixedPath->addPass();
 
 		pass->setMaterialState(MaterialState(color));
-		pass->setBlendState(BlendState::Combination_ALPHA);
+		pass->setBlendState(BlendState());
 		pass->setDepthState(DepthState(DepthState::DepthTest_LEQUAL,false));
 		pass->setRasterizerState(RasterizerState(RasterizerState::CullType_NONE));
 

@@ -1,11 +1,10 @@
 #include "Tree.h"
 #include "RandIsle.h"
-#include "Acorn.h"
 #include "Resources.h"
 
 static const scalar epsilon=0.001f;
 
-Tree::Tree(Scene *scene,int seed,Node *parent,const Vector3 &translate):Node(scene),
+Tree::Tree(Scene *scene,int seed):Node(scene),
 	mSections(0),
 	mCountMode(false),
 
@@ -38,12 +37,6 @@ Tree::Tree(Scene *scene,int seed,Node *parent,const Vector3 &translate):Node(sce
 
 	setScope(RandIsle::Scope_TREE);
 
-	setTranslate(translate);
-
-	parent->attach(this);
-
-	updateWorldTransform();
-
 	mSections=6;
 	mLowMod=2;
 	mLowDistance=300;
@@ -51,7 +44,7 @@ Tree::Tree(Scene *scene,int seed,Node *parent,const Vector3 &translate):Node(sce
 	mBranchMaterial=Resources::instance->treeBranch;
 	mLeafMaterial=Resources::instance->treeLeaf;
 
-	mSystem=BranchSystem::ptr(new BranchSystem(seed));
+	mSystem=new BranchSystem(seed);
 	mSystem->setBranchListener(this);
 
 	mCountMode=true;
@@ -244,12 +237,6 @@ BranchSystem::Branch::ptr Tree::branchCreated(BranchSystem::Branch *parent){
 
 	if(!mCountMode){
 		mTreeBranches.add(treeBranch);
-
-		if(parentTreeBranch!=NULL && parentTreeBranch->life<0.5){
-//			Acorn::ptr acorn=mEngine->createNodeType(Acorn::type(),mScene);
-//			acorn->setTranslate(parentTreeBranch->position+Vector3(0,0,4));
-//			attach(acorn);
-		}
 	}
 
 	return treeBranch;
@@ -264,7 +251,7 @@ void Tree::branchBuild(BranchSystem::Branch *branch){
 	if(treeBranch->points.size()>0){
 		Segment segment;
 		segment.origin=branch->position + getWorldTranslate();
-		segment.direction=branch->position-treeBranch->points[treeBranch->points.size()-1];
+		segment.direction=branch->position - treeBranch->points[treeBranch->points.size()-1];
 		PhysicsCollision result;
 		mScene->traceSegment(result,segment,-1,NULL);
 		if(result.time<Math::ONE){

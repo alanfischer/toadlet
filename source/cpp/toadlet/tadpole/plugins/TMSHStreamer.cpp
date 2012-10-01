@@ -240,11 +240,14 @@ void TMSHStreamer::writeMesh(DataStream *stream,Mesh::ptr mesh){
 
 /// @todo: This format should only store an AABox for each mesh bound, not a full thing
 Bound::ptr TMSHStreamer::readBound(DataStream *stream){
-	Bound::Type type;
+	Bound::Type type=(Bound::Type)stream->readInt32();
+	if(type==Bound::Type_EMPTY){
+		return NULL;
+	}
+
 	AABox box;
 	Sphere sphere;
 
-	type=(Bound::Type)stream->readInt32();
 	stream->readVector3(box.mins);
 	stream->readVector3(box.maxs);
 	stream->readVector3(sphere.origin);
@@ -264,6 +267,11 @@ Bound::ptr TMSHStreamer::readBound(DataStream *stream){
 }
 
 void TMSHStreamer::writeBound(DataStream *stream,Bound::ptr bound){
+	if(bound==NULL || bound->getType()==Bound::Type_EMPTY){
+		stream->writeInt32(Bound::Type_EMPTY);
+		return;
+	}
+
 	stream->writeInt32(bound->getType());
 	stream->writeVector3(bound->getAABox().mins);
 	stream->writeVector3(bound->getAABox().maxs);
