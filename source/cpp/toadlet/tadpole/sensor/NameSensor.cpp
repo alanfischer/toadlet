@@ -30,7 +30,8 @@ namespace toadlet{
 namespace tadpole{
 namespace sensor{
 
-NameSensor::NameSensor(Scene *scene):Sensor(scene){
+NameSensor::NameSensor(Scene *scene,const String &name):Sensor(scene){
+	mName=name;
 }
 
 bool NameSensor::senseNode(Node *node){

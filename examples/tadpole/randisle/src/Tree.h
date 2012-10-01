@@ -10,9 +10,9 @@ class Tree:public Node,public PathSystem,public BranchSystem::BranchListener{
 public:
 	class TreeBranch:public BranchSystem::Branch,public PathSystem::Path{
 	public:
-		TOADLET_SPTR(TreeBranch);
+		TOADLET_OBJECT(TreeBranch);
 
-		TreeBranch():BranchSystem::Branch(),skipFirst(false),started(false),lastVertex(-1){}
+		TreeBranch():skipFirst(false),started(false),lastVertex(-1){}
 
 		virtual ~TreeBranch(){}
 
@@ -100,7 +100,7 @@ public:
 		scalar wiggleOffset;
 	};
 
-	Tree(Scene *scene,int seed,Node *parent,const Vector3 &translate);
+	Tree(Scene *scene,int seed);
 	void destroy();
 
 	void frameUpdate(int dt,int scope);
@@ -118,9 +118,6 @@ public:
 
 	PathSystem::Path *getClosestPath(Vector3 &closestPoint,const Vector3 &point);
 	PathSystem::Path *getClosestPath(Vector3 &closestPoint,const Sphere &bound,TreeBranch *path);
-
-	inline MeshComponent *getMesh(){return mMesh;}
-	inline MeshComponent *getLowMesh(){return mLowMesh;}
 
 	VertexBufferAccessor bvba,lvba;
 	IndexBufferAccessor biba,lbiba,liba;

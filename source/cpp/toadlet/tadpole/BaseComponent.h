@@ -36,8 +36,8 @@ class TOADLET_API BaseComponent:public Object,public Component{
 public:
 	TOADLET_OBJECT(BaseComponent);
 	
-	BaseComponent():mParent(NULL){}
-	BaseComponent(const String &name):mParent(NULL){mName=name;}
+	BaseComponent():mParent(NULL),mRoot(NULL){}
+	BaseComponent(const String &name):mParent(NULL),mRoot(NULL){mName=name;}
 
 	virtual void destroy();
 

@@ -97,6 +97,7 @@ void Scene::setRoot(PartitionNode *root){
 	}
 
 	mRoot=root;
+	mRoot->rootChanged(mRoot);
 }
 
 void Scene::setRangeLogicDT(int minDT,int maxDT){

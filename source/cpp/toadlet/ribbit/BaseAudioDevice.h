@@ -37,7 +37,7 @@ public:
 
 	virtual ~BaseAudioDevice(){}
 
-	virtual bool create(int *options=NULL){return false;}
+	virtual bool create(int options=0){return false;}
 	virtual void destroy(){}
 
 	virtual void activate(){}

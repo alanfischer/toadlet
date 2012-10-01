@@ -56,17 +56,18 @@ public:
 
 	int gl_version;
 
-	// Options
-	const static int Option_USE_PBUFFERS=1;
-	const static int Option_USE_FBOS=2;
-	const static int Option_USE_HARDWARE_BUFFERS=3;
-	const static int Option_USE_FIXED_FUNCTION=4;
-	const static int Option_USE_SHADERS=5;
+	enum{
+		Option_BIT_NOPBUFFERS=			1<<0,
+		Option_BIT_NOFBOS=				1<<1,
+		Option_BIT_NOHARDWAREBUFFERS=	1<<2,
+		Option_BIT_NOFIXED=				1<<3,
+		Option_BIT_NOSHADER=			1<<4,
+	};
 
 	GLRenderDevice();
 
 	// Startup/Shutdown
-	bool create(RenderTarget *target,int *options);
+	bool create(RenderTarget *target,int options);
 	void destroy();
 	DeviceStatus activate();
 	bool reset();

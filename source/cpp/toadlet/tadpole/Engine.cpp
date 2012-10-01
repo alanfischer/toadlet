@@ -154,9 +154,8 @@
 namespace toadlet{
 namespace tadpole{
 
-Engine::Engine(void *env,void *ctx)://bool fixedBackable,bool shaderBackable):
-	mFixedBackable(false),
-	mShaderBackable(false),
+Engine::Engine(void *env,void *ctx,int options):
+	mOptions(0),
 	mRenderDevice(NULL),
 	mRenderDeviceChanged(false),
 	mAudioDevice(NULL),
@@ -164,8 +163,6 @@ Engine::Engine(void *env,void *ctx)://bool fixedBackable,bool shaderBackable):
 
 	//mContextListeners
 {
-	bool fixedBackable=true,shaderBackable=true;
-	
 	Logger *logger=Logger::getInstance();
 	logger->addCategory(Categories::TOADLET_EGG_LOGGER);
 	logger->addCategory(Categories::TOADLET_EGG_NET);
@@ -183,8 +180,7 @@ Engine::Engine(void *env,void *ctx)://bool fixedBackable,bool shaderBackable):
 		String("allocating ")+Categories::TOADLET_TADPOLE+".Engine:"+Version::STRING);
 
 	mEnv=env,mCtx=ctx;
-	mFixedBackable=fixedBackable;
-	mShaderBackable=shaderBackable;
+	mOptions=options;
 
 	mArchiveManager=new ArchiveManager(this);
 	mTextureManager=new TextureManager(this);
@@ -198,7 +194,7 @@ Engine::Engine(void *env,void *ctx)://bool fixedBackable,bool shaderBackable):
 	mStudioModelManager=new ResourceManager(this);
 	mSpriteModelManager=new ResourceManager(this);
 
-	mHandles.resize(1); // Handle 0 is always NULL
+	mHandles.resize(1,NULL); // Handle 0 is always NULL
 
 	Math::optimize();
 
@@ -354,7 +350,7 @@ void Engine::installHandlers(){
 
 bool Engine::setRenderDevice(RenderDevice *renderDevice){
 	if(renderDevice!=NULL){
-		if(mFixedBackable==false && mShaderBackable==false && mRenderDeviceChanged){
+		if(isFixedBackable()==false && isShaderBackable()==false && mRenderDeviceChanged){
 			Error::unknown(Categories::TOADLET_TADPOLE,"can not change RenderDevice in an unbacked engine");
 			return false;
 		}
@@ -604,23 +600,23 @@ Material::ptr Engine::createWaterMaterial(Texture *reflectTexture,Texture *refra
 	return shared_static_cast<WaterMaterialCreator>(mWaterMaterialCreator)->createWaterMaterial(reflectTexture,refractTexture,bumpTexture,color);
 }
 
-Mesh::ptr Engine::createAABoxMesh(const AABox &box,Material::ptr material){
+Mesh::ptr Engine::createAABoxMesh(const AABox &box,Material *material){
 	return shared_static_cast<AABoxMeshCreator>(mAABoxCreator)->createAABoxMesh(box,material);
 }
 
-Mesh::ptr Engine::createSkyBoxMesh(scalar size,bool unfolded,bool invert,Material::ptr bottom,Material::ptr top,Material::ptr left,Material::ptr right,Material::ptr back,Material::ptr front){
+Mesh::ptr Engine::createSkyBoxMesh(scalar size,bool unfolded,bool invert,Material *bottom,Material *top,Material *left,Material *right,Material *back,Material *front){
 	return shared_static_cast<SkyBoxMeshCreator>(mSkyBoxCreator)->createSkyBoxMesh(size,unfolded,invert,bottom,top,left,right,back,front);
 }
 
-Mesh::ptr Engine::createSkyDomeMesh(const Sphere &sphere,int numSegments,int numRings,scalar fade,Material::ptr material){
+Mesh::ptr Engine::createSkyDomeMesh(const Sphere &sphere,int numSegments,int numRings,scalar fade,Material *material){
 	return shared_static_cast<SkyDomeMeshCreator>(mSkyDomeCreator)->createSkyDomeMesh(sphere,numSegments,numRings,fade,material);
 }
 
-Mesh::ptr Engine::createSphereMesh(const Sphere &sphere,Material::ptr material){
+Mesh::ptr Engine::createSphereMesh(const Sphere &sphere,Material *material){
 	return shared_static_cast<SphereMeshCreator>(mSphereCreator)->createSphereMesh(sphere,16,16,material);
 }
 
-Mesh::ptr Engine::createGridMesh(scalar width,scalar height,int numWidth,int numHeight,Material::ptr material){
+Mesh::ptr Engine::createGridMesh(scalar width,scalar height,int numWidth,int numHeight,Material *material){
 	return shared_static_cast<GridMeshCreator>(mGridCreator)->createGridMesh(width,height,numWidth,numHeight,material);
 }
 

@@ -57,6 +57,7 @@ AndroidApplication::AndroidApplication():
 	mWidth(0),mHeight(0),
 	mLastX(0),mLastY(0),
 	mDifferenceMouse(false),
+	mFixedBackable(true),mShaderBackable(true),
 	//mThread,
 	mRun(false),
 
@@ -66,11 +67,12 @@ AndroidApplication::AndroidApplication():
 	mApplet(NULL)
 {
 	mFormat=WindowRenderTargetFormat::ptr(new WindowRenderTargetFormat());
-	mFormat->depthBits=16;
+	mFormat->setDepthBits(16);
+	mFormat->setFlags(2);
 	#if defined(TOADLET_DEBUG)
-		mFormat->debug=true;
+		mFormat->setDebug(true);
 	#else
-		mFormat->debug=false;
+		mFormat->setDebug(false);
 	#endif
 }
 
@@ -80,12 +82,12 @@ AndroidApplication::~AndroidApplication(){
 bool AndroidApplication::create(String renderDevice,String audioDevice){
 	mConfig=AConfiguration_new();
 
-	mEngine=new Engine(true,true);
-	
-	mEngine->installHandlers();
-
 	JNIEnv *env=mActivity->env;
 	jobject obj=mActivity->clazz;
+
+	mEngine=new Engine(env,obj,mFixedBackable,mShaderBackable);
+	
+	mEngine->installHandlers();
 	
 	jobject assetManagerObj=NULL;
 	jclass contextClass=env->FindClass("android/content/Context");
@@ -424,14 +426,14 @@ void AndroidApplication::windowCreated(ANativeWindow *window){
 
 	int nativeFormat=ANativeWindow_getFormat(window);
 	if(nativeFormat==WINDOW_FORMAT_RGB_565){
-		mFormat->pixelFormat=TextureFormat::Format_RGB_5_6_5;
+		mFormat->setPixelFormat(TextureFormat::Format_RGB_5_6_5);
 	}
 	else{
-		mFormat->pixelFormat=TextureFormat::Format_RGBA_8;
+		mFormat->setPixelFormat(TextureFormat::Format_RGBA_8);
 	}
 
 	// Start with gles2 and then try gles
-	for(mFormat->flags=2;mFormat->flags>=0 && mRenderDevice==NULL;mFormat->flags-=2){
+	for(;mFormat->getFlags()>=0 && mRenderDevice==NULL;mFormat->setFlags(mFormat->getFlags()-2)){
 		RenderTarget::ptr target;
 		TOADLET_TRY
 			target=new_EGLWindowRenderTarget(0,mWindow,mFormat);
@@ -444,7 +446,7 @@ void AndroidApplication::windowCreated(ANativeWindow *window){
 		RenderDevice::ptr device;
 		if(target!=NULL){
 			TOADLET_TRY
-				if(mFormat->flags==2){
+				if(mFormat->getFlags()==2){
 					device=new_GLES2RenderDevice();
 				}
 				else{

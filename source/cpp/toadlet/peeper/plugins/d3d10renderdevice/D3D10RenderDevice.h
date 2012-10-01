@@ -52,7 +52,7 @@ public:
 	D3D10RenderDevice();
 
 	// Startup/Shutdown
-	bool create(RenderTarget *target,int *options);
+	bool create(RenderTarget *target,int options);
 	void destroy();
 	DeviceStatus activate();
 	bool reset();

@@ -83,7 +83,7 @@ public:
 	virtual ~RenderDevice(){}
 
 	// Creation/Destruction
-	virtual bool create(RenderTarget *target,int *options=NULL)=0;
+	virtual bool create(RenderTarget *target,int options=0)=0;
 	virtual void destroy()=0;
 	virtual DeviceStatus activate()=0;
 	virtual bool reset()=0;

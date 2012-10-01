@@ -110,11 +110,14 @@ protected:
 	egg::Collection<int> mPathSequence;
 	egg::Collection<PopulatePatch> mPopulatePatches;
 
+	Quaternion mLastPredictedRotation;
+	int mLastPredictedTime;
 	VertexData::ptr mPredictedVertexData;
 	IndexData::ptr mPredictedIndexData;
 	Material::ptr mPredictedMaterial;
 
-	BoundingVolumeSensor::ptr mSensor;
+	Bound::ptr mMountBound;
+	BoundingVolumeSensor::ptr mBoundSensor;
 	int mPatchSize;
 	Vector3 mPatchScale;
 	Noise mPatchNoise;

@@ -18,7 +18,6 @@ set (LIBS ${TOADLET_LIBRARIES})
 set (SRC
 	../../main/toadletApp.cpp
 	../../main/toadletMain.cpp
-	src/Acorn.cpp
 	src/HUD.cpp
 	src/PathClimber.cpp
 	src/Resources.cpp
@@ -29,7 +28,6 @@ set (SRC
 
 # Headers
 set (H
-	src/Acorn.h
 	src/BranchSystem.h
 	src/GroundProjector.h
 	src/HUD.h

@@ -73,14 +73,15 @@ void BaseApplication::mapKeyNames(Map<int,String> &keyToName,Map<String,int> &na
 
 BaseApplication::BaseApplication():
 	//mFormat,
+	mEngineOptions(0),
 	mApplet(NULL),
 
 	//mRenderDevicePlugins,
 	//mCurrentRenderDevicePlugin,
 	//mNewRenderDevicePlugin,
-	mRenderDeviceOptions(0),
+	mRenderOptions(0),
 	//mAudioDevicePlugins,
-	mAudioDeviceOptions(0),
+	mAudioOptions(0),
 	//mMotionDetctorPlugins,
 
 	mEngine(NULL),
@@ -92,14 +93,14 @@ BaseApplication::BaseApplication():
 	mapKeyNames(mKeyToName,mNameToKey);
 	
 	mFormat=WindowRenderTargetFormat::ptr(new WindowRenderTargetFormat());
-	mFormat->pixelFormat=TextureFormat::Format_RGBA_8;
-	mFormat->depthBits=16;
-	mFormat->multisamples=2;
-	mFormat->threads=2;
+	mFormat->setPixelFormat(TextureFormat::Format_RGBA_8);
+	mFormat->setDepthBits(16);
+	mFormat->setMultisamples(2);
+	mFormat->setThreads(2);
 	#if defined(TOADLET_DEBUG)
-		mFormat->debug=true;
+		mFormat->setDebug(true);
 	#else
-		mFormat->debug=false;
+		mFormat->setDebug(false);
 	#endif
 
 	mInputDevices.resize(InputDevice::InputType_MAX,NULL);
@@ -110,7 +111,7 @@ bool BaseApplication::create(String renderDevice,String audioDevice){
 
 	preEngineCreate();
 
-	mEngine=new Engine(false,false);
+	mEngine=new Engine(NULL,NULL,mEngineOptions);
 
 	/// @todo: Unify the plugin framework a bit so we dont have as much code duplication for this potion, and the creating of the plugin
 	mNewRenderDevicePlugin=mCurrentRenderDevicePlugin=renderDevice;
@@ -180,24 +181,6 @@ void BaseApplication::destroy(){
 	mEngine=NULL;
 }
 
-void BaseApplication::setRenderDeviceOptions(int *options,int length){
-	if(mRenderDeviceOptions!=NULL){
-		delete[] mRenderDeviceOptions;
-	}
-
-	mRenderDeviceOptions=new int[length];
-	memcpy(mRenderDeviceOptions,options,length*sizeof(int));
-}
-
-void BaseApplication::setAudioDeviceOptions(int *options,int length){
-	if(mAudioDeviceOptions!=NULL){
-		delete[] mAudioDeviceOptions;
-	}
-
-	mAudioDeviceOptions=new int[length];
-	memcpy(mAudioDeviceOptions,options,length*sizeof(int));
-}
-
 RenderTarget::ptr BaseApplication::makeRenderTarget(const String &plugin){
 	RenderTarget::ptr target;
 
@@ -236,7 +219,7 @@ bool BaseApplication::createContextAndRenderDevice(const String &plugin){
 	bool result=false;
 	mRenderDevice=makeRenderDevice(plugin);
 	TOADLET_TRY
-		result=mRenderDevice->create(mRenderTarget,mRenderDeviceOptions);
+		result=mRenderDevice->create(mRenderTarget,mRenderOptions);
 	TOADLET_CATCH(const Exception &){result=false;}
 
 	if(result==false){
@@ -298,7 +281,7 @@ bool BaseApplication::createAudioDevice(const String &plugin){
 	mAudioDevice=makeAudioDevice(plugin);
 	if(mAudioDevice!=NULL){
 		TOADLET_TRY
-			result=mAudioDevice->create(mAudioDeviceOptions);
+			result=mAudioDevice->create(mAudioOptions);
 		TOADLET_CATCH(const Exception &){result=false;}
 		if(result==false){
 			mAudioDevice=NULL;

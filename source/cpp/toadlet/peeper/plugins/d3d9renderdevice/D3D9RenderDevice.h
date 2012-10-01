@@ -51,7 +51,7 @@ public:
 	D3D9RenderDevice();
 
 	// Startup/Shutdown
-	bool create(RenderTarget *target,int *options);
+	bool create(RenderTarget *target,int options);
 	void destroy();
 	DeviceStatus activate();
 	bool reset();
