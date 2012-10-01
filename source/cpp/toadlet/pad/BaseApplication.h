@@ -44,15 +44,18 @@ public:
 	virtual bool create(String renderDevice,String audioDevice);
 	virtual void destroy();
 
-	virtual void setWindowRenderTargetFormat(const WindowRenderTargetFormat::ptr format){mFormat=format;}
+	virtual void setWindowRenderTargetFormat(WindowRenderTargetFormat::ptr format){mFormat=format;}
 	virtual WindowRenderTargetFormat::ptr getWindowRenderTargetFormat() const{return mFormat;}
+
+	virtual void setEngineOptions(int options){mEngineOptions=options;}
+	virtual int getEngineOptions() const{return mEngineOptions;}
 
 	virtual void setApplet(Applet *applet){mApplet=applet;}
 	virtual Applet *getApplet() const{return mApplet;}
 
 	virtual void changeRenderDevicePlugin(const String &plugin){}
-	virtual void setRenderDeviceOptions(int *options,int length);
-	virtual void setAudioDeviceOptions(int *options,int length);
+	virtual void setRenderDeviceOptions(int options){mRenderOptions=options;}
+	virtual void setAudioDeviceOptions(int options){mAudioOptions=options;}
 
 	virtual void resized(int width,int height)		{if(mApplet!=NULL){mApplet->resized(width,height);}}
 	virtual void focusGained()						{if(mApplet!=NULL){mApplet->focusGained();}}
@@ -112,6 +115,7 @@ protected:
 	virtual bool createAudioDevice(const String &plugin);
 	virtual bool destroyAudioDevice();
 
+	int mEngineOptions;
 	WindowRenderTargetFormat::ptr mFormat;
 	Applet::ptr mApplet;
 
@@ -119,10 +123,10 @@ protected:
 	Collection<String> mRenderDevicePreferences;
 	String mCurrentRenderDevicePlugin;
 	String mNewRenderDevicePlugin;
-	int *mRenderDeviceOptions;
+	int mRenderOptions;
 	Map<String,AudioDevicePlugin> mAudioDevicePlugins;
 	Collection<String> mAudioDevicePreferences;
-	int *mAudioDeviceOptions;
+	int mAudioOptions;
 
 	Map<String,int> mNameToKey;
 	Map<int,String> mKeyToName;

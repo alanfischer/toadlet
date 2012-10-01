@@ -97,7 +97,7 @@ int main(int argc,char **argv){
 	Logger::getInstance()->setCategoryReportingLevel(Categories::TOADLET_EGG,Logger::Level_DISABLED);
 	Logger::getInstance()->setCategoryReportingLevel(Categories::TOADLET_EGG,Logger::Level_WARNING);
 	Logger::getInstance()->setCategoryReportingLevel(Categories::TOADLET_TADPOLE,Logger::Level_WARNING);
-	Engine::ptr engine=new Engine();
+	Engine::ptr engine=new Engine(0,0,Engine::Option_BIT_FIXEDBACKABLE|Engine::Option_BIT_SHADERBACKABLE);
 	engine->installHandlers();
 
 	VertexLighter lighter(engine);
@@ -116,7 +116,7 @@ int main(int argc,char **argv){
 		std::cout << "Lighting " << (const char*)mshFileName << std::endl;
 		
 		// Load the mesh data
-		Mesh::ptr mesh=engine->getMeshManager()->findMesh(mshFileName);
+		Mesh::ptr mesh=shared_static_cast<Mesh>(engine->getMeshManager()->find(mshFileName));
 		if(mesh==NULL){
 			std::cerr << "Error loading \"" << (const char*)mshFileName << "\" failed!  File invalid or not found." << std::endl;
 			result=false;

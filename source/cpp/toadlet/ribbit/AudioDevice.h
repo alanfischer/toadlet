@@ -40,7 +40,7 @@ public:
 
 	virtual ~AudioDevice(){}
 
-	virtual bool create(int *options=NULL)=0;
+	virtual bool create(int options=0)=0;
 	virtual void destroy()=0;
 
 	virtual void activate()=0;

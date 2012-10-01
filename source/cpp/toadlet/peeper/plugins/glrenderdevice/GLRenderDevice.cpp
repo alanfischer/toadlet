@@ -109,7 +109,7 @@ GLRenderDevice::GLRenderDevice():
 	mGLRenderTarget(NULL)
 {}
 
-bool GLRenderDevice::create(RenderTarget *target,int *options){
+bool GLRenderDevice::create(RenderTarget *target,int options){
 	Logger::alert(Categories::TOADLET_PEEPER,
 		"creating "+Categories::TOADLET_PEEPER+".GLRenderDevice");
 
@@ -119,43 +119,11 @@ bool GLRenderDevice::create(RenderTarget *target,int *options){
 		return false;
 	}
 
-	bool usePBuffers=true;
-	bool useFBOs=true;
-	bool useHardwareBuffers=true;
-	bool useFixedFunction=true;
-	bool useShaders=true;
-	if(options!=NULL){
-		int i=0;
-		while(options[i]!=0){
-			switch(options[i++]){
-				case Option_USE_PBUFFERS:
-					usePBuffers=options[i++]>0;
-					Logger::alert(Categories::TOADLET_PEEPER,
-						String("Setting PBuffer usage to:")+usePBuffers);
-				break;
-				case Option_USE_FBOS:
-					useFBOs=options[i++]>0;
-					Logger::alert(Categories::TOADLET_PEEPER,
-						String("Setting FBO usage to:")+useFBOs);
-				break;
-				case Option_USE_HARDWARE_BUFFERS:
-					useHardwareBuffers=options[i++]>0;
-					Logger::alert(Categories::TOADLET_PEEPER,
-						String("Setting Hardware Buffer usage to:")+useHardwareBuffers);
-				break;
-				case Option_USE_FIXED_FUNCTION:
-					useFixedFunction=options[i++]>0;
-					Logger::alert(Categories::TOADLET_PEEPER,
-						String("Setting Fixed Function usage to:")+useFixedFunction);
-				break;
-				case Option_USE_SHADERS:
-					useShaders=options[i++]>0;
-					Logger::alert(Categories::TOADLET_PEEPER,
-						String("Setting Shader usage to:")+useShaders);
-				break;
-			}
-		}
-	}
+	bool usePBuffers=(options&Option_BIT_NOPBUFFERS)==0;
+	bool useFBOs=(options&Option_BIT_NOFBOS)==0;
+	bool useHardwareBuffers=(options&Option_BIT_NOHARDWAREBUFFERS)==0;
+	bool useFixed=(options&Option_BIT_NOFIXED)==0;
+	bool useShader=(options&Option_BIT_NOSHADER)==0;
 
 	#if defined(TOADLET_HAS_GLESEM)
 		if(glesem_getInitialized()==false){
@@ -331,15 +299,15 @@ bool GLRenderDevice::create(RenderTarget *target,int *options){
 		#endif
 
 		#if defined(TOADLET_HAS_GLFIXED)
-			caps.hasFixed[Shader::ShaderType_VERTEX]=useFixedFunction;
-			caps.hasFixed[Shader::ShaderType_FRAGMENT]=useFixedFunction;
-			caps.hasFixed[Shader::ShaderType_GEOMETRY]=useFixedFunction;
+			caps.hasFixed[Shader::ShaderType_VERTEX]=useFixed;
+			caps.hasFixed[Shader::ShaderType_FRAGMENT]=useFixed;
+			caps.hasFixed[Shader::ShaderType_GEOMETRY]=useFixed;
 		#endif
 		
 		#if !defined(TOADLET_FIXED_POINT) && defined(TOADLET_HAS_GLSL)
-			caps.hasShader[Shader::ShaderType_VERTEX]=useShaders;
-			caps.hasShader[Shader::ShaderType_FRAGMENT]=useShaders;
-			caps.hasShader[Shader::ShaderType_GEOMETRY]=useShaders;
+			caps.hasShader[Shader::ShaderType_VERTEX]=useShader;
+			caps.hasShader[Shader::ShaderType_FRAGMENT]=useShader;
+			caps.hasShader[Shader::ShaderType_GEOMETRY]=useShader;
 		#endif
 
 		#if defined(TOADLET_HAS_GLES) && defined(TOADLET_FIXED_POINT)

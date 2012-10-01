@@ -20,7 +20,6 @@ endif (${ANDROID_NDK_API_LEVEL} GREATER 8)
 # Source files
 set (SRC
 	jni/RandIsleImpl.cpp
-	../src/Acorn.cpp
 	../src/HUD.cpp
 	../src/PathClimber.cpp
 	../src/RandIsle.cpp

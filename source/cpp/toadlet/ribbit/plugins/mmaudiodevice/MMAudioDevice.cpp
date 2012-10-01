@@ -57,29 +57,16 @@ MMAudioDevice::MMAudioDevice():
 	mNumBuffers(0),
 	mBufferSize(0)
 {
+	mBufferFadeTime=100;
 }
 
-bool MMAudioDevice::create(int *options){
+bool MMAudioDevice::create(int options){
 	Logger::alert(Categories::TOADLET_RIBBIT,
 		"creating MMAudioDevice");
-
-	if(options!=NULL){
-		int i=0;
-		while(options[i]!=0){
-			switch(options[i++]){
-				case Option_BUFFER_FADE_TIME:
-					mBufferFadeTime=options[i++];
-					Logger::alert(Categories::TOADLET_PEEPER,
-						String("Setting BufferFadeTime to:")+mBufferFadeTime);
-					break;
-			}
-		}
-	}
 
 	mFormat=AudioFormat::ptr(new AudioFormat(16,2,11025));
 	mBufferSize=1024;
 	mNumBuffers=4;
-	mBufferFadeTime=100;
 
 	mCaps.maxSources=16;
 
