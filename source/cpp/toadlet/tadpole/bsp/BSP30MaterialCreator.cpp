@@ -50,7 +50,7 @@ BSP30MaterialCreator::BSP30MaterialCreator(Engine *engine){
 
 		"void main(){\n"
 			"gl_Position=modelViewProjectionMatrix * POSITION;\n"
-			"texCoord=(textureMatrix * vec4(TEXCOORD0,0.0,1.0)).xy;\n"
+			"texCoord0=(textureMatrix * vec4(TEXCOORD0,0.0,1.0)).xy;\n"
 			"texCoord1=TEXCOORD1;\n"
 		"}",
 
