@@ -25,10 +25,18 @@ public:
 			cloudSize=128;
 			patchSize=32;
 			tolerance=0.0001;
+
+			numProps=20;
+			maxPropDist=80;
+			minPropDist=60;
 		#else
 			cloudSize=512;
 			patchSize=128;
 			tolerance=0.000001;
+
+			numProps=100;
+			maxPropDist=80;
+			minPropDist=60;
 		#endif
 
 		Logger::alert("Loading terrain");
@@ -215,6 +223,8 @@ public:
 	int patchSize;
 	scalar tolerance;
 	Vector4 skyColor,fadeColor;
+	int numProps;
+	scalar maxPropDist,minPropDist;
 	DiffuseTerrainMaterialSource::ptr terrainMaterialSource;
 	Texture::ptr reflectTexture,refractTexture,refractDepthTexture,bumpTexture;
 	PixelBufferRenderTarget::ptr reflectTarget,refractTarget;

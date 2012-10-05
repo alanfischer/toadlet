@@ -120,7 +120,7 @@ Node::ptr Input::makeNeedle(){
 
 void Input::setNeedle(Node::ptr needle,float value){
 	float max=5,min=-5;
-	needle->setRotate(Math::Y_UNIT_VECTOR3,((value-min)/(max-min))*Math::HALF_PI);
+	needle->setRotate(Math::Z_UNIT_VECTOR3,((value-min)/(max-min))*Math::HALF_PI);
 }
 
 void Input::inputDetected(const InputData &data){

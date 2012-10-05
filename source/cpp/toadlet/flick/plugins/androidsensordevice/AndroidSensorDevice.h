@@ -44,7 +44,7 @@ public:
 
 	virtual InputType getType(){return mInputType;}
 	virtual bool start();
-	virtual void update(int dt){}
+	virtual void update(int dt);
 	virtual void stop();
 
 	virtual void setListener(InputDeviceListener *listener){mListener=listener;}

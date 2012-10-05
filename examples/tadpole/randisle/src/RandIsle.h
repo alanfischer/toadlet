@@ -56,6 +56,7 @@ public:
 	float findPathSequence(egg::Collection<int> &sequence,PathClimber *climber,PathSystem::Path *path,int direction,scalar time);
 	float findPathSequence(egg::Collection<int> &sequence,PathClimber *climber,const Vector3 &forward,PathSystem::Path *previous,PathSystem::Path *path,int direction,scalar time,bool first);
 	void updateDanger(int dt);
+	void updateProps();
 	void updateClimber(PathClimber *climber,int dt);
 	void updatePredictedPath(PathClimber *climber,int dt);
 
@@ -105,6 +106,7 @@ protected:
 	Node::ptr mFollowNode;
 	Camera::ptr mCamera,mReflectCamera,mRefractCamera;
 	Node::ptr mPlayer;
+	Node::ptr mProps;
 	int mMouseButtons;
 	scalar mXJoy,mYJoy;
 	egg::Collection<int> mPathSequence;
