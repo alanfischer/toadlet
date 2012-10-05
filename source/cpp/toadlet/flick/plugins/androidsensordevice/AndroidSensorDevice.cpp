@@ -83,6 +83,10 @@ bool AndroidSensorDevice::start(){
 	}
 	return mRunning;
 }
+
+void AndroidSensorDevice::update(int dt){
+	onSensorChanged();
+}
 	
 void AndroidSensorDevice::stop(){
 	if(mSensor!=NULL){

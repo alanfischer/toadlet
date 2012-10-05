@@ -24,6 +24,9 @@ RandIsle::RandIsle(Application *app,String path):
 		mApp->setEngineOptions(mApp->getEngineOptions() | Engine::Option_BIT_NOSHADER);
 	#endif
 	mPath=path;
+
+	int idata=-655360;
+	printf("ASDF:%d\n",(unsigned int)idata>>16)
 }
 
 RandIsle::~RandIsle(){
@@ -134,8 +137,7 @@ void RandIsle::create(){
 			physics->setBound(new Bound(AABox(2)));
 
 			Segment segment;
-			segment.origin.set(10,0,1000);
-			segment.direction.set(0,0,-2000);
+			segment.setStartDir(Vector3(10,0,1000),Vector3(0,0,-2000));
 			PhysicsCollision result;
 			mScene->traceSegment(result,segment,-1,mPlayer);
 			result.point.z+=mPlayer->getBound()->getSphere().radius + 5;
@@ -178,6 +180,19 @@ void RandIsle::create(){
 //	mHUD->setTarget(mPlayer,mCamera);
 	mFollower->setTarget(mPlayer);
 	mTerrain->setUpdateTargetBias(128/(getPatchSize()*getPatchScale().x));
+
+	Logger::alert("Adding props");
+	mProps=new Node(mScene);
+	for(int i=0;i<Resources::instance->numProps;++i){
+		Node::ptr prop=new Node(mScene);
+		MeshComponent *mesh=new MeshComponent(mEngine);
+		mesh->setMesh(Resources::instance->grass);
+		mesh->setName("mesh");
+		mesh->getSharedRenderState()->setBlendState(BlendState::Combination_ALPHA);
+		prop->attach(mesh);
+		mProps->attach(prop);
+	}
+	mScene->getRoot()->attach(mProps);
 
 	Logger::alert("Populating terrain");
 	while(updatePopulatePatches());
@@ -288,6 +303,8 @@ void RandIsle::logicUpdate(int dt){
 
 //	updateDanger(dt);
 
+	updateProps();
+
 	scalar offset=mPlayer->getBound()->getAABox().getMins().z-2;
 	bool inWater=(physics->getPosition().z+offset)<=0;
 	if(!inWater && !climber->getMounted() && physics->getGravity()==0){
@@ -356,6 +373,42 @@ void RandIsle::updateDanger(int dt){
 
 	mPlayer->setDanger(danger);
 */
+}
+
+void RandIsle::updateProps(){
+	scalar maxDist=Resources::instance->maxPropDist;
+	scalar minDist=Resources::instance->minPropDist;
+	Segment segment;
+	Vector3 origin=mPlayer->getPhysics()->getPosition();
+	Random r(origin.x+origin.y+origin.z);
+	for(int i=0;i<mProps->getNumNodes();++i){
+		Node *prop=mProps->getNode(i);
+		Vector3 propOrigin=prop->getWorldTranslate();
+		scalar d=Math::length(propOrigin,origin);
+		scalar a=Math::ONE-(d-minDist)/(maxDist-minDist);
+
+		if(a<0 || propOrigin==Math::ZERO_VECTOR3){
+			scalar p=r.nextScalar(0,Math::TWO_PI);
+			if(propOrigin==Math::ZERO_VECTOR3){
+				d=r.nextScalar(0,maxDist);
+			}
+			else{
+				d=maxDist;
+			}
+			Vector3 offset(Math::sin(p)*d,Math::cos(p)*d,0);
+			segment.setStartDir(Vector3(origin.x+offset.x,origin.y+offset.y,1000),Vector3(0,0,-2000));
+			PhysicsCollision result;
+			mScene->traceSegment(result,segment,-1,mPlayer);
+			prop->setTranslate(result.point);
+			prop->setRotate(Math::Z_UNIT_VECTOR3,r.nextScalar(0,Math::TWO_PI));
+			scalar a=Math::ONE-(d-minDist)/(maxDist-minDist);
+		}
+
+		MeshComponent *mesh=(MeshComponent*)prop->getChild("mesh");
+		if(mesh!=NULL){
+			mesh->getSharedRenderState()->setMaterialState(MaterialState(Vector4(Math::ONE,Math::ONE,Math::ONE,a)));
+		}
+	}
 }
 
 void RandIsle::updateClimber(PathClimber *climber,int dt){
@@ -681,8 +734,7 @@ bool RandIsle::updatePopulatePatches(){
 		float wy=ty*mPatchSize*mPatchScale.y;
 
 		Segment segment;
-		segment.origin.set(wx,wy,1000);
-		segment.direction.set(0,0,-2000);
+		segment.setStartDir(Vector3(wx,wy,1000),Vector3(0,0,-2000));
 		PhysicsCollision result;
 		mScene->traceSegment(result,segment,-1,NULL);
 		if(result.time<Math::ONE && patch->bound->testIntersection(result.point)){
@@ -690,28 +742,7 @@ bool RandIsle::updatePopulatePatches(){
 			Tree::ptr tree=new Tree(mScene,wx+wy);
 			tree->setTranslate(result.point);
 			mScene->getRoot()->attach(tree);
-
-/*			/// @todo: Make the amount of props Resource dependent so it can scale
-			Random r; /// @todo: Replace with perlin noise
-			for(int j=0;j<10;++j){
-				Vector3 offset(r.nextFloat(-1,1),r.nextFloat(-1,1),0); /// @todo: Replace with random AxisAngle around Z + weighted distance
-				Math::normalize(offset);
-				offset=offset*20;
-
-				Segment segment;
-				segment.origin=tree->getTranslate() + offset;
-				segment.origin.z=1000;
-				segment.direction.set(0,0,-2000);
-				mScene->traceSegment(result,segment);
-
-				Node::ptr grass=new Node(mScene);
-				MeshComponent *mesh=new MeshComponent(mEngine);
-				mesh->setMesh(Resources::instance->grass);
-				grass->attach(mesh);
-				grass->setTranslate(result.point);
-				mScene->getRoot()->attach(grass);
-			}
-*/		}
+		}
 
 		if(patch->dy>=0){
 			patch->y+=step;

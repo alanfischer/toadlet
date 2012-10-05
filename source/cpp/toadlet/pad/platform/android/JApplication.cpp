@@ -251,7 +251,7 @@ InputDevice *JApplication::getInputDevice(InputDevice::InputType i) const{
 	jobject deviceObj=env->CallObjectMethod(obj,getInputDeviceID,i);
 
 	if(mInputDevices[i]==NULL || mLastInputDeviceObjs[i]!=deviceObj){
-		//if(jobject is NAudioDevice){
+		//if(jobject is NInputDevice){
 		//	mAudioDevice=deviceObj!=NULL?(AudioDevice*)env->CallIntMethod(deviceObj,getNativeHandleAudioDeviceID):NULL;
 		//}
 		//else{
