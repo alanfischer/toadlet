@@ -24,9 +24,6 @@ RandIsle::RandIsle(Application *app,String path):
 		mApp->setEngineOptions(mApp->getEngineOptions() | Engine::Option_BIT_NOSHADER);
 	#endif
 	mPath=path;
-
-	int idata=-655360;
-	printf("ASDF:%d\n",(unsigned int)idata>>16)
 }
 
 RandIsle::~RandIsle(){

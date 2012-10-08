@@ -97,11 +97,17 @@ bool GLSLShader::createContext(){
 			logString=log;
 			delete log;
 		}
+
+		TOADLET_CHECK_GLERROR("GLSLShader::createContext");
+		
 		Logger::debug(Categories::TOADLET_PEEPER,"program being compiled:\n"+mCode);
 		Error::unknown(Categories::TOADLET_PEEPER,"glsl compile error:\n"+logString);
+
 		return false;
 	}
 	
+	TOADLET_CHECK_GLERROR("GLSLShader::createContext");
+
 	return true;
 }
 
