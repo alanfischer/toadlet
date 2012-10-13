@@ -127,7 +127,7 @@ bool D3D9VertexBuffer::destroyContext(bool backData){
 				memcpy(mBackingData,data,mDataSize);
 				unlock();
 			}
-		TOADLET_CATCH(const Exception &){}
+		TOADLET_CATCH_ANONYMOUS(){}
 	}
 
 	HRESULT result=S_OK;

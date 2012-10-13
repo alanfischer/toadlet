@@ -94,7 +94,7 @@ WGLWindowRenderTarget::WGLWindowRenderTarget(HWND wnd,WindowRenderTargetFormat *
 		bool result=false;
 		TOADLET_TRY
 			result=createContext(tmpWnd,format,winPixelFormat);
-		TOADLET_CATCH(const Exception &){
+		TOADLET_CATCH_ANONYMOUS(){
 			result=false;
 		}
 
@@ -139,7 +139,7 @@ WGLWindowRenderTarget::WGLWindowRenderTarget(HWND wnd,WindowRenderTargetFormat *
 
 	TOADLET_TRY
 		createContext(wnd,format,winPixelFormat);
-	TOADLET_CATCH(const Exception &){}
+	TOADLET_CATCH_ANONYMOUS(){}
 }
 
 void WGLWindowRenderTarget::destroy(){
