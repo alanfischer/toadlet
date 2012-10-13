@@ -201,10 +201,12 @@
 
 #if defined(TOADLET_EXCEPTIONS)
 	#define TOADLET_TRY try{
+	#define TOADLET_CATCH_ANONYMOUS() }catch(const toadlet::egg::Exception &)
 	#define TOADLET_CATCH(exception) }catch(exception)
 #else
 	#define TOADLET_TRY {
-	#define TOADLET_CATCH(exception) }if(0)
+	#define TOADLET_CATCH_ANONYMOUS() }if(0)
+	#define TOADLET_CATCH(exception) }for(exception=toadlet::egg::Exception();false;)
 #endif
 
 #if defined(TOADLET_FIXED_POINT)

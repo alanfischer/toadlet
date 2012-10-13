@@ -437,7 +437,7 @@ void AndroidApplication::windowCreated(ANativeWindow *window){
 		RenderTarget::ptr target;
 		TOADLET_TRY
 			target=new_EGLWindowRenderTarget(0,mWindow,mFormat);
-		TOADLET_CATCH(const Exception &){target=NULL;}
+		TOADLET_CATCH_ANONYMOUS(){target=NULL;}
 		if(target!=NULL && target->isValid()==false){
 			target->destroy();
 			target=NULL;
@@ -452,7 +452,7 @@ void AndroidApplication::windowCreated(ANativeWindow *window){
 				else{
 					device=new_GLES1RenderDevice();
 				}
-			TOADLET_CATCH(const Exception &){device=NULL;}
+			TOADLET_CATCH_ANONYMOUS(){device=NULL;}
 			if(device!=NULL && device->create(target,NULL)==false){
 				device->destroy();
 				target->destroy();

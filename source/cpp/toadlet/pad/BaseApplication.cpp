@@ -188,7 +188,7 @@ RenderTarget::ptr BaseApplication::makeRenderTarget(const String &plugin){
 	if(it!=mRenderDevicePlugins.end()){
 		TOADLET_TRY
 			target=it->second.createRenderTarget(getDisplay(),getWindow(),mFormat);
-		TOADLET_CATCH(const Exception &){target=NULL;}
+		TOADLET_CATCH_ANONYMOUS(){target=NULL;}
 	}
 	if(target!=NULL && target->isValid()==false){
 		target=NULL;
@@ -202,7 +202,7 @@ RenderDevice::ptr BaseApplication::makeRenderDevice(const String &plugin){
 	if(it!=mRenderDevicePlugins.end()){
 		TOADLET_TRY
 			device=it->second.createRenderDevice();
-		TOADLET_CATCH(const Exception &){device=NULL;}
+		TOADLET_CATCH_ANONYMOUS(){device=NULL;}
 	}
 	return device;
 }
@@ -220,7 +220,7 @@ bool BaseApplication::createContextAndRenderDevice(const String &plugin){
 	mRenderDevice=makeRenderDevice(plugin);
 	TOADLET_TRY
 		result=mRenderDevice->create(mRenderTarget,mRenderOptions);
-	TOADLET_CATCH(const Exception &){result=false;}
+	TOADLET_CATCH_ANONYMOUS(){result=false;}
 
 	if(result==false){
 		if(mRenderDevice!=NULL){
@@ -268,7 +268,7 @@ AudioDevice::ptr BaseApplication::makeAudioDevice(const String &plugin){
 	if(it!=mAudioDevicePlugins.end()){
 		TOADLET_TRY
 			device=it->second.createAudioDevice();
-		TOADLET_CATCH(const Exception &){device=NULL;}
+		TOADLET_CATCH_ANONYMOUS(){device=NULL;}
 	}
 	return device;
 }
@@ -282,7 +282,7 @@ bool BaseApplication::createAudioDevice(const String &plugin){
 	if(mAudioDevice!=NULL){
 		TOADLET_TRY
 			result=mAudioDevice->create(mAudioOptions);
-		TOADLET_CATCH(const Exception &){result=false;}
+		TOADLET_CATCH_ANONYMOUS(){result=false;}
 		if(result==false){
 			mAudioDevice=NULL;
 		}

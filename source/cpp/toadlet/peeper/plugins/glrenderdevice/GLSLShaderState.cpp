@@ -107,7 +107,7 @@ int GLSLShaderState::getNumVariableBuffers(Shader::ShaderType type){
 	if(mNeedsLink){
 		TOADLET_TRY
 			link();
-		TOADLET_CATCH(const Exception &){}
+		TOADLET_CATCH_ANONYMOUS(){}
 	}
 
 	if(type==Shader::ShaderType_VERTEX){
@@ -122,7 +122,7 @@ VariableBufferFormat::ptr GLSLShaderState::getVariableBufferFormat(Shader::Shade
 	if(mNeedsLink){
 		TOADLET_TRY
 			link();
-		TOADLET_CATCH(const Exception &){}
+		TOADLET_CATCH_ANONYMOUS(){}
 	}
 
 	if(type==Shader::ShaderType_VERTEX){
@@ -137,7 +137,7 @@ bool GLSLShaderState::activate(){
 	if(mNeedsLink){
 		TOADLET_TRY
 			link();
-		TOADLET_CATCH(const Exception &){}
+		TOADLET_CATCH_ANONYMOUS(){}
 	}
 
 	// Only use the program if we succesfully linked

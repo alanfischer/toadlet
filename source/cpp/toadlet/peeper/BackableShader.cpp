@@ -102,7 +102,7 @@ bool BackableShader::convertCreate(Shader::ptr shader,RenderDevice *renderDevice
 			bool result=false;
 			TOADLET_TRY
 				result=shader->create(shaderType,profiles[i],codes[i]);
-			TOADLET_CATCH(const Exception &){result=false;}
+			TOADLET_CATCH_ANONYMOUS(){result=false;}
 			if(result==false){
 				return false;
 			}

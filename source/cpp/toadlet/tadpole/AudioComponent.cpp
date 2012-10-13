@@ -63,7 +63,7 @@ bool AudioComponent::setAudioBuffer(AudioBuffer *audioBuffer){
 
 	TOADLET_TRY
 		mAudio=mEngine->getAudioManager()->createAudio();
-	TOADLET_CATCH(const Exception &){
+	TOADLET_CATCH(const Exception &ex){ex;
 		mAudio=NULL;
 	}
 	if(mAudio!=NULL){
@@ -93,7 +93,7 @@ bool AudioComponent::setAudioStream(AudioStream *stream){
 
 	TOADLET_TRY
 		mAudio=mEngine->getAudioManager()->createAudio();
-	TOADLET_CATCH(const Exception &){
+	TOADLET_CATCH_ANONYMOUS(){
 		mAudio=NULL;
 	}
 	if(mAudio!=NULL){

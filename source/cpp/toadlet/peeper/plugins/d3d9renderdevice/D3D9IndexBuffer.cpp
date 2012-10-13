@@ -124,7 +124,7 @@ bool D3D9IndexBuffer::destroyContext(bool backup){
 				memcpy(mBackingData,data,mDataSize);
 				unlock();
 			}
-		TOADLET_CATCH(const Exception &){}
+		TOADLET_CATCH_ANONYMOUS(){}
 	}
 
 	HRESULT result=S_OK;

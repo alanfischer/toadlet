@@ -87,7 +87,7 @@ Resource::ptr ResourceManager::find(const String &name,ResourceData *data){
 	if(resource==NULL){
 		TOADLET_TRY
 			resource=findFromFile(name,data);
-		TOADLET_CATCH(const Exception &){resource=NULL;}
+		TOADLET_CATCH_ANONYMOUS(){resource=NULL;}
 		if(resource!=NULL){
 			resource->setName(name);
 			manage(resource);
@@ -314,7 +314,7 @@ Resource::ptr ResourceManager::findFromFile(const String &name,ResourceData *dat
 				Resource::ptr resource;
 				TOADLET_TRY
 					resource=streamer->load(stream,data,NULL);
-				TOADLET_CATCH(const Exception &){resource=NULL;}
+				TOADLET_CATCH_ANONYMOUS(){resource=NULL;}
 
 				if(tempPath.length()>0){
 					mEngine->getArchiveManager()->removeDirectory(tempPath);

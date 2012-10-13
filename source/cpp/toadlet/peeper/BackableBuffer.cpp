@@ -320,7 +320,7 @@ void BackableBuffer::readBack(){
 			memcpy(mData,data,mDataSize);
 			mBack->unlock();
 		}
-	TOADLET_CATCH(const Exception &){}
+	TOADLET_CATCH_ANONYMOUS(){}
 }
 
 void BackableBuffer::writeBack(){
@@ -336,14 +336,14 @@ void BackableBuffer::writeBack(){
 			}
 			mBack->unlock();
 		}
-	TOADLET_CATCH(const Exception &){}
+	TOADLET_CATCH_ANONYMOUS(){}
 }
 
 void BackableBuffer::updateBack(int start,int size){
 	TOADLET_TRY
 		/// @todo: Convert image data if necessary
 		mBack->update(mData+start,start,size);
-	TOADLET_CATCH(const Exception &){}
+	TOADLET_CATCH_ANONYMOUS(){}
 }
 
 }
