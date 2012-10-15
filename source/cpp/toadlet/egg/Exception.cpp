@@ -29,41 +29,53 @@
 namespace toadlet{
 namespace egg{
 
-Exception::Exception(int error)
+Exception::Exception(int error):
 	#if defined(TOADLET_EXCEPTIONS)
-		:std::runtime_error("unknown")
+		std::runtime_error("unknown")
+	#else
+		mDescription(NULL)
 	#endif
 {
 	mError=error;
 }
 
-Exception::Exception(const char *description)
-#if defined(TOADLET_EXCEPTIONS)
-	:std::runtime_error(description)
-#endif
-	{
-		mError=Error::Type_UNKNOWN ;
-#if !defined(TOADLET_EXCEPTIONS)
-		mDescription=new char[strlen(description)+1];
-		strcpy(mDescription,description);
-#endif
-	}
-
-Exception::Exception(int error,const char *description)
+Exception::Exception(const char *description):
 	#if defined(TOADLET_EXCEPTIONS)
-		:std::runtime_error(description)
+		std::runtime_error(description)
+	#else
+		mDescription(NULL)
+	#endif
+{
+	mError=Error::Type_UNKNOWN;
+	#if !defined(TOADLET_EXCEPTIONS)
+		if(description!=NULL){
+			mDescription=new char[strlen(description)+1];
+			strcpy(mDescription,description);
+		}
+	#endif
+}
+
+Exception::Exception(int error,const char *description):
+	#if defined(TOADLET_EXCEPTIONS)
+		std::runtime_error(description)
+	#else
+		mDescription(NULL)
 	#endif
 {
 	mError=error;
 	#if !defined(TOADLET_EXCEPTIONS)
-		mDescription=new char[strlen(description)+1];
-		strcpy(mDescription,description);
+		if(description!=NULL){
+			mDescription=new char[strlen(description)+1];
+			strcpy(mDescription,description);
+		}
 	#endif
 }
 
 Exception::~Exception() throw(){
 	#if !defined(TOADLET_EXCEPTIONS)
-		delete mDescription;
+		if(mDescription!=NULL){
+			delete mDescription;
+		}
 	#endif
 }
 

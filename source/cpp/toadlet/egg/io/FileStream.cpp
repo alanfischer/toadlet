@@ -37,11 +37,20 @@ FileStream::FileStream(const String &filename,int open):
 {
 	Logger::excess(Categories::TOADLET_EGG,"Opening file: "+filename);
 
-	const char *mode=NULL;
-	if(open==(Open_BIT_READ|Open_BIT_BINARY)) mode="rb";
-	else if(open==(Open_BIT_READ)) mode="r";
-	else if(open==(Open_BIT_WRITE|Open_BIT_BINARY)) mode="wb";
-	else if(open==(Open_BIT_WRITE)) mode="w";
+	String mode;
+	if((open&Open_BIT_APPEND)!=0){
+		mode+="a";
+	}
+	else if((open&Open_BIT_READ)!=0){
+		mode+="r";
+	}
+	else if((open&Open_BIT_WRITE)!=0){
+		mode+="w";
+	}
+
+	if((open&Open_BIT_BINARY)!=0){
+		mode+="b";
+	}
 
 	mOpen=open;
 	mFile=fopen(filename,mode);
