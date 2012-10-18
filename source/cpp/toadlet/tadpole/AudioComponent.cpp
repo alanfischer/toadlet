@@ -63,7 +63,7 @@ bool AudioComponent::setAudioBuffer(AudioBuffer *audioBuffer){
 
 	TOADLET_TRY
 		mAudio=mEngine->getAudioManager()->createAudio();
-	TOADLET_CATCH(const Exception &ex){ex;
+	TOADLET_CATCH_ANONYMOUS(){
 		mAudio=NULL;
 	}
 	if(mAudio!=NULL){

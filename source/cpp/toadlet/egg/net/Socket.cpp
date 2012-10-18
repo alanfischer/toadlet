@@ -256,7 +256,7 @@ int Socket::getTimeout() const{
 }
 
 bool Socket::addMembership(uint32 ipAddress){
-	struct ip_mreq mreq={0};
+	struct ip_mreq mreq={{0}};
 	mreq.imr_multiaddr.s_addr=ipAddress;
 	mreq.imr_interface.s_addr=htonl(INADDR_ANY);
 
