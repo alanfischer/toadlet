@@ -125,6 +125,12 @@ bool GLRenderDevice::create(RenderTarget *target,int options){
 	bool useFixed=(options&Option_BIT_NOFIXED)==0;
 	bool useShader=(options&Option_BIT_NOSHADER)==0;
 
+	TOADLET_IGNORE_UNUSED_VARIABLE_WARNING(usePBuffers);
+	TOADLET_IGNORE_UNUSED_VARIABLE_WARNING(useFBOs);
+	TOADLET_IGNORE_UNUSED_VARIABLE_WARNING(useHardwareBuffers);
+	TOADLET_IGNORE_UNUSED_VARIABLE_WARNING(useFixed);
+	TOADLET_IGNORE_UNUSED_VARIABLE_WARNING(useShader);
+	
 	#if defined(TOADLET_HAS_GLESEM)
 		if(glesem_getInitialized()==false){
 			int glesemInitResult=glesem_init(GLESEM_ACCELERATED_IF_AVAILABLE);

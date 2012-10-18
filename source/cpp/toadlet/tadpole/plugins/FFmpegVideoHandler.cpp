@@ -268,8 +268,8 @@ FFmpegController::FFmpegController(Engine *engine):
 	mIOCtx(NULL),
     mFormatCtx(NULL),
 
-	mTime(0),
-	mState(State_STOP)
+	mState(State_STOP),
+	mTime(0)
 {
 	mEngine=engine;
 }
