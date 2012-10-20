@@ -110,7 +110,7 @@ Resource::ptr PNGStreamer::load(Stream::ptr stream,ResourceData *data,ProgressLi
 	
 	png_read_image(png_ptr,row_pointers);
 
-	#if 0 // This code is removed until I have time to update it to all the non-depreciated & new trans stuff
+	#if 0 // This code is removed until I have time to update it to all the non-deprecated & new trans stuff
 	if(color_type==PNG_COLOR_TYPE_PALETTE){
 		#define PNGSTREAMER_GET_INDEX \
 			(row[x/a]>>((8-bit_depth)-bit_depth*(x%a)))&b

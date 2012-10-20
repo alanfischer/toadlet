@@ -1,13 +1,15 @@
-#ifndef TREE_H
-#define TREE_H
+#ifndef TREESYSTEM_H
+#define TREESYSTEM_H
 
 #include <toadlet/peeper.h>
 #include <toadlet/tadpole.h>
 #include "PathSystem.h"
 #include "BranchSystem.h"
 
-class Tree:public Node,public PathSystem,public BranchSystem::BranchListener{
+class TreeSystem:public BaseComponent,public PathSystem,public BranchSystem::BranchListener{
 public:
+	TOADLET_OBJECT(TreeSystem);
+
 	class TreeBranch:public BranchSystem::Branch,public PathSystem::Path{
 	public:
 		TOADLET_OBJECT(TreeBranch);
@@ -76,6 +78,16 @@ public:
 			}
 		}
 
+		// Returns x.y, where x,x+1 are the points to lerp between, and y is the amount
+		static scalar lerp(scalar *times,int length,scalar time){
+			if(length<=1) return 0;
+			int i;
+			time=Math::clamp(times[0],times[length-1],time);
+			for(i=1;time-times[i]>0;++i);
+			time=Math::div(time-times[i-1],times[i]-times[i-1]);
+			return (i-1)+time;
+		}
+
 		bool skipFirst;
 		bool started;
 		int lastVertex;
@@ -100,10 +112,12 @@ public:
 		scalar wiggleOffset;
 	};
 
-	Tree(Scene *scene,int seed);
+	TreeSystem(Scene *scene,int seed);
 	void destroy();
 
-	void frameUpdate(int dt,int scope);
+	void grow();
+
+	Bound *getBound() const{return mBound;}
 
 	BranchSystem::Branch::ptr branchCreated(BranchSystem::Branch *parent);
 	void branchDestroyed(BranchSystem::Branch *branch);
@@ -113,27 +127,23 @@ public:
 	void calculateNormals(TreeBranch *branch);
 	void mergeBounds(TreeBranch *branch);
 	bool wiggleLeaves(const Sphere &bound,TreeBranch *branch=NULL);
-
-	void gatherRenderables(Camera *camera,RenderableSet *set);
+	void wiggleUpdate(int dt);
 
 	PathSystem::Path *getClosestPath(Vector3 &closestPoint,const Vector3 &point);
 	PathSystem::Path *getClosestPath(Vector3 &closestPoint,const Sphere &bound,TreeBranch *path);
 
+	Mesh *getMesh() const{return mMesh;}
+	Mesh *getLowMesh() const{return mLowMesh;}
+
 	VertexBufferAccessor bvba,lvba;
 	IndexBufferAccessor biba,lbiba,liba;
 
-	// Returns x.y, where x,x+1 are the points to lerp between, and y is the amount
-	static scalar lerp(scalar *times,int length,scalar time){
-		if(length<=1) return 0;
-		int i;
-		time=Math::clamp(times[0],times[length-1],time);
-		for(i=1;time-times[i]>0;++i);
-		time=Math::div(time-times[i-1],times[i]-times[i-1]);
-		return (i-1)+time;
-	}
-
 protected:
 	void resetCounts();
+
+	Engine *mEngine;
+	Scene *mScene;
+	Bound::ptr mBound;
 
 	int mSections;
 	bool mCountMode;
@@ -161,9 +171,8 @@ protected:
 	bool mHasWiggleLeaves;
 
 	int mLowMod;
-	scalar mLowDistance;
-	MeshComponent::ptr mMesh;
-	MeshComponent::ptr mLowMesh;
+	Mesh::ptr mMesh;
+	Mesh::ptr mLowMesh;
 };
 
 #endif

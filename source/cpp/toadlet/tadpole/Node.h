@@ -54,6 +54,7 @@ public:
 	TOADLET_NODE(Node,"toadlet.tadpole.Node");
 
 	Node(Scene *scene=NULL);
+	virtual ~Node(){}
 	virtual void destroy();
 
 	virtual void create(Scene *scene);

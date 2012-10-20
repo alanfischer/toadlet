@@ -18,12 +18,13 @@ set (LIBS ${TOADLET_LIBRARIES})
 set (SRC
 	../../main/toadletApp.cpp
 	../../main/toadletMain.cpp
+	src/BranchSystem.cpp
 	src/HUD.cpp
 	src/PathClimber.cpp
 	src/Resources.cpp
 	src/Sky.cpp
 	src/RandIsle.cpp
-	src/Tree.cpp
+	src/TreeSystem.cpp
 )
 
 # Headers
@@ -38,7 +39,7 @@ set (H
 	src/Sky.h
 	src/SmoothFollower.h
 	src/RandIsle.h
-	src/Tree.h
+	src/TreeSystem.h
 )
 
 # Executable

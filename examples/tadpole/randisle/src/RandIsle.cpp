@@ -1,7 +1,7 @@
 #include "RandIsle.h"
 #include "PathClimber.h"
+#include "TreeSystem.h"
 #include "GroundProjector.h"
-#include "Tree.h"
 #include "HUD.h"
 #include "Resources.h"
 #include <toadlet/tadpole/plugins/HopManager.h>
@@ -425,8 +425,8 @@ void RandIsle::updateClimber(PathClimber *climber,int dt){
 
 			for(int i=0;i<results->size();++i){
 				Node *node=results->at(i);
-				if((node->getScope()==Scope_TREE)){
-					Tree *system=(Tree*)node;
+				TreeSystem *system=(TreeSystem*)node->getChild("system");
+				if(system!=NULL){
 					Vector3 point;
 					PathSystem::Path *path=system->getClosestPath(point,mPlayer->getTranslate());
 					float distance=Math::length(point,mPlayer->getTranslate());
@@ -434,7 +434,7 @@ void RandIsle::updateClimber(PathClimber *climber,int dt){
 					if(path!=NULL && distance<closestDistance){
 						closestDistance=distance;
 						closestPath=path;
-						closestSystem=system;
+						closestSystem=node;
 						closestPoint.set(point);
 					}
 				}
@@ -461,10 +461,6 @@ void RandIsle::updateClimber(PathClimber *climber,int dt){
 			else if(neighborTime<time && direction>0){
 				climber->setPathDirection(-1);
 			}
-		}
-
-		if(climber->getSpeed()>=5){
-			wiggleLeaves((Tree*)climber->getMounted(),mPlayer->getWorldBound()->getSphere());
 		}
 
 		if(Math::length(mLastPredictedRotation,climber->getIdealRotation())>epsilon || mLastPredictedTime+250<mScene->getLogicTime()){
@@ -677,16 +673,6 @@ float RandIsle::findPathSequence(Collection<int> &sequence,PathClimber *climber,
 	return closestd;
 }
 
-void RandIsle::wiggleLeaves(Tree *tree,const Sphere &bound){
-	Sphere localBound;
-	Math::sub(localBound,bound,tree->getWorldTranslate());
-	localBound.radius=20.0f;
-//	if(tree->wiggleLeaves(localBound) && mRustleSound->getPlaying()==false){
-//		mRustleSound->setGain(Math::ONE);
-//		mRustleSound->play();
-//	}
-}
-
 int RandIsle::atJunction(PathClimber *climber,PathSystem::Path *current,PathSystem::Path *next){
 	findPathSequence(mPathSequence,climber,climber->getPath(),climber->getPathDirection(),climber->getPathTime());
 
@@ -723,8 +709,8 @@ bool RandIsle::updatePopulatePatches(){
 			}
 		}
 
-		/// @todo: Could I replace some of this math with Terrain->toWorldXY()?
-		float ty=(float)(patch->py*mPatchSize+patch->y - mPatchSize/2)/(float)mPatchSize;
+		int size=getPatchSize();
+		float ty=(patch->py*size+patch->y - size/2)/(float)size;
 		float tx=pathValue(ty);
 
 		float wx=tx*mPatchSize*mPatchScale.x;
@@ -736,9 +722,23 @@ bool RandIsle::updatePopulatePatches(){
 		mScene->traceSegment(result,segment,-1,NULL);
 		if(result.time<Math::ONE && patch->bound->testIntersection(result.point)){
 			result.point.z-=5;
-			Tree::ptr tree=new Tree(mScene,wx+wy);
+
+			TreeSystem::ptr system;
+			Node::ptr tree=new Node(mScene);
+			{
+				system=new TreeSystem(mScene,wx+wy);
+				system->setName("system");
+				tree->attach(system);
+			}
 			tree->setTranslate(result.point);
 			mScene->getRoot()->attach(tree);
+
+			system->grow();
+
+			/// @todo: Swap between high & low res meshes, add LOD selection to node's renderables choices?
+			MeshComponent::ptr mesh=new MeshComponent(mEngine);
+			mesh->setMesh(system->getMesh());
+			tree->attach(mesh);
 		}
 
 		if(patch->dy>=0){
@@ -766,7 +766,7 @@ void RandIsle::terrainPatchDestroyed(int px,int py,Bound *bound){
 	SensorResults::ptr results=mBoundSensor->sense();
 	for(int i=0;i<results->size();++i){
 		Node *node=results->at(i);
-		if((node->getScope()==Scope_TREE) && Math::testInside(bound->getAABox(),node->getWorldTranslate())){
+		if(Math::testInside(bound->getAABox(),node->getWorldTranslate())){
 			node->destroy();
 		}
 	}
