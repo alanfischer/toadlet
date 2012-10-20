@@ -299,10 +299,6 @@ def export(filename):
 				out.write('\t\t\t<Translate>%f,%f,%f</Translate>\n' % (boneMat.translationPart().x, boneMat.translationPart().y, boneMat.translationPart().z))
 				out.write('\t\t\t<Rotate>%f,%f,%f,%f</Rotate>\n' % (boneMat.toQuat().x, boneMat.toQuat().y, boneMat.toQuat().z, boneMat.toQuat().w))
 				out.write('\t\t\t<Scale>%f,%f,%f</Scale>\n' % (boneMat.scalePart().x, boneMat.scalePart().y, boneMat.scalePart().z))
-
-				# TODO: apparently these are depreciated. Double check to be sure.
-				#out.write('\t\t\t<WorldToBoneTranslate>%f,%f,%f</WorldToBoneTranslate>\n' % ())
-				#out.write('\t\t\t<WorldToBoneRotate>%f,%f,%f</WorldToBoneRotate>\n' % ())
 			
 				out.write('\t\t</Bone>\n')
 

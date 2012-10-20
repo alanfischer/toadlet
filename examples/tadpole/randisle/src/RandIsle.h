@@ -6,7 +6,6 @@
 #include "PathClimber.h"
 #include "SmoothFollower.h"
 #include "Sky.h"
-#include "Tree.h"
 
 class HUD;
 
@@ -21,8 +20,6 @@ public:
 		Scope_BIT_WATER=		1<<4,
 		Scope_BIT_MAIN_CAMERA=	1<<5,
 
-		Scope_TREE=				Scope_BIT_TREE,
-		Scope_ACORN=			Scope_BIT_ACORN,
 		Scope_HUD=				Scope_BIT_HUD,
 	};
 
@@ -59,8 +56,6 @@ public:
 	void updateProps();
 	void updateClimber(PathClimber *climber,int dt);
 	void updatePredictedPath(PathClimber *climber,int dt);
-
-	void wiggleLeaves(Tree *tree,const Sphere &bound);
 
 	void pathMounted(PathClimber *climber){}
 	void pathDismounted(PathClimber *climber){}
