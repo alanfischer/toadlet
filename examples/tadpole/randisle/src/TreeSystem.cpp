@@ -514,18 +514,18 @@ bool TreeSystem::wiggleLeaves(const Sphere &bound,TreeSystem::TreeBranch *branch
 	return result;
 }
 
-PathSystem::Path *TreeSystem::getClosestPath(Vector3 &closestPoint,const Vector3 &point){
+Path *TreeSystem::getClosestPath(Vector3 &closestPoint,const Vector3 &point){
 	Sphere bound;
 	Math::sub(bound.origin,point,mParent->getWorldTranslate());
 	bound.radius=50;
-	PathSystem::Path *path=getClosestPath(closestPoint,bound,mTreeBranches[0]);
+	Path *path=getClosestPath(closestPoint,bound,mTreeBranches[0]);
 	Math::add(closestPoint,mParent->getWorldTranslate());
 	return path;
 }
 
-PathSystem::Path *TreeSystem::getClosestPath(Vector3 &closestPoint,const Sphere &bound,TreeBranch *path){
+Path *TreeSystem::getClosestPath(Vector3 &closestPoint,const Sphere &bound,TreeBranch *path){
 	if(Math::testIntersection(bound,path->bound)){
-		PathSystem::Path *closestPath=NULL;
+		Path *closestPath=NULL;
 		scalar closestDistance=1000;
 
 		Vector3 point;
@@ -544,7 +544,7 @@ PathSystem::Path *TreeSystem::getClosestPath(Vector3 &closestPoint,const Sphere 
 		int i;
 		for(i=0;i<path->children.size();++i){
 			Vector3 childPoint;
-			PathSystem::Path *childPath=getClosestPath(childPoint,bound,path->children[i]);
+			Path *childPath=getClosestPath(childPoint,bound,path->children[i]);
 			scalar childDistance=Math::length(childPoint,bound.origin);
 
 			if(childPath!=NULL && childDistance<closestDistance){

@@ -414,9 +414,9 @@ void RandIsle::updateClimber(PathClimber *climber,int dt){
 		if(climber->getNoClimbTime()<mScene->getLogicTime()){
 			// Find closest graph & mount point
 			float snapDistance=10;
-			Node *closestSystem=NULL;
+			Node *closestNode=NULL;
 			float closestDistance=1000;
-			PathSystem::Path *closestPath=NULL;
+			Path *closestPath=NULL;
 			Vector3 closestPoint;
 
 			mMountBound->set(mPlayer->getTranslate(),snapDistance);
@@ -428,20 +428,20 @@ void RandIsle::updateClimber(PathClimber *climber,int dt){
 				TreeSystem *system=(TreeSystem*)node->getChild("system");
 				if(system!=NULL){
 					Vector3 point;
-					PathSystem::Path *path=system->getClosestPath(point,mPlayer->getTranslate());
+					Path *path=system->getClosestPath(point,mPlayer->getTranslate());
 					float distance=Math::length(point,mPlayer->getTranslate());
 
 					if(path!=NULL && distance<closestDistance){
 						closestDistance=distance;
 						closestPath=path;
-						closestSystem=node;
+						closestNode=node;
 						closestPoint.set(point);
 					}
 				}
 			}
 
 			if(closestPath!=NULL && closestDistance<snapDistance){
-				climber->mount(closestSystem,closestPath,closestPoint);
+				climber->mount(closestNode,closestPath,closestPoint);
 				findPathSequence(mPathSequence,climber,climber->getPath(),climber->getPathDirection(),climber->getPathTime());
 			}
 		}
@@ -449,7 +449,7 @@ void RandIsle::updateClimber(PathClimber *climber,int dt){
 
 	// Update graph prediction & camera
 	if(climber->getPath()!=NULL){
-		PathSystem::Path *path=climber->getPath();
+		Path *path=climber->getPath();
 		int direction=climber->getPathDirection();
 		scalar time=climber->getPathTime();
 
@@ -483,7 +483,7 @@ void RandIsle::updateClimber(PathClimber *climber,int dt){
 void RandIsle::updatePredictedPath(PathClimber *climber,int dt){
 	if(climber->getPath()!=NULL && mPathSequence.size()>0){
 		// Update predicted path
-		PathSystem::Path *path=climber->getPath();
+		Path *path=climber->getPath();
 		scalar oldTime=0,time=climber->getPathTime();
 		int direction=climber->getPathDirection();
 
@@ -525,7 +525,7 @@ void RandIsle::updatePredictedPath(PathClimber *climber,int dt){
 			}
 			else if(skipCheck==true || climber->passedJunction(direction,oldTime,time,nextTime)){
 				scalar extraTime=Math::abs(time-nextTime);
-				PathSystem::Path  *nextPath=path->getNeighbor(mPathSequence[np]);
+				Path  *nextPath=path->getNeighbor(mPathSequence[np]);
 				np++;
 				if(np<mPathSequence.size()){
 					nextTime=nextPath->getNeighborTime(mPathSequence[np]);
@@ -626,7 +626,7 @@ void RandIsle::playerMove(Node *player,scalar dr,scalar ds){
 	climber->setSpeed(speed);
 }
 
-float RandIsle::findPathSequence(Collection<int> &sequence,PathClimber *climber,PathSystem::Path *path,int direction,scalar time){
+float RandIsle::findPathSequence(Collection<int> &sequence,PathClimber *climber,Path *path,int direction,scalar time){
 	Vector3 right,forward,up;
 	Math::setAxesFromQuaternion(climber->getIdealRotation(),right,forward,up);
 	forward.z+=0.25;
@@ -636,7 +636,7 @@ float RandIsle::findPathSequence(Collection<int> &sequence,PathClimber *climber,
 	return result;
 }
 
-float RandIsle::findPathSequence(Collection<int> &sequence,PathClimber *climber,const Vector3 &forward,PathSystem::Path *previous,PathSystem::Path *path,int direction,scalar time,bool first){
+float RandIsle::findPathSequence(Collection<int> &sequence,PathClimber *climber,const Vector3 &forward,Path *previous,Path *path,int direction,scalar time,bool first){
 	if(path==NULL){
 		return 0;
 	}
@@ -647,7 +647,7 @@ float RandIsle::findPathSequence(Collection<int> &sequence,PathClimber *climber,
 	path->getPoint(point,time);
 	int i;
 	for(i=0;i<path->getNumNeighbors();++i){
-		PathSystem::Path *next=path->getNeighbor(i);
+		Path *next=path->getNeighbor(i);
 		scalar nextTime=path->getNeighborTime(i);
 		if(next!=NULL && next==previous){
 			continue;
@@ -673,7 +673,7 @@ float RandIsle::findPathSequence(Collection<int> &sequence,PathClimber *climber,
 	return closestd;
 }
 
-int RandIsle::atJunction(PathClimber *climber,PathSystem::Path *current,PathSystem::Path *next){
+int RandIsle::atJunction(PathClimber *climber,Path *current,Path *next){
 	findPathSequence(mPathSequence,climber,climber->getPath(),climber->getPathDirection(),climber->getPathTime());
 
 	if(mPathSequence.size()>0 && current->getNeighbor(mPathSequence[0])==next){

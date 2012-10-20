@@ -2,7 +2,7 @@
 #define PATHCLIMBER_H
 
 #include <toadlet/toadlet.h>
-#include "PathSystem.h"
+#include "Path.h"
 #include "PathClimberListener.h"
 
 class PathClimber:public BaseComponent{
@@ -11,11 +11,11 @@ public:
 
 	PathClimber();
 
-	void mount(Node *system,PathSystem::Path *path,const Vector3 &point);
+	void mount(Node *system,Path *path,const Vector3 &point);
 	void dismount();
 
 	Node *getMounted(){return mMounted;}
-	PathSystem::Path *getPath(){return mPath;}
+	Path *getPath(){return mPath;}
 	int getPathDirection(){return mPathDirection;}
 	void setPathDirection(int direction);
 	float getPathTime(){return mPathTime;}
@@ -31,7 +31,7 @@ public:
 	void setIdealRotation(const Quaternion &idealRotation);
 	const Quaternion &getIdealRotation(){return mIdealRotation;}
 
-	int findPassedNeighbor(PathSystem::Path *path,int direction,scalar time);
+	int findPassedNeighbor(Path *path,int direction,scalar time);
 	void findRotation(Quaternion &r,const Vector3 &tangent,const Vector3 &normal);
 	bool passedJunction(int direction,scalar oldTime,scalar newTime,scalar junctionTime);
 
@@ -40,8 +40,8 @@ public:
 protected:
 	PathClimberListener *mPathClimberListener;
 	Node::ptr mMounted;
-	PathSystem::Path *mPreviousPath;
-	PathSystem::Path *mPath;
+	Path *mPreviousPath;
+	Path *mPath;
 	float mPathTime;
 	int mPathDirection;
 	int mPassedNeighbor;
