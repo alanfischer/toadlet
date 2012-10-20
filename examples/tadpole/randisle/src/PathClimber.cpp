@@ -70,7 +70,7 @@ void PathClimber::logicUpdate(int dt,int scope){
 		scalar neighborTime=mPath->getNeighborTime(mPassedNeighbor+mPathDirection);
 		if(passedJunction(mPathDirection,oldPathTime,pathTime,neighborTime)){
 			mPassedNeighbor+=mPathDirection;
-			PathSystem::Path *neighbor=mPath->getNeighbor(mPassedNeighbor);
+			Path *neighbor=mPath->getNeighbor(mPassedNeighbor);
 			if(neighbor==NULL){
 				dismount();
 			}
@@ -115,7 +115,7 @@ void PathClimber::logicUpdate(int dt,int scope){
 	}
 }
 
-void PathClimber::mount(Node *system,PathSystem::Path *path,const Vector3 &point){
+void PathClimber::mount(Node *system,Path *path,const Vector3 &point){
 	dismount();
 
 	mMounted=system;
@@ -200,7 +200,7 @@ void PathClimber::setIdealRotation(const Quaternion &idealRotation){
 	Math::setQuaternionFromAxes(mIdealRotation,right,forward,up);
 }
 
-int PathClimber::findPassedNeighbor(PathSystem::Path *path,int direction,scalar time){
+int PathClimber::findPassedNeighbor(Path *path,int direction,scalar time){
 	int passedNeighbor=0;
 	int i;
 	if(direction>0){

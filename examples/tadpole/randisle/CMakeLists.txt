@@ -34,7 +34,7 @@ set (H
 	src/HUD.h
 	src/PathClimber.h
 	src/PathClimberListener.h
-	src/PathSystem.h
+	src/Path.h
 	src/Resources.h
 	src/Sky.h
 	src/SmoothFollower.h

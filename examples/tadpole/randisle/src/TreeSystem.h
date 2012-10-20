@@ -3,14 +3,14 @@
 
 #include <toadlet/peeper.h>
 #include <toadlet/tadpole.h>
-#include "PathSystem.h"
+#include "Path.h"
 #include "BranchSystem.h"
 
-class TreeSystem:public BaseComponent,public PathSystem,public BranchSystem::BranchListener{
+class TreeSystem:public BaseComponent,public BranchSystem::BranchListener{
 public:
 	TOADLET_OBJECT(TreeSystem);
 
-	class TreeBranch:public BranchSystem::Branch,public PathSystem::Path{
+	class TreeBranch:public BranchSystem::Branch,public Path{
 	public:
 		TOADLET_OBJECT(TreeBranch);
 
@@ -129,8 +129,8 @@ public:
 	bool wiggleLeaves(const Sphere &bound,TreeBranch *branch=NULL);
 	void wiggleUpdate(int dt);
 
-	PathSystem::Path *getClosestPath(Vector3 &closestPoint,const Vector3 &point);
-	PathSystem::Path *getClosestPath(Vector3 &closestPoint,const Sphere &bound,TreeBranch *path);
+	Path *getClosestPath(Vector3 &closestPoint,const Vector3 &point);
+	Path *getClosestPath(Vector3 &closestPoint,const Sphere &bound,TreeBranch *path);
 
 	Mesh *getMesh() const{return mMesh;}
 	Mesh *getLowMesh() const{return mLowMesh;}
