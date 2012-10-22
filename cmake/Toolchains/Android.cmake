@@ -50,9 +50,6 @@
 #    ARM_TARGET=armeabi - type of floating point support.
 #      Other possible values are: "armeabi", "armeabi-v7a with NEON", "armeabi-v7a with VFPV3"
 #
-#    INSTALL_JAVA_ONLY=OFF - If ON, will install jars and libraries to libs subdir, and usually indicates to the project not to install headers.
-#      Mostly useful for installing directly into the libs/ folder of an existing android project.
-#
 #    ANDROID_STL=(SYSTEM GNU_SHARED GNU_STATIC GABI_SHARED GABI_STATIC STLPORT_SHARED STLPORT_STATIC) - choose one
 #      Select from among any of the android STL versions, shared or static. SYSTEM is the default
 #
@@ -352,18 +349,6 @@ elseif( ANDROID_ARCH STREQUAL "X86" )
  set( NDK_NAME_ARCH "x86" )
 endif( ANDROID_ARCH STREQUAL "ARM" )
 
-# Installing java only will place the libraries (no headers) into the libs/ subdir, for direct use in an android project.
-if( INSTALL_JAVA_ONLY )
- if( NOT DEFINED JAVA_LIB_INSTALL_DIR )
-  message( STATUS "INSTALL_JAVA_ONLY=${INSTALL_JAVA_ONLY}, only toadlet jars and libs will be installed" )
- endif( NOT DEFINED JAVA_LIB_INSTALL_DIR )
- set( JAVA_LIB_INSTALL_DIR libs )
-else( INSTALL_JAVA_ONLY )
- set( JAVA_LIB_INSTALL_DIR lib )
-endif( INSTALL_JAVA_ONLY )
-set( INSTALL_JAVA_ONLY ${INSTALL_JAVA_ONLY} CACHE BOOL "Only install java libraries and jards" FORCE )
-set( JAVA_LIB_INSTALL_DIR ${JAVA_LIB_INSTALL_DIR} CACHE STRING "java library installation suffix" FORCE )
-
 # Set find root path to the target environment, plus the user defined search path
 set( CMAKE_FIND_ROOT_PATH "${ANDROID_NDK_TOOLCHAIN_ROOT}/bin" "${ANDROID_NDK_TOOLCHAIN_ROOT}/${ANDROID_NDK_TOOLCHAIN_ARCH}" "${ANDROID_NDK_SYSROOT}" "${CMAKE_PREFIX_PATH}")
 
@@ -377,24 +362,31 @@ if( BUILD_WITH_ANDROID_NDK )
  set_property( CACHE ANDROID_STL PROPERTY STRINGS ${PossibleSTLTargets} )
 
  if ( ${ANDROID_STL} STREQUAL "SYSTEM" )
+  set( STL_CXX_FLAGS "-fno-exceptions -fno-rtti" )
   set( STL_PATH "${ANDROID_NDK}/sources/cxx-stl/system" )
   set( STL_LIBS "-lstdc++" )
  elseif( ${ANDROID_STL} STREQUAL "GNU_SHARED" )
+  set( STL_CXX_FLAGS "-fexceptions -frtti" )
   set( STL_PATH "${ANDROID_NDK}/sources/cxx-stl/gnu-libstdc++" )
   set( STL_LIBS "-lgnustl_shared -lstdc++" )
  elseif( ${ANDROID_STL} STREQUAL "GNU_STATIC" )
+  set( STL_CXX_FLAGS "-fexceptions -frtti" )
   set( STL_PATH "${ANDROID_NDK}/sources/cxx-stl/gnu-libstdc++" )
   set( STL_LIBS "-Wl,-Bstatic -Wl,--start-group -lgnustl_static -lsupc++ -Wl,-Bdynamic" )
  elseif( ${ANDROID_STL} STREQUAL "GABI_SHARED" )
+  set( STL_CXX_FLAGS "-fno-exceptions -frtti" )
   set( STL_PATH "${ANDROID_NDK}/sources/cxx-stl/gabi++" )
   set( STL_LIBS "-lgabi++_shared" )
  elseif( ${ANDROID_STL} STREQUAL "GABI_STATIC" )
+  set( STL_CXX_FLAGS "-fno-exceptions -frtti" )
   set( STL_PATH "${ANDROID_NDK}/sources/cxx-stl/gabi++" )
   set( STL_LIBS "-lgabi++_static" )
  elseif( ${ANDROID_STL} STREQUAL "STLPORT_SHARED" )
+  set( STL_CXX_FLAGS "-fno-exceptions -frtti" )
   set( STL_PATH "${ANDROID_NDK}/sources/cxx-stl/stlport" )
   set( STL_LIBS "-lstlport_shared" )
  elseif( ${ANDROID_STL} STREQUAL "STLPORT_STATIC" )
+  set( STL_CXX_FLAGS "-fno-exceptions -frtti" )
   set( STL_PATH "${ANDROID_NDK}/sources/cxx-stl/stlport" )
   set( STL_LIBS "-lstlport_static" )
  else( ${ANDROID_STL} STREQUAL "SYSTEM" )
@@ -427,8 +419,8 @@ set( CMAKE_FIND_ROOT_PATH_MODE_PROGRAM ONLY )
 set( CMAKE_FIND_ROOT_PATH_MODE_LIBRARY ONLY )
 set( CMAKE_FIND_ROOT_PATH_MODE_INCLUDE ONLY )
 
-set( CMAKE_CXX_FLAGS "-fPIC -DANDROID -Wno-psabi -fno-strict-aliasing -fsigned-char" )
-set( CMAKE_C_FLAGS "-fPIC -DANDROID -Wno-psabi -fno-strict-aliasing -fsigned-char" )
+set( CMAKE_CXX_FLAGS "-fPIC -DANDROID -Wno-psabi -fsigned-char" )
+set( CMAKE_C_FLAGS "-fPIC -DANDROID -Wno-psabi -fsigned-char" )
 
 set( FORCE_ARM OFF CACHE BOOL "Use 32-bit ARM instructions instead of Thumb-1" )
 if( ANDROID_ARCH STREQUAL "ARM")
@@ -444,12 +436,8 @@ if( ANDROID_ARCH STREQUAL "ARM")
 endif( ANDROID_ARCH STREQUAL "ARM")
 
 if( BUILD_WITH_ANDROID_NDK )
- set( CMAKE_CXX_FLAGS "--sysroot=\"${ANDROID_NDK_SYSROOT}\" ${CMAKE_CXX_FLAGS}" )
+ set( CMAKE_CXX_FLAGS "--sysroot=\"${ANDROID_NDK_SYSROOT}\" ${CMAKE_CXX_FLAGS} ${STL_CXX_FLAGS}" )
  set( CMAKE_C_FLAGS "--sysroot=\"${ANDROID_NDK_SYSROOT}\" ${CMAKE_C_FLAGS}" )
-
- if (${ANDROID_STL} STREQUAL "SYSTEM")
-  set( CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fno-exceptions -fno-rtti" )
- endif (${ANDROID_STL} STREQUAL "SYSTEM")
 
  # workaround for ugly cmake bug - compiler identification replaces all spaces (and somethimes " !!!) in compiler flags with ; symbol
  # as result identification fails if ANDROID_NDK_SYSROOT contain spaces
