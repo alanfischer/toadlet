@@ -90,7 +90,6 @@ public:
 	virtual bool activateAdditionalContext()=0;
 
 	// Resource operations
-	/// @todo: Merge all the create*Buffer into just a createBuffer where I'd pass in the type?
 	virtual Texture *createTexture()=0;
 	virtual PixelBufferRenderTarget *createPixelBufferRenderTarget()=0;
 	virtual PixelBuffer *createPixelBuffer()=0;

@@ -206,7 +206,7 @@ void Win32Application::postEngineCreate(){
 
 	mResourceArchive=new Win32TextureResourceArchive(mEngine->getTextureManager());
 	mResourceArchive->open(win32->mInstance);
-	mEngine->getArchiveManager()->manageArchive(shared_static_cast<Archive>(mResourceArchive));
+	mEngine->getArchiveManager()->manage(shared_static_cast<Archive>(mResourceArchive));
 	mEngine->getTextureManager()->addResourceArchive(mResourceArchive);
 }
 

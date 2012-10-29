@@ -766,7 +766,7 @@ void RandIsle::terrainPatchDestroyed(int px,int py,Bound *bound){
 	SensorResults::ptr results=mBoundSensor->sense();
 	for(int i=0;i<results->size();++i){
 		Node *node=results->at(i);
-		if(Math::testInside(bound->getAABox(),node->getWorldTranslate())){
+		if(node->getChild("system")!=NULL && Math::testInside(bound->getAABox(),node->getWorldTranslate())){
 			node->destroy();
 		}
 	}

@@ -88,17 +88,6 @@ bool AndroidApplication::create(String renderDevice,String audioDevice){
 	mEngine=new Engine(env,obj,mFixedBackable,mShaderBackable);
 	
 	mEngine->installHandlers();
-	
-	jobject assetManagerObj=NULL;
-	jclass contextClass=env->FindClass("android/content/Context");
-	{
-		jmethodID getAssetsID=env->GetMethodID(contextClass,"getAssets","()Landroid/content/res/AssetManager;");
-		assetManagerObj=env->CallObjectMethod(obj,getAssetsID);
-	}
-	env->DeleteLocalRef(contextClass);
-
-	AndroidAssetArchive::ptr assetArchive=new AndroidAssetArchive(env,assetManagerObj);
-	mEngine->getArchiveManager()->manageArchive(shared_static_cast<Archive>(assetArchive));
 
 	AndroidTextureStreamer::ptr textureStreamer=new AndroidTextureStreamer(mEngine->getTextureManager(),env);
 	mEngine->getTextureManager()->setDefaultStreamer(textureStreamer);

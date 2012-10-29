@@ -41,9 +41,8 @@ public:
 
 	Archive::ptr findArchive(const String &name){return shared_static_cast<Archive>(ResourceManager::find(name));}
 
-	// A slight hack, we need to store an iptr to the archive so it isn't automatically released
-	Archive::ptr manageArchive(const Archive::ptr &resource,const String &name=(char*)NULL){mArchives.add(resource);return shared_static_cast<Archive>(ResourceManager::manage(resource,name));}
-	void unmanageArchive(const Archive::ptr &resource){mArchives.remove(resource);ResourceManager::unmanage(resource);}
+	Resource::ptr manage(Resource *resource,const String &name=(char*)NULL);
+	void unmanage(Resource *resource);
 
 	void addDirectory(const String &directory);
 	void removeDirectory(const String &directory);
