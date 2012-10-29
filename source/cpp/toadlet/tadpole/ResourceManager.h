@@ -48,20 +48,20 @@ public:
 
 	virtual void destroy();
 
-	virtual void addResourceArchive(Archive::ptr archive);
-	virtual void removeResourceArchive(Archive::ptr archive);
+	virtual void addResourceArchive(Archive *archive);
+	virtual void removeResourceArchive(Archive *archive);
 
 	virtual Resource::ptr get(int handle);
 	virtual Resource::ptr get(const String &name);
 	virtual Resource::ptr find(const String &name,ResourceData *data=NULL);
-	virtual Resource::ptr manage(const Resource::ptr &resource,const String &name=(char*)NULL);
+	virtual Resource::ptr manage(Resource *resource,const String &name=(char*)NULL);
 	virtual void unmanage(Resource *resource);
 
-	virtual void setStreamer(ResourceStreamer::ptr streamer,const String &extension);
-	virtual ResourceStreamer::ptr getStreamer(const String &extension);
+	virtual void setStreamer(ResourceStreamer *streamer,const String &extension);
+	virtual ResourceStreamer *getStreamer(const String &extension);
 
-	virtual void setDefaultStreamer(ResourceStreamer::ptr streamer);
-	virtual ResourceStreamer::ptr getDefaultStreamer(){return mDefaultStreamer;}
+	virtual void setDefaultStreamer(ResourceStreamer *streamer);
+	virtual ResourceStreamer *getDefaultStreamer(){return mDefaultStreamer;}
 
 	virtual void setDefaultExtension(const String &extension){mDefaultExtension=extension;}
 	virtual const String &getDefaultExtension(){return mDefaultExtension;}

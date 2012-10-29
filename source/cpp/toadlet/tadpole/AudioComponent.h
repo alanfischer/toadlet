@@ -71,11 +71,9 @@ public:
 
 	void frameUpdate(int dt,int scope);
 
-	/// @todo: This needs to be integrated into the tadpole plugin
-	inline void setVelocity(const Vector3 &velocity){if(mAudio!=NULL){mAudio->setVelocity(velocity);}}
-
 protected:
 	void setAudioFromTransform();
+	void setAudioFromVelocity();
 	void setAudioParameters();
 
 	Engine *mEngine;

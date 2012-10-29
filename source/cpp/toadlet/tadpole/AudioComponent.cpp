@@ -24,6 +24,7 @@
  ********** Copyright header - do not remove **********/
 
 #include <toadlet/tadpole/AudioComponent.h>
+#include <toadlet/tadpole/PhysicsComponent.h>
 #include <toadlet/tadpole/Engine.h>
 
 namespace toadlet{
@@ -110,11 +111,19 @@ bool AudioComponent::setAudioStream(AudioStream *stream){
 
 void AudioComponent::frameUpdate(int dt,int scope){
 	setAudioFromTransform();
+
+	setAudioFromVelocity();
 }
 
 void AudioComponent::setAudioFromTransform(){
 	if(mAudio!=NULL){
 		mAudio->setPosition(mParent->getWorldTranslate());
+	}
+}
+
+void AudioComponent::setAudioFromVelocity(){
+	if(mAudio!=NULL && mParent->getPhysics()!=NULL){
+		mAudio->setVelocity(mParent->getPhysics()->getVelocity());
 	}
 }
 

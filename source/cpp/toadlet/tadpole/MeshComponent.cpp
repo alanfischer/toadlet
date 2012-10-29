@@ -283,7 +283,6 @@ void MeshComponent::updateVertexBuffer(){
 					for(j=0;j<vba.size();++j){
 						SkeletonComponent::Bone *bone=mSkeleton->getBone(vba[j].bone);
 
-						/// @todo: Move these ifs out to separate loops
 						if(bone->useMatrixTransforms){
 							Math::mulPoint3Full(temp,bone->boneSpaceMatrix,positionInitial);
 						}
@@ -294,7 +293,6 @@ void MeshComponent::updateVertexBuffer(){
 						Math::mul(temp,vba[j].weight);
 						Math::add(positionResult,temp);
 
-						/// @todo: Move these ifs out to separate loops
 						if(bone->useMatrixTransforms){
 							Math::mulVector3(temp,bone->boneSpaceMatrix,normalInitial);
 						}

@@ -55,11 +55,11 @@ void ResourceManager::destroy(){
 	mNameResourceMap.clear();
 }
 
-void ResourceManager::addResourceArchive(Archive::ptr archive){
+void ResourceManager::addResourceArchive(Archive *archive){
 	mResourceArchives.add(archive);
 }
 
-void ResourceManager::removeResourceArchive(Archive::ptr archive){
+void ResourceManager::removeResourceArchive(Archive  *archive){
 	mResourceArchives.remove(archive);
 }
 
@@ -97,7 +97,7 @@ Resource::ptr ResourceManager::find(const String &name,ResourceData *data){
 	return resource;
 }
 
-Resource::ptr ResourceManager::manage(const Resource::ptr &resource,const String &name){
+Resource::ptr ResourceManager::manage(Resource  *resource,const String &name){
 	if(mResources.contains(resource)==false){
 		int handle=-1;
 		int size=mFreeHandles.size();
@@ -158,7 +158,7 @@ void ResourceManager::unmanage(Resource *resource){
 	resource->setDestroyedListener(NULL);
 }
 
-void ResourceManager::setStreamer(ResourceStreamer::ptr streamer,const String &extension){
+void ResourceManager::setStreamer(ResourceStreamer  *streamer,const String &extension){
 	ExtensionStreamerMap::iterator it=mExtensionStreamerMap.find(extension);
 	if(it!=mExtensionStreamerMap.end()){
 		Logger::debug(Categories::TOADLET_TADPOLE,
@@ -174,14 +174,14 @@ void ResourceManager::setStreamer(ResourceStreamer::ptr streamer,const String &e
 	}
 }
 
-void ResourceManager::setDefaultStreamer(ResourceStreamer::ptr streamer){
+void ResourceManager::setDefaultStreamer(ResourceStreamer  *streamer){
 	Logger::debug(Categories::TOADLET_TADPOLE,
 		"adding default streamer");
 
 	mDefaultStreamer=streamer;
 }
 
-ResourceStreamer::ptr ResourceManager::getStreamer(const String &extension){
+ResourceStreamer *ResourceManager::getStreamer(const String &extension){
 	ExtensionStreamerMap::iterator it=mExtensionStreamerMap.find(extension);
 	if(it!=mExtensionStreamerMap.end()){
 		return it->second;

@@ -20,12 +20,13 @@ endif (${ANDROID_NDK_API_LEVEL} GREATER 8)
 # Source files
 set (SRC
 	jni/RandIsleImpl.cpp
+	../src/BranchSystem.cpp
 	../src/HUD.cpp
 	../src/PathClimber.cpp
 	../src/RandIsle.cpp
 	../src/Resources.cpp
 	../src/Sky.cpp
-	../src/Tree.cpp
+	../src/TreeSystem.cpp
 )
 
 # Headers
