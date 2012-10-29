@@ -37,6 +37,7 @@ class ALAudioDevice;
 class TOADLET_API ALAudio:public BaseAudio{
 public:
 	ALAudio(ALAudioDevice *audioDevice);
+	virtual ~ALAudio();
 
 	bool create(AudioBuffer *buffer);
 	bool create(AudioStream *stream);
@@ -86,6 +87,9 @@ protected:
 	ALuint mHandle;
 	ALuint *mStreamingBuffers;
 	int mTotalBuffersPlayed,mTotalBuffersQueued;
+	tbyte *mBuffer;
+	int mBufferSize;
+	int mNumBuffers;
 	scalar mGain;
 	AudioBuffer::ptr mAudioBuffer;
 	AudioStream::ptr mAudioStream;

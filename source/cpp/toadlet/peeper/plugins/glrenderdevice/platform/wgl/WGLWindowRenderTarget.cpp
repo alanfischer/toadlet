@@ -219,7 +219,7 @@ bool WGLWindowRenderTarget::createContext(HWND wnd,WindowRenderTargetFormat *for
 		}
 	}
 
-	// Use a HACK here to check to see if its a crashy pixel format on FireGL cards
+	// Use a string compare here to check to see if its a crashy pixel format on FireGL cards
 	String rendererName=glGetString(GL_RENDERER);
 	if(rendererName.equals("ATI FireGL V3100") && mPFD.cColorBits==16){
 		destroyContext();
