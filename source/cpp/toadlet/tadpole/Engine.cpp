@@ -253,7 +253,8 @@ void Engine::installHandlers(){
 			assetManagerObj=((JNIEnv*)mEnv)->CallObjectMethod((jobject)mCtx,getAssetsID);
 		}
 		((JNIEnv*)mEnv)->DeleteLocalRef(contextClass);
-		mArchiveManager->manageArchive(new AndroidAssetArchive((JNIEnv*)mEnv,assetManagerObj));
+		Archive::ptr assetArchive=new AndroidAssetArchive((JNIEnv*)mEnv,assetManagerObj);
+		mArchiveManager->manage(assetArchive);
 	#endif
 
 	// Texture streamers

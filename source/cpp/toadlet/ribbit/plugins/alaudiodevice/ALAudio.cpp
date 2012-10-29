@@ -34,10 +34,6 @@
 namespace toadlet{
 namespace ribbit{
 
-/// @todo: Move these into member variables of ALAudio
-const static int bufferSize=1024*4;
-const static int numBuffers=4;
-
 /// @todo: When playing back the Stove sample video, when we stop, rewind, and play again the audio timing seems to start later sometimes.  We probably need to flush more buffers.
 ALAudio::ALAudio(ALAudioDevice *audioDevice):
 	mDevice(NULL),
@@ -46,13 +42,24 @@ ALAudio::ALAudio(ALAudioDevice *audioDevice):
 	mHandle(0),
 	mStreamingBuffers(NULL),
 	mTotalBuffersPlayed(0),mTotalBuffersQueued(0),
+	mBuffer(NULL),
+	mBufferSize(0),
+	mNumBuffers(0),
 	mGain(0)
 	//mAudioBuffer,
 	//mAudioStream,
 {
 	mDevice=audioDevice;
 
+	mBufferSize=4096;
+	mNumBuffers=4;
+	mBuffer=new tbyte[mBufferSize];
+
 	mGain=Math::ONE;
+}
+
+ALAudio::~ALAudio(){
+	delete[] mBuffer;
 }
 
 bool ALAudio::create(AudioBuffer *audioBuffer){
@@ -121,29 +128,28 @@ void ALAudio::destroy(){
 
 bool ALAudio::play(){
 	if(mAudioStream!=NULL && mStreamingBuffers==NULL){
-		tbyte buffer[bufferSize];
 		int total=0;
 
-		mStreamingBuffers=new ALuint[numBuffers];
-		alGenBuffers(numBuffers,mStreamingBuffers);
+		mStreamingBuffers=new ALuint[mNumBuffers];
+		alGenBuffers(mNumBuffers,mStreamingBuffers);
 		TOADLET_CHECK_ALERROR("alGenBuffers");
 
 		int i;
-		for(i=0;i<numBuffers;++i){
-			int amount=readAudioData(buffer,bufferSize);
+		for(i=0;i<mNumBuffers;++i){
+			int amount=readAudioData(mBuffer,mBufferSize);
 			if(amount>0){
 				total=total+amount;
 				alBufferData(mStreamingBuffers[i],
 					ALAudioDevice::getALFormat(mAudioFormat),
-					buffer,amount,mAudioFormat->getSamplesPerSecond());
+					mBuffer,amount,mAudioFormat->getSamplesPerSecond());
 				TOADLET_CHECK_ALERROR("alBufferData");
 			}
 		}
 
-		mTotalBuffersPlayed=numBuffers;
-		mTotalBuffersQueued=numBuffers;
+		mTotalBuffersPlayed=mNumBuffers;
+		mTotalBuffersQueued=mNumBuffers;
 
-		alSourceQueueBuffers(mHandle,numBuffers,mStreamingBuffers);
+		alSourceQueueBuffers(mHandle,mNumBuffers,mStreamingBuffers);
 		TOADLET_CHECK_ALERROR("alSourceQueueBuffers");
 	}
 
@@ -162,8 +168,8 @@ bool ALAudio::stop(){
 	}
 
 	if(mAudioStream!=NULL && mStreamingBuffers!=NULL){
-		alSourceUnqueueBuffers(mHandle,numBuffers,mStreamingBuffers);
-		alDeleteBuffers(numBuffers,mStreamingBuffers);
+		alSourceUnqueueBuffers(mHandle,mNumBuffers,mStreamingBuffers);
+		alDeleteBuffers(mNumBuffers,mStreamingBuffers);
 		TOADLET_CHECK_ALERROR("alDeleteBuffers");
 
 		delete[] mStreamingBuffers;
@@ -318,7 +324,6 @@ void ALAudio::update(int dt){
 }
 
 void ALAudio::updateStreaming(int dt){
-	unsigned char buffer[bufferSize];
 	int total=0;
 	if(mStreamingBuffers!=NULL){
 		int processed=0;
@@ -329,17 +334,17 @@ void ALAudio::updateStreaming(int dt){
 		if(mTotalBuffersPlayed>processed && processed>0){
 			int i;
 			for(i=(mTotalBuffersPlayed-processed);i<mTotalBuffersPlayed;++i){
-				unsigned int bufferID=mStreamingBuffers[i % numBuffers];
+				unsigned int bufferID=mStreamingBuffers[i % mNumBuffers];
 				
 				alSourceUnqueueBuffers(mHandle,1,&bufferID);
 				TOADLET_CHECK_ALERROR("update::alSourceUnqueueBuffers");
 
-				int amount=readAudioData(buffer,bufferSize);
+				int amount=readAudioData(mBuffer,mBufferSize);
 				if(amount>0){
 					total=total+amount;
 					alBufferData(bufferID,
 						ALAudioDevice::getALFormat(mAudioFormat),
-						buffer,amount,mAudioFormat->getSamplesPerSecond());
+						mBuffer,amount,mAudioFormat->getSamplesPerSecond());
 					TOADLET_CHECK_ALERROR("update::alBufferData");
 					alSourceQueueBuffers(mHandle,1,&bufferID);
 					TOADLET_CHECK_ALERROR("update::alSourceQueueBuffers");
@@ -352,7 +357,7 @@ void ALAudio::updateStreaming(int dt){
 		mTotalBuffersPlayed+=processed;
 		mTotalBuffersQueued-=processed;
 
-		if(processed>=numBuffers){
+		if(processed>=mNumBuffers){
 			alSourcePlay(mHandle);
 			TOADLET_CHECK_ALERROR("update::alSourcePlay");
 		}
