@@ -23,8 +23,8 @@
  *
  ********** Copyright header - do not remove **********/
 
+#include <toadlet/egg/Log.h>
 #include <toadlet/egg/Error.h>
-#include <toadlet/egg/Logger.h>
 #include "TPKGArchive.h"
 
 namespace toadlet{
@@ -93,7 +93,7 @@ bool TPKGArchive::open(Stream::ptr stream){
 }
 
 Stream::ptr TPKGArchive::openStream(const String &name){
-	Logger::debug(Categories::TOADLET_TADPOLE,
+	Log::debug(Categories::TOADLET_TADPOLE,
 		"creating InputStream for "+name);
 
 	if(mStream==NULL){

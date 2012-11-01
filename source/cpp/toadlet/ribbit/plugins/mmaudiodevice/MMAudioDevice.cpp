@@ -29,7 +29,7 @@
 #include <toadlet/egg/EndianConversion.h>
 #include <toadlet/egg/Extents.h>
 #include <toadlet/egg/Error.h>
-#include <toadlet/egg/Logger.h>
+#include <toadlet/egg/Log.h>
 #include <toadlet/ribbit/AudioFormatConversion.h>
 
 #if !defined(TOADLET_PLATFORM_WINCE)
@@ -61,7 +61,7 @@ MMAudioDevice::MMAudioDevice():
 }
 
 bool MMAudioDevice::create(int options){
-	Logger::alert(Categories::TOADLET_RIBBIT,
+	Log::alert(Categories::TOADLET_RIBBIT,
 		"creating MMAudioDevice");
 
 	mFormat=AudioFormat::ptr(new AudioFormat(16,2,11025));
@@ -103,12 +103,12 @@ bool MMAudioDevice::create(int options){
 
 		result=waveOutPrepareHeader(mDevice,header,sizeof(WAVEHDR));
 		if(result!=MMSYSERR_NOERROR){
-			Logger::warning(Categories::TOADLET_RIBBIT,"waveOutPrepareHeader error");
+			Error::unknown(Categories::TOADLET_RIBBIT,"waveOutPrepareHeader error");
 		}
 
 		result=waveOutWrite(mDevice,header,sizeof(WAVEHDR));
 		if(result!=MMSYSERR_NOERROR){
-			Logger::warning(Categories::TOADLET_RIBBIT,"waveOutWrite error");
+			Error::unknown(Categories::TOADLET_RIBBIT,"waveOutWrite error");
 		}
 	}
 
@@ -116,7 +116,7 @@ bool MMAudioDevice::create(int options){
 }
 
 void MMAudioDevice::destroy(){
-	Logger::alert(Categories::TOADLET_RIBBIT,
+	Log::alert(Categories::TOADLET_RIBBIT,
 		"destroying MMAudioDevice");
 
 	if(mDevice!=NULL){
@@ -165,7 +165,7 @@ void MMAudioDevice::update(int dt){
 		if((header->dwFlags&WHDR_DONE)!=0){
 			MMRESULT result=waveOutUnprepareHeader(mDevice,header,sizeof(WAVEHDR));
 			if(result!=MMSYSERR_NOERROR){
-				Logger::warning(Categories::TOADLET_RIBBIT,"waveOutUnprepareHeader error");
+				Error::unknown(Categories::TOADLET_RIBBIT,"waveOutUnprepareHeader error");
 			}
 
 			read((tbyte*)header->lpData,mBufferSize);
@@ -173,12 +173,12 @@ void MMAudioDevice::update(int dt){
 
 			result=waveOutPrepareHeader(mDevice,header,sizeof(WAVEHDR));
 			if(result!=MMSYSERR_NOERROR){
-				Logger::warning(Categories::TOADLET_RIBBIT,"waveOutPrepareHeader error");
+				Error::unknown(Categories::TOADLET_RIBBIT,"waveOutPrepareHeader error");
 			}
 
 			result=waveOutWrite(mDevice,header,sizeof(WAVEHDR));
 			if(result!=MMSYSERR_NOERROR){
-				Logger::warning(Categories::TOADLET_RIBBIT,"waveOutWrite error");
+				Error::unknown(Categories::TOADLET_RIBBIT,"waveOutWrite error");
 			}
 		}
 	}

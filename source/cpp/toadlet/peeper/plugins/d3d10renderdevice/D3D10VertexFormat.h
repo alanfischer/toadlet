@@ -28,6 +28,7 @@
 
 #include "D3D10Includes.h"
 #include <toadlet/egg/BaseResource.h>
+#include <toadlet/egg/Collection.h>
 #include <toadlet/peeper/VertexFormat.h>
 
 namespace toadlet{

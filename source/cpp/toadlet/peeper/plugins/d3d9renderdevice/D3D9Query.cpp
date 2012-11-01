@@ -25,7 +25,6 @@
 
 #include "D3D9Query.h"
 #include "D3D9RenderDevice.h"
-#include <toadlet/egg/Logger.h>
 
 namespace toadlet{
 namespace peeper{
@@ -81,7 +80,7 @@ D3DQUERYTYPE D3D9Query::getD3DQUERYTYPE(QueryType queryType){
 		case QueryType_OCCLUSION:
 			return D3DQUERYTYPE_OCCLUSION;
 		default:
-			Logger::error(Categories::TOADLET_PEEPER,
+			Error::unknown(Categories::TOADLET_PEEPER,
 				"D3D9Query::getD3DQUERYTYPE: Invalid queryType");
 			return (D3DQUERYTYPE)0;
 		break;

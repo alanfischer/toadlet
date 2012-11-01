@@ -54,7 +54,7 @@ Resource::ptr BSP30Streamer::load(Stream::ptr stream,ResourceData *data,Progress
 		return NULL;
 	}
 
-	Logger::debug(Categories::TOADLET_TADPOLE,"Reading map");
+	Log::debug(Categories::TOADLET_TADPOLE,"Reading map");
 
 	BSP30Map::ptr map=new BSP30Map(mEngine);
 
@@ -85,7 +85,7 @@ Resource::ptr BSP30Streamer::load(Stream::ptr stream,ResourceData *data,Progress
 	buildBuffers(map);
 	buildMaterials(map);
 
-	Logger::debug(Categories::TOADLET_TADPOLE,"Reading map finished");
+	Log::debug(Categories::TOADLET_TADPOLE,"Reading map finished");
 
 	return map;
 }
@@ -104,7 +104,7 @@ void BSP30Streamer::readLump(Stream *stream,blump *lump,void **data,int size,int
 }
 
 void BSP30Streamer::parseVisibility(BSP30Map *map){
-	Logger::debug(Categories::TOADLET_TADPOLE,"Parsing visibility");
+	Log::debug(Categories::TOADLET_TADPOLE,"Parsing visibility");
 
 	int count;
 	int i,c,index;
@@ -171,7 +171,7 @@ void BSP30Streamer::parseVisibility(BSP30Map *map){
 }
 
 void BSP30Streamer::parseEntities(BSP30Map *map){
-	Logger::debug(Categories::TOADLET_TADPOLE,"Parsing entities");
+	Log::debug(Categories::TOADLET_TADPOLE,"Parsing entities");
 
 	char *data=map->entities;
 	Collection<BSP30Map::keyvalue> keyValues;
@@ -201,7 +201,7 @@ void BSP30Streamer::parseEntities(BSP30Map *map){
 }
 
 void BSP30Streamer::parseWADs(BSP30Map *map){
-	Logger::debug(Categories::TOADLET_TADPOLE,"Parsing WADs");
+	Log::debug(Categories::TOADLET_TADPOLE,"Parsing WADs");
 
 	if(map->parsedEntities.size()>0){
 		const Collection<BSP30Map::keyvalue> &keyvalues=map->parsedEntities[0];
@@ -224,7 +224,7 @@ void BSP30Streamer::parseWADs(BSP30Map *map){
 }
 
 void BSP30Streamer::parseTextures(BSP30Map *map){
-	Logger::debug(Categories::TOADLET_TADPOLE,"Parsing textures");
+	Log::debug(Categories::TOADLET_TADPOLE,"Parsing textures");
 
 	map->parsedTextures.resize(map->miptexlump->nummiptex);
 	int i;
@@ -243,7 +243,7 @@ void BSP30Streamer::parseTextures(BSP30Map *map){
 }
 
 void BSP30Streamer::buildBuffers(BSP30Map *map){
-	Logger::debug(Categories::TOADLET_TADPOLE,"Building buffers and lightmaps");
+	Log::debug(Categories::TOADLET_TADPOLE,"Building buffers and lightmaps");
 
 	int i,j;
 
@@ -363,7 +363,7 @@ void BSP30Streamer::buildBuffers(BSP30Map *map){
 }
 
 void BSP30Streamer::buildMaterials(BSP30Map *map){
-	Logger::debug(Categories::TOADLET_TADPOLE,"Building materials");
+	Log::debug(Categories::TOADLET_TADPOLE,"Building materials");
 
 	BSP30MaterialCreator::ptr creator=new BSP30MaterialCreator(mEngine);
 

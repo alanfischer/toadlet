@@ -25,7 +25,6 @@
 
 #include "EGLWindowRenderTarget.h"
 #include <toadlet/egg/Error.h>
-#include <toadlet/egg/Logger.h>
 
 namespace toadlet{
 namespace peeper{
@@ -50,7 +49,7 @@ EGLConfig EGLRenderTarget::chooseEGLConfig(EGLDisplay display,int redBits,int gr
     EGLint configOptions[32];
 	int i=0;
 
-	Logger::debug(Categories::TOADLET_PEEPER,
+	Log::debug(Categories::TOADLET_PEEPER,
 		String("Choosing config for color:")+redBits+","+greenBits+","+blueBits+","+alphaBits+" depth:"+depthBits+" stencil:"+stencilBits);
 
 	// Select default configuration 
@@ -160,7 +159,7 @@ EGLConfig EGLRenderTarget::chooseEGLConfigFromConfigOptions(EGLDisplay display,c
 
 		eglChooseConfig(display,configOptions,allConfigs,i,&numConfigs);
 		if(eglGetError()!=EGL_SUCCESS || numConfigs<=0){
-			Logger::debug(String("no configs from eglChooseConfig:")+numConfigs);
+			Log::debug(String("no configs from eglChooseConfig:")+numConfigs);
 			delete[] allConfigs;
 			return NULL;
 		}

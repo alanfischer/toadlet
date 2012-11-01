@@ -24,7 +24,7 @@
  ********** Copyright header - do not remove **********/
 
 #include <toadlet/egg/Error.h>
-#include <toadlet/egg/Logger.h>
+#include <toadlet/egg/Log.h>
 #include <toadlet/flick/InputDeviceListener.h>
 #include "Win32JoyDevice.h"
 #pragma comment(lib,"winmm.lib")
@@ -68,7 +68,7 @@ bool Win32JoyDevice::create(){
 	else{
 		mJoyID=-1;
 	}
-	Logger::alert(Categories::TOADLET_FLICK,
+	Log::alert(Categories::TOADLET_FLICK,
 		String("detected ")+numJoys+" joysticks");
 
 	return true;

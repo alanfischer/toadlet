@@ -23,8 +23,8 @@
  *
  ********** Copyright header - do not remove **********/
 
+#include <toadlet/egg/Log.h>
 #include <toadlet/egg/System.h>
-#include <toadlet/egg/Logger.h>
 #include <toadlet/egg/io/Stream.h>
 #include <toadlet/egg/io/FileStream.h>
 #include <toadlet/tadpole/ArchiveManager.h>

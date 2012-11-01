@@ -23,9 +23,9 @@
  *
  ********** Copyright header - do not remove **********/
 
-#include <toadlet/egg/platform/win32/Win32ErrorHandler.h>
-#include <toadlet/egg/Logger.h>
+#include "Win32ErrorHandler.h"
 #include "Win32ErrorHandler_currentctx.h"
+#include <toadlet/egg/String.h>
 #include "tchar.h"
 
 #include <stdio.h>

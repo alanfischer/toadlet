@@ -29,7 +29,6 @@
 #include <toadlet/flick/BaseInputDevice.h>
 #include <toadlet/flick/InputData.h>
 #include <toadlet/egg/System.h>
-#include <toadlet/egg/Logger.h>
 #import <UIKit/UIKit.h>
 
 namespace toadlet{

@@ -1,7 +1,7 @@
 #include "FFmpegVideoHandler.h"
 #include "FFmpegStreamContext.h"
+#include <toadlet/egg/Log.h>
 #include <toadlet/egg/Error.h>
-#include <toadlet/egg/Logger.h>
 #include <toadlet/egg/Mutex.h>
 #include <toadlet/egg/Random.h>
 #include <toadlet/egg/System.h>
@@ -53,7 +53,7 @@ TOADLET_C_API void toadlet_ffmpegLogCallback(void *ptr,int level,const char *fmt
 	if(amt>0 && buffer[amt-1]=='\n'){
 		buffer[amt-1]=0; // Trim off the trailing newline
 	}
-	Logger::getInstance()->addLogEntry("ffmpeg",toadlet_ffmpegGetLogLevel(level),buffer);
+	Log::getInstance()->addLogEntry("ffmpeg",toadlet_ffmpegGetLogLevel(level),buffer);
 }
 
 TOADLET_C_API void toadlet_ffmpegRegisterLogCallback(){
@@ -275,7 +275,7 @@ FFmpegController::FFmpegController(Engine *engine):
 }
 
 bool FFmpegController::open(Stream::ptr stream){
-	Logger::alert(Categories::TOADLET_TADPOLE,"FFmpegController::open");
+	Log::alert(Categories::TOADLET_TADPOLE,"FFmpegController::open");
 
 	if(stream->closed()){
 		Error::unknown(Categories::TOADLET_TADPOLE,
@@ -372,7 +372,7 @@ bool FFmpegController::open(Stream::ptr stream){
 }
 
 void FFmpegController::destroy(){
-	Logger::alert(Categories::TOADLET_TADPOLE,"FFmpegController::destroy");
+	Log::alert(Categories::TOADLET_TADPOLE,"FFmpegController::destroy");
 
 	mTexture=NULL;
 

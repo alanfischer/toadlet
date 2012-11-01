@@ -25,6 +25,7 @@
 
 #include "D3D9WindowRenderTarget.h"
 #include <toadlet/egg/Error.h>
+#include <toadlet/egg/Log.h>
 
 namespace toadlet{
 namespace peeper{
@@ -134,7 +135,7 @@ void D3D9WindowRenderTarget::reset(){
 bool D3D9WindowRenderTarget::createContext(HWND wnd,WindowRenderTargetFormat *format){
 	HRESULT result;
 
-	Logger::alert(Categories::TOADLET_PEEPER,
+	Log::alert(Categories::TOADLET_PEEPER,
 		"D3D9WindowRenderTarget::createContext");
 
 	char *d3dName=format->debug?TOADLET_D3D9_DEBUG_DLL_NAME:TOADLET_D3D9_DLL_NAME;
@@ -168,17 +169,17 @@ bool D3D9WindowRenderTarget::createContext(HWND wnd,WindowRenderTargetFormat *fo
 			char *compileShaderName=TOADLET_D3DX9_COMPILE_SHADER_NAME;
 			CompileShaderSymbol=(D3DXCompileShader)GetProcAddress(mD3DXLibrary,compileShaderName);
 			if(CompileShaderSymbol==NULL){
-				Logger::warning(Categories::TOADLET_PEEPER,
+				Log::warning(Categories::TOADLET_PEEPER,
 					String("D3D9WindowRenderTarget: Error finding ")+compileShaderName);
 			}
 		}
 	}
 	if(mD3DXLibrary==0){
-		Logger::warning(Categories::TOADLET_PEEPER,
+		Log::warning(Categories::TOADLET_PEEPER,
 			"D3D9WindowRenderTarget: Error loading "+d3dxName);
 	}
 	else{
-		Logger::alert(Categories::TOADLET_PEEPER,
+		Log::alert(Categories::TOADLET_PEEPER,
 			"Found "+d3dxName);
 	}
 
@@ -192,9 +193,9 @@ bool D3D9WindowRenderTarget::createContext(HWND wnd,WindowRenderTargetFormat *fo
 	mAdaptor=D3DADAPTER_DEFAULT;
 	D3DADAPTER_IDENTIFIER9 identifier={0};
 	mD3D->GetAdapterIdentifier(mAdaptor,0,&identifier);
-	Logger::alert(Categories::TOADLET_PEEPER,
+	Log::alert(Categories::TOADLET_PEEPER,
 		String("D3D Driver:") + identifier.Driver);
-	Logger::alert(Categories::TOADLET_PEEPER,
+	Log::alert(Categories::TOADLET_PEEPER,
 		String("D3D Description:") + identifier.Description);
 
 	#if defined(TOADLET_SET_D3DM)

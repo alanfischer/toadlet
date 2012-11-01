@@ -26,7 +26,6 @@
 #ifndef TOADLET_PEEPER_VERTEXBUFFERACCESSOR_H
 #define TOADLET_PEEPER_VERTEXBUFFERACCESSOR_H
 
-#include <toadlet/egg/Logger.h>
 #include <toadlet/egg/math/Math.h>
 #include <toadlet/egg/mathfixed/Math.h>
 #include <toadlet/peeper/VertexBuffer.h>

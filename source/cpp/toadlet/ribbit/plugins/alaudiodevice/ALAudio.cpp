@@ -27,7 +27,6 @@
 #include "ALAudio.h"
 #include "ALAudioBuffer.h"
 #include <toadlet/egg/MathConversion.h>
-#include <toadlet/egg/EndianConversion.h>
 #include <toadlet/egg/System.h>
 #include <toadlet/ribbit/AudioFormatConversion.h>
 
@@ -64,7 +63,7 @@ ALAudio::~ALAudio(){
 
 bool ALAudio::create(AudioBuffer *audioBuffer){
 	if(audioBuffer==NULL){
-		Logger::warning(Categories::TOADLET_RIBBIT,"invalid audioBuffer");
+		Error::unknown(Categories::TOADLET_RIBBIT,"invalid audioBuffer");
 		return false;
 	}
 	

@@ -170,7 +170,7 @@ rect{
 - (void) windowResized:(NSNotification*)notification{
 #endif
 	int width=[self bounds].size.width,height=[self bounds].size.height;
-	Logger::debug(Categories::TOADLET_PAD,String("resized:")+width+","+height);
+	Log::debug(Categories::TOADLET_PAD,String("resized:")+width+","+height);
 
 	mApplication->resized(width,height);
 

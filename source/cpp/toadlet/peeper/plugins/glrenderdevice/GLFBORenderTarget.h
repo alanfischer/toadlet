@@ -28,6 +28,7 @@
 
 #include "GLRenderTarget.h"
 #include "GLFBOPixelBuffer.h"
+#include <toadlet/egg/Collection.h>
 #include <toadlet/peeper/PixelBufferRenderTarget.h>
 
 #if defined(TOADLET_HAS_GLFBOS)

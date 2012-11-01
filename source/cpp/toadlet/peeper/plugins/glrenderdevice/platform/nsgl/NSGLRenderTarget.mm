@@ -24,7 +24,7 @@
  ********** Copyright header - do not remove **********/
 
 #include "NSGLRenderTarget.h"
-#include <toadlet/egg/Logger.h>
+#include <toadlet/egg/Log.h>
 #include <toadlet/egg/System.h>
 
 namespace toadlet{

@@ -23,8 +23,8 @@
  *
  ********** Copyright header - do not remove **********/
 
+#include <toadlet/egg/Log.h>
 #include <toadlet/egg/Error.h>
-#include <toadlet/egg/Logger.h>
 #include <toadlet/egg/io/DataStream.h>
 #include "TGAStreamer.h"
 
@@ -55,7 +55,7 @@ Resource::ptr TGAStreamer::load(Stream::ptr stream,ResourceData *data,ProgressLi
 		return NULL;
 	}
 
-	DataStream::ptr dataStream(new DataStream(stream));
+	DataStream::ptr dataStream=new DataStream(stream);
 
 	int idLength=dataStream->readUInt8();
 	int colorMapType=dataStream->readUInt8();

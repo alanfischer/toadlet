@@ -23,8 +23,8 @@
  *
  ********** Copyright header - do not remove **********/
 
+#include <toadlet/egg/Log.h>
 #include <toadlet/egg/Error.h>
-#include <toadlet/egg/Logger.h>
 #include "OggVorbisDecoder.h"
 #include <vorbis/codec.h>
 #include <vorbis/vorbisfile.h>

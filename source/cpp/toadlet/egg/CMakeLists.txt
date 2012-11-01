@@ -7,6 +7,7 @@ set (EGG_SRC
 	Assert.cpp
 	Error.cpp
 	Exception.cpp
+	Log.cpp
 	Logger.cpp
 	MathFormatting.cpp
 	SOSLoggerListener.cpp
@@ -93,6 +94,7 @@ set (EGG_HDR
 	Extents.h
 	Interface.h
 	IntrusivePointer.h
+	Log.h
 	Logger.h
 	LoggerListener.h
 	MathConversion.h

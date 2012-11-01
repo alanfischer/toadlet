@@ -51,7 +51,7 @@ Shader::ptr ShaderManager::createShader(Shader::ShaderType type,const String pro
 			shader=renderDevice->createShader();
 		TOADLET_CATCH_ANONYMOUS(){shader=NULL;}
 		if(BackableShader::convertCreate(shader,renderDevice,type,profiles,codes,numCodes)==false){
-			Logger::error(Categories::TOADLET_TADPOLE,"Error in shader convertCreate");
+			Error::unknown(Categories::TOADLET_TADPOLE,"Error in shader convertCreate");
 			return NULL;
 		}
 	}

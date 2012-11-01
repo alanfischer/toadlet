@@ -24,8 +24,8 @@
  ********** Copyright header - do not remove **********/
 
 #include <toadlet/egg/Error.h>
+#include <toadlet/egg/Log.h>
 #include <toadlet/egg/System.h>
-#include <toadlet/egg/Logger.h>
 #include <toadlet/pad/platform/win32/Win32Application.h>
 #include <windows.h>
 #if defined(TOADLET_PLATFORM_WINCE)
@@ -142,7 +142,7 @@ Win32Application::Win32Application():
 	#if defined(TOADLET_PLATFORM_WINCE)
 		HRSRC res=FindResource((HMODULE)win32->mInstance,TEXT("HI_RES_AWARE"),TEXT("CEUX"));
 		if(res==NULL){
-			Logger::error(Categories::TOADLET_PAD,"No resource of type CEUX with name HI_RES_AWARE, may not render on all devices");
+			Log::error(Categories::TOADLET_PAD,"No resource of type CEUX with name HI_RES_AWARE, may not render on all devices");
 		}
 	#endif
 
@@ -288,13 +288,13 @@ void Win32Application::stepEventLoop(){
 }
 
 void Win32Application::stop(){
-	Logger::debug(Categories::TOADLET_PAD,"Win32Application::stop");
+	Log::debug(Categories::TOADLET_PAD,"Win32Application::stop");
 	mRun=false;
 }
 
 void Win32Application::activate(){
 	if(mActive==false){
-		Logger::debug(Categories::TOADLET_PAD,"Win32Application::activate");
+		Log::debug(Categories::TOADLET_PAD,"Win32Application::activate");
 		mActive=true;
 
 		if(mFullscreen){
@@ -316,7 +316,7 @@ void Win32Application::activate(){
 
 void Win32Application::deactivate(){
 	if(mActive==true){
-		Logger::debug(Categories::TOADLET_PAD,"Win32Application::deactivate");
+		Log::debug(Categories::TOADLET_PAD,"Win32Application::deactivate");
 		mActive=false;
 
 		if(mFullscreen){

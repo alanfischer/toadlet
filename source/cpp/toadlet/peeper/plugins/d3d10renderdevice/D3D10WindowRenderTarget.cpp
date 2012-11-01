@@ -25,6 +25,7 @@
 
 #include "D3D10WindowRenderTarget.h"
 #include <toadlet/egg/Error.h>
+#include <toadlet/egg/Log.h>
 
 namespace toadlet{
 namespace peeper{
@@ -163,7 +164,7 @@ bool D3D10WindowRenderTarget::createContext(HWND wnd,WindowRenderTargetFormat *f
 	DXGI_ADAPTER_DESC adapterDesc;
 	mDXGIAdapter->GetDesc(&adapterDesc);
 
-	Logger::alert(Categories::TOADLET_PEEPER,
+	Log::alert(Categories::TOADLET_PEEPER,
 		String("D3D Description:") + adapterDesc.Description);
 
 	ID3D10Texture2D *texture;

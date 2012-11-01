@@ -25,7 +25,6 @@
 
 #include "GLXWindowRenderTarget.h"
 #include <toadlet/egg/Error.h>
-#include <toadlet/egg/Logger.h>
 #include <toadlet/egg/System.h>
 #include <toadlet/peeper/TextureFormat.h>
 
@@ -104,11 +103,11 @@ bool GLXWindowRenderTarget::createContext(Display *display,Window window,WindowR
 	}
 
 	if(glXIsDirect(mDisplay,mContext)){
-		Logger::alert(Categories::TOADLET_PEEPER,
+		Log::alert(Categories::TOADLET_PEEPER,
 			"Using Direct Rendering");
 	}
 	else{
-		Logger::alert(Categories::TOADLET_PEEPER,
+		Log::alert(Categories::TOADLET_PEEPER,
 			"No Direct Rendering possible");
 	}
 

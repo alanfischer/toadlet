@@ -24,8 +24,8 @@
  ********** Copyright header - do not remove **********/
 
 #include <toadlet/egg/Collection.h>
+#include <toadlet/egg/Log.h>
 #include <toadlet/egg/Error.h>
-#include <toadlet/egg/Logger.h>
 #include <toadlet/tadpole/platform/win32/Win32TextureStreamer.h>
 #include <toadlet/tadpole/platform/win32/StreamIStream.h>
 
@@ -87,7 +87,7 @@ bool Win32TextureStreamer::valid(){
 }
 
 Resource::ptr Win32TextureStreamer::load(Stream::ptr in,ResourceData *data,ProgressListener *listener){
-	Logger::debug(Categories::TOADLET_TADPOLE,"Win32TextureStreamer::load");
+	Log::debug(Categories::TOADLET_TADPOLE,"Win32TextureStreamer::load");
 
 	Texture::ptr texture=NULL;
 	int usage=(data!=NULL)?((TextureData*)data)->usage:0;

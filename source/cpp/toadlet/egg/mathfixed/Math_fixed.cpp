@@ -24,7 +24,7 @@
  ********** Copyright header - do not remove **********/
 
 #include <toadlet/egg/mathfixed/Math.h>
-#include <toadlet/egg/Logger.h>
+#include <toadlet/egg/Log.h>
 #include <toadlet/egg/System.h>
 
 namespace toadlet{
@@ -1132,10 +1132,10 @@ void Math::optimize(int o){
 	SystemCaps caps;
 	System::getSystemCaps(caps);
 
-	Logger::alert(String("Detected SSE version:")+caps.sseVersion);
-	Logger::alert(String("Detected NEON version:")+caps.neonVersion);
+	Log::alert(String("Detected SSE version:")+caps.sseVersion);
+	Log::alert(String("Detected NEON version:")+caps.neonVersion);
 	{
-		Logger::excess(Categories::TOADLET_EGG,"forcing Traditional math");
+		Log::excess(Categories::TOADLET_EGG,"forcing Traditional math");
 
 		init();
 	}

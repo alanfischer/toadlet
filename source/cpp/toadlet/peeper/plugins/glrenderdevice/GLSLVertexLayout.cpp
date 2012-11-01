@@ -26,6 +26,7 @@
 #include "GLSLVertexLayout.h"
 #include "GLRenderDevice.h"
 #include "GLSLShaderState.h"
+#include <toadlet/egg/Log.h>
 
 #if defined(TOADLET_HAS_GLSL)
 
@@ -45,7 +46,7 @@ bool GLSLVertexLayout::create(GLVertexFormat *vertexFormat,GLSLShaderState *shad
 		if(location==-1){
 			location=glGetAttribLocation(shaderState->mHandle,vertexFormat->getElementName(i)+vertexFormat->getElementIndex(i));
 		}
-		Logger::excess(Categories::TOADLET_PEEPER,
+		Log::excess(Categories::TOADLET_PEEPER,
 			String("Semantic name:")+vertexFormat->getElementName(i)+" found location:"+location);
 		if(location==-1){
 			location=GLRenderDevice::getFixedAttribFromSemantic(vertexFormat->getElementSemantic(i),vertexFormat->getElementIndex(i));

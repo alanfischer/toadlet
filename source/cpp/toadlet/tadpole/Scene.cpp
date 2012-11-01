@@ -23,8 +23,8 @@
  *
  ********** Copyright header - do not remove **********/
 
+#include <toadlet/egg/Log.h>
 #include <toadlet/egg/Error.h>
-#include <toadlet/egg/Logger.h>
 #include <toadlet/egg/Profile.h>
 #include <toadlet/tadpole/Colors.h>
 #include <toadlet/tadpole/Engine.h>
@@ -122,7 +122,7 @@ void Scene::setLogicTimeAndFrame(int time,int frame){
 
 void Scene::update(int dt){
 	if(mExcessiveDT>0 && dt>mExcessiveDT){
-		Logger::alert(Categories::TOADLET_TADPOLE,
+		Log::alert(Categories::TOADLET_TADPOLE,
 			String("skipping excessive dt:")+dt);
 		return;
 	}

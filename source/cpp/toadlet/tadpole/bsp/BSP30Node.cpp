@@ -92,7 +92,7 @@ void BSP30Node::setSkyName(const String &skyName){
 }
 
 void BSP30Node::setSkyTextures(const String &skyDown,const String &skyUp,const String &skyWest,const String &skyEast,const String &skySouth,const String &skyNorth){
-	Logger::debug(Categories::TOADLET_TADPOLE,"creating sky box");
+	Log::debug(Categories::TOADLET_TADPOLE,"creating sky box");
 
 	if(mSkyMesh!=NULL){
 		mSkyMesh->destroy();
@@ -260,7 +260,7 @@ void BSP30Node::gatherRenderables(Camera *camera,RenderableSet *set){
 
 	for(i=0;i<mMap->lightmapTextures.size();++i){
 		if(mMap->lightmapDirties[i]){
-			Logger::excess(Categories::TOADLET_TADPOLE_BSP,String("reloading lightmap:")+i);
+			Log::excess(Categories::TOADLET_TADPOLE_BSP,String("reloading lightmap:")+i);
 			mMap->lightmapDirties[i]=false;
 			mEngine->getTextureManager()->textureLoad(mMap->lightmapTextures[i],mMap->lightmapFormat,mMap->lightmapDatas[i]);
 		}

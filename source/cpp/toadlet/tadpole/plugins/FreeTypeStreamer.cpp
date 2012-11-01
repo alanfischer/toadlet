@@ -23,8 +23,8 @@
  *
  ********** Copyright header - do not remove **********/
 
+#include <toadlet/egg/Log.h>
 #include <toadlet/egg/Error.h>
-#include <toadlet/egg/Logger.h>
 #include <toadlet/egg/io/MemoryStream.h>
 #include <toadlet/tadpole/FontData.h>
 #include "FreeTypeStreamer.h"
@@ -46,10 +46,7 @@ FreeTypeStreamer::FreeTypeStreamer(TextureManager *textureManager){
 }
 
 FreeTypeStreamer::~FreeTypeStreamer(){
-	if(FT_Done_FreeType(mLibrary)){
-		Logger::error(Categories::TOADLET_TADPOLE,
-			"FT_Done_FreeType failed");
-	}
+	FT_Done_FreeType(mLibrary);
 }
 
 Resource::ptr FreeTypeStreamer::load(Stream::ptr stream,ResourceData *resourceData,ProgressListener *listener){

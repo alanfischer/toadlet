@@ -46,7 +46,7 @@ EGLWindowRenderTarget::EGLWindowRenderTarget(void *display,void *window,WindowRe
 	#if defined(TOADLET_HAS_GLESEM)
 		int initialized=glesem_getInitialized();
 		if(!initialized){
-			Logger::alert("initializing glesem");
+			Log::alert("initializing glesem");
 
 			int glesemInitResult=glesem_init(GLESEM_ACCELERATED_IF_AVAILABLE);
 			if(glesemInitResult<1){
@@ -61,7 +61,7 @@ EGLWindowRenderTarget::EGLWindowRenderTarget(void *display,void *window,WindowRe
 
 	#if defined(TOADLET_HAS_GLESEM)
 		if(result==false && !initialized){
-			Logger::alert("trying software glesem");
+			Log::alert("trying software glesem");
 
 			int glesemInitResult=glesem_init(GLESEM_ACCELERATED_NO);
 			if(glesemInitResult<1){
@@ -108,7 +108,7 @@ bool EGLWindowRenderTarget::createContext(void *display,void *window,WindowRende
 		}
 	#endif
 
-	Logger::debug(String("creating EGL context for ")+(pixmap?"pixmap":"window"));
+	Log::debug(String("creating EGL context for ")+(pixmap?"pixmap":"window"));
 
 	mPixmap=pixmap;
 
@@ -137,14 +137,14 @@ bool EGLWindowRenderTarget::createContext(void *display,void *window,WindowRende
 		}
 		egl_version=version[0]*10+version[1];
 	#endif
-	Logger::alert(Categories::TOADLET_PEEPER,
+	Log::alert(Categories::TOADLET_PEEPER,
 		String("CALCULATED EGL VERSION:")+(egl_version/10)+"."+(egl_version%10));
 
-	Logger::alert(Categories::TOADLET_PEEPER,
+	Log::alert(Categories::TOADLET_PEEPER,
 		String("EGL_VENDOR:")+eglQueryString(mDisplay,EGL_VENDOR));
-	Logger::alert(Categories::TOADLET_PEEPER,
+	Log::alert(Categories::TOADLET_PEEPER,
 		String("EGL_VERSION:")+eglQueryString(mDisplay,EGL_VERSION));
-	Logger::alert(Categories::TOADLET_PEEPER,
+	Log::alert(Categories::TOADLET_PEEPER,
 		String("EGL_EXTENSIONS:")+eglQueryString(mDisplay,EGL_EXTENSIONS));
 
 	int pixelFormat=format->pixelFormat;
@@ -165,7 +165,7 @@ bool EGLWindowRenderTarget::createContext(void *display,void *window,WindowRende
 		return false;
 	}
 
-	Logger::debug(Categories::TOADLET_PEEPER,
+	Log::debug(Categories::TOADLET_PEEPER,
 		String("chooseEGLConfig config:")+(int)mConfig);
 		
 	try{
@@ -223,7 +223,7 @@ bool EGLWindowRenderTarget::createContext(void *display,void *window,WindowRende
 
 bool EGLWindowRenderTarget::destroyContext(){
 	if(mDisplay!=EGL_NO_DISPLAY){
-		Logger::debug("destroying EGL context");
+		Log::debug("destroying EGL context");
 
 		eglMakeCurrent(mDisplay,EGL_NO_SURFACE,EGL_NO_SURFACE,EGL_NO_CONTEXT);
 

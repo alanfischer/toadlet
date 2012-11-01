@@ -25,7 +25,7 @@
 
 #include "D3D10Query.h"
 #include "D3D10RenderDevice.h"
-#include <toadlet/egg/Logger.h>
+#include <toadlet/egg/Log.h>
 
 namespace toadlet{
 namespace peeper{
@@ -84,7 +84,7 @@ D3D10_QUERY D3D10Query::getD3D10_QUERY(QueryType queryType){
 		case QueryType_OCCLUSION:
 			return D3D10_QUERY_OCCLUSION;
 		default:
-			Logger::error(Categories::TOADLET_PEEPER,
+			Log::error(Categories::TOADLET_PEEPER,
 				"D3D10Query::getD3D10_QUERY: Invalid queryType");
 			return (D3D10_QUERY)0;
 		break;

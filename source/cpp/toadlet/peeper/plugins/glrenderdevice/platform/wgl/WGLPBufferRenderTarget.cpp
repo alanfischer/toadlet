@@ -25,7 +25,7 @@
 
 #include "WGLPBufferRenderTarget.h"
 #include "../../GLRenderDevice.h"
-#include <toadlet/egg/Logger.h>
+#include <toadlet/egg/Log.h>
 #include <toadlet/egg/Error.h>
 #include <toadlet/peeper/TextureFormat.h>
 
@@ -222,7 +222,7 @@ bool WGLPBufferRenderTarget::createBuffer(){
 	wglGetPixelFormatAttribivARB(hdc,wglformat,0,sizeof(piAttributes)/sizeof(const int),piAttributes,piValues);
 	TOADLET_CHECK_WGLERROR("wglGetPixelFormatAttribivARB");
 
-	Logger::alert(Categories::TOADLET_PEEPER,
+	Log::alert(Categories::TOADLET_PEEPER,
 		String("Format RGBA=")+
 		piValues[0] + "," + piValues[1] + "," + piValues[2] + "," + piValues[3] + " Depth=" +
 		piValues[4] + " Stencil=" + piValues[5] + " Width=" + width + " Height=" + height);

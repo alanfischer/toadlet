@@ -26,7 +26,7 @@
 #ifndef TOADLET_PEEPER_ALINCLUDES_H
 #define TOADLET_PEEPER_ALINCLUDES_H
 
-#include <toadlet/egg/Logger.h>
+#include <toadlet/egg/Error.h>
 #include <toadlet/egg/MathConversion.h>
 #include <toadlet/ribbit/Types.h>
 
@@ -50,8 +50,8 @@
 	#define TOADLET_CHECK_ALERROR(function) \
 		{ int error=alGetError(); \
 		if(error!=AL_NO_ERROR) \
-			toadlet::egg::Logger::warning(toadlet::egg::Categories::TOADLET_RIBBIT, \
-				toadlet::egg::String("AL Error in ") + function + ": error=" + error + " string=" + alGetString(error)); }
+			toadlet::egg::Error::unknown(toadlet::egg::Categories::TOADLET_RIBBIT, \
+			toadlet::egg::String("AL Error in ") + function + ": error=" + error + " string=" + alGetString(error)); }
 
 #else
 	#define TOADLET_CHECK_ALERROR(function)

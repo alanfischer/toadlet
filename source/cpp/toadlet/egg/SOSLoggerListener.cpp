@@ -1,4 +1,5 @@
 #include "SOSLoggerListener.h"
+#include <toadlet/egg/Log.h>
 
 #include <stdio.h>
 
@@ -17,7 +18,7 @@ const char *const _sos_level_names[] = {
 
 SOSLoggerListener::SOSLoggerListener(String serverAddress){
 	// Turn off net errors when in use, to avoid recursion
-	Logger::getInstance()->setCategoryReportingLevel(Categories::TOADLET_EGG_NET,Logger::Level_DISABLED);
+	Log::getInstance()->setCategoryReportingLevel(Categories::TOADLET_EGG_NET,Logger::Level_DISABLED);
 
 	mServerAddress=serverAddress;
 	mMutex=Mutex::ptr(new Mutex());

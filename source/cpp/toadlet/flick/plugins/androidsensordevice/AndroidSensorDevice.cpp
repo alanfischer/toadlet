@@ -25,7 +25,6 @@
 
 #include "AndroidSensorDevice.h"
 #include <toadlet/egg/DynamicLibrary.h>
-#include <toadlet/egg/Logger.h>
 #include <toadlet/flick/InputDeviceListener.h>
 
 namespace toadlet{

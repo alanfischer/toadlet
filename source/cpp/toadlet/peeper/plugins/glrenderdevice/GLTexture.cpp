@@ -26,7 +26,7 @@
 #include "GLRenderDevice.h"
 #include "GLTexture.h"
 #include <toadlet/egg/Error.h>
-#include <toadlet/egg/Logger.h>
+#include <toadlet/egg/Log.h>
 
 namespace toadlet{
 namespace peeper{
@@ -119,7 +119,7 @@ bool GLTexture::createContext(int mipLevels,tbyte *mipDatas[]){
 	if(totalMipLevels!=mFormat->mipLevels && mFormat->mipLevels>0){
 		specifiedMipLevels=totalMipLevels;
 
-		Logger::debug(Categories::TOADLET_PEEPER,
+		Log::debug(Categories::TOADLET_PEEPER,
 			String("partial mipmap specification not supported.  calculated:")+totalMipLevels+" requested:"+mFormat->mipLevels);
 	}
 */
@@ -463,7 +463,7 @@ bool GLTexture::generateMipLevels(){
 	else
 	#endif
 	{
-		Logger::warning(Categories::TOADLET_PEEPER,
+		Log::warning(Categories::TOADLET_PEEPER,
 			"GLTexture::generateMipMaps: Not implemented");
 		return false;
 	}

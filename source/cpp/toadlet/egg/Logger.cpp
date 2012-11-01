@@ -48,23 +48,6 @@
 namespace toadlet{
 namespace egg{
 
-Logger *Logger::mTheLogger=NULL;
-
-Logger *Logger::getInstance(){
-	if(mTheLogger==NULL){
-		mTheLogger=new Logger();
-	}
-
-	return mTheLogger;
-}
-
-void Logger::destroy(){
-	if(mTheLogger!=NULL){
-		delete mTheLogger;
-		mTheLogger=NULL;
-	}
-}
-
 Logger::Logger(){
 	mLoggedMessage=false;
 	mReportingLevel=Level_MAX;

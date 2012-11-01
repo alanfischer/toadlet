@@ -23,8 +23,8 @@
  *
  ********** Copyright header - do not remove **********/
 
+#include <toadlet/egg/Log.h>
 #include <toadlet/egg/Error.h>
-#include <toadlet/egg/Logger.h>
 #include <toadlet/egg/Extents.h>
 #include <toadlet/tadpole/Engine.h>
 #include <toadlet/tadpole/ResourceManager.h>
@@ -161,21 +161,21 @@ void ResourceManager::unmanage(Resource *resource){
 void ResourceManager::setStreamer(ResourceStreamer  *streamer,const String &extension){
 	ExtensionStreamerMap::iterator it=mExtensionStreamerMap.find(extension);
 	if(it!=mExtensionStreamerMap.end()){
-		Logger::debug(Categories::TOADLET_TADPOLE,
+		Log::debug(Categories::TOADLET_TADPOLE,
 			"removing streamer for extension "+extension);
 
 		it->second=NULL;
 	}
 
 	if(streamer!=NULL){
-		Logger::debug(Categories::TOADLET_TADPOLE,
+		Log::debug(Categories::TOADLET_TADPOLE,
 			"adding streamer for extension "+extension);
 		mExtensionStreamerMap.add(extension,streamer);
 	}
 }
 
 void ResourceManager::setDefaultStreamer(ResourceStreamer  *streamer){
-	Logger::debug(Categories::TOADLET_TADPOLE,
+	Log::debug(Categories::TOADLET_TADPOLE,
 		"adding default streamer");
 
 	mDefaultStreamer=streamer;
@@ -198,7 +198,7 @@ void ResourceManager::resourceDestroyed(Resource *resource){
 void ResourceManager::logAllResources(){
 	int i;
 	for(i=0;i<mResources.size();++i){
-		Logger::alert(String("Resource:")+i+" name:"+(mResources[i]!=NULL?mResources[i]->getName():""));
+		Log::alert(String("Resource:")+i+" name:"+(mResources[i]!=NULL?mResources[i]->getName():""));
 	}
 }
 
@@ -262,7 +262,7 @@ Resource::ptr ResourceManager::unableToFindStreamer(const String &name,ResourceD
 }
 
 Resource::ptr ResourceManager::findFromFile(const String &name,ResourceData *data){
-	Logger::debug(Categories::TOADLET_TADPOLE,
+	Log::debug(Categories::TOADLET_TADPOLE,
 		"ResourceManager::findFromFile:"+name);
 
 	String filename=cleanPath(name);

@@ -32,9 +32,9 @@
 extern "C"{
 	#include <gif_lib.h>
 }
-#include <toadlet/egg/EndianConversion.h>
+#include <toadlet/egg/Log.h>
 #include <toadlet/egg/Error.h>
-#include <toadlet/egg/Logger.h>
+#include <toadlet/egg/EndianConversion.h>
 #include "GIFStreamer.h"
 
 namespace toadlet{

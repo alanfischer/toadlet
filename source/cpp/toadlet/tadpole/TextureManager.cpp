@@ -23,6 +23,7 @@
  *
  ********** Copyright header - do not remove **********/
 
+#include <toadlet/egg/Log.h>
 #include <toadlet/peeper/BackableTexture.h>
 #include <toadlet/peeper/BackablePixelBufferRenderTarget.h>
 #include <toadlet/peeper/TextureFormatConversion.h>
@@ -81,7 +82,7 @@ Texture::ptr TextureManager::createTexture(int usage,TextureFormat::ptr format,t
 	else if(renderDevice!=NULL){
 		texture=renderDevice->createTexture();
 		if(BackableTexture::convertCreate(texture,renderDevice,usage,format,mipDatas)==false){
-			Logger::error(Categories::TOADLET_TADPOLE,"Error in texture convertCreate");
+			Error::unknown(Categories::TOADLET_TADPOLE,"Error in texture convertCreate");
 			return NULL;
 		}
 	}
@@ -174,7 +175,7 @@ void TextureManager::contextDeactivate(RenderDevice *renderDevice){
 }
 
 void TextureManager::preContextReset(peeper::RenderDevice *renderDevice){
-	Logger::debug("TextureManager::preContextReset");
+	Log::debug("TextureManager::preContextReset");
 
 	int i;
 	for(i=0;i<mResources.size();++i){
@@ -193,7 +194,7 @@ void TextureManager::preContextReset(peeper::RenderDevice *renderDevice){
 }
 
 void TextureManager::postContextReset(peeper::RenderDevice *renderDevice){
-	Logger::debug("TextureManager::postContextReset");
+	Log::debug("TextureManager::postContextReset");
 
 	int i;
 	for(i=0;i<mResources.size();++i){

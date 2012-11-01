@@ -27,7 +27,7 @@
 #include "GLTexture.h"
 #include "GLRenderDevice.h"
 #include <toadlet/egg/Error.h>
-#include <toadlet/egg/Logger.h>
+#include <toadlet/egg/Log.h>
 
 #if defined(TOADLET_HAS_GLFBOS)
 
@@ -244,7 +244,7 @@ bool GLFBORenderTarget::compile(){
 	glBindFramebuffer(GL_FRAMEBUFFER,mHandle);
 	GLenum status=glCheckFramebufferStatus(GL_FRAMEBUFFER);
 	if(status!=GL_FRAMEBUFFER_COMPLETE){
-		Logger::warning(Categories::TOADLET_PEEPER,String("FBO Warning:")+getFBOMessage(status));
+		Log::warning(Categories::TOADLET_PEEPER,String("FBO Warning:")+getFBOMessage(status));
 	}
 	glBindFramebuffer(GL_FRAMEBUFFER,0);
 

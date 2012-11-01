@@ -25,7 +25,6 @@
 
 #include "AndroidApplication.h"
 #include <toadlet/egg/Error.h>
-#include <toadlet/egg/Logger.h>
 #include <toadlet/egg/System.h>
 #include <toadlet/tadpole/platform/android/AndroidAssetArchive.h>
 #include <toadlet/tadpole/platform/android/AndroidTextureStreamer.h>
@@ -177,7 +176,7 @@ bool AndroidApplication::isRunning() const{
 }
 
 void AndroidApplication::notifyWindowCreated(ANativeWindow *window){
-	Logger::alert("notifyWindowCreated");
+	Log::alert("notifyWindowCreated");
 
 	mWindowMutex.lock();
 		if(mRun){
@@ -191,7 +190,7 @@ void AndroidApplication::notifyWindowCreated(ANativeWindow *window){
 }
 
 void AndroidApplication::notifyWindowDestroyed(ANativeWindow *window){
-	Logger::alert("notifyWindowDestroyed");
+	Log::alert("notifyWindowDestroyed");
 
 	mWindowMutex.lock();
 		if(mRun){
@@ -205,7 +204,7 @@ void AndroidApplication::notifyWindowDestroyed(ANativeWindow *window){
 }
 
 void AndroidApplication::notifyWindowResized(){
-	Logger::alert("onNativeWindowResized");
+	Log::alert("onNativeWindowResized");
 
 	mWindowMutex.lock();
 		if(mRun){
@@ -219,7 +218,7 @@ void AndroidApplication::notifyWindowResized(){
 }
 
 void AndroidApplication::notifyQueueCreated(AInputQueue *queue){
-	Logger::alert("notifyQueueCreated");
+	Log::alert("notifyQueueCreated");
 
 	mWindowMutex.lock();
 		if(mRun){
@@ -233,7 +232,7 @@ void AndroidApplication::notifyQueueCreated(AInputQueue *queue){
 }
 
 void AndroidApplication::notifyQueueDestroyed(AInputQueue *queue){
-	Logger::alert("notifyQueueDestroyed");
+	Log::alert("notifyQueueDestroyed");
 
 	mWindowMutex.lock();
 		if(mRun){

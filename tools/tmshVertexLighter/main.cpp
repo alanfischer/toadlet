@@ -94,9 +94,9 @@ int main(int argc,char **argv){
 	std::cout << "--tmshVertexLighter--" << std::endl;
 
 	// Create a toadlet engine
-	Logger::getInstance()->setCategoryReportingLevel(Categories::TOADLET_EGG,Logger::Level_DISABLED);
-	Logger::getInstance()->setCategoryReportingLevel(Categories::TOADLET_EGG,Logger::Level_WARNING);
-	Logger::getInstance()->setCategoryReportingLevel(Categories::TOADLET_TADPOLE,Logger::Level_WARNING);
+	Log::getInstance()->setCategoryReportingLevel(Categories::TOADLET_EGG,Logger::Level_DISABLED);
+	Log::getInstance()->setCategoryReportingLevel(Categories::TOADLET_EGG,Logger::Level_WARNING);
+	Log::getInstance()->setCategoryReportingLevel(Categories::TOADLET_TADPOLE,Logger::Level_WARNING);
 	Engine::ptr engine=new Engine(0,0,Engine::Option_BIT_FIXEDBACKABLE|Engine::Option_BIT_SHADERBACKABLE);
 	engine->installHandlers();
 

@@ -24,7 +24,7 @@
  ********** Copyright header - do not remove **********/
 
 #include <toadlet/egg/Error.h>
-#include <toadlet/egg/Logger.h>
+#include <toadlet/egg/Log.h>
 #include <toadlet/egg/io/FileStream.h>
 #include <toadlet/egg/io/MemoryStream.h>
 #include "AndroidAssetArchive.h"
@@ -58,7 +58,7 @@ void AndroidAssetArchive::destroy(){
 }
 
 Stream::ptr AndroidAssetArchive::openStream(const String &name){
-	Logger::debug(Categories::TOADLET_EGG,"AndroidAssetArchive::openStream:"+name);
+	Log::debug(Categories::TOADLET_EGG,"AndroidAssetArchive::openStream:"+name);
 
 	jvm->AttachCurrentThread(&env,NULL);
 

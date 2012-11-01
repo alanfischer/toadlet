@@ -28,7 +28,7 @@
 #include "D3D10VertexFormat.h"
 #include "D3D10WindowRenderTarget.h"
 #include <toadlet/egg/Error.h>
-#include <toadlet/egg/Logger.h>
+#include <toadlet/egg/Log.h>
 
 namespace toadlet{
 namespace peeper{
@@ -228,7 +228,7 @@ ID3D10InputLayout *D3D10Shader::findInputLayout(D3D10VertexFormat *vertexFormat)
 				};
 				elements[vertexFormat->mElements.size()+i]=element;
 
-				Logger::alert(String("D3D10Shader: adding missing vertex element:")+missingParameters[i].SemanticName);
+				Log::alert(String("D3D10Shader: adding missing vertex element:")+missingParameters[i].SemanticName);
 			}
 		}
 		mDevice->getD3D10Device()->CreateInputLayout(elements,numElements,mBytecode->GetBufferPointer(),mBytecode->GetBufferSize(),&layout);

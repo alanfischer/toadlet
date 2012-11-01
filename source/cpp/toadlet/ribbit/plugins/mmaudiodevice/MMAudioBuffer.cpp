@@ -25,7 +25,7 @@
 
 #include "MMAudioBuffer.h"
 #include <toadlet/egg/Error.h>
-#include <toadlet/egg/Logger.h>
+#include <toadlet/egg/Log.h>
 #include <toadlet/ribbit/AudioFormatConversion.h>
 
 namespace toadlet{
@@ -56,7 +56,7 @@ bool MMAudioBuffer::create(AudioStream *stream){
 
 	AudioFormat::ptr newFormat=mDevice->getAudioFormat();
 	if(format!=newFormat){
-		Logger::debug(Categories::TOADLET_RIBBIT,String("converting audio from ")+
+		Log::debug(Categories::TOADLET_RIBBIT,String("converting audio from ")+
 			format->getChannels()+","+format->getBitsPerSample()+","+format->getSamplesPerSecond()+" to "+
 			newFormat->getChannels()+","+newFormat->getBitsPerSample()+","+newFormat->getSamplesPerSecond());
 

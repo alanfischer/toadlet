@@ -23,47 +23,42 @@
  *
  ********** Copyright header - do not remove **********/
 
-#include "PosixDynamicLibrary.h"
-#include <toadlet/egg/Error.h>
+#ifndef TOADLET_EGG_LOG_H
+#define TOADLET_EGG_LOG_H
+
+#include <toadlet/egg/Logger.h>
+
+#define TOADLET_MAKE_LOG_FUNCTION(name,level) \
+	static void name(const String &text){name((char*)NULL,text);} \
+	static void name(const String &categoryName,const String &text){ \
+		Logger *instance=getInstance(); \
+		if(level>Logger::Level_MAX) ; \
+		else if(level<=instance->getMasterReportingLevel() && level<=instance->getCategoryReportingLevel(categoryName)){ \
+			instance->addLogEntry(categoryName,level,text); \
+		} \
+	}
 
 namespace toadlet{
 namespace egg{
 
-PosixDynamicLibrary::PosixDynamicLibrary(){
-	mLibrary=NULL;
-}
+class LoggerListener;
 
-PosixDynamicLibrary::~PosixDynamicLibrary(){
-	if(mLibrary!=NULL){
-		dlclose(mLibrary);
-	}
-}
+class TOADLET_API Log{
+public:
+	static Logger *getInstance();
+	static void destroy();
 
-bool PosixDynamicLibrary::load(const String &name,const String &directory,const String &prefix,const String &extension){
-	if(mLibrary!=NULL){
-		dlclose(mLibrary);
-	}
+	TOADLET_MAKE_LOG_FUNCTION(error,Logger::Level_ERROR);
+	TOADLET_MAKE_LOG_FUNCTION(warning,Logger::Level_WARNING);
+	TOADLET_MAKE_LOG_FUNCTION(alert,Logger::Level_ALERT);
+	TOADLET_MAKE_LOG_FUNCTION(debug,Logger::Level_DEBUG);
+	TOADLET_MAKE_LOG_FUNCTION(excess,Logger::Level_EXCESS);
 
-	dlerror();
-	mLibrary=dlopen(directory+prefix+name+extension,RTLD_LAZY);
-	const char *err=dlerror();
-	if(mLibrary==NULL){
-		Error::libraryNotFound(Categories::TOADLET_EGG,err);
-		return false;
-	}
-	return true;
-}
-
-void *PosixDynamicLibrary::getSymbol(const String &name){
-	dlerror();
-	void *symbol=dlsym(mLibrary,name);
-	const char *err=dlerror();
-	if(symbol==NULL){
-		Error::symbolNotFound(Categories::TOADLET_EGG,err);
-		return NULL;
-	}
-	return symbol;
-}
+private:
+	static Logger *mTheLogger;
+};
 
 }
 }
+
+#endif

@@ -23,6 +23,7 @@
  *
  ********** Copyright header - do not remove **********/
 
+#include <toadlet/egg/Log.h>
 #include <toadlet/tadpole/BufferManager.h>
 #include <toadlet/tadpole/Engine.h>
 #include <toadlet/peeper/BackableBuffer.h>
@@ -314,7 +315,7 @@ Track *BufferManager::createColorTrack(){
 }
 
 void BufferManager::contextActivate(RenderDevice *renderDevice){
-	Logger::debug("BufferManager::contextActivate");
+	Log::debug("BufferManager::contextActivate");
 
 	int i;
 	for(i=0;i<mVertexFormats.size();++i){
@@ -359,7 +360,7 @@ void BufferManager::contextActivate(RenderDevice *renderDevice){
 }
 
 void BufferManager::contextDeactivate(RenderDevice *renderDevice){
-	Logger::debug("BufferManager::contextDeactivate");
+	Log::debug("BufferManager::contextDeactivate");
 
 	int i;
 	for(i=0;i<mVariableBuffers.size();++i){
@@ -399,7 +400,7 @@ void BufferManager::contextDeactivate(RenderDevice *renderDevice){
 }
 
 void BufferManager::preContextReset(RenderDevice *renderDevice){
-	Logger::debug("BufferManager::preContextReset");
+	Log::debug("BufferManager::preContextReset");
 
 	int i;
 	for(i=0;i<mVariableBuffers.size();++i){
@@ -417,7 +418,7 @@ void BufferManager::preContextReset(RenderDevice *renderDevice){
 }
 
 void BufferManager::postContextReset(RenderDevice *renderDevice){
-	Logger::debug("BufferManager::postContextReset");
+	Log::debug("BufferManager::postContextReset");
 
 	int i;
 	for(i=0;i<mVertexBuffers.size();++i){
@@ -453,7 +454,7 @@ bool BufferManager::useTriFan(){
 void BufferManager::outputVariableBufferFormat(VariableBufferFormat::ptr format){
 	String string;
 
-	Logger::alert(Categories::TOADLET_TADPOLE,"VariableBufferFormat:"+format->getName()+" primary:"+format->getPrimary()+" dataSize:"+format->getDataSize()+" numVariables:"+format->getSize());
+	Log::alert(Categories::TOADLET_TADPOLE,"VariableBufferFormat:"+format->getName()+" primary:"+format->getPrimary()+" dataSize:"+format->getDataSize()+" numVariables:"+format->getSize());
 	int i;
 	for(i=0;i<format->getSize();++i){
 		outputVariable(format->getVariable(i),"\t");
@@ -461,7 +462,7 @@ void BufferManager::outputVariableBufferFormat(VariableBufferFormat::ptr format)
 }
 
 void BufferManager::outputVariable(VariableBufferFormat::Variable *variable,const String &tabs){
-	Logger::alert(Categories::TOADLET_TADPOLE,tabs+"Variable:"+variable->getName()+" format:"+variable->getFormat()+" offset:"+variable->getOffset()+" index:"+variable->getIndex()+" arraySize:"+variable->getArraySize()+" structSize:"+variable->getStructSize());
+	Log::alert(Categories::TOADLET_TADPOLE,tabs+"Variable:"+variable->getName()+" format:"+variable->getFormat()+" offset:"+variable->getOffset()+" index:"+variable->getIndex()+" arraySize:"+variable->getArraySize()+" structSize:"+variable->getStructSize());
 
 	int i;
 	for(i=0;i<variable->getStructSize();++i){
