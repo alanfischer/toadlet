@@ -25,6 +25,7 @@
 
 #include "EGLWindowRenderTarget.h"
 #include <toadlet/egg/Error.h>
+#include <toadlet/egg/Log.h>
 #include <toadlet/peeper/TextureFormat.h>
 
 namespace toadlet{

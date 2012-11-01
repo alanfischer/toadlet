@@ -25,6 +25,7 @@
 
 #include "GLXWindowRenderTarget.h"
 #include <toadlet/egg/Error.h>
+#include <toadlet/egg/Log.h>
 #include <toadlet/egg/System.h>
 #include <toadlet/peeper/TextureFormat.h>
 
