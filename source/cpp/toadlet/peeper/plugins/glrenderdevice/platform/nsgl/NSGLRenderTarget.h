@@ -28,7 +28,7 @@
 
 #include "../../GLIncludes.h"
 #include "../../GLRenderTarget.h"
-#include <toadlet/egg/Error.h>
+#include <toadlet/egg/Collection.h>
 #include <toadlet/peeper/WindowRenderTargetFormat.h>
 
 #import <Cocoa/Cocoa.h>

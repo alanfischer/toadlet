@@ -26,6 +26,7 @@
 #include "EAGLRenderTarget.h"
 #include "../../GLTexture.h"
 #include <toadlet/egg/Error.h>
+#include <toadlet/egg/Log.h>
 #include <toadlet/peeper/Texture.h>
 #include <toadlet/peeper/TextureFormat.h>
 #import <QuartzCore/QuartzCore.h>
