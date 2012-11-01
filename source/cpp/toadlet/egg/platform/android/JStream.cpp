@@ -24,7 +24,6 @@
  ********** Copyright header - do not remove **********/
 
 #include <toadlet/egg/Error.h>
-#include <toadlet/egg/Logger.h>
 #include "JStream.h"
 
 namespace toadlet{

@@ -24,7 +24,7 @@
  ********** Copyright header - do not remove **********/
 
 #include <toadlet/egg/io/FileStream.h>
-#include <toadlet/egg/Logger.h>
+#include <toadlet/egg/Log.h>
 
 namespace toadlet{
 namespace egg{
@@ -35,7 +35,7 @@ FileStream::FileStream(const String &filename,int open):
 	mFile(NULL),
 	mAutoClose(false)
 {
-	Logger::excess(Categories::TOADLET_EGG,"Opening file: "+filename);
+	Log::excess(Categories::TOADLET_EGG,"Opening file: "+filename);
 
 	String mode;
 	if((open&Open_BIT_APPEND)!=0){

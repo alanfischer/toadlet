@@ -26,10 +26,11 @@
 #ifndef TOADLET_TADPOLE_FONT_H
 #define TOADLET_TADPOLE_FONT_H
 
-#include <toadlet/tadpole/Types.h>
 #include <toadlet/egg/BaseResource.h>
+#include <toadlet/egg/Collection.h>
 #include <toadlet/peeper/Texture.h>
 #include <toadlet/peeper/VertexBufferAccessor.h>
+#include <toadlet/tadpole/Types.h>
 
 namespace toadlet{
 namespace tadpole{

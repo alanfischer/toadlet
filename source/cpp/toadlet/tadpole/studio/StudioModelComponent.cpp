@@ -23,6 +23,7 @@
  *
  ********** Copyright header - do not remove **********/
 
+#include <toadlet/egg/Log.h>
 #include <toadlet/peeper/VertexFormat.h>
 #include <toadlet/tadpole/Engine.h>
 #include <toadlet/tadpole/RenderableSet.h>
@@ -540,7 +541,7 @@ void StudioModelComponent::updateSkeleton(){
 	}
 
 	if(mLink!=NULL && mLinkModel!=mLink->mModel){
-		Logger::debug(Categories::TOADLET_TADPOLE,"relinking skeleton");
+		Log::debug(Categories::TOADLET_TADPOLE,"relinking skeleton");
 
 		setLink(mLink);
 	}

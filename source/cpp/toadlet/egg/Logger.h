@@ -33,24 +33,11 @@
 	#include <toadlet/egg/Mutex.h>
 #endif
 
-#define TOADLET_MAKE_LOGGER_FUNCTION(name,level) \
-	static void name(const String &text){name((char*)NULL,text);} \
-	static void name(const String &categoryName,const String &text){ \
-		Logger *instance=getInstance(); \
-		if(level>Level_MAX) ; \
-		else if(level<=instance->getMasterReportingLevel() && level<=instance->getCategoryReportingLevel(categoryName)){ \
-			instance->addLogEntry(categoryName,level,text); \
-		} \
-	}
-
 namespace toadlet{
 namespace egg{
 
 class LoggerListener;
 
-/// @brief A Singleton Logger class
-///
-/// Used to log all messages from the engine
 class TOADLET_API Logger{
 public:
 	enum Level{
@@ -91,14 +78,8 @@ public:
 		String text;
 	};
 
-	static Logger *getInstance();
-	static void destroy();
-
-	TOADLET_MAKE_LOGGER_FUNCTION(error,Level_ERROR);
-	TOADLET_MAKE_LOGGER_FUNCTION(warning,Level_WARNING);
-	TOADLET_MAKE_LOGGER_FUNCTION(alert,Level_ALERT);
-	TOADLET_MAKE_LOGGER_FUNCTION(debug,Level_DEBUG);
-	TOADLET_MAKE_LOGGER_FUNCTION(excess,Level_EXCESS);
+	Logger();
+	~Logger();
 
 	void setMasterReportingLevel(Level level);
 	Level getMasterReportingLevel() const{return mReportingLevel;}
@@ -129,17 +110,12 @@ public:
 	Category *getCategory(const String &categoryName);
 
 private:
-	Logger();
-	~Logger();
-
 	typedef Map<String,Category*> CategoryNameCategoryMap;
 
 	void addCompleteLogEntry(Category *category,Level level,const String &text);
 
 	void lock();
 	void unlock();
-
-	static Logger *mTheLogger;
 
 	egg::Collection<LoggerListener*> mLoggerListeners;
 	bool mOutputLogEntry;

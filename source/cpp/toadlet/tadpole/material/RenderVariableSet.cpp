@@ -23,8 +23,8 @@
  *
  ********** Copyright header - do not remove **********/
 
+#include <toadlet/egg/Log.h>
 #include <toadlet/egg/Error.h>
-#include <toadlet/egg/Logger.h>
 #include <toadlet/tadpole/material/RenderVariableSet.h>
 #include <toadlet/tadpole/material/RenderPass.h>
 
@@ -77,7 +77,7 @@ bool RenderVariableSet::addTexture(const String &name,Texture *texture,const Str
 	}
 	if(formatVariable!=NULL){
 		if((formatVariable->getFormat()&VariableBufferFormat::Format_MASK_TYPES)!=VariableBufferFormat::Format_TYPE_RESOURCE){
-			Logger::warning(Categories::TOADLET_TADPOLE,
+			Log::warning(Categories::TOADLET_TADPOLE,
 				String("RenderVariable:")+name+" format does not match format:"+formatVariable->getFormat()+"!="+(int)VariableBufferFormat::Format_TYPE_RESOURCE);
 			return false;
 		}
@@ -89,7 +89,7 @@ bool RenderVariableSet::addTexture(const String &name,Texture *texture,const Str
 	}
 	else{
 		if(mBuffers.size()>0){
-			Logger::warning(Categories::TOADLET_TADPOLE,
+			Log::warning(Categories::TOADLET_TADPOLE,
 				"RenderVariable not found with name:"+name);
 			return false;
 		}
@@ -110,7 +110,7 @@ bool RenderVariableSet::addTexture(const String &name,Texture *texture,const Str
 		r.textureState=textureState;
 		mUnassignedResources.add(r);
 
-		Logger::alert("Adding unassigned texture");
+		Log::alert("Adding unassigned texture");
 	}
 
 	return true;
@@ -135,7 +135,7 @@ bool RenderVariableSet::addVariable(const String &name,RenderVariable::ptr varia
 	VariableBufferFormat::Variable *formatVariable=findFormatVariable(name,bufferInfo);
 	if(formatVariable!=NULL){
 		if((formatVariable->getFormat()&~VariableBufferFormat::Format_MASK_OPTIONS)!=(variable->getFormat()&~VariableBufferFormat::Format_MASK_OPTIONS)){
-			Logger::warning(Categories::TOADLET_TADPOLE,
+			Log::warning(Categories::TOADLET_TADPOLE,
 				String("RenderVariable:")+name+" format does not match format:"+formatVariable->getFormat()+"!="+variable->getFormat());
 			return false;
 		}
@@ -149,7 +149,7 @@ bool RenderVariableSet::addVariable(const String &name,RenderVariable::ptr varia
 
 	if(formatVariable==NULL){
 		if(mBuffers.size()>0){
-			Logger::warning(Categories::TOADLET_TADPOLE,
+			Log::warning(Categories::TOADLET_TADPOLE,
 				"RenderVariable not found with name:"+name);
 			return false;
 		}

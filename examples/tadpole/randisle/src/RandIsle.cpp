@@ -30,7 +30,7 @@ RandIsle::~RandIsle(){
 }
 
 void RandIsle::create(){
-	Logger::debug("RandIsle::create");
+	Log::debug("RandIsle::create");
 
 	mEngine=mApp->getEngine();
 	mEngine->getArchiveManager()->addDirectory(mPath);
@@ -178,7 +178,7 @@ void RandIsle::create(){
 	mFollower->setTarget(mPlayer);
 	mTerrain->setUpdateTargetBias(128/(getPatchSize()*getPatchScale().x));
 
-	Logger::alert("Adding props");
+	Log::alert("Adding props");
 	mProps=new Node(mScene);
 	for(int i=0;i<Resources::instance->numProps;++i){
 		Node::ptr prop=new Node(mScene);
@@ -191,10 +191,10 @@ void RandIsle::create(){
 	}
 	mScene->getRoot()->attach(mProps);
 
-	Logger::alert("Populating terrain");
+	Log::alert("Populating terrain");
 	while(updatePopulatePatches());
 
-	Logger::alert("Updating terrain");
+	Log::alert("Updating terrain");
 	mTerrain->updatePatches(mCamera);
 
 	InputDevice *joyDevice=mApp->getInputDevice(InputDevice::InputType_JOY);
@@ -203,11 +203,11 @@ void RandIsle::create(){
 		joyDevice->start();
 	}
 
-	Logger::debug("RandIsle::create finished");
+	Log::debug("RandIsle::create finished");
 }
 
 void RandIsle::destroy(){
-	Logger::debug("RandIsle::destroy");
+	Log::debug("RandIsle::destroy");
 
 	InputDevice *joyDevice=mApp->getInputDevice(InputDevice::InputType_JOY);
 	if(joyDevice!=NULL){
@@ -235,7 +235,7 @@ void RandIsle::destroy(){
 
 	Resources::destroy();
 
-	Logger::debug("RandIsle::destroy finished");
+	Log::debug("RandIsle::destroy finished");
 }
 
 void RandIsle::render(){

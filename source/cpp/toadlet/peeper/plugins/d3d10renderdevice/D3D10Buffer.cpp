@@ -25,7 +25,6 @@
 
 #include "D3D10Buffer.h"
 #include "D3D10RenderDevice.h"
-#include <toadlet/egg/Logger.h>
 #include <toadlet/egg/EndianConversion.h>
 #include <toadlet/peeper/BackableBuffer.h>
 

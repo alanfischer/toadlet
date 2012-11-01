@@ -27,7 +27,7 @@
 #define TOADLET_TADPOLE_BSP_BSP30MAP_H
 
 #include <toadlet/egg/BaseResource.h>
-#include <toadlet/egg/Logger.h>
+#include <toadlet/egg/Log.h>
 #include <toadlet/tadpole/bsp/BSP30Types.h>
 #include <toadlet/tadpole/Engine.h>
 #include <toadlet/tadpole/PhysicsCollision.h>

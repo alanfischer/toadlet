@@ -27,6 +27,7 @@
 #define TOADLET_PEEPER_BACKABLEPIXELBUFFERRENDERTARGET_H
 
 #include <toadlet/egg/BaseResource.h>
+#include <toadlet/egg/Collection.h>
 #include <toadlet/peeper/PixelBufferRenderTarget.h>
 
 namespace toadlet{

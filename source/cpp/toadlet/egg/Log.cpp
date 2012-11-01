@@ -23,28 +23,26 @@
  *
  ********** Copyright header - do not remove **********/
 
-#include <toadlet/tadpole/CameraComponent.h>
-#include <toadlet/tadpole/Node.h>
+#include <toadlet/egg/Log.h>
 
 namespace toadlet{
-namespace tadpole{
+namespace egg{
 
-CameraComponent::CameraComponent(Camera *camera){
-	mCamera=camera;
+Logger *Log::mTheLogger=NULL;
+
+Logger *Log::getInstance(){
+	if(mTheLogger==NULL){
+		mTheLogger=new Logger();
+	}
+
+	return mTheLogger;
 }
 
-void CameraComponent::frameUpdate(int dt,int scope){
-	setCameraFromTransform();
-}
-
-void CameraComponent::setCameraFromTransform(){
-	Matrix4x4 matrix;
-	mParent->getWorldTransform().getMatrix(matrix);
-	mCamera->setWorldMatrix(matrix);
-}
-
-void CameraComponent::setTransformFromCamera(){
-	mParent->setMatrix4x4(mCamera->getWorldMatrix());
+void Log::destroy(){
+	if(mTheLogger!=NULL){
+		delete mTheLogger;
+		mTheLogger=NULL;
+	}
 }
 
 }

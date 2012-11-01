@@ -27,7 +27,7 @@
 #include "D3D9VertexFormat.h"
 #include "D3D9RenderDevice.h"
 #include <toadlet/egg/Error.h>
-#include <toadlet/egg/Logger.h>
+#include <toadlet/egg/Log.h>
 
 namespace toadlet{
 namespace peeper{
@@ -145,7 +145,7 @@ uint8 *D3D9VertexBuffer::lock(int lockAccess){
 	}
 
 	if(mAccess==0 || ((mAccess&Access_BIT_WRITE)==0 && lockAccess==Access_BIT_WRITE) || ((mAccess&Access_BIT_READ)==0 && lockAccess==Access_BIT_READ)){
-		Logger::error(Categories::TOADLET_PEEPER,"invalid lock type on buffer");
+		Error::unknown(Categories::TOADLET_PEEPER,"invalid lock type on buffer");
 		return NULL;
 	}
 

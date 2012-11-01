@@ -142,7 +142,7 @@ bool EAGLRenderTarget::createContext(CAEAGLLayer *drawable,WindowRenderTargetFor
 		
 		GLenum status=glCheckFramebufferStatus(GL_FRAMEBUFFER);
 		if(status!=GL_FRAMEBUFFER_COMPLETE){
-			Logger::warning(Categories::TOADLET_PEEPER,String("FBO Warning:")+GLFBORenderTarget::getFBOMessage(status));
+			Log::warning(Categories::TOADLET_PEEPER,String("FBO Warning:")+GLFBORenderTarget::getFBOMessage(status));
 			mMSAARenderTarget=NULL;
 		}
 	}

@@ -39,6 +39,7 @@
 #endif
 #include <toadlet/egg/MathConversion.h>
 #include <toadlet/egg/Error.h>
+#include <toadlet/egg/Log.h>
 #include <toadlet/peeper/FogState.h>
 #include <toadlet/peeper/MaterialState.h>
 #include <toadlet/peeper/LightState.h>
@@ -93,7 +94,7 @@ D3D9RenderDevice::D3D9RenderDevice():
 }
 
 bool D3D9RenderDevice::create(RenderTarget *target,int options){
-	Logger::alert(Categories::TOADLET_PEEPER,
+	Log::alert(Categories::TOADLET_PEEPER,
 		"creating "+Categories::TOADLET_PEEPER+".D3D9RenderDevice");
 
 	if(target==NULL){
@@ -143,7 +144,7 @@ bool D3D9RenderDevice::create(RenderTarget *target,int options){
 
 	setDefaultState();
 
-	Logger::alert(Categories::TOADLET_PEEPER,
+	Log::alert(Categories::TOADLET_PEEPER,
 		"created D3D9RenderDevice");
 
 	return true;
@@ -159,7 +160,7 @@ void D3D9RenderDevice::destroy(){
 		mRenderTarget=NULL;
 		mD3DRenderTarget=NULL;
 		
-		Logger::alert(Categories::TOADLET_PEEPER,
+		Log::alert(Categories::TOADLET_PEEPER,
 			"destroyed D3D9RenderDevice");
 	}
 }
@@ -971,7 +972,7 @@ void D3D9RenderDevice::setCapsFromD3DCAPS9(RenderCaps &caps,const D3DCAPS9 &d3dc
 	#endif
 
 	#if defined(TOADLET_SET_D3DM)
-		Logger::alert(Categories::TOADLET_PEEPER,
+		Log::alert(Categories::TOADLET_PEEPER,
 			String("D3DM has lockable textures:")+((d3dcaps.SurfaceCaps & D3DMSURFCAPS_LOCKTEXTURE)>0));
 	#endif
 }
@@ -1433,7 +1434,7 @@ DWORD D3D9RenderDevice::getFVF(VertexFormat *vertexFormat){
 				break;
 				case VertexFormat::Format_COUNT_4:
 					#if defined(TOADLET_SET_D3DM)
-						Logger::error(Categories::TOADLET_PEEPER,
+						Error::unknown(Categories::TOADLET_PEEPER,
 							"D3D9VertexBuffer: Invalid tex coord count");
 						return 0;
 					#else
@@ -1454,7 +1455,7 @@ DWORD D3D9RenderDevice::getFVF(VertexFormat *vertexFormat){
 			texCoordCount++;
 		}
 		else{
-			Logger::error(Categories::TOADLET_PEEPER,
+			Error::unknown(Categories::TOADLET_PEEPER,
 				String("invalid vertex element:")+semantic+","+format);
 		}
 	}
@@ -1490,7 +1491,7 @@ DWORD D3D9RenderDevice::getFVF(VertexFormat *vertexFormat){
 			break;
 		#endif
 		default:
-			Logger::error(Categories::TOADLET_PEEPER,
+			Error::unknown(Categories::TOADLET_PEEPER,
 				String("invalid tex coord number:")+texCoordCount);
 	}
 

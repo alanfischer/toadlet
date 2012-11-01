@@ -24,7 +24,6 @@
  ********** Copyright header - do not remove **********/
 
 #include <toadlet/hop/Simulator.h>
-#include <toadlet/egg/Logger.h>
 #include <toadlet/egg/Error.h>
 #include <toadlet/egg/Extents.h>
 

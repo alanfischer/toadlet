@@ -1432,7 +1432,7 @@ bool M3GConverter::convertMesh(Mesh *mesh,Stream *outStream,float scale,int forc
 	int i,j;
 
 	if(scale==0){
-		Logger::alert("Using a scale of 0!");
+		Log::alert("Using a scale of 0!");
 	}
 
 	bool result=false;
@@ -1627,7 +1627,7 @@ M3GObject3D *M3GConverter::buildSceneGraph(Mesh *toadletMesh,float scale,int for
 				int translationBytes=forceBytes;
 				if(forceBytes==0){
 					translationBytes=VertexCompression::getSuggestedArrayBytes(3,track->getNumKeyFrames(),(float*)&translation[0],sizeof(Vector3));
-					Logger::alert(String("Animation Translation bytes:")+translationBytes);
+					Log::alert(String("Animation Translation bytes:")+translationBytes);
 				}
 				if(translationBytes==1){
 					VertexCompression::calculateArrayBiasAndScale(3,track->getNumKeyFrames(),
@@ -1667,7 +1667,7 @@ M3GObject3D *M3GConverter::buildSceneGraph(Mesh *toadletMesh,float scale,int for
 				int rotationBytes=forceBytes;
 				if(forceBytes==0){
 					rotationBytes=VertexCompression::getSuggestedArrayBytes(4,track->getNumKeyFrames(),(float*)&quaternions[0],sizeof(Quaternion));
-					Logger::alert(String("Animation Rotation bytes:")+rotationBytes);
+					Log::alert(String("Animation Rotation bytes:")+rotationBytes);
 				}
 				if(rotationBytes==1){
 					VertexCompression::calculateArrayBiasAndScale(4,track->getNumKeyFrames(),
@@ -1819,7 +1819,7 @@ M3GObject3D *M3GConverter::buildSceneGraph(Mesh *toadletMesh,float scale,int for
 			if(forceBytes==0){
 				bytes=VertexCompression::getSuggestedArrayBytes(3,numVertexes,
 					(float*)(vba.getData()+positionOffset),vertexFormat->getVertexSize());
-				Logger::alert(String("Position bytes:")+bytes);
+				Log::alert(String("Position bytes:")+bytes);
 			}
 			if(bytes==1){
 				positions->componentSize=1;
@@ -1928,7 +1928,7 @@ M3GObject3D *M3GConverter::buildSceneGraph(Mesh *toadletMesh,float scale,int for
 			if(forceBytes==0){
 				bytes=VertexCompression::getSuggestedArrayBytes(2,numVertexes,
 					(float*)(vba.getData()+texCoordOffset),vertexFormat->getVertexSize());
-				Logger::alert(String("TexCoord bytes:")+bytes);
+				Log::alert(String("TexCoord bytes:")+bytes);
 			}
 			if(bytes==1){
 				texCoords->componentSize=1;
@@ -2035,7 +2035,7 @@ M3GObject3D *M3GConverter::buildSceneGraph(Mesh *toadletMesh,float scale,int for
 				}
 			}
 
-			Logger::alert(String("Number of strips:")+strips.size());
+			Log::alert(String("Number of strips:")+strips.size());
 
 			triStrip->stripLengths.resize(strips.size());
 
@@ -2046,7 +2046,7 @@ M3GObject3D *M3GConverter::buildSceneGraph(Mesh *toadletMesh,float scale,int for
 				triStrip->stripLengths[j]=strips[j].size();
 			}
 
-			Logger::alert(os.str().c_str());
+			Log::alert(os.str().c_str());
 
 			mesh->submeshes[i].indexBuffer=triStrip;
 		}
@@ -2079,7 +2079,7 @@ M3GObject3D *M3GConverter::buildSceneGraph(Mesh *toadletMesh,float scale,int for
 				}
 			}
 
-			Logger::alert(String("Number of strips:")+numGroups);
+			Log::alert(String("Number of strips:")+numGroups);
 
 			triStrip->stripLengths.resize(numGroups);
 
@@ -2092,7 +2092,7 @@ M3GObject3D *M3GConverter::buildSceneGraph(Mesh *toadletMesh,float scale,int for
 
 			delete[] primitiveGroups;
 
-			Logger::alert(os.str().c_str());
+			Log::alert(os.str().c_str());
 
 			mesh->submeshes[i].indexBuffer=triStrip;
 		}
@@ -2138,7 +2138,7 @@ M3GObject3D *M3GConverter::buildSceneGraph(Mesh *toadletMesh,float scale,int for
 			}
 		}
 		else{
-			Logger::alert(String("Invalid material on submesh:")+i);
+			Log::alert(String("Invalid material on submesh:")+i);
 
 			appearance->polygonMode=new M3GPolygonMode();
 			appearance->userParameters.resize(1);

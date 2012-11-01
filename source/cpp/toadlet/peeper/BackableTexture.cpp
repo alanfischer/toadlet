@@ -23,7 +23,7 @@
  *
  ********** Copyright header - do not remove **********/
 
-#include <toadlet/egg/Logger.h>
+#include <toadlet/egg/Log.h>
 #include <toadlet/peeper/BackableTexture.h>
 #include <toadlet/peeper/BackableTextureMipPixelBuffer.h>
 #include <toadlet/peeper/RenderCaps.h>
@@ -289,7 +289,7 @@ bool BackableTexture::convertCreate(Texture::ptr texture,RenderDevice *renderDev
 	}
 	else{
 		if(format->getMipMax()==0 && wantsAutogen==false){
-			Logger::debug(Categories::TOADLET_PEEPER,
+			Log::debug(Categories::TOADLET_PEEPER,
 				"Auto calculated mip levels specified with no autogen, non zero levels may be empty");
 		}
 
@@ -314,7 +314,7 @@ bool BackableTexture::convertCreate(Texture::ptr texture,RenderDevice *renderDev
 			result=texture->create(usage,format,mipDatas);
 		}
 		else{
-			Logger::alert(Categories::TOADLET_PEEPER,String("BackableTexture::convertCreate - converting texture:")+needsNPOT+","+needsAutogen+","+needsConvert);
+			Log::alert(Categories::TOADLET_PEEPER,String("BackableTexture::convertCreate - converting texture:")+needsNPOT+","+needsAutogen+","+needsConvert);
 
 			TextureFormat::ptr newFormat(new TextureFormat(format));
 			newFormat->setPixelFormat(newPixelFormat);

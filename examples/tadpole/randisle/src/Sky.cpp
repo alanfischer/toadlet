@@ -7,7 +7,7 @@ Sky::Sky(Scene *scene,int cloudSize,const Vector4 &skyColor,const Vector4 &fadeC
 	Vector3 lightDir(1,-1,0.5);
 	bool advanced=false; // Use realtime bumpmapping, or precalculated
 
-	Logger::alert("Allocating Sky resources");
+	Log::alert("Allocating Sky resources");
 
 	SkyDomeMeshCreator::ptr skyDomeCreator=new SkyDomeMeshCreator(mEngine);
  	int numSegments=16,numRings=16;
@@ -253,7 +253,7 @@ Sky::Sky(Scene *scene,int cloudSize,const Vector4 &skyColor,const Vector4 &fadeC
 	mSunNode->setScale(128,128,128);
 	attach(mSunNode);
 
-	Logger::alert("Done allocating Sky resources");
+	Log::alert("Done allocating Sky resources");
 
 	mLightNode=new Node(mScene);
 	{

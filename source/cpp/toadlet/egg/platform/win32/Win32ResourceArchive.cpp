@@ -24,7 +24,6 @@
  ********** Copyright header - do not remove **********/
 
 #include <toadlet/egg/Error.h>
-#include <toadlet/egg/Logger.h>
 #include <toadlet/egg/io/MemoryStream.h>
 #include "Win32ResourceArchive.h"
 #include <windows.h>

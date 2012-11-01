@@ -27,6 +27,7 @@
 #define TOADLET_PEEPER_GLVERTEXFORMAT_H
 
 #include "GLIncludes.h"
+#include <toadlet/egg/Collection.h>
 #include <toadlet/egg/BaseResource.h>
 #include <toadlet/peeper/VertexFormat.h>
 

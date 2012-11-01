@@ -24,7 +24,7 @@
  ********** Copyright header - do not remove **********/
 
 #include <toadlet/egg/math/Math.h>
-#include <toadlet/egg/Logger.h>
+#include <toadlet/egg/Log.h>
 #include <toadlet/egg/System.h>
 #if defined(TOADLET_HAS_SSE)
 	#include <xmmintrin.h> // SSE
@@ -1686,9 +1686,9 @@ void Math::optimize(int o){
 	SystemCaps caps;
 	System::getSystemCaps(caps);
 
-	Logger::alert(Categories::TOADLET_EGG,
+	Log::alert(Categories::TOADLET_EGG,
 		String("Detected SSE version:")+caps.sseVersion);
-	Logger::alert(Categories::TOADLET_EGG,
+	Log::alert(Categories::TOADLET_EGG,
 		String("Detected NEON version:")+caps.neonVersion);
 
 	#if defined(TOADLET_HAS_SSE)
@@ -1733,18 +1733,18 @@ void Math::optimize(int o){
 
 			uint64 t4=System::utime();
 
-			Logger::alert(Categories::TOADLET_EGG,
+			Log::alert(Categories::TOADLET_EGG,
 				String("Timings - MatrixTraditional:")+(t1-t0)+" MatrixSSE:"+(t2-t1)+" VectorTraditional:"+(t3-t2)+" VectorSSE:"+(t4-t3));
 
 			if(t1-t0 < t2-t1){
-				Logger::excess(Categories::TOADLET_EGG,"using Traditional Matrix4x4 math");
+				Log::excess(Categories::TOADLET_EGG,"using Traditional Matrix4x4 math");
 
 				mulMatrix4x4=mulMatrix4x4Traditional;
 				preMulMatrix4x4=preMulMatrix4x4Traditional;
 				postMulMatrix4x4=postMulMatrix4x4Traditional;
 			}
 			else{
-				Logger::excess(Categories::TOADLET_EGG,"using SSE Matrix4x4 math");
+				Log::excess(Categories::TOADLET_EGG,"using SSE Matrix4x4 math");
 
 				mulMatrix4x4=mulMatrix4x4SSE;
 				preMulMatrix4x4=preMulMatrix4x4SSE;
@@ -1752,20 +1752,20 @@ void Math::optimize(int o){
 			}
 
 			if(t3-t2 < t4-t3){
-				Logger::excess(Categories::TOADLET_EGG,"using Traditional Vector4 math");
+				Log::excess(Categories::TOADLET_EGG,"using Traditional Vector4 math");
 
 				mulVector4Matrix4x4Vector4=mulVector4Matrix4x4Vector4Traditional;
 				mulVector4Matrix4x4=mulVector4Matrix4x4Traditional;
 			}
 			else{
-				Logger::excess(Categories::TOADLET_EGG,"using SSE Vector4 math");
+				Log::excess(Categories::TOADLET_EGG,"using SSE Vector4 math");
 
 				mulVector4Matrix4x4Vector4=mulVector4Matrix4x4Vector4SSE;
 				mulVector4Matrix4x4=mulVector4Matrix4x4SSE;
 			}
 		}
 		else if(o==Optimize_FORCE && caps.sseVersion>0){
-			Logger::excess(Categories::TOADLET_EGG,"forcing SSE math");
+			Log::excess(Categories::TOADLET_EGG,"forcing SSE math");
 
 			mulMatrix4x4=mulMatrix4x4SSE;
 			preMulMatrix4x4=preMulMatrix4x4SSE;
@@ -1816,18 +1816,18 @@ void Math::optimize(int o){
 
 			uint64 t4=System::utime();
 
-			Logger::alert(Categories::TOADLET_EGG,
+			Log::alert(Categories::TOADLET_EGG,
 				String("Timings - MatrixTraditional:")+(t1-t0)+" MatrixNEON:"+(t2-t1)+" VectorTraditional:"+(t3-t2)+" VectorNEON:"+(t4-t3));
 
 			if(t1-t0 < t2-t1){
-				Logger::excess(Categories::TOADLET_EGG,"using Traditional Matrix4x4 math");
+				Log::excess(Categories::TOADLET_EGG,"using Traditional Matrix4x4 math");
 
 				mulMatrix4x4=mulMatrix4x4Traditional;
 				preMulMatrix4x4=preMulMatrix4x4Traditional;
 				postMulMatrix4x4=postMulMatrix4x4Traditional;
 			}
 			else{
-				Logger::excess(Categories::TOADLET_EGG,"using NEON Matrix4x4 math");
+				Log::excess(Categories::TOADLET_EGG,"using NEON Matrix4x4 math");
 
 				mulMatrix4x4=mulMatrix4x4NEON;
 				preMulMatrix4x4=preMulMatrix4x4NEON;
@@ -1835,20 +1835,20 @@ void Math::optimize(int o){
 			}
 
 			if(t3-t2 < t4-t3){
-				Logger::excess(Categories::TOADLET_EGG,"using Traditional Vector4 math");
+				Log::excess(Categories::TOADLET_EGG,"using Traditional Vector4 math");
 
 				mulVector4Matrix4x4Vector4=mulVector4Matrix4x4Vector4Traditional;
 				mulVector4Matrix4x4=mulVector4Matrix4x4Traditional;
 			}
 			else{
-				Logger::excess(Categories::TOADLET_EGG,"using NEON Vector4 math");
+				Log::excess(Categories::TOADLET_EGG,"using NEON Vector4 math");
 
 				mulVector4Matrix4x4Vector4=mulVector4Matrix4x4Vector4NEON;
 				mulVector4Matrix4x4=mulVector4Matrix4x4NEON;
 			}
 		}
 		else if(o==Optimize_FORCE && caps.neonVersion>0){
-			Logger::excess(Categories::TOADLET_EGG,"forcing NEON math");
+			Log::excess(Categories::TOADLET_EGG,"forcing NEON math");
 
 			mulMatrix4x4=mulMatrix4x4NEON;
 			preMulMatrix4x4=preMulMatrix4x4NEON;
@@ -1858,7 +1858,7 @@ void Math::optimize(int o){
 		}
 	#endif
 	{
-		Logger::excess(Categories::TOADLET_EGG,"forcing Traditional math");
+		Log::excess(Categories::TOADLET_EGG,"forcing Traditional math");
 
 		init();
 	}

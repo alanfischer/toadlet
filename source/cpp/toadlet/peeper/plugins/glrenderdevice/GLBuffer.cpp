@@ -29,7 +29,6 @@
 #include "GLVertexFormat.h"
 #include <toadlet/egg/EndianConversion.h>
 #include <toadlet/egg/Error.h>
-#include <toadlet/egg/Logger.h>
 #include <toadlet/peeper/BackableBuffer.h>
 
 namespace toadlet{

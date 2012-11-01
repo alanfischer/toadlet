@@ -40,18 +40,18 @@ bool MathTest::testEulerAngleConversion(){
 	Matrix3x3 matrix;
 	bool result=true;
 
-	Logger::alert(" Testing EulerAngle -> Quaternion -> EulerAngle");
+	Log::alert(" Testing EulerAngle -> Quaternion -> EulerAngle");
 
 	angle1.set(EulerAngle::EulerOrder_XYZ,1.0,1.2,1.4);
 	angle2.order=EulerAngle::EulerOrder_XYZ;
 
 	Math::setQuaternionFromEulerAngle(quat,angle1);
 	if(Math::setEulerAngleFromQuaternion(angle2,quat,epsilon)==false){
-		Logger::alert("Singularity");
+		Log::alert("Singularity");
 	}
 
 	if(testEulerAngle(angle1,angle2)==false){
-		Logger::alert(formatEulerAngle(angle1)+"!="+formatEulerAngle(angle2));
+		Log::alert(formatEulerAngle(angle1)+"!="+formatEulerAngle(angle2));
 		result=false;
 	}
 
@@ -60,11 +60,11 @@ bool MathTest::testEulerAngleConversion(){
 
 	Math::setQuaternionFromEulerAngle(quat,angle1);
 	if(Math::setEulerAngleFromQuaternion(angle2,quat,epsilon)==false){
-		Logger::alert("Singularity");
+		Log::alert("Singularity");
 	}
 
 	if(testEulerAngle(angle1,angle2)==false){
-		Logger::alert(formatEulerAngle(angle1)+"!="+formatEulerAngle(angle2));
+		Log::alert(formatEulerAngle(angle1)+"!="+formatEulerAngle(angle2));
 		result=false;
 	}
 
@@ -73,26 +73,26 @@ bool MathTest::testEulerAngleConversion(){
 
 	Math::setQuaternionFromEulerAngle(quat,angle1);
 	if(Math::setEulerAngleFromQuaternion(angle2,quat,epsilon)==false){
-		Logger::alert("Singularity");
+		Log::alert("Singularity");
 	}
 
 	if(testEulerAngle(angle1,angle2)==false){
-		Logger::alert(formatEulerAngle(angle1)+"!="+formatEulerAngle(angle2));
+		Log::alert(formatEulerAngle(angle1)+"!="+formatEulerAngle(angle2));
 		result=false;
 	}
 
-	Logger::alert(" Testing EulerAngle -> Matrix -> EulerAngle");
+	Log::alert(" Testing EulerAngle -> Matrix -> EulerAngle");
 
 	angle1.set(EulerAngle::EulerOrder_XYZ,1.0,1.2,1.4);
 	angle2.order=EulerAngle::EulerOrder_XYZ;
 
 	Math::setMatrix3x3FromEulerAngle(matrix,angle1,epsilon);
 	if(Math::setEulerAngleFromMatrix3x3(angle2,matrix,epsilon)==false){
-		Logger::alert("Singularity");
+		Log::alert("Singularity");
 	}
 
 	if(testEulerAngle(angle1,angle2)==false){
-		Logger::alert(formatEulerAngle(angle1)+"!="+formatEulerAngle(angle2));
+		Log::alert(formatEulerAngle(angle1)+"!="+formatEulerAngle(angle2));
 		result=false;
 	}
 
@@ -101,11 +101,11 @@ bool MathTest::testEulerAngleConversion(){
 
 	Math::setMatrix3x3FromEulerAngle(matrix,angle1,epsilon);
 	if(Math::setEulerAngleFromMatrix3x3(angle2,matrix,epsilon)==false){
-		Logger::alert("Singularity");
+		Log::alert("Singularity");
 	}
 
 	if(testEulerAngle(angle1,angle2)==false){
-		Logger::alert(formatEulerAngle(angle1)+"!="+formatEulerAngle(angle2));
+		Log::alert(formatEulerAngle(angle1)+"!="+formatEulerAngle(angle2));
 		result=false;
 	}
 
@@ -114,11 +114,11 @@ bool MathTest::testEulerAngleConversion(){
 
 	Math::setMatrix3x3FromEulerAngle(matrix,angle1,epsilon);
 	if(Math::setEulerAngleFromMatrix3x3(angle2,matrix,epsilon)==false){
-		Logger::alert("Singularity");
+		Log::alert("Singularity");
 	}
 
 	if(testEulerAngle(angle1,angle2)==false){
-		Logger::alert(formatEulerAngle(angle1)+"!="+formatEulerAngle(angle2));
+		Log::alert(formatEulerAngle(angle1)+"!="+formatEulerAngle(angle2));
 		result=false;
 	}
 
@@ -128,9 +128,9 @@ bool MathTest::testEulerAngleConversion(){
 bool MathTest::run(){
 	bool result=false;
 
-	Logger::alert("Testing EulerAngles");
+	Log::alert("Testing EulerAngles");
 	result=testEulerAngleConversion();
-	Logger::alert(result?"Succeeded":"Failed");
+	Log::alert(result?"Succeeded":"Failed");
 
 	return result;
 }

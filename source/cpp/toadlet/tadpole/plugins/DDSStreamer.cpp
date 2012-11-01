@@ -23,8 +23,8 @@
  *
  ********** Copyright header - do not remove **********/
 
+#include <toadlet/egg/Log.h>
 #include <toadlet/egg/Error.h>
-#include <toadlet/egg/Logger.h>
 #include <toadlet/egg/EndianConversion.h>
 #include <toadlet/egg/io/DataStream.h>
 #include <toadlet/egg/math/Math.h>
@@ -252,10 +252,10 @@ Resource::ptr DDSStreamer::load(Stream::ptr stream,ResourceData *data,ProgressLi
 		}
 	}
 	else if(PF_IS_INDEX8(hdr.ddspf)){
-		Logger::alert("Other palette");
+		Log::alert("Other palette");
 	}
 	else{
-		Logger::alert("Other type");
+		Log::alert("Other type");
 	}
 
 	Texture::ptr texture=mTextureManager->createTexture(usage,textureFormat,mipDatas);

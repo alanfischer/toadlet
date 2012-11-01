@@ -39,7 +39,7 @@
 	#include "GLQuery.h"
 #endif
 #include <toadlet/egg/Error.h>
-#include <toadlet/egg/Logger.h>
+#include <toadlet/egg/Log.h>
 #include <toadlet/peeper/IndexData.h>
 #include <toadlet/peeper/VertexData.h>
 #include <toadlet/peeper/Viewport.h>
@@ -110,7 +110,7 @@ GLRenderDevice::GLRenderDevice():
 {}
 
 bool GLRenderDevice::create(RenderTarget *target,int options){
-	Logger::alert(Categories::TOADLET_PEEPER,
+	Log::alert(Categories::TOADLET_PEEPER,
 		"creating "+Categories::TOADLET_PEEPER+".GLRenderDevice");
 
 	if(target==NULL){
@@ -142,7 +142,7 @@ bool GLRenderDevice::create(RenderTarget *target,int options){
 		}
 
 		int glesemAcceleratedResult=glesem_getAccelerated();
-		Logger::alert(Categories::TOADLET_PEEPER,
+		Log::alert(Categories::TOADLET_PEEPER,
 			String("glesem_getAccelerated result:")+glesemAcceleratedResult);
 
 		gl_version=glesem_gl_majorVersion*10+glesem_gl_minorVersion;
@@ -170,7 +170,7 @@ bool GLRenderDevice::create(RenderTarget *target,int options){
 		}
 	#endif
 
-	Logger::alert(Categories::TOADLET_PEEPER,
+	Log::alert(Categories::TOADLET_PEEPER,
 		String("CALCULATED GL VERSION:")+(gl_version/10)+"."+(gl_version%10));
 
 	GLRenderTarget *gltarget=(GLRenderTarget*)target->getRootRenderTarget();
@@ -180,17 +180,17 @@ bool GLRenderDevice::create(RenderTarget *target,int options){
 	mRenderTarget=target;
 	mGLRenderTarget=gltarget;
 
-	Logger::alert(Categories::TOADLET_PEEPER,
+	Log::alert(Categories::TOADLET_PEEPER,
 		String("GL_VENDOR:") + glGetString(GL_VENDOR));
-	Logger::alert(Categories::TOADLET_PEEPER,
+	Log::alert(Categories::TOADLET_PEEPER,
 		String("GL_RENDERER:") + glGetString(GL_RENDERER));
-	Logger::alert(Categories::TOADLET_PEEPER,
+	Log::alert(Categories::TOADLET_PEEPER,
 		String("GL_VERSION:") + glGetString(GL_VERSION));
 	#if defined(TOADLET_HAS_GLSL)
-		Logger::alert(Categories::TOADLET_PEEPER,
+		Log::alert(Categories::TOADLET_PEEPER,
 			String("GL_SHADING_LANGUAGE_VERSION:") + glGetString(GL_SHADING_LANGUAGE_VERSION));
 	#endif
-	Logger::alert(Categories::TOADLET_PEEPER,
+	Log::alert(Categories::TOADLET_PEEPER,
 		String("GL_EXTENSIONS:") + glGetString(GL_EXTENSIONS));
 
 	RenderCaps &caps=mCaps;
@@ -344,7 +344,7 @@ bool GLRenderDevice::create(RenderTarget *target,int options){
 
 	TOADLET_CHECK_GLERROR("create");
 
-	Logger::alert(Categories::TOADLET_PEEPER,
+	Log::alert(Categories::TOADLET_PEEPER,
 		"created GLRenderDevice");
 
 	return true;
@@ -357,7 +357,7 @@ void GLRenderDevice::destroy(){
 		mRenderTarget=NULL;
 		mGLRenderTarget=NULL;
 
-		Logger::alert(Categories::TOADLET_PEEPER,
+		Log::alert(Categories::TOADLET_PEEPER,
 			"destroyed GLRenderDevice");
 	}
 }

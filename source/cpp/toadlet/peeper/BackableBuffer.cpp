@@ -23,7 +23,6 @@
  *
  ********** Copyright header - do not remove **********/
 
-#include <toadlet/egg/Logger.h>
 #include <toadlet/egg/Error.h>
 #include <toadlet/peeper/BackableBuffer.h>
 #include <toadlet/peeper/RenderDevice.h>

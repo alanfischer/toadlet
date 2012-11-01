@@ -27,6 +27,7 @@
 #include "GLVertexFormat.h"
 #include "GLSLVertexLayout.h"
 #include "GLRenderDevice.h"
+#include <toadlet/egg/Log.h>
 
 #if defined(TOADLET_HAS_GLSL)
 
@@ -265,7 +266,7 @@ bool GLSLShaderState::reflect(){
 
 				int j;
 				for(j=0;j<numUniforms;++j){
-					Logger::alert(String("Uniform block uniform index:")+indexes[j]);
+					Log::alert(String("Uniform block uniform index:")+indexes[j]);
 
 					int index=indexes[j];
 					variableFormat->setStructVariable(j,primaryVariables[index]);

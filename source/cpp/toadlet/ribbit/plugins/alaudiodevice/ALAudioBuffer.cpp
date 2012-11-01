@@ -26,7 +26,7 @@
 #include "ALAudioBuffer.h"
 #include "ALAudioDevice.h"
 #include <toadlet/egg/Error.h>
-#include <toadlet/egg/Logger.h>
+#include <toadlet/egg/Log.h>
 #include <toadlet/ribbit/AudioFormatConversion.h>
 
 namespace toadlet{

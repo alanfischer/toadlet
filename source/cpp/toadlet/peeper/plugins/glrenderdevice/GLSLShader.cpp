@@ -25,6 +25,7 @@
 
 #include "GLSLShader.h"
 #include "GLRenderDevice.h"
+#include <toadlet/egg/Log.h>
 
 #if defined(TOADLET_HAS_GLSL)
 
@@ -100,7 +101,7 @@ bool GLSLShader::createContext(){
 
 		TOADLET_CHECK_GLERROR("GLSLShader::createContext");
 		
-		Logger::debug(Categories::TOADLET_PEEPER,"program being compiled:\n"+mCode);
+		Log::debug(Categories::TOADLET_PEEPER,"program being compiled:\n"+mCode);
 		Error::unknown(Categories::TOADLET_PEEPER,"glsl compile error:\n"+logString);
 
 		return false;

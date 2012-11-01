@@ -24,8 +24,8 @@
  ********** Copyright header - do not remove **********/
 
 #include <toadlet/egg/Collection.h>
+#include <toadlet/egg/Log.h>
 #include <toadlet/egg/Error.h>
-#include <toadlet/egg/Logger.h>
 #include <toadlet/tadpole/platform/android/AndroidTextureStreamer.h>
 
 namespace toadlet{
@@ -65,7 +65,7 @@ AndroidTextureStreamer::~AndroidTextureStreamer(){
 Resource::ptr AndroidTextureStreamer::load(Stream::ptr stream,ResourceData *data,ProgressListener *listener){
 	int usage=(data!=NULL)?((TextureData*)data)->usage:0;
 
-	Logger::debug(Categories::TOADLET_TADPOLE,"AndroidTextureStreamer::load");
+	Log::debug(Categories::TOADLET_TADPOLE,"AndroidTextureStreamer::load");
 
 	jvm->AttachCurrentThread(&env,NULL);
 

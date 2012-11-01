@@ -381,7 +381,7 @@ bool BackableTexture::convertAndScale(TextureFormat *srcFormat,tbyte *src,Textur
 
 	Image::ptr image;
 	if((hasAutogen==false || hasNonPowerOf2==false) && (Math::isPowerOf2(width)==false || Math::isPowerOf2(height)==false || (dimension!=Image::Dimension_CUBE && Math::isPowerOf2(depth)==false))){
-		Logger::debug(Categories::TOADLET_TADPOLE,"making image power of 2");
+		Log::debug(Categories::TOADLET_TADPOLE,"making image power of 2");
 
 		int dwidth=width>1?(Math::nextPowerOf2(width)>>1):1;
 		int dheight=height>1?(Math::nextPowerOf2(height)>>1):1;
@@ -414,7 +414,7 @@ bool BackableTexture::convertAndScale(TextureFormat *srcFormat,tbyte *src,Textur
 
 	if(format!=closestFormat){
 if(closestFormat==0)closestFormat=Texture::Format_RGBA_8;
-		Logger::debug(Categories::TOADLET_TADPOLE,String("converting image from:")+format+" to:"+closestFormat);
+		Log::debug(Categories::TOADLET_TADPOLE,String("converting image from:")+format+" to:"+closestFormat);
 
 		Image::ptr convertedImage(Image::createAndReallocate(dimension,closestFormat,width,height,depth));
 		if(convertedImage==NULL){
@@ -435,7 +435,7 @@ if(closestFormat==0)closestFormat=Texture::Format_RGBA_8;
 	mipDatas.add(finalImage->getData());
 
 	if(hasAutogen==false && wantsAutogen==true){
-		Logger::debug(Categories::TOADLET_TADPOLE,"simulating mipmap generation");
+		Log::debug(Categories::TOADLET_TADPOLE,"simulating mipmap generation");
 
 		if(mipLevels==0){
 			int hwidth=width,hheight=height,hdepth=depth;

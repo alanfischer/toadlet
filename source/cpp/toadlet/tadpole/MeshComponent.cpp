@@ -23,6 +23,7 @@
  *
  ********** Copyright header - do not remove **********/
 
+#include <toadlet/egg/Log.h>
 #include <toadlet/egg/Error.h>
 #include <toadlet/tadpole/Engine.h>
 #include <toadlet/tadpole/Scene.h>
@@ -106,7 +107,7 @@ void MeshComponent::setMesh(const String &name){
 }
 
 void MeshComponent::setMesh(Mesh *mesh){
-	Logger::debug(Categories::TOADLET_TADPOLE,
+	Log::debug(Categories::TOADLET_TADPOLE,
 		"MeshComponent::setMesh");
 
 	mSubMeshes.clear();

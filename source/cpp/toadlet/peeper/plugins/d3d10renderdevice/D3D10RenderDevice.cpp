@@ -36,6 +36,7 @@
 #include "D3D10VertexFormat.h"
 #include <toadlet/egg/MathConversion.h>
 #include <toadlet/egg/Error.h>
+#include <toadlet/egg/Log.h>
 #include <toadlet/peeper/MaterialState.h>
 #include <toadlet/peeper/LightState.h>
 #include <toadlet/peeper/VertexData.h>
@@ -75,7 +76,7 @@ D3D10RenderDevice::D3D10RenderDevice():
 {}
 
 bool D3D10RenderDevice::create(RenderTarget *target,int options){
-	Logger::alert(Categories::TOADLET_PEEPER,
+	Log::alert(Categories::TOADLET_PEEPER,
 		"creating "+Categories::TOADLET_PEEPER+".D3D10RenderDevice");
 
 	if(target==NULL){
@@ -117,7 +118,7 @@ bool D3D10RenderDevice::create(RenderTarget *target,int options){
 		caps.hasShader[Shader::ShaderType_GEOMETRY]=true;
 	}
 
-	Logger::alert(Categories::TOADLET_PEEPER,
+	Log::alert(Categories::TOADLET_PEEPER,
 		"created D3D10RenderDevice");
 
 	mDefaultState=new D3D10RenderState(this);
@@ -265,7 +266,7 @@ void D3D10RenderDevice::renderPrimitive(VertexData *vertexData,IndexData *indexD
 		mLastShaderState->getShader(Shader::ShaderType_VERTEX)==NULL ||
 		mLastShaderState->getShader(Shader::ShaderType_FRAGMENT)==NULL
 	){
-		Logger::warning(Categories::TOADLET_PEEPER,
+		Log::warning(Categories::TOADLET_PEEPER,
 			"D3D10RenderDevice requires a vertex and fragment shader");
 		return;
 	}
@@ -492,7 +493,7 @@ D3D10_PRIMITIVE_TOPOLOGY D3D10RenderDevice::getD3D10_PRIMITIVE_TOPOLOGY(IndexDat
 		case IndexData::Primitive_TRISTRIP:
 			return D3D10_PRIMITIVE_TOPOLOGY_TRIANGLESTRIP;
 		default:
-			Logger::error(Categories::TOADLET_PEEPER,
+			Error::unknown(Categories::TOADLET_PEEPER,
 				"D3D10RenderDevice::getD3D10_PRIMITIVE_FORMAT: Invalid format");
 			return D3D10_PRIMITIVE_TOPOLOGY_UNDEFINED;
 		break;
@@ -509,7 +510,7 @@ DXGI_FORMAT D3D10RenderDevice::getIndexDXGI_FORMAT(IndexBuffer::IndexFormat form
 			return DXGI_FORMAT_R32_UINT;
 		break;
 		default:
-			Logger::error(Categories::TOADLET_PEEPER,
+			Error::unknown(Categories::TOADLET_PEEPER,
 				"D3D10RenderDevice::getIndexDXGI_FORMAT: Invalid format");
 			return DXGI_FORMAT_UNKNOWN;
 		break;
@@ -557,7 +558,7 @@ DXGI_FORMAT D3D10RenderDevice::getVertexDXGI_FORMAT(int format){
 		case VertexFormat::Format_TYPE_FLOAT_32|VertexFormat::Format_COUNT_4:
 			return DXGI_FORMAT_R32G32B32A32_FLOAT;
 		default:
-			Logger::error(Categories::TOADLET_PEEPER,
+			Error::unknown(Categories::TOADLET_PEEPER,
 				"D3D10RenderDevice::getVertexDXGI_FORMAT: Invalid format");
 			return DXGI_FORMAT_UNKNOWN;
 		break;

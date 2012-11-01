@@ -25,7 +25,7 @@
 
 #include <toadlet/egg/Profile.h>
 #include <toadlet/egg/Error.h>
-#include <toadlet/egg/Logger.h>
+#include <toadlet/egg/Log.h>
 #include <toadlet/egg/System.h>
 
 namespace toadlet{
@@ -115,7 +115,7 @@ void Profile::outputTimings(ProfileNode *node,int depth,int total){
 	}
 
 	if(node->getTotal()>0){
-		Logger::alert(Categories::TOADLET_EGG_PROFILE,spaces+node->getName()+":"+node->getTotal()+":%"+(float)node->getTotal()*100/(float)total);
+		Log::alert(Categories::TOADLET_EGG_PROFILE,spaces+node->getName()+":"+node->getTotal()+":%"+(float)node->getTotal()*100/(float)total);
 	}
 
 	for(node=node->getFirstChild();node!=NULL;node=node->getNext()){

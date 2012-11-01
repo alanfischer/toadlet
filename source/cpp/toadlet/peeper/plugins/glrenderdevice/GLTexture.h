@@ -29,6 +29,7 @@
 #include "GLIncludes.h"
 #include "GLTextureMipPixelBuffer.h"
 #include <toadlet/egg/BaseResource.h>
+#include <toadlet/egg/Collection.h>
 #include <toadlet/peeper/Texture.h>
 
 namespace toadlet{

@@ -23,6 +23,7 @@
  *
  ********** Copyright header - do not remove **********/
 
+#include <toadlet/egg/Log.h>
 #include <toadlet/tadpole/AudioManager.h>
 #include <toadlet/tadpole/AudioStreamer.h>
 #include <toadlet/tadpole/Engine.h>
@@ -65,7 +66,7 @@ Audio::ptr AudioManager::createAudio(){
 }
 
 AudioStream::ptr AudioManager::findAudioStream(const String &name,ResourceData *data){
-	Logger::debug(Categories::TOADLET_TADPOLE,
+	Log::debug(Categories::TOADLET_TADPOLE,
 		"finding audio stream:"+name);
 
 	/// @todo: Unify this with ResourceManager::findFromFile

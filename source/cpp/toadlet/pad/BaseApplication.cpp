@@ -24,8 +24,8 @@
  ********** Copyright header - do not remove **********/
 
 #include <toadlet/egg/Error.h>
+#include <toadlet/egg/Log.h>
 #include <toadlet/egg/System.h>
-#include <toadlet/egg/Logger.h>
 #include <toadlet/pad/BaseApplication.h>
 #include <ctype.h> // isalpha
 
@@ -208,7 +208,7 @@ RenderDevice::ptr BaseApplication::makeRenderDevice(const String &plugin){
 }
 
 bool BaseApplication::createContextAndRenderDevice(const String &plugin){
-	Logger::debug(Categories::TOADLET_PAD,
+	Log::debug(Categories::TOADLET_PAD,
 		"BaseApplication: creating RenderTarget and RenderDevice:"+plugin);
 
 	mRenderTarget=makeRenderTarget(plugin);
@@ -232,7 +232,7 @@ bool BaseApplication::createContextAndRenderDevice(const String &plugin){
 			mRenderTarget=NULL;
 		}
 
-		Logger::error(Categories::TOADLET_PAD,
+		Log::error(Categories::TOADLET_PAD,
 			"error starting RenderDevice");
 		return false;
 	}
@@ -245,7 +245,7 @@ bool BaseApplication::createContextAndRenderDevice(const String &plugin){
 }
 
 bool BaseApplication::destroyRenderDeviceAndContext(){
-	Logger::debug(Categories::TOADLET_PAD,
+	Log::debug(Categories::TOADLET_PAD,
 		"BaseApplication: destroying context and renderDevice");
 
 	if(mRenderDevice!=NULL){
@@ -274,7 +274,7 @@ AudioDevice::ptr BaseApplication::makeAudioDevice(const String &plugin){
 }
 
 bool BaseApplication::createAudioDevice(const String &plugin){
-	Logger::debug(Categories::TOADLET_PAD,
+	Log::debug(Categories::TOADLET_PAD,
 		"BaseApplication: creating AudioDevice:"+plugin);
 
 	bool result=false;
@@ -289,12 +289,12 @@ bool BaseApplication::createAudioDevice(const String &plugin){
 	}
 
 	if(result==false){
-		Logger::error(Categories::TOADLET_PAD,
+		Log::error(Categories::TOADLET_PAD,
 			"error starting AudioDevice");
 		return false;
 	}
 	else if(mAudioDevice==NULL){
-		Logger::error(Categories::TOADLET_PAD,
+		Log::error(Categories::TOADLET_PAD,
 			"error creating AudioDevice");
 		return false;
 	}

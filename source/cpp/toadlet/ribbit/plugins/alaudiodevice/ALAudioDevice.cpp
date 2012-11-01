@@ -29,7 +29,7 @@
 #include <toadlet/egg/System.h>
 #include <toadlet/egg/Extents.h>
 #include <toadlet/egg/Error.h>
-#include <toadlet/egg/EndianConversion.h>
+#include <toadlet/egg/Log.h>
 #include <stdlib.h>
 
 #if defined(TOADLET_PLATFORM_WIN32)
@@ -75,7 +75,7 @@ ALAudioDevice::ALAudioDevice():
 }
 
 bool ALAudioDevice::create(int options){
-	Logger::alert(Categories::TOADLET_RIBBIT,
+	Log::alert(Categories::TOADLET_RIBBIT,
 		"creating ALAudioDevice");
 
 	if(mContext!=NULL){
@@ -95,7 +95,7 @@ bool ALAudioDevice::create(int options){
 		}
 
 		int alemAcceleratedResult=alem_getAccelerated();
-		Logger::alert(Categories::TOADLET_RIBBIT,
+		Log::alert(Categories::TOADLET_RIBBIT,
 			String("alem_getAccelerated result:")+alemAcceleratedResult);
 	#endif
 
@@ -111,7 +111,7 @@ bool ALAudioDevice::create(int options){
 
 	alBufferDataStatic=(proc_alBufferDataStatic)alcGetProcAddress(mDevice,(ALCchar*)"alBufferDataStatic");
 	if(alBufferDataStatic!=NULL){
-		Logger::alert(Categories::TOADLET_RIBBIT,
+		Log::alert(Categories::TOADLET_RIBBIT,
 			"using alBufferDataStatic extension");
 	}
 
@@ -162,7 +162,7 @@ bool ALAudioDevice::create(int options){
 }
 
 void ALAudioDevice::destroy(){
-	Logger::alert(Categories::TOADLET_RIBBIT,
+	Log::alert(Categories::TOADLET_RIBBIT,
 		"destroying ALAudioDevice");
 
 	alcMakeContextCurrent(mContext);

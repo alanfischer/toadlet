@@ -26,7 +26,7 @@
 #include "JAudioDevice.h"
 #include "JAudio.h"
 #include "JAudioBuffer.h"
-#include <toadlet/egg/Logger.h>
+#include <toadlet/egg/Log.h>
 
 namespace toadlet{
 namespace ribbit{
@@ -64,14 +64,14 @@ JAudioDevice::~JAudioDevice(){
 }
 
 bool JAudioDevice::create(int *options){
-	Logger::alert(Categories::TOADLET_RIBBIT,
+	Log::alert(Categories::TOADLET_RIBBIT,
 		"creating JAudioDevice");
 
 	return env->CallBooleanMethod(obj,createID);
 }
 
 void JAudioDevice::destroy(){
-	Logger::alert(Categories::TOADLET_RIBBIT,
+	Log::alert(Categories::TOADLET_RIBBIT,
 		"destroying JAudioDevice");
 
 	return env->CallVoidMethod(obj,destroyID);

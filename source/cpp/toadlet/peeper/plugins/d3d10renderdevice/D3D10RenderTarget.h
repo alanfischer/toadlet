@@ -27,6 +27,7 @@
 #define TOADLET_PEEPER_D3D10RENDERTARGET_H
 
 #include "D3D10Includes.h"
+#include <toadlet/egg/Collection.h>
 #include <toadlet/peeper/RenderTarget.h>
 
 namespace toadlet{

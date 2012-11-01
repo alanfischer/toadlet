@@ -24,7 +24,7 @@
  ********** Copyright header - do not remove **********/
 
 #include "JInputDevice.h"
-#include <toadlet/egg/Logger.h>
+#include <toadlet/egg/Log.h>
 
 extern "C" JNIEXPORT void Java_us_toadlet_flick(JNIEnv *env);
 
@@ -69,14 +69,14 @@ JInputDevice::~JInputDevice(){
 }
 
 bool JInputDevice::create(){
-	Logger::alert(Categories::TOADLET_RIBBIT,
+	Log::alert(Categories::TOADLET_RIBBIT,
 		"creating JInputDevice");
 
 	return env->CallBooleanMethod(obj,createID);
 }
 
 void JInputDevice::destroy(){
-	Logger::alert(Categories::TOADLET_RIBBIT,
+	Log::alert(Categories::TOADLET_RIBBIT,
 		"destroying JInputDevice");
 
 	return env->CallVoidMethod(obj,destroyID);

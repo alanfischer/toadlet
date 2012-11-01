@@ -25,6 +25,7 @@
 
 #include "WGLWindowRenderTarget.h"
 #include <toadlet/egg/Error.h>
+#include <toadlet/egg/Log.h>
 #include <toadlet/egg/System.h>
 #include <toadlet/peeper/TextureFormat.h>
 
@@ -149,7 +150,7 @@ void WGLWindowRenderTarget::destroy(){
 }
 
 bool WGLWindowRenderTarget::createContext(HWND wnd,WindowRenderTargetFormat *format,int winPixelFormat){
-	Logger::alert(Categories::TOADLET_PEEPER,
+	Log::alert(Categories::TOADLET_PEEPER,
 		"WGLWindowRenderTarget::createContext");
 
 	BOOL result=0;

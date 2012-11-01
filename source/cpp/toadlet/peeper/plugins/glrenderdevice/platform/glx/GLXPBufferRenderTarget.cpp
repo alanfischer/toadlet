@@ -27,7 +27,6 @@
  
 #include "GLXPBufferRenderTarget.h"
 #include "../../GLRenderDevice.h"
-#include <toadlet/egg/Logger.h>
 #include <toadlet/egg/Error.h>
 #include <toadlet/peeper/TextureFormat.h>
 
@@ -258,7 +257,7 @@ mContext=glXCreateNewContext(mDisplay,fbConfig,GLX_RGBA_BIT,renderTarget->getGLX
 			return false;
 		}
 		else{
-			Logger::warning(Categories::TOADLET_PEEPER,
+			Log::warning(Categories::TOADLET_PEEPER,
 				"Using indirect GLXContext");
 		}
 	}

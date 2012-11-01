@@ -24,7 +24,7 @@
  ********** Copyright header - do not remove **********/
 
 #include <toadlet/egg/Error.h>
-#include <toadlet/egg/Logger.h>
+#include <toadlet/egg/Log.h>
 
 namespace toadlet{
 namespace egg{
@@ -101,7 +101,7 @@ const Exception &Error::getException(){
 }
 
 void Error::errorLog(const String &categoryName,const String &text){
-	Logger::getInstance()->addLogEntry(categoryName,Logger::Level_ERROR,text);
+	Log::getInstance()->addLogEntry(categoryName,Logger::Level_ERROR,text);
 }
 
 void Error::installHandler(){
@@ -117,16 +117,16 @@ void Error::uninstallHandler(){
 }
 
 void Error::startTrace(){
-	Logger::getInstance()->addLogEntry(Logger::Level_ERROR,"Backtrace starting");
+	Log::getInstance()->addLogEntry(Logger::Level_ERROR,"Backtrace starting");
 }
 
 void Error::traceFrame(const char *description){
-	Logger::getInstance()->addLogEntry(Logger::Level_ERROR,description);
+	Log::getInstance()->addLogEntry(Logger::Level_ERROR,description);
 }
 
 void Error::endTrace(){
-	Logger::getInstance()->addLogEntry(Logger::Level_ERROR,"Backtrace ended");
-	Logger::getInstance()->flush();
+	Log::getInstance()->addLogEntry(Logger::Level_ERROR,"Backtrace ended");
+	Log::getInstance()->flush();
 }
 
 }

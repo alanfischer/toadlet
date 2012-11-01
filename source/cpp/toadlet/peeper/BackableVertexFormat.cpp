@@ -25,7 +25,6 @@
 
 #include <toadlet/peeper/BackableVertexFormat.h>
 #include <toadlet/egg/Error.h>
-#include <toadlet/egg/Logger.h>
 
 namespace toadlet{
 namespace peeper{

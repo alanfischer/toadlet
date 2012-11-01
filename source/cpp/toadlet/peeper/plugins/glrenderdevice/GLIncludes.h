@@ -27,7 +27,6 @@
 #define TOADLET_PEEPER_GLINCLUDES_H
 
 #include <toadlet/egg/Error.h>
-#include <toadlet/egg/Logger.h>
 #include <toadlet/egg/MathConversion.h>
 #include <toadlet/peeper/Types.h>
 

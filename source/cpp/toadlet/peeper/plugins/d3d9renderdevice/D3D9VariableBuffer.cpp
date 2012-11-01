@@ -26,7 +26,6 @@
 #include "D3D9VariableBuffer.h"
 #include "D3D9RenderDevice.h"
 #include <toadlet/egg/Error.h>
-#include <toadlet/egg/Logger.h>
 #include <toadlet/peeper/BackableBuffer.h>
 
 namespace toadlet{

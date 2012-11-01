@@ -25,7 +25,6 @@
 
 #include <toadlet/egg/Error.h>
 #include <toadlet/egg/System.h>
-#include <toadlet/egg/Logger.h>
 #include <toadlet/pad/ConsoleApplication.h>
 
 using namespace toadlet::peeper;

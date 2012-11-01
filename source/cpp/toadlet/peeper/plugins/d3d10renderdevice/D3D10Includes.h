@@ -28,7 +28,6 @@
 
 #include <toadlet/peeper/Types.h>
 #include <toadlet/egg/Error.h>
-#include <toadlet/egg/Logger.h>
 #include <windows.h>
 #include <commctrl.h>
 #if defined(TOADLET_SET_D3D10)

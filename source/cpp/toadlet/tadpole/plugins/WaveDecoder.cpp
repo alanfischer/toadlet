@@ -23,9 +23,9 @@
  *
  ********** Copyright header - do not remove **********/
 
-#include <toadlet/egg/EndianConversion.h>
+#include <toadlet/egg/Log.h>
 #include <toadlet/egg/Error.h>
-#include <toadlet/egg/Logger.h>
+#include <toadlet/egg/EndianConversion.h>
 #include "WaveDecoder.h"
 
 namespace toadlet{
@@ -81,7 +81,7 @@ bool WaveDecoder::startStream(Stream::ptr stream){
 	mFormat=AudioFormat::ptr(new AudioFormat(16,1,22050));
 
 	if(stream->read((tbyte*)&header,sizeof(header))!=sizeof(header)){
-		Logger::error("unable to read header");
+		Error::unknown("unable to read header");
 		return false;
 	}
 
@@ -92,7 +92,7 @@ bool WaveDecoder::startStream(Stream::ptr stream){
 	//littleUInt32InPlace(header.fccType);
 
 	if(memcmp(&header.fccID,"RIFF",4)!=0 || memcmp(&header.fccType,"WAVE",4)!=0){
-		Logger::error("not RIFF WAVE format");
+		Error::unknown("not RIFF WAVE format");
 		return false;
 	}
 

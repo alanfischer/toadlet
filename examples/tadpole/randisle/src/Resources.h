@@ -39,7 +39,7 @@ public:
 			minPropDist=60;
 		#endif
 
-		Logger::alert("Loading terrain");
+		Log::alert("Loading terrain");
 
 		terrainMaterialSource=new DiffuseTerrainMaterialSource(engine);
 		terrainMaterialSource->setDiffuseScale(Vector3(16,16,16));
@@ -54,7 +54,7 @@ public:
 		#endif
 		terrainMaterialSource->setDiffuseTexture(2,"grass.png");
 
-		Logger::alert("Loading water");
+		Log::alert("Loading water");
 
 		Vector4 color=Colors::AZURE*1.5;
 		color.w=0.5f;
@@ -89,7 +89,7 @@ public:
 	}
 */
 
-		Logger::alert("Loading frog");
+		Log::alert("Loading frog");
 
 		creature=shared_static_cast<Mesh>(engine->getMeshManager()->find("frog.tmsh"));
 		if(creature!=NULL){
@@ -99,7 +99,7 @@ public:
 			creature->setTransform(transform);
 		}
 
-		Logger::alert("Loading shadow");
+		Log::alert("Loading shadow");
 
 		TextureFormat::ptr pointFormat(new TextureFormat(TextureFormat::Dimension_D2,TextureFormat::Format_A_8,128,128,1,0));
 		tbyte *pointData=createPoint(pointFormat);
@@ -118,7 +118,7 @@ public:
 			shadow->getSubMesh(0)->material=material;
 		}
 
-		Logger::alert("Loading grass");
+		Log::alert("Loading grass");
 
 		grass=shared_static_cast<Mesh>(engine->getMeshManager()->find("tall_grass.tmsh"));
 		if(creature!=NULL){
@@ -138,7 +138,7 @@ public:
 			}
 		}
 
-		Logger::alert("Loading tree items");
+		Log::alert("Loading tree items");
 
 		treeBranch=engine->getMaterialManager()->findMaterial("bark.png");
 
@@ -168,7 +168,7 @@ public:
 			treeLeaf->compile();
 		}
 
-		Logger::alert("Loading sounds");
+		Log::alert("Loading sounds");
 
  		dog=engine->getAudioManager()->findAudioBuffer("dog.wav");
 		shark=engine->getAudioManager()->findAudioBuffer("shark.wav");

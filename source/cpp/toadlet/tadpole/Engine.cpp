@@ -66,8 +66,6 @@
 /// @todo: Force no-scene-graph updates in renderUpdate, to allow us to thread that easily
 
 
-#include <toadlet/egg/Logger.h>
-#include <toadlet/egg/Error.h>
 #include <toadlet/peeper/RenderCaps.h>
 #include <toadlet/tadpole/Types.h>
 #include <toadlet/tadpole/Engine.h>
@@ -163,10 +161,9 @@ Engine::Engine(void *env,void *ctx,int options):
 
 	//mContextListeners
 {
-	Logger *logger=Logger::getInstance();
+	Logger *logger=Log::getInstance();
 	logger->addCategory(Categories::TOADLET_EGG_LOGGER);
 	logger->addCategory(Categories::TOADLET_EGG_NET);
-	logger->setCategoryReportingLevel(Categories::TOADLET_EGG_NET,Logger::Level_DISABLED); // Don't log socket errors
 	logger->addCategory(Categories::TOADLET_EGG);
 	logger->addCategory(Categories::TOADLET_FLICK);
 	logger->addCategory(Categories::TOADLET_HOP);
@@ -176,7 +173,7 @@ Engine::Engine(void *env,void *ctx,int options):
 	logger->addCategory(Categories::TOADLET_TADPOLE);
 	logger->addCategory(Categories::TOADLET_PAD);
 
-	Logger::debug(Categories::TOADLET_TADPOLE,
+	Log::debug(Categories::TOADLET_TADPOLE,
 		String("allocating ")+Categories::TOADLET_TADPOLE+".Engine:"+Version::STRING);
 
 	mEnv=env,mCtx=ctx;
@@ -210,12 +207,12 @@ Engine::Engine(void *env,void *ctx,int options):
 }
 
 Engine::~Engine(){
-	Logger::debug(Categories::TOADLET_TADPOLE,
+	Log::debug(Categories::TOADLET_TADPOLE,
 		"Engine::~Engine");
 }
 
 void Engine::destroy(){
-	Logger::debug(Categories::TOADLET_TADPOLE,
+	Log::debug(Categories::TOADLET_TADPOLE,
 		"Engine::destroy");
 
 	if(mRenderDevice!=NULL){
@@ -236,7 +233,7 @@ void Engine::destroy(){
 }
 
 void Engine::installHandlers(){
-	Logger::debug(Categories::TOADLET_TADPOLE,
+	Log::debug(Categories::TOADLET_TADPOLE,
 		"Engine: installing handlers");
 
 	// Archive streamers
@@ -362,25 +359,25 @@ bool Engine::setRenderDevice(RenderDevice *renderDevice){
 		renderDevice->getRenderCaps(mRenderCaps);
 		const RenderCaps &caps=mRenderCaps;
 		{
-			Logger::alert(Categories::TOADLET_TADPOLE,
+			Log::alert(Categories::TOADLET_TADPOLE,
 				"RenderDevice Capabilities:");
-			Logger::alert(Categories::TOADLET_TADPOLE,
+			Log::alert(Categories::TOADLET_TADPOLE,
 				String()+(char)9+"maxTextureStages:"+caps.maxTextureStages);
-			Logger::alert(Categories::TOADLET_TADPOLE,
+			Log::alert(Categories::TOADLET_TADPOLE,
 				String()+(char)9+"maxTextureSize:"+caps.maxTextureSize);
-			Logger::alert(Categories::TOADLET_TADPOLE,
+			Log::alert(Categories::TOADLET_TADPOLE,
 				String()+(char)9+"renderToTexture:"+caps.renderToTexture);
-			Logger::alert(Categories::TOADLET_TADPOLE,
+			Log::alert(Categories::TOADLET_TADPOLE,
 				String()+(char)9+"renderToDepthTexture:"+caps.renderToDepthTexture);
-			Logger::alert(Categories::TOADLET_TADPOLE,
+			Log::alert(Categories::TOADLET_TADPOLE,
 				String()+(char)9+"renderToTextureNonPowerOf2Restricted:"+caps.renderToTextureNonPowerOf2Restricted);
-			Logger::alert(Categories::TOADLET_TADPOLE,
+			Log::alert(Categories::TOADLET_TADPOLE,
 				String()+(char)9+"textureDot3:"+caps.textureDot3);
-			Logger::alert(Categories::TOADLET_TADPOLE,
+			Log::alert(Categories::TOADLET_TADPOLE,
 				String()+(char)9+"textureNonPowerOf2Restricted:"+caps.textureNonPowerOf2Restricted);
-			Logger::alert(Categories::TOADLET_TADPOLE,
+			Log::alert(Categories::TOADLET_TADPOLE,
 				String()+(char)9+"textureNonPowerOf2:"+caps.textureNonPowerOf2);
-			Logger::alert(Categories::TOADLET_TADPOLE,
+			Log::alert(Categories::TOADLET_TADPOLE,
 				String()+(char)9+"textureAutogenMipMaps:"+caps.textureAutogenMipMaps);
 		}
 
@@ -517,7 +514,7 @@ void Engine::nodeDestroyed(Node *node){
 
 // Context methods
 void Engine::contextReset(peeper::RenderDevice *renderDevice){
-	Logger::debug("Engine::contextReset");
+	Log::debug("Engine::contextReset");
 
 	int i;
 	for(i=0;i<mContextListeners.size();++i){
@@ -538,7 +535,7 @@ void Engine::contextReset(peeper::RenderDevice *renderDevice){
 }
 
 void Engine::contextActivate(RenderDevice *renderDevice){
-	Logger::debug("Engine::contextActivate");
+	Log::debug("Engine::contextActivate");
 
 	renderDevice->activate();
 
@@ -558,7 +555,7 @@ void Engine::contextActivate(RenderDevice *renderDevice){
 }
 
 void Engine::contextDeactivate(RenderDevice *renderDevice){
-	Logger::debug("Engine::contextDeactivate");
+	Log::debug("Engine::contextDeactivate");
 
 	renderDevice->activate();
 

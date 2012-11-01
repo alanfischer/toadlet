@@ -157,7 +157,7 @@ bool EGLPBufferRenderTarget::compile(){
 bool EGLPBufferRenderTarget::createBuffer(){
 	destroyBuffer();
 
-	Logger::debug("creating EGL context for pbuffer");
+	Log::debug("creating EGL context for pbuffer");
 
 	mDisplay=((EGLRenderTarget*)mDevice->getPrimaryRenderTarget()->getRootRenderTarget())->getEGLDisplay();
 
