@@ -175,12 +175,17 @@ if (SWIG_FOUND AND PAD_SWIG_INT)
 endif (SWIG_FOUND AND PAD_SWIG_INT)
 
 
+# For individual component installation 
+set (PAD_INSTALL)
+
+
 # Dynamic Library
 if (TOADLET_BUILD_DYNAMIC)
 	add_library (toadlet_pad SHARED ${PAD_SRC} ${PAD_HDR})
 	set_target_properties (toadlet_pad PROPERTIES ${DYNAMIC_LIB_PROPS})
 	target_link_libraries (toadlet_pad toadlet_flick toadlet_tadpole ${PAD_LIBS})
-	install (TARGETS toadlet_pad DESTINATION ${LIB_INSTALL_DIR})
+	install (TARGETS toadlet_pad DESTINATION ${LIB_INSTALL_DIR} COMPONENT pad)
+	set (PAD_INSTALL ${PAD_INSTALL} toadlet_pad)
 endif (TOADLET_BUILD_DYNAMIC)
 
 
@@ -189,11 +194,23 @@ if (TOADLET_BUILD_STATIC)
 	add_library (toadlet_pad_s STATIC ${PAD_SRC} ${PAD_HDR})
 	set_target_properties (toadlet_pad_s PROPERTIES ${STATIC_LIB_PROPS})
 	target_link_libraries (toadlet_pad_s toadlet_flick_s toadlet_tadpole_s ${PAD_LIBS_S})
-	install (TARGETS toadlet_pad_s DESTINATION ${LIB_INSTALL_DIR})
+	install (TARGETS toadlet_pad_s DESTINATION ${LIB_INSTALL_DIR} COMPONENT pad)
+	set (PAD_INSTALL ${PAD_INSTALL} toadlet_pad_s)
 
 	# HACK: install the library on iOS. This will disappear once cmake issue:0012506 is resolved. 
 	if (TOADLET_PLATFORM_IOS)
-	    install (DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/\$ENV{CONFIGURATION}\$ENV{EFFECTIVE_PLATFORM_NAME}/ DESTINATION ${LIB_INSTALL_DIR} FILES_MATCHING PATTERN "*.a")
+	    install (DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/\$ENV{CONFIGURATION}\$ENV{EFFECTIVE_PLATFORM_NAME}/ DESTINATION ${LIB_INSTALL_DIR} FILES_MATCHING PATTERN "*.a" COMPONENT pad)
 	endif (TOADLET_PLATFORM_IOS)
 endif (TOADLET_BUILD_STATIC)
+
+
+# Rule to install only pad
+add_custom_target (pad_install
+	COMMAND ${CMAKE_COMMAND} -DCOMPONENT=required -P ${PROJECT_BINARY_DIR}/cmake_install.cmake
+	COMMAND ${CMAKE_COMMAND} -DCOMPONENT=egg -P ${PROJECT_BINARY_DIR}/cmake_install.cmake
+	COMMAND ${CMAKE_COMMAND} -DCOMPONENT=flick -P ${PROJECT_BINARY_DIR}/cmake_install.cmake
+	COMMAND ${CMAKE_COMMAND} -DCOMPONENT=tadpole -P ${PROJECT_BINARY_DIR}/cmake_install.cmake
+	DEPENDS ${PAD_INSTALL}
+)
+
 

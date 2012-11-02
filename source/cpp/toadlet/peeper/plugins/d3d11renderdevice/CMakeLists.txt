@@ -47,7 +47,8 @@ if (TOADLET_BUILD_DYNAMIC)
 	add_library (toadlet_peeper_d3d11renderdevice SHARED ${PEEPER_D3D11RENDERDEVICE_SRC} ${PEEPER_D3D11RENDERDEVICE_HDR})
 	set_target_properties (toadlet_peeper_d3d11renderdevice PROPERTIES ${DYNAMIC_LIB_PROPS})
 	target_link_libraries (toadlet_peeper_d3d11renderdevice toadlet_peeper ${PEEPER_D3D11RENDERDEVICE_LIBS})
-	install (TARGETS toadlet_peeper_d3d11renderdevice DESTINATION ${LIB_INSTALL_DIR})
+	install (TARGETS toadlet_peeper_d3d11renderdevice DESTINATION ${LIB_INSTALL_DIR} COMPONENT peeper)
+	set (PEEPER_INSTALL ${PEEPER_INSTALL} toadlet_peeper_d3d11renderdevice PARENT_SCOPE)
 endif (TOADLET_BUILD_DYNAMIC)
 
 
@@ -56,6 +57,7 @@ if (TOADLET_BUILD_STATIC)
 	add_library (toadlet_peeper_d3d11renderdevice_s STATIC ${PEEPER_D3D11RENDERDEVICE_SRC} ${PEEPER_D3D11RENDERDEVICE_HDR})
 	set_target_properties (toadlet_peeper_d3d11renderdevice_s PROPERTIES ${STATIC_LIB_PROPS})
 	target_link_libraries (toadlet_peeper_d3d11renderdevice_s toadlet_peeper_s ${PEEPER_D3D11RENDERDEVICE_LIBS})
-	install (TARGETS toadlet_peeper_d3d11renderdevice_s DESTINATION ${LIB_INSTALL_DIR})
+	install (TARGETS toadlet_peeper_d3d11renderdevice_s DESTINATION ${LIB_INSTALL_DIR} COMPONENT peeper)
+	set (PEEPER_INSTALL ${PEEPER_INSTALL} toadlet_peeper_d3d11renderdevice_s PARENT_SCOPE)
 endif (TOADLET_BUILD_STATIC)
 

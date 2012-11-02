@@ -81,12 +81,17 @@ if (SWIG_FOUND AND PEEPER_SWIG_INT)
 endif (SWIG_FOUND AND PEEPER_SWIG_INT)
 
 
+# For individual component installation 
+set (PEEPER_INSTALL)
+
+
 # Dynamic library
 if (TOADLET_BUILD_DYNAMIC)
 	add_library (toadlet_peeper SHARED ${PEEPER_SRC} ${PEEPER_HDR})
 	set_target_properties (toadlet_peeper PROPERTIES ${DYNAMIC_LIB_PROPS})
 	target_link_libraries (toadlet_peeper toadlet_egg)
-	install (TARGETS toadlet_peeper DESTINATION ${LIB_INSTALL_DIR})
+	install (TARGETS toadlet_peeper DESTINATION ${LIB_INSTALL_DIR} COMPONENT peeper)
+	set (PEEPER_INSTALL ${PEEPER_INSTALL} toadlet_peeper)
 endif (TOADLET_BUILD_DYNAMIC)
 
 
@@ -95,11 +100,12 @@ if (TOADLET_BUILD_STATIC)
 	add_library (toadlet_peeper_s STATIC ${PEEPER_SRC} ${PEEPER_HDR})
 	set_target_properties (toadlet_peeper_s PROPERTIES ${STATIC_LIB_PROPS})
 	target_link_libraries (toadlet_peeper_s toadlet_egg_s)
-	install (TARGETS toadlet_peeper_s DESTINATION ${LIB_INSTALL_DIR})
+	install (TARGETS toadlet_peeper_s DESTINATION ${LIB_INSTALL_DIR} COMPONENT peeper)
+	set (PEEPER_INSTALL ${PEEPER_INSTALL} toadlet_peeper_s)
 
 	# HACK: install the library on iOS. This will disappear once cmake issue:0012506 is resolved. 
 	if (TOADLET_PLATFORM_IOS)
-	    install (DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/\$ENV{CONFIGURATION}\$ENV{EFFECTIVE_PLATFORM_NAME}/ DESTINATION ${LIB_INSTALL_DIR} FILES_MATCHING PATTERN "*.a")
+	    install (DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/\$ENV{CONFIGURATION}\$ENV{EFFECTIVE_PLATFORM_NAME}/ DESTINATION ${LIB_INSTALL_DIR} FILES_MATCHING PATTERN "*.a" COMPONENT peeper)
 	endif (TOADLET_PLATFORM_IOS)
 endif (TOADLET_BUILD_STATIC)
 
@@ -202,3 +208,11 @@ elseif (TOADLET_PLATFORM_POSIX)
 	endif (GLEW_FOUND)
 endif (TOADLET_PLATFORM_ANDROID)
 
+
+# Rule to install only peeper
+add_custom_target (peeper_install
+	COMMAND ${CMAKE_COMMAND} -DCOMPONENT=required -P ${PROJECT_BINARY_DIR}/cmake_install.cmake
+	COMMAND ${CMAKE_COMMAND} -DCOMPONENT=egg -P ${PROJECT_BINARY_DIR}/cmake_install.cmake
+	COMMAND ${CMAKE_COMMAND} -DCOMPONENT=peeper -P ${PROJECT_BINARY_DIR}/cmake_install.cmake
+	DEPENDS ${PEEPER_INSTALL}
+)

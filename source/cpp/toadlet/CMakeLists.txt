@@ -67,8 +67,8 @@ configure_file (${CMAKE_CURRENT_SOURCE_DIR}/Config.h.cmake ${CMAKE_CURRENT_BINAR
 
 # Install header files 
 if (NOT INSTALL_ANDROID_APP)
-	install (FILES ${toadlet_SOURCE_DIR}/source/cpp/toadlet/Types.h DESTINATION include/toadlet)
-	install (FILES ${toadlet_BINARY_DIR}/source/cpp/toadlet/Config.h DESTINATION include/toadlet)
+	install (FILES ${toadlet_SOURCE_DIR}/source/cpp/toadlet/Types.h DESTINATION include/toadlet COMPONENT required)
+	install (FILES ${toadlet_BINARY_DIR}/source/cpp/toadlet/Config.h DESTINATION include/toadlet COMPONENT required)
 	foreach (TOADLET_LIBRARY ${TOADLET_LIBRARY_LIST})
 		install (DIRECTORY ${toadlet_SOURCE_DIR}/source/cpp/toadlet/${TOADLET_LIBRARY} COMPONENT ${TOADLET_LIBRARY} DESTINATION include/toadlet FILES_MATCHING PATTERN "*.h")
 		install (FILES ${toadlet_BINARY_DIR}/source/cpp/toadlet/${TOADLET_LIBRARY}.h DESTINATION include/toadlet COMPONENT ${TOADLET_LIBRARY})
