@@ -26,7 +26,7 @@
 #ifndef TOADLET_EGG_STRING_H
 #define TOADLET_EGG_STRING_H
 
-#include <toadlet/Types.h>
+#include <toadlet/egg/Types.h>
 #if defined(__OBJC__)
 	#import <Foundation/Foundation.h>
 #endif

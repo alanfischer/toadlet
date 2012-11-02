@@ -26,7 +26,7 @@
 #ifndef TOADLET_EGG_MATHCONVERSION_H
 #define TOADLET_EGG_MATHCONVERSION_H
 
-#include <toadlet/Types.h>
+#include <toadlet/egg/Types.h>
 #include <toadlet/egg/math/Math.h>
 #include <toadlet/egg/mathfixed/Math.h>
 

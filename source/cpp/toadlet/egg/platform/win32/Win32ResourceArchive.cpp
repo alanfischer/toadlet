@@ -107,7 +107,7 @@ void *Win32ResourceArchive::findResourceName(const String &name){
 	return (void*)resName;
 }
 
-bool Win32ResourceArchive::findResources(LPSTR type){
+bool Win32ResourceArchive::findResources(char *type){
 	return EnumResourceNames((HMODULE)mModule,type,&resourceFoundCallback,(LONG_PTR)this)>0;
 }
 

@@ -26,7 +26,6 @@
 #ifndef TOADLET_EGG_NET_SOCKET_H
 #define TOADLET_EGG_NET_SOCKET_H
 
-#include <toadlet/Types.h>
 #include <toadlet/egg/String.h>
 #include <toadlet/egg/Collection.h>
 #include <toadlet/egg/Object.h>

@@ -23,39 +23,23 @@
  *
  ********** Copyright header - do not remove **********/
 
-#ifndef TOADLET_EGG_UUID_H
-#define TOADLET_EGG_UUID_H
+#ifndef TOADLET_EGG_TYPES_H
+#define TOADLET_EGG_TYPES_H
 
-#include <toadlet/egg/Types.h>
-#include <toadlet/egg/String.h>
+#include <toadlet/Types.h>
 
 namespace toadlet{
 namespace egg{
 
-class TOADLET_API UUID{
-public:
-	UUID():highBits(0),lowBits(0){}
-	UUID(tbyte bytes[]){highBits=*(uint64*)(bytes+0);lowBits=*(uint64*)(bytes+8);}
-	UUID(uint64 highBits1,uint64 lowBits1):highBits(highBits1),lowBits(lowBits1){}
-	UUID(const String &string){fromString(string);}
+namespace io{};
+namespace net{};
+namespace math{};
+namespace mathfixed{};
 
-	bool fromRandom();
-	bool fromString(const String &string);
-	String toString();
-	
-	uint64 getHighBits() const{return highBits;}
-	uint64 getLowBits() const{return lowBits;}
-		
-	inline bool equals(const UUID &u2) const{return highBits==u2.highBits && lowBits==u2.lowBits;}
-
-	inline bool operator==(const UUID &u2) const{return equals(u2);}
-	inline bool operator!=(const UUID &u2) const{return !equals(u2);}
-
-	uint64 highBits,lowBits;
-};
+using namespace io;
+using namespace net;
 
 }
 }
 
 #endif
-

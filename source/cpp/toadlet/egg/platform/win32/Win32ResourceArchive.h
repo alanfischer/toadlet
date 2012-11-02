@@ -53,7 +53,7 @@ public:
 
 protected:
 	void *findResourceName(const String &name);
-	bool findResources(LPSTR type);
+	bool findResources(char *type);
 
 	void *mModule;
 	Collection<String>::ptr mEntries;

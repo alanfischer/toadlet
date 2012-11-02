@@ -30,9 +30,6 @@
 #include <toadlet/egg/Exception.h>
 #include <toadlet/egg/String.h>
 #include <toadlet/egg/StackTraceListener.h>
-#if !defined(TOADLET_PLATFORM_EMSCRIPTEN)
-	#include <toadlet/egg/ErrorHandler.h>
-#endif
 
 #if defined(TOADLET_EXCEPTIONS)
 	#define TOADLET_MAKE_ERROR_FUNCTION(name,type) \

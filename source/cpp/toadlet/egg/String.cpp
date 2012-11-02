@@ -28,7 +28,7 @@
 #include <stdio.h>
 #include <ctype.h>
 
-#if defined(TOADLET_PLATFORM_POSIX) || defined(TOADLET_PLATFORM_EMSCRIPTEN)
+#if defined(TOADLET_PLATFORM_POSIX)
 	#include <wchar.h>
 	#include <wctype.h>
 #endif

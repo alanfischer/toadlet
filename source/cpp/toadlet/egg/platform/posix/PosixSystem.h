@@ -26,7 +26,7 @@
 #ifndef TOADLET_EGG_POSIXSYSTEM_H
 #define TOADLET_EGG_POSIXSYSTEM_H
 
-#include <toadlet/Types.h>
+#include <toadlet/egg/Types.h>
 #include <toadlet/egg/String.h>
 #include <toadlet/egg/SystemCaps.h>
 

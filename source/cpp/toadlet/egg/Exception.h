@@ -26,7 +26,7 @@
 #ifndef TOADLET_EGG_EXCEPTION_H
 #define TOADLET_EGG_EXCEPTION_H
 
-#include <toadlet/Types.h>
+#include <toadlet/egg/Types.h>
 #include <toadlet/egg/String.h>
 
 #if defined(TOADLET_EXCEPTIONS)

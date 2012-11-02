@@ -26,7 +26,7 @@
 #ifndef TOADLET_EGG_MUTEX_H
 #define TOADLET_EGG_MUTEX_H
 
-#include <toadlet/Types.h>
+#include <toadlet/egg/Types.h>
 
 #if defined(TOADLET_PLATFORM_WIN32)
 	#include "platform/win32/Win32Mutex.h"

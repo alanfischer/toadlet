@@ -26,7 +26,7 @@
 #ifndef TOADLET_EGG_WIN32MUTEX_H
 #define TOADLET_EGG_WIN32MUTEX_H
 
-#include <toadlet/Types.h>
+#include <toadlet/egg/Types.h>
 #include <toadlet/egg/SharedPointer.h>
 
 namespace toadlet{

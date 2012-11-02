@@ -26,7 +26,7 @@
 #ifndef TOADLET_EGG_POSIXMUTEX_H
 #define TOADLET_EGG_POSIXMUTEX_H
 
-#include <toadlet/Types.h>
+#include <toadlet/egg/Types.h>
 #include <toadlet/egg/WeakPointer.h>
 #include <pthread.h>
 

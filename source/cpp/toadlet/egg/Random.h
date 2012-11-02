@@ -26,7 +26,7 @@
 #ifndef TOADLET_EGG_RANDOM_H
 #define TOADLET_EGG_RANDOM_H
 
-#include <toadlet/Types.h>
+#include <toadlet/egg/Types.h>
 #include <toadlet/egg/SharedPointer.h>
 
 namespace toadlet{

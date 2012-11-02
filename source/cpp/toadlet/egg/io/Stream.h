@@ -26,17 +26,11 @@
 #ifndef TOADLET_EGG_IO_STREAM_H
 #define TOADLET_EGG_IO_STREAM_H
 
-#include <toadlet/Types.h>
+#include <toadlet/egg/Types.h>
 #include <toadlet/egg/Interface.h>
 
 namespace toadlet{
 namespace egg{
-/// @todo: These should be put in an egg Types.h file
-namespace io{};
-using namespace io;
-namespace net{};
-using namespace net;
-
 namespace io{
 
 class Stream:public Interface{

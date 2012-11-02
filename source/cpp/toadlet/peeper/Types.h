@@ -26,7 +26,7 @@
 #ifndef TOADLET_PEEPER_TYPES_H
 #define TOADLET_PEEPER_TYPES_H
 
-#include <toadlet/Types.h>
+#include <toadlet/egg/Types.h>
 #include <toadlet/egg/mathfixed/Math.h>
 #include <toadlet/egg/math/Math.h>
 #include <toadlet/egg/SharedPointer.h>

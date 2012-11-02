@@ -259,10 +259,9 @@ void BSP30Map::updateFaceLights(int faceIndex){
 			}
 			else{
 				for(k=0;k<faced->lightmapSize[0];++k){
-					/// @todo: Optimize this so we dont need so many ifs, cant think it through right now with a screaming baby
-					int d0=d[0]+(((int)s[0]*intensities[i])>>8);if(d0>255)d0=255;d[0]=d0;
-					int d1=d[1]+(((int)s[1]*intensities[i])>>8);if(d1>255)d1=255;d[1]=d1;
-					int d2=d[2]+(((int)s[2]*intensities[i])>>8);if(d2>255)d2=255;d[2]=d2;
+					int d0=Math::intClamp(0,255,d[0]+(((int)s[0]*intensities[i])>>8));
+					int d1=Math::intClamp(0,255,d[1]+(((int)s[1]*intensities[i])>>8));
+					int d2=Math::intClamp(0,255,d[2]+(((int)s[2]*intensities[i])>>8));
 					d+=3,s+=3;
 				}
 			}
