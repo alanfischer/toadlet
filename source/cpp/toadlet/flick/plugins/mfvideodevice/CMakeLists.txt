@@ -17,7 +17,8 @@ if (TOADLET_BUILD_DYNAMIC)
 	set_target_properties (toadlet_flick_mfvideodevice PROPERTIES ${DYNAMIC_LIB_PROPS})
 	set_property (TARGET toadlet_flick_mfvideodevice APPEND PROPERTY COMPILE_DEFINITIONS ${MFVIDEODEVICE_DEFS})
 	target_link_libraries (toadlet_flick_mfvideodevice toadlet_flick ${MEDIAFOUNDATION_LIBRARIES})
-	install (TARGETS toadlet_flick_mfvideodevice DESTINATION ${LIB_INSTALL_DIR})
+	install (TARGETS toadlet_flick_mfvideodevice DESTINATION ${LIB_INSTALL_DIR} COMPONENT flick)
+	set (FLICK_INSTALL ${FLICK_INSTALL} toadlet_flick_mfvideodevice PARENT_SCOPE)
 endif (TOADLET_BUILD_DYNAMIC)
 
 # Static library
@@ -25,6 +26,7 @@ if (TOADLET_BUILD_STATIC)
 	add_library (toadlet_flick_mfvideodevice_s STATIC ${MFVIDEODEVICE_SRC} ${MFVIDEODEVICE_HDR})
 	set_target_properties (toadlet_flick_mfvideodevice_s PROPERTIES ${STATIC_LIB_PROPS})
 	target_link_libraries (toadlet_flick_mfvideodevice_s toadlet_flick_s)
-	install (TARGETS toadlet_flick_mfvideodevice_s DESTINATION ${LIB_INSTALL_DIR})
+	install (TARGETS toadlet_flick_mfvideodevice_s DESTINATION ${LIB_INSTALL_DIR} COMPONENT flick)
+	set (FLICK_INSTALL ${FLICK_INSTALL} toadlet_flick_mfvideodevice_s PARENT_SCOPE)
 endif (TOADLET_BUILD_STATIC)
 

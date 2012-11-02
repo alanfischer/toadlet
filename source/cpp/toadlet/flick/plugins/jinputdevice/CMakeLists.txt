@@ -21,7 +21,8 @@ if (TOADLET_BUILD_DYNAMIC)
 	add_library (toadlet_flick_jinputdevice SHARED ${FLICK_JINPUTDEVICE_SRC} ${FLICK_JINPUTDEVICE_HDR})
 	set_target_properties (toadlet_flick_jinputdevice PROPERTIES ${DYNAMIC_LIB_PROPS})
 	target_link_libraries (toadlet_flick_jinputdevice toadlet_flick)
-	install (TARGETS toadlet_flick_jinputdevice DESTINATION ${LIB_INSTALL_DIR})
+	install (TARGETS toadlet_flick_jinputdevice DESTINATION ${LIB_INSTALL_DIR} COMPONENT flick)
+	set (FLICK_INSTALL ${FLICK_INSTALL} toadlet_flick_jinputdevice PARENT_SCOPE)
 endif (TOADLET_BUILD_DYNAMIC)
 
 # Static library
@@ -29,6 +30,7 @@ if (TOADLET_BUILD_STATIC)
 	add_library (toadlet_flick_jinputdevice_s STATIC ${FLICK_JINPUTDEVICE_SRC} ${FLICK_JINPUTDEVICE_HDR})
 	set_target_properties (toadlet_flick_jinputdevice_s PROPERTIES ${STATIC_LIB_PROPS})
 	target_link_libraries (toadlet_flick_jinputdevice_s toadlet_flick_s)
-	install (TARGETS toadlet_flick_jinputdevice_s DESTINATION ${LIB_INSTALL_DIR})
+	install (TARGETS toadlet_flick_jinputdevice_s DESTINATION ${LIB_INSTALL_DIR} COMPONENT flick)
+	set (FLICK_INSTALL ${FLICK_INSTALL} toadlet_flick_jinputdevice_s PARENT_SCOPE)
 endif (TOADLET_BUILD_STATIC)
 

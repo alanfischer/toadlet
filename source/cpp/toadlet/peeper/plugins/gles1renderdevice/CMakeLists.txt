@@ -57,7 +57,8 @@ if (TOADLET_BUILD_DYNAMIC)
 	set_target_properties (toadlet_peeper_gles1renderdevice PROPERTIES ${DYNAMIC_LIB_PROPS})
 	set_property (TARGET toadlet_peeper_gles1renderdevice APPEND PROPERTY COMPILE_DEFINITIONS ${PEEPER_GLES1RENDERDEVICE_DEFS})
 	target_link_libraries (toadlet_peeper_gles1renderdevice toadlet_peeper ${PEEPER_GLES1RENDERDEVICE_LIBS})
-	install (TARGETS toadlet_peeper_gles1renderdevice DESTINATION ${LIB_INSTALL_DIR})
+	install (TARGETS toadlet_peeper_gles1renderdevice DESTINATION ${LIB_INSTALL_DIR} COMPONENT peeper)
+	set (PEEPER_INSTALL ${PEEPER_INSTALL} toadlet_peeper_gles1renderdevice PARENT_SCOPE)
 endif (TOADLET_BUILD_DYNAMIC)
 
 
@@ -68,11 +69,12 @@ if (TOADLET_BUILD_STATIC)
 	set_property (TARGET toadlet_peeper_gles1renderdevice_s APPEND PROPERTY COMPILE_DEFINITIONS ${PEEPER_GLES1RENDERDEVICE_DEFS})
 	target_link_libraries (toadlet_peeper_gles1renderdevice_s toadlet_peeper_s ${PEEPER_GLES1RENDERDEVICE_LIBS})
 	MERGE_STATIC_LIBRARIES (toadlet_peeper_gles1renderdevice_s "${PEEPER_GLES1RENDERDEVICE_LIBS_S}")
-	install (TARGETS toadlet_peeper_gles1renderdevice_s DESTINATION ${LIB_INSTALL_DIR})
+	install (TARGETS toadlet_peeper_gles1renderdevice_s DESTINATION ${LIB_INSTALL_DIR} COMPONENT peeper)
+	set (PEEPER_INSTALL ${PEEPER_INSTALL} toadlet_peeper_gles1renderdevice_s PARENT_SCOPE)
 
 	# HACK: install the library on iOS. This will disappear once cmake issue:0012506 is resolved. 
 	if (TOADLET_PLATFORM_IOS)
-	    install (DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/\$ENV{CONFIGURATION}\$ENV{EFFECTIVE_PLATFORM_NAME}/ DESTINATION ${LIB_INSTALL_DIR} FILES_MATCHING PATTERN "*.a")
+	    install (DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/\$ENV{CONFIGURATION}\$ENV{EFFECTIVE_PLATFORM_NAME}/ DESTINATION ${LIB_INSTALL_DIR} FILES_MATCHING PATTERN "*.a" COMPONENT peeper)
 	endif (TOADLET_PLATFORM_IOS)
 endif (TOADLET_BUILD_STATIC)
 

@@ -40,13 +40,13 @@ class TOADLET_API MFVideoDevice:public Object,public VideoDevice,public IMFSourc
 public:
 	TOADLET_OBJECT(MFVideoDevice);
 
-    STDMETHODIMP QueryInterface(REFIID iid, void** ppv);
-    STDMETHODIMP_(ULONG) AddRef();
-    STDMETHODIMP_(ULONG) Release();
+	STDMETHODIMP QueryInterface(REFIID iid, void** ppv);
+	STDMETHODIMP_(ULONG) AddRef();
+	STDMETHODIMP_(ULONG) Release();
 
-    STDMETHODIMP OnReadSample(HRESULT hrStatus,DWORD dwStreamIndex,DWORD dwStreamFlags,LONGLONG llTimestamp,IMFSample *pSample);
-    STDMETHODIMP OnEvent(DWORD, IMFMediaEvent *){return S_OK;}
-    STDMETHODIMP OnFlush(DWORD){return S_OK;}
+	STDMETHODIMP OnReadSample(HRESULT hrStatus,DWORD dwStreamIndex,DWORD dwStreamFlags,LONGLONG llTimestamp,IMFSample *pSample);
+	STDMETHODIMP OnEvent(DWORD, IMFMediaEvent *){return S_OK;}
+	STDMETHODIMP OnFlush(DWORD){return S_OK;}
 
 	MFVideoDevice();
 
