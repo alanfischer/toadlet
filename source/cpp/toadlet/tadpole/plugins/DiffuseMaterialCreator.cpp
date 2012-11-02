@@ -129,7 +129,7 @@ DiffuseMaterialCreator::DiffuseMaterialCreator(Engine *engine){
 		"void main(){\n"
 			"vec4 fragColor=color*(texture2D(tex,texCoord)+(1.0-textureSet));\n"
 			"gl_FragColor=mix(fogColor,fragColor,fog);\n"
-		"}",
+		"}\n",
 
 
 
@@ -148,7 +148,7 @@ DiffuseMaterialCreator::DiffuseMaterialCreator(Engine *engine){
 		"float4 main(PIN pin): SV_TARGET{\n"
 			"float4 fragColor=pin.color*(tex.Sample(samp,pin.texCoord)+(1.0-textureSet));\n"
 			"return lerp(fogColor,fragColor,pin.fog);\n"
-		"}"
+		"}\n"
 	};
 
 	String pointSpriteGeometryCode[]={
@@ -195,7 +195,7 @@ DiffuseMaterialCreator::DiffuseMaterialCreator(Engine *engine){
 				"stream.Append(gout);\n"
 			"}\n"
 			"stream.RestartStrip();\n"
-		"}"
+		"}\n"
 	};
 
 	String pointSpriteFragmentCode[]={
@@ -215,7 +215,7 @@ DiffuseMaterialCreator::DiffuseMaterialCreator(Engine *engine){
 		"void main(){\n"
 			"vec4 fragColor=color*(texture2D(tex,gl_PointCoord)+(1.0-textureSet));\n"
 			"gl_FragColor=mix(fogColor,fragColor,fog);\n"
-		"}",
+		"}\n",
 
 
 
@@ -234,13 +234,21 @@ DiffuseMaterialCreator::DiffuseMaterialCreator(Engine *engine){
 		"float4 main(PIN pin): SV_TARGET{\n"
 			"float4 fragColor=pin.color*(tex.Sample(samp,pin.texCoord)+(1.0-textureSet));\n"
 			"return lerp(fogColor,fragColor,pin.fog);\n"
-		"}"
+		"}\n"
 	};
 
-	mDiffuseVertexShader=mEngine->getShaderManager()->createShader(Shader::ShaderType_VERTEX,profiles,diffuseVertexCode,2);
-	mDiffuseFragmentShader=mEngine->getShaderManager()->createShader(Shader::ShaderType_FRAGMENT,profiles,diffuseFragmentCode,2);
-	mPointSpriteGeometryShader=mEngine->getShaderManager()->createShader(Shader::ShaderType_GEOMETRY,profiles,pointSpriteGeometryCode,2);
-	mPointSpriteFragmentShader=mEngine->getShaderManager()->createShader(Shader::ShaderType_FRAGMENT,profiles,pointSpriteFragmentCode,2);
+	TOADLET_TRY
+		mDiffuseVertexShader=mEngine->getShaderManager()->createShader(Shader::ShaderType_VERTEX,profiles,diffuseVertexCode,2);
+	TOADLET_CATCH_ANONYMOUS(){}
+	TOADLET_TRY
+		mDiffuseFragmentShader=mEngine->getShaderManager()->createShader(Shader::ShaderType_FRAGMENT,profiles,diffuseFragmentCode,2);
+	TOADLET_CATCH_ANONYMOUS(){}
+	TOADLET_TRY
+		mPointSpriteGeometryShader=mEngine->getShaderManager()->createShader(Shader::ShaderType_GEOMETRY,profiles,pointSpriteGeometryCode,2);
+	TOADLET_CATCH_ANONYMOUS(){}
+	TOADLET_TRY
+		mPointSpriteFragmentShader=mEngine->getShaderManager()->createShader(Shader::ShaderType_FRAGMENT,profiles,pointSpriteFragmentCode,2);
+	TOADLET_CATCH_ANONYMOUS(){}
 
 	mDiffuseShaderState=mEngine->getMaterialManager()->createShaderState();
 	if(mDiffuseShaderState!=NULL){
@@ -272,6 +280,15 @@ void DiffuseMaterialCreator::destroy(){
 	if(mPointSpriteFragmentShader!=NULL){
 		mPointSpriteFragmentShader->destroy();
 		mPointSpriteFragmentShader=NULL;
+	}
+
+	if(mDiffuseShaderState!=NULL){
+		mDiffuseShaderState->destroy();
+		mDiffuseShaderState=NULL;
+	}
+	if(mPointShaderState!=NULL){
+		mPointShaderState->destroy();
+		mPointShaderState=NULL;
 	}
 }
 

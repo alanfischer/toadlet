@@ -300,7 +300,7 @@ void SimpleRenderManager::setupTextures(RenderPass *pass,int scope,RenderDevice 
 		for(i=0;i<pass->getNumTextures((Shader::ShaderType)j);++i){
 			device->setTexture((Shader::ShaderType)j,i,pass->getTexture((Shader::ShaderType)j,i));
 		}
-		if(mLastPass!=NULL){ /// @todo: Only do this if we're rendering a fixed function pass
+		if(pass->getShaderState()==NULL && mLastPass!=NULL){
 			for(;i<mLastPass->getNumTextures((Shader::ShaderType)j);++i){
 				device->setTexture((Shader::ShaderType)j,i,NULL);
 			}

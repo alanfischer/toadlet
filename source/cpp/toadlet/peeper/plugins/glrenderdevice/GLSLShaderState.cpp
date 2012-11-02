@@ -62,6 +62,7 @@ void GLSLShaderState::destroy(){
 
 	if(mDevice!=NULL){
 		mDevice->shaderStateDestroyed(this);
+		mDevice=NULL;
 	}
 
 	int i;

@@ -447,7 +447,7 @@ bool StudioModelComponent::getAttachmentTransform(Transform &result,int index){
 	result.setTranslate(translate);
 
 	Quaternion attachmentRotate;
-	Math::setQuaternionFromAxes(attachmentRotate,attachment->vectors[0],attachment->vectors[1],attachment->vectors[2]); /// @todo: Would it work to use setQuaternionFromMatrix with the vector array as a matrix?
+	Math::setQuaternionFromAxes(attachmentRotate,attachment->vectors[0],attachment->vectors[1],attachment->vectors[2]);
 	Math::postMul(rotate,attachmentRotate);
 	result.setRotate(rotate);
 

@@ -75,7 +75,7 @@ public:
 	bool getTextureState(Shader::ShaderType type,int i,TextureState &state){return mRenderState->getTextureState(type,i,state);}
 
 	void setShader(Shader::ShaderType type,Shader *shader);
-	Shader *getShader(Shader::ShaderType type){return mShaderState->getShader(type);}
+	Shader *getShader(Shader::ShaderType type){return mShaderState!=NULL?mShaderState->getShader(type):NULL;}
 
 	int getNumTextures(Shader::ShaderType type=Shader::ShaderType_FRAGMENT) const{return mTextures[type].size();}
 	void setTexture(const String &name,Texture *texture,const String &samplerName,const SamplerState &samplerState,const TextureState &textureState);

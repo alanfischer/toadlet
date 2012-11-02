@@ -42,6 +42,7 @@ RenderPass::RenderPass(MaterialManager *manager,RenderState *renderState,ShaderS
 	//mVariables,
 {
 	mManager=manager;
+
 	if(renderState==NULL){
 		if(manager!=NULL){
 			mRenderState=manager->createRenderState();
@@ -54,16 +55,8 @@ RenderPass::RenderPass(MaterialManager *manager,RenderState *renderState,ShaderS
 	else{
 		mRenderState=renderState;
 	}
-	if(shaderState==NULL){
-		if(manager!=NULL){
-			mShaderState=manager->createShaderState();
-		}
-		else{
-			mShaderState=new BackableShaderState();
-		}
-		mOwnShaderState=mShaderState;
-	}
-	else{
+
+	if(shaderState!=NULL){
 		mShaderState=shaderState;
 	}
 }
@@ -123,7 +116,13 @@ void RenderPass::setTexture(Shader::ShaderType type,int i,Texture *texture,const
 
 void RenderPass::setShader(Shader::ShaderType type,Shader *shader){
 	if(mShaderState==NULL){
-		return;
+		if(mManager!=NULL){
+			mShaderState=mManager->createShaderState();
+		}
+		else{
+			mShaderState=new BackableShaderState();
+		}
+		mOwnShaderState=mShaderState;
 	}
 	
 	mShaderState->setShader(type,shader);

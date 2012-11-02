@@ -3,7 +3,7 @@
 
 #if 0 && ANDROID_NDK_API_LEVEL>=9
 extern "C" JNIEXPORT void ANativeActivity_onCreate(ANativeActivity *activity,void *savedState,size_t savedStateSize){
-	Logger::alert("ANativeActivity_onCreate");
+	Log::alert("ANativeActivity_onCreate");
 
 	AndroidApplication *app=new AndroidApplication();
 	app->setApplet(new RandIsle(app,""));
@@ -11,10 +11,10 @@ extern "C" JNIEXPORT void ANativeActivity_onCreate(ANativeActivity *activity,voi
 }
 #else
 extern "C" JNIEXPORT jobject JNICALL Java_us_toadlet_randisle_RandIsle_createApplet(JNIEnv *env,jobject obj){
-	Logger::alert("getting Application");
+	Log::alert("getting Application");
 	Application *app=new JApplication(env,obj);
 
-	Logger::alert("creating applet");
+	Log::alert("creating applet");
 	Applet *applet=new RandIsle(app,"");
 
 	jobject appletObj=NULL;
