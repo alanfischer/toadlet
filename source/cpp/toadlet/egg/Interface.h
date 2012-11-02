@@ -26,7 +26,7 @@
 #ifndef TOADLET_EGG_INTERFACE_H
 #define TOADLET_EGG_INTERFACE_H
 
-#include <toadlet/Types.h>
+#include <toadlet/egg/Types.h>
 #include <toadlet/egg/IntrusivePointer.h>
 
 namespace toadlet{

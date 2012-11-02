@@ -26,7 +26,7 @@
 #ifndef TOADLET_EGG_MATH_INLINE_H
 #define TOADLET_EGG_MATH_INLINE_H
 
-#include <toadlet/Types.h>
+#include <toadlet/egg/Types.h>
 
 #define TOADLET_REAL	float
 

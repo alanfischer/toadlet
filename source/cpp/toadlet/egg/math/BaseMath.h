@@ -26,7 +26,6 @@
 #ifndef TOADLET_EGG_MATH_BASEMATH_H
 #define TOADLET_EGG_MATH_BASEMATH_H
 
-#include <toadlet/Types.h>
 #include <toadlet/egg/math/Inline.h>
 
 #if defined(TOADLET_PLATFORM_OSX)

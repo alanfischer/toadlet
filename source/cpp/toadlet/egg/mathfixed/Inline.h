@@ -26,7 +26,7 @@
 #ifndef TOADLET_EGG_MATHFIXED_INLINE_H
 #define TOADLET_EGG_MATHFIXED_INLINE_H
 
-#include <toadlet/Types.h>
+#include <toadlet/egg/Types.h>
 
 #define TOADLET_FIXED	int
 #define TOADLET_LONG	toadlet::int64

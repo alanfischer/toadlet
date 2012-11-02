@@ -26,7 +26,6 @@
 #ifndef TOADLET_EGG_MATHFIXED_BASEMATH_H
 #define TOADLET_EGG_MATHFIXED_BASEMATH_H
 
-#include <toadlet/Types.h>
 #include <toadlet/egg/mathfixed/Inline.h>
 
 #if defined(TOADLET_REPORT_OVERFLOWS)

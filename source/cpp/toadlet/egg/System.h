@@ -26,7 +26,7 @@
 #ifndef TOADLET_EGG_SYSTEM_H
 #define TOADLET_EGG_SYSTEM_H
 
-#include <toadlet/Types.h>
+#include <toadlet/egg/Types.h>
 
 #if defined(TOADLET_PLATFORM_WIN32)
 	#include "platform/win32/Win32System.h"
@@ -35,7 +35,7 @@
 		typedef Win32System System;
 	}
 	}
-#elif defined(TOADLET_PLATFORM_POSIX) || defined(TOADLET_PLATFORM_EMSCRIPTEN)
+#elif defined(TOADLET_PLATFORM_POSIX)
 	#include "platform/posix/PosixSystem.h"
 	namespace toadlet{
 	namespace egg{

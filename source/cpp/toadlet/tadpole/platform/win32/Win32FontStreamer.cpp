@@ -104,7 +104,9 @@ Resource::ptr Win32FontStreamer::load(Stream::ptr stream,ResourceData *data,Prog
 		DWORD amount=0;
 		HANDLE handle=AddFontMemResourceEx(memoryStream->getOriginalDataPointer(),memoryStream->length(),0,&amount);
 	#else
-		/// @todo: Implement this
+		Error::unimplemented(Categories::TOADLET_TADPOLE,
+			"loading font resource unimplemented");
+		return NULL;
 	#endif
 
 	HDC dc=GetDC(NULL);

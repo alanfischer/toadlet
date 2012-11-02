@@ -26,7 +26,7 @@
 #ifndef TOADLET_EGG_POINTERCOUNTER_H
 #define TOADLET_EGG_POINTERCOUNTER_H
 
-#include <toadlet/Types.h>
+#include <toadlet/egg/Types.h>
 
 namespace toadlet{
 namespace egg{

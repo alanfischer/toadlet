@@ -26,7 +26,7 @@
 #ifndef TOADLET_EGG_THREAD_H
 #define TOADLET_EGG_THREAD_H
 
-#include <toadlet/Types.h>
+#include <toadlet/egg/Types.h>
 
 #if defined(TOADLET_PLATFORM_WIN32)
 	#include <toadlet/egg/platform/win32/Win32Thread.h>

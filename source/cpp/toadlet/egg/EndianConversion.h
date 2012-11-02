@@ -26,7 +26,7 @@
 #ifndef TOADLET_EGG_ENDIANCONVERSION_H
 #define TOADLET_EGG_ENDIANCONVERSION_H
 
-#include <toadlet/Types.h>
+#include <toadlet/egg/Types.h>
 
 namespace toadlet{
 namespace egg{

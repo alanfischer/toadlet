@@ -26,7 +26,7 @@
 #ifndef TOADLET_EGG_WIN32ERRORHANDLER_H
 #define TOADLET_EGG_WIN32ERRORHANDLER_H
 
-#include <toadlet/Types.h>
+#include <toadlet/egg/Types.h>
 #include <toadlet/egg/StackTraceListener.h>
 #include <windows.h>
 #include "Win32ErrorHandler_dbghelp.h"
