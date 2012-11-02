@@ -68,7 +68,7 @@ WaterMaterialCreator::WaterMaterialCreator(Engine *engine){
 			"refractPosition.z = gl_Position.w;\n"
 			"refractPosition.w = 1.0;\n"
 
-			"vec2 windVector=vec2(0,0.1);"
+			"vec2 windVector=vec2(0,0.1);\n"
 			"float waveLength=0.1;\n"
 			"bumpPosition=TEXCOORD0/waveLength + time*windVector;\n"
 
@@ -76,7 +76,7 @@ WaterMaterialCreator::WaterMaterialCreator(Engine *engine){
 			// We calcaulate a separate refractFog, stored in positionFull.w, since the refractTex shows artifacts closer than the far plane
 			//  due to not being able to use fog in an oblique frustum
 			"positionFull.w=clamp(1.0-(gl_Position.z-fogDistance.x/4.0)/(fogDistance.y/4.0-fogDistance.x/4.0),0.0,1.0);\n"
-		"}",
+		"}\n",
 
 
 																	  
@@ -114,7 +114,7 @@ WaterMaterialCreator::WaterMaterialCreator(Engine *engine){
 			"vout.refractPosition.z = vout.position.w;\n"
 			"vout.refractPosition.w=1.0;\n"
 
-			"float2 windVector=float2(0,0.1f);"
+			"float2 windVector=float2(0,0.1f);\n"
 			"float waveLength=0.1f;\n"
 			"vout.bumpPosition=vin.texCoord/waveLength + time*windVector;\n"
 
@@ -123,7 +123,8 @@ WaterMaterialCreator::WaterMaterialCreator(Engine *engine){
 			//  due to not being able to use fog in an oblique frustum
 			"vout.positionFull.w=clamp(1.0-(vout.position.z-fogDistance.x/4.0)/(fogDistance.y/4.0-fogDistance.x/4.0),0.0,1.0);\n"
 
-			"return vout;\n""}"
+			"return vout;\n"
+		"}\n"
 	};
 
 	String fragmentCodes[]={
@@ -178,7 +179,7 @@ WaterMaterialCreator::WaterMaterialCreator(Engine *engine){
 
 			"fragColor.w=1.0;\n"
 			"gl_FragColor=mix(fogColor,fragColor,fog);\n"
-		"}",
+		"}\n",
 
 
 
@@ -233,7 +234,7 @@ WaterMaterialCreator::WaterMaterialCreator(Engine *engine){
 
 			"fragColor.w=1.0;\n"
 			"return lerp(fogColor,fragColor,pin.fog);\n"
-		"}"
+		"}\n"
 	};
 
 	mVertexShader=engine->getShaderManager()->createShader(Shader::ShaderType_VERTEX,profiles,vertexCodes,2);

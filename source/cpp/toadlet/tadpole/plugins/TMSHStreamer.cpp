@@ -238,7 +238,6 @@ void TMSHStreamer::writeMesh(DataStream *stream,Mesh::ptr mesh){
 	}
 }
 
-/// @todo: This format should only store an AABox for each mesh bound, not a full thing
 Bound::ptr TMSHStreamer::readBound(DataStream *stream){
 	Bound::Type type=(Bound::Type)stream->readInt32();
 	if(type==Bound::Type_EMPTY){

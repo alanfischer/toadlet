@@ -65,11 +65,12 @@ void GLVertexFormat::destroy(){
 	mGLDataTypes.clear();
 	mGLElementCounts.clear();
 
-	BaseResource::destroy();
-
 	if(mDevice!=NULL){
 		mDevice->vertexFormatDestroyed(this);
+		mDevice=NULL;
 	}
+
+	BaseResource::destroy();
 }
 
 bool GLVertexFormat::addElement(int semantic,const String &name,int index,int format){

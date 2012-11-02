@@ -61,11 +61,12 @@ void D3D10VertexFormat::destroy(){
 	mOffsets.clear();
 	mElements.clear();
 
-	BaseResource::destroy();
-
 	if(mDevice!=NULL){
 		mDevice->vertexFormatDestroyed(this);
+		mDevice=NULL;
 	}
+
+	BaseResource::destroy();
 }
 
 bool D3D10VertexFormat::addElement(int semantic,const String &name,int index,int format){
