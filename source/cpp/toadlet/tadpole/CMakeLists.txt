@@ -730,13 +730,17 @@ if (SWIG_FOUND AND TADPOLE_SWIG_INT)
 endif (SWIG_FOUND AND TADPOLE_SWIG_INT)
 
 
+# For individual component installation 
+set (TADPOLE_INSTALL)
+
+
 # Dynamic library
 if (TOADLET_BUILD_DYNAMIC)
 	add_library (toadlet_tadpole SHARED ${TADPOLE_SRC} ${TADPOLE_HDR})
 	set_target_properties (toadlet_tadpole PROPERTIES ${DYNAMIC_LIB_PROPS})
-
 	target_link_libraries (toadlet_tadpole toadlet_egg toadlet_peeper toadlet_ribbit ${TADPOLE_LIBS} ${TADPOLE_PLUGINS_LIBS})
-	install (TARGETS toadlet_tadpole DESTINATION ${LIB_INSTALL_DIR})
+	install (TARGETS toadlet_tadpole DESTINATION ${LIB_INSTALL_DIR} COMPONENT tadpole)
+	set (TADPOLE_INSTALL ${TADPOLE_INSTALL} toadlet_tadpole)
 endif (TOADLET_BUILD_DYNAMIC)
 
 
@@ -746,11 +750,22 @@ if (TOADLET_BUILD_STATIC)
 	set_target_properties (toadlet_tadpole_s PROPERTIES ${STATIC_LIB_PROPS})
 	target_link_libraries (toadlet_tadpole_s toadlet_egg_s toadlet_peeper_s toadlet_ribbit_s ${TADPOLE_LIBS})
 	MERGE_STATIC_LIBRARIES (toadlet_tadpole_s "${TADPOLE_PLUGINS_LIBS_S}")
-	install (TARGETS toadlet_tadpole_s DESTINATION ${LIB_INSTALL_DIR})
+	install (TARGETS toadlet_tadpole_s DESTINATION ${LIB_INSTALL_DIR} COMPONENT tadpole)
+	set (TADPOLE_INSTALL ${TADPOLE_INSTALL} toadlet_tadpole_s)
 
 	# HACK: install the library on iOS. This will disappear once cmake issue:0012506 is resolved. 
 	if (TOADLET_PLATFORM_IOS)
-	    install (DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/\$ENV{CONFIGURATION}\$ENV{EFFECTIVE_PLATFORM_NAME}/ DESTINATION ${LIB_INSTALL_DIR} FILES_MATCHING PATTERN "*.a")
+	    install (DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/\$ENV{CONFIGURATION}\$ENV{EFFECTIVE_PLATFORM_NAME}/ DESTINATION ${LIB_INSTALL_DIR} FILES_MATCHING PATTERN "*.a" COMPONENT tadpole)
 	endif (TOADLET_PLATFORM_IOS)
 endif (TOADLET_BUILD_STATIC)
 
+
+# Rule to install only tadpole
+add_custom_target (tadpole_install
+	COMMAND ${CMAKE_COMMAND} -DCOMPONENT=required -P ${PROJECT_BINARY_DIR}/cmake_install.cmake
+	COMMAND ${CMAKE_COMMAND} -DCOMPONENT=egg -P ${PROJECT_BINARY_DIR}/cmake_install.cmake
+	COMMAND ${CMAKE_COMMAND} -DCOMPONENT=peeper -P ${PROJECT_BINARY_DIR}/cmake_install.cmake
+	COMMAND ${CMAKE_COMMAND} -DCOMPONENT=ribbit -P ${PROJECT_BINARY_DIR}/cmake_install.cmake
+	COMMAND ${CMAKE_COMMAND} -DCOMPONENT=tadpole -P ${PROJECT_BINARY_DIR}/cmake_install.cmake
+	DEPENDS ${TADPOLE_INSTALL}
+)
