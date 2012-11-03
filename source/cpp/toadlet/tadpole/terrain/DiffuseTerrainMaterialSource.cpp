@@ -335,7 +335,7 @@ Material::ptr DiffuseTerrainMaterialSource::getMaterial(TerrainPatchComponent *p
 			variables->addVariable("fogColor",RenderVariable::ptr(new FogColorVariable()),Material::Scope_MATERIAL);
 
 			variables->addTexture("tex",mDiffuseTextures[i],"samp",SamplerState(),diffuseState);
-			variables->addTexture("detailTex",mDetailTexture,"detailSamp",clampState,detailState);
+			variables->addTexture("detailTex",mDetailTexture,"detailSamp",SamplerState(),detailState);
 			variables->addTexture("layerTex",patch->getLayerTexture(i),"layerSamp",clampState,layerState);
 		}
 	}
