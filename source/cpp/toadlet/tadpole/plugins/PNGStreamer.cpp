@@ -187,7 +187,7 @@ Resource::ptr PNGStreamer::load(Stream::ptr stream,ResourceData *data,ProgressLi
 		break;
 	}
 
-	TextureFormat::ptr textureFormat(new TextureFormat(TextureFormat::Dimension_D2,pixelFormat,width,height,1,0));
+	TextureFormat::ptr textureFormat=new TextureFormat(TextureFormat::Dimension_D2,pixelFormat,width,height,1,0);
 	tbyte *textureData=new tbyte[textureFormat->getDataSize()];
 	int textureXPitch=textureFormat->getXPitch();
 	for(y=0;y<height;++y){

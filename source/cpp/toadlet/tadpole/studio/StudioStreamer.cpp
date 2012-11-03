@@ -182,7 +182,7 @@ void StudioStreamer::buildMaterials(StudioModel *model){
 }
 
 Texture::ptr StudioStreamer::createTexture(studiotexture *t,tbyte *data,tbyte *pal){
-	TextureFormat::ptr textureFormat(new TextureFormat(TextureFormat::Dimension_D2,TextureFormat::Format_RGB_8,t->width,t->height,1,0));
+	TextureFormat::ptr textureFormat=new TextureFormat(TextureFormat::Dimension_D2,TextureFormat::Format_RGB_8,t->width,t->height,1,0);
 	tbyte *textureData=new tbyte[textureFormat->getDataSize()];
 
 	int i,j;

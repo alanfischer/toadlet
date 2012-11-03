@@ -337,7 +337,7 @@ bool TerrainPatchComponent::setLayerData(tbyte *data,int rowPitch,int width,int 
 		}
 
 		if(totalWeight!=0){
-			TextureFormat::ptr textureFormat(new TextureFormat(TextureFormat::Dimension_D2,TextureFormat::Format_A_8,width*2,height*2,1,1));
+			TextureFormat::ptr textureFormat=new TextureFormat(TextureFormat::Dimension_D2,TextureFormat::Format_A_8,width*2,height*2,1,1);
 			mLayerTextures[k]=mEngine->getTextureManager()->createTexture(Texture::Usage_BIT_STREAM,textureFormat,tdata);
 		}
 	}
@@ -401,7 +401,7 @@ bool TerrainPatchComponent::stitchToRight(TerrainPatchComponent *terrain,bool re
 	{
 		Collection<tbyte> textureData(2*mSize*2);
 		tbyte *tdata=&textureData[0];
-		TextureFormat::ptr stitchFormat(new TextureFormat(TextureFormat::Dimension_D2,TextureFormat::Format_A_8,2,mSize*2,1,1));
+		TextureFormat::ptr stitchFormat=new TextureFormat(TextureFormat::Dimension_D2,TextureFormat::Format_A_8,2,mSize*2,1,1);
 		stitchFormat->setOrigin(mSize*2-2,0,0);
 
 		// Start from 1, since the 0th LayerTexture is never used. (It is first pass, no blending)
@@ -528,7 +528,7 @@ bool TerrainPatchComponent::stitchToBottom(TerrainPatchComponent *terrain,bool r
 	{
 		Collection<tbyte> textureData(2*mSize*2);
 		tbyte *tdata=&textureData[0];
-		TextureFormat::ptr stitchFormat(new TextureFormat(TextureFormat::Dimension_D2,TextureFormat::Format_A_8,mSize*2,2,1,1));
+		TextureFormat::ptr stitchFormat=new TextureFormat(TextureFormat::Dimension_D2,TextureFormat::Format_A_8,mSize*2,2,1,1);
 		stitchFormat->setOrigin(0,mSize*2-2,0);
 		int textureRowPitch=mSize*2;
 

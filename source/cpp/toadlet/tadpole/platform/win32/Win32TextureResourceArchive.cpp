@@ -75,7 +75,7 @@ Resource::ptr Win32TextureResourceArchive::openResource(const String &name){
 		return NULL;
 	}
 	
-	TextureFormat::ptr textureFormat(new TextureFormat(TextureFormat::Dimension_D2,texturePixelFormat,textureWidth,textureHeight,0,0));
+	TextureFormat::ptr textureFormat=new TextureFormat(TextureFormat::Dimension_D2,texturePixelFormat,textureWidth,textureHeight,0,0);
 	tbyte *textureData=new tbyte[textureFormat->getDataSize()];
 
 	int textureStride=textureFormat->getXPitch();

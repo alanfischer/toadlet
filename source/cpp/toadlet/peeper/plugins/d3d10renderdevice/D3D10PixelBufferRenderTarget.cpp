@@ -135,8 +135,8 @@ bool D3D10PixelBufferRenderTarget::compile(){
 
 	if(color!=NULL && depth==NULL){
 		// No Depth-Stencil surface, so add one
-		D3D10TextureMipPixelBuffer::ptr buffer(new D3D10TextureMipPixelBuffer(mDevice));
-		TextureFormat::ptr format(new TextureFormat(TextureFormat::Dimension_D2,TextureFormat::Format_DEPTH_16,mWidth,mHeight,1,1));
+		D3D10TextureMipPixelBuffer::ptr buffer=new D3D10TextureMipPixelBuffer(mDevice);
+		TextureFormat::ptr format=new TextureFormat(TextureFormat::Dimension_D2,TextureFormat::Format_DEPTH_16,mWidth,mHeight,1,1);
 		if(buffer->create(Buffer::Usage_BIT_STREAM,Buffer::Access_NONE,format)){
 			attach(buffer,Attachment_DEPTH_STENCIL);
 			mDepthBuffer=buffer;

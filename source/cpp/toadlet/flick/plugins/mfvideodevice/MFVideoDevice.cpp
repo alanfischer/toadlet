@@ -286,7 +286,7 @@ TextureFormat::ptr MFVideoDevice::getTextureFormat(IMFMediaType *type){
 		hr=MFGetStrideForBitmapInfoHeader(subtype.Data1,width,&stride);
 	}
 	if(SUCCEEDED(hr)){
-		format=TextureFormat::ptr(new TextureFormat(TextureFormat::Dimension_D2,pixelFormat,width,height,1,1));
+		format=new TextureFormat(TextureFormat::Dimension_D2,pixelFormat,width,height,1,1);
 		format->setPitches(-stride,stride*height,stride*height);
 	}
 

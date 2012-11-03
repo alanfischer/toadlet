@@ -323,7 +323,7 @@ Resource::ptr GIFStreamer::load(Stream::ptr stream,ResourceData *data,ProgressLi
 
 	Collection<tbyte*> images;
 	Collection<int> delays;
-	TextureFormat *format=NULL;
+	TextureFormat::ptr format=NULL;
 	tbyte *image=NULL,*base=NULL,*working=NULL;
 	int delay=0;
 	int result=0;

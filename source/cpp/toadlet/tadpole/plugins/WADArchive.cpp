@@ -111,11 +111,11 @@ Texture::ptr WADArchive::createTexture(toadlet::tadpole::TextureManager *texture
 		pixelFormat=TextureFormat::Format_RGBA_8;
 	}
 
-	TextureFormat::ptr textureFormat(new TextureFormat(TextureFormat::Dimension_D2,pixelFormat,width,height,1,4));
+	TextureFormat::ptr textureFormat=new TextureFormat(TextureFormat::Dimension_D2,pixelFormat,width,height,1,4);
 	tbyte *mipDatas[4];
 	int mipLevel;
 	for(mipLevel=0;mipLevel<4;++mipLevel){
-		TextureFormat::ptr mipFormat(new TextureFormat(textureFormat,mipLevel));
+		TextureFormat::ptr mipFormat=new TextureFormat(textureFormat,mipLevel);
 		mipDatas[mipLevel]=new tbyte[mipFormat->getDataSize()];
 
 		tbyte *src=(tbyte*)miptex + littleInt32(miptex->offsets[mipLevel]);

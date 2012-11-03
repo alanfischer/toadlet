@@ -23,7 +23,7 @@ void ARToadlet::create(){
 
 	int width=mVideoCapture->get(CV_CAP_PROP_FRAME_WIDTH);
 	int height=mVideoCapture->get(CV_CAP_PROP_FRAME_HEIGHT);
-	mTextureFormat=TextureFormat::ptr(new TextureFormat(TextureFormat::Dimension_D2,TextureFormat::Format_BGR_8,width,height,1,1));
+	mTextureFormat=new TextureFormat(TextureFormat::Dimension_D2,TextureFormat::Format_BGR_8,width,height,1,1);
 
 	mDetector=SharedPointer<aruco::MarkerDetector>(new aruco::MarkerDetector());
 	mDetector->setCornerRefinementMethod(aruco::MarkerDetector::LINES);

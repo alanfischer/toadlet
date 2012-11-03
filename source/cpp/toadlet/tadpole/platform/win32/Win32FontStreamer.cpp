@@ -257,7 +257,7 @@ Resource::ptr Win32FontStreamer::load(Stream::ptr stream,ResourceData *data,Prog
 		GdiFlush();
 	#endif
 
-	TextureFormat::ptr textureFormat(new TextureFormat(TextureFormat::Dimension_D2,TextureFormat::Format_LA_8,textureWidth,textureHeight,1,0));	
+	TextureFormat::ptr textureFormat=new TextureFormat(TextureFormat::Dimension_D2,TextureFormat::Format_LA_8,textureWidth,textureHeight,1,0);
 	tbyte *textureData=new tbyte[textureFormat->getDataSize()];
 	int textureStride=textureFormat->getXPitch();
 	int bitmapStride=((textureWidth*2+sizeof(DWORD)-1)>>2)<<2; // stride is in DWORDs

@@ -51,7 +51,7 @@ BSP30Map::BSP30Map(Engine *engine):
 
 	this->engine=engine;
 
-	lightmapFormat=TextureFormat::ptr(new TextureFormat(TextureFormat::Dimension_D2,TextureFormat::Format_RGB_8,LIGHTMAP_SIZE,LIGHTMAP_SIZE,1,0));
+	lightmapFormat=new TextureFormat(TextureFormat::Dimension_D2,TextureFormat::Format_RGB_8,LIGHTMAP_SIZE,LIGHTMAP_SIZE,1,0);
 	lightmapData=new tbyte[lightmapFormat->getDataSize()];
 
 	memset(styleIntensities,255,sizeof(styleIntensities));

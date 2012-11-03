@@ -128,7 +128,7 @@ bool TextureManager::textureLoad(Texture::ptr texture,TextureFormat *format,tbyt
 		result=texture->load(format,data);
 	}
 	else{
-		TextureFormat::ptr newFormat(new TextureFormat(format));
+		TextureFormat::ptr newFormat=new TextureFormat(format);
 		newFormat->setPixelFormat(texture->getFormat()->getPixelFormat());
 		tbyte *newData=new tbyte[newFormat->getDataSize()];
 		TextureFormatConversion::convert(data,format,newData,newFormat);

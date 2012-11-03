@@ -90,7 +90,7 @@ void SpriteStreamer::buildMaterials(SpriteModel *model){
 }
 
 Texture::ptr SpriteStreamer::createTexture(spriteframe *f,tbyte *data,tbyte *pal){
-	TextureFormat::ptr textureFormat(new TextureFormat(TextureFormat::Dimension_D2,TextureFormat::Format_RGBA_8,f->width,f->height,1,0));
+	TextureFormat::ptr textureFormat=new TextureFormat(TextureFormat::Dimension_D2,TextureFormat::Format_RGBA_8,f->width,f->height,1,0);
 	tbyte *textureData=new tbyte[textureFormat->getDataSize()];
 
 	int i,j;
