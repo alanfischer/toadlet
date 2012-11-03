@@ -29,7 +29,7 @@ namespace toadlet{
 namespace tadpole{
 
 Texture::ptr NormalizationTextureCreator::createNormalizationTexture(int size){
-	TextureFormat::ptr format(new TextureFormat(TextureFormat::Dimension_CUBE,TextureFormat::Format_RGB_8,size,size,TextureFormat::CubeSide_MAX,1));
+	TextureFormat::ptr format=new TextureFormat(TextureFormat::Dimension_CUBE,TextureFormat::Format_RGB_8,size,size,TextureFormat::CubeSide_MAX,1);
 	tbyte *data=new tbyte[format->getDataSize()];
 
 	Vector3 HALF_VECTOR3(Math::HALF,Math::HALF,Math::HALF);

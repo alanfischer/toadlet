@@ -165,8 +165,10 @@ void ALAudioDevice::destroy(){
 	Log::alert(Categories::TOADLET_RIBBIT,
 		"destroying ALAudioDevice");
 
-	alcMakeContextCurrent(mContext);
-	TOADLET_CHECK_ALERROR("alcMakeContextCurrent");
+	if(mContext!=NULL){
+		alcMakeContextCurrent(mContext);
+		TOADLET_CHECK_ALERROR("alcMakeContextCurrent");
+	}
 
 	int i;
 	for(i=0;i<mAudios.size();++i){

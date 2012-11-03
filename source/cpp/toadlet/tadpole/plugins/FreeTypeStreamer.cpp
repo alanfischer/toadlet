@@ -120,7 +120,7 @@ Resource::ptr FreeTypeStreamer::load(Stream::ptr stream,ResourceData *resourceDa
 
 	int textureWidth=Math::nextPowerOf2(charmapWidth);
 	int textureHeight=Math::nextPowerOf2(charmapHeight);
-	TextureFormat::ptr textureFormat(new TextureFormat(TextureFormat::Dimension_D2,TextureFormat::Format_LA_8,textureWidth,textureHeight,1,0));
+	TextureFormat::ptr textureFormat=new TextureFormat(TextureFormat::Dimension_D2,TextureFormat::Format_LA_8,textureWidth,textureHeight,1,0);
 	tbyte *textureData=new tbyte[textureFormat->getDataSize()];
 	memset(textureData,0,textureFormat->getDataSize());
 	int textureStride=textureFormat->getXPitch();
@@ -166,8 +166,8 @@ Resource::ptr FreeTypeStreamer::load(Stream::ptr stream,ResourceData *resourceDa
 		}
 	}
 
-	Texture::ptr texture(mTextureManager->createTexture(textureFormat,textureData));
-	Font::ptr font(new Font(fontData->pointSize,0,texture,charArray,&glyphs[0],glyphs.size()));
+	Texture::ptr texture=mTextureManager->createTexture(textureFormat,textureData);
+	Font::ptr font=new Font(fontData->pointSize,0,texture,charArray,&glyphs[0],glyphs.size());
 
 	// Clean up FreeType data
 	for(i=0;i<bitmapGlyphs.size();++i){

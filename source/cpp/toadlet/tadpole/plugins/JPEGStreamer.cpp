@@ -219,7 +219,7 @@ Resource::ptr JPEGStreamer::load(Stream::ptr stream,ResourceData *data,ProgressL
 		return NULL;
 	}
 
-	TextureFormat::ptr textureFormat(new TextureFormat(TextureFormat::Dimension_D2,pixelFormat,cinfo.output_width,cinfo.output_height,1,0));
+	TextureFormat::ptr textureFormat=new TextureFormat(TextureFormat::Dimension_D2,pixelFormat,cinfo.output_width,cinfo.output_height,1,0);
 	tbyte *textureData=new tbyte[textureFormat->getDataSize()];
 
 	/* while (scan lines remain to be read) */

@@ -111,7 +111,7 @@ Resource::ptr TGAStreamer::load(Stream::ptr stream,ResourceData *data,ProgressLi
 		return NULL;
 	}
 
-	TextureFormat::ptr textureFormat(new TextureFormat(TextureFormat::Dimension_D2,pixelFormat,width,height,1,0));
+	TextureFormat::ptr textureFormat=new TextureFormat(TextureFormat::Dimension_D2,pixelFormat,width,height,1,0);
 	int textureSize=textureFormat->getDataSize();
 	tbyte *textureData=new tbyte[textureSize];
 

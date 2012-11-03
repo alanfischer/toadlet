@@ -5,7 +5,7 @@ Sky::Sky(Scene *scene,int cloudSize,const Vector4 &skyColor,const Vector4 &fadeC
 {
 	Sphere sphere(Vector3(0,0,0),512);
 	Vector3 lightDir(1,-1,0.5);
-	bool advanced=false; // Use realtime bumpmapping, or precalculated
+	bool advanced=true; // Use realtime bumpmapping, or precalculated
 
 	Log::alert("Allocating Sky resources");
 
@@ -14,9 +14,9 @@ Sky::Sky(Scene *scene,int cloudSize,const Vector4 &skyColor,const Vector4 &fadeC
 	VertexBuffer::ptr vertexBuffer=mEngine->getBufferManager()->createVertexBuffer(Buffer::Usage_BIT_STREAM,Buffer::Access_READ_WRITE,mEngine->getVertexFormats().POSITION_COLOR_TEX_COORD,skyDomeCreator->getSkyDomeVertexCount(numSegments,numRings));
 	IndexBuffer::ptr indexBuffer=mEngine->getBufferManager()->createIndexBuffer(Buffer::Usage_BIT_STATIC,Buffer::Access_BIT_WRITE,IndexBuffer::IndexFormat_UINT16,skyDomeCreator->getSkyDomeIndexCount(numSegments,numRings));
 
-	TextureFormat::ptr cloudFormat(new TextureFormat(TextureFormat::Dimension_D2,TextureFormat::Format_RGBA_8,cloudSize,cloudSize,1,0));
+	TextureFormat::ptr cloudFormat=new TextureFormat(TextureFormat::Dimension_D2,TextureFormat::Format_RGBA_8,cloudSize,cloudSize,1,0);
 	tbyte *cloudData=createCloud(cloudFormat,16,9,0.45,0.000025,0.75);
-	TextureFormat::ptr bumpFormat(new TextureFormat(TextureFormat::Dimension_D2,TextureFormat::Format_RGB_8,cloudSize,cloudSize,1,0));
+	TextureFormat::ptr bumpFormat=new TextureFormat(TextureFormat::Dimension_D2,TextureFormat::Format_RGB_8,cloudSize,cloudSize,1,0);
 	tbyte *bumpData=createBump(bumpFormat,cloudData,-1,-1,-32,4); // To debug any bump issues, try disabling fadeStage, make bump/cloud stage modulate, add a rotating sun, and use a zscale of 1
 
 	Material::ptr material;
@@ -24,7 +24,7 @@ Sky::Sky(Scene *scene,int cloudSize,const Vector4 &skyColor,const Vector4 &fadeC
 		Texture::ptr cloudTexture=mEngine->getTextureManager()->createTexture(cloudFormat,cloudData);
 		Texture::ptr bumpTexture=mEngine->getTextureManager()->createTexture(bumpFormat,bumpData);
 
-		TextureFormat::ptr fadeFormat(new TextureFormat(TextureFormat::Dimension_D2,TextureFormat::Format_RGBA_8,cloudSize/2,cloudSize/2,1,0));
+		TextureFormat::ptr fadeFormat=new TextureFormat(TextureFormat::Dimension_D2,TextureFormat::Format_RGBA_8,cloudSize/2,cloudSize/2,1,0);
 		tbyte *fadeData=createFade(fadeFormat,Vector4(fadeColor.x,fadeColor.y,fadeColor.z,0),fadeColor,1.1,0.01);
 		Texture::ptr fadeTexture=mEngine->getTextureManager()->createTexture(fadeFormat,fadeData);
 		delete[] fadeData;
@@ -204,7 +204,7 @@ Sky::Sky(Scene *scene,int cloudSize,const Vector4 &skyColor,const Vector4 &fadeC
 		material->compile();
 	}
 	else{
-		TextureFormat::ptr compositeFormat(new TextureFormat(TextureFormat::Dimension_D2,TextureFormat::Format_RGB_8,cloudSize,cloudSize,1,0));
+		TextureFormat::ptr compositeFormat=new TextureFormat(TextureFormat::Dimension_D2,TextureFormat::Format_RGB_8,cloudSize,cloudSize,1,0);
 		tbyte *compositeData=createComposite(compositeFormat,cloudData,bumpData,lightDir,skyColor);
 		Texture::ptr compositeTexture=mEngine->getTextureManager()->createTexture(compositeFormat,compositeData);
 		delete[] compositeData;
@@ -230,7 +230,7 @@ Sky::Sky(Scene *scene,int cloudSize,const Vector4 &skyColor,const Vector4 &fadeC
 	mSkyDome->setMesh(mesh);
 	attach(mSkyDome);
 
-	TextureFormat::ptr glowFormat(new TextureFormat(TextureFormat::Dimension_D2,TextureFormat::Format_L_8,128,128,1,0));
+	TextureFormat::ptr glowFormat=new TextureFormat(TextureFormat::Dimension_D2,TextureFormat::Format_L_8,128,128,1,0);
 	tbyte *glowData=createGlow(glowFormat);
 	Texture::ptr glowTexture=mEngine->getTextureManager()->createTexture(glowFormat,glowData);
 	delete[] glowData;

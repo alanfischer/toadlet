@@ -245,7 +245,7 @@ void BackableBuffer::setBack(PixelBuffer::ptr back,RenderDevice *renderDevice){
 	mBack=back;
 	
 	if(back!=NULL){
-		TextureFormat::ptr format(new TextureFormat(mTextureFormat));
+		TextureFormat::ptr format=new TextureFormat(mTextureFormat);
 		format->setPixelFormat(renderDevice->getClosePixelFormat(mTextureFormat->getPixelFormat(),mUsage));
 		back->create(mUsage,mAccess,format);
 

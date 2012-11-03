@@ -80,7 +80,7 @@ bool TextureDataSource::setTexture(Texture *texture,int px,int py){
 		mPatchSize=format->getWidth();
 		mTextureFormat=texture->getFormat();
 		mTextureData=new tbyte[mTextureFormat->getDataSize()];
-		mFormat=TextureFormat::ptr(new TextureFormat(TextureFormat::Dimension_D2,TextureFormat::Format_L_8,mPatchSize,mPatchSize,1,0));
+		mFormat=new TextureFormat(TextureFormat::Dimension_D2,TextureFormat::Format_L_8,mPatchSize,mPatchSize,1,0);
 		mData=new tbyte[mFormat->getDataSize()];
 		memset(mData,0,mFormat->getDataSize());
 	}

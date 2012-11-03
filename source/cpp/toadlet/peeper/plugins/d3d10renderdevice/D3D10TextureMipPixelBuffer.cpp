@@ -55,7 +55,7 @@ D3D10TextureMipPixelBuffer::D3D10TextureMipPixelBuffer(D3D10Texture *texture,int
 		l--;
 	}
 
-	mFormat=TextureFormat::ptr(new TextureFormat(texture->getFormat()));
+	mFormat=new TextureFormat(texture->getFormat());
 	mFormat->setSize(w,h,d);
 	mDataSize=mFormat->getDataSize();
 

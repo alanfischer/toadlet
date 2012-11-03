@@ -128,7 +128,7 @@ Resource::ptr BMPStreamer::load(Stream::ptr stream,ResourceData *data,ProgressLi
 		return NULL;
 	}
 
-	TextureFormat::ptr textureFormat(new TextureFormat(TextureFormat::Dimension_D2,pixelFormat,width,height,1,0));	
+	TextureFormat::ptr textureFormat=new TextureFormat(TextureFormat::Dimension_D2,pixelFormat,width,height,1,0);
 	tbyte *textureData=new tbyte[textureFormat->getDataSize()];
 
 	if(bmih.biBitCount==1 || bmih.biBitCount==2 || bmih.biBitCount==4 || bmih.biBitCount==8){

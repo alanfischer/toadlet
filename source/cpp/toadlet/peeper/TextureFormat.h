@@ -31,9 +31,9 @@
 namespace toadlet{
 namespace peeper{
 
-class TOADLET_API TextureFormat{
+class TOADLET_API TextureFormat:public Object{
 public:
-	TOADLET_SPTR(TextureFormat);
+	TOADLET_OBJECT(TextureFormat);
 
 	enum Dimension{
 		Dimension_UNKNOWN=0,

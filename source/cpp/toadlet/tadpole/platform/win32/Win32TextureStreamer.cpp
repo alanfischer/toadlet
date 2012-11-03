@@ -115,7 +115,7 @@ Resource::ptr Win32TextureStreamer::load(Stream::ptr in,ResourceData *data,Progr
 		int pixelFormat=getFormat(&gdiformat);
 		SIZE size={0};
 		hr=bitmap->GetSize(&size);
-		TextureFormat::ptr textureFormat(new TextureFormat(TextureFormat::Dimension_D2,pixelFormat,size.cx,size.cy,1,0);
+		TextureFormat::ptr textureFormat=new TextureFormat(TextureFormat::Dimension_D2,pixelFormat,size.cx,size.cy,1,0);
 		tbyte *textureData=new tbyte[textureFormat->getDataSize()];
 		
 		RECT rect={0};
@@ -162,7 +162,7 @@ Resource::ptr Win32TextureStreamer::load(Stream::ptr in,ResourceData *data,Progr
 
 		PixelFormat gdiformat=bitmap->GetPixelFormat();
 		int pixelFormat=getFormat(&gdiformat);
-		TextureFormat::ptr textureFormat(new TextureFormat(TextureFormat::Dimension_D2,pixelFormat,bitmap->GetWidth(),bitmap->GetHeight(),1,0));
+		TextureFormat::ptr textureFormat=new TextureFormat(TextureFormat::Dimension_D2,pixelFormat,bitmap->GetWidth(),bitmap->GetHeight(),1,0);
 		tbyte *textureData=new tbyte[textureFormat->getDataSize()];
 		frameCount=1;
 

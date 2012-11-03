@@ -48,7 +48,7 @@ D3D9PixelBuffer::D3D9PixelBuffer(D3D9RenderDevice *renderDevice,bool renderTarge
 bool D3D9PixelBuffer::create(int usage,int access,TextureFormat::ptr format){
 	mUsage=usage;
 	mAccess=access;
-	mFormat=TextureFormat::ptr(new TextureFormat(format));
+	mFormat=new TextureFormat(format);
 	mFormat->setPixelFormat(mDevice->getClosePixelFormat(format->getPixelFormat()));
 	mDataSize=mFormat->getDataSize();
 

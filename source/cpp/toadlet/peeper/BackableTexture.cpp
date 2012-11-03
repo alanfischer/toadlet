@@ -223,7 +223,7 @@ void BackableTexture::setBack(Texture::ptr back,RenderDevice *renderDevice){
 	mBack=back;
 	
 	if(mBack!=NULL){
-		TextureFormat::ptr format(new TextureFormat(mFormat));
+		TextureFormat::ptr format=new TextureFormat(mFormat);
 		format->setMips(0,(mUsage&Usage_BIT_AUTOGEN_MIPMAPS)!=0?0:1);
 		convertCreate(mBack,renderDevice,mUsage,format,(mData!=NULL?&mData:NULL));
 

@@ -88,7 +88,7 @@ void D3D9TextureMipPixelBuffer::resetCreate(){
 		depth=desc.Depth;
 	}
 
-	mFormat=TextureFormat::ptr(new TextureFormat(mTexture->mFormat));
+	mFormat=new TextureFormat(mTexture->mFormat);
 	mFormat->setSize(width,height,depth);
 }
 

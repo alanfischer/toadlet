@@ -226,10 +226,10 @@ Resource::ptr DDSStreamer::load(Stream::ptr stream,ResourceData *data,ProgressLi
 			break;
 		}
 
-		textureFormat=TextureFormat::ptr(new TextureFormat(TextureFormat::Dimension_D2,pixelFormat,width,height,depth,mipCount));
+		textureFormat=new TextureFormat(TextureFormat::Dimension_D2,pixelFormat,width,height,depth,mipCount);
 
 	    for(i=0;i<mipCount;++i){
-			TextureFormat::ptr mipFormat(new TextureFormat(textureFormat,mipCount));
+			TextureFormat::ptr mipFormat=new TextureFormat(textureFormat,mipCount);
 			int size=Math::maxVal(divSize,width)/divSize * Math::maxVal(divSize,height)/divSize * blockBytes;
 
 			if(i==0 && (hdr.dwHeaderFlags & DDSD_LINEARSIZE)!=0 && size!=(int)hdr.dwPitchOrLinearSize){

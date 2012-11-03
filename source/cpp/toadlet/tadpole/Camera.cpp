@@ -273,7 +273,7 @@ void Camera::render(RenderDevice *device,Scene *scene){
 Texture::ptr Camera::renderToTexture(RenderDevice *device,int format,int width,int height){
 	Engine *engine=mEngine;
 
-	TextureFormat::ptr textureFormat(new TextureFormat(TextureFormat::Dimension_D2,format,width,height,1,1));
+	TextureFormat::ptr textureFormat=new TextureFormat(TextureFormat::Dimension_D2,format,width,height,1,1);
 	Texture::ptr renderTexture=engine->getTextureManager()->createTexture(Texture::Usage_BIT_RENDERTARGET,textureFormat);
 	PixelBufferRenderTarget::ptr renderTarget=engine->getTextureManager()->createPixelBufferRenderTarget();
 	renderTarget->attach(renderTexture->getMipPixelBuffer(0,0),PixelBufferRenderTarget::Attachment_COLOR_0);
@@ -299,7 +299,7 @@ Texture::ptr Camera::renderToTexture(RenderDevice *device,int format,int width,i
 Mesh::ptr Camera::renderToSkyBox(RenderDevice *device,int format,int size,scalar scale){
 	Engine *engine=mParent->getEngine();
 
-	TextureFormat::ptr textureFormat(new TextureFormat(TextureFormat::Dimension_D2,format,size,size,1,1));
+	TextureFormat::ptr textureFormat=new TextureFormat(TextureFormat::Dimension_D2,format,size,size,1,1);
 	bool rtt=engine->getRenderCaps().renderToTexture;
 	int flags=Texture::Usage_BIT_RENDERTARGET;
 	Texture::ptr skyBoxTexture[6];

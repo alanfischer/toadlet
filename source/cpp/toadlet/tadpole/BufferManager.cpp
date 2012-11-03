@@ -180,7 +180,7 @@ VertexBuffer::ptr BufferManager::createVertexBuffer(int usage,int access,VertexF
 
 PixelBuffer::ptr BufferManager::createPixelBuffer(int usage,int access,int pixelFormat,int width,int height,int depth){
 	RenderDevice *renderDevice=mEngine->getRenderDevice();
-	TextureFormat::ptr textureFormat(new TextureFormat(TextureFormat::Dimension_D2,pixelFormat,width,height,depth,1));
+	TextureFormat::ptr textureFormat=new TextureFormat(TextureFormat::Dimension_D2,pixelFormat,width,height,depth,1);
 	PixelBuffer::ptr buffer;
 	if(mEngine->isBackable()){
 		BackableBuffer::ptr backableBuffer=new BackableBuffer();
