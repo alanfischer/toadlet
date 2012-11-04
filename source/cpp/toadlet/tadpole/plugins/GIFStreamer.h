@@ -46,7 +46,7 @@ public:
 protected:
 	GifFileType *openFile(Stream *stream);
 	int closeFile(GifFileType *file);
-	int getNextImage(tbyte *&data,int &delay,GifFileType *gifFile,TextureFormat *&format,tbyte *&base,tbyte *&working);
+	int getNextImage(tbyte *&data,int &delay,GifFileType *gifFile,TextureFormat::ptr &format,tbyte *&base,tbyte *&working);
 
 	TextureManager *mTextureManager;
 };

@@ -343,9 +343,8 @@ Resource::ptr GIFStreamer::load(Stream::ptr stream,ResourceData *data,ProgressLi
 	}
 	
 	Texture::ptr texture;
-	TextureFormat::ptr textureFormat(format);
 	if(result!=GIF_ERROR){
-		texture=mTextureManager->createTexture(usage,textureFormat,images[0]);
+		texture=mTextureManager->createTexture(usage,format,images[0]);
 	}
 	
 	delete[] base;
