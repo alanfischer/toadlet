@@ -116,7 +116,7 @@ void setImagePortion(TextureFormat *format,tbyte *data,int x,int y,int width,int
 	}
 }
 
-int GIFStreamer::getNextImage(tbyte *&data,int &delay,GifFileType *gifFile,TextureFormat *&format,tbyte *&base,tbyte *&working){
+int GIFStreamer::getNextImage(tbyte *&data,int &delay,GifFileType *gifFile,TextureFormat::ptr &format,tbyte *&base,tbyte *&working){
 	GifRecordType RecordType;
 	GifByteType *pLine=NULL;
 	GifByteType *pExtension=NULL;
