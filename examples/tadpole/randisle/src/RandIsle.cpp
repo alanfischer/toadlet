@@ -58,6 +58,7 @@ void RandIsle::create(){
 	mTerrain->setTolerance(Resources::instance->tolerance);
 	mTerrain->setCameraUpdateScope(Scope_BIT_MAIN_CAMERA);
 	mTerrain->setWaterScope(Scope_BIT_WATER);
+	mTerrain->setWaterTransparentScope(Scope_BIT_WATER_TRANSPARENT);
 	mTerrain->setMaterialSource(Resources::instance->terrainMaterialSource);
 	mTerrain->setWaterMaterial(Resources::instance->waterMaterial);
 	mTerrain->setDataSource(this);
@@ -71,7 +72,7 @@ void RandIsle::create(){
 
 	mCamera=new Camera();
 	mCamera->setAutoProjectionFov(Math::degToRad(Math::fromInt(60)),mCamera->getNearDist(),1024);
-	mCamera->setScope(~Scope_HUD | Scope_BIT_MAIN_CAMERA);
+	mCamera->setScope(~Scope_HUD | Scope_BIT_MAIN_CAMERA & ~Scope_BIT_WATER_TRANSPARENT);
 	mCamera->setDefaultState(mEngine->getMaterialManager()->createRenderState());
 	mCamera->setClearColor(Resources::instance->fadeColor);
 	mCamera->getDefaultState()->setFogState(FogState(FogState::FogType_LINEAR,Math::ONE,mCamera->getFarDist()/2,mCamera->getFarDist(),mCamera->getClearColor()));
@@ -81,7 +82,7 @@ void RandIsle::create(){
 		mReflectCamera=new Camera();
 		mReflectCamera->setRenderTarget(Resources::instance->reflectTarget);
 		mReflectCamera->setAutoProjectionFov(Math::degToRad(Math::fromInt(60)),mCamera->getNearDist(),mCamera->getFarDist());
-		mReflectCamera->setScope(~Scope_HUD & ~Scope_BIT_MAIN_CAMERA & ~Scope_BIT_WATER);
+		mReflectCamera->setScope(~Scope_HUD & ~Scope_BIT_MAIN_CAMERA & ~Scope_BIT_WATER & ~Scope_BIT_WATER_TRANSPARENT);
 		mReflectCamera->setDefaultState(mEngine->getMaterialManager()->createRenderState());
 		mReflectCamera->setClearColor(Resources::instance->fadeColor);
 		mReflectCamera->getDefaultState()->setFogState(FogState(FogState::FogType_LINEAR,Math::ONE,mCamera->getFarDist()/2,mCamera->getFarDist(),mCamera->getClearColor()));
@@ -91,7 +92,7 @@ void RandIsle::create(){
 		mRefractCamera=new Camera();
 		mRefractCamera->setRenderTarget(Resources::instance->refractTarget);
 		mRefractCamera->setAutoProjectionFov(Math::degToRad(Math::fromInt(60)),mCamera->getNearDist(),mCamera->getFarDist());
-		mRefractCamera->setScope(~Scope_HUD & ~Scope_BIT_MAIN_CAMERA & ~Scope_BIT_WATER);
+		mRefractCamera->setScope(~Scope_HUD & ~Scope_BIT_MAIN_CAMERA & ~Scope_BIT_WATER | Scope_BIT_WATER_TRANSPARENT);
 		mRefractCamera->setDefaultState(mEngine->getMaterialManager()->createRenderState());
 		mRefractCamera->setClearColor(Resources::instance->fadeColor);
 		mRefractCamera->getDefaultState()->setFogState(FogState(FogState::FogType_LINEAR,Math::ONE,mCamera->getFarDist()/2,mCamera->getFarDist(),mCamera->getClearColor()));
@@ -376,17 +377,17 @@ void RandIsle::updateProps(){
 	scalar maxDist=Resources::instance->maxPropDist;
 	scalar minDist=Resources::instance->minPropDist;
 	Segment segment;
-	Vector3 origin=mPlayer->getPhysics()->getPosition();
-	Random r(origin.x+origin.y+origin.z);
+	Vector2 origin(mPlayer->getPhysics()->getPosition().x,mPlayer->getPhysics()->getPosition().y);
+	Random r(System::mtime());
 	for(int i=0;i<mProps->getNumNodes();++i){
 		Node *prop=mProps->getNode(i);
-		Vector3 propOrigin=prop->getWorldTranslate();
+		Vector2 propOrigin(prop->getWorldTranslate().x,prop->getWorldTranslate().y);
 		scalar d=Math::length(propOrigin,origin);
 		scalar a=Math::ONE-(d-minDist)/(maxDist-minDist);
 
-		if(a<0 || propOrigin==Math::ZERO_VECTOR3){
+		if(a<0 || propOrigin==Math::ZERO_VECTOR2){
 			scalar p=r.nextScalar(0,Math::TWO_PI);
-			if(propOrigin==Math::ZERO_VECTOR3){
+			if(propOrigin==Math::ZERO_VECTOR2){
 				d=r.nextScalar(0,maxDist);
 			}
 			else{
@@ -399,6 +400,10 @@ void RandIsle::updateProps(){
 			prop->setTranslate(result.point);
 			prop->setRotate(Math::Z_UNIT_VECTOR3,r.nextScalar(0,Math::TWO_PI));
 			scalar a=Math::ONE-(d-minDist)/(maxDist-minDist);
+		}
+
+		if(prop->getWorldTranslate().z<mTerrain->getWaterLevel()){
+			a=0;
 		}
 
 		MeshComponent *mesh=(MeshComponent*)prop->getChild("mesh");

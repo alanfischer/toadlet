@@ -47,8 +47,8 @@ TerrainPatchComponent::TerrainPatchComponent(Scene *scene):
 	mCameraUpdateScope(-1),
 	mTerrainScope(-1),
 	mWaterScope(-1),
+	mWaterTransparentScope(-1),
 	mTolerance(0),
-	mWaterOpaque(false),
 	mWaterLevel(0)
 {
 	mScene=scene;
@@ -353,10 +353,6 @@ bool TerrainPatchComponent::setMaterial(Material *material){
 
 bool TerrainPatchComponent::setWaterMaterial(Material *material){
 	mWaterMaterial=material;
-
-	if(mWaterMaterial!=NULL){
-		mWaterOpaque=mWaterMaterial->isDepthSorted();
-	}
 
 	return true;
 }
@@ -1242,8 +1238,8 @@ bool TerrainPatchComponent::blockIntersectsCamera(const Block *block,Camera *cam
 
 bool TerrainPatchComponent::blockVisibleByWater(const Block *block,Camera *camera,bool water) const{
 	const Vector3 &cameraPosition=camera->getPosition();
-	bool waterOpaque=mWaterOpaque;
-	return (water==false && waterOpaque==false) || 
+	bool waterTransparent=(camera->getScope()&mWaterTransparentScope)!=0;
+	return (water==false && waterTransparent) || 
 		(cameraPosition.z>mWaterLevel && ((water==false && block->maxs.z>mWaterLevel) || (water==true && block->mins.z<=mWaterLevel))) ||
 		(cameraPosition.z<mWaterLevel && block->mins.z<=mWaterLevel);
 }

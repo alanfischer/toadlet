@@ -107,7 +107,8 @@ Material::ptr MaterialManager::createSharedMaterial(Material::ptr source,RenderS
 		}
 	}
 	
-	material->setSort(Material::SortType_AUTO);
+	material->setSort(source->getSort());
+	material->setLayer(source->getLayer());
 	material->compile();
 
 	return material;

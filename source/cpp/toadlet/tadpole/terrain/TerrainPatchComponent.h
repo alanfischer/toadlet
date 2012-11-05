@@ -104,6 +104,7 @@ public:
 	void setCameraUpdateScope(int scope){mCameraUpdateScope=scope;}
 	void setTerrainScope(int scope){mTerrainScope=scope;}
 	void setWaterScope(int scope){mWaterScope=scope;}
+	void setWaterTransparentScope(int scope){mWaterTransparentScope=scope;}
 	void setTolerance(scalar tolerance){mTolerance=tolerance;}
 	void setWaterLevel(scalar level);
 
@@ -244,8 +245,8 @@ protected:
 	int mCameraUpdateScope;
 	int mTerrainScope;
 	int mWaterScope;
+	int mWaterTransparentScope;
 	scalar mTolerance;
-	bool mWaterOpaque;
 	scalar mWaterLevel;
 	Transform mWaterTransform;
 	Transform mWaterWorldTransform;

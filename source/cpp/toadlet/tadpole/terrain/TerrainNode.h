@@ -75,6 +75,9 @@ public:
 	void setWaterScope(int scope);
 	int getWaterScope() const{return mPatchWaterScope;}
 
+	void setWaterTransparentScope(int scope);
+	int getWaterTransparentScope() const{return mPatchWaterTransparentScope;}
+
 	void setTolerance(scalar tolerance);
 	scalar getTolerance() const{return mPatchTolerance;}
 
@@ -147,6 +150,7 @@ protected:
 	int mPatchCameraUpdateScope;
 	int mPatchTerrainScope;
 	int mPatchWaterScope;
+	int mPatchWaterTransparentScope;
 	scalar mPatchTolerance;
 	scalar mPatchWaterLevel;
 	Vector3 mPatchScale;
