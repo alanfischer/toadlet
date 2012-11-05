@@ -84,6 +84,8 @@ public:
 			}
 			mParent->setRotate(rotate);
 		}
+
+		mParent->updateWorldTransform();
 	}
 
 	Node::ptr mTarget;
