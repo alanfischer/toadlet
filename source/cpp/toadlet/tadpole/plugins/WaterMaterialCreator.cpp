@@ -249,6 +249,7 @@ Material::ptr WaterMaterialCreator::createWaterMaterial(Texture *reflectTexture,
 		RenderPass::ptr pass=shaderPath->addPass();
 
 		pass->setMaterialState(MaterialState(color));
+		pass->setBlendState(BlendState());
 		pass->setDepthState(DepthState(DepthState::DepthTest_LEQUAL,false));
 		pass->setRasterizerState(RasterizerState(RasterizerState::CullType_NONE));
 		pass->setMaterialState(MaterialState(Math::ZERO_VECTOR4,Math::ONE_VECTOR4,Math::ONE_VECTOR4,128));

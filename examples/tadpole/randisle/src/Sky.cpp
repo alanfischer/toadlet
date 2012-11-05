@@ -124,7 +124,7 @@ Sky::Sky(Scene *scene,int cloudSize,const Vector4 &skyColor,const Vector4 &fadeC
 				"Texture2D bumpTex,cloudTex,fadeTex;\n"
 				"SamplerState bumpSamp,cloudSamp,fadeSamp;\n"
 
-				"float4 main(PIN pin): SV_TARGET{\n`"
+				"float4 main(PIN pin): SV_TARGET{\n"
 					"float4 bump=bumpTex.Sample(bumpSamp,pin.texCoord0);\n"
 					"float4 cloud=cloudTex.Sample(cloudSamp,pin.texCoord0);\n"
 					"float4 fade=fadeTex.Sample(fadeSamp,pin.texCoord1);\n"
@@ -136,10 +136,20 @@ Sky::Sky(Scene *scene,int cloudSize,const Vector4 &skyColor,const Vector4 &fadeC
 				"}"
 			};
 
-			Shader::ptr vertexShader=mEngine->getShaderManager()->createShader(Shader::ShaderType_VERTEX,profiles,vertexCodes,2);
-			pass->setShader(Shader::ShaderType_VERTEX,vertexShader);
-			Shader::ptr fragmentShader=mEngine->getShaderManager()->createShader(Shader::ShaderType_FRAGMENT,profiles,fragmentCodes,2);
-			pass->setShader(Shader::ShaderType_FRAGMENT,fragmentShader);
+			Shader::ptr vertexShader,fragmentShader;
+			TOADLET_TRY
+				vertexShader=mEngine->getShaderManager()->createShader(Shader::ShaderType_VERTEX,profiles,vertexCodes,2);
+			TOADLET_CATCH_ANONYMOUS(){}
+			TOADLET_TRY
+				fragmentShader=mEngine->getShaderManager()->createShader(Shader::ShaderType_FRAGMENT,profiles,fragmentCodes,2);
+			TOADLET_CATCH_ANONYMOUS(){}
+
+			if(vertexShader!=NULL){
+				pass->setShader(Shader::ShaderType_VERTEX,vertexShader);
+			}
+			if(fragmentShader!=NULL){
+				pass->setShader(Shader::ShaderType_FRAGMENT,fragmentShader);
+			}
 
 			RenderVariableSet::ptr variables=pass->makeVariables();
 			variables->addVariable("modelViewProjectionMatrix",RenderVariable::ptr(new MVPMatrixVariable()),Material::Scope_RENDERABLE);
@@ -236,6 +246,7 @@ Sky::Sky(Scene *scene,int cloudSize,const Vector4 &skyColor,const Vector4 &fadeC
 	delete[] glowData;
 
 	Material::ptr sunMaterial=mEngine->createDiffuseMaterial(glowTexture);
+	sunMaterial->setModelMatrixFlags(Material::MatrixFlag_CAMERA_ALIGNED);
 	sunMaterial->setLayer(-1);
 	sunMaterial->setSort(Material::SortType_MATERIAL);
 	sunMaterial->compile();

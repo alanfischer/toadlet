@@ -44,9 +44,10 @@ TerrainNode::TerrainNode(Scene *scene):PartitionNode(scene),
 	//mPatchGrid,
 	mPatchSize(0),
 	//mPatchMaterial,
-	mPatchCameraUpdateScope(0),
-	mPatchTerrainScope(0),
-	mPatchWaterScope(0),
+	mPatchCameraUpdateScope(-1),
+	mPatchTerrainScope(-1),
+	mPatchWaterScope(-1),
+	mPatchWaterTransparentScope(-1),
 	mPatchTolerance(0),
 	mPatchWaterLevel(0),
 	//mPatchScale,
@@ -58,9 +59,6 @@ TerrainNode::TerrainNode(Scene *scene):PartitionNode(scene),
 	mHalfSize=mSize/2;
 	mPatchGrid.resize(mSize*mSize);
 	mUpdateTargetBias=Math::fromMilli(250);
-	mPatchCameraUpdateScope=-1;
-	mPatchTerrainScope=-1;
-	mPatchWaterScope=-1;
 	mPatchTolerance=0.00001f;
 	mPatchScale.set(1,1,1);
 
@@ -209,6 +207,17 @@ void TerrainNode::setWaterScope(int scope){
 	for(i=0;i<mPatchGrid.size();++i){
 		if(mPatchGrid[i]!=NULL){
 			mPatchGrid[i]->setWaterScope(mPatchWaterScope);
+		}
+	}	
+}
+
+void TerrainNode::setWaterTransparentScope(int scope){
+	mPatchWaterTransparentScope=scope;
+	
+	int i;
+	for(i=0;i<mPatchGrid.size();++i){
+		if(mPatchGrid[i]!=NULL){
+			mPatchGrid[i]->setWaterTransparentScope(mPatchWaterTransparentScope);
 		}
 	}	
 }
