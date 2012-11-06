@@ -48,6 +48,12 @@ public:
 	bool create(String renderDevice,String audioDevice);
 	void destroy();
 
+	void setWindowRenderTargetFormat(WindowRenderTargetFormat::ptr format){mFormat=format;}
+	WindowRenderTargetFormat::ptr getWindowRenderTargetFormat() const{return mFormat;}
+
+	void setEngineOptions(int options){mEngineOptions=options;}
+	int getEngineOptions() const{return mEngineOptions;}
+
 	void setApplet(Applet *applet){mApplet=applet;}
 	Applet *getApplet() const{return mApplet;}
 
@@ -143,6 +149,7 @@ protected:
 	Thread::ptr mThread;
 	bool mRun;
 
+	int mEngineOptions;
 	WindowRenderTargetFormat::ptr mFormat;
 	Engine::ptr mEngine;
 	RenderTarget::ptr mRenderTarget;
