@@ -101,7 +101,7 @@ public:
 
 		Log::alert("Loading shadow");
 
-		TextureFormat::ptr pointFormat(new TextureFormat(TextureFormat::Dimension_D2,TextureFormat::Format_A_8,128,128,1,0));
+		TextureFormat::ptr pointFormat=new TextureFormat(TextureFormat::Dimension_D2,TextureFormat::Format_A_8,128,128,1,0);
 		tbyte *pointData=createPoint(pointFormat);
 		Texture::ptr pointTexture=engine->getTextureManager()->createTexture(pointFormat,pointData);
 		delete[] pointData;
