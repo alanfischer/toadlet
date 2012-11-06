@@ -6,6 +6,7 @@ configure_file (${CMAKE_CURRENT_SOURCE_DIR}/Version.h.cmake ${CMAKE_CURRENT_BINA
 set (EGG_SRC
 	Assert.cpp
 	Error.cpp
+	Errorer.cpp
 	Exception.cpp
 	Log.cpp
 	Logger.cpp
@@ -89,6 +90,7 @@ set (EGG_HDR
 	DynamicLibrary.h
 	EndianConversion.h
 	Error.h
+	Errorer.h
 	Event.h
 	Exception.h
 	Extents.h

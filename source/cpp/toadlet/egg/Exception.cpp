@@ -46,7 +46,7 @@ Exception::Exception(const char *description):
 		mDescription(NULL)
 	#endif
 {
-	mError=Error::Type_UNKNOWN;
+	mError=Errorer::Type_UNKNOWN;
 	#if !defined(TOADLET_EXCEPTIONS)
 		if(description!=NULL){
 			mDescription=new char[strlen(description)+1];
