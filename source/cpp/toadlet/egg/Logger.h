@@ -79,7 +79,7 @@ public:
 	};
 
 	Logger();
-	~Logger();
+	virtual ~Logger();
 
 	void setMasterReportingLevel(Level level);
 	Level getMasterReportingLevel() const{return mReportingLevel;}
