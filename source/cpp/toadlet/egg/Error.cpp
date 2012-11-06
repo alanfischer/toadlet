@@ -29,104 +29,25 @@
 namespace toadlet{
 namespace egg{
 
-Error *Error::mTheError=NULL;
+Errorer *Error::mTheErrorer=NULL;
 
-Error *Error::getInstance(){
-	if(mTheError==NULL){
-		mTheError=new Error();
+Errorer *Error::getInstance(){
+	if(mTheErrorer==NULL){
+		mTheErrorer=new Errorer();
 	}
 
-	return mTheError;
+	return mTheErrorer;
 }
 
 void Error::destroy(){
-	if(mTheError!=NULL){
-		delete mTheError;
-		mTheError=NULL;
+	if(mTheErrorer!=NULL){
+		delete mTheErrorer;
+		mTheErrorer=NULL;
 	}
-}
-
-Error::Error(){
-	mLastError=Type_NONE;
-	memset(mLastDescription,0,sizeof(mLastDescription));
-
-	#if defined(TOADLET_EGG_ERRORHANDLER_H)
-		mErrorHandler.setStackTraceListener(this);
-	#endif
-}
-
-void Error::setError(int error){
-	mLastError=error;
-	mLastDescription[0]=0;
-}
-
-void Error::setError(int error,const char *description){
-	mLastError=error;
-	int c=0;
-	while(description[c]!=0 && c<MAX_DESCRIPTION_LENGTH){
-		mLastDescription[c]=description[c];
-		c++;
-	}
-	mLastDescription[c]=0;
-}
-
-void Error::setError(int error,const String &description){
-	mLastError=error;
-	int c=0;
-	const char *p=description.c_str();
-	while(p[c]!=0 && c<MAX_DESCRIPTION_LENGTH){
-		mLastDescription[c]=p[c];
-		c++;
-	}
-	mLastDescription[c]=0;
-}
-
-void Error::setException(const Exception &ex){
-	setError(ex.getError(),ex.getDescription());
-	mException=ex;
-}
-
-int Error::getError(){
-	int error=mLastError;
-	mLastError=Type_NONE;
-	return error;
-}
-
-const char *Error::getDescription(){
-	return mLastDescription;
-}
-
-const Exception &Error::getException(){
-	return mException;
 }
 
 void Error::errorLog(const String &categoryName,const String &text){
 	Log::getInstance()->addLogEntry(categoryName,Logger::Level_ERROR,text);
-}
-
-void Error::installHandler(){
-	#if defined(TOADLET_EGG_ERRORHANDLER_H)
-		mErrorHandler.installHandler();
-	#endif
-}
-	
-void Error::uninstallHandler(){
-	#if defined(TOADLET_EGG_ERRORHANDLER_H)
-		mErrorHandler.uninstallHandler();
-	#endif
-}
-
-void Error::startTrace(){
-	Log::getInstance()->addLogEntry(Logger::Level_ERROR,"Backtrace starting");
-}
-
-void Error::traceFrame(const char *description){
-	Log::getInstance()->addLogEntry(Logger::Level_ERROR,description);
-}
-
-void Error::endTrace(){
-	Log::getInstance()->addLogEntry(Logger::Level_ERROR,"Backtrace ended");
-	Log::getInstance()->flush();
 }
 
 }
