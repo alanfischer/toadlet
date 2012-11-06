@@ -23,8 +23,8 @@
  *
  ********** Copyright header - do not remove **********/
 
-#ifndef TOADLET_EGG_UUID_H
-#define TOADLET_EGG_UUID_H
+#ifndef TOADLET_EGG_TGUID_H
+#define TOADLET_EGG_TGUID_H
 
 #include <toadlet/egg/Types.h>
 #include <toadlet/egg/String.h>
@@ -32,12 +32,12 @@
 namespace toadlet{
 namespace egg{
 
-class TOADLET_API UUID{
+class TOADLET_API TGUID{
 public:
-	UUID():highBits(0),lowBits(0){}
-	UUID(tbyte bytes[]){highBits=*(uint64*)(bytes+0);lowBits=*(uint64*)(bytes+8);}
-	UUID(uint64 highBits1,uint64 lowBits1):highBits(highBits1),lowBits(lowBits1){}
-	UUID(const String &string){fromString(string);}
+	TGUID():highBits(0),lowBits(0){}
+	TGUID(tbyte bytes[]){highBits=*(uint64*)(bytes+0);lowBits=*(uint64*)(bytes+8);}
+	TGUID(uint64 highBits1,uint64 lowBits1):highBits(highBits1),lowBits(lowBits1){}
+	TGUID(const String &string){fromString(string);}
 
 	bool fromRandom();
 	bool fromString(const String &string);
@@ -46,10 +46,10 @@ public:
 	uint64 getHighBits() const{return highBits;}
 	uint64 getLowBits() const{return lowBits;}
 		
-	inline bool equals(const UUID &u2) const{return highBits==u2.highBits && lowBits==u2.lowBits;}
+	inline bool equals(const TGUID &u2) const{return highBits==u2.highBits && lowBits==u2.lowBits;}
 
-	inline bool operator==(const UUID &u2) const{return equals(u2);}
-	inline bool operator!=(const UUID &u2) const{return !equals(u2);}
+	inline bool operator==(const TGUID &u2) const{return equals(u2);}
+	inline bool operator!=(const TGUID &u2) const{return !equals(u2);}
 
 	uint64 highBits,lowBits;
 };
