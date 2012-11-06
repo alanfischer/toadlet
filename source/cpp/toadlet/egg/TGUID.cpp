@@ -23,7 +23,7 @@
  *
  ********** Copyright header - do not remove **********/
 
-#include <toadlet/egg/UUID.h>
+#include <toadlet/egg/TGUID.h>
 #include <toadlet/egg/Random.h>
 #include <toadlet/egg/System.h>
 #include <stdio.h>
@@ -31,7 +31,7 @@
 namespace toadlet{
 namespace egg{
 
-bool UUID::fromRandom(){
+bool TGUID::fromRandom(){
 	tbyte *uu=(tbyte*)&highBits;
 
 	Random random(System::utime());
@@ -46,7 +46,7 @@ bool UUID::fromRandom(){
 	return true;
 }
 
-bool UUID::fromString(const String &string){
+bool TGUID::fromString(const String &string){
 	tbyte *uu=(tbyte*)&highBits;
 	int n=0;
 	sscanf(string.c_str(),	"%2hhx%2hhx%2hhx%2hhx-"
@@ -62,7 +62,7 @@ bool UUID::fromString(const String &string){
 	return n==36 && string[n]=='\0';
 }
 
-String UUID::toString(){
+String TGUID::toString(){
 	tbyte *uu=(tbyte*)&highBits;
 	char string[128];
 	sprintf(string,	"%02x%02x%02x%02x-"
