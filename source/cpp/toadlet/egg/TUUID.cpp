@@ -47,34 +47,52 @@ bool TUUID::fromRandom(){
 }
 
 bool TUUID::fromString(const String &string){
+	if(string.length()==0){
+		return false;
+	}
+
 	tbyte *uu=(tbyte*)&highBits;
+	int data[16];
 	int n=0;
-	sscanf(string.c_str(),	"%2hhx%2hhx%2hhx%2hhx-"
-							"%2hhx%2hhx-"
-							"%2hhx%2hhx-"
-							"%2hhx%2hhx-"
-							"%2hhx%2hhx%2hhx%2hhx%2hhx%2hhx%n",
-							&uu[0], &uu[1], &uu[2], &uu[3],
-							&uu[4], &uu[5],
-							&uu[6], &uu[7],
-							&uu[8], &uu[9],
-							&uu[10], &uu[11], &uu[12], &uu[13], &uu[14], &uu[15], &n);
+	sscanf(string.c_str(),	"%02x%02x%02x%02x-"
+							"%02x%02x-"
+							"%02x%02x-"
+							"%02x%02x-"
+							"%02x%02x%02x%02x%02x%02x%n",
+							&data[0], &data[1], &data[2], &data[3],
+							&data[4], &data[5],
+							&data[6], &data[7],
+							&data[8], &data[9],
+							&data[10], &data[11], &data[12], &data[13], &data[14], &data[15], &n);
+
+	int i;
+	for(i=0;i<16;++i){
+		uu[i]=data[i];
+	}
+
 	return n==36 && string[n]=='\0';
 }
 
 String TUUID::toString() const{
 	tbyte *uu=(tbyte*)&highBits;
+	int data[16];
+
+	int i;
+	for(i=0;i<16;++i){
+		data[i]=uu[i];
+	}
+
 	char string[128];
 	sprintf(string,	"%02x%02x%02x%02x-"
 					"%02x%02x-"
 					"%02x%02x-"
 					"%02x%02x-"
 					"%02x%02x%02x%02x%02x%02x",
-					uu[0], uu[1], uu[2], uu[3],
-					uu[4], uu[5],
-					uu[6], uu[7],
-					uu[8], uu[9],
-					uu[10], uu[11], uu[12], uu[13], uu[14], uu[15]);
+					data[0], data[1], data[2], data[3],
+					data[4], data[5],
+					data[6], data[7],
+					data[8], data[9],
+					data[10], data[11], data[12], data[13], data[14], data[15]);
 	return string;
 }
 
