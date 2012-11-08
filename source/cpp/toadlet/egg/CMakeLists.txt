@@ -16,7 +16,7 @@ set (EGG_SRC
 	Profile.cpp
 	Random.cpp
 	String.cpp
-	TGUID.cpp
+	TUUID.cpp
 	Version.cpp
 )
 
@@ -118,7 +118,7 @@ set (EGG_HDR
 	Type.h
 	WaitCondition.h
 	WeakPointer.h
-	TGUID.h
+	TUUID.h
 	Version.h
 )
 
