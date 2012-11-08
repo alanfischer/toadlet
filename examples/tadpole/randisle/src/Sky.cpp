@@ -5,7 +5,7 @@ Sky::Sky(Scene *scene,int cloudSize,const Vector4 &skyColor,const Vector4 &fadeC
 {
 	Sphere sphere(Vector3(0,0,0),512);
 	Vector3 lightDir(1,-1,0.5);
-	bool advanced=true; // Use realtime bumpmapping, or precalculated
+	bool advanced=false; // Use realtime bumpmapping, or precalculated
 
 	Log::alert("Allocating Sky resources");
 
@@ -178,7 +178,7 @@ Sky::Sky(Scene *scene,int cloudSize,const Vector4 &skyColor,const Vector4 &fadeC
 			bumpState.colorSource2=TextureState::Source_TEXTURE;
 			pass->setTexture(Shader::ShaderType_FRAGMENT,state,bumpTexture,SamplerState(),bumpState);
 			mBumpAccessor=Matrix4x4Accessor::ptr(new TextureStateMatrix4x4Accessor(pass,state++));
-/*
+
 			TextureState cloudState;
 			cloudState.colorOperation=TextureState::Operation_ADD;
 			cloudState.colorSource1=TextureState::Source_PREVIOUS;
@@ -208,7 +208,6 @@ Sky::Sky(Scene *scene,int cloudSize,const Vector4 &skyColor,const Vector4 &fadeC
 			fadeState.alphaSource1=TextureState::Source_TEXTURE;
 			pass->setTexture(Shader::ShaderType_FRAGMENT,state,fadeTexture,SamplerState(),fadeState);
 			mFadeAccessor=Matrix4x4Accessor::ptr(new TextureStateMatrix4x4Accessor(pass,state++));
-*/
 		}
 
 		material->compile();

@@ -26,7 +26,7 @@
 #include "AndroidApplication.h"
 #include <toadlet/egg/Error.h>
 #include <toadlet/egg/System.h>
-#include <toadlet/tadpole/platform/android/AndroidAssetArchive.h>
+#include <toadlet/egg/platform/android/AndroidAssetArchive.h>
 #include <toadlet/tadpole/platform/android/AndroidTextureStreamer.h>
 #include <android/sensor.h>
 
@@ -60,6 +60,7 @@ AndroidApplication::AndroidApplication():
 	//mThread,
 	mRun(false),
 
+	mEngineOptions(0),
 	mEngine(NULL),
 	mRenderDevice(NULL),
 	mAudioDevice(NULL),
@@ -73,6 +74,8 @@ AndroidApplication::AndroidApplication():
 	#else
 		mFormat->setDebug(false);
 	#endif
+	
+	mEngineOptions=Engine::Option_BIT_FIXEDBACKABLE | Engine::Option_BIT_SHADERBACKABLE;
 }
 
 AndroidApplication::~AndroidApplication(){
@@ -84,7 +87,7 @@ bool AndroidApplication::create(String renderDevice,String audioDevice){
 	JNIEnv *env=mActivity->env;
 	jobject obj=mActivity->clazz;
 
-	mEngine=new Engine(env,obj,mFixedBackable,mShaderBackable);
+	mEngine=new Engine(env,obj,mEngineOptions);
 	
 	mEngine->installHandlers();
 
