@@ -50,6 +50,8 @@ namespace tadpole{
 // The vx,vy,vz in the Particle class are only used for alignment, this class provides no simulation of particles.
 class TOADLET_API ParticleComponent:public BaseComponent,public Renderable,public Visible{
 public:
+	TOADLET_OBJECT(ParticleComponent);
+
 	enum ParticleType{
 		ParticleType_POINTSPRITE=0,
 		ParticleType_SPRITE=1,

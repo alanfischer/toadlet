@@ -9,7 +9,7 @@ Particles::~Particles(){
 
 void Particles::create(){
 	engine=app->getEngine();
-	engine->setDirectory("../../data");
+	engine->getArchiveManager()->addDirectory("../../data");
 
 	scene=Scene::ptr(new Scene(engine));
 
@@ -33,7 +33,7 @@ void Particles::create(){
 		Vector3(-ten,-ten,0),
 	};
 
-	Material::ptr pointMaterial=engine->getMaterialManager()->createPointSpriteMaterial(engine->getTextureManager()->findTexture("sparkle.png"),ten,false);
+	Material::ptr pointMaterial=engine->createPointSpriteMaterial(engine->getTextureManager()->findTexture("sparkle.png"),ten,false);
 	if(pointMaterial!=NULL){
 		pointMaterial->getPass()->setBlendState(BlendState::Combination_ALPHA_ADDITIVE);
 		pointMaterial->getPass()->setRasterizerState(RasterizerState(RasterizerState::CullType_NONE));
@@ -57,36 +57,47 @@ void Particles::create(){
 		beamMaterial->getPass()->setDepthState(DepthState(DepthState::DepthTest_LEQUAL,false));
 	}
 
-	pointNode=engine->createNodeType(ParticleNode::type(),scene);
-	pointNode->setNumParticles(4,ParticleNode::ParticleType_POINTSPRITE,Math::ONE,pointPositions);
-	pointNode->setMaterial(pointMaterial);
-	pointNode->setTranslate(-Math::fromInt(40),0,0);
-	scene->getRoot()->attach(pointNode);
+	Node::ptr pointsNode=new Node(scene);
+	{
+		points=new ParticleComponent(scene);
+		points->setNumParticles(4,ParticleComponent::ParticleType_POINTSPRITE,Math::ONE,pointPositions);
+		points->setMaterial(pointMaterial);
+		pointsNode->attach(points);
+	}
+	pointsNode->setTranslate(-Math::fromInt(40),0,0);
+	scene->getRoot()->attach(pointsNode);
 
- 	spriteNode=engine->createNodeType(ParticleNode::type(),scene);
-	spriteNode->setNumParticles(4,ParticleNode::ParticleType_SPRITE,Math::ONE,pointPositions);
-	spriteNode->setMaterial(spriteMaterial);
-	spriteNode->setTranslate(0,0,0);
-	scene->getRoot()->attach(spriteNode);
+	Node::ptr spritesNode=new Node(scene);
+	{
+ 		sprites=new ParticleComponent(scene);
+		sprites->setNumParticles(4,ParticleComponent::ParticleType_SPRITE,Math::ONE,pointPositions);
+		sprites->setMaterial(spriteMaterial);
+		spritesNode->attach(sprites);
+	}
+	spritesNode->setTranslate(0,0,0);
+	scene->getRoot()->attach(spritesNode);
 
- 	beamNode=engine->createNodeType(ParticleNode::type(),scene);
-	beamNode->setNumParticles(8,ParticleNode::ParticleType_BEAM,Math::ONE,beamPositions);
-	beamNode->setMaterial(beamMaterial);
-	beamNode->setTranslate(Math::fromInt(40),0,0);
-	scene->getRoot()->attach(beamNode);
+	Node::ptr beamsNode=new Node(scene);
+	{
+ 		beams=new ParticleComponent(scene);
+		beams->setNumParticles(8,ParticleComponent::ParticleType_BEAM,Math::ONE,beamPositions);
+		beams->setMaterial(beamMaterial);
+		beamsNode->attach(beams);
+	}
+	beamsNode->setTranslate(Math::fromInt(40),0,0);
+	scene->getRoot()->attach(beamsNode);
 
-	cameraNode=engine->createNodeType(CameraNode::type(),scene);
-	cameraNode->setLookAt(Vector3(0,-Math::fromInt(150),0),Math::ZERO_VECTOR3,Math::Z_UNIT_VECTOR3);
-	cameraNode->setClearColor(Colors::BLACK);
-	scene->getRoot()->attach(cameraNode);
+	camera=new Camera();
+	camera->setLookAt(Vector3(0,-Math::fromInt(150),0),Math::ZERO_VECTOR3,Math::Z_UNIT_VECTOR3);
+	camera->setClearColor(Colors::BLACK);
 
-	pointNode->setWorldSpace(true);
-	particles.add(pointNode);
-	spriteNode->setWorldSpace(true);
-	spriteNode->setVelocityAligned(true);
-	particles.add(spriteNode);
-	beamNode->setWorldSpace(true);
-	particles.add(beamNode);
+	points->setWorldSpace(true);
+	particles.add(points);
+	sprites->setWorldSpace(true);
+	sprites->setVelocityAligned(true);
+	particles.add(sprites);
+	beams->setWorldSpace(true);
+	particles.add(beams);
 
 	#if defined(LFX_DLL_NAME)
 		lfxLibrary.load(LFX_DLL_NAME,"","","");
@@ -110,21 +121,11 @@ void Particles::destroy(){
 	scene->destroy();
 }
 
-void Particles::resized(int width,int height){
-	if(cameraNode!=NULL && width>0 && height>0){
-		if(width>=height){
-			cameraNode->setProjectionFovY(Math::degToRad(Math::fromInt(45)),Math::div(Math::fromInt(width),Math::fromInt(height)),Math::fromInt(10),Math::fromInt(200));
-		}
-		else{
-			cameraNode->setProjectionFovX(Math::degToRad(Math::fromInt(45)),Math::div(Math::fromInt(height),Math::fromInt(width)),Math::fromInt(10),Math::fromInt(200));
-		}
-		cameraNode->setViewport(Viewport(0,0,width,height));
-	}
-}
+void Particles::render(){
+	RenderDevice *device=engine->getRenderDevice();
 
-void Particles::render(RenderDevice *device){
 	device->beginScene();
-		cameraNode->render(device);
+		camera->render(device,scene);
 	device->endScene();
  	device->swap();
 }
@@ -135,9 +136,9 @@ void Particles::update(int dt){
 
 	int i,j;
 	for(i=0;i<particles.size();++i){
-		ParticleNode *pn=particles[i];
-		for(j=0;j<pn->getNumParticles();++j){
-			ParticleNode::Particle *p=pn->getParticle(j);
+		ParticleComponent *pc=particles[i];
+		for(j=0;j<pc->getNumParticles();++j){
+			ParticleComponent::Particle *p=pc->getParticle(j);
 			p->vz-=Math::mul(Math::fromFloat(9.8),fdt);
 
 			p->x+=Math::mul(p->vx,fdt);
@@ -162,9 +163,9 @@ void Particles::update(int dt){
 			scalar avgz=0;
 			int total=0;
 			for(i=0;i<particles.size();++i){
-				ParticleNode *pn=particles[i];
-				for(j=0;j<pn->getNumParticles();++j){
-					ParticleNode::Particle *p=pn->getParticle(j);
+				ParticleComponent *pc=particles[i];
+				for(j=0;j<pc->getNumParticles();++j){
+					ParticleComponent::Particle *p=pc->getParticle(j);
 					avgz+=p->z;
 					total++;
 				}
@@ -186,9 +187,9 @@ void Particles::keyPressed(int key){
 		scalar v=Math::fromInt(4);
 		int i,j;
 		for(i=0;i<particles.size();++i){
-			ParticleNode *pn=particles[i];
-			for(j=0;j<pn->getNumParticles();++j){
-				ParticleNode::Particle *p=pn->getParticle(j);
+			ParticleComponent *pc=particles[i];
+			for(j=0;j<pc->getNumParticles();++j){
+				ParticleComponent::Particle *p=pc->getParticle(j);
 				p->vx+=random.nextScalar(-v,v);
 				p->vy+=random.nextScalar(-v,v);
 				p->vz+=random.nextScalar(-v,v);
