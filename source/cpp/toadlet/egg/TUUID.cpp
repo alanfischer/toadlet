@@ -62,7 +62,7 @@ bool TUUID::fromString(const String &string){
 	return n==36 && string[n]=='\0';
 }
 
-String TUUID::toString(){
+String TUUID::toString() const{
 	tbyte *uu=(tbyte*)&highBits;
 	char string[128];
 	sprintf(string,	"%02x%02x%02x%02x-"

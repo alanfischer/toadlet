@@ -158,8 +158,6 @@ Engine::Engine(void *env,void *ctx,int options):
 	mRenderDeviceChanged(false),
 	mAudioDevice(NULL),
 	mAudioDeviceChanged(false)
-
-	//mContextListeners
 {
 	Logger *logger=Log::getInstance();
 	logger->addCategory(Categories::TOADLET_EGG_LOGGER);

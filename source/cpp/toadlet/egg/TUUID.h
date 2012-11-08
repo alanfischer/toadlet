@@ -41,11 +41,13 @@ public:
 
 	bool fromRandom();
 	bool fromString(const String &string);
-	String toString();
-	
+
+	String toString() const;
+	inline operator String() const{return toString();}
+
 	uint64 getHighBits() const{return highBits;}
 	uint64 getLowBits() const{return lowBits;}
-		
+
 	inline bool equals(const TUUID &u2) const{return highBits==u2.highBits && lowBits==u2.lowBits;}
 
 	inline bool operator==(const TUUID &u2) const{return equals(u2);}
