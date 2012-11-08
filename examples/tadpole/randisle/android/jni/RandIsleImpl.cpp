@@ -1,15 +1,6 @@
 #include "../../src/RandIsle.h"
 #include <jni.h>
 
-#if 0 && ANDROID_NDK_API_LEVEL>=9
-extern "C" JNIEXPORT void ANativeActivity_onCreate(ANativeActivity *activity,void *savedState,size_t savedStateSize){
-	Log::alert("ANativeActivity_onCreate");
-
-	AndroidApplication *app=new AndroidApplication();
-	app->setApplet(new RandIsle(app,""));
-	app->setNativeActivity(activity);
-}
-#else
 extern "C" JNIEXPORT jobject JNICALL Java_us_toadlet_randisle_RandIsle_createApplet(JNIEnv *env,jobject obj){
 	Log::alert("getting Application");
 	Application *app=new JApplication(env,obj);
@@ -30,4 +21,3 @@ extern "C" JNIEXPORT jobject JNICALL Java_us_toadlet_randisle_RandIsle_createApp
 
 extern "C" JNIEXPORT void JNICALL Java_us_toadlet_randisle_RandIsle_destroyApplet(JNIEnv *env,jobject obj,jobject appletObj){
 }
-#endif

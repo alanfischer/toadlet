@@ -113,9 +113,7 @@ bool EGLWindowRenderTarget::createContext(void *display,void *window,WindowRende
 
 	mPixmap=pixmap;
 
-	try{
-		mDisplay=eglGetDisplay((NativeDisplayType)display);
-	}catch(...){mDisplay=EGL_NO_DISPLAY;}
+	mDisplay=eglGetDisplay((NativeDisplayType)display);
 	if(mDisplay==EGL_NO_DISPLAY){
 		Error::unknown(Categories::TOADLET_PEEPER,
 			"error getting display");
@@ -169,16 +167,14 @@ bool EGLWindowRenderTarget::createContext(void *display,void *window,WindowRende
 	Log::debug(Categories::TOADLET_PEEPER,
 		String("chooseEGLConfig config:")+(int)mConfig);
 		
-	try{
-		if(!pixmap){
-			mSurface=eglCreateWindowSurface(mDisplay,mConfig,(NativeWindowType)window,NULL);
-			TOADLET_CHECK_EGLERROR("eglCreateWindowSurface");
-		}
-		else{
-			mSurface=eglCreatePixmapSurface(mDisplay,mConfig,(egl_native_pixmap_t*)window,NULL);
-			TOADLET_CHECK_EGLERROR("eglCreatePixmapSurface");
-		}
-	}catch(...){mSurface=EGL_NO_SURFACE;}
+	if(!pixmap){
+		mSurface=eglCreateWindowSurface(mDisplay,mConfig,(NativeWindowType)window,NULL);
+		TOADLET_CHECK_EGLERROR("eglCreateWindowSurface");
+	}
+	else{
+		mSurface=eglCreatePixmapSurface(mDisplay,mConfig,(egl_native_pixmap_t*)window,NULL);
+		TOADLET_CHECK_EGLERROR("eglCreatePixmapSurface");
+	}
 	if(mSurface==EGL_NO_SURFACE){
 		Error::unknown(Categories::TOADLET_PEEPER,
 			"error creating surface");
@@ -196,21 +192,18 @@ bool EGLWindowRenderTarget::createContext(void *display,void *window,WindowRende
 	// Terminate the list with EGL_NONE
 	configOptions[i++]=EGL_NONE;
 
-	try{
-		mContext=eglCreateContext(mDisplay,mConfig,EGL_NO_CONTEXT,configOptions);
-		TOADLET_CHECK_EGLERROR("eglCreateContext");
-	}catch(...){mContext=EGL_NO_CONTEXT;}
+	mContext=eglCreateContext(mDisplay,mConfig,EGL_NO_CONTEXT,configOptions);
+	TOADLET_CHECK_EGLERROR("eglCreateContext");
+	
 	if(mContext==EGL_NO_CONTEXT){
 		Error::unknown(Categories::TOADLET_PEEPER,
 			"error creating context");
 		return false;
 	}
 
-	try{
-		eglMakeCurrent(mDisplay,mSurface,mSurface,mContext);
-		TOADLET_CHECK_EGLERROR("eglMakeCurrent");
-	}catch(...){}
-
+	eglMakeCurrent(mDisplay,mSurface,mSurface,mContext);
+	TOADLET_CHECK_EGLERROR("eglMakeCurrent");
+	
 	#if defined(TOADLET_HAS_GLESEM)
 		if(glesem_glInitialize()==false){
 			Error::unknown(Categories::TOADLET_PEEPER,
