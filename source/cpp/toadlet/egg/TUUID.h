@@ -34,9 +34,8 @@ namespace egg{
 
 class TOADLET_API TUUID{
 public:
-	TUUID():highBits(0),lowBits(0){}
+	TUUID(uint64 highBits1=0,uint64 lowBits1=0):highBits(highBits1),lowBits(lowBits1){}
 	TUUID(tbyte bytes[]){highBits=*(uint64*)(bytes+0);lowBits=*(uint64*)(bytes+8);}
-	TUUID(uint64 highBits1,uint64 lowBits1):highBits(highBits1),lowBits(lowBits1){}
 	TUUID(const String &string){fromString(string);}
 
 	bool fromRandom();
