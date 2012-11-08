@@ -4,15 +4,17 @@
 #include <toadlet/toadlet.h>
 //#include <LFX2.h>
 
-class Particles:public Applet{
+class Particles:public Object,public Applet{
 public:
+	TOADLET_OBJECT(Particles);
+
 	Particles(Application *app);
 	virtual ~Particles();
 
 	void create();
 	void destroy();
-	void resized(int width,int height);
-	void render(RenderDevice *device);
+	void resized(int width,int height){}
+	void render();
 	void update(int dt);
 	
 	void focusGained(){}
@@ -29,10 +31,10 @@ public:
 	Application *app;
 	Engine *engine;
 	Scene::ptr scene;
-	CameraNode::ptr cameraNode;
-	ParticleNode::ptr pointNode,spriteNode,beamNode;
+	Camera::ptr camera;
 	Random random;
-	Collection<ParticleNode::ptr> particles;
+	ParticleComponent::ptr points,sprites,beams;
+	Collection<ParticleComponent::ptr> particles;
 
 	#if defined(LFX_DLL_NAME)
 		int lfxTime;
