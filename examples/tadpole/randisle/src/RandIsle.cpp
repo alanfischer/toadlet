@@ -125,7 +125,6 @@ void RandIsle::create(){
 		PathClimber *climber=new PathClimber();
 		{
 			climber->setName("climber");
-			climber->setSpeed(40);
 			climber->setPathClimberListener(this);
 		}
 		mPlayer->attach(climber);
@@ -191,6 +190,7 @@ void RandIsle::create(){
 		mProps->attach(prop);
 	}
 	mScene->getRoot()->attach(mProps);
+	updateProps();
 
 	Log::alert("Populating terrain");
 	while(updatePopulatePatches());

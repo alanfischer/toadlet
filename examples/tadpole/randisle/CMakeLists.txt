@@ -19,6 +19,7 @@ set (SRC
 	../../main/toadletApp.cpp
 	../../main/toadletMain.cpp
 	src/BranchSystem.cpp
+	src/Clouds.cpp
 	src/HUD.cpp
 	src/PathClimber.cpp
 	src/Resources.cpp
@@ -30,6 +31,7 @@ set (SRC
 # Headers
 set (H
 	src/BranchSystem.h
+	src/Clouds.h
 	src/GroundProjector.h
 	src/HUD.h
 	src/PathClimber.h
