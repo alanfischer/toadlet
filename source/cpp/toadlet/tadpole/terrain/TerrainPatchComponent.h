@@ -56,12 +56,21 @@ public:
 
 	class Block{
 	public:
-		Block(){
+		Block():
+			xOrigin(0),
+			yOrigin(0),
+			stride(0),
+			delta0(0),
+			delta1(0),
+			deltaMax(0),
+			even(false),
+			processed(false),
+			visibility(false)
+		{
 			children[0]=0;
 			children[1]=0;
 			children[2]=0;
 			children[3]=0;
-			visibility=false;
 		}
 
 		Block *children[4];
