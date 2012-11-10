@@ -31,7 +31,7 @@ public:
 			minPropDist=60;
 		#else
 			cloudSize=512;
-			patchSize=128;
+			patchSize=16;
 			tolerance=0.000001;
 
 			numProps=100;

@@ -111,7 +111,7 @@ void PathClimber::logicUpdate(int dt,int scope){
 		Math::add(result,mMounted->getTranslate());
 		Math::setAxesFromQuaternion(mParent->getRotate(),right,forward,up);
 		result=result+up*(scale.x-mParent->getPhysics()->getBound()->getAABox().mins.z+1);
-		mParent->setTranslate(result);
+		mParent->getPhysics()->setPosition(result); // Set the physics position, instead of the node position, to take advantage of the physics lerping
 	}
 }
 

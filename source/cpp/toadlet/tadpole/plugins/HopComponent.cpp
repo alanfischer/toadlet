@@ -1,4 +1,4 @@
-/********** Copyright header - do not remove **********
+ /********** Copyright header - do not remove **********
  *
  * The Toadlet Engine
  *
@@ -35,7 +35,7 @@ HopComponent::HopComponent(HopManager *manager):
 	//mOldPosition,mNewPosition,mCurrentPosition,
 	mTransformChanged(false)
 	//mTraceableShape,
-//	mTraceable(NULL)
+	//mTraceable,
 {
 	mManager=manager;
 
@@ -61,6 +61,11 @@ void HopComponent::parentChanged(Node *node){
 
 	if(mParent!=NULL){
 		mParent->physicsAttached(this);
+
+		mOldPosition.set(mSolid->getPosition());
+		mNewPosition.set(mOldPosition);
+		lerpPosition(0);
+		mParent->updateWorldTransform();
 	}
 }
 
