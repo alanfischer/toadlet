@@ -237,7 +237,7 @@ bool TerrainPatchComponent::setHeightData(scalar *data,int rowPitch,int width,in
 
 	// Build blocks
 	int numBlocks=1<<(2*sizeN);
-	numBlocks=(int)((numBlocks-1)/3) + 1;
+	numBlocks=(int)((numBlocks-1)/3);
 
 	mBlocks.resize(numBlocks);
 	mBlockQueue.resize(numBlocks);
