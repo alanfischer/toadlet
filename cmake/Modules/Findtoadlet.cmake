@@ -72,6 +72,18 @@ endif (WIN32)
 # Find the toadlet header file
 find_path (TOADLET_INCLUDE_DIR toadlet/toadlet.h PATHS ${HEADER_SEARCH_PATHS})
 
+# If no global header was found, we may have a sub-library installation.
+# Check backwards through the list.
+if (NOT TOADLET_INCLUDE_DIR)
+		foreach (TOADLET_HEADER pad tadpole ribbit peeper hop flick egg)
+			find_path (TOADLET_INCLUDE_DIR toadlet/${TOADLET_HEADER}.h PATHS ${HEADER_SEARCH_PATHS})
+			if (TOADLET_INCLUDE_DIR)
+				message (STATUS "toadlet sub library installation found for ${TOADLET_HEADER}")
+				break()
+			endif (TOADLET_INCLUDE_DIR)
+		endforeach (TOADLET_HEADER)
+endif (NOT TOADLET_INCLUDE_DIR)
+
 # List of toadlet library basenames
 # NOTE: These are listed in the order acceptable for static linking
 set (TOADLET_LIB_BASENAMES
