@@ -46,7 +46,7 @@ public:
 	int nextInt();
 
 	// Returns a uniformly distributed random int between 0 (inclusive) and n (exclusive)
-	int nextInt(int n);
+	int nextInt(int upper);
 
 	// Returns a uniformly distributed random int between lower (inclusive) and upper (exclusive)
 	int nextInt(int lower,int upper);
@@ -54,7 +54,8 @@ public:
 	// Returns a uniformly distributed random float between 0.0 and 1.0
 	float nextFloat();
 
-	float nextFloat(float upper);
+	// Returns a uniformly distributed random float between 0 and n
+	float nextFloat(float n);
 
 	// Returns a uniformly distributed random float between lower and upper
 	float nextFloat(float lower,float upper);

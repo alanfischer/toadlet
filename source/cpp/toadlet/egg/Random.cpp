@@ -75,6 +75,10 @@ float Random::nextFloat(){
 	return next(24) / ((float)(1<<24));
 }
 
+float Random::nextFloat(float n){
+	return (nextFloat()*n);
+}
+
 float Random::nextFloat(float lower,float upper){
 	return (nextFloat()*(upper-lower))+lower;
 }
