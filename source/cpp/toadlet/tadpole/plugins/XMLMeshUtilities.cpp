@@ -294,6 +294,8 @@ mxml_node_t *XMLMeshUtilities::saveMaterial(Material::ptr material,int version,P
 				case RasterizerState::CullType_NONE:
 					mxmlNewOpaque(cullNode,"None");
 				break;
+				default:
+				break;
 			}
 		}
 	}
@@ -308,6 +310,8 @@ mxml_node_t *XMLMeshUtilities::saveMaterial(Material::ptr material,int version,P
 				break;
 				case BlendState::Operation_ONE_MINUS_SOURCE_COLOR:
 					mxmlNewOpaque(blendNode,"Color");
+				break;
+				default:
 				break;
 			}
 		}
