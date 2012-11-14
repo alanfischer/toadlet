@@ -45,7 +45,7 @@ public:
 	Font::ptr findFont(const String &name,float pointSize){return shared_static_cast<Font>(find(name,FontData::ptr(new FontData(pointSize))));}
 	Font::ptr getDefaultFont();
 	
-	Resource::ptr manage(const Resource::ptr &resource,const String &name=(char*)NULL);
+	Resource::ptr manage(Resource *resource,const String &name=(char*)NULL);
 	void unmanage(Resource *resource);
 
 	Resource::ptr find(const String &name,ResourceData *data=NULL);
