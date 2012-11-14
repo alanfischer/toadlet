@@ -37,9 +37,9 @@ FontManager::FontManager(Engine *engine):ResourceManager(engine){
 	mDefaultCharacterSet=String("ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789~!@#$%^&*()_+|{}:\"'<>?`-=\\/[];,. \t");
 }
 
-Resource::ptr FontManager::manage(const Resource::ptr &resource,const String &name){
+Resource::ptr FontManager::manage(Resource *resource,const String &name){
 	if(name!=(char*)NULL){
-		ResourceManager::manage(resource,name+String(":")+shared_static_cast<Font>(resource)->getPointSize());
+		ResourceManager::manage(resource,name+String(":")+((Font*)resource)->getPointSize());
 	}
 	else{
 		ResourceManager::manage(resource);

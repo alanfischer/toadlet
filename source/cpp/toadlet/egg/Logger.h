@@ -32,6 +32,9 @@
 #if !defined(TOADLET_NO_THREADS)
 	#include <toadlet/egg/Mutex.h>
 #endif
+#if defined(TOADLET_PLATFORM_OSX)
+	#include <asl.h>
+#endif
 
 namespace toadlet{
 namespace egg{
@@ -111,6 +114,9 @@ public:
 
 private:
 	typedef Map<String,Category*> CategoryNameCategoryMap;
+	#if defined(TOADLET_PLATFORM_OSX)
+		typedef Map<String,aslclient> CategoryNameClientMap;
+	#endif
 
 	void addCompleteLogEntry(Category *category,Level level,const String &text);
 
@@ -124,6 +130,9 @@ private:
 	bool mLoggedMessage;
 	egg::Collection<Entry*> mLogEntries;
 	CategoryNameCategoryMap mCategoryNameCategoryMap;
+	#if defined(TOADLET_PLATFORM_OSX)
+		CategoryNameClientMap mCategoryNameClientMap;
+	#endif
 	#if !defined(TOADLET_NO_THREADS)
 		Mutex mMutex;
 	#endif

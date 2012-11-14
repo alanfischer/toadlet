@@ -56,6 +56,14 @@ Logger::Logger(){
 }
 
 Logger::~Logger(){
+	#if defined(TOADLET_PLATFORM_OSX)
+		while(mCategoryNameClientMap.begin()!=mCategoryNameClientMap.end()){
+			aslclient client=mCategoryNameClientMap.begin()->second;
+			asl_close(client);
+			mCategoryNameClientMap.erase(mCategoryNameClientMap.begin());
+		}
+	#endif
+
 	while(mCategoryNameCategoryMap.begin()!=mCategoryNameCategoryMap.end()){
 		Category *category=mCategoryNameCategoryMap.begin()->second;
 		delete category;
@@ -251,11 +259,44 @@ void Logger::addCompleteLogEntry(Category *category,Level level,const String &te
 				case Level_ERROR:
 					priority=ANDROID_LOG_ERROR;
 				break;
+				default:
+				break;
 			}
 
 			__android_log_write(priority,category!=NULL?category->name:"toadlet",text);
 		#endif
 
+		#if defined(TOADLET_PLATFORM_OSX)
+			aslclient client=NULL;
+			if(category!=NULL){
+				CategoryNameClientMap::iterator it=mCategoryNameClientMap.find(category->name);
+				client=it!=mCategoryNameClientMap.end()?it->second:NULL;
+			}
+
+			int asllevel=ASL_LEVEL_NOTICE;
+			switch(level){
+				case Level_EXCESS:
+					asllevel=ASL_LEVEL_DEBUG;
+				break;
+				case Level_DEBUG:
+					asllevel=ASL_LEVEL_INFO;
+				break;
+				case Level_ALERT:
+					asllevel=ASL_LEVEL_NOTICE;
+				break;
+				case Level_WARNING:
+					asllevel=ASL_LEVEL_WARNING;
+				break;
+				case Level_ERROR:
+					asllevel=ASL_LEVEL_ERR;
+				break;
+				default:
+				break;
+			}
+		
+			asl_log(client,NULL,asllevel,"%s",line.c_str());
+		#endif
+		
 		#if defined(TOADLET_USE_STDERR_LOGGING)
 			fputs(line,stderr);
 		#endif
@@ -270,6 +311,9 @@ Logger::Category *Logger::addCategory(const String &categoryName){
 	Category *category=new Category(categoryName);
 	lock();
 		mCategoryNameCategoryMap.add(categoryName,category);
+		#if defined(TOADLET_PLATFORM_OSX)
+			mCategoryNameClientMap.add(categoryName,asl_open(categoryName,categoryName,0));
+		#endif
 	unlock();
 	return category;
 }
