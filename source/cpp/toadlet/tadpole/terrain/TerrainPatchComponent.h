@@ -243,8 +243,6 @@ protected:
 	int mBlockQueueEnd;
 	int mNumBlocksInQueue;
 	int mNumUnprocessedBlocks;
-	int mLastBlockUpdateFrame;
-	int mLastVertexesUpdateFrame;
 	scalar mEpsilon;
 	scalar mCellEpsilon;
 

@@ -437,13 +437,19 @@ void TerrainNode::updateBound(){
 }
 
 void TerrainNode::updatePatches(Camera *camera){
-	int i;
-	for(i=0;i<mPatchGrid.size();++i){
-		mPatchGrid[i]->updateBlocks(camera);
-	}
+	if((camera->getScope()&mPatchCameraUpdateScope)!=0){
+		int i;
+		for(i=0;i<mPatchGrid.size();++i){
+			mPatchGrid[i]->updateBlocks(camera);
+		}
 
-	for(i=0;i<mPatchGrid.size();++i){
-		mPatchGrid[i]->updateVertexes();
+		for(i=0;i<mPatchGrid.size();++i){
+			mPatchGrid[i]->updateVertexes();
+		}
+
+		for(i=0;i<mPatchGrid.size();++i){
+			mPatchGrid[i]->updateIndexBuffers(camera);
+		}
 	}
 }
 
