@@ -36,8 +36,6 @@ TerrainPatchComponent::TerrainPatchComponent(Scene *scene):
 	mBlockQueueEnd(0),
 	mNumBlocksInQueue(0),
 	mNumUnprocessedBlocks(0),
-	mLastBlockUpdateFrame(0),
-	mLastVertexesUpdateFrame(0),
 
 	//mLeftDependent,
 	//mTopDependent,
@@ -620,12 +618,6 @@ void TerrainPatchComponent::setWaterLevel(scalar level){
 void TerrainPatchComponent::gatherRenderables(Camera *camera,RenderableSet *set){
 	TOADLET_PROFILE_AUTOSCOPE();
 
-	if((camera->getScope()&mCameraUpdateScope)!=0){
-		updateBlocks(camera);
-		updateVertexes();
-		updateIndexBuffers(camera);
-	}
-
 	if((camera->getScope()&mTerrainScope)!=0 && mIndexData->getCount()>0){
 		set->queueRenderable(this);
 	}
@@ -646,10 +638,6 @@ void TerrainPatchComponent::gatherRenderables(Camera *camera,RenderableSet *set)
 void TerrainPatchComponent::updateBlocks(Camera *camera){
 	TOADLET_PROFILE_AUTOSCOPE();
 
-	if(mScene->getFrame()==mLastBlockUpdateFrame){
-		return;
-	}
-
 	Matrix4x4 matrix;
 	mParent->getWorldTransform().inverseTransform(matrix,camera->getWorldMatrix());
 	mLocalCamera->setWorldMatrix(matrix);
@@ -657,7 +645,6 @@ void TerrainPatchComponent::updateBlocks(Camera *camera){
 
 	resetBlocks();
 	simplifyBlocks(mLocalCamera);
-	mLastBlockUpdateFrame=mScene->getFrame();
 }
 
 void TerrainPatchComponent::updateIndexBuffers(Camera *camera){
@@ -1197,10 +1184,6 @@ void TerrainPatchComponent::computeDelta(Block *block,const Vector3 &cameraTrans
 void TerrainPatchComponent::updateVertexes(){
 	TOADLET_PROFILE_AUTOSCOPE();
 
-	if(mScene->getFrame()==mLastVertexesUpdateFrame){
-		return;
-	}
-
 	int i;
 	Block *b;
 	for(i=0;i<mNumBlocksInQueue;i++){
@@ -1221,8 +1204,6 @@ void TerrainPatchComponent::updateVertexes(){
 			enableVertex(vertexAt(b->xOrigin+b->stride*2,b->yOrigin+b->stride*2));
 		}
 	}
-	
-	mLastVertexesUpdateFrame=mScene->getFrame();
 }
 
 bool TerrainPatchComponent::blockIntersectsCamera(const Block *block,Camera *camera,bool water) const{
