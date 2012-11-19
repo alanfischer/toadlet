@@ -24,6 +24,13 @@ RandIsle::RandIsle(Application *app,String path):
 		mApp->setEngineOptions(mApp->getEngineOptions() | Engine::Option_BIT_NOSHADER);
 	#endif
 	mPath=path;
+
+	int items[]={0xa4,0x9,0x46,0x1,0xb9,0xa5,0x21,0xfb,0xbd,0x72,0xc3,0x45};
+	unsigned char check=0;
+	for(int i=0;i<12;++i){
+		check^=items[i];
+	}
+	Log::alert(String("CHECK:")+(int)check);
 }
 
 RandIsle::~RandIsle(){
@@ -300,6 +307,20 @@ void RandIsle::logicUpdate(int dt){
 	updateClimber(climber,dt);
 
 //	updateDanger(dt);
+
+	{
+		Vector3 windVector(0,0.1f,0);
+		float waveLength=0.1f;
+		float time=mScene->getTime()/1000.0f;
+		TextureState state;
+		state.calculation=TextureState::CalculationType_NORMAL;
+		Math::setMatrix4x4FromTranslateRotateScale(state.matrix,time*windVector,Quaternion(),Vector3(1.0/waveLength,1.0/waveLength,1.0/waveLength));
+
+		Shader::ShaderType type=(Shader::ShaderType)0;
+		int index=0;
+		Resources::instance->waterMaterial->getPass()->findTexture("waveTexture",type,index);
+		Resources::instance->waterMaterial->getPass()->setTextureState(type,index,state);
+	}
 
 	updateProps();
 

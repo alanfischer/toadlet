@@ -12,7 +12,7 @@ Clouds::Clouds(Scene *scene,int cloudSize,const Vector4 &skyColor,const Vector4 
 	mSkyColor=skyColor;
 
 	Sphere sphere(Vector3(0,0,0),512);
-	bool advanced=false; // Use realtime bumpmapping, or precalculated
+	bool advanced=true; // Use realtime bumpmapping, or precalculated
 
 	SkyDomeMeshCreator::ptr skyDomeCreator=new SkyDomeMeshCreator(mEngine);
  	int numSegments=16,numRings=16;
@@ -105,12 +105,12 @@ Clouds::Clouds(Scene *scene,int cloudSize,const Vector4 &skyColor,const Vector4 
 				"varying vec2 texCoord1;\n"
 
 				"uniform vec4 skyColor;\n"
-				"uniform sampler2D bumpTex,cloudTex,fadeTex;\n"
+				"uniform sampler2D bumpTexture,cloudTexture,fadeTexture;\n"
 
 				"void main(){\n"
-					"vec4 bump=texture2D(bumpTex,texCoord0);\n"
-					"vec4 cloud=texture2D(cloudTex,texCoord0);\n"
-					"vec4 fade=texture2D(fadeTex,texCoord1);\n"
+					"vec4 bump=texture2D(bumpTexture,texCoord0);\n"
+					"vec4 cloud=texture2D(cloudTexture,texCoord0);\n"
+					"vec4 fade=texture2D(fadeTexture,texCoord1);\n"
 					"vec4 color=vec4(dot((color.xyz-0.5)*2.0,(bump.xyz-0.5)*2.0));\n"
 					"color=vec4(color.xyz+cloud.xyz,cloud.a);\n"
 					"color=mix(skyColor,color,cloud.w);\n"
@@ -128,13 +128,13 @@ Clouds::Clouds(Scene *scene,int cloudSize,const Vector4 &skyColor,const Vector4 
 				"};\n"
 
 				"float4 skyColor;\n"
-				"Texture2D bumpTex,cloudTex,fadeTex;\n"
+				"Texture2D bumpTexture,cloudTexture,fadeTexture;\n"
 				"SamplerState bumpSamp,cloudSamp,fadeSamp;\n"
 
 				"float4 main(PIN pin): SV_TARGET{\n"
-					"float4 bump=bumpTex.Sample(bumpSamp,pin.texCoord0);\n"
-					"float4 cloud=cloudTex.Sample(cloudSamp,pin.texCoord0);\n"
-					"float4 fade=fadeTex.Sample(fadeSamp,pin.texCoord1);\n"
+					"float4 bump=bumpTexture.Sample(bumpSamp,pin.texCoord0);\n"
+					"float4 cloud=cloudTexture.Sample(cloudSamp,pin.texCoord0);\n"
+					"float4 fade=fadeTexture.Sample(fadeSamp,pin.texCoord1);\n"
 					"float4 color=dot((pin.color.xyz-0.5)*2,(bump.xyz-0.5)*2);\n"
 					"color=float4(color.xyz+cloud.xyz,cloud.a);\n"
 					"color=lerp(skyColor,color,cloud.w);\n"
@@ -163,10 +163,9 @@ Clouds::Clouds(Scene *scene,int cloudSize,const Vector4 &skyColor,const Vector4 
 			variables->addVariable("textureMatrix",RenderVariable::ptr(new TextureMatrixVariable(Shader::ShaderType_VERTEX,0)),Material::Scope_MATERIAL);
 			variables->addVariable("skyColor",RenderVariable::ptr(new Vector4Variable(mSkyColor)),Material::Scope_MATERIAL);
 
-			variables->addTexture("bumpTex",mBumpTexture,"bumpSamp",SamplerState(),TextureState());
-			variables->addTexture("cloudTex",mCloudTexture,"cloudSamp",SamplerState(),TextureState());
-			variables->addTexture("fadeTex",mFadeTexture,"fadeSamp",SamplerState(),TextureState());
-			mShaderAccessor=Matrix4x4Accessor::ptr(new TextureStateMatrix4x4Accessor(pass,0));
+			variables->addTexture("bumpTexture",mBumpTexture,"bumpSamp",SamplerState(),TextureState());
+			variables->addTexture("cloudTexture",mCloudTexture,"cloudSamp",SamplerState(),TextureState());
+			variables->addTexture("fadeTexture",mFadeTexture,"fadeSamp",SamplerState(),TextureState());
 		}
 
 		if(mEngine->hasFixed(Shader::ShaderType_VERTEX) && mEngine->hasFixed(Shader::ShaderType_FRAGMENT)){
@@ -184,7 +183,8 @@ Clouds::Clouds(Scene *scene,int cloudSize,const Vector4 &skyColor,const Vector4 
 			bumpState.colorSource1=TextureState::Source_PREVIOUS;
 			bumpState.colorSource2=TextureState::Source_TEXTURE;
 			pass->setTexture(Shader::ShaderType_FRAGMENT,state,mBumpTexture,SamplerState(),bumpState);
-			mBumpAccessor=Matrix4x4Accessor::ptr(new TextureStateMatrix4x4Accessor(pass,state++));
+			pass->setTextureLocationName(Shader::ShaderType_FRAGMENT,state,"bumpTexture");
+			state++;
 
 			TextureState cloudState;
 			cloudState.colorOperation=TextureState::Operation_ADD;
@@ -193,7 +193,8 @@ Clouds::Clouds(Scene *scene,int cloudSize,const Vector4 &skyColor,const Vector4 
 			cloudState.alphaOperation=TextureState::Operation_REPLACE;
 			cloudState.alphaSource1=TextureState::Source_TEXTURE;
 			pass->setTexture(Shader::ShaderType_FRAGMENT,state,mCloudTexture,SamplerState(),cloudState);
-			mCloudAccessor=Matrix4x4Accessor::ptr(new TextureStateMatrix4x4Accessor(pass,state++));
+			pass->setTextureLocationName(Shader::ShaderType_FRAGMENT,state,"cloudTexture");
+			state++;
 
 			TextureState colorState;
 			colorState.constantColor.set(mSkyColor);
@@ -204,7 +205,8 @@ Clouds::Clouds(Scene *scene,int cloudSize,const Vector4 &skyColor,const Vector4 
 			colorState.alphaOperation=TextureState::Operation_REPLACE;
 			colorState.alphaSource1=TextureState::Source_PREVIOUS;
 			pass->setTexture(Shader::ShaderType_FRAGMENT,state,mCloudTexture,SamplerState(),colorState); // Need a texture for this state to function on OpenGL currently
-			mColorAccessor=Matrix4x4Accessor::ptr(new TextureStateMatrix4x4Accessor(pass,state++));
+			pass->setTextureLocationName(Shader::ShaderType_FRAGMENT,state,"colorTexture");
+			state++;
 
 			TextureState fadeState;
 			fadeState.colorOperation=TextureState::Operation_ALPHABLEND;
@@ -214,7 +216,8 @@ Clouds::Clouds(Scene *scene,int cloudSize,const Vector4 &skyColor,const Vector4 
 			fadeState.alphaOperation=TextureState::Operation_REPLACE;
 			fadeState.alphaSource1=TextureState::Source_TEXTURE;
 			pass->setTexture(Shader::ShaderType_FRAGMENT,state,mFadeTexture,SamplerState(),fadeState);
-			mFadeAccessor=Matrix4x4Accessor::ptr(new TextureStateMatrix4x4Accessor(pass,state++));
+			pass->setTextureLocationName(Shader::ShaderType_FRAGMENT,state,"fadeTexture");
+			state++;
 		}
 
 		material->compile();
@@ -226,7 +229,7 @@ Clouds::Clouds(Scene *scene,int cloudSize,const Vector4 &skyColor,const Vector4 
 		mCompositeTexture=mEngine->getTextureManager()->createTexture(Texture::Usage_BIT_AUTOGEN_MIPMAPS|Texture::Usage_BIT_DYNAMIC,mCompositeFormat,mCompositeData);
 
 		material=mEngine->createSkyBoxMaterial(mCompositeTexture,false);
-		mCompositeAccessor=Matrix4x4Accessor::ptr(new TextureStateMatrix4x4Accessor(material->getPass(),0));
+		material->getPass()->setTextureLocationName(Shader::ShaderType_FRAGMENT,0,"compositeTexture");
 		material->getPass()->setBlendState(BlendState::Combination_ALPHA);
 		material->getPass()->setMaterialState(MaterialState(false,true));
 	}
@@ -279,12 +282,17 @@ void Clouds::setLightDirection(const Vector3 &lightDir){
 	VertexBufferAccessor vba(buffer,Buffer::Access_READ_WRITE);
 	int ip=buffer->getVertexFormat()->findElement(VertexFormat::Semantic_POSITION);
 	int ic=buffer->getVertexFormat()->findElement(VertexFormat::Semantic_COLOR);
+
+	Shader::ShaderType type;
+	int index;
+	bool hasBump=mMaterial->getPass()->findTexture("bumpTexture",type,index);
+
 	Vector3 pos,dir;
 	int i;
 	for(i=0;i<vba.getSize();++i){
 		vba.get3(i,ip,pos);
 		Math::normalize(pos);
-		if(mShaderAccessor!=NULL || mBumpAccessor!=NULL){
+		if(hasBump){
 			pos.z=0;
 			Math::sub(dir,pos,lightDir);
 			Math::normalize(dir);
@@ -311,17 +319,21 @@ void Clouds::frameUpdate(int dt,int scope){
 	offset.x+=Math::fromMilli(mScene->getTime())*0.01;
 	Matrix4x4 matrix;
 	Math::setMatrix4x4FromTranslate(matrix,offset);
-	if(mShaderAccessor!=NULL){
-		mShaderAccessor->setMatrix4x4(matrix);
-	}
-	if(mBumpAccessor!=NULL){
-		mBumpAccessor->setMatrix4x4(matrix);
-	}
-	if(mCloudAccessor!=NULL){
-		mCloudAccessor->setMatrix4x4(matrix);
-	}
-	if(mCompositeAccessor!=NULL){
-		mCompositeAccessor->setMatrix4x4(matrix);
+
+	setTextureMatrix("bumpTexture",mMaterial,matrix);
+	setTextureMatrix("cloudTexture",mMaterial,matrix);
+	setTextureMatrix("compositeTexture",mMaterial,matrix);
+}
+
+void Clouds::setTextureMatrix(const String &name,Material *material,const Matrix4x4 &matrix){
+	Shader::ShaderType type;
+	int index;
+	RenderPass *pass=material->getPath()->findTexture(name,type,index);
+	if(pass!=NULL){
+		TextureState state;
+		pass->getTextureState(type,index,state);
+		state.matrix.set(matrix);
+		pass->setTextureState(type,index,state);
 	}
 }
 

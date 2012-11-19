@@ -51,8 +51,8 @@ WaterMaterialCreator::WaterMaterialCreator(Engine *engine){
 
 		"uniform mat4 modelViewProjectionMatrix;\n"
 		"uniform mat4 modelMatrix;\n"
+		"uniform mat4 waveMatrix;\n"
 		"uniform vec2 fogDistance;\n"
-		"uniform float time;\n"
 
 		"void main(){\n"
 			"gl_Position=modelViewProjectionMatrix * POSITION;\n"
@@ -68,12 +68,10 @@ WaterMaterialCreator::WaterMaterialCreator(Engine *engine){
 			"refractPosition.z = gl_Position.w;\n"
 			"refractPosition.w = 1.0;\n"
 
-			"vec2 windVector=vec2(0,0.1);\n"
-			"float waveLength=0.1;\n"
-			"bumpPosition=TEXCOORD0/waveLength + time*windVector;\n"
+			"bumpPosition=(waveMatrix * vec4(TEXCOORD0,0.0,1.0)).xy;\n"
 
 			"fog=clamp(1.0-(gl_Position.z-fogDistance.x)/(fogDistance.y-fogDistance.x),0.0,1.0);\n"
-			// We calcaulate a separate refractFog, stored in positionFull.w, since the refractTex shows artifacts closer than the far plane
+			// We calcaulate a separate refractFog, stored in positionFull.w, since the refractTexture shows artifacts closer than the far plane
 			//  due to not being able to use fog in an oblique frustum
 			"positionFull.w=clamp(1.0-(gl_Position.z-fogDistance.x/4.0)/(fogDistance.y/4.0-fogDistance.x/4.0),0.0,1.0);\n"
 		"}\n",
@@ -96,8 +94,8 @@ WaterMaterialCreator::WaterMaterialCreator(Engine *engine){
 
 		"float4x4 modelViewProjectionMatrix;\n"
 		"float4x4 modelMatrix;\n"
+		"float4x4 waveMatrix;\n"
 		"float2 fogDistance;\n"
-		"float time;\n"
 
 		"VOUT main(VIN vin){\n"
 			"VOUT vout;\n"
@@ -114,12 +112,10 @@ WaterMaterialCreator::WaterMaterialCreator(Engine *engine){
 			"vout.refractPosition.z = vout.position.w;\n"
 			"vout.refractPosition.w=1.0;\n"
 
-			"float2 windVector=float2(0,0.1f);\n"
-			"float waveLength=0.1f;\n"
-			"vout.bumpPosition=vin.texCoord/waveLength + time*windVector;\n"
+			"vout.bumpPosition=mul(waveMatrix,float4(vin.texCoord,0.0,1.0));\n "
 
 			"vout.fog=clamp(1.0-(vout.position.z-fogDistance.x)/(fogDistance.y-fogDistance.x),0.0,1.0);\n"
-			// We calcaulate a separate refractFog, stored in positionFull.w, since the refractTex shows artifacts closer than the far plane
+			// We calcaulate a separate refractFog, stored in positionFull.w, since the refractTexture shows artifacts closer than the far plane
 			//  due to not being able to use fog in an oblique frustum
 			"vout.positionFull.w=clamp(1.0-(vout.position.z-fogDistance.x/4.0)/(fogDistance.y/4.0-fogDistance.x/4.0),0.0,1.0);\n"
 
@@ -145,15 +141,15 @@ WaterMaterialCreator::WaterMaterialCreator(Engine *engine){
 		"uniform float waveHeight;\n"
 		"uniform vec4 materialSpecular;\n"
 		"uniform float materialShininess;\n"
-		"uniform sampler2D reflectTex;\n"
-		"uniform sampler2D refractTex;\n"
-		"uniform sampler2D bumpTex;\n"
+		"uniform sampler2D reflectTexture;\n"
+		"uniform sampler2D refractTexture;\n"
+		"uniform sampler2D waveTexture;\n"
 		"uniform mat4 reflectMatrix;\n"
 		"uniform mat4 refractMatrix;\n"
 
 		"void main(){\n"
 			"vec3 normalVector=vec3(0,0,1.0);\n"
-			"vec4 bumpColor=texture2D(bumpTex,bumpPosition);\n"
+			"vec4 bumpColor=texture2D(waveTexture,bumpPosition);\n"
 			"vec3 bumpVector=(bumpColor.xyz-0.5)*2.0;\n"
 
 			"vec2 perturbation=waveHeight*bumpVector.xy;\n"
@@ -162,8 +158,8 @@ WaterMaterialCreator::WaterMaterialCreator(Engine *engine){
 			"float fresnelTerm = 0.02+0.67*pow((1.0-dot(eyeVector, bumpVector)),5.0);\n"
 			"fresnelTerm=clamp(fresnelTerm,0.0,1.0);\n"
 
-			"vec4 reflectColor = texture2D(reflectTex,mod((reflectMatrix * vec4((reflectPosition.xy / reflectPosition.z) + perturbation,0,0)).xy,1.0));\n"
-			"vec4 refractColor = texture2D(refractTex,mod((refractMatrix * vec4((refractPosition.xy / refractPosition.z) + perturbation,0,0)).xy,1.0));\n"
+			"vec4 reflectColor = texture2D(reflectTexture,mod((reflectMatrix * vec4((reflectPosition.xy / reflectPosition.z) + perturbation,0,0)).xy,1.0));\n"
+			"vec4 refractColor = texture2D(refractTexture,mod((refractMatrix * vec4((refractPosition.xy / refractPosition.z) + perturbation,0,0)).xy,1.0));\n"
 			"refractColor=mix(reflectColor,refractColor,positionFull.w);\n"
 
 			"vec4 fragColor=mix(reflectColor,refractColor,fresnelTerm);\n"
@@ -199,16 +195,16 @@ WaterMaterialCreator::WaterMaterialCreator(Engine *engine){
 		"float waveHeight;\n"
 		"float4 materialSpecular;\n"
 		"float materialShininess;\n"
-		"Texture2D reflectTex;\n"
-		"Texture2D refractTex;\n"
-		"Texture2D bumpTex;\n"
+		"Texture2D reflectTexture;\n"
+		"Texture2D refractTexture;\n"
+		"Texture2D waveTexture;\n"
 		"SamplerState reflectSamp;\n"
 		"SamplerState refractSamp;\n"
 		"SamplerState bumpSamp;\n"
 
 		"float4 main(PIN pin): SV_TARGET{\n"
 			"float3 normalVector=float3(0,0,1.0);\n"
-			"float4 bumpColor=bumpTex.Sample(bumpSamp,pin.bumpPosition);\n"
+			"float4 bumpColor=waveTexture.Sample(bumpSamp,pin.bumpPosition);\n"
 			"float3 bumpVector=(bumpColor.xyz-0.5)*2.0;\n"
 
 			"float2 perturbation=waveHeight*bumpVector.xy;\n"
@@ -217,8 +213,8 @@ WaterMaterialCreator::WaterMaterialCreator(Engine *engine){
 			"float fresnelTerm = 0.02+0.67*pow((1.0-dot(eyeVector, bumpVector)),5.0);\n"
 			"fresnelTerm=clamp(fresnelTerm,0.0,1.0);\n"
 
-			"float4 reflectColor = reflectTex.Sample(reflectSamp,(pin.reflectPosition.xy / pin.reflectPosition.z) + perturbation);\n"
-			"float4 refractColor = refractTex.Sample(refractSamp,(pin.refractPosition.xy / pin.refractPosition.z) + perturbation);\n"
+			"float4 reflectColor = reflectTexture.Sample(reflectSamp,(pin.reflectPosition.xy / pin.reflectPosition.z) + perturbation);\n"
+			"float4 refractColor = refractTexture.Sample(refractSamp,(pin.refractPosition.xy / pin.refractPosition.z) + perturbation);\n"
 			"refractColor=lerp(reflectColor,refractColor,pin.positionFull.w);\n"
 
 			"float4 fragColor=lerp(reflectColor,refractColor,fresnelTerm);\n"
@@ -241,7 +237,7 @@ WaterMaterialCreator::WaterMaterialCreator(Engine *engine){
 	mFragmentShader=engine->getShaderManager()->createShader(Shader::ShaderType_FRAGMENT,profiles,fragmentCodes,2);
 }
 
-Material::ptr WaterMaterialCreator::createWaterMaterial(Texture *reflectTexture,Texture *refractTexture,Texture *bumpTexture,const Vector4 &color){
+Material::ptr WaterMaterialCreator::createWaterMaterial(Texture *reflectTexture,Texture *refractTexture,Texture *waveTexture,const Vector4 &color){
 	Material::ptr waterMaterial=mEngine->getMaterialManager()->createMaterial();
 
 	if(mEngine->hasShader(Shader::ShaderType_VERTEX) && mEngine->hasShader(Shader::ShaderType_FRAGMENT)){
@@ -265,16 +261,16 @@ Material::ptr WaterMaterialCreator::createWaterMaterial(Texture *reflectTexture,
 		variables->addVariable("cameraPosition",RenderVariable::ptr(new CameraPositionVariable()),Material::Scope_MATERIAL);
 		variables->addVariable("lightPosition",RenderVariable::ptr(new LightPositionVariable()),Material::Scope_RENDERABLE);
 		variables->addVariable("lightSpecular",RenderVariable::ptr(new LightSpecularVariable()),Material::Scope_RENDERABLE);
-		variables->addVariable("time",RenderVariable::ptr(new TimeVariable()),Material::Scope_MATERIAL);
 		variables->addVariable("waveHeight",RenderVariable::ptr(new ScalarVariable(0.25)),Material::Scope_MATERIAL);
 		variables->addVariable("materialSpecular",RenderVariable::ptr(new MaterialSpecularVariable()),Material::Scope_RENDERABLE);
 		variables->addVariable("materialShininess",RenderVariable::ptr(new MaterialShininessVariable()),Material::Scope_RENDERABLE);
 
-		variables->addTexture("reflectTex",reflectTexture,"reflectSamp",SamplerState(SamplerState::FilterType_LINEAR,SamplerState::FilterType_LINEAR,SamplerState::FilterType_LINEAR,SamplerState::AddressType_CLAMP_TO_EDGE,SamplerState::AddressType_CLAMP_TO_EDGE),TextureState());
-		variables->addTexture("refractTex",refractTexture,"refractSamp",SamplerState(SamplerState::FilterType_LINEAR,SamplerState::FilterType_LINEAR,SamplerState::FilterType_LINEAR,SamplerState::AddressType_CLAMP_TO_EDGE,SamplerState::AddressType_CLAMP_TO_EDGE),TextureState());
-		variables->addTexture("bumpTex",bumpTexture,"bumpSamp",SamplerState(),TextureState());
-		variables->addVariable("reflectMatrix",RenderVariable::ptr(new TextureMatrixVariable("reflectTex")),Material::Scope_MATERIAL);
-		variables->addVariable("refractMatrix",RenderVariable::ptr(new TextureMatrixVariable("refractTex")),Material::Scope_MATERIAL);
+		variables->addTexture("reflectTexture",reflectTexture,"reflectSamp",SamplerState(SamplerState::FilterType_LINEAR,SamplerState::FilterType_LINEAR,SamplerState::FilterType_LINEAR,SamplerState::AddressType_CLAMP_TO_EDGE,SamplerState::AddressType_CLAMP_TO_EDGE),TextureState());
+		variables->addTexture("refractTexture",refractTexture,"refractSamp",SamplerState(SamplerState::FilterType_LINEAR,SamplerState::FilterType_LINEAR,SamplerState::FilterType_LINEAR,SamplerState::AddressType_CLAMP_TO_EDGE,SamplerState::AddressType_CLAMP_TO_EDGE),TextureState());
+		variables->addTexture("waveTexture",waveTexture,"bumpSamp",SamplerState(),TextureState());
+		variables->addVariable("reflectMatrix",RenderVariable::ptr(new TextureMatrixVariable("reflectTexture")),Material::Scope_MATERIAL);
+		variables->addVariable("refractMatrix",RenderVariable::ptr(new TextureMatrixVariable("refractTexture")),Material::Scope_MATERIAL);
+		variables->addVariable("waveMatrix",RenderVariable::ptr(new TextureMatrixVariable("waveTexture")),Material::Scope_MATERIAL);
 	}
 
 	if(mEngine->hasFixed(Shader::ShaderType_VERTEX) && mEngine->hasFixed(Shader::ShaderType_FRAGMENT)){
@@ -286,14 +282,8 @@ Material::ptr WaterMaterialCreator::createWaterMaterial(Texture *reflectTexture,
 		pass->setDepthState(DepthState(DepthState::DepthTest_LEQUAL,false));
 		pass->setRasterizerState(RasterizerState(RasterizerState::CullType_NONE));
 
-		TextureState textureState;
-		textureState.calculation=TextureState::CalculationType_NORMAL;
-
-		Math::setMatrix4x4FromScale(textureState.matrix,16,16,16);
-//		pass->setTexture(Shader::ShaderType_FRAGMENT,0,noise1,SamplerState(),textureState);
-
-		Math::setMatrix4x4FromScale(textureState.matrix,16,16,16);
-//		pass->setTexture(Shader::ShaderType_FRAGMENT,1,noise2,SamplerState(),textureState);
+		pass->setTexture(Shader::ShaderType_FRAGMENT,0,waveTexture,SamplerState(),TextureState());
+		pass->setTextureLocationName(Shader::ShaderType_FRAGMENT,0,"waveTexture");
 	}
 	
 	waterMaterial->compile();

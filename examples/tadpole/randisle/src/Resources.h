@@ -31,7 +31,7 @@ public:
 			minPropDist=60;
 		#else
 			cloudSize=512;
-			patchSize=16;
+			patchSize=128;
 			tolerance=0.000001;
 
 			numProps=100;
@@ -56,7 +56,7 @@ public:
 
 		Log::alert("Loading water");
 
-		Vector4 color=Colors::AZURE*1.5;
+		Vector4 color=Colors::AZURE;
 		color.w=0.5f;
 
 		TextureFormat::ptr waterFormat(new TextureFormat(TextureFormat::Dimension_D2,TextureFormat::Format_RGB_8,512,512,1,0));
@@ -73,21 +73,6 @@ public:
 
 		bumpTexture=engine->getTextureManager()->findTexture("water_bump.png");
 		waterMaterial=engine->createWaterMaterial(reflectTexture,refractTexture,bumpTexture,color);
-
-		/// @todo: Change the water shader so the bump time is replaced with a texture matrix offset, then we can animate it properly both fixed and shader
-/*
-	Material::ptr waterMaterial=Resources::instance->waterMaterial;
-	if(waterMaterial!=NULL){
-		TextureState textureState;
-		waterMaterial->getPass()->getTextureState(Shader::ShaderType_FRAGMENT,0,textureState);
-		Math::setMatrix4x4FromTranslate(textureState.matrix,Math::sin(Math::fromMilli(mScene->getTime())/4)/4,0,0);
-		waterMaterial->getPass()->setTextureState(Shader::ShaderType_FRAGMENT,0,textureState);
-
-		waterMaterial->getPass()->getTextureState(Shader::ShaderType_FRAGMENT,1,textureState);
-		Math::setMatrix4x4FromTranslate(textureState.matrix,0,Math::sin(Math::fromMilli(mScene->getTime())/4)/4,0);
-		waterMaterial->getPass()->setTextureState(Shader::ShaderType_FRAGMENT,1,textureState);
-	}
-*/
 
 		Log::alert("Loading frog");
 
