@@ -107,9 +107,6 @@ void MeshComponent::setMesh(const String &name){
 }
 
 void MeshComponent::setMesh(Mesh *mesh){
-	Log::debug(Categories::TOADLET_TADPOLE,
-		"MeshComponent::setMesh");
-
 	mSubMeshes.clear();
 
 	if(mDynamicVertexData!=NULL){

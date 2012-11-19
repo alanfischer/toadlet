@@ -95,6 +95,7 @@ public:
 
 	// Fixed
 	void setTextureLocationName(Shader::ShaderType type,int i,const String &name);
+	bool findTexture(const String &name,Shader::ShaderType &type,int &index);
 
 	bool isDepthSorted() const;
 
