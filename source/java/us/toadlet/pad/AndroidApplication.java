@@ -119,9 +119,7 @@ public abstract class AndroidApplication extends Activity implements Runnable{
 
 	public AndroidApplication(){
 		super();
-		
-		mEngineOptions=Engine.Option_BIT_FIXEDBACKABLE | Engine.Option_BIT_SHADERBACKABLE;
-		
+	
 		mFormat=new WindowRenderTargetFormat();
 		mFormat.setDepthBits(16);
 		mFormat.setFlags(2);
@@ -201,7 +199,7 @@ public abstract class AndroidApplication extends Activity implements Runnable{
 		}
 
 		if(mEngine==null){
-			mEngine=new Engine(this,mEngineOptions);
+			mEngine=new Engine(this);
 			mEngine.installHandlers();
 		}
 
@@ -475,9 +473,6 @@ public abstract class AndroidApplication extends Activity implements Runnable{
 	public void setDifferenceMouse(boolean difference){mDifferenceMouse=difference;}
 	public boolean getDifferenceMouse(){return mDifferenceMouse;}
 
-	public void setEngineOptions(int options){mEngineOptions=options;}
-	public int getEngineOptions(){return mEngineOptions;}
-
 	public void setFullscreen(boolean fullscreen){mFullscreen=fullscreen;}
 	public boolean getFullscreen(){return mFullscreen;}
 
@@ -519,10 +514,10 @@ public abstract class AndroidApplication extends Activity implements Runnable{
 		int Format_RGB_5_6_5=Format_SEMANTIC_RGB|Format_TYPE_UINT_5_6_5;
 		mFormat.setPixelFormat(Format_RGB_5_6_5);
 
-		if((mEngineOptions&Engine.Option_BIT_NOFIXED)!=0){
+		if(mEngine.hasShader(0)){
 			mFormat.setFlags(2);
 		}
-		else if((mEngineOptions&Engine.Option_BIT_NOSHADER)!=0){
+		else if(mEngine.hasFixed(0)){
 			mFormat.setFlags(0);
 		}
 		
@@ -604,7 +599,6 @@ public abstract class AndroidApplication extends Activity implements Runnable{
 	protected Object mSurfaceMutex=new Object();
 	protected long mLastTime=0;
 	protected boolean mDifferenceMouse;
-	protected int mEngineOptions;
 	protected int mLastMouseX,mLastMouseY;
 	protected WindowRenderTargetFormat mFormat;
 	protected boolean mFixedBackable=true,mShaderBackable=true;

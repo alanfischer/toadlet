@@ -102,6 +102,8 @@ BaseApplication::BaseApplication():
 		mFormat->setDebug(false);
 	#endif
 
+	mEngine->setBackableRenderCaps(RenderCaps());
+	
 	mInputDevices.resize(InputDevice::InputType_MAX,NULL);
 }
 

@@ -71,9 +71,6 @@ public:
 	void setWindowRenderTargetFormat(WindowRenderTargetFormat::ptr format){}
 	WindowRenderTargetFormat::ptr getWindowRenderTargetFormat() const{return WindowRenderTargetFormat::ptr();}
 
-	void setEngineOptions(int options);
-	int getEngineOptions() const;
-
 	// Integrate a JApplet class here
 	void setApplet(Applet *applet){}
 	Applet *getApplet() const{return NULL;}

@@ -198,6 +198,12 @@ Engine::Engine(void *env,void *ctx):
 		mRenderCaps.idealVertexFormatType=VertexFormat::Format_TYPE_FLOAT_32;
 	#endif
 
+	int i;
+	for(i=0;i<Shader::ShaderType_MAX;++i){
+		mBackableRenderCaps.hasShader[i]=true;
+		mBackableRenderCaps.hasFixed[i]=true;
+	}
+	
 	// Create initial BackableVertexFormats.  This doesn't need to be done, but without it, starting an application without a RenderDevice will crash.
 	updateVertexFormats();
 }
