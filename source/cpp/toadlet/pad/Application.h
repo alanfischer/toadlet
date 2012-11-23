@@ -102,9 +102,6 @@ public:
 	virtual void setDifferenceMouse(bool difference)=0;
 	virtual bool getDifferenceMouse() const=0;
 
-	virtual void setEngineOptions(int options)=0;
-	virtual int getEngineOptions() const=0;
-
 	virtual void setWindowRenderTargetFormat(WindowRenderTargetFormat::ptr format)=0;
 	virtual WindowRenderTargetFormat::ptr getWindowRenderTargetFormat() const=0;
 

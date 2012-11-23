@@ -47,6 +47,7 @@ public:
 	}
 
 	Material::ptr createWaterMaterial(Texture *reflectTexture,Texture *refractTexture,Texture *bumpTexture,const Vector4 &color);
+	bool createPaths(Material *material,RenderState *renderState,Texture *reflectTexture,Texture *refractTexture,Texture *waveTexture);
 
 protected:
 	Engine *mEngine;

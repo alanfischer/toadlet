@@ -162,12 +162,12 @@ Mesh::ptr GeoSphereMeshCreator::createGeoSphereMesh(VertexBuffer::ptr vertexBuff
 	}
 	iba.unlock();
 
-	Mesh::SubMesh::ptr subMesh(new Mesh::SubMesh());
-	subMesh->indexData=IndexData::ptr(new IndexData(IndexData::Primitive_TRIS,indexBuffer));
+	Mesh::SubMesh::ptr subMesh=new Mesh::SubMesh();
+	subMesh->indexData=new IndexData(IndexData::Primitive_TRIS,indexBuffer);
 
 	Mesh::ptr mesh=new Mesh();
 	mesh->addSubMesh(subMesh);
-	mesh->setStaticVertexData(VertexData::ptr(new VertexData(vertexBuffer)));
+	mesh->setStaticVertexData(new VertexData(vertexBuffer));
 	mesh->setBound(new Bound(sphere));
 
 	return mesh;

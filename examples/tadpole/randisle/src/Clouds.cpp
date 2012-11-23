@@ -1,5 +1,6 @@
 #include "Clouds.h"
 #include <toadlet/tadpole/plugins/SkyDomeMeshCreator.h>
+#include <toadlet/tadpole/plugins/SkyBoxMaterialCreator.h>
 
 Clouds::Clouds(Scene *scene,int cloudSize,const Vector4 &skyColor,const Vector4 &fadeColor):BaseComponent(),
 	mCloudData(NULL),
@@ -15,7 +16,9 @@ Clouds::Clouds(Scene *scene,int cloudSize,const Vector4 &skyColor,const Vector4 
 	bool advanced=true; // Use realtime bumpmapping, or precalculated
 
 	SkyDomeMeshCreator::ptr skyDomeCreator=new SkyDomeMeshCreator(mEngine);
- 	int numSegments=16,numRings=16;
+	SkyBoxMaterialCreator::ptr skyBoxCreator=new SkyBoxMaterialCreator(mEngine);
+
+	int numSegments=16,numRings=16;
 	VertexBuffer::ptr vertexBuffer=mEngine->getBufferManager()->createVertexBuffer(Buffer::Usage_BIT_STREAM,Buffer::Access_READ_WRITE,mEngine->getVertexFormats().POSITION_COLOR_TEX_COORD,skyDomeCreator->getSkyDomeVertexCount(numSegments,numRings));
 	IndexBuffer::ptr indexBuffer=mEngine->getBufferManager()->createIndexBuffer(Buffer::Usage_BIT_STATIC,Buffer::Access_BIT_WRITE,IndexBuffer::IndexFormat_UINT16,skyDomeCreator->getSkyDomeIndexCount(numSegments,numRings));
 
@@ -26,8 +29,8 @@ Clouds::Clouds(Scene *scene,int cloudSize,const Vector4 &skyColor,const Vector4 
 	mBumpData=new tbyte[mBumpFormat->getDataSize()];
 	createBump(mBumpFormat,mBumpData,mCloudData,-1,-1,-32,4); // To debug any bump issues, try disabling fadeStage, make bump/cloud stage modulate, add a rotating sun, and use a zscale of 1
 
-	Material::ptr material;
-	if(advanced){
+	Material::ptr material=mEngine->getMaterialManager()->createMaterial();
+	if(mEngine->getRenderCaps().maxTextureStages>=4){
 		mCloudTexture=mEngine->getTextureManager()->createTexture(mCloudFormat,mCloudData);
 		mBumpTexture=mEngine->getTextureManager()->createTexture(mBumpFormat,mBumpData);
 
@@ -36,14 +39,15 @@ Clouds::Clouds(Scene *scene,int cloudSize,const Vector4 &skyColor,const Vector4 
 		createFade(mFadeFormat,mFadeData,Vector4(fadeColor.x,fadeColor.y,fadeColor.z,0),fadeColor,1.1,0.01);
 		mFadeTexture=mEngine->getTextureManager()->createTexture(mFadeFormat,mFadeData);
 
-		material=mEngine->getMaterialManager()->createMaterial();
+		RenderState::ptr renderState=mEngine->getMaterialManager()->createRenderState();
+		renderState->setBlendState(BlendState());
+		renderState->setDepthState(DepthState(DepthState::DepthTest_ALWAYS,false));
+		renderState->setRasterizerState(RasterizerState());
+		renderState->setMaterialState(MaterialState(false,true));
+
 		if(mEngine->hasShader(Shader::ShaderType_VERTEX) && mEngine->hasShader(Shader::ShaderType_FRAGMENT)){
 			RenderPath::ptr shaderPath=material->addPath();
-			RenderPass::ptr pass=shaderPath->addPass();
-
-			pass->setBlendState(BlendState());
-			pass->setDepthState(DepthState(DepthState::DepthTest_ALWAYS,false));
-			pass->setRasterizerState(RasterizerState());
+			RenderPass::ptr pass=shaderPath->addPass(renderState);
 
 			String profiles[]={
 				"glsl",
@@ -170,12 +174,7 @@ Clouds::Clouds(Scene *scene,int cloudSize,const Vector4 &skyColor,const Vector4 
 
 		if(mEngine->hasFixed(Shader::ShaderType_VERTEX) && mEngine->hasFixed(Shader::ShaderType_FRAGMENT)){
 			RenderPath::ptr fixedPath=material->addPath();
-			RenderPass::ptr pass=fixedPath->addPass();
-
-			pass->setBlendState(BlendState());
-			pass->setDepthState(DepthState(DepthState::DepthTest_ALWAYS,false));
-			pass->setRasterizerState(RasterizerState());
-			pass->setMaterialState(MaterialState(false,true));
+			RenderPass::ptr pass=fixedPath->addPass(renderState);
 
 			int state=0;
 			TextureState bumpState;
@@ -219,22 +218,25 @@ Clouds::Clouds(Scene *scene,int cloudSize,const Vector4 &skyColor,const Vector4 
 			pass->setTextureLocationName(Shader::ShaderType_FRAGMENT,state,"fadeTexture");
 			state++;
 		}
-
-		material->compile();
 	}
-	else{
+	if(mEngine->getRenderCaps().maxTextureStages<4 || mEngine->isBackable()){
 		mCompositeFormat=new TextureFormat(TextureFormat::Dimension_D2,TextureFormat::Format_RGB_8,cloudSize,cloudSize,1,0);
 		mCompositeData=new tbyte[mCompositeFormat->getDataSize()];
 		createComposite(mCompositeFormat,mCompositeData,mCloudData,mBumpData,Math::Z_UNIT_VECTOR3,mSkyColor);
 		mCompositeTexture=mEngine->getTextureManager()->createTexture(Texture::Usage_BIT_AUTOGEN_MIPMAPS|Texture::Usage_BIT_DYNAMIC,mCompositeFormat,mCompositeData);
 
-		material=mEngine->createSkyBoxMaterial(mCompositeTexture,false);
-		material->getPass()->setTextureLocationName(Shader::ShaderType_FRAGMENT,0,"compositeTexture");
-		material->getPass()->setBlendState(BlendState::Combination_ALPHA);
-		material->getPass()->setMaterialState(MaterialState(false,true));
+		RenderState::ptr renderState=mEngine->getMaterialManager()->createRenderState();
+		renderState->setBlendState(BlendState::Combination_ALPHA);
+		renderState->setDepthState(DepthState(DepthState::DepthTest_LEQUAL,false));
+		renderState->setRasterizerState(RasterizerState());
+		renderState->setMaterialState(MaterialState(false,true));
+		renderState->setFogState(FogState());
+
+		skyBoxCreator->createPaths(material,renderState,mCompositeTexture,false);
 	}
+	material->setLayer(-2);
+	material->compile();
 	mMaterial=material;
-	mMaterial->setLayer(-2);
 
 	mMesh=skyDomeCreator->createSkyDomeMesh(vertexBuffer,indexBuffer,sphere,numSegments,numRings,0.35);
 	Transform transform;
@@ -322,7 +324,7 @@ void Clouds::frameUpdate(int dt,int scope){
 
 	setTextureMatrix("bumpTexture",mMaterial,matrix);
 	setTextureMatrix("cloudTexture",mMaterial,matrix);
-	setTextureMatrix("compositeTexture",mMaterial,matrix);
+	setTextureMatrix("texture",mMaterial,matrix);
 }
 
 void Clouds::setTextureMatrix(const String &name,Material *material,const Matrix4x4 &matrix){

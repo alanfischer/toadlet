@@ -152,8 +152,7 @@
 namespace toadlet{
 namespace tadpole{
 
-Engine::Engine(void *env,void *ctx,int options):
-	mOptions(0),
+Engine::Engine(void *env,void *ctx):
 	mRenderDevice(NULL),
 	mRenderDeviceChanged(false),
 	mAudioDevice(NULL),
@@ -175,7 +174,6 @@ Engine::Engine(void *env,void *ctx,int options):
 		String("allocating ")+Categories::TOADLET_TADPOLE+".Engine:"+Version::STRING);
 
 	mEnv=env,mCtx=ctx;
-	mOptions=options;
 
 	mArchiveManager=new ArchiveManager(this);
 	mTextureManager=new TextureManager(this);
@@ -194,10 +192,10 @@ Engine::Engine(void *env,void *ctx,int options):
 	Math::optimize();
 
 	// Make a guess at what the ideal format is.
-	#if defined(TOADLET_FIXED_POINT) && (defined(TOADLET_PLATFORM_WINCE) || defined(TOADLET_PLATFORM_IOS) || defined(TOADLET_PLATFORM_ANDROID))
-		mIdealVertexFormatType=VertexFormat::Format_TYPE_FIXED_32;
+	#if defined(TOADLET_FIXED_POINT)
+		mRenderCaps.idealVertexFormatType=VertexFormat::Format_TYPE_FIXED_32;
 	#else
-		mIdealVertexFormatType=VertexFormat::Format_TYPE_FLOAT_32;
+		mRenderCaps.idealVertexFormatType=VertexFormat::Format_TYPE_FLOAT_32;
 	#endif
 
 	// Create initial BackableVertexFormats.  This doesn't need to be done, but without it, starting an application without a RenderDevice will crash.
@@ -344,65 +342,45 @@ void Engine::installHandlers(){
 	mGridCreator=new GridMeshCreator(this);
 }
 
-bool Engine::setRenderDevice(RenderDevice *renderDevice){
-	if(renderDevice!=NULL){
-		if(isFixedBackable()==false && isShaderBackable()==false && mRenderDeviceChanged){
-			Error::unknown(Categories::TOADLET_TADPOLE,"can not change RenderDevice in an unbacked engine");
-			return false;
-		}
-		else{
-			mRenderDeviceChanged=true;
-		}
-
-		renderDevice->getRenderCaps(mRenderCaps);
-		const RenderCaps &caps=mRenderCaps;
-		{
-			Log::alert(Categories::TOADLET_TADPOLE,
-				"RenderDevice Capabilities:");
-			Log::alert(Categories::TOADLET_TADPOLE,
-				String()+(char)9+"maxTextureStages:"+caps.maxTextureStages);
-			Log::alert(Categories::TOADLET_TADPOLE,
-				String()+(char)9+"maxTextureSize:"+caps.maxTextureSize);
-			Log::alert(Categories::TOADLET_TADPOLE,
-				String()+(char)9+"renderToTexture:"+caps.renderToTexture);
-			Log::alert(Categories::TOADLET_TADPOLE,
-				String()+(char)9+"renderToDepthTexture:"+caps.renderToDepthTexture);
-			Log::alert(Categories::TOADLET_TADPOLE,
-				String()+(char)9+"renderToTextureNonPowerOf2Restricted:"+caps.renderToTextureNonPowerOf2Restricted);
-			Log::alert(Categories::TOADLET_TADPOLE,
-				String()+(char)9+"textureDot3:"+caps.textureDot3);
-			Log::alert(Categories::TOADLET_TADPOLE,
-				String()+(char)9+"textureNonPowerOf2Restricted:"+caps.textureNonPowerOf2Restricted);
-			Log::alert(Categories::TOADLET_TADPOLE,
-				String()+(char)9+"textureNonPowerOf2:"+caps.textureNonPowerOf2);
-			Log::alert(Categories::TOADLET_TADPOLE,
-				String()+(char)9+"textureAutogenMipMaps:"+caps.textureAutogenMipMaps);
-		}
-
-		mIdealVertexFormatType=caps.idealVertexFormatType;
-	}
-
-	RenderDevice *lastRenderDevice=mRenderDevice;
-
-	if(renderDevice!=lastRenderDevice && lastRenderDevice!=NULL){
-		contextDeactivate(lastRenderDevice);
-	}
-
-	mRenderDevice=renderDevice;
-
-	if(renderDevice!=lastRenderDevice && renderDevice!=NULL){
-		contextActivate(renderDevice);
-	}
-
-	return true;
+void Engine::setMaximumRenderCaps(const RenderCaps &caps){
+	mMaximumRenderCaps.set(caps);
+	updateRenderCaps();
 }
 
-RenderDevice *Engine::getRenderDevice() const{
-	return mRenderDevice;
+void Engine::setBackableRenderCaps(const RenderCaps &caps){
+	mBackableRenderCaps.set(caps);
+	updateRenderCaps();
+}
+
+int Engine::mergeCap(int render,int maximum,int backable){
+	if(maximum>0){
+		render=Math::intMinVal(render,maximum);
+	}
+	if(backable>0){
+		render=Math::intMaxVal(render,backable);
+	}
+	return render;
+}
+
+void Engine::updateRenderCaps(){
+	// engineRenderCaps = max(min(renderCaps,maximumCaps),backableRenderCaps)
+
+	mEngineRenderCaps.set(mRenderCaps);
+
+	mEngineRenderCaps.maxTextureStages=	mergeCap(mRenderCaps.maxTextureStages,	mMaximumRenderCaps.maxTextureStages,mBackableRenderCaps.maxTextureStages);
+	mEngineRenderCaps.maxTextureSize=	mergeCap(mRenderCaps.maxTextureSize,	mMaximumRenderCaps.maxTextureSize,	mBackableRenderCaps.maxTextureSize);
+
+	int i;
+	for(i=0;i<Shader::ShaderType_MAX;++i){
+		mEngineRenderCaps.hasShader[i]=	mergeCap(mRenderCaps.hasShader[i],	mMaximumRenderCaps.hasShader[i],mBackableRenderCaps.hasShader[i])	> 0;
+		mEngineRenderCaps.hasFixed[i]=	mergeCap(mRenderCaps.hasFixed[i],	mMaximumRenderCaps.hasFixed[i],	mBackableRenderCaps.hasFixed[i])	> 0;
+	}
+
+	mEngineRenderCaps.maxLights=		mergeCap(mRenderCaps.maxLights,			mMaximumRenderCaps.maxLights,		mBackableRenderCaps.maxLights);
 }
 
 void Engine::updateVertexFormats(){
-	int formatType=mIdealVertexFormatType;
+	int formatType=mRenderCaps.idealVertexFormatType;
 
 	VertexFormat::ptr format;
 
@@ -459,6 +437,63 @@ void Engine::updateVertexFormats(){
 	format=mBufferManager->createVertexFormat();
 	format->addElement(VertexFormat::Semantic_COLOR,0,formatType|VertexFormat::Format_COUNT_4);
 	mVertexFormats.COLOR=format;
+}
+
+bool Engine::setRenderDevice(RenderDevice *renderDevice){
+	if(renderDevice!=NULL){
+		if(isBackable()==false && mRenderDeviceChanged){
+			Error::unknown(Categories::TOADLET_TADPOLE,"can not change RenderDevice in an unbacked engine");
+			return false;
+		}
+		else{
+			mRenderDeviceChanged=true;
+		}
+
+		renderDevice->getRenderCaps(mRenderCaps);
+		const RenderCaps &caps=mRenderCaps;
+		{
+			Log::alert(Categories::TOADLET_TADPOLE,
+				"RenderDevice Capabilities:");
+			Log::alert(Categories::TOADLET_TADPOLE,
+				String()+(char)9+"maxTextureStages:"+caps.maxTextureStages);
+			Log::alert(Categories::TOADLET_TADPOLE,
+				String()+(char)9+"maxTextureSize:"+caps.maxTextureSize);
+			Log::alert(Categories::TOADLET_TADPOLE,
+				String()+(char)9+"renderToTexture:"+caps.renderToTexture);
+			Log::alert(Categories::TOADLET_TADPOLE,
+				String()+(char)9+"renderToDepthTexture:"+caps.renderToDepthTexture);
+			Log::alert(Categories::TOADLET_TADPOLE,
+				String()+(char)9+"renderToTextureNonPowerOf2Restricted:"+caps.renderToTextureNonPowerOf2Restricted);
+			Log::alert(Categories::TOADLET_TADPOLE,
+				String()+(char)9+"textureDot3:"+caps.textureDot3);
+			Log::alert(Categories::TOADLET_TADPOLE,
+				String()+(char)9+"textureNonPowerOf2Restricted:"+caps.textureNonPowerOf2Restricted);
+			Log::alert(Categories::TOADLET_TADPOLE,
+				String()+(char)9+"textureNonPowerOf2:"+caps.textureNonPowerOf2);
+			Log::alert(Categories::TOADLET_TADPOLE,
+				String()+(char)9+"textureAutogenMipMaps:"+caps.textureAutogenMipMaps);
+		}
+	}
+
+	updateRenderCaps();
+
+	RenderDevice *lastRenderDevice=mRenderDevice;
+
+	if(renderDevice!=lastRenderDevice && lastRenderDevice!=NULL){
+		contextDeactivate(lastRenderDevice);
+	}
+
+	mRenderDevice=renderDevice;
+
+	if(renderDevice!=lastRenderDevice && renderDevice!=NULL){
+		contextActivate(renderDevice);
+	}
+
+	return true;
+}
+
+RenderDevice *Engine::getRenderDevice() const{
+	return mRenderDevice;
 }
 
 bool Engine::setAudioDevice(AudioDevice *audioDevice){

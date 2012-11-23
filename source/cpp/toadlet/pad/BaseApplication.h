@@ -47,9 +47,6 @@ public:
 	virtual void setWindowRenderTargetFormat(WindowRenderTargetFormat::ptr format){mFormat=format;}
 	virtual WindowRenderTargetFormat::ptr getWindowRenderTargetFormat() const{return mFormat;}
 
-	virtual void setEngineOptions(int options){mEngineOptions=options;}
-	virtual int getEngineOptions() const{return mEngineOptions;}
-
 	virtual void setApplet(Applet *applet){mApplet=applet;}
 	virtual Applet *getApplet() const{return mApplet;}
 
@@ -115,7 +112,6 @@ protected:
 	virtual bool createAudioDevice(const String &plugin);
 	virtual bool destroyAudioDevice();
 
-	int mEngineOptions;
 	WindowRenderTargetFormat::ptr mFormat;
 	Applet::ptr mApplet;
 

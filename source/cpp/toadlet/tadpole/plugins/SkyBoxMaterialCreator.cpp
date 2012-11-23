@@ -97,10 +97,10 @@ void SkyBoxMaterialCreator::createShaders(){
 		"varying vec4 color;\n"
 		"varying vec2 texCoord;\n"
 		
-		"uniform sampler2D tex;\n"
+		"uniform sampler2D texture;\n"
 		
 		"void main(){\n"
-			"gl_FragColor = color * texture2D(tex,texCoord);\n"
+			"gl_FragColor = color * texture2D(texture,texCoord);\n"
 		"}",
 
 
@@ -111,11 +111,11 @@ void SkyBoxMaterialCreator::createShaders(){
 			"float2 texCoord: TEXCOORD0;\n"
 		"};\n"
 
-		"Texture2D tex;\n"
+		"Texture2D texture;\n"
 		"SamplerState samp;\n"
 
 		"float4 main(PIN pin): SV_TARGET{\n"
-			"return pin.color * tex.Sample(samp,pin.texCoord);\n"
+			"return pin.color * texture.Sample(samp,pin.texCoord);\n"
 		"}"
 	};
 
@@ -139,8 +139,8 @@ Resource::ptr SkyBoxMaterialCreator::create(const String &name,ResourceData *dat
 	return NULL;
 }
 
-Material::ptr SkyBoxMaterialCreator::createSkyBoxMaterial(Texture::ptr texture,bool clamp){
-	Material::ptr material(new Material(mEngine->getMaterialManager()));
+Material::ptr SkyBoxMaterialCreator::createSkyBoxMaterial(Texture *texture,bool clamp){
+	Material::ptr material=new Material(mEngine->getMaterialManager());
 
 	RenderState::ptr renderState=mEngine->getMaterialManager()->createRenderState();
 	renderState->setBlendState(BlendState());
@@ -149,6 +149,17 @@ Material::ptr SkyBoxMaterialCreator::createSkyBoxMaterial(Texture::ptr texture,b
 	renderState->setMaterialState(MaterialState());
 	renderState->setFogState(FogState());
 
+	createPaths(material,renderState,texture,clamp);
+
+	material->setLayer(-1);
+	material->compile();
+
+	mEngine->getMaterialManager()->manage(material);
+
+	return material;
+}
+
+bool SkyBoxMaterialCreator::createPaths(Material *material,RenderState *renderState,Texture *texture,bool clamp){
 	SamplerState samplerState(mEngine->getMaterialManager()->getDefaultSamplerState());
 	if(clamp){
 		samplerState.uAddress=SamplerState::AddressType_CLAMP_TO_EDGE;
@@ -169,7 +180,7 @@ Material::ptr SkyBoxMaterialCreator::createSkyBoxMaterial(Texture::ptr texture,b
 		variables->addVariable("textureMatrix",RenderVariable::ptr(new TextureMatrixVariable("tex")),Material::Scope_MATERIAL);
 		variables->addVariable("materialTrackColor",RenderVariable::ptr(new MaterialTrackColorVariable()),Material::Scope_MATERIAL);
 
-		variables->addTexture("tex",texture,"samp",samplerState,TextureState());
+		variables->addTexture("texture",texture,"samp",samplerState,TextureState());
 	}
 
 	if(mEngine->hasFixed(Shader::ShaderType_VERTEX) && mEngine->hasFixed(Shader::ShaderType_FRAGMENT)){
@@ -178,14 +189,10 @@ Material::ptr SkyBoxMaterialCreator::createSkyBoxMaterial(Texture::ptr texture,b
 		RenderPass::ptr pass=fixedPath->addPass(renderState);
 
 		pass->setTexture(Shader::ShaderType_FRAGMENT,0,texture,samplerState,TextureState());
+		pass->setTextureLocationName(Shader::ShaderType_FRAGMENT,0,"texture");
 	}
 
-	material->setLayer(-1);
-	material->compile();
-
-	mEngine->getMaterialManager()->manage(material);
-
-	return material;
+	return true;
 }
 
 }

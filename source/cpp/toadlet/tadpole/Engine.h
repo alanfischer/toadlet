@@ -55,23 +55,28 @@ class TOADLET_API Engine:public Object{
 public:
 	TOADLET_OBJECT(Engine);
 
-	enum{
-		Option_BIT_FIXEDBACKABLE=	1<<0,
-		Option_BIT_SHADERBACKABLE=	1<<1,
-		Option_BIT_NOFIXED=			1<<2,
-		Option_BIT_NOSHADER=		1<<3,
-	};
-
-	Engine(void *env=NULL,void *ctx=NULL,int options=0);
+	Engine(void *env=NULL,void *ctx=NULL);
 	virtual ~Engine();
 
 	void destroy();
 
 	void installHandlers();
 	
+	void setMaximumRenderCaps(const RenderCaps &caps);
+	void setBackableRenderCaps(const RenderCaps &caps);
+	int mergeCap(int render,int maximum,int backable);
+	void updateRenderCaps();
+	const RenderCaps &getRenderCaps() const{return mEngineRenderCaps;}
+	void updateVertexFormats();
+	const VertexFormats &getVertexFormats() const{return mVertexFormats;}
+	bool isBackable() const{return mBackableRenderCaps.hasShader[Shader::ShaderType_VERTEX] | mBackableRenderCaps.hasFixed[Shader::ShaderType_VERTEX];}
+	bool isShaderBackable() const{return mBackableRenderCaps.hasShader[Shader::ShaderType_VERTEX];}
+	bool isFixedBackable() const{return mBackableRenderCaps.hasFixed[Shader::ShaderType_VERTEX];}
+	bool hasShader(Shader::ShaderType type) const{return mEngineRenderCaps.hasShader[type];}
+	bool hasFixed(Shader::ShaderType type) const{return mEngineRenderCaps.hasFixed[type];}
+
 	bool setRenderDevice(RenderDevice *renderDevice);
 	RenderDevice *getRenderDevice() const;
-	void updateVertexFormats();
 
 	bool setAudioDevice(AudioDevice *audioDevice);
 	AudioDevice *getAudioDevice() const;
@@ -91,18 +96,6 @@ public:
 
 	void addContextListener(ContextListener *listener){mContextListeners.add(listener);}
 	void removeContextListener(ContextListener *listener){mContextListeners.remove(listener);}
-
-	int getIdealVertexFormatType() const{return mIdealVertexFormatType;}
-	const VertexFormats &getVertexFormats() const{return mVertexFormats;}
-	const RenderCaps &getRenderCaps() const{return mRenderCaps;}
-
-	bool isFixedBackable() const{return isFixedAllowed() && (mOptions&Option_BIT_FIXEDBACKABLE)!=0;}
-	bool isShaderBackable() const{return isShaderAllowed() && (mOptions&Option_BIT_SHADERBACKABLE)!=0;}
-	bool isFixedAllowed() const{return (mOptions&Option_BIT_NOFIXED)==0;}
-	bool isShaderAllowed() const{return (mOptions&Option_BIT_NOSHADER)==0;}
-	bool isBackable() const{return isFixedBackable() || isShaderBackable();}
-	bool hasFixed(Shader::ShaderType type){return isFixedAllowed() && (isFixedBackable() || mRenderCaps.hasFixed[type]);}
-	bool hasShader(Shader::ShaderType type){return isShaderAllowed() && (isShaderBackable() || mRenderCaps.hasShader[type]);}
 
 	inline ArchiveManager *getArchiveManager() const{return mArchiveManager;}
 	inline TextureManager *getTextureManager() const{return mTextureManager;}
@@ -133,7 +126,6 @@ public:
 
 protected:
 	void *mEnv,*mCtx;
-	int mOptions;
 	RenderDevice *mRenderDevice;
 	bool mRenderDeviceChanged;
 	AudioDevice *mAudioDevice;
@@ -141,9 +133,11 @@ protected:
 
 	Collection<ContextListener*> mContextListeners;
 
-	int mIdealVertexFormatType;
-	VertexFormats mVertexFormats;
+	RenderCaps mMaximumRenderCaps;
+	RenderCaps mBackableRenderCaps;
 	RenderCaps mRenderCaps;
+	RenderCaps mEngineRenderCaps;
+	VertexFormats mVertexFormats;
 
 	ArchiveManager::ptr mArchiveManager;
 	TextureManager::ptr mTextureManager;
