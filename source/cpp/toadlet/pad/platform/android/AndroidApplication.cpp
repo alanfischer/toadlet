@@ -56,11 +56,9 @@ AndroidApplication::AndroidApplication():
 	mWidth(0),mHeight(0),
 	mLastX(0),mLastY(0),
 	mDifferenceMouse(false),
-	mFixedBackable(true),mShaderBackable(true),
 	//mThread,
 	mRun(false),
 
-	mEngineOptions(0),
 	mEngine(NULL),
 	mRenderDevice(NULL),
 	mAudioDevice(NULL),
@@ -74,8 +72,6 @@ AndroidApplication::AndroidApplication():
 	#else
 		mFormat->setDebug(false);
 	#endif
-	
-	mEngineOptions=Engine::Option_BIT_FIXEDBACKABLE | Engine::Option_BIT_SHADERBACKABLE;
 }
 
 AndroidApplication::~AndroidApplication(){
@@ -87,7 +83,7 @@ bool AndroidApplication::create(String renderDevice,String audioDevice){
 	JNIEnv *env=mActivity->env;
 	jobject obj=mActivity->clazz;
 
-	mEngine=new Engine(env,obj,mEngineOptions);
+	mEngine=new Engine(env,obj);
 	
 	mEngine->installHandlers();
 

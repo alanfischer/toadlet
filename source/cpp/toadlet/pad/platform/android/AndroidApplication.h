@@ -95,10 +95,6 @@ public:
 	void setDifferenceMouse(bool difference){mDifferenceMouse=difference;}
 	bool getDifferenceMouse() const{return mDifferenceMouse;}
 
-	void setBackable(bool fixed,bool shader){mFixedBackable=fixed;mShaderBackable=shader;}
-	bool getFixedBackable() const{return mFixedBackable;}
-	bool getShaderbackable() const{return mShaderBackable;}
-
 	void resized(int width,int height)		{if(mApplet!=NULL){mApplet->resized(width,height);}}
 	void focusGained()						{if(mApplet!=NULL){mApplet->focusGained();}}
 	void focusLost()						{if(mApplet!=NULL){mApplet->focusLost();}}
@@ -149,7 +145,6 @@ protected:
 	Thread::ptr mThread;
 	bool mRun;
 
-	int mEngineOptions;
 	WindowRenderTargetFormat::ptr mFormat;
 	Engine::ptr mEngine;
 	RenderTarget::ptr mRenderTarget;

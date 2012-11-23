@@ -36,20 +36,24 @@ ShaderManager::ShaderManager(Engine *engine):ResourceManager(engine){
 Shader::ptr ShaderManager::createShader(Shader::ShaderType type,const String profiles[],const String codes[],int numCodes){
 	RenderDevice *renderDevice=mEngine->getRenderDevice();
 	Shader::ptr shader;
-	if(mEngine->isShaderBackable()){
+	if(mEngine->hasBackableShader(type)){
 		BackableShader::ptr backableShader=new BackableShader();
 		backableShader->create(type,profiles,codes,numCodes);
 		if(renderDevice!=NULL && mEngine->hasShader(type)){
+			Shader::ptr back;
 			TOADLET_TRY
-				backableShader->setBack(renderDevice->createShader(),renderDevice);
+				back=renderDevice->createShader();
 			TOADLET_CATCH_ANONYMOUS(){}
+			if(back!=NULL){
+				backableShader->setBack(back,renderDevice);
+			}
 		}
 		shader=backableShader;
 	}
 	else if(renderDevice!=NULL && mEngine->hasShader(type)){
 		TOADLET_TRY
 			shader=renderDevice->createShader();
-		TOADLET_CATCH_ANONYMOUS(){shader=NULL;}
+		TOADLET_CATCH_ANONYMOUS(){}
 		if(BackableShader::convertCreate(shader,renderDevice,type,profiles,codes,numCodes)==false){
 			Error::unknown(Categories::TOADLET_TADPOLE,"Error in shader convertCreate");
 			return NULL;

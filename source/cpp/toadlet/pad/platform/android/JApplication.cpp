@@ -73,8 +73,6 @@ JApplication::JApplication(JNIEnv *jenv,jobject jobj):
 		getHeightID=env->GetMethodID(appClass,"getHeight","()I");
 		setDifferenceMouseID=env->GetMethodID(appClass,"setDifferenceMouse","(Z)V");
 		getDifferenceMouseID=env->GetMethodID(appClass,"getDifferenceMouse","()Z");
-		setEngineOptionsID=env->GetMethodID(appClass,"setEngineOptions","(I)V");
-		getEngineOptionsID=env->GetMethodID(appClass,"getEngineOptions","()I");
 		getEngineID=env->GetMethodID(appClass,"getEngine","()Lus/toadlet/tadpole/Engine;");
 		getRenderDeviceID=env->GetMethodID(appClass,"getRenderDevice","()Lus/toadlet/peeper/RenderDevice;");
 		getAudioDeviceID=env->GetMethodID(appClass,"getAudioDevice","()Lus/toadlet/ribbit/AudioDevice;");
@@ -175,14 +173,6 @@ void JApplication::setDifferenceMouse(bool difference){
 
 bool JApplication::getDifferenceMouse() const{
 	env->CallBooleanMethod(obj,getDifferenceMouseID);
-}
-
-void JApplication::setEngineOptions(int options){
-	env->CallVoidMethod(obj,setEngineOptionsID,options);
-}
-
-int JApplication::getEngineOptions() const{
-	env->CallIntMethod(obj,getEngineOptionsID);
 }
 
 Engine *JApplication::getEngine() const{

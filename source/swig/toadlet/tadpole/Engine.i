@@ -16,16 +16,17 @@ namespace tadpole{
 
 class Engine{
 public:
-	Engine(JNIEnv *env,void *context,int options);
-
-	static const int Option_BIT_FIXEDBACKABLE=	1<<0;
-	static const int Option_BIT_SHADERBACKABLE=	1<<1;
-	static const int Option_BIT_NOFIXED=		1<<2;
-	static const int Option_BIT_NOSHADER=		1<<3;
+	Engine(JNIEnv *env,void *context);
 
 	void destroy();
 
 	void installHandlers();
+	
+	bool isBackable() const;
+	bool hasBackableShader(int type) const;
+	bool hasBackableFixed(int type) const;
+	bool hasShader(int type) const;
+	bool hasFixed(int type) const;
 	
 	bool setRenderDevice(RenderDevice *renderDevice);
 

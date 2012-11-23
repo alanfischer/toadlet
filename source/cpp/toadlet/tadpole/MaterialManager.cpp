@@ -145,7 +145,7 @@ RenderState::ptr MaterialManager::createRenderState(){
 ShaderState::ptr MaterialManager::createShaderState(){
 	RenderDevice *renderDevice=mEngine->getRenderDevice();
 	ShaderState::ptr shaderState;
-	if(mEngine->isShaderBackable()){
+	if(mEngine->hasBackableShader(Shader::ShaderType_VERTEX)){
 		BackableShaderState::ptr backableShaderState=new BackableShaderState();
 		backableShaderState->create();
 		if(renderDevice!=NULL){
