@@ -91,12 +91,12 @@ Mesh::ptr GridMeshCreator::createGridMesh(VertexBuffer::ptr vertexBuffer,IndexBu
 		vba.unlock();
 	}
 
-	Mesh::SubMesh::ptr subMesh(new Mesh::SubMesh());
-	subMesh->indexData=IndexData::ptr(new IndexData(IndexData::Primitive_TRISTRIP,indexBuffer));
+	Mesh::SubMesh::ptr subMesh=new Mesh::SubMesh();
+	subMesh->indexData=new IndexData(IndexData::Primitive_TRISTRIP,indexBuffer);
 
 	Mesh::ptr mesh=new Mesh();
 	mesh->addSubMesh(subMesh);
-	mesh->setStaticVertexData(VertexData::ptr(new VertexData(vertexBuffer)));
+	mesh->setStaticVertexData(new VertexData(vertexBuffer));
 	mesh->setBound(new Bound(AABox(-width/2,-height/2,0,width/2,height/2,0)));
 
 	return mesh;

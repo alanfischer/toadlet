@@ -106,26 +106,26 @@ Mesh::ptr SkyBoxMeshCreator::createSkyBoxMesh(scalar size,bool unfolded,bool inv
 	}
 
 	Mesh::ptr mesh=new Mesh();
-	mesh->setStaticVertexData(VertexData::ptr(new VertexData(vertexBuffer)));
+	mesh->setStaticVertexData(new VertexData(vertexBuffer));
 	mesh->setBound(new Bound(AABox(-size,-size,-size,size,size,size)));
 
 	if(unfolded){
-		mesh->addSubMesh(Mesh::SubMesh::ptr(new Mesh::SubMesh()));
-		mesh->getSubMesh(0)->indexData=IndexData::ptr(new IndexData(IndexData::Primitive_TRIS,indexBuffer));
+		mesh->addSubMesh(new Mesh::SubMesh());
+		mesh->getSubMesh(0)->indexData=new IndexData(IndexData::Primitive_TRIS,indexBuffer);
 	}
 	else{
-		mesh->addSubMesh(Mesh::SubMesh::ptr(new Mesh::SubMesh()));
-		mesh->getSubMesh(0)->indexData=IndexData::ptr(new IndexData(IndexData::Primitive_TRIS,indexBuffer,0,6));
-		mesh->addSubMesh(Mesh::SubMesh::ptr(new Mesh::SubMesh()));
-		mesh->getSubMesh(1)->indexData=IndexData::ptr(new IndexData(IndexData::Primitive_TRIS,indexBuffer,6,6));
-		mesh->addSubMesh(Mesh::SubMesh::ptr(new Mesh::SubMesh()));
-		mesh->getSubMesh(2)->indexData=IndexData::ptr(new IndexData(IndexData::Primitive_TRIS,indexBuffer,12,6));
-		mesh->addSubMesh(Mesh::SubMesh::ptr(new Mesh::SubMesh()));
-		mesh->getSubMesh(3)->indexData=IndexData::ptr(new IndexData(IndexData::Primitive_TRIS,indexBuffer,18,6));
-		mesh->addSubMesh(Mesh::SubMesh::ptr(new Mesh::SubMesh()));
-		mesh->getSubMesh(4)->indexData=IndexData::ptr(new IndexData(IndexData::Primitive_TRIS,indexBuffer,24,6));
-		mesh->addSubMesh(Mesh::SubMesh::ptr(new Mesh::SubMesh()));
-		mesh->getSubMesh(5)->indexData=IndexData::ptr(new IndexData(IndexData::Primitive_TRIS,indexBuffer,30,6));
+		mesh->addSubMesh(new Mesh::SubMesh());
+		mesh->getSubMesh(0)->indexData=new IndexData(IndexData::Primitive_TRIS,indexBuffer,0,6);
+		mesh->addSubMesh(new Mesh::SubMesh());
+		mesh->getSubMesh(1)->indexData=new IndexData(IndexData::Primitive_TRIS,indexBuffer,6,6);
+		mesh->addSubMesh(new Mesh::SubMesh());
+		mesh->getSubMesh(2)->indexData=new IndexData(IndexData::Primitive_TRIS,indexBuffer,12,6);
+		mesh->addSubMesh(new Mesh::SubMesh());
+		mesh->getSubMesh(3)->indexData=new IndexData(IndexData::Primitive_TRIS,indexBuffer,18,6);
+		mesh->addSubMesh(new Mesh::SubMesh());
+		mesh->getSubMesh(4)->indexData=new IndexData(IndexData::Primitive_TRIS,indexBuffer,24,6);
+		mesh->addSubMesh(new Mesh::SubMesh());
+		mesh->getSubMesh(5)->indexData=new IndexData(IndexData::Primitive_TRIS,indexBuffer,30,6);
 	}
 
 	mesh->getSubMesh(0)->material=bottom;

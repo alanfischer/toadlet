@@ -238,17 +238,26 @@ WaterMaterialCreator::WaterMaterialCreator(Engine *engine){
 }
 
 Material::ptr WaterMaterialCreator::createWaterMaterial(Texture *reflectTexture,Texture *refractTexture,Texture *waveTexture,const Vector4 &color){
-	Material::ptr waterMaterial=mEngine->getMaterialManager()->createMaterial();
+	Material::ptr material=mEngine->getMaterialManager()->createMaterial();
 
+	RenderState::ptr renderState=mEngine->getMaterialManager()->createRenderState();
+	renderState->setMaterialState(MaterialState(color));
+	renderState->setBlendState(BlendState());
+	renderState->setDepthState(DepthState(DepthState::DepthTest_LEQUAL,false));
+	renderState->setRasterizerState(RasterizerState(RasterizerState::CullType_NONE));
+	renderState->setMaterialState(MaterialState(Math::ZERO_VECTOR4,Math::ONE_VECTOR4,Math::ONE_VECTOR4,128));
+
+	createPaths(material,renderState,reflectTexture,refractTexture,waveTexture);
+	
+	material->compile();
+	
+	return material;
+}
+
+bool WaterMaterialCreator::createPaths(Material *material,RenderState *renderState,Texture *reflectTexture,Texture *refractTexture,Texture *waveTexture){
 	if(mEngine->hasShader(Shader::ShaderType_VERTEX) && mEngine->hasShader(Shader::ShaderType_FRAGMENT)){
-		RenderPath::ptr shaderPath=waterMaterial->addPath();
-		RenderPass::ptr pass=shaderPath->addPass();
-
-		pass->setMaterialState(MaterialState(color));
-		pass->setBlendState(BlendState());
-		pass->setDepthState(DepthState(DepthState::DepthTest_LEQUAL,false));
-		pass->setRasterizerState(RasterizerState(RasterizerState::CullType_NONE));
-		pass->setMaterialState(MaterialState(Math::ZERO_VECTOR4,Math::ONE_VECTOR4,Math::ONE_VECTOR4,128));
+		RenderPath::ptr shaderPath=material->addPath();
+		RenderPass::ptr pass=shaderPath->addPass(renderState);
 
 		pass->setShader(Shader::ShaderType_VERTEX,mVertexShader);
 		pass->setShader(Shader::ShaderType_FRAGMENT,mFragmentShader);
@@ -274,21 +283,14 @@ Material::ptr WaterMaterialCreator::createWaterMaterial(Texture *reflectTexture,
 	}
 
 	if(mEngine->hasFixed(Shader::ShaderType_VERTEX) && mEngine->hasFixed(Shader::ShaderType_FRAGMENT)){
-		RenderPath::ptr fixedPath=waterMaterial->addPath();
-		RenderPass::ptr pass=fixedPath->addPass();
-
-		pass->setMaterialState(MaterialState(color));
-		pass->setBlendState(BlendState());
-		pass->setDepthState(DepthState(DepthState::DepthTest_LEQUAL,false));
-		pass->setRasterizerState(RasterizerState(RasterizerState::CullType_NONE));
+		RenderPath::ptr fixedPath=material->addPath();
+		RenderPass::ptr pass=fixedPath->addPass(renderState);
 
 		pass->setTexture(Shader::ShaderType_FRAGMENT,0,waveTexture,SamplerState(),TextureState());
 		pass->setTextureLocationName(Shader::ShaderType_FRAGMENT,0,"waveTexture");
 	}
-	
-	waterMaterial->compile();
-	
-	return waterMaterial;
+
+	return true;
 }
 
 }

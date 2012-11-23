@@ -59,9 +59,9 @@ public:
 		Vector4 color=Colors::AZURE;
 		color.w=0.5f;
 
-		TextureFormat::ptr waterFormat(new TextureFormat(TextureFormat::Dimension_D2,TextureFormat::Format_RGB_8,512,512,1,0));
+		TextureFormat::ptr waterFormat=new TextureFormat(TextureFormat::Dimension_D2,TextureFormat::Format_RGB_8,512,512,1,0);
 
-		if(engine->isShaderAllowed()){
+		if(engine->hasShader(Shader::ShaderType_FRAGMENT)){
 			reflectTexture=engine->getTextureManager()->createTexture(Texture::Usage_BIT_RENDERTARGET|Texture::Usage_BIT_AUTOGEN_MIPMAPS,waterFormat);
 			reflectTarget=engine->getTextureManager()->createPixelBufferRenderTarget();
 			reflectTarget->attach(reflectTexture->getMipPixelBuffer(0,0),PixelBufferRenderTarget::Attachment_COLOR_0);
