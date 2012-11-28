@@ -102,8 +102,6 @@ BaseApplication::BaseApplication():
 		mFormat->setDebug(false);
 	#endif
 
-	mEngine->setBackableRenderCaps(RenderCaps());
-	
 	mInputDevices.resize(InputDevice::InputType_MAX,NULL);
 }
 
@@ -113,6 +111,9 @@ bool BaseApplication::create(String renderDevice,String audioDevice){
 	preEngineCreate();
 
 	mEngine=new Engine(NULL,NULL);
+
+	mEngine->setHasBackableShader(true);
+	mEngine->setHasBackableFixed(true);
 
 	/// @todo: Unify the plugin framework a bit so we dont have as much code duplication for this potion, and the creating of the plugin
 	mNewRenderDevicePlugin=mCurrentRenderDevicePlugin=renderDevice;

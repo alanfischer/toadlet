@@ -42,7 +42,7 @@ BackableTexture::BackableTexture():BaseResource(),
 
 bool BackableTexture::create(int usage,TextureFormat::ptr format,tbyte *mipDatas[]){
 	mUsage=usage;
-	mFormat=TextureFormat::ptr(new TextureFormat(format));
+	mFormat=new TextureFormat(format);
 
 	// BackableTextures only store the first mipLevel, so if it's not a staging resource and has multiple mip levels, then we need to autogen mipmaps
 	if((usage&Usage_BIT_STAGING)==0 && format->getMipMax()!=1){
@@ -120,7 +120,7 @@ PixelBuffer::ptr BackableTexture::getMipPixelBuffer(int level,int cubeSide){
 	}
 
 	if(mBuffers[index]==NULL){
-		PixelBuffer::ptr buffer(new BackableTextureMipPixelBuffer(this,level,cubeSide));
+		PixelBuffer::ptr buffer=new BackableTextureMipPixelBuffer(this,level,cubeSide);
 		mBuffers[index]=buffer;
 	}
 
@@ -283,7 +283,7 @@ bool BackableTexture::convertCreate(Texture::ptr texture,RenderDevice *renderDev
 
 	bool result=false;
 	if(mipDatas==NULL){
-		TextureFormat::ptr newFormat(new TextureFormat(format));
+		TextureFormat::ptr newFormat=new TextureFormat(format);
 		newFormat->setPixelFormat(newPixelFormat);
 		result=texture->create(usage,newFormat,NULL);
 	}
@@ -316,7 +316,7 @@ bool BackableTexture::convertCreate(Texture::ptr texture,RenderDevice *renderDev
 		else{
 			Log::alert(Categories::TOADLET_PEEPER,String("BackableTexture::convertCreate - converting texture:")+needsNPOT+","+needsAutogen+","+needsConvert);
 
-			TextureFormat::ptr newFormat(new TextureFormat(format));
+			TextureFormat::ptr newFormat=new TextureFormat(format);
 			newFormat->setPixelFormat(newPixelFormat);
 			if(needsNPOT){
 				int newWidth=Math::nextPowerOf2(format->getWidth()),newHeight=Math::nextPowerOf2(format->getHeight()),newDepth=Math::nextPowerOf2(format->getDepth());
@@ -325,8 +325,8 @@ bool BackableTexture::convertCreate(Texture::ptr texture,RenderDevice *renderDev
 			tbyte **newMipDatas=new tbyte*[allocatedMipLevels];
 
 			for(i=0;i<allocatedMipLevels;++i){
-				TextureFormat::ptr mipFormat(new TextureFormat(format,i));
-				TextureFormat::ptr newMipFormat(new TextureFormat(newFormat,i));
+				TextureFormat::ptr mipFormat=new TextureFormat(format,i);
+				TextureFormat::ptr newMipFormat=new TextureFormat(newFormat,i);
 				newMipDatas[i]=new tbyte[newMipFormat->getDataSize()];
 		
 				TextureFormatConversion::convert(mipDatas[i],mipFormat,newMipDatas[i],newMipFormat);

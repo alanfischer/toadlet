@@ -95,16 +95,16 @@ VertexFormat::ptr BufferManager::createVertexFormat(){
 	RenderDevice *renderDevice=mEngine->getRenderDevice();
 	VertexFormat::ptr vertexFormat;
 	if(renderDevice==NULL /*mEngine->isBackable()*/){ /// @todo: Engine uses this before it has a renderer.  Need to change the Engine so it wont call any resource items without on
-		BackableVertexFormat::ptr backableVertexFormat(new BackableVertexFormat());
+		BackableVertexFormat::ptr backableVertexFormat=new BackableVertexFormat();
 		backableVertexFormat->create();
 		if(renderDevice!=NULL){
-			VertexFormat::ptr back(renderDevice->createVertexFormat());
+			VertexFormat::ptr back=renderDevice->createVertexFormat();
 			backableVertexFormat->setBack(back);
 		}
 		vertexFormat=backableVertexFormat;
 	}
 	else{
-		vertexFormat=VertexFormat::ptr(renderDevice->createVertexFormat());
+		vertexFormat=renderDevice->createVertexFormat();
 		if(vertexFormat==NULL){
 			return NULL;
 		}
@@ -212,7 +212,7 @@ VariableBuffer::ptr BufferManager::createVariableBuffer(int usage,int access,Var
 	RenderDevice *renderDevice=mEngine->getRenderDevice();
 	VariableBuffer::ptr buffer;
 	if(mEngine->isBackable()){
-		BackableBuffer::ptr backableBuffer(new BackableBuffer());
+		BackableBuffer::ptr backableBuffer=new BackableBuffer();
 		backableBuffer->create(usage,access,format);
 		if(renderDevice!=NULL){
 			VariableBuffer::ptr back(renderDevice->createVariableBuffer());

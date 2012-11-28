@@ -177,7 +177,7 @@ bool SkyBoxMaterialCreator::createPaths(Material *material,RenderState *renderSt
 
 		RenderVariableSet::ptr variables=pass->makeVariables();
 		variables->addVariable("modelViewProjectionMatrix",RenderVariable::ptr(new MVPMatrixVariable()),Material::Scope_RENDERABLE);
-		variables->addVariable("textureMatrix",RenderVariable::ptr(new TextureMatrixVariable("tex")),Material::Scope_MATERIAL);
+		variables->addVariable("textureMatrix",RenderVariable::ptr(new TextureMatrixVariable("texture")),Material::Scope_MATERIAL);
 		variables->addVariable("materialTrackColor",RenderVariable::ptr(new MaterialTrackColorVariable()),Material::Scope_MATERIAL);
 
 		variables->addTexture("texture",texture,"samp",samplerState,TextureState());

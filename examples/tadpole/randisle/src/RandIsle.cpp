@@ -20,17 +20,7 @@ RandIsle::RandIsle(Application *app,String path):
 	mPatchNoise(4,4,1,1,256)
 {
 	mApp=app;
-	#if defined(TOADLET_PLATFORM_ANDROID)
-		mApp->setEngineOptions(mApp->getEngineOptions() | Engine::Option_BIT_NOSHADER);
-	#endif
 	mPath=path;
-
-	int items[]={0xa4,0x9,0x46,0x1,0xb9,0xa5,0x21,0xfb,0xbd,0x72,0xc3,0x45};
-	unsigned char check=0;
-	for(int i=0;i<12;++i){
-		check^=items[i];
-	}
-	Log::alert(String("CHECK:")+(int)check);
 }
 
 RandIsle::~RandIsle(){

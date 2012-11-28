@@ -25,12 +25,10 @@
 			android:icon="@drawable/icon"
 			android:debuggable="true"
 			>
-		<activity android:name="RandIsle"
+		<activity android:name=".RandIsle"
 				android:theme="@android:style/Theme.NoTitleBar.Fullscreen"
 				android:launchMode="singleTask"
 				android:configChanges="orientation|keyboardHidden">
-			<meta-data android:name="android.app.lib_name"
-					android:value="randisle" />
 			<intent-filter>
 				<action android:name="android.intent.action.MAIN" />
 				<category android:name="android.intent.category.LAUNCHER" />

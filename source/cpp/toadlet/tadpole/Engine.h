@@ -71,10 +71,17 @@ public:
 	const VertexFormats &getVertexFormats() const{return mVertexFormats;}
 
 	bool isBackable() const{return mBackableRenderCaps.hasShader[Shader::ShaderType_VERTEX] | mBackableRenderCaps.hasFixed[Shader::ShaderType_VERTEX];}
-	bool hasBackableShader(Shader::ShaderType type) const{return mBackableRenderCaps.hasShader[type];}
-	bool hasBackableFixed(Shader::ShaderType type) const{return mBackableRenderCaps.hasFixed[type];}
-	bool hasShader(Shader::ShaderType type) const{return mEngineRenderCaps.hasShader[type];}
-	bool hasFixed(Shader::ShaderType type) const{return mEngineRenderCaps.hasFixed[type];}
+	// Until we have Shader exposed to swig, we will use int here instead of Shader::Type
+	bool hasShader(int type) const{return mEngineRenderCaps.hasShader[type];}
+	bool hasFixed(int type) const{return mEngineRenderCaps.hasFixed[type];}
+	bool hasBackableShader(int type) const{return mBackableRenderCaps.hasShader[type];}
+	bool hasBackableFixed(int type) const{return mBackableRenderCaps.hasFixed[type];}
+	void setHasBackableShader(bool has);
+	void setHasBackableFixed(bool has);
+	bool hasMaximumShader(int type) const{return mMaximumRenderCaps.hasShader[type];}
+	bool hasMaximumFixed(int type) const{return mMaximumRenderCaps.hasFixed[type];}
+	void setHasMaximumShader(bool has);
+	void setHasMaximumFixed(bool has);
 
 	bool setRenderDevice(RenderDevice *renderDevice);
 	RenderDevice *getRenderDevice() const;

@@ -151,7 +151,7 @@ protected:
 	RenderDevice::ptr mRenderDevice;
 	AudioDevice::ptr mAudioDevice;
 	InputDevice::ptr mInputDevices[InputDevice::InputType_MAX];
-	Applet *mApplet;
+	Applet::ptr mApplet;
 };
 
 }

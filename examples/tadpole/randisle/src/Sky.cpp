@@ -1,10 +1,11 @@
 #include "Sky.h"
 #include "Clouds.h"
 #include <toadlet/tadpole/plugins/SkyDomeMeshCreator.h>
+#include "Resources.h"
 
 Sky::Sky(Scene *scene,int cloudSize,const Vector4 &skyColor,const Vector4 &fadeColor):Node(scene)
 {
-	Vector3 lightDir(1,-1,0.5);
+	Vector3 lightDir(0,1,0.5);
 
 	Clouds::ptr clouds=new Clouds(scene,cloudSize,skyColor,fadeColor);
 	clouds->setLightDirection(lightDir);
@@ -19,6 +20,7 @@ Sky::Sky(Scene *scene,int cloudSize,const Vector4 &skyColor,const Vector4 &fadeC
 	Texture::ptr glowTexture=mEngine->getTextureManager()->createTexture(glowFormat,glowData);
 	delete[] glowData;
 
+	/// @todo: There is an unsolved issue on android GLES 2 where the Sun will not appear
 	Material::ptr sunMaterial=mEngine->createDiffuseMaterial(glowTexture);
 	sunMaterial->setModelMatrixFlags(Material::MatrixFlag_CAMERA_ALIGNED);
 	sunMaterial->setLayer(-1);

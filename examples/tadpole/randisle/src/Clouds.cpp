@@ -1,6 +1,4 @@
 #include "Clouds.h"
-#include <toadlet/tadpole/plugins/SkyDomeMeshCreator.h>
-#include <toadlet/tadpole/plugins/SkyBoxMaterialCreator.h>
 
 Clouds::Clouds(Scene *scene,int cloudSize,const Vector4 &skyColor,const Vector4 &fadeColor):BaseComponent(),
 	mCloudData(NULL),
@@ -12,15 +10,15 @@ Clouds::Clouds(Scene *scene,int cloudSize,const Vector4 &skyColor,const Vector4 
 	mScene=scene;
 	mSkyColor=skyColor;
 
+	mSkyDomeCreator=new SkyDomeMeshCreator(mEngine);
+	mSkyBoxCreator=new SkyBoxMaterialCreator(mEngine);
+
 	Sphere sphere(Vector3(0,0,0),512);
 	bool advanced=true; // Use realtime bumpmapping, or precalculated
 
-	SkyDomeMeshCreator::ptr skyDomeCreator=new SkyDomeMeshCreator(mEngine);
-	SkyBoxMaterialCreator::ptr skyBoxCreator=new SkyBoxMaterialCreator(mEngine);
-
 	int numSegments=16,numRings=16;
-	VertexBuffer::ptr vertexBuffer=mEngine->getBufferManager()->createVertexBuffer(Buffer::Usage_BIT_STREAM,Buffer::Access_READ_WRITE,mEngine->getVertexFormats().POSITION_COLOR_TEX_COORD,skyDomeCreator->getSkyDomeVertexCount(numSegments,numRings));
-	IndexBuffer::ptr indexBuffer=mEngine->getBufferManager()->createIndexBuffer(Buffer::Usage_BIT_STATIC,Buffer::Access_BIT_WRITE,IndexBuffer::IndexFormat_UINT16,skyDomeCreator->getSkyDomeIndexCount(numSegments,numRings));
+	VertexBuffer::ptr vertexBuffer=mEngine->getBufferManager()->createVertexBuffer(Buffer::Usage_BIT_STREAM,Buffer::Access_READ_WRITE,mEngine->getVertexFormats().POSITION_COLOR_TEX_COORD,mSkyDomeCreator->getSkyDomeVertexCount(numSegments,numRings));
+	IndexBuffer::ptr indexBuffer=mEngine->getBufferManager()->createIndexBuffer(Buffer::Usage_BIT_STATIC,Buffer::Access_BIT_WRITE,IndexBuffer::IndexFormat_UINT16,mSkyDomeCreator->getSkyDomeIndexCount(numSegments,numRings));
 
 	mCloudFormat=new TextureFormat(TextureFormat::Dimension_D2,TextureFormat::Format_RGBA_8,cloudSize,cloudSize,1,0);
 	mCloudData=new tbyte[mCloudFormat->getDataSize()];
@@ -68,7 +66,7 @@ Clouds::Clouds(Scene *scene,int cloudSize,const Vector4 &skyColor,const Vector4 
 				"void main(){\n"
 					"gl_Position=modelViewProjectionMatrix * POSITION;\n"
 					"color=COLOR;\n"
-					"texCoord0=(textureMatrix * vec4(TEXCOORD0,0.0,1.0)).xy;\n "
+					"texCoord0=(textureMatrix * vec4(TEXCOORD0,0.0,1.0)).xy;\n"
 					"texCoord1=TEXCOORD0;\n"
 				"}",
 
@@ -223,7 +221,7 @@ Clouds::Clouds(Scene *scene,int cloudSize,const Vector4 &skyColor,const Vector4 
 		mCompositeFormat=new TextureFormat(TextureFormat::Dimension_D2,TextureFormat::Format_RGB_8,cloudSize,cloudSize,1,0);
 		mCompositeData=new tbyte[mCompositeFormat->getDataSize()];
 		createComposite(mCompositeFormat,mCompositeData,mCloudData,mBumpData,Math::Z_UNIT_VECTOR3,mSkyColor);
-		mCompositeTexture=mEngine->getTextureManager()->createTexture(Texture::Usage_BIT_AUTOGEN_MIPMAPS|Texture::Usage_BIT_DYNAMIC,mCompositeFormat,mCompositeData);
+		mCompositeTexture=mEngine->getTextureManager()->createTexture(Texture::Usage_BIT_AUTOGEN_MIPMAPS|Texture::Usage_BIT_STREAM,mCompositeFormat,mCompositeData);
 
 		RenderState::ptr renderState=mEngine->getMaterialManager()->createRenderState();
 		renderState->setBlendState(BlendState::Combination_ALPHA);
@@ -232,13 +230,13 @@ Clouds::Clouds(Scene *scene,int cloudSize,const Vector4 &skyColor,const Vector4 
 		renderState->setMaterialState(MaterialState(false,true));
 		renderState->setFogState(FogState());
 
-		skyBoxCreator->createPaths(material,renderState,mCompositeTexture,false);
+		mSkyBoxCreator->createPaths(material,renderState,mCompositeTexture,false);
 	}
 	material->setLayer(-2);
 	material->compile();
 	mMaterial=material;
 
-	mMesh=skyDomeCreator->createSkyDomeMesh(vertexBuffer,indexBuffer,sphere,numSegments,numRings,0.35);
+	mMesh=mSkyDomeCreator->createSkyDomeMesh(vertexBuffer,indexBuffer,sphere,numSegments,numRings,0.35);
 	Transform transform;
 	transform.setScale(1,1,0.5f);
 	mMesh->setTransform(transform);

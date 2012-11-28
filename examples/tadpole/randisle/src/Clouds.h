@@ -4,6 +4,8 @@
 #include <toadlet/egg.h>
 #include <toadlet/peeper.h>
 #include <toadlet/tadpole.h>
+#include <toadlet/tadpole/plugins/SkyDomeMeshCreator.h>
+#include <toadlet/tadpole/plugins/SkyBoxMaterialCreator.h>
 
 class Clouds:public BaseComponent{
 public:
@@ -44,6 +46,9 @@ protected:
 	TextureFormat::ptr mCompositeFormat;
 	tbyte *mCompositeData;
 	Texture::ptr mCompositeTexture;
+
+	SkyDomeMeshCreator::ptr mSkyDomeCreator;
+	SkyBoxMaterialCreator::ptr mSkyBoxCreator;
 
 	Mesh::ptr mMesh;
 	Material::ptr mMaterial;
