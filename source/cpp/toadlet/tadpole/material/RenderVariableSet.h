@@ -57,13 +57,20 @@ public:
 	inline Shader::ShaderType getBufferShaderType(int i){return mBuffers[i].shaderType;}
 	inline int getBufferIndex(int i){return mBuffers[i].index;}
 
+	/// @todo: The getNumTextures through getTextureTextureState only work for unassigned resources, currently used by Material duplication
 	bool addTexture(const String &name,Texture *texture,const String &samplerName,const SamplerState &samplerState,const TextureState &textureState);
 	bool findTexture(const String &name,Shader::ShaderType &type,int &index);
+	int getNumTextures(){return getNumResourceInfos();}
+	Texture::ptr getTexture(int i){return getResourceInfo(i)->texture;}
+	const String &getTextureName(int i){return getResourceInfo(i)->name;}
+	const String &getTextureSamplerName(int i){return getResourceInfo(i)->samplerName;}
+	SamplerState getTextureSamplerState(int i){return getResourceInfo(i)->samplerState;}
+	TextureState getTextureTextureState(int i){return getResourceInfo(i)->textureState;}
 
 	bool addVariable(const String &name,RenderVariable::ptr variable,int scope);
 	void removeVariable(RenderVariable::ptr variable);
 	RenderVariable::ptr findVariable(const String &name);
-	int getNumVariables(){int count=0,j;for(j=0;j<mBuffers.size();++j){count+=mBuffers[j].variables.size();}return count;}
+	int getNumVariables(){return getNumVariableInfos();}
 	RenderVariable::ptr getVariable(int i){return getVariableInfo(i)->variable;}
 	const String &getVariableName(int i){return getVariableInfo(i)->name;}
 	int getVariableScope(int i){return getVariableInfo(i)->scope;}
@@ -85,7 +92,7 @@ protected:
 		String name;
 		Texture::ptr texture;
 		String samplerName;
-		SamplerState samperState;
+		SamplerState samplerState;
 		TextureState textureState;
 	};
 
@@ -98,12 +105,34 @@ protected:
 		Collection<VariableInfo> variables;
 	};
 
+	inline int getNumVariableInfos(){
+		int count=0,j;
+		for(j=0;j<mBuffers.size();++j){
+			count+=mBuffers[j].variables.size();
+		}
+		count+=mUnassignedVariables.size();
+		return count;
+	}
+
 	inline VariableInfo *getVariableInfo(int i){
 		int j;
 		for(j=0;j<mBuffers.size() && i>=mBuffers[j].variables.size();++j){
 			i-=mBuffers[j].variables.size();
 		}
-		return &mBuffers[j].variables[i];
+		if(j<mBuffers.size() && i<mBuffers[j].variables.size()){
+			return &mBuffers[j].variables[i];
+		}
+		else{
+			return &mUnassignedVariables[i];
+		}
+	}
+
+	inline int getNumResourceInfos(){
+		return mUnassignedResources.size();
+	}
+
+	inline ResourceInfo *getResourceInfo(int i){
+		return &mUnassignedResources[i];
 	}
 
 	VariableBufferFormat::Variable *findFormatVariable(const String &name,BufferInfo *&buffer);

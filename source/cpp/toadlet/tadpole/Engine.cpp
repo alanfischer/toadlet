@@ -645,47 +645,69 @@ void Engine::contextDeactivate(RenderDevice *renderDevice){
 }
 
 Texture::ptr Engine::createNormalizationTexture(int size){
-	return shared_static_cast<NormalizationTextureCreator>(mNormalizationCreator)->createNormalizationTexture(size);
+	Texture::ptr texture=shared_static_cast<NormalizationTextureCreator>(mNormalizationCreator)->createNormalizationTexture(size);
+	mTextureManager->manage(texture);
+	return texture;
 }
 
 Material::ptr Engine::createDiffuseMaterial(Texture *texture){
-	return shared_static_cast<DiffuseMaterialCreator>(mDiffuseCreator)->createDiffuseMaterial(texture);
+	Material::ptr material=shared_static_cast<DiffuseMaterialCreator>(mDiffuseCreator)->createDiffuseMaterial(texture);
+	mMaterialManager->manage(material);
+	return material;
 }
 
 Material::ptr Engine::createPointSpriteMaterial(Texture *texture,scalar size,bool attenuated){
-	return shared_static_cast<DiffuseMaterialCreator>(mDiffuseCreator)->createPointSpriteMaterial(texture,size,attenuated);
+	Material::ptr material=shared_static_cast<DiffuseMaterialCreator>(mDiffuseCreator)->createPointSpriteMaterial(texture,size,attenuated);
+	mMaterialManager->manage(material);
+	return material;
 }
 
 Material::ptr Engine::createFontMaterial(Font *font){
-	return shared_static_cast<DiffuseMaterialCreator>(mDiffuseCreator)->createFontMaterial(font);
+	Material::ptr material=shared_static_cast<DiffuseMaterialCreator>(mDiffuseCreator)->createFontMaterial(font);
+	mMaterialManager->manage(material);
+	return material;
 }
 
 Material::ptr Engine::createSkyBoxMaterial(Texture *texture,bool clamp){
-	return shared_static_cast<SkyBoxMaterialCreator>(mSkyBoxMaterialCreator)->createSkyBoxMaterial(texture,clamp);
+	Material::ptr material=shared_static_cast<SkyBoxMaterialCreator>(mSkyBoxMaterialCreator)->createSkyBoxMaterial(texture,clamp);
+	mMaterialManager->manage(material);
+	return material;
 }
 
 Material::ptr Engine::createWaterMaterial(Texture *reflectTexture,Texture *refractTexture,Texture *bumpTexture,const Vector4 &color){
-	return shared_static_cast<WaterMaterialCreator>(mWaterMaterialCreator)->createWaterMaterial(reflectTexture,refractTexture,bumpTexture,color);
+	Material::ptr material=shared_static_cast<WaterMaterialCreator>(mWaterMaterialCreator)->createWaterMaterial(reflectTexture,refractTexture,bumpTexture,color);
+	mMaterialManager->manage(material);
+	return material;
 }
 
 Mesh::ptr Engine::createAABoxMesh(const AABox &box,Material *material){
-	return shared_static_cast<AABoxMeshCreator>(mAABoxCreator)->createAABoxMesh(box,material);
+	Mesh::ptr mesh=shared_static_cast<AABoxMeshCreator>(mAABoxCreator)->createAABoxMesh(box,material);
+	mMeshManager->manage(mesh);
+	return mesh;
 }
 
 Mesh::ptr Engine::createSkyBoxMesh(scalar size,bool unfolded,bool invert,Material *bottom,Material *top,Material *left,Material *right,Material *back,Material *front){
-	return shared_static_cast<SkyBoxMeshCreator>(mSkyBoxCreator)->createSkyBoxMesh(size,unfolded,invert,bottom,top,left,right,back,front);
+	Mesh::ptr mesh=shared_static_cast<SkyBoxMeshCreator>(mSkyBoxCreator)->createSkyBoxMesh(size,unfolded,invert,bottom,top,left,right,back,front);
+	mMeshManager->manage(mesh);
+	return mesh;
 }
 
 Mesh::ptr Engine::createSkyDomeMesh(const Sphere &sphere,int numSegments,int numRings,scalar fade,Material *material){
-	return shared_static_cast<SkyDomeMeshCreator>(mSkyDomeCreator)->createSkyDomeMesh(sphere,numSegments,numRings,fade,material);
+	Mesh::ptr mesh=shared_static_cast<SkyDomeMeshCreator>(mSkyDomeCreator)->createSkyDomeMesh(sphere,numSegments,numRings,fade,material);
+	mMeshManager->manage(mesh);
+	return mesh;
 }
 
 Mesh::ptr Engine::createSphereMesh(const Sphere &sphere,Material *material){
-	return shared_static_cast<SphereMeshCreator>(mSphereCreator)->createSphereMesh(sphere,16,16,material);
+	Mesh::ptr mesh=shared_static_cast<SphereMeshCreator>(mSphereCreator)->createSphereMesh(sphere,16,16,material);
+	mMeshManager->manage(mesh);
+	return mesh;
 }
 
 Mesh::ptr Engine::createGridMesh(scalar width,scalar height,int numWidth,int numHeight,Material *material){
-	return shared_static_cast<GridMeshCreator>(mGridCreator)->createGridMesh(width,height,numWidth,numHeight,material);
+	Mesh::ptr mesh=shared_static_cast<GridMeshCreator>(mGridCreator)->createGridMesh(width,height,numWidth,numHeight,material);
+	mMeshManager->manage(mesh);
+	return mesh;
 }
 
 }

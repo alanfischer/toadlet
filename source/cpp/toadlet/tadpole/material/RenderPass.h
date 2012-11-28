@@ -96,6 +96,8 @@ public:
 	// Fixed
 	void setTextureLocationName(Shader::ShaderType type,int i,const String &name);
 	bool findTexture(const String &name,Shader::ShaderType &type,int &index);
+	int getNumTextureLocationNames(Shader::ShaderType type) const{return mTextureLocationNames[type].size();}
+	String getTextureLocationName(Shader::ShaderType type,int i) const{return mTextureLocationNames[type][i];}
 
 	bool isDepthSorted() const;
 

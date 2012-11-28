@@ -90,18 +90,25 @@ Material::ptr MaterialManager::createSharedMaterial(Material::ptr source,RenderS
 					srcPass->getTextureState(type,l,textureState);
 					dstPass->setTexture(type,l,texture,samplerState,textureState);
 				}
+
+				for(l=0;l<srcPass->getNumTextureLocationNames(type);++l){
+					String name=srcPass->getTextureLocationName(type,l);
+					dstPass->setTextureLocationName(type,l,name);
+				}
 			}
 
 			dstPass->setModelMatrixFlags(srcPass->getModelMatrixFlags());
 
 			// Don't set Buffers, since those are currently constructed upon variable accessing.
 			/// @todo: Should we share buffers instead?
-
 			RenderVariableSet *srcVars=srcPass->getVariables();
 			if(srcVars!=NULL){
 				RenderVariableSet *dstVars=dstPass->makeVariables();
 				for(k=0;k<srcVars->getNumVariables();++k){
 					dstVars->addVariable(srcVars->getVariableName(k),srcVars->getVariable(k),srcVars->getVariableScope(k));
+				}
+				for(k=0;k<srcVars->getNumTextures();++k){
+					dstVars->addTexture(srcVars->getTextureName(k),srcVars->getTexture(k),srcVars->getTextureSamplerName(k),srcVars->getTextureSamplerState(k),srcVars->getTextureTextureState(k));
 				}
 			}
 		}
@@ -110,6 +117,7 @@ Material::ptr MaterialManager::createSharedMaterial(Material::ptr source,RenderS
 	material->setSort(source->getSort());
 	material->setLayer(source->getLayer());
 	material->compile();
+	manage(material);
 
 	return material;
 }
