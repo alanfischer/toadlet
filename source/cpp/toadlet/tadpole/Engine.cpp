@@ -198,11 +198,18 @@ Engine::Engine(void *env,void *ctx):
 		mRenderCaps.idealVertexFormatType=VertexFormat::Format_TYPE_FLOAT_32;
 	#endif
 
+	mMaximumRenderCaps.maxTextureSize=4096*16;
+	mMaximumRenderCaps.maxTextureStages=512;
+	mMaximumRenderCaps.maxLights=512;
 	int i;
 	for(i=0;i<Shader::ShaderType_MAX;++i){
-		mBackableRenderCaps.hasShader[i]=true;
-		mBackableRenderCaps.hasFixed[i]=true;
+		mMaximumRenderCaps.hasShader[i]=true;
+		mMaximumRenderCaps.hasFixed[i]=true;
 	}
+	
+	mBackableRenderCaps.maxTextureSize=4096*16;
+	mBackableRenderCaps.maxTextureStages=512;
+	mBackableRenderCaps.maxLights=512;
 	
 	// Create initial BackableVertexFormats.  This doesn't need to be done, but without it, starting an application without a RenderDevice will crash.
 	updateVertexFormats();
@@ -359,12 +366,8 @@ void Engine::setBackableRenderCaps(const RenderCaps &caps){
 }
 
 int Engine::mergeCap(int render,int maximum,int backable){
-	if(maximum>0){
-		render=Math::intMinVal(render,maximum);
-	}
-	if(backable>0){
-		render=Math::intMaxVal(render,backable);
-	}
+	render=Math::intMinVal(render,maximum);
+	render=Math::intMaxVal(render,backable);
 	return render;
 }
 
@@ -443,6 +446,34 @@ void Engine::updateVertexFormats(){
 	format=mBufferManager->createVertexFormat();
 	format->addElement(VertexFormat::Semantic_COLOR,0,formatType|VertexFormat::Format_COUNT_4);
 	mVertexFormats.COLOR=format;
+}
+
+void Engine::setHasBackableShader(bool has){
+	for(int i=0;i<Shader::ShaderType_MAX;++i){
+		mBackableRenderCaps.hasShader[i]=has;
+	}
+	updateRenderCaps();
+}
+
+void Engine::setHasBackableFixed(bool has){
+	for(int i=0;i<Shader::ShaderType_MAX;++i){
+		mBackableRenderCaps.hasFixed[i]=has;
+	}
+	updateRenderCaps();
+}
+
+void Engine::setHasMaximumShader(bool has){
+	for(int i=0;i<Shader::ShaderType_MAX;++i){
+		mMaximumRenderCaps.hasShader[i]=has;
+	}
+	updateRenderCaps();
+}
+
+void Engine::setHasMaximumFixed(bool has){
+	for(int i=0;i<Shader::ShaderType_MAX;++i){
+		mMaximumRenderCaps.hasFixed[i]=has;
+	}
+	updateRenderCaps();
 }
 
 bool Engine::setRenderDevice(RenderDevice *renderDevice){

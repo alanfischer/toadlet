@@ -143,7 +143,7 @@ void TextureManager::contextActivate(RenderDevice *renderDevice){
 	for(i=0;i<mResources.size();++i){
 		Texture *texture=(Texture*)mResources[i];
 		if(texture!=NULL && texture->getRootTexture()!=texture){
-			Texture::ptr back(renderDevice->createTexture());
+			Texture::ptr back=renderDevice->createTexture();
 			((BackableTexture*)texture)->setBack(back,renderDevice);
 		}
 	}

@@ -23,10 +23,12 @@ public:
 	void installHandlers();
 	
 	bool isBackable() const;
-	bool hasBackableShader(int type) const;
-	bool hasBackableFixed(int type) const;
 	bool hasShader(int type) const;
 	bool hasFixed(int type) const;
+	void setHasBackableShader(bool has);
+	void setHasBackableFixed(bool has);
+	void setHasMaximumShader(bool has);
+	void setHasMaximumFixed(bool has);
 	
 	bool setRenderDevice(RenderDevice *renderDevice);
 
