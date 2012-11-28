@@ -106,7 +106,7 @@ bool RenderVariableSet::addTexture(const String &name,Texture *texture,const Str
 		r.name=name;
 		r.texture=texture;
 		r.samplerName=samplerName;
-		r.samperState=samplerState;
+		r.samplerState=samplerState;
 		r.textureState=textureState;
 		mUnassignedResources.add(r);
 
@@ -316,7 +316,7 @@ void RenderVariableSet::buildBuffers(BufferManager *manager,RenderPass *pass){
 	}
 
 	for(i=0;i<resources.size();++i){
-		addTexture(resources[i].name,resources[i].texture,resources[i].samplerName,resources[i].samperState,resources[i].textureState);
+		addTexture(resources[i].name,resources[i].texture,resources[i].samplerName,resources[i].samplerState,resources[i].textureState);
 	}
 }
 
