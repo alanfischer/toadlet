@@ -44,7 +44,7 @@ Clouds::Clouds(Scene *scene,int cloudSize,const Vector4 &skyColor,const Vector4 
 		renderState->setMaterialState(MaterialState(false,true));
 
 		if(mEngine->hasShader(Shader::ShaderType_VERTEX) && mEngine->hasShader(Shader::ShaderType_FRAGMENT)){
-			RenderPath::ptr shaderPath=material->addPath();
+			RenderPath::ptr shaderPath=material->addPath("advancedShader");
 			RenderPass::ptr pass=shaderPath->addPass(renderState);
 
 			String profiles[]={
@@ -171,7 +171,7 @@ Clouds::Clouds(Scene *scene,int cloudSize,const Vector4 &skyColor,const Vector4 
 		}
 
 		if(mEngine->hasFixed(Shader::ShaderType_VERTEX) && mEngine->hasFixed(Shader::ShaderType_FRAGMENT)){
-			RenderPath::ptr fixedPath=material->addPath();
+			RenderPath::ptr fixedPath=material->addPath("advancedFixed");
 			RenderPass::ptr pass=fixedPath->addPass(renderState);
 
 			int state=0;
@@ -179,6 +179,7 @@ Clouds::Clouds(Scene *scene,int cloudSize,const Vector4 &skyColor,const Vector4 
 			bumpState.colorOperation=TextureState::Operation_DOTPRODUCT;
 			bumpState.colorSource1=TextureState::Source_PREVIOUS;
 			bumpState.colorSource2=TextureState::Source_TEXTURE;
+			bumpState.calculation=TextureState::CalculationType_NORMAL;
 			pass->setTexture(Shader::ShaderType_FRAGMENT,state,mBumpTexture,SamplerState(),bumpState);
 			pass->setTextureLocationName(Shader::ShaderType_FRAGMENT,state,"bumpTexture");
 			state++;
@@ -189,6 +190,7 @@ Clouds::Clouds(Scene *scene,int cloudSize,const Vector4 &skyColor,const Vector4 
 			cloudState.colorSource2=TextureState::Source_TEXTURE;
 			cloudState.alphaOperation=TextureState::Operation_REPLACE;
 			cloudState.alphaSource1=TextureState::Source_TEXTURE;
+			cloudState.calculation=TextureState::CalculationType_NORMAL;
 			pass->setTexture(Shader::ShaderType_FRAGMENT,state,mCloudTexture,SamplerState(),cloudState);
 			pass->setTextureLocationName(Shader::ShaderType_FRAGMENT,state,"cloudTexture");
 			state++;
@@ -201,6 +203,7 @@ Clouds::Clouds(Scene *scene,int cloudSize,const Vector4 &skyColor,const Vector4 
 			colorState.colorSource3=TextureState::Source_PREVIOUS;
 			colorState.alphaOperation=TextureState::Operation_REPLACE;
 			colorState.alphaSource1=TextureState::Source_PREVIOUS;
+			colorState.calculation=TextureState::CalculationType_NORMAL;
 			pass->setTexture(Shader::ShaderType_FRAGMENT,state,mCloudTexture,SamplerState(),colorState); // Need a texture for this state to function on OpenGL currently
 			pass->setTextureLocationName(Shader::ShaderType_FRAGMENT,state,"colorTexture");
 			state++;
@@ -212,6 +215,7 @@ Clouds::Clouds(Scene *scene,int cloudSize,const Vector4 &skyColor,const Vector4 
 			fadeState.colorSource3=TextureState::Source_TEXTURE;
 			fadeState.alphaOperation=TextureState::Operation_REPLACE;
 			fadeState.alphaSource1=TextureState::Source_TEXTURE;
+			fadeState.calculation=TextureState::CalculationType_NORMAL;
 			pass->setTexture(Shader::ShaderType_FRAGMENT,state,mFadeTexture,SamplerState(),fadeState);
 			pass->setTextureLocationName(Shader::ShaderType_FRAGMENT,state,"fadeTexture");
 			state++;
@@ -328,7 +332,7 @@ void Clouds::frameUpdate(int dt,int scope){
 void Clouds::setTextureMatrix(const String &name,Material *material,const Matrix4x4 &matrix){
 	Shader::ShaderType type;
 	int index;
-	RenderPass *pass=material->getPath()->findTexture(name,type,index);
+	RenderPass *pass=material->getBestPath()->findTexture(name,type,index);
 	if(pass!=NULL){
 		TextureState state;
 		pass->getTextureState(type,index,state);

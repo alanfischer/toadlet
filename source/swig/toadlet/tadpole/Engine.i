@@ -27,8 +27,12 @@ public:
 	bool hasFixed(int type) const;
 	void setHasBackableShader(bool has);
 	void setHasBackableFixed(bool has);
+	bool hasBackableShader(int type) const;
+	bool hasBackableFixed(int type) const;
 	void setHasMaximumShader(bool has);
 	void setHasMaximumFixed(bool has);
+	bool hasMaximumShader(int type) const;
+	bool hasMaximumFixed(int type) const;
 	
 	bool setRenderDevice(RenderDevice *renderDevice);
 

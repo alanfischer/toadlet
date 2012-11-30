@@ -168,7 +168,7 @@ bool SkyBoxMaterialCreator::createPaths(Material *material,RenderState *renderSt
 	}
 
 	if(mEngine->hasShader(Shader::ShaderType_VERTEX) && mEngine->hasShader(Shader::ShaderType_FRAGMENT)){
-		RenderPath::ptr shaderPath=material->addPath();
+		RenderPath::ptr shaderPath=material->addPath("shader");
 
 		RenderPass::ptr pass=shaderPath->addPass(renderState);
 
@@ -184,7 +184,7 @@ bool SkyBoxMaterialCreator::createPaths(Material *material,RenderState *renderSt
 	}
 
 	if(mEngine->hasFixed(Shader::ShaderType_VERTEX) && mEngine->hasFixed(Shader::ShaderType_FRAGMENT)){
-		RenderPath::ptr fixedPath=material->addPath();
+		RenderPath::ptr fixedPath=material->addPath("fixed");
 
 		RenderPass::ptr pass=fixedPath->addPass(renderState);
 
