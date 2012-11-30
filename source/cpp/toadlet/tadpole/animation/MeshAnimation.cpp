@@ -73,9 +73,17 @@ void MeshAnimation::setSequenceIndex(int index){
 }
 
 void MeshAnimation::setValue(scalar value){
-	if(mTarget!=NULL && mTarget->getSkeleton()){
+	if(mTarget!=NULL && mTarget->getSkeleton()!=NULL){
 		mTarget->getSkeleton()->updateBones(mSequenceIndex,value);
 	}
+}
+
+scalar MeshAnimation::getMaxValue() const{
+	scalar value=0;
+	if(mTarget!=NULL && mTarget->getSkeleton()!=NULL){
+		value=mTarget->getSkeleton()->getSkeleton()->getSequence(mSequenceIndex)->getLength();
+	}
+	return value;
 }
 
 }

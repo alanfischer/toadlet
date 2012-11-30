@@ -72,6 +72,8 @@ Shader::ptr ShaderManager::createShader(Shader::ShaderType type,const String &pr
 }
 
 void ShaderManager::contextActivate(RenderDevice *renderDevice){
+	Log::debug("ShaderManager::contextActivate");
+
 	int i;
 	for(i=0;i<mResources.size();++i){
 		Shader *shader=(Shader*)mResources[i];
@@ -88,6 +90,8 @@ void ShaderManager::contextActivate(RenderDevice *renderDevice){
 }
 
 void ShaderManager::contextDeactivate(RenderDevice *renderDevice){
+	Log::debug("ShaderManager::contextDeactivate");
+
 	int i;
 	for(i=0;i<mResources.size();++i){
 		Shader *shader=(Shader*)mResources[i];

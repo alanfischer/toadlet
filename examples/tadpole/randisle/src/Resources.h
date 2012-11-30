@@ -106,7 +106,7 @@ public:
 		Log::alert("Loading grass");
 
 		grass=shared_static_cast<Mesh>(engine->getMeshManager()->find("tall_grass.tmsh"));
-		if(creature!=NULL){
+		if(grass!=NULL){
 			Transform transform;
 			transform.setScale(0.1,0.1,0.1);
 			grass->setTransform(transform);

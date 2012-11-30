@@ -1,6 +1,6 @@
 %{
 #	include <toadlet/peeper/RenderDevice.h>
-#include <toadlet/peeper/plugins/glrenderdevice/platform/jgl/JGLWindowRenderTarget.h>
+#	include <toadlet/peeper/plugins/glrenderdevice/platform/jgl/JGLWindowRenderTarget.h>
 %}
 
 namespace toadlet{

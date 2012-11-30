@@ -139,6 +139,8 @@ bool TextureManager::textureLoad(Texture::ptr texture,TextureFormat *format,tbyt
 }
 
 void TextureManager::contextActivate(RenderDevice *renderDevice){
+	Log::debug("TextureManager::contextActivate");
+
 	int i;
 	for(i=0;i<mResources.size();++i){
 		Texture *texture=(Texture*)mResources[i];
@@ -158,6 +160,8 @@ void TextureManager::contextActivate(RenderDevice *renderDevice){
 }
 
 void TextureManager::contextDeactivate(RenderDevice *renderDevice){
+	Log::debug("TextureManager::contextDeactivate");
+
 	int i;
 	for(i=0;i<mResources.size();++i){
 		Texture *texture=(Texture*)mResources[i];
