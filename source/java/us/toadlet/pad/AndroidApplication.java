@@ -184,22 +184,25 @@ public abstract class AndroidApplication extends Activity implements Runnable{
 	}
 	
 	public boolean onCreateOptionsMenu(Menu menu){
-		if(mEngine.hasShader(0)){
-			mShaderItem=menu.add("Enable FixedFunction");
+		mShaderItem=menu.add("");
+		mExitItem=menu.add("Exit");
+		return true;
+	}
+
+	public boolean onPrepareOptionsMenu(Menu menu){
+		if(mEngine.hasMaximumShader(0)){
+			mShaderItem.setTitle("Enable FixedFunction");
 		}
 		else{
-			mShaderItem=menu.add("Enable Shaders");
+			mShaderItem.setTitle("Enable Shaders");
 		}
-
-		mExitItem=menu.add("Exit");
-
 		return true;
 	}
 	
 	public boolean onOptionsItemSelected(MenuItem item){
 		if(item==mShaderItem){
 			mNotifyShaderChanged=true;
-			mShaderState=!mEngine.hasShader(0);
+			mShaderState=!mEngine.hasMaximumShader(0);
 		}
 		else if(item==mExitItem){
 			stop();
@@ -218,8 +221,8 @@ public abstract class AndroidApplication extends Activity implements Runnable{
 			mEngine.setHasBackableShader(true);
 			mEngine.setHasBackableFixed(true);
 
-			mEngine.setHasMaximumShader(false);
-			mEngine.setHasMaximumFixed(true);
+			mEngine.setHasMaximumShader(true);
+			mEngine.setHasMaximumFixed(false);
 			
 			mEngine.installHandlers();
 		}
