@@ -182,7 +182,6 @@ void RandIsle::create(){
 		MeshComponent *mesh=new MeshComponent(mEngine);
 		mesh->setMesh(Resources::instance->grass);
 		mesh->setName("mesh");
-		mesh->getSharedRenderState()->setBlendState(BlendState::Combination_ALPHA);
 		prop->attach(mesh);
 		mProps->attach(prop);
 	}

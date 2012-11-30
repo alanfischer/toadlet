@@ -366,13 +366,13 @@ void Engine::setBackableRenderCaps(const RenderCaps &caps){
 }
 
 int Engine::mergeCap(int render,int maximum,int backable){
-	render=Math::intMinVal(render,maximum);
 	render=Math::intMaxVal(render,backable);
+	render=Math::intMinVal(render,maximum);
 	return render;
 }
 
 void Engine::updateRenderCaps(){
-	// engineRenderCaps = max(min(renderCaps,maximumCaps),backableRenderCaps)
+	// engineRenderCaps = min(max(renderCaps,backableCaps),maximumCaps)
 
 	mEngineRenderCaps.set(mRenderCaps);
 
@@ -381,8 +381,8 @@ void Engine::updateRenderCaps(){
 
 	int i;
 	for(i=0;i<Shader::ShaderType_MAX;++i){
-		mEngineRenderCaps.hasShader[i]=	mergeCap(mRenderCaps.hasShader[i],	mMaximumRenderCaps.hasShader[i],mBackableRenderCaps.hasShader[i])	> 0;
-		mEngineRenderCaps.hasFixed[i]=	mergeCap(mRenderCaps.hasFixed[i],	mMaximumRenderCaps.hasFixed[i],	mBackableRenderCaps.hasFixed[i])	> 0;
+		mEngineRenderCaps.hasShader[i]=	mergeCap(mRenderCaps.hasShader[i],		mMaximumRenderCaps.hasShader[i],	mBackableRenderCaps.hasShader[i])> 0;
+		mEngineRenderCaps.hasFixed[i]=	mergeCap(mRenderCaps.hasFixed[i],		mMaximumRenderCaps.hasFixed[i],		mBackableRenderCaps.hasFixed[i])> 0;
 	}
 
 	mEngineRenderCaps.maxLights=		mergeCap(mRenderCaps.maxLights,			mMaximumRenderCaps.maxLights,		mBackableRenderCaps.maxLights);

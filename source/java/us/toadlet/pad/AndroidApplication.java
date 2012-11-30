@@ -184,12 +184,26 @@ public abstract class AndroidApplication extends Activity implements Runnable{
 	}
 	
 	public boolean onCreateOptionsMenu(Menu menu){
-		menu.add("Exit");
+		if(mEngine.hasShader(0)){
+			mShaderItem=menu.add("Enable FixedFunction");
+		}
+		else{
+			mShaderItem=menu.add("Enable Shaders");
+		}
+
+		mExitItem=menu.add("Exit");
+
 		return true;
 	}
 	
 	public boolean onOptionsItemSelected(MenuItem item){
-		stop();
+		if(item==mShaderItem){
+			mNotifyShaderChanged=true;
+			mShaderState=!mEngine.hasShader(0);
+		}
+		else if(item==mExitItem){
+			stop();
+		}
 		return true;
 	}
 	
@@ -203,6 +217,9 @@ public abstract class AndroidApplication extends Activity implements Runnable{
 			
 			mEngine.setHasBackableShader(true);
 			mEngine.setHasBackableFixed(true);
+
+			mEngine.setHasMaximumShader(false);
+			mEngine.setHasMaximumFixed(true);
 			
 			mEngine.installHandlers();
 		}
@@ -326,6 +343,19 @@ public abstract class AndroidApplication extends Activity implements Runnable{
 					if(mActive && mRenderDevice!=null){
 						render();
 					}
+				}
+				if(mNotifyShaderChanged){
+					mNotifyShaderChanged=false;
+					if(mShaderState){
+						mEngine.setHasMaximumShader(true);
+						mEngine.setHasMaximumFixed(false);
+					}
+					else{
+						mEngine.setHasMaximumShader(false);
+						mEngine.setHasMaximumFixed(true);
+					}
+					surfaceDestroyed(mSurfaceHolder);
+					surfaceCreated(mSurfaceHolder);
 				}
 			}
 
@@ -483,10 +513,6 @@ public abstract class AndroidApplication extends Activity implements Runnable{
 	public void setWindowRenderTargetFormat(WindowRenderTargetFormat format){mFormat=format;}
 	public WindowRenderTargetFormat getWindowRenderTargetFormat(){return mFormat;}
 	
-	public void setBackable(boolean fixed,boolean shader){mFixedBackable=fixed;mShaderBackable=shader;}
-	public boolean getFixedBackable(){return mFixedBackable;}
-	public boolean getShaderbackable(){return mShaderBackable;}
-	
 	public void setApplet(Applet applet){mApplet=applet;}
 	public Applet getApplet(){return mApplet;}
 
@@ -540,9 +566,11 @@ public abstract class AndroidApplication extends Activity implements Runnable{
 			if(target!=null){
 				try{
 					if(mFormat.getFlags()==2){
+					System.out.println("GLES2");
 						device=pad.new_GLES2RenderDevice();
 					}
 					else{
+					System.out.println("GLES1");
 						device=pad.new_GLES1RenderDevice();
 					}
 				}
@@ -562,6 +590,8 @@ public abstract class AndroidApplication extends Activity implements Runnable{
 		if(mRenderDevice!=null){
 			mEngine.setRenderDevice(mRenderDevice);
 		}
+		
+		mSurfaceHolder=holder;
 	}
 
 	public void surfaceDestroyed(SurfaceHolder holder){
@@ -605,12 +635,12 @@ public abstract class AndroidApplication extends Activity implements Runnable{
 	protected boolean mDifferenceMouse;
 	protected int mLastMouseX,mLastMouseY;
 	protected WindowRenderTargetFormat mFormat;
-	protected boolean mFixedBackable=true,mShaderBackable=true;
 	protected RenderTarget mRenderTarget;
 	protected RenderDevice mRenderDevice;
 	protected AudioDevice mAudioDevice;
 	protected us.toadlet.flick.InputDevice[] mInputDevices=new us.toadlet.flick.InputDevice[us.toadlet.flick.InputDevice.InputType_MAX];
 	
+	protected SurfaceHolder mSurfaceHolder;
 	protected SurfaceHolder mNotifySurfaceCreated;
 	protected SurfaceHolder mNotifySurfaceDestroyed;
 	protected boolean mSurfaceCreated;
@@ -626,4 +656,8 @@ public abstract class AndroidApplication extends Activity implements Runnable{
 	protected int mMouseMovedX,mMouseMovedY;
 	protected boolean mNotifyMouseReleased;
 	protected int mMouseReleasedX,mMouseReleasedY;
+	protected boolean mNotifyShaderChanged;
+	protected boolean mShaderState;
+
+	protected MenuItem mShaderItem,mExitItem;
 }

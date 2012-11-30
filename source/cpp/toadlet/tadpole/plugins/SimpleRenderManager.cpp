@@ -277,8 +277,10 @@ void SimpleRenderManager::setupLights(const RenderableSet::LightQueue &lightQueu
 		mSceneParameters->setLightState(state);
 	}
 
+	RenderCaps caps;
+	device->getRenderCaps(caps);
+	int maxLights=caps.maxLights;
 	int i;
-	int maxLights=mScene->getEngine()->getRenderCaps().maxLights;
 	for(i=0;i<maxLights;++i){
 		if(i<lightQueue.size()){
 			LightComponent *light=lightQueue[i].light;

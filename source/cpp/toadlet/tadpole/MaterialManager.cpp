@@ -225,6 +225,8 @@ void MaterialManager::setRenderPathChooser(RenderPathChooser *chooser){
 }
 
 void MaterialManager::contextActivate(RenderDevice *renderDevice){
+	Log::debug("MaterialManager::contextActivate");
+
 	int i;
 	for(i=0;i<mRenderStates.size();++i){
 		RenderState::ptr renderState=mRenderStates[i];
@@ -261,6 +263,8 @@ void MaterialManager::contextActivate(RenderDevice *renderDevice){
 }
 
 void MaterialManager::contextDeactivate(RenderDevice *renderDevice){
+	Log::debug("MaterialManager::contextDeactivate");
+
 	int i;
 	for(i=0;i<mRenderStates.size();++i){
 		RenderState::ptr renderState=mRenderStates[i];
