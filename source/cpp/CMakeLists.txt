@@ -131,6 +131,10 @@ elseif (TOADLET_PLATFORM_POSIX)
 		message (STATUS "SSE2 support enabled")
 	endif (TOADLET_HAS_SSE)
 
+	# Always use position independent code
+	set (DYNAMIC_LIB_FLAGS "${DYNAMIC_LIB_FLAGS} -fPIC")
+	set (STATIC_LIB_FLAGS "${STATIC_LIB_FLAGS} -fPIC")
+
 	# Append the compile flags to the properties
 	if (DYNAMIC_LIB_FLAGS)
 		set (DYNAMIC_LIB_PROPS ${DYNAMIC_LIB_PROPS} COMPILE_FLAGS ${DYNAMIC_LIB_FLAGS})
