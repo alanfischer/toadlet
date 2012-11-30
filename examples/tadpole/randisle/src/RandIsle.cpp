@@ -11,6 +11,10 @@
 
 static const scalar epsilon=0.001f;
 
+/// @todo: Fix:
+///  - Android shutdown of RandIsle not being able to launch again
+///  - Android GLES1/2 swapping not working due to different GL libraries being loaded, have to use glesem
+
 RandIsle::RandIsle(Application *app,String path):
 	mMouseButtons(0),
 	mXJoy(0),mYJoy(0),
@@ -269,11 +273,11 @@ void RandIsle::render(){
 	RenderDevice *device=mEngine->getRenderDevice();
 	device->beginScene();
 	{
-		if(mRefractCamera!=NULL){
+		if(mRefractCamera!=NULL && mRefractCamera->ready()){
 			mRefractCamera->render(device,mScene);
 		}
 
-		if(mReflectCamera!=NULL){
+		if(mReflectCamera!=NULL && mReflectCamera->ready()){
 			mReflectCamera->render(device,mScene);
 		}
 

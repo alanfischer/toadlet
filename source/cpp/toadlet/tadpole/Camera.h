@@ -94,6 +94,8 @@ public:
 	void setRenderTarget(RenderTarget *target);
 	RenderTarget *getRenderTarget(){return mRenderTarget;}
 
+	bool ready() const{return mRenderTarget==NULL || mRenderTarget->getRootRenderTarget()!=NULL;}
+
 	void setViewport(const Viewport &viewport){mViewport.set(viewport);}
 	void setViewport(int x,int y,int width,int height){mViewport.set(x,y,width,height);}
 	inline const Viewport &getViewport() const{return mViewport;}
