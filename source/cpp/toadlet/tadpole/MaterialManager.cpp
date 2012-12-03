@@ -305,8 +305,8 @@ bool MaterialManager::isPathUseable(RenderPath *path,const RenderCaps &caps){
 		RenderPass *pass=path->getPass(i);
 		ShaderState *state=pass->getShaderState();
 
-		if(state!=NULL){
-			for(j=0;j<Shader::ShaderType_MAX;++j){
+		for(j=0;j<Shader::ShaderType_MAX;++j){
+			if(state!=NULL){
 				/// @todo: I believe this wont currently detect a shader path that didn't load properly.  so FIX IT
 				Shader *shader=state->getShader((Shader::ShaderType)j);
 				if(shader!=NULL && (shader->getRootShader()==NULL || caps.hasShader[j]==false)){
@@ -314,9 +314,13 @@ bool MaterialManager::isPathUseable(RenderPath *path,const RenderCaps &caps){
 				}
 			}
 
-			if(j!=Shader::ShaderType_MAX){
+			if(pass->getNumTextures((Shader::ShaderType)j)>caps.maxTextureStages){
 				break;
 			}
+		}
+
+		if(j!=Shader::ShaderType_MAX){
+			break;
 		}
 	}
 
@@ -329,11 +333,13 @@ bool MaterialManager::compileMaterial(Material *material){
 	if(mRenderPathChooser!=NULL){
 		bestPath=mRenderPathChooser->chooseBestPath(material);
 	}
-	else{
+	else if(mEngine->getRenderDevice()!=NULL){
+		RenderCaps caps;
+		mEngine->getRenderDevice()->getRenderCaps(caps);
 		int i;
 		for(i=0;i<material->getNumPaths();++i){
 			RenderPath::ptr path=material->getPath(i);
-			if(isPathUseable(path,mEngine->getRenderCaps())){
+			if(isPathUseable(path,caps)){
 				bestPath=path;
 				break;
 			}

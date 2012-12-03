@@ -4,6 +4,7 @@
 #include <toadlet/egg.h>
 #include <toadlet/peeper.h>
 #include <toadlet/tadpole.h>
+#include "Clouds.h"
 
 class Sky:public Node{
 public:
@@ -22,6 +23,7 @@ protected:
 	Node::ptr mLightNode;
 	SpriteComponent::ptr mSun;
 	Node::ptr mSunNode;
+	Clouds::ptr mClouds;
 	MeshComponent::ptr mSkyDome;
 };
 

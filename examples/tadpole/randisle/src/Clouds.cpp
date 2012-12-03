@@ -245,6 +245,8 @@ Clouds::Clouds(Scene *scene,int cloudSize,const Vector4 &skyColor,const Vector4 
 	transform.setScale(1,1,0.5f);
 	mMesh->setTransform(transform);
 	mMesh->getSubMesh(0)->material=mMaterial;
+
+	mEngine->addContextListener(this);
 }
 
 void Clouds::destroy(){
@@ -278,10 +280,16 @@ void Clouds::destroy(){
 		mMaterial=NULL;
 	}
 
+	if(mEngine!=NULL){
+		mEngine->removeContextListener(this);
+	}
+
 	BaseComponent::destroy();
 }
 
 void Clouds::setLightDirection(const Vector3 &lightDir){
+	mLightDirection.set(lightDir);
+
 	VertexBuffer *buffer=mMesh->getStaticVertexData()->getVertexBuffer(0);
 	VertexBufferAccessor vba(buffer,Buffer::Access_READ_WRITE);
 	int ip=buffer->getVertexFormat()->findElement(VertexFormat::Semantic_POSITION);
@@ -327,6 +335,10 @@ void Clouds::frameUpdate(int dt,int scope){
 	setTextureMatrix("bumpTexture",mMaterial,matrix);
 	setTextureMatrix("cloudTexture",mMaterial,matrix);
 	setTextureMatrix("texture",mMaterial,matrix);
+}
+
+void Clouds::postContextActivate(RenderDevice *renderDevice){
+	setLightDirection(mLightDirection);
 }
 
 void Clouds::setTextureMatrix(const String &name,Material *material,const Matrix4x4 &matrix){

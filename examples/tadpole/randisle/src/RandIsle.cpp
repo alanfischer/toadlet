@@ -219,6 +219,8 @@ void RandIsle::destroy(){
 	if(mScene!=NULL){
 		mScene->destroy();
 		mScene=NULL;
+
+		Resources::destroy();
 	}
 
 	if(mPredictedVertexData!=NULL){
@@ -233,8 +235,6 @@ void RandIsle::destroy(){
 		mPredictedMaterial->destroy();
 		mPredictedMaterial=NULL;
 	}
-
-	Resources::destroy();
 
 	Log::debug("RandIsle::destroy finished");
 }
