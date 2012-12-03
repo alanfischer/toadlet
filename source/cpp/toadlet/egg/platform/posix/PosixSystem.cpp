@@ -62,7 +62,7 @@ void PosixSystem::msleep(uint64 milliseconds){
 uint64 PosixSystem::utime(){
 	struct timeval now;
 	gettimeofday(&now,0);
-	return now.tv_usec;
+	return ((uint64)now.tv_sec)*1000000+((uint64)now.tv_usec);
 }
 
 uint64 PosixSystem::mtime(){
