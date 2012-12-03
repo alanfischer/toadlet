@@ -12,6 +12,7 @@ extern "C" JNIEXPORT jobject JNICALL Java_us_toadlet_randisle_RandIsle_createApp
 	jclass appletClass=env->FindClass("us/toadlet/pad/Applet");
 	{
 		jmethodID initID=env->GetMethodID(appletClass,"<init>","(JZ)V");
+		applet->retain();
 		appletObj=env->NewObject(appletClass,initID,(jlong)applet,true);
 	}
 	env->DeleteLocalRef(appletClass);

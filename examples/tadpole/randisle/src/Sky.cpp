@@ -1,17 +1,15 @@
 #include "Sky.h"
-#include "Clouds.h"
 #include <toadlet/tadpole/plugins/SkyDomeMeshCreator.h>
 
 Sky::Sky(Scene *scene,int cloudSize,const Vector4 &skyColor,const Vector4 &fadeColor):Node(scene)
 {
 	Vector3 lightDir(1,-1,0.5);
 
-	Clouds::ptr clouds=new Clouds(scene,cloudSize,skyColor,fadeColor);
-	clouds->setLightDirection(lightDir);
-	attach(clouds);
+	mClouds=new Clouds(scene,cloudSize,skyColor,fadeColor);
+	attach(mClouds);
 
 	mSkyDome=new MeshComponent(mEngine);
-	mSkyDome->setMesh(clouds->getMesh());
+	mSkyDome->setMesh(mClouds->getMesh());
 	attach(mSkyDome);
 
 	TextureFormat::ptr glowFormat=new TextureFormat(TextureFormat::Dimension_D2,TextureFormat::Format_L_8,128,128,1,0);
@@ -62,6 +60,8 @@ void Sky::updateLightDirection(const Vector3 &lightDir){
 	mLight->setLightState(state);
 
 	mSunNode->setTranslate(lightDir*256);
+
+	mClouds->setLightDirection(lightDir);
 }
 
 tbyte *Sky::createGlow(TextureFormat *format){

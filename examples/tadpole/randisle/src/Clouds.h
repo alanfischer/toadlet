@@ -7,7 +7,7 @@
 #include <toadlet/tadpole/plugins/SkyDomeMeshCreator.h>
 #include <toadlet/tadpole/plugins/SkyBoxMaterialCreator.h>
 
-class Clouds:public BaseComponent{
+class Clouds:public BaseComponent,public ContextListener{
 public:
 	TOADLET_OBJECT(Clouds);
 
@@ -21,6 +21,13 @@ public:
 	inline Mesh *getMesh(){return mMesh;}
 	inline Material *getSkyMaterial(){return mMaterial;}
 
+	virtual void preContextReset(RenderDevice *renderDevice){}
+	virtual void postContextReset(RenderDevice *renderDevice){}
+	virtual void preContextActivate(RenderDevice *renderDevice){}
+	virtual void postContextActivate(RenderDevice *renderDevice);
+	virtual void preContextDeactivate(RenderDevice *renderDevice){}
+	virtual void postContextDeactivate(RenderDevice *renderDevice){}
+
 protected:
 	static void createCloud(TextureFormat *format,tbyte *data,int scale,int seed,float cover,float sharpness,float brightness);
 	static void createBump(TextureFormat *format,tbyte *data,tbyte *src,float xscale,float yscale,float zscale,int spread);
@@ -33,6 +40,7 @@ protected:
 	Scene *mScene;
 
 	Vector4 mSkyColor;
+	Vector3 mLightDirection;
 
 	TextureFormat::ptr mCloudFormat;
 	tbyte *mCloudData;

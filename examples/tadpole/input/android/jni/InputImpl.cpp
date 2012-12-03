@@ -21,6 +21,7 @@ extern "C" JNIEXPORT jobject JNICALL Java_us_toadlet_input_Input_createApplet(JN
 	jclass appletClass=env->FindClass("us/toadlet/pad/Applet");
 	{
 		jmethodID initID=env->GetMethodID(appletClass,"<init>","(JZ)V");
+		applet->retain();
 		appletObj=env->NewObject(appletClass,initID,(jlong)applet,true);
 	}
 	env->DeleteLocalRef(appletClass);

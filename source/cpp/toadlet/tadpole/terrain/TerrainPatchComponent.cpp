@@ -65,6 +65,10 @@ TerrainPatchComponent::TerrainPatchComponent(Scene *scene):
 }
 
 void TerrainPatchComponent::destroy(){
+	mLeftDependent=NULL;
+	mTopDependent=NULL;
+
+	mLayerTextures.clear();
 	mMaterial=NULL;
 	if(mVertexBuffer!=NULL){
 		mVertexBuffer->destroy();

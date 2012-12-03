@@ -79,7 +79,11 @@ TerrainNode::TerrainNode(Scene *scene):PartitionNode(scene),
 }
 
 void TerrainNode::destroy(){
+	mTarget=NULL;
+	mDataSource=NULL;
+	mMaterialSource=NULL;
 	mPatchMaterial=NULL;
+	mPatchWaterMaterial=NULL;
 
 	int i;
 	for(i=0;i<mUnactivePatches.size();++i){
