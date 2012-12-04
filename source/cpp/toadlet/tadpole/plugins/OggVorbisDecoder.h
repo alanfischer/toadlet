@@ -53,7 +53,7 @@ public:
 	bool writeable(){return false;}
 	int write(const tbyte *buffer,int length){return -1;}
 
-	bool startStream(Stream::ptr stream);
+	bool startStream(Stream *stream);
 	bool stopStream();
 
 	bool reset();
