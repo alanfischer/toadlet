@@ -54,7 +54,7 @@ void OggVorbisDecoder::close(){
 	stopStream();
 }
 
-bool OggVorbisDecoder::startStream(Stream::ptr stream){
+bool OggVorbisDecoder::startStream(Stream *stream){
 	mStream=stream;
 
 	if(mStream==NULL){

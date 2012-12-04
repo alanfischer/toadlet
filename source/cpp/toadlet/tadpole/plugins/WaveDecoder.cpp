@@ -72,7 +72,7 @@ WaveDecoder::~WaveDecoder(){
 	}
 }
 
-bool WaveDecoder::startStream(Stream::ptr stream){
+bool WaveDecoder::startStream(Stream *stream){
 	RIFFHEADER header;
 	CHUNKHEADER chunk;
 	WAVEFORMAT fmt;
@@ -185,7 +185,7 @@ bool WaveDecoder::reset(){
 	return true;
 }
 
-void WaveDecoder::skip(Stream::ptr stream,int amount){
+void WaveDecoder::skip(Stream *stream,int amount){
 	tbyte *skipBuffer=new tbyte[amount];
 	stream->read(skipBuffer,amount);
 	delete[] skipBuffer;

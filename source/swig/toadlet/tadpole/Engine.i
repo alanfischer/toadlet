@@ -36,7 +36,7 @@ public:
 	
 	bool setRenderDevice(RenderDevice *renderDevice);
 
-	bool setAudioDevice(AudioDevice * audioDevice);
+	bool setAudioDevice(AudioDevice *audioDevice);
 };
 
 }

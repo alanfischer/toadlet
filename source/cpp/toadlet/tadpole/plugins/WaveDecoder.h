@@ -48,7 +48,7 @@ public:
 	bool writeable(){return false;}
 	int write(const tbyte *buffer,int length){return -1;}
 
-	bool startStream(Stream::ptr stream);
+	bool startStream(Stream *stream);
 	bool reset();
 	int length(){return mSize;}
 	int position(){return mPosition;}
@@ -57,7 +57,7 @@ public:
 	AudioFormat::ptr getAudioFormat() const{return mFormat;}
 
 private:
-	void skip(Stream::ptr stream,int amount);
+	void skip(Stream *stream,int amount);
 	void ADPCMDecoder(const char *in,short *out,int len);
 
 	AudioFormat::ptr mFormat;
