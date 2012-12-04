@@ -49,14 +49,24 @@ class String;
 
 %typemap(typecheck) String = char *;
 
+// Shared pragmas
+%pragma(java) jniclassimports=%{
+import us.toadlet.peeper.RenderDevice;
+import us.toadlet.ribbit.AudioDevice;
+%}
+
 
 // Ribbit accessors
+%{
+#	include <toadlet/ribbit/plugins/jaudiodevice/JAudioDevice.h>
+%}
+
 namespace toadlet{
 namespace ribbit{
-class AudioDevice;
+class AudioDevice{virtual interface()=0;}; // This tricks swig into generating the gpcpp parameter which we can pull the jobject from
 %typemap(jtype) AudioDevice * "long"
 %typemap(jstype) AudioDevice * "us.toadlet.ribbit.AudioDevice"
-%typemap(in) AudioDevice * "$1=*(toadlet::ribbit::AudioDevice**)&$input;"
+%typemap(in) AudioDevice * "$1=($input!=NULL?*(toadlet::ribbit::AudioDevice**)&$input:new toadlet::ribbit::JAudioDevice(jenv,$input_));"
 %typemap(javain) AudioDevice * "us.toadlet.ribbit.AudioDevice.getCPtr($javainput)"
 %typemap(javaout) AudioDevice * "{return new us.toadlet.ribbit.AudioDevice($jnicall, $owner);}"
 }
@@ -67,7 +77,7 @@ using namespace toadlet::ribbit;
 // Peeper accessors
 namespace toadlet{
 namespace peeper{
-class RenderDevice;
+class RenderDevice{virtual interface()=0;}; // This tricks swig into generating the gpcpp parameter which we can pull the jobject from
 %typemap(jtype) RenderDevice * "long"
 %typemap(jstype) RenderDevice * "us.toadlet.peeper.RenderDevice"
 %typemap(in) RenderDevice * "$1=*(toadlet::peeper::RenderDevice**)&$input;"

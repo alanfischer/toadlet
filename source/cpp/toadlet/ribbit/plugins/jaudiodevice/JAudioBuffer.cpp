@@ -49,15 +49,17 @@ JAudioBuffer::~JAudioBuffer(){
 }
 
 bool JAudioBuffer::create(AudioStream *stream){
+	Log::debug(Categories::TOADLET_RIBBIT,
+		"JAudioBuffer::create");
+
 	mAudioStream=stream; // Store the pointer until we have reference counting
 	jobject streamObj=NULL;
 
-	jclass streamClass=env->FindClass("us/toadlet/ribbit/NAudioStream");
+	jclass streamClass=env->FindClass("us/toadlet/ribbit/AudioStream");
 	{
-		jmethodID initID=env->GetMethodID(streamClass,"<init>","(III)V");
-		int length=2048;
-		tbyte *buffer=new tbyte[length]; 
-		streamObj=env->NewObject(streamClass,initID,(int)stream,buffer,length);
+		jmethodID initID=env->GetMethodID(streamClass,"<init>","(JZ)V");
+		stream->retain();
+		streamObj=env->NewObject(streamClass,initID,(jlong)stream,true);
 	}
 	env->DeleteLocalRef(streamClass);
 

@@ -461,6 +461,7 @@ void RandIsle::updateClimber(PathClimber *climber,int dt){
 
 			if(closestPath!=NULL && closestDistance<snapDistance){
 				climber->mount(closestNode,closestPath,closestPoint);
+				mRustleSound->play();
 				findPathSequence(mPathSequence,climber,climber->getPath(),climber->getPathDirection(),climber->getPathTime());
 			}
 		}

@@ -31,6 +31,8 @@ import android.media.AudioManager;
 
 public class ATAudio extends BaseAudio implements AudioTrack.OnPlaybackPositionUpdateListener{
 	public ATAudio(ATAudioDevice device){
+		super(0,false);
+
 		mGain=1.0f;
 		mAudioGain=1.0f;
 		mDevice=device;
