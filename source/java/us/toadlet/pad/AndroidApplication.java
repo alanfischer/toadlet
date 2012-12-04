@@ -31,7 +31,9 @@ import android.hardware.*;
 import android.view.*;
 import android.os.*;
 import us.toadlet.peeper.*;
+import us.toadlet.peeper.RenderDevice;
 import us.toadlet.ribbit.*;
+import us.toadlet.ribbit.AudioDevice;
 import us.toadlet.flick.*;
 import us.toadlet.tadpole.*;
 
