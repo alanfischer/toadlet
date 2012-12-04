@@ -30,6 +30,8 @@ import android.os.Looper;
 
 public class ATAudioDevice extends BaseAudioDevice implements Runnable{
 	public ATAudioDevice(){
+		super(0,false);
+		
 //		mCaps=new AudioCaps();
 //		mCaps.maxSources=16;
 //		mCaps.streaming=true;

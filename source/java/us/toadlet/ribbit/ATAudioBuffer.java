@@ -29,6 +29,8 @@ import android.media.AudioTrack;
 
 public class ATAudioBuffer extends BaseAudioBuffer{
 	public ATAudioBuffer(){
+		super(0,false);
+
 		mAudioFormat=new us.toadlet.ribbit.AudioFormat(0,0,0);
 	}
 

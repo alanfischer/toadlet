@@ -68,15 +68,18 @@ bool JAudio::create(AudioBuffer *audioBuffer){
 	return env->CallBooleanMethod(obj,createAudioBufferID,audioBufferObj);
 }
 
-bool JAudio::create(AudioStream *audioStream){
-	mAudioStream=audioStream; // Store the pointer until we have reference counting
-	jobject audioStreamObj=NULL;
-	jclass streamClass=env->FindClass("us/toadlet/ribbit/NAudioStream");
-	if(audioStream!=NULL){
-		jmethodID initID=env->GetMethodID(streamClass,"<init>","(III)V");
-		int length=2048;
-		tbyte *buffer=new tbyte[length];
-		audioStreamObj=env->NewObject(streamClass,initID,(int)audioStream,(int)buffer,length);
+bool JAudio::create(AudioStream *stream){
+	Log::debug(Categories::TOADLET_RIBBIT,
+		"JAudio::create");
+
+	mAudioStream=stream; // Store the pointer until we have reference counting
+	jobject streamObj=NULL;
+
+	jclass streamClass=env->FindClass("us/toadlet/ribbit/AudioStream");
+	if(stream!=NULL){
+		jmethodID initID=env->GetMethodID(streamClass,"<init>","(JZ)V");
+		stream->retain();
+		streamObj=env->NewObject(streamClass,initID,(jlong)stream,true);
 	}
 	env->DeleteLocalRef(streamClass);
 
@@ -87,7 +90,7 @@ bool JAudio::create(AudioStream *audioStream){
 		return false;
 	}
 
-	return env->CallBooleanMethod(obj,createAudioStreamID,audioStreamObj);
+	return env->CallBooleanMethod(obj,createAudioStreamID,streamObj);
 }
 
 void JAudio::destroy(){
