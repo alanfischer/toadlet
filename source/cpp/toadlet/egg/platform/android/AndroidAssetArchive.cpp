@@ -32,6 +32,13 @@
 namespace toadlet{
 namespace egg{
 
+enum{
+	ACCESS_UNKNOWN=0,
+	ACCESS_RANDOM=1,
+	ACCESS_STREAMING=2,
+	ACCESS_BUFFER=3
+};
+
 AndroidAssetArchive::AndroidAssetArchive(JNIEnv *env1,jobject assetManagerObj1):
 	env(NULL),
 	jvm(NULL)
@@ -42,7 +49,7 @@ AndroidAssetArchive::AndroidAssetArchive(JNIEnv *env1,jobject assetManagerObj1):
 
 	jclass managerClass=env->FindClass("android/content/res/AssetManager");
 	{
-		openManagerID=env->GetMethodID(managerClass,"open","(Ljava/lang/String;)Ljava/io/InputStream;");
+		openManagerID=env->GetMethodID(managerClass,"open","(Ljava/lang/String;I)Ljava/io/InputStream;");
 	}
 	env->DeleteLocalRef(managerClass);
 
@@ -63,7 +70,7 @@ Stream::ptr AndroidAssetArchive::openStream(const String &name){
 	jvm->AttachCurrentThread(&env,NULL);
 
 	jstring nameObj=env->NewStringUTF(name);
-	jobject streamObj=env->CallObjectMethod(assetManagerObj,openManagerID,nameObj);
+	jobject streamObj=env->CallObjectMethod(assetManagerObj,openManagerID,nameObj,ACCESS_RANDOM);
 	jthrowable exc=env->ExceptionOccurred();
 	if(exc!=NULL){
 		env->ExceptionDescribe();

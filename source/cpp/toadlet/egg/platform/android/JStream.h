@@ -59,7 +59,7 @@ protected:
 	JNIEnv *env;
 	jclass istreamClass,ostreamClass;
 	jobject istreamObj,ostreamObj;
-	jmethodID closeIStreamID,readIStreamID,availableIStreamID,resetIStreamID,skipIStreamID;
+	jmethodID closeIStreamID,readIStreamID,availableIStreamID,markIStreamID,resetIStreamID,skipIStreamID;
 	jmethodID closeOStreamID,writeOStreamID;
 
 	int bufferLength;

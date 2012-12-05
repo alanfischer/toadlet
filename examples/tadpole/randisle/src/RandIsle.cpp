@@ -12,7 +12,6 @@
 static const scalar epsilon=0.001f;
 
 /// @todo: Fix:
-///  - Android shutdown of RandIsle not being able to launch again
 ///  - Android GLES1/2 swapping not working due to different GL libraries being loaded, have to use glesem
 
 RandIsle::RandIsle(Application *app,String path):
