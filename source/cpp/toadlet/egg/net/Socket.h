@@ -89,6 +89,9 @@ public:
 	virtual uint32 getHostIPAddress() const{return mHostIPAddress;}
 	virtual int getHostPort() const{return mHostPort;}
 
+	virtual void setExceptions(bool exceptions){mExceptions=exceptions;}
+	virtual bool getExceptions() const{return mExceptions;}
+
 	virtual bool setBlocking(bool blocking);
 	virtual bool getBlocking() const;
 
@@ -129,6 +132,7 @@ protected:
 	int mHandle;
 	bool mBound;
 	bool mConnected;
+	bool mExceptions;
 	bool mBlocking;
 	uint32 mHostIPAddress;
 	uint32 mHostPort;

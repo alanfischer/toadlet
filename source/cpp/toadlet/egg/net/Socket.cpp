@@ -70,6 +70,7 @@ Socket::Socket():
 	mHandle(TOADLET_INVALID_SOCKET),
 	mBound(false),
 	mConnected(false),
+	mExceptions(false),
 	mBlocking(true),
 	mHostIPAddress(0),
 	mHostPort(0)
@@ -458,13 +459,21 @@ bool Socket::getHostAdaptorsByIP(Collection<uint32> &adaptors,uint32 ip){
 }
 
 void Socket::error(const String &function){
+	int error=
 	#if defined(TOADLET_PLATFORM_WIN32)
-		Error::unknown(Categories::TOADLET_EGG_NET,
-			String("Socket::")+function+"(): error "+(int)WSAGetLastError());
+		WSAGetLastError();
 	#else
-		Error::unknown(Categories::TOADLET_EGG_NET,
-			String("Socket::")+function+"(): error "+(int)errno);
+		errno;
 	#endif
+
+	if(mExceptions){
+		Error::unknown(Categories::TOADLET_EGG_NET,
+			String("Socket::")+function+"(): error "+error);
+	}
+	else{
+		Log::warning(Categories::TOADLET_EGG_NET,
+			String("Socket::")+function+"(): error "+error);
+	}
 }
 
 }
