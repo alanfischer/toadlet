@@ -127,7 +127,7 @@ public:
 protected:
 	Socket(int socket,uint32 ipAddress,int port);
 
-	void error(const String &function);
+	void error(const String &function) const;
 
 	int mHandle;
 	bool mBound;
