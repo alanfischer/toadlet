@@ -43,6 +43,7 @@ JStream::JStream(JNIEnv *env1,jobject streamObj):
 		closeIStreamID=env->GetMethodID(istreamClass,"close","()V");
 		readIStreamID=env->GetMethodID(istreamClass,"read","([BII)I");
 		availableIStreamID=env->GetMethodID(istreamClass,"available","()I");
+		markIStreamID=env->GetMethodID(istreamClass,"mark","(I)V");
 		resetIStreamID=env->GetMethodID(istreamClass,"reset","()V");
 		skipIStreamID=env->GetMethodID(istreamClass,"skip","(J)J");
 	}
@@ -78,6 +79,8 @@ bool JStream::open(jobject streamObj){
 
 	if(env->IsInstanceOf(streamObj,istreamClass)){
 		istreamObj=env->NewGlobalRef(streamObj);
+
+		env->CallVoidMethod(streamObj,markIStreamID,65536);
 	}
 	else if(env->IsInstanceOf(streamObj,ostreamClass)){
 		ostreamObj=env->NewGlobalRef(streamObj);
@@ -188,15 +191,15 @@ bool JStream::seek(int offs){
 	if(reset()==false){
 		return false;
 	}
-	
-	env->CallLongMethod(istreamObj,skipIStreamID,offs);
+
+	jlong amount=env->CallLongMethod(istreamObj,skipIStreamID,(jlong)offs);
 	if(env->ExceptionOccurred()!=NULL){
 		env->ExceptionDescribe();
 		env->ExceptionClear();
 		return false;
 	}
 
-	current=offs;
+	current=amount;
 	return true;
 }
 
