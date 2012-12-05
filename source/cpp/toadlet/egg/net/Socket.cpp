@@ -458,7 +458,7 @@ bool Socket::getHostAdaptorsByIP(Collection<uint32> &adaptors,uint32 ip){
 	}
 }
 
-void Socket::error(const String &function){
+void Socket::error(const String &function) const{
 	int error=
 	#if defined(TOADLET_PLATFORM_WIN32)
 		WSAGetLastError();
