@@ -25,8 +25,3 @@ extern "C" JNIEXPORT jobject JNICALL Java_us_toadlet_myplanet_MyPlanet_createApp
 
 	return japplet;
 }
-
-extern "C" JNIEXPORT void JNICALL Java_us_toadlet_myplanet_MyPlanet_destroyApplet(JNIEnv *env,jobject obj,jobject applet){
-	delete applet;
-	delete application;
-}

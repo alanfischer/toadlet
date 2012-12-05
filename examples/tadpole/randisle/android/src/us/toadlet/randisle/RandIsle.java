@@ -50,5 +50,4 @@ public class RandIsle extends AndroidApplication{
 	}
 
 	protected native Applet createApplet(AndroidApplication app);
-	protected native void destroyApplet(Applet applet);
 }

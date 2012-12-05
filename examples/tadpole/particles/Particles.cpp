@@ -203,4 +203,3 @@ void Particles::mousePressed(int x,int y,int button){
 }
 
 Applet *createApplet(Application *app){return new Particles(app);}
-void destroyApplet(Applet *applet){delete applet;}

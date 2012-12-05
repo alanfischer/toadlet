@@ -280,7 +280,6 @@ public abstract class AndroidApplication extends Activity implements Runnable{
 	public void destroy(){
 		if(mApplet!=null){
 			mApplet.destroy();
-			destroyApplet(mApplet);
 			mApplet=null;
 		}
 		
@@ -311,7 +310,6 @@ public abstract class AndroidApplication extends Activity implements Runnable{
 	}
 
 	protected abstract Applet createApplet(AndroidApplication app);
-	protected abstract void destroyApplet(Applet applet);
 
 	public void run(){
 		while(mRun){

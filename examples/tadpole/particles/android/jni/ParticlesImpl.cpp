@@ -33,7 +33,3 @@ extern "C" JNIEXPORT jobject JNICALL Java_us_toadlet_particles_Particles_createA
 
 	return japplet;
 }
-
-extern "C" JNIEXPORT void JNICALL Java_us_toadlet_particles_Particles_destroyApplet(JNIEnv *env,jobject obj,jobject applet){
-	delete applet;
-}
