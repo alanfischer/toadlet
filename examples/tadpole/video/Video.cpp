@@ -97,4 +97,3 @@ void Video::frameReceived(TextureFormat::ptr format,tbyte *data){
 }
 
 Applet *createApplet(Application *app){return new Video(app);}
-void destroyApplet(Applet *applet){delete applet;}

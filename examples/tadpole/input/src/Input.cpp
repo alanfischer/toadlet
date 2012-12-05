@@ -138,4 +138,3 @@ void Input::inputDetected(const InputData &data){
 }
 
 Applet *createApplet(Application *app){return new Input(app);}
-void destroyApplet(Applet *applet){delete applet;}
