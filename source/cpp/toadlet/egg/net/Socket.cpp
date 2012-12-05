@@ -81,6 +81,7 @@ Socket::Socket(int domain,int type,int protocol):
 	mHandle(TOADLET_INVALID_SOCKET),
 	mBound(false),
 	mConnected(false),
+	mExceptions(false),
 	mBlocking(true),
 	mHostIPAddress(0),
 	mHostPort(0)
