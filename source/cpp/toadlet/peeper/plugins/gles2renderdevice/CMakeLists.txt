@@ -70,7 +70,7 @@ if (TOADLET_BUILD_STATIC)
 	set_target_properties (toadlet_peeper_gles2renderdevice_s PROPERTIES ${STATIC_LIB_PROPS})
 	set_property (TARGET toadlet_peeper_gles2renderdevice_s APPEND PROPERTY COMPILE_DEFINITIONS ${PEEPER_GLES2RENDERDEVICE_DEFS})
 	target_link_libraries (toadlet_peeper_gles2renderdevice_s toadlet_peeper_s ${PEEPER_GLES2RENDERDEVICE_LIBS})
-	MERGE_STATIC_LIBRARIES (toadlet_peeper_gles2renderdevice_s "${PEEPER_GLES2RENDERDEVICE_LIBS_S}")
+	MERGE_STATIC_LIBRARIES (toadlet_peeper_gles2renderdevice_s ALL "${PEEPER_GLES2RENDERDEVICE_LIBS_S}")
 	install (TARGETS toadlet_peeper_gles2renderdevice_s DESTINATION ${LIB_INSTALL_DIR} COMPONENT peeper)
 	set (PEEPER_INSTALL ${PEEPER_INSTALL} toadlet_peeper_gles2renderdevice_s PARENT_SCOPE)
 
