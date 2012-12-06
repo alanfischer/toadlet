@@ -14,7 +14,6 @@ macro (MERGE_STATIC_LIBRARIES TARGET CONFIGURATION LIBRARIES)
 		# with each library path wrapped in "" in case it contains spaces
 		string (REPLACE ";" "\" \"" LIBS "${LIBRARIES}")
 		set (LIBS \"${LIBS}\")
-		string (REPLACE "/" "\\" LIBS "${LIBS}")
 
 		if(${CONFIGURATION} STREQUAL "DEBUG")
 			set_property (TARGET ${TARGET} APPEND PROPERTY STATIC_LIBRARY_FLAGS_DEBUG "${LIBS}")
