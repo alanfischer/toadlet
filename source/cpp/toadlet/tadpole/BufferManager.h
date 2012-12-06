@@ -64,8 +64,6 @@ public:
 
 	void resourceDestroyed(Resource *buffer);
 
-	bool useTriFan();
-
 	void outputVariableBufferFormat(VariableBufferFormat::ptr format);
 	void outputVariable(VariableBufferFormat::Variable *variable,const String &tabs);
 

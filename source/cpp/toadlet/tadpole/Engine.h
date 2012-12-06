@@ -63,7 +63,9 @@ public:
 	void installHandlers();
 	
 	void setMaximumRenderCaps(const RenderCaps &caps);
+	const RenderCaps &getMaximumRenderCaps() const{return mMaximumRenderCaps;}
 	void setBackableRenderCaps(const RenderCaps &caps);
+	const RenderCaps &getBackableRenderCaps() const{return mBackableRenderCaps;}
 	int mergeCap(int render,int maximum,int backable);
 	void updateRenderCaps();
 	const RenderCaps &getRenderCaps() const{return mEngineRenderCaps;}
@@ -74,10 +76,12 @@ public:
 	// Until we have Shader exposed to swig, we will use int here instead of Shader::Type
 	bool hasShader(int type) const{return mEngineRenderCaps.hasShader[type];}
 	bool hasFixed(int type) const{return mEngineRenderCaps.hasFixed[type];}
+	/// @todo: Once the RenderCaps has been better Objectized and exposed to swig, these can go away
 	bool hasBackableShader(int type) const{return mBackableRenderCaps.hasShader[type];}
 	bool hasBackableFixed(int type) const{return mBackableRenderCaps.hasFixed[type];}
 	void setHasBackableShader(bool has);
 	void setHasBackableFixed(bool has);
+	void setHasBackableTriangleFan(bool has);
 	bool hasMaximumShader(int type) const{return mMaximumRenderCaps.hasShader[type];}
 	bool hasMaximumFixed(int type) const{return mMaximumRenderCaps.hasFixed[type];}
 	void setHasMaximumShader(bool has);

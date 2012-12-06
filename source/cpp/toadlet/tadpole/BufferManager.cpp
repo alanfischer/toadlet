@@ -447,10 +447,6 @@ void BufferManager::resourceDestroyed(Resource *resource){
 	}
 }
 
-bool BufferManager::useTriFan(){
-	return !mEngine->isBackable() && mEngine->getRenderCaps().triangleFan;
-}
-
 void BufferManager::outputVariableBufferFormat(VariableBufferFormat::ptr format){
 	String string;
 

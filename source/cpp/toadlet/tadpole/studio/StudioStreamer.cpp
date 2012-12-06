@@ -123,7 +123,7 @@ void StudioStreamer::buildBuffers(StudioModel *model){
 						l=-l;
 						int numedges=l;
 						int firstedge=vertexCount;
-						if(mEngine->getBufferManager()->useTriFan()){
+						if(mEngine->getRenderCaps().triangleFan){
 							indexData=new IndexData(IndexData::Primitive_TRIFAN,NULL,firstedge,numedges);
 						}
 						else{
