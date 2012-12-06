@@ -150,6 +150,15 @@ void String::internal_String(const stringchar *text){
 	update();
 }
 
+void String::internal_String(const Collection<tbyte> &text){
+	mLength=text.size();
+	mData=new stringchar[mLength+1];
+	stringchar *dest=mData;
+	for(int i=0;i<mLength;++i)mData[i]=text[i];
+	mNarrowData=NULL;
+	update();
+}
+
 String::String(const String &string){
 	mLength=string.mLength;
 	mData=new stringchar[mLength+1];
@@ -348,6 +357,12 @@ const char *String::c_str() const{
 		while((*dest++=*source++)!=0);
 	}
 	return mNarrowData;
+}
+
+Collection<tbyte> String::data() const{
+	Collection<tbyte> text(mLength);
+	for(int i=0;i<mLength;++i)text[i]=mData[i];
+	return text;
 }
 
 String String::toLower() const{

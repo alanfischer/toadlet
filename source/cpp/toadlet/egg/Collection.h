@@ -28,7 +28,6 @@
 
 #include <toadlet/egg/Types.h>
 #include <toadlet/egg/SharedPointer.h>
-#include <toadlet/egg/Profile.h>
 
 namespace toadlet{
 namespace egg{
