@@ -201,6 +201,7 @@ Engine::Engine(void *env,void *ctx):
 	mMaximumRenderCaps.maxTextureSize=4096*16;
 	mMaximumRenderCaps.maxTextureStages=512;
 	mMaximumRenderCaps.maxLights=512;
+	mMaximumRenderCaps.triangleFan=true;
 	int i;
 	for(i=0;i<Shader::ShaderType_MAX;++i){
 		mMaximumRenderCaps.hasShader[i]=true;
@@ -386,6 +387,7 @@ void Engine::updateRenderCaps(){
 	}
 
 	mEngineRenderCaps.maxLights=		mergeCap(mRenderCaps.maxLights,			mMaximumRenderCaps.maxLights,		mBackableRenderCaps.maxLights);
+	mEngineRenderCaps.triangleFan=		mergeCap(mRenderCaps.triangleFan,		mMaximumRenderCaps.triangleFan,		mBackableRenderCaps.triangleFan);
 }
 
 void Engine::updateVertexFormats(){
@@ -459,6 +461,11 @@ void Engine::setHasBackableFixed(bool has){
 	for(int i=0;i<Shader::ShaderType_MAX;++i){
 		mBackableRenderCaps.hasFixed[i]=has;
 	}
+	updateRenderCaps();
+}
+
+void Engine::setHasBackableTriangleFan(bool has){
+	mBackableRenderCaps.triangleFan=has;
 	updateRenderCaps();
 }
 

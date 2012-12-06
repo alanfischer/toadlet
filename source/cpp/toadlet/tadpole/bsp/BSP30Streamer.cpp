@@ -307,7 +307,7 @@ void BSP30Streamer::buildBuffers(BSP30Map *map){
 		}
 
 		IndexData::ptr indexData;
-		if(mEngine->getBufferManager()->useTriFan()){
+		if(mEngine->getRenderCaps().triangleFan){
 			indexData=new IndexData(IndexData::Primitive_TRIFAN,NULL,face->firstedge,face->numedges);
 		}
 		else{

@@ -222,6 +222,7 @@ public abstract class AndroidApplication extends Activity implements Runnable{
 			
 			mEngine.setHasBackableShader(true);
 			mEngine.setHasBackableFixed(true);
+			mEngine.setHasBackableTriangleFan(true);
 
 			mEngine.setHasMaximumShader(false);
 			mEngine.setHasMaximumFixed(true);
