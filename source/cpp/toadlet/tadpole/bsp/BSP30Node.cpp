@@ -100,29 +100,15 @@ void BSP30Node::setSkyTextures(const String &skyDown,const String &skyUp,const S
 		mSkyMesh=NULL;
 	}
 
-	Material::ptr down=mEngine->getMaterialManager()->findMaterial(skyDown);
-	Material::ptr up=mEngine->getMaterialManager()->findMaterial(skyUp);
-	Material::ptr front=mEngine->getMaterialManager()->findMaterial(skyWest);
-	Material::ptr back=mEngine->getMaterialManager()->findMaterial(skyEast);
-	Material::ptr right=mEngine->getMaterialManager()->findMaterial(skySouth);
-	Material::ptr left=mEngine->getMaterialManager()->findMaterial(skyNorth);
+	Material::ptr down=mEngine->createSkyBoxMaterial(mEngine->getTextureManager()->findTexture(skyDown));
+	Material::ptr up=mEngine->createSkyBoxMaterial(mEngine->getTextureManager()->findTexture(skyUp));
+	Material::ptr front=mEngine->createSkyBoxMaterial(mEngine->getTextureManager()->findTexture(skyWest));
+	Material::ptr back=mEngine->createSkyBoxMaterial(mEngine->getTextureManager()->findTexture(skyEast));
+	Material::ptr right=mEngine->createSkyBoxMaterial(mEngine->getTextureManager()->findTexture(skySouth));
+	Material::ptr left=mEngine->createSkyBoxMaterial(mEngine->getTextureManager()->findTexture(skyNorth));
 
 	if(down!=NULL || up!=NULL || front!=NULL || back!=NULL || right!=NULL || left!=NULL){
 		Mesh::ptr mesh=mEngine->createSkyBoxMesh(1024,false,false,down,up,front,back,right,left);
-		int i;
-		for(i=0;i<mesh->getNumSubMeshes();++i){
-			Material *material=mesh->getSubMesh(i)->material;
-			if(material!=NULL){
-				material->getPass()->setDepthState(DepthState(DepthState::DepthTest_LEQUAL,false));
-				material->getPass()->setMaterialState(MaterialState(false,false,MaterialState::ShadeType_FLAT));
-				SamplerState samplerState;
-				samplerState.uAddress=SamplerState::AddressType_CLAMP_TO_EDGE;
-				samplerState.vAddress=SamplerState::AddressType_CLAMP_TO_EDGE;
-				material->getPass()->setSamplerState(Shader::ShaderType_FRAGMENT,0,samplerState);
-				material->setLayer(-1);
-			}
-		}
-
 		mSkyMesh=new MeshComponent(mEngine);
 		mSkyMesh->setMesh(mesh);
 		mScene->getBackground()->attach(mSkyMesh);

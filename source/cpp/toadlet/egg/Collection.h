@@ -62,6 +62,16 @@ public:
 		}
 	}
 
+	Collection(const Type *values,int size){
+		mSize=size;
+		mCapacity=size;
+		mData=new Type[mCapacity+1];
+		int i;
+		for(i=0;i<size;++i){
+			mData[i]=values[i];
+		}
+	}
+
 	Collection(const Collection &c){
 		mSize=c.mSize;
 		mCapacity=c.mCapacity;
