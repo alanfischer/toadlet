@@ -750,7 +750,7 @@ if (TOADLET_BUILD_STATIC)
 	add_library (toadlet_tadpole_s STATIC ${TADPOLE_SRC_S} ${TADPOLE_HDR_S})
 	set_target_properties (toadlet_tadpole_s PROPERTIES ${STATIC_LIB_PROPS})
 	target_link_libraries (toadlet_tadpole_s toadlet_egg_s toadlet_peeper_s toadlet_ribbit_s ${TADPOLE_LIBS})
-	MERGE_STATIC_LIBRARIES (toadlet_tadpole_s "${TADPOLE_PLUGINS_LIBS_S}")
+	MERGE_STATIC_LIBRARIES (toadlet_tadpole_s ALL "${TADPOLE_PLUGINS_LIBS_S}")
 	install (TARGETS toadlet_tadpole_s DESTINATION ${LIB_INSTALL_DIR} COMPONENT tadpole)
 	set (TADPOLE_INSTALL ${TADPOLE_INSTALL} toadlet_tadpole_s)
 
