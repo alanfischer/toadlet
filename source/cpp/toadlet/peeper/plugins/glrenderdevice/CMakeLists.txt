@@ -86,7 +86,7 @@ if (TOADLET_BUILD_STATIC)
 	set_target_properties (toadlet_peeper_glrenderdevice_s PROPERTIES ${STATIC_LIB_PROPS})
 	set_property (TARGET toadlet_peeper_glrenderdevice_s APPEND PROPERTY COMPILE_DEFINITIONS ${PEEPER_GLRENDERDEVICE_DEFS_S})
 	target_link_libraries (toadlet_peeper_glrenderdevice_s toadlet_peeper_s ${PEEPER_GLRENDERDEVICE_LIBS})
-	MERGE_STATIC_LIBRARIES (toadlet_peeper_glrenderdevice_s "${PEEPER_GLRENDERDEVICE_LIBS_S}")
+	MERGE_STATIC_LIBRARIES (toadlet_peeper_glrenderdevice_s ALL "${PEEPER_GLRENDERDEVICE_LIBS_S}")
 	install (TARGETS toadlet_peeper_glrenderdevice_s DESTINATION ${LIB_INSTALL_DIR} COMPONENT peeper)
 	set (PEEPER_INSTALL ${PEEPER_INSTALL} toadlet_peeper_glrenderdevice_s PARENT_SCOPE)
 
