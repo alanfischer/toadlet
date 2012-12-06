@@ -27,6 +27,7 @@
 #define TOADLET_EGG_STRING_H
 
 #include <toadlet/egg/Types.h>
+#include <toadlet/egg/Collection.h>
 #if defined(__OBJC__)
 	#import <Foundation/Foundation.h>
 #endif
@@ -58,6 +59,8 @@ public:
 	inline String(const unsigned char *text){internal_String(text);}
 	void internal_String(const stringchar *text);
 	inline String(const wchar *text){internal_String((const stringchar*)text);}
+	void internal_String(const Collection<tbyte> &text);
+	inline String(const Collection<tbyte> &text){internal_String(text);}
 	#if defined(__OBJC__)
 		inline String(NSString *string){internal_String([string UTF8String]);}
 	#endif
@@ -125,6 +128,9 @@ public:
 	#if defined(__OBJC__)
 		inline operator NSString *() const{return [NSString stringWithUTF8String:c_str()];}
 	#endif
+
+	Collection<tbyte> data() const;
+	inline operator Collection<tbyte> () const{return data();}
 
 	inline wchar at(int i) const{return mData[i];}
 
