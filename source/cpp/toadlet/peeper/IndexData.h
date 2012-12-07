@@ -51,7 +51,7 @@ public:
 	inline Primitive getPrimitive() const{return primitive;}
 
 	inline void setIndexBuffer(IndexBuffer::ptr buffer){indexBuffer=buffer;}
-	inline const IndexBuffer::ptr &getIndexBuffer() const{return indexBuffer;}
+	inline IndexBuffer *getIndexBuffer() const{return indexBuffer;}
 
 	inline void setStart(int start1){start=start1;}
 	inline int getStart() const{return start;}

@@ -153,7 +153,6 @@ void String::internal_String(const stringchar *text){
 void String::internal_String(const Collection<tbyte> &text){
 	mLength=text.size();
 	mData=new stringchar[mLength+1];
-	stringchar *dest=mData;
 	for(int i=0;i<mLength;++i)mData[i]=text[i];
 	mData[mLength]=0;
 	mNarrowData=NULL;

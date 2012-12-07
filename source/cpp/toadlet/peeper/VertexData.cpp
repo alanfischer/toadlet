@@ -44,7 +44,7 @@ VertexData::VertexData(VertexBuffer::ptr vertexBuffer)
 	addVertexBuffer(vertexBuffer);
 }
 
-bool VertexData::addVertexBuffer(const VertexBuffer::ptr &vertexBuffer){
+bool VertexData::addVertexBuffer(VertexBuffer::ptr vertexBuffer){
 	if(vertexBuffers.size()>0 && vertexFormat==vertexBuffers[0]->getVertexFormat()){
 		Error::unknown(Categories::TOADLET_PEEPER,"cannot add multiple buffers to a VertexData with an unspecified VertexFormat");
 		return false;

@@ -39,12 +39,12 @@ public:
 	VertexData(VertexFormat::ptr vertexFormat);
 	VertexData(VertexBuffer::ptr vertexBuffer);
 
-	bool addVertexBuffer(const VertexBuffer::ptr &vertexBuffer);
+	bool addVertexBuffer(VertexBuffer::ptr vertexBuffer);
 
 	inline int getNumVertexBuffers() const{return vertexBuffers.size();}
-	inline const VertexBuffer::ptr &getVertexBuffer(int index) const{return vertexBuffers[index];}
+	inline VertexBuffer *getVertexBuffer(int index) const{return vertexBuffers[index];}
 
-	inline VertexFormat::ptr getVertexFormat(){return vertexFormat;}
+	inline VertexFormat *getVertexFormat(){return vertexFormat;}
 
 	Collection<VertexBuffer::ptr> vertexBuffers;
 	VertexFormat::ptr vertexFormat;
