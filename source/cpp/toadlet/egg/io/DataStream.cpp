@@ -136,7 +136,10 @@ int DataStream::readNullTerminatedString(String &s){
 	int i=0;
 	while(true){
 		amt=read((tbyte*)string+i,1);
-		if(amt<=0 || string[i]==0){
+		if(amt<0){
+			return -1;
+		}
+		else if(amt==0 || string[i]==0){
 			break;
 		}
 		total+=amt;
