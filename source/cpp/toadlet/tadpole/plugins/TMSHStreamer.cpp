@@ -602,6 +602,7 @@ Sequence::ptr TMSHStreamer::readSequence(DataStream *stream,int blockSize){
 
 	sequence->setLength(stream->readFloat());
 	bool oldScaled=stream->readBool();
+	TOADLET_IGNORE_UNUSED_VARIABLE_WARNING(oldScaled);
 
 	return sequence;
 }
