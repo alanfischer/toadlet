@@ -121,15 +121,15 @@ BSP30MaterialCreator::BSP30MaterialCreator(Engine *engine){
 Material::ptr BSP30MaterialCreator::createBSP30Material(Texture *diffuseTexture){
 	Material::ptr material=mEngine->getMaterialManager()->createMaterial();
 
+	RenderState::ptr renderState=mEngine->getMaterialManager()->createRenderState();
+	renderState->setBlendState(BlendState());
+	renderState->setDepthState(DepthState(DepthState::DepthTest_LEQUAL,true));
+	renderState->setMaterialState(MaterialState(false,false,MaterialState::ShadeType_FLAT));
+	renderState->setRasterizerState(RasterizerState(RasterizerState::CullType_FRONT));
+
 	if(mEngine->hasShader(Shader::ShaderType_VERTEX) && mEngine->hasShader(Shader::ShaderType_FRAGMENT)){
 		RenderPath::ptr shaderPath=material->addPath();
-		RenderPass::ptr pass=shaderPath->addPass();
-
-		RenderState::ptr renderState=pass->getRenderState();
-		renderState->setBlendState(BlendState());
-		renderState->setDepthState(DepthState(DepthState::DepthTest_LEQUAL,true));
-		renderState->setMaterialState(MaterialState(false,false,MaterialState::ShadeType_FLAT));
-		renderState->setRasterizerState(RasterizerState(RasterizerState::CullType_FRONT));
+		RenderPass::ptr pass=shaderPath->addPass(renderState);
 
 		pass->setShader(Shader::ShaderType_VERTEX,mVertexShader);
 		pass->setShader(Shader::ShaderType_FRAGMENT,mFragmentShader);
@@ -144,14 +144,8 @@ Material::ptr BSP30MaterialCreator::createBSP30Material(Texture *diffuseTexture)
 
 	if(mEngine->hasFixed(Shader::ShaderType_VERTEX) && mEngine->hasFixed(Shader::ShaderType_FRAGMENT)){
 		RenderPath::ptr fixedPath=material->addPath();
-		RenderPass::ptr pass=fixedPath->addPass();
+		RenderPass::ptr pass=fixedPath->addPass(renderState);
 		
-		RenderState::ptr renderState=pass->getRenderState();
-		renderState->setBlendState(BlendState());
-		renderState->setDepthState(DepthState(DepthState::DepthTest_LEQUAL,true));
-		renderState->setMaterialState(MaterialState(false,false,MaterialState::ShadeType_FLAT));
-		renderState->setRasterizerState(RasterizerState(RasterizerState::CullType_FRONT));
-
 		pass->setTexture(Shader::ShaderType_FRAGMENT,0,diffuseTexture,mEngine->getMaterialManager()->getDefaultSamplerState(),TextureState());
 		pass->setTexture(Shader::ShaderType_FRAGMENT,1,NULL,mEngine->getMaterialManager()->getDefaultSamplerState(),TextureState());
 

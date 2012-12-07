@@ -259,9 +259,9 @@ void BSP30Map::updateFaceLights(int faceIndex){
 			}
 			else{
 				for(k=0;k<faced->lightmapSize[0];++k){
-					d[0]+=Math::intClamp(0,255,d[0]+(((int)s[0]*intensities[i])>>8));
-					d[1]+=Math::intClamp(0,255,d[1]+(((int)s[1]*intensities[i])>>8));
-					d[2]+=Math::intClamp(0,255,d[2]+(((int)s[2]*intensities[i])>>8));
+					d[0]=Math::intClamp(0,255,d[0]+(((int)s[0]*intensities[i])>>8));
+					d[1]=Math::intClamp(0,255,d[1]+(((int)s[1]*intensities[i])>>8));
+					d[2]=Math::intClamp(0,255,d[2]+(((int)s[2]*intensities[i])>>8));
 					d+=3,s+=3;
 				}
 			}
