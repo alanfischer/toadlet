@@ -30,6 +30,8 @@
 
 #if !defined(TOADLET_PLATFORM_WIN32)
 	#include <sys/ioctl.h>
+	#include <netinet/in.h>
+	#include <ifaddrs.h>
 	#include <errno.h>
 #endif
 
@@ -458,6 +460,24 @@ bool Socket::getHostAdaptorsByIP(Collection<uint32> &adaptors,uint32 ip){
 		return false;
 	}
 }
+
+
+bool Socket::getLocalAdaptors(Collection<uint32> &adaptors){
+	#if defined(TOADLET_PLATFORM_WIN32)
+		return getHostAdaptorsByName(adaptors,"");
+	#else
+		struct ifaddrs *addrs,*a=NULL;
+		getifaddrs(&addrs);
+		for(a=addrs;a!=NULL;a=a->ifa_next){
+			if(a->ifa_addr->sa_family==AF_INET){
+				adaptors.add(((struct sockaddr_in*)a->ifa_addr)->sin_addr.s_addr);
+			}
+		}
+		freeifaddrs(addrs);
+		return true;
+	#endif
+}
+
 
 void Socket::error(const String &function) const{
 	int error=
