@@ -123,6 +123,7 @@ public:
 	static uint32 stringToIP(const String &string);
 	static bool getHostAdaptorsByName(Collection<uint32> &adaptors,const String &name);
 	static bool getHostAdaptorsByIP(Collection<uint32> &adaptors,uint32 ip);
+	static bool getLocalAdaptors(Collection<uint32> &adaptors);
 
 protected:
 	Socket(int socket,uint32 ipAddress,int port);
