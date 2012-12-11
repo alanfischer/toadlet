@@ -30,28 +30,9 @@
 #include <toadlet/egg/Collection.h>
 #include <toadlet/egg/Object.h>
 
+struct sockaddr_in;
 #if defined(TOADLET_PLATFORM_WIN32)
-	#ifndef WIN32_LEAN_AND_MEAN
-		#define WIN32_LEAN_AND_MEAN 1
-	#endif
-	#include <windows.h>
-	#include <winsock.h>
-#else
-	#include <unistd.h>
-	#include <netdb.h> 
-	#include <sys/socket.h> 
-	#include <netinet/in.h>
-	#include <arpa/inet.h>
-#endif
-
-#if defined(TOADLET_PLATFORM_WIN32)
-	#define TOADLET_SOCKET_ERROR SOCKET_ERROR
-	#define TOADLET_INVALID_SOCKET INVALID_SOCKET
-	#define TOADLET_SOCKLEN int
-#else
-	#define TOADLET_SOCKET_ERROR -1
-	#define TOADLET_INVALID_SOCKET -1
-	#define TOADLET_SOCKLEN socklen_t
+	struct WSAData;
 #endif
 
 namespace toadlet{
@@ -84,7 +65,7 @@ public:
 	virtual Socket *accept();
 
 	virtual void close();
-	virtual bool closed(){return mHandle==TOADLET_INVALID_SOCKET;}
+	virtual bool closed(){return mHandle==-1;}
 
 	virtual uint32 getHostIPAddress() const{return mHostIPAddress;}
 	virtual int getHostPort() const{return mHostPort;}
@@ -143,7 +124,7 @@ protected:
 		public:
 			WSAHandler();
 			~WSAHandler();
-			WSADATA mWSADATA;
+			WSAData *mWSADATA;
 		} mWSAHandler;
 	#endif
 };

@@ -28,11 +28,33 @@
 #include <toadlet/egg/Log.h>
 #include <time.h>
 
-#if !defined(TOADLET_PLATFORM_WIN32)
+#if defined(TOADLET_PLATFORM_WIN32)
+	#ifndef WIN32_LEAN_AND_MEAN
+		#define WIN32_LEAN_AND_MEAN 1
+	#endif
+	#include <windows.h>
+	#include <winsock.h>
+
+	#define TOADLET_SOCKET_ERROR SOCKET_ERROR
+	#define TOADLET_INVALID_SOCKET INVALID_SOCKET
+	#define TOADLET_SOCKLEN int
+#else
+	#include <unistd.h>
+	#include <netdb.h>
+	#include <errno.h>
+	#include <sys/socket.h>
 	#include <sys/ioctl.h>
 	#include <netinet/in.h>
-	#include <ifaddrs.h>
-	#include <errno.h>
+	#include <arpa/inet.h>
+	#if defined(TOADLET_PLATFORM_ANDROID)
+		#include <net/if.h>
+	#else
+		#include <ifaddrs.h>
+	#endif
+
+	#define TOADLET_SOCKET_ERROR -1
+	#define TOADLET_INVALID_SOCKET -1
+	#define TOADLET_SOCKLEN socklen_t
 #endif
 
 #if defined(TOADLET_PLATFORM_WIN32)
@@ -50,7 +72,8 @@ namespace net{
 #if defined(TOADLET_PLATFORM_WIN32)
 	// We'll keep these errors in TOADLET_EGG, since they are more significant than the socket errors
 	Socket::WSAHandler::WSAHandler(){
-		int result=WSAStartup(MAKEWORD(1,1),&mWSADATA);
+		mWSADATA=new WSADATA();
+		int result=WSAStartup(MAKEWORD(1,1),mWSADATA);
 		if(result!=0){
 			Log::error(Categories::TOADLET_EGG,
 				String("WSAHandler::WSAHandler(): error ")+result);
@@ -59,6 +82,7 @@ namespace net{
 
 	Socket::WSAHandler::~WSAHandler(){
 		int result=WSACleanup();
+		delete mWSADATA;
 		if(result!=0){
 			Log::error(Categories::TOADLET_EGG,
 				String("WSAHandler::~WSAHandler(): error ")+result);
@@ -111,9 +135,6 @@ Socket::Socket(int handle,struct sockaddr_in *address):
 	mHostIPAddress(address->sin_addr.s_addr),
 	mHostPort(address->sin_port)
 {
-	// It seems on win32, or at least wince, if I have a server socket on port X,
-	//  and a client socket trying to connect to port Y on a separate machine,
-	//  it will give an address in use error unless I set this.
 	int value=1;
 	setsockopt(mHandle,SOL_SOCKET,SO_REUSEADDR,(char*)&value,sizeof(int));
 	#if defined(SO_NOSIGPIPE)
@@ -465,6 +486,22 @@ bool Socket::getHostAdaptorsByIP(Collection<uint32> &adaptors,uint32 ip){
 bool Socket::getLocalAdaptors(Collection<uint32> &adaptors){
 	#if defined(TOADLET_PLATFORM_WIN32)
 		return getHostAdaptorsByName(adaptors,"");
+	#elif defined(TOADLET_PLATFORM_ANDROID)
+		struct ifreq ifreqs[20];
+		struct ifconf ifconf;
+
+		memset(&ifconf,0,sizeof(ifconf));
+		ifconf.ifc_buf = (char*) (ifreqs);
+		ifconf.ifc_len = sizeof(ifreqs);
+
+		int sock=::socket(AF_INET,SOCK_STREAM,0);
+		ioctl(sock,SIOCGIFCONF,(char*)&ifconf);
+		::close(sock);
+
+		int count=ifconf.ifc_len/sizeof(struct ifreq);
+		for(int i=0;i<count;++i){
+			adaptors.add(((struct sockaddr_in*)&ifreqs[i].ifr_addr)->sin_addr.s_addr);
+		}
 	#else
 		struct ifaddrs *addrs,*a=NULL;
 		getifaddrs(&addrs);
