@@ -25,6 +25,7 @@
 
 #include <toadlet/egg/Log.h>
 #include <toadlet/egg/System.h>
+#include <toadlet/egg/Extents.h>
 #include <toadlet/egg/io/Stream.h>
 #include <toadlet/egg/io/FileStream.h>
 #include <toadlet/tadpole/ArchiveManager.h>
@@ -33,6 +34,7 @@ namespace toadlet{
 namespace tadpole{
 
 ArchiveManager::ArchiveManager(Engine *engine):ResourceManager(engine){
+	mMaxStreamLength=Extents::MAX_INT; // Archive streams are usually not loaded into memory
 }
 
 Resource::ptr ArchiveManager::manage(Resource *resource,const String &name){
