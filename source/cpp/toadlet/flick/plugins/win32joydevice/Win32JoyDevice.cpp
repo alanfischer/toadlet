@@ -101,7 +101,7 @@ void Win32JoyDevice::update(int dt){
 			if(mListener!=NULL){
 				mJoyData.valid=(1<<InputData::Semantic_JOY_DIRECTION) | (1<<InputData::Semantic_JOY_ROTATION);
 				mJoyData.values[InputData::Semantic_JOY_DIRECTION].set(joyToScalar(joyInfo->dwXpos),joyToScalar(joyInfo->dwYpos),joyToScalar(joyInfo->dwZpos),0);
-				mJoyData.values[InputData::Semantic_JOY_ROTATION].set(joyToScalar(joyInfo->dwRpos),joyToScalar(joyInfo->dwUpos),joyToScalar(joyInfo->dwVpos),0);
+				mJoyData.values[InputData::Semantic_JOY_ROTATION].set(joyToScalar(joyInfo->dwUpos),joyToScalar(joyInfo->dwVpos),joyToScalar(joyInfo->dwRpos),0);
 				mListener->inputDetected(mJoyData);
 			}
 		}
