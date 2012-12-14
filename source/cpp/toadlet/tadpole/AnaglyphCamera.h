@@ -57,11 +57,10 @@ protected:
 	Texture::ptr mLeftTexture;
 	PixelBufferRenderTarget::ptr mLeftRenderTarget;
 	Vector4 mLeftColor;
-	Material::ptr mLeftMaterial;
 	Texture::ptr mRightTexture;
 	PixelBufferRenderTarget::ptr mRightRenderTarget;
 	Vector4 mRightColor;
-	Material::ptr mRightMaterial;
+	Material::ptr mMaterial;
 };
 
 }
