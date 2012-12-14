@@ -159,7 +159,6 @@ Socket::~Socket(){
 }
 
 void Socket::close(){
-	int result=0;
 	if(mHandle!=TOADLET_INVALID_SOCKET){
 		#if defined(TOADLET_PLATFORM_WIN32)
 			shutdown(mHandle,2);
@@ -416,7 +415,9 @@ int Socket::receive(tbyte *buffer,int length){
 	int flags=0;
 	int result=::recv(mHandle,(char*)buffer,length,flags);
 	if(result<0){
-		return -error();
+		result=-error();
+		Log::debug(Categories::TOADLET_EGG_NET,
+			String("receive:")+result);
 	}
 	return result;
 }
@@ -429,7 +430,9 @@ int Socket::receiveFrom(tbyte *buffer,int length,uint32 &ipAddress,int &port){
 	ipAddress=from.sin_addr.s_addr;
 	port=ntohs(from.sin_port);
 	if(result<0){
-		return -error();
+		result=-error();
+		Log::debug(Categories::TOADLET_EGG_NET,
+			String("receiveFrom:")+result);
 	}
 	return result;
 }
@@ -442,7 +445,9 @@ int Socket::send(const tbyte *buffer,int length){
 	#endif
 	int result=::send(mHandle,(char*)buffer,length,flags);
 	if(result<0){
-		return -error();
+		result=-error();
+		Log::debug(Categories::TOADLET_EGG_NET,
+			String("send:")+result);
 	}
 	return result;
 }
@@ -459,7 +464,9 @@ int Socket::sendTo(const tbyte *buffer,int length,uint32 ipAddress,int port){
 	address.sin_port=htons(port);
 	int result=::sendto(mHandle,(char*)buffer,length,flags,(struct sockaddr*)&address,sizeof(address));
 	if(result<0){
-		return -error();
+		result=-error();
+		Log::debug(Categories::TOADLET_EGG_NET,
+			String("sendTo:")+result);
 	}
 	return result;
 }
