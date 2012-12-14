@@ -27,6 +27,7 @@
 #include <toadlet/tadpole/Engine.h>
 #include <toadlet/tadpole/Scene.h>
 #include <toadlet/tadpole/AnaglyphCamera.h>
+#include <toadlet/tadpole/SpriteComponent.h>
 
 namespace toadlet{
 namespace tadpole{
@@ -47,14 +48,39 @@ AnaglyphCamera::AnaglyphCamera(Engine *engine):
 	mRightRenderTarget=engine->getTextureManager()->createPixelBufferRenderTarget();
 	mRightRenderTarget->attach(mRightTexture->getMipPixelBuffer(0,0),PixelBufferRenderTarget::Attachment_COLOR_0);
 
-	mLeftMaterial=engine->createDiffuseMaterial(mLeftTexture);
-	mLeftMaterial->getRenderState()->setDepthState(DepthState(DepthState::DepthTest_NEVER,false));
-	mLeftMaterial->getRenderState()->setMaterialState(MaterialState(Colors::RED));
+	Material::ptr leftMaterial=engine->createDiffuseMaterial(mLeftTexture);
+	Material::ptr rightMaterial=engine->createDiffuseMaterial(mRightTexture);
 
-	mRightMaterial=engine->createDiffuseMaterial(mRightTexture);
-	mRightMaterial->getRenderState()->setDepthState(DepthState(DepthState::DepthTest_NEVER,false));
-	mRightMaterial->getRenderState()->setMaterialState(MaterialState(Colors::CYAN));
-	mRightMaterial->getRenderState()->setBlendState(BlendState::Combination_COLOR_ADDITIVE);
+	mMaterial=engine->getMaterialManager()->createMaterial();
+	for(int i=0;i<leftMaterial->getNumPaths();++i){
+		RenderPath::ptr leftPath=leftMaterial->getPath(i);
+		RenderPath::ptr rightPath=leftMaterial->getPath(i);
+		RenderPath::ptr path=mMaterial->addPath();
+
+		RenderPass::ptr leftPass=leftPath->takePass(0);
+		leftPass->getRenderState()->setDepthState(DepthState(DepthState::DepthTest_NEVER,false));
+		path->addPass(leftPass);
+
+		RenderPass::ptr rightPass=rightPath->takePass(0);
+		rightPass->getRenderState()->setDepthState(DepthState(DepthState::DepthTest_NEVER,false));
+		rightPass->getRenderState()->setBlendState(BlendState::Combination_COLOR_ADDITIVE);
+		path->addPass(rightPass);
+	}
+
+	SpriteComponent::ptr sprite=new SpriteComponent(engine);
+//	sprite->setMaterial(
+	/// @todo: Fix me
+//	device->setMatrix(RenderDevice::MatrixType_PROJECTION,mOverlayMatrix);
+//	device->setMatrix(RenderDevice::MatrixType_VIEW,Math::IDENTITY_MATRIX4X4);
+//	device->setMatrix(RenderDevice::MatrixType_MODEL,Math::IDENTITY_MATRIX4X4);
+//	mLeftMaterial->setupRenderDevice(device);
+//	device->renderPrimitive(mOverlayVertexData,mOverlayIndexData);
+//	mRightMaterial->setupRenderDevice(device);
+//	device->renderPrimitive(mOverlayVertexData,mOverlayIndexData);
+
+
+	setLeftColor(Colors::RED);
+	setRightColor(Colors::CYAN);
 }
 
 void AnaglyphCamera::destroy(){
@@ -68,18 +94,21 @@ void AnaglyphCamera::destroy(){
 		mRightRenderTarget=NULL;
 	}
 
-	mLeftMaterial=NULL;
-	mRightMaterial=NULL;
+	mMaterial=NULL;
 }
 
 void AnaglyphCamera::setLeftColor(const Vector4 &color){
 	mLeftColor.set(color);
-	mLeftMaterial->getPass()->setMaterialState(MaterialState(mLeftColor));
+	for(int i=0;i<mMaterial->getNumPaths();++i){
+		mMaterial->getPath(i)->getPass(0)->getRenderState()->setMaterialState(MaterialState(mLeftColor));
+	}
 }
 
 void AnaglyphCamera::setRightColor(const Vector4 &color){
 	mRightColor.set(color);
-	mRightMaterial->getPass()->setMaterialState(MaterialState(mRightColor));
+	for(int i=0;i<mMaterial->getNumPaths();++i){
+		mMaterial->getPath(i)->getPass(1)->getRenderState()->setMaterialState(MaterialState(mLeftColor));
+	}
 }
 
 void AnaglyphCamera::render(RenderDevice *device,Scene *scene){
@@ -88,29 +117,18 @@ void AnaglyphCamera::render(RenderDevice *device,Scene *scene){
 	device->setRenderTarget(mLeftRenderTarget);
 	Math::msub(position,mRight,mSeparation,position);
 	setPosition(position);
-		scene->render(device,this,NULL);
-	device->swap();
+	scene->render(device,this,NULL);
 
 	device->setRenderTarget(mRightRenderTarget);
 	Math::madd(position,mRight,2*mSeparation,position);
 	setPosition(position);
-		scene->render(device,this,NULL);
-	device->swap();
+	scene->render(device,this,NULL);
 
 	device->setRenderTarget(device->getPrimaryRenderTarget());
 	Math::msub(position,mRight,mSeparation,position);
 	setPosition(position);
 
-	device->setViewport(getViewport());
-
-/// @todo: Fix me
-//	device->setMatrix(RenderDevice::MatrixType_PROJECTION,mOverlayMatrix);
-//	device->setMatrix(RenderDevice::MatrixType_VIEW,Math::IDENTITY_MATRIX4X4);
-//	device->setMatrix(RenderDevice::MatrixType_MODEL,Math::IDENTITY_MATRIX4X4);
-//	mLeftMaterial->setupRenderDevice(device);
-//	device->renderPrimitive(mOverlayVertexData,mOverlayIndexData);
-//	mRightMaterial->setupRenderDevice(device);
-//	device->renderPrimitive(mOverlayVertexData,mOverlayIndexData);
+//	scene->render(device,this,overlay);
 }
 
 }
