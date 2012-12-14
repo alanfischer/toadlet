@@ -37,8 +37,8 @@
 
 	#define TOADLET_SOCKET_ERROR SOCKET_ERROR
 	#define TOADLET_INVALID_SOCKET INVALID_SOCKET
-	#define TOADLET_EINPROGRESS WSAEINPROGRESS
-	#define TOADLET_EWOULDBLOCK WSAEWOULDBLOCK
+	#define TOADLET_EINPROGRESS WSAEINPROGRESS-10000
+	#define TOADLET_EWOULDBLOCK WSAEWOULDBLOCK-10000
 	#define TOADLET_SOCKLEN int
 #else
 	#include <unistd.h>
@@ -415,6 +415,9 @@ Socket *Socket::accept(){
 int Socket::receive(tbyte *buffer,int length){
 	int flags=0;
 	int result=::recv(mHandle,(char*)buffer,length,flags);
+	if(result<0){
+		return -error();
+	}
 	return result;
 }
 
@@ -425,6 +428,9 @@ int Socket::receiveFrom(tbyte *buffer,int length,uint32 &ipAddress,int &port){
 	int result=::recvfrom(mHandle,(char*)buffer,length,flags,(struct sockaddr*)&from,&fromLength);
 	ipAddress=from.sin_addr.s_addr;
 	port=ntohs(from.sin_port);
+	if(result<0){
+		return -error();
+	}
 	return result;
 }
 
@@ -435,6 +441,9 @@ int Socket::send(const tbyte *buffer,int length){
 		int flags=0;
 	#endif
 	int result=::send(mHandle,(char*)buffer,length,flags);
+	if(result<0){
+		return -error();
+	}
 	return result;
 }
 
@@ -449,6 +458,9 @@ int Socket::sendTo(const tbyte *buffer,int length,uint32 ipAddress,int port){
 	address.sin_addr.s_addr=ipAddress;
 	address.sin_port=htons(port);
 	int result=::sendto(mHandle,(char*)buffer,length,flags,(struct sockaddr*)&address,sizeof(address));
+	if(result<0){
+		return -error();
+	}
 	return result;
 }
 
@@ -526,7 +538,7 @@ bool Socket::getLocalAdaptors(Collection<uint32> &adaptors){
 
 int Socket::error() const{
 	#if defined(TOADLET_PLATFORM_WIN32)
-		return WSAGetLastError();
+		return WSAGetLastError()-10000;
 	#else
 		return errno;
 	#endif
