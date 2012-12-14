@@ -52,11 +52,7 @@ public:
 		Type_EGG_START=1000,
 		Type_LIBRARY_NOT_FOUND,
 		Type_SYMBOL_NOT_FOUND,
-		Type_LOADING_IMAGE,
-		Type_BLUETOOTH_DISABLED,
-
-		// Flick errors
-		Type_SEQUENCE=2000,
+		Type_SOCKET,
 
 		// Knot errors
 		Type_KNOT_START=3000,

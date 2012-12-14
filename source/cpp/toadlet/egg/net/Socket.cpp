@@ -37,6 +37,8 @@
 
 	#define TOADLET_SOCKET_ERROR SOCKET_ERROR
 	#define TOADLET_INVALID_SOCKET INVALID_SOCKET
+	#define TOADLET_EINPROGRESS WSAEINPROGRESS
+	#define TOADLET_EWOULDBLOCK WSAEWOULDBLOCK
 	#define TOADLET_SOCKLEN int
 #else
 	#include <unistd.h>
@@ -54,6 +56,8 @@
 
 	#define TOADLET_SOCKET_ERROR -1
 	#define TOADLET_INVALID_SOCKET -1
+	#define TOADLET_EINPROGRESS EINPROGRESS
+	#define TOADLET_EWOULDBLOCK EWOULDBLOCK
 	#define TOADLET_SOCKLEN socklen_t
 #endif
 
@@ -96,7 +100,6 @@ Socket::Socket():
 	mHandle(TOADLET_INVALID_SOCKET),
 	mBound(false),
 	mConnected(false),
-	mExceptions(false),
 	mBlocking(true),
 	mHostIPAddress(0),
 	mHostPort(0)
@@ -107,14 +110,15 @@ Socket::Socket(int domain,int type,int protocol):
 	mHandle(TOADLET_INVALID_SOCKET),
 	mBound(false),
 	mConnected(false),
-	mExceptions(false),
 	mBlocking(true),
 	mHostIPAddress(0),
 	mHostPort(0)
 {
 	mHandle=socket(domain,type,protocol);
 	if(mHandle==TOADLET_INVALID_SOCKET){
-		error("socket");
+		Error::socket(Categories::TOADLET_EGG_NET,
+			String("Socket:")+error());
+		return;
 	}
 
 	// It seems on win32, or at least wince, if I have a server socket on port X,
@@ -159,10 +163,10 @@ void Socket::close(){
 	if(mHandle!=TOADLET_INVALID_SOCKET){
 		#if defined(TOADLET_PLATFORM_WIN32)
 			shutdown(mHandle,2);
-			result=::closesocket(mHandle);
+			::closesocket(mHandle);
 		#else
 			shutdown(mHandle,SHUT_RDWR);
-			result=::close(mHandle);
+			::close(mHandle);
 		#endif
 		mHandle=TOADLET_INVALID_SOCKET;
 	}
@@ -170,10 +174,6 @@ void Socket::close(){
 	mConnected=false;
 	mHostIPAddress=0;
 	mHostPort=0;
-
-	if(result==TOADLET_SOCKET_ERROR){
-		error("closesocket");
-	}
 }
 
 bool Socket::setBlocking(bool blocking){
@@ -185,7 +185,8 @@ bool Socket::setBlocking(bool blocking){
 		result=ioctl(mHandle,FIONBIO,&value);
 	#endif
 	if(result==TOADLET_SOCKET_ERROR){
-		error("ioctlsocket");
+		Error::socket(Categories::TOADLET_EGG_NET,
+			String("setBlocking:")+error());
 		return false;
 	}
 	mBlocking=blocking;
@@ -199,7 +200,8 @@ bool Socket::getBlocking() const{
 bool Socket::setSendBufferSize(int size){
 	int result=setsockopt(mHandle,SOL_SOCKET,SO_SNDBUF,(char*)&size,sizeof(size));
 	if(result==TOADLET_SOCKET_ERROR){
-		error("setsockopt");
+		Error::socket(Categories::TOADLET_EGG_NET,
+			String("setSendBufferSize:")+error());
 		return false;
 	}
 	return true;
@@ -210,7 +212,8 @@ int Socket::getSendBufferSize() const{
 	TOADLET_SOCKLEN size=sizeof(value);
 	int result=getsockopt(mHandle,SOL_SOCKET,SO_SNDBUF,(char*)&value,&size);
 	if(result==TOADLET_SOCKET_ERROR){
-		error("getsockopt");
+		Error::socket(Categories::TOADLET_EGG_NET,
+			String("getSendBufferSize:")+error());
 		return -1;
 	}
 	return size;
@@ -219,7 +222,8 @@ int Socket::getSendBufferSize() const{
 bool Socket::setRecieveBufferSize(int size){
 	int result=setsockopt(mHandle,SOL_SOCKET,SO_RCVBUF,(char*)&size,sizeof(size));
 	if(result==TOADLET_SOCKET_ERROR){
-		error("setsockopt");
+		Error::socket(Categories::TOADLET_EGG_NET,
+			String("setReceiveBufferSize:")+error());
 		return false;
 	}
 	return true;
@@ -230,7 +234,8 @@ int Socket::getRecieveBufferSize() const{
 	TOADLET_SOCKLEN size=sizeof(value);
 	int result=getsockopt(mHandle,SOL_SOCKET,SO_RCVBUF,(char*)&value,&size);
 	if(result==TOADLET_SOCKET_ERROR){
-		error("getsockopt");
+		Error::socket(Categories::TOADLET_EGG_NET,
+			String("getRecieveBufferSize:")+error());
 		return -1;
 	}
 	return value;
@@ -240,7 +245,8 @@ bool Socket::setBroadcast(bool broadcast){
 	int value=broadcast;
 	int result=setsockopt(mHandle,SOL_SOCKET,SO_BROADCAST,(char*)&value,sizeof(value));
 	if(result==TOADLET_SOCKET_ERROR){
-		error("setsockopt");
+		Error::socket(Categories::TOADLET_EGG_NET,
+			String("setBroadcast:")+error());
 		return false;
 	}
 	return true;
@@ -251,8 +257,9 @@ bool Socket::getBroadcast() const{
 	TOADLET_SOCKLEN size=sizeof(value);
 	int result=getsockopt(mHandle,SOL_SOCKET,SO_BROADCAST,(char*)&value,&size);
 	if(result==TOADLET_SOCKET_ERROR){
-		error("getsockopt");
-		return -1;
+		Error::socket(Categories::TOADLET_EGG_NET,
+			String("getBroadcast:")+error());
+		return false;
 	}
 	return value>0;
 }
@@ -263,7 +270,8 @@ bool Socket::setTimeout(int milliseconds){
 	value.tv_usec=(milliseconds%1000)*1000;
 	int result=setsockopt(mHandle,SOL_SOCKET,SO_RCVTIMEO,(char*)&value,sizeof(value));
 	if(result==TOADLET_SOCKET_ERROR){
-		error("setsockopt");
+		Error::socket(Categories::TOADLET_EGG_NET,
+			String("setTimeout:")+error());
 		return false;
 	}
 	return true;
@@ -274,7 +282,8 @@ int Socket::getTimeout() const{
 	TOADLET_SOCKLEN size=sizeof(value);
 	int result=getsockopt(mHandle,SOL_SOCKET,SO_RCVTIMEO,(char*)&value,&size);
 	if(result==TOADLET_SOCKET_ERROR){
-		error("getsockopt");
+		Error::socket(Categories::TOADLET_EGG_NET,
+			String("getTimeout:")+error());
 		return -1;
 	}
 	return value.tv_sec*1000 + value.tv_usec/1000;
@@ -287,7 +296,8 @@ bool Socket::addMembership(uint32 ipAddress){
 
 	int result=setsockopt(mHandle,IPPROTO_IP,IP_ADD_MEMBERSHIP,(const char *)&mreq,sizeof(struct ip_mreq));
 	if(result==TOADLET_SOCKET_ERROR){
-		error("setsockopt");
+		Error::socket(Categories::TOADLET_EGG_NET,
+			String("addMembership:")+error());
 		return false;
 	}
 	return true;
@@ -325,7 +335,8 @@ bool Socket::bind(int port){
 
 	int result=::bind(mHandle,(struct sockaddr*)&address,sizeof(address));
 	if(result==TOADLET_SOCKET_ERROR){
-		error("bind");
+		Error::socket(Categories::TOADLET_EGG_NET,
+			String("bind:")+error());
 		return false;
 	}
 
@@ -345,7 +356,11 @@ bool Socket::connect(uint32 ipAddress,int port){
 
 	int result=::connect(mHandle,(struct sockaddr*)&address,sizeof(address));
 	if(result==TOADLET_SOCKET_ERROR){
-		error("connect");
+		result=error();
+		if(result!=TOADLET_EINPROGRESS){
+			Error::socket(Categories::TOADLET_EGG_NET,
+				String("connect:")+error());
+		}
 		return false;
 	}
 
@@ -370,7 +385,8 @@ bool Socket::connect(const String &name,int port){
 bool Socket::listen(int backlog){
 	int result=::listen(mHandle,backlog);
 	if(result==TOADLET_SOCKET_ERROR){
-		error("listen");
+		Error::socket(Categories::TOADLET_EGG_NET,
+			String("listen:")+error());
 		return false;
 	}
 
@@ -383,8 +399,12 @@ Socket *Socket::accept(){
 
 	int clientHandle=::accept(mHandle,(struct sockaddr*)&clientAddress,&clientAddressLength);
 	if(clientHandle==TOADLET_SOCKET_ERROR){
-//		error("accept");
-		return NULL;
+		int result=error();
+		if(result!=TOADLET_EWOULDBLOCK){
+			Error::socket(Categories::TOADLET_EGG_NET,
+				String("accept:")+result);
+		}
+		return false;
 	}
 	else{
 		Socket *socket=new Socket(clientHandle,&clientAddress);
@@ -395,9 +415,6 @@ Socket *Socket::accept(){
 int Socket::receive(tbyte *buffer,int length){
 	int flags=0;
 	int result=::recv(mHandle,(char*)buffer,length,flags);
-	if(result==TOADLET_SOCKET_ERROR){
-		error("recv");
-	}
 	return result;
 }
 
@@ -406,9 +423,6 @@ int Socket::receiveFrom(tbyte *buffer,int length,uint32 &ipAddress,int &port){
 	struct sockaddr_in from={0};
 	TOADLET_SOCKLEN fromLength=sizeof(sockaddr_in);
 	int result=::recvfrom(mHandle,(char*)buffer,length,flags,(struct sockaddr*)&from,&fromLength);
-	if(result==TOADLET_SOCKET_ERROR){
-		error("recvfrom");
-	}
 	ipAddress=from.sin_addr.s_addr;
 	port=ntohs(from.sin_port);
 	return result;
@@ -421,9 +435,6 @@ int Socket::send(const tbyte *buffer,int length){
 		int flags=0;
 	#endif
 	int result=::send(mHandle,(char*)buffer,length,flags);
-	if(result==TOADLET_SOCKET_ERROR){
-		error("send");
-	}
 	return result;
 }
 
@@ -438,9 +449,6 @@ int Socket::sendTo(const tbyte *buffer,int length,uint32 ipAddress,int port){
 	address.sin_addr.s_addr=ipAddress;
 	address.sin_port=htons(port);
 	int result=::sendto(mHandle,(char*)buffer,length,flags,(struct sockaddr*)&address,sizeof(address));
-	if(result==TOADLET_SOCKET_ERROR){
-		error("sendto");
-	}
 	return result;
 }
 
@@ -516,22 +524,12 @@ bool Socket::getLocalAdaptors(Collection<uint32> &adaptors){
 }
 
 
-void Socket::error(const String &function) const{
-	int error=
+int Socket::error() const{
 	#if defined(TOADLET_PLATFORM_WIN32)
-		WSAGetLastError();
+		return WSAGetLastError();
 	#else
-		errno;
+		return errno;
 	#endif
-
-	if(mExceptions){
-		Error::unknown(Categories::TOADLET_EGG_NET,
-			String("Socket::")+function+"(): error "+error);
-	}
-	else{
-		Log::warning(Categories::TOADLET_EGG_NET,
-			String("Socket::")+function+"(): error "+error);
-	}
 }
 
 }

@@ -69,9 +69,7 @@ public:
 	// Egg
 	TOADLET_MAKE_ERROR_FUNCTION(libraryNotFound,Errorer::Type_LIBRARY_NOT_FOUND)
 	TOADLET_MAKE_ERROR_FUNCTION(symbolNotFound,Errorer::Type_SYMBOL_NOT_FOUND)
-
-	// Flick
-	TOADLET_MAKE_ERROR_FUNCTION(sequence,Errorer::Type_SEQUENCE)
+	TOADLET_MAKE_ERROR_FUNCTION(socket,Errorer::Type_SOCKET)
 
 	// Knot
 	TOADLET_MAKE_ERROR_FUNCTION(alreadyConnected,Errorer::Type_ALREADY_CONNECTED)
