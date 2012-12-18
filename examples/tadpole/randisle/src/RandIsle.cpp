@@ -70,7 +70,7 @@ void RandIsle::create(){
 	mFollowNode->attach(mFollower);
 	mScene->getRoot()->attach(mFollowNode);
 
-	mCamera=new Camera();
+	mCamera=new AnaglyphCamera(mScene);
 	mCamera->setAutoProjectionFov(Math::degToRad(Math::fromInt(60)),mCamera->getNearDist(),1024);
 	mCamera->setScope(~Scope_HUD | Scope_BIT_MAIN_CAMERA & ~Scope_BIT_WATER_TRANSPARENT);
 	mCamera->setDefaultState(mEngine->getMaterialManager()->createRenderState());

@@ -32,9 +32,11 @@
 namespace toadlet{
 namespace tadpole{
 
-AnaglyphCamera::AnaglyphCamera(Engine *engine):
-	mSeparation(Math::ONE)
+AnaglyphCamera::AnaglyphCamera(Scene *scene):
+	mSeparation(0)
 {
+	Engine *engine=scene->getEngine();
+
 	int flags=Texture::Usage_BIT_RENDERTARGET;
 	int size=1024;//Math::nextPowerOf2((getWidth()<getHeight()?getWidth():getHeight())/2);
 	int format=TextureFormat::Format_L_8;
@@ -44,9 +46,15 @@ AnaglyphCamera::AnaglyphCamera(Engine *engine):
 	mLeftRenderTarget=engine->getTextureManager()->createPixelBufferRenderTarget();
 	mLeftRenderTarget->attach(mLeftTexture->getMipPixelBuffer(0,0),PixelBufferRenderTarget::Attachment_COLOR_0);
 
+	mLeftCamera=new Camera();
+	mLeftCamera->setRenderTarget(mLeftRenderTarget);
+
 	mRightTexture=engine->getTextureManager()->createTexture(flags,textureFormat);
 	mRightRenderTarget=engine->getTextureManager()->createPixelBufferRenderTarget();
 	mRightRenderTarget->attach(mRightTexture->getMipPixelBuffer(0,0),PixelBufferRenderTarget::Attachment_COLOR_0);
+
+	mRightCamera=new Camera();
+	mRightCamera->setRenderTarget(mRightRenderTarget);
 
 	Material::ptr leftMaterial=engine->createDiffuseMaterial(mLeftTexture);
 	Material::ptr rightMaterial=engine->createDiffuseMaterial(mRightTexture);
@@ -54,31 +62,30 @@ AnaglyphCamera::AnaglyphCamera(Engine *engine):
 	mMaterial=engine->getMaterialManager()->createMaterial();
 	for(int i=0;i<leftMaterial->getNumPaths();++i){
 		RenderPath::ptr leftPath=leftMaterial->getPath(i);
-		RenderPath::ptr rightPath=leftMaterial->getPath(i);
+		RenderPath::ptr rightPath=rightMaterial->getPath(i);
 		RenderPath::ptr path=mMaterial->addPath();
 
 		RenderPass::ptr leftPass=leftPath->takePass(0);
-		leftPass->getRenderState()->setDepthState(DepthState(DepthState::DepthTest_NEVER,false));
+		leftPass->getRenderState()->setDepthState(DepthState(DepthState::DepthTest_ALWAYS,false));
 		path->addPass(leftPass);
 
 		RenderPass::ptr rightPass=rightPath->takePass(0);
-		rightPass->getRenderState()->setDepthState(DepthState(DepthState::DepthTest_NEVER,false));
+		rightPass->getRenderState()->setDepthState(DepthState(DepthState::DepthTest_ALWAYS,false));
 		rightPass->getRenderState()->setBlendState(BlendState::Combination_COLOR_ADDITIVE);
 		path->addPass(rightPass);
 	}
+	mMaterial->compile();
 
+	mOverlay=new Node(scene);
 	SpriteComponent::ptr sprite=new SpriteComponent(engine);
-//	sprite->setMaterial(
-	/// @todo: Fix me
-//	device->setMatrix(RenderDevice::MatrixType_PROJECTION,mOverlayMatrix);
-//	device->setMatrix(RenderDevice::MatrixType_VIEW,Math::IDENTITY_MATRIX4X4);
-//	device->setMatrix(RenderDevice::MatrixType_MODEL,Math::IDENTITY_MATRIX4X4);
-//	mLeftMaterial->setupRenderDevice(device);
-//	device->renderPrimitive(mOverlayVertexData,mOverlayIndexData);
-//	mRightMaterial->setupRenderDevice(device);
-//	device->renderPrimitive(mOverlayVertexData,mOverlayIndexData);
+	sprite->setMaterial(mMaterial);
+	mOverlay->attach(sprite);
 
+	mOverlayCamera=new Camera();
+	mOverlayCamera->setProjectionOrtho(Math::HALF,-Math::HALF,Math::HALF,-Math::HALF,-Math::ONE,Math::ONE);
+	mOverlayCamera->setLookAt(Math::Z_UNIT_VECTOR3,Math::ZERO_VECTOR3,Math::Y_UNIT_VECTOR3);
 
+	setSeparation(Math::ONE);
 	setLeftColor(Colors::RED);
 	setRightColor(Colors::CYAN);
 }
@@ -97,6 +104,25 @@ void AnaglyphCamera::destroy(){
 	mMaterial=NULL;
 }
 
+void AnaglyphCamera::setScope(int scope){
+	Camera::setScope(scope);
+
+	mLeftCamera->setScope(scope);
+	mRightCamera->setScope(scope);
+}
+
+void AnaglyphCamera::setRenderTarget(RenderTarget *target){
+	Camera::setRenderTarget(target);
+
+	mOverlayCamera->setRenderTarget(target);
+}
+
+void AnaglyphCamera::setSeparation(scalar separation){
+	mSeparation=separation;
+
+	updateWorldTransform();
+}
+
 void AnaglyphCamera::setLeftColor(const Vector4 &color){
 	mLeftColor.set(color);
 	for(int i=0;i<mMaterial->getNumPaths();++i){
@@ -107,28 +133,41 @@ void AnaglyphCamera::setLeftColor(const Vector4 &color){
 void AnaglyphCamera::setRightColor(const Vector4 &color){
 	mRightColor.set(color);
 	for(int i=0;i<mMaterial->getNumPaths();++i){
-		mMaterial->getPath(i)->getPass(1)->getRenderState()->setMaterialState(MaterialState(mLeftColor));
+		mMaterial->getPath(i)->getPass(1)->getRenderState()->setMaterialState(MaterialState(mRightColor));
 	}
 }
 
-void AnaglyphCamera::render(RenderDevice *device,Scene *scene){
-	Vector3 position=getPosition();
+void AnaglyphCamera::render(RenderDevice *device,Scene *scene,Node *node){
+	mLeftCamera->render(device,scene,node);
 
-	device->setRenderTarget(mLeftRenderTarget);
-	Math::msub(position,mRight,mSeparation,position);
-	setPosition(position);
-	scene->render(device,this,NULL);
+	mRightCamera->render(device,scene,node);
 
-	device->setRenderTarget(mRightRenderTarget);
-	Math::madd(position,mRight,2*mSeparation,position);
-	setPosition(position);
-	scene->render(device,this,NULL);
+	mOverlayCamera->render(device,scene,mOverlay);
+}
 
-	device->setRenderTarget(device->getPrimaryRenderTarget());
-	Math::msub(position,mRight,mSeparation,position);
-	setPosition(position);
+void AnaglyphCamera::projectionUpdated(){
+	Camera::projectionUpdated();
 
-//	scene->render(device,this,overlay);
+	mLeftCamera->setProjectionMatrix(mProjectionMatrix);
+	mRightCamera->setProjectionMatrix(mProjectionMatrix);
+}
+
+void AnaglyphCamera::updateWorldTransform(){
+	Camera::updateWorldTransform();
+
+	mLeftCamera->setWorldMatrix(mWorldMatrix);
+	{
+		Vector3 position=mLeftCamera->getPosition();
+		Math::madd(position,mRight,-mSeparation,position);
+		mLeftCamera->setPosition(position);
+	}
+
+	mRightCamera->setWorldMatrix(mWorldMatrix);
+	{
+		Vector3 position=mRightCamera->getPosition();
+		Math::madd(position,mRight,mSeparation,position);
+		mRightCamera->setPosition(position);
+	}
 }
 
 }
