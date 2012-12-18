@@ -34,13 +34,17 @@
 namespace toadlet{
 namespace tadpole{
 
-class AnaglyphCamera:public Camera{
+class TOADLET_API AnaglyphCamera:public Camera{
 public:
-	AnaglyphCamera(Engine *engine);
+	AnaglyphCamera(Scene *scene);
 
 	void destroy();
 
-	void setSeparation(scalar separation){mSeparation=separation;}
+	void setScope(int scope);
+
+	void setRenderTarget(RenderTarget *target);
+
+	void setSeparation(scalar separation);
 	scalar getSeparation() const{return mSeparation;}
 
 	void setLeftColor(const Vector4 &color);
@@ -49,18 +53,27 @@ public:
 	void setRightColor(const Vector4 &color);
 	const Vector4 &getRightColor() const{return mRightColor;}
 
-	virtual void render(RenderDevice *device,Scene *scene);
+	virtual void render(RenderDevice *device,Scene *scene,Node *node);
 
 protected:
+	virtual void projectionUpdated();
+	virtual void updateWorldTransform();
+
 	scalar mSeparation;
 
 	Texture::ptr mLeftTexture;
 	PixelBufferRenderTarget::ptr mLeftRenderTarget;
 	Vector4 mLeftColor;
+	Camera::ptr mLeftCamera;
+
 	Texture::ptr mRightTexture;
 	PixelBufferRenderTarget::ptr mRightRenderTarget;
 	Vector4 mRightColor;
+	Camera::ptr mRightCamera;
+
 	Material::ptr mMaterial;
+	Node::ptr mOverlay;
+	Camera::ptr mOverlayCamera;
 };
 
 }

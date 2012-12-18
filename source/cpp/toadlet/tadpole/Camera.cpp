@@ -188,7 +188,12 @@ void Camera::setPosition(const Vector3 &position){
 
 void Camera::setRenderTarget(RenderTarget *target){
 	mRenderTarget=target;
-	mViewport.set(0,0,target->getWidth(),target->getHeight());
+	if(target==NULL){
+		mViewport.set(0,0,0,0);
+	}
+	else{
+		mViewport.set(0,0,target->getWidth(),target->getHeight());
+	}
 }
 
 void Camera::projectionUpdated(){
@@ -244,7 +249,7 @@ void Camera::projectionUpdated(){
 	updateWorldTransform();
 }
 
-void Camera::render(RenderDevice *device,Scene *scene){
+void Camera::render(RenderDevice *device,Scene *scene,Node *node){
 	if(mProjectionType==ProjectionType_FOV){
 		RenderTarget *target=mRenderTarget;
 		if(target==NULL){
@@ -266,7 +271,7 @@ void Camera::render(RenderDevice *device,Scene *scene){
 
 	mVisibleCount=0;
 
-	scene->render(device,this);
+	scene->render(device,this,node);
 }
 
 /*

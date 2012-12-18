@@ -36,6 +36,7 @@ namespace toadlet{
 namespace tadpole{
 
 class Scene;
+class Node;
 
 class TOADLET_API Camera:public Object{
 public:
@@ -53,7 +54,7 @@ public:
 	Camera();
 	virtual ~Camera(){}
 
-	void setScope(int scope){mScope=scope;}
+	virtual void setScope(int scope){mScope=scope;}
 	inline int getScope() const{return mScope;}
 
 	inline ProjectionType getProjectionType() const{return mProjectionType;}
@@ -91,7 +92,7 @@ public:
 	void setLookDir(const Vector3 &eye,const Vector3 &dir,const Vector3 &up);
 	void setWorldMatrix(const Matrix4x4 &matrix);
 
-	void setRenderTarget(RenderTarget *target);
+	virtual void setRenderTarget(RenderTarget *target);
 	RenderTarget *getRenderTarget(){return mRenderTarget;}
 
 	bool ready() const{return mRenderTarget==NULL || mRenderTarget->getRootRenderTarget()!=NULL;}
@@ -130,7 +131,7 @@ public:
 	inline const Plane &getClipPlane(int i) const{return mClipPlanes[i];}
 	inline const Plane *getClipPlanes() const{return mClipPlanes;}
 
-	virtual void render(RenderDevice *device,Scene *scene);
+	virtual void render(RenderDevice *device,Scene *scene,Node *node=NULL);
 
 	bool culled(Bound *bound) const;
 	bool culled(const AABox &box) const;
@@ -140,9 +141,9 @@ public:
 	inline int getVisibleCount() const{return mVisibleCount;}
 
 protected:
-	void projectionUpdated();
-	void updateWorldTransform();
-	void updateClippingPlanes();
+	virtual void projectionUpdated();
+	virtual void updateWorldTransform();
+	virtual void updateClippingPlanes();
 
 	int mScope;
 	ProjectionType mProjectionType;
