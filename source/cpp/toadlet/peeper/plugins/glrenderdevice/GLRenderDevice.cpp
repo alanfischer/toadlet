@@ -1693,6 +1693,13 @@ int GLRenderDevice::getClosePixelFormat(int format,int usage){
 		}
 	}
 
+	if((usage&Texture::Usage_BIT_RENDERTARGET)!=0){
+		switch(format){
+			case TextureFormat::Format_L_8:
+				return TextureFormat::Format_RGB_8;
+		}
+	}
+
 	switch(format){
 		case TextureFormat::Format_R_8:
 		case TextureFormat::Format_RG_8:

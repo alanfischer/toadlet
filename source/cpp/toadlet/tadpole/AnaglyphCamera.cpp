@@ -39,7 +39,7 @@ AnaglyphCamera::AnaglyphCamera(Scene *scene):
 
 	int flags=Texture::Usage_BIT_RENDERTARGET;
 	int size=1024;//Math::nextPowerOf2((getWidth()<getHeight()?getWidth():getHeight())/2);
-	int format=TextureFormat::Format_RGB_8;
+	int format=TextureFormat::Format_L_8;
 	TextureFormat::ptr textureFormat=new TextureFormat(TextureFormat::Dimension_D2,format,size,size,1,1);
 
 	mLeftTexture=engine->getTextureManager()->createTexture(flags,textureFormat);
