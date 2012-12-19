@@ -23,27 +23,27 @@
  *
  ********** Copyright header - do not remove **********/
 
-#include <toadlet/flick/FilteredMotionDevice.h>
+#include <toadlet/flick/FilteredLinearDevice.h>
 
 namespace toadlet{
 namespace flick{
 
-FilteredMotionDevice::FilteredMotionDevice():
+FilteredLinearDevice::FilteredLinearDevice():
 	mListener(NULL),
 	mDevice(NULL),
 	mAlpha(Math::fromMilli(667)),
-	mMotionData(InputType_MOTION,0,InputData::Semantic_MAX_MOTION)
+	mLinearData(InputType_LINEAR,0,InputData::Semantic_MAX_LINEAR)
 {
 }
 
-FilteredMotionDevice::~FilteredMotionDevice(){
+FilteredLinearDevice::~FilteredLinearDevice(){
 }
 
-void FilteredMotionDevice::setMotionDevice(InputDevice *device){
+void FilteredLinearDevice::setLinearDevice(InputDevice *device){
 	mDevice=device;
 }
 
-bool FilteredMotionDevice::create(){
+bool FilteredLinearDevice::create(){
 	if(mDevice==NULL){
 		return false;
 	}
@@ -51,7 +51,7 @@ bool FilteredMotionDevice::create(){
 	return mDevice->create();
 }
 
-void FilteredMotionDevice::destroy(){
+void FilteredLinearDevice::destroy(){
 	if(mDevice==NULL){
 		return;
 	}
@@ -59,7 +59,7 @@ void FilteredMotionDevice::destroy(){
 	mDevice->destroy();
 }
 
-InputDevice::InputType FilteredMotionDevice::getType(){
+InputDevice::InputType FilteredLinearDevice::getType(){
 	if(mDevice==NULL){
 		return (InputType)0;
 	}
@@ -67,7 +67,7 @@ InputDevice::InputType FilteredMotionDevice::getType(){
 	return mDevice->getType();
 }
 
-bool FilteredMotionDevice::start(){
+bool FilteredLinearDevice::start(){
 	if(mDevice==NULL){
 		return false;
 	}
@@ -75,7 +75,7 @@ bool FilteredMotionDevice::start(){
 	return mDevice->start();
 }
 
-void FilteredMotionDevice::update(int dt){
+void FilteredLinearDevice::update(int dt){
 	if(mDevice==NULL){
 		return;
 	}
@@ -83,7 +83,7 @@ void FilteredMotionDevice::update(int dt){
 	mDevice->update(dt);
 }
 
-void FilteredMotionDevice::stop(){
+void FilteredLinearDevice::stop(){
 	if(mDevice==NULL){
 		return;
 	}
@@ -91,7 +91,7 @@ void FilteredMotionDevice::stop(){
 	mDevice->stop();
 }
 
-void FilteredMotionDevice::setSampleTime(int dt){
+void FilteredLinearDevice::setSampleTime(int dt){
 	if(mDevice==NULL){
 		return;
 	}
@@ -99,27 +99,27 @@ void FilteredMotionDevice::setSampleTime(int dt){
 	mDevice->setSampleTime(dt);
 }
 
-void FilteredMotionDevice::inputDetected(const InputData &data){
-	Vector4 lastAcceleration=mMotionData.values[InputData::Semantic_MOTION_ACCELERATION];
-	Vector4 lastVelocity=mMotionData.values[InputData::Semantic_MOTION_VELOCITY];
+void FilteredLinearDevice::inputDetected(const InputData &data){
+	Vector4 lastAcceleration=mLinearData.values[InputData::Semantic_LINEAR_ACCELERATION];
+	Vector4 lastVelocity=mLinearData.values[InputData::Semantic_LINEAR_VELOCITY];
 	Vector4 lastRawVelocity=mRawVelocity;
-	Vector4 newAcceleration=data.values[InputData::Semantic_MOTION_ACCELERATION];
-	Vector4 newVelocity=data.values[InputData::Semantic_MOTION_VELOCITY];
+	Vector4 newAcceleration=data.values[InputData::Semantic_LINEAR_ACCELERATION];
+	Vector4 newVelocity=data.values[InputData::Semantic_LINEAR_VELOCITY];
 	Vector4 vector;
 
-	mMotionData.valid=data.valid;
-	mMotionData.values[InputData::Semantic_MOTION_ACCELERATION].set(newAcceleration);
+	mLinearData.valid=data.valid;
+	mLinearData.values[InputData::Semantic_LINEAR_ACCELERATION].set(newAcceleration);
 
-	if(mMotionData.time==0){
-		mMotionData.time=data.time;
-		mMotionData.values[InputData::Semantic_MOTION_VELOCITY].reset();
+	if(mLinearData.time==0){
+		mLinearData.time=data.time;
+		mLinearData.values[InputData::Semantic_LINEAR_VELOCITY].reset();
 		mRawVelocity.reset();
 	}
 	else{
 		// Improved euler integration
 		// v = v + 0.5dt * (ao + a)
 		Math::add(vector,newAcceleration,lastAcceleration);
-		Math::mul(vector,Math::fromMilli(data.time-mMotionData.time)/2);
+		Math::mul(vector,Math::fromMilli(data.time-mLinearData.time)/2);
 		Math::add(mRawVelocity,vector);
 
 		// Highpass filtering
@@ -128,11 +128,11 @@ void FilteredMotionDevice::inputDetected(const InputData &data){
 		Math::add(vector,lastVelocity);
 		Math::mul(newVelocity,vector,mAlpha);
 
-		mMotionData.time=data.time;
-		mMotionData.values[InputData::Semantic_MOTION_VELOCITY].set(newVelocity);
+		mLinearData.time=data.time;
+		mLinearData.values[InputData::Semantic_LINEAR_VELOCITY].set(newVelocity);
 		
 		if(mListener!=NULL){
-			mListener->inputDetected(mMotionData);
+			mListener->inputDetected(mLinearData);
 		}
 	}
 }

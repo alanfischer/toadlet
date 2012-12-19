@@ -40,7 +40,7 @@ public:
 
 	enum InputType{
 		InputType_JOY=0,
-		InputType_MOTION, /// @todo: Rename MOTION to LINEAR
+		InputType_LINEAR,
 		InputType_ANGULAR,
 		InputType_LIGHT,
 		InputType_PROXIMITY,

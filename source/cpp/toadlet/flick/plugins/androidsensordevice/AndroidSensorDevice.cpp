@@ -107,9 +107,9 @@ void AndroidSensorDevice::onSensorChanged(){
 		mData.time=event.timestamp/1000;
 		
 		switch(mInputType){
-			case InputType_MOTION:
-				mData.valid=(1<<InputData::Semantic_MOTION_ACCELERATION);
-				memcpy(&mData.values[InputData::Semantic_MOTION_ACCELERATION],event.data,sizeof(Vector4));
+			case InputType_LINEAR:
+				mData.valid=(1<<InputData::Semantic_LINEAR_ACCELERATION);
+				memcpy(&mData.values[InputData::Semantic_LINEAR_ACCELERATION],event.data,sizeof(Vector4));
 			break;
 			case InputType_ANGULAR:
 				mData.valid=(1<<InputData::Semantic_ANGULAR);
@@ -141,7 +141,7 @@ void AndroidSensorDevice::onSensorChanged(){
 InputDevice::InputType AndroidSensorDevice::getInputTypeFromSensorType(int sensorType){
 	switch(sensorType){
 		case ASENSOR_TYPE_ACCELEROMETER:
-			return InputType_MOTION;
+			return InputType_LINEAR;
 		case ASENSOR_TYPE_GYROSCOPE:
 			return InputType_ANGULAR;
 		case ASENSOR_TYPE_LIGHT:

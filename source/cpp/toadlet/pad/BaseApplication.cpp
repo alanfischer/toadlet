@@ -81,7 +81,6 @@ BaseApplication::BaseApplication():
 	mRenderOptions(0),
 	//mAudioDevicePlugins,
 	mAudioOptions(0),
-	//mMotionDetctorPlugins,
 
 	mEngine(NULL),
 	mRenderTarget(NULL),

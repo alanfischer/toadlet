@@ -4,7 +4,7 @@ configure_file (${CMAKE_CURRENT_SOURCE_DIR}/Version.h.cmake ${CMAKE_CURRENT_BINA
 
 # Source files for toadlet_flick
 set (FLICK_SRC
-	FilteredMotionDevice.cpp
+	FilteredLinearDevice.cpp
 	Version.cpp
 )
 
@@ -12,7 +12,7 @@ set (FLICK_SRC
 # Header files for flick
 set (FLICK_HDR
 	BaseInputDevice.h
-	FilteredMotionDevice.h
+	FilteredLinearDevice.h
 	InputData.h
 	InputDevice.h
 	InputDeviceListener.h

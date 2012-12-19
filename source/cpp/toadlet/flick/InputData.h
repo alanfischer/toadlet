@@ -41,9 +41,9 @@ public:
 		Semantic_JOY_ROTATION,
 		Semantic_MAX_JOY,
 		
-		Semantic_MOTION_ACCELERATION=0,
-		Semantic_MOTION_VELOCITY,
-		Semantic_MAX_MOTION,
+		Semantic_LINEAR_ACCELERATION=0,
+		Semantic_LINEAR_VELOCITY,
+		Semantic_MAX_LINEAR,
 
 		Semantic_ANGULAR=0,
 		Semantic_MAX_ANGULAR,
