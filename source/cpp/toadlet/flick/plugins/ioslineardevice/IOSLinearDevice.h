@@ -23,8 +23,8 @@
  *
  ********** Copyright header - do not remove **********/
 
-#ifndef TOADLET_FLICK_IOSMOTIONDEVICE_H
-#define TOADLET_FLICK_IOSMOTIONDEVICE_H
+#ifndef TOADLET_FLICK_IOSLINEARDEVICE_H
+#define TOADLET_FLICK_IOSLINEARDEVICE_H
 
 #include <toadlet/flick/BaseInputDevice.h>
 #include <toadlet/flick/InputData.h>
@@ -34,16 +34,16 @@
 namespace toadlet{
 namespace flick{
 
-class IOSMotionDevice;
+class IOSLinearDevice;
 
 }
 }
 
 @interface ToadletAccelerometerDelegate:NSObject<UIAccelerometerDelegate>{
-    toadlet::flick::IOSMotionDevice *mMotionDevice;    
+    toadlet::flick::IOSLinearDevice *mLinearDevice;    
 }
 
-- (id) initWithMotionDevice:(toadlet::flick::IOSMotionDevice*)motionDevice;
+- (id) initWithLinearDevice:(toadlet::flick::IOSLinearDevice*)linearDevice;
 - (void) accelerometer:(UIAccelerometer*)accelerometer didAccelerate:(UIAcceleration*)acceleration;
 
 @end
@@ -51,17 +51,17 @@ class IOSMotionDevice;
 namespace toadlet{
 namespace flick{
 
-class IOSMotionDevice:public BaseInputDevice{
+class IOSLinearDevice:public BaseInputDevice{
 public:
-	TOADLET_OBJECT(IOSMotionDevice);
+	TOADLET_OBJECT(IOSLinearDevice);
 	
-	IOSMotionDevice();
-	virtual ~IOSMotionDevice();
+	IOSLinearDevice();
+	virtual ~IOSLinearDevice();
 
 	bool create();
 	void destroy();
 
-	InputDevice::InputType getType(){return InputDevice::InputType_MOTION;}
+	InputDevice::InputType getType(){return InputDevice::InputType_LINEAR;}
 	bool start();
 	void update(int dt){}
 	void stop();
@@ -76,7 +76,7 @@ protected:
 	bool mRunning;
 	InputDeviceListener *mListener;
 	ToadletAccelerometerDelegate *mAccelerometerDelegate;
-	InputData mMotionData;
+	InputData mLinearData;
 };
 
 }

@@ -25,17 +25,17 @@
 
 #include <toadlet/egg/Error.h>
 #include <toadlet/flick/InputDeviceListener.h>
-#include "IOSMotionDevice.h"
+#include "IOSLinearDevice.h"
 
 @implementation ToadletAccelerometerDelegate
 
-- (id) initWithMotionDevice:(toadlet::flick::IOSMotionDevice*)motionDevice{
-	mMotionDevice=motionDevice;
+- (id) initWithLinearDevice:(toadlet::flick::IOSLinearDevice*)linearDevice{
+	mLinearDevice=linearDevice;
 	return self;
 }
 
 - (void) accelerometer:(UIAccelerometer*)accelerometer didAccelerate:(UIAcceleration*)acceleration{
-	mMotionDevice->didAccelerate(acceleration);
+	mLinearDevice->didAccelerate(acceleration);
 }
 
 @end
@@ -43,30 +43,30 @@
 namespace toadlet{
 namespace flick{
 
-TOADLET_C_API InputDevice *new_IOSMotionDevice(){
-	return new IOSMotionDevice();
+TOADLET_C_API InputDevice *new_IOSLinearDevice(){
+	return new IOSLinearDevice();
 }
 
 #if defined(TOADLET_BUILD_DYNAMIC)
-	TOADLET_C_API InputDevice* new_MotionDevice(){
-		return new IOSMotionDevice();
+	TOADLET_C_API InputDevice* new_LinearDevice(){
+		return new IOSLinearDevice();
 	}
 #endif
 
-IOSMotionDevice::IOSMotionDevice():
+IOSLinearDevice::IOSLinearDevice():
 	mRunning(false),
 	mListener(NULL),
 	mAccelerometerDelegate(nil)
 
 {}
 
-bool IOSMotionDevice::create(){
-	mAccelerometerDelegate=[[ToadletAccelerometerDelegate alloc] initWithMotionDevice:this];
+bool IOSLinearDevice::create(){
+	mAccelerometerDelegate=[[ToadletAccelerometerDelegate alloc] initWithLinearDevice:this];
 
 	return true;
 }
 
-bool IOSMotionDevice::start(){
+bool IOSLinearDevice::start(){
 	[UIAccelerometer sharedAccelerometer].updateInterval=0.05;
 	[UIAccelerometer sharedAccelerometer].delegate=mAccelerometerDelegate;
 
@@ -75,14 +75,14 @@ bool IOSMotionDevice::start(){
 	return mRunning;
 }
 
-void IOSMotionDevice::stop(){
+void IOSLinearDevice::stop(){
 	[UIAccelerometer sharedAccelerometer].updateInterval=0;
 	[UIAccelerometer sharedAccelerometer].delegate=nil;
 
 	mRunning=false;
 }
 
-void IOSMotionDevice::destroy(){
+void IOSLinearDevice::destroy(){
 	if(mRunning){
 		stop();
 	}
@@ -93,18 +93,18 @@ void IOSMotionDevice::destroy(){
 	}
 }
 
-void IOSMotionDevice::setSampleTime(int dt){
+void IOSLinearDevice::setSampleTime(int dt){
 	[UIAccelerometer sharedAccelerometer].updateInterval=(float)dt/1000.0;
 }
 
-void IOSMotionDevice::didAccelerate(UIAcceleration *acceleration){
-	mMotionData.type=InputDevice::InputType_MOTION;
-	mMotionData.time=(int)acceleration.timestamp*1000;
-	mMotionData.valid=(1<<InputData::Semantic_MOTION_ACCELERATION);
-	mMotionData.values[InputData::Semantic_MOTION_ACCELERATION].set(Math::fromFloat(acceleration.x),Math::fromFloat(acceleration.y),Math::fromFloat(acceleration.z),0);
+void IOSLinearDevice::didAccelerate(UIAcceleration *acceleration){
+	mLinearData.type=InputDevice::InputType_LINEAR;
+	mLinearData.time=(int)acceleration.timestamp*1000;
+	mLinearData.valid=(1<<InputData::Semantic_LINEAR_ACCELERATION);
+	mLinearData.values[InputData::Semantic_LINEAR_ACCELERATION].set(Math::fromFloat(acceleration.x),Math::fromFloat(acceleration.y),Math::fromFloat(acceleration.z),0);
 
 	if(mListener!=NULL){
-		mListener->inputDetected(mMotionData);
+		mListener->inputDetected(mLinearData);
 	}
 }
 

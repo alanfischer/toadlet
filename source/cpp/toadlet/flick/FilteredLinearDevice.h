@@ -23,8 +23,8 @@
  *
  ********** Copyright header - do not remove **********/
 
-#ifndef TOADLET_FLICK_FILTEREDMOTIONDEVICE_H
-#define TOADLET_FLICK_FILTEREDMOTIONDEVICE_H
+#ifndef TOADLET_FLICK_FILTEREDLINEARDEVICE_H
+#define TOADLET_FLICK_FILTEREDLINEARDEVICE_H
 
 #include <toadlet/flick/BaseInputDevice.h>
 #include <toadlet/flick/InputDeviceListener.h>
@@ -32,14 +32,14 @@
 namespace toadlet{
 namespace flick{
 
-class TOADLET_API FilteredMotionDevice:public BaseInputDevice,public InputDeviceListener{
+class TOADLET_API FilteredLinearDevice:public BaseInputDevice,public InputDeviceListener{
 public:
-	TOADLET_OBJECT(FilteredMotionDevice);
+	TOADLET_OBJECT(FilteredLinearDevice);
 
-	FilteredMotionDevice();
-	virtual ~FilteredMotionDevice();
+	FilteredLinearDevice();
+	virtual ~FilteredLinearDevice();
 
-	virtual void setMotionDevice(InputDevice *device);
+	virtual void setLinearDevice(InputDevice *device);
 	
 	virtual bool create();
 	virtual void destroy();
@@ -59,7 +59,7 @@ protected:
 	InputDeviceListener *mListener;
 	InputDevice *mDevice;
 	scalar mAlpha;
-	InputData mMotionData;
+	InputData mLinearData;
 	Vector4 mRawVelocity;
 };
 

@@ -90,9 +90,9 @@ bool AndroidApplication::create(String renderDevice,String audioDevice){
 	AndroidTextureStreamer::ptr textureStreamer=new AndroidTextureStreamer(mEngine->getTextureManager(),env);
 	mEngine->getTextureManager()->setDefaultStreamer(textureStreamer);
 	
-	InputDevice::ptr motionDevice=new_AndroidSensorDevice(ASENSOR_TYPE_ACCELEROMETER);
-	if(motionDevice->create()){
-		mInputDevices[motionDevice->getType()]=motionDevice;
+	InputDevice::ptr linearDevice=new_AndroidSensorDevice(ASENSOR_TYPE_ACCELEROMETER);
+	if(linearDevice->create()){
+		mInputDevices[linearDevice->getType()]=linearDevice;
 	}
 
 	InputDevice::ptr angularDevice=new_AndroidSensorDevice(ASENSOR_TYPE_GYROSCOPE);
