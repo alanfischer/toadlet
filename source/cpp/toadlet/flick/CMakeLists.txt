@@ -77,7 +77,7 @@ elseif (TOADLET_PLATFORM_ANDROID)
 		add_subdirectory (plugins/androidsensordevice)
 	endif (ANDROID_NDK_API_LEVEL GREATER 8)
 elseif (TOADLET_PLATFORM_IOS)
-	add_subdirectory (plugins/iosmotiondevice)
+	add_subdirectory (plugins/ioslineardevice)
 endif (TOADLET_PLATFORM_WIN32)
 
 
