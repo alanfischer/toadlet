@@ -169,7 +169,7 @@ void AnaglyphCamera::setRightColor(const Vector4 &color){
 
 void AnaglyphCamera::render(RenderDevice *device,Scene *scene,Node *node){
 	if(mProjectionType==ProjectionType_FOV){
-		autoUpdateProjection(mRenderTarget!=NULL?mRenderTarget:device->getPrimaryRenderTarget());
+		autoUpdateProjection(mRenderTarget!=NULL?mRenderTarget.get():device->getPrimaryRenderTarget());
 	}
 
 	mLeftCamera->render(device,scene,node);
