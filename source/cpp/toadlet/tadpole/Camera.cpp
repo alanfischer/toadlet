@@ -251,7 +251,7 @@ void Camera::projectionUpdated(){
 
 void Camera::render(RenderDevice *device,Scene *scene,Node *node){
 	if(mProjectionType==ProjectionType_FOV){
-		autoUpdateProjection(mRenderTarget!=NULL?mRenderTarget:device->getPrimaryRenderTarget());
+		autoUpdateProjection(mRenderTarget!=NULL?mRenderTarget.get():device->getPrimaryRenderTarget());
 	}
 
 	updateFramesPerSecond(scene->getTime());
