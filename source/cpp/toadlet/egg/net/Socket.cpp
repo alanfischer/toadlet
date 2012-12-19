@@ -403,7 +403,7 @@ Socket *Socket::accept(){
 			Error::socket(Categories::TOADLET_EGG_NET,
 				String("accept:")+result);
 		}
-		return false;
+		return NULL;
 	}
 	else{
 		Socket *socket=new Socket(clientHandle,&clientAddress);
