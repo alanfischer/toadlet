@@ -105,16 +105,16 @@ public:
 	inline int getViewportWidth() const{return mViewport.width;}
 	inline int getViewportHeight() const{return mViewport.height;}
 
-	void setClearFlags(int clearFlags){mClearFlags=clearFlags;}
+	virtual void setClearFlags(int clearFlags){mClearFlags=clearFlags;}
 	inline int getClearFlags() const{return mClearFlags;}
 
-	void setClearColor(const Vector4 &clearColor){mClearColor.set(clearColor);}
+	virtual void setClearColor(const Vector4 &clearColor){mClearColor.set(clearColor);}
 	inline const Vector4 &getClearColor() const{return mClearColor;}
 
-	void setSkipFirstClear(bool skip){mSkipFirstClear=skip;}
+	virtual void setSkipFirstClear(bool skip){mSkipFirstClear=skip;}
 	inline bool getSkipFirstClear() const{return mSkipFirstClear;}
 
-	void setDefaultState(RenderState *renderState){mDefaultState=renderState;}
+	virtual void setDefaultState(RenderState *renderState){mDefaultState=renderState;}
 	inline RenderState* getDefaultState() const{return mDefaultState;}
 
 	void setObliqueNearPlaneMatrix(const Matrix4x4 &oblique);
@@ -144,6 +144,7 @@ protected:
 	virtual void projectionUpdated();
 	virtual void updateWorldTransform();
 	virtual void updateClippingPlanes();
+	virtual void autoUpdateProjection(RenderTarget *target);
 
 	int mScope;
 	ProjectionType mProjectionType;

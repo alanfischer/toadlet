@@ -244,7 +244,7 @@ bool GLFBORenderTarget::compile(){
 	glBindFramebuffer(GL_FRAMEBUFFER,mHandle);
 	GLenum status=glCheckFramebufferStatus(GL_FRAMEBUFFER);
 	if(status!=GL_FRAMEBUFFER_COMPLETE){
-		Log::warning(Categories::TOADLET_PEEPER,String("FBO Warning:")+getFBOMessage(status));
+		Log::warning(Categories::TOADLET_PEEPER,String("FBO Warning:")+status+"="+getFBOMessage(status));
 	}
 	glBindFramebuffer(GL_FRAMEBUFFER,0);
 
@@ -293,6 +293,8 @@ const char *GLFBORenderTarget::getFBOMessage(GLenum status){
 				return "GL_FRAMEBUFFER_INCOMPLETE_DRAW_BUFFER";
 			case GL_FRAMEBUFFER_INCOMPLETE_READ_BUFFER:
 				return "GL_FRAMEBUFFER_INCOMPLETE_READ_BUFFER";
+			case GL_FRAMEBUFFER_UNSUPPORTED:
+				return "GL_FRAMEBUFFER_UNSUPPORTED";
 		#endif
 		default:
 			return "UNKNOWN";

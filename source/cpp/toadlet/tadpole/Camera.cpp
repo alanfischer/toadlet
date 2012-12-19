@@ -251,20 +251,7 @@ void Camera::projectionUpdated(){
 
 void Camera::render(RenderDevice *device,Scene *scene,Node *node){
 	if(mProjectionType==ProjectionType_FOV){
-		RenderTarget *target=mRenderTarget;
-		if(target==NULL){
-			target=device->getPrimaryRenderTarget();
-		}
-		
-		int width=target->getWidth(),height=target->getHeight();
-		mViewport.set(0,0,width,height);
-		if(width>=height){
-			Math::setMatrix4x4FromPerspectiveY(mProjectionMatrix,mFov,Math::div(Math::fromInt(width),Math::fromInt(height)),mNearDist,mFarDist);
-		}
-		else{
-			Math::setMatrix4x4FromPerspectiveX(mProjectionMatrix,mFov,Math::div(Math::fromInt(height),Math::fromInt(width)),mNearDist,mFarDist);
-		}
-		projectionUpdated();
+		autoUpdateProjection(mRenderTarget!=NULL?mRenderTarget:device->getPrimaryRenderTarget());
 	}
 
 	updateFramesPerSecond(scene->getTime());
@@ -439,6 +426,18 @@ void Camera::updateClippingPlanes(){
 	Math::normalize(mClipPlanes[4].set(vpt[3]-vpt[2], vpt[7]-vpt[6], vpt[11]-vpt[10], vpt[15]-vpt[14]));
 	// Near clipping plane.
 	Math::normalize(mClipPlanes[5].set(vpt[3]+vpt[2], vpt[7]+vpt[6], vpt[11]+vpt[10], vpt[15]+vpt[14]));
+}
+
+void Camera::autoUpdateProjection(RenderTarget *target){
+	int width=target->getWidth(),height=target->getHeight();
+	mViewport.set(0,0,width,height);
+	if(width>=height){
+		Math::setMatrix4x4FromPerspectiveY(mProjectionMatrix,mFov,Math::div(Math::fromInt(width),Math::fromInt(height)),mNearDist,mFarDist);
+	}
+	else{
+		Math::setMatrix4x4FromPerspectiveX(mProjectionMatrix,mFov,Math::div(Math::fromInt(height),Math::fromInt(width)),mNearDist,mFarDist);
+	}
+	projectionUpdated();
 }
 
 }

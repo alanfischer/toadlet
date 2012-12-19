@@ -39,7 +39,7 @@ AnaglyphCamera::AnaglyphCamera(Scene *scene):
 
 	int flags=Texture::Usage_BIT_RENDERTARGET;
 	int size=1024;//Math::nextPowerOf2((getWidth()<getHeight()?getWidth():getHeight())/2);
-	int format=TextureFormat::Format_L_8;
+	int format=TextureFormat::Format_RGB_8;
 	TextureFormat::ptr textureFormat=new TextureFormat(TextureFormat::Dimension_D2,format,size,size,1,1);
 
 	mLeftTexture=engine->getTextureManager()->createTexture(flags,textureFormat);
@@ -67,10 +67,12 @@ AnaglyphCamera::AnaglyphCamera(Scene *scene):
 
 		RenderPass::ptr leftPass=leftPath->takePass(0);
 		leftPass->getRenderState()->setDepthState(DepthState(DepthState::DepthTest_ALWAYS,false));
+		leftPass->getRenderState()->setRasterizerState(RasterizerState(RasterizerState::CullType_NONE));
 		path->addPass(leftPass);
 
 		RenderPass::ptr rightPass=rightPath->takePass(0);
 		rightPass->getRenderState()->setDepthState(DepthState(DepthState::DepthTest_ALWAYS,false));
+		rightPass->getRenderState()->setRasterizerState(RasterizerState(RasterizerState::CullType_NONE));
 		rightPass->getRenderState()->setBlendState(BlendState::Combination_COLOR_ADDITIVE);
 		path->addPass(rightPass);
 	}
@@ -83,7 +85,7 @@ AnaglyphCamera::AnaglyphCamera(Scene *scene):
 
 	mOverlayCamera=new Camera();
 	mOverlayCamera->setProjectionOrtho(Math::HALF,-Math::HALF,Math::HALF,-Math::HALF,-Math::ONE,Math::ONE);
-	mOverlayCamera->setLookAt(Math::Z_UNIT_VECTOR3,Math::ZERO_VECTOR3,Math::Y_UNIT_VECTOR3);
+	mOverlayCamera->setLookAt(Math::NEG_Z_UNIT_VECTOR3,Math::ZERO_VECTOR3,Math::Y_UNIT_VECTOR3);
 
 	setSeparation(Math::ONE);
 	setLeftColor(Colors::RED);
@@ -109,6 +111,34 @@ void AnaglyphCamera::setScope(int scope){
 
 	mLeftCamera->setScope(scope);
 	mRightCamera->setScope(scope);
+}
+
+void AnaglyphCamera::setClearFlags(int clearFlags){
+	Camera::setClearFlags(clearFlags);
+
+	mLeftCamera->setClearFlags(clearFlags);
+	mRightCamera->setClearFlags(clearFlags);
+}
+
+void AnaglyphCamera::setClearColor(const Vector4 &clearColor){
+	Camera::setClearColor(clearColor);
+
+	mLeftCamera->setClearColor(clearColor);
+	mRightCamera->setClearColor(clearColor);
+}
+
+void AnaglyphCamera::setSkipFirstClear(bool skip){
+	Camera::setSkipFirstClear(skip);
+
+	mLeftCamera->setSkipFirstClear(skip);
+	mRightCamera->setSkipFirstClear(skip);
+}
+
+void AnaglyphCamera::setDefaultState(RenderState *renderState){
+	Camera::setDefaultState(renderState);
+
+	mLeftCamera->setDefaultState(renderState);
+	mRightCamera->setDefaultState(renderState);
 }
 
 void AnaglyphCamera::setRenderTarget(RenderTarget *target){
@@ -138,6 +168,10 @@ void AnaglyphCamera::setRightColor(const Vector4 &color){
 }
 
 void AnaglyphCamera::render(RenderDevice *device,Scene *scene,Node *node){
+	if(mProjectionType==ProjectionType_FOV){
+		autoUpdateProjection(mRenderTarget!=NULL?mRenderTarget:device->getPrimaryRenderTarget());
+	}
+
 	mLeftCamera->render(device,scene,node);
 
 	mRightCamera->render(device,scene,node);
