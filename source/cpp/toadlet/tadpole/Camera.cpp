@@ -42,9 +42,6 @@ Camera::Camera():
 	mSkipFirstClear(false),
 	mAlignmentCalculationsUseOrigin(false),
 
-	mProjectionRotation(0),
-	mProjectionMirrorY(false),
-
 	mFPSLastTime(0),
 	mFPSFrameCount(0),
 	mFPS(0),
@@ -122,18 +119,6 @@ void Camera::setProjectionMatrix(const Matrix4x4 &matrix){
 	projectionUpdated();
 }
 
-void Camera::setProjectionRotation(scalar rotate){
-	mProjectionRotation=rotate;
-
-	projectionUpdated();
-}
-
-void Camera::setProjectionMirrorY(bool mirror){
-	mProjectionMirrorY=mirror;
-
-	projectionUpdated();
-}
-
 void Camera::setObliqueNearPlaneMatrix(const Matrix4x4 &oblique){
 	mObliqueMatrix.set(oblique);
 	
@@ -199,26 +184,7 @@ void Camera::setRenderTarget(RenderTarget *target){
 void Camera::projectionUpdated(){
 	Matrix4x4 matrix;
 
-/// @todo: Make some test cases for the projection rotation, and get this debugged
-	scalar x=0;//mViewport.x+mViewport.width/2;
-	scalar y=0;//mViewport.y+mViewport.height/2;
 	mFinalProjectionMatrix.set(mProjectionMatrix);
-
-	matrix.reset();
-	Math::setMatrix4x4FromTranslate(matrix,x,y,0);
-	Math::preMul(matrix,mFinalProjectionMatrix);
-
-	matrix.reset();
-	Math::setMatrix4x4FromZ(matrix,mProjectionRotation);
-	Math::postMul(mFinalProjectionMatrix,matrix);
-
-	matrix.reset();
-	Math::setMatrix4x4FromTranslate(matrix,-x,-y,0);
-	Math::postMul(mFinalProjectionMatrix,matrix);
-
-	matrix.reset();
-	Math::setMatrix4x4FromScale(matrix,Math::ONE,mProjectionMirrorY?-Math::ONE:Math::ONE,Math::ONE);
-	Math::preMul(mFinalProjectionMatrix,matrix);
 
 	if(mObliqueMatrix.equals(Math::IDENTITY_MATRIX4X4)==false){
 		Matrix4x4 invtransProjMatrix;

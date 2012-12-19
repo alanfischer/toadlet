@@ -30,7 +30,6 @@ namespace toadlet{
 namespace egg{
 namespace math{
 
-/// @todo: Write a unit test for this
 void Sphere::merge(const Sphere &sphere,real epsilon){
 	Vector3 originDifference;
 	Math::sub(originDifference,sphere.origin,origin);

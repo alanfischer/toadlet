@@ -81,8 +81,6 @@ public:
 	void setPosition(const Vector3 &position);
 	inline const Vector3 &getPosition() const{return mPosition;}
 
-	void setProjectionRotation(scalar rotate);
-	void setProjectionMirrorY(bool mirror);
 	void setNearAndFarDist(scalar nearDist,scalar farDist);
 
 	void setAlignmentCalculationsUseOrigin(bool origin){mAlignmentCalculationsUseOrigin=origin;}
@@ -162,8 +160,6 @@ protected:
 	RenderState::ptr mDefaultState;
 
 	Matrix4x4 mProjectionMatrix;
-	scalar mProjectionRotation;
-	bool mProjectionMirrorY;
 	Matrix4x4 mObliqueMatrix;
 	Matrix4x4 mFinalProjectionMatrix;
 	Matrix4x4 mViewMatrix;

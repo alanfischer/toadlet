@@ -64,10 +64,8 @@ public:
 	Errorer();
 	virtual ~Errorer();
 
-	/// @todo: Add threaded support to this, to make the errors thread specific
 	void setError(int error);
 	void setError(int error,const char *description);
-	void setError(int error,const String &description);
 	void setException(const Exception &ex);
 
 	int getError();
