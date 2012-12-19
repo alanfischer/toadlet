@@ -33,13 +33,8 @@
 	#include <wctype.h>
 #endif
 
-/// @todo: Have CMake set TOADLET_HAS_SWPRINTF
-#if defined(TOADLET_HAS_SWPRINTF) && defined(TOADLET_PLATFORM_WIN32)
-	#define TOADLET_SPRINTF(str,fmt,x) \
-		str.mLength=_snwprintf((wchar_t*)(str).mData,(str).mLength,L##fmt,x)
-	#define TOADLET_SSCANF(str,fmt,x) \
-		swscanf((wchar_t*)(str).mData,L##fmt,x)
-#elif defined(TOADLET_HAS_SWPRINTF) && defined(TOADLET_PLATFORM_POSIX)
+#define TOADLET_HAS_SWPRINTF
+#if defined(TOADLET_HAS_SWPRINTF)
 	#define TOADLET_SPRINTF(str,fmt,x) \
 		str.mLength=swprintf((wchar_t*)(str).mData,(str).mLength,L##fmt,x)
 	#define TOADLET_SSCANF(str,fmt,x) \
