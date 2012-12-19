@@ -387,7 +387,7 @@ void Engine::updateRenderCaps(){
 	}
 
 	mEngineRenderCaps.maxLights=		mergeCap(mRenderCaps.maxLights,			mMaximumRenderCaps.maxLights,		mBackableRenderCaps.maxLights);
-	mEngineRenderCaps.triangleFan=		mergeCap(mRenderCaps.triangleFan,		mMaximumRenderCaps.triangleFan,		mBackableRenderCaps.triangleFan);
+	mEngineRenderCaps.triangleFan=		mergeCap(mRenderCaps.triangleFan,		mMaximumRenderCaps.triangleFan,		mBackableRenderCaps.triangleFan)> 0;
 }
 
 void Engine::updateVertexFormats(){
