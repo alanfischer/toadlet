@@ -233,32 +233,36 @@ double DataStream::readBDouble(){
 
 
 int DataStream::readBVector2(math::Vector2 &v){
-	v.x=readBFloat();
-	v.y=readBFloat();
-	return 4*2;
+	int amount=read((tbyte*)&v,sizeof(v));
+	bigFloatInPlace(v.x);
+	bigFloatInPlace(v.y);
+	return amount;
 }
 
 int DataStream::readBVector3(math::Vector3 &v){
-	v.x=readBFloat();
-	v.y=readBFloat();
-	v.z=readBFloat();
-	return 4*3;
+	int amount=read((tbyte*)&v,sizeof(v));
+	bigFloatInPlace(v.x);
+	bigFloatInPlace(v.y);
+	bigFloatInPlace(v.z);
+	return amount;
 }
 
 int DataStream::readBVector4(math::Vector4 &v){
-	v.x=readBFloat();
-	v.y=readBFloat();
-	v.z=readBFloat();
-	v.w=readBFloat();
-	return 4*4;
+	int amount=read((tbyte*)&v,sizeof(v));
+	bigFloatInPlace(v.x);
+	bigFloatInPlace(v.y);
+	bigFloatInPlace(v.z);
+	bigFloatInPlace(v.w);
+	return amount;
 }
 
 int DataStream::readBQuaternion(math::Quaternion &q){
-	q.x=readBFloat();
-	q.y=readBFloat();
-	q.z=readBFloat();
-	q.w=readBFloat();
-	return 4*4;
+	int amount=read((tbyte*)&q,sizeof(q));
+	bigFloatInPlace(q.x);
+	bigFloatInPlace(q.y);
+	bigFloatInPlace(q.z);
+	bigFloatInPlace(q.w);
+	return amount;
 }
 
 int DataStream::readBAABox(math::AABox &a){
@@ -271,37 +275,42 @@ int DataStream::readBAABox(math::AABox &a){
 int DataStream::readBSphere(math::Sphere &s){
 	int amount=0;
 	amount+=readBVector3(s.origin);
-	s.radius=readBFloat();amount+=4;
+	amount+=read((tbyte*)&s.radius,sizeof(s.radius));
+	bigFloatInPlace(s.radius);
 	return amount;
 }
 
 int DataStream::readBVector2(mathfixed::Vector2 &v){
-	v.x=readBInt32();
-	v.y=readBInt32();
-	return 4*2;
+	int amount=read((tbyte*)&v,sizeof(v));
+	bigInt32InPlace(v.x);
+	bigInt32InPlace(v.y);
+	return amount;
 }
 
 int DataStream::readBVector3(mathfixed::Vector3 &v){
-	v.x=readBInt32();
-	v.y=readBInt32();
-	v.z=readBInt32();
-	return 4*3;
+	int amount=read((tbyte*)&v,sizeof(v));
+	bigInt32InPlace(v.x);
+	bigInt32InPlace(v.y);
+	bigInt32InPlace(v.z);
+	return amount;
 }
 
 int DataStream::readBVector4(mathfixed::Vector4 &v){
-	v.x=readBInt32();
-	v.y=readBInt32();
-	v.z=readBInt32();
-	v.w=readBInt32();
-	return 4*4;
+	int amount=read((tbyte*)&v,sizeof(v));
+	bigInt32InPlace(v.x);
+	bigInt32InPlace(v.y);
+	bigInt32InPlace(v.z);
+	bigInt32InPlace(v.w);
+	return amount;
 }
 
 int DataStream::readBQuaternion(mathfixed::Quaternion &q){
-	q.x=readBInt32();
-	q.y=readBInt32();
-	q.z=readBInt32();
-	q.w=readBInt32();
-	return 4*4;
+	int amount=read((tbyte*)&q,sizeof(q));
+	bigInt32InPlace(q.x);
+	bigInt32InPlace(q.y);
+	bigInt32InPlace(q.z);
+	bigInt32InPlace(q.w);
+	return amount;
 }
 
 int DataStream::readBAABox(mathfixed::AABox &a){
@@ -314,7 +323,8 @@ int DataStream::readBAABox(mathfixed::AABox &a){
 int DataStream::readBSphere(mathfixed::Sphere &s){
 	int amount=0;
 	amount+=readBVector3(s.origin);
-	s.radius=readBInt32();amount+=4;
+	amount+=read((tbyte*)&s.radius,sizeof(s.radius));
+	bigInt32InPlace(s.radius);
 	return amount;
 }
 
@@ -392,32 +402,36 @@ double DataStream::readLDouble(){
 }
 
 int DataStream::readLVector2(math::Vector2 &v){
-	v.x=readLFloat();
-	v.y=readLFloat();
-	return 4*2;
+	int amount=read((tbyte*)&v,sizeof(v));
+	littleFloatInPlace(v.x);
+	littleFloatInPlace(v.y);
+	return amount;
 }
 
 int DataStream::readLVector3(math::Vector3 &v){
-	v.x=readLFloat();
-	v.y=readLFloat();
-	v.z=readLFloat();
-	return 4*3;
+	int amount=read((tbyte*)&v,sizeof(v));
+	littleFloatInPlace(v.x);
+	littleFloatInPlace(v.y);
+	littleFloatInPlace(v.z);
+	return amount;
 }
 
 int DataStream::readLVector4(math::Vector4 &v){
-	v.x=readLFloat();
-	v.y=readLFloat();
-	v.z=readLFloat();
-	v.w=readLFloat();
-	return 4*4;
+	int amount=read((tbyte*)&v,sizeof(v));
+	littleFloatInPlace(v.x);
+	littleFloatInPlace(v.y);
+	littleFloatInPlace(v.z);
+	littleFloatInPlace(v.w);
+	return amount;
 }
 
 int DataStream::readLQuaternion(math::Quaternion &q){
-	q.x=readLFloat();
-	q.y=readLFloat();
-	q.z=readLFloat();
-	q.w=readLFloat();
-	return 4*4;
+	int amount=read((tbyte*)&q,sizeof(q));
+	littleFloatInPlace(q.x);
+	littleFloatInPlace(q.y);
+	littleFloatInPlace(q.z);
+	littleFloatInPlace(q.w);
+	return amount;
 }
 
 int DataStream::readLAABox(math::AABox &a){
@@ -430,37 +444,42 @@ int DataStream::readLAABox(math::AABox &a){
 int DataStream::readLSphere(math::Sphere &s){
 	int amount=0;
 	amount+=readLVector3(s.origin);
-	s.radius=readLFloat();amount+=4;
+	amount+=read((tbyte*)&s.radius,sizeof(s.radius));
+	littleFloatInPlace(s.radius);
 	return amount;
 }
 
 int DataStream::readLVector2(mathfixed::Vector2 &v){
-	v.x=readLInt32();
-	v.y=readLInt32();
-	return 4*2;
+	int amount=read((tbyte*)&v,sizeof(v));
+	littleInt32InPlace(v.x);
+	littleInt32InPlace(v.y);
+	return amount;
 }
 
 int DataStream::readLVector3(mathfixed::Vector3 &v){
-	v.x=readLInt32();
-	v.y=readLInt32();
-	v.z=readLInt32();
-	return 4*3;
+	int amount=read((tbyte*)&v,sizeof(v));
+	littleInt32InPlace(v.x);
+	littleInt32InPlace(v.y);
+	littleInt32InPlace(v.z);
+	return amount;
 }
 
 int DataStream::readLVector4(mathfixed::Vector4 &v){
-	v.x=readLInt32();
-	v.y=readLInt32();
-	v.z=readLInt32();
-	v.w=readLInt32();
-	return 4*4;
+	int amount=read((tbyte*)&v,sizeof(v));
+	littleInt32InPlace(v.x);
+	littleInt32InPlace(v.y);
+	littleInt32InPlace(v.z);
+	littleInt32InPlace(v.w);
+	return amount;
 }
 
 int DataStream::readLQuaternion(mathfixed::Quaternion &q){
-	q.x=readLInt32();
-	q.y=readLInt32();
-	q.z=readLInt32();
-	q.w=readLInt32();
-	return 4*4;
+	int amount=read((tbyte*)&q,sizeof(q));
+	littleInt32InPlace(q.x);
+	littleInt32InPlace(q.y);
+	littleInt32InPlace(q.z);
+	littleInt32InPlace(q.w);
+	return amount;
 }
 
 int DataStream::readLAABox(mathfixed::AABox &a){
@@ -473,7 +492,8 @@ int DataStream::readLAABox(mathfixed::AABox &a){
 int DataStream::readLSphere(mathfixed::Sphere &s){
 	int amount=0;
 	amount+=readLVector3(s.origin);
-	s.radius=readLInt32();amount+=4;
+	amount+=read((tbyte*)&s.radius,sizeof(s.radius));
+	littleInt32InPlace(s.radius);
 	return amount;
 }
 

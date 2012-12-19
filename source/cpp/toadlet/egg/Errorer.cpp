@@ -56,17 +56,6 @@ void Errorer::setError(int error,const char *description){
 	mLastDescription[c]=0;
 }
 
-void Errorer::setError(int error,const String &description){
-	mLastError=error;
-	int c=0;
-	const char *p=description.c_str();
-	while(p[c]!=0 && c<MAX_DESCRIPTION_LENGTH){
-		mLastDescription[c]=p[c];
-		c++;
-	}
-	mLastDescription[c]=0;
-}
-
 void Errorer::setException(const Exception &ex){
 	setError(ex.getError(),ex.getDescription());
 	mException=ex;
