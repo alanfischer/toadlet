@@ -202,11 +202,20 @@ void ResourceManager::logAllResources(){
 	}
 }
 
-String ResourceManager::cleanPath(const String &name,bool directory){
-	char *temp=new char[name.length()+2];
-	memcpy(temp,name.c_str(),name.length()+2);
+String ResourceManager::checkDefaultExtension(const String &path){
+	if(path.rfind('.')==String::npos && mDefaultExtension.length()>0){
+		return path+"."+mDefaultExtension;
+	}
+	else{
+		return path;
+	}
+}
 
-	// Eliminate all ".." from the name
+String ResourceManager::cleanPath(const String &path,bool directory){
+	char *temp=new char[path.length()+2];
+	memcpy(temp,path.c_str(),path.length()+2);
+
+	// Eliminate all ".." from the path
 	char *p=0;
 	while((p=strstr(temp,".."))!=0){
 		char *p2=p;
@@ -248,11 +257,21 @@ String ResourceManager::cleanPath(const String &name,bool directory){
 		}
 	}
 
-	String cleanName=temp;
+	String cleanPath=temp;
 
 	delete[] temp;
 
-	return cleanName;
+	return cleanPath;
+}
+
+String ResourceManager::findExtension(const String &path){
+	int i=path.rfind('.');
+	if(i!=String::npos){
+		return path.substr(i+1,path.length()).toLower();
+	}
+	else{
+		return String();
+	}
 }
 
 Resource::ptr ResourceManager::unableToFindStreamer(const String &name,ResourceData *data){
@@ -265,17 +284,10 @@ Resource::ptr ResourceManager::findFromFile(const String &name,ResourceData *dat
 	Log::debug(Categories::TOADLET_TADPOLE,
 		"ResourceManager::findFromFile:"+name);
 
-	String filename=cleanPath(name);
-	String extension;
-	int i=filename.rfind('.');
-	if(i!=String::npos){
-		extension=filename.substr(i+1,filename.length()).toLower();
-	}
-	else if(mDefaultExtension.length()>0){
-		extension=mDefaultExtension;
-		filename+="."+extension;
-	}
+	String filename=checkDefaultExtension(cleanPath(name));
+	String extension=findExtension(filename);
 
+	int i;
 	for(i=0;i<mResourceArchives.size();++i){
 		Resource::ptr resource=mResourceArchives[i]->openResource(filename);
 		if(resource!=NULL){

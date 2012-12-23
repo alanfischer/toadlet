@@ -69,17 +69,8 @@ AudioStream::ptr AudioManager::findAudioStream(const String &name,ResourceData *
 	Log::debug(Categories::TOADLET_TADPOLE,
 		"finding audio stream:"+name);
 
-	/// @todo: Unify this with ResourceManager::findFromFile
-	String filename=cleanPath(name);
-	String extension;
-	int i=filename.rfind('.');
-	if(i!=String::npos){
-		extension=filename.substr(i+1,filename.length()).toLower();
-	}
-	else if(mDefaultExtension.length()>0){
-		extension=mDefaultExtension;
-		filename+="."+extension;
-	}
+	String filename=checkDefaultExtension(cleanPath(name));
+	String extension=findExtension(filename);
 
 	ResourceStreamer::ptr streamer=getStreamer(extension);
 	if(streamer==NULL){

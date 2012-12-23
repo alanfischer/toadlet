@@ -142,6 +142,9 @@
 #if defined(TOADLET_HAS_GME)
 	#include <toadlet/tadpole/plugins/GMEStreamer.h>
 #endif
+#if defined(TOADLET_HAS_MODPLUG)
+	#include <toadlet/tadpole/plugins/MODStreamer.h>
+#endif
 
 #if !defined(TOADLET_FIXED_POINT)
 	#include <toadlet/tadpole/plugins/SPRStreamer.h>
@@ -333,6 +336,33 @@ void Engine::installHandlers(){
 		mAudioManager->setStreamer(gmeStreamer,"spc");
 		mAudioManager->setStreamer(gmeStreamer,"vgm");
 		mAudioManager->setStreamer(gmeStreamer,"vgz");
+	#endif
+	#if defined(TOADLET_HAS_MODPLUG)
+		MODStreamer::ptr modStreamer=new MODStreamer(mAudioManager);
+		mAudioManager->setStreamer(modStreamer,"mod");
+		mAudioManager->setStreamer(modStreamer,"s3m");
+		mAudioManager->setStreamer(modStreamer,"xm");
+		mAudioManager->setStreamer(modStreamer,"it");
+		mAudioManager->setStreamer(modStreamer,"669");
+		mAudioManager->setStreamer(modStreamer,"amf");
+		mAudioManager->setStreamer(modStreamer,"ams");
+		mAudioManager->setStreamer(modStreamer,"dbm");
+		mAudioManager->setStreamer(modStreamer,"dmf");
+		mAudioManager->setStreamer(modStreamer,"dsm");
+		mAudioManager->setStreamer(modStreamer,"far");
+		mAudioManager->setStreamer(modStreamer,"mdl");
+		mAudioManager->setStreamer(modStreamer,"med");
+		mAudioManager->setStreamer(modStreamer,"mtm");
+		mAudioManager->setStreamer(modStreamer,"okt");
+		mAudioManager->setStreamer(modStreamer,"ptm");
+		mAudioManager->setStreamer(modStreamer,"stm");
+		mAudioManager->setStreamer(modStreamer,"ult");
+		mAudioManager->setStreamer(modStreamer,"umx");
+		mAudioManager->setStreamer(modStreamer,"mt2");
+		mAudioManager->setStreamer(modStreamer,"psm");
+		mAudioManager->setStreamer(modStreamer,"abc");
+		mAudioManager->setStreamer(modStreamer,"mid");
+		mAudioManager->setStreamer(modStreamer,"midi");
 	#endif
 
 	// Plugin types, should be removed from here somehow

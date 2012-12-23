@@ -72,7 +72,9 @@ public:
 
 	inline Engine *getEngine(){return mEngine;}
 
-	static String cleanPath(const String &name,bool directory=false);
+	String checkDefaultExtension(const String &path);
+	static String cleanPath(const String &path,bool directory=false);
+	static String findExtension(const String &path);
 
 protected:
 	typedef Map<String,Resource*> NameResourceMap;
