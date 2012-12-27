@@ -33,15 +33,16 @@ namespace peeper{
 
 class TOADLET_API Viewport{
 public:
-	inline Viewport():x(0),y(0),width(0),height(0){}
+	inline Viewport():x(0),y(0),width(0),height(0),empty(true){}
 
-	inline Viewport(int x1,int y1,int width1,int height1):x(x1),y(y1),width(width1),height(height1){}
+	inline Viewport(int x1,int y1,int width1,int height1):x(x1),y(y1),width(width1),height(height1),empty(false){}
 
 	inline Viewport &set(const Viewport &v){
 		x=v.x;
 		y=v.y;
 		width=v.width;
 		height=v.height;
+		empty=v.empty;
 		return *this;
 	}
 
@@ -50,6 +51,7 @@ public:
 		y=y1;
 		width=width1;
 		height=height1;
+		empty=false;
 		return *this;
 	}
 
@@ -58,6 +60,7 @@ public:
 		y=0;
 		width=0;
 		height=0;
+		empty=true;
 		return *this;
 	}
 
@@ -65,6 +68,7 @@ public:
 	int y;
 	int width;
 	int height;
+	bool empty;
 };
 
 }

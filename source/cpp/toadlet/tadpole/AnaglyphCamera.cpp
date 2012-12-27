@@ -189,17 +189,19 @@ void AnaglyphCamera::projectionUpdated(){
 void AnaglyphCamera::updateWorldTransform(){
 	Camera::updateWorldTransform();
 
+	scalar separation=mSeparation;
+
 	mLeftCamera->setWorldMatrix(mWorldMatrix);
 	{
 		Vector3 position=mLeftCamera->getPosition();
-		Math::madd(position,mRight,-mSeparation,position);
+		Math::madd(position,mRight,-separation,position);
 		mLeftCamera->setPosition(position);
 	}
 
 	mRightCamera->setWorldMatrix(mWorldMatrix);
 	{
 		Vector3 position=mRightCamera->getPosition();
-		Math::madd(position,mRight,mSeparation,position);
+		Math::madd(position,mRight,separation,position);
 		mRightCamera->setPosition(position);
 	}
 }

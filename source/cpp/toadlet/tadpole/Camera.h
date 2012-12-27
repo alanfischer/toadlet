@@ -95,13 +95,8 @@ public:
 
 	bool ready() const{return mRenderTarget==NULL || mRenderTarget->getRootRenderTarget()!=NULL;}
 
-	void setViewport(const Viewport &viewport){mViewport.set(viewport);}
-	void setViewport(int x,int y,int width,int height){mViewport.set(x,y,width,height);}
+	virtual void setViewport(const Viewport &viewport){mViewport.set(viewport);}
 	inline const Viewport &getViewport() const{return mViewport;}
-	inline int getViewportX() const{return mViewport.x;}
-	inline int getViewportY() const{return mViewport.y;}
-	inline int getViewportWidth() const{return mViewport.width;}
-	inline int getViewportHeight() const{return mViewport.height;}
 
 	virtual void setClearFlags(int clearFlags){mClearFlags=clearFlags;}
 	inline int getClearFlags() const{return mClearFlags;}

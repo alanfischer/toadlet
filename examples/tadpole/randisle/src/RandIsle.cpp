@@ -70,7 +70,8 @@ void RandIsle::create(){
 	mFollowNode->attach(mFollower);
 	mScene->getRoot()->attach(mFollowNode);
 
-	mCamera=new AnaglyphCamera(mScene);
+	mCamera=new StereoscopicCamera();
+	shared_static_cast<StereoscopicCamera>(mCamera)->setCrossEyed(true);
 	mCamera->setAutoProjectionFov(Math::degToRad(Math::fromInt(60)),mCamera->getNearDist(),1024);
 	mCamera->setScope(~Scope_HUD | Scope_BIT_MAIN_CAMERA & ~Scope_BIT_WATER_TRANSPARENT);
 	mCamera->setDefaultState(mEngine->getMaterialManager()->createRenderState());
@@ -117,8 +118,9 @@ void RandIsle::create(){
 	mPredictedMaterial->getPass()->setBlendState(BlendState::Combination_ALPHA);
 
 	mRustleSound=new AudioComponent(mEngine);
-	mRustleSound->setAudioBuffer(Resources::instance->rustle);
+	mRustleSound->setAudioStream("C:\\users\\siralanf\\downloads\\angelswehrd.mid");//setAudioBuffer(Resources::instance->rustle);
 	mScene->getRoot()->attach(mRustleSound);
+	mRustleSound->play();
 	
 	mPlayer=new Node(mScene);
 	{

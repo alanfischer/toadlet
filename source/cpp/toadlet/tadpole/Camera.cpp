@@ -396,7 +396,7 @@ void Camera::updateClippingPlanes(){
 
 void Camera::autoUpdateProjection(RenderTarget *target){
 	int width=target->getWidth(),height=target->getHeight();
-	mViewport.set(0,0,width,height);
+	setViewport(Viewport(0,0,width,height));
 	if(width>=height){
 		Math::setMatrix4x4FromPerspectiveY(mProjectionMatrix,mFov,Math::div(Math::fromInt(width),Math::fromInt(height)),mNearDist,mFarDist);
 	}
