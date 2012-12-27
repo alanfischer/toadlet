@@ -51,9 +51,6 @@ public:
 	void setWindowRenderTargetFormat(WindowRenderTargetFormat::ptr format){mFormat=format;}
 	WindowRenderTargetFormat::ptr getWindowRenderTargetFormat() const{return mFormat;}
 
-	void setEngineOptions(int options){mEngineOptions=options;}
-	int getEngineOptions() const{return mEngineOptions;}
-
 	void setApplet(Applet *applet){mApplet=applet;}
 	Applet *getApplet() const{return mApplet;}
 

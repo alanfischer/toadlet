@@ -23,58 +23,54 @@
  *
  ********** Copyright header - do not remove **********/
 
-#include <toadlet/egg/Log.h>
-#include <toadlet/egg/Error.h>
-#include <toadlet/egg/io/DataStream.h>
-#include <toadlet/ribbit/AudioFormatConversion.h>
-#include "MODDecoder.h"
+#ifndef TOADLET_TADPOLE_STEREOSCOPICCAMERA_H
+#define TOADLET_TADPOLE_STEREOSCOPICCAMERA_H
+
+#include <toadlet/tadpole/Camera.h>
 
 namespace toadlet{
 namespace tadpole{
 
-MODDecoder::MODDecoder():
-	mFile(NULL)
-{
-	mFormat=AudioFormat::ptr(new AudioFormat(16,2,22050));
-}
+class TOADLET_API StereoscopicCamera:public Camera{
+public:
+	StereoscopicCamera();
 
-MODDecoder::~MODDecoder(){
-	if(mFile!=NULL){
-		ModPlug_Unload(mFile);
-	}
-}
+	void destroy();
 
-bool MODDecoder::openStream(Stream *stream){
-	if(mFile!=NULL){
-		ModPlug_Unload(mFile);
-	}
+	void setScope(int scope);
 
-	ModPlug_Settings settings;
-	ModPlug_GetSettings(&settings);
-	{
-		settings.mChannels=mFormat->getChannels();
-		settings.mBits=mFormat->getBitsPerSample();
-		settings.mFrequency=mFormat->getSamplesPerSecond();
-	}
-	ModPlug_SetSettings(&settings);
+	void setClearFlags(int clearFlags);
 
-	int length=stream->length();
-	tbyte *data=new tbyte[length];
-	stream->read(data,length);
-	mFile=ModPlug_Load(data,length);
-	delete[] data;
+	void setClearColor(const Vector4 &clearColor);
 
-	return mFile!=NULL;
-}
+	void setSkipFirstClear(bool skip);
 
-int MODDecoder::read(tbyte *buffer,int length){
-	return ModPlug_Read(mFile,buffer,length);
-}
+	void setDefaultState(RenderState *renderState);
 
-bool MODDecoder::reset(){
-	ModPlug_Seek(mFile,0);
-	return true;
-}
+	void setRenderTarget(RenderTarget *target);
+
+	void setViewport(const Viewport &viewport);
+
+	void setSeparation(scalar separation);
+	scalar getSeparation() const{return mSeparation;}
+
+	void setCrossEyed(bool crossEyed);
+	bool getCrossEyed() const{return mCrossEyed;}
+
+	void render(RenderDevice *device,Scene *scene,Node *node);
+
+protected:
+	void projectionUpdated();
+	void updateWorldTransform();
+
+	scalar mSeparation;
+	bool mCrossEyed;
+
+	Camera::ptr mLeftCamera;
+	Camera::ptr mRightCamera;
+};
 
 }
 }
+
+#endif

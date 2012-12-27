@@ -33,7 +33,8 @@
 	#include <wctype.h>
 #endif
 
-#define TOADLET_HAS_SWPRINTF
+/// @todo: This crashes for some reason
+//#define TOADLET_HAS_SWPRINTF
 #if defined(TOADLET_HAS_SWPRINTF)
 	#define TOADLET_SPRINTF(str,fmt,x) \
 		str.mLength=swprintf((wchar_t*)(str).mData,(str).mLength,L##fmt,x)

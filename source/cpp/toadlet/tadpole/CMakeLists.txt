@@ -35,6 +35,7 @@ set (TADPOLE_SRC
 	Skeleton.cpp
 	SkeletonComponent.cpp
 	SpriteComponent.cpp
+	StereoscopicCamera.cpp
 	Track.cpp
 	TextureManager.cpp
 	Version.cpp
@@ -239,6 +240,7 @@ set (TADPOLE_HDR
 	Skeleton.h
 	SkeletonComponent.h
 	SpriteComponent.h
+	StereoscopicCamera.h
 	TextureData.h
 	TextureManager.h
 	Traceable.h
