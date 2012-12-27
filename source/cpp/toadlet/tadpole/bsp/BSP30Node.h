@@ -29,9 +29,9 @@
 #include <toadlet/peeper/IndexData.h>
 #include <toadlet/peeper/VertexData.h>
 #include <toadlet/tadpole/Camera.h>
-#include <toadlet/tadpole/Traceable.h>
 #include <toadlet/tadpole/Renderable.h>
 #include <toadlet/tadpole/Visible.h>
+#include <toadlet/tadpole/PhysicsTraceable.h>
 #include <toadlet/tadpole/MeshComponent.h>
 #include <toadlet/tadpole/PartitionNode.h>
 #include <toadlet/tadpole/bsp/BSP30Map.h>
@@ -40,7 +40,7 @@ namespace toadlet{
 namespace tadpole{
 namespace bsp{
 
-class TOADLET_API BSP30Node:public PartitionNode,public Traceable,public Renderable{
+class TOADLET_API BSP30Node:public PartitionNode,public Renderable,public PhysicsTraceable{
 public:
 	TOADLET_OBJECT(BSP30Node);
 
@@ -71,15 +71,15 @@ public:
 	bool sensePotentiallyVisible(SensorResultsListener *listener,const Vector3 &point);
 	bool findAmbientForPoint(Vector4 &r,const Vector3 &point);
 
-	// Traceable items
-	Bound *getTraceableBound() const{return Node::getBound();}
-	void traceSegment(PhysicsCollision &result,const Vector3 &position,const Segment &segment,const Vector3 &size);
-
 	// Renderable items
 	Material *getRenderMaterial() const{return NULL;}
 	const Transform &getRenderTransform() const{return mWorldTransform;}
 	Bound *getRenderBound() const{return mWorldBound;}
 	void render(RenderManager *manager) const;
+
+	// Traceable items
+	Bound *getTraceableBound() const{return Node::getBound();}
+	void traceSegment(PhysicsCollision &result,const Vector3 &position,const Segment &segment,const Vector3 &size);
 
 protected:
 	void childTransformUpdated(Node *child);

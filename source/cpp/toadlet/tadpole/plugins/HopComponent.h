@@ -33,7 +33,7 @@
 namespace toadlet{
 namespace tadpole{
 
-class TOADLET_API HopComponent:public BaseComponent,public PhysicsComponent,public hop::CollisionListener,public hop::TraceCallback{
+class TOADLET_API HopComponent:public BaseComponent,public PhysicsComponent,public hop::CollisionListener,public hop::Traceable{
 public:
 	TOADLET_COMPONENT(HopComponent,PhysicsComponent);
 
@@ -63,7 +63,7 @@ public:
 	int getCollisionScope() const{return mSolid->getCollisionScope();}
 
 	void setBound(Bound *bound);
-	void setTraceable(Traceable *traceable);
+	void setTraceable(PhysicsTraceable *traceable);
 	void addShape(hop::Shape *shape);
 	void removeShape(hop::Shape *shape);
 
@@ -101,7 +101,7 @@ protected:
 	Vector3 mOldPosition,mNewPosition,mCurrentPosition;
 	bool mTransformChanged;
 	Bound::ptr mBound;
-	Traceable::ptr mTraceable;
+	PhysicsTraceable::ptr mTraceable;
 	hop::Shape::ptr mTraceableShape;
 };
 

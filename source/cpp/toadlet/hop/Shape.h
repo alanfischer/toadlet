@@ -28,7 +28,7 @@
 
 #include <toadlet/egg/Object.h>
 #include <toadlet/hop/Types.h>
-#include <toadlet/hop/TraceCallback.h>
+#include <toadlet/hop/Traceable.h>
 
 namespace toadlet{
 namespace hop{
@@ -45,7 +45,7 @@ public:
 		Type_SPHERE=		1<<1,
 		Type_CAPSULE=		1<<2,
 		Type_CONVEXSOLID=	1<<3,
-		Type_CALLBACK=		1<<4,
+		Type_TRACEABLE=		1<<4,
 	};
 
 	Shape();
@@ -53,7 +53,7 @@ public:
 	Shape(const Sphere &sphere);
 	Shape(const Capsule &capsule);
 	Shape(const ConvexSolid &convexSolid);
-	Shape(TraceCallback *callback);
+	Shape(Traceable *traceable);
 
 	void reset();
 
@@ -69,8 +69,8 @@ public:
 	void setConvexSolid(const ConvexSolid &convexSolid);
 	inline const ConvexSolid &getConvexSolid() const{return mConvexSolid;}
 
-	void setCallback(TraceCallback *callback);
-	inline TraceCallback *getCallback() const{return mCallback;}
+	void setTraceable(Traceable *traceable);
+	inline Traceable *getTraceable() const{return mTraceable;}
 
 	inline Type getType() const{return mType;}
 
@@ -82,7 +82,7 @@ protected:
 	Sphere mSphere;
 	Capsule mCapsule;
 	ConvexSolid mConvexSolid;
-	TraceCallback *mCallback;
+	Traceable *mTraceable;
 	Solid *mSolid;
 
 	Vector3 cache_getBound_r;

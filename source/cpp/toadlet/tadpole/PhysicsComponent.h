@@ -28,7 +28,7 @@
 
 #include <toadlet/tadpole/Component.h>
 #include <toadlet/tadpole/Bound.h>
-#include <toadlet/tadpole/Traceable.h>
+#include <toadlet/tadpole/PhysicsTraceable.h>
 #include <toadlet/tadpole/PhysicsCollisionListener.h>
 
 namespace toadlet{
@@ -44,7 +44,7 @@ public:
 	virtual void removeCollisionListener(PhysicsCollisionListener *listener)=0;
 
 	virtual void setBound(Bound *bound)=0;
-	virtual void setTraceable(Traceable *traceable)=0;
+	virtual void setTraceable(PhysicsTraceable *traceable)=0;
 
 	virtual void setPosition(const Vector3 &position)=0;
 	virtual const Vector3 &getPosition() const=0;

@@ -26,14 +26,14 @@
 #ifndef TOADLET_TADPOLE_DETAILTRACEABLE_H
 #define TOADLET_TADPOLE_DETAILTRACEABLE_H
 
-#include <toadlet/tadpole/Traceable.h>
+#include <toadlet/tadpole/PhysicsTraceable.h>
 
 namespace toadlet{
 namespace tadpole{
 
-// This is the same signature as a Traceable
+// This is the same signature as a PhysicsTraceable
 //  but a different interface to reinforce the fact that it's not to be used for physics tracing
-class DetailTraceable:public Traceable{
+class DetailTraceable:public PhysicsTraceable{
 public:
 	virtual ~DetailTraceable(){}
 };

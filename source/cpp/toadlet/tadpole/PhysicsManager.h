@@ -28,7 +28,7 @@
 
 #include <toadlet/tadpole/Types.h>
 #include <toadlet/tadpole/PhysicsCollision.h>
-#include <toadlet/tadpole/Traceable.h>
+#include <toadlet/tadpole/PhysicsTraceable.h>
 
 namespace toadlet{
 namespace tadpole{
@@ -43,7 +43,7 @@ public:
 	
 	virtual void setGravity(const Vector3 &gravity)=0;
 
-	virtual void setTraceable(Traceable *traceable)=0;
+	virtual void setTraceable(PhysicsTraceable *traceable)=0;
 
 	virtual void traceSegment(PhysicsCollision &result,const Segment &segment,int collideWithScope,Node *ignore)=0;
 	virtual void traceNode(PhysicsCollision &result,Node *node,const Segment &segment,int collideWithScope)=0;

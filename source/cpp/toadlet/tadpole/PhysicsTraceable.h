@@ -23,8 +23,8 @@
  *
  ********** Copyright header - do not remove **********/
 
-#ifndef TOADLET_TADPOLE_TRACEABLE_H
-#define TOADLET_TADPOLE_TRACEABLE_H
+#ifndef TOADLET_TADPOLE_PHYSICSTRACEABLE_H
+#define TOADLET_TADPOLE_PHYSICSTRACEABLE_H
 
 #include <toadlet/tadpole/Types.h>
 #include <toadlet/tadpole/Bound.h>
@@ -33,11 +33,11 @@
 namespace toadlet{
 namespace tadpole{
 
-class Traceable:public Interface{
+class PhysicsTraceable:public Interface{
 public:
-	TOADLET_INTERFACE(Traceable);
+	TOADLET_INTERFACE(PhysicsTraceable);
 
-	virtual ~Traceable(){}
+	virtual ~PhysicsTraceable(){}
 
 	virtual Bound *getTraceableBound() const=0;
 	virtual void traceSegment(PhysicsCollision &result,const Vector3 &position,const Segment &segment,const Vector3 &size)=0;

@@ -23,8 +23,8 @@
 #include <toadlet/peeper/IndexBuffer.h>
 #include <toadlet/peeper/VertexBuffer.h>
 #include <toadlet/tadpole/Renderable.h>
-#include <toadlet/tadpole/Traceable.h>
 #include <toadlet/tadpole/Visible.h>
+#include <toadlet/tadpole/PhysicsTraceable.h>
 #include <toadlet/tadpole/RenderManager.h>
 #include <toadlet/tadpole/BaseComponent.h>
 
@@ -32,7 +32,7 @@ namespace toadlet{
 namespace tadpole{
 namespace terrain{
 
-class TOADLET_API TerrainPatchComponent:public BaseComponent,public Visible,Renderable,public Traceable{
+class TOADLET_API TerrainPatchComponent:public BaseComponent,public Visible,Renderable,public PhysicsTraceable{
 public:
 	TOADLET_OBJECT(TerrainPatchComponent);
 

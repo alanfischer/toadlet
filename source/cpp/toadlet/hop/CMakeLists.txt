@@ -21,7 +21,7 @@ set (HOP_HDR
 	Shape.h
 	Simulator.h
 	Solid.h
-	TraceCallback.h
+	Traceable.h
 	Types.h
 	Version.h
 )
