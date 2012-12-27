@@ -125,7 +125,7 @@ void StereoscopicCamera::projectionUpdated(){
 
 	Matrix4x4 projectionMatrix;
 	projectionMatrix.set(mProjectionMatrix);
-	projectionMatrix.setAt(0,0,1/Math::atan(1/projectionMatrix.at(0,0))*2);
+	projectionMatrix.setAt(0,0,projectionMatrix.at(0,0)*2);
 
 	mLeftCamera->setProjectionMatrix(projectionMatrix);
 	mRightCamera->setProjectionMatrix(projectionMatrix);
