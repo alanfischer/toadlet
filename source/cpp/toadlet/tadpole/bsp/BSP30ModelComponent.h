@@ -28,9 +28,9 @@
 
 #include <toadlet/peeper/IndexData.h>
 #include <toadlet/peeper/VertexData.h>
-#include <toadlet/tadpole/Traceable.h>
 #include <toadlet/tadpole/Renderable.h>
 #include <toadlet/tadpole/Visible.h>
+#include <toadlet/tadpole/PhysicsTraceable.h>
 #include <toadlet/tadpole/BaseComponent.h>
 #include <toadlet/tadpole/bsp/BSP30Map.h>
 
@@ -38,7 +38,7 @@ namespace toadlet{
 namespace tadpole{
 namespace bsp{
 
-class TOADLET_API BSP30ModelComponent:public BaseComponent,public Traceable,public Visible{
+class TOADLET_API BSP30ModelComponent:public BaseComponent,public Visible,public PhysicsTraceable{
 public:
 	TOADLET_OBJECT(BSP30ModelComponent);
 

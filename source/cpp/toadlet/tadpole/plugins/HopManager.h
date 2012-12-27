@@ -29,7 +29,7 @@
 #include <toadlet/hop/Simulator.h>
 #include <toadlet/tadpole/PhysicsCollision.h>
 #include <toadlet/tadpole/PhysicsManager.h>
-#include <toadlet/tadpole/Traceable.h>
+#include <toadlet/tadpole/PhysicsTraceable.h>
 #include <toadlet/tadpole/sensor/BoundingVolumeSensor.h>
 
 namespace toadlet{
@@ -48,7 +48,7 @@ public:
 
 	void setGravity(const Vector3 &gravity);
 
-	void setTraceable(Traceable *traceable);
+	void setTraceable(PhysicsTraceable *traceable);
 
 	void traceSegment(PhysicsCollision &result,const Segment &segment,int collideWithScope,Node *ignore);
 	void traceNode(PhysicsCollision &result,Node *node,const Segment &segment,int collideWithScope);
@@ -107,7 +107,7 @@ protected:
 
 	Scene::ptr mScene;
 	hop::Simulator::ptr mSimulator;
-	Traceable *mTraceable;
+	PhysicsTraceable *mTraceable;
 	hop::Solid::ptr mSolid;
 
 	BoundingVolumeSensor::ptr mVolumeSensor;

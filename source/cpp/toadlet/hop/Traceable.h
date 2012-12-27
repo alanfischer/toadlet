@@ -23,8 +23,8 @@
  *
  ********** Copyright header - do not remove **********/
 
-#ifndef TOADLET_HOP_TRACECALLBACK_H
-#define TOADLET_HOP_TRACECALLBACK_H
+#ifndef TOADLET_HOP_TRACEABLE_H
+#define TOADLET_HOP_TRACEABLE_H
 
 #include <toadlet/hop/Collision.h>
 
@@ -33,10 +33,9 @@ namespace hop{
 
 class Solid;
 
-/// @todo: Rename this to Traceable?
-class TraceCallback{
+class Traceable{
 public:
-	virtual ~TraceCallback(){}
+	virtual ~Traceable(){}
 
 	virtual void getBound(AABox &result)=0;
 	virtual void traceSegment(Collision &result,const Vector3 &position,const Segment &segment)=0;

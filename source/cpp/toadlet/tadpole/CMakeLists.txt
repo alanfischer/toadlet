@@ -243,7 +243,7 @@ set (TADPOLE_HDR
 	StereoscopicCamera.h
 	TextureData.h
 	TextureManager.h
-	Traceable.h
+	PhysicsTraceable.h
 	Track.h
 	Transform.h
 	Transformable.h

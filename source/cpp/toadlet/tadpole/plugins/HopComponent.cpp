@@ -96,7 +96,7 @@ void HopComponent::setBound(Bound *bound){
 	}
 }
 
-void HopComponent::setTraceable(Traceable *traceable){
+void HopComponent::setTraceable(PhysicsTraceable *traceable){
 	if(mTraceable!=NULL){
 		removeShape(mTraceableShape);
 		mTraceableShape=NULL;

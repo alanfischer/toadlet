@@ -59,7 +59,7 @@ void HopManager::setGravity(const Vector3 &gravity){
 	mSimulator->setGravity(gravity);
 }
 
-void HopManager::setTraceable(Traceable *traceable){
+void HopManager::setTraceable(PhysicsTraceable *traceable){
 	mTraceable=traceable;
 }
 
@@ -171,7 +171,7 @@ void HopManager::traceSegment(hop::Collision &result,const Segment &segment,int 
 
 void HopManager::traceSolid(hop::Collision &result,hop::Solid *solid,const Segment &segment,int collideWithScope){
 	// Only trace shapes that aren't a callback
-	if(mTraceable!=NULL && (collideWithScope&mSolid->getCollisionScope())!=0 && (solid->getShapeTypes()&hop::Shape::Type_CALLBACK)==0){
+	if(mTraceable!=NULL && (collideWithScope&mSolid->getCollisionScope())!=0 && (solid->getShapeTypes()&hop::Shape::Type_TRACEABLE)==0){
 		PhysicsCollision collision;
 		const AABox &bound=solid->getLocalBound();
 		Vector3 size;

@@ -758,8 +758,8 @@ void Simulator::testSegment(Collision &result,const Segment &segment,Solid *soli
 			case Shape::Type_CONVEXSOLID:
 				Error::unimplemented("traceSegment not implemented for Type_CONVEXSOLID"); 
 			break;
-			case Shape::Type_CALLBACK:
-				shape->mCallback->traceSegment(collision,solid->mPosition,segment);
+			case Shape::Type_TRACEABLE:
+				shape->mTraceable->traceSegment(collision,solid->mPosition,segment);
 				modifyScope=true;
 			break;
 		}
@@ -977,12 +977,12 @@ void Simulator::testSolid(Collision &result,Solid *solid1,const Segment &segment
 			else if(shape1->mType==Shape::Type_CONVEXSOLID && shape2->mType==Shape::Type_CONVEXSOLID){
 				Error::unimplemented("from Type_CONVEXSOLID to Type_CONVEXSOLID unimplemented");
 			}
-			else if(shape1->mType==Shape::Type_CALLBACK && shape2->mType!=Shape::Type_CALLBACK){
+			else if(shape1->mType==Shape::Type_TRACEABLE && shape2->mType!=Shape::Type_TRACEABLE){
 				Segment isegment;
 				isegment.origin.set(solid2->mPosition);
 				Math::mul(isegment.direction,segment.direction,-Math::ONE);
 
-				shape1->mCallback->traceSolid(collision,solid2,segment.origin,isegment);
+				shape1->mTraceable->traceSolid(collision,solid2,segment.origin,isegment);
 
 				// This will do most of the inverting, but the point still needs to be recalculated,
 				//  since invert is mainly used for swapping reference solid
@@ -998,12 +998,12 @@ void Simulator::testSolid(Collision &result,Solid *solid1,const Segment &segment
 				#endif
 				modifyScope=true;
 			}
-			else if(shape1->mType!=Shape::Type_CALLBACK && shape2->mType==Shape::Type_CALLBACK){
-				shape2->mCallback->traceSolid(collision,solid1,solid2->mPosition,segment);
+			else if(shape1->mType!=Shape::Type_TRACEABLE && shape2->mType==Shape::Type_TRACEABLE){
+				shape2->mTraceable->traceSolid(collision,solid1,solid2->mPosition,segment);
 				modifyScope=true;
 			}
 
-			if(shape1->mType!=Shape::Type_CALLBACK && shape2->mType!=Shape::Type_CALLBACK && collision.time==0){
+			if(shape1->mType!=Shape::Type_TRACEABLE && shape2->mType!=Shape::Type_TRACEABLE && collision.time==0){
 				collision.scope=solid2->mScope;
 			}
 			if(collision.time==0){
