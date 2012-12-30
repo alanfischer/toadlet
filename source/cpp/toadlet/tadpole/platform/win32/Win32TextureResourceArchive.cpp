@@ -79,10 +79,10 @@ Resource::ptr Win32TextureResourceArchive::openResource(const String &name){
 	tbyte *textureData=new tbyte[textureFormat->getDataSize()];
 
 	int textureStride=textureFormat->getXPitch();
-	/// @todo: Figure out bitmapStride
-	int bitmapStride=textureStride;//((imageWidth*2+sizeof(DWORD)-1)>>2)<<2; // stride is in DWORDs
+	int bitmapHeight=bitmap.bmHeight;
+	int bitmapStride=((bitmap.bmWidth*2+sizeof(DWORD)-1)>>2)<<2; // stride is in DWORDs
 
-	tbyte *bitmapData=new tbyte[bitmapStride*textureHeight];
+	tbyte *bitmapData=new tbyte[bitmapStride*bitmapHeight];
 	if(textureData==NULL || bitmapData==NULL){
 		delete[] textureData;
 		DeleteObject(hbitmap);
