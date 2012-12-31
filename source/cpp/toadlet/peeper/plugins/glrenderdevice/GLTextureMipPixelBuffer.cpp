@@ -34,6 +34,7 @@ GLTextureMipPixelBuffer::GLTextureMipPixelBuffer(GLTexture *texture,GLuint level
 	mTexture(NULL),
 	mLevel(0),
 	mCubeSide(0),
+	mUsage(0),
 	//mFormat,
 	mDataSize(0)
 {
@@ -48,6 +49,7 @@ GLTextureMipPixelBuffer::GLTextureMipPixelBuffer(GLTexture *texture,GLuint level
 		l--;
 	}
 
+	mUsage=texture->getUsage()&(Usage_BIT_STATIC|Usage_BIT_STREAM|Usage_BIT_DYNAMIC|Usage_BIT_STAGING);
 	mFormat=new TextureFormat(texture->getFormat());
 	mFormat->setSize(w,h,d);
 	mDataSize=mFormat->getDataSize();

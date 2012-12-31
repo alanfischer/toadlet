@@ -46,10 +46,6 @@ D3D9TextureMipPixelBuffer::~D3D9TextureMipPixelBuffer(){
 	destroy();
 }
 
-bool D3D9TextureMipPixelBuffer::create(int usage,int access,TextureFormat::ptr format){
-	return false;
-}
-
 void D3D9TextureMipPixelBuffer::destroy(){
 	resetDestroy();
 }
