@@ -118,7 +118,7 @@ void RandIsle::create(){
 	mPredictedMaterial->getPass()->setBlendState(BlendState::Combination_ALPHA);
 
 	mRustleSound=new AudioComponent(mEngine);
-	mRustleSound->setAudioStream("C:\\users\\siralanf\\downloads\\angelswehrd.mid");//setAudioBuffer(Resources::instance->rustle);
+	mRustleSound->setAudioBuffer(Resources::instance->rustle);
 	mScene->getRoot()->attach(mRustleSound);
 	mRustleSound->play();
 	

@@ -42,13 +42,10 @@ DecalShadowRenderManager::~DecalShadowRenderManager(){
 }
 
 void DecalShadowRenderManager::renderScene(RenderDevice *device,Node *node,Camera *camera){
-/// @todo:
-/*
-	gatherRenderables(mRenderableSet,node,camera);
-	renderRenderables(mRenderableSet,device,camera);
+	SimpleRenderManager::renderScene(device,node,camera);
 
 	RenderableSet *set=mRenderableSet;
-	LightNode *light=NULL;
+	LightComponent *light=NULL;
 	if(set->getLightQueue().size()>0){
 		light=set->getLightQueue()[0].light;
 	}
@@ -57,10 +54,9 @@ void DecalShadowRenderManager::renderScene(RenderDevice *device,Node *node,Camer
 		return;
 	}
 
-	const LightState &state=light->getLightState();
-
-	mShadowMaterial->setupRenderDevice(device);
-
+	LightState state;
+	light->getLightState(state);
+/*
 	int i,j;
 	for(i=0;i<set->getNumRenderableQueues();++i){
 		const RenderableSet::RenderableQueue &queue=set->getRenderableQueue(i);

@@ -57,8 +57,7 @@ public:
 	void resetCreate(){}
 	void resetDestroy(){}
 
-	/// @todo: implement
-	int getUsage() const{return 0;}
+	int getUsage() const{return mUsage;}
 	int getAccess() const{return 0;}
 	TextureFormat::ptr getTextureFormat() const{return mFormat;}
 	int getDataSize() const{return mDataSize;}
@@ -79,6 +78,7 @@ protected:
 	GLTexture *mTexture;
 	GLuint mLevel;
 	GLuint mCubeSide;
+	int mUsage;
 	TextureFormat::ptr mFormat;
 	int mDataSize;
 
