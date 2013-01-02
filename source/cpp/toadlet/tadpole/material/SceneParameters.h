@@ -60,9 +60,9 @@ public:
 	inline void setViewport(Viewport viewport){mViewport=viewport;}
 	inline const Viewport &getViewport() const{return mViewport;}
 
-	inline void setModelMatrix(const Matrix4x4 &matrix){mModelMatrix.set(matrix);}
-	inline const Matrix4x4 &getModelMatrix() const{return mModelMatrix;}
-	
+	inline void setMatrix(RenderDevice::MatrixType type,const Matrix4x4 &matrix){mMatrixes[type].set(matrix);}
+	inline const Matrix4x4 &getMatrix(RenderDevice::MatrixType type) const{return mMatrixes[type];}
+
 	inline void setRenderable(Renderable *renderable){mRenderable=renderable;}
 	inline Renderable *getRenderable() const{return mRenderable;}
 
@@ -84,14 +84,14 @@ public:
 	inline void setLightState(const LightState &state){mLightState.set(state);}
 	inline const LightState &getLightState() const{return mLightState;}
 
-	inline void setAmbient(const Vector4 &ambient){mAmbient.set(ambient);}
-	inline const Vector4 &getAmbient() const{return mAmbient;}
+	inline void setAmbientColor(const Vector4 &color){mAmbientColor.set(color);}
+	inline const Vector4 &getAmbientColor() const{return mAmbientColor;}
 
 protected:
 	Scene *mScene;
 	Camera *mCamera;
 	Viewport mViewport;
-	Matrix4x4 mModelMatrix;
+	Matrix4x4 mMatrixes[RenderDevice::MatrixType_MAX];
 	Renderable *mRenderable;
 	RenderPass *mRenderPass;
 
@@ -100,7 +100,7 @@ protected:
 	FogState mFogState;
 
 	LightState mLightState;
-	Vector4 mAmbient;
+	Vector4 mAmbientColor;
 };
 
 }

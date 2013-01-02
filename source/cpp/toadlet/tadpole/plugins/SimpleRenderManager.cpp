@@ -36,15 +36,16 @@ namespace tadpole{
 SimpleRenderManager::SimpleRenderManager(Scene *scene):
 	mScene(scene),
 	mDevice(NULL),
-	//mSceneParameters,
+	mCamera(NULL),
+	//mParams,
 	//mRenderableSet,
 	mLastPass(NULL),
 	mLastRenderState(NULL),
 	mLastShaderState(NULL)
 {
 	mRenderableSet=RenderableSet::ptr(new RenderableSet(scene));
-	mSceneParameters=new SceneParameters();
-	mSceneParameters->setScene(scene);
+	mParams=new SceneParameters();
+	mParams->setScene(scene);
 }
 
 SimpleRenderManager::~SimpleRenderManager(){
@@ -54,50 +55,60 @@ void SimpleRenderManager::renderScene(RenderDevice *device,Node *node,Camera *ca
 	TOADLET_PROFILE_AUTOSCOPE();
 
 	mDevice=device;
-	mSceneParameters->setCamera(camera);
+	mCamera=camera;
 
 	gatherRenderables(mRenderableSet,node,camera);
 
 	RenderTarget *target=camera->getRenderTarget();
 	device->setRenderTarget(target!=NULL?target:device->getPrimaryRenderTarget());
 
-	setupViewport(camera,device);
+	Viewport viewport=camera->getViewport();
+	if(viewport.empty){
+		viewport.width=device->getRenderTarget()->getWidth();
+		viewport.height=device->getRenderTarget()->getHeight();
+	}
+	device->setViewport(viewport);
+	mParams->setViewport(viewport);
+
+	mParams->setCamera(camera);
 
 	renderRenderables(mRenderableSet,device,camera);
 
-	mSceneParameters->setCamera(NULL);
+	mParams->setCamera(NULL);
 
 	mLastPass=NULL;
 	mLastRenderState=NULL;
 	mLastShaderState=NULL;
 	mDevice=NULL;
+	mCamera=NULL;
 }
 
-void SimpleRenderManager::setupPass(RenderPass *pass){
-	mSceneParameters->setRenderPass(pass);
+void SimpleRenderManager::setupPass(RenderPass *pass,RenderDevice *device){
+	mParams->setRenderPass(pass);
 
-	pass->updateVariables(Material::Scope_MATERIAL,mSceneParameters);
+	pass->updateVariables(Material::Scope_MATERIAL,mParams);
 
 	if(mLastShaderState==NULL || mLastShaderState!=pass->getShaderState()){
 		mLastShaderState=pass->getShaderState();
-		mDevice->setShaderState(mLastShaderState);
+		device->setShaderState(mLastShaderState);
 	}
 	if(mLastRenderState==NULL || mLastRenderState!=pass->getRenderState()){
 		mLastRenderState=pass->getRenderState();
-		mDevice->setRenderState(mLastRenderState);
-		mSceneParameters->setRenderState(mLastRenderState);
+		device->setRenderState(mLastRenderState);
+		mParams->setRenderState(mLastRenderState);
 	}
 
-	setupTextures(pass,Material::Scope_MATERIAL,mDevice);
-	setupVariableBuffers(pass,Material::Scope_MATERIAL,mDevice);
+	setupTextures(pass,Material::Scope_MATERIAL,device);
+	setupVariableBuffers(pass,Material::Scope_MATERIAL,device);
 
 	mLastPass=pass;
 }
 
-void SimpleRenderManager::setupPassForRenderable(RenderPass *pass,Renderable *renderable,const Vector4 &ambient){
+void SimpleRenderManager::setupPassForRenderable(RenderPass *pass,RenderDevice *device,Renderable *renderable,const Vector4 &ambient){
+	Camera *camera=mCamera;
+
 	Matrix4x4 matrix;
 	renderable->getRenderTransform().getMatrix(matrix);
-	Camera *camera=mSceneParameters->getCamera();
 
 	// This should exist as a RenderVariable, but to support fixed devices it is calculated here
 	int flags=pass->getModelMatrixFlags();
@@ -110,7 +121,7 @@ void SimpleRenderManager::setupPassForRenderable(RenderPass *pass,Renderable *re
 		Math::setScaleFromMatrix4x4(scale,matrix);
 
 		if((flags&Material::MatrixFlag_CAMERA_ALIGNED)!=0){
-			if(mSceneParameters->getCamera()->getAlignmentCalculationsUseOrigin()){
+			if(camera->getAlignmentCalculationsUseOrigin()){
 				Matrix4x4 lookAtCamera;
 				Math::setMatrix4x4FromLookAt(lookAtCamera,camera->getPosition(),translate,Math::Z_UNIT_VECTOR3,false);
 				Math::setQuaternionFromMatrix4x4(rotate,lookAtCamera);
@@ -132,20 +143,20 @@ void SimpleRenderManager::setupPassForRenderable(RenderPass *pass,Renderable *re
 		Math::setMatrix4x4FromTranslateRotateScale(matrix,translate,rotate,scale);
 	}
 
-	// Fixed states
-	mDevice->setMatrix(RenderDevice::MatrixType_MODEL,matrix);
-	mDevice->setAmbientColor(ambient);
+	device->setMatrix(RenderDevice::MatrixType_MODEL,matrix);
+	mParams->setMatrix(RenderDevice::MatrixType_MODEL,matrix);
+
+	device->setAmbientColor(ambient);
+	mParams->setAmbientColor(ambient);
 
 	// Shader states
 	if(pass!=NULL){
-		mSceneParameters->setModelMatrix(matrix);
-		mSceneParameters->setRenderable(renderable);
-		mSceneParameters->setAmbient(ambient);
+		mParams->setRenderable(renderable);
 
-		pass->updateVariables(Material::Scope_RENDERABLE,mSceneParameters);
-		setupVariableBuffers(pass,Material::Scope_RENDERABLE,mDevice);
+		pass->updateVariables(Material::Scope_RENDERABLE,mParams);
+		setupVariableBuffers(pass,Material::Scope_RENDERABLE,device);
 	
-		mSceneParameters->setRenderable(NULL);
+		mParams->setRenderable(NULL);
 	}
 }
 
@@ -170,15 +181,20 @@ void SimpleRenderManager::renderRenderables(RenderableSet *set,RenderDevice *dev
 		device->clear(clearFlags,camera->getClearColor());
 	}
 
-	device->setMatrix(RenderDevice::MatrixType_PROJECTION,camera->getProjectionMatrix());
 	device->setMatrix(RenderDevice::MatrixType_VIEW,camera->getViewMatrix());
+	mParams->setMatrix(RenderDevice::MatrixType_VIEW,camera->getViewMatrix());
+
+	device->setMatrix(RenderDevice::MatrixType_PROJECTION,camera->getProjectionMatrix());
+	mParams->setMatrix(RenderDevice::MatrixType_PROJECTION,camera->getProjectionMatrix());
+
 	device->setMatrix(RenderDevice::MatrixType_MODEL,Math::IDENTITY_MATRIX4X4);
+	mParams->setMatrix(RenderDevice::MatrixType_MODEL,Math::IDENTITY_MATRIX4X4);
 
 	if(useMaterials){
 		device->setDefaultState();
 		if(camera->getDefaultState()!=NULL){
 			device->setRenderState(camera->getDefaultState());
-			mSceneParameters->setRenderState(camera->getDefaultState());
+			mParams->setRenderState(camera->getDefaultState());
 		}
 	}
 
@@ -233,39 +249,30 @@ void SimpleRenderManager::renderDepthSortedRenderables(const RenderableSet::Rend
 /// @todo: We should see if the Pass is a Fixed or Shader pass, in which case we either set Fixed states, or setupRenderVariables
 ///  And then maybe set Fixed states should be moved the pass, like setupRenderVariables
 void SimpleRenderManager::renderQueueItems(Material *material,const RenderableSet::RenderableQueueItem *items,int numItems){
+	Camera *camera=mCamera;
 	RenderPath *path=(material!=NULL)?material->getBestPath():NULL;
 	int numPasses=(path!=NULL?path->getNumPasses():1);
 	int i,j;
 	for(i=0;i<numPasses;++i){
 		RenderPass *pass=(path!=NULL)?path->getPass(i):NULL;
 		if(pass!=NULL){
-			setupPass(pass);
+			setupPass(pass,mDevice);
 		}
 
 		for(j=0;j<numItems;++j){
 			const RenderableSet::RenderableQueueItem &item=items[j];
 			if(pass!=NULL){
-				setupPassForRenderable(pass,item.renderable,item.ambient);
+				setupPassForRenderable(pass,mDevice,item.renderable,item.ambient);
 			}
 			item.renderable->render(this);
 		}
 
-		if(mSceneParameters->getCamera()->getDefaultState()!=NULL){
-			mDevice->setRenderState(mSceneParameters->getCamera()->getDefaultState());
-			mSceneParameters->setRenderState(mSceneParameters->getCamera()->getDefaultState());
+		if(camera->getDefaultState()!=NULL){
+			mDevice->setRenderState(camera->getDefaultState());
+			mParams->setRenderState(camera->getDefaultState());
 			mLastRenderState=NULL;
 		}
 	}
-}
-
-void SimpleRenderManager::setupViewport(Camera *camera,RenderDevice *device){
-	Viewport viewport=camera->getViewport();
-	if(viewport.x==0 && viewport.y==0 && viewport.width==0 && viewport.height==0){
-		viewport.width=device->getRenderTarget()->getWidth();
-		viewport.height=device->getRenderTarget()->getHeight();
-	}
-	device->setViewport(viewport);
-	mSceneParameters->setViewport(viewport);
 }
 
 /// @todo: Clean this up to handle multiple lights in shader passes
@@ -275,7 +282,7 @@ void SimpleRenderManager::setupLights(const RenderableSet::LightQueue &lightQueu
 
 		LightState state;
 		light->getLightState(state);
-		mSceneParameters->setLightState(state);
+		mParams->setLightState(state);
 	}
 
 	RenderCaps caps;

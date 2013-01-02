@@ -39,8 +39,8 @@ public:
 	virtual ~RenderManager(){}
 
 	virtual void renderScene(RenderDevice *device,Node *node,Camera *camera)=0;
-	virtual void setupPass(RenderPass *pass)=0;
-	virtual void setupPassForRenderable(RenderPass *pass,Renderable *renderable,const Vector4 &ambient)=0;
+	virtual void setupPass(RenderPass *pass,RenderDevice *device)=0;
+	virtual void setupPassForRenderable(RenderPass *pass,RenderDevice *device,Renderable *renderable,const Vector4 &ambient)=0;
 
 	virtual RenderDevice *getDevice()=0;
 };
