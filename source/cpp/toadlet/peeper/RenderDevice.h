@@ -78,6 +78,7 @@ public:
 		MatrixType_PROJECTION,
 		MatrixType_VIEW,
 		MatrixType_MODEL,
+		MatrixType_MAX,
 	};
 
 	virtual ~RenderDevice(){}

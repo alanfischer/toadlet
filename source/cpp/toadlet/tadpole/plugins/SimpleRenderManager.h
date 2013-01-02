@@ -41,8 +41,8 @@ public:
 
 	virtual void renderScene(RenderDevice *device,Node *node,Camera *camera);
 	virtual RenderDevice *getDevice(){return mDevice;}
-	virtual void setupPass(RenderPass *pass);
-	virtual void setupPassForRenderable(RenderPass *pass,Renderable *renderable,const Vector4 &ambient);
+	virtual void setupPass(RenderPass *pass,RenderDevice *device);
+	virtual void setupPassForRenderable(RenderPass *pass,RenderDevice *device,Renderable *renderable,const Vector4 &ambient);
 
 protected:
 	virtual void gatherRenderables(RenderableSet *set,Node *node,Camera *camera);
@@ -50,14 +50,14 @@ protected:
 	virtual void renderDepthSortedRenderables(const RenderableSet::RenderableQueue &queue,bool useMaterials);
 	virtual void renderQueueItems(Material *material,const RenderableSet::RenderableQueueItem *items,int numItems);
 
-	void setupViewport(Camera *camera,RenderDevice *device);
 	void setupLights(const RenderableSet::LightQueue &lightQueue,RenderDevice *device);
 	void setupTextures(RenderPass *pass,int scope,RenderDevice *device);
 	void setupVariableBuffers(RenderPass *pass,int scope,RenderDevice *device);
 
 	Scene *mScene;
 	RenderDevice *mDevice;
-	SceneParameters::ptr mSceneParameters;
+	Camera *mCamera;
+	SceneParameters::ptr mParams;
 	RenderableSet::ptr mRenderableSet;
 	RenderPass *mLastPass;
 	RenderState *mLastRenderState;

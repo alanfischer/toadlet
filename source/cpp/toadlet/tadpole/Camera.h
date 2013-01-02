@@ -115,7 +115,6 @@ public:
 
 	inline const Matrix4x4 &getWorldMatrix() const{return mWorldMatrix;}
 	inline const Matrix4x4 &getViewMatrix() const{return mViewMatrix;}
-	inline const Matrix4x4 &getViewProjectionMatrix() const{return mViewProjectionMatrix;}
 	inline const Vector3 &getForward() const{return mForward;}
 	inline const Vector3 &getRight() const{return mRight;}
 	inline const Vector3 &getUp() const{return mUp;}

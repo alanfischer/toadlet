@@ -71,12 +71,13 @@ public:
 	int getFormat(){return VariableBufferFormat::Format_TYPE_FLOAT_32|VariableBufferFormat::Format_COUNT_4X4|VariableBufferFormat::Format_BIT_PROJECTION;}
 
 	void update(tbyte *data,SceneParameters *parameters){
-		Math::mul(mMVPMatrix,parameters->getCamera()->getViewProjectionMatrix(),parameters->getModelMatrix());
+		Math::mul(mViewProjectionMatrix,parameters->getMatrix(RenderDevice::MatrixType_PROJECTION),parameters->getMatrix(RenderDevice::MatrixType_VIEW));
+		Math::mul(mMVPMatrix,mViewProjectionMatrix,parameters->getMatrix(RenderDevice::MatrixType_MODEL));
 		memcpy(data,mMVPMatrix.getData(),sizeof(Matrix4x4));
 	}
 
 protected:
-	Matrix4x4 mMVPMatrix,mModelMatrix;
+	Matrix4x4 mMVPMatrix,mViewProjectionMatrix;
 };
 
 class MVMatrixVariable:public RenderVariable{
@@ -86,7 +87,7 @@ public:
 	int getFormat(){return VariableBufferFormat::Format_TYPE_FLOAT_32|VariableBufferFormat::Format_COUNT_4X4;}
 
 	void update(tbyte *data,SceneParameters *parameters){
-		Math::mul(mMVMatrix,parameters->getCamera()->getViewMatrix(),parameters->getModelMatrix());
+		Math::mul(mMVMatrix,parameters->getMatrix(RenderDevice::MatrixType_VIEW),parameters->getMatrix(RenderDevice::MatrixType_MODEL));
 		memcpy(data,mMVMatrix.getData(),sizeof(Matrix4x4));
 	}
 
@@ -101,7 +102,7 @@ public:
 	int getFormat(){return VariableBufferFormat::Format_TYPE_FLOAT_32|VariableBufferFormat::Format_COUNT_4X4;}
 
 	void update(tbyte *data,SceneParameters *parameters){
-		memcpy(data,parameters->getModelMatrix().getData(),sizeof(Matrix4x4));
+		memcpy(data,parameters->getMatrix(RenderDevice::MatrixType_MODEL).getData(),sizeof(Matrix4x4));
 	}
 
 protected:
@@ -115,7 +116,7 @@ public:
 	int getFormat(){return VariableBufferFormat::Format_TYPE_FLOAT_32|VariableBufferFormat::Format_COUNT_4X4;}
 
 	void update(tbyte *data,SceneParameters *parameters){
-		memcpy(data,parameters->getCamera()->getViewMatrix().getData(),sizeof(Matrix4x4));
+		memcpy(data,parameters->getMatrix(RenderDevice::MatrixType_VIEW).getData(),sizeof(Matrix4x4));
 	}
 };
 
@@ -126,7 +127,7 @@ public:
 	int getFormat(){return VariableBufferFormat::Format_TYPE_FLOAT_32|VariableBufferFormat::Format_COUNT_4X4|VariableBufferFormat::Format_BIT_PROJECTION;}
 
 	void update(tbyte *data,SceneParameters *parameters){
-		memcpy(data,parameters->getCamera()->getProjectionMatrix().getData(),sizeof(Matrix4x4));
+		memcpy(data,parameters->getMatrix(RenderDevice::MatrixType_PROJECTION).getData(),sizeof(Matrix4x4));
 	}
 };
 
@@ -137,7 +138,7 @@ public:
 	int getFormat(){return VariableBufferFormat::Format_TYPE_FLOAT_32|VariableBufferFormat::Format_COUNT_4X4;}
 
 	void update(tbyte *data,SceneParameters *parameters){
-		Math::mul(mNormalMatrix,parameters->getCamera()->getViewMatrix(),parameters->getModelMatrix());
+		Math::mul(mNormalMatrix,parameters->getMatrix(RenderDevice::MatrixType_VIEW),parameters->getMatrix(RenderDevice::MatrixType_MODEL));
 		Math::zeroTranslateSheer(mNormalMatrix);
 		Math::invert(mInverseMatrix,mNormalMatrix);
 		Math::transpose(mNormalMatrix,mInverseMatrix);
@@ -153,8 +154,7 @@ public:
 	int getFormat(){return VariableBufferFormat::Format_TYPE_FLOAT_32|VariableBufferFormat::Format_COUNT_4;}
 
 	void update(tbyte *data,SceneParameters *parameters){
-		Vector4 &cameraPosition=*(Vector4*)data;
-		cameraPosition=Vector4(parameters->getCamera()->getPosition(),0);
+		memcpy(data,&Vector4(parameters->getCamera()->getPosition(),0),sizeof(Vector4));
 	}
 };
 
@@ -163,10 +163,7 @@ public:
 	int getFormat(){return VariableBufferFormat::Format_TYPE_FLOAT_32|VariableBufferFormat::Format_COUNT_4;}
 
 	void update(tbyte *data,SceneParameters *parameters){
-		// This Vector4 isn't aligned, so we don't multiply directly into it.
-		Vector4 &finalLightPosition=*(Vector4*)data;
-		Vector4 lightPosition(parameters->getLightState().direction,0);
-		finalLightPosition=lightPosition;
+		memcpy(data,&Vector4(parameters->getLightState().direction,0),sizeof(Vector4));
 	}
 };
 
@@ -178,7 +175,7 @@ public:
 		// This Vector4 isn't aligned, so we don't multiply directly into it.
 		Vector4 &finalLightPosition=*(Vector4*)data;
 		Vector4 lightPosition(parameters->getLightState().direction,0);
-		Math::mul(lightPosition,parameters->getCamera()->getViewMatrix());
+		Math::mul(lightPosition,parameters->getMatrix(RenderDevice::MatrixType_VIEW));
 		finalLightPosition=lightPosition;
 	}
 };
@@ -206,7 +203,7 @@ public:
 	int getFormat(){return VariableBufferFormat::Format_TYPE_FLOAT_32|VariableBufferFormat::Format_COUNT_4;}
 
 	void update(tbyte *data,SceneParameters *parameters){
-		memcpy(data,parameters->getAmbient().getData(),sizeof(Vector4));
+		memcpy(data,parameters->getAmbientColor().getData(),sizeof(Vector4));
 	}
 };
 
