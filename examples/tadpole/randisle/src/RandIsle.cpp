@@ -1,11 +1,11 @@
 #include "RandIsle.h"
 #include "PathClimber.h"
 #include "TreeSystem.h"
-#include "GroundProjector.h"
 #include "HUD.h"
 #include "Resources.h"
 #include <toadlet/tadpole/plugins/HopManager.h>
 #include <toadlet/tadpole/plugins/HopComponent.h>
+#include <toadlet/tadpole/plugins/DecalShadowRenderManager.h>
 
 #define TREE_CAMERA_DISTANCE 80
 
@@ -45,6 +45,7 @@ void RandIsle::create(){
 	mScene->setUpdateListener(this);
 	mScene->setRangeLogicDT(50,50);
 	mScene->setExcessiveDT(600);
+	mScene->setRenderManager(new DecalShadowRenderManager(mScene));
 
 	Simulator *simulator=((HopManager*)mScene->getPhysicsManager())->getSimulator();
 	simulator->setGravity(Vector3(0,0,-50));
@@ -157,17 +158,6 @@ void RandIsle::create(){
 			jumpAction->setStopGently(true);
 		}
 		mPlayer->attach(new ActionComponent("jump",jumpAction));
-
-		Node::ptr shadow=new Node(mScene);
-		{
-			MeshComponent *shadowMesh=new MeshComponent(mEngine);
-			if(Resources::instance->shadow!=NULL){
-				shadowMesh->setMesh(Resources::instance->shadow);
-			}
-			shadow->attach(shadowMesh);
-			shadow->attach(new GroundProjector(mPlayer,20,0));
-		}
-		mPlayer->attach(shadow);
 	}
  	mScene->getRoot()->attach(mPlayer);
 

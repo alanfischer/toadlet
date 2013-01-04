@@ -84,25 +84,6 @@ public:
 			creature->setTransform(transform);
 		}
 
-		Log::alert("Loading shadow");
-
-		TextureFormat::ptr pointFormat=new TextureFormat(TextureFormat::Dimension_D2,TextureFormat::Format_A_8,128,128,1,0);
-		tbyte *pointData=createPoint(pointFormat);
-		Texture::ptr pointTexture=engine->getTextureManager()->createTexture(pointFormat,pointData);
-		delete[] pointData;
-
-		shadow=engine->createAABoxMesh(AABox(-4,-4,0,4,4,0));
-		{
-			Material::ptr material=engine->createDiffuseMaterial(pointTexture);
-			material->getPass()->setBlendState(BlendState(BlendState::Operation_ONE_MINUS_SOURCE_ALPHA,BlendState::Operation_SOURCE_ALPHA));
-			material->getPass()->setDepthState(DepthState(DepthState::DepthTest_LEQUAL,false));
-			material->getPass()->setMaterialState(MaterialState(Colors::BLACK));
-			// We want it rendered before the water, but on the water layer
-			material->setSort(Material::SortType_MATERIAL);
-			material->setLayer(-1);
-			shadow->getSubMesh(0)->material=material;
-		}
-
 		Log::alert("Loading grass");
 
 		grass=shared_static_cast<Mesh>(engine->getMeshManager()->find("tall_grass.tmsh"));
@@ -168,7 +149,7 @@ public:
 		}
 
 		// HUD
-		hudFade=engine->createDiffuseMaterial(pointTexture);
+//		hudFade=engine->createDiffuseMaterial(pointTexture);
 		/// TODO
 /*		hudFade->getPass()->setSamplerState(0,SamplerState(
 			SamplerState::FilterType_LINEAR,SamplerState::FilterType_LINEAR,SamplerState::FilterType_LINEAR,
@@ -199,7 +180,6 @@ public:
 		return true;
 	}
 
-	static tbyte *createPoint(TextureFormat *format);
 	static tbyte *createNoise(TextureFormat *format,int scale,int seed,scalar brightnessScale,scalar brightnessOffset);
 
 	static Resources *instance;
@@ -215,7 +195,6 @@ public:
 	PixelBufferRenderTarget::ptr reflectTarget,refractTarget;
 	Material::ptr waterMaterial;
 	Mesh::ptr creature;
-	Mesh::ptr shadow;
 	Mesh::ptr grass;
 	Material::ptr treeBranch;
 	Material::ptr treeLeaf;

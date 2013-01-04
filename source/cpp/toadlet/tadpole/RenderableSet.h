@@ -76,6 +76,7 @@ public:
 
 	typedef Collection<RenderableQueueItem> RenderableQueue;
 	typedef Collection<LightQueueItem> LightQueue;
+	typedef Collection<Node*> NodeQueue;
 	typedef Map<Material*,int> MaterialToQueueIndexMap;
 	typedef Map<int,int> LayerToQueueIndexMap;
 	typedef Collection<int> IndexCollection;
@@ -86,6 +87,7 @@ public:
 	virtual void setCamera(Camera *camera){mCamera=camera;}
 	virtual void startQueuing();
 	virtual void endQueuing();
+	virtual void queueNode(Node *node);
 	virtual void queueRenderable(Renderable *renderable);
 	virtual void queueLight(LightComponent *light);
 
@@ -95,6 +97,8 @@ public:
 	inline const IndexCollection &getLayeredMaterialQueueIndexes() const{return mLayeredMaterialQueueIndexes;}
 	inline const IndexCollection &getLayeredDepthQueueIndexes() const{return mLayeredDepthQueueIndexes;}
 	inline const LightQueue &getLightQueue(){return mLightQueue;}
+	inline const NodeQueue &getNodeQueue(){return mNodeQueue;}
+	inline void setGatherNodes(bool gather){mGatherNodes=gather;}
 
 protected:
 	Scene *mScene;
@@ -107,6 +111,8 @@ protected:
 	IndexCollection mLayeredMaterialQueueIndexes;
 	IndexCollection mLayeredDepthQueueIndexes;
 	LightQueue mLightQueue;
+	NodeQueue mNodeQueue;
+	bool mGatherNodes;
 };
 
 }
