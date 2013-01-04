@@ -31,8 +31,8 @@
 namespace toadlet{
 namespace tadpole{
 
-DecalShadowRenderManager::DecalShadowRenderManager(Scene *scene):
-	SimpleRenderManager(scene)
+DecalShadowRenderManager::DecalShadowRenderManager(Scene *scene):SimpleRenderManager(scene),
+	mShadowScope(-1)
 {
 	mRenderableSet->setGatherNodes(true);
 
@@ -99,15 +99,43 @@ void DecalShadowRenderManager::renderScene(RenderDevice *device,Node *node,Camer
 
 		for(ni=0;ni<set->getNodeQueue().size();++ni){
 			Node *node=set->getNodeQueue().at(ni);
-			Matrix4x4 matrix;
-			node->getWorldTransform().getMatrix(matrix);
 
-			mDevice->setMatrix(RenderDevice::MatrixType_MODEL,matrix);
-			mParams->setMatrix(RenderDevice::MatrixType_MODEL,matrix);
+			if((node->getScope()&mShadowScope)!=0){
+				Matrix4x4 matrix;
+				Matrix3x3 rotate;
 
-			setupVariableBuffers(pass,Material::Scope_RENDERABLE,mDevice);
+				float mDistance=10;
+				float mOffset=0.01;
 
-			mDevice->renderPrimitive(mVertexData,mIndexData);
+				Segment segment;
+				segment.origin.set(node->getWorldTranslate());
+				Math::mul(segment.direction,Math::NEG_Z_UNIT_VECTOR3,mDistance);
+				PhysicsCollision result;
+				mScene->traceSegment(result,segment,-1,node);
+
+				if(result.time<Math::ONE){
+					Math::madd(result.point,result.normal,mOffset,result.point);
+	
+					Vector3 right,forward,up;
+					Math::mul(forward,node->getWorldRotate(),Math::Y_UNIT_VECTOR3);
+					up.set(result.normal);
+					Math::cross(right,forward,up);
+					Math::normalize(right);
+					Math::cross(forward,up,right);
+					Math::setMatrix3x3FromAxes(rotate,right,forward,up);
+				}
+
+				scalar scale=Math::ONE-result.time;
+				Math::setMatrix4x4FromRotateScale(matrix,rotate,Vector3(scale,scale,scale));
+				Math::setMatrix4x4FromTranslate(matrix,result.point);
+
+				mDevice->setMatrix(RenderDevice::MatrixType_MODEL,matrix);
+				mParams->setMatrix(RenderDevice::MatrixType_MODEL,matrix);
+
+				setupVariableBuffers(pass,Material::Scope_RENDERABLE,mDevice);
+
+				mDevice->renderPrimitive(mVertexData,mIndexData);
+			}
 		}
 	}
 }
