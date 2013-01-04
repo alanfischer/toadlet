@@ -32,7 +32,6 @@ set (SRC
 set (H
 	src/BranchSystem.h
 	src/Clouds.h
-	src/GroundProjector.h
 	src/HUD.h
 	src/PathClimber.h
 	src/PathClimberListener.h

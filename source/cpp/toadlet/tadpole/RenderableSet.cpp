@@ -36,9 +36,11 @@ RenderableSet::RenderableSet(Scene *scene):
 	mRoot(NULL),
 	//mCamera,
 	//mRenderableQueues,
-	mRenderableQueueCount(0)
+	mRenderableQueueCount(0),
 	//mMaterialToQueueIndexMap,
-	//mLightQueue
+	//mLightQueue,
+	//mNodeQueue,
+	mGatherNodes(false)
 {
 	mScene=scene;
 }
@@ -57,12 +59,19 @@ void RenderableSet::startQueuing(){
 	mLayeredMaterialQueueIndexes.clear();
 	mLayeredDepthQueueIndexes.clear();
 	mLightQueue.clear();
+	mNodeQueue.clear();
 
 	mRoot=mScene->getRoot();
 }
 
 void RenderableSet::endQueuing(){
 	mRoot=NULL;
+}
+
+void RenderableSet::queueNode(Node *node){
+	if(mGatherNodes){
+		mNodeQueue.add(node);
+	}
 }
 
 void RenderableSet::queueRenderable(Renderable *renderable){

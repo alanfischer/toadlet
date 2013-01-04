@@ -34,8 +34,41 @@ namespace tadpole{
 DecalShadowRenderManager::DecalShadowRenderManager(Scene *scene):
 	SimpleRenderManager(scene)
 {
-	mShadowMaterial=mScene->getEngine()->getMaterialManager()->createMaterial();
-	mPlane.set(Math::Z_UNIT_VECTOR3,0);
+	mRenderableSet->setGatherNodes(true);
+
+	Engine *engine=mScene->getEngine();
+
+	TextureFormat::ptr pointFormat=new TextureFormat(TextureFormat::Dimension_D2,TextureFormat::Format_A_8,128,128,1,0);
+	tbyte *pointData=createPoint(pointFormat);
+	Texture::ptr pointTexture=engine->getTextureManager()->createTexture(pointFormat,pointData);
+	delete[] pointData;
+
+	RenderState::ptr renderState=engine->getMaterialManager()->createRenderState();
+	renderState->setBlendState(BlendState(BlendState::Operation_ONE_MINUS_SOURCE_ALPHA,BlendState::Operation_SOURCE_ALPHA));
+	renderState->setDepthState(DepthState(DepthState::DepthTest_LEQUAL,false));
+	renderState->setMaterialState(MaterialState(Math::ZERO_VECTOR4));
+	mMaterial=engine->getMaterialManager()->createSharedMaterial(engine->createDiffuseMaterial(pointTexture),renderState);
+
+	VertexBuffer::ptr vertexBuffer=engine->getBufferManager()->createVertexBuffer(Buffer::Usage_BIT_STATIC,Buffer::Access_BIT_WRITE,engine->getVertexFormats().POSITION_TEX_COORD,4);
+	mVertexData=new VertexData(vertexBuffer);
+	{
+		VertexBufferAccessor vba(vertexBuffer,Buffer::Access_BIT_WRITE);
+
+		vba.set3(0,0, -Math::ONE,-Math::ONE,0);
+		vba.set2(0,1, 0,0);
+
+		vba.set3(1,0, Math::ONE,-Math::ONE,0);
+		vba.set2(1,1, Math::ONE,0);
+
+		vba.set3(2,0, -Math::ONE,Math::ONE,0);
+		vba.set2(2,1, 0,Math::ONE);
+
+		vba.set3(3,0, Math::ONE,Math::ONE,0);
+		vba.set2(3,1, Math::ONE,Math::ONE);
+
+		vba.unlock();
+	}
+	mIndexData=new IndexData(IndexData::Primitive_TRISTRIP,NULL,0,4);
 }
 
 DecalShadowRenderManager::~DecalShadowRenderManager(){
@@ -56,31 +89,47 @@ void DecalShadowRenderManager::renderScene(RenderDevice *device,Node *node,Camer
 
 	LightState state;
 	light->getLightState(state);
-/*
-	int i,j;
-	for(i=0;i<set->getNumRenderableQueues();++i){
-		const RenderableSet::RenderableQueue &queue=set->getRenderableQueue(i);
-		for(j=0;j<queue.size();++j){
-			const RenderableSet::RenderableQueueItem &item=queue[j];
-			Renderable *renderable=item.renderable;
 
-			Matrix4x4 m;
-			if(state.type==LightState::Type_DIRECTION){
-				Math::setMatrix4x4FromObliquePlane(m,mPlane,state.direction);
-			}
-			else{
-				Math::setMatrix4x4FromPerspectivePlane(m,mPlane,state.position);
-			}
-			
-			Matrix4x4 m2;
-			renderable->getRenderTransform().getMatrix(m2);
-			Math::postMul(m,m2);
-			
-			device->setMatrix(RenderDevice::MatrixType_MODEL,m);
-			renderable->render(device);
+	RenderPath *path=mMaterial->getBestPath();
+	int numPasses=path->getNumPasses();
+	int pi,ni;
+	for(pi=0;pi<numPasses;++pi){
+		RenderPass *pass=path->getPass(pi);
+		setupPass(pass,mDevice);
+
+		for(ni=0;ni<set->getNodeQueue().size();++ni){
+			Node *node=set->getNodeQueue().at(ni);
+			Matrix4x4 matrix;
+			node->getWorldTransform().getMatrix(matrix);
+
+			mDevice->setMatrix(RenderDevice::MatrixType_MODEL,matrix);
+			mParams->setMatrix(RenderDevice::MatrixType_MODEL,matrix);
+
+			setupVariableBuffers(pass,Material::Scope_RENDERABLE,mDevice);
+
+			mDevice->renderPrimitive(mVertexData,mIndexData);
 		}
 	}
-*/
+}
+
+tbyte *DecalShadowRenderManager::createPoint(TextureFormat *format){
+	int width=format->getWidth(),height=format->getHeight();
+	tbyte *data=new tbyte[format->getDataSize()];
+
+	int x=0,y=0;
+	for(y=0;y<height;y++){
+		for(x=0;x<width;x++){
+			float v=1.0;
+			v=v*(Math::length(Vector2(x-width/2,y-height/2))/(width/2));
+			if(v<0) v=0;
+			if(v>1) v=1;
+			v=pow(v,1.25f);
+
+			data[y*width+x]=255*v;
+		}
+	}
+
+	return data;
 }
 
 }

@@ -39,11 +39,13 @@ public:
 	virtual ~DecalShadowRenderManager();
 
 	void renderScene(RenderDevice *renderDevice,Node *node,Camera *camera);
-	void setPlane(const Plane &p){mPlane.set(p);}
 
 protected:
-	Material::ptr mShadowMaterial;
-	Plane mPlane;
+	tbyte *createPoint(TextureFormat *format);
+
+	Material::ptr mMaterial;
+	VertexData::ptr mVertexData;
+	IndexData::ptr mIndexData;
 };
 
 }

@@ -74,19 +74,18 @@ void SimpleRenderManager::renderScene(RenderDevice *device,Node *node,Camera *ca
 
 	renderRenderables(mRenderableSet,device,camera);
 
-	mParams->setCamera(NULL);
+	/// @todo: Reorganize RenderManagers so we can have some pre-post render callbacks, and let us enable this portion again
+//	mParams->setCamera(NULL);
 
-	mLastPass=NULL;
-	mLastRenderState=NULL;
-	mLastShaderState=NULL;
-	mDevice=NULL;
-	mCamera=NULL;
+//	mLastPass=NULL;
+//	mLastRenderState=NULL;
+//	mLastShaderState=NULL;
+//	mDevice=NULL;
+//	mCamera=NULL;
 }
 
 void SimpleRenderManager::setupPass(RenderPass *pass,RenderDevice *device){
 	mParams->setRenderPass(pass);
-
-	pass->updateVariables(Material::Scope_MATERIAL,mParams);
 
 	if(mLastShaderState==NULL || mLastShaderState!=pass->getShaderState()){
 		mLastShaderState=pass->getShaderState();
@@ -153,7 +152,6 @@ void SimpleRenderManager::setupPassForRenderable(RenderPass *pass,RenderDevice *
 	if(pass!=NULL){
 		mParams->setRenderable(renderable);
 
-		pass->updateVariables(Material::Scope_RENDERABLE,mParams);
 		setupVariableBuffers(pass,Material::Scope_RENDERABLE,device);
 	
 		mParams->setRenderable(NULL);
@@ -165,6 +163,7 @@ void SimpleRenderManager::gatherRenderables(RenderableSet *set,Node *node,Camera
 
 	set->setCamera(camera);
 
+	/// @todo: We need a way to expose gatherRenderables so we can not only gather Renderables but also Nodes, which can be processed for shadows, since decal shadows would be node based, not renderable based
 	set->startQueuing();
 	if(node==mScene->getRoot()){
 		mScene->getBackground()->gatherRenderables(camera,set);
@@ -319,6 +318,8 @@ void SimpleRenderManager::setupTextures(RenderPass *pass,int scope,RenderDevice 
 }
 
 void SimpleRenderManager::setupVariableBuffers(RenderPass *pass,int scope,RenderDevice *device){
+	pass->updateVariables(scope,mParams);
+
 	RenderVariableSet::ptr variables=pass->getVariables();
 	if(variables!=NULL){
 		int i;

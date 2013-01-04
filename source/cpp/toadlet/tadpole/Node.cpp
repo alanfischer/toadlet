@@ -454,6 +454,8 @@ void Node::spacialUpdated(){
 void Node::gatherRenderables(Camera *camera,RenderableSet *set){
 	int i;
 
+	set->queueNode(this);
+
 	for(i=0;i<mNodes.size();++i){
 		Node *node=mNodes[i];
 		if((camera->getScope()&node->getScope())!=0 && camera->culled(node->getWorldBound())==false){
