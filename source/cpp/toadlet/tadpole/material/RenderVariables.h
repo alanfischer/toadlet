@@ -154,7 +154,8 @@ public:
 	int getFormat(){return VariableBufferFormat::Format_TYPE_FLOAT_32|VariableBufferFormat::Format_COUNT_4;}
 
 	void update(tbyte *data,SceneParameters *parameters){
-		memcpy(data,&Vector4(parameters->getCamera()->getPosition(),0),sizeof(Vector4));
+		Vector4 position(parameters->getCamera()->getPosition(),1);
+		memcpy(data,&position,sizeof(Vector4));
 	}
 };
 
@@ -163,7 +164,8 @@ public:
 	int getFormat(){return VariableBufferFormat::Format_TYPE_FLOAT_32|VariableBufferFormat::Format_COUNT_4;}
 
 	void update(tbyte *data,SceneParameters *parameters){
-		memcpy(data,&Vector4(parameters->getLightState().direction,0),sizeof(Vector4));
+		Vector4 direction(parameters->getLightState().direction,0);
+		memcpy(data,&direction,sizeof(Vector4));
 	}
 };
 

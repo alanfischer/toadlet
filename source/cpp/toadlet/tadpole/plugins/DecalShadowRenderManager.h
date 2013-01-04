@@ -43,6 +43,7 @@ public:
 protected:
 	tbyte *createPoint(TextureFormat *format);
 
+	int mShadowScope;
 	Material::ptr mMaterial;
 	VertexData::ptr mVertexData;
 	IndexData::ptr mIndexData;
