@@ -385,6 +385,28 @@ public:
 		return *this;
 	}
 
+	inline bool equals(const Collection &c) const{
+		if(mSize!=c.mSize){
+			return false;
+		}
+
+		int i;
+		for(i=0;i<mSize;++i){
+			if(mData[i]!=c.mData[i]){
+				return false;
+			}
+		}
+		return true;
+	}
+
+	inline bool operator==(const Collection &c) const{
+		return equals(c);
+	}
+
+	inline bool operator!=(const Collection &clane) const{
+		return !equals(c);
+	}
+
 	int mSize;
 	int mCapacity;
 	Type *mData;
