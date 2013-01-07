@@ -80,7 +80,7 @@ void D3D10RenderState::destroy(){
 		}
 		mSamplerStates[j].clear();
 		for(i=0;i<mTextureStates[j].size();++i){
-			if(mTextureStates[i]!=NULL){
+			if(mTextureStates[j][i]!=NULL){
 				delete mTextureStates[j][i];
 				mTextureStates[j][i]=NULL;
 			}
