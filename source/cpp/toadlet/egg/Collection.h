@@ -403,7 +403,7 @@ public:
 		return equals(c);
 	}
 
-	inline bool operator!=(const Collection &clane) const{
+	inline bool operator!=(const Collection &c) const{
 		return !equals(c);
 	}
 
