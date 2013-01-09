@@ -52,6 +52,8 @@ public:
 	inline bool operator==(const TUUID &u2) const{return equals(u2);}
 	inline bool operator!=(const TUUID &u2) const{return !equals(u2);}
 
+	inline bool operator<(const TUUID &u2) const{return highBits<u2.highBits || (highBits==u2.highBits && lowBits<u2.lowBits);}
+
 	uint64 highBits,lowBits;
 };
 
