@@ -103,6 +103,14 @@ public:
 		return mPointer;
 	}
 
+	template<typename Type2> inline bool operator==(const ExplicitIntrusivePointer<Type2,PointerSemantics> &pointer) const{
+		return mPointer==pointer.get();
+	}
+
+	template<typename Type2> inline bool operator!=(const ExplicitIntrusivePointer<Type2,PointerSemantics> &pointer) const{
+		return mPointer!=pointer.get();
+	}
+
 	inline bool operator==(const ExplicitIntrusivePointer<Type,PointerSemantics> &pointer) const{
 		return mPointer==pointer.mPointer;
 	}
