@@ -265,7 +265,6 @@ template<typename Type,typename Type2,typename PointerSemantics> inline SharedPo
 			PointerSemantics::retainReference(count,p.get());
 		}
 	}
-
 	return p;
 }
 
@@ -279,7 +278,6 @@ template<typename Type,typename Type2,typename PointerSemantics> inline SharedPo
 			PointerSemantics::retainReference(count,p.get());
 		}
 	}
-
 	return p;
 }
 
@@ -293,7 +291,6 @@ template<typename Type,typename Type2,typename PointerSemantics> inline SharedPo
 			PointerSemantics::retainReference(count,p.get());
 		}
 	}
-
 	return p;
 }
 
@@ -307,7 +304,6 @@ template<typename Type,typename Type2,typename PointerSemantics> inline SharedPo
 			PointerSemantics::retainReference(count,p.get());
 		}
 	}
-
 	return p;
 }
 

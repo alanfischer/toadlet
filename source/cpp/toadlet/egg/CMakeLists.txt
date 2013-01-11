@@ -94,6 +94,7 @@ set (EGG_HDR
 	Event.h
 	Exception.h
 	Extents.h
+	ExplicitIntrusivePointer.h
 	Interface.h
 	IntrusivePointer.h
 	Log.h
