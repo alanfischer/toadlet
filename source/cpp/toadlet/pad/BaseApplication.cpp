@@ -73,19 +73,19 @@ void BaseApplication::mapKeyNames(Map<int,String> &keyToName,Map<String,int> &na
 
 BaseApplication::BaseApplication():
 	//mFormat,
-	mApplet(NULL),
+	//mApplet,
 
 	//mRenderDevicePlugins,
 	//mCurrentRenderDevicePlugin,
 	//mNewRenderDevicePlugin,
 	mRenderOptions(0),
 	//mAudioDevicePlugins,
-	mAudioOptions(0),
+	mAudioOptions(0)
 
-	mEngine(NULL),
-	mRenderTarget(NULL),
-	mRenderDevice(NULL),
-	mAudioDevice(NULL)
+	//mEngine,
+	//mRenderTarget,
+	//mRenderDevice,
+	//mAudioDevice,
 	//mInputDevices
 {
 	mapKeyNames(mKeyToName,mNameToKey);

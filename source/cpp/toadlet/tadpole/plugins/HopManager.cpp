@@ -35,7 +35,7 @@ namespace toadlet{
 namespace tadpole{
 
 HopManager::HopManager(Scene *scene):
-	mSimulator(NULL),
+	//mSimulator,
 	mTraceable(NULL)
 {
 	mScene=scene;

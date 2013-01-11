@@ -36,7 +36,6 @@ namespace toadlet{
 namespace tadpole{
 
 Node::Node(Scene *scene):BaseComponent(),
-	mScene(NULL),
 	mUniqueHandle(0),
 
 	//mParent,

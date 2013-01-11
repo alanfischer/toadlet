@@ -122,12 +122,6 @@ public:
 		cleanup();
 	}
 
-	#if(defined(TOADLET_COMPILER_VC5) || defined(TOADLET_COMPILER_VC6))
-		inline IntrusivePointer<Type,PointerSemantics> &operator=(const int null){
-			Error__Cannot_assign_pointer_to_IntrusivePointer;
-		}
-	#endif
-
 	template<typename Type2> IntrusivePointer<Type,PointerSemantics> &operator=(const IntrusivePointer<Type2,PointerSemantics> &pointer){
 		if(this==(IntrusivePointer<Type,PointerSemantics>*)&pointer){
 			return *this;
@@ -158,7 +152,7 @@ public:
 
 		return *this;
 	}
-
+	
 	template<typename Type2> IntrusivePointer<Type,PointerSemantics> &operator=(const WeakPointer<Type2,PointerSemantics> &pointer){
 		cleanup();
 
@@ -249,7 +243,6 @@ template<typename Type,typename Type2,typename PointerSemantics> inline Intrusiv
 	if(p.get()!=NULL){
 		PointerSemantics::retainReference(p.get());
 	}
-
 	return p;
 }
 
@@ -259,7 +252,6 @@ template<typename Type,typename Type2,typename PointerSemantics> inline Intrusiv
 	if(p.get()!=NULL){
 		PointerSemantics::retainReference(p.get());
 	}
-
 	return p;
 }
 
@@ -269,7 +261,6 @@ template<typename Type,typename Type2,typename PointerSemantics> inline Intrusiv
 	if(p.get()!=NULL){
 		PointerSemantics::retainReference(p.get());
 	}
-
 	return p;
 }
 
@@ -279,7 +270,6 @@ template<typename Type,typename Type2,typename PointerSemantics> inline Intrusiv
 	if(p.get()!=NULL){
 		PointerSemantics::retainReference(p.get());
 	}
-
 	return p;
 }
 

@@ -101,12 +101,7 @@ GLRenderDevice::GLRenderDevice():
 	//mViewMatrix,
 
 	mMultiTexture(false),
-	mHasClampToEdge(false),
-
-	mPrimaryRenderTarget(NULL),
-	mGLPrimaryRenderTarget(NULL),
-	mRenderTarget(NULL),
-	mGLRenderTarget(NULL)
+	mHasClampToEdge(false)
 {}
 
 bool GLRenderDevice::create(RenderTarget *target,int options){

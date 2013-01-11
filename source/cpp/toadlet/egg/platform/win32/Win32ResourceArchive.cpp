@@ -79,7 +79,7 @@ Stream::ptr Win32ResourceArchive::openStream(const String &name){
 	LPVOID data=LockResource(handle);
 	DWORD length=SizeofResource((HMODULE)mModule,src);
 	
-	MemoryStream::ptr stream(new MemoryStream((tbyte*)data,length,length,false));
+	MemoryStream::ptr stream=new MemoryStream((tbyte*)data,length,length,false);
 	return stream;
 }
 
