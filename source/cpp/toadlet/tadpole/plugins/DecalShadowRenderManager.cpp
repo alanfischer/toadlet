@@ -46,7 +46,7 @@ DecalShadowRenderManager::DecalShadowRenderManager(Scene *scene):SimpleRenderMan
 	RenderState::ptr renderState=engine->getMaterialManager()->createRenderState();
 	renderState->setBlendState(BlendState(BlendState::Operation_ONE_MINUS_SOURCE_ALPHA,BlendState::Operation_SOURCE_ALPHA));
 	renderState->setDepthState(DepthState(DepthState::DepthTest_LEQUAL,false));
-	renderState->setMaterialState(MaterialState(Math::ZERO_VECTOR4));
+	renderState->setMaterialState(MaterialState(false));
 	mMaterial=engine->getMaterialManager()->createSharedMaterial(engine->createDiffuseMaterial(pointTexture),renderState);
 
 	VertexBuffer::ptr vertexBuffer=engine->getBufferManager()->createVertexBuffer(Buffer::Usage_BIT_STATIC,Buffer::Access_BIT_WRITE,engine->getVertexFormats().POSITION_TEX_COORD,4);
@@ -74,10 +74,7 @@ DecalShadowRenderManager::DecalShadowRenderManager(Scene *scene):SimpleRenderMan
 DecalShadowRenderManager::~DecalShadowRenderManager(){
 }
 
-void DecalShadowRenderManager::renderScene(RenderDevice *device,Node *node,Camera *camera){
-	SimpleRenderManager::renderScene(device,node,camera);
-
-	RenderableSet *set=mRenderableSet;
+void DecalShadowRenderManager::interRenderRenderables(RenderableSet *set,RenderDevice *device,Camera *camera,bool useMaterials){
 	LightComponent *light=NULL;
 	if(set->getLightQueue().size()>0){
 		light=set->getLightQueue()[0].light;
@@ -89,6 +86,11 @@ void DecalShadowRenderManager::renderScene(RenderDevice *device,Node *node,Camer
 
 	LightState state;
 	light->getLightState(state);
+
+	if(camera->getDefaultState()!=NULL){
+		device->setRenderState(camera->getDefaultState());
+		mParams->setRenderState(camera->getDefaultState());
+	}
 
 	RenderPath *path=mMaterial->getBestPath();
 	int numPasses=path->getNumPasses();
@@ -136,6 +138,12 @@ void DecalShadowRenderManager::renderScene(RenderDevice *device,Node *node,Camer
 
 				mDevice->renderPrimitive(mVertexData,mIndexData);
 			}
+		}
+
+		if(camera->getDefaultState()!=NULL){
+			mDevice->setRenderState(camera->getDefaultState());
+			mParams->setRenderState(camera->getDefaultState());
+			mLastRenderState=NULL;
 		}
 	}
 }

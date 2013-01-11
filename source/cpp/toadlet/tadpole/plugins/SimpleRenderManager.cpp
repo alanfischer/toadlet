@@ -57,8 +57,6 @@ void SimpleRenderManager::renderScene(RenderDevice *device,Node *node,Camera *ca
 	mDevice=device;
 	mCamera=camera;
 
-	gatherRenderables(mRenderableSet,node,camera);
-
 	RenderTarget *target=camera->getRenderTarget();
 	device->setRenderTarget(target!=NULL?target:device->getPrimaryRenderTarget());
 
@@ -70,18 +68,19 @@ void SimpleRenderManager::renderScene(RenderDevice *device,Node *node,Camera *ca
 	device->setViewport(viewport);
 	mParams->setViewport(viewport);
 
+	gatherRenderables(mRenderableSet,node,camera);
+
 	mParams->setCamera(camera);
 
 	renderRenderables(mRenderableSet,device,camera);
 
-	/// @todo: Reorganize RenderManagers so we can have some pre-post render callbacks, and let us enable this portion again
-//	mParams->setCamera(NULL);
+	mParams->setCamera(NULL);
 
-//	mLastPass=NULL;
-//	mLastRenderState=NULL;
-//	mLastShaderState=NULL;
-//	mDevice=NULL;
-//	mCamera=NULL;
+	mLastPass=NULL;
+	mLastRenderState=NULL;
+	mLastShaderState=NULL;
+	mDevice=NULL;
+	mCamera=NULL;
 }
 
 void SimpleRenderManager::setupPass(RenderPass *pass,RenderDevice *device){
@@ -223,6 +222,8 @@ void SimpleRenderManager::renderRenderables(RenderableSet *set,RenderDevice *dev
 
 		renderQueueItems((useMaterials && material!=NULL)?material:NULL,&queue[0],queue.size());
 	}
+
+	interRenderRenderables(set,device,camera,useMaterials);
 
 	while(depthIndex<depthQueueIndexes.size()){
 		const RenderableSet::RenderableQueue &depthQueue=set->getRenderableQueue(depthQueueIndexes[depthIndex]);
