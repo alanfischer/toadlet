@@ -38,7 +38,7 @@ public:
 	DecalShadowRenderManager(Scene *scene);
 	virtual ~DecalShadowRenderManager();
 
-	void renderScene(RenderDevice *renderDevice,Node *node,Camera *camera);
+	void interRenderRenderables(RenderableSet *set,RenderDevice *device,Camera *camera,bool useMaterials);
 
 protected:
 	tbyte *createPoint(TextureFormat *format);

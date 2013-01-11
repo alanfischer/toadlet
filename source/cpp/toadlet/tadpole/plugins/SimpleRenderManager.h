@@ -49,6 +49,7 @@ protected:
 	virtual void renderRenderables(RenderableSet *set,RenderDevice *device,Camera *camera,bool useMaterials=true);
 	virtual void renderDepthSortedRenderables(const RenderableSet::RenderableQueue &queue,bool useMaterials);
 	virtual void renderQueueItems(Material *material,const RenderableSet::RenderableQueueItem *items,int numItems);
+	virtual void interRenderRenderables(RenderableSet *set,RenderDevice *device,Camera *camera,bool useMaterials){}
 
 	void setupLights(const RenderableSet::LightQueue &lightQueue,RenderDevice *device);
 	void setupTextures(RenderPass *pass,int scope,RenderDevice *device);
