@@ -38,6 +38,9 @@ public:
 	DecalShadowRenderManager(Scene *scene);
 	virtual ~DecalShadowRenderManager();
 
+	void setShadowScope(int scope){mShadowScope=scope;}
+	int getShadowScope() const{return mShadowScope;}
+
 	void interRenderRenderables(RenderableSet *set,RenderDevice *device,Camera *camera,bool useMaterials);
 
 protected:

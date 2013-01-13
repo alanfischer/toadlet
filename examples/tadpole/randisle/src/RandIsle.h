@@ -19,8 +19,7 @@ public:
 		Scope_BIT_WATER=		1<<4,
 		Scope_BIT_WATER_TRANSPARENT=1<<5,
 		Scope_BIT_MAIN_CAMERA=	1<<6,
-
-		Scope_HUD=				Scope_BIT_HUD,
+		Scope_BIT_SHADOW=		1<<7,
 	};
 
 	RandIsle(Application *app,String path);
