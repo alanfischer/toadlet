@@ -102,7 +102,12 @@ void DecalShadowRenderManager::interRenderRenderables(RenderableSet *set,RenderD
 		for(ni=0;ni<set->getNodeQueue().size();++ni){
 			Node *node=set->getNodeQueue().at(ni);
 
-			if((node->getScope()&mShadowScope)!=0){
+			if((node->getScope()&mShadowScope)!=0 && node!=mScene->getBackground() && node!=mScene->getRoot()){
+				Sphere boundingSphere=node->getWorldBound()->getSphere();
+				if(boundingSphere.radius*4 > (camera->getFarDist()-camera->getNearDist())){
+					continue;
+				}
+
 				Matrix4x4 matrix;
 				Matrix3x3 rotate;
 
@@ -110,7 +115,7 @@ void DecalShadowRenderManager::interRenderRenderables(RenderableSet *set,RenderD
 				float mOffset=0.01;
 
 				Segment segment;
-				segment.origin.set(node->getWorldTranslate());
+				segment.origin.set(boundingSphere.getOrigin());
 				Math::mul(segment.direction,Math::NEG_Z_UNIT_VECTOR3,mDistance);
 				PhysicsCollision result;
 				mScene->traceSegment(result,segment,-1,node);
@@ -127,7 +132,7 @@ void DecalShadowRenderManager::interRenderRenderables(RenderableSet *set,RenderD
 					Math::setMatrix3x3FromAxes(rotate,right,forward,up);
 				}
 
-				scalar scale=Math::ONE-result.time;
+				scalar scale=boundingSphere.radius/2 * (Math::ONE-result.time);
 				Math::setMatrix4x4FromRotateScale(matrix,rotate,Vector3(scale,scale,scale));
 				Math::setMatrix4x4FromTranslate(matrix,result.point);
 

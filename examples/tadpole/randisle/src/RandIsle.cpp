@@ -45,7 +45,10 @@ void RandIsle::create(){
 	mScene->setUpdateListener(this);
 	mScene->setRangeLogicDT(50,50);
 	mScene->setExcessiveDT(600);
-	mScene->setRenderManager(new DecalShadowRenderManager(mScene));
+
+	DecalShadowRenderManager::ptr renderManager=new DecalShadowRenderManager(mScene);
+	renderManager->setShadowScope(Scope_BIT_SHADOW);
+	mScene->setRenderManager(renderManager);
 
 	Simulator *simulator=((HopManager*)mScene->getPhysicsManager())->getSimulator();
 	simulator->setGravity(Vector3(0,0,-50));
@@ -74,7 +77,7 @@ void RandIsle::create(){
 	mCamera=new Camera();
 //	shared_static_cast<StereoscopicCamera>(mCamera)->setCrossEyed(true);
 	mCamera->setAutoProjectionFov(Math::degToRad(Math::fromInt(60)),mCamera->getNearDist(),1024);
-	mCamera->setScope(~Scope_HUD | Scope_BIT_MAIN_CAMERA & ~Scope_BIT_WATER_TRANSPARENT);
+	mCamera->setScope(~Scope_BIT_HUD | Scope_BIT_MAIN_CAMERA & ~Scope_BIT_WATER_TRANSPARENT);
 	mCamera->setDefaultState(mEngine->getMaterialManager()->createRenderState());
 	mCamera->setClearColor(Resources::instance->fadeColor);
 	mCamera->getDefaultState()->setFogState(FogState(FogState::FogType_LINEAR,Math::ONE,mCamera->getFarDist()/2,mCamera->getFarDist(),mCamera->getClearColor()));
@@ -84,7 +87,7 @@ void RandIsle::create(){
 		mReflectCamera=new Camera();
 		mReflectCamera->setRenderTarget(Resources::instance->reflectTarget);
 		mReflectCamera->setAutoProjectionFov(Math::degToRad(Math::fromInt(60)),mCamera->getNearDist(),mCamera->getFarDist());
-		mReflectCamera->setScope(~Scope_HUD & ~Scope_BIT_MAIN_CAMERA & ~Scope_BIT_WATER & ~Scope_BIT_WATER_TRANSPARENT);
+		mReflectCamera->setScope(~Scope_BIT_HUD & ~Scope_BIT_MAIN_CAMERA & ~Scope_BIT_WATER & ~Scope_BIT_WATER_TRANSPARENT);
 		mReflectCamera->setDefaultState(mEngine->getMaterialManager()->createRenderState());
 		mReflectCamera->setClearColor(Resources::instance->fadeColor);
 		mReflectCamera->getDefaultState()->setFogState(FogState(FogState::FogType_LINEAR,Math::ONE,mCamera->getFarDist()/2,mCamera->getFarDist(),mCamera->getClearColor()));
@@ -94,7 +97,7 @@ void RandIsle::create(){
 		mRefractCamera=new Camera();
 		mRefractCamera->setRenderTarget(Resources::instance->refractTarget);
 		mRefractCamera->setAutoProjectionFov(Math::degToRad(Math::fromInt(60)),mCamera->getNearDist(),mCamera->getFarDist());
-		mRefractCamera->setScope(~Scope_HUD & ~Scope_BIT_MAIN_CAMERA & ~Scope_BIT_WATER | Scope_BIT_WATER_TRANSPARENT);
+		mRefractCamera->setScope(~Scope_BIT_HUD & ~Scope_BIT_MAIN_CAMERA & ~Scope_BIT_WATER | Scope_BIT_WATER_TRANSPARENT);
 		mRefractCamera->setDefaultState(mEngine->getMaterialManager()->createRenderState());
 		mRefractCamera->setClearColor(Resources::instance->fadeColor);
 		mRefractCamera->getDefaultState()->setFogState(FogState(FogState::FogType_LINEAR,Math::ONE,mCamera->getFarDist()/2,mCamera->getFarDist(),mCamera->getClearColor()));
@@ -107,6 +110,9 @@ void RandIsle::create(){
 	mScene->getRoot()->attach(mHUD);
 */
 	mSky=new Sky(mScene,Resources::instance->cloudSize,Resources::instance->skyColor,Resources::instance->fadeColor);
+	mSky->setScope(mSky->getScope()&~Scope_BIT_SHADOW);
+	mSky->getSun()->getParent()->setScope(~Scope_BIT_SHADOW);
+	mSky->getLight()->getParent()->setScope(~Scope_BIT_SHADOW);
 	mScene->getBackground()->attach(mSky);
 
 	VertexBuffer::ptr predictedVertexBuffer=mEngine->getBufferManager()->createVertexBuffer(Buffer::Usage_BIT_STREAM,Buffer::Access_BIT_WRITE,mEngine->getVertexFormats().POSITION_COLOR,512);
@@ -178,8 +184,11 @@ void RandIsle::create(){
 		mesh->setMesh(Resources::instance->grass);
 		mesh->setName("mesh");
 		prop->attach(mesh);
+		prop->setScope(prop->getScope()&~Scope_BIT_SHADOW);
+
 		mProps->attach(prop);
 	}
+	mProps->setScope(mProps->getScope()&~Scope_BIT_SHADOW);
 	mScene->getRoot()->attach(mProps);
 	updateProps();
 
@@ -740,6 +749,8 @@ bool RandIsle::updatePopulatePatches(){
 				system=new TreeSystem(mScene,wx+wy);
 				system->setName("system");
 				tree->attach(system);
+
+				tree->setScope(tree->getScope()&~Scope_BIT_SHADOW);
 			}
 			tree->setTranslate(result.point);
 			mScene->getRoot()->attach(tree);

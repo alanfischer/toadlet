@@ -8,6 +8,8 @@
 
 class Sky:public Node{
 public:
+	TOADLET_OBJECT(Sky);
+
 	Sky(Scene *scene,int cloudSize,const Vector4 &skyColor,const Vector4 &fadeColor);
 
 	void updateLightDirection(const Vector3 &lightDir);
