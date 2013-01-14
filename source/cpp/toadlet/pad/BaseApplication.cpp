@@ -111,8 +111,8 @@ bool BaseApplication::create(String renderDevice,String audioDevice){
 
 	mEngine=new Engine(NULL,NULL);
 
-	mEngine->setHasBackableShader(true);
-	mEngine->setHasBackableFixed(true);
+	mEngine->setHasBackableShader(false);
+	mEngine->setHasBackableFixed(false);
 
 	/// @todo: Unify the plugin framework a bit so we dont have as much code duplication for this potion, and the creating of the plugin
 	mNewRenderDevicePlugin=mCurrentRenderDevicePlugin=renderDevice;

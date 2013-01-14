@@ -32,7 +32,10 @@ namespace toadlet{
 namespace tadpole{
 
 DecalShadowRenderManager::DecalShadowRenderManager(Scene *scene):SimpleRenderManager(scene),
-	mShadowScope(-1)
+	mShadowScope(-1),
+	mTraceScope(-1),
+	mTraceDistance(Math::fromInt(64)),
+	mOffset(Math::fromMilli(10))
 {
 	mRenderableSet->setGatherNodes(true);
 
@@ -80,12 +83,10 @@ void DecalShadowRenderManager::interRenderRenderables(RenderableSet *set,RenderD
 		light=set->getLightQueue()[0].light;
 	}
 
-	if(light==NULL){
-		return;
-	}
-
 	LightState state;
-	light->getLightState(state);
+	if(light!=NULL){
+		light->getLightState(state);
+	}
 
 	if(camera->getDefaultState()!=NULL){
 		device->setRenderState(camera->getDefaultState());
@@ -111,14 +112,20 @@ void DecalShadowRenderManager::interRenderRenderables(RenderableSet *set,RenderD
 				Matrix4x4 matrix;
 				Matrix3x3 rotate;
 
-				float mDistance=10;
-				float mOffset=0.01;
-
 				Segment segment;
 				segment.origin.set(boundingSphere.getOrigin());
-				Math::mul(segment.direction,Math::NEG_Z_UNIT_VECTOR3,mDistance);
+
+				if(state.type==LightState::Type_DIRECTION){
+					Math::mul(segment.direction,state.direction,mTraceDistance);
+				}
+				else{
+					Math::sub(segment.direction,segment.origin,state.position);
+					Math::normalize(segment.direction);
+					Math::mul(segment.direction,state.direction,mTraceDistance);
+				}
+
 				PhysicsCollision result;
-				mScene->traceSegment(result,segment,-1,node);
+				mScene->traceSegment(result,segment,mTraceScope,node);
 
 				if(result.time<Math::ONE){
 					Math::madd(result.point,result.normal,mOffset,result.point);
