@@ -41,12 +41,24 @@ public:
 	void setShadowScope(int scope){mShadowScope=scope;}
 	int getShadowScope() const{return mShadowScope;}
 
+	void setTraceScope(int scope){mTraceScope=scope;}
+	int getTraceScope() const{return mTraceScope;}
+
+	void setTraceDistance(scalar distance){mTraceDistance=distance;}
+	scalar getTraceDistance() const{return mTraceDistance;}
+
+	void setOffset(scalar offset){mOffset=offset;}
+	scalar getOffset() const{return mOffset;}
+
 	void interRenderRenderables(RenderableSet *set,RenderDevice *device,Camera *camera,bool useMaterials);
 
 protected:
 	tbyte *createPoint(TextureFormat *format);
 
 	int mShadowScope;
+	int mTraceScope;
+	scalar mTraceDistance;
+	scalar mOffset;
 	Material::ptr mMaterial;
 	VertexData::ptr mVertexData;
 	IndexData::ptr mIndexData;
