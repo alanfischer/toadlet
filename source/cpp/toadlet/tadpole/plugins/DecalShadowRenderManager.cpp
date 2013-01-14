@@ -50,6 +50,7 @@ DecalShadowRenderManager::DecalShadowRenderManager(Scene *scene):SimpleRenderMan
 	renderState->setBlendState(BlendState(BlendState::Operation_ONE_MINUS_SOURCE_ALPHA,BlendState::Operation_SOURCE_ALPHA));
 	renderState->setDepthState(DepthState(DepthState::DepthTest_LEQUAL,false));
 	renderState->setMaterialState(MaterialState(false));
+	renderState->setRasterizerState(RasterizerState(RasterizerState::CullType_BACK));
 	mMaterial=engine->getMaterialManager()->createSharedMaterial(engine->createDiffuseMaterial(pointTexture),renderState);
 
 	VertexBuffer::ptr vertexBuffer=engine->getBufferManager()->createVertexBuffer(Buffer::Usage_BIT_STATIC,Buffer::Access_BIT_WRITE,engine->getVertexFormats().POSITION_TEX_COORD,4);
