@@ -80,6 +80,9 @@ Node::Node(Scene *scene):BaseComponent(),
 	}
 }
 
+Node::~Node(){
+}
+
 void Node::destroy(){
 	destroyAllChildren();
 	mEngine->nodeDestroyed(this);
@@ -206,6 +209,22 @@ bool Node::getActionActive(const String &action){
 		}
 	}
 	return false;
+}
+
+void Node::visibleAttached(Visible *visible){
+	mVisibles.add(visible);
+}
+
+void Node::visibleRemoved(Visible *visible){
+	mVisibles.remove(visible);
+}
+
+void Node::lightAttached(LightComponent *light){
+	mLights.add(light);
+}
+
+void Node::lightRemoved(LightComponent *light){
+	mLights.remove(light);
 }
 
 void Node::physicsAttached(PhysicsComponent *physics){

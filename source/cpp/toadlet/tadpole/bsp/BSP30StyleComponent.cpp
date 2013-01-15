@@ -32,7 +32,7 @@ namespace tadpole{
 namespace bsp{
 
 BSP30StyleComponent::BSP30StyleComponent():
-	//mBSPNode,
+	//mNode,
 	mStyle(0),
 	mIntensity(0)
 {
