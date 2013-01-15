@@ -54,7 +54,7 @@ public:
 	TOADLET_NODE(Node,"toadlet.tadpole.Node");
 
 	Node(Scene *scene=NULL);
-	virtual ~Node(){}
+	virtual ~Node();
 	virtual void destroy();
 
 	virtual void create(Scene *scene);
@@ -89,12 +89,12 @@ public:
 	virtual void stopAllActions();
 	virtual bool getActionActive(const String &name);
 
-	virtual void visibleAttached(Visible *visible){mVisibles.add(visible);}
-	virtual void visibleRemoved(Visible *visible){mVisibles.remove(visible);}
+	virtual void visibleAttached(Visible *visible);
+	virtual void visibleRemoved(Visible *visible);
 	
 	// Attached Component methods
-	virtual void lightAttached(LightComponent *light){mLights.add(light);}
-	virtual void lightRemoved(LightComponent *light){mLights.remove(light);}
+	virtual void lightAttached(LightComponent *light);
+	virtual void lightRemoved(LightComponent *light);
 	
 	virtual void physicsAttached(PhysicsComponent *physics);
 	virtual void physicsRemoved(PhysicsComponent *physics);

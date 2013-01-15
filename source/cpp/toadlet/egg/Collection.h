@@ -407,6 +407,7 @@ public:
 		return !equals(c);
 	}
 
+protected:
 	int mSize;
 	int mCapacity;
 	Type *mData;
