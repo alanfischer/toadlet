@@ -53,6 +53,7 @@ bool TUUID::fromString(const String &string){
 
 	tbyte *uu=(tbyte*)&highBits;
 	int data[16];
+	memset(data,0,sizeof(data));
 	int n=0;
 	sscanf(string.c_str(),	"%02x%02x%02x%02x-"
 							"%02x%02x-"
@@ -83,6 +84,7 @@ String TUUID::toString() const{
 	}
 
 	char string[128];
+	memset(string,0,sizeof(data));
 	sprintf(string,	"%02x%02x%02x%02x-"
 					"%02x%02x-"
 					"%02x%02x-"
