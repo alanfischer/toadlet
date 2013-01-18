@@ -38,13 +38,17 @@ void CameraComponent::frameUpdate(int dt,int scope){
 }
 
 void CameraComponent::setCameraFromTransform(){
-	Matrix4x4 matrix;
-	mParent->getWorldTransform().getMatrix(matrix);
-	mCamera->setWorldMatrix(matrix);
+	if(mParent!=NULL){
+		Matrix4x4 matrix;
+		mParent->getWorldTransform().getMatrix(matrix);
+		mCamera->setWorldMatrix(matrix);
+	}
 }
 
 void CameraComponent::setTransformFromCamera(){
-	mParent->setMatrix4x4(mCamera->getWorldMatrix());
+	if(mParent!=NULL){
+		mParent->setMatrix4x4(mCamera->getWorldMatrix());
+	}
 }
 
 }
