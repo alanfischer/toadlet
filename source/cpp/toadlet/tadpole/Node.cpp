@@ -333,9 +333,7 @@ void Node::logicUpdate(int dt,int scope){
 		if(node->getActive() && (node->getScope()&scope)!=0){
 			node->tryDeactivate();
 		}
-		else{
-			mergeWorldBound(node,false);
-		}
+		mergeWorldBound(node,false);
 	}
 }
 
@@ -351,11 +349,7 @@ void Node::frameUpdate(int dt,int scope){
 
 	for(i=0;i<mNodes.size();++i){
 		Node *node=mNodes[i];
-		if(node->getActive() && (node->getScope()&scope)!=0){
-		}
-		else{
-			mergeWorldBound(node,false);
-		}
+		mergeWorldBound(node,false);
 	}
 }
 
