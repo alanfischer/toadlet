@@ -49,6 +49,9 @@ HopManager::HopManager(Scene *scene):
 
 	mVolumeSensor=new BoundingVolumeSensor(mScene);
 	mSensorResults=SolidSensorResults::ptr(new SolidSensorResults());
+
+	// Update the MicroCollisionThreshold
+	setGravity(getGravity());
 }
 
 PhysicsComponent *HopManager::createPhysicsComponent(){
@@ -57,6 +60,13 @@ PhysicsComponent *HopManager::createPhysicsComponent(){
 
 void HopManager::setGravity(const Vector3 &gravity){
 	mSimulator->setGravity(gravity);
+
+	// Estimate a good MicroCollisionThreshold for this gravity
+	mSimulator->setMicroCollisionThreshold(Math::length(gravity)/8);
+}
+
+const Vector3 &HopManager::getGravity() const{
+	return mSimulator->getGravity();
 }
 
 void HopManager::setTraceable(PhysicsTraceable *traceable){

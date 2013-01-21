@@ -47,6 +47,7 @@ public:
 	PhysicsComponent *createPhysicsComponent();
 
 	void setGravity(const Vector3 &gravity);
+	const Vector3 &getGravity() const;
 
 	void setTraceable(PhysicsTraceable *traceable);
 

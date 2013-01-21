@@ -43,8 +43,6 @@ void RandIsle::create(){
 
 	mScene=new Scene(mEngine);
 	mScene->setUpdateListener(this);
-	mScene->setRangeLogicDT(50,50);
-	mScene->setExcessiveDT(600);
 
 	DecalShadowRenderManager::ptr renderManager=new DecalShadowRenderManager(mScene);
 	renderManager->setShadowScope(Scope_BIT_SHADOW);

@@ -120,6 +120,7 @@ public:
 	String getBoneName(Bone *bone) const{return mSkeleton->getBone(bone->index)->name;}
 
 	Bound *getBound() const{return mBound;}
+	bool getActive() const{return false;}
 
 	inline Skeleton *getSkeleton() const{return mSkeleton;}
 
