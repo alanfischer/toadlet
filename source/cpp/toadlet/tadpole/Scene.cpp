@@ -59,12 +59,13 @@ Scene::Scene(Engine *engine):Object(),
 	mEngine->addContextListener(this);
 
 	setExcessiveDT(500);
-	setRangeLogicDT(0,0);
+	setRangeLogicDT(50,50);
 	setAmbientColor(Colors::GREY);
 
 	mBackground=new PartitionNode(this);
 
 	mRoot=new PartitionNode(this);
+	mRoot->rootChanged(mRoot);
 
 	mRenderManager=new SimpleRenderManager(this);
 
