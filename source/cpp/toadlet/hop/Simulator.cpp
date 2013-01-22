@@ -364,13 +364,16 @@ void Simulator::update(int dt,int scope,Solid *solid){
 		if(solid->mCollideWithScope!=0){
 			sub(temp,newPosition,oldPosition);
 
+			/// @todo: Removed this, maybe it should just go completely
+			///  I had a 1 meter large sphere deactivated, sitting on top of an infinite mass plane, with -9.8 gravity, and attemping to set the velocity to 5 up, this causes it to just zero out
 			/// @todo: Calculate this 0.5f from the coefficient of static friction between solid & mTouching
-			if(solid->mTouching!=NULL && toSmall(temp,0.5f)){
-				newPosition.set(oldPosition);
-				solid->mVelocity.set(oldVelocity);
-				skip=true;
-			}
-			else{
+			//if(solid->mTouching!=NULL && toSmall(temp,0.5f)){
+			//	newPosition.set(oldPosition);
+			//	solid->mVelocity.set(oldVelocity);
+			//	skip=true;
+			//}
+			//else
+			{
 				if(temp.x<0){temp.x=-temp.x;}
 				if(temp.y<0){temp.y=-temp.y;}
 				if(temp.z<0){temp.z=-temp.z;}
