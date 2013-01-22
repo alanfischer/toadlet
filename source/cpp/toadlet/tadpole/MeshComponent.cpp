@@ -125,7 +125,7 @@ void MeshComponent::setMesh(Mesh *mesh){
 		return;
 	}
 
-	mBound->transform(mMesh->getBound(),mMesh->getTransform());
+	setTransform(mMesh->getTransform());
 
 	if(mMesh->getSkeleton()!=NULL){
 		mSkeleton=new SkeletonComponent(mEngine,mMesh->getSkeleton());
@@ -150,6 +150,7 @@ void MeshComponent::setMesh(Mesh *mesh){
 		}
 
 		subMesh->mHasOwnTransform=subMesh->mMeshSubMesh->hasOwnTransform;
+		subMesh->mTransform.set(subMesh->mMeshSubMesh->transform);
 
 		if(mSharedRenderState!=NULL){
 			subMesh->mMaterial=mEngine->getMaterialManager()->createSharedMaterial(subMesh->mMaterial,mSharedRenderState);
@@ -185,7 +186,7 @@ void MeshComponent::frameUpdate(int dt,int scope){
 	}
 
 	if(mMesh!=NULL){
-		mWorldTransform.setTransform(mParent->getWorldTransform(),mMesh->getTransform());
+		mWorldTransform.setTransform(mParent->getWorldTransform(),mTransform);
 		mWorldBound->transform(mBound,mParent->getWorldTransform());
 	}
 
@@ -193,9 +194,17 @@ void MeshComponent::frameUpdate(int dt,int scope){
 	for(i=0;i<mSubMeshes.size();++i){
 		SubMesh *subMesh=mSubMeshes[i];
 		if(subMesh->mHasOwnTransform){
-			subMesh->mWorldTransform.setTransform(mWorldTransform,subMesh->mMeshSubMesh->transform);
+			subMesh->mWorldTransform.setTransform(mWorldTransform,subMesh->mTransform);
 			subMesh->mWorldBound->transform(subMesh->mMeshSubMesh->bound,subMesh->mWorldTransform);
 		}
+	}
+}
+
+void MeshComponent::setTransform(const Transform &transform){
+	mTransform.set(transform);
+
+	if(mMesh!=NULL){
+		mBound->transform(mMesh->getBound(),transform);
 	}
 }
 

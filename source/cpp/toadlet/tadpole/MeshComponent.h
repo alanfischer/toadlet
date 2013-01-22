@@ -47,6 +47,9 @@ public:
 		SubMesh(MeshComponent *parent,Mesh::SubMesh *meshSubMesh);
 		virtual ~SubMesh(){}
 
+		void setTransform(const Transform &transform){mTransform.set(transform);}
+		const Transform &getTransform() const{return mTransform;}
+
 		// Renderable
 		Material *getRenderMaterial() const{return mMaterial;}
 		const Transform &getRenderTransform() const{return mHasOwnTransform?mWorldTransform:mParent->getWorldTransform();}
@@ -61,6 +64,7 @@ public:
 		Mesh::SubMesh *mMeshSubMesh;
 
 		bool mHasOwnTransform;
+		Transform mTransform;
 		Transform mWorldTransform;
 		Bound::ptr mWorldBound;
 		int mScope;
@@ -87,7 +91,12 @@ public:
 	void setSkeleton(SkeletonComponent *skeleton);
 
 	void frameUpdate(int dt,int scope);
+
+	void setTransform(const Transform &transform);
+	const Transform &getTransform() const{return mTransform;}
+
 	Bound *getBound() const{return mBound;}
+
 	bool getActive() const{return false;}
 
 	// Visible
@@ -117,6 +126,7 @@ protected:
 	RenderState::ptr mSharedRenderState;
 	SkeletonComponent::ptr mSkeleton;
 	VertexData::ptr mDynamicVertexData;
+	Transform mTransform;
 	Bound::ptr mBound;
 	Transform mWorldTransform;
 	Bound::ptr mWorldBound;
