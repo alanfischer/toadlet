@@ -13,9 +13,22 @@ include (LocateStaticLibraries)
 include (MergeStaticLibraries)
 
 
-# By default we always build static and dynamic libraries
+# Library options
 option (TOADLET_BUILD_DYNAMIC "Build dynamic libraries" ON)
 option (TOADLET_BUILD_STATIC "Build static libraries" ON)
+if (NOT TOADLET_PLATFORM_WIN32)
+	option (TOADLET_PROFILE "Build with profiling information" OFF)
+endif (NOT TOADLET_PLATFORM_WIN32)
+
+
+# Setup link flags according to profiling
+if (TOADLET_PROFILE) 
+	set (DYNAMIC_LIB_FLAGS "-pg")
+	set (STATIC_LIB_FLAGS "-pg")
+	set (DYNAMIC_LIB_LINK "-pg")
+	set (STATIC_LIB_LINK "-pg")
+	message (STATUS "Profiling enabled")
+endif (TOADLET_PROFILE) 
 
 
 # Setup all platform specific options
@@ -55,13 +68,19 @@ if (TOADLET_PLATFORM_ANDROID)
 		message (STATUS "Exceptions disabled")
 	endif (TOADLET_EXCEPTIONS)
 
-	# Append the compile flags to the properties
+	# Append the individual flags to the overall properties
 	if (DYNAMIC_LIB_FLAGS)
 		set (DYNAMIC_LIB_PROPS ${DYNAMIC_LIB_PROPS} COMPILE_FLAGS ${DYNAMIC_LIB_FLAGS})
 	endif (DYNAMIC_LIB_FLAGS)
 	if (STATIC_LIB_FLAGS)
 		set (STATIC_LIB_PROPS ${STATIC_LIB_PROPS} COMPILE_FLAGS ${STATIC_LIB_FLAGS})
 	endif (STATIC_LIB_FLAGS)
+	if (DYNAMIC_LIB_LINK)
+		set (DYNAMIC_LIB_PROPS ${DYNAMIC_LIB_PROPS} LINK_FLAGS ${DYNAMIC_LIB_LINK})
+	endif (DYNAMIC_LIB_LINK)
+	if (STATIC_LIB_LINK)
+		set (STATIC_LIB_PROPS ${STATIC_LIB_PROPS} LINK_FLAGS ${STATIC_LIB_LINK})
+	endif (STATIC_LIB_LINK)
 elseif (TOADLET_PLATFORM_IOS)
 	# iOS does not permit dynamic libraries
 	set (TOADLET_BUILD_DYNAMIC OFF CACHE BOOL "Build dynamic libraries" FORCE)
@@ -90,13 +109,19 @@ elseif (TOADLET_PLATFORM_IOS)
 		message (STATUS "Exceptions disabled")
 	endif (TOADLET_EXCEPTIONS)
 
-	# Append the compile flags to the properties
+	# Append the individual flags to the overall properties
 	if (DYNAMIC_LIB_FLAGS)
 		set (DYNAMIC_LIB_PROPS ${DYNAMIC_LIB_PROPS} COMPILE_FLAGS ${DYNAMIC_LIB_FLAGS})
 	endif (DYNAMIC_LIB_FLAGS)
 	if (STATIC_LIB_FLAGS)
 		set (STATIC_LIB_PROPS ${STATIC_LIB_PROPS} COMPILE_FLAGS ${STATIC_LIB_FLAGS})
 	endif (STATIC_LIB_FLAGS)
+	if (DYNAMIC_LIB_LINK)
+		set (DYNAMIC_LIB_PROPS ${DYNAMIC_LIB_PROPS} LINK_FLAGS ${DYNAMIC_LIB_LINK})
+	endif (DYNAMIC_LIB_LINK)
+	if (STATIC_LIB_LINK)
+		set (STATIC_LIB_PROPS ${STATIC_LIB_PROPS} LINK_FLAGS ${STATIC_LIB_LINK})
+	endif (STATIC_LIB_LINK)
 elseif (TOADLET_PLATFORM_POSIX)
 	# Set defaults
 	option (TOADLET_RTTI "Enable Run Time Type Information" ON)
@@ -135,13 +160,19 @@ elseif (TOADLET_PLATFORM_POSIX)
 	set (DYNAMIC_LIB_FLAGS "${DYNAMIC_LIB_FLAGS} -fPIC")
 	set (STATIC_LIB_FLAGS "${STATIC_LIB_FLAGS} -fPIC")
 
-	# Append the compile flags to the properties
+	# Append the individual flags to the overall properties
 	if (DYNAMIC_LIB_FLAGS)
 		set (DYNAMIC_LIB_PROPS ${DYNAMIC_LIB_PROPS} COMPILE_FLAGS ${DYNAMIC_LIB_FLAGS})
 	endif (DYNAMIC_LIB_FLAGS)
 	if (STATIC_LIB_FLAGS)
 		set (STATIC_LIB_PROPS ${STATIC_LIB_PROPS} COMPILE_FLAGS ${STATIC_LIB_FLAGS})
 	endif (STATIC_LIB_FLAGS)
+	if (DYNAMIC_LIB_LINK)
+		set (DYNAMIC_LIB_PROPS ${DYNAMIC_LIB_PROPS} LINK_FLAGS ${DYNAMIC_LIB_LINK})
+	endif (DYNAMIC_LIB_LINK)
+	if (STATIC_LIB_LINK)
+		set (STATIC_LIB_PROPS ${STATIC_LIB_PROPS} LINK_FLAGS ${STATIC_LIB_LINK})
+	endif (STATIC_LIB_LINK)
 
 	# OSX specifically adds the install_name parameter to dynamic libraries
 	if (TOADLET_PLATFORM_OSX)
