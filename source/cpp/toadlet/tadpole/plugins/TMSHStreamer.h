@@ -56,6 +56,9 @@ protected:
 	Bound::ptr readBound(DataStream *stream);
 	void writeBound(DataStream *stream,Bound::ptr bound);
 
+	Transform::ptr readTransform(DataStream *stream);
+	void writeTransform(DataStream *stream,Transform::ptr transform);
+
 	IndexData::ptr readIndexData(DataStream *stream);
 	IndexBuffer::ptr readIndexBuffer(DataStream *stream);
 	VertexData::ptr readVertexData(DataStream *stream);

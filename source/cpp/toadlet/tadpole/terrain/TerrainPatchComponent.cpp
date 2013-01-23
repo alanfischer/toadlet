@@ -62,6 +62,9 @@ TerrainPatchComponent::TerrainPatchComponent(Scene *scene):
 
 	mTolerance=0.00001f;
 
+	mWaterTransform=new Transform();
+	mWaterWorldTransform=new Transform();
+
 	mLocalCamera=new Camera();
 }
 
@@ -617,7 +620,7 @@ bool TerrainPatchComponent::unstitchFromBottom(TerrainPatchComponent *terrain){
 
 void TerrainPatchComponent::setWaterLevel(scalar level){
 	mWaterLevel=level;
-	mWaterTransform.setTranslate(0,0,level);
+	mWaterTransform->setTranslate(0,0,level);
 }
 
 void TerrainPatchComponent::gatherRenderables(Camera *camera,RenderableSet *set){
@@ -628,7 +631,7 @@ void TerrainPatchComponent::gatherRenderables(Camera *camera,RenderableSet *set)
 	}
 
 	if((camera->getScope()&mWaterScope)!=0 && mWaterRenderable!=NULL && mWaterMaterial!=NULL){
-		mWaterWorldTransform.setTransform(mParent->getWorldTransform(),mWaterTransform);
+		mWaterWorldTransform->setTransform(mParent->getWorldTransform(),mWaterTransform);
 
 		if((camera->getScope()&mCameraUpdateScope)!=0){
 			updateWaterIndexBuffers(camera);
@@ -644,7 +647,7 @@ void TerrainPatchComponent::updateBlocks(Camera *camera){
 	TOADLET_PROFILE_AUTOSCOPE();
 
 	Matrix4x4 matrix;
-	mParent->getWorldTransform().inverseTransform(matrix,camera->getWorldMatrix());
+	mParent->getWorldTransform()->inverseTransform(matrix,camera->getWorldMatrix());
 	mLocalCamera->setWorldMatrix(matrix);
 	mLocalCamera->setProjectionMatrix(camera->getProjectionMatrix());
 
@@ -656,7 +659,7 @@ void TerrainPatchComponent::updateIndexBuffers(Camera *camera){
 	TOADLET_PROFILE_AUTOSCOPE();
 
 	Matrix4x4 matrix;
-	mParent->getWorldTransform().inverseTransform(matrix,camera->getWorldMatrix());
+	mParent->getWorldTransform()->inverseTransform(matrix,camera->getWorldMatrix());
 	mLocalCamera->setWorldMatrix(matrix);
 	mLocalCamera->setProjectionMatrix(camera->getProjectionMatrix());
 
@@ -671,7 +674,7 @@ void TerrainPatchComponent::updateWaterIndexBuffers(Camera *camera){
 	TOADLET_PROFILE_AUTOSCOPE();
 
 	Matrix4x4 matrix;
-	mParent->getWorldTransform().inverseTransform(matrix,camera->getWorldMatrix());
+	mParent->getWorldTransform()->inverseTransform(matrix,camera->getWorldMatrix());
 	mLocalCamera->setWorldMatrix(matrix);
 	mLocalCamera->setProjectionMatrix(camera->getProjectionMatrix());
 
@@ -687,13 +690,13 @@ void TerrainPatchComponent::render(RenderManager *manager) const{
 }
 
 void TerrainPatchComponent::traceSegment(PhysicsCollision &result,const Vector3 &position,const Segment &segment,const Vector3 &size){
-	const Transform &worldTransform=mParent->getWorldTransform();
+	Transform *worldTransform=mParent->getWorldTransform();
 
 	Segment localSegment;
-	scalar sizeAdjust=Math::div(size.z/2,worldTransform.getScale().z);
+	scalar sizeAdjust=Math::div(size.z/2,worldTransform->getScale().z);
 	Transform transform;
 
-	transform.set(position,worldTransform.getScale(),worldTransform.getRotate());
+	transform.set(position,worldTransform->getScale(),worldTransform->getRotate());
 	transform.inverseTransform(localSegment,segment);
 	localSegment.origin.z-=sizeAdjust;
 

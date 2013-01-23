@@ -345,7 +345,7 @@ void StudioModelComponent::traceSegment(PhysicsCollision &result,const Vector3 &
 	Transform transform;
 	int i;
 
-	transform.set(position,mParent->getWorldTransform().getScale(),mParent->getWorldTransform().getRotate());
+	transform.set(position,mParent->getWorldTransform()->getScale(),mParent->getWorldTransform()->getRotate());
 	transform.inverseTransform(localSegment,segment);
 
 	result.time=Math::ONE;
@@ -434,7 +434,7 @@ int StudioModelComponent::getAttachmentIndex(const String &name){
 	return -1;
 }
 
-bool StudioModelComponent::getAttachmentTransform(Transform &result,int index){
+bool StudioModelComponent::getAttachmentTransform(Transform *result,int index){
 	if(index<0 || index>mModel->header->numattachments){
 		return false;
 	}
@@ -444,12 +444,12 @@ bool StudioModelComponent::getAttachmentTransform(Transform &result,int index){
 	Quaternion rotate=mBoneRotates[attachment->bone];
 
 	Math::add(translate,attachment->org);
-	result.setTranslate(translate);
+	result->setTranslate(translate);
 
 	Quaternion attachmentRotate;
 	Math::setQuaternionFromAxes(attachmentRotate,attachment->vectors[0],attachment->vectors[1],attachment->vectors[2]);
 	Math::postMul(rotate,attachmentRotate);
-	result.setRotate(rotate);
+	result->setRotate(rotate);
 
 	return true;
 }

@@ -55,8 +55,8 @@ public:
 		Material::ptr material;
 		String materialName;
 
-		bool hasOwnTransform;
-		Transform transform;
+		bool hasOwnTransform; /// @todo: Replace with transform/bound being null
+		Transform::ptr transform;
 		Bound::ptr bound;
 	};
 
@@ -83,8 +83,8 @@ public:
 	void compile();
 	void compileBoneBounds();
 
-	virtual void setTransform(const Transform &transform){mTransform.set(transform);}
-	const Transform &getTransform() const{return mTransform;}
+	virtual void setTransform(Transform *transform){mTransform=transform;}
+	Transform *getTransform() const{return mTransform;}
 
 	virtual void setBound(Bound *bound){mBound=bound;}
 	Bound *getBound() const{return mBound;}
@@ -105,7 +105,7 @@ public:
 	const Collection<VertexBoneAssignmentList> &getVertexBoneAssignments() const{return mVertexBoneAssignments;}
 
 protected:
-	Transform mTransform;
+	Transform::ptr mTransform;
 	Bound::ptr mBound;
 	Collection<SubMesh::ptr> mSubMeshes;
 	VertexData::ptr mStaticVertexData;

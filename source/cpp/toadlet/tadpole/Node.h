@@ -105,27 +105,27 @@ public:
 
 	virtual void setTranslate(const Vector3 &translate);
 	virtual void setTranslate(scalar x,scalar y,scalar z);
-	inline const Vector3 &getTranslate() const{return mTransform.getTranslate();}
+	inline const Vector3 &getTranslate() const{return mTransform->getTranslate();}
 
 	virtual void setRotate(const Quaternion &rotate);
 	virtual void setRotate(const Matrix3x3 &rotate);
 	virtual void setRotate(const Vector3 &axis,scalar angle);
-	inline const Quaternion &getRotate() const{return mTransform.getRotate();}
+	inline const Quaternion &getRotate() const{return mTransform->getRotate();}
 
 	virtual void setScale(const Vector3 &scale);
 	virtual void setScale(scalar x,scalar y,scalar z);
 	virtual void setScale(scalar s){setScale(s,s,s);}
-	inline const Vector3 &getScale() const{return mTransform.getScale();}
+	inline const Vector3 &getScale() const{return mTransform->getScale();}
 
-	inline const Vector3 &getWorldTranslate() const{return mWorldTransform.getTranslate();}
-	inline const Quaternion &getWorldRotate() const{return mWorldTransform.getRotate();}
-	inline const Vector3 &getWorldScale() const{return mWorldTransform.getScale();}
+	inline const Vector3 &getWorldTranslate() const{return mWorldTransform->getTranslate();}
+	inline const Quaternion &getWorldRotate() const{return mWorldTransform->getRotate();}
+	inline const Vector3 &getWorldScale() const{return mWorldTransform->getScale();}
 
 	virtual void setMatrix4x4(const Matrix4x4 &matrix);
 
-	virtual void setTransform(const Transform &transform);
-	virtual const Transform &getTransform() const{return mTransform;}
-	inline const Transform &getWorldTransform() const{return mWorldTransform;}
+	virtual void setTransform(Transform *transform);
+	virtual Transform *getTransform() const{return mTransform;}
+	inline Transform *getWorldTransform() const{return mWorldTransform;}
 
 	virtual void setBound(Bound *bound);
 	inline Bound *getBound() const{return mBound;}
@@ -176,9 +176,9 @@ protected:
 	int mDeactivateCount;
 	int mTransformUpdatedFrame;
 
-	Transform mTransform;
+	Transform::ptr mTransform;
 	Bound::ptr mBound;
-	Transform mWorldTransform;
+	Transform::ptr mWorldTransform;
 	Bound::ptr mWorldBound;
 	Bound::ptr mComponentBound;
 	Bound::ptr mComponentWorldBound;

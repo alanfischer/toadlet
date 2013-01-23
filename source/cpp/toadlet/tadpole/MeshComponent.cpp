@@ -33,7 +33,6 @@ namespace toadlet{
 namespace tadpole{
 
 MeshComponent::SubMesh::SubMesh(MeshComponent *parent,Mesh::SubMesh *meshSubMesh):
-	mHasOwnTransform(false),
 	mScope(-1)
 {
 	mParent=parent;
@@ -55,7 +54,9 @@ MeshComponent::MeshComponent(Engine *engine):
 	//mDynamicVertexData
 {
 	mEngine=engine;
+	mTransform=new Transform();
 	mBound=new Bound();
+	mWorldTransform=new Transform();
 	mWorldBound=new Bound();
 }
 
@@ -149,8 +150,9 @@ void MeshComponent::setMesh(Mesh *mesh){
 			}
 		}
 
-		subMesh->mHasOwnTransform=subMesh->mMeshSubMesh->hasOwnTransform;
-		subMesh->mTransform.set(subMesh->mMeshSubMesh->transform);
+		if(subMesh->mMeshSubMesh->hasOwnTransform){
+			subMesh->mTransform=new Transform(subMesh->mMeshSubMesh->transform);
+		}
 
 		if(mSharedRenderState!=NULL){
 			subMesh->mMaterial=mEngine->getMaterialManager()->createSharedMaterial(subMesh->mMaterial,mSharedRenderState);
@@ -186,25 +188,30 @@ void MeshComponent::frameUpdate(int dt,int scope){
 	}
 
 	if(mMesh!=NULL){
-		mWorldTransform.setTransform(mParent->getWorldTransform(),mTransform);
+		mWorldTransform->setTransform(mParent->getWorldTransform(),mTransform);
 		mWorldBound->transform(mBound,mParent->getWorldTransform());
 	}
 
 	int i;
 	for(i=0;i<mSubMeshes.size();++i){
 		SubMesh *subMesh=mSubMeshes[i];
-		if(subMesh->mHasOwnTransform){
-			subMesh->mWorldTransform.setTransform(mWorldTransform,subMesh->mTransform);
+		if(subMesh->mTransform){
+			subMesh->mWorldTransform->setTransform(mWorldTransform,subMesh->mTransform);
 			subMesh->mWorldBound->transform(subMesh->mMeshSubMesh->bound,subMesh->mWorldTransform);
 		}
 	}
 }
 
-void MeshComponent::setTransform(const Transform &transform){
-	mTransform.set(transform);
+void MeshComponent::setTransform(Transform *transform){
+	if(transform==NULL){
+		mTransform->reset();
+	}
+	else{
+		mTransform->set(transform);
+	}
 
 	if(mMesh!=NULL){
-		mBound->transform(mMesh->getBound(),transform);
+		mBound->transform(mMesh->getBound(),mTransform);
 	}
 }
 
@@ -231,7 +238,7 @@ void MeshComponent::gatherRenderables(Camera *camera,RenderableSet *set){
 	int i;
 	for(i=0;i<mSubMeshes.size();++i){
 		SubMesh *subMesh=mSubMeshes[i];
-		if((subMesh->mScope&camera->getScope())!=0 && (subMesh->mHasOwnTransform==false || camera->culled(subMesh->getRenderBound())==false)){
+		if((subMesh->mScope&camera->getScope())!=0 && (subMesh->mTransform==NULL || camera->culled(subMesh->getRenderBound())==false)){
 			set->queueRenderable(subMesh);
 		}
 	}

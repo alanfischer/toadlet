@@ -191,7 +191,7 @@ void BSP30ModelComponent::traceSegment(PhysicsCollision &result,const Vector3 &p
 
 	bool transformed=true;//(getWorldTransform()!=Node::identityTransform());
 	if(transformed){
-		transform.set(position,mParent->getWorldTransform().getScale(),mParent->getWorldTransform().getRotate());
+		transform.set(position,mParent->getWorldTransform()->getScale(),mParent->getWorldTransform()->getRotate());
 		transform.inverseTransform(localSegment);
 	}
 

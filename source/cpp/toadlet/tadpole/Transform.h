@@ -26,35 +26,41 @@
 #ifndef TOADLET_TADPOLE_TRANSFORM_H
 #define TOADLET_TADPOLE_TRANSFORM_H
 
-#include <toadlet/egg/io/DataStream.h>
 #include <toadlet/tadpole/Types.h>
 
 namespace toadlet{
 namespace tadpole{
 
-/// @todo: Decide if this is a State style object, or a full Object
-class TOADLET_API Transform{
+class TOADLET_API Transform:public Object{
 public:
+	TOADLET_OBJECT(Transform);
+
 	Transform():
 		mScale(Math::ONE,Math::ONE,Math::ONE)
 	{}
 
-	Transform(const Vector3 &t,const Vector3 &s,const Quaternion &r){
-		mTranslate.set(t);
-		mScale.set(s);
-		mRotate.set(r);
-	}
-	
+	Transform(const Vector3 &t,const Vector3 &s,const Quaternion &r):
+		mTranslate(t),
+		mScale(s),
+		mRotate(r)
+	{}
+
+	Transform(const Transform *transform):
+		mTranslate(transform->mTranslate),
+		mScale(transform->mScale),
+		mRotate(transform->mRotate)
+	{}
+
 	void reset(){
 		mTranslate.reset();
 		mScale.set(Math::ONE,Math::ONE,Math::ONE);
 		mRotate.reset();
 	}
 
-	void set(const Transform &transform){
-		mTranslate.set(transform.mTranslate);
-		mScale.set(transform.mScale);
-		mRotate.set(transform.mRotate);
+	void set(const Transform *transform){
+		mTranslate.set(transform->mTranslate);
+		mScale.set(transform->mScale);
+		mRotate.set(transform->mRotate);
 	}
 
 	void set(const Vector3 &t,const Vector3 &s,const Quaternion &r){
@@ -63,12 +69,12 @@ public:
 		mRotate.set(r);
 	}
 
-	void setTransform(const Transform &parentTransform,const Transform &transform){
-		Math::mul(mRotate,parentTransform.mRotate,transform.mRotate);
-		Math::mul(mScale,parentTransform.mScale,transform.mScale);
-		Math::mul(mTranslate,parentTransform.mRotate,transform.mTranslate);
-		Math::mul(mTranslate,parentTransform.mScale);
-		Math::add(mTranslate,parentTransform.mTranslate);
+	void setTransform(const Transform *parentTransform,const Transform *transform){
+		Math::mul(mRotate,parentTransform->mRotate,transform->mRotate);
+		Math::mul(mScale,parentTransform->mScale,transform->mScale);
+		Math::mul(mTranslate,parentTransform->mRotate,transform->mTranslate);
+		Math::mul(mTranslate,parentTransform->mScale);
+		Math::add(mTranslate,parentTransform->mTranslate);
 	}
 	
 	const Vector3 &getTranslate() const{return mTranslate;}
@@ -87,6 +93,7 @@ public:
 	void getMatrix(Matrix4x4 &r) const{
 		Math::setMatrix4x4FromTranslateRotateScale(r,mTranslate,mRotate,mScale);
 	}
+
 	void setMatrix(const Matrix4x4 &m){
 		Math::setScaleFromMatrix4x4(mScale,m);
 		Math::setQuaternionFromMatrix4x4(mRotate,m);

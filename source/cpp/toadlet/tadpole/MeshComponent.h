@@ -47,12 +47,12 @@ public:
 		SubMesh(MeshComponent *parent,Mesh::SubMesh *meshSubMesh);
 		virtual ~SubMesh(){}
 
-		void setTransform(const Transform &transform){mTransform.set(transform);}
-		const Transform &getTransform() const{return mTransform;}
+		void setTransform(Transform *transform){mTransform->set(transform);}
+		Transform *getTransform() const{return mTransform;}
 
 		// Renderable
 		Material *getRenderMaterial() const{return mMaterial;}
-		const Transform &getRenderTransform() const{return mHasOwnTransform?mWorldTransform:mParent->getWorldTransform();}
+		Transform *getRenderTransform() const{return mWorldTransform!=NULL?mWorldTransform.get():mParent->getWorldTransform();}
 		Bound *getRenderBound() const{return mWorldBound!=NULL?mWorldBound.get():mParent->getWorldBound();}
 		void render(RenderManager *manager) const;
 
@@ -63,9 +63,8 @@ public:
 		MeshComponent *mParent;
 		Mesh::SubMesh *mMeshSubMesh;
 
-		bool mHasOwnTransform;
-		Transform mTransform;
-		Transform mWorldTransform;
+		Transform::ptr mTransform;
+		Transform::ptr mWorldTransform;
 		Bound::ptr mWorldBound;
 		int mScope;
 
@@ -92,8 +91,8 @@ public:
 
 	void frameUpdate(int dt,int scope);
 
-	void setTransform(const Transform &transform);
-	const Transform &getTransform() const{return mTransform;}
+	void setTransform(Transform *transform);
+	Transform *getTransform() const{return mTransform;}
 
 	Bound *getBound() const{return mBound;}
 
@@ -109,10 +108,10 @@ public:
 	int getNumAttachments(){return mSkeleton!=NULL?mSkeleton->getNumAttachments():0;}
 	String getAttachmentName(int index){return mSkeleton!=NULL?mSkeleton->getAttachmentName(index):(char*)NULL;}
 	int getAttachmentIndex(const String &name){return mSkeleton!=NULL?mSkeleton->getAttachmentIndex(name):0;}
-	bool getAttachmentTransform(Transform &result,int index){return mSkeleton!=NULL?mSkeleton->getAttachmentTransform(result,index):false;}
+	bool getAttachmentTransform(Transform *result,int index){return mSkeleton!=NULL?mSkeleton->getAttachmentTransform(result,index):false;}
 
 	// SubMesh::Renderable
-	const Transform &getWorldTransform() const{return mWorldTransform;}
+	Transform *getWorldTransform() const{return mWorldTransform;}
 	Bound *getWorldBound() const{return mWorldBound;}
 
 	void createVertexBuffer();
@@ -126,9 +125,9 @@ protected:
 	RenderState::ptr mSharedRenderState;
 	SkeletonComponent::ptr mSkeleton;
 	VertexData::ptr mDynamicVertexData;
-	Transform mTransform;
+	Transform::ptr mTransform;
 	Bound::ptr mBound;
-	Transform mWorldTransform;
+	Transform::ptr mWorldTransform;
 	Bound::ptr mWorldBound;
 };
 

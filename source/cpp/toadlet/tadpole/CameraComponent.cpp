@@ -40,7 +40,7 @@ void CameraComponent::frameUpdate(int dt,int scope){
 void CameraComponent::setCameraFromTransform(){
 	if(mParent!=NULL){
 		Matrix4x4 matrix;
-		mParent->getWorldTransform().getMatrix(matrix);
+		mParent->getWorldTransform()->getMatrix(matrix);
 		mCamera->setWorldMatrix(matrix);
 	}
 }

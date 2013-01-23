@@ -24,6 +24,7 @@
  ********** Copyright header - do not remove **********/
 
 #include <toadlet/egg/Error.h>
+#include <toadlet/egg/io/DataStream.h>
 #include <toadlet/egg/MathFormatting.h>
 #include "XANMStreamer.h"
 #include "XMLMeshUtilities.h"

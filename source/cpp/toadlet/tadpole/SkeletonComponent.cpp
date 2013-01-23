@@ -348,7 +348,7 @@ void SkeletonComponent::destroySkeletonBuffers(){
 	}
 }
 
-const Transform &SkeletonComponent::getRenderTransform() const{
+Transform *SkeletonComponent::getRenderTransform() const{
 	return mParent->getWorldTransform();
 }
 
@@ -362,11 +362,11 @@ void SkeletonComponent::render(RenderManager *manager) const{
 	manager->getDevice()->renderPrimitive(mHitBoxVertexData,mHitBoxIndexData);
 }
 
-bool SkeletonComponent::getAttachmentTransform(Transform &result,int index){
+bool SkeletonComponent::getAttachmentTransform(Transform *result,int index){
 	if(index>=0 && index<mBones.size()){
 		Bone *bone=mBones[index];
-		result.setTranslate(bone->worldTranslate);
-		result.setRotate(bone->worldRotate);
+		result->setTranslate(bone->worldTranslate);
+		result->setRotate(bone->worldRotate);
 		return true;
 	}
 	else{
