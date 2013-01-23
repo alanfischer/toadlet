@@ -67,9 +67,9 @@ Node::Node(Scene *scene):BaseComponent(),
 	mDeactivateCount=0;
 	mTransformUpdatedFrame=-1;
 
-	mTransform.reset();
+	mTransform=new Transform();
 	mBound=new Bound();
-	mWorldTransform.reset();
+	mWorldTransform=new Transform();
 	mWorldBound=new Bound();
 	mComponentBound=new Bound();
 	mComponentWorldBound=new Bound();
@@ -259,47 +259,47 @@ void Node::rootChanged(Node *root){
 }
 
 void Node::setTranslate(const Vector3 &translate){
-	mTransform.setTranslate(translate);
+	mTransform->setTranslate(translate);
 	spacialUpdated();
 }
 
 void Node::setTranslate(scalar x,scalar y,scalar z){
-	mTransform.setTranslate(x,y,z);
+	mTransform->setTranslate(x,y,z);
 	spacialUpdated();
 }
 
 void Node::setRotate(const Quaternion &rotate){
-	mTransform.setRotate(rotate);
+	mTransform->setRotate(rotate);
 	spacialUpdated();
 }
 
 void Node::setRotate(const Matrix3x3 &rotate){
-	mTransform.setRotate(rotate);
+	mTransform->setRotate(rotate);
 	spacialUpdated();
 }
 
 void Node::setRotate(const Vector3 &axis,scalar angle){
-	mTransform.setRotate(axis,angle);
+	mTransform->setRotate(axis,angle);
 	spacialUpdated();
 }
 
 void Node::setScale(const Vector3 &scale){
-	mTransform.setScale(scale);
+	mTransform->setScale(scale);
 	spacialUpdated();
 }
 
 void Node::setScale(scalar x,scalar y,scalar z){
-	mTransform.setScale(x,y,z);
+	mTransform->setScale(x,y,z);
 	spacialUpdated();
 }
 
 void Node::setMatrix4x4(const Matrix4x4 &matrix){
-	mTransform.setMatrix(matrix);
+	mTransform->setMatrix(matrix);
 	spacialUpdated();
 }
 
-void Node::setTransform(const Transform &transform){
-	mTransform.set(transform);
+void Node::setTransform(Transform *transform){
+	mTransform->set(transform);
 	spacialUpdated();
 }
 
@@ -424,13 +424,13 @@ bool Node::getTransformUpdated(){return mScene->getFrame()==mTransformUpdatedFra
 
 void Node::updateWorldTransform(){
 	if(mParent==NULL){
-		mWorldTransform.set(mTransform);
+		mWorldTransform->set(mTransform);
 	}
 	else if(mTransformUpdatedFrame==-1){
-		mWorldTransform.set(mParent->mWorldTransform);
+		mWorldTransform->set(mParent->mWorldTransform);
 	}
 	else{
-		mWorldTransform.setTransform(mParent->mWorldTransform,mTransform);
+		mWorldTransform->setTransform(mParent->mWorldTransform,mTransform);
 	}
 	mWorldBound->transform(mBound,mWorldTransform);
 

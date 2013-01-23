@@ -76,7 +76,7 @@ public:
 
 	// Renderable
 	Material *getRenderMaterial() const{return mMaterial;}
-	const Transform &getRenderTransform() const{return mParent->getWorldTransform();}
+	Transform *getRenderTransform() const{return mParent->getWorldTransform();}
 	Bound *getRenderBound() const{return mParent->getWorldBound();}
 	void render(RenderManager *manager) const;
 

@@ -109,7 +109,7 @@ public:
 
 	// Renderable
 	Material *getRenderMaterial() const{return mMaterial;}
-	const Transform &getRenderTransform() const{return mWorldSpace==false?mParent->getWorldTransform():mScene->getRoot()->getWorldTransform();}
+	Transform *getRenderTransform() const{return mWorldSpace==false?mParent->getWorldTransform():mScene->getRoot()->getWorldTransform();}
 	Bound *getRenderBound() const{return mParent->getWorldBound();}
 	void render(RenderManager *manager) const;
 

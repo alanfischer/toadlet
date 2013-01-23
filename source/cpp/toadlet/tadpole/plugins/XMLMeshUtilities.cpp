@@ -326,20 +326,21 @@ Mesh::ptr XMLMeshUtilities::loadMesh(mxml_node_t *node,int version,BufferManager
 
 	mxml_node_t *transformNode=mxmlFindChild(node,"Transform");
 	if(transformNode!=NULL){
-		Transform transform;
+		Transform::ptr transform=new Transform();
+
 		mxml_node_t *translateNode=mxmlFindChild(transformNode,"Translate");
 		if(translateNode!=NULL){
-			transform.setTranslate(parseVector3(mxmlGetOpaque(translateNode->child)));
+			transform->setTranslate(parseVector3(mxmlGetOpaque(translateNode->child)));
 		}
 
 		mxml_node_t *rotateNode=mxmlFindChild(transformNode,"Rotate");
 		if(rotateNode!=NULL){
-			transform.setRotate(parseQuaternion(mxmlGetOpaque(rotateNode->child)));
+			transform->setRotate(parseQuaternion(mxmlGetOpaque(rotateNode->child)));
 		}
 
 		mxml_node_t *scaleNode=mxmlFindChild(transformNode,"Scale");
 		if(scaleNode!=NULL){
-			transform.setScale(parseVector3(mxmlGetOpaque(scaleNode->child)));
+			transform->setScale(parseVector3(mxmlGetOpaque(scaleNode->child)));
 		}
 
 		mesh->setTransform(transform);
@@ -619,21 +620,21 @@ mxml_node_t *XMLMeshUtilities::saveMesh(Mesh::ptr mesh,int version,ProgressListe
 
 	mxml_node_t *transformNode=mxmlNewElement(meshNode,"Transform");
 	{
-		const Transform &transform=mesh->getTransform();
+		Transform *transform=mesh->getTransform();
 
 		mxml_node_t *translateNode=mxmlNewElement(transformNode,"Translate");
 		{
-			mxmlNewOpaque(translateNode,formatVector3(transform.getTranslate()));
+			mxmlNewOpaque(translateNode,formatVector3(transform->getTranslate()));
 		}
 
 		mxml_node_t *rotateNode=mxmlNewElement(transformNode,"Rotate");
 		{
-			mxmlNewOpaque(rotateNode,formatQuaternion(transform.getRotate()));
+			mxmlNewOpaque(rotateNode,formatQuaternion(transform->getRotate()));
 		}
 
 		mxml_node_t *scaleNode=mxmlNewElement(transformNode,"Scale");
 		{
-			mxmlNewOpaque(scaleNode,formatVector3(transform.getScale()));
+			mxmlNewOpaque(scaleNode,formatVector3(transform->getScale()));
 		}
 	}
 

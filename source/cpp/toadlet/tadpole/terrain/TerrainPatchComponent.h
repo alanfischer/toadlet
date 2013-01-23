@@ -135,7 +135,7 @@ public:
 
 	// Renderable
 	Material *getRenderMaterial() const{return mMaterial;}
-	const Transform &getRenderTransform() const{return mParent->getWorldTransform();}
+	Transform *getRenderTransform() const{return mParent->getWorldTransform();}
 	Bound *getRenderBound() const{return mParent->getWorldBound();}
 	void render(RenderManager *manager) const;
 
@@ -154,7 +154,7 @@ protected:
 		WaterRenderable(TerrainPatchComponent *terrain){mTerrain=terrain;}
 
 		Material *getRenderMaterial() const{return mTerrain->mWaterMaterial;}
-		const Transform &getRenderTransform() const{return mTerrain->mWaterWorldTransform;}
+		Transform *getRenderTransform() const{return mTerrain->mWaterWorldTransform;}
 		Bound *getRenderBound() const{return mTerrain->getRenderBound();}
 		void render(RenderManager *manager) const{manager->getDevice()->renderPrimitive(mTerrain->mWaterVertexData,mTerrain->mWaterIndexData);}
 
@@ -255,8 +255,8 @@ protected:
 	int mWaterTransparentScope;
 	scalar mTolerance;
 	scalar mWaterLevel;
-	Transform mWaterTransform;
-	Transform mWaterWorldTransform;
+	Transform::ptr mWaterTransform;
+	Transform::ptr mWaterWorldTransform;
 
 	Collection<Texture::ptr> mLayerTextures;
 	Material::ptr mMaterial;

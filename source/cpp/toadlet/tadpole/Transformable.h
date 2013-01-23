@@ -33,8 +33,8 @@ namespace tadpole{
 
 class Transformable{
 public:
-	virtual void setTransform(const Transform &transform)=0;
-	virtual const Transform &getTransform() const=0;
+	virtual void setTransform(Transform *transform)=0;
+	virtual Transform *getTransform() const=0;
 };
 
 }

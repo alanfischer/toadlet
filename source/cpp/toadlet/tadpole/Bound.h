@@ -51,10 +51,10 @@ public:
 		mType(type)
 	{}
 
-	Bound(const Bound &bound):
-		mType(bound.mType),
-		mSphere(bound.mSphere),
-		mBox(bound.mBox)
+	Bound(const Bound *bound):
+		mType(bound->mType),
+		mSphere(bound->mSphere),
+		mBox(bound->mBox)
 	{}
 
 	Bound(const AABox &box):
@@ -166,12 +166,12 @@ public:
 	const Sphere &getSphere() const{return mSphere;}
 	const AABox &getAABox() const{return mBox;}
 
-	void transform(Bound *source,const Transform &transform){
+	void transform(Bound *source,Transform *transform){
 		mType=source->mType;
 
-		const Vector3 &translate=transform.getTranslate();
-		const Quaternion &rotate=transform.getRotate();
-		const Vector3 &scale=transform.getScale();
+		const Vector3 &translate=transform->getTranslate();
+		const Quaternion &rotate=transform->getRotate();
+		const Vector3 &scale=transform->getScale();
 
 		if(source->mType==Type_SPHERE){
 			Math::mul(mSphere.origin,scale,source->mSphere.radius);

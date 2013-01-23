@@ -73,7 +73,7 @@ public:
 
 	// Renderable items
 	Material *getRenderMaterial() const{return NULL;}
-	const Transform &getRenderTransform() const{return mWorldTransform;}
+	Transform *getRenderTransform() const{return mWorldTransform;}
 	Bound *getRenderBound() const{return mWorldBound;}
 	void render(RenderManager *manager) const;
 

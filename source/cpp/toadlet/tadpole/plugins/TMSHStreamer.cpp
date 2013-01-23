@@ -159,9 +159,7 @@ Mesh::ptr TMSHStreamer::readMesh(DataStream *stream,int blockSize){
 	int i;
 	Mesh::ptr mesh=new Mesh();
 	
-	Transform transform;
-	stream->read((tbyte*)&transform,sizeof(Transform));
-	mesh->setTransform(transform);
+	mesh->setTransform(readTransform(stream));
 
 	mesh->setBound(readBound(stream));
 
@@ -182,8 +180,7 @@ Mesh::ptr TMSHStreamer::readMesh(DataStream *stream,int blockSize){
 		subMesh->setName(stream->readNullTerminatedString());
 
 		subMesh->hasOwnTransform=stream->readBool();
-		stream->read((tbyte*)&subMesh->transform,sizeof(Transform));
-
+		subMesh->transform=readTransform(stream);
 		subMesh->bound=readBound(stream);
 
 		mesh->addSubMesh(subMesh);
@@ -205,7 +202,7 @@ Mesh::ptr TMSHStreamer::readMesh(DataStream *stream,int blockSize){
 }
 
 void TMSHStreamer::writeMesh(DataStream *stream,Mesh::ptr mesh){
-	stream->write((tbyte*)&mesh->getTransform(),sizeof(Transform));
+	writeTransform(stream,mesh->getTransform());
 
 	writeBound(stream,mesh->getBound());
 	
@@ -222,8 +219,7 @@ void TMSHStreamer::writeMesh(DataStream *stream,Mesh::ptr mesh){
 		stream->writeNullTerminatedString(subMesh->getName());
 
 		stream->writeBool(subMesh->hasOwnTransform);
-		stream->write((tbyte*)&subMesh->transform,sizeof(Transform));
-
+		writeTransform(stream,subMesh->transform);
 		writeBound(stream,subMesh->bound);
 	}
 	writeVertexData(stream,mesh->getStaticVertexData());
@@ -276,6 +272,34 @@ void TMSHStreamer::writeBound(DataStream *stream,Bound::ptr bound){
 	stream->writeVector3(bound->getAABox().maxs);
 	stream->writeVector3(bound->getSphere().origin);
 	stream->writeFloat(bound->getSphere().radius);
+}
+
+Transform::ptr TMSHStreamer::readTransform(DataStream *stream){
+	Vector3 translate;
+	Vector3 scale;
+	Quaternion rotate;
+
+	stream->readVector3(translate);
+	stream->readVector3(scale);
+	stream->readQuaternion(rotate);
+
+	return new Transform(translate,scale,rotate);
+}
+
+void TMSHStreamer::writeTransform(DataStream *stream,Transform::ptr transform){
+	Vector3 translate;
+	Vector3 scale;
+	Quaternion rotate;
+
+	if(transform!=NULL){
+		translate=transform->getTranslate();
+		scale=transform->getScale();
+		rotate=transform->getRotate();
+	}
+
+	stream->writeVector3(translate);
+	stream->writeVector3(scale);
+	stream->writeQuaternion(rotate);
 }
 
 IndexData::ptr TMSHStreamer::readIndexData(DataStream *stream){

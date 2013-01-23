@@ -129,7 +129,7 @@ public:
 
 	// Renderable
 	Material *getRenderMaterial() const{return mSkeletonMaterial;}
-	const Transform &getRenderTransform() const;
+	Transform *getRenderTransform() const;
 	Bound *getRenderBound() const;
 	void render(RenderManager *manager) const;
 
@@ -137,7 +137,7 @@ public:
 	int getNumAttachments(){return mBones.size();}
 	String getAttachmentName(int index){return getBoneName(index);}
 	int getAttachmentIndex(const String &name){return getBoneIndex(name);}
-	bool getAttachmentTransform(Transform &result,int index);
+	bool getAttachmentTransform(Transform *result,int index);
 
 protected:
 	void createSkeletonBuffers();

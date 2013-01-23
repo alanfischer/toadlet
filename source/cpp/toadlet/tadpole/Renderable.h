@@ -44,7 +44,7 @@ public:
 	virtual ~Renderable(){}
 
 	virtual Material *getRenderMaterial() const=0;
-	virtual const Transform &getRenderTransform() const=0;
+	virtual Transform *getRenderTransform() const=0;
 	virtual Bound *getRenderBound() const=0;
 	virtual void render(RenderManager *manager) const=0;
 };

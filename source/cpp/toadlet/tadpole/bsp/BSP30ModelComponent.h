@@ -50,7 +50,7 @@ public:
 		void destroy(){mMaterial=NULL;}
 
 		Material *getRenderMaterial() const{return mMaterial;}
-		const Transform &getRenderTransform() const{return mParent->getParent()->getWorldTransform();}
+		Transform *getRenderTransform() const{return mParent->getParent()->getWorldTransform();}
 		Bound *getRenderBound() const{return mParent->getParent()->getWorldBound();}
 		void render(RenderManager *manager) const;
 

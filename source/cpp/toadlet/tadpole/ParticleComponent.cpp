@@ -138,7 +138,7 @@ void ParticleComponent::setWorldSpace(bool worldSpace){
 			for(i=0;i<mParticles.size();++i){
 				Particle &p=mParticles[i];
 				position.set(p.x,p.y,p.z);
-				mParent->getWorldTransform().transform(position);
+				mParent->getWorldTransform()->transform(position);
 				p.x=position.x;p.y=position.y;p.z=position.z;
 			}
 		}
@@ -146,7 +146,7 @@ void ParticleComponent::setWorldSpace(bool worldSpace){
 			for(i=0;i<mParticles.size();++i){
 				Particle &p=mParticles[i];
 				position.set(p.x,p.y,p.z);
-				mParent->getWorldTransform().inverseTransform(position);
+				mParent->getWorldTransform()->inverseTransform(position);
 				p.x=position.x;p.y=position.y;p.z=position.z;
 			}
 		}
@@ -300,7 +300,7 @@ void ParticleComponent::updateVertexBuffer(Camera *camera){
 	int i=0,j=0;
 	Vector3 viewRight,viewUp,viewForward;
 	Quaternion invRot;
-	Math::invert(invRot,mParent->getWorldTransform().getRotate());
+	Math::invert(invRot,mParent->getWorldTransform()->getRotate());
 	bool useOrigin=camera->getAlignmentCalculationsUseOrigin();
 	if(useOrigin==false){
 		Matrix4x4 invViewMatrix;

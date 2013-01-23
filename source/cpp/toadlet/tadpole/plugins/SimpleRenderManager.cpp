@@ -106,7 +106,7 @@ void SimpleRenderManager::setupPassForRenderable(RenderPass *pass,RenderDevice *
 	Camera *camera=mCamera;
 
 	Matrix4x4 matrix;
-	renderable->getRenderTransform().getMatrix(matrix);
+	renderable->getRenderTransform()->getMatrix(matrix);
 
 	// This should exist as a RenderVariable, but to support fixed devices it is calculated here
 	int flags=pass->getModelMatrixFlags();

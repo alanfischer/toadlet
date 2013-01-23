@@ -183,7 +183,7 @@ void BSP30Node::gatherRenderables(Camera *camera,RenderableSet *set){
 	set->queueRenderable(this);
 
 	Matrix4x4 matrix;
-	mWorldTransform.inverseTransform(matrix,camera->getWorldMatrix());
+	mWorldTransform->inverseTransform(matrix,camera->getWorldMatrix());
 	mLocalCamera->setWorldMatrix(matrix);
 	mLocalCamera->setProjectionMatrix(camera->getProjectionMatrix());
 
@@ -375,7 +375,7 @@ void BSP30Node::traceSegment(PhysicsCollision &result,const Vector3 &position,co
 
 	bool transformed=true;//(getWorldTransform()!=Node::identityTransform());
 	if(transformed){
-		transform.set(position,mWorldTransform.getScale(),mWorldTransform.getRotate());
+		transform.set(position,mWorldTransform->getScale(),mWorldTransform->getRotate());
 		transform.inverseTransform(localSegment);
 	}
 

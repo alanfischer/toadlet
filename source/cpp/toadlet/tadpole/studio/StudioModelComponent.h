@@ -52,7 +52,7 @@ public:
 		void destroy(){mMaterial=NULL;}
 	
 		Material *getRenderMaterial() const{return mMaterial;}
-		const Transform &getRenderTransform() const{return mParent->getRenderTransform();}
+		Transform *getRenderTransform() const{return mParent->getRenderTransform();}
 		Bound *getRenderBound() const{return mParent->getRenderBound();}
 		void render(RenderManager *manager) const;
 
@@ -134,7 +134,7 @@ public:
 
 	// Renderable
 	Material *getRenderMaterial() const{return mSkeletonMaterial;}
-	const Transform &getRenderTransform() const{return mParent->getWorldTransform();}
+	Transform *getRenderTransform() const{return mParent->getWorldTransform();}
 	Bound *getRenderBound() const{return mParent->getWorldBound();}
 	void render(RenderManager *manager) const;
 
@@ -142,7 +142,7 @@ public:
 	int getNumAttachments(){return mModel->header->numattachments;}
 	String getAttachmentName(int index){return mModel->attachment(index)->name;}
 	int getAttachmentIndex(const String &name);
-	bool getAttachmentTransform(Transform &result,int index);
+	bool getAttachmentTransform(Transform *result,int index);
 
 protected:
 	void updateSkeleton();
