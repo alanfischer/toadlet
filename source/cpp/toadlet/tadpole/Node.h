@@ -124,7 +124,7 @@ public:
 	virtual void setMatrix4x4(const Matrix4x4 &matrix);
 
 	virtual void setTransform(Transform *transform);
-	virtual Transform *getTransform() const{return mTransform;}
+	inline Transform *getTransform() const{return mTransform;}
 	inline Transform *getWorldTransform() const{return mWorldTransform;}
 
 	virtual void setBound(Bound *bound);

@@ -438,9 +438,16 @@ void Node::updateWorldTransform(){
 	int i;
 	for(i=0;i<mComponents.size();++i){
 		Component *component=mComponents[i];
+		Transform *transform=component->getTransform();
 		Bound *bound=component->getBound();
 		if(bound!=NULL){
-			mComponentBound->merge(bound,mScene->getEpsilon());
+			if(transform!=NULL){
+				mComponentWorldBound->transform(bound,transform);
+				mComponentBound->merge(mComponentWorldBound,mScene->getEpsilon());
+			}
+			else{
+				mComponentBound->merge(bound,mScene->getEpsilon());
+			}
 		}
 	}
 	mComponentWorldBound->transform(mComponentBound,mWorldTransform);

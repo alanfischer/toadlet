@@ -126,7 +126,8 @@ void MeshComponent::setMesh(Mesh *mesh){
 		return;
 	}
 
-	setTransform(mMesh->getTransform());
+	mBound->set(mMesh->getBound());
+ 	setTransform(mMesh->getTransform());
 
 	if(mMesh->getSkeleton()!=NULL){
 		mSkeleton=new SkeletonComponent(mEngine,mMesh->getSkeleton());
@@ -187,10 +188,8 @@ void MeshComponent::frameUpdate(int dt,int scope){
 		}
 	}
 
-	if(mMesh!=NULL){
-		mWorldTransform->setTransform(mParent->getWorldTransform(),mTransform);
-		mWorldBound->transform(mBound,mParent->getWorldTransform());
-	}
+	mWorldTransform->setTransform(mParent->getWorldTransform(),mTransform);
+	mWorldBound->transform(mBound,mWorldTransform);
 
 	int i;
 	for(i=0;i<mSubMeshes.size();++i){
@@ -210,8 +209,8 @@ void MeshComponent::setTransform(Transform *transform){
 		mTransform->set(transform);
 	}
 
-	if(mMesh!=NULL){
-		mBound->transform(mMesh->getBound(),mTransform);
+	if(mSkeleton!=NULL){
+		mSkeleton->setTransform(transform);
 	}
 }
 

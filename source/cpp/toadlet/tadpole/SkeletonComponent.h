@@ -105,6 +105,8 @@ public:
 	SkeletonComponent(Engine *engine,Skeleton *skeleton);
 	void destroy();
 
+	void frameUpdate(int dt,int scope);
+
 	void updateBones();
 	void updateBones(int sequenceIndex,scalar sequenceTime);
 	inline int getLastUpdateFrame() const{return mLastUpdateFrame;}
@@ -119,7 +121,11 @@ public:
 	String getBoneName(int index) const;
 	String getBoneName(Bone *bone) const{return mSkeleton->getBone(bone->index)->name;}
 
+	void setTransform(Transform *transform);
+	Transform *getTransform() const{return mTransform;}
+
 	Bound *getBound() const{return mBound;}
+
 	bool getActive() const{return false;}
 
 	inline Skeleton *getSkeleton() const{return mSkeleton;}
@@ -129,8 +135,8 @@ public:
 
 	// Renderable
 	Material *getRenderMaterial() const{return mSkeletonMaterial;}
-	Transform *getRenderTransform() const;
-	Bound *getRenderBound() const;
+	Transform *getRenderTransform() const{return mWorldTransform;}
+	Bound *getRenderBound() const{return mWorldBound;}
 	void render(RenderManager *manager) const;
 
 	// Attachable
@@ -150,7 +156,10 @@ protected:
 	Engine *mEngine;
 	Skeleton::ptr mSkeleton;
 	Collection<Bone::ptr> mBones;
+	Transform::ptr mTransform;
 	Bound::ptr mBound;
+	Transform::ptr mWorldTransform;
+	Bound::ptr mWorldBound;
 	int mLastUpdateFrame;
 
 	Sequence::ptr mSequence;

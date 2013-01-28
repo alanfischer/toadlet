@@ -29,6 +29,7 @@
 #include <toadlet/egg/Interface.h>
 #include <toadlet/egg/Event.h>
 #include <toadlet/tadpole/Types.h>
+#include <toadlet/tadpole/Transform.h>
 #include <toadlet/tadpole/Bound.h>
 
 namespace toadlet{
@@ -52,6 +53,7 @@ public:
 	virtual void frameUpdate(int dt,int scope)=0;
 
 	virtual bool getActive() const=0;
+	virtual Transform *getTransform() const=0;
 	virtual Bound *getBound() const=0;
 
 	virtual bool handleEvent(Event *event)=0;

@@ -73,6 +73,7 @@ public:
 	void frameUpdate(int dt,int scope){}
 
 	bool getActive() const{return mSolid->active();}
+	Transform *getTransform() const{return NULL;}
 	Bound *getBound() const{return mBound;}
 
 	inline hop::Solid *getSolid(){return mSolid;}

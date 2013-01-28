@@ -51,7 +51,10 @@ SkeletonComponent::SkeletonComponent(Engine *engine,Skeleton *skeleton):
 
 	mTrackHints.resize(mBones.size());
 
+	mTransform=new Transform();
 	mBound=new Bound();
+	mWorldTransform=new Transform();
+	mWorldBound=new Bound();
 	
 	updateBones();
 }
@@ -62,6 +65,11 @@ void SkeletonComponent::destroy(){
 	destroySkeletonBuffers();
 
 	BaseComponent::destroy();
+}
+
+void SkeletonComponent::frameUpdate(int dt,int scope){
+	mWorldTransform->setTransform(mParent->getWorldTransform(),mTransform);
+	mWorldBound->transform(mBound,mWorldTransform);
 }
 
 void SkeletonComponent::updateBones(){
@@ -120,6 +128,15 @@ String SkeletonComponent::getBoneName(int index) const{
 	}
 	else{
 		return (char*)NULL;
+	}
+}
+
+void SkeletonComponent::setTransform(Transform *transform){
+	if(transform==NULL){
+		mTransform->reset();
+	}
+	else{
+		mTransform->set(transform);
 	}
 }
 
@@ -346,14 +363,6 @@ void SkeletonComponent::destroySkeletonBuffers(){
 		mHitBoxVertexData=NULL;
 		mHitBoxIndexData=NULL;
 	}
-}
-
-Transform *SkeletonComponent::getRenderTransform() const{
-	return mParent->getWorldTransform();
-}
-
-Bound *SkeletonComponent::getRenderBound() const{
-	return mParent->getWorldBound();
 }
 
 void SkeletonComponent::render(RenderManager *manager) const{
