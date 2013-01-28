@@ -304,8 +304,8 @@ endif (TOADLET_BUILD_STATIC)
 
 # Rule to install only egg
 add_custom_target (egg_install
-	COMMAND ${CMAKE_COMMAND} -DCOMPONENT=required -P ${PROJECT_BINARY_DIR}/cmake_install.cmake
-	COMMAND ${CMAKE_COMMAND} -DCOMPONENT=egg -P ${PROJECT_BINARY_DIR}/cmake_install.cmake
+	COMMAND ${CMAKE_COMMAND} -DBUILD_TYPE=$<CONFIGURATION> -DCOMPONENT=required -P ${PROJECT_BINARY_DIR}/cmake_install.cmake
+	COMMAND ${CMAKE_COMMAND} -DBUILD_TYPE=$<CONFIGURATION> -DCOMPONENT=egg -P ${PROJECT_BINARY_DIR}/cmake_install.cmake
 	DEPENDS ${EGG_INSTALL}
 )
 
