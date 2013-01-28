@@ -241,8 +241,8 @@ Clouds::Clouds(Scene *scene,int cloudSize,const Vector4 &skyColor,const Vector4 
 	mMaterial=material;
 
 	mMesh=mSkyDomeCreator->createSkyDomeMesh(vertexBuffer,indexBuffer,sphere,numSegments,numRings,0.35);
-	Transform transform;
-	transform.setScale(1,1,0.5f);
+	Transform::ptr transform=new Transform();
+	transform->setScale(1,1,0.5f);
 	mMesh->setTransform(transform);
 	mMesh->getSubMesh(0)->material=mMaterial;
 

@@ -55,7 +55,8 @@ public:
 	virtual void frameUpdate(int dt,int scope){}
 
 	virtual bool getActive() const{return true;}
-	virtual Bound *getBound() const{return NULL;}
+	virtual Transform *getTransform() const{return mTransform;}
+	virtual Bound *getBound() const{return mBound;}
 	
 	virtual bool handleEvent(Event *event){return false;}
 
@@ -63,6 +64,8 @@ protected:
 	Node *mParent;
 	Node *mRoot;
 	String mName;
+	Transform::ptr mTransform;
+	Bound::ptr mBound;
 };
 
 }

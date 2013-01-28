@@ -275,30 +275,32 @@ void TMSHStreamer::writeBound(DataStream *stream,Bound::ptr bound){
 }
 
 Transform::ptr TMSHStreamer::readTransform(DataStream *stream){
-	Vector3 translate;
-	Vector3 scale;
+	/// @todo: REMOVE IN VERSION BUMP, move these to Vector3s, we just use Vector4s due to the legacy padding
+	Vector4 translate;
+	Vector4 scale;
 	Quaternion rotate;
 
-	stream->readVector3(translate);
-	stream->readVector3(scale);
+	stream->readVector4(translate);
+	stream->readVector4(scale);
 	stream->readQuaternion(rotate);
 
-	return new Transform(translate,scale,rotate);
+	return new Transform(Vector3(translate.x,translate.y,translate.z),Vector3(scale.x,scale.y,scale.z),rotate);
 }
 
 void TMSHStreamer::writeTransform(DataStream *stream,Transform::ptr transform){
-	Vector3 translate;
-	Vector3 scale;
+	/// @todo: REMOVE IN VERSION BUMP, move these to Vector3s, we just use Vector4s due to the legacy padding
+	Vector4 translate;
+	Vector4 scale;
 	Quaternion rotate;
 
 	if(transform!=NULL){
-		translate=transform->getTranslate();
-		scale=transform->getScale();
+		translate=Vector4(transform->getTranslate(),0);
+		scale=Vector4(transform->getScale(),0);
 		rotate=transform->getRotate();
 	}
 
-	stream->writeVector3(translate);
-	stream->writeVector3(scale);
+	stream->writeVector4(translate);
+	stream->writeVector4(scale);
 	stream->writeQuaternion(rotate);
 }
 
@@ -625,6 +627,7 @@ Sequence::ptr TMSHStreamer::readSequence(DataStream *stream,int blockSize){
 	}
 
 	sequence->setLength(stream->readFloat());
+	/// @todo: REMOVE IN VERSION BUMP
 	bool oldScaled=stream->readBool();
 	TOADLET_IGNORE_UNUSED_VARIABLE_WARNING(oldScaled);
 
@@ -659,6 +662,7 @@ void TMSHStreamer::writeSequence(DataStream *stream,Sequence::ptr sequence){
 	}
 
 	stream->writeFloat(sequence->getLength());
+	/// @todo: REMOVE IN VERSION BUMP
 	stream->writeBool(false);
 }
 

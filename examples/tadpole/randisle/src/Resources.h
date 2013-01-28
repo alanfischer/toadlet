@@ -78,9 +78,9 @@ public:
 
 		creature=shared_static_cast<Mesh>(engine->getMeshManager()->find("frog.tmsh"));
 		if(creature!=NULL){
-			Transform transform;
-			transform.setTranslate(0,0,-2.0);
-			transform.setRotate(Math::Z_UNIT_VECTOR3,Math::PI);
+			Transform::ptr transform=new Transform();
+			transform->setTranslate(0,0,-2.0);
+			transform->setRotate(Math::Z_UNIT_VECTOR3,Math::PI);
 			creature->setTransform(transform);
 		}
 
@@ -88,8 +88,8 @@ public:
 
 		grass=shared_static_cast<Mesh>(engine->getMeshManager()->find("tall_grass.tmsh"));
 		if(grass!=NULL){
-			Transform transform;
-			transform.setScale(0.1,0.1,0.1);
+			Transform::ptr transform=new Transform();
+			transform->setScale(0.1,0.1,0.1);
 			grass->setTransform(transform);
 
 			for(int i=0;i<grass->getNumSubMeshes();++i){
