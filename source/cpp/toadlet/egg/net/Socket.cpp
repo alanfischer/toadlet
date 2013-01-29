@@ -98,7 +98,6 @@ namespace net{
 
 Socket::Socket():
 	mHandle(TOADLET_INVALID_SOCKET),
-	mBound(false),
 	mConnected(false),
 	mBlocking(true),
 	mHostIPAddress(0),
@@ -108,7 +107,6 @@ Socket::Socket():
 
 Socket::Socket(int domain,int type,int protocol):
 	mHandle(TOADLET_INVALID_SOCKET),
-	mBound(false),
 	mConnected(false),
 	mBlocking(true),
 	mHostIPAddress(0),
@@ -133,7 +131,6 @@ Socket::Socket(int domain,int type,int protocol):
 
 Socket::Socket(int handle,struct sockaddr_in *address):
 	mHandle(handle),
-	mBound(true),
 	mConnected(true),
 	mBlocking(true),
 	mHostIPAddress(address->sin_addr.s_addr),
@@ -169,7 +166,6 @@ void Socket::close(){
 		#endif
 		mHandle=TOADLET_INVALID_SOCKET;
 	}
-	mBound=false;
 	mConnected=false;
 	mHostIPAddress=0;
 	mHostPort=0;
@@ -296,7 +292,7 @@ bool Socket::addMembership(uint32 ipAddress){
 	int result=setsockopt(mHandle,IPPROTO_IP,IP_ADD_MEMBERSHIP,(const char *)&mreq,sizeof(struct ip_mreq));
 	if(result==TOADLET_SOCKET_ERROR){
 		Error::socket(Categories::TOADLET_EGG_NET,
-			String("addMembership:")+error());
+			String("addMembership:")+strerror(error()));
 		return false;
 	}
 	return true;
@@ -327,9 +323,13 @@ bool Socket::pollWrite(int millis){
 }
 
 bool Socket::bind(int port){
+	return bind(htonl(INADDR_ANY),port);
+}
+
+bool Socket::bind(uint32 ipAddress,int port){
 	struct sockaddr_in address={0};
 	address.sin_family=AF_INET;
-	address.sin_addr.s_addr=htonl(INADDR_ANY);
+	address.sin_addr.s_addr=ipAddress;
 	address.sin_port=htons(port);
 
 	int result=::bind(mHandle,(struct sockaddr*)&address,sizeof(address));
@@ -338,8 +338,6 @@ bool Socket::bind(int port){
 			String("bind:")+error());
 		return false;
 	}
-
-	mBound=true;
 
 	return true;
 }
@@ -363,7 +361,6 @@ bool Socket::connect(uint32 ipAddress,int port){
 		return false;
 	}
 
-	mBound=true;
 	mConnected=true;
 
 	return true;

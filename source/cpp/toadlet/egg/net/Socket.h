@@ -55,7 +55,7 @@ public:
 	static Socket *createUDPSocket();
 
 	virtual bool bind(int port=0);
-	virtual bool bound(){return mBound;}
+	virtual bool bind(uint32 ipAddress,int port);
 
 	virtual bool connect(uint32 ipAddress,int port);
 	virtual bool connect(const String &name,int port);
@@ -109,7 +109,6 @@ protected:
 	int error() const;
 
 	int mHandle;
-	bool mBound;
 	bool mConnected;
 	bool mBlocking;
 	uint32 mHostIPAddress;
