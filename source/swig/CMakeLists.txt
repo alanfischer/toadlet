@@ -3,13 +3,8 @@
 # otherwise the swig wrapper files are generated first and compiled directly into the toadlet libraries.
 if (NOT TOADLET_PLATFORM_PYTHON)
 	# Setup the swig wrap macro and include the header output folder
-	if (TOADLET_PLATFORM_ANDROID)
-		include_directories (${PROJECT_BINARY_DIR}/source/java)
-		swig_wrap_setup (java us.toadlet ${PROJECT_BINARY_DIR}/source/java ${CMAKE_CURRENT_SOURCE_DIR})
-	else (TOADLET_PLATFORM_IOS)
-		include_directories (${PROJECT_BINARY_DIR}/source/objc)
-		swig_wrap_setup (objc NO ${PROJECT_BINARY_DIR}/source/objc ${CMAKE_CURRENT_SOURCE_DIR})
-	endif (TOADLET_PLATFORM_ANDROID)
+	include_directories (${PROJECT_BINARY_DIR}/source/java)
+	swig_wrap_setup (java us.toadlet ${PROJECT_BINARY_DIR}/source/java ${CMAKE_CURRENT_SOURCE_DIR})
 
 	# List the main and dependent interface files and the output language-specific files for each library
 
@@ -25,20 +20,15 @@ if (NOT TOADLET_PLATFORM_PYTHON)
 		${CMAKE_CURRENT_SOURCE_DIR}/toadlet/flick/InputDevice.i
 		PARENT_SCOPE
 	)
-	if (TOADLET_PLATFORM_ANDROID)
-		set (FLICK_SWIG_INT_OUTPUTS
-			${PROJECT_BINARY_DIR}/source/java/us/toadlet/flick/BaseInputDevice.java
-			${PROJECT_BINARY_DIR}/source/java/us/toadlet/flick/BaseInputDeviceListener.java
-			${PROJECT_BINARY_DIR}/source/java/us/toadlet/flick/InputData.java
-			${PROJECT_BINARY_DIR}/source/java/us/toadlet/flick/InputDevice.java
-			${PROJECT_BINARY_DIR}/source/java/us/toadlet/flick/flick.java
-			${PROJECT_BINARY_DIR}/source/java/us/toadlet/flick/flickJNI.java
-			PARENT_SCOPE
-		)	
-	elseif (TOADLET_PLATFORM_IOS)
-		set (FLICK_SWIG_INT_OUTPUTS
-		)
-	endif (TOADLET_PLATFORM_ANDROID)
+	set (FLICK_SWIG_INT_OUTPUTS
+		${PROJECT_BINARY_DIR}/source/java/us/toadlet/flick/BaseInputDevice.java
+		${PROJECT_BINARY_DIR}/source/java/us/toadlet/flick/BaseInputDeviceListener.java
+		${PROJECT_BINARY_DIR}/source/java/us/toadlet/flick/InputData.java
+		${PROJECT_BINARY_DIR}/source/java/us/toadlet/flick/InputDevice.java
+		${PROJECT_BINARY_DIR}/source/java/us/toadlet/flick/flick.java
+		${PROJECT_BINARY_DIR}/source/java/us/toadlet/flick/flickJNI.java
+		PARENT_SCOPE
+	)	
 
 	# Toadlet Peeper
 	set (PEEPER_SWIG_INT
@@ -53,20 +43,16 @@ if (NOT TOADLET_PLATFORM_PYTHON)
 		${CMAKE_CURRENT_SOURCE_DIR}/toadlet/peeper/WindowRenderTargetFormat.i
 		PARENT_SCOPE
 	)
-	if (TOADLET_PLATFORM_ANDROID)
-		set (PEEPER_SWIG_INT_OUTPUTS
-			${PROJECT_BINARY_DIR}/source/java/us/toadlet/peeper/RenderDevice.java
-			${PROJECT_BINARY_DIR}/source/java/us/toadlet/peeper/RenderState.java
-			${PROJECT_BINARY_DIR}/source/java/us/toadlet/peeper/RenderTarget.java
-			${PROJECT_BINARY_DIR}/source/java/us/toadlet/peeper/GLRenderTarget.java
-			${PROJECT_BINARY_DIR}/source/java/us/toadlet/peeper/WindowRenderTargetFormat.java
-			${PROJECT_BINARY_DIR}/source/java/us/toadlet/peeper/peeper.java
-			${PROJECT_BINARY_DIR}/source/java/us/toadlet/peeper/peeperJNI.java
-		)
-	elseif (TOADLET_PLATFORM_IOS)
-		set (PEEPER_SWIG_INT_OUTPUTS
-		)
-	endif (TOADLET_PLATFORM_ANDROID)
+	set (PEEPER_SWIG_INT_OUTPUTS
+		${PROJECT_BINARY_DIR}/source/java/us/toadlet/peeper/RenderDevice.java
+		${PROJECT_BINARY_DIR}/source/java/us/toadlet/peeper/RenderState.java
+		${PROJECT_BINARY_DIR}/source/java/us/toadlet/peeper/RenderTarget.java
+		${PROJECT_BINARY_DIR}/source/java/us/toadlet/peeper/GLRenderTarget.java
+		${PROJECT_BINARY_DIR}/source/java/us/toadlet/peeper/WindowRenderTargetFormat.java
+		${PROJECT_BINARY_DIR}/source/java/us/toadlet/peeper/peeper.java
+		${PROJECT_BINARY_DIR}/source/java/us/toadlet/peeper/peeperJNI.java
+		PARENT_SCOPE
+	)
 
 	# Toadlet Ribbit
 	set (RIBBIT_SWIG_INT
@@ -84,24 +70,19 @@ if (NOT TOADLET_PLATFORM_PYTHON)
 		${CMAKE_CURRENT_SOURCE_DIR}/toadlet/ribbit/BaseAudioDevice.i
 		PARENT_SCOPE
 	)
-	if (TOADLET_PLATFORM_ANDROID)
-		set (RIBBIT_SWIG_INT_OUTPUTS
-			${PROJECT_BINARY_DIR}/source/java/us/toadlet/ribbit/AudioFormat.java
-			${PROJECT_BINARY_DIR}/source/java/us/toadlet/ribbit/AudioBuffer.java
-			${PROJECT_BINARY_DIR}/source/java/us/toadlet/ribbit/AudioStream.java
-			${PROJECT_BINARY_DIR}/source/java/us/toadlet/ribbit/Audio.java
-			${PROJECT_BINARY_DIR}/source/java/us/toadlet/ribbit/AudioDevice.java
-			${PROJECT_BINARY_DIR}/source/java/us/toadlet/ribbit/BaseAudio.java
-			${PROJECT_BINARY_DIR}/source/java/us/toadlet/ribbit/BaseAudioBuffer.java
-			${PROJECT_BINARY_DIR}/source/java/us/toadlet/ribbit/BaseAudioDevice.java
-			${PROJECT_BINARY_DIR}/source/java/us/toadlet/ribbit/ribbit.java
-			${PROJECT_BINARY_DIR}/source/java/us/toadlet/ribbit/ribbitJNI.java
-			PARENT_SCOPE
-		)
-	elseif (TOADLET_PLATFORM_IOS)
-		set (RIBBIT_SWIG_INT_OUTPUTS
-		)
-	endif (TOADLET_PLATFORM_ANDROID)
+	set (RIBBIT_SWIG_INT_OUTPUTS
+		${PROJECT_BINARY_DIR}/source/java/us/toadlet/ribbit/AudioFormat.java
+		${PROJECT_BINARY_DIR}/source/java/us/toadlet/ribbit/AudioBuffer.java
+		${PROJECT_BINARY_DIR}/source/java/us/toadlet/ribbit/AudioStream.java
+		${PROJECT_BINARY_DIR}/source/java/us/toadlet/ribbit/Audio.java
+		${PROJECT_BINARY_DIR}/source/java/us/toadlet/ribbit/AudioDevice.java
+		${PROJECT_BINARY_DIR}/source/java/us/toadlet/ribbit/BaseAudio.java
+		${PROJECT_BINARY_DIR}/source/java/us/toadlet/ribbit/BaseAudioBuffer.java
+		${PROJECT_BINARY_DIR}/source/java/us/toadlet/ribbit/BaseAudioDevice.java
+		${PROJECT_BINARY_DIR}/source/java/us/toadlet/ribbit/ribbit.java
+		${PROJECT_BINARY_DIR}/source/java/us/toadlet/ribbit/ribbitJNI.java
+		PARENT_SCOPE
+	)
 
 	# Toadlet Tadpole
 	set (TADPOLE_SWIG_INT
@@ -129,30 +110,25 @@ if (NOT TOADLET_PLATFORM_PYTHON)
 		${CMAKE_CURRENT_SOURCE_DIR}/toadlet/tadpole/animation/MaterialAnimation.i
 		PARENT_SCOPE
 	)
-	if (TOADLET_PLATFORM_ANDROID)
-		set (TADPOLE_SWIG_INT_OUTPUTS
-			${PROJECT_BINARY_DIR}/source/java/us/toadlet/tadpole/Engine.java
-			${PROJECT_BINARY_DIR}/source/java/us/toadlet/tadpole/Scene.java
-			${PROJECT_BINARY_DIR}/source/java/us/toadlet/tadpole/Component.java
-			${PROJECT_BINARY_DIR}/source/java/us/toadlet/tadpole/Track.java
-			${PROJECT_BINARY_DIR}/source/java/us/toadlet/tadpole/Sequence.java
-			${PROJECT_BINARY_DIR}/source/java/us/toadlet/tadpole/Action.java
-			${PROJECT_BINARY_DIR}/source/java/us/toadlet/tadpole/AnimationAction.java
-			${PROJECT_BINARY_DIR}/source/java/us/toadlet/tadpole/ActionComponent.java
-			${PROJECT_BINARY_DIR}/source/java/us/toadlet/tadpole/AudioComponent.java
-			${PROJECT_BINARY_DIR}/source/java/us/toadlet/tadpole/Node.java
-			${PROJECT_BINARY_DIR}/source/java/us/toadlet/tadpole/Camera.java
-			${PROJECT_BINARY_DIR}/source/java/us/toadlet/tadpole/CameraComponent.java
-			${PROJECT_BINARY_DIR}/source/java/us/toadlet/tadpole/MeshComponent.java
-			${PROJECT_BINARY_DIR}/source/java/us/toadlet/tadpole/LightComponent.java
-			${PROJECT_BINARY_DIR}/source/java/us/toadlet/tadpole/tadpole.java
-			${PROJECT_BINARY_DIR}/source/java/us/toadlet/tadpole/tadpoleJNI.java
-			PARENT_SCOPE
-		)
-	elseif (TOADLET_PLATFORM_IOS)
-		set (TADPOLE_SWIG_INT_OUTPUTS
-		)
-	endif (TOADLET_PLATFORM_ANDROID)
+	set (TADPOLE_SWIG_INT_OUTPUTS
+		${PROJECT_BINARY_DIR}/source/java/us/toadlet/tadpole/Engine.java
+		${PROJECT_BINARY_DIR}/source/java/us/toadlet/tadpole/Scene.java
+		${PROJECT_BINARY_DIR}/source/java/us/toadlet/tadpole/Component.java
+		${PROJECT_BINARY_DIR}/source/java/us/toadlet/tadpole/Track.java
+		${PROJECT_BINARY_DIR}/source/java/us/toadlet/tadpole/Sequence.java
+		${PROJECT_BINARY_DIR}/source/java/us/toadlet/tadpole/Action.java
+		${PROJECT_BINARY_DIR}/source/java/us/toadlet/tadpole/AnimationAction.java
+		${PROJECT_BINARY_DIR}/source/java/us/toadlet/tadpole/ActionComponent.java
+		${PROJECT_BINARY_DIR}/source/java/us/toadlet/tadpole/AudioComponent.java
+		${PROJECT_BINARY_DIR}/source/java/us/toadlet/tadpole/Node.java
+		${PROJECT_BINARY_DIR}/source/java/us/toadlet/tadpole/Camera.java
+		${PROJECT_BINARY_DIR}/source/java/us/toadlet/tadpole/CameraComponent.java
+		${PROJECT_BINARY_DIR}/source/java/us/toadlet/tadpole/MeshComponent.java
+		${PROJECT_BINARY_DIR}/source/java/us/toadlet/tadpole/LightComponent.java
+		${PROJECT_BINARY_DIR}/source/java/us/toadlet/tadpole/tadpole.java
+		${PROJECT_BINARY_DIR}/source/java/us/toadlet/tadpole/tadpoleJNI.java
+		PARENT_SCOPE
+	)
 	
 	# Toadlet Pad
 	set (PAD_SWIG_INT
@@ -163,17 +139,12 @@ if (NOT TOADLET_PLATFORM_PYTHON)
 		${CMAKE_CURRENT_SOURCE_DIR}/toadlet/pad/Applet.i
 		PARENT_SCOPE
 	)
-	if (TOADLET_PLATFORM_ANDROID)
-		set (PAD_SWIG_INT_OUTPUTS
-			${PROJECT_BINARY_DIR}/source/java/us/toadlet/pad/Applet.java
-			${PROJECT_BINARY_DIR}/source/java/us/toadlet/pad/pad.java
-			${PROJECT_BINARY_DIR}/source/java/us/toadlet/pad/padJNI.java
-			PARENT_SCOPE
-		)
-	elseif (TOADLET_PLATFORM_IOS)
-		set (PAD_SWIG_INT_OUTPUTS
-		)
-	endif (TOADLET_PLATFORM_ANDROID)
+	set (PAD_SWIG_INT_OUTPUTS
+		${PROJECT_BINARY_DIR}/source/java/us/toadlet/pad/Applet.java
+		${PROJECT_BINARY_DIR}/source/java/us/toadlet/pad/pad.java
+		${PROJECT_BINARY_DIR}/source/java/us/toadlet/pad/padJNI.java
+		PARENT_SCOPE
+	)
 else (NOT TOADLET_PLATFORM_PYTHON)
 	# Python needs a global interface file
 	set (TOADLET_SWIG_INT

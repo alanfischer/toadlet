@@ -80,19 +80,53 @@ endif (WIN32)
 # Toadlet options
 option (TOADLET_RUN_MEMCHECK "Run memory check operations on unit tests" OFF)
 option (TOADLET_BUILD_DOXYGEN "Build doxygen documentation along with source files" OFF)
-option (TOADLET_BUILD_DOXYGEN_ONLY "Build ONLY the doxygen documentation" OFF)
 
 
-# Add the source code subdirectory
-if (NOT TOADLET_BUILD_DOXYGEN_ONLY)
-	add_subdirectory (source)
-endif (NOT TOADLET_BUILD_DOXYGEN_ONLY)
+# Build doxygen or build toadlet
+if (TOADLET_BUILD_DOXYGEN)
+        find_package (Doxygen)
+        find_package (SWIG)
+        if (DOXYGEN_FOUND AND DOXYGEN_DOT_FOUND AND SWIG_FOUND)
+                # Generate the swig wrapped files
+                include (SwigWrapFiles)
+                add_subdirectory (source/swig)
 
+                # Setup doxygen
+                add_subdirectory (doxygen/java)
+                add_subdirectory (doxygen/cpp)
+        else (DOXYGEN_FOUND AND DOXYGEN_DOT_FOUND AND SWIG_FOUND)
+                message ("Doxygen, dot and/or swig was not found. Doxygen docs will not be built")
+        endif (DOXYGEN_FOUND AND DOXYGEN_DOT_FOUND AND SWIG_FOUND)
+else (TOADLET_BUILD_DOXYGEN)
+	if (TOADLET_PLATFORM_ANDROID)
+		if (NOT EXISTS ${ANDROID_JAR})
+			message (FATAL_ERROR "ANDROID_JAR not found")
+		endif (NOT EXISTS ${ANDROID_JAR})
 
-# Add the doxygen subdirectory
-if (TOADLET_BUILD_DOXYGEN OR TOADLET_BUILD_DOXYGEN_ONLY)
-	add_subdirectory (doxygen)
-endif (TOADLET_BUILD_DOXYGEN OR TOADLET_BUILD_DOXYGEN_ONLY)
+                # Android requires swig to generate bindings before compilation
+                # Find swig on our host and include our swig wrapper macro
+                find_host_package (SWIG REQUIRED)
+                include (SwigWrapFiles)
+
+                # Add the swig files
+                add_subdirectory (source/swig)
+
+                # Android requires java code
+                add_subdirectory (source/java)
+	endif (TOADLET_PLATFORM_ANDROID)
+
+        # c++ code
+        add_subdirectory (source/cpp)
+
+	if (TOADLET_PLATFORM_PYTHON)
+		# Python requries the swig bindings be added as a separate module
+		find_package (SWIG REQUIRED)
+		include (UseSwig)
+		
+		# Add the swig files
+		add_subdirectory (source/swig)
+	endif (TOADLET_PLATFORM_PYTHON)
+endif (TOADLET_BUILD_DOXYGEN)
 
 
 # TODO: Remove this hack once we decide where toadlet and WindowsCE/WindowsPhone is going
