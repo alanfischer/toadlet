@@ -33,10 +33,10 @@ set (HOP_NAMESPACES ${HOP_NAMESPACES} PARENT_SCOPE)
 
 
 # If we are using swig create the wrapper file from the interface files
-if (SWIG_FOUND AND TOADLET_HOP_INT)
-	swig_wrap_files (hop_wrap.cpp hop ${TOADLET_HOP_INT} "${TOADLET_HOP_INT_DEPS}")	
+if (SWIG_FOUND AND HOP_SWIG_INT)
+	swig_wrap_files (hop_wrap.cpp hop ${HOP_SWIG_INT} "${HOP_SWIG_INT_DEPS}" "${HOP_SWIG_INT_OUTPUTS}")	
 	set (HOP_SRC ${HOP_SRC} hop_wrap.cpp)
-endif (SWIG_FOUND AND TOADLET_HOP_INT)
+endif (SWIG_FOUND AND HOP_SWIG_INT)
 
 
 # For individual component installation 
