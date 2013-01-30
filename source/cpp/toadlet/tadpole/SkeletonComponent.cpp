@@ -277,9 +277,13 @@ void SkeletonComponent::updateBone(Bone *bone){
 void SkeletonComponent::setRenderSkeleton(bool skeleton){
 	if(skeleton){
 		if(mSkeletonMaterial==NULL){
-			mSkeletonMaterial=mEngine->getMaterialManager()->createMaterial();
-			mSkeletonMaterial->getPass()->setDepthState(DepthState(DepthState::DepthTest_NEVER,false));
-			mSkeletonMaterial->getPass()->setPointState(PointState(true,Math::fromInt(8),false,0,0,0,0,0));
+			RenderState::ptr renderState=mEngine->getMaterialManager()->createRenderState();
+			if(renderState!=NULL){
+				renderState->setDepthState(DepthState(DepthState::DepthTest_NEVER,false));
+				renderState->setPointState(PointState(true,Math::fromInt(8),false,0,0,0,0,0));
+
+				mSkeletonMaterial=mEngine->createDiffuseMaterial(NULL,renderState);
+			}
 		}
 	}
 	else{

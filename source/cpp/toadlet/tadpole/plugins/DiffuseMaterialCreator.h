@@ -42,7 +42,7 @@ public:
 	void destroy();
 
 	Resource::ptr create(const String &name,ResourceData *data,ProgressListener *listener);
-	Material::ptr createDiffuseMaterial(Texture *texture);
+	Material::ptr createDiffuseMaterial(Texture *texture,RenderState *state);
 	Material::ptr createPointSpriteMaterial(Texture *texture,scalar size,bool attenuated);
 	Material::ptr createFontMaterial(Font *font);
 

@@ -70,9 +70,6 @@ Scene::Scene(Engine *engine):Object(),
 	mRenderManager=new SimpleRenderManager(this);
 
 	mPhysicsManager=new HopManager(this);
-
-	mSphereMesh=mEngine->createSphereMesh(Sphere(Math::ONE));
-	mAABoxMesh=mEngine->createAABoxMesh(AABox(-Math::ONE,-Math::ONE,-Math::ONE,Math::ONE,Math::ONE,Math::ONE));
 }
 
 void Scene::destroy(){

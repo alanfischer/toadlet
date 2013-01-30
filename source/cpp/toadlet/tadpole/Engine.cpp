@@ -687,8 +687,8 @@ Texture::ptr Engine::createNormalizationTexture(int size){
 	return texture;
 }
 
-Material::ptr Engine::createDiffuseMaterial(Texture *texture){
-	Material::ptr material=shared_static_cast<DiffuseMaterialCreator>(mDiffuseCreator)->createDiffuseMaterial(texture);
+Material::ptr Engine::createDiffuseMaterial(Texture *texture,RenderState *renderState){
+	Material::ptr material=shared_static_cast<DiffuseMaterialCreator>(mDiffuseCreator)->createDiffuseMaterial(texture,renderState);
 	mMaterialManager->manage(material);
 	return material;
 }

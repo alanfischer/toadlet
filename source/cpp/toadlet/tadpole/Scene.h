@@ -127,8 +127,6 @@ protected:
 	PhysicsManager::ptr mPhysicsManager;
 
 	Collection<Component::ptr> mDestroyComponents;
-
-	Mesh::ptr mSphereMesh,mAABoxMesh;
 };
 
 }
