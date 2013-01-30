@@ -2150,7 +2150,7 @@ M3GObject3D *M3GConverter::buildSceneGraph(Mesh *toadletMesh,float scale,int for
 		mesh->submeshes[i].appearance=appearance;
 	}
 
-	if(Error::getInstance()->getError()!=Error::Type_NONE){
+	if(Error::getInstance()->getError()!=Errorer::Type_NONE){
 		// WARNING: Memory leakage here, should somehow clean up allocated objects
 		return NULL;
 	}

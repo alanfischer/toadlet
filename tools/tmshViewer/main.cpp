@@ -31,7 +31,7 @@ int main(int argc,char **argv){
 	PlatformApplication::ptr app=new PlatformApplication();
 	app->setSize(640,480);
 	app->setFullscreen(false);
-	app->create("d3d10","al");
+	app->defaultCreate();
 
 	Viewer::ptr viewer=new Viewer(app);
 	app->setApplet(viewer);

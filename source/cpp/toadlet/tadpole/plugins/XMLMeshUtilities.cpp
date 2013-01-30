@@ -137,97 +137,98 @@ Material::ptr XMLMeshUtilities::loadMaterial(mxml_node_t *materialNode,int versi
 	}
 
 	RenderState::ptr renderState=material->getRenderState();
-
-	MaterialState materialState;
-	renderState->getMaterialState(materialState);
-	{
-		mxml_node_t *lightNode=mxmlFindChild(materialNode,"Light");
-		if(lightNode!=NULL){
-			materialState.light=parseBool(mxmlGetOpaque(lightNode->child));
-		}
-
-		mxml_node_t *ambientNode=mxmlFindChild(materialNode,"Ambient");
-		if(ambientNode!=NULL){
-			materialState.ambient=parseVector4(mxmlGetOpaque(ambientNode->child));
-		}
-
-		mxml_node_t *diffuseNode=mxmlFindChild(materialNode,"Diffuse");
-		if(diffuseNode!=NULL){
-			materialState.diffuse=parseVector4(mxmlGetOpaque(diffuseNode->child));
-		}
-
-		mxml_node_t *specularNode=mxmlFindChild(materialNode,"Specular");
-		if(specularNode!=NULL){
-			materialState.specular=parseVector4(mxmlGetOpaque(specularNode->child));
-		}
-
-		mxml_node_t *shininessNode=mxmlFindChild(materialNode,"Shininess");
-		if(shininessNode!=NULL){
-			materialState.shininess=parseScalar(mxmlGetOpaque(shininessNode->child));
-		}
-
-		mxml_node_t *emissiveNode=mxmlFindChild(materialNode,"Emissive");
-		if(emissiveNode!=NULL){
-			materialState.emissive=parseVector4(mxmlGetOpaque(emissiveNode->child));
-		}
-
-		mxml_node_t *shadeNode=mxmlFindChild(materialNode,"Shade");
-		if(shadeNode!=NULL){
-			String shade=String(mxmlGetOpaque(shadeNode->child)).toLower();
-			if(shade=="flag"){
-				materialState.shade=MaterialState::ShadeType_FLAT;
+	if(renderState!=NULL){
+		MaterialState materialState;
+		renderState->getMaterialState(materialState);
+		{
+			mxml_node_t *lightNode=mxmlFindChild(materialNode,"Light");
+			if(lightNode!=NULL){
+				materialState.light=parseBool(mxmlGetOpaque(lightNode->child));
 			}
-			else if(shade=="phong"){
-				materialState.shade=MaterialState::ShadeType_PHONG;
-			}
-			else{
-				materialState.shade=MaterialState::ShadeType_GOURAUD;
-			}
-		}
 
-		if(ambientNode!=NULL || diffuseNode!=NULL || specularNode!=NULL || emissiveNode!=NULL){
-			renderState->setMaterialState(materialState);
-		}
-	}
+			mxml_node_t *ambientNode=mxmlFindChild(materialNode,"Ambient");
+			if(ambientNode!=NULL){
+				materialState.ambient=parseVector4(mxmlGetOpaque(ambientNode->child));
+			}
 
-	RasterizerState rasterizerState;
-	renderState->getRasterizerState(rasterizerState);
-	{
-		mxml_node_t *cullNode=mxmlFindChild(materialNode,"Cull");
-		if(cullNode!=NULL){
-			String cull=String(mxmlGetOpaque(cullNode->child)).toLower();
-			if(cull=="front"){
-				rasterizerState.cull=RasterizerState::CullType_FRONT;
+			mxml_node_t *diffuseNode=mxmlFindChild(materialNode,"Diffuse");
+			if(diffuseNode!=NULL){
+				materialState.diffuse=parseVector4(mxmlGetOpaque(diffuseNode->child));
 			}
-			else if(cull=="back"){
-				rasterizerState.cull=RasterizerState::CullType_BACK;
+
+			mxml_node_t *specularNode=mxmlFindChild(materialNode,"Specular");
+			if(specularNode!=NULL){
+				materialState.specular=parseVector4(mxmlGetOpaque(specularNode->child));
 			}
-			else{
-				rasterizerState.cull=RasterizerState::CullType_NONE;
+
+			mxml_node_t *shininessNode=mxmlFindChild(materialNode,"Shininess");
+			if(shininessNode!=NULL){
+				materialState.shininess=parseScalar(mxmlGetOpaque(shininessNode->child));
+			}
+
+			mxml_node_t *emissiveNode=mxmlFindChild(materialNode,"Emissive");
+			if(emissiveNode!=NULL){
+				materialState.emissive=parseVector4(mxmlGetOpaque(emissiveNode->child));
+			}
+
+			mxml_node_t *shadeNode=mxmlFindChild(materialNode,"Shade");
+			if(shadeNode!=NULL){
+				String shade=String(mxmlGetOpaque(shadeNode->child)).toLower();
+				if(shade=="flag"){
+					materialState.shade=MaterialState::ShadeType_FLAT;
+				}
+				else if(shade=="phong"){
+					materialState.shade=MaterialState::ShadeType_PHONG;
+				}
+				else{
+					materialState.shade=MaterialState::ShadeType_GOURAUD;
+				}
+			}
+
+			if(ambientNode!=NULL || diffuseNode!=NULL || specularNode!=NULL || emissiveNode!=NULL){
+				renderState->setMaterialState(materialState);
 			}
 		}
 
-		if(cullNode!=NULL){
-			renderState->setRasterizerState(rasterizerState);
+		RasterizerState rasterizerState;
+		renderState->getRasterizerState(rasterizerState);
+		{
+			mxml_node_t *cullNode=mxmlFindChild(materialNode,"Cull");
+			if(cullNode!=NULL){
+				String cull=String(mxmlGetOpaque(cullNode->child)).toLower();
+				if(cull=="front"){
+					rasterizerState.cull=RasterizerState::CullType_FRONT;
+				}
+				else if(cull=="back"){
+					rasterizerState.cull=RasterizerState::CullType_BACK;
+				}
+				else{
+					rasterizerState.cull=RasterizerState::CullType_NONE;
+				}
+			}
+
+			if(cullNode!=NULL){
+				renderState->setRasterizerState(rasterizerState);
+			}
 		}
-	}
 	
-	BlendState blendState;
-	renderState->getBlendState(blendState);
-	{
-		mxml_node_t *blendNode=mxmlFindChild(materialNode,"Blend");
-		if(blendNode!=NULL){
-			String blend=String(mxmlGetOpaque(blendNode->child)).toLower();
-			if(blend=="alpha"){
-				blendState.set(BlendState::Combination_ALPHA);
+		BlendState blendState;
+		renderState->getBlendState(blendState);
+		{
+			mxml_node_t *blendNode=mxmlFindChild(materialNode,"Blend");
+			if(blendNode!=NULL){
+				String blend=String(mxmlGetOpaque(blendNode->child)).toLower();
+				if(blend=="alpha"){
+					blendState.set(BlendState::Combination_ALPHA);
+				}
+				else if(blend=="color"){
+					blendState.set(BlendState::Combination_COLOR);
+				}
 			}
-			else if(blend=="color"){
-				blendState.set(BlendState::Combination_COLOR);
-			}
-		}
 
-		if(blendNode!=NULL){
-			renderState->setBlendState(blendState);
+			if(blendNode!=NULL){
+				renderState->setBlendState(blendState);
+			}
 		}
 	}
 

@@ -140,12 +140,12 @@ int main(int argc,char **argv){
 	Log::getInstance()->setCategoryReportingLevel(Categories::TOADLET_EGG_LOGGER,Logger::Level_DISABLED);
 	Log::getInstance()->setCategoryReportingLevel(Categories::TOADLET_EGG,Logger::Level_WARNING);
 	Log::getInstance()->setCategoryReportingLevel(Categories::TOADLET_TADPOLE,Logger::Level_WARNING);
-	Engine::ptr engine=new Engine(0,0,Engine::Option_BIT_FIXEDBACKABLE|Engine::Option_BIT_SHADERBACKABLE);
+	Engine::ptr engine=new Engine();
 	engine->installHandlers();
 
 	TextureArchive::ptr textureArchive=new TextureArchive();
 	textureArchive->setDirectory(texDir);
-	engine->getArchiveManager()->manageArchive(textureArchive);
+	engine->getArchiveManager()->manage(shared_static_cast<Archive>(textureArchive));
 
 	std::cout << "Compiling a version " << version << " file" << std::endl;
 

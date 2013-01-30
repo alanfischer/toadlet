@@ -124,7 +124,7 @@ public:
 
 	Texture::ptr createNormalizationTexture(int size);
 
-	Material::ptr createDiffuseMaterial(Texture *texture);
+	Material::ptr createDiffuseMaterial(Texture *texture,RenderState *renderState=NULL);
 	Material::ptr createPointSpriteMaterial(Texture *texture,scalar size,bool attenuated);
 	Material::ptr createFontMaterial(Font *font);
 	Material::ptr createSkyBoxMaterial(Texture *texture,bool clamp=true);

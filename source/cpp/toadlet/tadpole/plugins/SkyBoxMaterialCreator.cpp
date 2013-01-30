@@ -143,11 +143,13 @@ Material::ptr SkyBoxMaterialCreator::createSkyBoxMaterial(Texture *texture,bool 
 	Material::ptr material=new Material(mEngine->getMaterialManager());
 
 	RenderState::ptr renderState=mEngine->getMaterialManager()->createRenderState();
-	renderState->setBlendState(BlendState());
-	renderState->setDepthState(DepthState(DepthState::DepthTest_LEQUAL,false));
-	renderState->setRasterizerState(RasterizerState());
-	renderState->setMaterialState(MaterialState());
-	renderState->setFogState(FogState());
+	if(renderState!=NULL){
+		renderState->setBlendState(BlendState());
+		renderState->setDepthState(DepthState(DepthState::DepthTest_LEQUAL,false));
+		renderState->setRasterizerState(RasterizerState());
+		renderState->setMaterialState(MaterialState());
+		renderState->setFogState(FogState());
+	}
 
 	createPaths(material,renderState,texture,clamp);
 

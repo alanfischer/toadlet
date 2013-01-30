@@ -255,13 +255,15 @@ void MeshComponent::createVertexBuffer(){
 			int numVertexes=srcVertexBuffer->getSize();
 			VertexBuffer::ptr vertexBuffer=mEngine->getBufferManager()->createVertexBuffer(Buffer::Usage_BIT_DYNAMIC,Buffer::Access_BIT_WRITE,vertexFormat,numVertexes);
 
-			uint8 *srcData=srcVertexBuffer->lock(Buffer::Access_BIT_READ);
-			uint8 *dstData=vertexBuffer->lock(Buffer::Access_BIT_WRITE);
-			memcpy(dstData,srcData,srcVertexBuffer->getDataSize());
-			vertexBuffer->unlock();
-			srcVertexBuffer->unlock();
+			if(srcVertexBuffer!=NULL && vertexBuffer!=NULL){
+				uint8 *srcData=srcVertexBuffer->lock(Buffer::Access_BIT_READ);
+				uint8 *dstData=vertexBuffer->lock(Buffer::Access_BIT_WRITE);
+				memcpy(dstData,srcData,srcVertexBuffer->getDataSize());
+				vertexBuffer->unlock();
+				srcVertexBuffer->unlock();
 
-			mDynamicVertexData=VertexData::ptr(new VertexData(vertexBuffer));
+				mDynamicVertexData=new VertexData(vertexBuffer);
+			}
 		}
 	}
 }

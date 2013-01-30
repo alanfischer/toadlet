@@ -296,14 +296,19 @@ Resource::ptr DiffuseMaterialCreator::create(const String &name,ResourceData *da
 	return mEngine->getMaterialManager()->find(name);
 }
 
-Material::ptr DiffuseMaterialCreator::createDiffuseMaterial(Texture *texture){
+Material::ptr DiffuseMaterialCreator::createDiffuseMaterial(Texture *texture,RenderState *state){
 	Material::ptr material=new Material(mEngine->getMaterialManager());
 
-	RenderState::ptr renderState=mEngine->getMaterialManager()->createRenderState();
-	renderState->setBlendState(BlendState());
-	renderState->setDepthState(DepthState());
-	renderState->setRasterizerState(RasterizerState());
-	renderState->setMaterialState(MaterialState(true,false,MaterialState::ShadeType_GOURAUD));
+	RenderState::ptr renderState=state;
+	if(renderState==NULL){
+		renderState=mEngine->getMaterialManager()->createRenderState();
+		if(renderState!=NULL){
+			renderState->setBlendState(BlendState());
+			renderState->setDepthState(DepthState());
+			renderState->setRasterizerState(RasterizerState());
+			renderState->setMaterialState(MaterialState(true,false,MaterialState::ShadeType_GOURAUD));
+		}
+	}
 
 	if(mEngine->hasShader(Shader::ShaderType_VERTEX) && mEngine->hasShader(Shader::ShaderType_FRAGMENT)){
 		RenderPath::ptr shaderPath=material->addPath();
@@ -350,13 +355,15 @@ Material::ptr DiffuseMaterialCreator::createPointSpriteMaterial(Texture *texture
 	Material::ptr material(new Material(mEngine->getMaterialManager()));
 
 	RenderState::ptr renderState=mEngine->getMaterialManager()->createRenderState();
-	renderState->setBlendState(BlendState());
-	renderState->setDepthState(DepthState());
-	renderState->setRasterizerState(RasterizerState());
-	renderState->setMaterialState(MaterialState(true,false,MaterialState::ShadeType_GOURAUD));
-	/// @todo: We need to sort out how to handle the case in GL where you can have Geometry Shaders and PointSprites both functional.
-	/// Though I suppose that would be in the GLRenderDevice, it would deactivate PointSprites if Geometry Shaders are used.
-	renderState->setPointState(PointState(true,size,attenuated));
+	if(renderState!=NULL){
+		renderState->setBlendState(BlendState());
+		renderState->setDepthState(DepthState());
+		renderState->setRasterizerState(RasterizerState());
+		renderState->setMaterialState(MaterialState(true,false,MaterialState::ShadeType_GOURAUD));
+		/// @todo: We need to sort out how to handle the case in GL where you can have Geometry Shaders and PointSprites both functional.
+		/// Though I suppose that would be in the GLRenderDevice, it would deactivate PointSprites if Geometry Shaders are used.
+		renderState->setPointState(PointState(true,size,attenuated));
+	}
 
 	if(	mEngine->hasShader(Shader::ShaderType_VERTEX) &&
 		mEngine->hasShader(Shader::ShaderType_FRAGMENT)	&& 
@@ -417,14 +424,16 @@ Material::ptr DiffuseMaterialCreator::createFontMaterial(Font *font){
 	Texture::ptr texture=font->getTexture();
 
 	RenderState::ptr renderState=mEngine->getMaterialManager()->createRenderState();
-	renderState->setRasterizerState(RasterizerState(RasterizerState::CullType_NONE));
-	renderState->setDepthState(DepthState(DepthState::DepthTest_LEQUAL,false));
-	renderState->setMaterialState(MaterialState(true,true,MaterialState::ShadeType_FLAT));
-	if(TextureFormat::getAlphaBits(texture->getFormat()->getPixelFormat())>0){
-		renderState->setBlendState(BlendState::Combination_ALPHA);
-	}
-	else{
-		renderState->setBlendState(BlendState::Combination_COLOR);
+	if(renderState!=NULL){
+		renderState->setRasterizerState(RasterizerState(RasterizerState::CullType_NONE));
+		renderState->setDepthState(DepthState(DepthState::DepthTest_LEQUAL,false));
+		renderState->setMaterialState(MaterialState(true,true,MaterialState::ShadeType_FLAT));
+		if(TextureFormat::getAlphaBits(texture->getFormat()->getPixelFormat())>0){
+			renderState->setBlendState(BlendState::Combination_ALPHA);
+		}
+		else{
+			renderState->setBlendState(BlendState::Combination_COLOR);
+		}
 	}
 
 	if(mEngine->hasShader(Shader::ShaderType_VERTEX) &&
