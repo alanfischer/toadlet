@@ -88,12 +88,16 @@ void TerrainNode::destroy(){
 
 	int i;
 	for(i=0;i<mUnactivePatches.size();++i){
-		mUnactivePatches[i]->getParent()->destroy();
+		if(mUnactivePatches[i]!=NULL){
+			mUnactivePatches[i]->getParent()->destroy();
+		}
 	}
 	mUnactivePatches.clear();
 
 	for(i=0;i<mPatchGrid.size();++i){
-		mPatchGrid[i]->getParent()->destroy();
+		if(mPatchGrid[i]!=NULL){
+			mPatchGrid[i]->getParent()->destroy();
+		}
 	}
 	mPatchGrid.clear();
 
@@ -362,6 +366,8 @@ void TerrainNode::updateTarget(){
 }
 
 void TerrainNode::createPatch(int x,int y){
+	Log::debug("TerrainNode::createPatch");
+
 	TerrainPatchComponent::ptr patch=mUnactivePatches.back();mUnactivePatches.pop_back();
 	setPatchAt(x,y,patch);
 
@@ -408,6 +414,8 @@ void TerrainNode::createPatch(int x,int y){
 }
 
 void TerrainNode::destroyPatch(int x,int y){
+	Log::debug("TerrainNode::destroyPatch");
+
 	TerrainPatchComponent::ptr patch=patchAt(x,y);
 
 	if(patchAt(x-1,y)!=NULL){

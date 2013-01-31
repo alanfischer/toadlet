@@ -49,7 +49,7 @@ DecalShadowRenderManager::DecalShadowRenderManager(Scene *scene):SimpleRenderMan
 	RenderState::ptr renderState=engine->getMaterialManager()->createRenderState();
 	renderState->setBlendState(BlendState(BlendState::Operation_ONE_MINUS_SOURCE_ALPHA,BlendState::Operation_SOURCE_ALPHA));
 	renderState->setDepthState(DepthState(DepthState::DepthTest_LEQUAL,false));
-	renderState->setMaterialState(MaterialState(false));
+	renderState->setMaterialState(MaterialState(Vector4(0,0,0,Math::ONE)));
 	renderState->setRasterizerState(RasterizerState(RasterizerState::CullType_BACK));
 	mMaterial=engine->getMaterialManager()->createSharedMaterial(engine->createDiffuseMaterial(pointTexture),renderState);
 

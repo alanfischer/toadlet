@@ -19,6 +19,7 @@
 -->
 
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
+	android:installLocation="preferExternal"
     package="us.toadlet.randisle">
     <application
             android:label="@string/randisle_activity"

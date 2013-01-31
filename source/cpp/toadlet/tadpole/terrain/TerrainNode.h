@@ -85,7 +85,7 @@ public:
 	scalar getWaterLevel() const{return mPatchWaterLevel*mPatchScale.z;}
 
 	int localPatchIndex(int x,int y){return (y+mHalfSize)*mSize+(x+mHalfSize);}
-	TerrainPatchComponent *patchAt(int x,int y){
+	TerrainPatchComponent::ptr patchAt(int x,int y){
 		int index=localPatchIndex(x-mTerrainX,y-mTerrainY);
 		if(index>=0 && index<mPatchGrid.size()) return mPatchGrid[index];
 		else return NULL;
