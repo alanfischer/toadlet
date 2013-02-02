@@ -34,13 +34,10 @@ public:
 
 	void logicUpdate(int dt,int scope){
 		if(mTarget!=NULL){
-			Vector3 position;
-			Math::mul(position,mTarget->getWorldRotate(),mOffset);
-			Math::add(position,mTarget->getWorldTranslate());
-			PhysicsCollision result;
 			Segment segment;
-			segment.origin.set(mTarget->getWorldTranslate());
-			Math::sub(segment.direction,position,segment.origin);
+			segment.origin.set(mTarget->getWorldBound()->getSphere().origin);
+			Math::mul(segment.direction,mTarget->getWorldRotate(),mOffset);
+			PhysicsCollision result;
 			mTarget->getScene()->traceSegment(result,segment,-1,mTarget);
 			result.time-=0.1;
 			Math::madd(result.point,segment.direction,result.time,segment.origin);
