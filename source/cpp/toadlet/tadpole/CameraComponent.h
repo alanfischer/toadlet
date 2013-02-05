@@ -41,7 +41,7 @@ public:
 	void setCamera(Camera *camera){mCamera=camera;}
 	Camera *getCamera(){return mCamera;}
 
-	void setAutoProjectionFov(scalar fov,scalar nearDist,scalar farDist){mCamera->setAutoProjectionFov(fov,nearDist,farDist);}
+	void setAutoProjectionFov(scalar fov,bool yheight,scalar nearDist,scalar farDist){mCamera->setAutoProjectionFov(fov,yheight,nearDist,farDist);}
 
 	void setProjectionOrtho(scalar leftDist,scalar rightDist,scalar bottomDist,scalar topDist,scalar nearDist,scalar farDist){mCamera->setProjectionOrtho(leftDist,rightDist,bottomDist,topDist,nearDist,farDist);}\
 	void setProjectionFrustum(scalar leftDist,scalar rightDist,scalar bottomDist,scalar topDist,scalar nearDist,scalar farDist){mCamera->setProjectionFrustum(leftDist,rightDist,bottomDist,topDist,nearDist,farDist);}\

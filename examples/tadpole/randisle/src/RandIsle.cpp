@@ -74,7 +74,7 @@ void RandIsle::create(){
 
 	mCamera=new Camera();
 //	shared_static_cast<StereoscopicCamera>(mCamera)->setCrossEyed(true);
-	mCamera->setAutoProjectionFov(Math::degToRad(Math::fromInt(60)),mCamera->getNearDist(),1024);
+	mCamera->setAutoProjectionFov(Math::degToRad(Math::fromInt(60)),false,mCamera->getNearDist(),1024);
 	mCamera->setScope(~Scope_BIT_HUD | Scope_BIT_MAIN_CAMERA & ~Scope_BIT_WATER_TRANSPARENT);
 	mCamera->setDefaultState(mEngine->getMaterialManager()->createRenderState());
 	mCamera->setClearColor(Resources::instance->fadeColor);
@@ -84,7 +84,7 @@ void RandIsle::create(){
 	if(Resources::instance->reflectTarget!=NULL){
 		mReflectCamera=new Camera();
 		mReflectCamera->setRenderTarget(Resources::instance->reflectTarget);
-		mReflectCamera->setAutoProjectionFov(Math::degToRad(Math::fromInt(60)),mCamera->getNearDist(),mCamera->getFarDist());
+		mReflectCamera->setAutoProjectionFov(Math::degToRad(Math::fromInt(60)),false,mCamera->getNearDist(),mCamera->getFarDist());
 		mReflectCamera->setScope(~Scope_BIT_HUD & ~Scope_BIT_MAIN_CAMERA & ~Scope_BIT_WATER & ~Scope_BIT_WATER_TRANSPARENT);
 		mReflectCamera->setDefaultState(mEngine->getMaterialManager()->createRenderState());
 		mReflectCamera->setClearColor(Resources::instance->fadeColor);
@@ -94,7 +94,7 @@ void RandIsle::create(){
 	if(Resources::instance->refractTarget!=NULL){
 		mRefractCamera=new Camera();
 		mRefractCamera->setRenderTarget(Resources::instance->refractTarget);
-		mRefractCamera->setAutoProjectionFov(Math::degToRad(Math::fromInt(60)),mCamera->getNearDist(),mCamera->getFarDist());
+		mRefractCamera->setAutoProjectionFov(Math::degToRad(Math::fromInt(60)),false,mCamera->getNearDist(),mCamera->getFarDist());
 		mRefractCamera->setScope(~Scope_BIT_HUD & ~Scope_BIT_MAIN_CAMERA & ~Scope_BIT_WATER | Scope_BIT_WATER_TRANSPARENT);
 		mRefractCamera->setDefaultState(mEngine->getMaterialManager()->createRenderState());
 		mRefractCamera->setClearColor(Resources::instance->fadeColor);

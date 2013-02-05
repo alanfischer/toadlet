@@ -40,7 +40,7 @@ TMSHStreamer::TMSHStreamer(Engine *engine){
 Resource::ptr TMSHStreamer::load(Stream::ptr stream,ResourceData *data,ProgressListener *listener){
 	int i,j;
 
-	DataStream::ptr dataStream(new DataStream(stream));
+	DataStream::ptr dataStream=new DataStream(stream);
 
 	int id=dataStream->readUInt32();
 	if(id!=TMSH){
@@ -108,14 +108,14 @@ bool TMSHStreamer::save(Stream::ptr stream,Resource::ptr resource,ResourceData *
 	}
 
 	int i;
-	DataStream::ptr dataStream(new DataStream(stream));
+	DataStream::ptr dataStream=new DataStream(stream);
 
 	dataStream->writeUInt32(TMSH);
 
 	dataStream->writeUInt32(VERSION);
 
-	MemoryStream::ptr memoryStream(new MemoryStream());
-	DataStream::ptr dataMemoryStream(new DataStream(shared_static_cast<Stream>(memoryStream)));
+	MemoryStream::ptr memoryStream=new MemoryStream();
+	DataStream::ptr dataMemoryStream=new DataStream(memoryStream);
 
 	writeMesh(dataMemoryStream,mesh);
 	dataStream->writeInt32(Block_MESH);
@@ -170,7 +170,7 @@ Mesh::ptr TMSHStreamer::readMesh(DataStream *stream,int blockSize){
 		return NULL;
 	}
 	for(i=0;i<numSubMeshes;++i){
-		Mesh::SubMesh::ptr subMesh(new Mesh::SubMesh());
+		Mesh::SubMesh::ptr subMesh=new Mesh::SubMesh();
 	
 		subMesh->vertexData=readVertexData(stream);
 		subMesh->indexData=readIndexData(stream);
@@ -275,33 +275,31 @@ void TMSHStreamer::writeBound(DataStream *stream,Bound::ptr bound){
 }
 
 Transform::ptr TMSHStreamer::readTransform(DataStream *stream){
-	/// @todo: REMOVE IN VERSION BUMP, move these to Vector3s, we just use Vector4s due to the legacy padding
-	Vector4 translate;
-	Vector4 scale;
+	if(stream->readBool()==false){
+		return NULL;
+	}
+
+	Vector3 translate;
+	Vector3 scale;
 	Quaternion rotate;
 
-	stream->readVector4(translate);
-	stream->readVector4(scale);
+	stream->readVector3(translate);
+	stream->readVector3(scale);
 	stream->readQuaternion(rotate);
 
-	return new Transform(Vector3(translate.x,translate.y,translate.z),Vector3(scale.x,scale.y,scale.z),rotate);
+	return new Transform(translate,scale,rotate);
 }
 
 void TMSHStreamer::writeTransform(DataStream *stream,Transform::ptr transform){
-	/// @todo: REMOVE IN VERSION BUMP, move these to Vector3s, we just use Vector4s due to the legacy padding
-	Vector4 translate;
-	Vector4 scale;
-	Quaternion rotate;
-
-	if(transform!=NULL){
-		translate=Vector4(transform->getTranslate(),0);
-		scale=Vector4(transform->getScale(),0);
-		rotate=transform->getRotate();
+	if(transform==NULL){
+		stream->writeBool(false);
+		return;
 	}
 
-	stream->writeVector4(translate);
-	stream->writeVector4(scale);
-	stream->writeQuaternion(rotate);
+	stream->writeBool(true);
+	stream->writeVector3(transform->getTranslate());
+	stream->writeVector3(transform->getScale());
+	stream->writeQuaternion(transform->getRotate());
 }
 
 IndexData::ptr TMSHStreamer::readIndexData(DataStream *stream){
@@ -310,11 +308,11 @@ IndexData::ptr TMSHStreamer::readIndexData(DataStream *stream){
 		return NULL;
 	}
 
-	IndexBuffer::ptr indexBuffer=readIndexBuffer(stream);
+	IndexBuffer::ptr buffer=readIndexBuffer(stream);
 	int start=stream->readInt32();
 	int cound=stream->readInt32();
 	
-	return IndexData::ptr(new IndexData(primitive,indexBuffer,start,cound));
+	return buffer!=NULL?new IndexData(primitive,buffer,start,cound):NULL;
 }
 
 IndexBuffer::ptr TMSHStreamer::readIndexBuffer(DataStream *stream){
@@ -328,9 +326,14 @@ IndexBuffer::ptr TMSHStreamer::readIndexBuffer(DataStream *stream){
 	int size=stream->readUInt32();
 
 	IndexBuffer::ptr buffer=mEngine->getBufferManager()->createIndexBuffer(usage,access,format,size);
-	tbyte *data=buffer->lock(Buffer::Access_BIT_WRITE);
-	stream->read(data,size*format);
-	buffer->unlock();
+	if(buffer!=NULL){
+		tbyte *data=buffer->lock(Buffer::Access_BIT_WRITE);
+		stream->read(data,size*format);
+		buffer->unlock();
+	}
+	else{
+		stream->seek(stream->position()+size*format);
+	}
 
 	return buffer;
 }
@@ -343,7 +346,7 @@ VertexData::ptr TMSHStreamer::readVertexData(DataStream *stream){
 	}
 
 	VertexBuffer::ptr buffer=readVertexBuffer(stream);
-	return VertexData::ptr(new VertexData(buffer));
+	return buffer!=NULL?new VertexData(buffer):NULL;
 }
 
 VertexBuffer::ptr TMSHStreamer::readVertexBuffer(DataStream *stream){
@@ -357,9 +360,14 @@ VertexBuffer::ptr TMSHStreamer::readVertexBuffer(DataStream *stream){
 	int size=stream->readUInt32();
 
 	VertexBuffer::ptr buffer=mEngine->getBufferManager()->createVertexBuffer(usage,access,format,size);
-	tbyte *data=buffer->lock(Buffer::Access_BIT_WRITE);
-	stream->read(data,size*format->getVertexSize());
-	buffer->unlock();
+	if(buffer!=NULL){
+		tbyte *data=buffer->lock(Buffer::Access_BIT_WRITE);
+		stream->read(data,size*format->getVertexSize());
+		buffer->unlock();
+	}
+	else{
+		stream->seek(stream->position()+size*format->getVertexSize());
+	}
 
 	return buffer;
 }
@@ -516,7 +524,7 @@ void TMSHStreamer::writeMaterial(DataStream *stream,Material::ptr material){
 	RenderState::ptr renderState=material->getRenderState();
 
 	MaterialState materialState;
-	if(renderState->getMaterialState(materialState)){
+	if(renderState!=NULL && renderState->getMaterialState(materialState)){
 		stream->writeBool(true);
 		stream->write((tbyte*)&materialState,sizeof(MaterialState));
 	}
@@ -525,7 +533,7 @@ void TMSHStreamer::writeMaterial(DataStream *stream,Material::ptr material){
 	}
 
 	RasterizerState rasterizerState;
-	if(renderState->getRasterizerState(rasterizerState)){
+	if(renderState!=NULL && renderState->getRasterizerState(rasterizerState)){
 		stream->writeBool(true);
 		stream->write((tbyte*)&rasterizerState,sizeof(RasterizerState));
 	}
@@ -534,7 +542,7 @@ void TMSHStreamer::writeMaterial(DataStream *stream,Material::ptr material){
 	}
 
 	BlendState blendState;
-	if(renderState->getBlendState(blendState)){
+	if(renderState!=NULL && renderState->getBlendState(blendState)){
 		stream->writeBool(true);
 		stream->write((tbyte*)&blendState,sizeof(BlendState));
 	}
@@ -550,7 +558,7 @@ Skeleton::ptr TMSHStreamer::readSkeleton(DataStream *stream,int blockSize){
 
 	int i;
 	for(i=0;i<numBones;++i){
-		Skeleton::Bone::ptr bone(new Skeleton::Bone());
+		Skeleton::Bone::ptr bone=new Skeleton::Bone();
 
 		bone->index=stream->readInt32();
 		bone->parentIndex=stream->readInt32();
@@ -627,9 +635,6 @@ Sequence::ptr TMSHStreamer::readSequence(DataStream *stream,int blockSize){
 	}
 
 	sequence->setLength(stream->readFloat());
-	/// @todo: REMOVE IN VERSION BUMP
-	bool oldScaled=stream->readBool();
-	TOADLET_IGNORE_UNUSED_VARIABLE_WARNING(oldScaled);
 
 	return sequence;
 }
@@ -662,8 +667,6 @@ void TMSHStreamer::writeSequence(DataStream *stream,Sequence::ptr sequence){
 	}
 
 	stream->writeFloat(sequence->getLength());
-	/// @todo: REMOVE IN VERSION BUMP
-	stream->writeBool(false);
 }
 
 }

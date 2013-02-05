@@ -214,7 +214,14 @@ Engine::Engine(void *env,void *ctx):
 	mBackableRenderCaps.maxTextureSize=4096*16;
 	mBackableRenderCaps.maxTextureStages=512;
 	mBackableRenderCaps.maxLights=512;
-	
+
+	// Android currently must be backed, since the context can not be created when the application is
+	#if defined(TOADLET_PLATFORM_ANDROID)
+		setHasBackableShader(true);
+		setHasBackableFixed(true);
+		setHasBackableTriangleFan(true);
+	#endif
+
 	// Create initial BackableVertexFormats.  This doesn't need to be done, but without it, starting an application without a RenderDevice will crash.
 	updateVertexFormats();
 }
