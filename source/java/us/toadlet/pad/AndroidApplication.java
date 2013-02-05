@@ -220,10 +220,6 @@ public abstract class AndroidApplication extends Activity implements Runnable{
 		if(mEngine==null){
 			mEngine=new Engine(this);
 			
-			mEngine.setHasBackableShader(true);
-			mEngine.setHasBackableFixed(true);
-			mEngine.setHasBackableTriangleFan(true);
-
 			mEngine.setHasMaximumShader(false);
 			mEngine.setHasMaximumFixed(true);
 			

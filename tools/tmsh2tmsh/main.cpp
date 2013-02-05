@@ -43,6 +43,7 @@ int main(int argc,char **argv){
 	Log::getInstance()->setCategoryReportingLevel(Categories::TOADLET_EGG,Logger::Level_WARNING);
 	Log::getInstance()->setCategoryReportingLevel(Categories::TOADLET_TADPOLE,Logger::Level_WARNING);
 	Engine::ptr engine=new Engine();
+	engine->setBackableRenderCaps(engine->getMaximumRenderCaps());
 	engine->installHandlers();
 
 	// Load the mesh data
@@ -62,7 +63,7 @@ int main(int argc,char **argv){
 	// Prepare the output file
 	int loc=mshFileName.rfind('.');
 	String tmshFileName=mshFileName.substr(0,loc)+(xmsh?".xmsh":".tmsh");
-	FileStream::ptr stream(new FileStream(tmshFileName,FileStream::Open_WRITE_BINARY));
+	FileStream::ptr stream=new FileStream(tmshFileName,FileStream::Open_WRITE_BINARY);
 
 	// Write to desired format
 	bool result=false;
@@ -72,7 +73,7 @@ int main(int argc,char **argv){
 	}
 	else{
 		TMSHStreamer::ptr streamer=new TMSHStreamer(engine);
-		result=streamer->save(stream,mesh,NULL,NULL);
+ 		result=streamer->save(stream,mesh,NULL,NULL);
 	}
 
 	if(result){

@@ -41,22 +41,24 @@ Camera::Camera():
 	mClearFlags(0),
 	mSkipFirstClear(false),
 	mAlignmentCalculationsUseOrigin(false),
+	mAutoYHeight(false),
 
 	mFPSLastTime(0),
 	mFPSFrameCount(0),
 	mFPS(0),
 	mVisibleCount(0)
 {
-	setAutoProjectionFov(Math::QUARTER_PI,Math::ONE,Math::fromInt(1000));
+	setAutoProjectionFov(Math::QUARTER_PI,false,Math::ONE,Math::fromInt(1000));
 	mClearFlags=RenderDevice::ClearType_BIT_COLOR|RenderDevice::ClearType_BIT_DEPTH;
 }
 
-void Camera::setAutoProjectionFov(scalar fov,scalar nearDist,scalar farDist){
+void Camera::setAutoProjectionFov(scalar fov,bool yheight,scalar nearDist,scalar farDist){
 	mProjectionType=ProjectionType_FOV;
 	mFov=fov;mAspect=Math::ONE;
 	mLeftDist=0;mRightDist=0;
 	mBottomDist=0;mTopDist=0;
 	mNearDist=nearDist;mFarDist=farDist;
+	mAutoYHeight=yheight;
 }
 
 void Camera::setProjectionFovX(scalar fovx,scalar aspect,scalar nearDist,scalar farDist){
@@ -131,7 +133,7 @@ void Camera::setNearAndFarDist(scalar nearDist,scalar farDist){
 
 	switch(mProjectionType){
 		case(ProjectionType_FOV):
-			setAutoProjectionFov(mFov,mNearDist,mFarDist);
+			setAutoProjectionFov(mFov,mAutoYHeight,mNearDist,mFarDist);
 		break;
 		case(ProjectionType_FOVX):
 			setProjectionFovX(mFov,mAspect,mNearDist,mFarDist);
@@ -397,7 +399,7 @@ void Camera::updateClippingPlanes(){
 void Camera::autoUpdateProjection(RenderTarget *target){
 	int width=target->getWidth(),height=target->getHeight();
 	setViewport(Viewport(0,0,width,height));
-	if(width>=height){
+	if((width>=height && !mAutoYHeight) || (height>=width && mAutoYHeight)){
 		Math::setMatrix4x4FromPerspectiveY(mProjectionMatrix,mFov,Math::div(Math::fromInt(width),Math::fromInt(height)),mNearDist,mFarDist);
 	}
 	else{

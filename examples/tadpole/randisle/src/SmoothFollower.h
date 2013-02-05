@@ -35,7 +35,7 @@ public:
 	void logicUpdate(int dt,int scope){
 		if(mTarget!=NULL){
 			Segment segment;
-			segment.origin.set(mTarget->getWorldBound()->getSphere().origin);
+			segment.origin.set(mTarget->getTranslate());
 			Math::mul(segment.direction,mTarget->getWorldRotate(),mOffset);
 			PhysicsCollision result;
 			mTarget->getScene()->traceSegment(result,segment,-1,mTarget);

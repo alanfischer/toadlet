@@ -60,7 +60,7 @@ public:
 	inline ProjectionType getProjectionType() const{return mProjectionType;}
 
 	// Automatically adjust fov for the RenderTarget size
-	void setAutoProjectionFov(scalar fov,scalar nearDist,scalar farDist);
+	void setAutoProjectionFov(scalar fov,bool yheight,scalar nearDist,scalar farDist);
 
 	void setProjectionFovX(scalar fovx,scalar aspect,scalar nearDist,scalar farDist);
 	void setProjectionFovY(scalar fovy,scalar aspect,scalar nearDist,scalar farDist);
@@ -151,6 +151,7 @@ protected:
 	Vector4 mClearColor;
 	bool mSkipFirstClear;
 	bool mAlignmentCalculationsUseOrigin;
+	bool mAutoYHeight;
 	RenderState::ptr mDefaultState;
 
 	Matrix4x4 mProjectionMatrix;
