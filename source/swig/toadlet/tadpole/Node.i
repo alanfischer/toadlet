@@ -26,9 +26,16 @@ public:
 	bool attach(Component *node);
 	bool remove(Component *node);
 
+	ActionComponent *getAction(const String &name);
 	void startAction(String name);
 	void stopAction(String name);
 	bool getActionActive(String name);
+	
+	int getNumVisibles() const;
+	Visible *getVisible(int i);
+	
+	int getNumLights() const;
+	LightComponent *getLight(int i);
 };
 
 }

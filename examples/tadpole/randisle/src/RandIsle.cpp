@@ -180,7 +180,6 @@ void RandIsle::create(){
 		Node::ptr prop=new Node(mScene);
 		MeshComponent *mesh=new MeshComponent(mEngine);
 		mesh->setMesh(Resources::instance->grass);
-		mesh->setName("mesh");
 		prop->attach(mesh);
 		prop->setScope(prop->getScope()&~Scope_BIT_SHADOW);
 
@@ -418,9 +417,8 @@ void RandIsle::updateProps(){
 			a=0;
 		}
 
-		MeshComponent *mesh=(MeshComponent*)prop->getChild("mesh");
-		if(mesh!=NULL){
-			mesh->getSharedRenderState()->setMaterialState(MaterialState(Vector4(Math::ONE,Math::ONE,Math::ONE,a)));
+		for(int j=0;j<prop->getNumVisibles();++j){
+			prop->getVisible(j)->getSharedRenderState()->setMaterialState(MaterialState(Vector4(Math::ONE,Math::ONE,Math::ONE,a)));
 		}
 	}
 }
