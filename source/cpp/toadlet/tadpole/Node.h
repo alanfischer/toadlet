@@ -91,10 +91,13 @@ public:
 
 	virtual void visibleAttached(Visible *visible);
 	virtual void visibleRemoved(Visible *visible);
+	virtual int getNumVisibles() const{return mVisibles.size();}
+	virtual Visible *getVisible(int i){return mVisibles[i];}
 	
-	// Attached Component methods
 	virtual void lightAttached(LightComponent *light);
 	virtual void lightRemoved(LightComponent *light);
+	virtual int getNumLights() const{return mLights.size();}
+	virtual LightComponent *getLight(int i){return mLights[i];}
 	
 	virtual void physicsAttached(PhysicsComponent *physics);
 	virtual void physicsRemoved(PhysicsComponent *physics);
