@@ -50,7 +50,7 @@ void RandIsle::create(){
 
 	Simulator *simulator=((HopManager*)mScene->getPhysicsManager())->getSimulator();
 	simulator->setGravity(Vector3(0,0,-50));
-	simulator->setEpsilon(0.03125);
+	simulator->setEpsilon(0.05);
 	simulator->setMicroCollisionThreshold(100);
 
 	mTerrain=new TerrainNode(mScene);
