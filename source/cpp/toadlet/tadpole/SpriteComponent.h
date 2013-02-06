@@ -36,7 +36,6 @@
 namespace toadlet{
 namespace tadpole{
 
-/// @todo: This class should really take an array of Materials, so they can be animated, much like the SpriteModelComponent
 class TOADLET_API SpriteComponent:public BaseComponent,public Renderable,public Visible{
 public:
 	TOADLET_OBJECT(SpriteComponent);
@@ -46,8 +45,12 @@ public:
 
 	void parentChanged(Node *node);
 
-	void setMaterial(Material *material);
-	Material *getMaterial() const{return mMaterial;}
+	void setMaterial(Material *material,int i=0);
+	Material *getMaterial(int i=0) const{return mMaterials.size()>i?mMaterials[i]:NULL;}
+	int getNumMaterials() const{return mMaterials.size();}
+
+	void setMaterialIndex(int index){mMaterialIndex=index;}
+	int getMaterialIndex() const{return mMaterialIndex;}
 
 	void setAlignment(int alignment);
 	int getAlignment() const{return mAlignment;}
@@ -61,7 +64,7 @@ public:
 	void gatherRenderables(Camera *camera,RenderableSet *set);
 
 	// Renderable
-	Material *getRenderMaterial() const{return mMaterial;}
+	Material *getRenderMaterial() const{return mMaterialIndex<mMaterials.size()?mMaterials[mMaterialIndex]:NULL;}
 	Transform *getRenderTransform() const{return mParent->getWorldTransform();}
 	Bound *getRenderBound() const{return mParent->getWorldBound();}
 	void render(RenderManager *manager) const;
@@ -71,7 +74,8 @@ protected:
 
 	Engine *mEngine;
 	int mAlignment;
-	Material::ptr mMaterial;
+	Collection<Material::ptr> mMaterials;
+	int mMaterialIndex;
 	bool mRendered;
 	Bound::ptr mBound;
 	RenderState::ptr mSharedRenderState;

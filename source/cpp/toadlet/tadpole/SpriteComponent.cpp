@@ -34,8 +34,9 @@ namespace tadpole{
 
 SpriteComponent::SpriteComponent(Engine *engine):
 	mAlignment(0),
-	mRendered(false)
-	//mMaterial,
+	mRendered(false),
+	//mMaterials,
+	mMaterialIndex(0)
 	//mSharedRenderState,
 	//mVertexData,
 	//mIndexData,
@@ -49,7 +50,7 @@ SpriteComponent::SpriteComponent(Engine *engine):
 }
 
 void SpriteComponent::destroy(){
-	mMaterial=NULL;
+	mMaterials.clear();
 
 	if(mVertexData!=NULL){
 		mVertexData->destroy();
@@ -81,11 +82,21 @@ void SpriteComponent::parentChanged(Node *node){
 	}
 }
 
-void SpriteComponent::setMaterial(Material *material){
-	mMaterial=material;
+void SpriteComponent::setMaterial(Material *material,int i){
+	if(mMaterials.size()==i+1 && material==NULL){
+		mMaterials.resize(i);
+		return;
+	}
+
+	if(mMaterials.size()<=i){
+		mMaterials.resize(i+1);
+	}
+	mMaterials[i]=material;
 
 	if(mSharedRenderState!=NULL){
-		mMaterial=mEngine->getMaterialManager()->createSharedMaterial(mMaterial,mSharedRenderState);
+		if(mMaterials[i]!=NULL){
+			mMaterials[i]=mEngine->getMaterialManager()->createSharedMaterial(mMaterials[i],mSharedRenderState);
+		}
 	}
 }
 
@@ -98,10 +109,13 @@ void SpriteComponent::setAlignment(int alignment){
 RenderState::ptr SpriteComponent::getSharedRenderState(){
 	if(mSharedRenderState==NULL){
 		mSharedRenderState=mEngine->getMaterialManager()->createRenderState();
-		if(mMaterial!=NULL){
-			mEngine->getMaterialManager()->modifyRenderState(mSharedRenderState,mMaterial->getRenderState());
+		int i;
+		for(i=0;i<mMaterials.size();++i){
+			if(mMaterials[i]!=NULL){
+				mEngine->getMaterialManager()->modifyRenderState(mSharedRenderState,mMaterials[i]->getRenderState());
 
-			mMaterial=mEngine->getMaterialManager()->createSharedMaterial(mMaterial,mSharedRenderState);
+				mMaterials[i]=mEngine->getMaterialManager()->createSharedMaterial(mMaterials[i],mSharedRenderState);
+			}
 		}
 	}
 

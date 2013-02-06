@@ -32,6 +32,7 @@
 #include <toadlet/tadpole/Renderable.h>
 #include <toadlet/tadpole/DetailTraceable.h>
 #include <toadlet/tadpole/Visible.h>
+#include <toadlet/tadpole/BaseComponent.h>
 #include <toadlet/tadpole/studio/StudioModel.h>
 
 namespace toadlet{

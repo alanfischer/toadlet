@@ -82,7 +82,7 @@ Simulator::Simulator():
 		setDeactivateSpeed(1<<8); // Some default
 		setDeactivateCount(4); // 4 frames
 	#else
-		setEpsilon(.0001);
+		setEpsilon(.001);
 		setMaxPositionComponent(100000);
 		setMaxVelocityComponent(1000);
 		setMaxForceComponent(1000);
