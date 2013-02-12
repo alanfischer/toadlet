@@ -80,6 +80,10 @@ void AnimationAction::start(){
 	mRunning=true;
 
 	int i;
+	for(i=0;i<mAnimations.size();++i){
+		mAnimations[i]->setWeight(Math::ONE);
+	}
+
 	for(i=0;i<mListeners.size();++i){
 		mListeners[i]->actionStarted(this);
 	}
@@ -94,6 +98,10 @@ void AnimationAction::stop(){
 	mRunning=false;
 
 	int i;
+	for(i=0;i<mAnimations.size();++i){
+		mAnimations[i]->setWeight(0);
+	}
+
 	for(i=0;i<mListeners.size();++i){
 		mListeners[i]->actionStopped(this);
 	}

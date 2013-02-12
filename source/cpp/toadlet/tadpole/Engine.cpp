@@ -24,8 +24,6 @@
  ********** Copyright header - do not remove **********/
 
 /// @todo: OVERALL
-// - Sprites and animated meshes need to if(no event frames){deactivate if not being looked at}
-
 // I REALLY NEED TO PLAY WITH THIS, IT WILL LET ME USE A THREADPOOL AND HAUL ASS THROUGH NODE UPDATES
 // In theory, each child of a parent node should be updated simultaniously
 // Meaning, a child can get the parent node's translate at any time & be correct.
@@ -36,35 +34,6 @@
 // - The node transform should also be buffered.  As in, the order of the nodes to a parent shouldn't affect what order they get updated.
 //		So we could have localTransform, and workingLocalTransform.  worldTransform and workingWorldTransform.
 //		When we're actually in an update, we would update the workingLocalTransform, and the... FINISH FIGURING THIS OUT
-// - Interpolation will be handled by some Interpolator which will do the actual HopEntity interpolation between frames,
-//		so we can still have just a Transform(world & local), and the localTransform will be modified by the Interpolator each renderFrame,
-//		until a logicFrame, at which point the interpolator should be at the exact position as the solid (or exactly 1 logic dt behind)
-// - There are two types of alignments.
-//		= Regular Alignments are in the scene, and would be a model pointing at something else, or a billboard pointing a certain direction.
-//			Regular Alignments are applied to the rotation of the node.  THIS IS WHAT THE SQUIREL CAMERA IS
-
-// - Interpolation:
-//		Can be used by Nodes as they move through space, or by Skeleton's as they move their bones through space.
-//		Biggest difference is Skeletons you know all your keyframes.  General nodes you may only know 2, or a few more if we allow it.
-//		Should I allow other things besides transforms to be interpolated?  What about general color interpolation?
-//		Maybe this needs to be tied into the keyFrame stuff.  We have a keyframe, which can be position, rotation, color, who knows.
-//		Then the interpolator will operate on the KeyFrames & time, and change something based on that.
-//		Then nodes can be assigned an interpolator...  But how?  Is it a node property?  Or maybe a NodeListener?  This is like the M3G Sequence or whatever.  They have it part of the node.
-//		HopEntity's interpolator will listen to the logicFrame.  
-
-/// @todo  I think a good way to let us use EventKeyFrames with the Controller framework is to:
-///   1: Have a way of ensuring that the EventKeyFrames are aligned on LogicDT times.
-///   2: Have the AnimationControllerNode not issue a renderUpdate until we have enough logicUpdates to keep up with it.
-///  That way, entities without EventKeyFrames should update smoothly if something keeps the logic from flowing, but
-///   we will still be able to have any logic dependent stuff happen at the correct times.
-///
-///  Or perhaps, we could use the above tactic for all the update entities.  There is just 1 function, update
-///   But it stops being called if logic updates cease due to networking issues.
-///   Down sides are that its harder to do logic based updating, since you'd have to handle the checking to see if its
-///    been a logicDT yourself.
-
-/// @todo: Force no-scene-graph updates in renderUpdate, to allow us to thread that easily
-
 
 #include <toadlet/peeper/RenderCaps.h>
 #include <toadlet/tadpole/Types.h>

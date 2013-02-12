@@ -33,13 +33,12 @@
 #include <toadlet/tadpole/DetailTraceable.h>
 #include <toadlet/tadpole/Visible.h>
 #include <toadlet/tadpole/BaseComponent.h>
+#include <toadlet/tadpole/animation/BaseAnimation.h>
 #include <toadlet/tadpole/studio/StudioModel.h>
 
 namespace toadlet{
 namespace tadpole{
 namespace studio{
-
-class StudioModelController;
 
 class TOADLET_API StudioModelComponent:public BaseComponent,public DetailTraceable,public Renderable,public Attachable,public Visible{
 public:
@@ -71,6 +70,34 @@ public:
 		friend class StudioModelComponent;
 	};
 
+	class SequenceAnimation:public BaseAnimation{
+	public:
+		TOADLET_OBJECT(SequenceAnimation);
+
+		SequenceAnimation(studioseqdesc *sequence);
+
+		String getName() const{return mSSequence->label;}		
+
+		void setValue(scalar value){mValue=value;}
+		scalar getMinValue() const{return 0;}
+		scalar getMaxValue() const{return mSSequence->numframes/mSSequence->fps;}
+		scalar getValue() const{return mValue;}
+
+		void setWeight(scalar weight){mWeight=weight;}
+		scalar getWeight() const{return mWeight;}
+
+		void setScope(int scope){mScope=scope;}
+		int getScope() const{return mScope;}
+
+	protected:
+		studioseqdesc *mSSequence;
+		scalar mValue;
+		scalar mWeight;
+		int mScope;
+
+		friend class StudioModelComponent;
+	};
+
 	StudioModelComponent(Engine *engine);
 	void destroy();
 
@@ -82,18 +109,6 @@ public:
 	void setModel(const String &name);
 	void setModel(StudioModel *model);
 	StudioModel *getModel() const{return mModel;}
-
-	void setSequence(int sequence);
-	int getSequence() const{return mSequenceIndex;}
-
-	void setSequenceTime(scalar time);
-	scalar getSequenceTime() const{return mSequenceTime;}
-
-	void setGaitSequence(int sequence);
-	int getGaitSequence() const{return mGaitSequenceIndex;}
-
-	void setGaitSequenceTime(scalar time);
-	scalar getGaitSequenceTime() const{return mGaitSequenceTime;}
 
 	void setRenderSkeleton(bool skeleton);
 	bool getRenderSkeleton() const{return mSkeletonMaterial!=NULL;}
@@ -113,12 +128,15 @@ public:
 	void setSkin(int skin);
 	int getSkin() const{return mSkinIndex;}
 
+	int getNumBones() const{return mModel->header->numbones;}
+	String getBoneName(int i){return mModel->bone(i)->name;}
+	int getBoneIndex(const String &name);
+	void setBoneScope(int i,int scope,bool recurse);
+	int getBoneScope(int i) const{return mBoneScopes[i];}
+
 	// If set, it overrides any sequences or controllers
 	void setLink(StudioModelComponent *link);
 	StudioModelComponent *getLink() const{return mLink;}
-
-	StudioModelController *getController();
-	StudioModelController *getGaitController();
 
 	bool getActive() const{return true;}
 	Bound *getBound() const{return mBound;}
@@ -145,9 +163,14 @@ public:
 	int getAttachmentIndex(const String &name);
 	bool getAttachmentTransform(Transform *result,int index);
 
+	// AnimationComponent
+	int getNumAnimations(){return mAnimations.size();}
+	Animation *getAnimation(const String &name);
+	Animation *getAnimation(int index){return mAnimations[index];}
+
 protected:
 	void updateSkeleton();
-	void findBoneTransforms(Vector3 *translates,Quaternion *rotates,StudioModel *model,studioseqdesc *sseqdesc,studioanim *sanim,float t);
+	void findBoneTransforms(Vector3 *translates,Quaternion *rotates,StudioModel *model,studioseqdesc *sseqdesc,studioanim *sanim,SequenceAnimation *animation);
 	void findBoneTranslate(Vector3 &r,int frame,float s,studiobone *sbone,studioanim *sanim);
 	void findBoneRotate(Quaternion &r,int frame,float s,studiobone *sbone,studioanim *sanim);
 	void updateVertexes(StudioModel *model,int bodypartsIndex,int modelIndex);
@@ -167,20 +190,18 @@ protected:
 	int mBodypartIndex;
 	int mModelIndex;
 	int mSkinIndex;
-	int mSequenceIndex;
-	scalar mSequenceTime;
-	int mGaitSequenceIndex;
-	scalar mGaitSequenceTime;
 	scalar mControllerValues[4],mAdjustedControllerValues[4];
 	scalar mBlenderValues[4],mAdjustedBlenderValues[4];
 	StudioModelComponent::ptr mLink;
 	StudioModel::ptr mLinkModel;
-//	Controller::ptr mController,mGaitController;
+	Collection<SequenceAnimation::ptr> mAnimations;
+	int mBlendSequenceIndex;
 
 	Vector3 mChromeForward,mChromeRight;
 	Collection<Vector3> mBoneTranslates;
 	Collection<Quaternion> mBoneRotates;
 	Collection<int16> mBoneLinks;
+	Collection<int> mBoneScopes;
 	Collection<Vector3> mTransformedVerts;
 	Collection<Vector3> mTransformedNorms;
 	Collection<Vector2> mTransformedChromes;

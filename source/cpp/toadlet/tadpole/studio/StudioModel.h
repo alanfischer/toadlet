@@ -72,6 +72,7 @@ public:
 	studiobbox *bbox(int i){return &((studiobbox*)(data+header->hitboxindex))[i];}
 	studiobonecontroller *bonecontroller(int i){return &((studiobonecontroller*)(data+header->bonecontrollerindex))[i];}
 	studioattachment *attachment(int i){return &((studioattachment*)(data+header->attachmentindex))[i];}
+	studioevent *event(studioseqdesc *seqdesc,int i){return &((studioevent*)(data+seqdesc->eventindex))[i];}
 
 	struct meshdata{
 		int vertexStart;
