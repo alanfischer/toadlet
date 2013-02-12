@@ -28,7 +28,6 @@
 #include <toadlet/tadpole/RenderableSet.h>
 #include <toadlet/tadpole/RenderManager.h>
 #include <toadlet/tadpole/studio/SpriteModelComponent.h>
-#include <toadlet/tadpole/studio/SpriteStreamer.h>
 
 namespace toadlet{
 namespace tadpole{
