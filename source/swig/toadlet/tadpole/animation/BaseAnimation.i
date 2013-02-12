@@ -10,6 +10,8 @@ namespace animation{
 
 class BaseAnimation:public Animation{
 public:
+	virtual String getName() const;
+
 	virtual void setValue(scalar value);
 	virtual scalar getMinValue() const;
 	virtual scalar getMaxValue() const;
@@ -17,6 +19,9 @@ public:
 
 	virtual void setWeight(scalar weight);
 	virtual scalar getWeight() const;
+	
+	virtual void setScope(int scope);
+	virtual int getScope() const;
 };
 
 }
