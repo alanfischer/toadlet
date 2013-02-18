@@ -23,28 +23,23 @@
  *
  ********** Copyright header - do not remove **********/
 
-#ifndef TOADLET_TADPOLE_RENDERABLE_H
-#define TOADLET_TADPOLE_RENDERABLE_H
+#ifndef TOADLET_TADPOLE_ANIMATABLE_H
+#define TOADLET_TADPOLE_ANIMATABLE_H
 
-#include <toadlet/egg/Interface.h>
+#include <toadlet/peeper/RenderState.h>
 #include <toadlet/tadpole/Types.h>
 
 namespace toadlet{
 namespace tadpole{
-namespace material{class Material;}
+namespace animation{class Animation;}
 
-class Bound;
-class RenderManager;
-class Transform;
-
-class Renderable{
+class Animatable{
 public:
-	virtual ~Renderable(){}
+	virtual ~Animatable(){}
 
-	virtual Material *getRenderMaterial() const=0;
-	virtual Transform *getRenderTransform() const=0;
-	virtual Bound *getRenderBound() const=0;
-	virtual void render(RenderManager *manager) const=0;
+	virtual int getNumAnimations()=0;
+	virtual Animation *getAnimation(const String &name)=0;
+	virtual Animation *getAnimation(int index)=0;
 };
 
 }

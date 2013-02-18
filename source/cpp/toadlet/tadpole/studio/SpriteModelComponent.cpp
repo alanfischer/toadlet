@@ -156,6 +156,23 @@ void SpriteModelComponent::gatherRenderables(Camera *camera,RenderableSet *set){
 	set->queueRenderable(this);
 }
 
+Material *SpriteModelComponent::getRenderMaterial() const{
+	if(mMaterials.size()==0){
+		return NULL;
+	}
+
+	int sequenceIndex=Math::toInt(mSequenceTime);
+	if(sequenceIndex<0){
+		return mMaterials[0];
+	}
+	if(sequenceIndex>=mMaterials.size()){
+		return mMaterials[mMaterials.size()-1];
+	}
+	else{
+		return mMaterials[sequenceIndex];
+	}
+}
+
 void SpriteModelComponent::render(RenderManager *manager) const{
 	manager->getDevice()->renderPrimitive(mVertexData,mIndexData);
 }

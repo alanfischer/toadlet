@@ -46,7 +46,6 @@ set (TADPOLE_ANIMATION_SRC
 	animation/CameraProjectionAnimation.cpp
 	animation/NodePathAnimation.cpp
 	animation/MaterialAnimation.cpp
-	animation/MeshAnimation.cpp
 )
 
 set (TADPOLE_BSP_SRC
@@ -195,6 +194,7 @@ set (TADPOLE_HDR
 	AudioAction.h
 	ActionComponent.h
 	Action.h
+	Animatable.h
 	Attachable.h
 	ArchiveManager.h
 	AudioStreamer.h
@@ -263,7 +263,6 @@ set (TADPOLE_ANIMATION_HDR
 	animation/CameraProjectionAnimation.h
 	animation/NodePathAnimation.h
 	animation/MaterialAnimation.h
-	animation/MeshAnimation.h
 )
 
 set (TADPOLE_BSP_HDR

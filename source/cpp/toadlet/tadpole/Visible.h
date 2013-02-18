@@ -35,7 +35,7 @@ namespace tadpole{
 class RenderableSet;
 class Camera;
 
-class Visible/*:public Interface*/{
+class Visible{
 public:
 	virtual ~Visible(){}
 

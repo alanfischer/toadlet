@@ -30,12 +30,14 @@
 #include <toadlet/tadpole/Renderable.h>
 #include <toadlet/tadpole/Engine.h>
 #include <toadlet/tadpole/Skeleton.h>
+#include <toadlet/tadpole/Animatable.h>
 #include <toadlet/tadpole/material/Material.h>
+#include <toadlet/tadpole/animation/BaseAnimation.h>
 
 namespace toadlet{
 namespace tadpole{
 
-class TOADLET_API SkeletonComponent:public BaseComponent,public Renderable,public Attachable{
+class TOADLET_API SkeletonComponent:public BaseComponent,public Renderable,public Attachable,public Animatable{
 public:
 	TOADLET_OBJECT(SkeletonComponent);
 
@@ -62,6 +64,7 @@ public:
 
 		Bone(int index):
 			index(0),
+			scope(-1),
 			controller(NULL),
 			dontUpdateFlags(0),
 			useMatrixTransforms(false)
@@ -95,11 +98,39 @@ public:
 		Quaternion boneSpaceRotate;
 		Matrix4x4 boneSpaceMatrix;
 
+		int scope;
 		BoneController *controller;
-
 		int dontUpdateFlags;
-
 		bool useMatrixTransforms;
+	};
+
+	class SequenceAnimation:public BaseAnimation{
+	public:
+		TOADLET_OBJECT(SequenceAnimation);
+
+		SequenceAnimation(Sequence *sequence);
+
+		const String &getName() const{return mSequence->getName();}		
+
+		void setValue(scalar value){mValue=value;}
+		scalar getMinValue() const{return 0;}
+		scalar getMaxValue() const{return mSequence->getLength();}
+		scalar getValue() const{return mValue;}
+
+		void setWeight(scalar weight){mWeight=weight;}
+		scalar getWeight() const{return mWeight;}
+
+		void setScope(int scope){mScope=scope;}
+		int getScope() const{return mScope;}
+
+	protected:
+		Sequence::ptr mSequence;
+		scalar mValue;
+		scalar mWeight;
+		int mScope;
+		Collection<int> mTrackHints;
+
+		friend class SkeletonComponent;
 	};
 
 	SkeletonComponent(Engine *engine,Skeleton *skeleton);
@@ -108,12 +139,12 @@ public:
 	void frameUpdate(int dt,int scope);
 
 	void updateBones();
-	void updateBones(int sequenceIndex,scalar sequenceTime);
 	inline int getLastUpdateFrame() const{return mLastUpdateFrame;}
 
 	inline int getNumBones() const{return mBones.size();}
 	inline Bone *getBone(int index) const{return (index>=0 && index<mBones.size())?mBones[index]:NULL;}
 	inline Bone *getBone(const String &name) const{return getBone(getBoneIndex(name));}
+	void setBoneScope(int i,int scope,bool recurse);
 
 	int getBoneIndex(const String &name) const;
 	int getBoneIndex(Bone *bone) const{return bone->index;}
@@ -126,7 +157,7 @@ public:
 
 	Bound *getBound() const{return mBound;}
 
-	bool getActive() const{return false;}
+	bool getActive() const{return true;}
 
 	inline Skeleton *getSkeleton() const{return mSkeleton;}
 
@@ -145,6 +176,11 @@ public:
 	int getAttachmentIndex(const String &name){return getBoneIndex(name);}
 	bool getAttachmentTransform(Transform *result,int index);
 
+	// Animatable
+	int getNumAnimations(){return mAnimations.size();}
+	Animation *getAnimation(const String &name);
+	Animation *getAnimation(int index){return mAnimations[index];}
+
 protected:
 	void createSkeletonBuffers();
 	void updateSkeletonBuffers();
@@ -161,10 +197,7 @@ protected:
 	Transform::ptr mWorldTransform;
 	Bound::ptr mWorldBound;
 	int mLastUpdateFrame;
-
-	Sequence::ptr mSequence;
-	scalar mSequenceTime;
-	Collection<int> mTrackHints;
+	Collection<SequenceAnimation::ptr> mAnimations;
 
 	// For rendering the skeleton outline
 	Material::ptr mSkeletonMaterial;
