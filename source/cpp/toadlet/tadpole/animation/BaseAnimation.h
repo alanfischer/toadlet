@@ -53,9 +53,6 @@ public:
 	void setScope(int scope){}
 	int getScope() const{return -1;}
 
-	void setScope(int scope){}
-	int getScope() const{return -1;}
-
 	void setAnimationListener(AnimationListener *listener){mListener=listener;}
 	AnimationListener *getAnimationListener() const{return mListener;}
 

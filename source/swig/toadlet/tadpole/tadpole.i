@@ -116,7 +116,6 @@ using namespace toadlet::peeper;
 %include <toadlet/tadpole/LightComponent.i>
 %include <toadlet/tadpole/animation/Animation.i>
 %include <toadlet/tadpole/animation/BaseAnimation.i>
-%include <toadlet/tadpole/animation/MeshAnimation.i>
 %include <toadlet/tadpole/animation/MaterialAnimation.i>
 %{
 using namespace toadlet;
