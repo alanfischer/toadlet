@@ -62,7 +62,9 @@ StudioModelComponent::SequenceAnimation::SequenceAnimation(studioseqdesc *sequen
 	mWeight(0),
 	mScope(-1)
 {
+	mName=sequence->label;
 }
+
 
 StudioModelComponent::StudioModelComponent(Engine *engine):
 	mRendered(false),
@@ -558,15 +560,13 @@ void StudioModelComponent::updateSkeleton(){
 		setLink(mLink);
 	}
 
-	/// @todo: Move these to member variables?
-	Collection<Vector3> boneTranslates(mModel->header->numbones);
-	Collection<Quaternion> boneRotates(mModel->header->numbones);
-
 	int blendSequenceIndex=-1;
 
+	float totalWeight=0;
 	for(i=0;i<mAnimations.size();++i){
 		SequenceAnimation *animation=mAnimations[i];
 		if(animation->mWeight>0){
+			totalWeight+=animation->mWeight;
 			studioseqdesc *sseqdesc=mModel->seqdesc(i);
 			studioanim *sanim=mModel->anim(sseqdesc);
 
@@ -584,7 +584,19 @@ void StudioModelComponent::updateSkeleton(){
 		}
 	}
 
+	if(totalWeight==0){
+		for(i=0;i<mModel->header->numbones;++i){
+			studiobone *sbone=mModel->bone(i);
+			mBoneTranslates[i].set(sbone->value[0],sbone->value[1],sbone->value[2]);
+			Math::setQuaternionFromEulerAngle(mBoneRotates[i],EulerAngle(EulerAngle::EulerOrder_ZYX,sbone->value[5],sbone->value[4],sbone->value[3]));
+		}
+	}
+
 	if(false && mBlendSequenceIndex>=0){
+		/// @todo: Move these to member variables?
+		Collection<Vector3> boneTranslates(mModel->header->numbones);
+		Collection<Quaternion> boneRotates(mModel->header->numbones);
+
 		studioseqdesc *sseqdesc=mModel->seqdesc(mBlendSequenceIndex);
 		studioanim *sanim=mModel->anim(sseqdesc)+mModel->header->numbones;
 		SequenceAnimation *animation=mAnimations[mBlendSequenceIndex];
@@ -633,6 +645,15 @@ void StudioModelComponent::findBoneTransforms(Vector3 *translates,Quaternion *ro
 	float t=animation->mValue * sseqdesc->fps;
 	int frame=Math::intFloor(t);
 	float s=(t-Math::fromInt(frame));
+
+	if(frame<0){
+		frame=0;
+		s=0.0;
+	}
+	else if(frame>=sseqdesc->numframes){
+		frame=sseqdesc->numframes-1;
+		s=1.0f;
+	}
 
 	studiobone *sbone=model->bone(0);
 	int i;
@@ -692,10 +713,8 @@ void StudioModelComponent::findBoneRotate(Quaternion &r,int frame,float s,studio
 	int j,k;
 
 	for(j=0;j<3;++j){
-		if(sanim->offset[j+3]==0){
-			angle2[j]=angle1[j]=sbone->value[j+3];
-		}
-		else{
+		angle2[j]=angle1[j]=sbone->value[j+3];
+		if(sanim->offset[j+3]!=0){
 			sanimvalue=mModel->animvalue(sanim,j+3);
 			k=frame;
 			while(sanimvalue->num.total<=k){
@@ -734,14 +753,9 @@ void StudioModelComponent::findBoneRotate(Quaternion &r,int frame,float s,studio
 		}
 	}
 
-	if(angle1.equals(angle2)==false){
-		Math::setQuaternionFromEulerAngle(q1,EulerAngle(EulerAngle::EulerOrder_ZYX,angle1.z,angle1.y,angle1.x));
-		Math::setQuaternionFromEulerAngle(q2,EulerAngle(EulerAngle::EulerOrder_ZYX,angle2.z,angle2.y,angle2.x));
-		Math::slerp(r,q1,q2,s);
-	}
-	else{
-		Math::setQuaternionFromEulerAngle(r,EulerAngle(EulerAngle::EulerOrder_ZYX,angle1.z,angle1.y,angle1.x));
-	}
+	Math::setQuaternionFromEulerAngle(q1,EulerAngle(EulerAngle::EulerOrder_ZYX,angle1.z,angle1.y,angle1.x));
+	Math::setQuaternionFromEulerAngle(q2,EulerAngle(EulerAngle::EulerOrder_ZYX,angle2.z,angle2.y,angle2.x));
+	Math::slerp(r,q1,q2,s);
 }
 
 void StudioModelComponent::createSubModels(){

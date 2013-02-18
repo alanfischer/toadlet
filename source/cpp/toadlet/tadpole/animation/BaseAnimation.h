@@ -40,6 +40,8 @@ public:
 	BaseAnimation();
 	virtual ~BaseAnimation();
 
+	const String &getName() const{return mName;}
+
 	void setValue(scalar value){}
 	scalar getMinValue() const{return 0;}
 	scalar getMaxValue() const{return 0;}
@@ -48,10 +50,14 @@ public:
 	void setWeight(scalar weight){}
 	scalar getWeight() const{return Math::ONE;}
 
+	void setScope(int scope){}
+	int getScope() const{return -1;}
+
 	void setAnimationListener(AnimationListener *listener){mListener=listener;}
 	AnimationListener *getAnimationListener() const{return mListener;}
 
 protected:
+	String mName;
 	AnimationListener *mListener;
 };
 

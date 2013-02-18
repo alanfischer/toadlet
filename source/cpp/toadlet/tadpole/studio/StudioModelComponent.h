@@ -32,6 +32,7 @@
 #include <toadlet/tadpole/Renderable.h>
 #include <toadlet/tadpole/DetailTraceable.h>
 #include <toadlet/tadpole/Visible.h>
+#include <toadlet/tadpole/Animatable.h>
 #include <toadlet/tadpole/BaseComponent.h>
 #include <toadlet/tadpole/animation/BaseAnimation.h>
 #include <toadlet/tadpole/studio/StudioModel.h>
@@ -40,7 +41,7 @@ namespace toadlet{
 namespace tadpole{
 namespace studio{
 
-class TOADLET_API StudioModelComponent:public BaseComponent,public DetailTraceable,public Renderable,public Attachable,public Visible{
+class TOADLET_API StudioModelComponent:public BaseComponent,public DetailTraceable,public Renderable,public Attachable,public Visible,public Animatable{
 public:
 	TOADLET_OBJECT(StudioModelComponent);
 
@@ -75,8 +76,6 @@ public:
 		TOADLET_OBJECT(SequenceAnimation);
 
 		SequenceAnimation(studioseqdesc *sequence);
-
-		String getName() const{return mSSequence->label;}		
 
 		void setValue(scalar value){mValue=value;}
 		scalar getMinValue() const{return 0;}
@@ -163,7 +162,7 @@ public:
 	int getAttachmentIndex(const String &name);
 	bool getAttachmentTransform(Transform *result,int index);
 
-	// AnimationComponent
+	// Animatable
 	int getNumAnimations(){return mAnimations.size();}
 	Animation *getAnimation(const String &name);
 	Animation *getAnimation(int index){return mAnimations[index];}
