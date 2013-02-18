@@ -96,7 +96,7 @@ public:
 
 	Bound *getBound() const{return mBound;}
 
-	bool getActive() const{return false;}
+	bool getActive() const{return true;}
 
 	// Visible
 	bool getRendered() const{return mRendered;}

@@ -31,14 +31,19 @@
 namespace toadlet{
 namespace tadpole{
 
+SkeletonComponent::SequenceAnimation::SequenceAnimation(Sequence *sequence):
+	mSequence(sequence),
+	mValue(0),
+	mWeight(0),
+	mScope(-1)
+{
+}
+
 SkeletonComponent::SkeletonComponent(Engine *engine,Skeleton *skeleton):
 	mEngine(NULL),
 	//mSkeleton,
 	//mBones,
-	mLastUpdateFrame(-1),
-
-	//mSequence,
-	mSequenceTime(0)
+	mLastUpdateFrame(-1)
 {
 	mEngine=engine;
 	mSkeleton=skeleton;
@@ -49,7 +54,11 @@ SkeletonComponent::SkeletonComponent(Engine *engine,Skeleton *skeleton):
 		mBones[i]=Bone::ptr(new Bone(i));
 	}
 
-	mTrackHints.resize(mBones.size());
+	mAnimations.resize(mSkeleton->getNumSequences());
+	for(i=0;i<mSkeleton->getNumSequences();++i){
+		mAnimations[i]=new SequenceAnimation(mSkeleton->getSequence(i));
+		mAnimations[i]->mTrackHints.resize(mBones.size());
+	}
 
 	mTransform=new Transform();
 	mBound=new Bound();
@@ -70,6 +79,8 @@ void SkeletonComponent::destroy(){
 void SkeletonComponent::frameUpdate(int dt,int scope){
 	mWorldTransform->setTransform(mParent->getWorldTransform(),mTransform);
 	mWorldBound->transform(mBound,mWorldTransform);
+
+	updateBones();
 }
 
 void SkeletonComponent::updateBones(){
@@ -102,15 +113,6 @@ void SkeletonComponent::updateBones(){
 	}
 }
 
-void SkeletonComponent::updateBones(int sequenceIndex,scalar sequenceTime){
-	if(sequenceIndex>=0 && sequenceIndex<mSkeleton->getNumSequences()){
-		mSequence=mSkeleton->getSequence(sequenceIndex);
-		mSequenceTime=sequenceTime;
-	}
-
-	updateBones();
-}
-
 int SkeletonComponent::getBoneIndex(const String &name) const{
 	int i;
 	for(i=0;i<mSkeleton->getNumBones();++i){
@@ -131,6 +133,28 @@ String SkeletonComponent::getBoneName(int index) const{
 	}
 }
 
+void SkeletonComponent::setBoneScope(int i,int scope,bool recurse){
+	if(i==-1){
+		for(i=0;i<mBones.size();++i){
+			if(mSkeleton->getBone(i)->parentIndex==-1){
+				setBoneScope(i,scope,recurse);
+			}
+		}
+		return;
+	}
+
+	mBones[i]->scope=scope;
+
+	if(recurse){
+		int parent=i;
+		for(i=0;i<mBones.size();++i){
+			if(mSkeleton->getBone(i)->parentIndex==parent){
+				setBoneScope(i,scope,recurse);
+			}
+		}
+	}
+}
+
 void SkeletonComponent::setTransform(Transform *transform){
 	if(transform==NULL){
 		mTransform->reset();
@@ -141,14 +165,18 @@ void SkeletonComponent::setTransform(Transform *transform){
 }
 
 int SkeletonComponent::updateBoneTransformation(Bone *bone){
-	if(mSequence!=NULL){
-		Track *track=mSequence->getTrack(bone->index);
-		scalar time=mSequenceTime;
-		if(track!=NULL){
+	int flags=bone->dontUpdateFlags;
+	int i;
+	for(i=0;i<mAnimations.size();++i){
+		SequenceAnimation *animation=mAnimations[i];
+		Sequence *sequence=animation->mSequence;
+		Track *track=sequence->getTrack(bone->index);
+		scalar time=animation->mValue;
+		if(track!=NULL && (animation->mScope&bone->scope)!=0 && animation->mWeight>0){
 			int f1=-1,f2=-1;
-			scalar t=track->getKeyFramesAtTime(time,f1,f2,mTrackHints[bone->index]);
+			scalar t=track->getKeyFramesAtTime(time,f1,f2,animation->mTrackHints[bone->index]);
 			if(f1==-1 || f2==-1){
-				return bone->dontUpdateFlags;
+				continue;
 			}
 
 			int positionIndex=track->getElementIndex(VertexFormat::Semantic_POSITION);
@@ -168,11 +196,11 @@ int SkeletonComponent::updateBoneTransformation(Bone *bone){
 				Math::lerp(bone->localRotate,r1,r2,t);
 				Math::normalizeCarefully(bone->localRotate,0);
 			}
-			return BoneSpaceUpdate_FLAG_TRANSLATE|BoneSpaceUpdate_FLAG_ROTATE;
+			flags=BoneSpaceUpdate_FLAG_TRANSLATE|BoneSpaceUpdate_FLAG_ROTATE;
 		}
 	}
 
-	return bone->dontUpdateFlags;
+	return flags;
 }
 
 void SkeletonComponent::updateBone(Bone *bone){
@@ -313,13 +341,13 @@ void SkeletonComponent::createSkeletonBuffers(){
 		iba.unlock();
 	}
 
-	mSkeletonIndexData=IndexData::ptr(new IndexData(IndexData::Primitive_LINES,skeletonIndexBuffer));
+	mSkeletonIndexData=new IndexData(IndexData::Primitive_LINES,skeletonIndexBuffer);
 	mSkeletonVertexBuffer=mEngine->getBufferManager()->createVertexBuffer(Buffer::Usage_BIT_DYNAMIC,Buffer::Access_BIT_WRITE,mEngine->getVertexFormats().POSITION,mBones.size());
-	mSkeletonVertexData=VertexData::ptr(new VertexData(mSkeletonVertexBuffer));
+	mSkeletonVertexData=new VertexData(mSkeletonVertexBuffer);
 
 	mHitBoxVertexBuffer=mEngine->getBufferManager()->createVertexBuffer(Buffer::Usage_BIT_STREAM,Buffer::Access_BIT_WRITE,mEngine->getVertexFormats().POSITION,mBones.size()*8);
-	mHitBoxVertexData=VertexData::ptr(new VertexData(mHitBoxVertexBuffer));
-	mHitBoxIndexData=IndexData::ptr(new IndexData(IndexData::Primitive_LINES,NULL,0,mHitBoxVertexBuffer->getSize()));
+	mHitBoxVertexData=new VertexData(mHitBoxVertexBuffer);
+	mHitBoxIndexData=new IndexData(IndexData::Primitive_LINES,NULL,0,mHitBoxVertexBuffer->getSize());
 
 	updateSkeletonBuffers();
 }
@@ -385,6 +413,16 @@ bool SkeletonComponent::getAttachmentTransform(Transform *result,int index){
 	else{
 		return false;
 	}
+}
+
+Animation *SkeletonComponent::getAnimation(const String &name){
+	int i;
+	for(i=0;i<mAnimations.size();++i){
+		if(mAnimations[i]->getName()==name){
+			return mAnimations[i];
+		}
+	}
+	return NULL;
 }
 
 }

@@ -40,7 +40,7 @@ public:
 	BaseAnimation();
 	virtual ~BaseAnimation();
 
-	String getName() const{return "";}
+	const String &getName() const{return mName;}
 
 	void setValue(scalar value){}
 	scalar getMinValue() const{return 0;}
@@ -53,10 +53,14 @@ public:
 	void setScope(int scope){}
 	int getScope() const{return -1;}
 
+	void setScope(int scope){}
+	int getScope() const{return -1;}
+
 	void setAnimationListener(AnimationListener *listener){mListener=listener;}
 	AnimationListener *getAnimationListener() const{return mListener;}
 
 protected:
+	String mName;
 	AnimationListener *mListener;
 };
 
