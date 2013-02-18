@@ -79,7 +79,7 @@ public:
 
 		void setValue(scalar value){mValue=value;}
 		scalar getMinValue() const{return 0;}
-		scalar getMaxValue() const{return mSSequence->numframes/mSSequence->fps;}
+		scalar getMaxValue() const{return (mSSequence->numframes-1)/mSSequence->fps;}
 		scalar getValue() const{return mValue;}
 
 		void setWeight(scalar weight){mWeight=weight;}

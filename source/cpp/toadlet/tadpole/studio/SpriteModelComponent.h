@@ -28,11 +28,11 @@
 
 #include <toadlet/peeper/IndexData.h>
 #include <toadlet/peeper/VertexData.h>
+#include <toadlet/tadpole/BaseComponent.h>
 #include <toadlet/tadpole/Renderable.h>
 #include <toadlet/tadpole/Visible.h>
 #include <toadlet/tadpole/Animatable.h>
-#include <toadlet/tadpole/BaseComponent.h>
-#include <toadlet/tadpole/animation/BaseAnimation.h>
+#include <toadlet/tadpole/animation/Animation.h>
 #include <toadlet/tadpole/studio/SpriteModel.h>
 
 namespace toadlet{

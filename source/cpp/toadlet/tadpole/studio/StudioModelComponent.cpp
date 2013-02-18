@@ -650,9 +650,14 @@ void StudioModelComponent::findBoneTransforms(Vector3 *translates,Quaternion *ro
 		frame=0;
 		s=0.0;
 	}
-	else if(frame>=sseqdesc->numframes){
-		frame=sseqdesc->numframes-1;
-		s=1.0f;
+	else{
+		if(sseqdesc->numframes<=1){
+			frame=0;
+		}
+		else if(frame>=sseqdesc->numframes-1){
+			frame=sseqdesc->numframes-2;
+			s=1.0f;
+		}
 	}
 
 	studiobone *sbone=model->bone(0);
