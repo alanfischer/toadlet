@@ -107,7 +107,6 @@ if (NOT TOADLET_PLATFORM_PYTHON)
 		${CMAKE_CURRENT_SOURCE_DIR}/toadlet/tadpole/Node.i
 		${CMAKE_CURRENT_SOURCE_DIR}/toadlet/tadpole/animation/Animation.i
 		${CMAKE_CURRENT_SOURCE_DIR}/toadlet/tadpole/animation/BaseAnimation.i
-		${CMAKE_CURRENT_SOURCE_DIR}/toadlet/tadpole/animation/MeshAnimation.i
 		${CMAKE_CURRENT_SOURCE_DIR}/toadlet/tadpole/animation/MaterialAnimation.i
 		PARENT_SCOPE
 	)
