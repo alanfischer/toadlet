@@ -157,13 +157,13 @@ void RandIsle::create(){
 
 		AnimationAction *jumpAction=new AnimationAction();
 		{
-			jumpAction->attach(new MeshAnimation(mesh,1));
+			jumpAction->attach(mesh->getSkeleton()->getAnimation(1));
 			jumpAction->setCycling(AnimationAction::Cycling_LOOP);
 			jumpAction->setStopGently(true);
 		}
 		mPlayer->attach(new ActionComponent("jump",jumpAction));
 	}
- 	mScene->getRoot()->attach(mPlayer);
+	mScene->getRoot()->attach(mPlayer);
 
 	mTerrain->setTarget(mPlayer);
 
