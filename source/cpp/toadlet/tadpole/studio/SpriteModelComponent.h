@@ -30,14 +30,16 @@
 #include <toadlet/peeper/VertexData.h>
 #include <toadlet/tadpole/Renderable.h>
 #include <toadlet/tadpole/Visible.h>
+#include <toadlet/tadpole/Animatable.h>
 #include <toadlet/tadpole/BaseComponent.h>
+#include <toadlet/tadpole/animation/BaseAnimation.h>
 #include <toadlet/tadpole/studio/SpriteModel.h>
 
 namespace toadlet{
 namespace tadpole{
 namespace studio{
 
-class TOADLET_API SpriteModelComponent:public BaseComponent,public Renderable,public Visible{
+class TOADLET_API SpriteModelComponent:public BaseComponent,public Renderable,public Visible,public Animatable,public Animation{
 public:
 	TOADLET_OBJECT(SpriteModelComponent);
 
@@ -63,10 +65,32 @@ public:
 	void gatherRenderables(Camera *camera,RenderableSet *set);
 
 	// Renderable
-	Material *getRenderMaterial() const{return mSequenceTime<mMaterials.size()?mMaterials[Math::toInt(mSequenceTime)]:NULL;}
+	Material *getRenderMaterial() const;
 	Transform *getRenderTransform() const{return mParent->getWorldTransform();}
 	Bound *getRenderBound() const{return mParent->getWorldBound();}
 	void render(RenderManager *manager) const;
+
+	// Animatable
+	int getNumAnimations(){return 1;}
+	Animation *getAnimation(const String &name){return this;}
+	Animation *getAnimation(int index){return this;}
+
+	// Animation
+	const String &getName() const{return BaseComponent::getName();}
+
+	void setValue(scalar value){setSequenceTime(value);}
+	scalar getValue() const{return getSequenceTime();}
+	scalar getMinValue() const{return 0;}
+	scalar getMaxValue() const{return mMaterials.size();}
+
+	void setWeight(scalar weight){}
+	scalar getWeight() const{return Math::ONE;}
+
+	void setScope(int scope){}
+	int getScope() const{return -1;}
+
+	void setAnimationListener(AnimationListener *listener){}
+	AnimationListener *getAnimationListener() const{return NULL;}
 
 protected:
 	void createBuffers();
