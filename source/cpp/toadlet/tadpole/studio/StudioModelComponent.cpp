@@ -284,7 +284,7 @@ int StudioModelComponent::getBoneIndex(const String &name){
 	int i;
 	for(i=0;i<mModel->header->numbones;++i){
 		studiobone *bone=mModel->bone(i);
-		if(name==mModel->bone(i)->name){
+		if(name==bone->name){
 			return i;
 		}
 	}
