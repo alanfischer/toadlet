@@ -562,6 +562,7 @@ void StudioModelComponent::updateSkeleton(){
 
 	int blendSequenceIndex=-1;
 
+	/// @todo: Support blending weighted animations
 	float totalWeight=0;
 	for(i=0;i<mAnimations.size();++i){
 		SequenceAnimation *animation=mAnimations[i];

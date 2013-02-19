@@ -165,6 +165,7 @@ void SkeletonComponent::setTransform(Transform *transform){
 }
 
 int SkeletonComponent::updateBoneTransformation(Bone *bone){
+	/// @todo: Support blending weighted animations
 	int flags=bone->dontUpdateFlags;
 	int i;
 	for(i=0;i<mAnimations.size();++i){
