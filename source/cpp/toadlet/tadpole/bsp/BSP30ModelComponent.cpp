@@ -27,6 +27,7 @@
 #include <toadlet/tadpole/Engine.h>
 #include <toadlet/tadpole/RenderableSet.h>
 #include <toadlet/tadpole/Scene.h>
+#include <toadlet/tadpole/PhysicsComponent.h>
 #include <toadlet/tadpole/bsp/BSP30ModelComponent.h>
 
 namespace toadlet{
@@ -77,12 +78,20 @@ void BSP30ModelComponent::destroy(){
 void BSP30ModelComponent::parentChanged(Node *node){
 	if(mParent!=NULL){
 		mParent->visibleRemoved(this);
+		PhysicsComponent *physics=mParent->getPhysics();
+		if(physics!=NULL){
+			physics->setTraceable(NULL);
+		}
 	}
 
 	BaseComponent::parentChanged(node);
 
 	if(mParent!=NULL){
 		mParent->visibleAttached(this);
+		PhysicsComponent *physics=mParent->getPhysics();
+		if(physics!=NULL){
+			physics->setTraceable(this);
+		}
 	}
 }
 
