@@ -34,9 +34,9 @@ namespace tadpole{
 
 SpriteComponent::SpriteComponent(Engine *engine):
 	mAlignment(0),
-	mRendered(false),
 	//mMaterials,
-	mMaterialIndex(0)
+	mMaterialIndex(0),
+	mRendered(false)
 	//mSharedRenderState,
 	//mVertexData,
 	//mIndexData,
