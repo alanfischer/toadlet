@@ -23,18 +23,6 @@
  *
  ********** Copyright header - do not remove **********/
 
-/// @todo: OVERALL
-// I REALLY NEED TO PLAY WITH THIS, IT WILL LET ME USE A THREADPOOL AND HAUL ASS THROUGH NODE UPDATES
-// In theory, each child of a parent node should be updated simultaniously
-// Meaning, a child can get the parent node's translate at any time & be correct.
-// But a child can not get a sisters or cousins translate at any time & be correct.
-//  So nodes should have 2 translates.  The immediate one and the public one.
-//  After a node is completely updated, then all public transforms are made to equal the immediate transforms.
-
-// - The node transform should also be buffered.  As in, the order of the nodes to a parent shouldn't affect what order they get updated.
-//		So we could have localTransform, and workingLocalTransform.  worldTransform and workingWorldTransform.
-//		When we're actually in an update, we would update the workingLocalTransform, and the... FINISH FIGURING THIS OUT
-
 #include <toadlet/peeper/RenderCaps.h>
 #include <toadlet/tadpole/Types.h>
 #include <toadlet/tadpole/Engine.h>
