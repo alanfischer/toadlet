@@ -74,12 +74,14 @@ void SpriteModelComponent::destroy(){
 void SpriteModelComponent::parentChanged(Node *node){
 	if(mParent!=NULL){
 		mParent->visibleRemoved(this);
+		mParent->animatableRemoved(this);
 	}
 
 	BaseComponent::parentChanged(node);
 
 	if(mParent!=NULL){
 		mParent->visibleAttached(this);
+		mParent->animatableAttached(this);
 	}
 }
 
