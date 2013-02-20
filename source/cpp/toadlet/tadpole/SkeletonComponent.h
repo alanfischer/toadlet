@@ -136,6 +136,8 @@ public:
 	SkeletonComponent(Engine *engine,Skeleton *skeleton);
 	void destroy();
 
+	void parentChanged(Node *node);
+
 	void frameUpdate(int dt,int scope);
 
 	void updateBones();

@@ -44,9 +44,10 @@ class Engine;
 class RenderableSet;
 class Scene;
 class Camera;
+class Visible;
+class Animatable;
 class ActionComponent;
 class LightComponent;
-class Visible;
 class PhysicsComponent;
 
 class TOADLET_API Node:public BaseComponent,public Transformable{
@@ -94,6 +95,11 @@ public:
 	virtual int getNumVisibles() const{return mVisibles.size();}
 	virtual Visible *getVisible(int i){return mVisibles[i];}
 	
+	virtual void animatableAttached(Animatable *animatable);
+	virtual void animatableRemoved(Animatable *animatable);
+	virtual int getNumAnimatables() const{return mAnimatables.size();}
+	virtual Animatable *getAnimatable(int i){return mAnimatables[i];}
+
 	virtual void lightAttached(LightComponent *light);
 	virtual void lightRemoved(LightComponent *light);
 	virtual int getNumLights() const{return mLights.size();}
@@ -172,6 +178,7 @@ protected:
 
 	Collection<ActionComponent*> mActions;
 	Collection<Visible*> mVisibles;
+	Collection<Animatable*> mAnimatables;
 	Collection<LightComponent*> mLights;
 	PhysicsComponent *mPhysics;
 

@@ -219,6 +219,14 @@ void Node::visibleRemoved(Visible *visible){
 	mVisibles.remove(visible);
 }
 
+void Node::animatableAttached(Animatable *animatable){
+	mAnimatables.add(animatable);
+}
+
+void Node::animatableRemoved(Animatable *animatable){
+	mAnimatables.remove(animatable);
+}
+
 void Node::lightAttached(LightComponent *light){
 	mLights.add(light);
 }

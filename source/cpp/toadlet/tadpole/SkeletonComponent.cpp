@@ -76,6 +76,18 @@ void SkeletonComponent::destroy(){
 	BaseComponent::destroy();
 }
 
+void SkeletonComponent::parentChanged(Node *node){
+	if(mParent!=NULL){
+		mParent->animatableRemoved(this);
+	}
+
+	BaseComponent::parentChanged(node);
+
+	if(mParent!=NULL){
+		mParent->animatableAttached(this);
+	}
+}
+
 void SkeletonComponent::frameUpdate(int dt,int scope){
 	mWorldTransform->setTransform(mParent->getWorldTransform(),mTransform);
 	mWorldBound->transform(mBound,mWorldTransform);
