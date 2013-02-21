@@ -147,7 +147,7 @@ Material::ptr SkyBoxMaterialCreator::createSkyBoxMaterial(Texture *texture,bool 
 		renderState->setBlendState(BlendState());
 		renderState->setDepthState(DepthState(DepthState::DepthTest_LEQUAL,false));
 		renderState->setRasterizerState(RasterizerState());
-		renderState->setMaterialState(MaterialState());
+		renderState->setMaterialState(MaterialState(false));
 		renderState->setFogState(FogState());
 	}
 
