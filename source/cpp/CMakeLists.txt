@@ -192,6 +192,7 @@ elseif (TOADLET_PLATFORM_WIN32)
 		option (TOADLET_STATIC_MULTITHREAD_DYNAMIC "Use the /MD (Not /MT) compile switch with static libraries" OFF)
 		option (TOADLET_RTTI "Enable Run Time Type Information" ON)
 		option (TOADLET_EXCEPTIONS "Enable Exception handling" ON)
+		option (TOADLET_ITERATOR_DEBUGGING "Enable Iterator Debugging" ON)
 	endif (TOADLET_PLATFORM_WINCE)
 	
 	# Deal with multithread static/dynamic libraries
@@ -253,6 +254,13 @@ elseif (TOADLET_PLATFORM_WIN32)
 		set (STATIC_LIB_FLAGS "${STATIC_LIB_FLAGS} /arch:SSE2")
 		message (STATUS "SSE2 support enabled")
 	endif (TOADLET_HAS_SSE)
+	
+	# Disable iterator debugging
+	if (NOT TOADLET_ITERATOR_DEBUGGING)
+		set (DYNAMIC_LIB_FLAGS "${DYNAMIC_LIB_FLAGS} /D_HAS_ITERATOR_DEBUGGING=0")
+		set (STATIC_LIB_FLAGS "${STATIC_LIB_FLAGS} /D_HAS_ITERATOR_DEBUGGING=0")
+		message (STATUS "Iterator debugging disabled")
+	endif (NOT TOADLET_ITERATOR_DEBUGGING)
 
 	# Append the compile flags to the properties
 	# TODO: Also clean this up once issue 0006493 is resolved
