@@ -41,7 +41,7 @@ DecalShadowRenderManager::DecalShadowRenderManager(Scene *scene):SimpleRenderMan
 
 	Engine *engine=mScene->getEngine();
 
-	TextureFormat::ptr pointFormat=new TextureFormat(TextureFormat::Dimension_D2,TextureFormat::Format_A_8,128,128,1,0);
+	TextureFormat::ptr pointFormat=new TextureFormat(TextureFormat::Dimension_D2,TextureFormat::Format_LA_8,128,128,1,0);
 	tbyte *pointData=createPoint(pointFormat);
 	Texture::ptr pointTexture=engine->getTextureManager()->createTexture(pointFormat,pointData);
 	delete[] pointData;
@@ -49,7 +49,7 @@ DecalShadowRenderManager::DecalShadowRenderManager(Scene *scene):SimpleRenderMan
 	RenderState::ptr renderState=engine->getMaterialManager()->createRenderState();
 	renderState->setBlendState(BlendState(BlendState::Operation_ONE_MINUS_SOURCE_ALPHA,BlendState::Operation_SOURCE_ALPHA));
 	renderState->setDepthState(DepthState(DepthState::DepthTest_LEQUAL,false));
-	renderState->setMaterialState(MaterialState(Vector4(0,0,0,Math::ONE),false));
+	renderState->setMaterialState(MaterialState(false));
 	renderState->setRasterizerState(RasterizerState(RasterizerState::CullType_BACK));
 	mMaterial=engine->getMaterialManager()->createSharedMaterial(engine->createDiffuseMaterial(pointTexture),renderState);
 
@@ -135,7 +135,12 @@ void DecalShadowRenderManager::interRenderRenderables(RenderableSet *set,RenderD
 					Math::mul(forward,node->getWorldRotate(),Math::Y_UNIT_VECTOR3);
 					up.set(result.normal);
 					Math::cross(right,forward,up);
-					Math::normalize(right);
+					if(Math::normalizeCarefully(right,mScene->getEpsilon())==false){
+						Math::mul(forward,node->getWorldRotate(),Math::X_UNIT_VECTOR3);
+						up.set(result.normal);
+						Math::cross(right,forward,up);
+						Math::normalizeCarefully(right,mScene->getEpsilon());
+					}
 					Math::cross(forward,up,right);
 					Math::setMatrix3x3FromAxes(rotate,right,forward,up);
 				}
@@ -174,7 +179,8 @@ tbyte *DecalShadowRenderManager::createPoint(TextureFormat *format){
 			if(v>1) v=1;
 			v=pow(v,1.25f);
 
-			data[y*width+x]=255*v;
+			data[(y*width+x)*2+0]=0;
+			data[(y*width+x)*2+1]=255*v;
 		}
 	}
 

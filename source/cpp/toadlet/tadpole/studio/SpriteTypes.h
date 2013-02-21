@@ -62,7 +62,7 @@ static const int SPRITE_VP_PARALLEL_ORIENTED=	4;
 static const int SPRITE_NORMAL=					0;
 static const int SPRITE_ADDITIVE=				1;
 static const int SPRITE_INDEXALPHA=				2;
-static const int SPRITE_ALPHTEST=				3;
+static const int SPRITE_ALPHATEST=				3;
 
 struct spriteframe{
 	int origin[2];
