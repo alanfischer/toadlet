@@ -90,6 +90,7 @@ public:
 
 	// Shader
 	RenderVariableSet::ptr makeVariables();
+	void setVariables(RenderVariableSet::ptr variables){mVariables=variables;}
 	inline RenderVariableSet::ptr getVariables() const{return mVariables;}
 	void updateVariables(int scope,SceneParameters *parameters);
 
