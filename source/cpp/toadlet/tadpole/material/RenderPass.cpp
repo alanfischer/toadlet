@@ -134,7 +134,7 @@ void RenderPass::setShader(Shader::ShaderType type,Shader *shader){
 
 RenderVariableSet::ptr RenderPass::makeVariables(){
 	if(mVariables==NULL){
-		mVariables=RenderVariableSet::ptr(new RenderVariableSet());
+		mVariables=new RenderVariableSet();
 		mVariables->buildBuffers(mManager->getBufferManager(),this);
 	}
 
