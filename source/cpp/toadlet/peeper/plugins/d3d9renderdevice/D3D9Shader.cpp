@@ -26,6 +26,7 @@
 #include "D3D9Shader.h"
 #include "D3D9RenderDevice.h"
 #include "D3D9WindowRenderTarget.h"
+#include <toadlet/egg/Log.h>
 #include <toadlet/egg/Error.h>
 
 namespace toadlet{
@@ -89,6 +90,7 @@ bool D3D9Shader::createContext(){
 
 	HRESULT result=renderTarget->CompileShaderSymbol(mCode,mCode.length(),defines,NULL,function,targetProfile,0,&mBytecode,&mLog,&mConstantTable);
 	if(FAILED(result)){
+		Log::alert(String("Code:")+mCode);
 		Error::unknown(Categories::TOADLET_PEEPER,(LPCSTR)mLog->GetBufferPointer());
 		return false;
 	}
