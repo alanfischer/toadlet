@@ -46,7 +46,7 @@ public:
 protected:
 	void buildTextures(SpriteModel *model);
 	void buildMaterials(SpriteModel *model);
-	Texture::ptr createTexture(spriteframe *frame,tbyte *data,tbyte *pal);
+	Texture::ptr createTexture(SpriteModel *model,spriteframe *frame,tbyte *data,tbyte *pal);
 
 	Engine *mEngine;
 };

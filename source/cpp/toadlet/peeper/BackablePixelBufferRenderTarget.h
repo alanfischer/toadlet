@@ -53,6 +53,8 @@ public:
 	virtual void resetCreate(){if(mBack!=NULL){mBack->resetCreate();}}
 	virtual void resetDestroy(){if(mBack!=NULL){mBack->resetDestroy();}}
 
+	virtual AdaptorInfo *getAdaptorInfo() const{return NULL;}
+
 	virtual bool attach(PixelBuffer::ptr buffer,Attachment attachment);
 	virtual bool remove(PixelBuffer::ptr buffer);
 

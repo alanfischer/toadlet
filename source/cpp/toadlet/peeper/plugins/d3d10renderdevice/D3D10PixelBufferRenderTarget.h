@@ -63,6 +63,8 @@ public:
 	int getWidth() const{return mWidth;}
 	int getHeight() const{return mHeight;}
 
+	AdaptorInfo *getAdaptorInfo() const{return NULL;}
+
 protected:
 	D3D10RenderDevice *mDevice;
 	int mWidth;

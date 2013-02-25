@@ -65,6 +65,7 @@ Resource::ptr SpriteStreamer::load(Stream::ptr stream,ResourceData *data,Progres
 	model->header=(spritehdr*)model->data;
 	model->paletteSize=(*(uint16*)(model->data+sizeof(spritehdr)));
 	model->palette=(model->data+sizeof(spritehdr)+2);
+		Log::alert(String("TYPE:")+model->header->type);
 
 	buildTextures(model);
 	buildMaterials(model);
@@ -76,34 +77,46 @@ void SpriteStreamer::buildTextures(SpriteModel *model){
 	int i;
 	for(i=0;i<model->header->numframes;++i){
 		spriteframe *frame=model->frame(i);
-		model->textures.add(createTexture(frame,((tbyte*)frame)+sizeof(spriteframe),model->palette));
+		model->textures.add(createTexture(model,frame,((tbyte*)frame)+sizeof(spriteframe),model->palette));
 	}
 }
 
 void SpriteStreamer::buildMaterials(SpriteModel *model){
+	RenderState::ptr renderState=mEngine->getMaterialManager()->createRenderState();
+	if(renderState!=NULL){
+		renderState->setBlendState(BlendState());
+		renderState->setDepthState(DepthState());
+		renderState->setRasterizerState(RasterizerState());
+		renderState->setMaterialState(MaterialState(true,false,MaterialState::ShadeType_GOURAUD));
+	}
+
 	model->materials.resize(model->header->numframes);
 	int i;
 	for(i=0;i<model->header->numframes;i++){
-		model->materials[i]=mEngine->createDiffuseMaterial(model->textures[i]);
+		model->materials[i]=mEngine->createDiffuseMaterial(model->textures[i],renderState);
 		model->materials[i]->setModelMatrixFlags(Material::MatrixFlag_CAMERA_ALIGNED);
 	}
 }
 
-Texture::ptr SpriteStreamer::createTexture(spriteframe *f,tbyte *data,tbyte *pal){
-	TextureFormat::ptr textureFormat=new TextureFormat(TextureFormat::Dimension_D2,TextureFormat::Format_RGBA_8,f->width,f->height,1,0);
+Texture::ptr SpriteStreamer::createTexture(SpriteModel *model,spriteframe *f,tbyte *data,tbyte *pal){
+	int bpp=model->header->texFormat==SPRITE_INDEXALPHA?4:3;
+
+	TextureFormat::ptr textureFormat=new TextureFormat(TextureFormat::Dimension_D2,bpp==4?TextureFormat::Format_RGBA_8:TextureFormat::Format_RGB_8,f->width,f->height,1,0);
 	tbyte *textureData=new tbyte[textureFormat->getDataSize()];
 
 	int i,j;
 	for(j=0;j<f->height;++j){
 		for(i=0;i<f->width;++i){
-			tbyte *d=textureData+(j*f->width+i)*4;
+			tbyte *d=textureData+(j*f->width+i)*bpp;
 			tbyte s=data[(f->height-j-1)*f->width+i];
 			tbyte *c=pal+s*3;
 
 			d[0]=c[0];
 			d[1]=c[1];
 			d[2]=c[2];
-			d[3]=(s==255)?0:255;
+			if(bpp==4){
+				d[3]=(s==255)?0:255;
+			}
 		}
 	}
 	

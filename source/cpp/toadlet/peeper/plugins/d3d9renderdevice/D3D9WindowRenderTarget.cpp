@@ -193,6 +193,10 @@ bool D3D9WindowRenderTarget::createContext(HWND wnd,WindowRenderTargetFormat *fo
 	mAdaptor=D3DADAPTER_DEFAULT;
 	D3DADAPTER_IDENTIFIER9 identifier={0};
 	mD3D->GetAdapterIdentifier(mAdaptor,0,&identifier);
+
+	mAdaptorInfo=new AdaptorInfo();
+	mAdaptorInfo->setDescription(identifier.Description);
+
 	Log::alert(Categories::TOADLET_PEEPER,
 		String("D3D Driver:") + identifier.Driver);
 	Log::alert(Categories::TOADLET_PEEPER,

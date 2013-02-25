@@ -27,7 +27,7 @@
 #define TOADLET_PEEPER_RENDERTARGET_H
 
 #include <toadlet/egg/Resource.h>
-#include <toadlet/peeper/Types.h>
+#include <toadlet/peeper/AdaptorInfo.h>
 
 namespace toadlet{
 namespace peeper{
@@ -46,6 +46,8 @@ public:
 	virtual bool isValid() const=0;
 	virtual int getWidth() const=0;
 	virtual int getHeight() const=0;
+
+	virtual AdaptorInfo *getAdaptorInfo() const=0;
 };
 
 }

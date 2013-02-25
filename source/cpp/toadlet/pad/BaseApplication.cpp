@@ -217,6 +217,18 @@ bool BaseApplication::createContextAndRenderDevice(const String &plugin){
 		return false;
 	}
 
+	// Blacklist or restrict known faulty drivers here
+	{
+		AdaptorInfo *info=mRenderTarget->getAdaptorInfo();
+		if(info!=NULL && info->getDescription()=="ATI FireGL V3100" && (mFormat->getPixelFormat()==TextureFormat::Format_RGB_5_6_5 || mFormat->getPixelFormat()==TextureFormat::Format_BGR_5_6_5)){
+			Error::unknown(Categories::TOADLET_PAD,
+				"The requested pixel format is known to crash on this card.  Try 24 color bits");
+			return false;
+		}
+
+		/// @todo: Add a preference for fixed function on alienware intel integrated
+	}
+
 	bool result=false;
 	mRenderDevice=makeRenderDevice(plugin);
 	TOADLET_TRY

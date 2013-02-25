@@ -72,6 +72,8 @@ public:
 	int getWidth() const{return mWidth;}
 	int getHeight() const{return mHeight;}
 
+	AdaptorInfo *getAdaptorInfo() const{return GLRenderTarget::getAdaptorInfo();}
+
 	GLuint getHandle(){return mHandle;}
 	
 	static GLenum getGLAttachment(Attachment attachment);
