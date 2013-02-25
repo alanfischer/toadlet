@@ -61,7 +61,7 @@ void SOSLoggerListener::flush(){
 }
 
 void SOSLoggerListener::sendEntry(Logger::Category *category,Logger::Level level,uint64 time,const String &text){
-	if (mSocket->connected() == false || level <= 0) {
+	if (level <= 0) {
 		return;
 	}
 	

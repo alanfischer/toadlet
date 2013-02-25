@@ -33,7 +33,7 @@ namespace toadlet{
 namespace tadpole{
 namespace material{
 
-class RenderVariableSet;
+class RenderPass;
 class SceneParameters;
 
 class RenderVariable{
@@ -43,7 +43,7 @@ public:
 	virtual ~RenderVariable(){}
 
 	virtual int getFormat()=0;
-	virtual void linked(RenderVariableSet *variables){}
+	virtual void linked(RenderPass *pass){}
 	virtual void update(tbyte *data,SceneParameters *parameters)=0;
 };
 

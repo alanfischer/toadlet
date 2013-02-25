@@ -49,8 +49,6 @@ public:
 	void destroy();
 
 	bool addBuffer(Shader::ShaderType shaderType,int index,VariableBuffer *buffer);
-	void removeBuffer(VariableBuffer *buffer);
-	int findBuffer(const String &name);
 	inline int getNumBuffers() const{return mBuffers.size();}
 	inline VariableBuffer *getBuffer(int i){return mBuffers[i].buffer;}
 	inline int getBufferScope(int i){return mBuffers[i].scope;}
@@ -89,6 +87,15 @@ protected:
 
 	class ResourceInfo{
 	public:
+		ResourceInfo(){}
+
+		ResourceInfo(String name1,Texture *texture1,String samplerName1,const SamplerState &samplerState1,const TextureState &textureState1):
+			name(name1),
+			texture(texture1),
+			samplerName(samplerName1),
+			samplerState(samplerState1),
+			textureState(textureState1){}
+
 		String name;
 		Texture::ptr texture;
 		String samplerName;
@@ -98,6 +105,15 @@ protected:
 
 	class BufferInfo{
 	public:
+		BufferInfo(){}
+
+		BufferInfo(Shader::ShaderType type,int index1,VariableBuffer *buffer1):
+		  buffer(buffer1),
+		  index(index1),
+		  shaderType(type),
+		  scope(0)
+		{}
+
 		VariableBuffer::ptr buffer;
 		int scope;
 		Shader::ShaderType shaderType;

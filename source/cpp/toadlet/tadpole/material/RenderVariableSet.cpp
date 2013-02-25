@@ -47,27 +47,6 @@ void RenderVariableSet::destroy(){
 	mBuffers.clear();
 }
 
-bool RenderVariableSet::addBuffer(Shader::ShaderType shaderType,int index,VariableBuffer *buffer){
-	BufferInfo set;
-	set.buffer=buffer;
-	set.scope=0;
-	set.shaderType=shaderType;
-	set.index=index;
-
-	mBuffers.add(set);
-	return true;
-}
-
-void RenderVariableSet::removeBuffer(VariableBuffer *buffer){
-	int i;
-	for(i=0;i<mBuffers.size();++i){
-		if(mBuffers[i].buffer==buffer){
-			mBuffers.removeAt(i);
-			return;
-		}
-	}
-}
-
 bool RenderVariableSet::addTexture(const String &name,Texture *texture,const String &samplerName,const SamplerState &samplerState,const TextureState &textureState){
 	Shader::ShaderType type;
 	VariableBufferFormat::Variable *formatVariable=findResourceVariable(name,type);
@@ -102,13 +81,7 @@ bool RenderVariableSet::addTexture(const String &name,Texture *texture,const Str
 			}
 		}
 
-		ResourceInfo r;
-		r.name=name;
-		r.texture=texture;
-		r.samplerName=samplerName;
-		r.samplerState=samplerState;
-		r.textureState=textureState;
-		mUnassignedResources.add(r);
+		mUnassignedResources.add(ResourceInfo(name,texture,samplerName,samplerState,textureState));
 
 		Log::alert("Adding unassigned texture");
 	}
@@ -117,7 +90,8 @@ bool RenderVariableSet::addTexture(const String &name,Texture *texture,const Str
 }
 
 bool RenderVariableSet::findTexture(const String &name,Shader::ShaderType &type,int &index){
-	VariableBufferFormat::Variable *formatVariable=findResourceVariable(name,type);
+	return mRenderPass->findTexture(name,type,index);
+/*	VariableBufferFormat::Variable *formatVariable=findResourceVariable(name,type);
 	if(formatVariable!=NULL){
 		index=formatVariable->getResourceIndex();
 		return true;
@@ -127,6 +101,7 @@ bool RenderVariableSet::findTexture(const String &name,Shader::ShaderType &type,
 		index=0;
 		return false;
 	}
+*/
 }
 
 // Search for the correct buffer and correct index
@@ -158,7 +133,7 @@ bool RenderVariableSet::addVariable(const String &name,RenderVariable::ptr varia
 	}
 	else{
 		v.location=formatVariable->getOffset();
-		variable->linked(this);
+		variable->linked(mRenderPass);
 		bufferInfo->variables.add(v);
 		bufferInfo->scope|=scope;
 
@@ -307,7 +282,7 @@ void RenderVariableSet::buildBuffers(BufferManager *manager,RenderPass *pass){
 				buffer=new BackableBuffer();
 				buffer->create(Buffer::Usage_BIT_DYNAMIC,Buffer::Access_BIT_WRITE,format);
 			}
-			addBuffer((Shader::ShaderType)i,j,buffer);
+			mBuffers.add(BufferInfo((Shader::ShaderType)i,j,buffer));
 		}
 	}
 

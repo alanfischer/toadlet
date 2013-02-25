@@ -353,6 +353,13 @@ bool D3D10RenderDevice::copyPixelBuffer(PixelBuffer *dst,PixelBuffer *src){
 }
 
 void D3D10RenderDevice::setDefaultState(){
+	if(mNullShaderResources.size()>0){
+		mD3DDevice->VSSetShaderResources(0,mNullShaderResources.size(),&mNullShaderResources[0]);
+		mD3DDevice->PSSetShaderResources(0,mNullShaderResources.size(),&mNullShaderResources[0]);
+		mD3DDevice->GSSetShaderResources(0,mNullShaderResources.size(),&mNullShaderResources[0]);
+		mNullShaderResources.clear();
+	}
+
 	setRenderState(mDefaultState);
 }
 
@@ -446,6 +453,10 @@ void D3D10RenderDevice::setTexture(Shader::ShaderType shaderType,int i,Texture *
 		case Shader::ShaderType_GEOMETRY:
 			mD3DDevice->GSSetShaderResources(i,1,&resourceview);
 		break;
+	}
+
+	if(mNullShaderResources.size()<=i){
+		mNullShaderResources.resize(i+1,NULL);
 	}
 }
 

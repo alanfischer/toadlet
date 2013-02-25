@@ -341,8 +341,8 @@ public:
 
 	int getFormat(){return VariableBufferFormat::Format_TYPE_FLOAT_32|VariableBufferFormat::Format_COUNT_4X4|((mIndex+1)<<VariableBufferFormat::Format_SHIFT_SAMPLER_MATRIX);}
 
-	void linked(RenderVariableSet *variables){
-		variables->findTexture(mName,mType,mIndex);
+	void linked(RenderPass *pass){
+		pass->findTexture(mName,mType,mIndex);
 	}
 
 	void update(tbyte *data,SceneParameters *parameters){
@@ -373,8 +373,8 @@ public:
 
 	int getFormat(){return VariableBufferFormat::Format_TYPE_FLOAT_32|VariableBufferFormat::Format_COUNT_1;}
 
-	void linked(RenderVariableSet *variables){
-		variables->findTexture(mName,mType,mIndex);
+	void linked(RenderPass *pass){
+		pass->findTexture(mName,mType,mIndex);
 	}
 
 	void update(tbyte *data,SceneParameters *parameters){

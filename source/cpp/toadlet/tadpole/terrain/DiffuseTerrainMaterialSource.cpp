@@ -272,71 +272,73 @@ Material::ptr DiffuseTerrainMaterialSource::getMaterial(TerrainPatchComponent *p
 
 	int numLayers=patch->getNumLayers();
 
+	RenderState::ptr baseRenderState=mEngine->getMaterialManager()->createRenderState();
+	baseRenderState->setBlendState(BlendState());
+	baseRenderState->setDepthState(DepthState());
+	baseRenderState->setRasterizerState(RasterizerState());
+	baseRenderState->setMaterialState(MaterialState(true,false,MaterialState::ShadeType_GOURAUD));
+
+	RenderState::ptr layerRenderState=mEngine->getMaterialManager()->createRenderState();
+	layerRenderState->setBlendState(BlendState::Combination_ALPHA);
+	layerRenderState->setDepthState(DepthState());
+	layerRenderState->setRasterizerState(RasterizerState());
+	layerRenderState->setMaterialState(MaterialState(true,false,MaterialState::ShadeType_GOURAUD));
+
 	if(mEngine->hasShader(Shader::ShaderType_VERTEX) && mEngine->hasShader(Shader::ShaderType_FRAGMENT)){
 		RenderPath::ptr shaderPath=material->addPath();
 		
 		{
-			RenderPass::ptr pass=shaderPath->addPass();
+			RenderPass::ptr pass=shaderPath->addPass(baseRenderState);
 
-			pass->setBlendState(BlendState());
-			pass->setDepthState(DepthState());
-			pass->setRasterizerState(RasterizerState());
-			pass->setMaterialState(MaterialState(true,false,MaterialState::ShadeType_GOURAUD));
 			pass->setShader(Shader::ShaderType_VERTEX,mDiffuseVertexShader);
 			pass->setShader(Shader::ShaderType_FRAGMENT,mDiffuseBaseFragmentShader);
 
-			RenderVariableSet::ptr variables=pass->makeVariables();
-			variables->addVariable("modelViewProjectionMatrix",RenderVariable::ptr(new MVPMatrixVariable()),Material::Scope_RENDERABLE);
-			variables->addVariable("normalMatrix",RenderVariable::ptr(new NormalMatrixVariable()),Material::Scope_RENDERABLE);
-			variables->addVariable("lightViewPosition",RenderVariable::ptr(new LightViewPositionVariable()),Material::Scope_MATERIAL);
-			variables->addVariable("lightColor",RenderVariable::ptr(new LightDiffuseVariable()),Material::Scope_MATERIAL);
-			variables->addVariable("ambientColor",RenderVariable::ptr(new AmbientVariable()),Material::Scope_RENDERABLE);
-			variables->addVariable("materialLight",RenderVariable::ptr(new MaterialLightVariable()),Material::Scope_MATERIAL);
-			variables->addVariable("materialDiffuseColor",RenderVariable::ptr(new MaterialDiffuseVariable()),Material::Scope_MATERIAL);
-			variables->addVariable("materialAmbientColor",RenderVariable::ptr(new MaterialAmbientVariable()),Material::Scope_MATERIAL);
-			variables->addVariable("materialTrackColor",RenderVariable::ptr(new MaterialTrackColorVariable()),Material::Scope_MATERIAL);
-			variables->addVariable("textureMatrix",RenderVariable::ptr(new TextureMatrixVariable("tex")),Material::Scope_MATERIAL);
-			variables->addVariable("detailTextureMatrix",RenderVariable::ptr(new TextureMatrixVariable("detailTex")),Material::Scope_MATERIAL);
-			variables->addVariable("fogDensity",RenderVariable::ptr(new FogDensityVariable()),Material::Scope_MATERIAL);
-			variables->addVariable("fogDistance",RenderVariable::ptr(new FogDistanceVariable()),Material::Scope_MATERIAL);
-			variables->addVariable("fogColor",RenderVariable::ptr(new FogColorVariable()),Material::Scope_MATERIAL);
+			pass->addVariable("modelViewProjectionMatrix",RenderVariable::ptr(new MVPMatrixVariable()),Material::Scope_RENDERABLE);
+			pass->addVariable("normalMatrix",RenderVariable::ptr(new NormalMatrixVariable()),Material::Scope_RENDERABLE);
+			pass->addVariable("lightViewPosition",RenderVariable::ptr(new LightViewPositionVariable()),Material::Scope_MATERIAL);
+			pass->addVariable("lightColor",RenderVariable::ptr(new LightDiffuseVariable()),Material::Scope_MATERIAL);
+			pass->addVariable("ambientColor",RenderVariable::ptr(new AmbientVariable()),Material::Scope_RENDERABLE);
+			pass->addVariable("materialLight",RenderVariable::ptr(new MaterialLightVariable()),Material::Scope_MATERIAL);
+			pass->addVariable("materialDiffuseColor",RenderVariable::ptr(new MaterialDiffuseVariable()),Material::Scope_MATERIAL);
+			pass->addVariable("materialAmbientColor",RenderVariable::ptr(new MaterialAmbientVariable()),Material::Scope_MATERIAL);
+			pass->addVariable("materialTrackColor",RenderVariable::ptr(new MaterialTrackColorVariable()),Material::Scope_MATERIAL);
+			pass->addVariable("textureMatrix",RenderVariable::ptr(new TextureMatrixVariable("tex")),Material::Scope_MATERIAL);
+			pass->addVariable("detailTextureMatrix",RenderVariable::ptr(new TextureMatrixVariable("detailTex")),Material::Scope_MATERIAL);
+			pass->addVariable("fogDensity",RenderVariable::ptr(new FogDensityVariable()),Material::Scope_MATERIAL);
+			pass->addVariable("fogDistance",RenderVariable::ptr(new FogDistanceVariable()),Material::Scope_MATERIAL);
+			pass->addVariable("fogColor",RenderVariable::ptr(new FogColorVariable()),Material::Scope_MATERIAL);
 
-			variables->addTexture("tex",mDiffuseTextures.size()>0?mDiffuseTextures[0]:NULL,"samp",SamplerState(),diffuseState);
-			variables->addTexture("detailTex",mDetailTexture,"detailSamp",SamplerState(),detailState);
+			pass->setTexture("tex",mDiffuseTextures.size()>0?mDiffuseTextures[0]:NULL,"samp",SamplerState(),diffuseState);
+			pass->setTexture("detailTex",mDetailTexture,"detailSamp",SamplerState(),detailState);
 		}
 
 		int i;
 		for(i=1;i<numLayers;++i){
 			if(patch->getLayerTexture(i)==NULL) continue;
 
-			RenderPass::ptr pass=shaderPath->addPass();
+			RenderPass::ptr pass=shaderPath->addPass(layerRenderState);
 
-			pass->setBlendState(BlendState::Combination_ALPHA);
-			pass->setDepthState(DepthState());
-			pass->setRasterizerState(RasterizerState());
-			pass->setMaterialState(MaterialState(true,false,MaterialState::ShadeType_GOURAUD));
 			pass->setShader(Shader::ShaderType_VERTEX,mDiffuseVertexShader);
 			pass->setShader(Shader::ShaderType_FRAGMENT,mDiffuseLayerFragmentShader);
 
-			RenderVariableSet::ptr variables=pass->makeVariables();
-			variables->addVariable("modelViewProjectionMatrix",RenderVariable::ptr(new MVPMatrixVariable()),Material::Scope_RENDERABLE);
-			variables->addVariable("normalMatrix",RenderVariable::ptr(new NormalMatrixVariable()),Material::Scope_RENDERABLE);
-			variables->addVariable("lightViewPosition",RenderVariable::ptr(new LightViewPositionVariable()),Material::Scope_MATERIAL);
-			variables->addVariable("lightColor",RenderVariable::ptr(new LightDiffuseVariable()),Material::Scope_MATERIAL);
-			variables->addVariable("ambientColor",RenderVariable::ptr(new AmbientVariable()),Material::Scope_RENDERABLE);
-			variables->addVariable("materialLight",RenderVariable::ptr(new MaterialLightVariable()),Material::Scope_MATERIAL);
-			variables->addVariable("materialDiffuseColor",RenderVariable::ptr(new MaterialDiffuseVariable()),Material::Scope_MATERIAL);
-			variables->addVariable("materialAmbientColor",RenderVariable::ptr(new MaterialAmbientVariable()),Material::Scope_MATERIAL);
-			variables->addVariable("materialTrackColor",RenderVariable::ptr(new MaterialTrackColorVariable()),Material::Scope_MATERIAL);
-			variables->addVariable("textureMatrix",RenderVariable::ptr(new TextureMatrixVariable("tex")),Material::Scope_MATERIAL);
-			variables->addVariable("detailTextureMatrix",RenderVariable::ptr(new TextureMatrixVariable("detailTex")),Material::Scope_MATERIAL);
-			variables->addVariable("fogDensity",RenderVariable::ptr(new FogDensityVariable()),Material::Scope_MATERIAL);
-			variables->addVariable("fogDistance",RenderVariable::ptr(new FogDistanceVariable()),Material::Scope_MATERIAL);
-			variables->addVariable("fogColor",RenderVariable::ptr(new FogColorVariable()),Material::Scope_MATERIAL);
+			pass->addVariable("modelViewProjectionMatrix",RenderVariable::ptr(new MVPMatrixVariable()),Material::Scope_RENDERABLE);
+			pass->addVariable("normalMatrix",RenderVariable::ptr(new NormalMatrixVariable()),Material::Scope_RENDERABLE);
+			pass->addVariable("lightViewPosition",RenderVariable::ptr(new LightViewPositionVariable()),Material::Scope_MATERIAL);
+			pass->addVariable("lightColor",RenderVariable::ptr(new LightDiffuseVariable()),Material::Scope_MATERIAL);
+			pass->addVariable("ambientColor",RenderVariable::ptr(new AmbientVariable()),Material::Scope_RENDERABLE);
+			pass->addVariable("materialLight",RenderVariable::ptr(new MaterialLightVariable()),Material::Scope_MATERIAL);
+			pass->addVariable("materialDiffuseColor",RenderVariable::ptr(new MaterialDiffuseVariable()),Material::Scope_MATERIAL);
+			pass->addVariable("materialAmbientColor",RenderVariable::ptr(new MaterialAmbientVariable()),Material::Scope_MATERIAL);
+			pass->addVariable("materialTrackColor",RenderVariable::ptr(new MaterialTrackColorVariable()),Material::Scope_MATERIAL);
+			pass->addVariable("textureMatrix",RenderVariable::ptr(new TextureMatrixVariable("tex")),Material::Scope_MATERIAL);
+			pass->addVariable("detailTextureMatrix",RenderVariable::ptr(new TextureMatrixVariable("detailTex")),Material::Scope_MATERIAL);
+			pass->addVariable("fogDensity",RenderVariable::ptr(new FogDensityVariable()),Material::Scope_MATERIAL);
+			pass->addVariable("fogDistance",RenderVariable::ptr(new FogDistanceVariable()),Material::Scope_MATERIAL);
+			pass->addVariable("fogColor",RenderVariable::ptr(new FogColorVariable()),Material::Scope_MATERIAL);
 
-			variables->addTexture("tex",mDiffuseTextures[i],"samp",SamplerState(),diffuseState);
-			variables->addTexture("detailTex",mDetailTexture,"detailSamp",SamplerState(),detailState);
-			variables->addTexture("layerTex",patch->getLayerTexture(i),"layerSamp",clampState,layerState);
+			pass->setTexture("tex",mDiffuseTextures[i],"samp",SamplerState(),diffuseState);
+			pass->setTexture("detailTex",mDetailTexture,"detailSamp",SamplerState(),detailState);
+			pass->setTexture("layerTex",patch->getLayerTexture(i),"layerSamp",clampState,layerState);
 		}
 	}
 
@@ -344,12 +346,7 @@ Material::ptr DiffuseTerrainMaterialSource::getMaterial(TerrainPatchComponent *p
 		RenderPath::ptr fixedPath=material->addPath();
 
 		{
-			RenderPass::ptr pass=fixedPath->addPass();
-
-			pass->setBlendState(BlendState());
-			pass->setDepthState(DepthState());
-			pass->setRasterizerState(RasterizerState());
-			pass->setMaterialState(MaterialState(true,false,MaterialState::ShadeType_GOURAUD));
+			RenderPass::ptr pass=fixedPath->addPass(baseRenderState);
 
 			pass->setTexture(Shader::ShaderType_FRAGMENT,0,mDiffuseTextures.size()>0?mDiffuseTextures[0]:NULL,SamplerState(),diffuseState);
 		}
@@ -358,12 +355,7 @@ Material::ptr DiffuseTerrainMaterialSource::getMaterial(TerrainPatchComponent *p
 		for(i=1;i<numLayers;++i){
 			if(patch->getLayerTexture(i)==NULL) continue;
 
-			RenderPass::ptr pass=fixedPath->addPass();
-
-			pass->setBlendState(BlendState::Combination_ALPHA);
-			pass->setDepthState(DepthState());
-			pass->setRasterizerState(RasterizerState());
-			pass->setMaterialState(MaterialState(true,false,MaterialState::ShadeType_GOURAUD));
+			RenderPass::ptr pass=fixedPath->addPass(layerRenderState);
 
 			pass->setTexture(Shader::ShaderType_FRAGMENT,0,mDiffuseTextures[i],SamplerState(),diffuseState);
 			pass->setTexture(Shader::ShaderType_FRAGMENT,1,patch->getLayerTexture(i),clampState,layerState);

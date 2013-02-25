@@ -177,12 +177,11 @@ bool SkyBoxMaterialCreator::createPaths(Material *material,RenderState *renderSt
 		pass->setShader(Shader::ShaderType_VERTEX,mSkyBoxVertexShader);
 		pass->setShader(Shader::ShaderType_FRAGMENT,mSkyBoxFragmentShader);
 
-		RenderVariableSet::ptr variables=pass->makeVariables();
-		variables->addVariable("modelViewProjectionMatrix",RenderVariable::ptr(new MVPMatrixVariable()),Material::Scope_RENDERABLE);
-		variables->addVariable("textureMatrix",RenderVariable::ptr(new TextureMatrixVariable("tex")),Material::Scope_MATERIAL);
-		variables->addVariable("materialTrackColor",RenderVariable::ptr(new MaterialTrackColorVariable()),Material::Scope_MATERIAL);
+		pass->addVariable("modelViewProjectionMatrix",RenderVariable::ptr(new MVPMatrixVariable()),Material::Scope_RENDERABLE);
+		pass->addVariable("textureMatrix",RenderVariable::ptr(new TextureMatrixVariable("tex")),Material::Scope_MATERIAL);
+		pass->addVariable("materialTrackColor",RenderVariable::ptr(new MaterialTrackColorVariable()),Material::Scope_MATERIAL);
 
-		variables->addTexture("tex",texture,"samp",samplerState,TextureState());
+		pass->setTexture("tex",texture,"samp",samplerState,TextureState());
 	}
 
 	if(mEngine->hasFixed(Shader::ShaderType_VERTEX) && mEngine->hasFixed(Shader::ShaderType_FRAGMENT)){

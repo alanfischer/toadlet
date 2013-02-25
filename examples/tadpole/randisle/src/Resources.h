@@ -97,9 +97,10 @@ public:
 				for(int j=0;j<subMesh->material->getNumPaths();++j){
 					RenderPath *path=subMesh->material->getPath(j);
 					RenderPass *pass=path->getPass(0);
+					RenderState *state=pass->getRenderState();
 
-					pass->setBlendState(BlendState(BlendState::Combination_ALPHA));
-					pass->setDepthState(DepthState(DepthState::DepthTest_LEQUAL,false));
+					state->setBlendState(BlendState(BlendState::Combination_ALPHA));
+					state->setDepthState(DepthState(DepthState::DepthTest_LEQUAL,false));
 				}
 			}
 		}
@@ -120,14 +121,16 @@ public:
 					RenderPath::ptr bottomPath=treeLeafBottom->getPath(i);
 
 					RenderPass::ptr topPass=path->addPass(topPath->takePass(0));
-					topPass->setRasterizerState(RasterizerState(RasterizerState::CullType_BACK));
-					topPass->setBlendState(BlendState::Combination_ALPHA);
-					topPass->setDepthState(DepthState(DepthState::DepthTest_LEQUAL,false));
+					RenderState::ptr topState=topPass->getRenderState();
+					topState->setRasterizerState(RasterizerState(RasterizerState::CullType_BACK));
+					topState->setBlendState(BlendState::Combination_ALPHA);
+					topState->setDepthState(DepthState(DepthState::DepthTest_LEQUAL,false));
 
 					RenderPass::ptr bottomPass=path->addPass(bottomPath->takePass(0));
-					bottomPass->setRasterizerState(RasterizerState(RasterizerState::CullType_FRONT));
-					bottomPass->setBlendState(BlendState::Combination_ALPHA);
-					bottomPass->setDepthState(DepthState(DepthState::DepthTest_LEQUAL,false));
+					RenderState::ptr bottomState=bottomPass->getRenderState();
+					bottomState->setRasterizerState(RasterizerState(RasterizerState::CullType_FRONT));
+					bottomState->setBlendState(BlendState::Combination_ALPHA);
+					bottomState->setDepthState(DepthState(DepthState::DepthTest_LEQUAL,false));
 				}
 			}
 
@@ -140,7 +143,7 @@ public:
 		shark=engine->getAudioManager()->findAudioBuffer("shark.wav");
 		rustle=engine->getAudioManager()->findAudioBuffer("rustle.wav");
 		crunch=engine->getAudioManager()->findAudioBuffer("crunch.wav");
-
+/*
 		acorn=engine->getMaterialManager()->findMaterial("acorn.png");
 		if(acorn!=NULL){
 			acorn->getPass()->setMaterialState(MaterialState(false));
@@ -157,7 +160,7 @@ public:
 		hudFade->getPass()->setDepthState(DepthState(DepthState::DepthTest_NEVER,false));
 		hudFade->getPass()->setBlendState(BlendState::Combination_ALPHA);
 		hudFade->getPass()->setMaterialState(MaterialState(Colors::TRANSPARENT_RED));
-*/
+
 		
 		hudCompass=engine->getMaterialManager()->findMaterial("compass.png");
 		if(hudCompass!=NULL){
@@ -172,7 +175,7 @@ public:
 			hudAcorn->getPass()->setDepthState(DepthState(DepthState::DepthTest_NEVER,false));
 			hudAcorn->getPass()->setBlendState(BlendState(BlendState::Combination_ALPHA));
 		}
-
+*/
 		hudWooden=engine->getFontManager()->findFont("Pinewood.ttf",100);
 
 		hudSystem=engine->getFontManager()->getDefaultFont();
