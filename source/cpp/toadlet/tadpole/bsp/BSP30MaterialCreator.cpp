@@ -135,7 +135,7 @@ Material::ptr BSP30MaterialCreator::createBSP30Material(Texture *diffuseTexture)
 		pass->setShader(Shader::ShaderType_FRAGMENT,mFragmentShader);
 
 		pass->addVariable("modelViewProjectionMatrix",RenderVariable::ptr(new MVPMatrixVariable()),Material::Scope_RENDERABLE);
-		pass->addVariable("textureMatrix",RenderVariable::ptr(new TextureMatrixVariable("tex")),Material::Scope_MATERIAL);
+		pass->addVariable("textureMatrix",RenderVariable::ptr(new TextureMatrixVariable("diffuseTex")),Material::Scope_MATERIAL);
 
 		pass->setTexture("diffuseTex",diffuseTexture,"diffuseSamp",mEngine->getMaterialManager()->getDefaultSamplerState(),TextureState());
 		pass->setTexture("lightmapTex",NULL,"lightmapSamp",mEngine->getMaterialManager()->getDefaultSamplerState(),TextureState());
