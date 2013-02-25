@@ -156,7 +156,7 @@ void RenderPass::setTextureLocationName(Shader::ShaderType type,int i,const Stri
 
 bool RenderPass::findTexture(const String &name,Shader::ShaderType &type,int &index){
 	if(mVariables!=NULL){
-		mVariables->findTexture(name,type,index);
+		return mVariables->findTexture(name,type,index);
 	}
 	else{
 		int i,j;

@@ -59,8 +59,10 @@ public:
 
 protected:
 	void findAdaptorInfo(){
-		mAdaptorInfo=new AdaptorInfo();
-		mAdaptorInfo->setDescription(glGetString(GL_RENDERER));
+		#if defined(GL_RENDERER)
+			mAdaptorInfo=new AdaptorInfo();
+			mAdaptorInfo->setDescription(glGetString(GL_RENDERER));
+		#endif
 	}
 
 	AdaptorInfo::ptr mAdaptorInfo;
