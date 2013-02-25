@@ -59,7 +59,6 @@ public:
 
 	virtual bool connect(uint32 ipAddress,int port);
 	virtual bool connect(const String &name,int port);
-	virtual bool connected(){return mConnected;}
 
 	virtual bool listen(int backlog);
 	virtual Socket *accept();
@@ -109,7 +108,6 @@ protected:
 	int error() const;
 
 	int mHandle;
-	bool mConnected;
 	bool mBlocking;
 	uint32 mHostIPAddress;
 	uint32 mHostPort;

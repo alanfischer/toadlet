@@ -98,7 +98,6 @@ namespace net{
 
 Socket::Socket():
 	mHandle(TOADLET_INVALID_SOCKET),
-	mConnected(false),
 	mBlocking(true),
 	mHostIPAddress(0),
 	mHostPort(0)
@@ -107,7 +106,6 @@ Socket::Socket():
 
 Socket::Socket(int domain,int type,int protocol):
 	mHandle(TOADLET_INVALID_SOCKET),
-	mConnected(false),
 	mBlocking(true),
 	mHostIPAddress(0),
 	mHostPort(0)
@@ -131,7 +129,6 @@ Socket::Socket(int domain,int type,int protocol):
 
 Socket::Socket(int handle,struct sockaddr_in *address):
 	mHandle(handle),
-	mConnected(true),
 	mBlocking(true),
 	mHostIPAddress(address->sin_addr.s_addr),
 	mHostPort(address->sin_port)
@@ -166,7 +163,6 @@ void Socket::close(){
 		#endif
 		mHandle=TOADLET_INVALID_SOCKET;
 	}
-	mConnected=false;
 	mHostIPAddress=0;
 	mHostPort=0;
 }
@@ -360,8 +356,6 @@ bool Socket::connect(uint32 ipAddress,int port){
 		}
 		return false;
 	}
-
-	mConnected=true;
 
 	return true;
 }

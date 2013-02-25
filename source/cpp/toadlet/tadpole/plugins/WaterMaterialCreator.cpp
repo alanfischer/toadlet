@@ -264,24 +264,23 @@ bool WaterMaterialCreator::createPaths(Material *material,RenderState *renderSta
 		pass->setShader(Shader::ShaderType_VERTEX,mVertexShader);
 		pass->setShader(Shader::ShaderType_FRAGMENT,mFragmentShader);
 
-		RenderVariableSet::ptr variables=pass->makeVariables();
-		variables->addVariable("modelViewProjectionMatrix",RenderVariable::ptr(new MVPMatrixVariable()),Material::Scope_RENDERABLE);
-		variables->addVariable("modelMatrix",RenderVariable::ptr(new ModelMatrixVariable()),Material::Scope_RENDERABLE);
-		variables->addVariable("fogDistance",RenderVariable::ptr(new FogDistanceVariable()),Material::Scope_MATERIAL);
-		variables->addVariable("fogColor",RenderVariable::ptr(new FogColorVariable()),Material::Scope_MATERIAL);
-		variables->addVariable("cameraPosition",RenderVariable::ptr(new CameraPositionVariable()),Material::Scope_MATERIAL);
-		variables->addVariable("lightPosition",RenderVariable::ptr(new LightPositionVariable()),Material::Scope_RENDERABLE);
-		variables->addVariable("lightSpecular",RenderVariable::ptr(new LightSpecularVariable()),Material::Scope_RENDERABLE);
-		variables->addVariable("waveHeight",RenderVariable::ptr(new ScalarVariable(0.25)),Material::Scope_MATERIAL);
-		variables->addVariable("materialSpecular",RenderVariable::ptr(new MaterialSpecularVariable()),Material::Scope_RENDERABLE);
-		variables->addVariable("materialShininess",RenderVariable::ptr(new MaterialShininessVariable()),Material::Scope_RENDERABLE);
+		pass->addVariable("modelViewProjectionMatrix",RenderVariable::ptr(new MVPMatrixVariable()),Material::Scope_RENDERABLE);
+		pass->addVariable("modelMatrix",RenderVariable::ptr(new ModelMatrixVariable()),Material::Scope_RENDERABLE);
+		pass->addVariable("fogDistance",RenderVariable::ptr(new FogDistanceVariable()),Material::Scope_MATERIAL);
+		pass->addVariable("fogColor",RenderVariable::ptr(new FogColorVariable()),Material::Scope_MATERIAL);
+		pass->addVariable("cameraPosition",RenderVariable::ptr(new CameraPositionVariable()),Material::Scope_MATERIAL);
+		pass->addVariable("lightPosition",RenderVariable::ptr(new LightPositionVariable()),Material::Scope_RENDERABLE);
+		pass->addVariable("lightSpecular",RenderVariable::ptr(new LightSpecularVariable()),Material::Scope_RENDERABLE);
+		pass->addVariable("waveHeight",RenderVariable::ptr(new ScalarVariable(0.25)),Material::Scope_MATERIAL);
+		pass->addVariable("materialSpecular",RenderVariable::ptr(new MaterialSpecularVariable()),Material::Scope_RENDERABLE);
+		pass->addVariable("materialShininess",RenderVariable::ptr(new MaterialShininessVariable()),Material::Scope_RENDERABLE);
 
-		variables->addTexture("reflectTex",reflectTexture,"reflectSamp",SamplerState(SamplerState::FilterType_LINEAR,SamplerState::FilterType_LINEAR,SamplerState::FilterType_LINEAR,SamplerState::AddressType_CLAMP_TO_EDGE,SamplerState::AddressType_CLAMP_TO_EDGE),TextureState());
-		variables->addTexture("refractTex",refractTexture,"refractSamp",SamplerState(SamplerState::FilterType_LINEAR,SamplerState::FilterType_LINEAR,SamplerState::FilterType_LINEAR,SamplerState::AddressType_CLAMP_TO_EDGE,SamplerState::AddressType_CLAMP_TO_EDGE),TextureState());
-		variables->addTexture("waveTex",waveTexture,"bumpSamp",SamplerState(),TextureState());
-		variables->addVariable("reflectMatrix",RenderVariable::ptr(new TextureMatrixVariable("reflectTex")),Material::Scope_MATERIAL);
-		variables->addVariable("refractMatrix",RenderVariable::ptr(new TextureMatrixVariable("refractTex")),Material::Scope_MATERIAL);
-		variables->addVariable("waveMatrix",RenderVariable::ptr(new TextureMatrixVariable("waveTex")),Material::Scope_MATERIAL);
+		pass->setTexture("reflectTex",reflectTexture,"reflectSamp",SamplerState(SamplerState::FilterType_LINEAR,SamplerState::FilterType_LINEAR,SamplerState::FilterType_LINEAR,SamplerState::AddressType_CLAMP_TO_EDGE,SamplerState::AddressType_CLAMP_TO_EDGE),TextureState());
+		pass->setTexture("refractTex",refractTexture,"refractSamp",SamplerState(SamplerState::FilterType_LINEAR,SamplerState::FilterType_LINEAR,SamplerState::FilterType_LINEAR,SamplerState::AddressType_CLAMP_TO_EDGE,SamplerState::AddressType_CLAMP_TO_EDGE),TextureState());
+		pass->setTexture("waveTex",waveTexture,"bumpSamp",SamplerState(),TextureState());
+		pass->addVariable("reflectMatrix",RenderVariable::ptr(new TextureMatrixVariable("reflectTex")),Material::Scope_MATERIAL);
+		pass->addVariable("refractMatrix",RenderVariable::ptr(new TextureMatrixVariable("refractTex")),Material::Scope_MATERIAL);
+		pass->addVariable("waveMatrix",RenderVariable::ptr(new TextureMatrixVariable("waveTex")),Material::Scope_MATERIAL);
 	}
 
 	if(mEngine->hasFixed(Shader::ShaderType_VERTEX) && mEngine->hasFixed(Shader::ShaderType_FRAGMENT)){

@@ -43,6 +43,7 @@ Material::Material(MaterialManager *manager):BaseResource(),
 
 void Material::destroy(){
 	int i;
+
 	for(i=0;i<mPaths.size();++i){
 		mPaths[i]->destroy();
 	}

@@ -116,11 +116,12 @@ void RandIsle::create(){
 	VertexBuffer::ptr predictedVertexBuffer=mEngine->getBufferManager()->createVertexBuffer(Buffer::Usage_BIT_STREAM,Buffer::Access_BIT_WRITE,mEngine->getVertexFormats().POSITION_COLOR,512);
 	mPredictedVertexData=VertexData::ptr(new VertexData(predictedVertexBuffer));
 	mPredictedIndexData=IndexData::ptr(new IndexData(IndexData::Primitive_TRISTRIP,NULL,0,predictedVertexBuffer->getSize()));
-	mPredictedMaterial=mEngine->getMaterialManager()->createMaterial();
-	mPredictedMaterial->getPass()->setDepthState(DepthState(DepthState::DepthTest_NEVER,false));
-	mPredictedMaterial->getPass()->setRasterizerState(RasterizerState(RasterizerState::CullType_NONE));
-	mPredictedMaterial->getPass()->setMaterialState(MaterialState(true));
-	mPredictedMaterial->getPass()->setBlendState(BlendState::Combination_ALPHA);
+	RenderState::ptr renderState=mEngine->getMaterialManager()->createRenderState();
+	renderState->setDepthState(DepthState(DepthState::DepthTest_NEVER,false));
+	renderState->setRasterizerState(RasterizerState(RasterizerState::CullType_NONE));
+	renderState->setMaterialState(MaterialState(true));
+	renderState->setBlendState(BlendState::Combination_ALPHA);
+	mPredictedMaterial=mEngine->createDiffuseMaterial(NULL,renderState);
 
 	mRustleSound=new AudioComponent(mEngine);
 	mRustleSound->setAudioBuffer(Resources::instance->rustle);

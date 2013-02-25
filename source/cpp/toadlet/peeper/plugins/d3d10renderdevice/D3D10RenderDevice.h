@@ -140,6 +140,7 @@ protected:
 	RenderCaps mCaps;
 
 	RenderState::ptr mDefaultState;
+	Collection<ID3D10ShaderResourceView*> mNullShaderResources;
 
 	friend class D3D10Buffer;
 	friend class D3D10Shader;

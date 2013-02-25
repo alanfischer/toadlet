@@ -145,16 +145,15 @@ Material::ptr BSP30MaterialCreator::createBSP30Material(Texture *diffuseTexture)
 	if(mEngine->hasFixed(Shader::ShaderType_VERTEX) && mEngine->hasFixed(Shader::ShaderType_FRAGMENT)){
 		RenderPath::ptr fixedPath=material->addPath();
 		RenderPass::ptr pass=fixedPath->addPass(renderState);
-		
-		pass->setTexture(Shader::ShaderType_FRAGMENT,0,diffuseTexture,mEngine->getMaterialManager()->getDefaultSamplerState(),TextureState());
-		pass->setTexture(Shader::ShaderType_FRAGMENT,1,NULL,mEngine->getMaterialManager()->getDefaultSamplerState(),TextureState());
 
 		TextureState lightmapState;
 		lightmapState.texCoordIndex=1;
 		lightmapState.colorOperation=TextureState::Operation_MODULATE;
 		lightmapState.colorSource1=TextureState::Source_PREVIOUS;
 		lightmapState.colorSource2=TextureState::Source_TEXTURE;
-		pass->setTextureState(Shader::ShaderType_FRAGMENT,1,lightmapState);
+
+		pass->setTexture(Shader::ShaderType_FRAGMENT,0,diffuseTexture,mEngine->getMaterialManager()->getDefaultSamplerState(),TextureState());
+		pass->setTexture(Shader::ShaderType_FRAGMENT,1,NULL,mEngine->getMaterialManager()->getDefaultSamplerState(),lightmapState);
 	}
 	
 	material->compile();
