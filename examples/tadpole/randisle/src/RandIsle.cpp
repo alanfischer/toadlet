@@ -309,7 +309,7 @@ void RandIsle::logicUpdate(int dt){
 
 		Shader::ShaderType type=(Shader::ShaderType)0;
 		int index=0;
-		Resources::instance->waterMaterial->getPass()->findTexture("waveTexture",type,index);
+		Resources::instance->waterMaterial->getPass()->findTexture("waveTex",type,index);
 		Resources::instance->waterMaterial->getPass()->setTextureState(type,index,state);
 	}
 
