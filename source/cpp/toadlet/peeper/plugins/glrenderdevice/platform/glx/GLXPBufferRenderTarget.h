@@ -66,6 +66,9 @@ public:
 	bool isValid() const{return mPBuffer!=0;}
 	int getWidth() const{return mWidth;}
 	int getHeight() const{return mHeight;}
+
+	AdaptorInfo *getAdaptorInfo() const{return GLRenderTarget::getAdaptorInfo();}
+
 	inline GLXPbuffer getGLXPbuffer() const{return mPBuffer;}
 
 protected:
