@@ -108,16 +108,16 @@ protected:
 		BufferInfo(){}
 
 		BufferInfo(Shader::ShaderType type,int index1,VariableBuffer *buffer1):
-		  buffer(buffer1),
-		  index(index1),
-		  shaderType(type),
-		  scope(0)
+			shaderType(type),
+			index(index1),
+			buffer(buffer1),
+			scope(0)
 		{}
 
-		VariableBuffer::ptr buffer;
-		int scope;
 		Shader::ShaderType shaderType;
 		int index;
+		VariableBuffer::ptr buffer;
+		int scope;
 		Collection<VariableInfo> variables;
 	};
 
