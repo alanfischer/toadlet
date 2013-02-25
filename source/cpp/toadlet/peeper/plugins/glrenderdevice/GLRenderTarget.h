@@ -48,12 +48,22 @@ public:
 	virtual int getWidth() const{return 0;}
 	virtual int getHeight() const{return 0;}
 
+	virtual AdaptorInfo *getAdaptorInfo() const{return mAdaptorInfo;}
+
 	virtual bool swap(){return false;}
 	virtual void reset(){} // Mostly unused except for NSGLRenderTarget
 	virtual bool activate(){return false;}
 	virtual bool deactivate(){return false;}
 	virtual bool activateAdditionalContext(){return false;}
 	virtual void deactivateAdditionalContext(){}
+
+protected:
+	void findAdaptorInfo(){
+		mAdaptorInfo=new AdaptorInfo();
+		mAdaptorInfo->setDescription(glGetString(GL_RENDERER));
+	}
+
+	AdaptorInfo::ptr mAdaptorInfo;
 };
 
 }

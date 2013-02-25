@@ -134,12 +134,11 @@ Material::ptr BSP30MaterialCreator::createBSP30Material(Texture *diffuseTexture)
 		pass->setShader(Shader::ShaderType_VERTEX,mVertexShader);
 		pass->setShader(Shader::ShaderType_FRAGMENT,mFragmentShader);
 
-		RenderVariableSet::ptr variables=pass->makeVariables();
-		variables->addVariable("modelViewProjectionMatrix",RenderVariable::ptr(new MVPMatrixVariable()),Material::Scope_RENDERABLE);
-		variables->addVariable("textureMatrix",RenderVariable::ptr(new TextureMatrixVariable("tex")),Material::Scope_MATERIAL);
+		pass->addVariable("modelViewProjectionMatrix",RenderVariable::ptr(new MVPMatrixVariable()),Material::Scope_RENDERABLE);
+		pass->addVariable("textureMatrix",RenderVariable::ptr(new TextureMatrixVariable("tex")),Material::Scope_MATERIAL);
 
-		variables->addTexture("diffuseTex",diffuseTexture,"diffuseSamp",mEngine->getMaterialManager()->getDefaultSamplerState(),TextureState());
-		variables->addTexture("lightmapTex",NULL,"lightmapSamp",mEngine->getMaterialManager()->getDefaultSamplerState(),TextureState());
+		pass->setTexture("diffuseTex",diffuseTexture,"diffuseSamp",mEngine->getMaterialManager()->getDefaultSamplerState(),TextureState());
+		pass->setTexture("lightmapTex",NULL,"lightmapSamp",mEngine->getMaterialManager()->getDefaultSamplerState(),TextureState());
 	}
 
 	if(mEngine->hasFixed(Shader::ShaderType_VERTEX) && mEngine->hasFixed(Shader::ShaderType_FRAGMENT)){

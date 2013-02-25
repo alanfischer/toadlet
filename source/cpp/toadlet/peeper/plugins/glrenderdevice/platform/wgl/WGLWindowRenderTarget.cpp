@@ -220,15 +220,6 @@ bool WGLWindowRenderTarget::createContext(HWND wnd,WindowRenderTargetFormat *for
 		}
 	}
 
-	// Use a string compare here to check to see if its a crashy pixel format on FireGL cards
-	String rendererName=glGetString(GL_RENDERER);
-	if(rendererName.equals("ATI FireGL V3100") && mPFD.cColorBits==16){
-		destroyContext();
-		Error::unknown(Categories::TOADLET_PEEPER,
-			"The requested pixel format is known to crash on this card.  Try 24 color bits");
-		return false;
-	}
-
 	int numThreads=(format==NULL||format->threads<=1)?0:format->threads-1;
 	mThreadContexts.resize(numThreads,0);
 	mThreadIDs.resize(numThreads,0);
@@ -250,6 +241,8 @@ bool WGLWindowRenderTarget::createContext(HWND wnd,WindowRenderTargetFormat *for
 			return false;
 		}
 	}
+
+	findAdaptorInfo();
 
 	return true;
 }

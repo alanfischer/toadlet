@@ -60,6 +60,8 @@ public:
 	bool activate();
 	bool deactivate();
 
+	AdaptorInfo *getAdaptorInfo() const{return mAdaptorInfo;}
+
 	void swap();
 	void reset();
 
@@ -93,6 +95,7 @@ protected:
 	IDirect3DSurface9 *mColorSurface;
 	IDirect3DSurface9 *mDepthSurface;
 	HWND mWindow;
+	AdaptorInfo::ptr mAdaptorInfo;
 };
 
 }

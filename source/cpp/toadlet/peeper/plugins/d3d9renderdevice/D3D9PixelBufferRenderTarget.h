@@ -63,6 +63,8 @@ public:
 	int getWidth() const{return mWidth;}
 	int getHeight() const{return mHeight;}
 
+	AdaptorInfo *getAdaptorInfo() const{return NULL;}
+
 	IDirect3D9 *getDirect3D9() const{return NULL;}
 	IDirect3DDevice9 *getDirect3DDevice9() const{return NULL;}
 

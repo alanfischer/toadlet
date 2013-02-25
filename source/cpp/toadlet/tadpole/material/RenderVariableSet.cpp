@@ -90,8 +90,7 @@ bool RenderVariableSet::addTexture(const String &name,Texture *texture,const Str
 }
 
 bool RenderVariableSet::findTexture(const String &name,Shader::ShaderType &type,int &index){
-	return mRenderPass->findTexture(name,type,index);
-/*	VariableBufferFormat::Variable *formatVariable=findResourceVariable(name,type);
+	VariableBufferFormat::Variable *formatVariable=findResourceVariable(name,type);
 	if(formatVariable!=NULL){
 		index=formatVariable->getResourceIndex();
 		return true;
@@ -101,7 +100,6 @@ bool RenderVariableSet::findTexture(const String &name,Shader::ShaderType &type,
 		index=0;
 		return false;
 	}
-*/
 }
 
 // Search for the correct buffer and correct index

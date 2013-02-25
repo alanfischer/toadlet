@@ -59,6 +59,8 @@ public:
 	bool activateAdditionalContext(){return false;}
 	void deactivateAdditionalContext(){}
 
+	AdaptorInfo *getAdaptorInfo() const{return WGLRenderTarget::getAdaptorInfo();}
+
 	bool attach(PixelBuffer::ptr buffer,Attachment attachment);
 	bool remove(PixelBuffer::ptr buffer);
 

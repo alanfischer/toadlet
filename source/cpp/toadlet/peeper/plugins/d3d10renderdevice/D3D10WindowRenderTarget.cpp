@@ -164,6 +164,9 @@ bool D3D10WindowRenderTarget::createContext(HWND wnd,WindowRenderTargetFormat *f
 	DXGI_ADAPTER_DESC adapterDesc;
 	mDXGIAdapter->GetDesc(&adapterDesc);
 
+	mAdaptorInfo=new AdaptorInfo();
+	mAdaptorInfo->setDescription(adapterDesc.Description);
+
 	Log::alert(Categories::TOADLET_PEEPER,
 		String("D3D Description:") + adapterDesc.Description);
 

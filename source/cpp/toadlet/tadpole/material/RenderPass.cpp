@@ -155,17 +155,22 @@ void RenderPass::setTextureLocationName(Shader::ShaderType type,int i,const Stri
 }
 
 bool RenderPass::findTexture(const String &name,Shader::ShaderType &type,int &index){
-	int i,j;
-	for(j=0;j<Shader::ShaderType_MAX;++j){
-		for(i=0;i<mTextureLocationNames[j].size();++i){
-			if(mTextureLocationNames[j][i]==name){
-				type=(Shader::ShaderType)j;
-				index=i;
-				return true;
+	if(mVariables!=NULL){
+		mVariables->findTexture(name,type,index);
+	}
+	else{
+		int i,j;
+		for(j=0;j<Shader::ShaderType_MAX;++j){
+			for(i=0;i<mTextureLocationNames[j].size();++i){
+				if(mTextureLocationNames[j][i]==name){
+					type=(Shader::ShaderType)j;
+					index=i;
+					return true;
+				}
 			}
 		}
+		return false;
 	}
-	return false;
 }
 
 bool RenderPass::isDepthSorted() const{

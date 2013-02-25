@@ -112,6 +112,8 @@ bool GLXWindowRenderTarget::createContext(Display *display,Window window,WindowR
 			"No Direct Rendering possible");
 	}
 
+	findAdaptorInfo();
+
 	return true;
 }
 

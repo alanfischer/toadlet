@@ -57,8 +57,9 @@ public:
 	int getWidth() const{return mWidth;}
 	int getHeight() const{return mHeight;}
 
-	void swap();
+	AdaptorInfo *getAdaptorInfo() const{return mAdaptorInfo;}
 
+	void swap();
 	void reset();
 
 	inline ID3D10RenderTargetView *getRenderTargetView() const{return mRenderTargetViews[0];}
@@ -80,6 +81,7 @@ protected:
 	D3D10Texture *mDepthTexture;
 	HWND mWindow;
 	int mWidth,mHeight;
+	AdaptorInfo::ptr mAdaptorInfo;
 };
 
 }

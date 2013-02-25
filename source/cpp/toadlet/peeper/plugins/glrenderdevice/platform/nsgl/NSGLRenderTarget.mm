@@ -104,6 +104,8 @@ bool NSGLRenderTarget::createContext(NSView *view,WindowRenderTargetFormat *form
 
 	activate();
 
+	findAdaptorInfo();
+
 	return true;
 }
 
