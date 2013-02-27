@@ -17,8 +17,6 @@ set (FLICK_HDR
 	InputDevice.h
 	InputDeviceListener.h
 	Types.h
-	VideoDevice.h
-	VideoDeviceListener.h
 	Version.h
 )
 
@@ -67,10 +65,6 @@ endif (TOADLET_BUILD_STATIC)
 # Platform specific modules
 if (TOADLET_PLATFORM_WIN32)
 	add_subdirectory (plugins/win32joydevice)
-	find_package (MediaFoundation)
-	if (MEDIAFOUNDATION_FOUND)
-		add_subdirectory (plugins/mfvideodevice)
-	endif (MEDIAFOUNDATION_FOUND)
 elseif (TOADLET_PLATFORM_ANDROID)
 	add_subdirectory (plugins/jinputdevice)
 	if (ANDROID_NDK_API_LEVEL GREATER 8)
