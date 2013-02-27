@@ -75,7 +75,7 @@ int main(int argc,char **argv){
 			smd.setFPS(fpses[i-1]);
 		}
 
-		FileStream::ptr stream(new FileStream(fileName,FileStream::Open_READ_BINARY));
+		FileStream::ptr stream=new FileStream(fileName,FileStream::Open_READ_BINARY);
 		if(stream->closed()==false){
 			smd.load(engine,stream,fileName);
 		}
@@ -92,7 +92,7 @@ int main(int argc,char **argv){
 
 		std::cout << "Saving " << (const char*)outputName << std::endl;
 
-		FileStream::ptr stream(new FileStream(outputName,FileStream::Open_WRITE_BINARY));
+		FileStream::ptr stream=new FileStream(outputName,FileStream::Open_WRITE_BINARY);
 		if(stream->closed()==false){
 			XMSHStreamer::ptr streamer=new XMSHStreamer(NULL);
 			streamer->save(stream,smd.getMesh(),NULL,NULL);

@@ -38,7 +38,7 @@ bool MeshOptimizer::optimizeMesh(Mesh *mesh,Engine *engine){
 						ciba.set(oldSize+k,iba2.get(k));
 					}
 
-					subMesh1->indexData=IndexData::ptr(new IndexData(IndexData::Primitive_TRIS,cib,0,cib->getSize()));
+					subMesh1->indexData=new IndexData(IndexData::Primitive_TRIS,cib,0,cib->getSize());
 
 					mesh->removeSubMesh(subMesh2);
 
@@ -252,7 +252,7 @@ bool MeshOptimizer::optimizeMesh(Mesh *mesh,Engine *engine){
 		}
 	}
 
-	mesh->setStaticVertexData(VertexData::ptr(new VertexData(newVertexBuffer)));
+	mesh->setStaticVertexData(new VertexData(newVertexBuffer));
 	mesh->setVertexBoneAssignments(nvertexBoneAssignments);
 
 	for(i=0;i<mesh->getNumSubMeshes();++i){
@@ -266,7 +266,7 @@ bool MeshOptimizer::optimizeMesh(Mesh *mesh,Engine *engine){
 			niba.set(j,oldToNew[iba.get(j)]);
 		}
 
-		subMesh->indexData=IndexData::ptr(new IndexData(subMesh->indexData->getPrimitive(),newIndexBuffer,0,newIndexBuffer->getSize()));
+		subMesh->indexData=new IndexData(subMesh->indexData->getPrimitive(),newIndexBuffer,0,newIndexBuffer->getSize());
 	}
 
 	// Remove empty tracks

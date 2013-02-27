@@ -227,8 +227,8 @@ bool GLFBORenderTarget::compile(){
 	glBindFramebuffer(GL_FRAMEBUFFER,mHandle);
 	if(color!=NULL && depth==NULL){
 		// No Depth-Stencil buffer, so add one
-		GLFBOPixelBuffer::ptr buffer(new GLFBOPixelBuffer(this));
-		if(buffer->create(Buffer::Usage_BIT_STREAM,Buffer::Access_NONE,TextureFormat::ptr(new TextureFormat(TextureFormat::Dimension_D2,TextureFormat::Format_DEPTH_24,mWidth,mHeight,1,1)))){
+		GLFBOPixelBuffer::ptr buffer=new GLFBOPixelBuffer(this);
+		if(buffer->create(Buffer::Usage_BIT_STREAM,Buffer::Access_NONE,new TextureFormat(TextureFormat::Dimension_D2,TextureFormat::Format_DEPTH_24,mWidth,mHeight,1,1))){
 			attach(buffer,Attachment_DEPTH_STENCIL);
 			mOwnedDepthBuffer=buffer;
 		}

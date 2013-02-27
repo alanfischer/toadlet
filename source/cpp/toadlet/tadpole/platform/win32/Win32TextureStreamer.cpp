@@ -92,7 +92,7 @@ Resource::ptr Win32TextureStreamer::load(Stream::ptr in,ResourceData *data,Progr
 	Texture::ptr texture=NULL;
 	int usage=(data!=NULL)?((TextureData*)data)->usage:0;
 
-	StreamIStream::ptr stream(new StreamIStream(in));
+	StreamIStream::ptr stream=new StreamIStream(in);
 	HRESULT hr=0;
 
 	#if defined(TOADLET_PLATFORM_WINCE)

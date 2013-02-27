@@ -68,7 +68,7 @@ bool D3D9Texture::create(int usage,TextureFormat::ptr format,byte *mipDatas[]){
 		int specifiedMipLevels=mFormat->getMipMax()>0?mFormat->getMipMax():1;
 		int level;
 		for(level=0;level<specifiedMipLevels;++level){
-			TextureFormat::ptr format(new TextureFormat(mFormat,level));
+			TextureFormat::ptr format=new TextureFormat(mFormat,level);
 			load(format,mipDatas[level]);
 		}
 	}
@@ -211,7 +211,7 @@ PixelBuffer::ptr D3D9Texture::getMipPixelBuffer(int level,int cubeSide){
 	}
 
 	if(mBuffers[index]==NULL){
-		PixelBuffer::ptr buffer(new D3D9TextureMipPixelBuffer(this,level,cubeSide));
+		PixelBuffer::ptr buffer=new D3D9TextureMipPixelBuffer(this,level,cubeSide);
 		mBuffers[index]=buffer;
 	}
 

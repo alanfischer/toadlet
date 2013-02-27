@@ -153,14 +153,14 @@ bool TerrainPatchComponent::setHeightData(scalar *data,int rowPitch,int width,in
 			mVertexBuffer->destroy();
 		}
 		mVertexBuffer=mEngine->getBufferManager()->createVertexBuffer(Buffer::Usage_BIT_STREAM,Buffer::Access_READ_WRITE,vertexFormat,numVertexes);
-		mVertexData=VertexData::ptr(new VertexData(mVertexBuffer));
+		mVertexData=new VertexData(mVertexBuffer);
 	}
 	if(mIndexBuffer==NULL || mIndexBuffer->getSize()!=numIndexes){
 		if(mIndexBuffer!=NULL){
 			mIndexBuffer->destroy();
 		}
 		mIndexBuffer=mEngine->getBufferManager()->createIndexBuffer(Buffer::Usage_BIT_DYNAMIC,Buffer::Access_BIT_WRITE,indexFormat,numIndexes);
-		mIndexData=IndexData::ptr(new IndexData(IndexData::Primitive_TRIS,mIndexBuffer));
+		mIndexData=new IndexData(IndexData::Primitive_TRIS,mIndexBuffer);
 	}
 
 	VertexBufferAccessor vba(mVertexBuffer,Buffer::Access_BIT_WRITE);
@@ -213,14 +213,14 @@ bool TerrainPatchComponent::setHeightData(scalar *data,int rowPitch,int width,in
 				mWaterVertexBuffer->destroy();
 			}
 			mWaterVertexBuffer=mEngine->getBufferManager()->createVertexBuffer(Buffer::Usage_BIT_STREAM,Buffer::Access_READ_WRITE,vertexFormat,numVertexes);
-			mWaterVertexData=VertexData::ptr(new VertexData(mWaterVertexBuffer));
+			mWaterVertexData=new VertexData(mWaterVertexBuffer);
 		}
 		if(mWaterIndexBuffer==NULL || mWaterIndexBuffer->getSize()!=numIndexes){
 			if(mWaterIndexBuffer!=NULL){
 				mWaterIndexBuffer->destroy();
 			}
 			mWaterIndexBuffer=mEngine->getBufferManager()->createIndexBuffer(Buffer::Usage_BIT_DYNAMIC,Buffer::Access_BIT_WRITE,indexFormat,numIndexes);
-			mWaterIndexData=IndexData::ptr(new IndexData(IndexData::Primitive_TRIS,mWaterIndexBuffer));
+			mWaterIndexData=new IndexData(IndexData::Primitive_TRIS,mWaterIndexBuffer);
 		}
 
 		vba.lock(mWaterVertexBuffer,Buffer::Access_BIT_WRITE);

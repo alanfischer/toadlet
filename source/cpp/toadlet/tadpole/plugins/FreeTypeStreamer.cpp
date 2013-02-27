@@ -60,7 +60,7 @@ Resource::ptr FreeTypeStreamer::load(Stream::ptr stream,ResourceData *resourceDa
 	const wchar_t *charArray=fontData->characterSet.wc_str();
 	int numChars=numChars=fontData->characterSet.length();
 
-	MemoryStream::ptr memoryStream(new MemoryStream(stream));
+	MemoryStream::ptr memoryStream=new MemoryStream(stream);
 	int i=0,j=0,k=0;
 
 	FT_Face face=NULL;

@@ -223,7 +223,7 @@ void ParticleComponent::createVertexBuffer(){
 	}
 
 	VertexBuffer::ptr vertexBuffer=mEngine->getBufferManager()->createVertexBuffer(Buffer::Usage_BIT_STREAM,Buffer::Access_BIT_WRITE,vertexFormat,numVertexes);
-	mVertexData=VertexData::ptr(new VertexData(vertexBuffer));
+	mVertexData=new VertexData(vertexBuffer);
 
 	int numIndexes=0;
 	if(mParticleType==ParticleType_SPRITE){

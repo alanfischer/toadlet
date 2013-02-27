@@ -59,12 +59,12 @@ int main(int argc,char **argv){
 	MeshOptimizer optimizer;
 	bool result=optimizer.optimizeMesh(mesh,engine);
 
-	FileStream::ptr stream(new FileStream(mshFileName,FileStream::Open_WRITE_BINARY));
+	FileStream::ptr stream=new FileStream(mshFileName,FileStream::Open_WRITE_BINARY);
 	if(stream->closed()){
 		std::cout << "Error opening " << (const char*)mshFileName << std::endl;
 		return 0;
 	}
-	XMSHStreamer::ptr streamer(new XMSHStreamer(NULL));
+	XMSHStreamer::ptr streamer=new XMSHStreamer(NULL);
 	streamer->save(stream,mesh,NULL,NULL);
 
 	if(result){

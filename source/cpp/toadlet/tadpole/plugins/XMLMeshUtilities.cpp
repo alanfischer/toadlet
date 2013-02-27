@@ -554,7 +554,7 @@ Mesh::ptr XMLMeshUtilities::loadMesh(mxml_node_t *node,int version,BufferManager
 				indexBuffer->create(Buffer::Usage_BIT_STATIC,Buffer::Access_BIT_WRITE,IndexBuffer::IndexFormat_UINT16,count);
 			}
 
-			subMesh->indexData=IndexData::ptr(new IndexData(IndexData::Primitive_TRIS,indexBuffer,0,count));
+			subMesh->indexData=new IndexData(IndexData::Primitive_TRIS,indexBuffer,0,count);
 
 			IndexBufferAccessor iba;
 			iba.lock(indexBuffer,Buffer::Access_BIT_WRITE);
