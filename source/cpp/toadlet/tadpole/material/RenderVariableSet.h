@@ -79,6 +79,14 @@ public:
 protected:
 	class VariableInfo{
 	public:
+		VariableInfo(){}
+
+		VariableInfo(String name1,int location1,int scope1,RenderVariable::ptr variable1):
+			name(name1),
+			location(location1),
+			scope(scope1),
+			variable(variable1){}
+
 		String name;
 		int location;
 		int scope;

@@ -114,11 +114,7 @@ bool RenderVariableSet::addVariable(const String &name,RenderVariable::ptr varia
 		}
 	}
 
-	VariableInfo v;
-	v.name=name;
-	v.location=0;
-	v.scope=scope;
-	v.variable=variable;
+	VariableInfo v(name,0,scope,variable);
 
 	if(formatVariable==NULL){
 		if(mBuffers.size()>0){
