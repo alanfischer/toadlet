@@ -1437,7 +1437,7 @@ bool M3GConverter::convertMesh(Mesh *mesh,Stream *outStream,float scale,int forc
 
 	bool result=false;
 
-	DataStream::ptr out(new DataStream(outStream));
+	DataStream::ptr out=new DataStream(outStream);
 
 	Collection<M3GProxy*> objects;
 	M3GHeaderObject headerObject;

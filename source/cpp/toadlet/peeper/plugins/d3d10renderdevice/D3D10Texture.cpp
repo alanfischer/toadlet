@@ -79,7 +79,7 @@ bool D3D10Texture::create(int usage,TextureFormat::ptr format,byte *mipDatas[]){
 		if(result && mipDatas!=NULL){
 			int level;
 			for(level=0;level<1 || level<format->getMipMax();++level){
-				TextureFormat::ptr format(new TextureFormat(mFormat,level));
+				TextureFormat::ptr format=new TextureFormat(mFormat,level);
 				load(format,mipDatas[level]);
 			}
 		}
@@ -142,7 +142,7 @@ bool D3D10Texture::createContext(int numMipDatas,byte *mipDatas[]){
 		sData=new D3D10_SUBRESOURCE_DATA[numSubResources];
 		int i;
 		for(i=0;i<numSubResources;++i){
-			TextureFormat::ptr format(new TextureFormat(mFormat,i));
+			TextureFormat::ptr format=new TextureFormat(mFormat,i);
 			sData[i].pSysMem=(i==0 || i<numMipDatas) ? mipDatas[i]:NULL;
 			sData[i].SysMemPitch=format->getXPitch();
 			sData[i].SysMemSlicePitch=format->getYPitch();
@@ -256,7 +256,7 @@ PixelBuffer::ptr D3D10Texture::getMipPixelBuffer(int level,int cubeSide){
 	}
 
 	if(mBuffers[index]==NULL){
-		PixelBuffer::ptr buffer(new D3D10TextureMipPixelBuffer(this,level,cubeSide));
+		PixelBuffer::ptr buffer=new D3D10TextureMipPixelBuffer(this,level,cubeSide);
 		mBuffers[index]=buffer;
 	}
 

@@ -140,7 +140,7 @@ bool GLTexture::createContext(int mipLevels,tbyte *mipDatas[]){
 	// Allocate texture memory
 	int level=0;
 	for(level=0;level<specifiedMipLevels;++level){
-		TextureFormat::ptr format(new TextureFormat(mFormat,level));
+		TextureFormat::ptr format=new TextureFormat(mFormat,level);
 		int width=format->getWidth(),height=format->getHeight(),depth=format->getDepth();
 		int xPitch=format->getXPitch();
 		int yPitch=format->getYPitch();
@@ -291,7 +291,7 @@ PixelBuffer::ptr GLTexture::getMipPixelBuffer(int level,int cubeSide){
 	}
 
 	if(mBuffers[index]==NULL){
-		PixelBuffer::ptr buffer(new GLTextureMipPixelBuffer(const_cast<GLTexture*>(this),index,cubeSide));
+		PixelBuffer::ptr buffer=new GLTextureMipPixelBuffer(const_cast<GLTexture*>(this),index,cubeSide);
 		mBuffers[index]=buffer;
 	}
 

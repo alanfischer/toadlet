@@ -102,7 +102,7 @@ int main(int argc,char **argv){
 	
 		for(i=3;i<argc;++i){
 			std::cout << "Inserting " << argv[i] << std::endl;
-			FileStream::ptr stream(new FileStream(argv[i],FileStream::Open_READ_BINARY));
+			FileStream::ptr stream=new FileStream(argv[i],FileStream::Open_READ_BINARY);
 			if(stream->closed()){
 				std::cout << "Error opening " << argv[i] << std::endl;
 				return 0;

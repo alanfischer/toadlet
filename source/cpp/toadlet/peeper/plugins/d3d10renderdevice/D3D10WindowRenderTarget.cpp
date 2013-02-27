@@ -177,7 +177,7 @@ bool D3D10WindowRenderTarget::createContext(HWND wnd,WindowRenderTargetFormat *f
 	mD3DDevice->CreateRenderTargetView(texture,NULL,&mRenderTargetViews[0]);
 
 	mDepthTexture=new D3D10Texture(mD3DDevice);
-	TextureFormat::ptr textureFormat(new TextureFormat(TextureFormat::Dimension_D2,TextureFormat::Format_DEPTH_16,textureDesc.Width,textureDesc.Height,1,1));
+	TextureFormat::ptr textureFormat=new TextureFormat(TextureFormat::Dimension_D2,TextureFormat::Format_DEPTH_16,textureDesc.Width,textureDesc.Height,1,1);
 	mDepthTexture->create(Texture::Usage_BIT_RENDERTARGET,textureFormat,NULL);
 	mD3DDevice->CreateDepthStencilView(mDepthTexture->getD3D10Resource(),NULL,&mDepthStencilView);
 

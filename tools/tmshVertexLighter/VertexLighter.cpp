@@ -58,7 +58,7 @@ void VertexLighter::lightMesh(Mesh *mesh){
 	}
 
 	VertexBuffer::ptr newVertexBuffer=mEngine->getBufferManager()->cloneVertexBuffer(vertexBuffer,Buffer::Usage_BIT_STATIC,Buffer::Access_READ_WRITE,newVertexFormat,vertexBuffer->getSize());
-	mesh->setStaticVertexData(VertexData::ptr(new VertexData(newVertexBuffer)));
+	mesh->setStaticVertexData(new VertexData(newVertexBuffer));
 
 	int pi=newVertexFormat->findElement(VertexFormat::Semantic_POSITION);
 	int ni=newVertexFormat->findElement(VertexFormat::Semantic_NORMAL);

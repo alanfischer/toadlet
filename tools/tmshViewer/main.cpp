@@ -68,7 +68,7 @@ int main(int argc,char **argv){
 			int sequence=atoi(argv[2]);
 			if(sequence>=0 && sequence<numSequences){
 				AnimationAction::ptr animation=new AnimationAction();
-				animation->attach(new MeshAnimation(meshComponent,sequence));
+				animation->attach(meshComponent->getSkeleton()->getAnimation(sequence));
 				animation->setCycling(AnimationAction::Cycling_LOOP);
 				animation->start();
 				node->attach(new ActionComponent("animation",animation));

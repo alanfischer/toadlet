@@ -50,6 +50,24 @@ public:
 	void setName(const String &name){mName=name;}
 	const String &getName(){return mName;}
 
+	void setBlendState(const BlendState &state){mRenderState->setBlendState(state);}
+	bool getBlendState(BlendState &state) const{return mRenderState->getBlendState(state);}
+
+	void setDepthState(const DepthState &state){mRenderState->setDepthState(state);}
+	bool getDepthState(DepthState &state) const{return mRenderState->getDepthState(state);}
+
+	void setRasterizerState(const RasterizerState &state){mRenderState->setRasterizerState(state);}
+	bool getRasterizerState(RasterizerState &state) const{return mRenderState->getRasterizerState(state);}
+
+	void setFogState(const FogState &state){mRenderState->setFogState(state);}
+	bool getFogState(FogState &state) const{return mRenderState->getFogState(state);}
+
+	void setPointState(const PointState &state){mRenderState->setPointState(state);}
+	bool getPointState(PointState &state) const{return mRenderState->getPointState(state);}
+
+	void setMaterialState(const MaterialState &state){mRenderState->setMaterialState(state);}
+	bool getMaterialState(MaterialState &state) const{return mRenderState->getMaterialState(state);}
+
 	void setSamplerState(Shader::ShaderType type,int i,const SamplerState &state){mRenderState->setSamplerState(type,i,state);}
 	bool getSamplerState(Shader::ShaderType type,int i,SamplerState &state){return mRenderState->getSamplerState(type,i,state);}
 
@@ -63,6 +81,7 @@ public:
 	void setTexture(const String &name,Texture *texture,const String &samplerName,const SamplerState &samplerState,const TextureState &textureState);
 	void setTexture(Shader::ShaderType type,int i,Texture *texture,const SamplerState &samplerState,const TextureState &textureState);
 	Texture *getTexture(Shader::ShaderType type=Shader::ShaderType_FRAGMENT,int i=0) const{return i<mTextures[type].size()?mTextures[type][i]:NULL;}
+	bool findTexture(const String &name,Shader::ShaderType &type,int &index);
 
 	bool addVariable(const String &name,RenderVariable::ptr variable,int scope){return makeVariables()->addVariable(name,variable,scope);}
 
@@ -74,13 +93,17 @@ public:
 
 	// Shader
 	RenderVariableSet::ptr makeVariables();
-	void setVariables(RenderVariableSet::ptr variables){mVariables=variables;}
 	inline RenderVariableSet::ptr getVariables() const{return mVariables;}
 	void updateVariables(int scope,SceneParameters *parameters);
 
+	inline int getNumBuffers() const{return mVariables==NULL?0:mVariables->getNumBuffers();}
+	inline VariableBuffer *getBuffer(int i){return mVariables->getBuffer(i);}
+	inline int getBufferScope(int i){return mVariables->getBufferScope(i);}
+	inline Shader::ShaderType getBufferShaderType(int i){return mVariables->getBufferShaderType(i);}
+	inline int getBufferIndex(int i){return mVariables->getBufferIndex(i);}
+
 	// Fixed
 	void setTextureLocationName(Shader::ShaderType type,int i,const String &name);
-	bool findTexture(const String &name,Shader::ShaderType &type,int &index);
 	int getNumTextureLocationNames(Shader::ShaderType type) const{return mTextureLocationNames[type].size();}
 	String getTextureLocationName(Shader::ShaderType type,int i) const{return mTextureLocationNames[type][i];}
 

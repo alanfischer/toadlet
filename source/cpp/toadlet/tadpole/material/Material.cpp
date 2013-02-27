@@ -53,7 +53,7 @@ void Material::destroy(){
 }
 
 RenderPath::ptr Material::addPath(const String name){
-	RenderPath::ptr path(new RenderPath(mManager));
+	RenderPath::ptr path=new RenderPath(mManager);
 	path->setName(name);
 	mPaths.add(path);
 	return path;

@@ -101,8 +101,8 @@ Mesh::ptr AABoxMeshCreator::createAABoxMesh(const AABox &box,Material::ptr mater
 		iba.unlock();
 	}
 
-	Mesh::SubMesh::ptr subMesh(new Mesh::SubMesh());
-	subMesh->indexData=IndexData::ptr(new IndexData(IndexData::Primitive_TRIS,indexBuffer));
+	Mesh::SubMesh::ptr subMesh=new Mesh::SubMesh();
+	subMesh->indexData=new IndexData(IndexData::Primitive_TRIS,indexBuffer);
 	if(material==NULL){
 		material=mEngine->createDiffuseMaterial(NULL);
 	}
@@ -111,7 +111,7 @@ Mesh::ptr AABoxMeshCreator::createAABoxMesh(const AABox &box,Material::ptr mater
 	Mesh::ptr mesh=new Mesh();
 	mesh->addSubMesh(subMesh);
 	mesh->setBound(new Bound(box));
-	mesh->setStaticVertexData(VertexData::ptr(new VertexData(vertexBuffer)));
+	mesh->setStaticVertexData(new VertexData(vertexBuffer));
 
 	return mesh;
 }

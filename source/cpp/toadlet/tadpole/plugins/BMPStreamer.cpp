@@ -74,7 +74,7 @@ Resource::ptr BMPStreamer::load(Stream::ptr stream,ResourceData *data,ProgressLi
 		return NULL;
 	}
 
-	DataStream::ptr dataStream(new DataStream(stream));
+	DataStream::ptr dataStream=new DataStream(stream);
 
 	dataStream->read((tbyte*)&bmfh,SIZEOF_BITMAPFILEHEADER);
 	#if defined(TOADLET_BIG_ENDIAN)
@@ -243,7 +243,7 @@ bool BMPStreamer::save(Stream::ptr stream,Resource::ptr resource,ResourceData *d
 		sizeof(bmih.biCompression) + sizeof(bmih.biSizeImage) + sizeof(bmih.biXPelsPerMeter) + sizeof(bmih.biYPelsPerMeter) +
 		sizeof(bmih.biClrUsed) + sizeof(bmih.biClrImportant);
 
-	DataStream::ptr dataStream(new DataStream(stream));
+	DataStream::ptr dataStream=new DataStream(stream);
 
 	bmfh.bfType=((int16)(((char)('B')) | ((int16)((char('M'))) << 8)));
 	bmfh.bfSize=fhSize+ihSize+rowSize*height;

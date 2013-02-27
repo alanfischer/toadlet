@@ -177,7 +177,7 @@ int main(int argc,char **argv){
 		// Prepare the output file
 		int loc=mshFileName.rfind('.');
 		String bacFileName=mshFileName.substr(0,loc)+String(".bac");
-		FileStream::ptr stream(new FileStream(bacFileName,FileStream::Open_WRITE_BINARY));
+		FileStream::ptr stream=new FileStream(bacFileName,FileStream::Open_WRITE_BINARY);
 
 		std::cout << "Writing mesh " << (const char*)bacFileName << std::endl;
 
@@ -207,7 +207,7 @@ int main(int argc,char **argv){
 					traFileName=ss.str().c_str();
 				}
 				std::cout << "Writing animation " << (const char*)traFileName << std::endl;
-				FileStream::ptr stream(new FileStream(traFileName,FileStream::Open_WRITE_BINARY));
+				FileStream::ptr stream=new FileStream(traFileName,FileStream::Open_WRITE_BINARY);
 
 				if(bac.convertAnimation(mesh,skeleton->getSequence(j),stream,(version==3)?4:3)==false){
 					std::cout << "Error converting animation" << std::endl;

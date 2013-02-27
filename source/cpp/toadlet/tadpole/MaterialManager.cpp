@@ -100,10 +100,6 @@ Material::ptr MaterialManager::createSharedMaterial(Material::ptr source,RenderS
 			dstPass->setModelMatrixFlags(srcPass->getModelMatrixFlags());
 
 			/// @todo: Remove this once RenderVariableSet is merged into RenderPass
-
-//			///  this is NOT CORRECT since all buffers are shared, ideally only buffers containing any Renderable scoped variables will be shared
-//			dstPass->setVariables(srcPass->getVariables());
-
 			/// @todo: Should we share buffers instead?
 			RenderVariableSet *srcVars=srcPass->getVariables();
 			if(srcVars!=NULL){

@@ -143,7 +143,7 @@ Resource::ptr DDSStreamer::load(Stream::ptr stream,ResourceData *data,ProgressLi
 		return NULL;
 	}
 
-	DataStream::ptr dataStream(new DataStream(stream));
+	DataStream::ptr dataStream=new DataStream(stream);
 
 	uint32 magic=dataStream->readLUInt32();
 	if(magic!=DDS_MAGIC){

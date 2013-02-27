@@ -35,7 +35,7 @@ ShadowMappedRenderManager::ShadowMappedRenderManager(Scene *scene):
 {
 	Engine *engine=scene->getEngine();
 
-	mShadowTexture=engine->getTextureManager()->createTexture(Texture::Usage_BIT_RENDERTARGET,TextureFormat::ptr(new TextureFormat(TextureFormat::Dimension_D2,TextureFormat::Format_DEPTH_24,1024,1024,1,1)));
+	mShadowTexture=engine->getTextureManager()->createTexture(Texture::Usage_BIT_RENDERTARGET,new TextureFormat(TextureFormat::Dimension_D2,TextureFormat::Format_DEPTH_24,1024,1024,1,1));
 	mShadowTarget=engine->getTextureManager()->createPixelBufferRenderTarget();
 	mShadowTarget->attach(mShadowTexture->getMipPixelBuffer(0,0),PixelBufferRenderTarget::Attachment_DEPTH_STENCIL);
 

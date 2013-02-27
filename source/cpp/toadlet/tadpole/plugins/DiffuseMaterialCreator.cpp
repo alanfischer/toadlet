@@ -351,7 +351,7 @@ Material::ptr DiffuseMaterialCreator::createDiffuseMaterial(Texture *texture,Ren
 }
 
 Material::ptr DiffuseMaterialCreator::createPointSpriteMaterial(Texture *texture,scalar size,bool attenuated){
-	Material::ptr material(new Material(mEngine->getMaterialManager()));
+	Material::ptr material=new Material(mEngine->getMaterialManager());
 
 	RenderState::ptr renderState=mEngine->getMaterialManager()->createRenderState();
 	if(renderState!=NULL){
@@ -417,7 +417,7 @@ Material::ptr DiffuseMaterialCreator::createFontMaterial(Font *font){
 		return NULL;
 	}
 
-	Material::ptr material(new Material(mEngine->getMaterialManager()));
+	Material::ptr material=new Material(mEngine->getMaterialManager());
 
 	Texture::ptr texture=font->getTexture();
 

@@ -248,7 +248,7 @@ bool DiffuseTerrainMaterialSource::setDetailTexture(Texture *texture){
 }
 
 Material::ptr DiffuseTerrainMaterialSource::getMaterial(TerrainPatchComponent *patch){
-	Material::ptr material(new Material(mEngine->getMaterialManager()));
+	Material::ptr material=new Material(mEngine->getMaterialManager());
 
 	TextureState diffuseState;
 	diffuseState.calculation=TextureState::CalculationType_NORMAL;

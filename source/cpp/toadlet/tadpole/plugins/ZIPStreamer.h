@@ -39,7 +39,7 @@ public:
 	ZIPStreamer(){}
 
 	Resource::ptr load(Stream::ptr stream,ResourceData *data,ProgressListener *listener){
-		ZIPArchive::ptr archive(new ZIPArchive());
+		ZIPArchive::ptr archive=new ZIPArchive();
 		bool result=archive->open(stream);
 		if(result){
 			return shared_static_cast<Archive>(archive);

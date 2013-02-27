@@ -81,7 +81,7 @@ Resource::ptr Win32FontStreamer::load(Stream::ptr stream,ResourceData *data,Prog
 	const wchar_t *charArray=fontData->characterSet.wc_str();
 	int numChars=numChars=fontData->characterSet.length();
 
-	MemoryStream::ptr memoryStream(new MemoryStream(stream));
+	MemoryStream::ptr memoryStream=new MemoryStream(stream);
 
 	String name;
 	#if !defined(TOADLET_PLATFORM_WINCE)
@@ -275,7 +275,7 @@ Resource::ptr Win32FontStreamer::load(Stream::ptr stream,ResourceData *data,Prog
 
 	delete[] textureData;
 
-	Font::ptr font(new Font(fontData->pointSize,0,texture,charArray,&glyphs[0],glyphs.size()));
+	Font::ptr font=new Font(fontData->pointSize,0,texture,charArray,&glyphs[0],glyphs.size());
 
 	SelectObject(cdc,oldBitmap);
 	DeleteObject(bitmap);

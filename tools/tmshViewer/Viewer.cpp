@@ -67,7 +67,7 @@ Viewer::Viewer(Application *app):
 
 	mCamera=new Camera();
 	mCamera->setClearColor(Colors::ORANGE);
-	mCamera->setAutoProjectionFov(Math::degToRad(Math::fromInt(45)),0.01,1000);
+	mCamera->setAutoProjectionFov(Math::degToRad(Math::fromInt(45)),false,0.01,1000);
 
 	mParent=new Node(mScene);
 	mScene->getRoot()->attach(mParent);
