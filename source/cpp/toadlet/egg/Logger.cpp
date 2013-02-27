@@ -222,7 +222,7 @@ void Logger::addCompleteLogEntry(Category *category,Level level,const String &te
 			break;
 		}
 		
-		String line=String()+timeString+levelString+text+(char)10;
+		String line=String()+timeString+": "+levelString+text+(char)10;
 
 		#if defined(TOADLET_USE_OUTPUTDEBUGSTRING_LOGGING)
 			int len=line.length();
