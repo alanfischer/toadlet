@@ -252,6 +252,8 @@ void Node::parentChanged(Node *node){
 		parent->nodeRemoved(this);
 	}
 	if(mParent!=NULL){
+		updateWorldTransform();
+
 		mParent->nodeAttached(this);
 	}
 }
