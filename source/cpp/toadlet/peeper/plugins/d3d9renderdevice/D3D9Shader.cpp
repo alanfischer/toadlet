@@ -147,7 +147,7 @@ bool D3D9Shader::reflect(){
 		return false;
 	}
 
-	VariableBufferFormat::ptr primaryFormat(new VariableBufferFormat(true,(char*)NULL,0,tableDesc.Constants));
+	VariableBufferFormat::ptr primaryFormat=new VariableBufferFormat(true,(char*)NULL,0,tableDesc.Constants);
 
 	int dataSize=0;
 	int i;
