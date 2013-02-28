@@ -260,7 +260,7 @@ bool GLSLShaderState::reflect(){
 				glGetActiveUniformBlockiv(mHandle,i,GL_UNIFORM_BLOCK_DATA_SIZE,&dataSize);
 				glGetActiveUniformBlockiv(mHandle,i,GL_UNIFORM_BLOCK_ACTIVE_UNIFORMS,&numUniforms);
 
-				VariableBufferFormat::ptr variableFormat(new VariableBufferFormat(false,name,dataSize,numUniforms));
+				VariableBufferFormat::ptr variableFormat=new VariableBufferFormat(false,name,dataSize,numUniforms);
 
 				GLint *indexes=new GLint[numUniforms];
 				glGetActiveUniformBlockiv(mHandle,i,GL_UNIFORM_BLOCK_ACTIVE_UNIFORM_INDICES,indexes);
@@ -297,7 +297,7 @@ bool GLSLShaderState::reflect(){
 		}
 	}
 
-	VariableBufferFormat::ptr primaryFormat(new VariableBufferFormat(true,(char*)NULL,dataSize,primaryVariables.size()));
+	VariableBufferFormat::ptr primaryFormat=new VariableBufferFormat(true,(char*)NULL,dataSize,primaryVariables.size());
 	for(i=0;i<primaryFormat->getStructSize();++i){
 		primaryFormat->setStructVariable(i,primaryVariables[i]);
 	}

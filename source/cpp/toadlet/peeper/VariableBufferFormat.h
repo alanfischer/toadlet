@@ -33,9 +33,9 @@
 namespace toadlet{
 namespace peeper{
 
-class TOADLET_API VariableBufferFormat{
+class TOADLET_API VariableBufferFormat:public Object{
 public:
-	TOADLET_SPTR(VariableBufferFormat);
+	TOADLET_OBJECT(VariableBufferFormat);
 
 	enum Format{
 		Format_UNKNOWN=				0,

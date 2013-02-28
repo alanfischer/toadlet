@@ -279,7 +279,7 @@ bool D3D10Shader::reflect(){
 		if(primary){
 			numVariables+=numResources;
 		}
-		VariableBufferFormat::ptr format(new VariableBufferFormat(primary,bufferDesc.Name,bufferDesc.Size,numVariables));
+		VariableBufferFormat::ptr format=new VariableBufferFormat(primary,bufferDesc.Name,bufferDesc.Size,numVariables);
 		if(primary){
 			primaryFormat=format;
 		}
@@ -305,7 +305,7 @@ bool D3D10Shader::reflect(){
 	}
 
 	if(primaryFormat==NULL && desc.BoundResources>0){
-		primaryFormat=VariableBufferFormat::ptr(new VariableBufferFormat(true,"$Globals",0,desc.BoundResources));
+		primaryFormat=new VariableBufferFormat(true,"$Globals",0,desc.BoundResources);
 		mVariableBufferFormats.add(primaryFormat);
 	}
 
