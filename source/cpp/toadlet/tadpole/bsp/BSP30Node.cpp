@@ -407,7 +407,7 @@ void BSP30Node::render(RenderManager *manager) const{
 }
 
 void BSP30Node::childTransformUpdated(Node *child){
-	if(mMap==NULL){
+	if(mMap==NULL || child->getParentData()==NULL){
 		return;
 	}
 
@@ -464,10 +464,12 @@ void BSP30Node::addLeafToVisible(bleaf *leaf,const Vector3 &cameraPosition){
 }
 
 void BSP30Node::findBoundLeafs(egg::Collection<int> &leafs,Node *node){
-	const AABox &box=node->getWorldBound()->getAABox();
+	Bound *bound=node->getWorldBound();
+
+	const AABox &box=bound->getAABox();
 	// If the radius is infinite or greater than our threshold, assume its global
 	scalar threshold=512;
-	if(box.maxs.x-box.mins.x>=threshold || box.maxs.y-box.mins.y>=threshold || box.maxs.z-box.mins.z>=threshold){
+	if(bound->getType()==Bound::Type_INFINITE || box.maxs.x-box.mins.x>=threshold || box.maxs.y-box.mins.y>=threshold || box.maxs.z-box.mins.z>=threshold){
 		leafs.add(-1);
 	}
 	else{

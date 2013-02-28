@@ -107,7 +107,7 @@ bool D3D9Texture::createContext(bool restore){
 	#if !defined(TOADLET_SET_D3DM)
 		if(mManuallyGenerateMipLevels && mDevice->isD3DFORMATValid(mD3DFormat,D3DUSAGE_AUTOGENMIPMAP)){
 			mD3DUsage|=D3DUSAGE_AUTOGENMIPMAP;
-			mManuallyGenerateMipLevels=false;
+			// Leave mManuallyGenerateMipLevels on so it will trigger mipmap generation upon resource loading
 		}
 	#endif
 
