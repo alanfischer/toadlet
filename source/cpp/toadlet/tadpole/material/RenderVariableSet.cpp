@@ -47,61 +47,6 @@ void RenderVariableSet::destroy(){
 	mBuffers.clear();
 }
 
-bool RenderVariableSet::addTexture(const String &name,Texture *texture,const String &samplerName,const SamplerState &samplerState,const TextureState &textureState){
-	Shader::ShaderType type;
-	VariableBufferFormat::Variable *formatVariable=findResourceVariable(name,type);
-	if(formatVariable==NULL){
-		// If not found, then search for the d3d9 style appended name
-		formatVariable=findResourceVariable(samplerName+"+"+name,type);
-	}
-	if(formatVariable!=NULL){
-		if((formatVariable->getFormat()&VariableBufferFormat::Format_MASK_TYPES)!=VariableBufferFormat::Format_TYPE_RESOURCE){
-			Log::warning(Categories::TOADLET_TADPOLE,
-				String("RenderVariable:")+name+" format does not match format:"+formatVariable->getFormat()+"!="+(int)VariableBufferFormat::Format_TYPE_RESOURCE);
-			return false;
-		}
-
-		mRenderPass->setTextureLocationName(type,formatVariable->getResourceIndex(),name);
-
-		/// @todo: Set the sampler by name also
-		mRenderPass->setTexture(type,formatVariable->getResourceIndex(),texture,samplerState,textureState);
-	}
-	else{
-		if(mBuffers.size()>0){
-			Log::warning(Categories::TOADLET_TADPOLE,
-				"RenderVariable not found with name:"+name);
-			return false;
-		}
-
-		int i;
-		for(i=0;i<mUnassignedResources.size();++i){
-			if(mUnassignedResources[i].name==name){
-				mUnassignedResources.removeAt(i);
-				break;
-			}
-		}
-
-		mUnassignedResources.add(ResourceInfo(name,texture,samplerName,samplerState,textureState));
-
-		Log::alert("Adding unassigned texture");
-	}
-
-	return true;
-}
-
-bool RenderVariableSet::findTexture(const String &name,Shader::ShaderType &type,int &index){
-	VariableBufferFormat::Variable *formatVariable=findResourceVariable(name,type);
-	if(formatVariable!=NULL){
-		index=formatVariable->getResourceIndex();
-		return true;
-	}
-	else{
-		type=(Shader::ShaderType)0;
-		index=0;
-		return false;
-	}
-}
-
 // Search for the correct buffer and correct index
 bool RenderVariableSet::addVariable(const String &name,RenderVariable::ptr variable,int scope){
 	BufferInfo *bufferInfo=NULL;
@@ -227,31 +172,13 @@ VariableBufferFormat::Variable *RenderVariableSet::findFormatVariable(const Stri
 	return formatVariable;	
 }
 
-VariableBufferFormat::Variable *RenderVariableSet::findResourceVariable(const String &name,Shader::ShaderType &type){
-	VariableBufferFormat::Variable *formatVariable=NULL;
-	int i,j,k;
-	for(j=0;j<Shader::ShaderType_MAX;++j){
-		for(i=0;i<mShaderState->getNumVariableBuffers((Shader::ShaderType)j);++i){
-			VariableBufferFormat::ptr format=mShaderState->getVariableBufferFormat((Shader::ShaderType)j,i);
-			for(k=0;k<format->getSize();++k){
-				if(name.equals(format->getVariable(k)->getFullName())){
-					formatVariable=format->getVariable(k);
-					type=(Shader::ShaderType)j;
-					return formatVariable;
-				}
-			}
-		}
-	}
-	return NULL;
-}
-
 void RenderVariableSet::buildBuffers(BufferManager *manager,RenderPass *pass){
 	int i,j;
-	Collection<VariableInfo> variables=mUnassignedVariables;
-	mUnassignedVariables.clear();
+//	Collection<VariableInfo> variables=mUnassignedVariables;
+//	mUnassignedVariables.clear();
 
-	Collection<ResourceInfo> resources=mUnassignedResources;
-	mUnassignedResources.clear();
+//	Collection<ResourceInfo> resources=mUnassignedResources;
+//	mUnassignedResources.clear();
 
 	mRenderPass=pass;
 	mRenderState=pass->getRenderState();
@@ -259,9 +186,9 @@ void RenderVariableSet::buildBuffers(BufferManager *manager,RenderPass *pass){
 
 	while(mBuffers.size()>0){
 		BufferInfo *buffer=&mBuffers[0];
-		for(j=0;j<buffer->variables.size();++j){
-			variables.add(buffer->variables[j]);
-		}
+//		for(j=0;j<buffer->variables.size();++j){
+//			variables.add(buffer->variables[j]);
+//		}
 		mBuffers.removeAt(0);
 	}
 
@@ -280,13 +207,13 @@ void RenderVariableSet::buildBuffers(BufferManager *manager,RenderPass *pass){
 		}
 	}
 
-	for(i=0;i<variables.size();++i){
-		addVariable(variables[i].name,variables[i].variable,variables[i].scope);
-	}
+//	for(i=0;i<variables.size();++i){
+//		addVariable(variables[i].name,variables[i].variable,variables[i].scope);
+//	}
 
-	for(i=0;i<resources.size();++i){
-		addTexture(resources[i].name,resources[i].texture,resources[i].samplerName,resources[i].samplerState,resources[i].textureState);
-	}
+//	for(i=0;i<resources.size();++i){
+//		addTexture(resources[i].name,resources[i].texture,resources[i].samplerName,resources[i].samplerState,resources[i].textureState);
+//	}
 }
 
 void RenderVariableSet::update(int scope,SceneParameters *parameters){

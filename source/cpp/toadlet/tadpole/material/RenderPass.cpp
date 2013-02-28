@@ -58,6 +58,8 @@ RenderPass::RenderPass(MaterialManager *manager,RenderState *renderState,ShaderS
 
 	if(shaderState!=NULL){
 		mShaderState=shaderState;
+
+		populateLocationNames();
 	}
 }
 
@@ -85,18 +87,10 @@ void RenderPass::destroy(){
 }
 
 void RenderPass::setTexture(const String &name,Texture *texture,const String &samplerName,const SamplerState &samplerState,const TextureState &textureState){
-	if(mVariables!=NULL){
-		mVariables->addTexture(name,texture,samplerName,samplerState,textureState);
-	}
-	else{
-		int i,j;
-		for(j=0;j<Shader::ShaderType_MAX;++j){
-			for(i=0;i<mTextureLocationNames[j].size();++i){
-				if(mTextureLocationNames[j][i]==name){
-					setTexture((Shader::ShaderType)j,i,texture,samplerState,textureState);
-				}
-			}
-		}
+	Shader::ShaderType type;
+	int index;
+	if(findTexture(type,index,name,samplerName)){
+		setTexture(type,index,texture,samplerState,textureState);
 	}
 }
 
@@ -114,6 +108,23 @@ void RenderPass::setTexture(Shader::ShaderType type,int i,Texture *texture,const
 	mRenderState->setTextureState(type,i,textureState);
 }
 
+bool RenderPass::findTexture(Shader::ShaderType &type,int &index,const String &name,const String &samplerName){
+	String combinedName=samplerName+"+"+name;
+
+	int i,j;
+	for(j=0;j<Shader::ShaderType_MAX;++j){
+		for(i=0;i<mTextureLocationNames[j].size();++i){
+			const String locationName=mTextureLocationNames[j][i];
+			if(locationName==name || locationName==combinedName){
+				type=(Shader::ShaderType)j;
+				index=i;
+				return true;
+			}
+		}
+	}
+	return false;
+}
+
 void RenderPass::setShader(Shader::ShaderType type,Shader *shader){
 	if(mShaderState==NULL){
 		if(mManager!=NULL){
@@ -126,6 +137,8 @@ void RenderPass::setShader(Shader::ShaderType type,Shader *shader){
 	}
 	
 	mShaderState->setShader(type,shader);
+
+	populateLocationNames();
 
 	if(mVariables!=NULL){
 		mVariables->buildBuffers(mManager->getBufferManager(),this);
@@ -154,23 +167,11 @@ void RenderPass::setTextureLocationName(Shader::ShaderType type,int i,const Stri
 	mTextureLocationNames[type][i]=name;
 }
 
-bool RenderPass::findTexture(const String &name,Shader::ShaderType &type,int &index){
-	if(mVariables!=NULL){
-		return mVariables->findTexture(name,type,index);
+void RenderPass::setBufferLocationName(Shader::ShaderType type,int i,const String &name){
+	if(i>=mBufferLocationNames[type].size()){
+		mBufferLocationNames[type].resize(i+1);
 	}
-	else{
-		int i,j;
-		for(j=0;j<Shader::ShaderType_MAX;++j){
-			for(i=0;i<mTextureLocationNames[j].size();++i){
-				if(mTextureLocationNames[j][i]==name){
-					type=(Shader::ShaderType)j;
-					index=i;
-					return true;
-				}
-			}
-		}
-		return false;
-	}
+	mBufferLocationNames[type][i]=name;
 }
 
 bool RenderPass::isDepthSorted() const{
@@ -179,8 +180,33 @@ bool RenderPass::isDepthSorted() const{
 }
 
 void RenderPass::compile(){
-	if(mVariables!=NULL){
-		mVariables->buildBuffers(mManager->getBufferManager(),this);
+//	if(mVariables!=NULL){
+//		mVariables->buildBuffers(mManager->getBufferManager(),this);
+//	}
+}
+
+void RenderPass::populateLocationNames(){
+	if(mShaderState==NULL){
+		return;
+	}
+
+	int i,j,k;
+	for(j=0;j<Shader::ShaderType_MAX;++j){
+		mBufferLocationNames[j].clear();
+		mTextureLocationNames[j].clear();
+
+		for(i=0;i<mShaderState->getNumVariableBuffers((Shader::ShaderType)j);++i){
+			VariableBufferFormat::ptr format=mShaderState->getVariableBufferFormat((Shader::ShaderType)j,i);
+
+			setBufferLocationName((Shader::ShaderType)j,i,format->getName());
+
+			for(k=0;k<format->getSize();++k){
+				VariableBufferFormat::Variable *variable=format->getVariable(k);
+				if((variable->getFormat()&VariableBufferFormat::Format_TYPE_RESOURCE)!=0){
+					setTextureLocationName((Shader::ShaderType)j,variable->getResourceIndex(),variable->getName());
+				}
+			}
+		}
 	}
 }
 

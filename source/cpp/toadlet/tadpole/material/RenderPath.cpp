@@ -55,16 +55,6 @@ RenderPass *RenderPath::addPass(RenderPass *pass){
 	return pass;
 }
 
-RenderPass *RenderPath::findTexture(const String &name,Shader::ShaderType &type,int &index){
-	int i;
-	for(i=0;i<mPasses.size();++i){
-		if(mPasses[i]->findTexture(name,type,index)){
-			return mPasses[i];
-		}
-	}
-	return NULL;
-}
-
 bool RenderPath::isDepthSorted() const{
 	if(mPasses.size()>0 && mPasses[0]->isDepthSorted()){
 		return true;

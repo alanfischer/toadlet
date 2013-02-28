@@ -296,7 +296,7 @@ void Clouds::setLightDirection(const Vector3 &lightDir){
 
 	Shader::ShaderType type;
 	int index;
-	bool hasBump=mMaterial->getPass()->findTexture("bumpTexture",type,index);
+	bool hasBump=mMaterial->getPass()->findTexture(type,index,"bumpTexture");
 
 	Vector3 pos,dir;
 	int i;
@@ -341,7 +341,8 @@ void Clouds::postContextActivate(RenderDevice *renderDevice){
 }
 
 void Clouds::setTextureMatrix(const String &name,Material *material,const Matrix4x4 &matrix){
-	Shader::ShaderType type;
+return; /// @TODO
+/*	Shader::ShaderType type;
 	int index;
 	RenderPass *pass=material->getBestPath()->findTexture(name,type,index);
 	if(pass!=NULL){
@@ -349,7 +350,7 @@ void Clouds::setTextureMatrix(const String &name,Material *material,const Matrix
 		pass->getTextureState(type,index,state);
 		state.matrix.set(matrix);
 		pass->setTextureState(type,index,state);
-	}
+	}*/
 }
 
 void Clouds::createCloud(TextureFormat *format,tbyte *data,int scale,int seed,float cover,float sharpness,float brightness){

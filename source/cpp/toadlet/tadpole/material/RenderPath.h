@@ -49,8 +49,6 @@ public:
 	RenderPass *addPass(RenderState *renderState=NULL,ShaderState *shaderState=NULL);
 	RenderPass *addPass(RenderPass *pass);
 
-	RenderPass *findTexture(const String &name,Shader::ShaderType &type,int &index);
-
 	bool isDepthSorted() const;
 
 	void compile();

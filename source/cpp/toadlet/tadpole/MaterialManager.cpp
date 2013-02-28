@@ -107,9 +107,6 @@ Material::ptr MaterialManager::createSharedMaterial(Material::ptr source,RenderS
 				for(k=0;k<srcVars->getNumVariables();++k){
 					dstVars->addVariable(srcVars->getVariableName(k),srcVars->getVariable(k),srcVars->getVariableScope(k));
 				}
-				for(k=0;k<srcVars->getNumTextures();++k){
-					dstVars->addTexture(srcVars->getTextureName(k),srcVars->getTexture(k),srcVars->getTextureSamplerName(k),srcVars->getTextureSamplerState(k),srcVars->getTextureTextureState(k));
-				}
 			}
 		}
 	}

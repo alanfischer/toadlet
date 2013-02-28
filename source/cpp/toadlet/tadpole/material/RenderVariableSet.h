@@ -55,16 +55,6 @@ public:
 	inline Shader::ShaderType getBufferShaderType(int i){return mBuffers[i].shaderType;}
 	inline int getBufferIndex(int i){return mBuffers[i].index;}
 
-	/// @todo: The getNumTextures through getTextureTextureState only work for unassigned resources, currently used by Material duplication
-	bool addTexture(const String &name,Texture *texture,const String &samplerName,const SamplerState &samplerState,const TextureState &textureState);
-	bool findTexture(const String &name,Shader::ShaderType &type,int &index);
-	int getNumTextures(){return getNumResourceInfos();}
-	Texture::ptr getTexture(int i){return getResourceInfo(i)->texture;}
-	const String &getTextureName(int i){return getResourceInfo(i)->name;}
-	const String &getTextureSamplerName(int i){return getResourceInfo(i)->samplerName;}
-	SamplerState getTextureSamplerState(int i){return getResourceInfo(i)->samplerState;}
-	TextureState getTextureTextureState(int i){return getResourceInfo(i)->textureState;}
-
 	bool addVariable(const String &name,RenderVariable::ptr variable,int scope);
 	void removeVariable(RenderVariable::ptr variable);
 	RenderVariable::ptr findVariable(const String &name);
@@ -160,7 +150,6 @@ protected:
 	}
 
 	VariableBufferFormat::Variable *findFormatVariable(const String &name,BufferInfo *&buffer);
-	VariableBufferFormat::Variable *findResourceVariable(const String &name,Shader::ShaderType &type);
 
 	Collection<BufferInfo> mBuffers;
 	Collection<VariableInfo> mUnassignedVariables;
