@@ -28,6 +28,7 @@
 
 #include <toadlet/tadpole/ResourceCreator.h>
 #include <toadlet/tadpole/material/Material.h>
+#include <toadlet/tadpole/Engine.h>
 #include <toadlet/tadpole/Colors.h>
 
 namespace toadlet{

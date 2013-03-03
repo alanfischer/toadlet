@@ -140,7 +140,6 @@ set (TADPOLE_MATERIAL_SRC
 	material/Material.cpp
 	material/RenderPass.cpp
 	material/RenderPath.cpp
-	material/RenderVariableSet.cpp
 )
 
 set (TADPOLE_SENSOR_SRC
@@ -366,7 +365,6 @@ set (TADPOLE_MATERIAL_HDR
 	material/RenderPath.h
 	material/RenderVariable.h
 	material/RenderVariables.h
-	material/RenderVariableSet.h
 	material/SceneParameters.h
 )
 
