@@ -321,12 +321,14 @@ void SimpleRenderManager::setupTextures(RenderPass *pass,int scope,RenderDevice 
 void SimpleRenderManager::setupVariableBuffers(RenderPass *pass,int scope,RenderDevice *device){
 	pass->updateVariables(scope,mParams);
 
-	int i;
-	for(i=0;i<pass->getNumBuffers();++i){
-		int bufferScope=pass->getBufferScope(i);
-		// If the buffer applies to this scope, and it is the highest bit scope in the buffer
-		if((bufferScope&scope)!=0 && (bufferScope&~scope)<=scope){
-			device->setBuffer(pass->getBufferShaderType(i),pass->getBufferIndex(i),pass->getBuffer(i));
+	int i,j;
+	for(j=0;j<Shader::ShaderType_MAX;++j){
+		for(i=0;i<pass->getNumBuffers((Shader::ShaderType)j);++i){
+			int bufferScope=pass->getBufferScope((Shader::ShaderType)j,i);
+			// If the buffer applies to this scope, and it is the highest bit scope in the buffer
+			if((bufferScope&scope)!=0 && (bufferScope&~scope)<=scope){
+				device->setBuffer((Shader::ShaderType)j,i,pass->getBuffer((Shader::ShaderType)j,i));
+			}
 		}
 	}
 }
