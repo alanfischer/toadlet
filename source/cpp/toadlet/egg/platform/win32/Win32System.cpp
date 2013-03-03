@@ -67,7 +67,7 @@ String Win32System::mtimeToString(uint64 time){
 	time=(time*1000+DELTA_EPOC_MICROSECONDS)*10;
 	fileTime=(*(FILETIME*)&time);
 	FileTimeToSystemTime(&fileTime,&systemTime);
-	sprintf(timeString,"%04d-%02d-%02d %02d:%02d:%02d :",systemTime.wYear,systemTime.wMonth,systemTime.wDay,systemTime.wHour,systemTime.wMinute,systemTime.wSecond);
+	sprintf(timeString,"%04d-%02d-%02d %02d:%02d:%02d",systemTime.wYear,systemTime.wMonth,systemTime.wDay,systemTime.wHour,systemTime.wMinute,systemTime.wSecond);
 	return timeString;
 }
 
