@@ -34,36 +34,53 @@ namespace toadlet{
 namespace tadpole{
 namespace material{
 
-RenderPass::RenderPass(MaterialManager *manager,RenderState *renderState,ShaderState *shaderState):
-	mManager(NULL),
-	//mRenderState,
-	//mShaderState,
-	//mTextures,
+RenderPass::RenderPass(MaterialManager *manager):
+	mManager(manager),
 	mModelMatrixFlags(0)
-	//mVariables,
 {
-	mManager=manager;
-
-	if(renderState==NULL){
-		if(manager!=NULL){
-			mRenderState=manager->createRenderState();
-		}
-		else{
-			mRenderState=new BackableRenderState();
-		}
-		mOwnRenderState=mRenderState;
+	if(mManager!=NULL){
+		mRenderState=mManager->createRenderState();
 	}
 	else{
-		mRenderState=renderState;
+		mRenderState=new BackableRenderState();
 	}
-
-	if(shaderState!=NULL){
-		mShaderState=shaderState;
-
-		populateLocationNames();
-		createBuffers();
+	mOwnRenderState=mRenderState;
+	
+	if(mManager!=NULL){
+		mShaderState=mManager->createShaderState();
 	}
+	else{
+		mShaderState=new BackableShaderState();
+	}
+	mOwnShaderState=mShaderState;
 }
+
+RenderPass::RenderPass(MaterialManager *manager,RenderState *renderState,ShaderState *shaderState):
+	mManager(manager),
+	mModelMatrixFlags(0)
+{
+	mRenderState=renderState;
+	mShaderState=shaderState;
+
+	populateLocationNames();
+	createBuffers();
+}
+
+RenderPass::RenderPass(MaterialManager *manager,RenderPass *pass):
+	mManager(manager),
+	mModelMatrixFlags(0)
+{
+	mName=pass->mName;
+	mRenderState=pass->mRenderState;
+	mShaderState=pass->mShaderState;
+	for(int i=0;i<Shader::ShaderType_MAX;++i){
+		mBuffers[i]=pass->mBuffers[i];
+		mTextures[i]=pass->mTextures[i];
+	}
+	mModelMatrixFlags=pass->mModelMatrixFlags;
+	mVariables=pass->mVariables;
+}
+
 
 void RenderPass::destroy(){
 	if(mOwnRenderState!=NULL){
@@ -130,6 +147,24 @@ void RenderPass::setBuffer(Shader::ShaderType type,int i,VariableBuffer *buffer)
 	mBuffers[type][i].buffer=buffer;
 }
 
+void RenderPass::setRenderState(RenderState *renderState){
+	if(mOwnRenderState!=NULL){
+		mOwnRenderState->destroy();
+		mOwnRenderState=NULL;
+	}
+
+	mRenderState=renderState;
+}
+
+void RenderPass::setShaderState(ShaderState *shaderState){
+	if(mOwnShaderState!=NULL){
+		mOwnShaderState->destroy();
+		mOwnShaderState=NULL;
+	}
+
+	mShaderState=shaderState;
+}
+
 void RenderPass::setShader(Shader::ShaderType type,Shader *shader){
 	if(mShaderState==NULL){
 		if(mManager!=NULL){
@@ -144,7 +179,7 @@ void RenderPass::setShader(Shader::ShaderType type,Shader *shader){
 	mShaderState->setShader(type,shader);
 
 	populateLocationNames();
-	createBuffers(); /// @todo: Only do this after all buffers have been added?  or maybe at first variable adding?
+	createBuffers();
 }
 
 void RenderPass::updateVariables(int scope,SceneParameters *parameters){
