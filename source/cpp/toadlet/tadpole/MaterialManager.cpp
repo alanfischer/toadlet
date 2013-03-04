@@ -72,34 +72,15 @@ Material::ptr MaterialManager::createMaterial(){
 Material::ptr MaterialManager::createSharedMaterial(Material::ptr source,RenderState::ptr renderState){
 	Material::ptr material=new Material(this);
 
-	int i,j,k,l;
+	int i,j;
 	for(j=0;j<source->getNumPaths();++j){
 		RenderPath *srcPath=source->getPath(j);
 		RenderPath *dstPath=material->addPath();
 		for(i=0;i<srcPath->getNumPasses();++i){
 			RenderPass *srcPass=srcPath->getPass(i);
-			RenderPass *dstPass=dstPath->addPass(renderState,srcPass->getShaderState());
-
-			for(k=0;k<Shader::ShaderType_MAX;++k){
-				Shader::ShaderType type=(Shader::ShaderType)k;
-				for(l=0;l<srcPass->getNumTextures(type);++l){
-					Texture::ptr texture=srcPass->getTexture(type,l);
-					SamplerState samplerState;
-					TextureState textureState;
-					srcPass->getSamplerState(type,l,samplerState);
-					srcPass->getTextureState(type,l,textureState);
-					dstPass->setTexture(type,l,texture,samplerState,textureState);
-				}
-
-				for(l=0;l<srcPass->getNumTextureLocationNames(type);++l){
-					String name=srcPass->getTextureLocationName(type,l);
-					dstPass->setTextureLocationName(type,l,name);
-				}
-			}
-
-			dstPass->setModelMatrixFlags(srcPass->getModelMatrixFlags());
-
-			Log::alert("NOT COPYING BUFFERS OR VARIABLES");
+			RenderPass *dstPass=new RenderPass(this,srcPass);
+			dstPass->setRenderState(renderState);
+			dstPath->addPass(dstPass);
 		}
 	}
 	

@@ -44,7 +44,9 @@ class TOADLET_API RenderPass:public Object{
 public:
 	TOADLET_OBJECT(RenderPass);
 
-	RenderPass(MaterialManager *manager,RenderState *renderState=NULL,ShaderState *shaderState=NULL);
+	RenderPass(MaterialManager *manager);
+	RenderPass(MaterialManager *manager,RenderState *renderState,ShaderState *shaderState);
+	RenderPass(MaterialManager *manager,RenderPass *pass);
 
 	void destroy();
 
@@ -75,7 +77,10 @@ public:
 	void setTextureState(Shader::ShaderType type,int i,const TextureState &state){mRenderState->setTextureState(type,i,state);}
 	bool getTextureState(Shader::ShaderType type,int i,TextureState &state){return mRenderState->getTextureState(type,i,state);}
 
+	void setRenderState(RenderState *renderState);
 	inline RenderState *getRenderState() const{return mRenderState;}
+
+	void setShaderState(ShaderState *shaderState);
 	inline ShaderState *getShaderState() const{return mShaderState;}
 
 	void setShader(Shader::ShaderType type,Shader *shader);
