@@ -31,17 +31,22 @@ namespace egg{
 
 Exception::Exception(int error){
 	mError=error;
-	strcpy(mDescription,"unknown");
+	mDescription="unknown";
 }
 
 Exception::Exception(const char *description){
 	mError=Errorer::Type_UNKNOWN;
-	strncpy(mDescription,description,128);
+	mDescription=description;
 }
 
 Exception::Exception(int error,const char *description){
 	mError=error;
-	strncpy(mDescription,description,128);
+	mDescription=description;
+}
+
+Exception::Exception(const Exception &ex){
+	mError=ex.mError;
+	mDescription=ex.mDescription;
 }
 
 Exception::~Exception() throw(){
