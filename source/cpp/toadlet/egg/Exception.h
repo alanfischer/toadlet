@@ -45,6 +45,7 @@ public:
 	Exception(int type=0);
 	Exception(const char *description);
 	Exception(int type,const char *description);
+	Exception(const Exception &ex);
 	virtual ~Exception() throw();
 
 	int getError() const throw();
@@ -56,7 +57,7 @@ public:
 
 protected:
 	int mError;
-	char mDescription[128];
+	String mDescription;
 };
 
 }
