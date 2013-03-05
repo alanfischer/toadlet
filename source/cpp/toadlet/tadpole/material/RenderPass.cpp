@@ -306,7 +306,7 @@ void RenderPass::createBuffers(){
 }
 
 VariableBufferFormat::Variable *RenderPass::findFormatVariable(const String &name,Shader::ShaderType &bufferType,int &bufferIndex){
-	int i=0,j=0,p=name.find(".");
+	int i=0,j=0,k=0,p=name.find(".");
 	String fullName=name;
 	VariableBufferFormat::Variable *formatVariable=NULL;
 	bufferIndex=-1;
@@ -339,14 +339,15 @@ VariableBufferFormat::Variable *RenderPass::findFormatVariable(const String &nam
 	else{
 		for(j=0;j<Shader::ShaderType_MAX;++j){
 			for(i=0;i<mBuffers[j].size();++i){
+				VariableBuffer *buffer=mBuffers[j][i].buffer;
 				if(mBuffers[j][i].buffer->getVariableBufferFormat()->getPrimary()){
 					bufferType=(Shader::ShaderType)j;
 					bufferIndex=i;
 
 					VariableBufferFormat *format=mBuffers[j][i].buffer->getVariableBufferFormat();
-					for(j=0;j<format->getSize();++j){
-						if(fullName.equals(format->getVariable(j)->getFullName())){
-							formatVariable=format->getVariable(j);
+					for(k=0;k<format->getSize();++k){
+						if(fullName.equals(format->getVariable(k)->getFullName())){
+							formatVariable=format->getVariable(k);
 							break;
 						}
 					}

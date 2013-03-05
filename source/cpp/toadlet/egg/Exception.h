@@ -38,10 +38,9 @@ namespace egg{
 
 class TOADLET_API Exception
 	#if defined(TOADLET_EXCEPTIONS)
-		:public std::runtime_error
+		:public std::exception
 	#endif
 {
-
 public:
 	Exception(int type=0);
 	Exception(const char *description);
@@ -51,11 +50,13 @@ public:
 	int getError() const throw();
 	const char *getDescription() const throw();
 
+	#if defined(TOADLET_EXCEPTIONS)
+		const char* what() const throw(){return getDescription();}
+	#endif
+
 protected:
 	int mError;
-	#if !defined(TOADLET_EXCEPTIONS)
-		char *mDescription;
-	#endif
+	char mDescription[128];
 };
 
 }

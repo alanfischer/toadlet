@@ -29,54 +29,22 @@
 namespace toadlet{
 namespace egg{
 
-Exception::Exception(int error):
-	#if defined(TOADLET_EXCEPTIONS)
-		std::runtime_error("unknown")
-	#else
-		mDescription(NULL)
-	#endif
-{
+Exception::Exception(int error){
 	mError=error;
+	strcpy(mDescription,"unknown");
 }
 
-Exception::Exception(const char *description):
-	#if defined(TOADLET_EXCEPTIONS)
-		std::runtime_error(description)
-	#else
-		mDescription(NULL)
-	#endif
-{
+Exception::Exception(const char *description){
 	mError=Errorer::Type_UNKNOWN;
-	#if !defined(TOADLET_EXCEPTIONS)
-		if(description!=NULL){
-			mDescription=new char[strlen(description)+1];
-			strcpy(mDescription,description);
-		}
-	#endif
+	strncpy(mDescription,description,128);
 }
 
-Exception::Exception(int error,const char *description):
-	#if defined(TOADLET_EXCEPTIONS)
-		std::runtime_error(description)
-	#else
-		mDescription(NULL)
-	#endif
-{
+Exception::Exception(int error,const char *description){
 	mError=error;
-	#if !defined(TOADLET_EXCEPTIONS)
-		if(description!=NULL){
-			mDescription=new char[strlen(description)+1];
-			strcpy(mDescription,description);
-		}
-	#endif
+	strncpy(mDescription,description,128);
 }
 
 Exception::~Exception() throw(){
-	#if !defined(TOADLET_EXCEPTIONS)
-		if(mDescription!=NULL){
-			delete mDescription;
-		}
-	#endif
 }
 
 int Exception::getError() const throw(){
@@ -84,11 +52,7 @@ int Exception::getError() const throw(){
 }
 
 const char *Exception::getDescription() const throw(){
-	#if defined(TOADLET_EXCEPTIONS)
-		return what();
-	#else
-		return mDescription;
-	#endif
+	return mDescription;
 }
 
 }
