@@ -54,7 +54,7 @@ public:
 	virtual void logicUpdate(int dt,int scope){}
 	virtual void frameUpdate(int dt,int scope){}
 
-	virtual bool getActive() const{return true;}
+	virtual bool getActive() const{return false;}
 	virtual Transform *getTransform() const{return mTransform;}
 	virtual Bound *getBound() const{return mBound;}
 	

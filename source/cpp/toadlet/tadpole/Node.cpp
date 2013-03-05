@@ -24,6 +24,7 @@
  ********** Copyright header - do not remove **********/
 
 #include <toadlet/egg/Error.h>
+#include <toadlet/egg/Profile.h>
 #include <toadlet/tadpole/Engine.h>
 #include <toadlet/tadpole/Scene.h>
 #include <toadlet/tadpole/ActionComponent.h>
@@ -319,6 +320,8 @@ void Node::setBound(Bound *bound){
 }
 
 void Node::logicUpdate(int dt,int scope){
+	TOADLET_PROFILE_AUTOSCOPE();
+
 	int i;
 
 	updateWorldTransform();
@@ -348,6 +351,8 @@ void Node::logicUpdate(int dt,int scope){
 }
 
 void Node::frameUpdate(int dt,int scope){
+	TOADLET_PROFILE_AUTOSCOPE();
+
 	int i;
 
 	updateWorldTransform();

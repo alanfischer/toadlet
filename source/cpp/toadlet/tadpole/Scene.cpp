@@ -204,6 +204,8 @@ void Scene::update(int dt){
 }
 
 void Scene::logicUpdate(int dt,int scope,Node *node){
+	TOADLET_PROFILE_AUTOSCOPE();
+
 	if(node!=NULL){
 		if(mPhysicsManager!=NULL){
 			mPhysicsManager->logicUpdate(dt,scope,node);

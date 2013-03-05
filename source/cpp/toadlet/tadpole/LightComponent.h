@@ -41,10 +41,10 @@ public:
 	inline void setEnabled(bool enabled){mEnabled=enabled;}
 	inline bool getEnabled() const{return mEnabled;}
 
-	inline void setLightState(const LightState &state){mDirection.set(state.direction);mLightState.set(state);}
+	void setLightState(const LightState &state);
 	inline void getLightState(LightState &state){state.set(mLightState);}
 
-	inline void setDirection(const Vector3 &direction){mDirection.set(direction);mLightState.direction.set(direction);}
+	void setDirection(const Vector3 &direction);
 	inline const Vector3 &getDirection(){return mDirection;}
 
 	void parentChanged(Node *node);

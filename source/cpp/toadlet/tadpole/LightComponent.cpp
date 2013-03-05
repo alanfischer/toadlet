@@ -34,7 +34,9 @@ LightComponent::LightComponent():
 	mEnabled(true)
 	//mLightState
 {
-	mBound=new Bound(Bound::Type_INFINITE);
+	mBound=new Bound();
+
+	setLightState(mLightState);
 }
 
 void LightComponent::parentChanged(Node *node){
@@ -47,6 +49,23 @@ void LightComponent::parentChanged(Node *node){
 	if(mParent!=NULL){
 		mParent->lightAttached(this);
 	}
+}
+
+void LightComponent::setLightState(const LightState &state){
+	mDirection.set(state.direction);
+	mLightState.set(state);
+
+	if(state.type==LightState::Type_DIRECTION){
+		mBound->setInfinite();
+	}
+	else{
+		mBound->set(state.radius);
+	}
+}
+
+void LightComponent::setDirection(const Vector3 &direction){
+	mDirection.set(direction);
+	mLightState.direction.set(direction);
 }
 
 void LightComponent::frameUpdate(int dt,int scope){
