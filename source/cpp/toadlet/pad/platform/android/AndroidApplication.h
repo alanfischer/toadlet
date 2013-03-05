@@ -136,7 +136,6 @@ protected:
 	int mWidth,mHeight;
 	int mLastX,mLastY;
 	bool mDifferenceMouse;
-	bool mFixedBackable,mShaderBackable;
 	Mutex mWindowMutex;
 	WaitCondition mWindowCondition;
 	Thread::ptr mThread;
