@@ -98,10 +98,10 @@ void IOSLinearDevice::setSampleTime(int dt){
 }
 
 void IOSLinearDevice::didAccelerate(UIAcceleration *acceleration){
-	mLinearData.type=InputDevice::InputType_LINEAR;
+	mLinearData.type=InputDevice::LINEAR;
 	mLinearData.time=(int)acceleration.timestamp*1000;
-	mLinearData.valid=(1<<InputData::Semantic_LINEAR_ACCELERATION);
-	mLinearData.values[InputData::Semantic_LINEAR_ACCELERATION].set(Math::fromFloat(acceleration.x),Math::fromFloat(acceleration.y),Math::fromFloat(acceleration.z),0);
+	mLinearData.valid=(1<<InputData::LINEAR_ACCELERATION);
+	mLinearData.values[InputData::LINEAR_ACCELERATION].set(Math::fromFloat(acceleration.x),Math::fromFloat(acceleration.y),Math::fromFloat(acceleration.z),0);
 
 	if(mListener!=NULL){
 		mListener->inputDetected(mLinearData);
