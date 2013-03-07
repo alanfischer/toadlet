@@ -2,6 +2,10 @@
 
 %module(directors="1") pad
 
+%include <arrays_java.i>
+%include <../toadlet_egg.i>
+%include <enumtypeunsafe.swg>
+%javaconst(1);
 
 // Peeper accessors
 namespace toadlet{
@@ -21,8 +25,6 @@ using namespace toadlet::peeper;
 using namespace toadlet;
 using namespace toadlet::pad;
 %}
-
-typedef float scalar;
 
 %inline %{
 #include <toadlet/peeper/RenderDevice.h>

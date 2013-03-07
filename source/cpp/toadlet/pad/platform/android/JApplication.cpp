@@ -52,7 +52,7 @@ JApplication::JApplication(JNIEnv *jenv,jobject jobj):
 	mLastAudioDeviceObj(NULL)
 {
 	int i;
-	for(i=0;i<InputDevice::InputType_MAX;++i){
+	for(i=0;i<InputDevice::MAX;++i){
 		mInputDevices[i]=NULL;
 		mLastInputDeviceObjs[i]=NULL;
 	}

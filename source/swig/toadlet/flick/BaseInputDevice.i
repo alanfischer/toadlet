@@ -14,7 +14,7 @@ public:
 	virtual bool create();
 	virtual void destroy();
 
-	virtual int getType();
+	virtual InputType getType();
 	virtual bool start();
 	virtual void update(int dt);
 	virtual void stop();

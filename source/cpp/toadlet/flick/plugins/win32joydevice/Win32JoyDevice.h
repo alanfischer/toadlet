@@ -43,7 +43,7 @@ public:
 	bool create();
 	void destroy();
 
-	InputType getType(){return InputType_JOY;}
+	InputType getType(){return JOY;}
 	bool start();
 	void update(int dt);
 	void stop();

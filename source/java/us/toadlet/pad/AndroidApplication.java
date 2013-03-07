@@ -291,7 +291,7 @@ public abstract class AndroidApplication extends Activity implements Runnable{
 		}
 
 		int i;
-		for(i=0;i<us.toadlet.flick.InputDevice.InputType_MAX;++i){
+		for(i=0;i<us.toadlet.flick.InputDevice.InputType.MAX;++i){
 			if(mInputDevices[i]!=null){
 				mInputDevices[i].destroy();
 				mInputDevices[i]=null;
@@ -638,7 +638,7 @@ public abstract class AndroidApplication extends Activity implements Runnable{
 	protected RenderTarget mRenderTarget;
 	protected RenderDevice mRenderDevice;
 	protected AudioDevice mAudioDevice;
-	protected us.toadlet.flick.InputDevice[] mInputDevices=new us.toadlet.flick.InputDevice[us.toadlet.flick.InputDevice.InputType_MAX];
+	protected us.toadlet.flick.InputDevice[] mInputDevices=new us.toadlet.flick.InputDevice[us.toadlet.flick.InputDevice.InputType.MAX];
 	
 	protected SurfaceHolder mSurfaceHolder;
 	protected SurfaceHolder mNotifySurfaceCreated;
