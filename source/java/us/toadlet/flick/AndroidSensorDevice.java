@@ -80,25 +80,25 @@ public class AndroidSensorDevice extends BaseInputDevice implements SensorEventL
 		
 		/// @todo: Change InputData so setValid does not need to be called if setValue is called
 		switch(mInputType){
-			case InputType_MOTION:
-				mData.setValid(1<<InputData.Semantic_MOTION_ACCELERATION);
-				mData.setValue(InputData.Semantic_MOTION_ACCELERATION,mValues);
+			case InputType.LINEAR:
+				mData.setValid(1<<InputData.Semantic.LINEAR_ACCELERATION);
+				mData.setValue(InputData.Semantic.LINEAR_ACCELERATION,mValues);
 			break;
-			case InputType_ANGULAR:
-				mData.setValid(1<<InputData.Semantic_ANGULAR);
-				mData.setValue(InputData.Semantic_ANGULAR,mValues);
+			case InputType.ANGULAR:
+				mData.setValid(1<<InputData.Semantic.ANGULAR);
+				mData.setValue(InputData.Semantic.ANGULAR,mValues);
 			break;
-			case InputType_LIGHT:
-				mData.setValid(1<<InputData.Semantic_LIGHT);
-				mData.setValue(InputData.Semantic_LIGHT,mValues);
+			case InputType.LIGHT:
+				mData.setValid(1<<InputData.Semantic.LIGHT);
+				mData.setValue(InputData.Semantic.LIGHT,mValues);
 			break;
-			case InputType_PROXIMITY:
-				mData.setValid(1<<InputData.Semantic_PROXIMITY);
-				mData.setValue(InputData.Semantic_PROXIMITY,mValues);
+			case InputType.PROXIMITY:
+				mData.setValid(1<<InputData.Semantic.PROXIMITY);
+				mData.setValue(InputData.Semantic.PROXIMITY,mValues);
 			break;
-			case InputType_MAGNETIC:
-				mData.setValid(1<<InputData.Semantic_MAGNETIC);
-				mData.setValue(InputData.Semantic_MAGNETIC,mValues);
+			case InputType.MAGNETIC:
+				mData.setValid(1<<InputData.Semantic.MAGNETIC);
+				mData.setValue(InputData.Semantic.MAGNETIC,mValues);
 			break;
 		}
 
@@ -110,17 +110,17 @@ public class AndroidSensorDevice extends BaseInputDevice implements SensorEventL
 	public static int getInputTypeFromSensorType(int sensorType){
 		switch(sensorType){
 			case Sensor.TYPE_ACCELEROMETER:
-				return InputType_MOTION;
+				return InputType.LINEAR;
 			case Sensor.TYPE_GYROSCOPE:
-				return InputType_ANGULAR;
+				return InputType.ANGULAR;
 			case Sensor.TYPE_LIGHT:
-				return InputType_LIGHT;
+				return InputType.LIGHT;
 			case Sensor.TYPE_PROXIMITY:
-				return InputType_PROXIMITY;
+				return InputType.PROXIMITY;
 			case Sensor.TYPE_MAGNETIC_FIELD:
-				return InputType_MAGNETIC;
+				return InputType.MAGNETIC;
 			default:
-				return InputType_MAX;
+				return InputType.MAX;
 		}
 	}
 

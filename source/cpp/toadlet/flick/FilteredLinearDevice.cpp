@@ -32,7 +32,7 @@ FilteredLinearDevice::FilteredLinearDevice():
 	mListener(NULL),
 	mDevice(NULL),
 	mAlpha(Math::fromMilli(667)),
-	mLinearData(InputType_LINEAR,0,InputData::Semantic_MAX_LINEAR)
+	mLinearData(LINEAR,0,InputData::MAX_LINEAR)
 {
 }
 
@@ -100,19 +100,19 @@ void FilteredLinearDevice::setSampleTime(int dt){
 }
 
 void FilteredLinearDevice::inputDetected(const InputData &data){
-	Vector4 lastAcceleration=mLinearData.values[InputData::Semantic_LINEAR_ACCELERATION];
-	Vector4 lastVelocity=mLinearData.values[InputData::Semantic_LINEAR_VELOCITY];
+	Vector4 lastAcceleration=mLinearData.values[InputData::LINEAR_ACCELERATION];
+	Vector4 lastVelocity=mLinearData.values[InputData::LINEAR_VELOCITY];
 	Vector4 lastRawVelocity=mRawVelocity;
-	Vector4 newAcceleration=data.values[InputData::Semantic_LINEAR_ACCELERATION];
-	Vector4 newVelocity=data.values[InputData::Semantic_LINEAR_VELOCITY];
+	Vector4 newAcceleration=data.values[InputData::LINEAR_ACCELERATION];
+	Vector4 newVelocity=data.values[InputData::LINEAR_VELOCITY];
 	Vector4 vector;
 
 	mLinearData.valid=data.valid;
-	mLinearData.values[InputData::Semantic_LINEAR_ACCELERATION].set(newAcceleration);
+	mLinearData.values[InputData::LINEAR_ACCELERATION].set(newAcceleration);
 
 	if(mLinearData.time==0){
 		mLinearData.time=data.time;
-		mLinearData.values[InputData::Semantic_LINEAR_VELOCITY].reset();
+		mLinearData.values[InputData::LINEAR_VELOCITY].reset();
 		mRawVelocity.reset();
 	}
 	else{
@@ -129,7 +129,7 @@ void FilteredLinearDevice::inputDetected(const InputData &data){
 		Math::mul(newVelocity,vector,mAlpha);
 
 		mLinearData.time=data.time;
-		mLinearData.values[InputData::Semantic_LINEAR_VELOCITY].set(newVelocity);
+		mLinearData.values[InputData::LINEAR_VELOCITY].set(newVelocity);
 		
 		if(mListener!=NULL){
 			mListener->inputDetected(mLinearData);

@@ -3,6 +3,9 @@
 %module(directors="1") ribbit
 
 %include <arrays_java.i>
+%include <../toadlet_egg.i>
+%include <enumtypeunsafe.swg>
+%javaconst(1);
 
 %include <toadlet/ribbit/AudioFormat.i>
 %include <toadlet/ribbit/AudioStream.i>
@@ -16,7 +19,3 @@
 using namespace toadlet;
 using namespace toadlet::ribbit;
 %}
-
-typedef float scalar;
-typedef long long uint64;
-typedef signed char tbyte;

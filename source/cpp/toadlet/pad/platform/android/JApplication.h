@@ -94,8 +94,8 @@ protected:
 	mutable jobject mLastRenderDeviceObj;
 	mutable AudioDevice *mAudioDevice;
 	mutable jobject mLastAudioDeviceObj;
-	mutable InputDevice *mInputDevices[InputDevice::InputType_MAX];
-	mutable jobject mLastInputDeviceObjs[InputDevice::InputType_MAX];
+	mutable InputDevice *mInputDevices[InputDevice::MAX];
+	mutable jobject mLastInputDeviceObjs[InputDevice::MAX];
 };
 
 }

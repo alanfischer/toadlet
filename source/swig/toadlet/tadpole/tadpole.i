@@ -3,51 +3,9 @@
 %module(directors="1") tadpole
 
 %include <arrays_java.i>
-
-// String
-%naturalvar String;
-
-class String;
-
-%typemap(jni) String "jstring"
-%typemap(jtype) String "String"
-%typemap(jstype) String "String"
-%typemap(javadirectorin) String "$jniinput"
-%typemap(javadirectorout) String "$javacall"
-
-%typemap(in) String 
-%{ if(!$input) {
-     SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException, "null String");
-     return $null;
-    } 
-    const char *$1_pstr = (const char *)jenv->GetStringUTFChars($input, 0); 
-    if (!$1_pstr) return $null;
-    $1=$1_pstr;
-    jenv->ReleaseStringUTFChars($input, $1_pstr); %}
-
-%typemap(directorout) String 
-%{ if(!$input) {
-     SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException, "null String");
-     return $null;
-   } 
-   const char *$1_pstr = (const char *)jenv->GetStringUTFChars($input, 0); 
-   if (!$1_pstr) return $null;
-   $result=$1_pstr;
-   jenv->ReleaseStringUTFChars($input, $1_pstr); %}
-
-%typemap(directorin,descriptor="Ljava/lang/String;") String
-%{ $input = jenv->NewStringUTF($1.c_str()); %}
-
-%typemap(out) String
-%{ $result = jenv->NewStringUTF($1.c_str()); %}
-
-%typemap(javain) String "$javainput"
-
-%typemap(javaout) String {
-    return $jnicall;
-  }
-
-%typemap(typecheck) String = char *;
+%include <../toadlet_egg.i>
+%include <enumtypeunsafe.swg>
+%javaconst(1);
 
 // Shared pragmas
 %pragma(java) jniclassimports=%{
@@ -123,8 +81,6 @@ using namespace toadlet::tadpole;
 using namespace toadlet::tadpole::animation;
 using namespace toadlet::tadpole::node;
 %}
-
-typedef float scalar;
 
 %newobject createColorTrack;
 %inline %{

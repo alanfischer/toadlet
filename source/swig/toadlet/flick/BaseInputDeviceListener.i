@@ -2,8 +2,6 @@
 #include <toadlet/flick/InputDeviceListener.h>
 %}
 
-%javaconst(1);
-
 namespace toadlet{
 namespace flick{
 
