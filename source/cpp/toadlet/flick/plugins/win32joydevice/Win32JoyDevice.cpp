@@ -46,7 +46,7 @@ Win32JoyDevice::Win32JoyDevice():
 	mRunning(false),
 	mListener(NULL),
 	mJoyID(0),
-	mJoyData(JOY,0,InputData::MAX_JOY)
+	mJoyData(InputType_JOY,0,InputData::Semantic_MAX_JOY)
 {
 	memset(&mJoyInfo,0,sizeof(JOYINFOEX));
 	memset(&mLastJoyInfo,0,sizeof(JOYINFOEX));
@@ -99,9 +99,9 @@ void Win32JoyDevice::update(int dt){
 		if(	joyInfo->dwXpos!=lastJoyInfo->dwXpos || joyInfo->dwYpos!=lastJoyInfo->dwYpos || joyInfo->dwZpos!=lastJoyInfo->dwZpos ||
 			joyInfo->dwRpos!=lastJoyInfo->dwRpos || joyInfo->dwUpos!=lastJoyInfo->dwUpos || joyInfo->dwVpos!=lastJoyInfo->dwVpos){
 			if(mListener!=NULL){
-				mJoyData.valid=(1<<InputData::JOY_DIRECTION) | (1<<InputData::JOY_ROTATION);
-				mJoyData.values[InputData::JOY_DIRECTION].set(joyToScalar(joyInfo->dwXpos),joyToScalar(joyInfo->dwYpos),joyToScalar(joyInfo->dwZpos),0);
-				mJoyData.values[InputData::JOY_ROTATION].set(joyToScalar(joyInfo->dwUpos),joyToScalar(joyInfo->dwVpos),joyToScalar(joyInfo->dwRpos),0);
+				mJoyData.valid=(1<<InputData::Semantic_JOY_DIRECTION) | (1<<InputData::Semantic_JOY_ROTATION);
+				mJoyData.values[InputData::Semantic_JOY_DIRECTION].set(joyToScalar(joyInfo->dwXpos),joyToScalar(joyInfo->dwYpos),joyToScalar(joyInfo->dwZpos),0);
+				mJoyData.values[InputData::Semantic_JOY_ROTATION].set(joyToScalar(joyInfo->dwUpos),joyToScalar(joyInfo->dwVpos),joyToScalar(joyInfo->dwRpos),0);
 				mListener->inputDetected(mJoyData);
 			}
 		}
@@ -112,15 +112,15 @@ void Win32JoyDevice::update(int dt){
 			while(pressedButtons>0 || releasedButtons>0){
 				if((pressedButtons&1)>0){
 					if(mListener!=NULL){
-						mJoyData.valid=(1<<InputData::JOY_BUTTON_PRESSED);
-						mJoyData.values[InputData::JOY_BUTTON_PRESSED].set(button,0,0,0);
+						mJoyData.valid=(1<<InputData::Semantic_JOY_BUTTON_PRESSED);
+						mJoyData.values[InputData::Semantic_JOY_BUTTON_PRESSED].set(button,0,0,0);
 						mListener->inputDetected(mJoyData);
 					}
 				}
 				if((releasedButtons&1)>0){
 					if(mListener!=NULL){
-						mJoyData.valid=(1<<InputData::JOY_BUTTON_RELEASED);
-						mJoyData.values[InputData::JOY_BUTTON_RELEASED].set(button,0,0,0);
+						mJoyData.valid=(1<<InputData::Semantic_JOY_BUTTON_RELEASED);
+						mJoyData.values[InputData::Semantic_JOY_BUTTON_RELEASED].set(button,0,0,0);
 						mListener->inputDetected(mJoyData);
 					}
 				}

@@ -101,7 +101,7 @@ BaseApplication::BaseApplication():
 		mFormat->setDebug(false);
 	#endif
 
-	mInputDevices.resize(InputDevice::MAX,NULL);
+	mInputDevices.resize(InputDevice::InputType_MAX,NULL);
 }
 
 bool BaseApplication::create(String renderDevice,String audioDevice){

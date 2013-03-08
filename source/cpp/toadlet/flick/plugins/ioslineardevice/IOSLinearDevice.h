@@ -61,7 +61,7 @@ public:
 	bool create();
 	void destroy();
 
-	InputDevice::InputType getType(){return InputDevice::LINEAR;}
+	InputDevice::InputType getType(){return InputDevice::InputType_LINEAR;}
 	bool start();
 	void update(int dt){}
 	void stop();
