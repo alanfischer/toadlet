@@ -39,13 +39,13 @@ public:
 	TOADLET_INTERFACE(InputDevice);
 
 	enum InputType{
-		JOY=0,
-		LINEAR,
-		ANGULAR,
-		LIGHT,
-		PROXIMITY,
-		MAGNETIC,
-		MAX,
+		InputType_JOY=0,
+		InputType_LINEAR,
+		InputType_ANGULAR,
+		InputType_LIGHT,
+		InputType_PROXIMITY,
+		InputType_MAGNETIC,
+		InputType_MAX,
 	};
 
 	virtual ~InputDevice(){}

@@ -35,27 +35,27 @@ namespace flick{
 class InputData{
 public:	
 	enum Semantic{
-		JOY_BUTTON_PRESSED=0,
-		JOY_BUTTON_RELEASED,
-		JOY_DIRECTION,
-		JOY_ROTATION,
-		MAX_JOY,
+		Semantic_JOY_BUTTON_PRESSED=0,
+		Semantic_JOY_BUTTON_RELEASED,
+		Semantic_JOY_DIRECTION,
+		Semantic_JOY_ROTATION,
+		Semantic_MAX_JOY,
 
-		LINEAR_ACCELERATION=0,
-		LINEAR_VELOCITY,
-		MAX_LINEAR,
+		Semantic_LINEAR_ACCELERATION=0,
+		Semantic_LINEAR_VELOCITY,
+		Semantic_MAX_LINEAR,
 
-		ANGULAR=0,
-		MAX_ANGULAR,
+		Semantic_ANGULAR=0,
+		Semantic_MAX_ANGULAR,
 
-		LIGHT=0,
-		MAX_LIGHT,
+		Semantic_LIGHT=0,
+		Semantic_MAX_LIGHT,
 
-		PROXIMITY=0,
-		MAX_PROXIMITY,
+		Semantic_PROXIMITY=0,
+		Semantic_MAX_PROXIMITY,
 
-		MAGNETIC=0,
-		MAX_MAGNETIC,
+		Semantic_MAGNETIC=0,
+		Semantic_MAX_MAGNETIC,
 	};
 
 	InputData(int type1=0,int time1=0,int size=0):
