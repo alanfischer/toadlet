@@ -103,7 +103,7 @@ public:
 	int getNumBuffers(Shader::ShaderType type) const{return mBuffers[type].size();}
 	void setBuffer(Shader::ShaderType type,int i,VariableBuffer *buffer);
 	VariableBuffer *getBuffer(Shader::ShaderType type,int i) const{return i<mBuffers[type].size()?mBuffers[type][i].buffer:NULL;}
-	int getBufferScope(Shader::ShaderType type,int i) const{return i<mBuffers[type].size()?mBuffers[type][i].scope:NULL;}
+	int getBufferScope(Shader::ShaderType type,int i) const{return i<mBuffers[type].size()?mBuffers[type][i].scope:0;}
 	bool findBuffer(Shader::ShaderType &type,int &index,const String &name);
 
 	void setBufferLocationName(Shader::ShaderType type,int i,const String &name);

@@ -24,9 +24,9 @@ namespace ribbit{
 class AudioDevice{virtual interface()=0;}; // This tricks swig into generating the gpcpp parameter which we can pull the jobject from
 %typemap(jtype) AudioDevice * "long"
 %typemap(jstype) AudioDevice * "us.toadlet.ribbit.AudioDevice"
-%typemap(in) AudioDevice * "$1=($input!=NULL?*(toadlet::ribbit::AudioDevice**)&$input:new toadlet::ribbit::JAudioDevice(jenv,$input_));"
+%typemap(in) AudioDevice * "$1=($input!=0?*(toadlet::ribbit::AudioDevice**)&$input:new toadlet::ribbit::JAudioDevice(jenv,$input_));"
 %typemap(javain) AudioDevice * "us.toadlet.ribbit.AudioDevice.getCPtr($javainput)"
-%typemap(javaout) AudioDevice * "{return new us.toadlet.ribbit.AudioDevice($jnicall, $owner);}"
+%typemap(javaout) AudioDevice * "{long cobj=$jnicall;return cobj!=0?new us.toadlet.ribbit.AudioDevice(cobj,$owner):null;}"
 }
 }
 using namespace toadlet::ribbit;
@@ -40,7 +40,7 @@ class RenderDevice{virtual interface()=0;}; // This tricks swig into generating 
 %typemap(jstype) RenderDevice * "us.toadlet.peeper.RenderDevice"
 %typemap(in) RenderDevice * "$1=*(toadlet::peeper::RenderDevice**)&$input;"
 %typemap(javain) RenderDevice * "us.toadlet.peeper.RenderDevice.getCPtr($javainput)"
-%typemap(javaout) RenderDevice * "{return new us.toadlet.peeper.RenderDevice($jnicall, $owner);}"
+%typemap(javaout) RenderDevice * "{long cobj=$jnicall;return cobj!=0?new us.toadlet.peeper.RenderDevice(cobj,$owner):null;}"
 }
 }
 using namespace toadlet::peeper;
@@ -51,7 +51,7 @@ namespace peeper{
 class RenderState;
 %typemap(jtype) RenderState * "long"
 %typemap(jstype) RenderState * "us.toadlet.peeper.RenderState"
-%typemap(javaout) RenderState * "{return new us.toadlet.peeper.RenderState($jnicall,$owner);}"
+%typemap(javaout) RenderState * "{long cobj=$jnicall;return cobj!=0?new us.toadlet.peeper.RenderState(cobj,$owner):null;}"
 }
 }
 using namespace toadlet::peeper;
