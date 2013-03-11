@@ -8,7 +8,7 @@ namespace peeper{
 
 class RenderTarget;
 /// @todo: set swigCPtr,swigCMemOwn when I create a JObject
-%typemap(in) RenderTarget * "$1=($input!=NULL?*(toadlet::peeper::RenderTarget**)&$input:new toadlet::peeper::JGLWindowRenderTarget(jenv,$input_));"
+%typemap(in) RenderTarget * "$1=($input!=0?*(toadlet::peeper::RenderTarget**)&$input:new toadlet::peeper::JGLWindowRenderTarget(jenv,$input_));"
 
 %refobject RenderDevice "$this->retain();"
 %unrefobject RenderDevice "$this->release();"
