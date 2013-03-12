@@ -100,7 +100,7 @@ bool D3D10RenderDevice::create(RenderTarget *target,int options){
 
 	RenderCaps &caps=mCaps;
 	{
-		caps.resetOnResize=false;
+		caps.resetOnResize=true;
 		caps.maxTextureStages=16;
 		caps.maxTextureSize=8192;
 		caps.textureDot3=false;
@@ -139,7 +139,8 @@ RenderDevice::DeviceStatus D3D10RenderDevice::activate(){
 }
 
 bool D3D10RenderDevice::reset(){
-	// No device reset necessary
+	mD3DPrimaryRenderTarget->reset();
+
 	setDefaultState();
 
 	return true;
