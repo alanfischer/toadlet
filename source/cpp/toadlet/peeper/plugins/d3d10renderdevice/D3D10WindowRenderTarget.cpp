@@ -46,9 +46,7 @@ D3D10WindowRenderTarget::D3D10WindowRenderTarget():D3D10RenderTarget(),
 	mDXGIDevice(NULL),
 	mDXGIAdapter(NULL),
 	mDepthTexture(NULL),
-	mWindow(0),
-	mWidth(0),
-	mHeight(0)
+	mWindow(0)
 {
 	mRenderTargetViews.resize(1,NULL);
 }
@@ -59,9 +57,7 @@ D3D10WindowRenderTarget::D3D10WindowRenderTarget(HWND wnd,WindowRenderTargetForm
 	mDXGIDevice(NULL),
 	mDXGIAdapter(NULL),
 	mDepthTexture(NULL),
-	mWindow(0),
-	mWidth(0),
-	mHeight(0)
+	mWindow(0)
 {
 	mRenderTargetViews.resize(1,NULL);
 	createContext(wnd,format);
@@ -83,7 +79,17 @@ void D3D10WindowRenderTarget::reset(){
 		mRenderTargetViews[0]=NULL;
 	}
 
-	mD3DDevice->OMGetRenderTargets(1,&mRenderTargetViews[0],NULL);
+	mD3DDevice->ClearState();
+
+	HRESULT result=mDXGISwapChain->ResizeBuffers(0, 0, 0, DXGI_FORMAT_UNKNOWN, 0);
+
+	ID3D10Texture2D *texture;
+	mDXGISwapChain->GetBuffer(0,__uuidof(texture),(void**)&texture);
+	D3D10_TEXTURE2D_DESC textureDesc;
+	texture->GetDesc(&textureDesc);
+	mD3DDevice->CreateRenderTargetView(texture,NULL,&mRenderTargetViews[0]);
+
+//	mD3DDevice->OMGetRenderTargets(1,&mRenderTargetViews[0],NULL);
 }
 
 bool D3D10WindowRenderTarget::createContext(HWND wnd,WindowRenderTargetFormat *format){
@@ -127,13 +133,11 @@ bool D3D10WindowRenderTarget::createContext(HWND wnd,WindowRenderTargetFormat *f
 	mWindow=wnd;
 	RECT rect={0};
 	GetClientRect(mWindow,&rect);
-	mWidth=rect.right-rect.left;
-	mHeight=rect.bottom-rect.top;
 
 	DXGI_SWAP_CHAIN_DESC desc={0};
 	desc.BufferCount=1;
-	desc.BufferDesc.Width=mWidth;
-	desc.BufferDesc.Height=mHeight;
+	desc.BufferDesc.Width=rect.right-rect.left;
+	desc.BufferDesc.Height=rect.bottom-rect.top;
 	desc.BufferDesc.Format=DXGI_FORMAT_R8G8B8A8_UNORM;
 	desc.BufferUsage=DXGI_USAGE_RENDER_TARGET_OUTPUT;
 	desc.OutputWindow=mWindow;
@@ -152,6 +156,10 @@ bool D3D10WindowRenderTarget::createContext(HWND wnd,WindowRenderTargetFormat *f
 	}
 
 	result=CreateDeviceAndSwapChainSymbol(NULL,D3D10_DRIVER_TYPE_HARDWARE,NULL,flags,D3D10_SDK_VERSION,&desc,&mDXGISwapChain,&mD3DDevice);
+	if(result==E_FAIL && (flags&D3D10_CREATE_DEVICE_DEBUG)!=0){
+		flags&=~D3D10_CREATE_DEVICE_DEBUG;
+		result=CreateDeviceAndSwapChainSymbol(NULL,D3D10_DRIVER_TYPE_HARDWARE,NULL,flags,D3D10_SDK_VERSION,&desc,&mDXGISwapChain,&mD3DDevice);
+	}
 	if(FAILED(result) || mD3DDevice==NULL){
 		Error::unknown(Categories::TOADLET_PEEPER,
 			"D3D10RenderWindow: Error creating D3D10Device object");

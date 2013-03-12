@@ -54,8 +54,8 @@ public:
 	bool createContext(HWND wnd,WindowRenderTargetFormat *format);
 	bool destroyContext();
 
-	int getWidth() const{return mWidth;}
-	int getHeight() const{return mHeight;}
+	int getWidth() const{RECT r;GetClientRect(mWindow,&r);return r.right-r.left;}
+	int getHeight() const{RECT r;GetClientRect(mWindow,&r);return r.bottom-r.top;}
 
 	AdaptorInfo *getAdaptorInfo() const{return mAdaptorInfo;}
 
@@ -80,7 +80,6 @@ protected:
 	IDXGIAdapter *mDXGIAdapter;
 	D3D10Texture *mDepthTexture;
 	HWND mWindow;
-	int mWidth,mHeight;
 	AdaptorInfo::ptr mAdaptorInfo;
 };
 
