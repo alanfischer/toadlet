@@ -332,7 +332,7 @@ void RandIsle::logicUpdate(int dt){
 		}
 	}
 
-	if(Math::square(physics->getVelocity().x)+Math::square(physics->getVelocity().y)<0.05 && climber->getMounted()==NULL){
+	if(climber->getSpeed()<0.05){
 		if(mPlayer->getActionActive("jump")){
 			mPlayer->stopAction("jump");
 		}
