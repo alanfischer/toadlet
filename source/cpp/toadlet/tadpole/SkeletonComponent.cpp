@@ -199,13 +199,13 @@ int SkeletonComponent::updateBoneTransformation(Bone *bone){
 			if(positionIndex>=0 && (bone->dontUpdateFlags&BoneSpaceUpdate_FLAG_TRANSLATE)==0){
 				Vector3 t1,t2;
 				vba.get3(f1,positionIndex,t1);
-				vba.get3(f1,positionIndex,t2);
+				vba.get3(f2,positionIndex,t2);
 				Math::lerp(bone->localTranslate,t1,t2,t);
 			}
 			if(rotateIndex>=0 && (bone->dontUpdateFlags&BoneSpaceUpdate_FLAG_ROTATE)==0){
 				Quaternion r1,r2;
 				vba.get4(f1,rotateIndex,r1);
-				vba.get4(f1,rotateIndex,r2);
+				vba.get4(f2,rotateIndex,r2);
 				Math::lerp(bone->localRotate,r1,r2,t);
 				Math::normalizeCarefully(bone->localRotate,0);
 			}

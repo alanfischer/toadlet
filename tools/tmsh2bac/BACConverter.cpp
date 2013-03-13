@@ -297,58 +297,58 @@ bool BACConverter::extractMeshData(Mesh::ptr mesh,bool useSubmeshes){
 		iba.unlock();
 
 		// Extract materials
-		for(j=0;j<1/*sub->getNumMaterials()*/;++j){
-			BACMaterial *m=new BACMaterial();
+		BACMaterial *m=new BACMaterial();
 
-			Material *material=subMesh->material;
-			if(material!=NULL){
-				if(material->getName().length()==0){
-					m->name="unknown";
-				}
-				else{
-					m->name=material->getName();
-				}
-
-				RasterizerState rasterizerState;
-				if(material->getPass()->getRasterizerState(rasterizerState)){
-					m->doubleSided=(rasterizerState.cull==RasterizerState::CullType_NONE);
-				}
-
-				MaterialState materialState;
-				if(material->getPass()->getMaterialState(materialState)){
-					m->lighting=materialState.light;
-				}
-
-				Texture *texture=material->getPass()->getTexture();
-				if(texture!=NULL){
-					int width=256,height=256;
-					if(texture->getFormat()->getWidth()>0 && texture->getFormat()->getHeight()>0){
-						width=texture->getFormat()->getWidth();
-						height=texture->getFormat()->getHeight();
-					}
-					else{
-						Log::alert(String("Texture ")+texture->getName()+" not found, a texture must be available so msh2bac can determine the texture size.  Will default to 256x256");
-					}
-					mTextures.add(Vector2(width,height));
-					m->textureIndex=mTextures.size()-1;
-					m->colorIndex=-1;
-				}
-				else{
-					mColors.add(materialState.diffuse);
-					m->textureIndex=-1;
-					m->colorIndex=mColors.size()-1;
-				}
+		Material *material=subMesh->material;
+		if(material!=NULL){
+			if(material->getName().length()==0){
+				m->name="unknown";
 			}
 			else{
-				mColors.add(Colors::WHITE);
-				m->doubleSided=true;
-				m->lighting=true;
-				m->colorIndex=mColors.size()-1;
-				m->textureIndex=-1;
+				m->name=material->getName();
 			}
 
-			mMaterials.add(m);
+			RenderPass *pass=material->getPass();
+
+			RasterizerState rasterizerState;
+			if(pass->getRasterizerState(rasterizerState)){
+				m->doubleSided=(rasterizerState.cull==RasterizerState::CullType_NONE);
+			}
+
+			MaterialState materialState;
+			if(pass->getMaterialState(materialState)){
+				m->lighting=materialState.light;
+			}
+
+			Texture *texture=pass->getNumTextures(Shader::ShaderType_FRAGMENT)==0?NULL:pass->getTexture(Shader::ShaderType_FRAGMENT,0);
+			if(texture!=NULL){
+				int width=256,height=256;
+				if(texture->getFormat()->getWidth()>0 && texture->getFormat()->getHeight()>0){
+					width=texture->getFormat()->getWidth();
+					height=texture->getFormat()->getHeight();
+				}
+				else{
+					Log::alert(String("Texture ")+texture->getName()+" not found, a texture must be available so msh2bac can determine the texture size.  Will default to 256x256");
+				}
+				mTextures.add(Vector2(width,height));
+				m->textureIndex=mTextures.size()-1;
+				m->colorIndex=-1;
+			}
+			else{
+				mColors.add(materialState.diffuse);
+				m->textureIndex=-1;
+				m->colorIndex=mColors.size()-1;
+			}
 		}
+		else{
+			mColors.add(Colors::WHITE);
+			m->doubleSided=true;
+			m->lighting=true;
+			m->colorIndex=mColors.size()-1;
+			m->textureIndex=-1;
+		}
+
+		mMaterials.add(m);
 	}
 
 	Log::alert(String("Number of mTriangles: ")+mTriangles.size()+" triangles");
