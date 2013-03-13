@@ -74,22 +74,26 @@ void D3D10WindowRenderTarget::swap(){
 }
 
 void D3D10WindowRenderTarget::reset(){
+	mD3DDevice->ClearState();
+
 	if(mRenderTargetViews[0]!=NULL){
 		mRenderTargetViews[0]->Release();
 		mRenderTargetViews[0]=NULL;
 	}
 
-	mD3DDevice->ClearState();
+	if(mDepthStencilView!=NULL){
+		mDepthStencilView->Release();
+		mDepthStencilView=NULL;
+	}
+
+	if(mDepthTexture!=NULL){
+		mDepthTexture->destroy();
+		mDepthTexture=NULL;
+	}
 
 	HRESULT result=mDXGISwapChain->ResizeBuffers(0, 0, 0, DXGI_FORMAT_UNKNOWN, 0);
 
-	ID3D10Texture2D *texture;
-	mDXGISwapChain->GetBuffer(0,__uuidof(texture),(void**)&texture);
-	D3D10_TEXTURE2D_DESC textureDesc;
-	texture->GetDesc(&textureDesc);
-	mD3DDevice->CreateRenderTargetView(texture,NULL,&mRenderTargetViews[0]);
-
-//	mD3DDevice->OMGetRenderTargets(1,&mRenderTargetViews[0],NULL);
+	buildBackBuffers();
 }
 
 bool D3D10WindowRenderTarget::createContext(HWND wnd,WindowRenderTargetFormat *format){
@@ -178,16 +182,7 @@ bool D3D10WindowRenderTarget::createContext(HWND wnd,WindowRenderTargetFormat *f
 	Log::alert(Categories::TOADLET_PEEPER,
 		String("D3D Description:") + adapterDesc.Description);
 
-	ID3D10Texture2D *texture;
-	mDXGISwapChain->GetBuffer(0,__uuidof(texture),(void**)&texture);
-	D3D10_TEXTURE2D_DESC textureDesc;
-	texture->GetDesc(&textureDesc);
-	mD3DDevice->CreateRenderTargetView(texture,NULL,&mRenderTargetViews[0]);
-
-	mDepthTexture=new D3D10Texture(mD3DDevice);
-	TextureFormat::ptr textureFormat=new TextureFormat(TextureFormat::Dimension_D2,TextureFormat::Format_DEPTH_16,textureDesc.Width,textureDesc.Height,1,1);
-	mDepthTexture->create(Texture::Usage_BIT_RENDERTARGET,textureFormat,NULL);
-	mD3DDevice->CreateDepthStencilView(mDepthTexture->getD3D10Resource(),NULL,&mDepthStencilView);
+	buildBackBuffers();
 
 	return true;
 }
@@ -206,7 +201,7 @@ bool D3D10WindowRenderTarget::destroyContext(){
 	}
 
 	if(mDepthTexture!=NULL){
-		delete mDepthTexture;
+		mDepthTexture->destroy();
 		mDepthTexture=NULL;
 	}
 
@@ -236,6 +231,20 @@ bool D3D10WindowRenderTarget::destroyContext(){
 	}
 
 	return true;
+}
+
+void D3D10WindowRenderTarget::buildBackBuffers(){
+	ID3D10Texture2D *texture;
+	mDXGISwapChain->GetBuffer(0,__uuidof(texture),(void**)&texture);
+	D3D10_TEXTURE2D_DESC textureDesc;
+	texture->GetDesc(&textureDesc);
+	mD3DDevice->CreateRenderTargetView(texture,NULL,&mRenderTargetViews[0]);
+	texture->Release();
+
+	mDepthTexture=new D3D10Texture(mD3DDevice);
+	TextureFormat::ptr textureFormat=new TextureFormat(TextureFormat::Dimension_D2,TextureFormat::Format_DEPTH_16,textureDesc.Width,textureDesc.Height,1,1);
+	mDepthTexture->create(Texture::Usage_BIT_RENDERTARGET,textureFormat,NULL);
+	mD3DDevice->CreateDepthStencilView(mDepthTexture->getD3D10Resource(),NULL,&mDepthStencilView);
 }
 
 }

@@ -74,11 +74,13 @@ public:
 	D3DX10CompileFromMemory CompileFromMemorySymbol;
 
 protected:
+	void buildBackBuffers();
+
 	HINSTANCE mD3DLibrary,mD3DXLibrary;
 	IDXGISwapChain *mDXGISwapChain;
 	IDXGIDevice *mDXGIDevice;
 	IDXGIAdapter *mDXGIAdapter;
-	D3D10Texture *mDepthTexture;
+	D3D10Texture::ptr mDepthTexture;
 	HWND mWindow;
 	AdaptorInfo::ptr mAdaptorInfo;
 };
