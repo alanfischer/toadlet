@@ -66,7 +66,7 @@ bool MeshOptimizer::optimizeMesh(Mesh *mesh,Engine *engine){
 			Mesh::SubMesh::ptr subMesh=mesh->getSubMesh(i);
 
 			Material::ptr material=subMesh->material;
-			if(material!=NULL && material->getPass()->getNumTextures()>0){
+			if(material!=NULL && material->getPass()->getNumTextures(Shader::ShaderType_FRAGMENT)>0){
 				IndexBufferAccessor iba(subMesh->indexData->getIndexBuffer());
 				for(j=0;j<iba.getSize();++j){
 					vertHasTex[iba.get(j)]=true;
