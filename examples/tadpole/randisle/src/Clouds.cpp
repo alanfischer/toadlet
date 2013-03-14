@@ -161,7 +161,7 @@ Clouds::Clouds(Scene *scene,int cloudSize,const Vector4 &skyColor,const Vector4 
 			}
 
 			pass->addVariable("modelViewProjectionMatrix",RenderVariable::ptr(new MVPMatrixVariable()),Material::Scope_RENDERABLE);
-			pass->addVariable("textureMatrix",RenderVariable::ptr(new TextureMatrixVariable(Shader::ShaderType_VERTEX,0)),Material::Scope_MATERIAL);
+			pass->addVariable("textureMatrix",RenderVariable::ptr(new TextureMatrixVariable("cloudTexture")),Material::Scope_MATERIAL);
 			pass->addVariable("skyColor",RenderVariable::ptr(new Vector4Variable(mSkyColor)),Material::Scope_MATERIAL);
 
 			pass->setTexture("bumpTexture",mBumpTexture,"bumpSamp",SamplerState(),TextureState());
@@ -341,16 +341,15 @@ void Clouds::postContextActivate(RenderDevice *renderDevice){
 }
 
 void Clouds::setTextureMatrix(const String &name,Material *material,const Matrix4x4 &matrix){
-return; /// @TODO
-/*	Shader::ShaderType type;
+	Shader::ShaderType type;
 	int index;
-	RenderPass *pass=material->getBestPath()->findTexture(name,type,index);
+	RenderPass *pass=material->getBestPath()->findTexture(type,index,name);
 	if(pass!=NULL){
 		TextureState state;
 		pass->getTextureState(type,index,state);
 		state.matrix.set(matrix);
 		pass->setTextureState(type,index,state);
-	}*/
+	}
 }
 
 void Clouds::createCloud(TextureFormat *format,tbyte *data,int scale,int seed,float cover,float sharpness,float brightness){

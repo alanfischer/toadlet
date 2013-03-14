@@ -7,7 +7,7 @@ int toadletMain(int argc,char **argv){
 	Applet::ptr applet=createApplet(app);
 	app->setApplet(applet);
 	app->setSize(400,400);
-	app->create("d3d10","mm");
+	app->create("gl","mm");
 	app->start();
 	app->destroy();
 	return 1;
