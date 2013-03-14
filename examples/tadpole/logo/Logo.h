@@ -30,7 +30,7 @@ public:
 	Application *app;
 	Engine::ptr engine;
 	Scene::ptr scene;
-	CameraNode::ptr camera;
+	CameraComponent::ptr camera;
 };
 
 #endif

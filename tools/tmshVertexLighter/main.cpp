@@ -98,6 +98,7 @@ int main(int argc,char **argv){
 	Log::getInstance()->setCategoryReportingLevel(Categories::TOADLET_EGG,Logger::Level_WARNING);
 	Log::getInstance()->setCategoryReportingLevel(Categories::TOADLET_TADPOLE,Logger::Level_WARNING);
 	Engine::ptr engine=new Engine();
+	engine->setBackableRenderCaps(engine->getMaximumRenderCaps());
 	engine->installHandlers();
 
 	VertexLighter lighter(engine);

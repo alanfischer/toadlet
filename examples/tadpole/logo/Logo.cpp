@@ -8,44 +8,48 @@ Logo::~Logo(){
 }
 
 void Logo::create(){
-Logger::alert("CREATE er");
 	engine=app->getEngine();
-Logger::alert("CREATE era");
-	engine->setDirectory("../../../data");
+	engine->getArchiveManager()->addDirectory("../../../data");
 
-	scene=Scene::ptr(new Scene(engine));
+	scene=new Scene(engine);
 
-//	DecalShadowSceneRenderer::ptr sceneRenderer(new DecalShadowSceneRenderer(scene));
-//	sceneRenderer->setPlane(Plane(Math::Z_UNIT_VECTOR3,-30));
-//	scene->setSceneRenderer(sceneRenderer);
-
-	LightNode::ptr light=engine->createNodeType(LightNode::type(),scene);
-	LightState state;
-	state.type=LightState::Type_DIRECTION;
-	state.direction=Math::NEG_Z_UNIT_VECTOR3;
-	light->setLightState(state);
-	scene->getRoot()->attach(light);
-
-	Node::ptr lt=engine->createNodeType(LightNode::type(),scene);
+	Node::ptr node=new Node(scene);
 	{
- 		MeshNode::ptr mesh=engine->createNodeType(MeshNode::type(),scene);
-		mesh->setMesh("lt.tmsh");
+		LightComponent::ptr light=new LightComponent();
+		LightState state;
+		state.type=LightState::Type_DIRECTION;
+		state.direction=Math::NEG_Z_UNIT_VECTOR3;
+		light->setLightState(state);
+		node->attach(light);
+	}
+	scene->getRoot()->attach(node);
+
+	Node::ptr lt=new Node(scene);
+	{
+ 		MeshComponent::ptr mesh=new MeshComponent(engine);
+		mesh->setMesh("lt.xmsh");
 		lt->attach(mesh);
 
 		if(mesh!=NULL){
-			AnimationActionComponent::ptr animation=new AnimationActionComponent("animation");
-			animation->attach(new MeshAnimation(mesh,0));
-			animation->setCycling(AnimationActionComponent::Cycling_REFLECT);
-			animation->start();
-			lt->attach(animation);
+			ActionComponent::ptr action=new ActionComponent("animation");
+			AnimationAction::ptr animation=new AnimationAction(mesh->getSkeleton()->getAnimation(0));
+			animation->setCycling(AnimationAction::Cycling_REFLECT);
+			action->attach(animation);
+			lt->attach(action);
+			mesh->getSkeleton()->setRenderSkeleton(true);
 		}
+		lt->startAction("animation");
 	}
 	scene->getRoot()->attach(lt);
 
-	camera=engine->createNodeType(CameraNode::type(),scene);
-	camera->setLookAt(Vector3(0,-Math::fromInt(150),0),Math::ZERO_VECTOR3,Math::Z_UNIT_VECTOR3);
-	camera->setClearColor(Colors::BLUE);
-	scene->getRoot()->attach(camera);
+	node=new Node(scene);
+	{
+		camera=new CameraComponent(new Camera());
+		camera->setClearColor(Colors::BLUE);
+		node->attach(camera);
+		camera->setLookAt(Vector3(0,-Math::fromInt(150),0),Math::ZERO_VECTOR3,Math::Z_UNIT_VECTOR3);
+	}
+	scene->getRoot()->attach(node);
 }
 
 void Logo::destroy(){
@@ -56,7 +60,7 @@ void Logo::render(){
 	RenderDevice *renderDevice=engine->getRenderDevice();
 
 	renderDevice->beginScene();
-		camera->render(renderDevice);
+		camera->getCamera()->render(renderDevice,scene);
 	renderDevice->endScene();
 	renderDevice->swap();
 }
