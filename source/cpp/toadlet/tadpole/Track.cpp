@@ -35,16 +35,7 @@ Track::Track(VertexFormat *format):
 	//mTimes,
 	mLength(0)
 {
-
 	mFormat=format;
-	int i;
-	for(i=0;i<mFormat->getNumElements();++i){
-		int semantic=mFormat->getElementSemantic(i);
-		if(semantic>=mSemantics.size()){
-			mSemantics.resize(semantic+1,-1);
-		}
-		mSemantics[semantic]=i;
-	}
 }
 
 int Track::addKeyFrame(scalar time,void *frame){
@@ -60,6 +51,10 @@ int Track::addKeyFrame(scalar time,void *frame){
 
 	mVBA.unlock();
 	mVBA.lock(this,mFormat);
+
+	if(mLength<mTimes[index]){
+		mLength=mTimes[index];
+	}
 
 	return index;
 }

@@ -28,6 +28,7 @@
 
 #include <toadlet/tadpole/animation/BaseAnimation.h>
 #include <toadlet/tadpole/Camera.h>
+#include <toadlet/tadpole/Sequence.h>
 
 namespace toadlet{
 namespace tadpole{
@@ -37,26 +38,26 @@ class TOADLET_API CameraProjectionAnimation:public BaseAnimation{
 public:
 	TOADLET_OBJECT(CameraProjectionAnimation);
 
-	CameraProjectionAnimation(Camera *target);
+	CameraProjectionAnimation(Camera *target,Sequence *sequence,int trackIndex=0);
 	virtual ~CameraProjectionAnimation(){}
 
 	void setTarget(Camera *target);
 	inline Camera *getTarget() const{return mTarget;}
 
-	// HACK: Until we introduce a proper ProjectionKeyFrame, this will have to do
-	void setStart(scalar left,scalar right,scalar bottom,scalar top,scalar neard,scalar fard);
-	void setEnd(scalar left,scalar right,scalar bottom,scalar top,scalar neard,scalar fard,scalar length);
+	bool setSequence(Sequence *sequence,int trackIndex);
+	inline Sequence *getSequence() const{return mSequence;}
 
 	void setValue(scalar value);
-	scalar getMinValue() const{return 0;}
-	scalar getMaxValue() const{return mMaxValue;}
 	scalar getValue() const{return mValue;}
+	scalar getMinValue() const{return 0;}
+	scalar getMaxValue() const{return mSequence->getLength();}
 
 protected:
 	Camera::ptr mTarget;
-	scalar mStartLeft,mStartRight,mStartBottom,mStartTop,mStartNear,mStartFar;
-	scalar mEndLeft,mEndRight,mEndBottom,mEndTop,mEndNear,mEndFar;
-	scalar mValue,mMaxValue;
+	Sequence::ptr mSequence;
+	Track::ptr mTrack;
+	int mElements[3]; // Left/Right, Top/Bottom, Near/Far
+	scalar mValue;
 };
 
 }

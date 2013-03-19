@@ -42,9 +42,8 @@ public:
 	Track(VertexFormat *format);
 
 	void destroy(){}
-	void compile();
 
-	int getElementIndex(int semantic){return (semantic>=0 && semantic<mSemantics.size())?mSemantics[semantic]:-1;}
+	VertexFormat::ptr getFormat() const{return mFormat;}
 
 	int addKeyFrame(scalar time,void *frame=NULL);
 	bool getKeyFrame(void *frame,int index);
@@ -73,9 +72,10 @@ public:
 
 	bool update(tbyte *data,int start,int size){return false;}
 
+	void compile();
+
 protected:
 	VertexFormat::ptr mFormat;
-	Collection<int> mSemantics;
 	int mIndex;
 	Collection<tbyte> mData;
 	Collection<scalar> mTimes;

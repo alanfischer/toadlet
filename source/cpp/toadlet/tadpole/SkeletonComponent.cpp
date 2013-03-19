@@ -192,8 +192,8 @@ int SkeletonComponent::updateBoneTransformation(Bone *bone){
 				continue;
 			}
 
-			int positionIndex=track->getElementIndex(VertexFormat::Semantic_POSITION);
-			int rotateIndex=track->getElementIndex(VertexFormat::Semantic_ROTATE);
+			int positionIndex=track->getFormat()->findElement(VertexFormat::Semantic_POSITION);
+			int rotateIndex=track->getFormat()->findElement(VertexFormat::Semantic_ROTATE);
 			
 			VertexBufferAccessor &vba=track->getAccessor();
 			if(positionIndex>=0 && (bone->dontUpdateFlags&BoneSpaceUpdate_FLAG_TRANSLATE)==0){
