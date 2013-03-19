@@ -1,3 +1,4 @@
+
 /********** Copyright header - do not remove **********
  *
  * The Toadlet Engine
@@ -41,9 +42,6 @@ MaterialAnimation::MaterialAnimation(Material *target,Sequence *sequence,int tra
 	setSequence(sequence,trackIndex);
 }
 
-MaterialAnimation::~MaterialAnimation(){
-}
-
 void MaterialAnimation::setTarget(Material *target){
 	mTarget=target;
 }
@@ -51,7 +49,7 @@ void MaterialAnimation::setTarget(Material *target){
 bool MaterialAnimation::setSequence(Sequence *sequence,int trackIndex){
 	mSequence=sequence;
 	mTrack=mSequence->getTrack(trackIndex);
-	mElement=mTrack->getElementIndex(VertexFormat::Semantic_COLOR);
+	mElement=mTrack->getFormat()->findElement(VertexFormat::Semantic_COLOR);
 	if(mElement<0){
 		Error::invalidParameters(Categories::TOADLET_TADPOLE,
 			"no Semantic_COLOR in Track");
@@ -66,6 +64,7 @@ bool MaterialAnimation::setSequence(Sequence *sequence,int trackIndex){
 }
 
 void MaterialAnimation::setValue(scalar value){
+	mValue=value;
 	if(mTarget!=NULL){
 		int f1=-1,f2=-1;
 		int hint=0;

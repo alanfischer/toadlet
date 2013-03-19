@@ -39,15 +39,16 @@ public:
 	Sequence();
 
 	void destroy();
-	void compile();
 
 	int getNumTracks() const{return mTracks.size();}
-	virtual void addTrack(Track *track){mTracks.add(track);}
-	virtual void removeTrack(int i){mTracks.removeAt(i);}
+	void addTrack(Track *track);
+	void removeTrack(int i);
 	Track *getTrack(int i){return mTracks[i];}
 
 	scalar getLength() const{return mLength;}
 	void setLength(scalar length){mLength=length;}
+
+	void compile();
 
 protected:
 	Collection<Track::ptr> mTracks;

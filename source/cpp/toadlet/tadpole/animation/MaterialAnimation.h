@@ -41,7 +41,7 @@ public:
 	TOADLET_OBJECT(MaterialAnimation);
 
 	MaterialAnimation(Material *target,Sequence *sequence,int trackIndex=0);
-	virtual ~MaterialAnimation();
+	virtual ~MaterialAnimation(){}
 
 	void setTarget(Material *target);
 	inline Material *getTarget() const{return mTarget;}

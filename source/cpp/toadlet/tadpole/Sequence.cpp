@@ -37,6 +37,18 @@ void Sequence::destroy(){
 	BaseResource::destroy();
 }
 
+void Sequence::addTrack(Track *track){
+	mTracks.add(track);
+
+	if(mLength<track->getLength()){
+		mLength=track->getLength();
+	}
+}
+
+void Sequence::removeTrack(int i){
+	mTracks.removeAt(i);
+}
+
 void Sequence::compile(){
 	int i;
 

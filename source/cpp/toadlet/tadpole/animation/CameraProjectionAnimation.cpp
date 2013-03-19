@@ -24,53 +24,75 @@
  ********** Copyright header - do not remove **********/
 
 #include <toadlet/tadpole/animation/CameraProjectionAnimation.h>
+#include <toadlet/egg/Error.h>
 
 namespace toadlet{
 namespace tadpole{
 namespace animation{
 
-CameraProjectionAnimation::CameraProjectionAnimation(Camera *target)
-	//mTarget
+CameraProjectionAnimation::CameraProjectionAnimation(Camera *target,Sequence *sequence,int trackIndex):
+	mTarget(target),
+//	mSequence,
+//	mTrack,
+	mValue(0)
 {
-	mTarget=target;
+	setSequence(sequence,trackIndex);
 }
 
 void CameraProjectionAnimation::setTarget(Camera *target){
 	mTarget=target;
 }
 
-void CameraProjectionAnimation::setStart(scalar left,scalar right,scalar bottom,scalar top,scalar neard,scalar fard){
-	mStartLeft=left;
-	mStartRight=right;
-	mStartBottom=bottom;
-	mStartTop=top;
-	mStartNear=neard;
-	mStartFar=fard;
-}
+bool CameraProjectionAnimation::setSequence(Sequence *sequence,int trackIndex){
+	mSequence=sequence;
+	mTrack=mSequence->getTrack(trackIndex);
+	int elementIndex=0;
+	VertexFormat *format=mTrack->getFormat();
+	for(int i=0;i<format->getNumElements() && elementIndex<3;++i){
+		if(format->getElementSemantic(i)==VertexFormat::Semantic_POSITION){
+			mElements[i]=i;
+			elementIndex++;
+		}
+	}
+	if(elementIndex<3){
+		Error::invalidParameters(Categories::TOADLET_TADPOLE,
+			"not enough Semantic_POSITION in Track");
+		return false;
+	}
 
-void CameraProjectionAnimation::setEnd(scalar left,scalar right,scalar bottom,scalar top,scalar neard,scalar fard,scalar length){
-	mEndLeft=left;
-	mEndRight=right;
-	mEndBottom=bottom;
-	mEndTop=top;
-	mEndNear=neard;
-	mEndFar=fard;
+	if(mListener!=NULL){
+		mListener->animationExtentsChanged(this);
+	}
 
-	mMaxValue=length;
+	return true;
 }
 
 void CameraProjectionAnimation::setValue(scalar value){
 	mValue=value;
-	scalar t=Math::div(mValue,mMaxValue);
+	if(mTarget!=NULL){
+		int f1=-1,f2=-1;
+		int hint=0;
+		scalar time=mTrack->getKeyFramesAtTime(value,f1,f2,hint);
 
-	mTarget->setProjectionFrustum(
-		Math::lerp(mStartLeft,mEndLeft,t),
-		Math::lerp(mStartRight,mEndRight,t),
-		Math::lerp(mStartBottom,mEndBottom,t),
-		Math::lerp(mStartTop,mEndTop,t),
-		Math::lerp(mStartNear,mEndNear,t),
-		Math::lerp(mStartFar,mEndFar,t)
-	);
+		VertexBufferAccessor &vba=mTrack->getAccessor();
+
+		Vector2 lr1,lr2,lr;
+		vba.get2(f1,mElements[0],lr1);
+		vba.get2(f2,mElements[0],lr2);
+		Math::lerp(lr,lr1,lr2,time);
+
+		Vector2 bt1,bt2,bt;
+		vba.get2(f1,mElements[1],bt1);
+		vba.get2(f2,mElements[1],bt2);
+		Math::lerp(bt,bt1,bt2,time);
+
+		Vector2 nf1,nf2,nf;
+		vba.get2(f1,mElements[2],nf1);
+		vba.get2(f2,mElements[2],nf2);
+		Math::lerp(nf,nf1,nf2,time);
+
+		mTarget->setProjectionFrustum(lr[0],lr[1],bt[0],bt[1],nf[0],nf[1]);
+	}
 }
 
 }
