@@ -101,6 +101,9 @@ void Node::destroyAllChildren(){
 	while(mComponents.size()>0){
 		mComponents[0]->destroy();
 	}
+	while(mNodes.size()>0){
+		mNodes[0]->destroy();
+	}
 }
 
 bool Node::attach(Component *component){
@@ -141,9 +144,11 @@ bool Node::remove(Component *component){
 
 void Node::nodeAttached(Node *node){
 	mNodes.add(node);
+	mComponents.remove(node);
 }
 
 void Node::nodeRemoved(Node *node){
+	mComponents.add(node);
 	mNodes.remove(node);
 }
 
@@ -160,6 +165,11 @@ Component *Node::getChild(const String &name){
 	for(i=0;i<mComponents.size();++i){
 		if(mComponents[i]->getName()==name){
 			return mComponents[i];
+		}
+	}
+	for(i=0;i<mNodes.size();++i){
+		if(mNodes[i]->getName()==name){
+			return mNodes[i];
 		}
 	}
 	return NULL;
@@ -253,7 +263,7 @@ void Node::parentChanged(Node *node){
 		parent->nodeRemoved(this);
 	}
 	if(mParent!=NULL){
-		updateWorldTransform();
+		updateWorldSpacial();
 
 		mParent->nodeAttached(this);
 	}
@@ -264,8 +274,10 @@ void Node::rootChanged(Node *root){
 
 	int i;
 	for(i=0;i<mComponents.size();++i){
-		Component *component=mComponents[i];
-		component->rootChanged(root);
+		mComponents[i]->rootChanged(root);
+	}
+	for(i=0;i<mNodes.size();++i){
+		mNodes[i]->rootChanged(root);
 	}
 }
 
@@ -324,7 +336,7 @@ void Node::logicUpdate(int dt,int scope){
 
 	int i;
 
-	updateWorldTransform();
+	updateTransform();
 
 	if(mActivateChildren){
 		for(i=0;i<mNodes.size();++i){
@@ -341,8 +353,12 @@ void Node::logicUpdate(int dt,int scope){
 		mChildrenActive|=component->getActive();
 	}
 
+	updateComponentBound();
+
 	for(i=0;i<mNodes.size();++i){
 		Node *node=mNodes[i];
+		node->logicUpdate(dt,scope);
+		mChildrenActive|=node->getActive();
 		if(node->getActive() && (node->getScope()&scope)!=0){
 			node->tryDeactivate();
 		}
@@ -355,15 +371,18 @@ void Node::frameUpdate(int dt,int scope){
 
 	int i;
 
-	updateWorldTransform();
+	updateTransform();
 
 	for(i=0;i<mComponents.size();++i){
 		Component *component=mComponents[i];
 		component->frameUpdate(dt,scope);
 	}
 
+	updateComponentBound();
+
 	for(i=0;i<mNodes.size();++i){
 		Node *node=mNodes[i];
+		node->frameUpdate(dt,scope);
 		mergeWorldBound(node,false);
 	}
 }
@@ -372,8 +391,10 @@ bool Node::handleEvent(Event *event){
 	int i=0;
 	bool result=false;
 	for(i=0;i<mComponents.size();++i){
-		Component *component=mComponents[i];
-		result|=component->handleEvent(event);
+		result|=mComponents[i]->handleEvent(event);
+	}
+	for(i=0;i<mNodes.size();++i){
+		result|=mNodes[i]->handleEvent(event);
 	}
 	return result;
 }
@@ -437,7 +458,7 @@ void Node::tryDeactivate(){
 
 bool Node::getTransformUpdated(){return mScene->getFrame()==mTransformUpdatedFrame;}
 
-void Node::updateWorldTransform(){
+void Node::updateTransform(){
 	if(mParent==NULL){
 		mWorldTransform->set(mTransform);
 	}
@@ -447,8 +468,10 @@ void Node::updateWorldTransform(){
 	else{
 		mWorldTransform->setTransform(mParent->mWorldTransform,mTransform);
 	}
-	mWorldBound->transform(mBound,mWorldTransform);
+}
 
+void Node::updateComponentBound(){
+	mWorldBound->transform(mBound,mWorldTransform);
 	mComponentBound->reset();
 	int i;
 	for(i=0;i<mComponents.size();++i){
@@ -467,6 +490,20 @@ void Node::updateWorldTransform(){
 	}
 	mComponentWorldBound->transform(mComponentBound,mWorldTransform);
 	mWorldBound->merge(mComponentWorldBound,mScene->getEpsilon());
+}
+
+void Node::updateNodeBound(){
+	int i;
+	for(i=0;i<mNodes.size();++i){
+		Node *node=mNodes[i];
+		mWorldBound->merge(node->getWorldBound(),mScene->getEpsilon());
+	}
+}
+
+void Node::updateWorldSpacial(){
+	updateTransform();
+	updateComponentBound();
+	updateNodeBound();
 
 	if(mParent!=NULL){
 		mParent->mergeWorldBound(this,false);

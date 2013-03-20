@@ -82,7 +82,7 @@ public:
 			mParent->setRotate(rotate);
 		}
 
-		mParent->updateWorldTransform();
+		mParent->updateWorldSpacial();
 	}
 
 	Node::ptr mTarget;
