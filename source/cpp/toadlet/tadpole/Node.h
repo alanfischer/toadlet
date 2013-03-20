@@ -157,7 +157,12 @@ public:
 	virtual bool getActive() const{return mActive;}
 	bool getTransformUpdated();
 
-	virtual void updateWorldTransform();
+	virtual void updateTransform();
+	virtual void updateComponentBound();
+	virtual void updateNodeBound();
+
+	virtual void updateWorldSpacial();
+
 	virtual void spacialUpdated();
 	virtual void gatherRenderables(Camera *camera,RenderableSet *set);
 

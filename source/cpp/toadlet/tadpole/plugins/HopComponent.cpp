@@ -65,7 +65,8 @@ void HopComponent::parentChanged(Node *node){
 		mOldPosition.set(mSolid->getPosition());
 		mNewPosition.set(mOldPosition);
 		lerpPosition(0);
-		mParent->updateWorldTransform();
+
+		mParent->updateWorldSpacial();
 	}
 }
 
