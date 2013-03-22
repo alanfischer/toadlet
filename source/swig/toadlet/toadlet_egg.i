@@ -61,9 +61,9 @@ class TUUID;
      SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException, "null UUID");
      return $null;
     }
-	jlong bits[2];
-	jenv->GetLongArrayRegion($input,0,2,bits);
-	$1=TUUID(bits[0],bits[1]); %}
+	jlong $1_bits[2];
+	jenv->GetLongArrayRegion($input,0,2,$1_bits);
+	$1=TUUID($1_bits[0],$1_bits[1]); %}
 	
 %typemap(javain) TUUID "new long[]{$javainput.getMostSignificantBits(),$javainput.getLeastSignificantBits()}"
 
@@ -74,9 +74,9 @@ class TUUID;
 
 %typemap(out) TUUID
 %{ $result = jenv->NewLongArray(2);
-	jlong bits[2];
-	bits[0]=$1.getHighBits();bits[1]=$1.getLowBits();
-	jenv->SetLongArrayRegion($result,0,2,bits); %}
+	jlong $1_bits[2];
+	$1_bits[0]=$1.getHighBits();$1_bits[1]=$1.getLowBits();
+	jenv->SetLongArrayRegion($result,0,2,$1_bits); %}
 
 }
 
