@@ -334,13 +334,13 @@ Logger::Category *Logger::getCategory(const String &categoryName){
 }
 
 void Logger::lock(){
-	#if !defined(TOADLET_NO_THREADS)
+	#if defined(TOADLET_THREADSAFE)
 		mMutex.lock();
 	#endif
 }
 
 void Logger::unlock(){
-	#if !defined(TOADLET_NO_THREADS)
+	#if defined(TOADLET_THREADSAFE)
 		mMutex.unlock();
 	#endif
 }
