@@ -27,7 +27,7 @@
 #define TOADLET_EGG_OBJECT_H
 
 #include <toadlet/egg/Interface.h>
-#if !defined(TOADLET_NO_THREADS)
+#if defined(TOADLET_THREADSAFE)
 	#include <toadlet/egg/Mutex.h>
 #endif
 
@@ -44,11 +44,11 @@ public:
 
 	virtual int retain(){
 		int count=0;
-		#if !defined(TOADLET_NO_THREADS)
+		#if defined(TOADLET_THREADSAFE)
 			mSharedMutex.lock();
 		#endif
 		count=++mSharedCount;
-		#if !defined(TOADLET_NO_THREADS)
+		#if defined(TOADLET_THREADSAFE)
 			mSharedMutex.unlock();
 		#endif
 		return count;
@@ -56,11 +56,11 @@ public:
 	
 	virtual int release(){
 		int count=0;
-		#if !defined(TOADLET_NO_THREADS)
+		#if defined(TOADLET_THREADSAFE)
 			mSharedMutex.lock();
 		#endif
 		count=--mSharedCount;
-		#if !defined(TOADLET_NO_THREADS)
+		#if defined(TOADLET_THREADSAFE)
 			mSharedMutex.unlock();
 		#endif
 
@@ -75,7 +75,7 @@ public:
 
 protected:
 	int mSharedCount;
-	#if !defined(TOADLET_NO_THREADS)
+	#if defined(TOADLET_THREADSAFE)
 		Mutex mSharedMutex;
 	#endif
 };

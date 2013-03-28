@@ -29,7 +29,7 @@
 #include <toadlet/egg/Categories.h>
 #include <toadlet/egg/Map.h>
 #include <toadlet/egg/String.h>
-#if !defined(TOADLET_NO_THREADS)
+#if defined(TOADLET_THREADSAFE)
 	#include <toadlet/egg/Mutex.h>
 #endif
 #if defined(TOADLET_PLATFORM_OSX)
@@ -133,7 +133,7 @@ private:
 	#if defined(TOADLET_PLATFORM_OSX)
 		CategoryNameClientMap mCategoryNameClientMap;
 	#endif
-	#if !defined(TOADLET_NO_THREADS)
+	#if defined(TOADLET_THREADSAFE)
 		Mutex mMutex;
 	#endif
 };
