@@ -23,25 +23,9 @@
  *
  ********** Copyright header - do not remove **********/
 
-#ifndef TOADLET_TADPOLE_ACTIONLISTENER_H
-#define TOADLET_TADPOLE_ACTIONLISTENER_H
+package us.toadlet.tadpole;
 
-#include <toadlet/tadpole/Types.h>
-
-namespace toadlet{
-namespace tadpole{
-
-class Action;
-
-class ActionListener{
-public:
-	virtual ~ActionListener(){}
-
-	virtual void actionStarted(Action *action)=0;
-	virtual void actionStopped(Action *action)=0;
+public interface ActionListener{
+	public void actionStarted(Action action);
+	public void actionStopped(Action action);
 };
-
-}
-}
-
-#endif

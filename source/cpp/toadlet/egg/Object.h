@@ -27,6 +27,9 @@
 #define TOADLET_EGG_OBJECT_H
 
 #include <toadlet/egg/Interface.h>
+#if !defined(TOADLET_NO_THREADS)
+	#include <toadlet/egg/Mutex.h>
+#endif
 
 namespace toadlet{
 namespace egg{
@@ -40,12 +43,28 @@ public:
 	virtual ~Object(){}
 
 	virtual int retain(){
-		return ++mSharedCount;
+		int count=0;
+		#if !defined(TOADLET_NO_THREADS)
+			mSharedMutex.lock();
+		#endif
+		count=++mSharedCount;
+		#if !defined(TOADLET_NO_THREADS)
+			mSharedMutex.unlock();
+		#endif
+		return count;
 	}
 	
 	virtual int release(){
-		int count=--mSharedCount;
-		if(mSharedCount<=0){
+		int count=0;
+		#if !defined(TOADLET_NO_THREADS)
+			mSharedMutex.lock();
+		#endif
+		count=--mSharedCount;
+		#if !defined(TOADLET_NO_THREADS)
+			mSharedMutex.unlock();
+		#endif
+
+		if(count<=0){
 			destroy();
 			delete this;
 		}
@@ -56,6 +75,9 @@ public:
 
 protected:
 	int mSharedCount;
+	#if !defined(TOADLET_NO_THREADS)
+		Mutex mSharedMutex;
+	#endif
 };
 
 // The same as DefaultIntrusiveSemantics, but casts to an Object so we can still reference forward declared items
