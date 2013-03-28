@@ -277,7 +277,7 @@ public:
 		}
 	}
 
-	template<typename Type2> int indexOf(const Type2 &type){
+	template<typename Type2> int indexOf(const Type2 &type) const{
 		int i;
 		for(i=0;i<mSize;++i){
 			if(mData[i]==type){
@@ -287,7 +287,7 @@ public:
 		return -1;
 	}
 
-	template<typename Type2> bool contains(const Type2 &type){
+	template<typename Type2> bool contains(const Type2 &type) const{
 		return indexOf(type)>=0;
 	}
 

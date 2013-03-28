@@ -292,7 +292,7 @@ endif (TOADLET_INCLUDE_DIR AND TOADLET_LIBRARY_DIR)
 # Standard settings
 if (TOADLET_FOUND)
 	if (NOT TOADLET_FIND_QUITELY)
-		message (STATUS "toadet found")
+		message (STATUS "toadlet found")
 	endif (NOT TOADLET_FIND_QUITELY)
 else (TOADLET_FOUND)
 	if (TOADLET_FIND_REQUIRED)
