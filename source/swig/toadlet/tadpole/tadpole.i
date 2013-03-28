@@ -63,6 +63,7 @@ using namespace toadlet::peeper;
 %include <toadlet/tadpole/Scene.i>
 %include <toadlet/tadpole/Component.i>
 %include <toadlet/tadpole/Action.i>
+%include <toadlet/tadpole/ActionListener.i>
 %include <toadlet/tadpole/Visible.i>
 %include <toadlet/tadpole/AnimationAction.i>
 %include <toadlet/tadpole/ActionComponent.i>

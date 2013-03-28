@@ -5,18 +5,6 @@
 namespace toadlet{
 namespace tadpole{
 
-#%feature("director") ActionListener;
-
-class Action;
-
-class ActionListener{
-public:
-	virtual ~ActionListener(){}
-
-	virtual void actionStarted(Action *action)=0;
-	virtual void actionStopped(Action *action)=0;
-};
-
 class Action{
 public:
 	virtual ~Action(){}
