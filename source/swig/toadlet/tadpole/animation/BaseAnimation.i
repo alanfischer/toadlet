@@ -10,7 +10,7 @@ namespace animation{
 
 class BaseAnimation:public Animation{
 public:
-	virtual const String &getName() const;
+	virtual String getName() const;
 
 	virtual void setValue(scalar value);
 	virtual scalar getMinValue() const;
