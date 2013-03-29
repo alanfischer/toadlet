@@ -2,6 +2,8 @@
 
 %module(directors="1") tadpole
 
+%typemap(javaimports) SWIGTYPE %{import us.toadlet.tadpole.*;%}
+
 %include <arrays_java.i>
 %include <../toadlet_egg.i>
 %include <enumtypeunsafe.swg>
@@ -57,10 +59,17 @@ class RenderState;
 using namespace toadlet::peeper;
 
 
+namespace toadlet{
+namespace tadpole{
+}
+}
+using namespace toadlet::tadpole;
+
 %include <toadlet/tadpole/Track.i>
 %include <toadlet/tadpole/Sequence.i>
 %include <toadlet/tadpole/Engine.i>
 %include <toadlet/tadpole/Scene.i>
+%include <toadlet/tadpole/Camera.i>
 %include <toadlet/tadpole/Component.i>
 %include <toadlet/tadpole/Action.i>
 %include <toadlet/tadpole/ActionListener.i>
@@ -68,11 +77,10 @@ using namespace toadlet::peeper;
 %include <toadlet/tadpole/AnimationAction.i>
 %include <toadlet/tadpole/ActionComponent.i>
 %include <toadlet/tadpole/AudioComponent.i>
-%include <toadlet/tadpole/Node.i>
-%include <toadlet/tadpole/Camera.i>
 %include <toadlet/tadpole/CameraComponent.i>
 %include <toadlet/tadpole/MeshComponent.i>
 %include <toadlet/tadpole/LightComponent.i>
+%include <toadlet/tadpole/Node.i>
 %include <toadlet/tadpole/animation/Animation.i>
 %include <toadlet/tadpole/animation/BaseAnimation.i>
 %include <toadlet/tadpole/animation/MaterialAnimation.i>
