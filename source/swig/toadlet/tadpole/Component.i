@@ -9,6 +9,8 @@ namespace tadpole{
 %unrefobject Component "$this->release();"
 
 class Component{
+	virtual ~Component(){}
+
 	virtual void destroy()=0;
 	
 	virtual void setName(String name)=0;

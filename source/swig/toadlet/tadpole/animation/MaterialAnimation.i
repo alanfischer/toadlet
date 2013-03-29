@@ -10,7 +10,7 @@ class MaterialAnimation:public Animation{
 public:
 	MaterialAnimation(Material *target,Sequence *sequence,int trackIndex=0);
 
-	const String &getName() const;
+	String getName() const;
 
 	void setValue(scalar value);
 	scalar getMinValue() const;
