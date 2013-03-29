@@ -26,7 +26,7 @@ public:
 	bool attach(Component *node);
 	bool remove(Component *node);
 
-	ActionComponent *getAction(const String &name);
+	ActionComponent *getAction(String name);
 	void startAction(String name);
 	void stopAction(String name);
 	bool getActionActive(String name);
