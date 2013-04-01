@@ -1,8 +1,6 @@
 #ifndef SKY_H
 #define SKY_H
 
-#include <toadlet/egg.h>
-#include <toadlet/peeper.h>
 #include <toadlet/tadpole.h>
 #include "Clouds.h"
 

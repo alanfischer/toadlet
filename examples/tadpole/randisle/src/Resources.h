@@ -143,12 +143,12 @@ public:
 		shark=engine->getAudioManager()->findAudioBuffer("shark.wav");
 		rustle=engine->getAudioManager()->findAudioBuffer("rustle.wav");
 		crunch=engine->getAudioManager()->findAudioBuffer("crunch.wav");
-/*
+
 		acorn=engine->getMaterialManager()->findMaterial("acorn.png");
 		if(acorn!=NULL){
-			acorn->getPass()->setMaterialState(MaterialState(false));
-			acorn->getPass()->setDepthState(DepthState(DepthState::DepthTest_LEQUAL,false));
-			acorn->getPass()->setBlendState(BlendState(BlendState::Combination_ALPHA));
+//			acorn->getPass()->setMaterialState(MaterialState(false));
+//			acorn->getPass()->setDepthState(DepthState(DepthState::DepthTest_LEQUAL,false));
+//			acorn->getPass()->setBlendState(BlendState(BlendState::Combination_ALPHA));
 		}
 
 		// HUD
@@ -160,22 +160,22 @@ public:
 		hudFade->getPass()->setDepthState(DepthState(DepthState::DepthTest_NEVER,false));
 		hudFade->getPass()->setBlendState(BlendState::Combination_ALPHA);
 		hudFade->getPass()->setMaterialState(MaterialState(Colors::TRANSPARENT_RED));
-
+*/
 		
 		hudCompass=engine->getMaterialManager()->findMaterial("compass.png");
 		if(hudCompass!=NULL){
-			hudCompass->getPass()->setMaterialState(MaterialState(false));
-			hudCompass->getPass()->setDepthState(DepthState(DepthState::DepthTest_NEVER,false));
-			hudCompass->getPass()->setBlendState(BlendState(BlendState::Operation_ZERO,BlendState::Operation_SOURCE_COLOR));
+//			hudCompass->getPass()->setMaterialState(MaterialState(false));
+//			hudCompass->getPass()->setDepthState(DepthState(DepthState::DepthTest_NEVER,false));
+//			hudCompass->getPass()->setBlendState(BlendState(BlendState::Operation_ZERO,BlendState::Operation_SOURCE_COLOR));
 		}
 
 		hudAcorn=engine->getMaterialManager()->findMaterial("acorn.png");
 		if(hudAcorn!=NULL){
-			hudAcorn->getPass()->setMaterialState(MaterialState(false));
-			hudAcorn->getPass()->setDepthState(DepthState(DepthState::DepthTest_NEVER,false));
-			hudAcorn->getPass()->setBlendState(BlendState(BlendState::Combination_ALPHA));
+//			hudAcorn->getPass()->setMaterialState(MaterialState(false));
+//			hudAcorn->getPass()->setDepthState(DepthState(DepthState::DepthTest_NEVER,false));
+//			hudAcorn->getPass()->setBlendState(BlendState(BlendState::Combination_ALPHA));
 		}
-*/
+
 		hudWooden=engine->getFontManager()->findFont("Pinewood.ttf",100);
 
 		hudSystem=engine->getFontManager()->getDefaultFont();

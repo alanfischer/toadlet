@@ -1,71 +1,33 @@
 #include "HUD.h"
 #include "PathClimber.h"
 #include "Resources.h"
-#if 0
-TOADLET_NODE_IMPLEMENT(HUD,"HUD");
 
-HUD::HUD():super(),
-	mAcornCount(0),
-	mChompTime(0),
-	mNextBarkTime(0),
-	mWaterAmount(0)
-{
-}
+class CompassComponent:public BaseComponent{
+public:
+	TOADLET_OBJECT(CompassComponent);
 
-Node *HUD::create(Scene *scene){
-	super::create(scene);
+	CompassComponent(Camera *camera){
+		mCamera=camera;
+	}
 
-	mDogSound=new AudioComponent(mEngine);
-	mDogSound->setAudioBuffer(Resources::instance->dog);
-	mScene->getRoot()->attach(mDogSound);
-	mSharkSound=new AudioComponent(mEngine);
-	mSharkSound->setAudioBuffer(Resources::instance->shark);
-	mScene->getRoot()->attach(mSharkSound);
+	void logicUpdate(int dt,int scope){
+		BaseComponent::logicUpdate(dt,scope);
 
-	mFadeSprite=mEngine->createNodeType(SpriteNode::type(),mScene);
-	mFadeSprite->setMaterial(Resources::instance->hudFade);
-	mFadeSprite->setScale(Vector3(2,2,2));
-	attach(mFadeSprite);
-
-	mCompassSprite=mEngine->createNodeType(SpriteNode::type(),mScene);
-	mCompassSprite->setMaterial(Resources::instance->hudCompass);
-	mCompassSprite->setTranslate(0.75,0.75,0);
-	mCompassSprite->setScale(.25,.25,.25);
-	attach(mCompassSprite);
-
-	mAcornSprite=mEngine->createNodeType(SpriteNode::type(),mScene);
-	mAcornSprite->setMaterial(Resources::instance->hudAcorn);
-	mAcornSprite->setTranslate(-0.75,0.75,0);
-	mAcornSprite->setScale(0.25,0.20,0.25);
-	attach(mAcornSprite);
-
-	mAcornLabel=mEngine->createNodeType(LabelNode::type(),mScene);
-	mAcornLabel->setFont(Resources::instance->hudWooden);
-	mAcornLabel->setAlignment(Font::Alignment_BIT_VCENTER|Font::Alignment_BIT_LEFT);
-	mAcornLabel->setTranslate(-0.60,0.80,0);
-	mAcornLabel->setScale(0.3,0.3,0.3);
-	mAcornLabel->getSharedRenderState()->setMaterialState(MaterialState(Colors::BROWN));
-	attach(mAcornLabel);
-	updateAcornCount(0);
-
-	mSystemLabel=mEngine->createNodeType(LabelNode::type(),mScene);
-	mSystemLabel->setFont(Resources::instance->hudSystem);
-	mSystemLabel->setTranslate(-0.25,-0.80,0);
-	mSystemLabel->setScale(0.1,0.1,0.1);
-	attach(mSystemLabel);
-
-	return this;
-}
-
-void HUD::frameUpdate(int dt,int scope){
-	if(mPlayer!=NULL){
-		Vector3 right,forward,up;
-		Math::setAxesFromQuaternion(mCamera->getWorldRotate(),forward,right,up);
+		Vector3 forward=mCamera->getForward();
 		forward.z=0;
 		Math::normalizeCarefully(forward,0);
 		scalar angle=-Math::atan2(forward.y,forward.x);
-		mCompassSprite->setRotate(Math::Z_UNIT_VECTOR3,angle);
+		mParent->setRotate(Math::Z_UNIT_VECTOR3,angle);\
+	}
 
+	bool getActive() const{return true;}
+
+protected:
+	Camera::ptr mCamera;
+};
+
+/* 
+	FadeComponent::frameUpdate, replace with some animations
 		MaterialState materialState;
 		if(mFadeSprite->getMaterial()!=NULL){
 			mFadeSprite->getMaterial()->getPass()->getMaterialState(materialState);
@@ -73,8 +35,6 @@ void HUD::frameUpdate(int dt,int scope){
 		Vector4 dangerColor=materialState.ambient;
 //		dangerColor.w=mPlayer->getDanger();
 
-		/// @todo:
-/*
 		if(mChompTime>0){
 			scalar chompamount=Math::fromMilli(mScene->getTime()-mChompTime);
 			scalar amount=powf(5.0,Math::sin(Math::mul(chompamount,Math::PI)));
@@ -95,7 +55,6 @@ void HUD::frameUpdate(int dt,int scope){
 				dangerColor.w=Math::clamp(0,Math::ONE,(Math::ONE-chompamount*2)+Math::ONE);
 			}
 		}
-*/
 
 		materialState.set(dangerColor);
 		if(mFadeSprite->getMaterial()!=NULL){
@@ -107,19 +66,27 @@ void HUD::frameUpdate(int dt,int scope){
 		else{
 			mFadeSprite->setScope(0);
 		}
-	}
+*/
 
-	super::frameUpdate(dt,scope);
-}
-
-void HUD::logicUpdate(int dt,int scope){
-	/*
-	if(mPlayer!=NULL){
+/* AcornComponent
 		int newAcornCount=mPlayer->getAcornCount();
 		if(mAcornCount!=newAcornCount){
 			updateAcornCount(newAcornCount);
-		}
 
+			void HUD::updateAcornCount(int count){
+				mAcornCount=count;
+				String text;
+				int digits=0;
+				int i;
+				for(i=mAcornCount;i>0;i/=10,digits++);
+				for(i=0;i<3-digits;++i) text=text+"0";
+				if(count>0) text=text+count;
+				((LabelComponent*)mAcorns->getVisible(0))->setText(text);
+			}
+		}
+*/
+
+/* ChompComponent
 		if(mPlayer->getCoefficientOfGravity()==0){
 			mWaterAmount+=Math::fromMilli(dt*4);
 		}
@@ -167,35 +134,64 @@ void HUD::logicUpdate(int dt,int scope){
 			mSharkSound->setGain(0);
 			mSharkSound->stop();
 		}
+*/
+
+HUD::HUD(Scene *scene,Node *player,Camera *camera):Node(scene){
+	Node::ptr sounds=new Node(mScene);
+	{
+		mDogSound=new AudioComponent(mEngine);
+		mDogSound->setAudioBuffer(Resources::instance->dog);
+		mDogSound->setGlobal(true);
+		sounds->attach(mDogSound);
+
+		mSharkSound=new AudioComponent(mEngine);
+		mSharkSound->setAudioBuffer(Resources::instance->shark);
+		mSharkSound->setGlobal(true);
+		sounds->attach(mSharkSound);
 	}
-	*/
+	attach(sounds);
 
-	/// @todo: Why isn't this working?
-//	mSystemLabel->setText(String("FPS:")+(int)getFramesPerSecond());
+	mFade=new Node(mScene);
+	{
+		SpriteComponent::ptr sprite=new SpriteComponent(mEngine);
+		sprite->setMaterial(Resources::instance->hudFade);
+		mFade->attach(sprite);
+		mFade->setScale(Vector3(2,2,2));
+	}
+	attach(mFade);
 
-	super::logicUpdate(dt,scope);
+	mCompass=new Node(mScene);
+	{
+		SpriteComponent::ptr sprite=new SpriteComponent(mEngine);
+		sprite->setMaterial(Resources::instance->hudCompass);
+		mCompass->attach(sprite);
+		mCompass->setTranslate(0.75,0.75,0);
+		mCompass->setScale(0.25,0.25,0.25);
+
+		CompassComponent::ptr compass=new CompassComponent(camera);
+		mCompass->attach(compass);
+	}
+	attach(mCompass);
+	
+	mAcorn=new Node(mScene);
+	{
+		SpriteComponent::ptr sprite=new SpriteComponent(mEngine);
+		sprite->setMaterial(Resources::instance->hudAcorn);
+		mAcorn->attach(sprite);
+		mAcorn->setTranslate(-0.75,0.75,0);
+		mAcorn->setScale(0.25,0.20,0.25);
+	}
+	attach(mAcorn);
+
+	mAcorns=new Node(mScene);
+	{
+		LabelComponent::ptr label=new LabelComponent(mEngine);
+		label->setFont(Resources::instance->hudWooden);
+		label->setAlignment(Font::Alignment_BIT_VCENTER|Font::Alignment_BIT_LEFT);
+		label->getSharedRenderState()->setMaterialState(MaterialState(Colors::BROWN));
+		mAcorns->attach(label);
+		mAcorns->setTranslate(-0.60,0.80,0);
+		mAcorns->setScale(0.3,0.3,0.3);
+	}
+	attach(mAcorns);
 }
-
-void HUD::setTarget(Node *player,CameraNode *camera){
-	mPlayer=player;
-	mCamera=camera;
-}
-
-void HUD::setProjectionOrtho(scalar leftDist,scalar rightDist,scalar bottomDist,scalar topDist,scalar nearDist,scalar farDist){
-	super::setProjectionOrtho(leftDist,rightDist,bottomDist,topDist,nearDist,farDist);
-	scalar width=rightDist*2,height=topDist*2;
-
-	mFadeSprite->setScale(width,height,Math::ONE);
-}
-
-void HUD::updateAcornCount(int count){
-	mAcornCount=count;
-	String text;
-	int digits=0;
-	int i;
-	for(i=mAcornCount;i>0;i/=10,digits++);
-	for(i=0;i<3-digits;++i) text=text+"0";
-	if(count>0) text=text+count;
-	mAcornLabel->setText(text);
-}
-#endif

@@ -5,8 +5,7 @@
 #include "PathClimber.h"
 #include "SmoothFollower.h"
 #include "Sky.h"
-
-class HUD;
+#include "HUD.h"
 
 class RandIsle:public Object,public Applet,public TerrainNodeDataSource,public UpdateListener,public TerrainNodeListener,public InputDeviceListener,public PathClimberListener{
 public:
@@ -118,9 +117,11 @@ protected:
 	Vector3 mPatchScale;
 	Noise mPatchNoise;
 	Sky::ptr mSky;
-	AudioComponent::ptr mRustleSound;
 
-//	IntrusivePointer<HUD> mHUD;
+	HUD::ptr mHUD;
+	Camera::ptr mHUDCamera;
+
+	AudioComponent::ptr mRustleSound; // TODO: Move to hud?
 };
 
 #endif

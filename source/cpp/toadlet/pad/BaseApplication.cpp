@@ -218,15 +218,18 @@ bool BaseApplication::createContextAndRenderDevice(const String &plugin){
 	}
 
 	// Blacklist or restrict known faulty drivers here
-	{
-		AdaptorInfo *info=mRenderTarget->getAdaptorInfo();
-		if(info!=NULL && info->getDescription()=="ATI FireGL V3100" && (mFormat->getPixelFormat()==TextureFormat::Format_RGB_5_6_5 || mFormat->getPixelFormat()==TextureFormat::Format_BGR_5_6_5)){
+	AdaptorInfo *info=mRenderTarget->getAdaptorInfo();
+	if(info!=NULL){
+		if(info->getDescription()=="ATI FireGL V3100" && (mFormat->getPixelFormat()==TextureFormat::Format_RGB_5_6_5 || mFormat->getPixelFormat()==TextureFormat::Format_BGR_5_6_5)){
 			Error::unknown(Categories::TOADLET_PAD,
 				"The requested pixel format is known to crash on this card.  Try 24 color bits");
 			return false;
 		}
 
-		/// @todo: Add a preference for fixed function on alienware intel integrated
+		// Shader performance is quite poor, force fixed until we can just prefer fixed
+		if(info->getDescription()=="Intel(R) HD Graphics Family"/* && info->getVersion()=="3.0.0 - Build 8.15.10.2342"*/){
+			mEngine->setHasMaximumShader(false);
+		}
 	}
 
 	bool result=false;
