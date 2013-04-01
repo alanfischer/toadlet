@@ -23,6 +23,7 @@ set (PEEPER_SRC
 
 # Headers
 set (PEEPER_HDR
+	AdaptorInfo.h
 	BackableBuffer.h
 	BackableVertexFormat.h
 	BackablePixelBufferRenderTarget.h

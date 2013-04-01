@@ -100,13 +100,16 @@ void RandIsle::create(){
 		mRefractCamera->setClearColor(Resources::instance->fadeColor);
 		mRefractCamera->getDefaultState()->setFogState(FogState(FogState::FogType_LINEAR,Math::ONE,mCamera->getFarDist()/2,mCamera->getFarDist(),mCamera->getClearColor()));
 	}
-/*
-	mHUD=mEngine->createNodeType(HUD::type(),mScene);
-	mHUD->setProjectionOrtho(-1,1,-1,1,-1,1);
-	mHUD->setClearFlags(0);
-	mHUD->setScope(Scope_HUD);
+
+	mHUD=new HUD(mScene,mPlayer,mCamera);
+	mHUD->setScope(Scope_BIT_HUD);
 	mScene->getRoot()->attach(mHUD);
-*/
+
+	mHUDCamera=new Camera();
+	mHUDCamera->setProjectionOrtho(-1,1,-1,1,-1,1);
+	mHUDCamera->setClearFlags(0);
+	mHUDCamera->setScope(Scope_BIT_HUD);
+
 	mSky=new Sky(mScene,Resources::instance->cloudSize,Resources::instance->skyColor,Resources::instance->fadeColor);
 	mSky->setScope(mSky->getScope()&~Scope_BIT_SHADOW);
 	mSky->getSun()->getParent()->setScope(~Scope_BIT_SHADOW);
@@ -171,7 +174,6 @@ void RandIsle::create(){
 	mMountBound=new Bound();
 	mBoundSensor=new BoundingVolumeSensor(mScene);
 
-//	mHUD->setTarget(mPlayer,mCamera);
 	mFollower->setTarget(mPlayer);
 	mTerrain->setUpdateTargetBias(128/(getPatchSize()*getPatchScale().x));
 
@@ -281,7 +283,7 @@ void RandIsle::render(){
 
 		mCamera->render(device,mScene);
 
-//		mHUD->render(device);
+		mHUDCamera->render(device,mScene,mHUD);
 	}
 	device->endScene();
 	device->swap();
