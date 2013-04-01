@@ -92,15 +92,16 @@ if (NOT TOADLET_PLATFORM_PYTHON)
 	set (TADPOLE_SWIG_INT_DEPS
 		${CMAKE_CURRENT_SOURCE_DIR}/toadlet/tadpole/Engine.i
 		${CMAKE_CURRENT_SOURCE_DIR}/toadlet/tadpole/Scene.i
+		${CMAKE_CURRENT_SOURCE_DIR}/toadlet/tadpole/Camera.i
 		${CMAKE_CURRENT_SOURCE_DIR}/toadlet/tadpole/Component.i
 		${CMAKE_CURRENT_SOURCE_DIR}/toadlet/tadpole/Track.i
 		${CMAKE_CURRENT_SOURCE_DIR}/toadlet/tadpole/Sequence.i
 		${CMAKE_CURRENT_SOURCE_DIR}/toadlet/tadpole/Action.i
+		${CMAKE_CURRENT_SOURCE_DIR}/toadlet/tadpole/ActionListener.i
 		${CMAKE_CURRENT_SOURCE_DIR}/toadlet/tadpole/Visible.i
 		${CMAKE_CURRENT_SOURCE_DIR}/toadlet/tadpole/AnimationAction.i
 		${CMAKE_CURRENT_SOURCE_DIR}/toadlet/tadpole/ActionComponent.i
 		${CMAKE_CURRENT_SOURCE_DIR}/toadlet/tadpole/AudioComponent.i
-		${CMAKE_CURRENT_SOURCE_DIR}/toadlet/tadpole/Camera.i
 		${CMAKE_CURRENT_SOURCE_DIR}/toadlet/tadpole/CameraComponent.i
 		${CMAKE_CURRENT_SOURCE_DIR}/toadlet/tadpole/MeshComponent.i
 		${CMAKE_CURRENT_SOURCE_DIR}/toadlet/tadpole/LightComponent.i
