@@ -13,7 +13,7 @@ class Animation{
 public:
 	virtual ~Animation(){}
 
-	virtual const String &getName() const=0;
+	virtual String getName() const=0;
 	
 	virtual void setValue(scalar value)=0;
 	virtual scalar getMinValue() const=0;
