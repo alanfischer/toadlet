@@ -37,7 +37,7 @@ class TOADLET_API AudioAction:public Object,public Action{
 public:
 	TOADLET_OBJECT(AudioAction);
 
-	AudioAction();
+	AudioAction(AudioComponent *audio=NULL);
 	virtual ~AudioAction(){}
 
 	bool getActive() const{return mRunning;}
@@ -46,7 +46,6 @@ public:
 	void removeActionListener(ActionListener *listener){mListeners.remove(listener);}
 
 	void setAudio(AudioComponent *audio);
-	void setAudioStream(const String &stream);
 
 	void start();
 	void stop();
@@ -56,7 +55,6 @@ public:
 protected:
 	Collection<ActionListener*> mListeners;
 	AudioComponent::ptr mAudio;
-	String mAudioStream;
 	bool mRunning;
 };
 
