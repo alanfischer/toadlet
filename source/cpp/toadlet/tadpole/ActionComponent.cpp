@@ -29,7 +29,8 @@
 namespace toadlet{
 namespace tadpole{
 
-ActionComponent::ActionComponent(const String &name,Action *action):BaseComponent(name)
+ActionComponent::ActionComponent(const String &name,Action *action):BaseComponent(name),
+	mActive(false)
 	//mAction
 {
 	if(action!=NULL){
@@ -81,10 +82,22 @@ void ActionComponent::stop(){
 }
 
 void ActionComponent::frameUpdate(int dt,int scope){
+	bool active=false;
+
 	int i;
 	for(i=0;i<mActions.size();++i){
 		mActions[i]->update(dt);
+
+		active|=mActions[i]->getActive();
 	}
+
+	if(mActive==true && active==false){
+		if(mNextActionName!=(char*)NULL){
+			mParent->startAction(mNextActionName);
+		}
+	}
+
+	mActive=active;
 }
 
 bool ActionComponent::getActive() const{
