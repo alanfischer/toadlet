@@ -14,6 +14,21 @@ static const scalar epsilon=0.001f;
 /// @todo: Fix:
 ///  - Android GLES1/2 swapping not working due to different GL libraries being loaded, have to use glesem
 
+/// @todo: These could be removed if nodes supported propagating scopes, similar to worldTransform, worldScope
+void clearScopeBit(Node *node,int scope){
+	node->setScope(node->getScope()&~scope);
+	for(int i=0;i<node->getNumNodes();++i){
+		clearScopeBit(node->getNode(i),scope);
+	}
+}
+
+void setScopeBit(Node *node,int scope){
+	node->setScope(node->getScope()|scope);
+	for(int i=0;i<node->getNumNodes();++i){
+		setScopeBit(node->getNode(i),scope);
+	}
+}
+
 RandIsle::RandIsle(Application *app,String path):
 	mMouseButtons(0),
 	mXJoy(0),mYJoy(0),
@@ -102,18 +117,16 @@ void RandIsle::create(){
 	}
 
 	mHUD=new HUD(mScene,mPlayer,mCamera);
-	mHUD->setScope(Scope_BIT_HUD);
+	clearScopeBit(mHUD,Scope_BIT_SHADOW);
+	setScopeBit(mHUD,Scope_BIT_HUD);
 	mScene->getRoot()->attach(mHUD);
 
 	mHUDCamera=new Camera();
 	mHUDCamera->setProjectionOrtho(-1,1,-1,1,-1,1);
 	mHUDCamera->setClearFlags(0);
-	mHUDCamera->setScope(Scope_BIT_HUD);
 
 	mSky=new Sky(mScene,Resources::instance->cloudSize,Resources::instance->skyColor,Resources::instance->fadeColor);
-	mSky->setScope(mSky->getScope()&~Scope_BIT_SHADOW);
-	mSky->getSun()->getParent()->setScope(~Scope_BIT_SHADOW);
-	mSky->getLight()->getParent()->setScope(~Scope_BIT_SHADOW);
+	clearScopeBit(mSky,Scope_BIT_SHADOW);
 	mScene->getBackground()->attach(mSky);
 
 	VertexBuffer::ptr predictedVertexBuffer=mEngine->getBufferManager()->createVertexBuffer(Buffer::Usage_BIT_STREAM,Buffer::Access_BIT_WRITE,mEngine->getVertexFormats().POSITION_COLOR,512);

@@ -26,7 +26,6 @@
 #ifndef TOADLET_PAD_APPLICATION_H
 #define TOADLET_PAD_APPLICATION_H
 
-#include <toadlet/egg/String.h>
 #include <toadlet/peeper/RenderTarget.h>
 #include <toadlet/peeper/RenderDevice.h>
 #include <toadlet/peeper/WindowRenderTargetFormat.h>

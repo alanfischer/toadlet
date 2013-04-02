@@ -26,7 +26,6 @@
 #ifndef TOADLET_TADPOLE_PARTICLECOMPONENT_H
 #define TOADLET_TADPOLE_PARTICLECOMPONENT_H
 
-#include <toadlet/egg/String.h>
 #include <toadlet/egg/Random.h>
 #include <toadlet/peeper/IndexBufferAccessor.h>
 #include <toadlet/peeper/IndexData.h>

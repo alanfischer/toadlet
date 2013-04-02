@@ -27,7 +27,6 @@
 #define TOADLET_PEEPER_VARIABLEBUFFERFORMAT_H
 
 #include <toadlet/egg/Collection.h>
-#include <toadlet/egg/String.h>
 #include <toadlet/peeper/Types.h>
 
 namespace toadlet{

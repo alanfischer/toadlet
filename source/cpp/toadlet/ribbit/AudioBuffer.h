@@ -26,7 +26,6 @@
 #ifndef TOADLET_RIBBIT_AUDIOBUFFER_H
 #define TOADLET_RIBBIT_AUDIOBUFFER_H
 
-#include <toadlet/egg/String.h>
 #include <toadlet/egg/Resource.h>
 #include <toadlet/ribbit/Types.h>
 #include <toadlet/ribbit/AudioStream.h>
