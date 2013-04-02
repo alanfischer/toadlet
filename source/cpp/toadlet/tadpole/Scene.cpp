@@ -268,8 +268,6 @@ void Scene::traceSegment(PhysicsCollision &result,const Segment &segment,int col
 }
 
 void Scene::destroy(Component *component){
-	TOADLET_ASSERT(false && "This function appears to be broken when removing an physical object");
-
 	mDestroyComponents.add(component);
 }
 

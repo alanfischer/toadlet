@@ -33,6 +33,7 @@
 namespace toadlet{
 namespace tadpole{
 
+/// @todo: Introduce CombinedAction instead of ActionComponent implicitly combining actions.  Then a CombinedAction could have the nextAction functionality.
 class TOADLET_API ActionComponent:public BaseComponent,public ActionListener{
 public:
 	TOADLET_OBJECT(ActionComponent);
@@ -44,6 +45,8 @@ public:
 	
 	virtual void attach(Action *action);
 	virtual void remove(Action *action);
+
+	void setNextActionName(String name){mNextActionName=name;}
 
 	virtual void start();
 	virtual void stop();
@@ -57,6 +60,8 @@ public:
 
 protected:
 	Collection<Action::ptr> mActions;
+	bool mActive;
+	String mNextActionName;
 };
 
 }
