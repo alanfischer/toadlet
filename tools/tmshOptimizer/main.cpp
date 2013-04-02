@@ -1,4 +1,3 @@
-#include <toadlet/egg/String.h>
 #include <toadlet/egg/io/FileStream.h>
 #include <toadlet/tadpole/Engine.h>
 #include <toadlet/tadpole/plugins/XMSHStreamer.h>

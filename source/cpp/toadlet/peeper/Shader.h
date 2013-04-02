@@ -27,7 +27,6 @@
 #define TOADLET_PEEPER_SHADER_H
 
 #include <toadlet/egg/Resource.h>
-#include <toadlet/egg/String.h>
 #include <toadlet/peeper/VariableBufferFormat.h>
 
 namespace toadlet{

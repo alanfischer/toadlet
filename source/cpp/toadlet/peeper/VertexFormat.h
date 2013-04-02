@@ -26,7 +26,6 @@
 #ifndef TOADLET_PEEPER_VERTEXFORMAT_H
 #define TOADLET_PEEPER_VERTEXFORMAT_H
 
-#include <toadlet/egg/String.h>
 #include <toadlet/egg/Resource.h>
 #include <toadlet/peeper/Types.h>
 

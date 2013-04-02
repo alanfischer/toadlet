@@ -32,6 +32,7 @@
 #include <toadlet/egg/SharedPointer.h>
 #include <toadlet/egg/IntrusivePointer.h>
 #include <toadlet/egg/Object.h>
+#include <toadlet/egg/String.h>
 
 namespace toadlet{
 namespace peeper{

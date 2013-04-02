@@ -26,13 +26,12 @@
 #ifndef TOADLET_TADPOLE_ATTACHABLE_H
 #define TOADLET_TADPOLE_ATTACHABLE_H
 
-#include <toadlet/egg/String.h>
 #include <toadlet/tadpole/Transform.h>
 
 namespace toadlet{
 namespace tadpole{
 
-class Attachable/*:public Interface*/{
+class Attachable{
 public:
 	virtual ~Attachable(){}
 
