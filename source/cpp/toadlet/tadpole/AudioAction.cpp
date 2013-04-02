@@ -28,9 +28,9 @@
 namespace toadlet{
 namespace tadpole{
 
-AudioAction::AudioAction():
+AudioAction::AudioAction(AudioComponent *audio):
 	//mListeners,
-	//mAudio,
+	mAudio(audio),
 	//mAudioStream,
 	mRunning(false)
 {
@@ -40,13 +40,10 @@ void AudioAction::setAudio(AudioComponent *audio){
 	mAudio=audio;
 }
 
-void AudioAction::setAudioStream(const String &stream){
-	mAudioStream=stream;
-}
-
 void AudioAction::start(){
-	mAudio->setAudioStream(mAudioStream);
-	mAudio->play();
+	if(mAudio!=NULL){
+		mAudio->play();
+	}
 
 	mRunning=true;
 
@@ -57,7 +54,9 @@ void AudioAction::start(){
 }
 
 void AudioAction::stop(){
-	mAudio->stop();
+	if(mAudio!=NULL){
+		mAudio->stop();
+	}
 
 	mRunning=false;
 
