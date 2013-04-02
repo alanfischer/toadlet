@@ -241,8 +241,8 @@ foreach (TOADLET_LIB ${TOADLET_LIB_BASENAMES})
 			if (${TOADLET_LIB_VAR}_LIB AND ${TOADLET_LIB_VAR}_LIB_D)
 				set (${TOADLET_LIB_VAR}_DLL ${${TOADLET_LIB_VAR}_DLL} CACHE FILEPATH "Path to release dll" FORCE)
 				set (${TOADLET_LIB_VAR}_DLL_D ${${TOADLET_LIB_VAR}_DLL_D} CACHE FILEPATH "Path to debug dll" FORCE)
-				set (TOADLET_DLLS ${TOADLET_DLLS} ${${TOADLET_LIB_VAR}_LIB})
-				set (TOADLET_DLL_D ${TOADLET_DLLS_D} ${${TOADLET_LIB_VAR}_LIB_D})
+				set (TOADLET_DLLS ${TOADLET_DLLS} ${${TOADLET_LIB_VAR}_DLL})
+				set (TOADLET_DLLS_D ${TOADLET_DLLS_D} ${${TOADLET_LIB_VAR}_DLL_D})
 			endif (${TOADLET_LIB_VAR}_LIB AND ${TOADLET_LIB_VAR}_LIB_D)
 			
 			# If only release dlls are found, assign them to the debug dlls
