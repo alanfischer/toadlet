@@ -71,23 +71,23 @@ using namespace toadlet::tadpole;
 %include <toadlet/tadpole/Scene.i>
 %include <toadlet/tadpole/Camera.i>
 %include <toadlet/tadpole/Component.i>
-%include <toadlet/tadpole/Action.i>
-%include <toadlet/tadpole/ActionListener.i>
 %include <toadlet/tadpole/Visible.i>
-%include <toadlet/tadpole/AnimationAction.i>
 %include <toadlet/tadpole/ActionComponent.i>
 %include <toadlet/tadpole/AudioComponent.i>
 %include <toadlet/tadpole/CameraComponent.i>
 %include <toadlet/tadpole/MeshComponent.i>
 %include <toadlet/tadpole/LightComponent.i>
 %include <toadlet/tadpole/Node.i>
-%include <toadlet/tadpole/animation/Animation.i>
-%include <toadlet/tadpole/animation/BaseAnimation.i>
-%include <toadlet/tadpole/animation/MaterialAnimation.i>
+%include <toadlet/tadpole/action/Action.i>
+%include <toadlet/tadpole/action/ActionListener.i>
+%include <toadlet/tadpole/action/AnimationAction.i>
+%include <toadlet/tadpole/action/Animation.i>
+%include <toadlet/tadpole/action/BaseAnimation.i>
+%include <toadlet/tadpole/action/MaterialAnimation.i>
 %{
 using namespace toadlet;
 using namespace toadlet::tadpole;
-using namespace toadlet::tadpole::animation;
+using namespace toadlet::tadpole::action;
 using namespace toadlet::tadpole::node;
 %}
 

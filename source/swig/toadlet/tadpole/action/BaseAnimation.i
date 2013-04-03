@@ -1,10 +1,10 @@
 %{
-#include <toadlet/tadpole/animation/BaseAnimation.h>
+#include <toadlet/tadpole/action/BaseAnimation.h>
 %}
 
 namespace toadlet{
 namespace tadpole{
-namespace animation{
+namespace action{
 
 #%feature("director") BaseAnimation;
 

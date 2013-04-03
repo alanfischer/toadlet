@@ -1,22 +1,23 @@
 %{
-#include <toadlet/tadpole/ActionListener.h>
+#include <toadlet/tadpole/action/ActionListener.h>
 %}
 
 // @todo: Reenable this when dynamic_cast is supported by default on android, or write custom java directors
 // #define ACTIONLISTENER_DIRECTOR
 
 #ifdef ACTIONLISTENER_DIRECTOR
-%feature("director") toadlet::tadpole::ActionListener;
+%feature("director") toadlet::tadpole::action::ActionListener;
 #endif
-%rename(NativeActionListener) toadlet::tadpole::ActionListener; 
-%typemap(jstype) toadlet::tadpole::ActionListener* "ActionListener";
-%typemap(javainterfaces) toadlet::tadpole::ActionListener "ActionListener";
+%rename(NativeActionListener) toadlet::tadpole::action::ActionListener; 
+%typemap(jstype) toadlet::tadpole::action::ActionListener* "ActionListener";
+%typemap(javainterfaces) toadlet::tadpole::action::ActionListener "ActionListener";
 %typemap(javain,pgcppname="n",
 	pre="NativeActionListener n = tadpole.makeNative($javainput);")
-	toadlet::tadpole::ActionListener* "NativeActionListener.getCPtr(n)"
+	toadlet::tadpole::action::ActionListener* "NativeActionListener.getCPtr(n)"
 	
 namespace toadlet{
 namespace tadpole{
+namespace action{
 
 class ActionListener{
 public:
@@ -26,6 +27,7 @@ public:
 	virtual void actionStopped(Action *action)=0;
 };
 
+}
 }
 }
 

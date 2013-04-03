@@ -1,9 +1,12 @@
 %{
-#include <toadlet/tadpole/Action.h>
+#include <toadlet/tadpole/action/Action.h>
 %}
 
 namespace toadlet{
 namespace tadpole{
+namespace action{
+
+class ActionListener;
 
 class Action{
 public:
@@ -18,5 +21,6 @@ public:
 	void removeActionListener(ActionListener *listener)=0;
 };
 
+}
 }
 }
