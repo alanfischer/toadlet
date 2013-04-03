@@ -73,6 +73,10 @@ public:
 	bool collisionResponse(hop::Solid *solid,Vector3 &position,Vector3 &remainder,hop::Collision &collision){return false;}
 	void postUpdate(hop::Solid *solid,int dt,scalar fdt){}
 
+	/// @todo: Should be in a subclass of HopManager/HopComponent
+	void setSnapGrid(float snap){mSnapGrid=snap;}
+	float mSnapGrid;
+
 	static void set(PhysicsCollision &r,const hop::Collision &c);
 	static void set(hop::Collision &r,const PhysicsCollision &c,hop::Solid *collider,hop::Solid *collidee);
 
