@@ -24,8 +24,6 @@
  ********** Copyright header - do not remove **********/
 
 #include "MMAudioBuffer.h"
-#include <toadlet/egg/Error.h>
-#include <toadlet/egg/Log.h>
 #include <toadlet/ribbit/AudioFormatConversion.h>
 
 namespace toadlet{

@@ -23,7 +23,6 @@
  *
  ********** Copyright header - do not remove **********/
 
-#include <toadlet/egg/Log.h>
 #include <toadlet/peeper/VertexBufferAccessor.h>
 #include <toadlet/tadpole/Mesh.h>
 

@@ -23,45 +23,22 @@
  *
  ********** Copyright header - do not remove **********/
 
-#ifndef TOADLET_TADPOLE_ANIMATION_NODEPATHANIMATION_H
-#define TOADLET_TADPOLE_ANIMATION_NODEPATHANIMATION_H
+#ifndef TOADLET_TADPOLE_ACTION_COSINTERPOLATOR_H
+#define TOADLET_TADPOLE_ACTION_COSINTERPOLATOR_H
 
-#include <toadlet/tadpole/animation/BaseAnimation.h>
-#include <toadlet/tadpole/Node.h>
-#include <toadlet/tadpole/Track.h>
+#include <toadlet/tadpole/action/Interpolator.h>
 
 namespace toadlet{
 namespace tadpole{
-namespace animation{
+namespace action{
 
-class TOADLET_API NodePathAnimation:public BaseAnimation{
+class TOADLET_API CosInterpolator:public Object,public Interpolator{
 public:
-	TOADLET_OBJECT(NodePathAnimation);
+	TOADLET_OBJECT(CosInterpolator);
 
-	NodePathAnimation(Node::ptr target);
-	virtual ~NodePathAnimation(){}
-
-	void setTarget(Node::ptr target);
-	inline Node::ptr getTarget() const{return mTarget;}
-
-	void setTrack(Track::ptr track);
-	inline Track::ptr getTrack() const{return mTrack;}
-
-	void setLookAt(const Vector3 &lookAt);
-	inline const Vector3 &getLookAt() const{return mLookAt;}
-
-	void setValue(scalar value);
-	scalar getValue() const{return mValue;}
-	scalar getMinValue() const{return 0;}
-	scalar getMaxValue() const{return mTrack->getLength();}
-
-protected:
-	Node::ptr mTarget;
-	Track::ptr mTrack;
-	bool mUseLookAt;
-	Vector3 mLookAt;
-	int mHint;
-	scalar mValue;
+	virtual scalar interpolate(scalar value){
+		return Math::div(Math::ONE-Math::cos(Math::mul(value,Math::PI)),Math::TWO);
+	}
 };
 
 }
@@ -69,4 +46,3 @@ protected:
 }
 
 #endif
-

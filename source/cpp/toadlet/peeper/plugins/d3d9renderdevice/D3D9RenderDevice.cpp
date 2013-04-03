@@ -38,8 +38,6 @@
 	#include "D3D9Shader.h"
 #endif
 #include <toadlet/egg/MathConversion.h>
-#include <toadlet/egg/Error.h>
-#include <toadlet/egg/Log.h>
 #include <toadlet/peeper/FogState.h>
 #include <toadlet/peeper/MaterialState.h>
 #include <toadlet/peeper/LightState.h>

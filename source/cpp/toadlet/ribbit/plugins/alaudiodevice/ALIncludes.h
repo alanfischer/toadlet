@@ -26,7 +26,6 @@
 #ifndef TOADLET_PEEPER_ALINCLUDES_H
 #define TOADLET_PEEPER_ALINCLUDES_H
 
-#include <toadlet/egg/Error.h>
 #include <toadlet/egg/MathConversion.h>
 #include <toadlet/ribbit/Types.h>
 

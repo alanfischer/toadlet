@@ -23,7 +23,6 @@
  *
  ********** Copyright header - do not remove **********/
 
-#include <toadlet/egg/Error.h>
 #include <toadlet/tadpole/FontManager.h>
 #if defined(TOADLET_PLATFORM_WIN32)
 	#include <windows.h>

@@ -26,7 +26,6 @@
 #include "JAudioDevice.h"
 #include "JAudio.h"
 #include "JAudioBuffer.h"
-#include <toadlet/egg/Log.h>
 
 namespace toadlet{
 namespace ribbit{

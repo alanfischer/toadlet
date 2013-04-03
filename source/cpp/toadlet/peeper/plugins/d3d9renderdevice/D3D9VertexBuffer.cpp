@@ -26,8 +26,6 @@
 #include "D3D9VertexBuffer.h"
 #include "D3D9VertexFormat.h"
 #include "D3D9RenderDevice.h"
-#include <toadlet/egg/Error.h>
-#include <toadlet/egg/Log.h>
 
 namespace toadlet{
 namespace peeper{

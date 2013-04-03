@@ -25,7 +25,6 @@
 
 #include "D3D10RenderDevice.h"
 #include "D3D10PixelBufferRenderTarget.h"
-#include <toadlet/egg/Error.h>
 
 namespace toadlet{
 namespace peeper{

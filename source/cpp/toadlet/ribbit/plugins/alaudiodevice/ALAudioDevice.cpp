@@ -28,8 +28,6 @@
 #include "ALAudioBuffer.h"
 #include <toadlet/egg/System.h>
 #include <toadlet/egg/Extents.h>
-#include <toadlet/egg/Error.h>
-#include <toadlet/egg/Log.h>
 #include <stdlib.h>
 
 #if defined(TOADLET_PLATFORM_WIN32)

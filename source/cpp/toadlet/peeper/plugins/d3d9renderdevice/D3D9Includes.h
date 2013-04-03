@@ -27,8 +27,6 @@
 #define TOADLET_PEEPER_D3D9INCLUDES_H
 
 #include <toadlet/peeper/Types.h>
-#include <toadlet/egg/Error.h>
-#include <toadlet/egg/Logger.h>
 #include <windows.h>
 #include <commctrl.h>
 #if defined(TOADLET_DEBUG)

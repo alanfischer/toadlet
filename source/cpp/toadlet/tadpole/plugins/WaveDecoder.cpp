@@ -23,8 +23,6 @@
  *
  ********** Copyright header - do not remove **********/
 
-#include <toadlet/egg/Log.h>
-#include <toadlet/egg/Error.h>
 #include <toadlet/egg/EndianConversion.h>
 #include "WaveDecoder.h"
 

@@ -23,24 +23,19 @@
  *
  ********** Copyright header - do not remove **********/
 
-#ifndef TOADLET_TADPOLE_ANIMATION_INTERPOLATOR_H
-#define TOADLET_TADPOLE_ANIMATION_INTERPOLATOR_H
-
-#include <toadlet/tadpole/animation/Animation.h>
+#include <toadlet/tadpole/action/BaseAnimation.h>
 
 namespace toadlet{
 namespace tadpole{
-namespace animation{
+namespace action{
 
-class TOADLET_API Interpolator:public Interface{
-public:
-	TOADLET_INTERFACE(Interpolator);
+BaseAnimation::BaseAnimation():
+	mListener(NULL)
+{}
 
-	virtual scalar interpolate(scalar value)=0;
-};
+BaseAnimation::~BaseAnimation(){
+}
 
 }
 }
 }
-
-#endif

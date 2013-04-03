@@ -32,7 +32,7 @@
 #include <toadlet/tadpole/Skeleton.h>
 #include <toadlet/tadpole/Animatable.h>
 #include <toadlet/tadpole/material/Material.h>
-#include <toadlet/tadpole/animation/BaseAnimation.h>
+#include <toadlet/tadpole/action/BaseAnimation.h>
 
 namespace toadlet{
 namespace tadpole{

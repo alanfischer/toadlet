@@ -23,22 +23,45 @@
  *
  ********** Copyright header - do not remove **********/
 
-#ifndef TOADLET_TADPOLE_ANIMATION_ANIMATIONLISTENER_H
-#define TOADLET_TADPOLE_ANIMATION_ANIMATIONLISTENER_H
+#ifndef TOADLET_TADPOLE_ACTION_NODEPATHANIMATION_H
+#define TOADLET_TADPOLE_ACTION_NODEPATHANIMATION_H
 
-#include <toadlet/tadpole/Types.h>
+#include <toadlet/tadpole/action/BaseAnimation.h>
+#include <toadlet/tadpole/Node.h>
+#include <toadlet/tadpole/Track.h>
 
 namespace toadlet{
 namespace tadpole{
-namespace animation{
+namespace action{
 
-class Animation;
-
-class AnimationListener{
+class TOADLET_API NodePathAnimation:public BaseAnimation{
 public:
-	virtual ~AnimationListener(){}
+	TOADLET_OBJECT(NodePathAnimation);
 
-	virtual void animationExtentsChanged(Animation *animation)=0;
+	NodePathAnimation(Node::ptr target);
+	virtual ~NodePathAnimation(){}
+
+	void setTarget(Node::ptr target);
+	inline Node::ptr getTarget() const{return mTarget;}
+
+	void setTrack(Track::ptr track);
+	inline Track::ptr getTrack() const{return mTrack;}
+
+	void setLookAt(const Vector3 &lookAt);
+	inline const Vector3 &getLookAt() const{return mLookAt;}
+
+	void setValue(scalar value);
+	scalar getValue() const{return mValue;}
+	scalar getMinValue() const{return 0;}
+	scalar getMaxValue() const{return mTrack->getLength();}
+
+protected:
+	Node::ptr mTarget;
+	Track::ptr mTrack;
+	bool mUseLookAt;
+	Vector3 mLookAt;
+	int mHint;
+	scalar mValue;
 };
 
 }
@@ -46,3 +69,4 @@ public:
 }
 
 #endif
+

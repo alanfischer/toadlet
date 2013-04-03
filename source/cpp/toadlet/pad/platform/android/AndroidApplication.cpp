@@ -24,7 +24,6 @@
  ********** Copyright header - do not remove **********/
 
 #include "AndroidApplication.h"
-#include <toadlet/egg/Error.h>
 #include <toadlet/egg/System.h>
 #include <toadlet/egg/platform/android/AndroidAssetArchive.h>
 #include <toadlet/tadpole/platform/android/AndroidTextureStreamer.h>

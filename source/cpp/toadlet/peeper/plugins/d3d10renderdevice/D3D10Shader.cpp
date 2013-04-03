@@ -27,8 +27,6 @@
 #include "D3D10RenderDevice.h"
 #include "D3D10VertexFormat.h"
 #include "D3D10WindowRenderTarget.h"
-#include <toadlet/egg/Error.h>
-#include <toadlet/egg/Log.h>
 
 namespace toadlet{
 namespace peeper{

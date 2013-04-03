@@ -32,7 +32,7 @@
 #include <toadlet/tadpole/Renderable.h>
 #include <toadlet/tadpole/Visible.h>
 #include <toadlet/tadpole/Animatable.h>
-#include <toadlet/tadpole/animation/Animation.h>
+#include <toadlet/tadpole/action/Animation.h>
 #include <toadlet/tadpole/studio/SpriteModel.h>
 
 namespace toadlet{

@@ -23,19 +23,26 @@
  *
  ********** Copyright header - do not remove **********/
 
-#include <toadlet/tadpole/animation/BaseAnimation.h>
+#ifndef TOADLET_TADPOLE_ACTION_ANIMATIONLISTENER_H
+#define TOADLET_TADPOLE_ACTION_ANIMATIONLISTENER_H
+
+#include <toadlet/tadpole/Types.h>
 
 namespace toadlet{
 namespace tadpole{
-namespace animation{
+namespace action{
 
-BaseAnimation::BaseAnimation():
-	mListener(NULL)
-{}
+class Animation;
 
-BaseAnimation::~BaseAnimation(){
-}
+class AnimationListener{
+public:
+	virtual ~AnimationListener(){}
+
+	virtual void animationExtentsChanged(Animation *animation)=0;
+};
 
 }
 }
 }
+
+#endif

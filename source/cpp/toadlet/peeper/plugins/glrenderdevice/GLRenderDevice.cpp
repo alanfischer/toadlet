@@ -38,8 +38,6 @@
 #if defined(TOADLET_HAS_GLQUERY)
 	#include "GLQuery.h"
 #endif
-#include <toadlet/egg/Error.h>
-#include <toadlet/egg/Log.h>
 #include <toadlet/peeper/IndexData.h>
 #include <toadlet/peeper/VertexData.h>
 #include <toadlet/peeper/Viewport.h>

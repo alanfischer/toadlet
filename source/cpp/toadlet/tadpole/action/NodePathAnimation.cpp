@@ -23,11 +23,11 @@
  *
  ********** Copyright header - do not remove **********/
 
-#include <toadlet/tadpole/animation/NodePathAnimation.h>
+#include <toadlet/tadpole/action/NodePathAnimation.h>
 
 namespace toadlet{
 namespace tadpole{
-namespace animation{
+namespace action{
 
 NodePathAnimation::NodePathAnimation(Node::ptr target):
 	//mTarget,

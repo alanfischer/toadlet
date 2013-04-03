@@ -34,7 +34,7 @@
 #include <toadlet/tadpole/Visible.h>
 #include <toadlet/tadpole/Animatable.h>
 #include <toadlet/tadpole/BaseComponent.h>
-#include <toadlet/tadpole/animation/BaseAnimation.h>
+#include <toadlet/tadpole/action/BaseAnimation.h>
 #include <toadlet/tadpole/studio/StudioModel.h>
 
 namespace toadlet{

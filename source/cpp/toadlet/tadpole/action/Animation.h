@@ -23,22 +23,37 @@
  *
  ********** Copyright header - do not remove **********/
 
-#ifndef TOADLET_TADPOLE_ANIMATION_COSINTERPOLATOR_H
-#define TOADLET_TADPOLE_ANIMATION_COSINTERPOLATOR_H
+#ifndef TOADLET_TADPOLE_ACTION_ANIMATION_H
+#define TOADLET_TADPOLE_ACTION_ANIMATION_H
 
-#include <toadlet/tadpole/animation/Interpolator.h>
+#include <toadlet/tadpole/Types.h>
+#include <toadlet/tadpole/action/AnimationListener.h>
 
 namespace toadlet{
 namespace tadpole{
-namespace animation{
+namespace action{
 
-class TOADLET_API CosInterpolator:public Object,public Interpolator{
+class Animation:public Interface{
 public:
-	TOADLET_OBJECT(CosInterpolator);
+	TOADLET_INTERFACE(Animation);
 
-	virtual scalar interpolate(scalar value){
-		return Math::div(Math::ONE-Math::cos(Math::mul(value,Math::PI)),Math::TWO);
-	}
+	virtual ~Animation(){}
+
+	virtual const String &getName() const=0;
+
+	virtual void setValue(scalar value)=0;
+	virtual scalar getMinValue() const=0;
+	virtual scalar getMaxValue() const=0;
+	virtual scalar getValue() const=0;
+
+	virtual void setWeight(scalar weight)=0;
+	virtual scalar getWeight() const=0;
+
+	virtual void setScope(int scope)=0;
+	virtual int getScope() const=0;
+
+	// TODO: dont allow animations to change length, so this wont be necessary
+	virtual void setAnimationListener(AnimationListener *listener)=0;
 };
 
 }

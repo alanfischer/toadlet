@@ -27,7 +27,6 @@
 #include "GLVertexFormat.h"
 #include "GLSLVertexLayout.h"
 #include "GLRenderDevice.h"
-#include <toadlet/egg/Log.h>
 
 #if defined(TOADLET_HAS_GLSL)
 

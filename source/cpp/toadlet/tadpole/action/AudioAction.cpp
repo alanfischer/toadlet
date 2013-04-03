@@ -23,42 +23,60 @@
  *
  ********** Copyright header - do not remove **********/
 
-#ifndef TOADLET_TADPOLE_AUDIOACTION_H
-#define TOADLET_TADPOLE_AUDIOACTION_H
-
-#include <toadlet/egg/Collection.h>
-#include <toadlet/tadpole/Action.h>
-#include <toadlet/tadpole/AudioComponent.h>
+#include <toadlet/tadpole/action/AudioAction.h>
 
 namespace toadlet{
 namespace tadpole{
+namespace action{
 
-class TOADLET_API AudioAction:public Object,public Action{
-public:
-	TOADLET_OBJECT(AudioAction);
+AudioAction::AudioAction(AudioComponent *audio):
+	//mListeners,
+	mAudio(audio),
+	//mAudioStream,
+	mRunning(false)
+{
+}
 
-	AudioAction(AudioComponent *audio=NULL);
-	virtual ~AudioAction(){}
+void AudioAction::setAudio(AudioComponent *audio){
+	mAudio=audio;
+}
 
-	bool getActive() const{return mRunning;}
+void AudioAction::start(){
+	if(mAudio!=NULL){
+		mAudio->play();
+	}
 
-	void addActionListener(ActionListener *listener){mListeners.add(listener);}
-	void removeActionListener(ActionListener *listener){mListeners.remove(listener);}
+	mRunning=true;
 
-	void setAudio(AudioComponent *audio);
+	int i;
+	for(i=0;i<mListeners.size();++i){
+		mListeners[i]->actionStarted(this);
+	}
+}
 
-	void start();
-	void stop();
+void AudioAction::stop(){
+	if(mAudio!=NULL){
+		mAudio->stop();
+	}
 
-	void update(int dt);
+	mRunning=false;
 
-protected:
-	Collection<ActionListener*> mListeners;
-	AudioComponent::ptr mAudio;
-	bool mRunning;
-};
+	int i;
+	for(i=0;i<mListeners.size();++i){
+		mListeners[i]->actionStopped(this);
+	}
+}
+
+void AudioAction::update(int dt){
+	if(mRunning==false){
+		return;
+	}
+
+	if(mRunning && mAudio->getFinished()){
+		stop();
+	}
+}
 
 }
 }
-
-#endif
+}

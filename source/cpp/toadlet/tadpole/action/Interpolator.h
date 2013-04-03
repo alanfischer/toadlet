@@ -23,56 +23,24 @@
  *
  ********** Copyright header - do not remove **********/
 
-#include <toadlet/egg/io/DataStream.h>
-#include <toadlet/ribbit/AudioFormatConversion.h>
-#include "MODDecoder.h"
+#ifndef TOADLET_TADPOLE_ACTION_INTERPOLATOR_H
+#define TOADLET_TADPOLE_ACTION_INTERPOLATOR_H
+
+#include <toadlet/tadpole/action/Animation.h>
 
 namespace toadlet{
 namespace tadpole{
+namespace action{
 
-MODDecoder::MODDecoder():
-	mFile(NULL)
-{
-	mFormat=AudioFormat::ptr(new AudioFormat(16,2,22050));
-}
+class TOADLET_API Interpolator:public Interface{
+public:
+	TOADLET_INTERFACE(Interpolator);
 
-MODDecoder::~MODDecoder(){
-	if(mFile!=NULL){
-		ModPlug_Unload(mFile);
-	}
-}
-
-bool MODDecoder::openStream(Stream *stream){
-	if(mFile!=NULL){
-		ModPlug_Unload(mFile);
-	}
-
-	ModPlug_Settings settings;
-	ModPlug_GetSettings(&settings);
-	{
-		settings.mChannels=mFormat->getChannels();
-		settings.mBits=mFormat->getBitsPerSample();
-		settings.mFrequency=mFormat->getSamplesPerSecond();
-	}
-	ModPlug_SetSettings(&settings);
-
-	int length=stream->length();
-	tbyte *data=new tbyte[length];
-	stream->read(data,length);
-	mFile=ModPlug_Load(data,length);
-	delete[] data;
-
-	return mFile!=NULL;
-}
-
-int MODDecoder::read(tbyte *buffer,int length){
-	return ModPlug_Read(mFile,buffer,length);
-}
-
-bool MODDecoder::reset(){
-	ModPlug_Seek(mFile,0);
-	return true;
-}
+	virtual scalar interpolate(scalar value)=0;
+};
 
 }
 }
+}
+
+#endif

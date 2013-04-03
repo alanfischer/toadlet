@@ -23,42 +23,46 @@
  *
  ********** Copyright header - do not remove **********/
 
-#ifndef TOADLET_TADPOLE_ANIMATION_BASEANIMATION_H
-#define TOADLET_TADPOLE_ANIMATION_BASEANIMATION_H
+#ifndef TOADLET_TADPOLE_ACTION_MATERIALANIMATION_H
+#define TOADLET_TADPOLE_ACTION_MATERIALANIMATION_H
 
-#include <toadlet/egg/Object.h>
-#include <toadlet/tadpole/animation/Animation.h>
+#include <toadlet/tadpole/action/BaseAnimation.h>
+#include <toadlet/tadpole/material/Material.h>
+#include <toadlet/tadpole/Sequence.h>
 
 namespace toadlet{
 namespace tadpole{
-namespace animation{
+namespace action{
 
-class TOADLET_API BaseAnimation:public Object,public Animation{
+class Controller;
+
+class TOADLET_API MaterialAnimation:public BaseAnimation{
 public:
-	TOADLET_OBJECT(BaseAnimation);
+	TOADLET_OBJECT(MaterialAnimation);
 
-	BaseAnimation();
-	virtual ~BaseAnimation();
+	MaterialAnimation(Material *target,Sequence *sequence,int trackIndex=0);
+	virtual ~MaterialAnimation(){}
 
-	const String &getName() const{return mName;}
+	void setTarget(Material *target);
+	inline Material *getTarget() const{return mTarget;}
 
-	void setValue(scalar value){}
+	bool setSequence(Sequence *sequence,int trackIndex);
+	inline Sequence *getSequence() const{return mSequence;}
+
+	void setValue(scalar value);
+	scalar getValue() const{return mValue;}
 	scalar getMinValue() const{return 0;}
-	scalar getMaxValue() const{return 0;}
-	scalar getValue() const{return 0;}
+	scalar getMaxValue() const{return mSequence->getLength();}
 
 	void setWeight(scalar weight){}
 	scalar getWeight() const{return Math::ONE;}
 
-	void setScope(int scope){}
-	int getScope() const{return -1;}
-
-	void setAnimationListener(AnimationListener *listener){mListener=listener;}
-	AnimationListener *getAnimationListener() const{return mListener;}
-
 protected:
-	String mName;
-	AnimationListener *mListener;
+	Material::ptr mTarget;
+	Sequence::ptr mSequence;
+	Track::ptr mTrack;
+	int mElement;
+	scalar mValue;
 };
 
 }

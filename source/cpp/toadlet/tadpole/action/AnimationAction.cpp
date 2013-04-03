@@ -23,11 +23,11 @@
  *
  ********** Copyright header - do not remove **********/
 
-#include <toadlet/tadpole/AnimationAction.h>
-#include <toadlet/tadpole/Node.h>
+#include <toadlet/tadpole/action/AnimationAction.h>
 
 namespace toadlet{
 namespace tadpole{
+namespace action{
 
 AnimationAction::AnimationAction(Animation *animation):
 	//mListeners,
@@ -220,5 +220,6 @@ void AnimationAction::animationExtentsChanged(Animation *animation){
 	mMaxTime=Math::toMilli(mMaxValue);
 }
 
+}
 }
 }

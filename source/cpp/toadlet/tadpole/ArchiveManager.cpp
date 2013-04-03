@@ -23,7 +23,6 @@
  *
  ********** Copyright header - do not remove **********/
 
-#include <toadlet/egg/Log.h>
 #include <toadlet/egg/System.h>
 #include <toadlet/egg/Extents.h>
 #include <toadlet/egg/io/Stream.h>

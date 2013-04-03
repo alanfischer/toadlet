@@ -23,28 +23,26 @@
  *
  ********** Copyright header - do not remove **********/
 
-#ifndef TOADLET_TADPOLE_ANIMATION_MATERIALANIMATION_H
-#define TOADLET_TADPOLE_ANIMATION_MATERIALANIMATION_H
+#ifndef TOADLET_TADPOLE_ACTION_CAMERAPROJECTIONANIMATION_H
+#define TOADLET_TADPOLE_ACTION_CAMERAPROJECTIONANIMATION_H
 
-#include <toadlet/tadpole/animation/BaseAnimation.h>
-#include <toadlet/tadpole/material/Material.h>
+#include <toadlet/tadpole/action/BaseAnimation.h>
+#include <toadlet/tadpole/Camera.h>
 #include <toadlet/tadpole/Sequence.h>
 
 namespace toadlet{
 namespace tadpole{
-namespace animation{
+namespace action{
 
-class Controller;
-
-class TOADLET_API MaterialAnimation:public BaseAnimation{
+class TOADLET_API CameraProjectionAnimation:public BaseAnimation{
 public:
-	TOADLET_OBJECT(MaterialAnimation);
+	TOADLET_OBJECT(CameraProjectionAnimation);
 
-	MaterialAnimation(Material *target,Sequence *sequence,int trackIndex=0);
-	virtual ~MaterialAnimation(){}
+	CameraProjectionAnimation(Camera *target,Sequence *sequence,int trackIndex=0);
+	virtual ~CameraProjectionAnimation(){}
 
-	void setTarget(Material *target);
-	inline Material *getTarget() const{return mTarget;}
+	void setTarget(Camera *target);
+	inline Camera *getTarget() const{return mTarget;}
 
 	bool setSequence(Sequence *sequence,int trackIndex);
 	inline Sequence *getSequence() const{return mSequence;}
@@ -54,14 +52,11 @@ public:
 	scalar getMinValue() const{return 0;}
 	scalar getMaxValue() const{return mSequence->getLength();}
 
-	void setWeight(scalar weight){}
-	scalar getWeight() const{return Math::ONE;}
-
 protected:
-	Material::ptr mTarget;
+	Camera::ptr mTarget;
 	Sequence::ptr mSequence;
 	Track::ptr mTrack;
-	int mElement;
+	int mElements[3]; // Left/Right, Top/Bottom, Near/Far
 	scalar mValue;
 };
 

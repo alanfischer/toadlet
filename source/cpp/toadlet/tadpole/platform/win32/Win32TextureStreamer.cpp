@@ -24,8 +24,6 @@
  ********** Copyright header - do not remove **********/
 
 #include <toadlet/egg/Collection.h>
-#include <toadlet/egg/Log.h>
-#include <toadlet/egg/Error.h>
 #include <toadlet/tadpole/platform/win32/Win32TextureStreamer.h>
 #include <toadlet/tadpole/platform/win32/StreamIStream.h>
 

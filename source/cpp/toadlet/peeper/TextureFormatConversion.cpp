@@ -24,7 +24,6 @@
  ********** Copyright header - do not remove **********/
 
 #include <toadlet/peeper/TextureFormatConversion.h>
-#include <toadlet/egg/Error.h>
 
 namespace toadlet{
 namespace peeper{

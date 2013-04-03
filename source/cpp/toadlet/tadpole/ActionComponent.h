@@ -27,13 +27,12 @@
 #define TOADLET_TADPOLE_ACTIONCOMPONENT_H
 
 #include <toadlet/egg/Collection.h>
-#include <toadlet/tadpole/Action.h>
+#include <toadlet/tadpole/action/Action.h>
 #include <toadlet/tadpole/BaseComponent.h>
 
 namespace toadlet{
 namespace tadpole{
 
-/// @todo: Introduce CombinedAction instead of ActionComponent implicitly combining actions.  Then a CombinedAction could have the nextAction functionality.
 class TOADLET_API ActionComponent:public BaseComponent,public ActionListener{
 public:
 	TOADLET_OBJECT(ActionComponent);
@@ -42,26 +41,19 @@ public:
 	virtual ~ActionComponent();
 
 	virtual void parentChanged(Node *node);
-	
-	virtual void attach(Action *action);
-	virtual void remove(Action *action);
-
-	void setNextActionName(String name){mNextActionName=name;}
 
 	virtual void start();
 	virtual void stop();
 
 	virtual void frameUpdate(int dt,int scope);
 
-	virtual bool getActive() const;
+	virtual bool getActive() const{return mAction!=NULL?mAction->getActive():false;}
 
-	virtual void actionStarted(Action *component);
-	virtual void actionStopped(Action *component);
+	virtual void actionStarted(Action *component){}
+	virtual void actionStopped(Action *component){}
 
 protected:
-	Collection<Action::ptr> mActions;
-	bool mActive;
-	String mNextActionName;
+	Action::ptr mAction;
 };
 
 }

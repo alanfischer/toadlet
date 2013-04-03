@@ -27,11 +27,15 @@
 #define TOADLET_RIBBIT_TYPES_H
 
 #include <toadlet/egg/Types.h>
-#include <toadlet/egg/math/Math.h>
 #include <toadlet/egg/mathfixed/Math.h>
+#include <toadlet/egg/math/Math.h>
 #include <toadlet/egg/SharedPointer.h>
 #include <toadlet/egg/IntrusivePointer.h>
 #include <toadlet/egg/Object.h>
+#include <toadlet/egg/String.h>
+#include <toadlet/egg/Log.h>
+#include <toadlet/egg/Error.h>
+#include <toadlet/egg/Profile.h>
 
 namespace toadlet{
 namespace egg{namespace io{}}

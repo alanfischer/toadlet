@@ -24,7 +24,6 @@
  ********** Copyright header - do not remove **********/
 
 #include "CoreAudioDecoder.h"
-#include <toadlet/egg/Error.h>
 #include <memory.h>
 
 namespace toadlet{

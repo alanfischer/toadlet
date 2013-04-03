@@ -24,8 +24,6 @@
  ********** Copyright header - do not remove **********/
 
 #include "JAudioBuffer.h"
-#include <toadlet/egg/Error.h>
-#include <toadlet/egg/Log.h>
 
 namespace toadlet{
 namespace ribbit{
