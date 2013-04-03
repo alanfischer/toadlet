@@ -1,9 +1,12 @@
 %{
-#include <toadlet/tadpole/AnimationAction.h>
+#include <toadlet/tadpole/action/AnimationAction.h>
 %}
 
 namespace toadlet{
 namespace tadpole{
+namespace action{
+
+class Animation;
 
 class AnimationAction:public Action{
 public:
@@ -26,8 +29,8 @@ public:
 
 	void setStopGently(bool stop);
 	
-	void attach(toadlet::tadpole::animation::Animation *animation);
-	void remove(toadlet::tadpole::animation::Animation *animation);
+	void attach(Animation *animation);
+	void remove(Animation *animation);
 
 	void start();
 	void stop();
@@ -39,5 +42,6 @@ public:
 	void removeActionListener(ActionListener *listener);
 };
 
+}
 }
 }

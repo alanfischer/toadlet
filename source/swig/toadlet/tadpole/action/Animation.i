@@ -1,10 +1,10 @@
 %{
-#include <toadlet/tadpole/animation/Animation.h>
+#include <toadlet/tadpole/action/Animation.h>
 %}
 
 namespace toadlet{
 namespace tadpole{
-namespace animation{
+namespace action{
 
 %refobject Animation "$this->retain();"
 %unrefobject Animation "$this->release();"

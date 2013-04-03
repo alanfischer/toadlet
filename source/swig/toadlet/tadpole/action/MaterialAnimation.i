@@ -1,10 +1,10 @@
 %{
-#include <toadlet/tadpole/animation/MaterialAnimation.h>
+#include <toadlet/tadpole/action/MaterialAnimation.h>
 %}
 
 namespace toadlet{
 namespace tadpole{
-namespace animation{
+namespace action{
 
 class MaterialAnimation:public Animation{
 public:

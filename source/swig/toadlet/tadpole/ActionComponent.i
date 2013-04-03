@@ -9,7 +9,7 @@ namespace tadpole{
 
 class ActionComponent:public Component{
 public:
-	ActionComponent(String name,Action *action=NULL);
+	ActionComponent(String name,toadlet::tadpole::action::Action *action=NULL);
 	void destroy();
 
 	void setName(String name);
@@ -19,9 +19,6 @@ public:
 	
 	void start();
 	void stop();
-	
-	void attach(Action *action);
-	void remove(Action *action);
 };
 
 }
