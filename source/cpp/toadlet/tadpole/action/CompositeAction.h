@@ -23,28 +23,50 @@
  *
  ********** Copyright header - do not remove **********/
 
-#ifndef TOADLET_TADPOLE_ACTION_H
-#define TOADLET_TADPOLE_ACTION_H
+#ifndef TOADLET_TADPOLE_ACTION_COMPOSITEACTION_H
+#define TOADLET_TADPOLE_ACTION_COMPOSITEACTION_H
 
-#include <toadlet/egg/Interface.h>
-#include <toadlet/tadpole/ActionListener.h>
+#include <toadlet/egg/Collection.h>
+#include <toadlet/tadpole/action/Action.h>
 
 namespace toadlet{
 namespace tadpole{
+namespace action{
 
-class Action:public Interface{
+class TOADLET_API CompositeAction:public Object,public Action,public ActionListener{
 public:
-	TOADLET_INTERFACE(Action);
+	TOADLET_OBJECT(CompositeAction);
 
-	virtual void start()=0;
-	virtual void stop()=0;
-	virtual void update(int dt)=0;
-	virtual bool getActive() const=0;
+	CompositeAction();
+	virtual ~CompositeAction();
 
-	virtual void addActionListener(ActionListener *listener)=0;
-	virtual void removeActionListener(ActionListener *listener)=0;
+	void attach(Action *action);
+	void remove(Action *action);
+
+	void setNextAction(Action *action){mNextAction=action;}
+	Action *getNextAction() const{return mNextAction;}
+
+	void start();
+	void stop();
+
+	void update(int dt);
+
+	bool getActive() const;
+
+	void addActionListener(ActionListener *listener){mListeners.add(listener);}
+	void removeActionListener(ActionListener *listener){mListeners.remove(listener);}
+
+	void actionStarted(Action *action);
+	void actionStopped(Action *action);
+
+protected:
+	Collection<ActionListener*> mListeners;
+	Collection<Action::ptr> mActions;
+	Action::ptr mNextAction;
+	bool mActive;
 };
 
+}
 }
 }
 

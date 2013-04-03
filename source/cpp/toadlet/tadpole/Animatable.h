@@ -31,7 +31,7 @@
 
 namespace toadlet{
 namespace tadpole{
-namespace animation{class Animation;}
+namespace action{class Animation;}
 
 class Animatable{
 public:

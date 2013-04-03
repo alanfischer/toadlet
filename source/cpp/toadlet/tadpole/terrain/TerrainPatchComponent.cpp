@@ -18,7 +18,6 @@
  ********** Copyright header - do not remove **********/
 
 #include <toadlet/egg/Extents.h>
-#include <toadlet/egg/Profile.h>
 #include <toadlet/tadpole/Engine.h>
 #include <toadlet/tadpole/RenderableSet.h>
 #include <toadlet/tadpole/Scene.h>

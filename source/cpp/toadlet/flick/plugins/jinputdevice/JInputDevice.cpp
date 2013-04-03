@@ -24,7 +24,6 @@
  ********** Copyright header - do not remove **********/
 
 #include "JInputDevice.h"
-#include <toadlet/egg/Log.h>
 
 extern "C" JNIEXPORT void Java_us_toadlet_flick(JNIEnv *env);
 

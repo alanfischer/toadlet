@@ -23,7 +23,6 @@
  *
  ********** Copyright header - do not remove **********/
 
-#include <toadlet/egg/Log.h>
 #include <toadlet/tadpole/AudioManager.h>
 #include <toadlet/tadpole/AudioStreamer.h>
 #include <toadlet/tadpole/Engine.h>

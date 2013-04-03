@@ -1,5 +1,4 @@
 #include "FFmpegStreamContext.h"
-#include <toadlet/egg/Log.h>
 
 using namespace toadlet::egg;
 using namespace toadlet::egg::io;

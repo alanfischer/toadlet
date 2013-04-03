@@ -1,3 +1,4 @@
+
 /********** Copyright header - do not remove **********
  *
  * The Toadlet Engine
@@ -23,40 +24,33 @@
  *
  ********** Copyright header - do not remove **********/
 
-#include <toadlet/tadpole/animation/CameraProjectionAnimation.h>
-#include <toadlet/egg/Error.h>
+#include <toadlet/tadpole/action/MaterialAnimation.h>
 
 namespace toadlet{
 namespace tadpole{
-namespace animation{
+namespace action{
 
-CameraProjectionAnimation::CameraProjectionAnimation(Camera *target,Sequence *sequence,int trackIndex):
+MaterialAnimation::MaterialAnimation(Material *target,Sequence *sequence,int trackIndex):
 	mTarget(target),
 //	mSequence,
 //	mTrack,
+	mElement(0),
 	mValue(0)
 {
 	setSequence(sequence,trackIndex);
 }
 
-void CameraProjectionAnimation::setTarget(Camera *target){
+void MaterialAnimation::setTarget(Material *target){
 	mTarget=target;
 }
 
-bool CameraProjectionAnimation::setSequence(Sequence *sequence,int trackIndex){
+bool MaterialAnimation::setSequence(Sequence *sequence,int trackIndex){
 	mSequence=sequence;
 	mTrack=mSequence->getTrack(trackIndex);
-	int elementIndex=0;
-	VertexFormat *format=mTrack->getFormat();
-	for(int i=0;i<format->getNumElements() && elementIndex<3;++i){
-		if(format->getElementSemantic(i)==VertexFormat::Semantic_POSITION){
-			mElements[i]=i;
-			elementIndex++;
-		}
-	}
-	if(elementIndex<3){
+	mElement=mTrack->getFormat()->findElement(VertexFormat::Semantic_COLOR);
+	if(mElement<0){
 		Error::invalidParameters(Categories::TOADLET_TADPOLE,
-			"not enough Semantic_POSITION in Track");
+			"no Semantic_COLOR in Track");
 		return false;
 	}
 
@@ -67,7 +61,7 @@ bool CameraProjectionAnimation::setSequence(Sequence *sequence,int trackIndex){
 	return true;
 }
 
-void CameraProjectionAnimation::setValue(scalar value){
+void MaterialAnimation::setValue(scalar value){
 	mValue=value;
 	if(mTarget!=NULL){
 		int f1=-1,f2=-1;
@@ -76,22 +70,15 @@ void CameraProjectionAnimation::setValue(scalar value){
 
 		VertexBufferAccessor &vba=mTrack->getAccessor();
 
-		Vector2 lr1,lr2,lr;
-		vba.get2(f1,mElements[0],lr1);
-		vba.get2(f2,mElements[0],lr2);
-		Math::lerp(lr,lr1,lr2,time);
+		Vector4 c1,c2,color;
+		vba.get4(f1,mElement,c1);
+		vba.get4(f2,mElement,c2);
+		Math::lerp(color,c1,c2,time);
 
-		Vector2 bt1,bt2,bt;
-		vba.get2(f1,mElements[1],bt1);
-		vba.get2(f2,mElements[1],bt2);
-		Math::lerp(bt,bt1,bt2,time);
-
-		Vector2 nf1,nf2,nf;
-		vba.get2(f1,mElements[2],nf1);
-		vba.get2(f2,mElements[2],nf2);
-		Math::lerp(nf,nf1,nf2,time);
-
-		mTarget->setProjectionFrustum(lr[0],lr[1],bt[0],bt[1],nf[0],nf[1]);
+		MaterialState state;
+		mTarget->getRenderState()->getMaterialState(state);
+		state.set(color);
+		mTarget->getRenderState()->setMaterialState(state);
 	}
 }
 

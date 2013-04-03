@@ -25,9 +25,7 @@
 
 #include "MMAudio.h"
 #include "MMAudioBuffer.h"
-#include <toadlet/egg/Error.h>
 #include <toadlet/egg/Extents.h>
-#include <toadlet/egg/Log.h>
 #include <toadlet/egg/System.h>
 #include <toadlet/egg/MathConversion.h>
 #include <toadlet/ribbit/AudioFormatConversion.h>

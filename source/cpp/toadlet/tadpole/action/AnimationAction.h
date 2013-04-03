@@ -23,17 +23,18 @@
  *
  ********** Copyright header - do not remove **********/
 
-#ifndef TOADLET_TADPOLE_ANIMATIONACTION_H
-#define TOADLET_TADPOLE_ANIMATIONACTION_H
+#ifndef TOADLET_TADPOLE_ACTION_ANIMATIONACTION_H
+#define TOADLET_TADPOLE_ACTION_ANIMATIONACTION_H
 
 #include <toadlet/egg/Collection.h>
-#include <toadlet/tadpole/Action.h>
-#include <toadlet/tadpole/animation/Animation.h>
-#include <toadlet/tadpole/animation/Interpolator.h>
-#include <toadlet/tadpole/animation/CosInterpolator.h>
+#include <toadlet/tadpole/action/Action.h>
+#include <toadlet/tadpole/action/Animation.h>
+#include <toadlet/tadpole/action/Interpolator.h>
+#include <toadlet/tadpole/action/CosInterpolator.h>
 
 namespace toadlet{
 namespace tadpole{
+namespace action{
 
 class TOADLET_API AnimationAction:public Object,public Action,public AnimationListener{
 public:
@@ -101,6 +102,7 @@ protected:
 	bool mRunning;
 };
 
+}
 }
 }
 

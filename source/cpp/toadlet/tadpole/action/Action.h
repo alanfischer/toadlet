@@ -23,37 +23,27 @@
  *
  ********** Copyright header - do not remove **********/
 
-#ifndef TOADLET_TADPOLE_ANIMATION_ANIMATION_H
-#define TOADLET_TADPOLE_ANIMATION_ANIMATION_H
+#ifndef TOADLET_TADPOLE_ACTION_ACTION_H
+#define TOADLET_TADPOLE_ACTION_ACTION_H
 
-#include <toadlet/tadpole/Types.h>
-#include <toadlet/tadpole/animation/AnimationListener.h>
+#include <toadlet/egg/Interface.h>
+#include <toadlet/tadpole/action/ActionListener.h>
 
 namespace toadlet{
 namespace tadpole{
-namespace animation{
+namespace action{
 
-class Animation:public Interface{
+class Action:public Interface{
 public:
-	TOADLET_INTERFACE(Animation);
+	TOADLET_INTERFACE(Action);
 
-	virtual ~Animation(){}
+	virtual void start()=0;
+	virtual void stop()=0;
+	virtual void update(int dt)=0;
+	virtual bool getActive() const=0;
 
-	virtual const String &getName() const=0;
-
-	virtual void setValue(scalar value)=0;
-	virtual scalar getMinValue() const=0;
-	virtual scalar getMaxValue() const=0;
-	virtual scalar getValue() const=0;
-
-	virtual void setWeight(scalar weight)=0;
-	virtual scalar getWeight() const=0;
-
-	virtual void setScope(int scope)=0;
-	virtual int getScope() const=0;
-
-	// TODO: dont allow animations to change length, so this wont be necessary
-	virtual void setAnimationListener(AnimationListener *listener)=0;
+	virtual void addActionListener(ActionListener *listener)=0;
+	virtual void removeActionListener(ActionListener *listener)=0;
 };
 
 }

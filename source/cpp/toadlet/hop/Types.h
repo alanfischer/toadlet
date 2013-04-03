@@ -27,10 +27,16 @@
 #define TOADLET_HOP_TYPES_H
 
 #include <toadlet/egg/Types.h>
-#include <toadlet/egg/math/Math.h>
-#include <toadlet/egg/math/ConvexSolid.h>
 #include <toadlet/egg/mathfixed/Math.h>
+#include <toadlet/egg/math/Math.h>
 #include <toadlet/egg/mathfixed/ConvexSolid.h>
+#include <toadlet/egg/math/ConvexSolid.h>
+#include <toadlet/egg/SharedPointer.h>
+#include <toadlet/egg/IntrusivePointer.h>
+#include <toadlet/egg/Object.h>
+#include <toadlet/egg/String.h>
+#include <toadlet/egg/Log.h>
+#include <toadlet/egg/Error.h>
 
 namespace toadlet{
 namespace hop{

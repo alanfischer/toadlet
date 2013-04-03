@@ -25,8 +25,6 @@
 
 #include "GLRenderDevice.h"
 #include "GLTexture.h"
-#include <toadlet/egg/Error.h>
-#include <toadlet/egg/Log.h>
 
 namespace toadlet{
 namespace peeper{

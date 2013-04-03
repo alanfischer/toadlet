@@ -23,58 +23,27 @@
  *
  ********** Copyright header - do not remove **********/
 
-#include <toadlet/tadpole/AudioAction.h>
+#ifndef TOADLET_TADPOLE_ACTION_ACTIONLISTENER_H
+#define TOADLET_TADPOLE_ACTION_ACTIONLISTENER_H
+
+#include <toadlet/tadpole/Types.h>
 
 namespace toadlet{
 namespace tadpole{
+namespace action{
 
-AudioAction::AudioAction(AudioComponent *audio):
-	//mListeners,
-	mAudio(audio),
-	//mAudioStream,
-	mRunning(false)
-{
-}
+class Action;
 
-void AudioAction::setAudio(AudioComponent *audio){
-	mAudio=audio;
-}
+class ActionListener{
+public:
+	virtual ~ActionListener(){}
 
-void AudioAction::start(){
-	if(mAudio!=NULL){
-		mAudio->play();
-	}
-
-	mRunning=true;
-
-	int i;
-	for(i=0;i<mListeners.size();++i){
-		mListeners[i]->actionStarted(this);
-	}
-}
-
-void AudioAction::stop(){
-	if(mAudio!=NULL){
-		mAudio->stop();
-	}
-
-	mRunning=false;
-
-	int i;
-	for(i=0;i<mListeners.size();++i){
-		mListeners[i]->actionStopped(this);
-	}
-}
-
-void AudioAction::update(int dt){
-	if(mRunning==false){
-		return;
-	}
-
-	if(mRunning && mAudio->getFinished()){
-		stop();
-	}
-}
+	virtual void actionStarted(Action *action)=0;
+	virtual void actionStopped(Action *action)=0;
+};
 
 }
 }
+}
+
+#endif

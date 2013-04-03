@@ -26,8 +26,6 @@
 #ifndef TOADLET_TADPOLE_ENGINE_H
 #define TOADLET_TADPOLE_ENGINE_H
 
-#include <toadlet/egg/Log.h>
-#include <toadlet/egg/Error.h>
 #include <toadlet/peeper/RenderDevice.h>
 #include <toadlet/peeper/IndexBuffer.h>
 #include <toadlet/peeper/IndexBufferAccessor.h>

@@ -23,24 +23,43 @@
  *
  ********** Copyright header - do not remove **********/
 
-#ifndef TOADLET_TADPOLE_ACTIONLISTENER_H
-#define TOADLET_TADPOLE_ACTIONLISTENER_H
+#ifndef TOADLET_TADPOLE_ACTION_AUDIOACTION_H
+#define TOADLET_TADPOLE_ACTION_AUDIOACTION_H
 
-#include <toadlet/tadpole/Types.h>
+#include <toadlet/egg/Collection.h>
+#include <toadlet/tadpole/action/Action.h>
+#include <toadlet/tadpole/AudioComponent.h>
 
 namespace toadlet{
 namespace tadpole{
+namespace action{
 
-class Action;
-
-class ActionListener{
+class TOADLET_API AudioAction:public Object,public Action{
 public:
-	virtual ~ActionListener(){}
+	TOADLET_OBJECT(AudioAction);
 
-	virtual void actionStarted(Action *action)=0;
-	virtual void actionStopped(Action *action)=0;
+	AudioAction(AudioComponent *audio=NULL);
+	virtual ~AudioAction(){}
+
+	bool getActive() const{return mRunning;}
+
+	void addActionListener(ActionListener *listener){mListeners.add(listener);}
+	void removeActionListener(ActionListener *listener){mListeners.remove(listener);}
+
+	void setAudio(AudioComponent *audio);
+
+	void start();
+	void stop();
+
+	void update(int dt);
+
+protected:
+	Collection<ActionListener*> mListeners;
+	AudioComponent::ptr mAudio;
+	bool mRunning;
 };
 
+}
 }
 }
 

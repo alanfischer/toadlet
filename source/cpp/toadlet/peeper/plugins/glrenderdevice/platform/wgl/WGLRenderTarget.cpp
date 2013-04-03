@@ -24,7 +24,6 @@
  ********** Copyright header - do not remove **********/
 
 #include "WGLRenderTarget.h"
-#include <toadlet/egg/Error.h>
 
 namespace toadlet{
 namespace peeper{

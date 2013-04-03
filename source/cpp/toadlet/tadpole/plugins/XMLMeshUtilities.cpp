@@ -30,7 +30,6 @@
 #include <toadlet/peeper/IndexBufferAccessor.h>
 #include <toadlet/egg/MathConversion.h>
 #include <toadlet/egg/MathFormatting.h>
-#include <toadlet/egg/Error.h>
 #include <stdio.h>
 
 using namespace toadlet::egg::MathConversion;

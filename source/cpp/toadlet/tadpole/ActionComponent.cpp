@@ -30,12 +30,8 @@ namespace toadlet{
 namespace tadpole{
 
 ActionComponent::ActionComponent(const String &name,Action *action):BaseComponent(name),
-	mActive(false)
-	//mAction
+	mAction(action)
 {
-	if(action!=NULL){
-		attach(action);
-	}
 }
 
 ActionComponent::~ActionComponent(){
@@ -53,73 +49,21 @@ void ActionComponent::parentChanged(Node *node){
 	}
 }
 
-void ActionComponent::attach(Action *action){
-	mActions.add(action);
-	action->addActionListener(this);
-}
-
-void ActionComponent::remove(Action *action){
-	mActions.remove(action);
-	action->removeActionListener(this);
-}
-
 void ActionComponent::start(){
 	if(mParent!=NULL){
 		mParent->activate();
 	}
 
-	int i;
-	for(i=0;i<mActions.size();++i){
-		mActions[i]->start();
-	}
+	mAction->start();
 }
 
 void ActionComponent::stop(){
-	int i;
-	for(i=0;i<mActions.size();++i){
-		mActions[i]->stop();
-	}
+	mAction->stop();
 }
 
 void ActionComponent::frameUpdate(int dt,int scope){
-	bool active=false;
-
-	int i;
-	for(i=0;i<mActions.size();++i){
-		mActions[i]->update(dt);
-
-		active|=mActions[i]->getActive();
-	}
-
-	if(mActive==true && active==false){
-		if(mNextActionName!=(char*)NULL){
-			mParent->startAction(mNextActionName);
-		}
-	}
-
-	mActive=active;
-}
-
-bool ActionComponent::getActive() const{
-	int i;
-	for(i=0;i<mActions.size();++i){
-		if(mActions[i]->getActive()){
-			return true;
-		}
-	}
-
-	return false;
-}
-
-void ActionComponent::actionStarted(Action *component){
-}
-
-void ActionComponent::actionStopped(Action *component){
-	int i;
-	for(i=0;i<mActions.size();++i){
-		if(mActions[i]!=component && mActions[i]->getActive()){
-			mActions[i]->stop();
-		}
+	if(mAction!=NULL){
+		mAction->update(dt);
 	}
 }
 

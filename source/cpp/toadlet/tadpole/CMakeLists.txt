@@ -5,8 +5,6 @@ configure_file (${CMAKE_CURRENT_SOURCE_DIR}/Version.h.cmake ${CMAKE_CURRENT_BINA
 # Source files for toadlet_tadpole
 set (TADPOLE_SRC
 	AnaglyphCamera.cpp
-	AnimationAction.cpp
-	AudioAction.cpp
 	ActionComponent.cpp
 	AudioComponent.cpp
 	ArchiveManager.cpp
@@ -41,11 +39,14 @@ set (TADPOLE_SRC
 	Version.cpp
 )
 
-set (TADPOLE_ANIMATION_SRC
-	animation/BaseAnimation.cpp
-	animation/CameraProjectionAnimation.cpp
-	animation/NodePathAnimation.cpp
-	animation/MaterialAnimation.cpp
+set (TADPOLE_ACTION_SRC
+	action/AnimationAction.cpp
+	action/AudioAction.cpp
+	action/CompositeAction.cpp
+	action/BaseAnimation.cpp
+	action/CameraProjectionAnimation.cpp
+	action/NodePathAnimation.cpp
+	action/MaterialAnimation.cpp
 )
 
 set (TADPOLE_BSP_SRC
@@ -189,10 +190,7 @@ set (TADPOLE_PLATFORM_WIN32_GDIPLUS_SRC
 # Headers
 set (TADPOLE_HDR
 	AnaglyphCamera.h
-	AnimationAction.h
-	AudioAction.h
 	ActionComponent.h
-	Action.h
 	Animatable.h
 	Attachable.h
 	ArchiveManager.h
@@ -255,13 +253,18 @@ set (TADPOLE_HDR
 	Visible.h
 )
 
-set (TADPOLE_ANIMATION_HDR
-	animation/Animation.h
-	animation/AnimationListener.h
-	animation/BaseAnimation.h
-	animation/CameraProjectionAnimation.h
-	animation/NodePathAnimation.h
-	animation/MaterialAnimation.h
+set (TADPOLE_ACTION_HDR
+	action/AnimationAction.h
+	action/AudioAction.h
+	action/Action.h
+	action/ActionListener.h
+	action/CompositeAction.h
+	action/Animation.h
+	action/AnimationListener.h
+	action/BaseAnimation.h
+	action/CameraProjectionAnimation.h
+	action/NodePathAnimation.h
+	action/MaterialAnimation.h
 )
 
 set (TADPOLE_BSP_HDR
@@ -421,23 +424,23 @@ set (TADPOLE_PLATFORM_WIN32_GDIPLUS_HDR
 
 
 # Bundle source
-source_group ("Source Files\\\\animation" FILES ${TADPOLE_ANIMATION_SRC})
+source_group ("Source Files\\\\action" FILES ${TADPOLE_ACTION_SRC})
 source_group ("Source Files\\\\material" FILES ${TADPOLE_MATERIAL_SRC})
 source_group ("Source Files\\\\sensor" FILES ${TADPOLE_SENSOR_SRC})
 source_group ("Source Files\\\\terrain" FILES ${TADPOLE_TERRAIN_SRC})
 
 
 # Bundle headers
-source_group ("Header Files\\\\animation" FILES ${TADPOLE_ANIMATION_HDR})
+source_group ("Header Files\\\\action" FILES ${TADPOLE_ACTION_HDR})
 source_group ("Header Files\\\\material" FILES ${TADPOLE_MATERIAL_HDR})
 source_group ("Header Files\\\\sensor" FILES ${TADPOLE_SENSOR_HDR})
 source_group ("Header Files\\\\terrain" FILES ${TADPOLE_TERRAIN_HDR})
 
 
 # Sources, headers and namespaces
-set (TADPOLE_SRC ${TADPOLE_SRC} ${TADPOLE_ANIMATION_SRC} ${TADPOLE_PLUGINS_SRC} ${TADPOLE_MATERIAL_SRC} ${TADPOLE_SENSOR_SRC} ${TADPOLE_TERRAIN_SRC})
-set (TADPOLE_HDR ${TADPOLE_HDR} ${TADPOLE_ANIMATION_HDR} ${TADPOLE_MATERIAL_HDR} ${TADPOLE_SENSOR_HDR} ${TADPOLE_TERRAIN_HDR})
-set (TADPOLE_NAMESPACES ${TADPOLE_NAMESPACES} animation material node sensor terrain)
+set (TADPOLE_SRC ${TADPOLE_SRC} ${TADPOLE_ACTION_SRC} ${TADPOLE_PLUGINS_SRC} ${TADPOLE_MATERIAL_SRC} ${TADPOLE_SENSOR_SRC} ${TADPOLE_TERRAIN_SRC})
+set (TADPOLE_HDR ${TADPOLE_HDR} ${TADPOLE_ACTION_HDR} ${TADPOLE_MATERIAL_HDR} ${TADPOLE_SENSOR_HDR} ${TADPOLE_TERRAIN_HDR})
+set (TADPOLE_NAMESPACES ${TADPOLE_NAMESPACES} action material node sensor terrain)
 
 
 # Fixed point builds use fewer features
@@ -611,28 +614,6 @@ if (SIDPLAY_FOUND)
 		endif (RESID_LIBRARY_S)
 	endif (${SIDPLAY_VERSION} EQUAL 2)
 endif (SIDPLAY_FOUND)
-
-find_path (GME_INCLUDES gme/gme.h)
-find_library (GME_LIBRARY NAMES gme)
-if (GME_INCLUDES AND GME_LIBRARY)
-	message(STATUS "GME Found")
-
-	set (TOADLET_HAS_GME ON PARENT_SCOPE)
-	include_directories (${GME_INCLUDES})
-	
-	# Dynamic Library
-	set (TADPOLE_PLUGINS_SRC ${TADPOLE_PLUGINS_SRC} ${TADPOLE_PLUGINS_GMEDECODER_SRC})
-	set (TADPOLE_PLUGINS_LIBS ${TADPOLE_PLUGINS_LIBS} ${GME_LIBRARY})
-	
-	# Static Library
-	LOCATE_STATIC_LIBRARIES (GME_LIBRARY_S "${GME_LIBRARY}")
-	if (GME_LIBRARY_S)
-		set (TADPOLE_PLUGINS_SRC_S ${TADPOLE_PLUGINS_SRC_S} ${TADPOLE_PLUGINS_GMEDECODER_SRC})
-		set (TADPOLE_PLUGINS_LIBS_S ${TADPOLE_PLUGINS_LIBS_S} ${GME_LIBRARY_S})
-	endif (GME_LIBRARY_S)
-elseif (GME_INCLUDES AND GME_LIBRARY)
-	message(STATUS "Could NOT find GME")
-endif (GME_INCLUDES AND GME_LIBRARY)
 
 find_path (GME_INCLUDES gme/gme.h)
 find_library (GME_LIBRARY NAMES gme)

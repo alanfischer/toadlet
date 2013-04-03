@@ -23,7 +23,6 @@
  *
  ********** Copyright header - do not remove **********/
 
-#include <toadlet/egg/Error.h>
 #include <toadlet/tadpole/bsp/BSP30Streamer.h>
 #include <toadlet/tadpole/bsp/BSP30MaterialCreator.h>
 #include <toadlet/tadpole/plugins/WADArchive.h>

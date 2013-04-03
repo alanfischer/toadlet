@@ -1,9 +1,6 @@
 #include "FFmpegVideoHandler.h"
 #include "FFmpegStreamContext.h"
-#include <toadlet/egg/Log.h>
-#include <toadlet/egg/Error.h>
 #include <toadlet/egg/Mutex.h>
-#include <toadlet/egg/Random.h>
 #include <toadlet/egg/System.h>
 
 namespace toadlet{

@@ -35,8 +35,6 @@
 #include "D3D10Texture.h"
 #include "D3D10VertexFormat.h"
 #include <toadlet/egg/MathConversion.h>
-#include <toadlet/egg/Error.h>
-#include <toadlet/egg/Log.h>
 #include <toadlet/peeper/MaterialState.h>
 #include <toadlet/peeper/LightState.h>
 #include <toadlet/peeper/VertexData.h>

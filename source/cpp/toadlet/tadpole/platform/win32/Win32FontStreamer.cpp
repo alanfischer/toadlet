@@ -27,7 +27,6 @@
 
 #define _WIN32_WINNT 0x0500
 
-#include <toadlet/egg/Error.h>
 #include <toadlet/egg/io/MemoryStream.h>
 #include <toadlet/tadpole/platform/win32/Win32FontStreamer.h>
 #include <stdlib.h>

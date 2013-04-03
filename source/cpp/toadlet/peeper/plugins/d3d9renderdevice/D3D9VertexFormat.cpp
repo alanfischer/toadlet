@@ -25,7 +25,6 @@
 
 #include "D3D9VertexFormat.h"
 #include "D3D9RenderDevice.h"
-#include <toadlet/egg/Error.h>
 #include <toadlet/peeper/BackableVertexFormat.h>
 
 namespace toadlet{

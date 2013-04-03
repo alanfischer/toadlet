@@ -26,8 +26,6 @@
 #include "GLFBORenderTarget.h"
 #include "GLTexture.h"
 #include "GLRenderDevice.h"
-#include <toadlet/egg/Error.h>
-#include <toadlet/egg/Log.h>
 
 #if defined(TOADLET_HAS_GLFBOS)
 

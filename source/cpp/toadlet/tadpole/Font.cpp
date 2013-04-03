@@ -23,7 +23,6 @@
  *
  ********** Copyright header - do not remove **********/
 
-#include <toadlet/egg/Error.h>
 #include <toadlet/egg/Extents.h>
 #include <toadlet/tadpole/Font.h>
 

@@ -27,19 +27,13 @@
 #define TOADLET_TADPOLE_TYPES_H
 
 #include <toadlet/egg/Types.h>
-#include <toadlet/egg/mathfixed/Math.h>
-#include <toadlet/egg/math/Math.h>
-#include <toadlet/egg/String.h>
-#include <toadlet/egg/SharedPointer.h>
-#include <toadlet/egg/IntrusivePointer.h>
-#include <toadlet/egg/Object.h>
 #include <toadlet/peeper/Types.h>
 #include <toadlet/ribbit/Types.h>
 
 namespace toadlet{
 namespace egg{}
 namespace tadpole{
-namespace animation{}
+namespace action{}
 namespace material{}
 namespace node{}
 namespace sensor{}
@@ -53,7 +47,7 @@ namespace sensor{}
 using namespace toadlet::egg;
 using namespace toadlet::peeper;
 using namespace toadlet::ribbit;
-using namespace toadlet::tadpole::animation;
+using namespace toadlet::tadpole::action;
 using namespace toadlet::tadpole::material;
 using namespace toadlet::tadpole::node;
 using namespace toadlet::tadpole::sensor;

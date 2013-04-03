@@ -23,7 +23,6 @@
  *
  ********** Copyright header - do not remove **********/
 
-#include <toadlet/egg/Log.h>
 #include <toadlet/peeper/BackableTexture.h>
 #include <toadlet/peeper/BackablePixelBufferRenderTarget.h>
 #include <toadlet/peeper/TextureFormatConversion.h>

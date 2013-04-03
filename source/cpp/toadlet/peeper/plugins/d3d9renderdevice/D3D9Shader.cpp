@@ -26,8 +26,6 @@
 #include "D3D9Shader.h"
 #include "D3D9RenderDevice.h"
 #include "D3D9WindowRenderTarget.h"
-#include <toadlet/egg/Log.h>
-#include <toadlet/egg/Error.h>
 
 namespace toadlet{
 namespace peeper{

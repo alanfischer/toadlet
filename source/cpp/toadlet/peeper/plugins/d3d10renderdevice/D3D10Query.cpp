@@ -25,7 +25,6 @@
 
 #include "D3D10Query.h"
 #include "D3D10RenderDevice.h"
-#include <toadlet/egg/Log.h>
 
 namespace toadlet{
 namespace peeper{

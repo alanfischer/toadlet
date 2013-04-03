@@ -23,7 +23,6 @@
  *
  ********** Copyright header - do not remove **********/
 
-#include <toadlet/egg/Error.h>
 #include <toadlet/egg/System.h>
 #include <toadlet/pad/ConsoleApplication.h>
 

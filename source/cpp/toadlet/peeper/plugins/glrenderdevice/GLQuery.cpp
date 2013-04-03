@@ -25,7 +25,6 @@
 
 #include "GLQuery.h"
 #include "GLRenderDevice.h"
-#include <toadlet/egg/Error.h>
 
 #if defined(TOADLET_HAS_GLQUERY)
 

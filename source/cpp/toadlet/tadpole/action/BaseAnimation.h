@@ -23,41 +23,42 @@
  *
  ********** Copyright header - do not remove **********/
 
-#ifndef TOADLET_TADPOLE_ANIMATION_CAMERAPROJECTIONANIMATION_H
-#define TOADLET_TADPOLE_ANIMATION_CAMERAPROJECTIONANIMATION_H
+#ifndef TOADLET_TADPOLE_ACTION_BASEANIMATION_H
+#define TOADLET_TADPOLE_ACTION_BASEANIMATION_H
 
-#include <toadlet/tadpole/animation/BaseAnimation.h>
-#include <toadlet/tadpole/Camera.h>
-#include <toadlet/tadpole/Sequence.h>
+#include <toadlet/egg/Object.h>
+#include <toadlet/tadpole/action/Animation.h>
 
 namespace toadlet{
 namespace tadpole{
-namespace animation{
+namespace action{
 
-class TOADLET_API CameraProjectionAnimation:public BaseAnimation{
+class TOADLET_API BaseAnimation:public Object,public Animation{
 public:
-	TOADLET_OBJECT(CameraProjectionAnimation);
+	TOADLET_OBJECT(BaseAnimation);
 
-	CameraProjectionAnimation(Camera *target,Sequence *sequence,int trackIndex=0);
-	virtual ~CameraProjectionAnimation(){}
+	BaseAnimation();
+	virtual ~BaseAnimation();
 
-	void setTarget(Camera *target);
-	inline Camera *getTarget() const{return mTarget;}
+	const String &getName() const{return mName;}
 
-	bool setSequence(Sequence *sequence,int trackIndex);
-	inline Sequence *getSequence() const{return mSequence;}
-
-	void setValue(scalar value);
-	scalar getValue() const{return mValue;}
+	void setValue(scalar value){}
 	scalar getMinValue() const{return 0;}
-	scalar getMaxValue() const{return mSequence->getLength();}
+	scalar getMaxValue() const{return 0;}
+	scalar getValue() const{return 0;}
+
+	void setWeight(scalar weight){}
+	scalar getWeight() const{return Math::ONE;}
+
+	void setScope(int scope){}
+	int getScope() const{return -1;}
+
+	void setAnimationListener(AnimationListener *listener){mListener=listener;}
+	AnimationListener *getAnimationListener() const{return mListener;}
 
 protected:
-	Camera::ptr mTarget;
-	Sequence::ptr mSequence;
-	Track::ptr mTrack;
-	int mElements[3]; // Left/Right, Top/Bottom, Near/Far
-	scalar mValue;
+	String mName;
+	AnimationListener *mListener;
 };
 
 }
