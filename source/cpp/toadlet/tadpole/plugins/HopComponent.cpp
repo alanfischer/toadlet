@@ -96,6 +96,8 @@ void HopComponent::setBound(Bound *bound){
 	if(shape!=NULL){
 		mSolid->addShape(shape);
 	}
+
+	mBound->set(mSolid->getLocalBound());
 }
 
 void HopComponent::setTraceable(PhysicsTraceable *traceable){
