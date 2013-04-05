@@ -49,7 +49,7 @@ if(WIN32)
 	# Toadlet debug dlls
 	file (MAKE_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/Debug)
 	foreach (TDLLD ${TOADLET_DLLS_D})
-		add_custom_command (TARGET quarqman POST_BUILD 
+		add_custom_command (TARGET randisle POST_BUILD 
 			COMMAND ${CMAKE_COMMAND} -E copy ${TDLLD} ${CMAKE_CURRENT_BINARY_DIR}/Debug
 		)
 	endforeach (TDLLD ${TOADLET_DLLS_D})
@@ -57,7 +57,7 @@ if(WIN32)
 	# Toadlet release dlls
 	file (MAKE_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/Release)
 	foreach (TDLLD ${TOADLET_DLLS_D})
-		add_custom_command (TARGET quarqman POST_BUILD 
+		add_custom_command (TARGET randisle POST_BUILD 
 			COMMAND ${CMAKE_COMMAND} -E copy ${TDLLD} ${CMAKE_CURRENT_BINARY_DIR}/Release
 		)
 	endforeach (TDLLD ${TOADLET_DLLS_D})
@@ -66,7 +66,7 @@ if(WIN32)
 	find_package (ffmpeg)
 	if (FFMPEG_FOUND)
 		foreach (FDLL ${FFMPEG_DLLS})
-			add_custom_command (TARGET quarqman POST_BUILD 
+			add_custom_command (TARGET randisle POST_BUILD 
 				COMMAND ${CMAKE_COMMAND} -E copy ${FDLL} "${CMAKE_CURRENT_BINARY_DIR}/\$(CONFIGURATION)"
 			)
 		endforeach (FDLL ${FFMPEG_DLLS})
