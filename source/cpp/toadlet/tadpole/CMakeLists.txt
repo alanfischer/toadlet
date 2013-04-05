@@ -46,7 +46,8 @@ set (TADPOLE_ACTION_SRC
 	action/BaseAnimation.cpp
 	action/CameraProjectionAnimation.cpp
 	action/NodePathAnimation.cpp
-	action/MaterialAnimation.cpp
+	action/MaterialStateAnimation.cpp
+	action/TextureStateAnimation.cpp
 )
 
 set (TADPOLE_BSP_SRC
@@ -264,7 +265,8 @@ set (TADPOLE_ACTION_HDR
 	action/BaseAnimation.h
 	action/CameraProjectionAnimation.h
 	action/NodePathAnimation.h
-	action/MaterialAnimation.h
+	action/MaterialStateAnimation.h
+	action/TextureStateAnimation.h
 )
 
 set (TADPOLE_BSP_HDR

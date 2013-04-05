@@ -24,13 +24,13 @@
  *
  ********** Copyright header - do not remove **********/
 
-#include <toadlet/tadpole/action/MaterialAnimation.h>
+#include <toadlet/tadpole/action/MaterialStateAnimation.h>
 
 namespace toadlet{
 namespace tadpole{
 namespace action{
 
-MaterialAnimation::MaterialAnimation(Material *target,Sequence *sequence,int trackIndex):
+MaterialStateAnimation::MaterialStateAnimation(RenderState *target,Sequence *sequence,int trackIndex):
 	mTarget(target),
 //	mSequence,
 //	mTrack,
@@ -40,11 +40,11 @@ MaterialAnimation::MaterialAnimation(Material *target,Sequence *sequence,int tra
 	setSequence(sequence,trackIndex);
 }
 
-void MaterialAnimation::setTarget(Material *target){
+void MaterialStateAnimation::setTarget(RenderState *target){
 	mTarget=target;
 }
 
-bool MaterialAnimation::setSequence(Sequence *sequence,int trackIndex){
+bool MaterialStateAnimation::setSequence(Sequence *sequence,int trackIndex){
 	mSequence=sequence;
 	mTrack=mSequence->getTrack(trackIndex);
 	mElement=mTrack->getFormat()->findElement(VertexFormat::Semantic_COLOR);
@@ -61,7 +61,7 @@ bool MaterialAnimation::setSequence(Sequence *sequence,int trackIndex){
 	return true;
 }
 
-void MaterialAnimation::setValue(scalar value){
+void MaterialStateAnimation::setValue(scalar value){
 	mValue=value;
 	if(mTarget!=NULL){
 		int f1=-1,f2=-1;
@@ -76,9 +76,9 @@ void MaterialAnimation::setValue(scalar value){
 		Math::lerp(color,c1,c2,time);
 
 		MaterialState state;
-		mTarget->getRenderState()->getMaterialState(state);
+		mTarget->getMaterialState(state);
 		state.set(color);
-		mTarget->getRenderState()->setMaterialState(state);
+		mTarget->setMaterialState(state);
 	}
 }
 

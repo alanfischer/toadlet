@@ -152,15 +152,15 @@ public:
 		}
 
 		// HUD
-//		hudFade=engine->createDiffuseMaterial(pointTexture);
-		/// TODO
-/*		hudFade->getPass()->setSamplerState(0,SamplerState(
+		RenderState::ptr hudFadeState=engine->getMaterialManager()->createRenderState();
+		hudFadeState->setSamplerState(Shader::ShaderType_FRAGMENT,0,SamplerState(
 			SamplerState::FilterType_LINEAR,SamplerState::FilterType_LINEAR,SamplerState::FilterType_LINEAR,
 			SamplerState::AddressType_CLAMP_TO_EDGE,SamplerState::AddressType_CLAMP_TO_EDGE,SamplerState::AddressType_CLAMP_TO_EDGE));
-		hudFade->getPass()->setDepthState(DepthState(DepthState::DepthTest_NEVER,false));
-		hudFade->getPass()->setBlendState(BlendState::Combination_ALPHA);
-		hudFade->getPass()->setMaterialState(MaterialState(Colors::TRANSPARENT_RED));
-*/
+		hudFadeState->setDepthState(DepthState(DepthState::DepthTest_ALWAYS,false));
+		hudFadeState->setBlendState(BlendState::Combination_ALPHA);
+		hudFadeState->setMaterialState(MaterialState(Colors::TRANSPARENT_RED));
+		hudFadeState->setRasterizerState(RasterizerState());
+		hudFade=engine->createDiffuseMaterial(NULL,hudFadeState);
 		
 		hudCompass=engine->getMaterialManager()->findMaterial("compass.png");
 		if(hudCompass!=NULL){

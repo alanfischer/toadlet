@@ -582,7 +582,8 @@ void RandIsle::keyPressed(int key){
 		mApp->stop();
 	}
 	else if(key==' '){
-		playerJump(mPlayer);
+//		playerJump(mPlayer);
+		mHUD->startAction("action");
 	}
 }
 
