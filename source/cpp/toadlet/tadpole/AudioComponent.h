@@ -46,8 +46,8 @@ public:
 	bool setAudioStream(const String &name,int track=0);
 	bool setAudioStream(AudioStream *stream);
 
-	AudioBuffer *getAudioBuffer(){return mAudio->getAudioBuffer();}
-	AudioStream *getAudioStream(){return mAudio->getAudioStream();}
+	AudioBuffer *getAudioBuffer(){return mAudio!=NULL?mAudio->getAudioBuffer():NULL;}
+	AudioStream *getAudioStream(){return mAudio!=NULL?mAudio->getAudioStream():NULL;}
 	
 	inline bool play(){if(mAudio!=NULL){return mAudio->play();}else{return false;}}
 	inline bool stop(){if(mAudio!=NULL){return mAudio->stop();}else{return false;}}
