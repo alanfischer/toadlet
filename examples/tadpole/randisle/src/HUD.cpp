@@ -17,7 +17,7 @@ public:
 		forward.z=0;
 		Math::normalizeCarefully(forward,0);
 		scalar angle=-Math::atan2(forward.y,forward.x);
-		mParent->setRotate(Math::Z_UNIT_VECTOR3,angle);\
+		mParent->setRotate(Math::Z_UNIT_VECTOR3,angle);
 	}
 
 	bool getActive() const{return true;}
@@ -25,48 +25,6 @@ public:
 protected:
 	Camera::ptr mCamera;
 };
-
-/* 
-	FadeComponent::frameUpdate, replace with some animations
-		MaterialState materialState;
-		if(mFadeSprite->getMaterial()!=NULL){
-			mFadeSprite->getMaterial()->getPass()->getMaterialState(materialState);
-		}
-		Vector4 dangerColor=materialState.ambient;
-//		dangerColor.w=mPlayer->getDanger();
-
-		if(mChompTime>0){
-			scalar chompamount=Math::fromMilli(mScene->getTime()-mChompTime);
-			scalar amount=powf(5.0,Math::sin(Math::mul(chompamount,Math::PI)));
-
-			TextureState textureState;
-			mFadeSprite->getMaterial()->getPass()->getTextureState(0,textureState);
-			textureState.calculation=TextureState::CalculationType_NORMAL;
-			Matrix4x4 matrix,temp;
-			Math::setMatrix4x4FromTranslate(matrix,0,Math::HALF,0);
-			Math::setMatrix4x4FromScale(temp,Math::ONE,amount,Math::ONE);
-			Math::postMul(matrix,temp);
-			Math::setMatrix4x4FromTranslate(temp,0,-Math::mul(Math::HALF,amount),0);
-			Math::postMul(matrix,temp);
-			textureState.matrix.set(matrix);
-			mFadeSprite->getMaterial()->getPass()->setTextureState(0,textureState);
-
-			if(chompamount>=Math::HALF){
-				dangerColor.w=Math::clamp(0,Math::ONE,(Math::ONE-chompamount*2)+Math::ONE);
-			}
-		}
-
-		materialState.set(dangerColor);
-		if(mFadeSprite->getMaterial()!=NULL){
-			mFadeSprite->getMaterial()->getPass()->setMaterialState(materialState);
-		}
-		if(dangerColor.w>0){
-			mFadeSprite->setScope(-1);
-		}
-		else{
-			mFadeSprite->setScope(0);
-		}
-*/
 
 /* AcornComponent
 		int newAcornCount=mPlayer->getAcornCount();
@@ -157,6 +115,69 @@ HUD::HUD(Scene *scene,Node *player,Camera *camera):Node(scene){
 		sprite->setMaterial(Resources::instance->hudFade);
 		mFade->attach(sprite);
 		mFade->setScale(Vector3(2,2,2));
+
+		Sequence::ptr sequence=new Sequence();
+		{
+			Track::ptr colorTrack=new Track(mEngine->getVertexFormats().COLOR);
+			colorTrack->addKeyFrame(0,(void*)Colors::TRANSPARENT_RED.getData());
+			colorTrack->addKeyFrame(1,(void*)Colors::RED.getData());
+			sequence->addTrack(colorTrack);
+
+			Matrix4x4 startMatrix,endMatrix,temp;
+			{
+				float amount=0;
+				Math::setMatrix4x4FromTranslate(startMatrix,0,Math::HALF,0);
+				Math::setMatrix4x4FromScale(temp,Math::ONE,amount,Math::ONE);
+				Math::postMul(startMatrix,temp);
+				Math::setMatrix4x4FromTranslate(temp,0,-Math::mul(Math::HALF,amount),0);
+				Math::postMul(startMatrix,temp);
+
+				amount=Math::ONE;
+				Math::setMatrix4x4FromTranslate(endMatrix,0,Math::HALF,0);
+				Math::setMatrix4x4FromScale(temp,Math::ONE,amount,Math::ONE);
+				Math::postMul(endMatrix,temp);
+				Math::setMatrix4x4FromTranslate(temp,0,-Math::mul(Math::HALF,amount),0);
+				Math::postMul(endMatrix,temp);
+			}
+
+			Vector3 position;
+			Quaternion rotate;
+			Vector3 scale;
+
+			Track::ptr transformTrack=new Track(mEngine->getVertexFormats().POSITION_ROTATE_SCALE);
+			VertexBufferAccessor &vba=transformTrack->getAccessor();
+
+			Math::setTranslateFromMatrix4x4(position,startMatrix);
+			Math::setQuaternionFromMatrix4x4(rotate,startMatrix);
+			Math::setScaleFromMatrix4x4(scale,startMatrix);
+			transformTrack->addKeyFrame(0);
+			vba.set3(0,0,position);
+			vba.set4(0,1,rotate);
+			vba.set3(0,2,scale);
+
+			Math::setTranslateFromMatrix4x4(position,endMatrix);
+			Math::setQuaternionFromMatrix4x4(rotate,endMatrix);
+			Math::setScaleFromMatrix4x4(scale,endMatrix);
+			transformTrack->addKeyFrame(1);
+			vba.set3(1,0,position);
+			vba.set4(1,1,rotate);
+			vba.set3(1,2,scale);
+
+			sequence->addTrack(transformTrack);
+		}
+
+		Animation::ptr colorAnimation=new MaterialStateAnimation(sprite->getSharedRenderState(),sequence,0);
+
+		TextureState textureState;
+		sprite->getSharedRenderState()->getTextureState(Shader::ShaderType_FRAGMENT,0,textureState);
+		textureState.calculation=TextureState::CalculationType_NORMAL;
+		sprite->getSharedRenderState()->setTextureState(Shader::ShaderType_FRAGMENT,0,textureState);
+		Animation::ptr transformAnimation=new TextureStateAnimation(sprite->getSharedRenderState(),Shader::ShaderType_FRAGMENT,0,sequence,1);
+
+		AnimationAction::ptr action=new AnimationAction();
+		action->attach(colorAnimation);
+		action->attach(transformAnimation);
+		attach(new ActionComponent("action",action));
 	}
 	attach(mFade);
 

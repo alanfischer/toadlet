@@ -23,28 +23,26 @@
  *
  ********** Copyright header - do not remove **********/
 
-#ifndef TOADLET_TADPOLE_ACTION_MATERIALANIMATION_H
-#define TOADLET_TADPOLE_ACTION_MATERIALANIMATION_H
+#ifndef TOADLET_TADPOLE_ACTION_TEXTURESTATEANIMATION_H
+#define TOADLET_TADPOLE_ACTION_TEXTURESTATEANIMATION_H
 
 #include <toadlet/tadpole/action/BaseAnimation.h>
-#include <toadlet/tadpole/material/Material.h>
 #include <toadlet/tadpole/Sequence.h>
+#include <toadlet/peeper/RenderState.h>
 
 namespace toadlet{
 namespace tadpole{
 namespace action{
 
-class Controller;
-
-class TOADLET_API MaterialAnimation:public BaseAnimation{
+class TOADLET_API TextureStateAnimation:public BaseAnimation{
 public:
-	TOADLET_OBJECT(MaterialAnimation);
+	TOADLET_OBJECT(TextureStateAnimation);
 
-	MaterialAnimation(Material *target,Sequence *sequence,int trackIndex=0);
-	virtual ~MaterialAnimation(){}
+	TextureStateAnimation(RenderState *target,Shader::ShaderType type,int index,Sequence *sequence,int trackIndex=0);
+	virtual ~TextureStateAnimation(){}
 
-	void setTarget(Material *target);
-	inline Material *getTarget() const{return mTarget;}
+	void setTarget(RenderState *target,Shader::ShaderType type,int index);
+	inline RenderState *getTarget() const{return mTarget;}
 
 	bool setSequence(Sequence *sequence,int trackIndex);
 	inline Sequence *getSequence() const{return mSequence;}
@@ -58,10 +56,12 @@ public:
 	scalar getWeight() const{return Math::ONE;}
 
 protected:
-	Material::ptr mTarget;
+	RenderState::ptr mTarget;
+	Shader::ShaderType mType;
+	int mIndex;
 	Sequence::ptr mSequence;
 	Track::ptr mTrack;
-	int mElement;
+	int mPositionElement,mRotateElement,mScaleElement;
 	scalar mValue;
 };
 
