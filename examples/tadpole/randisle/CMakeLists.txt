@@ -5,15 +5,6 @@ project (randisle CXX C)
 # Custom cmake scripts
 set (CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${randisle_SOURCE_DIR}/../../../cmake/Modules/")
 
-# Find toadlet
-find_package (toadlet REQUIRED)
-
-# Includes
-include_directories (${randisle_SOURCE_DIR} ${TOADLET_INCLUDE_DIR})
-
-# Libraries
-set (LIBS ${TOADLET_LIBRARIES})
-
 # Source files
 set (SRC
 	../../main/toadletApp.cpp
@@ -43,7 +34,44 @@ set (H
 	src/TreeSystem.h
 )
 
+# Find toadlet
+find_package (toadlet REQUIRED)
+
+# Includes
+include_directories (${randisle_SOURCE_DIR} ${TOADLET_INCLUDE_DIR})
+
 # Executable
 add_executable (randisle ${SRC} ${H})
-target_link_libraries (randisle ${LIBS})
+target_link_libraries (randisle ${TOADLET_LIBRARIES_MIXED})
+
+# Add the required resources to the directory necessary for in-editor running
+if(WIN32)
+	# Toadlet debug dlls
+	file (MAKE_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/Debug)
+	foreach (TDLLD ${TOADLET_DLLS_D})
+		add_custom_command (TARGET quarqman POST_BUILD 
+			COMMAND ${CMAKE_COMMAND} -E copy ${TDLLD} ${CMAKE_CURRENT_BINARY_DIR}/Debug
+		)
+	endforeach (TDLLD ${TOADLET_DLLS_D})
+
+	# Toadlet release dlls
+	file (MAKE_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/Release)
+	foreach (TDLLD ${TOADLET_DLLS_D})
+		add_custom_command (TARGET quarqman POST_BUILD 
+			COMMAND ${CMAKE_COMMAND} -E copy ${TDLLD} ${CMAKE_CURRENT_BINARY_DIR}/Release
+		)
+	endforeach (TDLLD ${TOADLET_DLLS_D})
+	
+	# Win32 toadlet may need the ffmpeg dlls for in-editor running
+	find_package (ffmpeg)
+	if (FFMPEG_FOUND)
+		foreach (FDLL ${FFMPEG_DLLS})
+			add_custom_command (TARGET quarqman POST_BUILD 
+				COMMAND ${CMAKE_COMMAND} -E copy ${FDLL} "${CMAKE_CURRENT_BINARY_DIR}/\$(CONFIGURATION)"
+			)
+		endforeach (FDLL ${FFMPEG_DLLS})
+	endif (FFMPEG_FOUND)
+endif(WIN32)
+
+# Installation
 install (TARGETS randisle DESTINATION bin)
