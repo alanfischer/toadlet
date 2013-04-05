@@ -1,14 +1,14 @@
 %{
-#include <toadlet/tadpole/action/MaterialAnimation.h>
+#include <toadlet/tadpole/action/MaterialStateAnimation.h>
 %}
 
 namespace toadlet{
 namespace tadpole{
 namespace action{
 
-class MaterialAnimation:public Animation{
+class MaterialStateAnimation:public Animation{
 public:
-	MaterialAnimation(Material *target,Sequence *sequence,int trackIndex=0);
+	MaterialStateAnimation(RenderState *target,Sequence *sequence,int trackIndex=0);
 
 	String getName() const;
 

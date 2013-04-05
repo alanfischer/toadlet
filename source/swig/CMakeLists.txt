@@ -102,7 +102,7 @@ if (NOT TOADLET_PLATFORM_PYTHON)
 		${CMAKE_CURRENT_SOURCE_DIR}/toadlet/tadpole/action/AnimationAction.i
 		${CMAKE_CURRENT_SOURCE_DIR}/toadlet/tadpole/action/Animation.i
 		${CMAKE_CURRENT_SOURCE_DIR}/toadlet/tadpole/action/BaseAnimation.i
-		${CMAKE_CURRENT_SOURCE_DIR}/toadlet/tadpole/action/MaterialAnimation.i
+		${CMAKE_CURRENT_SOURCE_DIR}/toadlet/tadpole/action/MaterialStateAnimation.i
 		${CMAKE_CURRENT_SOURCE_DIR}/toadlet/tadpole/ActionComponent.i
 		${CMAKE_CURRENT_SOURCE_DIR}/toadlet/tadpole/AudioComponent.i
 		${CMAKE_CURRENT_SOURCE_DIR}/toadlet/tadpole/CameraComponent.i

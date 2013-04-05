@@ -53,6 +53,8 @@ namespace peeper{
 class RenderState;
 %typemap(jtype) RenderState * "long"
 %typemap(jstype) RenderState * "us.toadlet.peeper.RenderState"
+%typemap(in) RenderState * "$1=*(toadlet::peeper::RenderState**)&$input;"
+%typemap(javain) RenderState * "us.toadlet.peeper.RenderState.getCPtr($javainput)"
 %typemap(javaout) RenderState * "{long cobj=$jnicall;return cobj!=0?new us.toadlet.peeper.RenderState(cobj,$owner):null;}"
 }
 }
@@ -83,7 +85,7 @@ using namespace toadlet::tadpole;
 %include <toadlet/tadpole/action/AnimationAction.i>
 %include <toadlet/tadpole/action/Animation.i>
 %include <toadlet/tadpole/action/BaseAnimation.i>
-%include <toadlet/tadpole/action/MaterialAnimation.i>
+%include <toadlet/tadpole/action/MaterialStateAnimation.i>
 %{
 using namespace toadlet;
 using namespace toadlet::tadpole;
