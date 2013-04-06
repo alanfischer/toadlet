@@ -52,9 +52,9 @@ public:
 
 	void interRenderRenderables(RenderableSet *set,RenderDevice *device,Camera *camera,bool useMaterials);
 
-protected:
-	tbyte *createPoint(TextureFormat *format);
+	static tbyte *createPoint(TextureFormat *format);
 
+protected:
 	int mShadowScope;
 	int mTraceScope;
 	scalar mTraceDistance;

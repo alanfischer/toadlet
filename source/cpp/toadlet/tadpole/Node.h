@@ -79,6 +79,7 @@ public:
 	virtual void nodeRemoved(Node *node);
 	virtual int getNumNodes() const{return mNodes.size();}
 	virtual Node *getNode(int i) const{return mNodes[i];}
+	virtual Node *getNode(const String &name);
 
 	// Attached Interface methods
 	/// @todo: Replace these with finding Components by Interface, even if that Interface has to extend Component

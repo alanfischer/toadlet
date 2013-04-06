@@ -583,7 +583,7 @@ void RandIsle::keyPressed(int key){
 	}
 	else if(key==' '){
 //		playerJump(mPlayer);
-		mHUD->startAction("action");
+		mHUD->getNode("fade")->startAction("action");
 	}
 }
 
