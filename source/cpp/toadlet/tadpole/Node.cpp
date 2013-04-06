@@ -173,6 +173,16 @@ Component *Node::getChild(const String &name){
 	return NULL;
 }
 
+Node *Node::getNode(const String &name){
+	int i;
+	for(i=0;i<mNodes.size();++i){
+		if(mNodes[i]->getName()==name){
+			return mNodes[i];
+		}
+	}
+	return NULL;
+}
+
 ActionComponent *Node::getAction(const String &name){
 	int i;
 	for(i=0;i<mActions.size();++i){

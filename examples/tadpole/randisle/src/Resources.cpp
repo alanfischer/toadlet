@@ -22,3 +22,24 @@ tbyte *Resources::createNoise(TextureFormat *format,int scale,int seed,scalar br
 
 	return data;
 }
+
+tbyte *Resources::createPoint(TextureFormat *format){
+	int width=format->getWidth(),height=format->getHeight();
+	tbyte *data=new tbyte[format->getDataSize()];
+
+	int x=0,y=0;
+	for(y=0;y<height;y++){
+		for(x=0;x<width;x++){
+			float v=1.0;
+			v=v*(Math::length(Vector2(x-width/2,y-height/2))/(width/2));
+			if(v<0) v=0;
+			if(v>1) v=1;
+			v=pow(v,1.25f);
+
+			data[(y*width+x)*2+0]=255;
+			data[(y*width+x)*2+1]=255*v;
+		}
+	}
+
+	return data;
+}

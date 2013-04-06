@@ -26,6 +26,90 @@ protected:
 	Camera::ptr mCamera;
 };
 
+class ChompComponent:public BaseComponent,public Animatable{
+public:
+	TOADLET_OBJECT(ChompComponent);
+
+	ChompComponent(Engine *engine,SpriteComponent *sprite){
+		Sequence::ptr sequence=new Sequence();
+		{
+			Track::ptr colorTrack=new Track(engine->getVertexFormats().COLOR);
+			colorTrack->addKeyFrame(0,(void*)Colors::TRANSPARENT_RED.getData());
+			colorTrack->addKeyFrame(1,(void*)Colors::RED.getData());
+			sequence->addTrack(colorTrack);
+
+			Matrix4x4 startMatrix,endMatrix,temp;
+			{
+				scalar y=0;
+				Math::setMatrix4x4FromTranslate(startMatrix,0,Math::HALF,0);
+				Math::setMatrix4x4FromScale(temp,Math::ONE,y,Math::ONE);
+				Math::postMul(startMatrix,temp);
+				Math::setMatrix4x4FromTranslate(temp,0,-Math::mul(Math::HALF,y),0);
+				Math::postMul(startMatrix,temp);
+
+				y=3;
+				Math::setMatrix4x4FromTranslate(endMatrix,0,Math::HALF,0);
+				Math::setMatrix4x4FromScale(temp,Math::ONE,y,Math::ONE);
+				Math::postMul(endMatrix,temp);
+				Math::setMatrix4x4FromTranslate(temp,0,-Math::mul(Math::HALF,y),0);
+				Math::postMul(endMatrix,temp);
+			}
+
+			Vector3 position;
+			Quaternion rotate;
+			Vector3 scale;
+
+			Track::ptr transformTrack=new Track(engine->getVertexFormats().POSITION_ROTATE_SCALE);
+			VertexBufferAccessor &vba=transformTrack->getAccessor();
+
+			Math::setTranslateFromMatrix4x4(position,startMatrix);
+			Math::setQuaternionFromMatrix4x4(rotate,startMatrix);
+			Math::setScaleFromMatrix4x4(scale,startMatrix);
+			transformTrack->addKeyFrame(0);
+			vba.set3(0,0,position);
+			vba.set4(0,1,rotate);
+			vba.set3(0,2,scale);
+
+			Math::setTranslateFromMatrix4x4(position,endMatrix);
+			Math::setQuaternionFromMatrix4x4(rotate,endMatrix);
+			Math::setScaleFromMatrix4x4(scale,endMatrix);
+			transformTrack->addKeyFrame(1);
+			vba.set3(1,0,position);
+			vba.set4(1,1,rotate);
+			vba.set3(1,2,scale);
+
+			sequence->addTrack(transformTrack);
+		}
+
+		mColorAnimation=new MaterialStateAnimation(sprite->getSharedRenderState(),sequence,0);
+
+		TextureState textureState;
+		sprite->getSharedRenderState()->getTextureState(Shader::ShaderType_FRAGMENT,0,textureState);
+		textureState.calculation=TextureState::CalculationType_NORMAL;
+		sprite->getSharedRenderState()->setTextureState(Shader::ShaderType_FRAGMENT,0,textureState);
+		mTransformAnimation=new TextureStateAnimation(sprite->getSharedRenderState(),Shader::ShaderType_FRAGMENT,0,sequence,1);
+	}
+
+	void parentChanged(Node *node){
+		if(mParent!=NULL){
+			mParent->animatableRemoved(this);
+		}
+
+		BaseComponent::parentChanged(node);
+
+		if(mParent!=NULL){
+			mParent->animatableAttached(this);
+		}
+	}
+
+	int getNumAnimations(){return 2;}
+	Animation *getAnimation(const String &name){return NULL;}
+	Animation *getAnimation(int index){return index==0?mColorAnimation:mTransformAnimation;}
+
+protected:
+	Animation::ptr mColorAnimation,mTransformAnimation;
+};
+
 /* AcornComponent
 		int newAcornCount=mPlayer->getAcornCount();
 		if(mAcornCount!=newAcornCount){
@@ -111,73 +195,22 @@ HUD::HUD(Scene *scene,Node *player,Camera *camera):Node(scene){
 
 	mFade=new Node(mScene);
 	{
+		mFade->setName("fade");
+
 		SpriteComponent::ptr sprite=new SpriteComponent(mEngine);
 		sprite->setMaterial(Resources::instance->hudFade);
 		mFade->attach(sprite);
 		mFade->setScale(Vector3(2,2,2));
 
-		Sequence::ptr sequence=new Sequence();
-		{
-			Track::ptr colorTrack=new Track(mEngine->getVertexFormats().COLOR);
-			colorTrack->addKeyFrame(0,(void*)Colors::TRANSPARENT_RED.getData());
-			colorTrack->addKeyFrame(1,(void*)Colors::RED.getData());
-			sequence->addTrack(colorTrack);
-
-			Matrix4x4 startMatrix,endMatrix,temp;
-			{
-				float amount=0;
-				Math::setMatrix4x4FromTranslate(startMatrix,0,Math::HALF,0);
-				Math::setMatrix4x4FromScale(temp,Math::ONE,amount,Math::ONE);
-				Math::postMul(startMatrix,temp);
-				Math::setMatrix4x4FromTranslate(temp,0,-Math::mul(Math::HALF,amount),0);
-				Math::postMul(startMatrix,temp);
-
-				amount=Math::ONE;
-				Math::setMatrix4x4FromTranslate(endMatrix,0,Math::HALF,0);
-				Math::setMatrix4x4FromScale(temp,Math::ONE,amount,Math::ONE);
-				Math::postMul(endMatrix,temp);
-				Math::setMatrix4x4FromTranslate(temp,0,-Math::mul(Math::HALF,amount),0);
-				Math::postMul(endMatrix,temp);
-			}
-
-			Vector3 position;
-			Quaternion rotate;
-			Vector3 scale;
-
-			Track::ptr transformTrack=new Track(mEngine->getVertexFormats().POSITION_ROTATE_SCALE);
-			VertexBufferAccessor &vba=transformTrack->getAccessor();
-
-			Math::setTranslateFromMatrix4x4(position,startMatrix);
-			Math::setQuaternionFromMatrix4x4(rotate,startMatrix);
-			Math::setScaleFromMatrix4x4(scale,startMatrix);
-			transformTrack->addKeyFrame(0);
-			vba.set3(0,0,position);
-			vba.set4(0,1,rotate);
-			vba.set3(0,2,scale);
-
-			Math::setTranslateFromMatrix4x4(position,endMatrix);
-			Math::setQuaternionFromMatrix4x4(rotate,endMatrix);
-			Math::setScaleFromMatrix4x4(scale,endMatrix);
-			transformTrack->addKeyFrame(1);
-			vba.set3(1,0,position);
-			vba.set4(1,1,rotate);
-			vba.set3(1,2,scale);
-
-			sequence->addTrack(transformTrack);
-		}
-
-		Animation::ptr colorAnimation=new MaterialStateAnimation(sprite->getSharedRenderState(),sequence,0);
-
-		TextureState textureState;
-		sprite->getSharedRenderState()->getTextureState(Shader::ShaderType_FRAGMENT,0,textureState);
-		textureState.calculation=TextureState::CalculationType_NORMAL;
-		sprite->getSharedRenderState()->setTextureState(Shader::ShaderType_FRAGMENT,0,textureState);
-		Animation::ptr transformAnimation=new TextureStateAnimation(sprite->getSharedRenderState(),Shader::ShaderType_FRAGMENT,0,sequence,1);
+		ChompComponent::ptr chomp=new ChompComponent(mEngine,sprite);
+		mFade->attach(chomp);
 
 		AnimationAction::ptr action=new AnimationAction();
-		action->attach(colorAnimation);
-		action->attach(transformAnimation);
-		attach(new ActionComponent("action",action));
+		action->attach(chomp->getAnimation(0));
+		action->attach(chomp->getAnimation(1));
+		action->setInterpolator(new CosInterpolator());
+		action->setCycling(AnimationAction::Cycling_REFLECT);
+		mFade->attach(new ActionComponent("action",action));
 	}
 	attach(mFade);
 

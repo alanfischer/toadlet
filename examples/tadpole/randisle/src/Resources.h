@@ -152,15 +152,26 @@ public:
 		}
 
 		// HUD
-		RenderState::ptr hudFadeState=engine->getMaterialManager()->createRenderState();
-		hudFadeState->setSamplerState(Shader::ShaderType_FRAGMENT,0,SamplerState(
-			SamplerState::FilterType_LINEAR,SamplerState::FilterType_LINEAR,SamplerState::FilterType_LINEAR,
-			SamplerState::AddressType_CLAMP_TO_EDGE,SamplerState::AddressType_CLAMP_TO_EDGE,SamplerState::AddressType_CLAMP_TO_EDGE));
-		hudFadeState->setDepthState(DepthState(DepthState::DepthTest_ALWAYS,false));
-		hudFadeState->setBlendState(BlendState::Combination_ALPHA);
-		hudFadeState->setMaterialState(MaterialState(Colors::TRANSPARENT_RED));
-		hudFadeState->setRasterizerState(RasterizerState());
-		hudFade=engine->createDiffuseMaterial(NULL,hudFadeState);
+		{
+			RenderState::ptr hudFadeState=engine->getMaterialManager()->createRenderState();
+			hudFadeState->setSamplerState(Shader::ShaderType_FRAGMENT,0,SamplerState(
+				SamplerState::FilterType_LINEAR,SamplerState::FilterType_LINEAR,SamplerState::FilterType_LINEAR,
+				SamplerState::AddressType_CLAMP_TO_EDGE,SamplerState::AddressType_CLAMP_TO_EDGE,SamplerState::AddressType_CLAMP_TO_EDGE));
+			hudFadeState->setDepthState(DepthState(DepthState::DepthTest_ALWAYS,false));
+			hudFadeState->setBlendState(BlendState::Combination_ALPHA);
+			hudFadeState->setMaterialState(MaterialState(Colors::TRANSPARENT_RED));
+			hudFadeState->setRasterizerState(RasterizerState());
+
+			TextureFormat::ptr pointFormat=new TextureFormat(TextureFormat::Dimension_D2,TextureFormat::Format_LA_8,128,128,1,0);
+			tbyte *pointData=createPoint(pointFormat);
+			Texture::ptr pointTexture=engine->getTextureManager()->createTexture(pointFormat,pointData);
+			delete[] pointData;
+
+			hudFade=engine->createDiffuseMaterial(pointTexture,hudFadeState);
+
+			hudFade->getRenderState()->setSamplerState(Shader::ShaderType_FRAGMENT,0,SamplerState(SamplerState::FilterType_LINEAR,SamplerState::FilterType_LINEAR,SamplerState::FilterType_LINEAR,
+				SamplerState::AddressType_CLAMP_TO_EDGE,SamplerState::AddressType_CLAMP_TO_EDGE));
+		}
 		
 		hudCompass=engine->getMaterialManager()->findMaterial("compass.png");
 		if(hudCompass!=NULL){
@@ -184,6 +195,8 @@ public:
 	}
 
 	static tbyte *createNoise(TextureFormat *format,int scale,int seed,scalar brightnessScale,scalar brightnessOffset);
+
+	static tbyte *createPoint(TextureFormat *format);
 
 	static Resources *instance;
 
