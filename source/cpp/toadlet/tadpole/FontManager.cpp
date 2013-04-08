@@ -54,7 +54,7 @@ Font::ptr FontManager::getDefaultFont(){
 			TCHAR path[MAX_PATH];
 			SHGetSpecialFolderPath(0,path,CSIDL_FONTS,false);
 			file=path+String("\\Arial.ttf");
-		#elif defined(TOADLET_PLATFORM_IPHONE)
+		#elif defined(TOADLET_PLATFORM_IOS)
 			file="/System/Library/Fonts/Cache/Geneva.dfont";
 		#elif defined(TOADLET_PLATFORM_OSX)
 			file="/System/Library/Fonts/Geneva.dfont";

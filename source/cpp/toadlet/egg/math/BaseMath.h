@@ -27,12 +27,7 @@
 #define TOADLET_EGG_MATH_BASEMATH_H
 
 #include <toadlet/egg/math/Inline.h>
-
-#if defined(TOADLET_PLATFORM_OSX)
-	#include <sys/../math.h> // Force it to use the right math.h, because xcode is buggy
-#else
-	#include <math.h>
-#endif
+#include <cmath>
 
 namespace toadlet{
 namespace egg{
