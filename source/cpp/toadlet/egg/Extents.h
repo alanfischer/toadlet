@@ -85,7 +85,7 @@ namespace Extents{
 		#if defined(TOADLET_PLATFORM_WIN32)
 			return !_finite(v);
 		#else
-			return isinf(v);
+			return std::isinf(v);
 		#endif
 	}
 
@@ -93,7 +93,7 @@ namespace Extents{
 		#if defined(TOADLET_PLATFORM_WIN32)
 			return _isnan(v)>0;
 		#else
-			return isnan(v)>0;
+			return std::isnan(v)>0;
 		#endif
 	}
 
