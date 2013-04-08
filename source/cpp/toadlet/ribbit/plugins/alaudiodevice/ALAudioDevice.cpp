@@ -107,11 +107,12 @@ bool ALAudioDevice::create(int options){
 		return false;
 	}
 
-	alBufferDataStatic=(proc_alBufferDataStatic)alcGetProcAddress(mDevice,(ALCchar*)"alBufferDataStatic");
-	if(alBufferDataStatic!=NULL){
-		Log::alert(Categories::TOADLET_RIBBIT,
-			"using alBufferDataStatic extension");
-	}
+// Avoid this until we can figure out a good way of deleting an object that may be playing
+//	alBufferDataStatic=(proc_alBufferDataStatic)alcGetProcAddress(mDevice,(ALCchar*)"alBufferDataStatic");
+//	if(alBufferDataStatic!=NULL){
+//		Log::alert(Categories::TOADLET_RIBBIT,
+//			"using alBufferDataStatic extension");
+//	}
 
 	mContext=alcCreateContext(mDevice,NULL);
 	TOADLET_CHECK_ALERROR("alcCreateContext");
