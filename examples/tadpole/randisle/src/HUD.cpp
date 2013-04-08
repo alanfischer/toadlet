@@ -26,6 +26,30 @@ protected:
 	Camera::ptr mCamera;
 };
 
+class AcornCountComponent:public BaseComponent{
+public:
+	TOADLET_OBJECT(AcornCountComponent);
+
+	AcornCountComponent(LabelComponent *label):
+		mCount(0),
+		mLabel(label){}
+
+	void addAcorns(int count){
+		mCount+=count;
+		String text;
+		int digits=0;
+		int i;
+		for(i=mCount;i>0;i/=10,digits++);
+		for(i=0;i<3-digits;++i) text=text+"0";
+		if(mCount>0) text=text+mCount;
+		mLabel->setText(text);
+	}
+
+protected:
+	int mCount;
+	LabelComponent::ptr mLabel;
+};
+
 class ChompComponent:public BaseComponent,public Animatable{
 public:
 	TOADLET_OBJECT(ChompComponent);
@@ -47,7 +71,7 @@ public:
 				Math::setMatrix4x4FromTranslate(temp,0,-Math::mul(Math::HALF,y),0);
 				Math::postMul(startMatrix,temp);
 
-				y=3;
+				y=4;
 				Math::setMatrix4x4FromTranslate(endMatrix,0,Math::HALF,0);
 				Math::setMatrix4x4FromScale(temp,Math::ONE,y,Math::ONE);
 				Math::postMul(endMatrix,temp);
@@ -88,6 +112,10 @@ public:
 		textureState.calculation=TextureState::CalculationType_NORMAL;
 		sprite->getSharedRenderState()->setTextureState(Shader::ShaderType_FRAGMENT,0,textureState);
 		mTransformAnimation=new TextureStateAnimation(sprite->getSharedRenderState(),Shader::ShaderType_FRAGMENT,0,sequence,1);
+
+		mCompositeAnimation=new CompositeAnimation();
+		mCompositeAnimation->attach(mColorAnimation);
+		mCompositeAnimation->attach(mTransformAnimation);
 	}
 
 	void parentChanged(Node *node){
@@ -102,41 +130,11 @@ public:
 		}
 	}
 
-	int getNumAnimations(){return 2;}
+	int getNumAnimations(){return 1;}
 	Animation *getAnimation(const String &name){return NULL;}
-	Animation *getAnimation(int index){return index==0?mColorAnimation:mTransformAnimation;}
+	Animation *getAnimation(int index){return mCompositeAnimation;}
 
-protected:
-	Animation::ptr mColorAnimation,mTransformAnimation;
-};
-
-/* AcornComponent
-		int newAcornCount=mPlayer->getAcornCount();
-		if(mAcornCount!=newAcornCount){
-			updateAcornCount(newAcornCount);
-
-			void HUD::updateAcornCount(int count){
-				mAcornCount=count;
-				String text;
-				int digits=0;
-				int i;
-				for(i=mAcornCount;i>0;i/=10,digits++);
-				for(i=0;i<3-digits;++i) text=text+"0";
-				if(count>0) text=text+count;
-				((LabelComponent*)mAcorns->getVisible(0))->setText(text);
-			}
-		}
-*/
-
-/* ChompComponent
-		if(mPlayer->getCoefficientOfGravity()==0){
-			mWaterAmount+=Math::fromMilli(dt*4);
-		}
-		else{
-			mWaterAmount-=Math::fromMilli(dt*4);
-		}
-		mWaterAmount=Math::clamp(0,Math::ONE,mWaterAmount);
-
+	/*
 		scalar danger=mPlayer->getDanger();
 		if(mChompTime>0){
 			scalar chompamount=Math::fromMilli(mScene->getTime()-mChompTime);
@@ -176,43 +174,43 @@ protected:
 			mSharkSound->setGain(0);
 			mSharkSound->stop();
 		}
-*/
+	*/
+
+protected:
+	Animation::ptr mColorAnimation,mTransformAnimation;
+	CompositeAnimation::ptr mCompositeAnimation;
+};
 
 HUD::HUD(Scene *scene,Node *player,Camera *camera):Node(scene){
-	Node::ptr sounds=new Node(mScene);
+	mChomp=new Node(mScene);
 	{
-		mDogSound=new AudioComponent(mEngine);
-		mDogSound->setAudioBuffer(Resources::instance->dog);
-		mDogSound->setGlobal(true);
-		sounds->attach(mDogSound);
-
-		mSharkSound=new AudioComponent(mEngine);
-		mSharkSound->setAudioBuffer(Resources::instance->shark);
-		mSharkSound->setGlobal(true);
-		sounds->attach(mSharkSound);
-	}
-	attach(sounds);
-
-	mFade=new Node(mScene);
-	{
-		mFade->setName("fade");
+		mChomp->setName("chomp");
 
 		SpriteComponent::ptr sprite=new SpriteComponent(mEngine);
 		sprite->setMaterial(Resources::instance->hudFade);
-		mFade->attach(sprite);
-		mFade->setScale(Vector3(2,2,2));
+		mChomp->attach(sprite);
+		mChomp->setScale(Vector3(2,2,2));
 
-		ChompComponent::ptr chomp=new ChompComponent(mEngine,sprite);
-		mFade->attach(chomp);
+		AudioComponent::ptr dog=new AudioComponent(mEngine);
+		dog->setAudioBuffer(Resources::instance->dog);
+		dog->setGlobal(true);
+		mChomp->attach(dog);
+
+		AudioComponent::ptr shark=new AudioComponent(mEngine);
+		shark->setAudioBuffer(Resources::instance->shark);
+		shark->setGlobal(true);
+		mChomp->attach(shark);
+
+		ChompComponent::ptr chomp=new ChompComponent(mEngine,sprite);//,dog,shark);
+		mChomp->attach(chomp);
 
 		AnimationAction::ptr action=new AnimationAction();
 		action->attach(chomp->getAnimation(0));
 		action->attach(chomp->getAnimation(1));
-		action->setInterpolator(new CosInterpolator());
 		action->setCycling(AnimationAction::Cycling_REFLECT);
-		mFade->attach(new ActionComponent("action",action));
+		attach(new ActionComponent("action",action));
 	}
-	attach(mFade);
+	attach(mChomp);
 
 	mCompass=new Node(mScene);
 	{
@@ -229,23 +227,32 @@ HUD::HUD(Scene *scene,Node *player,Camera *camera):Node(scene){
 	
 	mAcorn=new Node(mScene);
 	{
-		SpriteComponent::ptr sprite=new SpriteComponent(mEngine);
-		sprite->setMaterial(Resources::instance->hudAcorn);
-		mAcorn->attach(sprite);
-		mAcorn->setTranslate(-0.75,0.75,0);
-		mAcorn->setScale(0.25,0.20,0.25);
+		Node::ptr node=new Node(mScene);
+		{
+			SpriteComponent::ptr sprite=new SpriteComponent(mEngine);
+			sprite->setMaterial(Resources::instance->hudAcorn);
+			node->attach(sprite);
+			node->setTranslate(-0.75,0.75,0);
+			node->setScale(0.25,0.20,0.25);
+		}
+		mAcorn->attach(node);
+
+		LabelComponent::ptr label;
+		node=new Node(mScene);
+		{
+			label=new LabelComponent(mEngine);
+			label->setFont(Resources::instance->hudWooden);
+			label->setAlignment(Font::Alignment_BIT_VCENTER|Font::Alignment_BIT_LEFT);
+			label->getSharedRenderState()->setMaterialState(MaterialState(Colors::BROWN));
+			node->attach(label);
+			node->setTranslate(-0.60,0.80,0);
+			node->setScale(0.3,0.3,0.3);
+		}
+		mAcorn->attach(node);
+
+		AcornCountComponent::ptr count=new AcornCountComponent(label);
+		count->setName("count");
+		mAcorn->attach(count);
 	}
 	attach(mAcorn);
-
-	mAcorns=new Node(mScene);
-	{
-		LabelComponent::ptr label=new LabelComponent(mEngine);
-		label->setFont(Resources::instance->hudWooden);
-		label->setAlignment(Font::Alignment_BIT_VCENTER|Font::Alignment_BIT_LEFT);
-		label->getSharedRenderState()->setMaterialState(MaterialState(Colors::BROWN));
-		mAcorns->attach(label);
-		mAcorns->setTranslate(-0.60,0.80,0);
-		mAcorns->setScale(0.3,0.3,0.3);
-	}
-	attach(mAcorns);
 }

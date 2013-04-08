@@ -13,10 +13,9 @@ protected:
 	AudioComponent::ptr mDogSound;
 	AudioComponent::ptr mSharkSound;
 
-	Node::ptr mFade;
 	Node::ptr mCompass;
+	Node::ptr mChomp;
 	Node::ptr mAcorn;
-	Node::ptr mAcorns;
 };
 
 #endif

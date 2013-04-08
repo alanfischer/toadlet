@@ -43,6 +43,7 @@ set (TADPOLE_ACTION_SRC
 	action/AnimationAction.cpp
 	action/AudioAction.cpp
 	action/CompositeAction.cpp
+	action/CompositeAnimation.cpp
 	action/BaseAnimation.cpp
 	action/CameraProjectionAnimation.cpp
 	action/NodePathAnimation.cpp
@@ -260,6 +261,7 @@ set (TADPOLE_ACTION_HDR
 	action/Action.h
 	action/ActionListener.h
 	action/CompositeAction.h
+	action/CompositeAnimation.h
 	action/Animation.h
 	action/AnimationListener.h
 	action/BaseAnimation.h
