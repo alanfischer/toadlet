@@ -92,6 +92,8 @@ void ALAudioBuffer::destroy(){
 		delete[] mStaticData;
 		mStaticData=NULL;
 	}
+
+	BaseResource::destroy();
 }
 
 }
