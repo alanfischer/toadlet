@@ -57,6 +57,11 @@ public:
 	void setAlignment(int alignment);
 	int getAlignment() const{return mAlignment;}
 
+	void frameUpdate(int dt,int scope);
+
+	void setTransform(Transform *transform);
+	Transform *getTransform() const{return mTransform;}
+
 	Bound *getBound() const{return mBound;}
 
 	// Visible
@@ -67,8 +72,8 @@ public:
 
 	// Renderable
 	Material *getRenderMaterial() const{return mMaterialIndex<mMaterials.size()?mMaterials[mMaterialIndex]:NULL;}
-	Transform *getRenderTransform() const{return mParent->getWorldTransform();}
-	Bound *getRenderBound() const{return mParent->getWorldBound();}
+	Transform *getRenderTransform() const{return mWorldTransform;}
+	Bound *getRenderBound() const{return mWorldBound;}
 	void render(RenderManager *manager) const;
 
 	// Animatable
@@ -101,7 +106,10 @@ protected:
 	Collection<Material::ptr> mMaterials;
 	int mMaterialIndex;
 	bool mRendered;
+	Transform::ptr mTransform;
 	Bound::ptr mBound;
+	Transform::ptr mWorldTransform;
+	Bound::ptr mWorldBound;
 	RenderState::ptr mSharedRenderState;
 	VertexData::ptr mVertexData;
 	IndexData::ptr mIndexData;
