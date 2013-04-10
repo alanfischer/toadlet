@@ -62,7 +62,7 @@ namespace Extents{
 		const math::real MAX_REAL=MAX_FLOAT;
 	#endif
 
-	#if defined(TOADLET_FIXED_POINT)
+	#if defined(TOADLET_FIXED_POINT)  
 		const mathfixed::fixed MIN_SCALAR=MIN_FIXED;
 		const mathfixed::fixed MAX_SCALAR=MAX_FIXED;
 	#else

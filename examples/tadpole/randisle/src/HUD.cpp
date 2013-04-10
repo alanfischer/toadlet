@@ -107,11 +107,14 @@ public:
 
 		mColorAnimation=new MaterialStateAnimation(sprite->getSharedRenderState(),sequence,0);
 
+		Shader::ShaderType type;
+		int index;
+		sprite->getMaterial()->getBestPath()->findTexture(type,index,"tex");
 		TextureState textureState;
-		sprite->getSharedRenderState()->getTextureState(Shader::ShaderType_FRAGMENT,0,textureState);
+		sprite->getSharedRenderState()->getTextureState(type,index,textureState);
 		textureState.calculation=TextureState::CalculationType_NORMAL;
-		sprite->getSharedRenderState()->setTextureState(Shader::ShaderType_FRAGMENT,0,textureState);
-		mTransformAnimation=new TextureStateAnimation(sprite->getSharedRenderState(),Shader::ShaderType_FRAGMENT,0,sequence,1);
+		sprite->getSharedRenderState()->setTextureState(type,index,textureState);
+		mTransformAnimation=new TextureStateAnimation(sprite->getSharedRenderState(),type,index,sequence,1);
 
 		mCompositeAnimation=new CompositeAnimation();
 		mCompositeAnimation->attach(mColorAnimation);

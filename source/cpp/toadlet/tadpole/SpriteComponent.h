@@ -51,7 +51,7 @@ public:
 	Material *getMaterial(int i=0) const{return mMaterials.size()>i?mMaterials[i]:NULL;}
 	int getNumMaterials() const{return mMaterials.size();}
 
-	void setMaterialIndex(int index){mMaterialIndex=index;}
+	void setMaterialIndex(int index){mMaterialIndex=Math::intClamp(0,mMaterials.size()-1,index);}
 	int getMaterialIndex() const{return mMaterialIndex;}
 
 	void setAlignment(int alignment);
