@@ -342,6 +342,7 @@ Material::ptr DiffuseMaterialCreator::createDiffuseMaterial(Texture *texture,Ren
 
 		if(texture!=NULL){
 			pass->setTexture(Shader::ShaderType_FRAGMENT,0,texture,mEngine->getMaterialManager()->getDefaultSamplerState(),TextureState());
+			pass->setTextureLocationName(Shader::ShaderType_FRAGMENT,0,"tex");
 		}
 	}
 
@@ -404,6 +405,7 @@ Material::ptr DiffuseMaterialCreator::createPointSpriteMaterial(Texture *texture
 
 		if(texture!=NULL){
 			pass->setTexture(Shader::ShaderType_FRAGMENT,0,texture,mEngine->getMaterialManager()->getDefaultSamplerState(),TextureState());
+			pass->setTextureLocationName(Shader::ShaderType_FRAGMENT,0,"tex");
 		}
 	}
 
@@ -467,6 +469,7 @@ Material::ptr DiffuseMaterialCreator::createFontMaterial(Font *font){
 		RenderPass::ptr pass=fixedPath->addPass(renderState);
 
 		pass->setTexture(Shader::ShaderType_FRAGMENT,0,texture,mEngine->getMaterialManager()->getDefaultSamplerState(),TextureState());
+		pass->setTextureLocationName(Shader::ShaderType_FRAGMENT,0,"tex");
 	}
 
 	mEngine->getMaterialManager()->manage(material);
