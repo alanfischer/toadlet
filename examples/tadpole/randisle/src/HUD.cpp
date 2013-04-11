@@ -190,7 +190,7 @@ HUD::HUD(Scene *scene,Node *player,Camera *camera):Node(scene){
 		mChomp->setName("chomp");
 
 		SpriteComponent::ptr sprite=new SpriteComponent(mEngine);
-		sprite->setMaterial(Resources::instance->hudFade);
+		sprite->setMaterial(Resources::instance->fade);
 		mChomp->attach(sprite);
 		mChomp->setScale(Vector3(2,2,2));
 
@@ -211,14 +211,14 @@ HUD::HUD(Scene *scene,Node *player,Camera *camera):Node(scene){
 		action->attach(chomp->getAnimation(0));
 		action->attach(chomp->getAnimation(1));
 		action->setCycling(AnimationAction::Cycling_REFLECT);
-		attach(new ActionComponent("action",action));
+		mChomp->attach(new ActionComponent("action",action));
 	}
 	attach(mChomp);
 
 	mCompass=new Node(mScene);
 	{
 		SpriteComponent::ptr sprite=new SpriteComponent(mEngine);
-		sprite->setMaterial(Resources::instance->hudCompass);
+		sprite->setMaterial(Resources::instance->compass);
 		mCompass->attach(sprite);
 		mCompass->setTranslate(0.75,0.75,0);
 		mCompass->setScale(0.25,0.25,0.25);
@@ -233,7 +233,7 @@ HUD::HUD(Scene *scene,Node *player,Camera *camera):Node(scene){
 		Node::ptr node=new Node(mScene);
 		{
 			SpriteComponent::ptr sprite=new SpriteComponent(mEngine);
-			sprite->setMaterial(Resources::instance->hudAcorn);
+			sprite->setMaterial(Resources::instance->acorn);
 			node->attach(sprite);
 			node->setTranslate(-0.75,0.75,0);
 			node->setScale(0.25,0.20,0.25);
@@ -244,7 +244,7 @@ HUD::HUD(Scene *scene,Node *player,Camera *camera):Node(scene){
 		node=new Node(mScene);
 		{
 			label=new LabelComponent(mEngine);
-			label->setFont(Resources::instance->hudWooden);
+			label->setFont(Resources::instance->wooden);
 			label->setAlignment(Font::Alignment_BIT_VCENTER|Font::Alignment_BIT_LEFT);
 			label->getSharedRenderState()->setMaterialState(MaterialState(Colors::BROWN));
 			node->attach(label);

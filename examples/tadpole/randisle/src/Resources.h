@@ -144,52 +144,49 @@ public:
 		rustle=engine->getAudioManager()->findAudioBuffer("rustle.wav");
 		crunch=engine->getAudioManager()->findAudioBuffer("crunch.wav");
 
-		acorn=engine->getMaterialManager()->findMaterial("acorn.png");
-		if(acorn!=NULL){
-//			acorn->getPass()->setMaterialState(MaterialState(false));
-//			acorn->getPass()->setDepthState(DepthState(DepthState::DepthTest_LEQUAL,false));
-//			acorn->getPass()->setBlendState(BlendState(BlendState::Combination_ALPHA));
+		{
+			RenderState::ptr renderState=engine->getMaterialManager()->createRenderState();
+			renderState->setMaterialState(MaterialState(false));
+			renderState->setDepthState(DepthState(DepthState::DepthTest_LEQUAL,false));
+			renderState->setBlendState(BlendState(BlendState::Combination_ALPHA));
+			acorn=engine->createDiffuseMaterial(engine->getTextureManager()->findTexture("acorn.png"),renderState);
 		}
 
 		// HUD
 		{
-			RenderState::ptr hudFadeState=engine->getMaterialManager()->createRenderState();
-			hudFadeState->setSamplerState(Shader::ShaderType_FRAGMENT,0,SamplerState(
+			RenderState::ptr renderState=engine->getMaterialManager()->createRenderState();
+			renderState->setSamplerState(Shader::ShaderType_FRAGMENT,0,SamplerState(
 				SamplerState::FilterType_LINEAR,SamplerState::FilterType_LINEAR,SamplerState::FilterType_LINEAR,
 				SamplerState::AddressType_CLAMP_TO_EDGE,SamplerState::AddressType_CLAMP_TO_EDGE,SamplerState::AddressType_CLAMP_TO_EDGE));
-			hudFadeState->setDepthState(DepthState(DepthState::DepthTest_ALWAYS,false));
-			hudFadeState->setBlendState(BlendState::Combination_ALPHA);
-			hudFadeState->setMaterialState(MaterialState(Colors::TRANSPARENT_RED));
-			hudFadeState->setRasterizerState(RasterizerState());
+			renderState->setDepthState(DepthState(DepthState::DepthTest_ALWAYS,false));
+			renderState->setBlendState(BlendState::Combination_ALPHA);
+			renderState->setMaterialState(MaterialState(Colors::TRANSPARENT_RED));
+			renderState->setRasterizerState(RasterizerState());
 
 			TextureFormat::ptr pointFormat=new TextureFormat(TextureFormat::Dimension_D2,TextureFormat::Format_LA_8,128,128,1,0);
 			tbyte *pointData=createPoint(pointFormat);
 			Texture::ptr pointTexture=engine->getTextureManager()->createTexture(pointFormat,pointData);
 			delete[] pointData;
 
-			hudFade=engine->createDiffuseMaterial(pointTexture,hudFadeState);
+			fade=engine->createDiffuseMaterial(pointTexture,renderState);
 
-			hudFade->getRenderState()->setSamplerState(Shader::ShaderType_FRAGMENT,0,SamplerState(SamplerState::FilterType_LINEAR,SamplerState::FilterType_LINEAR,SamplerState::FilterType_LINEAR,
+			/// @todo: This has to be set afterwords apparently
+			fade->getRenderState()->setSamplerState(Shader::ShaderType_FRAGMENT,0,SamplerState(SamplerState::FilterType_LINEAR,SamplerState::FilterType_LINEAR,SamplerState::FilterType_LINEAR,
 				SamplerState::AddressType_CLAMP_TO_EDGE,SamplerState::AddressType_CLAMP_TO_EDGE));
 		}
 		
-		hudCompass=engine->getMaterialManager()->findMaterial("compass.png");
-		if(hudCompass!=NULL){
-//			hudCompass->getPass()->setMaterialState(MaterialState(false));
-//			hudCompass->getPass()->setDepthState(DepthState(DepthState::DepthTest_NEVER,false));
-//			hudCompass->getPass()->setBlendState(BlendState(BlendState::Operation_ZERO,BlendState::Operation_SOURCE_COLOR));
+		{
+			RenderState::ptr renderState=engine->getMaterialManager()->createRenderState();
+			renderState->setMaterialState(MaterialState(false));
+			renderState->setDepthState(DepthState(DepthState::DepthTest_LEQUAL,false));
+			renderState->setBlendState(BlendState(BlendState::Operation_ZERO,BlendState::Operation_SOURCE_COLOR));
+			compass=engine->createDiffuseMaterial(engine->getTextureManager()->findTexture("compass.png"),renderState);
 		}
 
-		hudAcorn=engine->getMaterialManager()->findMaterial("acorn.png");
-		if(hudAcorn!=NULL){
-//			hudAcorn->getPass()->setMaterialState(MaterialState(false));
-//			hudAcorn->getPass()->setDepthState(DepthState(DepthState::DepthTest_NEVER,false));
-//			hudAcorn->getPass()->setBlendState(BlendState(BlendState::Combination_ALPHA));
-		}
 
-		hudWooden=engine->getFontManager()->findFont("Pinewood.ttf",100);
+		wooden=engine->getFontManager()->findFont("Pinewood.ttf",100);
 
-		hudSystem=engine->getFontManager()->getDefaultFont();
+		system=engine->getFontManager()->getDefaultFont();
 
 		return true;
 	}
@@ -221,11 +218,10 @@ public:
 	AudioBuffer::ptr crunch;
 
 	// HUD
-	Material::ptr hudFade;
-	Material::ptr hudCompass;
-	Material::ptr hudAcorn;
-	Font::ptr hudWooden;
-	Font::ptr hudSystem;
+	Material::ptr fade;
+	Material::ptr compass;
+	Font::ptr wooden;
+	Font::ptr system;
 };
 
 #endif
