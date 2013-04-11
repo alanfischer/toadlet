@@ -51,6 +51,7 @@ public:
 	enum MatrixFlags{
 		MatrixFlag_CAMERA_ALIGNED=1<<0,
 		MatrixFlag_NO_PERSPECTIVE=1<<1,
+		MatrixFlag_ASPECT_CORRECT=1<<2,
 	};
 
 	Material(MaterialManager *manager);
