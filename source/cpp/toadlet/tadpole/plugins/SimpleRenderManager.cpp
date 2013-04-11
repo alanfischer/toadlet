@@ -136,6 +136,11 @@ void SimpleRenderManager::setupPassForRenderable(RenderPass *pass,RenderDevice *
 			Math::mul(scale,point.w);
 		}
 
+		if((flags&Material::MatrixFlag_ASPECT_CORRECT)!=0){
+			Viewport viewport=mParams->getViewport();
+			scale.x=Math::mul(scale.x,Math::div(Math::fromInt(mCamera->getViewport().height),Math::fromInt(mCamera->getViewport().width)));
+		}
+
 		Math::setMatrix4x4FromTranslateRotateScale(matrix,translate,rotate,scale);
 	}
 
