@@ -1,15 +1,9 @@
-#include <toadlet/egg/io/FileStream.h>
-#include <toadlet/tadpole/Engine.h>
+#include <toadlet/toadlet.h>
 #include <toadlet/tadpole/plugins/XMSHStreamer.h>
 
 #include <iostream>
 
 #include "MeshOptimizer.h"
-
-using namespace toadlet::egg;
-using namespace toadlet::egg::io;
-using namespace toadlet::egg::math;
-using namespace toadlet::tadpole;
 
 int main(int argc,char **argv){
 	String arg;
