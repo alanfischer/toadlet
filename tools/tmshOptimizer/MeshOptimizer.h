@@ -1,15 +1,14 @@
 #ifndef MESHOPTIMIZER_H
 #define MESHOPTIMIZER_H
 
-#include <toadlet/egg/math/Math.h>
-#include <toadlet/tadpole/Engine.h>
+#include <toadlet/tadpole.h>
 
 class MeshOptimizer{
 public:
 	MeshOptimizer();
 	~MeshOptimizer();
 
-	bool optimizeMesh(toadlet::tadpole::Mesh *mesh,toadlet::tadpole::Engine *engine);
+	bool optimizeMesh(Mesh *mesh,Engine *engine);
 
 protected:
 	float mEpsilon;

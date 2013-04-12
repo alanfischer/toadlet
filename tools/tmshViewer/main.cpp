@@ -2,11 +2,6 @@
 #include <iostream>
 #include <stdlib.h>
 
-using namespace toadlet::egg;
-using namespace toadlet::tadpole;
-using namespace toadlet::tadpole::animation;
-using namespace toadlet::tadpole::node;
-
 int main(int argc,char **argv){
 	String arg;
 	int i=0;
