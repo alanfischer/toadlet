@@ -37,11 +37,19 @@ class TOADLET_API CompositeAction:public Object,public Action,public ActionListe
 public:
 	TOADLET_OBJECT(CompositeAction);
 
+	enum StopStyle{
+		StopStyle_ON_FIRST,
+		StopStyle_ON_LAST
+	};
+
 	CompositeAction();
 	virtual ~CompositeAction();
 
 	void attach(Action *action);
 	void remove(Action *action);
+
+	void setStopStyle(StopStyle style){mStopStyle=style;}
+	StopStyle getStopStyle() const{return mStopStyle;}
 
 	void setNextAction(Action *action){mNextAction=action;}
 	Action *getNextAction() const{return mNextAction;}
@@ -62,6 +70,7 @@ public:
 protected:
 	Collection<ActionListener*> mListeners;
 	Collection<Action::ptr> mActions;
+	StopStyle mStopStyle;
 	Action::ptr mNextAction;
 	bool mActive;
 };

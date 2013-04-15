@@ -58,10 +58,6 @@ void PathClimber::logicUpdate(int dt,int scope){
 		}
 		Math::mul(forward,mIdealRotation);
 		mParent->getPhysics()->setVelocity(forward);
-
-//		if((mSolid->getTouching()!=NULL || getCoefficientOfGravity()==0) && mGroundTime==0){
-//			mGroundTime=mParent->getScene()->getLogicTime();
-//		}
 	}
 	else{
 		scalar oldPathTime=mPathTime;
@@ -136,18 +132,10 @@ void PathClimber::mount(Node *system,Path *path,const Vector3 &point){
 	Math::sub(localPoint,point,system->getTranslate());
 	mPathTime=Math::length(localPoint,segment.origin);
 
-	bool flip=false;
-//	if(mGroundTime>0){
-//		flip=Math::dot(ndir,Math::Z_UNIT_VECTOR3)<0;
-//	}
-//	else{
-		flip=Math::dot(segment.direction,forward)<0;
-//	}
+	bool flip=Math::dot(segment.direction,forward)<0;
 	mPathDirection=flip?-1:1;
 
 	mPassedNeighbor=findPassedNeighbor(mPath,mPathDirection,mPathTime);
-
-//	mGroundTime=0;
 
 	if(mPathClimberListener!=NULL){
 		mPathClimberListener->pathMounted(this);

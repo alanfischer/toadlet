@@ -42,6 +42,7 @@ set (TADPOLE_SRC
 set (TADPOLE_ACTION_SRC
 	action/AnimationAction.cpp
 	action/AudioAction.cpp
+	action/AudioGainAnimation.cpp
 	action/CompositeAction.cpp
 	action/CompositeAnimation.cpp
 	action/BaseAnimation.cpp
@@ -258,6 +259,7 @@ set (TADPOLE_HDR
 set (TADPOLE_ACTION_HDR
 	action/AnimationAction.h
 	action/AudioAction.h
+	action/AudioGainAnimation.h
 	action/Action.h
 	action/ActionListener.h
 	action/CompositeAction.h
