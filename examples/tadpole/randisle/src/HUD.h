@@ -11,7 +11,6 @@ public:
 
 protected:
 	AudioComponent::ptr mDogSound;
-	AudioComponent::ptr mSharkSound;
 
 	Node::ptr mCompass;
 	Node::ptr mChomp;

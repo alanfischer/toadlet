@@ -572,15 +572,12 @@ void Engine::nodeCreated(Node *node){
 }
 
 void Engine::nodeDestroyed(Node *node){
-	/// @todo: Network: I dont want handles to be reused at this time
-/*
 	int handle=node->getUniqueHandle();
 	if(handle>0){
 		mHandles[handle]=NULL;
 		mFreeHandles.add(handle);
 		node->internal_setUniqueHandle(0);
 	}
-*/
 }
 
 // Context methods

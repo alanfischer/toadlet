@@ -140,7 +140,6 @@ public:
 		Log::alert("Loading sounds");
 
  		dog=engine->getAudioManager()->findAudioBuffer("dog.wav");
-		shark=engine->getAudioManager()->findAudioBuffer("shark.wav");
 		rustle=engine->getAudioManager()->findAudioBuffer("rustle.wav");
 		crunch=engine->getAudioManager()->findAudioBuffer("crunch.wav");
 
@@ -213,7 +212,6 @@ public:
 	Material::ptr treeLeaf;
 	Material::ptr acorn;
 	AudioBuffer::ptr dog;
-	AudioBuffer::ptr shark;
 	AudioBuffer::ptr rustle;
 	AudioBuffer::ptr crunch;
 

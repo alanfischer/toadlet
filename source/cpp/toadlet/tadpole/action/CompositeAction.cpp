@@ -102,10 +102,12 @@ void CompositeAction::actionStarted(Action *action){
 
 void CompositeAction::actionStopped(Action *action){
 	if(mActive){
-		stop();
+		if(mStopStyle==StopStyle_ON_FIRST || (mStopStyle==StopStyle_ON_LAST && getActive()==false)){
+			stop();
 
-		if(mNextAction!=NULL){
-			mNextAction->start();
+			if(mNextAction!=NULL){
+				mNextAction->start();
+			}
 		}
 	}
 }

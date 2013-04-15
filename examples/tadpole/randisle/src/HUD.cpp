@@ -50,11 +50,57 @@ protected:
 	LabelComponent::ptr mLabel;
 };
 
-class ChompComponent:public BaseComponent,public Animatable{
+class DangerComponent:public BaseComponent{
 public:
-	TOADLET_OBJECT(ChompComponent);
+	TOADLET_OBJECT(DangerComponent);
 
-	ChompComponent(Engine *engine,SpriteComponent *sprite){
+	DangerComponent(Node *player,Animation *danger,AudioComponent *dog,ActionComponent *chomp):
+		mPlayer(player),
+		mDanger(danger),
+		mDog(dog),
+		mChomp(chomp),
+		mNextDogTime(0),
+		danger(0)
+	{
+	}
+
+	void logicUpdate(int dt,int scope){
+//		scalar danger=0;
+
+		danger+=Math::fromMilli(dt)*0.1;
+
+		if(danger>=Math::ONE){
+			if(mChomp->getActive()==false){
+				mChomp->start();
+				mDog->stop();
+			}
+		}
+		else if(danger>0){
+			if(mNextDogTime<mParent->getScene()->getLogicTime() && mDog->getPlaying()==false){
+				mNextDogTime=mParent->getScene()->getLogicTime()+mRandom.nextInt(500,1500);
+				mDog->play();
+			}
+		}
+
+		mDanger->setValue(danger);
+	}
+
+	scalar danger;
+
+protected:
+	Node::ptr mPlayer;
+	Animation::ptr mDanger;
+	AudioComponent::ptr mDog;
+	ActionComponent::ptr mChomp;
+	int mNextDogTime;
+	Random mRandom;
+};
+
+class ChompyComponent:public BaseComponent,public Animatable{
+public:
+	TOADLET_OBJECT(ChompyComponent);
+
+	ChompyComponent(Engine *engine,SpriteComponent *sprite,AudioComponent *audio){
 		Sequence::ptr sequence=new Sequence();
 		{
 			Track::ptr colorTrack=new Track(engine->getVertexFormats().COLOR);
@@ -62,9 +108,14 @@ public:
 			colorTrack->addKeyFrame(1,(void*)Colors::RED.getData());
 			sequence->addTrack(colorTrack);
 
+			Track::ptr gainTrack=new Track(engine->getVertexFormats().COLOR);
+			gainTrack->addKeyFrame(0,(void*)Vector4(0,0,0,0).getData());
+			gainTrack->addKeyFrame(1,(void*)Vector4(1,0,0,0).getData());
+			sequence->addTrack(gainTrack);
+
 			Matrix4x4 startMatrix,endMatrix,temp;
 			{
-				scalar y=0;
+				scalar y=Math::ONE;
 				Math::setMatrix4x4FromTranslate(startMatrix,0,Math::HALF,0);
 				Math::setMatrix4x4FromScale(temp,Math::ONE,y,Math::ONE);
 				Math::postMul(startMatrix,temp);
@@ -79,6 +130,7 @@ public:
 				Math::postMul(endMatrix,temp);
 			}
 
+			int i;
 			Vector3 position;
 			Quaternion rotate;
 			Vector3 scale;
@@ -89,23 +141,33 @@ public:
 			Math::setTranslateFromMatrix4x4(position,startMatrix);
 			Math::setQuaternionFromMatrix4x4(rotate,startMatrix);
 			Math::setScaleFromMatrix4x4(scale,startMatrix);
-			transformTrack->addKeyFrame(0);
-			vba.set3(0,0,position);
-			vba.set4(0,1,rotate);
-			vba.set3(0,2,scale);
+			i=transformTrack->addKeyFrame(0);
+			vba.set3(i,0,position);
+			vba.set4(i,1,rotate);
+			vba.set3(i,2,scale);
 
 			Math::setTranslateFromMatrix4x4(position,endMatrix);
 			Math::setQuaternionFromMatrix4x4(rotate,endMatrix);
 			Math::setScaleFromMatrix4x4(scale,endMatrix);
-			transformTrack->addKeyFrame(1);
-			vba.set3(1,0,position);
-			vba.set4(1,1,rotate);
-			vba.set3(1,2,scale);
+			i=transformTrack->addKeyFrame(0.5);
+			vba.set3(i,0,position);
+			vba.set4(i,1,rotate);
+			vba.set3(i,2,scale);
+
+			Math::setTranslateFromMatrix4x4(position,startMatrix);
+			Math::setQuaternionFromMatrix4x4(rotate,startMatrix);
+			Math::setScaleFromMatrix4x4(scale,startMatrix);
+			i=transformTrack->addKeyFrame(1);
+			vba.set3(i,0,position);
+			vba.set4(i,1,rotate);
+			vba.set3(i,2,scale);
 
 			sequence->addTrack(transformTrack);
 		}
 
-		mColorAnimation=new MaterialStateAnimation(sprite->getSharedRenderState(),sequence,0);
+		mDangerAnimation=new CompositeAnimation();
+		mDangerAnimation->attach(new MaterialStateAnimation(sprite->getSharedRenderState(),sequence,0));
+		mDangerAnimation->attach(new AudioGainAnimation(audio,sequence,1));
 
 		Shader::ShaderType type;
 		int index;
@@ -114,11 +176,7 @@ public:
 		sprite->getSharedRenderState()->getTextureState(type,index,textureState);
 		textureState.calculation=TextureState::CalculationType_NORMAL;
 		sprite->getSharedRenderState()->setTextureState(type,index,textureState);
-		mTransformAnimation=new TextureStateAnimation(sprite->getSharedRenderState(),type,index,sequence,1);
-
-		mCompositeAnimation=new CompositeAnimation();
-		mCompositeAnimation->attach(mColorAnimation);
-		mCompositeAnimation->attach(mTransformAnimation);
+		mChompAnimation=new TextureStateAnimation(sprite->getSharedRenderState(),type,index,sequence,2);
 	}
 
 	void parentChanged(Node *node){
@@ -133,55 +191,27 @@ public:
 		}
 	}
 
-	int getNumAnimations(){return 1;}
-	Animation *getAnimation(const String &name){return NULL;}
-	Animation *getAnimation(int index){return mCompositeAnimation;}
-
-	/*
-		scalar danger=mPlayer->getDanger();
-		if(mChompTime>0){
-			scalar chompamount=Math::fromMilli(mScene->getTime()-mChompTime);
-			if(chompamount>=Math::HALF && mPlayer->getHealth()>0){
-				mDogSound->stop();
-				mSharkSound->stop();
-
-				mDogSound->setAudioBuffer(Resources::instance->crunch);
-				mDogSound->setGain(Math::ONE);
-				mDogSound->play();
-
-				mPlayer->setHealth(0);
-				mPlayer->setSpeed(0);
-				mPlayer->setVelocity(Math::ZERO_VECTOR3);
-				mPlayer->dismount();
-			}
+	int getNumAnimations(){return 2;}
+	Animation *getAnimation(const String &name){
+		if(name=="danger"){
+			return mDangerAnimation;
 		}
-		else if(danger>=Math::ONE){
-			mChompTime=mScene->getTime();
+		else{
+			return mChompAnimation;
 		}
-		else if(danger>0){
-			mDogSound->setGain(Math::mul(danger,Math::ONE-mWaterAmount)*4);
-			mSharkSound->setGain(Math::mul(Math::ONE,mWaterAmount)*4); // use Math::mul(danger,mWaterAmount) when the shark sound is constant volume
-
-			if(mNextBarkTime<mScene->getLogicTime() && mDogSound->getPlaying()==false){
-				mNextBarkTime=mScene->getLogicTime()+mRandom.nextInt(500,1500);
-				mDogSound->play();
-			}
-			if(mSharkSound->getPlaying()==false){
-				mSharkSound->play();
-			}
+	}
+	Animation *getAnimation(int index){
+		if(index==0){
+			return mDangerAnimation;
 		}
-		else if(mNextBarkTime>0){
-			mNextBarkTime=0;
-			mDogSound->setGain(0);
-			mDogSound->stop();
-			mSharkSound->setGain(0);
-			mSharkSound->stop();
+		else{
+			return mChompAnimation;
 		}
-	*/
+	}
 
 protected:
-	Animation::ptr mColorAnimation,mTransformAnimation;
-	CompositeAnimation::ptr mCompositeAnimation;
+	CompositeAnimation::ptr mDangerAnimation;
+	Animation::ptr mChompAnimation;
 };
 
 HUD::HUD(Scene *scene,Node *player,Camera *camera):Node(scene){
@@ -199,19 +229,23 @@ HUD::HUD(Scene *scene,Node *player,Camera *camera):Node(scene){
 		dog->setGlobal(true);
 		mChomp->attach(dog);
 
-		AudioComponent::ptr shark=new AudioComponent(mEngine);
-		shark->setAudioBuffer(Resources::instance->shark);
-		shark->setGlobal(true);
-		mChomp->attach(shark);
+		AudioComponent::ptr crunch=new AudioComponent(mEngine);
+		crunch->setAudioBuffer(Resources::instance->crunch);
+		crunch->setGlobal(true);
+		mChomp->attach(crunch);
 
-		ChompComponent::ptr chomp=new ChompComponent(mEngine,sprite);//,dog,shark);
+		ChompyComponent::ptr chompy=new ChompyComponent(mEngine,sprite,dog);
+		mChomp->attach(chompy);
+
+		CompositeAction::ptr chompAction=new CompositeAction();
+		chompAction->setStopStyle(CompositeAction::StopStyle_ON_LAST);
+		chompAction->attach(new AnimationAction(chompy->getAnimation("chomp")));
+		chompAction->attach(new AudioAction(crunch));
+		ActionComponent::ptr chomp=new ActionComponent("chomp",chompAction);
 		mChomp->attach(chomp);
 
-		AnimationAction::ptr action=new AnimationAction();
-		action->attach(chomp->getAnimation(0));
-		action->attach(chomp->getAnimation(1));
-		action->setCycling(AnimationAction::Cycling_REFLECT);
-		mChomp->attach(new ActionComponent("action",action));
+		DangerComponent::ptr danger=new DangerComponent(player,chompy->getAnimation("danger"),dog,chomp);
+		mChomp->attach(danger);
 	}
 	attach(mChomp);
 
