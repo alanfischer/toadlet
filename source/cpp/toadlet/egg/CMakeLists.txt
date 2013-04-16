@@ -111,6 +111,7 @@ set (EGG_HDR
 	Resource.h
 	ResourceDestroyedListener.h
 	Runnable.h
+	Runner.h
 	SharedPointer.h
 	SOSLoggerListener.h
 	String.h
