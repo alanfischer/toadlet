@@ -120,8 +120,6 @@ protected:
 
 	HUD::ptr mHUD;
 	Camera::ptr mHUDCamera;
-
-	AudioComponent::ptr mRustleSound; // TODO: Move to hud?
 };
 
 #endif

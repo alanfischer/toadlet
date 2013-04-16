@@ -32,26 +32,27 @@ namespace toadlet{
 namespace egg{
 
 PosixThread::PosixThread():
-	mRunner(NULL),
+	mRunnable(NULL)
+	//mRunner,
 	//mThread(NULL),
-	mAlive(false)
+	//mAlive
 {
 	memset(&mThread,0,sizeof(mThread));
-	mRunner=this;
+	mRunnable=this;
 }
 
 PosixThread::PosixThread(Runnable *r):
-	mRunner(NULL),
+	//mSelf,
+	mRunnable(NULL)
+	//mRunner,
 	//mThread(NULL),
-	mAlive(false)
+	//mAlive
 {
 	memset(&mThread,0,sizeof(mThread));
-	mRunner=r;
+	mRunnable=r;
 }
 
 PosixThread::~PosixThread(){
-	TOADLET_ASSERT(mAlive==false);
-	
 	pthread_t empty;
 	memset(&empty,0,sizeof(empty));
 	if(memcmp(&mThread,&empty,sizeof(mThread))!=0){
@@ -60,8 +61,8 @@ PosixThread::~PosixThread(){
 }
 
 void PosixThread::start(){
-	if(mAlive==false){
-		mAlive=true;		
+	if(mAlive==NULL){
+		mAlive=this;		
 		pthread_attr_t attrib;
 		pthread_attr_init(&attrib);
 		#if defined(TOADLET_PLATFORM_IRIX)
@@ -89,14 +90,16 @@ bool PosixThread::join(){
 }
 
 void PosixThread::run(){
-	if(mRunner!=NULL){
-		mRunner->run();
+	if(mRunnable!=NULL){
+		mRunnable->run();
 	}
 }
 
 void PosixThread::startRun(){
 	run();
-	mAlive=false;
+
+	mRunner=NULL;
+	mAlive=NULL;
 }
 
 void *PosixThread::startThread(void *thread){

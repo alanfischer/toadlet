@@ -26,19 +26,20 @@
 #ifndef TOADLET_EGG_POSIXTHREAD_H
 #define TOADLET_EGG_POSIXTHREAD_H
 
-#include <toadlet/egg/Runnable.h>
-#include <toadlet/egg/SharedPointer.h>
+#include <toadlet/egg/Runner.h>
+#include <toadlet/egg/Object.h>
 #include <pthread.h>
 
 namespace toadlet{
 namespace egg{
 
-class PosixThread:public Runnable{
+class PosixThread:public Object,public Runner{
 public:
-	TOADLET_SPTR(PosixThread);
+	TOADLET_OBJECT(PosixThread);
 
 	PosixThread();
 	PosixThread(Runnable *r);
+	PosixThread(Runner *r);
 	virtual ~PosixThread();
 
 	virtual void start();
@@ -47,15 +48,16 @@ public:
 	
 	virtual void run();
 
-	inline bool isAlive() const{return mAlive;}
+	inline bool isAlive() const{return mAlive!=NULL;}
 
 private:
 	void startRun();
 	static void *startThread(void *thread);
 
-	Runnable *mRunner;
+	Runnable *mRunnable;
+	Runner::ptr mRunner;
 	pthread_t mThread;
-	bool mAlive;
+	Runner::ptr mAlive;
 };
 
 }
