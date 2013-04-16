@@ -26,15 +26,15 @@
 #ifndef TOADLET_EGG_WIN32THREAD_H
 #define TOADLET_EGG_WIN32THREAD_H
 
-#include <toadlet/egg/Runnable.h>
-#include <toadlet/egg/SharedPointer.h>
+#include <toadlet/egg/Runner.h>
+#include <toadlet/egg/Object.h>
 
 namespace toadlet{
 namespace egg{
 
-class TOADLET_API Win32Thread:public Runnable{
+class TOADLET_API Win32Thread:public Object,public Runner{
 public:
-	TOADLET_SPTR(Win32Thread);
+	TOADLET_OBJECT(Win32Thread);
 
 	Win32Thread();
 	Win32Thread(Runnable *r);
@@ -46,13 +46,15 @@ public:
 
 	virtual void run();
 
-	inline bool isAlive() const{return mThread!=0;}
+	inline bool isAlive() const{return mAlive!=NULL;}
 
 	void internal_startRun();
 
 protected:
-	Runnable *mRunner;
+	Runnable *mRunnable;
+	Runner::ptr mRunner;
 	void *mThread;
+	Runner::ptr mAlive;
 };
 
 }

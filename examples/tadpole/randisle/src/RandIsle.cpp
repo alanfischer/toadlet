@@ -138,11 +138,6 @@ void RandIsle::create(){
 	renderState->setMaterialState(MaterialState(true));
 	renderState->setBlendState(BlendState::Combination_ALPHA);
 	mPredictedMaterial=mEngine->createDiffuseMaterial(NULL,renderState);
-
-	mRustleSound=new AudioComponent(mEngine);
-	mRustleSound->setAudioBuffer(Resources::instance->rustle);
-	mScene->getRoot()->attach(mRustleSound);
-	mRustleSound->play();
 	
 	mPlayer=new Node(mScene);
 	{
@@ -473,7 +468,6 @@ void RandIsle::updateClimber(PathClimber *climber,int dt){
 
 			if(closestPath!=NULL && closestDistance<snapDistance){
 				climber->mount(closestNode,closestPath,closestPoint);
-				mRustleSound->play();
 				findPathSequence(mPathSequence,climber,climber->getPath(),climber->getPathDirection(),climber->getPathTime());
 			}
 		}
@@ -582,8 +576,7 @@ void RandIsle::keyPressed(int key){
 		mApp->stop();
 	}
 	else if(key==' '){
-//		playerJump(mPlayer);
-		mHUD->getNode("chomp")->startAction("chomp");
+		playerJump(mPlayer);
 	}
 }
 

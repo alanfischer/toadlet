@@ -38,25 +38,29 @@ unsigned long WINAPI startThread(void *thread){
 }
 
 Win32Thread::Win32Thread():
-	mRunner(NULL),
-	mThread(0)
+	mRunnable(NULL),
+	//mRunner,
+	mThread(NULL)
+	//mAlive
 {
-	mRunner=this;
+	mRunnable=this;
 }
 
 Win32Thread::Win32Thread(Runnable *r):
-	mRunner(NULL),
-	mThread(0)
+	mRunnable(NULL),
+	//mRunner,
+	mThread(NULL)
+	//mAlive
 {
-	mRunner=r;
+	mRunnable=r;
 }
 
 Win32Thread::~Win32Thread(){
-	TOADLET_ASSERT(mThread==0);
 }
 
 void Win32Thread::start(){
-	if(mThread==0){
+	if(mAlive==NULL){
+		mAlive=this;		
 		mThread=CreateThread(NULL,0,&startThread,this,0,0);
 		SetThreadPriority(mThread,THREAD_PRIORITY_NORMAL);
 		ResumeThread(mThread);
@@ -85,6 +89,9 @@ void Win32Thread::internal_startRun(){
 		CloseHandle(mThread);
 		mThread=0;
 	}
+
+	mRunner=NULL;
+	mAlive=NULL;
 }
 
 }
