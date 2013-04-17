@@ -124,7 +124,7 @@ void MeshComponent::setMesh(Mesh *mesh){
 		return;
 	}
 
-	mBound->set(mMesh->getBound());
+	setBound(mMesh->getBound());
  	setTransform(mMesh->getTransform());
 
 	if(mMesh->getSkeleton()!=NULL){
@@ -196,6 +196,15 @@ void MeshComponent::frameUpdate(int dt,int scope){
 			subMesh->mWorldTransform->setTransform(mWorldTransform,subMesh->mTransform);
 			subMesh->mWorldBound->transform(subMesh->mMeshSubMesh->bound,subMesh->mWorldTransform);
 		}
+	}
+}
+
+void MeshComponent::setBound(Bound *bound){
+	if(bound==NULL){
+		mBound->reset();
+	}
+	else{
+		mBound->set(bound);
 	}
 }
 

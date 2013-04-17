@@ -130,15 +130,32 @@ void RandIsle::create(){
 	mScene->getBackground()->attach(mSky);
 
 	VertexBuffer::ptr predictedVertexBuffer=mEngine->getBufferManager()->createVertexBuffer(Buffer::Usage_BIT_STREAM,Buffer::Access_BIT_WRITE,mEngine->getVertexFormats().POSITION_COLOR,512);
-	mPredictedVertexData=VertexData::ptr(new VertexData(predictedVertexBuffer));
-	mPredictedIndexData=IndexData::ptr(new IndexData(IndexData::Primitive_TRISTRIP,NULL,0,predictedVertexBuffer->getSize()));
+	mPredictedVertexData=new VertexData(predictedVertexBuffer);
+	mPredictedIndexData=new IndexData(IndexData::Primitive_TRISTRIP,NULL,0,predictedVertexBuffer->getSize());
 	RenderState::ptr renderState=mEngine->getMaterialManager()->createRenderState();
-	renderState->setDepthState(DepthState(DepthState::DepthTest_NEVER,false));
+	renderState->setDepthState(DepthState(DepthState::DepthTest_ALWAYS,false));
 	renderState->setRasterizerState(RasterizerState(RasterizerState::CullType_NONE));
-	renderState->setMaterialState(MaterialState(true));
+	renderState->setMaterialState(MaterialState(true,true));
 	renderState->setBlendState(BlendState::Combination_ALPHA);
-	mPredictedMaterial=mEngine->createDiffuseMaterial(NULL,renderState);
+	Material::ptr predictedMaterial=mEngine->createDiffuseMaterial(NULL,renderState);
 	
+	mPredictedNode=new Node(mScene);
+	{
+		mPredictedComponent=new MeshComponent(mEngine);
+		{
+			Mesh::ptr mesh=new Mesh();
+			Mesh::SubMesh::ptr subMesh=new Mesh::SubMesh();
+			subMesh->vertexData=mPredictedVertexData;
+			subMesh->indexData=mPredictedIndexData;
+			subMesh->material=predictedMaterial;
+			mesh->setBound(new Bound(Bound::Type_INFINITE));
+			mesh->addSubMesh(subMesh);
+			mPredictedComponent->setMesh(mesh);
+		}
+		mPredictedNode->attach(mPredictedComponent);
+	}
+	mScene->getRoot()->attach(mPredictedNode);
+
 	mPlayer=new Node(mScene);
 	{
 		PathClimber *climber=new PathClimber();
@@ -184,6 +201,14 @@ void RandIsle::create(){
 
 	mFollower->setTarget(mPlayer);
 	mTerrain->setUpdateTargetBias(128/(getPatchSize()*getPatchScale().x));
+
+if(false){
+Node::ptr node=new Node(mScene);
+CameraComponent::ptr cc=new CameraComponent(mCamera);
+node->attach(cc);
+mPlayer->attach(node);
+cc->setLookDir(Vector3(0,0,0),Vector3(0,1,0),Vector3(0,0,1));
+}
 
 	Log::alert("Adding props");
 	mProps=new Node(mScene);
@@ -238,10 +263,6 @@ void RandIsle::destroy(){
 	if(mPredictedIndexData!=NULL){
 		mPredictedIndexData->destroy();
 		mPredictedIndexData=NULL;
-	}
-	if(mPredictedMaterial!=NULL){
-		mPredictedMaterial->destroy();
-		mPredictedMaterial=NULL;
 	}
 
 	Log::debug("RandIsle::destroy finished");
