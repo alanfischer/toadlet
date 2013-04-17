@@ -110,6 +110,8 @@ protected:
 	VertexData::ptr mPredictedVertexData;
 	IndexData::ptr mPredictedIndexData;
 	Material::ptr mPredictedMaterial;
+	Node::ptr mPredictedNode;
+	MeshComponent::ptr mPredictedComponent;
 
 	Bound::ptr mMountBound;
 	BoundingVolumeSensor::ptr mBoundSensor;

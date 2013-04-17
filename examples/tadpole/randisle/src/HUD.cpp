@@ -59,13 +59,12 @@ public:
 		mDanger(danger),
 		mDog(dog),
 		mChomp(chomp),
-		mNextDogTime(0),
-		danger(0)
+		mNextDogTime(0)
 	{
 	}
 
 	void logicUpdate(int dt,int scope){
-//		scalar danger=0;
+		scalar danger=0;
 
 		danger+=Math::fromMilli(dt)*0.1;
 
@@ -84,8 +83,6 @@ public:
 
 		mDanger->setValue(danger);
 	}
-
-	scalar danger;
 
 protected:
 	Node::ptr mPlayer;

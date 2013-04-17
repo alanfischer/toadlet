@@ -118,6 +118,8 @@ public:
 	void updateVertexBuffer();
 
 protected:
+	void setBound(Bound *bound);
+
 	Engine *mEngine;
 	bool mRendered;
 	Mesh::ptr mMesh;
