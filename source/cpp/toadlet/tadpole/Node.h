@@ -50,7 +50,7 @@ class ActionComponent;
 class LightComponent;
 class PhysicsComponent;
 
-class TOADLET_API Node:public BaseComponent,public Transformable{
+class TOADLET_API Node:public BaseComponent,public Transformable,public TransformListener{
 public:
 	TOADLET_NODE(Node,"toadlet.tadpole.Node");
 
@@ -164,7 +164,7 @@ public:
 
 	virtual void updateWorldSpacial();
 
-	virtual void spacialUpdated();
+	virtual void transformChanged(Transform *transform);
 	virtual void gatherRenderables(Camera *camera,RenderableSet *set);
 
 	inline Engine *getEngine() const{return (Engine*)mEngine;}

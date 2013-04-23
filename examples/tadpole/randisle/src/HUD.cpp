@@ -61,8 +61,7 @@ public:
 		mChomp(chomp),
 		mNextDogTime(0),
 		danger(0)
-	{
-	}
+	{}
 
 	void logicUpdate(int dt,int scope){
 //		scalar danger=0;
