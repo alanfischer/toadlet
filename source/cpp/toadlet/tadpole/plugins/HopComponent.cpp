@@ -166,11 +166,11 @@ void HopComponent::lerpPosition(scalar fraction){
 		mCurrentPosition.x = Math::intCeil(mCurrentPosition.x / mManager->mSnapGrid) * mManager->mSnapGrid;
 	}
 
-	mParent->setTranslate(mCurrentPosition);
+	mParent->getTransform()->setTranslate(mCurrentPosition);
 }
 
 void HopComponent::transformChanged(){
-	const Vector3 &translate=mParent->getTranslate();
+	const Vector3 &translate=mParent->getTransform()->getTranslate();
 	if(mCurrentPosition.equals(translate)==false){
 		mOldPosition.set(translate);
 		mNewPosition.set(translate);

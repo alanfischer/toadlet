@@ -23,26 +23,26 @@
  *
  ********** Copyright header - do not remove **********/
 
-#ifndef TOADLET_TADPOLE_ACTION_NODEPATHANIMATION_H
-#define TOADLET_TADPOLE_ACTION_NODEPATHANIMATION_H
+#ifndef TOADLET_TADPOLE_ACTION_TRANSFORMANIMATION_H
+#define TOADLET_TADPOLE_ACTION_TRANSFORMANIMATION_H
 
 #include <toadlet/tadpole/action/BaseAnimation.h>
-#include <toadlet/tadpole/Node.h>
+#include <toadlet/tadpole/Transform.h>
 #include <toadlet/tadpole/Track.h>
 
 namespace toadlet{
 namespace tadpole{
 namespace action{
 
-class TOADLET_API NodePathAnimation:public BaseAnimation{
+class TOADLET_API TransformAnimation:public BaseAnimation{
 public:
-	TOADLET_OBJECT(NodePathAnimation);
+	TOADLET_OBJECT(TransformAnimation);
 
-	NodePathAnimation(Node::ptr target);
-	virtual ~NodePathAnimation(){}
+	TransformAnimation(Transform::ptr target);
+	virtual ~TransformAnimation(){}
 
-	void setTarget(Node::ptr target);
-	inline Node::ptr getTarget() const{return mTarget;}
+	void setTarget(Transform::ptr target);
+	inline Transform::ptr getTarget() const{return mTarget;}
 
 	void setTrack(Track::ptr track);
 	inline Track::ptr getTrack() const{return mTrack;}
@@ -56,7 +56,7 @@ public:
 	scalar getMaxValue() const{return mTrack->getLength();}
 
 protected:
-	Node::ptr mTarget;
+	Transform::ptr mTarget;
 	Track::ptr mTrack;
 	bool mUseLookAt;
 	Vector3 mLookAt;

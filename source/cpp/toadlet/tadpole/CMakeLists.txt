@@ -47,9 +47,9 @@ set (TADPOLE_ACTION_SRC
 	action/CompositeAnimation.cpp
 	action/BaseAnimation.cpp
 	action/CameraProjectionAnimation.cpp
-	action/NodePathAnimation.cpp
 	action/MaterialStateAnimation.cpp
 	action/TextureStateAnimation.cpp
+	action/TransformAnimation.cpp
 )
 
 set (TADPOLE_BSP_SRC
@@ -246,6 +246,7 @@ set (TADPOLE_HDR
 	PhysicsTraceable.h
 	Track.h
 	Transform.h
+	TransformListener.h
 	Transformable.h
 	Types.h
 	UpdateListener.h
@@ -268,9 +269,9 @@ set (TADPOLE_ACTION_HDR
 	action/AnimationListener.h
 	action/BaseAnimation.h
 	action/CameraProjectionAnimation.h
-	action/NodePathAnimation.h
 	action/MaterialStateAnimation.h
 	action/TextureStateAnimation.h
+	action/TransformAnimation.h
 )
 
 set (TADPOLE_BSP_HDR
