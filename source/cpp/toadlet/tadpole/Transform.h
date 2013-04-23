@@ -27,6 +27,7 @@
 #define TOADLET_TADPOLE_TRANSFORM_H
 
 #include <toadlet/tadpole/Types.h>
+#include <toadlet/tadpole/TransformListener.h>
 
 namespace toadlet{
 namespace tadpole{
@@ -36,37 +37,43 @@ public:
 	TOADLET_OBJECT(Transform);
 
 	Transform():
-		mScale(Math::ONE,Math::ONE,Math::ONE)
+		mScale(Math::ONE,Math::ONE,Math::ONE),
+		mTransformListener(NULL)
 	{}
 
 	Transform(const Vector3 &t,const Vector3 &s,const Quaternion &r):
 		mTranslate(t),
 		mScale(s),
-		mRotate(r)
+		mRotate(r),
+		mTransformListener(NULL)
 	{}
 
 	Transform(const Transform *transform):
 		mTranslate(transform->mTranslate),
 		mScale(transform->mScale),
-		mRotate(transform->mRotate)
+		mRotate(transform->mRotate),
+		mTransformListener(NULL)
 	{}
 
 	void reset(){
 		mTranslate.reset();
 		mScale.set(Math::ONE,Math::ONE,Math::ONE);
 		mRotate.reset();
+		changed();
 	}
 
 	void set(const Transform *transform){
 		mTranslate.set(transform->mTranslate);
 		mScale.set(transform->mScale);
 		mRotate.set(transform->mRotate);
+		changed();
 	}
 
 	void set(const Vector3 &t,const Vector3 &s,const Quaternion &r){
 		mTranslate.set(t);
 		mScale.set(s);
 		mRotate.set(r);
+		changed();
 	}
 
 	void setTransform(const Transform *parentTransform,const Transform *transform){
@@ -75,20 +82,42 @@ public:
 		Math::mul(mTranslate,parentTransform->mRotate,transform->mTranslate);
 		Math::mul(mTranslate,parentTransform->mScale);
 		Math::add(mTranslate,parentTransform->mTranslate);
+		changed();
 	}
 	
 	const Vector3 &getTranslate() const{return mTranslate;}
-	void setTranslate(const Vector3 &t){mTranslate.set(t);}
-	void setTranslate(scalar x,scalar y,scalar z){mTranslate.set(x,y,z);}
+	void setTranslate(const Vector3 &t){
+		mTranslate.set(t);
+		changed();
+	}
+	void setTranslate(scalar x,scalar y,scalar z){
+		mTranslate.set(x,y,z);
+		changed();
+	}
 
 	const Vector3 &getScale() const{return mScale;}
-	void setScale(const Vector3 &s){mScale.set(s);}
-	void setScale(scalar x,scalar y,scalar z){mScale.set(x,y,z);}
+	void setScale(const Vector3 &s){
+		mScale.set(s);
+		changed();
+	}
+	void setScale(scalar x,scalar y,scalar z){
+		mScale.set(x,y,z);
+		changed();
+	}
 
 	const Quaternion &getRotate() const{return mRotate;}
-	void setRotate(const Quaternion &r){mRotate.set(r);}
-	void setRotate(const Matrix3x3 &r){Math::setQuaternionFromMatrix3x3(mRotate,r);}
-	void setRotate(const Vector3 &axis,scalar angle){Math::setQuaternionFromAxisAngle(mRotate,axis,angle);}
+	void setRotate(const Quaternion &r){
+		mRotate.set(r);
+		changed();
+	}
+	void setRotate(const Matrix3x3 &r){
+		Math::setQuaternionFromMatrix3x3(mRotate,r);
+		changed();
+	}
+	void setRotate(const Vector3 &axis,scalar angle){
+		Math::setQuaternionFromAxisAngle(mRotate,axis,angle);
+		changed();
+	}
 
 	void getMatrix(Matrix4x4 &r) const{
 		Math::setMatrix4x4FromTranslateRotateScale(r,mTranslate,mRotate,mScale);
@@ -98,6 +127,7 @@ public:
 		Math::setScaleFromMatrix4x4(mScale,m);
 		Math::setQuaternionFromMatrix4x4(mRotate,m);
 		Math::setTranslateFromMatrix4x4(mTranslate,m);
+		changed();
 	}
 
 	void transform(Vector3 &r,const Vector3 &t) const{
@@ -178,10 +208,20 @@ public:
 		Math::mul(r,invxform,m);
 	}
 
+	void setTransformListener(TransformListener *listener){mTransformListener=listener;}
+	TransformListener *getTransformListener() const{return mTransformListener;}
+
 protected:
+	void changed(){
+		if(mTransformListener!=NULL){
+			mTransformListener->transformChanged(this);
+		}
+	}
+
 	Vector3 mTranslate;
 	Vector3 mScale;
 	Quaternion mRotate;
+	TransformListener *mTransformListener;
 };
 
 }

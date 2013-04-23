@@ -67,6 +67,7 @@ Node::Node(Scene *scene):BaseComponent(),
 	mTransformUpdatedFrame=-1;
 
 	mTransform=new Transform();
+	mTransform->setTransformListener(this);
 	mBound=new Bound();
 	mWorldTransform=new Transform();
 	mWorldBound=new Bound();
@@ -291,52 +292,42 @@ void Node::rootChanged(Node *root){
 
 void Node::setTranslate(const Vector3 &translate){
 	mTransform->setTranslate(translate);
-	spacialUpdated();
 }
 
 void Node::setTranslate(scalar x,scalar y,scalar z){
 	mTransform->setTranslate(x,y,z);
-	spacialUpdated();
 }
 
 void Node::setRotate(const Quaternion &rotate){
 	mTransform->setRotate(rotate);
-	spacialUpdated();
 }
 
 void Node::setRotate(const Matrix3x3 &rotate){
 	mTransform->setRotate(rotate);
-	spacialUpdated();
 }
 
 void Node::setRotate(const Vector3 &axis,scalar angle){
 	mTransform->setRotate(axis,angle);
-	spacialUpdated();
 }
 
 void Node::setScale(const Vector3 &scale){
 	mTransform->setScale(scale);
-	spacialUpdated();
 }
 
 void Node::setScale(scalar x,scalar y,scalar z){
 	mTransform->setScale(x,y,z);
-	spacialUpdated();
 }
 
 void Node::setMatrix4x4(const Matrix4x4 &matrix){
 	mTransform->setMatrix(matrix);
-	spacialUpdated();
 }
 
 void Node::setTransform(Transform *transform){
 	mTransform->set(transform);
-	spacialUpdated();
 }
 
 void Node::setBound(Bound *bound){
 	mBound->set(bound);
-	spacialUpdated();
 }
 
 void Node::logicUpdate(int dt,int scope){
@@ -518,7 +509,7 @@ void Node::updateWorldSpacial(){
 	}
 }
 
-void Node::spacialUpdated(){
+void Node::transformChanged(Transform *transform){
 	if(mScene!=NULL){
 		mTransformUpdatedFrame=mScene->getFrame();
 	}
