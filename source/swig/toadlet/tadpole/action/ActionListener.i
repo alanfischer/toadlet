@@ -33,9 +33,9 @@ public:
 
 #ifdef ACTIONLISTENER_DIRECTOR
 %pragma(java) modulecode=%{
-	private static class NativeActionListenerProxy extends NativeActionListener {
+	private static class ProxyActionListener extends NativeActionListener {
 		private ActionListener delegate;
-		public NativeActionListenerProxy(ActionListener i) {delegate = i;}
+		public ProxyActionListener(ActionListener i) {delegate = i;}
 
 		public void actionStarted(Action action){
 			delegate.actionStarted(action);
@@ -50,7 +50,7 @@ public:
 		if (i instanceof NativeActionListener) {
 			return (NativeActionListener)i;
 		}
-		return new NativeActionListenerProxy(i);
+		return new ProxyActionListener(i);
 	}
 %}
 #else
