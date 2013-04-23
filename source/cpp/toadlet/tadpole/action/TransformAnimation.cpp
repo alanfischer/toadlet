@@ -23,13 +23,13 @@
  *
  ********** Copyright header - do not remove **********/
 
-#include <toadlet/tadpole/action/NodePathAnimation.h>
+#include <toadlet/tadpole/action/TransformAnimation.h>
 
 namespace toadlet{
 namespace tadpole{
 namespace action{
 
-NodePathAnimation::NodePathAnimation(Node::ptr target):
+TransformAnimation::TransformAnimation(Transform::ptr target):
 	//mTarget,
 	//mTrack,
 	mUseLookAt(false),
@@ -40,20 +40,20 @@ NodePathAnimation::NodePathAnimation(Node::ptr target):
 	mTarget=target;
 }
 
-void NodePathAnimation::setTarget(Node::ptr target){
+void TransformAnimation::setTarget(Transform::ptr target){
 	mTarget=target;
 }
 
-void NodePathAnimation::setTrack(Track::ptr track){
+void TransformAnimation::setTrack(Track::ptr track){
 	mTrack=track;
 }
 
-void NodePathAnimation::setLookAt(const Vector3 &lookAt){
+void TransformAnimation::setLookAt(const Vector3 &lookAt){
 	mLookAt.set(lookAt);
 	mUseLookAt=true;
 }
 
-void NodePathAnimation::setValue(scalar value){
+void TransformAnimation::setValue(scalar value){
 	int f1=-1,f2=-1;
 	mValue=value;
 	scalar t=mTrack->getKeyFramesAtTime(mValue,f1,f2,mHint);
