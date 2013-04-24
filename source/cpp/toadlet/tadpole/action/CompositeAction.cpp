@@ -31,6 +31,7 @@ namespace action{
 
 CompositeAction::CompositeAction():
 	//mListeners,
+	mStopStyle(StopStyle_ON_FIRST),
 	mActive(false)
 {
 }
