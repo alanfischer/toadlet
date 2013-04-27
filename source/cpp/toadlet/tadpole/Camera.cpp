@@ -30,7 +30,7 @@
 namespace toadlet{
 namespace tadpole{
 
-Camera::Camera():
+Camera::Camera(Engine *engine):
 	mScope(-1),
 	mProjectionType(ProjectionType_FOV),
 	mFov(0),mAspect(0),
@@ -49,6 +49,14 @@ Camera::Camera():
 {
 	setAutoProjectionFov(Math::QUARTER_PI,false,Math::ONE,Math::fromInt(1000));
 	mClearFlags=RenderDevice::ClearType_BIT_COLOR|RenderDevice::ClearType_BIT_DEPTH;
+	if(engine!=NULL){
+		mDefaultState=engine->getMaterialManager()->createRenderState();
+		mDefaultState->setBlendState(BlendState());
+		mDefaultState->setDepthState(DepthState());
+		mDefaultState->setRasterizerState(RasterizerState());
+		mDefaultState->setFogState(FogState());
+		mDefaultState->setPointState(PointState());
+	}
 }
 
 void Camera::setAutoProjectionFov(scalar fov,bool yheight,scalar nearDist,scalar farDist){

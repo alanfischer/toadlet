@@ -31,11 +31,9 @@ void Logo::create(){
 		lt->attach(mesh);
 
 		if(mesh!=NULL){
-			ActionComponent::ptr action=new ActionComponent("animation");
 			AnimationAction::ptr animation=new AnimationAction(mesh->getSkeleton()->getAnimation(0));
 			animation->setCycling(AnimationAction::Cycling_REFLECT);
-			action->attach(animation);
-			lt->attach(action);
+			lt->attach(new ActionComponent("animation",animation));
 			mesh->getSkeleton()->setRenderSkeleton(true);
 		}
 		lt->startAction("animation");

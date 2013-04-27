@@ -182,7 +182,6 @@ public:
 			compass=engine->createDiffuseMaterial(engine->getTextureManager()->findTexture("compass.png"),renderState);
 		}
 
-
 		wooden=engine->getFontManager()->findFont("Pinewood.ttf",100);
 
 		system=engine->getFontManager()->getDefaultFont();

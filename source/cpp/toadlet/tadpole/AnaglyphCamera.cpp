@@ -33,6 +33,7 @@ namespace toadlet{
 namespace tadpole{
 
 AnaglyphCamera::AnaglyphCamera(Scene *scene):
+	Camera(scene->getEngine()),
 	mSeparation(0)
 {
 	Engine *engine=scene->getEngine();
@@ -46,14 +47,14 @@ AnaglyphCamera::AnaglyphCamera(Scene *scene):
 	mLeftRenderTarget=engine->getTextureManager()->createPixelBufferRenderTarget();
 	mLeftRenderTarget->attach(mLeftTexture->getMipPixelBuffer(0,0),PixelBufferRenderTarget::Attachment_COLOR_0);
 
-	mLeftCamera=new Camera();
+	mLeftCamera=new Camera(engine);
 	mLeftCamera->setRenderTarget(mLeftRenderTarget);
 
 	mRightTexture=engine->getTextureManager()->createTexture(flags,textureFormat);
 	mRightRenderTarget=engine->getTextureManager()->createPixelBufferRenderTarget();
 	mRightRenderTarget->attach(mRightTexture->getMipPixelBuffer(0,0),PixelBufferRenderTarget::Attachment_COLOR_0);
 
-	mRightCamera=new Camera();
+	mRightCamera=new Camera(engine);
 	mRightCamera->setRenderTarget(mRightRenderTarget);
 
 	Material::ptr leftMaterial=engine->createDiffuseMaterial(mLeftTexture);
@@ -83,7 +84,7 @@ AnaglyphCamera::AnaglyphCamera(Scene *scene):
 	sprite->setMaterial(mMaterial);
 	mOverlay->attach(sprite);
 
-	mOverlayCamera=new Camera();
+	mOverlayCamera=new Camera(engine);
 	mOverlayCamera->setProjectionOrtho(Math::HALF,-Math::HALF,Math::HALF,-Math::HALF,-Math::ONE,Math::ONE);
 	mOverlayCamera->setLookAt(Math::NEG_Z_UNIT_VECTOR3,Math::ZERO_VECTOR3,Math::Y_UNIT_VECTOR3);
 

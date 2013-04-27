@@ -14,6 +14,72 @@ static const scalar epsilon=0.001f;
 /// @todo: Fix:
 ///  - Android GLES1/2 swapping not working due to different GL libraries being loaded, have to use glesem
 
+class SnowComponent:public BaseComponent{
+public:
+	SnowComponent(ParticleComponent *particles):
+		mParticles(particles),
+		mSkip(20),
+		mNext(0)
+	{
+		mSnowData.resize(mParticles->getNumParticles());
+		for(int i=0;i<mParticles->getNumParticles();++i){
+			ParticleComponent::Particle *p=mParticles->getParticle(i);
+			mSnowData[i].oldPosition=mSnowData[i].newPosition=Vector3(p->x,p->y,p->z);
+		}
+	}
+
+	void logicUpdate(int dt,int scope){
+		Scene *scene=mParent->getScene();
+
+		for(int i=0;i<mParticles->getNumParticles();i++){
+			ParticleComponent::Particle *p=mParticles->getParticle(i);
+
+			Vector3 position(p->x,p->y,p->z);
+			Vector3 velocity(p->vx,p->vy,p->vz);
+
+			float t=1.0-float((i-mNext+mSkip)%mSkip)/float(mSkip);
+			Math::lerp(position,mSnowData[i].oldPosition,mSnowData[i].newPosition,t);
+
+			if((i%mSkip)==mNext){
+				Segment segment;
+				segment.origin=position;
+				segment.direction=velocity*Math::fromMilli(dt) * mSkip;
+
+				PhysicsCollision result;
+				scene->getPhysicsManager()->traceSegment(result,segment,-1,NULL);
+
+				mSnowData[i].oldPosition=mSnowData[i].newPosition;
+
+				if(result.time<1){
+					mSnowData[i].newPosition=result.point;
+				}
+				else{
+					mSnowData[i].newPosition=position+segment.direction;
+				}
+			}
+
+			p->x=position.x;p->y=position.y;p->z=position.z;
+			p->vx=velocity.x;p->vy=velocity.y;p->vz=velocity.z;
+		}
+
+		mNext++;
+		if(mNext>=mSkip){
+			mNext=0;
+		}
+	}
+
+protected:
+	class SnowData{
+	public:
+		Vector3 oldPosition;
+		Vector3 newPosition;
+	};
+
+	ParticleComponent::ptr mParticles;
+	Collection<SnowData> mSnowData;
+	int mSkip,mNext;
+};
+
 /// @todo: These could be removed if nodes supported propagating scopes, similar to worldTransform, worldScope
 void clearScopeBit(Node *node,int scope){
 	node->setScope(node->getScope()&~scope);
@@ -87,31 +153,28 @@ void RandIsle::create(){
 	mFollowNode->attach(mFollower);
 	mScene->getRoot()->attach(mFollowNode);
 
-	mCamera=new Camera();
+	mCamera=new Camera(mEngine);
 //	shared_static_cast<StereoscopicCamera>(mCamera)->setCrossEyed(true);
 	mCamera->setAutoProjectionFov(Math::degToRad(Math::fromInt(60)),false,mCamera->getNearDist(),1024);
 	mCamera->setScope(~Scope_BIT_HUD | Scope_BIT_MAIN_CAMERA & ~Scope_BIT_WATER_TRANSPARENT);
-	mCamera->setDefaultState(mEngine->getMaterialManager()->createRenderState());
 	mCamera->setClearColor(Resources::instance->fadeColor);
 	mCamera->getDefaultState()->setFogState(FogState(FogState::FogType_LINEAR,Math::ONE,mCamera->getFarDist()/2,mCamera->getFarDist(),mCamera->getClearColor()));
 	mFollowNode->attach(new CameraComponent(mCamera));
 
 	if(Resources::instance->reflectTarget!=NULL){
-		mReflectCamera=new Camera();
+		mReflectCamera=new Camera(mEngine);
 		mReflectCamera->setRenderTarget(Resources::instance->reflectTarget);
 		mReflectCamera->setAutoProjectionFov(Math::degToRad(Math::fromInt(60)),false,mCamera->getNearDist(),mCamera->getFarDist());
 		mReflectCamera->setScope(~Scope_BIT_HUD & ~Scope_BIT_MAIN_CAMERA & ~Scope_BIT_WATER & ~Scope_BIT_WATER_TRANSPARENT);
-		mReflectCamera->setDefaultState(mEngine->getMaterialManager()->createRenderState());
 		mReflectCamera->setClearColor(Resources::instance->fadeColor);
 		mReflectCamera->getDefaultState()->setFogState(FogState(FogState::FogType_LINEAR,Math::ONE,mCamera->getFarDist()/2,mCamera->getFarDist(),mCamera->getClearColor()));
 	}
 
 	if(Resources::instance->refractTarget!=NULL){
-		mRefractCamera=new Camera();
+		mRefractCamera=new Camera(mEngine);
 		mRefractCamera->setRenderTarget(Resources::instance->refractTarget);
 		mRefractCamera->setAutoProjectionFov(Math::degToRad(Math::fromInt(60)),false,mCamera->getNearDist(),mCamera->getFarDist());
 		mRefractCamera->setScope(~Scope_BIT_HUD & ~Scope_BIT_MAIN_CAMERA & ~Scope_BIT_WATER | Scope_BIT_WATER_TRANSPARENT);
-		mRefractCamera->setDefaultState(mEngine->getMaterialManager()->createRenderState());
 		mRefractCamera->setClearColor(Resources::instance->fadeColor);
 		mRefractCamera->getDefaultState()->setFogState(FogState(FogState::FogType_LINEAR,Math::ONE,mCamera->getFarDist()/2,mCamera->getFarDist(),mCamera->getClearColor()));
 	}
@@ -121,7 +184,7 @@ void RandIsle::create(){
 	setScopeBit(mHUD,Scope_BIT_HUD);
 	mScene->getRoot()->attach(mHUD);
 
-	mHUDCamera=new Camera();
+	mHUDCamera=new Camera(mEngine);
 	mHUDCamera->setProjectionOrtho(-1,1,-1,1,-1,1);
 	mHUDCamera->setClearFlags(0);
 
@@ -236,6 +299,25 @@ cc->setLookDir(Vector3(0,0,0),Vector3(0,1,0),Vector3(0,0,1));
 		joyDevice->setListener(this);
 		joyDevice->start();
 	}
+
+	Node::ptr snow=new Node(mScene);
+	{
+		ParticleComponent::ptr particles=new ParticleComponent(mScene);
+		particles->setNumParticles(5000,ParticleComponent::ParticleType_SPRITE,1);
+		particles->setMaterial(Resources::instance->acorn);
+//		particles->setWorldSpace(true);
+		Random r;
+		for(int i=0;i<particles->getNumParticles();++i){
+			ParticleComponent::Particle *p=particles->getParticle(i);
+			p->x=r.nextFloat(-100,100);p->y=r.nextFloat(-100,100);p->z=200;
+			p->vz=-15;
+		}
+		snow->attach(particles);
+
+		snow->attach(new SnowComponent(particles));
+	}
+	snow->setName("snow");
+	mScene->getRoot()->attach(snow);
 
 	Log::debug("RandIsle::create finished");
 }

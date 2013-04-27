@@ -31,6 +31,7 @@
 #include <toadlet/peeper/RenderTarget.h>
 #include <toadlet/peeper/RenderState.h>
 #include <toadlet/tadpole/Bound.h>
+#include <toadlet/tadpole/Engine.h>
 
 namespace toadlet{
 namespace tadpole{
@@ -51,7 +52,7 @@ public:
 		ProjectionType_MATRIX
 	};
 
-	Camera();
+	Camera(Engine *engine);
 	virtual ~Camera(){}
 
 	virtual void setScope(int scope){mScope=scope;}

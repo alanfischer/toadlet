@@ -33,7 +33,7 @@ namespace tadpole{
 
 class TOADLET_API StereoscopicCamera:public Camera{
 public:
-	StereoscopicCamera();
+	StereoscopicCamera(Engine *engine);
 
 	void destroy();
 
