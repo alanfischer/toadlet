@@ -28,13 +28,14 @@
 namespace toadlet{
 namespace tadpole{
 
-StereoscopicCamera::StereoscopicCamera():
+StereoscopicCamera::StereoscopicCamera(Engine *engine):
+	Camera(engine),
 	mSeparation(0),
 	mCrossEyed(false)
 {
-	mLeftCamera=new Camera();
+	mLeftCamera=new Camera(engine);
 
-	mRightCamera=new Camera();
+	mRightCamera=new Camera(engine);
 
 	setSeparation(Math::ONE);
 	setCrossEyed(false);

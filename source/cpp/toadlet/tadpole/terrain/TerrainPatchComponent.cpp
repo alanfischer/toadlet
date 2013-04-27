@@ -64,7 +64,7 @@ TerrainPatchComponent::TerrainPatchComponent(Scene *scene):
 	mWaterTransform=new Transform();
 	mWaterWorldTransform=new Transform();
 
-	mLocalCamera=new Camera();
+	mLocalCamera=new Camera(NULL);
 }
 
 void TerrainPatchComponent::destroy(){

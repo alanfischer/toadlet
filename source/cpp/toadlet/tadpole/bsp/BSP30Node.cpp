@@ -37,7 +37,7 @@ namespace bsp{
 BSP30Node::BSP30Node(Scene *scene):PartitionNode(scene),
 	mCounter(1)
 {
-	mLocalCamera=new Camera();
+	mLocalCamera=new Camera(NULL);
 }
 
 void BSP30Node::setMap(const String &name){
