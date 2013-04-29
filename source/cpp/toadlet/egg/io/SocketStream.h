@@ -27,8 +27,8 @@
 #define TOADLET_EGG_IO_SOCKETSTREAM_H
 
 #include <toadlet/egg/Object.h>
+#include <toadlet/egg/Socket.h>
 #include <toadlet/egg/io/Stream.h>
-#include <toadlet/egg/net/Socket.h>
 
 namespace toadlet{
 namespace egg{

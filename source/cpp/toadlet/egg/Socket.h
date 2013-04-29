@@ -23,8 +23,8 @@
  *
  ********** Copyright header - do not remove **********/
 
-#ifndef TOADLET_EGG_NET_SOCKET_H
-#define TOADLET_EGG_NET_SOCKET_H
+#ifndef TOADLET_EGG_SOCKET_H
+#define TOADLET_EGG_SOCKET_H
 
 #include <toadlet/egg/String.h>
 #include <toadlet/egg/Collection.h>
@@ -37,10 +37,6 @@ struct sockaddr_in;
 
 namespace toadlet{
 namespace egg{
-namespace net{};
-using namespace net;
-
-namespace net{
 
 class TOADLET_API Socket:public Object{
 public:
@@ -122,7 +118,6 @@ protected:
 	#endif
 };
 
-}
 }
 }
 

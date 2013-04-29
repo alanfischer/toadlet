@@ -34,7 +34,6 @@ namespace egg{
 namespace Categories{
 	const static String TOADLET=					"toadlet";
 	const static String TOADLET_EGG=				TOADLET+".egg";
-	const static String TOADLET_EGG_NET=			TOADLET_EGG+".net";
 	const static String TOADLET_EGG_LOGGER=			TOADLET_EGG+".Logger";
 	const static String TOADLET_EGG_PROFILE=		TOADLET_EGG+".Profile";
 	const static String TOADLET_FLICK=				TOADLET+".flick";
