@@ -6,7 +6,7 @@
 #include <toadlet/egg/Thread.h>
 #include <toadlet/egg/Mutex.h>
 #include <toadlet/egg/WaitCondition.h>
-#include <toadlet/egg/net/Socket.h>
+#include <toadlet/egg/Socket.h>
 
 namespace toadlet{
 namespace egg{

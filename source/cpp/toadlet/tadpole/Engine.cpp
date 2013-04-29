@@ -120,7 +120,6 @@ Engine::Engine(void *env,void *ctx):
 {
 	Logger *logger=Log::getInstance();
 	logger->addCategory(Categories::TOADLET_EGG_LOGGER);
-	logger->addCategory(Categories::TOADLET_EGG_NET);
 	logger->addCategory(Categories::TOADLET_EGG);
 	logger->addCategory(Categories::TOADLET_FLICK);
 	logger->addCategory(Categories::TOADLET_HOP);

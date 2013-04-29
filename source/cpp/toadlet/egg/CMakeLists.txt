@@ -15,6 +15,7 @@ set (EGG_SRC
 	Object.cpp
 	Profile.cpp
 	Random.cpp
+	Socket.cpp
 	String.cpp
 	TUUID.cpp
 	Version.cpp
@@ -45,10 +46,6 @@ set (EGG_MATHFIXED_SRC
 	mathfixed/Plane_fixed.cpp
 	mathfixed/Quaternion_fixed.cpp
 	mathfixed/Sphere_fixed.cpp
-)
-
-set (EGG_NET_SRC
-	net/Socket.cpp
 )
 
 set (EGG_PLATFORM_POSIX_SRC
@@ -113,6 +110,7 @@ set (EGG_HDR
 	Runnable.h
 	Runner.h
 	SharedPointer.h
+	Socket.h
 	SOSLoggerListener.h
 	String.h
 	System.h
@@ -167,10 +165,6 @@ set (EGG_MATHFIXED_HDR
 	mathfixed/Vector4.h
 )
 
-set (EGG_NET_HDR
-	net/Socket.h
-)
-
 set (EGG_PLATFORM_POSIX_HDR
 	platform/posix/PosixDynamicLibrary.h
 	platform/posix/PosixErrorHandler.h
@@ -202,18 +196,16 @@ set (EGG_PLATFORM_WIN32_HDR
 
 # Bundle source
 source_group ("Source Files\\\\io" FILES ${EGG_IO_SRC})
-source_group ("Source Files\\\\net" FILES ${EGG_NET_SRC})
 
 
 # Bundle headers
 source_group ("Header Files\\\\io" FILES ${EGG_IO_HDR})
-source_group ("Header Files\\\\net" FILES ${EGG_NET_HDR})
 
 
 # Sources, headers and namespaces
-set (EGG_SRC ${EGG_SRC} ${EGG_IO_SRC} ${EGG_NET_SRC})
-set (EGG_HDR ${EGG_HDR} ${EGG_IO_HDR} ${EGG_NET_HDR})
-set (EGG_NAMESPACES ${EGG_NAMESPACES} io net)
+set (EGG_SRC ${EGG_SRC} ${EGG_IO_SRC})
+set (EGG_HDR ${EGG_HDR} ${EGG_IO_HDR})
+set (EGG_NAMESPACES ${EGG_NAMESPACES} io)
 
 
 # Always build both fixed & floating point math

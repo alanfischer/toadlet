@@ -32,12 +32,10 @@ namespace toadlet{
 namespace egg{
 
 namespace io{};
-namespace net{};
 namespace math{};
 namespace mathfixed{};
 
 using namespace io;
-using namespace net;
 
 }
 }

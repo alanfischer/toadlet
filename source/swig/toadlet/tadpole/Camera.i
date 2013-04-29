@@ -7,6 +7,8 @@ namespace tadpole{
 
 class Camera{
 public:
+	Camera(Engine *engine);
+
 	void setClearColor(float color[4]);
 
 	void setLookAt(float eye[3],float point[3],float up[3]);
