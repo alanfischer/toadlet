@@ -6,7 +6,7 @@
 #include "Path.h"
 #include "BranchSystem.h"
 
-class TreeSystem:public BaseComponent,public BranchSystem::BranchListener{
+class TreeSystem:public BaseComponent,public BranchSystem::BranchListener,public DetailTraceable{
 public:
 	TOADLET_OBJECT(TreeSystem);
 
@@ -135,11 +135,16 @@ public:
 	Mesh *getMesh() const{return mMesh;}
 	Mesh *getLowMesh() const{return mLowMesh;}
 
+	Bound *getTraceableBound() const{return mBound;}
+	void traceSegment(PhysicsCollision &result,const Vector3 &position,const Segment &segment,const Vector3 &size);
+
 	VertexBufferAccessor bvba,lvba;
 	IndexBufferAccessor biba,lbiba,liba;
 
 protected:
 	void resetCounts();
+
+	Path *traceSegment(PhysicsCollision &result,const Vector3 &position,const Segment &segment,const Vector3 &size,TreeBranch *path);
 
 	Engine *mEngine;
 	Scene *mScene;

@@ -16,15 +16,31 @@ static const scalar epsilon=0.001f;
 
 class SnowComponent:public BaseComponent{
 public:
-	SnowComponent(ParticleComponent *particles):
+	SnowComponent(ParticleComponent *particles,int skip):
 		mParticles(particles),
-		mSkip(20),
+		mSkip(skip),
 		mNext(0)
 	{
 		mSnowData.resize(mParticles->getNumParticles());
 		for(int i=0;i<mParticles->getNumParticles();++i){
 			ParticleComponent::Particle *p=mParticles->getParticle(i);
 			mSnowData[i].oldPosition=mSnowData[i].newPosition=Vector3(p->x,p->y,p->z);
+		}
+	}
+
+	void frameUpdate(int dt,int scope){
+		Scene *scene=mParent->getScene();
+
+		for(int i=0;i<mParticles->getNumParticles();i++){
+			ParticleComponent::Particle *p=mParticles->getParticle(i);
+
+			Vector3 position(p->x,p->y,p->z);
+
+			float t=float((i-mNext+mSkip)%mSkip)/float(mSkip);
+			t = 1.0 - (t - scene->getLogicFraction()/float(mSkip));
+			Math::lerp(position,mSnowData[i].oldPosition,mSnowData[i].newPosition,t);
+
+			p->x=position.x;p->y=position.y;p->z=position.z;
 		}
 	}
 
@@ -37,8 +53,8 @@ public:
 			Vector3 position(p->x,p->y,p->z);
 			Vector3 velocity(p->vx,p->vy,p->vz);
 
-			float t=1.0-float((i-mNext+mSkip)%mSkip)/float(mSkip);
-			Math::lerp(position,mSnowData[i].oldPosition,mSnowData[i].newPosition,t);
+			float t=float((i-mNext+mSkip)%mSkip)/float(mSkip);
+			Math::lerp(position,mSnowData[i].oldPosition,mSnowData[i].newPosition,1.0-t);
 
 			if((i%mSkip)==mNext){
 				Segment segment;
@@ -305,7 +321,7 @@ cc->setLookDir(Vector3(0,0,0),Vector3(0,1,0),Vector3(0,0,1));
 		ParticleComponent::ptr particles=new ParticleComponent(mScene);
 		particles->setNumParticles(5000,ParticleComponent::ParticleType_SPRITE,1);
 		particles->setMaterial(Resources::instance->acorn);
-//		particles->setWorldSpace(true);
+		particles->setSorted(true);
 		Random r;
 		for(int i=0;i<particles->getNumParticles();++i){
 			ParticleComponent::Particle *p=particles->getParticle(i);
@@ -314,7 +330,7 @@ cc->setLookDir(Vector3(0,0,0),Vector3(0,1,0),Vector3(0,0,1));
 		}
 		snow->attach(particles);
 
-		snow->attach(new SnowComponent(particles));
+		snow->attach(new SnowComponent(particles,50));
 	}
 	snow->setName("snow");
 	mScene->getRoot()->attach(snow);

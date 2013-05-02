@@ -561,6 +561,29 @@ Path *TreeSystem::getClosestPath(Vector3 &closestPoint,const Sphere &bound,TreeB
 	}
 }
 
+void TreeSystem::traceSegment(PhysicsCollision &result,const Vector3 &position,const Segment &segment,const Vector3 &size){
+	traceSegment(result,position,segment,size,mTreeBranches[0]);
+}
+
+Path *TreeSystem::traceSegment(PhysicsCollision &result,const Vector3 &position,const Segment &segment,const Vector3 &size,TreeBranch *path){
+	result.time=Math::findIntersection(segment,path->bound,result.point,result.normal);
+
+	Path *closestPath;
+
+	int i;
+	for(i=0;i<path->children.size();++i){
+		Path *childPath=traceSegment(result,position,segment,size,path->children[i]);
+
+//		if(childPath!=NULL && childDistance<closestDistance){
+	//		closestDistance=childDistance;
+		//	closestPath=childPath;
+			//closestPoint.set(childPoint);
+		//}
+	}
+
+	return closestPath;
+}
+
 void TreeSystem::resetCounts(){
 	mBranchVertexCount=0;
 	mBranchIndexCount=0;
