@@ -59,14 +59,16 @@ Scene::Scene(Engine *engine):Object(),
 	setRangeLogicDT(50,50);
 	setAmbientColor(Colors::GREY);
 
-	mBackground=new PartitionNode(this);
-
-	mRoot=new PartitionNode(this);
-	mRoot->rootChanged(mRoot);
+	mNodeManager=new NodeManager(this);
 
 	mRenderManager=new SimpleRenderManager(this);
 
 	mPhysicsManager=new HopManager(this);
+
+	mBackground=new PartitionNode(this);
+
+	mRoot=new PartitionNode(this);
+	mRoot->rootChanged(mRoot);
 }
 
 void Scene::destroy(){

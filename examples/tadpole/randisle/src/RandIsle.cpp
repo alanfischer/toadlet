@@ -321,7 +321,6 @@ cc->setLookDir(Vector3(0,0,0),Vector3(0,1,0),Vector3(0,0,1));
 		ParticleComponent::ptr particles=new ParticleComponent(mScene);
 		particles->setNumParticles(5000,ParticleComponent::ParticleType_SPRITE,1);
 		particles->setMaterial(Resources::instance->acorn);
-		particles->setSorted(true);
 		Random r;
 		for(int i=0;i<particles->getNumParticles();++i){
 			ParticleComponent::Particle *p=particles->getParticle(i);

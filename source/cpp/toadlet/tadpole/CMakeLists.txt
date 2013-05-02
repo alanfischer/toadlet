@@ -22,6 +22,7 @@ set (TADPOLE_SRC
 	Mesh.cpp
 	MeshComponent.cpp
 	Node.cpp
+	NodeManager.cpp
 	Noise.cpp
 	ParticleComponent.cpp
 	PartitionNode.cpp
@@ -219,6 +220,7 @@ set (TADPOLE_HDR
 	Mesh.h
 	MeshComponent.h
 	Node.h
+	NodeManager.h
 	Noise.h
 	ParticleComponent.h
 	PartitionNode.h

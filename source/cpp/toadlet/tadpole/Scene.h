@@ -30,6 +30,7 @@
 #include <toadlet/tadpole/ContextListener.h>
 #include <toadlet/tadpole/Engine.h>
 #include <toadlet/tadpole/Mesh.h>
+#include <toadlet/tadpole/NodeManager.h>
 #include <toadlet/tadpole/RenderableSet.h>
 #include <toadlet/tadpole/RenderManager.h>
 #include <toadlet/tadpole/PhysicsCollision.h>
@@ -69,6 +70,9 @@ public:
 
 	virtual void setUpdateListener(UpdateListener *updateListener){mUpdateListener=updateListener;}
 	virtual UpdateListener *getUpdateListener() const{return mUpdateListener;}
+
+	virtual void setNodeManager(NodeManager *nodeManager){mNodeManager=nodeManager;}
+	virtual NodeManager *getNodeManager() const{return mNodeManager;}
 
 	virtual void setRenderManager(RenderManager *renderManager){mRenderManager=renderManager;}
 	virtual RenderManager *getRenderManager() const{return mRenderManager;}
@@ -120,10 +124,10 @@ protected:
 	Engine::ptr mEngine;
 	PartitionNode::ptr mBackground;
 	PartitionNode::ptr mRoot;
-
 	Vector4 mAmbientColor;
-	RenderManager::ptr mRenderManager;
 
+	NodeManager::ptr mNodeManager;
+	RenderManager::ptr mRenderManager;
 	PhysicsManager::ptr mPhysicsManager;
 
 	Collection<Component::ptr> mDestroyComponents;
