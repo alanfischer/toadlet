@@ -40,7 +40,7 @@ ParticleComponent::ParticleComponent(Scene *scene):
 	mManualUpdating(false),
 	mVelocityAligned(false),
 	mSorted(false),
-	mRendered(false)
+	mRendered(true)
 	//mMaterial,
 	//mSharedRenderState,
 	//mVertexData,
@@ -49,13 +49,11 @@ ParticleComponent::ParticleComponent(Scene *scene):
 	mScene=scene;
 	mEngine=scene->getEngine();
 
-
-	mParticleType=0;
-	mWorldSpace=false;
-	mManualUpdating=false;
-	mVelocityAligned=false;
-	mRendered=true;
+	mTransform=new Transform();
+	mTransform->setTransformListener(this);
 	mBound=new Bound();
+	mWorldTransform=new Transform();
+	mWorldBound=new Bound();
 }
 
 void ParticleComponent::destroy(){
@@ -169,7 +167,16 @@ void ParticleComponent::setMaterial(Material *material){
 	}
 }
 
-void ParticleComponent::frameUpdate(int dt,int scope){
+void ParticleComponent::setTransform(Transform *transform){
+	if(transform==NULL){
+		mTransform->reset();
+	}
+	else{
+		mTransform->set(transform);
+	}
+}
+
+void ParticleComponent::updateBound(){
 	Sphere sphere;
 	Sphere point;
 	scalar epsilon=mScene->getEpsilon();
@@ -183,6 +190,27 @@ void ParticleComponent::frameUpdate(int dt,int scope){
 		Math::sub(sphere,mParent->getWorldTranslate());
 	}
 	mBound->set(sphere);
+}
+
+void ParticleComponent::transformChanged(Transform *transform){
+	if(mParent==NULL){
+		return;
+	}
+
+	if(mWorldSpace){
+		mWorldTransform->set(mTransform);
+	}
+	else{
+		mWorldTransform->setTransform(mParent->getWorldTransform(),mTransform);
+	}
+
+	mWorldBound->transform(mBound,mWorldTransform);
+
+	mParent->boundChanged();
+}
+
+void ParticleComponent::frameUpdate(int dt,int scope){
+	updateBound();
 }
 
 RenderState::ptr ParticleComponent::getSharedRenderState(){

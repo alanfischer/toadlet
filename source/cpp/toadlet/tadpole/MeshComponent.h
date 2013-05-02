@@ -36,7 +36,7 @@
 namespace toadlet{
 namespace tadpole{
 
-class TOADLET_API MeshComponent:public BaseComponent,public Visible,public Attachable{
+class TOADLET_API MeshComponent:public BaseComponent,public TransformListener,public Visible,public Attachable{
 public:
 	TOADLET_INTERFACE(MeshComponent);
 
@@ -96,7 +96,9 @@ public:
 
 	Bound *getBound() const{return mBound;}
 
-	bool getActive() const{return true;}
+	void transformChanged(Transform *transform);
+
+	bool getActive() const{return mSkeleton!=NULL;}
 
 	// Visible
 	bool getRendered() const{return mRendered;}

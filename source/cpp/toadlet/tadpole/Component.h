@@ -52,11 +52,14 @@ public:
 	virtual void logicUpdate(int dt,int scope)=0;
 	virtual void frameUpdate(int dt,int scope)=0;
 
+	virtual bool handleEvent(Event *event)=0;
+
 	virtual bool getActive() const=0;
+
+	/// @todo: Move these to a SpacialComponent interface?
 	virtual Transform *getTransform() const=0;
 	virtual Bound *getBound() const=0;
-
-	virtual bool handleEvent(Event *event)=0;
+	virtual void transformChanged(Transform *transform)=0;
 };
 
 }

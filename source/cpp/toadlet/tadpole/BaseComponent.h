@@ -54,18 +54,18 @@ public:
 	virtual void logicUpdate(int dt,int scope){}
 	virtual void frameUpdate(int dt,int scope){}
 
-	virtual bool getActive() const{return false;}
-	virtual Transform *getTransform() const{return mTransform;}
-	virtual Bound *getBound() const{return mBound;}
-	
 	virtual bool handleEvent(Event *event){return false;}
+
+	virtual bool getActive() const{return false;}
+
+	virtual Transform *getTransform() const{return NULL;}
+	virtual Bound *getBound() const{return NULL;}
+	virtual void transformChanged(Transform *transform){}
 
 protected:
 	Node *mParent;
 	Node *mRoot;
 	String mName;
-	Transform::ptr mTransform;
-	Bound::ptr mBound;
 };
 
 }

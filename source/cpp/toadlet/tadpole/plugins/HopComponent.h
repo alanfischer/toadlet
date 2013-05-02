@@ -67,7 +67,7 @@ public:
 	void addShape(hop::Shape *shape);
 	void removeShape(hop::Shape *shape);
 
-	void transformChanged();
+	void transformChanged(Transform *transform);
 
 	void logicUpdate(int dt,int scope){}
 	void frameUpdate(int dt,int scope){}

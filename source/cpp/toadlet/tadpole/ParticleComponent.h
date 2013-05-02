@@ -47,7 +47,7 @@ namespace tadpole{
 // SPRITE - particles are rendered using 4 points and oriented towards the camera
 // BEAM - particles are rendered as beams that take up 2 or more particles
 // The vx,vy,vz in the Particle class are only used for alignment, this class provides no simulation of particles.
-class TOADLET_API ParticleComponent:public BaseComponent,public Renderable,public Visible{
+class TOADLET_API ParticleComponent:public BaseComponent,public TransformListener,public Renderable,public Visible{
 public:
 	TOADLET_OBJECT(ParticleComponent);
 
@@ -101,7 +101,14 @@ public:
 	Material *getMaterial() const{return mMaterial;}
 
 	void frameUpdate(int dt,int scope);
+
+	void setTransform(Transform *transform);
+	Transform *getTransform() const{return mTransform;}
+
+	void updateBound();
 	Bound *getBound() const{return mBound;}
+
+	void transformChanged(Transform *transform);
 
 	// Visible
 	bool getRendered() const{return mRendered;}
@@ -111,8 +118,8 @@ public:
 
 	// Renderable
 	Material *getRenderMaterial() const{return mMaterial;}
-	Transform *getRenderTransform() const{return mWorldSpace==false?mParent->getWorldTransform():mScene->getRoot()->getWorldTransform();}
-	Bound *getRenderBound() const{return mParent->getWorldBound();}
+	Transform *getRenderTransform() const{return mWorldTransform;}
+	Bound *getRenderBound() const{return mWorldBound;}
 	void render(RenderManager *manager) const;
 
 	void updateVertexData(Camera *camera);
@@ -135,11 +142,14 @@ protected:
 	bool mVelocityAligned;
 	bool mSorted;
 	bool mRendered;
+	Transform::ptr mTransform;
+	Bound::ptr mBound;
+	Transform::ptr mWorldTransform;
+	Bound::ptr mWorldBound;
 	Material::ptr mMaterial;
 	RenderState::ptr mSharedRenderState;
 	VertexData::ptr mVertexData;
 	IndexData::ptr mIndexData;
-	Bound::ptr mBound;
 };
 
 }

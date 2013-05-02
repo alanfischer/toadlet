@@ -169,7 +169,7 @@ void HopComponent::lerpPosition(scalar fraction){
 	mParent->getTransform()->setTranslate(mCurrentPosition);
 }
 
-void HopComponent::transformChanged(){
+void HopComponent::transformChanged(Transform *transform){
 	const Vector3 &translate=mParent->getTransform()->getTranslate();
 	if(mCurrentPosition.equals(translate)==false){
 		mOldPosition.set(translate);

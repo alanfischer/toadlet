@@ -38,7 +38,7 @@
 namespace toadlet{
 namespace tadpole{
 
-class TOADLET_API SpriteComponent:public BaseComponent,public Renderable,public Visible,public Animatable,public Animation{
+class TOADLET_API SpriteComponent:public BaseComponent,public TransformListener,public Renderable,public Visible,public Animatable,public Animation{
 public:
 	TOADLET_OBJECT(SpriteComponent);
 	
@@ -57,12 +57,12 @@ public:
 	void setAlignment(int alignment);
 	int getAlignment() const{return mAlignment;}
 
-	void frameUpdate(int dt,int scope);
-
 	void setTransform(Transform *transform);
 	Transform *getTransform() const{return mTransform;}
 
 	Bound *getBound() const{return mBound;}
+
+	void transformChanged(Transform *transform);
 
 	// Visible
 	bool getRendered() const{return mRendered;}

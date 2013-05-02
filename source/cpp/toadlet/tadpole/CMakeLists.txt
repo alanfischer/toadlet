@@ -249,7 +249,6 @@ set (TADPOLE_HDR
 	Track.h
 	Transform.h
 	TransformListener.h
-	Transformable.h
 	Types.h
 	UpdateListener.h
 	VertexFormats.h
