@@ -61,6 +61,7 @@ SkeletonComponent::SkeletonComponent(Engine *engine,Skeleton *skeleton):
 	}
 
 	mTransform=new Transform();
+	mTransform->setTransformListener(this);
 	mBound=new Bound();
 	mWorldTransform=new Transform();
 	mWorldBound=new Bound();
@@ -89,9 +90,6 @@ void SkeletonComponent::parentChanged(Node *node){
 }
 
 void SkeletonComponent::frameUpdate(int dt,int scope){
-	mWorldTransform->setTransform(mParent->getWorldTransform(),mTransform);
-	mWorldBound->transform(mBound,mWorldTransform);
-
 	updateBones();
 }
 
@@ -174,6 +172,17 @@ void SkeletonComponent::setTransform(Transform *transform){
 	else{
 		mTransform->set(transform);
 	}
+}
+
+void SkeletonComponent::transformChanged(Transform *transform){
+	if(mParent==NULL){
+		return;
+	}
+
+	mWorldTransform->setTransform(mParent->getWorldTransform(),mTransform);
+	mWorldBound->transform(mBound,mWorldTransform);
+
+	mParent->boundChanged();
 }
 
 int SkeletonComponent::updateBoneTransformation(Bone *bone){

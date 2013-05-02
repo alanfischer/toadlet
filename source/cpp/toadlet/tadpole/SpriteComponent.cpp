@@ -42,6 +42,7 @@ SpriteComponent::SpriteComponent(Engine *engine):
 {
 	mEngine=engine;
 	mTransform=new Transform();
+	mTransform->setTransformListener(this);
 	mBound=new Bound();
 	mWorldTransform=new Transform();
 	mWorldBound=new Bound();
@@ -110,14 +111,6 @@ void SpriteComponent::setAlignment(int alignment){
 	updateSprite();
 }
 
-/// @todo: Remove the need to do a frameUpdate to update the world transform & bound, this calculation should be somewhere else thats called when the parent transform is changed
-/// This relates to the other goal of node updating only happening as required, not every frame
-/// Do the same in MeshComponent
-void SpriteComponent::frameUpdate(int dt,int scope){
-	mWorldTransform->setTransform(mParent->getWorldTransform(),mTransform);
-	mWorldBound->transform(mBound,mWorldTransform);
-}
-
 void SpriteComponent::setTransform(Transform *transform){
 	if(transform==NULL){
 		mTransform->reset();
@@ -125,6 +118,17 @@ void SpriteComponent::setTransform(Transform *transform){
 	else{
 		mTransform->set(transform);
 	}
+}
+
+void SpriteComponent::transformChanged(Transform *transform){
+	if(mParent==NULL){
+		return;
+	}
+
+	mWorldTransform->setTransform(mParent->getWorldTransform(),mTransform);
+	mWorldBound->transform(mBound,mWorldTransform);
+
+	mParent->boundChanged();
 }
 
 RenderState::ptr SpriteComponent::getSharedRenderState(){

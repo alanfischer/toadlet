@@ -30,7 +30,6 @@
 #include <toadlet/egg/Type.h>
 #include <toadlet/tadpole/Bound.h>
 #include <toadlet/tadpole/BaseComponent.h>
-#include <toadlet/tadpole/Transformable.h>
 
 #define TOADLET_NODE(Class,TypeName)\
 	TOADLET_OBJECT(Class); \
@@ -50,7 +49,7 @@ class ActionComponent;
 class LightComponent;
 class PhysicsComponent;
 
-class TOADLET_API Node:public BaseComponent,public Transformable,public TransformListener{
+class TOADLET_API Node:public BaseComponent,public TransformListener{
 public:
 	TOADLET_NODE(Node,"toadlet.tadpole.Node");
 
@@ -165,6 +164,7 @@ public:
 	virtual void updateWorldSpacial();
 
 	virtual void transformChanged(Transform *transform);
+	virtual void boundChanged();
 	virtual void gatherRenderables(Camera *camera,RenderableSet *set);
 
 	inline Engine *getEngine() const{return (Engine*)mEngine;}

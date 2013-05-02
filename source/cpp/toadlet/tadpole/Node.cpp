@@ -467,6 +467,11 @@ void Node::updateTransform(){
 	else{
 		mWorldTransform->setTransform(mParent->mWorldTransform,mTransform);
 	}
+
+	int i;
+	for(i=0;i<mComponents.size();++i){
+		mComponents[i]->transformChanged(mWorldTransform);
+	}
 }
 
 void Node::updateComponentBound(){
@@ -514,10 +519,15 @@ void Node::transformChanged(Transform *transform){
 		mTransformUpdatedFrame=mScene->getFrame();
 	}
 
-	if(mPhysics!=NULL){
-		mPhysics->transformChanged();
+	int i;
+	for(i=0;i<mComponents.size();++i){
+		mComponents[i]->transformChanged(transform);
 	}
 
+	activate();
+}
+
+void Node::boundChanged(){
 	activate();
 }
 

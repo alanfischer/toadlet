@@ -37,7 +37,7 @@
 namespace toadlet{
 namespace tadpole{
 
-class TOADLET_API SkeletonComponent:public BaseComponent,public Renderable,public Attachable,public Animatable{
+class TOADLET_API SkeletonComponent:public BaseComponent,public TransformListener,public Renderable,public Attachable,public Animatable{
 public:
 	TOADLET_OBJECT(SkeletonComponent);
 
@@ -158,6 +158,8 @@ public:
 	Transform *getTransform() const{return mTransform;}
 
 	Bound *getBound() const{return mBound;}
+
+	void transformChanged(Transform *transform);
 
 	bool getActive() const{return true;}
 

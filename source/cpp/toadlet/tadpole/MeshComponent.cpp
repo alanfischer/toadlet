@@ -53,6 +53,7 @@ MeshComponent::MeshComponent(Engine *engine):
 {
 	mEngine=engine;
 	mTransform=new Transform();
+	mTransform->setTransformListener(this);
 	mBound=new Bound();
 	mWorldTransform=new Transform();
 	mWorldBound=new Bound();
@@ -185,18 +186,6 @@ void MeshComponent::frameUpdate(int dt,int scope){
 			updateVertexBuffer();
 		}
 	}
-
-	mWorldTransform->setTransform(mParent->getWorldTransform(),mTransform);
-	mWorldBound->transform(mBound,mWorldTransform);
-
-	int i;
-	for(i=0;i<mSubMeshes.size();++i){
-		SubMesh *subMesh=mSubMeshes[i];
-		if(subMesh->mTransform){
-			subMesh->mWorldTransform->setTransform(mWorldTransform,subMesh->mTransform);
-			subMesh->mWorldBound->transform(subMesh->mMeshSubMesh->bound,subMesh->mWorldTransform);
-		}
-	}
 }
 
 void MeshComponent::setBound(Bound *bound){
@@ -219,6 +208,26 @@ void MeshComponent::setTransform(Transform *transform){
 	if(mSkeleton!=NULL){
 		mSkeleton->setTransform(transform);
 	}
+}
+
+void MeshComponent::transformChanged(Transform *transform){
+	if(mParent==NULL){
+		return;
+	}
+
+	mWorldTransform->setTransform(mParent->getWorldTransform(),mTransform);
+	mWorldBound->transform(mBound,mWorldTransform);
+
+	int i;
+	for(i=0;i<mSubMeshes.size();++i){
+		SubMesh *subMesh=mSubMeshes[i];
+		if(subMesh->mTransform){
+			subMesh->mWorldTransform->setTransform(mWorldTransform,subMesh->mTransform);
+			subMesh->mWorldBound->transform(subMesh->mMeshSubMesh->bound,subMesh->mWorldTransform);
+		}
+	}
+
+	mParent->boundChanged();
 }
 
 RenderState::ptr MeshComponent::getSharedRenderState(){
