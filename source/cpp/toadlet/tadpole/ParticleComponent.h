@@ -94,6 +94,9 @@ public:
 	inline void setManualUpdating(bool manual){mManualUpdating=manual;}
 	inline bool getManualUpdating() const{return mManualUpdating;}
 
+	void setSorted(bool sorted);
+	inline bool getSorted() const{return mSorted;}
+
 	void setMaterial(Material *material);
 	Material *getMaterial() const{return mMaterial;}
 
@@ -112,12 +115,17 @@ public:
 	Bound *getRenderBound() const{return mParent->getWorldBound();}
 	void render(RenderManager *manager) const;
 
-	void updateVertexBuffer(Camera *camera);
+	void updateVertexData(Camera *camera);
 
 protected:
-	void createVertexBuffer();
+	void createVertexData();
+	void createIndexData();
+
+	void updateIndexData(Camera *camera);
 
 	Collection<Particle> mParticles;
+	Collection<scalar> mDistances;
+	Collection<int> mOrders;
 
 	Engine *mEngine;
 	Scene *mScene;
@@ -125,6 +133,7 @@ protected:
 	bool mWorldSpace;
 	bool mManualUpdating;
 	bool mVelocityAligned;
+	bool mSorted;
 	bool mRendered;
 	Material::ptr mMaterial;
 	RenderState::ptr mSharedRenderState;

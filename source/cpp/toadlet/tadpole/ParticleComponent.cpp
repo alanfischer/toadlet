@@ -39,6 +39,7 @@ ParticleComponent::ParticleComponent(Scene *scene):
 	mWorldSpace(false),
 	mManualUpdating(false),
 	mVelocityAligned(false),
+	mSorted(false),
 	mRendered(false)
 	//mMaterial,
 	//mSharedRenderState,
@@ -59,6 +60,8 @@ ParticleComponent::ParticleComponent(Scene *scene):
 
 void ParticleComponent::destroy(){
 	mParticles.clear();
+	mDistances.clear();
+	mOrders.clear();
 
 	mMaterial=NULL;
 
@@ -117,7 +120,8 @@ bool ParticleComponent::setNumParticles(int numParticles,int particleType,scalar
 		mParticles[i].scale=scale;
 	}
 
-	createVertexBuffer();
+	createVertexData();
+	createIndexData();
 
 	return true;
 }
@@ -149,6 +153,12 @@ void ParticleComponent::setWorldSpace(bool worldSpace){
 			}
 		}
 	}
+}
+
+void ParticleComponent::setSorted(bool sorted){
+	mSorted=sorted;
+
+	createIndexData();
 }
 
 void ParticleComponent::setMaterial(Material *material){
@@ -190,7 +200,11 @@ void ParticleComponent::gatherRenderables(Camera *camera,RenderableSet *set){
 	}
 
 	if(mManualUpdating==false){
-		updateVertexBuffer(camera);
+		updateVertexData(camera);
+	}
+
+	if(mSorted){
+		updateIndexData(camera);
 	}
 
 	set->queueRenderable(this);
@@ -202,8 +216,11 @@ void ParticleComponent::render(RenderManager *manager) const{
 	}
 }
 
-void ParticleComponent::createVertexBuffer(){
-	int i,j,ii,vi;
+void ParticleComponent::createVertexData(){
+	if(mVertexData!=NULL){
+		mVertexData->destroy();
+		mVertexData=NULL;
+	}
 
 	VertexFormat::ptr vertexFormat=mEngine->getVertexFormats().POSITION_COLOR_TEX_COORD;
 
@@ -222,9 +239,22 @@ void ParticleComponent::createVertexBuffer(){
 
 	VertexBuffer::ptr vertexBuffer=mEngine->getBufferManager()->createVertexBuffer(Buffer::Usage_BIT_STREAM,Buffer::Access_BIT_WRITE,vertexFormat,numVertexes);
 	mVertexData=new VertexData(vertexBuffer);
+}
 
+void ParticleComponent::createIndexData(){
+	int i,j,ii,vi;
+
+	if(mIndexData!=NULL){
+		mIndexData->destroy();
+		mIndexData=NULL;
+	}
+
+	int numParticles=mParticles.size();
 	int numIndexes=0;
-	if(mParticleType==ParticleType_SPRITE){
+	if(mParticleType==ParticleType_POINTSPRITE){
+		numIndexes=numParticles;
+	}
+	else if(mParticleType==ParticleType_SPRITE){
 		numIndexes=numParticles*6;
 	}
 	else if(mParticleType>=ParticleType_BEAM){
@@ -232,11 +262,18 @@ void ParticleComponent::createVertexBuffer(){
 		numIndexes=(numParticles/mParticleType)*((mParticleType-2)*2+6)*3;
 	}
 
-	if(numIndexes>0){
-		IndexBuffer::ptr indexBuffer=mEngine->getBufferManager()->createIndexBuffer(Buffer::Usage_BIT_STATIC,Buffer::Access_BIT_WRITE,numVertexes<256?IndexBuffer::IndexFormat_UINT8:IndexBuffer::IndexFormat_UINT16,numIndexes);
+	IndexBuffer::ptr indexBuffer=NULL;
+	if(mParticleType!=ParticleType_POINTSPRITE|| mSorted==true){
+		indexBuffer=mEngine->getBufferManager()->createIndexBuffer(Buffer::Usage_BIT_STATIC,Buffer::Access_BIT_WRITE,mVertexData->getVertexBuffer(0)->getSize()<256?IndexBuffer::IndexFormat_UINT8:IndexBuffer::IndexFormat_UINT16,numIndexes);
+
 		IndexBufferAccessor iba(indexBuffer,Buffer::Access_BIT_WRITE);
 
-		if(mParticleType==ParticleType_SPRITE){
+		if(mParticleType==ParticleType_POINTSPRITE){
+			for(i=0;i<numParticles;++i){
+				iba.set(i,i);
+			}
+		}
+		else if(mParticleType==ParticleType_SPRITE){
 			for(i=0;i<numParticles;++i){
 				ii=i*6;
 
@@ -282,15 +319,25 @@ void ParticleComponent::createVertexBuffer(){
 		}
 
 		iba.unlock();
+	}
 
-		mIndexData=new IndexData(IndexData::Primitive_TRIS,indexBuffer,0,numIndexes);
+	mIndexData=new IndexData(mParticleType==ParticleType_POINTSPRITE?IndexData::Primitive_POINTS:IndexData::Primitive_TRIS,indexBuffer,0,numIndexes);
+
+	if(mSorted){
+		mDistances.resize(numParticles);
+		mOrders.resize(numParticles);
+
+		for(i=0;i<numParticles;++i){
+			mOrders[i]=i;
+		}
 	}
 	else{
-		mIndexData=new IndexData(IndexData::Primitive_POINTS,NULL,0,numParticles);
+		mDistances.resize(0);
+		mOrders.resize(0);
 	}
 }
 
-void ParticleComponent::updateVertexBuffer(Camera *camera){
+void ParticleComponent::updateVertexData(Camera *camera){
 	if(mVertexData==NULL){
 		return;
 	}
@@ -312,13 +359,14 @@ void ParticleComponent::updateVertexBuffer(Camera *camera){
 		}
 	}
 
+	int numParticles=mParticles.size();
 	scalar epsilon=mScene->getEpsilon();
 	Vector3 right,up,forward;
 	{
 		VertexBufferAccessor vba(mVertexData->getVertexBuffer(0),Buffer::Access_BIT_WRITE);
 
 		if(mParticleType==ParticleType_POINTSPRITE){
-			for(i=0;i<mParticles.size();++i){
+			for(i=0;i<numParticles;++i){
 				const Particle &p=mParticles[i];
 
 				vba.set3(i+0,0,		p.x,p.y,p.z);
@@ -327,7 +375,7 @@ void ParticleComponent::updateVertexBuffer(Camera *camera){
 			}
 		}
 		else if(mParticleType==ParticleType_SPRITE){
-			for(i=0;i<mParticles.size();++i){
+			for(i=0;i<numParticles;++i){
 				const Particle &p=mParticles[i];
 				int vi=i*4;
 
@@ -373,7 +421,7 @@ void ParticleComponent::updateVertexBuffer(Camera *camera){
 		}
 		else{
 			int vertexesPerBeam=((mParticleType-2)*2+8);
-			for(i=0;i<mParticles.size()/mParticleType;i++){
+			for(i=0;i<numParticles/mParticleType;i++){
 				int pi=i*mParticleType;
 				int vi=i*vertexesPerBeam;
 				Particle &p=mParticles[pi];
@@ -458,6 +506,67 @@ void ParticleComponent::updateVertexBuffer(Camera *camera){
 		}
 
 		vba.unlock();
+	}
+}
+
+void ParticleComponent::updateIndexData(Camera *camera){
+	int i,j,ii;
+
+	if(mIndexData==NULL){
+		return;
+	}
+
+	Vector3 cameraPosition=camera->getPosition();
+	if(mWorldSpace==false){
+		Math::sub(cameraPosition,mParent->getWorldTransform()->getTranslate());
+	}
+
+	for(i=0;i<mParticles.size();++i){
+		const Particle &p=mParticles[i];
+		mDistances[i]=Math::lengthSquared(cameraPosition,Vector3(p.x,p.y,p.z));
+	}
+
+	bool swapped=false;
+	int numParticles=mParticles.size();
+	for(i=0;i<numParticles;++i){
+		swapped=false;
+		for(j=i;j<numParticles-1;++j){
+			if(mDistances[mOrders[j]] < mDistances[mOrders[j+1]]){
+				int temp=mOrders[j+1];
+				mOrders[j+1]=mOrders[j];
+				mOrders[j]=temp;
+				swapped=true;
+			}
+		}
+		if(swapped==false){
+			break;
+		}
+	}
+
+	{
+		IndexBufferAccessor iba(mIndexData->getIndexBuffer(),Buffer::Access_BIT_WRITE);
+
+		if(mParticleType==ParticleType_POINTSPRITE){
+			for(i=0;i<numParticles;++i){
+				iba.set(i,mOrders[i]);
+			}
+		}
+		else if(mParticleType==ParticleType_SPRITE){
+			for(i=0;i<numParticles;++i){
+				ii=i*6;
+
+				j=mOrders[i];
+
+				iba.set(ii+0,j*4+0);
+				iba.set(ii+1,j*4+1);
+				iba.set(ii+2,j*4+2);
+				iba.set(ii+3,j*4+3);
+				iba.set(ii+4,j*4+2);
+				iba.set(ii+5,j*4+1);
+			}
+		}
+
+		iba.unlock();
 	}
 }
 
