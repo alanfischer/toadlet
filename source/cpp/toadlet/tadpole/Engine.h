@@ -93,12 +93,6 @@ public:
 
 	Stream::ptr openStream(const String &name){return mArchiveManager->openStream(name);}
 
-	// Node methods
-	void nodeCreated(Node *node);
-	void nodeDestroyed(Node *node);
-
-	inline Node *getNodeByHandle(int handle){return (handle>=0 && handle<mHandles.size())?mHandles[handle]:NULL;}
-
 	// Context methods
 	void contextReset(RenderDevice *renderDevice);
 	void contextActivate(RenderDevice *renderDevice);
@@ -164,9 +158,6 @@ protected:
 	ResourceCreator::ptr mNormalizationCreator;
 	ResourceCreator::ptr mDiffuseCreator,mSkyBoxMaterialCreator,mWaterMaterialCreator;
 	ResourceCreator::ptr mAABoxCreator,mSkyBoxCreator,mSkyDomeCreator,mSphereCreator,mGridCreator;
-
-	Collection<int> mFreeHandles;
-	Collection<Node*> mHandles;
 };
 
 }
