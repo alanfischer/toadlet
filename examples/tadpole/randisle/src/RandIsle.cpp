@@ -695,6 +695,9 @@ void RandIsle::keyPressed(int key){
 	}
 	else if(key==' '){
 		playerJump(mPlayer);
+
+		Profile::getInstance()->outputTimings();
+		Profile::getInstance()->clearTimings();
 	}
 }
 
