@@ -329,8 +329,9 @@ bool Socket::bind(uint32 ipAddress,int port){
 
 	int result=::bind(mHandle,(struct sockaddr*)&address,sizeof(address));
 	if(result==TOADLET_SOCKET_ERROR){
+		result=error();
 		Error::socket(Categories::TOADLET_EGG,
-			String("bind:")+error());
+			String("bind:")+result);
 		return false;
 	}
 
@@ -351,7 +352,7 @@ bool Socket::connect(uint32 ipAddress,int port){
 		result=error();
 		if(result!=TOADLET_EINPROGRESS){
 			Error::socket(Categories::TOADLET_EGG,
-				String("connect:")+error());
+				String("connect:")+result);
 		}
 		return false;
 	}
@@ -374,8 +375,9 @@ bool Socket::connect(const String &name,int port){
 bool Socket::listen(int backlog){
 	int result=::listen(mHandle,backlog);
 	if(result==TOADLET_SOCKET_ERROR){
+		result=error();
 		Error::socket(Categories::TOADLET_EGG,
-			String("listen:")+error());
+			String("listen:")+result);
 		return false;
 	}
 
