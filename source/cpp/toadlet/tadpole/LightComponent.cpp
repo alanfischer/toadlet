@@ -68,8 +68,10 @@ void LightComponent::setDirection(const Vector3 &direction){
 	mLightState.direction.set(direction);
 }
 
-void LightComponent::frameUpdate(int dt,int scope){
-	BaseComponent::frameUpdate(dt,scope);
+void LightComponent::transformChanged(Transform *transform){
+	if(mParent==NULL){
+		return;
+	}
 
 	mLightState.position.set(mParent->getWorldTranslate());
 	Math::mul(mLightState.direction,mParent->getWorldRotate(),mDirection);

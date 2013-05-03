@@ -49,7 +49,7 @@ public:
 
 	void parentChanged(Node *node);
 
-	void frameUpdate(int dt,int scope);
+	void transformChanged(Transform *transform);
 
 	bool getActive() const{return false;}
 	Bound *getBound() const{return mBound;}

@@ -33,7 +33,7 @@ CameraComponent::CameraComponent(Camera *camera){
 	mCamera=camera;
 }
 
-void CameraComponent::frameUpdate(int dt,int scope){
+void CameraComponent::transformChanged(Transform *transform){
 	setCameraFromTransform();
 }
 

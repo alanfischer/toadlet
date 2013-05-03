@@ -52,7 +52,7 @@ public:
 	void setLookAt(const Vector3 &eye,const Vector3 &point,const Vector3 &up){mCamera->setLookAt(eye,point,up);setTransformFromCamera();}
 	void setLookDir(const Vector3 &eye,const Vector3 &dir,const Vector3 &up){mCamera->setLookDir(eye,dir,up);setTransformFromCamera();}
 
-	void frameUpdate(int dt,int scope);
+	void transformChanged(Transform *transform);
 
 protected:
 	void setTransformFromCamera();

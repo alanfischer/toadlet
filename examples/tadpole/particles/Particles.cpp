@@ -87,7 +87,7 @@ void Particles::create(){
 	beamsNode->setTranslate(Math::fromInt(40),0,0);
 	scene->getRoot()->attach(beamsNode);
 
-	camera=new Camera();
+	camera=new Camera(engine);
 	camera->setLookAt(Vector3(0,-Math::fromInt(150),0),Math::ZERO_VECTOR3,Math::Z_UNIT_VECTOR3);
 	camera->setClearColor(Colors::BLACK);
 

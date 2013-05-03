@@ -42,7 +42,7 @@ void Logo::create(){
 
 	node=new Node(scene);
 	{
-		camera=new CameraComponent(new Camera());
+		camera=new CameraComponent(new Camera(engine));
 		camera->setClearColor(Colors::BLUE);
 		node->attach(camera);
 		camera->setLookAt(Vector3(0,-Math::fromInt(150),0),Math::ZERO_VECTOR3,Math::Z_UNIT_VECTOR3);

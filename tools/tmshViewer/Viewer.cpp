@@ -65,7 +65,7 @@ Viewer::Viewer(Application *app):
 
  	mScene=new Scene(mEngine);
 
-	mCamera=new Camera();
+	mCamera=new Camera(mEngine);
 	mCamera->setClearColor(Colors::ORANGE);
 	mCamera->setAutoProjectionFov(Math::degToRad(Math::fromInt(45)),false,0.01,1000);
 
