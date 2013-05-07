@@ -23,38 +23,23 @@
  *
  ********** Copyright header - do not remove **********/
 
-#ifndef TOADLET_TADPOLE_COMPONENT_H
-#define TOADLET_TADPOLE_COMPONENT_H
+#ifndef TOADLET_TADPOLE_SPACIAL_H
+#define TOADLET_TADPOLE_SPACIAL_H
 
-#include <toadlet/egg/Interface.h>
-#include <toadlet/egg/Event.h>
 #include <toadlet/tadpole/Types.h>
-#include <toadlet/tadpole/Transform.h>
-#include <toadlet/tadpole/Bound.h>
 
 namespace toadlet{
 namespace tadpole{
 
-class Node;
-
-class Component:public Interface{
+class Spacial{
 public:
-	TOADLET_INTERFACE(Component);
-	
-	virtual void destroy()=0;
+	virtual ~Spacial(){}
 
-	virtual void parentChanged(Node *node)=0;
-	virtual void rootChanged(Node *root)=0;
-
-	virtual const String &getName() const=0;
-	virtual void setName(const String &name)=0;
-
-	virtual void logicUpdate(int dt,int scope)=0;
-	virtual void frameUpdate(int dt,int scope)=0;
-
-	virtual bool handleEvent(Event *event)=0;
-
-	virtual bool getActive() const=0;
+	virtual Transform *getTransform() const=0;
+	virtual Transform *getWorldTransform() const=0;
+	virtual Bound *getBound() const=0;
+	virtual Bound *getWorldBound() const=0;
+	virtual void transformChanged(Transform *transform)=0;
 };
 
 }

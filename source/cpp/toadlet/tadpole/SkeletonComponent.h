@@ -26,18 +26,19 @@
 #ifndef TOADLET_TADPOLE_SKELETONCOMPONENT_H
 #define TOADLET_TADPOLE_SKELETONCOMPONENT_H
 
-#include <toadlet/tadpole/Attachable.h>
-#include <toadlet/tadpole/Renderable.h>
 #include <toadlet/tadpole/Engine.h>
 #include <toadlet/tadpole/Skeleton.h>
+#include <toadlet/tadpole/Attachable.h>
+#include <toadlet/tadpole/Renderable.h>
 #include <toadlet/tadpole/Animatable.h>
+#include <toadlet/tadpole/Spacial.h>
 #include <toadlet/tadpole/material/Material.h>
 #include <toadlet/tadpole/action/BaseAnimation.h>
 
 namespace toadlet{
 namespace tadpole{
 
-class TOADLET_API SkeletonComponent:public BaseComponent,public TransformListener,public Renderable,public Attachable,public Animatable{
+class TOADLET_API SkeletonComponent:public BaseComponent,public TransformListener,public Spacial,public Renderable,public Attachable,public Animatable{
 public:
 	TOADLET_OBJECT(SkeletonComponent);
 
@@ -154,19 +155,20 @@ public:
 	String getBoneName(int index) const;
 	String getBoneName(Bone *bone) const{return mSkeleton->getBone(bone->index)->name;}
 
-	void setTransform(Transform *transform);
-	Transform *getTransform() const{return mTransform;}
-
-	Bound *getBound() const{return mBound;}
-
-	void transformChanged(Transform *transform);
-
 	bool getActive() const{return true;}
 
 	inline Skeleton *getSkeleton() const{return mSkeleton;}
 
 	void setRenderSkeleton(bool skeleton);
 	bool getRenderSkeleton() const{return mSkeletonMaterial!=NULL;}
+
+	// Spacial
+	void setTransform(Transform *transform);
+	Transform *getTransform() const{return mTransform;}
+	Bound *getBound() const{return mBound;}
+	Transform *getWorldTransform() const{return mWorldTransform;}
+	Bound *getWorldBound() const{return mWorldBound;}
+	void transformChanged(Transform *transform);
 
 	// Renderable
 	Material *getRenderMaterial() const{return mSkeletonMaterial;}

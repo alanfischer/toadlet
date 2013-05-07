@@ -404,7 +404,7 @@ void TerrainNode::createPatch(int x,int y){
 		patch->stitchToBottom(patchAt(x,y+1));
 	}
 
-	patch->getParent()->updateWorldSpacial();
+	patch->getParent()->boundChanged();
 
 	if(mListener!=NULL){
 		mListener->terrainPatchCreated(x,y,patch->getParent()->getWorldBound());

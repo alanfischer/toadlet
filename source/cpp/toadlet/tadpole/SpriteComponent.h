@@ -29,6 +29,7 @@
 #include <toadlet/peeper/IndexData.h>
 #include <toadlet/peeper/VertexData.h>
 #include <toadlet/tadpole/BaseComponent.h>
+#include <toadlet/tadpole/Spacial.h>
 #include <toadlet/tadpole/Renderable.h>
 #include <toadlet/tadpole/Visible.h>
 #include <toadlet/tadpole/Animatable.h>
@@ -38,7 +39,7 @@
 namespace toadlet{
 namespace tadpole{
 
-class TOADLET_API SpriteComponent:public BaseComponent,public TransformListener,public Renderable,public Visible,public Animatable,public Animation{
+class TOADLET_API SpriteComponent:public BaseComponent,public TransformListener,public Spacial,public Renderable,public Visible,public Animatable,public Animation{
 public:
 	TOADLET_OBJECT(SpriteComponent);
 	
@@ -57,11 +58,12 @@ public:
 	void setAlignment(int alignment);
 	int getAlignment() const{return mAlignment;}
 
+	// Spacial
 	void setTransform(Transform *transform);
 	Transform *getTransform() const{return mTransform;}
-
+	Transform *getWorldTransform() const{return mWorldTransform;}
 	Bound *getBound() const{return mBound;}
-
+	Bound *getWorldBound() const{return mWorldBound;}
 	void transformChanged(Transform *transform);
 
 	// Visible

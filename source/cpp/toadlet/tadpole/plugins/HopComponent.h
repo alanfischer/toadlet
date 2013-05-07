@@ -67,14 +67,10 @@ public:
 	void addShape(hop::Shape *shape);
 	void removeShape(hop::Shape *shape);
 
-	void transformChanged(Transform *transform);
-
 	void logicUpdate(int dt,int scope){}
 	void frameUpdate(int dt,int scope){}
 
 	bool getActive() const{return mSolid->active();}
-	Transform *getTransform() const{return NULL;}
-	Bound *getBound() const{return mBound;}
 
 	inline hop::Solid *getSolid(){return mSolid;}
 
@@ -87,6 +83,13 @@ public:
 	void getBound(AABox &result);
 	void traceSegment(hop::Collision &result,const Vector3 &position,const Segment &segment);
 	void traceSolid(hop::Collision &result,hop::Solid *solid,const Vector3 &position,const Segment &segment);
+
+	// Spacial
+	Transform *getTransform() const{return NULL;}
+	Bound *getBound() const{return mBound;}
+	Transform *getWorldTransform() const{return NULL;}
+	Bound *getWorldBound() const{return mWorldBound;}
+	void transformChanged(Transform *transform);
 
 protected:
 	friend class HopManager;
@@ -103,6 +106,7 @@ protected:
 	Vector3 mOldPosition,mNewPosition,mCurrentPosition;
 	bool mTransformChanged;
 	Bound::ptr mBound;
+	Bound::ptr mWorldBound;
 	PhysicsTraceable::ptr mTraceable;
 	hop::Shape::ptr mTraceableShape;
 };

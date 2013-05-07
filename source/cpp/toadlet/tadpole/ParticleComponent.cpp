@@ -83,12 +83,14 @@ void ParticleComponent::destroy(){
 
 void ParticleComponent::parentChanged(Node *node){
 	if(mParent!=NULL){
+		mParent->spacialRemoved(this);
 		mParent->visibleRemoved(this);
 	}
 
 	BaseComponent::parentChanged(node);
 
 	if(mParent!=NULL){
+		mParent->spacialAttached(this);
 		mParent->visibleAttached(this);
 	}
 }
@@ -190,6 +192,10 @@ void ParticleComponent::updateBound(){
 		Math::sub(sphere,mParent->getWorldTranslate());
 	}
 	mBound->set(sphere);
+
+	mWorldBound->transform(mBound,mWorldTransform);
+
+	mParent->boundChanged();
 }
 
 void ParticleComponent::transformChanged(Transform *transform){
@@ -206,7 +212,9 @@ void ParticleComponent::transformChanged(Transform *transform){
 
 	mWorldBound->transform(mBound,mWorldTransform);
 
-	mParent->boundChanged();
+	if(transform==mTransform){
+		mParent->boundChanged();
+	}
 }
 
 void ParticleComponent::frameUpdate(int dt,int scope){

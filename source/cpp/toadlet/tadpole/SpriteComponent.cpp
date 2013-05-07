@@ -75,6 +75,7 @@ void SpriteComponent::destroy(){
 
 void SpriteComponent::parentChanged(Node *node){
 	if(mParent!=NULL){
+		mParent->spacialRemoved(this);
 		mParent->visibleRemoved(this);
 		mParent->animatableRemoved(this);
 	}
@@ -82,6 +83,7 @@ void SpriteComponent::parentChanged(Node *node){
 	BaseComponent::parentChanged(node);
 
 	if(mParent!=NULL){
+		mParent->spacialAttached(this);
 		mParent->visibleAttached(this);
 		mParent->animatableAttached(this);
 	}
@@ -128,7 +130,9 @@ void SpriteComponent::transformChanged(Transform *transform){
 	mWorldTransform->setTransform(mParent->getWorldTransform(),mTransform);
 	mWorldBound->transform(mBound,mWorldTransform);
 
-	mParent->boundChanged();
+	if(transform==mTransform){
+		mParent->boundChanged();
+	}
 }
 
 RenderState::ptr SpriteComponent::getSharedRenderState(){

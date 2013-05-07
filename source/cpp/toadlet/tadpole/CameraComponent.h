@@ -28,15 +28,18 @@
 
 #include <toadlet/tadpole/BaseComponent.h>
 #include <toadlet/tadpole/Camera.h>
+#include <toadlet/tadpole/Spacial.h>
 
 namespace toadlet{
 namespace tadpole{
 
-class TOADLET_API CameraComponent:public BaseComponent{
+class TOADLET_API CameraComponent:public BaseComponent,public Spacial{
 public:
 	TOADLET_OBJECT(CameraComponent);
 
 	CameraComponent(Camera *camera);
+
+	void parentChanged(Node *node);
 
 	void setCamera(Camera *camera){mCamera=camera;}
 	Camera *getCamera(){return mCamera;}
@@ -52,6 +55,11 @@ public:
 	void setLookAt(const Vector3 &eye,const Vector3 &point,const Vector3 &up){mCamera->setLookAt(eye,point,up);setTransformFromCamera();}
 	void setLookDir(const Vector3 &eye,const Vector3 &dir,const Vector3 &up){mCamera->setLookDir(eye,dir,up);setTransformFromCamera();}
 
+	// Spacial
+	Transform *getTransform() const{return NULL;}
+	Bound *getBound() const{return NULL;}
+	Transform *getWorldTransform() const{return NULL;}
+	Bound *getWorldBound() const{return NULL;}
 	void transformChanged(Transform *transform);
 
 protected:

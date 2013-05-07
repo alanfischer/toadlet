@@ -35,18 +35,21 @@ LightComponent::LightComponent():
 	//mLightState
 {
 	mBound=new Bound();
+	mWorldBound=new Bound();
 
 	setLightState(mLightState);
 }
 
 void LightComponent::parentChanged(Node *node){
 	if(mParent!=NULL){
+		mParent->spacialRemoved(this);
 		mParent->lightRemoved(this);
 	}
 
 	BaseComponent::parentChanged(node);
 	
 	if(mParent!=NULL){
+		mParent->spacialAttached(this);
 		mParent->lightAttached(this);
 	}
 }
@@ -75,6 +78,8 @@ void LightComponent::transformChanged(Transform *transform){
 
 	mLightState.position.set(mParent->getWorldTranslate());
 	Math::mul(mLightState.direction,mParent->getWorldRotate(),mDirection);
+
+	mWorldBound->transform(mBound,mParent->getWorldTransform());
 }
 
 }

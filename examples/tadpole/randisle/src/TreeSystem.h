@@ -6,7 +6,7 @@
 #include "Path.h"
 #include "BranchSystem.h"
 
-class TreeSystem:public BaseComponent,public BranchSystem::BranchListener,public DetailTraceable{
+class TreeSystem:public BaseComponent,public BranchSystem::BranchListener,public Spacial,public DetailTraceable{
 public:
 	TOADLET_OBJECT(TreeSystem);
 
@@ -115,9 +115,9 @@ public:
 	TreeSystem(Scene *scene,int seed);
 	void destroy();
 
-	void grow();
+	void parentChanged(Node *node);
 
-	Bound *getBound() const{return mBound;}
+	void grow();
 
 	BranchSystem::Branch::ptr branchCreated(BranchSystem::Branch *parent);
 	void branchDestroyed(BranchSystem::Branch *branch);
@@ -135,6 +135,14 @@ public:
 	Mesh *getMesh() const{return mMesh;}
 	Mesh *getLowMesh() const{return mLowMesh;}
 
+	// Spacial
+	Transform *getTransform() const{return NULL;}
+	Bound *getBound() const{return mBound;}
+	Transform *getWorldTransform() const{return NULL;}
+	Bound *getWorldBound() const{return mWorldBound;}
+	void transformChanged(Transform *transform);
+
+	// DetailTraceable
 	Bound *getTraceableBound() const{return mBound;}
 	void traceSegment(PhysicsCollision &result,const Vector3 &position,const Segment &segment,const Vector3 &size);
 
@@ -148,7 +156,9 @@ protected:
 
 	Engine *mEngine;
 	Scene *mScene;
+
 	Bound::ptr mBound;
+	Bound::ptr mWorldBound;
 
 	int mSections;
 	bool mCountMode;

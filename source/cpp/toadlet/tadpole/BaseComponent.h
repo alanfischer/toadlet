@@ -58,10 +58,6 @@ public:
 
 	virtual bool getActive() const{return false;}
 
-	virtual Transform *getTransform() const{return NULL;}
-	virtual Bound *getBound() const{return NULL;}
-	virtual void transformChanged(Transform *transform){}
-
 protected:
 	Node *mParent;
 	Node *mRoot;

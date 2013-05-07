@@ -44,6 +44,7 @@ class RenderableSet;
 class Scene;
 class Camera;
 class Visible;
+class Spacial;
 class Animatable;
 class ActionComponent;
 class LightComponent;
@@ -90,6 +91,11 @@ public:
 	virtual void stopAllActions();
 	virtual bool getActionActive(const String &name);
 
+	virtual void spacialAttached(Spacial *spacial);
+	virtual void spacialRemoved(Spacial *spacial);
+	virtual int getNumSpacials() const{return mSpacials.size();}
+	virtual Spacial *getSpacial(int i){return mSpacials[i];}
+
 	virtual void visibleAttached(Visible *visible);
 	virtual void visibleRemoved(Visible *visible);
 	virtual int getNumVisibles() const{return mVisibles.size();}
@@ -110,8 +116,6 @@ public:
 	virtual PhysicsComponent *getPhysics(){return mPhysics;}
 
 	// Spacial methods
-	virtual void mergeWorldBound(Node *child,bool justAttached);
-
 	virtual void setTranslate(const Vector3 &translate);
 	virtual void setTranslate(scalar x,scalar y,scalar z);
 	inline const Vector3 &getTranslate() const{return mTransform->getTranslate();}
@@ -155,22 +159,18 @@ public:
 	virtual void deactivate();
 	virtual void tryDeactivate();
 	virtual bool getActive() const{return mActive;}
-	bool getTransformUpdated();
-
-	virtual void updateTransform();
-	virtual void updateComponentBound();
-	virtual void updateNodeBound();
-
-	virtual void updateWorldSpacial();
 
 	virtual void transformChanged(Transform *transform);
 	virtual void boundChanged();
+	virtual void nodeBoundChanged(Node *node);
 	virtual void gatherRenderables(Camera *camera,RenderableSet *set);
 
 	inline Engine *getEngine() const{return (Engine*)mEngine;}
 	inline Scene *getScene() const{return (Scene*)mScene;}
 
 protected:
+	virtual void calculateBound();
+
 	// Engine items
 	IntrusivePointer<Engine,ObjectSemantics> mEngine;
 	IntrusivePointer<Scene,ObjectSemantics> mScene;
@@ -186,18 +186,16 @@ protected:
 	Collection<Visible*> mVisibles;
 	Collection<Animatable*> mAnimatables;
 	Collection<LightComponent*> mLights;
+	Collection<Spacial*> mSpacials;
 	PhysicsComponent *mPhysics;
 
 	bool mActive;
 	int mDeactivateCount;
-	int mTransformUpdatedFrame;
 
 	Transform::ptr mTransform;
 	Bound::ptr mBound;
 	Transform::ptr mWorldTransform;
 	Bound::ptr mWorldBound;
-	Bound::ptr mComponentBound;
-	Bound::ptr mComponentWorldBound;
 	int mScope;
 };
 

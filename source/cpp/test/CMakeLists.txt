@@ -1,6 +1,7 @@
 if (NOT TOADLET_PLATFORM_ANDROID AND NOT TOADLET_PLATFORM_IOS)
 	set (UNIT_SRC
 		MathTest.cpp
+		NodeTest.cpp
 		unitTest.cpp
 	)
 	
@@ -8,11 +9,11 @@ if (NOT TOADLET_PLATFORM_ANDROID AND NOT TOADLET_PLATFORM_IOS)
 	
 	# Platform specific libraries
 	if (TOADLET_PLATFORM_WIN32)
-		target_link_libraries (unitTest toadlet_egg_s)
+		target_link_libraries (unitTest toadlet_egg_s toadlet_peeper_s toadlet_ribbit_s toadlet_tadpole_s )
 	elseif (TOADLET_PLATFORM_OSX)
-		target_link_libraries (unitTest toadlet_egg_s "-framework Foundation")
+		target_link_libraries (unitTest toadlet_egg_s toadlet_peeper_s toadlet_ribbit_s toadlet_tadpole_s  "-framework Foundation")
 	elseif (TOADLET_PLATFORM_POSIX)
-		target_link_libraries (unitTest toadlet_egg_s -lpthread)
+		target_link_libraries (unitTest toadlet_egg_s toadlet_peeper_s toadlet_ribbit_s toadlet_tadpole_s -lpthread)
 	endif (TOADLET_PLATFORM_WIN32)	
 
 	if (TOADLET_RUN_MEMCHECK)

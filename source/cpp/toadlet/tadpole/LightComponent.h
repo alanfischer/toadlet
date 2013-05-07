@@ -28,11 +28,12 @@
 
 #include <toadlet/peeper/LightState.h>
 #include <toadlet/tadpole/BaseComponent.h>
+#include <toadlet/tadpole/Spacial.h>
 
 namespace toadlet{
 namespace tadpole{
 
-class TOADLET_API LightComponent:public BaseComponent{
+class TOADLET_API LightComponent:public BaseComponent,public Spacial{
 public:
 	TOADLET_OBJECT(LightComponent);
 
@@ -49,16 +50,21 @@ public:
 
 	void parentChanged(Node *node);
 
-	void transformChanged(Transform *transform);
-
 	bool getActive() const{return false;}
+
+	// Spacial
+	Transform *getTransform() const{return NULL;}
 	Bound *getBound() const{return mBound;}
+	Transform *getWorldTransform() const{return NULL;}
+	Bound *getWorldBound() const{return mWorldBound;}
+	void transformChanged(Transform *transform);
 
 protected:
 	bool mEnabled;
 	Vector3 mDirection;
 	LightState mLightState;
 	Bound::ptr mBound;
+	Bound::ptr mWorldBound;
 };
 
 }

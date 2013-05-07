@@ -64,7 +64,7 @@ public:
 	void insertNodeLeafIndexes(const Collection<int> &indexes,Node *node);
 	void removeNodeLeafIndexes(const Collection<int> &indexes,Node *node);
 
-	void mergeWorldBound(Node *child,bool justAttached);
+	void nodeBoundChanged(Node *node);
 	void gatherRenderables(Camera *camera,RenderableSet *set);
 
 	bool senseBoundingVolumes(SensorResultsListener *listener,Bound *bound);
@@ -82,7 +82,6 @@ public:
 	void traceSegment(PhysicsCollision &result,const Vector3 &position,const Segment &segment,const Vector3 &size);
 
 protected:
-	void childTransformUpdated(Node *child);
 	void addLeafToVisible(bleaf *leaf,const Vector3 &cameraPosition);
 	void findBoundLeafs(Collection<int> &leafs,Node *node);
 
