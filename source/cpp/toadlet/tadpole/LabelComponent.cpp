@@ -48,6 +48,7 @@ LabelComponent::LabelComponent(Engine *engine):
 	mEngine=engine;
 	mRendered=true;
 	mBound=new Bound();
+	mWorldBound=new Bound();
 
 	setFont(mEngine->getFontManager()->getDefaultFont());
 	setAlignment(Font::Alignment_BIT_HCENTER|Font::Alignment_BIT_VCENTER);
@@ -126,6 +127,10 @@ void LabelComponent::setWordWrap(bool wordWrap){
 	mWordWrap=wordWrap;
 
 	updateLabel();
+}
+
+void LabelComponent::transformChanged(Transform *transform){
+	mWorldBound->transform(mBound,mParent->getWorldTransform());
 }
 
 RenderState::ptr LabelComponent::getSharedRenderState(){

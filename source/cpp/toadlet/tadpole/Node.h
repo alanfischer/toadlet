@@ -136,11 +136,11 @@ public:
 
 	virtual void setMatrix4x4(const Matrix4x4 &matrix);
 
-	virtual void setTransform(Transform *transform);
+	virtual void setTransform(Transform::ptr transform);
 	inline Transform *getTransform() const{return mTransform;}
 	inline Transform *getWorldTransform() const{return mWorldTransform;}
 
-	virtual void setBound(Bound *bound);
+	virtual void setBound(Bound::ptr bound);
 	inline Bound *getBound() const{return mBound;}
 	inline Bound *getWorldBound() const{return mWorldBound;}
 

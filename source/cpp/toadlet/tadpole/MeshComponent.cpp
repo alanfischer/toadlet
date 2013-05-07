@@ -190,7 +190,7 @@ void MeshComponent::frameUpdate(int dt,int scope){
 	}
 }
 
-void MeshComponent::setBound(Bound *bound){
+void MeshComponent::setBound(Bound::ptr bound){
 	if(bound==NULL){
 		mBound->reset();
 	}
@@ -199,7 +199,7 @@ void MeshComponent::setBound(Bound *bound){
 	}
 }
 
-void MeshComponent::setTransform(Transform *transform){
+void MeshComponent::setTransform(Transform::ptr transform){
 	if(transform==NULL){
 		mTransform->reset();
 	}

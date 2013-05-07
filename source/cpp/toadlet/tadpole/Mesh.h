@@ -83,10 +83,10 @@ public:
 	void compile();
 	void compileBoneBounds();
 
-	virtual void setTransform(Transform *transform){mTransform=transform;}
+	virtual void setTransform(Transform::ptr transform){mTransform=transform;}
 	Transform *getTransform() const{return mTransform;}
 
-	virtual void setBound(Bound *bound){mBound=bound;}
+	virtual void setBound(Bound::ptr bound){mBound=bound;}
 	Bound *getBound() const{return mBound;}
 
 	virtual void addSubMesh(SubMesh::ptr subMesh){mSubMeshes.add(subMesh);}

@@ -48,7 +48,7 @@ public:
 		SubMesh(MeshComponent *parent,Mesh::SubMesh *meshSubMesh);
 		virtual ~SubMesh(){}
 
-		void setTransform(Transform *transform){mTransform->set(transform);}
+		void setTransform(Transform::ptr transform){mTransform->set(transform);}
 		Transform *getTransform() const{return mTransform;}
 
 		// Renderable
@@ -95,7 +95,7 @@ public:
 	bool getActive() const{return mSkeleton!=NULL;}
 
 	// Spacial
-	void setTransform(Transform *transform);
+	void setTransform(Transform::ptr transform);
 	Transform *getTransform() const{return mTransform;}
 	Bound *getBound() const{return mBound;}
 	Transform *getWorldTransform() const{return mWorldTransform;}
@@ -118,7 +118,7 @@ public:
 	void updateVertexBuffer();
 
 protected:
-	void setBound(Bound *bound);
+	void setBound(Bound::ptr bound);
 
 	Engine *mEngine;
 	bool mRendered;
