@@ -167,7 +167,7 @@ void SkeletonComponent::setBoneScope(int i,int scope,bool recurse){
 	}
 }
 
-void SkeletonComponent::setTransform(Transform *transform){
+void SkeletonComponent::setTransform(Transform::ptr transform){
 	if(transform==NULL){
 		mTransform->reset();
 	}

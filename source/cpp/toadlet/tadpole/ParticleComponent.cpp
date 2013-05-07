@@ -169,7 +169,7 @@ void ParticleComponent::setMaterial(Material *material){
 	}
 }
 
-void ParticleComponent::setTransform(Transform *transform){
+void ParticleComponent::setTransform(Transform::ptr transform){
 	if(transform==NULL){
 		mTransform->reset();
 	}

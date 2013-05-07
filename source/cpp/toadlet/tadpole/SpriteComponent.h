@@ -59,7 +59,7 @@ public:
 	int getAlignment() const{return mAlignment;}
 
 	// Spacial
-	void setTransform(Transform *transform);
+	void setTransform(Transform::ptr transform);
 	Transform *getTransform() const{return mTransform;}
 	Transform *getWorldTransform() const{return mWorldTransform;}
 	Bound *getBound() const{return mBound;}

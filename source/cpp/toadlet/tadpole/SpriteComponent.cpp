@@ -113,7 +113,7 @@ void SpriteComponent::setAlignment(int alignment){
 	updateSprite();
 }
 
-void SpriteComponent::setTransform(Transform *transform){
+void SpriteComponent::setTransform(Transform::ptr transform){
 	if(transform==NULL){
 		mTransform->reset();
 	}

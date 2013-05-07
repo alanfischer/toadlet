@@ -106,7 +106,7 @@ public:
 	void updateBound();
 
 	// Spacial
-	void setTransform(Transform *transform);
+	void setTransform(Transform::ptr transform);
 	Transform *getTransform() const{return mTransform;}
 	Bound *getBound() const{return mBound;}
 	Transform *getWorldTransform() const{return mWorldTransform;}

@@ -29,7 +29,7 @@
 namespace toadlet{
 namespace tadpole{
 
-CameraComponent::CameraComponent(Camera *camera){
+CameraComponent::CameraComponent(Camera::ptr camera){
 	mCamera=camera;
 }
 

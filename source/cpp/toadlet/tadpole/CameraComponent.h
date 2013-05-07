@@ -37,11 +37,11 @@ class TOADLET_API CameraComponent:public BaseComponent,public Spacial{
 public:
 	TOADLET_OBJECT(CameraComponent);
 
-	CameraComponent(Camera *camera);
+	CameraComponent(Camera::ptr camera);
 
 	void parentChanged(Node *node);
 
-	void setCamera(Camera *camera){mCamera=camera;}
+	void setCamera(Camera::ptr camera){mCamera=camera;}
 	Camera *getCamera(){return mCamera;}
 
 	void setAutoProjectionFov(scalar fov,bool yheight,scalar nearDist,scalar farDist){mCamera->setAutoProjectionFov(fov,yheight,nearDist,farDist);}

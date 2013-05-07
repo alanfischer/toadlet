@@ -327,11 +327,11 @@ void Node::setMatrix4x4(const Matrix4x4 &matrix){
 	mTransform->setMatrix(matrix);
 }
 
-void Node::setTransform(Transform *transform){
+void Node::setTransform(Transform::ptr transform){
 	mTransform->set(transform);
 }
 
-void Node::setBound(Bound *bound){
+void Node::setBound(Bound::ptr bound){
 	mBound->set(bound);
 
 	boundChanged();
