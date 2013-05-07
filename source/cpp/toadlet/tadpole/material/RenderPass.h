@@ -54,28 +54,28 @@ public:
 	const String &getName(){return mName;}
 
 	void setBlendState(const BlendState &state){mRenderState->setBlendState(state);}
-	bool getBlendState(BlendState &state) const{return mRenderState!=NULL?mRenderState->getBlendState(state):NULL;}
+	bool getBlendState(BlendState &state) const{return mRenderState!=NULL?mRenderState->getBlendState(state):false;}
 
 	void setDepthState(const DepthState &state){mRenderState->setDepthState(state);}
-	bool getDepthState(DepthState &state) const{return mRenderState!=NULL?mRenderState->getDepthState(state):NULL;}
+	bool getDepthState(DepthState &state) const{return mRenderState!=NULL?mRenderState->getDepthState(state):false;}
 
 	void setRasterizerState(const RasterizerState &state){mRenderState->setRasterizerState(state);}
-	bool getRasterizerState(RasterizerState &state) const{return mRenderState!=NULL?mRenderState->getRasterizerState(state):NULL;}
+	bool getRasterizerState(RasterizerState &state) const{return mRenderState!=NULL?mRenderState->getRasterizerState(state):false;}
 
 	void setFogState(const FogState &state){mRenderState->setFogState(state);}
-	bool getFogState(FogState &state) const{return mRenderState!=NULL?mRenderState->getFogState(state):NULL;}
+	bool getFogState(FogState &state) const{return mRenderState!=NULL?mRenderState->getFogState(state):false;}
 
 	void setPointState(const PointState &state){mRenderState->setPointState(state);}
-	bool getPointState(PointState &state) const{return mRenderState!=NULL?mRenderState->getPointState(state):NULL;}
+	bool getPointState(PointState &state) const{return mRenderState!=NULL?mRenderState->getPointState(state):false;}
 
 	void setMaterialState(const MaterialState &state){mRenderState->setMaterialState(state);}
-	bool getMaterialState(MaterialState &state) const{return mRenderState!=NULL?mRenderState->getMaterialState(state):NULL;}
+	bool getMaterialState(MaterialState &state) const{return mRenderState!=NULL?mRenderState->getMaterialState(state):false;}
 
 	void setSamplerState(Shader::ShaderType type,int i,const SamplerState &state){mRenderState->setSamplerState(type,i,state);}
-	bool getSamplerState(Shader::ShaderType type,int i,SamplerState &state){return mRenderState!=NULL?mRenderState->getSamplerState(type,i,state):NULL;}
+	bool getSamplerState(Shader::ShaderType type,int i,SamplerState &state){return mRenderState!=NULL?mRenderState->getSamplerState(type,i,state):false;}
 
 	void setTextureState(Shader::ShaderType type,int i,const TextureState &state){mRenderState->setTextureState(type,i,state);}
-	bool getTextureState(Shader::ShaderType type,int i,TextureState &state){return mRenderState!=NULL?mRenderState->getTextureState(type,i,state):NULL;}
+	bool getTextureState(Shader::ShaderType type,int i,TextureState &state){return mRenderState!=NULL?mRenderState->getTextureState(type,i,state):false;}
 
 	void setRenderState(RenderState *renderState);
 	inline RenderState *getRenderState() const{return mRenderState;}

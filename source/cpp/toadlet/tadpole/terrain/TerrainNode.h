@@ -133,8 +133,6 @@ public:
 	bool sensePotentiallyVisible(SensorResultsListener *listener,const Vector3 &point);
 */
 protected:
-//	void childTransformUpdated(Node *child);
-
 	TerrainNodeListener *mListener;
 	Node::ptr mTarget;
 	TerrainNodeDataSource::ptr mDataSource;
