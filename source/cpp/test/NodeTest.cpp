@@ -30,6 +30,7 @@ bool NodeTest::testNodeTransform(){
 	Node::ptr child=new Node(NULL);
 	Node::ptr gchild=new Node(NULL);
 
+	parent->setBound(new Bound(Sphere(0)));
 	gchild->setBound(new Bound(Sphere(0)));
 
 	child->attach(gchild);
@@ -38,8 +39,13 @@ bool NodeTest::testNodeTransform(){
 	gchild->setTranslate(Vector3(0,0,1));
 	child->setTranslate(Vector3(0,0,1));
 	
-	Log::alert(String("GChild translate:")+gchild->getWorldTranslate().z);
-	Log::alert(String("Parent bound:")+parent->getWorldBound()->getSphere().radius);
+	if(gchild->getWorldTranslate() != Vector3(0,0,2)){
+		return false;
+	}
+
+	if(parent->getWorldBound()->getSphere() != Sphere(Vector3(0,0,1),1)){
+		return false;
+	}
 
 	return true;
 }

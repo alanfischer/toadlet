@@ -79,7 +79,9 @@ Node::~Node(){
 
 void Node::destroy(){
 	destroyAllChildren();
-	mScene->getNodeManager()->nodeDestroyed(this);
+	if(mScene!=NULL){
+		mScene->getNodeManager()->nodeDestroyed(this);
+	}
 
 	BaseComponent::destroy();
 }
