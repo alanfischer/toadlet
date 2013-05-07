@@ -42,8 +42,6 @@ Camera::Camera(Engine *engine):
 	mAlignmentCalculationsUseOrigin(false),
 	mAutoYHeight(false),
 
-	mFPSLastTime(0),
-	mFPSFrameCount(0),
 	mFPS(0),
 	mVisibleCount(0)
 {
@@ -57,6 +55,8 @@ Camera::Camera(Engine *engine):
 		mDefaultState->setFogState(FogState());
 		mDefaultState->setPointState(PointState());
 	}
+
+	mFPSData.resize(10);
 }
 
 void Camera::setAutoProjectionFov(scalar fov,bool yheight,scalar nearDist,scalar farDist){
@@ -362,16 +362,19 @@ bool Camera::culled(const AABox &box) const{
 }
 
 void Camera::updateFramesPerSecond(uint64 time){
-	mFPSFrameCount++;
-	if(mFPSLastTime==0 || time-mFPSLastTime>5000){
-		scalar fps=0;
-		if(mFPSLastTime>0){
-			fps=Math::div(Math::fromInt(mFPSFrameCount),Math::fromMilli(time-mFPSLastTime));
-		}
-		mFPSLastTime=time;
-		mFPSFrameCount=0;
-		mFPS=fps;
+	FPSData &oldf=mFPSData[0];
+
+	FPSData newf;
+	newf.time=time;
+	newf.count=mFPSData[mFPSData.size()-1].count+1;
+
+	int dt=newf.time-oldf.time;
+	if(dt>0){
+		mFPS=Math::div(Math::fromInt(newf.count-oldf.count),Math::fromMilli(newf.time-oldf.time));
 	}
+
+	mFPSData.removeAt(0);
+	mFPSData.add(newf);
 }
 
 void Camera::updateWorldTransform(){

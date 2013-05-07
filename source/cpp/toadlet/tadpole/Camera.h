@@ -167,8 +167,15 @@ protected:
 	Vector3 mForward,mRight,mUp;
 	Vector3 mPosition;
 
-	mutable int mFPSLastTime;
-	mutable int mFPSFrameCount;
+	class FPSData{
+	public:
+		FPSData():time(0),count(0){}
+
+		uint64 time;
+		uint64 count;
+	};
+
+	Collection<FPSData> mFPSData;
 	mutable scalar mFPS;
 	mutable int mVisibleCount;
 };
