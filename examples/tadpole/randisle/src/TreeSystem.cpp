@@ -45,6 +45,7 @@ TreeSystem::TreeSystem(Scene *scene,int seed):
 	mSystem->setBranchListener(this);
 
 	mBound=new Bound();
+	mWorldBound=new Bound();
 }
 
 void TreeSystem::destroy(){
@@ -77,6 +78,18 @@ void TreeSystem::destroy(){
 	mLeaves.clear();
 
 	BaseComponent::destroy();
+}
+
+void TreeSystem::parentChanged(Node *node){
+	if(mParent!=NULL){
+		mParent->spacialRemoved(this);
+	}
+
+	BaseComponent::parentChanged(node);
+
+	if(mParent!=NULL){
+		mParent->spacialAttached(this);
+	}
 }
 
 void TreeSystem::grow(){
@@ -559,6 +572,14 @@ Path *TreeSystem::getClosestPath(Vector3 &closestPoint,const Sphere &bound,TreeB
 	else{
 		return NULL;
 	}
+}
+
+void TreeSystem::transformChanged(Transform *transform){
+	if(mParent==NULL){
+		return;
+	}
+
+	mWorldBound->transform(mBound,mParent->getWorldTransform());
 }
 
 void TreeSystem::traceSegment(PhysicsCollision &result,const Vector3 &position,const Segment &segment,const Vector3 &size){

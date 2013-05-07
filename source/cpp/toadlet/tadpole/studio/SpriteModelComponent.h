@@ -39,7 +39,7 @@ namespace toadlet{
 namespace tadpole{
 namespace studio{
 
-class TOADLET_API SpriteModelComponent:public BaseComponent,public Renderable,public Visible,public Animatable,public Animation{
+class TOADLET_API SpriteModelComponent:public BaseComponent,public Spacial,public Renderable,public Visible,public Animatable,public Animation{
 public:
 	TOADLET_OBJECT(SpriteModelComponent);
 
@@ -56,7 +56,13 @@ public:
 	scalar getSequenceTime() const{return mSequenceTime;}
 
 	bool getActive() const{return false;}
+
+	// Spacial
+	Transform *getTransform() const{return NULL;}
 	Bound *getBound() const{return mBound;}
+	Transform *getWorldTransform() const{return NULL;}
+	Bound *getWorldBound() const{return mWorldBound;}
+	void transformChanged(Transform *transform);
 
 	// Visible
 	bool getRendered() const{return mRendered;}
@@ -106,6 +112,7 @@ protected:
 	IndexData::ptr mIndexData;
 	RenderState::ptr mSharedRenderState;
 	Bound::ptr mBound;
+	Bound::ptr mWorldBound;
 };
 
 }

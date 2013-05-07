@@ -84,6 +84,7 @@ void MeshComponent::destroy(){
 
 void MeshComponent::parentChanged(Node *node){
 	if(mParent!=NULL){
+		mParent->spacialRemoved(this);
 		mParent->visibleRemoved(this);
 
 		if(mSkeleton!=NULL){
@@ -94,6 +95,7 @@ void MeshComponent::parentChanged(Node *node){
 	BaseComponent::parentChanged(node);
 	
 	if(mParent!=NULL){
+		mParent->spacialAttached(this);
 		mParent->visibleAttached(this);
 
 		if(mSkeleton!=NULL){
@@ -227,7 +229,9 @@ void MeshComponent::transformChanged(Transform *transform){
 		}
 	}
 
-	mParent->boundChanged();
+	if(transform==mTransform){
+		mParent->boundChanged();
+	}
 }
 
 RenderState::ptr MeshComponent::getSharedRenderState(){

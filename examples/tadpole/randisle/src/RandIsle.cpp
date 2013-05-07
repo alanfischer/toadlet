@@ -38,6 +38,9 @@ public:
 
 			float t=float((i-mNext+mSkip)%mSkip)/float(mSkip);
 			t = 1.0 - (t - scene->getLogicFraction()/float(mSkip));
+			if(mSnowData[i].traceTime>0){
+				t = Math::clamp(0, Math::ONE, t / mSnowData[i].traceTime);
+			}
 			Math::lerp(position,mSnowData[i].oldPosition,mSnowData[i].newPosition,t);
 
 			p->x=position.x;p->y=position.y;p->z=position.z;
@@ -54,7 +57,11 @@ public:
 			Vector3 velocity(p->vx,p->vy,p->vz);
 
 			float t=float((i-mNext+mSkip)%mSkip)/float(mSkip);
-			Math::lerp(position,mSnowData[i].oldPosition,mSnowData[i].newPosition,1.0-t);
+			t = 1.0 - t;
+			if(mSnowData[i].traceTime>0){
+				t = Math::clamp(0, Math::ONE, t / mSnowData[i].traceTime);
+			}
+			Math::lerp(position,mSnowData[i].oldPosition,mSnowData[i].newPosition,t);
 
 			if((i%mSkip)==mNext){
 				Segment segment;
@@ -63,6 +70,7 @@ public:
 
 				PhysicsCollision result;
 				scene->getPhysicsManager()->traceSegment(result,segment,-1,NULL);
+				mSnowData[i].traceTime=result.time;
 
 				mSnowData[i].oldPosition=mSnowData[i].newPosition;
 
@@ -87,8 +95,11 @@ public:
 protected:
 	class SnowData{
 	public:
+		SnowData():traceTime(0){}
+
 		Vector3 oldPosition;
 		Vector3 newPosition;
+		scalar traceTime;
 	};
 
 	ParticleComponent::ptr mParticles;
@@ -315,25 +326,24 @@ cc->setLookDir(Vector3(0,0,0),Vector3(0,1,0),Vector3(0,0,1));
 		joyDevice->setListener(this);
 		joyDevice->start();
 	}
-
+/*
 	Node::ptr snow=new Node(mScene);
 	{
 		ParticleComponent::ptr particles=new ParticleComponent(mScene);
-		particles->setNumParticles(5000,ParticleComponent::ParticleType_SPRITE,1);
+		particles->setNumParticles(2000,ParticleComponent::ParticleType_SPRITE,1);
 		particles->setMaterial(Resources::instance->acorn);
 		Random r;
 		for(int i=0;i<particles->getNumParticles();++i){
 			ParticleComponent::Particle *p=particles->getParticle(i);
 			p->x=r.nextFloat(-100,100);p->y=r.nextFloat(-100,100);p->z=200;
-			p->vz=-15;
+			p->vx=r.nextFloat(-1,1);p->vy=r.nextFloat(-1,1);p->vz=r.nextFloat(0,-15);
 		}
 		snow->attach(particles);
 
 		snow->attach(new SnowComponent(particles,50));
 	}
-	snow->setName("snow");
 	mScene->getRoot()->attach(snow);
-
+*/
 	Log::debug("RandIsle::create finished");
 }
 
@@ -366,13 +376,15 @@ void RandIsle::destroy(){
 }
 
 void RandIsle::render(){
+	TOADLET_PROFILE_AUTOSCOPE();
+
 	Matrix4x4 matrix;
 
 	Vector3 position=mCamera->getPosition();
 	Vector3 forward=mCamera->getForward();
 	Vector3 up=mCamera->getUp();
 
-	if(mRefractCamera!=NULL){
+	if(false &&mRefractCamera!=NULL){
 		mRefractCamera->setProjectionMatrix(mCamera->getProjectionMatrix());
 		mRefractCamera->setLookDir(position,forward,up);
 		matrix.reset();
@@ -385,7 +397,7 @@ void RandIsle::render(){
 	forward.z*=-1;
 	up.z*=-1;
 
-	if(mReflectCamera!=NULL){
+	if(false &&mReflectCamera!=NULL){
 		mReflectCamera->setProjectionMatrix(mCamera->getProjectionMatrix());
 		mReflectCamera->setLookDir(position,forward,up);
 		matrix.reset();
@@ -420,6 +432,8 @@ void RandIsle::update(int dt){
 }
 
 void RandIsle::logicUpdate(int dt){
+	TOADLET_PROFILE_AUTOSCOPE();
+
 	PathClimber *climber=(PathClimber*)mPlayer->getChild("climber");
 	PhysicsComponent *physics=mPlayer->getPhysics();
 
@@ -483,6 +497,8 @@ void RandIsle::logicUpdate(int dt){
 }
 
 void RandIsle::frameUpdate(int dt){
+	TOADLET_PROFILE_AUTOSCOPE();
+
 	mScene->frameUpdate(dt);
 }
 

@@ -79,12 +79,14 @@ void SkeletonComponent::destroy(){
 
 void SkeletonComponent::parentChanged(Node *node){
 	if(mParent!=NULL){
+		mParent->spacialRemoved(this);
 		mParent->animatableRemoved(this);
 	}
 
 	BaseComponent::parentChanged(node);
 
 	if(mParent!=NULL){
+		mParent->spacialAttached(this);
 		mParent->animatableAttached(this);
 	}
 }
@@ -182,7 +184,9 @@ void SkeletonComponent::transformChanged(Transform *transform){
 	mWorldTransform->setTransform(mParent->getWorldTransform(),mTransform);
 	mWorldBound->transform(mBound,mWorldTransform);
 
-	mParent->boundChanged();
+	if(transform==mTransform){
+		mParent->boundChanged();
+	}
 }
 
 int SkeletonComponent::updateBoneTransformation(Bone *bone){

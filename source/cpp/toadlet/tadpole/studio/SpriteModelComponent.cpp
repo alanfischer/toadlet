@@ -46,6 +46,7 @@ SpriteModelComponent::SpriteModelComponent(Engine *engine):
 	mRendered=true;
 	mIndexData=new IndexData(IndexData::Primitive_TRISTRIP,NULL,0,4);
 	mBound=new Bound();
+	mWorldBound=new Bound();
 }
 
 void SpriteModelComponent::destroy(){
@@ -73,6 +74,7 @@ void SpriteModelComponent::destroy(){
 
 void SpriteModelComponent::parentChanged(Node *node){
 	if(mParent!=NULL){
+		mParent->spacialRemoved(this);
 		mParent->visibleRemoved(this);
 		mParent->animatableRemoved(this);
 	}
@@ -80,6 +82,7 @@ void SpriteModelComponent::parentChanged(Node *node){
 	BaseComponent::parentChanged(node);
 
 	if(mParent!=NULL){
+		mParent->spacialAttached(this);
 		mParent->visibleAttached(this);
 		mParent->animatableAttached(this);
 	}
@@ -133,6 +136,14 @@ void SpriteModelComponent::setModel(SpriteModel *model){
 
 		vba.unlock();
 	}
+}
+
+void SpriteModelComponent::transformChanged(Transform *transform){
+	if(mParent==NULL){
+		return;
+	}
+
+	mWorldBound->transform(mBound,mParent->getWorldTransform());
 }
 
 RenderState::ptr SpriteModelComponent::getSharedRenderState(){

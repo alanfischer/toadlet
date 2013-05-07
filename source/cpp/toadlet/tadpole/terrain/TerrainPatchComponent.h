@@ -32,7 +32,7 @@ namespace toadlet{
 namespace tadpole{
 namespace terrain{
 
-class TOADLET_API TerrainPatchComponent:public BaseComponent,public Visible,Renderable,public PhysicsTraceable{
+class TOADLET_API TerrainPatchComponent:public BaseComponent,public Spacial,public Visible,public Renderable,public PhysicsTraceable{
 public:
 	TOADLET_OBJECT(TerrainPatchComponent);
 
@@ -125,7 +125,12 @@ public:
 	int getNumLayers(){return mLayerTextures.size();}
 	Texture::ptr getLayerTexture(int i){return mLayerTextures[i];}
 
+	// Spacial
+	Transform *getTransform() const{return NULL;}
 	Bound *getBound() const{return mBound;}
+	Transform *getWorldTransform() const{return NULL;}
+	Bound *getWorldBound() const{return mWorldBound;}
+	void transformChanged(Transform *transform);
 
 	// Visible
 	bool getRendered() const{return true;}
@@ -232,7 +237,9 @@ protected:
 
 	Engine *mEngine;
 	Scene *mScene;
+
 	Bound::ptr mBound;
+	Bound::ptr mWorldBound;
 
 	int mSize;
 	Collection<Vertex> mVertexes;

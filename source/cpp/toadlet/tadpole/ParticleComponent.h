@@ -35,6 +35,7 @@
 #include <toadlet/tadpole/Camera.h>
 #include <toadlet/tadpole/Renderable.h>
 #include <toadlet/tadpole/Visible.h>
+#include <toadlet/tadpole/Spacial.h>
 #include <toadlet/tadpole/Scene.h>
 #include <toadlet/tadpole/material/Material.h>
 
@@ -47,7 +48,7 @@ namespace tadpole{
 // SPRITE - particles are rendered using 4 points and oriented towards the camera
 // BEAM - particles are rendered as beams that take up 2 or more particles
 // The vx,vy,vz in the Particle class are only used for alignment, this class provides no simulation of particles.
-class TOADLET_API ParticleComponent:public BaseComponent,public TransformListener,public Renderable,public Visible{
+class TOADLET_API ParticleComponent:public BaseComponent,public TransformListener,public Renderable,public Visible,public Spacial{
 public:
 	TOADLET_OBJECT(ParticleComponent);
 
@@ -102,12 +103,14 @@ public:
 
 	void frameUpdate(int dt,int scope);
 
+	void updateBound();
+
+	// Spacial
 	void setTransform(Transform *transform);
 	Transform *getTransform() const{return mTransform;}
-
-	void updateBound();
 	Bound *getBound() const{return mBound;}
-
+	Transform *getWorldTransform() const{return mWorldTransform;}
+	Bound *getWorldBound() const{return mWorldBound;}
 	void transformChanged(Transform *transform);
 
 	// Visible

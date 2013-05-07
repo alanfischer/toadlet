@@ -36,8 +36,6 @@ namespace tadpole{
 
 Node::Node(Scene *scene):BaseComponent(),
 	mUniqueHandle(0),
-
-	//mParent,
 	mParentData(NULL),
 
 	mChildrenActive(false),
@@ -48,7 +46,6 @@ Node::Node(Scene *scene):BaseComponent(),
 
 	mActive(false),
 	mDeactivateCount(0),
-	mTransformUpdatedFrame(0),
 
 	//mTransform,
 	//mBound,
@@ -64,15 +61,12 @@ Node::Node(Scene *scene):BaseComponent(),
 
 	mActive=true;
 	mDeactivateCount=0;
-	mTransformUpdatedFrame=-1;
 
 	mTransform=new Transform();
 	mTransform->setTransformListener(this);
 	mBound=new Bound();
 	mWorldTransform=new Transform();
 	mWorldBound=new Bound();
-	mComponentBound=new Bound();
-	mComponentWorldBound=new Bound();
 	mScope=-1;
 
 	if(scene!=NULL){
@@ -144,6 +138,8 @@ bool Node::remove(Component *component){
 void Node::nodeAttached(Node *node){
 	mNodes.add(node);
 	mComponents.remove(node);
+
+	node->transformChanged(node->mTransform); // Trigger bound updating
 }
 
 void Node::nodeRemoved(Node *node){
@@ -231,6 +227,16 @@ bool Node::getActionActive(const String &action){
 	return false;
 }
 
+void Node::spacialAttached(Spacial *spacial){
+	mSpacials.add(spacial);
+
+	spacial->transformChanged(spacial->getTransform());
+}
+
+void Node::spacialRemoved(Spacial *spacial){
+	mSpacials.remove(spacial);
+}
+
 void Node::visibleAttached(Visible *visible){
 	mVisibles.add(visible);
 }
@@ -264,16 +270,13 @@ void Node::physicsRemoved(PhysicsComponent *physics){
 }
 
 void Node::parentChanged(Node *node){
-	Node *parent=mParent;
+	if(mParent!=NULL){
+		mParent->nodeRemoved(this);
+	}
 	
 	BaseComponent::parentChanged(node);
 
-	if(parent!=NULL){
-		parent->nodeRemoved(this);
-	}
 	if(mParent!=NULL){
-		updateWorldSpacial();
-
 		mParent->nodeAttached(this);
 	}
 }
@@ -328,14 +331,14 @@ void Node::setTransform(Transform *transform){
 
 void Node::setBound(Bound *bound){
 	mBound->set(bound);
+
+	boundChanged();
 }
 
 void Node::logicUpdate(int dt,int scope){
 	TOADLET_PROFILE_AUTOSCOPE();
 
 	int i;
-
-	updateTransform();
 
 	if(mActivateChildren){
 		for(i=0;i<mNodes.size();++i){
@@ -352,8 +355,6 @@ void Node::logicUpdate(int dt,int scope){
 		mChildrenActive|=component->getActive();
 	}
 
-	updateComponentBound();
-
 	for(i=0;i<mNodes.size();++i){
 		Node *node=mNodes[i];
 		node->logicUpdate(dt,scope);
@@ -361,7 +362,6 @@ void Node::logicUpdate(int dt,int scope){
 		if(node->getActive() && (node->getScope()&scope)!=0){
 			node->tryDeactivate();
 		}
-		mergeWorldBound(node,false);
 	}
 }
 
@@ -369,20 +369,14 @@ void Node::frameUpdate(int dt,int scope){
 	TOADLET_PROFILE_AUTOSCOPE();
 
 	int i;
-
-	updateTransform();
-
 	for(i=0;i<mComponents.size();++i){
 		Component *component=mComponents[i];
 		component->frameUpdate(dt,scope);
 	}
 
-	updateComponentBound();
-
 	for(i=0;i<mNodes.size();++i){
 		Node *node=mNodes[i];
 		node->frameUpdate(dt,scope);
-		mergeWorldBound(node,false);
 	}
 }
 
@@ -396,10 +390,6 @@ bool Node::handleEvent(Event *event){
 		result|=mNodes[i]->handleEvent(event);
 	}
 	return result;
-}
-
-void Node::mergeWorldBound(Node *child,bool justAttached){
-	mWorldBound->merge(child->getWorldBound(),mScene->getEpsilon());
 }
 
 void Node::setStayActive(bool active){
@@ -455,83 +445,72 @@ void Node::tryDeactivate(){
 	}
 }
 
-bool Node::getTransformUpdated(){return mScene->getFrame()==mTransformUpdatedFrame;}
+void Node::transformChanged(Transform *transform){
+	TOADLET_PROFILE_AUTOSCOPE();
 
-void Node::updateTransform(){
 	if(mParent==NULL){
 		mWorldTransform->set(mTransform);
-	}
-	else if(mTransformUpdatedFrame==-1){
-		mWorldTransform->set(mParent->mWorldTransform);
 	}
 	else{
 		mWorldTransform->setTransform(mParent->mWorldTransform,mTransform);
 	}
 
 	int i;
-	for(i=0;i<mComponents.size();++i){
-		mComponents[i]->transformChanged(mWorldTransform);
-	}
-}
-
-void Node::updateComponentBound(){
-	mWorldBound->transform(mBound,mWorldTransform);
-	mComponentBound->reset();
-	int i;
-	for(i=0;i<mComponents.size();++i){
-		Component *component=mComponents[i];
-		Transform *transform=component->getTransform();
-		Bound *bound=component->getBound();
-		if(bound!=NULL){
-			if(transform!=NULL){
-				mComponentWorldBound->transform(bound,transform);
-				mComponentBound->merge(mComponentWorldBound,mScene->getEpsilon());
-			}
-			else{
-				mComponentBound->merge(bound,mScene->getEpsilon());
-			}
-		}
-	}
-	mComponentWorldBound->transform(mComponentBound,mWorldTransform);
-	mWorldBound->merge(mComponentWorldBound,mScene->getEpsilon());
-}
-
-void Node::updateNodeBound(){
-	int i;
 	for(i=0;i<mNodes.size();++i){
-		Node *node=mNodes[i];
-		mWorldBound->merge(node->getWorldBound(),mScene->getEpsilon());
+		mNodes[i]->transformChanged(mWorldTransform);
 	}
-}
-
-void Node::updateWorldSpacial(){
-	updateTransform();
-	updateComponentBound();
-	updateNodeBound();
-
-	if(mParent!=NULL){
-		mParent->mergeWorldBound(this,false);
-	}
-}
-
-void Node::transformChanged(Transform *transform){
-	if(mScene!=NULL){
-		mTransformUpdatedFrame=mScene->getFrame();
+	for(i=0;i<mSpacials.size();++i){
+		mSpacials[i]->transformChanged(mWorldTransform);
 	}
 
-	int i;
-	for(i=0;i<mComponents.size();++i){
-		mComponents[i]->transformChanged(transform);
+	if(transform==mTransform){
+		boundChanged();
 	}
-
-	activate();
+	else{
+		calculateBound();
+	}
 }
 
 void Node::boundChanged(){
-	activate();
+	calculateBound();
+
+	if(mParent!=NULL){
+		mParent->nodeBoundChanged(this);
+	}
+}
+
+void Node::nodeBoundChanged(Node *node){
+	boundChanged();
+}
+
+void Node::calculateBound(){
+	TOADLET_PROFILE_AUTOSCOPE();
+
+	/// @todo: We need to rework this so it doesn't rebuild the bounds every time a child transform is changed.  For a root node of an active scene, that will get very (almost) pointlessly expensive
+	{
+		mWorldBound->transform(mBound,mWorldTransform);
+
+		scalar epsilon=mScene!=NULL?mScene->getEpsilon():0;
+
+		int i;
+		for(i=0;i<mNodes.size();++i){
+			Node *node=mNodes[i];
+			mWorldBound->merge(node->getWorldBound(),epsilon);
+		}
+
+		for(i=0;i<mSpacials.size();++i){
+			Spacial *spacial=mSpacials[i];
+			Bound *bound=spacial->getWorldBound();
+			if(bound!=NULL){
+				mWorldBound->merge(bound,epsilon);
+			}
+		}
+	}
 }
 
 void Node::gatherRenderables(Camera *camera,RenderableSet *set){
+	TOADLET_PROFILE_AUTOSCOPE();
+
 	int i;
 
 	set->queueNode(this);

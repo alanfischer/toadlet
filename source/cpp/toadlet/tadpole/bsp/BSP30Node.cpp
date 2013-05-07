@@ -121,7 +121,7 @@ void BSP30Node::nodeAttached(Node *node){
 
 	if(mMap!=NULL){
 		Collection<int> &newIndexes=((childdata*)node->getParentData())->leafs;
-		/// @todo: Is this initial placement necessary, or will this get taken care of by the mergeWorldBounds at the end of the node attachment?
+
 		findBoundLeafs(newIndexes,node);
 		insertNodeLeafIndexes(newIndexes,node);
 	}
@@ -159,13 +159,6 @@ void BSP30Node::removeNodeLeafIndexes(const Collection<int> &indexes,Node *node)
 		else{
 			mLeafData[indexes[i]].occupants.remove(node);
 		}
-	}
-}
-
-void BSP30Node::mergeWorldBound(Node *child,bool justAttached){
-	Node::mergeWorldBound(child,justAttached);
-	if(justAttached || child->getTransformUpdated()){
-		childTransformUpdated(child);
 	}
 }
 
@@ -405,7 +398,9 @@ void BSP30Node::render(RenderManager *manager) const{
 	}
 }
 
-void BSP30Node::childTransformUpdated(Node *child){
+void BSP30Node::nodeBoundChanged(Node *child){
+	Node::nodeBoundChanged(child);
+
 	if(mMap==NULL || child->getParentData()==NULL){
 		return;
 	}

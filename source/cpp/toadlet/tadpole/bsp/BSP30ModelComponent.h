@@ -38,7 +38,7 @@ namespace toadlet{
 namespace tadpole{
 namespace bsp{
 
-class TOADLET_API BSP30ModelComponent:public BaseComponent,public Visible,public PhysicsTraceable{
+class TOADLET_API BSP30ModelComponent:public BaseComponent,public Spacial,public Visible,public PhysicsTraceable{
 public:
 	TOADLET_OBJECT(BSP30ModelComponent);
 
@@ -80,7 +80,13 @@ public:
 	void showPlanarFaces(int plane);
 
 	bool getActive() const{return false;}
+
+	// Spacial
+	Transform *getTransform() const{return NULL;}
 	Bound *getBound() const{return mBound;}
+	Transform *getWorldTransform() const{return NULL;}
+	Bound *getWorldBound() const{return mWorldBound;}
+	void transformChanged(Transform *transform);
 
 	// Visible
 	bool getRendered() const{return mRendered;}
@@ -95,6 +101,7 @@ public:
 protected:
 	Engine *mEngine;
 	Bound::ptr mBound;
+	Bound::ptr mWorldBound;
 	BSP30Map::ptr mMap;
 	int mModelIndex;
 	Collection<SubModel::ptr> mSubModels;

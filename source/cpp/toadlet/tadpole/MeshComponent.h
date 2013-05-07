@@ -31,12 +31,13 @@
 #include <toadlet/tadpole/Mesh.h>
 #include <toadlet/tadpole/Renderable.h>
 #include <toadlet/tadpole/Visible.h>
+#include <toadlet/tadpole/Spacial.h>
 #include <toadlet/tadpole/SkeletonComponent.h>
 
 namespace toadlet{
 namespace tadpole{
 
-class TOADLET_API MeshComponent:public BaseComponent,public TransformListener,public Visible,public Attachable{
+class TOADLET_API MeshComponent:public BaseComponent,public TransformListener,public Spacial,public Visible,public Attachable{
 public:
 	TOADLET_INTERFACE(MeshComponent);
 
@@ -91,14 +92,15 @@ public:
 
 	void frameUpdate(int dt,int scope);
 
+	bool getActive() const{return mSkeleton!=NULL;}
+
+	// Spacial
 	void setTransform(Transform *transform);
 	Transform *getTransform() const{return mTransform;}
-
 	Bound *getBound() const{return mBound;}
-
+	Transform *getWorldTransform() const{return mWorldTransform;}
+	Bound *getWorldBound() const{return mWorldBound;}
 	void transformChanged(Transform *transform);
-
-	bool getActive() const{return mSkeleton!=NULL;}
 
 	// Visible
 	bool getRendered() const{return mRendered;}
@@ -111,10 +113,6 @@ public:
 	String getAttachmentName(int index){return mSkeleton!=NULL?mSkeleton->getAttachmentName(index):(char*)NULL;}
 	int getAttachmentIndex(const String &name){return mSkeleton!=NULL?mSkeleton->getAttachmentIndex(name):0;}
 	bool getAttachmentTransform(Transform *result,int index){return mSkeleton!=NULL?mSkeleton->getAttachmentTransform(result,index):false;}
-
-	// SubMesh::Renderable
-	Transform *getWorldTransform() const{return mWorldTransform;}
-	Bound *getWorldBound() const{return mWorldBound;}
 
 	void createVertexBuffer();
 	void updateVertexBuffer();

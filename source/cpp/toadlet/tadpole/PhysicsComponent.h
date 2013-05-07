@@ -28,13 +28,14 @@
 
 #include <toadlet/tadpole/Component.h>
 #include <toadlet/tadpole/Bound.h>
+#include <toadlet/tadpole/Spacial.h>
 #include <toadlet/tadpole/PhysicsTraceable.h>
 #include <toadlet/tadpole/PhysicsCollisionListener.h>
 
 namespace toadlet{
 namespace tadpole{
 
-class TOADLET_API PhysicsComponent:public Component{
+class TOADLET_API PhysicsComponent:public Component,public Spacial{
 public:
 	TOADLET_INTERFACE(PhysicsComponent);
 

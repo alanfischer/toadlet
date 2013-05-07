@@ -56,6 +56,7 @@ BSP30ModelComponent::BSP30ModelComponent(Engine *engine):
 {
 	mEngine=engine;
 	mBound=new Bound();
+	mWorldBound=new Bound();
 	mModelIndex=-1;
 	mRendered=true;
 }
@@ -77,6 +78,7 @@ void BSP30ModelComponent::destroy(){
 
 void BSP30ModelComponent::parentChanged(Node *node){
 	if(mParent!=NULL){
+		mParent->spacialRemoved(this);
 		mParent->visibleRemoved(this);
 		PhysicsComponent *physics=mParent->getPhysics();
 		if(physics!=NULL){
@@ -87,6 +89,7 @@ void BSP30ModelComponent::parentChanged(Node *node){
 	BaseComponent::parentChanged(node);
 
 	if(mParent!=NULL){
+		mParent->spacialAttached(this);
 		mParent->visibleAttached(this);
 		PhysicsComponent *physics=mParent->getPhysics();
 		if(physics!=NULL){
@@ -177,6 +180,14 @@ void BSP30ModelComponent::showPlanarFaces(int plane){
 			face=face->next;
 		}
 	}
+}
+
+void BSP30ModelComponent::transformChanged(Transform *transform){
+	if(mParent==NULL){
+		return;
+	}
+
+	mWorldBound->transform(mBound,mParent->getWorldTransform());
 }
 
 void BSP30ModelComponent::gatherRenderables(Camera*camera,RenderableSet *set){

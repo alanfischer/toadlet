@@ -45,8 +45,7 @@ HopComponent::HopComponent(HopManager *manager):
 	mSolid->setCollisionListener(this);
 
 	mBound=new Bound();
-
-	setName("physics");
+	mWorldBound=new Bound();
 }
 
 void HopComponent::destroy(){
@@ -56,18 +55,20 @@ void HopComponent::destroy(){
 void HopComponent::parentChanged(Node *node){
 	if(mParent!=NULL){
 		mParent->physicsRemoved(this);
+		mParent->spacialRemoved(this);
 	}
 
 	BaseComponent::parentChanged(node);
 
 	if(mParent!=NULL){
 		mParent->physicsAttached(this);
+		mParent->spacialAttached(this);
 
 		mOldPosition.set(mSolid->getPosition());
 		mNewPosition.set(mOldPosition);
 		lerpPosition(0);
 
-		mParent->updateWorldSpacial();
+		mParent->boundChanged();
 	}
 }
 
@@ -170,6 +171,10 @@ void HopComponent::lerpPosition(scalar fraction){
 }
 
 void HopComponent::transformChanged(Transform *transform){
+	if(mParent==NULL){
+		return;
+	}
+
 	const Vector3 &translate=mParent->getTransform()->getTranslate();
 	if(mCurrentPosition.equals(translate)==false){
 		mOldPosition.set(translate);
@@ -177,6 +182,8 @@ void HopComponent::transformChanged(Transform *transform){
 		mCurrentPosition.set(translate);
 
 		mBound->set(mSolid->getLocalBound());
+
+		mWorldBound->transform(mBound,mParent->getWorldTransform());
 
 		mTransformChanged=true;
 	}

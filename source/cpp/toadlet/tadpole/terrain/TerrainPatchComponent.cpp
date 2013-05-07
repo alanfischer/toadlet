@@ -51,7 +51,9 @@ TerrainPatchComponent::TerrainPatchComponent(Scene *scene):
 {
 	mScene=scene;
 	mEngine=scene->getEngine();
+
 	mBound=new Bound();
+	mWorldBound=new Bound();
 
 	// Epsilon for tracing against planes
 	mEpsilon=0.03125/16;
@@ -114,12 +116,14 @@ void TerrainPatchComponent::destroy(){
 
 void TerrainPatchComponent::parentChanged(Node *node){
 	if(mParent!=NULL){
+		mParent->spacialRemoved(this);
 		mParent->visibleRemoved(this);
 	}
 
 	BaseComponent::parentChanged(node);
 
 	if(mParent!=NULL){
+		mParent->spacialAttached(this);
 		mParent->visibleAttached(this);
 	}
 }
@@ -620,6 +624,14 @@ bool TerrainPatchComponent::unstitchFromBottom(TerrainPatchComponent *terrain){
 void TerrainPatchComponent::setWaterLevel(scalar level){
 	mWaterLevel=level;
 	mWaterTransform->setTranslate(0,0,level);
+}
+
+void TerrainPatchComponent::transformChanged(Transform *transform){
+	if(mParent==NULL){
+		return;
+	}
+
+	mWorldBound->transform(mBound,mParent->getWorldTransform());
 }
 
 void TerrainPatchComponent::gatherRenderables(Camera *camera,RenderableSet *set){

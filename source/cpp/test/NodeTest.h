@@ -23,45 +23,11 @@
  *
  ********** Copyright header - do not remove **********/
 
-#include <toadlet/tadpole/CameraComponent.h>
-#include <toadlet/tadpole/Node.h>
+#include <toadlet/tadpole.h>
 
-namespace toadlet{
-namespace tadpole{
+class NodeTest{
+public:
+	bool testNodeTransform();
 
-CameraComponent::CameraComponent(Camera *camera){
-	mCamera=camera;
-}
-
-void CameraComponent::parentChanged(Node *node){
-	if(mParent!=NULL){
-		mParent->spacialRemoved(this);
-	}
-
-	BaseComponent::parentChanged(node);
-
-	if(mParent!=NULL){
-		mParent->spacialAttached(this);
-	}
-}
-
-void CameraComponent::transformChanged(Transform *transform){
-	setCameraFromTransform();
-}
-
-void CameraComponent::setCameraFromTransform(){
-	if(mParent!=NULL){
-		Matrix4x4 matrix;
-		mParent->getWorldTransform()->getMatrix(matrix);
-		mCamera->setWorldMatrix(matrix);
-	}
-}
-
-void CameraComponent::setTransformFromCamera(){
-	if(mParent!=NULL){
-		mParent->setMatrix4x4(mCamera->getWorldMatrix());
-	}
-}
-
-}
-}
+	bool run();
+};

@@ -23,45 +23,33 @@
  *
  ********** Copyright header - do not remove **********/
 
-#include <toadlet/tadpole/CameraComponent.h>
-#include <toadlet/tadpole/Node.h>
+#include "NodeTest.h"
 
-namespace toadlet{
-namespace tadpole{
+bool NodeTest::testNodeTransform(){
+	Node::ptr parent=new Node(NULL);
+	Node::ptr child=new Node(NULL);
+	Node::ptr gchild=new Node(NULL);
 
-CameraComponent::CameraComponent(Camera *camera){
-	mCamera=camera;
+	gchild->setBound(new Bound(Sphere(0)));
+
+	child->attach(gchild);
+	parent->attach(child);
+	
+	gchild->setTranslate(Vector3(0,0,1));
+	child->setTranslate(Vector3(0,0,1));
+	
+	Log::alert(String("GChild translate:")+gchild->getWorldTranslate().z);
+	Log::alert(String("Parent bound:")+parent->getWorldBound()->getSphere().radius);
+
+	return true;
 }
 
-void CameraComponent::parentChanged(Node *node){
-	if(mParent!=NULL){
-		mParent->spacialRemoved(this);
-	}
+bool NodeTest::run(){
+	bool result=false;
 
-	BaseComponent::parentChanged(node);
+	Log::alert("Testing NodeTransform");
+	result=testNodeTransform();
+	Log::alert(result?"Succeeded":"Failed");
 
-	if(mParent!=NULL){
-		mParent->spacialAttached(this);
-	}
-}
-
-void CameraComponent::transformChanged(Transform *transform){
-	setCameraFromTransform();
-}
-
-void CameraComponent::setCameraFromTransform(){
-	if(mParent!=NULL){
-		Matrix4x4 matrix;
-		mParent->getWorldTransform()->getMatrix(matrix);
-		mCamera->setWorldMatrix(matrix);
-	}
-}
-
-void CameraComponent::setTransformFromCamera(){
-	if(mParent!=NULL){
-		mParent->setMatrix4x4(mCamera->getWorldMatrix());
-	}
-}
-
-}
+	return result;
 }

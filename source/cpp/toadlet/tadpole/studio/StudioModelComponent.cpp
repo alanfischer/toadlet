@@ -103,6 +103,7 @@ StudioModelComponent::StudioModelComponent(Engine *engine):
 	mRendered=true;
 	mEngine=engine;
 	mBound=new Bound();
+	mWorldBound=new Bound();
 }
 
 void StudioModelComponent::destroy(){
@@ -126,6 +127,7 @@ void StudioModelComponent::destroy(){
 
 void StudioModelComponent::parentChanged(Node *node){
 	if(mParent!=NULL){
+		mParent->spacialRemoved(this);
 		mParent->visibleRemoved(this);
 		mParent->animatableRemoved(this);
 	}
@@ -133,6 +135,7 @@ void StudioModelComponent::parentChanged(Node *node){
 	BaseComponent::parentChanged(node);
 
 	if(mParent!=NULL){
+		mParent->spacialAttached(this);
 		mParent->visibleAttached(this);
 		mParent->animatableAttached(this);
 	}
@@ -342,6 +345,14 @@ void StudioModelComponent::setLink(StudioModelComponent *link){
 			}
 		}
 	}
+}
+
+void StudioModelComponent::transformChanged(Transform *transform){
+	if(mParent==NULL){
+		return;
+	}
+
+	mWorldBound->transform(mBound,mParent->getWorldTransform());
 }
 
 void StudioModelComponent::traceSegment(PhysicsCollision &result,const Vector3 &position,const Segment &segment,const Vector3 &size){
