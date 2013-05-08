@@ -25,8 +25,30 @@
 
 #include <toadlet/egg/Object.h>
 
+#if defined(TOADLET_THREADSAFE) && !defined(TOADLET_PLATFORM_WIN32)
+	#define TOADLET_COUNT_MUTEX
+#elif defined(TOADLET_THREADSAFE) && defined(TOADLET_PLATFORM_WIN32)
+	#define TOADLET_COUNT_WIN32
+#endif
+
+#if defined(TOADLET_COUNT_MUTEX)
+	#include <toadlet/egg/Mutex.h>
+#elif defined(TOADLET_COUNT_WIN32)
+	#include <windows.h>
+#endif
+
 namespace toadlet{
 namespace egg{
+
+#if defined(TOADLET_COUNT_MUTEX)
+	class SharedData{
+	public:
+		SharedData():count(0){}
+
+		int count;
+		Mutex mutex;
+	};
+#endif
 
 void *Object::operator new(size_t size){
 	return TOADLET_ALIGNED_MALLOC(size,TOADLET_ALIGNED_SIZE);
@@ -35,6 +57,87 @@ void *Object::operator new(size_t size){
 void Object::operator delete(void *p){
 	TOADLET_ALIGNED_FREE(p);
 }
+
+Object::Object():
+	mSharedData(NULL)
+{
+	#if defined(TOADLET_COUNT_MUTEX)
+		mSharedData=new SharedData();
+	#elif defined(TOADLET_COUNT_WIN32)
+		mSharedData=TOADLET_ALIGNED_MALLOC(sizeof(LONG),TOADLET_ALIGNED_SIZE);
+		*(LONG*)mSharedData=0;
+	#else
+		mSharedData=new int(0);
+	#endif
+}
+
+Object::~Object(){
+	#if defined(TOADLET_COUNT_MUTEX)
+		delete mSharedData;
+	#elif defined(TOADLET_COUNT_WIN32)
+		TOADLET_ALIGNED_FREE(mSharedData);
+	#else
+		delete mSharedData;
+	#endif
+}
+
+#if defined(TOADLET_COUNT_MUTEX)
+
+int Object::retain(){
+	int count=0;
+	((SharedData*)mSharedData)->mutex.lock();
+		count=++((SharedData*)mSharedData)->count;
+	((SharedData*)mSharedData)->mutex.unlock();
+	return count;
+}
+
+int Object::release(){
+	int count=0;
+	((SharedData*)mSharedData)->mutex.lock();
+		count=--((SharedData*)mSharedData)->count;
+	((SharedData*)mSharedData)->mutex.unlock();
+	if(count<=0){
+		destroy();
+		delete this;
+	}
+	return count;
+}
+
+#elif defined(TOADLET_COUNT_WIN32)
+
+int Object::retain(){
+	int count=InterlockedIncrement((LONG*)mSharedData);
+	return count;
+}
+
+int Object::release(){
+	int count=InterlockedDecrement((LONG*)mSharedData);
+	if(count<=0){
+		destroy();
+		delete this;
+	}
+	return count;
+}
+
+#else
+
+int Object::retain(){
+	int count=++*(int*)mSharedData;
+	return count;
+}
+
+int Object::release(){
+	int count=--*(int*)mSharedData;
+	if(count<=0){
+		destroy();
+		delete this;
+	}
+	return count;
+}
+
+#endif
+
+
 
 }
 }
