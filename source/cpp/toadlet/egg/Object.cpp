@@ -25,16 +25,20 @@
 
 #include <toadlet/egg/Object.h>
 
-#if defined(TOADLET_THREADSAFE) && !defined(TOADLET_PLATFORM_WIN32)
-	#define TOADLET_COUNT_MUTEX
-#elif defined(TOADLET_THREADSAFE) && defined(TOADLET_PLATFORM_WIN32)
+#if defined(TOADLET_THREADSAFE) && defined(TOADLET_PLATFORM_WIN32)
 	#define TOADLET_COUNT_WIN32
+#elif defined(TOADLET_THREADSAFE) && defined(TOADLET_PLATFORM_OSX)
+	#define TOADLET_COUNT_OSX
+#elif defined(TOADLET_THREADSAFE)
+	#define TOADLET_COUNT_MUTEX
 #endif
 
 #if defined(TOADLET_COUNT_MUTEX)
 	#include <toadlet/egg/Mutex.h>
 #elif defined(TOADLET_COUNT_WIN32)
 	#include <windows.h>
+#elif defined(TOADLET_COUNT_OSX)
+	#include <libkern/OSAtomic.h>
 #endif
 
 namespace toadlet{
@@ -63,9 +67,9 @@ Object::Object():
 {
 	#if defined(TOADLET_COUNT_MUTEX)
 		mSharedData=new SharedData();
-	#elif defined(TOADLET_COUNT_WIN32)
-		mSharedData=TOADLET_ALIGNED_MALLOC(sizeof(LONG),TOADLET_ALIGNED_SIZE);
-		*(LONG*)mSharedData=0;
+	#elif defined(TOADLET_COUNT_WIN32) || defined(TOADLET_COUNT_OSX)
+		mSharedData=TOADLET_ALIGNED_MALLOC(sizeof(int32),TOADLET_ALIGNED_SIZE);
+		*(int32*)mSharedData=0;
 	#else
 		mSharedData=new int(0);
 	#endif
@@ -74,7 +78,7 @@ Object::Object():
 Object::~Object(){
 	#if defined(TOADLET_COUNT_MUTEX)
 		delete mSharedData;
-	#elif defined(TOADLET_COUNT_WIN32)
+	#elif defined(TOADLET_COUNT_WIN32) || defined(TOADLET_COUNT_OSX)
 		TOADLET_ALIGNED_FREE(mSharedData);
 	#else
 		delete mSharedData;
@@ -106,12 +110,28 @@ int Object::release(){
 #elif defined(TOADLET_COUNT_WIN32)
 
 int Object::retain(){
-	int count=InterlockedIncrement((LONG*)mSharedData);
+	int count=InterlockedIncrement((int32*)mSharedData);
 	return count;
 }
 
 int Object::release(){
-	int count=InterlockedDecrement((LONG*)mSharedData);
+	int count=InterlockedDecrement((int32*)mSharedData);
+	if(count<=0){
+		destroy();
+		delete this;
+	}
+	return count;
+}
+	
+#elif defined(TOADLET_COUNT_OSX)
+	
+int Object::retain(){
+	int count=OSAtomicIncrement32((int32*)mSharedData);
+	return count;
+}
+	
+int Object::release(){
+	int count=OSAtomicDecrement32((int32*)mSharedData);
 	if(count<=0){
 		destroy();
 		delete this;
