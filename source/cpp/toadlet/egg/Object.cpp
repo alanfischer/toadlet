@@ -113,7 +113,7 @@ int Object::retain(){
 
 int Object::release(){
 	int count=0;
-	((Mutex*)mSharedData)->.lock();
+	((Mutex*)mSharedData)->lock();
 		count=--mSharedCount;
 	((Mutex*)mSharedData)->unlock();
 	if(count<=0){
