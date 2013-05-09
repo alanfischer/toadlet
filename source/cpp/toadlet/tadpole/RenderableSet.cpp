@@ -102,8 +102,8 @@ void RenderableSet::queueRenderable(Renderable *renderable){
 			int i;
 			for(i=0;i<mLayeredDepthQueueIndexes.size();++i){
 				int index=mLayeredDepthQueueIndexes[i];
-				const RenderableQueue &queue=mRenderableQueues[index];
-				int queueLayer=queue[0].material!=NULL?queue[0].material->getLayer():0;
+				Material *material=mRenderableQueues[index][0].material;
+				int queueLayer=material!=NULL?material->getLayer():0;
 				if(layer<queueLayer) break;
 			}
 			mLayeredDepthQueueIndexes.insert(i,queueIndex);
@@ -137,8 +137,8 @@ void RenderableSet::queueRenderable(Renderable *renderable){
 			int i;
 			for(i=0;i<mLayeredMaterialQueueIndexes.size();++i){
 				int index=mLayeredMaterialQueueIndexes[i];
-				const RenderableQueue &queue=mRenderableQueues[index];
-				int queueLayer=queue[0].material!=NULL?queue[0].material->getLayer():0;
+				Material *material=mRenderableQueues[index][0].material;
+				int queueLayer=material!=NULL?material->getLayer():0;
 				if(layer<queueLayer) break;
 			}
 			mLayeredMaterialQueueIndexes.insert(i,queueIndex);

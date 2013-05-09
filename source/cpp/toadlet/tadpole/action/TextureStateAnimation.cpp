@@ -84,7 +84,7 @@ void TextureStateAnimation::setValue(scalar value){
 		int hint=0;
 		scalar time=mTrack->getKeyFramesAtTime(value,f1,f2,hint);
 
-		VertexBufferAccessor &vba=mTrack->getAccessor();
+		const VertexBufferAccessor &vba=mTrack->getAccessor();
 
 		Vector3 p1,p2,position;
 		Quaternion r1,r2,rotate;

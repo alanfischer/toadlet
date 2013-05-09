@@ -66,14 +66,14 @@ public:
 	void compile();
 
 	int getNumBones() const{return mBones.size();}
-	virtual void addBone(Bone *bone){mBones.add(bone);}
-	virtual void removeBone(int i){mBones.removeAt(i);}
-	Bone::ptr getBone(int i){return mBones[i];}
-	Bone::ptr getBone(const String &name);
+	void addBone(Bone *bone){mBones.add(bone);}
+	void removeBone(int i){mBones.removeAt(i);}
+	Bone *getBone(int i) const{return mBones[i];}
+	Bone *getBone(const String &name) const;
 
 	int getNumSequences() const{return mSequences.size();}
-	virtual void addSequence(Sequence *sequence){mSequences.add(sequence);}
-	virtual void removeSequence(int i){mSequences.removeAt(i);}
+	void addSequence(Sequence *sequence){mSequences.add(sequence);}
+	void removeSequence(int i){mSequences.removeAt(i);}
 	Sequence *getSequence(int i){return mSequences[i];}
 
 protected:

@@ -125,7 +125,7 @@ public:
 		inline int getStructSize() const{return mStructVariables.size();}
 
 		inline void setStructVariable(int i,Variable::ptr variable){mStructVariables[i]=variable;}
-		inline Variable::ptr getStructVariable(int i) const{return mStructVariables[i];}
+		inline const Variable::ptr &getStructVariable(int i) const{return mStructVariables[i];}
 
 	protected:
 		String mName;
@@ -165,10 +165,10 @@ public:
 	inline int getStructSize() const{return mStructVariable->getStructSize();}
 
 	inline void setStructVariable(int i,Variable::ptr variable){mStructVariable->setStructVariable(i,variable);}
-	inline Variable::ptr getStructVariable(int i) const{return mStructVariable->getStructVariable(i);}
+	inline const Variable::ptr &getStructVariable(int i) const{return mStructVariable->getStructVariable(i);}
 
 	inline int getSize() const{return mFlatVariables.size();}
-	inline Variable::ptr getVariable(int i) const{return mFlatVariables[i];}
+	inline const Variable::ptr &getVariable(int i) const{return mFlatVariables[i];}
 
 	void compile();
 

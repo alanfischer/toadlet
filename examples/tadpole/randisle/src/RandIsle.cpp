@@ -441,20 +441,6 @@ void RandIsle::logicUpdate(int dt){
 
 //	updateDanger(dt);
 
-	{
-		Vector3 windVector(0,0.1f,0);
-		float waveLength=0.1f;
-		float time=mScene->getTime()/1000.0f;
-		TextureState state;
-		state.calculation=TextureState::CalculationType_NORMAL;
-		Math::setMatrix4x4FromTranslateRotateScale(state.matrix,time*windVector,Quaternion(),Vector3(1.0/waveLength,1.0/waveLength,1.0/waveLength));
-
-		Shader::ShaderType type=(Shader::ShaderType)0;
-		int index=0;
-		Resources::instance->waterMaterial->getPass()->findTexture(type,index,"waveTex");
-		Resources::instance->waterMaterial->getPass()->setTextureState(type,index,state);
-	}
-
 	updateProps();
 
 	scalar offset=mPlayer->getBound()->getAABox().getMins().z-2;
@@ -498,6 +484,20 @@ void RandIsle::logicUpdate(int dt){
 
 void RandIsle::frameUpdate(int dt){
 	TOADLET_PROFILE_AUTOSCOPE();
+
+	{
+		Vector3 windVector(0,0.1f,0);
+		float waveLength=0.1f;
+		float time=Math::fromMilli(mScene->getTime());
+		TextureState state;
+		state.calculation=TextureState::CalculationType_NORMAL;
+		Math::setMatrix4x4FromTranslateRotateScale(state.matrix,time*windVector,Quaternion(),Vector3(1.0/waveLength,1.0/waveLength,1.0/waveLength));
+
+		Shader::ShaderType type=(Shader::ShaderType)0;
+		int index=0;
+		Resources::instance->waterMaterial->getPass()->findTexture(type,index,"waveTex");
+		Resources::instance->waterMaterial->getPass()->setTextureState(type,index,state);
+	}
 
 	mScene->frameUpdate(dt);
 }

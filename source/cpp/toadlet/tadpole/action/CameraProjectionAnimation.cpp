@@ -73,7 +73,7 @@ void CameraProjectionAnimation::setValue(scalar value){
 		int hint=0;
 		scalar time=mTrack->getKeyFramesAtTime(value,f1,f2,hint);
 
-		VertexBufferAccessor &vba=mTrack->getAccessor();
+		const VertexBufferAccessor &vba=mTrack->getAccessor();
 
 		Vector2 lr1,lr2,lr;
 		vba.get2(f1,mElements[0],lr1);

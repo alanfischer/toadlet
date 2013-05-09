@@ -58,7 +58,7 @@ void TransformAnimation::setValue(scalar value){
 	mValue=value;
 	scalar t=mTrack->getKeyFramesAtTime(mValue,f1,f2,mHint);
 
-	VertexBufferAccessor &vba=mTrack->getAccessor();
+	const VertexBufferAccessor &vba=mTrack->getAccessor();
 
 	Vector3 t1,t2,translate;
 	vba.get3(f1,0,t1);

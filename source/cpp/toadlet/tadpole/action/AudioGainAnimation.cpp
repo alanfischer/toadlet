@@ -60,7 +60,7 @@ void AudioGainAnimation::setValue(scalar value){
 		int hint=0;
 		scalar time=mTrack->getKeyFramesAtTime(value,f1,f2,hint);
 
-		VertexBufferAccessor &vba=mTrack->getAccessor();
+		const VertexBufferAccessor &vba=mTrack->getAccessor();
 
 		float v1,v2,v;
 		v1=vba.get(f1,0);

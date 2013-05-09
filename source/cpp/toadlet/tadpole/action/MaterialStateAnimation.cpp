@@ -68,7 +68,7 @@ void MaterialStateAnimation::setValue(scalar value){
 		int hint=0;
 		scalar time=mTrack->getKeyFramesAtTime(value,f1,f2,hint);
 
-		VertexBufferAccessor &vba=mTrack->getAccessor();
+		const VertexBufferAccessor &vba=mTrack->getAccessor();
 
 		Vector4 c1,c2,color;
 		vba.get4(f1,mElement,c1);
