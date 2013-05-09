@@ -33,26 +33,18 @@
 	#define TOADLET_COUNT_MUTEX
 #endif
 
-#if defined(TOADLET_COUNT_MUTEX)
-	#include <toadlet/egg/Mutex.h>
-#elif defined(TOADLET_COUNT_WIN32)
+#if defined(TOADLET_COUNT_WIN32)
 	#include <windows.h>
 #elif defined(TOADLET_COUNT_OSX)
 	#include <libkern/OSAtomic.h>
+#elif defined(TOADLET_COUNT_MUTEX)
+	#include <toadlet/egg/Mutex.h>
 #endif
+
+// mSharedCount will always be aligned on TOADLET_ALIGNED_SIZE, due to the Object's new operator
 
 namespace toadlet{
 namespace egg{
-
-#if defined(TOADLET_COUNT_MUTEX)
-	class SharedData{
-	public:
-		SharedData():count(0){}
-
-		int count;
-		Mutex mutex;
-	};
-#endif
 
 void *Object::operator new(size_t size){
 	return TOADLET_ALIGNED_MALLOC(size,TOADLET_ALIGNED_SIZE);
@@ -63,59 +55,29 @@ void Object::operator delete(void *p){
 }
 
 Object::Object():
+	mSharedCount(0),
 	mSharedData(NULL)
 {
 	#if defined(TOADLET_COUNT_MUTEX)
-		mSharedData=new SharedData();
-	#elif defined(TOADLET_COUNT_WIN32) || defined(TOADLET_COUNT_OSX)
-		mSharedData=TOADLET_ALIGNED_MALLOC(sizeof(int32),TOADLET_ALIGNED_SIZE);
-		*(int32*)mSharedData=0;
-	#else
-		mSharedData=new int(0);
+		mSharedData=new Mutex();
 	#endif
 }
 
 Object::~Object(){
 	#if defined(TOADLET_COUNT_MUTEX)
-		delete mSharedData;
-	#elif defined(TOADLET_COUNT_WIN32) || defined(TOADLET_COUNT_OSX)
-		TOADLET_ALIGNED_FREE(mSharedData);
-	#else
-		delete mSharedData;
+		delete (Mutex*)mSharedData;
 	#endif
 }
 
-#if defined(TOADLET_COUNT_MUTEX)
+#if defined(TOADLET_COUNT_WIN32)
 
 int Object::retain(){
-	int count=0;
-	((SharedData*)mSharedData)->mutex.lock();
-		count=++((SharedData*)mSharedData)->count;
-	((SharedData*)mSharedData)->mutex.unlock();
+	int count=InterlockedIncrement((LONG*)&mSharedCount);
 	return count;
 }
 
 int Object::release(){
-	int count=0;
-	((SharedData*)mSharedData)->mutex.lock();
-		count=--((SharedData*)mSharedData)->count;
-	((SharedData*)mSharedData)->mutex.unlock();
-	if(count<=0){
-		destroy();
-		delete this;
-	}
-	return count;
-}
-
-#elif defined(TOADLET_COUNT_WIN32)
-
-int Object::retain(){
-	int count=InterlockedIncrement((int32*)mSharedData);
-	return count;
-}
-
-int Object::release(){
-	int count=InterlockedDecrement((int32*)mSharedData);
+	int count=InterlockedDecrement((LONG*)&mSharedCount);
 	if(count<=0){
 		destroy();
 		delete this;
@@ -126,12 +88,34 @@ int Object::release(){
 #elif defined(TOADLET_COUNT_OSX)
 	
 int Object::retain(){
-	int count=OSAtomicIncrement32((int32*)mSharedData);
+	int count=OSAtomicIncrement32((int32*)&mSharedCount);
 	return count;
 }
 	
 int Object::release(){
-	int count=OSAtomicDecrement32((int32*)mSharedData);
+	int count=OSAtomicDecrement32((int32*)&mSharedCount);
+	if(count<=0){
+		destroy();
+		delete this;
+	}
+	return count;
+}
+
+#elif defined(TOADLET_COUNT_MUTEX)
+
+int Object::retain(){
+	int count=0;
+	((Mutex*)mSharedData)->lock();
+		count=++mSharedCount;
+	((Mutex*)mSharedData)->unlock();
+	return count;
+}
+
+int Object::release(){
+	int count=0;
+	((Mutex*)mSharedData)->.lock();
+		count=--mSharedCount;
+	((Mutex*)mSharedData)->unlock();
 	if(count<=0){
 		destroy();
 		delete this;
@@ -142,12 +126,12 @@ int Object::release(){
 #else
 
 int Object::retain(){
-	int count=++*(int*)mSharedData;
+	int count=++mSharedCount;
 	return count;
 }
 
 int Object::release(){
-	int count=--*(int*)mSharedData;
+	int count=--mSharedCount;
 	if(count<=0){
 		destroy();
 		delete this;

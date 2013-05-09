@@ -46,8 +46,7 @@ public:
 	const static int BoneSpaceUpdate_NONE=				0;
 	const static int BoneSpaceUpdate_FLAG_TRANSLATE=	1<<0;
 	const static int BoneSpaceUpdate_FLAG_ROTATE=		1<<1;
-	const static int BoneSpaceUpdate_FLAG_MATRIX=		1<<2;
-	const static int BoneSpaceUpdate_FLAG_WORLD=		1<<3;
+	const static int BoneSpaceUpdate_FLAG_WORLD=		1<<2;
 
 	class Bone;
 
@@ -67,8 +66,7 @@ public:
 			index(0),
 			scope(-1),
 			controller(NULL),
-			dontUpdateFlags(0),
-			useMatrixTransforms(false)
+			dontUpdateFlags(0)
 		{
 			this->index=index;
 		}
@@ -92,17 +90,14 @@ public:
 
 		Vector3 worldTranslate;
 		Quaternion worldRotate;
-		Matrix4x4 worldMatrix;
 		AABox worldBound;
 
 		Vector3 boneSpaceTranslate;
 		Quaternion boneSpaceRotate;
-		Matrix4x4 boneSpaceMatrix;
 
 		int scope;
 		BoneController *controller;
 		int dontUpdateFlags;
-		bool useMatrixTransforms;
 	};
 
 	class SequenceAnimation:public BaseAnimation{

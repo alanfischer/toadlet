@@ -35,8 +35,8 @@ public:
 			tolerance=0.000001;
 
 			numProps=100;
-			maxPropDist=80;
-			minPropDist=60;
+			maxPropDist=100;
+			minPropDist=80;
 		#endif
 
 		Log::alert("Loading terrain");

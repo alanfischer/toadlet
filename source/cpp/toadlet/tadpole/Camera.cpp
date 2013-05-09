@@ -56,7 +56,7 @@ Camera::Camera(Engine *engine):
 		mDefaultState->setPointState(PointState());
 	}
 
-	mFPSData.resize(10);
+	mFPSData.resize(100);
 }
 
 void Camera::setAutoProjectionFov(scalar fov,bool yheight,scalar nearDist,scalar farDist){

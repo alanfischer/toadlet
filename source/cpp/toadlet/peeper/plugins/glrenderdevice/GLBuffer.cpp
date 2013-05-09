@@ -305,8 +305,8 @@ bool GLBuffer::unlock(){
 			glBindBuffer(mTarget,0);
 		}
 
-		// Only delete our data if we have no desire to read it and a hardware back 
-		if(mData!=NULL && (mAccess&Access_BIT_READ)==0 && mHandle!=0){
+		// Only delete our data if we have no desire to read it, its not changed every frame, and it has a hardware back
+		if(mData!=NULL && (mAccess&Access_BIT_READ)==0 && (mUsage&(Usage_BIT_DYNAMIC|Usage_BIT_STREAM))==0 && mHandle!=0){
 			delete[] mData;
 			mData=NULL;
 		}
@@ -345,8 +345,8 @@ bool GLBuffer::update(tbyte *data,int start,int size){
 bool GLBuffer::activateUniforms(){
 	math::Matrix4x4 matrix,textureMatrix;
 
-	int i;
-	for(i=0;i<mVariableFormat->getSize();++i){
+	int i,size=mVariableFormat->getSize();
+	for(i=0;i<size;++i){
 		VariableBufferFormat::Variable *variable=mVariableFormat->getVariable(i);
 		int format=variable->getFormat();
 		int index=variable->getIndex();

@@ -240,7 +240,7 @@ public:
 		mColorData[offset(i,e)]=Math::argbToRGBA(c);
 	}
 
-	inline scalar get(int i,int e){
+	inline scalar get(int i,int e) const{
 		TOADLET_CHECK_READ();
 		i=offset(i,e);
 		if(mNativeFixed){
@@ -251,7 +251,7 @@ public:
 		}
 	}
 
-	inline void get2(int i,int e,scalar x[]){
+	inline void get2(int i,int e,scalar x[]) const{
 		TOADLET_CHECK_READ();
 		i=offset(i,e);
 		if(mNativeFixed){
@@ -264,7 +264,7 @@ public:
 		}
 	}
 
-	inline void get3(int i,int e,scalar x[]){
+	inline void get3(int i,int e,scalar x[]) const{
 		TOADLET_CHECK_READ();
 		i=offset(i,e);
 		if(mNativeFixed){
@@ -279,7 +279,7 @@ public:
 		}
 	}
 
-	inline void get4(int i,int e,scalar x[]){
+	inline void get4(int i,int e,scalar x[]) const{
 		TOADLET_CHECK_READ();
 		i=offset(i,e);
 		if(mNativeFixed){
@@ -296,7 +296,7 @@ public:
 		}
 	}
 
-	inline void get2(int i,int e,Vector2 &v){
+	inline void get2(int i,int e,Vector2 &v) const{
 		TOADLET_CHECK_READ();
 		i=offset(i,e);
 		if(mNativeFixed){
@@ -309,7 +309,7 @@ public:
 		}
 	}
 
-	inline void get3(int i,int e,Vector3 &v){
+	inline void get3(int i,int e,Vector3 &v) const{
 		TOADLET_CHECK_READ();
 		i=offset(i,e);
 		if(mNativeFixed){
@@ -324,24 +324,7 @@ public:
 		}
 	}
 
-	inline void get4(int i,int e,Vector4 &v){
-		TOADLET_CHECK_READ();
-		i=offset(i,e);
-		if(mNativeFixed){
-			v.x=TOADLET_FROMFIXED(mFixedData[i]);
-			v.y=TOADLET_FROMFIXED(mFixedData[i+1]);
-			v.z=TOADLET_FROMFIXED(mFixedData[i+2]);
-			v.w=TOADLET_FROMFIXED(mFixedData[i+3]);
-		}
-		else{
-			v.x=TOADLET_FROMFLOAT(mFloatData[i]);
-			v.y=TOADLET_FROMFLOAT(mFloatData[i+1]);
-			v.z=TOADLET_FROMFLOAT(mFloatData[i+2]);
-			v.w=TOADLET_FROMFLOAT(mFloatData[i+3]);
-		}
-	}
-
-	inline void get4(int i,int e,Quaternion &v){
+	inline void get4(int i,int e,Vector4 &v) const{
 		TOADLET_CHECK_READ();
 		i=offset(i,e);
 		if(mNativeFixed){
@@ -358,18 +341,35 @@ public:
 		}
 	}
 
-	inline uint32 getRGBA(int i,int e){
+	inline void get4(int i,int e,Quaternion &v) const{
+		TOADLET_CHECK_READ();
+		i=offset(i,e);
+		if(mNativeFixed){
+			v.x=TOADLET_FROMFIXED(mFixedData[i]);
+			v.y=TOADLET_FROMFIXED(mFixedData[i+1]);
+			v.z=TOADLET_FROMFIXED(mFixedData[i+2]);
+			v.w=TOADLET_FROMFIXED(mFixedData[i+3]);
+		}
+		else{
+			v.x=TOADLET_FROMFLOAT(mFloatData[i]);
+			v.y=TOADLET_FROMFLOAT(mFloatData[i+1]);
+			v.z=TOADLET_FROMFLOAT(mFloatData[i+2]);
+			v.w=TOADLET_FROMFLOAT(mFloatData[i+3]);
+		}
+	}
+
+	inline uint32 getRGBA(int i,int e) const{
 		TOADLET_CHECK_READ();
 		return mColorData[offset(i,e)];
 	}
 
-	inline uint32 getARGB(int i,int e){
+	inline uint32 getARGB(int i,int e) const{
 		TOADLET_CHECK_READ();
 		return Math::rgbaToARGB(mColorData[offset(i,e)]);
 	}
 
 protected:
-	inline int offset(int vertex,int element){
+	inline int offset(int vertex,int element) const{
 		TOADLET_ASSERT(vertex>=0 && element>=0 && (vertex*mVertexSize32 + mElementOffsets32[element])*sizeof(int32)<(uint32)mBuffer->getDataSize()); // "vertex out of bounds"
 		return vertex*mVertexSize32 + mElementOffsets32[element];
 	}
