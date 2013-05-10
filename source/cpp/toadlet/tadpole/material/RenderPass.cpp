@@ -311,7 +311,7 @@ VariableBufferFormat::Variable *RenderPass::findFormatVariable(const String &nam
 	bufferIndex=-1;
 
 	if(p>0){
-		String possibleBufferName=name.substr(0,i);
+		String possibleBufferName=name.substr(0,p);
 		for(j=0;j<Shader::ShaderType_MAX;++j){
 			for(i=0;i<mBuffers[j].size();++i){
 				if(possibleBufferName.equals(mBuffers[j][i].buffer->getVariableBufferFormat()->getName())){
