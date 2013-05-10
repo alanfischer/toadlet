@@ -80,6 +80,7 @@ namespace peeper{
 #endif
 
 GLRenderDevice::GLRenderDevice():
+	gl_version(0),
 	mPBuffers(false),mFBOs(false),
 	mVBOs(false),mIBOs(false),mPBOs(false),mUBOs(false),
 
@@ -149,7 +150,20 @@ bool GLRenderDevice::create(RenderTarget *target,int options){
 			return false;
 		}
 
-		gl_version=GLEW_VERSION_2_1?21:(GLEW_VERSION_2_0?20:(GLEW_VERSION_1_5?15:(GLEW_VERSION_1_4?14:(GLEW_VERSION_1_3?13:(GLEW_VERSION_1_2?12:(GLEW_VERSION_1_1?11:00))))));
+		if(GLEW_VERSION_4_1)	  gl_version=41;
+		else if(GLEW_VERSION_4_0) gl_version=40;
+		else if(GLEW_VERSION_3_3) gl_version=33;
+		else if(GLEW_VERSION_3_2) gl_version=32;
+		else if(GLEW_VERSION_3_1) gl_version=31;
+		else if(GLEW_VERSION_3_0) gl_version=30;
+		else if(GLEW_VERSION_2_1) gl_version=21;
+		else if(GLEW_VERSION_2_0) gl_version=20;
+		else if(GLEW_VERSION_1_5) gl_version=15;
+		else if(GLEW_VERSION_1_4) gl_version=14;
+		else if(GLEW_VERSION_1_3) gl_version=13;
+		else if(GLEW_VERSION_1_2) gl_version=12;
+		else if(GLEW_VERSION_1_1) gl_version=11;
+		else					  gl_version=10;
 	#else
 		const char *versionString=(const char*)glGetString(GL_VERSION);
 		if(strstr(versionString,"2.")!=NULL){
