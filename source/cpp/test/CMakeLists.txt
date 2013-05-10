@@ -9,7 +9,19 @@ if (NOT TOADLET_PLATFORM_ANDROID AND NOT TOADLET_PLATFORM_IOS)
 	
 	# Platform specific libraries
 	if (TOADLET_PLATFORM_WIN32)
-		target_link_libraries (unitTest toadlet_egg toadlet_peeper toadlet_ribbit toadlet_tadpole )
+		target_link_libraries (unitTest toadlet_egg toadlet_peeper toadlet_ribbit toadlet_tadpole)
+
+		# On windows we use fixup_bundle to collect the required dlls for build directory execution
+		set (FIXUP_APP ${CMAKE_CURRENT_BINARY_DIR}/\${CONFIGURATION}/unitTest.exe)
+		set (FIXUP_DIRS
+			${CMAKE_CURRENT_BINARY_DIR}/../toadlet/egg/\${CONFIGURATION}
+			${CMAKE_CURRENT_BINARY_DIR}/../toadlet/hop/\${CONFIGURATION}
+			${CMAKE_CURRENT_BINARY_DIR}/../toadlet/peeper/\${CONFIGURATION}
+			${CMAKE_CURRENT_BINARY_DIR}/../toadlet/ribbit/\${CONFIGURATION}
+			${CMAKE_CURRENT_BINARY_DIR}/../toadlet/tadpole/\${CONFIGURATION}
+		)
+		configure_file (${PROJECT_SOURCE_DIR}/cmake/Modules/Fixup.cmake.in ${CMAKE_CURRENT_BINARY_DIR}/Fixup.cmake @ONLY)
+		add_custom_command (TARGET unitTest POST_BUILD COMMAND ${CMAKE_COMMAND} -DCONFIGURATION=$<CONFIGURATION> -P ${CMAKE_CURRENT_BINARY_DIR}/Fixup.cmake)
 	elseif (TOADLET_PLATFORM_OSX)
 		target_link_libraries (unitTest toadlet_egg toadlet_peeper toadlet_ribbit toadlet_tadpole  "-framework Foundation")
 	elseif (TOADLET_PLATFORM_POSIX)
