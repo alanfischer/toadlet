@@ -1,0 +1,6 @@
+# A handy script that does all of the nastyness for in-editor running
+include (BundleUtilities)
+
+# Call fixup bundle
+fixup_bundle ("@FIXUP_APP@" "@FIXUP_LIBS@" "@FIXUP_DIRS@")
+
