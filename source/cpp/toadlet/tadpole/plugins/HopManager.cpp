@@ -33,8 +33,7 @@ namespace tadpole{
 
 HopManager::HopManager(Scene *scene):
 	//mSimulator,
-	mTraceable(NULL),
-	mSnapGrid(0)
+	mTraceable(NULL)
 {
 	mScene=scene;
 
