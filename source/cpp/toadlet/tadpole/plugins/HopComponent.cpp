@@ -33,10 +33,9 @@ HopComponent::HopComponent(HopManager *manager):
 	//mManager,
 	//mSolid,
 	//mOldPosition,mNewPosition,mCurrentPosition,
-	mTransformChanged(false),
+	mTransformChanged(false)
 	//mTraceableShape,
-	//mTraceable,
-	mSnapGrid(0)
+	//mTraceable
 {
 	mManager=manager;
 
@@ -162,10 +161,6 @@ void HopComponent::updatePosition(const Vector3 &position){
 
 void HopComponent::lerpPosition(scalar fraction){
 	Math::lerp(mCurrentPosition,mOldPosition,mNewPosition,mParent->getScene()->getLogicFraction());
-
-	if(mManager->mSnapGrid!=0){
-		mCurrentPosition.x = Math::intCeil(mCurrentPosition.x / mManager->mSnapGrid) * mManager->mSnapGrid;
-	}
 
 	mParent->getTransform()->setTranslate(mCurrentPosition);
 }

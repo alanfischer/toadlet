@@ -99,7 +99,6 @@ protected:
 	void updatePosition(const Vector3 &position);
 	void lerpPosition(scalar fraction);
 
-	float mSnapGrid;
 	HopManager *mManager;
 	hop::Solid::ptr mSolid;
 	Collection<PhysicsCollisionListener*> mListeners;
