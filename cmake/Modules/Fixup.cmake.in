@@ -1,6 +1,14 @@
 # A handy script that does all of the nastyness for in-editor running
 include (BundleUtilities)
 
+# On windows clean dlls out of the current app dir, otherwise no updates to existing ones will occur
+if (WIN32)
+	get_filename_component (APP_DIR "@FIXUP_APP@" PATH)
+	file (GLOB DLLS "${APP_DIR}/*.dll")
+	if (DLLS)
+		file (REMOVE ${DLLS})
+	endif (DLLS)
+endif (WIN32)
+
 # Call fixup bundle
 fixup_bundle ("@FIXUP_APP@" "@FIXUP_LIBS@" "@FIXUP_DIRS@")
-
