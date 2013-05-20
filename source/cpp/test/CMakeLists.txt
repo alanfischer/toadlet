@@ -13,14 +13,16 @@ if (NOT TOADLET_PLATFORM_ANDROID AND NOT TOADLET_PLATFORM_IOS)
 
 		# On windows we use fixup_bundle to collect the required dlls for build directory execution
 		set (FIXUP_APP ${CMAKE_CURRENT_BINARY_DIR}/\${CONFIGURATION}/unitTest.exe)
+		file(TO_CMAKE_PATH ${CMAKE_PREFIX_PATH}/lib PREFIX_LIB)
+		file(TO_CMAKE_PATH ${CMAKE_PREFIX_PATH}/bin PREFIX_BIN)
 		set (FIXUP_DIRS
 			${CMAKE_CURRENT_BINARY_DIR}/../toadlet/egg/\${CONFIGURATION}
 			${CMAKE_CURRENT_BINARY_DIR}/../toadlet/hop/\${CONFIGURATION}
 			${CMAKE_CURRENT_BINARY_DIR}/../toadlet/peeper/\${CONFIGURATION}
 			${CMAKE_CURRENT_BINARY_DIR}/../toadlet/ribbit/\${CONFIGURATION}
 			${CMAKE_CURRENT_BINARY_DIR}/../toadlet/tadpole/\${CONFIGURATION}
-			${CMAKE_PREFIX_PATH}/lib
-			${CMAKE_PREFIX_PATH}/bin
+			${PREFIX_LIB}
+			${PREFIX_BIN}
 		)
 		configure_file (${PROJECT_SOURCE_DIR}/cmake/Modules/Fixup.cmake.in ${CMAKE_CURRENT_BINARY_DIR}/Fixup.cmake @ONLY)
 		add_custom_command (TARGET unitTest POST_BUILD COMMAND ${CMAKE_COMMAND} -DCONFIGURATION=$<CONFIGURATION> -P ${CMAKE_CURRENT_BINARY_DIR}/Fixup.cmake)
