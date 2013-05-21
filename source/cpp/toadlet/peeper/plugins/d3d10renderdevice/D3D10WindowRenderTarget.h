@@ -64,14 +64,14 @@ public:
 
 	inline ID3D10RenderTargetView *getRenderTargetView() const{return mRenderTargetViews[0];}
 
-	typedef HRESULT(WINAPI *D3D10CreateDeviceAndSwapChain)(IDXGIAdapter*,D3D10_DRIVER_TYPE,HMODULE,UINT,UINT,DXGI_SWAP_CHAIN_DESC*,IDXGISwapChain**,ID3D10Device**);
-	D3D10CreateDeviceAndSwapChain CreateDeviceAndSwapChainSymbol;
+	typedef HRESULT(WINAPI *D3D10CreateDeviceAndSwapChain_)(IDXGIAdapter*,D3D10_DRIVER_TYPE,HMODULE,UINT,UINT,DXGI_SWAP_CHAIN_DESC*,IDXGISwapChain**,ID3D10Device**);
+	D3D10CreateDeviceAndSwapChain_ D3D10CreateDeviceAndSwapChain;
 
-	typedef HRESULT(WINAPI *D3D10ReflectShader)(void*,SIZE_T,ID3D10ShaderReflection**);
-	D3D10ReflectShader ReflectShaderSymbol;
+	typedef HRESULT(WINAPI *D3D10ReflectShader_)(void*,SIZE_T,ID3D10ShaderReflection**);
+	D3D10ReflectShader_ D3D10ReflectShader;
 
-	typedef HRESULT(WINAPI *D3DX10CompileFromMemory)(LPCSTR,SIZE_T,LPCSTR,D3D10_SHADER_MACRO*,interface ID3DInclude*,LPCSTR,LPCSTR,UINT,UINT,interface ID3DX10ThreadPump*,interface ID3D10Blob**,interface ID3D10Blob**,HRESULT*);
-	D3DX10CompileFromMemory CompileFromMemorySymbol;
+	typedef HRESULT(WINAPI *D3DX10CompileFromMemory_)(LPCSTR,SIZE_T,LPCSTR,D3D10_SHADER_MACRO*,interface ID3DInclude*,LPCSTR,LPCSTR,UINT,UINT,interface ID3DX10ThreadPump*,interface ID3D10Blob**,interface ID3D10Blob**,HRESULT*);
+	D3DX10CompileFromMemory_ D3DX10CompileFromMemory;
 
 protected:
 	void buildBackBuffers();

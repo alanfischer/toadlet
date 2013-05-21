@@ -28,7 +28,17 @@
 
 #include <toadlet/peeper/Texture.h>
 #include <toadlet/tadpole/TextureManager.h>
-#include <windows.h>
+#if defined(TOADLET_PLATFORM_WINCE)
+	#include <Imaging.h>
+	#include <initguid.h>
+	#include <imgguids.h>
+#else
+	#include <windows.h>
+    #include <Gdiplus.h>
+
+	using namespace Gdiplus;
+	using namespace Gdiplus::DllExports;
+#endif
 
 namespace toadlet{
 namespace tadpole{
@@ -44,11 +54,46 @@ public:
 
 	Resource::ptr load(Stream::ptr in,ResourceData *data,ProgressListener *listener);
 
+	#if !defined(TOADLET_PLATFORM_WINCE)
+		typedef Status(WINAPI *GdiplusStartup_)(OUT ULONG_PTR *token,const GdiplusStartupInput *input,OUT GdiplusStartupOutput *output);
+		typedef VOID(WINAPI *GdiplusShutdown_)(ULONG_PTR token);
+		typedef GpStatus(WINGDIPAPI *GdipCreateBitmapFromStream_)(IStream* stream, GpBitmap **bitmap);
+		typedef GpStatus(WINGDIPAPI *GdipDisposeImage_)(GpImage *image);
+		typedef GpStatus(WINGDIPAPI *GdipImageGetFrameDimensionsCount_)(GpImage* image, UINT* count);
+		typedef GpStatus(WINGDIPAPI *GdipImageGetFrameDimensionsList_)(GpImage* image, GUID* dimensionIDs, UINT count);
+		typedef GpStatus(WINGDIPAPI *GdipImageGetFrameCount_)(GpImage *image, GDIPCONST GUID* dimensionID, UINT* count);
+		typedef GpStatus(WINGDIPAPI *GdipImageSelectActiveFrame_)(GpImage *image, GDIPCONST GUID* dimensionID, UINT frameIndex);
+		typedef GpStatus(WINGDIPAPI *GdipGetPropertyItemSize_)(GpImage *image, PROPID propId, UINT* size);
+		typedef GpStatus(WINGDIPAPI *GdipGetPropertyItem_)(GpImage *image, PROPID propId,UINT propSize, PropertyItem* buffer);
+		typedef GpStatus(WINGDIPAPI *GdipGetImageWidth_)(GpImage *image, UINT *width);
+		typedef GpStatus(WINGDIPAPI *GdipGetImageHeight_)(GpImage *image, UINT *height);
+		typedef GpStatus(WINGDIPAPI *GdipGetImagePixelFormat_)(GpImage *image, PixelFormat *format);
+		typedef GpStatus(WINGDIPAPI *GdipBitmapLockBits_)(GpBitmap* bitmap, GDIPCONST GpRect* rect, UINT flags, PixelFormat format, BitmapData* lockedBitmapData);
+		typedef GpStatus(WINGDIPAPI *GdipBitmapUnlockBits_)(GpBitmap* bitmap, BitmapData* lockedBitmapData);
+
+		GdiplusStartup_ GdiplusStartup;
+		GdiplusShutdown_ GdiplusShutdown;
+		GdipCreateBitmapFromStream_ GdipCreateBitmapFromStream;
+		GdipDisposeImage_ GdipDisposeImage;
+		GdipImageGetFrameDimensionsCount_ GdipImageGetFrameDimensionsCount;
+		GdipImageGetFrameDimensionsList_ GdipImageGetFrameDimensionsList;
+		GdipImageGetFrameCount_ GdipImageGetFrameCount;
+		GdipImageSelectActiveFrame_ GdipImageSelectActiveFrame;
+		GdipGetPropertyItemSize_ GdipGetPropertyItemSize;
+		GdipGetPropertyItem_ GdipGetPropertyItem;
+		GdipGetImageWidth_ GdipGetImageWidth;
+		GdipGetImageHeight_ GdipGetImageHeight;
+		GdipGetImagePixelFormat_ GdipGetImagePixelFormat;
+		GdipBitmapLockBits_ GdipBitmapLockBits;
+		GdipBitmapUnlockBits_ GdipBitmapUnlockBits;
+	#endif
+
 protected:
 	int getFormat(INT *gdiformat);
 
 	TextureManager *mTextureManager;
 	#if !defined(TOADLET_PLATFORM_WINCE)
+		HMODULE mLibrary;
 		ULONG_PTR mToken;
 	#else
 		IUnknown *mImagingFactory;
