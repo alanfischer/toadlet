@@ -71,11 +71,11 @@ public:
 	inline IDirect3DSurface9 *getColorSurface() const{return mColorSurface;}
 	inline IDirect3DSurface9 *getDepthSurface() const{return mDepthSurface;}
 
-	typedef IDirect3D9*(WINAPI *Direct3DCreate9)(UINT);
-	Direct3DCreate9 CreateSymbol;
+	typedef IDirect3D9*(WINAPI *Direct3DCreate9_)(UINT);
+	Direct3DCreate9_ Direct3DCreate9;
 
-	typedef HRESULT(WINAPI *D3DXCompileShader)(LPCSTR,UINT,struct _D3DXMACRO *,interface ID3DXInclude *,LPCSTR,LPCSTR,DWORD,interface ID3DXBuffer **,interface ID3DXBuffer **,interface ID3DXConstantTable **);
-	D3DXCompileShader CompileShaderSymbol;
+	typedef HRESULT(WINAPI *D3DXCompileShader_)(LPCSTR,UINT,struct _D3DXMACRO *,interface ID3DXInclude *,LPCSTR,LPCSTR,DWORD,interface ID3DXBuffer **,interface ID3DXBuffer **,interface ID3DXConstantTable **);
+	D3DXCompileShader_ D3DXCompileShader;
 
 protected:
 	int getClosestSamples(int samples);

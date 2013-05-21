@@ -80,13 +80,13 @@ bool D3D9Shader::createContext(){
 	}
 
 	D3D9WindowRenderTarget *renderTarget=((D3D9WindowRenderTarget*)mDevice->getPrimaryRenderTarget()->getRootRenderTarget());
-	if(renderTarget==NULL || renderTarget->CompileShaderSymbol==NULL){
+	if(renderTarget==NULL || renderTarget->D3DXCompileShader==NULL){
 		return false;
 	}
 
 	D3DXMACRO defines[1]={0};
 
-	HRESULT result=renderTarget->CompileShaderSymbol(mCode,mCode.length(),defines,NULL,function,targetProfile,0,&mBytecode,&mLog,&mConstantTable);
+	HRESULT result=renderTarget->D3DXCompileShader(mCode,mCode.length(),defines,NULL,function,targetProfile,0,&mBytecode,&mLog,&mConstantTable);
 	if(FAILED(result)){
 		Log::alert(String("Code:")+mCode);
 		Error::unknown(Categories::TOADLET_PEEPER,(LPCSTR)mLog->GetBufferPointer());

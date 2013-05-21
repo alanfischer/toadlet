@@ -102,7 +102,7 @@ bool D3D10Shader::createContext(){
 
 	D3D10_SHADER_MACRO defines[1]={0};
 	
-	HRESULT result=((D3D10WindowRenderTarget*)mDevice->getPrimaryRenderTarget()->getRootRenderTarget())->CompileFromMemorySymbol(mCode,mCode.length(),NULL,defines,NULL,function,targetProfile,0,0,NULL,&mBytecode,&mLog,NULL);
+	HRESULT result=((D3D10WindowRenderTarget*)mDevice->getPrimaryRenderTarget()->getRootRenderTarget())->D3DX10CompileFromMemory(mCode,mCode.length(),NULL,defines,NULL,function,targetProfile,0,0,NULL,&mBytecode,&mLog,NULL);
 	if(FAILED(result)){
 		Error::unknown(Categories::TOADLET_PEEPER,(LPCSTR)mLog->GetBufferPointer());
 		return false;
@@ -126,7 +126,7 @@ bool D3D10Shader::createContext(){
 		return false;
 	}
 
-	result=((D3D10WindowRenderTarget*)mDevice->getPrimaryRenderTarget()->getRootRenderTarget())->ReflectShaderSymbol(mBytecode->GetBufferPointer(),mBytecode->GetBufferSize(),&mReflector);
+	result=((D3D10WindowRenderTarget*)mDevice->getPrimaryRenderTarget()->getRootRenderTarget())->D3D10ReflectShader(mBytecode->GetBufferPointer(),mBytecode->GetBufferSize(),&mReflector);
 	if(FAILED(result)){
 		Error::unknown(Categories::TOADLET_PEEPER,"unable to reflect shader");
 		return false;

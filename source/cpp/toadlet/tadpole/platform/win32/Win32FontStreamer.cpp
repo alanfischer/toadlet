@@ -31,12 +31,6 @@
 #include <toadlet/tadpole/platform/win32/Win32FontStreamer.h>
 #include <stdlib.h>
 
-#if !defined(TOADLET_PLATFORM_WINCE)
-	#include <OleCtl.h>
-	#include <gdiplus.h>
-	#pragma comment(lib,"gdiplus.lib")
-#endif
-
 namespace toadlet{
 namespace tadpole{
 
@@ -46,10 +40,26 @@ Win32FontStreamer::Win32FontStreamer(TextureManager *textureManager):
 		,mToken(0)
 	#endif
 {
+	mLibrary=LoadLibrary("gdiplus.dll");
+	if(mLibrary==0){
+		Error::libraryNotFound(Categories::TOADLET_TADPOLE,
+			"Win32TextureStreamer: Error loading gdiplus.dll");
+		return;
+	}
+
+	GdiplusStartup=(GdiplusStartup_)GetProcAddress(mLibrary,"GdiplusStartup");
+	GdiplusShutdown=(GdiplusShutdown_)GetProcAddress(mLibrary,"GdiplusShutdown");
+	GdipNewPrivateFontCollection=(GdipNewPrivateFontCollection_)GetProcAddress(mLibrary,"GdipNewPrivateFontCollection");
+	GdipDeletePrivateFontCollection=(GdipDeletePrivateFontCollection_)GetProcAddress(mLibrary,"GdipDeletePrivateFontCollection");
+	GdipPrivateAddMemoryFont=(GdipPrivateAddMemoryFont_)GetProcAddress(mLibrary,"GdipPrivateAddMemoryFont");
+	GdipGetFontCollectionFamilyCount=(GdipGetFontCollectionFamilyCount_)GetProcAddress(mLibrary,"GdipGetFontCollectionFamilyCount");
+	GdipGetFontCollectionFamilyList=(GdipGetFontCollectionFamilyList_)GetProcAddress(mLibrary,"GdipGetFontCollectionFamilyList");
+	GdipGetFamilyName=(GdipGetFamilyName_)GetProcAddress(mLibrary,"GdipGetFamilyName");
+
 	mTextureManager=textureManager;
 	#if !defined(TOADLET_PLATFORM_WINCE)
-		Gdiplus::GdiplusStartupInput gdiplusStartupInput;
-		Gdiplus::GdiplusStartup(&mToken,&gdiplusStartupInput,NULL);
+		GdiplusStartupInput gdiplusStartupInput;
+		GdiplusStartup(&mToken,&gdiplusStartupInput,NULL);
 	#endif
 }
 
@@ -63,7 +73,7 @@ bool Win32FontStreamer::valid(){
 
 Win32FontStreamer::~Win32FontStreamer(){
 	#if !defined(TOADLET_PLATFORM_WINCE)
-		Gdiplus::GdiplusShutdown(mToken);
+		GdiplusShutdown(mToken);
 	#endif
 }
 
@@ -86,18 +96,29 @@ Resource::ptr Win32FontStreamer::load(Stream::ptr stream,ResourceData *data,Prog
 	#if !defined(TOADLET_PLATFORM_WINCE)
 		// This is hacky, but for now we grab the font name by loading it using Gdiplus
 		// Then we need to actually load the font using regular Gdi.  Could be replaced with an all Gdiplus font loader.
-		Gdiplus::PrivateFontCollection *collection=new Gdiplus::PrivateFontCollection();
-		collection->AddMemoryFont(memoryStream->getOriginalDataPointer(),memoryStream->length());
+		GpFontCollection *collection=NULL;
+		GdipNewPrivateFontCollection(&collection);
+		GdipPrivateAddMemoryFont(collection,memoryStream->getOriginalDataPointer(),memoryStream->length());
 
-		Gdiplus::FontFamily fontFamily;
 		int numFamilys=0;
-		collection->GetFamilies(1,&fontFamily,&numFamilys);
+		GdipGetFontCollectionFamilyCount(collection,&numFamilys);
+		if(numFamilys==0){
+			GdipDeletePrivateFontCollection(&collection);
+
+			Error::nullPointer(Categories::TOADLET_TADPOLE,
+				"FamilyCount is 0");
+			return NULL;
+		}
+		GpFontFamily **fontFamily=new GpFontFamily*[numFamilys];
+		GdipGetFontCollectionFamilyList(collection,numFamilys,fontFamily,&numFamilys);
 		WCHAR wname[1024];
-		fontFamily.GetFamilyName(wname);
+		GdipGetFamilyName(fontFamily[0],wname,0);
 		name=wname;
 		
+		delete[] fontFamily;
+
 		// We're done with the collection, so delete it
-		delete collection;
+		GdipDeletePrivateFontCollection(&collection);
 		collection=NULL;
 
 		DWORD amount=0;
@@ -108,7 +129,7 @@ Resource::ptr Win32FontStreamer::load(Stream::ptr stream,ResourceData *data,Prog
 		return NULL;
 	#endif
 
-	HDC dc=GetDC(NULL);
+		HDC dc=GetDC(NULL);
 	HDC cdc=CreateCompatibleDC(dc);
 
 	LOGFONT logFont={0};
@@ -252,8 +273,8 @@ Resource::ptr Win32FontStreamer::load(Stream::ptr stream,ResourceData *data,Prog
 	}
 
 	#if !defined(TOADLET_PLATFORM_WINCE)
-		RemoveFontMemResourceEx(handle);
-		GdiFlush();
+//		RemoveFontMemResourceEx(handle);
+//		GdiFlush();
 	#endif
 
 	TextureFormat::ptr textureFormat=new TextureFormat(TextureFormat::Dimension_D2,TextureFormat::Format_LA_8,textureWidth,textureHeight,1,0);

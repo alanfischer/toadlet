@@ -45,10 +45,7 @@ D3D9WindowRenderTarget::D3D9WindowRenderTarget():D3D9RenderTarget(),
 	mD3DDevice(NULL),
 	mColorSurface(NULL),
 	mDepthSurface(NULL),
-	mWindow(0),
-
-	CreateSymbol(NULL),
-	CompileShaderSymbol(NULL)
+	mWindow(0)
 {
 }
 
@@ -58,10 +55,7 @@ D3D9WindowRenderTarget::D3D9WindowRenderTarget(HWND wnd,WindowRenderTargetFormat
 	mD3DDevice(NULL),
 	mColorSurface(NULL),
 	mDepthSurface(NULL),
-	mWindow(0),
-
-	CreateSymbol(NULL),
-	CompileShaderSymbol(NULL)
+	mWindow(0)
 {
 	createContext(wnd,format);
 }
@@ -145,8 +139,8 @@ bool D3D9WindowRenderTarget::createContext(HWND wnd,WindowRenderTargetFormat *fo
 	}
 
 	char *createName=TOADLET_D3D9_CREATE_NAME;
-	CreateSymbol=(Direct3DCreate9)GetProcAddress(mD3DLibrary,createName);
-	if(CreateSymbol==NULL){
+	Direct3DCreate9=(Direct3DCreate9_)GetProcAddress(mD3DLibrary,createName);
+	if(Direct3DCreate9==NULL){
 		Error::symbolNotFound(Categories::TOADLET_PEEPER,
 			String("D3D9WindowRenderTarget: Error finding ")+createName);
 		return NULL;
@@ -165,8 +159,8 @@ bool D3D9WindowRenderTarget::createContext(HWND wnd,WindowRenderTargetFormat *fo
 		mD3DXLibrary=LoadLibrary(d3dxName);
 		if(mD3DXLibrary!=0){
 			char *compileShaderName=TOADLET_D3DX9_COMPILE_SHADER_NAME;
-			CompileShaderSymbol=(D3DXCompileShader)GetProcAddress(mD3DXLibrary,compileShaderName);
-			if(CompileShaderSymbol==NULL){
+			D3DXCompileShader=(D3DXCompileShader_)GetProcAddress(mD3DXLibrary,compileShaderName);
+			if(D3DXCompileShader==NULL){
 				Log::warning(Categories::TOADLET_PEEPER,
 					String("D3D9WindowRenderTarget: Error finding ")+compileShaderName);
 			}
@@ -181,7 +175,7 @@ bool D3D9WindowRenderTarget::createContext(HWND wnd,WindowRenderTargetFormat *fo
 			"Found "+d3dxName);
 	}
 
-	mD3D=CreateSymbol(D3D_SDK_VERSION);
+	mD3D=Direct3DCreate9(D3D_SDK_VERSION);
 	if(mD3D==NULL){
 		Error::unknown(Categories::TOADLET_PEEPER,
 			"D3D9WindowRenderTarget: Error creating Direct3D object");

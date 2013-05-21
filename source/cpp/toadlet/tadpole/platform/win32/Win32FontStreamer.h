@@ -29,7 +29,13 @@
 #include <toadlet/tadpole/Font.h>
 #include <toadlet/tadpole/FontData.h>
 #include <toadlet/tadpole/TextureManager.h>
-#include <windows.h>
+#if !defined(TOADLET_PLATFORM_WINCE)
+	#include <windows.h>
+    #include <Gdiplus.h>
+
+	using namespace Gdiplus;
+	using namespace Gdiplus::DllExports;
+#endif
 
 namespace toadlet{
 namespace tadpole{
@@ -45,9 +51,30 @@ public:
 
 	Resource::ptr load(Stream::ptr stream,ResourceData *data,ProgressListener *listener);
 
+	#if !defined(TOADLET_PLATFORM_WINCE)
+		typedef Status(WINAPI *GdiplusStartup_)(OUT ULONG_PTR *token,const GdiplusStartupInput *input,OUT GdiplusStartupOutput *output);
+		typedef VOID(WINAPI *GdiplusShutdown_)(ULONG_PTR token);
+		typedef GpStatus(WINGDIPAPI *GdipNewPrivateFontCollection_)(GpFontCollection** fontCollection);
+		typedef GpStatus(WINGDIPAPI *GdipDeletePrivateFontCollection_)(GpFontCollection** fontCollection);
+		typedef GpStatus(WINGDIPAPI *GdipPrivateAddMemoryFont_)(GpFontCollection* fontCollection, GDIPCONST void* memory, INT length);
+		typedef GpStatus(WINGDIPAPI *GdipGetFontCollectionFamilyCount_)(GpFontCollection* fontCollection, INT* numFound);
+		typedef GpStatus(WINGDIPAPI *GdipGetFontCollectionFamilyList_)(GpFontCollection* fontCollection, INT numSought, GpFontFamily* gpfamilies[], INT* numFound);
+		typedef GpStatus(WINGDIPAPI *GdipGetFamilyName_)( GDIPCONST GpFontFamily* family,__out_ecount(LF_FACESIZE) LPWSTR name, LANGID language);
+
+		GdiplusStartup_ GdiplusStartup;
+		GdiplusShutdown_ GdiplusShutdown;
+		GdipNewPrivateFontCollection_ GdipNewPrivateFontCollection;
+		GdipDeletePrivateFontCollection_ GdipDeletePrivateFontCollection;
+		GdipPrivateAddMemoryFont_ GdipPrivateAddMemoryFont;
+		GdipGetFontCollectionFamilyCount_ GdipGetFontCollectionFamilyCount;
+		GdipGetFontCollectionFamilyList_ GdipGetFontCollectionFamilyList;
+		GdipGetFamilyName_ GdipGetFamilyName;
+	#endif
+
 protected:
 	TextureManager *mTextureManager;
 	#if !defined(TOADLET_PLATFORM_WINCE)
+		HMODULE mLibrary;
 		ULONG_PTR mToken;
 	#endif
 };
