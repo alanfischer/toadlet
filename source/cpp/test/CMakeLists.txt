@@ -25,7 +25,7 @@ if (NOT TOADLET_PLATFORM_ANDROID AND NOT TOADLET_PLATFORM_IOS)
 			${PREFIX_BIN}
 		)
 		configure_file (${PROJECT_SOURCE_DIR}/cmake/Modules/Fixup.cmake.in ${CMAKE_CURRENT_BINARY_DIR}/Fixup.cmake @ONLY)
-		add_custom_command (TARGET unitTest POST_BUILD COMMAND ${CMAKE_COMMAND} --debug-output --trace -DCONFIGURATION=$<CONFIGURATION> -P ${CMAKE_CURRENT_BINARY_DIR}/Fixup.cmake)
+		add_custom_command (TARGET unitTest POST_BUILD COMMAND ${CMAKE_COMMAND} --debug-output -DCONFIGURATION=$<CONFIGURATION> -P ${CMAKE_CURRENT_BINARY_DIR}/Fixup.cmake)
 	elseif (TOADLET_PLATFORM_OSX)
 		target_link_libraries (unitTest toadlet_egg toadlet_peeper toadlet_ribbit toadlet_tadpole  "-framework Foundation")
 	elseif (TOADLET_PLATFORM_POSIX)
