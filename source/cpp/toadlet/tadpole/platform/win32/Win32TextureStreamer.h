@@ -35,9 +35,6 @@
 #else
 	#include <windows.h>
     #include <Gdiplus.h>
-
-	using namespace Gdiplus;
-	using namespace Gdiplus::DllExports;
 #endif
 
 namespace toadlet{
@@ -55,21 +52,21 @@ public:
 	Resource::ptr load(Stream::ptr in,ResourceData *data,ProgressListener *listener);
 
 	#if !defined(TOADLET_PLATFORM_WINCE)
-		typedef Status(WINAPI *GdiplusStartup_)(OUT ULONG_PTR *token,const GdiplusStartupInput *input,OUT GdiplusStartupOutput *output);
+		typedef Gdiplus::GpStatus(WINAPI *GdiplusStartup_)(OUT ULONG_PTR *token,const Gdiplus::GdiplusStartupInput *input,OUT Gdiplus::GdiplusStartupOutput *output);
 		typedef VOID(WINAPI *GdiplusShutdown_)(ULONG_PTR token);
-		typedef GpStatus(WINGDIPAPI *GdipCreateBitmapFromStream_)(IStream* stream, GpBitmap **bitmap);
-		typedef GpStatus(WINGDIPAPI *GdipDisposeImage_)(GpImage *image);
-		typedef GpStatus(WINGDIPAPI *GdipImageGetFrameDimensionsCount_)(GpImage* image, UINT* count);
-		typedef GpStatus(WINGDIPAPI *GdipImageGetFrameDimensionsList_)(GpImage* image, GUID* dimensionIDs, UINT count);
-		typedef GpStatus(WINGDIPAPI *GdipImageGetFrameCount_)(GpImage *image, GDIPCONST GUID* dimensionID, UINT* count);
-		typedef GpStatus(WINGDIPAPI *GdipImageSelectActiveFrame_)(GpImage *image, GDIPCONST GUID* dimensionID, UINT frameIndex);
-		typedef GpStatus(WINGDIPAPI *GdipGetPropertyItemSize_)(GpImage *image, PROPID propId, UINT* size);
-		typedef GpStatus(WINGDIPAPI *GdipGetPropertyItem_)(GpImage *image, PROPID propId,UINT propSize, PropertyItem* buffer);
-		typedef GpStatus(WINGDIPAPI *GdipGetImageWidth_)(GpImage *image, UINT *width);
-		typedef GpStatus(WINGDIPAPI *GdipGetImageHeight_)(GpImage *image, UINT *height);
-		typedef GpStatus(WINGDIPAPI *GdipGetImagePixelFormat_)(GpImage *image, PixelFormat *format);
-		typedef GpStatus(WINGDIPAPI *GdipBitmapLockBits_)(GpBitmap* bitmap, GDIPCONST GpRect* rect, UINT flags, PixelFormat format, BitmapData* lockedBitmapData);
-		typedef GpStatus(WINGDIPAPI *GdipBitmapUnlockBits_)(GpBitmap* bitmap, BitmapData* lockedBitmapData);
+		typedef Gdiplus::GpStatus(WINGDIPAPI *GdipCreateBitmapFromStream_)(IStream* stream, Gdiplus::GpBitmap **bitmap);
+		typedef Gdiplus::GpStatus(WINGDIPAPI *GdipDisposeImage_)(Gdiplus::GpImage *image);
+		typedef Gdiplus::GpStatus(WINGDIPAPI *GdipImageGetFrameDimensionsCount_)(Gdiplus::GpImage* image, UINT* count);
+		typedef Gdiplus::GpStatus(WINGDIPAPI *GdipImageGetFrameDimensionsList_)(Gdiplus::GpImage* image, GUID* dimensionIDs, UINT count);
+		typedef Gdiplus::GpStatus(WINGDIPAPI *GdipImageGetFrameCount_)(Gdiplus::GpImage *image, GDIPCONST GUID* dimensionID, UINT* count);
+		typedef Gdiplus::GpStatus(WINGDIPAPI *GdipImageSelectActiveFrame_)(Gdiplus::GpImage *image, GDIPCONST GUID* dimensionID, UINT frameIndex);
+		typedef Gdiplus::GpStatus(WINGDIPAPI *GdipGetPropertyItemSize_)(Gdiplus::GpImage *image, PROPID propId, UINT* size);
+		typedef Gdiplus::GpStatus(WINGDIPAPI *GdipGetPropertyItem_)(Gdiplus::GpImage *image, PROPID propId,UINT propSize, Gdiplus::PropertyItem* buffer);
+		typedef Gdiplus::GpStatus(WINGDIPAPI *GdipGetImageWidth_)(Gdiplus::GpImage *image, UINT *width);
+		typedef Gdiplus::GpStatus(WINGDIPAPI *GdipGetImageHeight_)(Gdiplus::GpImage *image, UINT *height);
+		typedef Gdiplus::GpStatus(WINGDIPAPI *GdipGetImagePixelFormat_)(Gdiplus::GpImage *image, Gdiplus::PixelFormat *format);
+		typedef Gdiplus::GpStatus(WINGDIPAPI *GdipBitmapLockBits_)(Gdiplus::GpBitmap* bitmap, GDIPCONST Gdiplus::GpRect* rect, UINT flags, Gdiplus::PixelFormat format, Gdiplus::BitmapData* lockedBitmapData);
+		typedef Gdiplus::GpStatus(WINGDIPAPI *GdipBitmapUnlockBits_)(Gdiplus::GpBitmap* bitmap, Gdiplus::BitmapData* lockedBitmapData);
 
 		GdiplusStartup_ GdiplusStartup;
 		GdiplusShutdown_ GdiplusShutdown;

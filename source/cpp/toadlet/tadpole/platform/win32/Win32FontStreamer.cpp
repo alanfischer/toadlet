@@ -31,6 +31,10 @@
 #include <toadlet/tadpole/platform/win32/Win32FontStreamer.h>
 #include <stdlib.h>
 
+#if !defined(TOADLET_PLATFORM_WINCE)
+	using namespace Gdiplus;
+#endif
+
 namespace toadlet{
 namespace tadpole{
 

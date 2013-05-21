@@ -32,9 +32,6 @@
 #if !defined(TOADLET_PLATFORM_WINCE)
 	#include <windows.h>
     #include <Gdiplus.h>
-
-	using namespace Gdiplus;
-	using namespace Gdiplus::DllExports;
 #endif
 
 namespace toadlet{
@@ -52,14 +49,14 @@ public:
 	Resource::ptr load(Stream::ptr stream,ResourceData *data,ProgressListener *listener);
 
 	#if !defined(TOADLET_PLATFORM_WINCE)
-		typedef Status(WINAPI *GdiplusStartup_)(OUT ULONG_PTR *token,const GdiplusStartupInput *input,OUT GdiplusStartupOutput *output);
+		typedef Gdiplus::GpStatus(WINAPI *GdiplusStartup_)(OUT ULONG_PTR *token,const Gdiplus::GdiplusStartupInput *input,OUT Gdiplus::GdiplusStartupOutput *output);
 		typedef VOID(WINAPI *GdiplusShutdown_)(ULONG_PTR token);
-		typedef GpStatus(WINGDIPAPI *GdipNewPrivateFontCollection_)(GpFontCollection** fontCollection);
-		typedef GpStatus(WINGDIPAPI *GdipDeletePrivateFontCollection_)(GpFontCollection** fontCollection);
-		typedef GpStatus(WINGDIPAPI *GdipPrivateAddMemoryFont_)(GpFontCollection* fontCollection, GDIPCONST void* memory, INT length);
-		typedef GpStatus(WINGDIPAPI *GdipGetFontCollectionFamilyCount_)(GpFontCollection* fontCollection, INT* numFound);
-		typedef GpStatus(WINGDIPAPI *GdipGetFontCollectionFamilyList_)(GpFontCollection* fontCollection, INT numSought, GpFontFamily* gpfamilies[], INT* numFound);
-		typedef GpStatus(WINGDIPAPI *GdipGetFamilyName_)( GDIPCONST GpFontFamily* family,__out_ecount(LF_FACESIZE) LPWSTR name, LANGID language);
+		typedef Gdiplus::GpStatus(WINGDIPAPI *GdipNewPrivateFontCollection_)(Gdiplus::GpFontCollection** fontCollection);
+		typedef Gdiplus::GpStatus(WINGDIPAPI *GdipDeletePrivateFontCollection_)(Gdiplus::GpFontCollection** fontCollection);
+		typedef Gdiplus::GpStatus(WINGDIPAPI *GdipPrivateAddMemoryFont_)(Gdiplus::GpFontCollection* fontCollection, GDIPCONST void* memory, INT length);
+		typedef Gdiplus::GpStatus(WINGDIPAPI *GdipGetFontCollectionFamilyCount_)(Gdiplus::GpFontCollection* fontCollection, INT* numFound);
+		typedef Gdiplus::GpStatus(WINGDIPAPI *GdipGetFontCollectionFamilyList_)(Gdiplus::GpFontCollection* fontCollection, INT numSought, Gdiplus::GpFontFamily* gpfamilies[], INT* numFound);
+		typedef Gdiplus::GpStatus(WINGDIPAPI *GdipGetFamilyName_)( GDIPCONST Gdiplus::GpFontFamily* family,__out_ecount(LF_FACESIZE) LPWSTR name, LANGID language);
 
 		GdiplusStartup_ GdiplusStartup;
 		GdiplusShutdown_ GdiplusShutdown;
