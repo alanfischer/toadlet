@@ -71,7 +71,7 @@ Mesh::VertexBoneAssignmentList parseBoneAssignment(const String &string){
 			vba.bone=parseInt(string.substr(i,comma-i));
 		}
 		else{
-			vba.weight=parseScalar(string.substr(i,comma-i));
+			parseScalar(vba.weight,string.substr(i,comma-i));
 			total+=vba.weight;
 			vbaList.add(vba);
 		}
@@ -147,27 +147,27 @@ Material::ptr XMLMeshUtilities::loadMaterial(mxml_node_t *materialNode,int versi
 
 			mxml_node_t *ambientNode=mxmlFindChild(materialNode,"Ambient");
 			if(ambientNode!=NULL){
-				materialState.ambient=parseVector4(mxmlGetOpaque(ambientNode->child));
+				parseVector4(materialState.ambient,mxmlGetOpaque(ambientNode->child));
 			}
 
 			mxml_node_t *diffuseNode=mxmlFindChild(materialNode,"Diffuse");
 			if(diffuseNode!=NULL){
-				materialState.diffuse=parseVector4(mxmlGetOpaque(diffuseNode->child));
+				parseVector4(materialState.diffuse,mxmlGetOpaque(diffuseNode->child));
 			}
 
 			mxml_node_t *specularNode=mxmlFindChild(materialNode,"Specular");
 			if(specularNode!=NULL){
-				materialState.specular=parseVector4(mxmlGetOpaque(specularNode->child));
+				parseVector4(materialState.specular,mxmlGetOpaque(specularNode->child));
 			}
 
 			mxml_node_t *shininessNode=mxmlFindChild(materialNode,"Shininess");
 			if(shininessNode!=NULL){
-				materialState.shininess=parseScalar(mxmlGetOpaque(shininessNode->child));
+				parseScalar(materialState.shininess,mxmlGetOpaque(shininessNode->child));
 			}
 
 			mxml_node_t *emissiveNode=mxmlFindChild(materialNode,"Emissive");
 			if(emissiveNode!=NULL){
-				materialState.emissive=parseVector4(mxmlGetOpaque(emissiveNode->child));
+				parseVector4(materialState.emissive,mxmlGetOpaque(emissiveNode->child));
 			}
 
 			mxml_node_t *shadeNode=mxmlFindChild(materialNode,"Shade");
@@ -330,17 +330,23 @@ Mesh::ptr XMLMeshUtilities::loadMesh(mxml_node_t *node,int version,BufferManager
 
 		mxml_node_t *translateNode=mxmlFindChild(transformNode,"Translate");
 		if(translateNode!=NULL){
-			transform->setTranslate(parseVector3(mxmlGetOpaque(translateNode->child)));
+			Vector3 translate;
+			parseVector3(translate,mxmlGetOpaque(translateNode->child));
+			transform->setTranslate(translate);
 		}
 
 		mxml_node_t *rotateNode=mxmlFindChild(transformNode,"Rotate");
 		if(rotateNode!=NULL){
-			transform->setRotate(parseQuaternion(mxmlGetOpaque(rotateNode->child)));
+			Quaternion rotate;
+			parseQuaternion(rotate,mxmlGetOpaque(rotateNode->child));
+			transform->setRotate(rotate);
 		}
 
 		mxml_node_t *scaleNode=mxmlFindChild(transformNode,"Scale");
 		if(scaleNode!=NULL){
-			transform->setScale(parseVector3(mxmlGetOpaque(scaleNode->child)));
+			Vector3 scale;
+			parseVector3(scale,mxmlGetOpaque(scaleNode->child));
+			transform->setScale(scale);
 		}
 
 		mesh->setTransform(transform);
@@ -474,18 +480,25 @@ Mesh::ptr XMLMeshUtilities::loadMesh(mxml_node_t *node,int version,BufferManager
 							semantic=vertexFormat->getElementSemantic(c);
 						}
 						if(semantic==VertexFormat::Semantic_POSITION){
-							Vector3 position=parseVector3(element);
+							Vector3 position;
+							parseVector3(position,element);
 							bound.merge(position);
 							vba.set3(l,pi,position);
 						}
 						else if(semantic==VertexFormat::Semantic_NORMAL){
-							vba.set3(l,ni,parseVector3(element));
+							Vector3 normal;
+							parseVector3(normal,element);
+							vba.set3(l,ni,normal);
 						}
 						else if(semantic==VertexFormat::Semantic_TEXCOORD){
-							vba.set2(l,ti,parseVector2(element));
+							Vector2 texCoord;
+							parseVector2(texCoord,element);
+							vba.set2(l,ti,texCoord);
 						}
 						else if(semantic==VertexFormat::Semantic_COLOR){
- 							vba.setRGBA(l,ci,parseVector4(element).getRGBA());
+							Vector4 color;
+							parseVector4(color,element);
+ 							vba.setRGBA(l,ci,color.getRGBA());
 						}
 						else if(vbas.size()>0){
 							vbas[l]=parseBoneAssignment(element);
@@ -807,17 +820,17 @@ Skeleton::ptr XMLMeshUtilities::loadSkeleton(mxml_node_t *node,int version){
 
 		mxml_node_t *translateNode=mxmlFindChild(boneNode,"Translate");
 		if(translateNode!=NULL){
-			bone->translate=parseVector3(mxmlGetOpaque(translateNode->child));
+			parseVector3(bone->translate,mxmlGetOpaque(translateNode->child));
 		}
 
 		mxml_node_t *rotateNode=mxmlFindChild(boneNode,"Rotate");
 		if(rotateNode!=NULL){
-			bone->rotate=parseQuaternion(mxmlGetOpaque(rotateNode->child));
+			parseQuaternion(bone->rotate,mxmlGetOpaque(rotateNode->child));
 		}
 
 		mxml_node_t *scaleNode=mxmlFindChild(boneNode,"Scale");
 		if(scaleNode!=NULL){
-			bone->scale=parseVector3(mxmlGetOpaque(scaleNode->child));
+			parseVector3(bone->scale,mxmlGetOpaque(scaleNode->child));
 		}
 
 		skeleton->addBone(bone);
@@ -880,7 +893,7 @@ Sequence::ptr XMLMeshUtilities::loadSequence(mxml_node_t *node,int version,Buffe
 	scalar sequenceLength=0;
 	prop=mxmlElementGetAttr(node,"Length");
 	if(prop!=NULL){
-		sequenceLength=parseScalar(prop);
+		parseScalar(sequenceLength,prop);
 	}
 
 	mxml_node_t *trackNode=node->child;
@@ -925,22 +938,30 @@ Sequence::ptr XMLMeshUtilities::loadSequence(mxml_node_t *node,int version,Buffe
 			int index=0;
 			prop=mxmlElementGetAttr(keyFrameNode,"Time");
 			if(prop!=NULL){
-				index=track->addKeyFrame(parseScalar(prop));
+				scalar time;
+				parseScalar(time,prop);
+				index=track->addKeyFrame(time);
 			}
 
 			mxml_node_t *translateNode=mxmlFindChild(keyFrameNode,"Translate");
 			if(translateNode!=NULL){
-				vba.set3(index,0,parseVector3(mxmlGetOpaque(translateNode->child)));
+				Vector3 translate;
+				parseVector3(translate,mxmlGetOpaque(translateNode->child));
+				vba.set3(index,0,translate);
 			}
 
 			mxml_node_t *rotateNode=mxmlFindChild(keyFrameNode,"Rotate");
 			if(rotateNode!=NULL){
-				vba.set4(index,1,parseQuaternion(mxmlGetOpaque(rotateNode->child)));
+				Quaternion rotate;
+				parseQuaternion(rotate,mxmlGetOpaque(rotateNode->child));
+				vba.set4(index,1,rotate);
 			}
 
 			mxml_node_t *scaleNode=mxmlFindChild(keyFrameNode,"Scale");
 			if(scaleNode!=NULL){
-				vba.set3(index,2,parseVector3(mxmlGetOpaque(scaleNode->child)));
+				Vector3 scale;
+				parseVector3(scale,mxmlGetOpaque(scaleNode->child));
+				vba.set3(index,2,scale);
 			}
 		}
 	}

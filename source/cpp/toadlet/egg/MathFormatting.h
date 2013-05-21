@@ -27,51 +27,52 @@
 #define TOADLET_EGG_MATHFORMATTING_H
 
 #include <toadlet/egg/String.h>
-#include <toadlet/egg/math/Math.h>
 #include <toadlet/egg/mathfixed/Math.h>
+#include <toadlet/egg/math/Math.h>
 
 namespace toadlet{
 namespace egg{
 
 namespace MathFormatting{
-#if defined(TOADLET_FIXED_POINT)
-	using namespace toadlet::egg::mathfixed;
-#else
-	using namespace toadlet::egg::math;
-#endif
-
 	TOADLET_API String formatBool(bool b);
-	TOADLET_API bool parseBool(const char *string);
-
 	TOADLET_API String formatInt(int i);
+
+	TOADLET_API String formatScalar(math::real s);
+	TOADLET_API String formatVector2(const math::Vector2 &v,const char *separator=",");
+	TOADLET_API String formatVector3(const math::Vector3 &v,const char *separator=",");
+	TOADLET_API String formatVector4(const math::Vector4 &v,const char *separator=",");
+	TOADLET_API String formatEulerAngle(const math::EulerAngle &e,const char *separator=",",bool degrees=false);
+	TOADLET_API String formatQuaternion(const math::Quaternion &q,const char *separator=",");
+	TOADLET_API String formatByteColor(const math::Vector4 &c,const char *separator=",");
+
+	TOADLET_API String formatScalar(mathfixed::fixed s);
+	TOADLET_API String formatVector2(const mathfixed::Vector2 &v,const char *separator=",");
+	TOADLET_API String formatVector3(const mathfixed::Vector3 &v,const char *separator=",");
+	TOADLET_API String formatVector4(const mathfixed::Vector4 &v,const char *separator=",");
+	TOADLET_API String formatEulerAngle(const mathfixed::EulerAngle &e,const char *separator=",",bool degrees=false);
+	TOADLET_API String formatQuaternion(const mathfixed::Quaternion &q,const char *separator=",");
+	TOADLET_API String formatByteColor(const mathfixed::Vector4 &c,const char *separator=",");
+
+	TOADLET_API bool parseBool(const char *string);
 	TOADLET_API int parseInt(const char *string);
 
-	TOADLET_API String formatScalar(scalar s);
-	TOADLET_API scalar parseScalar(const char *string);
+	TOADLET_API math::real parseScalar(math::real &s,const char *string);
+	TOADLET_API math::Vector2 &parseVector2(math::Vector2 &r,const char *string);
+	TOADLET_API math::Vector2 &parseVector2(math::Vector2 &r,const char *string);
+	TOADLET_API math::Vector3 &parseVector3(math::Vector3 &r,const char *string);
+	TOADLET_API math::Vector4 &parseVector4(math::Vector4 &r,const char *string);
+	TOADLET_API math::EulerAngle &parseEulerAngle(math::EulerAngle &r,const char *string,math::EulerAngle::EulerOrder order,bool degrees=false);
+	TOADLET_API math::Quaternion &parseQuaternion(math::Quaternion &r,const char *string);
+	TOADLET_API math::Vector4 &parseByteColor(math::Vector4 &r,const char *string);
 
-	TOADLET_API String formatVector2(const Vector2 &v,const char *separator=",");
-	TOADLET_API Vector2 &parseVector2(Vector2 &r,const char *string);
-	inline Vector2 parseVector2(const char *string){Vector2 r;parseVector2(r,string);return r;}
-
-	TOADLET_API String formatVector3(const Vector3 &v,const char *separator=",");
-	TOADLET_API Vector3 &parseVector3(Vector3 &r,const char *string);
-	inline Vector3 parseVector3(const char *string){Vector3 r;parseVector3(r,string);return r;}
-
-	TOADLET_API String formatVector4(const Vector4 &v,const char *separator=",");
-	TOADLET_API Vector4 &parseVector4(Vector4 &r,const char *string);
-	inline Vector4 parseVector4(const char *string){Vector4 r;parseVector4(r,string);return r;}
-
-	TOADLET_API String formatEulerAngle(const EulerAngle &e,const char *separator=",",bool degrees=false);
-	TOADLET_API EulerAngle &parseEulerAngle(EulerAngle &r,const char *string,EulerAngle::EulerOrder order,bool degrees=false);
-	inline EulerAngle parseEulerAngle(const char *string,EulerAngle::EulerOrder order,bool degrees=false){EulerAngle r;parseEulerAngle(r,string,order,degrees);return r;}
-
-	TOADLET_API String formatQuaternion(const Quaternion &q,const char *separator=",");
-	TOADLET_API Quaternion &parseQuaternion(Quaternion &r,const char *string);
-	inline Quaternion parseQuaternion(const char *string){Quaternion r;parseQuaternion(r,string);return r;}
-
-	TOADLET_API String formatByteColor(const Vector4 &c,const char *separator=",");
-	TOADLET_API Vector4 &parseByteColor(Vector4 &r,const char *string);
-	inline Vector4 parseByteColor(const char *string){Vector4 r;parseByteColor(r,string);return r;}
+	TOADLET_API mathfixed::fixed parseScalar(mathfixed::fixed &s,const char *string);
+	TOADLET_API mathfixed::Vector2 &parseVector2(mathfixed::Vector2 &r,const char *string);
+	TOADLET_API mathfixed::Vector2 &parseVector2(mathfixed::Vector2 &r,const char *string);
+	TOADLET_API mathfixed::Vector3 &parseVector3(mathfixed::Vector3 &r,const char *string);
+	TOADLET_API mathfixed::Vector4 &parseVector4(mathfixed::Vector4 &r,const char *string);
+	TOADLET_API mathfixed::EulerAngle &parseEulerAngle(mathfixed::EulerAngle &r,const char *string,mathfixed::EulerAngle::EulerOrder order,bool degrees=false);
+	TOADLET_API mathfixed::Quaternion &parseQuaternion(mathfixed::Quaternion &r,const char *string);
+	TOADLET_API mathfixed::Vector4 &parseByteColor(mathfixed::Vector4 &r,const char *string);
 }
 
 }

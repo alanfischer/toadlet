@@ -51,7 +51,7 @@ bool MathTest::testEulerAngleConversion(){
 	}
 
 	if(testEulerAngle(angle1,angle2)==false){
-		Log::alert(formatEulerAngle(angle1)+"!="+formatEulerAngle(angle2));
+		Log::alert(MathFormatting::formatEulerAngle(angle1)+"!="+MathFormatting::formatEulerAngle(angle2));
 		result=false;
 	}
 
@@ -64,7 +64,7 @@ bool MathTest::testEulerAngleConversion(){
 	}
 
 	if(testEulerAngle(angle1,angle2)==false){
-		Log::alert(formatEulerAngle(angle1)+"!="+formatEulerAngle(angle2));
+		Log::alert(MathFormatting::formatEulerAngle(angle1)+"!="+MathFormatting::formatEulerAngle(angle2));
 		result=false;
 	}
 
@@ -77,7 +77,7 @@ bool MathTest::testEulerAngleConversion(){
 	}
 
 	if(testEulerAngle(angle1,angle2)==false){
-		Log::alert(formatEulerAngle(angle1)+"!="+formatEulerAngle(angle2));
+		Log::alert(MathFormatting::formatEulerAngle(angle1)+"!="+MathFormatting::formatEulerAngle(angle2));
 		result=false;
 	}
 
@@ -92,7 +92,7 @@ bool MathTest::testEulerAngleConversion(){
 	}
 
 	if(testEulerAngle(angle1,angle2)==false){
-		Log::alert(formatEulerAngle(angle1)+"!="+formatEulerAngle(angle2));
+		Log::alert(MathFormatting::formatEulerAngle(angle1)+"!="+MathFormatting::formatEulerAngle(angle2));
 		result=false;
 	}
 
@@ -105,7 +105,7 @@ bool MathTest::testEulerAngleConversion(){
 	}
 
 	if(testEulerAngle(angle1,angle2)==false){
-		Log::alert(formatEulerAngle(angle1)+"!="+formatEulerAngle(angle2));
+		Log::alert(MathFormatting::formatEulerAngle(angle1)+"!="+MathFormatting::formatEulerAngle(angle2));
 		result=false;
 	}
 
@@ -118,7 +118,7 @@ bool MathTest::testEulerAngleConversion(){
 	}
 
 	if(testEulerAngle(angle1,angle2)==false){
-		Log::alert(formatEulerAngle(angle1)+"!="+formatEulerAngle(angle2));
+		Log::alert(MathFormatting::formatEulerAngle(angle1)+"!="+MathFormatting::formatEulerAngle(angle2));
 		result=false;
 	}
 

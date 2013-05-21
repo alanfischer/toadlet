@@ -26,6 +26,8 @@
 #include <toadlet/egg/MathFormatting.h>
 #include <stdio.h>
 
+using namespace toadlet::egg::math::Math;
+
 namespace toadlet{
 namespace egg{
 namespace MathFormatting{
@@ -34,163 +36,198 @@ String formatBool(bool b){
 	return b?"true":"false";
 }
 
-bool parseBool(const char *string){
-	return String(string).toLower()=="true";
-}
-
 String formatInt(int i){
 	return String()+i;
+}
+
+String formatScalar(math::real s){
+	return String()+s;
+}
+
+String formatVector2(const math::Vector2 &v,const char *separator){
+	return String()+v.x+separator+v.y;
+}
+
+String formatVector3(const math::Vector3 &v,const char *separator){
+	return String()+v.x+separator+v.y+separator+v.z;
+}
+
+String formatVector4(const math::Vector4 &v,const char *separator){
+	return String()+v.x+separator+v.y+separator+v.z+separator+v.w;
+}
+
+String formatEulerAngle(const math::EulerAngle &e,const char *separator,bool degrees){
+	if(degrees){
+		return String()+radToDeg(e.x)+separator+radToDeg(e.y)+separator+radToDeg(e.z);
+	}
+	else{
+		return String()+e.x+separator+e.y+separator+e.z;
+	}
+}
+
+String formatQuaternion(const math::Quaternion &q,const char *separator){
+	return String()+q.x+separator+q.y+separator+q.z+separator+q.w;
+}
+
+String formatByteColor(const math::Vector4 &c,const char *separator){
+	int r=toInt(c.x*255),g=toInt(c.y*255),b=toInt(c.z*255),a=toInt(c.w*255);
+	return String()+r+separator+g+separator+b+separator+a;
+}
+
+
+String formatScalar(mathfixed::fixed s){
+	return formatScalar(toFloat(s));
+}
+
+String formatVector2(const mathfixed::Vector2 &v,const char *separator){
+	math::Vector2 rv;
+	rv.set(toFloat(v.x),toFloat(v.y));
+	return formatVector2(rv,separator);
+}
+
+String formatVector3(const mathfixed::Vector3 &v,const char *separator){
+	math::Vector3 rv;
+	rv.set(toFloat(v.x),toFloat(v.y),toFloat(v.z));
+	return formatVector3(rv,separator);
+}
+
+String formatVector4(const mathfixed::Vector4 &v,const char *separator){
+	math::Vector4 rv;
+	rv.set(toFloat(v.x),toFloat(v.y),toFloat(v.z),toFloat(v.w));
+	return formatVector4(rv,separator);
+}
+
+String formatEulerAngle(const mathfixed::EulerAngle &e,const char *separator,bool degrees){
+	math::EulerAngle re;
+	re.set((math::EulerAngle::EulerOrder)e.order,toFloat(e.x),toFloat(e.y),toFloat(e.z));
+	return formatEulerAngle(re,separator);
+}
+
+String formatQuaternion(const mathfixed::Quaternion &q,const char *separator){
+	math::Quaternion rq;
+	rq.set(toFloat(q.x),toFloat(q.y),toFloat(q.z),toFloat(q.w));
+	return formatQuaternion(rq,separator);
+}
+
+String formatByteColor(const mathfixed::Vector4 &c,const char *separator){
+	math::Vector4 rc;
+	rc.set(toFloat(c.x),toFloat(c.y),toFloat(c.z),toFloat(c.w));
+	return formatByteColor(rc,separator);
+}
+
+
+bool parseBool(const char *string){
+	return String(string).toLower()=="true";
 }
 
 int parseInt(const char *string){
 	return String(string).toInt32();
 }
 
-String formatScalar(scalar s){
-	#if defined(TOADLET_FIXED_POINT)
-		return String()+Math::toFloat(s);
-	#else
-		return String()+s;
-	#endif
+math::real parseScalar(math::real &s,const char *string){
+	s=String(string).toFloat();
+	return s;
 }
 
-scalar parseScalar(const char *string){
-	#if defined(TOADLET_FIXED_POINT)
-		return Math::fromFloat(String(string).toFloat());
-	#else
-		return String(string).toFloat();
-	#endif
-}
-
-String formatVector2(const Vector2 &v,const char *separator){
-	#if defined(TOADLET_FIXED_POINT)
-		return String()+Math::toFloat(v.x)+separator+Math::toFloat(v.y);
-	#else
-		return String()+v.x+separator+v.y;
-	#endif
-}
-
-Vector2 &parseVector2(Vector2 &r,const char *string){
+math::Vector2 &parseVector2(math::Vector2 &r,const char *string){
 	const char *parse=strchr(string,',')!=NULL?"%f,%f":"%f %f";
 	float x=0,y=0;
 	sscanf(string,parse,&x,&y);
-	#if defined(TOADLET_FIXED_POINT)
-		r.x=Math::fromFloat(x);r.y=Math::fromFloat(y);
-	#else
-		r.x=x;r.y=y;
-	#endif
+	r.set(x,y);
 	return r;
 }
 
-String formatVector3(const Vector3 &v,const char *separator){
-	#if defined(TOADLET_FIXED_POINT)
-		return String()+Math::toFloat(v.x)+separator+Math::toFloat(v.y)+separator+Math::toFloat(v.z);
-	#else
-		return String()+v.x+separator+v.y+separator+v.z;
-	#endif
-}
-
-Vector3 &parseVector3(Vector3 &r,const char *string){
+math::Vector3 &parseVector3(math::Vector3 &r,const char *string){
 	const char *parse=strchr(string,',')!=NULL?"%f,%f,%f":"%f %f %f";
 	float x=0,y=0,z=0;
 	sscanf(string,parse,&x,&y,&z);
-	#if defined(TOADLET_FIXED_POINT)
-		r.x=Math::fromFloat(x);r.y=Math::fromFloat(y);r.z=Math::fromFloat(z);
-	#else
-		r.x=x;r.y=y;r.z=z;
-	#endif
+	r.set(x,y,z);
 	return r;
 }
 
-String formatVector4(const Vector4 &v,const char *separator){
-	#if defined(TOADLET_FIXED_POINT)
-		return String()+Math::toFloat(v.x)+separator+Math::toFloat(v.y)+separator+Math::toFloat(v.z)+separator+Math::toFloat(v.w);
-	#else
-		return String()+v.x+separator+v.y+separator+v.z+separator+v.w;
-	#endif
-}
-
-Vector4 &parseVector4(Vector4 &r,const char *string){
+math::Vector4 &parseVector4(math::Vector4 &r,const char *string){
 	const char *parse=strchr(string,',')!=NULL?"%f,%f,%f,%f":"%f %f %f %f";
 	float x=0,y=0,z=0,w=0;
 	sscanf(string,parse,&x,&y,&z,&w);
-	#if defined(TOADLET_FIXED_POINT)
-		r.x=Math::fromFloat(x);r.y=Math::fromFloat(y);r.z=Math::fromFloat(z);r.w=Math::fromFloat(w);
-	#else
-		r.x=x;r.y=y;r.z=z;r.w=w;
-	#endif
+	r.set(x,y,z,w);
 	return r;
 }
 
-String formatEulerAngle(const EulerAngle &e,const char *separator,bool degrees){
-	if(degrees){
-		#if defined(TOADLET_FIXED_POINT)
-			return String()+Math::toFloat(Math::radToDeg(e.x))+separator+Math::toFloat(Math::radToDeg(e.y))+separator+Math::toFloat(Math::radToDeg(e.z));
-		#else
-			return String()+Math::radToDeg(e.x)+separator+Math::radToDeg(e.y)+separator+Math::radToDeg(e.z);
-		#endif
-	}
-	else{
-		#if defined(TOADLET_FIXED_POINT)
-			return String()+Math::toFloat(e.x)+separator+Math::toFloat(e.y)+separator+Math::toFloat(e.z);
-		#else
-			return String()+e.x+separator+e.y+separator+e.z;
-		#endif
-	}
-}
-
-EulerAngle &parseEulerAngle(EulerAngle &r,const char *string,EulerAngle::EulerOrder order,bool degrees){
-	r.order=order;	
+math::EulerAngle &parseEulerAngle(math::EulerAngle &r,const char *string,math::EulerAngle::EulerOrder order,bool degrees){
 	const char *parse=strchr(string,',')!=NULL?"%f,%f,%f":"%f %f %f";
 	float x=0,y=0,z=0;
 	sscanf(string,parse,&x,&y,&z);
 	if(degrees){
-		#if defined(TOADLET_FIXED_POINT)
-			r.x=Math::degToRad(Math::fromFloat(x));r.y=Math::degToRad(Math::fromFloat(y));r.z=Math::degToRad(Math::fromFloat(z));
-		#else
-			r.x=Math::degToRad(x);r.y=Math::degToRad(y);r.z=Math::degToRad(z);
-		#endif
+		r.set(order,degToRad(x),degToRad(y),degToRad(z));
 	}
 	else{
-		#if defined(TOADLET_FIXED_POINT)
-			r.x=Math::fromFloat(x);r.y=Math::fromFloat(y);r.z=Math::fromFloat(z);
-		#else
-			r.x=x;r.y=y;r.z=z;
-		#endif
+		r.set(order,x,y,z);
 	}
 	return r;
 }
 
-String formatQuaternion(const Quaternion &q,const char *separator){
-	#if defined(TOADLET_FIXED_POINT)
-		return String()+Math::toFloat(q.x)+separator+Math::toFloat(q.y)+separator+Math::toFloat(q.z)+separator+Math::toFloat(q.w);
-	#else
-		return String()+q.x+separator+q.y+separator+q.z+separator+q.w;
-	#endif
-}
-
-Quaternion &parseQuaternion(Quaternion &r,const char *string){
+math::Quaternion &parseQuaternion(math::Quaternion &r,const char *string){
 	const char *parse=strchr(string,',')!=NULL?"%f,%f,%f,%f":"%f %f %f %f";
 	float x=0,y=0,z=0,w=0;
 	sscanf(string,parse,&x,&y,&z,&w);
-	#if defined(TOADLET_FIXED_POINT)
-		r.x=Math::fromFloat(x);r.y=Math::fromFloat(y);r.z=Math::fromFloat(z);r.w=Math::fromFloat(w);
-	#else
-		r.x=x;r.y=y;r.z=z;r.w=w;
-	#endif
+	r.set(x,y,z,w);
 	return r;
 }
 
-String formatByteColor(const Vector4 &c,const char *separator){
-	int r=Math::toInt(c.x*255),g=Math::toInt(c.y*255),b=Math::toInt(c.z*255),a=Math::toInt(c.w*255);
-	return String()+r+separator+g+separator+b+separator+a;
-}
-
-Vector4 &parseByteColor(Vector4 &r,const char *string){
+math::Vector4 &parseByteColor(math::Vector4 &r,const char *string){
 	const char *parse=strchr(string,',')!=NULL?"%d,%d,%d,%d":"%d %d %d %d";
 	int R=0,g=0,b=0,a=0;
 	sscanf(string,parse,&R,&g,&b,&a);
-	r.x=Math::fromInt(R)/255;r.y=Math::fromInt(g)/255;r.z=Math::fromInt(b)/255;r.w=Math::fromInt(a)/255;
+	r.set(fromInt(R)/255,fromInt(g)/255,fromInt(b),fromInt(a)/255);
+	return r;
+}
+
+mathfixed::fixed parseScalar(mathfixed::fixed &s,const char *string){
+	math::real rs;
+	parseScalar(rs,string);
+	s=fromFloat(rs);
+	return s;
+}
+
+mathfixed::Vector2 &parseVector2(mathfixed::Vector2 &r,const char *string){
+	math::Vector2 rv;
+	parseVector2(rv,string);
+	r.set(fromFloat(rv.x),fromFloat(rv.y));
+	return r;
+}
+
+mathfixed::Vector3 &parseVector3(mathfixed::Vector3 &r,const char *string){
+	math::Vector3 rv;
+	parseVector3(rv,string);
+	r.set(fromFloat(rv.x),fromFloat(rv.y),fromFloat(rv.z));
+	return r;
+}
+
+mathfixed::Vector4 &parseVector4(mathfixed::Vector4 &r,const char *string){
+	math::Vector4 rv;
+	parseVector4(rv,string);
+	r.set(fromFloat(rv.x),fromFloat(rv.y),fromFloat(rv.z),fromFloat(rv.w));
+	return r;
+}
+
+mathfixed::EulerAngle &parseEulerAngle(mathfixed::EulerAngle &r,const char *string,mathfixed::EulerAngle::EulerOrder order,bool degrees){
+	math::EulerAngle ra;
+	parseEulerAngle(ra,string,(math::EulerAngle::EulerOrder)order,degrees);
+	r.set((mathfixed::EulerAngle::EulerOrder)ra.order,fromFloat(ra.x),fromFloat(ra.y),fromFloat(ra.z));
+	return r;
+}
+
+mathfixed::Quaternion &parseQuaternion(mathfixed::Quaternion &r,const char *string){
+	math::Quaternion rq;
+	parseQuaternion(rq,string);
+	r.set(fromFloat(rq.x),fromFloat(rq.y),fromFloat(rq.z),fromFloat(rq.w));
+	return r;
+}
+
+mathfixed::Vector4 &parseByteColor(mathfixed::Vector4 &r,const char *string){
+	math::Vector4 rv;
+	parseByteColor(rv,string);
+	r.set(fromFloat(rv.x),fromFloat(rv.y),fromFloat(rv.z),fromFloat(rv.w));
 	return r;
 }
 

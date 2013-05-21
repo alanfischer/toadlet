@@ -30,7 +30,6 @@
 using namespace toadlet;
 using namespace toadlet::egg;
 using namespace toadlet::egg::math;
-using namespace toadlet::egg::MathFormatting;
 
 class MathTest{
 public:
