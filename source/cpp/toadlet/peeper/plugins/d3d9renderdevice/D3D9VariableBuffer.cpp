@@ -102,7 +102,6 @@ bool D3D9VariableBuffer::update(tbyte *data,int start,int size){
 }
 
 void D3D9VariableBuffer::activateConstants(Shader::ShaderType type){
-	math::Matrix4x4 matrix;
 	IDirect3DDevice9 *device=mDevice->getDirect3DDevice9();
 
 	int i;
@@ -130,9 +129,9 @@ void D3D9VariableBuffer::activateConstants(Shader::ShaderType type){
 		}
 
 		if((format&VariableBufferFormat::Format_BIT_PROJECTION)!=0){
-			matrix.set((float*)data);
-			mDevice->updateProjectionMatrix(matrix);
-			data=(tbyte*)matrix.data;
+			mDevice->cacheMatrix4x4.set((scalar*)data);
+			mDevice->updateProjectionMatrix(mDevice->cacheMatrix4x4);
+			data=(tbyte*)mDevice->cacheMatrix4x4.data;
 		}
 
 		switch(format&VariableBufferFormat::Format_MASK_TYPES){

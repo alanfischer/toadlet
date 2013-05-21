@@ -290,7 +290,7 @@ Vector3 ALAudio::getPosition() const{
 	Vector3 position;
 	if(alIsSource(mHandle)){
 		alGetSourcefv(mHandle,AL_POSITION,(ALfloat*)mDevice->cacheVector3.getData());
-		MathConversion::scalarToFloat(position,mDevice->cacheVector3);
+		MathConversion::floatToScalar(position,mDevice->cacheVector3);
 	}
 	return position;
 }
@@ -311,7 +311,7 @@ Vector3 ALAudio::getVelocity() const{
 	Vector3 velocity;
 	if(alIsSource(mHandle)){
 		alGetSourcefv(mHandle,AL_VELOCITY,(ALfloat*)mDevice->cacheVector3.getData());
-		MathConversion::scalarToFloat(velocity,mDevice->cacheVector3);
+		MathConversion::floatToScalar(velocity,mDevice->cacheVector3);
 	}
 	return velocity;
 }

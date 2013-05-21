@@ -37,7 +37,37 @@ namespace MathConversion{
 #if defined(TOADLET_FIXED_POINT)
 	inline float scalarToFloat(scalar s){return mathfixed::Math::toFloat(s);}
 
+	inline math::Vector2 &scalarToFloat(math::Vector2 &result,const mathfixed::Vector2 &src){
+		result.x=mathfixed::Math::toFloat(src.x);
+		result.y=mathfixed::Math::toFloat(src.y);
+		return result;
+	}
+
 	inline math::Vector3 &scalarToFloat(math::Vector3 &result,const mathfixed::Vector3 &src){
+		result.x=mathfixed::Math::toFloat(src.x);
+		result.y=mathfixed::Math::toFloat(src.y);
+		result.z=mathfixed::Math::toFloat(src.z);
+		return result;
+	}
+
+	inline math::Vector4 &scalarToFloat(math::Vector4 &result,const mathfixed::Vector4 &src){
+		result.x=mathfixed::Math::toFloat(src.x);
+		result.y=mathfixed::Math::toFloat(src.y);
+		result.z=mathfixed::Math::toFloat(src.z);
+		result.w=mathfixed::Math::toFloat(src.w);
+		return result;
+	}
+
+	inline math::Quaternion &scalarToFloat(math::Quaternion &result,const mathfixed::Quaternion &src){
+		result.x=mathfixed::Math::toFloat(src.x);
+		result.y=mathfixed::Math::toFloat(src.y);
+		result.z=mathfixed::Math::toFloat(src.z);
+		result.w=mathfixed::Math::toFloat(src.w);
+		return result;
+	}
+
+	inline math::EulerAngle &scalarToFloat(math::EulerAngle &result,const mathfixed::EulerAngle &src){
+		result.order=(math::EulerAngle::EulerOrder)src.order;
 		result.x=mathfixed::Math::toFloat(src.x);
 		result.y=mathfixed::Math::toFloat(src.y);
 		result.z=mathfixed::Math::toFloat(src.z);
@@ -66,7 +96,37 @@ namespace MathConversion{
 
 	inline scalar floatToScalar(float f){return mathfixed::Math::fromFloat(f);}
 
+	inline mathfixed::Vector2 &floatToScalar(mathfixed::Vector2 &result,const math::Vector2 &src){
+		result.x=mathfixed::Math::fromFloat(src.x);
+		result.y=mathfixed::Math::fromFloat(src.y);
+		return result;
+	}
+
 	inline mathfixed::Vector3 &floatToScalar(mathfixed::Vector3 &result,const math::Vector3 &src){
+		result.x=mathfixed::Math::fromFloat(src.x);
+		result.y=mathfixed::Math::fromFloat(src.y);
+		result.z=mathfixed::Math::fromFloat(src.z);
+		return result;
+	}
+
+	inline mathfixed::Vector4 &floatToScalar(mathfixed::Vector4 &result,const math::Vector4 &src){
+		result.x=mathfixed::Math::fromFloat(src.x);
+		result.y=mathfixed::Math::fromFloat(src.y);
+		result.z=mathfixed::Math::fromFloat(src.z);
+		result.w=mathfixed::Math::fromFloat(src.w);
+		return result;
+	}
+
+	inline mathfixed::Quaternion &floatToScalar(mathfixed::Quaternion &result,const math::Quaternion &src){
+		result.x=mathfixed::Math::fromFloat(src.x);
+		result.y=mathfixed::Math::fromFloat(src.y);
+		result.z=mathfixed::Math::fromFloat(src.z);
+		result.w=mathfixed::Math::fromFloat(src.w);
+		return result;
+	}
+
+	inline mathfixed::EulerAngle &floatToScalar(mathfixed::EulerAngle &result,const math::EulerAngle &src){
+		result.order=(mathfixed::EulerAngle::EulerOrder)src.order;
 		result.x=mathfixed::Math::fromFloat(src.x);
 		result.y=mathfixed::Math::fromFloat(src.y);
 		result.z=mathfixed::Math::fromFloat(src.z);
@@ -95,31 +155,93 @@ namespace MathConversion{
 
 	inline mathfixed::fixed scalarToFixed(scalar s){return s;}
 
+	inline mathfixed::Vector2 &scalarToFixed(mathfixed::Vector2 &result,const mathfixed::Vector2 &src){result.set(src);return result;}
+
 	inline mathfixed::Vector3 &scalarToFixed(mathfixed::Vector3 &result,const mathfixed::Vector3 &src){result.set(src);return result;}
+
+	inline mathfixed::Vector4 &scalarToFixed(mathfixed::Vector4 &result,const mathfixed::Vector4 &src){result.set(src);return result;}
+
+	inline mathfixed::Quaternion &scalarToFixed(mathfixed::Quaternion &result,const mathfixed::Quaternion &src){result.set(src);return result;}
+
+	inline mathfixed::EulerAngle &scalarToFixed(mathfixed::EulerAngle &result,const mathfixed::EulerAngle &src){result.set(src);return result;}
 
 	inline mathfixed::Matrix4x4 &scalarToFixed(mathfixed::Matrix4x4 &result,const mathfixed::Matrix4x4 &src){result.set(src);return result;}
 
 	inline scalar fixedToScalar(mathfixed::fixed f){return f;}
 
+	inline mathfixed::Vector2 &fixedToScalar(mathfixed::Vector2 &result,const mathfixed::Vector2 &src){result.set(src);return result;}
+
 	inline mathfixed::Vector3 &fixedToScalar(mathfixed::Vector3 &result,const mathfixed::Vector3 &src){result.set(src);return result;}
+
+	inline mathfixed::Vector4 &fixedToScalar(mathfixed::Vector4 &result,const mathfixed::Vector4 &src){result.set(src);return result;}
+
+	inline mathfixed::Quaternion &fixedToScalar(mathfixed::Quaternion &result,const mathfixed::Quaternion &src){result.set(src);return result;}
+
+	inline mathfixed::EulerAngle &fixedToScalar(mathfixed::EulerAngle &result,const mathfixed::EulerAngle &src){result.set(src);return result;}
 
 	inline mathfixed::Matrix4x4 &fixedToScalar(mathfixed::Matrix4x4 &result,const mathfixed::Matrix4x4 &src){result.set(src);return result;}
 #else
 	inline float scalarToFloat(scalar s){return s;}
 
+	inline math::Vector2 &scalarToFloat(math::Vector2 &result,const math::Vector2 &src){result.set(src);return result;}
+
 	inline math::Vector3 &scalarToFloat(math::Vector3 &result,const math::Vector3 &src){result.set(src);return result;}
+
+	inline math::Vector4 &scalarToFloat(math::Vector4 &result,const math::Vector4 &src){result.set(src);return result;}
+
+	inline math::Quaternion &scalarToFloat(math::Quaternion &result,const math::Quaternion &src){result.set(src);return result;}
+
+	inline math::EulerAngle &scalarToFloat(math::EulerAngle &result,const math::EulerAngle &src){result.set(src);return result;}
 
 	inline math::Matrix4x4 &scalarToFloat(math::Matrix4x4 &result,const math::Matrix4x4 &src){result.set(src);return result;}
 
 	inline scalar floatToScalar(float f){return f;}
 
+	inline math::Vector2 &floatToScalar(math::Vector2 &result,const math::Vector2 &src){result.set(src);return result;}
+
 	inline math::Vector3 &floatToScalar(math::Vector3 &result,const math::Vector3 &src){result.set(src);return result;}
+
+	inline math::Vector4 &floatToScalar(math::Vector4 &result,const math::Vector4 &src){result.set(src);return result;}
+
+	inline math::Quaternion &floatToScalar(math::Quaternion &result,const math::Quaternion &src){result.set(src);return result;}
+
+	inline math::EulerAngle &floatToScalar(math::EulerAngle &result,const math::EulerAngle &src){result.set(src);return result;}
 
 	inline math::Matrix4x4 &floatToScalar(math::Matrix4x4 &result,const math::Matrix4x4 &src){result.set(src);return result;}
 
 	inline mathfixed::fixed scalarToFixed(scalar s){return mathfixed::Math::fromFloat(s);}
 
-	inline mathfixed::Vector3 &scalarToFixed(mathfixed::Vector3 &result,const mathfixed::Vector3 &src){
+	inline mathfixed::Vector2 &scalarToFixed(mathfixed::Vector2 &result,const math::Vector2 &src){
+		result.x=mathfixed::Math::fromFloat(src.x);
+		result.y=mathfixed::Math::fromFloat(src.y);
+		return result;
+	}
+
+	inline mathfixed::Vector3 &scalarToFixed(mathfixed::Vector3 &result,const math::Vector3 &src){
+		result.x=mathfixed::Math::fromFloat(src.x);
+		result.y=mathfixed::Math::fromFloat(src.y);
+		result.z=mathfixed::Math::fromFloat(src.z);
+		return result;
+	}
+
+	inline mathfixed::Vector4 &scalarToFixed(mathfixed::Vector4 &result,const math::Vector4 &src){
+		result.x=mathfixed::Math::fromFloat(src.x);
+		result.y=mathfixed::Math::fromFloat(src.y);
+		result.z=mathfixed::Math::fromFloat(src.z);
+		result.w=mathfixed::Math::fromFloat(src.w);
+		return result;
+	}
+
+	inline mathfixed::Quaternion &scalarToFixed(mathfixed::Quaternion &result,const math::Quaternion &src){
+		result.x=mathfixed::Math::fromFloat(src.x);
+		result.y=mathfixed::Math::fromFloat(src.y);
+		result.z=mathfixed::Math::fromFloat(src.z);
+		result.w=mathfixed::Math::fromFloat(src.w);
+		return result;
+	}
+
+	inline mathfixed::EulerAngle &scalarToFixed(mathfixed::EulerAngle &result,const math::EulerAngle &src){
+		result.order=(mathfixed::EulerAngle::EulerOrder)src.order;
 		result.x=mathfixed::Math::fromFloat(src.x);
 		result.y=mathfixed::Math::fromFloat(src.y);
 		result.z=mathfixed::Math::fromFloat(src.z);
@@ -148,7 +270,37 @@ namespace MathConversion{
 
 	inline scalar fixedToScalar(mathfixed::fixed f){return mathfixed::Math::toFloat(f);}
 
+	inline math::Vector2 &fixedToScalar(math::Vector2 &result,const mathfixed::Vector2 &src){
+		result.x=mathfixed::Math::toFloat(src.x);
+		result.y=mathfixed::Math::toFloat(src.y);
+		return result;
+	}
+
 	inline math::Vector3 &fixedToScalar(math::Vector3 &result,const mathfixed::Vector3 &src){
+		result.x=mathfixed::Math::toFloat(src.x);
+		result.y=mathfixed::Math::toFloat(src.y);
+		result.z=mathfixed::Math::toFloat(src.z);
+		return result;
+	}
+
+	inline math::Vector4 &fixedToScalar(math::Vector4 &result,const mathfixed::Vector4 &src){
+		result.x=mathfixed::Math::toFloat(src.x);
+		result.y=mathfixed::Math::toFloat(src.y);
+		result.z=mathfixed::Math::toFloat(src.z);
+		result.w=mathfixed::Math::toFloat(src.w);
+		return result;
+	}
+
+	inline math::Quaternion &fixedToScalar(math::Quaternion &result,const mathfixed::Quaternion &src){
+		result.x=mathfixed::Math::toFloat(src.x);
+		result.y=mathfixed::Math::toFloat(src.y);
+		result.z=mathfixed::Math::toFloat(src.z);
+		result.w=mathfixed::Math::toFloat(src.w);
+		return result;
+	}
+
+	inline math::EulerAngle &fixedToScalar(math::EulerAngle &result,const mathfixed::EulerAngle &src){
+		result.order=(math::EulerAngle::EulerOrder)src.order;
 		result.x=mathfixed::Math::toFloat(src.x);
 		result.y=mathfixed::Math::toFloat(src.y);
 		result.z=mathfixed::Math::toFloat(src.z);
