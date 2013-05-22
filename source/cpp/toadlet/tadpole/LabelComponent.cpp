@@ -47,6 +47,9 @@ LabelComponent::LabelComponent(Engine *engine):
 {
 	mEngine=engine;
 	mRendered=true;
+	mTransform=new Transform();
+	mTransform->setTransformListener(this);
+	mWorldTransform=new Transform();
 	mBound=new Bound();
 	mWorldBound=new Bound();
 
@@ -80,12 +83,14 @@ void LabelComponent::destroy(){
 
 void LabelComponent::parentChanged(Node *node){
 	if(mParent!=NULL){
+		mParent->spacialRemoved(this);
 		mParent->visibleRemoved(this);
 	}
 
 	BaseComponent::parentChanged(node);
 	
 	if(mParent!=NULL){
+		mParent->spacialAttached(this);
 		mParent->visibleAttached(this);
 	}
 }
@@ -129,8 +134,26 @@ void LabelComponent::setWordWrap(bool wordWrap){
 	updateLabel();
 }
 
+void LabelComponent::setTransform(Transform::ptr transform){
+	if(transform==NULL){
+		mTransform->reset();
+	}
+	else{
+		mTransform->set(transform);
+	}
+}
+
 void LabelComponent::transformChanged(Transform *transform){
-	mWorldBound->transform(mBound,mParent->getWorldTransform());
+	if(mParent==NULL){
+		return;
+	}
+
+	mWorldTransform->setTransform(mParent->getWorldTransform(),mTransform);
+	mWorldBound->transform(mBound,mWorldTransform);
+
+	if(transform==mTransform){
+		mParent->boundChanged();
+	}
 }
 
 RenderState::ptr LabelComponent::getSharedRenderState(){

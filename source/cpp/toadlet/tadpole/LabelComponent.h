@@ -39,7 +39,7 @@
 namespace toadlet{
 namespace tadpole{
 
-class TOADLET_API LabelComponent:public BaseComponent,public Spacial,public Visible,public Renderable{
+class TOADLET_API LabelComponent:public BaseComponent,public TransformListener,public Spacial,public Visible,public Renderable{
 public:
 	TOADLET_OBJECT(LabelComponent);
 
@@ -67,8 +67,9 @@ public:
 	inline scalar getWidth() const{return mWidth;}
 
 	// Spacial
-	Transform *getTransform() const{return NULL;}
-	Transform *getWorldTransform() const{return NULL;}
+	void setTransform(Transform::ptr transform);
+	Transform *getTransform() const{return mTransform;}
+	Transform *getWorldTransform() const{return mWorldTransform;}
 	Bound *getBound() const{return mBound;}
 	Bound *getWorldBound() const{return mWorldBound;}
 	void transformChanged(Transform *transform);
@@ -81,8 +82,8 @@ public:
 
 	// Renderable
 	Material *getRenderMaterial() const{return mMaterial;}
-	Transform *getRenderTransform() const{return mParent->getWorldTransform();}
-	Bound *getRenderBound() const{return mParent->getWorldBound();}
+	Transform *getRenderTransform() const{return mWorldTransform;}
+	Bound *getRenderBound() const{return mWorldBound;}
 	void render(RenderManager *manager) const;
 
 protected:
@@ -99,6 +100,8 @@ protected:
 	bool mWordWrap;
 	scalar mWidth;
 	bool mRendered;
+	Transform::ptr mTransform;
+	Transform::ptr mWorldTransform;
 	Bound::ptr mBound;
 	Bound::ptr mWorldBound;
 
