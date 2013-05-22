@@ -139,10 +139,9 @@ void ResourceManager::unmanage(Resource *resource){
 	}
 	else{
 		int handle=resource->getUniqueHandle();
-		if(handle>=0){
+		if(handle>=0 && mResources[handle]==resource){
 			mResources[handle]=NULL;
 			mFreeHandles.add(handle);
-			resource->internal_setUniqueHandle(0);
 		}
 	}
 

@@ -99,7 +99,6 @@ public:
 	void setAmbientColor(const Vector4 &ambientColor){mAmbientColor.set(ambientColor);}
 	inline const Vector4 &getAmbientColor() const{return mAmbientColor;}
 
-	int countActiveNodes(Node *node=NULL);
 	void renderBoundingVolumes(RenderDevice *renderDevice,Node *node=NULL);
 
 	virtual void preContextReset(RenderDevice *renderDevice){}

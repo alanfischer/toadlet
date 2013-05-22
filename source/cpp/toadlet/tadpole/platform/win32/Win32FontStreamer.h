@@ -29,10 +29,8 @@
 #include <toadlet/tadpole/Font.h>
 #include <toadlet/tadpole/FontData.h>
 #include <toadlet/tadpole/TextureManager.h>
-#if !defined(TOADLET_PLATFORM_WINCE)
-	#include <windows.h>
-    #include <Gdiplus.h>
-#endif
+#include <windows.h>
+#include <Gdiplus.h>
 
 namespace toadlet{
 namespace tadpole{
@@ -48,32 +46,28 @@ public:
 
 	Resource::ptr load(Stream::ptr stream,ResourceData *data,ProgressListener *listener);
 
-	#if !defined(TOADLET_PLATFORM_WINCE)
-		typedef Gdiplus::GpStatus(WINAPI *GdiplusStartup_)(OUT ULONG_PTR *token,const Gdiplus::GdiplusStartupInput *input,OUT Gdiplus::GdiplusStartupOutput *output);
-		typedef VOID(WINAPI *GdiplusShutdown_)(ULONG_PTR token);
-		typedef Gdiplus::GpStatus(WINGDIPAPI *GdipNewPrivateFontCollection_)(Gdiplus::GpFontCollection** fontCollection);
-		typedef Gdiplus::GpStatus(WINGDIPAPI *GdipDeletePrivateFontCollection_)(Gdiplus::GpFontCollection** fontCollection);
-		typedef Gdiplus::GpStatus(WINGDIPAPI *GdipPrivateAddMemoryFont_)(Gdiplus::GpFontCollection* fontCollection, GDIPCONST void* memory, INT length);
-		typedef Gdiplus::GpStatus(WINGDIPAPI *GdipGetFontCollectionFamilyCount_)(Gdiplus::GpFontCollection* fontCollection, INT* numFound);
-		typedef Gdiplus::GpStatus(WINGDIPAPI *GdipGetFontCollectionFamilyList_)(Gdiplus::GpFontCollection* fontCollection, INT numSought, Gdiplus::GpFontFamily* gpfamilies[], INT* numFound);
-		typedef Gdiplus::GpStatus(WINGDIPAPI *GdipGetFamilyName_)( GDIPCONST Gdiplus::GpFontFamily* family,__out_ecount(LF_FACESIZE) LPWSTR name, LANGID language);
+	typedef Gdiplus::GpStatus(WINAPI *GdiplusStartup_)(OUT ULONG_PTR *token,const Gdiplus::GdiplusStartupInput *input,OUT Gdiplus::GdiplusStartupOutput *output);
+	typedef VOID(WINAPI *GdiplusShutdown_)(ULONG_PTR token);
+	typedef Gdiplus::GpStatus(WINGDIPAPI *GdipNewPrivateFontCollection_)(Gdiplus::GpFontCollection** fontCollection);
+	typedef Gdiplus::GpStatus(WINGDIPAPI *GdipDeletePrivateFontCollection_)(Gdiplus::GpFontCollection** fontCollection);
+	typedef Gdiplus::GpStatus(WINGDIPAPI *GdipPrivateAddMemoryFont_)(Gdiplus::GpFontCollection* fontCollection, GDIPCONST void* memory, INT length);
+	typedef Gdiplus::GpStatus(WINGDIPAPI *GdipGetFontCollectionFamilyCount_)(Gdiplus::GpFontCollection* fontCollection, INT* numFound);
+	typedef Gdiplus::GpStatus(WINGDIPAPI *GdipGetFontCollectionFamilyList_)(Gdiplus::GpFontCollection* fontCollection, INT numSought, Gdiplus::GpFontFamily* gpfamilies[], INT* numFound);
+	typedef Gdiplus::GpStatus(WINGDIPAPI *GdipGetFamilyName_)( GDIPCONST Gdiplus::GpFontFamily* family,__out_ecount(LF_FACESIZE) LPWSTR name, LANGID language);
 
-		GdiplusStartup_ GdiplusStartup;
-		GdiplusShutdown_ GdiplusShutdown;
-		GdipNewPrivateFontCollection_ GdipNewPrivateFontCollection;
-		GdipDeletePrivateFontCollection_ GdipDeletePrivateFontCollection;
-		GdipPrivateAddMemoryFont_ GdipPrivateAddMemoryFont;
-		GdipGetFontCollectionFamilyCount_ GdipGetFontCollectionFamilyCount;
-		GdipGetFontCollectionFamilyList_ GdipGetFontCollectionFamilyList;
-		GdipGetFamilyName_ GdipGetFamilyName;
-	#endif
+	GdiplusStartup_ GdiplusStartup;
+	GdiplusShutdown_ GdiplusShutdown;
+	GdipNewPrivateFontCollection_ GdipNewPrivateFontCollection;
+	GdipDeletePrivateFontCollection_ GdipDeletePrivateFontCollection;
+	GdipPrivateAddMemoryFont_ GdipPrivateAddMemoryFont;
+	GdipGetFontCollectionFamilyCount_ GdipGetFontCollectionFamilyCount;
+	GdipGetFontCollectionFamilyList_ GdipGetFontCollectionFamilyList;
+	GdipGetFamilyName_ GdipGetFamilyName;
 
 protected:
 	TextureManager *mTextureManager;
-	#if !defined(TOADLET_PLATFORM_WINCE)
-		HMODULE mLibrary;
-		ULONG_PTR mToken;
-	#endif
+	HMODULE mLibrary;
+	ULONG_PTR mToken;
 };
 
 }

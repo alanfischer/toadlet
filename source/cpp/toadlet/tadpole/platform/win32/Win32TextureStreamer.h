@@ -28,14 +28,8 @@
 
 #include <toadlet/peeper/Texture.h>
 #include <toadlet/tadpole/TextureManager.h>
-#if defined(TOADLET_PLATFORM_WINCE)
-	#include <Imaging.h>
-	#include <initguid.h>
-	#include <imgguids.h>
-#else
-	#include <windows.h>
-    #include <Gdiplus.h>
-#endif
+#include <windows.h>
+#include <Gdiplus.h>
 
 namespace toadlet{
 namespace tadpole{
@@ -51,50 +45,44 @@ public:
 
 	Resource::ptr load(Stream::ptr in,ResourceData *data,ProgressListener *listener);
 
-	#if !defined(TOADLET_PLATFORM_WINCE)
-		typedef Gdiplus::GpStatus(WINAPI *GdiplusStartup_)(OUT ULONG_PTR *token,const Gdiplus::GdiplusStartupInput *input,OUT Gdiplus::GdiplusStartupOutput *output);
-		typedef VOID(WINAPI *GdiplusShutdown_)(ULONG_PTR token);
-		typedef Gdiplus::GpStatus(WINGDIPAPI *GdipCreateBitmapFromStream_)(IStream* stream, Gdiplus::GpBitmap **bitmap);
-		typedef Gdiplus::GpStatus(WINGDIPAPI *GdipDisposeImage_)(Gdiplus::GpImage *image);
-		typedef Gdiplus::GpStatus(WINGDIPAPI *GdipImageGetFrameDimensionsCount_)(Gdiplus::GpImage* image, UINT* count);
-		typedef Gdiplus::GpStatus(WINGDIPAPI *GdipImageGetFrameDimensionsList_)(Gdiplus::GpImage* image, GUID* dimensionIDs, UINT count);
-		typedef Gdiplus::GpStatus(WINGDIPAPI *GdipImageGetFrameCount_)(Gdiplus::GpImage *image, GDIPCONST GUID* dimensionID, UINT* count);
-		typedef Gdiplus::GpStatus(WINGDIPAPI *GdipImageSelectActiveFrame_)(Gdiplus::GpImage *image, GDIPCONST GUID* dimensionID, UINT frameIndex);
-		typedef Gdiplus::GpStatus(WINGDIPAPI *GdipGetPropertyItemSize_)(Gdiplus::GpImage *image, PROPID propId, UINT* size);
-		typedef Gdiplus::GpStatus(WINGDIPAPI *GdipGetPropertyItem_)(Gdiplus::GpImage *image, PROPID propId,UINT propSize, Gdiplus::PropertyItem* buffer);
-		typedef Gdiplus::GpStatus(WINGDIPAPI *GdipGetImageWidth_)(Gdiplus::GpImage *image, UINT *width);
-		typedef Gdiplus::GpStatus(WINGDIPAPI *GdipGetImageHeight_)(Gdiplus::GpImage *image, UINT *height);
-		typedef Gdiplus::GpStatus(WINGDIPAPI *GdipGetImagePixelFormat_)(Gdiplus::GpImage *image, Gdiplus::PixelFormat *format);
-		typedef Gdiplus::GpStatus(WINGDIPAPI *GdipBitmapLockBits_)(Gdiplus::GpBitmap* bitmap, GDIPCONST Gdiplus::GpRect* rect, UINT flags, Gdiplus::PixelFormat format, Gdiplus::BitmapData* lockedBitmapData);
-		typedef Gdiplus::GpStatus(WINGDIPAPI *GdipBitmapUnlockBits_)(Gdiplus::GpBitmap* bitmap, Gdiplus::BitmapData* lockedBitmapData);
+	typedef Gdiplus::GpStatus(WINAPI *GdiplusStartup_)(OUT ULONG_PTR *token,const Gdiplus::GdiplusStartupInput *input,OUT Gdiplus::GdiplusStartupOutput *output);
+	typedef VOID(WINAPI *GdiplusShutdown_)(ULONG_PTR token);
+	typedef Gdiplus::GpStatus(WINGDIPAPI *GdipCreateBitmapFromStream_)(IStream* stream, Gdiplus::GpBitmap **bitmap);
+	typedef Gdiplus::GpStatus(WINGDIPAPI *GdipDisposeImage_)(Gdiplus::GpImage *image);
+	typedef Gdiplus::GpStatus(WINGDIPAPI *GdipImageGetFrameDimensionsCount_)(Gdiplus::GpImage* image, UINT* count);
+	typedef Gdiplus::GpStatus(WINGDIPAPI *GdipImageGetFrameDimensionsList_)(Gdiplus::GpImage* image, GUID* dimensionIDs, UINT count);
+	typedef Gdiplus::GpStatus(WINGDIPAPI *GdipImageGetFrameCount_)(Gdiplus::GpImage *image, GDIPCONST GUID* dimensionID, UINT* count);
+	typedef Gdiplus::GpStatus(WINGDIPAPI *GdipImageSelectActiveFrame_)(Gdiplus::GpImage *image, GDIPCONST GUID* dimensionID, UINT frameIndex);
+	typedef Gdiplus::GpStatus(WINGDIPAPI *GdipGetPropertyItemSize_)(Gdiplus::GpImage *image, PROPID propId, UINT* size);
+	typedef Gdiplus::GpStatus(WINGDIPAPI *GdipGetPropertyItem_)(Gdiplus::GpImage *image, PROPID propId,UINT propSize, Gdiplus::PropertyItem* buffer);
+	typedef Gdiplus::GpStatus(WINGDIPAPI *GdipGetImageWidth_)(Gdiplus::GpImage *image, UINT *width);
+	typedef Gdiplus::GpStatus(WINGDIPAPI *GdipGetImageHeight_)(Gdiplus::GpImage *image, UINT *height);
+	typedef Gdiplus::GpStatus(WINGDIPAPI *GdipGetImagePixelFormat_)(Gdiplus::GpImage *image, Gdiplus::PixelFormat *format);
+	typedef Gdiplus::GpStatus(WINGDIPAPI *GdipBitmapLockBits_)(Gdiplus::GpBitmap* bitmap, GDIPCONST Gdiplus::GpRect* rect, UINT flags, Gdiplus::PixelFormat format, Gdiplus::BitmapData* lockedBitmapData);
+	typedef Gdiplus::GpStatus(WINGDIPAPI *GdipBitmapUnlockBits_)(Gdiplus::GpBitmap* bitmap, Gdiplus::BitmapData* lockedBitmapData);
 
-		GdiplusStartup_ GdiplusStartup;
-		GdiplusShutdown_ GdiplusShutdown;
-		GdipCreateBitmapFromStream_ GdipCreateBitmapFromStream;
-		GdipDisposeImage_ GdipDisposeImage;
-		GdipImageGetFrameDimensionsCount_ GdipImageGetFrameDimensionsCount;
-		GdipImageGetFrameDimensionsList_ GdipImageGetFrameDimensionsList;
-		GdipImageGetFrameCount_ GdipImageGetFrameCount;
-		GdipImageSelectActiveFrame_ GdipImageSelectActiveFrame;
-		GdipGetPropertyItemSize_ GdipGetPropertyItemSize;
-		GdipGetPropertyItem_ GdipGetPropertyItem;
-		GdipGetImageWidth_ GdipGetImageWidth;
-		GdipGetImageHeight_ GdipGetImageHeight;
-		GdipGetImagePixelFormat_ GdipGetImagePixelFormat;
-		GdipBitmapLockBits_ GdipBitmapLockBits;
-		GdipBitmapUnlockBits_ GdipBitmapUnlockBits;
-	#endif
+	GdiplusStartup_ GdiplusStartup;
+	GdiplusShutdown_ GdiplusShutdown;
+	GdipCreateBitmapFromStream_ GdipCreateBitmapFromStream;
+	GdipDisposeImage_ GdipDisposeImage;
+	GdipImageGetFrameDimensionsCount_ GdipImageGetFrameDimensionsCount;
+	GdipImageGetFrameDimensionsList_ GdipImageGetFrameDimensionsList;
+	GdipImageGetFrameCount_ GdipImageGetFrameCount;
+	GdipImageSelectActiveFrame_ GdipImageSelectActiveFrame;
+	GdipGetPropertyItemSize_ GdipGetPropertyItemSize;
+	GdipGetPropertyItem_ GdipGetPropertyItem;
+	GdipGetImageWidth_ GdipGetImageWidth;
+	GdipGetImageHeight_ GdipGetImageHeight;
+	GdipGetImagePixelFormat_ GdipGetImagePixelFormat;
+	GdipBitmapLockBits_ GdipBitmapLockBits;
+	GdipBitmapUnlockBits_ GdipBitmapUnlockBits;
 
 protected:
 	int getFormat(INT *gdiformat);
 
 	TextureManager *mTextureManager;
-	#if !defined(TOADLET_PLATFORM_WINCE)
-		HMODULE mLibrary;
-		ULONG_PTR mToken;
-	#else
-		IUnknown *mImagingFactory;
-	#endif
+	HMODULE mLibrary;
+	ULONG_PTR mToken;
 };
 
 }
