@@ -41,12 +41,12 @@ public:
 	void nodeCreated(Node *node);
 	void nodeDestroyed(Node *node);
 
-	inline Node *getNodeByHandle(int handle){return (handle>=0 && handle<mHandles.size())?mHandles[handle]:NULL;}
+	inline Node *getNodeByHandle(int handle){return (handle>=0 && handle<mNodes.size())?mNodes[handle]:NULL;}
 
 protected:	
 	Scene *mScene;
 	Collection<int> mFreeHandles;
-	Collection<Node*> mHandles;
+	Collection<Node*> mNodes;
 };
 
 }

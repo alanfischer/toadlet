@@ -27,20 +27,14 @@
 #include <toadlet/tadpole/platform/win32/Win32TextureStreamer.h>
 #include <toadlet/tadpole/platform/win32/StreamIStream.h>
 
-#if !defined(TOADLET_PLATFORM_WINCE)
-	using namespace Gdiplus;
-#endif
+using namespace Gdiplus;
 
 namespace toadlet{
 namespace tadpole{
 
 Win32TextureStreamer::Win32TextureStreamer(TextureManager *textureManager):
 	mTextureManager(NULL),
-	#if !defined(TOADLET_PLATFORM_WINCE)
-		mToken(0)
-	#else
-		mImagingFactory(NULL)
-	#endif
+	mToken(0)
 {
 	mLibrary=LoadLibrary("gdiplus.dll");
 	if(mLibrary==0){
@@ -66,43 +60,21 @@ Win32TextureStreamer::Win32TextureStreamer(TextureManager *textureManager):
 	GdipBitmapUnlockBits=(GdipBitmapUnlockBits_)GetProcAddress(mLibrary,"GdipBitmapUnlockBits");
 
 	mTextureManager=textureManager;
-	#if !defined(TOADLET_PLATFORM_WINCE)
-		GdiplusStartupInput gdiplusStartupInput;
-		GdiplusStartup(&mToken,&gdiplusStartupInput,NULL);
-	#else
-		HRESULT hr=CoInitializeEx(NULL,COINIT_MULTITHREADED);
-		if(hr==S_OK){
-			IImagingFactory *imagingFactory=NULL;
-			hr=CoCreateInstance(CLSID_ImagingFactory,NULL,CLSCTX_INPROC_SERVER,IID_IImagingFactory,(void**)&imagingFactory);
-			if(SUCCEEDED(hr) && imagingFactory!=NULL){
-				mImagingFactory=imagingFactory;
-			}
-		}
-	#endif
+	GdiplusStartupInput gdiplusStartupInput;
+	GdiplusStartup(&mToken,&gdiplusStartupInput,NULL);
 }
 
 Win32TextureStreamer::~Win32TextureStreamer(){
-	#if !defined(TOADLET_PLATFORM_WINCE)
-		GdiplusShutdown(mToken);
+	GdiplusShutdown(mToken);
 
-		if(mLibrary!=0){
-			FreeLibrary(mLibrary);
-			mLibrary=0;
-		}
-	#else
-		if(mImagingFactory!=NULL){
-			mImagingFactory->Release();
-		}
-		CoUninitialize();
-	#endif
+	if(mLibrary!=0){
+		FreeLibrary(mLibrary);
+		mLibrary=0;
+	}
 }
 
 bool Win32TextureStreamer::valid(){
-	#if !defined(TOADLET_PLATFORM_WINCE)
-		return mLibrary!=0;
-	#else
-		return mImagingFactory!=NULL;
-	#endif
+	return mLibrary!=0;
 }
 
 Resource::ptr Win32TextureStreamer::load(Stream::ptr in,ResourceData *data,ProgressListener *listener){
@@ -114,118 +86,77 @@ Resource::ptr Win32TextureStreamer::load(Stream::ptr in,ResourceData *data,Progr
 	StreamIStream::ptr stream=new StreamIStream(in);
 	HRESULT hr=0;
 
-	#if defined(TOADLET_PLATFORM_WINCE)
-		IImage *image=NULL;
-		hr=((IImagingFactory*)mImagingFactory)->CreateImageFromStream(stream,&image);
-		if(FAILED(hr) || image==NULL){
-			Error::unknown("CreateImageFromStream failed");
-			return NULL;
-		}
+	GpBitmap *bitmap=NULL;
+	GpStatus status=GdipCreateBitmapFromStream(stream,&bitmap);
+	if(bitmap==NULL){
+		Error::unknown("GdipCreateBitmapFromStream failed");
+		return NULL;
+	}
 
-		IBitmapImage *bitmap=NULL;
-		hr=((IImagingFactory*)mImagingFactory)->CreateBitmapFromImage(image,0,0,0,InterpolationHintDefault,&bitmap);
-		if(FAILED(hr) || bitmap==NULL){
-			Error::unknown("CreateBitmapFromImage failed");
-			return NULL;
-		}
+	if(status!=Ok){
+		GdipDisposeImage(bitmap);
+		Error::unknown("GdipCreateBitmapFromStream errored");
+		return NULL;
+	}
 
-		PixelFormat gdiformat=PixelFormatUndefined;
-		hr=bitmap->GetPixelFormatID(&gdiformat);
-		int pixelFormat=getFormat(&gdiformat);
-		SIZE size={0};
-		hr=bitmap->GetSize(&size);
-		TextureFormat::ptr textureFormat=new TextureFormat(TextureFormat::Dimension_D2,pixelFormat,size.cx,size.cy,1,0);
-		tbyte *textureData=new tbyte[textureFormat->getDataSize()];
-		
-		RECT rect={0};
-		rect.right=size.cx;
-		rect.bottom=size.cy;
-		BitmapData bitmapData;
-		bitmap->LockBits(&rect,ImageLockModeRead,gdiformat,&bitmapData);
+	UINT dimensionCount=0;
+	GdipImageGetFrameDimensionsCount(bitmap,&dimensionCount);
+	GUID *dimensionIDs=new GUID[dimensionCount];
+	GdipImageGetFrameDimensionsList(bitmap,dimensionIDs,dimensionCount);
+	UINT frameCount=0;
+	GdipImageGetFrameCount(bitmap,&dimensionIDs[0],&frameCount);
 
-		int i;
-		for(i=0;i<textureFormat->getHeight();++i){
-			memcpy(textureData+textureFormat->getXPitch()*i,((uint8*)bitmapData.Scan0)+bitmapData.Stride*(size.cy-i-1),textureFormat->getXPitch());
-		}
+	UINT propertySize=0;
+	GdipGetPropertyItemSize(bitmap,PropertyTagFrameDelay,&propertySize);
+	PropertyItem *propertyItem=NULL;
+	if(propertySize>0){
+		propertyItem=(PropertyItem*)malloc(propertySize);
+		GdipGetPropertyItem(bitmap,PropertyTagFrameDelay,propertySize,propertyItem);
+	}
 
-		bitmap->UnlockBits(&bitmapData);
+	PixelFormat gdiformat;
+	GdipGetImagePixelFormat(bitmap,&gdiformat);
+	int pixelFormat=getFormat(&gdiformat);
+	UINT width=0,height=0;
+	GdipGetImageWidth(bitmap,&width);
+	GdipGetImageHeight(bitmap,&height);
+	TextureFormat::ptr textureFormat=new TextureFormat(TextureFormat::Dimension_D2,pixelFormat,width,height,1,0);
+	tbyte *textureData=new tbyte[textureFormat->getDataSize()];
+	frameCount=1;
 
-		texture=mTextureManager->createTexture(usage,textureFormat,textureData);
-
-		delete[] textureData;
-	#else
-		GpBitmap *bitmap=NULL;
-		GpStatus status=GdipCreateBitmapFromStream(stream,&bitmap);
-		if(bitmap==NULL){
-			Error::unknown("GdipCreateBitmapFromStream failed");
-			return NULL;
-		}
-
-		if(status!=Ok){
-			GdipDisposeImage(bitmap);
-			Error::unknown("GdipCreateBitmapFromStream errored");
-			return NULL;
-		}
-
-		UINT dimensionCount=0;
-		GdipImageGetFrameDimensionsCount(bitmap,&dimensionCount);
-		GUID *dimensionIDs=new GUID[dimensionCount];
-		GdipImageGetFrameDimensionsList(bitmap,dimensionIDs,dimensionCount);
-		UINT frameCount=0;
-		GdipImageGetFrameCount(bitmap,&dimensionIDs[0],&frameCount);
-
-		UINT propertySize=0;
-		GdipGetPropertyItemSize(bitmap,PropertyTagFrameDelay,&propertySize);
-		PropertyItem *propertyItem=NULL;
-		if(propertySize>0){
-			propertyItem=(PropertyItem*)malloc(propertySize);
-			GdipGetPropertyItem(bitmap,PropertyTagFrameDelay,propertySize,propertyItem);
-		}
-
-		PixelFormat gdiformat;
-		GdipGetImagePixelFormat(bitmap,&gdiformat);
-		int pixelFormat=getFormat(&gdiformat);
-		UINT width=0,height=0;
+	int i;
+	for(i=0;i<frameCount;++i){
+		GdipImageSelectActiveFrame(bitmap,&dimensionIDs[0],i);
+			
 		GdipGetImageWidth(bitmap,&width);
 		GdipGetImageHeight(bitmap,&height);
-		TextureFormat::ptr textureFormat=new TextureFormat(TextureFormat::Dimension_D2,pixelFormat,width,height,1,0);
-		tbyte *textureData=new tbyte[textureFormat->getDataSize()];
-		frameCount=1;
+		Rect rect(0,0,width,height);
+		BitmapData bitmapData;
+		GdipBitmapLockBits(bitmap,&rect,ImageLockModeRead,gdiformat,&bitmapData);
 
-		int i;
-		for(i=0;i<frameCount;++i){
-			GdipImageSelectActiveFrame(bitmap,&dimensionIDs[0],i);
-			
-			GdipGetImageWidth(bitmap,&width);
-			GdipGetImageHeight(bitmap,&height);
-			Rect rect(0,0,width,height);
-			BitmapData bitmapData;
-			GdipBitmapLockBits(bitmap,&rect,ImageLockModeRead,gdiformat,&bitmapData);
-
-			int j;
-			for(j=0;j<textureFormat->getHeight();++j){
-				memcpy(textureData+textureFormat->getXPitch()*j,((uint8*)bitmapData.Scan0)+bitmapData.Stride*(textureFormat->getHeight()-j-1),textureFormat->getXPitch());
-			}
-
-			GdipBitmapUnlockBits(bitmap,&bitmapData);
-
-			int delay=0;
-			if(propertyItem!=NULL){
-				delay=((UINT*)propertyItem[0].value)[i]*10;
-			}
-			if(delay<100){
-				delay=100;
-			}
+		int j;
+		for(j=0;j<textureFormat->getHeight();++j){
+			memcpy(textureData+textureFormat->getXPitch()*j,((uint8*)bitmapData.Scan0)+bitmapData.Stride*(textureFormat->getHeight()-j-1),textureFormat->getXPitch());
 		}
 
-		GdipDisposeImage(bitmap);
-		delete[] dimensionIDs;
-		free(propertyItem);
+		GdipBitmapUnlockBits(bitmap,&bitmapData);
 
-		texture=mTextureManager->createTexture(usage,textureFormat,textureData);
+		int delay=0;
+		if(propertyItem!=NULL){
+			delay=((UINT*)propertyItem[0].value)[i]*10;
+		}
+		if(delay<100){
+			delay=100;
+		}
+	}
 
-		delete[] textureData;
-	#endif
+	GdipDisposeImage(bitmap);
+	delete[] dimensionIDs;
+	free(propertyItem);
+
+	texture=mTextureManager->createTexture(usage,textureFormat,textureData);
+
+	delete[] textureData;
 
 	return texture;
 }

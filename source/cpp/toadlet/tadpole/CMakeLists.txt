@@ -148,6 +148,7 @@ set (TADPOLE_MATERIAL_SRC
 )
 
 set (TADPOLE_SENSOR_SRC
+	sensor/ActiveSensor.cpp
 	sensor/BoundingVolumeSensor.cpp
 	sensor/InterfaceSensor.cpp
 	sensor/NameSensor.cpp
@@ -380,6 +381,7 @@ set (TADPOLE_MATERIAL_HDR
 )
 
 set (TADPOLE_SENSOR_HDR
+	sensor/ActiveSensor.h
 	sensor/BoundingVolumeSensor.h
 	sensor/InterfaceSensor.h
 	sensor/NameSensor.h

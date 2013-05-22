@@ -268,20 +268,6 @@ void Scene::destroy(Component *component){
 	mDestroyComponents.add(component);
 }
 
-int Scene::countActiveNodes(Node *node){
-	if(node==NULL){
-		return countActiveNodes(mRoot);
-	}
-	
-	int count=node->getActive()?1:0;
-	int i;
-	for(i=0;i<node->getNumNodes();++i){
-		count+=countActiveNodes(node->getNode(i));
-	}
-
-	return count;
-}
-
 void Scene::postContextActivate(RenderDevice *device){
 	mResetFrame=true;
 	mRoot->activate();
