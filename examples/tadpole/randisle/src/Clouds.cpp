@@ -298,7 +298,7 @@ void Clouds::setLightDirection(const Vector3 &lightDir){
 	int index;
 	bool hasBump=false;
 	if(mMaterial!=NULL && mMaterial->getBestPath()!=NULL){
-		hasBump=mMaterial->getBestPath()->findTexture(type,index,"bumpTexture");
+		hasBump=mMaterial->getBestPath()->findTexture(type,index,"bumpTexture")!=NULL;
 	}
 
 	Vector3 pos,dir;
