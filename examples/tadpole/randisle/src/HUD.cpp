@@ -92,6 +92,31 @@ protected:
 	Random mRandom;
 };
 
+class FPSComponent:public BaseComponent{
+public:
+	TOADLET_OBJECT(FPSComponent);
+
+	FPSComponent(LabelComponent *label,Camera *camera):
+		mLabel(label),
+		mCamera(camera),
+		mNextOutputTime(0)
+	{}
+
+	void logicUpdate(int dt,int scope){
+		mLabel->setText(String("FPS:")+mCamera->getFramesPerSecond());
+
+		if(mNextOutputTime<mParent->getScene()->getTime()){
+			mNextOutputTime=mParent->getScene()->getTime()+5000;
+			Log::alert(String("FPS:")+mCamera->getFramesPerSecond());
+		}
+	}
+
+protected:
+	LabelComponent::ptr mLabel;
+	Camera::ptr mCamera;
+	int mNextOutputTime;
+};
+
 class ChompyComponent:public BaseComponent,public Animatable{
 public:
 	TOADLET_OBJECT(ChompyComponent);
@@ -290,4 +315,19 @@ HUD::HUD(Scene *scene,Node *player,Camera *camera):Node(scene){
 		mAcorn->attach(count);
 	}
 	attach(mAcorn);
+
+	mFPS=new Node(mScene);
+	{
+		LabelComponent::ptr label=new LabelComponent(mEngine);
+		label->setFont(Resources::instance->wooden);
+		label->setAlignment(Font::Alignment_BIT_LEFT);
+		label->getSharedRenderState()->setMaterialState(MaterialState(Colors::BROWN));
+		mFPS->attach(label);
+		mFPS->setTranslate(.4,-0.8,0);
+		mFPS->setScale(0.1,0.1,0.1);
+
+		FPSComponent::ptr fps=new FPSComponent(label,camera);
+		mFPS->attach(fps);
+	}
+	attach(mFPS);
 }

@@ -15,6 +15,7 @@ protected:
 	Node::ptr mCompass;
 	Node::ptr mChomp;
 	Node::ptr mAcorn;
+	Node::ptr mFPS;
 };
 
 #endif
