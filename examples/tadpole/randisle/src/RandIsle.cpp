@@ -478,8 +478,6 @@ void RandIsle::logicUpdate(int dt){
 	mScene->logicUpdate(dt);
 
 	playerMove(mPlayer,-mXJoy/8.0,-mYJoy*80);
-
-	mApp->setTitle(String("FPS:")+mCamera->getFramesPerSecond()+" VISIBLE:"+mCamera->getVisibleCount()+" ACTIVE:"+mScene->countActiveNodes());
 }
 
 void RandIsle::frameUpdate(int dt){
@@ -495,8 +493,12 @@ void RandIsle::frameUpdate(int dt){
 
 		Shader::ShaderType type=(Shader::ShaderType)0;
 		int index=0;
-		Resources::instance->waterMaterial->getPass()->findTexture(type,index,"waveTex");
-		Resources::instance->waterMaterial->getPass()->setTextureState(type,index,state);
+		Material::ptr water=Resources::instance->waterMaterial;
+		if(water && water->getPass()!=NULL){
+			RenderPass::ptr pass=water->getPass();
+			pass->findTexture(type,index,"waveTex");
+			pass->setTextureState(type,index,state);
+		}
 	}
 
 	mScene->frameUpdate(dt);

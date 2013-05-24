@@ -128,7 +128,7 @@ bool RenderPass::findTexture(Shader::ShaderType &type,int &index,const String &n
 	int i,j;
 	for(j=0;j<Shader::ShaderType_MAX;++j){
 		for(i=0;i<mTextures[j].size();++i){
-			const String locationName=mTextures[j][i].locationName;
+			const String &locationName=mTextures[j][i].locationName;
 			if(locationName==name || locationName==combinedName){
 				type=(Shader::ShaderType)j;
 				index=i;
