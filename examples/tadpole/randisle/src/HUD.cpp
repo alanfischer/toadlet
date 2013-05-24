@@ -76,7 +76,7 @@ public:
 		else if(danger>0){
 			if(mNextDogTime<mParent->getScene()->getLogicTime() && mDog->getPlaying()==false){
 				mNextDogTime=mParent->getScene()->getLogicTime()+mRandom.nextInt(500,1500);
-				mDog->play();
+//				mDog->play();
 			}
 		}
 
@@ -167,11 +167,13 @@ public:
 
 		Shader::ShaderType type;
 		int index;
-		sprite->getMaterial()->getBestPath()->findTexture(type,index,"tex");
-		TextureState textureState;
-		sprite->getSharedRenderState()->getTextureState(type,index,textureState);
-		textureState.calculation=TextureState::CalculationType_NORMAL;
-		sprite->getSharedRenderState()->setTextureState(type,index,textureState);
+		if(sprite->getMaterial()!=NULL && sprite->getMaterial()->getBestPath()!=NULL){
+			sprite->getMaterial()->getBestPath()->findTexture(type,index,"tex");
+			TextureState textureState;
+			sprite->getSharedRenderState()->getTextureState(type,index,textureState);
+			textureState.calculation=TextureState::CalculationType_NORMAL;
+			sprite->getSharedRenderState()->setTextureState(type,index,textureState);
+		}
 		mChompAnimation=new TextureStateAnimation(sprite->getSharedRenderState(),type,index,sequence,2);
 	}
 

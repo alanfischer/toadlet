@@ -296,7 +296,10 @@ void Clouds::setLightDirection(const Vector3 &lightDir){
 
 	Shader::ShaderType type;
 	int index;
-	bool hasBump=mMaterial->getPass()->findTexture(type,index,"bumpTexture");
+	bool hasBump=false;
+	if(mMaterial!=NULL && mMaterial->getBestPath()!=NULL){
+		hasBump=mMaterial->getBestPath()->findTexture(type,index,"bumpTexture");
+	}
 
 	Vector3 pos,dir;
 	int i;
@@ -333,7 +336,7 @@ void Clouds::frameUpdate(int dt,int scope){
 
 	setTextureMatrix("bumpTexture",mMaterial,matrix);
 	setTextureMatrix("cloudTexture",mMaterial,matrix);
-	setTextureMatrix("texture",mMaterial,matrix);
+	setTextureMatrix("tex",mMaterial,matrix);
 }
 
 void Clouds::postContextActivate(RenderDevice *renderDevice){
@@ -343,12 +346,14 @@ void Clouds::postContextActivate(RenderDevice *renderDevice){
 void Clouds::setTextureMatrix(const String &name,Material *material,const Matrix4x4 &matrix){
 	Shader::ShaderType type;
 	int index;
-	RenderPass *pass=material->getBestPath()->findTexture(type,index,name);
-	if(pass!=NULL){
-		TextureState state;
-		pass->getTextureState(type,index,state);
-		state.matrix.set(matrix);
-		pass->setTextureState(type,index,state);
+	if(material!=NULL && material->getBestPath()!=NULL){
+		RenderPass *pass=material->getBestPath()->findTexture(type,index,name);
+		if(pass!=NULL){
+			TextureState state;
+			pass->getTextureState(type,index,state);
+			state.matrix.set(matrix);
+			pass->setTextureState(type,index,state);
+		}
 	}
 }
 

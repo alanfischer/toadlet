@@ -310,6 +310,11 @@ Material::ptr DiffuseMaterialCreator::createDiffuseMaterial(Texture *texture,Ren
 		}
 	}
 
+	SamplerState samplerState=mEngine->getMaterialManager()->getDefaultSamplerState();
+
+	TextureState textureState;
+	textureState.calculation=TextureState::CalculationType_NORMAL;
+
 	if(mEngine->hasShader(Shader::ShaderType_VERTEX) && mEngine->hasShader(Shader::ShaderType_FRAGMENT)){
 		RenderPath::ptr shaderPath=material->addPath();
 
@@ -331,7 +336,7 @@ Material::ptr DiffuseMaterialCreator::createDiffuseMaterial(Texture *texture,Ren
 		pass->addVariable("textureSet",RenderVariable::ptr(new TextureSetVariable("tex")),Material::Scope_MATERIAL);
 
 		if(texture!=NULL){
-			pass->setTexture("tex",texture,"samp",mEngine->getMaterialManager()->getDefaultSamplerState(),TextureState());
+			pass->setTexture("tex",texture,"samp",samplerState,textureState);
 		}
 	}
 
@@ -341,7 +346,7 @@ Material::ptr DiffuseMaterialCreator::createDiffuseMaterial(Texture *texture,Ren
 		RenderPass::ptr pass=fixedPath->addPass(renderState);
 
 		if(texture!=NULL){
-			pass->setTexture(Shader::ShaderType_FRAGMENT,0,texture,mEngine->getMaterialManager()->getDefaultSamplerState(),TextureState());
+			pass->setTexture(Shader::ShaderType_FRAGMENT,0,texture,samplerState,textureState);
 			pass->setTextureLocationName(Shader::ShaderType_FRAGMENT,0,"tex");
 		}
 	}

@@ -169,6 +169,9 @@ bool SkyBoxMaterialCreator::createPaths(Material *material,RenderState *renderSt
 		samplerState.wAddress=SamplerState::AddressType_CLAMP_TO_EDGE;
 	}
 
+	TextureState textureState;
+	textureState.calculation=TextureState::CalculationType_NORMAL;
+
 	if(mEngine->hasShader(Shader::ShaderType_VERTEX) && mEngine->hasShader(Shader::ShaderType_FRAGMENT)){
 		RenderPath::ptr shaderPath=material->addPath("shader");
 
@@ -181,7 +184,7 @@ bool SkyBoxMaterialCreator::createPaths(Material *material,RenderState *renderSt
 		pass->addVariable("textureMatrix",RenderVariable::ptr(new TextureMatrixVariable("tex")),Material::Scope_MATERIAL);
 		pass->addVariable("materialTrackColor",RenderVariable::ptr(new MaterialTrackColorVariable()),Material::Scope_MATERIAL);
 
-		pass->setTexture("tex",texture,"samp",samplerState,TextureState());
+		pass->setTexture("tex",texture,"samp",samplerState,textureState);
 	}
 
 	if(mEngine->hasFixed(Shader::ShaderType_VERTEX) && mEngine->hasFixed(Shader::ShaderType_FRAGMENT)){
@@ -189,7 +192,7 @@ bool SkyBoxMaterialCreator::createPaths(Material *material,RenderState *renderSt
 
 		RenderPass::ptr pass=fixedPath->addPass(renderState);
 
-		pass->setTexture(Shader::ShaderType_FRAGMENT,0,texture,samplerState,TextureState());
+		pass->setTexture(Shader::ShaderType_FRAGMENT,0,texture,samplerState,textureState);
 		pass->setTextureLocationName(Shader::ShaderType_FRAGMENT,0,"tex");
 	}
 
