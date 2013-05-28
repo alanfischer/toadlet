@@ -24,14 +24,14 @@ void Input::create(){
 	}
 	scene->getRoot()->attach(lightNode);
 
-	motionLabel=makeLabel("M.png");
-	motionLabel->setTranslate(-25,25,0);
-	scene->getRoot()->attach(motionLabel);
+	linearLabel=makeLabel("M.png");
+	linearLabel->setTranslate(-25,25,0);
+	scene->getRoot()->attach(linearLabel);
 
 	for(int i=0;i<3;++i){
-		motionNeedle[i]=makeNeedle();
-		motionNeedle[i]->setTranslate(5+i*20,25,0);
-		scene->getRoot()->attach(motionNeedle[i]);
+		linearNeedle[i]=makeNeedle();
+		linearNeedle[i]->setTranslate(5+i*20,25,0);
+		scene->getRoot()->attach(linearNeedle[i]);
 	}
 
 	proximityLabel=makeLabel("P.png");
@@ -50,14 +50,14 @@ void Input::create(){
 	lightNeedle->setTranslate(25,-25,0);
 	scene->getRoot()->attach(lightNeedle);
 
-	camera=new Camera();
+	camera=new Camera(engine);
 	camera->setLookAt(Vector3(0,0,Math::fromInt(150)),Math::ZERO_VECTOR3,Math::Y_UNIT_VECTOR3);
 	camera->setClearColor(Colors::BLUE);
 
-	InputDevice *motionDevice=app->getInputDevice(InputDevice::InputType_MOTION);
-	if(motionDevice!=NULL){
-		motionDevice->setListener(this);
-		motionDevice->start();
+	InputDevice *linearDevice=app->getInputDevice(InputDevice::InputType_LINEAR);
+	if(linearDevice!=NULL){
+		linearDevice->setListener(this);
+		linearDevice->start();
 	}
 	InputDevice *proximityDevice=app->getInputDevice(InputDevice::InputType_PROXIMITY);
 	if(proximityDevice!=NULL){
@@ -67,9 +67,9 @@ void Input::create(){
 }
 
 void Input::destroy(){
-	InputDevice *motionDevice=app->getInputDevice(InputDevice::InputType_MOTION);
-	if(motionDevice!=NULL){
-		motionDevice->stop();
+	InputDevice *linearDevice=app->getInputDevice(InputDevice::InputType_LINEAR);
+	if(linearDevice!=NULL){
+		linearDevice->stop();
 	}
 
 	InputDevice *proximityDevice=app->getInputDevice(InputDevice::InputType_PROXIMITY);
@@ -124,9 +124,9 @@ void Input::setNeedle(Node::ptr needle,float value){
 }
 
 void Input::inputDetected(const InputData &data){
-	if(data.type==InputDevice::InputType_MOTION){
+	if(data.type==InputDevice::InputType_LINEAR){
 		for(int i=0;i<3;++i){
-			setNeedle(motionNeedle[i],data.values[InputData::Semantic_MOTION_ACCELERATION][i]);
+			setNeedle(linearNeedle[i],data.values[InputData::Semantic_LINEAR_ACCELERATION][i]);
 		}
 	}
 	if(data.type==InputDevice::InputType_PROXIMITY){

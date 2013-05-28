@@ -40,8 +40,8 @@ public:
 	Engine *engine;
 	Scene::ptr scene;
 	Camera::ptr camera;
-	Node::ptr motionLabel,proximityLabel,lightLabel;
-	Node::ptr motionNeedle[3],proximityNeedle,lightNeedle;
+	Node::ptr linearLabel,proximityLabel,lightLabel;
+	Node::ptr linearNeedle[3],proximityNeedle,lightNeedle;
 };
 
 #endif

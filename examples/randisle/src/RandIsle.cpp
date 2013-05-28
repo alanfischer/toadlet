@@ -275,7 +275,7 @@ void RandIsle::create(){
 		mPlayer->attach(mesh);
 
 		AnimationAction *jumpAction=new AnimationAction();
-		{
+		if(mesh->getSkeleton() && mesh->getSkeleton()->getNumAnimations()>1){
 			jumpAction->attach(mesh->getSkeleton()->getAnimation(1));
 			jumpAction->setCycling(AnimationAction::Cycling_LOOP);
 			jumpAction->setStopGently(true);
@@ -991,7 +991,7 @@ scalar RandIsle::pathValue(float ty){
 Applet *createApplet(Application *app){
 	String path;
 	String lookFor="/grass.png";
-	const char *paths[]={"../../res","../res","res",".",NULL};
+	const char *paths[]={"../../randisle/res","../randisle/res","../../res","../res","res",".",NULL};
 	int i;
 	for(i=0;paths[i]!=NULL;++i){
 		if(FileStream(paths[i]+lookFor,FileStream::Open_BIT_READ|FileStream::Open_BIT_BINARY).closed()==false){
