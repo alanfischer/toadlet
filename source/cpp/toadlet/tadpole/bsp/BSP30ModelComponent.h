@@ -40,7 +40,7 @@ namespace bsp{
 
 class TOADLET_API BSP30ModelComponent:public BaseComponent,public Spacial,public Visible,public PhysicsTraceable{
 public:
-	TOADLET_OBJECT(BSP30ModelComponent);
+	TOADLET_COMPONENT(BSP30ModelComponent);
 
 	class TOADLET_API SubModel:public Object,public Renderable{
 	public:

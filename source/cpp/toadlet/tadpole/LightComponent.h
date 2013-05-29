@@ -35,7 +35,7 @@ namespace tadpole{
 
 class TOADLET_API LightComponent:public BaseComponent,public Spacial{
 public:
-	TOADLET_OBJECT(LightComponent);
+	TOADLET_COMPONENT(LightComponent);
 
 	LightComponent();
 

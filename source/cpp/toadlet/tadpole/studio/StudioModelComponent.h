@@ -43,7 +43,7 @@ namespace studio{
 
 class TOADLET_API StudioModelComponent:public BaseComponent,public Spacial,public DetailTraceable,public Renderable,public Attachable,public Visible,public Animatable{
 public:
-	TOADLET_OBJECT(StudioModelComponent);
+	TOADLET_COMPONENT(StudioModelComponent);
 
 	class TOADLET_API SubModel:public Object,public Renderable{
 	public:

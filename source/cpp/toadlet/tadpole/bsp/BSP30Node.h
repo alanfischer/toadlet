@@ -42,9 +42,9 @@ namespace bsp{
 
 class TOADLET_API BSP30Node:public PartitionNode,public Renderable,public PhysicsTraceable{
 public:
-	TOADLET_OBJECT(BSP30Node);
+	TOADLET_NODE(BSP30Node);
 
-	BSP30Node(Scene *scene);
+	BSP30Node(Scene *scene=NULL);
 
 	void setMap(const String &name);
 	void setMap(BSP30Map *map);

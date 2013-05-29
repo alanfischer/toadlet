@@ -41,7 +41,7 @@ namespace tadpole{
 
 class TOADLET_API SpriteComponent:public BaseComponent,public TransformListener,public Spacial,public Renderable,public Visible,public Animatable,public Animation{
 public:
-	TOADLET_OBJECT(SpriteComponent);
+	TOADLET_COMPONENT(SpriteComponent);
 	
 	SpriteComponent(Engine *engine);
 	void destroy();

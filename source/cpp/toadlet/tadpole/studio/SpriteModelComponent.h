@@ -41,7 +41,7 @@ namespace studio{
 
 class TOADLET_API SpriteModelComponent:public BaseComponent,public Spacial,public Renderable,public Visible,public Animatable,public Animation{
 public:
-	TOADLET_OBJECT(SpriteModelComponent);
+	TOADLET_COMPONENT(SpriteModelComponent);
 
 	SpriteModelComponent(Engine *engine);
 	void destroy();

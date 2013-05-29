@@ -157,7 +157,7 @@ void Node::actionRemoved(ActionComponent *action){
 	mActions.remove(action);
 }
 
-Component *Node::getChild(const String &name){
+Component *Node::getChild(const String &name) const{
 	int i;
 	for(i=0;i<mComponents.size();++i){
 		if(mComponents[i]->getName()==name){
@@ -172,7 +172,22 @@ Component *Node::getChild(const String &name){
 	return NULL;
 }
 
-Node *Node::getNode(const String &name){
+Component *Node::getChild(const Type<Component> *type) const{
+	int i;
+	for(i=0;i<mComponents.size();++i){
+		if(mComponents[i]->getType()->getFullName()==type->getFullName()){ // Compare names to avoid the issue of multiple types being built into different libraries
+			return mComponents[i];
+		}
+	}
+	for(i=0;i<mNodes.size();++i){
+		if(mNodes[i]->getType()->getFullName()==type->getFullName()){  // Compare names to avoid the issue of multiple types being built into different libraries
+			return mNodes[i];
+		}
+	}
+	return NULL;
+}
+
+Node *Node::getNode(const String &name) const{
 	int i;
 	for(i=0;i<mNodes.size();++i){
 		if(mNodes[i]->getName()==name){
@@ -182,7 +197,17 @@ Node *Node::getNode(const String &name){
 	return NULL;
 }
 
-ActionComponent *Node::getAction(const String &name){
+Node *Node::getNode(const Type<Component> *type) const{
+	int i;
+	for(i=0;i<mNodes.size();++i){
+		if(mNodes[i]->getType()->getFullName()==type->getFullName()){ // Compare names to avoid the issue of multiple types being built into different libraries
+			return mNodes[i];
+		}
+	}
+	return NULL;
+}
+
+ActionComponent *Node::getAction(const String &name) const{
 	int i;
 	for(i=0;i<mActions.size();++i){
 		if(mActions[i]->getName()==name){
@@ -219,7 +244,7 @@ void Node::stopAllActions(){
 	}
 }
 
-bool Node::getActionActive(const String &action){
+bool Node::getActionActive(const String &action) const{
 	int i;
 	for(i=0;i<mActions.size();++i){
 		if(mActions[i]->getName()==action){

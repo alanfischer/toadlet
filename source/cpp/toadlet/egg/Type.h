@@ -52,6 +52,17 @@ protected:
 	String mFullName;
 };
 
+template<typename Class,typename SuperClass>
+class TOADLET_API NonInstantiableType:public Type<SuperClass>{
+public:
+	NonInstantiableType(const char *fullName):mFullName(fullName){}
+	const String &getFullName() const{return mFullName;}
+	SuperClass *newInstance() const{return NULL;}
+
+protected:
+	String mFullName;
+};
+
 template<typename Class>
 class TypeFactory{
 public:

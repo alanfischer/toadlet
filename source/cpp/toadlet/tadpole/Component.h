@@ -27,6 +27,7 @@
 #define TOADLET_TADPOLE_COMPONENT_H
 
 #include <toadlet/egg/Interface.h>
+#include <toadlet/egg/Type.h>
 #include <toadlet/egg/Event.h>
 #include <toadlet/tadpole/Types.h>
 #include <toadlet/tadpole/Transform.h>
@@ -43,11 +44,11 @@ public:
 	
 	virtual void destroy()=0;
 
+	virtual Type<Component> *getType() const=0;
+	virtual const String &getName() const=0;
+
 	virtual void parentChanged(Node *node)=0;
 	virtual void rootChanged(Node *root)=0;
-
-	virtual const String &getName() const=0;
-	virtual void setName(const String &name)=0;
 
 	virtual void logicUpdate(int dt,int scope)=0;
 	virtual void frameUpdate(int dt,int scope)=0;

@@ -29,9 +29,10 @@
 namespace toadlet{
 namespace tadpole{
 
-ActionComponent::ActionComponent(const String &name,Action *action):BaseComponent(name),
+ActionComponent::ActionComponent(const String &name,Action *action):BaseComponent(),
 	mAction(action)
 {
+	setName(name);
 }
 
 ActionComponent::~ActionComponent(){
