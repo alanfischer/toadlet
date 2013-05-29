@@ -3,7 +3,7 @@ cmake_minimum_required (VERSION 2.6)
 project (randisle CXX C)
 
 # Custom cmake scripts
-set (CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${randisle_SOURCE_DIR}/../../../../cmake/Modules/")
+set (CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${randisle_SOURCE_DIR}/../../../cmake/Modules/")
 
 # Find toadlet
 find_package (toadlet REQUIRED)
