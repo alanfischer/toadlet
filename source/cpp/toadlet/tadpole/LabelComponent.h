@@ -41,7 +41,7 @@ namespace tadpole{
 
 class TOADLET_API LabelComponent:public BaseComponent,public TransformListener,public Spacial,public Visible,public Renderable{
 public:
-	TOADLET_OBJECT(LabelComponent);
+	TOADLET_COMPONENT(LabelComponent);
 
 	LabelComponent(Engine *engine);
 	void destroy();

@@ -31,10 +31,15 @@
 #include <toadlet/tadpole/Bound.h>
 #include <toadlet/tadpole/BaseComponent.h>
 
-#define TOADLET_NODE(Class,TypeName)\
-	TOADLET_OBJECT(Class); \
-	static toadlet::egg::Type<toadlet::tadpole::Node> *type(){static toadlet::egg::InstantiableType<Class,toadlet::tadpole::Node> thisType(TypeName);return &thisType;} \
-	virtual toadlet::egg::Type<toadlet::tadpole::Node> *getType() const{return type();}
+#define TOADLET_NODE(Class)\
+	TOADLET_OBJECT(Class);\
+	static toadlet::egg::Type<toadlet::tadpole::Component> *type(){static toadlet::egg::InstantiableType<Class,toadlet::tadpole::Component> thisType(#Class);return &thisType;} \
+	virtual toadlet::egg::Type<toadlet::tadpole::Component> *getType() const{return type();}
+
+#define TOADLET_NODE_NAME(Class,Name)\
+	TOADLET_OBJECT(Class);\
+	static toadlet::egg::Type<toadlet::tadpole::Component> *type(){static toadlet::egg::InstantiableType<Class,toadlet::tadpole::Component> thisType(Name);return &thisType;} \
+	virtual toadlet::egg::Type<toadlet::tadpole::Component> *getType() const{return type();}
 
 namespace toadlet{
 namespace tadpole{
@@ -52,7 +57,7 @@ class PhysicsComponent;
 
 class TOADLET_API Node:public BaseComponent,public TransformListener{
 public:
-	TOADLET_NODE(Node,"toadlet.tadpole.Node");
+	TOADLET_NODE(Node);
 
 	Node(Scene *scene=NULL);
 	virtual ~Node();
@@ -73,47 +78,50 @@ public:
 
 	virtual bool attach(Component *component);
 	virtual bool remove(Component *component);
-	virtual Component *getChild(const String &name);
+	virtual Component *getChild(const String &name) const;
+	virtual Component *getChild(const Type<Component> *type) const;
+	template<typename Type> Type *getChildType() const{return (Type*)getChild(Type::type());}
 
 	virtual void nodeAttached(Node *node);
 	virtual void nodeRemoved(Node *node);
 	virtual int getNumNodes() const{return mNodes.size();}
 	virtual Node *getNode(int i) const{return mNodes[i];}
-	virtual Node *getNode(const String &name);
+	virtual Node *getNode(const String &name) const;
+	virtual Node *getNode(const Type<Component> *type) const;
+	template<typename Type> Type *getNodeType() const{return (Type*)getNode(Type::type());}
 
 	// Attached Interface methods
-	/// @todo: Replace these with finding Components by Interface, even if that Interface has to extend Component
 	virtual void actionAttached(ActionComponent *action);
 	virtual void actionRemoved(ActionComponent *action);
-	virtual ActionComponent *getAction(const String &name);
+	virtual ActionComponent *getAction(const String &name) const;
 	virtual void startAction(const String &name);
 	virtual void stopAction(const String &name);
 	virtual void stopAllActions();
-	virtual bool getActionActive(const String &name);
+	virtual bool getActionActive(const String &name) const;
 
 	virtual void spacialAttached(Spacial *spacial);
 	virtual void spacialRemoved(Spacial *spacial);
 	virtual int getNumSpacials() const{return mSpacials.size();}
-	virtual Spacial *getSpacial(int i){return mSpacials[i];}
+	virtual Spacial *getSpacial(int i) const{return mSpacials[i];}
 
 	virtual void visibleAttached(Visible *visible);
 	virtual void visibleRemoved(Visible *visible);
 	virtual int getNumVisibles() const{return mVisibles.size();}
-	virtual Visible *getVisible(int i){return mVisibles[i];}
+	virtual Visible *getVisible(int i) const{return mVisibles[i];}
 	
 	virtual void animatableAttached(Animatable *animatable);
 	virtual void animatableRemoved(Animatable *animatable);
 	virtual int getNumAnimatables() const{return mAnimatables.size();}
-	virtual Animatable *getAnimatable(int i){return mAnimatables[i];}
+	virtual Animatable *getAnimatable(int i) const{return mAnimatables[i];}
 
 	virtual void lightAttached(LightComponent *light);
 	virtual void lightRemoved(LightComponent *light);
 	virtual int getNumLights() const{return mLights.size();}
-	virtual LightComponent *getLight(int i){return mLights[i];}
+	virtual LightComponent *getLight(int i) const{return mLights[i];}
 	
 	virtual void physicsAttached(PhysicsComponent *physics);
 	virtual void physicsRemoved(PhysicsComponent *physics);
-	virtual PhysicsComponent *getPhysics(){return mPhysics;}
+	virtual PhysicsComponent *getPhysics() const{return mPhysics;}
 
 	// Spacial methods
 	virtual void setTranslate(const Vector3 &translate);

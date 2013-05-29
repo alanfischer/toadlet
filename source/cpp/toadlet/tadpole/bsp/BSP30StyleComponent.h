@@ -35,7 +35,7 @@ namespace bsp{
 
 class TOADLET_API BSP30StyleComponent:public BaseComponent{
 public:
-	TOADLET_OBJECT(BSP30StyleComponent);
+	TOADLET_COMPONENT(BSP30StyleComponent);
 
 	BSP30StyleComponent();
 

@@ -29,15 +29,32 @@
 #include <toadlet/egg/Object.h>
 #include <toadlet/tadpole/Component.h>
 
+#define TOADLET_COMPONENT(Class)\
+	TOADLET_OBJECT(Class);\
+	static toadlet::egg::Type<toadlet::tadpole::Component> *type(){static toadlet::egg::NonInstantiableType<Class,toadlet::tadpole::Component> thisType(#Class);return &thisType;} \
+	virtual toadlet::egg::Type<toadlet::tadpole::Component> *getType() const{return type();}
+
+#define TOADLET_COMPONENT_NAME(Class,Name)\
+	TOADLET_OBJECT(Class);\
+	static toadlet::egg::Type<toadlet::tadpole::Component> *type(){static toadlet::egg::NonInstantiableType<Class,toadlet::tadpole::Component> thisType(Name);return &thisType;} \
+	virtual toadlet::egg::Type<toadlet::tadpole::Component> *getType() const{return type();}
+
+// Help to work around an issue with c++ multiple inheritance issues
+#define TOADLET_COMPONENT2(Class,BaseClass)\
+	TOADLET_COMPONENT(Class); \
+	toadlet::tadpole::Component *componentThis(){return (BaseClass*)this;} \
+	inline const String &getName() const{return toadlet::tadpole::BaseComponent::getName();}\
+	Node *getParent(){return toadlet::tadpole::BaseComponent::getParent();} \
+	bool handleEvent(Event *event){return toadlet::tadpole::BaseComponent::handleEvent(event);}
+
 namespace toadlet{
 namespace tadpole{
 
 class TOADLET_API BaseComponent:public Object,public Component{
 public:
-	TOADLET_OBJECT(BaseComponent);
+	TOADLET_COMPONENT(BaseComponent);
 	
 	BaseComponent():mParent(NULL),mRoot(NULL){}
-	BaseComponent(const String &name):mParent(NULL),mRoot(NULL){mName=name;}
 
 	virtual void destroy();
 
@@ -66,14 +83,5 @@ protected:
 
 }
 }
-
-// Help to work around an issue with c++ multiple inheritance issues
-#define TOADLET_COMPONENT(Class,BaseClass)\
-	TOADLET_OBJECT(Class); \
-	toadlet::tadpole::Component *componentThis(){return (BaseClass*)this;} \
-	void setName(const String &name){toadlet::tadpole::BaseComponent::setName(name);}\
-	inline const String &getName() const{return toadlet::tadpole::BaseComponent::getName();}\
-	Node *getParent(){return toadlet::tadpole::BaseComponent::getParent();} \
-	bool handleEvent(Event *event){return toadlet::tadpole::BaseComponent::handleEvent(event);}
 
 #endif

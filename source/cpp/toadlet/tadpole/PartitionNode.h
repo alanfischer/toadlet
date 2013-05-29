@@ -34,9 +34,9 @@ namespace tadpole{
 
 class TOADLET_API PartitionNode:public Node{
 public:
-	TOADLET_OBJECT(PartitionNode);
+	TOADLET_NODE(PartitionNode);
 
-	PartitionNode(Scene *scene);
+	PartitionNode(Scene *scene=NULL);
 
 	virtual bool senseBoundingVolumes(SensorResultsListener *listener,Bound *bound);
 	virtual bool sensePotentiallyVisible(SensorResultsListener *listener,const Vector3 &point);

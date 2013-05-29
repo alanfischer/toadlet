@@ -39,9 +39,9 @@ namespace terrain{
 /// @todo: Use the quadtree to store child nodes and implement the commented out methods
 class TOADLET_API TerrainNode:public PartitionNode,public PhysicsTraceable{
 public:
-	TOADLET_OBJECT(TerrainNode);
+	TOADLET_NODE(TerrainNode);
 
-	TerrainNode(Scene *scene);
+	TerrainNode(Scene *scene=NULL);
 
 	void destroy();
 

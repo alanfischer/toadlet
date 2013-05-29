@@ -34,7 +34,7 @@ namespace terrain{
 
 class TOADLET_API TerrainPatchComponent:public BaseComponent,public Spacial,public Visible,public Renderable,public PhysicsTraceable{
 public:
-	TOADLET_OBJECT(TerrainPatchComponent);
+	TOADLET_COMPONENT(TerrainPatchComponent);
 
 	class Vertex{
 	public:

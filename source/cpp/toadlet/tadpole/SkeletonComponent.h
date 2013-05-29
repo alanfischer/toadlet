@@ -40,7 +40,7 @@ namespace tadpole{
 
 class TOADLET_API SkeletonComponent:public BaseComponent,public TransformListener,public Spacial,public Renderable,public Attachable,public Animatable{
 public:
-	TOADLET_OBJECT(SkeletonComponent);
+	TOADLET_COMPONENT(SkeletonComponent);
 
 	// BoneSpaceUpdate flags
 	const static int BoneSpaceUpdate_NONE=				0;

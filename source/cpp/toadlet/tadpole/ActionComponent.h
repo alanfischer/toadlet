@@ -35,9 +35,9 @@ namespace tadpole{
 
 class TOADLET_API ActionComponent:public BaseComponent,public ActionListener{
 public:
-	TOADLET_OBJECT(ActionComponent);
+	TOADLET_COMPONENT(ActionComponent);
 
-	ActionComponent(const String &name,Action *action=NULL);
+	ActionComponent(const String &name=(char*)NULL,Action *action=NULL);
 	virtual ~ActionComponent();
 
 	virtual void parentChanged(Node *node);

@@ -35,7 +35,7 @@ namespace tadpole{
 
 class TOADLET_API HopComponent:public BaseComponent,public PhysicsComponent,public hop::CollisionListener,public hop::Traceable{
 public:
-	TOADLET_COMPONENT(HopComponent,PhysicsComponent);
+	TOADLET_COMPONENT2(HopComponent,PhysicsComponent);
 
 	HopComponent(HopManager *manager);
 

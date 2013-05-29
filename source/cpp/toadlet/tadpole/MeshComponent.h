@@ -39,7 +39,7 @@ namespace tadpole{
 
 class TOADLET_API MeshComponent:public BaseComponent,public TransformListener,public Spacial,public Visible,public Attachable{
 public:
-	TOADLET_INTERFACE(MeshComponent);
+	TOADLET_COMPONENT(MeshComponent);
 
 	class TOADLET_API SubMesh:public Object,public Renderable{
 	public:
