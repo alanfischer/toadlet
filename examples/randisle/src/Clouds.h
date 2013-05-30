@@ -9,7 +9,7 @@
 
 class Clouds:public BaseComponent,public ContextListener{
 public:
-	TOADLET_OBJECT(Clouds);
+	TOADLET_COMPONENT(Clouds);
 
 	Clouds(Scene *scene,int cloudSize,const Vector4 &skyColor,const Vector4 &fadeColor);
 	void destroy();

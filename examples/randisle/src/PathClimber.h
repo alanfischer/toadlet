@@ -7,7 +7,7 @@
 
 class PathClimber:public BaseComponent{
 public:
-	TOADLET_OBJECT(PathClimber);
+	TOADLET_COMPONENT(PathClimber);
 
 	PathClimber();
 
