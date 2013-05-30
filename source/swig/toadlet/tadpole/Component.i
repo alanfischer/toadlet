@@ -14,7 +14,6 @@ public:
 
 	virtual void destroy()=0;
 	
-	virtual void setName(String name)=0;
 	virtual String getName() const=0;
 	
 	virtual bool getActive() const=0;
