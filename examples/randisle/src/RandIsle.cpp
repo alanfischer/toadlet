@@ -250,7 +250,6 @@ void RandIsle::create(){
 	{
 		PathClimber *climber=new PathClimber();
 		{
-			climber->setName("climber");
 			climber->setPathClimberListener(this);
 		}
 		mPlayer->attach(climber);
@@ -434,7 +433,7 @@ void RandIsle::update(int dt){
 void RandIsle::logicUpdate(int dt){
 	TOADLET_PROFILE_AUTOSCOPE();
 
-	PathClimber *climber=(PathClimber*)mPlayer->getChild("climber");
+	PathClimber *climber=mPlayer->getChildType<PathClimber>();
 	PhysicsComponent *physics=mPlayer->getPhysics();
 
 	updateClimber(climber,dt);
@@ -587,7 +586,7 @@ void RandIsle::updateClimber(PathClimber *climber,int dt){
 
 			for(int i=0;i<results->size();++i){
 				Node *node=results->at(i);
-				TreeSystem *system=(TreeSystem*)node->getChild("system");
+				TreeSystem *system=node->getChildType<TreeSystem>();
 				if(system!=NULL){
 					Vector3 point;
 					Path *path=system->getClosestPath(point,mPlayer->getTranslate());
@@ -756,7 +755,7 @@ void RandIsle::inputDetected(const InputData &data){
 }
 
 void RandIsle::playerJump(Node *player){
-	PathClimber *climber=(PathClimber*)player->getChild("climber");
+	PathClimber *climber=player->getChildType<PathClimber>();
 
 	if(climber->getPath()==NULL){
 		Segment segment;
@@ -774,7 +773,7 @@ void RandIsle::playerJump(Node *player){
 }
 
 void RandIsle::playerMove(Node *player,scalar dr,scalar ds){
-	PathClimber *climber=(PathClimber*)player->getChild("climber");
+	PathClimber *climber=player->getChildType<PathClimber>();
 
 	Matrix3x3 drm;
 	Math::setMatrix3x3FromZ(drm,dr);
@@ -892,7 +891,6 @@ bool RandIsle::updatePopulatePatches(){
 			Node::ptr tree=new Node(mScene);
 			{
 				system=new TreeSystem(mScene,wx+wy);
-				system->setName("system");
 				tree->attach(system);
 
 				tree->setScope(tree->getScope()&~Scope_BIT_SHADOW);
@@ -933,7 +931,7 @@ void RandIsle::terrainPatchDestroyed(int px,int py,Bound *bound){
 	SensorResults::ptr results=mBoundSensor->sense();
 	for(int i=0;i<results->size();++i){
 		Node *node=results->at(i);
-		if(node->getChild("system")!=NULL && Math::testInside(bound->getAABox(),node->getWorldTranslate())){
+		if(node->getChildType<TreeSystem>()!=NULL && Math::testInside(bound->getAABox(),node->getWorldTranslate())){
 			node->destroy();
 		}
 	}

@@ -52,7 +52,7 @@ namespace tadpole{
 
 class TOADLET_API BaseComponent:public Object,public Component{
 public:
-	TOADLET_COMPONENT(BaseComponent);
+	TOADLET_COMPONENT_NAME(BaseComponent,""); // Leave it unnamed so it can't be found unless subclassed
 	
 	BaseComponent():mParent(NULL),mRoot(NULL){}
 

@@ -6,9 +6,10 @@
 #include "Path.h"
 #include "BranchSystem.h"
 
+/// @todo: Refactor into TreeSystem isa BranchSystem and TreeComponent hasa TreeSystem
 class TreeSystem:public BaseComponent,public BranchSystem::BranchListener,public Spacial,public DetailTraceable{
 public:
-	TOADLET_OBJECT(TreeSystem);
+	TOADLET_COMPONENT(TreeSystem);
 
 	class TreeBranch:public BranchSystem::Branch,public Path{
 	public:

@@ -173,6 +173,10 @@ Component *Node::getChild(const String &name) const{
 }
 
 Component *Node::getChild(const Type<Component> *type) const{
+	if(type->getFullName()==(char*)NULL){
+		return NULL;
+	}
+
 	int i;
 	for(i=0;i<mComponents.size();++i){
 		if(mComponents[i]->getType()->getFullName()==type->getFullName()){ // Compare names to avoid the issue of multiple types being built into different libraries
@@ -198,6 +202,10 @@ Node *Node::getNode(const String &name) const{
 }
 
 Node *Node::getNode(const Type<Component> *type) const{
+	if(type->getFullName()==(char*)NULL){
+		return NULL;
+	}
+
 	int i;
 	for(i=0;i<mNodes.size();++i){
 		if(mNodes[i]->getType()->getFullName()==type->getFullName()){ // Compare names to avoid the issue of multiple types being built into different libraries
