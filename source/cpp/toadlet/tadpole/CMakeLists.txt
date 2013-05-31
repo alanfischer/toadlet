@@ -60,6 +60,7 @@ set (TADPOLE_BSP_SRC
 	bsp/BSP30Node.cpp
 	bsp/BSP30Streamer.cpp
 	bsp/BSP30StyleComponent.cpp
+	bsp/BSP30SkyComponent.cpp
 )
 
 set (TADPOLE_PLUGINS_SRC
@@ -283,6 +284,7 @@ set (TADPOLE_BSP_HDR
 	bsp/BSP30Node.h
 	bsp/BSP30Streamer.h
 	bsp/BSP30StyleComponent.h
+	bsp/BSP30SkyComponent.h
 	bsp/BSP30Types.h
 )
 
