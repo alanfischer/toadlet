@@ -249,7 +249,7 @@ elseif (TOADLET_PLATFORM_POSIX)
 		set (EGG_LIBS ${EGG_LIBS} log)
 	else (TOADLET_PLATFORM_ANDROID)
 		# Android does not have a separate pthread library
-		set (EGG_LIBS ${EGG_LIBS} pthread)
+		set (EGG_LIBS ${EGG_LIBS} dl pthread)
 	endif (TOADLET_PLATFORM_ANDROID)
 endif (TOADLET_PLATFORM_WIN32)
 
