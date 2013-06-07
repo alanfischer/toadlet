@@ -353,6 +353,10 @@ void StudioModelComponent::transformChanged(Transform *transform){
 	}
 
 	mWorldBound->transform(mBound,mParent->getWorldTransform());
+
+	if(transform==NULL){
+		mParent->boundChanged();
+	}
 }
 
 void StudioModelComponent::traceSegment(PhysicsCollision &result,const Vector3 &position,const Segment &segment,const Vector3 &size){
@@ -576,6 +580,7 @@ void StudioModelComponent::updateSkeleton(){
 	int blendSequenceIndex=-1;
 
 	/// @todo: Support blending weighted animations
+	AABox bound;
 	float totalWeight=0;
 	for(i=0;i<mAnimations.size();++i){
 		SequenceAnimation *animation=mAnimations[i];
@@ -595,8 +600,26 @@ void StudioModelComponent::updateSkeleton(){
 			}
 
 			findBoneTransforms(mBoneTranslates,mBoneRotates,mModel,sseqdesc,sanim,animation);
+
+			AABox box(sseqdesc->bbmin,sseqdesc->bbmax);
+			if(i==0){
+				bound.set(box);
+			}
+			else{
+				bound.merge(box);
+			}
 		}
 	}
+	if(totalWeight==0){
+		AABox box(mModel->header->bbmin,mModel->header->bbmax);
+		bound.set(box);
+		if(mAnimations.size()>0){
+			studioseqdesc *sseqdesc=mModel->seqdesc(0);
+			AABox box(sseqdesc->bbmin,sseqdesc->bbmax);
+			bound.merge(box);
+		}
+	}
+	mBound->set(bound);
 
 	if(totalWeight==0){
 		for(i=0;i<mModel->header->numbones;++i){
@@ -624,7 +647,6 @@ void StudioModelComponent::updateSkeleton(){
 		}
 	}
 
-	AABox bound;
 	for(i=0;i<mModel->header->numbones;++i){
 		studiobone *sbone=mModel->bone(i);
 		int link=mBoneLinks[i];
@@ -639,20 +661,7 @@ void StudioModelComponent::updateSkeleton(){
 				Math::add(mBoneTranslates[i],mBoneTranslates[sbone->parent]);
 			}
 		}
-
-		studiobbox *sbox=mModel->bbox(i);
-		AABox box(sbox->bbmin,sbox->bbmax);
-		Math::mul(box,mBoneRotates[i]);
-		Math::add(box,mBoneTranslates[i]);
-		if(i==0){
-			bound.set(box);
-		}
-		else{
-			bound.merge(box);
-		}
 	}
-
-	mBound->set(bound);
 }
 
 void StudioModelComponent::findBoneTransforms(Vector3 *translates,Quaternion *rotates,StudioModel *model,studioseqdesc *sseqdesc,studioanim *sanim,SequenceAnimation *animation){

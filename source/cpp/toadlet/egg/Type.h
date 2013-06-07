@@ -38,29 +38,34 @@ class Type{
 public:
 	virtual ~Type(){}
 	virtual const String &getFullName() const=0;
+	virtual bool instanceOf(const String &fullName) const=0;
 	virtual Class *newInstance() const=0;
 };
 
 template<typename Class,typename SuperClass>
 class TOADLET_API InstantiableType:public Type<SuperClass>{
 public:
-	InstantiableType(const char *fullName):mFullName(fullName){}
+	InstantiableType(const char *fullName,Type<SuperClass> *superType=NULL):mFullName(fullName),mSuperType(superType){}
 	const String &getFullName() const{return mFullName;}
+	bool instanceOf(const String &fullName) const{return mFullName==fullName || (mSuperType!=NULL && mSuperType->instanceOf(fullName));}
 	SuperClass *newInstance() const{return new Class();}
 
 protected:
 	String mFullName;
+	Type<SuperClass> *mSuperType;
 };
 
 template<typename Class,typename SuperClass>
 class TOADLET_API NonInstantiableType:public Type<SuperClass>{
 public:
-	NonInstantiableType(const char *fullName):mFullName(fullName){}
+	NonInstantiableType(const char *fullName,Type<SuperClass> *superType=NULL):mFullName(fullName),mSuperType(superType){}
 	const String &getFullName() const{return mFullName;}
+	bool instanceOf(const String &fullName) const{return mFullName==fullName || (mSuperType!=NULL && mSuperType->instanceOf(fullName));}
 	SuperClass *newInstance() const{return NULL;}
 
 protected:
 	String mFullName;
+	Type<SuperClass> *mSuperType;
 };
 
 template<typename Class>
