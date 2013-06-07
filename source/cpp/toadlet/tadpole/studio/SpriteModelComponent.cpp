@@ -144,6 +144,10 @@ void SpriteModelComponent::transformChanged(Transform *transform){
 	}
 
 	mWorldBound->transform(mBound,mParent->getWorldTransform());
+
+	if(transform==NULL){
+		mParent->boundChanged();
+	}
 }
 
 RenderState::ptr SpriteModelComponent::getSharedRenderState(){
