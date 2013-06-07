@@ -42,14 +42,13 @@ public:
 	void setType(Type<Component> *type){mType=type;}
 	Type<Component> *getType() const{return mType;}
 
-	void setTypeName(const String &typeName){mTypeName=typeName;}
-	const String &getTypeName() const{return mTypeName;}
+	void setHasType(Type<Component> *type){mHasType=type;}
+	Type<Component> *getHasType() const{return mHasType;}
 
 protected:
 	bool senseNode(Node *node);
 
-	Type<Component> *mType;
-	String mTypeName;
+	Type<Component> *mType,*mHasType;
 };
 
 }
