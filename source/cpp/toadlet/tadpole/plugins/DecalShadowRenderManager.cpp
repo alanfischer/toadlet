@@ -25,6 +25,7 @@
 
 #include <toadlet/tadpole/Engine.h>
 #include <toadlet/tadpole/Scene.h>
+#include <toadlet/tadpole/Visible.h>
 #include "DecalShadowRenderManager.h"
 
 namespace toadlet{
@@ -95,13 +96,23 @@ void DecalShadowRenderManager::interRenderRenderables(RenderableSet *set,RenderD
 
 	RenderPath *path=mMaterial->getBestPath();
 	int numPasses=path->getNumPasses();
-	int pi,ni;
+	int pi,ni,vi;
 	for(pi=0;pi<numPasses;++pi){
 		RenderPass *pass=path->getPass(pi);
 		setupPass(pass,mDevice);
 
 		for(ni=0;ni<set->getNodeQueue().size();++ni){
 			Node *node=set->getNodeQueue().at(ni);
+
+			/// @todo: Replace this with a node stack that increments counts of all renderables queued in the node & subnodes
+			for(vi=0;vi<node->getNumVisibles();++vi){
+				if(node->getVisible(vi)->getRendered()){
+					break;
+				}
+			}
+			if(vi==node->getNumVisibles()){
+				continue;
+			}
 
 			if((node->getScope()&mShadowScope)!=0 && node!=mScene->getBackground() && node!=mScene->getRoot()){
 				Sphere boundingSphere=node->getWorldBound()->getSphere();

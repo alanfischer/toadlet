@@ -1220,58 +1220,60 @@ void Simulator::traceSolidWithCurrentSpacials(Collision &result,Solid *solid,con
 
 void Simulator::traceAABox(Collision &c,const Segment &segment,const AABox &box){
 	if(testInside(box,segment.origin)){
-		scalar x;
-		#if defined(TOADLET_FIXED_POINT)
-			x=segment.origin.x-box.mins.x;scalar dix=(x^(x>>31))-(x>>31);
-			x=segment.origin.y-box.mins.y;scalar diy=(x^(x>>31))-(x>>31);
-			x=segment.origin.z-box.mins.z;scalar diz=(x^(x>>31))-(x>>31);
-			x=segment.origin.x-box.maxs.x;scalar dax=(x^(x>>31))-(x>>31);
-			x=segment.origin.y-box.maxs.y;scalar day=(x^(x>>31))-(x>>31);
-			x=segment.origin.z-box.maxs.z;scalar daz=(x^(x>>31))-(x>>31);
-		#else
-			x=segment.origin.x-box.mins.x;scalar dix=x<0?-x:x;
-			x=segment.origin.y-box.mins.y;scalar diy=x<0?-x:x;
-			x=segment.origin.z-box.mins.z;scalar diz=x<0?-x:x;
-			x=segment.origin.x-box.maxs.x;scalar dax=x<0?-x:x;
-			x=segment.origin.y-box.maxs.y;scalar day=x<0?-x:x;
-			x=segment.origin.z-box.maxs.z;scalar daz=x<0?-x:x;
-		#endif
+		if(Math::lengthSquared(segment.direction)>0){
+			scalar x;
+			#if defined(TOADLET_FIXED_POINT)
+				x=segment.origin.x-box.mins.x;scalar dix=(x^(x>>31))-(x>>31);
+				x=segment.origin.y-box.mins.y;scalar diy=(x^(x>>31))-(x>>31);
+				x=segment.origin.z-box.mins.z;scalar diz=(x^(x>>31))-(x>>31);
+				x=segment.origin.x-box.maxs.x;scalar dax=(x^(x>>31))-(x>>31);
+				x=segment.origin.y-box.maxs.y;scalar day=(x^(x>>31))-(x>>31);
+				x=segment.origin.z-box.maxs.z;scalar daz=(x^(x>>31))-(x>>31);
+			#else
+				x=segment.origin.x-box.mins.x;scalar dix=x<0?-x:x;
+				x=segment.origin.y-box.mins.y;scalar diy=x<0?-x:x;
+				x=segment.origin.z-box.mins.z;scalar diz=x<0?-x:x;
+				x=segment.origin.x-box.maxs.x;scalar dax=x<0?-x:x;
+				x=segment.origin.y-box.maxs.y;scalar day=x<0?-x:x;
+				x=segment.origin.z-box.maxs.z;scalar daz=x<0?-x:x;
+			#endif
 
-		if(dix<=diy && dix<=diz && dix<=dax && dix<=day && dix<=daz){
-			if(dot(segment.direction,NEG_X_UNIT_VECTOR3)>=0){
-				return;
+			if(dix<=diy && dix<=diz && dix<=dax && dix<=day && dix<=daz){
+				if(dot(segment.direction,NEG_X_UNIT_VECTOR3)>=0){
+					return;
+				}
+				c.normal.set(NEG_X_UNIT_VECTOR3);
 			}
-			c.normal.set(NEG_X_UNIT_VECTOR3);
-		}
-		else if(diy<=diz && diy<=dax && diy<=day && diy<=daz){
-			if(dot(segment.direction,NEG_Y_UNIT_VECTOR3)>=0){
-				return;
+			else if(diy<=diz && diy<=dax && diy<=day && diy<=daz){
+				if(dot(segment.direction,NEG_Y_UNIT_VECTOR3)>=0){
+					return;
+				}
+				c.normal.set(NEG_Y_UNIT_VECTOR3);
 			}
-			c.normal.set(NEG_Y_UNIT_VECTOR3);
-		}
-		else if(diz<=dax && diz<=day && diz<=daz){
-			if(dot(segment.direction,NEG_Z_UNIT_VECTOR3)>=0){
-				return;
+			else if(diz<=dax && diz<=day && diz<=daz){
+				if(dot(segment.direction,NEG_Z_UNIT_VECTOR3)>=0){
+					return;
+				}
+				c.normal.set(NEG_Z_UNIT_VECTOR3);
 			}
-			c.normal.set(NEG_Z_UNIT_VECTOR3);
-		}
-		else if(dax<=day && dax<=daz){
-			if(dot(segment.direction,X_UNIT_VECTOR3)>=0){
-				return;
+			else if(dax<=day && dax<=daz){
+				if(dot(segment.direction,X_UNIT_VECTOR3)>=0){
+					return;
+				}
+				c.normal.set(X_UNIT_VECTOR3);
 			}
-			c.normal.set(X_UNIT_VECTOR3);
-		}
-		else if(day<=daz){
-			if(dot(segment.direction,Y_UNIT_VECTOR3)>=0){
-				return;
+			else if(day<=daz){
+				if(dot(segment.direction,Y_UNIT_VECTOR3)>=0){
+					return;
+				}
+				c.normal.set(Y_UNIT_VECTOR3);
 			}
-			c.normal.set(Y_UNIT_VECTOR3);
-		}
-		else{
-			if(dot(segment.direction,Z_UNIT_VECTOR3)>=0){
-				return;
+			else{
+				if(dot(segment.direction,Z_UNIT_VECTOR3)>=0){
+					return;
+				}
+				c.normal.set(Z_UNIT_VECTOR3);
 			}
-			c.normal.set(Z_UNIT_VECTOR3);
 		}
 
 		c.time=0;
