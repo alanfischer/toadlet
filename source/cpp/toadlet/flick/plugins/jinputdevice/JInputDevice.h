@@ -52,7 +52,9 @@ public:
 	void setAlpha(scalar alpha);
 	
 protected:
-	JNIEnv *env;
+	JNIEnv *getEnv() const;
+
+	JavaVM *vm;
 	jobject obj;
 	jmethodID createID,destroyID,getTypeID,startID,updateID,stopID,setListenerID,setSampleTimeID,setAlphaID;
 };

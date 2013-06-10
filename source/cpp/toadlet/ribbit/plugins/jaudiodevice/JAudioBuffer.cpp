@@ -28,8 +28,12 @@
 namespace toadlet{
 namespace ribbit{
 
-JAudioBuffer::JAudioBuffer(JNIEnv *jenv,jobject jobj){
-	env=jenv;
+JAudioBuffer::JAudioBuffer(JNIEnv *jenv,jobject jobj):
+	vm(NULL),
+	obj(NULL)
+{
+	jenv->GetJavaVM(&vm);
+	JNIEnv *env=getEnv();
 	obj=env->NewGlobalRef(jobj);
 
 	jclass bufferClass=env->GetObjectClass(obj);
@@ -41,12 +45,14 @@ JAudioBuffer::JAudioBuffer(JNIEnv *jenv,jobject jobj){
 }
 
 JAudioBuffer::~JAudioBuffer(){
-	env->DeleteGlobalRef(obj);
+	getEnv()->DeleteGlobalRef(obj);
 	obj=NULL;
-	env=NULL;
+	vm=NULL;
 }
 
 bool JAudioBuffer::create(AudioStream *stream){
+	JNIEnv *env=getEnv();
+
 	Log::debug(Categories::TOADLET_RIBBIT,
 		"JAudioBuffer::create");
 
@@ -72,9 +78,15 @@ bool JAudioBuffer::create(AudioStream *stream){
 }
 
 void JAudioBuffer::destroy(){
-	env->CallVoidMethod(obj,destroyID);
+	getEnv()->CallVoidMethod(obj,destroyID);
 
 	BaseResource::destroy();
+}
+
+JNIEnv *JAudioBuffer::getEnv() const{
+	JNIEnv *env=NULL;
+	vm->AttachCurrentThread(&env,NULL);
+	return env;
 }
 
 }

@@ -28,8 +28,12 @@
 namespace toadlet{
 namespace ribbit{
 
-JAudio::JAudio(JNIEnv *jenv,jobject jobj){
-	env=jenv;
+JAudio::JAudio(JNIEnv *jenv,jobject jobj):
+	vm(NULL),
+	obj(NULL)
+{
+	jenv->GetJavaVM(&vm);
+	JNIEnv *env=getEnv();
 	obj=env->NewGlobalRef(jobj);
 
 	jclass audioClass=env->GetObjectClass(obj);
@@ -54,19 +58,21 @@ JAudio::JAudio(JNIEnv *jenv,jobject jobj){
 }
 
 JAudio::~JAudio(){
-	env->DeleteGlobalRef(obj);
+	getEnv()->DeleteGlobalRef(obj);
 	obj=NULL;
-	env=NULL;
+	vm=NULL;
 }
 
 bool JAudio::create(AudioBuffer *audioBuffer){
 	mAudioBuffer=audioBuffer; // Store the pointer until we have reference counting
 	jobject audioBufferObj=(audioBuffer!=NULL)?((JAudioBuffer*)audioBuffer->getRootAudioBuffer())->getJObject():NULL;
 
-	return env->CallBooleanMethod(obj,createAudioBufferID,audioBufferObj);
+	return getEnv()->CallBooleanMethod(obj,createAudioBufferID,audioBufferObj);
 }
 
 bool JAudio::create(AudioStream *stream){
+	JNIEnv *env=getEnv();
+
 	Log::debug(Categories::TOADLET_RIBBIT,
 		"JAudio::create");
 
@@ -92,39 +98,45 @@ bool JAudio::create(AudioStream *stream){
 }
 
 void JAudio::destroy(){
-	env->CallVoidMethod(obj,destroyID);
+	getEnv()->CallVoidMethod(obj,destroyID);
 }
 
 bool JAudio::play(){
-	return env->CallBooleanMethod(obj,playID);
+	return getEnv()->CallBooleanMethod(obj,playID);
 }
 
 bool JAudio::stop(){
-	return env->CallBooleanMethod(obj,stopID);
+	return getEnv()->CallBooleanMethod(obj,stopID);
 }
 
 bool JAudio::getPlaying() const{
-	return env->CallBooleanMethod(obj,getPlayingID);
+	return getEnv()->CallBooleanMethod(obj,getPlayingID);
 }
 
 bool JAudio::getFinished() const{
-	return env->CallBooleanMethod(obj,getFinishedID);
+	return getEnv()->CallBooleanMethod(obj,getFinishedID);
 }
 
 void JAudio::setLooping(bool looping){
-	env->CallVoidMethod(obj,setLoopingID,looping);
+	getEnv()->CallVoidMethod(obj,setLoopingID,looping);
 }
 
 bool JAudio::getLooping() const{
-	return env->CallBooleanMethod(obj,getLoopingID);
+	return getEnv()->CallBooleanMethod(obj,getLoopingID);
 }
 
 void JAudio::setGain(scalar gain){
-	env->CallVoidMethod(obj,setGainID,(float)gain);
+	getEnv()->CallVoidMethod(obj,setGainID,(float)gain);
 }
 
 scalar JAudio::getGain() const{
-	return env->CallFloatMethod(obj,getGainID);
+	return getEnv()->CallFloatMethod(obj,getGainID);
+}
+
+JNIEnv *JAudio::getEnv() const{
+	JNIEnv *env=NULL;
+	vm->AttachCurrentThread(&env,NULL);
+	return env;
 }
 
 }
