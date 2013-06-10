@@ -31,12 +31,11 @@ namespace tadpole{
 
 AndroidTextureStreamer::AndroidTextureStreamer(TextureManager *textureManager,JNIEnv *jenv):
 	mTextureManager(NULL),
-	env(NULL),
-	jvm(NULL)
+	vm(NULL)
 {
 	mTextureManager=textureManager;
-	env=jenv;
-	env->GetJavaVM(&jvm);
+	jenv->GetJavaVM(&vm);
+	JNIEnv *env=jenv;
 
 	jclass bitmapClass=env->FindClass("android/graphics/Bitmap");
 	{
@@ -54,18 +53,17 @@ AndroidTextureStreamer::AndroidTextureStreamer(TextureManager *textureManager,JN
 }
 
 AndroidTextureStreamer::~AndroidTextureStreamer(){
-	if(factoryClass!=NULL){
-		env->DeleteGlobalRef(factoryClass);
-		factoryClass=NULL;
-	}
+	getEnv()->DeleteGlobalRef(factoryClass);
+	factoryClass=NULL;
+	vm=NULL;
 }
 
 Resource::ptr AndroidTextureStreamer::load(Stream::ptr stream,ResourceData *data,ProgressListener *listener){
+	JNIEnv *env=getEnv();
+
 	int usage=(data!=NULL)?((TextureData*)data)->usage:0;
 
 	Log::debug(Categories::TOADLET_TADPOLE,"AndroidTextureStreamer::load");
-
-	jvm->AttachCurrentThread(&env,NULL);
 
 	int length=stream->length();
 	tbyte *streamData=new tbyte[length];
@@ -125,6 +123,12 @@ Resource::ptr AndroidTextureStreamer::load(Stream::ptr stream,ResourceData *data
 	delete[] textureData;
 	
 	return texture;
+}
+
+JNIEnv *AndroidTextureStreamer::getEnv() const{
+	JNIEnv *env=NULL;
+	vm->AttachCurrentThread(&env,NULL);
+	return env;
 }
 
 }

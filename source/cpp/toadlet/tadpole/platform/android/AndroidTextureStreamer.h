@@ -42,12 +42,11 @@ public:
 
 	Resource::ptr load(Stream::ptr in,ResourceData *data,ProgressListener *listener);
 
-	void setEnv(JNIEnv *env){this->env=env;}
-
 protected:
+	JNIEnv *getEnv() const;
+
 	TextureManager *mTextureManager;
-	JNIEnv *env;
-	JavaVM *jvm;
+	JavaVM *vm;
 	jclass factoryClass;
 	jmethodID decodeFactoryID,recycleBitmapID,getWidthBitmapID,getHeightBitmapID,getPixelsBitmapID;
 };

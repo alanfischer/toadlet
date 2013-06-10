@@ -39,13 +39,13 @@ enum{
 	ACCESS_BUFFER=3
 };
 
-AndroidAssetArchive::AndroidAssetArchive(JNIEnv *env1,jobject assetManagerObj1):
-	env(NULL),
-	jvm(NULL)
+AndroidAssetArchive::AndroidAssetArchive(JNIEnv *jenv,jobject jobj):
+	vm(NULL),
+	obj(NULL)
 {
-	env=env1;
-	env->GetJavaVM(&jvm);
-	assetManagerObj=env->NewGlobalRef(assetManagerObj1);
+	jenv->GetJavaVM(&vm);
+	JNIEnv *env=getEnv();
+	obj=env->NewGlobalRef(jobj);
 
 	jclass managerClass=env->FindClass("android/content/res/AssetManager");
 	{
@@ -57,20 +57,19 @@ AndroidAssetArchive::AndroidAssetArchive(JNIEnv *env1,jobject assetManagerObj1):
 	mStream=new JStream(env);
 }
 
-void AndroidAssetArchive::destroy(){
-	if(assetManagerObj!=NULL){
-		env->DeleteGlobalRef(assetManagerObj);
-		assetManagerObj=NULL;
-	}
+AndroidAssetArchive::~AndroidAssetArchive(){
+	getEnv()->DeleteGlobalRef(obj);
+	obj=NULL;
+	vm=NULL;
 }
 
 Stream::ptr AndroidAssetArchive::openStream(const String &name){
+	JNIEnv *env=getEnv();
+
 	Log::debug(Categories::TOADLET_EGG,"AndroidAssetArchive::openStream:"+name);
 
-	jvm->AttachCurrentThread(&env,NULL);
-
 	jstring nameObj=env->NewStringUTF(name);
-	jobject streamObj=env->CallObjectMethod(assetManagerObj,openManagerID,nameObj,ACCESS_RANDOM);
+	jobject streamObj=env->CallObjectMethod(obj,openManagerID,nameObj,ACCESS_RANDOM);
 	jthrowable exc=env->ExceptionOccurred();
 	if(exc!=NULL){
 		env->ExceptionDescribe();
@@ -98,6 +97,12 @@ Stream::ptr AndroidAssetArchive::openStream(const String &name){
 
 Collection<String>::ptr AndroidAssetArchive::getEntries(){
 	return mEntries;
+}
+
+JNIEnv *AndroidAssetArchive::getEnv() const{
+	JNIEnv *env=NULL;
+	vm->AttachCurrentThread(&env,NULL);
+	return env;
 }
 
 }

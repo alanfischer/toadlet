@@ -53,7 +53,9 @@ public:
 	int getHeight() const;
 
 protected:
-	JNIEnv *env;
+	JNIEnv *getEnv() const;
+
+	JavaVM *vm;
 	jobject obj;
 	jmethodID swapID,resetID,activateID,deactivateID,activateAdditionalContextID,deactivateAdditionalContextID;
 	jmethodID destroyID,isPrimaryID,isValidID,getWidthID,getHeightID;

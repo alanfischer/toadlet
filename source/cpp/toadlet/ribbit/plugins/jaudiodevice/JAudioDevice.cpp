@@ -34,8 +34,12 @@ TOADLET_C_API AudioDevice* new_JAudioDevice(JNIEnv *jenv,jobject jobj){
 	return new JAudioDevice(jenv,jobj);
 }
 
-JAudioDevice::JAudioDevice(JNIEnv *jenv,jobject jobj){
-	env=jenv;
+JAudioDevice::JAudioDevice(JNIEnv *jenv,jobject jobj):
+	vm(NULL),
+	obj(NULL)
+{
+	jenv->GetJavaVM(&vm);
+	JNIEnv *env=getEnv();
 	obj=env->NewGlobalRef(jobj);
 
 	jclass deviceClass=env->GetObjectClass(obj);
@@ -57,39 +61,45 @@ JAudioDevice::JAudioDevice(JNIEnv *jenv,jobject jobj){
 }
 
 JAudioDevice::~JAudioDevice(){
-	env->DeleteGlobalRef(obj);
+	getEnv()->DeleteGlobalRef(obj);
 	obj=NULL;
-	env=NULL;
+	vm=NULL;
 }
 
 bool JAudioDevice::create(int *options){
 	Log::alert(Categories::TOADLET_RIBBIT,
 		"creating JAudioDevice");
 
-	return env->CallBooleanMethod(obj,createID);
+	return getEnv()->CallBooleanMethod(obj,createID);
 }
 
 void JAudioDevice::destroy(){
 	Log::alert(Categories::TOADLET_RIBBIT,
 		"destroying JAudioDevice");
 
-	return env->CallVoidMethod(obj,destroyID);
+	return getEnv()->CallVoidMethod(obj,destroyID);
 }
 
 AudioBuffer *JAudioDevice::createAudioBuffer(){
-	jobject audioBufferObj=env->CallObjectMethod(obj,createAudioBufferID);
+	jobject audioBufferObj=getEnv()->CallObjectMethod(obj,createAudioBufferID);
 
-	return new JAudioBuffer(env,audioBufferObj);
+	return new JAudioBuffer(getEnv(),audioBufferObj);
 }
 
 Audio *JAudioDevice::createAudio(){
-	jobject audioObj=env->CallObjectMethod(obj,createAudioID);
+	jobject audioObj=getEnv()->CallObjectMethod(obj,createAudioID);
 
-	return new JAudio(env,audioObj);
+	return new JAudio(getEnv(),audioObj);
 }
 
 void JAudioDevice::update(int dt){
-	return env->CallVoidMethod(obj,updateID,dt);
+	return getEnv()->CallVoidMethod(obj,updateID,dt);
+}
+
+JNIEnv *JAudioDevice::getEnv() const{
+	JNIEnv *env=NULL;
+	vm->AttachCurrentThread(&env,NULL);
+	return env;
 }
 
 }

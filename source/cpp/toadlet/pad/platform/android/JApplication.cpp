@@ -40,7 +40,7 @@ namespace toadlet{
 namespace pad{
 
 JApplication::JApplication(JNIEnv *jenv,jobject jobj):
-	env(NULL),
+	vm(NULL),
 	obj(NULL),
 
 	mEngine(NULL),
@@ -56,7 +56,8 @@ JApplication::JApplication(JNIEnv *jenv,jobject jobj):
 		mLastInputDeviceObjs[i]=NULL;
 	}
 
-	env=jenv;
+	jenv->GetJavaVM(&vm);
+	JNIEnv *env=jenv;
 	obj=env->NewGlobalRef(jobj);
 
 	jclass appClass=env->GetObjectClass(obj);
@@ -93,6 +94,8 @@ JApplication::JApplication(JNIEnv *jenv,jobject jobj):
 }
 
 JApplication::~JApplication(){
+	JNIEnv *env=getEnv();
+
 	if(obj!=NULL){
 		env->DeleteGlobalRef(obj);
 		obj=NULL;
@@ -117,28 +120,30 @@ JApplication::~JApplication(){
 }
 
 bool JApplication::create(String renderDevice,String audioDevice){
-	return env->CallBooleanMethod(obj,createID);
+	return getEnv()->CallBooleanMethod(obj,createID);
 }
 
 void JApplication::destroy(){
-	env->CallVoidMethod(obj,destroyID);
+	getEnv()->CallVoidMethod(obj,destroyID);
 }
 
 void JApplication::start(){
-	env->CallVoidMethod(obj,startID);
+	getEnv()->CallVoidMethod(obj,startID);
 }
 
 void JApplication::stop(){
-	env->CallVoidMethod(obj,stopID);
+	getEnv()->CallVoidMethod(obj,stopID);
 }
 
 bool JApplication::isRunning() const{
-	env->CallBooleanMethod(obj,isRunningID);
+	getEnv()->CallBooleanMethod(obj,isRunningID);
 }
 
 void JApplication::setTitle(const String &title){
 // Disabled since calling it enough calls a crash in Window.setTitle for some reason
 #if 0
+	JNIEnv *env=getEnv();
+
 	jstring titleObj=env->NewStringUTF(title);
 	if(env->ExceptionOccurred()!=NULL){
 		env->ExceptionDescribe();
@@ -151,6 +156,8 @@ void JApplication::setTitle(const String &title){
 }
 
 String JApplication::getTitle() const{
+	JNIEnv *env=getEnv();
+
 	jstring titleObj=(jstring)env->CallObjectMethod(obj,getTitleID);
 	const char *chars=env->GetStringUTFChars(titleObj,NULL);
 	String title=chars;
@@ -159,22 +166,24 @@ String JApplication::getTitle() const{
 }
 
 int JApplication::getWidth() const{
-	env->CallIntMethod(obj,getWidthID);
+	getEnv()->CallIntMethod(obj,getWidthID);
 }
 
 int JApplication::getHeight() const{
-	env->CallIntMethod(obj,getHeightID);
+	getEnv()->CallIntMethod(obj,getHeightID);
 }
 
 void JApplication::setDifferenceMouse(bool difference){
-	env->CallVoidMethod(obj,setDifferenceMouseID,difference);
+	getEnv()->CallVoidMethod(obj,setDifferenceMouseID,difference);
 }
 
 bool JApplication::getDifferenceMouse() const{
-	env->CallBooleanMethod(obj,getDifferenceMouseID);
+	getEnv()->CallBooleanMethod(obj,getDifferenceMouseID);
 }
 
 Engine *JApplication::getEngine() const{
+	JNIEnv *env=getEnv();
+
 	jobject engineObj=env->CallObjectMethod(obj,getEngineID);
 
 	if(mEngine==NULL || mLastEngineObj!=engineObj){
@@ -192,6 +201,8 @@ Engine *JApplication::getEngine() const{
 }
 
 RenderDevice *JApplication::getRenderDevice() const{
+	JNIEnv *env=getEnv();
+
 	jobject deviceObj=env->CallObjectMethod(obj,getRenderDeviceID);
 
 	if(mRenderDevice==NULL || mLastRenderDeviceObj!=deviceObj){
@@ -214,6 +225,8 @@ RenderDevice *JApplication::getRenderDevice() const{
 }
 
 AudioDevice *JApplication::getAudioDevice() const{
+	JNIEnv *env=getEnv();
+
 	jobject deviceObj=env->CallObjectMethod(obj,getAudioDeviceID);
 
 	if(mAudioDevice==NULL || mLastAudioDeviceObj!=deviceObj){
@@ -236,6 +249,8 @@ AudioDevice *JApplication::getAudioDevice() const{
 }
 
 InputDevice *JApplication::getInputDevice(InputDevice::InputType i) const{
+	JNIEnv *env=getEnv();
+
 	jobject deviceObj=env->CallObjectMethod(obj,getInputDeviceID,i);
 
 	if(mInputDevices[i]==NULL || mLastInputDeviceObjs[i]!=deviceObj){
@@ -259,6 +274,12 @@ InputDevice *JApplication::getInputDevice(InputDevice::InputType i) const{
 
 Stream::ptr JApplication::makeStream(JNIEnv *env,jobject obj){
 	return new JStream(env,obj);
+}
+
+JNIEnv *JApplication::getEnv() const{
+	JNIEnv *env=NULL;
+	vm->AttachCurrentThread(&env,NULL);
+	return env;
 }
 
 }

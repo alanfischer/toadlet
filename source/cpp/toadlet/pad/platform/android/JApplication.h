@@ -83,7 +83,9 @@ public:
 	Stream::ptr makeStream(JNIEnv *env,jobject obj);
 	
 protected:
-	JNIEnv *env;
+	JNIEnv *getEnv() const;
+
+	JavaVM *vm;
 	jobject obj;
 	jmethodID createID,destroyID,startID,stopID,isRunningID,setTitleID,getTitleID,setDifferenceMouseID,getDifferenceMouseID,setEngineOptionsID,getEngineOptionsID,getWidthID,getHeightID,getEngineID,getRenderDeviceID,getAudioDeviceID,getInputDeviceID;
 	jfieldID Engine_nativeHandle,RenderDevice_nativeHandle;
