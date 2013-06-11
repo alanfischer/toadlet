@@ -45,7 +45,9 @@ public:
 	inline jobject getJObject(){return obj;}
 
 protected:
-	JNIEnv *env;
+	JNIEnv *getEnv() const;
+
+	JavaVM *vm;
 	jobject obj;
 	jmethodID createID,destroyID;
 

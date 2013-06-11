@@ -61,7 +61,9 @@ public:
 	bool getAudioCaps(AudioCaps &caps){caps.set(mCaps);return true;}
 
 protected:
-	JNIEnv *env;
+	JNIEnv *getEnv() const;
+
+	JavaVM *vm;
 	jobject obj;
 	jmethodID createID,destroyID,createAudioBufferID,createAudioID,updateID;
 

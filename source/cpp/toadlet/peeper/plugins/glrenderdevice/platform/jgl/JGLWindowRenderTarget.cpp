@@ -33,78 +33,85 @@ TOADLET_C_API RenderTarget *new_JGLWindowRenderTarget(JNIEnv *jenv,jobject jobj)
 }
 
 JGLWindowRenderTarget::JGLWindowRenderTarget(JNIEnv *jenv,jobject jobj):
-	env(NULL),
+	vm(NULL),
 	obj(NULL)
 {
-	env=jenv;
+	jenv->GetJavaVM(&vm);
+	JNIEnv *env=jenv;
 	obj=env->NewGlobalRef(jobj);
 
-	jclass clazz=env->GetObjectClass(obj);
-
-	swapID=env->GetMethodID(clazz,"swap","()Z");
-	resetID=env->GetMethodID(clazz,"reset","()V");
-	activateID=env->GetMethodID(clazz,"activate","()Z");
-	deactivateID=env->GetMethodID(clazz,"deactivate","()Z");
-	activateAdditionalContextID=env->GetMethodID(clazz,"activateAdditionalContext","()Z");
-	deactivateAdditionalContextID=env->GetMethodID(clazz,"deactivateAdditionalContext","()V");
+	jclass renderTargetClass=env->GetObjectClass(obj);
+	{
+		swapID=env->GetMethodID(renderTargetClass,"swap","()Z");
+		resetID=env->GetMethodID(renderTargetClass,"reset","()V");
+		activateID=env->GetMethodID(renderTargetClass,"activate","()Z");
+		deactivateID=env->GetMethodID(renderTargetClass,"deactivate","()Z");
+		activateAdditionalContextID=env->GetMethodID(renderTargetClass,"activateAdditionalContext","()Z");
+		deactivateAdditionalContextID=env->GetMethodID(renderTargetClass,"deactivateAdditionalContext","()V");
 	
-	destroyID=env->GetMethodID(clazz,"destroy","()V");
-	isPrimaryID=env->GetMethodID(clazz,"isPrimary","()Z");
-	isValidID=env->GetMethodID(clazz,"isValid","()Z");
-	getWidthID=env->GetMethodID(clazz,"getWidth","()I");
-	getHeightID=env->GetMethodID(clazz,"getHeight","()I");
-
-	env->DeleteLocalRef(clazz);
+		destroyID=env->GetMethodID(renderTargetClass,"destroy","()V");
+		isPrimaryID=env->GetMethodID(renderTargetClass,"isPrimary","()Z");
+		isValidID=env->GetMethodID(renderTargetClass,"isValid","()Z");
+		getWidthID=env->GetMethodID(renderTargetClass,"getWidth","()I");
+		getHeightID=env->GetMethodID(renderTargetClass,"getHeight","()I");
+	}
+	env->DeleteLocalRef(renderTargetClass);
 }
 
 JGLWindowRenderTarget::~JGLWindowRenderTarget(){
-	env->DeleteGlobalRef(obj);
+	getEnv()->DeleteGlobalRef(obj);
 	obj=NULL;
-	env=NULL;
+	vm=NULL;
 }
 
 void JGLWindowRenderTarget::destroy(){
-	env->CallVoidMethod(obj,destroyID);
+	getEnv()->CallVoidMethod(obj,destroyID);
 }
 
 bool JGLWindowRenderTarget::swap(){
-	return env->CallBooleanMethod(obj,swapID);
+	return getEnv()->CallBooleanMethod(obj,swapID);
 }
 
 void JGLWindowRenderTarget::reset(){
-	env->CallVoidMethod(obj,resetID);
+	getEnv()->CallVoidMethod(obj,resetID);
 }
 
 bool JGLWindowRenderTarget::activate(){
-	return env->CallBooleanMethod(obj,activateID);
+	return getEnv()->CallBooleanMethod(obj,activateID);
 }
 
 bool JGLWindowRenderTarget::deactivate(){
-	return env->CallBooleanMethod(obj,deactivateID);
+	return getEnv()->CallBooleanMethod(obj,deactivateID);
 }
 
 bool JGLWindowRenderTarget::activateAdditionalContext(){
-	return env->CallBooleanMethod(obj,activateAdditionalContextID);
+	return getEnv()->CallBooleanMethod(obj,activateAdditionalContextID);
 }
 
 void JGLWindowRenderTarget::deactivateAdditionalContext(){
-	return env->CallVoidMethod(obj,deactivateAdditionalContextID);
+	return getEnv()->CallVoidMethod(obj,deactivateAdditionalContextID);
 }
 
 bool JGLWindowRenderTarget::isPrimary() const{
-	return env->CallBooleanMethod(obj,isPrimaryID);
+	return getEnv()->CallBooleanMethod(obj,isPrimaryID);
 }
 
 bool JGLWindowRenderTarget::isValid() const{
-	return env->CallBooleanMethod(obj,isValidID);
+	return getEnv()->CallBooleanMethod(obj,isValidID);
 }
 
 int JGLWindowRenderTarget::getWidth() const{
-	return env->CallIntMethod(obj,getWidthID);
+	return getEnv()->CallIntMethod(obj,getWidthID);
 }
 
 int JGLWindowRenderTarget::getHeight() const{
-	return env->CallIntMethod(obj,getHeightID);
+	return getEnv()->CallIntMethod(obj,getHeightID);
+}
+
+JNIEnv *JGLWindowRenderTarget::getEnv() const{
+	JNIEnv *env=NULL;
+	vm->AttachCurrentThread(&env,NULL);
+	return env;
 }
 
 }

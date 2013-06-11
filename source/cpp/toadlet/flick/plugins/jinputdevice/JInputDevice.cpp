@@ -34,8 +34,12 @@ TOADLET_C_API InputDevice* new_JInputDevice(JNIEnv *jenv,jobject jobj){
 	return new JInputDevice(jenv,jobj);
 }
 
-JInputDevice::JInputDevice(JNIEnv *jenv,jobject jobj){
-	env=jenv;
+JInputDevice::JInputDevice(JNIEnv *jenv,jobject jobj):
+	vm(NULL),
+	obj(NULL)
+{
+	jenv->GetJavaVM(&vm);
+	JNIEnv *env=jenv;
 	obj=env->NewGlobalRef(jobj);
 
 	jclass deviceClass=env->GetObjectClass(obj);
@@ -62,42 +66,44 @@ JInputDevice::JInputDevice(JNIEnv *jenv,jobject jobj){
 }
 
 JInputDevice::~JInputDevice(){
-	env->DeleteGlobalRef(obj);
+	getEnv()->DeleteGlobalRef(obj);
 	obj=NULL;
-	env=NULL;
+	vm=NULL;
 }
 
 bool JInputDevice::create(){
 	Log::alert(Categories::TOADLET_RIBBIT,
 		"creating JInputDevice");
 
-	return env->CallBooleanMethod(obj,createID);
+	return getEnv()->CallBooleanMethod(obj,createID);
 }
 
 void JInputDevice::destroy(){
 	Log::alert(Categories::TOADLET_RIBBIT,
 		"destroying JInputDevice");
 
-	return env->CallVoidMethod(obj,destroyID);
+	return getEnv()->CallVoidMethod(obj,destroyID);
 }
 
 InputDevice::InputType JInputDevice::getType(){
-	return (InputType)env->CallIntMethod(obj,getTypeID);
+	return (InputType)getEnv()->CallIntMethod(obj,getTypeID);
 }
 
 bool JInputDevice::start(){
-	return env->CallBooleanMethod(obj,startID);
+	return getEnv()->CallBooleanMethod(obj,startID);
 }
 
 void JInputDevice::update(int dt){
-	env->CallVoidMethod(obj,updateID,dt);
+	getEnv()->CallVoidMethod(obj,updateID,dt);
 }
 
 void JInputDevice::stop(){
-	env->CallVoidMethod(obj,stopID);
+	getEnv()->CallVoidMethod(obj,stopID);
 }
 
 void JInputDevice::setListener(InputDeviceListener *listener){
+	JNIEnv *env=getEnv();
+
 	jobject listenerObj=NULL;
 	if(listener!=NULL){
 		jclass listenerClass=env->FindClass("us/toadlet/flick/BaseInputDeviceListener");
@@ -118,11 +124,17 @@ void JInputDevice::setListener(InputDeviceListener *listener){
 }
 
 void JInputDevice::setSampleTime(int dt){
-	env->CallVoidMethod(obj,setSampleTimeID,dt);
+	getEnv()->CallVoidMethod(obj,setSampleTimeID,dt);
 }
 
 void JInputDevice::setAlpha(scalar alpha){
-	env->CallVoidMethod(obj,setAlphaID,Math::toFloat(alpha));
+	getEnv()->CallVoidMethod(obj,setAlphaID,Math::toFloat(alpha));
+}
+
+JNIEnv *JInputDevice::getEnv() const{
+	JNIEnv *env=NULL;
+	vm->AttachCurrentThread(&env,NULL);
+	return env;
 }
 
 }

@@ -57,7 +57,9 @@ public:
 	scalar getGain() const;
 
 protected:
-	JNIEnv *env;
+	JNIEnv *getEnv() const;
+
+	JavaVM *vm;
 	jobject obj;
 	jmethodID createAudioBufferID,createAudioStreamID,destroyID,playID,stopID,getPlayingID,getFinishedID,setLoopingID,getLoopingID,setGainID,getGainID;
 
