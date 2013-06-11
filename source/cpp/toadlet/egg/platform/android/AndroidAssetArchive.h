@@ -39,8 +39,9 @@ public:
 	TOADLET_RESOURCE(AndroidAssetArchive,Archive);
 
 	AndroidAssetArchive(JNIEnv *jenv,jobject jassetManager);
+	virtual ~AndroidAssetArchive();
 
-	void destroy();
+	void destroy(){}
 
 	Stream::ptr openStream(const String &name);
 	Resource::ptr openResource(const String &name){return NULL;}
@@ -48,11 +49,12 @@ public:
 	Collection<String>::ptr getEntries();
 
 protected:
+	JNIEnv *getEnv() const;
+
 	JStream::ptr mStream;
 	Collection<String>::ptr mEntries;
-	JNIEnv *env;
-	JavaVM *jvm;
-	jobject assetManagerObj;
+	JavaVM *vm;
+	jobject obj;
 	jmethodID closeManagerID,openManagerID,availableStreamID,readStreamID,closeStreamID;
 };
 

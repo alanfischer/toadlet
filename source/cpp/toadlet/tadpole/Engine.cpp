@@ -132,7 +132,10 @@ Engine::Engine(void *env,void *ctx):
 	Log::debug(Categories::TOADLET_TADPOLE,
 		String("allocating ")+Categories::TOADLET_TADPOLE+".Engine:"+Version::STRING);
 
-	mEnv=env,mCtx=ctx;
+	#if defined(TOADLET_PLATFORM_ANDROID)
+		mEnv=env;
+		mCtx=((JNIEnv*)mEnv)->NewGlobalRef((jobject)ctx);
+	#endif
 
 	mArchiveManager=new ArchiveManager(this);
 	mTextureManager=new TextureManager(this);
@@ -181,6 +184,11 @@ Engine::Engine(void *env,void *ctx):
 }
 
 Engine::~Engine(){
+	#if defined(TOADLET_PLATFORM_ANDROID)
+		((JNIEnv*)mEnv)->DeleteGlobalRef((jobject)mCtx);
+		mEnv=NULL;
+	#endif
+
 	Log::debug(Categories::TOADLET_TADPOLE,
 		"Engine::~Engine");
 }
