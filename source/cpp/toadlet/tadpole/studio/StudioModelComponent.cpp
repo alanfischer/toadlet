@@ -102,6 +102,9 @@ StudioModelComponent::StudioModelComponent(Engine *engine):
 	memset(mAdjustedControllerValues,0,sizeof(mAdjustedControllerValues));
 	mRendered=true;
 	mEngine=engine;
+	mTransform=new Transform();
+	mTransform->setTransformListener(this);
+	mWorldTransform=new Transform();
 	mBound=new Bound();
 	mWorldBound=new Bound();
 }
@@ -347,14 +350,24 @@ void StudioModelComponent::setLink(StudioModelComponent *link){
 	}
 }
 
+void StudioModelComponent::setTransform(Transform::ptr transform){
+	if(transform==NULL){
+		mTransform->reset();
+	}
+	else{
+		mTransform->set(transform);
+	}
+}
+
 void StudioModelComponent::transformChanged(Transform *transform){
 	if(mParent==NULL){
 		return;
 	}
 
-	mWorldBound->transform(mBound,mParent->getWorldTransform());
+	mWorldTransform->setTransform(mParent->getWorldTransform(),mTransform);
+	mWorldBound->transform(mBound,mWorldTransform);
 
-	if(transform==NULL){
+	if(transform==mTransform){
 		mParent->boundChanged();
 	}
 }

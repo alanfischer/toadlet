@@ -130,7 +130,7 @@ void BSP30Node::nodeAttached(Node *node){
 void BSP30Node::nodeRemoved(Node *node){
 	Node::nodeRemoved(node);
 
-	if(mMap!=NULL){
+	if(mMap!=NULL && node->getParentData()!=NULL){
 		removeNodeLeafIndexes(((childdata*)node->getParentData())->leafs,node);
 	}
 

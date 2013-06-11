@@ -361,7 +361,12 @@ void Node::setMatrix4x4(const Matrix4x4 &matrix){
 }
 
 void Node::setTransform(Transform::ptr transform){
-	mTransform->set(transform);
+	if(transform==NULL){
+		mTransform->reset();
+	}
+	else{
+		mTransform->set(transform);
+	}
 }
 
 void Node::setBound(Bound::ptr bound){
