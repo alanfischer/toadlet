@@ -41,7 +41,7 @@ namespace toadlet{
 namespace tadpole{
 namespace studio{
 
-class TOADLET_API StudioModelComponent:public BaseComponent,public Spacial,public DetailTraceable,public Renderable,public Attachable,public Visible,public Animatable{
+class TOADLET_API StudioModelComponent:public BaseComponent,public TransformListener,public Spacial,public DetailTraceable,public Renderable,public Attachable,public Visible,public Animatable{
 public:
 	TOADLET_COMPONENT(StudioModelComponent);
 
@@ -140,9 +140,10 @@ public:
 	bool getActive() const{return true;}
 
 	// Spacial
-	Transform *getTransform() const{return NULL;}
+	void setTransform(Transform::ptr transform);
+	Transform *getTransform() const{return mTransform;}
+	Transform *getWorldTransform() const{return mWorldTransform;}
 	Bound *getBound() const{return mBound;}
-	Transform *getWorldTransform() const{return NULL;}
 	Bound *getWorldBound() const{return mWorldBound;}
 	void transformChanged(Transform *transform);
 
@@ -158,8 +159,8 @@ public:
 
 	// Renderable
 	Material *getRenderMaterial() const{return mSkeletonMaterial;}
-	Transform *getRenderTransform() const{return mParent->getWorldTransform();}
-	Bound *getRenderBound() const{return mParent->getWorldBound();}
+	Transform *getRenderTransform() const{return mWorldTransform;}
+	Bound *getRenderBound() const{return mWorldBound;}
 	void render(RenderManager *manager) const;
 
 	// Attachable
@@ -186,12 +187,14 @@ protected:
 	void destroySkeletonBuffers();
 
 	Engine *mEngine;
-	Bound::ptr mBound;
-	Bound::ptr mWorldBound;
 	bool mRendered;
 	StudioModel::ptr mModel;
 	Collection<SubModel::ptr> mSubModels;
 	RenderState::ptr mSharedRenderState;
+	Transform::ptr mTransform;
+	Transform::ptr mWorldTransform;
+	Bound::ptr mBound;
+	Bound::ptr mWorldBound;
 
 	int mBodypartIndex;
 	int mModelIndex;
