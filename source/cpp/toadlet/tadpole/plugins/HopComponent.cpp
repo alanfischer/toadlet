@@ -72,7 +72,9 @@ void HopComponent::parentChanged(Node *node){
 }
 
 void HopComponent::rootChanged(Node *root){
-	if(root!=NULL){
+	BaseComponent::rootChanged(root);
+
+	if(mParent!=NULL && root!=NULL && mParent->getParent()==root){
 		mManager->getSimulator()->addSolid(mSolid);
 	}
 	else{

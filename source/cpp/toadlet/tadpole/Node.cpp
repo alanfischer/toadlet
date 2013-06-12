@@ -102,15 +102,9 @@ void Node::destroyAllChildren(){
 }
 
 bool Node::attach(Component *component){
-	Component::ptr reference=component; // To make sure that the object is not released early
-
-	mComponents.add(component);
+	Component::ptr reference=component;
 
 	component->parentChanged(this);
-
-	if(mRoot!=NULL){
-		component->rootChanged(mRoot);
-	}
 
 	if(getActive()==false){
 		activate();
@@ -120,21 +114,23 @@ bool Node::attach(Component *component){
 }
 
 bool Node::remove(Component *component){
-	Component::ptr reference=component; // To make sure that the object is not released early
+	Component::ptr reference=component;
 
 	component->parentChanged(NULL);
-
-	mComponents.remove(component);
-
-	if(mRoot!=NULL){
-		component->rootChanged(NULL);
-	}
 
 	if(getActive()==false){
 		activate();
 	}
 
 	return true;
+}
+
+void Node::componentAttached(Component *component){
+	mComponents.add(component);
+}
+
+void Node::componentRemoved(Component *component){
+	mComponents.remove(component);
 }
 
 void Node::nodeAttached(Node *node){

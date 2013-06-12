@@ -30,7 +30,10 @@ namespace toadlet{
 namespace tadpole{
 namespace sensor{
 
-TypeSensor::TypeSensor(Scene *scene):Sensor(scene){
+TypeSensor::TypeSensor(Scene *scene):Sensor(scene),
+	mType(NULL),
+	mHasType(NULL)
+{
 }
 
 bool TypeSensor::senseNode(Node *node){
