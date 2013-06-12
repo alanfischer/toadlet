@@ -29,6 +29,12 @@
 namespace toadlet{
 namespace tadpole{
 
+BaseComponent::BaseComponent():
+	mParent(NULL),
+	mRoot(NULL),
+	mRemoving(false)
+{}
+
 void BaseComponent::destroy(){
 	if(mParent!=NULL){
 		mParent->remove(componentThis());
@@ -36,11 +42,24 @@ void BaseComponent::destroy(){
 }
 
 void BaseComponent::parentChanged(Node *node){
-	if(node!=NULL && mParent!=NULL){
-		mParent->remove(this);
+	if(mParent!=NULL){
+		mParent->componentRemoved(this);
 	}
 
 	mParent=node;
+
+	if(mParent!=NULL){
+		mParent->componentAttached(this);
+	}
+
+	Node *root=NULL;
+	if(mParent!=NULL){
+		root=mParent->getRoot();
+	}
+
+	if(root!=mRoot){
+		rootChanged(root);
+	}
 }
 
 void BaseComponent::rootChanged(Node *root){

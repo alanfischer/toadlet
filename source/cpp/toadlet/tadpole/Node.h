@@ -73,11 +73,15 @@ public:
 	virtual void parentChanged(Node *node);
 	virtual void rootChanged(Node *root);
 
+	virtual Node *getRoot() const{return mRoot;}
+
 	void *getParentData() const{return mParentData;}
 	void setParentData(void *parentData){mParentData=parentData;}
 
 	virtual bool attach(Component *component);
 	virtual bool remove(Component *component);
+	virtual void componentAttached(Component *component);
+	virtual void componentRemoved(Component *component);
 	virtual Component *getChild(const String &name) const;
 	virtual Component *getChild(const Type<Component> *type) const;
 	template<typename Type> Type *getChildType() const{return (Type*)getChild(Type::type());}
