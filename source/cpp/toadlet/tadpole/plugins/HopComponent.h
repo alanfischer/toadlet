@@ -59,8 +59,15 @@ public:
 	void setGravity(scalar gravity){mSolid->setCoefficientOfGravity(gravity);}
 	scalar getGravity() const{return mSolid->getCoefficientOfGravity();}
 
-	void setCollisionScope(int scope){mSolid->setCollisionScope(scope);mSolid->setCollideWithScope(scope);mSolid->setInternalScope(scope);}
-	int getCollisionScope() const{return mSolid->getCollisionScope();}
+	void setScope(int scope){mSolid->setCollisionScope(scope);mSolid->setCollideWithScope(scope);mSolid->setInternalScope(scope);}
+	int getScope() const{return mSolid->getCollisionScope();}
+
+	/// @todo: Eventually rename setSolidCollisionScope to just setCollisionScope, but since we changed that methods meaning, leave it for now to force update
+	void setSolidCollisionScope(int scope){mSolid->setCollisionScope(scope);}
+	int getSolidCollisionScope() const{return mSolid->getCollisionScope();}
+
+	void setSolidCollideWithScope(int scope){mSolid->setCollideWithScope(scope);}
+	int getSolidCollideWithScope() const{return mSolid->getCollideWithScope();}
 
 	void setBound(Bound *bound);
 	void setTraceable(PhysicsTraceable *traceable);
