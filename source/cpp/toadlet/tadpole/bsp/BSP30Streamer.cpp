@@ -236,6 +236,9 @@ void BSP30Streamer::parseTextures(BSP30Map *map){
 			if(texture==NULL){
 				texture=mEngine->getTextureManager()->findTexture(miptex->name);
 			}
+			if(texture==NULL){
+				Log::debug(Categories::TOADLET_TADPOLE,String("Unable to find texture:")+miptex->name);
+			}
 		}
 		map->parsedTextures[i]=texture;
 	}

@@ -114,6 +114,10 @@ void DecalShadowRenderManager::interRenderRenderables(RenderableSet *set,RenderD
 				continue;
 			}
 
+			if(node->getRoot()==NULL){
+				return;
+			}
+
 			if((node->getScope()&mShadowScope)!=0 && node!=mScene->getBackground() && node!=mScene->getRoot()){
 				Sphere boundingSphere=node->getWorldBound()->getSphere();
 				if(boundingSphere.radius*4 > (camera->getFarDist()-camera->getNearDist())){

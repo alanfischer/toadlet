@@ -81,14 +81,22 @@ void BSP30Node::setMap(BSP30Map *map){
 void BSP30Node::setSkyName(const String &skyName){
 	mSkyName=skyName;
 
-	setSkyTextures(
-		skyName+"dn.tga",
-		skyName+"up.tga",
-		skyName+"ft.tga",
-		skyName+"bk.tga",
-		skyName+"rt.tga",
-		skyName+"lf.tga"
-	);
+	if(skyName!=(char*)NULL){
+		setSkyTextures(
+			"sky/"+skyName+"dn.tga",
+			"sky/"+skyName+"up.tga",
+			"sky/"+skyName+"ft.tga",
+			"sky/"+skyName+"bk.tga",
+			"sky/"+skyName+"rt.tga",
+			"sky/"+skyName+"lf.tga"
+		);
+	}
+	else{
+		if(mSkyMesh!=NULL){
+			mSkyMesh->destroy();
+			mSkyMesh=NULL;
+		}
+	}
 }
 
 void BSP30Node::setSkyTextures(const String &skyDown,const String &skyUp,const String &skyWest,const String &skyEast,const String &skySouth,const String &skyNorth){
