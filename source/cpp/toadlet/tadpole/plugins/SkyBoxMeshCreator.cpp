@@ -48,10 +48,10 @@ Mesh::ptr SkyBoxMeshCreator::createSkyBoxMesh(scalar size,bool unfolded,bool inv
 		scalar bot=invert?0:one;
 
 		// Bottom
-		vba.set3(vi,0,-size,-size,-size); if(unfolded) vba.set2(vi,1, quarter, one);	else vba.set2(vi,1, 0, top);	vi++;
-		vba.set3(vi,0, size,-size,-size); if(unfolded) vba.set2(vi,1, half, one);		else vba.set2(vi,1, one, top);	vi++;
-		vba.set3(vi,0, size, size,-size); if(unfolded) vba.set2(vi,1, half, third2);	else vba.set2(vi,1, one, bot);	vi++;
-		vba.set3(vi,0,-size, size,-size); if(unfolded) vba.set2(vi,1, quarter, third2);	else vba.set2(vi,1, 0, bot);	vi++;
+		vba.set3(vi,0,-size,-size,-size); if(unfolded) vba.set2(vi,1, quarter, one);	else vba.set2(vi,1, one, bot);	vi++;
+		vba.set3(vi,0, size,-size,-size); if(unfolded) vba.set2(vi,1, half, one);		else vba.set2(vi,1, 0, bot);	vi++;
+		vba.set3(vi,0, size, size,-size); if(unfolded) vba.set2(vi,1, half, third2);	else vba.set2(vi,1, 0, top);	vi++;
+		vba.set3(vi,0,-size, size,-size); if(unfolded) vba.set2(vi,1, quarter, third2);	else vba.set2(vi,1, one, top);	vi++;
 
 		iba.set(ii++,0);		iba.set(ii++,1);		iba.set(ii++,2);
 		iba.set(ii++,2);		iba.set(ii++,3);		iba.set(ii++,0);
