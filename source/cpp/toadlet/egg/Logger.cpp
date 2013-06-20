@@ -32,6 +32,7 @@
 // Choose output method
 #if defined(TOADLET_PLATFORM_WIN32)
 	#define TOADLET_USE_OUTPUTDEBUGSTRING_LOGGING
+	#define TOADLET_USE_WINDOWS_CONSOLE
 	#include <windows.h>
 #endif
 
@@ -40,7 +41,7 @@
 	#include <android/log.h>
 #endif
 
-#if !defined(TOADLET_PLATFORM_WINCE)
+#if !defined(TOADLET_PLATFORM_WIN32)
 	#define TOADLET_USE_STDERR_LOGGING
 	#include <stdio.h>
 #endif
@@ -241,6 +242,35 @@ void Logger::addCompleteLogEntry(Category *category,Level level,const String &te
 			}
 		#endif
 
+		#if defined(TOADLET_USE_WINDOWS_CONSOLE)
+			int textColor=FOREGROUND_RED|FOREGROUND_GREEN|FOREGROUND_BLUE;
+			int levelColor=textColor;
+			switch(level){
+				case Level_ERROR:
+					levelColor=FOREGROUND_RED;
+				break;
+				case Level_WARNING:
+					levelColor=FOREGROUND_RED|FOREGROUND_GREEN;
+				break;
+				case Level_ALERT:
+					levelColor=FOREGROUND_GREEN;
+				break;
+				default:
+				break;
+			}
+
+			String stime=timeString+": ";
+			String slevel=levelString;
+			String stext=text+(char)10;
+
+			HANDLE hout=GetStdHandle(STD_ERROR_HANDLE);
+			WriteConsole(hout,(const TCHAR*)stime,stime.length(),NULL,NULL);
+			SetConsoleTextAttribute(hout,levelColor);
+			WriteConsole(hout,(const TCHAR*)slevel,slevel.length(),NULL,NULL);
+			SetConsoleTextAttribute(hout,textColor);
+			WriteConsole(hout,(const TCHAR*)stext,stext.length(),NULL,NULL);
+		#endif
+
 		#if defined(TOADLET_USE_ANDROID_LOGGING)
 			int priority=0;
 			switch(level){
@@ -296,7 +326,7 @@ void Logger::addCompleteLogEntry(Category *category,Level level,const String &te
 		
 			asl_log(client,NULL,asllevel,"%s",line.c_str());
 		#endif
-		
+
 		#if defined(TOADLET_USE_STDERR_LOGGING)
 			fputs(line,stderr);
 		#endif

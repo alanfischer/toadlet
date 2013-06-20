@@ -109,9 +109,16 @@ toadlet::tadpole::Track *createColorTrack(toadlet::tadpole::Engine *engine){
 Collection<DynamicLibrary::ptr> libraries;
 toadlet::peeper::RenderDevice *new_RenderDevice(char *name){
 	DynamicLibrary::ptr library(new DynamicLibrary());
-	if(library->load(name,(char*)NULL,(char*)NULL)){
+	bool result=false;
+	TOADLET_TRY
+		result=library->load(name,(char*)NULL,(char*)NULL);
+	TOADLET_CATCH_ANONYMOUS(){}
+	if(result){
 		libraries.add(library);
-		RenderDevice *(*creator)()=(RenderDevice*(*)())library->getSymbol("new_RenderDevice");
+		RenderDevice *(*creator)()=NULL;
+		TOADLET_TRY
+			creator=(RenderDevice*(*)())library->getSymbol("new_RenderDevice");
+		TOADLET_CATCH_ANONYMOUS(){}
 		if(creator!=NULL){
 			return creator();
 		}
@@ -120,9 +127,16 @@ toadlet::peeper::RenderDevice *new_RenderDevice(char *name){
 }
 toadlet::ribbit::AudioDevice *new_AudioDevice(char *name){
 	DynamicLibrary::ptr library(new DynamicLibrary());
-	if(library->load(name,(char*)NULL,(char*)NULL)){
+	bool result=false;
+	TOADLET_TRY
+		result=library->load(name,(char*)NULL,(char*)NULL);
+	TOADLET_CATCH_ANONYMOUS(){}
+	if(result){
 		libraries.add(library);
-		AudioDevice *(*creator)()=(AudioDevice*(*)())library->getSymbol("new_AudioDevice");
+		AudioDevice *(*creator)()=NULL;
+		TOADLET_TRY
+			creator=(AudioDevice*(*)())library->getSymbol("new_AudioDevice");
+		TOADLET_CATCH_ANONYMOUS(){}
 		if(creator!=NULL){
 			return creator();
 		}

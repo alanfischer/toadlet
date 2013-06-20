@@ -155,7 +155,7 @@ void Solid::setPosition(const Vector3 &position){
 	setPositionDirect(position);
 
 	// Attempt to gather touching information
-/*	if(mSimulator!=NULL){
+	if(mSimulator!=NULL){
 		Vector3 velocity=mVelocity;
 		Vector3 force=mForce;
 
@@ -165,7 +165,7 @@ void Solid::setPosition(const Vector3 &position){
 		mVelocity=velocity;
 		mForce=force;
 		activate();
-	}*/
+	}
 }
 
 void Solid::setVelocity(const Vector3 &velocity){
