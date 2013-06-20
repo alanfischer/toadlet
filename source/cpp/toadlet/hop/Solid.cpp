@@ -65,8 +65,9 @@ Solid::Solid():
 	//mTouched1Normal,
 	mTouched2(NULL),
 	//mTouched2Normal,
-	//mTouching,
+	mTouching(NULL),
 	//mTouchingNormal,
+	mLastDT(0),
 
 	mDoUpdateCallback(false),
 	mManager(NULL),
@@ -151,14 +152,20 @@ void Solid::setInfiniteMass(){
 bool Solid::hasInfiniteMass() const{return mMass==INFINITE_MASS;}
 
 void Solid::setPosition(const Vector3 &position){
-	mPosition.set(position);
-	Math::add(mWorldBound,mLocalBound,mPosition);
-	activate();
+	setPositionDirect(position);
 
-	// Reset touching information
-	mTouched1=NULL;
-	mTouched2=NULL;
-	mTouching=NULL;
+	// Attempt to gather touching information
+/*	if(mSimulator!=NULL){
+		Vector3 velocity=mVelocity;
+		Vector3 force=mForce;
+
+		mSimulator->updateSolid(this,mLastDT,Math::fromMilli(mLastDT));
+
+		setPositionDirect(position);
+		mVelocity=velocity;
+		mForce=force;
+		activate();
+	}*/
 }
 
 void Solid::setVelocity(const Vector3 &velocity){

@@ -171,6 +171,7 @@ protected:
 	Vector3 mTouched2Normal;
 	Solid *mTouching;
 	Vector3 mTouchingNormal;
+	int mLastDT;
 
 	bool mDoUpdateCallback;
 	Manager *mManager;

@@ -188,6 +188,47 @@ void Simulator::removeConstraint(Constraint *constraint){
 }
 
 void Simulator::update(int dt,int scope,Solid *solid){
+	int i;
+
+	scalar fdt=fromMilli(dt);
+
+	if(mManager!=NULL){
+		mManager->preUpdate(dt,fdt);
+	}
+
+	int numSolids=(solid!=NULL)?1:mSolids.size();
+	for(i=0;i<numSolids;i++){
+		if(numSolids>1 || solid==NULL){
+			solid=mSolids[i];
+		}
+
+		if(solid->mActive==false || (scope!=0 && (solid->mScope&scope)==0)){
+			continue;
+		}
+
+		solid->mLastDT=dt;
+
+		if(solid->mDoUpdateCallback){
+			(solid->mManager!=NULL?solid->mManager:mManager)->preUpdate(solid,dt,fdt);
+		}
+
+		updateSolid(solid,dt,fdt);
+
+		if(solid->mDoUpdateCallback && mManager!=NULL){
+			(solid->mManager!=NULL?solid->mManager:mManager)->postUpdate(solid,dt,fdt);
+		}
+	}
+
+	if((scope&Scope_REPORT_COLLISIONS)!=0){
+		reportCollisions();
+	}
+
+	if(mManager!=NULL){
+		mManager->postUpdate(dt,fdt);
+	}
+}
+
+void Simulator::updateSolid(Solid *solid,int dt,scalar fdt){
 	Vector3 &oldPosition=cache_update_oldPosition;
 	Vector3 &newPosition=cache_update_newPosition;
 	Vector3 &oldVelocity=cache_update_oldVelocity;
@@ -204,440 +245,411 @@ void Simulator::update(int dt,int scope,Solid *solid){
 	int loop=0;
 	Solid *hitSolid=NULL;
 	Collision &c=cache_update_c.reset();
-	int i,j;
+	int j;
 
-	scalar fdt=fromMilli(dt);
-	scalar hfdt=fdt/2;
-	scalar qfdt=fdt/4;
-	scalar sfdt=fdt/6;
-	scalar ttfdt=fdt*2/3;
+	oldPosition.set(solid->mPosition);
+	oldVelocity.set(solid->mVelocity);
 
-	if(mManager!=NULL){
-		mManager->preUpdate(dt,fdt);
+	// The cheapest, fastest, and worst integrator, it's 1st order
+	// It may have trouble settling, so it is not recommended
+	if(mIntegrator==Integrator_EULER){
+		/*
+			integrationStep(solid,oldPosition,solid->mVelocity,ZERO_VECTOR3,ZERO_VECTOR3,fdt,dx1,dv1);
+			newPosition=oldPosition+dx1*fdt;
+			velocity=solid->mVelocity+dv1*fdt;
+		*/
+
+		integrationStep(solid,oldPosition,solid->mVelocity,ZERO_VECTOR3,ZERO_VECTOR3,fdt,dx1,dv1);
+
+		mul(newPosition,dx1,fdt);
+		add(newPosition,oldPosition);
+		mul(velocity,dv1,fdt);
+		add(velocity,solid->mVelocity);
+	}
+	// Improved is 2nd order and a nice balance between speed and accuracy
+	else if(mIntegrator==Integrator_IMPROVED){
+		scalar hfdt=fdt/2;
+
+		/*
+			integrationStep(solid,oldPosition,solid->mVelocity,ZERO_VECTOR3,ZERO_VECTOR3,fdt,dx1,dv1);
+			integrationStep(solid,oldPosition,solid->mVelocity,dx1,dv1,fdt,dx2,dv2)
+			newPosition=oldPosition+0.5*fdt*(dx1+dx2);
+			velocity=solid->mVelocity+0.5*fdt*(dv1+dv2);
+		*/
+
+		integrationStep(solid,oldPosition,solid->mVelocity,ZERO_VECTOR3,ZERO_VECTOR3,fdt,dx1,dv1);
+
+		newPosition.set(dx1);
+		velocity.set(dv1);
+
+		integrationStep(solid,oldPosition,solid->mVelocity,dx1,dv1,fdt,dx2,dv2);
+
+		add(newPosition,dx2);
+		mul(newPosition,hfdt);
+		add(newPosition,oldPosition);
+
+		add(velocity,dv2);
+		mul(velocity,hfdt);
+		add(velocity,solid->mVelocity);
+	}
+	// Heun's method is 2nd order and so has the same speed as Improved, but it biases towards the 2nd portion of the integration step, and thus may be more stable
+	else if(mIntegrator==Integrator_HEUN){
+		scalar qfdt=fdt/4;
+		scalar ttfdt=fdt*2/3;
+
+		/*
+			integrationStep(solid,oldPosition,solid->mVelocity,ZERO_VECTOR3,ZERO_VECTOR3,fdt,dx1,dv1);
+			integrationStep(solid,oldPosition,solid->mVelocity,dx1,dv1,2.0f/3.0f*fdt,dx2,dv2);
+			newPosition=oldPosition+0.25f*fdt*(dx1+3.0f*dx2);
+			velocity=solid->mVelocity+0.25f*fdt*(dv1+3.0f*dv2);
+		*/
+
+		integrationStep(solid,oldPosition,solid->mVelocity,ZERO_VECTOR3,ZERO_VECTOR3,fdt,dx1,dv1);
+
+		newPosition.set(dx1);
+		velocity.set(dv1);
+
+		integrationStep(solid,oldPosition,solid->mVelocity,dx1,dv1,ttfdt,dx2,dv2);
+
+		mul(dx2,THREE);
+		add(newPosition,dx2);
+		mul(newPosition,qfdt);
+		add(newPosition,oldPosition);
+
+		mul(dv2,THREE);
+		add(velocity,dv2);
+		mul(velocity,qfdt);
+		add(velocity,solid->mVelocity);
+	}
+	// Runge Kutta is 4th order, decently fast, and very stable for larger step sizes
+	else if(mIntegrator==Integrator_RUNGE_KUTTA){
+		scalar hfdt=fdt/2;
+		scalar sfdt=fdt/6;
+
+		/*
+			integrationStep(solid,oldPosition,solid->mVelocity,ZERO_VECTOR3,ZERO_VECTOR3,fdt,dx1,dv1);
+			integrationStep(solid,oldPosition,solid->mVelocity,dx1,dv1,0.5f*fdt,dx2,dv2);
+			integrationStep(solid,oldPosition,solid->mVelocity,dx2,dv2,0.5f*fdt,dx3,dv3);
+			integrationStep(solid,oldPosition,solid->mVelocity,dx3,dv3,fdt,dx4,dv4);
+			newPosition=oldPosition+1.0f/6.0f*fdt*(dx1+2.0f*(dx2+dx3)+dx4);
+			velocity=solid->mVelocity+1.0f/6.0f*fdt*(dv1+2.0f*(dv2+dv3)+dv4);
+		*/
+
+		integrationStep(solid,oldPosition,solid->mVelocity,ZERO_VECTOR3,ZERO_VECTOR3,fdt,dx1,dv1);
+
+		newPosition.set(dx1);
+		velocity.set(dv1);
+
+		integrationStep(solid,oldPosition,solid->mVelocity,dx1,dv1,hfdt,dx2,dv2);
+
+		mul(temp,dx2,TWO);
+		add(newPosition,temp);
+		mul(temp,dv2,TWO);
+		add(velocity,temp);
+
+		integrationStep(solid,oldPosition,solid->mVelocity,dx2,dv2,hfdt,dx1,dv1);
+
+		mul(temp,dx1,TWO);
+		add(newPosition,temp);
+		mul(temp,dv1,TWO);
+		add(velocity,temp);
+
+		integrationStep(solid,oldPosition,solid->mVelocity,dx1,dv1,fdt,dx2,dv2);
+
+		add(newPosition,dx2);
+		mul(newPosition,sfdt);
+		add(newPosition,oldPosition);
+
+		add(velocity,dv2);
+		mul(velocity,sfdt);
+		add(velocity,solid->mVelocity);
 	}
 
-	int numSolids=(solid!=NULL)?1:mSolids.size();
-	for(i=0;i<numSolids;i++){
-		if(numSolids>1 || solid==NULL){
-			solid=mSolids[i];
+	// Clean up
+	capVector3(velocity,mMaxVelocityComponent);
+	solid->mVelocity.set(velocity);
+	solid->clearForce();
+
+	bool first=true;
+	bool skip=false;
+
+	if(solid->mDoUpdateCallback){
+		(solid->mManager!=NULL?solid->mManager:mManager)->intraUpdate(solid,dt,fdt);
+	}
+
+	// In most cases we don't need to cap the oldPosition, but if our position is set outside of the max,
+	//  then when we cap the newPosition, it will think we are attempting to move from the old to the new, instead of just setting there
+	snapToGrid(oldPosition);
+	capVector3(oldPosition,mMaxPositionComponent);
+	snapToGrid(newPosition);
+	capVector3(newPosition,mMaxPositionComponent);
+
+	// Collect all possible solids in the whole movement area
+	if(solid->mCollideWithScope!=0){
+		sub(temp,newPosition,oldPosition);
+
+		/// @todo: Removed this, maybe it should just go completely
+		///  I had a 1 meter large sphere deactivated, sitting on top of an infinite mass plane, with -9.8 gravity, and attemping to set the velocity to 5 up, this causes it to just zero out
+		/// @todo: Calculate this 0.5f from the coefficient of static friction between solid & mTouching
+		//if(solid->mTouching!=NULL && tooSmall(temp,0.5f)){
+		//	newPosition.set(oldPosition);
+		//	solid->mVelocity.set(oldVelocity);
+		//	skip=true;
+		//}
+		//else
+		{
+			if(temp.x<0){temp.x=-temp.x;}
+			if(temp.y<0){temp.y=-temp.y;}
+			if(temp.z<0){temp.z=-temp.z;}
+
+			scalar m=temp.x;
+			if(temp.y>m){m=temp.y;}
+			if(temp.z>m){m=temp.z;}
+			m+=mEpsilon; // Move it out by epsilon, since we haven't snapped yet
+
+			AABox &box=cache_update_box.set(solid->mLocalBound);
+
+			add(box,newPosition);
+			box.mins.x-=m;
+			box.mins.y-=m;
+			box.mins.z-=m;
+			box.maxs.x+=m;
+			box.maxs.y+=m;
+			box.maxs.z+=m;
+
+			mNumSpacialCollection=findSolidsInAABox(box,mSpacialCollection,mSpacialCollection.size());
 		}
+	}
 
-		if(solid->mActive==false || (scope!=0 && (solid->mScope&scope)==0)){
-			continue;
-		}
+	// Loop to use up available momentum
+	loop=0;
+	while(skip==false){
+		if(first==false){
+			snapToGrid(oldPosition);
+			snapToGrid(newPosition);
 
-		if(solid->mDoUpdateCallback){
-			(solid->mManager!=NULL?solid->mManager:mManager)->preUpdate(solid,dt,fdt);
-		}
-
-		oldPosition.set(solid->mPosition);
-		oldVelocity.set(solid->mVelocity);
-
-		// The cheapest, fastest, and worst integrator, it's 1st order
-		// It may have trouble settling, so it is not recommended
-		if(mIntegrator==Integrator_EULER){
-			/*
-				integrationStep(solid,oldPosition,solid->mVelocity,ZERO_VECTOR3,ZERO_VECTOR3,fdt,dx1,dv1);
-				newPosition=oldPosition+dx1*fdt;
-				velocity=solid->mVelocity+dv1*fdt;
-			*/
-
-			integrationStep(solid,oldPosition,solid->mVelocity,ZERO_VECTOR3,ZERO_VECTOR3,fdt,dx1,dv1);
-
-			mul(newPosition,dx1,fdt);
-			add(newPosition,oldPosition);
-			mul(velocity,dv1,fdt);
-			add(velocity,solid->mVelocity);
-		}
-		// Improved is 2nd order and a nice balance between speed and accuracy
-		else if(mIntegrator==Integrator_IMPROVED){
-			/*
-				integrationStep(solid,oldPosition,solid->mVelocity,ZERO_VECTOR3,ZERO_VECTOR3,fdt,dx1,dv1);
-				integrationStep(solid,oldPosition,solid->mVelocity,dx1,dv1,fdt,dx2,dv2)
-				newPosition=oldPosition+0.5*fdt*(dx1+dx2);
-				velocity=solid->mVelocity+0.5*fdt*(dv1+dv2);
-			*/
-
-			integrationStep(solid,oldPosition,solid->mVelocity,ZERO_VECTOR3,ZERO_VECTOR3,fdt,dx1,dv1);
-
-			newPosition.set(dx1);
-			velocity.set(dv1);
-
-			integrationStep(solid,oldPosition,solid->mVelocity,dx1,dv1,fdt,dx2,dv2);
-
-			add(newPosition,dx2);
-			mul(newPosition,hfdt);
-			add(newPosition,oldPosition);
-
-			add(velocity,dv2);
-			mul(velocity,hfdt);
-			add(velocity,solid->mVelocity);
-		}
-		// Heun's method is 2nd order and so has the same speed as Improved, but it biases towards the 2nd portion of the integration step, and thus may be more stable
-		else if(mIntegrator==Integrator_HEUN){
-			/*
-				integrationStep(solid,oldPosition,solid->mVelocity,ZERO_VECTOR3,ZERO_VECTOR3,fdt,dx1,dv1);
-				integrationStep(solid,oldPosition,solid->mVelocity,dx1,dv1,2.0f/3.0f*fdt,dx2,dv2);
-				newPosition=oldPosition+0.25f*fdt*(dx1+3.0f*dx2);
-				velocity=solid->mVelocity+0.25f*fdt*(dv1+3.0f*dv2);
-			*/
-
-			integrationStep(solid,oldPosition,solid->mVelocity,ZERO_VECTOR3,ZERO_VECTOR3,fdt,dx1,dv1);
-
-			newPosition.set(dx1);
-			velocity.set(dv1);
-
-			integrationStep(solid,oldPosition,solid->mVelocity,dx1,dv1,ttfdt,dx2,dv2);
-
-			mul(dx2,THREE);
-			add(newPosition,dx2);
-			mul(newPosition,qfdt);
-			add(newPosition,oldPosition);
-
-			mul(dv2,THREE);
-			add(velocity,dv2);
-			mul(velocity,qfdt);
-			add(velocity,solid->mVelocity);
-		}
-		// Runge Kutta is 4th order, decently fast, and very stable for larger step sizes
-		else if(mIntegrator==Integrator_RUNGE_KUTTA){
-			/*
-				integrationStep(solid,oldPosition,solid->mVelocity,ZERO_VECTOR3,ZERO_VECTOR3,fdt,dx1,dv1);
-				integrationStep(solid,oldPosition,solid->mVelocity,dx1,dv1,0.5f*fdt,dx2,dv2);
-				integrationStep(solid,oldPosition,solid->mVelocity,dx2,dv2,0.5f*fdt,dx3,dv3);
-				integrationStep(solid,oldPosition,solid->mVelocity,dx3,dv3,fdt,dx4,dv4);
-				newPosition=oldPosition+1.0f/6.0f*fdt*(dx1+2.0f*(dx2+dx3)+dx4);
-				velocity=solid->mVelocity+1.0f/6.0f*fdt*(dv1+2.0f*(dv2+dv3)+dv4);
-			*/
-
-			integrationStep(solid,oldPosition,solid->mVelocity,ZERO_VECTOR3,ZERO_VECTOR3,fdt,dx1,dv1);
-
-			newPosition.set(dx1);
-			velocity.set(dv1);
-
-			integrationStep(solid,oldPosition,solid->mVelocity,dx1,dv1,hfdt,dx2,dv2);
-
-			mul(temp,dx2,TWO);
-			add(newPosition,temp);
-			mul(temp,dv2,TWO);
-			add(velocity,temp);
-
-			integrationStep(solid,oldPosition,solid->mVelocity,dx2,dv2,hfdt,dx1,dv1);
-
-			mul(temp,dx1,TWO);
-			add(newPosition,temp);
-			mul(temp,dv1,TWO);
-			add(velocity,temp);
-
-			integrationStep(solid,oldPosition,solid->mVelocity,dx1,dv1,fdt,dx2,dv2);
-
-			add(newPosition,dx2);
-			mul(newPosition,sfdt);
-			add(newPosition,oldPosition);
-
-			add(velocity,dv2);
-			mul(velocity,sfdt);
-			add(velocity,solid->mVelocity);
-		}
-
-		// Clean up
-		capVector3(velocity,mMaxVelocityComponent);
-		solid->mVelocity.set(velocity);
-		solid->clearForce();
-
-		bool first=true;
-		bool skip=false;
-
-		if(solid->mDoUpdateCallback){
-			(solid->mManager!=NULL?solid->mManager:mManager)->intraUpdate(solid,dt,fdt);
-		}
-
-		// In most cases we don't need to cap the oldPosition, but if our position is set outside of the max,
-		//  then when we cap the newPosition, it will think we are attempting to move from the old to the new, instead of just setting there
-		snapToGrid(oldPosition);
-		capVector3(oldPosition,mMaxPositionComponent);
-		snapToGrid(newPosition);
-		capVector3(newPosition,mMaxPositionComponent);
-
-		// Collect all possible solids in the whole movement area
-		if(solid->mCollideWithScope!=0){
 			sub(temp,newPosition,oldPosition);
-
-			/// @todo: Removed this, maybe it should just go completely
-			///  I had a 1 meter large sphere deactivated, sitting on top of an infinite mass plane, with -9.8 gravity, and attemping to set the velocity to 5 up, this causes it to just zero out
-			/// @todo: Calculate this 0.5f from the coefficient of static friction between solid & mTouching
-			//if(solid->mTouching!=NULL && toSmall(temp,0.5f)){
-			//	newPosition.set(oldPosition);
-			//	solid->mVelocity.set(oldVelocity);
-			//	skip=true;
-			//}
-			//else
-			{
-				if(temp.x<0){temp.x=-temp.x;}
-				if(temp.y<0){temp.y=-temp.y;}
-				if(temp.z<0){temp.z=-temp.z;}
-
-				scalar m=temp.x;
-				if(temp.y>m){m=temp.y;}
-				if(temp.z>m){m=temp.z;}
-				m+=mEpsilon; // Move it out by epsilon, since we haven't snapped yet
-
-				AABox &box=cache_update_box.set(solid->mLocalBound);
-
-				add(box,newPosition);
-				box.mins.x-=m;
-				box.mins.y-=m;
-				box.mins.z-=m;
-				box.maxs.x+=m;
-				box.maxs.y+=m;
-				box.maxs.z+=m;
-
-				mNumSpacialCollection=findSolidsInAABox(box,mSpacialCollection,mSpacialCollection.size());
-			}
-		}
-
-		// Loop to use up available momentum
-		loop=0;
-		while(skip==false){
-			if(first==false){
-				snapToGrid(oldPosition);
-				snapToGrid(newPosition);
-
-				sub(temp,newPosition,oldPosition);
-				if(toSmall(temp,mEpsilon)){
-					newPosition.set(oldPosition);
-					break;
-				}
-			}
-
-			path.setStartEnd(oldPosition,newPosition);
-
-			traceSolidWithCurrentSpacials(c,solid,path,solid->mCollideWithScope);
-			if(c.time<ONE){
-				// Calculate offset vector, and then resulting position
-				snapToGrid(c.point);
-
-				// Calculate oldPosition to be an epsilon back from where we can get to
-				sub(leftOver,c.point,oldPosition);
-				calculateEpsilonOffset(oldPosition,leftOver,c.normal);
-				add(oldPosition,c.point);
-
-				// Update leftOver, the energy we still have moving in this direction that we couldnt use
-				sub(leftOver,newPosition,oldPosition);
-
-				// If its a valid collision, and someone is listening, then store it
-				if(c.collider!=solid->mTouching &&
-					(solid->mCollisionListener!=NULL || (c.collider!=NULL && c.collider->mCollisionListener!=NULL)))
-				{
-					c.collidee=solid;
-					if(c.collider!=NULL){
-						sub(c.velocity,solid->mVelocity,c.collider->mVelocity);
-					}
-					else{
-						c.velocity.set(solid->mVelocity);
-					}
-
-					if(mCollisions.size()<=mNumCollisions){
-						mCollisions.resize(mNumCollisions+1);
-					}
-
-					mCollisions[mNumCollisions].set(c);
-					mNumCollisions++;
-				}
-				hitSolid=c.collider;
-
-				/// @todo: We need to add a flag to regather possible solids if this callback is performed
-				bool responded=false;
-				if(solid->mDoUpdateCallback){
-					responded=(solid->mManager!=NULL?solid->mManager:mManager)->collisionResponse(solid,oldPosition,leftOver,c);
-				}
-
-				if(responded==false){
-					// Conservation of momentum
-					if(solid->mCoefficientOfRestitutionOverride || hitSolid==NULL){
-						cor=solid->mCoefficientOfRestitution;
-					}
-					else{
-						cor=(solid->mCoefficientOfRestitution+hitSolid->mCoefficientOfRestitution)/2;
-					}
-
-					if(hitSolid!=NULL){
-						sub(temp,hitSolid->mVelocity,solid->mVelocity);
-					}
-					else{
-						neg(temp,solid->mVelocity);
-					}
-
-					// Attempt to detect a microcollision
-					if(dot(temp,c.normal)<mMicroCollisionThreshold){
-						cor=0;
-					}
-
-					scalar numerator=mul(ONE+cor,dot(temp,c.normal));
-
-					// Temp stores the velocity change on hitSolid
-					temp.reset();
-
-					if(solid->mMass!=0 && (hitSolid==NULL || hitSolid->mMass!=0)){
-						oneOverMass=solid->mInvMass;
-						oneOverHitMass=hitSolid!=NULL?hitSolid->mInvMass:0;
-
-						// Check to make sure its not two infinite mass solids interacting
-						if(oneOverMass+oneOverHitMass!=0){
-							impulse=div(numerator,oneOverMass+oneOverHitMass);
-						}
-						else{
-							impulse=0;
-						}
-
-						if(solid->mMass!=Solid::INFINITE_MASS){
-							/*
-								solid->mVelocity+=(c.normal*impulse)*oneOverMass;
-							*/
-
-							mul(t,c.normal,impulse);
-							mul(t,oneOverMass);
-							add(solid->mVelocity,t);
-						}
-						if(hitSolid!=NULL && hitSolid->mMass!=Solid::INFINITE_MASS){
-							if(solid->mMass==Solid::INFINITE_MASS){
-								// Infinite mass trains assume a CoefficientOfRestitution of 1 
-								// for the hitSolid calculation to avoid having gravity jam objects against them 
-								/*
-									temp=c.normal*2.0f*dot(hitSolid->mVelocity-solid->mVelocity,c.normal);
-								*/
-
-								sub(temp,hitSolid->mVelocity,solid->mVelocity);
-								mul(temp,c.normal,dot(temp,c.normal)/2);
-							}
-							else{
-								/*
-									temp=(c.normal*impulse)*oneOverHitMass;
-								*/
-
-								mul(temp,c.normal,impulse);
-								mul(temp,oneOverHitMass);
-							}
-						}
-					}
-					else if(hitSolid!=NULL || hitSolid->mMass==0){
-						mul(temp,c.normal,numerator);
-					}
-					else if(solid->mMass==0){
-						mul(t,c.normal,numerator);
-						add(solid->mVelocity,t);
-					}
-
-					// Only affect hitSolid if hitSolid would have collided with solid.
-					if(hitSolid!=NULL && (hitSolid->mCollideWithScope&solid->mCollisionScope)!=0 &&
-						(Math::abs(temp.x)>=mDeactivateSpeed || Math::abs(temp.y)>=mDeactivateSpeed || Math::abs(temp.z)>=mDeactivateSpeed))
-					{
-						hitSolid->activate();
-						sub(hitSolid->mVelocity,temp);
-					}
-				}
-
-				// Touching code
-				solid->mTouched2=solid->mTouched1;
-				solid->mTouched2Normal.set(solid->mTouched1Normal);
-				if(solid->mTouched1==c.collider){
-					solid->mTouching=c.collider;
-					solid->mTouchingNormal.set(c.normal);
-				}
-				else{
-					solid->mTouched1=c.collider;
-					solid->mTouched1Normal.set(c.normal);
-					solid->mTouching=NULL;
-				}
-
-				if(toSmall(leftOver,mEpsilon)){
-					newPosition.set(oldPosition);
-					break;
-				}
-				else if(loop>4){
-					// We keep hitting something, so zero the velocity and break out
-					solid->mVelocity.reset();
-					newPosition.set(oldPosition);
-					break;
-				}
-				else{
-					// Calculate new destinations from coefficient of restitution applied to velocity
-					if(normalizeCarefully(velocity,solid->mVelocity,mEpsilon)==false){
-						newPosition.set(oldPosition);
-						break;
-					}
-					else{
-						/*
-							velocity*=length(leftOver);
-							velocity-=c.normal*dot(velocity,c.normal);
-							newPosition=oldPosition+velocity;
-						*/
-
-						mul(velocity,length(leftOver));
-						mul(temp,c.normal,dot(velocity,c.normal));
-						sub(velocity,temp);
-						add(newPosition,oldPosition,velocity);
-					}
-					first=false;
-				}
-			}
-			else{
+			if(tooSmall(temp,mEpsilon)){
+				newPosition.set(oldPosition);
 				break;
 			}
-
-			loop++;
 		}
 
-		// Check to see if we need to reset touching
-		if(skip==false && c.time==ONE && loop==0){
-			solid->mTouching=NULL;
-			solid->mTouched1=NULL;
-			solid->mTouched2=NULL;
-		}
+		path.setStartEnd(oldPosition,newPosition);
 
-		if(solid->mDeactivateCount>=0){
-			if(Math::abs(newPosition.x-solid->mPosition.x)<mDeactivateSpeed && Math::abs(newPosition.y-solid->mPosition.y)<mDeactivateSpeed && Math::abs(newPosition.z-solid->mPosition.z)<mDeactivateSpeed){
-				solid->mDeactivateCount++;
-				if(solid->mDeactivateCount>mDeactivateCount){
-					for(j=solid->mConstraints.size()-1;j>=0;--j){
-						Constraint *constraint=solid->mConstraints[j];
-						Solid *startSolid=constraint->mStartSolid;
-						Solid *endSolid=constraint->mEndSolid;
-						if(startSolid!=solid){
-							if(startSolid->mActive==true && startSolid->mDeactivateCount<=mDeactivateCount){
-								break;
-							}
-						}
-						else if(endSolid!=NULL){
-							if(endSolid->mActive==true && endSolid->mDeactivateCount<=mDeactivateCount){
-								break;
-							}
-						}
+		traceSolidWithCurrentSpacials(c,solid,path,solid->mCollideWithScope);
+		if(c.time<ONE){
+			// Calculate offset vector, and then resulting position
+			snapToGrid(c.point);
+
+			// Calculate oldPosition to be an epsilon back from where we can get to
+			sub(leftOver,c.point,oldPosition);
+			calculateEpsilonOffset(oldPosition,leftOver,c.normal);
+			add(oldPosition,c.point);
+
+			// Update leftOver, the energy we still have moving in this direction that we couldnt use
+			sub(leftOver,newPosition,oldPosition);
+
+			// If its a valid collision, and someone is listening, then store it
+			if(c.collider!=solid->mTouching &&
+				(solid->mCollisionListener!=NULL || (c.collider!=NULL && c.collider->mCollisionListener!=NULL)))
+			{
+				c.collidee=solid;
+				if(c.collider!=NULL){
+					sub(c.velocity,solid->mVelocity,c.collider->mVelocity);
+				}
+				else{
+					c.velocity.set(solid->mVelocity);
+				}
+
+				if(mCollisions.size()<=mNumCollisions){
+					mCollisions.resize(mNumCollisions+1);
+				}
+
+				mCollisions[mNumCollisions].set(c);
+				mNumCollisions++;
+			}
+			hitSolid=c.collider;
+
+			/// @todo: We need to add a flag to regather possible solids if this callback is performed
+			bool responded=false;
+			if(solid->mDoUpdateCallback){
+				responded=(solid->mManager!=NULL?solid->mManager:mManager)->collisionResponse(solid,oldPosition,leftOver,c);
+			}
+
+			if(responded==false){
+				// Conservation of momentum
+				if(solid->mCoefficientOfRestitutionOverride || hitSolid==NULL){
+					cor=solid->mCoefficientOfRestitution;
+				}
+				else{
+					cor=(solid->mCoefficientOfRestitution+hitSolid->mCoefficientOfRestitution)/2;
+				}
+
+				if(hitSolid!=NULL){
+					sub(temp,hitSolid->mVelocity,solid->mVelocity);
+				}
+				else{
+					neg(temp,solid->mVelocity);
+				}
+
+				// Attempt to detect a microcollision
+				if(dot(temp,c.normal)<mMicroCollisionThreshold){
+					cor=0;
+				}
+
+				scalar numerator=mul(ONE+cor,dot(temp,c.normal));
+
+				// Temp stores the velocity change on hitSolid
+				temp.reset();
+
+				if(solid->mMass!=0 && (hitSolid==NULL || hitSolid->mMass!=0)){
+					oneOverMass=solid->mInvMass;
+					oneOverHitMass=hitSolid!=NULL?hitSolid->mInvMass:0;
+
+					// Check to make sure its not two infinite mass solids interacting
+					if(oneOverMass+oneOverHitMass!=0){
+						impulse=div(numerator,oneOverMass+oneOverHitMass);
 					}
-					if(j<0){
-						solid->deactivate();
+					else{
+						impulse=0;
+					}
+
+					if(solid->mMass!=Solid::INFINITE_MASS){
+						/*
+							solid->mVelocity+=(c.normal*impulse)*oneOverMass;
+						*/
+
+						mul(t,c.normal,impulse);
+						mul(t,oneOverMass);
+						add(solid->mVelocity,t);
+					}
+					if(hitSolid!=NULL && hitSolid->mMass!=Solid::INFINITE_MASS){
+						if(solid->mMass==Solid::INFINITE_MASS){
+							// Infinite mass trains assume a CoefficientOfRestitution of 1 
+							// for the hitSolid calculation to avoid having gravity jam objects against them 
+							/*
+								temp=c.normal*2.0f*dot(hitSolid->mVelocity-solid->mVelocity,c.normal);
+							*/
+
+							sub(temp,hitSolid->mVelocity,solid->mVelocity);
+							mul(temp,c.normal,dot(temp,c.normal)/2);
+						}
+						else{
+							/*
+								temp=(c.normal*impulse)*oneOverHitMass;
+							*/
+
+							mul(temp,c.normal,impulse);
+							mul(temp,oneOverHitMass);
+						}
 					}
 				}
+				else if(hitSolid!=NULL || hitSolid->mMass==0){
+					mul(temp,c.normal,numerator);
+				}
+				else if(solid->mMass==0){
+					mul(t,c.normal,numerator);
+					add(solid->mVelocity,t);
+				}
+
+				// Only affect hitSolid if hitSolid would have collided with solid.
+				if(hitSolid!=NULL && (hitSolid->mCollideWithScope&solid->mCollisionScope)!=0 &&
+					(Math::abs(temp.x)>=mDeactivateSpeed || Math::abs(temp.y)>=mDeactivateSpeed || Math::abs(temp.z)>=mDeactivateSpeed))
+				{
+					hitSolid->activate();
+					sub(hitSolid->mVelocity,temp);
+				}
+			}
+
+			// Touching code
+			solid->mTouched2=solid->mTouched1;
+			solid->mTouched2Normal.set(solid->mTouched1Normal);
+			if(solid->mTouched1==c.collider){
+				solid->mTouching=c.collider;
+				solid->mTouchingNormal.set(c.normal);
 			}
 			else{
-				solid->mDeactivateCount=0;
+				solid->mTouched1=c.collider;
+				solid->mTouched1Normal.set(c.normal);
+				solid->mTouching=NULL;
+			}
+
+			if(tooSmall(leftOver,mEpsilon)){
+				newPosition.set(oldPosition);
+				break;
+			}
+			else if(loop>4){
+				// We keep hitting something, so zero the velocity and break out
+				solid->mVelocity.reset();
+				newPosition.set(oldPosition);
+				break;
+			}
+			else{
+				// Calculate new destinations from coefficient of restitution applied to velocity
+				if(normalizeCarefully(velocity,solid->mVelocity,mEpsilon)==false){
+					newPosition.set(oldPosition);
+					break;
+				}
+				else{
+					/*
+						velocity*=length(leftOver);
+						velocity-=c.normal*dot(velocity,c.normal);
+						newPosition=oldPosition+velocity;
+					*/
+
+					mul(velocity,length(leftOver));
+					mul(temp,c.normal,dot(velocity,c.normal));
+					sub(velocity,temp);
+					add(newPosition,oldPosition,velocity);
+				}
+				first=false;
 			}
 		}
+		else{
+			break;
+		}
 
-		solid->setPositionDirect(newPosition);
+		loop++;
+	}
 
-		if(solid->mDoUpdateCallback && mManager!=NULL){
-			(solid->mManager!=NULL?solid->mManager:mManager)->postUpdate(solid,dt,fdt);
+	// Check to see if we need to reset touching
+	if(skip==false && c.time==ONE && loop==0){
+		solid->mTouching=NULL;
+		solid->mTouched1=NULL;
+		solid->mTouched2=NULL;
+	}
+
+	if(solid->mDeactivateCount>=0){
+		if(Math::abs(newPosition.x-solid->mPosition.x)<mDeactivateSpeed && Math::abs(newPosition.y-solid->mPosition.y)<mDeactivateSpeed && Math::abs(newPosition.z-solid->mPosition.z)<mDeactivateSpeed){
+			solid->mDeactivateCount++;
+			if(solid->mDeactivateCount>mDeactivateCount){
+				for(j=solid->mConstraints.size()-1;j>=0;--j){
+					Constraint *constraint=solid->mConstraints[j];
+					Solid *startSolid=constraint->mStartSolid;
+					Solid *endSolid=constraint->mEndSolid;
+					if(startSolid!=solid){
+						if(startSolid->mActive==true && startSolid->mDeactivateCount<=mDeactivateCount){
+							break;
+						}
+					}
+					else if(endSolid!=NULL){
+						if(endSolid->mActive==true && endSolid->mDeactivateCount<=mDeactivateCount){
+							break;
+						}
+					}
+				}
+				if(j<0){
+					solid->deactivate();
+				}
+			}
+		}
+		else{
+			solid->mDeactivateCount=0;
 		}
 	}
 
-	if((scope&Scope_REPORT_COLLISIONS)!=0){
-		reportCollisions();
-	}
-
-	if(mManager!=NULL){
-		mManager->postUpdate(dt,fdt);
-	}
+	solid->setPositionDirect(newPosition);
 }
 
 void Simulator::reportCollisions(){
@@ -1103,7 +1115,7 @@ void Simulator::snapToGrid(Vector3 &pos) const{
 	}
 }
 
-bool Simulator::toSmall(const Vector3 &value,scalar epsilon) const{
+bool Simulator::tooSmall(const Vector3 &value,scalar epsilon) const{
 	return (value.x<epsilon && value.x>-epsilon && value.y<epsilon && value.y>-epsilon && value.z<epsilon && value.z>-epsilon);
 }
 
