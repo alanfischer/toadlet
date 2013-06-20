@@ -179,6 +179,7 @@ void StudioStreamer::buildMaterials(StudioModel *model){
 		renderState->setMaterialState(MaterialState(true,false,(stexture->flags&STUDIO_NF_FLATSHADE)!=0?MaterialState::ShadeType_FLAT:MaterialState::ShadeType_GOURAUD));
 
 		model->materials[i]=mEngine->createDiffuseMaterial(model->textures[i],renderState);
+		model->materials[i]->setName(stexture->name);
 	}
 }
 
