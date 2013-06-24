@@ -149,6 +149,7 @@ public:
 			renderState->setDepthState(DepthState(DepthState::DepthTest_LEQUAL,false));
 			renderState->setBlendState(BlendState(BlendState::Combination_ALPHA));
 			acorn=engine->createDiffuseMaterial(engine->getTextureManager()->findTexture("acorn.png"),renderState);
+			acorn->setModelMatrixFlags(Material::MatrixFlag_ASPECT_CORRECT);
 		}
 
 		// HUD
@@ -180,6 +181,7 @@ public:
 			renderState->setDepthState(DepthState(DepthState::DepthTest_LEQUAL,false));
 			renderState->setBlendState(BlendState(BlendState::Operation_ZERO,BlendState::Operation_SOURCE_COLOR));
 			compass=engine->createDiffuseMaterial(engine->getTextureManager()->findTexture("compass.png"),renderState);
+			compass->setModelMatrixFlags(Material::MatrixFlag_ASPECT_CORRECT);
 		}
 
 		wooden=engine->getFontManager()->findFont("Pinewood.ttf",100);

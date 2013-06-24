@@ -438,9 +438,37 @@ void setQuaternionFromMatrix(Quaternion &r,const Matrix &m){
 	}
 }
 
-void Math::setQuaternionFromMatrix3x3(Quaternion &r,const Matrix3x3 &m){ setQuaternionFromMatrix(r,m); }
+void Math::setQuaternionFromMatrix3x3(Quaternion &r,const Matrix3x3 &m){
+	Vector3 scale;
+	setScaleFromMatrix3x3(scale,m);
+	Matrix3x3 m2;
+	m2.setAt(0,0,TOADLET_DIV_XX(m.at(0,0),scale.x));
+	m2.setAt(1,0,TOADLET_DIV_XX(m.at(1,0),scale.x));
+	m2.setAt(2,0,TOADLET_DIV_XX(m.at(2,0),scale.x));
+	m2.setAt(0,1,TOADLET_DIV_XX(m.at(0,1),scale.y));
+	m2.setAt(1,1,TOADLET_DIV_XX(m.at(1,1),scale.y));
+	m2.setAt(2,1,TOADLET_DIV_XX(m.at(2,1),scale.y));
+	m2.setAt(0,2,TOADLET_DIV_XX(m.at(0,2),scale.z));
+	m2.setAt(1,2,TOADLET_DIV_XX(m.at(1,2),scale.z));
+	m2.setAt(2,2,TOADLET_DIV_XX(m.at(2,2),scale.z));
+	setQuaternionFromMatrix(r,m2);
+}
 
-void Math::setQuaternionFromMatrix4x4(Quaternion &r,const Matrix4x4 &m){ setQuaternionFromMatrix(r,m); }
+void Math::setQuaternionFromMatrix4x4(Quaternion &r,const Matrix4x4 &m){
+	Vector3 scale;
+	setScaleFromMatrix4x4(scale,m);
+	Matrix4x4 m2(m);
+	m2.setAt(0,0,TOADLET_DIV_XX(m.at(0,0),scale.x));
+	m2.setAt(1,0,TOADLET_DIV_XX(m.at(1,0),scale.x));
+	m2.setAt(2,0,TOADLET_DIV_XX(m.at(2,0),scale.x));
+	m2.setAt(0,1,TOADLET_DIV_XX(m.at(0,1),scale.y));
+	m2.setAt(1,1,TOADLET_DIV_XX(m.at(1,1),scale.y));
+	m2.setAt(2,1,TOADLET_DIV_XX(m.at(2,1),scale.y));
+	m2.setAt(0,2,TOADLET_DIV_XX(m.at(0,2),scale.z));
+	m2.setAt(1,2,TOADLET_DIV_XX(m.at(1,2),scale.z));
+	m2.setAt(2,2,TOADLET_DIV_XX(m.at(2,2),scale.z));
+	setQuaternionFromMatrix(r,m2);
+}
 
 void Math::lerp(Quaternion &r,const Quaternion &q1,const Quaternion &q2,fixed t){
 	fixed cosom=dot(q1,q2);
