@@ -311,6 +311,9 @@ Material::ptr DiffuseMaterialCreator::createDiffuseMaterial(Texture *texture,Ren
 	}
 
 	SamplerState samplerState=mEngine->getMaterialManager()->getDefaultSamplerState();
+	if(renderState){
+		renderState->getSamplerState(Shader::ShaderType_FRAGMENT,0,samplerState);
+	}
 
 	TextureState textureState;
 	textureState.calculation=TextureState::CalculationType_NORMAL;
