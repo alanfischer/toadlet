@@ -148,6 +148,11 @@ public:
 			renderState->setMaterialState(MaterialState(false));
 			renderState->setDepthState(DepthState(DepthState::DepthTest_LEQUAL,false));
 			renderState->setBlendState(BlendState(BlendState::Combination_ALPHA));
+			SamplerState samplerState;
+			samplerState.uAddress=SamplerState::AddressType_CLAMP_TO_EDGE;
+			samplerState.vAddress=SamplerState::AddressType_CLAMP_TO_EDGE;
+			samplerState.wAddress=SamplerState::AddressType_CLAMP_TO_EDGE;
+			renderState->setSamplerState(Shader::ShaderType_FRAGMENT,0,samplerState);
 			acorn=engine->createDiffuseMaterial(engine->getTextureManager()->findTexture("acorn.png"),renderState);
 			acorn->setModelMatrixFlags(Material::MatrixFlag_ASPECT_CORRECT);
 		}
@@ -180,6 +185,11 @@ public:
 			renderState->setMaterialState(MaterialState(false));
 			renderState->setDepthState(DepthState(DepthState::DepthTest_LEQUAL,false));
 			renderState->setBlendState(BlendState(BlendState::Operation_ZERO,BlendState::Operation_SOURCE_COLOR));
+			SamplerState samplerState;
+			samplerState.uAddress=SamplerState::AddressType_CLAMP_TO_EDGE;
+			samplerState.vAddress=SamplerState::AddressType_CLAMP_TO_EDGE;
+			samplerState.wAddress=SamplerState::AddressType_CLAMP_TO_EDGE;
+			renderState->setSamplerState(Shader::ShaderType_FRAGMENT,0,samplerState);
 			compass=engine->createDiffuseMaterial(engine->getTextureManager()->findTexture("compass.png"),renderState);
 			compass->setModelMatrixFlags(Material::MatrixFlag_ASPECT_CORRECT);
 		}

@@ -10,6 +10,18 @@ public:
 		mCamera=camera;
 	}
 
+	void parentChanged(Node *node){
+		if(mParent!=NULL){
+			mState=NULL;
+		}
+
+		BaseComponent::parentChanged(node);
+
+		if(mParent!=NULL && mParent->getNumVisibles()>0){
+			mState=mParent->getVisible(0)->getSharedRenderState();
+		}
+	}
+
 	void logicUpdate(int dt,int scope){
 		BaseComponent::logicUpdate(dt,scope);
 
@@ -17,13 +29,20 @@ public:
 		forward.z=0;
 		Math::normalizeCarefully(forward,0);
 		scalar angle=-Math::atan2(forward.y,forward.x);
-		mParent->setRotate(Math::Z_UNIT_VECTOR3,angle);
+		if(mState!=NULL){
+			TextureState textureState;
+			mState->getTextureState(Shader::ShaderType_FRAGMENT,0,textureState);
+			Math::setMatrix4x4FromAxisAngle(textureState.matrix,Math::Z_UNIT_VECTOR3,angle);
+			Math::setMatrix4x4AsTextureRotation(textureState.matrix);
+			mState->setTextureState(Shader::ShaderType_FRAGMENT,0,textureState);
+		}
 	}
 
 	bool getActive() const{return true;}
 
 protected:
 	Camera::ptr mCamera;
+	RenderState::ptr mState;
 };
 
 class AcornCountComponent:public BaseComponent{

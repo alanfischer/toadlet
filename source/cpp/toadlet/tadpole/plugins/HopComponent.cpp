@@ -75,6 +75,8 @@ void HopComponent::rootChanged(Node *root){
 	BaseComponent::rootChanged(root);
 
 	if(mParent!=NULL && root!=NULL && mParent->getParent()==root){
+		// Make sure solid has proper position before being inserted into simulation
+		preSimulate();
 		mManager->getSimulator()->addSolid(mSolid);
 	}
 	else{

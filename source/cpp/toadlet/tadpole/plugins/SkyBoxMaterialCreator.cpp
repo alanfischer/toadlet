@@ -168,6 +168,9 @@ bool SkyBoxMaterialCreator::createPaths(Material *material,RenderState *renderSt
 		samplerState.vAddress=SamplerState::AddressType_CLAMP_TO_EDGE;
 		samplerState.wAddress=SamplerState::AddressType_CLAMP_TO_EDGE;
 	}
+	if(renderState){
+		renderState->getSamplerState(Shader::ShaderType_FRAGMENT,0,samplerState);
+	}
 
 	TextureState textureState;
 	textureState.calculation=TextureState::CalculationType_NORMAL;
