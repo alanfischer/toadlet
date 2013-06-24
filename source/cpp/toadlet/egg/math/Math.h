@@ -930,6 +930,12 @@ namespace Math{
 		r.data[0+2*3]=m.data[2+0*4]; r.data[1+2*3]=m.data[2+1*4]; r.data[2+2*3]=m.data[2+2*4];
 	}
 
+	inline void setScaleFromMatrix3x3(Vector3 &r,const Matrix3x3 &m){
+		r.x=sqrt(m.data[0+0*3]*m.data[0+0*3] + m.data[1+0*3]*m.data[1+0*3] + m.data[2+0*3]*m.data[2+0*3]);
+		r.y=sqrt(m.data[0+1*3]*m.data[0+1*3] + m.data[1+1*3]*m.data[1+1*3] + m.data[2+1*3]*m.data[2+1*3]);
+		r.z=sqrt(m.data[0+2*3]*m.data[0+2*3] + m.data[1+2*3]*m.data[1+2*3] + m.data[2+2*3]*m.data[2+2*3]);
+	}
+
 	// Matrix4x4 advanced operations
 	inline void zeroTranslateSheer(Matrix4x4 &r){
 		r.data[3+0*4]=0; r.data[3+1*4]=0; r.data[3+2*4]=0; r.data[3+3*4]=ONE;

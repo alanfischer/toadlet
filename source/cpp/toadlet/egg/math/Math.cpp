@@ -534,9 +534,37 @@ void setQuaternionFromMatrix(Quaternion &r,const Matrix &m){
 	}
 }
 
-void Math::setQuaternionFromMatrix3x3(Quaternion &r,const Matrix3x3 &m){ setQuaternionFromMatrix(r,m); }
+void Math::setQuaternionFromMatrix3x3(Quaternion &r,const Matrix3x3 &m){
+	Vector3 scale;
+	setScaleFromMatrix3x3(scale,m);
+	Matrix3x3 m2;
+	m2.setAt(0,0,m.at(0,0)/scale.x);
+	m2.setAt(1,0,m.at(1,0)/scale.x);
+	m2.setAt(2,0,m.at(2,0)/scale.x);
+	m2.setAt(0,1,m.at(0,1)/scale.y);
+	m2.setAt(1,1,m.at(1,1)/scale.y);
+	m2.setAt(2,1,m.at(2,1)/scale.y);
+	m2.setAt(0,2,m.at(0,2)/scale.z);
+	m2.setAt(1,2,m.at(1,2)/scale.z);
+	m2.setAt(2,2,m.at(2,2)/scale.z);
+	setQuaternionFromMatrix(r,m2);
+}
 
-void Math::setQuaternionFromMatrix4x4(Quaternion &r,const Matrix4x4 &m){ setQuaternionFromMatrix(r,m); }
+void Math::setQuaternionFromMatrix4x4(Quaternion &r,const Matrix4x4 &m){
+	Vector3 scale;
+	setScaleFromMatrix4x4(scale,m);
+	Matrix4x4 m2(m);
+	m2.setAt(0,0,m.at(0,0)/scale.x);
+	m2.setAt(1,0,m.at(1,0)/scale.x);
+	m2.setAt(2,0,m.at(2,0)/scale.x);
+	m2.setAt(0,1,m.at(0,1)/scale.y);
+	m2.setAt(1,1,m.at(1,1)/scale.y);
+	m2.setAt(2,1,m.at(2,1)/scale.y);
+	m2.setAt(0,2,m.at(0,2)/scale.z);
+	m2.setAt(1,2,m.at(1,2)/scale.z);
+	m2.setAt(2,2,m.at(2,2)/scale.z);
+	setQuaternionFromMatrix(r,m2);
+}
 
 // Algorithm from the GMTL: http://ggt.sf.net
 bool Math::setQuaternionFromEulerAngle(Quaternion &r,const EulerAngle &a){

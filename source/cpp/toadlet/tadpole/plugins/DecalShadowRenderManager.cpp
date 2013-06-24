@@ -115,7 +115,7 @@ void DecalShadowRenderManager::interRenderRenderables(RenderableSet *set,RenderD
 			}
 
 			if(node->getRoot()==NULL){
-				return;
+				continue;
 			}
 
 			if((node->getScope()&mShadowScope)!=0 && node!=mScene->getBackground() && node!=mScene->getRoot()){
