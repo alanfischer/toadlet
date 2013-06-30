@@ -64,7 +64,7 @@ bool PartitionNode::sensePotentiallyVisible(SensorResultsListener *listener,cons
 	return result;
 }
 
-bool PartitionNode::findAmbientForPoint(Vector4 &r,const Vector3 &point){
+bool PartitionNode::findAmbientForBound(Vector4 &r,Bound *bound){
 	return false;
 }
 

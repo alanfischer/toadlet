@@ -75,12 +75,11 @@ void RenderableSet::queueNode(Node *node){
 
 void RenderableSet::queueRenderable(Renderable *renderable){
 	Material *material=renderable->getRenderMaterial();
-	Transform *transform=renderable->getRenderTransform();
 	Bound *bound=renderable->getRenderBound();
 
 	/// @todo: Add a flag to skip this, for shadow calculations
 	Vector4 ambient;
-	if(mRoot->findAmbientForPoint(ambient,transform->getTranslate())==false){
+	if(mRoot->findAmbientForBound(ambient,bound)==false){
 		ambient.set(mScene->getAmbientColor());
 	}
 

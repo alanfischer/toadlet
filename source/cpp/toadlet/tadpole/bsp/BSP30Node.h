@@ -69,7 +69,7 @@ public:
 
 	bool senseBoundingVolumes(SensorResultsListener *listener,Bound *bound);
 	bool sensePotentiallyVisible(SensorResultsListener *listener,const Vector3 &point);
-	bool findAmbientForPoint(Vector4 &r,const Vector3 &point);
+	bool findAmbientForBound(Vector4 &r,Bound *bound);
 
 	// Renderable items
 	Material *getRenderMaterial() const{return NULL;}

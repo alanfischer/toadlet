@@ -40,7 +40,7 @@ public:
 
 	virtual bool senseBoundingVolumes(SensorResultsListener *listener,Bound *bound);
 	virtual bool sensePotentiallyVisible(SensorResultsListener *listener,const Vector3 &point);
-	virtual bool findAmbientForPoint(Vector4 &r,const Vector3 &point);
+	virtual bool findAmbientForBound(Vector4 &r,Bound *bound);
 };
 
 }

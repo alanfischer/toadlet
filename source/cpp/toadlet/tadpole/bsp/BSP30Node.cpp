@@ -358,13 +358,13 @@ bool BSP30Node::sensePotentiallyVisible(SensorResultsListener *listener,const Ve
 	return result;
 }
 
-bool BSP30Node::findAmbientForPoint(Vector4 &r,const Vector3 &point){
-	Vector3 end;
-	end.x=point.x;
-	end.y=point.y;
-	end.z=point.z-1024;
-	if(mMap!=NULL){
-		return mMap->modelLightTrace(r,0,point,end);
+bool BSP30Node::findAmbientForBound(Vector4 &r,Bound *bound){
+	Vector3 start=bound->getSphere().origin;
+	Vector3 end=start;
+	end.z-=1024;
+	scalar threshold=512;
+	if(mMap!=NULL && bound->getSphere().radius<threshold){
+		return mMap->modelLightTrace(r,0,start,end);
 	}
 	return false;
 }
