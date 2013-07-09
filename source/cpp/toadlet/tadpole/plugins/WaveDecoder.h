@@ -49,6 +49,7 @@ public:
 	int write(const tbyte *buffer,int length){return -1;}
 
 	bool startStream(Stream *stream);
+	bool flush(){return false;}
 	bool reset();
 	int length(){return mSize;}
 	int position(){return mPosition;}

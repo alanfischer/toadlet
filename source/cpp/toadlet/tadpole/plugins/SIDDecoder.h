@@ -59,6 +59,7 @@ public:
 	int length(){return -1;}
 	int position(){return -1;}
 	bool seek(int offs){return false;}
+	bool flush(){return false;}
 
 protected:
 	AudioFormat::ptr mFormat;

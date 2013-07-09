@@ -56,6 +56,7 @@ public:
 	virtual int length(){return mStream->length();}
 	virtual int position(){return mStream->position();}
 	virtual bool seek(int offs){return mStream->seek(offs);}
+	virtual bool flush(){return mStream->flush();}
 
 	// read
 	bool readBool();

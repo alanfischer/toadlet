@@ -60,6 +60,7 @@ public:
 	int length();
 	int position();
 	bool seek(int offs);
+	bool flush(){return false;}
 
 	AudioFormat::ptr getAudioFormat() const{return mFormat;}
 
