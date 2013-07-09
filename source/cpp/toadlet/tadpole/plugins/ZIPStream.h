@@ -64,6 +64,7 @@ public:
 	int length();
 	int position();
 	bool seek(int offs);
+	bool flush(){return false;}
 
 protected:
 	int mOpenFlags;

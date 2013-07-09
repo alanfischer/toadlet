@@ -52,6 +52,7 @@ public:
 	virtual int length()=0;
 	virtual int position()=0;
 	virtual bool seek(int offs)=0;
+	virtual bool flush()=0;
 };
 
 }

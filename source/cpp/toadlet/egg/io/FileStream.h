@@ -66,6 +66,7 @@ public:
 	virtual int length();
 	virtual int position();
 	virtual bool seek(int offs);
+	virtual bool flush();
 
 	void setFILE(FILE *file){mFile=file;}
 	FILE *getFILE(){return mFile;}

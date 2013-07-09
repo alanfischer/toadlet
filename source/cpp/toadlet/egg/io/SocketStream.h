@@ -54,6 +54,7 @@ public:
 	virtual int length(){return -1;}
 	virtual int position(){return -1;}
 	virtual bool seek(int offs){return false;}
+	virtual bool flush(){return false;}
 
 protected:
 	Socket::ptr mSocket;

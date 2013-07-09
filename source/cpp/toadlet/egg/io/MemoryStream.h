@@ -57,6 +57,7 @@ public:
 	virtual int length(){return mLength;}
 	virtual int position(){return mPosition;}
 	virtual bool seek(int offs);
+	virtual bool flush(){return false;}
 
 	tbyte *getCurrentDataPointer();
 	tbyte *getOriginalDataPointer();

@@ -54,17 +54,17 @@ public:
 	int length();
 	int position();
 	bool seek(int offs);
+	bool flush();
 
 protected:
 	JNIEnv *env;
 	jclass istreamClass,ostreamClass;
 	jobject istreamObj,ostreamObj;
 	jmethodID closeIStreamID,readIStreamID,availableIStreamID,markIStreamID,resetIStreamID,skipIStreamID;
-	jmethodID closeOStreamID,writeOStreamID;
+	jmethodID closeOStreamID,writeOStreamID,flushOStreamID;
 
 	int bufferLength;
 	jbyteArray bufferObj;
-	jmethodID closeID,availableID,readID,writeID;
 	
 	int current;
 };

@@ -52,6 +52,7 @@ JStream::JStream(JNIEnv *env1,jobject streamObj):
 	{
 		closeOStreamID=env->GetMethodID(ostreamClass,"close","()V");
 		writeOStreamID=env->GetMethodID(ostreamClass,"write","([BII)V");
+		flushOStreamID=env->GetMethodID(ostreamClass,"flush","()V");
 	}
 
 	bufferLength=2048;
@@ -200,6 +201,21 @@ bool JStream::seek(int offs){
 	}
 
 	current=amount;
+	return true;
+}
+
+bool JStream::flush(){
+	if(ostreamObj==NULL){
+		return false;
+	}
+
+	env->CallVoidMethod(ostreamObj,flushOStreamID);
+	if(env->ExceptionOccurred()!=NULL){
+		env->ExceptionDescribe();
+		env->ExceptionClear();
+		return false;
+	}
+	
 	return true;
 }
 

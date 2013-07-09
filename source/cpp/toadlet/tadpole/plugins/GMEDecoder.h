@@ -58,6 +58,7 @@ public:
 	int length(){return -1;}
 	int position(){return -1;}
 	bool seek(int offs){return false;}
+	bool flush(){return false;}
 
 	static gme_err_t reader(void *data,void *buffer,int length);
 

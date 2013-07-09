@@ -96,6 +96,10 @@ bool FileStream::seek(int offs){
 	return fseek(mFile,offs,SEEK_SET)==0;
 }
 
+bool FileStream::flush(){
+	return fflush(mFile)==0;
+}
+
 }	
 }
 }
