@@ -31,26 +31,12 @@ namespace tadpole{
 namespace sensor{
 
 SensorResults::SensorResults():
-	mMaxSize(-1),
-	mScope(-1),
-	//mResults,
-	mMaxDistance(0)
+	mScope(-1)
+	//mResults
 {}
 
-void SensorResults::setMaxSize(int size){
-	mMaxSize=size;
-	if(size>=0){
-		mResults.reserve(size);
-	}
-}
-
-bool SensorResults::contains(Node *node){
-	return mResults.contains(node);
-}
-
 void SensorResults::sensingBeginning(){
-	mResults.clear();
-	mMaxDistance=0;
+	mNodes.clear();
 }
 	
 bool SensorResults::resultFound(Node *result,scalar distance){
@@ -58,11 +44,14 @@ bool SensorResults::resultFound(Node *result,scalar distance){
 		return true;
 	}
 
-	if(mMaxSize>0 && mResults.size()>=mMaxSize && distance>mMaxDistance){
-		return mMaxDistance>0; // If 0, then we can't find anything closer, so stop searching
+	int handle=result->getUniqueHandle();
+	NodeCollection::iterator it;
+	for(it=mNodes.begin();it!=mNodes.end();++it){
+		if(it->getUniqueHandle()>handle){
+			break;
+		}
 	}
-
-	mResults.add(result);
+	mNodes.insert(it,result);
 
 	return true;
 }

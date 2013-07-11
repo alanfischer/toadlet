@@ -38,7 +38,7 @@ Sensor::~Sensor(){
 
 SensorResults::ptr Sensor::sense(){
 	if(mResults==NULL){
-		mResults=SensorResults::ptr(new SensorResults());
+		mResults=new SensorResults();
 	}
 
 	sense(mResults);
@@ -64,9 +64,8 @@ int Sensor::senseNodes(Node *node,SensorResultsListener *results){
 		}
 	}
 
-	int i;
-	for(i=0;i<node->getNumNodes();++i){
-		int r=senseNodes(node->getNode(i),results);
+	for(Node::NodeCollection::iterator n=node->getNodeBegin();n!=node->getNodeEnd();++n){
+		int r=senseNodes(n,results);
 		if(r<0){
 			return -1;
 		}

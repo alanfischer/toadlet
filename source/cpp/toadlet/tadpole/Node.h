@@ -28,6 +28,7 @@
 
 #include <toadlet/tadpole/Types.h>
 #include <toadlet/egg/Type.h>
+#include <toadlet/egg/PointerCollection.h>
 #include <toadlet/tadpole/Bound.h>
 #include <toadlet/tadpole/BaseComponent.h>
 
@@ -59,6 +60,9 @@ class TOADLET_API Node:public BaseComponent,public TransformListener{
 public:
 	TOADLET_NODE(Node);
 
+	typedef PointerCollection<Component> ComponentCollection;
+	typedef PointerCollection<Node> NodeCollection;
+
 	Node(Scene *scene=NULL);
 	virtual ~Node();
 	virtual void destroy();
@@ -82,17 +86,19 @@ public:
 	virtual bool remove(Component *component);
 	virtual void componentAttached(Component *component);
 	virtual void componentRemoved(Component *component);
-	virtual Component *getChild(const String &name) const;
-	virtual Component *getChild(const Type<Component> *type) const;
-	template<typename Type> Type *getChildType() const{return (Type*)getChild(Type::type());}
+	virtual Component *getChild(const String &name);
+	virtual Component *getChild(const Type<Component> *type);
+	template<typename Type> Type *getChildType(){return (Type*)getChild(Type::type());}
 
 	virtual void nodeAttached(Node *node);
 	virtual void nodeRemoved(Node *node);
-	virtual int getNumNodes() const{return mNodes.size();}
-	virtual Node *getNode(int i) const{return mNodes[i];}
-	virtual Node *getNode(const String &name) const;
-	virtual Node *getNode(const Type<Component> *type) const;
-	template<typename Type> Type *getNodeType() const{return (Type*)getNode(Type::type());}
+	virtual NodeCollection::iterator getNodeBegin(){return mNodes.begin();}
+	virtual NodeCollection::iterator getNodeEnd(){return mNodes.end();}
+	virtual NodeCollection::const_iterator getNodeBegin() const{return mNodes.begin();}
+	virtual NodeCollection::const_iterator getNodeEnd() const{return mNodes.end();}
+	virtual Node *getNode(const String &name);
+	virtual Node *getNode(const Type<Component> *type);
+	template<typename Type> Type *getNodeType(){return (Type*)getNode(Type::type());}
 
 	// Attached Interface methods
 	virtual void actionAttached(ActionComponent *action);
@@ -189,8 +195,8 @@ protected:
 	int mUniqueHandle;
 	void *mParentData;
 
-	Collection<Component::ptr> mComponents;
-	Collection<Node::ptr> mNodes;
+	ComponentCollection mComponents;
+	NodeCollection mNodes;
 	bool mChildrenActive;
 	bool mActivateChildren;
 

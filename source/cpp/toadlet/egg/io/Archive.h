@@ -41,7 +41,7 @@ public:
 	virtual Stream::ptr openStream(const String &name)=0;
 	virtual Resource::ptr openResource(const String &name)=0;
 
-	virtual Collection<String>::ptr getEntries()=0;
+	virtual const Collection<String> &getEntries()=0;
 };
 
 }

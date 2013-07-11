@@ -110,15 +110,15 @@ protected:
 /// @todo: These could be removed if nodes supported propagating scopes, similar to worldTransform, worldScope
 void clearScopeBit(Node *node,int scope){
 	node->setScope(node->getScope()&~scope);
-	for(int i=0;i<node->getNumNodes();++i){
-		clearScopeBit(node->getNode(i),scope);
+	for(Node::NodeCollection::iterator n=node->getNodeBegin();n!=node->getNodeEnd();++n){
+		clearScopeBit(n,scope);
 	}
 }
 
 void setScopeBit(Node *node,int scope){
 	node->setScope(node->getScope()|scope);
-	for(int i=0;i<node->getNumNodes();++i){
-		setScopeBit(node->getNode(i),scope);
+	for(Node::NodeCollection::iterator n=node->getNodeBegin();n!=node->getNodeEnd();++n){
+		setScopeBit(n,scope);
 	}
 }
 
@@ -536,8 +536,7 @@ void RandIsle::updateProps(){
 	Segment segment;
 	Vector2 origin(mPlayer->getPhysics()->getPosition().x,mPlayer->getPhysics()->getPosition().y);
 	Random r(System::mtime());
-	for(int i=0;i<mProps->getNumNodes();++i){
-		Node *prop=mProps->getNode(i);
+	for(Node::NodeCollection::iterator prop=mProps->getNodeBegin();prop!=mProps->getNodeEnd();++prop){
 		Vector2 propOrigin(prop->getWorldTranslate().x,prop->getWorldTranslate().y);
 		scalar d=Math::length(propOrigin,origin);
 		scalar a=Math::ONE-(d-minDist)/(maxDist-minDist);
@@ -584,8 +583,7 @@ void RandIsle::updateClimber(PathClimber *climber,int dt){
 			mBoundSensor->setBound(mMountBound);
 			SensorResults::ptr results=mBoundSensor->sense();
 
-			for(int i=0;i<results->size();++i){
-				Node *node=results->at(i);
+			for(SensorResults::iterator node=results->begin();node!=results->end();++node){
 				TreeSystem *system=node->getChildType<TreeSystem>();
 				if(system!=NULL){
 					Vector3 point;
@@ -929,8 +927,7 @@ void RandIsle::terrainPatchCreated(int px,int py,Bound *bound){
 void RandIsle::terrainPatchDestroyed(int px,int py,Bound *bound){
 	mBoundSensor->setBound(bound);
 	SensorResults::ptr results=mBoundSensor->sense();
-	for(int i=0;i<results->size();++i){
-		Node *node=results->at(i);
+	for(SensorResults::iterator node=results->begin();node!=results->end();++node){
 		if(node->getChildType<TreeSystem>()!=NULL && Math::testInside(bound->getAABox(),node->getWorldTranslate())){
 			node->destroy();
 		}

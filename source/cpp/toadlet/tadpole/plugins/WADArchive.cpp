@@ -64,6 +64,7 @@ bool WADArchive::open(Stream::ptr stream){
 		mLumpinfos[i].filepos=littleInt32(mLumpinfos[i].filepos);
 		mLumpinfos[i].size=littleInt32(mLumpinfos[i].size);
 		mNameMap.add(String(mLumpinfos[i].name).toLower(),i);
+		mEntries.add(mLumpinfos[i].name);
 	}
 
 	return true;
@@ -80,15 +81,6 @@ Resource::ptr WADArchive::openResource(const String &name){
 	mStream->read((tbyte*)mInBuffer,info->size);
 
 	return createTexture(mTextureManager,(wmiptex*)mInBuffer);
-}
-
-Collection<String>::ptr WADArchive::getEntries(){
-	Collection<String>::ptr entries(new Collection<String>());
-	int i;
-	for(i=0;i<mHeader.numlumps;i++){
-		entries->add(mLumpinfos[i].name);
-	}
-	return entries;
 }
 
 Texture::ptr WADArchive::createTexture(toadlet::tadpole::TextureManager *textureManager,wmiptex *miptex,tbyte *pal){
