@@ -102,7 +102,7 @@ MemoryStream::~MemoryStream(){
 }
 
 int MemoryStream::read(tbyte *buffer,int length){
-	tbyte *data=(mData!=NULL)?mData:mInternalData->begin();
+	tbyte *data=(mData!=NULL)?mData:&*mInternalData[0];
 	int amt=(length<(mLength-mPosition)?length:(mLength-mPosition));
 	memcpy(buffer,data+mPosition,amt);
 	mPosition+=amt;
@@ -153,12 +153,12 @@ bool MemoryStream::seek(int offs){
 }
 
 tbyte *MemoryStream::getCurrentDataPointer(){
-	tbyte *data=(mData!=NULL)?mData:mInternalData->begin();
+	tbyte *data=(mData!=NULL)?mData:&*mInternalData[0];
 	return data+mPosition;
 }
 
 tbyte *MemoryStream::getOriginalDataPointer(){
-	tbyte *data=(mData!=NULL)?mData:mInternalData->begin();
+	tbyte *data=(mData!=NULL)?mData:&*mInternalData[0];
 	return data;
 }
 

@@ -46,13 +46,13 @@ public:
 	Stream::ptr openStream(const String &name);
 	Resource::ptr openResource(const String &name){return NULL;}
 
-	Collection<String>::ptr getEntries();
+	const Collection<String> &getEntries(){return mEntries;}
 
 protected:
 	JNIEnv *getEnv() const;
 
 	JStream::ptr mStream;
-	Collection<String>::ptr mEntries;
+	Collection<String> mEntries;
 	JavaVM *vm;
 	jobject obj;
 	jmethodID closeManagerID,openManagerID,availableStreamID,readStreamID,closeStreamID;

@@ -53,7 +53,6 @@ AndroidAssetArchive::AndroidAssetArchive(JNIEnv *jenv,jobject jobj):
 	}
 	env->DeleteLocalRef(managerClass);
 
-	mEntries=Collection<String>::ptr(new Collection<String>());
 	mStream=new JStream(env);
 }
 
@@ -93,10 +92,6 @@ Stream::ptr AndroidAssetArchive::openStream(const String &name){
 		stream=NULL;
 	}
 	return stream;
-}
-
-Collection<String>::ptr AndroidAssetArchive::getEntries(){
-	return mEntries;
 }
 
 JNIEnv *AndroidAssetArchive::getEnv() const{
