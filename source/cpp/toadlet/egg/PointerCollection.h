@@ -69,7 +69,7 @@ public:
 		inline const Type *operator*() const{return **it;}
 		inline const Type *operator->() const{return **it;}
 		inline operator const TypePtr() const{return **it;}
-		inline operator const Type*() const{return **it}
+		inline operator const Type*() const{return **it;}
 
 		typename CollectionType::const_iterator it;
 	};
