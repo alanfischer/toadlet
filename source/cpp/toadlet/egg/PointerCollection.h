@@ -29,6 +29,7 @@
 #include <toadlet/egg/Types.h>
 #include <toadlet/egg/Collection.h>
 #include <toadlet/egg/IntrusivePointer.h>
+#include <toadlet/egg/ExplicitIntrusivePointer.h>
 
 namespace toadlet{
 namespace egg{
@@ -36,7 +37,7 @@ namespace egg{
 template<typename Type>
 class TOADLET_API PointerCollection{
 public:
-	typedef IntrusivePointer<Type> TypePtr;
+	typedef typename Type::ptr TypePtr;
 	typedef Collection<TypePtr> CollectionType;
 
 	class iterator{
@@ -49,9 +50,9 @@ public:
 
 		inline operator typename CollectionType::iterator() const{return it;}
 		inline Type *operator*() const{return **it;}
-		inline Type *operator->() const{return **this;}
-		inline operator Type*() const{return **this;}
-		inline operator TypePtr() const{return **this;}
+		inline Type *operator->() const{return **it;}
+		inline operator TypePtr() const{return **it;}
+		inline operator Type*() const{return **it;}
 
 		typename CollectionType::iterator it;
 	};
@@ -66,9 +67,9 @@ public:
 
 		inline operator typename CollectionType::const_iterator() const{return it;}
 		inline const Type *operator*() const{return **it;}
-		inline const Type *operator->() const{return **this;}
-		inline operator const Type*() const{return **this;}
-		inline operator const TypePtr() const{return **this;}
+		inline const Type *operator->() const{return **it;}
+		inline operator const TypePtr() const{return **it;}
+		inline operator const Type*() const{return **it}
 
 		typename CollectionType::const_iterator it;
 	};

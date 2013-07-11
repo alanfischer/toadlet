@@ -46,7 +46,7 @@ public:
 		inline void operator ++(int){it++;}
 
 		inline Type *operator*() const{return it;}
-		inline Type *operator->() const{return **this;}
+		inline Type *operator->() const{return it;}
 		inline operator Type*() const{return it;}
 
 		inline bool operator==(const iterator &i) const{return it==i.it;}
@@ -67,7 +67,7 @@ public:
 		inline void operator ++(int){it++;}
 
 		inline const Type *operator*() const{return it;}
-		inline const Type *operator->() const{return **this;}
+		inline const Type *operator->() const{return it;}
 		inline operator const Type*() const{return it;}
 
 		inline bool operator==(const const_iterator &i) const{return it==i.it;}
