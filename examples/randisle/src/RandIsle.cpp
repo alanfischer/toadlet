@@ -383,7 +383,7 @@ void RandIsle::render(){
 	Vector3 forward=mCamera->getForward();
 	Vector3 up=mCamera->getUp();
 
-	if(false &&mRefractCamera!=NULL){
+	if(mRefractCamera!=NULL){
 		mRefractCamera->setProjectionMatrix(mCamera->getProjectionMatrix());
 		mRefractCamera->setLookDir(position,forward,up);
 		matrix.reset();
@@ -396,7 +396,7 @@ void RandIsle::render(){
 	forward.z*=-1;
 	up.z*=-1;
 
-	if(false &&mReflectCamera!=NULL){
+	if(mReflectCamera!=NULL){
 		mReflectCamera->setProjectionMatrix(mCamera->getProjectionMatrix());
 		mReflectCamera->setLookDir(position,forward,up);
 		matrix.reset();
