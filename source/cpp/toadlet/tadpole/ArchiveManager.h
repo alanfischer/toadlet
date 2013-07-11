@@ -53,11 +53,12 @@ public:
 	Stream::ptr openStream(const String &name);
 	Resource::ptr openResource(const String &name){return NULL;}
 
-	Collection<String>::ptr getEntries(){return NULL;}
+	const Collection<String> &getEntries(){return mEntries;}
 
 protected:
 	Collection<String> mDirectories;
 	Collection<Archive::ptr> mArchives;
+	Collection<String> mEntries;
 };
 
 }

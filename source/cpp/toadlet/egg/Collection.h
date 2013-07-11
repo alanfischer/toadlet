@@ -27,7 +27,6 @@
 #define TOADLET_EGG_COLLECTION_H
 
 #include <toadlet/egg/Types.h>
-#include <toadlet/egg/SharedPointer.h>
 
 namespace toadlet{
 namespace egg{
@@ -35,15 +34,54 @@ namespace egg{
 template<typename Type>
 class TOADLET_API Collection{
 public:
-	TOADLET_SPTR(Collection);
+	class const_iterator;
 
-	typedef Type* iterator;
-	typedef const Type* const_iterator;
+	class iterator{
+	public:
+		inline iterator():it(NULL){}
+		inline iterator(Type *i):it(i){}
+		inline explicit iterator(const const_iterator &i):it(const_cast<Type*>(i.it)){}
+
+		inline void operator ++(){++it;}
+		inline void operator ++(int){it++;}
+
+		inline Type *operator*() const{return it;}
+		inline Type *operator->() const{return **this;}
+		inline operator Type*() const{return it;}
+
+		inline bool operator==(const iterator &i) const{return it==i.it;}
+		inline bool operator!=(const iterator &i) const{return it!=i.it;}
+		inline bool operator<(const iterator &i) const{return it<i.it;}
+		inline bool operator>(const iterator &i) const{return it>i.it;}
+
+		Type *it;
+	};
+
+	class const_iterator{
+	public:
+		inline const_iterator():it(NULL){}
+		inline const_iterator(const Type *i):it(i){}
+		inline explicit const_iterator(const iterator &i):it(i.it){}
+
+		inline void operator ++(){++it;}
+		inline void operator ++(int){it++;}
+
+		inline const Type *operator*() const{return it;}
+		inline const Type *operator->() const{return **this;}
+		inline operator const Type*() const{return it;}
+
+		inline bool operator==(const const_iterator &i) const{return it==i.it;}
+		inline bool operator!=(const const_iterator &i) const{return it!=i.it;}
+		inline bool operator<(const const_iterator &i) const{return it<i.it;}
+		inline bool operator>(const const_iterator &i) const{return it>i.it;}
+
+		const Type *it;
+	};
 
 	Collection(){
 		mSize=0;
 		mCapacity=0;
-		mData=NULL;
+		mData=new Type[0];
 	}
 
 	Collection(int size){
@@ -231,7 +269,7 @@ public:
 	}
 
 	iterator erase(iterator it){
-		int iit=it-mData;
+		int iit=it-begin();
 
 		int i;
 		for(i=iit+1;i<mSize;++i){
@@ -320,7 +358,7 @@ public:
 		return &mData[0];
 	}
 
-	const iterator begin() const{
+	const_iterator begin() const{
 		return &mData[0];
 	}
 
@@ -328,7 +366,7 @@ public:
 		return &mData[mSize];
 	}
 
-	const Type *end() const{
+	const_iterator end() const{
 		return &mData[mSize];
 	}
 
@@ -362,6 +400,14 @@ public:
 	}
 
 	inline const Type &at(int n) const{
+		return mData[n];
+	}
+	
+	inline Type &operator[](int n){
+		return mData[n];
+	}
+
+	inline const Type &operator[](int n) const{
 		return mData[n];
 	}
 

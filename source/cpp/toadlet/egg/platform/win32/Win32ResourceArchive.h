@@ -42,12 +42,12 @@ public:
 	void destroy();
 
 	virtual bool open(void *module);
-	void setMap(Map<String,int>::ptr idMap);
+	void setMap(const Map<String,int> &idMap);
 
 	Stream::ptr openStream(const String &name);
 	Resource::ptr openResource(const String &name){return NULL;}
 
-	Collection<String>::ptr getEntries();
+	const Collection<String> &getEntries();
 
 	void resourceFound(const String &name);
 
@@ -56,8 +56,8 @@ protected:
 	bool findResources(char *type);
 
 	void *mModule;
-	Collection<String>::ptr mEntries;
-	Map<String,int>::ptr mIDMap;
+	Collection<String> mEntries;
+	Map<String,int> mIDMap;
 };
 
 }

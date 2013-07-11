@@ -83,6 +83,7 @@ bool TPKGArchive::open(Stream::ptr stream){
 		index.position=mStream->readBUInt32();mDataOffset+=4;
 		index.length=mStream->readBUInt32();mDataOffset+=4;
 
+		mEntries.add(name);
 		mIndex[name]=index;
 		delete[] name;
 	}
@@ -120,14 +121,6 @@ Stream::ptr TPKGArchive::openStream(const String &name){
 		mStream->read(data,length);
 		return new MemoryStream(data,length,length,true);
 	}
-}
-
-Collection<String>::ptr TPKGArchive::getEntries(){
-	Collection<String>::ptr entries(new Collection<String>());
-	for(Map<String,Index>::iterator it=mIndex.begin();it!=mIndex.end();++it){
-		entries->add(it->first);
-	}
-	return entries;
 }
 
 }

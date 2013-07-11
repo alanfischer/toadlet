@@ -102,6 +102,7 @@ set (EGG_HDR
 	Map.h
 	Mutex.h
 	Object.h
+	PointerCollection.h
 	PointerCounter.h
 	Profile.h
 	Random.h

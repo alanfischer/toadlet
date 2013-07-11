@@ -26,40 +26,39 @@
 #ifndef TOADLET_TADPOLE_SENSOR_SENSORRESULTS_H
 #define TOADLET_TADPOLE_SENSOR_SENSORRESULTS_H
 
-#include <toadlet/egg/Collection.h>
 #include <toadlet/tadpole/sensor/SensorResultsListener.h>
+#include <toadlet/tadpole/Node.h>
 
 namespace toadlet{
 namespace tadpole{
 namespace sensor{
 
-/// @todo: Change to have a unified Collection<Node> Interface, and move Collection to Vector?
 class TOADLET_API SensorResults:public Object,public SensorResultsListener{
 public:
 	TOADLET_OBJECT(SensorResults);
 
-	SensorResults();
+	typedef Node::NodeCollection NodeCollection;
+	typedef NodeCollection::iterator iterator;
+	typedef NodeCollection::const_iterator const_iterator;
 
-	void setMaxSize(int size);
-	int getMaxSize() const{return mMaxSize;}
+	SensorResults();
 
 	void setScope(int scope){mScope=scope;}
 	int getScope() const{return mScope;}
-
-	int size() const{return mResults.size();}
-	Node *at(int i){return mResults[i];}
-
-	bool contains(Node *node);
 
 	void sensingBeginning();
 	bool resultFound(Node *result,scalar distance);
 	void sensingEnding();
 	
+	inline iterator begin(){return mNodes.begin();}
+	inline iterator end(){return mNodes.end();}
+	inline const_iterator begin() const{return mNodes.begin();}
+	inline const_iterator end() const{return mNodes.end();}
+	inline int size() const{return mNodes.size();}
+
 protected:
-	int mMaxSize;
 	int mScope;
-	Collection<Node*> mResults;
-	scalar mMaxDistance;
+	NodeCollection mNodes;
 };
 
 }

@@ -193,7 +193,7 @@ Mesh::ptr TMSHStreamer::readMesh(DataStream *stream,int blockSize){
 		
 		int numAssignments=stream->readUInt8();
 		list.resize(numAssignments);
-		stream->read((tbyte*)list.begin(),numAssignments*sizeof(Mesh::VertexBoneAssignment));
+		stream->read((tbyte*)&list[0],numAssignments*sizeof(Mesh::VertexBoneAssignment));
 	}
 	mesh->setVertexBoneAssignments(vbas);
 
@@ -229,7 +229,7 @@ void TMSHStreamer::writeMesh(DataStream *stream,Mesh::ptr mesh){
 		const Mesh::VertexBoneAssignmentList &list=vbas[i];
 		int numAssignments=list.size();
 		stream->writeUInt8(numAssignments);
-		stream->write((tbyte*)list.begin(),numAssignments*sizeof(Mesh::VertexBoneAssignment));
+		stream->write((tbyte*)&list[0],numAssignments*sizeof(Mesh::VertexBoneAssignment));
 	}
 }
 

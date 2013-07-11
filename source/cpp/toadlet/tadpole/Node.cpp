@@ -93,11 +93,11 @@ void Node::create(Scene *scene){
 }
 
 void Node::destroyAllChildren(){
-	while(mComponents.size()>0){
-		mComponents[0]->destroy();
+	while(mComponents.begin()!=mComponents.end()){
+		mComponents.begin()->destroy();
 	}
-	while(mNodes.size()>0){
-		mNodes[0]->destroy();
+	while(mNodes.begin()!=mNodes.end()){
+		mNodes.begin()->destroy();
 	}
 }
 
@@ -153,59 +153,55 @@ void Node::actionRemoved(ActionComponent *action){
 	mActions.remove(action);
 }
 
-Component *Node::getChild(const String &name) const{
-	int i;
-	for(i=0;i<mComponents.size();++i){
-		if(mComponents[i]->getName()==name){
-			return mComponents[i];
+Component *Node::getChild(const String &name){
+	for(ComponentCollection::iterator c=mComponents.begin();c!=mComponents.end();++c){
+		if(c->getName()==name){
+			return c;
 		}
 	}
-	for(i=0;i<mNodes.size();++i){
-		if(mNodes[i]->getName()==name){
-			return mNodes[i];
+	for(NodeCollection::iterator n=mNodes.begin();n!=mNodes.end();++n){
+		if(n->getName()==name){
+			return n;
 		}
 	}
 	return NULL;
 }
 
-Component *Node::getChild(const Type<Component> *type) const{
+Component *Node::getChild(const Type<Component> *type){
 	if(type->getFullName()==(char*)NULL){
 		return NULL;
 	}
 
-	int i;
-	for(i=0;i<mComponents.size();++i){
-		if(mComponents[i]->getType()->getFullName()==type->getFullName()){ // Compare names to avoid the issue of multiple types being built into different libraries
-			return mComponents[i];
+	for(ComponentCollection::iterator c=mComponents.begin();c!=mComponents.end();++c){
+		if(c->getType()->getFullName()==type->getFullName()){ // Compare names to avoid the issue of multiple types being built into different libraries
+			return c;
 		}
 	}
-	for(i=0;i<mNodes.size();++i){
-		if(mNodes[i]->getType()->getFullName()==type->getFullName()){  // Compare names to avoid the issue of multiple types being built into different libraries
-			return mNodes[i];
-		}
-	}
-	return NULL;
-}
-
-Node *Node::getNode(const String &name) const{
-	int i;
-	for(i=0;i<mNodes.size();++i){
-		if(mNodes[i]->getName()==name){
-			return mNodes[i];
+	for(NodeCollection::iterator n=mNodes.begin();n!=mNodes.end();++n){
+		if(n->getType()->getFullName()==type->getFullName()){  // Compare names to avoid the issue of multiple types being built into different libraries
+			return n;
 		}
 	}
 	return NULL;
 }
 
-Node *Node::getNode(const Type<Component> *type) const{
+Node *Node::getNode(const String &name){
+	for(NodeCollection::iterator n=mNodes.begin();n!=mNodes.end();++n){
+		if(n->getName()==name){
+			return n;
+		}
+	}
+	return NULL;
+}
+
+Node *Node::getNode(const Type<Component> *type){
 	if(type->getFullName()==(char*)NULL){
 		return NULL;
 	}
 
-	int i;
-	for(i=0;i<mNodes.size();++i){
-		if(mNodes[i]->getType()->getFullName()==type->getFullName()){ // Compare names to avoid the issue of multiple types being built into different libraries
-			return mNodes[i];
+	for(NodeCollection::iterator n=mNodes.begin();n!=mNodes.end();++n){
+		if(n->getType()->getFullName()==type->getFullName()){ // Compare names to avoid the issue of multiple types being built into different libraries
+			return n;
 		}
 	}
 	return NULL;
@@ -315,12 +311,11 @@ void Node::parentChanged(Node *node){
 void Node::rootChanged(Node *root){
 	BaseComponent::rootChanged(root);
 
-	int i;
-	for(i=0;i<mComponents.size();++i){
-		mComponents[i]->rootChanged(root);
+	for(ComponentCollection::iterator c=mComponents.begin();c!=mComponents.end();++c){
+		c->rootChanged(root);
 	}
-	for(i=0;i<mNodes.size();++i){
-		mNodes[i]->rootChanged(root);
+	for(NodeCollection::iterator n=mNodes.begin();n!=mNodes.end();++n){
+		n->rootChanged(root);
 	}
 }
 
@@ -374,29 +369,24 @@ void Node::setBound(Bound::ptr bound){
 void Node::logicUpdate(int dt,int scope){
 	TOADLET_PROFILE_AUTOSCOPE();
 
-	int i;
-
 	if(mActivateChildren){
-		for(i=0;i<mNodes.size();++i){
-			Node *node=mNodes[i];
-			node->activate();
+		for(NodeCollection::iterator n=mNodes.begin();n!=mNodes.end();++n){
+			n->activate();
 		}
 		mActivateChildren=false;
 	}
 
 	mChildrenActive=false;
-	for(i=0;i<mComponents.size();++i){
-		Component *component=mComponents[i];
-		component->logicUpdate(dt,scope);
-		mChildrenActive|=component->getActive();
+	for(ComponentCollection::iterator c=mComponents.begin();c!=mComponents.end();++c){
+		c->logicUpdate(dt,scope);
+		mChildrenActive|=c->getActive();
 	}
 
-	for(i=0;i<mNodes.size();++i){
-		Node *node=mNodes[i];
-		node->logicUpdate(dt,scope);
-		mChildrenActive|=node->getActive();
-		if(node->getActive() && (node->getScope()&scope)!=0){
-			node->tryDeactivate();
+	for(NodeCollection::iterator n=mNodes.begin();n!=mNodes.end();++n){
+		n->logicUpdate(dt,scope);
+		mChildrenActive|=n->getActive();
+		if(n->getActive() && (n->getScope()&scope)!=0){
+			n->tryDeactivate();
 		}
 	}
 }
@@ -404,26 +394,22 @@ void Node::logicUpdate(int dt,int scope){
 void Node::frameUpdate(int dt,int scope){
 	TOADLET_PROFILE_AUTOSCOPE();
 
-	int i;
-	for(i=0;i<mComponents.size();++i){
-		Component *component=mComponents[i];
-		component->frameUpdate(dt,scope);
+	for(ComponentCollection::iterator c=mComponents.begin();c!=mComponents.end();++c){
+		c->frameUpdate(dt,scope);
 	}
 
-	for(i=0;i<mNodes.size();++i){
-		Node *node=mNodes[i];
-		node->frameUpdate(dt,scope);
+	for(NodeCollection::iterator n=mNodes.begin();n!=mNodes.end();++n){
+		n->frameUpdate(dt,scope);
 	}
 }
 
 bool Node::handleEvent(Event *event){
-	int i=0;
 	bool result=false;
-	for(i=0;i<mComponents.size();++i){
-		result|=mComponents[i]->handleEvent(event);
+	for(ComponentCollection::iterator c=mComponents.begin();c!=mComponents.end();++c){
+		result|=c->handleEvent(event);
 	}
-	for(i=0;i<mNodes.size();++i){
-		result|=mNodes[i]->handleEvent(event);
+	for(NodeCollection::iterator n=mNodes.begin();n!=mNodes.end();++n){
+		result|=n->handleEvent(event);
 	}
 	return result;
 }
@@ -460,10 +446,8 @@ void Node::deactivate(){
 	mActive=false;
 	mDeactivateCount=0;
 
-	int i;
-	for(i=0;i<mNodes.size();++i){
-		Node *node=mNodes[i];
-		node->deactivate();
+	for(NodeCollection::iterator n=mNodes.begin();n!=mNodes.end();++n){
+		n->deactivate();
 	}
 }
 
@@ -491,11 +475,10 @@ void Node::transformChanged(Transform *transform){
 		mWorldTransform->setTransform(mParent->mWorldTransform,mTransform);
 	}
 
-	int i;
-	for(i=0;i<mNodes.size();++i){
-		mNodes[i]->transformChanged(mWorldTransform);
+	for(NodeCollection::iterator n=mNodes.begin();n!=mNodes.end();++n){
+		n->transformChanged(mWorldTransform);
 	}
-	for(i=0;i<mSpacials.size();++i){
+	for(int i=0;i<mSpacials.size();++i){
 		mSpacials[i]->transformChanged(mWorldTransform);
 	}
 
@@ -528,13 +511,11 @@ void Node::calculateBound(){
 
 		scalar epsilon=mScene!=NULL?mScene->getEpsilon():0;
 
-		int i;
-		for(i=0;i<mNodes.size();++i){
-			Node *node=mNodes[i];
-			mWorldBound->merge(node->getWorldBound(),epsilon);
+		for(NodeCollection::iterator n=mNodes.begin();n!=mNodes.end();++n){
+			mWorldBound->merge(n->getWorldBound(),epsilon);
 		}
 
-		for(i=0;i<mSpacials.size();++i){
+		for(int i=0;i<mSpacials.size();++i){
 			Spacial *spacial=mSpacials[i];
 			Bound *bound=spacial->getWorldBound();
 			if(bound!=NULL){
@@ -547,24 +528,21 @@ void Node::calculateBound(){
 void Node::gatherRenderables(Camera *camera,RenderableSet *set){
 	TOADLET_PROFILE_AUTOSCOPE();
 
-	int i;
-
 	set->queueNode(this);
 
-	for(i=0;i<mNodes.size();++i){
-		Node *node=mNodes[i];
-		if((camera->getScope()&node->getScope())!=0 && camera->culled(node->getWorldBound())==false){
-			node->gatherRenderables(camera,set);
+	for(NodeCollection::iterator n=mNodes.begin();n!=mNodes.end();++n){
+		if((camera->getScope()&n->getScope())!=0 && camera->culled(n->getWorldBound())==false){
+			n->gatherRenderables(camera,set);
 		}
 	}
 	
-	for(i=0;i<mLights.size();++i){
+	for(int i=0;i<mLights.size();++i){
 		if(mLights[i]->getEnabled()){
 			set->queueLight(mLights[i]);
 		}
 	}
 
-	for(i=0;i<mVisibles.size();++i){
+	for(int i=0;i<mVisibles.size();++i){
 		mVisibles[i]->gatherRenderables(camera,set);
 	}
 }

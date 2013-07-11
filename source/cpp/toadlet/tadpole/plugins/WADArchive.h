@@ -47,7 +47,7 @@ public:
 	Stream::ptr openStream(const String &name){return NULL;}
 	Resource::ptr openResource(const String &name);
 
-	Collection<String>::ptr getEntries();
+	const Collection<String> &getEntries(){return mEntries;}
 
 	struct wheader{
 		char identification[4]; // should be WAD2 or 2DAW
@@ -83,6 +83,7 @@ protected:
 	wheader mHeader;
 	Collection<wlumpinfo> mLumpinfos;
 	Map<String,int> mNameMap;
+	Collection<String> mEntries;
 };
 
 }

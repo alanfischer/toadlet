@@ -80,8 +80,6 @@ inline Pair<T1,T2> make_pair (const T1& a, const T2& b){
 template <typename K, typename V>
 class TOADLET_API Map : public Collection<Pair<K,V> > {
 public:
-	TOADLET_SPTR(Map);
-
 	typedef K										key_type;
 	typedef V										data_type;
 	typedef const K&								const_key_ref;
@@ -110,7 +108,7 @@ public:
 	inline void			assign (const_iterator i1, const_iterator i2)	{ clear(); insert (i1, i2); }
 	inline void			push_back (const_reference v)			{ insert (v); }
 	inline const_iterator	find (const_key_ref k) const;
-	inline iterator		find (const_key_ref k)	{ return (const_cast<iterator> (const_cast<rcself_t>(*this).find (k))); }
+	inline iterator		find (const_key_ref k)	{ return (iterator(const_cast<rcself_t>(*this).find (k))); }
 	inline const_iterator	find_data (const_data_ref v, const_iterator first = NULL, const_iterator last = NULL) const;
 	inline iterator		find_data (const_data_ref v, iterator first = NULL, iterator last = NULL);
 	iterator			insert (const_reference v);
@@ -122,7 +120,7 @@ public:
 	inline void add(const_key_ref key,const_data_ref value);
 private:
 	const_iterator		lower_bound (const_key_ref k) const;
-	inline iterator		lower_bound (const_key_ref k) { return (const_cast<iterator>(const_cast<rcself_t>(*this).lower_bound (k))); }
+	inline iterator		lower_bound (const_key_ref k) { return (iterator(const_cast<rcself_t>(*this).lower_bound (k))); }
 };
 
 template <typename K, typename V>

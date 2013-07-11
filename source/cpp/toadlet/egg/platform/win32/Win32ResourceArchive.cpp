@@ -59,11 +59,10 @@ void Win32ResourceArchive::destroy(){
 bool Win32ResourceArchive::open(void *module){
 	mModule=module;
 
-	mEntries=Collection<String>::ptr(new Collection<String>());
 	return findResources(RT_RCDATA);
 }
 
-void Win32ResourceArchive::setMap(Map<String,int>::ptr idMap){
+void Win32ResourceArchive::setMap(const Map<String,int> &idMap){
 	mIDMap=idMap;
 }
 
@@ -83,12 +82,12 @@ Stream::ptr Win32ResourceArchive::openStream(const String &name){
 	return stream;
 }
 
-Collection<String>::ptr Win32ResourceArchive::getEntries(){
+const Collection<String> &Win32ResourceArchive::getEntries(){
 	return mEntries;
 }
 
 void Win32ResourceArchive::resourceFound(const String &name){
-	mEntries->add(name);
+	mEntries.add(name);
 }
 
 void *Win32ResourceArchive::findResourceName(const String &name){
@@ -98,11 +97,9 @@ void *Win32ResourceArchive::findResourceName(const String &name){
 	}
 
 	LPCTSTR resName=name;
-	if(mIDMap!=NULL){
-		Map<String,int>::iterator result=mIDMap->find(name);
-		if(result!=mIDMap->end()){
-			resName=MAKEINTRESOURCE(result->second);
-		}
+	Map<String,int>::iterator result=mIDMap.find(name);
+	if(result!=mIDMap.end()){
+		resName=MAKEINTRESOURCE(result->second);
 	}
 	return (void*)resName;
 }

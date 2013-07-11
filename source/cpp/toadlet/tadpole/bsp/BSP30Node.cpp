@@ -54,10 +54,7 @@ void BSP30Node::setMap(const String &name){
 }
 
 void BSP30Node::setMap(BSP30Map *map){
-	int i;
-
-	for(i=0;i<getNumNodes();++i){
-		Node *node=getNode(i);
+	for(NodeCollection::iterator node=getNodeBegin();node!=getNodeEnd();++node){
 		Collection<int> &indexes=((childdata*)node->getParentData())->leafs;
 		removeNodeLeafIndexes(indexes,node);
 	}
@@ -68,8 +65,7 @@ void BSP30Node::setMap(BSP30Map *map){
 	mMarkedFaces=new uint8[(mMap->nfaces+7)>>3]; // Allocate enough markedfaces for 1 bit for each face
 	mVisibleMaterialFaces.resize(map->miptexlump->nummiptex);
 
-	for(i=0;i<getNumNodes();++i){
-		Node *node=getNode(i);
+	for(NodeCollection::iterator node=getNodeBegin();node!=getNodeEnd();++node){
 		Collection<int> &indexes=((childdata*)node->getParentData())->leafs;
 		findBoundLeafs(indexes,node);
 		insertNodeLeafIndexes(indexes,node);
@@ -205,8 +201,7 @@ void BSP30Node::gatherRenderables(Camera *camera,RenderableSet *set){
 			mMap->updateFaceLights(faceIndex);
 		}
 
-		for(i=0;i<getNumNodes();++i){
-			Node *node=getNode(i);
+		for(NodeCollection::iterator node=getNodeBegin();node!=getNodeEnd();++node){
 			if((camera->getScope()&node->getScope())!=0 && camera->culled(node->getWorldBound())==false){
 				node->gatherRenderables(camera,set);
 			}
@@ -319,8 +314,7 @@ bool BSP30Node::sensePotentiallyVisible(SensorResultsListener *listener,const Ve
 	memset(&mVisibleMaterialFaces[0],0,sizeof(BSP30Map::facedata*)*mVisibleMaterialFaces.size());
 	int leaf=mMap->findPointLeaf(mMap->planes,mMap->nodes,sizeof(bnode),0,point);
 	if(leaf==0 || mMap->nvisibility==0){
-		for(i=0;i<getNumNodes();++i){
-			Node *node=getNode(i);
+		for(NodeCollection::iterator node=getNodeBegin();node!=getNodeEnd();++node){
 			result|=true;
 			if(listener->resultFound(node,Math::lengthSquared(point,node->getWorldTranslate()))==false){
 				return true;
