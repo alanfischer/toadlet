@@ -96,7 +96,6 @@ public:
 	int getScope() const{return -1;}
 
 	void setAnimationListener(AnimationListener *listener){}
-	AnimationListener *getAnimationListener() const{return NULL;}
 
 protected:
 	void createBuffers();
