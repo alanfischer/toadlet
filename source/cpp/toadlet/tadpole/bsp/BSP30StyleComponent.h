@@ -68,6 +68,11 @@ public:
 	void setWeight(scalar weight){}
 	scalar getWeight() const{return Math::ONE;}
 
+	void setScope(int scope){}
+	int getScope() const{return -1;}
+
+	void setAnimationListener(AnimationListener *listener){}
+
 protected:
 	void update();
 

@@ -574,10 +574,10 @@ inline void setQuaternionsFromAngles(Quaternion &qx,Quaternion &qy,Quaternion &q
 	qx.x=sin(hx);
 	qx.w=cos(hx);
 
-	qy.x=sin(hy);
+	qy.y=sin(hy);
 	qy.w=cos(hy);
 
-	qz.x=sin(hz);
+	qz.z=sin(hz);
 	qz.w=cos(hz);
 }
 
