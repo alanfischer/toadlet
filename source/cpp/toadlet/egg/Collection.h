@@ -78,21 +78,23 @@ public:
 		const Type *it;
 	};
 
-	Collection(){
-		mSize=0;
-		mCapacity=0;
-		mData=new Type[0];
-	}
+	inline Collection():
+		mSize(0),
+		mCapacity(0),
+		mData(NULL)
+	{}
 
-	Collection(int size){
-		mSize=size;
-		mCapacity=size;
+	inline Collection(int size):
+		mSize(size),
+		mCapacity(size)
+	{
 		mData=new Type[mCapacity+1];
 	}
 
-	Collection(int size,const Type &value){
-		mSize=size;
-		mCapacity=size;
+	inline Collection(int size,const Type &value):
+		mSize(size),
+		mCapacity(size)
+	{
 		mData=new Type[mCapacity+1];
 		int i;
 		for(i=0;i<size;++i){
@@ -100,9 +102,10 @@ public:
 		}
 	}
 
-	Collection(const Type *values,int size){
-		mSize=size;
-		mCapacity=size;
+	inline Collection(const Type *values,int size):
+		mSize(size),
+		mCapacity(size)
+	{
 		mData=new Type[mCapacity+1];
 		int i;
 		for(i=0;i<size;++i){
@@ -110,9 +113,10 @@ public:
 		}
 	}
 
-	Collection(const Collection &c){
-		mSize=c.mSize;
-		mCapacity=c.mCapacity;
+	inline Collection(const Collection &c):
+		mSize(c.mSize),
+		mCapacity(c.mCapacity)
+	{
 		mData=new Type[mCapacity+1];
 		int i;
 		for(i=0;i<mSize;++i){
@@ -120,44 +124,22 @@ public:
 		}
 	}
 
-	Collection(const Collection *c){
-		mSize=c->mSize;
-		mCapacity=c->mCapacity;
-		mData=new Type[mCapacity+1];
-		int i;
-		for(i=0;i<mSize;++i){
-			mData[i]=c->mData[i];
-		}
-	}
-
-	template<typename Type2> Collection(const Collection<Type2> &c){
-		mSize=c.mSize;
-		mCapacity=c.mCapacity;
+	template<typename Type2> inline Collection(const Collection<Type2> &c):
+		mSize(c.mSize),
+		mCapacity(c.mCapacity)
+	{
 		mData=new Type[mCapacity+1];
 		int i;
 		for(i=0;i<mSize;++i){
 			mData[i]=c.mData[i];
-		}
-	}
-
-	template<typename Type2> Collection(const Collection<Type2> *c){
-		mSize=c->mSize;
-		mCapacity=c->mCapacity;
-		mData=new Type[mCapacity+1];
-		int i;
-		for(i=0;i<mSize;++i){
-			mData[i]=c->mData[i];
 		}
 	}
 
 	~Collection(){
-		if(mData!=NULL){
-			delete[] mData;
-			mData=NULL;
-		}
+		delete[] mData;
 	}
 
-	void push_back(const Type &type){
+	inline void push_back(const Type &type){
 		if(mSize+1>mCapacity){
 			reserve((mSize+1)*2);
 		}
@@ -166,19 +148,23 @@ public:
 		mSize++;
 	}
 
-	void add(const Type &type){
+	inline void add(const Type &type){
 		push_back(type);
 	}
 
-	void setAt(int index,const Type &type){
+	inline void setAt(int index,const Type &type){
 		mData[index]=type;
 	}
 
-	const Type &back(){
+	inline Type &back(){
 		return mData[mSize-1];
 	}
 
-	void pop_back(){
+	inline const Type &back() const{
+		return mData[mSize-1];
+	}
+
+	inline void pop_back(){
 		mData[mSize-1]=Type();
 
 		mSize--;
@@ -202,15 +188,15 @@ public:
 		return &mData[iat];
 	}
 
-	void insert(int index,const Type &type){
+	inline void insert(int index,const Type &type){
 		insert(begin()+index,type);
 	}
 
-	void addAll(const Collection<Type> &collection){
+	inline void addAll(const Collection<Type> &collection){
 		insert(end(),collection.begin(),collection.end());
 	}
 
-	void addAll(const Collection<Type> *collection){
+	inline void addAll(const Collection<Type> *collection){
 		insert(end(),collection->begin(),collection->end());
 	}
 
@@ -331,7 +317,7 @@ public:
 
 	void reserve(int s){
 		if(mCapacity<s){
-			Type *data=new Type[s];
+			Type *data=new Type[s+1];
 			int i;
 			for(i=0;i<mSize;++i){
 				data[i]=mData[i];
@@ -342,32 +328,32 @@ public:
 		mCapacity=s;
 	}
 
-	int size() const{
+	inline int size() const{
 		return mSize;
 	}
 
-	int capacity() const{
+	inline int capacity() const{
 		return mCapacity;
 	}
 	
-	bool empty() const{
+	inline bool empty() const{
 		return mSize==0;
 	}
 
-	iterator begin(){
-		return &mData[0];
+	inline iterator begin(){
+		return mData==NULL?NULL:&mData[0];
 	}
 
-	const_iterator begin() const{
-		return &mData[0];
+	inline const_iterator begin() const{
+		return mData==NULL?NULL:&mData[0];
 	}
 
-	iterator end(){
-		return &mData[mSize];
+	inline iterator end(){
+		return mData==NULL?NULL:&mData[mSize];
 	}
 
-	const_iterator end() const{
-		return &mData[mSize];
+	inline const_iterator end() const{
+		return mData==NULL?NULL:&mData[mSize];
 	}
 
 	void clear(){

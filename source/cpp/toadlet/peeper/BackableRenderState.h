@@ -30,6 +30,8 @@
 #include <toadlet/egg/BaseResource.h>
 #include <toadlet/peeper/RenderState.h>
 
+//#define FULLY_BACKED
+
 namespace toadlet{
 namespace peeper{
 
@@ -80,6 +82,7 @@ public:
 	}
 	virtual bool getMaterialState(MaterialState &state) const{if(mMaterialState==NULL){return false;}else{state.set(*mMaterialState);return true;}}
 
+#if defined(FULLY_BACKED)
 	virtual int getNumSamplerStates(Shader::ShaderType type) const{return mSamplerStates[type].size();}
 	virtual void setSamplerState(Shader::ShaderType type,int i,const SamplerState &state){
 		if(mSamplerStates[type].size()<=i){
@@ -109,6 +112,21 @@ public:
 		if(mBack!=NULL){mBack->setTextureState(type,i,state);}
 	}
 	virtual bool getTextureState(Shader::ShaderType type,int i,TextureState &state) const{if(mTextureStates[type].size()<=i || mTextureStates[type][i]==NULL){return false;}else{state.set(*mTextureStates[type][i]);return true;}}
+#else
+	virtual int getNumSamplerStates(Shader::ShaderType type) const{return mSamplerState!=NULL?1:0;}
+	virtual void setSamplerState(Shader::ShaderType type,int i,const SamplerState &state){
+		if(mSamplerState==NULL){mSamplerState=new SamplerState(state);}else{mSamplerState->set(state);}
+		if(mBack!=NULL){mBack->setSamplerState(type,i,state);}
+	}
+	virtual bool getSamplerState(Shader::ShaderType type,int i,SamplerState &state) const{if(mSamplerState==NULL){return false;}else{state.set(*mSamplerState);return true;}}
+
+	virtual int getNumTextureStates(Shader::ShaderType type) const{return mTextureState!=NULL?1:0;}
+	virtual void setTextureState(Shader::ShaderType type,int i,const TextureState &state){
+		if(mTextureState==NULL){mTextureState=new TextureState(state);}else{mTextureState->set(state);}
+		if(mBack!=NULL){mBack->setTextureState(type,i,state);}
+	}
+	virtual bool getTextureState(Shader::ShaderType type,int i,TextureState &state) const{if(mTextureState==NULL){return false;}else{state.set(*mTextureState);return true;}}
+#endif
 
 	virtual void setBack(RenderState::ptr back);
 	virtual RenderState::ptr getBack(){return mBack;}
@@ -120,8 +138,13 @@ protected:
 	FogState *mFogState;
 	PointState *mPointState;
 	MaterialState *mMaterialState;
+#if defined(FULLY_BACKED)
 	Collection<SamplerState*> mSamplerStates[Shader::ShaderType_MAX];
 	Collection<TextureState*> mTextureStates[Shader::ShaderType_MAX];
+#else
+	SamplerState* mSamplerState;
+	TextureState* mTextureState;
+#endif
 
 	RenderState::ptr mBack;
 };

@@ -250,6 +250,7 @@ private:
 
 	stringchar *mData;
 	int mLength;
+	static stringchar mNull;
 
 	mutable char *mNarrowData;
 };

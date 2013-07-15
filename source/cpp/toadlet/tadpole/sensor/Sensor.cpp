@@ -64,7 +64,7 @@ int Sensor::senseNodes(Node *node,SensorResultsListener *results){
 		}
 	}
 
-	for(Node::NodeCollection::iterator n=node->getNodeBegin();n!=node->getNodeEnd();++n){
+	for(Node::NodeCollection::iterator n=node->getNodeBegin(),end=node->getNodeEnd();n!=end;++n){
 		int r=senseNodes(n,results);
 		if(r<0){
 			return -1;
