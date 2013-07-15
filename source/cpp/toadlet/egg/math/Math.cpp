@@ -566,33 +566,36 @@ void Math::setQuaternionFromMatrix4x4(Quaternion &r,const Matrix4x4 &m){
 	setQuaternionFromMatrix(r,m2);
 }
 
-// Algorithm from the GMTL: http://ggt.sf.net
-bool Math::setQuaternionFromEulerAngle(Quaternion &r,const EulerAngle &a){
-	const real x=(a.order==EulerAngle::EulerOrder_XYZ)?a.x:((a.order==EulerAngle::EulerOrder_ZXY)?a.y:a.z);
-	const real y=(a.order==EulerAngle::EulerOrder_XYZ)?a.y:((a.order==EulerAngle::EulerOrder_ZXY)?a.z:a.y);
-	const real z=(a.order==EulerAngle::EulerOrder_XYZ)?a.z:((a.order==EulerAngle::EulerOrder_ZXY)?a.x:a.x);
-
-	real hx=x*0.5,hy=y*0.5,hz=z*0.5;
-
-	Quaternion qx,qy,qz;
+inline void setQuaternionsFromAngles(Quaternion &qx,Quaternion &qy,Quaternion &qz,real x,real y,real z){
+	real hx=x*0.5;
+	real hy=y*0.5;
+	real hz=z*0.5;
 
 	qx.x=sin(hx);
 	qx.w=cos(hx);
 
-	qy.y=sin(hy);
+	qy.x=sin(hy);
 	qy.w=cos(hy);
 
-	qz.z=sin(hz);
+	qz.x=sin(hz);
 	qz.w=cos(hz);
+}
+
+// Algorithm from the GMTL: http://ggt.sf.net
+bool Math::setQuaternionFromEulerAngle(Quaternion &r,const EulerAngle &a){
+	Quaternion qx,qy,qz;
 
 	switch(a.order){
 		case EulerAngle::EulerOrder_XYZ:
+			setQuaternionsFromAngles(qx,qy,qz,a.x,a.y,a.z);
 			r=qx*qy*qz;
 		break;
 		case EulerAngle::EulerOrder_ZYX:
+			setQuaternionsFromAngles(qx,qy,qz,a.z,a.y,a.x);
 			r=qz*qy*qx;
 		break;
 		case EulerAngle::EulerOrder_ZXY:
+			setQuaternionsFromAngles(qx,qy,qz,a.y,a.z,a.x);
 			r=qz*qx*qy;
 		break;
 		default:

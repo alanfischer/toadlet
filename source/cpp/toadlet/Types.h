@@ -33,7 +33,7 @@
 #endif
 
 #if defined(TOADLET_DEBUG)
-	#define TOADLET_PROFILE 1
+//	#define TOADLET_PROFILE 1
 #endif
 
 // Set platform specific defines
