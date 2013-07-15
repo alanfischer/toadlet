@@ -47,11 +47,11 @@ public:
 	Stream::ptr openStream(const String &name);
 	Resource::ptr openResource(const String &name){return NULL;}
 
-	Collection<String>::ptr getEntries();
+	const Collection<String> &getEntries(){return mEntries;}
 
 protected:
 	void *mBundle;
-	Collection<String>::ptr mEntries;
+	Collection<String> mEntries;
 };
 
 }
