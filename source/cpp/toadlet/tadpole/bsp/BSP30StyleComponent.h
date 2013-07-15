@@ -33,7 +33,7 @@ namespace toadlet{
 namespace tadpole{
 namespace bsp{
 
-class TOADLET_API BSP30StyleComponent:public BaseComponent{
+class TOADLET_API BSP30StyleComponent:public BaseComponent,public Animatable,public Animation{
 public:
 	TOADLET_COMPONENT(BSP30StyleComponent);
 
@@ -52,6 +52,22 @@ public:
 	void setIntensity(scalar intensity);
 	scalar getIntensity() const{return mIntensity;}
 	
+	// Animatable
+	int getNumAnimations(){return 1;}
+	Animation *getAnimation(const String &name){return this;}
+	Animation *getAnimation(int index){return this;}
+
+	// Animation
+	const String &getName() const{return BaseComponent::getName();}
+
+	void setValue(scalar value){setIntensity(value);}
+	scalar getValue() const{return getIntensity();}
+	scalar getMinValue() const{return 0;}
+	scalar getMaxValue() const{return 1;}
+
+	void setWeight(scalar weight){}
+	scalar getWeight() const{return Math::ONE;}
+
 protected:
 	void update();
 
