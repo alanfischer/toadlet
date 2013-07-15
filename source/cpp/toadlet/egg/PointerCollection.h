@@ -43,41 +43,45 @@ public:
 	class iterator{
 	public:
 		inline iterator():it(NULL){}
-		inline iterator(typename CollectionType::iterator i):it(i){}
+		inline iterator(TypePtr *i):it(i){}
 
 		inline void operator ++(){++it;}
 		inline void operator ++(int){it++;}
 
 		inline operator typename CollectionType::iterator() const{return it;}
-		inline Type *operator*() const{return **it;}
-		inline Type *operator->() const{return **it;}
-		inline operator TypePtr() const{return **it;}
-		inline operator Type*() const{return **it;}
+		inline Type *operator*() const{return *it;}
+		inline Type *operator->() const{return *it;}
+		inline operator TypePtr() const{return *it;}
+		inline operator Type*() const{return *it;}
 
 		inline bool operator==(const iterator &i) const{return it==i.it;}
 		inline bool operator!=(const iterator &i) const{return it!=i.it;}
+		inline bool operator<(const iterator &i) const{return it<i.it;}
+		inline bool operator>(const iterator &i) const{return it>i.it;}
 
-		typename CollectionType::iterator it;
+		TypePtr *it;
 	};
 
 	class const_iterator{
 	public:
 		inline const_iterator():it(NULL){}
-		inline const_iterator(typename CollectionType::const_iterator i):it(i){}
+		inline const_iterator(const TypePtr *i):it(i){}
 
 		inline void operator ++(){++it;}
 		inline void operator ++(int){it++;}
 
 		inline operator typename CollectionType::const_iterator() const{return it;}
-		inline const Type *operator*() const{return **it;}
-		inline const Type *operator->() const{return **it;}
-		inline operator const TypePtr() const{return **it;}
-		inline operator const Type*() const{return **it;}
+		inline const Type *operator*() const{return *it;}
+		inline const Type *operator->() const{return *it;}
+		inline operator const TypePtr() const{return *it;}
+		inline operator const Type*() const{return *it;}
 
-		inline bool operator==(const iterator &i) const{return it==i.it;}
-		inline bool operator!=(const iterator &i) const{return it!=i.it;}
+		inline bool operator==(const const_iterator &i) const{return it==i.it;}
+		inline bool operator!=(const const_iterator &i) const{return it!=i.it;}
+		inline bool operator<(const const_iterator &i) const{return it<i.it;}
+		inline bool operator>(const const_iterator &i) const{return it>i.it;}
 
-		typename CollectionType::const_iterator it;
+		const TypePtr *it;
 	};
 
 	inline PointerCollection(){}
@@ -116,11 +120,11 @@ public:
 	
 	inline bool empty() const{return mCollection.empty();}
 
-	inline iterator begin(){return mCollection.begin();}
-	inline iterator end(){return mCollection.end();}
+	inline const iterator &begin(){return reinterpret_cast<const iterator&>(mCollection.begin());}
+	inline const iterator &end(){return reinterpret_cast<const iterator&>(mCollection.end());}
 
-	inline const_iterator begin() const{return mCollection.begin();}
-	inline const_iterator end() const{return mCollection.end();}
+	inline const const_iterator &begin() const{return reinterpret_cast<const const_iterator&>(mCollection.begin());}
+	inline const const_iterator &end() const{return reinterpret_cast<const const_iterator&>(mCollection.end());}
 
 	inline void clear(){mCollection.clear();}
 

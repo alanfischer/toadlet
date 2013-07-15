@@ -81,12 +81,14 @@ public:
 	inline Collection():
 		mSize(0),
 		mCapacity(0),
-		mData(NULL)
+		mData(NULL),
+		mBegin(NULL),mEnd(NULL)
 	{}
 
 	inline Collection(int size):
 		mSize(size),
-		mCapacity(size)
+		mCapacity(size),
+		mBegin(NULL),mEnd(NULL)
 	{
 		mData=new Type[mCapacity+1];
 	}
@@ -100,6 +102,7 @@ public:
 		for(i=0;i<size;++i){
 			mData[i]=value;
 		}
+		mBegin=&mData[0];mEnd=&mData[mSize];
 	}
 
 	inline Collection(const Type *values,int size):
@@ -111,6 +114,7 @@ public:
 		for(i=0;i<size;++i){
 			mData[i]=values[i];
 		}
+		mBegin=&mData[0];mEnd=&mData[mSize];
 	}
 
 	inline Collection(const Collection &c):
@@ -122,6 +126,7 @@ public:
 		for(i=0;i<mSize;++i){
 			mData[i]=c.mData[i];
 		}
+		mBegin=&mData[0];mEnd=&mData[mSize];
 	}
 
 	template<typename Type2> inline Collection(const Collection<Type2> &c):
@@ -133,6 +138,7 @@ public:
 		for(i=0;i<mSize;++i){
 			mData[i]=c.mData[i];
 		}
+		mBegin=&mData[0];mEnd=&mData[mSize];
 	}
 
 	~Collection(){
@@ -146,6 +152,7 @@ public:
 
 		mData[mSize]=type;
 		mSize++;
+		mEnd=&mData[mSize];
 	}
 
 	inline void add(const Type &type){
@@ -168,6 +175,7 @@ public:
 		mData[mSize-1]=Type();
 
 		mSize--;
+		mEnd=&mData[mSize];
 	}
 
 	iterator insert(iterator at,const Type &type){
@@ -184,6 +192,7 @@ public:
 
 		mData[iat]=type;
 		mSize++;
+		mEnd=&mData[mSize];
 
 		return &mData[iat];
 	}
@@ -218,6 +227,7 @@ public:
 		}
 
 		mSize+=addsize;
+		mEnd=&mData[mSize];
 
 		return &mData[iat];
 	}
@@ -235,6 +245,7 @@ public:
 		else{
 			mSize=s;
 		}
+		mEnd=&mData[mSize];
 	}
 
 	void resize(int s,const Type &type){
@@ -252,6 +263,7 @@ public:
 				mData[mSize-1]=Type();
 			}
 		}
+		mEnd=&mData[mSize];
 	}
 
 	iterator erase(iterator it){
@@ -263,6 +275,7 @@ public:
 		}
 		mData[mSize-1]=Type();
 		mSize--;
+		mEnd=&mData[mSize];
 
 		return &mData[iit];
 	}
@@ -282,6 +295,7 @@ public:
 
 			mData[mSize-1]=Type();
 			mSize--;
+			mEnd=&mData[mSize];
 			
 			return true;
 		}
@@ -298,6 +312,7 @@ public:
 
 			mData[mSize-1]=Type();
 			mSize--;
+			mEnd=&mData[mSize];
 		}
 	}
 
@@ -324,6 +339,7 @@ public:
 			}
 			delete[] mData;
 			mData=data;
+			mBegin=&mData[0];mEnd=&mData[mSize];
 		}
 		mCapacity=s;
 	}
@@ -340,21 +356,11 @@ public:
 		return mSize==0;
 	}
 
-	inline iterator begin(){
-		return mData==NULL?NULL:&mData[0];
-	}
+	inline const iterator &begin(){return mBegin;}
+	inline const iterator &end(){return mEnd;}
 
-	inline const_iterator begin() const{
-		return mData==NULL?NULL:&mData[0];
-	}
-
-	inline iterator end(){
-		return mData==NULL?NULL:&mData[mSize];
-	}
-
-	inline const_iterator end() const{
-		return mData==NULL?NULL:&mData[mSize];
-	}
+	inline const const_iterator &begin() const{return reinterpret_cast<const const_iterator&>(mBegin);}
+	inline const const_iterator &end() const{return reinterpret_cast<const const_iterator&>(mEnd);}
 
 	void clear(){
 		int i;
@@ -363,6 +369,7 @@ public:
 		}
 
 		mSize=0;
+		mEnd=&mData[mSize];
 	}
 
 	inline Type *toArray(){
@@ -414,6 +421,7 @@ public:
 		for(i=0;i<mSize;++i){
 			mData[i]=c.mData[i];
 		}
+		mBegin=&mData[0];mEnd=&mData[mSize];
 		return *this;
 	}
 
@@ -443,6 +451,7 @@ protected:
 	int mSize;
 	int mCapacity;
 	Type *mData;
+	iterator mBegin,mEnd;
 };
 
 }
