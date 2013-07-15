@@ -35,6 +35,10 @@ BackableRenderState::BackableRenderState():BaseResource(),
 	mFogState(NULL),
 	mPointState(NULL),
 	mMaterialState(NULL)
+#if !defined(FULLY_BACKED)
+	,mSamplerState(NULL),
+	mTextureState(NULL)
+#endif
 {}
 
 void BackableRenderState::destroy(){
@@ -67,6 +71,7 @@ void BackableRenderState::destroy(){
 		delete mMaterialState;
 		mMaterialState=NULL;
 	}
+#if defined(FULLY_BACKED)
 	int i,j;
 	for(j=0;j<Shader::ShaderType_MAX;++j){
 		for(i=0;i<mSamplerStates[j].size();++i){
@@ -78,6 +83,16 @@ void BackableRenderState::destroy(){
 		}
 		mTextureStates[j].clear();
 	}
+#else
+	if(mSamplerState!=NULL){
+		delete mSamplerState;
+		mSamplerState=NULL;
+	}
+	if(mTextureState!=NULL){
+		delete mTextureState;
+		mTextureState=NULL;
+	}
+#endif
 
 	BaseResource::destroy();
 }
@@ -96,6 +111,7 @@ void BackableRenderState::setBack(RenderState::ptr back){
 		if(mFogState!=NULL){mBack->setFogState(*mFogState);}
 		if(mPointState!=NULL){mBack->setPointState(*mPointState);}
 		if(mMaterialState!=NULL){mBack->setMaterialState(*mMaterialState);}
+#if defined(FULLY_BACKED)
 		int j,i;
 		for(j=0;j<Shader::ShaderType_MAX;++j){
 			for(i=0;i<mSamplerStates[j].size();++i){
@@ -105,6 +121,10 @@ void BackableRenderState::setBack(RenderState::ptr back){
 				if(mTextureStates[j][i]!=NULL){mBack->setTextureState((Shader::ShaderType)j,i,*mTextureStates[j][i]);}
 			}
 		}
+#else
+		if(mSamplerState!=NULL){mBack->setSamplerState(Shader::ShaderType_FRAGMENT,0,*mSamplerState);}
+		if(mTextureState!=NULL){mBack->setTextureState(Shader::ShaderType_FRAGMENT,0,*mTextureState);}
+#endif
 	}
 }
 

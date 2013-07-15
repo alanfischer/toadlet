@@ -89,9 +89,10 @@
 namespace toadlet{
 namespace egg{
 
+stringchar String::mNull=0;
+
 String::String(){
-	mData=new stringchar[1];
-	mData[0]=0;
+	mData=&mNull;
 	mLength=0;
 	mNarrowData=NULL;
 }
@@ -99,8 +100,7 @@ String::String(){
 void String::internal_String(const char *text){
 	if(text==NULL){
 		mLength=0;
-		mData=new stringchar[1];
-		mData[0]=0;
+		mData=&mNull;
 		mNarrowData=NULL;
 		return;
 	}
@@ -115,10 +115,8 @@ void String::internal_String(const char *text){
 void String::internal_String(const unsigned char *text){
 	if(text==NULL){
 		mLength=0;
-		mData=new stringchar[1];
-		mData[0]=0;
+		mData=&mNull;
 		mNarrowData=NULL;
-		update();
 		return;
 	}
 
@@ -133,8 +131,7 @@ void String::internal_String(const unsigned char *text){
 void String::internal_String(const stringchar *text){
 	if(text==NULL){
 		mLength=0;
-		mData=new stringchar[1];
-		mData[0]=0;
+		mData=&mNull;
 		mNarrowData=NULL;
 		return;
 	}
@@ -171,8 +168,9 @@ String::String(int length){
 
 String::~String(){
 	clearExtraData();
-	delete[] mData;
-	mData=NULL;
+	if(mData!=&mNull){
+		delete[] mData;
+	}
 }
 
 int String::find(char c) const{
@@ -451,7 +449,9 @@ const String &String::operator=(const String &string){
 	clearExtraData();
 
 	mLength=string.mLength;
-	delete[] mData;
+	if(mData!=&mNull){
+		delete[] mData;
+	}
 	mData=new stringchar[mLength+1];
 	TOADLET_WCSNCPY((wchar_t*)mData,(wchar_t*)string.mData,mLength+1);
 	update();
@@ -560,7 +560,9 @@ void String::operator+=(const String &string){
 	int length=mLength+string.mLength;
 	data[length]=0;
 
-	delete[] mData;
+	if(mData!=&mNull){
+		delete[] mData;
+	}
 	mData=data;
 	mLength=length;
 	update();
@@ -582,7 +584,9 @@ void String::operator+=(const char *text){
 	int length=mLength+len2;
 	data[length]=0;
 
-	delete[] mData;
+	if(mData!=&mNull){
+		delete[] mData;
+	}
 	mData=data;
 	mLength=length;
 	update();
@@ -603,7 +607,9 @@ void String::internal_addassign(const stringchar *text){
 	int length=mLength+len2;
 	data[length]=0;
 
-	delete[] mData;
+	if(mData!=&mNull){
+		delete[] mData;
+	}
 	mData=data;
 	mLength=length;
 	update();

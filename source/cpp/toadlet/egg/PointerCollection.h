@@ -42,8 +42,8 @@ public:
 
 	class iterator{
 	public:
-		iterator():it(NULL){}
-		iterator(typename CollectionType::iterator i):it(i){}
+		inline iterator():it(NULL){}
+		inline iterator(typename CollectionType::iterator i):it(i){}
 
 		inline void operator ++(){++it;}
 		inline void operator ++(int){it++;}
@@ -54,13 +54,16 @@ public:
 		inline operator TypePtr() const{return **it;}
 		inline operator Type*() const{return **it;}
 
+		inline bool operator==(const iterator &i) const{return it==i.it;}
+		inline bool operator!=(const iterator &i) const{return it!=i.it;}
+
 		typename CollectionType::iterator it;
 	};
 
 	class const_iterator{
 	public:
-		const_iterator():it(NULL){}
-		const_iterator(typename CollectionType::const_iterator i):it(i){}
+		inline const_iterator():it(NULL){}
+		inline const_iterator(typename CollectionType::const_iterator i):it(i){}
 
 		inline void operator ++(){++it;}
 		inline void operator ++(int){it++;}
@@ -71,52 +74,55 @@ public:
 		inline operator const TypePtr() const{return **it;}
 		inline operator const Type*() const{return **it;}
 
+		inline bool operator==(const iterator &i) const{return it==i.it;}
+		inline bool operator!=(const iterator &i) const{return it!=i.it;}
+
 		typename CollectionType::const_iterator it;
 	};
 
-	PointerCollection(){}
+	inline PointerCollection(){}
 
-	PointerCollection(int size):mCollection(size){}
+	inline PointerCollection(int size):mCollection(size){}
 
-	void push_back(const TypePtr &type){mCollection.push_back(type);}
+	inline void push_back(const TypePtr &type){mCollection.push_back(type);}
 
-	void add(const TypePtr &type){mCollection.add(type);}
+	inline void add(const TypePtr &type){mCollection.add(type);}
 
-	void setAt(int index,const TypePtr &type){mCollection.setAt(index,type);}
+	inline void setAt(int index,const TypePtr &type){mCollection.setAt(index,type);}
 
-	TypePtr back(){return mCollection.back();}
+	inline TypePtr back(){return mCollection.back();}
 
-	void pop_back(){mCollection.pop_back();}
+	inline void pop_back(){mCollection.pop_back();}
 
-	iterator insert(iterator at,const TypePtr &type){return mCollection.insert(at,type);}
+	inline iterator insert(iterator at,const TypePtr &type){return mCollection.insert(at,type);}
 
-	iterator insert(iterator at,const_iterator start,const_iterator end){return mCollection.insert(at,start,end);}
+	inline iterator insert(iterator at,const_iterator start,const_iterator end){return mCollection.insert(at,start,end);}
 
-	void resize(int s){mCollection.resize(s);}
+	inline void resize(int s){mCollection.resize(s);}
 
-	iterator erase(iterator it){return mCollection.erase(it);}
+	inline iterator erase(iterator it){return mCollection.erase(it);}
 
-	template<typename Type2> bool remove(const Type2 &type){return mCollection.remove(type);}
+	template<typename Type2> inline bool remove(const Type2 &type){return mCollection.remove(type);}
 
-	template<typename Type2> int indexOf(const Type2 &type) const{return mCollection.indexOf(type);}
+	template<typename Type2> inline int indexOf(const Type2 &type) const{return mCollection.indexOf(type);}
 
-	template<typename Type2> bool contains(const Type2 &type) const{return mCollection.contains(type);}
+	template<typename Type2> inline bool contains(const Type2 &type) const{return mCollection.contains(type);}
 
-	void reserve(int s){mCollection.reserve(s);}
+	inline void reserve(int s){mCollection.reserve(s);}
 
-	int size() const{return mCollection.size();}
+	inline int size() const{return mCollection.size();}
 
-	int capacity() const{return mCollection.capacity();}
+	inline int capacity() const{return mCollection.capacity();}
 	
-	bool empty() const{return mCollection.empty();}
+	inline bool empty() const{return mCollection.empty();}
 
-	iterator begin(){return mCollection.begin();}
-	iterator end(){return mCollection.end();}
+	inline iterator begin(){return mCollection.begin();}
+	inline iterator end(){return mCollection.end();}
 
-	const_iterator begin() const{return mCollection.begin();}
-	const_iterator end() const{return mCollection.end();}
+	inline const_iterator begin() const{return mCollection.begin();}
+	inline const_iterator end() const{return mCollection.end();}
 
-	void clear(){mCollection.clear();}
+	inline void clear(){mCollection.clear();}
 
 	inline TypePtr &get(int n){return mCollection.get(n);}
 	inline const TypePtr &get(int n) const{return mCollection.get(n);}
