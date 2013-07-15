@@ -40,10 +40,18 @@ BSP30StyleComponent::BSP30StyleComponent():
 }
 
 void BSP30StyleComponent::parentChanged(Node *node){
+	if(mParent!=NULL){
+		mParent->animatableRemoved(this);
+	}
+
 	BaseComponent::parentChanged(node);
 	
-	if(mParent!=NULL && mParent->getScene()->getRoot()->getType()==BSP30Node::type()){
-		setNode((BSP30Node*)mParent->getScene()->getRoot());
+	if(mParent!=NULL){
+		mParent->animatableAttached(this);
+
+		if(mParent->getScene()->getRoot()->getType()==BSP30Node::type()){
+			setNode((BSP30Node*)mParent->getScene()->getRoot());
+		}
 	}
 }
 

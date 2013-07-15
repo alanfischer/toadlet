@@ -48,9 +48,6 @@ void OSXBundleArchive::destroy(){
 bool OSXBundleArchive::open(void *bundle){
 	mBundle=bundle;
 
-	mEntries=egg::Collection<String>::ptr(new egg::Collection<String>());
-	/// @todo: Enumerate directories and insert them into mEntries
-	
 	return true;
 }
 
@@ -61,10 +58,6 @@ Stream::ptr OSXBundleArchive::openStream(const String &name){
 		stream=NULL;
 	}
 	return stream;
-}
-
-egg::Collection<String>::ptr OSXBundleArchive::getEntries(){
-	return mEntries;
 }
 
 }
