@@ -106,9 +106,9 @@ public:
 
 	inline void pop_back(){mCollection.pop_back();}
 
-	inline iterator insert(iterator at,const TypePtr &type){return mCollection.insert(at,type).it;}
+	inline iterator insert(iterator at,const TypePtr &type){return mCollection.insert(at,type);}
 
-	inline iterator insert(iterator at,const_iterator start,const_iterator end){return mCollection.insert(at,start,end).it;}
+	inline iterator insert(iterator at,const_iterator start,const_iterator end){return mCollection.insert(at,start,end);}
 
 	inline void resize(int s){mCollection.resize(s);}
 

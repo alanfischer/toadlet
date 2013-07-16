@@ -34,57 +34,8 @@ namespace egg{
 template<typename Type>
 class TOADLET_API Collection{
 public:
-	class const_iterator;
-
-	class iterator{
-	public:
-		inline iterator():it(NULL){}
-		inline iterator(Type *i):it(i){}
-		inline explicit iterator(const const_iterator &i):it(const_cast<Type*>(i.it)){}
-
-		inline iterator operator ++(){return ++it;}
-		inline iterator operator ++(int){return it++;}
-		inline iterator operator +(int i){return it+i;}
-		inline iterator operator --(){return --it;}
-		inline iterator operator --(int){return it--;}
-		inline iterator operator -(int i){return it-i;}
-
-		inline Type *operator*() const{return it;}
-		inline Type *operator->() const{return it;}
-		inline operator Type*() const{return it;}
-
-		inline bool operator==(const iterator &i) const{return it==i.it;}
-		inline bool operator!=(const iterator &i) const{return it!=i.it;}
-		inline bool operator<(const iterator &i) const{return it<i.it;}
-		inline bool operator>(const iterator &i) const{return it>i.it;}
-
-		Type *it;
-	};
-
-	class const_iterator{
-	public:
-		inline const_iterator():it(NULL){}
-		inline const_iterator(const Type *i):it(i){}
-		inline explicit const_iterator(const iterator &i):it(i.it){}
-
-		inline const_iterator operator ++(){return ++it;}
-		inline const_iterator operator ++(int){return it++;}
-		inline const_iterator operator +(int i){return it+i;}
-		inline const_iterator operator --(){return --it;}
-		inline const_iterator operator --(int){return it--;}
-		inline const_iterator operator -(int i){return it-i;}
-
-		inline const Type *operator*() const{return it;}
-		inline const Type *operator->() const{return it;}
-		inline operator const Type*() const{return it;}
-
-		inline bool operator==(const const_iterator &i) const{return it==i.it;}
-		inline bool operator!=(const const_iterator &i) const{return it!=i.it;}
-		inline bool operator<(const const_iterator &i) const{return it<i.it;}
-		inline bool operator>(const const_iterator &i) const{return it>i.it;}
-
-		const Type *it;
-	};
+	typedef Type *iterator;
+	typedef const Type *const_iterator;
 
 	inline Collection():
 		mSize(0),
@@ -211,10 +162,6 @@ public:
 
 	inline void addAll(const Collection<Type> &collection){
 		insert(end(),collection.begin(),collection.end());
-	}
-
-	inline void addAll(const Collection<Type> *collection){
-		insert(end(),collection->begin(),collection->end());
 	}
 
 	iterator insert(iterator at,const_iterator start,const_iterator end){
