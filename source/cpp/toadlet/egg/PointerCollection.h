@@ -47,10 +47,10 @@ public:
 
 		inline iterator operator ++(){return ++it;}
 		inline iterator operator ++(int){return it++;}
-		inline iterator operator +(int i){return it+i;}
+		inline iterator operator +(int i) const{return it+i;}
 		inline iterator operator --(){return --it;}
 		inline iterator operator --(int){return it--;}
-		inline iterator operator -(int i){return it-i;}
+		inline iterator operator -(int i) const{return it-i;}
 
 		inline operator typename CollectionType::iterator() const{return it;}
 		inline Type *operator*() const{return *it;}
@@ -73,10 +73,10 @@ public:
 
 		inline const_iterator operator ++(){return ++it;}
 		inline const_iterator operator ++(int){return it++;}
-		inline const_iterator operator +(int i){return it+i;}
+		inline const_iterator operator +(int i) const{return it+i;}
 		inline const_iterator operator --(){return --it;}
 		inline const_iterator operator --(int){return it--;}
-		inline const_iterator operator -(int i){return it-i;}
+		inline const_iterator operator -(int i) const{return it-i;}
 
 		inline operator typename CollectionType::const_iterator() const{return it;}
 		inline const Type *operator*() const{return *it;}
