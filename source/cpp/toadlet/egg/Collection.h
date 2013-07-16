@@ -42,8 +42,12 @@ public:
 		inline iterator(Type *i):it(i){}
 		inline explicit iterator(const const_iterator &i):it(const_cast<Type*>(i.it)){}
 
-		inline void operator ++(){++it;}
-		inline void operator ++(int){it++;}
+		inline iterator operator ++(){return ++it;}
+		inline iterator operator ++(int){return it++;}
+		inline iterator operator +(int i){return it+i;}
+		inline iterator operator --(){return --it;}
+		inline iterator operator --(int){return it--;}
+		inline iterator operator -(int i){return it-i;}
 
 		inline Type *operator*() const{return it;}
 		inline Type *operator->() const{return it;}
@@ -63,8 +67,12 @@ public:
 		inline const_iterator(const Type *i):it(i){}
 		inline explicit const_iterator(const iterator &i):it(i.it){}
 
-		inline void operator ++(){++it;}
-		inline void operator ++(int){it++;}
+		inline const_iterator operator ++(){return ++it;}
+		inline const_iterator operator ++(int){return it++;}
+		inline const_iterator operator +(int i){return it+i;}
+		inline const_iterator operator --(){return --it;}
+		inline const_iterator operator --(int){return it--;}
+		inline const_iterator operator -(int i){return it-i;}
 
 		inline const Type *operator*() const{return it;}
 		inline const Type *operator->() const{return it;}
