@@ -318,11 +318,17 @@ int String::internal_find(const stringchar *text,int i) const{
 }
 
 String String::substr(int start,int amt) const{
-	if(start>=mLength){
+	if(start<0){
+		start=0;
+	}
+	else if(start>=mLength){
 		start=mLength;
 	}
 
-	if(start+amt>mLength){
+	if(amt<0){
+		amt=mLength-start;
+	}
+	else if(start+amt>mLength){
 		amt=mLength-start;
 	}
 
