@@ -62,6 +62,7 @@ public:
 		inline bool operator!=(const iterator &i) const{return it!=i.it;}
 		inline bool operator<(const iterator &i) const{return it<i.it;}
 		inline bool operator>(const iterator &i) const{return it>i.it;}
+		inline int operator -(const iterator &i) const{return it-i.it;}
 
 		TypePtr *it;
 	};
@@ -88,6 +89,7 @@ public:
 		inline bool operator!=(const const_iterator &i) const{return it!=i.it;}
 		inline bool operator<(const const_iterator &i) const{return it<i.it;}
 		inline bool operator>(const const_iterator &i) const{return it>i.it;}
+		inline int operator -(const const_iterator &i) const{return it-i.it;}
 
 		const TypePtr *it;
 	};
