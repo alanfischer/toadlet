@@ -55,12 +55,13 @@ void StudioModelComponent::SubModel::render(RenderManager *manager) const{
 }
 
 
-StudioModelComponent::SequenceAnimation::SequenceAnimation(studioseqdesc *sequence):
+StudioModelComponent::SequenceAnimation::SequenceAnimation(StudioModelComponent *parent,studioseqdesc *sequence):
 	mSSequence(sequence),
 	mValue(0),
 	mWeight(0),
 	mScope(-1)
 {
+	mParent=parent;
 	mName=sequence->label;
 }
 
@@ -78,7 +79,9 @@ StudioModelComponent::StudioModelComponent(Engine *engine):
 	//mBlenderValues[4],mAdjustedBlenderValues[4],
 	//mLink,
 	//mLinkModel,
-	mBlendSequenceIndex(0)
+	mBlendSequenceIndex(0),
+	mSkeletonDirty(false),
+	mMeshDirty(false)
 
 	//mChromeForward,mChromeRight,
 	//mBoneTranslates,
@@ -145,11 +148,15 @@ void StudioModelComponent::parentChanged(Node *node){
 }
 
 void StudioModelComponent::logicUpdate(int dt,int scope){
-	updateSkeleton();
+	if(mSkeletonDirty){
+		updateSkeleton();
+	}
 }
 
 void StudioModelComponent::frameUpdate(int dt,int scope){
-	updateSkeleton();
+	if(mSkeletonDirty){
+		updateSkeleton();
+	}
 }
 
 void StudioModelComponent::setModel(const String &name){
@@ -183,7 +190,7 @@ void StudioModelComponent::setModel(StudioModel *model){
 	mAnimations.resize(mModel->header->numseq);
 	int i;
 	for(i=0;i<mModel->header->numseq;++i){
-		mAnimations[i]=new SequenceAnimation(mModel->seqdesc(i));
+		mAnimations[i]=new SequenceAnimation(this,mModel->seqdesc(i));
 	}
 
 	updateSkeleton();
@@ -430,11 +437,14 @@ void StudioModelComponent::gatherRenderables(Camera *camera,RenderableSet *set){
 	mChromeRight.set(camera->getRight());
 
 	int i,j;
-	for(i=0;i<=mModel->header->numbodyparts;++i){
-		studiobodyparts *sbodyparts=mModel->bodyparts(i);
-		for(j=0;j<sbodyparts->nummodels;++j){
-			updateVertexes(mModel,i,j);
+	if(mMeshDirty){
+		for(i=0;i<=mModel->header->numbodyparts;++i){
+			studiobodyparts *sbodyparts=mModel->bodyparts(i);
+			for(j=0;j<sbodyparts->nummodels;++j){
+				updateVertexes(mModel,i,j);
+			}
 		}
+		mMeshDirty=false;
 	}
 
 	for(i=0;i<mSubModels.size();++i){
@@ -675,6 +685,9 @@ void StudioModelComponent::updateSkeleton(){
 			}
 		}
 	}
+
+	mMeshDirty=true;
+	mSkeletonDirty=false;
 }
 
 void StudioModelComponent::findBoneTransforms(Vector3 *translates,Quaternion *rotates,StudioModel *model,studioseqdesc *sseqdesc,studioanim *sanim,SequenceAnimation *animation){
