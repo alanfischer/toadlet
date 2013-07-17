@@ -1,5 +1,6 @@
 if (NOT TOADLET_PLATFORM_ANDROID AND NOT TOADLET_PLATFORM_IOS)
 	set (UNIT_SRC
+		ContainerTest.cpp
 		MathTest.cpp
 		NodeTest.cpp
 		unitTest.cpp

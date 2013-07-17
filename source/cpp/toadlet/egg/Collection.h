@@ -50,6 +50,7 @@ public:
 		mBegin(NULL),mEnd(NULL)
 	{
 		mData=new Type[mCapacity+1];
+		mBegin=&mData[0];mEnd=&mData[mSize];
 	}
 
 	inline Collection(int size,const Type &value):
@@ -104,6 +105,18 @@ public:
 		delete[] mData;
 	}
 
+	inline Type &front(){return mData[0];}
+	inline Type &back(){return mData[mSize-1];}
+
+	inline const Type &front() const{return mData[0];}
+	inline const Type &back() const{return mData[mSize-1];}
+
+	inline const iterator &begin(){return mBegin;}
+	inline const iterator &end(){return mEnd;}
+
+	inline const const_iterator &begin() const{return reinterpret_cast<const const_iterator&>(mBegin);}
+	inline const const_iterator &end() const{return reinterpret_cast<const const_iterator&>(mEnd);}
+
 	inline void push_back(const Type &type){
 		if(mSize+1>mCapacity){
 			reserve((mSize+1)*2);
@@ -112,22 +125,6 @@ public:
 		mData[mSize]=type;
 		mSize++;
 		mEnd=&mData[mSize];
-	}
-
-	inline void add(const Type &type){
-		push_back(type);
-	}
-
-	inline void setAt(int index,const Type &type){
-		mData[index]=type;
-	}
-
-	inline Type &back(){
-		return mData[mSize-1];
-	}
-
-	inline const Type &back() const{
-		return mData[mSize-1];
 	}
 
 	inline void pop_back(){
@@ -154,14 +151,6 @@ public:
 		mEnd=&mData[mSize];
 
 		return &mData[iat];
-	}
-
-	inline void insert(int index,const Type &type){
-		insert(begin()+index,type);
-	}
-
-	inline void addAll(const Collection<Type> &collection){
-		insert(end(),collection.begin(),collection.end());
 	}
 
 	iterator insert(iterator at,const_iterator start,const_iterator end){
@@ -259,18 +248,6 @@ public:
 		}
 	}
 
-	void removeAt(int i){
-		if(i>=0 && i<mSize){
-			for(i++;i<mSize;++i){
-				mData[i-1]=mData[i];
-			}
-
-			mData[mSize-1]=Type();
-			mSize--;
-			mEnd=&mData[mSize];
-		}
-	}
-
 	template<typename Type2> int indexOf(const Type2 &type) const{
 		int i;
 		for(i=0;i<mSize;++i){
@@ -281,9 +258,7 @@ public:
 		return -1;
 	}
 
-	template<typename Type2> bool contains(const Type2 &type) const{
-		return indexOf(type)>=0;
-	}
+	template<typename Type2> bool contains(const Type2 &type) const{return indexOf(type)>=0;}
 
 	void reserve(int s){
 		if(mCapacity<s){
@@ -299,24 +274,6 @@ public:
 		mCapacity=s;
 	}
 
-	inline int size() const{
-		return mSize;
-	}
-
-	inline int capacity() const{
-		return mCapacity;
-	}
-	
-	inline bool empty() const{
-		return mSize==0;
-	}
-
-	inline const iterator &begin(){return mBegin;}
-	inline const iterator &end(){return mEnd;}
-
-	inline const const_iterator &begin() const{return reinterpret_cast<const const_iterator&>(mBegin);}
-	inline const const_iterator &end() const{return reinterpret_cast<const const_iterator&>(mEnd);}
-
 	void clear(){
 		int i;
 		for(i=0;i<mSize;++i){
@@ -327,45 +284,27 @@ public:
 		mEnd=&mData[mSize];
 	}
 
-	inline Type *toArray(){
-		return mData;
-	}
+	inline int size() const{return mSize;}
+	inline int capacity() const{return mCapacity;}
+	inline bool empty() const{return mSize==0;}
 
-	inline const Type *toArray() const{
-		return mData;
-	}
-
-	inline Type &get(int n){
-		return mData[n];
-	}
-
-	inline const Type &get(int n) const{
-		return mData[n];
-	}
-
-	inline Type &at(int n){
-		return mData[n];
-	}
-
-	inline const Type &at(int n) const{
-		return mData[n];
-	}
+	inline void removeAt(int i){erase(begin()+i);}
+	inline void add(const Type &type){push_back(type);}
+	inline void setAt(int index,const Type &type){mData[index]=type;}
+	inline void addAll(const Collection<Type> &collection){insert(end(),collection.begin(),collection.end());}
+	inline void insert(int index,const Type &type){insert(begin()+index,type);}
 	
-	inline Type &operator[](int n){
-		return mData[n];
-	}
+	inline Type *toArray(){return mData;}
+	inline const Type *toArray() const{return mData;}
 
-	inline const Type &operator[](int n) const{
-		return mData[n];
-	}
+	inline Type &at(int n){return mData[n];}
+	inline const Type &at(int n) const{return mData[n];}
+	
+	inline Type &operator[](int n){return mData[n];}
+	inline const Type &operator[](int n) const{return mData[n];}
 
-	inline operator Type *(){
-		return mData;
-	}
-
-	inline operator const Type *() const{
-		return mData;
-	}
+	inline operator Type *(){return mData;}
+	inline operator const Type *() const{return mData;}
 
 	Collection &operator=(const Collection &c){
 		mSize=c.mSize;
@@ -394,13 +333,8 @@ public:
 		return true;
 	}
 
-	inline bool operator==(const Collection &c) const{
-		return equals(c);
-	}
-
-	inline bool operator!=(const Collection &c) const{
-		return !equals(c);
-	}
+	inline bool operator==(const Collection &c) const{return equals(c);}
+	inline bool operator!=(const Collection &c) const{return !equals(c);}
 
 protected:
 	int mSize;
