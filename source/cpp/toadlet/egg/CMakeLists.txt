@@ -82,8 +82,9 @@ set (EGG_PLATFORM_WIN32_SRC
 set (EGG_HDR
 	Assert.h
 	BaseResource.h
-	Collection.h
 	Categories.h
+	CircularBuffer.h
+	Collection.h
 	DynamicLibrary.h
 	EndianConversion.h
 	Error.h
