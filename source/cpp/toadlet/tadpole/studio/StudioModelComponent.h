@@ -75,20 +75,21 @@ public:
 	public:
 		TOADLET_OBJECT(SequenceAnimation);
 
-		SequenceAnimation(studioseqdesc *sequence);
+		SequenceAnimation(StudioModelComponent *parent,studioseqdesc *sequence);
 
-		void setValue(scalar value){mValue=value;}
+		void setValue(scalar value){mValue=value;mParent->dirtySkeleton();}
 		scalar getMinValue() const{return 0;}
 		scalar getMaxValue() const{return (mSSequence->numframes-1)/mSSequence->fps;}
 		scalar getValue() const{return mValue;}
 
-		void setWeight(scalar weight){mWeight=weight;}
+		void setWeight(scalar weight){mWeight=weight;mParent->dirtySkeleton();}
 		scalar getWeight() const{return mWeight;}
 
 		void setScope(int scope){mScope=scope;}
 		int getScope() const{return mScope;}
 
 	protected:
+		StudioModelComponent *mParent;
 		studioseqdesc *mSSequence;
 		scalar mValue;
 		scalar mWeight;
@@ -138,6 +139,8 @@ public:
 	StudioModelComponent *getLink() const{return mLink;}
 
 	bool getActive() const{return true;}
+
+	void dirtySkeleton(){mSkeletonDirty=true;}
 
 	// Spacial
 	void setTransform(Transform::ptr transform);
@@ -205,6 +208,8 @@ protected:
 	StudioModel::ptr mLinkModel;
 	Collection<SequenceAnimation::ptr> mAnimations;
 	int mBlendSequenceIndex;
+	bool mSkeletonDirty;
+	bool mMeshDirty;
 
 	Vector3 mChromeForward,mChromeRight;
 	Collection<Vector3> mBoneTranslates;
