@@ -53,7 +53,7 @@ public:
 		inline iterator operator -(int i) const{return it-i;}
 
 		inline operator typename CollectionType::iterator() const{return it;}
-		inline Type *operator*() const{return *it;}
+		inline Type &operator*() const{return **it;}
 		inline Type *operator->() const{return *it;}
 		inline operator TypePtr() const{return *it;}
 		inline operator Type*() const{return *it;}
@@ -80,7 +80,7 @@ public:
 		inline const_iterator operator -(int i) const{return it-i;}
 
 		inline operator typename CollectionType::const_iterator() const{return it;}
-		inline const Type *operator*() const{return *it;}
+		inline const Type &operator*() const{return **it;}
 		inline const Type *operator->() const{return *it;}
 		inline operator const TypePtr() const{return *it;}
 		inline operator const Type*() const{return *it;}
