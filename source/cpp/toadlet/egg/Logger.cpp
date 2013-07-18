@@ -338,14 +338,7 @@ void Logger::addCompleteLogEntry(Category *category,Level level,const String &te
 }
 
 Logger::Category *Logger::addCategory(const String &categoryName){
-	Category *category=new Category(categoryName);
-	lock();
-		mCategoryNameCategoryMap.add(categoryName,category);
-		#if defined(TOADLET_PLATFORM_OSX)
-			mCategoryNameClientMap.add(categoryName,asl_open(categoryName,categoryName,0));
-		#endif
-	unlock();
-	return category;
+	return getCategory(categoryName);
 }
 
 Logger::Category *Logger::getCategory(const String &categoryName){
@@ -357,6 +350,13 @@ Logger::Category *Logger::getCategory(const String &categoryName){
 		CategoryNameCategoryMap::iterator it=mCategoryNameCategoryMap.find(categoryName);
 		if(it!=mCategoryNameCategoryMap.end()){
 			category=it->second;
+		}
+		if(category==NULL){
+			category=new Category(categoryName);
+			mCategoryNameCategoryMap.add(categoryName,category);
+			#if defined(TOADLET_PLATFORM_OSX)
+				mCategoryNameClientMap.add(categoryName,asl_open(categoryName,categoryName,0));
+			#endif
 		}
 	unlock();
 
