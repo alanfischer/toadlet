@@ -138,6 +138,17 @@ public:
 	inline egg::mathfixed::fixed *lightPosArray(egg::mathfixed::fixed result[],const Vector3 &src){result[0]=MathConversion::scalarToFixed(src.x);result[1]=MathConversion::scalarToFixed(src.y);result[2]=MathConversion::scalarToFixed(src.z);result[3]=MathConversion::scalarToFixed(Math::ONE);return result;}
 	inline float *lightPosArray(float result[],const Vector3 &src){result[0]=MathConversion::scalarToFloat(src.x);result[1]=MathConversion::scalarToFloat(src.y);result[2]=MathConversion::scalarToFloat(src.z);result[3]=MathConversion::scalarToFloat(Math::ONE);return result;}
 
+	inline bool activeTexture(int i){
+		if(i>=mCaps.maxTextureStages){
+			return false;
+		}
+		else if(mMultiTexture && i!=mLastActiveTexture){
+			glActiveTexture(GL_TEXTURE0+i);
+			mLastActiveTexture=i;
+		}
+		return true;
+	}
+
 	#if defined(TOADLET_FIXED_POINT) && defined(TOADLET_HAS_GLES)
 		egg::mathfixed::Matrix4x4 cacheMatrix4x4;
 		egg::mathfixed::fixed cacheArray[4];
@@ -207,6 +218,8 @@ protected:
 	Collection<short> mLastTexCoordIndexes;
 	int mLastShaderSemanticBits;
 	GLSLShaderState *mLastShaderState;
+	int mLastActiveTexture;
+
 	Collection<GLSLShaderState*> mShaderStates;
 	Collection<GLVertexFormat*> mVertexFormats;
 	#if defined(TOADLET_HAS_GLES)
