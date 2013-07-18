@@ -41,12 +41,12 @@ public:
 	void destroy(){}
 
 	Resource::ptr create(const String &name,ResourceData *data,ProgressListener *listener){
-		Resource::ptr resource=createBSP30Material(NULL);
+		Resource::ptr resource=createBSP30Material(NULL,NULL);
 		resource->setName(name);
 		return resource;
 	}
 
-	Material::ptr createBSP30Material(Texture *diffuseTexture);
+	Material::ptr createBSP30Material(Texture *diffuseTexture,RenderState *state);
 
 protected:
 	Engine *mEngine;

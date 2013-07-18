@@ -93,6 +93,8 @@ GLRenderDevice::GLRenderDevice():
 	//mLastTexCoordIndexes,
 	mLastShaderSemanticBits(0),
 	mLastShaderState(NULL),
+	mLastActiveTexture(0),
+
 	//mShaderStates,
 	//mVertexFormats,
 
@@ -1099,66 +1101,6 @@ void GLRenderDevice::setTextureState(int i,TextureState *state){
 		return;
 	}
 
-	mLastTextureStates[i]=state;
-}
-
-void GLRenderDevice::setSamplerStatePostTexture(int i,SamplerState *state){
-	if(i>=mCaps.maxTextureStages){
-		return;
-	}
-	else if(mMultiTexture){
-		glActiveTexture(GL_TEXTURE0+i);
-	}
-
-	GLTexture *texture=mLastTextures[i];
-	GLuint textureTarget=texture!=NULL?texture->mTarget:0;
-
-	if(state!=NULL && textureTarget!=0){
-		glTexParameteri(textureTarget,GL_TEXTURE_WRAP_S,getGLWrap(state->uAddress,mHasClampToEdge));
-		glTexParameteri(textureTarget,GL_TEXTURE_WRAP_T,getGLWrap(state->vAddress,mHasClampToEdge));
-		#if !defined(TOADLET_HAS_GLES) && defined(TOADLET_HAS_GL_12)
-			if(gl_version>=12){
-				glTexParameteri(textureTarget,GL_TEXTURE_WRAP_R,getGLWrap(state->wAddress,mHasClampToEdge));
-			}
-		#endif
-
-		SamplerState::FilterType mipFilter=(texture->mFormat->getMipMax()==1?SamplerState::FilterType_NONE:state->mipFilter);
-		glTexParameteri(textureTarget,GL_TEXTURE_MIN_FILTER,getGLMinFilter(state->minFilter,mipFilter));
-		glTexParameteri(textureTarget,GL_TEXTURE_MAG_FILTER,getGLMagFilter(state->magFilter));
-
-		/// @todo: Determine if this should be used and override the settings in the GLTexture itself?
-		/*
-		#if !defined(TOADLET_HAS_GLES)
-			if(gl_version>=12){
-				glTexParameteri(textureTarget,GL_TEXTURE_BASE_LEVEL,state->minLOD);
-				glTexParameteri(textureTarget,GL_TEXTURE_MAX_LEVEL,state->maxLOD);
-			}
-		#endif
-		*/
-
-		if(i==0){
-			#if defined(TOADLET_HAS_GLES) && defined(TOADLET_HAS_GL_11)
-				glHint(GL_PERSPECTIVE_CORRECTION_HINT,state->perspective?GL_NICEST:GL_FASTEST);
-			#endif
-		}
-	}
-
-	TOADLET_CHECK_GLERROR("setSamplerState");
-}
-
-void GLRenderDevice::setTextureStatePostTexture(int i,TextureState *state){
-#if defined(TOADLET_HAS_GLFIXED)
-	if(i>=mCaps.maxTextureStages){
-		return;
-	}
-	else if(mMultiTexture){
-		glActiveTexture(GL_TEXTURE0+i);
-	}
-
-	GLTexture *texture=mLastTextures[i];
-	GLuint textureTarget=texture!=NULL?texture->mTarget:0;
-	int texCoordIndex=0;
-
 	if(state!=NULL){
 		// Setup texture blending
 		bool specifyColor=(state->colorOperation!=TextureState::Operation_UNSPECIFIED);
@@ -1230,7 +1172,59 @@ void GLRenderDevice::setTextureStatePostTexture(int i,TextureState *state){
 		if(specifyAlpha){
 			glTexEnvf(GL_TEXTURE_ENV,GL_ALPHA_SCALE,getGLTextureBlendScale(state->alphaOperation));
 		}
+	}
 
+	mLastTextureStates[i]=state;
+}
+
+void GLRenderDevice::setSamplerStatePostTexture(int i,SamplerState *state){
+	if(!activeTexture(i)) return;
+
+	GLTexture *texture=mLastTextures[i];
+	GLuint textureTarget=texture!=NULL?texture->mTarget:0;
+
+	if(state!=NULL && textureTarget!=0){
+		glTexParameteri(textureTarget,GL_TEXTURE_WRAP_S,getGLWrap(state->uAddress,mHasClampToEdge));
+		glTexParameteri(textureTarget,GL_TEXTURE_WRAP_T,getGLWrap(state->vAddress,mHasClampToEdge));
+		#if !defined(TOADLET_HAS_GLES) && defined(TOADLET_HAS_GL_12)
+			if(gl_version>=12){
+				glTexParameteri(textureTarget,GL_TEXTURE_WRAP_R,getGLWrap(state->wAddress,mHasClampToEdge));
+			}
+		#endif
+
+		SamplerState::FilterType mipFilter=(texture->mFormat->getMipMax()==1?SamplerState::FilterType_NONE:state->mipFilter);
+		glTexParameteri(textureTarget,GL_TEXTURE_MIN_FILTER,getGLMinFilter(state->minFilter,mipFilter));
+		glTexParameteri(textureTarget,GL_TEXTURE_MAG_FILTER,getGLMagFilter(state->magFilter));
+
+		/// @todo: Determine if this should be used and override the settings in the GLTexture itself?
+		/*
+		#if !defined(TOADLET_HAS_GLES)
+			if(gl_version>=12){
+				glTexParameteri(textureTarget,GL_TEXTURE_BASE_LEVEL,state->minLOD);
+				glTexParameteri(textureTarget,GL_TEXTURE_MAX_LEVEL,state->maxLOD);
+			}
+		#endif
+		*/
+
+		if(i==0){
+			#if defined(TOADLET_HAS_GLES) && defined(TOADLET_HAS_GL_11)
+				glHint(GL_PERSPECTIVE_CORRECTION_HINT,state->perspective?GL_NICEST:GL_FASTEST);
+			#endif
+		}
+	}
+
+	TOADLET_CHECK_GLERROR("setSamplerState");
+}
+
+void GLRenderDevice::setTextureStatePostTexture(int i,TextureState *state){
+#if defined(TOADLET_HAS_GLFIXED)
+	if(!activeTexture(i)) return;
+
+	GLTexture *texture=mLastTextures[i];
+	GLuint textureTarget=texture!=NULL?texture->mTarget:0;
+	int texCoordIndex=0;
+
+	if(state!=NULL){
 		// Setup TexCoordIndex
 		texCoordIndex=state->texCoordIndex;
 
@@ -1377,17 +1371,9 @@ void GLRenderDevice::setBuffer(Shader::ShaderType shaderType,int i,VariableBuffe
 }
 
 void GLRenderDevice::setTexture(Shader::ShaderType shaderType,int i,Texture *texture){
-	if(i>=mCaps.maxTextureStages){
-		return;
-	}
 	// Skip the setTexture if it's a disable, and aimed at a different shaderType, since GL doesn't differentiate.
 	// Otherwise we can have problems where the texture ends up being disabled because it was affecting a different shaderType, and it shouldn't have been.
-	else if(texture==NULL && mLastTextureType[i]!=shaderType){
-		return;
-	}
-	else if(mMultiTexture){
-		glActiveTexture(GL_TEXTURE0+i);
-	}
+	if(!activeTexture(i) || (texture==NULL && mLastTextureType[i]!=shaderType)) return;
 
 	GLuint textureTarget=0;
 	GLTexture *gltexture=texture!=NULL?(GLTexture*)texture->getRootTexture():NULL;
@@ -1453,6 +1439,7 @@ void GLRenderDevice::setPointState(const PointState &state){
 			int stage;
 			for(stage=0;stage<mCaps.maxTextureStages;++stage){
 				glActiveTexture(GL_TEXTURE0+stage);
+				mLastActiveTexture=stage;
 				glTexEnvi(GL_POINT_SPRITE,GL_COORD_REPLACE,value);
 			}
 		}

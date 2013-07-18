@@ -118,14 +118,19 @@ BSP30MaterialCreator::BSP30MaterialCreator(Engine *engine){
 	mFragmentShader=engine->getShaderManager()->createShader(Shader::ShaderType_FRAGMENT,profiles,fragmentCodes,2);
 }
 
-Material::ptr BSP30MaterialCreator::createBSP30Material(Texture *diffuseTexture){
+Material::ptr BSP30MaterialCreator::createBSP30Material(Texture *diffuseTexture,RenderState *state){
 	Material::ptr material=mEngine->getMaterialManager()->createMaterial();
 
-	RenderState::ptr renderState=mEngine->getMaterialManager()->createRenderState();
-	renderState->setBlendState(BlendState());
-	renderState->setDepthState(DepthState(DepthState::DepthTest_LEQUAL,true));
-	renderState->setMaterialState(MaterialState(false,false,MaterialState::ShadeType_FLAT));
-	renderState->setRasterizerState(RasterizerState(RasterizerState::CullType_FRONT));
+	RenderState::ptr renderState=state;
+	if(renderState==NULL){
+		renderState=mEngine->getMaterialManager()->createRenderState();
+		if(renderState!=NULL){
+			renderState->setBlendState(BlendState());
+			renderState->setDepthState(DepthState(DepthState::DepthTest_LEQUAL,true));
+			renderState->setMaterialState(MaterialState(false,false,MaterialState::ShadeType_FLAT));
+			renderState->setRasterizerState(RasterizerState(RasterizerState::CullType_FRONT));
+		}
+	}
 
 	if(mEngine->hasShader(Shader::ShaderType_VERTEX) && mEngine->hasShader(Shader::ShaderType_FRAGMENT)){
 		RenderPath::ptr shaderPath=material->addPath();
