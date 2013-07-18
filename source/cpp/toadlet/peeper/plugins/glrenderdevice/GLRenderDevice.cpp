@@ -1101,6 +1101,7 @@ void GLRenderDevice::setTextureState(int i,TextureState *state){
 		return;
 	}
 
+#if defined(TOADLET_HAS_GLFIXED)
 	if(state!=NULL){
 		// Setup texture blending
 		bool specifyColor=(state->colorOperation!=TextureState::Operation_UNSPECIFIED);
@@ -1173,6 +1174,7 @@ void GLRenderDevice::setTextureState(int i,TextureState *state){
 			glTexEnvf(GL_TEXTURE_ENV,GL_ALPHA_SCALE,getGLTextureBlendScale(state->alphaOperation));
 		}
 	}
+#endif
 
 	mLastTextureStates[i]=state;
 }
