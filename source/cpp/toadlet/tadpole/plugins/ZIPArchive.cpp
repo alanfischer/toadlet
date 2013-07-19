@@ -147,6 +147,14 @@ bool ZIPArchive::open(Stream::ptr stream){
 	String idString=String()+id;
 	mDir=(void*)zzip_dir_open_ext_io(idString.c_str(),NULL,NULL,(zzip_plugin_io_handlers*)mIO);
 
+	if(mDir!=NULL){
+		ZZIP_DIRENT *dir=NULL;
+		while((dir=zzip_readdir((ZZIP_DIR*)mDir))!=NULL){
+			mEntries.add(dir->d_name);
+		}
+		zzip_rewinddir((ZZIP_DIR*)mDir);
+	}
+
 	return mDir!=NULL;
 }
 
@@ -163,16 +171,6 @@ Stream::ptr ZIPArchive::openStream(const String &name){
 	else{
 		return NULL;
 	}
-}
-
-Collection<String>::ptr ZIPArchive::getEntries(){
-	Collection<String>::ptr entries(new Collection<String>());
-	ZZIP_DIRENT *dir=NULL;
-	while((dir=zzip_readdir((ZZIP_DIR*)mDir))!=NULL){
-		entries->add(dir->d_name);
-	}
-	zzip_rewinddir((ZZIP_DIR*)mDir);
-	return entries;
 }
 
 }
