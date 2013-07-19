@@ -64,6 +64,18 @@ public:
 		return *this;
 	}
 
+	inline bool equals(const Viewport &v) const{
+		return (v.x==x && v.y==y && v.width==width && v.height==height && v.empty==empty);
+	}
+
+	inline bool operator==(const Viewport &v) const{
+		return equals(v);
+	}
+
+	inline bool operator!=(const Viewport &v) const{
+		return !equals(v);
+	}
+
 	int x;
 	int y;
 	int width;

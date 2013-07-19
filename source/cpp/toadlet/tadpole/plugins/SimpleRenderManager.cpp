@@ -63,8 +63,10 @@ void SimpleRenderManager::renderScene(RenderDevice *device,Node *node,Camera *ca
 		viewport.width=device->getRenderTarget()->getWidth();
 		viewport.height=device->getRenderTarget()->getHeight();
 	}
-	device->setViewport(viewport);
-	mParams->setViewport(viewport);
+	if(mParams->getViewport()!=viewport){
+		device->setViewport(viewport);
+		mParams->setViewport(viewport);
+	}
 
 	gatherRenderables(mRenderableSet,node,camera);
 
