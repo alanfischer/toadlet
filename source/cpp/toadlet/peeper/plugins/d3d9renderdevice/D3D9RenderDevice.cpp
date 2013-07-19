@@ -265,7 +265,7 @@ ShaderState *D3D9RenderDevice::createShaderState(){
 
 bool D3D9RenderDevice::setRenderTarget(RenderTarget *target){
 	D3D9RenderTarget *d3dtarget=target!=NULL?(D3D9RenderTarget*)target->getRootRenderTarget():NULL;
-	if(d3dtarget==NULL){
+	if(d3dtarget==NULL || mRenderTarget==target){
 		return false;
 	}
 

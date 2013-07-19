@@ -194,7 +194,7 @@ ShaderState *D3D10RenderDevice::createShaderState(){
 
 bool D3D10RenderDevice::setRenderTarget(RenderTarget *target){
 	D3D10RenderTarget *d3dtarget=target!=NULL?(D3D10RenderTarget*)target->getRootRenderTarget():NULL;
-	if(d3dtarget==NULL){
+	if(d3dtarget==NULL || mRenderTarget==target){
 		return false;
 	}
 

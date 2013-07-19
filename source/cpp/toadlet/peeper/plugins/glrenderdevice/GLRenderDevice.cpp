@@ -528,7 +528,7 @@ void GLRenderDevice::setMatrix(MatrixType type,const Matrix4x4 &matrix){
 
 bool GLRenderDevice::setRenderTarget(RenderTarget *target){
 	GLRenderTarget *gltarget=target!=NULL?(GLRenderTarget*)target->getRootRenderTarget():NULL;
-	if(gltarget==NULL){
+	if(gltarget==NULL || mRenderTarget==target){
 		return false;
 	}
 
