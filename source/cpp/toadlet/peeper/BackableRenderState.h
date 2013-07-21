@@ -46,6 +46,8 @@ public:
 	virtual bool create(){return true;}
 	virtual void destroy();
 
+	int getSetStates() const{return ((mBlendState!=NULL)<<StateType_BLEND) | ((mDepthState!=NULL)<<StateType_DEPTH) | ((mRasterizerState!=NULL)<<StateType_RASTERIZER) | ((mFogState!=NULL)<<StateType_FOG) | ((mPointState!=NULL)<<StateType_POINT) | ((mMaterialState!=NULL)<<StateType_MATERIAL);}
+
 	virtual void setBlendState(const BlendState &state){
 		if(mBlendState==NULL){mBlendState=new BlendState(state);}else{mBlendState->set(state);}
 		if(mBack!=NULL){mBack->setBlendState(state);}

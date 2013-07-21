@@ -135,20 +135,23 @@ void SpriteComponent::transformChanged(Transform *transform){
 	}
 }
 
-RenderState::ptr SpriteComponent::getSharedRenderState(){
-	if(mSharedRenderState==NULL){
-		mSharedRenderState=mEngine->getMaterialManager()->createRenderState();
-		int i;
+void SpriteComponent::setSharedRenderState(RenderState::ptr renderState){
+	int i;
+	if(renderState==NULL){
+		renderState=mEngine->getMaterialManager()->createRenderState();
 		for(i=0;i<mMaterials.size();++i){
 			if(mMaterials[i]!=NULL){
-				mEngine->getMaterialManager()->modifyRenderState(mSharedRenderState,mMaterials[i]->getRenderState());
-
-				mMaterials[i]=mEngine->getMaterialManager()->createSharedMaterial(mMaterials[i],mSharedRenderState);
+				mEngine->getMaterialManager()->modifyRenderState(renderState,mMaterials[i]->getRenderState());
 			}
 		}
 	}
 
-	return mSharedRenderState;
+	mSharedRenderState=renderState;
+	for(i=0;i<mMaterials.size();++i){
+		if(mMaterials[i]!=NULL){
+			mMaterials[i]=mEngine->getMaterialManager()->createSharedMaterial(mMaterials[i],mSharedRenderState);
+		}
+	}
 }
 
 void SpriteComponent::gatherRenderables(Camera *camera,RenderableSet *set){

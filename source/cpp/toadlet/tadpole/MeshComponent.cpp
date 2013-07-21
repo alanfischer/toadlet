@@ -234,19 +234,21 @@ void MeshComponent::transformChanged(Transform *transform){
 	}
 }
 
-RenderState::ptr MeshComponent::getSharedRenderState(){
-	if(mSharedRenderState==NULL){
-		mSharedRenderState=mEngine->getMaterialManager()->createRenderState();
-		int i;
+void MeshComponent::setSharedRenderState(RenderState::ptr renderState){
+	int i;
+	if(renderState==NULL){
+		renderState=mEngine->getMaterialManager()->createRenderState();
 		for(i=0;i<mSubMeshes.size();++i){
 			if(i==0){
-				mEngine->getMaterialManager()->modifyRenderState(mSharedRenderState,mSubMeshes[i]->mMaterial->getRenderState());
+				mEngine->getMaterialManager()->modifyRenderState(renderState,mSubMeshes[i]->mMaterial->getRenderState());
 			}
-			mSubMeshes[i]->mMaterial=mEngine->getMaterialManager()->createSharedMaterial(mSubMeshes[i]->mMaterial,mSharedRenderState);
 		}
 	}
 
-	return mSharedRenderState;
+	mSharedRenderState=renderState;
+	for(i=0;i<mSubMeshes.size();++i){
+		mSubMeshes[i]->mMaterial=mEngine->getMaterialManager()->createSharedMaterial(mSubMeshes[i]->mMaterial,mSharedRenderState);
+	}
 }
 
 void MeshComponent::gatherRenderables(Camera *camera,RenderableSet *set){

@@ -89,10 +89,10 @@ BaseApplication::BaseApplication():
 	mapKeyNames(mKeyToName,mNameToKey);
 	
 	mFormat=WindowRenderTargetFormat::ptr(new WindowRenderTargetFormat());
-	mFormat->setPixelFormat(TextureFormat::Format_RGBA_8);
+	mFormat->setPixelFormat(TextureFormat::Format_RGB_5_6_5);
 	mFormat->setDepthBits(16);
-	mFormat->setMultisamples(2);
-	mFormat->setThreads(2);
+	mFormat->setMultisamples(1);
+	mFormat->setThreads(1);
 	#if defined(TOADLET_DEBUG)
 		mFormat->setDebug(true);
 	#else
@@ -224,8 +224,8 @@ bool BaseApplication::createContextAndRenderDevice(const String &plugin){
 			return false;
 		}
 
-		// Shader performance is quite poor, force fixed until we can just prefer fixed
 		if(info->getDescription()=="Intel(R) HD Graphics Family"/* && info->getVersion()=="3.0.0 - Build 8.15.10.2342"*/){
+			Log::alert(Categories::TOADLET_PAD,"Shader performance is quite poor, force fixed until we can just prefer fixed");
 			mEngine->setHasMaximumShader(false);
 		}
 	}

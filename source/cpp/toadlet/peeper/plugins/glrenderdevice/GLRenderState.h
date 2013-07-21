@@ -45,8 +45,9 @@ public:
 	RenderState *getRootRenderState(){return this;}
 
 	bool create(){return true;}
-
 	void destroy();
+
+	int getSetStates() const{return ((mBlendState!=NULL)<<StateType_BLEND) | ((mDepthState!=NULL)<<StateType_DEPTH) | ((mRasterizerState!=NULL)<<StateType_RASTERIZER) | ((mFogState!=NULL)<<StateType_FOG) | ((mPointState!=NULL)<<StateType_POINT) | ((mMaterialState!=NULL)<<StateType_MATERIAL);}
 
 	void setBlendState(const BlendState &state){if(mBlendState==NULL){mBlendState=new BlendState(state);}else{mBlendState->set(state);}}
 	bool getBlendState(BlendState &state) const{if(mBlendState==NULL){return false;}else{state.set(*mBlendState);return true;}}
