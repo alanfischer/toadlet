@@ -638,30 +638,32 @@ void GLRenderDevice::endScene(){
 		}
 	}
 
-	#if defined(TOADLET_HAS_GLIBOS)
-		if(mIBOs){
-			glBindBuffer(GL_ELEMENT_ARRAY_BUFFER,0);
-		}
-	#endif
-	#if defined(TOADLET_HAS_GLVBOS)
-		if(mVBOs){
-			glBindBuffer(GL_ARRAY_BUFFER,0);
-		}
-	#endif
-	#if defined(TOADLET_HAS_GLPBOS)
-		if(mPBOs){
-			glBindBuffer(GL_PIXEL_UNPACK_BUFFER,0);
-		}
-	#endif
-	#if defined(TOADLET_HAS_GLUBOS)
-		if(mUBOs){
-			glBindBuffer(GL_UNIFORM_BUFFER,0);
-		}
-	#endif
-	#if defined(TOADLET_HAS_GLSL)
-		if(mCaps.hasShader[Shader::ShaderType_VERTEX]){
-			glUseProgram(0);
-		}
+	#if defined(TOADLET_HAS_FIXED)
+		#if defined(TOADLET_HAS_GLIBOS)
+			if(mIBOs){
+				glBindBuffer(GL_ELEMENT_ARRAY_BUFFER,0);
+			}
+		#endif
+		#if defined(TOADLET_HAS_GLVBOS)
+			if(mVBOs){
+				glBindBuffer(GL_ARRAY_BUFFER,0);
+			}
+		#endif
+		#if defined(TOADLET_HAS_GLPBOS)
+			if(mPBOs){
+				glBindBuffer(GL_PIXEL_UNPACK_BUFFER,0);
+			}
+		#endif
+		#if defined(TOADLET_HAS_GLUBOS)
+			if(mUBOs){
+				glBindBuffer(GL_UNIFORM_BUFFER,0);
+			}
+		#endif
+		#if defined(TOADLET_HAS_GLSL)
+			if(mCaps.hasShader[Shader::ShaderType_VERTEX]){
+				glUseProgram(0);
+			}
+		#endif
 	#endif
 
 	TOADLET_CHECK_GLERROR("endScene");
@@ -870,7 +872,7 @@ void GLRenderDevice::setDefaultState(){
 	}
 
 	// GL specific states
-	#if !defined(TOADLET_HAS_GLES) && defined(TOADLET_HAS_GL_11)
+	#if defined(TOADLET_HAS_GLFIXED) && !defined(TOADLET_HAS_GLES) && defined(TOADLET_HAS_GL_11)
 	if(gl_version>=11){
 		glLightModeli(GL_LIGHT_MODEL_COLOR_CONTROL,GL_SEPARATE_SPECULAR_COLOR);
 	}
@@ -965,7 +967,7 @@ void GLRenderDevice::setDepthState(const DepthState &state){
 		glEnable(GL_DEPTH_TEST);
 	}
 
-	glDepthMask(state.write?GL_TRUE:GL_FALSE);
+	glDepthMask(state.write);
 
 	TOADLET_CHECK_GLERROR("setDepthState");
 }
@@ -1396,9 +1398,11 @@ void GLRenderDevice::setTexture(Shader::ShaderType shaderType,int i,Texture *tex
 		}
 
 		// Always re-enable the texture, since it can get glDisabled in mipmap generation
-		if(textureTarget!=0){
-			glEnable(textureTarget);
-		}
+		#if defined(TOADLET_HAS_GLFIXED)
+			if(textureTarget!=0){
+				glEnable(textureTarget);
+			}
+		#endif
 	}
 	else{
 		if(mLastTextures[i]!=NULL){
@@ -1406,8 +1410,10 @@ void GLRenderDevice::setTexture(Shader::ShaderType shaderType,int i,Texture *tex
 		}
 
 		if(mLastTexTargets[i]!=0){
-			glBindTexture(mLastTexTargets[i],0);
-			glDisable(mLastTexTargets[i]);
+			#if defined(TOADLET_HAS_GLFIXED)
+				glBindTexture(mLastTexTargets[i],0);
+				glDisable(mLastTexTargets[i]);
+			#endif
 			mLastTexTargets[i]=0;
 		}
 	}

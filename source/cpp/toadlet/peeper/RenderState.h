@@ -44,12 +44,30 @@ class TOADLET_API RenderState:public Resource{
 public:
 	TOADLET_INTERFACE(RenderState);
 
+	enum StateType{
+		StateType_BLEND=	0,
+		StateType_DEPTH=	1,
+		StateType_RASTERIZER=2,
+		StateType_FOG=		3,
+		StateType_POINT=	4,
+		StateType_MATERIAL=	5,
+
+		StateType_BIT_BLEND=	1<<StateType_BLEND,
+		StateType_BIT_DEPTH=	1<<StateType_DEPTH,
+		StateType_BIT_RASTERIZER=1<<StateType_RASTERIZER,
+		StateType_BIT_FOG=		1<<StateType_FOG,
+		StateType_BIT_POINT=	1<<StateType_POINT,
+		StateType_BIT_MATERIAL=	1<<StateType_MATERIAL,
+	};
+
 	virtual ~RenderState(){}
 
 	virtual RenderState *getRootRenderState()=0;
 
 	virtual bool create()=0;
 	virtual void destroy()=0;
+
+	virtual int getSetStates() const=0;
 
 	virtual void setBlendState(const BlendState &state)=0;
 	virtual bool getBlendState(BlendState &state) const=0;

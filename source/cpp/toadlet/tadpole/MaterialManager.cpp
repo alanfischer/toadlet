@@ -80,16 +80,18 @@ Material::ptr MaterialManager::createSharedMaterial(Material::ptr source,RenderS
 
 			// We need to copy the Texture & Sampler states, since the shared RenderState has no knowledge of Texture or Sampler states by default
 			RenderState *srcState=srcPass->getRenderState();
-			for(int t=0;t<Shader::ShaderType_MAX;++t){
-				for(int s=0;s<srcState->getNumTextureStates((Shader::ShaderType)t);++s){
-					TextureState state;
-					srcState->getTextureState((Shader::ShaderType)t,s,state);
-					renderState->setTextureState((Shader::ShaderType)t,s,state);
-				}
-				for(int s=0;s<srcState->getNumSamplerStates((Shader::ShaderType)t);++s){
-					SamplerState state;
-					srcState->getSamplerState((Shader::ShaderType)t,s,state);
-					renderState->setSamplerState((Shader::ShaderType)t,s,state);
+			if(srcState!=NULL){
+				for(int t=0;t<Shader::ShaderType_MAX;++t){
+					for(int s=0;s<srcState->getNumTextureStates((Shader::ShaderType)t);++s){
+						TextureState state;
+						srcState->getTextureState((Shader::ShaderType)t,s,state);
+						renderState->setTextureState((Shader::ShaderType)t,s,state);
+					}
+					for(int s=0;s<srcState->getNumSamplerStates((Shader::ShaderType)t);++s){
+						SamplerState state;
+						srcState->getSamplerState((Shader::ShaderType)t,s,state);
+						renderState->setSamplerState((Shader::ShaderType)t,s,state);
+					}
 				}
 			}
 

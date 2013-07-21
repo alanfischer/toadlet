@@ -151,19 +151,21 @@ void BSP30ModelComponent::setModel(BSP30Map *map,int index){
 	}
 }
 
-RenderState::ptr BSP30ModelComponent::getSharedRenderState(){
-	if(mSharedRenderState==NULL){
-		mSharedRenderState=mEngine->getMaterialManager()->createRenderState();
-		int i;
+void BSP30ModelComponent::setSharedRenderState(RenderState::ptr renderState){
+	int i;
+	if(renderState==NULL){
+		renderState=mEngine->getMaterialManager()->createRenderState();
 		for(i=0;i<mSubModels.size();++i){
 			if(i==0){
-				mEngine->getMaterialManager()->modifyRenderState(mSharedRenderState,mSubModels[i]->mMaterial->getRenderState());
+				mEngine->getMaterialManager()->modifyRenderState(renderState,mSubModels[i]->mMaterial->getRenderState());
 			}
-			mSubModels[i]->mMaterial=mEngine->getMaterialManager()->createSharedMaterial(mSubModels[i]->mMaterial,mSharedRenderState);
 		}
 	}
 
-	return mSharedRenderState;
+	mSharedRenderState=renderState;
+	for(i=0;i<mSubModels.size();++i){
+		mSubModels[i]->mMaterial=mEngine->getMaterialManager()->createSharedMaterial(mSubModels[i]->mMaterial,mSharedRenderState);
+	}
 }
 
 void BSP30ModelComponent::showPlanarFaces(int plane){

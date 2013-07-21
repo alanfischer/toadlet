@@ -412,19 +412,21 @@ void StudioModelComponent::traceSegment(PhysicsCollision &result,const Vector3 &
 	}
 }
 
-RenderState::ptr StudioModelComponent::getSharedRenderState(){
-	if(mSharedRenderState==NULL){
-		mSharedRenderState=mEngine->getMaterialManager()->createRenderState();
-		int i;
+void StudioModelComponent::setSharedRenderState(RenderState::ptr renderState){
+	int i;
+	if(renderState==NULL){
+		renderState=mEngine->getMaterialManager()->createRenderState();
 		for(i=0;i<mSubModels.size();++i){
 			if(i==0){
-				mEngine->getMaterialManager()->modifyRenderState(mSharedRenderState,mSubModels[i]->mMaterial->getRenderState());
+				mEngine->getMaterialManager()->modifyRenderState(renderState,mSubModels[i]->mMaterial->getRenderState());
 			}
-			mSubModels[i]->mMaterial=mEngine->getMaterialManager()->createSharedMaterial(mSubModels[i]->mMaterial,mSharedRenderState);
 		}
 	}
 
-	return mSharedRenderState;
+	mSharedRenderState=renderState;
+	for(i=0;i<mSubModels.size();++i){
+		mSubModels[i]->mMaterial=mEngine->getMaterialManager()->createSharedMaterial(mSubModels[i]->mMaterial,mSharedRenderState);
+	}
 }
 
 void StudioModelComponent::gatherRenderables(Camera *camera,RenderableSet *set){

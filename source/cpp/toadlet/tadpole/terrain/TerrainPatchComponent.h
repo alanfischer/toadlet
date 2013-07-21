@@ -135,7 +135,8 @@ public:
 	// Visible
 	bool getRendered() const{return true;}
 	void setRendered(bool rendered){}
-	RenderState::ptr getSharedRenderState(){return NULL;}
+	void setSharedRenderState(RenderState::ptr renderState){}
+	RenderState *getSharedRenderState() const{return NULL;}
 	void gatherRenderables(Camera *camera,RenderableSet *set);
 
 	// Renderable

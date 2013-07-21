@@ -60,8 +60,7 @@ void SimpleRenderManager::renderScene(RenderDevice *device,Node *node,Camera *ca
 
 	Viewport viewport=camera->getViewport();
 	if(viewport.empty){
-		viewport.width=device->getRenderTarget()->getWidth();
-		viewport.height=device->getRenderTarget()->getHeight();
+		viewport.set(0,0,device->getRenderTarget()->getWidth(),device->getRenderTarget()->getHeight());
 	}
 	if(mParams->getViewport()!=viewport){
 		device->setViewport(viewport);
@@ -91,7 +90,22 @@ void SimpleRenderManager::setupPass(RenderPass *pass,RenderDevice *device){
 		device->setShaderState(mLastShaderState);
 	}
 	if(mLastRenderState==NULL || mLastRenderState!=pass->getRenderState()){
-		mLastRenderState=pass->getRenderState();
+		RenderState *renderState=pass->getRenderState();
+		RenderState *cameraState=mCamera->getDefaultState();
+
+		if(mLastRenderState!=NULL && renderState!=NULL && cameraState!=NULL){
+			int lastBits=mLastRenderState->getSetStates();
+			int renderBits=renderState->getSetStates();
+			int cameraBits=cameraState->getSetStates();
+			int oldBits=((~renderBits) & lastBits);
+
+			if(oldBits & cameraBits){
+				mDevice->setRenderState(mCamera->getDefaultState());
+				mParams->setRenderState(mCamera->getDefaultState());
+			}
+		}
+
+		mLastRenderState=renderState;
 		device->setRenderState(mLastRenderState);
 		mParams->setRenderState(mLastRenderState);
 	}
@@ -139,7 +153,7 @@ void SimpleRenderManager::setupPassForRenderable(RenderPass *pass,RenderDevice *
 		}
 
 		if((flags&Material::MatrixFlag_ASPECT_CORRECT)!=0){
-			Viewport viewport=mParams->getViewport();
+			const Viewport &viewport=mParams->getViewport();
 			scale.x=Math::mul(scale.x,Math::div(Math::fromInt(viewport.height),Math::fromInt(viewport.width)));
 		}
 
@@ -270,12 +284,6 @@ void SimpleRenderManager::renderQueueItems(Material *material,const RenderableSe
 				setupPassForRenderable(pass,mDevice,item.renderable,item.ambient);
 			}
 			item.renderable->render(this);
-		}
-
-		if(camera->getDefaultState()!=NULL){
-			mDevice->setRenderState(camera->getDefaultState());
-			mParams->setRenderState(camera->getDefaultState());
-			mLastRenderState=NULL;
 		}
 	}
 }

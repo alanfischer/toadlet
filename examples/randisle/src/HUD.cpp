@@ -18,6 +18,7 @@ public:
 		BaseComponent::parentChanged(node);
 
 		if(mParent!=NULL && mParent->getNumVisibles()>0){
+			mParent->getVisible(0)->setSharedRenderState(NULL);
 			mState=mParent->getVisible(0)->getSharedRenderState();
 		}
 	}
@@ -205,6 +206,8 @@ public:
 			sequence->addTrack(transformTrack);
 		}
 
+		sprite->setSharedRenderState(NULL);
+
 		mDangerAnimation=new CompositeAnimation();
 		mDangerAnimation->attach(new MaterialStateAnimation(sprite->getSharedRenderState(),sequence,0));
 		mDangerAnimation->attach(new AudioGainAnimation(audio,sequence,1));
@@ -322,6 +325,7 @@ HUD::HUD(Scene *scene,Node *player,Camera *camera):Node(scene){
 			label=new LabelComponent(mEngine);
 			label->setFont(Resources::instance->wooden);
 			label->setAlignment(Font::Alignment_BIT_VCENTER|Font::Alignment_BIT_LEFT);
+			label->setSharedRenderState(NULL);
 			label->getSharedRenderState()->setMaterialState(MaterialState(Colors::BROWN));
 			node->attach(label);
 			node->setTranslate(-0.60,0.80,0);
@@ -340,6 +344,7 @@ HUD::HUD(Scene *scene,Node *player,Camera *camera):Node(scene){
 		LabelComponent::ptr label=new LabelComponent(mEngine);
 		label->setFont(Resources::instance->wooden);
 		label->setAlignment(Font::Alignment_BIT_LEFT);
+		label->setSharedRenderState(NULL);
 		label->getSharedRenderState()->setMaterialState(MaterialState(Colors::BROWN));
 		mFPS->attach(label);
 		mFPS->setTranslate(.4,-0.8,0);

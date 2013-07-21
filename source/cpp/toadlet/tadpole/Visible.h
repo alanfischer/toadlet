@@ -41,7 +41,8 @@ public:
 
 	virtual bool getRendered() const=0;
 	virtual void setRendered(bool visible)=0;
-	virtual RenderState::ptr getSharedRenderState()=0;
+	virtual void setSharedRenderState(RenderState::ptr renderState)=0;
+	virtual RenderState *getSharedRenderState() const=0;
 	virtual void gatherRenderables(Camera *camera,RenderableSet *set)=0;
 };
 

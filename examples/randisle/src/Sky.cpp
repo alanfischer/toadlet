@@ -27,6 +27,7 @@ Sky::Sky(Scene *scene,int cloudSize,const Vector4 &skyColor,const Vector4 &fadeC
 	{
 		mSun=new SpriteComponent(mEngine);
 		mSun->setMaterial(sunMaterial);
+		mSun->setSharedRenderState(NULL);
 		mSun->getSharedRenderState()->setBlendState(BlendState::Combination_COLOR_ADDITIVE);
 		mSun->getSharedRenderState()->setMaterialState(MaterialState(false));
 		mSun->getSharedRenderState()->setDepthState(DepthState(DepthState::DepthTest_ALWAYS,false));

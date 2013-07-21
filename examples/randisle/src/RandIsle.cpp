@@ -563,6 +563,7 @@ void RandIsle::updateProps(){
 		}
 
 		for(int j=0;j<prop->getNumVisibles();++j){
+			prop->getVisible(j)->setSharedRenderState(NULL);
 			prop->getVisible(j)->getSharedRenderState()->setMaterialState(MaterialState(Vector4(Math::ONE,Math::ONE,Math::ONE,a)));
 		}
 	}
