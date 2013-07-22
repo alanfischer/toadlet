@@ -95,6 +95,9 @@ void DecalShadowRenderManager::interRenderRenderables(RenderableSet *set,RenderD
 	}
 
 	RenderPath *path=mMaterial->getBestPath();
+	if(path==NULL){
+		return;
+	}
 	int numPasses=path->getNumPasses();
 	int pi,ni,vi;
 	for(pi=0;pi<numPasses;++pi){

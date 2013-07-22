@@ -262,7 +262,7 @@
 #endif
 
 #if defined(TOADLET_HAS_GL_11)
-//	#define TOADLET_HAS_GLFIXED
+	#define TOADLET_HAS_GLFIXED
 #endif
 #if defined(TOADLET_HAS_GL_20)
 	#define TOADLET_HAS_GLSHADERS
