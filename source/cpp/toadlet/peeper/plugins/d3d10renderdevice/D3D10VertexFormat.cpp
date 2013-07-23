@@ -39,7 +39,7 @@ D3D10VertexFormat::D3D10VertexFormat(D3D10RenderDevice *renderDevice):
 	//mOffsets,
 	mVertexSize(0),
 
-	mUniqueHandle(0)
+	mRenderHandle(0)
 	//mElements
 {
 	mDevice=renderDevice;

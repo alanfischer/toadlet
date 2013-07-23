@@ -70,7 +70,7 @@ protected:
 	Collection<int> mOffsets;
 	int mVertexSize;
 
-	int mUniqueHandle;
+	int mRenderHandle;
 	Collection<GLenum> mGLDataTypes;
 	Collection<GLuint> mGLElementCounts;
 	uint32 mSemanticBits;

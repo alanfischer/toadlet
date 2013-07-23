@@ -155,7 +155,7 @@ bool GLSLShaderState::activate(){
 }
 
 GLSLVertexLayout *GLSLShaderState::findVertexLayout(GLVertexFormat *vertexFormat){
-	int handle=vertexFormat->mUniqueHandle;
+	int handle=vertexFormat->mRenderHandle;
 	if(handle>=mLayouts.size()){
 		mLayouts.resize(handle+1,NULL);
 	}

@@ -902,14 +902,14 @@ int D3D10RenderDevice::getVariableFormat(const D3D10_SHADER_TYPE_DESC &type){
 
 void D3D10RenderDevice::vertexFormatCreated(D3D10VertexFormat *format){
 	int handle=mVertexFormats.size();
-	format->mUniqueHandle=handle;
+	format->mRenderHandle=handle;
 	mVertexFormats.resize(handle+1);
 	mVertexFormats[handle]=format;
 }
 
 void D3D10RenderDevice::vertexFormatDestroyed(D3D10VertexFormat *format){
-	int handle=format->mUniqueHandle;
-	if(handle==-1){
+	int handle=format->mRenderHandle;
+	if(handle==-1 || mVertexFormats[handle]!=format){
 		return;
 	}
 
@@ -925,7 +925,7 @@ void D3D10RenderDevice::vertexFormatDestroyed(D3D10VertexFormat *format){
 		}
 	}
 	for(i=handle;i<mVertexFormats.size();++i){
-		mVertexFormats[i]->mUniqueHandle--;
+		mVertexFormats[i]->mRenderHandle--;
 	}
 	mVertexFormats.removeAt(handle);
 }
