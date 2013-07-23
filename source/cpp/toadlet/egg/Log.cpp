@@ -32,10 +32,16 @@ Logger *Log::mTheLogger=NULL;
 
 Logger *Log::getInstance(){
 	if(mTheLogger==NULL){
-		mTheLogger=new Logger();
+		initialize();
 	}
 
 	return mTheLogger;
+}
+
+void Log::initialize(bool startSilent){
+	if(mTheLogger==NULL){
+		mTheLogger=new Logger(startSilent);
+	}
 }
 
 void Log::destroy(){

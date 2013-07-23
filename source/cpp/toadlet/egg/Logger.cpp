@@ -49,11 +49,15 @@
 namespace toadlet{
 namespace egg{
 
-Logger::Logger(){
-	mLoggedMessage=false;
-	mReportingLevel=Level_MAX;
-	mOutputLogEntry=true;
-	mStoreLogEntry=false;
+Logger::Logger(bool startSilent):
+	mOutputLogEntry(true),
+	mStoreLogEntry(false),
+	mReportingLevel(Level_MAX)
+{
+	if(startSilent==false){
+		String line=String("creating toadlet.egg.Logger:")+Version::STRING;
+		addCompleteLogEntry(NULL,Level_DISABLED,line);
+	}
 }
 
 Logger::~Logger(){
@@ -80,7 +84,9 @@ Logger::~Logger(){
 void Logger::setMasterReportingLevel(Level level){
 	mReportingLevel=level;
 
-	addLogEntry(Categories::TOADLET_EGG_LOGGER,Level_DISABLED,String("Master Reporting Level is ")+level);
+	lock();
+		addCompleteLogEntry(NULL,Level_DISABLED,String("Master Reporting Level is ")+level);
+	unlock();
 }
 
 void Logger::setCategoryReportingLevel(const String &categoryName,Level level){
@@ -142,20 +148,6 @@ void Logger::addLogEntry(const String &categoryName,Level level,const String &te
 	Category *category=getCategory(categoryName);
 	lock();
 		if((category==NULL || category->reportingLevel>=level) && mReportingLevel>=level){
-			if(mLoggedMessage==false){
-				mLoggedMessage=true;
-
-				String line="creating "+Categories::TOADLET_EGG_LOGGER+":"+Version::STRING;
-				
-				int loggerLevel=Level_DISABLED;
-				unlock();
-					loggerLevel=getCategoryReportingLevel(Categories::TOADLET_EGG_LOGGER);
-				lock();
-				if(loggerLevel>Level_DISABLED){
-					addCompleteLogEntry(NULL,Level_DISABLED,line);
-				}
-			}
-
 			addCompleteLogEntry(category,level,text);
 		}
 	unlock();

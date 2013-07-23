@@ -81,7 +81,7 @@ public:
 		String text;
 	};
 
-	Logger();
+	Logger(bool startSilent);
 	virtual ~Logger();
 
 	void setMasterReportingLevel(Level level);
@@ -127,7 +127,6 @@ private:
 	bool mOutputLogEntry;
 	bool mStoreLogEntry;
 	Level mReportingLevel;
-	bool mLoggedMessage;
 	egg::Collection<Entry*> mLogEntries;
 	CategoryNameCategoryMap mCategoryNameCategoryMap;
 	#if defined(TOADLET_PLATFORM_OSX)
