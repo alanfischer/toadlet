@@ -223,21 +223,20 @@ public:
 
 	bool equals(const String &string) const;
 	inline bool operator==(const String &string) const{return equals(string);}
-	bool operator!=(const String &string) const;
+	inline bool operator!=(const String &string) const{return !equals(string);}
 
 	bool equals(const char *text) const;
 	inline bool operator==(const char *text) const{return equals(text);}
-	bool operator!=(const char *text) const;
+	inline bool operator!=(const char *text) const{return !equals(text);}
 
 	inline bool equals(const unsigned char *text) const{return equals((const char*)text);}
 	inline bool operator==(const unsigned char *text) const{return equals((const char*)text);}
-	inline bool operator!=(const unsigned char *text) const{return operator!=((const char*)text);}
+	inline bool operator!=(const unsigned char *text) const{return !equals((const char*)text);}
 
 	bool internal_equals(const stringchar *text) const;
-	bool internal_notequals(const stringchar *text) const;
 	inline bool equals(const wchar *text) const{return internal_equals((const stringchar*)text);}
 	inline bool operator==(const wchar *text) const{return internal_equals((const stringchar*)text);}
-	inline bool operator!=(const wchar *text) const{return internal_notequals((const stringchar*)text);}
+	inline bool operator!=(const wchar *text) const{return !internal_equals((const stringchar*)text);}
 
 	bool operator<(const String &string) const;
 
