@@ -40,7 +40,7 @@ GLVertexFormat::GLVertexFormat(GLRenderDevice *renderDevice):
 	//mOffsets,
 	mVertexSize(0),
 
-	mUniqueHandle(0),
+	mRenderHandle(0),
 	//mGLDataTypes,
 	//mGLElementCount,
 	mSemanticBits(0)

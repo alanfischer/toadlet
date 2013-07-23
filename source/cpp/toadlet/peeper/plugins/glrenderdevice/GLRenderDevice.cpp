@@ -2558,14 +2558,14 @@ int GLRenderDevice::getVariableFormat(GLuint type){
 
 void GLRenderDevice::vertexFormatCreated(GLVertexFormat *format){
 	int handle=mVertexFormats.size();
-	format->mUniqueHandle=handle;
+	format->mRenderHandle=handle;
 	mVertexFormats.resize(handle+1);
 	mVertexFormats[handle]=format;
 }
 
 void GLRenderDevice::vertexFormatDestroyed(GLVertexFormat *format){
-	int handle=format->mUniqueHandle;
-	if(handle==-1){
+	int handle=format->mRenderHandle;
+	if(handle==-1 || mVertexFormats[handle]!=format){
 		return;
 	}
 
@@ -2583,7 +2583,7 @@ void GLRenderDevice::vertexFormatDestroyed(GLVertexFormat *format){
 		}
 	#endif
 	for(i=handle;i<mVertexFormats.size();++i){
-		mVertexFormats[i]->mUniqueHandle--;
+		mVertexFormats[i]->mRenderHandle--;
 	}
 	mVertexFormats.removeAt(handle);
 }

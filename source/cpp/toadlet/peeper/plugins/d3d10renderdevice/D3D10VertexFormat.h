@@ -70,7 +70,7 @@ protected:
 	Collection<int> mOffsets;
 	int mVertexSize;
 
-	int mUniqueHandle;
+	int mRenderHandle;
 	Collection<D3D10_INPUT_ELEMENT_DESC> mElements;
 
 	friend class D3D10RenderDevice;

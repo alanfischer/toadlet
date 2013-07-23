@@ -110,7 +110,7 @@ void BackableVertexFormat::setBack(VertexFormat::ptr back){
 
 	mBack=back;
 	
-	if(mBack!=NULL && mSemantics.size()>0){
+	if(mBack!=NULL){
 		mBack->create();
 		int i;
 		for(i=0;i<mSemantics.size();++i){
