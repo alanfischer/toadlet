@@ -118,17 +118,6 @@ Engine::Engine(void *env,void *ctx):
 	mAudioDevice(NULL),
 	mAudioDeviceChanged(false)
 {
-	Logger *logger=Log::getInstance();
-	logger->addCategory(Categories::TOADLET_EGG_LOGGER);
-	logger->addCategory(Categories::TOADLET_EGG);
-	logger->addCategory(Categories::TOADLET_FLICK);
-	logger->addCategory(Categories::TOADLET_HOP);
-	logger->addCategory(Categories::TOADLET_KNOT);
-	logger->addCategory(Categories::TOADLET_PEEPER);
-	logger->addCategory(Categories::TOADLET_RIBBIT);
-	logger->addCategory(Categories::TOADLET_TADPOLE);
-	logger->addCategory(Categories::TOADLET_PAD);
-
 	Log::debug(Categories::TOADLET_TADPOLE,
 		String("allocating ")+Categories::TOADLET_TADPOLE+".Engine:"+Version::STRING);
 
