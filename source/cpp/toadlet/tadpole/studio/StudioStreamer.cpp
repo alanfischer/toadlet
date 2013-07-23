@@ -169,14 +169,34 @@ void StudioStreamer::buildTextures(StudioModel *model){
 }
 
 void StudioStreamer::buildMaterials(StudioModel *model){
+	RenderState::ptr smoothRenderState,flatRenderState;
+
 	model->materials.resize(model->header->numtextures);
 	int i;
 	for(i=0;i<model->header->numtextures;i++){
 		studiotexture *stexture=model->texture(i);
 
-		RenderState::ptr renderState=mEngine->getMaterialManager()->createRenderState();
-		renderState->setRasterizerState(RasterizerState(RasterizerState::CullType_FRONT));
-		renderState->setMaterialState(MaterialState(true,false,(stexture->flags&STUDIO_NF_FLATSHADE)!=0?MaterialState::ShadeType_FLAT:MaterialState::ShadeType_GOURAUD));
+		RenderState::ptr renderState;
+		if((stexture->flags&STUDIO_NF_FLATSHADE)!=0){
+			if(flatRenderState==NULL){
+				flatRenderState=mEngine->getMaterialManager()->createRenderState();
+				if(flatRenderState!=NULL){
+					flatRenderState->setRasterizerState(RasterizerState(RasterizerState::CullType_FRONT));
+					flatRenderState->setMaterialState(MaterialState(true,false,MaterialState::ShadeType_FLAT));
+				}
+			}
+			renderState=flatRenderState;
+		}
+		else{
+			if(smoothRenderState==NULL){
+				smoothRenderState=mEngine->getMaterialManager()->createRenderState();
+				if(smoothRenderState!=NULL){
+					smoothRenderState->setRasterizerState(RasterizerState(RasterizerState::CullType_FRONT));
+					smoothRenderState->setMaterialState(MaterialState(true,false,MaterialState::ShadeType_GOURAUD));
+				}
+			}
+			renderState=smoothRenderState;
+		}
 
 		model->materials[i]=mEngine->createDiffuseMaterial(model->textures[i],renderState);
 		model->materials[i]->setName(stexture->name);
