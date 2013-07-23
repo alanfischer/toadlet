@@ -622,14 +622,20 @@ void String::internal_addassign(const stringchar *text){
 }
 
 bool String::equals(const String &string) const{
+	if(mData==NULL){
+		return string.mLength==0;
+	}
+	if(string.mData==NULL){
+		return mLength==0;
+	}
+
 	return TOADLET_WCSCMP((wchar_t*)mData,(wchar_t*)string.mData)==0;
 }
 
-bool String::operator!=(const String &string) const{
-	return TOADLET_WCSCMP((wchar_t*)mData,(wchar_t*)string.mData)!=0;
-}
-
 bool String::equals(const char *text) const{
+	if(mData==NULL){
+		return text==NULL || *text==0;
+	}
 	if(text==NULL){
 		return mLength==0;
 	}
@@ -642,33 +648,15 @@ bool String::equals(const char *text) const{
 	return (data[i]-text[i])==0;
 }
 
-bool String::operator!=(const char *text) const{
-	if(text==NULL){
-		return mLength!=0;
-	}
-
-	stringchar *data=mData;
-	int i=0;
-	while (data[i]==text[i] && data[i]!=0){
-		i++;
-	}
-	return (data[i]-text[i])!=0;
-}
-
 bool String::internal_equals(const stringchar *text) const{
+	if(mData==NULL){
+		return text==NULL || *text==0;
+	}
 	if(text==NULL){
-		return mLength!=0;
+		return mLength==0;
 	}
 
 	return TOADLET_WCSCMP((wchar_t*)mData,(wchar_t*)text)==0;
-}
-
-bool String::internal_notequals(const stringchar *text) const{
-	if(text==NULL){
-		return mLength!=0;
-	}
-
-	return TOADLET_WCSCMP((wchar_t*)mData,(wchar_t*)text)!=0;
 }
 
 bool String::operator<(const String &string) const{

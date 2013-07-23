@@ -342,8 +342,7 @@ Logger::Category *Logger::addCategory(const String &categoryName){
 }
 
 Logger::Category *Logger::getCategory(const String &categoryName){
-	// In case the Logger is called after our static categoryNames have been freed, this can help prevent a crash
-	if(categoryName.wc_str()==NULL) return NULL;
+	if(categoryName==(char*)NULL) return NULL;
 
 	Category *category=NULL;
 	lock();
