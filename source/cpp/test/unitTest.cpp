@@ -6,4 +6,6 @@ int main(int argc,char **argv){
 	ContainerTest().run();
 	MathTest().run();
 	NodeTest().run();
+
+	Log::destroy();
 }
