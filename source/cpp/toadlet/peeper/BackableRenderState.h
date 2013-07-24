@@ -30,7 +30,7 @@
 #include <toadlet/egg/BaseResource.h>
 #include <toadlet/peeper/RenderState.h>
 
-#define FULLY_BACKED
+//#define FULLY_BACKED
 
 namespace toadlet{
 namespace peeper{

@@ -124,6 +124,10 @@ bool D3D9RenderDevice::create(RenderTarget *target,int options){
 	mRenderTarget=target;
 	mD3DRenderTarget=d3dtarget;
 
+	if(mD3DRenderTarget!=NULL){
+		mD3DRenderTarget->activate();
+	}
+
 	ZeroMemory(&mD3DCaps,sizeof(mD3DCaps));
 	HRESULT result=mD3DDevice->GetDeviceCaps(&mD3DCaps);
 	TOADLET_CHECK_D3D9ERROR(result,"Error getting caps");

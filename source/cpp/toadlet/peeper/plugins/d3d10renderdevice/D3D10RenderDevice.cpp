@@ -96,6 +96,10 @@ bool D3D10RenderDevice::create(RenderTarget *target,int options){
 	mRenderTarget=target;
 	mD3DRenderTarget=d3dtarget;
 
+	if(mD3DRenderTarget!=NULL){
+		mD3DRenderTarget->activate();
+	}
+
 	RenderCaps &caps=mCaps;
 	{
 		caps.resetOnResize=true;
@@ -116,14 +120,14 @@ bool D3D10RenderDevice::create(RenderTarget *target,int options){
 		caps.hasShader[Shader::ShaderType_GEOMETRY]=true;
 	}
 
-	Log::alert(Categories::TOADLET_PEEPER,
-		"created D3D10RenderDevice");
-
 	mDefaultState=new D3D10RenderState(this);
 	mDefaultState->setBlendState(BlendState());
 	mDefaultState->setDepthState(DepthState());
 	mDefaultState->setRasterizerState(RasterizerState());
 	setRenderState(mDefaultState);
+	
+	Log::alert(Categories::TOADLET_PEEPER,
+		"created D3D10RenderDevice");
 
 	return true;
 }
