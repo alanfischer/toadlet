@@ -119,8 +119,18 @@ void SkyBoxMaterialCreator::createShaders(){
 		"}"
 	};
 
-	mSkyBoxVertexShader=mEngine->getShaderManager()->createShader(Shader::ShaderType_VERTEX,profiles,skyBoxVertexCode,2);
-	mSkyBoxFragmentShader=mEngine->getShaderManager()->createShader(Shader::ShaderType_FRAGMENT,profiles,skyBoxFragmentCode,2);
+	TOADLET_TRY
+		mSkyBoxVertexShader=mEngine->getShaderManager()->createShader(Shader::ShaderType_VERTEX,profiles,skyBoxVertexCode,2);
+	TOADLET_CATCH_ANONYMOUS(){}
+	TOADLET_TRY
+		mSkyBoxFragmentShader=mEngine->getShaderManager()->createShader(Shader::ShaderType_FRAGMENT,profiles,skyBoxFragmentCode,2);
+	TOADLET_CATCH_ANONYMOUS(){}
+
+	mSkyBoxShaderState=mEngine->getMaterialManager()->createShaderState();
+	if(mSkyBoxShaderState!=NULL){
+		mSkyBoxShaderState->setShader(Shader::ShaderType_VERTEX,mSkyBoxVertexShader);
+		mSkyBoxShaderState->setShader(Shader::ShaderType_FRAGMENT,mSkyBoxFragmentShader);
+	}
 }
 
 void SkyBoxMaterialCreator::destroyShaders(){
@@ -139,21 +149,25 @@ Resource::ptr SkyBoxMaterialCreator::create(const String &name,ResourceData *dat
 	return NULL;
 }
 
-Material::ptr SkyBoxMaterialCreator::createSkyBoxMaterial(Texture *texture,bool clamp){
+Material::ptr SkyBoxMaterialCreator::createSkyBoxMaterial(Texture *texture,bool clamp,RenderState *state){
 	Material::ptr material=new Material(mEngine->getMaterialManager());
 
-	RenderState::ptr renderState=mEngine->getMaterialManager()->createRenderState();
-	if(renderState!=NULL){
-		renderState->setBlendState(BlendState());
-		renderState->setDepthState(DepthState(DepthState::DepthTest_LEQUAL,false));
-		renderState->setRasterizerState(RasterizerState());
-		renderState->setMaterialState(MaterialState(false));
-		renderState->setFogState(FogState());
+	RenderState::ptr renderState=state;
+	if(renderState==NULL){
+		renderState=mEngine->getMaterialManager()->createRenderState();
+		if(renderState!=NULL){
+			renderState->setBlendState(BlendState());
+			renderState->setDepthState(DepthState(DepthState::DepthTest_LEQUAL,false));
+			renderState->setRasterizerState(RasterizerState());
+			renderState->setMaterialState(MaterialState(false));
+			renderState->setFogState(FogState());
+		}
 	}
 
 	createPaths(material,renderState,texture,clamp);
 
 	material->setLayer(-1);
+	material->setSort(Material::SortType_MATERIAL);
 	material->compile();
 
 	mEngine->getMaterialManager()->manage(material);
@@ -178,7 +192,7 @@ bool SkyBoxMaterialCreator::createPaths(Material *material,RenderState *renderSt
 	if(mEngine->hasShader(Shader::ShaderType_VERTEX) && mEngine->hasShader(Shader::ShaderType_FRAGMENT)){
 		RenderPath::ptr shaderPath=material->addPath("shader");
 
-		RenderPass::ptr pass=shaderPath->addPass(renderState);
+		RenderPass::ptr pass=shaderPath->addPass(renderState,mSkyBoxShaderState);
 
 		pass->setShader(Shader::ShaderType_VERTEX,mSkyBoxVertexShader);
 		pass->setShader(Shader::ShaderType_FRAGMENT,mSkyBoxFragmentShader);

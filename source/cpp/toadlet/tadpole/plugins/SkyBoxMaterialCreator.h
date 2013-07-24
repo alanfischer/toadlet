@@ -45,12 +45,13 @@ public:
 	void destroyShaders();
 
 	Resource::ptr create(const String &name,ResourceData *data,ProgressListener *listener);
-	Material::ptr createSkyBoxMaterial(Texture *texture,bool clamp);
+	Material::ptr createSkyBoxMaterial(Texture *texture,bool clamp,RenderState *renderState);
 	bool createPaths(Material *material,RenderState *renderState,Texture *texture,bool clamp);
 
 protected:
 	Engine *mEngine;
 	Shader::ptr mSkyBoxVertexShader,mSkyBoxFragmentShader;
+	ShaderState::ptr mSkyBoxShaderState;
 };
 
 }

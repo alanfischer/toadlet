@@ -103,12 +103,21 @@ void BSP30Node::setSkyTextures(const String &skyDown,const String &skyUp,const S
 		mSkyMesh=NULL;
 	}
 
-	Material::ptr down=mEngine->createSkyBoxMaterial(mEngine->getTextureManager()->findTexture(skyDown));
-	Material::ptr up=mEngine->createSkyBoxMaterial(mEngine->getTextureManager()->findTexture(skyUp));
-	Material::ptr front=mEngine->createSkyBoxMaterial(mEngine->getTextureManager()->findTexture(skyWest));
-	Material::ptr back=mEngine->createSkyBoxMaterial(mEngine->getTextureManager()->findTexture(skyEast));
-	Material::ptr right=mEngine->createSkyBoxMaterial(mEngine->getTextureManager()->findTexture(skySouth));
-	Material::ptr left=mEngine->createSkyBoxMaterial(mEngine->getTextureManager()->findTexture(skyNorth));
+	RenderState::ptr renderState=mEngine->getMaterialManager()->createRenderState();
+	if(renderState!=NULL){
+		renderState->setBlendState(BlendState());
+		renderState->setDepthState(DepthState(DepthState::DepthTest_LEQUAL,false));
+		renderState->setRasterizerState(RasterizerState());
+		renderState->setMaterialState(MaterialState(false));
+		renderState->setFogState(FogState());
+	}
+
+	Material::ptr down=mEngine->createSkyBoxMaterial(mEngine->getTextureManager()->findTexture(skyDown),true,renderState);
+	Material::ptr up=mEngine->createSkyBoxMaterial(mEngine->getTextureManager()->findTexture(skyUp),true,renderState);
+	Material::ptr front=mEngine->createSkyBoxMaterial(mEngine->getTextureManager()->findTexture(skyWest),true,renderState);
+	Material::ptr back=mEngine->createSkyBoxMaterial(mEngine->getTextureManager()->findTexture(skyEast),true,renderState);
+	Material::ptr right=mEngine->createSkyBoxMaterial(mEngine->getTextureManager()->findTexture(skySouth),true,renderState);
+	Material::ptr left=mEngine->createSkyBoxMaterial(mEngine->getTextureManager()->findTexture(skyNorth),true,renderState);
 
 	if(down!=NULL || up!=NULL || front!=NULL || back!=NULL || right!=NULL || left!=NULL){
 		Mesh::ptr mesh=mEngine->createSkyBoxMesh(1024,false,false,down,up,front,back,right,left);
