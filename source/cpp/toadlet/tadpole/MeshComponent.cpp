@@ -240,14 +240,14 @@ void MeshComponent::setSharedRenderState(RenderState::ptr renderState){
 		renderState=mEngine->getMaterialManager()->createRenderState();
 		for(i=0;i<mSubMeshes.size();++i){
 			if(i==0){
-				mEngine->getMaterialManager()->modifyRenderState(renderState,mSubMeshes[i]->mMaterial->getRenderState());
+				mEngine->getMaterialManager()->modifyRenderState(renderState,mSubMeshes[i]->mMeshSubMesh->material->getRenderState());
 			}
 		}
 	}
 
 	mSharedRenderState=renderState;
 	for(i=0;i<mSubMeshes.size();++i){
-		mSubMeshes[i]->mMaterial=mEngine->getMaterialManager()->createSharedMaterial(mSubMeshes[i]->mMaterial,mSharedRenderState);
+		mSubMeshes[i]->mMaterial=mEngine->getMaterialManager()->createSharedMaterial(mSubMeshes[i]->mMeshSubMesh->material,mSharedRenderState);
 	}
 }
 

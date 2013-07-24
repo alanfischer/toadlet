@@ -30,7 +30,7 @@
 #include <toadlet/egg/BaseResource.h>
 #include <toadlet/peeper/RenderState.h>
 
-//#define FULLY_BACKED
+#define FULLY_BACKED
 
 namespace toadlet{
 namespace peeper{
@@ -46,46 +46,70 @@ public:
 	virtual bool create(){return true;}
 	virtual void destroy();
 
-	int getSetStates() const{return ((mBlendState!=NULL)<<StateType_BLEND) | ((mDepthState!=NULL)<<StateType_DEPTH) | ((mRasterizerState!=NULL)<<StateType_RASTERIZER) | ((mFogState!=NULL)<<StateType_FOG) | ((mPointState!=NULL)<<StateType_POINT) | ((mMaterialState!=NULL)<<StateType_MATERIAL);}
+	int getSetStates() const{
+		if(mBack!=NULL){return mBack->getSetStates();}
+		else{return ((mBlendState!=NULL)<<StateType_BLEND) | ((mDepthState!=NULL)<<StateType_DEPTH) | ((mRasterizerState!=NULL)<<StateType_RASTERIZER) | ((mFogState!=NULL)<<StateType_FOG) | ((mPointState!=NULL)<<StateType_POINT) | ((mMaterialState!=NULL)<<StateType_MATERIAL);}
+	}
 
 	virtual void setBlendState(const BlendState &state){
 		if(mBlendState==NULL){mBlendState=new BlendState(state);}else{mBlendState->set(state);}
 		if(mBack!=NULL){mBack->setBlendState(state);}
 	}
-	virtual bool getBlendState(BlendState &state) const{if(mBlendState==NULL){return false;}else{state.set(*mBlendState);return true;}}
+	virtual bool getBlendState(BlendState &state) const{
+		if(mBack!=NULL){return mBack->getBlendState(state);}
+		else if(mBlendState==NULL){return false;}else{state.set(*mBlendState);return true;}
+	}
 
 	virtual void setDepthState(const DepthState &state){
 		if(mDepthState==NULL){mDepthState=new DepthState(state);}else{mDepthState->set(state);}
 		if(mBack!=NULL){mBack->setDepthState(state);}
 	}
-	virtual bool getDepthState(DepthState &state) const{if(mDepthState==NULL){return false;}else{state.set(*mDepthState);return true;}}
+	virtual bool getDepthState(DepthState &state) const{
+		if(mBack!=NULL){return mBack->getDepthState(state);}
+		else if(mDepthState==NULL){return false;}else{state.set(*mDepthState);return true;}
+	}
 
 	virtual void setRasterizerState(const RasterizerState &state){
 		if(mRasterizerState==NULL){mRasterizerState=new RasterizerState(state);}else{mRasterizerState->set(state);}
 		if(mBack!=NULL){mBack->setRasterizerState(state);}
 	}
-	virtual bool getRasterizerState(RasterizerState &state) const{if(mRasterizerState==NULL){return false;}else{state.set(*mRasterizerState);return true;}}
+	virtual bool getRasterizerState(RasterizerState &state) const{
+		if(mBack!=NULL){return mBack->getRasterizerState(state);}
+		else if(mRasterizerState==NULL){return false;}else{state.set(*mRasterizerState);return true;}
+	}
 
 	virtual void setFogState(const FogState &state){
 		if(mFogState==NULL){mFogState=new FogState(state);}else{mFogState->set(state);}
 		if(mBack!=NULL){mBack->setFogState(state);}
 	}
-	virtual bool getFogState(FogState &state) const{if(mFogState==NULL){return false;}else{state.set(*mFogState);return true;}}
+	virtual bool getFogState(FogState &state) const{
+		if(mBack!=NULL){return mBack->getFogState(state);}
+		else if(mFogState==NULL){return false;}else{state.set(*mFogState);return true;}
+	}
 
 	virtual void setPointState(const PointState &state){
 		if(mPointState==NULL){mPointState=new PointState(state);}else{mPointState->set(state);}
 		if(mBack!=NULL){mBack->setPointState(state);}
 	}
-	virtual bool getPointState(PointState &state) const{if(mPointState==NULL){return false;}else{state.set(*mPointState);return true;}}
+	virtual bool getPointState(PointState &state) const{
+		if(mBack!=NULL){return mBack->getPointState(state);}
+		else if(mPointState==NULL){return false;}else{state.set(*mPointState);return true;}
+	}
 
 	virtual void setMaterialState(const MaterialState &state){
 		if(mMaterialState==NULL){mMaterialState=new MaterialState(state);}else{mMaterialState->set(state);}
 		if(mBack!=NULL){mBack->setMaterialState(state);}
 	}
-	virtual bool getMaterialState(MaterialState &state) const{if(mMaterialState==NULL){return false;}else{state.set(*mMaterialState);return true;}}
+	virtual bool getMaterialState(MaterialState &state) const{
+		if(mBack!=NULL){return mBack->getMaterialState(state);}
+		else if(mMaterialState==NULL){return false;}else{state.set(*mMaterialState);return true;}
+	}
 
 #if defined(FULLY_BACKED)
-	virtual int getNumSamplerStates(Shader::ShaderType type) const{return mSamplerStates[type].size();}
+	virtual int getNumSamplerStates(Shader::ShaderType type) const{
+		if(mBack!=NULL){return mBack->getNumSamplerStates(type);}
+		else return mSamplerStates[type].size();
+	}
 	virtual void setSamplerState(Shader::ShaderType type,int i,const SamplerState &state){
 		if(mSamplerStates[type].size()<=i){
 			mSamplerStates[type].resize(i+1,NULL);
@@ -98,9 +122,15 @@ public:
 		}
 		if(mBack!=NULL){mBack->setSamplerState(type,i,state);}
 	}
-	virtual bool getSamplerState(Shader::ShaderType type,int i,SamplerState &state) const{if(mSamplerStates[type].size()<=i || mSamplerStates[type][i]==NULL){return false;}else{state.set(*mSamplerStates[type][i]);return true;}}
+	virtual bool getSamplerState(Shader::ShaderType type,int i,SamplerState &state) const{
+		if(mBack!=NULL){return mBack->getSamplerState(type,i,state);}
+		else if(mSamplerStates[type].size()<=i || mSamplerStates[type][i]==NULL){return false;}else{state.set(*mSamplerStates[type][i]);return true;}
+	}
 
-	virtual int getNumTextureStates(Shader::ShaderType type) const{return mTextureStates[type].size();}
+	virtual int getNumTextureStates(Shader::ShaderType type) const{
+		if(mBack!=NULL){return mBack->getNumTextureStates(type);}
+		else return mTextureStates[type].size();
+	}
 	virtual void setTextureState(Shader::ShaderType type,int i,const TextureState &state){
 		if(mTextureStates[type].size()<=i){
 			mTextureStates[type].resize(i+1,NULL);
@@ -113,21 +143,36 @@ public:
 		}
 		if(mBack!=NULL){mBack->setTextureState(type,i,state);}
 	}
-	virtual bool getTextureState(Shader::ShaderType type,int i,TextureState &state) const{if(mTextureStates[type].size()<=i || mTextureStates[type][i]==NULL){return false;}else{state.set(*mTextureStates[type][i]);return true;}}
+	virtual bool getTextureState(Shader::ShaderType type,int i,TextureState &state) const{
+		if(mBack!=NULL){return mBack->getTextureState(type,i,state);}
+		else if(mTextureStates[type].size()<=i || mTextureStates[type][i]==NULL){return false;}else{state.set(*mTextureStates[type][i]);return true;}
+	}
 #else
-	virtual int getNumSamplerStates(Shader::ShaderType type) const{return mSamplerState!=NULL?1:0;}
+	virtual int getNumSamplerStates(Shader::ShaderType type) const{
+		if(mBack!=NULL){return mBack->getNumSamplerStates(type);}
+		else return mSamplerState!=NULL?1:0;
+	}
 	virtual void setSamplerState(Shader::ShaderType type,int i,const SamplerState &state){
 		if(mSamplerState==NULL){mSamplerState=new SamplerState(state);}else{mSamplerState->set(state);}
 		if(mBack!=NULL){mBack->setSamplerState(type,i,state);}
 	}
-	virtual bool getSamplerState(Shader::ShaderType type,int i,SamplerState &state) const{if(mSamplerState==NULL){return false;}else{state.set(*mSamplerState);return true;}}
+	virtual bool getSamplerState(Shader::ShaderType type,int i,SamplerState &state) const{
+		if(mBack!=NULL){return mBack->getSamplerState(type,i,state);}
+		else if(mSamplerState==NULL){return false;}else{state.set(*mSamplerState);return true;}
+	}
 
-	virtual int getNumTextureStates(Shader::ShaderType type) const{return mTextureState!=NULL?1:0;}
+	virtual int getNumTextureStates(Shader::ShaderType type) const{
+		if(mBack!=NULL){return mBack->getNumTextureStates(type);}
+		else return mTextureState!=NULL?1:0;
+	}
 	virtual void setTextureState(Shader::ShaderType type,int i,const TextureState &state){
 		if(mTextureState==NULL){mTextureState=new TextureState(state);}else{mTextureState->set(state);}
 		if(mBack!=NULL){mBack->setTextureState(type,i,state);}
 	}
-	virtual bool getTextureState(Shader::ShaderType type,int i,TextureState &state) const{if(mTextureState==NULL){return false;}else{state.set(*mTextureState);return true;}}
+	virtual bool getTextureState(Shader::ShaderType type,int i,TextureState &state) const{
+		if(mBack!=NULL){return mBack->getTextureState(type,i,state);}
+		else if(mTextureState==NULL){return false;}else{state.set(*mTextureState);return true;}
+	}
 #endif
 
 	virtual void setBack(RenderState::ptr back);

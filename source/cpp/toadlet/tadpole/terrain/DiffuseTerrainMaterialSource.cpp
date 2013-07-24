@@ -201,9 +201,27 @@ void DiffuseTerrainMaterialSource::createShaders(){
 		"}"
 	};
 
-	mDiffuseVertexShader=mEngine->getShaderManager()->createShader(Shader::ShaderType_VERTEX,profiles,diffuseVertexCode,2);
-	mDiffuseBaseFragmentShader=mEngine->getShaderManager()->createShader(Shader::ShaderType_FRAGMENT,profiles,diffuseBaseFragmentCode,2);
-	mDiffuseLayerFragmentShader=mEngine->getShaderManager()->createShader(Shader::ShaderType_FRAGMENT,profiles,diffuseLayerFragmentCode,2);
+	TOADLET_TRY
+		mDiffuseVertexShader=mEngine->getShaderManager()->createShader(Shader::ShaderType_VERTEX,profiles,diffuseVertexCode,2);
+	TOADLET_CATCH_ANONYMOUS(){}
+	TOADLET_TRY
+		mDiffuseBaseFragmentShader=mEngine->getShaderManager()->createShader(Shader::ShaderType_FRAGMENT,profiles,diffuseBaseFragmentCode,2);
+	TOADLET_CATCH_ANONYMOUS(){}
+	TOADLET_TRY
+		mDiffuseLayerFragmentShader=mEngine->getShaderManager()->createShader(Shader::ShaderType_FRAGMENT,profiles,diffuseLayerFragmentCode,2);
+	TOADLET_CATCH_ANONYMOUS(){}
+
+	mDiffuseBaseState=mEngine->getMaterialManager()->createShaderState();
+	if(mDiffuseBaseState!=NULL){
+		mDiffuseBaseState->setShader(Shader::ShaderType_VERTEX,mDiffuseVertexShader);
+		mDiffuseBaseState->setShader(Shader::ShaderType_FRAGMENT,mDiffuseBaseFragmentShader);
+	}
+
+	mDiffuseLayerState=mEngine->getMaterialManager()->createShaderState();
+	if(mDiffuseLayerState!=NULL){
+		mDiffuseLayerState->setShader(Shader::ShaderType_VERTEX,mDiffuseVertexShader);
+		mDiffuseLayerState->setShader(Shader::ShaderType_FRAGMENT,mDiffuseLayerFragmentShader);
+	}
 }
 
 void DiffuseTerrainMaterialSource::destroy(){
@@ -220,6 +238,15 @@ void DiffuseTerrainMaterialSource::destroy(){
 	if(mDiffuseLayerFragmentShader!=NULL){
 		mDiffuseLayerFragmentShader->destroy();
 		mDiffuseLayerFragmentShader=NULL;
+	}
+
+	if(mDiffuseBaseState!=NULL){
+		mDiffuseBaseState->destroy();
+		mDiffuseBaseState=NULL;
+	}
+	if(mDiffuseLayerState!=NULL){
+		mDiffuseLayerState->destroy();
+		mDiffuseLayerState=NULL;
 	}
 }
 
@@ -288,10 +315,7 @@ Material::ptr DiffuseTerrainMaterialSource::getMaterial(TerrainPatchComponent *p
 		RenderPath::ptr shaderPath=material->addPath();
 		
 		{
-			RenderPass::ptr pass=shaderPath->addPass(baseRenderState);
-
-			pass->setShader(Shader::ShaderType_VERTEX,mDiffuseVertexShader);
-			pass->setShader(Shader::ShaderType_FRAGMENT,mDiffuseBaseFragmentShader);
+			RenderPass::ptr pass=shaderPath->addPass(baseRenderState,mDiffuseBaseState);
 
 			pass->addVariable("modelViewProjectionMatrix",RenderVariable::ptr(new MVPMatrixVariable()),Material::Scope_RENDERABLE);
 			pass->addVariable("normalMatrix",RenderVariable::ptr(new NormalMatrixVariable()),Material::Scope_RENDERABLE);
@@ -316,10 +340,7 @@ Material::ptr DiffuseTerrainMaterialSource::getMaterial(TerrainPatchComponent *p
 		for(i=1;i<numLayers;++i){
 			if(patch->getLayerTexture(i)==NULL) continue;
 
-			RenderPass::ptr pass=shaderPath->addPass(layerRenderState);
-
-			pass->setShader(Shader::ShaderType_VERTEX,mDiffuseVertexShader);
-			pass->setShader(Shader::ShaderType_FRAGMENT,mDiffuseLayerFragmentShader);
+			RenderPass::ptr pass=shaderPath->addPass(layerRenderState,mDiffuseLayerState);
 
 			pass->addVariable("modelViewProjectionMatrix",RenderVariable::ptr(new MVPMatrixVariable()),Material::Scope_RENDERABLE);
 			pass->addVariable("normalMatrix",RenderVariable::ptr(new NormalMatrixVariable()),Material::Scope_RENDERABLE);

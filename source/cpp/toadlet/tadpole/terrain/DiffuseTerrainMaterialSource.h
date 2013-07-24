@@ -57,6 +57,7 @@ public:
 protected:
 	Engine *mEngine;
 	Shader::ptr mDiffuseVertexShader,mDiffuseBaseFragmentShader,mDiffuseLayerFragmentShader;
+	ShaderState::ptr mDiffuseBaseState,mDiffuseLayerState;
 	Vector3 mDiffuseScale,mDetailScale;
 	Collection<Texture::ptr> mDiffuseTextures;
 	Texture::ptr mDetailTexture;

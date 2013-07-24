@@ -101,6 +101,8 @@ bool D3D10TextureMipPixelBuffer::create(int usage,int access,TextureFormat::ptr 
 
 void D3D10TextureMipPixelBuffer::destroy(){
 	mTexture=NULL;
+	mBufferTexture=NULL;
+	mFormat=NULL;
 
 	BaseResource::destroy();
 }
