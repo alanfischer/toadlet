@@ -634,8 +634,8 @@ Material::ptr Engine::createFontMaterial(Font *font){
 	return material;
 }
 
-Material::ptr Engine::createSkyBoxMaterial(Texture *texture,bool clamp){
-	Material::ptr material=shared_static_cast<SkyBoxMaterialCreator>(mSkyBoxMaterialCreator)->createSkyBoxMaterial(texture,clamp);
+Material::ptr Engine::createSkyBoxMaterial(Texture *texture,bool clamp,RenderState *renderState){
+	Material::ptr material=shared_static_cast<SkyBoxMaterialCreator>(mSkyBoxMaterialCreator)->createSkyBoxMaterial(texture,clamp,renderState);
 	mMaterialManager->manage(material);
 	return material;
 }

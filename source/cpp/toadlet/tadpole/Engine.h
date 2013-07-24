@@ -119,7 +119,7 @@ public:
 	Material::ptr createDiffuseMaterial(Texture *texture,RenderState *renderState=NULL);
 	Material::ptr createPointSpriteMaterial(Texture *texture,scalar size,bool attenuated);
 	Material::ptr createFontMaterial(Font *font);
-	Material::ptr createSkyBoxMaterial(Texture *texture,bool clamp=true);
+	Material::ptr createSkyBoxMaterial(Texture *texture,bool clamp=true,RenderState *renderState=NULL);
 	Material::ptr createWaterMaterial(Texture *reflectTexture,Texture *refractTexture,Texture *bumpTexture,const Vector4 &color);
 
 	Mesh::ptr createAABoxMesh(const AABox &box,Material *material=NULL);
