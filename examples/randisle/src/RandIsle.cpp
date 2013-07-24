@@ -305,6 +305,7 @@ cc->setLookDir(Vector3(0,0,0),Vector3(0,1,0),Vector3(0,0,1));
 		Node::ptr prop=new Node(mScene);
 		MeshComponent *mesh=new MeshComponent(mEngine);
 		mesh->setMesh(Resources::instance->grass);
+		mesh->setSharedRenderState(NULL);
 		prop->attach(mesh);
 		prop->setScope(prop->getScope()&~Scope_BIT_SHADOW);
 
@@ -563,7 +564,6 @@ void RandIsle::updateProps(){
 		}
 
 		for(int j=0;j<prop->getNumVisibles();++j){
-			prop->getVisible(j)->setSharedRenderState(NULL);
 			prop->getVisible(j)->getSharedRenderState()->setMaterialState(MaterialState(Vector4(Math::ONE,Math::ONE,Math::ONE,a)));
 		}
 	}

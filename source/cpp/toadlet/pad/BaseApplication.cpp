@@ -224,7 +224,7 @@ bool BaseApplication::createContextAndRenderDevice(const String &plugin){
 			return false;
 		}
 
-		if(info->getDescription()=="Intel(R) HD Graphics Family"/* && info->getVersion()=="3.0.0 - Build 8.15.10.2342"*/){
+		if(plugin=="gl" && info->getDescription()=="Intel(R) HD Graphics Family"/* && info->getVersion()=="3.0.0 - Build 8.15.10.2342"*/){
 			Log::alert(Categories::TOADLET_PAD,"Shader performance is quite poor, force fixed until we can just prefer fixed");
 			mEngine->setHasMaximumShader(false);
 		}
