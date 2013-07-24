@@ -162,7 +162,7 @@ bool D3D10Shader::destroyContext(){
 }
 
 ID3D10InputLayout *D3D10Shader::findInputLayout(D3D10VertexFormat *vertexFormat){
-	int handle=vertexFormat->mUniqueHandle;
+	int handle=vertexFormat->mRenderHandle;
 	ID3D10InputLayout *layout=NULL;
 	if(handle<mLayouts.size() && mLayouts[handle]!=NULL){
 		layout=mLayouts[handle];
