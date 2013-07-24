@@ -400,11 +400,13 @@ void BSP30Node::traceSegment(PhysicsCollision &result,const Vector3 &position,co
 void BSP30Node::render(RenderManager *manager) const{
 	int i,j;
 	for(i=0;i<mVisibleMaterialFaces.size();i++){
-		RenderPath *path=mMap->materials[i]->getBestPath();
-		for(j=0;j<path->getNumPasses();++j){
-			manager->setupPass(path->getPass(j),manager->getDevice());
-			manager->setupPassForRenderable(path->getPass(j),manager->getDevice(),(Renderable*)this,Math::ZERO_VECTOR4);
-			mMap->renderFaces(manager->getDevice(),mVisibleMaterialFaces[i]);
+		if(mVisibleMaterialFaces[i]!=NULL){
+			RenderPath *path=mMap->materials[i]->getBestPath();
+			for(j=0;j<path->getNumPasses();++j){
+				manager->setupPass(path->getPass(j),manager->getDevice());
+				manager->setupPassForRenderable(path->getPass(j),manager->getDevice(),(Renderable*)this,Math::ZERO_VECTOR4);
+				mMap->renderFaces(manager->getDevice(),mVisibleMaterialFaces[i]);
+			}
 		}
 	}
 }
