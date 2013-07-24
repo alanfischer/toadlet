@@ -189,6 +189,10 @@ bool GLRenderDevice::create(RenderTarget *target,int options){
 	mRenderTarget=target;
 	mGLRenderTarget=gltarget;
 
+	if(mGLRenderTarget!=NULL){
+		mGLRenderTarget->activate();
+	}
+
 	Log::alert(Categories::TOADLET_PEEPER,
 		String("GL_VENDOR:") + glGetString(GL_VENDOR));
 	Log::alert(Categories::TOADLET_PEEPER,
