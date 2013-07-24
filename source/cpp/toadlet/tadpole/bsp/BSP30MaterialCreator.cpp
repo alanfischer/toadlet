@@ -114,8 +114,18 @@ BSP30MaterialCreator::BSP30MaterialCreator(Engine *engine){
 		"}"
 	};
 
-	mVertexShader=engine->getShaderManager()->createShader(Shader::ShaderType_VERTEX,profiles,vertexCodes,2);
-	mFragmentShader=engine->getShaderManager()->createShader(Shader::ShaderType_FRAGMENT,profiles,fragmentCodes,2);
+	TOADLET_TRY
+		mVertexShader=engine->getShaderManager()->createShader(Shader::ShaderType_VERTEX,profiles,vertexCodes,2);
+	TOADLET_CATCH_ANONYMOUS(){}
+	TOADLET_TRY
+		mFragmentShader=engine->getShaderManager()->createShader(Shader::ShaderType_FRAGMENT,profiles,fragmentCodes,2);
+	TOADLET_CATCH_ANONYMOUS(){}
+
+	mShaderState=mEngine->getMaterialManager()->createShaderState();
+	if(mShaderState!=NULL){
+		mShaderState->setShader(Shader::ShaderType_VERTEX,mVertexShader);
+		mShaderState->setShader(Shader::ShaderType_FRAGMENT,mFragmentShader);
+	}
 }
 
 Material::ptr BSP30MaterialCreator::createBSP30Material(Texture *diffuseTexture,RenderState *state){
@@ -134,10 +144,7 @@ Material::ptr BSP30MaterialCreator::createBSP30Material(Texture *diffuseTexture,
 
 	if(mEngine->hasShader(Shader::ShaderType_VERTEX) && mEngine->hasShader(Shader::ShaderType_FRAGMENT)){
 		RenderPath::ptr shaderPath=material->addPath();
-		RenderPass::ptr pass=shaderPath->addPass(renderState);
-
-		pass->setShader(Shader::ShaderType_VERTEX,mVertexShader);
-		pass->setShader(Shader::ShaderType_FRAGMENT,mFragmentShader);
+		RenderPass::ptr pass=shaderPath->addPass(renderState,mShaderState);
 
 		pass->addVariable("modelViewProjectionMatrix",RenderVariable::ptr(new MVPMatrixVariable()),Material::Scope_RENDERABLE);
 		pass->addVariable("textureMatrix",RenderVariable::ptr(new TextureMatrixVariable("diffuseTex")),Material::Scope_MATERIAL);

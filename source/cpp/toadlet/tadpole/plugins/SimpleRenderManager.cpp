@@ -208,7 +208,8 @@ void SimpleRenderManager::renderRenderables(RenderableSet *set,RenderDevice *dev
 	mParams->setMatrix(RenderDevice::MatrixType_MODEL,Math::IDENTITY_MATRIX4X4);
 
 	if(useMaterials){
-		device->setDefaultState();
+		/// @todo: Removed this redundant step.  If we DO find issues with fixed function materials, then we should trace them down, not rely on a massive reset
+		//device->setDefaultState();
 		if(camera->getDefaultState()!=NULL){
 			device->setRenderState(camera->getDefaultState());
 			mParams->setRenderState(camera->getDefaultState());
@@ -251,8 +252,9 @@ void SimpleRenderManager::renderRenderables(RenderableSet *set,RenderDevice *dev
 	}
 
 	if(useMaterials){
+		/// @todo: Removed this redundant step.  If we DO find issues with fixed function materials, then we should trace them down, not rely on a massive reset
 		// This seems redundant, but it solves some issues with fixed function materials
-		device->setDefaultState();
+		// device->setDefaultState();
 	}
 }
 
