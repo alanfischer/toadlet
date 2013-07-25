@@ -83,9 +83,6 @@ void SpriteStreamer::buildTextures(SpriteModel *model){
 void SpriteStreamer::buildMaterials(SpriteModel *model){
 	RenderState::ptr renderState=mEngine->getMaterialManager()->createRenderState();
 	if(renderState!=NULL){
-		renderState->setBlendState(BlendState());
-		renderState->setDepthState(DepthState());
-		renderState->setRasterizerState(RasterizerState());
 		renderState->setMaterialState(MaterialState(true,false,MaterialState::ShadeType_GOURAUD));
 	}
 

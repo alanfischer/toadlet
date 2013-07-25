@@ -300,15 +300,10 @@ Material::ptr DiffuseTerrainMaterialSource::getMaterial(TerrainPatchComponent *p
 	int numLayers=patch->getNumLayers();
 
 	RenderState::ptr baseRenderState=mEngine->getMaterialManager()->createRenderState();
-	baseRenderState->setBlendState(BlendState());
-	baseRenderState->setDepthState(DepthState());
-	baseRenderState->setRasterizerState(RasterizerState());
 	baseRenderState->setMaterialState(MaterialState(true,false,MaterialState::ShadeType_GOURAUD));
 
 	RenderState::ptr layerRenderState=mEngine->getMaterialManager()->createRenderState();
 	layerRenderState->setBlendState(BlendState::Combination_ALPHA);
-	layerRenderState->setDepthState(DepthState());
-	layerRenderState->setRasterizerState(RasterizerState());
 	layerRenderState->setMaterialState(MaterialState(true,false,MaterialState::ShadeType_GOURAUD));
 
 	if(mEngine->hasShader(Shader::ShaderType_VERTEX) && mEngine->hasShader(Shader::ShaderType_FRAGMENT)){

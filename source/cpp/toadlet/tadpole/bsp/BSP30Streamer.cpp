@@ -371,7 +371,6 @@ void BSP30Streamer::buildMaterials(BSP30Map *map){
 
 	RenderState::ptr renderState=mEngine->getMaterialManager()->createRenderState();
 	if(renderState!=NULL){
-		renderState->setBlendState(BlendState());
 		renderState->setDepthState(DepthState(DepthState::DepthTest_LEQUAL,true));
 		renderState->setMaterialState(MaterialState(false,false,MaterialState::ShadeType_FLAT));
 		renderState->setRasterizerState(RasterizerState(RasterizerState::CullType_FRONT));
