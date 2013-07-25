@@ -135,7 +135,6 @@ Material::ptr BSP30MaterialCreator::createBSP30Material(Texture *diffuseTexture,
 	if(renderState==NULL){
 		renderState=mEngine->getMaterialManager()->createRenderState();
 		if(renderState!=NULL){
-			renderState->setBlendState(BlendState());
 			renderState->setDepthState(DepthState(DepthState::DepthTest_LEQUAL,true));
 			renderState->setMaterialState(MaterialState(false,false,MaterialState::ShadeType_FLAT));
 			renderState->setRasterizerState(RasterizerState(RasterizerState::CullType_FRONT));

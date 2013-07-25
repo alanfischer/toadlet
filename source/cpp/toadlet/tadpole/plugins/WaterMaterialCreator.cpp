@@ -242,8 +242,6 @@ Material::ptr WaterMaterialCreator::createWaterMaterial(Texture *reflectTexture,
 
 	RenderState::ptr renderState=mEngine->getMaterialManager()->createRenderState();
 	if(renderState!=NULL){
-		renderState->setMaterialState(MaterialState(color));
-		renderState->setBlendState(BlendState());
 		renderState->setDepthState(DepthState(DepthState::DepthTest_LEQUAL,false));
 		renderState->setRasterizerState(RasterizerState(RasterizerState::CullType_NONE));
 		renderState->setMaterialState(MaterialState(Math::ZERO_VECTOR4,Math::ONE_VECTOR4,Math::ONE_VECTOR4,128));

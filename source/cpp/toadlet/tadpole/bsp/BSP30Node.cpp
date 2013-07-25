@@ -105,9 +105,7 @@ void BSP30Node::setSkyTextures(const String &skyDown,const String &skyUp,const S
 
 	RenderState::ptr renderState=mEngine->getMaterialManager()->createRenderState();
 	if(renderState!=NULL){
-		renderState->setBlendState(BlendState());
 		renderState->setDepthState(DepthState(DepthState::DepthTest_LEQUAL,false));
-		renderState->setRasterizerState(RasterizerState());
 		renderState->setMaterialState(MaterialState(false));
 		renderState->setFogState(FogState());
 	}
