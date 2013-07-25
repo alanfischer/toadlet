@@ -1103,11 +1103,11 @@ void GLRenderDevice::setSamplerState(int i,SamplerState *state){
 }
 
 void GLRenderDevice::setTextureState(int i,TextureState *state){
-	if(i>=mCaps.maxTextureStages){
-		return;
-	}
+	if(i>=mCaps.maxTextureStages) return;
 
 #if defined(TOADLET_HAS_GLFIXED)
+	if(!activeTexture(i)) return;
+
 	if(state!=NULL){
 		// Setup texture blending
 		bool specifyColor=(state->colorOperation!=TextureState::Operation_UNSPECIFIED);
