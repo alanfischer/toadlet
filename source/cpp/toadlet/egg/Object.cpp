@@ -29,6 +29,8 @@
 	#define TOADLET_COUNT_WIN32
 #elif defined(TOADLET_THREADSAFE) && defined(TOADLET_PLATFORM_OSX)
 	#define TOADLET_COUNT_OSX
+#elif defined(TOADLET_THREADSAFE) && defined(TOADLET_COMPILER_GCC)
+	#define TOADLET_COUNT_GCC
 #elif defined(TOADLET_THREADSAFE)
 	#define TOADLET_COUNT_MUTEX
 #endif
@@ -94,6 +96,22 @@ int Object::retain(){
 	
 int Object::release(){
 	int count=OSAtomicDecrement32((int32*)&mSharedCount);
+	if(count<=0){
+		destroy();
+		delete this;
+	}
+	return count;
+}
+
+#elif defined(TOADLET_COUNT_GCC)
+
+int Object::retain(){
+	int count=__sync_fetch_and_add(&mSharedCount,1) + 1;
+	return count;
+}
+	
+int Object::release(){
+	int count=__sync_fetch_and_sub(&mSharedCount,1) - 1;
 	if(count<=0){
 		destroy();
 		delete this;
