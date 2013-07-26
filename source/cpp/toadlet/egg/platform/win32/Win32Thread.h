@@ -38,6 +38,7 @@ public:
 
 	Win32Thread();
 	Win32Thread(Runnable *r);
+	Win32Thread(Runner *r);
 	virtual ~Win32Thread();
 
 	virtual void start();

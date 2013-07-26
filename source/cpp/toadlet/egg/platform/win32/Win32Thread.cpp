@@ -55,6 +55,15 @@ Win32Thread::Win32Thread(Runnable *r):
 	mRunnable=r;
 }
 
+Win32Thread::Win32Thread(Runner *r):
+	mRunnable(NULL),
+	mRunner(r),
+	mThread(NULL)
+	//mAlive
+{
+	mRunnable=r;
+}
+
 Win32Thread::~Win32Thread(){
 }
 
@@ -77,8 +86,8 @@ bool Win32Thread::join(){
 }
 
 void Win32Thread::run(){
-	if(mRunner!=NULL){
-		mRunner->run();
+	if(mRunnable!=NULL){
+		mRunnable->run();
 	}
 }
 
@@ -90,6 +99,7 @@ void Win32Thread::internal_startRun(){
 		mThread=0;
 	}
 
+	mRunnable=NULL;
 	mRunner=NULL;
 	mAlive=NULL;
 }

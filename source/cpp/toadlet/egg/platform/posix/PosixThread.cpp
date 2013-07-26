@@ -52,6 +52,17 @@ PosixThread::PosixThread(Runnable *r):
 	mRunnable=r;
 }
 
+PosixThread::PosixThread(Runner *r):
+	//mSelf,
+	mRunnable(NULL),
+	mRunner(r)
+	//mThread(NULL),
+	//mAlive
+{
+	memset(&mThread,0,sizeof(mThread));
+	mRunnable=r;
+}
+
 PosixThread::~PosixThread(){
 	pthread_t empty;
 	memset(&empty,0,sizeof(empty));
@@ -98,6 +109,7 @@ void PosixThread::run(){
 void PosixThread::startRun(){
 	run();
 
+	mRunnable=NULL;
 	mRunner=NULL;
 	mAlive=NULL;
 }

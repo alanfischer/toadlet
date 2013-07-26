@@ -48,7 +48,6 @@ bool Win32WaitCondition::wait(Mutex *mutex){
 	ReleaseMutex(mutex->mMutex);
 	DWORD result=WaitForSingleObject(mEvent,INFINITE);
 	WaitForSingleObject(mutex->mMutex,INFINITE);
-	ResetEvent(mEvent);
 	return result==WAIT_OBJECT_0;
 }
 
@@ -56,7 +55,6 @@ bool Win32WaitCondition::wait(Mutex *mutex,int time){
 	ReleaseMutex(mutex->mMutex);
 	DWORD result=WaitForSingleObject(mEvent,time);
 	WaitForSingleObject(mutex->mMutex,INFINITE);
-	ResetEvent(mEvent);
 	return result==WAIT_OBJECT_0;
 }
 
