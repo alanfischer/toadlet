@@ -159,11 +159,15 @@ void LabelComponent::transformChanged(Transform *transform){
 void LabelComponent::setSharedRenderState(RenderState::ptr renderState){
 	if(renderState==NULL){
 		renderState=mEngine->getMaterialManager()->createRenderState();
-		mEngine->getMaterialManager()->modifyRenderState(renderState,mMaterial->getPass()->getRenderState());
+		if(mMaterial!=NULL){
+			mEngine->getMaterialManager()->modifyRenderState(renderState,mMaterial->getPass()->getRenderState());
+		}
 	}
 
 	mSharedRenderState=renderState;
-	mMaterial=mEngine->getMaterialManager()->createSharedMaterial(mMaterial,mSharedRenderState);
+	if(mMaterial!=NULL){
+		mMaterial=mEngine->getMaterialManager()->createSharedMaterial(mMaterial,mSharedRenderState);
+	}
 }
 
 void LabelComponent::gatherRenderables(Camera *camera,RenderableSet *set){
