@@ -270,7 +270,6 @@ void SimpleRenderManager::renderDepthSortedRenderables(const RenderableSet::Rend
 /// @todo: We should see if the Pass is a Fixed or Shader pass, in which case we either set Fixed states, or setupRenderVariables
 ///  And then maybe set Fixed states should be moved the pass, like setupRenderVariables
 void SimpleRenderManager::renderQueueItems(Material *material,const RenderableSet::RenderableQueueItem *items,int numItems){
-	Camera *camera=mCamera;
 	RenderPath *path=(material!=NULL)?material->getBestPath():NULL;
 	int numPasses=(path!=NULL?path->getNumPasses():1);
 	int i,j;
