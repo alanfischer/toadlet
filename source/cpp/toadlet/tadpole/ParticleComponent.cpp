@@ -221,13 +221,18 @@ void ParticleComponent::frameUpdate(int dt,int scope){
 	updateBound();
 }
 
-RenderState::ptr ParticleComponent::getSharedRenderState(){
-	if(mSharedRenderState==NULL){
-		mSharedRenderState=mEngine->getMaterialManager()->createRenderState();
-		mMaterial=mEngine->getMaterialManager()->createSharedMaterial(mMaterial,mSharedRenderState);
+void ParticleComponent::setSharedRenderState(RenderState::ptr renderState){
+	if(renderState==NULL){
+		renderState=mEngine->getMaterialManager()->createRenderState();
+		if(mMaterial!=NULL){
+			mEngine->getMaterialManager()->modifyRenderState(renderState,mMaterial->getRenderState());
+		}
 	}
 
-	return mSharedRenderState;
+	mSharedRenderState=renderState;
+	if(mMaterial!=NULL){
+		mMaterial=mEngine->getMaterialManager()->createSharedMaterial(mMaterial,mSharedRenderState);
+	}
 }
 
 void ParticleComponent::gatherRenderables(Camera *camera,RenderableSet *set){
