@@ -44,7 +44,7 @@ class TOADLET_API EAGLRenderTarget:public GLFBORenderTarget{
 public:
 	EAGLRenderTarget();
 	EAGLRenderTarget(CAEAGLLayer *drawable,WindowRenderTargetFormat *format,NSString *colorFormat=nil);
-	virtual ~EAGLRenderTarget();
+	void destroy();
 
 	RenderTarget *getRootRenderTarget(){return (GLRenderTarget*)this;}
 

@@ -62,7 +62,7 @@ using namespace toadlet::pad;
 	extern "C" AudioDevice *new_ALAudioDevice();
 #endif
 #if defined(TOADLET_PLATFORM_IOS)
-	extern "C" InputDevice *new_IOSMotionDevice();
+	extern "C" InputDevice *new_IOSLinearDevice();
 #endif
 
 @interface ApplicationView:
@@ -380,12 +380,12 @@ void OSXApplication::preEngineCreate(){
 
 void OSXApplication::postEngineCreate(){
 #if defined(TOADLET_PLATFORM_IOS)
-	InputDevice::ptr motionDevice=new_IOSMotionDevice();
-	if(motionDevice->create()==false){
-		motionDevice=NULL;
+	InputDevice::ptr linearDevice=new_IOSLinearDevice();
+	if(linearDevice->create()==false){
+		linearDevice=NULL;
 	}
 	else{
-		mInputDevices[motionDevice->getType()]=motionDevice;
+		mInputDevices[linearDevice->getType()]=linearDevice;
 	}
 #endif
 	

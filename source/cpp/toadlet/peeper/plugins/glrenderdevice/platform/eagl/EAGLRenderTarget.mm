@@ -75,8 +75,10 @@ EAGLRenderTarget::EAGLRenderTarget(CAEAGLLayer *drawable,WindowRenderTargetForma
 	createContext(drawable,format,colorFormat);
 }
 
-EAGLRenderTarget::~EAGLRenderTarget(){
+void EAGLRenderTarget::destroy(){
 	destroyContext();
+	
+	BaseResource::destroy();
 }
 
 bool EAGLRenderTarget::createContext(CAEAGLLayer *drawable,WindowRenderTargetFormat *format,NSString *colorFormat){
@@ -162,6 +164,8 @@ bool EAGLRenderTarget::createContext(CAEAGLLayer *drawable,WindowRenderTargetFor
 
 	GLFBORenderTarget::activate();
 
+	findAdaptorInfo();
+	
 	return true;
 }
 

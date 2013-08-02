@@ -56,7 +56,7 @@ public:
 	TOADLET_OBJECT(IOSLinearDevice);
 	
 	IOSLinearDevice();
-	virtual ~IOSLinearDevice();
+	virtual ~IOSLinearDevice(){}
 
 	bool create();
 	void destroy();
