@@ -74,10 +74,6 @@ EGLWindowRenderTarget::EGLWindowRenderTarget(void *display,void *window,WindowRe
 	#endif
 }
 
-EGLWindowRenderTarget::~EGLWindowRenderTarget(){
-	destroyContext();
-}
-
 void EGLWindowRenderTarget::destroy(){
 	destroyContext();
 	

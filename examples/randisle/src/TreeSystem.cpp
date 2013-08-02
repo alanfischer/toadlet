@@ -593,7 +593,7 @@ Path *TreeSystem::traceSegment(PhysicsCollision &result,const Vector3 &position,
 
 	int i;
 	for(i=0;i<path->children.size();++i){
-		Path *childPath=traceSegment(result,position,segment,size,path->children[i]);
+//		Path *childPath=traceSegment(result,position,segment,size,path->children[i]);
 
 //		if(childPath!=NULL && childDistance<closestDistance){
 	//		closestDistance=childDistance;

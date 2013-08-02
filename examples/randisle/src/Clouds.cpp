@@ -14,7 +14,6 @@ Clouds::Clouds(Scene *scene,int cloudSize,const Vector4 &skyColor,const Vector4 
 	mSkyBoxCreator=new SkyBoxMaterialCreator(mEngine);
 
 	Sphere sphere(Vector3(0,0,0),512);
-	bool advanced=true; // Use realtime bumpmapping, or precalculated
 
 	int numSegments=16,numRings=16;
 	VertexBuffer::ptr vertexBuffer=mEngine->getBufferManager()->createVertexBuffer(Buffer::Usage_BIT_STREAM,Buffer::Access_READ_WRITE,mEngine->getVertexFormats().POSITION_COLOR_TEX_COORD,mSkyDomeCreator->getSkyDomeVertexCount(numSegments,numRings));

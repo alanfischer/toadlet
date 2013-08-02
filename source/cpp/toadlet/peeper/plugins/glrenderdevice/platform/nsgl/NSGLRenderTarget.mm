@@ -59,6 +59,8 @@ NSGLRenderTarget::NSGLRenderTarget(NSOpenGLContext *context):GLRenderTarget(),
 
 void NSGLRenderTarget::destroy(){
 	destroyContext();
+
+	BaseResource::destroy();
 }
 
 bool NSGLRenderTarget::createContext(NSView *view,WindowRenderTargetFormat *format,NSOpenGLPixelFormat *pixelFormat){
