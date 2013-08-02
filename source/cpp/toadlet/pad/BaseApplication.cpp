@@ -221,12 +221,22 @@ bool BaseApplication::createContextAndRenderDevice(const String &plugin){
 		if(info->getDescription()=="ATI FireGL V3100" && (mFormat->getPixelFormat()==TextureFormat::Format_RGB_5_6_5 || mFormat->getPixelFormat()==TextureFormat::Format_BGR_5_6_5)){
 			Error::unknown(Categories::TOADLET_PAD,
 				"The requested pixel format is known to crash on this card.  Try 24 color bits");
+			mRenderTarget=NULL;
 			return false;
 		}
 
 		if(plugin=="gl" && info->getDescription()=="Intel(R) HD Graphics Family"/* && info->getVersion()=="3.0.0 - Build 8.15.10.2342"*/){
 			Log::alert(Categories::TOADLET_PAD,"Shader performance is quite poor, force fixed until we can just prefer fixed");
+			mEngine->setHasBackableShader(false);
 			mEngine->setHasMaximumShader(false);
+		}
+		
+		if(plugin=="gles2" && info->getDescription()=="PowerVR SGX 535"){
+			Log::alert(Categories::TOADLET_PAD,"Shader performance is quite poor, fall back to gles1");
+			mEngine->setHasBackableShader(false);
+			mEngine->setHasMaximumShader(false);
+			mRenderTarget=NULL;
+			return false;
 		}
 	}
 

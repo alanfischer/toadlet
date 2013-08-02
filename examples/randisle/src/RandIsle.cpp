@@ -183,7 +183,7 @@ void RandIsle::create(){
 	mCamera=new Camera(mEngine);
 //	shared_static_cast<StereoscopicCamera>(mCamera)->setCrossEyed(true);
 	mCamera->setAutoProjectionFov(Math::degToRad(Math::fromInt(60)),false,mCamera->getNearDist(),1024);
-	mCamera->setScope(~Scope_BIT_HUD | Scope_BIT_MAIN_CAMERA & ~Scope_BIT_WATER_TRANSPARENT);
+	mCamera->setScope(~Scope_BIT_HUD | (Scope_BIT_MAIN_CAMERA & ~Scope_BIT_WATER_TRANSPARENT));
 	mCamera->setClearColor(Resources::instance->fadeColor);
 	mCamera->getDefaultState()->setFogState(FogState(FogState::FogType_LINEAR,Math::ONE,mCamera->getFarDist()/2,mCamera->getFarDist(),mCamera->getClearColor()));
 	mFollowNode->attach(new CameraComponent(mCamera));
@@ -201,7 +201,7 @@ void RandIsle::create(){
 		mRefractCamera=new Camera(mEngine);
 		mRefractCamera->setRenderTarget(Resources::instance->refractTarget);
 		mRefractCamera->setAutoProjectionFov(Math::degToRad(Math::fromInt(60)),false,mCamera->getNearDist(),mCamera->getFarDist());
-		mRefractCamera->setScope(~Scope_BIT_HUD & ~Scope_BIT_MAIN_CAMERA & ~Scope_BIT_WATER | Scope_BIT_WATER_TRANSPARENT);
+		mRefractCamera->setScope((~Scope_BIT_HUD & ~Scope_BIT_MAIN_CAMERA & ~Scope_BIT_WATER) | Scope_BIT_WATER_TRANSPARENT);
 		mRefractCamera->setClearColor(Resources::instance->fadeColor);
 		mRefractCamera->getDefaultState()->setFogState(FogState(FogState::FogType_LINEAR,Math::ONE,mCamera->getFarDist()/2,mCamera->getFarDist(),mCamera->getClearColor()));
 	}
@@ -556,7 +556,7 @@ void RandIsle::updateProps(){
 			mScene->traceSegment(result,segment,-1,mPlayer);
 			prop->setTranslate(result.point);
 			prop->setRotate(Math::Z_UNIT_VECTOR3,r.nextScalar(0,Math::TWO_PI));
-			scalar a=Math::ONE-(d-minDist)/(maxDist-minDist);
+			a=Math::ONE-(d-minDist)/(maxDist-minDist);
 		}
 
 		if(prop->getWorldTranslate().z<mTerrain->getWaterLevel()){

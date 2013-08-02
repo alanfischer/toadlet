@@ -24,13 +24,15 @@
 		8C5E7F97152F9B02005BBD2F /* rock_bump.png in Resources */ = {isa = PBXBuildFile; fileRef = 8C5E7F92152F9B02005BBD2F /* rock_bump.png */; };
 		8C5E7F98152F9B02005BBD2F /* seafloor_bump.png in Resources */ = {isa = PBXBuildFile; fileRef = 8C5E7F93152F9B02005BBD2F /* seafloor_bump.png */; };
 		8C5E7F9A152F9B69005BBD2F /* water_bump.png in Resources */ = {isa = PBXBuildFile; fileRef = 8C5E7F99152F9B69005BBD2F /* water_bump.png */; };
-		8C7B604F13995EFD0095C5C5 /* Acorn.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 8C7B603C13995EFD0095C5C5 /* Acorn.cpp */; };
-		8C7B605013995EFD0095C5C5 /* HUD.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 8C7B604013995EFD0095C5C5 /* HUD.cpp */; };
-		8C7B605113995EFD0095C5C5 /* PathClimber.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 8C7B604213995EFD0095C5C5 /* PathClimber.cpp */; };
-		8C7B605213995EFD0095C5C5 /* RandIsle.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 8C7B604613995EFD0095C5C5 /* RandIsle.cpp */; };
-		8C7B605313995EFD0095C5C5 /* Resources.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 8C7B604813995EFD0095C5C5 /* Resources.cpp */; };
-		8C7B605413995EFD0095C5C5 /* Sky.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 8C7B604A13995EFD0095C5C5 /* Sky.cpp */; };
-		8C7B605513995EFD0095C5C5 /* Tree.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 8C7B604D13995EFD0095C5C5 /* Tree.cpp */; };
+		8C6FFBAC17A95E3700554003 /* BranchSystem.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 8C6FFB9917A95E3700554003 /* BranchSystem.cpp */; };
+		8C6FFBAD17A95E3700554003 /* Clouds.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 8C6FFB9B17A95E3700554003 /* Clouds.cpp */; };
+		8C6FFBAE17A95E3700554003 /* HUD.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 8C6FFB9D17A95E3700554003 /* HUD.cpp */; };
+		8C6FFBAF17A95E3700554003 /* PathClimber.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 8C6FFBA017A95E3700554003 /* PathClimber.cpp */; };
+		8C6FFBB017A95E3700554003 /* RandIsle.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 8C6FFBA317A95E3700554003 /* RandIsle.cpp */; };
+		8C6FFBB117A95E3700554003 /* Resources.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 8C6FFBA517A95E3700554003 /* Resources.cpp */; };
+		8C6FFBB217A95E3700554003 /* Sky.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 8C6FFBA717A95E3700554003 /* Sky.cpp */; };
+		8C6FFBB317A95E3700554003 /* TreeSystem.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 8C6FFBAA17A95E3700554003 /* TreeSystem.cpp */; };
+		8C6FFBB517AC306700554003 /* Default-568h@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = 8C6FFBB417AC306700554003 /* Default-568h@2x.png */; };
 		8C7B606A13995F6E0095C5C5 /* acorn.png in Resources */ = {isa = PBXBuildFile; fileRef = 8C7B605A13995F6E0095C5C5 /* acorn.png */; };
 		8C7B606B13995F6E0095C5C5 /* bark.png in Resources */ = {isa = PBXBuildFile; fileRef = 8C7B605B13995F6E0095C5C5 /* bark.png */; };
 		8C7B606C13995F6E0095C5C5 /* compass.png in Resources */ = {isa = PBXBuildFile; fileRef = 8C7B605C13995F6E0095C5C5 /* compass.png */; };
@@ -75,25 +77,26 @@
 		8C5E7F92152F9B02005BBD2F /* rock_bump.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = rock_bump.png; path = ../res/rock_bump.png; sourceTree = "<group>"; };
 		8C5E7F93152F9B02005BBD2F /* seafloor_bump.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = seafloor_bump.png; path = ../res/seafloor_bump.png; sourceTree = "<group>"; };
 		8C5E7F99152F9B69005BBD2F /* water_bump.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = water_bump.png; path = ../res/water_bump.png; sourceTree = "<group>"; };
-		8C7B603C13995EFD0095C5C5 /* Acorn.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = Acorn.cpp; path = ../src/Acorn.cpp; sourceTree = SOURCE_ROOT; };
-		8C7B603D13995EFD0095C5C5 /* Acorn.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = Acorn.h; path = ../src/Acorn.h; sourceTree = SOURCE_ROOT; };
-		8C7B603E13995EFD0095C5C5 /* BranchSystem.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = BranchSystem.h; path = ../src/BranchSystem.h; sourceTree = SOURCE_ROOT; };
-		8C7B603F13995EFD0095C5C5 /* GroundProjector.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = GroundProjector.h; path = ../src/GroundProjector.h; sourceTree = SOURCE_ROOT; };
-		8C7B604013995EFD0095C5C5 /* HUD.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = HUD.cpp; path = ../src/HUD.cpp; sourceTree = SOURCE_ROOT; };
-		8C7B604113995EFD0095C5C5 /* HUD.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = HUD.h; path = ../src/HUD.h; sourceTree = SOURCE_ROOT; };
-		8C7B604213995EFD0095C5C5 /* PathClimber.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = PathClimber.cpp; path = ../src/PathClimber.cpp; sourceTree = SOURCE_ROOT; };
-		8C7B604313995EFD0095C5C5 /* PathClimber.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = PathClimber.h; path = ../src/PathClimber.h; sourceTree = SOURCE_ROOT; };
-		8C7B604413995EFD0095C5C5 /* PathClimberListener.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = PathClimberListener.h; path = ../src/PathClimberListener.h; sourceTree = SOURCE_ROOT; };
-		8C7B604513995EFD0095C5C5 /* PathSystem.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = PathSystem.h; path = ../src/PathSystem.h; sourceTree = SOURCE_ROOT; };
-		8C7B604613995EFD0095C5C5 /* RandIsle.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = RandIsle.cpp; path = ../src/RandIsle.cpp; sourceTree = SOURCE_ROOT; };
-		8C7B604713995EFD0095C5C5 /* RandIsle.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = RandIsle.h; path = ../src/RandIsle.h; sourceTree = SOURCE_ROOT; };
-		8C7B604813995EFD0095C5C5 /* Resources.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = Resources.cpp; path = ../src/Resources.cpp; sourceTree = SOURCE_ROOT; };
-		8C7B604913995EFD0095C5C5 /* Resources.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = Resources.h; path = ../src/Resources.h; sourceTree = SOURCE_ROOT; };
-		8C7B604A13995EFD0095C5C5 /* Sky.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = Sky.cpp; path = ../src/Sky.cpp; sourceTree = SOURCE_ROOT; };
-		8C7B604B13995EFD0095C5C5 /* Sky.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = Sky.h; path = ../src/Sky.h; sourceTree = SOURCE_ROOT; };
-		8C7B604C13995EFD0095C5C5 /* SmoothFollower.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = SmoothFollower.h; path = ../src/SmoothFollower.h; sourceTree = SOURCE_ROOT; };
-		8C7B604D13995EFD0095C5C5 /* Tree.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = Tree.cpp; path = ../src/Tree.cpp; sourceTree = SOURCE_ROOT; };
-		8C7B604E13995EFD0095C5C5 /* Tree.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = Tree.h; path = ../src/Tree.h; sourceTree = SOURCE_ROOT; };
+		8C6FFB9917A95E3700554003 /* BranchSystem.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = BranchSystem.cpp; path = ../../src/BranchSystem.cpp; sourceTree = "<group>"; };
+		8C6FFB9A17A95E3700554003 /* BranchSystem.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = BranchSystem.h; path = ../../src/BranchSystem.h; sourceTree = "<group>"; };
+		8C6FFB9B17A95E3700554003 /* Clouds.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = Clouds.cpp; path = ../../src/Clouds.cpp; sourceTree = "<group>"; };
+		8C6FFB9C17A95E3700554003 /* Clouds.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = Clouds.h; path = ../../src/Clouds.h; sourceTree = "<group>"; };
+		8C6FFB9D17A95E3700554003 /* HUD.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = HUD.cpp; path = ../../src/HUD.cpp; sourceTree = "<group>"; };
+		8C6FFB9E17A95E3700554003 /* HUD.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = HUD.h; path = ../../src/HUD.h; sourceTree = "<group>"; };
+		8C6FFB9F17A95E3700554003 /* Path.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = Path.h; path = ../../src/Path.h; sourceTree = "<group>"; };
+		8C6FFBA017A95E3700554003 /* PathClimber.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = PathClimber.cpp; path = ../../src/PathClimber.cpp; sourceTree = "<group>"; };
+		8C6FFBA117A95E3700554003 /* PathClimber.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = PathClimber.h; path = ../../src/PathClimber.h; sourceTree = "<group>"; };
+		8C6FFBA217A95E3700554003 /* PathClimberListener.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = PathClimberListener.h; path = ../../src/PathClimberListener.h; sourceTree = "<group>"; };
+		8C6FFBA317A95E3700554003 /* RandIsle.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = RandIsle.cpp; path = ../../src/RandIsle.cpp; sourceTree = "<group>"; };
+		8C6FFBA417A95E3700554003 /* RandIsle.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = RandIsle.h; path = ../../src/RandIsle.h; sourceTree = "<group>"; };
+		8C6FFBA517A95E3700554003 /* Resources.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = Resources.cpp; path = ../../src/Resources.cpp; sourceTree = "<group>"; };
+		8C6FFBA617A95E3700554003 /* Resources.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = Resources.h; path = ../../src/Resources.h; sourceTree = "<group>"; };
+		8C6FFBA717A95E3700554003 /* Sky.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = Sky.cpp; path = ../../src/Sky.cpp; sourceTree = "<group>"; };
+		8C6FFBA817A95E3700554003 /* Sky.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = Sky.h; path = ../../src/Sky.h; sourceTree = "<group>"; };
+		8C6FFBA917A95E3700554003 /* SmoothFollower.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = SmoothFollower.h; path = ../../src/SmoothFollower.h; sourceTree = "<group>"; };
+		8C6FFBAA17A95E3700554003 /* TreeSystem.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = TreeSystem.cpp; path = ../../src/TreeSystem.cpp; sourceTree = "<group>"; };
+		8C6FFBAB17A95E3700554003 /* TreeSystem.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = TreeSystem.h; path = ../../src/TreeSystem.h; sourceTree = "<group>"; };
+		8C6FFBB417AC306700554003 /* Default-568h@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "Default-568h@2x.png"; sourceTree = "<group>"; };
 		8C7B605A13995F6E0095C5C5 /* acorn.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = acorn.png; path = ../res/acorn.png; sourceTree = SOURCE_ROOT; };
 		8C7B605B13995F6E0095C5C5 /* bark.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = bark.png; path = ../res/bark.png; sourceTree = SOURCE_ROOT; };
 		8C7B605C13995F6E0095C5C5 /* compass.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = compass.png; path = ../res/compass.png; sourceTree = SOURCE_ROOT; };
@@ -140,25 +143,25 @@
 		080E96DDFE201D6D7F000001 /* Classes */ = {
 			isa = PBXGroup;
 			children = (
-				8C7B603C13995EFD0095C5C5 /* Acorn.cpp */,
-				8C7B603D13995EFD0095C5C5 /* Acorn.h */,
-				8C7B603E13995EFD0095C5C5 /* BranchSystem.h */,
-				8C7B603F13995EFD0095C5C5 /* GroundProjector.h */,
-				8C7B604013995EFD0095C5C5 /* HUD.cpp */,
-				8C7B604113995EFD0095C5C5 /* HUD.h */,
-				8C7B604213995EFD0095C5C5 /* PathClimber.cpp */,
-				8C7B604313995EFD0095C5C5 /* PathClimber.h */,
-				8C7B604413995EFD0095C5C5 /* PathClimberListener.h */,
-				8C7B604513995EFD0095C5C5 /* PathSystem.h */,
-				8C7B604613995EFD0095C5C5 /* RandIsle.cpp */,
-				8C7B604713995EFD0095C5C5 /* RandIsle.h */,
-				8C7B604813995EFD0095C5C5 /* Resources.cpp */,
-				8C7B604913995EFD0095C5C5 /* Resources.h */,
-				8C7B604A13995EFD0095C5C5 /* Sky.cpp */,
-				8C7B604B13995EFD0095C5C5 /* Sky.h */,
-				8C7B604C13995EFD0095C5C5 /* SmoothFollower.h */,
-				8C7B604D13995EFD0095C5C5 /* Tree.cpp */,
-				8C7B604E13995EFD0095C5C5 /* Tree.h */,
+				8C6FFB9917A95E3700554003 /* BranchSystem.cpp */,
+				8C6FFB9A17A95E3700554003 /* BranchSystem.h */,
+				8C6FFB9B17A95E3700554003 /* Clouds.cpp */,
+				8C6FFB9C17A95E3700554003 /* Clouds.h */,
+				8C6FFB9D17A95E3700554003 /* HUD.cpp */,
+				8C6FFB9E17A95E3700554003 /* HUD.h */,
+				8C6FFB9F17A95E3700554003 /* Path.h */,
+				8C6FFBA017A95E3700554003 /* PathClimber.cpp */,
+				8C6FFBA117A95E3700554003 /* PathClimber.h */,
+				8C6FFBA217A95E3700554003 /* PathClimberListener.h */,
+				8C6FFBA317A95E3700554003 /* RandIsle.cpp */,
+				8C6FFBA417A95E3700554003 /* RandIsle.h */,
+				8C6FFBA517A95E3700554003 /* Resources.cpp */,
+				8C6FFBA617A95E3700554003 /* Resources.h */,
+				8C6FFBA717A95E3700554003 /* Sky.cpp */,
+				8C6FFBA817A95E3700554003 /* Sky.h */,
+				8C6FFBA917A95E3700554003 /* SmoothFollower.h */,
+				8C6FFBAA17A95E3700554003 /* TreeSystem.cpp */,
+				8C6FFBAB17A95E3700554003 /* TreeSystem.h */,
 			);
 			path = Classes;
 			sourceTree = "<group>";
@@ -174,6 +177,7 @@
 		29B97314FDCFA39411CA2CEA /* CustomTemplate */ = {
 			isa = PBXGroup;
 			children = (
+				8C6FFBB417AC306700554003 /* Default-568h@2x.png */,
 				080E96DDFE201D6D7F000001 /* Classes */,
 				29B97315FDCFA39411CA2CEA /* Other Sources */,
 				29B97317FDCFA39411CA2CEA /* Resources */,
@@ -325,6 +329,7 @@
 				8C5E7F97152F9B02005BBD2F /* rock_bump.png in Resources */,
 				8C5E7F98152F9B02005BBD2F /* seafloor_bump.png in Resources */,
 				8C5E7F9A152F9B69005BBD2F /* water_bump.png in Resources */,
+				8C6FFBB517AC306700554003 /* Default-568h@2x.png in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -337,13 +342,14 @@
 			files = (
 				1D60589B0D05DD56006BFB54 /* main.m in Sources */,
 				1D3623260D0F684500981E51 /* RandIsleAppDelegate.mm in Sources */,
-				8C7B604F13995EFD0095C5C5 /* Acorn.cpp in Sources */,
-				8C7B605013995EFD0095C5C5 /* HUD.cpp in Sources */,
-				8C7B605113995EFD0095C5C5 /* PathClimber.cpp in Sources */,
-				8C7B605213995EFD0095C5C5 /* RandIsle.cpp in Sources */,
-				8C7B605313995EFD0095C5C5 /* Resources.cpp in Sources */,
-				8C7B605413995EFD0095C5C5 /* Sky.cpp in Sources */,
-				8C7B605513995EFD0095C5C5 /* Tree.cpp in Sources */,
+				8C6FFBAC17A95E3700554003 /* BranchSystem.cpp in Sources */,
+				8C6FFBAD17A95E3700554003 /* Clouds.cpp in Sources */,
+				8C6FFBAE17A95E3700554003 /* HUD.cpp in Sources */,
+				8C6FFBAF17A95E3700554003 /* PathClimber.cpp in Sources */,
+				8C6FFBB017A95E3700554003 /* RandIsle.cpp in Sources */,
+				8C6FFBB117A95E3700554003 /* Resources.cpp in Sources */,
+				8C6FFBB217A95E3700554003 /* Sky.cpp in Sources */,
+				8C6FFBB317A95E3700554003 /* TreeSystem.cpp in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -358,16 +364,34 @@
 				BUNDLE_IDENTIFIER = com.lightningtoads.randisle;
 				COPY_PHASE_STRIP = NO;
 				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_ENABLE_CPP_RTTI = NO;
 				GCC_OPTIMIZATION_LEVEL = 0;
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = RandIsle_Prefix.pch;
 				GCC_VERSION = com.apple.compilers.llvm.clang.1_0;
 				ICON_FILE = icon.png;
 				INFOPLIST_FILE = "RandIsle-Info.plist";
-				LIBRARY_SEARCH_PATHS = "$(inherited)";
+				LIBRARY_SEARCH_PATHS = (
+					"$(inherited)",
+					"~/toadletDeps/ios/lib",
+				);
+				OTHER_LDFLAGS = (
+					"-ltoadlet_flick_ioslineardevice_sd",
+					"-ltoadlet_ribbit_alaudiodevice_sd",
+					"-ltoadlet_peeper_gles2renderdevice_sd",
+					"-ltoadlet_peeper_gles1renderdevice_sd",
+					"-ltoadlet_pad_sd",
+					"-ltoadlet_flick_sd",
+					"-ltoadlet_tadpole_sd",
+					"-ltoadlet_hop_sd",
+					"-ltoadlet_peeper_sd",
+					"-ltoadlet_ribbit_sd",
+					"-ltoadlet_egg_sd",
+				);
 				PRODUCT_NAME = RandIsle;
 				SDKROOT = iphoneos;
 				TARGETED_DEVICE_FAMILY = "1,2";
+				VALID_ARCHS = armv7;
 			};
 			name = Debug;
 		};
@@ -378,15 +402,33 @@
 				ARCHS = "$(ARCHS_STANDARD_32_BIT)";
 				BUNDLE_IDENTIFIER = com.lightningtoads.randisle;
 				COPY_PHASE_STRIP = YES;
+				GCC_ENABLE_CPP_RTTI = NO;
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = RandIsle_Prefix.pch;
 				GCC_VERSION = com.apple.compilers.llvm.clang.1_0;
 				ICON_FILE = icon.png;
 				INFOPLIST_FILE = "RandIsle-Info.plist";
-				LIBRARY_SEARCH_PATHS = "$(inherited)";
+				LIBRARY_SEARCH_PATHS = (
+					"$(inherited)",
+					"~/toadletDeps/ios/lib",
+				);
+				OTHER_LDFLAGS = (
+					"-ltoadlet_flick_ioslineardevice_s",
+					"-ltoadlet_pad_s",
+					"-ltoadlet_ribbit_alaudiodevice_s",
+					"-ltoadlet_peeper_gles2renderdevice_s",
+					"-ltoadlet_peeper_gles1renderdevice_s",
+					"-ltoadlet_tadpole_s",
+					"-ltoadlet_flick_s",
+					"-ltoadlet_peeper_s",
+					"-ltoadlet_ribbit_s",
+					"-ltoadlet_hop_s",
+					"-ltoadlet_egg_s",
+				);
 				PRODUCT_NAME = RandIsle;
 				SDKROOT = iphoneos;
 				TARGETED_DEVICE_FAMILY = "1,2";
+				VALID_ARCHS = armv7;
 			};
 			name = Release;
 		};
@@ -423,15 +465,27 @@
 				ARCHS = "$(ARCHS_STANDARD_32_BIT)";
 				BUNDLE_IDENTIFIER = com.lightningtoads.randisle;
 				COPY_PHASE_STRIP = YES;
+				GCC_ENABLE_CPP_RTTI = NO;
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = RandIsle_Prefix.pch;
 				GCC_VERSION = com.apple.compilers.llvm.clang.1_0;
 				ICON_FILE = icon.png;
 				INFOPLIST_FILE = "RandIsle-Info.plist";
 				LIBRARY_SEARCH_PATHS = "$(inherited)";
+				OTHER_LDFLAGS = (
+					"-ltoadlet_pad_s",
+					"-ltoadlet_ribbit_alaudiodevice_s",
+					"-ltoadlet_peeper_gles1renderdevice_s",
+					"-ltoadlet_tadpole_s",
+					"-ltoadlet_peeper_s",
+					"-ltoadlet_ribbit_s",
+					"-ltoadlet_hop_s",
+					"-ltoadlet_egg_s",
+				);
 				PRODUCT_NAME = RandIsle;
 				SDKROOT = iphoneos;
 				TARGETED_DEVICE_FAMILY = "1,2";
+				VALID_ARCHS = armv7;
 			};
 			name = Distribution;
 		};
