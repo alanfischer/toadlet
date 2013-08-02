@@ -38,7 +38,6 @@ class TOADLET_API EGLWindowRenderTarget:public EGLRenderTarget{
 public:
 	EGLWindowRenderTarget();
 	EGLWindowRenderTarget(void *display,void *window,WindowRenderTargetFormat *format,bool pixmap=false);
-	virtual ~EGLWindowRenderTarget();
 	void destroy();
 
 	virtual RenderTarget *getRootRenderTarget(){return (GLRenderTarget*)this;}
