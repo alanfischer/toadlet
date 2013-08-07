@@ -955,7 +955,7 @@ void GLRenderDevice::setBlendState(const BlendState &state){
 		glEnable(GL_BLEND);
 	}
 
-	glColorMask((state.colorWrite&BlendState::ColorWrite_BIT_R)>0,(state.colorWrite&BlendState::ColorWrite_BIT_G)>0,(state.colorWrite&BlendState::ColorWrite_BIT_B)>0,(state.colorWrite&BlendState::ColorWrite_BIT_A)>0);
+	glColorMask((state.colorWrite&BlendState::ColorWrite_BIT_R)!=0,(state.colorWrite&BlendState::ColorWrite_BIT_G)!=0,(state.colorWrite&BlendState::ColorWrite_BIT_B)!=0,(state.colorWrite&BlendState::ColorWrite_BIT_A)!=0);
 
 	TOADLET_CHECK_GLERROR("setBlendState");
 }
