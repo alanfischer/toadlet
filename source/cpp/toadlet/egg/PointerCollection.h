@@ -128,7 +128,7 @@ public:
 	inline void add(const TypePtr &type){mCollection.add(type);}
 	inline void setAt(int index,const TypePtr &type){mCollection.setAt(index,type);}
 	inline void addAll(const PointerCollection<Type> &collection){insert(end(),collection.begin(),collection.end());}
-	inline void insert(int index,const Type &type){mCollection.insert(index,type);}
+	inline void insert(int index,const TypePtr &type){mCollection.insert(index,type);}
 
 	inline TypePtr &at(int n){return mCollection.at(n);}
 	inline const TypePtr &at(int n) const{return mCollection.at(n);}
