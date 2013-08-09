@@ -63,7 +63,7 @@ ALAudio::~ALAudio(){
 
 bool ALAudio::create(AudioBuffer *audioBuffer){
 	if(audioBuffer==NULL){
-		Error::unknown(Categories::TOADLET_RIBBIT,"invalid audioBuffer");
+		Error::unknown(Categories::TOADLET_RIBBIT,"invalid AudioBuffer");
 		return false;
 	}
 	
@@ -89,6 +89,11 @@ bool ALAudio::create(AudioBuffer *audioBuffer){
 }
 
 bool ALAudio::create(AudioStream *stream){
+	if(stream==NULL){
+		Error::unknown(Categories::TOADLET_RIBBIT,"invalid AudioStream");
+		return false;
+	}
+
 	mDevice->activate();
 
 	mHandle=mDevice->checkoutSourceHandle(this);
