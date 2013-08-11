@@ -1525,7 +1525,7 @@ void GLRenderDevice::setRasterizerState(RasterizerState *state){
 	#if !defined(TOADLET_HAS_GLES)
 		glPolygonMode(GL_FRONT_AND_BACK,getGLPolygonMode(state->fill));
 	#else
-		mRasterizerFill=state.fill;
+		mRasterizerFill=state->fill;
 	#endif
 
 	if(state->depthBiasConstant==0 && state->depthBiasSlope==0){
