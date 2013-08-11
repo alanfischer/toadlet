@@ -46,7 +46,7 @@ public:
 	public:
 		TOADLET_RESOURCE(SubMesh,SubMesh);
 
-		SubMesh():hasOwnTransform(false){}
+		SubMesh(){}
 		virtual ~SubMesh(){}
 
 		VertexData::ptr vertexData;
@@ -55,7 +55,6 @@ public:
 		Material::ptr material;
 		String materialName;
 
-		bool hasOwnTransform; /// @todo: Replace with transform/bound being null
 		Transform::ptr transform;
 		Bound::ptr bound;
 	};

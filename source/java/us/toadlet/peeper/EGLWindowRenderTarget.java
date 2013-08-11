@@ -83,11 +83,10 @@ public class EGLWindowRenderTarget extends EGLRenderTarget{
 		int contextVersion=0;
 		if(format!=null){
 			pixelFormat=format.getPixelFormat();
-			/// @todo: Expose the TextureFormat and use that to get the bits
-			//redBits=TextureFormat.getRedBits(pixelFormat);
-			//greenBits=TextureFormat.getGreenBits(pixelFormat);
-			//blueBits=TextureFormat.getBlueBits(pixelFormat);
-			//alphaBits=TextureFormat.getAlphaBits(pixelFormat);
+			redBits=TextureFormat.getRedBits(pixelFormat);
+			greenBits=TextureFormat.getGreenBits(pixelFormat);
+			blueBits=TextureFormat.getBlueBits(pixelFormat);
+			alphaBits=TextureFormat.getAlphaBits(pixelFormat);
 			depthBits=format.getDepthBits();
 			stencilBits=format.getStencilBits();
 			multisamples=format.getMultisamples();

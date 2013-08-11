@@ -152,7 +152,7 @@ void MeshComponent::setMesh(Mesh *mesh){
 			}
 		}
 
-		if(subMesh->mMeshSubMesh->hasOwnTransform){
+		if(subMesh->mMeshSubMesh->transform){
 			subMesh->mTransform=new Transform(subMesh->mMeshSubMesh->transform);
 		}
 

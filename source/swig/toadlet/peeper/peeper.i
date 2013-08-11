@@ -10,6 +10,7 @@
 %include <toadlet/peeper/RenderTarget.i>
 %include <toadlet/peeper/RenderDevice.i>
 %include <toadlet/peeper/RenderState.i>
+%include <toadlet/peeper/TextureFormat.i>
 %include <toadlet/peeper/GLRenderTarget.i>
 %include <toadlet/peeper/WindowRenderTargetFormat.i>
 %{

@@ -39,6 +39,7 @@ if (NOT TOADLET_PLATFORM_PYTHON)
 		${CMAKE_CURRENT_SOURCE_DIR}/toadlet/peeper/RenderDevice.i
 		${CMAKE_CURRENT_SOURCE_DIR}/toadlet/peeper/RenderState.i
 		${CMAKE_CURRENT_SOURCE_DIR}/toadlet/peeper/RenderTarget.i
+		${CMAKE_CURRENT_SOURCE_DIR}/toadlet/peeper/TextureFormat.i
 		${CMAKE_CURRENT_SOURCE_DIR}/toadlet/peeper/GLRenderTarget.i
 		${CMAKE_CURRENT_SOURCE_DIR}/toadlet/peeper/WindowRenderTargetFormat.i
 		PARENT_SCOPE

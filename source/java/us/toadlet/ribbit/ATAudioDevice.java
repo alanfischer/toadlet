@@ -27,10 +27,14 @@ package us.toadlet.ribbit;
 
 import android.os.Handler;
 import android.os.Looper;
+import android.content.Context;
+import android.media.AudioManager;
 
 public class ATAudioDevice extends BaseAudioDevice implements Runnable{
-	public ATAudioDevice(){
+	public ATAudioDevice(Context context){
 		super(0,false);
+		
+		mContext=context;
 		
 //		mCaps=new AudioCaps();
 //		mCaps.maxSources=16;
@@ -62,8 +66,10 @@ public class ATAudioDevice extends BaseAudioDevice implements Runnable{
 	public AudioBuffer createAudioBuffer(){return new ATAudioBuffer();}
 	public Audio createAudio(){return new ATAudio(this);}
 
-	/// @todo: implement gain
-	public void setListenerGain(float gain){}
+	public void setListenerGain(float gain){
+		AudioManager manager=(AudioManager)mContext.getSystemService(Context.AUDIO_SERVICE);
+		manager.setStreamVolume(AudioManager.STREAM_MUSIC,(int)(gain * manager.getStreamMaxVolume(AudioManager.STREAM_MUSIC)), 0);
+	}
 	
 	public void update(int dt){}
 	
@@ -90,6 +96,7 @@ public class ATAudioDevice extends BaseAudioDevice implements Runnable{
 		mAudios.remove((ATAudio)audio);
 	}
 	
+	Context mContext;
 	int mMaxBufferSize;
 //	AudioCaps mCaps;
 	Handler mHandler;
