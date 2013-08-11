@@ -52,7 +52,6 @@ public:
 	virtual void setScope(int scope)=0;
 	virtual int getScope() const=0;
 
-	// TODO: dont allow animations to change length, so this wont be necessary
 	virtual void setAnimationListener(AnimationListener *listener)=0;
 };
 

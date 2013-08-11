@@ -144,6 +144,14 @@ bool D3D9RenderDevice::create(RenderTarget *target,int options){
 	mLastTextures.resize(mCaps.maxTextureStages,NULL);
 	mLastSamplerStates.resize(mCaps.maxTextureStages);
 
+	mDefaultState=new D3D9RenderState(this);
+	mDefaultState->setBlendState(BlendState());
+	mDefaultState->setDepthState(DepthState());
+	mDefaultState->setFogState(FogState());
+	mDefaultState->setPointState(PointState());
+	mDefaultState->setRasterizerState(RasterizerState());
+	mDefaultState->setMaterialState(MaterialState());
+
 	setDefaultState();
 
 	Log::alert(Categories::TOADLET_PEEPER,
@@ -502,11 +510,7 @@ bool D3D9RenderDevice::copySurface(IDirect3DSurface9 *dst,IDirect3DSurface9 *src
 }
 
 void D3D9RenderDevice::setDefaultState(){
-	setBlendState(BlendState::Combination_DISABLED);
-	setDepthState(DepthState());
-	setFogState(FogState());
-	setPointState(PointState());
-	setRasterizerState(RasterizerState());
+	setRenderState(mDefaultState);
 
 	int i;
 	for(i=0;i<mCaps.maxTextureStages;++i){
@@ -515,7 +519,6 @@ void D3D9RenderDevice::setDefaultState(){
 		setTexture((Shader::ShaderType)0,i,NULL);
 	}
 
-	setMaterialState(MaterialState());
 	setAmbientColor(Math::ONE_VECTOR4);
 
 	// D3D specific states
@@ -530,22 +533,22 @@ bool D3D9RenderDevice::setRenderState(RenderState *renderState){
 	}
 
 	if(d3drenderState->mBlendState!=NULL){
-		setBlendState(*d3drenderState->mBlendState);
+		setBlendState(d3drenderState->mBlendState);
 	}
 	if(d3drenderState->mDepthState!=NULL){
-		setDepthState(*d3drenderState->mDepthState);
+		setDepthState(d3drenderState->mDepthState);
 	}
 	if(d3drenderState->mRasterizerState!=NULL){
-		setRasterizerState(*d3drenderState->mRasterizerState);
+		setRasterizerState(d3drenderState->mRasterizerState);
 	}
 	if(d3drenderState->mFogState!=NULL){
-		setFogState(*d3drenderState->mFogState);
+		setFogState(d3drenderState->mFogState);
 	}
 	if(d3drenderState->mPointState!=NULL){
-		setPointState(*d3drenderState->mPointState);
+		setPointState(d3drenderState->mPointState);
 	}
 	if(d3drenderState->mMaterialState!=NULL){
-		setMaterialState(*d3drenderState->mMaterialState);
+		setMaterialState(d3drenderState->mMaterialState);
 	}
 	int i;
 	for(i=0;i<d3drenderState->mSamplerStates.size();++i){
@@ -579,14 +582,14 @@ bool D3D9RenderDevice::setShaderState(ShaderState *shaderState){
 	return d3dshaderState->activate();
 }
 
-void D3D9RenderDevice::setBlendState(const BlendState &state){
-	if(state.equals(BlendState::Combination_DISABLED)){
+void D3D9RenderDevice::setBlendState(BlendState *state){
+	if(state->equals(BlendState::Combination_DISABLED)){
 		mD3DDevice->SetRenderState(D3DRS_SRCBLEND,D3DBLEND_ONE);
 		mD3DDevice->SetRenderState(D3DRS_DESTBLEND,D3DBLEND_ZERO);
 	}
 	else{
-		D3DBLEND src=getD3DBLEND(state.source);
-		D3DBLEND dest=getD3DBLEND(state.dest);
+		D3DBLEND src=getD3DBLEND(state->source);
+		D3DBLEND dest=getD3DBLEND(state->dest);
 
 		HRESULT hr;
 		hr=mD3DDevice->SetRenderState(D3DRS_SRCBLEND,src);
@@ -595,62 +598,62 @@ void D3D9RenderDevice::setBlendState(const BlendState &state){
 		TOADLET_CHECK_D3D9ERROR(hr,"setBlendFunction");
 	}
 
-	mD3DDevice->SetRenderState(D3DRS_COLORWRITEENABLE,state.colorWrite); // D3DCOLORWRITEENABLE values match with BlendState::ColorWrite values
+	mD3DDevice->SetRenderState(D3DRS_COLORWRITEENABLE,state->colorWrite); // D3DCOLORWRITEENABLE values match with BlendState::ColorWrite values
 }
 
-void D3D9RenderDevice::setDepthState(const DepthState &state){
+void D3D9RenderDevice::setDepthState(DepthState *state){
 	HRESULT hr=S_OK;
 
-	if(state.test==DepthState::DepthTest_ALWAYS){
+	if(state->test==DepthState::DepthTest_ALWAYS){
 		mD3DDevice->SetRenderState(D3DRS_ZENABLE,D3DZB_FALSE);
 	}
 	else{
 		mD3DDevice->SetRenderState(D3DRS_ZENABLE,D3DZB_TRUE);
-		mD3DDevice->SetRenderState(D3DRS_ZFUNC,getD3DCMPFUNC(state.test));
+		mD3DDevice->SetRenderState(D3DRS_ZFUNC,getD3DCMPFUNC(state->test));
 	}
 
-	hr=mD3DDevice->SetRenderState(D3DRS_ZWRITEENABLE,state.write);
+	hr=mD3DDevice->SetRenderState(D3DRS_ZWRITEENABLE,state->write);
 	TOADLET_CHECK_D3D9ERROR(hr,"setDepthState");
 }
 
-void D3D9RenderDevice::setFogState(const FogState &state){
-	if(state.fog==FogState::FogType_NONE){
+void D3D9RenderDevice::setFogState(FogState *state){
+	if(state->fog==FogState::FogType_NONE){
 		mD3DDevice->SetRenderState(D3DRS_FOGENABLE,FALSE);
 	}
 	else{
-		float fNearDistance=scalarToFloat(state.nearDistance);
-		float fFarDistance=scalarToFloat(state.farDistance);
+		float fNearDistance=scalarToFloat(state->nearDistance);
+		float fFarDistance=scalarToFloat(state->farDistance);
 	
 		mD3DDevice->SetRenderState(D3DRS_FOGENABLE,TRUE);
-	    mD3DDevice->SetRenderState(D3DRS_FOGCOLOR,toD3DCOLOR(state.color));
-        mD3DDevice->SetRenderState(D3DRS_FOGVERTEXMODE,getD3DFOGMODE(state.fog));
-        mD3DDevice->SetRenderState(D3DRS_FOGDENSITY,state.density);
+	    mD3DDevice->SetRenderState(D3DRS_FOGCOLOR,toD3DCOLOR(state->color));
+        mD3DDevice->SetRenderState(D3DRS_FOGVERTEXMODE,getD3DFOGMODE(state->fog));
+        mD3DDevice->SetRenderState(D3DRS_FOGDENSITY,state->density);
 		mD3DDevice->SetRenderState(D3DRS_FOGSTART,*(DWORD*)(&fNearDistance));
 		mD3DDevice->SetRenderState(D3DRS_FOGEND,*(DWORD*)(&fFarDistance));
 	}
 }
 
-void D3D9RenderDevice::setMaterialState(const MaterialState &state){
+void D3D9RenderDevice::setMaterialState(MaterialState *state){
 	D3DMATERIAL9 material;
 
-	mD3DDevice->SetRenderState(D3DRS_LIGHTING,state.light);
+	mD3DDevice->SetRenderState(D3DRS_LIGHTING,state->light);
 
-	toD3DCOLORVALUE(material.Ambient,state.ambient);
-	toD3DCOLORVALUE(material.Diffuse,state.diffuse);
-	toD3DCOLORVALUE(material.Specular,state.specular);
+	toD3DCOLORVALUE(material.Ambient,state->ambient);
+	toD3DCOLORVALUE(material.Diffuse,state->diffuse);
+	toD3DCOLORVALUE(material.Specular,state->specular);
 	#if !defined(TOADLET_SET_D3DM) && defined(TOADLET_FIXED_POINT)
-		material.Power=scalarToFloat(state.shininess);
+		material.Power=scalarToFloat(state->shininess);
 	#else
-		material.Power=state.shininess;
+		material.Power=state->shininess;
 	#endif
 	#if !defined(TOADLET_SET_D3DM)
-		toD3DCOLORVALUE(material.Emissive,state.emissive);
+		toD3DCOLORVALUE(material.Emissive,state->emissive);
 	#endif
 
 	mD3DDevice->SetMaterial(&material TOADLET_D3DMFMT);
 
-	mD3DDevice->SetRenderState(D3DRS_COLORVERTEX,state.trackColor);
-	if(state.trackColor){
+	mD3DDevice->SetRenderState(D3DRS_COLORVERTEX,state->trackColor);
+	if(state->trackColor){
 		mD3DDevice->SetRenderState(D3DRS_AMBIENTMATERIALSOURCE,D3DMCS_COLOR1);
 		mD3DDevice->SetRenderState(D3DRS_DIFFUSEMATERIALSOURCE,D3DMCS_COLOR1);
 	}
@@ -659,42 +662,42 @@ void D3D9RenderDevice::setMaterialState(const MaterialState &state){
 		mD3DDevice->SetRenderState(D3DRS_DIFFUSEMATERIALSOURCE,D3DMCS_MATERIAL);
 	}
 
-	mD3DDevice->SetRenderState(D3DRS_SHADEMODE,getD3DSHADEMODE(state.shade));
-	mD3DDevice->SetRenderState(D3DRS_NORMALIZENORMALS,state.normalize!=MaterialState::NormalizeType_NONE);
+	mD3DDevice->SetRenderState(D3DRS_SHADEMODE,getD3DSHADEMODE(state->shade));
+	mD3DDevice->SetRenderState(D3DRS_NORMALIZENORMALS,state->normalize!=MaterialState::NormalizeType_NONE);
 
-	if(state.alphaTest==MaterialState::AlphaTest_NEVER){
+	if(state->alphaTest==MaterialState::AlphaTest_NEVER){
 		mD3DDevice->SetRenderState(D3DRS_ALPHATESTENABLE,false);
 	}
 	else{
 		mD3DDevice->SetRenderState(D3DRS_ALPHATESTENABLE,true);
-		mD3DDevice->SetRenderState(D3DRS_ALPHAREF,Math::toInt(state.alphaCutoff*255));
-		mD3DDevice->SetRenderState(D3DRS_ALPHAFUNC,getD3DCMPFUNC(state.alphaTest));
+		mD3DDevice->SetRenderState(D3DRS_ALPHAREF,Math::toInt(state->alphaCutoff*255));
+		mD3DDevice->SetRenderState(D3DRS_ALPHAFUNC,getD3DCMPFUNC(state->alphaTest));
 	}
 }
 
-void D3D9RenderDevice::setPointState(const PointState &state){
+void D3D9RenderDevice::setPointState(PointState *state){
 	HRESULT result=S_OK;
 
 	#if !defined(TOADLET_SET_D3DM)
 		// pointsize = size / sqrt(constant + linear*d + quadratic*d*d)
 		// if a&b = 0, then quadratic = 1/(C*C) where C = first component of projMatrix * 1/2 screen width
 		if(mCaps.pointSprites){
-			mD3DDevice->SetRenderState(D3DRS_POINTSPRITEENABLE,state.sprite);
-			mD3DDevice->SetRenderState(D3DRS_POINTSCALEENABLE,state.attenuated);
+			mD3DDevice->SetRenderState(D3DRS_POINTSPRITEENABLE,state->sprite);
+			mD3DDevice->SetRenderState(D3DRS_POINTSCALEENABLE,state->attenuated);
 
-			float fMinSize=MathConversion::scalarToFloat(state.minSize);
-			float fMaxSize=MathConversion::scalarToFloat(state.maxSize);
+			float fMinSize=MathConversion::scalarToFloat(state->minSize);
+			float fMaxSize=MathConversion::scalarToFloat(state->maxSize);
 			mD3DDevice->SetRenderState(D3DRS_POINTSIZE_MIN,*(DWORD*)(&fMinSize));
 			mD3DDevice->SetRenderState(D3DRS_POINTSIZE_MAX,*(DWORD*)(&fMaxSize));
 		}
 
-		float fSize=MathConversion::scalarToFloat(state.size);
+		float fSize=MathConversion::scalarToFloat(state->size);
 		mD3DDevice->SetRenderState(D3DRS_POINTSIZE,*(DWORD*)(&fSize));
 		
-		if(state.attenuated){
-			float fConstant=MathConversion::scalarToFloat(state.constant);
-			float fLinear=MathConversion::scalarToFloat(state.linear);
-			float fQuadratic=MathConversion::scalarToFloat(state.quadratic);
+		if(state->attenuated){
+			float fConstant=MathConversion::scalarToFloat(state->constant);
+			float fLinear=MathConversion::scalarToFloat(state->linear);
+			float fQuadratic=MathConversion::scalarToFloat(state->quadratic);
 
 			mD3DDevice->SetRenderState(D3DRS_POINTSCALE_A,*(DWORD*)(&fConstant));
 			mD3DDevice->SetRenderState(D3DRS_POINTSCALE_B,*(DWORD*)(&fLinear));
@@ -703,22 +706,22 @@ void D3D9RenderDevice::setPointState(const PointState &state){
 	#endif
 }
 
-void D3D9RenderDevice::setRasterizerState(const RasterizerState &state){
-	mD3DDevice->SetRenderState(D3DRS_CULLMODE,getD3DCULL(state.cull));
+void D3D9RenderDevice::setRasterizerState(RasterizerState *state){
+	mD3DDevice->SetRenderState(D3DRS_CULLMODE,getD3DCULL(state->cull));
 
-	mD3DDevice->SetRenderState(D3DRS_FILLMODE,getD3DFILLMODE(state.fill));
+	mD3DDevice->SetRenderState(D3DRS_FILLMODE,getD3DFILLMODE(state->fill));
 
-	float fconstant=scalarToFloat(state.depthBiasConstant) * 1e6f; // This value is what the Wine project uses
-	float fslope=scalarToFloat(state.depthBiasSlope);
+	float fconstant=scalarToFloat(state->depthBiasConstant) * 1e6f; // This value is what the Wine project uses
+	float fslope=scalarToFloat(state->depthBiasSlope);
 	mD3DDevice->SetRenderState(D3DRS_DEPTHBIAS,*(DWORD*)&fconstant);
 	mD3DDevice->SetRenderState(D3DRS_SLOPESCALEDEPTHBIAS,*(DWORD*)&fslope);
 
 	#if !defined(TOADLET_SET_D3DM)
-		mD3DDevice->SetRenderState(D3DRS_MULTISAMPLEANTIALIAS,state.multisample);
-		mD3DDevice->SetRenderState(D3DRS_ANTIALIASEDLINEENABLE,state.multisample);
+		mD3DDevice->SetRenderState(D3DRS_MULTISAMPLEANTIALIAS,state->multisample);
+		mD3DDevice->SetRenderState(D3DRS_ANTIALIASEDLINEENABLE,state->multisample);
 	#endif
 
-	mD3DDevice->SetRenderState(D3DRS_DITHERENABLE,state.dither);
+	mD3DDevice->SetRenderState(D3DRS_DITHERENABLE,state->dither);
 }
 
 void D3D9RenderDevice::setSamplerState(int i,SamplerState *state){

@@ -53,7 +53,6 @@ public:
 	VariableBuffer::ptr createVariableBuffer(int usage,int access,VariableBufferFormat::ptr variableFormat);
 	IndexBuffer::ptr cloneIndexBuffer(IndexBuffer::ptr oldIndexBuffer,int usage,int access,IndexBuffer::IndexFormat indexFormat,int size);
 	VertexBuffer::ptr cloneVertexBuffer(VertexBuffer::ptr oldVertexBuffer,int usage,int access,VertexFormat::ptr vertexFormat,int size);
-	/// @todo: clonePixelBuffer,cloneVariableBuffer
 
 	Track *createColorTrack();
 

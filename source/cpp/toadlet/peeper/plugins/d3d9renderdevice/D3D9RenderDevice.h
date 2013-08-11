@@ -37,6 +37,7 @@
 #include <toadlet/peeper/TextureState.h>
 #include <toadlet/peeper/RasterizerState.h>
 #include <toadlet/peeper/RenderCaps.h>
+#include <toadlet/peeper/RenderState.h>
 #include <toadlet/peeper/IndexData.h>
 
 namespace toadlet{
@@ -103,13 +104,12 @@ public:
 	bool getRenderCaps(RenderCaps &caps){caps.set(mCaps);return true;}
 	const RenderCaps &getCaps() const{return mCaps;}
 
-	/// @todo: Move these all to pointers once we have things working
-	void setBlendState(const BlendState &state);
-	void setDepthState(const DepthState &state);
-	void setRasterizerState(const RasterizerState &state);
-	void setFogState(const FogState &state);
-	void setPointState(const PointState &state);
-	void setMaterialState(const MaterialState &state);
+	void setBlendState(BlendState *state);
+	void setDepthState(DepthState *state);
+	void setRasterizerState(RasterizerState *state);
+	void setFogState(FogState *state);
+	void setPointState(PointState *state);
+	void setMaterialState(MaterialState *state);
 	void setSamplerState(int i,SamplerState *state);
 	void setSamplerStatePostTexture(int i,SamplerState *state);
 	void setTextureState(int i,TextureState *state);
@@ -158,6 +158,8 @@ protected:
 	Collection<SamplerState*> mLastSamplerStates;
 
 	RenderCaps mCaps;
+
+	RenderState::ptr mDefaultState;
 };
 
 }
