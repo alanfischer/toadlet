@@ -26,7 +26,6 @@
 package us.toadlet.pad;
 
 import android.app.Activity;
-import android.content.Context;
 import android.hardware.*;
 import android.view.*;
 import android.os.*;
@@ -227,7 +226,7 @@ public abstract class AndroidApplication extends Activity implements Runnable{
 		}
 
 		if(mAudioDevice==null){
-			mAudioDevice=new ATAudioDevice();
+			mAudioDevice=new ATAudioDevice(this);
 			if(mAudioDevice!=null && mAudioDevice.create()==false){
 				mAudioDevice=null;
 			}
