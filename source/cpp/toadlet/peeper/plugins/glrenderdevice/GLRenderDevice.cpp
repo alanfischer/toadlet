@@ -353,6 +353,14 @@ bool GLRenderDevice::create(RenderTarget *target,int options){
 		#endif
 	}
 
+	mDefaultState=new GLRenderState(this);
+	mDefaultState->setBlendState(BlendState());
+	mDefaultState->setDepthState(DepthState());
+	mDefaultState->setFogState(FogState());
+	mDefaultState->setPointState(PointState());
+	mDefaultState->setRasterizerState(RasterizerState());
+	mDefaultState->setMaterialState(MaterialState());
+
 	setDefaultState();
 
 	TOADLET_CHECK_GLERROR("create");
@@ -580,7 +588,7 @@ void GLRenderDevice::setViewport(const Viewport &viewport){
 	}
 
 	// Update PointState, since it is dependent upon viewport size
-	setPointState(mPointState);
+	setPointState(&mPointState);
 
 	TOADLET_CHECK_GLERROR("setViewport");
 }
@@ -854,14 +862,7 @@ bool GLRenderDevice::copyPixelBuffer(PixelBuffer *dst,PixelBuffer *src){
 }
 
 void GLRenderDevice::setDefaultState(){
-	// General states
-	setBlendState(BlendState());
-	setDepthState(DepthState());
-	setFogState(FogState());
-	setPointState(PointState());
-	setRasterizerState(RasterizerState());
-	setMaterialState(MaterialState());
-	setAmbientColor(Math::ONE_VECTOR4);
+	setRenderState(mDefaultState);
 
 	setVertexData(NULL);
 	setShaderState(NULL);
@@ -874,6 +875,8 @@ void GLRenderDevice::setDefaultState(){
 			setTexture((Shader::ShaderType)j,i,NULL);
 		}
 	}
+
+	setAmbientColor(Math::ONE_VECTOR4);
 
 	// GL specific states
 	#if defined(TOADLET_HAS_GLFIXED) && !defined(TOADLET_HAS_GLES) && defined(TOADLET_HAS_GL_11)
@@ -892,22 +895,22 @@ bool GLRenderDevice::setRenderState(RenderState *renderState){
 	}
 
 	if(glrenderState->mBlendState!=NULL){
-		setBlendState(*glrenderState->mBlendState);
+		setBlendState(glrenderState->mBlendState);
 	}
 	if(glrenderState->mDepthState!=NULL){
-		setDepthState(*glrenderState->mDepthState);
+		setDepthState(glrenderState->mDepthState);
 	}
 	if(glrenderState->mRasterizerState!=NULL){
-		setRasterizerState(*glrenderState->mRasterizerState);
+		setRasterizerState(glrenderState->mRasterizerState);
 	}
 	if(glrenderState->mFogState!=NULL){
-		setFogState(*glrenderState->mFogState);
+		setFogState(glrenderState->mFogState);
 	}
 	if(glrenderState->mPointState!=NULL){
-		setPointState(*glrenderState->mPointState);
+		setPointState(glrenderState->mPointState);
 	}
 	if(glrenderState->mMaterialState!=NULL){
-		setMaterialState(*glrenderState->mMaterialState);
+		setMaterialState(glrenderState->mMaterialState);
 	}
 	int i;
 	for(i=0;i<glrenderState->mSamplerStates.size();++i){
@@ -943,64 +946,64 @@ bool GLRenderDevice::setShaderState(ShaderState *shaderState){
 	#endif
 }
 
-void GLRenderDevice::setBlendState(const BlendState &state){
-	if(state.equals(BlendState::Combination_DISABLED)){
+void GLRenderDevice::setBlendState(BlendState *state){
+	if(state->equals(BlendState::Combination_DISABLED)){
 		glDisable(GL_BLEND);
 	}
 	else{
-		int src=getGLBlendOperation(state.source);
-		int dest=getGLBlendOperation(state.dest);
+		int src=getGLBlendOperation(state->source);
+		int dest=getGLBlendOperation(state->dest);
 
 		glBlendFunc(src,dest);
 		glEnable(GL_BLEND);
 	}
 
-	glColorMask((state.colorWrite&BlendState::ColorWrite_BIT_R)!=0,(state.colorWrite&BlendState::ColorWrite_BIT_G)!=0,(state.colorWrite&BlendState::ColorWrite_BIT_B)!=0,(state.colorWrite&BlendState::ColorWrite_BIT_A)!=0);
+	glColorMask((state->colorWrite&BlendState::ColorWrite_BIT_R)!=0,(state->colorWrite&BlendState::ColorWrite_BIT_G)!=0,(state->colorWrite&BlendState::ColorWrite_BIT_B)!=0,(state->colorWrite&BlendState::ColorWrite_BIT_A)!=0);
 
 	TOADLET_CHECK_GLERROR("setBlendState");
 }
 
-void GLRenderDevice::setDepthState(const DepthState &state){
-	mDepthState.set(state);
+void GLRenderDevice::setDepthState(DepthState *state){
+	mDepthState.set(*state);
 
-	if(state.test==DepthState::DepthTest_ALWAYS){
+	if(state->test==DepthState::DepthTest_ALWAYS){
 		glDisable(GL_DEPTH_TEST);
 	}
 	else{
-		glDepthFunc(getGLDepthFunc(state.test));
+		glDepthFunc(getGLDepthFunc(state->test));
 		glEnable(GL_DEPTH_TEST);
 	}
 
-	glDepthMask(state.write);
+	glDepthMask(state->write);
 
 	TOADLET_CHECK_GLERROR("setDepthState");
 }
 
-void GLRenderDevice::setFogState(const FogState &state){
+void GLRenderDevice::setFogState(FogState *state){
 #if defined(TOADLET_HAS_GLFIXED)
-	if(state.fog==FogState::FogType_NONE){
+	if(state->fog==FogState::FogType_NONE){
 		glDisable(GL_FOG);
 	}
 	else{
 		glEnable(GL_FOG);
-		glFogf(GL_FOG_MODE,getGLFogType(state.fog));
+		glFogf(GL_FOG_MODE,getGLFogType(state->fog));
 		#if defined(TOADLET_FIXED_POINT)
 			#if defined(TOADLET_HAS_GLES)
-				glFogx(GL_FOG_START,state.nearDistance);
-				glFogx(GL_FOG_END,state.farDistance);
-				glFogx(GL_FOG_DENSITY,state.density);
-				glFogxv(GL_FOG_COLOR,state.color.getData());
+				glFogx(GL_FOG_START,state->nearDistance);
+				glFogx(GL_FOG_END,state->farDistance);
+				glFogx(GL_FOG_DENSITY,state->density);
+				glFogxv(GL_FOG_COLOR,state->color.getData());
 			#else
-				glFogf(GL_FOG_START,MathConversion::scalarToFloat(state.nearDistance));
-				glFogf(GL_FOG_END,MathConversion::scalarToFloat(state.farDistance));
-				glFogf(GL_FOG_DENSITY,MathConversion::scalarToFloat(state.density));
-				glFogfv(GL_FOG_COLOR,colorArray(cacheArray,state.color));
+				glFogf(GL_FOG_START,MathConversion::scalarToFloat(state->nearDistance));
+				glFogf(GL_FOG_END,MathConversion::scalarToFloat(state->farDistance));
+				glFogf(GL_FOG_DENSITY,MathConversion::scalarToFloat(state->density));
+				glFogfv(GL_FOG_COLOR,colorArray(cacheArray,state->color));
 			#endif
 		#else
-			glFogf(GL_FOG_START,state.nearDistance);
-			glFogf(GL_FOG_END,state.farDistance);
-			glFogf(GL_FOG_DENSITY,state.density);
-			glFogfv(GL_FOG_COLOR,state.color.getData());
+			glFogf(GL_FOG_START,state->nearDistance);
+			glFogf(GL_FOG_END,state->farDistance);
+			glFogf(GL_FOG_DENSITY,state->density);
+			glFogfv(GL_FOG_COLOR,state->color.getData());
 		#endif
 	}
 
@@ -1008,9 +1011,9 @@ void GLRenderDevice::setFogState(const FogState &state){
 #endif
 }
 
-void GLRenderDevice::setMaterialState(const MaterialState &state){
+void GLRenderDevice::setMaterialState(MaterialState *state){
 #if defined(TOADLET_HAS_GLFIXED)
-	if(state.light){
+	if(state->light){
 		// 12/19/10
 		// There appears to be a bug in at least:
 		// GL_VENDOR:NVIDIA Corporation
@@ -1026,7 +1029,7 @@ void GLRenderDevice::setMaterialState(const MaterialState &state){
 	}
 
 	// The GL_COLOR_MATERIAL command must come before the actual Material settings
-	if(state.trackColor){
+	if(state->trackColor){
 		#if !defined(TOADLET_HAS_GLES) && defined(TOADLET_HAS_GL_11)
 		if(gl_version>=11){
 			glColorMaterial(GL_FRONT_AND_BACK,GL_AMBIENT_AND_DIFFUSE);
@@ -1040,29 +1043,29 @@ void GLRenderDevice::setMaterialState(const MaterialState &state){
 
 	#if defined(TOADLET_FIXED_POINT)
 		#if defined(TOADLET_HAS_GLES)
-			glMaterialxv(GL_FRONT_AND_BACK,GL_AMBIENT,state.ambient.getData());
-			glMaterialxv(GL_FRONT_AND_BACK,GL_DIFFUSE,state.diffuse.getData());
-			glMaterialxv(GL_FRONT_AND_BACK,GL_SPECULAR,state.specular.getData());
-			glMaterialx(GL_FRONT_AND_BACK,GL_SHININESS,state.shininess);
-			glMaterialxv(GL_FRONT_AND_BACK,GL_EMISSION,state.emissive.getData());
+			glMaterialxv(GL_FRONT_AND_BACK,GL_AMBIENT,state->ambient.getData());
+			glMaterialxv(GL_FRONT_AND_BACK,GL_DIFFUSE,state->diffuse.getData());
+			glMaterialxv(GL_FRONT_AND_BACK,GL_SPECULAR,state->specular.getData());
+			glMaterialx(GL_FRONT_AND_BACK,GL_SHININESS,state->shininess);
+			glMaterialxv(GL_FRONT_AND_BACK,GL_EMISSION,state->emissive.getData());
 		#else
-			glMaterialfv(GL_FRONT_AND_BACK,GL_AMBIENT,colorArray(cacheArray,state.ambient));
-			glMaterialfv(GL_FRONT_AND_BACK,GL_DIFFUSE,colorArray(cacheArray,state.diffuse));
-			glMaterialfv(GL_FRONT_AND_BACK,GL_SPECULAR,colorArray(cacheArray,state.specular));
-			glMaterialf(GL_FRONT_AND_BACK,GL_SHININESS,MathConversion::scalarToFloat(state.shininess));
-			glMaterialfv(GL_FRONT_AND_BACK,GL_EMISSION,colorArray(cacheArray,state.emissive));
+			glMaterialfv(GL_FRONT_AND_BACK,GL_AMBIENT,colorArray(cacheArray,state->ambient));
+			glMaterialfv(GL_FRONT_AND_BACK,GL_DIFFUSE,colorArray(cacheArray,state->diffuse));
+			glMaterialfv(GL_FRONT_AND_BACK,GL_SPECULAR,colorArray(cacheArray,state->specular));
+			glMaterialf(GL_FRONT_AND_BACK,GL_SHININESS,MathConversion::scalarToFloat(state->shininess));
+			glMaterialfv(GL_FRONT_AND_BACK,GL_EMISSION,colorArray(cacheArray,state->emissive));
 		#endif
 	#else
-		glMaterialfv(GL_FRONT_AND_BACK,GL_AMBIENT,state.ambient.getData());
-		glMaterialfv(GL_FRONT_AND_BACK,GL_DIFFUSE,state.diffuse.getData());
-		glMaterialfv(GL_FRONT_AND_BACK,GL_SPECULAR,state.specular.getData());
-		glMaterialf(GL_FRONT_AND_BACK,GL_SHININESS,state.shininess);
-		glMaterialfv(GL_FRONT_AND_BACK,GL_EMISSION,state.emissive.getData());
+		glMaterialfv(GL_FRONT_AND_BACK,GL_AMBIENT,state->ambient.getData());
+		glMaterialfv(GL_FRONT_AND_BACK,GL_DIFFUSE,state->diffuse.getData());
+		glMaterialfv(GL_FRONT_AND_BACK,GL_SPECULAR,state->specular.getData());
+		glMaterialf(GL_FRONT_AND_BACK,GL_SHININESS,state->shininess);
+		glMaterialfv(GL_FRONT_AND_BACK,GL_EMISSION,state->emissive.getData());
 	#endif
 
-	glShadeModel(getGLShadeModel(state.shade));
+	glShadeModel(getGLShadeModel(state->shade));
 
-	switch(state.normalize){
+	switch(state->normalize){
 		case MaterialState::NormalizeType_NONE:
 			glDisable(GL_NORMALIZE);
 			glDisable(GL_RESCALE_NORMAL);
@@ -1077,15 +1080,15 @@ void GLRenderDevice::setMaterialState(const MaterialState &state){
 		break;
 	}
 
-	if(state.alphaTest==MaterialState::AlphaTest_NEVER){
+	if(state->alphaTest==MaterialState::AlphaTest_NEVER){
 		glDisable(GL_ALPHA_TEST);
 	}
 	else{
-		GLenum func=getGLAlphaFunc(state.alphaTest);
+		GLenum func=getGLAlphaFunc(state->alphaTest);
 		#if defined(TOADLET_FIXED_POINT) && defined(TOADLET_HAS_GLES)
-			glAlphaFuncx(func,state.alphaCutoff);
+			glAlphaFuncx(func,state->alphaCutoff);
 		#else
-			glAlphaFunc(func,MathConversion::scalarToFloat(state.alphaCutoff));
+			glAlphaFunc(func,MathConversion::scalarToFloat(state->alphaCutoff));
 		#endif
 		glEnable(GL_ALPHA_TEST);
 	}
@@ -1430,15 +1433,15 @@ void GLRenderDevice::setTexture(Shader::ShaderType shaderType,int i,Texture *tex
 	TOADLET_CHECK_GLERROR("setTexture");
 }
 
-void GLRenderDevice::setPointState(const PointState &state){
+void GLRenderDevice::setPointState(PointState *state){
 #if defined(TOADLET_HAS_GLFIXED)
-	mPointState.set(state);
+	mPointState.set(*state);
 
 	// pointsize = size / sqrt(constant + linear*d + quadratic*d*d)
 	// if a&b = 0, then quadratic = 1/(C*C) where C = first component of projMatrix * 1/2 screen width
 	if(mCaps.pointSprites){
 		int value;
-		if(state.sprite){
+		if(state->sprite){
 			glEnable(GL_POINT_SPRITE);
 			value=1;
 		}
@@ -1461,28 +1464,28 @@ void GLRenderDevice::setPointState(const PointState &state){
 
 		#if defined(TOADLET_FIXED_POINT)
 			#if defined(TOADLET_HAS_GLES)
-				glPointParameterx(GL_POINT_SIZE_MIN,state.minSize);
-				glPointParameterx(GL_POINT_SIZE_MAX,state.maxSize);
+				glPointParameterx(GL_POINT_SIZE_MIN,state->minSize);
+				glPointParameterx(GL_POINT_SIZE_MAX,state->maxSize);
 			#else
-				glPointParameterf(GL_POINT_SIZE_MIN,MathConversion::scalarToFloat(state.minSize));
-				glPointParameterf(GL_POINT_SIZE_MAX,MathConversion::scalarToFloat(state.maxSize));
+				glPointParameterf(GL_POINT_SIZE_MIN,MathConversion::scalarToFloat(state->minSize));
+				glPointParameterf(GL_POINT_SIZE_MAX,MathConversion::scalarToFloat(state->maxSize));
 			#endif
 		#else
-			glPointParameterf(GL_POINT_SIZE_MIN,state.minSize);
-			glPointParameterf(GL_POINT_SIZE_MAX,state.maxSize);
+			glPointParameterf(GL_POINT_SIZE_MIN,state->minSize);
+			glPointParameterf(GL_POINT_SIZE_MAX,state->maxSize);
 		#endif
 
-		if(state.attenuated){
+		if(state->attenuated){
 			#if defined(TOADLET_FIXED_POINT)
 				#if defined(TOADLET_HAS_GLES)
-					cacheArray[0]=state.constant; cacheArray[1]=state.linear; cacheArray[2]=state.quadratic;
+					cacheArray[0]=state->constant; cacheArray[1]=state->linear; cacheArray[2]=state->quadratic;
 					glPointParameterxv(GL_POINT_DISTANCE_ATTENUATION,cacheArray);
 				#else
-					cacheArray[0]=MathConversion::scalarToFloat(state.constant); cacheArray[1]=MathConversion::scalarToFloat(state.linear); cacheArray[2]=MathConversion::scalarToFloat(state.quadratic);
+					cacheArray[0]=MathConversion::scalarToFloat(state->constant); cacheArray[1]=MathConversion::scalarToFloat(state->linear); cacheArray[2]=MathConversion::scalarToFloat(state->quadratic);
 					glPointParameterfv(GL_POINT_DISTANCE_ATTENUATION,cacheArray);
 				#endif
 			#else
-				cacheArray[0]=state.constant; cacheArray[1]=state.linear; cacheArray[2]=state.quadratic;
+				cacheArray[0]=state->constant; cacheArray[1]=state->linear; cacheArray[2]=state->quadratic;
 				glPointParameterfv(GL_POINT_DISTANCE_ATTENUATION,cacheArray);
 			#endif
 		}
@@ -1497,12 +1500,12 @@ void GLRenderDevice::setPointState(const PointState &state){
 		}
 	}
 
-	if(state.size>0){
-		if(state.attenuated){
-			glPointSize(MathConversion::scalarToFloat(state.size) * mViewport.height);
+	if(state->size>0){
+		if(state->attenuated){
+			glPointSize(MathConversion::scalarToFloat(state->size) * mViewport.height);
 		}
 		else{
-			glPointSize(MathConversion::scalarToFloat(state.size));
+			glPointSize(MathConversion::scalarToFloat(state->size));
 		}
 	}
 
@@ -1510,35 +1513,35 @@ void GLRenderDevice::setPointState(const PointState &state){
 #endif
 }
 
-void GLRenderDevice::setRasterizerState(const RasterizerState &state){
-	if(state.cull==RasterizerState::CullType_NONE){
+void GLRenderDevice::setRasterizerState(RasterizerState *state){
+	if(state->cull==RasterizerState::CullType_NONE){
 		glDisable(GL_CULL_FACE);
 	}
 	else{
-		glCullFace(getGLCullFace(state.cull));
+		glCullFace(getGLCullFace(state->cull));
 		glEnable(GL_CULL_FACE);
 	}
 
 	#if !defined(TOADLET_HAS_GLES)
-		glPolygonMode(GL_FRONT_AND_BACK,getGLPolygonMode(state.fill));
+		glPolygonMode(GL_FRONT_AND_BACK,getGLPolygonMode(state->fill));
 	#else
 		mRasterizerFill=state.fill;
 	#endif
 
-	if(state.depthBiasConstant==0 && state.depthBiasSlope==0){
+	if(state->depthBiasConstant==0 && state->depthBiasSlope==0){
 		glDisable(GL_POLYGON_OFFSET_FILL);
 	}
 	else{
 		#if defined(TOADLET_FIXED_POINT) && defined(TOADLET_HAS_GLES)
-			glPolygonOffsetx(state.depthBiasSlope,state.depthBiasConstant);
+			glPolygonOffsetx(state->depthBiasSlope,state->depthBiasConstant);
 		#else
-			glPolygonOffset(MathConversion::scalarToFloat(state.depthBiasSlope),MathConversion::scalarToFloat(state.depthBiasConstant));
+			glPolygonOffset(MathConversion::scalarToFloat(state->depthBiasSlope),MathConversion::scalarToFloat(state->depthBiasConstant));
 		#endif
 		glEnable(GL_POLYGON_OFFSET_FILL);
 	}
 
 	#if defined(TOADLET_HAS_GLFIXED)
-		if(state.multisample){
+		if(state->multisample){
 			glEnable(GL_MULTISAMPLE);
 		}
 		else{
@@ -1546,14 +1549,14 @@ void GLRenderDevice::setRasterizerState(const RasterizerState &state){
 		}
 	#endif
 
-	if(state.dither){
+	if(state->dither){
 		glEnable(GL_DITHER);
 	}
 	else{
 		glDisable(GL_DITHER);
 	}
 
-	glLineWidth(MathConversion::scalarToFloat(state.lineSize));
+	glLineWidth(MathConversion::scalarToFloat(state->lineSize));
 
 	TOADLET_CHECK_GLERROR("setRasterizerState");
 }

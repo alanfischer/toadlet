@@ -40,6 +40,7 @@
 #include <toadlet/peeper/TextureState.h>
 #include <toadlet/peeper/Viewport.h>
 #include <toadlet/peeper/RenderCaps.h>
+#include <toadlet/peeper/RenderState.h>
 
 namespace toadlet{
 namespace peeper{
@@ -116,13 +117,12 @@ public:
 	void getShadowBiasMatrix(const Texture *shadowTexture,Matrix4x4 &result);
 	bool getRenderCaps(RenderCaps &caps){caps.set(mCaps);return true;}
 
-	/// @todo: Move these all to pointers once we have things working
-	void setBlendState(const BlendState &state);
-	void setDepthState(const DepthState &state);
-	void setRasterizerState(const RasterizerState &state);
-	void setFogState(const FogState &state);
-	void setPointState(const PointState &state);
-	void setMaterialState(const MaterialState &state);
+	void setBlendState(BlendState *state);
+	void setDepthState(DepthState *state);
+	void setRasterizerState(RasterizerState *state);
+	void setFogState(FogState *state);
+	void setPointState(PointState *state);
+	void setMaterialState(MaterialState *state);
 	void setSamplerState(int i,SamplerState *state);
 	void setTextureState(int i,TextureState *state);
 	void setSamplerStatePostTexture(int i,SamplerState *state);
@@ -237,6 +237,8 @@ protected:
 	RenderCaps mCaps;
 	bool mMultiTexture;
 	bool mHasClampToEdge;
+
+	RenderState::ptr mDefaultState;
 
 	RenderTarget::ptr mPrimaryRenderTarget;
 	GLRenderTarget::ptr mGLPrimaryRenderTarget;

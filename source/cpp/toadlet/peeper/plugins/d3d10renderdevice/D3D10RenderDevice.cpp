@@ -124,7 +124,8 @@ bool D3D10RenderDevice::create(RenderTarget *target,int options){
 	mDefaultState->setBlendState(BlendState());
 	mDefaultState->setDepthState(DepthState());
 	mDefaultState->setRasterizerState(RasterizerState());
-	setRenderState(mDefaultState);
+
+	setDefaultState();
 	
 	Log::alert(Categories::TOADLET_PEEPER,
 		"created D3D10RenderDevice");
