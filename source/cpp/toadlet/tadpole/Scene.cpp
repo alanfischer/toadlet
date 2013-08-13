@@ -27,7 +27,7 @@
 #include <toadlet/tadpole/Engine.h>
 #include <toadlet/tadpole/Scene.h>
 
-/// @todo: Somehow the selection of RenderManager and PhysicsManager should be moved into the Engine I think?  The Engine handles all other plugins currently.
+/// @todo: We need to differentiate between a Manager and a System.  The Engine can keep hold of all Managers, but the Systems are Scene specific.
 #include <toadlet/tadpole/plugins/SimpleRenderManager.h>
 #include <toadlet/tadpole/plugins/HopManager.h>
 
