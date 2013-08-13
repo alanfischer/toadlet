@@ -77,7 +77,7 @@ void MaterialStateAnimation::setValue(scalar value){
 
 		MaterialState state;
 		mTarget->getMaterialState(state);
-		state.set(color);
+		state.set(color,state.light);
 		mTarget->setMaterialState(state);
 	}
 }

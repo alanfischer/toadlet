@@ -250,12 +250,11 @@ public:
 	inline wchar operator[](int i) const{return (wchar)mData[i];}
 
 private:
-	void clearc();
 	void updatec();
 
+	int mLength;
 	stringchar *mData;
 	char *mNarrowData;
-	int mLength;
 	static stringchar mNull;
 };
 

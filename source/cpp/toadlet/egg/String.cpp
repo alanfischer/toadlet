@@ -92,16 +92,16 @@ namespace egg{
 stringchar String::mNull=0;
 
 String::String(){
-	mData=&mNull;
 	mLength=0;
-	mNarrowData=NULL;
+	mData=&mNull;
+	mNarrowData=(char*)&mNull;
 }
 
 void String::internal_String(const char *text){
 	if(text==NULL){
 		mLength=0;
 		mData=&mNull;
-		mNarrowData=NULL;
+		mNarrowData=(char*)&mNull;
 		return;
 	}
 
@@ -118,7 +118,7 @@ void String::internal_String(const unsigned char *text){
 	if(text==NULL){
 		mLength=0;
 		mData=&mNull;
-		mNarrowData=NULL;
+		mNarrowData=(char*)&mNull;
 		return;
 	}
 
@@ -135,7 +135,7 @@ void String::internal_String(const stringchar *text){
 	if(text==NULL){
 		mLength=0;
 		mData=&mNull;
-		mNarrowData=NULL;
+		mNarrowData=(char*)&mNull;
 		return;
 	}
 
@@ -173,9 +173,11 @@ String::String(int length){
 }
 
 String::~String(){
-	delete[] mNarrowData;
 	if(mData!=&mNull){
 		delete[] mData;
+	}
+	if(mNarrowData!=(char*)&mNull){
+		delete[] mNarrowData;
 	}
 }
 
@@ -451,8 +453,6 @@ const String &String::operator=(const String &string){
 		return *this;
 	}
 
-	clearc();
-
 	mLength=string.mLength;
 	if(mData!=&mNull){
 		delete[] mData;
@@ -579,8 +579,6 @@ String String::operator+(double f) const{
 }
 
 void String::operator+=(const String &string){
-	clearc();
-
 	stringchar *data=new stringchar[mLength+string.mLength+1];
 	TOADLET_WCSNCPY((wchar_t*)data,(wchar_t*)mData,mLength);
 	TOADLET_WCSNCPY((wchar_t*)data+mLength,(wchar_t*)string.mData,string.mLength);
@@ -600,8 +598,6 @@ void String::operator+=(const char *text){
 	if(text==NULL){
 		return;
 	}
-
-	clearc();
 
 	int len2=strlen(text);
 
@@ -625,8 +621,6 @@ void String::internal_addassign(const stringchar *text){
 	if(text==NULL){
 		return;
 	}
-
-	clearc();
 
 	int len2=TOADLET_WCSLEN((wchar_t*)text);
 
@@ -687,12 +681,11 @@ bool String::operator<(const String &string) const{
 	return (TOADLET_WCSCMP((wchar_t*)mData,(wchar_t*)string.mData)<0);
 }
 
-void String::clearc(){
-	delete[] mNarrowData;
-	mNarrowData=NULL;
-}
-
 void String::updatec(){
+	if(mNarrowData!=(char*)&mNull){
+		delete[] mNarrowData;
+	}
+
 	mNarrowData=new char[mLength+1];
 	const stringchar *source=mData;
 	char *dest=mNarrowData;
