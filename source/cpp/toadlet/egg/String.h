@@ -64,6 +64,9 @@ public:
 	#if defined(__OBJC__)
 		inline String(NSString *string){internal_String([string UTF8String]);}
 	#endif
+	#if defined(QSTRING_H)
+		inline String(const QString &string){internal_String(string.toAscii().data());}
+	#endif
 	String(const String &string);
 	explicit String(int length);
 
@@ -118,7 +121,7 @@ public:
 
 	inline int length() const{return mLength;}
 
-	const char *c_str() const;
+	const char *c_str() const{return mNarrowData;}
 	inline operator const char *() const{return c_str();}
 
 	const stringchar *internal_wc_str() const{return mData;}
@@ -127,6 +130,9 @@ public:
 
 	#if defined(__OBJC__)
 		inline operator NSString *() const{return [NSString stringWithUTF8String:c_str()];}
+	#endif
+	#if defined(QSTRING_H)
+		inline operator QString () const{return QString(c_str());}
 	#endif
 
 	Collection<tbyte> data() const;
@@ -244,14 +250,13 @@ public:
 	inline wchar operator[](int i) const{return (wchar)mData[i];}
 
 private:
-	void clearExtraData();
-	void update();
+	void clearc();
+	void updatec();
 
 	stringchar *mData;
+	char *mNarrowData;
 	int mLength;
 	static stringchar mNull;
-
-	mutable char *mNarrowData;
 };
 
 TOADLET_API String operator+(const char *text,const String &string);

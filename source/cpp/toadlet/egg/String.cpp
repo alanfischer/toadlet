@@ -104,12 +104,14 @@ void String::internal_String(const char *text){
 		mNarrowData=NULL;
 		return;
 	}
+
 	mLength=strlen(text);
 	mData=new stringchar[mLength+1];
 	stringchar *dest=mData;
 	while((*dest++=*text++)!=0);
 	mNarrowData=NULL;
-	update();
+
+	updatec();
 }
 
 void String::internal_String(const unsigned char *text){
@@ -125,7 +127,8 @@ void String::internal_String(const unsigned char *text){
 	stringchar *dest=mData;
 	while((*dest++=*text++)!=0);
 	mNarrowData=NULL;
-	update();
+
+	updatec();
 }
 
 void String::internal_String(const stringchar *text){
@@ -140,7 +143,8 @@ void String::internal_String(const stringchar *text){
 	mData=new stringchar[mLength+1];
 	TOADLET_WCSNCPY((wchar_t*)mData,(wchar_t*)text,mLength+1);
 	mNarrowData=NULL;
-	update();
+
+	updatec();
 }
 
 void String::internal_String(const Collection<tbyte> &text){
@@ -149,7 +153,8 @@ void String::internal_String(const Collection<tbyte> &text){
 	for(int i=0;i<mLength;++i)mData[i]=text[i];
 	mData[mLength]=0;
 	mNarrowData=NULL;
-	update();
+
+	updatec();
 }
 
 String::String(const String &string){
@@ -157,7 +162,8 @@ String::String(const String &string){
 	mData=new stringchar[mLength+1];
 	TOADLET_WCSNCPY((wchar_t*)mData,(wchar_t*)string.mData,mLength+1);
 	mNarrowData=NULL;
-	update();
+
+	updatec();
 }
 
 String::String(int length){
@@ -167,7 +173,7 @@ String::String(int length){
 }
 
 String::~String(){
-	clearExtraData();
+	delete[] mNarrowData;
 	if(mData!=&mNull){
 		delete[] mData;
 	}
@@ -349,16 +355,6 @@ bool String::endsWith(const String &string) const{
 	return substr(mLength-len,len).equals(string);
 }
 
-const char *String::c_str() const{
-	if(mNarrowData==NULL){
-		mNarrowData=new char[mLength+1];
-		const stringchar *source=mData;
-		char *dest=mNarrowData;
-		while((*dest++=*source++)!=0);
-	}
-	return mNarrowData;
-}
-
 Collection<tbyte> String::data() const{
 	Collection<tbyte> text(mLength);
 	for(int i=0;i<mLength;++i)text[i]=mData[i];
@@ -452,7 +448,7 @@ const String &String::operator=(const String &string){
 		return *this;
 	}
 
-	clearExtraData();
+	clearc();
 
 	mLength=string.mLength;
 	if(mData!=&mNull){
@@ -460,7 +456,9 @@ const String &String::operator=(const String &string){
 	}
 	mData=new stringchar[mLength+1];
 	TOADLET_WCSNCPY((wchar_t*)mData,(wchar_t*)string.mData,mLength+1);
-	update();
+
+	updatec();
+
 	return *this;
 }
 
@@ -558,7 +556,7 @@ String String::operator+(double f) const{
 }
 
 void String::operator+=(const String &string){
-	clearExtraData();
+	clearc();
 
 	stringchar *data=new stringchar[mLength+string.mLength+1];
 	TOADLET_WCSNCPY((wchar_t*)data,(wchar_t*)mData,mLength);
@@ -571,7 +569,8 @@ void String::operator+=(const String &string){
 	}
 	mData=data;
 	mLength=length;
-	update();
+
+	updatec();
 }
 
 void String::operator+=(const char *text){
@@ -579,7 +578,7 @@ void String::operator+=(const char *text){
 		return;
 	}
 
-	clearExtraData();
+	clearc();
 
 	int len2=strlen(text);
 
@@ -595,7 +594,8 @@ void String::operator+=(const char *text){
 	}
 	mData=data;
 	mLength=length;
-	update();
+
+	updatec();
 }
 
 void String::internal_addassign(const stringchar *text){
@@ -603,7 +603,7 @@ void String::internal_addassign(const stringchar *text){
 		return;
 	}
 
-	clearExtraData();
+	clearc();
 
 	int len2=TOADLET_WCSLEN((wchar_t*)text);
 
@@ -618,7 +618,8 @@ void String::internal_addassign(const stringchar *text){
 	}
 	mData=data;
 	mLength=length;
-	update();
+
+	updatec();
 }
 
 bool String::equals(const String &string) const{
@@ -663,17 +664,16 @@ bool String::operator<(const String &string) const{
 	return (TOADLET_WCSCMP((wchar_t*)mData,(wchar_t*)string.mData)<0);
 }
 
-void String::clearExtraData(){
-	if(mNarrowData!=NULL){
-		delete[] mNarrowData;
-		mNarrowData=NULL;
-	}
+void String::clearc(){
+	delete[] mNarrowData;
+	mNarrowData=NULL;
 }
 
-void String::update(){
-	#if defined(TOADLET_DEBUG)
-		c_str();
-	#endif
+void String::updatec(){
+	mNarrowData=new char[mLength+1];
+	const stringchar *source=mData;
+	char *dest=mNarrowData;
+	while((*dest++=*source++)!=0);
 }
 
 String operator+(const char *text,const String &string){
