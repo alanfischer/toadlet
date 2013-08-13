@@ -339,8 +339,11 @@ String String::substr(int start,int amt) const{
 	}
 
 	String s(amt);
+
 	TOADLET_WCSNCPY((wchar_t*)s.mData,(wchar_t*)mData+start,s.mLength);
 	s.mData[s.mLength]=0;
+
+	s.updatec();
 
 	return s;
 }
@@ -464,9 +467,13 @@ const String &String::operator=(const String &string){
 
 String String::operator+(const String &string) const{
 	String s(mLength+string.mLength);
+
 	TOADLET_WCSNCPY((wchar_t*)s.mData,(wchar_t*)mData,mLength);
 	TOADLET_WCSNCPY((wchar_t*)s.mData+mLength,(wchar_t*)string.mData,string.mLength);
 	s.mData[s.mLength]=0;
+
+	s.updatec();
+
 	return s;
 }
 
@@ -478,10 +485,14 @@ String String::operator+(const char *text) const{
 	int len2=strlen(text);
 
 	String s(mLength+len2);
+
 	TOADLET_WCSNCPY((wchar_t*)s.mData,(wchar_t*)mData,mLength);
 	stringchar *dest=s.mData+mLength;
 	while((*dest++=*text++)!=0);
 	s.mData[s.mLength]=0;
+
+	s.updatec();
+
 	return s;
 }
 
@@ -493,25 +504,37 @@ String String::internal_add(const stringchar *text) const{
 	int len2=TOADLET_WCSLEN((wchar_t*)text);
 
 	String s(mLength+len2);
+
 	TOADLET_WCSNCPY((wchar_t*)s.mData,(wchar_t*)mData,mLength);
 	TOADLET_WCSNCPY((wchar_t*)s.mData+mLength,(wchar_t*)text,len2);
 	s.mData[s.mLength]=0;
+
+	s.updatec();
+
 	return s;
 }
 
 String String::operator+(char c) const{
 	String s(mLength+1);
+
 	TOADLET_WCSNCPY((wchar_t*)s.mData,(wchar_t*)mData,mLength);
 	s.mData[mLength]=c;
 	s.mData[s.mLength]=0;
+
+	s.updatec();
+
 	return s;
 }
 
 String String::internal_add(stringchar c) const{
 	String s(mLength+1);
+
 	TOADLET_WCSNCPY((wchar_t*)s.mData,(wchar_t*)mData,mLength);
 	s.mData[mLength]=c;
 	s.mData[s.mLength]=0;
+	
+	s.updatec();
+
 	return s;
 }
 
@@ -684,10 +707,14 @@ String operator+(const char *text,const String &string){
 	int len2=strlen(text);
 
 	String s(string.mLength+len2);
+
 	stringchar *dest=s.mData;
 	while((*dest++=*text++)!=0);
 	TOADLET_WCSNCPY((wchar_t*)s.mData+len2,(wchar_t*)string.mData,string.mLength);
 	s.mData[s.mLength]=0;
+
+	s.updatec();
+
 	return s;
 }
 
@@ -699,25 +726,37 @@ String internal_add(const stringchar *text,const String &string){
 	int len2=TOADLET_WCSLEN((wchar_t*)text);
 
 	String s(string.mLength+len2);
+
 	TOADLET_WCSNCPY((wchar_t*)s.mData,(wchar_t*)text,len2);
 	TOADLET_WCSNCPY((wchar_t*)s.mData+len2,(wchar_t*)string.mData,string.mLength);
 	s.mData[s.mLength]=0;
+
+	s.updatec();
+
 	return s;
 }
 
 String operator+(char c,const String &string){
 	String s(string.mLength+1);
+
 	s.mData[0]=c;
 	TOADLET_WCSNCPY((wchar_t*)s.mData+1,(wchar_t*)string.mData,string.mLength);
 	s.mData[s.mLength]=0;
+
+	s.updatec();
+
 	return s;
 }
 
 String internal_add(stringchar c,const String &string){
 	String s(string.mLength+1);
+
 	s.mData[0]=c;
 	TOADLET_WCSNCPY((wchar_t*)s.mData+1,(wchar_t*)string.mData,string.mLength);
 	s.mData[s.mLength]=0;
+
+	s.updatec();
+
 	return s;
 }
 
