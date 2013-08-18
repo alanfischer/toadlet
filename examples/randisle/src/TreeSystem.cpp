@@ -589,7 +589,7 @@ void TreeSystem::traceSegment(PhysicsCollision &result,const Vector3 &position,c
 Path *TreeSystem::traceSegment(PhysicsCollision &result,const Vector3 &position,const Segment &segment,const Vector3 &size,TreeBranch *path){
 	result.time=Math::findIntersection(segment,path->bound,result.point,result.normal);
 
-	Path *closestPath;
+	Path *closestPath=NULL;
 
 	int i;
 	for(i=0;i<path->children.size();++i){

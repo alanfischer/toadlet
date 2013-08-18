@@ -191,7 +191,7 @@ public abstract class AndroidApplication extends Activity implements Runnable{
 	}
 
 	public boolean onPrepareOptionsMenu(Menu menu){
-		if(mEngine.hasMaximumShader(0)){
+		if(mShaderState){
 			mShaderItem.setTitle("Enable FixedFunction");
 		}
 		else{
@@ -203,7 +203,7 @@ public abstract class AndroidApplication extends Activity implements Runnable{
 	public boolean onOptionsItemSelected(MenuItem item){
 		if(item==mShaderItem){
 			mNotifyShaderChanged=true;
-			mShaderState=!mEngine.hasMaximumShader(0);
+			mShaderState=!mShaderState;
 		}
 		else if(item==mExitItem){
 			stop();
@@ -218,10 +218,6 @@ public abstract class AndroidApplication extends Activity implements Runnable{
 
 		if(mEngine==null){
 			mEngine=new Engine(this);
-			
-			mEngine.setHasMaximumShader(false);
-			mEngine.setHasMaximumFixed(true);
-			
 			mEngine.installHandlers();
 		}
 
@@ -345,14 +341,6 @@ public abstract class AndroidApplication extends Activity implements Runnable{
 				}
 				if(mNotifyShaderChanged){
 					mNotifyShaderChanged=false;
-					if(mShaderState){
-						mEngine.setHasMaximumShader(true);
-						mEngine.setHasMaximumFixed(false);
-					}
-					else{
-						mEngine.setHasMaximumShader(false);
-						mEngine.setHasMaximumFixed(true);
-					}
 					surfaceDestroyed(mSurfaceHolder);
 					surfaceCreated(mSurfaceHolder);
 				}
@@ -542,13 +530,7 @@ public abstract class AndroidApplication extends Activity implements Runnable{
 		int Format_TYPE_UINT_5_6_5=7<<Format_SHIFT_TYPES;
 		int Format_RGB_5_6_5=Format_SEMANTIC_RGB|Format_TYPE_UINT_5_6_5;
 		mFormat.setPixelFormat(Format_RGB_5_6_5);
-
-		if(mEngine.hasShader(0)){
-			mFormat.setFlags(2);
-		}
-		else if(mEngine.hasFixed(0)){
-			mFormat.setFlags(0);
-		}
+		mFormat.setFlags(mShaderState?2:0);
 		
 		// Start with gles2 and then try gles
 		for(;mFormat.getFlags()>=0 && mRenderDevice==null;mFormat.setFlags(mFormat.getFlags()-2)){
@@ -656,7 +638,7 @@ public abstract class AndroidApplication extends Activity implements Runnable{
 	protected boolean mNotifyMouseReleased;
 	protected int mMouseReleasedX,mMouseReleasedY;
 	protected boolean mNotifyShaderChanged;
-	protected boolean mShaderState;
+	protected boolean mShaderState=true;
 
 	protected MenuItem mShaderItem,mExitItem;
 }
