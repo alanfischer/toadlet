@@ -300,6 +300,9 @@ bool MaterialManager::isPathUseable(RenderPath *path,const RenderCaps &caps){
 					break;
 				}
 			}
+			else if(caps.hasFixed[j]==false){
+				break;
+			}
 
 			if(pass->getNumTextures((Shader::ShaderType)j)>caps.maxTextureStages){
 				break;
@@ -316,7 +319,6 @@ bool MaterialManager::isPathUseable(RenderPath *path,const RenderCaps &caps){
 
 bool MaterialManager::compileMaterial(Material *material){
 	RenderPath::ptr bestPath;
-
 	if(mRenderPathChooser!=NULL){
 		bestPath=mRenderPathChooser->chooseBestPath(material);
 	}

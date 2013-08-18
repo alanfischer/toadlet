@@ -212,8 +212,8 @@ public:
 		mDangerAnimation->attach(new MaterialStateAnimation(sprite->getSharedRenderState(),sequence,0));
 		mDangerAnimation->attach(new AudioGainAnimation(audio,sequence,1));
 
-		Shader::ShaderType type;
-		int index;
+		Shader::ShaderType type=Shader::ShaderType_FRAGMENT;
+		int index=0;
 		if(sprite->getMaterial()!=NULL && sprite->getMaterial()->getBestPath()!=NULL){
 			sprite->getMaterial()->getBestPath()->findTexture(type,index,"tex");
 			TextureState textureState;
