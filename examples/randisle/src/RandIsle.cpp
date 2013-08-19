@@ -715,9 +715,6 @@ void RandIsle::keyPressed(int key){
 		Profile::getInstance()->outputTimings();
 		Profile::getInstance()->clearTimings();
 	}
-	else if(key=='g'){
-		((BaseApplication*)mApp)->changeRenderDevicePlugin("gl");
-	}
 }
 
 void RandIsle::keyReleased(int key){
