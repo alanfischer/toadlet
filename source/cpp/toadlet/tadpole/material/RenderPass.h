@@ -90,8 +90,8 @@ public:
 	int getModelMatrixFlags() const{return mModelMatrixFlags;}
 
 	int getNumTextures(Shader::ShaderType type) const{return mTextures[type].size();}
-	void setTexture(const String &name,Texture *texture,const String &samplerName,const SamplerState &samplerState,const TextureState &textureState);
-	void setTexture(Shader::ShaderType type,int i,Texture *texture,const SamplerState &samplerState,const TextureState &textureState);
+	bool setTexture(const String &name,Texture *texture,const String &samplerName,const SamplerState &samplerState,const TextureState &textureState);
+	bool setTexture(Shader::ShaderType type,int i,Texture *texture,const SamplerState &samplerState,const TextureState &textureState);
 	Texture *getTexture(Shader::ShaderType type,int i) const{return i<mTextures[type].size()?mTextures[type][i].texture:NULL;}
 	inline bool findTexture(Shader::ShaderType &type,int &index,const String &name){return findTexture(type,index,name,"");}
 	bool findTexture(Shader::ShaderType &type,int &index,const String &name,const String &samplerName);
@@ -118,8 +118,10 @@ public:
 	void compile(); 
 
 protected:
-	void populateLocationNames();
-	void createBuffers();
+	bool populateLocationNames();
+	bool createBuffers();
+	bool linkVariables();
+	bool linkTextures();
 	VariableBufferFormat::Variable *findFormatVariable(const String &name,Shader::ShaderType &bufferType,int &bufferIndex);
 
 	class BufferData{
@@ -136,6 +138,9 @@ protected:
 	public:
 		String locationName;
 		Texture::ptr texture;
+		String samplerLocationName;
+		SamplerState samplerState;
+		TextureState textureState;
 	};
 
 	class VariableData{
@@ -156,7 +161,8 @@ protected:
 	Collection<TextureData> mTextures[Shader::ShaderType_MAX];
 	int mModelMatrixFlags;
 
-	Collection<VariableData> mVariables;
+	Collection<VariableData> mUnlinkedVariables;
+	Collection<TextureData> mUnlinkedTextures;
 };
 
 }
