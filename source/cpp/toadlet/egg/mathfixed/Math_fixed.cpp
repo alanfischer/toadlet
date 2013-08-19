@@ -677,10 +677,11 @@ bool Math::getIntersectionOfThreePlanes(Vector3 &result,const Plane &p1,const Pl
 }
 
 void Math::getLineOfIntersection(Segment &result,const Plane &plane1,const Plane &plane2){
-	fixed determinant=mul(lengthSquared(plane1.normal),lengthSquared(plane2.normal)) - mul(dot(plane1.normal,plane2.normal),dot(plane1.normal,plane2.normal));
+	fixed d=dot(plane1.normal,plane2.normal);
+	fixed determinant=mul(lengthSquared(plane1.normal),lengthSquared(plane2.normal)) - mul(d,d);
 
-	fixed c1=div(mul(plane1.distance,lengthSquared(plane2.normal)) - mul(plane2.distance,dot(plane1.normal,plane2.normal)),determinant);
-	fixed c2=div(mul(plane2.distance,lengthSquared(plane1.normal)) - mul(plane1.distance,dot(plane1.normal,plane2.normal)),determinant);
+	fixed c1=div(mul(plane1.distance,lengthSquared(plane2.normal)) - mul(plane2.distance,d),determinant);
+	fixed c2=div(mul(plane2.distance,lengthSquared(plane1.normal)) - mul(plane1.distance,d),determinant);
 
 	cross(result.direction,plane1.normal,plane2.normal);
 	Vector3 n1,n2;
