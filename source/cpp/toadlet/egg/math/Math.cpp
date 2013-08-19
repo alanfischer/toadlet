@@ -898,10 +898,11 @@ bool Math::getIntersectionOfThreePlanes(Vector3 &result,const Plane &p1,const Pl
 }
 
 void Math::getLineOfIntersection(Segment &result,const Plane &plane1,const Plane &plane2){
-	real determinant=lengthSquared(plane1.normal)*lengthSquared(plane2.normal) - (dot(plane1.normal,plane2.normal)*dot(plane1.normal,plane2.normal));
+	real d=dot(plane1.normal,plane2.normal);
+	real determinant=lengthSquared(plane1.normal)*lengthSquared(plane2.normal) - (d*d);
 
-	real c1=(plane1.distance*lengthSquared(plane2.normal) - plane2.distance*dot(plane1.normal,plane2.normal))/determinant;
-	real c2=(plane2.distance*lengthSquared(plane1.normal) - plane1.distance*dot(plane1.normal,plane2.normal))/determinant;
+	real c1=(plane1.distance*lengthSquared(plane2.normal) - plane2.distance*d)/determinant;
+	real c2=(plane2.distance*lengthSquared(plane1.normal) - plane1.distance*d)/determinant;
 
 	cross(result.direction,plane1.normal,plane2.normal);
 	Vector3 n1,n2;
