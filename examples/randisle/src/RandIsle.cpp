@@ -107,21 +107,6 @@ protected:
 	int mSkip,mNext;
 };
 
-/// @todo: These could be removed if nodes supported propagating scopes, similar to worldTransform, worldScope
-void clearScopeBit(Node *node,int scope){
-	node->setScope(node->getScope()&~scope);
-	for(Node::NodeCollection::iterator n=node->getNodeBegin();n!=node->getNodeEnd();++n){
-		clearScopeBit(n,scope);
-	}
-}
-
-void setScopeBit(Node *node,int scope){
-	node->setScope(node->getScope()|scope);
-	for(Node::NodeCollection::iterator n=node->getNodeBegin();n!=node->getNodeEnd();++n){
-		setScopeBit(n,scope);
-	}
-}
-
 RandIsle::RandIsle(Application *app,String path):
 	mMouseButtons(0),
 	mXJoy(0),mYJoy(0),
@@ -207,8 +192,7 @@ void RandIsle::create(){
 	}
 
 	mHUD=new HUD(mScene,mPlayer,mCamera);
-	clearScopeBit(mHUD,Scope_BIT_SHADOW);
-	setScopeBit(mHUD,Scope_BIT_HUD);
+	mHUD->setScope(Scope_BIT_HUD);
 	mScene->getRoot()->attach(mHUD);
 
 	mHUDCamera=new Camera(mEngine);
@@ -216,7 +200,7 @@ void RandIsle::create(){
 	mHUDCamera->setClearFlags(0);
 
 	mSky=new Sky(mScene,Resources::instance->cloudSize,Resources::instance->skyColor,Resources::instance->fadeColor);
-	clearScopeBit(mSky,Scope_BIT_SHADOW);
+	mSky->setScope(mSky->getScope()&~Scope_BIT_SHADOW);
 	mScene->getBackground()->attach(mSky);
 
 	VertexBuffer::ptr predictedVertexBuffer=mEngine->getBufferManager()->createVertexBuffer(Buffer::Usage_BIT_STREAM,Buffer::Access_BIT_WRITE,mEngine->getVertexFormats().POSITION_COLOR,512);

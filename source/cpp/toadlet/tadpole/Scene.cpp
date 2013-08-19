@@ -265,7 +265,9 @@ void Scene::traceSegment(PhysicsCollision &result,const Segment &segment,int col
 }
 
 void Scene::destroy(Component *component){
-	mDestroyComponents.add(component);
+	if(mDestroyComponents.contains(component)==false){
+		mDestroyComponents.add(component);
+	}
 }
 
 void Scene::postContextActivate(RenderDevice *device){

@@ -74,8 +74,10 @@ public:
 
 	void destroyAllChildren();
 
-	virtual void parentChanged(Node *node);
 	virtual void rootChanged(Node *root);
+
+	virtual void notifyParentAttached();
+	virtual void notifyParentRemoved();
 
 	virtual Node *getRoot() const{return mRoot;}
 
@@ -164,6 +166,7 @@ public:
 
 	virtual void setScope(int scope){mScope=scope;}
 	inline int getScope() const{return mScope;}
+	inline int getWorldScope() const{return mWorldScope;}
 
 	virtual void logicUpdate(int dt,int scope);
 	virtual void frameUpdate(int dt,int scope);
@@ -188,6 +191,7 @@ public:
 
 protected:
 	virtual void calculateBound();
+	virtual void updatePending();
 
 	// Engine items
 	IntrusivePointer<Engine,ObjectSemantics> mEngine;
@@ -199,6 +203,11 @@ protected:
 	NodeCollection mNodes;
 	bool mChildrenActive;
 	bool mActivateChildren;
+
+	ComponentCollection mComponentsPendingAttach;
+	ComponentCollection mComponentsPendingRemove;
+	NodeCollection mNodesPendingAttach;
+	NodeCollection mNodesPendingRemove;
 
 	Collection<ActionComponent*> mActions;
 	Collection<Visible*> mVisibles;
@@ -215,6 +224,7 @@ protected:
 	Transform::ptr mWorldTransform;
 	Bound::ptr mWorldBound;
 	int mScope;
+	int mWorldScope;
 };
 
 }
