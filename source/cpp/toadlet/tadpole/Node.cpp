@@ -86,6 +86,8 @@ void Node::destroy(){
 	}
 
 	BaseComponent::destroy();
+
+	updatePending();
 }
 
 void Node::create(Scene *scene){
