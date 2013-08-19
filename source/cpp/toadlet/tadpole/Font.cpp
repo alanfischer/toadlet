@@ -122,10 +122,6 @@ bool Font::updateVertexBufferForString(VertexBuffer::ptr vertexBuffer,const Stri
 	int lineLength=0;
 	char c=(char)10;
 
-//	if(flip){
-//		y+=mPointSize;
-//	}
-
 	scalar pointSize=
 		#if defined(TOADLET_FIXED_POINT)
 			Math::fromFloat(mPointSize);
