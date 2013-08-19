@@ -60,9 +60,6 @@ RenderPass::RenderPass(MaterialManager *manager,RenderState *renderState,ShaderS
 {
 	mRenderState=renderState;
 	mShaderState=shaderState;
-
-	populateLocationNames();
-	createBuffers();
 }
 
 RenderPass::RenderPass(MaterialManager *manager,RenderPass *pass):
@@ -77,7 +74,7 @@ RenderPass::RenderPass(MaterialManager *manager,RenderPass *pass):
 		mTextures[i]=pass->mTextures[i];
 	}
 	mModelMatrixFlags=pass->mModelMatrixFlags;
-	mVariables=pass->mVariables;
+	mUnlinkedVariables=pass->mUnlinkedVariables;
 }
 
 
@@ -100,17 +97,21 @@ void RenderPass::destroy(){
 	}
 }
 
-void RenderPass::setTexture(const String &name,Texture *texture,const String &samplerName,const SamplerState &samplerState,const TextureState &textureState){
-	Shader::ShaderType type;
-	int index;
-	if(findTexture(type,index,name,samplerName)){
-		setTexture(type,index,texture,samplerState,textureState);
-	}
+bool RenderPass::setTexture(const String &name,Texture *texture,const String &samplerName,const SamplerState &samplerState,const TextureState &textureState){
+	TextureData t;
+	t.locationName=name;
+	t.texture=texture;
+	t.samplerLocationName=samplerName;
+	t.samplerState=samplerState;
+	t.textureState=textureState;
+	mUnlinkedTextures.add(t);
+
+	return true;
 }
 
-void RenderPass::setTexture(Shader::ShaderType type,int i,Texture *texture,const SamplerState &samplerState,const TextureState &textureState){
+bool RenderPass::setTexture(Shader::ShaderType type,int i,Texture *texture,const SamplerState &samplerState,const TextureState &textureState){
 	if(mRenderState==NULL){
-		return;
+		return false;
 	}
 
 	if(i>=mTextures[type].size()){
@@ -120,6 +121,8 @@ void RenderPass::setTexture(Shader::ShaderType type,int i,Texture *texture,const
 
 	mRenderState->setSamplerState(type,i,samplerState);
 	mRenderState->setTextureState(type,i,textureState);
+
+	return true;
 }
 
 bool RenderPass::findTexture(Shader::ShaderType &type,int &index,const String &name,const String &samplerName){
@@ -176,9 +179,6 @@ void RenderPass::setShader(Shader::ShaderType type,Shader *shader){
 	}
 	
 	mShaderState->setShader(type,shader);
-
-	populateLocationNames();
-	createBuffers();
 }
 
 void RenderPass::updateVariables(int scope,SceneParameters *parameters){
@@ -193,7 +193,7 @@ void RenderPass::updateVariables(int scope,SceneParameters *parameters){
 
 			tbyte *data=bufferData.buffer->lock(Buffer::Access_BIT_WRITE);
 			for(v=0;v<bufferData.variables.size();++v){
-				VariableData &variableData=mVariables[bufferData.variables[v]];
+				VariableData &variableData=mUnlinkedVariables[bufferData.variables[v]];
 				variableData.variable->update(data+variableData.location,parameters);
 			}
 			bufferData.buffer->unlock();
@@ -216,38 +216,12 @@ void RenderPass::setBufferLocationName(Shader::ShaderType type,int i,const Strin
 }
 
 bool RenderPass::addVariable(const String &name,RenderVariable::ptr variable,int scope){
-	Shader::ShaderType bufferType;
-	int bufferIndex=-1;
-	VariableBufferFormat::Variable *formatVariable=findFormatVariable(name,bufferType,bufferIndex);
-	if(formatVariable!=NULL){
-		if((formatVariable->getFormat()&~VariableBufferFormat::Format_MASK_OPTIONS)!=(variable->getFormat()&~VariableBufferFormat::Format_MASK_OPTIONS)){
-			Log::warning(Categories::TOADLET_TADPOLE,
-				String("RenderVariable:")+name+" format does not match format:"+formatVariable->getFormat()+"!="+variable->getFormat());
-			return false;
-		}
-	}
-
-	if(formatVariable==NULL){
-		if(mShaderState!=NULL){
-			Log::warning(Categories::TOADLET_TADPOLE,
-				"RenderVariable not found with name:"+name);
-			return false;
-		}
-	}
-	else{
-		VariableData v;
-		v.name=name;
-		v.variable=variable;
-		v.location=formatVariable->getOffset();
-		mVariables.add(v);
-		
-		variable->linked(this);
-		mBuffers[bufferType][bufferIndex].variables.add(mVariables.size()-1);
-		mBuffers[bufferType][bufferIndex].scope|=scope;
-
-		// Combine the two format, not sure this is ideal, but it will let us transfer information about the RenderVariable to the Buffer for items like Format_SAMPLER_MATRIX
-		formatVariable->setFormat(formatVariable->getFormat()|variable->getFormat());
-	}
+	VariableData v;
+	v.name=name;
+	v.variable=variable;
+	v.location=-1;
+	v.scope=scope;
+	mUnlinkedVariables.add(v);
 	
 	return true;
 }
@@ -258,11 +232,15 @@ bool RenderPass::isDepthSorted() const{
 }
 
 void RenderPass::compile(){
+	populateLocationNames();
+	createBuffers();
+	linkVariables();
+	linkTextures();
 }
 
-void RenderPass::populateLocationNames(){
+bool RenderPass::populateLocationNames(){
 	if(mShaderState==NULL){
-		return;
+		return false;
 	}
 
 	int i,j,k;
@@ -280,14 +258,16 @@ void RenderPass::populateLocationNames(){
 			}
 		}
 	}
+
+	return true;
 }
 
-void RenderPass::createBuffers(){
-	int i=0,j=0;
+bool RenderPass::createBuffers(){
 	if(mShaderState==NULL){
-		return;
+		return false;
 	}
 
+	int i=0,j=0;
 	for(j=0;j<Shader::ShaderType_MAX;++j){
 		for(i=0;i<mShaderState->getNumVariableBuffers((Shader::ShaderType)j);++i){
 			VariableBufferFormat::ptr format=mShaderState->getVariableBufferFormat((Shader::ShaderType)j,i);
@@ -302,6 +282,73 @@ void RenderPass::createBuffers(){
 			setBuffer((Shader::ShaderType)j,i,buffer);
 		}
 	}
+
+	return true;
+}
+
+bool RenderPass::linkVariables(){
+	int i=0;
+	for(i=0;i<mUnlinkedVariables.size();++i){
+		VariableData &vardata=mUnlinkedVariables[i];
+		String name=vardata.name;
+		int scope=vardata.scope;
+		RenderVariable *variable=vardata.variable;
+
+		Shader::ShaderType bufferType=(Shader::ShaderType)0;
+		int bufferIndex=-1;
+		VariableBufferFormat::Variable *formatVariable=findFormatVariable(name,bufferType,bufferIndex);
+		if(formatVariable!=NULL){
+			if((formatVariable->getFormat()&~VariableBufferFormat::Format_MASK_OPTIONS)!=(variable->getFormat()&~VariableBufferFormat::Format_MASK_OPTIONS)){
+				Log::warning(Categories::TOADLET_TADPOLE,
+					String("RenderVariable:")+name+" format does not match format:"+formatVariable->getFormat()+"!="+variable->getFormat());
+				continue;
+			}
+		}
+
+		if(formatVariable==NULL){
+			if(mShaderState!=NULL){
+				Log::warning(Categories::TOADLET_TADPOLE,
+					"RenderVariable not found with name:"+name);
+				continue;
+			}
+		}
+
+		vardata.location=formatVariable->getOffset();
+
+		variable->linked(this);
+		mBuffers[bufferType][bufferIndex].variables.add(i);
+		mBuffers[bufferType][bufferIndex].scope|=scope;
+
+		// Combine the two format, not sure this is ideal, but it will let us transfer information about the RenderVariable to the Buffer for items like Format_SAMPLER_MATRIX
+		formatVariable->setFormat(formatVariable->getFormat()|variable->getFormat());
+	}
+	
+	return true;
+}
+
+bool RenderPass::linkTextures(){
+	int i=0;
+	for(i=0;i<mUnlinkedTextures.size();++i){
+		TextureData &texdata=mUnlinkedTextures[i];
+		String name=texdata.locationName;
+		String samplerName=texdata.samplerLocationName;
+		Texture *texture=texdata.texture;
+		SamplerState samplerState=texdata.samplerState;
+		TextureState textureState=texdata.textureState;
+
+		Shader::ShaderType type=(Shader::ShaderType)0;
+		int index=-1;
+		if(findTexture(type,index,name,samplerName)==false){
+			Log::warning(Categories::TOADLET_TADPOLE,
+				"Texture not found with name:"+name);
+			continue;
+		}
+		else{
+			setTexture(type,index,texture,samplerState,textureState);
+		}
+	}
+
+	return true;
 }
 
 VariableBufferFormat::Variable *RenderPass::findFormatVariable(const String &name,Shader::ShaderType &bufferType,int &bufferIndex){
