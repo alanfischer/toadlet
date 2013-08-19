@@ -66,6 +66,9 @@ public:
 	virtual void parentChanged(Node *node);
 	virtual void rootChanged(Node *root);
 
+	virtual void notifyParentAttached();
+	virtual void notifyParentRemoved();
+
 	virtual Node *getParent(){return mParent;}
 
 	virtual void logicUpdate(int dt,int scope){}

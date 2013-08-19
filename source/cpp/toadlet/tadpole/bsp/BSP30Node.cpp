@@ -209,7 +209,7 @@ void BSP30Node::gatherRenderables(Camera *camera,RenderableSet *set){
 		}
 
 		for(NodeCollection::iterator node=getNodeBegin(),end=getNodeEnd();node!=end;++node){
-			if((camera->getScope()&node->getScope())!=0 && camera->culled(node->getWorldBound())==false){
+			if((camera->getScope()&node->getWorldScope())!=0 && camera->culled(node->getWorldBound())==false){
 				node->gatherRenderables(camera,set);
 			}
 		}
@@ -230,7 +230,7 @@ void BSP30Node::gatherRenderables(Camera *camera,RenderableSet *set){
 					childdata *data=(childdata*)node->getParentData();
 					if(data->counter!=mCounter){
 						data->counter=mCounter;
-						if((camera->getScope()&node->getScope())!=0 && camera->culled(node->getWorldBound())==false){
+						if((camera->getScope()&node->getWorldScope())!=0 && camera->culled(node->getWorldBound())==false){
 							node->gatherRenderables(camera,set);
 						}
 					}
@@ -241,7 +241,7 @@ void BSP30Node::gatherRenderables(Camera *camera,RenderableSet *set){
 		const Collection<Node*> &occupants=mGlobalLeafData.occupants;
 		for(j=0;j<occupants.size();++j){
 			Node *node=occupants[j];
-			if((camera->getScope()&node->getScope())!=0 && camera->culled(node->getWorldBound())==false){
+			if((camera->getScope()&node->getWorldScope())!=0 && camera->culled(node->getWorldBound())==false){
 				node->gatherRenderables(camera,set);
 			}
 		}

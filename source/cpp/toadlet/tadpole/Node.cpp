@@ -51,7 +51,8 @@ Node::Node(Scene *scene):BaseComponent(),
 	//mBound,
 	//mWorldTransform,
 	//mWorldBound,
-	mScope(0)
+	mScope(0),
+	mWorldScope(0)
 {
 	mParent=NULL;
 	mParentData=NULL;
@@ -68,6 +69,7 @@ Node::Node(Scene *scene):BaseComponent(),
 	mWorldTransform=new Transform();
 	mWorldBound=new Bound();
 	mScope=-1;
+	mWorldScope=-1;
 
 	if(scene!=NULL){
 		create(scene);
@@ -93,17 +95,15 @@ void Node::create(Scene *scene){
 }
 
 void Node::destroyAllChildren(){
-	while(mComponents.begin()!=mComponents.end()){
-		mComponents.begin()->destroy();
+	for(ComponentCollection::iterator c=mComponents.begin(),end=mComponents.end();c!=end;++c){
+		c->destroy();
 	}
-	while(mNodes.begin()!=mNodes.end()){
-		mNodes.begin()->destroy();
+	for(NodeCollection::iterator n=mNodes.begin(),end=mNodes.end();n!=end;++n){
+		n->destroy();
 	}
 }
 
 bool Node::attach(Component *component){
-	Component::ptr reference=component;
-
 	component->parentChanged(this);
 
 	if(getActive()==false){
@@ -114,8 +114,6 @@ bool Node::attach(Component *component){
 }
 
 bool Node::remove(Component *component){
-	Component::ptr reference=component;
-
 	component->parentChanged(NULL);
 
 	if(getActive()==false){
@@ -126,23 +124,22 @@ bool Node::remove(Component *component){
 }
 
 void Node::componentAttached(Component *component){
-	mComponents.add(component);
+	mComponentsPendingAttach.add(component);
 }
 
 void Node::componentRemoved(Component *component){
-	mComponents.remove(component);
+	mComponentsPendingRemove.add(component);
 }
 
 void Node::nodeAttached(Node *node){
-	mNodes.add(node);
-	mComponents.remove(node);
+	mNodesPendingAttach.add(node);
 
+	node->updatePending();
 	node->transformChanged(node->mTransform); // Trigger bound updating
 }
 
 void Node::nodeRemoved(Node *node){
-	mComponents.add(node);
-	mNodes.remove(node);
+	mNodesPendingRemove.add(node);
 }
 
 void Node::actionAttached(ActionComponent *action){
@@ -159,7 +156,17 @@ Component *Node::getChild(const String &name){
 			return c;
 		}
 	}
+	for(ComponentCollection::iterator c=mComponentsPendingAttach.begin(),end=mComponentsPendingAttach.end();c!=end;++c){
+		if(c->getName()==name){
+			return c;
+		}
+	}
 	for(NodeCollection::iterator n=mNodes.begin(),end=mNodes.end();n!=end;++n){
+		if(n->getName()==name){
+			return n;
+		}
+	}
+	for(NodeCollection::iterator n=mNodesPendingAttach.begin(),end=mNodesPendingAttach.end();n!=end;++n){
 		if(n->getName()==name){
 			return n;
 		}
@@ -177,7 +184,17 @@ Component *Node::getChild(const Type<Component> *type){
 			return c;
 		}
 	}
+	for(ComponentCollection::iterator c=mComponentsPendingAttach.begin(),end=mComponentsPendingAttach.end();c!=end;++c){
+		if(c->getType()->getFullName()==type->getFullName()){ // Compare names to avoid the issue of multiple types being built into different libraries
+			return c;
+		}
+	}
 	for(NodeCollection::iterator n=mNodes.begin(),end=mNodes.end();n!=end;++n){
+		if(n->getType()->getFullName()==type->getFullName()){  // Compare names to avoid the issue of multiple types being built into different libraries
+			return n;
+		}
+	}
+	for(NodeCollection::iterator n=mNodesPendingAttach.begin(),end=mNodesPendingAttach.end();n!=end;++n){
 		if(n->getType()->getFullName()==type->getFullName()){  // Compare names to avoid the issue of multiple types being built into different libraries
 			return n;
 		}
@@ -191,6 +208,11 @@ Node *Node::getNode(const String &name){
 			return n;
 		}
 	}
+	for(NodeCollection::iterator n=mNodesPendingAttach.begin(),end=mNodesPendingAttach.end();n!=end;++n){
+		if(n->getName()==name){
+			return n;
+		}
+	}
 	return NULL;
 }
 
@@ -200,6 +222,11 @@ Node *Node::getNode(const Type<Component> *type){
 	}
 
 	for(NodeCollection::iterator n=mNodes.begin(),end=mNodes.end();n!=end;++n){
+		if(n->getType()->getFullName()==type->getFullName()){ // Compare names to avoid the issue of multiple types being built into different libraries
+			return n;
+		}
+	}
+	for(NodeCollection::iterator n=mNodesPendingAttach.begin(),end=mNodesPendingAttach.end();n!=end;++n){
 		if(n->getType()->getFullName()==type->getFullName()){ // Compare names to avoid the issue of multiple types being built into different libraries
 			return n;
 		}
@@ -296,27 +323,29 @@ void Node::physicsRemoved(PhysicsComponent *physics){
 	mPhysics=NULL;
 }
 
-void Node::parentChanged(Node *node){
-	if(mParent!=NULL){
-		mParent->nodeRemoved(this);
-	}
-	
-	BaseComponent::parentChanged(node);
-
-	if(mParent!=NULL){
-		mParent->nodeAttached(this);
-	}
-}
-
 void Node::rootChanged(Node *root){
 	BaseComponent::rootChanged(root);
 
 	for(ComponentCollection::iterator c=mComponents.begin(),end=mComponents.end();c!=end;++c){
 		c->rootChanged(root);
 	}
+	for(ComponentCollection::iterator c=mComponentsPendingAttach.begin(),end=mComponentsPendingAttach.end();c!=end;++c){
+		c->rootChanged(root);
+	}
 	for(NodeCollection::iterator n=mNodes.begin(),end=mNodes.end();n!=end;++n){
 		n->rootChanged(root);
 	}
+	for(NodeCollection::iterator n=mNodesPendingAttach.begin(),end=mNodesPendingAttach.end();n!=end;++n){
+		n->rootChanged(root);
+	}
+}
+
+void Node::notifyParentAttached(){
+	mParent->nodeAttached(this);
+}
+
+void Node::notifyParentRemoved(){
+	mParent->nodeRemoved(this);
 }
 
 void Node::setTranslate(const Vector3 &translate){
@@ -369,8 +398,10 @@ void Node::setBound(Bound::ptr bound){
 void Node::logicUpdate(int dt,int scope){
 	TOADLET_PROFILE_AUTOSCOPE();
 
+	updatePending();
+
 	if(mActivateChildren){
-	for(NodeCollection::iterator n=mNodes.begin(),end=mNodes.end();n!=end;++n){
+		for(NodeCollection::iterator n=mNodes.begin(),end=mNodes.end();n!=end;++n){
 			n->activate();
 		}
 		mActivateChildren=false;
@@ -385,10 +416,12 @@ void Node::logicUpdate(int dt,int scope){
 	for(NodeCollection::iterator n=mNodes.begin(),end=mNodes.end();n!=end;++n){
 		n->logicUpdate(dt,scope);
 		mChildrenActive|=n->getActive();
-		if(n->getActive() && (n->getScope()&scope)!=0){
+		if(n->getActive() && (n->getWorldScope()&scope)!=0){
 			n->tryDeactivate();
 		}
 	}
+
+	updatePending();
 }
 
 void Node::frameUpdate(int dt,int scope){
@@ -470,12 +503,17 @@ void Node::transformChanged(Transform *transform){
 
 	if(mParent==NULL){
 		mWorldTransform->set(mTransform);
+		mWorldScope=mScope;
 	}
 	else{
 		mWorldTransform->setTransform(mParent->mWorldTransform,mTransform);
+		mWorldScope=mParent->mWorldScope&mScope;
 	}
 
 	for(NodeCollection::iterator n=mNodes.begin(),end=mNodes.end();n!=end;++n){
+		n->transformChanged(mWorldTransform);
+	}
+	for(NodeCollection::iterator n=mNodesPendingAttach.begin(),end=mNodesPendingAttach.end();n!=end;++n){
 		n->transformChanged(mWorldTransform);
 	}
 	for(int i=0;i<mSpacials.size();++i){
@@ -502,36 +540,18 @@ void Node::nodeBoundChanged(Node *node){
 	boundChanged();
 }
 
-void Node::calculateBound(){
-	TOADLET_PROFILE_AUTOSCOPE();
-
-	/// @todo: We need to rework this so it doesn't rebuild the bounds every time a child transform is changed.  For a root node of an active scene, that will get very (almost) pointlessly expensive
-	{
-		mWorldBound->transform(mBound,mWorldTransform);
-
-		scalar epsilon=mScene!=NULL?mScene->getEpsilon():0;
-
-		for(NodeCollection::iterator n=mNodes.begin(),end=mNodes.end();n!=end;++n){
-			mWorldBound->merge(n->getWorldBound(),epsilon);
-		}
-
-		for(int i=0;i<mSpacials.size();++i){
-			Spacial *spacial=mSpacials[i];
-			Bound *bound=spacial->getWorldBound();
-			if(bound!=NULL){
-				mWorldBound->merge(bound,epsilon);
-			}
-		}
-	}
-}
-
 void Node::gatherRenderables(Camera *camera,RenderableSet *set){
 	TOADLET_PROFILE_AUTOSCOPE();
 
 	set->queueNode(this);
 
 	for(NodeCollection::iterator n=mNodes.begin(),end=mNodes.end();n!=end;++n){
-		if((camera->getScope()&n->getScope())!=0 && camera->culled(n->getWorldBound())==false){
+		if((camera->getScope()&n->getWorldScope())!=0 && camera->culled(n->getWorldBound())==false){
+			n->gatherRenderables(camera,set);
+		}
+	}
+	for(NodeCollection::iterator n=mNodesPendingAttach.begin(),end=mNodesPendingAttach.end();n!=end;++n){
+		if((camera->getScope()&n->getWorldScope())!=0 && camera->culled(n->getWorldBound())==false){
 			n->gatherRenderables(camera,set);
 		}
 	}
@@ -545,6 +565,54 @@ void Node::gatherRenderables(Camera *camera,RenderableSet *set){
 	for(int i=0;i<mVisibles.size();++i){
 		mVisibles[i]->gatherRenderables(camera,set);
 	}
+}
+
+void Node::calculateBound(){
+	TOADLET_PROFILE_AUTOSCOPE();
+
+	/// @todo: We need to rework this so it doesn't rebuild the bounds every time a child transform is changed.  For a root node of an active scene, that will get very (almost) pointlessly expensive
+	{
+		mWorldBound->transform(mBound,mWorldTransform);
+
+		scalar epsilon=mScene!=NULL?mScene->getEpsilon():0;
+
+		for(NodeCollection::iterator n=mNodes.begin(),end=mNodes.end();n!=end;++n){
+			mWorldBound->merge(n->getWorldBound(),epsilon);
+		}
+		for(NodeCollection::iterator n=mNodesPendingAttach.begin(),end=mNodesPendingAttach.end();n!=end;++n){
+			mWorldBound->merge(n->getWorldBound(),epsilon);
+		}
+
+		for(int i=0;i<mSpacials.size();++i){
+			Spacial *spacial=mSpacials[i];
+			Bound *bound=spacial->getWorldBound();
+			if(bound!=NULL){
+				mWorldBound->merge(bound,epsilon);
+			}
+		}
+	}
+}
+
+void Node::updatePending(){
+	for(ComponentCollection::iterator c=mComponentsPendingAttach.begin(),end=mComponentsPendingAttach.end();c!=end;++c){
+		mComponents.add((Component*)c);
+	}
+	mComponentsPendingAttach.clear();
+
+	for(ComponentCollection::iterator c=mComponentsPendingRemove.begin(),end=mComponentsPendingRemove.end();c!=end;++c){
+		mComponents.remove((Component*)c);
+	}
+	mComponentsPendingRemove.clear();
+
+	for(NodeCollection::iterator n=mNodesPendingAttach.begin(),end=mNodesPendingAttach.end();n!=end;++n){
+		mNodes.add((Node*)n);
+	}
+	mNodesPendingAttach.clear();
+
+	for(NodeCollection::iterator n=mNodesPendingRemove.begin(),end=mNodesPendingRemove.end();n!=end;++n){
+		mNodes.remove((Node*)n);
+	}
+	mNodesPendingRemove.clear();
 }
 
 }
