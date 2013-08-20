@@ -88,9 +88,9 @@ public:
 	virtual bool remove(Component *component);
 	virtual void componentAttached(Component *component);
 	virtual void componentRemoved(Component *component);
-	virtual Component *getChild(const String &name);
-	virtual Component *getChild(const Type<Component> *type);
-	template<typename Type> Type *getChildType(){return (Type*)getChild(Type::type());}
+	virtual Component *getChild(const String &name) const;
+	virtual Component *getChild(const Type<Component> *type) const;
+	template<typename Type> Type *getChildType() const{return (Type*)getChild(Type::type());}
 
 	virtual void nodeAttached(Node *node);
 	virtual void nodeRemoved(Node *node);
@@ -98,9 +98,9 @@ public:
 	virtual NodeCollection::iterator getNodeEnd(){return mNodes.end();}
 	virtual NodeCollection::const_iterator getNodeBegin() const{return mNodes.begin();}
 	virtual NodeCollection::const_iterator getNodeEnd() const{return mNodes.end();}
-	virtual Node *getNode(const String &name);
-	virtual Node *getNode(const Type<Component> *type);
-	template<typename Type> Type *getNodeType(){return (Type*)getNode(Type::type());}
+	virtual Node *getNode(const String &name) const;
+	virtual Node *getNode(const Type<Component> *type) const;
+	template<typename Type> Type *getNodeType() const{return (Type*)getNode(Type::type());}
 
 	// Attached Interface methods
 	virtual void actionAttached(ActionComponent *action);
@@ -191,7 +191,6 @@ public:
 
 protected:
 	virtual void calculateBound();
-	virtual void updatePending();
 
 	// Engine items
 	IntrusivePointer<Engine,ObjectSemantics> mEngine;
@@ -203,11 +202,6 @@ protected:
 	NodeCollection mNodes;
 	bool mChildrenActive;
 	bool mActivateChildren;
-
-	ComponentCollection mComponentsPendingAttach;
-	ComponentCollection mComponentsPendingRemove;
-	NodeCollection mNodesPendingAttach;
-	NodeCollection mNodesPendingRemove;
 
 	Collection<ActionComponent*> mActions;
 	Collection<Visible*> mVisibles;
