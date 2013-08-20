@@ -97,6 +97,8 @@ void Node::create(Scene *scene){
 }
 
 void Node::destroyAllChildren(){
+	updatePending();
+
 	for(ComponentCollection::iterator c=mComponents.begin(),end=mComponents.end();c!=end;++c){
 		c->destroy();
 	}
