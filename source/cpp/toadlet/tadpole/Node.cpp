@@ -81,13 +81,12 @@ Node::~Node(){
 
 void Node::destroy(){
 	destroyAllChildren();
+
 	if(mScene!=NULL){
 		mScene->getNodeManager()->nodeDestroyed(this);
 	}
 
 	BaseComponent::destroy();
-
-	updatePending();
 }
 
 void Node::create(Scene *scene){
@@ -97,17 +96,19 @@ void Node::create(Scene *scene){
 }
 
 void Node::destroyAllChildren(){
-	updatePending();
-
-	for(ComponentCollection::iterator c=mComponents.begin(),end=mComponents.end();c!=end;++c){
+	ComponentCollection::iterator c;
+	while((c=mComponents.begin())!=mComponents.end()){
 		c->destroy();
 	}
-	for(NodeCollection::iterator n=mNodes.begin(),end=mNodes.end();n!=end;++n){
+	NodeCollection::iterator n;
+	while((n=mNodes.begin())!=mNodes.end()){
 		n->destroy();
 	}
 }
 
 bool Node::attach(Component *component){
+	Component::ptr reference=component;
+
 	component->parentChanged(this);
 
 	if(getActive()==false){
@@ -118,6 +119,8 @@ bool Node::attach(Component *component){
 }
 
 bool Node::remove(Component *component){
+	Component::ptr reference=component;
+
 	component->parentChanged(NULL);
 
 	if(getActive()==false){
@@ -128,22 +131,21 @@ bool Node::remove(Component *component){
 }
 
 void Node::componentAttached(Component *component){
-	mComponentsPendingAttach.add(component);
+	mComponents.add(component);
 }
 
 void Node::componentRemoved(Component *component){
-	mComponentsPendingRemove.add(component);
+	mComponents.remove(component);
 }
 
 void Node::nodeAttached(Node *node){
-	mNodesPendingAttach.add(node);
+	mNodes.add(node);
 
-	node->updatePending();
 	node->transformChanged(node->mTransform); // Trigger bound updating
 }
 
 void Node::nodeRemoved(Node *node){
-	mNodesPendingRemove.add(node);
+	mNodes.remove(node);
 }
 
 void Node::actionAttached(ActionComponent *action){
@@ -154,85 +156,55 @@ void Node::actionRemoved(ActionComponent *action){
 	mActions.remove(action);
 }
 
-Component *Node::getChild(const String &name){
-	for(ComponentCollection::iterator c=mComponents.begin(),end=mComponents.end();c!=end;++c){
+Component *Node::getChild(const String &name) const{
+	for(ComponentCollection::const_iterator c=mComponents.begin(),end=mComponents.end();c!=end;++c){
 		if(c->getName()==name){
-			return c;
+			return *c.it;
 		}
 	}
-	for(ComponentCollection::iterator c=mComponentsPendingAttach.begin(),end=mComponentsPendingAttach.end();c!=end;++c){
-		if(c->getName()==name){
-			return c;
-		}
-	}
-	for(NodeCollection::iterator n=mNodes.begin(),end=mNodes.end();n!=end;++n){
+	for(NodeCollection::const_iterator n=mNodes.begin(),end=mNodes.end();n!=end;++n){
 		if(n->getName()==name){
-			return n;
-		}
-	}
-	for(NodeCollection::iterator n=mNodesPendingAttach.begin(),end=mNodesPendingAttach.end();n!=end;++n){
-		if(n->getName()==name){
-			return n;
+			return *n.it;
 		}
 	}
 	return NULL;
 }
 
-Component *Node::getChild(const Type<Component> *type){
+Component *Node::getChild(const Type<Component> *type) const{
 	if(type->getFullName()==(char*)NULL){
 		return NULL;
 	}
 
-	for(ComponentCollection::iterator c=mComponents.begin(),end=mComponents.end();c!=end;++c){
+	for(ComponentCollection::const_iterator c=mComponents.begin(),end=mComponents.end();c!=end;++c){
 		if(c->getType()->getFullName()==type->getFullName()){ // Compare names to avoid the issue of multiple types being built into different libraries
-			return c;
+			return *c.it;
 		}
 	}
-	for(ComponentCollection::iterator c=mComponentsPendingAttach.begin(),end=mComponentsPendingAttach.end();c!=end;++c){
-		if(c->getType()->getFullName()==type->getFullName()){ // Compare names to avoid the issue of multiple types being built into different libraries
-			return c;
-		}
-	}
-	for(NodeCollection::iterator n=mNodes.begin(),end=mNodes.end();n!=end;++n){
+	for(NodeCollection::const_iterator n=mNodes.begin(),end=mNodes.end();n!=end;++n){
 		if(n->getType()->getFullName()==type->getFullName()){  // Compare names to avoid the issue of multiple types being built into different libraries
-			return n;
-		}
-	}
-	for(NodeCollection::iterator n=mNodesPendingAttach.begin(),end=mNodesPendingAttach.end();n!=end;++n){
-		if(n->getType()->getFullName()==type->getFullName()){  // Compare names to avoid the issue of multiple types being built into different libraries
-			return n;
+			return *n.it;
 		}
 	}
 	return NULL;
 }
 
-Node *Node::getNode(const String &name){
-	for(NodeCollection::iterator n=mNodes.begin(),end=mNodes.end();n!=end;++n){
+Node *Node::getNode(const String &name) const{
+	for(NodeCollection::const_iterator n=mNodes.begin(),end=mNodes.end();n!=end;++n){
 		if(n->getName()==name){
-			return n;
-		}
-	}
-	for(NodeCollection::iterator n=mNodesPendingAttach.begin(),end=mNodesPendingAttach.end();n!=end;++n){
-		if(n->getName()==name){
-			return n;
+			return *n.it;
 		}
 	}
 	return NULL;
 }
 
-Node *Node::getNode(const Type<Component> *type){
+Node *Node::getNode(const Type<Component> *type) const{
 	if(type->getFullName()==(char*)NULL){
 		return NULL;
 	}
 
-	for(NodeCollection::iterator n=mNodes.begin(),end=mNodes.end();n!=end;++n){
+	for(NodeCollection::const_iterator n=mNodes.begin(),end=mNodes.end();n!=end;++n){
 		if(n->getType()->getFullName()==type->getFullName()){ // Compare names to avoid the issue of multiple types being built into different libraries
-			return n;
-		}
-	}
-	for(NodeCollection::iterator n=mNodesPendingAttach.begin(),end=mNodesPendingAttach.end();n!=end;++n){
-		if(n->getType()->getFullName()==type->getFullName()){ // Compare names to avoid the issue of multiple types being built into different libraries
-			return n;
+			return *n.it;
 		}
 	}
 	return NULL;
@@ -333,13 +305,7 @@ void Node::rootChanged(Node *root){
 	for(ComponentCollection::iterator c=mComponents.begin(),end=mComponents.end();c!=end;++c){
 		c->rootChanged(root);
 	}
-	for(ComponentCollection::iterator c=mComponentsPendingAttach.begin(),end=mComponentsPendingAttach.end();c!=end;++c){
-		c->rootChanged(root);
-	}
 	for(NodeCollection::iterator n=mNodes.begin(),end=mNodes.end();n!=end;++n){
-		n->rootChanged(root);
-	}
-	for(NodeCollection::iterator n=mNodesPendingAttach.begin(),end=mNodesPendingAttach.end();n!=end;++n){
 		n->rootChanged(root);
 	}
 }
@@ -402,8 +368,6 @@ void Node::setBound(Bound::ptr bound){
 void Node::logicUpdate(int dt,int scope){
 	TOADLET_PROFILE_AUTOSCOPE();
 
-	updatePending();
-
 	if(mActivateChildren){
 		for(NodeCollection::iterator n=mNodes.begin(),end=mNodes.end();n!=end;++n){
 			n->activate();
@@ -424,8 +388,6 @@ void Node::logicUpdate(int dt,int scope){
 			n->tryDeactivate();
 		}
 	}
-
-	updatePending();
 }
 
 void Node::frameUpdate(int dt,int scope){
@@ -517,9 +479,6 @@ void Node::transformChanged(Transform *transform){
 	for(NodeCollection::iterator n=mNodes.begin(),end=mNodes.end();n!=end;++n){
 		n->transformChanged(mWorldTransform);
 	}
-	for(NodeCollection::iterator n=mNodesPendingAttach.begin(),end=mNodesPendingAttach.end();n!=end;++n){
-		n->transformChanged(mWorldTransform);
-	}
 	for(int i=0;i<mSpacials.size();++i){
 		mSpacials[i]->transformChanged(mWorldTransform);
 	}
@@ -554,11 +513,6 @@ void Node::gatherRenderables(Camera *camera,RenderableSet *set){
 			n->gatherRenderables(camera,set);
 		}
 	}
-	for(NodeCollection::iterator n=mNodesPendingAttach.begin(),end=mNodesPendingAttach.end();n!=end;++n){
-		if((camera->getScope()&n->getWorldScope())!=0 && camera->culled(n->getWorldBound())==false){
-			n->gatherRenderables(camera,set);
-		}
-	}
 	
 	for(int i=0;i<mLights.size();++i){
 		if(mLights[i]->getEnabled()){
@@ -583,9 +537,6 @@ void Node::calculateBound(){
 		for(NodeCollection::iterator n=mNodes.begin(),end=mNodes.end();n!=end;++n){
 			mWorldBound->merge(n->getWorldBound(),epsilon);
 		}
-		for(NodeCollection::iterator n=mNodesPendingAttach.begin(),end=mNodesPendingAttach.end();n!=end;++n){
-			mWorldBound->merge(n->getWorldBound(),epsilon);
-		}
 
 		for(int i=0;i<mSpacials.size();++i){
 			Spacial *spacial=mSpacials[i];
@@ -595,28 +546,6 @@ void Node::calculateBound(){
 			}
 		}
 	}
-}
-
-void Node::updatePending(){
-	for(ComponentCollection::iterator c=mComponentsPendingAttach.begin(),end=mComponentsPendingAttach.end();c!=end;++c){
-		mComponents.add((Component*)c);
-	}
-	mComponentsPendingAttach.clear();
-
-	for(ComponentCollection::iterator c=mComponentsPendingRemove.begin(),end=mComponentsPendingRemove.end();c!=end;++c){
-		mComponents.remove((Component*)c);
-	}
-	mComponentsPendingRemove.clear();
-
-	for(NodeCollection::iterator n=mNodesPendingAttach.begin(),end=mNodesPendingAttach.end();n!=end;++n){
-		mNodes.add((Node*)n);
-	}
-	mNodesPendingAttach.clear();
-
-	for(NodeCollection::iterator n=mNodesPendingRemove.begin(),end=mNodesPendingRemove.end();n!=end;++n){
-		mNodes.remove((Node*)n);
-	}
-	mNodesPendingRemove.clear();
 }
 
 }
