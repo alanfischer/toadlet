@@ -623,7 +623,7 @@ LRESULT CALLBACK wndProc(HWND wnd,UINT msg,WPARAM wParam,LPARAM lParam){
 	else{
 		return DefWindowProc(wnd,msg,wParam,lParam);
 	}
-
+	Log::alert(String("MSG:")+msg);
 	int key=0;
 	switch(msg){
 		case WM_SETFOCUS:
@@ -729,6 +729,9 @@ LRESULT CALLBACK wndProc(HWND wnd,UINT msg,WPARAM wParam,LPARAM lParam){
 		case WM_RBUTTONDOWN:
 			application->mousePressed(LOWORD(lParam),HIWORD(lParam),2);
 			return 0;
+		case WM_XBUTTONDOWN:
+			application->mousePressed(LOWORD(lParam),HIWORD(lParam),2+HIWORD(wParam));
+			return 0;
 		case WM_LBUTTONUP:
 			application->mouseReleased(LOWORD(lParam),HIWORD(lParam),0);
 			return 0;
@@ -737,6 +740,9 @@ LRESULT CALLBACK wndProc(HWND wnd,UINT msg,WPARAM wParam,LPARAM lParam){
 			return 0;
 		case WM_RBUTTONUP:
 			application->mouseReleased(LOWORD(lParam),HIWORD(lParam),2);
+			return 0;
+		case WM_XBUTTONUP:
+			application->mouseReleased(LOWORD(lParam),HIWORD(lParam),2+HIWORD(wParam));
 			return 0;
 		case WM_MOUSEWHEEL:
 			application->mouseScrolled(LOWORD(lParam),HIWORD(lParam),wParam);

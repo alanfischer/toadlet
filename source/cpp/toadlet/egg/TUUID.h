@@ -36,7 +36,7 @@ class TOADLET_API TUUID{
 public:
 	TUUID(uint64 highBits1=0,uint64 lowBits1=0):highBits(highBits1),lowBits(lowBits1){}
 	TUUID(tbyte bytes[]):highBits(*(uint64*)(bytes+0)),lowBits(*(uint64*)(bytes+8)){}
-	TUUID(const String &string):highBits(0),lowBits(0){fromString(string);}
+	explicit TUUID(const String &string):highBits(0),lowBits(0){fromString(string);}
 
 	bool fromRandom();
 	bool fromString(const String &string);
