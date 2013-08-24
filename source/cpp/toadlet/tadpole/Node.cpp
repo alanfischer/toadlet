@@ -384,7 +384,7 @@ void Node::logicUpdate(int dt,int scope){
 	for(NodeCollection::iterator n=mNodes.begin(),end=mNodes.end();n!=end;++n){
 		n->logicUpdate(dt,scope);
 		mChildrenActive|=n->getActive();
-		if(n->getActive() && (n->getWorldScope()&scope)!=0){
+		if(n->getActive() && (n->getScope()&scope)!=0){
 			n->tryDeactivate();
 		}
 	}
@@ -509,7 +509,7 @@ void Node::gatherRenderables(Camera *camera,RenderableSet *set){
 	set->queueNode(this);
 
 	for(NodeCollection::iterator n=mNodes.begin(),end=mNodes.end();n!=end;++n){
-		if((camera->getScope()&n->getWorldScope())!=0 && camera->culled(n->getWorldBound())==false){
+		if((camera->getScope()&n->getScope())!=0 && camera->culled(n->getWorldBound())==false){
 			n->gatherRenderables(camera,set);
 		}
 	}
