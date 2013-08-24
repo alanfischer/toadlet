@@ -623,7 +623,7 @@ LRESULT CALLBACK wndProc(HWND wnd,UINT msg,WPARAM wParam,LPARAM lParam){
 	else{
 		return DefWindowProc(wnd,msg,wParam,lParam);
 	}
-	Log::alert(String("MSG:")+msg);
+
 	int key=0;
 	switch(msg){
 		case WM_SETFOCUS:
