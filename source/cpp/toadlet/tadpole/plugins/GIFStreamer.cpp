@@ -235,7 +235,7 @@ int GIFStreamer::getNextImage(tbyte *&data,int &delay,GifFileType *gifFile,Textu
 			if (DGifGetExtension(gifFile,&ExtCode,&pExtension)==GIF_ERROR){
 				return GIF_ERROR;
 			}
-			bool bNetscapeExt = FALSE;
+			bool bNetscapeExt = false;
 			switch (ExtCode){
 				case COMMENT_EXT_FUNC_CODE:
 					break;
@@ -293,7 +293,11 @@ int GIFStreamer::getNextImage(tbyte *&data,int &delay,GifFileType *gifFile,Textu
 }
 
 GifFileType *GIFStreamer::openFile(Stream *stream){
+#if defined(GIFLIB_MAJOR) && (GIFLIB_MAJOR >= 5)
+	GifFileType *file=DGifOpen((void*)stream,&readGifData,NULL);
+#else
 	GifFileType *file=DGifOpen((void*)stream,&readGifData);
+#endif
 	return file;
 }
 
