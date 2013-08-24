@@ -53,8 +53,10 @@ public:
 	void setVelocity(const Vector3 &velocity){mSolid->setVelocity(velocity);}
 	const Vector3 &getVelocity() const{return mSolid->getVelocity();}
 
-	virtual void setMass(scalar mass){mSolid->setMass(mass);}
-	virtual scalar getMass() const{return mSolid->getMass();}
+	void addForce(const Vector3 &force){mSolid->addForce(force);}
+
+	void setMass(scalar mass){mSolid->setMass(mass);}
+	scalar getMass() const{return mSolid->getMass();}
 
 	void setGravity(scalar gravity){mSolid->setCoefficientOfGravity(gravity);}
 	scalar getGravity() const{return mSolid->getCoefficientOfGravity();}
