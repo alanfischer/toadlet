@@ -84,6 +84,8 @@ X11Application::X11Application():
 	x11=new X11Attributes();
 	memset(x11,0,sizeof(X11Attributes));
 
+	mFormat->setPixelFormat(TextureFormat::Format_RGBA_8);
+
 	#if defined(TOADLET_HAS_OPENGL)
 		mRenderDevicePlugins.add("gl",RenderDevicePlugin(new_GLXWindowRenderTarget,new_GLRenderDevice));
 	#endif
