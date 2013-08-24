@@ -222,6 +222,7 @@ void Simulator::update(int dt,int scope,Solid *solid){
 	if((scope&Scope_REPORT_COLLISIONS)!=0){
 		reportCollisions();
 	}
+	mNumCollisions=0;
 
 	if(mManager!=NULL){
 		mManager->postUpdate(dt,fdt);
@@ -674,7 +675,6 @@ void Simulator::reportCollisions(){
 			}
 		}
 	}
-	mNumCollisions=0;
 	mReportingCollisions=false;
 }
 
