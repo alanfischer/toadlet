@@ -94,7 +94,7 @@ void BSP30Map::destroy(){
 int BSP30Map::modelCollisionTrace(PhysicsCollision &result,int model,const Vector3 &size,const Vector3 &start,const Vector3 &end){
 	int hullIndex=0;
 	if(header.version==Q1BSPVERSION){
-		if(size[0]<3){
+		if(size[2]<3){
 			hullIndex=0;
 		}
 		else if(size[0]<=32){
@@ -105,7 +105,7 @@ int BSP30Map::modelCollisionTrace(PhysicsCollision &result,int model,const Vecto
 		}
 	}
 	else{
-		if(size[0]<3){
+		if(size[2]<3){
 			hullIndex=0; // 0x0x0
 		}
 		else if(size[0]<=32){
