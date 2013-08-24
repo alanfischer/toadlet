@@ -88,6 +88,8 @@ Simulator::Simulator():
 		setDeactivateSpeed(mEpsilon*2); // Twice epsilon
 		setDeactivateCount(4); // 4 frames
 	#endif
+
+	mCollisions.resize(64);
 }
 
 Simulator::~Simulator(){
@@ -154,7 +156,7 @@ void Simulator::removeSolid(Solid *solid){
 	// In case a solid is removed in the collision code, NULL it out
 	if(mReportingCollisions){
 		int i;
-		for(i=0;i<mCollisions.size();++i){
+		for(i=0;i<mNumCollisions;++i){
 			Collision &c=mCollisions[i];
 			if(c.collider==solid){
 				c.collider=NULL;
@@ -222,7 +224,6 @@ void Simulator::update(int dt,int scope,Solid *solid){
 	if((scope&Scope_REPORT_COLLISIONS)!=0){
 		reportCollisions();
 	}
-	mNumCollisions=0;
 
 	if(mManager!=NULL){
 		mManager->postUpdate(dt,fdt);
@@ -463,12 +464,10 @@ void Simulator::updateSolid(Solid *solid,int dt,scalar fdt){
 					c.velocity.set(solid->mVelocity);
 				}
 
-				if(mCollisions.size()<=mNumCollisions){
-					mCollisions.resize(mNumCollisions+1);
+				if(mNumCollisions<mCollisions.size()){
+					mCollisions[mNumCollisions].set(c);
+					mNumCollisions++;
 				}
-
-				mCollisions[mNumCollisions].set(c);
-				mNumCollisions++;
 			}
 			hitSolid=c.collider;
 
@@ -675,6 +674,7 @@ void Simulator::reportCollisions(){
 			}
 		}
 	}
+	mNumCollisions=0;
 	mReportingCollisions=false;
 }
 
