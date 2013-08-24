@@ -26,21 +26,27 @@
 #include <toadlet/tadpole/AudioComponent.h>
 #include <toadlet/tadpole/PhysicsComponent.h>
 #include <toadlet/tadpole/Engine.h>
+#include <toadlet/tadpole/Scene.h>
 
 namespace toadlet{
 namespace tadpole{
 
-AudioComponent::AudioComponent(Engine *engine):BaseComponent(),
+AudioComponent::AudioComponent(Scene *scene):BaseComponent(),
 	mGain(Math::ONE),
 	mPitch(Math::ONE),
 	mRolloff(0),
 	mLooping(false),
 	mGlobal(false)
 {
-	mEngine=engine;
+	mScene=scene;
+	mEngine=mScene->getEngine();
+	mBound=new Bound(Sphere(2));
 }
 
 void AudioComponent::destroy(){
+	mAudioBuffer=NULL;
+	mAudioStream=NULL;
+
 	if(mAudio!=NULL){
 		mAudio->destroy();
 		mAudio=NULL;
@@ -62,11 +68,17 @@ bool AudioComponent::setAudioBuffer(AudioBuffer *audioBuffer){
 		mAudio->destroy();
 	}
 
-	TOADLET_TRY
-		mAudio=mEngine->getAudioManager()->createAudio();
-	TOADLET_CATCH_ANONYMOUS(){
-		mAudio=NULL;
+	mAudioStream=NULL;
+	mAudioBuffer=audioBuffer;
+
+	if(mScene->getCreateAudio()){
+		TOADLET_TRY
+			mAudio=mEngine->getAudioManager()->createAudio();
+		TOADLET_CATCH_ANONYMOUS(){
+			mAudio=NULL;
+		}
 	}
+
 	if(mAudio!=NULL){
 		mAudio->create(audioBuffer);
 
@@ -83,8 +95,8 @@ bool AudioComponent::setAudioStream(const String &name,int track){
 	return setAudioStream(mEngine->getAudioManager()->findAudioStream(name,track));
 }
 
-bool AudioComponent::setAudioStream(AudioStream *stream){
-	if(mAudio!=NULL && mAudio->getAudioStream()==stream){
+bool AudioComponent::setAudioStream(AudioStream *audioStream){
+	if(mAudio!=NULL && mAudio->getAudioStream()==audioStream){
 		return true;
 	}
 
@@ -92,13 +104,19 @@ bool AudioComponent::setAudioStream(AudioStream *stream){
 		mAudio->destroy();
 	}
 
-	TOADLET_TRY
-		mAudio=mEngine->getAudioManager()->createAudio();
-	TOADLET_CATCH_ANONYMOUS(){
-		mAudio=NULL;
+	mAudioBuffer=NULL;
+	mAudioStream=audioStream;
+
+	if(mScene->getCreateAudio()){
+		TOADLET_TRY
+			mAudio=mEngine->getAudioManager()->createAudio();
+		TOADLET_CATCH_ANONYMOUS(){
+			mAudio=NULL;
+		}
 	}
+
 	if(mAudio!=NULL){
-		mAudio->create(stream);
+		mAudio->create(audioStream);
 
 		setAudioParameters();
 

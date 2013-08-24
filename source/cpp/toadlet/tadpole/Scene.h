@@ -80,6 +80,10 @@ public:
 	virtual void setPhysicsManager(PhysicsManager *physicsManager){mPhysicsManager=physicsManager;}
 	virtual PhysicsManager *getPhysicsManager() const{return mPhysicsManager;}
 
+	// In lieu of an AudioManager here, we want a way of specifying if AudioComponents should create Audios
+	virtual void setCreateAudio(bool audio){mCreateAudio=audio;}
+	virtual bool getCreateAudio() const{return mCreateAudio;}
+
 	virtual scalar getEpsilon() const{return Math::fromMilli(1);}
 
 	virtual void update(int dt);
@@ -128,6 +132,7 @@ protected:
 	NodeManager::ptr mNodeManager;
 	RenderManager::ptr mRenderManager;
 	PhysicsManager::ptr mPhysicsManager;
+	bool mCreateAudio;
 
 	Collection<Component::ptr> mDestroyComponents;
 };
