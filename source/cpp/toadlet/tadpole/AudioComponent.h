@@ -29,25 +29,26 @@
 #include <toadlet/ribbit/Audio.h>
 #include <toadlet/tadpole/BaseComponent.h>
 #include <toadlet/tadpole/Engine.h>
+#include <toadlet/tadpole/Spacial.h>
 
 namespace toadlet{
 namespace tadpole{
 
-class TOADLET_API AudioComponent:public BaseComponent{
+class TOADLET_API AudioComponent:public BaseComponent,public Spacial{
 public:
 	TOADLET_COMPONENT(AudioComponent);
 
-	AudioComponent(Engine *engine);
+	AudioComponent(Scene *scene);
 	virtual void destroy();
 
 	bool setAudioBuffer(const String &name,int track=0);
 	bool setAudioBuffer(AudioBuffer *audioBuffer);
 
 	bool setAudioStream(const String &name,int track=0);
-	bool setAudioStream(AudioStream *stream);
+	bool setAudioStream(AudioStream *audioStream);
 
-	AudioBuffer *getAudioBuffer(){return mAudio!=NULL?mAudio->getAudioBuffer():NULL;}
-	AudioStream *getAudioStream(){return mAudio!=NULL?mAudio->getAudioStream():NULL;}
+	AudioBuffer *getAudioBuffer(){return mAudioBuffer;}
+	AudioStream *getAudioStream(){return mAudioStream;}
 	
 	inline bool play(){if(mAudio!=NULL){return mAudio->play();}else{return false;}}
 	inline bool stop(){if(mAudio!=NULL){return mAudio->stop();}else{return false;}}
@@ -71,18 +72,30 @@ public:
 
 	void frameUpdate(int dt,int scope);
 
+	// Spacial
+	void setTransform(Transform::ptr transform){}
+	Transform *getTransform() const{return NULL;}
+	Bound *getBound() const{return mBound;}
+	Transform *getWorldTransform() const{return mParent->getWorldTransform();}
+	Bound *getWorldBound() const{return mParent->getWorldBound();}
+	void transformChanged(Transform *transform){}
+
 protected:
 	void setAudioFromTransform();
 	void setAudioFromVelocity();
 	void setAudioParameters();
 
+	Scene *mScene;
 	Engine *mEngine;
 	Audio::ptr mAudio;
+	AudioBuffer::ptr mAudioBuffer;
+	AudioStream::ptr mAudioStream;
 	scalar mGain;
 	scalar mPitch;
 	scalar mRolloff;
 	bool mLooping;
 	bool mGlobal;
+	Bound::ptr mBound;
 };
 
 }

@@ -44,13 +44,13 @@ Scene::Scene(Engine *engine):Object(),
 	mLogicFrame(0),
 	mAccumulatedDT(0),
 	mFrame(0),
-	mResetFrame(false)
+	mResetFrame(false),
 
 	//mBackground,
 	//mRoot,
 	//mAmbientColor,
 
-	//mRenderManager,
+	mCreateAudio(true)
 {
 	mEngine=engine;
 	mEngine->addContextListener(this);
