@@ -45,6 +45,7 @@ public:
 	virtual const Vector3 &getGravity() const=0;
 
 	virtual void setTraceable(PhysicsTraceable *traceable)=0;
+	virtual void setTraceableCollisionScope(int scope)=0;
 
 	virtual void traceSegment(PhysicsCollision &result,const Segment &segment,int collideWithScope,Node *ignore)=0;
 	virtual void traceNode(PhysicsCollision &result,Node *node,const Segment &segment,int collideWithScope)=0;

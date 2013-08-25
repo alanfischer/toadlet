@@ -38,7 +38,8 @@ TypeSensor::TypeSensor(Scene *scene):Sensor(scene),
 
 bool TypeSensor::senseNode(Node *node){
 	if(mType!=NULL){
-		return node->getType()==mType || node->getType()->getFullName()==mType->getFullName();
+		Type<Component> *type=node->getType();
+		return type==mType || type->getFullName()==mType->getFullName();
 	}
 	else if(mHasType!=NULL){
 		return node->getChild(mHasType)!=NULL;

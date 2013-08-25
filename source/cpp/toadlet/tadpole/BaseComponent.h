@@ -82,7 +82,6 @@ protected:
 	Node *mParent;
 	Node *mRoot;
 	String mName;
-	bool mRemoving;
 };
 
 }
