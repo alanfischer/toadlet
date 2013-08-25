@@ -48,6 +48,9 @@ HopComponent::HopComponent(HopManager *manager):
 }
 
 void HopComponent::destroy(){
+	mSolid->setCollisionListener(NULL);
+	mSolid->setUserData(NULL);
+
 	BaseComponent::destroy();
 }
 

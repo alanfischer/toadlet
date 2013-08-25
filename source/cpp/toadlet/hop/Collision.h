@@ -81,8 +81,8 @@ public:
 	Vector3 point; // This is the point at which the tracing solid would stop
 	Vector3 normal;
 	Vector3 velocity; // The velocity difference between the two solids
-	Solid *collider; // The solid that blocked the trace
-	Solid *collidee; // The solid being traced
+	IntrusivePointer<Solid> collider; // The solid that blocked the trace
+	IntrusivePointer<Solid> collidee; // The solid being traced
 	int scope; // The OR'd scope of the collision point
 };
 
