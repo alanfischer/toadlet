@@ -43,6 +43,8 @@ public:
 
 	virtual bool create(AudioStream *stream)=0;
 	virtual void destroy()=0;
+
+	virtual int getLengthTime() const=0;
 };
 
 }

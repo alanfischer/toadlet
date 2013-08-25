@@ -69,6 +69,8 @@ bool MMAudioBuffer::create(AudioStream *stream){
 
 		AudioFormatConversion::convert(buffer,length,format,newBuffer,newLength,newFormat);
 
+		format=newFormat;
+
 		delete[] buffer;
 
 		mLength=newLength;
@@ -78,6 +80,9 @@ bool MMAudioBuffer::create(AudioStream *stream){
 		mLength=length;
 		mData=buffer;
 	}
+
+	int numFrames=mLength*8/format->getBitsPerSample();
+	mLengthTime=numFrames*1000/format->getSamplesPerSecond();
 
 	return true;
 }
