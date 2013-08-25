@@ -50,6 +50,7 @@ public:
 	const Vector3 &getGravity() const;
 
 	void setTraceable(PhysicsTraceable *traceable);
+	void setTraceableCollisionScope(int scope);
 
 	void traceSegment(PhysicsCollision &result,const Segment &segment,int collideWithScope,Node *ignore);
 	void traceNode(PhysicsCollision &result,Node *node,const Segment &segment,int collideWithScope);

@@ -31,8 +31,7 @@ namespace tadpole{
 
 BaseComponent::BaseComponent():
 	mParent(NULL),
-	mRoot(NULL),
-	mRemoving(false)
+	mRoot(NULL)
 {}
 
 void BaseComponent::destroy(){
