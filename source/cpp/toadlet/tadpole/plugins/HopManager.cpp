@@ -74,6 +74,10 @@ void HopManager::setTraceableCollisionScope(int scope){
 	mSolid->setCollisionScope(scope);
 }
 
+int HopManager::getTraceableCollisionScope() const{
+	return mSolid->getCollisionScope();
+}
+
 void HopManager::traceSegment(PhysicsCollision &result,const Segment &segment,int collideWithScope,Node *ignore){
 	result.reset();
 
