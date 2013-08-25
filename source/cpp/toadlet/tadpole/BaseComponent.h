@@ -69,7 +69,7 @@ public:
 	virtual void notifyParentAttached();
 	virtual void notifyParentRemoved();
 
-	virtual Node *getParent(){return mParent;}
+	virtual Node *getParent() const{return mParent;}
 
 	virtual void logicUpdate(int dt,int scope){}
 	virtual void frameUpdate(int dt,int scope){}
