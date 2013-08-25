@@ -219,13 +219,13 @@ void Scene::logicUpdate(int dt,int scope,Node *node){
 
 		mBackground->logicUpdate(dt,scope);
 		mRoot->logicUpdate(dt,scope);
-
-		int i;
-		for(i=0;i<mDestroyComponents.size();++i){
-			mDestroyComponents[i]->destroy();
-		}
-		mDestroyComponents.clear();
 	}
+
+	int i;
+	for(i=0;i<mDestroyComponents.size();++i){
+		mDestroyComponents[i]->destroy();
+	}
+	mDestroyComponents.clear();
 }
 
 void Scene::frameUpdate(int dt,int scope,Node *node){
