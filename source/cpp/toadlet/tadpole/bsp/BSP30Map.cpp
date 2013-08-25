@@ -91,10 +91,10 @@ void BSP30Map::destroy(){
 	BaseResource::destroy();
 }
 
-int BSP30Map::modelCollisionTrace(PhysicsCollision &result,int model,const Vector3 &size,const Vector3 &start,const Vector3 &end){
+int BSP30Map::modelCollisionTrace(PhysicsCollision &result,int model,const Vector3 &size,Vector3 start,Vector3 end){
 	int hullIndex=0;
 	if(header.version==Q1BSPVERSION){
-		if(size[2]<3){
+		if(size[0]<3){
 			hullIndex=0;
 		}
 		else if(size[0]<=32){
@@ -105,19 +105,19 @@ int BSP30Map::modelCollisionTrace(PhysicsCollision &result,int model,const Vecto
 		}
 	}
 	else{
-		if(size[2]<3){
-			hullIndex=0; // 0x0x0
+		if(size[0]<3){
+			hullIndex=0;
 		}
 		else if(size[0]<=32){
 			if(size[2]<54){ // Nearest of 36 or 72
-				hullIndex=3; // 32x32x36
+				hullIndex=3;
 			}
 			else{
-				hullIndex=1; // 32x32x72
+				hullIndex=1;
 			}
 		}
 		else{
-			hullIndex=2; // 64x64x64
+			hullIndex=2;
 		}
 	}
 
@@ -125,6 +125,16 @@ int BSP30Map::modelCollisionTrace(PhysicsCollision &result,int model,const Vecto
 	int headClipNode=models[model].headnode[hullIndex];
 	if(headNode<0 || headNode>=nnodes || headClipNode<0 || headClipNode>=nclipnodes){
 		return 0;
+	}
+
+	const Vector3 &hullSize=HULLSIZES[hullIndex];
+
+	// Hack to let us z correct objects with approximate hulls
+	float off=(hullSize.z-size.z) / 2;
+
+	if(off != 0){
+		start.z+=off;
+		end.z+=off;
 	}
 
 	int contents=0;
@@ -135,6 +145,10 @@ int BSP30Map::modelCollisionTrace(PhysicsCollision &result,int model,const Vecto
 	else{
 		hullTrace(result,planes,NULL,clipnodes,sizeof(bclipnode),headClipNode,0,Math::ONE,start,end,0.03125,(-1-CONTENTS_SOLID)<<1,NULL);
 		contents=-1-findPointLeaf(planes,clipnodes,sizeof(bclipnode),headClipNode,start);
+	}
+
+	if(off != 0){
+		result.point.z-=off;
 	}
 
 	return contents;

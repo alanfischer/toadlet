@@ -114,6 +114,13 @@ enum{
 	TEX_SPECIAL=1     // sky or slime, no lightmap or 256 subdivision
 };
 
+const static Vector3 HULLSIZES[]={
+	Vector3(0,0,0),
+	Vector3(32,32,72),
+	Vector3(64,64,64),
+	Vector3(32,32,36),
+};
+
 struct bleaf{
 	int contents;
 	int visofs;	// -1 = no vis
