@@ -51,6 +51,7 @@ public:
 
 	void setTraceable(PhysicsTraceable *traceable);
 	void setTraceableCollisionScope(int scope);
+	int getTraceableCollisionScope() const;
 
 	void traceSegment(PhysicsCollision &result,const Segment &segment,int collideWithScope,Node *ignore);
 	void traceNode(PhysicsCollision &result,Node *node,const Segment &segment,int collideWithScope);
