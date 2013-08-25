@@ -42,6 +42,8 @@ public:
 
 	virtual bool create(AudioStream *stream){return false;}
 	virtual void destroy(){}
+
+	virtual int getLengthTime() const{return 0;}
 };
 
 }

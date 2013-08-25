@@ -41,10 +41,13 @@ public:
 	bool create(AudioStream *stream);
 	void destroy();
 
+	int getLengthTime() const{return mLengthTime;}
+
 protected:
 	MMAudioDevice *mDevice;
 	tbyte *mData;
 	int mLength;
+	int mLengthTime;
 
 	friend class MMAudio;
 };

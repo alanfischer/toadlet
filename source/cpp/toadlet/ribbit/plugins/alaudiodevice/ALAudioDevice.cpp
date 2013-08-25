@@ -138,7 +138,7 @@ bool ALAudioDevice::create(int options){
 
 	alDopplerFactor(1.0);
 	TOADLET_CHECK_ALERROR("alDopplerFactor");
-	alDopplerVelocity(340.0); /// @todo: Move the doppler parameters to the interface
+	alDopplerVelocity(20); /// @todo: Move the doppler parameters to the interface
 	TOADLET_CHECK_ALERROR("alDopplerVelocity");
 
 	mAllSources.resize(mCaps.maxSources);

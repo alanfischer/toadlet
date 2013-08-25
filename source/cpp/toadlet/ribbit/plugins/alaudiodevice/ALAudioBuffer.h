@@ -43,6 +43,8 @@ public:
 	bool create(AudioStream *stream);
 	void destroy();
 
+	int getLengthTime() const{return mLengthTime;}
+
 	inline ALuint getHandle() const{return mHandle;}
 
 protected:

@@ -50,10 +50,10 @@ public:
 	AudioBuffer *getAudioBuffer(){return mAudioBuffer;}
 	AudioStream *getAudioStream(){return mAudioStream;}
 	
-	inline bool play(){if(mAudio!=NULL){return mAudio->play();}else{return false;}}
-	inline bool stop(){if(mAudio!=NULL){return mAudio->stop();}else{return false;}}
-	inline bool getPlaying() const{if(mAudio!=NULL){return mAudio->getPlaying();}else{return false;}}
-	inline bool getFinished() const{if(mAudio!=NULL){return mAudio->getFinished();}else{return false;}}
+	bool play();
+	bool stop();
+	bool getPlaying() const;
+	bool getFinished() const;
 
 	inline void setGain(scalar gain){mGain=gain;if(mAudio!=NULL){mAudio->setGain(gain);}}
 	inline scalar getGain() const{if(mAudio!=NULL){return mAudio->getGain();}else{return mGain;}}
@@ -90,6 +90,7 @@ protected:
 	Audio::ptr mAudio;
 	AudioBuffer::ptr mAudioBuffer;
 	AudioStream::ptr mAudioStream;
+	int mTime;
 	scalar mGain;
 	scalar mPitch;
 	scalar mRolloff;

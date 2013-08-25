@@ -32,6 +32,7 @@ namespace toadlet{
 namespace tadpole{
 
 AudioComponent::AudioComponent(Scene *scene):BaseComponent(),
+	mTime(0),
 	mGain(Math::ONE),
 	mPitch(Math::ONE),
 	mRolloff(0),
@@ -127,10 +128,60 @@ bool AudioComponent::setAudioStream(AudioStream *audioStream){
 	}
 }
 
+bool AudioComponent::play(){
+	if(mAudio!=NULL){
+		return mAudio->play();
+	}
+	
+	mTime=0;
+	return false;
+}
+
+bool AudioComponent::stop(){
+	if(mAudio!=NULL){
+		return mAudio->stop();
+	}
+	
+	mTime=-1;
+	return false;
+}
+
+bool AudioComponent::getPlaying() const{
+	if(mAudio!=NULL){
+		return mAudio->getPlaying();
+	}
+	
+	if(mAudioBuffer!=NULL){
+		if(mTime>=0 && mTime<mAudioBuffer->getLengthTime()){
+			return true;
+		}
+	}
+
+	return false;
+}
+
+bool AudioComponent::getFinished() const{
+	if(mAudio!=NULL){
+		return mAudio->getFinished();
+	}
+
+	if(mAudioBuffer!=NULL){
+		if(mTime>=0 && mTime<mAudioBuffer->getLengthTime()){
+			return false;
+		}
+	}
+	
+	return true;
+}
+
 void AudioComponent::frameUpdate(int dt,int scope){
 	setAudioFromTransform();
 
 	setAudioFromVelocity();
+
+	if(mAudio==NULL && mAudioBuffer!=NULL && mTime>=0){
+		mTime+=dt;
+	}
 }
 
 void AudioComponent::setAudioFromTransform(){
