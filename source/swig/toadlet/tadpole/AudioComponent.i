@@ -7,7 +7,7 @@ namespace tadpole{
 
 class AudioComponent:public Component{
 public:
-	AudioComponent(Engine *engine);
+	AudioComponent(Scene *scene);
 	void destroy();
 
 	void setName(String name);
