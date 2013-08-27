@@ -57,7 +57,6 @@ public:
 	static Errorer *getInstance();
 	static void destroy();
     
-	// General
 	TOADLET_MAKE_ERROR_FUNCTION(unknown,Errorer::Type_UNKNOWN)
 	TOADLET_MAKE_ERROR_FUNCTION(tassert,Errorer::Type_ASSERT) // Name assert may already be in use
 	TOADLET_MAKE_ERROR_FUNCTION(invalidParameters,Errorer::Type_INVALID_PARAMETERS)
@@ -65,16 +64,9 @@ public:
 	TOADLET_MAKE_ERROR_FUNCTION(unimplemented,Errorer::Type_UNIMPLEMENTED)
 	TOADLET_MAKE_ERROR_FUNCTION(overflow,Errorer::Type_OVERFLOW)
 	TOADLET_MAKE_ERROR_FUNCTION(insufficientMemory,Errorer::Type_INSUFFICIENT_MEMORY)
-
-	// Egg
 	TOADLET_MAKE_ERROR_FUNCTION(libraryNotFound,Errorer::Type_LIBRARY_NOT_FOUND)
 	TOADLET_MAKE_ERROR_FUNCTION(symbolNotFound,Errorer::Type_SYMBOL_NOT_FOUND)
 	TOADLET_MAKE_ERROR_FUNCTION(socket,Errorer::Type_SOCKET)
-
-	// Knot
-	TOADLET_MAKE_ERROR_FUNCTION(alreadyConnected,Errorer::Type_ALREADY_CONNECTED)
-	TOADLET_MAKE_ERROR_FUNCTION(incorrectProtocolName,Errorer::Type_INCORRECT_PROTOCOL_NAME)
-	TOADLET_MAKE_ERROR_FUNCTION(incorrectProtocolVersion,Errorer::Type_INCORRECT_PROTOCOL_VERSION)
 
 protected:
 	static void errorLog(const String &categoryName,const String &description);

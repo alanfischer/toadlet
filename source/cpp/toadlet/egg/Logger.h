@@ -32,9 +32,6 @@
 #if defined(TOADLET_THREADSAFE)
 	#include <toadlet/egg/Mutex.h>
 #endif
-#if defined(TOADLET_PLATFORM_OSX)
-	#include <asl.h>
-#endif
 
 namespace toadlet{
 namespace egg{
@@ -95,9 +92,6 @@ public:
 	void addLoggerListener(LoggerListener *listener);
 	void removeLoggerListener(LoggerListener *listener);
 
-	void setOutputLogEntry(bool outputLogEntry);
-	bool getOutputLogEntry() const{return mOutputLogEntry;}
-
 	void setStoreLogEntry(bool storeLogEntry);
 	bool getStoreLogEntry() const{return mStoreLogEntry;}
 
@@ -114,9 +108,6 @@ public:
 
 private:
 	typedef Map<String,Category*> CategoryNameCategoryMap;
-	#if defined(TOADLET_PLATFORM_OSX)
-		typedef Map<String,aslclient> CategoryNameClientMap;
-	#endif
 
 	void addCompleteLogEntry(Category *category,Level level,const String &text);
 
@@ -124,14 +115,10 @@ private:
 	void unlock();
 
 	egg::Collection<LoggerListener*> mLoggerListeners;
-	bool mOutputLogEntry;
 	bool mStoreLogEntry;
 	Level mReportingLevel;
 	egg::Collection<Entry*> mLogEntries;
 	CategoryNameCategoryMap mCategoryNameCategoryMap;
-	#if defined(TOADLET_PLATFORM_OSX)
-		CategoryNameClientMap mCategoryNameClientMap;
-	#endif
 	#if defined(TOADLET_THREADSAFE)
 		Mutex mMutex;
 	#endif
