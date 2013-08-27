@@ -115,6 +115,10 @@ VertexFormat::ptr BufferManager::createVertexFormat(){
 
 		vertexFormat->setDestroyedListener(this);
 	}
+	else{
+		Error::nullPointer("unable to create VertexFormat");
+		return NULL;
+	}
 
 	return vertexFormat;
 }
@@ -144,6 +148,10 @@ IndexBuffer::ptr BufferManager::createIndexBuffer(int usage,int access,IndexBuff
 
 		buffer->setDestroyedListener(this);
 	}
+	else{
+		Error::nullPointer("unable to create IndexBuffer");
+		return NULL;
+	}
 
 	return buffer;
 }
@@ -172,6 +180,10 @@ VertexBuffer::ptr BufferManager::createVertexBuffer(int usage,int access,VertexF
 		mVertexBuffers.add(buffer);
 
 		buffer->setDestroyedListener(this);
+	}
+	else{
+		Error::nullPointer("unable to create VertexBuffer");
+		return NULL;
 	}
 
 	return buffer;
@@ -203,6 +215,10 @@ PixelBuffer::ptr BufferManager::createPixelBuffer(int usage,int access,int pixel
 
 		buffer->setDestroyedListener(this);
 	}
+	else{
+		Error::nullPointer("unable to create PixelBuffer");
+		return NULL;
+	}
 
 	return buffer;
 }
@@ -231,6 +247,10 @@ VariableBuffer::ptr BufferManager::createVariableBuffer(int usage,int access,Var
 		mVariableBuffers.add(buffer);
 
 		buffer->setDestroyedListener(this);
+	}
+	else{
+		Error::nullPointer("unable to create VariableBuffer");
+		return NULL;
 	}
 
 	return buffer;

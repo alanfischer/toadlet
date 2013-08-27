@@ -269,12 +269,12 @@ HUD::HUD(Scene *scene,Node *player,Camera *camera):Node(scene){
 		mChomp->attach(sprite);
 		mChomp->setScale(Vector3(2,2,2));
 
-		AudioComponent::ptr dog=new AudioComponent(mEngine);
+		AudioComponent::ptr dog=new AudioComponent(mScene);
 		dog->setAudioBuffer(Resources::instance->dog);
 		dog->setGlobal(true);
 		mChomp->attach(dog);
 
-		AudioComponent::ptr crunch=new AudioComponent(mEngine);
+		AudioComponent::ptr crunch=new AudioComponent(mScene);
 		crunch->setAudioBuffer(Resources::instance->crunch);
 		crunch->setGlobal(true);
 		mChomp->attach(crunch);

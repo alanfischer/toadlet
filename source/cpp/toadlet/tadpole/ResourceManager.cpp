@@ -344,7 +344,7 @@ Resource::ptr ResourceManager::findFromFile(const String &name,ResourceData *dat
 		}
 	}
 	else{
-		Error::unknown(Categories::TOADLET_TADPOLE,
+		Log::warning(Categories::TOADLET_TADPOLE,
 			"extension not found on file");
 		return NULL;
 	}
