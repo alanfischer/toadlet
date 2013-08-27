@@ -42,7 +42,7 @@
 #endif
 
 #if !defined(TOADLET_PLATFORM_WIN32)
-	#define TOADLET_USE_STDERR_LOGGING
+	#define TOADLET_USE_ANSI_LOGGING
 	#include <stdio.h>
 #endif
 
@@ -215,9 +215,9 @@ void Logger::addCompleteLogEntry(Category *category,Level level,const String &te
 			break;
 		}
 		
-		String line=String()+timeString+": "+levelString+text+(char)10;
-
 		#if defined(TOADLET_USE_OUTPUTDEBUGSTRING_LOGGING)
+		{
+			String line=String()+timeString+": "+levelString+text+(char)10;
 			int len=line.length();
 			// If we go above a certain amount, windows apparently just starts ignoring messages
 			if(len>=8192){
@@ -232,9 +232,11 @@ void Logger::addCompleteLogEntry(Category *category,Level level,const String &te
 				OutputDebugString(line.substr(i,newi-i));
 				i=newi;
 			}
+		}
 		#endif
 
 		#if defined(TOADLET_USE_WINDOWS_CONSOLE)
+		{
 			int textColor=FOREGROUND_RED|FOREGROUND_GREEN|FOREGROUND_BLUE;
 			int levelColor=textColor;
 			switch(level){
@@ -261,9 +263,11 @@ void Logger::addCompleteLogEntry(Category *category,Level level,const String &te
 			WriteConsole(hout,(const TCHAR*)slevel,slevel.length(),NULL,NULL);
 			SetConsoleTextAttribute(hout,textColor);
 			WriteConsole(hout,(const TCHAR*)stext,stext.length(),NULL,NULL);
+		}
 		#endif
 
 		#if defined(TOADLET_USE_ANDROID_LOGGING)
+		{
 			int priority=0;
 			switch(level){
 				case Level_EXCESS:
@@ -286,9 +290,11 @@ void Logger::addCompleteLogEntry(Category *category,Level level,const String &te
 			}
 
 			__android_log_write(priority,category!=NULL?category->name:"toadlet",text);
+		}
 		#endif
 
 		#if defined(TOADLET_PLATFORM_OSX)
+		{
 			aslclient client=NULL;
 			if(category!=NULL){
 				CategoryNameClientMap::iterator it=mCategoryNameClientMap.find(category->name);
@@ -316,11 +322,39 @@ void Logger::addCompleteLogEntry(Category *category,Level level,const String &te
 				break;
 			}
 		
+			String line=String()+timeString+": "+levelString+text+(char)10;
 			asl_log(client,NULL,asllevel,"%s",line.c_str());
+		}
 		#endif
 
-		#if defined(TOADLET_USE_STDERR_LOGGING)
-			fputs(line,stderr);
+		#if defined(TOADLET_USE_ANSI_LOGGING)
+		{
+			String textColor="\x1b[39m";
+			String levelColor=textColor;
+			switch(level){
+				case Level_ERROR:
+					levelColor="\x1b[31m";
+				break;
+				case Level_WARNING:
+					levelColor="\x1b[33m";
+				break;
+				case Level_ALERT:
+					levelColor="\x1b[32m";
+				break;
+				default:
+				break;
+			}
+
+			String stime=timeString+": ";
+			String slevel=levelString;
+			String stext=text+(char)10;
+
+			fputs(stime,stdout);
+			fputs(levelColor,stdout);
+			fputs(slevel,stdout);
+			fputs(textColor,stdout);
+			fputs(stext,stdout);
+		}
 		#endif
 	}
 
