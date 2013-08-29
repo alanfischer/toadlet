@@ -112,8 +112,8 @@ public:
 	inline void push_back(const TypePtr &type){mCollection.push_back(type);}
 	inline void pop_back(){mCollection.pop_back();}
 	
-	inline iterator insert(const iterator &at,const TypePtr &type){return mCollection.insert(reinterpret_cast<const CollectionType::iterator&>(at),type);}
-	inline iterator insert(const iterator &at,const const_iterator &start,const const_iterator &end){return mCollection.insert(reinterpret_cast<const CollectionType::iterator&>(at),reinterpret_cast<const CollectionType::iterator&>(start),reinterpret_cast<const CollectionType::iterator&>(end));}
+	inline iterator insert(const iterator &at,const TypePtr &type){return mCollection.insert(reinterpret_cast<const typename CollectionType::iterator&>(at),type);}
+	inline iterator insert(const iterator &at,const const_iterator &start,const const_iterator &end){return mCollection.insert(reinterpret_cast<const typename CollectionType::iterator&>(at),reinterpret_cast<const typename CollectionType::iterator&>(start),reinterpret_cast<const typename CollectionType::iterator&>(end));}
 
 	inline void resize(int s){mCollection.resize(s);}
 	inline iterator erase(iterator it){return mCollection.erase(it);}
