@@ -43,60 +43,56 @@ public:
 
 	class iterator{
     public:
-		iterator():parent(NULL),index(0){}
-		iterator(CollectionType *p,int i):parent(p),index(i){}
-		iterator(const iterator &it):parent(it.parent),index(it.index){}
-		iterator(const const_iterator &it):parent(it.parent),index(it.index){}
-		iterator(const typename CollectionType::iterator &it):parent(it.parent),index(it.index){}
+		inline iterator(){}
+		inline iterator(const iterator &it):iter(it.iter){}
+		inline iterator(const const_iterator &it):iter(it.iter){}
+		inline iterator(const typename CollectionType::iterator &it):iter(it){}
 
-		Type& operator*() const{return *(*parent)[index];}
-		TypePtr& operator->() const{return (*parent)[index];}
-		operator Type*() const{return (*parent)[index];}
-		operator TypePtr() const{return (*parent)[index];}
-		iterator& operator++(){index++;return(*this);}
-		iterator& operator--(){index--;return(*this);}
-		iterator operator++(int){iterator it(*this); operator++(); return(it);}
-		iterator operator--(int){iterator it(*this); operator--(); return(it);}
-		iterator operator+(int i) const{return iterator(parent,index+i);}
-		iterator operator-(int i) const{return iterator(parent,index-i);}
+		inline Type& operator*() const{return **iter;}
+		inline TypePtr& operator->() const{return *iter;}
+		inline operator Type*() const{return *iter;}
+		inline operator TypePtr() const{return *iter;}
+		inline iterator& operator++(){iter++;return(*this);}
+		inline iterator& operator--(){iter--;return(*this);}
+		inline iterator operator++(int){iterator it(*this); operator++(); return(it);}
+		inline iterator operator--(int){iterator it(*this); operator--(); return(it);}
+		inline iterator operator+(int i) const{return iterator(iter+i);}
+		inline iterator operator-(int i) const{return iterator(iter-i);}
 
-		int operator-(const iterator &it) const{return index-it.index;}
-		bool operator<(const iterator &it) const{return index<it.index;}
-		bool operator>(const iterator &it) const{return index>it.index;}
-		bool operator==(const iterator &it) const{return parent==it.parent && index==it.index;}
-		bool operator!=(const iterator &it) const{return parent!=it.parent || index!=it.index;}
+		inline int operator-(const iterator &it) const{return iter-it.iter;}
+		inline bool operator<(const iterator &it) const{return iter<it.iter;}
+		inline bool operator>(const iterator &it) const{return iter>it.iter;}
+		inline bool operator==(const iterator &it) const{return iter==it.iter;}
+		inline bool operator!=(const iterator &it) const{return iter!=it.iter;}
 
-		CollectionType *parent;
-		int index;
+		typename CollectionType::iterator iter;
 	};
 
     class const_iterator{
     public:
-		const_iterator():parent(NULL),index(0){}
-		const_iterator(CollectionType *p,int i):parent(p),index(i){}
-		const_iterator(const const_iterator &it):parent(it.parent),index(it.index){}
-		const_iterator(const iterator &it):parent(it.parent),index(it.index){}
-		const_iterator(const typename CollectionType::const_iterator &it):parent(it.parent),index(it.index){}
+		inline const_iterator(){}
+		inline const_iterator(const const_iterator &it):iter(it.iter){}
+		inline const_iterator(const iterator &it):iter(it.iter){}
+		inline const_iterator(const typename CollectionType::const_iterator &it):iter(it.iter){}
 
-		const Type& operator*() const{return *(*parent)[index];}
-		const TypePtr& operator->() const{return (*parent)[index];}
-		operator const Type*() const{return const_cast<Type*>((Type*)(*parent)[index]);}
-		operator const TypePtr() const{return (*parent)[index];}
-		const_iterator& operator++(){index++;return(*this);}
-		const_iterator& operator--(){index--;return(*this);}
-		const_iterator operator++(int){const_iterator it(*this); operator++(); return(it);}
-		const_iterator operator--(int){const_iterator it(*this); operator--(); return(it);}
-		const_iterator operator+(int i) const{return const_iterator(parent,index+i);}
-		const_iterator operator-(int i) const{return const_iterator(parent,index-i);}
+		inline const Type& operator*() const{return **iter;}
+		inline const TypePtr& operator->() const{return *iter;}
+		inline operator const Type*() const{return const_cast<Type*>((Type*)*iter);}
+		inline operator const TypePtr() const{return *iter;}
+		inline const_iterator& operator++(){iter++;return(*this);}
+		inline const_iterator& operator--(){iter--;return(*this);}
+		inline const_iterator operator++(int){const_iterator it(*this); operator++(); return(it);}
+		inline const_iterator operator--(int){const_iterator it(*this); operator--(); return(it);}
+		inline const_iterator operator+(int i) const{return const_iterator(iter+i);}
+		inline const_iterator operator-(int i) const{return const_iterator(iter-i);}
 
-		int operator-(const const_iterator &it) const{return index-it.index;}
-		bool operator<(const const_iterator &it) const{return index<it.index;}
-		bool operator>(const const_iterator &it) const{return index>it.index;}
-		bool operator==(const const_iterator &it) const{return parent==it.parent && index==it.index;}
-		bool operator!=(const const_iterator &it) const{return parent!=it.parent || index!=it.index;}
+		inline int operator-(const const_iterator &it) const{return iter-it.iter;}
+		inline bool operator<(const const_iterator &it) const{return iter<it.iter;}
+		inline bool operator>(const const_iterator &it) const{return iter>it.iter;}
+		inline bool operator==(const const_iterator &it) const{return iter==it.iter;}
+		inline bool operator!=(const const_iterator &it) const{return iter!=it.iter;}
 
-		CollectionType *parent;
-		int index;
+		typename CollectionType::const_iterator iter;
 	};
 
 	inline PointerCollection(){}

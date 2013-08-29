@@ -38,25 +38,26 @@ public:
 
     class iterator{
     public:
-		iterator():parent(NULL),index(0){}
-		iterator(Collection *p,int i):parent(p),index(i){}
-		iterator(const iterator &it):parent(it.parent),index(it.index){}
-		iterator(const const_iterator &it):parent(it.parent),index(it.index){}
+		inline iterator():parent(NULL),index(0){}
+		inline iterator(Collection *p,int i):parent(p),index(i){}
+		inline iterator(const iterator &it):parent(it.parent),index(it.index){}
+		inline iterator(const const_iterator &it):parent(it.parent),index(it.index){}
 
-		Type& operator*() const{return (*parent)[index];}
-		Type* operator->() const{return &(*parent)[index];}
-		iterator& operator++(){index++;return(*this);}
-		iterator& operator--(){index--;return(*this);}
-		iterator operator++(int){iterator it(*this); operator++(); return(it);}
-		iterator operator--(int){iterator it(*this); operator--(); return(it);}
-		iterator operator+(int i) const{return iterator(parent,index+i);}
-		iterator operator-(int i) const{return iterator(parent,index-i);}
+		inline Type& operator*() const{return (*parent)[index];}
+		inline Type* operator->() const{return &(*parent)[index];}
+		inline operator Type*() const{return &(*parent)[index];}
+		inline iterator& operator++(){index++;return(*this);}
+		inline iterator& operator--(){index--;return(*this);}
+		inline iterator operator++(int){iterator it(*this); operator++(); return(it);}
+		inline iterator operator--(int){iterator it(*this); operator--(); return(it);}
+		inline iterator operator+(int i) const{return iterator(parent,index+i);}
+		inline iterator operator-(int i) const{return iterator(parent,index-i);}
 
-		int operator-(const iterator &it) const{return index-it.index;}
-		bool operator<(const iterator &it) const{return index<it.index;}
-		bool operator>(const iterator &it) const{return index>it.index;}
-		bool operator==(const iterator &it) const{return parent==it.parent && index==it.index;}
-		bool operator!=(const iterator &it) const{return parent!=it.parent || index!=it.index;}
+		inline int operator-(const iterator &it) const{return index-it.index;}
+		inline bool operator<(const iterator &it) const{return index<it.index;}
+		inline bool operator>(const iterator &it) const{return index>it.index;}
+		inline bool operator==(const iterator &it) const{return parent==it.parent && index==it.index;}
+		inline bool operator!=(const iterator &it) const{return parent!=it.parent || index!=it.index;}
 
 		Collection<Type> *parent;
 		int index;
@@ -64,25 +65,26 @@ public:
 
     class const_iterator{
     public:
-		const_iterator():parent(NULL),index(0){}
-		const_iterator(Collection *p,int i):parent(p),index(i){}
-		const_iterator(const const_iterator &it):parent(it.parent),index(it.index){}
-		const_iterator(const iterator &it):parent(it.parent),index(it.index){}
+		inline const_iterator():parent(NULL),index(0){}
+		inline const_iterator(Collection *p,int i):parent(p),index(i){}
+		inline const_iterator(const const_iterator &it):parent(it.parent),index(it.index){}
+		inline const_iterator(const iterator &it):parent(it.parent),index(it.index){}
 
-		const Type& operator*() const{return (*parent)[index];}
-		const Type* operator->() const{return &(*parent)[index];}
-		const_iterator& operator++(){index++;return(*this);}
-		const_iterator& operator--(){index--;return(*this);}
-		const_iterator operator++(int){const_iterator it(*this); operator++(); return(it);}
-		const_iterator operator--(int){const_iterator it(*this); operator--(); return(it);}
-		const_iterator operator+(int i) const{return const_iterator(parent,index+i);}
-		const_iterator operator-(int i) const{return const_iterator(parent,index-i);}
+		inline const Type& operator*() const{return (*parent)[index];}
+		inline const Type* operator->() const{return &(*parent)[index];}
+		inline operator const Type*() const{return &(*parent)[index];}
+		inline const_iterator& operator++(){index++;return(*this);}
+		inline const_iterator& operator--(){index--;return(*this);}
+		inline const_iterator operator++(int){const_iterator it(*this); operator++(); return(it);}
+		inline const_iterator operator--(int){const_iterator it(*this); operator--(); return(it);}
+		inline const_iterator operator+(int i) const{return const_iterator(parent,index+i);}
+		inline const_iterator operator-(int i) const{return const_iterator(parent,index-i);}
 
-		int operator-(const const_iterator &it) const{return index-it.index;}
-		bool operator<(const const_iterator &it) const{return index<it.index;}
-		bool operator>(const const_iterator &it) const{return index>it.index;}
-		bool operator==(const const_iterator &it) const{return parent==it.parent && index==it.index;}
-		bool operator!=(const const_iterator &it) const{return parent!=it.parent || index!=it.index;}
+		inline int operator-(const const_iterator &it) const{return index-it.index;}
+		inline bool operator<(const const_iterator &it) const{return index<it.index;}
+		inline bool operator>(const const_iterator &it) const{return index>it.index;}
+		inline bool operator==(const const_iterator &it) const{return parent==it.parent && index==it.index;}
+		inline bool operator!=(const const_iterator &it) const{return parent!=it.parent || index!=it.index;}
 
 		Collection *parent;
 		int index;

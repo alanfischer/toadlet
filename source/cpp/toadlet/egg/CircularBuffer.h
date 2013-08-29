@@ -42,14 +42,13 @@ public:
 		inline iterator():it(NULL),begin(NULL),end(NULL){}
 		inline iterator(Type *i,Type *b,Type *e):it(i),begin(b),end(e){}
 
+		inline Type& operator*() const{return *it;}
+		inline Type *operator->() const{return it;}
+		inline operator Type*() const{return it;}
 		inline const iterator &operator ++(){++it;if(it==end)it=begin;return *this;}
 		inline iterator operator ++(int){iterator r=it++;if(it==end)it=begin;return r;}
 		inline const iterator &operator --(){--it;if(it<begin)it=end-1;return *this;}
 		inline iterator operator --(int){iterator r=it--;if(it<begin)it=end-1;return r;}
-
-		inline operator typename CollectionType::iterator() const{return it;}
-		inline Type *operator*() const{return *it;}
-		inline Type *operator->() const{return it;}
 
 		inline bool operator==(const iterator &i) const{return it==i.it;}
 		inline bool operator!=(const iterator &i) const{return it!=i.it;}
@@ -63,14 +62,13 @@ public:
 		inline const_iterator():it(NULL),begin(NULL),end(NULL){}
 		inline const_iterator(const Type *i,const Type *b,const Type *e):it(i),begin(b),end(e){}
 
+		inline const Type& operator*() const{return *it;}
+		inline const Type *operator->() const{return it;}
+		inline operator const Type*() const{return it;}
 		inline const const_iterator &operator ++(){++it;if(it==end)it=begin;return *this;}
 		inline const_iterator operator ++(int){iterator r=it++;if(it==end)it=begin;return r;}
 		inline const const_iterator &operator --(){--it;if(it<begin)it=end-1;return *this;}
 		inline const_iterator operator --(int){iterator r=it--;if(it<begin)it=end-1;return r;}
-
-		inline operator typename CollectionType::const_iterator() const{return it;}
-		inline const Type *operator*() const{return *it;}
-		inline const Type *operator->() const{return it;}
 
 		inline bool operator==(const const_iterator &i) const{return it==i.it;}
 		inline bool operator!=(const const_iterator &i) const{return it!=i.it;}
