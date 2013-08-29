@@ -21,12 +21,12 @@ public:
 
 		virtual scalar getLength(){return length;}
 		virtual void getPoint(Vector3 &point,scalar time){
-			scalar t=lerp(times.begin(),times.size(),time);
+			scalar t=lerp(times.data(),times.size(),time);
 			int it=Math::toInt(t);t-=Math::fromInt(it);
 			Math::lerp(point,points[it],points[it+1],t);
 		}
 		virtual void getOrientation(Vector3 &tangent,Vector3 &normal,Vector3 &scale,scalar time){
-			scalar t=lerp(times.begin(),times.size(),time);
+			scalar t=lerp(times.data(),times.size(),time);
 			int it=Math::toInt(t);t-=Math::fromInt(it);
 			Math::lerp(tangent,tangents[it],tangents[it+1],t);
 			Math::normalize(tangent);
@@ -36,7 +36,7 @@ public:
 			scale.set(s,s,s);
 		}
 		virtual int getTimeIndex(scalar time){
-			scalar t=lerp(times.begin(),times.size(),time);
+			scalar t=lerp(times.data(),times.size(),time);
 			return Math::toInt(t);
 		}
 

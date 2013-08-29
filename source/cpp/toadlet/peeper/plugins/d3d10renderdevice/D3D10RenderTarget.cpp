@@ -71,7 +71,7 @@ void D3D10RenderTarget::clear(int clearFlags,const Vector4 &clearColor){
 
 bool D3D10RenderTarget::activate(){
 	if(mD3DDevice!=NULL){
-		mD3DDevice->OMSetRenderTargets(mRenderTargetViews.size(),mRenderTargetViews.begin(),mDepthStencilView);
+		mD3DDevice->OMSetRenderTargets(mRenderTargetViews.size(),mRenderTargetViews.data(),mDepthStencilView);
 	}
 	return true;
 }

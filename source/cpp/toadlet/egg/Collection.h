@@ -34,23 +34,74 @@ namespace egg{
 template<typename Type>
 class TOADLET_API Collection{
 public:
-	typedef Type *iterator;
-	typedef const Type *const_iterator;
+	class const_iterator;
+
+    class iterator{
+    public:
+		iterator():parent(NULL),index(0){}
+		iterator(Collection *p,int i):parent(p),index(i){}
+		iterator(const iterator &it):parent(it.parent),index(it.index){}
+		iterator(const const_iterator &it):parent(it.parent),index(it.index){}
+
+		Type& operator*() const{return (*parent)[index];}
+		Type* operator->() const{return &(*parent)[index];}
+		iterator& operator++(){index++;return(*this);}
+		iterator& operator--(){index--;return(*this);}
+		iterator operator++(int){iterator it(*this); operator++(); return(it);}
+		iterator operator--(int){iterator it(*this); operator--(); return(it);}
+		iterator operator+(int i) const{return iterator(parent,index+i);}
+		iterator operator-(int i) const{return iterator(parent,index-i);}
+
+		int operator-(const iterator &it) const{return index-it.index;}
+		bool operator<(const iterator &it) const{return index<it.index;}
+		bool operator>(const iterator &it) const{return index>it.index;}
+		bool operator==(const iterator &it) const{return parent==it.parent && index==it.index;}
+		bool operator!=(const iterator &it) const{return parent!=it.parent || index!=it.index;}
+
+		int index;
+		Collection<Type> *parent;
+	};
+
+    class const_iterator{
+    public:
+		const_iterator():parent(NULL),index(0){}
+		const_iterator(Collection *p,int i):parent(p),index(i){}
+		const_iterator(const const_iterator &it):parent(it.parent),index(it.index){}
+		const_iterator(const iterator &it):parent(it.parent),index(it.index){}
+
+		const Type& operator*() const{return (*parent)[index];}
+		const Type* operator->() const{return &(*parent)[index];}
+		const_iterator& operator++(){index++;return(*this);}
+		const_iterator& operator--(){index--;return(*this);}
+		const_iterator operator++(int){const_iterator it(*this); operator++(); return(it);}
+		const_iterator operator--(int){const_iterator it(*this); operator--(); return(it);}
+		const_iterator operator+(int i) const{return const_iterator(parent,index+i);}
+		const_iterator operator-(int i) const{return const_iterator(parent,index-i);}
+
+		int operator-(const const_iterator &it) const{return index-it.index;}
+		bool operator<(const const_iterator &it) const{return index<it.index;}
+		bool operator>(const const_iterator &it) const{return index>it.index;}
+		bool operator==(const const_iterator &it) const{return parent==it.parent && index==it.index;}
+		bool operator!=(const const_iterator &it) const{return parent!=it.parent || index!=it.index;}
+
+		int index;
+		Collection *parent;
+	};
 
 	inline Collection():
 		mSize(0),
 		mCapacity(0),
-		mData(NULL),
-		mBegin(NULL),mEnd(NULL)
-	{}
+		mData(NULL)
+	{
+		mBegin=iterator(this,0);mEnd=iterator(this,0);
+	}
 
 	inline Collection(int size):
 		mSize(size),
-		mCapacity(size),
-		mBegin(NULL),mEnd(NULL)
+		mCapacity(size)
 	{
 		mData=new Type[mCapacity+1];
-		mBegin=&mData[0];mEnd=&mData[mSize];
+		mBegin=iterator(this,0);mEnd=iterator(this,mSize);
 	}
 
 	inline Collection(int size,const Type &value):
@@ -62,7 +113,7 @@ public:
 		for(i=0;i<size;++i){
 			mData[i]=value;
 		}
-		mBegin=&mData[0];mEnd=&mData[mSize];
+		mBegin=iterator(this,0);mEnd=iterator(this,mSize);
 	}
 
 	inline Collection(const Type *values,int size):
@@ -74,7 +125,7 @@ public:
 		for(i=0;i<size;++i){
 			mData[i]=values[i];
 		}
-		mBegin=&mData[0];mEnd=&mData[mSize];
+		mBegin=iterator(this,0);mEnd=iterator(this,mSize);
 	}
 
 	inline Collection(const Collection &c):
@@ -86,7 +137,7 @@ public:
 		for(i=0;i<mSize;++i){
 			mData[i]=c.mData[i];
 		}
-		mBegin=&mData[0];mEnd=&mData[mSize];
+		mBegin=iterator(this,0);mEnd=iterator(this,mSize);
 	}
 
 	template<typename Type2> inline Collection(const Collection<Type2> &c):
@@ -98,7 +149,7 @@ public:
 		for(i=0;i<mSize;++i){
 			mData[i]=c.mData[i];
 		}
-		mBegin=&mData[0];mEnd=&mData[mSize];
+		mBegin=iterator(this,0);mEnd=iterator(this,mSize);
 	}
 
 	~Collection(){
@@ -124,18 +175,18 @@ public:
 
 		mData[mSize]=type;
 		mSize++;
-		mEnd=&mData[mSize];
+		mEnd=iterator(this,mSize);
 	}
 
 	inline void pop_back(){
 		mData[mSize-1]=Type();
 
 		mSize--;
-		mEnd=&mData[mSize];
+		mEnd=iterator(this,mSize);
 	}
 
-	iterator insert(iterator at,const Type &type){
-		int iat=at-mData;
+	iterator insert(const iterator &at,const Type &type){
+		int iat=at-begin();
 
 		if(mSize+1>mCapacity){
 			reserve((mSize+1)*2);
@@ -148,12 +199,12 @@ public:
 
 		mData[iat]=type;
 		mSize++;
-		mEnd=&mData[mSize];
+		mEnd=iterator(this,mSize);
 
-		return &mData[iat];
+		return iterator(this,iat);
 	}
 
-	iterator insert(iterator at,const_iterator start,const_iterator end){
+	iterator insert(const iterator &at,const const_iterator &start,const const_iterator &end){
 		int iat=at-mData;
 
 		int addsize=end-start;
@@ -171,9 +222,9 @@ public:
 		}
 
 		mSize+=addsize;
-		mEnd=&mData[mSize];
+		mEnd=iterator(this,mSize);
 
-		return &mData[iat];
+		return iterator(this,iat);
 	}
 
 	void resize(int s){
@@ -189,7 +240,7 @@ public:
 		else{
 			mSize=s;
 		}
-		mEnd=&mData[mSize];
+		mEnd=iterator(this,mSize);
 	}
 
 	void resize(int s,const Type &type){
@@ -207,10 +258,10 @@ public:
 				mData[mSize-1]=Type();
 			}
 		}
-		mEnd=&mData[mSize];
+		mEnd=iterator(this,mSize);
 	}
 
-	iterator erase(iterator it){
+	iterator erase(const iterator &it){
 		int iit=it-begin();
 
 		int i;
@@ -219,9 +270,9 @@ public:
 		}
 		mData[mSize-1]=Type();
 		mSize--;
-		mEnd=&mData[mSize];
+		mEnd=iterator(this,mSize);
 
-		return &mData[iit];
+		return iterator(this,iit);
 	}
 
 	template<typename Type2> bool remove(const Type2 &type){
@@ -239,7 +290,7 @@ public:
 
 			mData[mSize-1]=Type();
 			mSize--;
-			mEnd=&mData[mSize];
+			mEnd=iterator(this,mSize);
 			
 			return true;
 		}
@@ -269,7 +320,7 @@ public:
 			}
 			delete[] mData;
 			mData=data;
-			mBegin=&mData[0];mEnd=&mData[mSize];
+			mBegin=iterator(this,0);mEnd=iterator(this,mSize);
 		}
 		mCapacity=s;
 	}
@@ -281,9 +332,10 @@ public:
 		}
 
 		mSize=0;
-		mEnd=&mData[mSize];
+		mEnd=iterator(this,mSize);
 	}
 
+	inline Type *data() const{return mData;}
 	inline int size() const{return mSize;}
 	inline int capacity() const{return mCapacity;}
 	inline bool empty() const{return mSize==0;}
@@ -315,7 +367,7 @@ public:
 		for(i=0;i<mSize;++i){
 			mData[i]=c.mData[i];
 		}
-		mBegin=&mData[0];mEnd=&mData[mSize];
+		mBegin=iterator(this,0);mEnd=iterator(this,mSize);
 		return *this;
 	}
 

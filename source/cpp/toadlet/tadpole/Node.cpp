@@ -159,12 +159,12 @@ void Node::actionRemoved(ActionComponent *action){
 Component *Node::getChild(const String &name) const{
 	for(ComponentCollection::const_iterator c=mComponents.begin(),end=mComponents.end();c!=end;++c){
 		if(c->getName()==name){
-			return *c.it;
+			return (Component*)(const Component*)c;
 		}
 	}
 	for(NodeCollection::const_iterator n=mNodes.begin(),end=mNodes.end();n!=end;++n){
 		if(n->getName()==name){
-			return *n.it;
+			return (Node*)(const Node*)n;
 		}
 	}
 	return NULL;
@@ -177,12 +177,12 @@ Component *Node::getChild(const Type<Component> *type) const{
 
 	for(ComponentCollection::const_iterator c=mComponents.begin(),end=mComponents.end();c!=end;++c){
 		if(c->getType()->getFullName()==type->getFullName()){ // Compare names to avoid the issue of multiple types being built into different libraries
-			return *c.it;
+			return (Component*)(const Component*)c;
 		}
 	}
 	for(NodeCollection::const_iterator n=mNodes.begin(),end=mNodes.end();n!=end;++n){
 		if(n->getType()->getFullName()==type->getFullName()){  // Compare names to avoid the issue of multiple types being built into different libraries
-			return *n.it;
+			return (Node*)(const Node*)n;
 		}
 	}
 	return NULL;
@@ -191,7 +191,7 @@ Component *Node::getChild(const Type<Component> *type) const{
 Node *Node::getNode(const String &name) const{
 	for(NodeCollection::const_iterator n=mNodes.begin(),end=mNodes.end();n!=end;++n){
 		if(n->getName()==name){
-			return *n.it;
+			return (Node*)(const Node*)n;
 		}
 	}
 	return NULL;
@@ -204,7 +204,7 @@ Node *Node::getNode(const Type<Component> *type) const{
 
 	for(NodeCollection::const_iterator n=mNodes.begin(),end=mNodes.end();n!=end;++n){
 		if(n->getType()->getFullName()==type->getFullName()){ // Compare names to avoid the issue of multiple types being built into different libraries
-			return *n.it;
+			return (Node*)(const Node*)n;
 		}
 	}
 	return NULL;

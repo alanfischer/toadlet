@@ -39,59 +39,62 @@ class TOADLET_API PointerCollection{
 public:
 	typedef typename Type::ptr TypePtr;
 	typedef Collection<TypePtr> CollectionType;
+	class const_iterator;
 
 	class iterator{
-	public:
-		inline iterator():it(NULL){}
-		inline iterator(TypePtr *i):it(i){}
+    public:
+		iterator():parent(NULL),index(0){}
+		iterator(CollectionType *p,int i):parent(p),index(i){}
+		iterator(const iterator &it):parent(it.parent),index(it.index){}
+		iterator(const const_iterator &it):parent(it.parent),index(it.index){}
+		iterator(const typename CollectionType::iterator &it):parent(it.parent),index(it.index){}
 
-		inline const iterator &operator ++(){++it;return *this;}
-		inline iterator operator ++(int){return it++;}
-		inline iterator operator +(int i) const{return it+i;}
-		inline const iterator &operator --(){--it;return *this;}
-		inline iterator operator --(int){return it--;}
-		inline iterator operator -(int i) const{return it-i;}
+		Type& operator*() const{return *(*parent)[index];}
+		Type* operator->() const{return (*parent)[index];}
+		operator Type*() const{return (*parent)[index];}
+		iterator& operator++(){index++;return(*this);}
+		iterator& operator--(){index--;return(*this);}
+		iterator operator++(int){iterator it(*this); operator++(); return(it);}
+		iterator operator--(int){iterator it(*this); operator--(); return(it);}
+		iterator operator+(int i) const{return iterator(parent,index+i);}
+		iterator operator-(int i) const{return iterator(parent,index-i);}
 
-		inline operator typename CollectionType::iterator() const{return it;}
-		inline Type &operator*() const{return **it;}
-		inline Type *operator->() const{return *it;}
-		inline operator TypePtr() const{return *it;}
-		inline operator Type*() const{return *it;}
+		int operator-(const iterator &it) const{return index-it.index;}
+		bool operator<(const iterator &it) const{return index<it.index;}
+		bool operator>(const iterator &it) const{return index>it.index;}
+		bool operator==(const iterator &it) const{return parent==it.parent && index==it.index;}
+		bool operator!=(const iterator &it) const{return parent!=it.parent || index!=it.index;}
 
-		inline bool operator==(const iterator &i) const{return it==i.it;}
-		inline bool operator!=(const iterator &i) const{return it!=i.it;}
-		inline bool operator<(const iterator &i) const{return it<i.it;}
-		inline bool operator>(const iterator &i) const{return it>i.it;}
-		inline int operator -(const iterator &i) const{return it-i.it;}
-
-		TypePtr *it;
+		int index;
+		CollectionType *parent;
 	};
 
-	class const_iterator{
-	public:
-		inline const_iterator():it(NULL){}
-		inline const_iterator(const TypePtr *i):it(i){}
+    class const_iterator{
+    public:
+		const_iterator():parent(NULL),index(0){}
+		const_iterator(CollectionType *p,int i):parent(p),index(i){}
+		const_iterator(const const_iterator &it):parent(it.parent),index(it.index){}
+		const_iterator(const iterator &it):parent(it.parent),index(it.index){}
+		const_iterator(const typename CollectionType::const_iterator &it):parent(it.parent),index(it.index){}
 
-		inline const const_iterator &operator ++(){++it;return *this;}
-		inline const_iterator operator ++(int){return it++;}
-		inline const_iterator operator +(int i) const{return it+i;}
-		inline const const_iterator &operator --(){--it;return *this;}
-		inline const_iterator operator --(int){return it--;}
-		inline const_iterator operator -(int i) const{return it-i;}
+		const Type& operator*() const{return *(*parent)[index];}
+		const Type* operator->() const{return (*parent)[index];}
+		operator Type*() const{return const_cast<Type*>((*parent)[index].get());}
+		const_iterator& operator++(){index++;return(*this);}
+		const_iterator& operator--(){index--;return(*this);}
+		const_iterator operator++(int){const_iterator it(*this); operator++(); return(it);}
+		const_iterator operator--(int){const_iterator it(*this); operator--(); return(it);}
+		const_iterator operator+(int i) const{return const_iterator(parent,index+i);}
+		const_iterator operator-(int i) const{return const_iterator(parent,index-i);}
 
-		inline operator typename CollectionType::const_iterator() const{return it;}
-		inline const Type &operator*() const{return **it;}
-		inline const Type *operator->() const{return *it;}
-		inline operator const TypePtr() const{return *it;}
-		inline operator const Type*() const{return *it;}
+		int operator-(const const_iterator &it) const{return index-it.index;}
+		bool operator<(const const_iterator &it) const{return index<it.index;}
+		bool operator>(const const_iterator &it) const{return index>it.index;}
+		bool operator==(const const_iterator &it) const{return parent==it.parent && index==it.index;}
+		bool operator!=(const const_iterator &it) const{return parent!=it.parent || index!=it.index;}
 
-		inline bool operator==(const const_iterator &i) const{return it==i.it;}
-		inline bool operator!=(const const_iterator &i) const{return it!=i.it;}
-		inline bool operator<(const const_iterator &i) const{return it<i.it;}
-		inline bool operator>(const const_iterator &i) const{return it>i.it;}
-		inline int operator -(const const_iterator &i) const{return it-i.it;}
-
-		const TypePtr *it;
+		int index;
+		CollectionType *parent;
 	};
 
 	inline PointerCollection(){}
@@ -109,8 +112,8 @@ public:
 	inline void push_back(const TypePtr &type){mCollection.push_back(type);}
 	inline void pop_back(){mCollection.pop_back();}
 	
-	inline iterator insert(iterator at,const TypePtr &type){return mCollection.insert(at,type);}
-	inline iterator insert(iterator at,const_iterator start,const_iterator end){return mCollection.insert(at,start,end);}
+	inline iterator insert(const iterator &at,const TypePtr &type){return mCollection.insert(reinterpret_cast<const CollectionType::iterator&>(at),type);}
+	inline iterator insert(const iterator &at,const const_iterator &start,const const_iterator &end){return mCollection.insert(reinterpret_cast<const CollectionType::iterator&>(at),reinterpret_cast<const CollectionType::iterator&>(start),reinterpret_cast<const CollectionType::iterator&>(end));}
 
 	inline void resize(int s){mCollection.resize(s);}
 	inline iterator erase(iterator it){return mCollection.erase(it);}
