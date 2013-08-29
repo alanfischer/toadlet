@@ -58,8 +58,8 @@ public:
 		bool operator==(const iterator &it) const{return parent==it.parent && index==it.index;}
 		bool operator!=(const iterator &it) const{return parent!=it.parent || index!=it.index;}
 
-		int index;
 		Collection<Type> *parent;
+		int index;
 	};
 
     class const_iterator{
@@ -84,8 +84,8 @@ public:
 		bool operator==(const const_iterator &it) const{return parent==it.parent && index==it.index;}
 		bool operator!=(const const_iterator &it) const{return parent!=it.parent || index!=it.index;}
 
-		int index;
 		Collection *parent;
+		int index;
 	};
 
 	inline Collection():
