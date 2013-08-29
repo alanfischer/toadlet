@@ -50,8 +50,9 @@ public:
 		iterator(const typename CollectionType::iterator &it):parent(it.parent),index(it.index){}
 
 		Type& operator*() const{return *(*parent)[index];}
-		Type* operator->() const{return (*parent)[index];}
+		TypePtr& operator->() const{return (*parent)[index];}
 		operator Type*() const{return (*parent)[index];}
+		operator TypePtr() const{return (*parent)[index];}
 		iterator& operator++(){index++;return(*this);}
 		iterator& operator--(){index--;return(*this);}
 		iterator operator++(int){iterator it(*this); operator++(); return(it);}
@@ -78,8 +79,9 @@ public:
 		const_iterator(const typename CollectionType::const_iterator &it):parent(it.parent),index(it.index){}
 
 		const Type& operator*() const{return *(*parent)[index];}
-		const Type* operator->() const{return (*parent)[index];}
-		operator Type*() const{return const_cast<Type*>((*parent)[index].get());}
+		const TypePtr& operator->() const{return (*parent)[index];}
+		operator const Type*() const{return const_cast<Type*>((Type*)(*parent)[index]);}
+		operator const TypePtr() const{return (*parent)[index];}
 		const_iterator& operator++(){index++;return(*this);}
 		const_iterator& operator--(){index--;return(*this);}
 		const_iterator operator++(int){const_iterator it(*this); operator++(); return(it);}
@@ -116,7 +118,7 @@ public:
 	inline iterator insert(const iterator &at,const const_iterator &start,const const_iterator &end){return mCollection.insert(reinterpret_cast<const typename CollectionType::iterator&>(at),reinterpret_cast<const typename CollectionType::iterator&>(start),reinterpret_cast<const typename CollectionType::iterator&>(end));}
 
 	inline void resize(int s){mCollection.resize(s);}
-	inline iterator erase(iterator it){return mCollection.erase(it);}
+	inline iterator erase(iterator it){return mCollection.erase(reinterpret_cast<const typename CollectionType::iterator&>(it));}
 	template<typename Type2> inline bool remove(const Type2 &type){return mCollection.remove(type);}
 	template<typename Type2> inline int indexOf(const Type2 &type) const{return mCollection.indexOf(type);}
 	template<typename Type2> inline bool contains(const Type2 &type) const{return mCollection.contains(type);}

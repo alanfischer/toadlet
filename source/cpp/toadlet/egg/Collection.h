@@ -205,7 +205,7 @@ public:
 	}
 
 	iterator insert(const iterator &at,const const_iterator &start,const const_iterator &end){
-		int iat=at-mData;
+		int iat=at-mBegin;
 
 		int addsize=end-start;
 		if(mSize+addsize>mCapacity){
