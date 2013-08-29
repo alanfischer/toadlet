@@ -128,6 +128,7 @@ public:
 	inline int size() const{return mCollection.size();}
 	inline int capacity() const{return mCollection.capacity();}
 	inline bool empty() const{return mCollection.empty();}
+	inline TypePtr* data() const{return mCollection.data();}
 
 	inline void removeAt(int i){erase(begin()+i);}
 	inline void add(const TypePtr &type){mCollection.add(type);}
