@@ -116,15 +116,15 @@ Resource::ptr OSXFontStreamer::load(Stream::ptr in,ResourceData *resourceData,Pr
 
 	// Get glyphs
 	egg::Collection<CGGlyph> cgglyphs(numChars);
-	memset(cgglyphs.begin(),0,sizeof(CGGlyph)*cgglyphs.size());
-	CGFontGetGlyphsForUnichars(cgfont,(const UniChar*)charArray,cgglyphs.begin(),numChars);
+	memset(cgglyphs.data(),0,sizeof(CGGlyph)*cgglyphs.size());
+	CGFontGetGlyphsForUnichars(cgfont,(const UniChar*)charArray,cgglyphs.data(),numChars);
 
 	// Get glyph sizes
 	egg::Collection<CGRect> sizes(numChars);
-	memset(sizes.begin(),0,sizeof(CGRect)*sizes.size());
-	CGFontGetGlyphBBoxes(cgfont,cgglyphs.begin(),numChars,sizes.begin());
+	memset(sizes.data(),0,sizeof(CGRect)*sizes.size());
+	CGFontGetGlyphBBoxes(cgfont,cgglyphs.data(),numChars,sizes.data());
 	egg::Collection<int> iadvances(numChars);
-	CGFontGetGlyphAdvances(cgfont,cgglyphs.begin(),numChars,iadvances.begin());
+	CGFontGetGlyphAdvances(cgfont,cgglyphs.data(),numChars,iadvances.data());
 	egg::Collection<float> advances(numChars);
 	for(i=0;i<sizes.size();++i){
 		sizes[i].origin.x=fromEm(sizes[i].origin.x,pointSize,unitsPerEm)-1;
@@ -243,7 +243,7 @@ Resource::ptr OSXFontStreamer::load(Stream::ptr in,ResourceData *resourceData,Pr
 	delete[] textureData;
 
 	// Build font
-	Font::ptr font(new Font(resdata->pointSize,0,texture,wcharArray,glyphs.begin(),glyphs.size()));
+	Font::ptr font(new Font(resdata->pointSize,0,texture,wcharArray,glyphs.data(),glyphs.size()));
 
 	CGContextRelease(context);
 	free(data);
