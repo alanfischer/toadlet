@@ -1,6 +1,6 @@
 #include "RandIsle.h"
 #include "PathClimber.h"
-#include "TreeSystem.h"
+#include "TreeComponent.h"
 #include "HUD.h"
 #include "Resources.h"
 #include <toadlet/tadpole/plugins/HopManager.h>
@@ -10,9 +10,6 @@
 #define TREE_CAMERA_DISTANCE 80
 
 static const scalar epsilon=0.001f;
-
-/// @todo: Fix:
-///  - Android GLES1/2 swapping not working due to different GL libraries being loaded, have to use glesem
 
 class SnowComponent:public BaseComponent{
 public:
@@ -423,7 +420,7 @@ void RandIsle::logicUpdate(int dt){
 
 	updateClimber(climber,dt);
 
-//	updateDanger(dt);
+	updateDanger(dt);
 
 	updateProps();
 
@@ -569,10 +566,10 @@ void RandIsle::updateClimber(PathClimber *climber,int dt){
 			SensorResults::ptr results=mBoundSensor->sense();
 
 			for(SensorResults::iterator node=results->begin();node!=results->end();++node){
-				TreeSystem *system=node->getChildType<TreeSystem>();
-				if(system!=NULL){
+				TreeComponent *tree=node->getChildType<TreeComponent>();
+				if(tree!=NULL){
 					Vector3 point;
-					Path *path=system->getClosestPath(point,mPlayer->getTranslate());
+					Path *path=tree->getClosestPath(point,mPlayer->getTranslate());
 					float distance=Math::length(point,mPlayer->getTranslate());
 
 					if(path!=NULL && distance<closestDistance){
@@ -870,23 +867,18 @@ bool RandIsle::updatePopulatePatches(){
 		if(result.time<Math::ONE && patch->bound->testIntersection(result.point)){
 			result.point.z-=5;
 
-			TreeSystem::ptr system;
+			TreeComponent::ptr treeComponent;
 			Node::ptr tree=new Node(mScene);
 			{
-				system=new TreeSystem(mScene,wx+wy);
-				tree->attach(system);
+				treeComponent=new TreeComponent(mScene,wx+wy);
+				tree->attach(treeComponent);
 
 				tree->setScope(tree->getScope()&~Scope_BIT_SHADOW);
 			}
 			tree->setTranslate(result.point);
 			mScene->getRoot()->attach(tree);
 
-			system->grow();
-
-			/// @todo: Swap between high & low res meshes, add LOD selection to node's renderables choices?
-			MeshComponent::ptr mesh=new MeshComponent(mEngine);
-			mesh->setMesh(system->getMesh());
-			tree->attach(mesh);
+			treeComponent->grow();
 		}
 
 		if(patch->dy>=0){
@@ -913,7 +905,7 @@ void RandIsle::terrainPatchDestroyed(int px,int py,Bound *bound){
 	mBoundSensor->setBound(bound);
 	SensorResults::ptr results=mBoundSensor->sense();
 	for(SensorResults::iterator node=results->begin();node!=results->end();++node){
-		if(node->getChildType<TreeSystem>()!=NULL && Math::testInside(bound->getAABox(),node->getWorldTranslate())){
+		if(node->getChildType<TreeComponent>()!=NULL && Math::testInside(bound->getAABox(),node->getWorldTranslate())){
 			node->destroy();
 		}
 	}

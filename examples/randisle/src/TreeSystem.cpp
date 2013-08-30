@@ -1,14 +1,14 @@
 #include "TreeSystem.h"
 #include "Resources.h"
 
-TreeSystem::TreeSystem(Scene *scene,int seed):
+TreeSystem::TreeSystem(Engine *engine,int seed,BranchSystem::BranchListener *listener):BranchSystem(seed),
 	mEngine(NULL),
-	mScene(NULL),
+
+	//mBound,
 
 	mSections(0),
 	mCountMode(false),
 
-	//mSystem,
 	//mBranchVertexStart,
 	//mBranchNodeStart,
 	//mBranchStarted,
@@ -32,8 +32,7 @@ TreeSystem::TreeSystem(Scene *scene,int seed):
 
 	mLowMod(0)
 {
-	mEngine=scene->getEngine();
-	mScene=scene;
+	mEngine=engine;
 
 	mSections=6;
 	mLowMod=2;
@@ -41,11 +40,10 @@ TreeSystem::TreeSystem(Scene *scene,int seed):
 	mBranchMaterial=Resources::instance->treeBranch;
 	mLeafMaterial=Resources::instance->treeLeaf;
 
-	mSystem=new BranchSystem(seed);
-	mSystem->setBranchListener(this);
-
-	mBound=new Bound();
-	mWorldBound=new Bound();
+	if(listener==NULL){
+		listener=this;
+	}
+	setBranchListener(listener);
 }
 
 void TreeSystem::destroy(){
@@ -73,30 +71,15 @@ void TreeSystem::destroy(){
 	mBranchMaterial=NULL;
 	mLeafMaterial=NULL;
 	
-	mSystem=NULL;
 	mTreeBranches.clear();
 	mLeaves.clear();
-
-	BaseComponent::destroy();
-}
-
-void TreeSystem::parentChanged(Node *node){
-	if(mParent!=NULL){
-		mParent->spacialRemoved(this);
-	}
-
-	BaseComponent::parentChanged(node);
-
-	if(mParent!=NULL){
-		mParent->spacialAttached(this);
-	}
 }
 
 void TreeSystem::grow(){
 	mCountMode=true;
 	resetCounts();
-	mSystem->start();
-	while(mSystem->update(30));
+	start();
+	while(update(30));
 	mCountMode=false;
 
 	mBranchVertexBuffer=mEngine->getBufferManager()->createVertexBuffer(Buffer::Usage_BIT_STATIC,Buffer::Access_BIT_WRITE,mEngine->getVertexFormats().POSITION_NORMAL_TEX_COORD,mBranchVertexCount);
@@ -113,8 +96,8 @@ void TreeSystem::grow(){
 		liba.lock(mLeafIndexBuffer,Buffer::Access_BIT_WRITE);
 
 		resetCounts();
-		mSystem->start();
-		while(mSystem->update(30));
+		start();
+		while(update(30));
 
 		liba.unlock();
 		lvba.unlock();
@@ -127,11 +110,11 @@ void TreeSystem::grow(){
 
 	mergeBounds(mTreeBranches[0]);
 
-	mBound->set(mTreeBranches[0]->bound);
+	Bound::ptr bound=new Bound(getBound());
 
 	mMesh=new Mesh();
 	mMesh->setStaticVertexData(new VertexData(mBranchVertexBuffer));
-	mMesh->setBound(mBound);
+	mMesh->setBound(bound);
 	{
 		Mesh::SubMesh::ptr subMesh=new Mesh::SubMesh();
 		subMesh->indexData=new IndexData(IndexData::Primitive_TRISTRIP,mBranchIndexBuffer);
@@ -149,7 +132,7 @@ void TreeSystem::grow(){
 
 	mLowMesh=new Mesh();
 	mLowMesh->setStaticVertexData(new VertexData(mBranchVertexBuffer));
-	mLowMesh->setBound(mBound);
+	mLowMesh->setBound(bound);
 	{
 		Mesh::SubMesh::ptr subMesh=new Mesh::SubMesh();
 		subMesh->indexData=new IndexData(IndexData::Primitive_TRISTRIP,mLowBranchIndexBuffer);
@@ -196,17 +179,6 @@ void TreeSystem::branchDestroyed(BranchSystem::Branch *branch){
 void TreeSystem::branchBuild(BranchSystem::Branch *branch){
 	TreeBranch *treeBranch=(TreeBranch*)branch;
 
-	if(treeBranch->points.size()>0){
-		Segment segment;
-		segment.origin=branch->position + mParent->getWorldTranslate();
-		segment.direction=branch->position - treeBranch->points[treeBranch->points.size()-1];
-		PhysicsCollision result;
-		mScene->traceSegment(result,segment,-1,NULL);
-		if(result.time<Math::ONE){
-			branch->life=0;
-		}
-	}
-
 	Vector3 branchUp,branchNormal,branchBinormal;
 	BranchSystem::getBranchVectors(branch,branchUp,branchNormal,branchBinormal);
 
@@ -219,7 +191,7 @@ void TreeSystem::branchBuild(BranchSystem::Branch *branch){
 
 	treeBranch->points.add(branch->position);
 	Vector3 tangent;
-	Math::normalizeCarefully(tangent,branch->velocity,mScene->getEpsilon());
+	Math::normalizeCarefully(tangent,branch->velocity,0.001);
 	treeBranch->tangents.add(tangent);
 	treeBranch->normals.add((branch->length==0 && treeBranch->parent==NULL)?Math::X_UNIT_VECTOR3:Math::ZERO_VECTOR3);
 	treeBranch->scales.add(branch->scale);
@@ -321,13 +293,13 @@ void TreeSystem::branchLeaf(BranchSystem::Branch *branch,const Vector3 &offset,s
 	Vector3 branchForward,branchNormal,branchBinormal;
 	BranchSystem::getBranchVectors(branch,branchForward,branchNormal,branchBinormal);
 
-	Math::normalizeCarefully(branchNormal,offset,mScene->getEpsilon());
+	Math::normalizeCarefully(branchNormal,offset,0.001);
 	Math::mul(branchNormal,scale);
 
 	Vector3 point;
 	Math::add(point,branch->position,offset);
 
-	scalar leafWiggleOffset=mSystem->getRandom()->nextFloat(0,1);
+	scalar leafWiggleOffset=getRandom()->nextFloat(0,1);
 
 	if(!mCountMode){
 		// Points are recalulated in alignLeaves
@@ -373,7 +345,7 @@ void TreeSystem::alignLeaves(const Vector3 &eyePoint,const Vector3 &eyeForward,b
 			const Segment &segment=mLeaves[i].segment;
 			if(individual){
 				Math::sub(normal,segment.origin,eyePoint);
-				Math::normalizeCarefully(normal,mScene->getEpsilon());
+				Math::normalizeCarefully(normal,0.001);
 				Math::cross(up,normal,segment.direction);
 			}
 			else{
@@ -416,11 +388,11 @@ void TreeSystem::wiggleUpdate(int dt){
 				scalar l=Math::length(segment.direction);
 				segment.direction.x+=Math::sin(ftime*8*leaf->wiggleOffset)*4;
 				segment.direction.y+=Math::sin(ftime*8*leaf->wiggleOffset)*4;
-				Math::normalizeCarefully(segment.direction,mScene->getEpsilon());
+				Math::normalizeCarefully(segment.direction,0.001);
 				segment.direction*=l;
 				if(individual){
 					Math::sub(normal,segment.origin,eyePoint);
-					Math::normalizeCarefully(normal,mScene->getEpsilon());
+					Math::normalizeCarefully(normal,0.001);
 					Math::cross(up,normal,segment.direction);
 				}
 				else{
@@ -450,11 +422,11 @@ void TreeSystem::calculateNormals(TreeBranch *branch){
 		neighborTangent=neighbor->tangents[0];
 
 		Math::add(normal,tangent,neighborTangent);
-		Math::normalizeCarefully(normal,mScene->getEpsilon());
+		Math::normalizeCarefully(normal,0.001);
 		Math::neg(normal);
 
 		Math::cross(binormal,tangent,normal);
-		Math::normalizeCarefully(binormal,mScene->getEpsilon());
+		Math::normalizeCarefully(binormal,0.001);
 		Math::cross(normal,binormal,tangent);
 
 		TOADLET_ASSERT(Math::length(normal)!=0);
@@ -481,7 +453,7 @@ void TreeSystem::calculateNormals(TreeBranch *branch){
 			Math::lerp(normal,branch->normals[i],branch->normals[j],(float)(k-i)/(float)(j-i));
 
 			Math::cross(binormal,tangent,normal);
-			Math::normalizeCarefully(binormal,mScene->getEpsilon());
+			Math::normalizeCarefully(binormal,0.001);
 			Math::cross(normal,binormal,tangent);
 
 			branch->normals[k]=normal;
@@ -527,16 +499,11 @@ bool TreeSystem::wiggleLeaves(const Sphere &bound,TreeSystem::TreeBranch *branch
 	return result;
 }
 
-Path *TreeSystem::getClosestPath(Vector3 &closestPoint,const Vector3 &point){
-	Sphere bound;
-	Math::sub(bound.origin,point,mParent->getWorldTranslate());
-	bound.radius=50;
-	Path *path=getClosestPath(closestPoint,bound,mTreeBranches[0]);
-	Math::add(closestPoint,mParent->getWorldTranslate());
-	return path;
-}
-
 Path *TreeSystem::getClosestPath(Vector3 &closestPoint,const Sphere &bound,TreeBranch *path){
+	if(path==NULL){
+		path=mTreeBranches[0];
+	}
+
 	if(Math::testIntersection(bound,path->bound)){
 		Path *closestPath=NULL;
 		scalar closestDistance=1000;
@@ -574,19 +541,11 @@ Path *TreeSystem::getClosestPath(Vector3 &closestPoint,const Sphere &bound,TreeB
 	}
 }
 
-void TreeSystem::transformChanged(Transform *transform){
-	if(mParent==NULL){
-		return;
+Path *TreeSystem::traceSegment(PhysicsCollision &result,const Vector3 &position,const Segment &segment,const Vector3 &size,TreeBranch *path){
+	if(path==NULL){
+		path=mTreeBranches[0];
 	}
 
-	mWorldBound->transform(mBound,mParent->getWorldTransform());
-}
-
-void TreeSystem::traceSegment(PhysicsCollision &result,const Vector3 &position,const Segment &segment,const Vector3 &size){
-	traceSegment(result,position,segment,size,mTreeBranches[0]);
-}
-
-Path *TreeSystem::traceSegment(PhysicsCollision &result,const Vector3 &position,const Segment &segment,const Vector3 &size,TreeBranch *path){
 	result.time=Math::findIntersection(segment,path->bound,result.point,result.normal);
 
 	Path *closestPath=NULL;
