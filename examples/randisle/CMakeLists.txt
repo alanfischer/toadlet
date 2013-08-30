@@ -16,6 +16,7 @@ set (SRC
 	src/Resources.cpp
 	src/Sky.cpp
 	src/RandIsle.cpp
+	src/TreeComponent.cpp
 	src/TreeSystem.cpp
 )
 
@@ -31,6 +32,7 @@ set (H
 	src/Sky.h
 	src/SmoothFollower.h
 	src/RandIsle.h
+	src/TreeComponent.h
 	src/TreeSystem.h
 )
 

@@ -1,15 +1,12 @@
 #ifndef TREESYSTEM_H
 #define TREESYSTEM_H
 
-#include <toadlet/peeper.h>
-#include <toadlet/tadpole.h>
 #include "Path.h"
 #include "BranchSystem.h"
 
-/// @todo: Refactor into TreeSystem isa BranchSystem and TreeComponent hasa TreeSystem
-class TreeSystem:public BaseComponent,public BranchSystem::BranchListener,public Spacial,public DetailTraceable{
+class TreeSystem:public BranchSystem,public BranchSystem::BranchListener{
 public:
-	TOADLET_COMPONENT(TreeSystem);
+	TOADLET_OBJECT(TreeSystem);
 
 	class TreeBranch:public BranchSystem::Branch,public Path{
 	public:
@@ -19,13 +16,13 @@ public:
 
 		virtual ~TreeBranch(){}
 
-		virtual scalar getLength(){return length;}
-		virtual void getPoint(Vector3 &point,scalar time){
+		virtual scalar getLength() const{return length;}
+		virtual void getPoint(Vector3 &point,scalar time) const{
 			scalar t=lerp(times.data(),times.size(),time);
 			int it=Math::toInt(t);t-=Math::fromInt(it);
 			Math::lerp(point,points[it],points[it+1],t);
 		}
-		virtual void getOrientation(Vector3 &tangent,Vector3 &normal,Vector3 &scale,scalar time){
+		virtual void getOrientation(Vector3 &tangent,Vector3 &normal,Vector3 &scale,scalar time) const{
 			scalar t=lerp(times.data(),times.size(),time);
 			int it=Math::toInt(t);t-=Math::fromInt(it);
 			Math::lerp(tangent,tangents[it],tangents[it+1],t);
@@ -35,14 +32,11 @@ public:
 			scalar s=Math::lerp(scales[it],scales[it+1],t);
 			scale.set(s,s,s);
 		}
-		virtual int getTimeIndex(scalar time){
-			scalar t=lerp(times.data(),times.size(),time);
-			return Math::toInt(t);
-		}
+		virtual int getTimeIndex(scalar time) const{return Math::toInt(lerp(times.data(),times.size(),time));}
 
 		// Count start and end as neighbors, even if they have null paths
-		virtual int getNumNeighbors(){return children.size()+2;}
-		virtual Path *getNeighbor(int i){
+		virtual int getNumNeighbors() const{return children.size()+2;}
+		virtual Path *getNeighbor(int i) const{
 			if(i==0){
 				return parent;
 			}
@@ -53,7 +47,7 @@ public:
 				return NULL;
 			}
 		}
-		virtual scalar getNeighborTime(int i){
+		virtual scalar getNeighborTime(int i) const{
 			if(i==0){
 				return 0;
 			}
@@ -64,7 +58,7 @@ public:
 				return length;
 			}
 		}
-		virtual scalar getNeighborTime(Path *neighbor){
+		virtual scalar getNeighborTime(Path *neighbor) const{
 			if(neighbor==parent){
 				return 0;
 			}
@@ -78,6 +72,8 @@ public:
 				return 0;
 			}
 		}
+
+		const AABox &getBound() const{return bound;}
 
 		// Returns x.y, where x,x+1 are the points to lerp between, and y is the amount
 		static scalar lerp(scalar *times,int length,scalar time){
@@ -113,10 +109,8 @@ public:
 		scalar wiggleOffset;
 	};
 
-	TreeSystem(Scene *scene,int seed);
+	TreeSystem(Engine *engine,int seed,BranchSystem::BranchListener *listener=NULL);
 	void destroy();
-
-	void parentChanged(Node *node);
 
 	void grow();
 
@@ -124,28 +118,20 @@ public:
 	void branchDestroyed(BranchSystem::Branch *branch);
 	void branchBuild(BranchSystem::Branch *branch);
 	void branchLeaf(BranchSystem::Branch *branch,const Vector3 &offset,scalar scale);
+
 	void alignLeaves(const Vector3 &eyePoint,const Vector3 &eyeForward,bool individual);
 	void calculateNormals(TreeBranch *branch);
 	void mergeBounds(TreeBranch *branch);
 	bool wiggleLeaves(const Sphere &bound,TreeBranch *branch=NULL);
 	void wiggleUpdate(int dt);
 
-	Path *getClosestPath(Vector3 &closestPoint,const Vector3 &point);
-	Path *getClosestPath(Vector3 &closestPoint,const Sphere &bound,TreeBranch *path);
+	const AABox &getBound() const{return mTreeBranches[0]->getBound();}
 
 	Mesh *getMesh() const{return mMesh;}
 	Mesh *getLowMesh() const{return mLowMesh;}
 
-	// Spacial
-	Transform *getTransform() const{return NULL;}
-	Bound *getBound() const{return mBound;}
-	Transform *getWorldTransform() const{return NULL;}
-	Bound *getWorldBound() const{return mWorldBound;}
-	void transformChanged(Transform *transform);
-
-	// DetailTraceable
-	Bound *getTraceableBound() const{return mBound;}
-	void traceSegment(PhysicsCollision &result,const Vector3 &position,const Segment &segment,const Vector3 &size);
+	Path *getClosestPath(Vector3 &closestPoint,const Sphere &bound,TreeBranch *path=NULL);
+	Path *traceSegment(PhysicsCollision &result,const Vector3 &position,const Segment &segment,const Vector3 &size,TreeBranch *path=NULL);
 
 	VertexBufferAccessor bvba,lvba;
 	IndexBufferAccessor biba,lbiba,liba;
@@ -153,18 +139,11 @@ public:
 protected:
 	void resetCounts();
 
-	Path *traceSegment(PhysicsCollision &result,const Vector3 &position,const Segment &segment,const Vector3 &size,TreeBranch *path);
-
 	Engine *mEngine;
-	Scene *mScene;
-
-	Bound::ptr mBound;
-	Bound::ptr mWorldBound;
 
 	int mSections;
 	bool mCountMode;
 
-	BranchSystem::ptr mSystem;
 	Collection<TreeBranch::ptr> mTreeBranches;
 	Collection<int> mBranchVertexStart;
 	Collection<int> mBranchNodeStart;

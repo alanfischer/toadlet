@@ -167,6 +167,9 @@ public:
 			renderState->setBlendState(BlendState::Combination_ALPHA);
 			renderState->setMaterialState(MaterialState(Colors::TRANSPARENT_RED));
 			renderState->setRasterizerState(RasterizerState());
+			renderState->setSamplerState(Shader::ShaderType_FRAGMENT,0,SamplerState(
+				SamplerState::FilterType_LINEAR,SamplerState::FilterType_LINEAR,SamplerState::FilterType_LINEAR,
+				SamplerState::AddressType_CLAMP_TO_EDGE,SamplerState::AddressType_CLAMP_TO_EDGE));
 
 			TextureFormat::ptr pointFormat=new TextureFormat(TextureFormat::Dimension_D2,TextureFormat::Format_LA_8,128,128,1,0);
 			tbyte *pointData=createPoint(pointFormat);
@@ -174,10 +177,6 @@ public:
 			delete[] pointData;
 
 			fade=engine->createDiffuseMaterial(pointTexture,renderState);
-
-			/// @todo: This has to be set afterwords apparently
-			fade->getRenderState()->setSamplerState(Shader::ShaderType_FRAGMENT,0,SamplerState(SamplerState::FilterType_LINEAR,SamplerState::FilterType_LINEAR,SamplerState::FilterType_LINEAR,
-				SamplerState::AddressType_CLAMP_TO_EDGE,SamplerState::AddressType_CLAMP_TO_EDGE));
 		}
 		
 		{
