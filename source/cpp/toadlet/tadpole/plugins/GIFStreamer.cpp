@@ -23,12 +23,6 @@
  *
  ********** Copyright header - do not remove **********/
 
-/// @todo: The GIFStreamer needs to be cleaned up in several ways:
-//  - Delays seem to be too long
-//  - Transparent backgrounds dont work properly
-//  - Some of the disposes seem to be broken, so it doesn't clear out the previous image correctly
-//  - Not all extensions are properly handled
-
 extern "C"{
 	#include <gif_lib.h>
 }
@@ -38,20 +32,10 @@ extern "C"{
 namespace toadlet{
 namespace tadpole{
 
-int readGifData(GifFileType *file,GifByteType *data,int amount){
-	Stream *stream=(Stream*)file->UserData;
-	return stream->read(data,amount);
-}
-
-int writeGifData(GifFileType *file,GifByteType *data,int amount){
-	Stream *stream=(Stream*)file->UserData;
-	return stream->write(data,amount);
-}
-
 const int InterlacedOffset[] = { 0, 4, 2, 1 };	// The way Interlaced image should
 const int InterlacedJumps[] = { 8, 8, 4, 2 };	//  be read - offsets and jumps...
 
-GifByteType szNetscape20ext[] = "\x0bNETSCAPE2.0";
+GifByteType Netscape20ext[] = "\x0bNETSCAPE2.0";
 #define NSEXT_LOOP			0x01	// Loop Count field code
 #define GIF_TRANSPARENT		0x01
 #define GIF_USER_INPUT		0x02
@@ -69,6 +53,16 @@ GifByteType szNetscape20ext[] = "\x0bNETSCAPE2.0";
 #define GIF_DISPOSE_RESTORE	3	// Restore to previous. The decoder is required to
 								//  restore the area overwritten by the graphic with
 								//  what was there prior to rendering the graphic.
+
+int readGifData(GifFileType *file,GifByteType *data,int amount){
+	Stream *stream=(Stream*)file->UserData;
+	return stream->read(data,amount);
+}
+
+int writeGifData(GifFileType *file,GifByteType *data,int amount){
+	Stream *stream=(Stream*)file->UserData;
+	return stream->write(data,amount);
+}
 
 void copyGIFLine(	unsigned char *dest,
 					unsigned int iwidth,unsigned int iheight,
@@ -114,18 +108,19 @@ void setImagePortion(TextureFormat *format,tbyte *data,int x,int y,int width,int
 	}
 }
 
-int GIFStreamer::getNextImage(tbyte *&data,int &delay,GifFileType *gifFile,TextureFormat::ptr &format,tbyte *&base,tbyte *&working){
+int GIFStreamer::getNextImage(GifFileType *gifFile,TextureFormat::ptr &format,tbyte *&base,tbyte *&working,int &delay){
 	GifRecordType RecordType;
 	GifByteType *pLine=NULL;
 	GifByteType *pExtension=NULL;
 	int dispose=GIF_DISPOSE_RESTORE;
 	int pass=0;
 	int transparent=GIF_NOT_TRANSPARENT;
+	int loopCount=0; // This is currently set, but unused
 
 	do{
 		int i, ExtCode;
 		if(DGifGetRecordType(gifFile,&RecordType)==GIF_ERROR){
-			break;
+			return -1;
 		}
 
 		switch (RecordType){
@@ -240,19 +235,13 @@ int GIFStreamer::getNextImage(tbyte *&data,int &delay,GifFileType *gifFile,Textu
 				case COMMENT_EXT_FUNC_CODE:
 					break;
 				case GRAPHICS_EXT_FUNC_CODE:{
-					int flag = pExtension[0];
+					int flag = pExtension[1];
 
-					delay=(pExtension[2] << 8) | pExtension[1];
+					delay=(pExtension[2] | (pExtension[3] << 8));
 					if(delay<10){
 						delay=10;
 					}
 			
-					if((flag&GIF_TRANSPARENT)!=0){
-						transparent=pExtension[3];
-					}
-					else{
-						transparent=GIF_NOT_TRANSPARENT;
-					}
 					transparent = (flag & GIF_TRANSPARENT) ? pExtension[4] : GIF_NOT_TRANSPARENT;
 					dispose = (flag >> GIF_DISPOSE_SHIFT) & GIF_DISPOSE_MASK;
 
@@ -261,7 +250,10 @@ int GIFStreamer::getNextImage(tbyte *&data,int &delay,GifFileType *gifFile,Textu
 				case PLAINTEXT_EXT_FUNC_CODE:
 					break;
 				case APPLICATION_EXT_FUNC_CODE:
-					break;
+					if (memcmp(pExtension, Netscape20ext, Netscape20ext[0]) == 0) {
+						bNetscapeExt = true;
+					}
+				 break;
 				default:
 					break;
 			}
@@ -274,8 +266,7 @@ int GIFStreamer::getNextImage(tbyte *&data,int &delay,GifFileType *gifFile,Textu
 					GifByteType bLength=pExtension[0];
 					int iSubCode=pExtension[1] & 0x07;
 					if(bLength==3 && iSubCode==NSEXT_LOOP){
-						//UINT uLoopCount=MAKEWORD(pExtension[2],pExtension[3]);
-						//m_uLoopCount=uLoopCount-1;
+						loopCount=(pExtension[2] | (pExtension[3] << 8)) - 1;
 					}
 				}
 			}
@@ -326,19 +317,20 @@ Resource::ptr GIFStreamer::load(Stream::ptr stream,ResourceData *data,ProgressLi
 	Collection<tbyte*> images;
 	Collection<int> delays;
 	TextureFormat::ptr format=NULL;
-	tbyte *image=NULL,*base=NULL,*working=NULL;
+	tbyte *base=NULL,*working=NULL;
 	int delay=0;
 	int result=0;
 
 	do{
-		image=NULL;
 		delay=0;
-		result=getNextImage(image,delay,file,format,base,working);
-		if(image!=NULL && result!=GIF_ERROR){
+		result=getNextImage(file,format,base,working,delay);
+		if(working!=NULL && result!=GIF_ERROR){
+			tbyte *image=new tbyte[format->getDataSize()];
+			memcpy(image,working,format->getDataSize());
 			images.add(image);
 			delays.add(delay);
 		}
-	}while(result!=GIF_ERROR && image!=NULL);
+	}while(result==GIF_OK && working!=NULL);
 
 	if(result!=GIF_ERROR){
 		result=DGifCloseFile(file);

@@ -236,9 +236,6 @@ void Engine::installHandlers(){
 		mTextureManager->setDefaultStreamer(new AndroidTextureStreamer(mTextureManager,(JNIEnv*)mEnv));
 	#else
 		mTextureManager->setStreamer(new BMPStreamer(mTextureManager),"bmp");
-		#if defined(TOADLET_HAS_GIF)
-			mTextureManager->setStreamer(new GIFStreamer(mTextureManager),"gif");
-		#endif
 		#if defined(TOADLET_HAS_JPEG)
 			JPEGStreamer::ptr jpegStreamer(new JPEGStreamer(mTextureManager));
 			mTextureManager->setStreamer(jpegStreamer,"jpeg");
@@ -247,6 +244,9 @@ void Engine::installHandlers(){
 		#if defined(TOADLET_HAS_PNG)
 			mTextureManager->setStreamer(new PNGStreamer(mTextureManager),"png");
 		#endif
+	#endif
+	#if defined(TOADLET_HAS_GIF)
+		mTextureManager->setStreamer(new GIFStreamer(mTextureManager),"gif");
 	#endif
 	mTextureManager->setStreamer(new TGAStreamer(mTextureManager),"tga");
 	#if defined(TOADLET_HAS_FFMPEG)
