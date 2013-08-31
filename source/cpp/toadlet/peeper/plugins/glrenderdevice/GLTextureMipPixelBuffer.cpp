@@ -68,5 +68,14 @@ GLuint GLTextureMipPixelBuffer::getTarget() const{
 	return mTexture->getTarget();
 }
 
+bool GLTextureMipPixelBuffer::update(tbyte *data,int start,int size){
+	if(start==0 && size==getSize()){
+		return mTexture->load(mFormat,data);
+	}
+	else{
+		return false;
+	}
+}
+
 }
 }
