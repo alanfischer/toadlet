@@ -69,10 +69,9 @@ public:
 	GLuint getHandle() const;
 	GLuint getTarget() const;
 
-	/// @todo: implement
 	tbyte *lock(int access){return NULL;}
 	bool unlock(){return false;}
-	bool update(tbyte *data,int start,int size){return false;}
+	bool update(tbyte *data,int start,int size);
 
 protected:
 	GLTexture *mTexture;

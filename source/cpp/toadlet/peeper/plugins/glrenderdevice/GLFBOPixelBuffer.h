@@ -60,7 +60,6 @@ public:
 
 	TextureFormat::ptr getTextureFormat() const{return mFormat;}
 	
-	/// @todo: Can these be implemented
 	tbyte *lock(int access){return NULL;}
 	bool unlock(){return false;}
 	bool update(tbyte *data,int start,int size){return false;}
