@@ -11,7 +11,7 @@ void Particles::create(){
 	engine=app->getEngine();
 	engine->getArchiveManager()->addDirectory("../../data");
 
-	scene=Scene::ptr(new Scene(engine));
+	scene=new Scene(engine);
 
 	scalar ten=Math::ONE*10;
 
@@ -91,13 +91,19 @@ void Particles::create(){
 	camera->setLookAt(Vector3(0,-Math::fromInt(150),0),Math::ZERO_VECTOR3,Math::Z_UNIT_VECTOR3);
 	camera->setClearColor(Colors::BLACK);
 
-	points->setWorldSpace(true);
-	particles.add(points);
-	sprites->setWorldSpace(true);
-	sprites->setVelocityAligned(true);
-	particles.add(sprites);
-	beams->setWorldSpace(true);
-	particles.add(beams);
+	if(points){
+		points->setWorldSpace(true);
+		particles.add(points);
+	}
+	if(sprites){
+		sprites->setWorldSpace(true);
+		sprites->setVelocityAligned(true);
+		particles.add(sprites);
+	}
+	if(beams){
+		beams->setWorldSpace(true);
+		particles.add(beams);
+	}
 
 	#if defined(LFX_DLL_NAME)
 		lfxLibrary.load(LFX_DLL_NAME,"","","");

@@ -153,6 +153,8 @@ void ParticleComponent::setWorldSpace(bool worldSpace){
 			}
 		}
 	}
+
+	transformChanged(mTransform);
 }
 
 void ParticleComponent::setSorted(bool sorted){
