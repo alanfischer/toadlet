@@ -23,7 +23,6 @@
  *
  ********** Copyright header - do not remove **********/
 
-#include <toadlet/peeper/VertexFormat.h>
 #include <toadlet/tadpole/Engine.h>
 #include <toadlet/tadpole/RenderableSet.h>
 #include <toadlet/tadpole/RenderManager.h>
@@ -155,7 +154,7 @@ void SpriteModelComponent::setSharedRenderState(RenderState::ptr renderState){
 	if(renderState==NULL){
 		renderState=mEngine->getMaterialManager()->createRenderState();
 		for(i=0;i<mMaterials.size();++i){
-			if(i==0){
+			if(mMaterials[i]!=NULL){
 				mEngine->getMaterialManager()->modifyRenderState(renderState,mMaterials[i]->getRenderState());
 			}
 		}
@@ -163,7 +162,9 @@ void SpriteModelComponent::setSharedRenderState(RenderState::ptr renderState){
 
 	mSharedRenderState=renderState;
 	for(i=0;i<mMaterials.size();++i){
-		mMaterials[i]=mEngine->getMaterialManager()->createSharedMaterial(mMaterials[i],mSharedRenderState);
+		if(mMaterials[i]!=NULL){
+			mMaterials[i]=mEngine->getMaterialManager()->createSharedMaterial(mMaterials[i],mSharedRenderState);
+		}
 	}
 }
 

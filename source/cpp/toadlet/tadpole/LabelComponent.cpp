@@ -192,12 +192,7 @@ void LabelComponent::updateLabel(){
 	// Update word wrap
 	String text;
 	if(mWordWrap){
-//		if(mNormalized){
-//			text=wordWrap(mFont,mFont->getPointSize(),mText);
-//		}
-//		else{
-			text=wordWrap(mFont,mWidth,mText);
-//		}
+		text=wordWrap(mFont,mWidth,mText);
 	}
 	else{
 		text=mText;

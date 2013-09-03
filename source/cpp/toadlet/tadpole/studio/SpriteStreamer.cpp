@@ -64,7 +64,6 @@ Resource::ptr SpriteStreamer::load(Stream::ptr stream,ResourceData *data,Progres
 	model->header=(spritehdr*)model->data;
 	model->paletteSize=(*(uint16*)(model->data+sizeof(spritehdr)));
 	model->palette=(model->data+sizeof(spritehdr)+2);
-		Log::alert(String("TYPE:")+model->header->type);
 
 	buildTextures(model);
 	buildMaterials(model);
