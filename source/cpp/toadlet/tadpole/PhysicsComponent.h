@@ -62,11 +62,11 @@ public:
 	virtual void setScope(int scope)=0;
 	virtual int getScope() const=0;
 
-	virtual void setSolidCollisionScope(int scope)=0;
-	virtual int getSolidCollisionScope() const=0;
+	virtual void setCollisionScope(int scope)=0;
+	virtual int getCollisionScope() const=0;
 
-	virtual void setSolidCollideWithScope(int scope)=0;
-	virtual int getSolidCollideWithScope() const=0;
+	virtual void setCollideWithScope(int scope)=0;
+	virtual int getCollideWithScope() const=0;
 
 	virtual void collision(const PhysicsCollision &collision)=0;
 };
