@@ -59,7 +59,7 @@ public:
 		inline bool operator==(const iterator &it) const{return parent==it.parent && index==it.index;}
 		inline bool operator!=(const iterator &it) const{return parent!=it.parent || index!=it.index;}
 
-		Collection<Type> *parent;
+		Collection *parent;
 		int index;
 	};
 
