@@ -58,6 +58,9 @@ public:
 	void setAlignment(int alignment);
 	int getAlignment() const{return mAlignment;}
 
+	void setNormalized(bool normalized);
+	bool getNormalized() const{return mNormalized;}
+
 	// Spacial
 	void setTransform(Transform::ptr transform);
 	Transform *getTransform() const{return mTransform;}
@@ -106,6 +109,7 @@ protected:
 
 	Engine *mEngine;
 	int mAlignment;
+	bool mNormalized;
 	Collection<Material::ptr> mMaterials;
 	int mMaterialIndex;
 	bool mRendered;

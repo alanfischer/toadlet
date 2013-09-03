@@ -33,6 +33,7 @@ namespace tadpole{
 
 SpriteComponent::SpriteComponent(Engine *engine):
 	mAlignment(0),
+	mNormalized(true),
 	//mMaterials,
 	mMaterialIndex(0),
 	mRendered(true)
@@ -105,10 +106,20 @@ void SpriteComponent::setMaterial(Material *material,int i){
 			mMaterials[i]=mEngine->getMaterialManager()->createSharedMaterial(mMaterials[i],mSharedRenderState);
 		}
 	}
+
+	if(i==0){
+		updateSprite();
+	}
 }
 
 void SpriteComponent::setAlignment(int alignment){
 	mAlignment=alignment;
+
+	updateSprite();
+}
+
+void SpriteComponent::setNormalized(bool normalize){
+	mNormalized=normalize;
 
 	updateSprite();
 }
@@ -168,7 +179,20 @@ void SpriteComponent::render(RenderManager *manager) const{
 
 void SpriteComponent::updateSprite(){
 	scalar x=0,y=0;
-	scalar width=Math::ONE,height=Math::ONE; // If we add in a non-normalized option, then this would be the size in non-normalized space.
+	scalar width=Math::ONE,height=Math::ONE;
+
+	if(mNormalized==false && mMaterials.size()>0){
+		Material *material=mMaterials[0];
+		Texture *texture=material->getPass()->getTexture(Shader::ShaderType_VERTEX,0);
+		if(texture==NULL){
+			texture=material->getPass()->getTexture(Shader::ShaderType_FRAGMENT,0);
+		}
+		if(texture!=NULL){
+			width=Math::fromInt(texture->getFormat()->getWidth());
+			height=Math::fromInt(texture->getFormat()->getHeight());
+		}
+	}
+
 	if((mAlignment&Font::Alignment_BIT_HCENTER)>0){
 		x=-width/2;
 	}
