@@ -94,10 +94,7 @@ public:
 
 	virtual void nodeAttached(Node *node);
 	virtual void nodeRemoved(Node *node);
-	virtual NodeCollection::iterator getNodeBegin(){return mNodes.begin();}
-	virtual NodeCollection::iterator getNodeEnd(){return mNodes.end();}
-	virtual NodeCollection::const_iterator getNodeBegin() const{return mNodes.begin();}
-	virtual NodeCollection::const_iterator getNodeEnd() const{return mNodes.end();}
+	virtual const NodeCollection &getNodes() const{return mNodes;}
 	virtual Node *getNode(const String &name) const;
 	virtual Node *getNode(const Type<Component> *type) const;
 	template<typename Type> Type *getNodeType() const{return (Type*)getNode(Type::type());}
