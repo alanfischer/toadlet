@@ -518,7 +518,7 @@ void RandIsle::updateProps(){
 	Segment segment;
 	Vector2 origin(mPlayer->getPhysics()->getPosition().x,mPlayer->getPhysics()->getPosition().y);
 	Random r(System::mtime());
-	for(Node::NodeCollection::iterator prop=mProps->getNodeBegin();prop!=mProps->getNodeEnd();++prop){
+	for(Node::NodeCollection::iterator prop=mProps->getNodes().begin();prop!=mProps->getNodes().begin();++prop){
 		Vector2 propOrigin(prop->getWorldTranslate().x,prop->getWorldTranslate().y);
 		scalar d=Math::length(propOrigin,origin);
 		scalar a=Math::ONE-(d-minDist)/(maxDist-minDist);

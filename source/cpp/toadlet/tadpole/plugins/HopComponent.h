@@ -64,12 +64,11 @@ public:
 	void setScope(int scope){mSolid->setCollisionScope(scope);mSolid->setCollideWithScope(scope);mSolid->setInternalScope(scope);}
 	int getScope() const{return mSolid->getCollisionScope();}
 
-	/// @todo: Eventually rename setSolidCollisionScope to just setCollisionScope, but since we changed that methods meaning, leave it for now to force update
-	void setSolidCollisionScope(int scope){mSolid->setCollisionScope(scope);}
-	int getSolidCollisionScope() const{return mSolid->getCollisionScope();}
+	void setCollisionScope(int scope){mSolid->setCollisionScope(scope);}
+	int getCollisionScope() const{return mSolid->getCollisionScope();}
 
-	void setSolidCollideWithScope(int scope){mSolid->setCollideWithScope(scope);}
-	int getSolidCollideWithScope() const{return mSolid->getCollideWithScope();}
+	void setCollideWithScope(int scope){mSolid->setCollideWithScope(scope);}
+	int getCollideWithScope() const{return mSolid->getCollideWithScope();}
 
 	void setBound(Bound *bound);
 	void setTraceable(PhysicsTraceable *traceable);
