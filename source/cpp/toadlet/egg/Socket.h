@@ -62,6 +62,8 @@ public:
 	virtual void close();
 	virtual bool closed(){return mHandle==-1;}
 
+	virtual int getHandle() const{return mHandle;}
+
 	virtual uint32 getHostIPAddress() const{return mHostIPAddress;}
 	virtual int getHostPort() const{return mHostPort;}
 
