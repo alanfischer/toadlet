@@ -157,12 +157,12 @@ void Node::actionRemoved(ActionComponent *action){
 }
 
 Component *Node::getChild(const String &name) const{
-	for(ComponentCollection::const_iterator c=mComponents.begin(),end=mComponents.end();c!=end;++c){
+	tforeach(ComponentCollection::const_iterator,c,mComponents){
 		if(c->getName()==name){
 			return (Component*)(const Component*)c;
 		}
 	}
-	for(NodeCollection::const_iterator n=mNodes.begin(),end=mNodes.end();n!=end;++n){
+	tforeach(NodeCollection::const_iterator,n,mNodes){
 		if(n->getName()==name){
 			return (Node*)(const Node*)n;
 		}
@@ -175,12 +175,12 @@ Component *Node::getChild(const Type<Component> *type) const{
 		return NULL;
 	}
 
-	for(ComponentCollection::const_iterator c=mComponents.begin(),end=mComponents.end();c!=end;++c){
+	tforeach(ComponentCollection::const_iterator,c,mComponents){
 		if(c->getType()->getFullName()==type->getFullName()){ // Compare names to avoid the issue of multiple types being built into different libraries
 			return (Component*)(const Component*)c;
 		}
 	}
-	for(NodeCollection::const_iterator n=mNodes.begin(),end=mNodes.end();n!=end;++n){
+	tforeach(NodeCollection::const_iterator,n,mNodes){
 		if(n->getType()->getFullName()==type->getFullName()){  // Compare names to avoid the issue of multiple types being built into different libraries
 			return (Node*)(const Node*)n;
 		}
@@ -189,7 +189,7 @@ Component *Node::getChild(const Type<Component> *type) const{
 }
 
 Node *Node::getNode(const String &name) const{
-	for(NodeCollection::const_iterator n=mNodes.begin(),end=mNodes.end();n!=end;++n){
+	tforeach(NodeCollection::const_iterator,n,mNodes){
 		if(n->getName()==name){
 			return (Node*)(const Node*)n;
 		}
@@ -202,7 +202,7 @@ Node *Node::getNode(const Type<Component> *type) const{
 		return NULL;
 	}
 
-	for(NodeCollection::const_iterator n=mNodes.begin(),end=mNodes.end();n!=end;++n){
+	tforeach(NodeCollection::const_iterator,n,mNodes){
 		if(n->getType()->getFullName()==type->getFullName()){ // Compare names to avoid the issue of multiple types being built into different libraries
 			return (Node*)(const Node*)n;
 		}
@@ -302,10 +302,10 @@ void Node::physicsRemoved(PhysicsComponent *physics){
 void Node::rootChanged(Node *root){
 	BaseComponent::rootChanged(root);
 
-	for(ComponentCollection::iterator c=mComponents.begin(),end=mComponents.end();c!=end;++c){
+	tforeach(ComponentCollection::iterator,c,mComponents){
 		c->rootChanged(root);
 	}
-	for(NodeCollection::iterator n=mNodes.begin(),end=mNodes.end();n!=end;++n){
+	tforeach(NodeCollection::iterator,n,mNodes){
 		n->rootChanged(root);
 	}
 }
@@ -369,19 +369,19 @@ void Node::logicUpdate(int dt,int scope){
 	TOADLET_PROFILE_AUTOSCOPE();
 
 	if(mActivateChildren){
-		for(NodeCollection::iterator n=mNodes.begin(),end=mNodes.end();n!=end;++n){
+		tforeach(NodeCollection::iterator,n,mNodes){
 			n->activate();
 		}
 		mActivateChildren=false;
 	}
 
 	mChildrenActive=false;
-	for(ComponentCollection::iterator c=mComponents.begin(),end=mComponents.end();c!=end;++c){
+	tforeach(ComponentCollection::iterator,c,mComponents){
 		c->logicUpdate(dt,scope);
 		mChildrenActive|=c->getActive();
 	}
 
-	for(NodeCollection::iterator n=mNodes.begin(),end=mNodes.end();n!=end;++n){
+	tforeach(NodeCollection::iterator,n,mNodes){
 		n->logicUpdate(dt,scope);
 		mChildrenActive|=n->getActive();
 		if(n->getActive() && (n->getScope()&scope)!=0){
@@ -393,21 +393,21 @@ void Node::logicUpdate(int dt,int scope){
 void Node::frameUpdate(int dt,int scope){
 	TOADLET_PROFILE_AUTOSCOPE();
 
-	for(ComponentCollection::iterator c=mComponents.begin(),end=mComponents.end();c!=end;++c){
+	tforeach(ComponentCollection::iterator,c,mComponents){
 		c->frameUpdate(dt,scope);
 	}
 
-	for(NodeCollection::iterator n=mNodes.begin(),end=mNodes.end();n!=end;++n){
+	tforeach(NodeCollection::iterator,n,mNodes){
 		n->frameUpdate(dt,scope);
 	}
 }
 
 bool Node::handleEvent(Event *event){
 	bool result=false;
-	for(ComponentCollection::iterator c=mComponents.begin(),end=mComponents.end();c!=end;++c){
+	tforeach(ComponentCollection::iterator,c,mComponents){
 		result|=c->handleEvent(event);
 	}
-	for(NodeCollection::iterator n=mNodes.begin(),end=mNodes.end();n!=end;++n){
+	tforeach(NodeCollection::iterator,n,mNodes){
 		result|=n->handleEvent(event);
 	}
 	return result;
@@ -445,7 +445,7 @@ void Node::deactivate(){
 	mActive=false;
 	mDeactivateCount=0;
 
-	for(NodeCollection::iterator n=mNodes.begin(),end=mNodes.end();n!=end;++n){
+	tforeach(NodeCollection::iterator,n,mNodes){
 		n->deactivate();
 	}
 }
@@ -476,7 +476,7 @@ void Node::transformChanged(Transform *transform){
 		mWorldScope=mParent->mWorldScope&mScope;
 	}
 
-	for(NodeCollection::iterator n=mNodes.begin(),end=mNodes.end();n!=end;++n){
+	tforeach(NodeCollection::iterator,n,mNodes){
 		n->transformChanged(mWorldTransform);
 	}
 	for(int i=0;i<mSpacials.size();++i){
@@ -508,7 +508,7 @@ void Node::gatherRenderables(Camera *camera,RenderableSet *set){
 
 	set->queueNode(this);
 
-	for(NodeCollection::iterator n=mNodes.begin(),end=mNodes.end();n!=end;++n){
+	tforeach(NodeCollection::iterator,n,mNodes){
 		if((camera->getScope()&n->getScope())!=0 && camera->culled(n->getWorldBound())==false){
 			n->gatherRenderables(camera,set);
 		}
@@ -534,7 +534,7 @@ void Node::calculateBound(){
 
 		scalar epsilon=mScene!=NULL?mScene->getEpsilon():0;
 
-		for(NodeCollection::iterator n=mNodes.begin(),end=mNodes.end();n!=end;++n){
+		tforeach(NodeCollection::const_iterator,n,mNodes){
 			mWorldBound->merge(n->getWorldBound(),epsilon);
 		}
 

@@ -35,7 +35,7 @@ PartitionNode::PartitionNode(Scene *scene):Node(scene){
 bool PartitionNode::senseBoundingVolumes(SensorResultsListener *listener,Bound *bound){
 	bool result=false;
 
-	for(NodeCollection::iterator node=getNodes().begin(),end=getNodes().end();node!=end;++node){
+	tforeach(NodeCollection::iterator,node,mNodes){
 		if(bound->testIntersection(node->getWorldBound())){
 			result|=true;
 			if(listener->resultFound(node,Math::lengthSquared(bound->getSphere().origin,node->getWorldTranslate()))==false){
@@ -50,7 +50,7 @@ bool PartitionNode::senseBoundingVolumes(SensorResultsListener *listener,Bound *
 bool PartitionNode::sensePotentiallyVisible(SensorResultsListener *listener,const Vector3 &point){
 	bool result=false;
 
-	for(NodeCollection::iterator node=getNodes().begin(),end=getNodes().end();node!=end;++node){
+	tforeach(NodeCollection::iterator,node,mNodes){
 		result|=true;
 		if(listener->resultFound(node,Math::lengthSquared(point,node->getWorldTranslate()))==false){
 			return true;
