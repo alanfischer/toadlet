@@ -276,6 +276,8 @@ template<typename Type,typename Type2,typename PointerSemantics> inline Intrusiv
 }
 }
 
+template<typename Type,typename PointerSemantics> Type &TOADLET_REMOVE_POINTER(toadlet::egg::IntrusivePointer<Type,PointerSemantics> type){return *type;}
+
 #define TOADLET_IPTR(Class) \
 	typedef toadlet::egg::IntrusivePointer<Class> ptr;
 

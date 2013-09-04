@@ -310,6 +310,8 @@ template<typename Type,typename Type2,typename PointerSemantics> inline SharedPo
 }
 }
 
+template<typename Type,typename PointerSemantics> Type &TOADLET_REMOVE_POINTER(toadlet::egg::SharedPointer<Type,PointerSemantics> type){return *type;}
+
 #define TOADLET_SPTR(Class) \
 	typedef toadlet::egg::SharedPointer<Class> ptr;
 

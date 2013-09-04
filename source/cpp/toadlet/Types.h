@@ -226,6 +226,15 @@
 
 template<typename Type> inline void TOADLET_IGNORE_UNUSED_VARIABLE_WARNING(Type t){}
 
+template<typename Type> Type &TOADLET_REMOVE_POINTER(Type *type){return *type;}
+template<typename Type> Type &TOADLET_REMOVE_POINTER(Type &type){return type;}
+
+#define TOADLET_MERGE_(x,y) x##y
+#define TOADLET_MERGE(x,y) TOADLET_MERGE_(x,y)
+#define TOADLET_ENDLINE TOADLET_MERGE(end,__LINE__)
+#define tforeach(Type,item,collection)\
+	for(Type item=TOADLET_REMOVE_POINTER(collection).begin(),TOADLET_ENDLINE=TOADLET_REMOVE_POINTER(collection).end();item!=TOADLET_ENDLINE;++item)
+
 namespace toadlet{
 
 typedef signed char int8;
