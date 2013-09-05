@@ -227,7 +227,7 @@ void BSP30Map::findSurfaceExtents(bface *face,int *smins,int *smaxs){
 }
 
 void BSP30Map::initLightmap(){
-	memset(lightmapData,0,lightmapFormat->getDataSize());
+	memset(lightmapData,255,lightmapFormat->getDataSize());
 	memset(lightmapAllocated,0,sizeof(lightmapAllocated));
 }
 
@@ -245,7 +245,7 @@ void BSP30Map::updateFaceLights(int faceIndex){
 	bface *face=&faces[faceIndex];
 	BSP30Map::facedata *faced=&facedatas[faceIndex];
 
-	if(face->styles[1]==255) return;
+	if(face->styles[1]==255 || nlighting==0) return;
 
 	int i,j,k;
 	int numStyles;
