@@ -261,6 +261,8 @@ void BSP30Streamer::buildBuffers(BSP30Map *map){
 	float s=0,t=0,ls=0,lt=0;
 	int surfmins[2],surfmaxs[2];
 
+	map->initLightmap();
+
 	map->facedatas.resize(map->nfaces);
 	VertexBufferAccessor vba;
 	IndexBufferAccessor iba;
@@ -300,11 +302,13 @@ void BSP30Streamer::buildBuffers(BSP30Map *map){
 				}
 			}
 
-			tbyte *dst=map->lightmapData;
-			int pixelSize=TextureFormat::getPixelSize(map->lightmapFormat->getPixelFormat());
-			tbyte *src=(tbyte*)map->lighting + face->lightofs;
-			for(j=0;j<faced->lightmapSize[1];++j){
-				memcpy(dst + ((faced->lightmapCoord[1]+j)*BSP30Map::LIGHTMAP_SIZE + faced->lightmapCoord[0])*pixelSize,src + faced->lightmapSize[0]*j*pixelSize,faced->lightmapSize[0]*pixelSize);
+			if(map->nlighting>0){
+				tbyte *dst=map->lightmapData;
+				int pixelSize=TextureFormat::getPixelSize(map->lightmapFormat->getPixelFormat());
+				tbyte *src=(tbyte*)map->lighting + face->lightofs;
+				for(j=0;j<faced->lightmapSize[1];++j){
+					memcpy(dst + ((faced->lightmapCoord[1]+j)*BSP30Map::LIGHTMAP_SIZE + faced->lightmapCoord[0])*pixelSize,src + faced->lightmapSize[0]*j*pixelSize,faced->lightmapSize[0]*pixelSize);
+				}
 			}
 		}
 
