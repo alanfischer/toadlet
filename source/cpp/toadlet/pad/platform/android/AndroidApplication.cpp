@@ -439,7 +439,7 @@ void AndroidApplication::windowCreated(ANativeWindow *window){
 					device=new_GLES1RenderDevice();
 				}
 			TOADLET_CATCH_ANONYMOUS(){device=NULL;}
-			if(device!=NULL && device->create(target,NULL)==false){
+			if(device!=NULL && device->create(target,0)==false){
 				device->destroy();
 				target->destroy();
 				device=NULL;

@@ -25,6 +25,7 @@ set (EGG_IO_SRC
 	io/DataStream.cpp
 	io/FileStream.cpp
 	io/MemoryStream.cpp
+	io/PacketMessageStream.cpp
 	io/SocketStream.cpp
 )
 
@@ -127,8 +128,11 @@ set (EGG_HDR
 set (EGG_IO_HDR
 	io/Archive.h
 	io/DataStream.h
+	io/DataMessageStream.h
 	io/FileStream.h
 	io/MemoryStream.h
+	io/MessageStream.h
+	io/PacketMessageStream.h
 	io/SocketStream.h
 	io/Stream.h
 )
