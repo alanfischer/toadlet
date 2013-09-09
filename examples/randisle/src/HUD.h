@@ -3,6 +3,8 @@
 
 #include <toadlet/tadpole.h>
 
+using namespace toadlet;
+
 class HUD:public Node{
 public:
 	TOADLET_OBJECT(HUD);

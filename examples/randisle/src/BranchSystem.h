@@ -4,6 +4,8 @@
 #include <toadlet/egg.h>
 #include <toadlet/tadpole.h>
 
+using namespace toadlet;
+
 class BranchSystem:public Object{
 public:
 	TOADLET_OBJECT(BranchSystem);

@@ -3,6 +3,8 @@
 
 #include <toadlet/toadlet.h>
 
+using namespace toadlet;
+
 class Resources{
 public:
 	static bool init(Engine *engine){

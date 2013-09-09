@@ -7,6 +7,8 @@
 #include "Sky.h"
 #include "HUD.h"
 
+using namespace toadlet;
+
 class RandIsle:public Object,public Applet,public TerrainNodeDataSource,public UpdateListener,public TerrainNodeListener,public InputDeviceListener,public PathClimberListener{
 public:
 	TOADLET_OBJECT(RandIsle);
