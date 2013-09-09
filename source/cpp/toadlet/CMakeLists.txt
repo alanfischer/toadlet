@@ -34,7 +34,6 @@ foreach (TOADLET_LIBRARY ${TOADLET_LIBRARY_LIST})
 
 	file (APPEND ${HEADER_FILE} ""\n)
 
-	file (APPEND ${HEADER_FILE} "using namespace toadlet;\n")
 	file (APPEND ${HEADER_FILE} "using namespace toadlet::${TOADLET_LIBRARY};\n")
 	foreach (NAMESPACE ${${UPPERNAME}_NAMESPACES})
 		file (APPEND ${HEADER_FILE} "using namespace toadlet::${TOADLET_LIBRARY}::${NAMESPACE};\n")
