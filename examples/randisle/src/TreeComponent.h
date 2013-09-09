@@ -5,6 +5,8 @@
 #include <toadlet/tadpole.h>
 #include "TreeSystem.h"
 
+using namespace toadlet;
+
 class TreeComponent:public BaseComponent,public BranchSystem::BranchListener,public Spacial,public DetailTraceable{
 public:
 	TOADLET_COMPONENT(TreeComponent);

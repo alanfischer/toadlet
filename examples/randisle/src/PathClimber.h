@@ -5,6 +5,8 @@
 #include "Path.h"
 #include "PathClimberListener.h"
 
+using namespace toadlet;
+
 class PathClimber:public BaseComponent{
 public:
 	TOADLET_COMPONENT(PathClimber);

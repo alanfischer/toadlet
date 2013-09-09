@@ -7,6 +7,8 @@
 #include <toadlet/tadpole/plugins/SkyDomeMeshCreator.h>
 #include <toadlet/tadpole/plugins/SkyBoxMaterialCreator.h>
 
+using namespace toadlet;
+
 class Clouds:public BaseComponent,public ContextListener{
 public:
 	TOADLET_COMPONENT(Clouds);
