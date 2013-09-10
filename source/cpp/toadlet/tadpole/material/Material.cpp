@@ -41,10 +41,8 @@ Material::Material(MaterialManager *manager):BaseResource(),
 }
 
 void Material::destroy(){
-	int i;
-
-	for(i=0;i<mPaths.size();++i){
-		mPaths[i]->destroy();
+	tforeach(PointerCollection<RenderPath>::iterator,path,mPaths){
+		path->destroy();
 	}
 	mPaths.clear();
 
@@ -59,9 +57,7 @@ RenderPath::ptr Material::addPath(const String name){
 }
 
 RenderPath::ptr Material::getPath(const String name) const{
-	int i;
-	for(i=0;i<mPaths.size();++i){
-		RenderPath::ptr path=mPaths[i];
+	tforeach(PointerCollection<RenderPath>::iterator,path,mPaths){
 		if(path->getName()==name){
 			return path;
 		}
@@ -92,16 +88,16 @@ RenderPass::ptr Material::getPass(int pathIndex,int passIndex){
 	}
 
 	if(passIndex==-1){
-		if(path->getNumPasses()>0){
-			return path->getPass(0);
+		if(path->getPasses().size()>0){
+			return path->getPasses()[0];
 		}
 		else{
 			return path->addPass();
 		}
 	}
 	else{
-		if(passIndex<path->getNumPasses()){
-			return path->getPass(passIndex);
+		if(passIndex<path->getPasses().size()){
+			return path->getPasses()[passIndex];
 		}
 		else{
 			return NULL;
@@ -110,11 +106,17 @@ RenderPass::ptr Material::getPass(int pathIndex,int passIndex){
 }
 
 void Material::setModelMatrixFlags(int flags){
-	int i,j;
-	for(i=0;i<mPaths.size();++i){
-		RenderPath *path=mPaths[i];
-		for(j=0;j<path->getNumPasses();++j){
-			path->getPass(j)->setModelMatrixFlags(flags);
+	tforeach(PathCollection::iterator,path,mPaths){
+		tforeach(RenderPath::PassCollection::iterator,pass,path->getPasses()){
+			pass->setModelMatrixFlags(flags);
+		}
+	}
+}
+
+void Material::setModelMatrixAlignAxis(const Vector3 &axis){
+	tforeach(PathCollection::iterator,path,mPaths){
+		tforeach(RenderPath::PassCollection::iterator,pass,path->getPasses()){
+			pass->setModelMatrixAlignAxis(axis);
 		}
 	}
 }

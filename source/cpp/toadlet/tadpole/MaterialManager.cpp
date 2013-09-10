@@ -70,12 +70,9 @@ Material::ptr MaterialManager::createMaterial(){
 Material::ptr MaterialManager::createSharedMaterial(Material::ptr source,RenderState::ptr renderState){
 	Material::ptr material=new Material(this);
 
-	int i,j;
-	for(j=0;j<source->getNumPaths();++j){
-		RenderPath *srcPath=source->getPath(j);
+	tforeach(Material::PathCollection::iterator,srcPath,source->getPaths()){
 		RenderPath *dstPath=material->addPath();
-		for(i=0;i<srcPath->getNumPasses();++i){
-			RenderPass *srcPass=srcPath->getPass(i);
+		tforeach(RenderPath::PassCollection::iterator,srcPass,srcPath->getPasses()){
 			RenderPass *dstPass=new RenderPass(this,srcPass);
 
 			// We need to copy the Texture & Sampler states, since the shared RenderState has no knowledge of Texture or Sampler states by default
@@ -288,11 +285,10 @@ Resource::ptr MaterialManager::unableToFindStreamer(const String &name,ResourceD
 }
 
 bool MaterialManager::isPathUseable(RenderPath *path,const RenderCaps &caps){
-	int i,j;
-	for(i=0;i<path->getNumPasses();++i){
-		RenderPass *pass=path->getPass(i);
+	tforeach(RenderPath::PassCollection::iterator,pass,path->getPasses()){
 		ShaderState *state=pass->getShaderState();
 
+		int j;
 		for(j=0;j<Shader::ShaderType_MAX;++j){
 			if(state!=NULL){
 				/// @todo: I believe this wont currently detect a shader path that didn't load properly.  so FIX IT
@@ -311,11 +307,11 @@ bool MaterialManager::isPathUseable(RenderPath *path,const RenderCaps &caps){
 		}
 
 		if(j!=Shader::ShaderType_MAX){
-			break;
+			return false;
 		}
 	}
 
-	return i==path->getNumPasses();
+	return true;
 }
 
 bool MaterialManager::compileMaterial(Material *material){
@@ -326,9 +322,7 @@ bool MaterialManager::compileMaterial(Material *material){
 	else if(mEngine->getRenderDevice()!=NULL){
 		RenderCaps caps;
 		mEngine->getRenderDevice()->getRenderCaps(caps);
-		int i;
-		for(i=0;i<material->getNumPaths();++i){
-			RenderPath::ptr path=material->getPath(i);
+		tforeach(Material::PathCollection::iterator,path,material->getPaths()){
 			if(isPathUseable(path,caps)){
 				bestPath=path;
 				break;

@@ -98,10 +98,8 @@ void DecalShadowRenderManager::interRenderRenderables(RenderableSet *set,RenderD
 	if(path==NULL){
 		return;
 	}
-	int numPasses=path->getNumPasses();
 	int pi,ni,vi;
-	for(pi=0;pi<numPasses;++pi){
-		RenderPass *pass=path->getPass(pi);
+	tforeach(RenderPath::PassCollection::iterator,pass,path->getPasses()){
 		setupPass(pass,mDevice);
 
 		for(ni=0;ni<set->getNodeQueue().size();++ni){
