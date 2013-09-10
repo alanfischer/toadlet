@@ -4,6 +4,8 @@
 #include "Path.h"
 #include "BranchSystem.h"
 
+using namespace toadlet;
+
 class TreeSystem:public BranchSystem,public BranchSystem::BranchListener{
 public:
 	TOADLET_OBJECT(TreeSystem);

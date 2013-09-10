@@ -4,6 +4,8 @@
 #include <toadlet/tadpole.h>
 #include "Clouds.h"
 
+using namespace toadlet;
+
 class Sky:public Node{
 public:
 	TOADLET_OBJECT(Sky);

@@ -3,6 +3,8 @@
 
 #include <toadlet/tadpole.h>
 
+using namespace toadlet;
+
 class Path{
 public:
 	virtual scalar getLength() const=0;
