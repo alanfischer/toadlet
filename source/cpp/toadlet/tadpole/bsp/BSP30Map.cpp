@@ -183,7 +183,7 @@ bool BSP30Map::modelLightTrace(Vector4 &result,int model,const Vector3 &start,co
 
 			int lmwidth=((maxs[0]-mins[0])>>4)+1;
 			tbyte *lightdata=((tbyte*)lighting) + face->lightofs + (lmwidth*((t-mins[1])>>4) + ((s-mins[0])>>4))*3;
-			result.set(lightdata[0]/255.0,lightdata[1]/255.0,lightdata[2]/255.0,0);
+			result.set(lightdata[0]/255.0,lightdata[1]/255.0,lightdata[2]/255.0,1.0);
 
 			return true;
 		}

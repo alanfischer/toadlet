@@ -27,6 +27,7 @@
 #define TOADLET_TADPOLE_MATERIAL_MATERIAL_H
 
 #include <toadlet/egg/BaseResource.h>
+#include <toadlet/egg/PointerCollection.h>
 #include <toadlet/tadpole/material/RenderPath.h>
 
 namespace toadlet{
@@ -49,18 +50,19 @@ public:
 	};
 
 	enum MatrixFlags{
-		MatrixFlag_CAMERA_ALIGNED=1<<0,
-		MatrixFlag_NO_PERSPECTIVE=1<<1,
-		MatrixFlag_ASPECT_CORRECT=1<<2,
+		MatrixFlag_NO_PERSPECTIVE=1<<0,
+		MatrixFlag_ASPECT_CORRECT=1<<1,
+		MatrixFlag_CAMERA_ALIGNED=1<<2,
 	};
+
+	typedef PointerCollection<RenderPath> PathCollection;
 
 	Material(MaterialManager *manager);
 
 	void destroy();
 
+	const PathCollection &getPaths() const{return mPaths;}
 	RenderPath::ptr addPath(const String name=(char*)NULL);
-	inline int getNumPaths() const{return mPaths.size();}
-	inline RenderPath::ptr getPath(int i) const{return mPaths[i];}
 	RenderPath::ptr getPath(const String name=(char*)NULL) const;
 	inline void setBestPath(RenderPath::ptr path){mBestPath=path;}
 	RenderPath::ptr getBestPath(){return mBestPath;}
@@ -76,6 +78,7 @@ public:
 	inline int getLayer() const{return mLayer;}
 
 	void setModelMatrixFlags(int flags);
+	void setModelMatrixAlignAxis(const Vector3 &axis);
 
 	bool isDepthSorted() const;
 
@@ -83,7 +86,7 @@ public:
 
 protected:
 	MaterialManager *mManager;
-	Collection<RenderPath::ptr> mPaths;
+	PathCollection mPaths;
 	RenderPath::ptr mBestPath;
 	SortType mSort;
 	int mLayer;

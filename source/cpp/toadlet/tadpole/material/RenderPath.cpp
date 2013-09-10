@@ -37,9 +37,8 @@ RenderPath::RenderPath(MaterialManager *manager):
 }
 
 void RenderPath::destroy(){
-	int i;
-	for(i=0;i<mPasses.size();++i){
-		mPasses[i]->destroy();
+	tforeach(PassCollection::iterator,pass,mPasses){
+		pass->destroy();
 	}
 	mPasses.clear();
 }
@@ -63,19 +62,17 @@ bool RenderPath::isDepthSorted() const{
 }
 
 RenderPass *RenderPath::findTexture(Shader::ShaderType &type,int &index,const String &name){
-	int i;
-	for(i=0;i<mPasses.size();++i){
-		if(mPasses[i]->findTexture(type,index,name)){
-			return mPasses[i];
+	tforeach(PassCollection::iterator,pass,mPasses){
+		if(pass->findTexture(type,index,name)){
+			return pass;
 		}
 	}
 	return NULL;
 }
 
 void RenderPath::compile(){
-	int i;
-	for(i=0;i<mPasses.size();++i){
-		mPasses[i]->compile();
+	tforeach(PassCollection::iterator,pass,mPasses){
+		pass->compile();
 	}
 }
 

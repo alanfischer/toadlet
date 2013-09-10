@@ -74,6 +74,7 @@ RenderPass::RenderPass(MaterialManager *manager,RenderPass *pass):
 		mTextures[i]=pass->mTextures[i];
 	}
 	mModelMatrixFlags=pass->mModelMatrixFlags;
+	mModelMatrixAlignAxis=pass->mModelMatrixAlignAxis;
 	mUnlinkedVariables=pass->mUnlinkedVariables;
 	mUnlinkedTextures=pass->mUnlinkedTextures;
 }

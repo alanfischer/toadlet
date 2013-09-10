@@ -133,15 +133,24 @@ void SimpleRenderManager::setupPassForRenderable(RenderPass *pass,RenderDevice *
 		Math::setScaleFromMatrix4x4(scale,matrix);
 
 		if((flags&Material::MatrixFlag_CAMERA_ALIGNED)!=0){
-			if(camera->getAlignmentCalculationsUseOrigin()){
-				Matrix4x4 lookAtCamera;
-				Math::setMatrix4x4FromLookAt(lookAtCamera,camera->getPosition(),translate,Math::Z_UNIT_VECTOR3,false);
-				Math::setQuaternionFromMatrix4x4(rotate,lookAtCamera);
+			Vector3 axis=pass->getModelMatrixAlignAxis();
+			if(axis==Math::ZERO_VECTOR3 && camera->getAlignmentCalculationsUseOrigin()){
+				axis=camera->getUp();
+			}
+
+			if(axis!=Math::ZERO_VECTOR3){
+				Vector3 look=camera->getPosition()-translate;
+				Vector3 up=axis;
+				Vector3 right;
+				Math::cross(right,up,look);
+				Math::normalize(right);
+				Math::cross(look,right,up);
+				Math::setQuaternionFromAxes(rotate,right,up,look);
 			}
 			else{
 				Math::setQuaternionFromMatrix4x4(rotate,camera->getViewMatrix());
+				Math::invert(rotate);
 			}
-			Math::invert(rotate);
 		}
 
 		if((flags&Material::MatrixFlag_NO_PERSPECTIVE)!=0){
@@ -270,20 +279,21 @@ void SimpleRenderManager::renderDepthSortedRenderables(const RenderableSet::Rend
 /// @todo: We should see if the Pass is a Fixed or Shader pass, in which case we either set Fixed states, or setupRenderVariables
 ///  And then maybe set Fixed states should be moved the pass, like setupRenderVariables
 void SimpleRenderManager::renderQueueItems(Material *material,const RenderableSet::RenderableQueueItem *items,int numItems){
+	int j;
 	RenderPath *path=(material!=NULL)?material->getBestPath():NULL;
-	int numPasses=(path!=NULL?path->getNumPasses():1);
-	int i,j;
-	for(i=0;i<numPasses;++i){
-		RenderPass *pass=(path!=NULL)?path->getPass(i):NULL;
-		if(pass!=NULL){
+	if(path!=NULL){
+		tforeach(PointerCollection<RenderPass>::iterator,pass,path->getPasses()){
 			setupPass(pass,mDevice);
+			for(j=0;j<numItems;++j){
+				const RenderableSet::RenderableQueueItem &item=items[j];
+				setupPassForRenderable(pass,mDevice,item.renderable,item.ambient);
+				item.renderable->render(this);
+			}
 		}
-
+	}
+	else{
 		for(j=0;j<numItems;++j){
 			const RenderableSet::RenderableQueueItem &item=items[j];
-			if(pass!=NULL){
-				setupPassForRenderable(pass,mDevice,item.renderable,item.ambient);
-			}
 			item.renderable->render(this);
 		}
 	}

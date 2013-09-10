@@ -61,9 +61,9 @@ AnaglyphCamera::AnaglyphCamera(Scene *scene):
 	Material::ptr rightMaterial=engine->createDiffuseMaterial(mRightTexture);
 
 	mMaterial=engine->getMaterialManager()->createMaterial();
-	for(int i=0;i<leftMaterial->getNumPaths();++i){
-		RenderPath::ptr leftPath=leftMaterial->getPath(i);
-		RenderPath::ptr rightPath=rightMaterial->getPath(i);
+	for(int i=0;i<leftMaterial->getPaths().size();++i){
+		RenderPath::ptr leftPath=leftMaterial->getPaths()[i];
+		RenderPath::ptr rightPath=rightMaterial->getPaths()[i];
 		RenderPath::ptr path=mMaterial->addPath();
 
 		RenderPass::ptr leftPass=leftPath->takePass(0);
@@ -156,15 +156,15 @@ void AnaglyphCamera::setSeparation(scalar separation){
 
 void AnaglyphCamera::setLeftColor(const Vector4 &color){
 	mLeftColor.set(color);
-	for(int i=0;i<mMaterial->getNumPaths();++i){
-		mMaterial->getPath(i)->getPass(0)->getRenderState()->setMaterialState(MaterialState(mLeftColor));
+	tforeach(Material::PathCollection::iterator,path,mMaterial->getPaths()){
+		path->getPasses()[0]->getRenderState()->setMaterialState(MaterialState(mLeftColor));
 	}
 }
 
 void AnaglyphCamera::setRightColor(const Vector4 &color){
 	mRightColor.set(color);
-	for(int i=0;i<mMaterial->getNumPaths();++i){
-		mMaterial->getPath(i)->getPass(1)->getRenderState()->setMaterialState(MaterialState(mRightColor));
+	tforeach(Material::PathCollection::iterator,path,mMaterial->getPaths()){
+		path->getPasses()[1]->getRenderState()->setMaterialState(MaterialState(mRightColor));
 	}
 }
 

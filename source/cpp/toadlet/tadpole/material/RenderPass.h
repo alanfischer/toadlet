@@ -89,6 +89,9 @@ public:
 	void setModelMatrixFlags(int flags){mModelMatrixFlags=flags;}
 	int getModelMatrixFlags() const{return mModelMatrixFlags;}
 
+	void setModelMatrixAlignAxis(const Vector3 &axis){mModelMatrixAlignAxis=axis;}
+	const Vector3 &getModelMatrixAlignAxis() const{return mModelMatrixAlignAxis;}
+
 	int getNumTextures(Shader::ShaderType type) const{return mTextures[type].size();}
 	bool setTexture(const String &name,Texture *texture,const String &samplerName,const SamplerState &samplerState,const TextureState &textureState);
 	bool setTexture(Shader::ShaderType type,int i,Texture *texture,const SamplerState &samplerState,const TextureState &textureState);
@@ -160,6 +163,7 @@ protected:
 	Collection<BufferData> mBuffers[Shader::ShaderType_MAX];
 	Collection<TextureData> mTextures[Shader::ShaderType_MAX];
 	int mModelMatrixFlags;
+	Vector3 mModelMatrixAlignAxis;
 
 	Collection<VariableData> mUnlinkedVariables;
 	Collection<TextureData> mUnlinkedTextures;

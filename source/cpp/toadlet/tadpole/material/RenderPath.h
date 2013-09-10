@@ -26,6 +26,7 @@
 #ifndef TOADLET_TADPOLE_MATERIAL_RENDERPATH_H
 #define TOADLET_TADPOLE_MATERIAL_RENDERPATH_H
 
+#include <toadlet/egg/PointerCollection.h>
 #include <toadlet/tadpole/material/RenderPass.h>
 
 namespace toadlet{
@@ -36,6 +37,8 @@ class TOADLET_API RenderPath:public Object{
 public:
 	TOADLET_OBJECT(RenderPath);
 
+	typedef PointerCollection<RenderPass> PassCollection;
+
 	RenderPath(MaterialManager *manager);
 
 	void destroy();
@@ -43,8 +46,7 @@ public:
 	inline void setName(const String &name){mName=name;}
 	inline const String &getName() const{return mName;}
 
-	inline int getNumPasses() const{return mPasses.size();}
-	inline RenderPass *getPass(int i) const{return mPasses[i];}
+	const PassCollection &getPasses() const{return mPasses;}
 	RenderPass::ptr takePass(int i){RenderPass::ptr pass=mPasses[i];mPasses.removeAt(i);return pass;}
 	RenderPass *addPass(RenderState *renderState=NULL,ShaderState *shaderState=NULL);
 	RenderPass *addPass(RenderPass *pass);
@@ -58,7 +60,7 @@ public:
 protected:
 	MaterialManager *mManager;
 	String mName;
-	Collection<RenderPass::ptr> mPasses;
+	PassCollection mPasses;
 };
 
 }
