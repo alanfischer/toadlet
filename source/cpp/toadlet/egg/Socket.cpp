@@ -279,6 +279,29 @@ int Socket::getTimeout() const{
 	return value.tv_sec*1000 + value.tv_usec/1000;
 }
 
+bool Socket::setKeepAlive(bool keepAlive){
+	int value=keepAlive;
+	int result=setsockopt(mHandle,SOL_SOCKET,SO_KEEPALIVE,(char*)&value,sizeof(value));
+	if(result==TOADLET_SOCKET_ERROR){
+		Error::socket(Categories::TOADLET_EGG,
+			String("setKeepAlive:")+error());
+		return false;
+	}
+	return true;
+}
+
+bool Socket::getKeepAlive() const{
+	int value=0;
+	TOADLET_SOCKLEN size=sizeof(value);
+	int result=getsockopt(mHandle,SOL_SOCKET,SO_KEEPALIVE,(char*)&value,&size);
+	if(result==TOADLET_SOCKET_ERROR){
+		Error::socket(Categories::TOADLET_EGG,
+			String("getKeepAlive:")+error());
+		return -1;
+	}
+	return value!=0;
+}
+
 bool Socket::addMembership(uint32 ipAddress){
 	struct ip_mreq mreq={{0}};
 	mreq.imr_multiaddr.s_addr=ipAddress;

@@ -82,6 +82,9 @@ public:
 	virtual bool setTimeout(int millis);
 	virtual int getTimeout() const;
 
+	virtual bool setKeepAlive(bool keepAlive);
+	virtual bool getKeepAlive() const;
+
 	virtual bool addMembership(uint32 ipAddress);
 
 	virtual bool pollRead(int millis);
