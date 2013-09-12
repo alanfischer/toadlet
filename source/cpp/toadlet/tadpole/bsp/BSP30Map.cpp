@@ -167,12 +167,14 @@ bool BSP30Map::modelLightTrace(Vector4 &result,int model,const Vector3 &start,co
 		int mins[2],maxs[2];
 		bnode *node=nodes+lastNode;
 		bface *face=faces+node->firstface;
-		int i;
+		int i,j;
 		for(i=0;i<node->numfaces;++i,++face){
 			btexinfo *texinfo=texinfos+face->texinfo;
 			if((texinfo->flags&TEX_SPECIAL)!=0) continue;
 			if(face->lightofs==0) continue;
 			
+			facedata *faced=&facedatas[node->firstface+i];
+
 			findSurfaceExtents(face,mins,maxs);
 
 			int s=Math::dot(collision.point,(Vector3&)texinfo->vecs[0]) + texinfo->vecs[0][3];
@@ -181,10 +183,18 @@ bool BSP30Map::modelLightTrace(Vector4 &result,int model,const Vector3 &start,co
 			if(s<mins[0] || t<mins[1]) continue;
 			if(s>maxs[0] || t>maxs[1]) continue;
 
-			int lmwidth=((maxs[0]-mins[0])>>4)+1;
-			tbyte *lightdata=((tbyte*)lighting) + face->lightofs + (lmwidth*((t-mins[1])>>4) + ((s-mins[0])>>4))*3;
-			result.set(lightdata[0]/255.0,lightdata[1]/255.0,lightdata[2]/255.0,1.0);
+			int pixelSize=3;
+			int size=faced->lightmapSize[0]*faced->lightmapSize[1]*pixelSize;
 
+			int ld[3]={0,0,0};
+			for(j=0;j<MAX_LIGHTMAPS && face->styles[j]!=255;++j){
+				int intensity=styleIntensities[face->styles[j]];
+				tbyte *ls=((tbyte*)lighting) + face->lightofs + size*j+ (faced->lightmapSize[0]*((t-mins[1])>>4) + ((s-mins[0])>>4))*3;
+				ld[0]=Math::intClamp(0,255,ld[0]+(((int)ls[0]*intensity)>>8));
+				ld[1]=Math::intClamp(0,255,ld[1]+(((int)ls[1]*intensity)>>8));
+				ld[2]=Math::intClamp(0,255,ld[2]+(((int)ls[2]*intensity)>>8));
+			}
+			result.set(ld[0]/255.0,ld[1]/255.0,ld[2]/255.0,1.0);
 			return true;
 		}
 	}
@@ -248,13 +258,12 @@ void BSP30Map::updateFaceLights(int faceIndex){
 	if(face->styles[1]==255 || nlighting==0) return;
 
 	int i,j,k;
-	int numStyles;
 	int intensities[MAX_LIGHTMAPS];
 	bool skipRecalculation=true;
-	for(numStyles=0;numStyles<MAX_LIGHTMAPS && face->styles[numStyles]!=255;++numStyles){
-		skipRecalculation&=(styleIntensities[face->styles[numStyles]]==faced->lastStyleIntensities[numStyles]);
-		faced->lastStyleIntensities[numStyles]=styleIntensities[face->styles[numStyles]];
-		intensities[numStyles]=styleIntensities[face->styles[numStyles]];
+	for(i=0;i<MAX_LIGHTMAPS && face->styles[i]!=255;++i){
+		skipRecalculation&=(styleIntensities[face->styles[i]]==faced->lastStyleIntensities[i]);
+		faced->lastStyleIntensities[i]=styleIntensities[face->styles[i]];
+		intensities[i]=styleIntensities[face->styles[i]];
 	}
 
 	if(skipRecalculation) return;
@@ -263,20 +272,21 @@ void BSP30Map::updateFaceLights(int faceIndex){
 	int size=faced->lightmapSize[0]*faced->lightmapSize[1]*pixelSize;
 
 	uint8 *dst=lightmapDatas[faced->lightmapIndex];
-	for(i=0;i<numStyles;++i){
+	for(i=0;i<MAX_LIGHTMAPS && face->styles[i]!=255;++i){
 		uint8 *src=(tbyte*)lighting + face->lightofs + size*i;
 		for(j=0;j<faced->lightmapSize[1];++j){
-			uint8 *d=dst + ((faced->lightmapCoord[1]+j)*BSP30Map::LIGHTMAP_SIZE + faced->lightmapCoord[0])*pixelSize;
-			uint8 *s=src + faced->lightmapSize[0]*j*pixelSize;
+			uint8 *ld=dst + ((faced->lightmapCoord[1]+j)*BSP30Map::LIGHTMAP_SIZE + faced->lightmapCoord[0])*pixelSize;
+			uint8 *ls=src + faced->lightmapSize[0]*j*pixelSize;
 			if(i==0){
-				memcpy(d,s,faced->lightmapSize[0]*pixelSize);
+				memcpy(ld,ls,faced->lightmapSize[0]*pixelSize);
 			}
 			else{
 				for(k=0;k<faced->lightmapSize[0];++k){
-					d[0]=Math::intClamp(0,255,d[0]+(((int)s[0]*intensities[i])>>8));
-					d[1]=Math::intClamp(0,255,d[1]+(((int)s[1]*intensities[i])>>8));
-					d[2]=Math::intClamp(0,255,d[2]+(((int)s[2]*intensities[i])>>8));
-					d+=3,s+=3;
+					int intensity=intensities[i];
+					ld[0]=Math::intClamp(0,255,ld[0]+(((int)ls[0]*intensity)>>8));
+					ld[1]=Math::intClamp(0,255,ld[1]+(((int)ls[1]*intensity)>>8));
+					ld[2]=Math::intClamp(0,255,ld[2]+(((int)ls[2]*intensity)>>8));
+					ld+=3,ls+=3;
 				}
 			}
 		}
