@@ -33,7 +33,7 @@ BackableRenderState::BackableRenderState():BaseResource(),
 	mDepthState(NULL),
 	mRasterizerState(NULL),
 	mFogState(NULL),
-	mPointState(NULL),
+	mGeometryState(NULL),
 	mMaterialState(NULL)
 #if !defined(FULLY_BACKED)
 	,mSamplerState(NULL),
@@ -63,9 +63,9 @@ void BackableRenderState::destroy(){
 		delete mFogState;
 		mFogState=NULL;
 	}
-	if(mPointState!=NULL){
-		delete mPointState;
-		mPointState=NULL;
+	if(mGeometryState!=NULL){
+		delete mGeometryState;
+		mGeometryState=NULL;
 	}
 	if(mMaterialState!=NULL){
 		delete mMaterialState;
@@ -109,7 +109,7 @@ void BackableRenderState::setBack(RenderState::ptr back){
 		if(mDepthState!=NULL){mBack->setDepthState(*mDepthState);}
 		if(mRasterizerState!=NULL){mBack->setRasterizerState(*mRasterizerState);}
 		if(mFogState!=NULL){mBack->setFogState(*mFogState);}
-		if(mPointState!=NULL){mBack->setPointState(*mPointState);}
+		if(mGeometryState!=NULL){mBack->setGeometryState(*mGeometryState);}
 		if(mMaterialState!=NULL){mBack->setMaterialState(*mMaterialState);}
 #if defined(FULLY_BACKED)
 		int j,i;

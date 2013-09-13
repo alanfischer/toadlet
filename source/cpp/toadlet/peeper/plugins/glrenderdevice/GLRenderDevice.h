@@ -34,7 +34,7 @@
 #include <toadlet/peeper/FogState.h>
 #include <toadlet/peeper/MaterialState.h>
 #include <toadlet/peeper/LightState.h>
-#include <toadlet/peeper/PointState.h>
+#include <toadlet/peeper/GeometryState.h>
 #include <toadlet/peeper/RasterizerState.h>
 #include <toadlet/peeper/SamplerState.h>
 #include <toadlet/peeper/TextureState.h>
@@ -121,7 +121,7 @@ public:
 	void setDepthState(DepthState *state);
 	void setRasterizerState(RasterizerState *state);
 	void setFogState(FogState *state);
-	void setPointState(PointState *state);
+	void setGeometryState(GeometryState *state);
 	void setMaterialState(MaterialState *state);
 	void setSamplerState(int i,SamplerState *state);
 	void setTextureState(int i,TextureState *state);
@@ -204,7 +204,7 @@ protected:
 
 	Viewport mViewport;
 	DepthState mDepthState;
-	PointState mPointState;
+	GeometryState mGeometryState;
 	Collection<GLTexture*> mLastTextures;
 	Collection<SamplerState*> mLastSamplerStates;
 	Collection<TextureState*> mLastTextureStates;

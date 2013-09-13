@@ -44,7 +44,7 @@ namespace tadpole{
 
 // ParticleComponent will render a group of screen facing sprites specified by points.
 // There are 3 types of particles, POINTSPRITE,SPRITE,BEAM
-// POINTSPRITE - particles are rendered using a single point, and the Material used should set its PointState
+// POINTSPRITE - particles are rendered using a single point, and the Material used should set its GeometryState
 // SPRITE - particles are rendered using 4 points and oriented towards the camera
 // BEAM - particles are rendered as beams that take up 2 or more particles
 // The vx,vy,vz in the Particle class are only used for alignment, this class provides no simulation of particles.

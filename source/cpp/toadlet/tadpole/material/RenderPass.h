@@ -65,8 +65,8 @@ public:
 	void setFogState(const FogState &state){mRenderState->setFogState(state);}
 	bool getFogState(FogState &state) const{return mRenderState!=NULL?mRenderState->getFogState(state):false;}
 
-	void setPointState(const PointState &state){mRenderState->setPointState(state);}
-	bool getPointState(PointState &state) const{return mRenderState!=NULL?mRenderState->getPointState(state):false;}
+	void setGeometryState(const GeometryState &state){mRenderState->setGeometryState(state);}
+	bool getGeometryState(GeometryState &state) const{return mRenderState!=NULL?mRenderState->getGeometryState(state):false;}
 
 	void setMaterialState(const MaterialState &state){mRenderState->setMaterialState(state);}
 	bool getMaterialState(MaterialState &state) const{return mRenderState!=NULL?mRenderState->getMaterialState(state):false;}
@@ -85,12 +85,6 @@ public:
 
 	void setShader(Shader::ShaderType type,Shader *shader);
 	Shader *getShader(Shader::ShaderType type){return mShaderState!=NULL?mShaderState->getShader(type):NULL;}
-
-	void setModelMatrixFlags(int flags){mModelMatrixFlags=flags;}
-	int getModelMatrixFlags() const{return mModelMatrixFlags;}
-
-	void setModelMatrixAlignAxis(const Vector3 &axis){mModelMatrixAlignAxis=axis;}
-	const Vector3 &getModelMatrixAlignAxis() const{return mModelMatrixAlignAxis;}
 
 	int getNumTextures(Shader::ShaderType type) const{return mTextures[type].size();}
 	bool setTexture(const String &name,Texture *texture,const String &samplerName,const SamplerState &samplerState,const TextureState &textureState);
@@ -162,8 +156,6 @@ protected:
 	ShaderState::ptr mShaderState,mOwnShaderState;
 	Collection<BufferData> mBuffers[Shader::ShaderType_MAX];
 	Collection<TextureData> mTextures[Shader::ShaderType_MAX];
-	int mModelMatrixFlags;
-	Vector3 mModelMatrixAlignAxis;
 
 	Collection<VariableData> mUnlinkedVariables;
 	Collection<TextureData> mUnlinkedTextures;

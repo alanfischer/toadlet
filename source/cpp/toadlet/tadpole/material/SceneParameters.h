@@ -71,14 +71,14 @@ public:
 
 	inline void setRenderState(RenderState *renderState){
 		renderState->getMaterialState(mMaterialState);
-		renderState->getPointState(mPointState);
+		renderState->getGeometryState(mGeometryState);
 		renderState->getFogState(mFogState);
 	}
 
 	///@todo: Texture states!
 
 	inline const MaterialState &getMaterialState() const{return mMaterialState;}
-	inline const PointState &getPointState() const{return mPointState;}
+	inline const GeometryState &getGeometryState() const{return mGeometryState;}
 	inline const FogState &getFogState() const{return mFogState;}
 
 	inline void setLightState(const LightState &state){mLightState.set(state);}
@@ -96,7 +96,7 @@ protected:
 	RenderPass *mRenderPass;
 
 	MaterialState mMaterialState;
-	PointState mPointState;
+	GeometryState mGeometryState;
 	FogState mFogState;
 
 	LightState mLightState;

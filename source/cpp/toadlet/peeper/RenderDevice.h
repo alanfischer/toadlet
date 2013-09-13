@@ -44,7 +44,7 @@ class LightState;
 class MaterialState;
 class PixelBufferRenderTarget;
 class PixelBuffer;
-class PointState;
+class GeometryState;
 class Query;
 class RenderTarget;
 class RasterizerState;

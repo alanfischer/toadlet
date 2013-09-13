@@ -23,17 +23,41 @@
  *
  ********** Copyright header - do not remove **********/
 
-#ifndef TOADLET_PEEPER_POINTSTATE_H
-#define TOADLET_PEEPER_POINTSTATE_H
+#ifndef TOADLET_PEEPER_GEOMETRYSTATE_H
+#define TOADLET_PEEPER_GEOMETRYSTATE_H
 
 #include <toadlet/peeper/Types.h>
 
 namespace toadlet{
 namespace peeper{
 
-class PointState{
+class GeometryState{
 public:
-	PointState():
+	enum MatrixFlags{
+		MatrixFlag_NO_PERSPECTIVE=1<<0,
+		MatrixFlag_ASPECT_CORRECT=1<<1,
+		MatrixFlag_CAMERA_ALIGNED=1<<2,
+	};
+
+	GeometryState():
+		sprite(false),
+		size(Math::ONE),
+		attenuated(false),
+		constant(0),
+		linear(0),
+		quadratic(0),
+		minSize(Math::ONE),
+		maxSize(Math::ONE),
+		matrixFlags(0)
+	{}
+
+	GeometryState(bool sprite1,scalar size1,bool attenuated1,scalar constant1=Math::ONE,scalar linear1=Math::ONE,scalar quadratic1=Math::ONE,scalar minSize1=Math::ONE,scalar maxSize1=Math::ONE*128):
+		matrixFlags(0)
+	{
+		set(sprite1,size1,attenuated1,constant1,linear1,quadratic1,minSize1,maxSize1);
+	}
+
+	GeometryState(int matrixFlags,const Vector3 &matrixAlignAxis=Math::ZERO_VECTOR3):
 		sprite(false),
 		size(Math::ONE),
 		attenuated(false),
@@ -42,13 +66,11 @@ public:
 		quadratic(0),
 		minSize(Math::ONE),
 		maxSize(Math::ONE)
-	{}
-
-	PointState(bool sprite1,scalar size1,bool attenuated1,scalar constant1=Math::ONE,scalar linear1=Math::ONE,scalar quadratic1=Math::ONE,scalar minSize1=Math::ONE,scalar maxSize1=Math::ONE*128){
-		set(sprite1,size1,attenuated1,constant1,linear1,quadratic1,minSize1,maxSize1);
+	{
+		set(matrixFlags,matrixAlignAxis);
 	}
 
-	PointState &set(const PointState &state){
+	GeometryState &set(const GeometryState &state){
 		sprite=state.sprite;
 		size=state.size;
 		attenuated=state.attenuated;
@@ -57,10 +79,12 @@ public:
 		quadratic=state.quadratic;
 		minSize=state.minSize;
 		maxSize=state.maxSize;
+		matrixFlags=state.matrixFlags;
+		matrixAlignAxis=state.matrixAlignAxis;
 		return *this;
 	}
 
-	PointState &set(bool sprite1,scalar size1,bool attenuated1,scalar constant1=Math::ONE,scalar linear1=Math::ONE,scalar quadratic1=Math::ONE,scalar minSize1=Math::ONE,scalar maxSize1=Math::ONE){
+	GeometryState &set(bool sprite1,scalar size1,bool attenuated1,scalar constant1=Math::ONE,scalar linear1=Math::ONE,scalar quadratic1=Math::ONE,scalar minSize1=Math::ONE,scalar maxSize1=Math::ONE){
 		sprite=sprite1;
 		size=size1;
 		attenuated=attenuated1;
@@ -72,17 +96,24 @@ public:
 		return *this;
 	}
 
-	inline bool equals(const PointState &state) const{
-		return (sprite==state.sprite && size==state.size && attenuated==state.attenuated &&
-			constant==state.constant && linear==state.linear && quadratic==state.quadratic &&
-			minSize==state.minSize && maxSize==state.maxSize);
+	GeometryState &set(int matrixFlags1,const Vector3 &matrixAlignAxis1=Math::ZERO_VECTOR3){
+		matrixFlags=matrixFlags1;
+		matrixAlignAxis.set(matrixAlignAxis1);
+		return *this;
 	}
 
-	inline bool operator==(const PointState &state) const{
+	inline bool equals(const GeometryState &state) const{
+		return (sprite==state.sprite && size==state.size && attenuated==state.attenuated &&
+			constant==state.constant && linear==state.linear && quadratic==state.quadratic &&
+			minSize==state.minSize && maxSize==state.maxSize &&
+			matrixFlags==state.matrixFlags && matrixAlignAxis==state.matrixAlignAxis);
+	}
+
+	inline bool operator==(const GeometryState &state) const{
 		return equals(state);
 	}
 
-	inline bool operator!=(const PointState &state) const{
+	inline bool operator!=(const GeometryState &state) const{
 		return !equals(state);
 	}
 
@@ -94,6 +125,8 @@ public:
 	scalar quadratic;
 	scalar minSize;
 	scalar maxSize;
+	int matrixFlags;
+	Vector3 matrixAlignAxis;
 };
 
 }

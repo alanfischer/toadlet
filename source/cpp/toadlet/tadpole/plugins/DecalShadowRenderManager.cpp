@@ -98,7 +98,7 @@ void DecalShadowRenderManager::interRenderRenderables(RenderableSet *set,RenderD
 	if(path==NULL){
 		return;
 	}
-	int pi,ni,vi;
+	int ni,vi;
 	tforeach(RenderPath::PassCollection::iterator,pass,path->getPasses()){
 		setupPass(pass,mDevice);
 

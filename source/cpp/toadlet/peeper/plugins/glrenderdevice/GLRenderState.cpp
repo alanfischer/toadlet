@@ -33,7 +33,7 @@ GLRenderState::GLRenderState(GLRenderDevice *renderDevice):
 	mDepthState(NULL),
 	mRasterizerState(NULL),
 	mFogState(NULL),
-	mPointState(NULL),
+	mGeometryState(NULL),
 	mMaterialState(NULL)
 {}
 
@@ -54,9 +54,9 @@ void GLRenderState::destroy(){
 		delete mFogState;
 		mFogState=NULL;
 	}
-	if(mPointState!=NULL){
-		delete mPointState;
-		mPointState=NULL;
+	if(mGeometryState!=NULL){
+		delete mGeometryState;
+		mGeometryState=NULL;
 	}
 	if(mMaterialState!=NULL){
 		delete mMaterialState;

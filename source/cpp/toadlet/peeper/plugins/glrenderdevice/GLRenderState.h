@@ -47,7 +47,7 @@ public:
 	bool create(){return true;}
 	void destroy();
 
-	int getSetStates() const{return ((mBlendState!=NULL)<<StateType_BLEND) | ((mDepthState!=NULL)<<StateType_DEPTH) | ((mRasterizerState!=NULL)<<StateType_RASTERIZER) | ((mFogState!=NULL)<<StateType_FOG) | ((mPointState!=NULL)<<StateType_POINT) | ((mMaterialState!=NULL)<<StateType_MATERIAL);}
+	int getSetStates() const{return ((mBlendState!=NULL)<<StateType_BLEND) | ((mDepthState!=NULL)<<StateType_DEPTH) | ((mRasterizerState!=NULL)<<StateType_RASTERIZER) | ((mFogState!=NULL)<<StateType_FOG) | ((mGeometryState!=NULL)<<StateType_GEOMETRY) | ((mMaterialState!=NULL)<<StateType_MATERIAL);}
 
 	void setBlendState(const BlendState &state){if(mBlendState==NULL){mBlendState=new BlendState(state);}else{mBlendState->set(state);}}
 	bool getBlendState(BlendState &state) const{if(mBlendState==NULL){return false;}else{state.set(*mBlendState);return true;}}
@@ -61,8 +61,8 @@ public:
 	void setFogState(const FogState &state){if(mFogState==NULL){mFogState=new FogState(state);}else{mFogState->set(state);}}
 	bool getFogState(FogState &state) const{if(mFogState==NULL){return false;}else{state.set(*mFogState);return true;}}
 
-	void setPointState(const PointState &state){if(mPointState==NULL){mPointState=new PointState(state);}else{mPointState->set(state);}}
-	bool getPointState(PointState &state) const{if(mPointState==NULL){return false;}else{state.set(*mPointState);return true;}}
+	void setGeometryState(const GeometryState &state){if(mGeometryState==NULL){mGeometryState=new GeometryState(state);}else{mGeometryState->set(state);}}
+	bool getGeometryState(GeometryState &state) const{if(mGeometryState==NULL){return false;}else{state.set(*mGeometryState);return true;}}
 
 	void setMaterialState(const MaterialState &state){if(mMaterialState==NULL){mMaterialState=new MaterialState(state);}else{mMaterialState->set(state);}}
 	bool getMaterialState(MaterialState &state) const{if(mMaterialState==NULL){return false;}else{state.set(*mMaterialState);return true;}}
@@ -100,7 +100,7 @@ protected:
 	DepthState *mDepthState;
 	RasterizerState *mRasterizerState;
 	FogState *mFogState;
-	PointState *mPointState;
+	GeometryState *mGeometryState;
 	MaterialState *mMaterialState;
 	egg::Collection<SamplerState*> mSamplerStates;
 	egg::Collection<TextureState*> mTextureStates;

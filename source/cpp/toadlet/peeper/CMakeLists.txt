@@ -46,7 +46,7 @@ set (PEEPER_HDR
 	Query.h
 	PixelBuffer.h
 	PixelBufferRenderTarget.h
-	PointState.h
+	GeometryState.h
 	RasterizerState.h
 	RenderDevice.h
 	RenderCaps.h

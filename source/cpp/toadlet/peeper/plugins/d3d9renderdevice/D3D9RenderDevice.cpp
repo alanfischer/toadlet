@@ -41,7 +41,7 @@
 #include <toadlet/peeper/FogState.h>
 #include <toadlet/peeper/MaterialState.h>
 #include <toadlet/peeper/LightState.h>
-#include <toadlet/peeper/PointState.h>
+#include <toadlet/peeper/GeometryState.h>
 #include <toadlet/peeper/VertexData.h>
 #include <toadlet/peeper/Viewport.h>
 
@@ -148,7 +148,7 @@ bool D3D9RenderDevice::create(RenderTarget *target,int options){
 	mDefaultState->setBlendState(BlendState());
 	mDefaultState->setDepthState(DepthState());
 	mDefaultState->setFogState(FogState());
-	mDefaultState->setPointState(PointState());
+	mDefaultState->setGeometryState(GeometryState());
 	mDefaultState->setRasterizerState(RasterizerState());
 	mDefaultState->setMaterialState(MaterialState());
 
@@ -544,8 +544,8 @@ bool D3D9RenderDevice::setRenderState(RenderState *renderState){
 	if(d3drenderState->mFogState!=NULL){
 		setFogState(d3drenderState->mFogState);
 	}
-	if(d3drenderState->mPointState!=NULL){
-		setPointState(d3drenderState->mPointState);
+	if(d3drenderState->mGeometryState!=NULL){
+		setGeometryState(d3drenderState->mGeometryState);
 	}
 	if(d3drenderState->mMaterialState!=NULL){
 		setMaterialState(d3drenderState->mMaterialState);
@@ -675,7 +675,7 @@ void D3D9RenderDevice::setMaterialState(MaterialState *state){
 	}
 }
 
-void D3D9RenderDevice::setPointState(PointState *state){
+void D3D9RenderDevice::setGeometryState(GeometryState *state){
 	HRESULT result=S_OK;
 
 	#if !defined(TOADLET_SET_D3DM)

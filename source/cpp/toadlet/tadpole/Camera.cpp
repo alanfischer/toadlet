@@ -53,7 +53,7 @@ Camera::Camera(Engine *engine):
 		mDefaultState->setDepthState(DepthState());
 		mDefaultState->setRasterizerState(RasterizerState());
 		mDefaultState->setFogState(FogState());
-		mDefaultState->setPointState(PointState());
+		mDefaultState->setGeometryState(GeometryState());
 	}
 
 	mFPSData.resize(100);

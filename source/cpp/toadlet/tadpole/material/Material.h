@@ -49,12 +49,6 @@ public:
 		Scope_RENDERABLE=1<<1,
 	};
 
-	enum MatrixFlags{
-		MatrixFlag_NO_PERSPECTIVE=1<<0,
-		MatrixFlag_ASPECT_CORRECT=1<<1,
-		MatrixFlag_CAMERA_ALIGNED=1<<2,
-	};
-
 	typedef PointerCollection<RenderPath> PathCollection;
 
 	Material(MaterialManager *manager);
@@ -76,9 +70,6 @@ public:
 
 	inline void setLayer(int layer){mLayer=layer;}
 	inline int getLayer() const{return mLayer;}
-
-	void setModelMatrixFlags(int flags);
-	void setModelMatrixAlignAxis(const Vector3 &axis);
 
 	bool isDepthSorted() const;
 
