@@ -96,9 +96,8 @@ public:
 
 			for(int i=0;i<grass->getNumSubMeshes();++i){
 				Mesh::SubMesh *subMesh=grass->getSubMesh(i);
-				for(int j=0;j<subMesh->material->getNumPaths();++j){
-					RenderPath *path=subMesh->material->getPath(j);
-					RenderPass *pass=path->getPass(0);
+				tforeach(Material::PathCollection::iterator,path,subMesh->material->getPaths()){
+					RenderPass *pass=path->getPasses()[0];
 					RenderState *state=pass->getRenderState();
 
 					state->setBlendState(BlendState(BlendState::Combination_ALPHA));
@@ -117,10 +116,10 @@ public:
 			Material::ptr treeLeafBottom=engine->getMaterialManager()->findMaterial("leaf_bottom1_alpha.png");
 
 			if(treeLeafTop!=NULL && treeLeafBottom!=NULL){
-				for(int i=0;i<treeLeafTop->getNumPaths();++i){
+				for(int i=0;i<treeLeafTop->getPaths().size();++i){
 					RenderPath::ptr path=treeLeaf->addPath();
-					RenderPath::ptr topPath=treeLeafTop->getPath(i);
-					RenderPath::ptr bottomPath=treeLeafBottom->getPath(i);
+					RenderPath::ptr topPath=treeLeafTop->getPaths()[i];
+					RenderPath::ptr bottomPath=treeLeafBottom->getPaths()[i];
 
 					RenderPass::ptr topPass=path->addPass(topPath->takePass(0));
 					RenderState::ptr topState=topPass->getRenderState();
@@ -150,13 +149,13 @@ public:
 			renderState->setMaterialState(MaterialState(false));
 			renderState->setDepthState(DepthState(DepthState::DepthTest_LEQUAL,false));
 			renderState->setBlendState(BlendState(BlendState::Combination_ALPHA));
+			renderState->setGeometryState(GeometryState(GeometryState::MatrixFlag_ASPECT_CORRECT));
 			SamplerState samplerState;
 			samplerState.uAddress=SamplerState::AddressType_CLAMP_TO_EDGE;
 			samplerState.vAddress=SamplerState::AddressType_CLAMP_TO_EDGE;
 			samplerState.wAddress=SamplerState::AddressType_CLAMP_TO_EDGE;
 			renderState->setSamplerState(Shader::ShaderType_FRAGMENT,0,samplerState);
 			acorn=engine->createDiffuseMaterial(engine->getTextureManager()->findTexture("acorn.png"),renderState);
-			acorn->setModelMatrixFlags(Material::MatrixFlag_ASPECT_CORRECT);
 		}
 
 		// HUD
@@ -186,13 +185,13 @@ public:
 			renderState->setMaterialState(MaterialState(false));
 			renderState->setDepthState(DepthState(DepthState::DepthTest_LEQUAL,false));
 			renderState->setBlendState(BlendState(BlendState::Operation_ZERO,BlendState::Operation_SOURCE_COLOR));
+			renderState->setGeometryState(GeometryState(GeometryState::MatrixFlag_ASPECT_CORRECT));
 			SamplerState samplerState;
 			samplerState.uAddress=SamplerState::AddressType_CLAMP_TO_EDGE;
 			samplerState.vAddress=SamplerState::AddressType_CLAMP_TO_EDGE;
 			samplerState.wAddress=SamplerState::AddressType_CLAMP_TO_EDGE;
 			renderState->setSamplerState(Shader::ShaderType_FRAGMENT,0,samplerState);
 			compass=engine->createDiffuseMaterial(engine->getTextureManager()->findTexture("compass.png"),renderState);
-			compass->setModelMatrixFlags(Material::MatrixFlag_ASPECT_CORRECT);
 		}
 
 		wooden=engine->getFontManager()->findFont("Pinewood.ttf",100);
