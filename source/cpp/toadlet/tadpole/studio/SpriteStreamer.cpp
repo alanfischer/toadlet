@@ -83,13 +83,13 @@ void SpriteStreamer::buildMaterials(SpriteModel *model){
 	RenderState::ptr renderState=mEngine->getMaterialManager()->createRenderState();
 	if(renderState!=NULL){
 		renderState->setMaterialState(MaterialState(true,false,MaterialState::ShadeType_GOURAUD));
+		renderState->setGeometryState(GeometryState(GeometryState::MatrixFlag_CAMERA_ALIGNED));
 	}
 
 	model->materials.resize(model->header->numframes);
 	int i;
 	for(i=0;i<model->header->numframes;i++){
 		model->materials[i]=mEngine->createDiffuseMaterial(model->textures[i],renderState);
-		model->materials[i]->setModelMatrixFlags(Material::MatrixFlag_CAMERA_ALIGNED);
 	}
 }
 

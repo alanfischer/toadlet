@@ -34,7 +34,7 @@ D3D10RenderState::D3D10RenderState(D3D10RenderDevice *renderDevice):
 	mDepthState(NULL),
 	mRasterizerState(NULL),
 	mFogState(NULL),
-	mPointState(NULL),
+	mGeometryState(NULL),
 	mMaterialState(NULL),
 
 	mD3DBlendState(NULL),
@@ -62,9 +62,9 @@ void D3D10RenderState::destroy(){
 		delete mFogState;
 		mFogState=NULL;
 	}
-	if(mPointState!=NULL){
-		delete mPointState;
-		mPointState=NULL;
+	if(mGeometryState!=NULL){
+		delete mGeometryState;
+		mGeometryState=NULL;
 	}
 	if(mMaterialState!=NULL){
 		delete mMaterialState;
@@ -154,12 +154,12 @@ bool D3D10RenderState::getFogState(FogState &state) const{
 	if(mFogState==NULL){return false;}else{state.set(*mFogState);return true;}
 }
 
-void D3D10RenderState::setPointState(const PointState &state){
-	if(mPointState==NULL){mPointState=new PointState(state);}else{mPointState->set(state);}
+void D3D10RenderState::setGeometryState(const GeometryState &state){
+	if(mGeometryState==NULL){mGeometryState=new GeometryState(state);}else{mGeometryState->set(state);}
 }
 
-bool D3D10RenderState::getPointState(PointState &state) const{
-	if(mPointState==NULL){return false;}else{state.set(*mPointState);return true;}
+bool D3D10RenderState::getGeometryState(GeometryState &state) const{
+	if(mGeometryState==NULL){return false;}else{state.set(*mGeometryState);return true;}
 }
 
 void D3D10RenderState::setMaterialState(const MaterialState &state){

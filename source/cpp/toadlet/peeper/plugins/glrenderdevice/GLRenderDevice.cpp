@@ -357,7 +357,7 @@ bool GLRenderDevice::create(RenderTarget *target,int options){
 	mDefaultState->setBlendState(BlendState());
 	mDefaultState->setDepthState(DepthState());
 	mDefaultState->setFogState(FogState());
-	mDefaultState->setPointState(PointState());
+	mDefaultState->setGeometryState(GeometryState());
 	mDefaultState->setRasterizerState(RasterizerState());
 	mDefaultState->setMaterialState(MaterialState());
 
@@ -587,8 +587,8 @@ void GLRenderDevice::setViewport(const Viewport &viewport){
 			"setViewport called without a valid render target");
 	}
 
-	// Update PointState, since it is dependent upon viewport size
-	setPointState(&mPointState);
+	// Update GeometryState, since it is dependent upon viewport size
+	setGeometryState(&mGeometryState);
 
 	TOADLET_CHECK_GLERROR("setViewport");
 }
@@ -906,8 +906,8 @@ bool GLRenderDevice::setRenderState(RenderState *renderState){
 	if(glrenderState->mFogState!=NULL){
 		setFogState(glrenderState->mFogState);
 	}
-	if(glrenderState->mPointState!=NULL){
-		setPointState(glrenderState->mPointState);
+	if(glrenderState->mGeometryState!=NULL){
+		setGeometryState(glrenderState->mGeometryState);
 	}
 	if(glrenderState->mMaterialState!=NULL){
 		setMaterialState(glrenderState->mMaterialState);
@@ -1433,9 +1433,9 @@ void GLRenderDevice::setTexture(Shader::ShaderType shaderType,int i,Texture *tex
 	TOADLET_CHECK_GLERROR("setTexture");
 }
 
-void GLRenderDevice::setPointState(PointState *state){
+void GLRenderDevice::setGeometryState(GeometryState *state){
 #if defined(TOADLET_HAS_GLFIXED)
-	mPointState.set(*state);
+	mGeometryState.set(*state);
 
 	// pointsize = size / sqrt(constant + linear*d + quadratic*d*d)
 	// if a&b = 0, then quadratic = 1/(C*C) where C = first component of projMatrix * 1/2 screen width
@@ -1444,6 +1444,43 @@ void GLRenderDevice::setPointState(PointState *state){
 		if(state->sprite){
 			glEnable(GL_POINT_SPRITE);
 			value=1;
+
+			#if defined(TOADLET_FIXED_POINT)
+				#if defined(TOADLET_HAS_GLES)
+					glPointParameterx(GL_POINT_SIZE_MIN,state->minSize);
+					glPointParameterx(GL_POINT_SIZE_MAX,state->maxSize);
+				#else
+					glPointParameterf(GL_POINT_SIZE_MIN,MathConversion::scalarToFloat(state->minSize));
+					glPointParameterf(GL_POINT_SIZE_MAX,MathConversion::scalarToFloat(state->maxSize));
+				#endif
+			#else
+				glPointParameterf(GL_POINT_SIZE_MIN,state->minSize);
+				glPointParameterf(GL_POINT_SIZE_MAX,state->maxSize);
+			#endif
+
+			if(state->attenuated){
+				#if defined(TOADLET_FIXED_POINT)
+					#if defined(TOADLET_HAS_GLES)
+						cacheArray[0]=state->constant; cacheArray[1]=state->linear; cacheArray[2]=state->quadratic;
+						glPointParameterxv(GL_POINT_DISTANCE_ATTENUATION,cacheArray);
+					#else
+						cacheArray[0]=MathConversion::scalarToFloat(state->constant); cacheArray[1]=MathConversion::scalarToFloat(state->linear); cacheArray[2]=MathConversion::scalarToFloat(state->quadratic);
+						glPointParameterfv(GL_POINT_DISTANCE_ATTENUATION,cacheArray);
+					#endif
+				#else
+					cacheArray[0]=state->constant; cacheArray[1]=state->linear; cacheArray[2]=state->quadratic;
+					glPointParameterfv(GL_POINT_DISTANCE_ATTENUATION,cacheArray);
+				#endif
+			}
+			else{
+				#if defined(TOADLET_FIXED_POINT) && defined(TOADLET_HAS_GLES)
+					cacheArray[0]=Math::ONE; cacheArray[1]=0; cacheArray[2]=0;
+					glPointParameterxv(GL_POINT_DISTANCE_ATTENUATION,cacheArray);
+				#else
+					cacheArray[0]=1.0f; cacheArray[1]=0; cacheArray[2]=0;
+					glPointParameterfv(GL_POINT_DISTANCE_ATTENUATION,cacheArray);
+				#endif
+			}
 		}
 		else{
 			glDisable(GL_POINT_SPRITE);
@@ -1461,43 +1498,6 @@ void GLRenderDevice::setPointState(PointState *state){
 		else{
 			glTexEnvi(GL_POINT_SPRITE,GL_COORD_REPLACE,value);
 		}
-
-		#if defined(TOADLET_FIXED_POINT)
-			#if defined(TOADLET_HAS_GLES)
-				glPointParameterx(GL_POINT_SIZE_MIN,state->minSize);
-				glPointParameterx(GL_POINT_SIZE_MAX,state->maxSize);
-			#else
-				glPointParameterf(GL_POINT_SIZE_MIN,MathConversion::scalarToFloat(state->minSize));
-				glPointParameterf(GL_POINT_SIZE_MAX,MathConversion::scalarToFloat(state->maxSize));
-			#endif
-		#else
-			glPointParameterf(GL_POINT_SIZE_MIN,state->minSize);
-			glPointParameterf(GL_POINT_SIZE_MAX,state->maxSize);
-		#endif
-
-		if(state->attenuated){
-			#if defined(TOADLET_FIXED_POINT)
-				#if defined(TOADLET_HAS_GLES)
-					cacheArray[0]=state->constant; cacheArray[1]=state->linear; cacheArray[2]=state->quadratic;
-					glPointParameterxv(GL_POINT_DISTANCE_ATTENUATION,cacheArray);
-				#else
-					cacheArray[0]=MathConversion::scalarToFloat(state->constant); cacheArray[1]=MathConversion::scalarToFloat(state->linear); cacheArray[2]=MathConversion::scalarToFloat(state->quadratic);
-					glPointParameterfv(GL_POINT_DISTANCE_ATTENUATION,cacheArray);
-				#endif
-			#else
-				cacheArray[0]=state->constant; cacheArray[1]=state->linear; cacheArray[2]=state->quadratic;
-				glPointParameterfv(GL_POINT_DISTANCE_ATTENUATION,cacheArray);
-			#endif
-		}
-		else{
-			#if defined(TOADLET_FIXED_POINT) && defined(TOADLET_HAS_GLES)
-				cacheArray[0]=Math::ONE; cacheArray[1]=0; cacheArray[2]=0;
-				glPointParameterxv(GL_POINT_DISTANCE_ATTENUATION,cacheArray);
-			#else
-				cacheArray[0]=1.0f; cacheArray[1]=0; cacheArray[2]=0;
-				glPointParameterfv(GL_POINT_DISTANCE_ATTENUATION,cacheArray);
-			#endif
-		}
 	}
 
 	if(state->size>0){
@@ -1509,7 +1509,7 @@ void GLRenderDevice::setPointState(PointState *state){
 		}
 	}
 
-	TOADLET_CHECK_GLERROR("setPointState");
+	TOADLET_CHECK_GLERROR("setGeometryState");
 #endif
 }
 

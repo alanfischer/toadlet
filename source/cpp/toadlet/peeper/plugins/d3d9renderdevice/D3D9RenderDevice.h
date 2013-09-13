@@ -108,7 +108,7 @@ public:
 	void setDepthState(DepthState *state);
 	void setRasterizerState(RasterizerState *state);
 	void setFogState(FogState *state);
-	void setPointState(PointState *state);
+	void setGeometryState(GeometryState *state);
 	void setMaterialState(MaterialState *state);
 	void setSamplerState(int i,SamplerState *state);
 	void setSamplerStatePostTexture(int i,SamplerState *state);

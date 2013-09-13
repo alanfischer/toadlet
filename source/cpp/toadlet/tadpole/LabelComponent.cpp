@@ -100,7 +100,6 @@ void LabelComponent::setFont(Font *font){
 
 	if(mFont!=NULL){
 		mMaterial=mEngine->createFontMaterial(mFont);
-		mMaterial->setModelMatrixFlags(Material::MatrixFlag_CAMERA_ALIGNED);
 
 		if(mSharedRenderState!=NULL){
 			mMaterial=mEngine->getMaterialManager()->createSharedMaterial(mMaterial,mSharedRenderState);

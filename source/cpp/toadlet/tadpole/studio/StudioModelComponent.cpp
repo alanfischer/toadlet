@@ -201,7 +201,7 @@ void StudioModelComponent::setRenderSkeleton(bool skeleton){
 		if(mSkeletonMaterial==NULL){
 			RenderState::ptr renderState=mEngine->getMaterialManager()->createRenderState();
 			renderState->setDepthState(DepthState(DepthState::DepthTest_NEVER,false));
-			renderState->setPointState(PointState(true,8,false,0,0,0,0,0));
+			renderState->setGeometryState(GeometryState(true,8,false,0,0,0,0,0));
 			mSkeletonMaterial=mEngine->createDiffuseMaterial(NULL,renderState);
 		}
 	}

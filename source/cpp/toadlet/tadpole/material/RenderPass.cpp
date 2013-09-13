@@ -34,8 +34,7 @@ namespace tadpole{
 namespace material{
 
 RenderPass::RenderPass(MaterialManager *manager):
-	mManager(manager),
-	mModelMatrixFlags(0)
+	mManager(manager)
 {
 	if(mManager!=NULL){
 		mRenderState=mManager->createRenderState();
@@ -55,16 +54,14 @@ RenderPass::RenderPass(MaterialManager *manager):
 }
 
 RenderPass::RenderPass(MaterialManager *manager,RenderState *renderState,ShaderState *shaderState):
-	mManager(manager),
-	mModelMatrixFlags(0)
+	mManager(manager)
 {
 	mRenderState=renderState;
 	mShaderState=shaderState;
 }
 
 RenderPass::RenderPass(MaterialManager *manager,RenderPass *pass):
-	mManager(manager),
-	mModelMatrixFlags(0)
+	mManager(manager)
 {
 	mName=pass->mName;
 	mRenderState=pass->mRenderState;
@@ -73,8 +70,6 @@ RenderPass::RenderPass(MaterialManager *manager,RenderPass *pass):
 		mBuffers[i]=pass->mBuffers[i];
 		mTextures[i]=pass->mTextures[i];
 	}
-	mModelMatrixFlags=pass->mModelMatrixFlags;
-	mModelMatrixAlignAxis=pass->mModelMatrixAlignAxis;
 	mUnlinkedVariables=pass->mUnlinkedVariables;
 	mUnlinkedTextures=pass->mUnlinkedTextures;
 }

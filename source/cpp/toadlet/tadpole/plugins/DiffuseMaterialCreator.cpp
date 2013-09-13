@@ -364,7 +364,7 @@ Material::ptr DiffuseMaterialCreator::createPointSpriteMaterial(Texture *texture
 		renderState->setMaterialState(MaterialState(true,false,MaterialState::ShadeType_GOURAUD));
 		/// @todo: We need to sort out how to handle the case in GL where you can have Geometry Shaders and PointSprites both functional.
 		/// Though I suppose that would be in the GLRenderDevice, it would deactivate PointSprites if Geometry Shaders are used.
-		renderState->setPointState(PointState(true,size,attenuated));
+		renderState->setGeometryState(GeometryState(true,size,attenuated));
 	}
 
 	if(	mEngine->hasShader(Shader::ShaderType_VERTEX) &&

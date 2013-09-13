@@ -185,8 +185,8 @@ void MaterialManager::modifyRenderState(RenderState::ptr dst,RenderState::ptr sr
 	FogState fogState;
 	if(src->getFogState(fogState)) dst->setFogState(fogState);
 
-	PointState pointState;
-	if(src->getPointState(pointState)) dst->setPointState(pointState);
+	GeometryState geometryState;
+	if(src->getGeometryState(geometryState)) dst->setGeometryState(geometryState);
 
 	MaterialState materialState;
 	if(src->getMaterialState(materialState)) dst->setMaterialState(materialState);

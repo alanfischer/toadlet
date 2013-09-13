@@ -31,7 +31,7 @@
 #include <toadlet/peeper/DepthState.h>
 #include <toadlet/peeper/RasterizerState.h>
 #include <toadlet/peeper/FogState.h>
-#include <toadlet/peeper/PointState.h>
+#include <toadlet/peeper/GeometryState.h>
 #include <toadlet/peeper/MaterialState.h>
 #include <toadlet/peeper/SamplerState.h>
 #include <toadlet/peeper/TextureState.h>
@@ -49,14 +49,14 @@ public:
 		StateType_DEPTH=	1,
 		StateType_RASTERIZER=2,
 		StateType_FOG=		3,
-		StateType_POINT=	4,
+		StateType_GEOMETRY=	4,
 		StateType_MATERIAL=	5,
 
 		StateType_BIT_BLEND=	1<<StateType_BLEND,
 		StateType_BIT_DEPTH=	1<<StateType_DEPTH,
 		StateType_BIT_RASTERIZER=1<<StateType_RASTERIZER,
 		StateType_BIT_FOG=		1<<StateType_FOG,
-		StateType_BIT_POINT=	1<<StateType_POINT,
+		StateType_BIT_GEOMETRY=	1<<StateType_GEOMETRY,
 		StateType_BIT_MATERIAL=	1<<StateType_MATERIAL,
 	};
 
@@ -81,8 +81,8 @@ public:
 	virtual void setFogState(const FogState &state)=0;
 	virtual bool getFogState(FogState &state) const=0;
 
-	virtual void setPointState(const PointState &state)=0;
-	virtual bool getPointState(PointState &state) const=0;
+	virtual void setGeometryState(const GeometryState &state)=0;
+	virtual bool getGeometryState(GeometryState &state) const=0;
 
 	virtual void setMaterialState(const MaterialState &state)=0;
 	virtual bool getMaterialState(MaterialState &state) const=0;

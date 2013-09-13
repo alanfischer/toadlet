@@ -272,7 +272,7 @@ public:
 
 	void update(tbyte *data,SceneParameters *parameters){
 		float &size=*(float*)data;
-		size=parameters->getPointState().size;
+		size=parameters->getGeometryState().size;
 	}
 };
 
@@ -282,7 +282,7 @@ public:
 
 	void update(tbyte *data,SceneParameters *parameters){
 		float &attenuated=*(float*)data;
-		attenuated=parameters->getPointState().attenuated?Math::ONE:0;
+		attenuated=parameters->getGeometryState().attenuated?Math::ONE:0;
 	}
 };
 

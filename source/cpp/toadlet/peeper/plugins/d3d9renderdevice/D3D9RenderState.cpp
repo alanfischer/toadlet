@@ -35,7 +35,7 @@ D3D9RenderState::D3D9RenderState(D3D9RenderDevice *renderDevice):
 	mDepthState(NULL),
 	mRasterizerState(NULL),
 	mFogState(NULL),
-	mPointState(NULL),
+	mGeometryState(NULL),
 	mMaterialState(NULL)
 {}
 
@@ -56,9 +56,9 @@ void D3D9RenderState::destroy(){
 		delete mFogState;
 		mFogState=NULL;
 	}
-	if(mPointState!=NULL){
-		delete mPointState;
-		mPointState=NULL;
+	if(mGeometryState!=NULL){
+		delete mGeometryState;
+		mGeometryState=NULL;
 	}
 	if(mMaterialState!=NULL){
 		delete mMaterialState;

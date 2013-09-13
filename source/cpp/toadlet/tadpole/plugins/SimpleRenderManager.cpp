@@ -122,9 +122,8 @@ void SimpleRenderManager::setupPassForRenderable(RenderPass *pass,RenderDevice *
 	Matrix4x4 matrix;
 	renderable->getRenderTransform()->getMatrix(matrix);
 
-	// This should exist as a RenderVariable, but to support fixed devices it is calculated here
-	int flags=pass->getModelMatrixFlags();
-	if(flags!=0){
+	GeometryState state;
+	if(pass->getRenderState()->getGeometryState(state) && state.matrixFlags!=0){
 		Vector3 translate;
 		Quaternion rotate;
 		Vector3 scale;
@@ -132,8 +131,8 @@ void SimpleRenderManager::setupPassForRenderable(RenderPass *pass,RenderDevice *
 		Math::setQuaternionFromMatrix4x4(rotate,matrix);
 		Math::setScaleFromMatrix4x4(scale,matrix);
 
-		if((flags&Material::MatrixFlag_CAMERA_ALIGNED)!=0){
-			Vector3 axis=pass->getModelMatrixAlignAxis();
+		if((state.matrixFlags&GeometryState::MatrixFlag_CAMERA_ALIGNED)!=0){
+			Vector3 axis=state.matrixAlignAxis;
 			if(axis==Math::ZERO_VECTOR3 && camera->getAlignmentCalculationsUseOrigin()){
 				axis=camera->getUp();
 			}
@@ -153,7 +152,7 @@ void SimpleRenderManager::setupPassForRenderable(RenderPass *pass,RenderDevice *
 			}
 		}
 
-		if((flags&Material::MatrixFlag_NO_PERSPECTIVE)!=0){
+		if((state.matrixFlags&GeometryState::MatrixFlag_NO_PERSPECTIVE)!=0){
 			Vector4 point;
 			point.set(translate,Math::ONE);
 			Math::mul(point,camera->getViewMatrix());
@@ -161,7 +160,7 @@ void SimpleRenderManager::setupPassForRenderable(RenderPass *pass,RenderDevice *
 			Math::mul(scale,point.w);
 		}
 
-		if((flags&Material::MatrixFlag_ASPECT_CORRECT)!=0){
+		if((state.matrixFlags&GeometryState::MatrixFlag_ASPECT_CORRECT)!=0){
 			const Viewport &viewport=mParams->getViewport();
 			scale.x=Math::mul(scale.x,Math::div(Math::fromInt(viewport.height),Math::fromInt(viewport.width)));
 		}

@@ -48,7 +48,7 @@ public:
 
 	int getSetStates() const{
 		if(mBack!=NULL){return mBack->getSetStates();}
-		else{return ((mBlendState!=NULL)<<StateType_BLEND) | ((mDepthState!=NULL)<<StateType_DEPTH) | ((mRasterizerState!=NULL)<<StateType_RASTERIZER) | ((mFogState!=NULL)<<StateType_FOG) | ((mPointState!=NULL)<<StateType_POINT) | ((mMaterialState!=NULL)<<StateType_MATERIAL);}
+		else{return ((mBlendState!=NULL)<<StateType_BLEND) | ((mDepthState!=NULL)<<StateType_DEPTH) | ((mRasterizerState!=NULL)<<StateType_RASTERIZER) | ((mFogState!=NULL)<<StateType_FOG) | ((mGeometryState!=NULL)<<StateType_GEOMETRY) | ((mMaterialState!=NULL)<<StateType_MATERIAL);}
 	}
 
 	virtual void setBlendState(const BlendState &state){
@@ -87,13 +87,13 @@ public:
 		else if(mFogState==NULL){return false;}else{state.set(*mFogState);return true;}
 	}
 
-	virtual void setPointState(const PointState &state){
-		if(mPointState==NULL){mPointState=new PointState(state);}else{mPointState->set(state);}
-		if(mBack!=NULL){mBack->setPointState(state);}
+	virtual void setGeometryState(const GeometryState &state){
+		if(mGeometryState==NULL){mGeometryState=new GeometryState(state);}else{mGeometryState->set(state);}
+		if(mBack!=NULL){mBack->setGeometryState(state);}
 	}
-	virtual bool getPointState(PointState &state) const{
-		if(mBack!=NULL){return mBack->getPointState(state);}
-		else if(mPointState==NULL){return false;}else{state.set(*mPointState);return true;}
+	virtual bool getGeometryState(GeometryState &state) const{
+		if(mBack!=NULL){return mBack->getGeometryState(state);}
+		else if(mGeometryState==NULL){return false;}else{state.set(*mGeometryState);return true;}
 	}
 
 	virtual void setMaterialState(const MaterialState &state){
@@ -183,7 +183,7 @@ protected:
 	DepthState *mDepthState;
 	RasterizerState *mRasterizerState;
 	FogState *mFogState;
-	PointState *mPointState;
+	GeometryState *mGeometryState;
 	MaterialState *mMaterialState;
 #if defined(FULLY_BACKED)
 	Collection<SamplerState*> mSamplerStates[Shader::ShaderType_MAX];

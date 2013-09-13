@@ -105,22 +105,6 @@ RenderPass::ptr Material::getPass(int pathIndex,int passIndex){
 	}
 }
 
-void Material::setModelMatrixFlags(int flags){
-	tforeach(PathCollection::iterator,path,mPaths){
-		tforeach(RenderPath::PassCollection::iterator,pass,path->getPasses()){
-			pass->setModelMatrixFlags(flags);
-		}
-	}
-}
-
-void Material::setModelMatrixAlignAxis(const Vector3 &axis){
-	tforeach(PathCollection::iterator,path,mPaths){
-		tforeach(RenderPath::PassCollection::iterator,pass,path->getPasses()){
-			pass->setModelMatrixAlignAxis(axis);
-		}
-	}
-}
-
 bool Material::isDepthSorted() const{
 	switch(mSort){
 		case SortType_DEPTH:
