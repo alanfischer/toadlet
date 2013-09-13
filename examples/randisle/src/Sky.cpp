@@ -17,8 +17,10 @@ Sky::Sky(Scene *scene,int cloudSize,const Vector4 &skyColor,const Vector4 &fadeC
 	Texture::ptr glowTexture=mEngine->getTextureManager()->createTexture(glowFormat,glowData);
 	delete[] glowData;
 
-	Material::ptr sunMaterial=mEngine->createDiffuseMaterial(glowTexture);
-	sunMaterial->setModelMatrixFlags(Material::MatrixFlag_CAMERA_ALIGNED);
+	RenderState::ptr renderState=mEngine->getMaterialManager()->createRenderState();
+	renderState->setGeometryState(GeometryState(GeometryState::MatrixFlag_CAMERA_ALIGNED));
+
+	Material::ptr sunMaterial=mEngine->createDiffuseMaterial(glowTexture,renderState);
 	sunMaterial->setLayer(-1);
 	sunMaterial->setSort(Material::SortType_MATERIAL);
 	sunMaterial->compile();
