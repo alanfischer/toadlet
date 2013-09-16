@@ -106,9 +106,9 @@ public:
 	void renderBoundingVolumes(RenderDevice *renderDevice,Node *node=NULL);
 
 	virtual void preContextReset(RenderDevice *renderDevice){}
-	virtual void postContextReset(RenderDevice *renderDevice){postContextActivate(renderDevice);}
+	virtual void postContextReset(RenderDevice *renderDevice);
 	virtual void preContextActivate(RenderDevice *renderDevice){}
-	virtual void postContextActivate(RenderDevice *renderDevice);
+	virtual void postContextActivate(RenderDevice *renderDevice){}
 	virtual void preContextDeactivate(RenderDevice *renderDevice){}
 	virtual void postContextDeactivate(RenderDevice *renderDevice){}
 

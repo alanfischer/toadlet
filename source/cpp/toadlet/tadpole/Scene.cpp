@@ -270,7 +270,8 @@ void Scene::destroy(Component *component){
 	}
 }
 
-void Scene::postContextActivate(RenderDevice *device){
+void Scene::postContextReset(RenderDevice *device){
+	/// @todo: Should this be replaced with individual items registering for context notifications?
 	mResetFrame=true;
 	mRoot->activate();
 	mRoot->frameUpdate(0,-1);

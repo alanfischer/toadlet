@@ -172,39 +172,37 @@ bool TerrainPatchComponent::setHeightData(scalar *data,int rowPitch,int width,in
 		// Iterate backwards so verts needed for normals are set
 		for(j=mSize-1;j>=0;--j){
 			for(i=mSize-1;i>=0;--i){
-				int index=indexOf(i,j);
 				Vertex *vertex=vertexAt(i,j);
 
 				vertex->height=data[j*rowPitch+i];
 				vertex->normal.set(vertex->height-vertexAt(i+1,j)->height,vertex->height-vertexAt(i,j+1)->height,Math::ONE);
 				Math::normalize(vertex->normal);
 
-				vba.set3(index,0,i,j,vertex->height);
-				vba.set3(index,1,vertex->normal);
-				vba.set2(index,2,Math::div(Math::fromInt(i)+Math::HALF,mSize),Math::div(Math::fromInt(j)+Math::HALF,mSize));
+				int vi=indexOf(i,j);
+				vba.set3(vi,0,i,j,vertex->height);
+				vba.set3(vi,1,vertex->normal);
+				vba.set2(vi,2,Math::div(Math::fromInt(i)+Math::HALF,mSize),Math::div(Math::fromInt(j)+Math::HALF,mSize));
 			}
 		}
 
 		j=mSize;
 		for(i=0;i<mSize+1;i++){
-			int si=indexOf(i,j);
-
 			vertexAt(i,j)->height=vertexAt(i,j-1)->height;
 
-			vba.set3(si,0,i,j,vertexAt(i,j)->height);
-			vba.set3(si,1,0,0,Math::ONE);
-			vba.set2(si,2,Math::div(Math::fromInt(i)+Math::HALF,mSize),Math::div(Math::fromInt(j)+Math::HALF,mSize));
+			int vi=indexOf(i,j);
+			vba.set3(vi,0,i,j,vertexAt(i,j)->height);
+			vba.set3(vi,1,0,0,Math::ONE);
+			vba.set2(vi,2,Math::div(Math::fromInt(i)+Math::HALF,mSize),Math::div(Math::fromInt(j)+Math::HALF,mSize));
 		}
 
 		i=mSize;
 		for(j=0;j<mSize+1;j++){
-			int si=indexOf(i,j);
-
 			vertexAt(i,j)->height=vertexAt(i-1,j)->height;
 
-			vba.set3(si,0,i,j,vertexAt(i,j)->height);
-			vba.set3(si,1,0,0,Math::ONE);
-			vba.set2(si,2,Math::div(Math::fromInt(i)+Math::HALF,mSize),Math::div(Math::fromInt(j)+Math::HALF,mSize));
+			int vi=indexOf(i,j);
+			vba.set3(vi,0,i,j,vertexAt(i,j)->height);
+			vba.set3(vi,1,0,0,Math::ONE);
+			vba.set2(vi,2,Math::div(Math::fromInt(i)+Math::HALF,mSize),Math::div(Math::fromInt(j)+Math::HALF,mSize));
 		}
 	}
 	vba.unlock();
@@ -232,10 +230,10 @@ bool TerrainPatchComponent::setHeightData(scalar *data,int rowPitch,int width,in
 			// Iterate backwards so verts needed for normals are set
 			for(j=mSize;j>=0;--j){
 				for(i=mSize;i>=0;--i){
-					int index=indexOf(i,j);
-					vba.set3(index,0,i,j,0);
-					vba.set3(index,1,Math::Z_UNIT_VECTOR3);
-					vba.set2(index,2,Math::div(Math::fromInt(i)+Math::HALF,mSize),Math::div(Math::fromInt(j)+Math::HALF,mSize));
+					int vi=indexOf(i,j);
+					vba.set3(vi,0,i,j,0);
+					vba.set3(vi,1,Math::Z_UNIT_VECTOR3);
+					vba.set2(vi,2,Math::div(Math::fromInt(i)+Math::HALF,mSize),Math::div(Math::fromInt(j)+Math::HALF,mSize));
 				}
 			}
 		}

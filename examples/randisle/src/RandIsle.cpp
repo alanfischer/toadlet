@@ -202,7 +202,7 @@ void RandIsle::create(){
 
 	VertexBuffer::ptr predictedVertexBuffer=mEngine->getBufferManager()->createVertexBuffer(Buffer::Usage_BIT_STREAM,Buffer::Access_BIT_WRITE,mEngine->getVertexFormats().POSITION_COLOR,512);
 	mPredictedVertexData=new VertexData(predictedVertexBuffer);
-	mPredictedIndexData=new IndexData(IndexData::Primitive_TRISTRIP,NULL,0,predictedVertexBuffer->getSize());
+	mPredictedIndexData=new IndexData(IndexData::Primitive_TRISTRIP,NULL,0,0);
 	RenderState::ptr renderState=mEngine->getMaterialManager()->createRenderState();
 	renderState->setDepthState(DepthState(DepthState::DepthTest_ALWAYS,false));
 	renderState->setRasterizerState(RasterizerState(RasterizerState::CullType_NONE));
@@ -518,7 +518,7 @@ void RandIsle::updateProps(){
 	Segment segment;
 	Vector2 origin(mPlayer->getPhysics()->getPosition().x,mPlayer->getPhysics()->getPosition().y);
 	Random r(System::mtime());
-	for(Node::NodeCollection::iterator prop=mProps->getNodes().begin();prop!=mProps->getNodes().begin();++prop){
+	tforeach(Node::NodeCollection::iterator,prop,mProps->getNodes()){
 		Vector2 propOrigin(prop->getWorldTranslate().x,prop->getWorldTranslate().y);
 		scalar d=Math::length(propOrigin,origin);
 		scalar a=Math::ONE-(d-minDist)/(maxDist-minDist);
@@ -917,8 +917,7 @@ bool RandIsle::getPatchHeightData(scalar *data,int px,int py){
 		for(int y=0;y<size;++y){
 			float tx=(float)(px*size+x - size/2)/(float)size;
 			float ty=(float)(py*size+y - size/2)/(float)size;
-			scalar v=terrainValue(tx,ty);
-			data[y*size+x]=v;
+			data[y*size+x]=terrainValue(tx,ty);
 		}
 	}
 	return true;

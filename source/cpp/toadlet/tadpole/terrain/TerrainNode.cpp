@@ -267,6 +267,20 @@ void TerrainNode::logicUpdate(int dt,int scope){
 	updateTarget();
 }
 
+void TerrainNode::frameUpdate(int dt,int scope){
+	Node::frameUpdate(dt,scope);
+
+	if(mScene->getResetFrame()){
+		int x,y;
+		for(y=mTerrainY-mHalfSize;y<=mTerrainY+mHalfSize;++y){
+			for(x=mTerrainX-mHalfSize;x<=mTerrainX+mHalfSize;++x){
+				destroyPatch(x,y);
+				createPatch(x,y);
+			}
+		}
+	}
+}
+
 void TerrainNode::traceSegment(PhysicsCollision &result,const Vector3 &position,const Segment &segment,const Vector3 &size){
 	result.time=Math::ONE;
 

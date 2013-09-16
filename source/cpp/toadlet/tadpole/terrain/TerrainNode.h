@@ -110,6 +110,7 @@ public:
 	void gatherRenderables(Camera *camera,RenderableSet *set);
 
 	void logicUpdate(int dt,int scope);
+	void frameUpdate(int dt,int scope);
 
 	// PhysicsTraceable
 	Bound *getTraceableBound() const{return Node::getBound();}
