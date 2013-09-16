@@ -474,13 +474,19 @@ void Engine::setHasMaximumFixed(bool has){
 }
 
 bool Engine::setRenderDevice(RenderDevice *renderDevice){
+	bool reset=false;
+
 	if(renderDevice!=NULL){
 		if(isBackable()==false && mRenderDeviceChanged){
 			Error::unknown(Categories::TOADLET_TADPOLE,"can not change RenderDevice in an unbacked engine");
 			return false;
 		}
-		else{
+		else if(mRenderDeviceChanged==false){
 			mRenderDeviceChanged=true;
+		}
+		else{
+			// Reset on subsequent RenderDevice changes
+			reset=true;
 		}
 
 		renderDevice->getRenderCaps(mRenderCaps);
@@ -521,6 +527,10 @@ bool Engine::setRenderDevice(RenderDevice *renderDevice){
 
 	if(renderDevice!=lastRenderDevice && renderDevice!=NULL){
 		contextActivate(renderDevice);
+
+		if(reset){
+			contextReset(renderDevice);
+		}
 	}
 
 	return true;

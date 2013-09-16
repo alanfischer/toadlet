@@ -27,6 +27,7 @@ set (SRC
 	../src/RandIsle.cpp
 	../src/Resources.cpp
 	../src/Sky.cpp
+	../src/TreeComponent.cpp
 	../src/TreeSystem.cpp
 )
 

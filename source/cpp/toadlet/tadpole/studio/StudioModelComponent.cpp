@@ -154,7 +154,7 @@ void StudioModelComponent::logicUpdate(int dt,int scope){
 }
 
 void StudioModelComponent::frameUpdate(int dt,int scope){
-	if(mSkeletonDirty){
+	if(mSkeletonDirty || mParent->getScene()->getResetFrame()){
 		updateSkeleton();
 	}
 }
