@@ -274,8 +274,8 @@ void TerrainNode::frameUpdate(int dt,int scope){
 		int x,y;
 		for(y=mTerrainY-mHalfSize;y<=mTerrainY+mHalfSize;++y){
 			for(x=mTerrainX-mHalfSize;x<=mTerrainX+mHalfSize;++x){
-				destroyPatch(x,y);
-				createPatch(x,y);
+				destroyPatch(x,y,false);
+				createPatch(x,y,false);
 			}
 		}
 	}
@@ -377,7 +377,7 @@ void TerrainNode::updateTarget(){
 	}
 }
 
-void TerrainNode::createPatch(int x,int y){
+void TerrainNode::createPatch(int x,int y,bool notify){
 	Log::debug("TerrainNode::createPatch");
 
 	TerrainPatchComponent::ptr patch=mUnactivePatches.back();mUnactivePatches.pop_back();
@@ -420,12 +420,12 @@ void TerrainNode::createPatch(int x,int y){
 
 	patch->getParent()->boundChanged();
 
-	if(mListener!=NULL){
+	if(notify && mListener!=NULL){
 		mListener->terrainPatchCreated(x,y,patch->getParent()->getWorldBound());
 	}
 }
 
-void TerrainNode::destroyPatch(int x,int y){
+void TerrainNode::destroyPatch(int x,int y,bool notify){
 	Log::debug("TerrainNode::destroyPatch");
 
 	TerrainPatchComponent::ptr patch=patchAt(x,y);
@@ -445,7 +445,7 @@ void TerrainNode::destroyPatch(int x,int y){
 
 	remove(patch->getParent());
 
-	if(mListener!=NULL){
+	if(notify && mListener!=NULL){
 		mListener->terrainPatchDestroyed(x,y,patch->getParent()->getWorldBound());
 	}
 
