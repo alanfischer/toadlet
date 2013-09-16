@@ -2,59 +2,6 @@
 #include <iostream>
 #include <sstream>
 
-class TextureArchive:public BaseResource,public Archive{
-public:
-	TOADLET_RESOURCE(TextureArchive,Archive);
-
-	TextureArchive(){}
-	void destroy(){}
-
-	bool open(Stream::ptr stream){return true;}
-	bool isResourceArchive() const{return false;}
-
-	void setDirectory(const String &directory){
-		if(directory.length()>0){
-			mDirectory=directory+"/";
-		}
-		else{
-			mDirectory=directory;
-		}
-	}
-
-	void setSecondaryDirectory(const String &directory){
-		if(directory.length()>0){
-			mSecondaryDirectory=directory+"/";
-		}
-		else{
-			mSecondaryDirectory=directory;
-		}
-	}
-
-	Stream::ptr openStream(const String &name){
-		FileStream::ptr stream=new FileStream(mDirectory+name,FileStream::Open_READ_BINARY);
-		if(stream->closed()){
-			if(mSecondaryDirectory.length()>0){
-				stream=new FileStream(mSecondaryDirectory+name,FileStream::Open_READ_BINARY);
-				if(stream->closed()){
-					stream=NULL;
-				}
-			}
-			else{
-				stream=NULL;
-			}
-		}
-		return stream;
-	}
-
-	Resource::ptr openResource(const String &name){return NULL;}
-
-	Collection<String>::ptr getEntries(){return Collection<String>::ptr();}
-
-protected:
-	String mDirectory;
-	String mSecondaryDirectory;
-};
-
 int main(int argc,char **argv){
 	String arg;
 	Collection<String> files;
@@ -137,16 +84,13 @@ int main(int argc,char **argv){
 	std::cout << "--tmsh2bac--" << std::endl;
 
 	// Create a toadlet engine
-	Log::getInstance()->setCategoryReportingLevel(Categories::TOADLET_EGG_LOGGER,Logger::Level_DISABLED);
 	Log::getInstance()->setCategoryReportingLevel(Categories::TOADLET_EGG,Logger::Level_WARNING);
 	Log::getInstance()->setCategoryReportingLevel(Categories::TOADLET_TADPOLE,Logger::Level_WARNING);
 	Engine::ptr engine=new Engine();
 	engine->setBackableRenderCaps(engine->getMaximumRenderCaps());
 	engine->installHandlers();
 
-	TextureArchive::ptr textureArchive=new TextureArchive();
-	textureArchive->setDirectory(texDir);
-	engine->getArchiveManager()->manage(shared_static_cast<Archive>(textureArchive));
+	engine->getArchiveManager()->addDirectory(texDir);
 
 	std::cout << "Compiling a version " << version << " file" << std::endl;
 
@@ -162,10 +106,7 @@ int main(int argc,char **argv){
 
 		int last=Math::maxVal(mshFileName.rfind('/'),mshFileName.rfind('\\'));
 		if(last>0){
-			textureArchive->setSecondaryDirectory(mshFileName.substr(0,last));
-		}
-		else{
-			textureArchive->setSecondaryDirectory("");
+			engine->getArchiveManager()->addDirectory(mshFileName.substr(0,last));
 		}
 
 		// Load the mesh data

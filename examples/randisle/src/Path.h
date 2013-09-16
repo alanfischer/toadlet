@@ -1,9 +1,7 @@
 #ifndef PATH_H
 #define PATH_H
 
-#include <toadlet/tadpole.h>
-
-using namespace toadlet;
+#include <toadlet/toadlet.h>
 
 class Path{
 public:

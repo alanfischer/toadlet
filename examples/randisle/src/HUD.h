@@ -1,9 +1,7 @@
 #ifndef HUD_H
 #define HUD_H
 
-#include <toadlet/tadpole.h>
-
-using namespace toadlet;
+#include <toadlet/toadlet.h>
 
 class HUD:public Node{
 public:

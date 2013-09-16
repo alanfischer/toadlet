@@ -1,13 +1,9 @@
 #ifndef CLOUDS_H
 #define CLOUDS_H
 
-#include <toadlet/egg.h>
-#include <toadlet/peeper.h>
-#include <toadlet/tadpole.h>
+#include <toadlet/toadlet.h>
 #include <toadlet/tadpole/plugins/SkyDomeMeshCreator.h>
 #include <toadlet/tadpole/plugins/SkyBoxMaterialCreator.h>
-
-using namespace toadlet;
 
 class Clouds:public BaseComponent,public ContextListener{
 public:

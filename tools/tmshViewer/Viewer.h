@@ -1,8 +1,7 @@
 #ifndef VIEWER_H
 #define VIEWER_H
 
-#include <toadlet/tadpole.h>
-#include <toadlet/pad.h>
+#include <toadlet/toadlet.h>
 
 class Viewer:public Object,public Applet{
 public:

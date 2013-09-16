@@ -33,11 +33,13 @@ foreach (TOADLET_LIBRARY ${TOADLET_LIBRARY_LIST})
 	endforeach (H_FILE)
 
 	file (APPEND ${HEADER_FILE} ""\n)
-
+	
+	file (APPEND ${HEADER_FILE} "namespace toadlet{"\n)
 	file (APPEND ${HEADER_FILE} "using namespace toadlet::${TOADLET_LIBRARY};\n")
 	foreach (NAMESPACE ${${UPPERNAME}_NAMESPACES})
 		file (APPEND ${HEADER_FILE} "using namespace toadlet::${TOADLET_LIBRARY}::${NAMESPACE};\n")
 	endforeach (NAMESPACE)
+	file (APPEND ${HEADER_FILE} "}"\n)
 
 	file (APPEND ${HEADER_FILE} "\n")
 	file (APPEND ${HEADER_FILE} "#endif\n")
@@ -55,6 +57,10 @@ file (APPEND ${HEADER_FILE} ""\n)
 foreach (TOADLET_LIBRARY ${TOADLET_LIBRARY_LIST})
 	file (APPEND ${HEADER_FILE} "#include <toadlet/${TOADLET_LIBRARY}.h>\n")
 endforeach (TOADLET_LIBRARY)
+
+file (APPEND ${HEADER_FILE} "\n")
+
+file (APPEND ${HEADER_FILE} "using namespace toadlet;\n")
 
 file (APPEND ${HEADER_FILE} "\n")
 file (APPEND ${HEADER_FILE} "#endif\n")

@@ -1,11 +1,8 @@
 #ifndef TREECOMPONENT_H
 #define TREECOMPONENT_H
 
-#include <toadlet/peeper.h>
-#include <toadlet/tadpole.h>
+#include <toadlet/toadlet.h>
 #include "TreeSystem.h"
-
-using namespace toadlet;
 
 class TreeComponent:public BaseComponent,public BranchSystem::BranchListener,public Spacial,public DetailTraceable{
 public:
