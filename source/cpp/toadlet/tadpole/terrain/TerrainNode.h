@@ -117,8 +117,8 @@ public:
 	void traceSegment(PhysicsCollision &result,const Vector3 &position,const Segment &segment,const Vector3 &size);
 
 	void updateTarget();
-	void createPatch(int x,int y);
-	void destroyPatch(int x,int y);
+	void createPatch(int x,int y,bool notify=true);
+	void destroyPatch(int x,int y,bool notify=true);
 	void updateBound();
 
 	void updatePatches(Camera *camera);
