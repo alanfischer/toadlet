@@ -1,5 +1,7 @@
 #include <toadlet/pad.h>
 
+using namespace toadlet::pad;
+
 extern Applet *createApplet(Application *app);
 
 int toadletMain(int argc,char **argv){

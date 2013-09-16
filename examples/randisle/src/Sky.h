@@ -1,10 +1,8 @@
 #ifndef SKY_H
 #define SKY_H
 
-#include <toadlet/tadpole.h>
+#include <toadlet/toadlet.h>
 #include "Clouds.h"
-
-using namespace toadlet;
 
 class Sky:public Node{
 public:

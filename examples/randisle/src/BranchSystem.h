@@ -1,10 +1,7 @@
 #ifndef BRANCHSYSTEM_H
 #define BRANCHSYSTEM_H
 
-#include <toadlet/egg.h>
-#include <toadlet/tadpole.h>
-
-using namespace toadlet;
+#include <toadlet/toadlet.h>
 
 class BranchSystem:public Object{
 public:

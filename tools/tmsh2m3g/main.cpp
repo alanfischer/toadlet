@@ -70,7 +70,6 @@ int main(int argc,char **argv){
 	std::cout << "Converting " << (const char*)mshFileName << std::endl;
 
 	// Create a toadlet engine
-	Log::getInstance()->setCategoryReportingLevel(Categories::TOADLET_EGG_LOGGER,Logger::Level_DISABLED);
 	Log::getInstance()->setCategoryReportingLevel(Categories::TOADLET_EGG,Logger::Level_WARNING);
 	Log::getInstance()->setCategoryReportingLevel(Categories::TOADLET_TADPOLE,Logger::Level_WARNING);
 	Engine::ptr engine=new Engine();

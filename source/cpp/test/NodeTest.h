@@ -23,7 +23,7 @@
  *
  ********** Copyright header - do not remove **********/
 
-#include <toadlet/tadpole.h>
+#include <toadlet/toadlet.h>
 
 class NodeTest{
 public:

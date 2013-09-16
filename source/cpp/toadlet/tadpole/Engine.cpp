@@ -113,6 +113,8 @@ namespace toadlet{
 namespace tadpole{
 
 Engine::Engine(void *env,void *ctx):
+	mEnv(NULL),
+	mCtx(NULL),
 	mRenderDevice(NULL),
 	mRenderDeviceChanged(false),
 	mAudioDevice(NULL),

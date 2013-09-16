@@ -1,7 +1,7 @@
 #ifndef MESHOPTIMIZER_H
 #define MESHOPTIMIZER_H
 
-#include <toadlet/tadpole.h>
+#include <toadlet/toadlet.h>
 
 class MeshOptimizer{
 public:
