@@ -1,4 +1,4 @@
-# Android toadlet uses java libraries for flick, peeper, ribbit, tadpole and pad.
+# Android toadlet uses java libraries for egg, flick, peeper, ribbit, tadpole and pad.
 
 # Special settings for debug builds
 string (TOUPPER ${CMAKE_BUILD_TYPE} BUILD_TYPE)
@@ -44,6 +44,29 @@ set (CMAKE_JAVA_COMPILE_FLAGS -Xlint:unchecked)
 
 
 # Compile jars for each library
+
+set (EGG_SRC
+	${EGG_SWIG_INT_OUTPUTS}
+)
+
+set (EGG_H
+)
+
+# Create the jar file with UseJava.cmake functions. See UseJava.cmake for details.
+if (${BUILD_TYPE} STREQUAL "DEBUG")
+	set (CMAKE_JAVA_TARGET_OUTPUT_NAME jtoadlet_egg_d)
+endif (${BUILD_TYPE} STREQUAL "DEBUG")
+set (CMAKE_JAR_CLASSES_PREFIX us/toadlet/egg)
+add_jar (jtoadlet_egg ${EGG_SRC})
+get_property (JARFILE TARGET jtoadlet_egg PROPERTY JAR_FILE)
+add_dependencies(jtoadlet_egg toadlet_egg)
+install (FILES ${JARFILE} DESTINATION ${JAR_INSTALL_DIR} COMPONENT egg)
+
+# Generate headers
+#add_custom_command (TARGET jtoadlet_egg POST_BUILD
+#	COMMAND ${Java_JAVAH_EXECUTABLE} -classpath ${JARFILE} ${EGG_H}
+#)
+
 
 set (FLICK_SRC
 	us/toadlet/flick/AndroidSensorDevice.java
