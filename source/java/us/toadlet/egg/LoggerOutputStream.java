@@ -1,7 +1,6 @@
-package com.logikworks.jag;
+package us.toadlet.egg;
 
 import java.io.*;
-import us.toadlet.egg.*;
 
 public class LoggerOutputStream extends OutputStream{
 	public LoggerOutputStream(Logger logger,String category,int level){
