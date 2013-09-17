@@ -46,6 +46,7 @@ set (CMAKE_JAVA_COMPILE_FLAGS -Xlint:unchecked)
 # Compile jars for each library
 
 set (EGG_SRC
+	us/toadlet/egg/LoggerOutputStream.java
 	${EGG_SWIG_INT_OUTPUTS}
 )
 
