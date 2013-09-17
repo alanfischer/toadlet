@@ -32,11 +32,13 @@
 #  TOADLET_RIBBIT_DLL
 #  TOADLET_TADPOLE_DLL
 #  TOADLET_PAD_DLL
-# Android builds with ndk api level < 9 only
-#  TOADLET_PEEPER_JAR
-#  TOADLET_RIBBIT_JAR
-#  TOADLET_TADPOLE_JAR
-#  TOADLET_PAD_JAR
+# Android builds 
+#  JTOADLET_EGG_JAR
+#  JTOADLET_FLICK_JAR
+#  JTOADLET_PEEPER_JAR
+#  JTOADLET_RIBBIT_JAR
+#  JTOADLET_TADPOLE_JAR
+#  JTOADLET_PAD_JAR
 # 
 # Caveats:
 # The generator will be queried for the build configurations (debug or optimized) and the proper library types assigned.
@@ -115,37 +117,42 @@ set (TOADLET_LIB_BASENAMES
 if (ANDROID) 
 	set (LIBRARY_SEARCH_SUFFIXES ${NDK_NAME_ARCH})
 
-	if (${ANDROID_NDK_API_LEVEL} LESS 9)
-		set (TOADLET_JAR_BASENAMES jtoadlet_flick jtoadlet_peeper jtoadlet_ribbit jtoadlet_tadpole jtoadlet_pad)
+	set (TOADLET_JAR_BASENAMES 
+		jtoadlet_egg
+		jtoadlet_flick
+		jtoadlet_peeper
+		jtoadlet_ribbit
+		jtoadlet_tadpole
+		jtoadlet_pad
+	)
 
-		# Search for and assign the android jar files
-		foreach (TOADLET_JAR ${TOADLET_JAR_BASENAMES})
-			string (TOUPPER ${TOADLET_JAR} TOADLET_JAR_VAR)
+	# Search for and assign the android jar files
+	foreach (TOADLET_JAR ${TOADLET_JAR_BASENAMES})
+		string (TOUPPER ${TOADLET_JAR} TOADLET_JAR_VAR)
 
-			# Only search for a library if we haven't already
-			# Otherwise the debug/release assignment settings below will cause trouble with multiple runs
-			if (NOT ${TOADLET_JAR_VAR}_FOUND)
-				# Find release and debug
-				find_file (${TOADLET_JAR_VAR}_JAR NAMES ${TOADLET_JAR}.jar PATHS ${LIBRARY_SEARCH_PATHS} PATH_SUFFIXES lib)
-				find_file (${TOADLET_JAR_VAR}_JAR_D NAMES ${TOADLET_JAR}_d.jar PATHS ${LIBRARY_SEARCH_PATHS} PATH_SUFFIXES lib)
+		# Only search for a library if we haven't already
+		# Otherwise the debug/release assignment settings below will cause trouble with multiple runs
+		if (NOT ${TOADLET_JAR_VAR}_FOUND)
+			# Find release and debug
+			find_file (${TOADLET_JAR_VAR}_JAR NAMES ${TOADLET_JAR}.jar PATHS ${LIBRARY_SEARCH_PATHS} PATH_SUFFIXES lib)
+			find_file (${TOADLET_JAR_VAR}_JAR_D NAMES ${TOADLET_JAR}_d.jar PATHS ${LIBRARY_SEARCH_PATHS} PATH_SUFFIXES lib)
 
-				# If only release libraries are found, assign them to the debug libraries
-				if (${TOADLET_JAR_VAR}_JAR AND NOT ${TOADLET_JAR_VAR}_JAR_D)
-					set (${TOADLET_JAR_VAR}_JAR_D ${${TOADLET_JAR_VAR}_JAR} CACHE FILEPATH "Path to a jar" FORCE)
-					set (${TOADLET_JAR_VAR}_FOUND "YES")
-				endif (${TOADLET_JAR_VAR}_JAR AND NOT ${TOADLET_JAR_VAR}_JAR_D)
-				
-				# If only debug libraries are found, assign them to the release libraries
-				if (${TOADLET_JAR_VAR}_JAR_D AND NOT ${TOADLET_JAR_VAR}_JAR)
-					set (${TOADLET_JAR_VAR}_JAR ${${TOADLET_JAR_VAR}_JAR_D} CACHE FILEPATH "Path to a jar" FORCE)
-					set (${TOADLET_JAR_VAR}_FOUND "YES")
-				endif (${TOADLET_JAR_VAR}_JAR_D AND NOT ${TOADLET_JAR_VAR}_JAR)
-				
-				set (${TOADLET_JAR_VAR}_FOUND ${${TOADLET_JAR_VAR}_FOUND} CACHE BOOL "Jar ${TOADLET_JAR} found flag" FORCE)
-				mark_as_advanced (${TOADLET_JAR_VAR}_JAR ${TOADLET_JAR_VAR}_JAR_D ${TOADLET_JAR_VAR}_FOUND)
-			endif (NOT ${TOADLET_JAR_VAR}_FOUND)
-		endforeach (TOADLET_JAR)
-	endif (${ANDROID_NDK_API_LEVEL} LESS 9)
+			# If only release libraries are found, assign them to the debug libraries
+			if (${TOADLET_JAR_VAR}_JAR AND NOT ${TOADLET_JAR_VAR}_JAR_D)
+				set (${TOADLET_JAR_VAR}_JAR_D ${${TOADLET_JAR_VAR}_JAR} CACHE FILEPATH "Path to a jar" FORCE)
+				set (${TOADLET_JAR_VAR}_FOUND "YES")
+			endif (${TOADLET_JAR_VAR}_JAR AND NOT ${TOADLET_JAR_VAR}_JAR_D)
+			
+			# If only debug libraries are found, assign them to the release libraries
+			if (${TOADLET_JAR_VAR}_JAR_D AND NOT ${TOADLET_JAR_VAR}_JAR)
+				set (${TOADLET_JAR_VAR}_JAR ${${TOADLET_JAR_VAR}_JAR_D} CACHE FILEPATH "Path to a jar" FORCE)
+				set (${TOADLET_JAR_VAR}_FOUND "YES")
+			endif (${TOADLET_JAR_VAR}_JAR_D AND NOT ${TOADLET_JAR_VAR}_JAR)
+			
+			set (${TOADLET_JAR_VAR}_FOUND ${${TOADLET_JAR_VAR}_FOUND} CACHE BOOL "Jar ${TOADLET_JAR} found flag" FORCE)
+			mark_as_advanced (${TOADLET_JAR_VAR}_JAR ${TOADLET_JAR_VAR}_JAR_D ${TOADLET_JAR_VAR}_FOUND)
+		endif (NOT ${TOADLET_JAR_VAR}_FOUND)
+	endforeach (TOADLET_JAR)
 endif (ANDROID)
 
 # Search for and assign the toadlet libraries
