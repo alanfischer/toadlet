@@ -8,15 +8,15 @@ namespace egg{
 class Logger{
 public:
 	enum Level{
-		Level_DISABLED=0,
+		DISABLED=0,
 
-		Level_ERROR,
-		Level_WARNING,
-		Level_ALERT,
-		Level_DEBUG,
-		Level_EXCESS,
+		ERROR,
+		WARNING,
+		ALERT,
+		DEBUG,
+		EXCESS,
 
-		Level_MAX,
+		MAX,
 	};
 
 	Logger(bool startSilent);
