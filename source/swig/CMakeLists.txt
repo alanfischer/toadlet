@@ -8,6 +8,24 @@ if (NOT TOADLET_PLATFORM_PYTHON)
 
 	# List the main and dependent interface files and the output language-specific files for each library
 
+	# Toadlet Egg
+	set (EGG_SWIG_INT 
+		${CMAKE_CURRENT_SOURCE_DIR}/toadlet/egg/egg.i 
+		PARENT_SCOPE
+	)
+	set (EGG_SWIG_INT_DEPS
+		${CMAKE_CURRENT_SOURCE_DIR}/toadlet/egg/Log.i
+		${CMAKE_CURRENT_SOURCE_DIR}/toadlet/egg/Logger.i
+		PARENT_SCOPE
+	)
+	set (EGG_SWIG_INT_OUTPUTS
+		${PROJECT_BINARY_DIR}/source/java/us/toadlet/egg/Log.java
+		${PROJECT_BINARY_DIR}/source/java/us/toadlet/egg/Logger.java
+		${PROJECT_BINARY_DIR}/source/java/us/toadlet/egg/egg.java
+		${PROJECT_BINARY_DIR}/source/java/us/toadlet/egg/eggJNI.java
+		PARENT_SCOPE
+	)	
+
 	# Toadlet Flick
 	set (FLICK_SWIG_INT 
 		${CMAKE_CURRENT_SOURCE_DIR}/toadlet/flick/flick.i 
