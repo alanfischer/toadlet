@@ -84,39 +84,39 @@ option (TOADLET_BUILD_DOXYGEN "Build doxygen documentation along with source fil
 
 # Build doxygen or build toadlet
 if (TOADLET_BUILD_DOXYGEN)
-        find_package (Doxygen)
-        find_package (SWIG)
-        if (DOXYGEN_FOUND AND DOXYGEN_DOT_FOUND AND SWIG_FOUND)
-                # Generate the swig wrapped files
-                include (SwigWrapFiles)
-                add_subdirectory (source/swig)
+	find_package (Doxygen)
+	find_package (SWIG)
+	if (DOXYGEN_FOUND AND DOXYGEN_DOT_FOUND AND SWIG_FOUND)
+		# Generate the swig wrapped files
+		include (SwigWrapFiles)
+		add_subdirectory (source/swig)
 
-                # Setup doxygen
-                add_subdirectory (doxygen/java)
-                add_subdirectory (doxygen/cpp)
-        else (DOXYGEN_FOUND AND DOXYGEN_DOT_FOUND AND SWIG_FOUND)
-                message ("Doxygen, dot and/or swig was not found. Doxygen docs will not be built")
-        endif (DOXYGEN_FOUND AND DOXYGEN_DOT_FOUND AND SWIG_FOUND)
+		# Setup doxygen
+		add_subdirectory (doxygen/java)
+		add_subdirectory (doxygen/cpp)
+	else (DOXYGEN_FOUND AND DOXYGEN_DOT_FOUND AND SWIG_FOUND)
+		message ("Doxygen, dot and/or swig was not found. Doxygen docs will not be built")
+	endif (DOXYGEN_FOUND AND DOXYGEN_DOT_FOUND AND SWIG_FOUND)
 else (TOADLET_BUILD_DOXYGEN)
 	if (TOADLET_PLATFORM_ANDROID)
 		if (NOT EXISTS ${ANDROID_JAR})
 			message (FATAL_ERROR "ANDROID_JAR not found")
 		endif (NOT EXISTS ${ANDROID_JAR})
 
-                # Android requires swig to generate bindings before compilation
-                # Find swig on our host and include our swig wrapper macro
-                find_host_package (SWIG REQUIRED)
-                include (SwigWrapFiles)
+		# Android requires swig to generate bindings before compilation
+		# Find swig on our host and include our swig wrapper macro
+		find_host_package (SWIG REQUIRED)
+		include (SwigWrapFiles)
 
-                # Add the swig files
-                add_subdirectory (source/swig)
+		# Add the swig files
+		add_subdirectory (source/swig)
 
-                # Android requires java code
-                add_subdirectory (source/java)
+		# Android requires java code
+		add_subdirectory (source/java)
 	endif (TOADLET_PLATFORM_ANDROID)
 
-        # c++ code
-        add_subdirectory (source/cpp)
+	# c++ code
+	add_subdirectory (source/cpp)
 
 	if (TOADLET_PLATFORM_PYTHON)
 		# Python requries the swig bindings be added as a separate module

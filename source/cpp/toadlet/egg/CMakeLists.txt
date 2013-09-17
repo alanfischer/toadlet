@@ -274,6 +274,9 @@ endif (SWIG_FOUND AND EGG_SWIG_INT)
 
 # For individual component installation 
 set (EGG_INSTALL)
+if (TOADLET_PLATFORM_ANDROID)
+	set (EGG_INSTALL jtoadlet_egg)
+endif (TOADLET_PLATFORM_ANDROID)
 
 
 # Dynamic library
