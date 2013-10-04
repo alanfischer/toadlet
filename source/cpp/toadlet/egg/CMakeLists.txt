@@ -69,6 +69,7 @@ set (EGG_PLATFORM_OSX_SRC
 )
 
 set (EGG_PLATFORM_WIN32_SRC
+	platform/win32/StreamIStream.h
 	platform/win32/Win32DynamicLibrary.cpp
 	platform/win32/Win32ErrorHandler.cpp
 	platform/win32/Win32Mutex.cpp
@@ -135,6 +136,8 @@ set (EGG_IO_HDR
 	io/PacketMessageStream.h
 	io/SocketStream.h
 	io/Stream.h
+	io/Stream_iostream.h
+	io/iostream_Stream.h
 )
 
 set (EGG_MATH_HDR
