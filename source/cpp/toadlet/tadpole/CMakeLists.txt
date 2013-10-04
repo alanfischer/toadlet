@@ -431,7 +431,6 @@ set (TADPOLE_PLATFORM_WIN32_HDR
 )
 
 set (TADPOLE_PLATFORM_WIN32_GDIPLUS_HDR
-	platform/win32/StreamIStream.h
 	platform/win32/Win32FontStreamer.h
 	platform/win32/Win32TextureStreamer.h
 )

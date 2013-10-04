@@ -23,15 +23,15 @@
  *
  ********** Copyright header - do not remove **********/
 
-#ifndef TOADLET_TADPOLE_STREAMISTREAM_H
-#define TOADLET_TADPOLE_STREAMISTREAM_H
+#ifndef TOADLET_EGG_STREAMISTREAM_H
+#define TOADLET_EGG_STREAMISTREAM_H
 
 #include <toadlet/egg/io/Stream.h>
 #include <toadlet/egg/Object.h>
 #include <windows.h>
 
 namespace toadlet{
-namespace tadpole{
+namespace egg{
 
 class StreamIStream:public Object,public IStream{
 public:

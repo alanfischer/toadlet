@@ -121,11 +121,13 @@ int MemoryStream::write(const tbyte *buffer,int length){
 		}
 
 		int oldsize=mInternalData->size();
-		int newsize=oldsize+length;
+		int newsize=mPosition+length;
 
-		mInternalData->resize(newsize);
+		if(newsize>oldsize){
+			mInternalData->resize(newsize);
+		}
 
-		tbyte *data=&mInternalData->at(oldsize);
+		tbyte *data=&mInternalData->at(mPosition);
 		memcpy(data,buffer,length);
 	}
 	mPosition+=length;
