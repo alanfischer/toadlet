@@ -80,6 +80,7 @@ using namespace toadlet::tadpole;
 %include <toadlet/tadpole/MeshComponent.i>
 %include <toadlet/tadpole/LightComponent.i>
 %include <toadlet/tadpole/Node.i>
+%include <toadlet/tadpole/Material.i>
 %include <toadlet/tadpole/action/Action.i>
 %include <toadlet/tadpole/action/ActionListener.i>
 %include <toadlet/tadpole/action/AnimationAction.i>

@@ -27,6 +27,7 @@
 #define TOADLET_EGG_IO_IOSTREAM_STREAM_H
 
 #include <toadlet/egg/io/Stream.h>
+#include <toadlet/egg/Object.h>
 #include <iostream>
 
 namespace toadlet{
@@ -34,6 +35,9 @@ namespace egg{
 namespace io{
 
 class iostream_Stream: public Object, public Stream{
+public:
+	TOADLET_OBJECT(iostream_Stream);
+
 	iostream_Stream(std::iostream &stream) :
 		mIStream(&stream),
 		mOStream(&stream){}

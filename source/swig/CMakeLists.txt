@@ -128,6 +128,7 @@ if (NOT TOADLET_PLATFORM_PYTHON)
 		${CMAKE_CURRENT_SOURCE_DIR}/toadlet/tadpole/MeshComponent.i
 		${CMAKE_CURRENT_SOURCE_DIR}/toadlet/tadpole/LightComponent.i
 		${CMAKE_CURRENT_SOURCE_DIR}/toadlet/tadpole/Node.i
+		${CMAKE_CURRENT_SOURCE_DIR}/toadlet/tadpole/Material.i
 		PARENT_SCOPE
 	)
 	set (TADPOLE_SWIG_INT_OUTPUTS
@@ -146,6 +147,7 @@ if (NOT TOADLET_PLATFORM_PYTHON)
 		${PROJECT_BINARY_DIR}/source/java/us/toadlet/tadpole/MeshComponent.java
 		${PROJECT_BINARY_DIR}/source/java/us/toadlet/tadpole/LightComponent.java
 		${PROJECT_BINARY_DIR}/source/java/us/toadlet/tadpole/Node.java
+		${PROJECT_BINARY_DIR}/source/java/us/toadlet/tadpole/Material.java
 		${PROJECT_BINARY_DIR}/source/java/us/toadlet/tadpole/tadpole.java
 		${PROJECT_BINARY_DIR}/source/java/us/toadlet/tadpole/tadpoleJNI.java
 		PARENT_SCOPE
