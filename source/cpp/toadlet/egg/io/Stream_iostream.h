@@ -58,11 +58,11 @@ public:
 	}
 
 	std::streambuf::int_type underflow(){
-		std::streambuf::int_type value=0;
-		if( mParent->read((tbyte*)value, 1) < 0 ){
+		tbyte value=0;
+		if( mParent->read(&value, 1) < 0 ){
 			value = EOF;
 		}
-		return value;
+		return std::streambuf::int_type(value);
 	}
 
 	std::streambuf::int_type overflow(std::streambuf::int_type value){

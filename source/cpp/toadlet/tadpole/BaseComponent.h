@@ -39,12 +39,12 @@
 	static toadlet::egg::Type<toadlet::tadpole::Component> *type(){static toadlet::egg::NonInstantiableType<Class,toadlet::tadpole::Component> thisType(Name);return &thisType;} \
 	virtual toadlet::egg::Type<toadlet::tadpole::Component> *getType() const{return type();}
 
-// Help to work around an issue with c++ multiple inheritance issues
+// Help to work around an issue with c++ multiple inheritance
 #define TOADLET_COMPONENT2(Class,BaseClass)\
 	TOADLET_COMPONENT(Class); \
 	toadlet::tadpole::Component *componentThis(){return (BaseClass*)this;} \
 	inline const String &getName() const{return toadlet::tadpole::BaseComponent::getName();}\
-	Node *getParent(){return toadlet::tadpole::BaseComponent::getParent();} \
+	Node *getParent() const{return toadlet::tadpole::BaseComponent::getParent();} \
 	bool handleEvent(Event *event){return toadlet::tadpole::BaseComponent::handleEvent(event);}
 
 namespace toadlet{
