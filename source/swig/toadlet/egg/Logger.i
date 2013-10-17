@@ -36,6 +36,9 @@ public:
 	void addLogEntry(String categoryName,Level level,String text);
 	void addLogEntry(Level level,String text);
 
+	int getNumLogEntries();
+	String getLogString(int i);
+
 	void flush();
 };
 
