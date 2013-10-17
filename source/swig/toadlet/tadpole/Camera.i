@@ -9,6 +9,8 @@ class Camera{
 public:
 	Camera(Engine *engine);
 
+	void setClearFlags(int clearFlags);
+
 	void setClearColor(float color[4]);
 
 	void setLookAt(float eye[3],float point[3],float up[3]);

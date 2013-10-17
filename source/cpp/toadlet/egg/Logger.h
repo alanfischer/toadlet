@@ -102,6 +102,7 @@ public:
 
 	int getNumLogEntries();
 	Entry *getLogEntry(int i);
+	String getLogString(int i){return getLogEntry(i)->text;}
 
 	Category *addCategory(const String &categoryName);
 	Category *getCategory(const String &categoryName);
