@@ -141,7 +141,10 @@ Material::ptr BSP30MaterialCreator::createBSP30Material(Texture *diffuseTexture,
 		}
 	}
 
-	if(mEngine->hasShader(Shader::ShaderType_VERTEX) && mEngine->hasShader(Shader::ShaderType_FRAGMENT)){
+	if(	mShaderState &&
+		mEngine->hasShader(Shader::ShaderType_VERTEX) &&
+		mEngine->hasShader(Shader::ShaderType_FRAGMENT)
+	){
 		RenderPath::ptr shaderPath=material->addPath();
 		RenderPass::ptr pass=shaderPath->addPass(renderState,mShaderState);
 
@@ -152,7 +155,9 @@ Material::ptr BSP30MaterialCreator::createBSP30Material(Texture *diffuseTexture,
 		pass->setTexture("lightmapTex",NULL,"lightmapSamp",mEngine->getMaterialManager()->getDefaultSamplerState(),TextureState());
 	}
 
-	if(mEngine->hasFixed(Shader::ShaderType_VERTEX) && mEngine->hasFixed(Shader::ShaderType_FRAGMENT)){
+	if(	mEngine->hasFixed(Shader::ShaderType_VERTEX) &&
+		mEngine->hasFixed(Shader::ShaderType_FRAGMENT)
+	){
 		RenderPath::ptr fixedPath=material->addPath();
 		RenderPass::ptr pass=fixedPath->addPass(renderState);
 

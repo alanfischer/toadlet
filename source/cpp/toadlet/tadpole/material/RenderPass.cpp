@@ -306,8 +306,8 @@ bool RenderPass::linkVariables(){
 			if(mShaderState!=NULL){
 				Log::warning(Categories::TOADLET_TADPOLE,
 					"RenderVariable not found with name:"+name);
-				continue;
 			}
+			continue;
 		}
 
 		vardata.location=formatVariable->getOffset();

@@ -187,13 +187,13 @@ bool SkyBoxMaterialCreator::createPaths(Material *material,RenderState *renderSt
 	TextureState textureState;
 	textureState.calculation=TextureState::CalculationType_NORMAL;
 
-	if(mEngine->hasShader(Shader::ShaderType_VERTEX) && mEngine->hasShader(Shader::ShaderType_FRAGMENT)){
+	if(	mSkyBoxShaderState &&
+		mEngine->hasShader(Shader::ShaderType_VERTEX) && 
+		mEngine->hasShader(Shader::ShaderType_FRAGMENT)
+	){
 		RenderPath::ptr shaderPath=material->addPath("shader");
 
 		RenderPass::ptr pass=shaderPath->addPass(renderState,mSkyBoxShaderState);
-
-		pass->setShader(Shader::ShaderType_VERTEX,mSkyBoxVertexShader);
-		pass->setShader(Shader::ShaderType_FRAGMENT,mSkyBoxFragmentShader);
 
 		pass->addVariable("modelViewProjectionMatrix",RenderVariable::ptr(new MVPMatrixVariable()),Material::Scope_RENDERABLE);
 		pass->addVariable("textureMatrix",RenderVariable::ptr(new TextureMatrixVariable("tex")),Material::Scope_MATERIAL);
@@ -202,7 +202,9 @@ bool SkyBoxMaterialCreator::createPaths(Material *material,RenderState *renderSt
 		pass->setTexture("tex",texture,"samp",samplerState,textureState);
 	}
 
-	if(mEngine->hasFixed(Shader::ShaderType_VERTEX) && mEngine->hasFixed(Shader::ShaderType_FRAGMENT)){
+	if(	mEngine->hasFixed(Shader::ShaderType_VERTEX) &&
+		mEngine->hasFixed(Shader::ShaderType_FRAGMENT)
+	){
 		RenderPath::ptr fixedPath=material->addPath("fixed");
 
 		RenderPass::ptr pass=fixedPath->addPass(renderState);

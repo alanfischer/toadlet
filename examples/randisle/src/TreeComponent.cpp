@@ -1,12 +1,12 @@
 #include "TreeComponent.h"
 #include "Resources.h"
 
-TreeComponent::TreeComponent(Scene *scene,int seed):
+TreeComponent::TreeComponent(Scene *scene,int seed,Material::ptr branchMaterial,Material::ptr leafMaterial):
 	mScene(NULL)
 {
 	mScene=scene;
 
-	mSystem=new TreeSystem(mScene->getEngine(),seed,this);
+	mSystem=new TreeSystem(mScene->getEngine(),seed,branchMaterial,leafMaterial,this);
 
 	mBound=new Bound();
 	mWorldBound=new Bound();

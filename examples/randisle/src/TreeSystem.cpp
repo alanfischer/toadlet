@@ -1,7 +1,6 @@
 #include "TreeSystem.h"
-#include "Resources.h"
 
-TreeSystem::TreeSystem(Engine *engine,int seed,BranchSystem::BranchListener *listener):BranchSystem(seed),
+TreeSystem::TreeSystem(Engine *engine,int seed,Material::ptr branchMaterial,Material::ptr leafMaterial,BranchSystem::BranchListener *listener):BranchSystem(seed),
 	mEngine(NULL),
 
 	//mBound,
@@ -37,8 +36,8 @@ TreeSystem::TreeSystem(Engine *engine,int seed,BranchSystem::BranchListener *lis
 	mSections=6;
 	mLowMod=2;
 
-	mBranchMaterial=Resources::instance->treeBranch;
-	mLeafMaterial=Resources::instance->treeLeaf;
+	mBranchMaterial=branchMaterial;
+	mLeafMaterial=leafMaterial;
 
 	if(listener==NULL){
 		listener=this;

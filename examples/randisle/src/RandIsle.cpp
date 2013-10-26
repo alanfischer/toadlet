@@ -870,7 +870,7 @@ bool RandIsle::updatePopulatePatches(){
 			TreeComponent::ptr treeComponent;
 			Node::ptr tree=new Node(mScene);
 			{
-				treeComponent=new TreeComponent(mScene,wx+wy);
+				treeComponent=new TreeComponent(mScene,wx+wy,Resources::instance->treeBranch,Resources::instance->treeLeaf);
 				tree->attach(treeComponent);
 
 				tree->setScope(tree->getScope()&~Scope_BIT_SHADOW);

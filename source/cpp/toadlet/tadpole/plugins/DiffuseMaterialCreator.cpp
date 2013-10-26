@@ -315,7 +315,10 @@ Material::ptr DiffuseMaterialCreator::createDiffuseMaterial(Texture *texture,Ren
 	TextureState textureState;
 	textureState.calculation=TextureState::CalculationType_NORMAL;
 
-	if(mEngine->hasShader(Shader::ShaderType_VERTEX) && mEngine->hasShader(Shader::ShaderType_FRAGMENT)){
+	if(	mDiffuseShaderState!=NULL &&
+		mEngine->hasShader(Shader::ShaderType_VERTEX) &&
+		mEngine->hasShader(Shader::ShaderType_FRAGMENT)
+	){
 		RenderPath::ptr shaderPath=material->addPath();
 
 		RenderPass::ptr pass=shaderPath->addPass(renderState,mDiffuseShaderState);
@@ -340,7 +343,9 @@ Material::ptr DiffuseMaterialCreator::createDiffuseMaterial(Texture *texture,Ren
 		}
 	}
 
-	if(mEngine->hasFixed(Shader::ShaderType_VERTEX) && mEngine->hasFixed(Shader::ShaderType_FRAGMENT)){
+	if(	mEngine->hasFixed(Shader::ShaderType_VERTEX) &&
+		mEngine->hasFixed(Shader::ShaderType_FRAGMENT)
+	){
 		RenderPath::ptr fixedPath=material->addPath("fixed");
 
 		RenderPass::ptr pass=fixedPath->addPass(renderState);
@@ -367,10 +372,11 @@ Material::ptr DiffuseMaterialCreator::createPointSpriteMaterial(Texture *texture
 		renderState->setGeometryState(GeometryState(true,size,attenuated));
 	}
 
-	if(	mEngine->hasShader(Shader::ShaderType_VERTEX) &&
+	if(	mPointShaderState &&
+		mEngine->hasShader(Shader::ShaderType_VERTEX) &&
 		mEngine->hasShader(Shader::ShaderType_FRAGMENT)	&& 
-		mEngine->hasShader(Shader::ShaderType_GEOMETRY))
-	{
+		mEngine->hasShader(Shader::ShaderType_GEOMETRY)
+	){
 		RenderPath::ptr shaderPath=material->addPath("shader");
 
 		RenderPass::ptr pass=shaderPath->addPass(renderState,mPointShaderState);
@@ -399,8 +405,8 @@ Material::ptr DiffuseMaterialCreator::createPointSpriteMaterial(Texture *texture
 
 	if(	mEngine->hasFixed(Shader::ShaderType_VERTEX) &&
 		mEngine->hasFixed(Shader::ShaderType_FRAGMENT) &&
-		mEngine->hasFixed(Shader::ShaderType_GEOMETRY))
-	{
+		mEngine->hasFixed(Shader::ShaderType_GEOMETRY)
+	){
 		RenderPath::ptr fixedPath=material->addPath("fixed");
 
 		RenderPass::ptr pass=fixedPath->addPass(renderState);
@@ -438,7 +444,8 @@ Material::ptr DiffuseMaterialCreator::createFontMaterial(Font *font){
 		}
 	}
 
-	if(mEngine->hasShader(Shader::ShaderType_VERTEX) &&
+	if(	mDiffuseShaderState &&
+		mEngine->hasShader(Shader::ShaderType_VERTEX) &&
 		mEngine->hasShader(Shader::ShaderType_FRAGMENT)
 	){
 		RenderPath::ptr shaderPath=material->addPath("shader");

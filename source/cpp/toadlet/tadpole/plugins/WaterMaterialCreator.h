@@ -53,6 +53,7 @@ public:
 protected:
 	Engine *mEngine;
 	Shader::ptr mVertexShader,mFragmentShader;
+	ShaderState::ptr mShaderState;
 };
 
 }
