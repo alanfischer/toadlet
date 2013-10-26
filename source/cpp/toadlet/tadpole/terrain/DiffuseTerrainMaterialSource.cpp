@@ -306,7 +306,10 @@ Material::ptr DiffuseTerrainMaterialSource::getMaterial(TerrainPatchComponent *p
 	layerRenderState->setBlendState(BlendState::Combination_ALPHA);
 	layerRenderState->setMaterialState(MaterialState(true,false,MaterialState::ShadeType_GOURAUD));
 
-	if(mEngine->hasShader(Shader::ShaderType_VERTEX) && mEngine->hasShader(Shader::ShaderType_FRAGMENT)){
+	if(	mDiffuseBaseState &&
+		mEngine->hasShader(Shader::ShaderType_VERTEX) &&
+		mEngine->hasShader(Shader::ShaderType_FRAGMENT)
+	){
 		RenderPath::ptr shaderPath=material->addPath();
 		
 		{
@@ -358,7 +361,9 @@ Material::ptr DiffuseTerrainMaterialSource::getMaterial(TerrainPatchComponent *p
 		}
 	}
 
-	if(mEngine->hasFixed(Shader::ShaderType_VERTEX) && mEngine->hasFixed(Shader::ShaderType_FRAGMENT)){
+	if(	mEngine->hasFixed(Shader::ShaderType_VERTEX) &&
+		mEngine->hasFixed(Shader::ShaderType_FRAGMENT)
+	){
 		RenderPath::ptr fixedPath=material->addPath();
 
 		{

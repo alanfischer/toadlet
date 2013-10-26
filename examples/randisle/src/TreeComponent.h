@@ -8,7 +8,7 @@ class TreeComponent:public BaseComponent,public BranchSystem::BranchListener,pub
 public:
 	TOADLET_COMPONENT(TreeComponent);
 
-	TreeComponent(Scene *scene,int seed);
+	TreeComponent(Scene *scene,int seed,Material::ptr branchMaterial,Material::ptr leafMaterial);
 	void destroy();
 
 	void grow();

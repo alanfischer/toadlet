@@ -233,8 +233,18 @@ WaterMaterialCreator::WaterMaterialCreator(Engine *engine){
 		"}\n"
 	};
 
-	mVertexShader=engine->getShaderManager()->createShader(Shader::ShaderType_VERTEX,profiles,vertexCodes,2);
-	mFragmentShader=engine->getShaderManager()->createShader(Shader::ShaderType_FRAGMENT,profiles,fragmentCodes,2);
+	TOADLET_TRY
+		mVertexShader=engine->getShaderManager()->createShader(Shader::ShaderType_VERTEX,profiles,vertexCodes,2);
+	TOADLET_CATCH_ANONYMOUS(){}
+	TOADLET_TRY
+		mFragmentShader=engine->getShaderManager()->createShader(Shader::ShaderType_FRAGMENT,profiles,fragmentCodes,2);
+	TOADLET_CATCH_ANONYMOUS(){}
+
+	mShaderState=mEngine->getMaterialManager()->createShaderState();
+	if(mShaderState!=NULL){
+		mShaderState->setShader(Shader::ShaderType_VERTEX,mVertexShader);
+		mShaderState->setShader(Shader::ShaderType_FRAGMENT,mFragmentShader);
+	}
 }
 
 Material::ptr WaterMaterialCreator::createWaterMaterial(Texture *reflectTexture,Texture *refractTexture,Texture *waveTexture,const Vector4 &color){
@@ -255,12 +265,12 @@ Material::ptr WaterMaterialCreator::createWaterMaterial(Texture *reflectTexture,
 }
 
 bool WaterMaterialCreator::createPaths(Material *material,RenderState *renderState,Texture *reflectTexture,Texture *refractTexture,Texture *waveTexture){
-	if(mEngine->hasShader(Shader::ShaderType_VERTEX) && mEngine->hasShader(Shader::ShaderType_FRAGMENT)){
+	if(	mShaderState && 
+		mEngine->hasShader(Shader::ShaderType_VERTEX) &&
+		mEngine->hasShader(Shader::ShaderType_FRAGMENT)
+	){
 		RenderPath::ptr shaderPath=material->addPath();
-		RenderPass::ptr pass=shaderPath->addPass(renderState);
-
-		pass->setShader(Shader::ShaderType_VERTEX,mVertexShader);
-		pass->setShader(Shader::ShaderType_FRAGMENT,mFragmentShader);
+		RenderPass::ptr pass=shaderPath->addPass(renderState,mShaderState);
 
 		pass->addVariable("modelViewProjectionMatrix",RenderVariable::ptr(new MVPMatrixVariable()),Material::Scope_RENDERABLE);
 		pass->addVariable("modelMatrix",RenderVariable::ptr(new ModelMatrixVariable()),Material::Scope_RENDERABLE);
@@ -281,7 +291,9 @@ bool WaterMaterialCreator::createPaths(Material *material,RenderState *renderSta
 		pass->addVariable("waveMatrix",RenderVariable::ptr(new TextureMatrixVariable("waveTex")),Material::Scope_MATERIAL);
 	}
 
-	if(mEngine->hasFixed(Shader::ShaderType_VERTEX) && mEngine->hasFixed(Shader::ShaderType_FRAGMENT)){
+	if(	mEngine->hasFixed(Shader::ShaderType_VERTEX) &&
+		mEngine->hasFixed(Shader::ShaderType_FRAGMENT)
+	){
 		RenderPath::ptr fixedPath=material->addPath();
 		RenderPass::ptr pass=fixedPath->addPass(renderState);
 

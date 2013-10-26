@@ -109,7 +109,7 @@ public:
 		scalar wiggleOffset;
 	};
 
-	TreeSystem(Engine *engine,int seed,BranchSystem::BranchListener *listener=NULL);
+	TreeSystem(Engine *engine,int seed,Material::ptr branchMaterial,Material::ptr leafMaterial,BranchSystem::BranchListener *listener=NULL);
 	void destroy();
 
 	void grow();
