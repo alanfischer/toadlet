@@ -84,7 +84,8 @@ public:
 	virtual void setCreateAudio(bool audio){mCreateAudio=audio;}
 	virtual bool getCreateAudio() const{return mCreateAudio;}
 
-	virtual scalar getEpsilon() const{return Math::fromMilli(1);}
+	virtual void setEpsilon(scalar epsilon){mEpsilon=epsilon;}
+	virtual scalar getEpsilon() const{return mEpsilon;}
 
 	virtual void update(int dt);
 	virtual void preLogicUpdate(int dt){}
@@ -123,6 +124,7 @@ protected:
 	int mAccumulatedDT;
 	int mFrame;
 	bool mResetFrame;
+	scalar mEpsilon;
 
 	Engine::ptr mEngine;
 	PartitionNode::ptr mBackground;

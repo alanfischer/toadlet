@@ -123,6 +123,8 @@ bool ParticleComponent::setNumParticles(int numParticles,int particleType,scalar
 	createVertexData();
 	createIndexData();
 
+	updateBound();
+
 	return true;
 }
 
@@ -152,6 +154,10 @@ void ParticleComponent::setWorldSpace(bool worldSpace){
 				p.x=position.x;p.y=position.y;p.z=position.z;
 			}
 		}
+	}
+
+	if(mWorldSpace){
+		mBound->inverseTransform(mBound,mParent->getWorldTransform());
 	}
 
 	transformChanged(mTransform);
@@ -190,14 +196,17 @@ void ParticleComponent::updateBound(){
 		point.origin.set(p->x,p->y,p->z);
 		sphere.merge(point,epsilon);
 	}
-	if(mWorldSpace){
-		Math::sub(sphere,mParent->getWorldTranslate());
-	}
 	mBound->set(sphere);
+
+	if(mWorldSpace){
+		mBound->inverseTransform(mBound,mParent->getWorldTransform());
+	}
 
 	mWorldBound->transform(mBound,mWorldTransform);
 
-	mParent->boundChanged();
+	if(mParent!=NULL){
+		mParent->boundChanged();
+	}
 }
 
 void ParticleComponent::transformChanged(Transform *transform){
@@ -217,10 +226,6 @@ void ParticleComponent::transformChanged(Transform *transform){
 	if(transform==mTransform){
 		mParent->boundChanged();
 	}
-}
-
-void ParticleComponent::frameUpdate(int dt,int scope){
-	updateBound();
 }
 
 void ParticleComponent::setSharedRenderState(RenderState::ptr renderState){
