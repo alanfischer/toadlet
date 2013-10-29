@@ -45,6 +45,7 @@ Scene::Scene(Engine *engine):Object(),
 	mAccumulatedDT(0),
 	mFrame(0),
 	mResetFrame(false),
+	mEpsilon(Math::fromMilli(1)),
 
 	//mBackground,
 	//mRoot,
