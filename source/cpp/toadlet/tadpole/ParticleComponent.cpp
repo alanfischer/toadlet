@@ -190,11 +190,14 @@ void ParticleComponent::updateBound(){
 	Sphere sphere;
 	Sphere point;
 	scalar epsilon=mScene->getEpsilon();
-	int i;
-	for(i=0;i<mParticles.size();++i){
-		Particle *p=&mParticles[i];
-		point.origin.set(p->x,p->y,p->z);
-		sphere.merge(point,epsilon);
+	if(mParticles.size()>0){
+		Particle *p=&mParticles[0];
+		sphere.origin.set(p->x,p->y,p->z);
+		for(int i=1;i<mParticles.size();++i){
+			p=&mParticles[i];
+			point.origin.set(p->x,p->y,p->z);
+			sphere.merge(point,epsilon);
+		}
 	}
 	mBound->set(sphere);
 
