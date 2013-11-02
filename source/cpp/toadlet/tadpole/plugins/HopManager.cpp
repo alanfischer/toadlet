@@ -39,6 +39,7 @@ HopManager::HopManager(Scene *scene):
 
 	mSimulator=new hop::Simulator();
 	mSimulator->setManager(this);
+	mSimulator->setEpsilon(scene->getEpsilon());
 
 	mSolid=new hop::Solid();
 	mSolid->setCoefficientOfGravity(0);

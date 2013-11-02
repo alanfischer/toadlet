@@ -34,7 +34,7 @@
 namespace toadlet{
 namespace tadpole{
 
-Scene::Scene(Engine *engine):Object(),
+Scene::Scene(Engine *engine,scalar epsilon):Object(),
 	mUpdateListener(NULL),
 
 	mExcessiveDT(0),
@@ -45,6 +45,7 @@ Scene::Scene(Engine *engine):Object(),
 	mAccumulatedDT(0),
 	mFrame(0),
 	mResetFrame(false),
+	mEpsilon(epsilon),
 
 	//mBackground,
 	//mRoot,

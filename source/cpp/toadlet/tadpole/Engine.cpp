@@ -217,12 +217,12 @@ void Engine::installHandlers(){
 	#endif
 	#if defined(TOADLET_PLATFORM_ANDROID)
 		jobject assetManagerObj=NULL;
-		jclass contextClass=((JNIEnv*)mEnv)->GetObjectClass((jobject)mCtx);
+		jclass oclass=((JNIEnv*)mEnv)->GetObjectClass((jobject)mCtx);
 		{
-			jmethodID getAssetsID=((JNIEnv*)mEnv)->GetMethodID(contextClass,"getAssets","()Landroid/content/res/AssetManager;");
+			jmethodID getAssetsID=((JNIEnv*)mEnv)->GetMethodID(oclass,"getAssets","()Landroid/content/res/AssetManager;");
 			assetManagerObj=((JNIEnv*)mEnv)->CallObjectMethod((jobject)mCtx,getAssetsID);
 		}
-		((JNIEnv*)mEnv)->DeleteLocalRef(contextClass);
+		((JNIEnv*)mEnv)->DeleteLocalRef(oclass);
 		Archive::ptr assetArchive=new AndroidAssetArchive((JNIEnv*)mEnv,assetManagerObj);
 		mArchiveManager->manage(assetArchive);
 	#endif

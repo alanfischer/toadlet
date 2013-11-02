@@ -42,21 +42,21 @@ JInputDevice::JInputDevice(JNIEnv *jenv,jobject jobj):
 	JNIEnv *env=jenv;
 	obj=env->NewGlobalRef(jobj);
 
-	jclass deviceClass=env->GetObjectClass(obj);
+	jclass oclass=env->GetObjectClass(obj);
 	{
-		createID=env->GetMethodID(deviceClass,"create","()Z");
-		destroyID=env->GetMethodID(deviceClass,"destroy","()V");
+		createID=env->GetMethodID(oclass,"create","()Z");
+		destroyID=env->GetMethodID(oclass,"destroy","()V");
 
-		getTypeID=env->GetMethodID(deviceClass,"getType","()I");
-		startID=env->GetMethodID(deviceClass,"start","()Z");
-		updateID=env->GetMethodID(deviceClass,"update","(I)V");
-		stopID=env->GetMethodID(deviceClass,"stop","()V");
+		getTypeID=env->GetMethodID(oclass,"getType","()I");
+		startID=env->GetMethodID(oclass,"start","()Z");
+		updateID=env->GetMethodID(oclass,"update","(I)V");
+		stopID=env->GetMethodID(oclass,"stop","()V");
 
-		setListenerID=env->GetMethodID(deviceClass,"setListener","(Lus/toadlet/flick/InputDeviceListener;)V");
-		setSampleTimeID=env->GetMethodID(deviceClass,"setSampleTime","(I)V");
-		setAlphaID=env->GetMethodID(deviceClass,"setAlpha","(F)V");
+		setListenerID=env->GetMethodID(oclass,"setListener","(Lus/toadlet/flick/InputDeviceListener;)V");
+		setSampleTimeID=env->GetMethodID(oclass,"setSampleTime","(I)V");
+		setAlphaID=env->GetMethodID(oclass,"setAlpha","(F)V");
 	}
-	env->DeleteLocalRef(deviceClass);
+	env->DeleteLocalRef(oclass);
 
 	if(env->ExceptionOccurred()!=0){
 		env->ExceptionDescribe();

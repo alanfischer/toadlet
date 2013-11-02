@@ -42,16 +42,16 @@ JAudioDevice::JAudioDevice(JNIEnv *jenv,jobject jobj):
 	JNIEnv *env=getEnv();
 	obj=env->NewGlobalRef(jobj);
 
-	jclass deviceClass=env->GetObjectClass(obj);
+	jclass oclass=env->GetObjectClass(obj);
 	{
-		createID=env->GetMethodID(deviceClass,"create","()Z");
-		destroyID=env->GetMethodID(deviceClass,"destroy","()V");
+		createID=env->GetMethodID(oclass,"create","()Z");
+		destroyID=env->GetMethodID(oclass,"destroy","()V");
 
-		createAudioBufferID=env->GetMethodID(deviceClass,"createAudioBuffer","()Lus/toadlet/ribbit/AudioBuffer;");
-		createAudioID=env->GetMethodID(deviceClass,"createAudio","()Lus/toadlet/ribbit/Audio;");
-		updateID=env->GetMethodID(deviceClass,"update","(I)V");
+		createAudioBufferID=env->GetMethodID(oclass,"createAudioBuffer","()Lus/toadlet/ribbit/AudioBuffer;");
+		createAudioID=env->GetMethodID(oclass,"createAudio","()Lus/toadlet/ribbit/Audio;");
+		updateID=env->GetMethodID(oclass,"update","(I)V");
 	}
-	env->DeleteLocalRef(deviceClass);
+	env->DeleteLocalRef(oclass);
 
 	jthrowable exc=env->ExceptionOccurred();
 	if(exc!=NULL){
