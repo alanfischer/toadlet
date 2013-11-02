@@ -66,6 +66,10 @@ void Camera::setAutoProjectionFov(scalar fov,bool yheight,scalar nearDist,scalar
 	mBottomDist=0;mTopDist=0;
 	mNearDist=nearDist;mFarDist=farDist;
 	mAutoYHeight=yheight;
+
+	Math::setMatrix4x4FromPerspectiveX(mProjectionMatrix,fov,Math::ONE,nearDist,farDist);
+
+	projectionUpdated();
 }
 
 void Camera::setProjectionFovX(scalar fovx,scalar aspect,scalar nearDist,scalar farDist){

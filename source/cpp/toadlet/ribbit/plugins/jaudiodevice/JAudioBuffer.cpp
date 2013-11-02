@@ -36,12 +36,12 @@ JAudioBuffer::JAudioBuffer(JNIEnv *jenv,jobject jobj):
 	JNIEnv *env=getEnv();
 	obj=env->NewGlobalRef(jobj);
 
-	jclass bufferClass=env->GetObjectClass(obj);
+	jclass oclass=env->GetObjectClass(obj);
 	{
-		createID=env->GetMethodID(bufferClass,"create","(Lus/toadlet/ribbit/AudioStream;)Z");
-		destroyID=env->GetMethodID(bufferClass,"destroy","()V");
+		createID=env->GetMethodID(oclass,"create","(Lus/toadlet/ribbit/AudioStream;)Z");
+		destroyID=env->GetMethodID(oclass,"destroy","()V");
 	}
-	env->DeleteLocalRef(bufferClass);
+	env->DeleteLocalRef(oclass);
 }
 
 JAudioBuffer::~JAudioBuffer(){
