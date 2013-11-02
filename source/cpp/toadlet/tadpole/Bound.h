@@ -174,10 +174,35 @@ public:
 		const Vector3 &scale=transform->getScale();
 
 		if(source->mType==Type_SPHERE){
-			Math::mul(mSphere.origin,scale,source->mSphere.radius);
-			mSphere.radius=Math::maxVal(Math::maxVal(mSphere.origin.x,mSphere.origin.y),mSphere.origin.z);
+			Vector3 radius;
+			Math::mul(radius,scale,source->mSphere.radius);
+			mSphere.radius=Math::maxVal(Math::maxVal(radius.x,radius.y),radius.z);
 			Math::mul(mSphere.origin,rotate,source->mSphere.origin);
 			Math::mul(mSphere.origin,scale);
+			Math::add(mSphere.origin,translate);
+		}
+		else if(source->mType==Type_AABOX){
+			Math::mul(mBox,rotate,source->mBox);
+			Math::mul(mBox.mins,scale);
+			Math::mul(mBox.maxs,scale);
+			Math::add(mBox,translate);
+		}
+		update();
+	}
+
+	void inverseTransform(Bound *source,Transform *transform){
+		mType=source->mType;
+
+		Vector3 translate;Math::neg(translate,transform->getTranslate());
+		Quaternion rotate;Math::invert(rotate,transform->getRotate());
+		Vector3 scale;Math::div(scale,Math::ONE_VECTOR3,transform->getScale());
+
+		if(source->mType==Type_SPHERE){
+			Vector3 radius;
+			Math::mul(radius,scale,source->mSphere.radius);
+			mSphere.radius=Math::maxVal(Math::maxVal(radius.x,radius.y),radius.z);
+			Math::mul(mSphere.origin,rotate,source->mSphere.origin);
+			Math::div(mSphere.origin,scale);
 			Math::add(mSphere.origin,translate);
 		}
 		else if(source->mType==Type_AABOX){

@@ -36,25 +36,25 @@ JAudio::JAudio(JNIEnv *jenv,jobject jobj):
 	JNIEnv *env=getEnv();
 	obj=env->NewGlobalRef(jobj);
 
-	jclass audioClass=env->GetObjectClass(obj);
+	jclass oclass=env->GetObjectClass(obj);
 	{
-		createAudioBufferID=env->GetMethodID(audioClass,"create","(Lus/toadlet/ribbit/AudioBuffer;)Z");
-		createAudioStreamID=env->GetMethodID(audioClass,"create","(Lus/toadlet/ribbit/AudioStream;)Z");
-		destroyID=env->GetMethodID(audioClass,"destroy","()V");
+		createAudioBufferID=env->GetMethodID(oclass,"create","(Lus/toadlet/ribbit/AudioBuffer;)Z");
+		createAudioStreamID=env->GetMethodID(oclass,"create","(Lus/toadlet/ribbit/AudioStream;)Z");
+		destroyID=env->GetMethodID(oclass,"destroy","()V");
 
-		playID=env->GetMethodID(audioClass,"play","()Z");
-		stopID=env->GetMethodID(audioClass,"stop","()Z");
+		playID=env->GetMethodID(oclass,"play","()Z");
+		stopID=env->GetMethodID(oclass,"stop","()Z");
 
-		getPlayingID=env->GetMethodID(audioClass,"getPlaying","()Z");
-		getFinishedID=env->GetMethodID(audioClass,"getFinished","()Z");
+		getPlayingID=env->GetMethodID(oclass,"getPlaying","()Z");
+		getFinishedID=env->GetMethodID(oclass,"getFinished","()Z");
 
-		setLoopingID=env->GetMethodID(audioClass,"setLooping","(Z)V");
-		getLoopingID=env->GetMethodID(audioClass,"getLooping","()Z");
+		setLoopingID=env->GetMethodID(oclass,"setLooping","(Z)V");
+		getLoopingID=env->GetMethodID(oclass,"getLooping","()Z");
 
-		setGainID=env->GetMethodID(audioClass,"setGain","(F)V");
-		getGainID=env->GetMethodID(audioClass,"getGain","()F");
+		setGainID=env->GetMethodID(oclass,"setGain","(F)V");
+		getGainID=env->GetMethodID(oclass,"getGain","()F");
 	}
-	env->DeleteLocalRef(audioClass);
+	env->DeleteLocalRef(oclass);
 }
 
 JAudio::~JAudio(){

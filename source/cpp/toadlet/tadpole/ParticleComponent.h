@@ -101,7 +101,7 @@ public:
 	void setMaterial(Material *material);
 	Material *getMaterial() const{return mMaterial;}
 
-	void frameUpdate(int dt,int scope);
+	void updateParticles(Camera *camera){updateBound();if(camera!=NULL){updateVertexData(camera);}}
 
 	void updateBound();
 

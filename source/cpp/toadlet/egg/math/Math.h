@@ -317,7 +317,7 @@ namespace Math{
 	inline void div(Vector3 &r,const Vector3 &v1,const Vector3 &v2){
 		r.x=v1.x/v2.x;
 		r.y=v1.y/v2.y;
-		r.y=v1.z/v2.z;
+		r.z=v1.z/v2.z;
 	}
 
 	inline void div(Vector3 &r,const Vector3 &v){
