@@ -60,37 +60,37 @@ JApplication::JApplication(JNIEnv *jenv,jobject jobj):
 	JNIEnv *env=jenv;
 	obj=env->NewGlobalRef(jobj);
 
-	jclass appClass=env->GetObjectClass(obj);
+	jclass oclass=env->GetObjectClass(obj);
 	{
-		createID=env->GetMethodID(appClass,"create","()Z");
-		destroyID=env->GetMethodID(appClass,"destroy","()V");
-		startID=env->GetMethodID(appClass,"start","()V");
-		stopID=env->GetMethodID(appClass,"stop","()V");
-		isRunningID=env->GetMethodID(appClass,"isRunning","()Z");
-		setTitleID=env->GetMethodID(appClass,"setTitle","(Ljava/lang/CharSequence;)V");
-		getTitleID=env->GetMethodID(appClass,"getTitle","()Ljava/lang/CharSequence;");
-		getWidthID=env->GetMethodID(appClass,"getWidth","()I");
-		getHeightID=env->GetMethodID(appClass,"getHeight","()I");
-		setDifferenceMouseID=env->GetMethodID(appClass,"setDifferenceMouse","(Z)V");
-		getDifferenceMouseID=env->GetMethodID(appClass,"getDifferenceMouse","()Z");
-		getEngineID=env->GetMethodID(appClass,"getEngine","()Lus/toadlet/tadpole/Engine;");
-		getRenderDeviceID=env->GetMethodID(appClass,"getRenderDevice","()Lus/toadlet/peeper/RenderDevice;");
-		getAudioDeviceID=env->GetMethodID(appClass,"getAudioDevice","()Lus/toadlet/ribbit/AudioDevice;");
-		getInputDeviceID=env->GetMethodID(appClass,"getInputDevice","(I)Lus/toadlet/flick/InputDevice;");
+		createID=env->GetMethodID(oclass,"create","()Z");
+		destroyID=env->GetMethodID(oclass,"destroy","()V");
+		startID=env->GetMethodID(oclass,"start","()V");
+		stopID=env->GetMethodID(oclass,"stop","()V");
+		isRunningID=env->GetMethodID(oclass,"isRunning","()Z");
+		setTitleID=env->GetMethodID(oclass,"setTitle","(Ljava/lang/CharSequence;)V");
+		getTitleID=env->GetMethodID(oclass,"getTitle","()Ljava/lang/CharSequence;");
+		getWidthID=env->GetMethodID(oclass,"getWidth","()I");
+		getHeightID=env->GetMethodID(oclass,"getHeight","()I");
+		setDifferenceMouseID=env->GetMethodID(oclass,"setDifferenceMouse","(Z)V");
+		getDifferenceMouseID=env->GetMethodID(oclass,"getDifferenceMouse","()Z");
+		getEngineID=env->GetMethodID(oclass,"getEngine","()Lus/toadlet/tadpole/Engine;");
+		getRenderDeviceID=env->GetMethodID(oclass,"getRenderDevice","()Lus/toadlet/peeper/RenderDevice;");
+		getAudioDeviceID=env->GetMethodID(oclass,"getAudioDevice","()Lus/toadlet/ribbit/AudioDevice;");
+		getInputDeviceID=env->GetMethodID(oclass,"getInputDevice","(I)Lus/toadlet/flick/InputDevice;");
 	}
-	env->DeleteLocalRef(appClass);
+	env->DeleteLocalRef(oclass);
 
-	jclass engineClass=env->FindClass("us/toadlet/tadpole/Engine");
+	oclass=env->FindClass("us/toadlet/tadpole/Engine");
 	{
-		Engine_nativeHandle=env->GetFieldID(engineClass,"swigCPtr","J");
+		Engine_nativeHandle=env->GetFieldID(oclass,"swigCPtr","J");
 	}
-	env->DeleteLocalRef(engineClass);
+	env->DeleteLocalRef(oclass);
 	
-	jclass renderDeviceClass=env->FindClass("us/toadlet/peeper/RenderDevice");
+	oclass=env->FindClass("us/toadlet/peeper/RenderDevice");
 	{
-		RenderDevice_nativeHandle=env->GetFieldID(renderDeviceClass,"swigCPtr","J");
+		RenderDevice_nativeHandle=env->GetFieldID(oclass,"swigCPtr","J");
 	}
-	env->DeleteLocalRef(renderDeviceClass);
+	env->DeleteLocalRef(oclass);
 }
 
 JApplication::~JApplication(){

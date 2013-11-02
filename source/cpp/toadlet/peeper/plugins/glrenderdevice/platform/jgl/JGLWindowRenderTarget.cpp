@@ -40,22 +40,22 @@ JGLWindowRenderTarget::JGLWindowRenderTarget(JNIEnv *jenv,jobject jobj):
 	JNIEnv *env=jenv;
 	obj=env->NewGlobalRef(jobj);
 
-	jclass renderTargetClass=env->GetObjectClass(obj);
+	jclass oclass=env->GetObjectClass(obj);
 	{
-		swapID=env->GetMethodID(renderTargetClass,"swap","()Z");
-		resetID=env->GetMethodID(renderTargetClass,"reset","()V");
-		activateID=env->GetMethodID(renderTargetClass,"activate","()Z");
-		deactivateID=env->GetMethodID(renderTargetClass,"deactivate","()Z");
-		activateAdditionalContextID=env->GetMethodID(renderTargetClass,"activateAdditionalContext","()Z");
-		deactivateAdditionalContextID=env->GetMethodID(renderTargetClass,"deactivateAdditionalContext","()V");
+		swapID=env->GetMethodID(oclass,"swap","()Z");
+		resetID=env->GetMethodID(oclass,"reset","()V");
+		activateID=env->GetMethodID(oclass,"activate","()Z");
+		deactivateID=env->GetMethodID(oclass,"deactivate","()Z");
+		activateAdditionalContextID=env->GetMethodID(oclass,"activateAdditionalContext","()Z");
+		deactivateAdditionalContextID=env->GetMethodID(oclass,"deactivateAdditionalContext","()V");
 	
-		destroyID=env->GetMethodID(renderTargetClass,"destroy","()V");
-		isPrimaryID=env->GetMethodID(renderTargetClass,"isPrimary","()Z");
-		isValidID=env->GetMethodID(renderTargetClass,"isValid","()Z");
-		getWidthID=env->GetMethodID(renderTargetClass,"getWidth","()I");
-		getHeightID=env->GetMethodID(renderTargetClass,"getHeight","()I");
+		destroyID=env->GetMethodID(oclass,"destroy","()V");
+		isPrimaryID=env->GetMethodID(oclass,"isPrimary","()Z");
+		isValidID=env->GetMethodID(oclass,"isValid","()Z");
+		getWidthID=env->GetMethodID(oclass,"getWidth","()I");
+		getHeightID=env->GetMethodID(oclass,"getHeight","()I");
 	}
-	env->DeleteLocalRef(renderTargetClass);
+	env->DeleteLocalRef(oclass);
 }
 
 JGLWindowRenderTarget::~JGLWindowRenderTarget(){

@@ -45,7 +45,7 @@ class TOADLET_API Scene:public Object,public ContextListener{
 public:
 	TOADLET_OBJECT(Scene);
 
-	Scene(Engine *engine);
+	Scene(Engine *engine,scalar epsilon=Math::fromMilli(1));
 	virtual void destroy();
 
 	virtual Engine *getEngine(){return mEngine;}
