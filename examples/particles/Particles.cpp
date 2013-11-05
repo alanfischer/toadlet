@@ -80,7 +80,7 @@ void Particles::create(){
 	Node::ptr beamsNode=new Node(scene);
 	{
  		beams=new ParticleComponent(scene);
-		beams->setNumParticles(8,ParticleComponent::ParticleType_BEAM,Math::ONE,beamPositions);
+		beams->setNumParticles(8,8 | ParticleComponent::ParticleType_BIT_LOOP,Math::ONE,beamPositions);
 		beams->setMaterial(beamMaterial);
 		beamsNode->attach(beams);
 	}
