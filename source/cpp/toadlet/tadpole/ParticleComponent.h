@@ -57,6 +57,7 @@ public:
 		ParticleType_SPRITE=1,
 		ParticleType_BEAM=2,
 		// 3 and more longer connected beams
+		ParticleType_BIT_LOOP=1<<30,
 	};
 
 	class Particle{
@@ -141,6 +142,8 @@ protected:
 	Engine *mEngine;
 	Scene *mScene;
 	int mParticleType;
+	int mBeamLength;
+	bool mBeamLoop;
 	bool mWorldSpace;
 	bool mManualUpdating;
 	bool mVelocityAligned;
