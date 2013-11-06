@@ -36,8 +36,9 @@ ParticleComponent::ParticleComponent(Scene *scene):
 	//mParticles,
 
 	mParticleType(0),
+	mParticleFlags(0),
 	mBeamLength(0),
-	mBeamLoop(false),
+	mBeamCount(0),
 	mWorldSpace(false),
 	mManualUpdating(false),
 	mVelocityAligned(false),
@@ -98,7 +99,7 @@ void ParticleComponent::parentChanged(Node *node){
 }
 
 bool ParticleComponent::setNumParticles(int numParticles,int particleType,scalar scale,const Vector3 positions[]){
-	if(particleType>=ParticleType_BEAM && (numParticles%(particleType&~ParticleType_BIT_LOOP))!=0){
+	if(particleType>=ParticleType_BEAM && (particleType&ParticleType_FLAGS)==0 && (numParticles%particleType)!=0){
 		Error::invalidParameters(Categories::TOADLET_TADPOLE,
 			"setNumParticles: Must specify a numParticles divisible by particleType");
 		return false;
@@ -107,8 +108,19 @@ bool ParticleComponent::setNumParticles(int numParticles,int particleType,scalar
 	mParticles.resize(numParticles);
 
 	mParticleType=particleType;
-	mBeamLength=particleType&~ParticleType_BIT_LOOP;
-	mBeamLoop=(particleType&ParticleType_BIT_LOOP)>0;
+	mParticleFlags=particleType&ParticleType_FLAGS;
+	mBeamLength=particleType&~ParticleType_FLAGS;
+	if((mParticleFlags&ParticleType_BIT_SERIES)!=0){
+		if((mParticleFlags&ParticleType_BIT_LOOP)!=0){
+			mBeamCount=(numParticles-1)/(mBeamLength-1)+1;
+		}
+		else{
+			mBeamCount=(numParticles-1)/(mBeamLength-1);
+		}
+	}
+	else{
+		mBeamCount=numParticles/mBeamLength;
+	}
 
 	int i;
 	if(positions!=NULL){
@@ -287,12 +299,13 @@ void ParticleComponent::createVertexData(){
 	else if(mParticleType==ParticleType_SPRITE){
 		numVertexes=numParticles*4;
 	}
-	else if(mParticleType>=ParticleType_BEAM && mBeamLoop==false){
+	else if((mParticleFlags&ParticleType_BIT_SERIES)!=0 || (mParticleFlags&ParticleType_BIT_LOOP)==0){
 		// Use enough vertexes for 4 on each beam end and 2 in between
-		numVertexes=(numParticles/mBeamLength)*((mBeamLength-2)*2+8);
+		numVertexes=mBeamCount*((mBeamLength-2)*2+8);
 	}
-	else if(mParticleType>=ParticleType_BEAM && mBeamLoop==true){
-		numVertexes=(numParticles/mBeamLength)*(mBeamLength*2);
+	else{
+		// Loop
+		numVertexes=mBeamCount*(mBeamLength*2);
 	}
 
 	VertexBuffer::ptr vertexBuffer=mEngine->getBufferManager()->createVertexBuffer(Buffer::Usage_BIT_STREAM,Buffer::Access_BIT_WRITE,vertexFormat,numVertexes);
@@ -315,12 +328,13 @@ void ParticleComponent::createIndexData(){
 	else if(mParticleType==ParticleType_SPRITE){
 		numIndexes=numParticles*6;
 	}
-	else if(mParticleType>=ParticleType_BEAM && mBeamLoop==false){
+	else if((mParticleFlags&ParticleType_BIT_SERIES)!=0 || (mParticleFlags&ParticleType_BIT_LOOP)==0){
 		// Use enough indexes for a 6 on each beam end and 6 in between
-		numIndexes=(numParticles/mBeamLength)*((mBeamLength-2)*2+6)*3;
+		numIndexes=mBeamCount*((mBeamLength-2)*2+6)*3;
 	}
-	else if(mParticleType>=ParticleType_BEAM && mBeamLoop==true){
-		numIndexes=(numParticles/mBeamLength)*(mBeamLength*2)*3;
+	else{
+		// Loop
+		numIndexes=mBeamCount*(mBeamLength*2)*3;
 	}
 
 	IndexBuffer::ptr indexBuffer=NULL;
@@ -346,10 +360,10 @@ void ParticleComponent::createIndexData(){
 				iba.set(ii+5,i*4+1);
 			}
 		}
-		else if(mParticleType>=ParticleType_BEAM && mBeamLoop==false){
+		else if((mParticleFlags&ParticleType_BIT_SERIES)!=0 || (mParticleFlags&ParticleType_BIT_LOOP)==0){
 			int indexesPerBeam=((mBeamLength-2)*2+6)*3;
 			int vertexesPerBeam=((mBeamLength-2)*2+8);
-			for(i=0;i<numParticles/mBeamLength;i++){
+			for(i=0;i<mBeamCount;i++){
 				ii=i*indexesPerBeam;
 				vi=i*vertexesPerBeam;
 
@@ -377,10 +391,10 @@ void ParticleComponent::createIndexData(){
 				iba.set(ii+indexesPerBeam-1,vi+vertexesPerBeam-1);
 			}
 		}
-		else if(mParticleType>=ParticleType_BEAM && mBeamLoop==true){
+		else{
 			int indexesPerBeam=(mBeamLength*2)*3;
 			int vertexesPerBeam=(mBeamLength*2);
-			for(i=0;i<numParticles/mBeamLength;i++){
+			for(i=0;i<mBeamCount;i++){
 				ii=i*indexesPerBeam;
 				vi=i*vertexesPerBeam;
 
@@ -503,14 +517,14 @@ void ParticleComponent::updateVertexData(Camera *camera){
 				vba.set2(vi+3,2,	p.s2,p.t2);
 			}
 		}
-		else if(mParticleType>=ParticleType_BEAM && mBeamLoop==false){
+		else if((mParticleFlags&ParticleType_BIT_SERIES)!=0 || (mParticleFlags&ParticleType_BIT_LOOP)==0){
 			int vertexesPerBeam=((mBeamLength-2)*2+8);
-			for(i=0;i<numParticles/mBeamLength;i++){
-				int pi=i*mBeamLength;
+			for(i=0;i<mBeamCount;i++){
+				int pi=i*(((mParticleFlags&ParticleType_BIT_SERIES)!=0) ? (mBeamLength-1) : mBeamLength);
 				int vi=i*vertexesPerBeam;
 				Particle &p=mParticles[pi];
-				Particle &p1=mParticles[pi+1];
-				Particle &pn=mParticles[pi+mBeamLength-1];
+				Particle &p1=mParticles[(pi+1)%mParticles.size()];
+				Particle &pn=mParticles[(pi+mBeamLength-1)%mParticles.size()];
 
 				right.x=p1.x-p.x; right.y=p1.y-p.y; right.z=p1.z-p.z;
 
@@ -588,14 +602,14 @@ void ParticleComponent::updateVertexData(Camera *camera){
 				vba.set2(vi+3,2,		Math::ONE,Math::ONE);
 			}
 		}
-		else if(mParticleType>=ParticleType_BEAM && mBeamLoop==true){
+		else{
 			int vertexesPerBeam=(mBeamLength*2);
-			for(i=0;i<numParticles/mBeamLength;i++){
-				int pi=i*mBeamLength;
+			for(i=0;i<mBeamCount;i++){
+				int pi=i*(((mParticleFlags&ParticleType_BIT_SERIES)!=0) ? (mBeamLength-1) : mBeamLength);
 				int vi=i*vertexesPerBeam;
 				Particle &p=mParticles[pi];
-				Particle &p1=mParticles[pi+1];
-				Particle &pn=mParticles[pi+mBeamLength-1];
+				Particle &p1=mParticles[(pi+1)%mParticles.size()];
+				Particle &pn=mParticles[(pi+mBeamLength-1)%mParticles.size()];
 
 				right.x=p1.x-p.x; right.y=p1.y-p.y; right.z=p1.z-p.z;
 

@@ -19,6 +19,11 @@ void TreeComponent::destroy(){
 }
 
 void TreeComponent::grow(){
+	if(mParent==NULL){
+		Error::nullPointer("parent is NULL");
+		return;
+	}
+
 	mSystem->grow();
 
 	mBound->set(mSystem->getBound());
@@ -52,7 +57,7 @@ void TreeComponent::parentChanged(Node *node){
 void TreeComponent::branchBuild(BranchSystem::Branch *branch){
 	TreeSystem::TreeBranch *treeBranch=(TreeSystem::TreeBranch*)branch;
 
-	if(treeBranch->points.size()>0){
+	if(treeBranch->points.size()>0 && mParent!=NULL){
 		Segment segment;
 		segment.origin=branch->position + mParent->getWorldTranslate();
 		segment.direction=branch->position - treeBranch->points[treeBranch->points.size()-1];
