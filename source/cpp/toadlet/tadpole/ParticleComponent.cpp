@@ -36,9 +36,10 @@ ParticleComponent::ParticleComponent(Scene *scene):
 	//mParticles,
 
 	mParticleType(0),
-	mParticleFlags(0),
 	mBeamLength(0),
 	mBeamCount(0),
+	mBeamType(0),
+	mNumIndexesPerBeam(0),mNumVertexesPerBeam(0),
 	mWorldSpace(false),
 	mManualUpdating(false),
 	mVelocityAligned(false),
@@ -108,10 +109,9 @@ bool ParticleComponent::setNumParticles(int numParticles,int particleType,scalar
 	mParticles.resize(numParticles);
 
 	mParticleType=particleType;
-	mParticleFlags=particleType&ParticleType_FLAGS;
 	mBeamLength=particleType&~ParticleType_FLAGS;
-	if((mParticleFlags&ParticleType_BIT_SERIES)!=0){
-		if((mParticleFlags&ParticleType_BIT_LOOP)!=0){
+	if((particleType&ParticleType_BIT_SERIES)!=0){
+		if((particleType&ParticleType_BIT_LOOP)!=0){
 			mBeamCount=(numParticles-1)/(mBeamLength-1)+1;
 		}
 		else{
@@ -120,6 +120,20 @@ bool ParticleComponent::setNumParticles(int numParticles,int particleType,scalar
 	}
 	else{
 		mBeamCount=numParticles/mBeamLength;
+	}
+
+	if(mBeamLength>2){
+		if((particleType&ParticleType_BIT_SERIES)!=0 || (particleType&ParticleType_BIT_LOOP)==0){
+			if((particleType&ParticleType_BIT_UNCAPPED)==0){
+				mBeamType=0;
+			}
+			else{
+				mBeamType=ParticleType_BIT_UNCAPPED;
+			}
+		}
+		else{
+			mBeamType=ParticleType_BIT_LOOP;
+		}
 	}
 
 	int i;
@@ -297,13 +311,20 @@ void ParticleComponent::createVertexData(){
 	else if(mParticleType==ParticleType_SPRITE){
 		numVertexes=numParticles*4;
 	}
-	else if((mParticleFlags&ParticleType_BIT_SERIES)!=0 || (mParticleFlags&ParticleType_BIT_LOOP)==0){
-		// Use enough vertexes for 4 on each beam end and 2 in between
-		numVertexes=mBeamCount*((mBeamLength-2)*2+8);
-	}
 	else{
-		// Loop
-		numVertexes=mBeamCount*(mBeamLength*2);
+		if(mBeamType==0){
+			// Use enough vertexes for 4 on each beam end and 2 in between
+			mNumVertexesPerBeam=((mBeamLength-2)*2+8);
+		}
+		else if(mBeamType==ParticleType_BIT_UNCAPPED){
+			// Use enough vertexes for 2 on each beam end and 2 in between
+			mNumVertexesPerBeam=((mBeamLength-2)*2+4);
+		}
+		else{
+			// Loop
+			mNumVertexesPerBeam=(mBeamLength*2);
+		}
+		numVertexes=mBeamCount*mNumVertexesPerBeam;
 	}
 
 	VertexBuffer::ptr vertexBuffer=mEngine->getBufferManager()->createVertexBuffer(Buffer::Usage_BIT_STREAM,Buffer::Access_BIT_WRITE,vertexFormat,numVertexes);
@@ -311,7 +332,7 @@ void ParticleComponent::createVertexData(){
 }
 
 void ParticleComponent::createIndexData(){
-	int i,j,ii,vi;
+	int i,j,ii,vi,io,vo;
 
 	if(mIndexData!=NULL){
 		mIndexData->destroy();
@@ -326,13 +347,20 @@ void ParticleComponent::createIndexData(){
 	else if(mParticleType==ParticleType_SPRITE){
 		numIndexes=numParticles*6;
 	}
-	else if((mParticleFlags&ParticleType_BIT_SERIES)!=0 || (mParticleFlags&ParticleType_BIT_LOOP)==0){
-		// Use enough indexes for a 6 on each beam end and 6 in between
-		numIndexes=mBeamCount*((mBeamLength-2)*2+6)*3;
-	}
 	else{
-		// Loop
-		numIndexes=mBeamCount*(mBeamLength*2)*3;
+		if(mBeamType==0){
+			// Use enough indexes for 6 on each beam end and 6 in between
+			mNumIndexesPerBeam=((mBeamLength-2)*2+6)*3;
+		}
+		else if(mBeamType==ParticleType_BIT_UNCAPPED){
+			// Use enough indexes for 3 on each beam end and 6 in between
+			mNumIndexesPerBeam=((mBeamLength-2)*2+3)*3;
+		}
+		else{
+			// Loop
+			mNumIndexesPerBeam=(mBeamLength*2)*3;
+		}
+		numIndexes=mBeamCount*mNumIndexesPerBeam;
 	}
 
 	IndexBuffer::ptr indexBuffer=NULL;
@@ -358,59 +386,49 @@ void ParticleComponent::createIndexData(){
 				iba.set(ii+5,i*4+1);
 			}
 		}
-		else if((mParticleFlags&ParticleType_BIT_SERIES)!=0 || (mParticleFlags&ParticleType_BIT_LOOP)==0){
-			int indexesPerBeam=((mBeamLength-2)*2+6)*3;
-			int vertexesPerBeam=((mBeamLength-2)*2+8);
-			for(i=0;i<mBeamCount;i++){
-				ii=i*indexesPerBeam;
-				vi=i*vertexesPerBeam;
-
-				iba.set(ii+0,vi+0);
-				iba.set(ii+1,vi+1);
-				iba.set(ii+2,vi+2);
-				iba.set(ii+3,vi+3);
-				iba.set(ii+4,vi+2);
-				iba.set(ii+5,vi+1);
-
-				for(j=0;j<mBeamLength-1;++j){
-					iba.set(ii+j*6+6 ,vi+j*2+2);
-					iba.set(ii+j*6+7 ,vi+j*2+3);
-					iba.set(ii+j*6+8 ,vi+j*2+4);
-					iba.set(ii+j*6+9 ,vi+j*2+5);
-					iba.set(ii+j*6+10,vi+j*2+4);
-					iba.set(ii+j*6+11,vi+j*2+3);
-				}
-
-				iba.set(ii+indexesPerBeam-6,vi+vertexesPerBeam-4);
-				iba.set(ii+indexesPerBeam-5,vi+vertexesPerBeam-3);
-				iba.set(ii+indexesPerBeam-4,vi+vertexesPerBeam-2);
-				iba.set(ii+indexesPerBeam-3,vi+vertexesPerBeam-3);
-				iba.set(ii+indexesPerBeam-2,vi+vertexesPerBeam-2);
-				iba.set(ii+indexesPerBeam-1,vi+vertexesPerBeam-1);
-			}
-		}
 		else{
-			int indexesPerBeam=(mBeamLength*2)*3;
-			int vertexesPerBeam=(mBeamLength*2);
 			for(i=0;i<mBeamCount;i++){
-				ii=i*indexesPerBeam;
-				vi=i*vertexesPerBeam;
+				ii=i*mNumIndexesPerBeam;
+				vi=i*mNumVertexesPerBeam;
+				io=0;
+				vo=0;
 
-				for(j=0;j<mBeamLength-1;++j){
-					iba.set(ii+j*6+0, vi+j*2+0);
-					iba.set(ii+j*6+1, vi+j*2+1);
-					iba.set(ii+j*6+2, vi+j*2+2);
-					iba.set(ii+j*6+3, vi+j*2+3);
-					iba.set(ii+j*6+4, vi+j*2+2);
-					iba.set(ii+j*6+5, vi+j*2+1);
+				if(mBeamType==0){
+					iba.set(ii+0,vi+0);
+					iba.set(ii+1,vi+1);
+					iba.set(ii+2,vi+2);
+					iba.set(ii+3,vi+3);
+					iba.set(ii+4,vi+2);
+					iba.set(ii+5,vi+1);
+					io=6;
+					vo=2;
 				}
 
-				iba.set(ii+indexesPerBeam-6,vi+vertexesPerBeam-2);
-				iba.set(ii+indexesPerBeam-5,vi+vertexesPerBeam-1);
-				iba.set(ii+indexesPerBeam-4,vi+0);
-				iba.set(ii+indexesPerBeam-3,vi+vertexesPerBeam-1);
-				iba.set(ii+indexesPerBeam-2,vi+0);
-				iba.set(ii+indexesPerBeam-1,vi+1);
+				for(j=0;j<mBeamLength-1;++j){
+					iba.set(ii+j*6+io+0 ,vi+j*2+vo+0);
+					iba.set(ii+j*6+io+1 ,vi+j*2+vo+1);
+					iba.set(ii+j*6+io+2 ,vi+j*2+vo+2);
+					iba.set(ii+j*6+io+3 ,vi+j*2+vo+3);
+					iba.set(ii+j*6+io+4 ,vi+j*2+vo+2);
+					iba.set(ii+j*6+io+5 ,vi+j*2+vo+1);
+				}
+
+				if(mBeamType==0){
+					iba.set(ii+mNumIndexesPerBeam-6,vi+mNumVertexesPerBeam-4);
+					iba.set(ii+mNumIndexesPerBeam-5,vi+mNumVertexesPerBeam-3);
+					iba.set(ii+mNumIndexesPerBeam-4,vi+mNumVertexesPerBeam-2);
+					iba.set(ii+mNumIndexesPerBeam-3,vi+mNumVertexesPerBeam-3);
+					iba.set(ii+mNumIndexesPerBeam-2,vi+mNumVertexesPerBeam-2);
+					iba.set(ii+mNumIndexesPerBeam-1,vi+mNumVertexesPerBeam-1);
+				}
+				else if(mBeamType==ParticleType_BIT_LOOP){
+					iba.set(ii+mNumIndexesPerBeam-6,vi+mNumVertexesPerBeam-2);
+					iba.set(ii+mNumIndexesPerBeam-5,vi+mNumVertexesPerBeam-1);
+					iba.set(ii+mNumIndexesPerBeam-4,vi+0);
+					iba.set(ii+mNumIndexesPerBeam-3,vi+mNumVertexesPerBeam-1);
+					iba.set(ii+mNumIndexesPerBeam-2,vi+0);
+					iba.set(ii+mNumIndexesPerBeam-1,vi+1);
+				}
 			}
 		}
 
@@ -515,15 +533,15 @@ void ParticleComponent::updateVertexData(Camera *camera){
 				vba.set2(vi+3,2,	p.s2,p.t2);
 			}
 		}
-		else if((mParticleFlags&ParticleType_BIT_SERIES)!=0 || (mParticleFlags&ParticleType_BIT_LOOP)==0){
-			int vertexesPerBeam=((mBeamLength-2)*2+8);
+		else{
 			for(i=0;i<mBeamCount;i++){
-				int pi=i*(((mParticleFlags&ParticleType_BIT_SERIES)!=0) ? (mBeamLength-1) : mBeamLength);
-				int vi=i*vertexesPerBeam;
+				int pi=i*(((mParticleType&ParticleType_BIT_SERIES)!=0) ? (mBeamLength-1) : mBeamLength);
+				int vi=i*mNumVertexesPerBeam;
+				int vo=0;
 				Particle &p=mParticles[pi];
 				Particle &p1=mParticles[(pi+1)%mParticles.size()];
 				Particle &pn=mParticles[(pi+mBeamLength-1)%mParticles.size()];
-
+				
 				right.x=p1.x-p.x; right.y=p1.y-p.y; right.z=p1.z-p.z;
 
 				Math::normalizeCarefully(right,epsilon);
@@ -534,26 +552,29 @@ void ParticleComponent::updateVertexData(Camera *camera){
 				Math::mul(up,p.scale);
 				Math::mul(right,p.scale);
 
-				vba.set3(vi+0,0,		p.x+up.x-right.x, p.y+up.y-right.y, p.z+up.z-right.z);
-				vba.setRGBA(vi+0,1,		p.color);
-				vba.set2(vi+0,2,		0,0);
+				if(mBeamType==0){
+					vba.set3(vi+0,0,		p.x+up.x-right.x, p.y+up.y-right.y, p.z+up.z-right.z);
+					vba.setRGBA(vi+0,1,		p.color);
+					vba.set2(vi+0,2,		0,0);
 
-				vba.set3(vi+1,0,		p.x-up.x-right.x, p.y-up.y-right.y, p.z-up.z-right.z);
-				vba.setRGBA(vi+1,1,		p.color);
-				vba.set2(vi+1,2,		0,Math::ONE);
+					vba.set3(vi+1,0,		p.x-up.x-right.x, p.y-up.y-right.y, p.z-up.z-right.z);
+					vba.setRGBA(vi+1,1,		p.color);
+					vba.set2(vi+1,2,		0,Math::ONE);
 
-				vba.set3(vi+2,0,		p.x+up.x, p.y+up.y, p.z+up.z);
-				vba.setRGBA(vi+2,1,		p.color);
-				vba.set2(vi+2,2,		Math::QUARTER,0);
+					vo=2;
+				}
 
-				vba.set3(vi+3,0,		p.x-up.x, p.y-up.y, p.z-up.z);
-				vba.setRGBA(vi+3,1,		p.color);
-				vba.set2(vi+3,2,		Math::QUARTER,Math::ONE);
+				vba.set3(vi+vo+0,0,		p.x+up.x, p.y+up.y, p.z+up.z);
+				vba.setRGBA(vi+vo+0,1,	p.color);
+				vba.set2(vi+vo+0,2,		Math::QUARTER,0);
 
+				vba.set3(vi+vo+1,0,		p.x-up.x, p.y-up.y, p.z-up.z);
+				vba.setRGBA(vi+vo+1,1,	p.color);
+				vba.set2(vi+vo+1,2,		Math::QUARTER,Math::ONE);
 
 				for(j=0;j<mBeamLength-2;++j){
 					int ipi=pi+j+1;
-					int ivi=vi+j*2+4;
+					int ivi=vi+j*2+vo+2;
 					Particle &ip=mParticles[ipi];
 					Particle &ip1=mParticles[ipi+1];
 
@@ -564,8 +585,12 @@ void ParticleComponent::updateVertexData(Camera *camera){
 						up2.set(Math::X_UNIT_VECTOR3);
 					}
 					Math::mul(up2,p.scale);
+
 					Math::add(up,up2);
-					Math::mul(up,Math::HALF);
+					if(Math::normalizeCarefully(up,epsilon)==false){
+						up.set(Math::X_UNIT_VECTOR3);
+					}
+					Math::mul(up,p.scale);
 
 					vba.set3(ivi+0,0,		ip.x+up.x, ip.y+up.y, ip.z+up.z);
 					vba.setRGBA(ivi+0,1,	p.color);
@@ -578,95 +603,27 @@ void ParticleComponent::updateVertexData(Camera *camera){
 					up.set(up2);
 				}
 
-				// We re-use the up from the previous particle pair,
-				//  since we always use particle(n) and particle(n+1), on the final beam cap we
-				//  only need to calculate the right, and only if we drew middle particles
-				if(j>0){
-					Math::normalizeCarefully(right,epsilon);
-					Math::mul(right,p.scale);
-				}
+				if(mBeamType==ParticleType_BIT_LOOP){
+					right.x=p.x-pn.x; right.y=p.y-pn.y; right.z=p.z-pn.z;
 
-				vi=vi+vertexesPerBeam-4;
-				vba.set3(vi+0,0,		pn.x+up.x, pn.y+up.y, pn.z+up.z);
-				vba.setRGBA(vi+0,1,		p.color);
-				vba.set2(vi+0,2,		Math::THREE_QUARTERS,0);
-
-				vba.set3(vi+1,0,		pn.x-up.x, pn.y-up.y, pn.z-up.z);
-				vba.setRGBA(vi+1,1,		p.color);
-				vba.set2(vi+1,2,		Math::THREE_QUARTERS,Math::ONE);
-
-				vba.set3(vi+2,0,		pn.x+up.x+right.x, pn.y+up.y+right.y, pn.z+up.z+right.z);
-				vba.setRGBA(vi+2,1,		p.color);
-				vba.set2(vi+2,2,		Math::ONE,0);
-
-				vba.set3(vi+3,0,		pn.x-up.x+right.x, pn.y-up.y+right.y, pn.z-up.z+right.z);
-				vba.setRGBA(vi+3,1,		p.color);
-				vba.set2(vi+3,2,		Math::ONE,Math::ONE);
-			}
-		}
-		else{
-			int vertexesPerBeam=(mBeamLength*2);
-			for(i=0;i<mBeamCount;i++){
-				int pi=i*(((mParticleFlags&ParticleType_BIT_SERIES)!=0) ? (mBeamLength-1) : mBeamLength);
-				int vi=i*vertexesPerBeam;
-				Particle &p=mParticles[pi];
-				Particle &p1=mParticles[(pi+1)%mParticles.size()];
-				Particle &pn=mParticles[(pi+mBeamLength-1)%mParticles.size()];
-
-				right.x=p1.x-p.x; right.y=p1.y-p.y; right.z=p1.z-p.z;
-
-				Math::normalizeCarefully(right,epsilon);
-				Math::cross(up,viewForward,right);
-				if(Math::normalizeCarefully(up,epsilon)==false){
-					up.set(Math::X_UNIT_VECTOR3);
-				}
-				Math::mul(up,p.scale);
-
-				vba.set3(vi+0,0,		p.x+up.x, p.y+up.y, p.z+up.z);
-				vba.setRGBA(vi+0,1,		p.color);
-				vba.set2(vi+0,2,		Math::QUARTER,0);
-
-				vba.set3(vi+1,0,		p.x-up.x, p.y-up.y, p.z-up.z);
-				vba.setRGBA(vi+1,1,		p.color);
-				vba.set2(vi+1,2,		Math::QUARTER,Math::ONE);
-
-
-				for(j=0;j<mBeamLength-2;++j){
-					int ipi=pi+j+1;
-					int ivi=vi+j*2+2;
-					Particle &ip=mParticles[ipi];
-					Particle &ip1=mParticles[ipi+1];
-
-					right.x=ip1.x-ip.x; right.y=ip1.y-ip.y; right.z=ip1.z-ip.z;
-					
-					Math::cross(up2,viewForward,right);
-					if(Math::normalizeCarefully(up2,epsilon)==false){
-						up2.set(Math::X_UNIT_VECTOR3);
+					Math::cross(up,viewForward,right);
+					if(Math::normalizeCarefully(up,epsilon)==false){
+						up.set(Math::X_UNIT_VECTOR3);
 					}
-					Math::mul(up2,p.scale);
-					Math::add(up,up2);
-					Math::mul(up,Math::HALF);
-
-					vba.set3(ivi+0,0,		ip.x+up.x, ip.y+up.y, ip.z+up.z);
-					vba.setRGBA(ivi+0,1,	p.color);
-					vba.set2(ivi+0,2,		Math::QUARTER,0);
-
-					vba.set3(ivi+1,0,		ip.x-up.x, ip.y-up.y, ip.z-up.z);
-					vba.setRGBA(ivi+1,1,	p.color);
-					vba.set2(ivi+1,2,		Math::QUARTER,Math::ONE);
-
-					up.set(up2);
+					Math::mul(up,p.scale);
+				}
+				else{
+					// We re-use the up from the previous particle pair,
+					//  since we always use particle(n) and particle(n+1), on the final beam cap we
+					//  only need to calculate the right, and only if we drew middle particles
+					if(j>0){
+						Math::normalizeCarefully(right,epsilon);
+						Math::mul(right,p.scale);
+					}
 				}
 
-				right.x=p.x-pn.x; right.y=p.y-pn.y; right.z=p.z-pn.z;
+				vi=vi+mNumVertexesPerBeam-(vo+2);
 
-				Math::cross(up,viewForward,right);
-				if(Math::normalizeCarefully(up,epsilon)==false){
-					up.set(Math::X_UNIT_VECTOR3);
-				}
-				Math::mul(up,p.scale);
-
-				vi=vi+vertexesPerBeam-2;
 				vba.set3(vi+0,0,		pn.x+up.x, pn.y+up.y, pn.z+up.z);
 				vba.setRGBA(vi+0,1,		p.color);
 				vba.set2(vi+0,2,		Math::THREE_QUARTERS,0);
@@ -674,6 +631,16 @@ void ParticleComponent::updateVertexData(Camera *camera){
 				vba.set3(vi+1,0,		pn.x-up.x, pn.y-up.y, pn.z-up.z);
 				vba.setRGBA(vi+1,1,		p.color);
 				vba.set2(vi+1,2,		Math::THREE_QUARTERS,Math::ONE);
+
+				if(mBeamType==0){
+					vba.set3(vi+2,0,		pn.x+up.x+right.x, pn.y+up.y+right.y, pn.z+up.z+right.z);
+					vba.setRGBA(vi+2,1,		p.color);
+					vba.set2(vi+2,2,		Math::ONE,0);
+
+					vba.set3(vi+3,0,		pn.x-up.x+right.x, pn.y-up.y+right.y, pn.z-up.z+right.z);
+					vba.setRGBA(vi+3,1,		p.color);
+					vba.set2(vi+3,2,		Math::ONE,Math::ONE);
+				}
 			}
 		}
 
