@@ -122,7 +122,7 @@ bool ParticleComponent::setNumParticles(int numParticles,int particleType,scalar
 		mBeamCount=numParticles/mBeamLength;
 	}
 
-	if(mBeamLength>2){
+	if(mBeamLength>=2){
 		if((particleType&ParticleType_BIT_SERIES)!=0 || (particleType&ParticleType_BIT_LOOP)==0){
 			if((particleType&ParticleType_BIT_UNCAPPED)==0){
 				mBeamType=0;
