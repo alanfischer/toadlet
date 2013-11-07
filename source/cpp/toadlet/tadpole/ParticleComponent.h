@@ -58,9 +58,10 @@ public:
 		ParticleType_BEAM=2,
 		// 3 and more longer connected beams
 
+		ParticleType_BIT_UNCAPPED=1<<28, // No caps on beams
 		ParticleType_BIT_LOOP=1<<29, // Beams are loops
 		ParticleType_BIT_SERIES=1<<30, // Multiple beams share start and end points
-		ParticleType_FLAGS=ParticleType_BIT_LOOP | ParticleType_BIT_SERIES
+		ParticleType_FLAGS=ParticleType_BIT_UNCAPPED | ParticleType_BIT_LOOP | ParticleType_BIT_SERIES
 	};
 
 	class Particle{
@@ -145,9 +146,10 @@ protected:
 	Engine *mEngine;
 	Scene *mScene;
 	int mParticleType;
-	int mParticleFlags;
 	int mBeamLength;
 	int mBeamCount;
+	int mBeamType;
+	int mNumIndexesPerBeam,mNumVertexesPerBeam;
 	bool mWorldSpace;
 	bool mManualUpdating;
 	bool mVelocityAligned;
