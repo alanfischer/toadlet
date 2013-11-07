@@ -203,19 +203,17 @@ void ParticleComponent::setTransform(Transform::ptr transform){
 }
 
 void ParticleComponent::updateBound(){
-	Sphere sphere;
-	Sphere point;
+	AABox box;
 	scalar epsilon=mScene->getEpsilon();
 	if(mParticles.size()>0){
 		Particle *p=&mParticles[0];
-		sphere.origin.set(p->x,p->y,p->z);
+		box.set(p->x,p->y,p->z,p->x,p->y,p->z);
 		for(int i=1;i<mParticles.size();++i){
 			p=&mParticles[i];
-			point.origin.set(p->x,p->y,p->z);
-			sphere.merge(point,epsilon);
+			box.merge(Vector3(p->x,p->y,p->z));
 		}
 	}
-	mBound->set(sphere);
+	mBound->set(box);
 
 	if(mWorldSpace){
 		mBound->inverseTransform(mBound,mParent->getWorldTransform());
@@ -459,7 +457,7 @@ void ParticleComponent::updateVertexData(Camera *camera){
 
 	int numParticles=mParticles.size();
 	scalar epsilon=mScene->getEpsilon();
-	Vector3 right,up,forward;
+	Vector3 right,up,up2;
 	{
 		VertexBufferAccessor vba(mVertexData->getVertexBuffer(0),Buffer::Access_BIT_WRITE);
 
@@ -561,11 +559,13 @@ void ParticleComponent::updateVertexData(Camera *camera){
 
 					right.x=ip1.x-ip.x; right.y=ip1.y-ip.y; right.z=ip1.z-ip.z;
 
-					Math::cross(up,viewForward,right);
-					if(Math::normalizeCarefully(up,epsilon)==false){
-						up.set(Math::X_UNIT_VECTOR3);
+					Math::cross(up2,viewForward,right);
+					if(Math::normalizeCarefully(up2,epsilon)==false){
+						up2.set(Math::X_UNIT_VECTOR3);
 					}
-					Math::mul(up,p.scale);
+					Math::mul(up2,p.scale);
+					Math::add(up,up2);
+					Math::mul(up,Math::HALF);
 
 					vba.set3(ivi+0,0,		ip.x+up.x, ip.y+up.y, ip.z+up.z);
 					vba.setRGBA(ivi+0,1,	p.color);
@@ -574,6 +574,8 @@ void ParticleComponent::updateVertexData(Camera *camera){
 					vba.set3(ivi+1,0,		ip.x-up.x, ip.y-up.y, ip.z-up.z);
 					vba.setRGBA(ivi+1,1,	p.color);
 					vba.set2(ivi+1,2,		Math::QUARTER,Math::ONE);
+
+					up.set(up2);
 				}
 
 				// We re-use the up from the previous particle pair,
@@ -636,12 +638,14 @@ void ParticleComponent::updateVertexData(Camera *camera){
 					Particle &ip1=mParticles[ipi+1];
 
 					right.x=ip1.x-ip.x; right.y=ip1.y-ip.y; right.z=ip1.z-ip.z;
-
-					Math::cross(up,viewForward,right);
-					if(Math::normalizeCarefully(up,epsilon)==false){
-						up.set(Math::X_UNIT_VECTOR3);
+					
+					Math::cross(up2,viewForward,right);
+					if(Math::normalizeCarefully(up2,epsilon)==false){
+						up2.set(Math::X_UNIT_VECTOR3);
 					}
-					Math::mul(up,p.scale);
+					Math::mul(up2,p.scale);
+					Math::add(up,up2);
+					Math::mul(up,Math::HALF);
 
 					vba.set3(ivi+0,0,		ip.x+up.x, ip.y+up.y, ip.z+up.z);
 					vba.setRGBA(ivi+0,1,	p.color);
@@ -650,6 +654,8 @@ void ParticleComponent::updateVertexData(Camera *camera){
 					vba.set3(ivi+1,0,		ip.x-up.x, ip.y-up.y, ip.z-up.z);
 					vba.setRGBA(ivi+1,1,	p.color);
 					vba.set2(ivi+1,2,		Math::QUARTER,Math::ONE);
+
+					up.set(up2);
 				}
 
 				right.x=p.x-pn.x; right.y=p.y-pn.y; right.z=p.z-pn.z;
