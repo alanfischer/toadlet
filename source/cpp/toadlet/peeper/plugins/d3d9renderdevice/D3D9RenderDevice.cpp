@@ -391,7 +391,7 @@ void D3D9RenderDevice::renderPrimitive(VertexData *vertexData,IndexData *indexDa
 	D3DPRIMITIVETYPE d3dpt;
 	int count;
 	getPrimitiveTypeAndCount(d3dpt,count,indexData->primitive,indexData->count);
-	if(count==0){
+	if(count<=0){
 		return;
 	}
 

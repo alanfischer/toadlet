@@ -35,29 +35,39 @@ public:
 		virtual int getTimeIndex(scalar time) const{return Math::toInt(lerp(times.data(),times.size(),time));}
 
 		// Count start and end as neighbors, even if they have null paths
-		virtual int getNumNeighbors() const{return children.size()+2;}
-		virtual Path *getNeighbor(int i) const{
-			if(i==0){
-				return parent;
+		class iterator{
+		public:
+			iterator(const TreeBranch *b,int i):branch(b),index(i){}
+
+			Neighbor operator*() const{
+				if(index==0){
+					return Neighbor((Path*)branch->parent,0);
+				}
+				else if(index-1<branch->children.size()){
+					return Neighbor((Path*)branch->children[index-1],branch->childrenTimes[index-1]);
+				}
+				else{
+					return Neighbor(NULL,branch->length);
+				}
 			}
-			else if(i-1<children.size()){
-				return children[i-1];
-			}
-			else{
-				return NULL;
-			}
+
+			iterator &operator++(){++index;return(*this);}
+			iterator &operator++(int){index++;return(*this);}
+			bool operator==(const iterator &it) const{return branch==it.branch && index==it.index;}
+
+			const TreeBranch *branch;
+			int index;
+		};
+
+		iterator begin() const{return iterator(this,0);}
+		iterator end() const{return iterator(this,children.size()+2);}
+
+		virtual IteratorRange<Neighbor> getNeighbors() const{
+			return IteratorRange<Neighbor>(
+				WrapIterator<Neighbor,iterator>(begin()),
+				WrapIterator<Neighbor,iterator>(end()));
 		}
-		virtual scalar getNeighborTime(int i) const{
-			if(i==0){
-				return 0;
-			}
-			else if(i-1<children.size()){
-				return childrenTimes[i-1];
-			}
-			else{
-				return length;
-			}
-		}
+		/*
 		virtual scalar getNeighborTime(Path *neighbor) const{
 			if(neighbor==parent){
 				return 0;
@@ -72,6 +82,7 @@ public:
 				return 0;
 			}
 		}
+		*/
 
 		const AABox &getBound() const{return bound;}
 

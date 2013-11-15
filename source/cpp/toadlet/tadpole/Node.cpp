@@ -38,6 +38,8 @@ Node::Node(Scene *scene):BaseComponent(),
 	mUniqueHandle(0),
 	mParentData(NULL),
 
+	//mComponents,
+	//mNodes,
 	mChildrenActive(false),
 	mActivateChildren(false),
 

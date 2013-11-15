@@ -39,6 +39,7 @@ class TOADLET_API PointerCollection{
 public:
 	typedef typename Type::ptr TypePtr;
 	typedef Collection<TypePtr> CollectionType;
+	typedef typename Type::ptr value_type;
 	class const_iterator;
 
 	class iterator{

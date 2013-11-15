@@ -518,7 +518,7 @@ void RandIsle::updateProps(){
 	Segment segment;
 	Vector2 origin(mPlayer->getPhysics()->getPosition().x,mPlayer->getPhysics()->getPosition().y);
 	Random r(System::mtime());
-	tforeach(Node::NodeCollection::iterator,prop,mProps->getNodes()){
+	tforeach(AnyPointerIterator<Node>,prop,mProps->getNodes()){
 		Vector2 propOrigin(prop->getWorldTranslate().x,prop->getWorldTranslate().y);
 		scalar d=Math::length(propOrigin,origin);
 		scalar a=Math::ONE-(d-minDist)/(maxDist-minDist);
@@ -565,7 +565,7 @@ void RandIsle::updateClimber(PathClimber *climber,int dt){
 			mBoundSensor->setBound(mMountBound);
 			SensorResults::ptr results=mBoundSensor->sense();
 
-			for(SensorResults::iterator node=results->begin();node!=results->end();++node){
+			tforeach(SensorResults::iterator,node,results){
 				TreeComponent *tree=node->getChildType<TreeComponent>();
 				if(tree!=NULL){
 					Vector3 point;
@@ -585,6 +585,7 @@ void RandIsle::updateClimber(PathClimber *climber,int dt){
 				climber->mount(closestNode,closestPath,closestPoint);
 				findPathSequence(mPathSequence,climber,climber->getPath(),climber->getPathDirection(),climber->getPathTime());
 			}
+
 		}
 	}
 
@@ -904,7 +905,7 @@ void RandIsle::terrainPatchCreated(int px,int py,Bound *bound){
 void RandIsle::terrainPatchDestroyed(int px,int py,Bound *bound){
 	mBoundSensor->setBound(bound);
 	SensorResults::ptr results=mBoundSensor->sense();
-	for(SensorResults::iterator node=results->begin();node!=results->end();++node){
+	tforeach(SensorResults::iterator,node,results){
 		if(node->getChildType<TreeComponent>()!=NULL && Math::testInside(bound->getAABox(),node->getWorldTranslate())){
 			node->destroy();
 		}

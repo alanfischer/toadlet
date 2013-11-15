@@ -44,7 +44,7 @@ protected:
 	Path *mPath;
 	float mPathTime;
 	int mPathDirection;
-	int mPassedNeighbor;
+	Path::NeighborRange::iterator mPassedNeighbor;
 	int mNoClimbTime;
 	float mSpeed;
 	Quaternion mIdealRotation;

@@ -186,7 +186,7 @@ void ParticleComponent::setWorldSpace(bool worldSpace){
 		}
 	}
 
-	if(mWorldSpace){
+	if(mWorldSpace && mParent!=NULL){
 		mBound->inverseTransform(mBound,mParent->getWorldTransform());
 	}
 

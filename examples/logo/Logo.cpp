@@ -9,7 +9,7 @@ Logo::~Logo(){
 
 void Logo::create(){
 	engine=app->getEngine();
-	engine->getArchiveManager()->addDirectory("../../../data");
+	engine->getArchiveManager()->addDirectory("../../data");
 
 	scene=new Scene(engine);
 

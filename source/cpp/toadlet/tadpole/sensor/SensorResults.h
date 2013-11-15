@@ -37,9 +37,8 @@ class TOADLET_API SensorResults:public Object,public SensorResultsListener{
 public:
 	TOADLET_OBJECT(SensorResults);
 
-	typedef Node::NodeCollection NodeCollection;
+	typedef PointerCollection<Node> NodeCollection;
 	typedef NodeCollection::iterator iterator;
-	typedef NodeCollection::const_iterator const_iterator;
 
 	SensorResults();
 
@@ -50,10 +49,8 @@ public:
 	bool resultFound(Node *result,scalar distance);
 	void sensingEnding();
 	
-	inline iterator begin(){return mNodes.begin();}
-	inline iterator end(){return mNodes.end();}
-	inline const_iterator begin() const{return mNodes.begin();}
-	inline const_iterator end() const{return mNodes.end();}
+	inline const NodeCollection::iterator &begin(){return mNodes.begin();}
+	inline const NodeCollection::iterator &end(){return mNodes.end();}
 	inline int size() const{return mNodes.size();}
 
 protected:

@@ -413,9 +413,9 @@ void TreeSystem::calculateNormals(TreeBranch *branch){
 	Vector3 tangent,neighborTangent,normal,binormal;
 
 	int i;
-	for(i=1;i<branch->getNumNeighbors()-1;++i){ // We do the start and end point separately
-		TreeBranch *neighbor=(TreeBranch*)branch->getNeighbor(i);
-		scalar neighborTime=branch->getNeighborTime(i);
+	for(i=0;i<branch->children.size();++i){ // We do the start and end point separately
+		TreeBranch *neighbor=branch->children[i];
+		scalar neighborTime=branch->childrenTimes[i];
 
 		tangent=branch->tangents[branch->getTimeIndex(neighborTime)];
 		neighborTangent=neighbor->tangents[0];
