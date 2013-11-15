@@ -34,6 +34,8 @@ namespace egg{
 template<typename Type>
 class TOADLET_API Collection{
 public:
+	typedef Type value_type;
+	
 	class const_iterator;
 
     class iterator{

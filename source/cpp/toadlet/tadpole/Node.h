@@ -29,6 +29,7 @@
 #include <toadlet/tadpole/Types.h>
 #include <toadlet/egg/Type.h>
 #include <toadlet/egg/PointerCollection.h>
+#include <toadlet/egg/Iterator.h>
 #include <toadlet/tadpole/Bound.h>
 #include <toadlet/tadpole/BaseComponent.h>
 
@@ -59,9 +60,6 @@ class PhysicsComponent;
 class TOADLET_API Node:public BaseComponent,public TransformListener{
 public:
 	TOADLET_NODE(Node);
-
-	typedef PointerCollection<Component> ComponentCollection;
-	typedef PointerCollection<Node> NodeCollection;
 
 	Node(Scene *scene=NULL);
 	virtual ~Node();
@@ -94,7 +92,7 @@ public:
 
 	virtual void nodeAttached(Node *node);
 	virtual void nodeRemoved(Node *node);
-	virtual const NodeCollection &getNodes() const{return mNodes;}
+	virtual PointerIteratorRange<Node> getNodes(){return PointerIteratorRange<Node>(mNodes);}
 	virtual Node *getNode(const String &name) const;
 	virtual Node *getNode(const Type<Component> *type) const;
 	template<typename Type> Type *getNodeType() const{return (Type*)getNode(Type::type());}
@@ -187,6 +185,9 @@ public:
 	inline Scene *getScene() const{return (Scene*)mScene;}
 
 protected:
+	typedef PointerCollection<Component> ComponentCollection;
+	typedef PointerCollection<Node> NodeCollection;
+
 	virtual void calculateBound();
 
 	// Engine items
