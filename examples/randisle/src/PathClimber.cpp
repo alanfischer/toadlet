@@ -7,7 +7,7 @@ PathClimber::PathClimber():BaseComponent(),
 	mPath(NULL),
 	mPathTime(0),
 	mPathDirection(0),
-	mPassedNeighbor(0),
+	//mPassedNeighbor(,
 	mNoClimbTime(0),
 	mSpeed(0),
 	//mIdealRotation,
@@ -62,12 +62,19 @@ void PathClimber::logicUpdate(int dt,int scope){
 	else{
 		scalar oldPathTime=mPathTime;
 		mPathTime+=mPathDirection*Math::mul(Math::fromMilli(dt),mSpeed);
-		scalar pathTime=mPathTime;
-		scalar neighborTime=mPath->getNeighborTime(mPassedNeighbor+mPathDirection);
-		if(passedJunction(mPathDirection,oldPathTime,pathTime,neighborTime)){
-			mPassedNeighbor+=mPathDirection;
-			Path *neighbor=mPath->getNeighbor(mPassedNeighbor);
-			if(neighbor==NULL){
+
+		PathVertex::iterator neighbor=mPassedNeighbor;
+		if(mPathDirection>0){
+			++neighbor;
+		}
+		else{
+			--neighbor;
+		}
+		scalar neighborTime=(neighbor->getVertex(false)==mPath)?neighbor->getTime(false):neighbor->getTime(true);
+
+		if(passedJunction(mPathDirection,oldPathTime,mPathTime,neighborTime)){
+			mPassedNeighbor=neighbor;
+			if(mPassedNeighbor->getVertex(true)==NULL){
 				dismount();
 			}
 			else{
@@ -79,12 +86,12 @@ void PathClimber::logicUpdate(int dt,int scope){
 					scalar extraTime=Math::abs(mPathTime-neighborTime);
 
 					mPreviousPath=mPath;
-					mPath=neighbor;
+					mPath=neighbor->getVertex((mPathDirection+1)/2);
 					mPathDirection=direction;
 
 					// I believe there is a case where we could use the extraTime, and end up passing our next destination
 					// I would like this code to be closer to RandIsle::updatePredictedPath, ideally a function in PathClimber which Squirrel would then use
-					mPathTime=mPath->getNeighborTime(mPreviousPath)+direction*extraTime;
+					mPathTime=neighbor->getTime((mPathDirection+1)/2)+direction*extraTime;
 
 					mPassedNeighbor=findPassedNeighbor(mPath,mPathDirection,mPathTime);
 				}
@@ -111,7 +118,7 @@ void PathClimber::logicUpdate(int dt,int scope){
 	}
 }
 
-void PathClimber::mount(Node *system,Path *path,const Vector3 &point){
+void PathClimber::mount(Node *system,PathVertex *path,const Vector3 &point){
 	dismount();
 
 	mMounted=system;
