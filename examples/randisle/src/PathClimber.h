@@ -11,11 +11,11 @@ public:
 
 	PathClimber();
 
-	void mount(Node *system,Path *path,const Vector3 &point);
+	void mount(Node *system,PathVertex *path,const Vector3 &point);
 	void dismount();
 
 	Node *getMounted(){return mMounted;}
-	Path *getPath(){return mPath;}
+	PathVertex *getPath(){return mPath;}
 	int getPathDirection(){return mPathDirection;}
 	void setPathDirection(int direction);
 	float getPathTime(){return mPathTime;}
@@ -40,11 +40,11 @@ public:
 protected:
 	PathClimberListener *mPathClimberListener;
 	Node::ptr mMounted;
-	Path *mPreviousPath;
-	Path *mPath;
+	PathVertex *mPreviousPath;
+	PathVertex *mPath;
 	float mPathTime;
 	int mPathDirection;
-	Path::NeighborRange::iterator mPassedNeighbor;
+	PathVertex::iterator mPassedNeighbor;
 	int mNoClimbTime;
 	float mSpeed;
 	Quaternion mIdealRotation;
