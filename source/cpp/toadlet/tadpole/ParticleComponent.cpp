@@ -218,7 +218,6 @@ void ParticleComponent::setTransform(Transform::ptr transform){
 
 void ParticleComponent::updateBound(){
 	AABox box;
-	scalar epsilon=mScene->getEpsilon();
 	if(mParticles.size()>0){
 		Particle *p=&mParticles[0];
 		box.set(p->x,p->y,p->z,p->x,p->y,p->z);
