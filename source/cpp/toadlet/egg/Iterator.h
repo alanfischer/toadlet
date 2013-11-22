@@ -50,9 +50,9 @@ public:
 
 	void increment(){++iter;}
 	void decrement(){--iter;}
-	Iterator *clone() const{return new WrapIterator(iter);}
+	Iterator<ValueType> *clone() const{return new WrapIterator(iter);}
 	ValueType dereference() const{return *iter;}
-	bool equals(Iterator *it) const{return iter==((WrapIterator*)it)->iter;}
+	bool equals(Iterator<ValueType> *it) const{return iter==((WrapIterator*)it)->iter;}
 
 	IteratorType iter;
 };
@@ -64,9 +64,9 @@ public:
 
 	void increment(){++iter;}
 	void decrement(){--iter;}
-	Iterator *clone() const{return new WrapPointerIterator(iter);}
+	Iterator<PointerType> *clone() const{return new WrapPointerIterator(iter);}
 	PointerType dereference() const{return iter;}
-	bool equals(Iterator *it) const{return iter==((WrapPointerIterator*)it)->iter;}
+	bool equals(Iterator<PointerType> *it) const{return iter==((WrapPointerIterator*)it)->iter;}
 
 	IteratorType iter;
 };
@@ -87,7 +87,7 @@ public:
 	inline bool operator==(const AnyIterator<Type> &it) const{return iter->equals(it.iter);}
 	inline bool operator!=(const AnyIterator<Type> &it) const{return !iter->equals(it.iter);}
 
-	typename Iterator<Type> *iter;
+	Iterator<Type> *iter;
 };
 
 template<typename Type>
@@ -107,7 +107,7 @@ public:
 	inline bool operator==(const AnyPointerIterator<Type> &it) const{return iter->equals(it.iter);}
 	inline bool operator!=(const AnyPointerIterator<Type> &it) const{return !iter->equals(it.iter);}
 
-	typename Iterator<typename Type::ptr> *iter;
+	Iterator<typename Type::ptr> *iter;
 };
 
 template<typename Type>
@@ -119,8 +119,8 @@ public:
 
 	template<typename CollectionType>
 	IteratorRange(const CollectionType &collection):
-		beginit(WrapIterator<CollectionType::value_type,CollectionType::iterator>(collection.begin())),
-		endit(WrapIterator<CollectionType::value_type,CollectionType::iterator>(collection.end())){}
+		beginit(WrapIterator<typename CollectionType::value_type,typename CollectionType::iterator>(collection.begin())),
+		endit(WrapIterator<typename CollectionType::value_type,typename CollectionType::iterator>(collection.end())){}
 
 	inline const iterator &begin() const{return beginit;}
 	inline const iterator &end() const{return endit;}
@@ -137,8 +137,8 @@ public:
 
 	template<typename CollectionType>
 	PointerIteratorRange(const CollectionType &collection):
-		beginit(WrapPointerIterator<CollectionType::value_type,CollectionType::iterator>(collection.begin())),
-		endit(WrapPointerIterator<CollectionType::value_type,CollectionType::iterator>(collection.end())){}
+		beginit(WrapPointerIterator<typename CollectionType::value_type,typename CollectionType::iterator>(collection.begin())),
+		endit(WrapPointerIterator<typename CollectionType::value_type,typename CollectionType::iterator>(collection.end())){}
 
 	inline const iterator &begin() const{return beginit;}
 	inline const iterator &end() const{return endit;}

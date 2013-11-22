@@ -228,6 +228,8 @@ template<typename Type> inline void TOADLET_IGNORE_UNUSED_VARIABLE_WARNING(Type 
 
 template<typename Type> Type &TOADLET_REMOVE_POINTER(Type *type){return *type;}
 template<typename Type> Type &TOADLET_REMOVE_POINTER(Type &type){return type;}
+template<typename Type> const Type &TOADLET_REMOVE_POINTER(const Type *type){return *type;}
+template<typename Type> const Type &TOADLET_REMOVE_POINTER(const Type &type){return type;}
 
 #define TOADLET_MERGE_(x,y) x##y
 #define TOADLET_MERGE(x,y) TOADLET_MERGE_(x,y)
