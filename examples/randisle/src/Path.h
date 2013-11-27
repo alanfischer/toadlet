@@ -7,13 +7,17 @@ class PathVertex;
 
 class PathEdge:public Interface{
 public:
-	virtual PathVertex *getVertex(bool end) const;
+	TOADLET_INTERFACE(PathEdge);
 
-	virtual scalar getTime(bool end) const;
+	virtual PathVertex *getVertex(bool end) const=0;
+
+	virtual scalar getTime(bool end) const=0;
 };
 
 class PathVertex:public Interface{
 public:
+	TOADLET_INTERFACE(PathVertex);
+
 	typedef PointerIteratorRange<PathEdge>::iterator iterator;
 	virtual PointerIteratorRange<PathEdge> getEdges() const=0;
 

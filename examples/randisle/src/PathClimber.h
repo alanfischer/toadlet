@@ -31,7 +31,7 @@ public:
 	void setIdealRotation(const Quaternion &idealRotation);
 	const Quaternion &getIdealRotation(){return mIdealRotation;}
 
-	int findPassedNeighbor(Path *path,int direction,scalar time);
+	PathVertex::iterator findPassedNeighbor(PathVertex *path,int direction,scalar time);
 	void findRotation(Quaternion &r,const Vector3 &tangent,const Vector3 &normal);
 	bool passedJunction(int direction,scalar oldTime,scalar newTime,scalar junctionTime);
 
