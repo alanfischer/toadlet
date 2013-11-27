@@ -8,13 +8,59 @@ class TreeSystem:public BranchSystem,public BranchSystem::BranchListener{
 public:
 	TOADLET_OBJECT(TreeSystem);
 
-	class TreeBranch:public BranchSystem::Branch,public Path{
+	class TreeBranch:public BranchSystem::Branch,public PathVertex,public PathEdge{
 	public:
 		TOADLET_OBJECT(TreeBranch);
 
 		TreeBranch():skipFirst(false),started(false),lastVertex(-1){}
 
 		virtual ~TreeBranch(){}
+
+		// Count start and end as neighbors, even if they have null paths
+		class iterator{
+		public:
+			iterator(const TreeBranch *b,int i):branch(b),index(i){}
+
+			operator PathEdge*() const{
+				if(index==0){
+					return branch->parent;
+				}
+				else if(index-1<branch->children.size()){
+					return branch->children[index-1];
+				}
+				else{
+					return NULL;
+				}
+			}
+			operator TreeBranch::ptr() const{
+				if(index==0){
+					return branch->parent;
+				}
+				else if(index-1<branch->children.size()){
+					return branch->children[index-1];
+				}
+				else{
+					return NULL;
+				}
+			}
+			iterator &operator++(){++index;return(*this);}
+			iterator &operator++(int){index++;return(*this);}
+			iterator &operator--(){--index;return(*this);}
+			iterator &operator--(int){index--;return(*this);}
+			bool operator==(const iterator &it) const{return branch==it.branch && index==it.index;}
+
+			const TreeBranch *branch;
+			int index;
+		};
+
+		iterator begin() const{return iterator(this,0);}
+		iterator end() const{return iterator(this,children.size()+2);}
+
+		virtual PointerIteratorRange<PathEdge> getEdges() const{
+			return PointerIteratorRange<PathEdge>(
+				WrapPointerIterator<PathEdge::ptr,iterator>(begin()),
+				WrapPointerIterator<PathEdge::ptr,iterator>(end()));
+		}
 
 		virtual scalar getLength() const{return length;}
 		virtual void getPoint(Vector3 &point,scalar time) const{
@@ -34,55 +80,9 @@ public:
 		}
 		virtual int getTimeIndex(scalar time) const{return Math::toInt(lerp(times.data(),times.size(),time));}
 
-		// Count start and end as neighbors, even if they have null paths
-		class iterator{
-		public:
-			iterator(const TreeBranch *b,int i):branch(b),index(i){}
+		virtual PathVertex *getVertex(bool end) const{return end?const_cast<TreeBranch*>(this):parent;}
 
-			Neighbor operator*() const{
-				if(index==0){
-					return Neighbor((Path*)branch->parent,0);
-				}
-				else if(index-1<branch->children.size()){
-					return Neighbor((Path*)branch->children[index-1],branch->childrenTimes[index-1]);
-				}
-				else{
-					return Neighbor(NULL,branch->length);
-				}
-			}
-
-			iterator &operator++(){++index;return(*this);}
-			iterator &operator++(int){index++;return(*this);}
-			bool operator==(const iterator &it) const{return branch==it.branch && index==it.index;}
-
-			const TreeBranch *branch;
-			int index;
-		};
-
-		iterator begin() const{return iterator(this,0);}
-		iterator end() const{return iterator(this,children.size()+2);}
-
-		virtual IteratorRange<Neighbor> getNeighbors() const{
-			return IteratorRange<Neighbor>(
-				WrapIterator<Neighbor,iterator>(begin()),
-				WrapIterator<Neighbor,iterator>(end()));
-		}
-		/*
-		virtual scalar getNeighborTime(Path *neighbor) const{
-			if(neighbor==parent){
-				return 0;
-			}
-			else{
-				int i;
-				for(i=0;i<children.size();++i){
-					if(children[i]==neighbor){
-						return childrenTimes[i];
-					}
-				}
-				return 0;
-			}
-		}
-		*/
+		virtual scalar getTime(bool end) const{return end?0:parentTime;}
 
 		const AABox &getBound() const{return bound;}
 
@@ -105,8 +105,8 @@ public:
 		Collection<scalar> scales;
 		Collection<scalar> times;
 		TreeBranch *parent;
+		float parentTime;
 		Collection<TreeBranch::ptr> children;
-		Collection<scalar> childrenTimes;
 		Collection<int> leaves;
 		AABox bound;
 	};
@@ -141,8 +141,8 @@ public:
 	Mesh *getMesh() const{return mMesh;}
 	Mesh *getLowMesh() const{return mLowMesh;}
 
-	Path *getClosestPath(Vector3 &closestPoint,const Sphere &bound,TreeBranch *path=NULL);
-	Path *traceSegment(PhysicsCollision &result,const Vector3 &position,const Segment &segment,const Vector3 &size,TreeBranch *path=NULL);
+	TreeBranch *getClosestBranch(Vector3 &closestPoint,const Sphere &bound,TreeBranch *path=NULL);
+	TreeBranch *traceSegment(PhysicsCollision &result,const Vector3 &position,const Segment &segment,const Vector3 &size,TreeBranch *path=NULL);
 
 	VertexBufferAccessor bvba,lvba;
 	IndexBufferAccessor biba,lbiba,liba;

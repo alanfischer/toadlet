@@ -623,6 +623,7 @@ void RandIsle::updateClimber(PathClimber *climber,int dt){
 }
 
 void RandIsle::updatePredictedPath(PathClimber *climber,int dt){
+/*
 	if(climber->getPath()!=NULL && mPathSequence.size()>0){
 		// Update predicted path
 		Path *path=climber->getPath();
@@ -685,6 +686,7 @@ void RandIsle::updatePredictedPath(PathClimber *climber,int dt){
 
 		vba.unlock();
 	}
+*/
 }
 
 void RandIsle::keyPressed(int key){
@@ -818,7 +820,7 @@ float RandIsle::findPathSequence(Collection<int> &sequence,PathClimber *climber,
 	return closestd;
 }
 
-int RandIsle::atJunction(PathClimber *climber,Path *current,Path *next){
+int RandIsle::atJunction(PathClimber *climber,PathVertex *current,PathVertex *next){
 	findPathSequence(mPathSequence,climber,climber->getPath(),climber->getPathDirection(),climber->getPathTime());
 
 	if(mPathSequence.size()>0 && current->getNeighbor(mPathSequence[0])==next){

@@ -13,7 +13,7 @@ public:
 
 	void grow();
 
-	Path *getClosestPath(Vector3 &closestPoint,const Vector3 &point);
+	TreeSystem::TreeBranch *getClosestBranch(Vector3 &closestPoint,const Vector3 &point);
 
 	void parentChanged(Node *node);
 

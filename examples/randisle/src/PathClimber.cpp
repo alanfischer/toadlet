@@ -80,18 +80,18 @@ void PathClimber::logicUpdate(int dt,int scope){
 			else{
 				int direction=0;
 				if(mPathClimberListener!=NULL){
-					direction=mPathClimberListener->atJunction(this,mPath,neighbor);
+					direction=mPathClimberListener->atJunction(this,mPath,(neighbor->getVertex(false)==mPath)?neighbor->getVertex(true):neighbor->getVertex(false));
 				}
 				if(direction!=0){
 					scalar extraTime=Math::abs(mPathTime-neighborTime);
 
 					mPreviousPath=mPath;
-					mPath=neighbor->getVertex((mPathDirection+1)/2);
+					mPath=neighbor->getVertex(mPathDirection==1);
 					mPathDirection=direction;
 
 					// I believe there is a case where we could use the extraTime, and end up passing our next destination
 					// I would like this code to be closer to RandIsle::updatePredictedPath, ideally a function in PathClimber which Squirrel would then use
-					mPathTime=neighbor->getTime((mPathDirection+1)/2)+direction*extraTime;
+					mPathTime=neighbor->getTime(mPathDirection==1)+direction*extraTime;
 
 					mPassedNeighbor=findPassedNeighbor(mPath,mPathDirection,mPathTime);
 				}
@@ -195,7 +195,7 @@ void PathClimber::setIdealRotation(const Quaternion &idealRotation){
 	Math::setQuaternionFromAxes(mIdealRotation,right,forward,up);
 }
 
-int PathClimber::findPassedNeighbor(Path *path,int direction,scalar time){
+PathVertex::iterator PathClimber::findPassedNeighbor(PathVertex *path,int direction,scalar time){
 	int passedNeighbor=0;
 	int i;
 	if(direction>0){

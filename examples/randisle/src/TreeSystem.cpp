@@ -154,15 +154,15 @@ BranchSystem::Branch::ptr TreeSystem::branchCreated(BranchSystem::Branch *parent
 	TreeBranch *parentTreeBranch=(TreeBranch*)parent;
 
 	// Our start is the previous section start, if negative then its the root branch
-	TreeBranch::ptr treeBranch(new TreeBranch());
+	TreeBranch::ptr treeBranch=new TreeBranch();
 	treeBranch->started=(parent==NULL);
 	treeBranch->skipFirst=(parent!=NULL);
 	treeBranch->lastVertex=mBranchVertexCount-mSections-1;
 	treeBranch->parent=parentTreeBranch;
 
 	if(parentTreeBranch!=NULL){
+		treeBranch->parentTime=parentTreeBranch->length;
 		parentTreeBranch->children.add(treeBranch);
-		parentTreeBranch->childrenTimes.add(parentTreeBranch->length);
 	}
 
 	if(!mCountMode){
@@ -415,7 +415,7 @@ void TreeSystem::calculateNormals(TreeBranch *branch){
 	int i;
 	for(i=0;i<branch->children.size();++i){ // We do the start and end point separately
 		TreeBranch *neighbor=branch->children[i];
-		scalar neighborTime=branch->childrenTimes[i];
+		scalar neighborTime=neighbor!=NULL?neighbor->parentTime:branch->length;
 
 		tangent=branch->tangents[branch->getTimeIndex(neighborTime)];
 		neighborTangent=neighbor->tangents[0];
@@ -498,56 +498,56 @@ bool TreeSystem::wiggleLeaves(const Sphere &bound,TreeSystem::TreeBranch *branch
 	return result;
 }
 
-Path *TreeSystem::getClosestPath(Vector3 &closestPoint,const Sphere &bound,TreeBranch *path){
-	if(path==NULL){
-		path=mTreeBranches[0];
+TreeSystem::TreeBranch *TreeSystem::getClosestBranch(Vector3 &closestPoint,const Sphere &bound,TreeBranch *branch){
+	if(branch==NULL){
+		branch=mTreeBranches[0];
 	}
 
-	if(Math::testIntersection(bound,path->bound)){
-		Path *closestPath=NULL;
+	if(Math::testIntersection(bound,branch->bound)){
+		TreeBranch *closestBranch=NULL;
 		scalar closestDistance=1000;
 
 		Vector3 point;
 		scalar dt=1.0;
 		scalar t;
-		for(t=0;t<path->getLength();t+=dt){
-			path->getPoint(point,t);
+		for(t=0;t<branch->getLength();t+=dt){
+			branch->getPoint(point,t);
 			scalar d=Math::length(point,bound.origin);
 			if(d<closestDistance){
 				closestDistance=d;
-				closestPath=path;
+				closestBranch=branch;
 				closestPoint.set(point);
 			}
 		}
 
 		int i;
-		for(i=0;i<path->children.size();++i){
+		for(i=0;i<branch->children.size();++i){
 			Vector3 childPoint;
-			Path *childPath=getClosestPath(childPoint,bound,path->children[i]);
+			TreeBranch *childBranch=getClosestBranch(childPoint,bound,branch->children[i]);
 			scalar childDistance=Math::length(childPoint,bound.origin);
 
-			if(childPath!=NULL && childDistance<closestDistance){
+			if(childBranch!=NULL && childDistance<closestDistance){
 				closestDistance=childDistance;
-				closestPath=childPath;
+				closestBranch=childBranch;
 				closestPoint.set(childPoint);
 			}
 		}
 
-		return closestPath;
+		return closestBranch;
 	}
 	else{
 		return NULL;
 	}
 }
 
-Path *TreeSystem::traceSegment(PhysicsCollision &result,const Vector3 &position,const Segment &segment,const Vector3 &size,TreeBranch *path){
+TreeSystem::TreeBranch *TreeSystem::traceSegment(PhysicsCollision &result,const Vector3 &position,const Segment &segment,const Vector3 &size,TreeBranch *path){
 	if(path==NULL){
 		path=mTreeBranches[0];
 	}
 
 	result.time=Math::findIntersection(segment,path->bound,result.point,result.normal);
 
-	Path *closestPath=NULL;
+	TreeBranch *closestBranch=NULL;
 
 	int i;
 	for(i=0;i<path->children.size();++i){
@@ -560,7 +560,7 @@ Path *TreeSystem::traceSegment(PhysicsCollision &result,const Vector3 &position,
 		//}
 	}
 
-	return closestPath;
+	return closestBranch;
 }
 
 void TreeSystem::resetCounts(){

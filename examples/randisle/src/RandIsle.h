@@ -48,8 +48,8 @@ public:
 	void playerJump(Node *player);
 	void playerMove(Node *player,scalar dr,scalar ds);
 
-	float findPathSequence(egg::Collection<int> &sequence,PathClimber *climber,Path *path,int direction,scalar time);
-	float findPathSequence(egg::Collection<int> &sequence,PathClimber *climber,const Vector3 &forward,Path *previous,Path *path,int direction,scalar time,bool first);
+	float findPathSequence(egg::Collection<int> &sequence,PathClimber *climber,PathVertex *path,int direction,scalar time);
+	float findPathSequence(egg::Collection<int> &sequence,PathClimber *climber,const Vector3 &forward,PathVertex *previous,PathVertex *path,int direction,scalar time,bool first);
 	void updateDanger(int dt);
 	void updateProps();
 	void updateClimber(PathClimber *climber,int dt);
@@ -57,7 +57,7 @@ public:
 
 	void pathMounted(PathClimber *climber){}
 	void pathDismounted(PathClimber *climber){}
-	int atJunction(PathClimber *climber,Path *current,Path *next);
+	int atJunction(PathClimber *climber,PathVertex *current,PathVertex *next);
 
 	bool updatePopulatePatches();
 	void terrainUpdated(int oldX,int oldY,int newX,int newY){}

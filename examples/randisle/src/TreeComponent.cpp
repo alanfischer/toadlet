@@ -33,13 +33,13 @@ void TreeComponent::grow(){
 	mParent->attach(mesh);
 }
 
-Path *TreeComponent::getClosestPath(Vector3 &closestPoint,const Vector3 &point){
+TreeSystem::TreeBranch *TreeComponent::getClosestBranch(Vector3 &closestPoint,const Vector3 &point){
 	Sphere bound(point,50);
 	Math::sub(bound.origin,point,mParent->getWorldTranslate());
 	bound.radius=50;
-	Path *path=mSystem->getClosestPath(closestPoint,bound);
+	TreeSystem::TreeBranch *branch=mSystem->getClosestBranch(closestPoint,bound);
 	Math::add(closestPoint,mParent->getWorldTranslate());
-	return path;
+	return branch;
 }
 
 void TreeComponent::parentChanged(Node *node){
