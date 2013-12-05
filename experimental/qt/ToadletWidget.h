@@ -7,14 +7,13 @@
 #include <toadlet/toadlet.h>
 
 class ToadletWidget:public QWidget{
-	Q_OBJECT
 public:
-	ToadletWidget(QWidget *parent);
-	virtual ~ToadletWidget();
+	inline ToadletWidget(QWidget *parent);
+	inline ~ToadletWidget();
 
-	void create(bool render,bool audio);
+	inline void create(bool render,bool audio);
 
-	QPaintEngine *paintEngine() const{return NULL;}
+	inline QPaintEngine *paintEngine() const{return NULL;}
 
 	inline RenderTarget *getRenderTarget(){return renderTarget;}
 	inline RenderDevice *getRenderDevice(){return renderDevice;}
@@ -25,5 +24,7 @@ protected:
 	RenderDevice::ptr renderDevice;
 	AudioDevice::ptr audioDevice;
 };
+
+#include "ToadletWidget.cpp"
 
 #endif
