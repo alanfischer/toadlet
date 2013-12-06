@@ -19,6 +19,10 @@ option (TOADLET_BUILD_STATIC "Build static libraries" ON)
 if (NOT TOADLET_PLATFORM_WIN32)
 	option (TOADLET_PROFILE "Build with profiling information" OFF)
 endif (NOT TOADLET_PLATFORM_WIN32)
+if (TOADLET_PLATFORM_OSX)
+	option (TOADLET_OSX_STDCPP "Build against legacy libstdc++" ON)
+endif (TOADLET_PLATFORM_OSX)
+
 
 
 # Setup link flags according to profiling
@@ -159,6 +163,14 @@ elseif (TOADLET_PLATFORM_POSIX)
 	# Always use position independent code
 	set (DYNAMIC_LIB_FLAGS "${DYNAMIC_LIB_FLAGS} -fPIC")
 	set (STATIC_LIB_FLAGS "${STATIC_LIB_FLAGS} -fPIC")
+
+	# Force the gnu stl
+	if (TOADLET_OSX_STDCPP)
+		set (DYNAMIC_LIB_FLAGS "${DYNAMIC_LIB_FLAGS} -mmacosx-version-min=10.5 -stdlib=libstdc++")
+		set (STATIC_LIB_FLAGS "${STATIC_LIB_FLAGS} -mmacosx-version-min=10.5 -stdlib=libstdc++")
+		set (DYNAMIC_LIB_LINK "${DYNAMIC_LIB_LINK} -mmacosx-version-min=10.5 -stdlib=libstdc++")
+		set (STATIC_LIB_LINK "${STATIC_LIB_LINK} -mmacosx-version-min=10.5 -stdlib=libstdc++")
+	endif (TOADLET_OSX_STDCPP)
 
 	# Append the individual flags to the overall properties
 	if (DYNAMIC_LIB_FLAGS)
