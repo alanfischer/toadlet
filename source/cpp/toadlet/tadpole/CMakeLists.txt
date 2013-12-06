@@ -1,6 +1,8 @@
 # Setup Versions
 configure_file (${CMAKE_CURRENT_SOURCE_DIR}/Version.h.cmake ${CMAKE_CURRENT_BINARY_DIR}/Version.h)
 
+option(TOADLET_DISABLE_FFMPEG "Lets you forcibly disable ffmpeg since it can be so troublesome" OFF)
+
 
 # Source files for toadlet_tadpole
 set (TADPOLE_SRC
@@ -674,34 +676,38 @@ endif (MODPLUG_INCLUDES AND MODPLUG_LIBRARY)
 
 find_package (FFmpeg)
 if (FFMPEG_FOUND)
-	set (TOADLET_HAS_FFMPEG ON PARENT_SCOPE)
-	include_directories (${FFMPEG_INCLUDE_DIR})
-	set (TADPOLE_PLUGINS_HDR ${TADPOLE_PLUGINS_HDR} ${TADPOLE_PLUGINS_FFMPEG_HDR})
+	if (TOADLET_DISABLE_FFMPEG)
+		message (STATUS "FFmpeg forcibly disabled")
+	else (TOADLET_DISABLE_FFMPEG)
+		set (TOADLET_HAS_FFMPEG ON PARENT_SCOPE)
+		include_directories (${FFMPEG_INCLUDE_DIR})
+		set (TADPOLE_PLUGINS_HDR ${TADPOLE_PLUGINS_HDR} ${TADPOLE_PLUGINS_FFMPEG_HDR})
 
-	# Dynamic Library
-	set (TADPOLE_PLUGINS_SRC ${TADPOLE_PLUGINS_SRC} ${TADPOLE_PLUGINS_FFMPEG_SRC})
-	set (TADPOLE_PLUGINS_LIBS ${TADPOLE_PLUGINS_LIBS} ${FFMPEG_LIBRARIES})
+		# Dynamic Library
+		set (TADPOLE_PLUGINS_SRC ${TADPOLE_PLUGINS_SRC} ${TADPOLE_PLUGINS_FFMPEG_SRC})
+		set (TADPOLE_PLUGINS_LIBS ${TADPOLE_PLUGINS_LIBS} ${FFMPEG_LIBRARIES})
 
-	if (TOADLET_PLATFORM_POSIX)
-		# HACK: FFmpeg requires this definition for 32bit posix
-		set_source_files_properties (${TADPOLE_SRC} PROPERTIES COMPILE_DEFINITIONS "__STDC_CONSTANT_MACROS")
-		set_source_files_properties (${TADPOLE_PLUGINS_SRC} PROPERTIES COMPILE_DEFINITIONS "__STDC_CONSTANT_MACROS")
-	endif (TOADLET_PLATFORM_POSIX)
-
-	# Static Library
-	LOCATE_STATIC_LIBRARIES (FFMPEG_LIBRARIES_S "${FFMPEG_LIBRARIES}")
-	if (FFMPEG_LIBRARIES_S)
-		set (TADPOLE_PLUGINS_SRC_S ${TADPOLE_PLUGINS_SRC_S} ${TADPOLE_PLUGINS_FFMPEG_SRC})
-		set (TADPOLE_PLUGINS_LIBS_S ${TADPOLE_PLUGINS_LIBS_S} ${FFMPEG_LIBRARIES_S})
-		if (TOADLET_PLATFORM_WIN32)
-			# HACK: FFmpeg on windows incorrectly exposes symbols from zlib, which then generate warnings.
-			# We can hide them by passing ignore flags directly to the linker, as if they were libraries.
-			set (TADPOLE_PLUGINS_LIBS_S ${TADPOLE_PLUGINS_LIBS_S} "/ignore:4006" "/ignore:4221")
-		elseif (TOADLET_PLATFORM_POSIX)
+		if (TOADLET_PLATFORM_POSIX)
+			# HACK: FFmpeg requires this definition for 32bit posix
 			set_source_files_properties (${TADPOLE_SRC} PROPERTIES COMPILE_DEFINITIONS "__STDC_CONSTANT_MACROS")
 			set_source_files_properties (${TADPOLE_PLUGINS_SRC} PROPERTIES COMPILE_DEFINITIONS "__STDC_CONSTANT_MACROS")
-		endif (TOADLET_PLATFORM_WIN32)
-	endif (FFMPEG_LIBRARIES_S)
+		endif (TOADLET_PLATFORM_POSIX)
+
+		# Static Library
+		LOCATE_STATIC_LIBRARIES (FFMPEG_LIBRARIES_S "${FFMPEG_LIBRARIES}")
+		if (FFMPEG_LIBRARIES_S)
+			set (TADPOLE_PLUGINS_SRC_S ${TADPOLE_PLUGINS_SRC_S} ${TADPOLE_PLUGINS_FFMPEG_SRC})
+			set (TADPOLE_PLUGINS_LIBS_S ${TADPOLE_PLUGINS_LIBS_S} ${FFMPEG_LIBRARIES_S})
+			if (TOADLET_PLATFORM_WIN32)
+				# HACK: FFmpeg on windows incorrectly exposes symbols from zlib, which then generate warnings.
+				# We can hide them by passing ignore flags directly to the linker, as if they were libraries.
+				set (TADPOLE_PLUGINS_LIBS_S ${TADPOLE_PLUGINS_LIBS_S} "/ignore:4006" "/ignore:4221")
+			elseif (TOADLET_PLATFORM_POSIX)
+				set_source_files_properties (${TADPOLE_SRC} PROPERTIES COMPILE_DEFINITIONS "__STDC_CONSTANT_MACROS")
+				set_source_files_properties (${TADPOLE_PLUGINS_SRC} PROPERTIES COMPILE_DEFINITIONS "__STDC_CONSTANT_MACROS")
+			endif (TOADLET_PLATFORM_WIN32)
+		endif (FFMPEG_LIBRARIES_S)
+	endif (TOADLET_DISABLE_FFMPEG)
 endif (FFMPEG_FOUND)
 
 #TODO: Depreicate ogg vorbis in favor of ffmpeg. Right now it serves as a backup.
