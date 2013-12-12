@@ -12,56 +12,13 @@ public:
 	public:
 		TOADLET_OBJECT(TreeBranch);
 
-		TreeBranch():skipFirst(false),started(false),lastVertex(-1){}
+		TreeBranch():skipFirst(false),started(false),lastVertex(-1){
+			branches.add(this);
+		}
 
 		virtual ~TreeBranch(){}
 
-		// Count start and end as neighbors, even if they have null paths
-		class iterator{
-		public:
-			iterator(const TreeBranch *b,int i):branch(b),index(i){}
-
-			operator PathEdge*() const{
-				if(index==0){
-					return branch->parent;
-				}
-				else if(index-1<branch->children.size()){
-					return branch->children[index-1];
-				}
-				else{
-					return NULL;
-				}
-			}
-			operator TreeBranch::ptr() const{
-				if(index==0){
-					return branch->parent;
-				}
-				else if(index-1<branch->children.size()){
-					return branch->children[index-1];
-				}
-				else{
-					return NULL;
-				}
-			}
-			iterator &operator++(){++index;return(*this);}
-			iterator &operator++(int){index++;return(*this);}
-			iterator &operator--(){--index;return(*this);}
-			iterator &operator--(int){index--;return(*this);}
-			bool operator==(const iterator &it) const{return branch==it.branch && index==it.index;}
-
-			const TreeBranch *branch;
-			int index;
-		};
-
-		iterator begin() const{return iterator(this,0);}
-		iterator end() const{return iterator(this,children.size()+2);}
-
-		virtual PointerIteratorRange<PathEdge> getEdges() const{
-			return PointerIteratorRange<PathEdge>(
-				WrapPointerIterator<PathEdge::ptr,iterator>(begin()),
-				WrapPointerIterator<PathEdge::ptr,iterator>(end()));
-		}
-
+		virtual PointerIteratorRange<PathEdge> getEdges() const{return PointerIteratorRange<PathEdge>(branches);}
 		virtual scalar getLength() const{return length;}
 		virtual void getPoint(Vector3 &point,scalar time) const{
 			scalar t=lerp(times.data(),times.size(),time);
@@ -78,11 +35,11 @@ public:
 			scalar s=Math::lerp(scales[it],scales[it+1],t);
 			scale.set(s,s,s);
 		}
-		virtual int getTimeIndex(scalar time) const{return Math::toInt(lerp(times.data(),times.size(),time));}
 
 		virtual PathVertex *getVertex(bool end) const{return end?const_cast<TreeBranch*>(this):parent;}
-
 		virtual scalar getTime(bool end) const{return end?0:parentTime;}
+
+		int getTimeIndex(scalar time) const{return Math::toInt(lerp(times.data(),times.size(),time));}
 
 		const AABox &getBound() const{return bound;}
 
@@ -106,7 +63,7 @@ public:
 		Collection<scalar> times;
 		TreeBranch *parent;
 		float parentTime;
-		Collection<TreeBranch::ptr> children;
+		PointerCollection<TreeBranch> branches;
 		Collection<int> leaves;
 		AABox bound;
 	};
