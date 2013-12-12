@@ -162,7 +162,7 @@ BranchSystem::Branch::ptr TreeSystem::branchCreated(BranchSystem::Branch *parent
 
 	if(parentTreeBranch!=NULL){
 		treeBranch->parentTime=parentTreeBranch->length;
-		parentTreeBranch->children.add(treeBranch);
+		parentTreeBranch->branches.add(treeBranch);
 	}
 
 	if(!mCountMode){
@@ -413,8 +413,8 @@ void TreeSystem::calculateNormals(TreeBranch *branch){
 	Vector3 tangent,neighborTangent,normal,binormal;
 
 	int i;
-	for(i=0;i<branch->children.size();++i){ // We do the start and end point separately
-		TreeBranch *neighbor=branch->children[i];
+	for(i=1;i<branch->branches.size();++i){ // We do the start and end point separately
+		TreeBranch *neighbor=branch->branches[i];
 		scalar neighborTime=neighbor!=NULL?neighbor->parentTime:branch->length;
 
 		tangent=branch->tangents[branch->getTimeIndex(neighborTime)];
@@ -462,9 +462,9 @@ void TreeSystem::calculateNormals(TreeBranch *branch){
 
 void TreeSystem::mergeBounds(TreeBranch *branch){
 	int i;
-	for(i=0;i<branch->children.size();++i){
-		mergeBounds(branch->children[i]);
-		branch->bound.merge(branch->children[i]->bound);
+	for(i=1;i<branch->branches.size();++i){
+		mergeBounds(branch->branches[i]);
+		branch->bound.merge(branch->branches[i]->bound);
 	}
 }
 
@@ -477,8 +477,8 @@ bool TreeSystem::wiggleLeaves(const Sphere &bound,TreeSystem::TreeBranch *branch
 
 	if(Math::testIntersection(bound,branch->bound)){
 		int i;
-		for(i=0;i<branch->children.size();++i){
-			result|=wiggleLeaves(bound,branch->children[i]);
+		for(i=1;i<branch->branches.size();++i){
+			result|=wiggleLeaves(bound,branch->branches[i]);
 		}
 
 		Vector3 endPoint;
@@ -521,9 +521,9 @@ TreeSystem::TreeBranch *TreeSystem::getClosestBranch(Vector3 &closestPoint,const
 		}
 
 		int i;
-		for(i=0;i<branch->children.size();++i){
+		for(i=1;i<branch->branches.size();++i){
 			Vector3 childPoint;
-			TreeBranch *childBranch=getClosestBranch(childPoint,bound,branch->children[i]);
+			TreeBranch *childBranch=getClosestBranch(childPoint,bound,branch->branches[i]);
 			scalar childDistance=Math::length(childPoint,bound.origin);
 
 			if(childBranch!=NULL && childDistance<closestDistance){
@@ -550,7 +550,7 @@ TreeSystem::TreeBranch *TreeSystem::traceSegment(PhysicsCollision &result,const 
 	TreeBranch *closestBranch=NULL;
 
 	int i;
-	for(i=0;i<path->children.size();++i){
+	for(i=1;i<path->branches.size();++i){
 //		Path *childPath=traceSegment(result,position,segment,size,path->children[i]);
 
 //		if(childPath!=NULL && childDistance<closestDistance){
