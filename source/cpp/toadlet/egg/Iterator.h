@@ -57,7 +57,7 @@ public:
 	IteratorType iter;
 };
 
-template<typename PointerType,typename DerivedPointerType,typename IteratorType>
+template<typename PointerType,typename IteratorType>
 class WrapPointerIterator:public Iterator<PointerType>{
 public:
 	WrapPointerIterator(IteratorType it):iter(it){}
@@ -65,7 +65,7 @@ public:
 	void increment(){++iter;}
 	void decrement(){--iter;}
 	Iterator<PointerType> *clone() const{return new WrapPointerIterator(iter);}
-	PointerType dereference() const{return (DerivedPointerType)iter;}
+	PointerType dereference() const{return &*iter;}
 	bool equals(Iterator<PointerType> *it) const{return iter==((WrapPointerIterator*)it)->iter;}
 
 	IteratorType iter;
@@ -137,8 +137,8 @@ public:
 
 	template<typename CollectionType>
 	PointerIteratorRange(const CollectionType &collection):
-		beginit(WrapPointerIterator<Type::ptr,typename CollectionType::value_type,typename CollectionType::iterator>(collection.begin())),
-		endit(WrapPointerIterator<Type::ptr,typename CollectionType::value_type,typename CollectionType::iterator>(collection.end())){}
+		beginit(WrapPointerIterator<typename Type::ptr,typename CollectionType::iterator>(collection.begin())),
+		endit(WrapPointerIterator<typename Type::ptr,typename CollectionType::iterator>(collection.end())){}
 
 	inline const iterator &begin() const{return beginit;}
 	inline const iterator &end() const{return endit;}
