@@ -63,37 +63,49 @@ void PathClimber::logicUpdate(int dt,int scope){
 		scalar oldPathTime=mPathTime;
 		mPathTime+=mPathDirection*Math::mul(Math::fromMilli(dt),mSpeed);
 
-		PathVertex::iterator neighbor=mPassedNeighbor;
+		PathEdge *edge=mPassedEdge;
 		if(mPathDirection>0){
-			++neighbor;
+			PathVertex::iterator begin=mPath->getEdges().begin(),end=mPath->getEdges().end();
+			for(PathVertex::iterator it=begin;it!=end;++it){
+				if(it==edge){
+					edge=++it;
+					break;
+				}
+			}
 		}
 		else{
-			--neighbor;
+			PathVertex::iterator begin=mPath->getEdges().end(),end=mPath->getEdges().begin();--begin,--end;
+			for(PathVertex::iterator it=begin;it!=end;++it){
+				if(it==edge){
+					edge=--it;
+					break;
+				}
+			}
 		}
-		scalar neighborTime=(neighbor->getVertex(false)==mPath)?neighbor->getTime(false):neighbor->getTime(true);
+		scalar neighborTime=edge->getTime(edge->getVertex(true)==mPath);
 
 		if(passedJunction(mPathDirection,oldPathTime,mPathTime,neighborTime)){
-			mPassedNeighbor=neighbor;
-			if(mPassedNeighbor->getVertex(true)==NULL){
+			mPassedEdge=edge;
+			if(mPassedEdge->getVertex(true)==NULL){
 				dismount();
 			}
 			else{
 				int direction=0;
 				if(mPathClimberListener!=NULL){
-					direction=mPathClimberListener->atJunction(this,mPath,(neighbor->getVertex(false)==mPath)?neighbor->getVertex(true):neighbor->getVertex(false));
+					direction=mPathClimberListener->atJunction(this,mPath,edge->getVertex(edge->getVertex(false)==mPath));
 				}
 				if(direction!=0){
 					scalar extraTime=Math::abs(mPathTime-neighborTime);
 
 					mPreviousPath=mPath;
-					mPath=neighbor->getVertex(mPathDirection==1);
+					mPath=edge->getVertex(mPathDirection==1);
 					mPathDirection=direction;
 
 					// I believe there is a case where we could use the extraTime, and end up passing our next destination
 					// I would like this code to be closer to RandIsle::updatePredictedPath, ideally a function in PathClimber which Squirrel would then use
-					mPathTime=neighbor->getTime(mPathDirection==1)+direction*extraTime;
+					mPathTime=edge->getTime(mPathDirection==1)+direction*extraTime;
 
-					mPassedNeighbor=findPassedNeighbor(mPath,mPathDirection,mPathTime);
+					mPassedEdge=findPassedEdge(mPath,mPathDirection,mPathTime);
 				}
 			}
 		}
@@ -142,7 +154,7 @@ void PathClimber::mount(Node *system,PathVertex *path,const Vector3 &point){
 	bool flip=Math::dot(segment.direction,forward)<0;
 	mPathDirection=flip?-1:1;
 
-	mPassedNeighbor=findPassedNeighbor(mPath,mPathDirection,mPathTime);
+	mPassedEdge=findPassedEdge(mPath,mPathDirection,mPathTime);
 
 	if(mPathClimberListener!=NULL){
 		mPathClimberListener->pathMounted(this);
@@ -180,7 +192,7 @@ void PathClimber::dismount(){
 
 void PathClimber::setPathDirection(int direction){
 	mPathDirection=direction;
-	mPassedNeighbor=findPassedNeighbor(mPath,mPathDirection,mPathTime);
+	mPassedEdge=findPassedEdge(mPath,mPathDirection,mPathTime);
 }
 
 void PathClimber::setIdealRotation(const Quaternion &idealRotation){
@@ -195,28 +207,29 @@ void PathClimber::setIdealRotation(const Quaternion &idealRotation){
 	Math::setQuaternionFromAxes(mIdealRotation,right,forward,up);
 }
 
-PathVertex::iterator PathClimber::findPassedNeighbor(PathVertex *path,int direction,scalar time){
-	int passedNeighbor=0;
-	int i;
+PathEdge *PathClimber::findPassedEdge(PathVertex *vertex,int direction,scalar time){
+	PathEdge *edge=NULL;
 	if(direction>0){
-		passedNeighbor=path->getNumNeighbors()-1;
-		for(i=0;i<path->getNumNeighbors();++i){
-			if(path->getNeighborTime(i)>=time){
-				passedNeighbor=i-1;
+		edge=vertex->getEdges().end()-1;
+		PathVertex::iterator begin=vertex->getEdges().end(),end=vertex->getEdges().begin();--begin,--end;
+		for(PathVertex::iterator it=begin;it!=end;--it){
+			if(it->getTime(it->getVertex(true)==vertex)>=time){
+				edge=it;
 				break;
 			}
 		}
 	}
 	else{
-		passedNeighbor=0;
-		for(i=path->getNumNeighbors()-1;i>=0;--i){
-			if(path->getNeighborTime(i)<=time){
-				passedNeighbor=i+1;
+		edge=vertex->getEdges().begin();
+		PathVertex::iterator begin=vertex->getEdges().begin(),end=vertex->getEdges().end();
+		for(PathVertex::iterator it=begin;it!=end;++it){
+			if(it->getTime(it->getVertex(true)==vertex)<=time){
+				edge=it;
 				break;
 			}
 		}
 	}
-	return passedNeighbor;
+	return edge;
 }
 
 void PathClimber::findRotation(Quaternion &r,const Vector3 &tangent,const Vector3 &normal){
