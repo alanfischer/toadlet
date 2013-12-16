@@ -558,7 +558,7 @@ void RandIsle::updateClimber(PathClimber *climber,int dt){
 			float snapDistance=10;
 			Node *closestNode=NULL;
 			float closestDistance=1000;
-			Path *closestPath=NULL;
+			PathVertex *closestVertex=NULL;
 			Vector3 closestPoint;
 
 			mMountBound->set(mPlayer->getTranslate(),snapDistance);
@@ -569,20 +569,20 @@ void RandIsle::updateClimber(PathClimber *climber,int dt){
 				TreeComponent *tree=node->getChildType<TreeComponent>();
 				if(tree!=NULL){
 					Vector3 point;
-					Path *path=tree->getClosestPath(point,mPlayer->getTranslate());
+					PathVertex *vertex=tree->getClosestBranch(point,mPlayer->getTranslate());
 					float distance=Math::length(point,mPlayer->getTranslate());
 
-					if(path!=NULL && distance<closestDistance){
+					if(vertex!=NULL && distance<closestDistance){
 						closestDistance=distance;
-						closestPath=path;
+						closestVertex=vertex;
 						closestNode=node;
 						closestPoint.set(point);
 					}
 				}
 			}
 
-			if(closestPath!=NULL && closestDistance<snapDistance){
-				climber->mount(closestNode,closestPath,closestPoint);
+			if(closestVertex!=NULL && closestDistance<snapDistance){
+				climber->mount(closestNode,closestVertex,closestPoint);
 				findPathSequence(mPathSequence,climber,climber->getPath(),climber->getPathDirection(),climber->getPathTime());
 			}
 
@@ -591,16 +591,16 @@ void RandIsle::updateClimber(PathClimber *climber,int dt){
 
 	// Update graph prediction & camera
 	if(climber->getPath()!=NULL){
-		Path *path=climber->getPath();
+		PathVertex *vertex=climber->getPath();
 		int direction=climber->getPathDirection();
 		scalar time=climber->getPathTime();
 
 		if(mPathSequence.size()>0){
-			scalar neighborTime=path->getNeighborTime(mPathSequence[0]);
-			if(neighborTime>time && direction<0){
+			scalar edgeTime=mPathSequence[0]->getTime(mPathSequence[0]->getVertex(true)==vertex);
+			if(edgeTime>time && direction<0){
 				climber->setPathDirection(1);
 			}
-			else if(neighborTime<time && direction>0){
+			else if(edgeTime<time && direction>0){
 				climber->setPathDirection(-1);
 			}
 		}
@@ -623,10 +623,9 @@ void RandIsle::updateClimber(PathClimber *climber,int dt){
 }
 
 void RandIsle::updatePredictedPath(PathClimber *climber,int dt){
-/*
 	if(climber->getPath()!=NULL && mPathSequence.size()>0){
 		// Update predicted path
-		Path *path=climber->getPath();
+		PathVertex *vertex=climber->getPath();
 		scalar oldTime=0,time=climber->getPathTime();
 		int direction=climber->getPathDirection();
 
@@ -637,14 +636,14 @@ void RandIsle::updatePredictedPath(PathClimber *climber,int dt){
 
 		VertexBufferAccessor vba(mPredictedVertexData->getVertexBuffer(0),Buffer::Access_BIT_WRITE);
 
-		scalar nextTime=path->getNeighborTime(mPathSequence[0]);
+		scalar nextTime=mPathSequence[0]->getTime(mPathSequence[0]->getVertex(true)==vertex);
 
 		float dt=1.0;
 		int np=0,i=0;
-		for(i=0;i<vba.getSize()-2 && path!=NULL && predictTime>0;i+=2){
-			path->getPoint(point,time);
+		for(i=0;i<vba.getSize()-2 && vertex!=NULL && predictTime>0;i+=2){
+			vertex->getPoint(point,time);
 			Math::add(point,climber->getMounted()->getWorldTranslate());
-			path->getOrientation(tangent,normal,scale,time);
+			vertex->getOrientation(tangent,normal,scale,time);
 
 			Math::sub(forward,point,mCamera->getPosition());
 			Math::cross(right,forward,tangent);Math::normalizeCarefully(right,epsilon);
@@ -668,25 +667,24 @@ void RandIsle::updatePredictedPath(PathClimber *climber,int dt){
 			}
 			else if(skipCheck==true || climber->passedJunction(direction,oldTime,time,nextTime)){
 				scalar extraTime=Math::abs(time-nextTime);
-				Path  *nextPath=path->getNeighbor(mPathSequence[np]);
+				PathVertex *nextVertex=mPathSequence[np]->getVertex(mPathSequence[np]->getVertex(false)==vertex);
 				np++;
 				if(np<mPathSequence.size()){
-					nextTime=nextPath->getNeighborTime(mPathSequence[np]);
+					nextTime=mPathSequence[np]->getTime(mPathSequence[np]->getVertex(false)==vertex);
 
-					time=nextPath->getNeighborTime(path);
+					time=mPathSequence[np]->getTime(mPathSequence[np]->getVertex(true)==vertex);
 					direction=(nextTime>time)?1:-1;
 					time+=direction*extraTime;
 					// We have to check the direction again, in case we passed our destination with the extraTime
 					direction=(nextTime>time)?1:-1;
 				}
-				path=nextPath;
+				vertex=nextVertex;
 			}
 		}
 		mPredictedIndexData->count=i;
 
 		vba.unlock();
 	}
-*/
 }
 
 void RandIsle::keyPressed(int key){
@@ -773,60 +771,58 @@ void RandIsle::playerMove(Node *player,scalar dr,scalar ds){
 	climber->setSpeed(speed);
 }
 
-float RandIsle::findPathSequence(Collection<int> &sequence,PathClimber *climber,Path *path,int direction,scalar time){
+float RandIsle::findPathSequence(PointerCollection<PathEdge> &sequence,PathClimber *climber,PathVertex *vertex,int direction,scalar time){
 	Vector3 right,forward,up;
 	Math::setAxesFromQuaternion(climber->getIdealRotation(),right,forward,up);
 	forward.z+=0.25;
 	Math::normalizeCarefully(forward,epsilon);
 	sequence.clear();
-	scalar result=findPathSequence(sequence,climber,forward,NULL,path,direction,time,true);
+	scalar result=findPathSequence(sequence,climber,forward,NULL,vertex,direction,time,true);
 	return result;
 }
 
-float RandIsle::findPathSequence(Collection<int> &sequence,PathClimber *climber,const Vector3 &forward,Path *previous,Path *path,int direction,scalar time,bool first){
-	if(path==NULL){
+float RandIsle::findPathSequence(PointerCollection<PathEdge> &sequence,PathClimber *climber,const Vector3 &forward,PathVertex *previous,PathVertex *vertex,int direction,scalar time,bool first){
+	if(vertex==NULL){
 		return 0;
 	}
 
+	sequence.clear();
 	scalar closestd=0;
-	Collection<int> closestp;
 	Vector3 point,tangent;
-	path->getPoint(point,time);
-	int i;
-	for(i=0;i<path->getNumNeighbors();++i){
-		Path *next=path->getNeighbor(i);
-		scalar nextTime=path->getNeighborTime(i);
-		if(next!=NULL && next==previous){
+	vertex->getPoint(point,time);
+
+	tforeach(PathVertex::iterator,next,vertex->getEdges()){
+		if(next!=NULL && next->getVertex(next->getVertex(false)==vertex)==previous){
 			continue;
 		}
+		scalar nextTime=next->getTime(next->getVertex(true)==vertex);
 
-		path->getPoint(tangent,nextTime);
+		vertex->getPoint(tangent,nextTime);
 		Math::sub(tangent,point);
 
 		scalar d=0;
-		Collection<int> p;
+		PointerCollection<PathEdge> p;
 		d=Math::dot(tangent,forward);
-		d+=findPathSequence(p,climber,forward,path,next,0,next!=NULL?next->getNeighborTime(path):0,false);
+		d+=findPathSequence(p,climber,forward,vertex,next->getVertex(next->getVertex(false)==vertex),0,next!=NULL?next->getTime(next->getVertex(true)==vertex):0,false);
 
-		p.insert(p.begin(),i);
+		p.insert(p.begin(),(PathEdge*)next);
 
-		if(closestp.size()==0 || d>closestd){
+		if(sequence.size()==0 || d>closestd){
 			closestd=d;
-			closestp=p;
+			sequence=p;
 		}
 	}
 
-	sequence=closestp;
 	return closestd;
 }
 
 int RandIsle::atJunction(PathClimber *climber,PathVertex *current,PathVertex *next){
 	findPathSequence(mPathSequence,climber,climber->getPath(),climber->getPathDirection(),climber->getPathTime());
 
-	if(mPathSequence.size()>0 && current->getNeighbor(mPathSequence[0])==next){
+	if(mPathSequence.size()>0 && mPathSequence[0]->getVertex(mPathSequence[0]->getVertex(false)==current)==next){
 		mPathSequence.removeAt(0);
 		if(mPathSequence.size()>0){
-			if(next->getNeighborTime(mPathSequence[0])>current->getNeighborTime(next)){
+			if(mPathSequence[0]->getTime(mPathSequence[0]->getVertex(true)==next) > mPathSequence[0]->getTime(mPathSequence[0]->getVertex(true)==current)){
 				return 1;
 			}
 			else{
