@@ -81,7 +81,7 @@ int Object::retain(){
 int Object::release(){
 	int count=InterlockedDecrement((LONG*)&mSharedCount);
 	if(count<=0){
-		destroy();
+		fullyReleased();
 		delete this;
 	}
 	return count;
@@ -97,7 +97,7 @@ int Object::retain(){
 int Object::release(){
 	int count=OSAtomicDecrement32((int32*)&mSharedCount);
 	if(count<=0){
-		destroy();
+		fullyReleased();
 		delete this;
 	}
 	return count;
@@ -113,7 +113,7 @@ int Object::retain(){
 int Object::release(){
 	int count=__sync_fetch_and_sub(&mSharedCount,1) - 1;
 	if(count<=0){
-		destroy();
+		fullyReleased();
 		delete this;
 	}
 	return count;
@@ -135,7 +135,7 @@ int Object::release(){
 		count=--mSharedCount;
 	((Mutex*)mSharedData)->unlock();
 	if(count<=0){
-		destroy();
+		fullyReleased();
 		delete this;
 	}
 	return count;
@@ -151,7 +151,7 @@ int Object::retain(){
 int Object::release(){
 	int count=--mSharedCount;
 	if(count<=0){
-		destroy();
+		fullyReleased();
 		delete this;
 	}
 	return count;
