@@ -64,29 +64,45 @@ void PathClimber::logicUpdate(int dt,int scope){
 		mPathTime+=mPathDirection*Math::mul(Math::fromMilli(dt),mSpeed);
 
 		PathEdge *edge=mPassedEdge;
+		scalar edgeTime=0;
 		if(mPathDirection>0){
-			PathVertex::iterator begin=mPath->getEdges().begin(),end=mPath->getEdges().end();
-			for(PathVertex::iterator it=begin;it!=end;++it){
+			PathVertex::iterator it,begin=mPath->getEdges().begin(),end=mPath->getEdges().end();
+			for(it=begin;it!=end;++it){
 				if(it==edge){
-					edge=++it;
+					++it;
 					break;
 				}
+			}
+			if(it==end){
+				edge=NULL;
+				edgeTime=mPath->getLength();
+			}
+			else{
+				edge=it;
+				edgeTime=edge->getTime(edge->getVertex(true)==mPath);
 			}
 		}
 		else{
-			PathVertex::iterator begin=mPath->getEdges().end(),end=mPath->getEdges().begin();--begin,--end;
-			for(PathVertex::iterator it=begin;it!=end;++it){
+			PathVertex::iterator it,begin=mPath->getEdges().end(),end=mPath->getEdges().begin();--begin,--end;
+			for(it=begin;it!=end;--it){
 				if(it==edge){
-					edge=--it;
+					--it;
 					break;
 				}
 			}
+			if(it==end){
+				edge=NULL;
+				edgeTime=0;
+			}
+			else{
+				edge=it;
+				edgeTime=edge->getTime(edge->getVertex(true)==mPath);
+			}
 		}
-		scalar neighborTime=edge->getTime(edge->getVertex(true)==mPath);
 
-		if(passedJunction(mPathDirection,oldPathTime,mPathTime,neighborTime)){
+		if(passedJunction(mPathDirection,oldPathTime,mPathTime,edgeTime)){
 			mPassedEdge=edge;
-			if(mPassedEdge->getVertex(true)==NULL){
+			if(mPassedEdge==NULL){
 				dismount();
 			}
 			else{
@@ -95,7 +111,7 @@ void PathClimber::logicUpdate(int dt,int scope){
 					direction=mPathClimberListener->atJunction(this,mPath,edge->getVertex(edge->getVertex(false)==mPath));
 				}
 				if(direction!=0){
-					scalar extraTime=Math::abs(mPathTime-neighborTime);
+					scalar extraTime=Math::abs(mPathTime-edgeTime);
 
 					mPreviousPath=mPath;
 					mPath=edge->getVertex(mPathDirection==1);
@@ -213,7 +229,7 @@ PathEdge *PathClimber::findPassedEdge(PathVertex *vertex,int direction,scalar ti
 		edge=vertex->getEdges().end()-1;
 		PathVertex::iterator begin=vertex->getEdges().end(),end=vertex->getEdges().begin();--begin,--end;
 		for(PathVertex::iterator it=begin;it!=end;--it){
-			if(it->getTime(it->getVertex(true)==vertex)>=time){
+			if(it->getTime(it->getVertex(true)==vertex)<=time){
 				edge=it;
 				break;
 			}
@@ -223,7 +239,7 @@ PathEdge *PathClimber::findPassedEdge(PathVertex *vertex,int direction,scalar ti
 		edge=vertex->getEdges().begin();
 		PathVertex::iterator begin=vertex->getEdges().begin(),end=vertex->getEdges().end();
 		for(PathVertex::iterator it=begin;it!=end;++it){
-			if(it->getTime(it->getVertex(true)==vertex)<=time){
+			if(it->getTime(it->getVertex(true)==vertex)>=time){
 				edge=it;
 				break;
 			}

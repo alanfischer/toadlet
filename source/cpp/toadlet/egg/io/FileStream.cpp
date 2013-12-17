@@ -52,6 +52,10 @@ FileStream::FileStream(const String &filename,int open):
 		mode+="b";
 	}
 
+	if((open&Open_BIT_TRUNCATE)!=0){
+		mode+="+";
+	}
+
 	mOpen=open;
 	mFile=fopen(filename,mode);
 	mAutoClose=true;
