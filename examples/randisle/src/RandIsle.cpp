@@ -620,6 +620,9 @@ void RandIsle::updateClimber(PathClimber *climber,int dt){
 
 		mFollower->logicUpdate(position,dt);
 	}
+	else{
+		mPredictedIndexData->setCount(0);
+	}
 }
 
 void RandIsle::updatePredictedPath(PathClimber *climber,int dt){
@@ -681,7 +684,7 @@ void RandIsle::updatePredictedPath(PathClimber *climber,int dt){
 				vertex=nextVertex;
 			}
 		}
-		mPredictedIndexData->count=i;
+		mPredictedIndexData->setCount(i);
 
 		vba.unlock();
 	}
