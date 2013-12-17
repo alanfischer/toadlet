@@ -46,6 +46,8 @@ public:
 	virtual void destroy(){}
 
 protected:
+	virtual void fullyReleased(){destroy();}
+
 	int32 mSharedCount;
 	void *mSharedData;
 };
