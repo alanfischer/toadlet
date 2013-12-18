@@ -30,7 +30,6 @@
 #include <toadlet/egg/BaseResource.h>
 #include <toadlet/peeper/RenderState.h>
 
-
 namespace toadlet{
 namespace peeper{
 
