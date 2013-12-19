@@ -1,7 +1,7 @@
 #ifndef QTARCHIVE_H
 #define QTARCHIVE_H
 
-#include <QtCore/QFile.h>
+#include <QtCore/qfile.h>
 #include <toadlet/egg/Resource.h>
 #include <toadlet/egg/Collection.h>
 #include <toadlet/egg/io/Stream.h>
