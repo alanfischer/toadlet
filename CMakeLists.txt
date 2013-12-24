@@ -39,7 +39,6 @@ enable_testing()
 # Custom cmake scripts
 set (CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${PROJECT_SOURCE_DIR}/cmake/Modules/")
 
-
 # Get the current hg revision
 if (ANDROID OR IOS)
 	find_host_package (Mercurial)
@@ -72,8 +71,9 @@ elseif (UNIX)
 			set (TOADLET_PLATFORM_IOS ON CACHE BOOL "Toadlet for iOS")
 		endif (IOS)
 	endif (APPLE)
-elseif (EMSCRIPTEN)
-	set (TOADLET_PLATFORM_EMSCRIPTEN ON CACHE BOOL "Toadlet for emscripten")
+	if (EMSCRIPTEN)
+		set (TOADLET_PLATFORM_EMSCRIPTEN ON CACHE BOOL "Toadlet for EMSCRIPTEN")
+	endif (EMSCRIPTEN)
 endif (WIN32)
 
 

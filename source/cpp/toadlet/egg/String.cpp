@@ -46,12 +46,12 @@
 		str.mLength=sprintf(temp,fmt,x); \
 		char *src=temp; \
 		stringchar *dst=(str).mData; \
-		while((*dst++=*src++)!=0);
+		while((*dst++=*src++)!=0){}
 	#define TOADLET_SSCANF(str,fmt,x) \
 		char temp[128]; \
 		stringchar *src=(str).mData; \
 		char *dst=temp; \
-		while((*dst++=*src++)!=0); \
+		while((*dst++=*src++)!=0){} \
 		sscanf(temp,fmt,x)
 #endif
 
@@ -108,7 +108,7 @@ void String::internal_String(const char *text){
 	mLength=strlen(text);
 	mData=new stringchar[mLength+1];
 	stringchar *dest=mData;
-	while((*dest++=*text++)!=0);
+	while((*dest++=*text++)!=0){}
 	mNarrowData=NULL;
 
 	updatec();
@@ -125,7 +125,7 @@ void String::internal_String(const unsigned char *text){
 	mLength=strlen((const char*)text);
 	mData=new stringchar[mLength+1];
 	stringchar *dest=mData;
-	while((*dest++=*text++)!=0);
+	while((*dest++=*text++)!=0){}
 	mNarrowData=NULL;
 
 	updatec();
@@ -488,7 +488,7 @@ String String::operator+(const char *text) const{
 
 	TOADLET_WCSNCPY((wchar_t*)s.mData,(wchar_t*)mData,mLength);
 	stringchar *dest=s.mData+mLength;
-	while((*dest++=*text++)!=0);
+	while((*dest++=*text++)!=0){}
 	s.mData[s.mLength]=0;
 
 	s.updatec();
@@ -604,7 +604,7 @@ void String::operator+=(const char *text){
 	stringchar *data=new stringchar[mLength+len2+1];
 	TOADLET_WCSNCPY((wchar_t*)data,(wchar_t*)mData,mLength);
 	stringchar *dest=data+mLength;
-	while((*dest++=*text++)!=0);
+	while((*dest++=*text++)!=0){}
 	int length=mLength+len2;
 	data[length]=0;
 
@@ -689,7 +689,7 @@ void String::updatec(){
 	mNarrowData=new char[mLength+1];
 	const stringchar *source=mData;
 	char *dest=mNarrowData;
-	while((*dest++=*source++)!=0);
+	while((*dest++=*source++)!=0){}
 }
 
 String operator+(const char *text,const String &string){
@@ -702,7 +702,7 @@ String operator+(const char *text,const String &string){
 	String s(string.mLength+len2);
 
 	stringchar *dest=s.mData;
-	while((*dest++=*text++)!=0);
+	while((*dest++=*text++)!=0){}
 	TOADLET_WCSNCPY((wchar_t*)s.mData+len2,(wchar_t*)string.mData,string.mLength);
 	s.mData[s.mLength]=0;
 

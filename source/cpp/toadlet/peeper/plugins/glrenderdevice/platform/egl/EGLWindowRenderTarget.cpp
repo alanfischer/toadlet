@@ -88,7 +88,7 @@ bool EGLWindowRenderTarget::createContext(void *display,void *window,WindowRende
 		}
 	#else
 		if(display==NULL){
-			display=EGL_DEFAULT_DISPLAY;
+			display=(EGLDisplay)EGL_DEFAULT_DISPLAY;
 		}
 	#endif
 
@@ -166,7 +166,7 @@ bool EGLWindowRenderTarget::createContext(void *display,void *window,WindowRende
 		TOADLET_CHECK_EGLERROR("eglCreateWindowSurface");
 	}
 	else{
-		mSurface=eglCreatePixmapSurface(mDisplay,mConfig,(egl_native_pixmap_t*)window,NULL);
+		mSurface=eglCreatePixmapSurface(mDisplay,mConfig,(EGLNativePixmapType)window,NULL);
 		TOADLET_CHECK_EGLERROR("eglCreatePixmapSurface");
 	}
 	if(mSurface==EGL_NO_SURFACE){

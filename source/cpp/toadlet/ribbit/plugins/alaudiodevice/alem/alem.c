@@ -41,8 +41,8 @@
 #	include <dlfcn.h>
 #	include <wchar.h>
 #	include <stdio.h>
-#	define ALEM_DEBUG printf
-#	define ALEM_DEBUGC printf
+#	define ALEM_DEBUG(x) printf("%s",x);
+#	define ALEM_DEBUGC(x) printf("%s",x);
 	typedef void *alem_Library;
 	typedef char alem_Char;
 #endif

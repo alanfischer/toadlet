@@ -126,6 +126,16 @@ elseif (TOADLET_PLATFORM_IOS)
 	if (STATIC_LIB_LINK)
 		set (STATIC_LIB_PROPS ${STATIC_LIB_PROPS} LINK_FLAGS ${STATIC_LIB_LINK})
 	endif (STATIC_LIB_LINK)
+elseif (TOADLET_PLATFORM_EMSCRIPTEN)
+	# emscripten does not handle dynamic libraries
+	set (TOADLET_BUILD_DYNAMIC OFF CACHE BOOL "Build dynamic libraries" FORCE)
+
+	if (STATIC_LIB_FLAGS)
+		set (STATIC_LIB_PROPS ${STATIC_LIB_PROPS} COMPILE_FLAGS ${STATIC_LIB_FLAGS})
+	endif (STATIC_LIB_FLAGS)
+
+	set (CMAKE_C_FLAGS "-Wno-warn-absolute-paths")
+	set (CMAKE_CXX_FLAGS "-Wno-warn-absolute-paths")
 elseif (TOADLET_PLATFORM_POSIX)
 	# Set defaults
 	option (TOADLET_RTTI "Enable Run Time Type Information" ON)
@@ -296,13 +306,6 @@ elseif (TOADLET_PLATFORM_WIN32)
 		LINK_FLAGS_MINSIZEREL ${STATIC_LIB_LINK_RELEASE}
 		LINK_FLAGS_RELWITHDEBINFO ${STATIC_LIB_LINK_RELEASE}
 	)
-else (TOADLET_PLATFORM_EMSCRIPTEN)
-	# emscripten does not handle dynamic libraries
-	set (TOADLET_BUILD_DYNAMIC OFF CACHE BOOL "Build dynamic libraries" FORCE)
-
-	if (STATIC_LIB_FLAGS)
-		set (STATIC_LIB_PROPS ${STATIC_LIB_PROPS} COMPILE_FLAGS ${STATIC_LIB_FLAGS})
-	endif (STATIC_LIB_FLAGS)
 else (TOADLET_PLATFORM_ANDROID)
 	message (FATAL_ERROR "Toadlet platform undefined. Toadlet will not be built")
 endif (TOADLET_PLATFORM_ANDROID)

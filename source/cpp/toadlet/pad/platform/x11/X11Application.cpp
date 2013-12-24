@@ -28,15 +28,23 @@
 #include <X11/Xlib.h>
 #include <X11/keysym.h>
 #include <X11/Xutil.h>
-#include <X11/extensions/xf86vmode.h>
+
+#if defined(TOADLET_PLATFORM_EMSCRIPTEN)
+	#include <emscripten/emscripten.h>
+#endif
 
 using namespace toadlet::peeper;
 using namespace toadlet::ribbit;
 using namespace toadlet::flick;
 
 #if defined(TOADLET_HAS_OPENGL)
-	extern "C" RenderDevice *new_GLRenderDevice();
-	extern "C" RenderTarget *new_GLXWindowRenderTarget(void *display,void *window,WindowRenderTargetFormat *format);
+	#if defined(TOADLET_PLATFORM_EMSCRIPTEN)
+		extern "C" RenderDevice *new_GLES2RenderDevice();
+		extern "C" RenderTarget *new_EGLWindowRenderTarget(void *display,void *window,WindowRenderTargetFormat *format);
+	#else
+		extern "C" RenderDevice *new_GLRenderDevice();
+		extern "C" RenderTarget *new_GLXWindowRenderTarget(void *display,void *window,WindowRenderTargetFormat *format);
+	#endif
 #endif
 #if defined(TOADLET_HAS_OPENAL)
 	extern "C" AudioDevice *new_ALAudioDevice();
@@ -59,10 +67,12 @@ struct X11Attributes{
 	}mOriginalEnv;
 
 	// Mode switching
+/*
 	struct{
 		XF86VidModeModeInfo mode;
 		int viewX,viewY;
 	}mOriginalMode;
+*/
 };
 
 X11Application::X11Application():
@@ -87,11 +97,17 @@ X11Application::X11Application():
 	mFormat->setPixelFormat(TextureFormat::Format_RGBA_8);
 
 	#if defined(TOADLET_HAS_OPENGL)
-		mRenderDevicePlugins.add("gl",RenderDevicePlugin(new_GLXWindowRenderTarget,new_GLRenderDevice));
+		#if defined(TOADLET_PLATFORM_EMSCRIPTEN)
+			mRenderDevicePlugins.add("gles2",RenderDevicePlugin(new_EGLWindowRenderTarget,new_GLES2RenderDevice));
+		#else
+			mRenderDevicePlugins.add("gl",RenderDevicePlugin(new_GLXWindowRenderTarget,new_GLRenderDevice));
+		#endif
 	#endif
 
 	#if defined(TOADLET_HAS_OPENAL)
-		mAudioDevicePlugins.add("al",AudioDevicePlugin(new_ALAudioDevice));
+		#if !defined(TOADLET_PLATFORM_EMSCRIPTEN)
+			mAudioDevicePlugins.add("al",AudioDevicePlugin(new_ALAudioDevice));
+		#endif
 	#endif
 }
 
@@ -113,10 +129,22 @@ void X11Application::destroy(){
 	BaseApplication::destroy();
 }
 
+X11Application::ptr app;
+void main_loop(){
+		app->update(33);
+		app->render();
+}
+
 void X11Application::start(){
 	resized(mWidth,mHeight);
 	mRun=true;
+
+#if defined(TOADLET_PLATFORM_EMSCRIPTEN)
+	app=this;
+	emscripten_set_main_loop(main_loop,30,true);
+#else
 	runEventLoop();
+#endif
 }
 
 void X11Application::runEventLoop(){
@@ -241,9 +269,17 @@ bool X11Application::createWindow(){
 		return false;
 	}
 
+	Window rootWindow=0;
+#if !defined(TOADLET_PLATFORM_EMSCRIPTEN)
+		rootWindow=XRootWindow(x11->mDisplay,x11->mScrnum);
+#endif
+
+#if !defined(TOADLET_PLATFORM_EMSCRIPTEN)
 	x11->mScrnum=XDefaultScreen(x11->mDisplay);
+#endif
 
 	if(mWidth==-1 || mHeight==-1){
+/*
 		XF86VidModeModeLine currentMode;
 		int tmp;
 		XF86VidModeGetModeLine(x11->mDisplay,x11->mScrnum,&tmp,&currentMode);
@@ -253,6 +289,7 @@ bool X11Application::createWindow(){
 		if(mHeight==-1){
 			mHeight=currentMode.vdisplay;
 		}
+*/
 	}
 
 	// Antialiasing should work with an nvidia card and nvidia glx
@@ -279,6 +316,7 @@ bool X11Application::createWindow(){
 		}
 	}
 
+#if !defined(TOADLET_PLATFORM_EMSCRIPTEN)
 	XVisualInfo info;
 	int redBits=TextureFormat::getRedBits(mFormat->pixelFormat);
 	int greenBits=TextureFormat::getGreenBits(mFormat->pixelFormat);
@@ -298,17 +336,21 @@ bool X11Application::createWindow(){
 			"failed to get visual");
 		return false;
 	}
+#endif
 
 	// Set the window attributes
 	XSetWindowAttributes attr;
 	unsigned long mask;
 	attr.background_pixel=0;
 	attr.border_pixel=0;
-	attr.colormap=XCreateColormap(x11->mDisplay,XRootWindow(x11->mDisplay,x11->mScrnum),x11->mVisualInfo->visual,AllocNone);
 	attr.event_mask=StructureNotifyMask | ExposureMask | KeyPressMask | KeyReleaseMask | ButtonPressMask | ButtonReleaseMask | PointerMotionMask | FocusChangeMask;
+#if !defined(TOADLET_PLATFORM_EMSCRIPTEN)
+	attr.colormap=XCreateColormap(x11->mDisplay,rootWindow,x11->mVisualInfo->visual,AllocNone);
+#endif
 
 	// Go to fullscreen mode if requested
 	if(mFullscreen){
+/*
 		// Get the display modes list
 		XF86VidModeModeInfo **displayModes=NULL;
 		int numDisplayModes;
@@ -361,7 +403,7 @@ bool X11Application::createWindow(){
 				"fullscreen mode unavailable due to bad requested fullscreen size");
 			return false;
 		}
-		
+
 		// Make sure we are square after mode switch
 		XSync(x11->mDisplay,true);
 
@@ -370,20 +412,22 @@ bool X11Application::createWindow(){
 			XFree(displayModes);
 			displayModes=NULL;
 		}
-		
+*/
 		// Set Fullscreen attributes
 		mask = CWBackPixel | CWBorderPixel | CWColormap | CWEventMask | CWOverrideRedirect;
 		attr.border_pixmap = None;
 		attr.override_redirect = true;
 
 		// Create window
-		x11->mWindow=XCreateWindow(x11->mDisplay,XRootWindow(x11->mDisplay,x11->mScrnum),mPositionX,mPositionY,mWidth,mHeight,0,x11->mVisualInfo->depth,InputOutput,x11->mVisualInfo->visual,mask,&attr);
+		x11->mWindow=XCreateWindow(x11->mDisplay,rootWindow,mPositionX,mPositionY,mWidth,mHeight,0,x11->mVisualInfo->depth,InputOutput,x11->mVisualInfo->visual,mask,&attr);
 
+#if !defined(TOADLET_PLATFORM_EMSCRIPTEN)
 		// Lock things to window
 		XWarpPointer(x11->mDisplay,None,x11->mWindow,0,0,0,0,mWidth/2,mHeight/2);
 		XMapRaised(x11->mDisplay,x11->mWindow);
 		XGrabKeyboard(x11->mDisplay,x11->mWindow,true,GrabModeAsync,GrabModeAsync,CurrentTime);
 		XGrabPointer(x11->mDisplay,x11->mWindow,true,ButtonPressMask,GrabModeAsync,GrabModeAsync,x11->mWindow,None,CurrentTime);
+#endif
 	}
 	// Otherwise use windowed mode
 	else{
@@ -391,8 +435,9 @@ bool X11Application::createWindow(){
 		mask = CWBackPixel | CWBorderPixel | CWColormap | CWEventMask;
 		
 		// Create window
-		x11->mWindow=XCreateWindow(x11->mDisplay,XRootWindow(x11->mDisplay,x11->mScrnum),mPositionX,mPositionY,mWidth,mHeight,0,x11->mVisualInfo->depth,InputOutput,x11->mVisualInfo->visual,mask,&attr);
+		x11->mWindow=XCreateWindow(x11->mDisplay,rootWindow,mPositionX,mPositionY,mWidth,mHeight,0,x11->mVisualInfo->depth,InputOutput,x11->mVisualInfo->visual,mask,&attr);
 		
+#if !defined(TOADLET_PLATFORM_EMSCRIPTEN)
 		// Set hints and properties
 		XSizeHints sizehints;
 		sizehints.x = 0;
@@ -405,8 +450,10 @@ bool X11Application::createWindow(){
 
 		// Bring up the window
 		XMapRaised(x11->mDisplay,x11->mWindow);
+#endif
 	}
 
+#if !defined(TOADLET_PLATFORM_EMSCRIPTEN)
 	// Make sure we catch the close window event
 	x11->mDeleteWindow=XInternAtom(x11->mDisplay,"WM_DELETE_WINDOW",false);
 	XSetWMProtocols(x11->mDisplay,x11->mWindow,&x11->mDeleteWindow,1);
@@ -416,6 +463,7 @@ bool X11Application::createWindow(){
 	Pixmap cursorPixmap=XCreateBitmapFromData(x11->mDisplay,x11->mWindow,cursorData,1,1);	
 	x11->mBlankCursor=XCreatePixmapCursor(x11->mDisplay,cursorPixmap,cursorPixmap,&cursorColor,&cursorColor,0,0);
 	XFreePixmap(x11->mDisplay,cursorPixmap);
+#endif
 
 	return true;
 }
@@ -447,7 +495,7 @@ void X11Application::destroyWindow(){
 }
 
 void X11Application::originalResolution(){
-	if(mFullscreen){
+/*	if(mFullscreen){
 		// Store the current mode
 		XF86VidModeModeLine currentMode;
 		int tmp;
@@ -467,6 +515,7 @@ void X11Application::originalResolution(){
 		XUngrabKeyboard(x11->mDisplay,CurrentTime);
 		XUngrabPointer(x11->mDisplay,CurrentTime);
 	}
+*/
 }
 
 void X11Application::originalEnv(){
