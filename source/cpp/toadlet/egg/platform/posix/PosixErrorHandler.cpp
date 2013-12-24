@@ -25,10 +25,15 @@
 
 #include <toadlet/egg/platform/posix/PosixErrorHandler.h>
 #include <stdlib.h>
-#if !defined(TOADLET_PLATFORM_ANDROID)
+#include <stdio.h>
+
+#if !defined(TOADLET_PLATFORM_ANDROID) && !defined(TOADLET_PLATFORM_EMSCRIPTEN)
+	#define TOADLET_HAS_BACKTRACE
+#endif
+
+#if defined(TOADLET_HAS_BACKTRACE)
 	#include <execinfo.h>
 #endif
-#include <stdio.h>
 
 namespace toadlet{
 namespace egg{
@@ -107,17 +112,18 @@ bool PosixErrorHandler::uninstallHandler(){
 
 void PosixErrorHandler::signalHandler(int sig,siginfo_t *info,void *context){
 	void **stackFrames=instance->mStackFrames;
-	#if defined(TOADLET_PLATFORM_ANDROID)
-		int frameCount=0;
+	int frameCount=
+	#if defined(TOADLET_HAS_BACKTRACE)
+		backtrace(stackFrames,MAX_STACKFRAMES);
 	#else
-		int frameCount=backtrace(stackFrames,MAX_STACKFRAMES);
+		0;
 	#endif
 	instance->handleFrames(stackFrames,frameCount);
 	instance->errorHandled();
 }
 
 void PosixErrorHandler::handleFrames(void **frames,int count){
-	#if !defined(TOADLET_PLATFORM_ANDROID)
+	#if defined(TOADLET_HAS_BACKTRACE)
 		char **strings=backtrace_symbols(frames,count);
 
 		if(mListener!=NULL){

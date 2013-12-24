@@ -24,7 +24,7 @@
  ********** Copyright header - do not remove **********/
 
 #ifndef TOADLET_PAD_CONSOLEAPPLICATION_H
-#define TOADLET_PAD_COSOLEAPPLICATION_H
+#define TOADLET_PAD_CONSOLEAPPLICATION_H
 
 #include <toadlet/pad/BaseApplication.h>
 

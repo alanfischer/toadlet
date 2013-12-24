@@ -3,10 +3,19 @@ if (NOT TOADLET_PLATFORM_ANDROID AND NOT TOADLET_PLATFORM_IOS)
 		ContainerTest.cpp
 		MathTest.cpp
 		NodeTest.cpp
-		unitTest.cpp
+#		unitTest.cpp
+		
+		toadletApp.cpp
+		toadletMain.cpp
+		Logo.cpp
 	)
 	
-	add_executable (unitTest ${UNIT_SRC})
+	if (TOADLET_PLATFORM_EMSCRIPTEN)
+		set (CMAKE_CXX_FLAGS "--embed-file lt.tmsh")
+		add_executable (unitTest.html ${UNIT_SRC})
+	else (TOADLET_PLATFORM_EMSCRIPTEN)
+		add_executable (unitTest ${UNIT_SRC})
+	endif (TOADLET_PLATFORM_EMSCRIPTEN)
 	
 	# Platform specific libraries
 	if (TOADLET_PLATFORM_WIN32)
@@ -29,8 +38,10 @@ if (NOT TOADLET_PLATFORM_ANDROID AND NOT TOADLET_PLATFORM_IOS)
 		add_custom_command (TARGET unitTest POST_BUILD COMMAND ${CMAKE_COMMAND} -DCONFIGURATION=$<CONFIGURATION> -P ${CMAKE_CURRENT_BINARY_DIR}/Fixup.cmake)
 	elseif (TOADLET_PLATFORM_OSX)
 		target_link_libraries (unitTest toadlet_egg toadlet_peeper toadlet_ribbit toadlet_tadpole  "-framework Foundation")
+	elseif (TOADLET_PLATFORM_EMSCRIPTEN)
+		target_link_libraries (unitTest.html toadlet_egg_s toadlet_peeper_s toadlet_ribbit_s toadlet_tadpole_s toadlet_hop_s toadlet_pad_s toadlet_peeper_gles2renderdevice_s toadlet_ribbit_alaudiodevice_s "--embed-file lt.tmsh")
 	elseif (TOADLET_PLATFORM_POSIX)
-		target_link_libraries (unitTest toadlet_egg toadlet_peeper toadlet_ribbit toadlet_tadpole -lpthread)
+		target_link_libraries (unitTests toadlet_egg toadlet_peeper toadlet_ribbit toadlet_tadpole -lpthread)
 	endif (TOADLET_PLATFORM_WIN32)	
 
 	if (TOADLET_RUN_MEMCHECK)

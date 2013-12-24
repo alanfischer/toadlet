@@ -57,6 +57,11 @@
 		#define TOADLET_HAS_EGL
 		#define TOADLET_HAS_EGL_20
 	#endif
+#elif defined(TOADLET_PLATFORM_EMSCRIPTEN)
+	#include <EGL/egl.h>
+	#include <GLES2/gl2.h>
+	#define TOADLET_HAS_EGL
+	#define TOADLET_HAS_EGL_20
 #else
 	#if defined(TOADLET_PLATFORM_WIN32)
 		#define GLEW_STATIC
