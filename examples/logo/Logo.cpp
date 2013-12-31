@@ -27,7 +27,7 @@ void Logo::create(){
 	Node::ptr lt=new Node(scene);
 	{
  		MeshComponent::ptr mesh=new MeshComponent(engine);
-		mesh->setMesh("lt.xmsh");
+		mesh->setMesh("lt.tmsh");
 		lt->attach(mesh);
 
 		if(mesh!=NULL){

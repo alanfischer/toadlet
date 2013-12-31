@@ -68,6 +68,7 @@ else (WIN32)
 	set (LIBRARY_SEARCH_PATHS
 		/usr/lib 
 		/usr/local/lib
+		c:/users/siralanf/emscripten/lib
 	)
 endif (WIN32)
 
@@ -88,30 +89,44 @@ endif (NOT TOADLET_INCLUDE_DIR)
 
 # List of toadlet library basenames
 # NOTE: These are listed in the order acceptable for static linking
-set (TOADLET_LIB_BASENAMES
-	toadlet_pad
-	toadlet_tadpole
-	toadlet_ribbit_jaudiodevice
-	toadlet_ribbit_mmaudiodevice
-	toadlet_ribbit_alaudiodevice
-	toadlet_ribbit
-	toadlet_peeper_d3dmrenderdevice
-	toadlet_peeper_d3d9renderdevice
-	toadlet_peeper_d3d10renderdevice
-	toadlet_peeper_d3d11renderdevice
-	toadlet_peeper_gles1renderdevice
-	toadlet_peeper_gles2renderdevice
-	toadlet_peeper_glrenderdevice
-	toadlet_peeper
-	toadlet_hop
-	toadlet_flick_androidsensordevice
-	toadlet_flick_ioslineardevice
-	toadlet_flick_jinputdevice
-	toadlet_flick_mfvideodevice
-	toadlet_flick_win32joydevice
-	toadlet_flick
-	toadlet_egg
-)
+if (EMSCRIPTEN)
+	set (TOADLET_LIB_BASENAMES
+		toadlet_pad
+		toadlet_tadpole
+		toadlet_ribbit_alaudiodevice
+		toadlet_ribbit
+		toadlet_peeper_gles2renderdevice
+		toadlet_peeper
+		toadlet_hop
+		toadlet_flick
+		toadlet_egg
+	)
+else (EMSCRIPTEN)
+	set (TOADLET_LIB_BASENAMES
+		toadlet_pad
+		toadlet_tadpole
+		toadlet_ribbit_jaudiodevice
+		toadlet_ribbit_mmaudiodevice
+		toadlet_ribbit_alaudiodevice
+		toadlet_ribbit
+		toadlet_peeper_d3dmrenderdevice
+		toadlet_peeper_d3d9renderdevice
+		toadlet_peeper_d3d10renderdevice
+		toadlet_peeper_d3d11renderdevice
+		toadlet_peeper_gles1renderdevice
+		toadlet_peeper_gles2renderdevice
+		toadlet_peeper_glrenderdevice
+		toadlet_peeper
+		toadlet_hop
+		toadlet_flick_androidsensordevice
+		toadlet_flick_ioslineardevice
+		toadlet_flick_jinputdevice
+		toadlet_flick_mfvideodevice
+		toadlet_flick_win32joydevice
+		toadlet_flick
+		toadlet_egg
+	)
+endif (EMSCRIPTEN)
 
 # Android specifics
 if (ANDROID) 
@@ -163,11 +178,18 @@ foreach (TOADLET_LIB ${TOADLET_LIB_BASENAMES})
 	# Otherwise the debug/release assignment settings below will cause trouble with multiple runs
 	if (NOT ${TOADLET_LIB_VAR}_FOUND)
 		# Find dynamic release, dynamic debug, static release and then static debug
-		find_library (${TOADLET_LIB_VAR}_LIB NAMES ${TOADLET_LIB} PATHS ${LIBRARY_SEARCH_PATHS} PATH_SUFFIXES ${LIBRARY_SEARCH_SUFFIXES})
-		find_library (${TOADLET_LIB_VAR}_LIB_D NAMES ${TOADLET_LIB}_d PATHS ${LIBRARY_SEARCH_PATHS} PATH_SUFFIXES ${LIBRARY_SEARCH_SUFFIXES})
-		find_library (${TOADLET_LIB_VAR}_LIB_S NAMES ${TOADLET_LIB}_s PATHS ${LIBRARY_SEARCH_PATHS} PATH_SUFFIXES ${LIBRARY_SEARCH_SUFFIXES})
-		find_library (${TOADLET_LIB_VAR}_LIB_SD NAMES ${TOADLET_LIB}_sd PATHS ${LIBRARY_SEARCH_PATHS} PATH_SUFFIXES ${LIBRARY_SEARCH_SUFFIXES})
-
+		if (EMSCRIPTEN)
+			set (${TOADLET_LIB_VAR}_LIB "C:\\users\\siralanf\\emscripten\\lib\\lib${TOADLET_LIB}.a")
+			set (${TOADLET_LIB_VAR}_LIB_D "C:\\users\\siralanf\\emscripten\\lib\\lib${TOADLET_LIB}_d.a")
+			set (${TOADLET_LIB_VAR}_LIB_S "C:\\users\\siralanf\\emscripten\\lib\\lib${TOADLET_LIB}_s.a")
+			set (${TOADLET_LIB_VAR}_LIB_SD "C:\\users\\siralanf\\emscripten\\lib\\lib${TOADLET_LIB}_sd.a")
+		else (EMSCRIPTEN)
+			find_library (${TOADLET_LIB_VAR}_LIB NAMES ${TOADLET_LIB} PATHS ${LIBRARY_SEARCH_PATHS} PATH_SUFFIXES ${LIBRARY_SEARCH_SUFFIXES})
+			find_library (${TOADLET_LIB_VAR}_LIB_D NAMES ${TOADLET_LIB}_d PATHS ${LIBRARY_SEARCH_PATHS} PATH_SUFFIXES ${LIBRARY_SEARCH_SUFFIXES})
+			find_library (${TOADLET_LIB_VAR}_LIB_S NAMES ${TOADLET_LIB}_s PATHS ${LIBRARY_SEARCH_PATHS} PATH_SUFFIXES ${LIBRARY_SEARCH_SUFFIXES})
+			find_library (${TOADLET_LIB_VAR}_LIB_SD NAMES ${TOADLET_LIB}_sd PATHS ${LIBRARY_SEARCH_PATHS} PATH_SUFFIXES ${LIBRARY_SEARCH_SUFFIXES})
+		endif (EMSCRIPTEN)
+			
 		# The first toadlet library we find sets the TOADLET_LIBRARY_DIR path
 		if (NOT TOADLET_LIBRARY_DIR)
 			if (${TOADLET_LIB_VAR}_LIB)

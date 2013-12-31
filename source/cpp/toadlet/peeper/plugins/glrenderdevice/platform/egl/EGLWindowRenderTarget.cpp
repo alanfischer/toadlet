@@ -166,8 +166,10 @@ bool EGLWindowRenderTarget::createContext(void *display,void *window,WindowRende
 		TOADLET_CHECK_EGLERROR("eglCreateWindowSurface");
 	}
 	else{
-		mSurface=eglCreatePixmapSurface(mDisplay,mConfig,(EGLNativePixmapType)window,NULL);
-		TOADLET_CHECK_EGLERROR("eglCreatePixmapSurface");
+		#if !defined(TOADLET_PLATFORM_EMSCRIPTEN)
+			mSurface=eglCreatePixmapSurface(mDisplay,mConfig,(EGLNativePixmapType)window,NULL);
+			TOADLET_CHECK_EGLERROR("eglCreatePixmapSurface");
+		#endif
 	}
 	if(mSurface==EGL_NO_SURFACE){
 		Error::unknown(Categories::TOADLET_PEEPER,
@@ -244,7 +246,9 @@ bool EGLWindowRenderTarget::destroyContext(){
 
 bool EGLWindowRenderTarget::swap(){
 	if(mPixmap){
-		eglWaitGL();
+		#if !defined(TOADLET_PLATFORM_EMSCRIPTEN)
+			eglWaitGL();
+		#endif
 	}
 	else{
 		eglSwapBuffers(mDisplay,mSurface);

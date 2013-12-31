@@ -182,8 +182,10 @@ bool EGLPBufferRenderTarget::createBuffer(){
 	}
 	attribList[i++]=EGL_NONE;
 
-	mSurface=eglCreatePbufferSurface(mDisplay,config,attribList);
-	TOADLET_CHECK_EGLERROR("eglCreatePbufferSurface");
+	#if !defined(TOADLET_PLATFORM_EMSCRIPTEN)
+		mSurface=eglCreatePbufferSurface(mDisplay,config,attribList);
+		TOADLET_CHECK_EGLERROR("eglCreatePbufferSurface");
+	#endif
 	if(mSurface==EGL_NO_SURFACE){
 		destroyBuffer();
 
@@ -254,8 +256,10 @@ void EGLPBufferRenderTarget::bind(){
 			TOADLET_CHECK_GLERROR("glCopyTexSubImage2D");
 		}
 		else{
-			eglBindTexImage(mDisplay,mSurface,EGL_BACK_BUFFER);
-			TOADLET_CHECK_EGLERROR("eglBindTexImage");
+			#if !defined(TOADLET_PLATFORM_EMSCRIPTEN)
+				eglBindTexImage(mDisplay,mSurface,EGL_BACK_BUFFER);
+				TOADLET_CHECK_EGLERROR("eglBindTexImage");
+			#endif
 		}
 
 		mTexture->generateMipLevels();
@@ -266,8 +270,10 @@ void EGLPBufferRenderTarget::unbind(){
 	if(mBound==true){
 		mBound=false;
 		if(mCopy==false){
-			eglReleaseTexImage(mDisplay,mSurface,EGL_BACK_BUFFER);
-			TOADLET_CHECK_EGLERROR("eglReleaseTexImage");
+			#if !defined(TOADLET_PLATFORM_EMSCRIPTEN)
+				eglReleaseTexImage(mDisplay,mSurface,EGL_BACK_BUFFER);
+				TOADLET_CHECK_EGLERROR("eglReleaseTexImage");
+			#endif
 		}
 	}
 }
