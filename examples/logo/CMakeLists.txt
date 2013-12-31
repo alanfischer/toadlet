@@ -11,9 +11,6 @@ find_package (toadlet REQUIRED)
 # Includes
 include_directories (${logo_SOURCE_DIR} ${TOADLET_INCLUDE_DIR})
 
-# Libraries
-set (LIBS ${TOADLET_LIBRARIES})
-
 # Source files
 set (SRC
 	../../main/toadletApp.cpp
@@ -26,7 +23,16 @@ set (H
 	Logo.h
 )
 
-# Executable
 add_executable (logo ${SRC} ${H})
-target_link_libraries (logo ${LIBS})
+
+# Executable
+if (EMSCRIPTEN)
+	set (CMAKE_C_FLAGS "-Wno-warn-absolute-paths")
+	set (CMAKE_CXX_FLAGS "-Wno-warn-absolute-paths")
+	target_link_libraries (logo ${TOADLET_LIBRARIES_S} "--embed-file lt.tmsh")
+	set_target_properties( logo PROPERTIES OUTPUT_NAME logo.html ) 
+else (EMSCRIPTEN)
+	target_link_libraries (logo ${TOADLET_LIBRARIES})
+endif (EMSCRIPTEN)
+
 install (TARGETS logo DESTINATION ${logo_BINARY_DIR})

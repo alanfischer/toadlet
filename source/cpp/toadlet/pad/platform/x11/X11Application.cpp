@@ -621,12 +621,14 @@ void X11Application::setDifferenceMouse(bool difference){
 	mDifferenceMouse=difference;
 	mSkipNextMove=true;
 
-	if(difference){
-		XDefineCursor(x11->mDisplay,x11->mWindow,x11->mBlankCursor);
-	}
-	else{
-		XUndefineCursor(x11->mDisplay,x11->mWindow);
-	}
+	#if !defined(TOADLET_PLATFORM_EMSCRIPTEN)
+		if(difference){
+			XDefineCursor(x11->mDisplay,x11->mWindow,x11->mBlankCursor);
+		}
+		else{
+			XUndefineCursor(x11->mDisplay,x11->mWindow);
+		}
+	#endif
 }
 
 void *X11Application::getDisplay(){return x11->mDisplay;}
