@@ -23,9 +23,13 @@ set (H
 	Logo.h
 )
 
-add_executable (logo ${SRC} ${H})
+set (RES
+	../data/lt.tmsh
+)
 
 # Executable
+add_executable (logo ${SRC} ${H})
+
 if (EMSCRIPTEN)
 	set (CMAKE_C_FLAGS "-Wno-warn-absolute-paths")
 	set (CMAKE_CXX_FLAGS "-Wno-warn-absolute-paths")
@@ -34,5 +38,9 @@ if (EMSCRIPTEN)
 else (EMSCRIPTEN)
 	target_link_libraries (logo ${TOADLET_LIBRARIES})
 endif (EMSCRIPTEN)
+
+foreach (R ${RES})
+	add_custom_command (TARGET logo PRE_BUILD COMMAND ${CMAKE_COMMAND} -E copy ${logo_SOURCE_DIR}/${R} ${logo_BINARY_DIR})
+endforeach (R ${RES})
 
 install (TARGETS logo DESTINATION ${logo_BINARY_DIR})
