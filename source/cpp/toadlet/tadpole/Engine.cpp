@@ -210,8 +210,10 @@ void Engine::installHandlers(){
 		"Engine: installing handlers");
 
 	// Archive streamers
-	mArchiveManager->setStreamer(new TPKGStreamer(),"tpkg");
-	mArchiveManager->setStreamer(new WADStreamer(mTextureManager),"wad");
+	#if !defined(TOADLET_PLATFORM_EMSCRIPTEN)
+		mArchiveManager->setStreamer(new TPKGStreamer(),"tpkg");
+		mArchiveManager->setStreamer(new WADStreamer(mTextureManager),"wad");
+	#endif
 	#if defined(TOADLET_HAS_ZZIP)
 		mArchiveManager->setStreamer(new ZIPStreamer(),"zip");
 	#endif
@@ -326,7 +328,7 @@ void Engine::installHandlers(){
 	#endif
 
 	// Plugin types, should be removed from here somehow
-	#if !defined(TOADLET_FIXED_POINT)
+	#if !defined(TOADLET_FIXED_POINT) && !defined(TOADLET_PLATFORM_EMSCRIPTEN)
 		mTextureManager->setStreamer(new SPRStreamer(this),"spr");
 
 		mSpriteModelManager->setStreamer(new studio::SpriteStreamer(this),"spr");

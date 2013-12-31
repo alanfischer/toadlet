@@ -5,6 +5,12 @@ project (randisle CXX C)
 # Custom cmake scripts
 set (CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${randisle_SOURCE_DIR}/../../cmake/Modules/")
 
+# Find toadlet
+find_package (toadlet REQUIRED)
+
+# Includes
+include_directories (${randisle_SOURCE_DIR} ${TOADLET_INCLUDE_DIR})
+
 # Source files
 set (SRC
 	../../main/toadletApp.cpp
@@ -36,15 +42,26 @@ set (H
 	src/TreeSystem.h
 )
 
-# Find toadlet
-find_package (toadlet REQUIRED)
-
-# Includes
-include_directories (${randisle_SOURCE_DIR} ${TOADLET_INCLUDE_DIR})
+set (RES
+	res/frog.tmsh
+	res/tall_grass.tmsh
+)	
 
 # Executable
 add_executable (randisle ${SRC} ${H})
-target_link_libraries (randisle ${TOADLET_LIBRARIES_MIXED})
+
+if (EMSCRIPTEN)
+	set (CMAKE_C_FLAGS "-Wno-warn-absolute-paths")
+	set (CMAKE_CXX_FLAGS "-Wno-warn-absolute-paths")
+	target_link_libraries (randisle ${TOADLET_LIBRARIES_S} "--embed-file frog.tmsh" "--embed-file tall_grass.tmsh")
+	set_target_properties( randisle PROPERTIES OUTPUT_NAME randisle.html ) 
+
+	foreach (R ${RES})
+		add_custom_command (TARGET randisle PRE_BUILD COMMAND ${CMAKE_COMMAND} -E copy ${randisle_SOURCE_DIR}/${R} ${randisle_BINARY_DIR})
+	endforeach (R ${RES})
+else (EMSCRIPTEN)
+	target_link_libraries (randisle ${TOADLET_LIBRARIES})
+endif (EMSCRIPTEN)
 
 # Add the required resources to the directory necessary for in-editor running
 if(WIN32)
