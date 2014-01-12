@@ -53,12 +53,12 @@ public:
 	static const int npos=-1;
 
 	String();
-	void internal_String(const char *text);
-	inline String(const char *text){internal_String(text);}
-	void internal_String(const unsigned char *text);
-	inline String(const unsigned char *text){internal_String(text);}
-	void internal_String(const stringchar *text);
-	inline String(const wchar *text){internal_String((const stringchar*)text);}
+	void internal_String(const char *text,int length=-1);
+	inline String(const char *text,int length=-1){internal_String(text,length);}
+	void internal_String(const unsigned char *text,int length=-1);
+	inline String(const unsigned char *text,int length=-1){internal_String(text,length);}
+	void internal_String(const stringchar *text,int length=-1);
+	inline String(const wchar *text,int length=-1){internal_String((const stringchar*)text,length);}
 	void internal_String(const Collection<tbyte> &text);
 	inline String(const Collection<tbyte> &text){internal_String(text);}
 	#if defined(__OBJC__)

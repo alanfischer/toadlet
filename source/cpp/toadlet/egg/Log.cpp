@@ -293,6 +293,8 @@ void Log::initialize(bool startSilent){
 		#elif defined(TOADLET_PLATFORM_ANDROID)
 			mListeners.add(new AndroidListener());
 			mListeners.add(new StandardListener());
+		#elif defined(TOADLET_PLATFORM_EMSCRIPTEN)
+			mListeners.add(new StandardListener());
 		#else
 			mListeners.add(new ANSIStandardListener());
 		#endif

@@ -97,7 +97,7 @@ String::String(){
 	mNarrowData=(char*)&mNull;
 }
 
-void String::internal_String(const char *text){
+void String::internal_String(const char *text,int length){
 	if(text==NULL){
 		mLength=0;
 		mData=&mNull;
@@ -105,16 +105,23 @@ void String::internal_String(const char *text){
 		return;
 	}
 
-	mLength=strlen(text);
+	if(length==-1){
+		mLength=strlen(text);
+	}
+	else{
+		mLength=length;
+	}
+
 	mData=new stringchar[mLength+1];
 	stringchar *dest=mData;
 	while((*dest++=*text++)!=0){}
+	mData[mLength]=0;
 	mNarrowData=NULL;
 
 	updatec();
 }
 
-void String::internal_String(const unsigned char *text){
+void String::internal_String(const unsigned char *text,int length){
 	if(text==NULL){
 		mLength=0;
 		mData=&mNull;
@@ -122,16 +129,23 @@ void String::internal_String(const unsigned char *text){
 		return;
 	}
 
-	mLength=strlen((const char*)text);
+	if(length==-1){
+		mLength=strlen((const char*)text);
+	}
+	else{
+		mLength=length;
+	}
+
 	mData=new stringchar[mLength+1];
 	stringchar *dest=mData;
 	while((*dest++=*text++)!=0){}
+	mData[mLength]=0;
 	mNarrowData=NULL;
 
 	updatec();
 }
 
-void String::internal_String(const stringchar *text){
+void String::internal_String(const stringchar *text,int length){
 	if(text==NULL){
 		mLength=0;
 		mData=&mNull;
@@ -139,9 +153,16 @@ void String::internal_String(const stringchar *text){
 		return;
 	}
 
-	mLength=TOADLET_WCSLEN((wchar_t*)text);
+	if(length==-1){
+		mLength=TOADLET_WCSLEN((wchar_t*)text);
+	}
+	else{
+		mLength=length;
+	}
+
 	mData=new stringchar[mLength+1];
-	TOADLET_WCSNCPY((wchar_t*)mData,(wchar_t*)text,mLength+1);
+	TOADLET_WCSNCPY((wchar_t*)mData,(wchar_t*)text,mLength);
+	mData[mLength]=0;
 	mNarrowData=NULL;
 
 	updatec();
