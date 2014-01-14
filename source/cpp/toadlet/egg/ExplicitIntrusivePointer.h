@@ -38,6 +38,8 @@ namespace egg{
 #endif
 class ExplicitIntrusivePointer{
 public:
+	typedef Type element_type;
+
 	explicit inline ExplicitIntrusivePointer(Type *pointer){
 		mPointer=pointer;
 		if(mPointer!=NULL){

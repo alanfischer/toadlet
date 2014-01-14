@@ -1,78 +1,42 @@
-#include <emscripten/bind.h>
-#include <emscripten/wire.h>
+#include "Bindings.h"
+#include <toadlet/egg/String.h>
 #include <toadlet/egg/Log.h>
 #include <toadlet/egg/Error.h>
+#include <toadlet/egg/math/Math.h>
 
 using namespace emscripten;
-using namespace toadlet;
-
-namespace emscripten {
-    namespace internal {
-
-    template<>
-    struct BindingType<egg::String> {
-        typedef struct {
-            size_t length;
-            wchar_t data[1]; // trailing data
-        }* WireType;
-        static WireType toWireType(const egg::String& v) {
-            WireType wt = (WireType)malloc(sizeof(size_t) + v.length() * sizeof(wchar_t));
-            wt->length = v.length();
-            wmemcpy(wt->data, v.wc_str(), v.length());
-            return wt;
-        }
-        static egg::String fromWireType(WireType v) {
-            return egg::String(v->data, v->length);
-        }
-        static void destroy(WireType v) {
-            free(v);
-        }
-    };
-
-    template<typename PointeeType>
-    struct smart_ptr_trait<egg::IntrusivePointer<PointeeType>> {
-        typedef egg::IntrusivePointer<PointeeType> PointerType;
-
-        static PointeeType get(const PointerType& ptr) {
-            return ptr.get();
-        }
-
-        static sharing_policy get_sharing_policy() {
-            return sharing_policy::BY_EMVAL;
-        }
-
-        static egg::IntrusivePointer<PointeeType>* share(PointeeType* p, internal::EM_VAL v) {
-            return new egg::IntrusivePointer<PointeeType>(
-                p,
-                val_deleter(val::take_ownership(v)));
-        }
-
-    private:
-        class val_deleter {
-        public:
-            val_deleter() = delete;
-            explicit val_deleter(val v)
-                : v(v)
-            {}
-            void operator()(void const*) {
-                v();
-                // eventually we'll need to support emptied out val
-                v = val::undefined();
-            }
-        private:
-            val v;
-        };
-    };
-
-	}
-}
-
 using namespace toadlet::egg;
+using namespace toadlet::egg::math;
 
 EMSCRIPTEN_BINDINGS(egg) {
     using namespace emscripten::internal;
 
 	_embind_register_std_wstring(TypeID<String>::get(), sizeof(stringchar), "String");
+
+    value_array<Vector2>("Vector2")
+        .element(&Vector2::x)
+        .element(&Vector2::y)
+        ;
+
+    value_array<Vector3>("Vector3")
+        .element(&Vector3::x)
+        .element(&Vector3::y)
+        .element(&Vector3::z)
+        ;
+
+    value_array<Vector4>("Vector4")
+        .element(&Vector4::x)
+        .element(&Vector4::y)
+        .element(&Vector4::z)
+        .element(&Vector4::w)
+        ;
+
+	value_array<Quaternion>("Quaternion")
+        .element(&Quaternion::x)
+        .element(&Quaternion::y)
+        .element(&Quaternion::z)
+        .element(&Quaternion::w)
+        ;
 
     class_<Log>("Log")
         .class_function("initialize", &Log::initialize)

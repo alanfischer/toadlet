@@ -62,6 +62,8 @@ class WeakPointer;
 class TOADLET_API SharedPointer{
 	class NullType{};
 public:
+	typedef Type element_type;
+
 	explicit inline SharedPointer(Type *pointer){
 		mPointer=pointer;
 		mCount=new PointerCounter(1);
