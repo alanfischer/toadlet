@@ -77,6 +77,8 @@ class WeakPointer;
 #endif
 class IntrusivePointer{
 public:
+	typedef Type element_type;
+
 	inline IntrusivePointer(Type *pointer){
 		mPointer=pointer;
 		if(mPointer!=NULL){

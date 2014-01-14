@@ -79,10 +79,6 @@ set (EGG_PLATFORM_WIN32_SRC
 	platform/win32/Win32WaitCondition.cpp
 )
 
-set (EGG_PLATFORM_EMSCRIPTEN_SRC
-	platform/emscripten/Bindings.cpp
-)
-
 
 # Headers
 set (EGG_HDR
@@ -206,9 +202,6 @@ set (EGG_PLATFORM_WIN32_HDR
 	platform/win32/Win32WaitCondition.h
 )
 
-set (EGG_PLATFORM_EMSCRIPTEN_HDR
-)
-
 
 # Bundle source
 source_group ("Source Files\\\\io" FILES ${EGG_IO_SRC})
@@ -313,15 +306,14 @@ if (TOADLET_BUILD_STATIC)
 	endif (TOADLET_PLATFORM_IOS)
 endif (TOADLET_BUILD_STATIC)
 
-
 # Javascript library
-if (TOADLET_PLATFORM_EMSCRIPTEN)
-	add_executable (toadlet_egg.js ${EGG_PLATFORM_EMSCRIPTEN_SRC} ${EGG_PLATFORM_EMSCRIPTEN_HDR})
-	set_target_properties (toadlet_egg.js PROPERTIES COMPILE_FLAGS "--bind")
-	set_target_properties (toadlet_egg.js PROPERTIES LINK_FLAGS "--bind")
-	target_link_libraries (toadlet_egg.js "toadlet_egg_s")
-	install (TARGETS toadlet_egg.js DESTINATION ${LIB_INSTALL_DIR} COMPONENT egg)
-endif (TOADLET_PLATFORM_EMSCRIPTEN)
+#if (TOADLET_PLATFORM_EMSCRIPTEN)
+#	add_executable (toadlet_egg.js "platform/emscripten/Bindings.cpp")
+#	set_target_properties (toadlet_egg.js PROPERTIES COMPILE_FLAGS "--bind")
+#	set_target_properties (toadlet_egg.js PROPERTIES LINK_FLAGS "--bind")
+#	target_link_libraries (toadlet_egg.js "toadlet_egg_s")
+#	install (TARGETS toadlet_egg.js DESTINATION ${LIB_INSTALL_DIR} COMPONENT egg)
+#endif (TOADLET_PLATFORM_EMSCRIPTEN)
 
 # Rule to install only egg
 add_custom_target (egg_install
