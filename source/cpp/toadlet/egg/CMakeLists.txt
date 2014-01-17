@@ -306,15 +306,6 @@ if (TOADLET_BUILD_STATIC)
 	endif (TOADLET_PLATFORM_IOS)
 endif (TOADLET_BUILD_STATIC)
 
-# Javascript library
-#if (TOADLET_PLATFORM_EMSCRIPTEN)
-#	add_executable (toadlet_egg.js "platform/emscripten/Bindings.cpp")
-#	set_target_properties (toadlet_egg.js PROPERTIES COMPILE_FLAGS "--bind")
-#	set_target_properties (toadlet_egg.js PROPERTIES LINK_FLAGS "--bind")
-#	target_link_libraries (toadlet_egg.js "toadlet_egg_s")
-#	install (TARGETS toadlet_egg.js DESTINATION ${LIB_INSTALL_DIR} COMPONENT egg)
-#endif (TOADLET_PLATFORM_EMSCRIPTEN)
-
 # Rule to install only egg
 add_custom_target (egg_install
 	COMMAND ${CMAKE_COMMAND} -DBUILD_TYPE=$<CONFIGURATION> -DCOMPONENT=required -P ${PROJECT_BINARY_DIR}/cmake_install.cmake

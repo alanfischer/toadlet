@@ -1,0 +1,45 @@
+<html>
+<head>
+<title>Demo</title>
+</head>
+
+<div class="canvas-container">
+    <canvas width="768" height="768" id="canvas0" oncontextmenu="return false;"></canvas>
+</div>
+
+</body>
+
+<script type="text/javascript">
+function loadScript(url, callback)
+{
+    // Adding the script tag to the head as suggested before
+    var head = document.getElementsByTagName('head')[0];
+    var script = document.createElement('script');
+    script.type = 'text/javascript';
+    script.src = url;
+
+    // Then bind the event to the callback function.
+    // There are several events for cross browser compatibility.
+    script.onreadystatechange = callback;
+    script.onload = callback;
+
+    // Fire the loading
+    head.appendChild(script);
+}
+
+loadScript("toadlet.js",function(){
+	var engine=new Module.Engine();
+	var scene=new Module.Scene(engine);
+	
+	var renderTarget=Module.new_EGLWindowRenderTarget(document.getElementById("canvas0"));
+	var renderDevice=Module.new_GLES2RenderDevice();
+
+	renderDevice.create(renderTarget,0);
+	
+	engine.setRenderDevice(renderDevice);
+	
+	scene.delete();
+	engine.delete();
+});
+</script>
+</html>

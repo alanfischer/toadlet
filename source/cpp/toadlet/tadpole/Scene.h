@@ -46,14 +46,14 @@ public:
 	TOADLET_OBJECT(Scene);
 
 	Scene(Engine *engine,scalar epsilon=Math::fromMilli(1));
-	virtual void destroy();
+	void destroy();
 
-	virtual Engine *getEngine(){return mEngine;}
+	Engine *getEngine(){return mEngine;}
 
-	virtual PartitionNode *getBackground(){return mBackground;}
+	PartitionNode *getBackground(){return mBackground;}
 
 	virtual void setRoot(PartitionNode *root);
-	virtual PartitionNode *getRoot(){return mRoot;}
+	PartitionNode *getRoot(){return mRoot;}
 
 	virtual void setExcessiveDT(int dt){mExcessiveDT=dt;}
 	virtual int getExcessiveDT() const{return mExcessiveDT;}
