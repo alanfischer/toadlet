@@ -871,16 +871,6 @@ if (TOADLET_BUILD_STATIC)
 endif (TOADLET_BUILD_STATIC)
 
 
-# Javascript library
-if (TOADLET_PLATFORM_EMSCRIPTEN)
-	add_executable (toadlet.js "../egg/platform/emscripten/Bindings.cpp" "platform/emscripten/Bindings.cpp")
-	set_target_properties (toadlet.js PROPERTIES COMPILE_FLAGS "--bind")
-	set_target_properties (toadlet.js PROPERTIES LINK_FLAGS "--bind")
-	target_link_libraries (toadlet.js "toadlet_egg_s" "toadlet_hop_s" "toadlet_peeper_s" "toadlet_ribbit_s" "toadlet_tadpole_s")
-	install (TARGETS toadlet.js DESTINATION ${LIB_INSTALL_DIR} COMPONENT tadpole)
-endif (TOADLET_PLATFORM_EMSCRIPTEN)
-
-
 # Rule to install only tadpole
 add_custom_target (tadpole_install
 	COMMAND ${CMAKE_COMMAND} -DBUILD_TYPE=$<CONFIGURATION> -DCOMPONENT=required -P ${PROJECT_BINARY_DIR}/cmake_install.cmake

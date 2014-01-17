@@ -70,6 +70,21 @@ file (APPEND ${HEADER_FILE} "#endif\n")
 configure_file (${CMAKE_CURRENT_SOURCE_DIR}/Config.h.cmake ${CMAKE_CURRENT_BINARY_DIR}/Config.h)
 
 
+# Javascript library
+if (TOADLET_PLATFORM_EMSCRIPTEN)
+	add_executable (toadlet.js 
+		"../../embind/toadlet/egg/Bindings.cpp"
+		"../../embind/toadlet/hop/Bindings.cpp"
+		"../../embind/toadlet/peeper/Bindings.cpp"
+		"../../embind/toadlet/tadpole/Bindings.cpp"
+	)
+	set_target_properties (toadlet.js PROPERTIES COMPILE_FLAGS "--bind")
+	set_target_properties (toadlet.js PROPERTIES LINK_FLAGS "--bind")
+	target_link_libraries (toadlet.js "toadlet_egg_s" "toadlet_hop_s" "toadlet_peeper_s" "toadlet_peeper_gles2renderdevice_s" "toadlet_ribbit_s" "toadlet_ribbit_alaudiodevice_s" "toadlet_tadpole_s")
+	install (TARGETS toadlet.js DESTINATION ${LIB_INSTALL_DIR})
+endif (TOADLET_PLATFORM_EMSCRIPTEN)
+
+
 # Install header files 
 if (NOT INSTALL_ANDROID_APP)
 	install (FILES ${toadlet_SOURCE_DIR}/source/cpp/toadlet/Types.h DESTINATION include/toadlet COMPONENT required)
