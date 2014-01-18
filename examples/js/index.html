@@ -1,45 +1,74 @@
 <html>
 <head>
-<title>Demo</title>
+<title>Toadlet Example</title>
 </head>
-
-<div class="canvas-container">
-    <canvas width="768" height="768" id="canvas0" oncontextmenu="return false;"></canvas>
-</div>
-
+<canvas width="512" height="512" id="canvas" oncontextmenu="return false;"></canvas>
 </body>
 
 <script type="text/javascript">
-function loadScript(url, callback)
-{
-    // Adding the script tag to the head as suggested before
-    var head = document.getElementsByTagName('head')[0];
-    var script = document.createElement('script');
-    script.type = 'text/javascript';
-    script.src = url;
+var renderDevice;
+var scene;
+var cameraComponent;
 
-    // Then bind the event to the callback function.
-    // There are several events for cross browser compatibility.
-    script.onreadystatechange = callback;
-    script.onload = callback;
-
-    // Fire the loading
-    head.appendChild(script);
-}
-
-loadScript("toadlet.js",function(){
-	var engine=new Module.Engine();
-	var scene=new Module.Scene(engine);
+var update=function(){
+	var t=(new Date()).getTime()/1000.0;
+	var camera=cameraComponent.getCamera();
 	
-	var renderTarget=Module.new_EGLWindowRenderTarget(document.getElementById("canvas0"));
-	var renderDevice=Module.new_GLES2RenderDevice();
+	cameraComponent.setLookAt([Math.cos(t)*10,Math.sin(t)*10,10],[0,0,0],[0,0,1]);
+	
+	scene.update(33);
+	
+	renderDevice.beginScene();
+		camera.render(renderDevice,scene,null);
+	renderDevice.endScene();
+	
+	window.setTimeout(update,33);
+};
 
+var init=function(){
+	var renderTarget=Module.new_EGLWindowRenderTarget(document.getElementById("canvas"));
+	renderDevice=Module.new_GLES2RenderDevice();
 	renderDevice.create(renderTarget,0);
 	
+	var engine=new Module.Engine();
 	engine.setRenderDevice(renderDevice);
+	engine.installHandlers();
 	
-	scene.delete();
+	scene=new Module.Scene(engine);
+	var root=scene.getRoot();
+
+	var camera=new Module.Camera(engine);
+	var cameraNode=new Module.Node(scene);
+	cameraComponent=new Module.CameraComponent(camera);
+	cameraNode.attach(cameraComponent);
+	root.attach(cameraNode);
+	cameraComponent.setLookAt([0,10,10],[0,0,0],[0,0,1]);
+	cameraNode.delete();
+	camera.delete();
+	
+	var material=engine.createDiffuseMaterial(null,null);
+	var mesh=engine.createTorusMesh(2,1,16,16,material);
+	var meshComponent=new Module.MeshComponent(engine);
+	var meshNode=new Module.Node(scene);
+	meshComponent.setMeshWithMesh(mesh);
+	meshNode.attach(meshComponent);
+	root.attach(meshNode);
+	meshNode.delete();
+	meshComponent.delete();
+	mesh.delete();
+	material.delete();
+
 	engine.delete();
-});
+	
+	update();
+};
+
+var script=document.createElement("script");
+script.type="text/javascript";
+script.src="toadlet.js";
+script.onreadystatechange=init;
+script.onload=init;
+document.getElementsByTagName("head")[0].appendChild(script);
+
 </script>
 </html>
