@@ -30,7 +30,7 @@ namespace toadlet{
 namespace tadpole{
 
 Mesh::ptr GridMeshCreator::createGridMesh(VertexBuffer::ptr vertexBuffer,IndexBuffer::ptr indexBuffer,scalar width,scalar height,int numWidth,int numHeight){
-	if(numWidth<=1 || numHeight<=0){
+	if(numWidth<=1 || numHeight<=1){
 		return NULL;
 	}
 

@@ -123,10 +123,11 @@ public:
 	Material::ptr createWaterMaterial(Texture *reflectTexture,Texture *refractTexture,Texture *bumpTexture,const Vector4 &color);
 
 	Mesh::ptr createAABoxMesh(const AABox &box,Material *material=NULL);
+	Mesh::ptr createSphereMesh(const Sphere &sphere,Material *material=NULL);
+	Mesh::ptr createTorusMesh(scalar majorRadius,scalar minorRadius,int numMajor,int numMinor,Material *material=NULL);
+	Mesh::ptr createGridMesh(scalar width,scalar height,int numWidth,int numHeight,Material *material=NULL);
 	Mesh::ptr createSkyBoxMesh(scalar size,bool unfolded,bool invert,Material *bottom,Material *top,Material *left,Material *right,Material *back,Material *front);
 	Mesh::ptr createSkyDomeMesh(const Sphere &sphere,int numSegments,int numRings,scalar fade,Material *material=NULL);
-	Mesh::ptr createSphereMesh(const Sphere &sphere,Material *material=NULL);
-	Mesh::ptr createGridMesh(scalar width,scalar height,int numWidth,int numHeight,Material *material=NULL);
 
 protected:
 	void *mEnv,*mCtx;
@@ -157,7 +158,7 @@ protected:
 
 	ResourceCreator::ptr mNormalizationCreator;
 	ResourceCreator::ptr mDiffuseCreator,mSkyBoxMaterialCreator,mWaterMaterialCreator;
-	ResourceCreator::ptr mAABoxCreator,mSkyBoxCreator,mSkyDomeCreator,mSphereCreator,mGridCreator;
+	ResourceCreator::ptr mAABoxCreator,mSphereCreator,mTorusCreator,mGridCreator,mSkyBoxCreator,mSkyDomeCreator;
 };
 
 }

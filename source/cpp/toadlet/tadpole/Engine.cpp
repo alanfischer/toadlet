@@ -31,10 +31,11 @@
 #include <toadlet/tadpole/Version.h>
 
 #include <toadlet/tadpole/plugins/AABoxMeshCreator.h>
+#include <toadlet/tadpole/plugins/SphereMeshCreator.h>
+#include <toadlet/tadpole/plugins/TorusMeshCreator.h>
+#include <toadlet/tadpole/plugins/GridMeshCreator.h>
 #include <toadlet/tadpole/plugins/SkyBoxMeshCreator.h>
 #include <toadlet/tadpole/plugins/SkyDomeMeshCreator.h>
-#include <toadlet/tadpole/plugins/SphereMeshCreator.h>
-#include <toadlet/tadpole/plugins/GridMeshCreator.h>
 #include <toadlet/tadpole/plugins/NormalizationTextureCreator.h>
 #include <toadlet/tadpole/plugins/DiffuseMaterialCreator.h>
 #include <toadlet/tadpole/plugins/SkyBoxMaterialCreator.h>
@@ -342,10 +343,11 @@ void Engine::installHandlers(){
 	mWaterMaterialCreator=new WaterMaterialCreator(this);
 
 	mAABoxCreator=new AABoxMeshCreator(this);
+	mSphereCreator=new SphereMeshCreator(this);
+	mTorusCreator=new TorusMeshCreator(this);
+	mGridCreator=new GridMeshCreator(this);
 	mSkyBoxCreator=new SkyBoxMeshCreator(this);
 	mSkyDomeCreator=new SkyDomeMeshCreator(this);
-	mSphereCreator=new SphereMeshCreator(this);
-	mGridCreator=new GridMeshCreator(this);
 }
 
 void Engine::setMaximumRenderCaps(const RenderCaps &caps){
@@ -666,6 +668,24 @@ Mesh::ptr Engine::createAABoxMesh(const AABox &box,Material *material){
 	return mesh;
 }
 
+Mesh::ptr Engine::createSphereMesh(const Sphere &sphere,Material *material){
+	Mesh::ptr mesh=shared_static_cast<SphereMeshCreator>(mSphereCreator)->createSphereMesh(sphere,16,16,material);
+	mMeshManager->manage(mesh);
+	return mesh;
+}
+
+Mesh::ptr Engine::createTorusMesh(scalar majorRadius,scalar minorRadius,int numMajor,int numMinor,Material *material){
+	Mesh::ptr mesh=shared_static_cast<TorusMeshCreator>(mTorusCreator)->createTorusMesh(majorRadius,minorRadius,numMajor,numMinor,material);
+	mMeshManager->manage(mesh);
+	return mesh;
+}
+
+Mesh::ptr Engine::createGridMesh(scalar width,scalar height,int numWidth,int numHeight,Material *material){
+	Mesh::ptr mesh=shared_static_cast<GridMeshCreator>(mGridCreator)->createGridMesh(width,height,numWidth,numHeight,material);
+	mMeshManager->manage(mesh);
+	return mesh;
+}
+
 Mesh::ptr Engine::createSkyBoxMesh(scalar size,bool unfolded,bool invert,Material *bottom,Material *top,Material *left,Material *right,Material *back,Material *front){
 	Mesh::ptr mesh=shared_static_cast<SkyBoxMeshCreator>(mSkyBoxCreator)->createSkyBoxMesh(size,unfolded,invert,bottom,top,left,right,back,front);
 	mMeshManager->manage(mesh);
@@ -674,18 +694,6 @@ Mesh::ptr Engine::createSkyBoxMesh(scalar size,bool unfolded,bool invert,Materia
 
 Mesh::ptr Engine::createSkyDomeMesh(const Sphere &sphere,int numSegments,int numRings,scalar fade,Material *material){
 	Mesh::ptr mesh=shared_static_cast<SkyDomeMeshCreator>(mSkyDomeCreator)->createSkyDomeMesh(sphere,numSegments,numRings,fade,material);
-	mMeshManager->manage(mesh);
-	return mesh;
-}
-
-Mesh::ptr Engine::createSphereMesh(const Sphere &sphere,Material *material){
-	Mesh::ptr mesh=shared_static_cast<SphereMeshCreator>(mSphereCreator)->createSphereMesh(sphere,16,16,material);
-	mMeshManager->manage(mesh);
-	return mesh;
-}
-
-Mesh::ptr Engine::createGridMesh(scalar width,scalar height,int numWidth,int numHeight,Material *material){
-	Mesh::ptr mesh=shared_static_cast<GridMeshCreator>(mGridCreator)->createGridMesh(width,height,numWidth,numHeight,material);
 	mMeshManager->manage(mesh);
 	return mesh;
 }
