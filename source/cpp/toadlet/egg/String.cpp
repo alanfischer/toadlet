@@ -560,18 +560,30 @@ String String::internal_add(stringchar c) const{
 }
 
 String String::operator+(bool b) const{
-	return operator+((int32)b);
+	return operator+((int)b);
 }
 
-String String::operator+(int32 i) const{
+String String::operator+(int i) const{
 	String result(128);
 	TOADLET_SPRINTF(result,"%d",i);
 	return (*this)+result;
 }
 
-String String::operator+(uint32 i) const{
+String String::operator+(unsigned int i) const{
 	String result(128);
 	TOADLET_SPRINTF(result,"%u",i);
+	return (*this)+result;
+}
+
+String String::operator+(long int i) const{
+	String result(128);
+	TOADLET_SPRINTF(result,"%ld",i);
+	return (*this)+result;
+}
+
+String String::operator+(unsigned long int i) const{
+	String result(128);
+	TOADLET_SPRINTF(result,"%lu",i);
 	return (*this)+result;
 }
 
@@ -778,15 +790,27 @@ String operator+(bool b,const String &string){
 	return operator+((int32)b,string);
 }
 
-String operator+(int32 i,const String &string){
+String operator+(int i,const String &string){
 	String result(128);
 	TOADLET_SPRINTF(result,"%d",i);
 	return result+string;
 }
 
-String operator+(uint32 i,const String &string){
+String operator+(unsigned int i,const String &string){
 	String result(128);
 	TOADLET_SPRINTF(result,"%u",i);
+	return result+string;
+}
+
+String operator+(long int i,const String &string){
+	String result(128);
+	TOADLET_SPRINTF(result,"%ld",i);
+	return result+string;
+}
+
+String operator+(unsigned long int i,const String &string){
+	String result(128);
+	TOADLET_SPRINTF(result,"%lu",i);
 	return result+string;
 }
 
