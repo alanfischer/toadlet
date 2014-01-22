@@ -180,9 +180,13 @@ public:
 
 	String operator+(bool b) const;
 
-	String operator+(int32 i) const;
+	String operator+(int i) const;
 
-	String operator+(uint32 i) const;
+	String operator+(unsigned int i) const;
+
+	String operator+(long int i) const;
+
+	String operator+(unsigned long int i) const;
 
 	String operator+(int64 i) const;
 
@@ -215,9 +219,13 @@ public:
 
 	friend TOADLET_API String operator+(bool b,const String &string);
 
-	friend TOADLET_API String operator+(int32 i,const String &string);
+	friend TOADLET_API String operator+(int i,const String &string);
 
-	friend TOADLET_API String operator+(uint32 i,const String &string);
+	friend TOADLET_API String operator+(unsigned int i,const String &string);
+
+	friend TOADLET_API String operator+(long int i,const String &string);
+
+	friend TOADLET_API String operator+(unsigned long int i,const String &string);
 
 	friend TOADLET_API String operator+(int64 i,const String &string);
 
