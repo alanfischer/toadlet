@@ -26,9 +26,8 @@
 #ifndef TOADLET_TADPOLE_BUFFERMANAGER_H
 #define TOADLET_TADPOLE_BUFFERMANAGER_H
 
-#include <toadlet/peeper/BackableBuffer.h>
-#include <toadlet/peeper/BackableVertexFormat.h>
 #include <toadlet/peeper/RenderDevice.h>
+#include <toadlet/peeper/VariableBuffer.h>
 #include <toadlet/tadpole/Types.h>
 #include <toadlet/tadpole/Track.h>
 

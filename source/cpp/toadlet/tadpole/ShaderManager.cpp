@@ -23,9 +23,9 @@
  *
  ********** Copyright header - do not remove **********/
 
-#include <toadlet/peeper/BackableShader.h>
 #include <toadlet/tadpole/Engine.h>
 #include <toadlet/tadpole/ShaderManager.h>
+#include <toadlet/peeper/BackableShader.h>
 
 namespace toadlet{
 namespace tadpole{
@@ -36,6 +36,7 @@ ShaderManager::ShaderManager(Engine *engine):ResourceManager(engine){
 Shader::ptr ShaderManager::createShader(Shader::ShaderType type,const String profiles[],const String codes[],int numCodes){
 	RenderDevice *renderDevice=mEngine->getRenderDevice();
 	Shader::ptr shader;
+#if defined(TOADLET_BACKABLE)
 	if(mEngine->hasBackableShader(type)){
 		BackableShader::ptr backableShader=new BackableShader();
 		backableShader->create(type,profiles,codes,numCodes);
@@ -50,7 +51,9 @@ Shader::ptr ShaderManager::createShader(Shader::ShaderType type,const String pro
 		}
 		shader=backableShader;
 	}
-	else if(renderDevice!=NULL && mEngine->hasShader(type)){
+	else
+#endif
+	if(renderDevice!=NULL && mEngine->hasShader(type)){
 		TOADLET_TRY
 			shader=renderDevice->createShader();
 		TOADLET_CATCH_ANONYMOUS(){}
@@ -74,6 +77,7 @@ Shader::ptr ShaderManager::createShader(Shader::ShaderType type,const String &pr
 void ShaderManager::contextActivate(RenderDevice *renderDevice){
 	Log::debug("ShaderManager::contextActivate");
 
+#if defined(TOADLET_BACKABLE)
 	int i;
 	for(i=0;i<mResources.size();++i){
 		Shader *shader=(Shader*)mResources[i];
@@ -87,11 +91,13 @@ void ShaderManager::contextActivate(RenderDevice *renderDevice){
 			}
 		}
 	}
+#endif
 }
 
 void ShaderManager::contextDeactivate(RenderDevice *renderDevice){
 	Log::debug("ShaderManager::contextDeactivate");
 
+#if defined(TOADLET_BACKABLE)
 	int i;
 	for(i=0;i<mResources.size();++i){
 		Shader *shader=(Shader*)mResources[i];
@@ -99,6 +105,7 @@ void ShaderManager::contextDeactivate(RenderDevice *renderDevice){
 			((BackableShader*)shader)->setBack(NULL,NULL);
 		}
 	}
+#endif
 }
 
 }

@@ -23,8 +23,6 @@
  *
  ********** Copyright header - do not remove **********/
 
-#include <toadlet/peeper/BackableRenderState.h>
-#include <toadlet/peeper/BackableShaderState.h>
 #include <toadlet/tadpole/BufferManager.h>
 #include <toadlet/tadpole/MaterialManager.h>
 #include <toadlet/tadpole/material/RenderPass.h>
@@ -36,20 +34,10 @@ namespace material{
 RenderPass::RenderPass(MaterialManager *manager):
 	mManager(manager)
 {
-	if(mManager!=NULL){
-		mRenderState=mManager->createRenderState();
-	}
-	else{
-		mRenderState=new BackableRenderState();
-	}
+	mRenderState=mManager->createRenderState();
 	mOwnRenderState=mRenderState;
 	
-	if(mManager!=NULL){
-		mShaderState=mManager->createShaderState();
-	}
-	else{
-		mShaderState=new BackableShaderState();
-	}
+	mShaderState=mManager->createShaderState();
 	mOwnShaderState=mShaderState;
 }
 
@@ -166,12 +154,7 @@ void RenderPass::setShaderState(ShaderState *shaderState){
 
 void RenderPass::setShader(Shader::ShaderType type,Shader *shader){
 	if(mShaderState==NULL){
-		if(mManager!=NULL){
-			mShaderState=mManager->createShaderState();
-		}
-		else{
-			mShaderState=new BackableShaderState();
-		}
+		mShaderState=mManager->createShaderState();
 		mOwnShaderState=mShaderState;
 	}
 	
@@ -268,14 +251,7 @@ bool RenderPass::createBuffers(){
 	for(j=0;j<Shader::ShaderType_MAX;++j){
 		for(i=0;i<mShaderState->getNumVariableBuffers((Shader::ShaderType)j);++i){
 			VariableBufferFormat::ptr format=mShaderState->getVariableBufferFormat((Shader::ShaderType)j,i);
-			VariableBuffer::ptr buffer;
-			if(mManager!=NULL){
-				buffer=mManager->getBufferManager()->createVariableBuffer(Buffer::Usage_BIT_DYNAMIC,Buffer::Access_BIT_WRITE,format);
-			}
-			else{
-				buffer=new BackableBuffer();
-				buffer->create(Buffer::Usage_BIT_DYNAMIC,Buffer::Access_BIT_WRITE,format);
-			}
+			VariableBuffer::ptr buffer=mManager->getBufferManager()->createVariableBuffer(Buffer::Usage_BIT_DYNAMIC,Buffer::Access_BIT_WRITE,format);
 			setBuffer((Shader::ShaderType)j,i,buffer);
 		}
 	}

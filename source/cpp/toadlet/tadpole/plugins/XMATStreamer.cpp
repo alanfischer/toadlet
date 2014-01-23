@@ -103,7 +103,7 @@ Material::ptr XMATStreamer::loadMaterial(mxml_node_t *root,int version){
 	mxml_node_t *block=root->child;
 	while((block=block->next)!=NULL){
 		if(strcmp(mxmlGetElementName(block),"Material")==0){
-			material=XMLMeshUtilities::loadMaterial(block,version,mEngine!=NULL?mEngine->getMaterialManager():NULL,mEngine!=NULL?mEngine->getTextureManager():NULL);
+			material=XMLMeshUtilities::loadMaterial(block,version,mEngine->getMaterialManager(),mEngine->getTextureManager());
 		}
 	}
 

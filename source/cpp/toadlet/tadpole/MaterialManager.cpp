@@ -23,12 +23,14 @@
  *
  ********** Copyright header - do not remove **********/
 
-#include <toadlet/peeper/BackableRenderState.h>
-#include <toadlet/peeper/BackableShaderState.h>
 #include <toadlet/peeper/Texture.h>
 #include <toadlet/tadpole/Colors.h>
 #include <toadlet/tadpole/Engine.h>
 #include <toadlet/tadpole/MaterialManager.h>
+#if defined(TOADLET_BACKABLE)
+#include <toadlet/peeper/BackableRenderState.h>
+#include <toadlet/peeper/BackableShaderState.h>
+#endif
 
 namespace toadlet{
 namespace tadpole{
@@ -110,6 +112,7 @@ Material::ptr MaterialManager::createSharedMaterial(Material::ptr source,RenderS
 RenderState::ptr MaterialManager::createRenderState(){
 	RenderDevice *renderDevice=mEngine->getRenderDevice();
 	RenderState::ptr renderState;
+#if defined(TOADLET_BACKABLE)
 	if(mEngine->isBackable()){
 		BackableRenderState::ptr backableRenderState=new BackableRenderState();
 		backableRenderState->create();
@@ -119,7 +122,9 @@ RenderState::ptr MaterialManager::createRenderState(){
 		}
 		renderState=backableRenderState;
 	}
-	else if(renderDevice!=NULL){
+	else
+#endif
+	if(renderDevice!=NULL){
 		renderState=renderDevice->createRenderState();
 		if(renderState==NULL || renderState->create()==false){
 			return NULL;
@@ -138,6 +143,7 @@ RenderState::ptr MaterialManager::createRenderState(){
 ShaderState::ptr MaterialManager::createShaderState(){
 	RenderDevice *renderDevice=mEngine->getRenderDevice();
 	ShaderState::ptr shaderState;
+#if defined(TOADLET_BACKABLE)
 	if(mEngine->hasBackableShader(Shader::ShaderType_VERTEX)){
 		BackableShaderState::ptr backableShaderState=new BackableShaderState();
 		backableShaderState->create();
@@ -150,7 +156,9 @@ ShaderState::ptr MaterialManager::createShaderState(){
 		}
 		shaderState=backableShaderState;
 	}
-	else if(renderDevice!=NULL){
+	else
+#endif
+	if(renderDevice!=NULL){
 		TOADLET_TRY
 			shaderState=renderDevice->createShaderState();
 		TOADLET_CATCH_ANONYMOUS(){}
@@ -213,6 +221,7 @@ void MaterialManager::contextActivate(RenderDevice *renderDevice){
 	Log::debug("MaterialManager::contextActivate");
 
 	int i;
+#if defined(TOADLET_BACKABLE)
 	for(i=0;i<mRenderStates.size();++i){
 		RenderState::ptr renderState=mRenderStates[i];
 		if(renderState!=NULL && renderState->getRootRenderState()!=renderState){
@@ -238,6 +247,7 @@ void MaterialManager::contextActivate(RenderDevice *renderDevice){
 			}
 		}
 	}
+#endif
 
 	for(i=0;i<mResources.size();++i){
 		Material *material=(Material*)mResources[i];
@@ -250,6 +260,7 @@ void MaterialManager::contextActivate(RenderDevice *renderDevice){
 void MaterialManager::contextDeactivate(RenderDevice *renderDevice){
 	Log::debug("MaterialManager::contextDeactivate");
 
+#if defined(TOADLET_BACKABLE)
 	int i;
 	for(i=0;i<mRenderStates.size();++i){
 		RenderState::ptr renderState=mRenderStates[i];
@@ -264,6 +275,7 @@ void MaterialManager::contextDeactivate(RenderDevice *renderDevice){
 			shared_static_cast<BackableShaderState>(shaderState)->setBack(NULL);
 		}
 	}
+#endif
 }
 
 void MaterialManager::resourceDestroyed(Resource *resource){
