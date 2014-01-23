@@ -105,6 +105,7 @@
 	#endif
 	#define TOADLET_ALIGNED_SIZE 16
 	#define TOADLET_THREADSAFE
+	#define TOADLET_BACKABLE
 #elif defined(TOADLET_PLATFORM_POSIX)
 	#define TOADLET_COMPILER_GCC 1
 	#include <sys/param.h>
@@ -157,6 +158,7 @@
 		#define TOADLET_HAS_NEON 1
 	#endif
 	#define TOADLET_THREADSAFE
+	#define TOADLET_BACKABLE
 #elif defined(TOADLET_PLATFORM_EMSCRIPTEN)
 	#include <stdlib.h>
 	#include <endian.h>

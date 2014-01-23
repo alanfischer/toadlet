@@ -23,8 +23,6 @@
  *
  ********** Copyright header - do not remove **********/
 
-#include <toadlet/peeper/BackableRenderState.h>
-#include <toadlet/peeper/BackableShaderState.h>
 #include <toadlet/peeper/RenderCaps.h>
 #include <toadlet/tadpole/Engine.h>
 #include <toadlet/tadpole/material/Material.h>

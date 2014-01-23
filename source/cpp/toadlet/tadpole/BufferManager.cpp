@@ -25,7 +25,11 @@
 
 #include <toadlet/tadpole/BufferManager.h>
 #include <toadlet/tadpole/Engine.h>
+#include <toadlet/peeper/BackableVertexFormat.h>
+#if defined(TOADLET_BACKABLE)
 #include <toadlet/peeper/BackableBuffer.h>
+#endif
+
 
 namespace toadlet{
 namespace tadpole{
@@ -126,6 +130,7 @@ VertexFormat::ptr BufferManager::createVertexFormat(){
 IndexBuffer::ptr BufferManager::createIndexBuffer(int usage,int access,IndexBuffer::IndexFormat indexFormat,int size){
 	RenderDevice *renderDevice=mEngine->getRenderDevice();
 	IndexBuffer::ptr buffer;
+#if defined(TOADLET_BACKABLE)
 	if(mEngine->isBackable()){
 		BackableBuffer::ptr backableBuffer=new BackableBuffer();
 		backableBuffer->create(usage,access,indexFormat,size);
@@ -135,7 +140,9 @@ IndexBuffer::ptr BufferManager::createIndexBuffer(int usage,int access,IndexBuff
 		}
 		buffer=backableBuffer;
 	}
-	else if(renderDevice!=NULL){
+	else
+#endif
+	if(renderDevice!=NULL){
 		buffer=renderDevice->createIndexBuffer();
 		if(buffer==NULL){
 			return NULL;
@@ -159,6 +166,7 @@ IndexBuffer::ptr BufferManager::createIndexBuffer(int usage,int access,IndexBuff
 VertexBuffer::ptr BufferManager::createVertexBuffer(int usage,int access,VertexFormat::ptr vertexFormat,int size){
 	RenderDevice *renderDevice=mEngine->getRenderDevice();
 	VertexBuffer::ptr buffer;
+#if defined(TOADLET_BACKABLE)
 	if(mEngine->isBackable()){
 		BackableBuffer::ptr backableBuffer=new BackableBuffer();
 		backableBuffer->create(usage,access,vertexFormat,size);
@@ -168,7 +176,9 @@ VertexBuffer::ptr BufferManager::createVertexBuffer(int usage,int access,VertexF
 		}
 		buffer=backableBuffer;
 	}
-	else if(renderDevice!=NULL){
+	else
+#endif
+	if(renderDevice!=NULL){
 		buffer=renderDevice->createVertexBuffer();
 		if(buffer==NULL){
 			return NULL;
@@ -193,6 +203,7 @@ PixelBuffer::ptr BufferManager::createPixelBuffer(int usage,int access,int pixel
 	RenderDevice *renderDevice=mEngine->getRenderDevice();
 	TextureFormat::ptr textureFormat=new TextureFormat(TextureFormat::Dimension_D2,pixelFormat,width,height,depth,1);
 	PixelBuffer::ptr buffer;
+#if defined(TOADLET_BACKABLE)
 	if(mEngine->isBackable()){
 		BackableBuffer::ptr backableBuffer=new BackableBuffer();
 		backableBuffer->create(usage,access,textureFormat);
@@ -202,7 +213,9 @@ PixelBuffer::ptr BufferManager::createPixelBuffer(int usage,int access,int pixel
 		}
 		buffer=backableBuffer;
 	}
-	else if(renderDevice!=NULL){
+	else
+#endif
+	if(renderDevice!=NULL){
 		buffer=renderDevice->createPixelBuffer();
 		if(buffer==NULL){
 			return NULL;
@@ -226,6 +239,7 @@ PixelBuffer::ptr BufferManager::createPixelBuffer(int usage,int access,int pixel
 VariableBuffer::ptr BufferManager::createVariableBuffer(int usage,int access,VariableBufferFormat::ptr format){
 	RenderDevice *renderDevice=mEngine->getRenderDevice();
 	VariableBuffer::ptr buffer;
+#if defined(TOADLET_BACKABLE)
 	if(mEngine->isBackable()){
 		BackableBuffer::ptr backableBuffer=new BackableBuffer();
 		backableBuffer->create(usage,access,format);
@@ -235,7 +249,9 @@ VariableBuffer::ptr BufferManager::createVariableBuffer(int usage,int access,Var
 		}
 		buffer=backableBuffer;
 	}
-	else if(renderDevice!=NULL){
+	else
+#endif
+	if(renderDevice!=NULL){
 		buffer=VariableBuffer::ptr(renderDevice->createVariableBuffer());
 		if(buffer==NULL){
 			return NULL;
@@ -344,7 +360,7 @@ void BufferManager::contextActivate(RenderDevice *renderDevice){
 			shared_static_cast<BackableVertexFormat>(vertexFormat)->setBack(back);
 		}
 	}
-
+#if defined(TOADLET_BACKABLE)
 	for(i=0;i<mIndexBuffers.size();++i){
 		IndexBuffer::ptr buffer=mIndexBuffers[i];
 		if(buffer->getRootIndexBuffer()!=buffer){
@@ -376,12 +392,14 @@ void BufferManager::contextActivate(RenderDevice *renderDevice){
 			shared_static_cast<BackableBuffer>(buffer)->setBack(back);
 		}
 	}
+#endif
 }
 
 void BufferManager::contextDeactivate(RenderDevice *renderDevice){
 	Log::debug("BufferManager::contextDeactivate");
 
 	int i;
+#if defined(TOADLET_BACKABLE)
 	for(i=0;i<mVariableBuffers.size();++i){
 		VariableBuffer::ptr buffer=mVariableBuffers[i];
 		if(buffer->getRootVariableBuffer()!=buffer){
@@ -409,6 +427,7 @@ void BufferManager::contextDeactivate(RenderDevice *renderDevice){
 			shared_static_cast<BackableBuffer>(buffer)->setBack(IndexBuffer::ptr());
 		}
 	}
+#endif
 
 	for(i=0;i<mVertexFormats.size();++i){
 		VertexFormat::ptr vertexFormat=mVertexFormats[i];

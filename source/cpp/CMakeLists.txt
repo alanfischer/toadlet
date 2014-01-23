@@ -136,6 +136,8 @@ elseif (TOADLET_PLATFORM_EMSCRIPTEN)
 
 	set (CMAKE_C_FLAGS "-Wno-warn-absolute-paths")
 	set (CMAKE_CXX_FLAGS "-Wno-warn-absolute-paths")
+	set (CMAKE_CXX_FLAGS_RELEASE "-O2 --closure 1")
+	set (CMAKE_EXE_LINKER_FLAGS_RELEASE "-O2 --closure 1")
 elseif (TOADLET_PLATFORM_POSIX)
 	# Set defaults
 	option (TOADLET_RTTI "Enable Run Time Type Information" ON)

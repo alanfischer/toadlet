@@ -118,17 +118,11 @@ Material::ptr XMLMeshUtilities::loadMaterial(mxml_node_t *materialNode,int versi
 	const char *prop=mxmlElementGetAttr(materialNode,"Name");
 
 	Material::ptr material;
-	if(materialManager!=NULL){
-		if(prop!=NULL){
-			material=materialManager->findMaterial(prop);
-		}
-		if(material==NULL){
-			material=materialManager->getEngine()->createDiffuseMaterial(NULL);
-		}
+	if(prop!=NULL){
+		material=materialManager->findMaterial(prop);
 	}
-	else{
-		material=new Material(NULL);
-		material->addPath()->addPass();
+	if(material==NULL){
+		material=materialManager->getEngine()->createDiffuseMaterial(NULL);
 	}
 
 	if(prop!=NULL){
@@ -355,13 +349,7 @@ Mesh::ptr XMLMeshUtilities::loadMesh(mxml_node_t *node,int version,BufferManager
 	mxml_node_t *vertexNode=mxmlFindChild(node,"Vertexes");
 	{
 		int count=0;
-		VertexFormat::ptr vertexFormat;
-		if(bufferManager!=NULL){
-			vertexFormat=bufferManager->createVertexFormat();
-		}
-		if(vertexFormat==NULL){
-			vertexFormat=new BackableVertexFormat();
-		}
+		VertexFormat::ptr vertexFormat=bufferManager->createVertexFormat();
 		Collection<Mesh::VertexBoneAssignmentList> vbas;
 
 		prop=mxmlElementGetAttr(vertexNode,"Count");
@@ -414,17 +402,11 @@ Mesh::ptr XMLMeshUtilities::loadMesh(mxml_node_t *node,int version,BufferManager
 		}
 
 		VertexBuffer::ptr vertexBuffer;
-		if(bufferManager!=NULL){
-			if(vbas.size()>0){
-				vertexBuffer=bufferManager->createVertexBuffer(Buffer::Usage_BIT_STAGING,Buffer::Access_READ_WRITE,vertexFormat,count);
-			}
-			else{
-				vertexBuffer=bufferManager->createVertexBuffer(Buffer::Usage_BIT_STATIC,Buffer::Access_BIT_WRITE,vertexFormat,count);
-			}
+		if(vbas.size()>0){
+			vertexBuffer=bufferManager->createVertexBuffer(Buffer::Usage_BIT_STAGING,Buffer::Access_READ_WRITE,vertexFormat,count);
 		}
-		if(vertexBuffer==NULL){
-			vertexBuffer=new BackableBuffer();
-			vertexBuffer->create(Buffer::Usage_BIT_STATIC,Buffer::Access_BIT_WRITE,vertexFormat,count);
+		else{
+			vertexBuffer=bufferManager->createVertexBuffer(Buffer::Usage_BIT_STATIC,Buffer::Access_BIT_WRITE,vertexFormat,count);
 		}
 
 		int pi=vertexFormat->findElement(VertexFormat::Semantic_POSITION);
@@ -557,14 +539,7 @@ Mesh::ptr XMLMeshUtilities::loadMesh(mxml_node_t *node,int version,BufferManager
 				count=parseInt(prop);
 			}
 
-			IndexBuffer::ptr indexBuffer;
-			if(bufferManager!=NULL){
-				indexBuffer=bufferManager->createIndexBuffer(Buffer::Usage_BIT_STATIC,Buffer::Access_BIT_WRITE,IndexBuffer::IndexFormat_UINT16,count);
-			}
-			if(indexBuffer==NULL){
-				indexBuffer=new BackableBuffer();
-				indexBuffer->create(Buffer::Usage_BIT_STATIC,Buffer::Access_BIT_WRITE,IndexBuffer::IndexFormat_UINT16,count);
-			}
+			IndexBuffer::ptr indexBuffer=bufferManager->createIndexBuffer(Buffer::Usage_BIT_STATIC,Buffer::Access_BIT_WRITE,IndexBuffer::IndexFormat_UINT16,count);
 
 			subMesh->indexData=new IndexData(IndexData::Primitive_TRIS,indexBuffer,0,count);
 
@@ -609,9 +584,7 @@ Mesh::ptr XMLMeshUtilities::loadMesh(mxml_node_t *node,int version,BufferManager
 			prop=mxmlElementGetAttr(materialNode,"File");
 			if(prop!=NULL){
 				subMesh->materialName=prop;
-				if(materialManager!=NULL){
-					material=materialManager->findMaterial(subMesh->materialName);
-				}
+				material=materialManager->findMaterial(subMesh->materialName);
 			}
 			else{
 				material=loadMaterial(materialNode,version,materialManager,textureManager);
@@ -902,13 +875,7 @@ Sequence::ptr XMLMeshUtilities::loadSequence(mxml_node_t *node,int version,Buffe
 			continue;
 		}
 
-		VertexFormat::ptr format;
-		if(bufferManager!=NULL){
-			format=bufferManager->createVertexFormat();
-		}
-		if(format==NULL){
-			format=new BackableVertexFormat();
-		}
+		VertexFormat::ptr format=bufferManager->createVertexFormat();
 		format->addElement(VertexFormat::Semantic_POSITION,0,VertexFormat::Format_TYPE_FLOAT_32|VertexFormat::Format_COUNT_3);
 		format->addElement(VertexFormat::Semantic_ROTATE,0,VertexFormat::Format_TYPE_FLOAT_32|VertexFormat::Format_COUNT_4);
 		format->addElement(VertexFormat::Semantic_SCALE,0,VertexFormat::Format_TYPE_FLOAT_32|VertexFormat::Format_COUNT_3);

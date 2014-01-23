@@ -27,7 +27,6 @@
 #define TOADLET_TADPOLE_TEXTUREMANAGER_H
 
 #include <toadlet/peeper/RenderDevice.h>
-#include <toadlet/peeper/BackableTexture.h>
 #include <toadlet/peeper/PixelBufferRenderTarget.h>
 #include <toadlet/tadpole/ResourceManager.h>
 #include <toadlet/tadpole/TextureData.h>

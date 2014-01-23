@@ -23,12 +23,14 @@
  *
  ********** Copyright header - do not remove **********/
 
-#include <toadlet/peeper/BackableTexture.h>
-#include <toadlet/peeper/BackablePixelBufferRenderTarget.h>
 #include <toadlet/peeper/TextureFormatConversion.h>
 #include <toadlet/tadpole/TextureManager.h>
 #include <toadlet/tadpole/Engine.h>
 #include <toadlet/tadpole/plugins/NormalizationTextureCreator.h>
+#include <toadlet/peeper/BackableTexture.h>
+#if defined(TOADLET_BACKABLE)
+#include <toadlet/peeper/BackablePixelBufferRenderTarget.h>
+#endif
 
 namespace toadlet{
 namespace tadpole{
@@ -70,6 +72,7 @@ Texture::ptr TextureManager::createTexture(int usage,TextureFormat::ptr format,t
 Texture::ptr TextureManager::createTexture(int usage,TextureFormat::ptr format,tbyte *mipDatas[]){
 	RenderDevice *renderDevice=mEngine->getRenderDevice();
 	Texture::ptr texture;
+#if defined(TOADLET_BACKABLE)
 	if(mEngine->isBackable()){
 		BackableTexture::ptr backableTexture=new BackableTexture();
 		backableTexture->create(usage,format,mipDatas);
@@ -78,7 +81,9 @@ Texture::ptr TextureManager::createTexture(int usage,TextureFormat::ptr format,t
 		}
 		texture=backableTexture;
 	}
-	else if(renderDevice!=NULL){
+	else
+#endif
+	if(renderDevice!=NULL){
 		texture=renderDevice->createTexture();
 		if(BackableTexture::convertCreate(texture,renderDevice,usage,format,mipDatas)==false){
 			Error::unknown(Categories::TOADLET_TADPOLE,"Error in texture convertCreate");
@@ -96,6 +101,7 @@ Texture::ptr TextureManager::createTexture(int usage,TextureFormat::ptr format,t
 PixelBufferRenderTarget::ptr TextureManager::createPixelBufferRenderTarget(){
 	RenderDevice *renderDevice=mEngine->getRenderDevice();
 	PixelBufferRenderTarget::ptr renderTarget;
+#if defined(TOADLET_BACKABLE)
 	if(mEngine->isBackable()){
 		BackablePixelBufferRenderTarget::ptr backableRenderTarget=new BackablePixelBufferRenderTarget();
 		backableRenderTarget->create();
@@ -105,7 +111,9 @@ PixelBufferRenderTarget::ptr TextureManager::createPixelBufferRenderTarget(){
 		}
 		renderTarget=backableRenderTarget;
 	}
-	else if(renderDevice!=NULL){
+	else
+#endif
+	if(renderDevice!=NULL){
 		renderTarget=renderDevice->createPixelBufferRenderTarget();
 		if(renderTarget->create()==false){
 			return NULL;
@@ -140,6 +148,7 @@ bool TextureManager::textureLoad(Texture::ptr texture,TextureFormat *format,tbyt
 void TextureManager::contextActivate(RenderDevice *renderDevice){
 	Log::debug("TextureManager::contextActivate");
 
+#if defined(TOADLET_BACKABLE)
 	int i;
 	for(i=0;i<mResources.size();++i){
 		Texture *texture=(Texture*)mResources[i];
@@ -156,11 +165,13 @@ void TextureManager::contextActivate(RenderDevice *renderDevice){
 			shared_static_cast<BackablePixelBufferRenderTarget>(renderTarget)->setBack(back);
 		}
 	}
+#endif
 }
 
 void TextureManager::contextDeactivate(RenderDevice *renderDevice){
 	Log::debug("TextureManager::contextDeactivate");
 
+#if defined(TOADLET_BACKABLE)
 	int i;
 	for(i=0;i<mResources.size();++i){
 		Texture *texture=(Texture*)mResources[i];
@@ -175,6 +186,7 @@ void TextureManager::contextDeactivate(RenderDevice *renderDevice){
 			shared_static_cast<BackablePixelBufferRenderTarget>(renderTarget)->setBack(NULL);
 		}
 	}
+#endif
 }
 
 void TextureManager::preContextReset(peeper::RenderDevice *renderDevice){

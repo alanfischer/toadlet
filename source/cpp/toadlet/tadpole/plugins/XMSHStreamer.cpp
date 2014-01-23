@@ -182,13 +182,13 @@ Mesh::ptr XMSHStreamer::loadMeshVersion1(mxml_node_t *root){
 	mxml_node_t *block=root->child;
 	while((block=block->next)!=NULL){
 		if(strcmp(mxmlGetElementName(block),"MeshData")==0){
-			mesh=XMLMeshUtilities::loadMesh(block,1,mEngine!=NULL?mEngine->getBufferManager():NULL,mEngine!=NULL?mEngine->getMaterialManager():NULL,mEngine!=NULL?mEngine->getTextureManager():NULL);
+			mesh=XMLMeshUtilities::loadMesh(block,1,mEngine->getBufferManager(),mEngine->getMaterialManager(),mEngine->getTextureManager());
 		}
 		else if(strcmp(mxmlGetElementName(block),"SkeletonData")==0){
 			mesh->setSkeleton(XMLMeshUtilities::loadSkeleton(block,1));
 		}
 		else if(strcmp(mxmlGetElementName(block),"AnimationData")==0){
-			mesh->getSkeleton()->addSequence(XMLMeshUtilities::loadSequence(block,1,mEngine!=NULL?mEngine->getBufferManager():NULL));
+			mesh->getSkeleton()->addSequence(XMLMeshUtilities::loadSequence(block,1,mEngine->getBufferManager()));
 		}
 	}
 
@@ -201,13 +201,13 @@ Mesh::ptr XMSHStreamer::loadMeshVersion2Up(mxml_node_t *root,int version){
 	mxml_node_t *block=root->child;
 	while((block=block->next)!=NULL){
 		if(strcmp(mxmlGetElementName(block),"Mesh")==0){
-			mesh=XMLMeshUtilities::loadMesh(block,version,mEngine!=NULL?mEngine->getBufferManager():NULL,mEngine!=NULL?mEngine->getMaterialManager():NULL,mEngine!=NULL?mEngine->getTextureManager():NULL);
+			mesh=XMLMeshUtilities::loadMesh(block,version,mEngine->getBufferManager(),mEngine->getMaterialManager(),mEngine->getTextureManager());
 		}
 		else if(strcmp(mxmlGetElementName(block),"Skeleton")==0){
 			mesh->setSkeleton(XMLMeshUtilities::loadSkeleton(block,version));
 		}
 		else if(strcmp(mxmlGetElementName(block),"Sequence")==0){
-			mesh->getSkeleton()->addSequence(XMLMeshUtilities::loadSequence(block,version,mEngine!=NULL?mEngine->getBufferManager():NULL));
+			mesh->getSkeleton()->addSequence(XMLMeshUtilities::loadSequence(block,version,mEngine->getBufferManager()));
 		}
 	}
 
