@@ -72,8 +72,16 @@ void FileStream::close(){
 	} 
 }
 
+bool FileStream::readable(){
+	return mFile!=NULL && (mOpen&Open_BIT_READ)!=0;
+}
+
 int FileStream::read(tbyte *buffer,int length){
 	return fread(buffer,1,length,mFile);
+}
+
+bool FileStream::writeable(){
+	return mFile!=NULL && (mOpen&Open_BIT_WRITE)!=0;
 }
 
 int FileStream::write(const tbyte *buffer,int length){

@@ -60,6 +60,7 @@ protected:
 	Camera *mCamera;
 	SceneParameters::ptr mParams;
 	RenderableSet::ptr mRenderableSet;
+	Material::ptr mDefaultMaterial;
 	RenderPass *mLastPass;
 	RenderState *mLastRenderState;
 	ShaderState *mLastShaderState;

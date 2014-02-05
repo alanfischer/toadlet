@@ -44,6 +44,8 @@ SimpleRenderManager::SimpleRenderManager(Scene *scene):
 	mRenderableSet=RenderableSet::ptr(new RenderableSet(scene));
 	mParams=new SceneParameters();
 	mParams->setScene(scene);
+	mDefaultMaterial=scene->getEngine()->createDiffuseMaterial(NULL);
+	mDefaultMaterial->getRenderState()->setMaterialState(MaterialState(Vector4()));
 }
 
 SimpleRenderManager::~SimpleRenderManager(){
@@ -123,7 +125,7 @@ void SimpleRenderManager::setupPassForRenderable(RenderPass *pass,RenderDevice *
 	renderable->getRenderTransform()->getMatrix(matrix);
 
 	GeometryState state;
-	if(pass->getRenderState()->getGeometryState(state) && state.matrixFlags!=0){
+	if(pass!=NULL && pass->getRenderState()->getGeometryState(state) && state.matrixFlags!=0){
 		Vector3 translate;
 		Quaternion rotate;
 		Vector3 scale;
@@ -291,8 +293,11 @@ void SimpleRenderManager::renderQueueItems(Material *material,const RenderableSe
 		}
 	}
 	else{
+		RenderPass *pass=mDefaultMaterial->getPass();
+		setupPass(pass,mDevice);
 		for(j=0;j<numItems;++j){
 			const RenderableSet::RenderableQueueItem &item=items[j];
+			setupPassForRenderable(pass,mDevice,item.renderable,item.ambient);
 			item.renderable->render(this);
 		}
 	}

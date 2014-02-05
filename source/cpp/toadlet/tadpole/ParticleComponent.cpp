@@ -229,10 +229,12 @@ void ParticleComponent::updateBound(){
 	mBound->set(box);
 
 	if(mWorldSpace){
+		mWorldBound->set(mBound);
 		mBound->inverseTransform(mBound,mParent->getWorldTransform());
 	}
-
-	mWorldBound->transform(mBound,mWorldTransform);
+	else{
+		mWorldBound->transform(mBound,mWorldTransform);
+	}
 
 	if(mParent!=NULL){
 		mParent->boundChanged();
