@@ -40,7 +40,7 @@ EMSCRIPTEN_BINDINGS(egg) {
 
 	class_<Log>("Log")
 		.class_function("initialize", &Log::initialize)
-
+		.class_function("destroy", &Log::destroy)
 		.class_function("error", select_overload<void(const String&)>(&Log::error))
 		.class_function("warning", select_overload<void(const String&)>(&Log::warning))
 		.class_function("alert", select_overload<void(const String&)>(&Log::alert))

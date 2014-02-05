@@ -456,8 +456,10 @@ void TerrainNode::destroyPatch(int x,int y,bool notify){
 void TerrainNode::updateBound(){
 	int i;
 	for(i=0;i<mPatchGrid.size();++i){
-		if(i==0) mBound->set(mPatchGrid[i]->getParent()->getWorldBound());
-		else mBound->merge(mPatchGrid[i]->getParent()->getWorldBound(),mScene->getEpsilon());
+		if(mPatchGrid[i]!=NULL){
+			if(i==0) mBound->set(mPatchGrid[i]->getParent()->getWorldBound());
+			else mBound->merge(mPatchGrid[i]->getParent()->getWorldBound(),mScene->getEpsilon());
+		}
 	}
 }
 
@@ -465,15 +467,21 @@ void TerrainNode::updatePatches(Camera *camera){
 	if((camera->getScope()&mPatchCameraUpdateScope)!=0){
 		int i;
 		for(i=0;i<mPatchGrid.size();++i){
-			mPatchGrid[i]->updateBlocks(camera);
+			if(mPatchGrid[i]!=NULL){
+				mPatchGrid[i]->updateBlocks(camera);
+			}
 		}
 
 		for(i=0;i<mPatchGrid.size();++i){
-			mPatchGrid[i]->updateVertexes();
+			if(mPatchGrid[i]!=NULL){
+				mPatchGrid[i]->updateVertexes();
+			}
 		}
 
 		for(i=0;i<mPatchGrid.size();++i){
-			mPatchGrid[i]->updateIndexBuffers(camera);
+			if(mPatchGrid[i]!=NULL){
+				mPatchGrid[i]->updateIndexBuffers(camera);
+			}
 		}
 	}
 }

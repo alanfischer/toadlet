@@ -63,7 +63,6 @@ EMSCRIPTEN_BINDINGS(tadpole) {
 
     class_<Camera>("Camera")
 		.smart_ptr_constructor(&make_ptr<Camera,Engine*>)
-
 		.function("setClearColor",&Camera::setClearColor)
 
 		.function("setViewport",&Camera::setViewport)
