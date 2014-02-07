@@ -65,6 +65,7 @@ TerrainNode::TerrainNode(Scene *scene):PartitionNode(scene),
 	for(j=0;j<mSize;++j){
 		for(i=0;i<mSize;++i){
 			TerrainPatchComponent::ptr patch=new TerrainPatchComponent(mScene);
+			patch->setProtected(true);
 			mUnactivePatches.add(patch);
 
 			Node::ptr node=new Node(mScene);
@@ -87,6 +88,7 @@ void TerrainNode::destroy(){
 	int i;
 	for(i=0;i<mUnactivePatches.size();++i){
 		if(mUnactivePatches[i]!=NULL){
+			mUnactivePatches[i]->setProtected(false);
 			mUnactivePatches[i]->getParent()->destroy();
 		}
 	}
@@ -94,6 +96,7 @@ void TerrainNode::destroy(){
 
 	for(i=0;i<mPatchGrid.size();++i){
 		if(mPatchGrid[i]!=NULL){
+			mPatchGrid[i]->setProtected(false);
 			mPatchGrid[i]->getParent()->destroy();
 		}
 	}

@@ -125,6 +125,10 @@ public:
 	int getNumLayers(){return mLayerTextures.size();}
 	Texture::ptr getLayerTexture(int i){return mLayerTextures[i];}
 
+	// Guard against destruction from other sources than the TerrainNode
+	void setProtected(bool p){mProtected=p;}
+	inline bool getProtected() const{return mProtected;}
+
 	// Spacial
 	Transform *getTransform() const{return NULL;}
 	Bound *getBound() const{return mBound;}
@@ -265,6 +269,7 @@ protected:
 	scalar mWaterLevel;
 	Transform::ptr mWaterTransform;
 	Transform::ptr mWaterWorldTransform;
+	bool mProtected;
 
 	Collection<Texture::ptr> mLayerTextures;
 	Material::ptr mMaterial;
