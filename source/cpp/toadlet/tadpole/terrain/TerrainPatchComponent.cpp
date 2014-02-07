@@ -41,6 +41,7 @@ TerrainPatchComponent::TerrainPatchComponent(Scene *scene):
 	//mTopDependent,
 	mEpsilon(0),
 	mCellEpsilon(0),
+	mProtected(false),
 
 	mCameraUpdateScope(-1),
 	mTerrainScope(-1),
@@ -70,6 +71,8 @@ TerrainPatchComponent::TerrainPatchComponent(Scene *scene):
 }
 
 void TerrainPatchComponent::destroy(){
+	TOADLET_ASSERT(!mProtected);
+
 	mLeftDependent=NULL;
 	mTopDependent=NULL;
 
