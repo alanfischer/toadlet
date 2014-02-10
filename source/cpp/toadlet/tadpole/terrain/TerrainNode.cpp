@@ -132,11 +132,11 @@ void TerrainNode::setDataSource(TerrainNodeDataSource *dataSource){
 		}
 	}
 
-	if(mListener!=NULL){
-		mListener->terrainUpdated(mTerrainX,mTerrainY,mTerrainX,mTerrainY);
-	}
-
 	updateBound();
+
+	if(mListener!=NULL){
+		mListener->terrainUpdated(mTerrainX,mTerrainY,getWorldBound(),mTerrainX,mTerrainY,getWorldBound());
+	}
 }
 
 void TerrainNode::setMaterial(Material::ptr material){
@@ -334,6 +334,8 @@ void TerrainNode::updateTarget(){
 		}
 
 		if(newTerrainX!=oldTerrainX || newTerrainY!=oldTerrainY){
+			Bound::ptr oldBound=new Bound(getWorldBound());
+
 			int x,y;
 			for(y=oldTerrainY-halfSize;y<=oldTerrainY+halfSize;++y){
 				for(x=oldTerrainX-halfSize;x<=oldTerrainX+halfSize;++x){
@@ -374,7 +376,7 @@ void TerrainNode::updateTarget(){
 			}
 
 			if(mListener!=NULL){
-				mListener->terrainUpdated(oldTerrainX,oldTerrainY,newTerrainX,newTerrainY);
+				mListener->terrainUpdated(oldTerrainX,oldTerrainY,oldBound,newTerrainX,newTerrainY,getWorldBound());
 			}
 		}
 	}
