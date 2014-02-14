@@ -23,50 +23,15 @@
  *
  ********** Copyright header - do not remove **********/
 
-#include <toadlet/egg/Object.h>
-#include <toadlet/egg/Atomic.h>
-
-// mSharedCount will always be aligned on TOADLET_ALIGNED_SIZE, due to the Object's new operator
+#include <toadlet/egg/Types.h>
 
 namespace toadlet{
 namespace egg{
 
-void *Object::operator new(size_t size){
-	return TOADLET_ALIGNED_MALLOC(size,TOADLET_ALIGNED_SIZE);
-}
-
-void Object::operator delete(void *p){
-	TOADLET_ALIGNED_FREE(p);
-}
-
-Object::Object():
-	mSharedCount(0),
-	mSharedData(NULL)
-{
-	#if defined(TOADLET_COUNT_MUTEX)
-		mSharedData=new Mutex();
-	#endif
-}
-
-Object::~Object(){
-	#if defined(TOADLET_COUNT_MUTEX)
-		delete (Mutex*)mSharedData;
-	#endif
-}
-
-int Object::retain(){
-	int count=Atomic::increment(mSharedCount,mSharedData);
-	return count;
-}
-
-int Object::release(){
-	int count=Atomic::decrement(mSharedCount,mSharedData);
-	if(count<=0){
-		fullyReleased();
-		delete this;
-	}
-	return count;
-}
+namespace Atomic{
+	TOADLET_API int increment(int &value,void *data);
+	TOADLET_API int decrement(int &value,void *data);
+};
 
 }
 }

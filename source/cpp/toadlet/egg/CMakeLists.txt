@@ -5,6 +5,7 @@ configure_file (${CMAKE_CURRENT_SOURCE_DIR}/Version.h.cmake ${CMAKE_CURRENT_BINA
 # Source files for toadlet_egg
 set (EGG_SRC
 	Assert.cpp
+	Atomic.cpp
 	Error.cpp
 	Errorer.cpp
 	Exception.cpp
@@ -83,6 +84,7 @@ set (EGG_PLATFORM_WIN32_SRC
 # Headers
 set (EGG_HDR
 	Assert.h
+	Atomic.h
 	BaseResource.h
 	Categories.h
 	CircularBuffer.h
