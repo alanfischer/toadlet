@@ -41,12 +41,15 @@ public:
 	void nodeCreated(Node *node);
 	void nodeDestroyed(Node *node);
 
-	inline Node *getNodeByHandle(int handle){return (handle>=0 && handle<mNodes.size())?mNodes[handle]:NULL;}
+	Node *getNodeByHandle(int handle) const;
 
 protected:	
 	Scene *mScene;
 	Collection<int> mFreeHandles;
 	Collection<Node*> mNodes;
+	#if defined(TOADLET_THREADSAFE)
+		mutable Mutex mMutex;
+	#endif
 };
 
 }
