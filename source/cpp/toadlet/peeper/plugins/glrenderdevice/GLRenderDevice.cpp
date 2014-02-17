@@ -2564,15 +2564,31 @@ int GLRenderDevice::getVariableFormat(GLuint type){
 #endif
 
 void GLRenderDevice::vertexFormatCreated(GLVertexFormat *format){
+	#if defined(TOADLET_THREADSAFE)
+		mMutex.lock();
+	#endif
+
 	int handle=mVertexFormats.size();
 	format->mRenderHandle=handle;
 	mVertexFormats.resize(handle+1);
 	mVertexFormats[handle]=format;
+
+	#if defined(TOADLET_THREADSAFE)
+		mMutex.unlock();
+	#endif
 }
 
 void GLRenderDevice::vertexFormatDestroyed(GLVertexFormat *format){
+	#if defined(TOADLET_THREADSAFE)
+		mMutex.lock();
+	#endif
+
 	int handle=format->mRenderHandle;
 	if(handle==-1 || mVertexFormats[handle]!=format){
+		#if defined(TOADLET_THREADSAFE)
+			mMutex.unlock();
+		#endif
+
 		return;
 	}
 
@@ -2593,14 +2609,34 @@ void GLRenderDevice::vertexFormatDestroyed(GLVertexFormat *format){
 		mVertexFormats[i]->mRenderHandle--;
 	}
 	mVertexFormats.removeAt(handle);
+
+	#if defined(TOADLET_THREADSAFE)
+		mMutex.unlock();
+	#endif
 }
 
 void GLRenderDevice::shaderStateCreated(GLSLShaderState *state){
+	#if defined(TOADLET_THREADSAFE)
+		mMutex.lock();
+	#endif
+
 	mShaderStates.add(state);
+
+	#if defined(TOADLET_THREADSAFE)
+		mMutex.unlock();
+	#endif
 }
 
 void GLRenderDevice::shaderStateDestroyed(GLSLShaderState *state){
+	#if defined(TOADLET_THREADSAFE)
+		mMutex.lock();
+	#endif
+
 	mShaderStates.remove(state);
+
+	#if defined(TOADLET_THREADSAFE)
+		mMutex.unlock();
+	#endif
 }
 
 }

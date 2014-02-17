@@ -245,6 +245,10 @@ protected:
 	RenderTarget::ptr mRenderTarget;
 	GLRenderTarget::ptr mGLRenderTarget;
 
+	#if defined(TOADLET_THREADSAFE)
+		Mutex mMutex;
+	#endif
+
 	friend class GLBuffer;
 	friend class GLTexture;
 	friend class GLVertexFormat;

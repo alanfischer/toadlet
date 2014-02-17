@@ -142,6 +142,10 @@ protected:
 	RenderState::ptr mDefaultState;
 	Collection<ID3D10ShaderResourceView*> mNullShaderResources;
 
+	#if defined(TOADLET_THREADSAFE)
+		Mutex mMutex;
+	#endif
+
 	friend class D3D10Buffer;
 	friend class D3D10Shader;
 	friend class D3D10VertexFormat;
