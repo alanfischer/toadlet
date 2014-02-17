@@ -906,15 +906,31 @@ int D3D10RenderDevice::getVariableFormat(const D3D10_SHADER_TYPE_DESC &type){
 }
 
 void D3D10RenderDevice::vertexFormatCreated(D3D10VertexFormat *format){
+	#if defined(TOADLET_THREADSAFE)
+		mMutex.lock();
+	#endif
+
 	int handle=mVertexFormats.size();
 	format->mRenderHandle=handle;
 	mVertexFormats.resize(handle+1);
 	mVertexFormats[handle]=format;
+
+	#if defined(TOADLET_THREADSAFE)
+		mMutex.unlock();
+	#endif
 }
 
 void D3D10RenderDevice::vertexFormatDestroyed(D3D10VertexFormat *format){
+	#if defined(TOADLET_THREADSAFE)
+		mMutex.unlock();
+	#endif
+
 	int handle=format->mRenderHandle;
 	if(handle==-1 || mVertexFormats[handle]!=format){
+		#if defined(TOADLET_THREADSAFE)
+			mMutex.unlock();
+		#endif
+
 		return;
 	}
 
@@ -933,18 +949,38 @@ void D3D10RenderDevice::vertexFormatDestroyed(D3D10VertexFormat *format){
 		mVertexFormats[i]->mRenderHandle--;
 	}
 	mVertexFormats.removeAt(handle);
+
+	#if defined(TOADLET_THREADSAFE)
+		mMutex.unlock();
+	#endif
 }
 
 void D3D10RenderDevice::shaderCreated(D3D10Shader *shader){
+	#if defined(TOADLET_THREADSAFE)
+		mMutex.lock();
+	#endif
+
 	if(shader->mShaderType==Shader::ShaderType_VERTEX){
 		mVertexShaders.add(shader);
 	}
+
+	#if defined(TOADLET_THREADSAFE)
+		mMutex.unlock();
+	#endif
 }
 
 void D3D10RenderDevice::shaderDestroyed(D3D10Shader *shader){
+	#if defined(TOADLET_THREADSAFE)
+		mMutex.lock();
+	#endif
+
 	if(shader->mShaderType==Shader::ShaderType_VERTEX){
 		mVertexShaders.remove(shader);
 	}
+
+	#if defined(TOADLET_THREADSAFE)
+		mMutex.unlock();
+	#endif
 }
 
 }
