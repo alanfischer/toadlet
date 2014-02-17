@@ -56,7 +56,6 @@ public:
 
 protected:
 	Engine *mEngine;
-	VertexBufferAccessor vba;
 };
 
 }

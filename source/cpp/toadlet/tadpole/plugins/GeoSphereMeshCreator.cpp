@@ -31,7 +31,7 @@ namespace tadpole{
 
 Mesh::ptr GeoSphereMeshCreator::createGeoSphereMesh(VertexBuffer::ptr vertexBuffer,IndexBuffer::ptr indexBuffer,const Sphere &sphere,int depth,bool icosahedron){
 	currentSphere=sphere;
-	vba.lock(vertexBuffer,Buffer::Access_BIT_WRITE);
+	VertexBufferAccessor vba(vertexBuffer,Buffer::Access_BIT_WRITE);
 
 	int vertexIndex=0;
 	int i,j;
@@ -52,18 +52,18 @@ Mesh::ptr GeoSphereMeshCreator::createGeoSphereMesh(VertexBuffer::ptr vertexBuff
 		scalar c = Math::fromMilli(723);
 		scalar d = Math::fromMilli(850);
 		scalar e = Math::fromMilli(525);
-		geoSet(vertexIndex++,Vector3(0, Math::ONE, 0));
-		geoSet(vertexIndex++,Vector3(a, y, 0));
-		geoSet(vertexIndex++,Vector3(b, y, -d));
-		geoSet(vertexIndex++,Vector3(-c, y, -e));
-		geoSet(vertexIndex++,Vector3(-c, y, e));
-		geoSet(vertexIndex++,Vector3(b, y, d));
-		geoSet(vertexIndex++,Vector3(c, -y, -e));
-		geoSet(vertexIndex++,Vector3(-b, -y, -d));
-		geoSet(vertexIndex++,Vector3(-a, -y, 0));
-		geoSet(vertexIndex++,Vector3(-b, -y, d));
-		geoSet(vertexIndex++,Vector3(c, -y, e));
-		geoSet(vertexIndex++,Vector3(0, -Math::ONE, 0));
+		geoSet(vba,vertexIndex++,Vector3(0, Math::ONE, 0));
+		geoSet(vba,vertexIndex++,Vector3(a, y, 0));
+		geoSet(vba,vertexIndex++,Vector3(b, y, -d));
+		geoSet(vba,vertexIndex++,Vector3(-c, y, -e));
+		geoSet(vba,vertexIndex++,Vector3(-c, y, e));
+		geoSet(vba,vertexIndex++,Vector3(b, y, d));
+		geoSet(vba,vertexIndex++,Vector3(c, -y, -e));
+		geoSet(vba,vertexIndex++,Vector3(-b, -y, -d));
+		geoSet(vba,vertexIndex++,Vector3(-a, -y, 0));
+		geoSet(vba,vertexIndex++,Vector3(-b, -y, d));
+		geoSet(vba,vertexIndex++,Vector3(c, -y, e));
+		geoSet(vba,vertexIndex++,Vector3(0, -Math::ONE, 0));
 
 		old.resize(indicesLength/3);
 		for(i=0;i<old.size();++i){
@@ -73,17 +73,17 @@ Mesh::ptr GeoSphereMeshCreator::createGeoSphereMesh(VertexBuffer::ptr vertexBuff
 	else{
 		/* Six equidistant points lying on the unit sphere */
 		int xplus = vertexIndex;
-		geoSet(vertexIndex++,Math::X_UNIT_VECTOR3);
+		geoSet(vba,vertexIndex++,Math::X_UNIT_VECTOR3);
 		int xmin = vertexIndex;
-		geoSet(vertexIndex++,Math::NEG_X_UNIT_VECTOR3);
+		geoSet(vba,vertexIndex++,Math::NEG_X_UNIT_VECTOR3);
 		int yplus = vertexIndex;
-		geoSet(vertexIndex++,Math::Y_UNIT_VECTOR3);
+		geoSet(vba,vertexIndex++,Math::Y_UNIT_VECTOR3);
 		int ymin = vertexIndex;
-		geoSet(vertexIndex++,Math::NEG_Y_UNIT_VECTOR3);
+		geoSet(vba,vertexIndex++,Math::NEG_Y_UNIT_VECTOR3);
 		int zplus = vertexIndex;
-		geoSet(vertexIndex++,Math::Z_UNIT_VECTOR3);
+		geoSet(vba,vertexIndex++,Math::Z_UNIT_VECTOR3);
 		int zmin = vertexIndex;
-		geoSet(vertexIndex++,Math::NEG_Z_UNIT_VECTOR3);
+		geoSet(vba,vertexIndex++,Math::NEG_Z_UNIT_VECTOR3);
 
 		old.resize(8);
 		old[0].set(yplus,zplus,xplus);
@@ -136,11 +136,11 @@ Mesh::ptr GeoSphereMeshCreator::createGeoSphereMesh(VertexBuffer::ptr vertexBuff
 			Vector3 bv;Math::lerp(bv,pt0,pt1,Math::HALF);Math::normalize(bv);
 			Vector3 cv;Math::lerp(cv,pt1,pt2,Math::HALF);Math::normalize(cv);
 			int a=vertexIndex;
-			geoSet(vertexIndex++,av);
+			geoSet(vba,vertexIndex++,av);
 			int b=vertexIndex;
-			geoSet(vertexIndex++,bv);
+			geoSet(vba,vertexIndex++,bv);
 			int c=vertexIndex;
-			geoSet(vertexIndex++,cv);
+			geoSet(vba,vertexIndex++,cv);
 
 			next[newi++].set(oldt.index[0],b,a);
 			next[newi++].set(b,oldt.index[1],c);
@@ -154,7 +154,7 @@ Mesh::ptr GeoSphereMeshCreator::createGeoSphereMesh(VertexBuffer::ptr vertexBuff
 
 	vba.unlock();
 
-	iba.lock(indexBuffer,Buffer::Access_BIT_WRITE);
+	IndexBufferAccessor iba(indexBuffer,Buffer::Access_BIT_WRITE);
 	for(i=0;i<old.size();++i){
 		for(j=0;j<3;++j){
 			iba.set(i*3+j,old[i].index[j]);
@@ -186,7 +186,7 @@ Mesh::ptr GeoSphereMeshCreator::createGeoSphereMesh(const Sphere &sphere,int dep
 	return mesh;
 }
 
-void GeoSphereMeshCreator::geoSet(int vertexIndex,const Vector3 &vec){
+void GeoSphereMeshCreator::geoSet(VertexBufferAccessor &vba,int vertexIndex,const Vector3 &vec){
 	vba.set3(vertexIndex,0,
 		Math::mul(vec.x,currentSphere.radius)+currentSphere.origin.x,
 		Math::mul(vec.y,currentSphere.radius)+currentSphere.origin.y,

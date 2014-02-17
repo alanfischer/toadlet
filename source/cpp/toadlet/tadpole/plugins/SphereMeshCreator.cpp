@@ -32,8 +32,8 @@ namespace tadpole{
 // Thanks to Ogre3D for this sphere routine
 Mesh::ptr SphereMeshCreator::createSphereMesh(VertexBuffer::ptr vertexBuffer,IndexBuffer::ptr indexBuffer,const Sphere &sphere,int numSegments,int numRings){
 	{
-		vba.lock(vertexBuffer,Buffer::Access_BIT_WRITE);
-		iba.lock(indexBuffer,Buffer::Access_BIT_WRITE);
+		VertexBufferAccessor vba(vertexBuffer,Buffer::Access_BIT_WRITE);
+		IndexBufferAccessor iba(indexBuffer,Buffer::Access_BIT_WRITE);
 
 		int positionIndex=vertexBuffer->getVertexFormat()->findElement(VertexFormat::Semantic_POSITION);
 		int normalIndex=vertexBuffer->getVertexFormat()->findElement(VertexFormat::Semantic_NORMAL);

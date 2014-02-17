@@ -48,6 +48,10 @@ Resource::ptr FontManager::manage(Resource *resource,const String &name){
 }
 
 Font::ptr FontManager::getDefaultFont(){
+	#if defined(TOADLET_THREADSAFE)
+		mMutex.lock();
+	#endif
+
 	if(mDefaultFont==NULL){
 		String file;
 		#if defined(TOADLET_PLATFORM_WIN32)
@@ -63,7 +67,14 @@ Font::ptr FontManager::getDefaultFont(){
 		#endif
 		mDefaultFont=findFont(file,64);
 	}
-	return mDefaultFont;
+
+	Font::ptr font=mDefaultFont;
+
+	#if defined(TOADLET_THREADSAFE)
+		mMutex.unlock();
+	#endif
+
+	return font;
 }
 
 void FontManager::unmanage(Resource *resource){

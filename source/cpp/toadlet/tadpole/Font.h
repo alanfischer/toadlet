@@ -89,8 +89,6 @@ public:
 	inline Texture::ptr getTexture() const{return mTexture;}
 	inline Glyph *getGlyph(int i) const{if(i<0 || i>=mGlyphs.size()){return NULL;}else{return mGlyphs[i];}}
 
-	VertexBufferAccessor vba;
-
 protected:
 	float mPointSize;
 	int mInnerSpace;

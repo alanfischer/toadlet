@@ -92,7 +92,7 @@ BaseApplication::BaseApplication():
 	mFormat->setPixelFormat(TextureFormat::Format_RGB_5_6_5);
 	mFormat->setDepthBits(16);
 	mFormat->setMultisamples(1);
-	mFormat->setThreads(1);
+	mFormat->setThreads(2);
 	#if defined(TOADLET_DEBUG)
 		mFormat->setDebug(true);
 	#else

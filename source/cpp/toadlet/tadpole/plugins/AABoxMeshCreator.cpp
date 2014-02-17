@@ -32,7 +32,7 @@ namespace tadpole{
 Mesh::ptr AABoxMeshCreator::createAABoxMesh(const AABox &box,Material::ptr material){
 	VertexBuffer::ptr vertexBuffer=mEngine->getBufferManager()->createVertexBuffer(Buffer::Usage_BIT_STATIC,Buffer::Access_BIT_WRITE,mEngine->getVertexFormats().POSITION_NORMAL_TEX_COORD,24);
 	{
-		vba.lock(vertexBuffer,Buffer::Access_BIT_WRITE);
+		VertexBufferAccessor vba(vertexBuffer,Buffer::Access_BIT_WRITE);
 
 		int vi=0;
 
@@ -77,7 +77,7 @@ Mesh::ptr AABoxMeshCreator::createAABoxMesh(const AABox &box,Material::ptr mater
 
 	IndexBuffer::ptr indexBuffer=mEngine->getBufferManager()->createIndexBuffer(Buffer::Usage_BIT_STATIC,Buffer::Access_BIT_WRITE,IndexBuffer::IndexFormat_UINT8,36);
 	{
-		iba.lock(indexBuffer,Buffer::Access_BIT_WRITE);
+		IndexBufferAccessor iba(indexBuffer,Buffer::Access_BIT_WRITE);
 
 		int i=0;
 		iba.set(i++,0);	iba.set(i++,1); iba.set(i++,2);
