@@ -73,7 +73,7 @@ int Atomic::increment(int &value,void *data){
 }
 	
 int Atomic::decrement(int &value,void *data){
-	return __sync_fetch_and_sub(&mSharedCount,1) - 1;
+	return __sync_fetch_and_sub(&value,1) - 1;
 }
 
 #elif defined(TOADLET_COUNT_MUTEX)
@@ -89,7 +89,7 @@ int Atomic::increment(int &value,void *data){
 int Atomic::decrement(int &value,void *data){
 	int count=0;
 	((Mutex*)data)->lock();
-		count=--mSharedCount;
+		count=--value;
 	((Mutex*)data)->unlock();
 	return count;
 }
@@ -97,11 +97,11 @@ int Atomic::decrement(int &value,void *data){
 #else
 
 int Atomic::increment(int &value,void *data){
-	return ++mSharedCount;
+	return ++value;
 }
 
 int Atomic::decrement(int &value,void *data){
-	return --mSharedCount;
+	return --value;
 }
 
 #endif

@@ -95,6 +95,10 @@ void BufferManager::destroy(){
 }
 
 VertexFormat::ptr BufferManager::createVertexFormat(){
+	#if defined(TOADLET_THREADSAFE)
+		mMutex.lock();
+	#endif
+
 	RenderDevice *renderDevice=mEngine->getRenderDevice();
 	VertexFormat::ptr vertexFormat;
 	if(renderDevice==NULL || mEngine->isBackable()){ // Always create a VertexFormat, even if the renderDevice is NULL
@@ -108,10 +112,9 @@ VertexFormat::ptr BufferManager::createVertexFormat(){
 	}
 	else{
 		vertexFormat=renderDevice->createVertexFormat();
-		if(vertexFormat==NULL){
-			return NULL;
+		if(vertexFormat!=NULL){
+			vertexFormat->create();
 		}
-		vertexFormat->create();
 	}
 
 	if(vertexFormat!=NULL){
@@ -120,14 +123,26 @@ VertexFormat::ptr BufferManager::createVertexFormat(){
 		vertexFormat->setDestroyedListener(this);
 	}
 	else{
+		#if defined(TOADLET_THREADSAFE)
+			mMutex.unlock();
+		#endif
+
 		Error::nullPointer("unable to create VertexFormat");
 		return NULL;
 	}
+
+	#if defined(TOADLET_THREADSAFE)
+		mMutex.unlock();
+	#endif
 
 	return vertexFormat;
 }
 
 IndexBuffer::ptr BufferManager::createIndexBuffer(int usage,int access,IndexBuffer::IndexFormat indexFormat,int size){
+	#if defined(TOADLET_THREADSAFE)
+		mMutex.lock();
+	#endif
+
 	RenderDevice *renderDevice=mEngine->getRenderDevice();
 	IndexBuffer::ptr buffer;
 #if defined(TOADLET_BACKABLE)
@@ -144,10 +159,9 @@ IndexBuffer::ptr BufferManager::createIndexBuffer(int usage,int access,IndexBuff
 #endif
 	if(renderDevice!=NULL){
 		buffer=renderDevice->createIndexBuffer();
-		if(buffer==NULL){
-			return NULL;
+		if(buffer!=NULL){
+			buffer->create(usage,access,indexFormat,size);
 		}
-		buffer->create(usage,access,indexFormat,size);
 	}
 
 	if(buffer!=NULL){
@@ -156,14 +170,26 @@ IndexBuffer::ptr BufferManager::createIndexBuffer(int usage,int access,IndexBuff
 		buffer->setDestroyedListener(this);
 	}
 	else{
+		#if defined(TOADLET_THREADSAFE)
+			mMutex.unlock();
+		#endif
+
 		Error::nullPointer("unable to create IndexBuffer");
 		return NULL;
 	}
+
+	#if defined(TOADLET_THREADSAFE)
+		mMutex.unlock();
+	#endif
 
 	return buffer;
 }
 
 VertexBuffer::ptr BufferManager::createVertexBuffer(int usage,int access,VertexFormat::ptr vertexFormat,int size){
+	#if defined(TOADLET_THREADSAFE)
+		mMutex.lock();
+	#endif
+
 	RenderDevice *renderDevice=mEngine->getRenderDevice();
 	VertexBuffer::ptr buffer;
 #if defined(TOADLET_BACKABLE)
@@ -180,10 +206,9 @@ VertexBuffer::ptr BufferManager::createVertexBuffer(int usage,int access,VertexF
 #endif
 	if(renderDevice!=NULL){
 		buffer=renderDevice->createVertexBuffer();
-		if(buffer==NULL){
-			return NULL;
+		if(buffer!=NULL){
+			buffer->create(usage,access,vertexFormat,size);
 		}
-		buffer->create(usage,access,vertexFormat,size);
 	}
 
 	if(buffer!=NULL){
@@ -192,14 +217,26 @@ VertexBuffer::ptr BufferManager::createVertexBuffer(int usage,int access,VertexF
 		buffer->setDestroyedListener(this);
 	}
 	else{
+		#if defined(TOADLET_THREADSAFE)
+			mMutex.unlock();
+		#endif
+
 		Error::nullPointer("unable to create VertexBuffer");
 		return NULL;
 	}
+
+	#if defined(TOADLET_THREADSAFE)
+		mMutex.unlock();
+	#endif
 
 	return buffer;
 }
 
 PixelBuffer::ptr BufferManager::createPixelBuffer(int usage,int access,int pixelFormat,int width,int height,int depth){
+	#if defined(TOADLET_THREADSAFE)
+		mMutex.lock();
+	#endif
+
 	RenderDevice *renderDevice=mEngine->getRenderDevice();
 	TextureFormat::ptr textureFormat=new TextureFormat(TextureFormat::Dimension_D2,pixelFormat,width,height,depth,1);
 	PixelBuffer::ptr buffer;
@@ -217,10 +254,9 @@ PixelBuffer::ptr BufferManager::createPixelBuffer(int usage,int access,int pixel
 #endif
 	if(renderDevice!=NULL){
 		buffer=renderDevice->createPixelBuffer();
-		if(buffer==NULL){
-			return NULL;
+		if(buffer!=NULL){
+			buffer->create(usage,access,textureFormat);
 		}
-		buffer->create(usage,access,textureFormat);
 	}
 
 	if(buffer!=NULL){
@@ -229,14 +265,26 @@ PixelBuffer::ptr BufferManager::createPixelBuffer(int usage,int access,int pixel
 		buffer->setDestroyedListener(this);
 	}
 	else{
+		#if defined(TOADLET_THREADSAFE)
+			mMutex.unlock();
+		#endif
+
 		Error::nullPointer("unable to create PixelBuffer");
 		return NULL;
 	}
+
+	#if defined(TOADLET_THREADSAFE)
+		mMutex.unlock();
+	#endif
 
 	return buffer;
 }
 
 VariableBuffer::ptr BufferManager::createVariableBuffer(int usage,int access,VariableBufferFormat::ptr format){
+	#if defined(TOADLET_THREADSAFE)
+		mMutex.lock();
+	#endif
+
 	RenderDevice *renderDevice=mEngine->getRenderDevice();
 	VariableBuffer::ptr buffer;
 #if defined(TOADLET_BACKABLE)
@@ -253,10 +301,9 @@ VariableBuffer::ptr BufferManager::createVariableBuffer(int usage,int access,Var
 #endif
 	if(renderDevice!=NULL){
 		buffer=VariableBuffer::ptr(renderDevice->createVariableBuffer());
-		if(buffer==NULL){
-			return NULL;
+		if(buffer!=NULL){
+			buffer->create(usage,access,format);
 		}
-		buffer->create(usage,access,format);
 	}
 
 	if(buffer!=NULL){
@@ -265,9 +312,17 @@ VariableBuffer::ptr BufferManager::createVariableBuffer(int usage,int access,Var
 		buffer->setDestroyedListener(this);
 	}
 	else{
+		#if defined(TOADLET_THREADSAFE)
+			mMutex.unlock();
+		#endif
+
 		Error::nullPointer("unable to create VariableBuffer");
 		return NULL;
 	}
+
+	#if defined(TOADLET_THREADSAFE)
+		mMutex.unlock();
+	#endif
 
 	return buffer;
 }
@@ -283,6 +338,7 @@ IndexBuffer::ptr BufferManager::cloneIndexBuffer(IndexBuffer::ptr oldIndexBuffer
 			return NULL;
 		}
 	#endif
+
 
 	IndexBuffer::ptr indexBuffer=createIndexBuffer(usage,access,indexFormat,size);
 
@@ -350,6 +406,10 @@ Track *BufferManager::createColorTrack(){
 }
 
 void BufferManager::contextActivate(RenderDevice *renderDevice){
+	#if defined(TOADLET_THREADSAFE)
+		mMutex.lock();
+	#endif
+
 	Log::debug("BufferManager::contextActivate");
 
 	int i;
@@ -393,9 +453,17 @@ void BufferManager::contextActivate(RenderDevice *renderDevice){
 		}
 	}
 #endif
+
+	#if defined(TOADLET_THREADSAFE)
+		mMutex.unlock();
+	#endif
 }
 
 void BufferManager::contextDeactivate(RenderDevice *renderDevice){
+	#if defined(TOADLET_THREADSAFE)
+		mMutex.lock();
+	#endif
+
 	Log::debug("BufferManager::contextDeactivate");
 
 	int i;
@@ -435,9 +503,17 @@ void BufferManager::contextDeactivate(RenderDevice *renderDevice){
 			shared_static_cast<BackableVertexFormat>(vertexFormat)->setBack(NULL);
 		}
 	}
+
+	#if defined(TOADLET_THREADSAFE)
+		mMutex.unlock();
+	#endif
 }
 
 void BufferManager::preContextReset(RenderDevice *renderDevice){
+	#if defined(TOADLET_THREADSAFE)
+		mMutex.lock();
+	#endif
+
 	Log::debug("BufferManager::preContextReset");
 
 	int i;
@@ -453,9 +529,17 @@ void BufferManager::preContextReset(RenderDevice *renderDevice){
 	for(i=0;i<mIndexBuffers.size();++i){
 		mIndexBuffers[i]->resetDestroy();
 	}
+
+	#if defined(TOADLET_THREADSAFE)
+		mMutex.unlock();
+	#endif
 }
 
 void BufferManager::postContextReset(RenderDevice *renderDevice){
+	#if defined(TOADLET_THREADSAFE)
+		mMutex.lock();
+	#endif
+
 	Log::debug("BufferManager::postContextReset");
 
 	int i;
@@ -471,9 +555,17 @@ void BufferManager::postContextReset(RenderDevice *renderDevice){
 	for(i=0;i<mVariableBuffers.size();++i){
 		mVariableBuffers[i]->resetCreate();
 	}
+
+	#if defined(TOADLET_THREADSAFE)
+		mMutex.unlock();
+	#endif
 }
 
 void BufferManager::resourceDestroyed(Resource *resource){
+	#if defined(TOADLET_THREADSAFE)
+		mMutex.lock();
+	#endif
+
 	if(mIndexBuffers.remove(resource)==false){
 		if(mVertexBuffers.remove(resource)==false){
 			if(mPixelBuffers.remove(resource)==false){
@@ -483,6 +575,10 @@ void BufferManager::resourceDestroyed(Resource *resource){
 			}
 		}
 	}
+
+	#if defined(TOADLET_THREADSAFE)
+		mMutex.unlock();
+	#endif
 }
 
 void BufferManager::outputVariableBufferFormat(VariableBufferFormat::ptr format){
