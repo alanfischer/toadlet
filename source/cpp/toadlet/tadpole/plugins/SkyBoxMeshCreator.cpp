@@ -33,8 +33,8 @@ Mesh::ptr SkyBoxMeshCreator::createSkyBoxMesh(scalar size,bool unfolded,bool inv
 	VertexBuffer::ptr vertexBuffer=mEngine->getBufferManager()->createVertexBuffer(Buffer::Usage_BIT_STATIC,Buffer::Access_BIT_WRITE,mEngine->getVertexFormats().POSITION_TEX_COORD,24);
 	IndexBuffer::ptr indexBuffer=mEngine->getBufferManager()->createIndexBuffer(Buffer::Usage_BIT_STATIC,Buffer::Access_BIT_WRITE,IndexBuffer::IndexFormat_UINT8,36);
 	{
-		vba.lock(vertexBuffer,Buffer::Access_BIT_WRITE);
-		iba.lock(indexBuffer,Buffer::Access_BIT_WRITE);
+		VertexBufferAccessor vba(vertexBuffer,Buffer::Access_BIT_WRITE);
+		IndexBufferAccessor iba(indexBuffer,Buffer::Access_BIT_WRITE);
 
 		int vi=0,ii=0;
 		scalar one=Math::ONE;

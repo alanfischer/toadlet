@@ -348,6 +348,8 @@ void Engine::installHandlers(){
 	mGridCreator=new GridMeshCreator(this);
 	mSkyBoxCreator=new SkyBoxMeshCreator(this);
 	mSkyDomeCreator=new SkyDomeMeshCreator(this);
+
+	mFontManager->getDefaultFont();
 }
 
 void Engine::setMaximumRenderCaps(const RenderCaps &caps){

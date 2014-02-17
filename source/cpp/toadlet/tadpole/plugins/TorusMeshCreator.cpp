@@ -31,7 +31,7 @@ namespace tadpole{
 
 Mesh::ptr TorusMeshCreator::createTorusMesh(VertexBuffer::ptr vertexBuffer,scalar majorRadius,scalar minorRadius,int numMajor,int numMinor){
 	{
-		vba.lock(vertexBuffer,Buffer::Access_BIT_WRITE);
+		VertexBufferAccessor vba(vertexBuffer,Buffer::Access_BIT_WRITE);
 
 		Vector3 normal;
 		scalar majorStep=Math::TWO_PI/numMajor;

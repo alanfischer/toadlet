@@ -70,12 +70,10 @@ protected:
 		int index[3];
 	};
 
-	void geoSet(int vertexIndex,const Vector3 &vec);
+	void geoSet(VertexBufferAccessor &vba,int vertexIndex,const Vector3 &vec);
 
 	Engine *mEngine;
 	Sphere currentSphere;
-	VertexBufferAccessor vba;
-	IndexBufferAccessor iba;
 };
 
 }
