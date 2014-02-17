@@ -97,6 +97,10 @@ protected:
 	ExtensionStreamerMap mExtensionStreamerMap;
 	ResourceStreamer::ptr mDefaultStreamer;
 	String mDefaultExtension;
+
+	#if defined(TOADLET_THREADSAFE)
+		Mutex mMutex;
+	#endif
 };
 
 }

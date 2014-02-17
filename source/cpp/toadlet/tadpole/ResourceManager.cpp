@@ -54,30 +54,64 @@ void ResourceManager::destroy(){
 }
 
 void ResourceManager::addResourceArchive(Archive *archive){
+	#if defined(TOADLET_THREADSAFE)
+		mMutex.lock();
+	#endif
+
 	mResourceArchives.add(archive);
+
+	#if defined(TOADLET_THREADSAFE)
+		mMutex.unlock();
+	#endif
 }
 
 void ResourceManager::removeResourceArchive(Archive  *archive){
+	#if defined(TOADLET_THREADSAFE)
+		mMutex.lock();
+	#endif
+
 	mResourceArchives.remove(archive);
+
+	#if defined(TOADLET_THREADSAFE)
+		mMutex.unlock();
+	#endif
 }
 
 Resource::ptr ResourceManager::get(int handle){
+	Resource::ptr resource;
+
+	#if defined(TOADLET_THREADSAFE)
+		mMutex.lock();
+	#endif
+
 	if(handle>=0 && handle<mResources.size()){
-		return mResources[handle];
+		resource=mResources[handle];
 	}
-	else{
-		return NULL;
-	}
+
+	#if defined(TOADLET_THREADSAFE)
+		mMutex.unlock();
+	#endif
+
+	return resource;
 }
 
 Resource::ptr ResourceManager::get(const String &name){
+	Resource::ptr resource;
+
+	#if defined(TOADLET_THREADSAFE)
+		mMutex.lock();
+	#endif
+
 	NameResourceMap::iterator it=mNameResourceMap.find(name);
 	if(it!=mNameResourceMap.end()){
-		return it->second;
+		resource=it->second;
 	}
-	else{
-		return NULL;
-	}
+
+	#if defined(TOADLET_THREADSAFE)
+		mMutex.unlock();
+	#endif
+
+	return resource;
 }
 
 Resource::ptr ResourceManager::find(const String &name,ResourceData *data){
@@ -96,6 +130,10 @@ Resource::ptr ResourceManager::find(const String &name,ResourceData *data){
 }
 
 Resource::ptr ResourceManager::manage(Resource  *resource,const String &name){
+	#if defined(TOADLET_THREADSAFE)
+		mMutex.lock();
+	#endif
+
 	if(mResources.contains(resource)==false){
 		int handle=-1;
 		int size=mFreeHandles.size();
@@ -128,11 +166,23 @@ Resource::ptr ResourceManager::manage(Resource  *resource,const String &name){
 		mNameResourceMap.add(resource->getName(),resource);
 	}
 
+	#if defined(TOADLET_THREADSAFE)
+		mMutex.unlock();
+	#endif
+
 	return resource;
 }
 
 void ResourceManager::unmanage(Resource *resource){
+	#if defined(TOADLET_THREADSAFE)
+		mMutex.lock();
+	#endif
+
 	if(mResources.contains(resource)==false){
+		#if defined(TOADLET_THREADSAFE)
+			mMutex.unlock();
+		#endif
+
 		Error::unknown(Categories::TOADLET_TADPOLE,
 			"error unmanaging resource, check that resource is managed, or check inheritance heiarchy");
 		return;
@@ -153,9 +203,17 @@ void ResourceManager::unmanage(Resource *resource){
 	}
 
 	resource->setDestroyedListener(NULL);
+
+	#if defined(TOADLET_THREADSAFE)
+		mMutex.unlock();
+	#endif
 }
 
 void ResourceManager::setStreamer(ResourceStreamer  *streamer,const String &extension){
+	#if defined(TOADLET_THREADSAFE)
+		mMutex.lock();
+	#endif
+
 	ExtensionStreamerMap::iterator it=mExtensionStreamerMap.find(extension);
 	if(it!=mExtensionStreamerMap.end()){
 		Log::debug(Categories::TOADLET_TADPOLE,
@@ -169,23 +227,44 @@ void ResourceManager::setStreamer(ResourceStreamer  *streamer,const String &exte
 			"adding streamer for extension "+extension);
 		mExtensionStreamerMap.add(extension,streamer);
 	}
+
+	#if defined(TOADLET_THREADSAFE)
+		mMutex.unlock();
+	#endif
 }
 
 void ResourceManager::setDefaultStreamer(ResourceStreamer  *streamer){
+	#if defined(TOADLET_THREADSAFE)
+		mMutex.lock();
+	#endif
+
 	Log::debug(Categories::TOADLET_TADPOLE,
 		"adding default streamer");
 
 	mDefaultStreamer=streamer;
+
+	#if defined(TOADLET_THREADSAFE)
+		mMutex.unlock();
+	#endif
 }
 
 ResourceStreamer *ResourceManager::getStreamer(const String &extension){
+	ResourceStreamer *streamer=NULL;
+
+	#if defined(TOADLET_THREADSAFE)
+		mMutex.lock();
+	#endif
+
 	ExtensionStreamerMap::iterator it=mExtensionStreamerMap.find(extension);
 	if(it!=mExtensionStreamerMap.end()){
-		return it->second;
+		streamer=it->second;
 	}
-	else{
-		return NULL;
-	}
+
+	#if defined(TOADLET_THREADSAFE)
+		mMutex.unlock();
+	#endif
+
+	return streamer;
 }
 
 void ResourceManager::resourceDestroyed(Resource *resource){
@@ -193,10 +272,18 @@ void ResourceManager::resourceDestroyed(Resource *resource){
 }
 
 void ResourceManager::logAllResources(){
+	#if defined(TOADLET_THREADSAFE)
+		mMutex.lock();
+	#endif
+
 	int i;
 	for(i=0;i<mResources.size();++i){
 		Log::alert(String("Resource:")+i+" name:"+(mResources[i]!=NULL?mResources[i]->getName():""));
 	}
+
+	#if defined(TOADLET_THREADSAFE)
+		mMutex.unlock();
+	#endif
 }
 
 String ResourceManager::checkDefaultExtension(const String &path){
@@ -284,10 +371,18 @@ Resource::ptr ResourceManager::findFromFile(const String &name,ResourceData *dat
 	String filename=checkDefaultExtension(cleanPath(name));
 	String extension=findExtension(filename);
 
+	#if defined(TOADLET_THREADSAFE)
+		mMutex.lock();
+	#endif
+
 	int i;
 	for(i=0;i<mResourceArchives.size();++i){
 		Resource::ptr resource=mResourceArchives[i]->openResource(filename);
 		if(resource!=NULL){
+			#if defined(TOADLET_THREADSAFE)
+				mMutex.unlock();
+			#endif
+
 			return resource;
 		}
 	}
@@ -302,6 +397,11 @@ Resource::ptr ResourceManager::findFromFile(const String &name,ResourceData *dat
 			if(stream!=NULL){
 				if(stream->length()>mMaxStreamLength){
 					stream->close();
+
+					#if defined(TOADLET_THREADSAFE)
+						mMutex.unlock();
+					#endif
+
 					Error::insufficientMemory(Categories::TOADLET_TADPOLE,
 						"stream length too large, increase ResourceManager max stream length or reduce resource size");
 					return NULL;
@@ -330,20 +430,35 @@ Resource::ptr ResourceManager::findFromFile(const String &name,ResourceData *dat
 				}
 
 				// We do not close the stream, since the Streamer may hold on to it.  Instead we let it close itself
+				#if defined(TOADLET_THREADSAFE)
+					mMutex.unlock();
+				#endif
 
 				return resource;
 			}
 			else{
+				#if defined(TOADLET_THREADSAFE)
+					mMutex.unlock();
+				#endif
+
 				Error::unknown(Categories::TOADLET_TADPOLE,
 					"file "+filename+" not found");
 				return NULL;
 			}
 		}
 		else{
+			#if defined(TOADLET_THREADSAFE)
+				mMutex.unlock();
+			#endif
+
 			return unableToFindStreamer(name,data);
 		}
 	}
 	else{
+		#if defined(TOADLET_THREADSAFE)
+			mMutex.unlock();
+		#endif
+
 		Log::warning(Categories::TOADLET_TADPOLE,
 			"extension not found on file");
 		return NULL;

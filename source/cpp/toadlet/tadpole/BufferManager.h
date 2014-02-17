@@ -73,6 +73,10 @@ protected:
 	Collection<IndexBuffer::ptr> mIndexBuffers;
 	Collection<PixelBuffer::ptr> mPixelBuffers;
 	Collection<VariableBuffer::ptr> mVariableBuffers;
+
+	#if defined(TOADLET_THREADSAFE)
+		Mutex mMutex;
+	#endif
 };
 
 }
