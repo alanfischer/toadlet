@@ -82,6 +82,8 @@ void ParticleComponent::destroy(){
 		mSharedRenderState=NULL;
 	}
 
+	mUpdateCamera=NULL;
+
 	BaseComponent::destroy();
 }
 
@@ -216,6 +218,16 @@ void ParticleComponent::setTransform(Transform::ptr transform){
 	}
 }
 
+void ParticleComponent::updateParticles(Camera *camera){
+	mUpdateCamera=camera;
+
+	updateBound();
+	
+	if(camera!=NULL){
+		updateVertexData(camera);
+	}
+}
+
 void ParticleComponent::updateBound(){
 	AABox box;
 	if(mParticles.size()>0){
@@ -240,6 +252,12 @@ void ParticleComponent::updateBound(){
 
 	if(mParent!=NULL){
 		mParent->boundChanged();
+	}
+}
+
+void ParticleComponent::frameUpdate(int dt,int scope){
+	if(mUpdateCamera!=NULL && mParent->getScene()->getResetFrame()){
+		updateVertexData(mUpdateCamera);
 	}
 }
 

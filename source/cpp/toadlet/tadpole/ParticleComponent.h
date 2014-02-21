@@ -106,9 +106,11 @@ public:
 	void setMaterial(Material *material);
 	Material *getMaterial() const{return mMaterial;}
 
-	void updateParticles(Camera *camera){updateBound();if(camera!=NULL){updateVertexData(camera);}}
+	void updateParticles(Camera *camera);
 
 	void updateBound();
+
+	void frameUpdate(int dt,int scope);
 
 	// Spacial
 	void setTransform(Transform::ptr transform);
@@ -163,6 +165,7 @@ protected:
 	RenderState::ptr mSharedRenderState;
 	VertexData::ptr mVertexData;
 	IndexData::ptr mIndexData;
+	Camera::ptr mUpdateCamera;
 };
 
 }
