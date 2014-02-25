@@ -10,6 +10,11 @@
 %javaconst(1);
 
 // Shared pragmas
+%pragma(java) moduleimports=%{
+import us.toadlet.peeper.RenderDevice;
+import us.toadlet.ribbit.AudioDevice;
+%}
+
 %pragma(java) jniclassimports=%{
 import us.toadlet.peeper.RenderDevice;
 import us.toadlet.ribbit.AudioDevice;

@@ -150,6 +150,14 @@ set (TADPOLE_SRC
 set (TADPOLE_H
 )
 
+# NOTE: This is required to remove spurious java files that qant swig generates that it should not, before attempting to compile jqant
+add_custom_target(jtoadlet_tadpole_swigfix
+	COMMAND ${CMAKE_COMMAND} -E remove ${PROJECT_BINARY_DIR}/source/java/us/toadlet/tadpole/RenderDevice.java
+	COMMAND ${CMAKE_COMMAND} -E remove ${PROJECT_BINARY_DIR}/source/java/us/toadlet/tadpole/AudioDevice.java
+	DEPENDS toadlet_tadpole
+	COMMENT "Removing spurious files from swig"
+)
+
 # Create the jar file with UseJava.cmake functions. See UseJava.cmake for details.
 if (${BUILD_TYPE} STREQUAL "DEBUG")
     set (CMAKE_JAVA_TARGET_OUTPUT_NAME jtoadlet_tadpole_d)
@@ -157,7 +165,7 @@ endif (${BUILD_TYPE} STREQUAL "DEBUG")
 set (CMAKE_JAR_CLASSES_PREFIX us/toadlet/tadpole)
 add_jar (jtoadlet_tadpole ${TADPOLE_SRC})
 get_property (JARFILE TARGET jtoadlet_tadpole PROPERTY JAR_FILE)
-add_dependencies(jtoadlet_tadpole toadlet_tadpole)
+add_dependencies(jtoadlet_tadpole toadlet_tadpole jtoadlet_tadpole_swigfix)
 install (FILES ${JARFILE} DESTINATION ${JAR_INSTALL_DIR} COMPONENT tadpole)
 
 # Generate headers
