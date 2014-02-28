@@ -68,7 +68,6 @@ else (WIN32)
 	set (LIBRARY_SEARCH_PATHS
 		/usr/lib 
 		/usr/local/lib
-		c:/users/siralanf/emscripten/lib
 	)
 endif (WIN32)
 
