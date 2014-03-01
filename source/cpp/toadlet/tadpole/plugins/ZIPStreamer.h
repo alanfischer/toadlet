@@ -34,7 +34,7 @@ namespace tadpole{
 
 class TOADLET_API ZIPStreamer:public Object,public ResourceStreamer{
 public:
-	TOADLET_OBJECT(ZIPStreamer);
+	TOADLET_IOBJECT(ZIPStreamer);
 
 	ZIPStreamer(){}
 

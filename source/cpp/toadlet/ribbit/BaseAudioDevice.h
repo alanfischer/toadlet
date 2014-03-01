@@ -33,7 +33,7 @@ namespace ribbit{
 
 class BaseAudioDevice:public Object,public AudioDevice{
 public:
-	TOADLET_OBJECT(BaseAudioDevice);
+	TOADLET_IOBJECT(BaseAudioDevice);
 
 	virtual ~BaseAudioDevice(){}
 

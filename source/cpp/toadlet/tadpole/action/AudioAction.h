@@ -36,7 +36,7 @@ namespace action{
 
 class TOADLET_API AudioAction:public Object,public Action{
 public:
-	TOADLET_OBJECT(AudioAction);
+	TOADLET_IOBJECT(AudioAction);
 
 	AudioAction(AudioComponent *audio=NULL);
 	virtual ~AudioAction(){}

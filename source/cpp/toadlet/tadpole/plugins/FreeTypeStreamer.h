@@ -44,7 +44,7 @@ namespace tadpole{
 
 class FreeTypeStreamer:public Object,public ResourceStreamer{
 public:
-	TOADLET_OBJECT(FreeTypeStreamer);
+	TOADLET_IOBJECT(FreeTypeStreamer);
 
 	FreeTypeStreamer(TextureManager *textureManager);
 	virtual ~FreeTypeStreamer();

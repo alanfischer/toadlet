@@ -39,7 +39,7 @@ namespace tadpole{
 
 class TOADLET_API OSXFontStreamer:public Object,public ResourceStreamer{
 public:
-	TOADLET_OBJECT(OSXFontStreamer);
+	TOADLET_IOBJECT(OSXFontStreamer);
 
 	OSXFontStreamer(TextureManager *textureManager);
 	virtual ~OSXFontStreamer(){}

@@ -46,7 +46,6 @@ public:
 	Font::ptr getDefaultFont();
 	
 	Resource::ptr manage(Resource *resource,const String &name=(char*)NULL);
-	void unmanage(Resource *resource);
 
 	Resource::ptr find(const String &name,ResourceData *data=NULL);
 

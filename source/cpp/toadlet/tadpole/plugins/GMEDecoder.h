@@ -35,7 +35,7 @@ namespace tadpole{
 
 class TOADLET_API GMEDecoder:public Object,public AudioStream{
 public:
-	TOADLET_OBJECT(GMEDecoder);
+	TOADLET_IOBJECT(GMEDecoder);
 
 	GMEDecoder();
 	virtual ~GMEDecoder();

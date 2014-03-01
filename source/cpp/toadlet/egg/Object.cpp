@@ -55,14 +55,21 @@ Object::~Object(){
 }
 
 int Object::retain(){
-	int count=Atomic::increment(mSharedCount,mSharedData);
-	return count;
+	return Atomic::increment(mSharedCount,mSharedData);
 }
 
 int Object::release(){
 	int count=Atomic::decrement(mSharedCount,mSharedData);
 	if(count<=0){
-		fullyReleased();
+		destroy();
+		delete this;
+	}
+	return count;
+}
+
+int Object::releaseNoDestroy(){
+	int count=Atomic::decrement(mSharedCount,mSharedData);
+	if(count<=0){
 		delete this;
 	}
 	return count;

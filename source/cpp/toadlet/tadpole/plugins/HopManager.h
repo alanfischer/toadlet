@@ -39,7 +39,7 @@ class HopComponent;
 
 class TOADLET_API HopManager:public Object,public PhysicsManager,public hop::Manager{
 public:
-	TOADLET_OBJECT(HopManager);
+	TOADLET_IOBJECT(HopManager);
 
 	HopManager(Scene *scene);
 	virtual ~HopManager(){}

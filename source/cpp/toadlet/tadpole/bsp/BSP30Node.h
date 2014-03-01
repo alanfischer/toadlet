@@ -42,7 +42,7 @@ namespace bsp{
 
 class TOADLET_API BSP30Node:public PartitionNode,public Renderable,public PhysicsTraceable{
 public:
-	TOADLET_NODE(BSP30Node);
+	TOADLET_INODE(BSP30Node);
 
 	BSP30Node(Scene *scene=NULL);
 

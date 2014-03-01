@@ -35,7 +35,7 @@ namespace tadpole{
 
 class TOADLET_API TorusMeshCreator:public Object,public ResourceCreator{
 public:
-	TOADLET_OBJECT(TorusMeshCreator);
+	TOADLET_IOBJECT(TorusMeshCreator);
 
 	TorusMeshCreator(Engine *engine){
 		mEngine=engine;

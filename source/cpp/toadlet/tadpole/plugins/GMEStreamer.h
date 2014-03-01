@@ -34,7 +34,7 @@ namespace tadpole{
 
 class TOADLET_API GMEStreamer:public Object,public AudioStreamer{
 public:
-	TOADLET_OBJECT(GMEStreamer);
+	TOADLET_IOBJECT(GMEStreamer);
 
 	GMEStreamer(AudioManager *audioManager):AudioStreamer(audioManager){}
 

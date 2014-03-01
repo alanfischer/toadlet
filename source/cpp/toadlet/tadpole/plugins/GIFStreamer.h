@@ -37,7 +37,7 @@ namespace tadpole{
 
 class TOADLET_API GIFStreamer:public Object,public ResourceStreamer{
 public:
-	TOADLET_OBJECT(GIFStreamer);
+	TOADLET_IOBJECT(GIFStreamer);
 
 	GIFStreamer(TextureManager *textureManager){mTextureManager=textureManager;}
 
