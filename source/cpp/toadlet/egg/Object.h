@@ -42,12 +42,11 @@ public:
 
 	virtual int retain();
 	virtual int release();
+	int releaseNoDestroy();
 
 	virtual void destroy(){}
 
 protected:
-	virtual void fullyReleased(){destroy();}
-
 	int32 mSharedCount;
 	void *mSharedData;
 };
@@ -63,9 +62,17 @@ public:
 }
 
 #define TOADLET_OBJECT(Class)\
+	TOADLET_INTERFACE(Class);
+
+#define TOADLET_IOBJECT(Class)\
 	TOADLET_INTERFACE(Class); \
 	virtual int retain(){return toadlet::egg::Object::retain();} \
 	virtual int release(){return toadlet::egg::Object::release();}
+
+#define TOADLET_JOBJECT(Class)\
+	TOADLET_INTERFACE(Class); \
+	virtual int retain(){return toadlet::egg::Object::retain();} \
+	virtual int release(){return toadlet::egg::Object::releaseNoDestroy();}
 
 #endif
 

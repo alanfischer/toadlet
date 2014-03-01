@@ -78,12 +78,14 @@ if (TOADLET_PLATFORM_EMSCRIPTEN)
 		"../../embind/toadlet/peeper/Bindings.cpp"
 		"../../embind/toadlet/tadpole/Bindings.cpp"
 	)
+	
 	set_target_properties (toadlet.js PROPERTIES COMPILE_FLAGS "--bind")
 	set_target_properties (toadlet.js PROPERTIES LINK_FLAGS "--bind")
 	target_link_libraries (toadlet.js "toadlet_egg_s" "toadlet_hop_s" "toadlet_peeper_s" "toadlet_peeper_gles2renderdevice_s" "toadlet_ribbit_s" "toadlet_ribbit_alaudiodevice_s" "toadlet_tadpole_s")
-	install (TARGETS toadlet.js DESTINATION ${LIB_INSTALL_DIR})
+	get_target_property (TOADLET_JS_OUTPUT toadlet.js LOCATION)
+	add_custom_command(TARGET toadlet.js POST_BUILD
+		COMMAND python ${CMAKE_CURRENT_SOURCE_DIR}/../../../cmake/Modules/JSModulify.py toadlet ${TOADLET_JS_OUTPUT} ${CMAKE_INSTALL_PREFIX}/${LIB_INSTALL_DIR}/toadlet.js)
 endif (TOADLET_PLATFORM_EMSCRIPTEN)
-
 
 # Install header files 
 if (NOT INSTALL_ANDROID_APP)

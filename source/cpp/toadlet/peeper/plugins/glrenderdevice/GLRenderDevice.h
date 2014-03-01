@@ -53,7 +53,7 @@ class GLVertexFormat;
 
 class TOADLET_API GLRenderDevice:public Object,public RenderDevice{
 public:
-	TOADLET_OBJECT(GLRenderDevice);
+	TOADLET_IOBJECT(GLRenderDevice);
 
 	int gl_version;
 

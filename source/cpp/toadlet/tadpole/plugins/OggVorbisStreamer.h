@@ -34,7 +34,7 @@ namespace tadpole{
 
 class TOADLET_API OggVorbisStreamer:public Object,public AudioStreamer{
 public:
-	TOADLET_OBJECT(OggVorbisStreamer);
+	TOADLET_IOBJECT(OggVorbisStreamer);
 
 	OggVorbisStreamer(AudioManager *audioManager):AudioStreamer(audioManager){}
 

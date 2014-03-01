@@ -27,8 +27,11 @@
 #define TOADLET_PEEPER_TYPES_H
 
 #include <toadlet/egg/Types.h>
-#include <toadlet/egg/mathfixed/Math.h>
-#include <toadlet/egg/math/Math.h>
+#if defined(TOADLET_FIXED_POINT)
+	#include <toadlet/egg/mathfixed/Math.h>
+#else
+	#include <toadlet/egg/math/Math.h>
+#endif
 #include <toadlet/egg/SharedPointer.h>
 #include <toadlet/egg/IntrusivePointer.h>
 #include <toadlet/egg/Object.h>

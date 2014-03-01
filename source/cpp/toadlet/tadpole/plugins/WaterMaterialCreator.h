@@ -36,7 +36,7 @@ namespace tadpole{
 
 class TOADLET_API WaterMaterialCreator:public Object,public ResourceCreator{
 public:
-	TOADLET_OBJECT(WaterMaterialCreator);
+	TOADLET_IOBJECT(WaterMaterialCreator);
 
 	WaterMaterialCreator(Engine *engine);
 	void destroy(){}

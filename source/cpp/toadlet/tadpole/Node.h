@@ -43,6 +43,16 @@
 	static toadlet::egg::Type<toadlet::tadpole::Component> *type(){static toadlet::egg::InstantiableType<Class,toadlet::tadpole::Component> thisType(Name);return &thisType;} \
 	virtual toadlet::egg::Type<toadlet::tadpole::Component> *getType() const{return type();}
 
+#define TOADLET_INODE(Class)\
+	TOADLET_IOBJECT(Class);\
+	static toadlet::egg::Type<toadlet::tadpole::Component> *type(){static toadlet::egg::InstantiableType<Class,toadlet::tadpole::Component> thisType(#Class);return &thisType;} \
+	virtual toadlet::egg::Type<toadlet::tadpole::Component> *getType() const{return type();}
+
+#define TOADLET_INODE_NAME(Class,Name)\
+	TOADLET_IOBJECT(Class);\
+	static toadlet::egg::Type<toadlet::tadpole::Component> *type(){static toadlet::egg::InstantiableType<Class,toadlet::tadpole::Component> thisType(Name);return &thisType;} \
+	virtual toadlet::egg::Type<toadlet::tadpole::Component> *getType() const{return type();}
+
 namespace toadlet{
 namespace tadpole{
 

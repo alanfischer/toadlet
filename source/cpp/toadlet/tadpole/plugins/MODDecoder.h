@@ -35,7 +35,7 @@ namespace tadpole{
 
 class TOADLET_API MODDecoder:public Object,public AudioStream{
 public:
-	TOADLET_OBJECT(MODDecoder);
+	TOADLET_IOBJECT(MODDecoder);
 
 	MODDecoder();
 	virtual ~MODDecoder();

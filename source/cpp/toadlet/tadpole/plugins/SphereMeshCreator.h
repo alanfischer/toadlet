@@ -35,7 +35,7 @@ namespace tadpole{
 
 class TOADLET_API SphereMeshCreator:public Object,public ResourceCreator{
 public:
-	TOADLET_OBJECT(SphereMeshCreator);
+	TOADLET_IOBJECT(SphereMeshCreator);
 
 	SphereMeshCreator(Engine *engine){
 		mEngine=engine;

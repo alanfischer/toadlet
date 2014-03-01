@@ -37,7 +37,7 @@ namespace io{
 // This does not properly support both reading & writing of the same stream
 class TOADLET_API MemoryStream:public Object,public Stream{
 public:
-	TOADLET_OBJECT(MemoryStream);
+	TOADLET_IOBJECT(MemoryStream);
 
 	MemoryStream(tbyte *data,int dataLength,int initialLength,bool ownsData);
 	MemoryStream(Stream *stream); // Read all data from stream

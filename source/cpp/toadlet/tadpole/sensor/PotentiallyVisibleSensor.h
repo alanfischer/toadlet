@@ -35,7 +35,7 @@ namespace sensor{
 
 class TOADLET_API PotentiallyVisibleSensor:public Object,public Sensor{
 public:
-	TOADLET_OBJECT(PotentiallyVisibleSensor);
+	TOADLET_IOBJECT(PotentiallyVisibleSensor);
 
 	PotentiallyVisibleSensor(Scene *scene,const Vector3 &point=Math::ZERO_VECTOR3);
 

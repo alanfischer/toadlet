@@ -188,7 +188,7 @@ protected:
 
 class FFmpegVideoHandler:public Object,public VideoHandler{
 public:
-	TOADLET_OBJECT(FFmpegVideoHandler);
+	TOADLET_IOBJECT(FFmpegVideoHandler);
 
 	FFmpegVideoHandler(Engine *engine);
 

@@ -35,7 +35,7 @@ namespace action{
 
 class TOADLET_API BaseAnimation:public Object,public Animation{
 public:
-	TOADLET_OBJECT(BaseAnimation);
+	TOADLET_IOBJECT(BaseAnimation);
 
 	BaseAnimation();
 	virtual ~BaseAnimation();

@@ -9,7 +9,7 @@ using namespace toadlet::egg;
 using namespace toadlet::egg::math;
 
 EMSCRIPTEN_BINDINGS(egg) {
-    using namespace emscripten::internal;
+	using namespace emscripten::internal;
 
 	_embind_register_std_wstring(TypeID<String>::get(), sizeof(stringchar), "String");
 

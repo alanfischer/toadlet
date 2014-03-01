@@ -35,7 +35,7 @@ namespace tadpole{
 
 class TOADLET_API NormalizationTextureCreator:public Object,public ResourceCreator{
 public:
-	TOADLET_OBJECT(NormalizationTextureCreator);
+	TOADLET_IOBJECT(NormalizationTextureCreator);
 
 	NormalizationTextureCreator(Engine *engine){
 		mEngine=engine;

@@ -37,7 +37,7 @@ namespace io{
 
 class TOADLET_API FileStream:public Object,public Stream{
 public:
-	TOADLET_OBJECT(FileStream);
+	TOADLET_IOBJECT(FileStream);
 
 	enum Open{
 		Open_BIT_UNKNOWN=	0,

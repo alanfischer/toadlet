@@ -302,12 +302,12 @@ bool RenderPass::linkVariables(){
 bool RenderPass::linkTextures(){
 	int i=0;
 	for(i=0;i<mUnlinkedTextures.size();++i){
-		TextureData &texdata=mUnlinkedTextures[i];
-		String name=texdata.locationName;
-		String samplerName=texdata.samplerLocationName;
+		const TextureData &texdata=mUnlinkedTextures[i];
+		const String &name=texdata.locationName;
+		const String &samplerName=texdata.samplerLocationName;
 		Texture *texture=texdata.texture;
-		SamplerState samplerState=texdata.samplerState;
-		TextureState textureState=texdata.textureState;
+		const SamplerState &samplerState=texdata.samplerState;
+		const TextureState &textureState=texdata.textureState;
 
 		Shader::ShaderType type=(Shader::ShaderType)0;
 		int index=-1;

@@ -33,7 +33,7 @@ namespace pad{
 
 class TOADLET_API BaseApplication:public Object,public Application{
 public:
-	TOADLET_OBJECT(BaseApplication);
+	TOADLET_IOBJECT(BaseApplication);
 
 	static void mapKeyNames(Map<int,String> &keyToName,Map<String,int> &nameToKey);
 

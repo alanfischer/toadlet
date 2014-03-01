@@ -34,7 +34,7 @@ namespace sensor{
 
 class TOADLET_API NameSensor:public Object,public Sensor{
 public:
-	TOADLET_OBJECT(NameSensor);
+	TOADLET_IOBJECT(NameSensor);
 
 	NameSensor(Scene *scene,const String &name=(char*)NULL);
 

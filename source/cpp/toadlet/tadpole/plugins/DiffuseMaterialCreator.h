@@ -35,7 +35,7 @@ namespace tadpole{
 
 class TOADLET_API DiffuseMaterialCreator:public Object,public ResourceCreator{
 public:
-	TOADLET_OBJECT(DiffuseMaterialCreator);
+	TOADLET_IOBJECT(DiffuseMaterialCreator);
 
 	DiffuseMaterialCreator(Engine *engine);
 

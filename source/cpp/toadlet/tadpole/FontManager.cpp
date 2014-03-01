@@ -38,7 +38,7 @@ FontManager::FontManager(Engine *engine):ResourceManager(engine){
 
 Resource::ptr FontManager::manage(Resource *resource,const String &name){
 	if(name!=(char*)NULL){
-		ResourceManager::manage(resource,name+String(":")+((Font*)resource)->getPointSize());
+		ResourceManager::manage(resource,name+":"+((Font*)resource)->getPointSize());
 	}
 	else{
 		ResourceManager::manage(resource);
@@ -75,10 +75,6 @@ Font::ptr FontManager::getDefaultFont(){
 	#endif
 
 	return font;
-}
-
-void FontManager::unmanage(Resource *resource){
-	return ResourceManager::unmanage(resource);
 }
 
 Resource::ptr FontManager::find(const String &name,ResourceData *data){

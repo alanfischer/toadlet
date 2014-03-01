@@ -47,7 +47,7 @@ class D3D9Texture;
 
 class D3D9RenderDevice:public Object,public RenderDevice{
 public:
-	TOADLET_OBJECT(D3D9RenderDevice);
+	TOADLET_IOBJECT(D3D9RenderDevice);
 
 	D3D9RenderDevice();
 
