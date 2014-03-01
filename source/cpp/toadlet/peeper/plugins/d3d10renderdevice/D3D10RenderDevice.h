@@ -47,7 +47,7 @@ class D3D10VertexFormat;
 
 class D3D10RenderDevice:public Object,public RenderDevice{
 public:
-	TOADLET_OBJECT(D3D10RenderDevice);
+	TOADLET_IOBJECT(D3D10RenderDevice);
 
 	D3D10RenderDevice();
 

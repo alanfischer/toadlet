@@ -37,7 +37,7 @@ namespace tadpole{
 
 class TOADLET_API OSXTextureStreamer:public Object,public ResourceStreamer{
 public:
-	TOADLET_OBJECT(OSXTextureStreamer);
+	TOADLET_IOBJECT(OSXTextureStreamer);
 
 	OSXTextureStreamer(TextureManager *textureManager);
 	virtual ~OSXTextureStreamer(){}

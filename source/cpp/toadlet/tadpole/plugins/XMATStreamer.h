@@ -37,7 +37,7 @@ namespace tadpole{
 
 class TOADLET_API XMATStreamer:public Object,public ResourceStreamer{
 public:
-	TOADLET_OBJECT(XMATStreamer);
+	TOADLET_IOBJECT(XMATStreamer);
 
 	XMATStreamer(Engine *engine);
 

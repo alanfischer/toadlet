@@ -35,7 +35,7 @@ namespace action{
 
 class TOADLET_API CompositeAction:public Object,public Action,public ActionListener{
 public:
-	TOADLET_OBJECT(CompositeAction);
+	TOADLET_IOBJECT(CompositeAction);
 
 	enum StopStyle{
 		StopStyle_ON_FIRST,

@@ -38,7 +38,7 @@ namespace tadpole{
 /// @brief  A lighter weight font handling class for the Win32 platform
 class TOADLET_API Win32FontStreamer:public Object,public ResourceStreamer{
 public:
-	TOADLET_OBJECT(Win32FontStreamer);
+	TOADLET_IOBJECT(Win32FontStreamer);
 
 	Win32FontStreamer(TextureManager *textureManager);
 	virtual ~Win32FontStreamer();

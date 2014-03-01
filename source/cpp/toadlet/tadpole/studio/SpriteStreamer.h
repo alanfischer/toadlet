@@ -36,7 +36,7 @@ namespace studio{
 
 class TOADLET_API SpriteStreamer:public Object,public ResourceStreamer{
 public:
-	TOADLET_OBJECT(SpriteStreamer);
+	TOADLET_IOBJECT(SpriteStreamer);
 
 	SpriteStreamer(Engine *engine);
 	virtual ~SpriteStreamer();

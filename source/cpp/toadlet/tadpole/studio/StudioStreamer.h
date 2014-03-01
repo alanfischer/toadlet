@@ -36,7 +36,7 @@ namespace studio{
 
 class TOADLET_API StudioStreamer:public Object,public ResourceStreamer{
 public:
-	TOADLET_OBJECT(StudioStreamer);
+	TOADLET_IOBJECT(StudioStreamer);
 
 	StudioStreamer(Engine *engine);
 	virtual ~StudioStreamer();

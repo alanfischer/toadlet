@@ -20,9 +20,9 @@ RenderTarget *new_EGLWindowRenderTarget2(val canvas){
 }
 
 EMSCRIPTEN_BINDINGS(peeper) {
-    using namespace emscripten::internal;
+	using namespace emscripten::internal;
 
-    value_array<Viewport>("Viewport")
+	value_array<Viewport>("Viewport")
 		.element(&Viewport::x)
 		.element(&Viewport::y)
 		.element(&Viewport::width)

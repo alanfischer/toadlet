@@ -35,7 +35,7 @@ namespace tadpole{
 
 class TOADLET_API DDSStreamer:public Object,public ResourceStreamer{
 public:
-	TOADLET_OBJECT(DDSStreamer);
+	TOADLET_IOBJECT(DDSStreamer);
 
 	DDSStreamer(TextureManager *textureManager){mTextureManager=textureManager;}
 

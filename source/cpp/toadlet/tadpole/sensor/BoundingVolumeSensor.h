@@ -35,7 +35,7 @@ namespace sensor{
 
 class TOADLET_API BoundingVolumeSensor:public Object,public Sensor{
 public:
-	TOADLET_OBJECT(BoundingVolumeSensor);
+	TOADLET_IOBJECT(BoundingVolumeSensor);
 
 	BoundingVolumeSensor(Scene *scene);
 

@@ -34,7 +34,7 @@ namespace tadpole{
 
 class TOADLET_API AABoxMeshCreator:public Object,public ResourceCreator{
 public:
-	TOADLET_OBJECT(AABoxMeshCreator);
+	TOADLET_IOBJECT(AABoxMeshCreator);
 
 	AABoxMeshCreator(Engine *engine){
 		mEngine=engine;

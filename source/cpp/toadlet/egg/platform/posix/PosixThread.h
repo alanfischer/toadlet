@@ -35,7 +35,7 @@ namespace egg{
 
 class PosixThread:public Object,public Runner{
 public:
-	TOADLET_OBJECT(PosixThread);
+	TOADLET_IOBJECT(PosixThread);
 
 	PosixThread();
 	PosixThread(Runnable *r);

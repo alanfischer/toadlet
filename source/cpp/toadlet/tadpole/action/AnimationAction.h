@@ -38,7 +38,7 @@ namespace action{
 
 class TOADLET_API AnimationAction:public Object,public Action,public AnimationListener{
 public:
-	TOADLET_OBJECT(AnimationAction);
+	TOADLET_IOBJECT(AnimationAction);
 
 	enum Cycling{
 		Cycling_NONE,

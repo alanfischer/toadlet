@@ -231,7 +231,10 @@ void Engine::installHandlers(){
 	#endif
 
 	// Texture streamers
-	mTextureManager->setStreamer(new DDSStreamer(mTextureManager),"dds");
+	#if !defined(TOADLET_PLATFORM_EMSCRIPTEN)
+		mTextureManager->setStreamer(new DDSStreamer(mTextureManager),"dds");
+		mTextureManager->setStreamer(new TGAStreamer(mTextureManager),"tga");
+	#endif
 	#if defined(TOADLET_HAS_GDIPLUS)
 		mTextureManager->setDefaultStreamer(new Win32TextureStreamer(mTextureManager));
 	#elif defined(TOADLET_PLATFORM_OSX)
@@ -253,9 +256,8 @@ void Engine::installHandlers(){
 	#if defined(TOADLET_HAS_GIF)
 		mTextureManager->setStreamer(new GIFStreamer(mTextureManager),"gif");
 	#endif
-	mTextureManager->setStreamer(new TGAStreamer(mTextureManager),"tga");
 	#if defined(TOADLET_HAS_FFMPEG)
-		mTextureManager->setVideoHandler(FFmpegVideoHandler::ptr(new FFmpegVideoHandler(this)));
+		mTextureManager->setVideoHandler(new FFmpegVideoHandler(this));
 	#endif
 
 	// Font streamers, try for freetype first, since it currently looks best.  This can be changed back once the others look as nice

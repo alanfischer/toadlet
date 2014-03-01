@@ -34,7 +34,7 @@ namespace tadpole{
 
 class TOADLET_API WaveStreamer:public Object,public AudioStreamer{
 public:
-	TOADLET_OBJECT(WaveStreamer);
+	TOADLET_IOBJECT(WaveStreamer);
 
 	WaveStreamer(AudioManager *audioManager):AudioStreamer(audioManager){}
 

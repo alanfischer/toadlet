@@ -34,7 +34,7 @@ namespace egg{
 
 class TOADLET_API Win32Thread:public Object,public Runner{
 public:
-	TOADLET_OBJECT(Win32Thread);
+	TOADLET_IOBJECT(Win32Thread);
 
 	Win32Thread();
 	Win32Thread(Runnable *r);

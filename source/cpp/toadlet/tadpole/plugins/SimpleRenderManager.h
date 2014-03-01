@@ -34,7 +34,7 @@ namespace tadpole{
 
 class TOADLET_API SimpleRenderManager:public Object,public RenderManager{
 public:
-	TOADLET_OBJECT(SimpleRenderManager);
+	TOADLET_IOBJECT(SimpleRenderManager);
 
 	SimpleRenderManager(Scene *scene);
 	virtual ~SimpleRenderManager();
