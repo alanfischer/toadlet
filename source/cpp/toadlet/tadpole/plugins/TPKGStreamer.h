@@ -34,7 +34,7 @@ namespace tadpole{
 
 class TOADLET_API TPKGStreamer:public Object,public ResourceStreamer{
 public:
-	TOADLET_OBJECT(TPKGStreamer);
+	TOADLET_IOBJECT(TPKGStreamer);
 
 	TPKGStreamer(){}
 

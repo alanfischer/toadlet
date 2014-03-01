@@ -34,7 +34,7 @@ namespace tadpole{
 
 class TOADLET_API SkyBoxMeshCreator:public Object,public ResourceCreator{
 public:
-	TOADLET_OBJECT(SkyBoxMeshCreator);
+	TOADLET_IOBJECT(SkyBoxMeshCreator);
 
 	SkyBoxMeshCreator(Engine *engine){
 		mEngine=engine;

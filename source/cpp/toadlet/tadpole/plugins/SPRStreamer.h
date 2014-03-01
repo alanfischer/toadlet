@@ -35,7 +35,7 @@ namespace tadpole{
 
 class TOADLET_API SPRStreamer:public Object,public ResourceStreamer{
 public:
-	TOADLET_OBJECT(SPRStreamer);
+	TOADLET_IOBJECT(SPRStreamer);
 
 	SPRStreamer(Engine *engine):Object(),mStreamer(engine){}
 

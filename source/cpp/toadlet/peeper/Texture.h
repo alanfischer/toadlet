@@ -28,7 +28,6 @@
 
 #include <toadlet/egg/Resource.h>
 #include <toadlet/egg/String.h>
-#include <toadlet/egg/mathfixed/Math.h>
 #include <toadlet/peeper/Types.h>
 #include <toadlet/peeper/PixelBuffer.h>
 #include <toadlet/peeper/TextureFormat.h>

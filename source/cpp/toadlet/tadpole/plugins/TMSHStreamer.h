@@ -39,7 +39,7 @@ namespace tadpole{
 
 class TOADLET_API TMSHStreamer:public Object,public ResourceStreamer{
 public:
-	TOADLET_OBJECT(TMSHStreamer);
+	TOADLET_IOBJECT(TMSHStreamer);
 
 	const static int VERSION=0x10001;
 	const static int TMSH=1414353736; // "TMSH"

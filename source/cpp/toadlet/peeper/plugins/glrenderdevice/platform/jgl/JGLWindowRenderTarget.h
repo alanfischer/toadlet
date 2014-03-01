@@ -34,8 +34,11 @@ namespace peeper{
 
 class TOADLET_API JGLWindowRenderTarget:public GLRenderTarget{
 public:
+	TOADLET_JOBJECT(JGLWindowRenderTarget);
+
 	JGLWindowRenderTarget(JNIEnv *env,jobject obj);
 	virtual ~JGLWindowRenderTarget();
+
 	void destroy();
 
 	virtual RenderTarget *getRootRenderTarget(){return (GLRenderTarget*)this;}

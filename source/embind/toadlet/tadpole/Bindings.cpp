@@ -13,7 +13,7 @@ using namespace toadlet::egg;
 using namespace toadlet::tadpole;
 
 EMSCRIPTEN_BINDINGS(tadpole) {
-    using namespace emscripten::internal;
+	using namespace emscripten::internal;
 
 	class_<Mesh>("Mesh")
 		.smart_ptr<Mesh::ptr>()
@@ -53,15 +53,15 @@ EMSCRIPTEN_BINDINGS(tadpole) {
 
 	class_<Transform>("Transform")
 		.smart_ptr_constructor(&make_ptr<Transform>)
-        .function("getTranslate",&Transform::getTranslate)
-        .function("setTranslate",select_overload<void(const Vector3&)>(&Transform::setTranslate))
-        .function("getScale",&Transform::getScale)
-        .function("setScale",select_overload<void(const Vector3&)>(&Transform::setScale))
-        .function("getRotate",&Transform::getRotate)
-        .function("setRotate",select_overload<void(const Quaternion&)>(&Transform::setRotate))
+		.function("getTranslate",&Transform::getTranslate)
+		.function("setTranslate",select_overload<void(const Vector3&)>(&Transform::setTranslate))
+		.function("getScale",&Transform::getScale)
+		.function("setScale",select_overload<void(const Vector3&)>(&Transform::setScale))
+		.function("getRotate",&Transform::getRotate)
+		.function("setRotate",select_overload<void(const Quaternion&)>(&Transform::setRotate))
 	;
 
-    class_<Camera>("Camera")
+	class_<Camera>("Camera")
 		.smart_ptr_constructor(&make_ptr<Camera,Engine*>)
 		.function("setClearColor",&Camera::setClearColor)
 
@@ -71,19 +71,19 @@ EMSCRIPTEN_BINDINGS(tadpole) {
 		.function("render",&Camera::render, allow_raw_pointers())
 	;
 
-    class_<Component>("Component")
-        .smart_ptr<Component::ptr>()
-        .function("destroy",&Component::destroy)
+	class_<Component>("Component")
+		.smart_ptr<Component::ptr>()
+		.function("destroy",&Component::destroy)
 		.function("getName",&Component::getName)
 	;
 
-    class_<CameraComponent,base<Component>>("CameraComponent")
+	class_<CameraComponent,base<Component>>("CameraComponent")
 		.smart_ptr_constructor(&make_ptr<CameraComponent,Camera*>)
 		.function("setLookAt",&CameraComponent::setLookAt)
 		.function("getCamera",&CameraComponent::getCamera, allow_raw_pointers())
 	;
 
-    class_<MeshComponent,base<Component>>("MeshComponent")
+	class_<MeshComponent,base<Component>>("MeshComponent")
 		.smart_ptr_constructor(&make_ptr<MeshComponent,Engine*>)
 		.function("setMeshWithName",select_overload<void(const String&)>(&MeshComponent::setMesh))
 		.function("setMeshWithMesh",select_overload<void(Mesh*)>(&MeshComponent::setMesh), allow_raw_pointers())
@@ -93,14 +93,14 @@ EMSCRIPTEN_BINDINGS(tadpole) {
 		.function("setName",&BaseComponent::setName)
 	;
 
-    class_<Node,base<BaseComponent>>("Node")
+	class_<Node,base<BaseComponent>>("Node")
 		.smart_ptr_constructor(&make_ptr<Node,Scene*>)
-        .function("destroy",&Node::destroy)
+		.function("destroy",&Node::destroy)
 
 		.function("getRoot",&Node::getRoot, allow_raw_pointers())
 
-        .function("attach",&Node::attach, allow_raw_pointers())
-        .function("remove",&Node::remove, allow_raw_pointers())
+		.function("attach",&Node::attach, allow_raw_pointers())
+		.function("remove",&Node::remove, allow_raw_pointers())
 
 		.function("setScope",&Node::setScope)
 		.function("getScope",&Node::getScope)
@@ -110,7 +110,7 @@ EMSCRIPTEN_BINDINGS(tadpole) {
 		.function("getWorldTransform",&Node::getWorldTransform, allow_raw_pointers())
 
 		.function("getNodes", &Node::getNodes)
-    ;
+	;
 
 	class_<PartitionNode,base<Node>>("PartitionNode")
 		.smart_ptr<PartitionNode::ptr>()

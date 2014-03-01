@@ -36,7 +36,7 @@ namespace tadpole{
 
 class TOADLET_API XMSHStreamer:public Object,public ResourceStreamer{
 public:
-	TOADLET_OBJECT(XMSHStreamer);
+	TOADLET_IOBJECT(XMSHStreamer);
 
 	XMSHStreamer(Engine *engine);
 

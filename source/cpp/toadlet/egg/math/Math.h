@@ -39,6 +39,7 @@
 #include <toadlet/egg/math/Sphere.h>
 #include <toadlet/egg/math/AABox.h>
 #include <toadlet/egg/math/Capsule.h>
+#include <toadlet/egg/math/ConvexSolid.h>
 
 namespace toadlet{
 namespace egg{

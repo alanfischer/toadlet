@@ -25,7 +25,7 @@ SOSLoggerListener::SOSLoggerListener(String serverAddress){
 	mCondition=WaitCondition::ptr(new WaitCondition());
 
 	mStop=false;
-	mThread=Thread::ptr(new Thread(this));
+	mThread=new Thread(this);
 	mThread->start();
 	
 	mTermination = 0;

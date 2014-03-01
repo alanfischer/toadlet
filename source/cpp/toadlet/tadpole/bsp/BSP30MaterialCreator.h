@@ -35,7 +35,7 @@ namespace tadpole{
 
 class TOADLET_API BSP30MaterialCreator:public Object,public ResourceCreator{
 public:
-	TOADLET_OBJECT(BSP30MaterialCreator);
+	TOADLET_IOBJECT(BSP30MaterialCreator);
 
 	BSP30MaterialCreator(Engine *engine);
 	void destroy(){}

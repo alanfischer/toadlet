@@ -35,7 +35,7 @@ namespace sensor{
 
 class TOADLET_API InterfaceSensor:public Object,public Sensor{
 public:
-	TOADLET_OBJECT(InterfaceSensor);
+	TOADLET_IOBJECT(InterfaceSensor);
 
 	InterfaceSensor(Scene *scene);
 

@@ -34,7 +34,7 @@ namespace sensor{
 
 class TOADLET_API ActiveSensor:public Object,public Sensor{
 public:
-	TOADLET_OBJECT(ActiveSensor);
+	TOADLET_IOBJECT(ActiveSensor);
 
 	ActiveSensor(Scene *scene,bool active=true);
 

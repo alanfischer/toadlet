@@ -33,7 +33,7 @@ namespace flick{
 
 class BaseInputDevice:public Object,public InputDevice{
 public:
-	TOADLET_OBJECT(BaseInputDevice);
+	TOADLET_IOBJECT(BaseInputDevice);
 
 	virtual ~BaseInputDevice(){}
 

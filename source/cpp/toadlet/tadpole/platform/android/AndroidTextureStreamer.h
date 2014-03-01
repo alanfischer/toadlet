@@ -35,7 +35,7 @@ namespace tadpole{
 
 class TOADLET_API AndroidTextureStreamer:public Object,public ResourceStreamer{
 public:
-	TOADLET_OBJECT(AndroidTextureStreamer);
+	TOADLET_IOBJECT(AndroidTextureStreamer);
 
 	AndroidTextureStreamer(TextureManager *textureManager,JNIEnv *env);
 	virtual ~AndroidTextureStreamer();

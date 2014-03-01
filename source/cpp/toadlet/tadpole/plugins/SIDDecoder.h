@@ -36,7 +36,7 @@ class SIDAttributes;
 
 class TOADLET_API SIDDecoder:public Object,public AudioStream{
 public:
-	TOADLET_OBJECT(SIDDecoder);
+	TOADLET_IOBJECT(SIDDecoder);
 
 	SIDDecoder();
 	virtual ~SIDDecoder();

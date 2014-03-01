@@ -38,7 +38,7 @@ namespace io{
 
 class TOADLET_API DataStream:public Object,public Stream{
 public:
-	TOADLET_OBJECT(DataStream);
+	TOADLET_IOBJECT(DataStream);
 
 	DataStream(Stream *stream);
 	virtual ~DataStream();

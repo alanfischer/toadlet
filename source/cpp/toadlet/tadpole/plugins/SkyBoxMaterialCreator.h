@@ -35,7 +35,7 @@ namespace tadpole{
 
 class TOADLET_API SkyBoxMaterialCreator:public Object,public ResourceCreator{
 public:
-	TOADLET_OBJECT(SkyBoxMaterialCreator);
+	TOADLET_IOBJECT(SkyBoxMaterialCreator);
 
 	SkyBoxMaterialCreator(Engine *engine);
 

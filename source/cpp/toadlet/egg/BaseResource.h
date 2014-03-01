@@ -67,7 +67,7 @@ protected:
 
 // Help to work around an issue with c++ multiple inheritance issues
 #define TOADLET_RESOURCE(Class,BaseClass)\
-	TOADLET_OBJECT(Class); \
+	TOADLET_IOBJECT(Class); \
 	toadlet::egg::Resource *resourceThis(){return (BaseClass*)this;} \
 	void setDestroyedListener(toadlet::egg::ResourceDestroyedListener *listener){toadlet::egg::BaseResource::setDestroyedListener(listener);} \
 	void setName(const toadlet::egg::String &name){toadlet::egg::BaseResource::setName(name);}\

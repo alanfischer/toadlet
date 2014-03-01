@@ -35,7 +35,7 @@ namespace action{
 
 class TOADLET_API InstantAction:public Object,public Action{
 public:
-	TOADLET_OBJECT(InstantAction);
+	TOADLET_IOBJECT(InstantAction);
 
 	InstantAction();
 	virtual ~InstantAction(){}

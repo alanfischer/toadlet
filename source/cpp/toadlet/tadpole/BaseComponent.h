@@ -30,12 +30,12 @@
 #include <toadlet/tadpole/Component.h>
 
 #define TOADLET_COMPONENT(Class)\
-	TOADLET_OBJECT(Class);\
+	TOADLET_IOBJECT(Class);\
 	static toadlet::egg::Type<toadlet::tadpole::Component> *type(){static toadlet::egg::NonInstantiableType<Class,toadlet::tadpole::Component> thisType(#Class);return &thisType;} \
 	virtual toadlet::egg::Type<toadlet::tadpole::Component> *getType() const{return type();}
 
 #define TOADLET_COMPONENT_NAME(Class,Name)\
-	TOADLET_OBJECT(Class);\
+	TOADLET_IOBJECT(Class);\
 	static toadlet::egg::Type<toadlet::tadpole::Component> *type(){static toadlet::egg::NonInstantiableType<Class,toadlet::tadpole::Component> thisType(Name);return &thisType;} \
 	virtual toadlet::egg::Type<toadlet::tadpole::Component> *getType() const{return type();}
 

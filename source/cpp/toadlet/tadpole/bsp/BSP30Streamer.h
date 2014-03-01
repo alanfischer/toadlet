@@ -36,7 +36,7 @@ namespace bsp{
 
 class BSP30Streamer:public Object,public ResourceStreamer{
 public:
-	TOADLET_OBJECT(BSP30Streamer);
+	TOADLET_IOBJECT(BSP30Streamer);
 
 	BSP30Streamer(Engine *engine);
 	virtual ~BSP30Streamer();

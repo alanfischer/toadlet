@@ -35,7 +35,7 @@ namespace tadpole{
 
 class TOADLET_API TGAStreamer:public Object,public ResourceStreamer{
 public:
-	TOADLET_OBJECT(TGAStreamer);
+	TOADLET_IOBJECT(TGAStreamer);
 
 	TGAStreamer(TextureManager *textureManager){mTextureManager=textureManager;}
 

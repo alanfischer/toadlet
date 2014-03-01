@@ -35,7 +35,7 @@ namespace tadpole{
 
 class TOADLET_API BMPStreamer:public Object,public ResourceStreamer{
 public:
-	TOADLET_OBJECT(BMPStreamer);
+	TOADLET_IOBJECT(BMPStreamer);
 
 	BMPStreamer(TextureManager *textureManager){mTextureManager=textureManager;}
 
