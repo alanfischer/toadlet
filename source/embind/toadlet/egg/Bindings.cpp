@@ -3,6 +3,7 @@
 #include <toadlet/egg/Log.h>
 #include <toadlet/egg/Error.h>
 #include <toadlet/egg/math/Math.h>
+#include <toadlet/egg/io/Archive.h>
 
 using namespace emscripten;
 using namespace toadlet::egg;
@@ -54,5 +55,30 @@ EMSCRIPTEN_BINDINGS(egg) {
 		.class_function("invalidParameters", select_overload<void(const String&)>(&Error::invalidParameters))
 		.class_function("nullPointer", select_overload<void(const String&)>(&Error::nullPointer))
 		.class_function("unimplemented", select_overload<void(const String&)>(&Error::unimplemented))
+	;
+
+	class_<Stream>("Stream")
+		.smart_ptr<Stream::ptr>()
+
+		.function("close", &Stream::close)
+		.function("closed", &Stream::closed)
+
+		.function("readable", &Stream::readable)
+		.function("read", &Stream::read, allow_raw_pointers())
+
+		.function("writeable", &Stream::writeable)
+		.function("write", &Stream::write, allow_raw_pointers())
+
+		.function("reset", &Stream::reset)
+		.function("length", &Stream::length)
+		.function("position", &Stream::position)
+		.function("seek", &Stream::seek)
+		.function("flush", &Stream::flush)
+	;
+
+	class_<Archive>("Archive")
+		.smart_ptr<Archive::ptr>()
+
+		.function("openStream", &Archive::openStream)
 	;
 }
