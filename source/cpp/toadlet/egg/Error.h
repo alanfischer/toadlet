@@ -30,22 +30,28 @@
 
 #if defined(TOADLET_EXCEPTIONS)
 	#define TOADLET_MAKE_ERROR_FUNCTION(name,type) \
-		static void name(const String &text){name((char*)NULL,true,text);} \
-		static void name(const String &categoryName,const String &text){name(categoryName,true,text);} \
-		static void name(const String &categoryName,bool report,const String &text){ \
+		static toadlet::egg::Exception name(const String &text){return name((char*)NULL,true,text,Throw_YES);} \
+		static toadlet::egg::Exception name(const String &text,Throw throwit){return name((char*)NULL,true,text,throwit);} \
+		static toadlet::egg::Exception name(const String &categoryName,const String &text,Throw throwit=Throw_YES){return name(categoryName,true,text,throwit);} \
+		static toadlet::egg::Exception name(const String &categoryName,bool report,const String &text,Throw throwit=Throw_YES){ \
 			if(report){errorLog(categoryName,text);} \
 			toadlet::egg::Exception ex(type,text); \
 			Error::getInstance()->setException(ex); \
-			throw ex;\
+			if(throwit==Throw_YES){ \
+				throw ex; \
+			} \
+			return ex; \
 		}
 #else
 	#define TOADLET_MAKE_ERROR_FUNCTION(name,type) \
-		static void name(const String &text){name((char*)NULL,true,text);} \
-		static void name(const String &categoryName,const String &text){name(categoryName,true,text);} \
-		static void name(const String &categoryName,bool report,const String &text){ \
+		static toadlet::egg::Exception name(const String &text){return name((char*)NULL,true,text,Throw_YES);} \
+		static toadlet::egg::Exception name(const String &text,Throw throwit){return name((char*)NULL,true,text,throwit);} \
+		static toadlet::egg::Exception name(const String &categoryName,const String &text,Throw throwit=Throw_YES){return name(categoryName,true,text,throwit);} \
+		static toadlet::egg::Exception name(const String &categoryName,bool report,const String &text,Throw throwit=Throw_YES){ \
 			if(report){errorLog(categoryName,text);} \
 			toadlet::egg::Exception ex(type,text); \
 			Error::getInstance()->setException(ex); \
+			return ex; \
 		}
 #endif
 
@@ -54,6 +60,11 @@ namespace egg{
 
 class TOADLET_API Error{
 public:
+	enum Throw{
+		Throw_NO,
+		Throw_YES
+	};
+
 	static Errorer *getInstance();
 	static void destroy();
     
@@ -64,6 +75,7 @@ public:
 	TOADLET_MAKE_ERROR_FUNCTION(unimplemented,Errorer::Type_UNIMPLEMENTED)
 	TOADLET_MAKE_ERROR_FUNCTION(overflow,Errorer::Type_OVERFLOW)
 	TOADLET_MAKE_ERROR_FUNCTION(insufficientMemory,Errorer::Type_INSUFFICIENT_MEMORY)
+	TOADLET_MAKE_ERROR_FUNCTION(fileNotFound,Errorer::Type_FILE_NOT_FOUND)
 	TOADLET_MAKE_ERROR_FUNCTION(libraryNotFound,Errorer::Type_LIBRARY_NOT_FOUND)
 	TOADLET_MAKE_ERROR_FUNCTION(symbolNotFound,Errorer::Type_SYMBOL_NOT_FOUND)
 	TOADLET_MAKE_ERROR_FUNCTION(socket,Errorer::Type_SOCKET)

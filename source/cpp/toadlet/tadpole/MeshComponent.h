@@ -37,7 +37,7 @@
 namespace toadlet{
 namespace tadpole{
 
-class TOADLET_API MeshComponent:public BaseComponent,public TransformListener,public Spacial,public Visible,public Attachable{
+class TOADLET_API MeshComponent:public BaseComponent,public ResourceRequest,public TransformListener,public Spacial,public Visible,public Attachable{
 public:
 	TOADLET_COMPONENT(MeshComponent);
 
@@ -93,6 +93,9 @@ public:
 	void frameUpdate(int dt,int scope);
 
 	bool getActive() const{return mSkeleton!=NULL;}
+
+	void resourceReady(Resource *resource){setMesh((Mesh*)resource);}
+	void resourceException(const Exception &ex){}
 
 	// Spacial
 	void setTransform(Transform::ptr transform);

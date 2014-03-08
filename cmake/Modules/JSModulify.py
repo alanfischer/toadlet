@@ -6,4 +6,4 @@ with open(sys.argv[3], 'w') as outfile:
 	with open(sys.argv[2]) as infile:
 		for line in infile:
 			outfile.write(line)
-	outfile.write('return Module;})();')
+	outfile.write('\nreturn Module;})();')

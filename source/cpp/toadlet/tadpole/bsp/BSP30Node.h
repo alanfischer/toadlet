@@ -34,13 +34,14 @@
 #include <toadlet/tadpole/PhysicsTraceable.h>
 #include <toadlet/tadpole/MeshComponent.h>
 #include <toadlet/tadpole/PartitionNode.h>
+#include <toadlet/tadpole/bsp/BSP30Streamer.h>
 #include <toadlet/tadpole/bsp/BSP30Map.h>
 
 namespace toadlet{
 namespace tadpole{
 namespace bsp{
 
-class TOADLET_API BSP30Node:public PartitionNode,public Renderable,public PhysicsTraceable{
+class TOADLET_API BSP30Node:public PartitionNode,public StreamRequest,public Renderable,public PhysicsTraceable{
 public:
 	TOADLET_INODE(BSP30Node);
 
@@ -71,6 +72,13 @@ public:
 	bool sensePotentiallyVisible(SensorResultsListener *listener,const Vector3 &point);
 	bool findAmbientForBound(Vector4 &r,Bound *bound);
 
+	void streamReady(Stream *stream){
+		BSP30Map::ptr map=shared_static_cast<BSP30Map>(mStreamer->load(stream,NULL,NULL));
+		map->setName(mMapName);
+		setMap(map);
+	}
+	void streamException(const Exception &ex){}
+
 	// Renderable items
 	Material *getRenderMaterial() const{return NULL;}
 	Transform *getRenderTransform() const{return mWorldTransform;}
@@ -85,6 +93,8 @@ protected:
 	void addLeafToVisible(bleaf *leaf,const Vector3 &cameraPosition);
 	void findBoundLeafs(Collection<int> &leafs,Node *node);
 
+	BSP30Streamer::ptr mStreamer;
+	String mMapName;
 	BSP30Map::ptr mMap;
 	String mSkyName;
 	MeshComponent::ptr mSkyMesh;

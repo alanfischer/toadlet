@@ -36,6 +36,24 @@ FontManager::FontManager(Engine *engine):ResourceManager(engine){
 	mDefaultCharacterSet=String("ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789~!@#$%^&*()_+|{}:\"'<>?`-=\\/[];,. \t");
 }
 
+void FontManager::findDefaultFont(){
+	String file;
+	#if defined(TOADLET_PLATFORM_WIN32)
+		TCHAR path[MAX_PATH];
+		SHGetSpecialFolderPath(0,path,CSIDL_FONTS,false);
+		file=path+String("\\Arial.ttf");
+	#elif defined(TOADLET_PLATFORM_IOS)
+		file="/System/Library/Fonts/Cache/Geneva.dfont";
+	#elif defined(TOADLET_PLATFORM_OSX)
+		file="/System/Library/Fonts/Geneva.dfont";
+	#elif defined(TOADLET_PLATFORM_POSIX)
+		file="/usr/share/fonts/TTF/DejaVuSerif.ttf";
+	#endif
+	if(file!=(char*)NULL){
+		findFont(file,64,this);
+	}
+}
+
 Resource::ptr FontManager::manage(Resource *resource,const String &name){
 	if(name!=(char*)NULL){
 		ResourceManager::manage(resource,name+":"+((Font*)resource)->getPointSize());
@@ -48,48 +66,34 @@ Resource::ptr FontManager::manage(Resource *resource,const String &name){
 }
 
 Font::ptr FontManager::getDefaultFont(){
-	#if defined(TOADLET_THREADSAFE)
-		mMutex.lock();
-	#endif
-
-	if(mDefaultFont==NULL){
-		String file;
-		#if defined(TOADLET_PLATFORM_WIN32)
-			TCHAR path[MAX_PATH];
-			SHGetSpecialFolderPath(0,path,CSIDL_FONTS,false);
-			file=path+String("\\Arial.ttf");
-		#elif defined(TOADLET_PLATFORM_IOS)
-			file="/System/Library/Fonts/Cache/Geneva.dfont";
-		#elif defined(TOADLET_PLATFORM_OSX)
-			file="/System/Library/Fonts/Geneva.dfont";
-		#elif defined(TOADLET_PLATFORM_POSIX)
-			file="/usr/share/fonts/TTF/DejaVuSerif.ttf";
-		#endif
-		mDefaultFont=findFont(file,64);
-	}
-
-	Font::ptr font=mDefaultFont;
-
-	#if defined(TOADLET_THREADSAFE)
-		mMutex.unlock();
-	#endif
-
-	return font;
+	return mDefaultFont;
 }
 
-Resource::ptr FontManager::find(const String &name,ResourceData *data){
+bool FontManager::find(const String &name,ResourceRequest *request,ResourceData *data){
 	FontData *resdata=(FontData*)data;
 	if(resdata==NULL){
 		Error::nullPointer(Categories::TOADLET_TADPOLE,
 			"invalid FontData");
-		return NULL;
+		return false;
 	}
 
 	if(resdata->characterSet==(char*)NULL){
 		resdata->characterSet=mDefaultCharacterSet;
 	}
 
-	return ResourceManager::find(name,resdata);
+	return ResourceManager::find(name,request,resdata);
+}
+
+void FontManager::resourceReady(Resource *resource){
+	#if defined(TOADLET_THREADSAFE)
+		mMutex.lock();
+	#endif
+
+	mDefaultFont=(Font*)resource;
+
+	#if defined(TOADLET_THREADSAFE)
+		mMutex.unlock();
+	#endif
 }
 
 }

@@ -23,43 +23,30 @@
  *
  ********** Copyright header - do not remove **********/
 
-#ifndef TOADLET_FLICK_JINPUTDEVICE_H
-#define TOADLET_FLICK_JINPUTDEVICE_H
-
-#include <toadlet/flick/InputDevice.h>
-#include <jni.h>
+#include "TextureMaterialStreamer.h"
 
 namespace toadlet{
-namespace flick{
+namespace tadpole{
 
-class TOADLET_API JInputDevice:public Object,public InputDevice{
-public:
-	TOADLET_JOBJECT(JInputDevice);
-
-	JInputDevice(JNIEnv *jenv,jobject jobj);
-	virtual ~JInputDevice();
+Resource::ptr TextureMaterialStreamer::load(Stream::ptr stream,ResourceData *data,ProgressListener *listener){
+	if(data==NULL){
+		return NULL;
+	}
 	
-	bool create();
-	void destroy();
-
-	InputType getType();
-	bool start();
-	void update(int dt);
-	void stop();
-
-	void setListener(InputDeviceListener *listener);
-	void setSampleTime(int dt);
-	void setAlpha(scalar alpha);
+	String extension=ResourceManager::findExtension(data->getName());
+	if(extension!=(char*)NULL){
+		ResourceStreamer *streamer=mEngine->getTextureManager()->getStreamer(extension);
+		if(streamer==NULL){
+			streamer=mEngine->getTextureManager()->getDefaultStreamer();
+		}
+		if(streamer!=NULL){
+			Texture::ptr texture=shared_static_cast<Texture>(streamer->load(stream,data,listener));
+			return mEngine->createDiffuseMaterial(texture);
+		}
+	}
 	
-protected:
-	JNIEnv *getEnv() const;
-
-	JavaVM *vm;
-	jobject obj;
-	jmethodID createID,destroyID,getTypeID,startID,updateID,stopID,setListenerID,setSampleTimeID,setAlphaID;
-};
+	return NULL;
+}
 
 }
 }
-
-#endif

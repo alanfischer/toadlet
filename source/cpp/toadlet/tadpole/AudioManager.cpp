@@ -64,7 +64,7 @@ Audio::ptr AudioManager::createAudio(){
 	return audioDevice->createAudio();
 }
 
-AudioStream::ptr AudioManager::findAudioStream(const String &name,ResourceData *data){
+bool AudioManager::findAudioStream(const String &name,StreamRequest *request,ResourceData *data){
 	Log::debug(Categories::TOADLET_TADPOLE,
 		"finding audio stream:"+name);
 
@@ -76,24 +76,36 @@ AudioStream::ptr AudioManager::findAudioStream(const String &name,ResourceData *
 		streamer=mDefaultStreamer;
 	}
 	if(streamer!=NULL){
-		Stream::ptr stream=mEngine->openStream(filename);
-		if(stream!=NULL){
-			return shared_static_cast<AudioStreamer>(streamer)->createAudioStream(stream,data);
-		}
-		else{
-			Error::unknown(Categories::TOADLET_TADPOLE,
-				"file "+filename+" not found");
-			return NULL;
-		}
+		return mEngine->getArchiveManager()->openStream(filename,new AudioStreamRequest(request,shared_static_cast<AudioStreamer>(streamer),data));
 	}
 	else{
 		Error::unknown(Categories::TOADLET_TADPOLE,
 			"streamer for \""+name+"\" not found");
-		return NULL;
+		return false;
 	}
 }
 
 AudioDevice *AudioManager::getAudioDevice(){return mEngine->getAudioDevice();}
+
+AudioManager::AudioStreamRequest::AudioStreamRequest(StreamRequest *request,ResourceStreamer *streamer,ResourceData *data){
+	mRequest=request;
+	mStreamer=streamer;
+	mData=data;
+}
+
+void AudioManager::AudioStreamRequest::streamReady(Stream *stream){
+	AudioStream::ptr audioStream=shared_static_cast<AudioStreamer>(mStreamer)->createAudioStream(stream,mData);
+	if(audioStream!=NULL){
+		mRequest->streamReady(audioStream);
+	}
+	else{
+		mRequest->streamException(Exception(Errorer::Type_UNKNOWN));
+	}
+}
+
+void AudioManager::AudioStreamRequest::streamException(const Exception &ex){
+	mRequest->streamException(ex);
+}
 
 }
 }

@@ -105,7 +105,7 @@ void MeshComponent::parentChanged(Node *node){
 }
 
 void MeshComponent::setMesh(const String &name){
-	setMesh(shared_static_cast<Mesh>(mEngine->getMeshManager()->find(name)));
+	mEngine->getMeshManager()->find(name,this);
 }
 
 void MeshComponent::setMesh(Mesh *mesh){

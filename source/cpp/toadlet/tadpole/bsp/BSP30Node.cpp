@@ -28,7 +28,6 @@
 #include <toadlet/tadpole/RenderableSet.h>
 #include <toadlet/tadpole/Scene.h>
 #include <toadlet/tadpole/bsp/BSP30Node.h>
-#include <toadlet/tadpole/bsp/BSP30Streamer.h>
 
 namespace toadlet{
 namespace tadpole{
@@ -37,20 +36,13 @@ namespace bsp{
 BSP30Node::BSP30Node(Scene *scene):PartitionNode(scene),
 	mCounter(1)
 {
+	mStreamer=new BSP30Streamer(mEngine);
 	mLocalCamera=new Camera(NULL);
 }
 
 void BSP30Node::setMap(const String &name){
-	Stream::ptr stream=mEngine->openStream(name);
-	if(stream==NULL){
-		Error::unknown("Unable to find level");
-		return;
-	}
-
-	BSP30Streamer::ptr streamer=new BSP30Streamer(mEngine);
-	BSP30Map::ptr map=shared_static_cast<BSP30Map>(streamer->load(stream,NULL,NULL));
-	map->setName(name);
-	setMap(map);
+	mMapName=name;
+	mEngine->getArchiveManager()->openStream(name,this);
 }
 
 void BSP30Node::setMap(BSP30Map *map){

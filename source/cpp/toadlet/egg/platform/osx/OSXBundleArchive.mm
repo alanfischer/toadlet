@@ -51,13 +51,15 @@ bool OSXBundleArchive::open(void *bundle){
 	return true;
 }
 
-Stream::ptr OSXBundleArchive::openStream(const String &name){
+bool OSXBundleArchive::openStream(const String &name,StreamRequest *request){
 	NSString *filePath=[((NSBundle*)mBundle) pathForResource:name ofType:nil];
 	FileStream::ptr stream(new FileStream(filePath,FileStream::Open_READ_BINARY));
 	if(stream->closed()){
-		stream=NULL;
+		request->streamException(Error::fileNotFound(Categories::TOADLET_EGG,Error::Throw_NO));
+		return false;
 	}
-	return stream;
+	request->streamReady(stream);
+	return true;
 }
 
 }

@@ -56,36 +56,58 @@ void ArchiveManager::removeDirectory(const String &directory){
 	mDirectories.remove(cleanPath(directory,true));
 }
 
-Stream::ptr ArchiveManager::openStream(const String &name){
-	Stream::ptr stream;
+bool ArchiveManager::openStream(const String &name,StreamRequest *request){
+	ArchiveStreamRequest::ptr streamRequest=new ArchiveStreamRequest(this,name,request);
+	streamRequest->request();
 
-	int i;
-	for(i=0;i<mResources.size();++i){
-		Archive *archive=(Archive*)mResources[i];
-		if(archive!=NULL && (stream=archive->openStream(name))!=NULL){
-			break;
-		}
-	}
+	return true;
+}
 
-	if(stream==NULL){
-		FileStream::ptr fileStream;
-		if(System::absolutePath(name)==false){
-			for(i=0;i<mDirectories.size();++i){
-				fileStream=new FileStream(mDirectories[i]+name,FileStream::Open_READ_BINARY);
-				if(fileStream->closed()==false){
-					break;
-				}
+ArchiveManager::ArchiveStreamRequest::ArchiveStreamRequest(ArchiveManager *manager,const String &name,StreamRequest *request){
+	mManager=manager;
+	mName=name;
+	mRequest=request;
+	mIt=manager->mResources.begin();
+}
+
+void ArchiveManager::ArchiveStreamRequest::request(){
+	((Archive*)(*mIt))->openStream(mName,this);
+}
+
+void ArchiveManager::ArchiveStreamRequest::notFound(){
+	FileStream::ptr fileStream;
+	if(System::absolutePath(mName)==false){
+		for(int i=0;i<mManager->mDirectories.size();++i){
+			fileStream=new FileStream(mManager->mDirectories[i]+mName,FileStream::Open_READ_BINARY);
+			if(fileStream->closed()==false){
+				break;
 			}
 		}
-		if(fileStream==NULL || fileStream->closed()==true){
-			fileStream=new FileStream(name,FileStream::Open_READ_BINARY);
-		}
-		if(fileStream!=NULL && fileStream->closed()==false){
-			stream=fileStream;
-		}
+	}
+	if(fileStream==NULL || fileStream->closed()==true){
+		fileStream=new FileStream(mName,FileStream::Open_READ_BINARY);
 	}
 
-	return stream;
+	if(fileStream!=NULL && fileStream->closed()==false){
+		mRequest->streamReady(fileStream);
+	}
+	else{
+		mRequest->streamException(Exception(Errorer::Type_FILE_NOT_FOUND));
+	}
+}
+
+void ArchiveManager::ArchiveStreamRequest::streamReady(Stream *stream){
+	mRequest->streamReady(stream);
+}
+
+void ArchiveManager::ArchiveStreamRequest::streamException(const Exception &ex){
+	mIt++;
+	if(mIt!=mManager->mResources.end()){
+		request();
+	}
+	else{
+		notFound();
+	}
 }
 
 }

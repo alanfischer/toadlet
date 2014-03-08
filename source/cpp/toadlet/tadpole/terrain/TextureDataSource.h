@@ -34,9 +34,9 @@ namespace toadlet{
 namespace tadpole{
 namespace terrain{
 
-class TOADLET_API TextureDataSource:public Object,public TerrainNodeDataSource{
+class TOADLET_API TextureDataSource:public Object,public TerrainNodeDataSource,public ResourceRequest{
 public:
-	TOADLET_OBJECT(TextureDataSource);
+	TOADLET_IOBJECT(TextureDataSource);
 
 	TextureDataSource(Engine *engine,const Vector3 &scale,scalar offset,const String &name);
 	TextureDataSource(Engine *engine,const Vector3 &scale,scalar offset,Texture *texture=NULL);
@@ -51,6 +51,20 @@ public:
 	bool getPatchLayerData(tbyte *data,int px,int py);
 	
 protected:
+	class TextureRequest:public Object,public ResourceRequest{
+	public:
+		TOADLET_IOBJECT(TextureRequest);
+
+		TextureRequest(TextureDataSource *parent,int px,int py):mParent(parent),mPx(px),mPy(py){}
+
+		void resourceReady(Resource *resource){mParent->setTexture((Texture*)resource,mPx,mPy);}
+		void resourceException(const Exception &ex){}
+
+	protected:
+		TextureDataSource::ptr mParent;
+		int mPx,mPy;
+	};
+
 	Engine *mEngine;
 	int mPatchSize;
 	Vector3 mPatchScale;

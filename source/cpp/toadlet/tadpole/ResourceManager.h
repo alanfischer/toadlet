@@ -53,7 +53,7 @@ public:
 
 	virtual Resource::ptr get(int handle);
 	virtual Resource::ptr get(const String &name);
-	virtual Resource::ptr find(const String &name,ResourceData *data=NULL);
+	virtual bool find(const String &name,ResourceRequest *request,ResourceData *data=NULL);
 	virtual Resource::ptr manage(Resource *resource,const String &name=(char*)NULL);
 	virtual void unmanage(Resource *resource);
 
@@ -77,14 +77,50 @@ public:
 	static String findExtension(const String &path);
 
 protected:
+	class ArchiveResourceRequest:public Object,public ResourceRequest,public StreamRequest{
+	public:
+		TOADLET_IOBJECT(ArchiveResourceRequest);
+
+		ArchiveResourceRequest(ResourceManager *manager,const String &name,ResourceData *data,ResourceRequest *request);
+
+		void request();
+		void notFound();
+
+		void resourceReady(Resource *resource);
+		void resourceException(const Exception &ex);
+
+		void streamReady(Stream *stream);
+		void streamException(const Exception &ex);
+
+	protected:
+		ResourceManager::ptr mManager;
+		String mName;
+		String mFilename;
+		ResourceStreamer *mStreamer;
+		ResourceRequest::ptr mRequest;
+		ResourceData::ptr mData;
+		Collection<Archive::ptr>::iterator mIt;
+	};
+
+	class SyncRequest:public Object,public ResourceRequest{
+	public:
+		TOADLET_IOBJECT(SyncRequest);
+
+		SyncRequest(){Log::warning("Using a SyncRequest!");}
+
+		void resourceReady(Resource *resource){mResource=resource;}
+		void resourceException(const Exception &ex){mException=ex;}
+
+		Resource::ptr getResource() const{return mResource;}
+		const Exception &getException() const{return mException;}
+
+	protected:
+		Resource::ptr mResource;
+		Exception mException;
+	};
+
 	typedef Map<String,Resource*> NameResourceMap;
 	typedef Map<String,ResourceStreamer::ptr> ExtensionStreamerMap;
-
-	virtual Resource::ptr unableToFindStreamer(const String &name,ResourceData *data);
-	virtual Resource::ptr findFromFile(const String &name,ResourceData *data);
-
-	virtual void resourceLoaded(const Resource::ptr &resource){}
-	virtual void resourceUnloaded(const Resource::ptr &resource){}
 
 	Engine *mEngine;
 	Collection<Archive::ptr> mResourceArchives;

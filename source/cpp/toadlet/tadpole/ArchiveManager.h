@@ -39,8 +39,6 @@ public:
 
 	ArchiveManager(Engine *engine);
 
-	Archive::ptr findArchive(const String &name){return shared_static_cast<Archive>(ResourceManager::find(name));}
-
 	Resource::ptr manage(Resource *resource,const String &name=(char*)NULL);
 	void unmanage(Resource *resource);
 
@@ -50,12 +48,31 @@ public:
 	String getDirectory(int i) const{return mDirectories[i];}
 
 	// Searches through all archives for the file
-	Stream::ptr openStream(const String &name);
-	Resource::ptr openResource(const String &name){return NULL;}
+	bool openStream(const String &name,StreamRequest *request);
+	bool openResource(const String &name,ResourceRequest *request){return false;}
 
 	const Collection<String> &getEntries(){return mEntries;}
 
 protected:
+	class ArchiveStreamRequest:public Object,public StreamRequest{
+	public:
+		TOADLET_IOBJECT(ArchiveStreamRequest);
+
+		ArchiveStreamRequest(ArchiveManager *manager,const String &name,StreamRequest *request);
+
+		void request();
+		void notFound();
+
+		void streamReady(Stream *stream);
+		void streamException(const Exception &ex);
+
+	protected:
+		ArchiveManager::ptr mManager;
+		String mName;
+		StreamRequest::ptr mRequest;
+		Collection<Resource*>::iterator mIt;
+	};
+
 	Collection<String> mDirectories;
 	Collection<Archive::ptr> mArchives;
 	Collection<String> mEntries;

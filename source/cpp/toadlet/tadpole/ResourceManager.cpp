@@ -114,19 +114,17 @@ Resource::ptr ResourceManager::get(const String &name){
 	return resource;
 }
 
-Resource::ptr ResourceManager::find(const String &name,ResourceData *data){
+bool ResourceManager::find(const String &name,ResourceRequest *request,ResourceData *data){
 	Resource::ptr resource=get(name);
-	if(resource==NULL){
-		TOADLET_TRY
-			resource=findFromFile(name,data);
-		TOADLET_CATCH_ANONYMOUS(){resource=NULL;}
-		if(resource!=NULL){
-			resource->setName(name);
-			manage(resource);
-		}
+	if(resource!=NULL){
+		request->resourceReady(resource);
+		return true;
 	}
-
-	return resource;
+	else{
+		ArchiveResourceRequest::ptr resourceRequest=new ArchiveResourceRequest(this,name,data,request);
+		resourceRequest->request();
+		return true;
+	}
 }
 
 Resource::ptr ResourceManager::manage(Resource  *resource,const String &name){
@@ -358,111 +356,99 @@ String ResourceManager::findExtension(const String &path){
 	}
 }
 
-Resource::ptr ResourceManager::unableToFindStreamer(const String &name,ResourceData *data){
-	Error::unknown(Categories::TOADLET_TADPOLE,
-		"streamer for "+name+" not found");
-	return NULL;
+ResourceManager::ArchiveResourceRequest::ArchiveResourceRequest(ResourceManager *manager,const String &name,ResourceData *data,ResourceRequest *request){
+	mManager=manager;
+	mName=name;
+	mData=data;
+	if(mData==NULL){
+		mData=new ResourceData();
+		mData->setName(mName);
+	}
+	mRequest=request;
+	mIt=manager->mResourceArchives.begin();
 }
 
-Resource::ptr ResourceManager::findFromFile(const String &name,ResourceData *data){
-	Log::debug(Categories::TOADLET_TADPOLE,
-		"ResourceManager::findFromFile:"+name);
-
-	String filename=checkDefaultExtension(cleanPath(name));
-	String extension=findExtension(filename);
-
-	#if defined(TOADLET_THREADSAFE)
-		mMutex.lock();
-	#endif
-
-	int i;
-	for(i=0;i<mResourceArchives.size();++i){
-		Resource::ptr resource=mResourceArchives[i]->openResource(filename);
-		if(resource!=NULL){
-			#if defined(TOADLET_THREADSAFE)
-				mMutex.unlock();
-			#endif
-
-			return resource;
-		}
+void ResourceManager::ArchiveResourceRequest::request(){
+	if(mIt!=mManager->mResourceArchives.end()){
+		((Archive*)(*mIt))->openResource(mName,this);
 	}
+	else{
+		notFound();
+	}
+}
 
+void ResourceManager::ArchiveResourceRequest::notFound(){
+	mFilename=mManager->checkDefaultExtension(cleanPath(mName));
+	String extension=findExtension(mFilename);
+
+	Engine *engine=mManager->mEngine;
 	if(extension!=(char*)NULL){
-		ResourceStreamer *streamer=getStreamer(extension);
-		if(streamer==NULL){
-			streamer=mDefaultStreamer;
+		mStreamer=mManager->getStreamer(extension);
+		if(mStreamer==NULL){
+			mStreamer=mManager->mDefaultStreamer;
 		}
-		if(streamer!=NULL){
-			Stream::ptr stream=mEngine->openStream(filename);
-			if(stream!=NULL){
-				if(stream->length()>mMaxStreamLength){
-					stream->close();
-
-					#if defined(TOADLET_THREADSAFE)
-						mMutex.unlock();
-					#endif
-
-					Error::insufficientMemory(Categories::TOADLET_TADPOLE,
-						"stream length too large, increase ResourceManager max stream length or reduce resource size");
-					return NULL;
-				}
-
-				String tempPath;
-				int slash=filename.rfind('/');
-				if(slash>0){
-					tempPath=filename.substr(0,slash);
-					if(mEngine->getArchiveManager()->getNumDirectories()>0){
-						tempPath=mEngine->getArchiveManager()->getDirectory(0)+tempPath;
-					}
-				}
-
-				if(tempPath.length()>0){
-					mEngine->getArchiveManager()->addDirectory(tempPath);
-				}
-
-				Resource::ptr resource;
-				TOADLET_TRY
-					resource=streamer->load(stream,data,NULL);
-				TOADLET_CATCH_ANONYMOUS(){resource=NULL;}
-
-				if(tempPath.length()>0){
-					mEngine->getArchiveManager()->removeDirectory(tempPath);
-				}
-
-				// We do not close the stream, since the Streamer may hold on to it.  Instead we let it close itself
-				#if defined(TOADLET_THREADSAFE)
-					mMutex.unlock();
-				#endif
-
-				return resource;
-			}
-			else{
-				#if defined(TOADLET_THREADSAFE)
-					mMutex.unlock();
-				#endif
-
-				Error::unknown(Categories::TOADLET_TADPOLE,
-					"file "+filename+" not found");
-				return NULL;
-			}
+		if(mStreamer!=NULL){
+			engine->getArchiveManager()->openStream(mFilename,this);
 		}
 		else{
-			#if defined(TOADLET_THREADSAFE)
-				mMutex.unlock();
-			#endif
-
-			return unableToFindStreamer(name,data);
+			mRequest->resourceException(Error::unknown(Categories::TOADLET_TADPOLE,
+				"unable to find streamer for:"+mName,Error::Throw_NO));
+			return;
 		}
 	}
 	else{
-		#if defined(TOADLET_THREADSAFE)
-			mMutex.unlock();
-		#endif
-
-		Log::warning(Categories::TOADLET_TADPOLE,
-			"extension not found on file");
-		return NULL;
+		mRequest->resourceException(Error::unknown(Categories::TOADLET_TADPOLE,
+			"extension not found on file",Error::Throw_NO));
+		return;
 	}
+}
+
+void ResourceManager::ArchiveResourceRequest::resourceReady(Resource *resource){
+	mRequest->resourceReady(resource);
+}
+
+void ResourceManager::ArchiveResourceRequest::resourceException(const Exception &ex){
+	mIt++;
+	request();
+}
+
+void ResourceManager::ArchiveResourceRequest::streamReady(Stream *stream){
+	if(stream->length()>mManager->mMaxStreamLength){
+		stream->close();
+
+		mRequest->resourceException(Error::insufficientMemory(Categories::TOADLET_TADPOLE,
+			"stream length too large, increase ResourceManager max stream length or reduce resource size",Error::Throw_NO));
+		return;
+	}
+
+	Engine *engine=mManager->mEngine;
+	String tempPath;
+	int slash=mFilename.rfind('/');
+	if(slash>0){
+		tempPath=mFilename.substr(0,slash);
+		if(engine->getArchiveManager()->getNumDirectories()>0){
+			tempPath=engine->getArchiveManager()->getDirectory(0)+tempPath;
+		}
+	}
+
+	if(tempPath.length()>0){
+		engine->getArchiveManager()->addDirectory(tempPath);
+	}
+
+	Resource::ptr resource;
+	TOADLET_TRY
+		resource=mStreamer->load(stream,mData,NULL);
+	TOADLET_CATCH_ANONYMOUS(){resource=NULL;}
+
+	if(tempPath.length()>0){
+		engine->getArchiveManager()->removeDirectory(tempPath);
+	}
+
+	mRequest->resourceReady(resource);
+}
+
+void ArchiveManager::ArchiveResourceRequest::streamException(const Exception &ex){
+	mRequest->resourceException(ex);
 }
 
 }

@@ -45,12 +45,27 @@ public:
 
 	Audio::ptr createAudio();
 
-	AudioStream::ptr findAudioStream(const String &name,int track=0){return findAudioStream(name,AudioData::ptr(new AudioData(track)));}
-	AudioBuffer::ptr findAudioBuffer(const String &name,int track=0){return shared_static_cast<AudioBuffer>(ResourceManager::find(name,AudioData::ptr(new AudioData(track))));}
-
-	AudioStream::ptr findAudioStream(const String &name,ResourceData *data);
+	bool findAudioBuffer(const String &name,ResourceRequest *request,int track=0){return ResourceManager::find(name,request,new AudioData(track));}
+	bool findAudioStream(const String &name,StreamRequest *request,int track=0){return findAudioStream(name,request,new AudioData(track));}
+	bool findAudioStream(const String &name,StreamRequest *request,ResourceData *data);
 
 	AudioDevice *getAudioDevice();
+
+protected:
+	class AudioStreamRequest:public Object,public StreamRequest{
+	public:
+		TOADLET_IOBJECT(AudioStreamRequest);
+
+		AudioStreamRequest(StreamRequest *request,ResourceStreamer *streamer,ResourceData *data);
+
+		void streamReady(Stream *stream);
+		void streamException(const Exception &ex);
+
+	protected:
+		StreamRequest::ptr mRequest;
+		ResourceStreamer::ptr mStreamer;
+		ResourceData::ptr mData;
+	};
 };
 
 }

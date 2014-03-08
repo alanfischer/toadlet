@@ -92,6 +92,7 @@ set (TADPOLE_PLUGINS_SRC
 	plugins/SkyDomeMeshCreator.cpp
 	plugins/SphereMeshCreator.cpp
 	plugins/TorusMeshCreator.cpp
+	plugins/TextureMaterialStreamer.cpp
 	plugins/BMPStreamer.cpp
 	plugins/DDSStreamer.cpp
 	plugins/TGAStreamer.cpp
@@ -318,6 +319,7 @@ set (TADPOLE_PLUGINS_HDR
 	plugins/SkyDomeMeshCreator.h
 	plugins/TorusMeshCreator.h
 	plugins/SphereMeshCreator.h
+	plugins/TextureMaterialStreamer.h
 	plugins/BMPStreamer.h
 	plugins/TMSHStreamer.h
 	plugins/PNGStreamer.h

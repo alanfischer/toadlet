@@ -40,15 +40,19 @@ bool Win32TextureResourceArchive::open(void *module){
 	return false;
 }
 
-Resource::ptr Win32TextureResourceArchive::openResource(const String &name){
+bool Win32TextureResourceArchive::openResource(const String &name,ResourceRequest *request){
 	if(mTextureManager==NULL){
-		return NULL;
+		request->resourceException(Error::nullPointer(Categories::TOADLET_TADPOLE,Error::Throw_NO));
+		return false;
 	}
 
 	LPTSTR resName=(LPTSTR)findResourceName(name);
 
 	HBITMAP hbitmap=LoadBitmap((HMODULE)mModule,IS_INTRESOURCE(resName)?resName:"\""+String(resName)+"\"");
-	if(hbitmap==NULL) return NULL;
+	if(hbitmap==NULL){
+		request->resourceException(Error::nullPointer(Categories::TOADLET_TADPOLE,Error::Throw_NO));
+		return false;
+	}
 	
 	BITMAP bitmap={0};
 	int result=GetObject(hbitmap,sizeof(bitmap),&bitmap);
@@ -70,7 +74,8 @@ Resource::ptr Win32TextureResourceArchive::openResource(const String &name){
 
 	if(texturePixelFormat==0){
 		DeleteObject(hbitmap);
-		return NULL;
+		request->resourceException(Error::unknown(Categories::TOADLET_TADPOLE,Error::Throw_NO));
+		return false;
 	}
 	
 	TextureFormat::ptr textureFormat=new TextureFormat(TextureFormat::Dimension_D2,texturePixelFormat,textureWidth,textureHeight,0,0);
@@ -84,7 +89,8 @@ Resource::ptr Win32TextureResourceArchive::openResource(const String &name){
 	if(textureData==NULL || bitmapData==NULL){
 		delete[] textureData;
 		DeleteObject(hbitmap);
-		return NULL;
+		request->resourceException(Error::insufficientMemory(Categories::TOADLET_TADPOLE,Error::Throw_NO));
+		return false;
 	}
 
 	GetBitmapBits(hbitmap,bitmapStride*textureHeight,bitmapData);
@@ -101,7 +107,8 @@ Resource::ptr Win32TextureResourceArchive::openResource(const String &name){
 	delete[] textureData;
 	DeleteObject(hbitmap);
 
-	return texture;
+	request->resourceReady(texture);
+	return true;
 }
 
 }

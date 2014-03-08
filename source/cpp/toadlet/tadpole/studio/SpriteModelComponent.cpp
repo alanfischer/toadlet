@@ -88,7 +88,7 @@ void SpriteModelComponent::parentChanged(Node *node){
 }
 
 void SpriteModelComponent::setModel(const String &name){
-	setModel(shared_static_cast<SpriteModel>(mEngine->getSpriteModelManager()->find(name)));
+	mEngine->getSpriteModelManager()->find(name,this);
 }
 
 void SpriteModelComponent::setModel(SpriteModel *model){
@@ -147,6 +147,10 @@ void SpriteModelComponent::transformChanged(Transform *transform){
 	if(transform==NULL){
 		mParent->boundChanged();
 	}
+}
+
+void SpriteModelComponent::resourceReady(Resource *resource){
+	setModel((SpriteModel*)resource);
 }
 
 void SpriteModelComponent::setSharedRenderState(RenderState::ptr renderState){

@@ -47,7 +47,6 @@ public:
 
 	Material::ptr createMaterial();
 	Material::ptr createSharedMaterial(Material::ptr source,RenderState::ptr renderState);
-	Material::ptr findMaterial(const String &name){return shared_static_cast<Material>(ResourceManager::find(name));}
 
 	RenderState::ptr createRenderState();
 	ShaderState::ptr createShaderState();
@@ -66,12 +65,17 @@ public:
 
 	void resourceDestroyed(Resource *resource);
 
-	Resource::ptr unableToFindStreamer(const String &name,ResourceData *data);
-
 	bool isPathUseable(RenderPath *path,const RenderCaps &caps);
 	bool compileMaterial(Material *material);
 
 	BufferManager *getBufferManager();
+
+	// Deprecated
+	Material::ptr findMaterial(const String &name){
+		SyncRequest::ptr request=new SyncRequest();
+		find(name,request);
+		return shared_static_cast<Material>(request->getResource());
+	}
 
 protected:
 	Collection<RenderState::ptr> mRenderStates;

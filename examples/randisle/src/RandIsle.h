@@ -60,7 +60,7 @@ public:
 	int atJunction(PathClimber *climber,PathVertex *current,PathVertex *next);
 
 	bool updatePopulatePatches();
-	void terrainUpdated(int oldX,int oldY,int newX,int newY){}
+	void terrainUpdated(int oldX,int oldY,Bound *oldBound,int newX,int newY,Bound *newBound){}
 	void terrainPatchCreated(int x,int y,Bound *bound);
 	void terrainPatchDestroyed(int x,int y,Bound *bound);
 
