@@ -37,6 +37,12 @@ public:
 	TOADLET_OBJECT(ResourceData);
 
 	virtual ~ResourceData(){}
+
+	void setName(const String &name){mName=name;}
+	const String &getName() const{return mName;}
+
+protected:
+	String mName;
 };
 
 }

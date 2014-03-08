@@ -26,9 +26,9 @@
 #ifndef TOADLET_EGG_IO_ARCHIVE_H
 #define TOADLET_EGG_IO_ARCHIVE_H
 
-#include <toadlet/egg/Resource.h>
 #include <toadlet/egg/Collection.h>
-#include <toadlet/egg/io/Stream.h>
+#include <toadlet/egg/io/ResourceRequest.h>
+#include <toadlet/egg/io/StreamRequest.h>
 
 namespace toadlet{
 namespace egg{
@@ -38,8 +38,8 @@ class Archive:public Resource{
 public:
 	TOADLET_INTERFACE(Archive);
 
-	virtual Stream::ptr openStream(const String &name)=0;
-	virtual Resource::ptr openResource(const String &name)=0;
+	virtual bool openStream(const String &name,StreamRequest *request)=0;
+	virtual bool openResource(const String &name,ResourceRequest *request)=0;
 
 	virtual const Collection<String> &getEntries()=0;
 };

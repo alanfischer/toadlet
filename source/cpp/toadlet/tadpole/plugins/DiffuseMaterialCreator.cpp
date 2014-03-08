@@ -293,7 +293,7 @@ void DiffuseMaterialCreator::destroy(){
 }
 
 Resource::ptr DiffuseMaterialCreator::create(const String &name,ResourceData *data,ProgressListener *listener){
-	return mEngine->getMaterialManager()->find(name);
+	return NULL;
 }
 
 Material::ptr DiffuseMaterialCreator::createDiffuseMaterial(Texture *texture,RenderState *state){

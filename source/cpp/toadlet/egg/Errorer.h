@@ -50,15 +50,10 @@ public:
 
 		// Egg errors
 		Type_EGG_START=1000,
+		Type_FILE_NOT_FOUND,
 		Type_LIBRARY_NOT_FOUND,
 		Type_SYMBOL_NOT_FOUND,
 		Type_SOCKET,
-
-		// Knot errors
-		Type_KNOT_START=3000,
-		Type_ALREADY_CONNECTED,
-		Type_INCORRECT_PROTOCOL_NAME,
-		Type_INCORRECT_PROTOCOL_VERSION,
 	};
 
 	Errorer();

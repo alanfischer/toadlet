@@ -70,17 +70,20 @@ bool WADArchive::open(Stream::ptr stream){
 	return true;
 }
 
-Resource::ptr WADArchive::openResource(const String &name){
+bool WADArchive::openResource(const String &name,ResourceRequest *request){
 	Map<String,int>::iterator texindex=mNameMap.find(name.toLower());
 	if(texindex==mNameMap.end()){
-		return NULL;
+		request->resourceException(Error::fileNotFound(Categories::TOADLET_TADPOLE,Error::Throw_NO));
+		return false;
 	}
 	
 	wlumpinfo *info=&mLumpinfos[texindex->second];
 	mStream->seek(info->filepos);
 	mStream->read((tbyte*)mInBuffer,info->size);
 
-	return createTexture(mTextureManager,(wmiptex*)mInBuffer);
+	Texture::ptr texture=createTexture(mTextureManager,(wmiptex*)mInBuffer);
+	request->resourceReady(texture);
+	return true;
 }
 
 Texture::ptr WADArchive::createTexture(toadlet::tadpole::TextureManager *textureManager,wmiptex *miptex,tbyte *pal){

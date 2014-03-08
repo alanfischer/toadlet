@@ -35,7 +35,7 @@ namespace terrain{
 
 class TOADLET_API DiffuseTerrainMaterialSource:public Object,public TerrainNodeMaterialSource{
 public:
-	TOADLET_OBJECT(DiffuseTerrainMaterialSource);
+	TOADLET_IOBJECT(DiffuseTerrainMaterialSource);
 	
 	DiffuseTerrainMaterialSource(Engine *engine);
 	virtual ~DiffuseTerrainMaterialSource(){}
@@ -55,6 +55,20 @@ public:
 	Material::ptr getMaterial(TerrainPatchComponent *patch);
 	
 protected:
+	class TextureRequest:public Object,public ResourceRequest{
+	public:
+		TOADLET_IOBJECT(TextureRequest);
+
+		TextureRequest(DiffuseTerrainMaterialSource *parent,int layer=-1):mParent(parent),mLayer(layer){}
+
+		void resourceReady(Resource *resource){if(mLayer>=0){mParent->setDiffuseTexture(mLayer,(Texture*)resource);}else{mParent->setDetailTexture((Texture*)resource);}}
+		void resourceException(const Exception &ex){}
+
+	protected:
+		DiffuseTerrainMaterialSource::ptr mParent;
+		int mLayer;
+	};
+
 	Engine *mEngine;
 	Shader::ptr mDiffuseVertexShader,mDiffuseBaseFragmentShader,mDiffuseLayerFragmentShader;
 	ShaderState::ptr mDiffuseBaseState,mDiffuseLayerState;

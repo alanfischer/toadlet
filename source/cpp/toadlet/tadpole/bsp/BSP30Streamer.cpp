@@ -212,10 +212,7 @@ void BSP30Streamer::parseWADs(BSP30Map *map){
 				while((end=wad.find(".wad",end+1))!=-1){
 					start=Math::maxVal(wad.rfind('\\',end)+1,wad.rfind(';',end)+1);
 					String file=wad.substr(start,(end-start)+4);
-					Archive::ptr archive=mEngine->getArchiveManager()->findArchive(file);
-					if(archive!=NULL){
-						mEngine->getTextureManager()->addResourceArchive(archive);
-					}
+					mEngine->getArchiveManager()->find(file,new TextureArchiveRequest(mEngine));
 				}
 			}
 		}

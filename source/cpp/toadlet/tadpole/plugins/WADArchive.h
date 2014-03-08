@@ -44,8 +44,8 @@ public:
 
 	bool open(Stream::ptr stream);
 
-	Stream::ptr openStream(const String &name){return NULL;}
-	Resource::ptr openResource(const String &name);
+	bool openStream(const String &name,StreamRequest *request){return false;}
+	bool openResource(const String &name,ResourceRequest *request);
 
 	const Collection<String> &getEntries(){return mEntries;}
 

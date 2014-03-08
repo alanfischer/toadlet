@@ -91,36 +91,37 @@ bool TPKGArchive::open(Stream::ptr stream){
 	return true;
 }
 
-Stream::ptr TPKGArchive::openStream(const String &name){
+bool TPKGArchive::openStream(const String &name,StreamRequest *request){
 	Log::debug(Categories::TOADLET_TADPOLE,
 		"creating InputStream for "+name);
 
 	if(mStream==NULL){
-		Error::unknown(Categories::TOADLET_TADPOLE,
-			"TPKG not opened");
-		return NULL;
+		request->streamException(Error::unknown(Categories::TOADLET_TADPOLE,Error::Throw_NO));
+		return false;
 	}
 
 	Map<String,Index>::iterator it;
 	it=mIndex.find(name);
 	if(it==mIndex.end()){
-		Error::unknown(Categories::TOADLET_TADPOLE,
-			"File not found in data file");
-		return NULL;
+		request->streamException(Error::fileNotFound(Categories::TOADLET_TADPOLE,Error::Throw_NO));
+		return false;
 	}
 
 	mStream->seek(mDataOffset+it->second.position);
 	int length=it->second.length;
 
+	Stream::ptr stream;
 	if(mMemoryStream!=NULL){
 		tbyte *data=mMemoryStream->getCurrentDataPointer();
-		return new MemoryStream(data,length,length,false);
+		stream=new MemoryStream(data,length,length,false);
 	}
 	else{
 		tbyte *data=new tbyte[length];
 		mStream->read(data,length);
-		return new MemoryStream(data,length,length,true);
+		stream=new MemoryStream(data,length,length,true);
 	}
+	request->streamReady(stream);
+	return true;
 }
 
 }

@@ -34,7 +34,7 @@
 namespace toadlet{
 namespace tadpole{
 
-class TOADLET_API AudioComponent:public BaseComponent,public Spacial{
+class TOADLET_API AudioComponent:public BaseComponent,public StreamRequest,public ResourceRequest,public Spacial{
 public:
 	TOADLET_COMPONENT(AudioComponent);
 
@@ -71,6 +71,12 @@ public:
 	inline bool getGlobal() const{if(mAudio!=NULL){return mAudio->getGlobal();}else{return mGlobal;}}
 
 	void frameUpdate(int dt,int scope);
+
+	void streamReady(Stream::ptr stream);
+	void streamException(const Exception &ex){}
+
+	void resourceReady(Resource::ptr resource);
+	void resourceException(const Exception &ex){}
 
 	// Spacial
 	void setTransform(Transform::ptr transform){}

@@ -40,6 +40,7 @@
 #include <toadlet/tadpole/plugins/DiffuseMaterialCreator.h>
 #include <toadlet/tadpole/plugins/SkyBoxMaterialCreator.h>
 #include <toadlet/tadpole/plugins/WaterMaterialCreator.h>
+#include <toadlet/tadpole/plugins/TextureMaterialStreamer.h>
 #include <toadlet/tadpole/plugins/BMPStreamer.h>
 #include <toadlet/tadpole/plugins/DDSStreamer.h>
 #include <toadlet/tadpole/plugins/TGAStreamer.h>
@@ -66,9 +67,6 @@
 #endif
 #if defined(TOADLET_HAS_PNG)
 	#include <toadlet/tadpole/plugins/PNGStreamer.h>
-#endif
-#if defined(TOADLET_HAS_FFMPEG)
-	#include <toadlet/tadpole/plugins/FFmpegVideoHandler.h>
 #endif
 
 #if defined(TOADLET_HAS_GDIPLUS)
@@ -256,9 +254,6 @@ void Engine::installHandlers(){
 	#if defined(TOADLET_HAS_GIF)
 		mTextureManager->setStreamer(new GIFStreamer(mTextureManager),"gif");
 	#endif
-	#if defined(TOADLET_HAS_FFMPEG)
-		mTextureManager->setVideoHandler(new FFmpegVideoHandler(this));
-	#endif
 
 	// Font streamers, try for freetype first, since it currently looks best.  This can be changed back once the others look as nice
 	#if defined(TOADLET_HAS_FREETYPE)
@@ -273,6 +268,7 @@ void Engine::installHandlers(){
 	#if defined(TOADLET_HAS_MXML)
 		mMaterialManager->setStreamer(new XMATStreamer(this),"xmat");
 	#endif
+	mMaterialManager->setDefaultStreamer(new TextureMaterialStreamer(this));
 
 	// Mesh streamers
 	#if defined(TOADLET_HAS_MXML)
@@ -351,7 +347,7 @@ void Engine::installHandlers(){
 	mSkyBoxCreator=new SkyBoxMeshCreator(this);
 	mSkyDomeCreator=new SkyDomeMeshCreator(this);
 
-	mFontManager->getDefaultFont();
+	mFontManager->findDefaultFont();
 }
 
 void Engine::setMaximumRenderCaps(const RenderCaps &caps){

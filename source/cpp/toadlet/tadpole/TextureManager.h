@@ -28,9 +28,9 @@
 
 #include <toadlet/peeper/RenderDevice.h>
 #include <toadlet/peeper/PixelBufferRenderTarget.h>
+#include <toadlet/peeper/Texture.h>
 #include <toadlet/tadpole/ResourceManager.h>
 #include <toadlet/tadpole/TextureData.h>
-#include <toadlet/tadpole/VideoHandler.h>
 
 namespace toadlet{
 namespace tadpole{
@@ -50,8 +50,6 @@ public:
 	Texture::ptr createTexture(TextureFormat::ptr format,tbyte *mipDatas[]);
 	Texture::ptr createTexture(int usage,TextureFormat::ptr format,tbyte *data=NULL);
 	Texture::ptr createTexture(int usage,TextureFormat::ptr format,tbyte *mipDatas[]);
-	Texture::ptr findTexture(const String &name){return shared_static_cast<Texture>(ResourceManager::find(name));}
-	Texture::ptr findTexture(const String &name,ResourceData::ptr data){return shared_static_cast<Texture>(ResourceManager::find(name,data));}
 
 	PixelBufferRenderTarget::ptr createPixelBufferRenderTarget();
 
@@ -64,12 +62,15 @@ public:
 
 	void resourceDestroyed(Resource *resource);
 
-	void setVideoHandler(VideoHandler::ptr handler){mVideoHandler=handler;}
-	VideoHandler::ptr getVideoHandler() const{return mVideoHandler;}
+	// Deprecated
+	Texture::ptr findTexture(const String &name){
+		SyncRequest::ptr request=new SyncRequest();
+		find(name,request);
+		return shared_static_cast<Texture>(request->getResource());
+	}
 
 protected:
 	Collection<PixelBufferRenderTarget::ptr> mRenderTargets;
-	VideoHandler::ptr mVideoHandler;
 };
 
 }

@@ -191,6 +191,7 @@
 	#define TOADLET_SIZEOF_WCHAR 32
 	#define TOADLET_ALIGNOF(Type) offsetof(alignment_trick<Type>,member)
 	#define TOADLET_ALIGN(a) __attribute__((aligned(a)))
+	#define TOADLET_BACKABLE
 #else
 	#error "Unknown platform"
 #endif

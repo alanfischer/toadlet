@@ -66,20 +66,27 @@ void Win32ResourceArchive::setMap(const Map<String,int> &idMap){
 	mIDMap=idMap;
 }
 
-Stream::ptr Win32ResourceArchive::openStream(const String &name){
+bool Win32ResourceArchive::openStream(const String &name,StreamRequest *request){
 	LPTSTR resName=(LPTSTR)findResourceName(name);
 
 	HRSRC src=FindResource((HMODULE)mModule,IS_INTRESOURCE(resName)?resName:"\""+String(resName)+"\"",RT_RCDATA);
-	if(src==NULL) return NULL;
+	if(src==NULL){
+		request->streamException(Error::nullPointer(Categories::TOADLET_EGG,Error::Throw_NO));
+		return false;
+	}
 	
 	HGLOBAL handle=LoadResource((HMODULE)mModule,src);
-	if(handle==NULL) return NULL;
+	if(handle==NULL){
+		request->streamException(Error::nullPointer(Categories::TOADLET_EGG,Error::Throw_NO));
+		return false;
+	}
 	
 	LPVOID data=LockResource(handle);
 	DWORD length=SizeofResource((HMODULE)mModule,src);
 	
 	MemoryStream::ptr stream=new MemoryStream((tbyte*)data,length,length,false);
-	return stream;
+	request->streamReady(stream);
+	return true;
 }
 
 const Collection<String> &Win32ResourceArchive::getEntries(){

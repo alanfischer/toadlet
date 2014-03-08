@@ -91,8 +91,6 @@ public:
 	bool setAudioDevice(AudioDevice *audioDevice);
 	AudioDevice *getAudioDevice() const;
 
-	Stream::ptr openStream(const String &name){return mArchiveManager->openStream(name);}
-
 	// Context methods
 	void contextReset(RenderDevice *renderDevice);
 	void contextActivate(RenderDevice *renderDevice);

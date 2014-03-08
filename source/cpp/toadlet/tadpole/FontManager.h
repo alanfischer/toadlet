@@ -35,19 +35,26 @@ namespace tadpole{
 
 class Engine;
 
-class TOADLET_API FontManager:public ResourceManager{
+class TOADLET_API FontManager:public ResourceManager,public ResourceRequest{
 public:
-	TOADLET_OBJECT(FontManager);
+	TOADLET_IOBJECT(FontManager);
 
 	FontManager(Engine *engine);
 
-	Font::ptr getFont(const String &name,float pointSize){return shared_static_cast<Font>(get(name+String(":")+pointSize));}
-	Font::ptr findFont(const String &name,float pointSize){return shared_static_cast<Font>(find(name,FontData::ptr(new FontData(pointSize))));}
+	void findDefaultFont();
+
 	Font::ptr getDefaultFont();
+
+	Font::ptr getFont(const String &name,float pointSize){return shared_static_cast<Font>(get(name+String(":")+pointSize));}
+
+	bool findFont(const String &name,float pointSize,ResourceRequest *request){return find(name,request,new FontData(pointSize));}
 	
 	Resource::ptr manage(Resource *resource,const String &name=(char*)NULL);
 
-	Resource::ptr find(const String &name,ResourceData *data=NULL);
+	bool find(const String &name,ResourceRequest *request,ResourceData *data=NULL);
+
+	void resourceReady(Resource *resource);
+	void resourceException(const Exception &ex){}
 
 protected:
 	String mDefaultCharacterSet;

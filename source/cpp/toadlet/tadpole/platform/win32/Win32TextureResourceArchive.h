@@ -38,7 +38,7 @@ public:
 
 	bool open(void *module);
 
-	Resource::ptr openResource(const String &name);
+	bool openResource(const String &name,ResourceRequest *request);
 
 protected:
 	TextureManager *mTextureManager;

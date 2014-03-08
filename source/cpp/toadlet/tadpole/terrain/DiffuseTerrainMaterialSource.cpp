@@ -251,7 +251,7 @@ void DiffuseTerrainMaterialSource::destroy(){
 }
 
 bool DiffuseTerrainMaterialSource::setDiffuseTexture(int layer,const String &name){
-	return setDiffuseTexture(layer,mEngine->getTextureManager()->findTexture(name));
+	return mEngine->getTextureManager()->find(name,new TextureRequest(this,layer));
 }
 
 bool DiffuseTerrainMaterialSource::setDiffuseTexture(int layer,Texture *texture){
@@ -265,7 +265,7 @@ bool DiffuseTerrainMaterialSource::setDiffuseTexture(int layer,Texture *texture)
 }
 
 bool DiffuseTerrainMaterialSource::setDetailTexture(const String &name){
-	return setDetailTexture(mEngine->getTextureManager()->findTexture(name));
+	return mEngine->getTextureManager()->find(name,new TextureRequest(this));
 }
 
 bool DiffuseTerrainMaterialSource::setDetailTexture(Texture *texture){

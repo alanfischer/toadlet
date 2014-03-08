@@ -66,7 +66,7 @@ TextureDataSource::~TextureDataSource(){
 }
 
 bool TextureDataSource::setTexture(const String &name,int px,int py){
-	return setTexture(mEngine->getTextureManager()->findTexture(name,new TextureData(Texture::Usage_BIT_STAGING)),px,py);
+	return mEngine->getTextureManager()->find(name,new TextureRequest(this,px,py),new TextureData(Texture::Usage_BIT_STAGING));
 }
 
 bool TextureDataSource::setTexture(Texture *texture,int px,int py){

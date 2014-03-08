@@ -41,7 +41,7 @@ namespace toadlet{
 namespace tadpole{
 namespace studio{
 
-class TOADLET_API StudioModelComponent:public BaseComponent,public TransformListener,public Spacial,public DetailTraceable,public Renderable,public Attachable,public Visible,public Animatable{
+class TOADLET_API StudioModelComponent:public BaseComponent,public ResourceRequest,public TransformListener,public Spacial,public DetailTraceable,public Renderable,public Attachable,public Visible,public Animatable{
 public:
 	TOADLET_COMPONENT(StudioModelComponent);
 
@@ -141,6 +141,9 @@ public:
 	bool getActive() const{return true;}
 
 	void dirtySkeleton(){mSkeletonDirty=true;}
+
+	void resourceReady(Resource *resource);
+	void resourceException(const Exception &ex){}
 
 	// Spacial
 	void setTransform(Transform::ptr transform);

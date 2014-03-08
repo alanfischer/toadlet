@@ -23,54 +23,27 @@
  *
  ********** Copyright header - do not remove **********/
 
-#ifndef TOADLET_TADPOLE_OGGVORBISDECODER_H
-#define TOADLET_TADPOLE_OGGVORBISDECODER_H
+#ifndef TOADLET_TADPOLE_TEXTUREMATERIALSTREAMER_H
+#define TOADLET_TADPOLE_TEXTUREMATERIALSTREAMER_H
 
-#include <toadlet/ribbit/AudioStream.h>
-#include <toadlet/tadpole/Types.h>
-
-struct OggVorbis_File;
-struct vorbis_info;
+#include <toadlet/tadpole/ResourceStreamer.h>
+#include <toadlet/tadpole/TextureManager.h>
+#include <toadlet/tadpole/Engine.h>
 
 namespace toadlet{
 namespace tadpole{
 
-const int OGGPACKETSIZE=4096;
-
-class TOADLET_API OggVorbisDecoder:public Object,public AudioStream{
+class TOADLET_API TextureMaterialStreamer:public Object,public ResourceStreamer{
 public:
-	TOADLET_IOBJECT(OggVorbisDecoder);
+	TOADLET_IOBJECT(TextureMaterialStreamer);
 
-	OggVorbisDecoder();
-	virtual ~OggVorbisDecoder();
+	TextureMaterialStreamer(Engine *engine){mEngine=engine;}
 
-	void close();
-	bool closed(){return mVorbisInfo==NULL;}
+	Resource::ptr load(Stream::ptr stream,ResourceData *data,ProgressListener *listener);
+	bool save(Stream::ptr stream,Resource::ptr resource,ResourceData *data,ProgressListener *listener){return false;}
 
-	bool readable(){return true;}
-	int read(tbyte *buffer,int length);
-
-	bool writeable(){return false;}
-	int write(const tbyte *buffer,int length){return -1;}
-
-	bool startStream(Stream *stream);
-	bool stopStream();
-
-	bool reset();
-	int length();
-	int position();
-	bool seek(int offs);
-	bool flush(){return false;}
-
-	AudioFormat::ptr getAudioFormat() const{return mFormat;}
-
-private:
-	OggVorbis_File *mVorbisFile;
-	vorbis_info *mVorbisInfo;
-	char mDataBuffer[OGGPACKETSIZE];
-	int mDataLength;
-	AudioFormat::ptr mFormat;
-	Stream::ptr mStream;
+protected:
+	Engine *mEngine;
 };
 
 }

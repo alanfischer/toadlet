@@ -57,7 +57,7 @@ void AudioComponent::destroy(){
 }
 
 bool AudioComponent::setAudioBuffer(const String &name,int track){
-	return setAudioBuffer(mEngine->getAudioManager()->findAudioBuffer(name,track));
+	return mEngine->getAudioManager()->findAudioBuffer(name,this,track);
 }
 
 bool AudioComponent::setAudioBuffer(AudioBuffer *audioBuffer){
@@ -93,7 +93,7 @@ bool AudioComponent::setAudioBuffer(AudioBuffer *audioBuffer){
 }
 
 bool AudioComponent::setAudioStream(const String &name,int track){
-	return setAudioStream(mEngine->getAudioManager()->findAudioStream(name,track));
+	return mEngine->getAudioManager()->findAudioStream(name,this,track);
 }
 
 bool AudioComponent::setAudioStream(AudioStream *audioStream){
@@ -182,6 +182,14 @@ void AudioComponent::frameUpdate(int dt,int scope){
 	if(mAudio==NULL && mAudioBuffer!=NULL && mTime>=0){
 		mTime+=dt;
 	}
+}
+
+void AudioComponent::streamReady(Stream::ptr stream){
+	setAudioStream(shared_static_cast<AudioStream>(stream));
+}
+
+void AudioComponent::resourceReady(Resource::ptr resource){
+	setAudioBuffer(shared_static_cast<AudioBuffer>(resource));
 }
 
 void AudioComponent::setAudioFromTransform(){

@@ -286,16 +286,6 @@ void MaterialManager::resourceDestroyed(Resource *resource){
 	}
 }
 
-Resource::ptr MaterialManager::unableToFindStreamer(const String &name,ResourceData *data){
-	Texture::ptr texture=mEngine->getTextureManager()->findTexture(name);
-	if(texture!=NULL){
-		return mEngine->createDiffuseMaterial(texture);
-	}
-	else{
-		return ResourceManager::unableToFindStreamer(name,data);
-	}
-}
-
 bool MaterialManager::isPathUseable(RenderPath *path,const RenderCaps &caps){
 	tforeach(RenderPath::PassCollection::iterator,pass,path->getPasses()){
 		ShaderState *state=pass->getShaderState();

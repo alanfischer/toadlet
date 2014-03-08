@@ -160,7 +160,7 @@ void StudioModelComponent::frameUpdate(int dt,int scope){
 }
 
 void StudioModelComponent::setModel(const String &name){
-	setModel(shared_static_cast<StudioModel>(mEngine->getStudioModelManager()->find(name)));
+	mEngine->getStudioModelManager()->find(name,this);
 }
 
 void StudioModelComponent::setModel(StudioModel *model){
@@ -377,6 +377,10 @@ void StudioModelComponent::transformChanged(Transform *transform){
 	if(transform==mTransform){
 		mParent->boundChanged();
 	}
+}
+
+void StudioModelComponent::resourceReady(Resource *resource){
+	setModel((StudioModel*)resource);
 }
 
 void StudioModelComponent::traceSegment(PhysicsCollision &result,const Vector3 &position,const Segment &segment,const Vector3 &size){

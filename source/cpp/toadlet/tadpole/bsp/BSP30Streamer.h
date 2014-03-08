@@ -44,6 +44,19 @@ public:
 	virtual Resource::ptr load(Stream::ptr stream,ResourceData *data,ProgressListener *listener);
 
 protected:
+	class TextureArchiveRequest:public Object,public ResourceRequest{
+	public:
+		TOADLET_IOBJECT(TextureArchiveRequest);
+
+		TextureArchiveRequest(Engine *engine):mEngine(engine){}
+
+		void resourceReady(Resource *resource){mEngine->getTextureManager()->addResourceArchive((Archive*)resource);}
+		void resourceException(const Exception &ex){}
+
+	protected:
+		Engine *mEngine;
+	};
+
 	void readLump(Stream *stream,blump *lump,void **data,int size,int *count);
 	void parseVisibility(BSP30Map *map);
 	void parseEntities(BSP30Map *map);
