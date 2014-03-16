@@ -114,16 +114,10 @@ String makeBoneAssignment(const Mesh::VertexBoneAssignmentList &vbaList){
 }
 
 /// @todo: Support loading all of the material, instead of starting with a DiffuseMaterial
-Material::ptr XMLMeshUtilities::loadMaterial(mxml_node_t *materialNode,int version,MaterialManager *materialManager,TextureManager *textureManager){
+Material::ptr XMLMeshUtilities::loadMaterial(mxml_node_t *materialNode,int version,MaterialManager *materialManager){
 	const char *prop=mxmlElementGetAttr(materialNode,"Name");
 
-	Material::ptr material;
-	if(prop!=NULL){
-		material=materialManager->findMaterial(prop);
-	}
-	if(material==NULL){
-		material=materialManager->getEngine()->createDiffuseMaterial(NULL);
-	}
+	Material::ptr material=new Material(materialManager);
 
 	if(prop!=NULL){
 		material->setName(prop);
@@ -228,7 +222,7 @@ Material::ptr XMLMeshUtilities::loadMaterial(mxml_node_t *materialNode,int versi
 	return material;
 }
 
-mxml_node_t *XMLMeshUtilities::saveMaterial(Material::ptr material,int version,ProgressListener *listener){
+mxml_node_t *XMLMeshUtilities::saveMaterial(Material::ptr material,int version){
 	if(material==NULL){
 		return NULL;
 	}
@@ -314,7 +308,7 @@ mxml_node_t *XMLMeshUtilities::saveMaterial(Material::ptr material,int version,P
 	return materialNode;
 }
 
-Mesh::ptr XMLMeshUtilities::loadMesh(mxml_node_t *node,int version,BufferManager *bufferManager,MaterialManager *materialManager,TextureManager *textureManager){
+Mesh::ptr XMLMeshUtilities::loadMesh(mxml_node_t *node,int version,BufferManager *bufferManager,MaterialManager *materialManager){
 	Mesh::ptr mesh=new Mesh();
 	const char *prop=NULL;
 
@@ -584,10 +578,11 @@ Mesh::ptr XMLMeshUtilities::loadMesh(mxml_node_t *node,int version,BufferManager
 			prop=mxmlElementGetAttr(materialNode,"File");
 			if(prop!=NULL){
 				subMesh->materialName=prop;
-				material=materialManager->findMaterial(subMesh->materialName);
+				subMesh->material=new Material(materialManager);
+				subMesh->material->setName(prop);
 			}
 			else{
-				material=loadMaterial(materialNode,version,materialManager,textureManager);
+				material=loadMaterial(materialNode,version,materialManager);
 			}
 
 			subMesh->material=material;
@@ -596,12 +591,10 @@ Mesh::ptr XMLMeshUtilities::loadMesh(mxml_node_t *node,int version,BufferManager
 		mesh->addSubMesh(subMesh);
 	}
 
-	mesh->compile();
-
 	return mesh;
 }
 
-mxml_node_t *XMLMeshUtilities::saveMesh(Mesh::ptr mesh,int version,ProgressListener *listener){
+mxml_node_t *XMLMeshUtilities::saveMesh(Mesh::ptr mesh,int version){
 	mxml_node_t *meshNode=mxmlNewElement(MXML_NO_PARENT,"Mesh");
 
 	Transform *transform=mesh->getTransform();
@@ -676,10 +669,6 @@ mxml_node_t *XMLMeshUtilities::saveMesh(Mesh::ptr mesh,int version,ProgressListe
 		String data;
 		int i;
 		for(i=0;i<vertexBuffer->getSize();++i){
-			if(listener!=NULL){
-				listener->progressUpdated((float)i/(float)vertexBuffer->getSize());
-			}
-
 			line[0]=0;
 
 			if(i==0) strcat(line,"\n");
@@ -747,7 +736,7 @@ mxml_node_t *XMLMeshUtilities::saveMesh(Mesh::ptr mesh,int version,ProgressListe
 
 			mxml_node_t *materialNode=NULL;
 			if(subMesh->materialName.length()==0){
-				materialNode=saveMaterial(subMesh->material,version,listener);
+				materialNode=saveMaterial(subMesh->material,version);
 			}
 			else{
 				materialNode=mxmlNewElement(MXML_NO_PARENT,"Material");
@@ -814,14 +803,11 @@ Skeleton::ptr XMLMeshUtilities::loadSkeleton(mxml_node_t *node,int version){
 	return skeleton;
 }
 
-mxml_node_t *XMLMeshUtilities::saveSkeleton(Skeleton::ptr skeleton,int version,ProgressListener *listener){
+mxml_node_t *XMLMeshUtilities::saveSkeleton(Skeleton::ptr skeleton,int version){
 	mxml_node_t *skeletonNode=mxmlNewElement(MXML_NO_PARENT,"Skeleton");
 
 	int i;
 	for(i=0;i<skeleton->getNumBones();++i){
-		if(listener!=NULL){
-			listener->progressUpdated((float)i/(float)skeleton->getNumBones());
-		}
 		Skeleton::Bone::ptr bone=skeleton->getBone(i);
 
 		mxml_node_t *boneNode=mxmlNewElement(skeletonNode,"Bone");
@@ -938,7 +924,7 @@ Sequence::ptr XMLMeshUtilities::loadSequence(mxml_node_t *node,int version,Buffe
 	return sequence;
 }
 
-mxml_node_t *XMLMeshUtilities::saveSequence(Sequence::ptr sequence,int version,ProgressListener *listener){
+mxml_node_t *XMLMeshUtilities::saveSequence(Sequence::ptr sequence,int version){
 	mxml_node_t *sequenceNode=mxmlNewElement(MXML_NO_PARENT,"Sequence");
 
 	if(sequence->getName()!=(char*)NULL){
@@ -949,10 +935,6 @@ mxml_node_t *XMLMeshUtilities::saveSequence(Sequence::ptr sequence,int version,P
 
 	int j;
 	for(j=0;j<sequence->getNumTracks();++j){
-		if(listener!=NULL){
-			listener->progressUpdated((float)j/(float)sequence->getNumTracks());
-		}
-
 		Track::ptr track=sequence->getTrack(j);
 
 		mxml_node_t *trackNode=mxmlNewElement(sequenceNode,"Track");
@@ -991,6 +973,36 @@ mxml_node_t *XMLMeshUtilities::saveSequence(Sequence::ptr sequence,int version,P
 
 	return sequenceNode;
 }
+
+void XMLMeshUtilities::MaterialRequest::request(){
+	while(mIndex<mMesh->getNumSubMeshes() && mMesh->getSubMesh(mIndex)->materialName.length()!=0){
+		mIndex++;
+	}
+	
+	if(mIndex<mMesh->getNumSubMeshes()){
+		mMaterialManager->find(mMesh->getSubMesh(mIndex)->material->getName(),this);
+	}
+	else{
+		mMesh->compile();
+		mRequest->resourceReady(mMesh);
+	}
+}
+
+void XMLMeshUtilities::MaterialRequest::resourceReady(Resource *resource){
+	Material::ptr material=(Material*)resource;
+	Mesh::SubMesh *subMesh=mMesh->getSubMesh(mIndex);
+	mMaterialManager->modifyRenderState(material->getRenderState(),subMesh->material->getRenderState());
+	subMesh->material=material;
+
+	mIndex++;
+	request();
+}
+
+void XMLMeshUtilities::MaterialRequest::resourceException(const Exception &ex){
+	mIndex++;
+	request();
+}
+
 
 }
 }

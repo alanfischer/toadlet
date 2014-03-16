@@ -62,12 +62,7 @@ public:
 
 	void resourceDestroyed(Resource *resource);
 
-	// Deprecated
-	Texture::ptr findTexture(const String &name){
-		SyncRequest::ptr request=new SyncRequest();
-		find(name,request);
-		return shared_static_cast<Texture>(request->getResource());
-	}
+	ResourceData *createResourceData(){return new TextureData();}
 
 protected:
 	Collection<PixelBufferRenderTarget::ptr> mRenderTargets;

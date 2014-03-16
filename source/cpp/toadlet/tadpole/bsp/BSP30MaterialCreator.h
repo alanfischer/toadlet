@@ -26,21 +26,21 @@
 #ifndef TOADLET_TADPOLE_BSP30MATERIALCREATOR_H
 #define TOADLET_TADPOLE_BSP30MATERIALCREATOR_H
 
-#include <toadlet/tadpole/ResourceCreator.h>
+#include <toadlet/tadpole/BaseResourceCreator.h>
 #include <toadlet/tadpole/material/Material.h>
 #include <toadlet/tadpole/Engine.h>
 
 namespace toadlet{
 namespace tadpole{
 
-class TOADLET_API BSP30MaterialCreator:public Object,public ResourceCreator{
+class TOADLET_API BSP30MaterialCreator:public BaseResourceCreator{
 public:
-	TOADLET_IOBJECT(BSP30MaterialCreator);
+	TOADLET_OBJECT(BSP30MaterialCreator);
 
 	BSP30MaterialCreator(Engine *engine);
 	void destroy(){}
 
-	Resource::ptr create(const String &name,ResourceData *data,ProgressListener *listener){
+	Resource::ptr create(const String &name,ResourceData *data){
 		Resource::ptr resource=createBSP30Material(NULL,NULL);
 		resource->setName(name);
 		return resource;

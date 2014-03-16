@@ -27,16 +27,16 @@
 #define TOADLET_EGG_ANDROIDASSETARCHIVE_H
 
 #include <toadlet/egg/BaseResource.h>
-#include <toadlet/egg/io/Archive.h>
+#include <toadlet/egg/io/BaseArchive.h>
 #include "JStream.h"
 #include <jni.h>
 
 namespace toadlet{
 namespace egg{
 
-class TOADLET_API AndroidAssetArchive:public BaseResource,public Archive{
+class TOADLET_API AndroidAssetArchive:public BaseArchive{
 public:
-	TOADLET_RESOURCE(AndroidAssetArchive,Archive);
+	TOADLET_OBJECT(AndroidAssetArchive);
 
 	AndroidAssetArchive(JNIEnv *jenv,jobject jassetManager);
 	virtual ~AndroidAssetArchive();

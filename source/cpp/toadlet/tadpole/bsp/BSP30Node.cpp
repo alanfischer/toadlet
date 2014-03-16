@@ -41,7 +41,6 @@ BSP30Node::BSP30Node(Scene *scene):PartitionNode(scene),
 }
 
 void BSP30Node::setMap(const String &name){
-	mMapName=name;
 	mEngine->getArchiveManager()->openStream(name,this);
 }
 
@@ -95,6 +94,9 @@ void BSP30Node::setSkyTextures(const String &skyDown,const String &skyUp,const S
 		mSkyMesh=NULL;
 	}
 
+	mSkyMesh=new MeshComponent(mEngine);
+	mScene->getBackground()->attach(mSkyMesh);
+
 	RenderState::ptr renderState=mEngine->getMaterialManager()->createRenderState();
 	if(renderState!=NULL){
 		renderState->setDepthState(DepthState(DepthState::DepthTest_LEQUAL,false));
@@ -102,19 +104,8 @@ void BSP30Node::setSkyTextures(const String &skyDown,const String &skyUp,const S
 		renderState->setFogState(FogState());
 	}
 
-	Material::ptr down=mEngine->createSkyBoxMaterial(mEngine->getTextureManager()->findTexture(skyDown),true,renderState);
-	Material::ptr up=mEngine->createSkyBoxMaterial(mEngine->getTextureManager()->findTexture(skyUp),true,renderState);
-	Material::ptr front=mEngine->createSkyBoxMaterial(mEngine->getTextureManager()->findTexture(skyWest),true,renderState);
-	Material::ptr back=mEngine->createSkyBoxMaterial(mEngine->getTextureManager()->findTexture(skyEast),true,renderState);
-	Material::ptr right=mEngine->createSkyBoxMaterial(mEngine->getTextureManager()->findTexture(skySouth),true,renderState);
-	Material::ptr left=mEngine->createSkyBoxMaterial(mEngine->getTextureManager()->findTexture(skyNorth),true,renderState);
-
-	if(down!=NULL || up!=NULL || front!=NULL || back!=NULL || right!=NULL || left!=NULL){
-		Mesh::ptr mesh=mEngine->createSkyBoxMesh(1024,false,false,down,up,front,back,right,left);
-		mSkyMesh=new MeshComponent(mEngine);
-		mSkyMesh->setMesh(mesh);
-		mScene->getBackground()->attach(mSkyMesh);
-	}
+	SkyMeshRequest::ptr request=new SkyMeshRequest(mEngine,mSkyMesh,renderState,skyDown,skyUp,skyWest,skyEast,skySouth,skyNorth);
+	request->request();
 }
 
 void BSP30Node::nodeAttached(Node *node){
@@ -472,6 +463,40 @@ void BSP30Node::findBoundLeafs(egg::Collection<int> &leafs,Node *node){
 	else{
 		mMap->findBoundLeafs(leafs,mMap->nodes,0,box);
 	}
+}
+
+BSP30Node::SkyMeshRequest::SkyMeshRequest(Engine *engine,MeshComponent::ptr mesh,RenderState::ptr state,const String &skyDown,const String &skyUp,const String &skyWest,const String &skyEast,const String &skySouth,const String &skyNorth):mIndex(0){
+	mEngine=engine;
+	mSkyMesh=mesh;
+	mRenderState=state;
+	mTextureNames[0]=skyDown;
+	mTextureNames[1]=skyUp;
+	mTextureNames[2]=skyWest;
+	mTextureNames[3]=skyEast;
+	mTextureNames[4]=skySouth;
+	mTextureNames[5]=skyNorth;
+}
+
+void BSP30Node::SkyMeshRequest::request(){
+	if(mIndex<6){
+		mEngine->getTextureManager()->find(mTextureNames[mIndex],this);
+	}
+	else{
+		Mesh::ptr mesh=mEngine->createSkyBoxMesh(1024,false,false,mMaterials[0],mMaterials[1],mMaterials[2],mMaterials[3],mMaterials[4],mMaterials[5]);
+		mSkyMesh->setMesh(mesh);
+	}
+}
+
+void BSP30Node::SkyMeshRequest::resourceReady(Resource *resource){
+	mMaterials[mIndex]=mEngine->createSkyBoxMaterial((Texture*)resource,true,mRenderState);
+
+	mIndex++;
+	request();
+}
+
+void BSP30Node::SkyMeshRequest::resourceException(const Exception &ex){
+	mIndex++;
+	request();
 }
 
 }

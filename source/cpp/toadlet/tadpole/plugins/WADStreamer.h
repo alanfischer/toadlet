@@ -26,22 +26,22 @@
 #ifndef TOADLET_TADPOLE_WADSTREAMER_H
 #define TOADLET_TADPOLE_WADSTREAMER_H
 
-#include <toadlet/tadpole/ResourceStreamer.h>
+#include <toadlet/tadpole/BaseResourceStreamer.h>
 #include "WADArchive.h"
 
 namespace toadlet{
 namespace tadpole{
 
-class TOADLET_API WADStreamer:public Object,public ResourceStreamer{
+class TOADLET_API WADStreamer:public BaseResourceStreamer{
 public:
-	TOADLET_IOBJECT(WADStreamer);
+	TOADLET_OBJECT(WADStreamer);
 
 	WADStreamer(TextureManager *textureManager){
 		mTextureManager=textureManager;
 	}
 
-	Resource::ptr load(Stream::ptr stream,ResourceData *data,ProgressListener *listener){
-		WADArchive::ptr archive(new WADArchive(mTextureManager));
+	Resource::ptr load(Stream::ptr stream,ResourceData *data){
+		WADArchive::ptr archive=new WADArchive(mTextureManager);
 		bool result=archive->open(stream);
 		if(result){
 			return shared_static_cast<Archive>(archive);

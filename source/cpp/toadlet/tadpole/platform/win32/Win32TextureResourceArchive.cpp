@@ -40,18 +40,18 @@ bool Win32TextureResourceArchive::open(void *module){
 	return false;
 }
 
-bool Win32TextureResourceArchive::openResource(const String &name,ResourceRequest *request){
+Resource::ptr Win32TextureResourceArchive::openResource(const String &name){
 	if(mTextureManager==NULL){
-		request->resourceException(Error::nullPointer(Categories::TOADLET_TADPOLE,Error::Throw_NO));
-		return false;
+		Error::nullPointer(Categories::TOADLET_TADPOLE,"TextureManager is null");
+		return NULL;
 	}
 
 	LPTSTR resName=(LPTSTR)findResourceName(name);
 
 	HBITMAP hbitmap=LoadBitmap((HMODULE)mModule,IS_INTRESOURCE(resName)?resName:"\""+String(resName)+"\"");
 	if(hbitmap==NULL){
-		request->resourceException(Error::nullPointer(Categories::TOADLET_TADPOLE,Error::Throw_NO));
-		return false;
+		//Error::nullPointer(Categories::TOADLET_TADPOLE,"LoadBitmap error");
+		return NULL;
 	}
 	
 	BITMAP bitmap={0};
@@ -74,8 +74,8 @@ bool Win32TextureResourceArchive::openResource(const String &name,ResourceReques
 
 	if(texturePixelFormat==0){
 		DeleteObject(hbitmap);
-		request->resourceException(Error::unknown(Categories::TOADLET_TADPOLE,Error::Throw_NO));
-		return false;
+		Error::unknown(Categories::TOADLET_TADPOLE,"unknown texture format");
+		return NULL;
 	}
 	
 	TextureFormat::ptr textureFormat=new TextureFormat(TextureFormat::Dimension_D2,texturePixelFormat,textureWidth,textureHeight,0,0);
@@ -89,8 +89,8 @@ bool Win32TextureResourceArchive::openResource(const String &name,ResourceReques
 	if(textureData==NULL || bitmapData==NULL){
 		delete[] textureData;
 		DeleteObject(hbitmap);
-		request->resourceException(Error::insufficientMemory(Categories::TOADLET_TADPOLE,Error::Throw_NO));
-		return false;
+		Error::insufficientMemory(Categories::TOADLET_TADPOLE,"unable to allocate bitmapData");
+		return NULL;
 	}
 
 	GetBitmapBits(hbitmap,bitmapStride*textureHeight,bitmapData);
@@ -107,8 +107,7 @@ bool Win32TextureResourceArchive::openResource(const String &name,ResourceReques
 	delete[] textureData;
 	DeleteObject(hbitmap);
 
-	request->resourceReady(texture);
-	return true;
+	return texture;
 }
 
 }

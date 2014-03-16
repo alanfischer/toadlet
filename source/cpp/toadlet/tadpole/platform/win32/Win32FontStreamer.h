@@ -28,6 +28,7 @@
 
 #include <toadlet/tadpole/Font.h>
 #include <toadlet/tadpole/FontData.h>
+#include <toadlet/tadpole/BaseResourceStreamer.h>
 #include <toadlet/tadpole/TextureManager.h>
 #include <windows.h>
 #include <Gdiplus.h>
@@ -36,15 +37,15 @@ namespace toadlet{
 namespace tadpole{
 
 /// @brief  A lighter weight font handling class for the Win32 platform
-class TOADLET_API Win32FontStreamer:public Object,public ResourceStreamer{
+class TOADLET_API Win32FontStreamer:public BaseResourceStreamer{
 public:
-	TOADLET_IOBJECT(Win32FontStreamer);
+	TOADLET_OBJECT(Win32FontStreamer);
 
 	Win32FontStreamer(TextureManager *textureManager);
 	virtual ~Win32FontStreamer();
 	bool valid();
 
-	Resource::ptr load(Stream::ptr stream,ResourceData *data,ProgressListener *listener);
+	Resource::ptr load(Stream::ptr stream,ResourceData *data);
 
 	typedef Gdiplus::GpStatus(WINAPI *GdiplusStartup_)(OUT ULONG_PTR *token,const Gdiplus::GdiplusStartupInput *input,OUT Gdiplus::GdiplusStartupOutput *output);
 	typedef VOID(WINAPI *GdiplusShutdown_)(ULONG_PTR token);

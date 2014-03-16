@@ -65,6 +65,7 @@ protected:
 
 		void streamReady(Stream *stream);
 		void streamException(const Exception &ex);
+		void streamProgress(float progress){}
 
 	protected:
 		ArchiveManager::ptr mManager;

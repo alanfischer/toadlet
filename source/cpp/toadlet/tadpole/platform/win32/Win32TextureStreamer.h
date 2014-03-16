@@ -28,6 +28,7 @@
 
 #include <toadlet/peeper/Texture.h>
 #include <toadlet/tadpole/TextureManager.h>
+#include <toadlet/tadpole/BaseResourceStreamer.h>
 #include <windows.h>
 #include <Gdiplus.h>
 
@@ -35,15 +36,15 @@ namespace toadlet{
 namespace tadpole{
 
 /// @brief  A lighter weight texture handling class for the Win32 platform
-class TOADLET_API Win32TextureStreamer:public Object,public ResourceStreamer{
+class TOADLET_API Win32TextureStreamer:public BaseResourceStreamer{
 public:
-	TOADLET_IOBJECT(Win32TextureStreamer);
+	TOADLET_OBJECT(Win32TextureStreamer);
 
 	Win32TextureStreamer(TextureManager *textureManager);
 	virtual ~Win32TextureStreamer();
 	bool valid();
 
-	Resource::ptr load(Stream::ptr in,ResourceData *data,ProgressListener *listener);
+	Resource::ptr load(Stream::ptr in,ResourceData *data);
 
 	typedef Gdiplus::GpStatus(WINAPI *GdiplusStartup_)(OUT ULONG_PTR *token,const Gdiplus::GdiplusStartupInput *input,OUT Gdiplus::GdiplusStartupOutput *output);
 	typedef VOID(WINAPI *GdiplusShutdown_)(ULONG_PTR token);

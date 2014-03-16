@@ -29,7 +29,7 @@
 #include <toadlet/egg/io/DataStream.h>
 #include <toadlet/peeper/IndexData.h>
 #include <toadlet/peeper/VertexData.h>
-#include <toadlet/tadpole/ResourceStreamer.h>
+#include <toadlet/tadpole/BaseResourceStreamer.h>
 #include <toadlet/tadpole/ResourceManager.h>
 #include <toadlet/tadpole/Engine.h>
 #include <toadlet/tadpole/Mesh.h>
@@ -37,19 +37,38 @@
 namespace toadlet{
 namespace tadpole{
 
-class TOADLET_API TMSHStreamer:public Object,public ResourceStreamer{
+class TOADLET_API TMSHStreamer:public BaseResourceStreamer{
 public:
-	TOADLET_IOBJECT(TMSHStreamer);
+	TOADLET_OBJECT(TMSHStreamer);
 
 	const static int VERSION=0x10001;
 	const static int TMSH=1414353736; // "TMSH"
 
 	TMSHStreamer(Engine *engine);
 
-	Resource::ptr load(Stream::ptr stream,ResourceData *data,ProgressListener *listener);
-	bool save(Stream::ptr stream,Resource::ptr resource,ResourceData *data,ProgressListener *listener);
+	bool load(Stream::ptr stream,ResourceData *data,ResourceRequest *request);
+	bool save(Stream::ptr stream,Resource::ptr resource,ResourceData *data,ResourceRequest *request);
 
 protected:
+	class MaterialRequest:public Object,public ResourceRequest{
+	public:
+		TOADLET_IOBJECT(MaterialRequest);
+
+		MaterialRequest(MaterialManager *materialManager,Mesh::ptr mesh,ResourceRequest *request):mMaterialManager(materialManager),mMesh(mesh),mRequest(request),mIndex(0){}
+
+		void request();
+
+		void resourceReady(Resource *resource);
+		void resourceException(const Exception &ex);
+		void resourceProgress(float progress){}
+
+	protected:
+		MaterialManager *mMaterialManager;
+		Mesh::ptr mMesh;
+		ResourceRequest::ptr mRequest;
+		int mIndex;
+	};
+
 	Mesh::ptr readMesh(DataStream *stream,int blockSize);
 	void writeMesh(DataStream *stream,Mesh::ptr mesh);
 

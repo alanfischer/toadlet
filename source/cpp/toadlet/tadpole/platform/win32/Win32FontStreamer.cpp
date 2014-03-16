@@ -74,7 +74,7 @@ bool Win32FontStreamer::valid(){
 	return mLibrary!=0;
 }
 
-Resource::ptr Win32FontStreamer::load(Stream::ptr stream,ResourceData *data,ProgressListener *listener){
+Resource::ptr Win32FontStreamer::load(Stream::ptr stream,ResourceData *data){
 	int i=0,j=0;
 
 	FontData *fontData=(FontData*)data;

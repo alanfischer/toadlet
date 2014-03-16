@@ -1,6 +1,6 @@
 #include "Resources.h"
 
-Resources *Resources::instance=NULL;
+Resources::ptr Resources::instance;
 
 tbyte *Resources::createNoise(TextureFormat *format,int scale,int seed,scalar brightnessScale,scalar brightnessOffset){
 	int width=format->getWidth(),height=format->getHeight();

@@ -70,6 +70,8 @@ public:
 
 	virtual void logAllResources();
 
+	virtual ResourceData *createResourceData(){return new ResourceData();}
+
 	inline Engine *getEngine(){return mEngine;}
 
 	String checkDefaultExtension(const String &path);
@@ -88,9 +90,11 @@ protected:
 
 		void resourceReady(Resource *resource);
 		void resourceException(const Exception &ex);
+		void resourceProgress(float progress){mRequest->resourceProgress(progress);}
 
 		void streamReady(Stream *stream);
 		void streamException(const Exception &ex);
+		void streamProgress(float progress){}
 
 	protected:
 		ResourceManager::ptr mManager;

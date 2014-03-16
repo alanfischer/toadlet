@@ -184,12 +184,12 @@ void AudioComponent::frameUpdate(int dt,int scope){
 	}
 }
 
-void AudioComponent::streamReady(Stream::ptr stream){
-	setAudioStream(shared_static_cast<AudioStream>(stream));
+void AudioComponent::streamReady(Stream *stream){
+	setAudioStream((AudioStream*)stream);
 }
 
-void AudioComponent::resourceReady(Resource::ptr resource){
-	setAudioBuffer(shared_static_cast<AudioBuffer>(resource));
+void AudioComponent::resourceReady(Resource *resource){
+	setAudioBuffer((AudioBuffer*)resource);
 }
 
 void AudioComponent::setAudioFromTransform(){

@@ -27,15 +27,15 @@
 #define TOADLET_TADPOLE_SPHEREMESHCREATOR_H
 
 #include <toadlet/tadpole/Engine.h>
-#include <toadlet/tadpole/ResourceCreator.h>
+#include <toadlet/tadpole/BaseResourceCreator.h>
 #include <toadlet/tadpole/Mesh.h>
 
 namespace toadlet{
 namespace tadpole{
 
-class TOADLET_API SphereMeshCreator:public Object,public ResourceCreator{
+class TOADLET_API SphereMeshCreator:public BaseResourceCreator{
 public:
-	TOADLET_IOBJECT(SphereMeshCreator);
+	TOADLET_OBJECT(SphereMeshCreator);
 
 	SphereMeshCreator(Engine *engine){
 		mEngine=engine;
@@ -43,7 +43,7 @@ public:
 
 	void destroy(){}
 
-	Resource::ptr create(const String &name,ResourceData *data,ProgressListener *listener){
+	Resource::ptr create(const String &name,ResourceData *data){
 		Resource::ptr resource=createSphereMesh(Sphere(Math::ONE),8,8,Material::ptr());
 		resource->setName(name);
 		return resource;

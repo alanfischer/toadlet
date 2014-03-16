@@ -27,7 +27,7 @@
 #define TOADLET_TADPOLE_GIFSTREAMER_H
 
 #include <toadlet/peeper/Texture.h>
-#include <toadlet/tadpole/ResourceStreamer.h>
+#include <toadlet/tadpole/BaseResourceStreamer.h>
 #include <toadlet/tadpole/TextureManager.h>
 
 struct GifFileType;
@@ -35,13 +35,13 @@ struct GifFileType;
 namespace toadlet{
 namespace tadpole{
 
-class TOADLET_API GIFStreamer:public Object,public ResourceStreamer{
+class TOADLET_API GIFStreamer:public BaseResourceStreamer{
 public:
-	TOADLET_IOBJECT(GIFStreamer);
+	TOADLET_OBJECT(GIFStreamer);
 
-	GIFStreamer(TextureManager *textureManager){mTextureManager=textureManager;}
+	GIFStreamer(TextureManager *textureManager):mTextureManager(textureManager){}
 
-	Resource::ptr load(Stream::ptr stream,ResourceData *data,ProgressListener *listener);
+	Resource::ptr load(Stream::ptr stream,ResourceData *data);
 
 protected:
 	GifFileType *openFile(Stream *stream);

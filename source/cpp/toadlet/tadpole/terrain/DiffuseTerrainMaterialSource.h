@@ -63,6 +63,7 @@ protected:
 
 		void resourceReady(Resource *resource){if(mLayer>=0){mParent->setDiffuseTexture(mLayer,(Texture*)resource);}else{mParent->setDetailTexture((Texture*)resource);}}
 		void resourceException(const Exception &ex){}
+		void resourceProgress(float progress){}
 
 	protected:
 		DiffuseTerrainMaterialSource::ptr mParent;

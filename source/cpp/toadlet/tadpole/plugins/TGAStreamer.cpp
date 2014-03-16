@@ -44,7 +44,7 @@ enum Encoding{
 	Encoding_RLE_BW=11,
 };
 
-Resource::ptr TGAStreamer::load(Stream::ptr stream,ResourceData *data,ProgressListener *listener){
+Resource::ptr TGAStreamer::load(Stream::ptr stream,ResourceData *data){
 	int usage=(data!=NULL)?((TextureData*)data)->usage:0;
 
 	if(stream==NULL){

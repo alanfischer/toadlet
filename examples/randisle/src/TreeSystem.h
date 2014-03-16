@@ -10,7 +10,7 @@ public:
 
 	class TreeBranch:public BranchSystem::Branch,public PathVertex,public PathEdge{
 	public:
-		TOADLET_OBJECT(TreeBranch);
+		TOADLET_IOBJECT(TreeBranch);
 
 		TreeBranch():skipFirst(false),started(false),lastVertex(-1){
 			branches.add(this);

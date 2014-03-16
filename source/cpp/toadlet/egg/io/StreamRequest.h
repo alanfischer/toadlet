@@ -40,6 +40,7 @@ public:
 
 	virtual void streamReady(Stream *stream)=0;
 	virtual void streamException(const Exception &ex)=0;
+	virtual void streamProgress(float progress)=0;
 };
 
 }

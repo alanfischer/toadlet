@@ -51,6 +51,8 @@ public:
 
 	AudioDevice *getAudioDevice();
 
+	ResourceData *createResourceData(){return new AudioData();}
+
 protected:
 	class AudioStreamRequest:public Object,public StreamRequest{
 	public:
@@ -60,6 +62,7 @@ protected:
 
 		void streamReady(Stream *stream);
 		void streamException(const Exception &ex);
+		void streamProgress(float progress){}
 
 	protected:
 		StreamRequest::ptr mRequest;

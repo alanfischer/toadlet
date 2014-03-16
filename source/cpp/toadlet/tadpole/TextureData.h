@@ -35,7 +35,7 @@ class TOADLET_API TextureData:public ResourceData{
 public:
 	TOADLET_OBJECT(TextureData);
 
-	TextureData(int usage1){
+	TextureData(int usage1=0){
 		usage=usage1;
 	}
 

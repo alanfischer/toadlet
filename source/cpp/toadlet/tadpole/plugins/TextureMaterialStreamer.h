@@ -26,7 +26,7 @@
 #ifndef TOADLET_TADPOLE_TEXTUREMATERIALSTREAMER_H
 #define TOADLET_TADPOLE_TEXTUREMATERIALSTREAMER_H
 
-#include <toadlet/tadpole/ResourceStreamer.h>
+#include <toadlet/tadpole/BaseResourceStreamer.h>
 #include <toadlet/tadpole/TextureManager.h>
 #include <toadlet/tadpole/Engine.h>
 
@@ -39,10 +39,25 @@ public:
 
 	TextureMaterialStreamer(Engine *engine){mEngine=engine;}
 
-	Resource::ptr load(Stream::ptr stream,ResourceData *data,ProgressListener *listener);
-	bool save(Stream::ptr stream,Resource::ptr resource,ResourceData *data,ProgressListener *listener){return false;}
+	bool load(Stream::ptr stream,ResourceData *data,ResourceRequest *request);
+	bool save(Stream::ptr stream,Resource::ptr resource,ResourceData *data,ResourceRequest *request){return false;}
 
 protected:
+	class TextureMaterialRequest:public Object,public ResourceRequest{
+	public:
+		TOADLET_IOBJECT(TextureMaterialRequest);
+
+		TextureMaterialRequest(Engine *engine,ResourceRequest *request):mEngine(engine),mRequest(request){}
+
+		void resourceReady(Resource *resource);
+		void resourceException(const Exception &ex){mRequest->resourceException(ex);}
+		void resourceProgress(float progress){mRequest->resourceProgress(progress);}
+
+	protected:
+		Engine *mEngine;
+		ResourceRequest::ptr mRequest;
+	};
+
 	Engine *mEngine;
 };
 

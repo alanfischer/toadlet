@@ -71,7 +71,13 @@ ArchiveManager::ArchiveStreamRequest::ArchiveStreamRequest(ArchiveManager *manag
 }
 
 void ArchiveManager::ArchiveStreamRequest::request(){
-	((Archive*)(*mIt))->openStream(mName,this);
+	Archive::ptr archive=((Archive*)(*mIt));
+	if(archive!=NULL){
+		archive->openStream(mName,this);
+	}
+	else{
+		streamException(Exception());
+	}
 }
 
 void ArchiveManager::ArchiveStreamRequest::notFound(){

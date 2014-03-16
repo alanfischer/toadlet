@@ -37,7 +37,7 @@ XANMStreamer::XANMStreamer(Engine *engine){
 	mEngine=engine;
 }
 
-Resource::ptr XANMStreamer::load(Stream::ptr stream,ResourceData *data,ProgressListener *listener){
+Resource::ptr XANMStreamer::load(Stream::ptr stream,ResourceData *data){
 	Sequence::ptr sequence=NULL;
 
 	DataStream::ptr dataStream=new DataStream(stream);
@@ -70,7 +70,7 @@ Resource::ptr XANMStreamer::load(Stream::ptr stream,ResourceData *data,ProgressL
 	return sequence;
 }
 
-bool XANMStreamer::save(Stream::ptr stream,Resource::ptr resource,ResourceData *data,ProgressListener *listener){
+bool XANMStreamer::save(Stream::ptr stream,Resource::ptr resource,ResourceData *data){
 	Sequence::ptr sequence=shared_static_cast<Sequence>(resource);
 	if(sequence==NULL){
 		return false;
@@ -82,10 +82,10 @@ bool XANMStreamer::save(Stream::ptr stream,Resource::ptr resource,ResourceData *
 	mxmlElementSetAttr(root,"Version",formatInt(version));
 
 	if(version==1){
-		saveSequenceVersion1(root,sequence,listener);
+		saveSequenceVersion1(root,sequence);
 	}
 	else if(version>=2){
-		saveSequenceVersion2Up(root,sequence,version,listener);
+		saveSequenceVersion2Up(root,sequence,version);
 	}
 	else{
 		mxmlRelease(root);
@@ -129,9 +129,9 @@ Sequence::ptr XANMStreamer::loadSequenceVersion2Up(mxml_node_t *root,int version
 	return sequence;
 }
 
-bool XANMStreamer::saveSequenceVersion1(mxml_node_t *root,Sequence::ptr sequence,ProgressListener *listener){
+bool XANMStreamer::saveSequenceVersion1(mxml_node_t *root,Sequence::ptr sequence){
 	if(sequence!=NULL){
-		mxml_node_t *node=XMLMeshUtilities::saveSequence(sequence,1,listener);
+		mxml_node_t *node=XMLMeshUtilities::saveSequence(sequence,1);
 		mxmlSetElement(node,"AnimationData");
 		mxmlAddChild(root,node);
 	}
@@ -139,9 +139,9 @@ bool XANMStreamer::saveSequenceVersion1(mxml_node_t *root,Sequence::ptr sequence
 	return true;
 }
 
-bool XANMStreamer::saveSequenceVersion2Up(mxml_node_t *root,Sequence::ptr sequence,int version,ProgressListener *listener){
+bool XANMStreamer::saveSequenceVersion2Up(mxml_node_t *root,Sequence::ptr sequence,int version){
 	if(sequence!=NULL){
-		mxml_node_t *node=XMLMeshUtilities::saveSequence(sequence,version,listener);
+		mxml_node_t *node=XMLMeshUtilities::saveSequence(sequence,version);
 		mxmlSetElement(node,"Sequence");
 		mxmlAddChild(root,node);
 	}

@@ -27,13 +27,13 @@
 #define TOADLET_TADPOLE_GEOSPHEREMESHCREATOR_H
 
 #include <toadlet/tadpole/Engine.h>
-#include <toadlet/tadpole/ResourceCreator.h>
+#include <toadlet/tadpole/BaseResourceCreator.h>
 #include <toadlet/tadpole/Mesh.h>
 
 namespace toadlet{
 namespace tadpole{
 
-class TOADLET_API GeoSphereMeshCreator:public Object,public ResourceCreator{
+class TOADLET_API GeoSphereMeshCreator:public BaseResourceCreator{
 public:
 	TOADLET_OBJECT(GeoSphereMeshCreator);
 
@@ -43,8 +43,8 @@ public:
 
 	void destroy(){}
 
-	Resource::ptr create(const String &name,ResourceData *data,ProgressListener *listener){
-		Resource::ptr resource=createGeoSphereMesh(Sphere(Math::ONE),3,false,Material::ptr());
+	Resource::ptr create(const String &name,ResourceData *data){
+		Resource::ptr resource=createGeoSphereMesh(Sphere(Math::ONE),3,false,NULL);
 		resource->setName(name);
 		return resource;
 	}

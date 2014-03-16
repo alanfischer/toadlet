@@ -27,15 +27,15 @@
 #define TOADLET_TADPOLE_SKYBOXMATERIALCREATOR_H
 
 #include <toadlet/tadpole/Engine.h>
-#include <toadlet/tadpole/ResourceCreator.h>
+#include <toadlet/tadpole/BaseResourceCreator.h>
 #include <toadlet/tadpole/material/Material.h>
 
 namespace toadlet{
 namespace tadpole{
 
-class TOADLET_API SkyBoxMaterialCreator:public Object,public ResourceCreator{
+class TOADLET_API SkyBoxMaterialCreator:public BaseResourceCreator{
 public:
-	TOADLET_IOBJECT(SkyBoxMaterialCreator);
+	TOADLET_OBJECT(SkyBoxMaterialCreator);
 
 	SkyBoxMaterialCreator(Engine *engine);
 
@@ -44,7 +44,7 @@ public:
 	void createShaders();
 	void destroyShaders();
 
-	Resource::ptr create(const String &name,ResourceData *data,ProgressListener *listener);
+	Resource::ptr create(const String &name,ResourceData *data);
 	Material::ptr createSkyBoxMaterial(Texture *texture,bool clamp,RenderState *renderState);
 	bool createPaths(Material *material,RenderState *renderState,Texture *texture,bool clamp);
 

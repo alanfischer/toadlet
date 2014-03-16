@@ -35,7 +35,7 @@ class TOADLET_API AudioData:public ResourceData{
 public:
 	TOADLET_OBJECT(AudioData);
 
-	AudioData(int track1){
+	AudioData(int track1=0){
 		track=track1;
 	}
 

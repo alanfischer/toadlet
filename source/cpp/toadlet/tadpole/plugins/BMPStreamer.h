@@ -27,20 +27,20 @@
 #define TOADLET_TADPOLE_BMPSTREAMER_H
 
 #include <toadlet/peeper/Texture.h>
-#include <toadlet/tadpole/ResourceStreamer.h>
+#include <toadlet/tadpole/BaseResourceStreamer.h>
 #include <toadlet/tadpole/TextureManager.h>
 
 namespace toadlet{
 namespace tadpole{
 
-class TOADLET_API BMPStreamer:public Object,public ResourceStreamer{
+class TOADLET_API BMPStreamer:public BaseResourceStreamer{
 public:
-	TOADLET_IOBJECT(BMPStreamer);
+	TOADLET_OBJECT(BMPStreamer);
 
 	BMPStreamer(TextureManager *textureManager){mTextureManager=textureManager;}
 
-	Resource::ptr load(Stream::ptr stream,ResourceData *data,ProgressListener *listener);
-	bool save(Stream::ptr stream,Resource::ptr resource,ResourceData *data,ProgressListener *listener);
+	Resource::ptr load(Stream::ptr stream,ResourceData *data);
+	bool save(Stream::ptr stream,Resource::ptr resource,ResourceData *data);
 
 protected:
 	TextureManager *mTextureManager;

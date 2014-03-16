@@ -28,9 +28,9 @@
 
 #include <toadlet/egg/Interface.h>
 #include <toadlet/egg/Resource.h>
+#include <toadlet/egg/ResourceRequest.h>
 #include <toadlet/egg/io/Stream.h>
 #include <toadlet/tadpole/ResourceData.h>
-#include <toadlet/tadpole/ProgressListener.h>
 
 namespace toadlet{
 namespace tadpole{
@@ -43,8 +43,8 @@ public:
 
 	virtual void destroy(){}
 
-	virtual Resource::ptr load(Stream::ptr stream,ResourceData *data,ProgressListener *listener)=0;
-	virtual bool save(Stream::ptr stream,Resource::ptr resource,ResourceData *data,ProgressListener *listener){return false;}
+	virtual bool load(Stream::ptr stream,ResourceData *data,ResourceRequest *request)=0;
+	virtual bool save(Stream::ptr stream,Resource::ptr resource,ResourceData *data,ResourceRequest *request)=0;
 };
 
 }

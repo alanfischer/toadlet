@@ -361,9 +361,9 @@ ResourceManager::ArchiveResourceRequest::ArchiveResourceRequest(ResourceManager 
 	mName=name;
 	mData=data;
 	if(mData==NULL){
-		mData=new ResourceData();
-		mData->setName(mName);
+		mData=manager->createResourceData();
 	}
+	mData->setName(mName);
 	mRequest=request;
 	mIt=manager->mResourceArchives.begin();
 }
@@ -404,12 +404,22 @@ void ResourceManager::ArchiveResourceRequest::notFound(){
 }
 
 void ResourceManager::ArchiveResourceRequest::resourceReady(Resource *resource){
+	resource->setName(mName);
+	mManager->manage(resource);
+
 	mRequest->resourceReady(resource);
 }
 
 void ResourceManager::ArchiveResourceRequest::resourceException(const Exception &ex){
-	mIt++;
-	request();
+	if(mIt!=mManager->mResourceArchives.end()){
+		// Still archive searching
+		mIt++;
+		request();
+	}
+	else{
+		// Failed streamer load
+		mRequest->resourceException(ex);
+	}
 }
 
 void ResourceManager::ArchiveResourceRequest::streamReady(Stream *stream){
@@ -432,19 +442,15 @@ void ResourceManager::ArchiveResourceRequest::streamReady(Stream *stream){
 	}
 
 	if(tempPath.length()>0){
-		engine->getArchiveManager()->addDirectory(tempPath);
+		Log::warning("no longer adding temp paths, needs to be cleaned");
+//		engine->getArchiveManager()->addDirectory(tempPath);
 	}
 
-	Resource::ptr resource;
-	TOADLET_TRY
-		resource=mStreamer->load(stream,mData,NULL);
-	TOADLET_CATCH_ANONYMOUS(){resource=NULL;}
+	mStreamer->load(stream,mData,this);
 
 	if(tempPath.length()>0){
-		engine->getArchiveManager()->removeDirectory(tempPath);
+//		engine->getArchiveManager()->removeDirectory(tempPath);
 	}
-
-	mRequest->resourceReady(resource);
 }
 
 void ArchiveManager::ArchiveResourceRequest::streamException(const Exception &ex){

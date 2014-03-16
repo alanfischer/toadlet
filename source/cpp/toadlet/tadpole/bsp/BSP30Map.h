@@ -109,6 +109,7 @@ public:
 	bmiptexlump *miptexlump;
 	Collection<Collection<int> > parsedVisibility;
 	Collection<Collection<keyvalue> > parsedEntities;
+	Collection<Archive::ptr> parsedWads;
 	Collection<Texture::ptr> parsedTextures;
 	Collection<Material::ptr> materials;
 	VertexData::ptr vertexData;

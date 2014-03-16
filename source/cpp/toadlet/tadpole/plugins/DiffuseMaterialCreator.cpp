@@ -292,7 +292,8 @@ void DiffuseMaterialCreator::destroy(){
 	}
 }
 
-Resource::ptr DiffuseMaterialCreator::create(const String &name,ResourceData *data,ProgressListener *listener){
+Resource::ptr DiffuseMaterialCreator::create(const String &name,ResourceData *data){
+	Error::unimplemented(Categories::TOADLET_TADPOLE,"DiffuseMaterialCreator::create unimplemented");
 	return NULL;
 }
 

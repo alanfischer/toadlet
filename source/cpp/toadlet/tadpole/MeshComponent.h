@@ -96,6 +96,7 @@ public:
 
 	void resourceReady(Resource *resource){setMesh((Mesh*)resource);}
 	void resourceException(const Exception &ex){}
+	void resourceProgress(float progress){}
 
 	// Spacial
 	void setTransform(Transform::ptr transform);

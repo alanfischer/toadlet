@@ -27,7 +27,7 @@
 #define TOADLET_TADPOLE_FREETYPESTREAMER_H
 
 #include <toadlet/tadpole/Font.h>
-#include <toadlet/tadpole/ResourceStreamer.h>
+#include <toadlet/tadpole/BaseResourceStreamer.h>
 #include <toadlet/tadpole/TextureManager.h>
 
 extern "C" {
@@ -42,14 +42,14 @@ extern "C" {
 namespace toadlet{
 namespace tadpole{
 
-class FreeTypeStreamer:public Object,public ResourceStreamer{
+class FreeTypeStreamer:public BaseResourceStreamer{
 public:
-	TOADLET_IOBJECT(FreeTypeStreamer);
+	TOADLET_OBJECT(FreeTypeStreamer);
 
 	FreeTypeStreamer(TextureManager *textureManager);
 	virtual ~FreeTypeStreamer();
 
-	Resource::ptr load(Stream::ptr stream,ResourceData *data,ProgressListener *listener);
+	Resource::ptr load(Stream::ptr stream,ResourceData *data);
 
 protected:
 	TextureManager *mTextureManager;

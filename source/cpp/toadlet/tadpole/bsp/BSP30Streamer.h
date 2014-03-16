@@ -27,42 +27,54 @@
 #define TOADLET_TADPOLE_BSP_BSP30STREAMER_H
 
 #include <toadlet/tadpole/Engine.h>
-#include <toadlet/tadpole/ResourceStreamer.h>
+#include <toadlet/tadpole/BaseResourceStreamer.h>
 #include <toadlet/tadpole/bsp/BSP30Map.h>
 
 namespace toadlet{
 namespace tadpole{
 namespace bsp{
 
-class BSP30Streamer:public Object,public ResourceStreamer{
+class BSP30Streamer:public BaseResourceStreamer{
 public:
-	TOADLET_IOBJECT(BSP30Streamer);
+	TOADLET_OBJECT(BSP30Streamer);
 
 	BSP30Streamer(Engine *engine);
 	virtual ~BSP30Streamer();
 
-	virtual Resource::ptr load(Stream::ptr stream,ResourceData *data,ProgressListener *listener);
+	bool load(Stream::ptr stream,ResourceData *data,ResourceRequest *request);
 
 protected:
-	class TextureArchiveRequest:public Object,public ResourceRequest{
+	class MaterialRequest:public Object,public ResourceRequest{
 	public:
-		TOADLET_IOBJECT(TextureArchiveRequest);
+		TOADLET_IOBJECT(MaterialRequest);
 
-		TextureArchiveRequest(Engine *engine):mEngine(engine){}
+		MaterialRequest(Engine *engine,BSP30Map *map,ResourceRequest *request);
 
-		void resourceReady(Resource *resource){mEngine->getTextureManager()->addResourceArchive((Archive*)resource);}
-		void resourceException(const Exception &ex){}
+		void request();
+
+		void parseWADs(BSP30Map *map);
+		void parseWADsDone(BSP30Map *map);
+		void parseMaterials(BSP30Map *map);
+		void parseMaterialsDone(BSP30Map *map);
+
+		void resourceReady(Resource *resource);
+		void resourceException(const Exception &ex);
+		void resourceProgress(float progress){}
 
 	protected:
 		Engine *mEngine;
+		BSP30Map::ptr mMap;
+		ResourceRequest::ptr mRequest;
+		int mWADIndex;
+		int mTextureIndex;
 	};
 
 	void readLump(Stream *stream,blump *lump,void **data,int size,int *count);
 	void parseVisibility(BSP30Map *map);
 	void parseEntities(BSP30Map *map);
+	void parseBuffers(BSP30Map *map);
 	void parseWADs(BSP30Map *map);
 	void parseTextures(BSP30Map *map);
-	void buildBuffers(BSP30Map *map);
 	void buildMaterials(BSP30Map *map);
 
 	Engine *mEngine;
