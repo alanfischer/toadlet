@@ -125,8 +125,12 @@ void RandIsle::create(){
 	mEngine=mApp->getEngine();
 	mEngine->getArchiveManager()->addDirectory(mPath);
 
-	Resources::init(mEngine);
+	Resources::init(mEngine,this);
 
+	Log::debug("RandIsle::create finished");
+}
+
+void RandIsle::ready(){
 	mPatchSize=Resources::instance->patchSize;
 	scalar scale=16*64/mPatchSize;
 	mPatchScale.set(scale,scale,64);
@@ -325,7 +329,6 @@ cc->setLookDir(Vector3(0,0,0),Vector3(0,1,0),Vector3(0,0,1));
 	}
 	mScene->getRoot()->attach(snow);
 */
-	Log::debug("RandIsle::create finished");
 }
 
 void RandIsle::destroy(){
@@ -340,8 +343,6 @@ void RandIsle::destroy(){
 	if(mScene!=NULL){
 		mScene->destroy();
 		mScene=NULL;
-
-		Resources::destroy();
 	}
 
 	if(mPredictedVertexData!=NULL){
@@ -409,7 +410,9 @@ void RandIsle::render(){
 }
 
 void RandIsle::update(int dt){
-	mScene->update(dt);
+	if(mScene!=NULL){
+		mScene->update(dt);
+	}
 }
 
 void RandIsle::logicUpdate(int dt){

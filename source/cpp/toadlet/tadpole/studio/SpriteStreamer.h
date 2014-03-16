@@ -27,21 +27,21 @@
 #define TOADLET_TADPOLE_STUDIO_SPRITESTREAMER_H
 
 #include <toadlet/tadpole/Engine.h>
-#include <toadlet/tadpole/ResourceStreamer.h>
+#include <toadlet/tadpole/BaseResourceStreamer.h>
 #include <toadlet/tadpole/studio/SpriteModel.h>
 
 namespace toadlet{
 namespace tadpole{
 namespace studio{
 
-class TOADLET_API SpriteStreamer:public Object,public ResourceStreamer{
+class TOADLET_API SpriteStreamer:public BaseResourceStreamer{
 public:
-	TOADLET_IOBJECT(SpriteStreamer);
+	TOADLET_OBJECT(SpriteStreamer);
 
 	SpriteStreamer(Engine *engine);
 	virtual ~SpriteStreamer();
 
-	virtual Resource::ptr load(Stream::ptr stream,ResourceData *data,ProgressListener *listener);
+	Resource::ptr load(Stream::ptr stream,ResourceData *data);
 
 protected:
 	void buildTextures(SpriteModel *model);

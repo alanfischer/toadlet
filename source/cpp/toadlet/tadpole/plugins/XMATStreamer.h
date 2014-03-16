@@ -27,7 +27,7 @@
 #define TOADLET_TADPOLE_XMATSTREAMER_H
 
 #include <toadlet/tadpole/Engine.h>
-#include <toadlet/tadpole/ResourceStreamer.h>
+#include <toadlet/tadpole/BaseResourceStreamer.h>
 #include <toadlet/tadpole/material/Material.h>
 
 typedef struct mxml_node_s mxml_node_t;
@@ -35,18 +35,18 @@ typedef struct mxml_node_s mxml_node_t;
 namespace toadlet{
 namespace tadpole{
 
-class TOADLET_API XMATStreamer:public Object,public ResourceStreamer{
+class TOADLET_API XMATStreamer:public BaseResourceStreamer{
 public:
-	TOADLET_IOBJECT(XMATStreamer);
+	TOADLET_OBJECT(XMATStreamer);
 
 	XMATStreamer(Engine *engine);
 
-	Resource::ptr load(Stream::ptr stream,ResourceData *data,ProgressListener *listener);
-	bool save(Stream::ptr stream,Resource::ptr resource,ResourceData *data,ProgressListener *listener);
+	Resource::ptr load(Stream::ptr stream,ResourceData *data);
+	bool save(Stream::ptr stream,Resource::ptr resource,ResourceData *data);
 
 protected:
 	Material::ptr loadMaterial(mxml_node_t *root,int version);
-	bool saveMaterial(mxml_node_t *root,Material::ptr jmaterial,int version,ProgressListener *listener);
+	bool saveMaterial(mxml_node_t *root,Material::ptr jmaterial,int version);
 
 	Engine *mEngine;
 };

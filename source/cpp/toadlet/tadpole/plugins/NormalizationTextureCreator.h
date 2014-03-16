@@ -43,10 +43,11 @@ public:
 
 	void destroy(){}
 
-	Resource::ptr create(const String &name,ResourceData *data,ProgressListener *listener){
+	bool create(const String &name,ResourceData *data,ResourceRequest *request){
 		Resource::ptr resource=createNormalizationTexture(256);
 		resource->setName(name);
-		return resource;
+		request->resourceReady(resource);
+		return true;
 	}
 
 	Texture::ptr createNormalizationTexture(int size);

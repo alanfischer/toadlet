@@ -53,8 +53,11 @@ public:
 
 	bool find(const String &name,ResourceRequest *request,ResourceData *data=NULL);
 
+	ResourceData *createResourceData(){return new FontData();}
+
 	void resourceReady(Resource *resource);
 	void resourceException(const Exception &ex){}
+	void resourceProgress(float progress){}
 
 protected:
 	String mDefaultCharacterSet;

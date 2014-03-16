@@ -144,7 +144,7 @@ void SkyBoxMaterialCreator::destroyShaders(){
 	}
 }
 
-Resource::ptr SkyBoxMaterialCreator::create(const String &name,ResourceData *data,ProgressListener *listener){
+Resource::ptr SkyBoxMaterialCreator::create(const String &name,ResourceData *data){
 	Error::unimplemented(Categories::TOADLET_TADPOLE,"SkyBoxMaterialCreator::create unimplemented");
 	return NULL;
 }

@@ -26,7 +26,7 @@
 #ifndef TOADLET_TADPOLE_WATERMATERIALCREATOR_H
 #define TOADLET_TADPOLE_WATERMATERIALCREATOR_H
 
-#include <toadlet/tadpole/ResourceCreator.h>
+#include <toadlet/tadpole/BaseResourceCreator.h>
 #include <toadlet/tadpole/material/Material.h>
 #include <toadlet/tadpole/Engine.h>
 #include <toadlet/tadpole/Colors.h>
@@ -34,14 +34,14 @@
 namespace toadlet{
 namespace tadpole{
 
-class TOADLET_API WaterMaterialCreator:public Object,public ResourceCreator{
+class TOADLET_API WaterMaterialCreator:public BaseResourceCreator{
 public:
-	TOADLET_IOBJECT(WaterMaterialCreator);
+	TOADLET_OBJECT(WaterMaterialCreator);
 
 	WaterMaterialCreator(Engine *engine);
 	void destroy(){}
 
-	Resource::ptr create(const String &name,ResourceData *data,ProgressListener *listener){
+	Resource::ptr create(const String &name,ResourceData *data){
 		Resource::ptr resource=createWaterMaterial(0,0,0,Colors::AZURE);
 		resource->setName(name);
 		return resource;

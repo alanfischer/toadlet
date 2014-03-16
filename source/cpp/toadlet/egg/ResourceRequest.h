@@ -23,19 +23,28 @@
  *
  ********** Copyright header - do not remove **********/
 
-#ifndef TOADLET_TADPOLE_PROGRESSLISTENER_H
-#define TOADLET_TADPOLE_PROGRESSLISTENER_H
+#ifndef TOADLET_EGG_IO_RESOURCEREQUEST_H
+#define TOADLET_EGG_IO_RESOURCEREQUEST_H
 
-#include <toadlet/tadpole/Types.h>
+#include <toadlet/egg/Resource.h>
+#include <toadlet/egg/Exception.h>
 
 namespace toadlet{
-namespace tadpole{
+namespace egg{
+namespace io{
 
-class ProgressListener{
+class ResourceRequest:public Interface{
 public:
-	virtual void progressUpdated(scalar amount)=0;
+	TOADLET_INTERFACE(ResourceRequest);
+
+	virtual ~ResourceRequest(){}
+
+	virtual void resourceReady(Resource *resource)=0;
+	virtual void resourceException(const Exception &ex)=0;
+	virtual void resourceProgress(float progress)=0;
 };
 
+}
 }
 }
 

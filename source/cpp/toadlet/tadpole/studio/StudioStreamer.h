@@ -27,21 +27,21 @@
 #define TOADLET_TADPOLE_STUDIO_STUDIOSTREAMER_H
 
 #include <toadlet/tadpole/Engine.h>
-#include <toadlet/tadpole/ResourceStreamer.h>
+#include <toadlet/tadpole/BaseResourceStreamer.h>
 #include <toadlet/tadpole/studio/StudioModel.h>
 
 namespace toadlet{
 namespace tadpole{
 namespace studio{
 
-class TOADLET_API StudioStreamer:public Object,public ResourceStreamer{
+class TOADLET_API StudioStreamer:public BaseResourceStreamer{
 public:
-	TOADLET_IOBJECT(StudioStreamer);
+	TOADLET_OBJECT(StudioStreamer);
 
 	StudioStreamer(Engine *engine);
 	virtual ~StudioStreamer();
 
-	virtual Resource::ptr load(Stream::ptr stream,ResourceData *data,ProgressListener *listener);
+	virtual Resource::ptr load(Stream::ptr stream,ResourceData *data);
 
 protected:
 	void buildBuffers(StudioModel *model);

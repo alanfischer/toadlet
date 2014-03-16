@@ -42,7 +42,7 @@ void toadlet_png_read_data(png_structp png_ptr,png_bytep data,png_size_t length)
 	}
 }
 
-Resource::ptr PNGStreamer::load(Stream::ptr stream,ResourceData *data,ProgressListener *listener){
+Resource::ptr PNGStreamer::load(Stream::ptr stream,ResourceData *data){
 	png_byte header[8];
 	int y;
 	int usage=(data!=NULL)?((TextureData*)data)->usage:0;

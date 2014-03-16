@@ -113,6 +113,7 @@ set (EGG_HDR
 	Random.h
 	Resource.h
 	ResourceDestroyedListener.h
+	ResourceRequest.h
 	Runnable.h
 	Runner.h
 	SharedPointer.h
@@ -130,6 +131,7 @@ set (EGG_HDR
 
 set (EGG_IO_HDR
 	io/Archive.h
+	io/BaseArchive.h
 	io/DataStream.h
 	io/DataMessageStream.h
 	io/FileStream.h
@@ -138,6 +140,7 @@ set (EGG_IO_HDR
 	io/PacketMessageStream.h
 	io/SocketStream.h
 	io/Stream.h
+	io/StreamRequest.h
 	io/Stream_iostream.h
 	io/iostream_Stream.h
 )

@@ -7,9 +7,9 @@
 #include "Sky.h"
 #include "HUD.h"
 
-class RandIsle:public Object,public Applet,public TerrainNodeDataSource,public UpdateListener,public TerrainNodeListener,public InputDeviceListener,public PathClimberListener{
+class RandIsle:public Object,public Applet,public ResourceRequest,public TerrainNodeDataSource,public UpdateListener,public TerrainNodeListener,public InputDeviceListener,public PathClimberListener{
 public:
-	TOADLET_OBJECT(RandIsle);
+	TOADLET_IOBJECT(RandIsle);
 
 	enum{
 		Scope_BIT_TREE=			1<<1,
@@ -26,6 +26,12 @@ public:
 
 	void create();
 	void destroy();
+	void ready();
+
+	void resourceReady(Resource *resource){ready();}
+	void resourceException(const Exception &ex){}
+	void resourceProgress(float progress){}
+
 	void resized(int width,int height){}
 	void render();
 	void update(int dt);

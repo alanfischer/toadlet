@@ -40,9 +40,23 @@ public:
 
 	virtual AudioStream::ptr createAudioStream(Stream *stream,ResourceData *data)=0;
 
-	Resource::ptr load(Stream::ptr stream,ResourceData *data,ProgressListener *listener){
-		return mAudioManager->createAudioBuffer(createAudioStream(stream,data));
+	bool load(Stream::ptr stream,ResourceData *data,ResourceRequest *request){
+		AudioBuffer::ptr result;
+		Exception exception;
+		TOADLET_TRY
+			result=mAudioManager->createAudioBuffer(createAudioStream(stream,data));
+		TOADLET_CATCH(Exception ex){exception=ex;}
+		if(result!=NULL){
+			request->resourceReady(result);
+			return true;
+		}
+		else{
+			request->resourceException(exception);
+			return false;
+		}
 	}
+
+	bool save(Stream::ptr stream,Resource::ptr resource,ResourceData *data,ResourceRequest *request){return false;}
 
 protected:
 	AudioManager *mAudioManager;

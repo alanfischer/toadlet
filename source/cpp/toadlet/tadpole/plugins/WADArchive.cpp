@@ -70,10 +70,10 @@ bool WADArchive::open(Stream::ptr stream){
 	return true;
 }
 
-bool WADArchive::openResource(const String &name,ResourceRequest *request){
+Resource::ptr WADArchive::openResource(const String &name){
 	Map<String,int>::iterator texindex=mNameMap.find(name.toLower());
 	if(texindex==mNameMap.end()){
-		request->resourceException(Error::fileNotFound(Categories::TOADLET_TADPOLE,Error::Throw_NO));
+		//Error::fileNotFound(Categories::TOADLET_TADPOLE,"resource not found");
 		return false;
 	}
 	
@@ -82,8 +82,7 @@ bool WADArchive::openResource(const String &name,ResourceRequest *request){
 	mStream->read((tbyte*)mInBuffer,info->size);
 
 	Texture::ptr texture=createTexture(mTextureManager,(wmiptex*)mInBuffer);
-	request->resourceReady(texture);
-	return true;
+	return texture;
 }
 
 Texture::ptr WADArchive::createTexture(toadlet::tadpole::TextureManager *textureManager,wmiptex *miptex,tbyte *pal){

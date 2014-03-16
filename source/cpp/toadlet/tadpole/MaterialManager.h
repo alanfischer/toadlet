@@ -70,13 +70,6 @@ public:
 
 	BufferManager *getBufferManager();
 
-	// Deprecated
-	Material::ptr findMaterial(const String &name){
-		SyncRequest::ptr request=new SyncRequest();
-		find(name,request);
-		return shared_static_cast<Material>(request->getResource());
-	}
-
 protected:
 	Collection<RenderState::ptr> mRenderStates;
 	Collection<ShaderState::ptr> mShaderStates;

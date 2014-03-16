@@ -28,14 +28,14 @@
 
 #include <toadlet/egg/BaseResource.h>
 #include <toadlet/egg/Map.h>
-#include <toadlet/egg/io/Archive.h>
+#include <toadlet/egg/io/BaseArchive.h>
 
 namespace toadlet{
 namespace egg{
 
-class TOADLET_API Win32ResourceArchive:public BaseResource,public Archive{
+class TOADLET_API Win32ResourceArchive:public BaseArchive{
 public:
-	TOADLET_RESOURCE(Win32ResourceArchive,Archive);
+	TOADLET_OBJECT(Win32ResourceArchive);
 
 	Win32ResourceArchive();
 
@@ -44,8 +44,7 @@ public:
 	virtual bool open(void *module);
 	void setMap(const Map<String,int> &idMap);
 
-	bool openStream(const String &name,StreamRequest *request);
-	bool openResource(const String &name,ResourceRequest *request){return false;}
+	Stream::ptr openStream(const String &name);
 
 	const Collection<String> &getEntries();
 

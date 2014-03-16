@@ -27,21 +27,21 @@
 #define TOADLET_TADPOLE_DIFFUSEMATERIALCREATOR_H
 
 #include <toadlet/tadpole/Engine.h>
-#include <toadlet/tadpole/ResourceManager.h>
+#include <toadlet/tadpole/BaseResourceCreator.h>
 #include <toadlet/tadpole/material/Material.h>
 
 namespace toadlet{
 namespace tadpole{
 
-class TOADLET_API DiffuseMaterialCreator:public Object,public ResourceCreator{
+class TOADLET_API DiffuseMaterialCreator:public BaseResourceCreator{
 public:
-	TOADLET_IOBJECT(DiffuseMaterialCreator);
+	TOADLET_OBJECT(DiffuseMaterialCreator);
 
 	DiffuseMaterialCreator(Engine *engine);
 
 	void destroy();
 
-	Resource::ptr create(const String &name,ResourceData *data,ProgressListener *listener);
+	Resource::ptr create(const String &name,ResourceData *data);
 	Material::ptr createDiffuseMaterial(Texture *texture,RenderState *state);
 	Material::ptr createPointSpriteMaterial(Texture *texture,scalar size,bool attenuated);
 	Material::ptr createFontMaterial(Font *font);

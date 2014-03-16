@@ -26,15 +26,15 @@
 #ifndef TOADLET_TADPOLE_AABOXMESHCREATOR_H
 #define TOADLET_TADPOLE_AABOXMESHCREATOR_H
 
-#include <toadlet/tadpole/ResourceCreator.h>
+#include <toadlet/tadpole/BaseResourceCreator.h>
 #include <toadlet/tadpole/Mesh.h>
 
 namespace toadlet{
 namespace tadpole{
 
-class TOADLET_API AABoxMeshCreator:public Object,public ResourceCreator{
+class TOADLET_API AABoxMeshCreator:public BaseResourceCreator{
 public:
-	TOADLET_IOBJECT(AABoxMeshCreator);
+	TOADLET_OBJECT(AABoxMeshCreator);
 
 	AABoxMeshCreator(Engine *engine){
 		mEngine=engine;
@@ -42,7 +42,7 @@ public:
 
 	void destroy(){}
 
-	Resource::ptr create(const String &name,ResourceData *data,ProgressListener *listener){
+	Resource::ptr create(const String &name,ResourceData *data){
 		Resource::ptr resource=createAABoxMesh(AABox(-Math::ONE,-Math::ONE,-Math::ONE,Math::ONE,Math::ONE,Math::ONE),Material::ptr());
 		resource->setName(name);
 		return resource;

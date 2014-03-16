@@ -26,9 +26,8 @@
 #ifndef TOADLET_TADPOLE_TPKGARCHIVE_H
 #define TOADLET_TADPOLE_TPKGARCHIVE_H
 
-#include <toadlet/egg/BaseResource.h>
 #include <toadlet/egg/Map.h>
-#include <toadlet/egg/io/Archive.h>
+#include <toadlet/egg/io/BaseArchive.h>
 #include <toadlet/egg/io/DataStream.h>
 #include <toadlet/egg/io/MemoryStream.h>
 #include <toadlet/tadpole/Types.h>
@@ -36,9 +35,9 @@
 namespace toadlet{
 namespace tadpole{
 
-class TOADLET_API TPKGArchive:public Archive,public BaseResource{
+class TOADLET_API TPKGArchive:public BaseArchive{
 public:
-	TOADLET_RESOURCE(TPKGArchive,Archive);
+	TOADLET_OBJECT(TPKGArchive);
 
 	TPKGArchive();
 
@@ -47,8 +46,7 @@ public:
 	bool open(MemoryStream::ptr memoryStream);
 	bool open(Stream::ptr stream);
 
-	bool openStream(const String &name,StreamRequest *request);
-	bool openResource(const String &name,ResourceRequest *request){return false;}
+	Stream::ptr openStream(const String &name);
 
 	const Collection<String> &getEntries(){return mEntries;}
 

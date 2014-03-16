@@ -26,20 +26,20 @@
 #ifndef TOADLET_TADPOLE_TPKGSTREAMER_H
 #define TOADLET_TADPOLE_TPKGSTREAMER_H
 
-#include <toadlet/tadpole/ResourceStreamer.h>
+#include <toadlet/tadpole/BaseResourceStreamer.h>
 #include "TPKGArchive.h"
 
 namespace toadlet{
 namespace tadpole{
 
-class TOADLET_API TPKGStreamer:public Object,public ResourceStreamer{
+class TOADLET_API TPKGStreamer:public BaseResourceStreamer{
 public:
-	TOADLET_IOBJECT(TPKGStreamer);
+	TOADLET_OBJECT(TPKGStreamer);
 
 	TPKGStreamer(){}
 
-	Resource::ptr load(Stream::ptr stream,ResourceData *data,ProgressListener *listener){
-		TPKGArchive::ptr archive(new TPKGArchive());
+	Resource::ptr load(Stream::ptr stream,ResourceData *data){
+		TPKGArchive::ptr archive=new TPKGArchive();
 		bool result=archive->open(stream);
 		if(result){
 			return shared_static_cast<Archive>(archive);

@@ -57,17 +57,17 @@ bool TPKGArchive::open(Stream::ptr stream){
 	tbyte signature[4];
 	mDataOffset+=mStream->read(signature,4);
 	if(signature[0]!='T' || signature[1]!='P' || signature[2]!='K' || signature[3]!='G'){
+		mStream=NULL;
 		Error::unknown(Categories::TOADLET_TADPOLE,
 			"Not of TPKG format");
-		mStream=NULL;
 		return false;
 	}
 
 	uint32 version=mStream->readBUInt32();mDataOffset+=4;
 	if(version!=1){
+		mStream=NULL;
 		Error::unknown(Categories::TOADLET_TADPOLE,
 			"Not TPKG version 1");
-		mStream=NULL;
 		return false;
 	}
 
@@ -91,20 +91,20 @@ bool TPKGArchive::open(Stream::ptr stream){
 	return true;
 }
 
-bool TPKGArchive::openStream(const String &name,StreamRequest *request){
+Stream::ptr TPKGArchive::openStream(const String &name){
 	Log::debug(Categories::TOADLET_TADPOLE,
 		"creating InputStream for "+name);
 
 	if(mStream==NULL){
-		request->streamException(Error::unknown(Categories::TOADLET_TADPOLE,Error::Throw_NO));
-		return false;
+		Error::unknown(Categories::TOADLET_TADPOLE,"null stream");
+		return NULL;
 	}
 
 	Map<String,Index>::iterator it;
 	it=mIndex.find(name);
 	if(it==mIndex.end()){
-		request->streamException(Error::fileNotFound(Categories::TOADLET_TADPOLE,Error::Throw_NO));
-		return false;
+		//Error::fileNotFound(Categories::TOADLET_TADPOLE,"unable to find file");
+		return NULL;
 	}
 
 	mStream->seek(mDataOffset+it->second.position);
@@ -120,8 +120,8 @@ bool TPKGArchive::openStream(const String &name,StreamRequest *request){
 		mStream->read(data,length);
 		stream=new MemoryStream(data,length,length,true);
 	}
-	request->streamReady(stream);
-	return true;
+
+	return stream;
 }
 
 }

@@ -77,7 +77,7 @@ bool Win32TextureStreamer::valid(){
 	return mLibrary!=0;
 }
 
-Resource::ptr Win32TextureStreamer::load(Stream::ptr in,ResourceData *data,ProgressListener *listener){
+Resource::ptr Win32TextureStreamer::load(Stream::ptr in,ResourceData *data){
 	Log::debug(Categories::TOADLET_TADPOLE,"Win32TextureStreamer::load");
 
 	Texture::ptr texture=NULL;

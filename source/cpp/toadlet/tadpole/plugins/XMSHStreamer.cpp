@@ -37,7 +37,7 @@ XMSHStreamer::XMSHStreamer(Engine *engine){
 	mEngine=engine;
 }
 
-Resource::ptr XMSHStreamer::load(Stream::ptr stream,ResourceData *data,ProgressListener *listener){
+bool XMSHStreamer::load(Stream::ptr stream,ResourceData *data,ResourceRequest *request){
 	Mesh::ptr mesh;
 
 	DataStream::ptr dataStream=new DataStream(stream);
@@ -45,7 +45,7 @@ Resource::ptr XMSHStreamer::load(Stream::ptr stream,ResourceData *data,ProgressL
 	mxml_node_t *root=mxmlLoadString(NULL,string,MXML_OPAQUE_CALLBACK);
 
 	if(root==NULL){
-		return NULL;
+		return false;
 	}
 
 	if(strcmp(mxmlGetElementName(root),"XMSH")==0){
@@ -65,7 +65,7 @@ Resource::ptr XMSHStreamer::load(Stream::ptr stream,ResourceData *data,ProgressL
 			mxmlRelease(root);
 			Error::unknown(Categories::TOADLET_TADPOLE,
 				"XMSHStreamer: Invalid version");
-			return NULL;
+			return false;
 		}
 	}
 
@@ -140,10 +140,13 @@ Resource::ptr XMSHStreamer::load(Stream::ptr stream,ResourceData *data,ProgressL
 
 	mesh->compileBoneBounds();
 
-	return mesh;
+	XMLMeshUtilities::MaterialRequest::ptr materialRequest=new XMLMeshUtilities::MaterialRequest(mEngine->getMaterialManager(),mesh,request);
+	materialRequest->request();
+
+	return true;
 }
 
-bool XMSHStreamer::save(Stream::ptr stream,Resource::ptr resource,ResourceData *data,ProgressListener *listener){
+bool XMSHStreamer::save(Stream::ptr stream,Resource::ptr resource,ResourceData *data){
 	Mesh::ptr mesh=shared_static_cast<Mesh>(resource);
 	if(mesh==NULL){
 		return false;
@@ -155,10 +158,10 @@ bool XMSHStreamer::save(Stream::ptr stream,Resource::ptr resource,ResourceData *
 	mxmlElementSetAttr(root,"Version",formatInt(version));
 
 	if(version==1){
-		saveMeshVersion1(root,mesh,listener);
+		saveMeshVersion1(root,mesh);
 	}
 	else if(version>=2){
-		saveMeshVersion2Up(root,mesh,version,listener);
+		saveMeshVersion2Up(root,mesh,version);
 	}
 	else{
 		mxmlRelease(root);
@@ -182,7 +185,7 @@ Mesh::ptr XMSHStreamer::loadMeshVersion1(mxml_node_t *root){
 	mxml_node_t *block=root->child;
 	while((block=block->next)!=NULL){
 		if(strcmp(mxmlGetElementName(block),"MeshData")==0){
-			mesh=XMLMeshUtilities::loadMesh(block,1,mEngine->getBufferManager(),mEngine->getMaterialManager(),mEngine->getTextureManager());
+			mesh=XMLMeshUtilities::loadMesh(block,1,mEngine->getBufferManager(),mEngine->getMaterialManager());
 		}
 		else if(strcmp(mxmlGetElementName(block),"SkeletonData")==0){
 			mesh->setSkeleton(XMLMeshUtilities::loadSkeleton(block,1));
@@ -201,7 +204,7 @@ Mesh::ptr XMSHStreamer::loadMeshVersion2Up(mxml_node_t *root,int version){
 	mxml_node_t *block=root->child;
 	while((block=block->next)!=NULL){
 		if(strcmp(mxmlGetElementName(block),"Mesh")==0){
-			mesh=XMLMeshUtilities::loadMesh(block,version,mEngine->getBufferManager(),mEngine->getMaterialManager(),mEngine->getTextureManager());
+			mesh=XMLMeshUtilities::loadMesh(block,version,mEngine->getBufferManager(),mEngine->getMaterialManager());
 		}
 		else if(strcmp(mxmlGetElementName(block),"Skeleton")==0){
 			mesh->setSkeleton(XMLMeshUtilities::loadSkeleton(block,version));
@@ -214,22 +217,22 @@ Mesh::ptr XMSHStreamer::loadMeshVersion2Up(mxml_node_t *root,int version){
 	return mesh;
 }
 
-bool XMSHStreamer::saveMeshVersion1(mxml_node_t *root,Mesh::ptr mesh,ProgressListener *listener){
+bool XMSHStreamer::saveMeshVersion1(mxml_node_t *root,Mesh::ptr mesh){
 	if(mesh!=NULL){
-		mxml_node_t *node=XMLMeshUtilities::saveMesh(mesh,1,listener);
+		mxml_node_t *node=XMLMeshUtilities::saveMesh(mesh,1);
 		mxmlSetElement(node,"MeshData");
 		mxmlAddChild(root,node);
 	}
 	if(mesh!=NULL && mesh->getSkeleton()!=NULL){
 		Skeleton::ptr skeleton=mesh->getSkeleton();
-		mxml_node_t *node=XMLMeshUtilities::saveSkeleton(skeleton,1,listener);
+		mxml_node_t *node=XMLMeshUtilities::saveSkeleton(skeleton,1);
 		mxmlSetElement(node,"SkeletonData");
 		mxmlAddChild(root,node);
 
 		int i;
 		for(i=0;i<skeleton->getNumSequences();++i){
 			Sequence::ptr sequence=skeleton->getSequence(i);
-			mxml_node_t *node=XMLMeshUtilities::saveSequence(sequence,1,listener);
+			mxml_node_t *node=XMLMeshUtilities::saveSequence(sequence,1);
 			mxmlSetElement(node,"AnimationData");
 			mxmlAddChild(root,node);
 		}
@@ -238,22 +241,22 @@ bool XMSHStreamer::saveMeshVersion1(mxml_node_t *root,Mesh::ptr mesh,ProgressLis
 	return true;
 }
 
-bool XMSHStreamer::saveMeshVersion2Up(mxml_node_t *root,Mesh::ptr mesh,int version,ProgressListener *listener){
+bool XMSHStreamer::saveMeshVersion2Up(mxml_node_t *root,Mesh::ptr mesh,int version){
 	if(mesh!=NULL){
-		mxml_node_t *node=XMLMeshUtilities::saveMesh(mesh,version,listener);
+		mxml_node_t *node=XMLMeshUtilities::saveMesh(mesh,version);
 		mxmlSetElement(node,"Mesh");
 		mxmlAddChild(root,node);
 	}
 	if(mesh!=NULL && mesh->getSkeleton()!=NULL){
 		Skeleton::ptr skeleton=mesh->getSkeleton();
-		mxml_node_t *node=XMLMeshUtilities::saveSkeleton(skeleton,version,listener);
+		mxml_node_t *node=XMLMeshUtilities::saveSkeleton(skeleton,version);
 		mxmlSetElement(node,"Skeleton");
 		mxmlAddChild(root,node);
 
 		int i;
 		for(i=0;i<skeleton->getNumSequences();++i){
 			Sequence::ptr sequence=skeleton->getSequence(i);
-			mxml_node_t *node=XMLMeshUtilities::saveSequence(sequence,version,listener);
+			mxml_node_t *node=XMLMeshUtilities::saveSequence(sequence,version);
 			mxmlSetElement(node,"Sequence");
 			mxmlAddChild(root,node);
 		}

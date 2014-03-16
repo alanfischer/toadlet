@@ -59,6 +59,7 @@ protected:
 
 		void resourceReady(Resource *resource){mParent->setTexture((Texture*)resource,mPx,mPy);}
 		void resourceException(const Exception &ex){}
+		void resourceProgress(float progress){}
 
 	protected:
 		TextureDataSource::ptr mParent;

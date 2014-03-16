@@ -26,17 +26,16 @@
 #ifndef TOADLET_TADPOLE_WADARCHIVE_H
 #define TOADLET_TADPOLE_WADARCHIVE_H
 
-#include <toadlet/egg/BaseResource.h>
-#include <toadlet/egg/io/Archive.h>
+#include <toadlet/egg/io/BaseArchive.h>
 #include <toadlet/egg/io/DataStream.h>
 #include <toadlet/tadpole/TextureManager.h>
 
 namespace toadlet{
 namespace tadpole{
 
-class TOADLET_API WADArchive:public Archive,public BaseResource{
+class TOADLET_API WADArchive:public BaseArchive{
 public:
-	TOADLET_RESOURCE(WADArchive,Archive);
+	TOADLET_OBJECT(WADArchive);
 
 	WADArchive(TextureManager *textureManager);
 
@@ -44,8 +43,7 @@ public:
 
 	bool open(Stream::ptr stream);
 
-	bool openStream(const String &name,StreamRequest *request){return false;}
-	bool openResource(const String &name,ResourceRequest *request);
+	Resource::ptr openResource(const String &name);
 
 	const Collection<String> &getEntries(){return mEntries;}
 

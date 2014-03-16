@@ -47,7 +47,7 @@ FreeTypeStreamer::~FreeTypeStreamer(){
 	FT_Done_FreeType(mLibrary);
 }
 
-Resource::ptr FreeTypeStreamer::load(Stream::ptr stream,ResourceData *resourceData,ProgressListener *listener){
+Resource::ptr FreeTypeStreamer::load(Stream::ptr stream,ResourceData *resourceData){
 	FontData *fontData=(FontData*)resourceData;
 	if(fontData==NULL){
 		Error::nullPointer(Categories::TOADLET_TADPOLE,

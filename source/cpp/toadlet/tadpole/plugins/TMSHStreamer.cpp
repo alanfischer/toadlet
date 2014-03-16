@@ -36,7 +36,7 @@ TMSHStreamer::TMSHStreamer(Engine *engine){
 	mEngine=engine;
 }
 
-Resource::ptr TMSHStreamer::load(Stream::ptr stream,ResourceData *data,ProgressListener *listener){
+bool TMSHStreamer::load(Stream::ptr stream,ResourceData *data,ResourceRequest *request){
 	int i,j;
 
 	DataStream::ptr dataStream=new DataStream(stream);
@@ -45,14 +45,14 @@ Resource::ptr TMSHStreamer::load(Stream::ptr stream,ResourceData *data,ProgressL
 	if(id!=TMSH){
 		Error::unknown(Categories::TOADLET_TADPOLE,
 			"Not of TMSH format");
-		return NULL;
+		return false;
 	}
 
 	int version=dataStream->readUInt32();
 	if(version!=VERSION){
 		Error::unknown(Categories::TOADLET_TADPOLE,
 			String("Not TMSH version:")+VERSION);
-		return NULL;
+		return false;
 	}
 
 	Mesh::ptr mesh;
@@ -81,6 +81,13 @@ Resource::ptr TMSHStreamer::load(Stream::ptr stream,ResourceData *data,ProgressL
 		}
 	}
 
+	if(skeleton!=NULL){
+		for(i=0;i<sequences.size();++i){
+			skeleton->addSequence(sequences[i]);
+		}
+		mesh->setSkeleton(skeleton);
+	}
+
 	j=0;
 	for(i=0;i<mesh->getNumSubMeshes();++i){
 		Mesh::SubMesh *subMesh=mesh->getSubMesh(i);
@@ -88,19 +95,14 @@ Resource::ptr TMSHStreamer::load(Stream::ptr stream,ResourceData *data,ProgressL
 			subMesh->material=materials[j++];
 		}
 	}
+	
+	MaterialRequest::ptr materialRequest=new MaterialRequest(mEngine->getMaterialManager(),mesh,request);
+	materialRequest->request();
 
-	if(skeleton!=NULL){
-		for(i=0;i<sequences.size();++i){
-			skeleton->addSequence(sequences[i]);
-		}
-	}
-
-	mesh->setSkeleton(skeleton);
-
-	return mesh;
+	return true;
 }
 
-bool TMSHStreamer::save(Stream::ptr stream,Resource::ptr resource,ResourceData *data,ProgressListener *listener){
+bool TMSHStreamer::save(Stream::ptr stream,Resource::ptr resource,ResourceData *data,ResourceRequest *request){
 	Mesh::ptr mesh=shared_static_cast<Mesh>(resource);
 	if(mesh==NULL){
 		return false;
@@ -151,6 +153,8 @@ bool TMSHStreamer::save(Stream::ptr stream,Resource::ptr resource,ResourceData *
 		}
 	}
 
+	request->resourceReady(resource);
+
 	return true;
 }
 
@@ -170,7 +174,7 @@ Mesh::ptr TMSHStreamer::readMesh(DataStream *stream,int blockSize){
 	}
 	for(i=0;i<numSubMeshes;++i){
 		Mesh::SubMesh::ptr subMesh=new Mesh::SubMesh();
-	
+
 		subMesh->vertexData=readVertexData(stream);
 		subMesh->indexData=readIndexData(stream);
 
@@ -464,21 +468,15 @@ void TMSHStreamer::writeVertexFormat(DataStream *stream,VertexFormat::ptr vertex
 	}
 };
 
-/// @todo: Support loading all of the material, instead of starting with a DiffuseMaterial
 Material::ptr TMSHStreamer::readMaterial(DataStream *stream,int blockSize){
 	if(stream->readBool()==false){
 		return NULL;
 	}
 
+	Material::ptr material=new Material(mEngine->getMaterialManager());
+
 	String name=stream->readNullTerminatedString();
 
-	Material::ptr material;
-	if(name!=(char*)NULL){
-		material=mEngine->getMaterialManager()->findMaterial(name);
-	}
-	if(material==NULL){
-		material=mEngine->createDiffuseMaterial(NULL);
-	}
 	if(name!=(char*)NULL){
 		material->setName(name);
 	}
@@ -668,6 +666,35 @@ void TMSHStreamer::writeSequence(DataStream *stream,Sequence::ptr sequence){
 	}
 
 	stream->writeFloat(sequence->getLength());
+}
+
+void TMSHStreamer::MaterialRequest::request(){
+	while(mIndex<mMesh->getNumSubMeshes() && mMesh->getSubMesh(mIndex)->materialName.length()!=0){
+		mIndex++;
+	}
+	
+	if(mIndex<mMesh->getNumSubMeshes()){
+		mMaterialManager->find(mMesh->getSubMesh(mIndex)->material->getName(),this);
+	}
+	else{
+		mMesh->compile();
+		mRequest->resourceReady(mMesh);
+	}
+}
+
+void TMSHStreamer::MaterialRequest::resourceReady(Resource *resource){
+	Material::ptr material=(Material*)resource;
+	Mesh::SubMesh *subMesh=mMesh->getSubMesh(mIndex);
+	mMaterialManager->modifyRenderState(material->getRenderState(),subMesh->material->getRenderState());
+	subMesh->material=material;
+
+	mIndex++;
+	request();
+}
+
+void TMSHStreamer::MaterialRequest::resourceException(const Exception &ex){
+	mIndex++;
+	request();
 }
 
 }

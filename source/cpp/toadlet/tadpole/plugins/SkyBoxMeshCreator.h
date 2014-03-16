@@ -26,15 +26,15 @@
 #ifndef TOADLET_TADPOLE_SKYBOXMESHCREATOR_H
 #define TOADLET_TADPOLE_SKYBOXMESHCREATOR_H
 
-#include <toadlet/tadpole/ResourceCreator.h>
+#include <toadlet/tadpole/BaseResourceCreator.h>
 #include <toadlet/tadpole/Mesh.h>
 
 namespace toadlet{
 namespace tadpole{
 
-class TOADLET_API SkyBoxMeshCreator:public Object,public ResourceCreator{
+class TOADLET_API SkyBoxMeshCreator:public BaseResourceCreator{
 public:
-	TOADLET_IOBJECT(SkyBoxMeshCreator);
+	TOADLET_OBJECT(SkyBoxMeshCreator);
 
 	SkyBoxMeshCreator(Engine *engine){
 		mEngine=engine;
@@ -42,8 +42,8 @@ public:
 
 	void destroy(){}
 
-	Resource::ptr create(const String &name,ResourceData *data,ProgressListener *listener){
-		Resource::ptr resource=createSkyBoxMesh(Math::ONE,false,false,Material::ptr(),Material::ptr(),Material::ptr(),Material::ptr(),Material::ptr(),Material::ptr());
+	Resource::ptr create(const String &name,ResourceData *data){
+		Resource::ptr resource=createSkyBoxMesh(Math::ONE,false,false,NULL,NULL,NULL,NULL,NULL,NULL);
 		resource->setName(name);
 		return resource;
 	}

@@ -28,9 +28,9 @@
 namespace toadlet{
 namespace tadpole{
 
-Resource::ptr TextureMaterialStreamer::load(Stream::ptr stream,ResourceData *data,ProgressListener *listener){
+bool TextureMaterialStreamer::load(Stream::ptr stream,ResourceData *data,ResourceRequest *request){
 	if(data==NULL){
-		return NULL;
+		return false;
 	}
 	
 	String extension=ResourceManager::findExtension(data->getName());
@@ -40,12 +40,19 @@ Resource::ptr TextureMaterialStreamer::load(Stream::ptr stream,ResourceData *dat
 			streamer=mEngine->getTextureManager()->getDefaultStreamer();
 		}
 		if(streamer!=NULL){
-			Texture::ptr texture=shared_static_cast<Texture>(streamer->load(stream,data,listener));
-			return mEngine->createDiffuseMaterial(texture);
+			TextureMaterialRequest::ptr materialRequest=new TextureMaterialRequest(mEngine,request);
+			streamer->load(stream,NULL,materialRequest); // Pass in NULL instead of the MaterialData, since it's expecting a TextureData
+			return true;
 		}
 	}
 	
-	return NULL;
+	return false;
+}
+
+void TextureMaterialStreamer::TextureMaterialRequest::resourceReady(Resource *resource){
+	Texture::ptr texture=(Texture*)resource;
+	Material::ptr material=mEngine->createDiffuseMaterial(texture);
+	mRequest->resourceReady(material);
 }
 
 }

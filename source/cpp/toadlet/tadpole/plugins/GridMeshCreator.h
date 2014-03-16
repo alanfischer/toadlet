@@ -26,15 +26,15 @@
 #ifndef TOADLET_TADPOLE_GRIDMESHCREATOR_H
 #define TOADLET_TADPOLE_GRIDMESHCREATOR_H
 
-#include <toadlet/tadpole/ResourceCreator.h>
+#include <toadlet/tadpole/BaseResourceCreator.h>
 #include <toadlet/tadpole/Mesh.h>
 
 namespace toadlet{
 namespace tadpole{
 
-class TOADLET_API GridMeshCreator:public Object,public ResourceCreator{
+class TOADLET_API GridMeshCreator:public BaseResourceCreator{
 public:
-	TOADLET_IOBJECT(GridMeshCreator);
+	TOADLET_OBJECT(GridMeshCreator);
 
 	GridMeshCreator(Engine *engine){
 		mEngine=engine;
@@ -42,7 +42,7 @@ public:
 
 	void destroy(){}
 
-	Resource::ptr create(const String &name,ResourceData *data,ProgressListener *listener){
+	Resource::ptr create(const String &name,ResourceData *data){
 		Resource::ptr resource=createGridMesh(Math::ONE,Math::ONE,4,4,Material::ptr());
 		resource->setName(name);
 		return resource;

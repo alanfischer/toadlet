@@ -26,21 +26,21 @@
 #ifndef TOADLET_TADPOLE_SPRSTREAMER_H
 #define TOADLET_TADPOLE_SPRSTREAMER_H
 
-#include <toadlet/tadpole/ResourceStreamer.h>
+#include <toadlet/tadpole/BaseResourceStreamer.h>
 #include <toadlet/tadpole/TextureManager.h>
 #include <toadlet/tadpole/studio/SpriteStreamer.h>
 
 namespace toadlet{
 namespace tadpole{
 
-class TOADLET_API SPRStreamer:public Object,public ResourceStreamer{
+class TOADLET_API SPRStreamer:public BaseResourceStreamer{
 public:
-	TOADLET_IOBJECT(SPRStreamer);
+	TOADLET_OBJECT(SPRStreamer);
 
-	SPRStreamer(Engine *engine):Object(),mStreamer(engine){}
+	SPRStreamer(Engine *engine):mStreamer(new studio::SpriteStreamer(engine)){}
 
-	Resource::ptr load(Stream::ptr stream,ResourceData *data,ProgressListener *listener){
-		studio::SpriteModel::ptr sprite=shared_static_cast<studio::SpriteModel>(mStreamer.load(stream,NULL,NULL));
+	Resource::ptr load(Stream::ptr stream,ResourceData *data){
+		studio::SpriteModel::ptr sprite=shared_static_cast<studio::SpriteModel>(mStreamer->load(stream,NULL));
 
 		if(sprite!=NULL && sprite->textures.size()>0){
 			return sprite->textures[0];
@@ -51,7 +51,7 @@ public:
 	}
 
 protected:
-	studio::SpriteStreamer mStreamer;
+	studio::SpriteStreamer::ptr mStreamer;
 };
 
 }

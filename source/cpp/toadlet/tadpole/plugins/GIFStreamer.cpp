@@ -297,7 +297,7 @@ int GIFStreamer::closeFile(GifFileType *file){
 	return result;
 }
 
-Resource::ptr GIFStreamer::load(Stream::ptr stream,ResourceData *data,ProgressListener *listener){
+Resource::ptr GIFStreamer::load(Stream::ptr stream,ResourceData *data){
 	int usage=(data!=NULL)?((TextureData*)data)->usage:0;
 
 	if(stream==NULL){

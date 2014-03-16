@@ -62,7 +62,7 @@ AndroidAssetArchive::~AndroidAssetArchive(){
 	vm=NULL;
 }
 
-bool AndroidAssetArchive::openStream(const String &name,StreamRequest *request){
+Stream::ptr AndroidAssetArchive::openStream(const String &name){
 	JNIEnv *env=getEnv();
 
 	Log::debug(Categories::TOADLET_EGG,"AndroidAssetArchive::openStream:"+name);
@@ -76,8 +76,8 @@ bool AndroidAssetArchive::openStream(const String &name,StreamRequest *request){
 	}
 	env->DeleteLocalRef(nameObj);
 	if(exc!=NULL){
-		request->streamException(Error::unknown(Categories::TOADLET_EGG,Error::Throw_NO));
-		return false;
+		Error::unknown(Categories::TOADLET_EGG,"unable to find stream");
+		return NULL;
 	}
 
 	JStream::ptr stream;
@@ -90,11 +90,11 @@ bool AndroidAssetArchive::openStream(const String &name,StreamRequest *request){
 	stream->open(streamObj);
 	env->DeleteLocalRef(streamObj);
 	if(stream->closed()){
-		request->streamException(Error::unknown(Categories::TOADLET_EGG,Error::Throw_NO));
-		return false;
+		Error::unknown(Categories::TOADLET_EGG,"unable to read stream");
+		return NULL;
 	}
-	request->streamReady(stream);
-	return true;
+
+	return stream;
 }
 
 JNIEnv *AndroidAssetArchive::getEnv() const{

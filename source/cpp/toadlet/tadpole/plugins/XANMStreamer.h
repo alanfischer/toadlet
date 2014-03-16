@@ -28,26 +28,27 @@
 
 #include <toadlet/tadpole/Engine.h>
 #include <toadlet/tadpole/Sequence.h>
+#include <toadlet/tadpole/BaseResourceStreamer.h>
 
 typedef struct mxml_node_s mxml_node_t;
 
 namespace toadlet{
 namespace tadpole{
 
-class TOADLET_API XANMStreamer:public Object,public ResourceStreamer{
+class TOADLET_API XANMStreamer:public BaseResourceStreamer{
 public:
 	TOADLET_OBJECT(XANMStreamer);
 
 	XANMStreamer(Engine *engine);
 
-	Resource::ptr load(Stream::ptr stream,ResourceData *data,ProgressListener *listener);
-	bool save(Stream::ptr stream,Resource::ptr resource,ResourceData *data,ProgressListener *listener);
+	Resource::ptr load(Stream::ptr stream,ResourceData *data);
+	bool save(Stream::ptr stream,Resource::ptr resource,ResourceData *data);
 
 protected:
 	Sequence::ptr loadSequenceVersion1(mxml_node_t *root);
 	Sequence::ptr loadSequenceVersion2Up(mxml_node_t *root,int version);
-	bool saveSequenceVersion1(mxml_node_t *root,Sequence::ptr sequence,ProgressListener *listener);
-	bool saveSequenceVersion2Up(mxml_node_t *root,Sequence::ptr sequence,int version,ProgressListener *listener);
+	bool saveSequenceVersion1(mxml_node_t *root,Sequence::ptr sequence);
+	bool saveSequenceVersion2Up(mxml_node_t *root,Sequence::ptr sequence,int version);
 
 	Engine *mEngine;
 };

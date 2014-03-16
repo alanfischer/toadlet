@@ -242,7 +242,6 @@ set (TADPOLE_HDR
 	Noise.h
 	ParticleComponent.h
 	PartitionNode.h
-	ProgressListener.h
 	PhysicsCollision.h
 	PhysicsCollisionListener.h
 	PhysicsComponent.h

@@ -35,7 +35,7 @@ class TOADLET_API FontData:public ResourceData{
 public:
 	TOADLET_OBJECT(FontData);
 
-	FontData(float pointSize1){
+	FontData(float pointSize1=0){
 		pointSize=pointSize1;
 	}
 

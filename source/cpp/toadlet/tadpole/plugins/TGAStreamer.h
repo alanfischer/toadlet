@@ -27,20 +27,19 @@
 #define TOADLET_TADPOLE_TGASTREAMER_H
 
 #include <toadlet/peeper/Texture.h>
-#include <toadlet/tadpole/ResourceStreamer.h>
+#include <toadlet/tadpole/BaseResourceStreamer.h>
 #include <toadlet/tadpole/TextureManager.h>
 
 namespace toadlet{
 namespace tadpole{
 
-class TOADLET_API TGAStreamer:public Object,public ResourceStreamer{
+class TOADLET_API TGAStreamer:public BaseResourceStreamer{
 public:
-	TOADLET_IOBJECT(TGAStreamer);
+	TOADLET_OBJECT(TGAStreamer);
 
 	TGAStreamer(TextureManager *textureManager){mTextureManager=textureManager;}
 
-	Resource::ptr load(Stream::ptr stream,ResourceData *data,ProgressListener *listener);
-	bool save(Stream::ptr stream,Resource::ptr resource,ResourceData *data,ProgressListener *listener){return false;}
+	Resource::ptr load(Stream::ptr stream,ResourceData *data);
 
 protected:
 	TextureManager *mTextureManager;

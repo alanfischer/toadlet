@@ -41,7 +41,7 @@ namespace toadlet{
 namespace tadpole{
 namespace bsp{
 
-class TOADLET_API BSP30Node:public PartitionNode,public StreamRequest,public Renderable,public PhysicsTraceable{
+class TOADLET_API BSP30Node:public PartitionNode,public ResourceRequest,public StreamRequest,public Renderable,public PhysicsTraceable{
 public:
 	TOADLET_INODE(BSP30Node);
 
@@ -72,12 +72,13 @@ public:
 	bool sensePotentiallyVisible(SensorResultsListener *listener,const Vector3 &point);
 	bool findAmbientForBound(Vector4 &r,Bound *bound);
 
-	void streamReady(Stream *stream){
-		BSP30Map::ptr map=shared_static_cast<BSP30Map>(mStreamer->load(stream,NULL,NULL));
-		map->setName(mMapName);
-		setMap(map);
-	}
+	void resourceReady(Resource *resource){setMap((BSP30Map*)resource);}
+	void resourceException(const Exception &ex){}
+	void resourceProgress(float progress){}
+
+	void streamReady(Stream *stream){shared_static_cast<ResourceStreamer>(mStreamer)->load(stream,NULL,this);}
 	void streamException(const Exception &ex){}
+	void streamProgress(float progress){}
 
 	// Renderable items
 	Material *getRenderMaterial() const{return NULL;}
@@ -90,11 +91,31 @@ public:
 	void traceSegment(PhysicsCollision &result,const Vector3 &position,const Segment &segment,const Vector3 &size);
 
 protected:
+	class SkyMeshRequest:public Object,public ResourceRequest{
+	public:
+		TOADLET_IOBJECT(SkyMeshRequest);
+
+		SkyMeshRequest(Engine *engine,MeshComponent::ptr mesh,RenderState::ptr state,const String &skyDown,const String &skyUp,const String &skyWest,const String &skyEasy,const String &skySouth,const String &skyNorth);
+
+		void request();
+
+		void resourceReady(Resource *resource);
+		void resourceException(const Exception &ex);
+		void resourceProgress(float progress){}
+
+	protected:
+		Engine *mEngine;
+		MeshComponent::ptr mSkyMesh;
+		RenderState::ptr mRenderState;
+		String mTextureNames[6];
+		Material::ptr mMaterials[6];
+		int mIndex;
+	};
+
 	void addLeafToVisible(bleaf *leaf,const Vector3 &cameraPosition);
 	void findBoundLeafs(Collection<int> &leafs,Node *node);
 
 	BSP30Streamer::ptr mStreamer;
-	String mMapName;
 	BSP30Map::ptr mMap;
 	String mSkyName;
 	MeshComponent::ptr mSkyMesh;

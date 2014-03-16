@@ -60,7 +60,7 @@ typedef struct{
 
 const static int SIZEOF_BITMAPFILEHEADER=14;
 
-Resource::ptr BMPStreamer::load(Stream::ptr stream,ResourceData *data,ProgressListener *listener){
+Resource::ptr BMPStreamer::load(Stream::ptr stream,ResourceData *data){
 	int i,j;
 	BITMAPINFOHEADER bmih={0};
 	BITMAPFILEHEADER bmfh={0};
@@ -201,7 +201,7 @@ Resource::ptr BMPStreamer::load(Stream::ptr stream,ResourceData *data,ProgressLi
 	return texture;
 } 
 
-bool BMPStreamer::save(Stream::ptr stream,Resource::ptr resource,ResourceData *data,ProgressListener *listener){
+bool BMPStreamer::save(Stream::ptr stream,Resource::ptr resource,ResourceData *data){
 	int rowSize;
 	int i,j;
 	int ihSize;

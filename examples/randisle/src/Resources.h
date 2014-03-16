@@ -3,21 +3,66 @@
 
 #include <toadlet/toadlet.h>
 
-class Resources{
+class Resources:public Object,public ResourceRequest{
 public:
-	static bool init(Engine *engine){
+	TOADLET_IOBJECT(Resources);
+
+	static bool init(Engine *engine,ResourceRequest *request){
 		if(instance==NULL){
 			instance=new Resources();
+			instance->engine=engine;
+			instance->request=request;
+			instance->resourceCount=0;
 		}
 		return instance->load(engine);
 	}
 	
-	static void destroy(){
-		delete instance;
-		instance=NULL;
+	bool load(Engine *engine){
+		resourceCount++;
+
+		loadResource("detail.png",engine->getTextureManager());
+		loadResource("sea.png",engine->getTextureManager());
+		loadResource("rock.png",engine->getTextureManager());
+		loadResource("grass.png",engine->getTextureManager());
+		loadResource("water_bump.png",engine->getTextureManager());
+		loadResource("frog.tmsh",engine->getMeshManager());
+		loadResource("tall_grass.tmsh",engine->getMeshManager());
+		loadResource("bark.png",engine->getMaterialManager());
+		loadResource("leaf_top1_alpha.png",engine->getMaterialManager());
+		loadResource("leaf_bottom1_alpha.png",engine->getMaterialManager());
+		loadResource("acorn.png",engine->getTextureManager());
+		loadResource("compass.png",engine->getTextureManager());
+		loadResource("dog.wav",engine->getAudioManager());
+		loadResource("rustle.wav",engine->getAudioManager());
+		loadResource("crunch.wav",engine->getAudioManager());
+		loadResource("Pinewood.ttf",engine->getFontManager(),new FontData(100));
+
+		resourceReady(NULL); // Dummy ready to finish loading
+
+		return true;
 	}
 
-	bool load(Engine *engine){
+	void loadResource(const String &resource,ResourceManager *manager,ResourceData *data=NULL){
+		resourceCount++;
+		manager->find(resource,this,data);
+	}
+
+	void resourceReady(Resource *resource){
+		resources.add(resource);
+		resourceCount--;
+		if(resourceCount==0){
+			build(engine);
+			request->resourceReady(NULL);
+		}
+	}
+
+	void resourceException(const Exception &ex){
+		resourceReady(NULL);
+	}
+	
+	void resourceProgress(float progress){}
+
+	bool build(Engine *engine){
 		skyColor=Colors::AZURE;
 		fadeColor=Vector4(0xB5C1C3FF);
 
@@ -71,12 +116,12 @@ public:
 			refractTarget->attach(refractTexture->getMipPixelBuffer(0,0),PixelBufferRenderTarget::Attachment_COLOR_0);
 		}
 
-		bumpTexture=engine->getTextureManager()->findTexture("water_bump.png");
+		bumpTexture=shared_static_cast<Texture>(engine->getTextureManager()->get("water_bump.png"));
 		waterMaterial=engine->createWaterMaterial(reflectTexture,refractTexture,bumpTexture,color);
 
 		Log::alert("Loading frog");
 
-		creature=shared_static_cast<Mesh>(engine->getMeshManager()->find("frog.tmsh"));
+		creature=shared_static_cast<Mesh>(engine->getMeshManager()->get("frog.tmsh"));
 		if(creature!=NULL){
 			Transform::ptr transform=new Transform();
 			transform->setTranslate(0,0,-2.0);
@@ -86,7 +131,7 @@ public:
 
 		Log::alert("Loading grass");
 
-		grass=shared_static_cast<Mesh>(engine->getMeshManager()->find("tall_grass.tmsh"));
+		grass=shared_static_cast<Mesh>(engine->getMeshManager()->get("tall_grass.tmsh"));
 		if(grass!=NULL){
 			Transform::ptr transform=new Transform();
 			transform->setScale(0.1,0.1,0.1);
@@ -106,12 +151,12 @@ public:
 
 		Log::alert("Loading tree items");
 
-		treeBranch=engine->getMaterialManager()->findMaterial("bark.png");
+		treeBranch=shared_static_cast<Material>(engine->getMaterialManager()->get("bark.png"));
 
 		treeLeaf=engine->getMaterialManager()->createMaterial();
 		if(treeLeaf!=NULL){
-			Material::ptr treeLeafTop=engine->getMaterialManager()->findMaterial("leaf_top1_alpha.png");
-			Material::ptr treeLeafBottom=engine->getMaterialManager()->findMaterial("leaf_bottom1_alpha.png");
+			Material::ptr treeLeafTop=shared_static_cast<Material>(engine->getMaterialManager()->get("leaf_top1_alpha.png"));
+			Material::ptr treeLeafBottom=shared_static_cast<Material>(engine->getMaterialManager()->get("leaf_bottom1_alpha.png"));
 
 			if(treeLeafTop!=NULL && treeLeafBottom!=NULL){
 				for(int i=0;i<treeLeafTop->getPaths().size();++i){
@@ -138,9 +183,9 @@ public:
 
 		Log::alert("Loading sounds");
 
- 		dog=engine->getAudioManager()->findAudioBuffer("dog.wav");
-		rustle=engine->getAudioManager()->findAudioBuffer("rustle.wav");
-		crunch=engine->getAudioManager()->findAudioBuffer("crunch.wav");
+ 		dog=shared_static_cast<AudioBuffer>(engine->getAudioManager()->get("dog.wav"));
+		rustle=shared_static_cast<AudioBuffer>(engine->getAudioManager()->get("rustle.wav"));
+		crunch=shared_static_cast<AudioBuffer>(engine->getAudioManager()->get("crunch.wav"));
 
 		{
 			RenderState::ptr renderState=engine->getMaterialManager()->createRenderState();
@@ -153,7 +198,7 @@ public:
 			samplerState.vAddress=SamplerState::AddressType_CLAMP_TO_EDGE;
 			samplerState.wAddress=SamplerState::AddressType_CLAMP_TO_EDGE;
 			renderState->setSamplerState(Shader::ShaderType_FRAGMENT,0,samplerState);
-			acorn=engine->createDiffuseMaterial(engine->getTextureManager()->findTexture("acorn.png"),renderState);
+			acorn=engine->createDiffuseMaterial(shared_static_cast<Texture>(engine->getTextureManager()->get("acorn.png")),renderState);
 		}
 
 		// HUD
@@ -189,10 +234,10 @@ public:
 			samplerState.vAddress=SamplerState::AddressType_CLAMP_TO_EDGE;
 			samplerState.wAddress=SamplerState::AddressType_CLAMP_TO_EDGE;
 			renderState->setSamplerState(Shader::ShaderType_FRAGMENT,0,samplerState);
-			compass=engine->createDiffuseMaterial(engine->getTextureManager()->findTexture("compass.png"),renderState);
+			compass=engine->createDiffuseMaterial(shared_static_cast<Texture>(engine->getTextureManager()->get("compass.png")),renderState);
 		}
 
-		wooden=engine->getFontManager()->findFont("Pinewood.ttf",100);
+		wooden=shared_static_cast<Font>(engine->getFontManager()->get("Pinewood.ttf"));
 
 		system=engine->getFontManager()->getDefaultFont();
 
@@ -203,7 +248,12 @@ public:
 
 	static tbyte *createPoint(TextureFormat *format);
 
-	static Resources *instance;
+	static Resources::ptr instance;
+
+	Engine *engine;
+	ResourceRequest *request;
+	Collection<Resource::ptr> resources;
+	int resourceCount;
 
 	int cloudSize;
 	int patchSize;

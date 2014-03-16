@@ -37,7 +37,7 @@ XMATStreamer::XMATStreamer(Engine *engine){
 	mEngine=engine;
 }
 
-Resource::ptr XMATStreamer::load(Stream::ptr stream,ResourceData *data,ProgressListener *listener){
+Resource::ptr XMATStreamer::load(Stream::ptr stream,ResourceData *data){
 	Material::ptr material=NULL;
 
 	DataStream::ptr dataStream=new DataStream(stream);
@@ -67,7 +67,7 @@ Resource::ptr XMATStreamer::load(Stream::ptr stream,ResourceData *data,ProgressL
 	return material;
 }
 
-bool XMATStreamer::save(Stream::ptr stream,Resource::ptr resource,ResourceData *data,ProgressListener *listener){
+bool XMATStreamer::save(Stream::ptr stream,Resource::ptr resource,ResourceData *data){
 	Material::ptr material=shared_static_cast<Material>(resource);
 	if(material==NULL){
 		return false;
@@ -79,7 +79,7 @@ bool XMATStreamer::save(Stream::ptr stream,Resource::ptr resource,ResourceData *
 	mxmlElementSetAttr(root,"Version",formatInt(version));
 
 	if(version==3){
-		saveMaterial(root,material,version,listener);
+		saveMaterial(root,material,version);
 	}
 	else{
 		mxmlRelease(root);
@@ -103,16 +103,16 @@ Material::ptr XMATStreamer::loadMaterial(mxml_node_t *root,int version){
 	mxml_node_t *block=root->child;
 	while((block=block->next)!=NULL){
 		if(strcmp(mxmlGetElementName(block),"Material")==0){
-			material=XMLMeshUtilities::loadMaterial(block,version,mEngine->getMaterialManager(),mEngine->getTextureManager());
+			material=XMLMeshUtilities::loadMaterial(block,version,mEngine->getMaterialManager());
 		}
 	}
 
 	return material;
 }
 
-bool XMATStreamer::saveMaterial(mxml_node_t *root,Material::ptr material,int version,ProgressListener *listener){
+bool XMATStreamer::saveMaterial(mxml_node_t *root,Material::ptr material,int version){
 	if(material!=NULL){
-		mxml_node_t *node=XMLMeshUtilities::saveMaterial(material,version,listener);
+		mxml_node_t *node=XMLMeshUtilities::saveMaterial(material,version);
 		mxmlSetElement(node,"Material");
 		mxmlAddChild(root,node);
 	}

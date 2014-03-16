@@ -27,7 +27,7 @@
 #define TOADLET_EGG_IO_ARCHIVE_H
 
 #include <toadlet/egg/Collection.h>
-#include <toadlet/egg/io/ResourceRequest.h>
+#include <toadlet/egg/ResourceRequest.h>
 #include <toadlet/egg/io/StreamRequest.h>
 
 namespace toadlet{

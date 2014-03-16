@@ -132,7 +132,7 @@ typedef struct{
 	uint32 dwReserved2[3];
 } DDS_HEADER;
 
-Resource::ptr DDSStreamer::load(Stream::ptr stream,ResourceData *data,ProgressListener *listener){
+Resource::ptr DDSStreamer::load(Stream::ptr stream,ResourceData *data){
 	int usage=(data!=NULL)?((TextureData*)data)->usage:0;
 
 	if(stream==NULL){

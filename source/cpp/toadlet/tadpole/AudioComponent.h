@@ -72,11 +72,13 @@ public:
 
 	void frameUpdate(int dt,int scope);
 
-	void streamReady(Stream::ptr stream);
+	void streamReady(Stream *stream);
 	void streamException(const Exception &ex){}
+	void streamProgress(float progress){}
 
-	void resourceReady(Resource::ptr resource);
+	void resourceReady(Resource *resource);
 	void resourceException(const Exception &ex){}
+	void resourceProgress(float progress){}
 
 	// Spacial
 	void setTransform(Transform::ptr transform){}

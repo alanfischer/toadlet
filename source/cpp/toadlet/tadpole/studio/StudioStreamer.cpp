@@ -36,7 +36,7 @@ StudioStreamer::StudioStreamer(Engine *engine){
 
 StudioStreamer::~StudioStreamer(){}
 
-Resource::ptr StudioStreamer::load(Stream::ptr stream,ResourceData *data,ProgressListener *listener){
+Resource::ptr StudioStreamer::load(Stream::ptr stream,ResourceData *data){
 	if(stream==NULL){
 		Error::nullPointer(Categories::TOADLET_TADPOLE_STUDIO,
 			"null stream");
