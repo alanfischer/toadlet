@@ -23,30 +23,22 @@
  *
  ********** Copyright header - do not remove **********/
 
-#ifndef TOADLET_TADPOLE_SHADERMANAGER_H
-#define TOADLET_TADPOLE_SHADERMANAGER_H
+#ifndef TOADLET_TADPOLE_MESHMANAGER_H
+#define TOADLET_TADPOLE_MESHMANAGER_H
 
-#include <toadlet/peeper/Shader.h>
 #include <toadlet/tadpole/ResourceManager.h>
+#include <toadlet/tadpole/Mesh.h>
 
 namespace toadlet{
 namespace tadpole{
 
-class Engine;
-
-class TOADLET_API ShaderManager:public ResourceManager{
+class TOADLET_API MeshManager:public ResourceManager{
 public:
-	TOADLET_OBJECT(ShaderManager);
+	TOADLET_OBJECT(MeshManager);
 
-	ShaderManager(Engine *engine);
+	MeshManager(Engine *engine):ResourceManager(engine){}
 
-	Shader::ptr createShader(Shader::ShaderType type,const String profiles[],const String codes[],int numCodes);
-	Shader::ptr createShader(Shader::ShaderType type,const String &profile,const String &code);
-
-	Shader::ptr getShader(const String &name){return shared_static_cast<Shader>(get(name));}
-
-	void contextActivate(RenderDevice *renderDevice);
-	void contextDeactivate(RenderDevice *renderDevice);
+	Mesh::ptr getMesh(const String &name){return shared_static_cast<Mesh>(get(name));}
 };
 
 }

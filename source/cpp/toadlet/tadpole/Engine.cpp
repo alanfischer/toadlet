@@ -133,7 +133,7 @@ Engine::Engine(void *env,void *ctx):
 	mShaderManager=new ShaderManager(this);
 	mMaterialManager=new MaterialManager(this);
 	mFontManager=new FontManager(this);
-	mMeshManager=new ResourceManager(this);
+	mMeshManager=new MeshManager(this);
 	mAudioManager=new AudioManager(this);
 
 	mStudioModelManager=new ResourceManager(this);

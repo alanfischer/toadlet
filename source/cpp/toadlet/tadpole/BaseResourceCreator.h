@@ -23,33 +23,42 @@
  *
  ********** Copyright header - do not remove **********/
 
-#ifndef TOADLET_TADPOLE_SHADERMANAGER_H
-#define TOADLET_TADPOLE_SHADERMANAGER_H
+#ifndef TOADLET_TADPOLE_BASERESOURCECREATOR_H
+#define TOADLET_TADPOLE_BASERESOURCECREATOR_H
 
-#include <toadlet/peeper/Shader.h>
-#include <toadlet/tadpole/ResourceManager.h>
+#include <toadlet/egg/Object.h>
+#include <toadlet/tadpole/ResourceCreator.h>
 
 namespace toadlet{
 namespace tadpole{
 
-class Engine;
-
-class TOADLET_API ShaderManager:public ResourceManager{
+class TOADLET_API BaseResourceCreator:public Object,public ResourceCreator{
 public:
-	TOADLET_OBJECT(ShaderManager);
+	TOADLET_IOBJECT(BaseResourceCreator);
 
-	ShaderManager(Engine *engine);
+	BaseResourceCreator(){}
 
-	Shader::ptr createShader(Shader::ShaderType type,const String profiles[],const String codes[],int numCodes);
-	Shader::ptr createShader(Shader::ShaderType type,const String &profile,const String &code);
+	bool create(const String &name,ResourceData *data,ResourceRequest *request){
+		Resource::ptr result;
+		Exception exception;
+		TOADLET_TRY
+			result=create(name,data);
+		TOADLET_CATCH(Exception ex){exception=ex;}
+		if(result!=NULL){
+			request->resourceReady(result);
+			return true;
+		}
+		else{
+			request->resourceException(exception);
+			return false;
+		}
+	}
 
-	Shader::ptr getShader(const String &name){return shared_static_cast<Shader>(get(name));}
-
-	void contextActivate(RenderDevice *renderDevice);
-	void contextDeactivate(RenderDevice *renderDevice);
+	virtual Resource::ptr create(const String &name,ResourceData *data)=0;
 };
 
 }
 }
 
 #endif
+

@@ -116,12 +116,12 @@ public:
 			refractTarget->attach(refractTexture->getMipPixelBuffer(0,0),PixelBufferRenderTarget::Attachment_COLOR_0);
 		}
 
-		bumpTexture=shared_static_cast<Texture>(engine->getTextureManager()->get("water_bump.png"));
+		bumpTexture=engine->getTextureManager()->getTexture("water_bump.png");
 		waterMaterial=engine->createWaterMaterial(reflectTexture,refractTexture,bumpTexture,color);
 
 		Log::alert("Loading frog");
 
-		creature=shared_static_cast<Mesh>(engine->getMeshManager()->get("frog.tmsh"));
+		creature=engine->getMeshManager()->getMesh("frog.tmsh");
 		if(creature!=NULL){
 			Transform::ptr transform=new Transform();
 			transform->setTranslate(0,0,-2.0);
@@ -131,7 +131,7 @@ public:
 
 		Log::alert("Loading grass");
 
-		grass=shared_static_cast<Mesh>(engine->getMeshManager()->get("tall_grass.tmsh"));
+		grass=engine->getMeshManager()->getMesh("tall_grass.tmsh");
 		if(grass!=NULL){
 			Transform::ptr transform=new Transform();
 			transform->setScale(0.1,0.1,0.1);
@@ -151,12 +151,12 @@ public:
 
 		Log::alert("Loading tree items");
 
-		treeBranch=shared_static_cast<Material>(engine->getMaterialManager()->get("bark.png"));
+		treeBranch=engine->getMaterialManager()->getMaterial("bark.png");
 
 		treeLeaf=engine->getMaterialManager()->createMaterial();
 		if(treeLeaf!=NULL){
-			Material::ptr treeLeafTop=shared_static_cast<Material>(engine->getMaterialManager()->get("leaf_top1_alpha.png"));
-			Material::ptr treeLeafBottom=shared_static_cast<Material>(engine->getMaterialManager()->get("leaf_bottom1_alpha.png"));
+			Material::ptr treeLeafTop=engine->getMaterialManager()->getMaterial("leaf_top1_alpha.png");
+			Material::ptr treeLeafBottom=engine->getMaterialManager()->getMaterial("leaf_bottom1_alpha.png");
 
 			if(treeLeafTop!=NULL && treeLeafBottom!=NULL){
 				for(int i=0;i<treeLeafTop->getPaths().size();++i){
@@ -183,9 +183,9 @@ public:
 
 		Log::alert("Loading sounds");
 
- 		dog=shared_static_cast<AudioBuffer>(engine->getAudioManager()->get("dog.wav"));
-		rustle=shared_static_cast<AudioBuffer>(engine->getAudioManager()->get("rustle.wav"));
-		crunch=shared_static_cast<AudioBuffer>(engine->getAudioManager()->get("crunch.wav"));
+ 		dog=engine->getAudioManager()->getAudioBuffer("dog.wav");
+		rustle=engine->getAudioManager()->getAudioBuffer("rustle.wav");
+		crunch=engine->getAudioManager()->getAudioBuffer("crunch.wav");
 
 		{
 			RenderState::ptr renderState=engine->getMaterialManager()->createRenderState();
@@ -198,7 +198,7 @@ public:
 			samplerState.vAddress=SamplerState::AddressType_CLAMP_TO_EDGE;
 			samplerState.wAddress=SamplerState::AddressType_CLAMP_TO_EDGE;
 			renderState->setSamplerState(Shader::ShaderType_FRAGMENT,0,samplerState);
-			acorn=engine->createDiffuseMaterial(shared_static_cast<Texture>(engine->getTextureManager()->get("acorn.png")),renderState);
+			acorn=engine->createDiffuseMaterial(engine->getTextureManager()->getTexture("acorn.png"),renderState);
 		}
 
 		// HUD
@@ -234,10 +234,10 @@ public:
 			samplerState.vAddress=SamplerState::AddressType_CLAMP_TO_EDGE;
 			samplerState.wAddress=SamplerState::AddressType_CLAMP_TO_EDGE;
 			renderState->setSamplerState(Shader::ShaderType_FRAGMENT,0,samplerState);
-			compass=engine->createDiffuseMaterial(shared_static_cast<Texture>(engine->getTextureManager()->get("compass.png")),renderState);
+			compass=engine->createDiffuseMaterial(engine->getTextureManager()->getTexture("compass.png"),renderState);
 		}
 
-		wooden=shared_static_cast<Font>(engine->getFontManager()->get("Pinewood.ttf"));
+		wooden=engine->getFontManager()->getFont("Pinewood.ttf",100);
 
 		system=engine->getFontManager()->getDefaultFont();
 
