@@ -74,7 +74,7 @@ Resource::ptr WADArchive::openResource(const String &name){
 	Map<String,int>::iterator texindex=mNameMap.find(name.toLower());
 	if(texindex==mNameMap.end()){
 		//Error::fileNotFound(Categories::TOADLET_TADPOLE,"resource not found");
-		return false;
+		return NULL;
 	}
 	
 	wlumpinfo *info=&mLumpinfos[texindex->second];
