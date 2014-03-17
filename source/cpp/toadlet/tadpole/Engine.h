@@ -41,6 +41,7 @@
 #include <toadlet/tadpole/BufferManager.h>
 #include <toadlet/tadpole/TextureManager.h>
 #include <toadlet/tadpole/MaterialManager.h>
+#include <toadlet/tadpole/MeshManager.h>
 #include <toadlet/tadpole/ShaderManager.h>
 #include <toadlet/tadpole/Mesh.h>
 #include <toadlet/tadpole/ContextListener.h>
@@ -105,7 +106,7 @@ public:
 	inline ShaderManager *getShaderManager() const{return mShaderManager;}
 	inline MaterialManager *getMaterialManager() const{return  mMaterialManager;}
 	inline FontManager *getFontManager() const{return mFontManager;}
-	inline ResourceManager *getMeshManager() const{return mMeshManager;}
+	inline MeshManager *getMeshManager() const{return mMeshManager;}
 	inline AudioManager *getAudioManager() const{return mAudioManager;}
 
 	/// @todo: These managers need to be optionally created upon BSP plugin loading
@@ -148,7 +149,7 @@ protected:
 	ShaderManager::ptr mShaderManager;
 	MaterialManager::ptr mMaterialManager;
 	FontManager::ptr mFontManager;
-	ResourceManager::ptr mMeshManager;
+	MeshManager::ptr mMeshManager;
 	AudioManager::ptr mAudioManager;
 
 	ResourceManager::ptr mStudioModelManager;

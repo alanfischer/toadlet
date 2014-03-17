@@ -6,7 +6,7 @@
 
 class Particles:public Object,public Applet{
 public:
-	TOADLET_OBJECT(Particles);
+	TOADLET_IOBJECT(Particles);
 
 	Particles(Application *app);
 	virtual ~Particles();
