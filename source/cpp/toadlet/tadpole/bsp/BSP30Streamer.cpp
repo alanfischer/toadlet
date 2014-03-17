@@ -422,7 +422,7 @@ void BSP30Streamer::MaterialRequest::resourceReady(Resource *resource){
 			mTextureIndex++;
 		}
 		if(mTextureIndex<mMap->parsedTextures.size()){
-			mMap->parsedTextures[mTextureIndex++]==(Texture*)resource;
+			mMap->parsedTextures[mTextureIndex++]=(Texture*)resource;
 		}
 		while(mTextureIndex<mMap->parsedTextures.size() && mMap->parsedTextures[mTextureIndex]!=NULL){
 			mTextureIndex++;
