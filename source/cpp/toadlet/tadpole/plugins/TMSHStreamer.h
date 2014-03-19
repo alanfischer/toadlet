@@ -54,7 +54,7 @@ protected:
 	public:
 		TOADLET_IOBJECT(MaterialRequest);
 
-		MaterialRequest(MaterialManager *materialManager,Mesh::ptr mesh,ResourceRequest *request):mMaterialManager(materialManager),mMesh(mesh),mRequest(request),mIndex(0){}
+		MaterialRequest(Engine *engine,Mesh::ptr mesh,ResourceRequest *request):mEngine(engine),mMesh(mesh),mRequest(request),mIndex(0){}
 
 		void request();
 
@@ -63,7 +63,7 @@ protected:
 		void resourceProgress(float progress){}
 
 	protected:
-		MaterialManager *mMaterialManager;
+		Engine *mEngine;
 		Mesh::ptr mMesh;
 		ResourceRequest::ptr mRequest;
 		int mIndex;
