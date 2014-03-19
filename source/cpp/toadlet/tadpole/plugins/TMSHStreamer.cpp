@@ -96,7 +96,7 @@ bool TMSHStreamer::load(Stream::ptr stream,ResourceData *data,ResourceRequest *r
 		}
 	}
 	
-	MaterialRequest::ptr materialRequest=new MaterialRequest(mEngine->getMaterialManager(),mesh,request);
+	MaterialRequest::ptr materialRequest=new MaterialRequest(mEngine,mesh,request);
 	materialRequest->request();
 
 	return true;
@@ -481,7 +481,7 @@ Material::ptr TMSHStreamer::readMaterial(DataStream *stream,int blockSize){
 		material->setName(name);
 	}
 
-	RenderState::ptr renderState=material->getRenderState();
+	RenderState::ptr renderState=mEngine->getMaterialManager()->createRenderState();
 
 	if(stream->readBool()){
 		MaterialState materialState;
@@ -506,6 +506,8 @@ Material::ptr TMSHStreamer::readMaterial(DataStream *stream,int blockSize){
 			renderState->setBlendState(blendState);
 		}
 	}
+
+	material->addPath()->addPass(renderState);
 
 	return material;
 }
@@ -674,7 +676,7 @@ void TMSHStreamer::MaterialRequest::request(){
 	}
 	
 	if(mIndex<mMesh->getNumSubMeshes()){
-		mMaterialManager->find(mMesh->getSubMesh(mIndex)->material->getName(),this);
+		mEngine->getMaterialManager()->find(mMesh->getSubMesh(mIndex)->material->getName(),this);
 	}
 	else{
 		mMesh->compile();
@@ -685,7 +687,7 @@ void TMSHStreamer::MaterialRequest::request(){
 void TMSHStreamer::MaterialRequest::resourceReady(Resource *resource){
 	Material::ptr material=(Material*)resource;
 	Mesh::SubMesh *subMesh=mMesh->getSubMesh(mIndex);
-	mMaterialManager->modifyRenderState(material->getRenderState(),subMesh->material->getRenderState());
+	mEngine->getMaterialManager()->modifyRenderState(material->getRenderState(),subMesh->material->getRenderState());
 	subMesh->material=material;
 
 	mIndex++;
@@ -693,6 +695,10 @@ void TMSHStreamer::MaterialRequest::resourceReady(Resource *resource){
 }
 
 void TMSHStreamer::MaterialRequest::resourceException(const Exception &ex){
+	Mesh::SubMesh *subMesh=mMesh->getSubMesh(mIndex);
+	Material::ptr material=mEngine->createDiffuseMaterial(NULL,subMesh->material->getRenderState());
+	subMesh->material=material;
+
 	mIndex++;
 	request();
 }

@@ -2,13 +2,13 @@
 #define QTARCHIVE_H
 
 #include <QtCore/qfile.h>
-#include <toadlet/egg/Resource.h>
 #include <toadlet/egg/Collection.h>
 #include <toadlet/egg/io/Stream.h>
+#include <toadlet/egg/io/BaseArchive.h>
 
 class QtFileStream:public Object,public Stream{
 public:
-	TOADLET_OBJECT(QtFileStream);
+	TOADLET_IOBJECT(QtFileStream);
 
 	QtFileStream(const QString &name):
 		mFile(name)
@@ -35,9 +35,9 @@ protected:
 	QFile mFile;
 };
 
-class QtArchive:public BaseResource,public Archive{
+class QtArchive:public BaseArchive{
 public:
-	TOADLET_RESOURCE(QtArchive,Archive);
+	TOADLET_OBJECT(QtArchive);
 	
 	void destroy(){}
 
@@ -49,8 +49,6 @@ public:
 		return stream;
 	}
 
-	Resource::ptr openResource(const String &name){return NULL;}
-	
 	const Collection<String> &getEntries(){return mEntries;}
 
 protected:
