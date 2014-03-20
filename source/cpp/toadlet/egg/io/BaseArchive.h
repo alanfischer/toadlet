@@ -38,6 +38,8 @@ class BaseArchive:public BaseResource,public Archive{
 public:
 	TOADLET_RESOURCE(BaseArchive,Archive);
 
+	void destroy(){}
+
 	bool openStream(const String &name,StreamRequest *request){
 		Stream::ptr result;
 		Exception exception;

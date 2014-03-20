@@ -123,7 +123,7 @@ Material::ptr XMLMeshUtilities::loadMaterial(mxml_node_t *materialNode,int versi
 		material->setName(prop);
 	}
 
-	RenderState::ptr renderState=mManager->createRenderState();
+	RenderState::ptr renderState=materialManager->createRenderState();
 
 	if(renderState!=NULL){
 		MaterialState materialState;
