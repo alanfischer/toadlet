@@ -9,11 +9,20 @@
 #include <toadlet/tadpole/Node.h>
 
 using namespace emscripten;
+using namespace toadlet;
 using namespace toadlet::egg;
 using namespace toadlet::tadpole;
 
+Texture::ptr TextureManager_createTexture(TextureManager *manager,TextureFormat::ptr format){
+	return manager->createTexture(format,(tbyte*)NULL);
+}
+
 EMSCRIPTEN_BINDINGS(tadpole) {
 	using namespace emscripten::internal;
+
+	class_<ResourceData>("ResourceData")
+		.smart_ptr<ResourceData::ptr>()
+	;
 
 	class_<Mesh>("Mesh")
 		.smart_ptr<Mesh::ptr>()
@@ -21,6 +30,27 @@ EMSCRIPTEN_BINDINGS(tadpole) {
 
 	class_<Material>("Material")
 		.smart_ptr<Material::ptr>()
+	;
+
+	class_<ResourceManager>("ResourceManager")
+		.smart_ptr<ResourceManager::ptr>()
+
+		.function("addResourceArchive",&ResourceManager::addResourceArchive, allow_raw_pointers())
+		.function("removeResourceArchive",&ResourceManager::removeResourceArchive, allow_raw_pointers())
+		.function("manage",&ResourceManager::manage, allow_raw_pointers())
+		.function("find",&ResourceManager::find, allow_raw_pointers())
+	;
+
+	class_<ArchiveManager,base<ResourceManager>>("ArchiveManager")
+		.smart_ptr<ArchiveManager::ptr>()
+	;
+
+	class_<TextureManager,base<ResourceManager>>("TextureManager")
+		.smart_ptr<TextureManager::ptr>()
+
+		.function("createTexture",&TextureManager_createTexture, allow_raw_pointers())
+
+		.function("getTexture",&TextureManager::getTexture, allow_raw_pointers())
 	;
 
 	class_<Engine>("Engine")
@@ -31,6 +61,9 @@ EMSCRIPTEN_BINDINGS(tadpole) {
 		.function("setHasBackableFixed",&Engine::setHasBackableFixed)
 
 		.function("installHandlers",&Engine::installHandlers)
+
+		.function("getArchiveManager",&Engine::getArchiveManager, allow_raw_pointers())
+		.function("getTextureManager",&Engine::getTextureManager, allow_raw_pointers())
 
 		.function("setRenderDevice",&Engine::setRenderDevice, allow_raw_pointers())
 		.function("setAudioDevice",&Engine::setAudioDevice, allow_raw_pointers())

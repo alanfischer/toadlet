@@ -114,7 +114,8 @@ void String::internal_String(const char *text,int length){
 
 	mData=new stringchar[mLength+1];
 	stringchar *dest=mData;
-	while((*dest++=*text++)!=0){}
+	//while((*dest++=*text++)!=0){}
+	for(int i=0;i<mLength;++i){dest[i]=text[i];}
 	mData[mLength]=0;
 	mNarrowData=NULL;
 
@@ -138,7 +139,8 @@ void String::internal_String(const unsigned char *text,int length){
 
 	mData=new stringchar[mLength+1];
 	stringchar *dest=mData;
-	while((*dest++=*text++)!=0){}
+	//while((*dest++=*text++)!=0){}
+	for(int i=0;i<mLength;++i){dest[i]=text[i];}
 	mData[mLength]=0;
 	mNarrowData=NULL;
 
@@ -161,7 +163,8 @@ void String::internal_String(const stringchar *text,int length){
 	}
 
 	mData=new stringchar[mLength+1];
-	TOADLET_WCSNCPY((wchar_t*)mData,(wchar_t*)text,mLength);
+	//TOADLET_WCSNCPY((wchar_t*)mData,(wchar_t*)text,mLength);
+	for(int i=0;i<mLength;++i){((wchar_t*)mData)[i]=((wchar_t*)text)[i];}
 	mData[mLength]=0;
 	mNarrowData=NULL;
 
@@ -722,7 +725,9 @@ void String::updatec(){
 	mNarrowData=new char[mLength+1];
 	const stringchar *source=mData;
 	char *dest=mNarrowData;
-	while((*dest++=*source++)!=0){}
+	//while((*dest++=*source++)!=0){}
+	for(int i=0;i<mLength;++i){dest[i]=source[i];}
+	dest[mLength]=0;
 }
 
 String operator+(const char *text,const String &string){

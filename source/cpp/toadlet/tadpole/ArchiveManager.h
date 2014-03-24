@@ -70,7 +70,7 @@ protected:
 		void streamProgress(float progress){}
 
 	protected:
-		ArchiveManager::ptr mManager;
+		ArchiveManager *mManager;
 		String mName;
 		StreamRequest::ptr mRequest;
 		Collection<Resource*>::iterator mIt;
