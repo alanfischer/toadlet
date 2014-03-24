@@ -36,7 +36,7 @@ namespace io{
 
 class TOADLET_API SocketStream:public Object,public Stream{
 public:
-	TOADLET_OBJECT(SocketStream);
+	TOADLET_IOBJECT(SocketStream);
 
 	SocketStream(Socket *socket);
 	virtual ~SocketStream();
