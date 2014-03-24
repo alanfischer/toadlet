@@ -4,6 +4,7 @@
 #include <toadlet/peeper/RenderDevice.h>
 #include <toadlet/peeper/RenderState.h>
 #include <toadlet/peeper/Texture.h>
+#include <toadlet/peeper/plugins/glrenderdevice/GLTexture.h>
 #include <toadlet/peeper/Viewport.h>
 
 using namespace emscripten;
@@ -17,6 +18,10 @@ RenderTarget *new_EGLWindowRenderTarget2(val canvas){
 	val::global("Module").set("canvas",canvas);
 	WindowRenderTargetFormat format;
 	return new_EGLWindowRenderTarget(NULL,NULL,&format);
+}
+
+Texture *toTexture(Resource *resource){
+	return (Texture*)resource;
 }
 
 EMSCRIPTEN_BINDINGS(peeper) {
@@ -48,8 +53,26 @@ EMSCRIPTEN_BINDINGS(peeper) {
 	class_<RenderState>("RenderState")
 		.smart_ptr<RenderState::ptr>()
 	;
+    
+	enum_<TextureFormat::Dimension>("Dimension")
+		.value("Dimension_UNKNOWN", TextureFormat::Dimension_UNKNOWN)
+		.value("Dimension_D1", TextureFormat::Dimension_D1)
+		.value("Dimension_D2", TextureFormat::Dimension_D2)
+		.value("Dimension_D3", TextureFormat::Dimension_D3)
+		.value("Dimension_CUBE", TextureFormat::Dimension_CUBE)
+	;
 
-	class_<Texture>("Texture")
+	enum_<TextureFormat::Format>("Format")
+		.value("Format_RGBA_8", TextureFormat::Format_RGBA_8)
+	;
+
+	class_<TextureFormat>("TextureFormat")
+		.smart_ptr_constructor(&make_ptr<TextureFormat,int,int,int,int,int,int>)
+	;
+
+	class_<Texture,base<Resource>>("Texture")
 		.smart_ptr<Texture::ptr>()
 	;
+
+	function("toTexture",&toTexture, allow_raw_pointers());
 }
