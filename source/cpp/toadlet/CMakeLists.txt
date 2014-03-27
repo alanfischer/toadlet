@@ -80,7 +80,7 @@ if (TOADLET_PLATFORM_EMSCRIPTEN)
 	)
 	
 	set_target_properties (toadlet.js PROPERTIES COMPILE_FLAGS "--bind")
-	set_target_properties (toadlet.js PROPERTIES LINK_FLAGS "--bind")
+	set_target_properties (toadlet.js PROPERTIES LINK_FLAGS "--bind --js-library ../../../../source/js/DOMArchive.js")
 	target_link_libraries (toadlet.js "toadlet_egg_s" "toadlet_hop_s" "toadlet_peeper_s" "toadlet_peeper_gles2renderdevice_s" "toadlet_ribbit_s" "toadlet_ribbit_alaudiodevice_s" "toadlet_tadpole_s")
 	get_target_property (TOADLET_JS_OUTPUT toadlet.js LOCATION)
 	add_custom_command(TARGET toadlet.js POST_BUILD

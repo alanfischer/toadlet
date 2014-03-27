@@ -5,9 +5,15 @@
 #include <emscripten/wire.h>
 #include <toadlet/egg/Iterator.h>
 #include <toadlet/egg/String.h>
+#include <toadlet/egg/Object.h>
 #include <toadlet/egg/IntrusivePointer.h>
+#include <toadlet/egg/io/BaseArchive.h>
 
 namespace emscripten {
+	using namespace toadlet;
+	using namespace toadlet::egg;
+	using namespace toadlet::egg::io;
+
 	namespace internal {
 
 	template<>
@@ -82,10 +88,10 @@ namespace emscripten {
 	};
 
 	template<typename T>
-	class_<toadlet::egg::PointerIteratorRange<T>> register_range(const char* name) {
-		typedef toadlet::egg::PointerIteratorRange<T> RangeType;
+	class_<PointerIteratorRange<T>> register_range(const char* name) {
+		typedef PointerIteratorRange<T> RangeType;
 
-		return class_<toadlet::egg::PointerIteratorRange<T>>(name)
+		return class_<PointerIteratorRange<T>>(name)
 			.function("atBegin", &RangeAccess<RangeType>::atBegin)
 			.function("atEnd", &RangeAccess<RangeType>::atEnd)
 			.function("next", &RangeAccess<RangeType>::next)
@@ -93,6 +99,60 @@ namespace emscripten {
 			;
 	}
 
+	class StreamRequestWrapper: public Object,public wrapper<StreamRequest> {
+	public:
+		TOADLET_IOBJECT(StreamRequestWrapper);
+		EMSCRIPTEN_WRAPPER(StreamRequestWrapper);
+
+		void streamReady(Stream *stream){
+			return call<void>("streamReady",Stream::ptr(stream));
+		}
+
+		void streamException(const Exception &ex){
+			return call<void>("streamException",ex);
+		}
+
+		void streamProgress(float progress){
+			return call<void>("streamProgress",progress);
+		}
+	};
+
+	class ResourceRequestWrapper: public Object,public wrapper<ResourceRequest> {
+	public:
+		TOADLET_IOBJECT(ResourceRequestWrapper);
+		EMSCRIPTEN_WRAPPER(ResourceRequestWrapper);
+
+		void resourceReady(Resource *resource){
+			return call<void>("resourceReady",Resource::ptr(resource));
+		}
+
+		void resourceException(const Exception &ex){
+			return call<void>("resourceException",ex);
+		}
+
+		void resourceProgress(float progress){
+			return call<void>("resourceProgress",progress);
+		}
+	};
+
+	class ArchiveWrapper: public wrapper<BaseArchive> {
+	public:
+		TOADLET_IOBJECT(ArchiveWrapper);
+		EMSCRIPTEN_WRAPPER(ArchiveWrapper);
+
+		bool openStream(const String &name,StreamRequest *request){
+			return call<bool>("openStream",name,StreamRequest::ptr(request));
+		}
+
+		bool openResource(const String &name,ResourceRequest *request){
+			return call<bool>("openResource",name,ResourceRequest::ptr(request));
+		}
+
+		const Collection<String> &getEntries(){return mEntries;}
+
+	protected:
+		Collection<String> mEntries;
+	};
 }
 
 #endif

@@ -102,6 +102,10 @@
 	#include <toadlet/tadpole/plugins/MODStreamer.h>
 #endif
 
+#if defined(TOADLET_PLATFORM_EMSCRIPTEN)
+	extern toadlet::egg::io::Archive::ptr makeDOMArchive(toadlet::tadpole::Engine *engine);
+#endif
+
 #if !defined(TOADLET_FIXED_POINT)
 	#include <toadlet/tadpole/plugins/SPRStreamer.h>
 	#include <toadlet/tadpole/studio/SpriteStreamer.h>
@@ -334,6 +338,12 @@ void Engine::installHandlers(){
 		mStudioModelManager->setStreamer(new studio::StudioStreamer(this),"mdl");
 	#endif
 
+	#if defined(TOADLET_PLATFORM_EMSCRIPTEN)
+		Archive::ptr domArchive=makeDOMArchive(this);
+		mArchiveManager->manage(domArchive,"DOMArchive");
+		mTextureManager->addResourceArchive(domArchive);
+	#endif
+		
 	mNormalizationCreator=new NormalizationTextureCreator(this);
 
 	mDiffuseCreator=new DiffuseMaterialCreator(this);

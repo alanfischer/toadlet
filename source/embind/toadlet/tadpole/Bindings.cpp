@@ -17,6 +17,15 @@ Texture::ptr TextureManager_createTexture(TextureManager *manager,TextureFormat:
 	return manager->createTexture(format,(tbyte*)NULL);
 }
 
+extern "C" void *DOMArchive();
+
+Archive::ptr makeDOMArchive(Engine *engine){
+	volatile bool link=false;
+	if(link){DOMArchive();}
+	val::module_property("DOMArchive").call<void>("setEngine",engine);
+	return new ArchiveWrapper(val::module_property("DOMArchive"));
+}
+
 EMSCRIPTEN_BINDINGS(tadpole) {
 	using namespace emscripten::internal;
 
