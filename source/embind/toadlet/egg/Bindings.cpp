@@ -3,11 +3,9 @@
 #include <toadlet/egg/Log.h>
 #include <toadlet/egg/Error.h>
 #include <toadlet/egg/Resource.h>
-#include <toadlet/egg/Object.h>
 #include <toadlet/egg/math/Math.h>
 #include <toadlet/egg/io/Stream.h>
 #include <toadlet/egg/io/MemoryStream.h>
-#include <toadlet/egg/io/BaseArchive.h>
 
 using namespace emscripten;
 using namespace toadlet;
@@ -100,24 +98,6 @@ EMSCRIPTEN_BINDINGS(egg) {
 		.smart_ptr<Resource::ptr>()
 	;
 
-	class StreamRequestWrapper: public Object,public wrapper<StreamRequest> {
-	public:
-		TOADLET_IOBJECT(StreamRequestWrapper);
-		EMSCRIPTEN_WRAPPER(StreamRequestWrapper);
-
-		void streamReady(Stream *stream){
-			return call<void>("streamReady",Stream::ptr(stream));
-		}
-
-		void streamException(const Exception &ex){
-			return call<void>("streamException",ex);
-		}
-
-		void streamProgress(float progress){
-			return call<void>("streamProgress",progress);
-		}
-	};
-
 	class_<StreamRequest>("StreamRequest")
 		.smart_ptr<StreamRequest::ptr>()
 		.allow_subclass<StreamRequestWrapper, StreamRequestWrapper::ptr>()
@@ -127,24 +107,6 @@ EMSCRIPTEN_BINDINGS(egg) {
 		.function("streamProgress", &StreamRequest::streamProgress)
 	;
 
-	class ResourceRequestWrapper: public Object,public wrapper<ResourceRequest> {
-	public:
-		TOADLET_IOBJECT(ResourceRequestWrapper);
-		EMSCRIPTEN_WRAPPER(ResourceRequestWrapper);
-
-		void resourceReady(Resource *resource){
-			return call<void>("resourceReady",Resource::ptr(resource));
-		}
-
-		void resourceException(const Exception &ex){
-			return call<void>("resourceException",ex);
-		}
-
-		void resourceProgress(float progress){
-			return call<void>("resourceProgress",progress);
-		}
-	};
-
 	class_<ResourceRequest>("ResourceRequest")
 		.smart_ptr<ResourceRequest::ptr>()
 		.allow_subclass<ResourceRequestWrapper, ResourceRequestWrapper::ptr>()
@@ -153,25 +115,6 @@ EMSCRIPTEN_BINDINGS(egg) {
 		.function("resourceException", &ResourceRequest::resourceException)
 		.function("resourceProgress", &ResourceRequest::resourceProgress)
 	;
-
-	class ArchiveWrapper: public wrapper<BaseArchive> {
-	public:
-		TOADLET_IOBJECT(ArchiveWrapper);
-		EMSCRIPTEN_WRAPPER(ArchiveWrapper);
-
-		bool openStream(const String &name,StreamRequest *request){
-			return call<bool>("openStream",name,StreamRequest::ptr(request));
-		}
-
-		bool openResource(const String &name,ResourceRequest *request){
-			return call<bool>("openResource",name,ResourceRequest::ptr(request));
-		}
-
-		const Collection<String> &getEntries(){return mEntries;}
-
-	protected:
-		Collection<String> mEntries;
-	};
 
 	class_<Archive,base<Resource>>("Archive")
 		.smart_ptr<Archive::ptr>()
