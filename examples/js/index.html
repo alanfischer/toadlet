@@ -67,80 +67,8 @@ var init=function(){
 		}
 	});
 	
-	var xmlHTTPArchive=toadlet.Archive.implement({
-		openStream: function(name,request){
-			var xmlHttp=new XMLHttpRequest();
-			xmlHttp.open("GET",name);
-			xmlHttp.onreadystatechange=function(){
-				if(xmlHttp.readyState==4){
-					if(xmlHttp.status==200){
-						request.stringStreamReady(xmlHttp.responseText);
-						request.delete();
-					}
-					else{
-						request.streamException(Error.unknown());
-						request.delete();
-					}
-				}
-			}
-			xmlHttp.ontimeout=function(){
-				request.streamException(Error.unknown());
-				request.delete();
-			}
-			xmlHttp.send();
-			return true;
-		},
-		openResource: function(name,request){
-			return false;
-		}
-	});
-
-	var domTextureArchive=toadlet.Archive.implement({
-		openStream: function(name,request){
-			return false;
-		},
-		openResource: function(name,request){
-			var image=new Image();
-			image.onload=function(){
-				// TODO: Can we cleanly get the texture handle from emscripten?
-				var gl=toadlet.ctx;
-				var target,handle;
-				var oldBindTexture=gl.bindTexture.bind(gl);
-				gl.bindTexture=function(gltarget,glhandle){
-					target=gltarget;
-					handle=glhandle;
-					oldBindTexture(gltarget,glhandle);
-				};
-
-				var textureManager=engine.getTextureManager();
-				var textureFormat=new toadlet.TextureFormat(toadlet.Dimension.Dimension_D2.value,toadlet.Format.Format_RGBA_8.value,image.naturalWidth,image.naturalHeight,1,0);
-				var texture=textureManager.createTexture(textureFormat);
-				gl.bindTexture(target,handle);
-				gl.texImage2D(target,0,gl.RGBA,gl.RGBA,gl.UNSIGNED_BYTE,image);
-				gl.generateMipmap(target);
-				gl.bindTexture(target,null);
-				textureManager.manage(texture,name);
-				request.resourceReady(texture);
-				texture.delete();
-				request.delete();
-				
-				gl.bindTexture=oldBindTexture;
-			}
-			image.onerror=function(){
-				request.resourceException(Error.unknown());
-				request.delete();
-			}
-			image.src=name;
-			return true;
-		}
-	});
-	
-	var archiveManager=engine.getArchiveManager();
-	archiveManager.manage(xmlHTTPArchive,"XMLHttpRequest");
-
 	var textureManager=engine.getTextureManager();
-	textureManager.addResourceArchive(domTextureArchive);
-	textureManager.find("http://people.sc.fsu.edu/~jburkardt/data/bmp/lena.bmp",request,null);
+	textureManager.find("sparkle.png",request,null);
 	
 	update();
 };
