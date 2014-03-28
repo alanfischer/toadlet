@@ -43,8 +43,7 @@ public:
 
 	void destroy(){}
 
-	bool openStream(const String &name,StreamRequest *request);
-	bool openResource(const String &name,ResourceRequest *request){return false;}
+	Stream::ptr openStream(const String &name);
 
 	const Collection<String> &getEntries(){return mEntries;}
 
