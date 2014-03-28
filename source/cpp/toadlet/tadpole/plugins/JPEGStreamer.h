@@ -27,19 +27,19 @@
 #define TOADLET_TADPOLE_JPEGSTREAMER_H
 
 #include <toadlet/peeper/Texture.h>
-#include <toadlet/tadpole/ResourceStreamer.h>
+#include <toadlet/tadpole/BaseResourceStreamer.h>
 #include <toadlet/tadpole/TextureManager.h>
 
 namespace toadlet{
 namespace tadpole{
 
-class TOADLET_API JPEGStreamer:public Object,public ResourceStreamer{
+class TOADLET_API JPEGStreamer:public BaseResourceStreamer{
 public:
-	TOADLET_IOBJECT(JPEGStreamer);
+	TOADLET_OBJECT(JPEGStreamer);
 
 	JPEGStreamer(TextureManager *textureManager){mTextureManager=textureManager;}
 
-	Resource::ptr load(Stream::ptr stream,ResourceData *data,ProgressListener *listener);
+	Resource::ptr load(Stream::ptr stream,ResourceData *data);
 
 protected:
 	TextureManager *mTextureManager;
