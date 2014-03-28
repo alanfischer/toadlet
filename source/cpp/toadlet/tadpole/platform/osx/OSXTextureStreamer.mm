@@ -55,7 +55,7 @@ OSXTextureStreamer::OSXTextureStreamer(TextureManager *textureManager){
 	mTextureManager=textureManager;
 }
 
-Resource::ptr OSXTextureStreamer::load(Stream::ptr in,ResourceData *data,ProgressListener *listener){
+Resource::ptr OSXTextureStreamer::load(Stream::ptr in,ResourceData *data){
 	int usage=(data!=NULL)?((TextureData*)data)->usage:0;
 	CGDataProviderSequentialCallbacks callbacks={0};
 	callbacks.version=0;

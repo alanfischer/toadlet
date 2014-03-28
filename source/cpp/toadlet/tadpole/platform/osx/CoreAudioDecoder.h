@@ -35,7 +35,7 @@ namespace decoder{
 
 class CoreAudioDecoder:public Object,public AudioStream{
 public:
-	TOADLET_OBJECT(CoreAudioDecoder);
+	TOADLET_IOBJECT(CoreAudioDecoder);
 
 	CoreAudioDecoder();
 	virtual ~CoreAudioDecoder();

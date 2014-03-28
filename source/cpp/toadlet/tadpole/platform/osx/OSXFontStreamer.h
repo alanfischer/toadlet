@@ -28,7 +28,7 @@
 
 #include <toadlet/tadpole/Font.h>
 #include <toadlet/tadpole/FontData.h>
-#include <toadlet/tadpole/ResourceStreamer.h>
+#include <toadlet/tadpole/BaseResourceStreamer.h>
 #include <toadlet/tadpole/TextureManager.h>
 
 namespace toadlet{
@@ -37,14 +37,14 @@ namespace tadpole{
 /// @brief  A lighter weight font handling class for the OSX platform
 ///  If the FreeTypeStreamer is unavailable or too heavy weight to include, this class may be used.
 
-class TOADLET_API OSXFontStreamer:public Object,public ResourceStreamer{
+class TOADLET_API OSXFontStreamer:public BaseResourceStreamer{
 public:
-	TOADLET_IOBJECT(OSXFontStreamer);
+	TOADLET_OBJECT(OSXFontStreamer);
 
 	OSXFontStreamer(TextureManager *textureManager);
 	virtual ~OSXFontStreamer(){}
 
-	Resource::ptr load(Stream::ptr in,ResourceData *data,ProgressListener *listener);
+	Resource::ptr load(Stream::ptr in,ResourceData *data);
 
 protected:
 	TextureManager *mTextureManager;

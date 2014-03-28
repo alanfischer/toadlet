@@ -28,19 +28,20 @@
 
 #include <toadlet/peeper/Texture.h>
 #include <toadlet/tadpole/TextureManager.h>
+#include <toadlet/tadpole/BaseResourceStreamer.h>
 #include <jni.h>
 
 namespace toadlet{
 namespace tadpole{
 
-class TOADLET_API AndroidTextureStreamer:public Object,public ResourceStreamer{
+class TOADLET_API AndroidTextureStreamer:public BaseResourceStreamer{
 public:
-	TOADLET_IOBJECT(AndroidTextureStreamer);
+	TOADLET_OBJECT(AndroidTextureStreamer);
 
 	AndroidTextureStreamer(TextureManager *textureManager,JNIEnv *env);
 	virtual ~AndroidTextureStreamer();
 
-	Resource::ptr load(Stream::ptr in,ResourceData *data,ProgressListener *listener);
+	Resource::ptr load(Stream::ptr in,ResourceData *data);
 
 protected:
 	JNIEnv *getEnv() const;

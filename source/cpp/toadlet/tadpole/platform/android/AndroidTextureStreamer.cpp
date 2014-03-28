@@ -58,7 +58,7 @@ AndroidTextureStreamer::~AndroidTextureStreamer(){
 	vm=NULL;
 }
 
-Resource::ptr AndroidTextureStreamer::load(Stream::ptr stream,ResourceData *data,ProgressListener *listener){
+Resource::ptr AndroidTextureStreamer::load(Stream::ptr stream,ResourceData *data){
 	JNIEnv *env=getEnv();
 
 	int usage=(data!=NULL)?((TextureData*)data)->usage:0;
