@@ -164,7 +164,7 @@ void toadlet_error_exit(j_common_ptr cinfo){
 	longjmp(toadleterr->setjmp_buffer,1);
 }
 
-Resource::ptr JPEGStreamer::load(Stream::ptr stream,ResourceData *data,ProgressListener *listener){
+Resource::ptr JPEGStreamer::load(Stream::ptr stream,ResourceData *data){
 	int usage=(data!=NULL)?((TextureData*)data)->usage:0;
 
 	struct jpeg_decompress_struct cinfo;
