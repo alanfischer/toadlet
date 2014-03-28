@@ -26,16 +26,15 @@
 #ifndef TOADLET_EGG_OSXBUNDLEARCHIVE_H
 #define TOADLET_EGG_OSXBUNDLEARCHIVE_H
 
-#include <toadlet/egg/BaseResource.h>
 #include <toadlet/egg/Map.h>
-#include <toadlet/egg/io/Archive.h>
+#include <toadlet/egg/io/BaseArchive.h>
 
 namespace toadlet{
 namespace egg{
 
-class TOADLET_API OSXBundleArchive:public BaseResource,public Archive{
+class TOADLET_API OSXBundleArchive:public BaseArchive{
 public:
-	TOADLET_RESOURCE(OSXBundleArchive,Archive);
+	TOADLET_OBJECT(OSXBundleArchive);
 
 	OSXBundleArchive();
 	virtual ~OSXBundleArchive();
@@ -44,8 +43,7 @@ public:
 
 	bool open(void *bundle);
 
-	bool openStream(const String &name,StreamRequest *request);
-	bool openResource(const String &name,ResourceRequest *request){return false;}
+	Stream::ptr openStream(const String &name);
 
 	const Collection<String> &getEntries(){return mEntries;}
 
