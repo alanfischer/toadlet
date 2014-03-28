@@ -75,7 +75,7 @@ float fromEm(float e,float pointSize,float unitsPerEm){
 	return unitsPerEm!=0?(e/unitsPerEm):e;
 }
 
-Resource::ptr OSXFontStreamer::load(Stream::ptr in,ResourceData *resourceData,ProgressListener *listener){
+Resource::ptr OSXFontStreamer::load(Stream::ptr in,ResourceData *resourceData){
 	FontData *resdata=(FontData*)resourceData;
 
 	if(!CGFontGetGlyphsForUnichars){
