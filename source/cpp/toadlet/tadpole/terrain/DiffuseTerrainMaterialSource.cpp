@@ -38,12 +38,12 @@ DiffuseTerrainMaterialSource::DiffuseTerrainMaterialSource(Engine *engine){
 }
 
 void DiffuseTerrainMaterialSource::createShaders(){
-	String profiles[]={
+	const char *profiles[]={
 		"glsl",
 		"hlsl"
 	};
 
-	String diffuseVertexCode[]={
+	const char *diffuseVertexCode[]={
 		"attribute vec4 POSITION;\n"
 		"attribute vec3 NORMAL;\n"
 		"attribute vec2 TEXCOORD0;\n"
@@ -124,7 +124,7 @@ void DiffuseTerrainMaterialSource::createShaders(){
 		"}"
 	};
 
-	String diffuseBaseFragmentCode[]={
+	const char *diffuseBaseFragmentCode[]={
 		"#if defined(GL_ES)\n"
 			"precision mediump float;\n"
 		"#endif\n"
@@ -161,7 +161,7 @@ void DiffuseTerrainMaterialSource::createShaders(){
 		"}"
 	};
 
-	String diffuseLayerFragmentCode[]={
+	const char *diffuseLayerFragmentCode[]={
 		"#if defined(GL_ES)\n"
 			"precision mediump float;\n"
 		"#endif\n"

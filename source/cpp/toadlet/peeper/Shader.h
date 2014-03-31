@@ -47,7 +47,7 @@ public:
 
 	virtual Shader *getRootShader()=0;
 
-	virtual bool create(ShaderType shaderType,const String &profile,const String &code)=0;
+	virtual bool create(ShaderType shaderType,const char *profile,const char *code)=0;
 	virtual void destroy()=0;
 	
 	virtual ShaderType getShaderType() const=0;

@@ -41,12 +41,12 @@ void SkyBoxMaterialCreator::destroy(){
 void SkyBoxMaterialCreator::createShaders(){
 	destroyShaders();
 
-	String profiles[]={
+	const char *profiles[]={
 		"glsl",
 		"hlsl"
 	};
 
-	String skyBoxVertexCode[]={
+	const char *skyBoxVertexCode[]={
 		"attribute vec4 POSITION;\n"
 		"attribute vec4 COLOR;\n"
 		"attribute vec2 TEXCOORD0;\n"
@@ -89,7 +89,7 @@ void SkyBoxMaterialCreator::createShaders(){
 		"}"
 	};
 
-	String skyBoxFragmentCode[]={
+	const char *skyBoxFragmentCode[]={
 		"#if defined(GL_ES)\n"
 			"precision mediump float;\n"
 		"#endif\n"

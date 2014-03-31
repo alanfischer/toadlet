@@ -46,7 +46,7 @@ void Error::destroy(){
 	}
 }
 
-void Error::errorLog(const String &categoryName,const String &text){
+void Error::errorLog(const char *categoryName,const char *text){
 	Log::getInstance()->addLogEntry(categoryName,Logger::Level_ERROR,text);
 }
 

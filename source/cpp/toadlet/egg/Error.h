@@ -30,10 +30,10 @@
 
 #if defined(TOADLET_EXCEPTIONS)
 	#define TOADLET_MAKE_ERROR_FUNCTION(name,type) \
-		static toadlet::egg::Exception name(const String &text){return name((char*)NULL,true,text,Throw_YES);} \
-		static toadlet::egg::Exception name(const String &text,Throw throwit){return name((char*)NULL,true,text,throwit);} \
-		static toadlet::egg::Exception name(const String &categoryName,const String &text,Throw throwit=Throw_YES){return name(categoryName,true,text,throwit);} \
-		static toadlet::egg::Exception name(const String &categoryName,bool report,const String &text,Throw throwit=Throw_YES){ \
+		static toadlet::egg::Exception name(const char *text){return name((char*)NULL,true,text,Throw_YES);} \
+		static toadlet::egg::Exception name(const char *text,Throw throwit){return name((char*)NULL,true,text,throwit);} \
+		static toadlet::egg::Exception name(const char *categoryName,const char *text,Throw throwit=Throw_YES){return name(categoryName,true,text,throwit);} \
+		static toadlet::egg::Exception name(const char *categoryName,bool report,const char *text,Throw throwit=Throw_YES){ \
 			if(report){errorLog(categoryName,text);} \
 			toadlet::egg::Exception ex(type,text); \
 			Error::getInstance()->setException(ex); \
@@ -44,10 +44,10 @@
 		}
 #else
 	#define TOADLET_MAKE_ERROR_FUNCTION(name,type) \
-		static toadlet::egg::Exception name(const String &text){return name((char*)NULL,true,text,Throw_YES);} \
-		static toadlet::egg::Exception name(const String &text,Throw throwit){return name((char*)NULL,true,text,throwit);} \
-		static toadlet::egg::Exception name(const String &categoryName,const String &text,Throw throwit=Throw_YES){return name(categoryName,true,text,throwit);} \
-		static toadlet::egg::Exception name(const String &categoryName,bool report,const String &text,Throw throwit=Throw_YES){ \
+		static toadlet::egg::Exception name(const char *text){return name((char*)NULL,true,text,Throw_YES);} \
+		static toadlet::egg::Exception name(const char *text,Throw throwit){return name((char*)NULL,true,text,throwit);} \
+		static toadlet::egg::Exception name(const char *categoryName,const char *text,Throw throwit=Throw_YES){return name(categoryName,true,text,throwit);} \
+		static toadlet::egg::Exception name(const char *categoryName,bool report,const char *text,Throw throwit=Throw_YES){ \
 			if(report){errorLog(categoryName,text);} \
 			toadlet::egg::Exception ex(type,text); \
 			Error::getInstance()->setException(ex); \
@@ -81,7 +81,7 @@ public:
 	TOADLET_MAKE_ERROR_FUNCTION(socket,Errorer::Type_SOCKET)
 
 protected:
-	static void errorLog(const String &categoryName,const String &description);
+	static void errorLog(const char *categoryName,const char *description);
 
 	static Errorer *mTheErrorer;
 };

@@ -38,8 +38,7 @@ public:
 	}
 
 	template<typename Type> static int releaseReference(Type *type){
-		PointerCounter *counter=type->pointerCounter();
-		int count=counter->decSharedCount();
+		int count=type->pointerCounter()->decSharedCount();
 		if(count<1){
 			delete type;
 		}
