@@ -48,7 +48,7 @@ SOSLoggerListener::~SOSLoggerListener(){
 	mThread->join();
 }
 
-void SOSLoggerListener::addLogEntry(Logger::Category *category,Logger::Level level,uint64 time,const String &text){
+void SOSLoggerListener::addLogEntry(Logger::Category *category,Logger::Level level,uint64 time,const char *text){
 	mMutex->lock();
 	mEntries.add(Logger::Entry(category,level,time,text));
 	mMutex->unlock();
@@ -60,15 +60,14 @@ void SOSLoggerListener::flush(){
 	mMutex->unlock();
 }
 
-void SOSLoggerListener::sendEntry(Logger::Category *category,Logger::Level level,uint64 time,const String &text){
+void SOSLoggerListener::sendEntry(Logger::Category *category,Logger::Level level,uint64 time,const char *text){
 	if (level <= 0) {
 		return;
 	}
 	
 	String formattedMessage = String("!SOS<showMessage key='") + _sos_level_names[level] + ("'>");
 	
-	String messagePrefix = String();
-	messagePrefix += String("[") + _sos_level_names[level] + String("] ");
+	String messagePrefix = String("[") + _sos_level_names[level] + String("] ");
 	
 	if (category != NULL) {
 		// Occasionally, we use __FILE__ as the category name. If we do, we don't

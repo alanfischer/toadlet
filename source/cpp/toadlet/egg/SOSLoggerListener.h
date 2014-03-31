@@ -16,11 +16,11 @@ public:
 	SOSLoggerListener(String serverAddress);
 	virtual ~SOSLoggerListener();
 
-	void addLogEntry(Logger::Category *category,Logger::Level level,uint64 time,const String &text);
+	void addLogEntry(Logger::Category *category,Logger::Level level,uint64 time,const char *text);
 
 	void flush();
 
-	void sendEntry(Logger::Category *category,Logger::Level level,uint64 time,const String &text);
+	void sendEntry(Logger::Category *category,Logger::Level level,uint64 time,const char *text);
 
 	void run();
 
