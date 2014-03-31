@@ -28,6 +28,7 @@
 
 #include <toadlet/egg/Collection.h>
 #include <toadlet/egg/Map.h>
+#include <toadlet/egg/Exception.h>
 #include <toadlet/egg/Object.h>
 #include <toadlet/egg/Mutex.h>
 #include <toadlet/egg/Thread.h>
@@ -37,10 +38,8 @@ namespace toadlet{
 namespace egg{
 
 template<typename Type>
-class TaskQueue:public Object{
+class TaskQueue{
 public:
-	TOADLET_OBJECT(TaskQueue);
-
 	void add(const Type &type){
 		mMutex.lock();
 		{
@@ -72,7 +71,26 @@ protected:
 	Collection<Type> mCollection;
 };
 
-class TaskGroup;
+class TaskGroup:public Object{
+public:
+	TOADLET_OBJECT(TaskGroup);
+
+	TaskGroup();
+
+	void addTask();
+	void removeTask();
+
+	void addException(const Exception &ex);
+	Exception getException();
+
+	void waitForAll();
+
+protected:
+	int mTaskCount;
+	Mutex mMutex;
+	WaitCondition mWait;
+	Exception mException;
+};
 
 class TOADLET_API ThreadPool:public Object{
 public:
@@ -83,18 +101,23 @@ public:
 	
 	void update();
 
+	void queueTask(Runner::ptr task);
 	void queueTasks(const Collection<Runner::ptr> &tasks);
+
+	void blockForTask(Runner::ptr task);
 	void blockForTasks(const Collection<Runner::ptr> &tasks);
 
 	bool running() const{return mRunning;}
 
-	TaskQueue<Pair<TaskGroup*,Runner::ptr> > *queue(){return &mQueue;}
+	TaskQueue<Pair<TaskGroup::ptr,Runner::ptr> > *queue(){return &mQueue;}
 
 protected:
+	void queueTasks(const Collection<Runner::ptr> &tasks,bool block);
+
 	void resizePool(int size);
 
 	bool mRunning;
-	TaskQueue<Pair<TaskGroup*,Runner::ptr> > mQueue;
+	TaskQueue<Pair<TaskGroup::ptr,Runner::ptr> > mQueue;
 	Collection<Thread::ptr> mPool;
 };
 

@@ -24,29 +24,9 @@
  ********** Copyright header - do not remove **********/
 
 #include <toadlet/egg/ThreadPool.h>
-#include <toadlet/egg/Exception.h>
 
 namespace toadlet{
 namespace egg{
-
-class TaskGroup{
-public:
-	TaskGroup();
-
-	void addTask();
-	void removeTask();
-
-	void addException(const Exception &ex);
-	Exception getException();
-
-	void waitForAll();
-
-protected:
-	int mTaskCount;
-	Mutex mMutex;
-	WaitCondition mWait;
-	Exception mException;
-};
 
 TaskGroup::TaskGroup():
 	mTaskCount(0)
@@ -129,7 +109,7 @@ TaskThread::TaskThread(ThreadPool *pool):
 
 void TaskThread::run(){
 	while(mPool->running()){
-		Pair<TaskGroup*,Runner::ptr> item=mPool->queue()->take();
+		Pair<TaskGroup::ptr,Runner::ptr> item=mPool->queue()->take();
 		if(item.second){
 			TOADLET_TRY
 				item.second->run();
@@ -154,7 +134,7 @@ ThreadPool::~ThreadPool() {
 	mRunning=false;
 
 	for(int i=0;i<mPool.size();++i){
-		mQueue.add(Pair<TaskGroup*,Runner::ptr>(NULL,NULL)); // Add dummy tasks to force the pool threads to finish
+		mQueue.add(Pair<TaskGroup::ptr,Runner::ptr>(NULL,NULL)); // Add dummy tasks to force the pool threads to finish
 	}
 
 	for(int i=0;i<mPool.size();++i){
@@ -162,7 +142,27 @@ ThreadPool::~ThreadPool() {
 	}
 }
 
+void ThreadPool::queueTask(Runner::ptr task){
+	Collection<Runner::ptr> tasks;
+	tasks.add(task);
+	queueTasks(tasks,false);
+}
+
+void ThreadPool::queueTasks(const Collection<Runner::ptr> &tasks){
+	queueTasks(tasks,false);
+}
+
+void ThreadPool::blockForTask(Runner::ptr task){
+	Collection<Runner::ptr> tasks;
+	tasks.add(task);
+	queueTasks(tasks,true);
+}
+
 void ThreadPool::blockForTasks(const Collection<Runner::ptr> &tasks){
+	queueTasks(tasks,true);
+}
+
+void ThreadPool::queueTasks(const Collection<Runner::ptr> &tasks,bool block){
 	Exception exception;
 
 	if(mPool.size()==0){
@@ -175,16 +175,18 @@ void ThreadPool::blockForTasks(const Collection<Runner::ptr> &tasks){
 		}
 	}
 	else{
-		TaskGroup group;
+		TaskGroup::ptr group=new TaskGroup();
 	
 		for(int i=0;i<tasks.size();++i){
-			group.addTask();
-			mQueue.add(Pair<TaskGroup*,Runner::ptr>(&group,tasks[i]));
+			group->addTask();
+			mQueue.add(Pair<TaskGroup::ptr,Runner::ptr>(group,tasks[i]));
 		}
 	
-		group.waitForAll();
+		if(block){
+			group->waitForAll();
 
-		exception=group.getException();
+			exception=group->getException();
+		}
 	}
 
 	if(exception.getError()!=0){
@@ -193,7 +195,6 @@ void ThreadPool::blockForTasks(const Collection<Runner::ptr> &tasks){
 }
 
 void ThreadPool::update(){
-	/// TODO: Handle issuing responses
 }
 
 void ThreadPool::resizePool(int poolSize){
