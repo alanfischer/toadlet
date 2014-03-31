@@ -41,8 +41,8 @@ public:
 
 	virtual Shader *getRootShader(){return mBack!=NULL?mBack->getRootShader():NULL;}
 
-	virtual bool create(ShaderType shaderType,const String &profile,const String &code);
-	virtual bool create(ShaderType shaderType,const String profiles[],const String codes[],int numCodes);
+	virtual bool create(ShaderType shaderType,const char *profile,const char *code);
+	virtual bool create(ShaderType shaderType,const char *profiles[],const char *codes[],int numCodes);
 	virtual void destroy();
 	
 	virtual ShaderType getShaderType() const{return mShaderType;}
@@ -51,12 +51,14 @@ public:
 	virtual void setBack(Shader::ptr back,RenderDevice *renderDevice);
 	virtual Shader::ptr getBack(){return mBack;}
 
-	static bool convertCreate(Shader::ptr shader,RenderDevice *renderDevice,Shader::ShaderType shaderType,const String profiles[],const String codes[],int numCodes);
+	static bool convertCreate(Shader::ptr shader,RenderDevice *renderDevice,Shader::ShaderType shaderType,const char *profiles[],const char *codes[],int numCodes);
 
 protected:
 	ShaderType mShaderType;
 	Collection<String> mProfiles;
 	Collection<String> mCodes;
+	Collection<const char*> mRawProfiles;
+	Collection<const char*> mRawCodes;
 	Shader::ptr mBack;
 };
 

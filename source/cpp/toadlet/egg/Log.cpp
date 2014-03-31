@@ -78,7 +78,7 @@ public:
 #if defined(TOADLET_PLATFORM_WIN32)
 	class OutputDebugStringListener:public BaseLoggerListener{
 	public:
-		void addLogEntry(Logger::Category *category,Logger::Level level,uint64 time,const String &text){
+		void addLogEntry(Logger::Category *category,Logger::Level level,uint64 time,const char *text){
 			String timeString=getTimeString(time);
 			String levelString=getLevelString(level);
 
@@ -101,10 +101,10 @@ public:
 	};
 	class ConsoleListener:public BaseLoggerListener{
 	public:
-		void addLogEntry(Logger::Category *category,Logger::Level level,uint64 time,const String &text){
+		void addLogEntry(Logger::Category *category,Logger::Level level,uint64 time,const char *text){
 			String timeString=getTimeString(time)+": ";
 			String levelString=getLevelString(level);
-			String textString=text+(char)10;
+			String textString=String()+text+(char)10;
 
 			int textColor=FOREGROUND_RED|FOREGROUND_GREEN|FOREGROUND_BLUE;
 			int levelColor=textColor;
@@ -144,7 +144,7 @@ public:
 			}
 		}
 
-		void addLogEntry(Logger::Category *category,Logger::Level level,uint64 time,const String &text){
+		void addLogEntry(Logger::Category *category,Logger::Level level,uint64 time,const char *text){
 			aslclient client=NULL;
 			if(category!=NULL){
 				CategoryNameClientMap::iterator it=mCategoryNameClientMap.find(category->name);
@@ -191,7 +191,7 @@ public:
 #elif defined(TOADLET_PLATFORM_ANDROID)
 	class AndroidListener:public BaseLoggerListener{
 	public:
-		void addLogEntry(Logger::Category *category,Logger::Level level,uint64 time,const String &text){
+		void addLogEntry(Logger::Category *category,Logger::Level level,uint64 time,const char *text){
 			int priority=0;
 			switch(level){
 				case Logger::Level_ERROR:
@@ -220,10 +220,10 @@ public:
 
 class ANSIStandardListener:public BaseLoggerListener{
 public:
-	void addLogEntry(Logger::Category *category,Logger::Level level,uint64 time,const String &text){
+	void addLogEntry(Logger::Category *category,Logger::Level level,uint64 time,const char *text){
 		String timeString=getTimeString(time)+": ";
 		String levelString=getLevelString(level);
-		String textString=text+(char)10;
+		String textString=String()+text+(char)10;
 
 		String textColor="\x1b[39m";
 		String levelColor=textColor;
@@ -253,10 +253,10 @@ public:
 
 class StandardListener:public BaseLoggerListener{
 public:
-	void addLogEntry(Logger::Category *category,Logger::Level level,uint64 time,const String &text){
+	void addLogEntry(Logger::Category *category,Logger::Level level,uint64 time,const char *text){
 		String timeString=getTimeString(time)+": ";
 		String levelString=getLevelString(level);
-		String textString=text+(char)10;
+		String textString=String()+text+(char)10;
 
 		FILE *outFile=stdout;
 		if(level==Logger::Level_ERROR){

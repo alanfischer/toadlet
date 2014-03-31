@@ -46,7 +46,7 @@ D3D9Shader::D3D9Shader(D3D9RenderDevice *renderDevice):BaseResource(),
 	mD3DDevice=mDevice->getDirect3DDevice9();
 }
 
-bool D3D9Shader::create(ShaderType shaderType,const String &profile,const String &code){
+bool D3D9Shader::create(ShaderType shaderType,const char *profile,const char *code){
 	mShaderType=shaderType;
 	mProfile=profile;
 	mCode=code;
