@@ -18,6 +18,7 @@ set (EGG_SRC
 	Random.cpp
 	Socket.cpp
 	String.cpp
+	ThreadPool.cpp
 	TUUID.cpp
 	Version.cpp
 )
@@ -122,6 +123,7 @@ set (EGG_HDR
 	String.h
 	System.h
 	Thread.h
+	ThreadPool.h
 	Type.h
 	WaitCondition.h
 	WeakPointer.h
