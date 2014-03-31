@@ -33,12 +33,12 @@ namespace tadpole{
 WaterMaterialCreator::WaterMaterialCreator(Engine *engine){
 	mEngine=engine;
 	
-	String profiles[]={
+	const char *profiles[]={
 		"glsl",
 		"hlsl"
 	};
 
-	String vertexCodes[]={
+	const char *vertexCodes[]={
 		"attribute vec4 POSITION;\n"
 		"attribute vec3 NORMAL;\n"
 		"attribute vec2 TEXCOORD0;\n"
@@ -123,7 +123,7 @@ WaterMaterialCreator::WaterMaterialCreator(Engine *engine){
 		"}\n"
 	};
 
-	String fragmentCodes[]={
+	const char *fragmentCodes[]={
 		"#if defined(GL_ES)\n"
 			"precision mediump float;\n"
 		"#endif\n"

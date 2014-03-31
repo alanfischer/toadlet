@@ -33,12 +33,12 @@ namespace tadpole{
 DiffuseMaterialCreator::DiffuseMaterialCreator(Engine *engine){
 	mEngine=engine;
 
-	String profiles[]={
+	const char *profiles[]={
 		"glsl",
 		"hlsl"
 	};
 
-	String diffuseVertexCode[]={
+	const char *diffuseVertexCode[]={
 		"attribute vec4 POSITION;\n"
 		"attribute vec3 NORMAL;\n"
 		"attribute vec4 COLOR;\n"
@@ -113,7 +113,7 @@ DiffuseMaterialCreator::DiffuseMaterialCreator(Engine *engine){
 		"}"
 	};
 
-	String diffuseFragmentCode[]={
+	const char *diffuseFragmentCode[]={
 		"#if defined(GL_ES)\n"
 			"precision mediump float;\n"
 		"#endif\n"
@@ -151,7 +151,7 @@ DiffuseMaterialCreator::DiffuseMaterialCreator(Engine *engine){
 		"}\n"
 	};
 
-	String pointSpriteGeometryCode[]={
+	const char *pointSpriteGeometryCode[]={
 		(char*)NULL,
 
 		"struct GIN{\n"
@@ -198,7 +198,7 @@ DiffuseMaterialCreator::DiffuseMaterialCreator(Engine *engine){
 		"}\n"
 	};
 
-	String pointSpriteFragmentCode[]={
+	const char *pointSpriteFragmentCode[]={
 		"#version 120\n"
 
 		"#if defined(GL_ES)\n"

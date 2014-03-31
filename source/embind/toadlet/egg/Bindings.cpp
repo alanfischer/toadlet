@@ -55,24 +55,11 @@ EMSCRIPTEN_BINDINGS(egg) {
 	class_<Log>("Log")
 		.class_function("initialize", &Log::initialize)
 		.class_function("destroy", &Log::destroy)
-		.class_function("error", select_overload<void(const String&)>(&Log::error))
-		.class_function("warning", select_overload<void(const String&)>(&Log::warning))
-		.class_function("alert", select_overload<void(const String&)>(&Log::alert))
-		.class_function("debug", select_overload<void(const String&)>(&Log::debug))
-		.class_function("excess", select_overload<void(const String&)>(&Log::excess))
-	;
-
-	class_<Exception>("Exception")
-		.function("getError", &Exception::getError)
-		.function("getDescription", &Exception_getDescription)
-	;
-
-	class_<Error>("Error")
-		.class_function("unknown", select_overload<Exception(const String&)>(&Error::unknown))
-		.class_function("tassert", select_overload<Exception(const String&)>(&Error::tassert))
-		.class_function("invalidParameters", select_overload<Exception(const String&)>(&Error::invalidParameters))
-		.class_function("nullPointer", select_overload<Exception(const String&)>(&Error::nullPointer))
-		.class_function("unimplemented", select_overload<Exception(const String&)>(&Error::unimplemented))
+		.class_function("error", select_overload<void(const char*)>(&Log::error), allow_raw_pointers())
+		.class_function("warning", select_overload<void(const char*)>(&Log::warning), allow_raw_pointers())
+		.class_function("alert", select_overload<void(const char*)>(&Log::alert), allow_raw_pointers())
+		.class_function("debug", select_overload<void(const char*)>(&Log::debug), allow_raw_pointers())
+		.class_function("excess", select_overload<void(const char*)>(&Log::excess), allow_raw_pointers())
 	;
 
 	class_<Stream>("Stream")

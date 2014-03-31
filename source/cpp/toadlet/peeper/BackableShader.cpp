@@ -36,28 +36,36 @@ BackableShader::BackableShader():BaseResource(),
 	//mBack
 {}
 
-bool BackableShader::create(ShaderType shaderType,const String &profile,const String &code){
+bool BackableShader::create(ShaderType shaderType,const char *profile,const char *code){
 	mShaderType=shaderType;
 	
 	mProfiles.resize(1);
 	mCodes.resize(1);
+	mRawProfiles.resize(1);
+	mRawCodes.resize(1);
 
 	mProfiles[0]=profile;
 	mCodes[0]=code;
+	mRawProfiles[0]=mProfiles[0];
+	mRawCodes[0]=mCodes[0];
 
 	return true;
 }
 
-bool BackableShader::create(ShaderType shaderType,const String profiles[],const String codes[],int numCodes){
+bool BackableShader::create(ShaderType shaderType,const char *profiles[],const char *codes[],int numCodes){
 	mShaderType=shaderType;
 	
 	mProfiles.resize(numCodes);
 	mCodes.resize(numCodes);
+	mRawProfiles.resize(numCodes);
+	mRawCodes.resize(numCodes);
 
 	int i;
 	for(i=0;i<numCodes;++i){
 		mProfiles[i]=profiles[i];
 		mCodes[i]=codes[i];
+		mRawProfiles[i]=mProfiles[i];
+		mRawCodes[i]=mCodes[i];
 	}
 
 	return true;
@@ -71,6 +79,8 @@ void BackableShader::destroy(){
 
 	mProfiles.clear();
 	mCodes.clear();
+	mRawProfiles.clear();
+	mRawCodes.clear();
 
 	BaseResource::destroy();
 }
@@ -83,20 +93,20 @@ void BackableShader::setBack(Shader::ptr back,RenderDevice *renderDevice){
 	mBack=back;
 	
 	if(mBack!=NULL){
-		if(convertCreate(mBack,renderDevice,mShaderType,mProfiles,mCodes,mProfiles.size())==false){
+		if(convertCreate(mBack,renderDevice,mShaderType,mRawProfiles,mRawCodes,mProfiles.size())==false){
 			mBack=NULL;
 		}
 	}
 }
 
-bool BackableShader::convertCreate(Shader::ptr shader,RenderDevice *renderDevice,Shader::ShaderType shaderType,const String profiles[],const String codes[],int numCodes){
+bool BackableShader::convertCreate(Shader::ptr shader,RenderDevice *renderDevice,Shader::ShaderType shaderType,const char *profiles[],const char *codes[],int numCodes){
 	if(shader==NULL){
 		return false;
 	}
 
 	int i;
 	for(i=0;i<numCodes;++i){
-		if(renderDevice->getShaderProfileSupported(profiles[i]) && codes[i].length()>0){
+		if(renderDevice->getShaderProfileSupported(profiles[i]) && codes[i]!=NULL){
 			bool result=false;
 			TOADLET_TRY
 				result=shader->create(shaderType,profiles[i],codes[i]);

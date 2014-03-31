@@ -54,7 +54,7 @@ public:
 
 	class Category{
 	public:
-		Category(const String &name,Level reportingLevel=Level_MAX){
+		Category(const char *name,Level reportingLevel=Level_MAX){
 			this->name=name;
 			this->reportingLevel=reportingLevel;
 		}
@@ -65,7 +65,7 @@ public:
 
 	class Entry{
 	public:
-		Entry(Category *category=NULL,Level level=Level_MAX,uint64 time=0,const String &text=(char*)NULL){
+		Entry(Category *category=NULL,Level level=Level_MAX,uint64 time=0,const char *text=(char*)NULL){
 			this->category=category;
 			this->level=level;
 			this->time=time;
@@ -84,10 +84,10 @@ public:
 	void setMasterReportingLevel(Level level);
 	Level getMasterReportingLevel() const{return mReportingLevel;}
 
-	void setCategoryReportingLevel(const String &categoryName,Level level);
-	Level getCategoryReportingLevel(const String &categoryName);
+	void setCategoryReportingLevel(const char *categoryName,Level level);
+	Level getCategoryReportingLevel(const char *categoryName);
 
-	Level getMasterCategoryReportingLevel(const String &categoryName);
+	Level getMasterCategoryReportingLevel(const char *categoryName);
 
 	void addLoggerListener(LoggerListener *listener);
 	void removeLoggerListener(LoggerListener *listener);
@@ -95,8 +95,8 @@ public:
 	void setStoreLogEntry(bool storeLogEntry);
 	bool getStoreLogEntry() const{return mStoreLogEntry;}
 
-	void addLogEntry(const String &categoryName,Level level,const String &text);
-	void addLogEntry(Level level,const String &text){addLogEntry((char*)NULL,level,text);}
+	void addLogEntry(const char *categoryName,Level level,const char *text);
+	void addLogEntry(Level level,const char *text){addLogEntry((char*)NULL,level,text);}
 
 	void flush();
 
@@ -104,13 +104,13 @@ public:
 	Entry *getLogEntry(int i);
 	String getLogString(int i){return getLogEntry(i)->text;}
 
-	Category *addCategory(const String &categoryName);
-	Category *getCategory(const String &categoryName);
+	Category *addCategory(const char *categoryName);
+	Category *getCategory(const char *categoryName);
 
 private:
 	typedef Map<String,Category*> CategoryNameCategoryMap;
 
-	void addCompleteLogEntry(Category *category,Level level,const String &text);
+	void addCompleteLogEntry(Category *category,Level level,const char *text);
 
 	void lock();
 	void unlock();

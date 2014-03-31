@@ -40,8 +40,8 @@ public:
 
 	ShaderManager(Engine *engine);
 
-	Shader::ptr createShader(Shader::ShaderType type,const String profiles[],const String codes[],int numCodes);
-	Shader::ptr createShader(Shader::ShaderType type,const String &profile,const String &code);
+	Shader::ptr createShader(Shader::ShaderType type,const char *profiles[],const char *codes[],int numCodes);
+	Shader::ptr createShader(Shader::ShaderType type,const char *profile,const char *code);
 
 	Shader::ptr getShader(const String &name){return shared_static_cast<Shader>(get(name));}
 

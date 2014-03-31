@@ -33,7 +33,7 @@ namespace tadpole{
 ShaderManager::ShaderManager(Engine *engine):ResourceManager(engine){
 }
 
-Shader::ptr ShaderManager::createShader(Shader::ShaderType type,const String profiles[],const String codes[],int numCodes){
+Shader::ptr ShaderManager::createShader(Shader::ShaderType type,const char *profiles[],const char *codes[],int numCodes){
 	RenderDevice *renderDevice=mEngine->getRenderDevice();
 	Shader::ptr shader;
 #if defined(TOADLET_BACKABLE)
@@ -70,7 +70,7 @@ Shader::ptr ShaderManager::createShader(Shader::ShaderType type,const String pro
 	return shader;
 }
 
-Shader::ptr ShaderManager::createShader(Shader::ShaderType type,const String &profile,const String &code){
+Shader::ptr ShaderManager::createShader(Shader::ShaderType type,const char *profile,const char *code){
 	return createShader(type,&profile,&code,1);
 }
 
