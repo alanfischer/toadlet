@@ -43,7 +43,7 @@ public:
 
 	Shader *getRootShader(){return this;}
 
-	bool create(ShaderType shaderType,const String &profile,const String &code);
+	bool create(ShaderType shaderType,const char *profile,const char *code);
 	void destroy();
 
 	ShaderType getShaderType() const{return mShaderType;}

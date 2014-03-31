@@ -29,7 +29,6 @@
 #include <toadlet/egg/Categories.h>
 #include <toadlet/egg/Exception.h>
 #include <toadlet/egg/ErrorHandler.h>
-#include <toadlet/egg/String.h>
 #include <toadlet/egg/StackTraceListener.h>
 
 namespace toadlet{

@@ -33,12 +33,12 @@ namespace tadpole{
 BSP30MaterialCreator::BSP30MaterialCreator(Engine *engine){
 	mEngine=engine;
 	
-	String profiles[]={
+	const char *profiles[]={
 		"glsl",
 		"hlsl"
 	};
 
-	String vertexCodes[]={
+	const char *vertexCodes[]={
 		"attribute vec4 POSITION;\n"
 		"attribute vec2 TEXCOORD0;\n"
 		"attribute vec2 TEXCOORD1;\n"
@@ -79,7 +79,7 @@ BSP30MaterialCreator::BSP30MaterialCreator(Engine *engine){
 		"}"
 	};
 
-	String fragmentCodes[]={
+	const char *fragmentCodes[]={
 		"#if defined(GL_ES)\n"
 			"precision mediump float;\n"
 		"#endif\n"

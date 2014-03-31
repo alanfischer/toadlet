@@ -29,8 +29,8 @@
 #include <toadlet/egg/Logger.h>
 
 #define TOADLET_MAKE_LOG_FUNCTION(name,level) \
-	static void name(const String &text){name((char*)NULL,text);} \
-	static void name(const String &categoryName,const String &text){ \
+	static void name(const char *text){name((char*)NULL,text);} \
+	static void name(const char *categoryName,const char *text){ \
 		Logger *instance=getInstance(); \
 		if(level>Logger::Level_MAX) ; \
 		else if(level<=instance->getMasterReportingLevel() && level<=instance->getCategoryReportingLevel(categoryName)){ \

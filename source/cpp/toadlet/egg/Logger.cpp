@@ -62,7 +62,7 @@ void Logger::setMasterReportingLevel(Level level){
 	unlock();
 }
 
-void Logger::setCategoryReportingLevel(const String &categoryName,Level level){
+void Logger::setCategoryReportingLevel(const char *categoryName,Level level){
 	Category *category=getCategory(categoryName);
 
 	if(category!=NULL){
@@ -72,7 +72,7 @@ void Logger::setCategoryReportingLevel(const String &categoryName,Level level){
 	}
 }
 
-Logger::Level Logger::getCategoryReportingLevel(const String &categoryName){
+Logger::Level Logger::getCategoryReportingLevel(const char *categoryName){
 	Level reportingLevel=Level_MAX;
 
 	const Category *category=getCategory(categoryName);
@@ -85,7 +85,7 @@ Logger::Level Logger::getCategoryReportingLevel(const String &categoryName){
 	return reportingLevel;
 }
 
-Logger::Level Logger::getMasterCategoryReportingLevel(const String &categoryName){
+Logger::Level Logger::getMasterCategoryReportingLevel(const char *categoryName){
 	Logger::Level level=getCategoryReportingLevel(categoryName);
 	if(level>mReportingLevel){
 		level=mReportingLevel;
@@ -111,7 +111,7 @@ void Logger::setStoreLogEntry(bool storeLogEntry){
 	unlock();
 }
 
-void Logger::addLogEntry(const String &categoryName,Level level,const String &text){
+void Logger::addLogEntry(const char *categoryName,Level level,const char *text){
 	Category *category=getCategory(categoryName);
 	lock();
 		if((category==NULL || category->reportingLevel>=level) && mReportingLevel>=level){
@@ -145,7 +145,7 @@ Logger::Entry *Logger::getLogEntry(int i){
 	return entry;
 }
 
-void Logger::addCompleteLogEntry(Category *category,Level level,const String &text){
+void Logger::addCompleteLogEntry(Category *category,Level level,const char *text){
 	int i;
 
 	uint64 time=System::mtime();
@@ -159,11 +159,11 @@ void Logger::addCompleteLogEntry(Category *category,Level level,const String &te
 	}
 }
 
-Logger::Category *Logger::addCategory(const String &categoryName){
+Logger::Category *Logger::addCategory(const char *categoryName){
 	return getCategory(categoryName);
 }
 
-Logger::Category *Logger::getCategory(const String &categoryName){
+Logger::Category *Logger::getCategory(const char *categoryName){
 	if(categoryName==(char*)NULL) return NULL;
 
 	Category *category=NULL;

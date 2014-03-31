@@ -44,7 +44,7 @@ GLSLShader::GLSLShader(GLRenderDevice *renderDevice):
 	mDevice=renderDevice;
 }
 
-bool GLSLShader::create(ShaderType shaderType,const String &profile,const String &code){
+bool GLSLShader::create(ShaderType shaderType,const char *profile,const char *code){
 	mShaderType=shaderType;
 	mProfile=profile;
 	mCode=code;
