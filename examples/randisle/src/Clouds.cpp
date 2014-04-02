@@ -46,12 +46,12 @@ Clouds::Clouds(Scene *scene,int cloudSize,const Vector4 &skyColor,const Vector4 
 			RenderPath::ptr shaderPath=material->addPath("advancedShader");
 			RenderPass::ptr pass=shaderPath->addPass(renderState);
 
-			String profiles[]={
+			const char *profiles[]={
 				"glsl",
 				"hlsl"
 			};
 
-			String vertexCodes[]={
+			const char *vertexCodes[]={
 				"attribute vec4 POSITION;\n"
 				"attribute vec4 COLOR;\n"
 				"attribute vec2 TEXCOORD0;\n"
@@ -96,7 +96,7 @@ Clouds::Clouds(Scene *scene,int cloudSize,const Vector4 &skyColor,const Vector4 
 				"}"
 			};
 
-			String fragmentCodes[]={\
+			const char *fragmentCodes[]={\
 				"#if defined(GL_ES)\n"
 					"precision mediump float;\n"
 				"#endif\n"

@@ -3,66 +3,51 @@
 
 #include <toadlet/toadlet.h>
 
-class Resources:public Object,public ResourceRequest{
+class Resources:public Object,public ResourceCacheListener{
 public:
 	TOADLET_IOBJECT(Resources);
 
-	static bool init(Engine *engine,ResourceRequest *request){
+	static void init(Engine *engine,ResourceCacheListener *listener){
 		if(instance==NULL){
 			instance=new Resources();
 			instance->engine=engine;
-			instance->request=request;
-			instance->resourceCount=0;
+			instance->listener=listener;
 		}
-		return instance->load(engine);
+		instance->cacheResources();
 	}
 	
-	bool load(Engine *engine){
-		resourceCount++;
+	void cacheResources(){
+		cache=new ResourceCache();
 
-		loadResource("detail.png",engine->getTextureManager());
-		loadResource("sea.png",engine->getTextureManager());
-		loadResource("rock.png",engine->getTextureManager());
-		loadResource("grass.png",engine->getTextureManager());
-		loadResource("water_bump.png",engine->getTextureManager());
-		loadResource("frog.tmsh",engine->getMeshManager());
-		loadResource("tall_grass.tmsh",engine->getMeshManager());
-		loadResource("bark.png",engine->getMaterialManager());
-		loadResource("leaf_top1_alpha.png",engine->getMaterialManager());
-		loadResource("leaf_bottom1_alpha.png",engine->getMaterialManager());
-		loadResource("acorn.png",engine->getTextureManager());
-		loadResource("compass.png",engine->getTextureManager());
-		loadResource("dog.wav",engine->getAudioManager());
-		loadResource("rustle.wav",engine->getAudioManager());
-		loadResource("crunch.wav",engine->getAudioManager());
-		loadResource("Pinewood.ttf",engine->getFontManager(),new FontData(100));
+		cache->setListener(this);
 
-		resourceReady(NULL); // Dummy ready to finish loading
+		cache->cacheResource("detail.png",engine->getTextureManager());
+		cache->cacheResource("sea.png",engine->getTextureManager());
+		cache->cacheResource("rock.png",engine->getTextureManager());
+		cache->cacheResource("grass.png",engine->getTextureManager());
+		cache->cacheResource("water_bump.png",engine->getTextureManager());
+		cache->cacheResource("frog.tmsh",engine->getMeshManager());
+		cache->cacheResource("tall_grass.tmsh",engine->getMeshManager());
+		cache->cacheResource("bark.png",engine->getMaterialManager());
+		cache->cacheResource("leaf_top1_alpha.png",engine->getMaterialManager());
+		cache->cacheResource("leaf_bottom1_alpha.png",engine->getMaterialManager());
+		cache->cacheResource("acorn.png",engine->getTextureManager());
+		cache->cacheResource("compass.png",engine->getTextureManager());
+		cache->cacheResource("dog.wav",engine->getAudioManager());
+		cache->cacheResource("rustle.wav",engine->getAudioManager());
+		cache->cacheResource("crunch.wav",engine->getAudioManager());
+		cache->cacheResource("Pinewood.ttf",engine->getFontManager(),new FontData(100));
 
-		return true;
+		cache->startCaching();
 	}
 
-	void loadResource(const String &resource,ResourceManager *manager,ResourceData *data=NULL){
-		resourceCount++;
-		manager->find(resource,this,data);
+	void resourceCacheReady(ResourceCache *cache){
+		buildResources();
+
+		listener->resourceCacheReady(cache);
 	}
 
-	void resourceReady(Resource *resource){
-		resources.add(resource);
-		resourceCount--;
-		if(resourceCount==0){
-			build(engine);
-			request->resourceReady(NULL);
-		}
-	}
-
-	void resourceException(const Exception &ex){
-		resourceReady(NULL);
-	}
-	
-	void resourceProgress(float progress){}
-
-	bool build(Engine *engine){
+	bool buildResources(){
 		skyColor=Colors::AZURE;
 		fadeColor=Vector4(0xB5C1C3FF);
 
@@ -251,9 +236,8 @@ public:
 	static Resources::ptr instance;
 
 	Engine *engine;
-	ResourceRequest *request;
-	Collection<Resource::ptr> resources;
-	int resourceCount;
+	ResourceCache::ptr cache;
+	ResourceCacheListener *listener;
 
 	int cloudSize;
 	int patchSize;

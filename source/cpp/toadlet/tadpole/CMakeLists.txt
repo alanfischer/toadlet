@@ -41,6 +41,7 @@ set (TADPOLE_SRC
 	ParticleComponent.cpp
 	PartitionNode.cpp
 	RenderableSet.cpp
+	ResourceCache.cpp
 	ResourceManager.cpp
 	Scene.cpp
 	Sequence.cpp
@@ -247,6 +248,7 @@ set (TADPOLE_HDR
 	PhysicsComponent.h
 	PhysicsManager.h
 	Renderable.h
+	ResourceCache.h
 	ResourceCreator.h
 	ResourceData.h
 	ResourceManager.h

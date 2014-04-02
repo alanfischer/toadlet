@@ -7,7 +7,7 @@
 #include "Sky.h"
 #include "HUD.h"
 
-class RandIsle:public Object,public Applet,public ResourceRequest,public TerrainNodeDataSource,public UpdateListener,public TerrainNodeListener,public InputDeviceListener,public PathClimberListener{
+class RandIsle:public Object,public Applet,public TerrainNodeDataSource,public ResourceCacheListener,public UpdateListener,public TerrainNodeListener,public InputDeviceListener,public PathClimberListener{
 public:
 	TOADLET_IOBJECT(RandIsle);
 
@@ -26,11 +26,7 @@ public:
 
 	void create();
 	void destroy();
-	void ready();
-
-	void resourceReady(Resource *resource){ready();}
-	void resourceException(const Exception &ex){}
-	void resourceProgress(float progress){}
+	void resourceCacheReady(ResourceCache *cache);
 
 	void resized(int width,int height){}
 	void render();
