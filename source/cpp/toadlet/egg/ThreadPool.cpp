@@ -24,6 +24,7 @@
  ********** Copyright header - do not remove **********/
 
 #include <toadlet/egg/ThreadPool.h>
+#include <toadlet/egg/Error.h>
 
 namespace toadlet{
 namespace egg{
@@ -190,7 +191,10 @@ void ThreadPool::queueTasks(const Collection<Runner::ptr> &tasks,bool block){
 	}
 
 	if(exception.getError()!=0){
-		throw exception;
+		Error::getInstance()->setException(exception);
+		#if defined(TOADLET_EXCEPTIONS)
+			throw exception;
+		#endif
 	}
 }
 

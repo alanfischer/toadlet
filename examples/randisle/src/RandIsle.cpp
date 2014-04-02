@@ -130,7 +130,7 @@ void RandIsle::create(){
 	Log::debug("RandIsle::create finished");
 }
 
-void RandIsle::ready(){
+void RandIsle::resourceCacheReady(ResourceCache *cache){
 	mPatchSize=Resources::instance->patchSize;
 	scalar scale=16*64/mPatchSize;
 	mPatchScale.set(scale,scale,64);

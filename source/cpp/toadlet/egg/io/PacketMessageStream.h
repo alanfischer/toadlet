@@ -12,7 +12,7 @@ namespace io{
 
 class TOADLET_API PacketMessageStream:public Object,public MessageStream{
 public:
-	TOADLET_OBJECT(PacketMessageStream);
+	TOADLET_IOBJECT(PacketMessageStream);
 
 	PacketMessageStream(Stream *stream,int maxID=Extents::MAX_INT,int maxMessageLength=Extents::MAX_INT);
 	

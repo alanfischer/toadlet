@@ -90,6 +90,10 @@ void SpriteComponent::parentChanged(Node *node){
 	}
 }
 
+void SpriteComponent::setMaterial(const String &name){
+	mEngine->getMaterialManager()->find(name,this);
+}
+
 void SpriteComponent::setMaterial(Material *material,int i){
 	if(mMaterials.size()==i+1 && material==NULL){
 		mMaterials.resize(i);

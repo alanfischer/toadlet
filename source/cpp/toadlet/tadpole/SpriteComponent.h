@@ -39,7 +39,7 @@
 namespace toadlet{
 namespace tadpole{
 
-class TOADLET_API SpriteComponent:public BaseComponent,public TransformListener,public Spacial,public Renderable,public Visible,public Animatable,public Animation{
+class TOADLET_API SpriteComponent:public BaseComponent,public ResourceRequest,public TransformListener,public Spacial,public Renderable,public Visible,public Animatable,public Animation{
 public:
 	TOADLET_COMPONENT(SpriteComponent);
 	
@@ -48,6 +48,7 @@ public:
 
 	void parentChanged(Node *node);
 
+	void setMaterial(const String &name);
 	void setMaterial(Material *material,int i=0);
 	Material *getMaterial(int i=0) const{return mMaterials.size()>i?mMaterials[i]:NULL;}
 	int getNumMaterials() const{return mMaterials.size();}
@@ -60,6 +61,10 @@ public:
 
 	void setNormalized(bool normalized);
 	bool getNormalized() const{return mNormalized;}
+
+	void resourceReady(Resource *resource){setMaterial((Material*)resource);}
+	void resourceException(const Exception &ex){}
+	void resourceProgress(float progress){}
 
 	// Spacial
 	void setTransform(Transform::ptr transform);

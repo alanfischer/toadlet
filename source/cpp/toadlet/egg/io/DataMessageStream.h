@@ -10,7 +10,7 @@ namespace io{
 
 class TOADLET_API DataMessageStream:public DataStream,public MessageStream{
 public:
-	TOADLET_OBJECT(DataMessageStream);
+	TOADLET_IOBJECT(DataMessageStream);
 
 	DataMessageStream(MessageStream *stream):DataStream(stream),mStream(stream){}
 	
