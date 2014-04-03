@@ -17,7 +17,7 @@ const char *const _sos_level_names[] = {
 };
 
 SOSLoggerListener::SOSLoggerListener(String serverAddress){
-	// Turn off net errors when in use, to avoid recursion
+	// Turn off egg errors when in use, to avoid recursion
 	Log::getInstance()->setCategoryReportingLevel(Categories::TOADLET_EGG,Logger::Level_DISABLED);
 
 	mServerAddress=serverAddress;

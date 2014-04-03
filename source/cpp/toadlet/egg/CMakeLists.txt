@@ -9,6 +9,7 @@ set (EGG_SRC
 	Error.cpp
 	Errorer.cpp
 	Exception.cpp
+	FileLoggerListener.cpp
 	Log.cpp
 	Logger.cpp
 	MathFormatting.cpp
@@ -98,6 +99,7 @@ set (EGG_HDR
 	Exception.h
 	Extents.h
 	ExplicitIntrusivePointer.h
+	FileLoggerListener.h
 	Interface.h
 	IntrusivePointer.h
 	Log.h
