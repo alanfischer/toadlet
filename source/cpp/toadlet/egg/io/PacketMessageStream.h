@@ -20,11 +20,11 @@ public:
 	bool closed(){return mStream->closed();}
 
 	bool readable(){return mStream->readable();}
-	int read(tbyte *buffer,int length){return mMessage.read(buffer,length);}
+	int read(tbyte *buffer,int length);
 	int readMessage();
 
 	bool writeable(){return mStream->writeable();}
-	int write(const tbyte *buffer,int length){return mMessage.write(buffer,length);}
+	int write(const tbyte *buffer,int length);
 	bool writeMessage(int message);
 
 	bool reset();
@@ -40,6 +40,16 @@ public:
 	int getMaxLength() const{return mMaxLength;}
 
 protected:
+	class Header{
+	public:
+		Header():header(0),id(0),sequence(0),length(0){}
+
+		uint16 header;
+		uint16 id;
+		uint16 sequence;
+		uint16 length;
+	};
+
 	class TOADLET_API Message{
 	public:
 		Message(int maxlen);
@@ -47,10 +57,12 @@ protected:
 		int read(tbyte *buffer,int length);
 		int write(const tbyte *buffer,int length);
 
-		int id;
+		Header header;
+
 		int length;
 		int maxLength;
 		int position;
+
 		Collection<tbyte> data;
 	};
 

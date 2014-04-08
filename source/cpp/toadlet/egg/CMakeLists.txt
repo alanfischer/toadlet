@@ -145,8 +145,6 @@ set (EGG_IO_HDR
 	io/SocketStream.h
 	io/Stream.h
 	io/StreamRequest.h
-	io/Stream_iostream.h
-	io/iostream_Stream.h
 )
 
 set (EGG_MATH_HDR
@@ -183,6 +181,11 @@ set (EGG_MATHFIXED_HDR
 	mathfixed/Vector4.h
 )
 
+set (EGG_IO_STL_HDR
+	io/Stream_iostream.h
+	io/iostream_Stream.h
+)
+
 set (EGG_PLATFORM_POSIX_HDR
 	platform/posix/PosixDynamicLibrary.h
 	platform/posix/PosixErrorHandler.h
@@ -210,6 +213,10 @@ set (EGG_PLATFORM_WIN32_HDR
 	platform/win32/Win32Thread.h
 	platform/win32/Win32WaitCondition.h
 )
+
+if (TOADLET_EXCEPTIONS)
+	set (EGG_IO_HDR ${EGG_IO_HDR} ${EGG_IO_STL_HDR})
+endif (TOADLET_EXCEPTIONS)
 
 
 # Bundle source
