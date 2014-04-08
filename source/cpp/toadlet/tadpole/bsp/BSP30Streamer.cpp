@@ -327,8 +327,8 @@ BSP30Streamer::MaterialRequest::MaterialRequest(Engine *engine,BSP30Map *map,Res
 	mEngine(engine),
 	mMap(map),
 	mRequest(request),
-	mWADIndex(0),
-	mTextureIndex(0){}
+	mWADCount(0),
+	mTextureCount(0){}
 
 void BSP30Streamer::MaterialRequest::request(){
 	parseWADs(mMap);
@@ -352,12 +352,21 @@ void BSP30Streamer::MaterialRequest::parseWADs(BSP30Map *map){
 			}
 		}
 		map->parsedWads.resize(wadNames.size());
+		mWADCount=mMap->parsedWads.size();
 		for(i=0;i<wadNames.size();++i){
-			mEngine->getArchiveManager()->find(wadNames[i],this);
+			mEngine->getArchiveManager()->find(wadNames[i],new ResourceCallbackRequest(this,&BSP30Streamer::MaterialRequest::wadComplete,i));
 		}
 	}
 	else{
 		parseMaterials(map);
+	}
+}
+
+void BSP30Streamer::MaterialRequest::wadComplete(Resource *resource,int index){
+	mMap->parsedWads[index]=(Archive*)resource;
+	mWADCount--;
+	if(mWADCount<=0){
+		parseWADsDone(mMap);
 	}
 }
 
@@ -375,6 +384,7 @@ void BSP30Streamer::MaterialRequest::parseMaterials(BSP30Map *map){
 	Log::debug(Categories::TOADLET_TADPOLE,"Parsing materials");
 
 	map->parsedTextures.resize(map->miptexlump->nummiptex);
+	mTextureCount=mMap->parsedTextures.size();
 	int i;
 	for(i=0;i<map->miptexlump->nummiptex;i++){
 		int miptexofs=map->miptexlump->dataofs[i];
@@ -383,11 +393,23 @@ void BSP30Streamer::MaterialRequest::parseMaterials(BSP30Map *map){
 			Texture::ptr texture=WADArchive::createTexture(mEngine->getTextureManager(),miptex,map->header.version==Q1BSPVERSION?Quake1Palette:NULL);
 			if(texture!=NULL){
 				map->parsedTextures[i]=texture;
+				mTextureCount--;
 			}
 			else{
-				mEngine->getTextureManager()->find(miptex->name,this);
+				mEngine->getTextureManager()->find(miptex->name,new ResourceCallbackRequest(this,&BSP30Streamer::MaterialRequest::textureComplete,i));
 			}
 		}
+		else{
+			mTextureCount--;
+		}
+	}
+}
+
+void BSP30Streamer::MaterialRequest::textureComplete(Resource *resource,int index){
+	mMap->parsedTextures[index]=(Texture*)resource;
+	mTextureCount--;
+	if(mTextureCount<=0){
+		parseMaterialsDone(mMap);
 	}
 }
 
@@ -408,33 +430,6 @@ void BSP30Streamer::MaterialRequest::parseMaterialsDone(BSP30Map *map){
 	}
 
 	mRequest->resourceReady(map);
-}
-
-void BSP30Streamer::MaterialRequest::resourceReady(Resource *resource){
-	if(mWADIndex<mMap->parsedWads.size()){
-		mMap->parsedWads[mWADIndex++]=(Archive*)resource;
-		if(mWADIndex>=mMap->parsedWads.size()){
-			parseWADsDone(mMap);
-		}
-	}
-	else{
-		while(mTextureIndex<mMap->parsedTextures.size() && (mMap->parsedTextures[mTextureIndex]!=NULL || mMap->miptexlump->dataofs[mTextureIndex]==-1)){
-			mTextureIndex++;
-		}
-		if(mTextureIndex<mMap->parsedTextures.size()){
-			mMap->parsedTextures[mTextureIndex++]=(Texture*)resource;
-		}
-		while(mTextureIndex<mMap->parsedTextures.size() && (mMap->parsedTextures[mTextureIndex]!=NULL || mMap->miptexlump->dataofs[mTextureIndex]==-1)){
-			mTextureIndex++;
-		}
-		if(mTextureIndex>=mMap->parsedTextures.size()){
-			parseMaterialsDone(mMap);
-		}
-	}
-}
-
-void BSP30Streamer::MaterialRequest::resourceException(const Exception &ex){
-	resourceReady(NULL);
 }
 
 tbyte Quake1Palette[]={

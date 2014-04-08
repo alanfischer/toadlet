@@ -44,29 +44,43 @@ public:
 	bool load(Stream::ptr stream,ResourceData *data,ResourceRequest *request);
 
 protected:
-	class MaterialRequest:public Object,public ResourceRequest{
+	class MaterialRequest:public Object{
 	public:
-		TOADLET_IOBJECT(MaterialRequest);
+		TOADLET_OBJECT(MaterialRequest);
 
 		MaterialRequest(Engine *engine,BSP30Map *map,ResourceRequest *request);
 
 		void request();
 
 		void parseWADs(BSP30Map *map);
+		void wadComplete(Resource *resource,int index);
 		void parseWADsDone(BSP30Map *map);
 		void parseMaterials(BSP30Map *map);
+		void textureComplete(Resource *resource,int index);
 		void parseMaterialsDone(BSP30Map *map);
-
-		void resourceReady(Resource *resource);
-		void resourceException(const Exception &ex);
-		void resourceProgress(float progress){}
 
 	protected:
 		Engine *mEngine;
 		BSP30Map::ptr mMap;
 		ResourceRequest::ptr mRequest;
-		int mWADIndex;
-		int mTextureIndex;
+		int mWADCount;
+		int mTextureCount;
+	};
+
+	class ResourceCallbackRequest:public Object,public ResourceRequest{
+	public:
+		TOADLET_IOBJECT(ResourceCallbackRequest);
+
+		ResourceCallbackRequest(MaterialRequest *request,void (MaterialRequest::*complete)(Resource*,int),int index):mRequest(request),mComplete(complete),mIndex(index){}
+
+		void resourceReady(Resource *resource){(mRequest->*mComplete)(resource,mIndex);}
+		void resourceException(const Exception &ex){(mRequest->*mComplete)(NULL,mIndex);}
+		void resourceProgress(float progress){}
+
+	protected:
+		MaterialRequest *mRequest;
+		void (MaterialRequest::*mComplete)(Resource*,int);
+		int mIndex;
 	};
 
 	void readLump(Stream *stream,blump *lump,void **data,int size,int *count);

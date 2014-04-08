@@ -59,7 +59,6 @@ protected:
 
 		Header header;
 
-		int length;
 		int maxLength;
 		int position;
 
