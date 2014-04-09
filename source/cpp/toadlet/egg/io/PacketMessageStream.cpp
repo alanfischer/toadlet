@@ -81,7 +81,7 @@ bool PacketMessageStream::flush(){
 
 	return amount==totalLength;
 }
-	
+
 PacketMessageStream::Message::Message(int maxlen):
 	maxLength(maxlen),
 	data(sizeof(header) + maxlen)
