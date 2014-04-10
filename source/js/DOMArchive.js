@@ -18,13 +18,13 @@ mergeInto(LibraryManager.library, {
 							request['stringStreamReady'](xmlHttp.responseText);
 						}
 						else{
-							request['streamException'](new Error());
+							request['streamException'](new toadlet['Exception']("status!=200"));
 						}
 						request['delete']();
 					}
 				}.bind(this);
 				xmlHttp.ontimeout=function(){
-					request['streamException'](new Error());
+					request['streamException'](new toadlet['Exception']("ontimeout"));
 					request['delete']();
 				}.bind(this);
 				xmlHttp.send();
@@ -34,6 +34,7 @@ mergeInto(LibraryManager.library, {
 			'openResource' : function(name,request){
 				var toadlet=Module;
 				var image=new Image();
+				image.crossOrigin = toadlet.crossOrigin || "anonymous";
 				image.onload=function(){
 					// TODO: Can we cleanly get the texture handle from emscripten?
 					var gl=toadlet.ctx;
@@ -48,7 +49,7 @@ mergeInto(LibraryManager.library, {
 					gl.bindTexture=oldBindTexture;
 
 					if(texture==null){
-						requext.resourceException(new Error());
+						request.resourceException(new toadlet['Exception']("texture==null"));
 					}
 					else{
 						gl.bindTexture(target,handle);
@@ -63,7 +64,7 @@ mergeInto(LibraryManager.library, {
 					request['delete']();
 				}.bind(this);
 				image.onerror=function(){
-					request['resourceException'](new Error());
+					request['resourceException'](new toadlet['Exception']("onerror"));
 					request['delete']();
 				}.bind(this);
 				image.src=name;

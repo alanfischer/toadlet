@@ -62,6 +62,12 @@ EMSCRIPTEN_BINDINGS(egg) {
 		.class_function("excess", select_overload<void(const char*)>(&Log::excess), allow_raw_pointers())
 	;
 
+	class_<Exception>("Exception")
+		.constructor<const String&>()
+		.function("getError", &Exception::getError, allow_raw_pointers())
+		.function("getDescription", &Exception::getDescription, allow_raw_pointers())
+	;
+
 	class_<Stream>("Stream")
 		.smart_ptr<Stream::ptr>()
 
