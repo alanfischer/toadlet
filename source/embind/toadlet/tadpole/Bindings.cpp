@@ -22,8 +22,7 @@ extern "C" void *DOMArchive();
 Archive::ptr makeDOMArchive(Engine *engine){
 	volatile bool link=false;
 	if(link){DOMArchive();}
-	val::module_property("DOMArchive").call<void>("setEngine",engine);
-	return new ArchiveWrapper(val::module_property("DOMArchive"));
+	return val::module_property("DOMArchive")(engine).as<Archive::ptr>();
 }
 
 EMSCRIPTEN_BINDINGS(tadpole) {

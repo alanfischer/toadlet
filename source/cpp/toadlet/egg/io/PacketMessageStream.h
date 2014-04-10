@@ -40,13 +40,19 @@ public:
 	int getMaxLength() const{return mMaxLength;}
 
 protected:
+	enum Sequence{
+		Sequence_START=	1 << 7,
+		Sequence_END=	1 << 6,
+	};
+
 	class Header{
 	public:
 		Header():header(0),id(0),sequence(0),length(0){}
 
 		uint16 header;
 		uint16 id;
-		uint16 sequence;
+		uint8 group;
+		uint8 sequence;
 		uint16 length;
 	};
 
@@ -68,6 +74,7 @@ protected:
 	Stream::ptr mStream;
 	int mMaxID;
 	int mMaxLength;
+	int mGroup;
 	Message mMessage;
 };
 
