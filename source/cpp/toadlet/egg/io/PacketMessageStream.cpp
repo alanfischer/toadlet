@@ -1,4 +1,5 @@
 #include "PacketMessageStream.h"
+#include <toadlet/egg/Log.h>
 
 using namespace toadlet;
 using namespace toadlet::egg;
@@ -8,6 +9,7 @@ PacketMessageStream::PacketMessageStream(Stream *stream,int maxID,int maxLength)
 	mStream(stream),
 	mMaxID(maxID),
 	mMaxLength(maxLength),
+	mGroup(0),
 	mMessage(0)
 {}
 
@@ -69,6 +71,7 @@ bool PacketMessageStream::seek(int offs){
 
 bool PacketMessageStream::flush(){
 	mMessage.header.length=mMessage.position;
+	mMessage.header.sequence |= (Sequence_START | Sequence_END);
 
 	if(mMessage.header.id>mMaxID || mMessage.header.length>mMaxLength){
 		return false;
