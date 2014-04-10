@@ -1,17 +1,14 @@
 <html>
 <head>
-<title>Toadlet Example</title>
-</head>
-<canvas width="512" height="512" id="canvas" oncontextmenu="return false;"></canvas>
-</body>
 
+<script type="text/javascript" src="toadlet.js"></script>
 <script type="text/javascript">
 var renderDevice;
 var engine;
 var scene;
 var cameraComponent;
 
-var update=function(){
+function update(){
 	var t=(new Date()).getTime()/1000.0;
 	var camera=cameraComponent.getCamera();
 	
@@ -26,7 +23,7 @@ var update=function(){
 	window.setTimeout(update,33);
 };
 
-var init=function(){
+function init(){
 	var renderTarget=toadlet.new_EGLWindowRenderTarget(document.getElementById("canvas"));
 	renderDevice=toadlet.new_GLES2RenderDevice();
 	renderDevice.create(renderTarget,0);
@@ -46,7 +43,7 @@ var init=function(){
 	cameraComponent.setLookAt([0,10,10],[0,0,0],[0,0,1]);
 	cameraNode.delete();
 	camera.delete();
-	
+
 	var request=toadlet.ResourceRequest.implement({
 		resourceReady: function(resource){
 			var material=engine.createDiffuseMaterial(toadlet.toTexture(resource),null);
@@ -72,13 +69,11 @@ var init=function(){
 	
 	update();
 };
-
-var script=document.createElement("script");
-script.type="text/javascript";
-script.src="toadlet.js";
-script.onreadystatechange=init;
-script.onload=init;
-document.getElementsByTagName("head")[0].appendChild(script);
-
 </script>
+
+<title>Toadlet Example</title>
+</head>
+<body onload="init();">
+<canvas width="512" height="512" id="canvas" oncontextmenu="return false;"></canvas>
+</body>
 </html>

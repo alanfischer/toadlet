@@ -30,6 +30,10 @@ int PacketMessageStream::readMessage(){
 		return -1;
 	}
 
+	if((mMessage.header.sequence & (Sequence_START | Sequence_END)) != (Sequence_START | Sequence_END)){
+		return -1;
+	}
+
 	if(mMessage.maxLength==0 && mMessage.data.size() < mMessage.header.length + sizeof(mMessage.header)){
 		mMessage.data.resize(sizeof(mMessage.header) + mMessage.header.length);
 	}
