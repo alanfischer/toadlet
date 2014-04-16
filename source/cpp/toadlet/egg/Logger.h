@@ -100,6 +100,8 @@ public:
 
 	void flush();
 
+	void clearLogEntries();
+
 	int getNumLogEntries();
 	Entry *getLogEntry(int i);
 	String getLogString(int i){return getLogEntry(i)->text;}

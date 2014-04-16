@@ -75,6 +75,20 @@ public:
 	void flush(){}
 };
 
+class ParentListener:public BaseLoggerListener{
+public:
+	ParentListener(Logger *parent){
+		mParent=parent;
+	}
+
+	void addLogEntry(Logger::Category *category,Logger::Level level,uint64 time,const char *text){
+		mParent->addLogEntry(category==NULL?String():category->name,level,text);
+	}
+
+protected:
+	Logger *mParent;
+};
+
 #if defined(TOADLET_PLATFORM_WIN32)
 	class OutputDebugStringListener:public BaseLoggerListener{
 	public:
@@ -271,16 +285,38 @@ public:
 
 Logger *Log::mTheLogger=NULL;
 Collection<LoggerListener*> Log::mListeners;
+#if defined(TOADLET_THREADSAFE)
+	Mutex Log::mMutex;
+#endif
+Map<int,Logger*> Log::mThreadLoggers;
+bool Log::mPerThread=false;
 
 Logger *Log::getInstance(){
 	if(mTheLogger==NULL){
 		initialize();
 	}
 
-	return mTheLogger;
+	Logger *logger=mTheLogger;
+	#if defined(TOADLET_THREADSAFE)
+		if(mPerThread){
+			int thread=System::threadID();
+			mMutex.lock();
+				Logger *logger=mThreadLoggers[thread];
+				if(logger==NULL){
+					LoggerListener *listener=new ParentListener(mTheLogger);
+					mListeners.add(listener);
+
+					logger=new Logger(true);
+					logger->addLoggerListener(listener);
+					mThreadLoggers[thread]=logger;
+				}
+			mMutex.unlock();
+		}
+	#endif
+	return logger;
 }
 
-void Log::initialize(bool startSilent){
+void Log::initialize(bool startSilent,bool perThread){
 	if(mTheLogger==NULL){
 		mTheLogger=new Logger(startSilent);
 
@@ -303,6 +339,8 @@ void Log::initialize(bool startSilent){
 		for(i=0;i<mListeners.size();++i){
 			mTheLogger->addLoggerListener(mListeners[i]);
 		}
+
+		mPerThread=perThread;
 	}
 }
 

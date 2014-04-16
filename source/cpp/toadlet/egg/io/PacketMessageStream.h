@@ -25,7 +25,7 @@ public:
 
 	bool writeable(){return mStream->writeable();}
 	int write(const tbyte *buffer,int length);
-	bool writeMessage(int message);
+	bool writeMessage(int id);
 
 	bool reset();
 	int length();
@@ -58,7 +58,7 @@ protected:
 
 	class TOADLET_API Message{
 	public:
-		Message(int maxlen);
+		Message(int maxlen=0);
 		void reset();
 		int read(tbyte *buffer,int length);
 		int write(const tbyte *buffer,int length);
@@ -75,7 +75,9 @@ protected:
 	int mMaxID;
 	int mMaxLength;
 	int mGroup;
-	Message mMessage;
+	Collection<Message> mReadMessages;
+	Collection<Message> mWriteMessages;
+	Message *message;
 };
 
 }
