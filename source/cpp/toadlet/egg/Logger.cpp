@@ -129,6 +129,12 @@ void Logger::flush(){
 	unlock();
 }
 
+void Logger::clearLogEntries(){
+	lock();
+		mLogEntries.clear();
+	unlock();
+}
+
 int Logger::getNumLogEntries(){
 	int size=0;
 	lock();

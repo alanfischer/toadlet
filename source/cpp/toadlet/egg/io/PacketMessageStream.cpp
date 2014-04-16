@@ -10,81 +10,90 @@ PacketMessageStream::PacketMessageStream(Stream *stream,int maxID,int maxLength)
 	mMaxID(maxID),
 	mMaxLength(maxLength),
 	mGroup(0),
-	mMessage(0)
-{}
+	message(NULL)
+{
+	mReadMessages.resize(1);
+	mWriteMessages.resize(1);
+}
 
 int PacketMessageStream::read(tbyte *buffer,int length){
-	return mMessage.read(buffer,length);
+	return message->read(buffer,length);
 }
 
 int PacketMessageStream::readMessage(){
-	mMessage.reset();
+	Header header;
 
-	if(mStream->read(mMessage.data,sizeof(mMessage.header)) != sizeof(mMessage.header)){
+	if(mStream->read((tbyte*)&header,sizeof(header)) != sizeof(header)){
 		return -1;
 	}
 
-	memcpy(&mMessage.header,mMessage.data,sizeof(mMessage.header));
-
-	if(mMessage.header.id>mMaxID || mMessage.header.length>mMaxLength){
+	if(header.id>mMaxID || header.length>mMaxLength){
 		return -1;
 	}
 
-	if((mMessage.header.sequence & (Sequence_START | Sequence_END)) != (Sequence_START | Sequence_END)){
+	if((header.sequence & (Sequence_START | Sequence_END)) != (Sequence_START | Sequence_END)){
 		return -1;
 	}
 
-	if(mMessage.maxLength==0 && mMessage.data.size() < mMessage.header.length + sizeof(mMessage.header)){
-		mMessage.data.resize(sizeof(mMessage.header) + mMessage.header.length);
+	message=&mReadMessages[0];
+	message->reset();
+
+	memcpy(message->data,&header,sizeof(header));
+	message->header=header;
+
+	if(message->maxLength==0 && message->data.size() < message->header.length + sizeof(message->header)){
+		message->data.resize(sizeof(message->header) + message->header.length);
 	}
 
 	int total=0,amount=1;
-	for(total=0;total<mMessage.header.length && amount>0;total+=amount){
-		amount=mStream->read(mMessage.data + sizeof(mMessage.header) + total,mMessage.header.length - total);
+	for(total=0;total<message->header.length && amount>0;total+=amount){
+		amount=mStream->read(message->data + sizeof(message->header) + total,message->header.length - total);
 	}
-	return mMessage.header.id;
+	return message->header.id;
 }
 
 int PacketMessageStream::write(const tbyte *buffer,int length){
-	return mMessage.write(buffer,length);
+	return message->write(buffer,length);
 }
 
-bool PacketMessageStream::writeMessage(int message){
-	mMessage.reset();
-	mMessage.header.id=message;
+bool PacketMessageStream::writeMessage(int id){
+	message=&mWriteMessages[0];
+	message->reset();
+
+	message->header.id=id;
 	return true;
 }
 
 bool PacketMessageStream::reset(){
-	mMessage.position=0;
+	message->position=0;
 	return true;
 }
 
 int PacketMessageStream::length(){
-	return mMessage.header.length;
+	return message->header.length;
 }
 
 int PacketMessageStream::position(){
-	return mMessage.position;
+	return message->position;
 }
 
 bool PacketMessageStream::seek(int offs){
-	mMessage.position+=offs;
+	message->position+=offs;
 	return true;
 }
 
 bool PacketMessageStream::flush(){
-	mMessage.header.length=mMessage.position;
-	mMessage.header.sequence |= (Sequence_START | Sequence_END);
+	message->header.length=message->position;
+	message->header.sequence |= (Sequence_START | Sequence_END);
 
-	if(mMessage.header.id>mMaxID || mMessage.header.length>mMaxLength){
+	if(message->header.id>mMaxID || message->header.length>mMaxLength){
 		return false;
 	}
 
-	memcpy(mMessage.data,&mMessage.header,sizeof(mMessage.header));
+	memcpy(message->data,&message->header,sizeof(message->header));
 
-	int totalLength=sizeof(mMessage.header) + mMessage.header.length;
-	int amount=mStream->write(mMessage.data,totalLength);
+	int totalLength=sizeof(message->header) + message->header.length;
+	int amount=mStream->write(message->data,totalLength);
 
 	return amount==totalLength;
 }

@@ -12,7 +12,7 @@ public:
 	TOADLET_INTERFACE(MessageStream);
 
 	virtual int readMessage()=0;
-	virtual bool writeMessage(int message)=0;
+	virtual bool writeMessage(int id)=0;
 };
 
 }
