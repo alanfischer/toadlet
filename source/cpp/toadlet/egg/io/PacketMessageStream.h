@@ -59,7 +59,7 @@ protected:
 	class TOADLET_API Message{
 	public:
 		Message(int maxlen=0);
-		void reset();
+		void reset(int id=0);
 		int read(tbyte *buffer,int length);
 		int write(const tbyte *buffer,int length);
 

@@ -39,6 +39,9 @@ bool StreamTest::testMessageStream(int messageLength,int maxLength){
 	outStream->writeMessage(id);
 	for(int i=0;i<messageLength;++i){
 		tbyte b=i%funkyMod;
+		if(i==maxLength){
+			int y=0;
+		}
 		outStream->write(&b,1);
 	}
 	outStream->flush();
@@ -67,8 +70,8 @@ bool StreamTest::run(){
 	bool result=false;
 
 	Log::alert("Testing Streams");
-	result|=testMessageStream(128,1024);
-//	result|=testMessageStream(2048,1024);
+	result&=testMessageStream(128,1024);
+//	result&=testMessageStream(2048,1024);
 	Log::alert(result?"Succeeded":"Failed");
 
 	return result;
