@@ -48,7 +48,9 @@ bool StreamTest::testMessageStream(int messageLength,int maxLength){
 
 	memoryStream->seek(0);
 
-	if(id!=inStream->readMessage()){
+	int readId=0;
+	while((readId=inStream->readMessage())==0);
+	if(id!=readId){
 		Log::alert("incorrect message id");
 		return false;
 	}
@@ -67,11 +69,11 @@ bool StreamTest::testMessageStream(int messageLength,int maxLength){
 }
 
 bool StreamTest::run(){
-	bool result=false;
+	bool result=true;
 
 	Log::alert("Testing Streams");
 	result&=testMessageStream(128,1024);
-//	result&=testMessageStream(2048,1024);
+	result&=testMessageStream(2048,1024);
 	Log::alert(result?"Succeeded":"Failed");
 
 	return result;

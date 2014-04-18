@@ -14,7 +14,7 @@ class TOADLET_API PacketMessageStream:public Object,public MessageStream{
 public:
 	TOADLET_IOBJECT(PacketMessageStream);
 
-	PacketMessageStream(Stream *stream,int maxID=Extents::MAX_INT,int maxMessageLength=Extents::MAX_INT);
+	PacketMessageStream(Stream *stream,int maxID=Extents::MAX_INT,int maxLength=256-sizeof(Header));
 	
 	void close(){mStream->close();}
 	bool closed(){return mStream->closed();}
@@ -43,6 +43,7 @@ protected:
 	enum Sequence{
 		Sequence_START=	1 << 7,
 		Sequence_END=	1 << 6,
+		Sequence_MASK=	0xFF & ~(Sequence_START | Sequence_END)
 	};
 
 	class Header{
@@ -77,6 +78,7 @@ protected:
 	int mGroup;
 	Collection<Message> mReadMessages;
 	Collection<Message> mWriteMessages;
+	Collection<Message> *mMessages;
 	Message *message;
 };
 
