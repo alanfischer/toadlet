@@ -10,6 +10,7 @@ PacketMessageStream::PacketMessageStream(Stream *stream,int maxID,int maxLength)
 	mMaxID(maxID),
 	mMaxLength(maxLength),
 	mGroup(0),
+	mMessages(NULL),
 	message(NULL)
 {
 	mReadMessages.resize(1,Message(maxLength));
@@ -17,7 +18,19 @@ PacketMessageStream::PacketMessageStream(Stream *stream,int maxID,int maxLength)
 }
 
 int PacketMessageStream::read(tbyte *buffer,int length){
-	return message->read(buffer,length);
+	int amount=0,total=0;
+	while(true){
+		amount=message->read(buffer + total,length - total);
+		total+=amount;
+		int sequence=(message->header.sequence & Sequence_MASK);
+		if(total < length && sequence+1<mMessages->size()){
+			message=&mMessages->at(sequence+1);
+		}
+		else{
+			break;
+		}
+	}
+	return total;
 }
 
 int PacketMessageStream::readMessage(){
@@ -31,11 +44,21 @@ int PacketMessageStream::readMessage(){
 		return -1;
 	}
 
-	if((header.sequence & (Sequence_START | Sequence_END)) != (Sequence_START | Sequence_END)){
-		return -1;
+	if((header.sequence & Sequence_START)==Sequence_START){
+		mReadMessages.resize(1);
+	}
+	else{
+		Message *previous=&mMessages->at(mMessages->size()-1);
+		if(	previous->header.group!=header.group ||
+			(previous->header.sequence & Sequence_END)==Sequence_END ||
+			(previous->header.sequence & Sequence_MASK)+1 != (header.sequence & Sequence_MASK)){
+			return -1;
+		}
+		mMessages->resize(mMessages->size()+1,Message(mMaxLength));
 	}
 
-	message=&mReadMessages[0];
+	mMessages=&mReadMessages;
+	message=&mReadMessages[mReadMessages.size()-1];
 	message->reset();
 
 	memcpy(message->data,&header,sizeof(header));
@@ -49,7 +72,14 @@ int PacketMessageStream::readMessage(){
 	for(total=0;total<message->header.length && amount>0;total+=amount){
 		amount=mStream->read(message->data + sizeof(message->header) + total,message->header.length - total);
 	}
-	return message->header.id;
+
+	if((message->header.sequence & Sequence_END)==Sequence_END){
+		message=&mMessages->at(0);
+		return message->header.id;
+	}
+	else{
+		return 0;
+	}
 }
 
 int PacketMessageStream::write(const tbyte *buffer,int length){
@@ -57,11 +87,15 @@ int PacketMessageStream::write(const tbyte *buffer,int length){
 	while(true){
 		amount=message->write(buffer + total,length - total);
 		total+=amount;
-		if(amount < length){
+		if(total < length){
 			int id=message->header.id;
-			mWriteMessages.resize(mWriteMessages.size()+1,Message(mMaxLength));
-			message=&mWriteMessages[mWriteMessages.size()-1];
+			int group=message->header.group;
+			int sequence=(message->header.sequence & Sequence_MASK);
+			mMessages->resize(mMessages->size()+1,Message(mMaxLength));
+			message=&mMessages->at(mMessages->size()-1);
 			message->reset(id);
+			message->header.group=group;
+			message->header.sequence |= sequence+1;
 		}
 		else{
 			break;
@@ -72,27 +106,56 @@ int PacketMessageStream::write(const tbyte *buffer,int length){
 
 bool PacketMessageStream::writeMessage(int id){
 	mWriteMessages.resize(1);
+	mMessages=&mWriteMessages;
 	message=&mWriteMessages[0];
 	message->reset(id);
+	message->header.group=mGroup++;
 	message->header.sequence |= Sequence_START;
 	return true;
 }
 
 bool PacketMessageStream::reset(){
+	if(mMessages!=NULL){
+		message=&mMessages->at(0);
+	}
 	message->position=0;
 	return true;
 }
 
 int PacketMessageStream::length(){
-	return message->header.length;
+	int length=0;
+	if(mMessages!=NULL){
+		for(int i=0;i<mMessages->size();++i){
+			length+=mMessages->at(i).header.length;
+		}
+	}
+	return length;
 }
 
 int PacketMessageStream::position(){
-	return message->position;
+	int position=0;
+	if(mMessages!=NULL){
+		for(int i=0;i<mMessages->size() && message!=&mMessages->at(i);++i){
+			position+=mMessages->at(i).header.length;
+		}
+	}
+	position+=message->position;
+	return position;
 }
 
 bool PacketMessageStream::seek(int offs){
-	message->position+=offs;
+	if(mMessages!=NULL){
+		for(int i=0;i<mMessages->size();++i){
+			message=&mMessages->at(i);
+			if(offs>=message->header.length){
+				offs-=message->header.length;
+			}
+			else{
+				message->position=offs;
+				break;
+			}
+		}
+	}
 	return true;
 }
 
@@ -100,8 +163,8 @@ bool PacketMessageStream::flush(){
 	message->header.length=message->position;
 	message->header.sequence |= Sequence_END;
 
-	for(int i=0;i<mWriteMessages.size();++i){
-		Message *message=&mWriteMessages[i];
+	for(int i=0;i<mMessages->size();++i){
+		Message *message=&mMessages->at(i);
 
 		if(message->header.id>mMaxID || message->header.length>mMaxLength){
 			return false;
@@ -129,6 +192,8 @@ PacketMessageStream::Message::Message(int maxlen):
 
 void PacketMessageStream::Message::reset(int id){
 	header.id=id;
+	header.group=0;
+	header.sequence=0;
 	header.length=maxLength;
 	position=0;
 }
