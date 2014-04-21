@@ -14,7 +14,24 @@ class TOADLET_API PacketMessageStream:public Object,public MessageStream{
 public:
 	TOADLET_IOBJECT(PacketMessageStream);
 
-	PacketMessageStream(Stream *stream,int maxID=Extents::MAX_INT,int maxLength=256-sizeof(Header));
+	enum Sequence{
+		Sequence_START=	1 << 7,
+		Sequence_END=	1 << 6,
+		Sequence_MASK=	0xFF & ~(Sequence_START | Sequence_END)
+	};
+
+	class Header{
+	public:
+		Header():header(0),id(0),sequence(0),length(0){}
+
+		uint16 header;
+		uint16 id;
+		uint8 group;
+		uint8 sequence;
+		uint16 length;
+	};
+
+	PacketMessageStream(Stream *stream,int maxID=Extents::MAX_INT,int maxLength=0);
 	
 	void close(){mStream->close();}
 	bool closed(){return mStream->closed();}
@@ -40,23 +57,6 @@ public:
 	int getMaxLength() const{return mMaxLength;}
 
 protected:
-	enum Sequence{
-		Sequence_START=	1 << 7,
-		Sequence_END=	1 << 6,
-		Sequence_MASK=	0xFF & ~(Sequence_START | Sequence_END)
-	};
-
-	class Header{
-	public:
-		Header():header(0),id(0),sequence(0),length(0){}
-
-		uint16 header;
-		uint16 id;
-		uint8 group;
-		uint8 sequence;
-		uint16 length;
-	};
-
 	class TOADLET_API Message{
 	public:
 		Message(int maxlen=0);

@@ -40,7 +40,7 @@ int PacketMessageStream::readMessage(){
 		return -1;
 	}
 
-	if(header.id>mMaxID || header.length>mMaxLength){
+	if(header.id>mMaxID || (mMaxLength>0 && header.length>mMaxLength)){
 		return -1;
 	}
 
@@ -166,7 +166,7 @@ bool PacketMessageStream::flush(){
 	for(int i=0;i<mMessages->size();++i){
 		Message *message=&mMessages->at(i);
 
-		if(message->header.id>mMaxID || message->header.length>mMaxLength){
+		if(message->header.id>mMaxID || (mMaxLength>0 && message->header.length>mMaxLength)){
 			return false;
 		}
 
