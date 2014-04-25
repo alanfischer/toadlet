@@ -2,12 +2,13 @@
 #define HUD_H
 
 #include <toadlet/toadlet.h>
+#include "Resources.h"
 
 class HUD:public Node{
 public:
 	TOADLET_OBJECT(HUD);
 
-	HUD(Scene *scene,Node *player,Camera *camera);
+	HUD(Scene *scene,Node *player,Camera *camera,Resources *resources);
 
 protected:
 	AudioComponent::ptr mDogSound;

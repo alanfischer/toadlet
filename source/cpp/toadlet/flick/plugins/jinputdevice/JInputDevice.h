@@ -34,7 +34,7 @@ namespace flick{
 
 class TOADLET_API JInputDevice:public Object,public InputDevice{
 public:
-	TOADLET_JOBJECT(JInputDevice);
+	TOADLET_IOBJECT(JInputDevice);
 
 	JInputDevice(JNIEnv *jenv,jobject jobj);
 	virtual ~JInputDevice();

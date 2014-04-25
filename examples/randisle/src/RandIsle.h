@@ -6,6 +6,7 @@
 #include "SmoothFollower.h"
 #include "Sky.h"
 #include "HUD.h"
+#include "Resources.h"
 
 class RandIsle:public Object,public Applet,public TerrainNodeDataSource,public ResourceCacheListener,public UpdateListener,public TerrainNodeListener,public InputDeviceListener,public PathClimberListener{
 public:
@@ -124,6 +125,8 @@ protected:
 
 	HUD::ptr mHUD;
 	Camera::ptr mHUDCamera;
+
+	Resources::ptr resources;
 };
 
 #endif

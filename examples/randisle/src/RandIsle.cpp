@@ -125,13 +125,14 @@ void RandIsle::create(){
 	mEngine=mApp->getEngine();
 	mEngine->getArchiveManager()->addDirectory(mPath);
 
-	Resources::init(mEngine,this);
+	resources=new Resources(mEngine,this);
+	resources->create();
 
 	Log::debug("RandIsle::create finished");
 }
 
 void RandIsle::resourceCacheReady(ResourceCache *cache){
-	mPatchSize=Resources::instance->patchSize;
+	mPatchSize=resources->patchSize;
 	scalar scale=16*64/mPatchSize;
 	mPatchScale.set(scale,scale,64);
 
@@ -151,12 +152,12 @@ void RandIsle::resourceCacheReady(ResourceCache *cache){
 	mScene->setRoot(mTerrain);
 	mScene->getPhysicsManager()->setTraceable(mTerrain);
 	mTerrain->setListener(this);
-	mTerrain->setTolerance(Resources::instance->tolerance);
+	mTerrain->setTolerance(resources->tolerance);
 	mTerrain->setCameraUpdateScope(Scope_BIT_MAIN_CAMERA);
 	mTerrain->setWaterScope(Scope_BIT_WATER);
 	mTerrain->setWaterTransparentScope(Scope_BIT_WATER_TRANSPARENT);
-	mTerrain->setMaterialSource(Resources::instance->terrainMaterialSource);
-	mTerrain->setWaterMaterial(Resources::instance->waterMaterial);
+	mTerrain->setMaterialSource(resources->terrainMaterialSource);
+	mTerrain->setWaterMaterial(resources->waterMaterial);
 	mTerrain->setDataSource(this);
 
 	mFollowNode=new Node(mScene);
@@ -170,29 +171,29 @@ void RandIsle::resourceCacheReady(ResourceCache *cache){
 //	shared_static_cast<StereoscopicCamera>(mCamera)->setCrossEyed(true);
 	mCamera->setAutoProjectionFov(Math::degToRad(Math::fromInt(60)),false,mCamera->getNearDist(),1024);
 	mCamera->setScope(~Scope_BIT_HUD | (Scope_BIT_MAIN_CAMERA & ~Scope_BIT_WATER_TRANSPARENT));
-	mCamera->setClearColor(Resources::instance->fadeColor);
+	mCamera->setClearColor(resources->fadeColor);
 	mCamera->getDefaultState()->setFogState(FogState(FogState::FogType_LINEAR,Math::ONE,mCamera->getFarDist()/2,mCamera->getFarDist(),mCamera->getClearColor()));
 	mFollowNode->attach(new CameraComponent(mCamera));
 
-	if(Resources::instance->reflectTarget!=NULL){
+	if(resources->reflectTarget!=NULL){
 		mReflectCamera=new Camera(mEngine);
-		mReflectCamera->setRenderTarget(Resources::instance->reflectTarget);
+		mReflectCamera->setRenderTarget(resources->reflectTarget);
 		mReflectCamera->setAutoProjectionFov(Math::degToRad(Math::fromInt(60)),false,mCamera->getNearDist(),mCamera->getFarDist());
 		mReflectCamera->setScope(~Scope_BIT_HUD & ~Scope_BIT_MAIN_CAMERA & ~Scope_BIT_WATER & ~Scope_BIT_WATER_TRANSPARENT);
-		mReflectCamera->setClearColor(Resources::instance->fadeColor);
+		mReflectCamera->setClearColor(resources->fadeColor);
 		mReflectCamera->getDefaultState()->setFogState(FogState(FogState::FogType_LINEAR,Math::ONE,mCamera->getFarDist()/2,mCamera->getFarDist(),mCamera->getClearColor()));
 	}
 
-	if(Resources::instance->refractTarget!=NULL){
+	if(resources->refractTarget!=NULL){
 		mRefractCamera=new Camera(mEngine);
-		mRefractCamera->setRenderTarget(Resources::instance->refractTarget);
+		mRefractCamera->setRenderTarget(resources->refractTarget);
 		mRefractCamera->setAutoProjectionFov(Math::degToRad(Math::fromInt(60)),false,mCamera->getNearDist(),mCamera->getFarDist());
 		mRefractCamera->setScope((~Scope_BIT_HUD & ~Scope_BIT_MAIN_CAMERA & ~Scope_BIT_WATER) | Scope_BIT_WATER_TRANSPARENT);
-		mRefractCamera->setClearColor(Resources::instance->fadeColor);
+		mRefractCamera->setClearColor(resources->fadeColor);
 		mRefractCamera->getDefaultState()->setFogState(FogState(FogState::FogType_LINEAR,Math::ONE,mCamera->getFarDist()/2,mCamera->getFarDist(),mCamera->getClearColor()));
 	}
 
-	mHUD=new HUD(mScene,mPlayer,mCamera);
+	mHUD=new HUD(mScene,mPlayer,mCamera,resources);
 	mHUD->setScope(Scope_BIT_HUD);
 	mScene->getRoot()->attach(mHUD);
 
@@ -200,7 +201,7 @@ void RandIsle::resourceCacheReady(ResourceCache *cache){
 	mHUDCamera->setProjectionOrtho(-1,1,-1,1,-1,1);
 	mHUDCamera->setClearFlags(0);
 
-	mSky=new Sky(mScene,Resources::instance->cloudSize,Resources::instance->skyColor,Resources::instance->fadeColor);
+	mSky=new Sky(mScene,resources->cloudSize,resources->skyColor,resources->fadeColor);
 	mSky->setScope(mSky->getScope()&~Scope_BIT_SHADOW);
 	mScene->getBackground()->attach(mSky);
 
@@ -253,8 +254,8 @@ void RandIsle::resourceCacheReady(ResourceCache *cache){
 		mPlayer->attach(physics);
 
 		MeshComponent *mesh=new MeshComponent(mEngine);
-		if(Resources::instance->creature!=NULL){
-			mesh->setMesh(Resources::instance->creature);
+		if(resources->creature!=NULL){
+			mesh->setMesh(resources->creature);
 		}
 		mPlayer->attach(mesh);
 
@@ -286,10 +287,10 @@ cc->setLookDir(Vector3(0,0,0),Vector3(0,1,0),Vector3(0,0,1));
 
 	Log::alert("Adding props");
 	mProps=new Node(mScene);
-	for(int i=0;i<Resources::instance->numProps;++i){
+	for(int i=0;i<resources->numProps;++i){
 		Node::ptr prop=new Node(mScene);
 		MeshComponent *mesh=new MeshComponent(mEngine);
-		mesh->setMesh(Resources::instance->grass);
+		mesh->setMesh(resources->grass);
 		mesh->setSharedRenderState(NULL);
 		prop->attach(mesh);
 		prop->setScope(prop->getScope()&~Scope_BIT_SHADOW);
@@ -316,7 +317,7 @@ cc->setLookDir(Vector3(0,0,0),Vector3(0,1,0),Vector3(0,0,1));
 	{
 		ParticleComponent::ptr particles=new ParticleComponent(mScene);
 		particles->setNumParticles(2000,ParticleComponent::ParticleType_SPRITE,1);
-		particles->setMaterial(Resources::instance->acorn);
+		particles->setMaterial(resources->acorn);
 		Random r;
 		for(int i=0;i<particles->getNumParticles();++i){
 			ParticleComponent::Particle *p=particles->getParticle(i);
@@ -353,6 +354,8 @@ void RandIsle::destroy(){
 		mPredictedIndexData->destroy();
 		mPredictedIndexData=NULL;
 	}
+
+	resources=NULL;
 
 	Log::debug("RandIsle::destroy finished");
 }
@@ -477,7 +480,7 @@ void RandIsle::frameUpdate(int dt){
 
 		Shader::ShaderType type=(Shader::ShaderType)0;
 		int index=0;
-		Material::ptr water=Resources::instance->waterMaterial;
+		Material::ptr water=resources->waterMaterial;
 		if(water && water->getPass()!=NULL){
 			RenderPass::ptr pass=water->getPass();
 			pass->findTexture(type,index,"waveTex");
@@ -516,8 +519,8 @@ void RandIsle::updateDanger(int dt){
 }
 
 void RandIsle::updateProps(){
-	scalar maxDist=Resources::instance->maxPropDist;
-	scalar minDist=Resources::instance->minPropDist;
+	scalar maxDist=resources->maxPropDist;
+	scalar minDist=resources->minPropDist;
 	Segment segment;
 	Vector2 origin(mPlayer->getPhysics()->getPosition().x,mPlayer->getPhysics()->getPosition().y);
 	Random r(System::mtime());
@@ -875,7 +878,7 @@ bool RandIsle::updatePopulatePatches(){
 			TreeComponent::ptr treeComponent;
 			Node::ptr tree=new Node(mScene);
 			{
-				treeComponent=new TreeComponent(mScene,wx+wy,Resources::instance->treeBranch,Resources::instance->treeLeaf);
+				treeComponent=new TreeComponent(mScene,wx+wy,resources->treeBranch,resources->treeLeaf);
 				tree->attach(treeComponent);
 
 				tree->setScope(tree->getScope()&~Scope_BIT_SHADOW);
@@ -945,7 +948,7 @@ bool RandIsle::getPatchLayerData(tbyte *data,int px,int py){
 			else{
 				layer=2;
 			}
-			data[y*size+x]=Resources::instance->terrainMaterialSource->getDiffuseTexture(layer)!=NULL?layer:0;
+			data[y*size+x]=resources->terrainMaterialSource->getDiffuseTexture(layer)!=NULL?layer:0;
 		}
 	}
 	return true;

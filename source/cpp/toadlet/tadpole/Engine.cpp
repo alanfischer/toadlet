@@ -168,9 +168,11 @@ Engine::Engine(void *env,void *ctx):
 
 	// Android currently must be backed, since the context can not be created when the application is
 	#if defined(TOADLET_PLATFORM_ANDROID)
+		mBackableRenderCaps.textureAutogenMipMaps=true;
 		setHasBackableShader(true);
 		setHasBackableFixed(true);
 		setHasBackableTriangleFan(true);
+		setHasBackableFixed(true);
 	#endif
 
 	// Create initial BackableVertexFormats.  This doesn't need to be done, but without it, starting an application without a RenderDevice will crash.
@@ -392,6 +394,7 @@ void Engine::updateRenderCaps(){
 
 	mEngineRenderCaps.maxLights=		mergeCap(mRenderCaps.maxLights,			mMaximumRenderCaps.maxLights,		mBackableRenderCaps.maxLights);
 	mEngineRenderCaps.triangleFan=		mergeCap(mRenderCaps.triangleFan,		mMaximumRenderCaps.triangleFan,		mBackableRenderCaps.triangleFan)> 0;
+	mEngineRenderCaps.textureAutogenMipMaps=mergeCap(mRenderCaps.textureAutogenMipMaps,mMaximumRenderCaps.textureAutogenMipMaps,mBackableRenderCaps.textureAutogenMipMaps)> 0;
 }
 
 void Engine::updateVertexFormats(){

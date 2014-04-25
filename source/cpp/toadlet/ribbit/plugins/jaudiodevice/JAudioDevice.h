@@ -37,7 +37,7 @@ namespace ribbit{
 
 class TOADLET_API JAudioDevice:public BaseAudioDevice{
 public:
-	TOADLET_JOBJECT(JAudioDevice);
+	TOADLET_IOBJECT(JAudioDevice);
 
 	JAudioDevice(JNIEnv *jenv,jobject jobj);
 	virtual ~JAudioDevice();

@@ -53,8 +53,19 @@ inline uint32 convertYCrCbToBGRA(int y,int cr,int cb){
 bool TextureFormatConversion::convert(tbyte *src,TextureFormat *srcFormat,tbyte *dst,TextureFormat *dstFormat){
 	int i,j,k;
 
+	if(src==NULL || srcFormat==NULL || dst==NULL || dstFormat==NULL){
+		return false;
+	}
+
+	//Log::debug(Categories::TOADLET_PEEPER,String()+ \
+		" src width:"+srcFormat->getWidth()+" height:"+srcFormat->getHeight()+" depth:"+srcFormat->getDepth()+" px:"+srcFormat->getPixelFormat()+ \
+		" dst width:"+dstFormat->getWidth()+" height:"+dstFormat->getHeight()+" depth:"+dstFormat->getDepth()+" px:"+dstFormat->getPixelFormat() \
+	);
+
 	/// @todo: Allow scaling and subsections
-	TOADLET_ASSERT(srcFormat->getWidth()==dstFormat->getWidth() && srcFormat->getHeight()==dstFormat->getHeight() && srcFormat->getDepth()==dstFormat->getDepth());
+	if(srcFormat->getWidth()!=dstFormat->getWidth() || srcFormat->getHeight()!=dstFormat->getHeight() || srcFormat->getDepth()!=dstFormat->getDepth()){
+		return false;
+	}
 
 	int srcPixelFormat=srcFormat->getPixelFormat(),dstPixelFormat=dstFormat->getPixelFormat();
 	int width=srcFormat->getWidth(),height=srcFormat->getHeight(),depth=srcFormat->getDepth();

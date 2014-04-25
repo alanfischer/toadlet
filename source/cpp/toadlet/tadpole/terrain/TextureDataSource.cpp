@@ -91,6 +91,8 @@ bool TextureDataSource::setTexture(Texture *texture,int px,int py){
 }
 
 bool TextureDataSource::getPatchHeightData(scalar *data,int px,int py){
+	Log::debug("TextureDataSource::getPatchHeightData");
+
 	if(mTexture[px][py]==NULL){
 		int i,j;
 		for(i=0;i<mPatchSize;++i){

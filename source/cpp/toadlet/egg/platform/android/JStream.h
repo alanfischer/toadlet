@@ -35,7 +35,7 @@ namespace egg{
 
 class TOADLET_API JStream:public Object,public Stream{
 public:
-	TOADLET_JOBJECT(JStream);
+	TOADLET_IOBJECT(JStream);
 
 	JStream(JNIEnv *env,jobject streamObj=NULL);
 	virtual ~JStream();
