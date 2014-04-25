@@ -1,6 +1,5 @@
 #include "HUD.h"
 #include "PathClimber.h"
-#include "Resources.h"
 
 class CompassComponent:public BaseComponent{
 public:
@@ -259,23 +258,23 @@ protected:
 	Animation::ptr mChompAnimation;
 };
 
-HUD::HUD(Scene *scene,Node *player,Camera *camera):Node(scene){
+HUD::HUD(Scene *scene,Node *player,Camera *camera,Resources *resources):Node(scene){
 	mChomp=new Node(mScene);
 	{
 		mChomp->setName("chomp");
 
 		SpriteComponent::ptr sprite=new SpriteComponent(mEngine);
-		sprite->setMaterial(Resources::instance->fade);
+		sprite->setMaterial(resources->fade);
 		mChomp->attach(sprite);
 		mChomp->setScale(Vector3(2,2,2));
 
 		AudioComponent::ptr dog=new AudioComponent(mScene);
-		dog->setAudioBuffer(Resources::instance->dog);
+		dog->setAudioBuffer(resources->dog);
 		dog->setGlobal(true);
 		mChomp->attach(dog);
 
 		AudioComponent::ptr crunch=new AudioComponent(mScene);
-		crunch->setAudioBuffer(Resources::instance->crunch);
+		crunch->setAudioBuffer(resources->crunch);
 		crunch->setGlobal(true);
 		mChomp->attach(crunch);
 
@@ -297,7 +296,7 @@ HUD::HUD(Scene *scene,Node *player,Camera *camera):Node(scene){
 	mCompass=new Node(mScene);
 	{
 		SpriteComponent::ptr sprite=new SpriteComponent(mEngine);
-		sprite->setMaterial(Resources::instance->compass);
+		sprite->setMaterial(resources->compass);
 		mCompass->attach(sprite);
 		mCompass->setTranslate(0.75,0.75,0);
 		mCompass->setScale(0.25,0.25,0.25);
@@ -312,7 +311,7 @@ HUD::HUD(Scene *scene,Node *player,Camera *camera):Node(scene){
 		Node::ptr node=new Node(mScene);
 		{
 			SpriteComponent::ptr sprite=new SpriteComponent(mEngine);
-			sprite->setMaterial(Resources::instance->acorn);
+			sprite->setMaterial(resources->acorn);
 			node->attach(sprite);
 			node->setTranslate(-0.75,0.75,0);
 			node->setScale(0.25,0.20,0.25);
@@ -323,7 +322,7 @@ HUD::HUD(Scene *scene,Node *player,Camera *camera):Node(scene){
 		node=new Node(mScene);
 		{
 			label=new LabelComponent(mEngine);
-			label->setFont(Resources::instance->wooden);
+			label->setFont(resources->wooden);
 			label->setAlignment(Font::Alignment_BIT_VCENTER|Font::Alignment_BIT_LEFT);
 			label->setSharedRenderState(NULL);
 			label->getSharedRenderState()->setMaterialState(MaterialState(Colors::BROWN));
@@ -342,7 +341,7 @@ HUD::HUD(Scene *scene,Node *player,Camera *camera):Node(scene){
 	mFPS=new Node(mScene);
 	{
 		LabelComponent::ptr label=new LabelComponent(mEngine);
-		label->setFont(Resources::instance->wooden);
+		label->setFont(resources->wooden);
 		label->setAlignment(Font::Alignment_BIT_LEFT);
 		label->setSharedRenderState(NULL);
 		label->getSharedRenderState()->setMaterialState(MaterialState(Colors::BROWN));

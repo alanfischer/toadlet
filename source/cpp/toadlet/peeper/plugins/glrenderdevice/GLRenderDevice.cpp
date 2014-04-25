@@ -168,14 +168,24 @@ bool GLRenderDevice::create(RenderTarget *target,int options){
 		else					  gl_version=10;
 	#else
 		const char *versionString=(const char*)glGetString(GL_VERSION);
-		if(strstr(versionString,"2.")!=NULL){
+		if(strstr(versionString,"4.")!=NULL){
+			gl_version=40;
+		}
+		else if(strstr(versionString,"3.")!=NULL){
+			gl_version=30;
+		}
+		else if(strstr(versionString,"2.")!=NULL){
 			gl_version=20;
 		}
 		else if(strstr(versionString,"1.1")!=NULL){
 			gl_version=11;
 		}
 		else{
-			gl_version=10;
+			#if defined(TOADLET_HAS_GLFIXED)
+				gl_version=10;
+			#else
+				gl_version=20;
+			#endif
 		}
 	#endif
 

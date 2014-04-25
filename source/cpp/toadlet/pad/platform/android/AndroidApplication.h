@@ -40,7 +40,7 @@ namespace pad{
 /// @todo: And the rest of the input keys need to be handled besides space
 class AndroidApplication:public Object,public Application,public Runnable{
 public:
-	TOADLET_OBJECT(AndroidApplication);
+	TOADLET_IOBJECT(AndroidApplication);
 
 	AndroidApplication();
 	virtual ~AndroidApplication();

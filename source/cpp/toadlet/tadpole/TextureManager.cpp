@@ -130,6 +130,8 @@ PixelBufferRenderTarget::ptr TextureManager::createPixelBufferRenderTarget(){
 }
 
 bool TextureManager::textureLoad(Texture::ptr texture,TextureFormat *format,tbyte *data){
+	Log::debug(Categories::TOADLET_TADPOLE,"TextureManager::textureLoad");
+
 	bool result=false;
 	if(format->getPixelFormat()==texture->getFormat()->getPixelFormat()){
 		result=texture->load(format,data);
@@ -146,7 +148,7 @@ bool TextureManager::textureLoad(Texture::ptr texture,TextureFormat *format,tbyt
 }
 
 void TextureManager::contextActivate(RenderDevice *renderDevice){
-	Log::debug("TextureManager::contextActivate");
+	Log::debug(Categories::TOADLET_TADPOLE,"TextureManager::contextActivate");
 
 #if defined(TOADLET_BACKABLE)
 	int i;
@@ -169,7 +171,7 @@ void TextureManager::contextActivate(RenderDevice *renderDevice){
 }
 
 void TextureManager::contextDeactivate(RenderDevice *renderDevice){
-	Log::debug("TextureManager::contextDeactivate");
+	Log::debug(Categories::TOADLET_TADPOLE,"TextureManager::contextDeactivate");
 
 #if defined(TOADLET_BACKABLE)
 	int i;
@@ -190,7 +192,7 @@ void TextureManager::contextDeactivate(RenderDevice *renderDevice){
 }
 
 void TextureManager::preContextReset(peeper::RenderDevice *renderDevice){
-	Log::debug("TextureManager::preContextReset");
+	Log::debug(Categories::TOADLET_TADPOLE,"TextureManager::preContextReset");
 
 	int i;
 	for(i=0;i<mResources.size();++i){
@@ -209,7 +211,7 @@ void TextureManager::preContextReset(peeper::RenderDevice *renderDevice){
 }
 
 void TextureManager::postContextReset(peeper::RenderDevice *renderDevice){
-	Log::debug("TextureManager::postContextReset");
+	Log::debug(Categories::TOADLET_TADPOLE,"TextureManager::postContextReset");
 
 	int i;
 	for(i=0;i<mResources.size();++i){

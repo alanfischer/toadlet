@@ -7,22 +7,18 @@ class Resources:public Object,public ResourceCacheListener{
 public:
 	TOADLET_IOBJECT(Resources);
 
-	static void init(Engine *engine,ResourceCacheListener *listener){
-		if(instance==NULL){
-			instance=new Resources();
-			instance->engine=engine;
-			instance->listener=listener;
-		}
-		instance->cacheResources();
+	Resources(Engine *engine,ResourceCacheListener *listener){
+		this->engine=engine;
+		this->listener=listener;
 	}
-	
-	void cacheResources(){
+
+	void create(){
 		cache=new ResourceCache();
 
 		cache->setListener(this);
 
 		cache->cacheResource("detail.png",engine->getTextureManager());
-		cache->cacheResource("sea.png",engine->getTextureManager());
+		cache->cacheResource("seafloor.png",engine->getTextureManager());
 		cache->cacheResource("rock.png",engine->getTextureManager());
 		cache->cacheResource("grass.png",engine->getTextureManager());
 		cache->cacheResource("water_bump.png",engine->getTextureManager());
@@ -232,8 +228,6 @@ public:
 	static tbyte *createNoise(TextureFormat *format,int scale,int seed,scalar brightnessScale,scalar brightnessOffset);
 
 	static tbyte *createPoint(TextureFormat *format);
-
-	static Resources::ptr instance;
 
 	Engine *engine;
 	ResourceCache::ptr cache;

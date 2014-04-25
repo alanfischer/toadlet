@@ -446,13 +446,17 @@ bool GLTexture::generateMipLevels(){
 	if(true){
 	#endif
 		glBindTexture(mTarget,mHandle);
-		// Set some items to make ATI cards happier
-		glEnable(mTarget);
-		glTexParameteri(mTarget,GL_TEXTURE_MIN_FILTER,GL_LINEAR);
-		glTexParameteri(mTarget,GL_TEXTURE_MAG_FILTER,GL_LINEAR);
+		#if defined(TOADLET_HAS_GLFIXED)
+			// Set some items to make ATI cards happier
+			glEnable(mTarget);
+			glTexParameteri(mTarget,GL_TEXTURE_MIN_FILTER,GL_LINEAR);
+			glTexParameteri(mTarget,GL_TEXTURE_MAG_FILTER,GL_LINEAR);
+		#endif
 		glGenerateMipmap(mTarget);
-		glDisable(mTarget);
-		glBindTexture(mTarget,0);
+		#if defined(TOADLET_HAS_GLFIXED)
+			glDisable(mTarget);
+			glBindTexture(mTarget,0);
+		#endif
 
 		TOADLET_CHECK_GLERROR("GLTexture::generateMipLevels");
 

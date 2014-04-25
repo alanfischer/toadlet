@@ -71,12 +71,17 @@ ArchiveManager::ArchiveStreamRequest::ArchiveStreamRequest(ArchiveManager *manag
 }
 
 void ArchiveManager::ArchiveStreamRequest::request(){
-	Archive::ptr archive=((Archive*)(*mIt));
-	if(archive!=NULL){
-		archive->openStream(mName,this);
+	if(mIt!=mManager->mResources.end()){
+		Archive *archive=((Archive*)(*mIt));
+		if(archive!=NULL){
+			archive->openStream(mName,this);
+		}
+		else{
+			streamException(Exception());
+		}
 	}
 	else{
-		streamException(Exception());
+		notFound();
 	}
 }
 
@@ -108,12 +113,7 @@ void ArchiveManager::ArchiveStreamRequest::streamReady(Stream *stream){
 
 void ArchiveManager::ArchiveStreamRequest::streamException(const Exception &ex){
 	mIt++;
-	if(mIt!=mManager->mResources.end()){
-		request();
-	}
-	else{
-		notFound();
-	}
+	request();
 }
 
 }

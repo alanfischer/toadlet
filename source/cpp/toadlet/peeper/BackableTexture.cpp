@@ -293,16 +293,15 @@ bool BackableTexture::convertCreate(Texture::ptr texture,RenderDevice *renderDev
 		}
 
 		int totalMipLevels=format->getMipMaxPossible();
-		int specifiedMipLevels=0;
-		int allocatedMipLevels=0;
-		if(needsAutogen || format->getMipMax()>0){
+		int specifiedMipLevels=Math::intMaxVal(format->getMipMax(),1);
+		int allocatedMipLevels=specifiedMipLevels;
+		if(needsAutogen){
 			if(format->getMipMax()>0){
-				specifiedMipLevels=format->getMipMax();
+				allocatedMipLevels=specifiedMipLevels;
 			}
 			else{
-				specifiedMipLevels=totalMipLevels;
+				allocatedMipLevels=totalMipLevels;
 			}
-			allocatedMipLevels=specifiedMipLevels;
 		}
 		else{
 			allocatedMipLevels=1;
@@ -324,11 +323,11 @@ bool BackableTexture::convertCreate(Texture::ptr texture,RenderDevice *renderDev
 			tbyte **newMipDatas=new tbyte*[allocatedMipLevels];
 
 			for(i=0;i<allocatedMipLevels;++i){
-				TextureFormat::ptr mipFormat=new TextureFormat(format,i);
+				int si=Math::intMinVal(specifiedMipLevels-1,i);
+				TextureFormat::ptr mipFormat=new TextureFormat(format,si);
 				TextureFormat::ptr newMipFormat=new TextureFormat(newFormat,i);
 				newMipDatas[i]=new tbyte[newMipFormat->getDataSize()];
-		
-				TextureFormatConversion::convert(mipDatas[i],mipFormat,newMipDatas[i],newMipFormat);
+				TextureFormatConversion::convert(mipDatas[si],mipFormat,newMipDatas[i],newMipFormat);
 			}
 
 			if(needsAutogen){
@@ -337,7 +336,7 @@ bool BackableTexture::convertCreate(Texture::ptr texture,RenderDevice *renderDev
 
 			result=texture->create(usage,newFormat,newMipDatas);
 
-			for(i=0;i<specifiedMipLevels;++i){
+			for(i=0;i<allocatedMipLevels;++i){
 				delete[] newMipDatas[i];
 			}
 			delete[] newMipDatas;

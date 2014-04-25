@@ -182,7 +182,7 @@ Mesh::ptr TMSHStreamer::readMesh(DataStream *stream,int blockSize){
 		
 		subMesh->setName(stream->readNullTerminatedString());
 
-		stream->readBool(); // Depricated
+		stream->readBool(); // Deprecated
 
 		subMesh->transform=readTransform(stream);
 		subMesh->bound=readBound(stream);
@@ -222,7 +222,7 @@ void TMSHStreamer::writeMesh(DataStream *stream,Mesh::ptr mesh){
 
 		stream->writeNullTerminatedString(subMesh->getName());
 
-		stream->writeBool(false); // Depricated
+		stream->writeBool(false); // Deprecated
 
 		writeTransform(stream,subMesh->transform);
 		writeBound(stream,subMesh->bound);

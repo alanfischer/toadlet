@@ -370,7 +370,13 @@ ResourceManager::ArchiveResourceRequest::ArchiveResourceRequest(ResourceManager 
 
 void ResourceManager::ArchiveResourceRequest::request(){
 	if(mIt!=mManager->mResourceArchives.end()){
-		((Archive*)(*mIt))->openResource(mName,this);
+		Archive *archive=((Archive*)(*mIt));
+		if(archive!=NULL){
+			archive->openResource(mName,this);
+		}
+		else{
+			resourceException(Exception());
+		}
 	}
 	else{
 		notFound();
@@ -411,15 +417,8 @@ void ResourceManager::ArchiveResourceRequest::resourceReady(Resource *resource){
 }
 
 void ResourceManager::ArchiveResourceRequest::resourceException(const Exception &ex){
-	if(mIt!=mManager->mResourceArchives.end()){
-		// Still archive searching
-		mIt++;
-		request();
-	}
-	else{
-		// Failed streamer load
-		mRequest->resourceException(ex);
-	}
+	mIt++;
+	request();
 }
 
 void ResourceManager::ArchiveResourceRequest::streamReady(Stream *stream){

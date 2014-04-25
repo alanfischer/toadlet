@@ -69,7 +69,7 @@ public:
 	virtual int retain(){return toadlet::egg::Object::retain();} \
 	virtual int release(){return toadlet::egg::Object::release();}
 
-#define TOADLET_JOBJECT(Class)\
+#define TOADLET_NODESTROY_OBJECT(Class)\
 	TOADLET_INTERFACE(Class); \
 	virtual int retain(){return toadlet::egg::Object::retain();} \
 	virtual int release(){return toadlet::egg::Object::releaseNoDestroy();}
