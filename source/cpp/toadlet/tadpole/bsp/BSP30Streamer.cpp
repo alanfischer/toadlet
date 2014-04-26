@@ -403,6 +403,10 @@ void BSP30Streamer::MaterialRequest::parseMaterials(BSP30Map *map){
 			mTextureCount--;
 		}
 	}
+
+	if(mTextureCount<=0){
+		parseMaterialsDone(mMap);
+	}
 }
 
 void BSP30Streamer::MaterialRequest::textureComplete(Resource *resource,int index){
