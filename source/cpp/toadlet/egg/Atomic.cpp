@@ -59,11 +59,11 @@ int Atomic::decrement(int &value,void *data){
 #elif defined(TOADLET_COUNT_OSX)
 
 int Atomic::increment(int &value,void *data){
-	return OSAtomicIncrement32((int32*)&value);
+	return OSAtomicAdd32(1,(int32*)&value);
 }
 	
 int Atomic::decrement(int &value,void *data){
-	return OSAtomicDecrement32((int32*)&value);
+	return OSAtomicAdd32(-1,(int32*)&value);
 }
 
 #elif defined(TOADLET_COUNT_GCC)
