@@ -31,8 +31,10 @@
 namespace toadlet{
 namespace peeper{
 
-class MaterialState{
+class TOADLET_API TOADLET_ALIGNED MaterialState{
 public:
+	TOADLET_ALIGNED_NEW;
+
 	enum ShadeType{
 		ShadeType_FLAT,
 		ShadeType_GOURAUD,

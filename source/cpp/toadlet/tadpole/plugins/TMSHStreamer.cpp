@@ -102,7 +102,7 @@ bool TMSHStreamer::load(Stream::ptr stream,ResourceData *data,ResourceRequest *r
 	return true;
 }
 
-bool TMSHStreamer::save(Stream::ptr stream,Resource::ptr resource,ResourceData *data,ResourceRequest *request){
+bool TMSHStreamer::save(Stream::ptr stream,Resource::ptr resource,ResourceData *data){
 	Mesh::ptr mesh=shared_static_cast<Mesh>(resource);
 	if(mesh==NULL){
 		return false;
@@ -153,8 +153,6 @@ bool TMSHStreamer::save(Stream::ptr stream,Resource::ptr resource,ResourceData *
 		}
 	}
 
-	request->resourceReady(resource);
-
 	return true;
 }
 
@@ -181,8 +179,6 @@ Mesh::ptr TMSHStreamer::readMesh(DataStream *stream,int blockSize){
 		subMesh->materialName=stream->readNullTerminatedString();
 		
 		subMesh->setName(stream->readNullTerminatedString());
-
-		stream->readBool(); // Deprecated
 
 		subMesh->transform=readTransform(stream);
 		subMesh->bound=readBound(stream);
@@ -221,8 +217,6 @@ void TMSHStreamer::writeMesh(DataStream *stream,Mesh::ptr mesh){
 		stream->writeNullTerminatedString(subMesh->materialName);
 
 		stream->writeNullTerminatedString(subMesh->getName());
-
-		stream->writeBool(false); // Deprecated
 
 		writeTransform(stream,subMesh->transform);
 		writeBound(stream,subMesh->bound);

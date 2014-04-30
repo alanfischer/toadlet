@@ -31,8 +31,10 @@
 namespace toadlet{
 namespace peeper{
 
-class GeometryState{
+class TOADLET_API TOADLET_ALIGNED GeometryState{
 public:
+	TOADLET_ALIGNED_NEW;
+
 	enum MatrixFlags{
 		MatrixFlag_NO_PERSPECTIVE=1<<0,
 		MatrixFlag_ASPECT_CORRECT=1<<1,

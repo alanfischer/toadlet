@@ -53,7 +53,11 @@ public:
 
 	virtual Resource::ptr get(int handle);
 	virtual Resource::ptr get(const String &name);
+
 	virtual bool find(const String &name,ResourceRequest *request,ResourceData *data=NULL);
+	// Only returns a resource if it was loaded immediately
+	virtual Resource::ptr find(const String &name,ResourceData *data=NULL);
+
 	virtual Resource::ptr manage(Resource *resource,const String &name=(char*)NULL);
 	virtual void unmanage(Resource *resource);
 

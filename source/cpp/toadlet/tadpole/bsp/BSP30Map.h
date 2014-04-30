@@ -48,7 +48,7 @@ public:
 	virtual ~BSP30Map(){}
 	void destroy();
 
-	int modelCollisionTrace(PhysicsCollision &result,int model,const Vector3 &size,Vector3 start,Vector3 end);
+	int modelCollisionTrace(PhysicsCollision &result,int model,const Vector3 &size,const Vector3 &start,const Vector3 &end);
 	bool modelLightTrace(Vector4 &result,int model,const Vector3 &start,const Vector3 &end);
 	void findSurfaceExtents(bface *face,int *mins,int *maxs);
 
