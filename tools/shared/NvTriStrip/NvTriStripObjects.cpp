@@ -1119,7 +1119,8 @@ void NvStripifier::Stripify(const WordVec &in_indices, const int in_cacheSize,
 	int numSamples = 10;
 	
 	//the cache size, clamped to one
-	cacheSize = max(1, in_cacheSize - CACHE_INEFFICIENCY);
+	cacheSize = in_cacheSize - CACHE_INEFFICIENCY;
+	if (cacheSize < 1) cacheSize = 1;
 	
 	minStripLength = in_minStripLength;  //this is the strip size threshold below which we dump the strip into a list
 	

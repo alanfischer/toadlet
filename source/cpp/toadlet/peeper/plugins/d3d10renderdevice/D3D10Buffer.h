@@ -96,6 +96,8 @@ protected:
 
 	class TextureData{
 	public:
+		TOADLET_ALIGNED_NEW;
+
 		TextureData():
 			mD3DState(NULL){}
 

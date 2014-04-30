@@ -91,7 +91,7 @@ void BSP30Map::destroy(){
 	BaseResource::destroy();
 }
 
-int BSP30Map::modelCollisionTrace(PhysicsCollision &result,int model,const Vector3 &size,Vector3 start,Vector3 end){
+int BSP30Map::modelCollisionTrace(PhysicsCollision &result,int model,const Vector3 &size,const Vector3 &start,const Vector3 &end){
 	int hullIndex=0;
 	if(header.version==Q1BSPVERSION){
 		if(size[0]<3){
@@ -132,19 +132,20 @@ int BSP30Map::modelCollisionTrace(PhysicsCollision &result,int model,const Vecto
 	// Hack to let us z correct objects with approximate hulls
 	float off=(hullSize.z-size.z) / 2;
 
+	Vector3 traceStart=start,traceEnd=end;
 	if(off != 0){
-		start.z+=off;
-		end.z+=off;
+		traceStart.z+=off;
+		traceEnd.z+=off;
 	}
 
 	int contents=0;
 	if(hullIndex==0){
-		hullTrace(result,planes,leafs,nodes,sizeof(bnode),headNode,0,Math::ONE,start,end,0.03125,(-1-CONTENTS_SOLID)<<1,NULL);
-		contents=leafs[findPointLeaf(planes,nodes,sizeof(bnode),headNode,start)].contents;
+		hullTrace(result,planes,leafs,nodes,sizeof(bnode),headNode,0,Math::ONE,traceStart,traceEnd,0.03125,(-1-CONTENTS_SOLID)<<1,NULL);
+		contents=leafs[findPointLeaf(planes,nodes,sizeof(bnode),headNode,traceStart)].contents;
 	}
 	else{
-		hullTrace(result,planes,NULL,clipnodes,sizeof(bclipnode),headClipNode,0,Math::ONE,start,end,0.03125,(-1-CONTENTS_SOLID)<<1,NULL);
-		contents=-1-findPointLeaf(planes,clipnodes,sizeof(bclipnode),headClipNode,start);
+		hullTrace(result,planes,NULL,clipnodes,sizeof(bclipnode),headClipNode,0,Math::ONE,traceStart,traceEnd,0.03125,(-1-CONTENTS_SOLID)<<1,NULL);
+		contents=-1-findPointLeaf(planes,clipnodes,sizeof(bclipnode),headClipNode,traceStart);
 	}
 
 	if(off != 0){

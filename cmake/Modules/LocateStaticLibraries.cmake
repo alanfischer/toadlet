@@ -37,11 +37,13 @@ macro (LOCATE_STATIC_LIBRARIES STATIC LIBRARIES) #FALSE/TRUE)
 
 				if (EXISTS ${LIBRARY})
 					# Use the lib.exe tool to dump the .lib contents to a file and search for the string ".dll" in that file
+					message("Using:${LIBEXE} to list:${LIBRARY} and dump to file: libout-${LIBNAME}")
 					get_filename_component (LIBNAME ${LIBRARY} NAME_WE)
 					execute_process (
 						COMMAND ${LIBEXE} /list ${LIBRARY} WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR} OUTPUT_FILE libout-${LIBNAME}
 					)
 					file (READ ${CMAKE_CURRENT_BINARY_DIR}/libout-${LIBNAME} LIBOUT)
+					message("Read found libout=|${LIBOUT}| when scanning:|${CMAKE_CURRENT_BINARY_DIR}/libout-${LIBNAME}")
 					string (FIND ${LIBOUT} ".dll" HASDLL)
 
 					if (${HASDLL} GREATER -1)

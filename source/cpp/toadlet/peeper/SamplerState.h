@@ -32,9 +32,9 @@
 namespace toadlet{
 namespace peeper{
 
-class TOADLET_API SamplerState{
+class TOADLET_API TOADLET_ALIGNED SamplerState{
 public:
-	TOADLET_SPTR(SamplerState);
+	TOADLET_ALIGNED_NEW;
 
 	enum FilterType{
 		FilterType_NONE,

@@ -68,11 +68,11 @@ int main(int argc,char **argv){
 	bool result=false;
 	if(xmsh){
 		XMSHStreamer::ptr streamer=new XMSHStreamer(engine);
-		result=streamer->save(stream,mesh,NULL,NULL);
+		result=streamer->save(stream,mesh,NULL);
 	}
 	else{
 		TMSHStreamer::ptr streamer=new TMSHStreamer(engine);
- 		result=streamer->save(stream,mesh,NULL,NULL);
+ 		result=streamer->save(stream,mesh,NULL);
 	}
 
 	if(result){
