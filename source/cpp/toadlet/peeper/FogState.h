@@ -31,8 +31,10 @@
 namespace toadlet{
 namespace peeper{
 
-class FogState{
+class TOADLET_API TOADLET_ALIGNED FogState{
 public:
+	TOADLET_ALIGNED_NEW;
+
 	enum FogType{
 		FogType_NONE,
 		FogType_LINEAR,

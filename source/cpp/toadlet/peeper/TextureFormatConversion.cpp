@@ -57,10 +57,12 @@ bool TextureFormatConversion::convert(tbyte *src,TextureFormat *srcFormat,tbyte 
 		return false;
 	}
 
-	//Log::debug(Categories::TOADLET_PEEPER,String()+ \
-		" src width:"+srcFormat->getWidth()+" height:"+srcFormat->getHeight()+" depth:"+srcFormat->getDepth()+" px:"+srcFormat->getPixelFormat()+ \
-		" dst width:"+dstFormat->getWidth()+" height:"+dstFormat->getHeight()+" depth:"+dstFormat->getDepth()+" px:"+dstFormat->getPixelFormat() \
+#if 0
+	Log::debug(Categories::TOADLET_PEEPER,String()+
+		" src width:"+srcFormat->getWidth()+" height:"+srcFormat->getHeight()+" depth:"+srcFormat->getDepth()+" px:"+srcFormat->getPixelFormat()+
+		" dst width:"+dstFormat->getWidth()+" height:"+dstFormat->getHeight()+" depth:"+dstFormat->getDepth()+" px:"+dstFormat->getPixelFormat()
 	);
+#endif
 
 	/// @todo: Allow scaling and subsections
 	if(srcFormat->getWidth()!=dstFormat->getWidth() || srcFormat->getHeight()!=dstFormat->getHeight() || srcFormat->getDepth()!=dstFormat->getDepth()){

@@ -31,8 +31,10 @@
 namespace toadlet{
 namespace peeper{
 
-class TOADLET_API BlendState{
+class TOADLET_API TOADLET_ALIGNED BlendState{
 public:
+	TOADLET_ALIGNED_NEW;
+
 	enum Operation{
 		Operation_ONE,
 		Operation_ZERO,

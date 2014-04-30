@@ -5,7 +5,7 @@
 
 class Viewer:public Object,public Applet{
 public:
-	TOADLET_OBJECT(Viewer);
+	TOADLET_IOBJECT(Viewer);
 
 	Viewer(Application *app);
 	virtual ~Viewer();

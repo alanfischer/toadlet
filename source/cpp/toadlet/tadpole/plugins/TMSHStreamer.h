@@ -41,13 +41,13 @@ class TOADLET_API TMSHStreamer:public BaseResourceStreamer{
 public:
 	TOADLET_OBJECT(TMSHStreamer);
 
-	const static int VERSION=0x10001;
+	const static int VERSION=0x10002;
 	const static int TMSH=1414353736; // "TMSH"
 
 	TMSHStreamer(Engine *engine);
 
 	bool load(Stream::ptr stream,ResourceData *data,ResourceRequest *request);
-	bool save(Stream::ptr stream,Resource::ptr resource,ResourceData *data,ResourceRequest *request);
+	bool save(Stream::ptr stream,Resource::ptr resource,ResourceData *data);
 
 protected:
 	class MaterialRequest:public Object,public ResourceRequest{

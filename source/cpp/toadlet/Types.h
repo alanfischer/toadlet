@@ -69,6 +69,7 @@
 	#pragma warning(disable:4201) // nonstandard extension is used, nameless struct or union
 	#pragma warning(disable:4127) // conditional expression is constant
 	#pragma warning(disable:4100) // unreferenced formal parameter
+	#pragma warning(disable:4005) // macro redefinition
 	#if(_MSC_VER>=1300)
 		#define _CRT_SECURE_NO_WARNINGS 1
 	#endif

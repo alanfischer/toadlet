@@ -101,63 +101,74 @@ public:
 	}
 
 	inline Collection(int size):
-		mSize(size),
-		mCapacity(size)
+		mSize(0),
+		mCapacity(0),
+		mData(NULL)
 	{
-		mData=new Type[mCapacity+1];
-		mBegin=iterator(this,0);mEnd=iterator(this,mSize);
+		resize(size);
+		mBegin = iterator(this, 0);
 	}
 
 	inline Collection(int size,const Type &value):
-		mSize(size),
-		mCapacity(size)
+		mSize(0),
+		mCapacity(0),
+		mData(NULL)
 	{
-		mData=new Type[mCapacity+1];
+		resize(size);
 		int i;
 		for(i=0;i<size;++i){
 			mData[i]=value;
 		}
-		mBegin=iterator(this,0);mEnd=iterator(this,mSize);
+		mBegin=iterator(this,0);
 	}
 
 	inline Collection(const Type *values,int size):
-		mSize(size),
-		mCapacity(size)
+		mSize(0),
+		mCapacity(0),
+		mData(NULL)
 	{
-		mData=new Type[mCapacity+1];
+		resize(size);
 		int i;
 		for(i=0;i<size;++i){
 			mData[i]=values[i];
 		}
-		mBegin=iterator(this,0);mEnd=iterator(this,mSize);
+		mBegin=iterator(this,0);
 	}
 
 	inline Collection(const Collection &c):
-		mSize(c.mSize),
-		mCapacity(c.mCapacity)
+		mSize(0),
+		mCapacity(0),
+		mData(NULL)
 	{
-		mData=new Type[mCapacity+1];
+		reserve(c.mCapacity);
+		resize(c.mSize);
 		int i;
 		for(i=0;i<mSize;++i){
 			mData[i]=c.mData[i];
 		}
-		mBegin=iterator(this,0);mEnd=iterator(this,mSize);
+		mBegin=iterator(this,0);
 	}
 
 	template<typename Type2> inline Collection(const Collection<Type2> &c):
-		mSize(c.mSize),
-		mCapacity(c.mCapacity)
+		mSize(0),
+		mCapacity(0),
+		mData(NULL)
 	{
-		mData=new Type[mCapacity+1];
+		reserve(c.mCapacity);
+		resize(c.mSize);
 		int i;
 		for(i=0;i<mSize;++i){
 			mData[i]=c.mData[i];
 		}
-		mBegin=iterator(this,0);mEnd=iterator(this,mSize);
+		mBegin=iterator(this,0);
 	}
 
 	~Collection(){
-		delete[] mData;
+		int i;
+		for(i=mSize-1;i>=0;--i){
+			mData[i].~Type();
+		}
+		TOADLET_ALIGNED_FREE(mData);
 	}
 
 	inline Type &front(){return mData[0];}
@@ -317,12 +328,23 @@ public:
 
 	void reserve(int s){
 		if(mCapacity<s){
-			Type *data=new Type[s+1];
+			Type *data=(Type*)TOADLET_ALIGNED_MALLOC(sizeof(Type)*(s+1),TOADLET_ALIGNED_SIZE);
+
 			int i;
+			for(i=0;i<s;++i){
+				new (&data[i]) Type();
+			}
+
 			for(i=0;i<mSize;++i){
 				data[i]=mData[i];
 			}
-			delete[] mData;
+
+			for(i=0;i<mCapacity;++i){
+				mData[i].~Type();
+			}
+
+			TOADLET_ALIGNED_FREE(mData);
+
 			mData=data;
 			mBegin=iterator(this,0);mEnd=iterator(this,mSize);
 		}
@@ -363,10 +385,8 @@ public:
 	inline operator const Type *() const{return mData;}
 
 	Collection &operator=(const Collection &c){
-		mSize=c.mSize;
-		mCapacity=c.mCapacity;
-		delete[] mData;
-		mData=new Type[mCapacity+1];
+		reserve(c.mCapacity);
+		resize(c.mSize);
 		int i;
 		for(i=0;i<mSize;++i){
 			mData[i]=c.mData[i];

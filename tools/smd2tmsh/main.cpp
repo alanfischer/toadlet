@@ -95,7 +95,7 @@ int main(int argc,char **argv){
 		FileStream::ptr stream=new FileStream(outputName,FileStream::Open_WRITE_BINARY);
 		if(stream->closed()==false){
 			XMSHStreamer::ptr streamer=new XMSHStreamer(NULL);
-			streamer->save(stream,smd.getMesh(),NULL,NULL);
+			streamer->save(stream,smd.getMesh(),NULL);
 
 			stream->close();
 

@@ -31,8 +31,10 @@
 namespace toadlet{
 namespace peeper{
 
-class TOADLET_API RasterizerState{
+class TOADLET_API TOADLET_ALIGNED RasterizerState{
 public:
+	TOADLET_ALIGNED_NEW;
+
 	enum CullType{
 		CullType_NONE,
 		CullType_FRONT,

@@ -58,7 +58,7 @@ int main(int argc,char **argv){
 		return 0;
 	}
 	XMSHStreamer::ptr streamer=new XMSHStreamer(NULL);
-	streamer->save(stream,mesh,NULL,NULL);
+	streamer->save(stream,mesh,NULL);
 
 	if(result){
 		std::cout << "complete" << std::endl;

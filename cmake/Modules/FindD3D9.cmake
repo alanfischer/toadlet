@@ -22,7 +22,7 @@ if (WIN32)
 
 	# Look for the windows 8 sdk
 	find_path (D3D9_INCLUDE_PATH 
-		NAMES d3d9helper.h
+		NAMES d3dx9shader.h
 		PATHS "${WIN8_SDK_DIR}/Include/um"
 		NO_DEFAULT_PATH
 		DOC "Path to the windows 8 d3d9.h file"
@@ -82,7 +82,7 @@ if (WIN32)
 				mark_as_advanced (D3D9_INCLUDE_PATH D3D9_LIB)
 			endif (D3D9_LIB AND D3DX9_LIB AND DXERR9_LIB)
 		endif (D3D9_INCLUDE_PATH)
-	endif (NOT D3D9_FOUND)
+	endif (NOT D3D9_FOUND)	
 endif (WIN32)
 
 if (D3D9_FOUND)	

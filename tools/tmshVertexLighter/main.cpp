@@ -160,7 +160,7 @@ int main(int argc,char **argv){
 		if(index!=String::npos) extension=mshFileName.substr(index+1,mshFileName.length()).toLower();
 		if(extension=="xmsh"){
 			XMSHStreamer::ptr streamer=new XMSHStreamer(NULL);
-			streamer->save(fout,mesh,NULL,NULL);
+			streamer->save(fout,mesh,NULL);
 		}
 		else{
 			std::cerr << "Error saving \"" << (const char*)mshFileName << "\"" << std::endl;
