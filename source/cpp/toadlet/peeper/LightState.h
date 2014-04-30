@@ -32,8 +32,10 @@
 namespace toadlet{
 namespace peeper{
 
-class TOADLET_API LightState{
+class TOADLET_API TOADLET_ALIGNED LightState{
 public:
+	TOADLET_ALIGNED_NEW;
+
 	enum Type{
 		Type_DIRECTION,
 		Type_POINT,

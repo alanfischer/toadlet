@@ -85,7 +85,7 @@ int main(int argc,char **argv){
 				return 0;
 			}
 			XANMStreamer::ptr streamer=new XANMStreamer(engine);
-			streamer->save(stream,sequence,NULL,NULL);
+			streamer->save(stream,sequence,NULL);
 		}
 	}
 
@@ -108,7 +108,7 @@ int main(int argc,char **argv){
 				return 0;
 			}
 			XANMStreamer::ptr streamer=new XANMStreamer(engine);
-			Sequence::ptr sequence=shared_static_cast<Sequence>(streamer->load(stream,NULL,NULL));
+			Sequence::ptr sequence=shared_static_cast<Sequence>(streamer->load(stream,NULL));
 			skeleton->addSequence(sequence);
 		}
 
@@ -119,7 +119,7 @@ int main(int argc,char **argv){
 		}
 
 		XMSHStreamer::ptr streamer=new XMSHStreamer(engine);
-		streamer->save(stream,mesh,NULL,NULL);
+		streamer->save(stream,mesh,NULL);
 	}
 
 	if(scale!=1.0f){
@@ -164,7 +164,7 @@ int main(int argc,char **argv){
 		}
 
 		XMSHStreamer::ptr streamer=new XMSHStreamer(NULL);
-		streamer->save(stream,mesh,NULL,NULL);
+		streamer->save(stream,mesh,NULL);
 	}
 
 	std::cout << "complete" << std::endl;

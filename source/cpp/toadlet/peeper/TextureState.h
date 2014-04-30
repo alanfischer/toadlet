@@ -31,8 +31,10 @@
 namespace toadlet{
 namespace peeper{
 
-class TOADLET_API TextureState{
+class TOADLET_API TOADLET_ALIGNED TextureState{
 public:
+	TOADLET_ALIGNED_NEW;
+
 	enum Operation{
 		Operation_UNSPECIFIED,
 		Operation_REPLACE,

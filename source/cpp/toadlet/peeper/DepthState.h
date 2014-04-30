@@ -31,8 +31,10 @@
 namespace toadlet{
 namespace peeper{
 
-class TOADLET_API DepthState{
+class TOADLET_API TOADLET_ALIGNED DepthState{
 public:
+	TOADLET_ALIGNED_NEW;
+
 	enum DepthTest{
 		DepthTest_NEVER,
 		DepthTest_LESS,

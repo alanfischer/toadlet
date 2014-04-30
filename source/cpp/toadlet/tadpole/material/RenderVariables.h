@@ -37,7 +37,7 @@ namespace material{
 
 class DataVariable:public RenderVariable{
 public:
-	TOADLET_ALIGNED_NEW
+	TOADLET_ALIGNED_NEW;
 
 	DataVariable(int format,int size){
 		mFormat=format;
@@ -66,7 +66,7 @@ public:
 
 class MVPMatrixVariable:public RenderVariable{
 public:
-	TOADLET_ALIGNED_NEW
+	TOADLET_ALIGNED_NEW;
 
 	int getFormat(){return VariableBufferFormat::Format_TYPE_FLOAT_32|VariableBufferFormat::Format_COUNT_4X4|VariableBufferFormat::Format_BIT_PROJECTION;}
 
@@ -82,7 +82,7 @@ protected:
 
 class MVMatrixVariable:public RenderVariable{
 public:
-	TOADLET_ALIGNED_NEW
+	TOADLET_ALIGNED_NEW;
 
 	int getFormat(){return VariableBufferFormat::Format_TYPE_FLOAT_32|VariableBufferFormat::Format_COUNT_4X4;}
 
@@ -97,7 +97,7 @@ protected:
 
 class ModelMatrixVariable:public RenderVariable{
 public:
-	TOADLET_ALIGNED_NEW
+	TOADLET_ALIGNED_NEW;
 
 	int getFormat(){return VariableBufferFormat::Format_TYPE_FLOAT_32|VariableBufferFormat::Format_COUNT_4X4;}
 
@@ -111,7 +111,7 @@ protected:
 
 class ViewMatrixVariable:public RenderVariable{
 public:
-	TOADLET_ALIGNED_NEW
+	TOADLET_ALIGNED_NEW;
 
 	int getFormat(){return VariableBufferFormat::Format_TYPE_FLOAT_32|VariableBufferFormat::Format_COUNT_4X4;}
 
@@ -122,7 +122,7 @@ public:
 
 class ProjectionMatrixVariable:public RenderVariable{
 public:
-	TOADLET_ALIGNED_NEW
+	TOADLET_ALIGNED_NEW;
 
 	int getFormat(){return VariableBufferFormat::Format_TYPE_FLOAT_32|VariableBufferFormat::Format_COUNT_4X4|VariableBufferFormat::Format_BIT_PROJECTION;}
 
@@ -133,7 +133,7 @@ public:
 
 class NormalMatrixVariable:public RenderVariable{
 public:
-	TOADLET_ALIGNED_NEW
+	TOADLET_ALIGNED_NEW;
 
 	int getFormat(){return VariableBufferFormat::Format_TYPE_FLOAT_32|VariableBufferFormat::Format_COUNT_4X4;}
 
@@ -412,6 +412,8 @@ public:
 
 class ScalarVariable:public RenderVariable{
 public:
+	TOADLET_ALIGNED_NEW;
+
 	ScalarVariable(scalar s){mScalar=s;}
 
 	int getFormat(){return VariableBufferFormat::Format_TYPE_FLOAT_32|VariableBufferFormat::Format_COUNT_1;}
@@ -427,6 +429,8 @@ protected:
 
 class Vector4Variable:public RenderVariable{
 public:
+	TOADLET_ALIGNED_NEW;
+
 	Vector4Variable(const Vector4 &vector){mVector=vector;}
 
 	int getFormat(){return VariableBufferFormat::Format_TYPE_FLOAT_32|VariableBufferFormat::Format_COUNT_4;}
