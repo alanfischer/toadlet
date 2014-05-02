@@ -45,7 +45,7 @@ class LoggerListener;
 
 class TOADLET_API Log{
 public:
-	static void initialize(bool startSilent=false,bool perThread=false);
+	static void initialize(bool startSilent=false,bool perThread=false,const char *options=NULL);
 	static Logger *getInstance();
 	static void destroy();
 
