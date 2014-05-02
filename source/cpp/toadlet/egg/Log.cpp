@@ -37,6 +37,10 @@
 	#include <android/log.h>
 #endif
 
+#if !defined(TOADLET_PLATFORM_EMSCRIPTEN)
+	#include <toadlet/egg/SOSLoggerListener.h>
+#endif
+
 namespace toadlet{
 namespace egg{
 
@@ -316,23 +320,29 @@ Logger *Log::getInstance(){
 	return logger;
 }
 
-void Log::initialize(bool startSilent,bool perThread){
+void Log::initialize(bool startSilent,bool perThread,const char *options){
 	if(mTheLogger==NULL){
 		mTheLogger=new Logger(startSilent);
 
 		#if defined(TOADLET_PLATFORM_WIN32)
-			mListeners.add(new OutputDebugStringListener());
 			mListeners.add(new ConsoleListener());
+			mListeners.add(new OutputDebugStringListener());
 		#elif defined(TOADLET_PLATFORM_OSX)
+			mListeners.add(new StandardListener());
 			mListeners.add(new ASLListener());
-			mListeners.add(new StandardListener());
 		#elif defined(TOADLET_PLATFORM_ANDROID)
-			mListeners.add(new AndroidListener());
 			mListeners.add(new StandardListener());
+			mListeners.add(new AndroidListener());
 		#elif defined(TOADLET_PLATFORM_EMSCRIPTEN)
 			mListeners.add(new StandardListener());
 		#else
 			mListeners.add(new ANSIStandardListener());
+		#endif
+
+		#if !defined(TOADLET_PLATFORM_EMSCRIPTEN)
+			if(options!=NULL){
+				mListeners.add(new SOSLoggerListener(options));
+			}
 		#endif
 
 		int i;
@@ -356,6 +366,10 @@ void Log::destroy(){
 		delete mTheLogger;
 		mTheLogger=NULL;
 	}
+	for(Map<int,Logger*>::iterator it=mThreadLoggers.begin();it!=mThreadLoggers.end();++it){
+		delete it->second;
+	}
+	mThreadLoggers.clear();
 }
 
 }

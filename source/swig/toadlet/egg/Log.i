@@ -7,7 +7,7 @@ namespace egg{
 
 class Log{
 public:
-	static void initialize(bool startSlient=false);
+	static void initialize(bool startSlient=false,bool perThread=false,const char *options=NULL);
 	static Logger *getInstance();
 	static void destroy();
 	

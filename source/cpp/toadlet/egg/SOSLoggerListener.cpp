@@ -35,6 +35,7 @@ SOSLoggerListener::SOSLoggerListener(String serverAddress){
 	bool result = mSocket->connect(mServerAddress,4444);
 	
 	if (result == false) {
+		Log::alert("SOSLoggerListener could not connect!");
 		printf("SOSLoggerListener could not connect!\n");
 	}
 }
