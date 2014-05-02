@@ -402,14 +402,14 @@ double DataStream::readLDouble(){
 }
 
 int DataStream::readLVector2(math::Vector2 &v){
-	int amount=read((tbyte*)&v,sizeof(v));
+	int amount=read((tbyte*)&v,sizeof(math::real)*2);
 	littleFloatInPlace(v.x);
 	littleFloatInPlace(v.y);
 	return amount;
 }
 
 int DataStream::readLVector3(math::Vector3 &v){
-	int amount=read((tbyte*)&v,sizeof(v));
+	int amount=read((tbyte*)&v,sizeof(math::real)*3);
 	littleFloatInPlace(v.x);
 	littleFloatInPlace(v.y);
 	littleFloatInPlace(v.z);
@@ -417,7 +417,7 @@ int DataStream::readLVector3(math::Vector3 &v){
 }
 
 int DataStream::readLVector4(math::Vector4 &v){
-	int amount=read((tbyte*)&v,sizeof(v));
+	int amount=read((tbyte*)&v,sizeof(math::real)*4);
 	littleFloatInPlace(v.x);
 	littleFloatInPlace(v.y);
 	littleFloatInPlace(v.z);
@@ -426,7 +426,7 @@ int DataStream::readLVector4(math::Vector4 &v){
 }
 
 int DataStream::readLQuaternion(math::Quaternion &q){
-	int amount=read((tbyte*)&q,sizeof(q));
+	int amount=read((tbyte*)&q,sizeof(math::real)*4);
 	littleFloatInPlace(q.x);
 	littleFloatInPlace(q.y);
 	littleFloatInPlace(q.z);
@@ -450,14 +450,14 @@ int DataStream::readLSphere(math::Sphere &s){
 }
 
 int DataStream::readLVector2(mathfixed::Vector2 &v){
-	int amount=read((tbyte*)&v,sizeof(v));
+	int amount=read((tbyte*)&v,sizeof(mathfixed::fixed)*2);
 	littleInt32InPlace(v.x);
 	littleInt32InPlace(v.y);
 	return amount;
 }
 
 int DataStream::readLVector3(mathfixed::Vector3 &v){
-	int amount=read((tbyte*)&v,sizeof(v));
+	int amount=read((tbyte*)&v,sizeof(mathfixed::fixed)*3);
 	littleInt32InPlace(v.x);
 	littleInt32InPlace(v.y);
 	littleInt32InPlace(v.z);
@@ -465,7 +465,7 @@ int DataStream::readLVector3(mathfixed::Vector3 &v){
 }
 
 int DataStream::readLVector4(mathfixed::Vector4 &v){
-	int amount=read((tbyte*)&v,sizeof(v));
+	int amount=read((tbyte*)&v,sizeof(mathfixed::fixed)*4);
 	littleInt32InPlace(v.x);
 	littleInt32InPlace(v.y);
 	littleInt32InPlace(v.z);
@@ -474,7 +474,7 @@ int DataStream::readLVector4(mathfixed::Vector4 &v){
 }
 
 int DataStream::readLQuaternion(mathfixed::Quaternion &q){
-	int amount=read((tbyte*)&q,sizeof(q));
+	int amount=read((tbyte*)&q,sizeof(mathfixed::fixed)*4);
 	littleInt32InPlace(q.x);
 	littleInt32InPlace(q.y);
 	littleInt32InPlace(q.z);
