@@ -1,7 +1,6 @@
 #include "SOSLoggerListener.h"
 #include <toadlet/egg/Log.h>
-
-#include <stdio.h>
+#include <toadlet/egg/Error.h>
 
 namespace toadlet{
 namespace egg{
