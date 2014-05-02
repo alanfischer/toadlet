@@ -16,7 +16,10 @@ const char *const _sos_level_names[] = {
 	"Trace"
 };
 
-SOSLoggerListener::SOSLoggerListener(String serverAddress){
+SOSLoggerListener::SOSLoggerListener(String serverAddress):
+	mStop(false),
+	mTermination(0)
+{
 	// Turn off egg errors when in use, to avoid recursion
 	Log::getInstance()->setCategoryReportingLevel(Categories::TOADLET_EGG,Logger::Level_DISABLED);
 
@@ -24,20 +27,10 @@ SOSLoggerListener::SOSLoggerListener(String serverAddress){
 	mMutex=Mutex::ptr(new Mutex());
 	mCondition=WaitCondition::ptr(new WaitCondition());
 
-	mStop=false;
+	mSocket=Socket::createTCPSocket();
+
 	mThread=new Thread(this);
-	mThread->start();
-	
-	mTermination = 0;
-	
-	mSocket = Socket::createTCPSocket();
-	
-	bool result = mSocket->connect(mServerAddress,4444);
-	
-	if (result == false) {
-		Log::alert("SOSLoggerListener could not connect!");
-		printf("SOSLoggerListener could not connect!\n");
-	}
+	mThread->start();	
 }
 
 SOSLoggerListener::~SOSLoggerListener(){
@@ -97,6 +90,12 @@ void SOSLoggerListener::sendEntry(Logger::Category *category,Logger::Level level
 }
 
 void SOSLoggerListener::run(){
+	bool result = mSocket->connect(mServerAddress,4444);
+	if (result == false) {
+		Error::unknown("SOSLoggerListener could not connect!");
+		return;
+	}
+
 	Logger::Entry entry;
 	bool hasEntry=false;
 
