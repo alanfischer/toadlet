@@ -173,15 +173,15 @@ Mesh::ptr TMSHStreamer::readMesh(DataStream *stream,int blockSize){
 	for(i=0;i<numSubMeshes;++i){
 		Mesh::SubMesh::ptr subMesh=new Mesh::SubMesh();
 
-		subMesh->vertexData=readVertexData(stream);
-		subMesh->indexData=readIndexData(stream);
-
-		subMesh->materialName=stream->readNullTerminatedString();
-		
 		subMesh->setName(stream->readNullTerminatedString());
 
 		subMesh->transform=readTransform(stream);
 		subMesh->bound=readBound(stream);
+
+		subMesh->vertexData=readVertexData(stream);
+		subMesh->indexData=readIndexData(stream);
+
+		subMesh->materialName=stream->readNullTerminatedString();
 
 		mesh->addSubMesh(subMesh);
 	}
@@ -211,15 +211,15 @@ void TMSHStreamer::writeMesh(DataStream *stream,Mesh::ptr mesh){
 	for(i=0;i<mesh->getNumSubMeshes();++i){
 		Mesh::SubMesh::ptr subMesh=mesh->getSubMesh(i);
 
-		writeVertexData(stream,subMesh->vertexData);
-		writeIndexData(stream,subMesh->indexData);
-
 		stream->writeNullTerminatedString(subMesh->materialName);
-
-		stream->writeNullTerminatedString(subMesh->getName());
 
 		writeTransform(stream,subMesh->transform);
 		writeBound(stream,subMesh->bound);
+
+		writeVertexData(stream,subMesh->vertexData);
+		writeIndexData(stream,subMesh->indexData);
+
+		stream->writeNullTerminatedString(subMesh->getName());
 	}
 	writeVertexData(stream,mesh->getStaticVertexData());
 
