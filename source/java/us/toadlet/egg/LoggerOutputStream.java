@@ -11,11 +11,23 @@ public class LoggerOutputStream extends OutputStream{
 	}
 	
 	public void write(byte[] b){
-		mBuilder.append(new String(b));
+		String string=new String(b);
+		if(string.endsWith(System.getProperty("line.separator"))){
+			string = string.substring(0,string.length()-System.getProperty("line.separator").length());
+		}
+		if(string.length()>0){
+			mBuilder.append(string);
+		}
 	}
 
 	public void write(byte[] b, int off, int len){
-		mBuilder.append(new String(b,off,len));
+		String string=new String(b,off,len);
+		if(string.endsWith(System.getProperty("line.separator"))){
+			string = string.substring(0,string.length()-System.getProperty("line.separator").length());
+		}
+		if(string.length()>0){
+			mBuilder.append(string);
+		}
 	}
 	
 	public void write(int b){
@@ -23,12 +35,10 @@ public class LoggerOutputStream extends OutputStream{
 	}
 	
 	public void flush(){
-		String string=mBuilder.toString();
-		if(string.endsWith("\n")){
-			string = string.substring(0,string.length()-1);
+		if(mBuilder.length()>0){
+			mLogger.addLogEntry(mCategory,mLevel,mBuilder.toString());
+			mBuilder.delete(0,mBuilder.length());
 		}
-		mLogger.addLogEntry(mCategory,mLevel,string);
-		mBuilder.delete(0,mBuilder.length());
 	}
 	
 	StringBuilder mBuilder;
