@@ -521,8 +521,8 @@ void StudioModelComponent::updateVertexes(StudioModel *model,int bodypartsIndex,
 	studiomodel *smodel=model->model(sbodyparts,modelIndex);
 	tbyte *svertbone=((tbyte*)model->data+smodel->vertinfoindex);
 	tbyte *snormbone=((tbyte*)model->data+smodel->norminfoindex);
-	Vector3 *sverts=(Vector3*)(model->data+smodel->vertindex);
-	Vector3 *snorms=(Vector3*)(model->data+smodel->normindex);
+	vec3_t *sverts=(vec3_t*)(model->data+smodel->vertindex);
+	vec3_t *snorms=(vec3_t*)(model->data+smodel->normindex);
 
 	Vector3 normal;
 	Vector2 chrome;

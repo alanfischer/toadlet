@@ -428,8 +428,9 @@ void BSP30Node::addLeafToVisible(bleaf *leaf,const Vector3 &cameraPosition){
 		// Check the proper markedfaces bit
 		if(!(mMarkedFaces[faceIndex>>3]&(1<<(faceIndex&7)))){
 			bface *face=&mMap->faces[faceIndex];
+			bplane *plane=&mMap->planes[face->planenum];
 
-			float d=Math::length(*(Plane*)&mMap->planes[face->planenum],cameraPosition);
+			float d=Math::length(Plane(plane->normal,plane->dist),cameraPosition);
 			if(face->side){
 				if(d>0) continue;
 			}
