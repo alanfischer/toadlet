@@ -279,7 +279,7 @@ bool WGLWindowRenderTarget::activateAdditionalContext(){
 	int i;
 	for(i=0;i<mThreadIDs.size();++i){
 		if(mThreadIDs[i]==threadID){
-			return false;
+			return true;
 		}
 	}
 
@@ -289,14 +289,19 @@ bool WGLWindowRenderTarget::activateAdditionalContext(){
 		}
 	}
 	if(i==mThreadIDs.size()){
+		Error::unknown(Categories::TOADLET_PEEPER,"no available thread contexts");
 		return false;
 	}
 
 	BOOL result=wglMakeCurrent(mDC,mThreadContexts[i]);
-	if(result==TRUE){
-		mThreadIDs[i]=threadID;
+	if(!result){
+		Error::unknown(Categories::TOADLET_PEEPER,String("wglMakeCurrent failed:")+GetLastError());
+		return false;
 	}
-	return result==TRUE;
+
+	mThreadIDs[i]=threadID;
+
+	return true;
 }
 
 void WGLWindowRenderTarget::deactivateAdditionalContext(){
