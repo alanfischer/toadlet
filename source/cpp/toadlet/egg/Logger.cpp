@@ -48,10 +48,7 @@ Logger::~Logger(){
 		mCategoryNameCategoryMap.erase(mCategoryNameCategoryMap.begin());
 	}
 
-	int i;
-	for(i=0;i<mLogEntries.size();++i){
-		delete mLogEntries[i];
-	}
+	clearLogEntries();
 }
 
 void Logger::setMasterReportingLevel(Level level){
@@ -131,6 +128,10 @@ void Logger::flush(){
 
 void Logger::clearLogEntries(){
 	lock();
+		int i;
+		for(i=0;i<mLogEntries.size();++i){
+			delete mLogEntries[i];
+		}
 		mLogEntries.clear();
 	unlock();
 }
