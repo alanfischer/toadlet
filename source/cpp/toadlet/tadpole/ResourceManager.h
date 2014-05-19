@@ -108,6 +108,7 @@ protected:
 		ResourceRequest::ptr mRequest;
 		ResourceData::ptr mData;
 		Collection<Archive::ptr>::iterator mIt;
+		bool mPushedTemp;
 	};
 
 	class SyncRequest:public Object,public ResourceRequest{
