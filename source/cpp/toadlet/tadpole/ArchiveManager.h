@@ -46,6 +46,10 @@ public:
 
 	void addDirectory(const String &directory);
 	void removeDirectory(const String &directory);
+
+	void pushDirectory(const String &directory);
+	void popDirectory();
+
 	int getNumDirectories() const{return mDirectories.size();}
 	String getDirectory(int i) const{return mDirectories[i];}
 

@@ -401,6 +401,7 @@ ResourceManager::ArchiveResourceRequest::ArchiveResourceRequest(ResourceManager 
 	mData->setName(mName);
 	mRequest=request;
 	mIt=manager->mResourceArchives.begin();
+	mPushedTemp=false;
 }
 
 void ResourceManager::ArchiveResourceRequest::request(){
@@ -445,6 +446,10 @@ void ResourceManager::ArchiveResourceRequest::notFound(){
 }
 
 void ResourceManager::ArchiveResourceRequest::resourceReady(Resource *resource){
+	if(mPushedTemp){
+		mManager->mEngine->getArchiveManager()->popDirectory();
+	}
+
 	resource->setName(mName);
 	mManager->manage(resource);
 
@@ -452,6 +457,10 @@ void ResourceManager::ArchiveResourceRequest::resourceReady(Resource *resource){
 }
 
 void ResourceManager::ArchiveResourceRequest::resourceException(const Exception &ex){
+	if(mPushedTemp){
+		mManager->mEngine->getArchiveManager()->popDirectory();
+	}
+
 	mIt++;
 	request();
 }
@@ -476,15 +485,14 @@ void ResourceManager::ArchiveResourceRequest::streamReady(Stream *stream){
 	}
 
 	if(tempPath.length()>0){
-		Log::warning("no longer adding temp paths, needs to be cleaned");
-//		engine->getArchiveManager()->addDirectory(tempPath);
+		mPushedTemp=true;
+		engine->getArchiveManager()->pushDirectory(tempPath);
+	}
+	else{
+		mPushedTemp=false;
 	}
 
 	mStreamer->load(stream,mData,this);
-
-	if(tempPath.length()>0){
-//		engine->getArchiveManager()->removeDirectory(tempPath);
-	}
 }
 
 void ArchiveManager::ArchiveResourceRequest::streamException(const Exception &ex){

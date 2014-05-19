@@ -56,6 +56,14 @@ void ArchiveManager::removeDirectory(const String &directory){
 	mDirectories.remove(cleanPath(directory,true));
 }
 
+void ArchiveManager::pushDirectory(const String &directory){
+	mDirectories.add(cleanPath(directory,true));
+}
+
+void ArchiveManager::popDirectory(){
+	mDirectories.removeAt(mDirectories.size()-1);
+}
+
 bool ArchiveManager::openStream(const String &name,StreamRequest *request){
 	ArchiveStreamRequest::ptr streamRequest=new ArchiveStreamRequest(this,name,request);
 	streamRequest->request();

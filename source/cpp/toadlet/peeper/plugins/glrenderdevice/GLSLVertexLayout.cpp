@@ -48,7 +48,7 @@ bool GLSLVertexLayout::create(GLVertexFormat *vertexFormat,GLSLShaderState *shad
 		if(location==-1){
 			location=GLRenderDevice::getFixedAttribFromSemantic(vertexFormat->getElementSemantic(i),vertexFormat->getElementIndex(i));
 		}
-		Log::alert(Categories::TOADLET_PEEPER,
+		Log::excess(Categories::TOADLET_PEEPER,
 			String("Semantic name:")+vertexFormat->getElementName(i)+" found location:"+location);
 		mSemanticIndexes[i]=location;
 	}
