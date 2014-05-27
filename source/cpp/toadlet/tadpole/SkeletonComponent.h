@@ -56,9 +56,9 @@ public:
 		virtual int updateBoneTransform(Bone *bone)=0;
 	};
 
-	class TOADLET_API TOADLET_ALIGNED Bone{
+	class TOADLET_API TOADLET_ALIGNED Bone:public Object{
 	public:
-		TOADLET_SPTR(Bone);
+		TOADLET_OBJECT(Bone);
 
 		TOADLET_ALIGNED_NEW;
 

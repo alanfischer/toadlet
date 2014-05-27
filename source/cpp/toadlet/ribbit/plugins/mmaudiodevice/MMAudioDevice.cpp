@@ -62,7 +62,7 @@ bool MMAudioDevice::create(int options){
 	Log::alert(Categories::TOADLET_RIBBIT,
 		"creating MMAudioDevice");
 
-	mFormat=AudioFormat::ptr(new AudioFormat(16,2,11025));
+	mFormat=new AudioFormat(16,2,11025);
 	mBufferSize=1024;
 	mNumBuffers=4;
 

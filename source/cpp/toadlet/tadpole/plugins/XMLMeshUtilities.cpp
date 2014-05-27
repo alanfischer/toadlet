@@ -766,7 +766,7 @@ Skeleton::ptr XMLMeshUtilities::loadSkeleton(mxml_node_t *node,int version){
 			continue;
 		}
 
-		Skeleton::Bone::ptr bone(new Skeleton::Bone());
+		Skeleton::Bone::ptr bone=new Skeleton::Bone();
 
 		prop=mxmlElementGetAttr(boneNode,"Index");
 		if(prop!=NULL){

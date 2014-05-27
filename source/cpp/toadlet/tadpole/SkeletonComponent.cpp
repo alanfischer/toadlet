@@ -51,7 +51,7 @@ SkeletonComponent::SkeletonComponent(Engine *engine,Skeleton *skeleton):
 	mBones.resize(skeleton->getNumBones());
 	int i;
 	for(i=0;i<skeleton->getNumBones();++i){
-		mBones[i]=Bone::ptr(new Bone(i));
+		mBones[i]=new Bone(i);
 	}
 
 	mAnimations.resize(mSkeleton->getNumSequences());

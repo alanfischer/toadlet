@@ -40,7 +40,7 @@ OggVorbisDecoder::OggVorbisDecoder():
 	mDataLength(0)
 {
 	mVorbisFile=new OggVorbis_File();
-	mFormat=AudioFormat::ptr(new AudioFormat());
+	mFormat=new AudioFormat();
 }
 
 OggVorbisDecoder::~OggVorbisDecoder(){
@@ -90,7 +90,7 @@ bool OggVorbisDecoder::startStream(Stream *stream){
 		return false;
 	}
 
-	mFormat=AudioFormat::ptr(new AudioFormat(16,mVorbisInfo->channels,mVorbisInfo->rate));
+	mFormat=new AudioFormat(16,mVorbisInfo->channels,mVorbisInfo->rate);
 
 	return true;
 }

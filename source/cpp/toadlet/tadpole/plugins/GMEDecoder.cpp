@@ -34,7 +34,7 @@ GMEDecoder::GMEDecoder():
 	emu(NULL),
 	mTrack(0)
 {
-	mFormat=AudioFormat::ptr(new AudioFormat(16,2,22050));
+	mFormat=new AudioFormat(16,2,22050);
 }
 
 GMEDecoder::~GMEDecoder(){

@@ -79,7 +79,7 @@ FFmpegAudioStream::FFmpegAudioStream(FFmpegController *controller,FFmpegControll
 	mPkt.data=NULL;
 
 	AVCodecContext *ctx=mStreamData->codecCtx;
-	mAudioFormat=AudioFormat::ptr(new AudioFormat(16,ctx->channels,ctx->sample_rate));
+	mAudioFormat=new AudioFormat(16,ctx->channels,ctx->sample_rate);
 	mDecodeBuffer=(tbyte*)av_mallocz(AVCODEC_MAX_AUDIO_FRAME_SIZE);
 }
 
