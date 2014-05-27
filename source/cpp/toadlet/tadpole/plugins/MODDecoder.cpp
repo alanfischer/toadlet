@@ -33,7 +33,7 @@ namespace tadpole{
 MODDecoder::MODDecoder():
 	mFile(NULL)
 {
-	mFormat=AudioFormat::ptr(new AudioFormat(16,2,22050));
+	mFormat=new AudioFormat(16,2,22050);
 }
 
 MODDecoder::~MODDecoder(){

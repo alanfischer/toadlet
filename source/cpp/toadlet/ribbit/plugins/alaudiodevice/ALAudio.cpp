@@ -100,7 +100,7 @@ bool ALAudio::create(AudioStream *stream){
 
 	mAudioStream=stream;
 	mAudioBuffer=NULL;
-	mAudioFormat=AudioFormat::ptr(new AudioFormat(stream->getAudioFormat()->getBitsPerSample(),stream->getAudioFormat()->getChannels(),stream->getAudioFormat()->getSamplesPerSecond()));
+	mAudioFormat=new AudioFormat(stream->getAudioFormat()->getBitsPerSample(),stream->getAudioFormat()->getChannels(),stream->getAudioFormat()->getSamplesPerSecond());
 	mAudioFormat->setChannels(mGlobal?mAudioStream->getAudioFormat()->getChannels():1);
 
 	update(0);

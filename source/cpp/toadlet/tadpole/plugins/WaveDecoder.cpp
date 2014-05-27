@@ -76,7 +76,7 @@ bool WaveDecoder::startStream(Stream *stream){
 	WAVEFORMAT fmt;
 
 	mStream=stream;
-	mFormat=AudioFormat::ptr(new AudioFormat(16,1,22050));
+	mFormat=new AudioFormat(16,1,22050);
 
 	if(stream->read((tbyte*)&header,sizeof(header))!=sizeof(header)){
 		Error::unknown("unable to read header");
@@ -119,7 +119,7 @@ bool WaveDecoder::startStream(Stream *stream){
 			littleUInt16InPlace(fmt.nBlockAlign);
 			littleUInt16InPlace(fmt.wBitsPerSample);
 
-			mFormat=AudioFormat::ptr(new AudioFormat(fmt.wBitsPerSample,fmt.nChannels,fmt.nSamplesPerSec));
+			mFormat=new AudioFormat(fmt.wBitsPerSample,fmt.nChannels,fmt.nSamplesPerSec);
 
 			skip(stream,chunk.dwSize-sizeof(fmt));
 		}

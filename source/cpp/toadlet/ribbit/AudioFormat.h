@@ -31,9 +31,9 @@
 namespace toadlet{
 namespace ribbit{
 
-class TOADLET_API AudioFormat{
+class TOADLET_API AudioFormat:public Object{
 public:
-	TOADLET_SPTR(AudioFormat);
+	TOADLET_OBJECT(AudioFormat);
 
 	AudioFormat(int bps=0,int chan=0,int sps=0):
 		bitsPerSample(bps),

@@ -65,7 +65,7 @@ SIDDecoder::SIDDecoder():
 	sid(NULL),
 	mTrack(0)
 {
-	mFormat=AudioFormat::ptr(new AudioFormat());
+	mFormat=new AudioFormat();
 	sid=new SIDAttributes();
 	#if SIDPLAY_VERSION==1
 		sid->player=&engine;
@@ -117,14 +117,14 @@ bool SIDDecoder::openStream(Stream *stream){
 	sid->config.bitsPerSample=16;
 	sid->config.channels=1;
 
-	mFormat=AudioFormat::ptr(new AudioFormat(sid->config.bitsPerSample,sid->config.channels,sid->config.frequency));
+	mFormat=new AudioFormat(sid->config.bitsPerSample,sid->config.channels,sid->config.frequency);
 
 	sid->player->setConfig(sid->config);
 #elif SIDPLAY_VERSION==2
 	sid->config=sid->player->config();
 	sid->info=sid->player->info();
 
-	mFormat=AudioFormat::ptr(new AudioFormat(sid->config.precision,sid->info.channels,sid->config.frequency));
+	mFormat=new AudioFormat(sid->config.precision,sid->info.channels,sid->config.frequency);
 
 	ReSIDBuilder *resid=new ReSIDBuilder("ReSID");
 	resid->create(sid->info.maxsids);

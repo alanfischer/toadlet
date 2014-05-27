@@ -48,12 +48,28 @@ public:
 	const Collection<String> &getEntries(){return mEntries;}
 
 	struct wheader{
+		wheader():
+			numlumps(0),
+			infotableofs(0){
+			identification[0]=0;
+		}
+
 		char identification[4]; // should be WAD2 or 2DAW
 		int numlumps;
 		int	infotableofs;
 	};
 
 	struct wlumpinfo{
+		wlumpinfo():
+			filepos(0),
+			disksize(0),
+			size(0),
+			type(0),
+			compression(0),
+			pad1(0),pad2(0){
+			name[0]=NULL;
+		}
+
 		int filepos;
 		int disksize;
 		int size; // uncompressed
@@ -65,6 +81,11 @@ public:
 
 	const static int MIPLEVELS=4;
 	struct wmiptex{
+		wmiptex():
+			width(0),height(0){
+			name[0]=0;
+			offsets[0]=0;
+		}
 		char name[16];
 		unsigned int width, height;
 		unsigned int offsets[MIPLEVELS]; // four mip maps stored
