@@ -2,7 +2,7 @@
 #define PARTICLES_H
 
 #include <toadlet/toadlet.h>
-//#include <LFX2.h>
+#include <LFX2.h>
 
 class Particles:public Object,public Applet{
 public:

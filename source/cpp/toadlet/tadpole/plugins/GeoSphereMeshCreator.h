@@ -61,6 +61,12 @@ public:
 protected:
 	class IndexTri{
 	public:
+		IndexTri(){
+			index[0]=0;
+			index[1]=0;
+			index[2]=0;
+		}
+
 		void set(int i1,int i2,int i3){
 			index[0]=i1;
 			index[1]=i2;

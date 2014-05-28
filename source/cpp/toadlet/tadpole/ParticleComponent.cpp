@@ -121,7 +121,7 @@ bool ParticleComponent::setNumParticles(int numParticles,int particleType,scalar
 		}
 	}
 	else{
-		mBeamCount=numParticles/mBeamLength;
+		mBeamCount=numParticles/Math::maxVal(mBeamLength,1);
 	}
 
 	if(mBeamLength>=2){

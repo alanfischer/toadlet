@@ -33,7 +33,7 @@ void Particles::create(){
 		Vector3(-ten,-ten,0),
 	};
 
-	Material::ptr pointMaterial=engine->createPointSpriteMaterial(engine->getTextureManager()->findTexture("sparkle.png"),ten,false);
+	Material::ptr pointMaterial=engine->createPointSpriteMaterial(shared_static_cast<Texture>(engine->getTextureManager()->find("sparkle.png")),ten,false);
 	if(pointMaterial!=NULL){
 		pointMaterial->getPass()->setBlendState(BlendState::Combination_ALPHA_ADDITIVE);
 		pointMaterial->getPass()->setRasterizerState(RasterizerState(RasterizerState::CullType_NONE));
@@ -41,7 +41,7 @@ void Particles::create(){
 		pointMaterial->getPass()->setDepthState(DepthState(DepthState::DepthTest_LEQUAL,false));
 	}
 
-	Material::ptr spriteMaterial=engine->getMaterialManager()->findMaterial("sparkle.png");
+	Material::ptr spriteMaterial=shared_static_cast<Material>(engine->getMaterialManager()->find("sparkle.png"));
 	if(spriteMaterial!=NULL){
 		spriteMaterial->getPass()->setBlendState(BlendState::Combination_ALPHA_ADDITIVE);
 		spriteMaterial->getPass()->setRasterizerState(RasterizerState(RasterizerState::CullType_NONE));
@@ -49,7 +49,7 @@ void Particles::create(){
 		spriteMaterial->getPass()->setDepthState(DepthState(DepthState::DepthTest_LEQUAL,false));
 	}
 
-	Material::ptr beamMaterial=engine->getMaterialManager()->findMaterial("fancyGlow.png");
+	Material::ptr beamMaterial=shared_static_cast<Material>(engine->getMaterialManager()->find("fancyGlow.png"));
 	if(beamMaterial!=NULL){
 		beamMaterial->getPass()->setBlendState(BlendState::Combination_ALPHA_ADDITIVE);
 		beamMaterial->getPass()->setRasterizerState(RasterizerState(RasterizerState::CullType_NONE));
