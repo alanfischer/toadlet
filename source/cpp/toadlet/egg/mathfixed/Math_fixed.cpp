@@ -656,7 +656,7 @@ bool Math::unprojectSegment(Segment &result,const Matrix4x4 &projViewMatrix,int 
 }
 
 int Math::setClipPlanesFromProjectionMatrix(Plane *planes,int maxNumPlanes,const Matrix4x4 &m){
-	scalar *d=m.data;
+	const fixed *d=m.data;
 
 	// Right clipping plane.
 	normalize(planes[0].set(d[3]-d[0], d[7]-d[4], d[11]-d[8], d[15]-d[12]));
