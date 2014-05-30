@@ -395,7 +395,7 @@ void Camera::updateWorldTransform(){
 }
 
 void Camera::updateClippingPlanes(){
-	Math::setClipPlanesFromProjectionMatrix(mClipPLanes,6,mViewProjectionMatrix);
+	Math::setClipPlanesFromProjectionMatrix(mClipPlanes,6,mViewProjectionMatrix);
 }
 
 void Camera::autoUpdateProjection(RenderTarget *target){
