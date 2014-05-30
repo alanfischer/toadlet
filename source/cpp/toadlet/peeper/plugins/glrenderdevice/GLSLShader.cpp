@@ -77,11 +77,16 @@ bool GLSLShader::createContext(){
 			return false;
 		break;
 	}
-	
-	mHandle=glCreateShader(mTarget);
-	
+
 	const char *string=mCode.c_str();
 	int length=mCode.length();
+
+	if(length==0){
+		return true;
+	}
+
+	mHandle=glCreateShader(mTarget);
+	
 	glShaderSource(mHandle,1,&string,&length);
 	glCompileShader(mHandle);
 	
