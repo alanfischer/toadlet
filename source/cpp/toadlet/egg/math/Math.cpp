@@ -876,6 +876,25 @@ bool Math::unprojectSegment(Segment &result,const Matrix4x4 &projViewMatrix,int 
 	return true;
 }
 
+int Math::setClipPlanesFromProjectionMatrix(Plane *planes,int maxNumPlanes,const Matrix4x4 &m){
+	scalar *d=m.data;
+
+	// Right clipping plane.
+	normalize(planes[0].set(d[3]-d[0], d[7]-d[4], d[11]-d[8], d[15]-d[12]));
+	// Left clipping plane.
+	normalize(planes[1].set(d[3]+d[0], d[7]+d[4], d[11]+d[8], d[15]+d[12]));
+	// Bottom clipping plane.
+	normalize(planes[2].set(d[3]+d[1], d[7]+d[5], d[11]+d[9], d[15]+d[13]));
+	// Top clipping plane.
+	normalize(planes[3].set(d[3]-d[1], d[7]-d[5], d[11]-d[9], d[15]-d[13]));
+	// Far clipping plane.
+	normalize(planes[4].set(d[3]-d[2], d[7]-d[6], d[11]-d[10], d[15]-d[14]));
+	// Near clipping plane.
+	normalize(planes[5].set(d[3]+d[2], d[7]+d[6], d[11]+d[10], d[15]+d[14]));
+
+	return 6;
+}
+
 bool Math::getIntersectionOfThreePlanes(Vector3 &result,const Plane &p1,const Plane &p2,const Plane &p3,real epsilon){
 	Vector3 p2xp3;
 	cross(p2xp3,p2.normal,p3.normal);
