@@ -395,19 +395,7 @@ void Camera::updateWorldTransform(){
 }
 
 void Camera::updateClippingPlanes(){
-	scalar *vpt=mViewProjectionMatrix.data;
-	// Right clipping plane.
-	Math::normalize(mClipPlanes[0].set(vpt[3]-vpt[0], vpt[7]-vpt[4], vpt[11]-vpt[8], vpt[15]-vpt[12]));
-	// Left clipping plane.
-	Math::normalize(mClipPlanes[1].set(vpt[3]+vpt[0], vpt[7]+vpt[4], vpt[11]+vpt[8], vpt[15]+vpt[12]));
-	// Bottom clipping plane.
-	Math::normalize(mClipPlanes[2].set(vpt[3]+vpt[1], vpt[7]+vpt[5], vpt[11]+vpt[9], vpt[15]+vpt[13]));
-	// Top clipping plane.
-	Math::normalize(mClipPlanes[3].set(vpt[3]-vpt[1], vpt[7]-vpt[5], vpt[11]-vpt[9], vpt[15]-vpt[13]));
-	// Far clipping plane.
-	Math::normalize(mClipPlanes[4].set(vpt[3]-vpt[2], vpt[7]-vpt[6], vpt[11]-vpt[10], vpt[15]-vpt[14]));
-	// Near clipping plane.
-	Math::normalize(mClipPlanes[5].set(vpt[3]+vpt[2], vpt[7]+vpt[6], vpt[11]+vpt[10], vpt[15]+vpt[14]));
+	Math::setClipPlanesFromProjectionMatrix(mClipPlanes,6,mViewProjectionMatrix);
 }
 
 void Camera::autoUpdateProjection(RenderTarget *target){
