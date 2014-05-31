@@ -97,7 +97,7 @@ Node::ptr Input::makeLabel(const String &name){
 	Node::ptr node=new Node(scene);
 	
 	SpriteComponent::ptr sprite=new SpriteComponent(engine);
-	sprite->setMaterial(engine->getMaterialManager()->findMaterial(name));
+	sprite->setMaterial(name);
 	node->attach(sprite);
 
 	node->setScale(10);
@@ -108,11 +108,11 @@ Node::ptr Input::makeNeedle(){
 	Node::ptr node=new Node(scene);
 
 	MeshComponent::ptr eye=new MeshComponent(engine);
-	eye->setMesh(engine->createSphereMesh(Sphere(1),engine->getMaterialManager()->findMaterial("P.png")));
+	eye->setMesh(engine->createSphereMesh(Sphere(1),shared_static_cast<Material>(engine->getMaterialManager()->find("P.png"))));
 	node->attach(eye);
 
  	MeshComponent::ptr point=new MeshComponent(engine);
-	point->setMesh(engine->createAABoxMesh(AABox(-.25,0,-.25,.25,10,.25),engine->getMaterialManager()->findMaterial("P.png")));
+	point->setMesh(engine->createAABoxMesh(AABox(-.25,0,-.25,.25,10,.25),shared_static_cast<Material>(engine->getMaterialManager()->find("P.png"))));
 	node->attach(point);
 
 	return node;
