@@ -1360,6 +1360,8 @@ namespace Math{
 		return p.normal.x*v.x + p.normal.y*v.y + p.normal.z*v.z - p.distance;
 	}
 
+	TOADLET_API int setClipPlanesFromProjectionMatrix(Plane *planes,int maxNumPlanes,const Matrix4x4 &m);
+
 	TOADLET_API bool getIntersectionOfThreePlanes(Vector3 &result,const Plane &p1,const Plane &p2,const Plane &p3,real epsilon);
 
 	TOADLET_API void getLineOfIntersection(Segment &result,const Plane &plane1,const Plane &plane2);
