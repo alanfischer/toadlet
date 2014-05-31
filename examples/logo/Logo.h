@@ -5,7 +5,7 @@
 
 class Logo:public Object,public Applet{
 public:
-	TOADLET_OBJECT(Logo);
+	TOADLET_IOBJECT(Logo);
 
 	Logo(Application *app);
 	virtual ~Logo();

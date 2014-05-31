@@ -5,7 +5,7 @@
 
 class Input:public Object,public Applet,public InputDeviceListener{
 public:
-	TOADLET_OBJECT(Input);
+	TOADLET_IOBJECT(Input);
 
 	Input(Application *app);
 	virtual ~Input();
