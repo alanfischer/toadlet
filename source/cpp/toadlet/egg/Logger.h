@@ -95,8 +95,9 @@ public:
 	void setStoreLogEntry(bool storeLogEntry);
 	bool getStoreLogEntry() const{return mStoreLogEntry;}
 
-	void addLogEntry(const char *categoryName,Level level,const char *text);
 	void addLogEntry(Level level,const char *text){addLogEntry((char*)NULL,level,text);}
+	void addLogEntry(const char *categoryName,Level level,const char *text){addLogEntry(getCategory(categoryName),level,text);}
+	void addLogEntry(Category *category,Level level,const char *text);
 
 	void flush();
 
