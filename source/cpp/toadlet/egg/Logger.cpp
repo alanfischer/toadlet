@@ -108,8 +108,7 @@ void Logger::setStoreLogEntry(bool storeLogEntry){
 	unlock();
 }
 
-void Logger::addLogEntry(const char *categoryName,Level level,const char *text){
-	Category *category=getCategory(categoryName);
+void Logger::addLogEntry(Category *category,Level level,const char *text){
 	lock();
 		if((category==NULL || category->reportingLevel>=level) && mReportingLevel>=level){
 			addCompleteLogEntry(category,level,text);
