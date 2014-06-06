@@ -56,7 +56,7 @@ public:
 
 		char identification[4]; // should be WAD2 or 2DAW
 		int numlumps;
-		int	infotableofs;
+		int infotableofs;
 	};
 
 	struct wlumpinfo{
@@ -67,7 +67,7 @@ public:
 			type(0),
 			compression(0),
 			pad1(0),pad2(0){
-			name[0]=NULL;
+			name[0]=0;
 		}
 
 		int filepos;

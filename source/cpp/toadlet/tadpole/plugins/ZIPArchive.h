@@ -26,16 +26,15 @@
 #ifndef TOADLET_TADPOLE_ZIPARCHIVE_H
 #define TOADLET_TADPOLE_ZIPARCHIVE_H
 
-#include <toadlet/egg/BaseResource.h>
-#include <toadlet/egg/io/Archive.h>
+#include <toadlet/egg/io/BaseArchive.h>
 #include <toadlet/tadpole/Types.h>
 
 namespace toadlet{
 namespace tadpole{
 
-class TOADLET_API ZIPArchive:public Archive,public BaseResource{
+class TOADLET_API ZIPArchive:public BaseArchive{
 public:
-	TOADLET_RESOURCE(ZIPArchive,Archive);
+	TOADLET_OBJECT(ZIPArchive);
 
 	ZIPArchive();
 	virtual ~ZIPArchive();

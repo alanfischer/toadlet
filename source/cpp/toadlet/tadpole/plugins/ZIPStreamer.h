@@ -26,19 +26,19 @@
 #ifndef TOADLET_TADPOLE_ZIPSTREAMER_H
 #define TOADLET_TADPOLE_ZIPSTREAMER_H
 
-#include <toadlet/tadpole/ResourceStreamer.h>
+#include <toadlet/tadpole/BaseResourceStreamer.h>
 #include "ZIPArchive.h"
 
 namespace toadlet{
 namespace tadpole{
 
-class TOADLET_API ZIPStreamer:public Object,public ResourceStreamer{
+class TOADLET_API ZIPStreamer:public BaseResourceStreamer{
 public:
-	TOADLET_IOBJECT(ZIPStreamer);
+	TOADLET_OBJECT(ZIPStreamer);
 
 	ZIPStreamer(){}
 
-	Resource::ptr load(Stream::ptr stream,ResourceData *data,ProgressListener *listener){
+	Resource::ptr load(Stream::ptr stream,ResourceData *data){
 		ZIPArchive::ptr archive=new ZIPArchive();
 		bool result=archive->open(stream);
 		if(result){
