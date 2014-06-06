@@ -29,6 +29,11 @@
 #include <toadlet/egg/math/Inline.h>
 #include <cmath>
 
+#ifdef PI
+	#define TOADLET_OLD_PI PI
+	#undef PI
+#endif
+
 namespace toadlet{
 namespace egg{
 namespace math{
@@ -181,5 +186,10 @@ namespace Math{
 }
 }
 }
+
+#ifdef TOADLET_OLD_PI
+	#define PI TOADLET_OLD_PI
+	#undef TOADLET_OLD_PI
+#endif
 
 #endif
