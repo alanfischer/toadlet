@@ -35,8 +35,6 @@ namespace toadlet{
 namespace egg{
 
 namespace Extents{
-	using namespace std; // Bring isinf/isnan into Extents if its there, otherwise if its global no harm done
-
 	const char MAX_CHAR=SCHAR_MAX;
 	const char MIN_CHAR=SCHAR_MIN;
 	const unsigned char MAX_UNSIGNED_CHAR=UCHAR_MAX;
@@ -86,16 +84,20 @@ namespace Extents{
 	inline bool isInfinite(double v){
 		#if defined(TOADLET_PLATFORM_WIN32)
 			return !_finite(v);
+		#elif defined(isinf)
+			return isinf(v)>0;
 		#else
-			return isinf(v);
+			return std::isinf(v)>0;
 		#endif
 	}
 
 	inline bool isNAN(double v){
 		#if defined(TOADLET_PLATFORM_WIN32)
 			return _isnan(v)>0;
-		#else
+		#elif defined(isnan)
 			return isnan(v)>0;
+		#else
+			return std::isnan(v)>0;
 		#endif
 	}
 
