@@ -39,6 +39,11 @@
 	#define TOADLET_CHECK_OVERFLOW(x,s)
 #endif
 
+#ifdef PI
+	#define TOADLET_OLD_PI PI
+	#undef PI
+#endif
+
 namespace toadlet{
 namespace egg{
 namespace mathfixed{
@@ -348,5 +353,10 @@ namespace Math{
 }
 }
 }
+
+#ifdef TOADLET_OLD_PI
+	#define PI TOADLET_OLD_PI
+	#undef TOADLET_OLD_PI
+#endif
 
 #endif
