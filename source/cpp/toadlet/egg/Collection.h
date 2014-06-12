@@ -332,7 +332,7 @@ public:
 
 			int i;
 			for(i=0;i<s;++i){
-				new (&data[i]) Type();
+				new (&data[i]) Type;
 			}
 
 			for(i=0;i<mSize;++i){

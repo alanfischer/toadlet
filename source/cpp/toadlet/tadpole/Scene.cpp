@@ -30,6 +30,7 @@
 /// @todo: We need to differentiate between a Manager and a System.  The Engine can keep hold of all Managers, but the Systems are Scene specific.
 #include <toadlet/tadpole/plugins/SimpleRenderManager.h>
 #include <toadlet/tadpole/plugins/HopManager.h>
+#include <toadlet/tadpole/plugins/BulletManager.h>
 
 namespace toadlet{
 namespace tadpole{
@@ -64,7 +65,7 @@ Scene::Scene(Engine *engine,scalar epsilon):Object(),
 
 	mRenderManager=new SimpleRenderManager(this);
 
-	mPhysicsManager=new HopManager(this);
+	mPhysicsManager=new BulletManager(this);
 
 	mBackground=new PartitionNode(this);
 
