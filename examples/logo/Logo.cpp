@@ -37,6 +37,11 @@ void Logo::create(){
 			mesh->getSkeleton()->setRenderSkeleton(true);
 		}
 		lt->startAction("animation");
+
+		PhysicsComponent::ptr physics=scene->getPhysicsManager()->createPhysicsComponent();
+		physics->setMass(1);
+		physics->setBound(new Bound(Sphere(1)));
+		lt->attach(physics);
 	}
 	scene->getRoot()->attach(lt);
 

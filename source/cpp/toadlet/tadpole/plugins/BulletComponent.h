@@ -23,21 +23,21 @@
  *
  ********** Copyright header - do not remove **********/
 
-#ifndef TOADLET_TADPOLE_HOPCOMPONENT_H
-#define TOADLET_TADPOLE_HOPCOMPONENT_H
+#ifndef TOADLET_TADPOLE_BULLETCOMPONENT_H
+#define TOADLET_TADPOLE_BULLETCOMPONENT_H
 
 #include <toadlet/tadpole/PhysicsComponent.h>
 #include <toadlet/tadpole/BaseComponent.h>
-#include "HopManager.h"
+#include "BulletManager.h"
 
 namespace toadlet{
 namespace tadpole{
 
-class TOADLET_API HopComponent:public BaseComponent,public PhysicsComponent,public hop::CollisionListener,public hop::Traceable{
+class TOADLET_API BulletComponent:public BaseComponent,public PhysicsComponent,public btMotionState{
 public:
-	TOADLET_COMPONENT2(HopComponent,PhysicsComponent);
+	TOADLET_COMPONENT2(BulletComponent,PhysicsComponent);
 
-	HopComponent(HopManager *manager);
+	BulletComponent(BulletManager *manager);
 
 	void destroy();
 
@@ -48,49 +48,35 @@ public:
 	void removeCollisionListener(PhysicsCollisionListener *listener){mListeners.remove(listener);}
 
 	void setPosition(const Vector3 &position);
-	const Vector3 &getPosition() const{return mSolid->getPosition();}
+	const Vector3 &getPosition() const{return reinterpret_cast<const Vector3&>(mBody->getCenterOfMassPosition());}
 
-	void setVelocity(const Vector3 &velocity){mSolid->setVelocity(velocity);}
-	const Vector3 &getVelocity() const{return mSolid->getVelocity();}
+	void setVelocity(const Vector3 &velocity){btVector3 v;setVector3(v,velocity);mBody->setLinearVelocity(v);}
+	const Vector3 &getVelocity() const{return reinterpret_cast<const Vector3&>(mBody->getLinearVelocity());}
 
-	void addForce(const Vector3 &force){mSolid->addForce(force);}
+	void addForce(const Vector3 &force){btVector3 v;setVector3(v,force);mBody->applyCentralForce(v);}
 
-	void setMass(scalar mass){mSolid->setMass(mass);}
-	scalar getMass() const{return mSolid->getMass();}
+	void setMass(scalar mass){mBody->setMassProps(mass,btVector3());}
+	scalar getMass() const{return Math::div(Math::ONE,mBody->getInvMass());}
 
-	void setGravity(scalar gravity){mSolid->setCoefficientOfGravity(gravity);}
-	scalar getGravity() const{return mSolid->getCoefficientOfGravity();}
-
-	void setScope(int scope){mSolid->setCollisionScope(scope);mSolid->setCollideWithScope(scope);mSolid->setInternalScope(scope);}
-	int getScope() const{return mSolid->getCollisionScope();}
-
-	void setCollisionScope(int scope){mSolid->setCollisionScope(scope);}
-	int getCollisionScope() const{return mSolid->getCollisionScope();}
-
-	void setCollideWithScope(int scope){mSolid->setCollideWithScope(scope);}
-	int getCollideWithScope() const{return mSolid->getCollideWithScope();}
+	void setGravity(scalar gravity){;}
+	scalar getGravity() const{return 0;}
 
 	void setBound(Bound *bound);
 	void setTraceable(PhysicsTraceable *traceable);
-	void addShape(hop::Shape *shape);
-	void removeShape(hop::Shape *shape);
 
-	void logicUpdate(int dt,int scope){}
-	void frameUpdate(int dt,int scope){}
-
-	bool getActive() const{return mSolid->active();}
-
-	inline hop::Solid *getSolid(){return mSolid;}
+	bool getActive() const{return mBody->isActive();}
 
 	void collision(const PhysicsCollision &collision);
 
-	// CollisionListener
-	void collision(const hop::Collision &c);
+	void logicUpdate(int dt, int scope){BaseComponent::logicUpdate(dt,scope);}
+	void frameUpdate(int dt,int scope){BaseComponent::frameUpdate(dt,scope);}
 
-	// TraceCallback
-	void getBound(AABox &result);
-	void traceSegment(hop::Collision &result,const Vector3 &position,const Segment &segment);
-	void traceSolid(hop::Collision &result,hop::Solid *solid,const Vector3 &position,const Segment &segment);
+	void setScope(int scope){}
+	int getScope() const{return -1;}
+	void setCollisionScope(int scope){}
+	int getCollisionScope() const{return -1;}
+	void setCollideWithScope(int scope){}
+	int getCollideWithScope() const{return -1;}
 
 	// Spacial
 	Transform *getTransform() const{return NULL;}
@@ -99,23 +85,25 @@ public:
 	Bound *getWorldBound() const{return mWorldBound;}
 	void transformChanged(Transform *transform);
 
+	// btMotionState
+	void getWorldTransform(btTransform& worldTrans) const;
+	void setWorldTransform(const btTransform& worldTrans);
+
 protected:
-	friend class HopManager;
+	friend class BulletManager;
 
 	void preSimulate();
 	void postSimulate();
 	void updatePosition(const Vector3 &position);
-	void lerpPosition(scalar fraction);
 
-	HopManager *mManager;
-	hop::Solid::ptr mSolid;
+	BulletManager *mManager;
+	btRigidBody *mBody;
 	Collection<PhysicsCollisionListener*> mListeners;
-	Vector3 mOldPosition,mNewPosition,mCurrentPosition;
-	bool mTransformChanged;
+	Vector3 mCurrentPosition;
+	Quaternion mCurrentOrientation;
 	Bound::ptr mBound;
 	Bound::ptr mWorldBound;
 	PhysicsTraceable::ptr mTraceable;
-	hop::Shape::ptr mTraceableShape;
 };
 
 }

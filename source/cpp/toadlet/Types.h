@@ -52,6 +52,7 @@
 			#define TOADLET_COMPILER_VC5 1
 		#endif
 	#endif
+
 	#pragma warning(disable:4244)
 	#pragma warning(disable:4786) // identifier was truncated to '255' characters in the debug information
 	#pragma warning(disable:4305) // truncation from 'const double' to 'float'

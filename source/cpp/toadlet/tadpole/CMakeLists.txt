@@ -159,6 +159,11 @@ set (TADPOLE_PLUGINS_HOP_SRC
 	plugins/HopManager.cpp
 )
 
+set (TADPOLE_PLUGINS_BULLET_SRC
+	plugins/BulletComponent.cpp
+	plugins/BulletManager.cpp
+)
+
 set (TADPOLE_MATERIAL_SRC
 	material/Material.cpp
 	material/RenderPass.cpp
@@ -390,6 +395,11 @@ set (TADPOLE_PLUGINS_ZIP_HDR
 set (TADPOLE_PLUGINS_HOP_HDR
 	plugins/HopComponent.h
 	plugins/HopManager.h
+)
+
+set (TADPOLE_PLUGINS_BULLET_HDR
+	plugins/BulletComponent.h
+	plugins/BulletManager.h
 )
 
 set (TADPOLE_MATERIAL_HDR
@@ -788,6 +798,21 @@ if (NOT FFMPEG_FOUND)
 	endif (OGGVORBIS_FOUND)
 endif (NOT FFMPEG_FOUND)
 
+find_package (BULLET)
+if (BULLET_FOUND)
+	include_directories (${BULLET_INCLUDE_DIR})
+	set (TADPOLE_PLUGINS_HDR ${TADPOLE_PLUGINS_HDR} ${TADPOLE_PLUGINS_BULLET_HDR})
+	set (TADPOLE_PLUGINS_SRC ${TADPOLE_PLUGINS_SRC} ${TADPOLE_PLUGINS_BULLET_SRC})
+	set (TADPOLE_PLUGINS_LIBS ${TADPOLE_PLUGINS_LIBS} ${BULLET_LIBRARIES})
+
+	# Static Library
+	LOCATE_STATIC_LIBRARIES (BULLET_LIBRARIES_S "${BULLET_LIBRARIES}")
+	if (BULLET_LIBRARY_S)
+		set (TADPOLE_PLUGINS_SRC_S ${TADPOLE_PLUGINS_SRC_S} ${TADPOLE_PLUGINS_BULLET_SRC})
+		set (TADPOLE_PLUGINS_LIBS_S ${TADPOLE_PLUGINS_LIBS_S} ${BULLET_LIBRARIES_S})
+	endif (BULLET_LIBRARY_S)
+endif (BULLET_FOUND)
+
 # Platform specific files 
 if (TOADLET_PLATFORM_ANDROID)
 	source_group ("Source Files\\\\platform\\\\android" FILES ${TADPOLE_PLATFORM_ANDROID_SRC})
@@ -827,7 +852,7 @@ endif (TOADLET_PLATFORM_ANDROID)
 set (TADPOLE_PLUGINS_SRC ${TADPOLE_PLUGINS_SRC} ${TADPOLE_PLUGINS_HOP_SRC})
 set (TADPOLE_PLUGINS_HDR ${TADPOLE_PLUGINS_HDR} ${TADPOLE_PLUGINS_HOP_HDR})
 set (TADPOLE_PLUGINS_LIBS ${TADPOLE_PLUGINS_LIBS} toadlet_hop)
-#set (TADPOLE_PLUGINS_LIBS_S ${TADPOLE_PLUGINS_LIBS_S} toadlet_hop_s)
+set (TADPOLE_PLUGINS_LIBS_S_UNMERGED ${TADPOLE_PLUGINS_LIBS_S_UNMERGED} toadlet_hop_s)
 
 
 # Bring in dependency results
@@ -862,7 +887,7 @@ endif (TOADLET_BUILD_DYNAMIC)
 if (TOADLET_BUILD_STATIC)
 	add_library (toadlet_tadpole_s STATIC ${TADPOLE_SRC_S} ${TADPOLE_HDR_S})
 	set_target_properties (toadlet_tadpole_s PROPERTIES ${STATIC_LIB_PROPS})
-	target_link_libraries (toadlet_tadpole_s toadlet_egg_s toadlet_peeper_s toadlet_ribbit_s ${TADPOLE_LIBS})
+	target_link_libraries (toadlet_tadpole_s toadlet_egg_s toadlet_peeper_s toadlet_ribbit_s ${TADPOLE_LIBS} ${TADPOLE_PLUGINS_LIBS_S_UNMERGED})
 	MERGE_STATIC_LIBRARIES (toadlet_tadpole_s ALL "${TADPOLE_PLUGINS_LIBS_S}")
 	install (TARGETS toadlet_tadpole_s DESTINATION ${LIB_INSTALL_DIR} COMPONENT tadpole)
 	set (TADPOLE_INSTALL ${TADPOLE_INSTALL} toadlet_tadpole_s)
