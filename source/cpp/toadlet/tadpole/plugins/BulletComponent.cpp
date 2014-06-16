@@ -34,11 +34,23 @@ BulletComponent::BulletComponent(BulletManager *manager)
 {
 	mManager=manager;
 
-	btCollisionShape *mShape=new btSphereShape(1.0f);
+	mShape=new btCompoundShape();
 	mBody=new btRigidBody(1.0f,this,mShape);
 
 	mBound=new Bound();
 	mWorldBound=new Bound();
+}
+
+BulletComponent::~BulletComponent(){
+	if(mBody!=NULL){
+		delete mBody;
+		mBody=NULL;
+	}
+
+	if(mShape!=NULL){
+		delete mShape;
+		mShape=NULL;
+	}
 }
 
 void BulletComponent::destroy(){
@@ -80,7 +92,67 @@ void BulletComponent::setPosition(const Vector3 &position){
 	mBody->setWorldTransform(transform);
 }
 
+void BulletComponent::setMass(scalar mass){
+	mass=Math::maxVal(mass,0);
+	mBody->setMassProps(mass,btVector3());
+}
+
+scalar BulletComponent::getMass() const{
+	scalar mass=mBody->getInvMass();
+	if(mass>0){
+		mass=Math::div(Math::ONE,mass);
+	}
+	return mass;
+}
+
+void BulletComponent::setGravity(scalar amount){
+	btVector3 gravity;
+	setVector3(gravity,mManager->getGravity());
+	mBody->setGravity(gravity*amount);
+}
+
+scalar BulletComponent::getGravity() const{
+	btVector3 gravity;
+	setVector3(gravity,mManager->getGravity());
+	return gravity.dot(mBody->getGravity());
+}
+
 void BulletComponent::setBound(Bound *bound){
+	mBody->setCollisionShape(NULL);
+	while(mShape->getNumChildShapes()>0){
+		mShape->removeChildShapeByIndex(0);
+	}
+
+	btTransform transform;
+	transform.setIdentity();
+	btCollisionShape *shape=NULL;
+	switch(bound->getType()){
+		case Bound::Type_AABOX:{
+			Vector3 hsize;
+			Math::sub(hsize,bound->getAABox().getMaxs(),bound->getAABox().getMins());
+			Math::div(hsize,2);
+			Vector3 origin;
+			Math::add(origin,bound->getAABox().getMins(),hsize);
+
+			btVector3 bextends;
+			setVector3(bextends,hsize);
+			shape=new btBoxShape(bextends);
+
+			btVector3 borigin;
+			setVector3(borigin,origin);
+			transform.setOrigin(borigin);
+		}break;
+		case Bound::Type_SPHERE:{
+			shape=new btSphereShape(bound->getSphere().getRadius());
+
+			btVector3 borigin;
+			setVector3(borigin,bound->getSphere().getOrigin());
+			transform.setOrigin(borigin);
+		}break;
+	}
+
+	mShape->addChildShape(transform,shape);
+	mBody->setCollisionShape(mShape);
 }
 
 void BulletComponent::setTraceable(PhysicsTraceable *traceable){
@@ -127,6 +199,7 @@ void BulletComponent::getWorldTransform(btTransform& worldTrans) const{
 	setVector3(origin,position);
 	btQuaternion rotation;
 	setQuaternion(rotation,orientation);
+	worldTrans.setIdentity();
 	worldTrans.setOrigin(origin);
 	worldTrans.setRotation(rotation);
 }
