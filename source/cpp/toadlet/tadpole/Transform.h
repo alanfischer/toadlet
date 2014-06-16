@@ -119,6 +119,19 @@ public:
 		changed();
 	}
 
+	void setTranslateRotate(const Vector3 &translate,const Quaternion &rotate){
+		mTranslate.set(translate);
+		mRotate.set(rotate);
+		changed();
+	}
+
+	void setTranslateRotateScale(const Vector3 &translate,const Quaternion &rotate,const Vector3 &scale){
+		mTranslate.set(translate);
+		mRotate.set(rotate);
+		mScale.set(scale);
+		changed();
+	}
+
 	void getMatrix(Matrix4x4 &r) const{
 		Math::setMatrix4x4FromTranslateRotateScale(r,mTranslate,mRotate,mScale);
 	}

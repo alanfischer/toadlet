@@ -90,6 +90,9 @@ public:
 	void getWorldTransform(btTransform& worldTrans) const;
 	void setWorldTransform(const btTransform& worldTrans);
 
+	btRigidBody *getBody() const{return mBody;}
+	btCompoundShape *getShape() const{return mShape;}
+
 protected:
 	friend class BulletManager;
 

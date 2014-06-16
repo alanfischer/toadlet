@@ -179,6 +179,7 @@ void BulletComponent::transformChanged(Transform *transform){
 		mWorldBound->transform(mBound,mParent->getWorldTransform());
 
 		btTransform worldTrans;
+		worldTrans.setIdentity();
 		getWorldTransform(worldTrans);
 		mBody->setWorldTransform(worldTrans);
 	}
@@ -199,7 +200,6 @@ void BulletComponent::getWorldTransform(btTransform& worldTrans) const{
 	setVector3(origin,position);
 	btQuaternion rotation;
 	setQuaternion(rotation,orientation);
-	worldTrans.setIdentity();
 	worldTrans.setOrigin(origin);
 	worldTrans.setRotation(rotation);
 }
@@ -211,8 +211,7 @@ void BulletComponent::setWorldTransform(const btTransform& worldTrans){
 
 	setVector3(mCurrentPosition,worldTrans.getOrigin());
 	setQuaternion(mCurrentOrientation,worldTrans.getRotation());
-	mParent->getTransform()->setTranslate(mCurrentPosition);
-	mParent->getTransform()->setRotate(mCurrentOrientation);
+	mParent->getTransform()->setTranslateRotate(mCurrentPosition,mCurrentOrientation);
 }
 
 }
