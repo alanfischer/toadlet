@@ -38,6 +38,7 @@ public:
 	TOADLET_COMPONENT2(BulletComponent,PhysicsComponent);
 
 	BulletComponent(BulletManager *manager);
+	~BulletComponent();
 
 	void destroy();
 
@@ -55,11 +56,11 @@ public:
 
 	void addForce(const Vector3 &force){btVector3 v;setVector3(v,force);mBody->applyCentralForce(v);}
 
-	void setMass(scalar mass){mBody->setMassProps(mass,btVector3());}
-	scalar getMass() const{return Math::div(Math::ONE,mBody->getInvMass());}
+	void setMass(scalar mass);
+	scalar getMass() const;
 
-	void setGravity(scalar gravity){;}
-	scalar getGravity() const{return 0;}
+	void setGravity(scalar gravity);
+	scalar getGravity() const;
 
 	void setBound(Bound *bound);
 	void setTraceable(PhysicsTraceable *traceable);
@@ -98,6 +99,7 @@ protected:
 
 	BulletManager *mManager;
 	btRigidBody *mBody;
+	btCompoundShape *mShape;
 	Collection<PhysicsCollisionListener*> mListeners;
 	Vector3 mCurrentPosition;
 	Quaternion mCurrentOrientation;
