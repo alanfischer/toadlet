@@ -12,6 +12,10 @@ using namespace toadlet;
 using namespace toadlet::egg;
 using namespace toadlet::egg::math;
 
+void Log_initialize(bool startSilent){
+	Log::initialize(startSilent);
+}
+
 String Exception_getDescription(const Exception &ex){
 	return ex.getDescription();
 }
@@ -53,7 +57,7 @@ EMSCRIPTEN_BINDINGS(egg) {
 	;
 
 	class_<Log>("Log")
-		.class_function("initialize", &Log::initialize)
+		.class_function("initialize", Log_initialize)
 		.class_function("destroy", &Log::destroy)
 		.class_function("error", select_overload<void(const char*)>(&Log::error), allow_raw_pointers())
 		.class_function("warning", select_overload<void(const char*)>(&Log::warning), allow_raw_pointers())

@@ -215,7 +215,6 @@ void Camera::projectionUpdated(){
 		if(cplane[2] < 0)
 			cplane *= -1;
 
-
 		Matrix4x4 suffix;
 		suffix.setAt(2,0,cplane[0]);
 		suffix.setAt(2,1,cplane[1]);
