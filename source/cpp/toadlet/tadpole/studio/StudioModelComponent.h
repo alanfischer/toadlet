@@ -219,6 +219,8 @@ protected:
 	Vector3 mChromeForward,mChromeRight;
 	Collection<Vector3> mBoneTranslates;
 	Collection<Quaternion> mBoneRotates;
+	Collection<Vector3> mBlendBoneTranslates;
+	Collection<Quaternion> mBlendBoneRotates;
 	Collection<int16> mBoneLinks;
 	Collection<int> mBoneScopes;
 	Collection<Vector3> mTransformedVerts;

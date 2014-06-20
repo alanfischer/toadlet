@@ -172,6 +172,8 @@ void StudioModelComponent::setModel(StudioModel *model){
 
 	mBoneTranslates.resize(model->header->numbones);
 	mBoneRotates.resize(model->header->numbones);
+	mBlendBoneTranslates.resize(model->header->numbones);
+	mBlendBoneRotates.resize(model->header->numbones);
 	mBoneLinks.resize(mModel->header->numbones,-1);
 	mBoneScopes.resize(mModel->header->numbones,-1);
 
@@ -659,19 +661,15 @@ void StudioModelComponent::updateSkeleton(){
 	}
 
 	if(false && mBlendSequenceIndex>=0){
-		/// @todo: Move these to member variables?
-		Collection<Vector3> boneTranslates(mModel->header->numbones);
-		Collection<Quaternion> boneRotates(mModel->header->numbones);
-
 		studioseqdesc *sseqdesc=mModel->seqdesc(mBlendSequenceIndex);
 		studioanim *sanim=mModel->anim(sseqdesc)+mModel->header->numbones;
 		SequenceAnimation *animation=mAnimations[mBlendSequenceIndex];
 
-		findBoneTransforms(boneTranslates,boneRotates,mModel,sseqdesc,sanim,animation);
+		findBoneTransforms(mBlendBoneTranslates,mBlendBoneRotates,mModel,sseqdesc,sanim,animation);
 
 		for(i=0;i<mModel->header->numbones;++i){
 			Quaternion r;
-			Math::slerp(r,mBoneRotates[i],boneRotates[i],mAdjustedBlenderValues[0]);
+			Math::slerp(r,mBoneRotates[i],mBlendBoneRotates[i],mAdjustedBlenderValues[0]);
 			mBoneRotates[i]=r;
 		}
 	}
