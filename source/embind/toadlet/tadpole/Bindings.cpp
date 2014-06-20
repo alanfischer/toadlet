@@ -46,7 +46,7 @@ EMSCRIPTEN_BINDINGS(tadpole) {
 		.function("addResourceArchive",&ResourceManager::addResourceArchive, allow_raw_pointers())
 		.function("removeResourceArchive",&ResourceManager::removeResourceArchive, allow_raw_pointers())
 		.function("manage",&ResourceManager::manage, allow_raw_pointers())
-		.function("find",&ResourceManager::find, allow_raw_pointers())
+		.function("find",select_overload<bool(const String&,ResourceRequest*,ResourceData*)>(&ResourceManager::find), allow_raw_pointers())
 	;
 
 	class_<ArchiveManager,base<ResourceManager>>("ArchiveManager")
