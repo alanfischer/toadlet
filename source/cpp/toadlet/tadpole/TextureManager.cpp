@@ -84,9 +84,12 @@ Texture::ptr TextureManager::createTexture(int usage,TextureFormat::ptr format,t
 	else
 #endif
 	if(renderDevice!=NULL){
-		texture=renderDevice->createTexture();
+		TOADLET_TRY
+			texture=renderDevice->createTexture();
+		TOADLET_CATCH_ANONYMOUS(){}
 		if(BackableTexture::convertCreate(texture,renderDevice,usage,format,mipDatas)==false){
-			Error::unknown(Categories::TOADLET_TADPOLE,"Error in texture convertCreate");
+			// See ShaderManager::createShader
+			//Error::unknown(Categories::TOADLET_TADPOLE,"Error in texture convertCreate");
 			return NULL;
 		}
 	}

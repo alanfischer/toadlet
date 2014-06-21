@@ -58,7 +58,8 @@ Shader::ptr ShaderManager::createShader(Shader::ShaderType type,const char *prof
 			shader=renderDevice->createShader();
 		TOADLET_CATCH_ANONYMOUS(){}
 		if(BackableShader::convertCreate(shader,renderDevice,type,profiles,codes,numCodes)==false){
-			Error::unknown(Categories::TOADLET_TADPOLE,"Error in shader convertCreate");
+			// I'm not sure if this should be an Error or not.  Sometimes it's ok for createShader to just return NULL, if there are no supported profiles?
+			//Error::unknown(Categories::TOADLET_TADPOLE,"Error in shader convertCreate");
 			return NULL;
 		}
 	}
