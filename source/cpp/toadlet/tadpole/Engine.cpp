@@ -236,6 +236,7 @@ void Engine::installHandlers(){
 
 	// Texture streamers
 	#if !defined(TOADLET_PLATFORM_EMSCRIPTEN)
+		mTextureManager->setStreamer(new BMPStreamer(mTextureManager),"bmp");
 		mTextureManager->setStreamer(new DDSStreamer(mTextureManager),"dds");
 		mTextureManager->setStreamer(new TGAStreamer(mTextureManager),"tga");
 	#endif
@@ -247,7 +248,6 @@ void Engine::installHandlers(){
 	#elif defined(TOADLET_PLATFORM_ANDROID)
 		mTextureManager->setDefaultStreamer(new AndroidTextureStreamer(mTextureManager,(JNIEnv*)mEnv));
 	#else
-		mTextureManager->setStreamer(new BMPStreamer(mTextureManager),"bmp");
 		#if defined(TOADLET_HAS_JPEG)
 			JPEGStreamer::ptr jpegStreamer(new JPEGStreamer(mTextureManager));
 			mTextureManager->setStreamer(jpegStreamer,"jpeg");
@@ -283,7 +283,9 @@ void Engine::installHandlers(){
 	mMeshManager->setStreamer(new TMSHStreamer(this),"tmsh");
 
 	// AudioBuffer streamers
-	mAudioManager->setStreamer(new WaveStreamer(mAudioManager),"wav");
+	#if !defined(TOADLET_PLATFORM_EMSCRIPTEN)
+		mAudioManager->setStreamer(new WaveStreamer(mAudioManager),"wav");
+	#endif
 	#if defined(TOADLET_HAS_OGGVORBIS)
 		mAudioManager->setStreamer(new OggVorbisStreamer(mAudioManager),"ogg");
 	#endif

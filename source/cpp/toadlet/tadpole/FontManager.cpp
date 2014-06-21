@@ -46,7 +46,7 @@ void FontManager::findDefaultFont(){
 		file="/System/Library/Fonts/Cache/Geneva.dfont";
 	#elif defined(TOADLET_PLATFORM_OSX)
 		file="/System/Library/Fonts/Geneva.dfont";
-	#elif defined(TOADLET_PLATFORM_POSIX)
+	#elif defined(TOADLET_PLATFORM_POSIX) && !defined(TOADLET_PLATFORM_EMSCRIPTEN)
 		file="/usr/share/fonts/TTF/DejaVuSerif.ttf";
 	#endif
 	if(file!=(char*)NULL){

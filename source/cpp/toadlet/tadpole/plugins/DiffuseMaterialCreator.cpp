@@ -199,6 +199,7 @@ DiffuseMaterialCreator::DiffuseMaterialCreator(Engine *engine){
 	};
 
 	const char *pointSpriteFragmentCode[]={
+	#if defined(TOADLET_HAS_GLFIXED)
 		"#version 120\n"
 
 		"#if defined(GL_ES)\n"
@@ -216,8 +217,11 @@ DiffuseMaterialCreator::DiffuseMaterialCreator(Engine *engine){
 			"vec4 fragColor=color*(texture2D(tex,gl_PointCoord)+(1.0-textureSet));\n"
 			"gl_FragColor=mix(fogColor,fragColor,fog);\n"
 		"}\n",
+	#else
+		(char*)NULL,
+	#endif
 
-
+	
 
 		"struct PIN{\n"
 			"float4 position: SV_POSITION;\n"
