@@ -69,7 +69,7 @@ EMSCRIPTEN_BINDINGS(egg) {
 	class_<Exception>("Exception")
 		.constructor<const String&>()
 		.function("getError", &Exception::getError, allow_raw_pointers())
-		.function("getDescription", &Exception::getDescription, allow_raw_pointers())
+		.function("getDescription", &Exception_getDescription, allow_raw_pointers())
 	;
 
 	class_<Stream>("Stream")

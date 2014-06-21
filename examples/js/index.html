@@ -10,14 +10,13 @@ var cameraComponent;
 
 function update(){
 	var t=(new Date()).getTime()/1000.0;
-	var camera=cameraComponent.getCamera();
-	
+
 	cameraComponent.setLookAt([Math.cos(t)*10,Math.sin(t)*10,10],[0,0,0],[0,0,1]);
 	
 	scene.update(33);
 	
 	renderDevice.beginScene();
-		camera.render(renderDevice,scene,null);
+		cameraComponent.render(renderDevice,scene,null);
 	renderDevice.endScene();
 
 	window.setTimeout(update,33);
@@ -57,10 +56,13 @@ function init(){
 			meshComponent.delete();
 			mesh.delete();
 			material.delete();
-			resource.delete();
+			if(resource!=null){
+				resource.delete();
+			}
 		},
 		resourceException: function(ex){
-			console.log(ex.getError());
+			console.log(ex.getDescription());
+			this.resourceReady(null);
 		}
 	});
 	

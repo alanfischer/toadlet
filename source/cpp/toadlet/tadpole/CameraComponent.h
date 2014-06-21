@@ -55,6 +55,8 @@ public:
 	void setLookAt(const Vector3 &eye,const Vector3 &point,const Vector3 &up){mCamera->setLookAt(eye,point,up);setTransformFromCamera();}
 	void setLookDir(const Vector3 &eye,const Vector3 &dir,const Vector3 &up){mCamera->setLookDir(eye,dir,up);setTransformFromCamera();}
 
+	void render(RenderDevice *device,Scene *scene,Node *node=NULL){mCamera->render(device,scene,node);}
+	
 	// Spacial
 	Transform *getTransform() const{return NULL;}
 	Bound *getBound() const{return NULL;}
