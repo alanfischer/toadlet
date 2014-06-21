@@ -120,8 +120,9 @@ EMSCRIPTEN_BINDINGS(tadpole) {
 
 	class_<CameraComponent,base<Component>>("CameraComponent")
 		.smart_ptr_constructor(&make_ptr<CameraComponent,Camera*>)
-		.function("setLookAt",&CameraComponent::setLookAt)
 		.function("getCamera",&CameraComponent::getCamera, allow_raw_pointers())
+		.function("setLookAt",&CameraComponent::setLookAt)
+		.function("render",&CameraComponent::render, allow_raw_pointers())
 	;
 
 	class_<MeshComponent,base<Component>>("MeshComponent")
