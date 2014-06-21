@@ -209,15 +209,17 @@ elseif (TOADLET_PLATFORM_WIN32)
 		option (TOADLET_STATIC_MULTITHREAD_DYNAMIC "Use the /MD (Not /MT) compile switch with static libraries" OFF)
 		option (TOADLET_RTTI "Enable Run Time Type Information" OFF)
 		option (TOADLET_EXCEPTIONS "Enable Exception handling" OFF)
-		option (TOADLET_ITERATOR_DEBUGGING "Enable Iterator Debugging" OFF)
-		option (TOADLET_RUNTIME_LIBRARY_CHECK "Enable Runtime Library Check" OFF)
+		option (TOADLET_MSVC_CHECK "Enable MSVC check" OFF)
+		option (TOADLET_ITERATOR_CHECK "Enable Iterator check" OFF)
+		option (TOADLET_RUNTIME_CHECK "Enable Runtime check" OFF)
 	else (TOADLET_PLATFORM_WINCE)
 		option (TOADLET_DYNAMIC_MULTITHREAD_DYNAMIC "Use the /MD (Not /MT) compile switch with dynamic libraries" ON)
 		option (TOADLET_STATIC_MULTITHREAD_DYNAMIC "Use the /MD (Not /MT) compile switch with static libraries" OFF)
 		option (TOADLET_RTTI "Enable Run Time Type Information" ON)
 		option (TOADLET_EXCEPTIONS "Enable Exception handling" ON)
-		option (TOADLET_ITERATOR_DEBUGGING "Enable Iterator Debugging" OFF)
-		option (TOADLET_RUNTIME_LIBRARY_CHECK "Enable Runtime Library Check" OFF)
+		option (TOADLET_MSVC_CHECK "Enable MSVC check" OFF)
+		option (TOADLET_ITERATOR_CHECK "Enable Iterator check" OFF)
+		option (TOADLET_RUNTIME_CHECK "Enable Runtime check" OFF)
 	endif (TOADLET_PLATFORM_WINCE)
 	
 	# Deal with multithread static/dynamic libraries
@@ -230,22 +232,22 @@ elseif (TOADLET_PLATFORM_WIN32)
 	#   if(/MT) {nodefaultlib=libcmtd,msvcrt,msvcrtd}
 	if (TOADLET_DYNAMIC_MULTITHREAD_DYNAMIC)
 		set (DYNAMIC_LIB_FLAGS "/MD")
-		set (DYNAMIC_LIB_LINK_DEBUG "/NODEFAULTLIB:LIBCMT.lib;LIBCMTd.lib;MSVCRTd.lib;msvcprtd.lib")
-		set (DYNAMIC_LIB_LINK_RELEASE "/NODEFAULTLIB:LIBCMT.lib;LIBCMTd.lib;MSVCRTd.lib;msvcprtd.lib")
+		set (DYNAMIC_LIB_LINK_DEBUG "/NODEFAULTLIB:LIBCMT.lib;LIBCMTd.lib")
+		set (DYNAMIC_LIB_LINK_RELEASE "/NODEFAULTLIB:LIBCMT.lib;LIBCMTd.lib")
 	else (TOADLET_DYNAMIC_MULTITHREAD_DYNAMIC)
 		message (STATUS "WARNING: Building dynamic libraries with /MT switch. Debug builds of toadlet dlls will fail!")
 		set (DYNAMIC_LIB_FLAGS "/MT")
-		set (DYNAMIC_LIB_LINK_DEBUG "/NODEFAULTLIB:LIBCMT.lib;MSVCRT.lib;MSVCRT.lib")
-		set (DYNAMIC_LIB_LINK_RELEASE "/NODEFAULTLIB:LIBCMTd.lib;MSCVRT.lib;MSVCRTd.lib")
+		set (DYNAMIC_LIB_LINK_DEBUG "")
+		set (DYNAMIC_LIB_LINK_RELEASE "")
 	endif (TOADLET_DYNAMIC_MULTITHREAD_DYNAMIC)
 	if (TOADLET_STATIC_MULTITHREAD_DYNAMIC)
 		set (STATIC_LIB_FLAGS "/MD")
-		set (STATIC_LIB_LINK_DEBUG "/NODEFAULTLIB:LIBCMT.lib;LIBCMTd.lib;MSVCRT.lib")
-		set (STATIC_LIB_LINK_RELEASE "/NODEFAULTLIB:LIBCMT.lib;LIBCMTd.lib;MSVCRTd.lib")
+		set (STATIC_LIB_LINK_DEBUG "/NODEFAULTLIB:LIBCMT.lib;LIBCMTd.lib")
+		set (STATIC_LIB_LINK_RELEASE "/NODEFAULTLIB:LIBCMT.lib;LIBCMTd.lib")
 	else (TOADLET_STATIC_MULTITHREAD_DYNAMIC)
 		set (STATIC_LIB_FLAGS "/MT")
-		set (STATIC_LIB_LINK_DEBUG "/NODEFAULTLIB:LIBCMT.lib;MSVCRT.lib;MSVCRTd.lib")
-		set (STATIC_LIB_LINK_RELEASE "/NODEFAULTLIB:LIBCMTd.lib;MSVCRT.lib;MSVCRTd.lib")
+		set (STATIC_LIB_LINK_DEBUG "")
+		set (STATIC_LIB_LINK_RELEASE "")
 	endif (TOADLET_STATIC_MULTITHREAD_DYNAMIC)
 
 	# Enable/Disable RTTI
@@ -282,26 +284,32 @@ elseif (TOADLET_PLATFORM_WIN32)
 		message (STATUS "SSE2 support enabled")
 	endif (TOADLET_HAS_SSE)
 	
-	# Disable iterator debugging
-	if (NOT TOADLET_ITERATOR_DEBUGGING)
-		set (DYNAMIC_LIB_FLAGS "${DYNAMIC_LIB_FLAGS} /D_HAS_ITERATOR_DEBUGGING=0")
-		set (STATIC_LIB_FLAGS "${STATIC_LIB_FLAGS} /D_HAS_ITERATOR_DEBUGGING=0")
-		message (STATUS "Iterator debugging disabled")
-	endif (NOT TOADLET_ITERATOR_DEBUGGING)
+	# Disable msvc mismatch
+	if (NOT TOADLET_MSVC_CHECK)
+		set (DYNAMIC_LIB_FLAGS "${DYNAMIC_LIB_FLAGS} /D_ALLOW_MSC_VER_MISMATCH")
+		set (STATIC_LIB_FLAGS "${STATIC_LIB_FLAGS} /D_ALLOW_MSC_VER_MISMATCH")
+		message (STATUS "MSVC mismatch disabled")
+	endif (NOT TOADLET_MSVC_CHECK)
+	
+	# Disable iterator mismatch
+	if (NOT TOADLET_ITERATOR_CHECK)
+		set (DYNAMIC_LIB_FLAGS "${DYNAMIC_LIB_FLAGS} /D_ALLOW_ITERATOR_DEBUG_LEVEL_MISMATCH")
+		set (STATIC_LIB_FLAGS "${STATIC_LIB_FLAGS} /D_ALLOW_ITERATOR_DEBUG_LEVEL_MISMATCH")
+		message (STATUS "Iterator mismatch disabled")
+	endif (NOT TOADLET_ITERATOR_CHECK)
 
-	# Disable runtime library check
-	if (NOT TOADLET_RUNTIME_LIBRARY_CHECK)
+	# Disable runtime mismatch
+	if (NOT TOADLET_RUNTIME_CHECK)
 		set (DYNAMIC_LIB_FLAGS "${DYNAMIC_LIB_FLAGS} /D_ALLOW_RUNTIME_LIBRARY_MISMATCH")
 		set (STATIC_LIB_FLAGS "${STATIC_LIB_FLAGS} /D_ALLOW_RUNTIME_LIBRARY_MISMATCH")
-		message (STATUS "Runtime library check disabled")
-	endif (NOT TOADLET_RUNTIME_LIBRARY_CHECK)
+		message (STATUS "Runtime mismatch disabled")
+	endif (NOT TOADLET_RUNTIME_CHECK)
 	
-message (STATUS "WHAT *************************************************************")
 	# Append the compile flags to the properties
 	# TODO: Also clean this up once issue 0006493 is resolved
 	if (DYNAMIC_LIB_FLAGS)
 		set (DYNAMIC_LIB_PROPS ${DYNAMIC_LIB_PROPS} COMPILE_FLAGS ${DYNAMIC_LIB_FLAGS})
-	message (STATUS ${DYNAMIC_LIB_FLAGS})
+	message (STATUS ${DYNAMIC_LIB_LINK_DEBUG})
 	endif (DYNAMIC_LIB_FLAGS)
 	if (STATIC_LIB_FLAGS)
 		set (STATIC_LIB_PROPS ${STATIC_LIB_PROPS} COMPILE_FLAGS ${STATIC_LIB_FLAGS})
@@ -309,7 +317,7 @@ message (STATUS "WHAT **********************************************************
 	
 	# Append the link flags to the properties
 	set (DYNAMIC_LIB_PROPS ${DYNAMIC_LIB_PROPS} 
-		LINK_FLAGS_DEBUG ${DYNAMIC_LIB_LINK_DEBUG} 
+		LINK_FLAGS_DEBUG "${DYNAMIC_LIB_LINK_DEBUG}"
 		LINK_FLAGS_RELEASE ${DYNAMIC_LIB_LINK_RELEASE}
 		LINK_FLAGS_MINSIZEREL ${DYNAMIC_LIB_LINK_RELEASE}
 		LINK_FLAGS_RELWITHDEBINFO ${DYNAMIC_LIB_LINK_RELEASE}
