@@ -11,6 +11,7 @@ mergeInto(LibraryManager.library, {
 			'openStream' : function(name,request){
 				var toadlet=Module;
 				var xmlHttp=new XMLHttpRequest();
+				xmlHttp.overrideMimeType('text\/plain; charset=x-user-defined');
 				xmlHttp.open("GET",name);
 				xmlHttp.onreadystatechange=function(){
 					if(xmlHttp.readyState==4){

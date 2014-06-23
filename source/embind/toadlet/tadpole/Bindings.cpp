@@ -25,6 +25,10 @@ Archive::ptr makeDOMArchive(Engine *engine){
 	return val::module_property("DOMArchive")(engine).as<Archive::ptr>();
 }
 
+Mesh *toMesh(Resource *resource){
+	return (Mesh*)resource;
+}
+
 EMSCRIPTEN_BINDINGS(tadpole) {
 	using namespace emscripten::internal;
 
@@ -61,6 +65,10 @@ EMSCRIPTEN_BINDINGS(tadpole) {
 		.function("getTexture",&TextureManager::getTexture, allow_raw_pointers())
 	;
 
+	class_<MeshManager,base<ResourceManager>>("MeshManager")
+		.smart_ptr<MeshManager::ptr>()
+	;
+
 	class_<Engine>("Engine")
 		.smart_ptr_constructor(&make_ptr<Engine>)
 		.function("destroy",&Engine::destroy)
@@ -72,6 +80,7 @@ EMSCRIPTEN_BINDINGS(tadpole) {
 
 		.function("getArchiveManager",&Engine::getArchiveManager, allow_raw_pointers())
 		.function("getTextureManager",&Engine::getTextureManager, allow_raw_pointers())
+		.function("getMeshManager",&Engine::getMeshManager, allow_raw_pointers())
 
 		.function("setRenderDevice",&Engine::setRenderDevice, allow_raw_pointers())
 		.function("setAudioDevice",&Engine::setAudioDevice, allow_raw_pointers())
@@ -159,4 +168,6 @@ EMSCRIPTEN_BINDINGS(tadpole) {
 	;
 
 	register_range<Node>("NodeRange");
+
+	function("toMesh",&toMesh, allow_raw_pointers());
 }
