@@ -37,7 +37,6 @@ namespace toadlet{
 namespace pad{
 
 /// @todo: There is still a problem where the native window doesn't resize correctly on rotation
-/// @todo: And the rest of the input keys need to be handled besides space
 class AndroidApplication:public Object,public Application,public Runnable{
 public:
 	TOADLET_IOBJECT(AndroidApplication);
@@ -116,6 +115,8 @@ public:
 	void run();
 	
 protected:
+	void translateKey(int key);
+
 	static void onDestroy(ANativeActivity *activity);
 	static void onStart(ANativeActivity *activity);
 	static void onStop(ANativeActivity *activity);
