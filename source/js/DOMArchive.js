@@ -19,7 +19,7 @@ mergeInto(LibraryManager.library, {
 							request['stringStreamReady'](xmlHttp.responseText);
 						}
 						else{
-							request['streamException'](new toadlet['Exception']("status!=200"));
+							request['streamException'](new toadlet['Exception']("status=="+xmlHttp.status));
 						}
 						request['delete']();
 					}

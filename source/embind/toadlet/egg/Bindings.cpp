@@ -56,6 +56,14 @@ EMSCRIPTEN_BINDINGS(egg) {
 		.element(&Quaternion::w)
 	;
 
+    constant("ZERO_VECTOR3", Math::ZERO_VECTOR3);
+    constant("X_UNIT_VECTOR3", Math::X_UNIT_VECTOR3);
+    constant("NEG_X_UNIT_VECTOR3", Math::NEG_X_UNIT_VECTOR3);
+    constant("Y_UNIT_VECTOR3", Math::Y_UNIT_VECTOR3);
+    constant("NEG_Y_UNIT_VECTOR3", Math::NEG_Y_UNIT_VECTOR3);
+    constant("Z_UNIT_VECTOR3", Math::Z_UNIT_VECTOR3);
+    constant("NEG_Z_UNIT_VECTOR3", Math::NEG_Z_UNIT_VECTOR3);
+
 	class_<Log>("Log")
 		.class_function("initialize", Log_initialize)
 		.class_function("destroy", &Log::destroy)
