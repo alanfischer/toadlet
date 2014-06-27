@@ -1,10 +1,10 @@
 #include "../egg/Bindings.h"
 #include <toadlet/peeper/WindowRenderTargetFormat.h>
+#include <toadlet/peeper/LightState.h>
 #include <toadlet/peeper/RenderTarget.h>
 #include <toadlet/peeper/RenderDevice.h>
 #include <toadlet/peeper/RenderState.h>
 #include <toadlet/peeper/Texture.h>
-#include <toadlet/peeper/plugins/glrenderdevice/GLTexture.h>
 #include <toadlet/peeper/Viewport.h>
 
 using namespace emscripten;
@@ -75,4 +75,26 @@ EMSCRIPTEN_BINDINGS(peeper) {
 	;
 
 	function("toTexture",&toTexture, allow_raw_pointers());
+
+	enum_<LightState::Type>("LightType")
+		.value("Type_DIRECTION", LightState::Type_DIRECTION)
+		.value("Type_POINT", LightState::Type_POINT)
+		.value("Type_SPOT", LightState::Type_SPOT)
+	;
+	
+    class_<LightState>("LightState")
+        .constructor()
+		.property("type",&LightState::type)
+		.property("specularColor",&LightState::specularColor)
+		.property("diffuseColor",&LightState::diffuseColor)
+		.property("constantAttenuation",&LightState::constantAttenuation)
+		.property("linearAttenuation",&LightState::linearAttenuation)
+		.property("quadraticAttenuation",&LightState::quadraticAttenuation)
+		.property("spotInnerRadius",&LightState::spotInnerRadius)
+		.property("spotOuterRadius",&LightState::spotOuterRadius)
+		.property("spotFalloff",&LightState::spotFalloff)
+		.property("radius",&LightState::radius)
+		.property("position",&LightState::position)
+		.property("direction",&LightState::direction)
+	;
 }
