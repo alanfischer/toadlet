@@ -358,13 +358,7 @@ void AndroidApplication::stepEventLoop(){
 
 			switch(AInputEvent_getType(event)){
 				case AINPUT_EVENT_TYPE_KEY:{
-					int key=0;
-					switch(AKeyEvent_getKeyCode(event)){
-						case AKEYCODE_SPACE:
-							key=' ';
-						break;
-					}
-					
+					int key=translateKey(AKeyEvent_getKeyCode(event));
 					int action=AKeyEvent_getAction(event);
 					if(action==AKEY_EVENT_ACTION_DOWN){
 						keyPressed(key);
@@ -489,6 +483,65 @@ void AndroidApplication::queueCreated(AInputQueue *queue){
 void AndroidApplication::queueDestroyed(AInputQueue *queue){
 	AInputQueue_detachLooper(mQueue);
 	mQueue=NULL;
+}
+
+int AndroidApplication::translateKey(int key){
+	switch(key){
+		case AKEYCODE_SOFT_LEFT:
+			return Key_SOFTLEFT;
+		case AKEYCODE_SOFT_RIGHT:
+			return Key_SOFTRIGHT;
+		case AKEYCODE_BACK:
+			return Key_BACK;
+		case AKEYCODE_STAR:
+			return '*';
+		case AKEYCODE_POUND:
+			return '#';
+		case AKEYCODE_DPAD_UP:
+			return Key_UP;
+		case AKEYCODE_DPAD_DOWN:
+			return Key_DOWN;
+		case AKEYCODE_DPAD_LEFT:
+			return Key_LEFT;
+		case AKEYCODE_DPAD_RIGHT:
+			return Key_RIGHT;
+		case AKEYCODE_DPAD_CENTER:
+			return Key_ACTION;
+		case AKEYCODE_COMMA:
+			return ',';
+		case AKEYCODE_PERIOD:
+			return '.';
+		case AKEYCODE_TAB:
+			return Key_TAB;
+		case AKEYCODE_SPACE:
+			return Key_SPACE;
+		case AKEYCODE_ENTER:
+			return Key_ENTER;
+		case AKEYCODE_ESCAPE:
+			return Key_ESC;
+		case AKEYCODE_SHIFT_LEFT:
+		case AKEYCODE_SHIFT_RIGHT:
+			return Key_SHIFT;
+		case AKEYCODE_ALT_LEFT:
+		case AKEYCODE_ALT_RIGHT:
+			return Key_ALT;
+		case AKEYCODE_CTRL_LEFT:
+		case AKEYCODE_CTRL_RIGHT:
+			return Key_CTRL;
+		case AKEYCODE_DEL:
+			return Key_DELETE;
+		case AKEYCODE_SYM:
+			return KEY_SPECIAL;
+	}
+
+	if(key>=AKEYCODE_0 && key<=AKEYCODE_9){
+		return key-AKEYCODE_0+'0';
+	}
+	else if(key>=AKEYCODE_A && key<=AKEYCODE_Z){
+		return key-AKEYCODE_A+'A';
+	}
+
+	return key;
 }
 
 void AndroidApplication::onDestroy(ANativeActivity *activity){

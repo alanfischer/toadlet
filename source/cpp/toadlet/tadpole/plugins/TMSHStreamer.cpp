@@ -338,14 +338,22 @@ IndexBuffer::ptr TMSHStreamer::readIndexBuffer(DataStream *stream){
 }
 
 VertexData::ptr TMSHStreamer::readVertexData(DataStream *stream){
-	/// @todo: Really support multiple VertexBuffers
 	int numVertexBuffers=stream->readUInt32();
 	if(numVertexBuffers==0){
 		return NULL;
 	}
 
-	VertexBuffer::ptr buffer=readVertexBuffer(stream);
-	return buffer!=NULL?new VertexData(buffer):NULL;
+	VertexData::ptr data;
+	for(int i=0;i<numVertexBuffers;++i){
+		VertexBuffer::ptr buffer=readVertexBuffer(stream);
+		if(data==NULL){
+			data=new VertexData(buffer);
+		}
+		else{
+			data->addVertexBuffer(buffer);
+		}
+	}
+	return data;
 }
 
 VertexBuffer::ptr TMSHStreamer::readVertexBuffer(DataStream *stream){
@@ -420,14 +428,15 @@ void TMSHStreamer::writeIndexBuffer(DataStream *stream,IndexBuffer::ptr buffer){
 }
 
 void TMSHStreamer::writeVertexData(DataStream *stream,VertexData::ptr vertexData){
-	/// @todo: Support multiple VertexBuffers
 	if(vertexData==NULL){
 		stream->writeUInt32(0);
 		return;
 	}
 
-	stream->writeUInt32(1);
-	writeVertexBuffer(stream,vertexData->vertexBuffers[0]);
+	stream->writeUInt32(vertexData->getNumVertexBuffers());
+	for(int i=0;i<vertexData->getNumVertexBuffers();++i){
+		writeVertexBuffer(stream,vertexData->getVertexBuffer(i));
+	}
 }
 
 void TMSHStreamer::writeVertexBuffer(DataStream *stream,VertexBuffer::ptr buffer){
