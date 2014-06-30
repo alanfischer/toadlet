@@ -1,0 +1,41 @@
+<html>
+<head>
+
+<script type="text/javascript" src="toadlet.js"></script>
+<script type="text/javascript" src="Logo.js"></script>
+<script type="text/javascript">
+var applet;
+
+function update(){
+	var t=(new Date()).getTime();
+	var dt = t-applet.ldt;
+	applet.ldt = t;
+
+	applet.update(dt);
+	applet.render();
+	
+	window.setTimeout(update,0);
+};
+
+function init(){
+	var renderTarget=toadlet.new_EGLWindowRenderTarget(document.getElementById("canvas"));
+	renderDevice=toadlet.new_GLES2RenderDevice();
+	renderDevice.create(renderTarget,0);
+
+	var engine=new toadlet.Engine();
+	engine.setRenderDevice(renderDevice);
+	engine.installHandlers();
+
+	applet=new Logo(engine);
+	applet.create();
+	applet.ldt=(new Date()).getTime();
+	update();
+}
+</script>
+
+<title>Toadlet Example</title>
+</head>
+<body onload="init();">
+<canvas width="512" height="512" id="canvas" oncontextmenu="return false;"></canvas>
+</body>
+</html>
