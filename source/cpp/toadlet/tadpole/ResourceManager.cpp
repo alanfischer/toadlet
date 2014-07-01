@@ -127,26 +127,6 @@ bool ResourceManager::find(const String &name,ResourceRequest *request,ResourceD
 	}
 }
 
-class ImmediateFindRequest:public Object,public ResourceRequest{
-public:
-	TOADLET_IOBJECT(ImmediateFindRequest);
-
-	ImmediateFindRequest():mHasException(false){}
-
-	Resource::ptr get() const{return mResource;}
-	bool hasException() const{return mHasException;}
-	const Exception &getException() const{return mException;}
-
-	void resourceReady(Resource *resource){mResource=resource;}
-	void resourceException(const Exception &ex){mHasException=true;mException=ex;}
-	void resourceProgress(float progress){}
-
-protected:
-	Resource::ptr mResource;
-	bool mHasException;
-	Exception mException;
-};
-
 Resource::ptr ResourceManager::find(const String &name,ResourceData *data){
 	ImmediateFindRequest::ptr request=new ImmediateFindRequest();
 	if(find(name,request,data)){

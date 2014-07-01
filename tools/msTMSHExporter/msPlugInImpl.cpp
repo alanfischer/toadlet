@@ -3,10 +3,9 @@
 #define CreatePlugIn MsCreatePlugIn
 #include "msPlugInImpl.h"
 #undef CreatePlugIn
-#include "commctrl.h"
 #include "../shared/msConversion.h"
-#include <toadlet/toadlet.h>
-#pragma comment(lib,"comctl32.lib")
+#include <toadlet/tadpole.h>
+#include <toadlet/peeper.h>
 
 #pragma warning(disable:4996)
 
@@ -44,6 +43,10 @@ cPlugIn::cPlugIn ()
     strcpy (szTitle, "Toadlet Mesh/Animation...");
 
 	engine=new Engine();
+	engine->setHasBackableShader(true);
+	engine->setHasBackableFixed(true);
+	engine->setHasBackableTriangleFan(true);
+	engine->setHasBackableFixed(true);
 	engine->installHandlers();
 }
 
@@ -131,15 +134,6 @@ cPlugIn::Execute (msModel *pModel)
         return 0;
 
 	HINSTANCE hInstance=GetModuleHandle(0);
-    InitCommonControls(); 
-    hwndProgress=CreateWindowEx(WS_EX_CLIENTEDGE,PROGRESS_CLASS,
-        (LPTSTR) NULL, WS_VISIBLE,
-		CW_USEDEFAULT,CW_USEDEFAULT,240,40,
-        0,0,hInstance,NULL);
-    ShowWindow(hwndProgress,SW_SHOW);
-    UpdateWindow(hwndProgress);
-
-    SendMessage(hwndProgress,PBM_SETRANGE,0,MAKELPARAM(0,100));
 
 	int result=-1;
 	String name=szFile;
@@ -384,8 +378,8 @@ cPlugIn::exportMesh(msModel *pModel,const String &name){
 
 	FileStream::ptr stream=new FileStream(name,FileStream::Open_WRITE_BINARY);
 	XMSHStreamer::ptr streamer=new XMSHStreamer(engine);
-
-	streamer->save(stream,mesh,NULL,this);
+	 
+	streamer->save(stream,mesh,NULL);
 
 	return 0;
 }
@@ -533,7 +527,7 @@ cPlugIn::exportAnimation(msModel *pModel,const String &name){
 					frames.add(frame);
 				}
 				else{
-					frames.insert(&frames[insertAfter+1],frame);
+					frames.insert(insertAfter+1,frame);
 				}
 			}
 		}
@@ -567,7 +561,7 @@ cPlugIn::exportAnimation(msModel *pModel,const String &name){
 					frames.add(frame);
 				}
 				else{
-					frames.insert(&frames[insertAfter+1],frame);
+					frames.insert(insertAfter+1,frame);
 				}
 			}
 		}
@@ -668,12 +662,11 @@ cPlugIn::exportAnimation(msModel *pModel,const String &name){
 	FileStream::ptr stream=new FileStream(name,FileStream::Open_WRITE_BINARY);
 	XANMStreamer::ptr streamer=new XANMStreamer(engine);
 
-	streamer->save(stream,sequence,NULL,this);
+	streamer->save(stream,sequence,NULL);
 
 	return 0;
 }
 
 void 
 cPlugIn::progressUpdated(float amount){
-	SendMessage(hwndProgress,PBM_SETPOS,amount*100,0); 
 }
