@@ -13,7 +13,7 @@ using namespace toadlet::egg::io;
 using namespace toadlet::tadpole;
 
 struct msModel;
-class cPlugIn : public cMsPlugIn,public ProgressListener
+class cPlugIn : public cMsPlugIn
 {
     char szTitle[64];
 	HWND hwndProgress;

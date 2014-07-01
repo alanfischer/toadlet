@@ -517,21 +517,16 @@ int AndroidApplication::translateKey(int key){
 			return Key_SPACE;
 		case AKEYCODE_ENTER:
 			return Key_ENTER;
-		case AKEYCODE_ESCAPE:
-			return Key_ESC;
 		case AKEYCODE_SHIFT_LEFT:
 		case AKEYCODE_SHIFT_RIGHT:
 			return Key_SHIFT;
 		case AKEYCODE_ALT_LEFT:
 		case AKEYCODE_ALT_RIGHT:
 			return Key_ALT;
-		case AKEYCODE_CTRL_LEFT:
-		case AKEYCODE_CTRL_RIGHT:
-			return Key_CTRL;
 		case AKEYCODE_DEL:
 			return Key_DELETE;
 		case AKEYCODE_SYM:
-			return KEY_SPECIAL;
+			return Key_SPECIAL;
 	}
 
 	if(key>=AKEYCODE_0 && key<=AKEYCODE_9){

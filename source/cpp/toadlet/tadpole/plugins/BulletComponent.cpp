@@ -29,8 +29,10 @@
 namespace toadlet{
 namespace tadpole{
 
-BulletComponent::BulletComponent(BulletManager *manager)
+BulletComponent::BulletComponent(BulletManager *manager):
 	//mManager
+	mCollisionScope(-1),
+	mCollideWithScope(-1)
 {
 	mManager=manager;
 
@@ -77,7 +79,12 @@ void BulletComponent::rootChanged(Node *root){
 	BaseComponent::rootChanged(root);
 
 	if(mParent!=NULL && root!=NULL && mParent->getParent()==root){
-		mManager->getWorld()->addRigidBody(mBody);
+		if(mCollisionScope!=-1 || mCollideWithScope!=-1){
+			mManager->getWorld()->addRigidBody(mBody,mCollisionScope,mCollideWithScope);
+		}
+		else{
+			mManager->getWorld()->addRigidBody(mBody);
+		}
 	}
 	else{
 		mManager->getWorld()->removeRigidBody(mBody);

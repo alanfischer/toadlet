@@ -1,6 +1,6 @@
 #include "stdafx.h"
 // CreatePlugIn has a different signature in the msLib, so redefine it
-#define CreatePlugIn MSCreatePlugIn
+#define CreatePlugIn MsCreatePlugIn
 #include "msPlugInImpl.h"
 #undef CreatePlugIn
 #include "../shared/msConversion.h"
@@ -47,6 +47,10 @@ cPlugIn::cPlugIn ()
     strcpy (szTitle, "Toadlet Mesh/Animation ...");
 
 	engine=new Engine();
+	engine->setHasBackableShader(true);
+	engine->setHasBackableFixed(true);
+	engine->setHasBackableTriangleFan(true);
+	engine->setHasBackableFixed(true);
 	engine->installHandlers();
 }
 
@@ -140,7 +144,9 @@ cPlugIn::importMesh(msModel *pModel,const String &name,int flags){
 	}
 
 	XMSHStreamer::ptr streamer=new XMSHStreamer(engine);
-	Mesh::ptr mesh=shared_static_cast<Mesh>(streamer->load(stream,NULL,NULL));
+	ResourceManager::ImmediateFindRequest::ptr request=new ResourceManager::ImmediateFindRequest();
+	streamer->load(stream,NULL,request);
+	Mesh::ptr mesh=shared_static_cast<Mesh>(request->get());
 	if(mesh==NULL){
 		::MessageBox(NULL,"Toadlet Mesh/Animation Import","Error loading file",MB_OK);
 		return -1;
@@ -284,7 +290,7 @@ cPlugIn::importMesh(msModel *pModel,const String &name,int flags){
 				msMaterial *msmat=msModel_GetMaterialAt(pModel,mati);
 				msMaterial_SetName(msmat,subMesh->materialName);
 
-				msMaterial_SetDiffuse(msmat,(scalar*)Math::ONE_VECTOR4.getData());
+				msMaterial_SetDiffuse(msmat,(float*)Math::ONE_VECTOR4.getData());
 
 				if(flags & eMeshes){
 					msMesh_SetMaterialIndex(msmesh,mati);
@@ -396,8 +402,10 @@ cPlugIn::importAnimation(msModel *pModel,const String &name,int flags){
 		return -1;
 	}
 
-	XANMStreamer::ptr streamer=new XANMStreamer(engine);
-	Sequence::ptr sequence=shared_static_cast<Sequence>(streamer->load(stream,NULL,NULL));
+	ResourceStreamer::ptr streamer=new XANMStreamer(engine);
+	ResourceManager::ImmediateFindRequest::ptr request=new ResourceManager::ImmediateFindRequest();
+	streamer->load(stream,NULL,request);
+	Sequence::ptr sequence=shared_static_cast<Sequence>(request->get());
 	if(sequence==NULL){
 		::MessageBox(NULL,"Toadlet Mesh/Animation Import","Error loading file",MB_OK);
 		return -1;

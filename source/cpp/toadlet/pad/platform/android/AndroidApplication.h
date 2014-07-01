@@ -115,7 +115,7 @@ public:
 	void run();
 	
 protected:
-	void translateKey(int key);
+	int translateKey(int key);
 
 	static void onDestroy(ANativeActivity *activity);
 	static void onStart(ANativeActivity *activity);
