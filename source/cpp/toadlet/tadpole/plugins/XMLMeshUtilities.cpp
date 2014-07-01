@@ -238,72 +238,74 @@ mxml_node_t *XMLMeshUtilities::saveMaterial(Material::ptr material,int version){
 
 	RenderState::ptr renderState=material->getRenderState();
 
-	MaterialState materialState;
-	if(renderState->getMaterialState(materialState)){
-		mxml_node_t *lightNode=mxmlNewElement(materialNode,"Light");
-		{
-			mxmlNewOpaque(lightNode,formatBool(materialState.light));
-		}
+	if(renderState!=NULL){
+		MaterialState materialState;
+		if(renderState->getMaterialState(materialState)){
+			mxml_node_t *lightNode=mxmlNewElement(materialNode,"Light");
+			{
+				mxmlNewOpaque(lightNode,formatBool(materialState.light));
+			}
 
-		mxml_node_t *ambientNode=mxmlNewElement(materialNode,"Ambient");
-		{
-			mxmlNewOpaque(ambientNode,formatVector4(materialState.ambient));
-		}
+			mxml_node_t *ambientNode=mxmlNewElement(materialNode,"Ambient");
+			{
+				mxmlNewOpaque(ambientNode,formatVector4(materialState.ambient));
+			}
 
-		mxml_node_t *diffuseNode=mxmlNewElement(materialNode,"Diffuse");
-		{
-			mxmlNewOpaque(diffuseNode,formatVector4(materialState.diffuse));
-		}
+			mxml_node_t *diffuseNode=mxmlNewElement(materialNode,"Diffuse");
+			{
+				mxmlNewOpaque(diffuseNode,formatVector4(materialState.diffuse));
+			}
 
-		mxml_node_t *specularNode=mxmlNewElement(materialNode,"Specular");
-		{
-			mxmlNewOpaque(specularNode,formatVector4(materialState.specular));
-		}
+			mxml_node_t *specularNode=mxmlNewElement(materialNode,"Specular");
+			{
+				mxmlNewOpaque(specularNode,formatVector4(materialState.specular));
+			}
 		
-		mxml_node_t *shininessNode=mxmlNewElement(materialNode,"Shininess");
-		{
-			mxmlNewOpaque(shininessNode,formatScalar(materialState.shininess));
-		}
+			mxml_node_t *shininessNode=mxmlNewElement(materialNode,"Shininess");
+			{
+				mxmlNewOpaque(shininessNode,formatScalar(materialState.shininess));
+			}
 
-		mxml_node_t *emissiveNode=mxmlNewElement(materialNode,"Emissive");
-		{
-			mxmlNewOpaque(emissiveNode,formatVector4(materialState.emissive));
-		}
-	}
-
-	RasterizerState rasterizerState;
-	if(renderState->getRasterizerState(rasterizerState)){
-		mxml_node_t *cullNode=mxmlNewElement(materialNode,"Cull");
-		{
-			switch(rasterizerState.cull){
-				case RasterizerState::CullType_FRONT:
-					mxmlNewOpaque(cullNode,"Front");
-				break;
-				case RasterizerState::CullType_BACK:
-					mxmlNewOpaque(cullNode,"Back");
-				break;
-				case RasterizerState::CullType_NONE:
-					mxmlNewOpaque(cullNode,"None");
-				break;
-				default:
-				break;
+			mxml_node_t *emissiveNode=mxmlNewElement(materialNode,"Emissive");
+			{
+				mxmlNewOpaque(emissiveNode,formatVector4(materialState.emissive));
 			}
 		}
-	}
 
-	BlendState blendState;
-	if(renderState->getBlendState(blendState)){
-		mxml_node_t *blendNode=mxmlNewElement(materialNode,"Blend");
-		{
-			switch(blendState.dest){
-				case BlendState::Operation_ONE_MINUS_SOURCE_ALPHA:
-					mxmlNewOpaque(blendNode,"Alpha");
-				break;
-				case BlendState::Operation_ONE_MINUS_SOURCE_COLOR:
-					mxmlNewOpaque(blendNode,"Color");
-				break;
-				default:
-				break;
+		RasterizerState rasterizerState;
+		if(renderState->getRasterizerState(rasterizerState)){
+			mxml_node_t *cullNode=mxmlNewElement(materialNode,"Cull");
+			{
+				switch(rasterizerState.cull){
+					case RasterizerState::CullType_FRONT:
+						mxmlNewOpaque(cullNode,"Front");
+					break;
+					case RasterizerState::CullType_BACK:
+						mxmlNewOpaque(cullNode,"Back");
+					break;
+					case RasterizerState::CullType_NONE:
+						mxmlNewOpaque(cullNode,"None");
+					break;
+					default:
+					break;
+				}
+			}
+		}
+
+		BlendState blendState;
+		if(renderState->getBlendState(blendState)){
+			mxml_node_t *blendNode=mxmlNewElement(materialNode,"Blend");
+			{
+				switch(blendState.dest){
+					case BlendState::Operation_ONE_MINUS_SOURCE_ALPHA:
+						mxmlNewOpaque(blendNode,"Alpha");
+					break;
+					case BlendState::Operation_ONE_MINUS_SOURCE_COLOR:
+						mxmlNewOpaque(blendNode,"Color");
+					break;
+					default:
+					break;
+				}
 			}
 		}
 	}
@@ -978,12 +980,12 @@ mxml_node_t *XMLMeshUtilities::saveSequence(Sequence::ptr sequence,int version){
 }
 
 void XMLMeshUtilities::MaterialRequest::request(){
-	while(mIndex<mMesh->getNumSubMeshes() && mMesh->getSubMesh(mIndex)->materialName.length()!=0){
+	while(mIndex<mMesh->getNumSubMeshes() && mMesh->getSubMesh(mIndex)->materialName.length()==0){
 		mIndex++;
 	}
 	
 	if(mIndex<mMesh->getNumSubMeshes()){
-		mMaterialManager->find(mMesh->getSubMesh(mIndex)->material->getName(),this);
+		mMaterialManager->find(mMesh->getSubMesh(mIndex)->materialName,this);
 	}
 	else{
 		mMesh->compile();
@@ -994,7 +996,9 @@ void XMLMeshUtilities::MaterialRequest::request(){
 void XMLMeshUtilities::MaterialRequest::resourceReady(Resource *resource){
 	Material::ptr material=(Material*)resource;
 	Mesh::SubMesh *subMesh=mMesh->getSubMesh(mIndex);
-	mMaterialManager->modifyRenderState(material->getRenderState(),subMesh->material->getRenderState());
+	if(material->getRenderState() && subMesh->material!=NULL && subMesh->material->getRenderState()!=NULL){
+		mMaterialManager->modifyRenderState(material->getRenderState(),subMesh->material->getRenderState());
+	}
 	subMesh->material=material;
 
 	mIndex++;

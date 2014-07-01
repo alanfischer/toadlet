@@ -74,10 +74,10 @@ public:
 
 	void setScope(int scope){}
 	int getScope() const{return -1;}
-	void setCollisionScope(int scope){}
-	int getCollisionScope() const{return -1;}
-	void setCollideWithScope(int scope){}
-	int getCollideWithScope() const{return -1;}
+	void setCollisionScope(int scope){mCollisionScope=scope;}
+	int getCollisionScope() const{return mCollisionScope;}
+	void setCollideWithScope(int scope){mCollideWithScope=scope;}
+	int getCollideWithScope() const{return mCollideWithScope;}
 
 	// Spacial
 	Transform *getTransform() const{return NULL;}
@@ -103,6 +103,8 @@ protected:
 	BulletManager *mManager;
 	btRigidBody *mBody;
 	btCompoundShape *mShape;
+	int mCollisionScope;
+	int mCollideWithScope;
 	Collection<PhysicsCollisionListener*> mListeners;
 	Vector3 mCurrentPosition;
 	Quaternion mCurrentOrientation;

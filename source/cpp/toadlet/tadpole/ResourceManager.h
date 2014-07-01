@@ -44,6 +44,26 @@ class TOADLET_API ResourceManager:public Object,public ResourceDestroyedListener
 public:
 	TOADLET_OBJECT(ResourceManager);
 
+	class ImmediateFindRequest:public Object,public ResourceRequest{
+	public:
+		TOADLET_IOBJECT(ImmediateFindRequest);
+
+		ImmediateFindRequest():mHasException(false){}
+
+		Resource::ptr get() const{return mResource;}
+		bool hasException() const{return mHasException;}
+		const Exception &getException() const{return mException;}
+
+		void resourceReady(Resource *resource){mResource=resource;}
+		void resourceException(const Exception &ex){mHasException=true;mException=ex;}
+		void resourceProgress(float progress){}
+
+	protected:
+		Resource::ptr mResource;
+		bool mHasException;
+		Exception mException;
+	};
+
 	ResourceManager(Engine *engine);
 
 	virtual void destroy();
@@ -109,23 +129,6 @@ protected:
 		ResourceData::ptr mData;
 		Collection<Archive::ptr>::iterator mIt;
 		bool mPushedTemp;
-	};
-
-	class SyncRequest:public Object,public ResourceRequest{
-	public:
-		TOADLET_IOBJECT(SyncRequest);
-
-		SyncRequest(){Log::warning("Using a SyncRequest!");}
-
-		void resourceReady(Resource *resource){mResource=resource;}
-		void resourceException(const Exception &ex){mException=ex;}
-
-		Resource::ptr getResource() const{return mResource;}
-		const Exception &getException() const{return mException;}
-
-	protected:
-		Resource::ptr mResource;
-		Exception mException;
 	};
 
 	typedef Map<String,Resource*> NameResourceMap;
