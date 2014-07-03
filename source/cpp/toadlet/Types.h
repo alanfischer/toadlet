@@ -84,6 +84,7 @@
 	#else
 		#define TOADLET_API
 	#endif
+	#define NOMINMAX
 	#include <stdlib.h>
 	#include <string.h>
 	#if	defined(_WCHAR_T_DEFINED) || defined(_WCHAR_T_DEFINED_)

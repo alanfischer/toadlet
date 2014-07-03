@@ -65,7 +65,7 @@ public:
 		inline String(NSString *string){internal_String([string UTF8String]);}
 	#endif
 	#if defined(QSTRING_H)
-		inline String(const QString &string){internal_String(string.toAscii().data());}
+		inline String(const QString &string){internal_String(string.toLatin1().data());}
 	#endif
 	String(const String &string);
 	explicit String(int length);

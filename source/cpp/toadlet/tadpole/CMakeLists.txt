@@ -15,6 +15,7 @@ option(TOADLET_DISABLE_MODPLUG "Forcibly disable modplug" OFF)
 option(TOADLET_DISABLE_FFMPEG "Forcibly disable ffmpeg" OFF)
 option(TOADLET_DISABLE_OGGVORBIS "Forcibly disable oggvorbis" OFF)
 option(TOADLET_DISABLE_GDIPLUS "Forcibly disable gdiplus" OFF)
+option(TOADLET_DISABLE_ASSIMP "Forcibly disable assimp" OFF)
 
 # Source files for toadlet_tadpole
 set (TADPOLE_SRC
@@ -152,6 +153,10 @@ set (TADPOLE_PLUGINS_SIDDECODER_SRC
 set (TADPOLE_PLUGINS_ZIP_SRC
 	plugins/ZIPArchive.cpp
 	plugins/ZIPStream.cpp
+)
+
+set (TADPOLE_PLUGINS_ASSIMP_SRC
+	plugins/AssimpHandler.cpp
 )
 
 set (TADPOLE_PLUGINS_HOP_SRC
@@ -390,6 +395,10 @@ set (TADPOLE_PLUGINS_SIDDECODER_HDR
 set (TADPOLE_PLUGINS_ZIP_HDR
 	plugins/ZIPArchive.h
 	plugins/ZIPStream.h
+)
+
+set (TADPOLE_PLUGINS_ASSIMP_HDR
+	plugins/AssimpHandler.h
 )
 
 set (TADPOLE_PLUGINS_HOP_HDR
@@ -798,7 +807,29 @@ if (NOT FFMPEG_FOUND)
 	endif (OGGVORBIS_FOUND)
 endif (NOT FFMPEG_FOUND)
 
-find_package (BULLET)
+find_package (assimp)
+if (assimp_FOUND)
+	if (TOADLET_DISABLE_ASSIMP)
+		message (STATUS "Assimp forcibly disabled")
+	else (TOADLET_DISABLE_ASSIMP)
+		set (TOADLET_HAS_ASSIMP ON PARENT_SCOPE)
+		include_directories (${assimp_INCLUDE_DIRS})
+		set (TADPOLE_PLUGINS_HDR ${TADPOLE_PLUGINS_HDR} ${TADPOLE_PLUGINS_ASSIMP_HDR})
+		
+		# Dynamic Library
+		set (TADPOLE_PLUGINS_SRC ${TADPOLE_PLUGINS_SRC} ${TADPOLE_PLUGINS_ASSIMP_SRC})
+		set (TADPOLE_PLUGINS_LIBS ${TADPOLE_PLUGINS_LIBS} ${ASSIMP_LIBRARY})
+
+		# Static Library
+		LOCATE_STATIC_LIBRARIES (assimp_LIBRARIES_S "${assimp_LIBRARIES}")
+		if (assimp_LIBRARIES_S)
+			set (TADPOLE_PLUGINS_SRC_S ${TADPOLE_PLUGINS_SRC_S} ${TADPOLE_PLUGINS_ASSIMP_SRC})
+			set (TADPOLE_PLUGINS_LIBS_S ${TADPOLE_PLUGINS_LIBS_S} ${assimp_LIBRARIES_S})
+		endif (assimp_LIBRARIES_S)
+	endif(TOADLET_DISABLE_ASSIMP)
+endif (assimp_FOUND)
+
+find_package (Bullet)
 if (BULLET_FOUND)
 	include_directories (${BULLET_INCLUDE_DIR})
 	set (TADPOLE_PLUGINS_HDR ${TADPOLE_PLUGINS_HDR} ${TADPOLE_PLUGINS_BULLET_HDR})
