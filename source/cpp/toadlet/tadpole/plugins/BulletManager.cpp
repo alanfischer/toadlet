@@ -43,7 +43,7 @@ BulletManager::BulletManager(Scene *scene):
 	btDbvtBroadphase *broadphase = new btDbvtBroadphase();
 	btSequentialImpulseConstraintSolver *solver = new btSequentialImpulseConstraintSolver();
 
-	mWorld=new btSimpleDynamicsWorld(dispatcher,broadphase,solver,collisionConfiguration);
+	mWorld=new btDiscreteDynamicsWorld(dispatcher,broadphase,solver,collisionConfiguration);
 }
 
 BulletManager::~BulletManager(){

@@ -136,6 +136,11 @@ public:
 		Math::setMatrix4x4FromTranslateRotateScale(r,mTranslate,mRotate,mScale);
 	}
 
+	Matrix4x4 getMatrix() const{
+		Matrix4x4 matrix; Math::setMatrix4x4FromTranslateRotateScale(matrix,mTranslate,mRotate,mScale);
+		return matrix;
+	}
+
 	void setMatrix(const Matrix4x4 &m){
 		Math::setScaleFromMatrix4x4(mScale,m);
 		Math::setQuaternionFromMatrix4x4(mRotate,m);

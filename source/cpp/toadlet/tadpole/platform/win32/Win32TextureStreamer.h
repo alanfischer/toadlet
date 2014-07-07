@@ -30,7 +30,12 @@
 #include <toadlet/tadpole/TextureManager.h>
 #include <toadlet/tadpole/BaseResourceStreamer.h>
 #include <windows.h>
+
+#define max(a,b) (((a) > (b)) ? (a) : (b))
+#define min(a,b) (((a) < (b)) ? (a) : (b))
 #include <Gdiplus.h>
+#undef max
+#undef min
 
 namespace toadlet{
 namespace tadpole{
