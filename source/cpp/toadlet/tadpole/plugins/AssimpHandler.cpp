@@ -26,6 +26,7 @@
 #include "AssimpHandler.h"
 #include <assimp/Importer.hpp>
 #include <assimp/Exporter.hpp>
+#include <assimp/scene.h>
 
 namespace toadlet{
 namespace tadpole{
@@ -34,7 +35,7 @@ AssimpHandler::AssimpHandler(Engine *engine):
 	mEngine(engine)
 {}
 
-Node::ptr AssimpHandler::loadScene(Stream *stream,const String &format){
+Node::ptr AssimpHandler::load(Stream *stream,const String &format){
 	int length=stream->length();
 	tbyte *data=new tbyte[length];
 	stream->read(data,length);
@@ -52,22 +53,40 @@ Node::ptr AssimpHandler::loadScene(Stream *stream,const String &format){
 	return node;
 }
 
-Node::ptr AssimpHandler::loadScene(const aiScene *iscene,const aiNode *inode){
-	Node::ptr node;
-	if(inode==NULL){
-		node=loadScene(iscene,iscene->mRootNode);
-	}
-	else{
-		node=new Node();
-		int i;
-		for(i=0;i<inode->mNumChildren;++i){
-			node->attach(loadScene(iscene,inode->mChildren[i]));
-		}
-	}
+Node::ptr AssimpHandler::loadScene(const aiScene *ascene){
+	Scene *scene=new Scene();
+
+	scene->cameras.resize(ascene->mNumCameras);
+
+	scene->meshes.resize(ascene->mNumMeshes);
+
+	Node::ptr node=loadScene(scene,ascene,ascene->mRootNode);
+
+	delete scene;
+
 	return node;
 }
 
-bool AssimpHandler::saveScene(Stream *stream,Node *node,const String &format){
+Node::ptr AssimpHandler::loadScene(Scene *scene,const aiScene *ascene,const aiNode *anode){
+	Node::ptr node=new Node();
+
+	node->setName(anode->mName.C_Str());
+
+	node->getTransform()->setMatrix(toMatrix4x4(anode->mTransformation));
+
+	int i;
+	for(i=0;i<anode->mNumMeshes;++i){
+		Mesh *mesh=scene->meshes[anode->mMeshes[i]];
+	}
+
+	for(i=0;i<anode->mNumChildren;++i){
+		node->attach(loadScene(scene,ascene,anode->mChildren[i]));
+	}
+
+	return node;
+}
+
+bool AssimpHandler::save(Stream *stream,Node *node,const String &format){
 	const aiScene *scene=saveScene(node);
 
 	Assimp::Exporter *exporter=new Assimp::Exporter();
@@ -87,7 +106,41 @@ bool AssimpHandler::saveScene(Stream *stream,Node *node,const String &format){
 }
 
 const aiScene *AssimpHandler::saveScene(Node *node){
-	return new aiScene();
+	Scene *scene=new Scene();
+
+	aiScene *ascene=new aiScene();
+
+	ascene->mRootNode=saveScene(scene,ascene,node);
+
+	delete scene;
+
+	return ascene;
+}
+
+aiNode *AssimpHandler::saveScene(Scene *scene,const aiScene *ascene,Node *node){
+	aiNode *anode=new aiNode();
+
+	anode->mName=node->getName();
+
+	anode->mTransformation=toMatrix4x4(node->getTransform()->getMatrix());
+
+	int i;
+	MeshComponent::ptr mesh=node->getChildType<MeshComponent>();
+	if(mesh!=NULL){
+		// TODO
+	}
+
+	tforeach(AnyPointerIterator<Node>,child,node->getNodes()){anode->mNumChildren++;}
+
+	if(anode->mNumChildren>0){
+		anode->mChildren=new aiNode*[anode->mNumChildren];
+		i=0;
+		tforeach(AnyPointerIterator<Node>,child,node->getNodes()){
+			anode->mChildren[i++]=saveScene(scene,ascene,child);
+		}
+	}
+
+	return anode;
 }
 
 }
