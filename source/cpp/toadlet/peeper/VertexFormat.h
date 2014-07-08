@@ -47,6 +47,8 @@ public:
 		Semantic_TEXCOORD=			5,
 		Semantic_SCALE=				6,
 		Semantic_ROTATE=			7,
+		Semantic_TANGENT=			8,
+		Semantic_BITANGENT=			9,
 	};
 
 	enum Format{

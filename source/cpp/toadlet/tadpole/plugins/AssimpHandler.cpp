@@ -54,11 +54,16 @@ Node::ptr AssimpHandler::load(Stream *stream,const String &format){
 }
 
 Node::ptr AssimpHandler::loadScene(const aiScene *ascene){
+	int i;
+
 	Scene *scene=new Scene();
 
 	scene->cameras.resize(ascene->mNumCameras);
 
 	scene->meshes.resize(ascene->mNumMeshes);
+	for(i=0;i<ascene->mNumMeshes;++i){
+		scene->meshes[i]=loadMesh(ascene->mMeshes[i]);
+	}
 
 	Node::ptr node=loadScene(scene,ascene,ascene->mRootNode);
 
@@ -84,6 +89,118 @@ Node::ptr AssimpHandler::loadScene(Scene *scene,const aiScene *ascene,const aiNo
 	}
 
 	return node;
+}
+
+Mesh::ptr AssimpHandler::loadMesh(const aiMesh *amesh){
+	int i,v;
+
+	VertexFormat::ptr format=mEngine->getBufferManager()->createVertexFormat();
+	{
+		if(amesh->HasPositions()){
+			format->addElement(VertexFormat::Semantic_POSITION,0,VertexFormat::Format_COUNT_3|VertexFormat::Format_TYPE_FLOAT_32);
+		}
+		if(amesh->HasNormals()){
+			format->addElement(VertexFormat::Semantic_NORMAL,0,VertexFormat::Format_COUNT_3|VertexFormat::Format_TYPE_FLOAT_32);
+		}
+		for(i=0;i<amesh->GetNumColorChannels();++i){
+			if(amesh->HasVertexColors(i)){
+				format->addElement(VertexFormat::Semantic_COLOR,i,VertexFormat::Format_COUNT_4|VertexFormat::Format_TYPE_FLOAT_32);
+			}
+		}
+		for(i=0;i<amesh->GetNumUVChannels();++i){
+			if(amesh->HasTextureCoords(i)){
+				int count=amesh->mNumUVComponents[i];
+				format->addElement(VertexFormat::Semantic_TEXCOORD,i,(VertexFormat::Format_COUNT_1<<(count-1))|VertexFormat::Format_TYPE_FLOAT_32);
+			}
+		}
+		if(amesh->HasTangentsAndBitangents()){
+			format->addElement(VertexFormat::Semantic_TANGENT,i,VertexFormat::Format_COUNT_3|VertexFormat::Format_TYPE_FLOAT_32);
+			format->addElement(VertexFormat::Semantic_BITANGENT,i,VertexFormat::Format_COUNT_3|VertexFormat::Format_TYPE_FLOAT_32);
+		}
+	}
+	format->create();
+
+	VertexBuffer::ptr vertexBuffer=mEngine->getBufferManager()->createVertexBuffer(Buffer::Usage_BIT_STATIC,Buffer::Access_BIT_WRITE,format,amesh->mNumVertices);
+	{
+		int e=0;
+		VertexBufferAccessor vba(vertexBuffer);
+		if(amesh->HasPositions()){
+			for(v=0;v<amesh->mNumVertices;++v){
+				vba.set3(v,e,toVector3(amesh->mVertices[v]));
+			}
+			e++;
+		}
+		if(amesh->HasNormals()){
+			for(v=0;v<amesh->mNumVertices;++v){
+				vba.set3(v,e,toVector3(amesh->mNormals[v]));
+			}
+			e++;
+		}
+		for(i=0;i<amesh->GetNumColorChannels();++i){
+			if(amesh->HasVertexColors(i)){
+				for(v=0;v<amesh->mNumVertices;++v){
+					vba.set4(v,e,toColor4(amesh->mColors[i][v]));
+				}
+				e++;
+			}
+		}
+		for(i=0;i<amesh->GetNumUVChannels();++i){
+			if(amesh->HasTextureCoords(i)){
+				int count=amesh->mNumUVComponents[i];
+				switch(count){
+					case 1:
+						for(v=0;v<amesh->mNumVertices;++v){
+							vba.set(v,e,amesh->mTextureCoords[i][v].x);
+						}
+					break;
+					case 2:
+						for(v=0;v<amesh->mNumVertices;++v){
+							vba.set2(v,e,amesh->mTextureCoords[i][v].x,amesh->mTextureCoords[i][v].y);
+						}
+					break;
+					case 3:
+						for(v=0;v<amesh->mNumVertices;++v){
+							vba.set3(v,e,toVector3(amesh->mTextureCoords[i][v]));
+						}
+					break;
+				}
+				e++;
+			}
+		}
+		if(amesh->HasTangentsAndBitangents()){
+			for(v=0;v<amesh->mNumVertices;++v){
+				vba.set3(v,e,toVector3(amesh->mTangents[v]));
+				vba.set3(v,e+1,toVector3(amesh->mBitangents[v]));
+			}
+			e+=2;
+		}
+		vba.unlock();
+	}
+
+	IndexBuffer::ptr indexBuffer;
+	if(amesh->HasFaces()){
+		int numIndexes=0;
+		for(i=0;i<amesh->mNumFaces;++i){
+			numIndexes+=amesh->mFaces[i].mNumIndices;
+		}
+		indexBuffer=mEngine->getBufferManager()->createIndexBuffer(Buffer::Usage_BIT_STATIC,Buffer::Access_BIT_WRITE,IndexBuffer::IndexFormat_UINT16,numIndexes);
+
+		int e=0;
+		IndexBufferAccessor iba(indexBuffer);
+		for(i=0;i<amesh->mNumFaces;++i){
+			for(v=0;v<amesh->mFaces[i].mNumIndices;++v){
+				iba.set(e,amesh->mFaces[i].mIndices[v]);
+				e++;
+			}
+		}
+		iba.unlock();
+	}
+
+	Mesh::ptr mesh=new Mesh();
+
+	mesh->setStaticVertexData(new VertexData(vertexBuffer));
+
+	return mesh;
 }
 
 bool AssimpHandler::save(Stream *stream,Node *node,const String &format){

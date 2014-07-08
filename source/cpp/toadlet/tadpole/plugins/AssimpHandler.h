@@ -33,6 +33,7 @@
 #include <toadlet/tadpole/LightComponent.h>
 #include <assimp/scene.h>
 #include <assimp/vector3.h>
+#include <assimp/color4.h>
 
 namespace toadlet{
 namespace tadpole{
@@ -49,7 +50,10 @@ public:
 	Node::ptr loadScene(const aiScene *ascene);
 	const aiScene *saveScene(Node *node);
 
+	Mesh::ptr loadMesh(const aiMesh *mesh);
+
 	static aiVector3D toVector3(const Vector3 &v){return aiVector3D(v.x,v.y,v.z);}
+	static aiColor4D toColor4(const Vector4 &v){return aiColor4D(v.x,v.y,v.z,v.w);}
 	static aiQuaternion toQuaternion(const Quaternion &q){return aiQuaternion(q.x,q.y,q.z,q.w);}
 	static aiMatrix4x4 toMatrix4x4(const Matrix4x4 &m){return aiMatrix4x4(
 		m.data[ 0],m.data[ 1],m.data[ 2],m.data[ 3],
@@ -58,6 +62,7 @@ public:
 		m.data[12],m.data[13],m.data[14],m.data[15]);}
 
 	static Vector3 toVector3(const aiVector3D &v){return Vector3(v.x,v.y,v.z);}
+	static Vector4 toColor4(const aiColor4D &v){return Vector4(v.r,v.g,v.b,v.a);}
 	static Quaternion toQuaternion(const aiQuaternion &q){return Quaternion(q.x,q.y,q.z,q.w);}
 	static Matrix4x4 toMatrix4x4(const aiMatrix4x4 &m){return Matrix4x4(
 		m.a1,m.a2,m.a3,m.a4,
