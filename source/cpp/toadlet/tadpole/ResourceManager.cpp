@@ -386,6 +386,7 @@ ResourceManager::ArchiveResourceRequest::ArchiveResourceRequest(ResourceManager 
 
 void ResourceManager::ArchiveResourceRequest::request(){
 	if(mIt!=mManager->mResourceArchives.end()){
+		mSearchingArchives=true;
 		Archive *archive=((Archive*)(*mIt));
 		if(archive!=NULL){
 			archive->openResource(mName,this);
@@ -395,6 +396,7 @@ void ResourceManager::ArchiveResourceRequest::request(){
 		}
 	}
 	else{
+		mSearchingArchives=false;
 		notFound();
 	}
 }
@@ -441,8 +443,13 @@ void ResourceManager::ArchiveResourceRequest::resourceException(const Exception 
 		mManager->mEngine->getArchiveManager()->popDirectory();
 	}
 
-	mIt++;
-	request();
+	if(mSearchingArchives){
+		mIt++;
+		request();
+	}
+	else{
+		mRequest->resourceException(ex);
+	}
 }
 
 void ResourceManager::ArchiveResourceRequest::streamReady(Stream *stream){

@@ -88,6 +88,9 @@
 	#include <toadlet/tadpole/plugins/XMATStreamer.h>
 	#include <toadlet/tadpole/plugins/XMSHStreamer.h>
 #endif
+#if defined(TOADLET_HAS_ASSIMP)
+	#include <toadlet/tadpole/plugins/AssimpMeshStreamer.h>
+#endif
 
 #if defined(TOADLET_HAS_OGGVORBIS)
 	#include <toadlet/tadpole/plugins/OggVorbisStreamer.h>
@@ -281,6 +284,9 @@ void Engine::installHandlers(){
 		mMeshManager->setStreamer(new XMSHStreamer(this),"xmsh");
 	#endif
 	mMeshManager->setStreamer(new TMSHStreamer(this),"tmsh");
+	#if defined(TOADLET_HAS_ASSIMP)
+		mMeshManager->setDefaultStreamer(new AssimpMeshStreamer(this));
+	#endif
 
 	// AudioBuffer streamers
 	#if !defined(TOADLET_PLATFORM_EMSCRIPTEN)

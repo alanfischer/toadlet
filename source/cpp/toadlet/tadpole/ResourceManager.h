@@ -128,6 +128,7 @@ protected:
 		ResourceRequest::ptr mRequest;
 		ResourceData::ptr mData;
 		Collection<Archive::ptr>::iterator mIt;
+		bool mSearchingArchives;
 		bool mPushedTemp;
 	};
 
