@@ -68,5 +68,6 @@
 #cmakedefine TOADLET_HAS_GME
 #cmakedefine TOADLET_HAS_MODPLUG
 #cmakedefine TOADLET_HAS_GDIPLUS
+#cmakedefine TOADLET_HAS_ASSIMP
 
 #endif

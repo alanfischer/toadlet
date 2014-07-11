@@ -1,15 +1,16 @@
-#include "Logo.h"
+#include "Sandbox.h"
+#include <toadlet/tadpole/plugins/AssimpHandler.h>
 
-Logo::Logo(Application *app){
+Sandbox::Sandbox(Application *app){
 	this->app=app;
 }
 
-Logo::~Logo(){
+Sandbox::~Sandbox(){
 }
 
-void Logo::create(){
+void Sandbox::create(){
 	engine=app->getEngine();
-	engine->getArchiveManager()->addDirectory("../../data");
+	engine->getArchiveManager()->addDirectory("..");
 
 	scene=new Scene(engine);
 
@@ -26,17 +27,19 @@ void Logo::create(){
 
 	Node::ptr lt=new Node(scene);
 	{
- 		MeshComponent::ptr mesh=new MeshComponent(engine);
-		mesh->setMesh("lt.tmsh");
-		lt->attach(mesh);
+// 		MeshComponent::ptr mesh=new MeshComponent(engine);
+//		mesh->setMesh("spider.obj");
+//		lt->attach(mesh);
 
-		if(mesh!=NULL){
-			AnimationAction::ptr animation=new AnimationAction(mesh->getSkeleton()->getAnimation(0));
-			animation->setCycling(AnimationAction::Cycling_REFLECT);
-			lt->attach(new ActionComponent("animation",animation));
-			mesh->getSkeleton()->setRenderSkeleton(true);
-		}
-		lt->startAction("animation");
+		AssimpHandler::ptr handler=new AssimpHandler(engine);
+		Node::ptr node=handler->load(new FileStream("../duck.dae",FileStream::Open_READ_BINARY),"");
+		lt->setScale(100);
+		lt->attach(node);
+
+//		PhysicsComponent::ptr physics=scene->getPhysicsManager()->createPhysicsComponent();
+//		physics->setMass(1);
+//		physics->setBound(new Bound(Sphere(1)));
+//		lt->attach(physics);
 	}
 	scene->getRoot()->attach(lt);
 
@@ -50,21 +53,21 @@ void Logo::create(){
 	scene->getRoot()->attach(node);
 }
 
-void Logo::destroy(){
+void Sandbox::destroy(){
 	scene->destroy();
 }
 
-void Logo::render(){
+void Sandbox::render(){
 	RenderDevice *renderDevice=engine->getRenderDevice();
 
 	renderDevice->beginScene();
-		camera->render(renderDevice,scene);
+		camera->getCamera()->render(renderDevice,scene);
 	renderDevice->endScene();
 	renderDevice->swap();
 }
 
-void Logo::update(int dt){
+void Sandbox::update(int dt){
 	scene->update(dt);
 }
 
-Applet *createApplet(Application *app){return new Logo(app);}
+Applet *createApplet(Application *app){return new Sandbox(app);}

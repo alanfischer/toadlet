@@ -81,7 +81,9 @@ Node::ptr AssimpHandler::loadScene(Scene *scene,const aiScene *ascene,const aiNo
 
 	int i;
 	for(i=0;i<anode->mNumMeshes;++i){
-		Mesh *mesh=scene->meshes[anode->mMeshes[i]];
+		MeshComponent::ptr meshComponent=new MeshComponent(mEngine);
+		meshComponent->setMesh(scene->meshes[anode->mMeshes[i]]);
+		node->attach(meshComponent);
 	}
 
 	for(i=0;i<anode->mNumChildren;++i){
@@ -199,6 +201,13 @@ Mesh::ptr AssimpHandler::loadMesh(const aiMesh *amesh){
 	Mesh::ptr mesh=new Mesh();
 
 	mesh->setStaticVertexData(new VertexData(vertexBuffer));
+
+	Mesh::SubMesh::ptr subMesh=new Mesh::SubMesh();
+	subMesh->indexData=new IndexData(IndexData::Primitive_TRIS,indexBuffer);
+	subMesh->material=mEngine->createDiffuseMaterial(NULL);
+
+	mesh->addSubMesh(subMesh);
+	mesh->setBound(new Bound(Bound::Type_INFINITE));
 
 	return mesh;
 }
