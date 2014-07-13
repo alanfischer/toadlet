@@ -68,7 +68,7 @@ Scene::Scene(Engine *engine,scalar epsilon):Object(),
 
 	mRenderManager=new SimpleRenderManager(this);
 
-#ifdef TOADLET_HAS_BULLET
+#if defined(TOADLET_HAS_BULLET)
 	mPhysicsManager=new BulletManager(this);
 #else
 	mPhysicsManager=new HopManager(this);

@@ -211,7 +211,7 @@ void TMSHStreamer::writeMesh(DataStream *stream,Mesh::ptr mesh){
 	for(i=0;i<mesh->getNumSubMeshes();++i){
 		Mesh::SubMesh::ptr subMesh=mesh->getSubMesh(i);
 
-		stream->writeNullTerminatedString(subMesh->materialName);
+		stream->writeNullTerminatedString(subMesh->getName());
 
 		writeTransform(stream,subMesh->transform);
 		writeBound(stream,subMesh->bound);
@@ -219,7 +219,7 @@ void TMSHStreamer::writeMesh(DataStream *stream,Mesh::ptr mesh){
 		writeVertexData(stream,subMesh->vertexData);
 		writeIndexData(stream,subMesh->indexData);
 
-		stream->writeNullTerminatedString(subMesh->getName());
+		stream->writeNullTerminatedString(subMesh->materialName);
 	}
 	writeVertexData(stream,mesh->getStaticVertexData());
 
@@ -674,12 +674,12 @@ void TMSHStreamer::writeSequence(DataStream *stream,Sequence::ptr sequence){
 }
 
 void TMSHStreamer::MaterialRequest::request(){
-	while(mIndex<mMesh->getNumSubMeshes() && mMesh->getSubMesh(mIndex)->materialName.length()!=0){
+	while(mIndex<mMesh->getNumSubMeshes() && mMesh->getSubMesh(mIndex)->materialName.length()==0){
 		mIndex++;
 	}
 	
 	if(mIndex<mMesh->getNumSubMeshes()){
-		mEngine->getMaterialManager()->find(mMesh->getSubMesh(mIndex)->material->getName(),this);
+		mEngine->getMaterialManager()->find(mMesh->getSubMesh(mIndex)->materialName,this);
 	}
 	else{
 		mMesh->compile();
@@ -690,7 +690,9 @@ void TMSHStreamer::MaterialRequest::request(){
 void TMSHStreamer::MaterialRequest::resourceReady(Resource *resource){
 	Material::ptr material=(Material*)resource;
 	Mesh::SubMesh *subMesh=mMesh->getSubMesh(mIndex);
-	mEngine->getMaterialManager()->modifyRenderState(material->getRenderState(),subMesh->material->getRenderState());
+	if(material->getRenderState() && subMesh->material!=NULL && subMesh->material->getRenderState()!=NULL){
+		mEngine->getMaterialManager()->modifyRenderState(material->getRenderState(),subMesh->material->getRenderState());
+	}
 	subMesh->material=material;
 
 	mIndex++;

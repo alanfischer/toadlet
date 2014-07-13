@@ -25,7 +25,7 @@
 		</Vertexes>
 		<SubMesh>
 			<Indexes Count="24">0 1 2 2 3 0 4 5 6 6 7 4 8 9 10 10 11 8 12 13 14 14 15 12</Indexes>
-			<Material Name="tall_grass.png" />
+			<Material File="tall_grass.png" />
 		</SubMesh>
 	</Mesh>
 	<Skeleton>
