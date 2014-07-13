@@ -41,6 +41,10 @@ BulletComponent::BulletComponent(BulletManager *manager):
 
 	mBound=new Bound();
 	mWorldBound=new Bound();
+
+	if(mManager!=NULL){
+		mManager->componentCreated(this);
+	}
 }
 
 BulletComponent::~BulletComponent(){
@@ -56,6 +60,10 @@ BulletComponent::~BulletComponent(){
 }
 
 void BulletComponent::destroy(){
+	if(mManager!=NULL){
+		mManager->componentDestroyed(this);
+	}
+
 	BaseComponent::destroy();
 }
 
@@ -101,7 +109,13 @@ void BulletComponent::setPosition(const Vector3 &position){
 
 void BulletComponent::setMass(scalar mass){
 	mass=Math::maxVal(mass,0);
-	mBody->setMassProps(mass,btVector3());
+
+	btVector3 inertia;
+	if(mShape!=NULL){
+		mShape->calculateLocalInertia(mass,inertia);
+	}
+
+	mBody->setMassProps(mass,inertia);
 }
 
 scalar BulletComponent::getMass() const{
@@ -160,6 +174,8 @@ void BulletComponent::setBound(Bound *bound){
 
 	mShape->addChildShape(transform,shape);
 	mBody->setCollisionShape(mShape);
+
+	setMass(getMass()); // Update inertia
 }
 
 void BulletComponent::setTraceable(PhysicsTraceable *traceable){

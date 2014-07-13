@@ -44,6 +44,9 @@ BulletManager::BulletManager(Scene *scene):
 	btSequentialImpulseConstraintSolver *solver = new btSequentialImpulseConstraintSolver();
 
 	mWorld=new btDiscreteDynamicsWorld(dispatcher,broadphase,solver,collisionConfiguration);
+	mWorld->setLatencyMotionStateInterpolation(true);
+
+	setGravity(Vector3(0,0,-Math::fromMilli(9810)));
 }
 
 BulletManager::~BulletManager(){
@@ -57,10 +60,27 @@ PhysicsComponent *BulletManager::createPhysicsComponent(){
 void BulletManager::logicUpdate(int dt,int scope,Node *node){
 	scalar fdt=Math::milliToReal(dt);
 
-	mWorld->stepSimulation(fdt);
+	mWorld->stepSimulation(fdt,100,1.0/60.0);
 }
 
 void BulletManager::frameUpdate(int dt,int scope,Node *node){
+	float timeStep=mScene->getLogicFraction() * Math::fromMilli(mScene->getMinLogicDT());
+
+	// Manually synchronize motion states, since there does not appear
+	// to be a good way to force bullet to do it out of sync with its internal stepSimulation
+	for(int i=0;i<mComponents.size();++i){
+		btRigidBody *body=mComponents[i]->getBody();
+		if(body!=NULL && body->isActive()){
+			if(body->getMotionState() && !body->isStaticOrKinematicObject()){
+				btTransform interpolatedTransform;
+				btTransformUtil::integrateTransform(body->getInterpolationWorldTransform(),
+				body->getInterpolationLinearVelocity(),body->getInterpolationAngularVelocity(),
+				timeStep,
+				interpolatedTransform);
+				body->getMotionState()->setWorldTransform(interpolatedTransform);
+			}
+		}
+	}
 }
 
 }

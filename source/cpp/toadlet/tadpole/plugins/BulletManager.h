@@ -70,10 +70,14 @@ public:
 	void logicUpdate(int dt,int scope,Node *node);
 	void frameUpdate(int dt,int scope,Node *node);
 
+	void componentCreated(BulletComponent *component){mComponents.add(component);}
+	void componentDestroyed(BulletComponent *component){mComponents.remove(component);}
+
 protected:
 	Scene::ptr mScene;
-	btDynamicsWorld *mWorld;
+	btDiscreteDynamicsWorld *mWorld;
 	Vector3 mGravity;
+	Collection<BulletComponent*> mComponents;
 };
 
 }

@@ -1,5 +1,4 @@
 #include "Sky.h"
-#include <toadlet/tadpole/plugins/SkyDomeMeshCreator.h>
 
 Sky::Sky(Scene *scene,int cloudSize,const Vector4 &skyColor,const Vector4 &fadeColor):Node(scene)
 {
