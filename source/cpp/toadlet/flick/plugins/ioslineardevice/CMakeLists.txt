@@ -14,8 +14,10 @@ set (IOSLINEARDEVICE_HDR
 if (TOADLET_BUILD_STATIC)
 	find_library (UIKIT_LIBS UIKit)
 	add_library (toadlet_flick_ioslineardevice_s STATIC ${IOSLINEARDEVICE_SRC} ${IOSLINEARDEVICE_HDR})
-	set_target_properties (toadlet_flick_ioslineardevice_s PROPERTIES ${STATIC_LIB_PROPS})
-	target_link_libraries (toadlet_flick_ioslineardevice_s objc ${UIKIT_LIBS} toadlet_flick_s)
+	set_target_properties (toadlet_flick_ioslineardevice_s PROPERTIES ${DYNAMIC_LIB_PROP})
+	target_compile_definitions (toadlet_flick_ioslineardevice_s ${DYNAMIC_LIB_DEFS})
+	target_compile_options (toadlet_flick_ioslineardevice_s ${DYNAMIC_LIB_FLAG})
+	target_link_libraries (toadlet_flick_ioslineardevice_s ${DYNAMIC_LIB_LINK} toadlet_flick_s)
 	install (TARGETS toadlet_flick_ioslineardevice_s DESTINATION ${LIB_INSTALL_DIR} COMPONENT flick)
 	set (FLICK_INSTALL ${FLICK_INSTALL} toadlet_flick_ioslineardevice_s PARENT_SCOPE)
 
