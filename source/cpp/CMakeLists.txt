@@ -3,8 +3,14 @@ include_directories (${toadlet_SOURCE_DIR}/source/cpp ${toadlet_BINARY_DIR}/sour
 
 
 # Set engine wide library properties
-set (DYNAMIC_LIB_PROPS COMPILE_DEFINITIONS TOADLET_BUILD_DYNAMIC COMPILE_DEFINITIONS_DEBUG TOADLET_DEBUG DEBUG_POSTFIX _d)
-set (STATIC_LIB_PROPS COMPILE_DEFINITIONS TOADLET_BUILD_STATIC COMPILE_DEFINITIONS_DEBUG TOADLET_DEBUG DEBUG_POSTFIX d)
+set (DYNAMIC_LIB_PROP DEBUG_POSTFIX _d)
+set (DYNAMIC_LIB_DEFS PUBLIC "TOADLET_BUILD_DYNAMIC $<$<CONFIG:Debug>:TOADLET_DEBUG>")
+set (DYNAMIC_LIB_FLAG PUBLIC)
+set (DYNAMIC_LIB_LINK "")
+set (STATIC_LIB_PROP DEBUG_POSTFIX _d)
+set (STATIC_LIB_DEFS PUBLIC "TOADLET_BUILD_STATIC $<$<CONFIG:Debug>:TOADLET_DEBUG>")
+set (STATIC_LIB_FLAG PUBLIC)
+set (STATIC_LIB_LINK "")
 set (LIB_INSTALL_DIR lib)
 
 
@@ -24,13 +30,12 @@ if (TOADLET_PLATFORM_OSX)
 endif (TOADLET_PLATFORM_OSX)
 
 
-
 # Setup link flags according to profiling
 if (TOADLET_PROFILE) 
-	set (DYNAMIC_LIB_FLAGS "-pg")
-	set (STATIC_LIB_FLAGS "-pg")
-	set (DYNAMIC_LIB_LINK "-pg")
-	set (STATIC_LIB_LINK "-pg")
+	set (DYNAMIC_LIB_FLAG "${DYNAMIC_LIB_FLAG} -pg")
+	set (STATIC_LIB_FLAG "${STATIC_LIB_FLAG} -pg")
+	set (DYNAMIC_LIB_LINK "${DYNAMIC_LIB_LINK} -pg")
+	set (STATIC_LIB_LINK "${STATIC_LIB_LINK} -pg")
 	message (STATUS "Profiling enabled")
 endif (TOADLET_PROFILE) 
 
@@ -56,35 +61,21 @@ if (TOADLET_PLATFORM_ANDROID)
 	if (TOADLET_RTTI)
 		message (STATUS "RTTI enabled")
 	else (TOADLET_RTTI)
-		set (DYNAMIC_LIB_FLAGS "${DYNAMIC_LIB_FLAGS} -fno-rtti")
-		set (STATIC_LIB_FLAGS "${STATIC_LIB_FLAGS} -fno-rtti")
+		set (DYNAMIC_LIB_FLAG "${DYNAMIC_LIB_FLAG} -fno-rtti")
+		set (STATIC_LIB_FLAG "${STATIC_LIB_FLAG} -fno-rtti")
 		message (STATUS "RTTI disabled")
 	endif (TOADLET_RTTI)
 
 	# Enable/Disable Exceptions
 	if (TOADLET_EXCEPTIONS)
-		set (DYNAMIC_LIB_FLAGS "${DYNAMIC_LIB_FLAGS} -fexceptions")
-		set (STATIC_LIB_FLAGS "${STATIC_LIB_FLAGS} -fexceptions")
+		set (DYNAMIC_LIB_FLAG "${DYNAMIC_LIB_FLAG} -fexceptions")
+		set (STATIC_LIB_FLAG "${STATIC_LIB_FLAG} -fexceptions")
 		message (STATUS "Exceptions enabled")
 	else (TOADLET_EXCEPTIONS)
-		set (DYNAMIC_LIB_FLAGS "${DYNAMIC_LIB_FLAGS} -fno-exceptions")
-		set (STATIC_LIB_FLAGS "${STATIC_LIB_FLAGS} -fno-exceptions")
+		set (DYNAMIC_LIB_FLAG "${DYNAMIC_LIB_FLAG} -fno-exceptions")
+		set (STATIC_LIB_FLAG "${STATIC_LIB_FLAG} -fno-exceptions")
 		message (STATUS "Exceptions disabled")
 	endif (TOADLET_EXCEPTIONS)
-
-	# Append the individual flags to the overall properties
-	if (DYNAMIC_LIB_FLAGS)
-		set (DYNAMIC_LIB_PROPS ${DYNAMIC_LIB_PROPS} COMPILE_FLAGS ${DYNAMIC_LIB_FLAGS})
-	endif (DYNAMIC_LIB_FLAGS)
-	if (STATIC_LIB_FLAGS)
-		set (STATIC_LIB_PROPS ${STATIC_LIB_PROPS} COMPILE_FLAGS ${STATIC_LIB_FLAGS})
-	endif (STATIC_LIB_FLAGS)
-	if (DYNAMIC_LIB_LINK)
-		set (DYNAMIC_LIB_PROPS ${DYNAMIC_LIB_PROPS} LINK_FLAGS ${DYNAMIC_LIB_LINK})
-	endif (DYNAMIC_LIB_LINK)
-	if (STATIC_LIB_LINK)
-		set (STATIC_LIB_PROPS ${STATIC_LIB_PROPS} LINK_FLAGS ${STATIC_LIB_LINK})
-	endif (STATIC_LIB_LINK)
 elseif (TOADLET_PLATFORM_IOS)
 	# iOS does not permit dynamic libraries
 	set (TOADLET_BUILD_DYNAMIC OFF CACHE BOOL "Build dynamic libraries" FORCE)
@@ -97,47 +88,33 @@ elseif (TOADLET_PLATFORM_IOS)
 	if (TOADLET_RTTI)
 		message (STATUS "RTTI enabled")
 	else (TOADLET_RTTI)
-		set (DYNAMIC_LIB_FLAGS "${DYNAMIC_LIB_FLAGS} -fno-rtti")
-		set (STATIC_LIB_FLAGS "${STATIC_LIB_FLAGS} -fno-rtti")
+		set (DYNAMIC_LIB_FLAG "${DYNAMIC_LIB_FLAG} -fno-rtti")
+		set (STATIC_LIB_FLAG "${STATIC_LIB_FLAG} -fno-rtti")
 		message (STATUS "RTTI disabled")
 	endif (TOADLET_RTTI)
 
 	# Enable/Disable Exceptions
 	if (TOADLET_EXCEPTIONS)
-		set (DYNAMIC_LIB_FLAGS "${DYNAMIC_LIB_FLAGS} -fexceptions")
-		set (STATIC_LIB_FLAGS "${STATIC_LIB_FLAGS} -fexceptions")
+		set (DYNAMIC_LIB_FLAG "${DYNAMIC_LIB_FLAG} -fexceptions")
+		set (STATIC_LIB_FLAG "${STATIC_LIB_FLAG} -fexceptions")
 		message (STATUS "Exceptions enabled")
 	else (TOADLET_EXCEPTIONS)
-		set (DYNAMIC_LIB_FLAGS "${DYNAMIC_LIB_FLAGS} -fno-exceptions")
-		set (STATIC_LIB_FLAGS "${STATIC_LIB_FLAGS} -fno-exceptions")
+		set (DYNAMIC_LIB_FLAG "${DYNAMIC_LIB_FLAG} -fno-exceptions")
+		set (STATIC_LIB_FLAG "${STATIC_LIB_FLAG} -fno-exceptions")
 		message (STATUS "Exceptions disabled")
 	endif (TOADLET_EXCEPTIONS)
-
-	# Append the individual flags to the overall properties
-	if (DYNAMIC_LIB_FLAGS)
-		set (DYNAMIC_LIB_PROPS ${DYNAMIC_LIB_PROPS} COMPILE_FLAGS ${DYNAMIC_LIB_FLAGS})
-	endif (DYNAMIC_LIB_FLAGS)
-	if (STATIC_LIB_FLAGS)
-		set (STATIC_LIB_PROPS ${STATIC_LIB_PROPS} COMPILE_FLAGS ${STATIC_LIB_FLAGS})
-	endif (STATIC_LIB_FLAGS)
-	if (DYNAMIC_LIB_LINK)
-		set (DYNAMIC_LIB_PROPS ${DYNAMIC_LIB_PROPS} LINK_FLAGS ${DYNAMIC_LIB_LINK})
-	endif (DYNAMIC_LIB_LINK)
-	if (STATIC_LIB_LINK)
-		set (STATIC_LIB_PROPS ${STATIC_LIB_PROPS} LINK_FLAGS ${STATIC_LIB_LINK})
-	endif (STATIC_LIB_LINK)
 elseif (TOADLET_PLATFORM_EMSCRIPTEN)
 	# emscripten does not handle dynamic libraries
 	set (TOADLET_BUILD_DYNAMIC OFF CACHE BOOL "Build dynamic libraries" FORCE)
 
-	if (STATIC_LIB_FLAGS)
-		set (STATIC_LIB_PROPS ${STATIC_LIB_PROPS} COMPILE_FLAGS ${STATIC_LIB_FLAGS})
-	endif (STATIC_LIB_FLAGS)
+	if (STATIC_LIB_FLAG)
+		set (STATIC_LIB_PROPS ${STATIC_LIB_PROPS} COMPILE_FLAG ${STATIC_LIB_FLAG})
+	endif (STATIC_LIB_FLAG)
 
-	set (CMAKE_C_FLAGS "-Wno-warn-absolute-paths")
-	set (CMAKE_CXX_FLAGS "-Wno-warn-absolute-paths")
-	set (CMAKE_CXX_FLAGS_RELEASE "-O2 --closure 1")
-	set (CMAKE_EXE_LINKER_FLAGS_RELEASE "-O2 --closure 1")
+	set (CMAKE_C_FLAG "-Wno-warn-absolute-paths")
+	set (CMAKE_CXX_FLAG "-Wno-warn-absolute-paths")
+	set (CMAKE_CXX_FLAG_RELEASE "-O2 --closure 1")
+	set (CMAKE_EXE_LINKER_FLAG_RELEASE "-O2 --closure 1")
 elseif (TOADLET_PLATFORM_POSIX)
 	# Set defaults
 	option (TOADLET_RTTI "Enable Run Time Type Information" ON)
@@ -147,19 +124,19 @@ elseif (TOADLET_PLATFORM_POSIX)
 	if (TOADLET_RTTI)
 		message (STATUS "RTTI enabled")
 	else (TOADLET_RTTI)
-		set (DYNAMIC_LIB_FLAGS "${DYNAMIC_LIB_FLAGS} -fno-rtti")
-		set (STATIC_LIB_FLAGS "${STATIC_LIB_FLAGS} -fno-rtti")
+		set (DYNAMIC_LIB_FLAG "${DYNAMIC_LIB_FLAG} -fno-rtti")
+		set (STATIC_LIB_FLAG "${STATIC_LIB_FLAG} -fno-rtti")
 		message (STATUS "RTTI disabled")
 	endif (TOADLET_RTTI)
 
 	# Enable/Disable Exceptions
 	if (TOADLET_EXCEPTIONS)
-		set (DYNAMIC_LIB_FLAGS "${DYNAMIC_LIB_FLAGS} -fexceptions")
-		set (STATIC_LIB_FLAGS "${STATIC_LIB_FLAGS} -fexceptions")
+		set (DYNAMIC_LIB_FLAG "${DYNAMIC_LIB_FLAG} -fexceptions")
+		set (STATIC_LIB_FLAG "${STATIC_LIB_FLAG} -fexceptions")
 		message (STATUS "Exceptions enabled")
 	else (TOADLET_EXCEPTIONS)
-		set (DYNAMIC_LIB_FLAGS "${DYNAMIC_LIB_FLAGS} -fno-exceptions")
-		set (STATIC_LIB_FLAGS "${STATIC_LIB_FLAGS} -fno-exceptions")
+		set (DYNAMIC_LIB_FLAG "${DYNAMIC_LIB_FLAG} -fno-exceptions")
+		set (STATIC_LIB_FLAG "${STATIC_LIB_FLAG} -fno-exceptions")
 		message (STATUS "Exceptions disabled")
 	endif (TOADLET_EXCEPTIONS)
 
@@ -167,36 +144,22 @@ elseif (TOADLET_PLATFORM_POSIX)
 	include (CheckCXXCompilerFlag)
 	CHECK_CXX_COMPILER_FLAG ("-msse2" TOADLET_HAS_SSE)
 	if (TOADLET_HAS_SSE)
-		set (DYNAMIC_LIB_FLAGS "${DYNAMIC_LIB_FLAGS} -msse2")
-		set (STATIC_LIB_FLAGS "${STATIC_LIB_FLAGS} -msse2")
+		set (DYNAMIC_LIB_FLAG "${DYNAMIC_LIB_FLAG} -msse2")
+		set (STATIC_LIB_FLAG "${STATIC_LIB_FLAG} -msse2")
 		message (STATUS "SSE2 support enabled")
 	endif (TOADLET_HAS_SSE)
 
 	# Always use position independent code
-	set (DYNAMIC_LIB_FLAGS "${DYNAMIC_LIB_FLAGS} -fPIC")
-	set (STATIC_LIB_FLAGS "${STATIC_LIB_FLAGS} -fPIC")
+	set (DYNAMIC_LIB_FLAG "${DYNAMIC_LIB_FLAG} -fPIC")
+	set (STATIC_LIB_FLAG "${STATIC_LIB_FLAG} -fPIC")
 
 	# Force the gnu stl
 	if (TOADLET_OSX_STDCPP)
-		set (DYNAMIC_LIB_FLAGS "${DYNAMIC_LIB_FLAGS} -mmacosx-version-min=10.5 -stdlib=libstdc++")
-		set (STATIC_LIB_FLAGS "${STATIC_LIB_FLAGS} -mmacosx-version-min=10.5 -stdlib=libstdc++")
+		set (DYNAMIC_LIB_FLAG "${DYNAMIC_LIB_FLAG} -mmacosx-version-min=10.5 -stdlib=libstdc++")
+		set (STATIC_LIB_FLAG "${STATIC_LIB_FLAG} -mmacosx-version-min=10.5 -stdlib=libstdc++")
 		set (DYNAMIC_LIB_LINK "${DYNAMIC_LIB_LINK} -mmacosx-version-min=10.5 -stdlib=libstdc++")
 		set (STATIC_LIB_LINK "${STATIC_LIB_LINK} -mmacosx-version-min=10.5 -stdlib=libstdc++")
 	endif (TOADLET_OSX_STDCPP)
-
-	# Append the individual flags to the overall properties
-	if (DYNAMIC_LIB_FLAGS)
-		set (DYNAMIC_LIB_PROPS ${DYNAMIC_LIB_PROPS} COMPILE_FLAGS ${DYNAMIC_LIB_FLAGS})
-	endif (DYNAMIC_LIB_FLAGS)
-	if (STATIC_LIB_FLAGS)
-		set (STATIC_LIB_PROPS ${STATIC_LIB_PROPS} COMPILE_FLAGS ${STATIC_LIB_FLAGS})
-	endif (STATIC_LIB_FLAGS)
-	if (DYNAMIC_LIB_LINK)
-		set (DYNAMIC_LIB_PROPS ${DYNAMIC_LIB_PROPS} LINK_FLAGS ${DYNAMIC_LIB_LINK})
-	endif (DYNAMIC_LIB_LINK)
-	if (STATIC_LIB_LINK)
-		set (STATIC_LIB_PROPS ${STATIC_LIB_PROPS} LINK_FLAGS ${STATIC_LIB_LINK})
-	endif (STATIC_LIB_LINK)
 
 	# OSX specifically adds the install_name parameter to dynamic libraries
 	if (TOADLET_PLATFORM_OSX)
@@ -226,52 +189,56 @@ elseif (TOADLET_PLATFORM_WIN32)
 	# TODO: Once cmake supports _<CONFIGURATION> compile flags, make the /MDd /MD /MTd /MT all configuration specific!
 	# Monitor issue 0006493 - http://public.kitware.com/Bug/view.php?id=6493
 	# Ultimate Result should be:
-	#   if(/MDd) {nodefaultlib=libcmt,libcmtd,msvcrt}
-	#   if(/MD) {nodefaultlib=libcmt,libcmtd,msvcrtd}
-	#   if(/MTd) {nodefaultlib=libcmt,msvcrt,msvcrtd}
-	#   if(/MT) {nodefaultlib=libcmtd,msvcrt,msvcrtd}
+	#   if(/MDd) {nodefaultlib=libcmt, libcmtd, libcpmt, libcpmtd, msvcrt, msvcprt}
+	#   if(/MD)  {nodefaultlib=libcmt, libcmtd, libcpmt, libcpmtd, msvcrtd, msvcprtd}
+	#   if(/MTd) {nodefaultlib=libcmt, libcpmt, msvcrt, msvcprt, msvcrtd, msvcprtd}
+	#   if(/MT)  {nodefaultlib=libcmtd, libcpmtd, msvcrt, msvcprt, msvcrtd, msvcprtd}
+	set (MD_LINK
+		"$<$<CONFIG:Debug>:/NODEFAULTLIB:LIBCMT.lib$<SEMICOLON>LIBCMTd.lib$<SEMICOLON>LIBCPMT.lib$<SEMICOLON>LIBCPMTd.lib$<SEMICOLON>MSVCRT.lib$<SEMICOLON>MSVCPRT.lib>
+		$<$<NOT:$<CONFIG:Debug>>:/NODEFAULTLIB:LIBCMT.lib$<SEMICOLON>LIBCMTd.lib$<SEMICOLON>LIBCPMT.lib$<SEMICOLON>LIBCPMTd.lib$<SEMICOLON>MSVCRTd.lib$<SEMICOLON>MSVCPRTd.lib>"
+	)
+	set (MT_LINK 
+		"$<$<CONFIG:Debug>:/NODEFAULTLIB:LIBCMT.lib$<SEMICOLON>LIBCPMT.lib$<SEMICOLON>MSVCRT.lib$<SEMICOLON>MSVCPRT.lib$<SEMICOLON>MSVCRTd.lib$<SEMICOLON>MSVCPRTd.lib> 
+		$<$<NOT:$<CONFIG:Debug>>:/NODEFAULTLIB:LIBCMTd.lib$<SEMICOLON>LIBCPMTd.lib$<SEMICOLON>MSVCRT.lib$<SEMICOLON>MSVCPRT.lib$<SEMICOLON>MSVCRTd.lib$<SEMICOLON>MSVCPRTd.lib>"
+	)
 	if (TOADLET_DYNAMIC_MULTITHREAD_DYNAMIC)
-		set (DYNAMIC_LIB_FLAGS "/MD")
-		set (DYNAMIC_LIB_LINK_DEBUG "/NODEFAULTLIB:LIBCMT.lib;LIBCMTd.lib")
-		set (DYNAMIC_LIB_LINK_RELEASE "/NODEFAULTLIB:LIBCMT.lib;LIBCMTd.lib")
+		set (DYNAMIC_LIB_FLAG "${DYNAMIC_LIB_FLAG} /MD$<$<CONFIG:Debug>:d>")
+		set (DYNAMIC_LIB_LINK "${DYNAMIC_LIB_LINK} ${MD_LINK}")
 	else (TOADLET_DYNAMIC_MULTITHREAD_DYNAMIC)
 		message (STATUS "WARNING: Building dynamic libraries with /MT switch. Debug builds of toadlet dlls will fail!")
-		set (DYNAMIC_LIB_FLAGS "/MT")
-		set (DYNAMIC_LIB_LINK_DEBUG "")
-		set (DYNAMIC_LIB_LINK_RELEASE "")
+		set (DYNAMIC_LIB_FLAG "${DYNAMIC_LIB_FLAG} /MT$<$<CONFIG:Debug>:d>")
+		set (DYNAMIC_LIB_LINK "${DYNAMIC_LIB_LINK} ${MT_LINK}")
 	endif (TOADLET_DYNAMIC_MULTITHREAD_DYNAMIC)
 	if (TOADLET_STATIC_MULTITHREAD_DYNAMIC)
-		set (STATIC_LIB_FLAGS "/MD")
-		set (STATIC_LIB_LINK_DEBUG "/NODEFAULTLIB:LIBCMT.lib;LIBCMTd.lib")
-		set (STATIC_LIB_LINK_RELEASE "/NODEFAULTLIB:LIBCMT.lib;LIBCMTd.lib")
+		set (STATIC_LIB_FLAG "${STATIC_LIB_FLAG} /MD$<$<CONFIG:Debug>:d>")
+		set (STATIC_LIB_LINK "${STATIC_LIB_LINK} ${MD_LINK}")
 	else (TOADLET_STATIC_MULTITHREAD_DYNAMIC)
-		set (STATIC_LIB_FLAGS "/MT")
-		set (STATIC_LIB_LINK_DEBUG "")
-		set (STATIC_LIB_LINK_RELEASE "")
+		set (STATIC_LIB_FLAG "${STATIC_LIB_FLAG} /MT$<$<CONFIG:Debug>:d>")
+		set (STATIC_LIB_LINK "${STATIC_LIB_LINK} ${MT_LINK}")
 	endif (TOADLET_STATIC_MULTITHREAD_DYNAMIC)
 
 	# Enable/Disable RTTI
 	if (TOADLET_RTTI)
-		set (DYNAMIC_LIB_FLAGS "${DYNAMIC_LIB_FLAGS} /GR")
-		set (STATIC_LIB_FLAGS "${STATIC_LIB_FLAGS} /GR")
+		set (DYNAMIC_LIB_FLAG "${DYNAMIC_LIB_FLAG} /GR")
+		set (STATIC_LIB_FLAG "${STATIC_LIB_FLAG} /GR")
 		if (TOADLET_PLATFORM_WINCE)
 			set (CMAKE_CXX_STANDARD_LIBRARIES "${CMAKE_CXX_STANDARD_LIBRARIES} ccrtrtti.lib")
 		endif (TOADLET_PLATFORM_WINCE)
 		message (STATUS "RTTI enabled")
 	else (TOADLET_RTTI)
-		set (DYNAMIC_LIB_FLAGS "${DYNAMIC_LIB_FLAGS} /GR-")
-		set (STATIC_LIB_FLAGS "${STATIC_LIB_FLAGS} /GR-")
+		set (DYNAMIC_LIB_FLAG "${DYNAMIC_LIB_FLAG} /GR-")
+		set (STATIC_LIB_FLAG "${STATIC_LIB_FLAG} /GR-")
 		message (STATUS "RTTI disabled")
 	endif (TOADLET_RTTI)
 
 	# Enable/Disable Exceptions
 	if (TOADLET_EXCEPTIONS)
-		set (DYNAMIC_LIB_FLAGS "${DYNAMIC_LIB_FLAGS} /EHsc")
-		set (STATIC_LIB_FLAGS "${STATIC_LIB_FLAGS} /EHsc")
+		set (DYNAMIC_LIB_FLAG "${DYNAMIC_LIB_FLAG} /EHsc")
+		set (STATIC_LIB_FLAG "${STATIC_LIB_FLAG} /EHsc")
 		message (STATUS "Exceptions enabled")
 	else (TOADLET_EXCEPTIONS)
-		set (DYNAMIC_LIB_FLAGS "${DYNAMIC_LIB_FLAGS} /EHs-c-")
-		set (STATIC_LIB_FLAGS "${STATIC_LIB_FLAGS} /EHs-c-")
+		set (DYNAMIC_LIB_FLAG "${DYNAMIC_LIB_FLAG} /EHs-c-")
+		set (STATIC_LIB_FLAG "${STATIC_LIB_FLAG} /EHs-c-")
 		message (STATUS "Exceptions disabled")
 	endif (TOADLET_EXCEPTIONS)
 
@@ -279,55 +246,31 @@ elseif (TOADLET_PLATFORM_WIN32)
 	include (CheckCXXCompilerFlag)
 	CHECK_CXX_COMPILER_FLAG ("/arch:SSE2" TOADLET_HAS_SSE)
 	if (TOADLET_HAS_SSE)
-		set (DYNAMIC_LIB_FLAGS "${DYNAMIC_LIB_FLAGS} /arch:SSE2")
-		set (STATIC_LIB_FLAGS "${STATIC_LIB_FLAGS} /arch:SSE2")
+		set (DYNAMIC_LIB_FLAG "${DYNAMIC_LIB_FLAG} /arch:SSE2")
+		set (STATIC_LIB_FLAG "${STATIC_LIB_FLAG} /arch:SSE2")
 		message (STATUS "SSE2 support enabled")
 	endif (TOADLET_HAS_SSE)
 	
 	# Disable msvc mismatch
 	if (NOT TOADLET_MSVC_CHECK)
-		set (DYNAMIC_LIB_FLAGS "${DYNAMIC_LIB_FLAGS} /D_ALLOW_MSC_VER_MISMATCH")
-		set (STATIC_LIB_FLAGS "${STATIC_LIB_FLAGS} /D_ALLOW_MSC_VER_MISMATCH")
+		set (DYNAMIC_LIB_FLAG "${DYNAMIC_LIB_FLAG} /D_ALLOW_MSC_VER_MISMATCH")
+		set (STATIC_LIB_FLAG "${STATIC_LIB_FLAG} /D_ALLOW_MSC_VER_MISMATCH")
 		message (STATUS "MSVC mismatch disabled")
 	endif (NOT TOADLET_MSVC_CHECK)
 	
 	# Disable iterator mismatch
 	if (NOT TOADLET_ITERATOR_CHECK)
-		set (DYNAMIC_LIB_FLAGS "${DYNAMIC_LIB_FLAGS} /D_ITERATOR_DEBUG_LEVEL=0 /D_ALLOW_ITERATOR_DEBUG_LEVEL_MISMATCH")
-		set (STATIC_LIB_FLAGS "${STATIC_LIB_FLAGS} /D_ITERATOR_DEBUG_LEVEL=0 /D_ALLOW_ITERATOR_DEBUG_LEVEL_MISMATCH")
+		set (DYNAMIC_LIB_FLAG "${DYNAMIC_LIB_FLAG} /D_ITERATOR_DEBUG_LEVEL=0 /D_ALLOW_ITERATOR_DEBUG_LEVEL_MISMATCH")
+		set (STATIC_LIB_FLAG "${STATIC_LIB_FLAG} /D_ITERATOR_DEBUG_LEVEL=0 /D_ALLOW_ITERATOR_DEBUG_LEVEL_MISMATCH")
 		message (STATUS "Iterator mismatch disabled")
 	endif (NOT TOADLET_ITERATOR_CHECK)
 
 	# Disable runtime mismatch
 	if (NOT TOADLET_RUNTIME_CHECK)
-		set (DYNAMIC_LIB_FLAGS "${DYNAMIC_LIB_FLAGS} /D_ALLOW_RUNTIME_LIBRARY_MISMATCH")
-		set (STATIC_LIB_FLAGS "${STATIC_LIB_FLAGS} /D_ALLOW_RUNTIME_LIBRARY_MISMATCH")
+		set (DYNAMIC_LIB_FLAG "${DYNAMIC_LIB_FLAG} /D_ALLOW_RUNTIME_LIBRARY_MISMATCH")
+		set (STATIC_LIB_FLAG "${STATIC_LIB_FLAG} /D_ALLOW_RUNTIME_LIBRARY_MISMATCH")
 		message (STATUS "Runtime mismatch disabled")
 	endif (NOT TOADLET_RUNTIME_CHECK)
-	
-	# Append the compile flags to the properties
-	# TODO: Also clean this up once issue 0006493 is resolved
-	if (DYNAMIC_LIB_FLAGS)
-		set (DYNAMIC_LIB_PROPS ${DYNAMIC_LIB_PROPS} COMPILE_FLAGS ${DYNAMIC_LIB_FLAGS})
-	message (STATUS ${DYNAMIC_LIB_LINK_DEBUG})
-	endif (DYNAMIC_LIB_FLAGS)
-	if (STATIC_LIB_FLAGS)
-		set (STATIC_LIB_PROPS ${STATIC_LIB_PROPS} COMPILE_FLAGS ${STATIC_LIB_FLAGS})
-	endif (STATIC_LIB_FLAGS)
-	
-	# Append the link flags to the properties
-	set (DYNAMIC_LIB_PROPS ${DYNAMIC_LIB_PROPS} 
-		LINK_FLAGS_DEBUG "${DYNAMIC_LIB_LINK_DEBUG}"
-		LINK_FLAGS_RELEASE ${DYNAMIC_LIB_LINK_RELEASE}
-		LINK_FLAGS_MINSIZEREL ${DYNAMIC_LIB_LINK_RELEASE}
-		LINK_FLAGS_RELWITHDEBINFO ${DYNAMIC_LIB_LINK_RELEASE}
-	)
-	set (STATIC_LIB_PROPS ${STATIC_LIB_PROPS} 
-		LINK_FLAGS_DEBUG ${STATIC_LIB_LINK_DEBUG} 
-		LINK_FLAGS_RELEASE ${STATIC_LIB_LINK_RELEASE}
-		LINK_FLAGS_MINSIZEREL ${STATIC_LIB_LINK_RELEASE}
-		LINK_FLAGS_RELWITHDEBINFO ${STATIC_LIB_LINK_RELEASE}
-	)
 else (TOADLET_PLATFORM_ANDROID)
 	message (FATAL_ERROR "Toadlet platform undefined. Toadlet will not be built")
 endif (TOADLET_PLATFORM_ANDROID)
