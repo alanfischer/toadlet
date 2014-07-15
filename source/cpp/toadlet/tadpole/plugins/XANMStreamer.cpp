@@ -109,7 +109,7 @@ Sequence::ptr XANMStreamer::loadSequenceVersion1(mxml_node_t *root){
 	mxml_node_t *block=root->child;
 	while((block=block->next)!=NULL){
 		if(strcmp(mxmlGetElementName(block),"AnimationData")==0){
-			sequence=XMLMeshUtilities::loadSequence(block,1,mEngine->getBufferManager());
+			sequence=XMLMeshUtilities::loadSequence(block,1,mEngine);
 		}
 	}
 
@@ -122,7 +122,7 @@ Sequence::ptr XANMStreamer::loadSequenceVersion2Up(mxml_node_t *root,int version
 	mxml_node_t *block=root->child;
 	while((block=block->next)!=NULL){
 		if(strcmp(mxmlGetElementName(block),"Sequence")==0){
-			sequence=XMLMeshUtilities::loadSequence(block,version,mEngine->getBufferManager());
+			sequence=XMLMeshUtilities::loadSequence(block,version,mEngine);
 		}
 	}
 

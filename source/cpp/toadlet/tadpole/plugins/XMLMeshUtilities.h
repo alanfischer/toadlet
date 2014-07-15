@@ -41,23 +41,23 @@ public:
 
 	static const int version=3;
 
-	static Material::ptr loadMaterial(mxml_node_t *node,int version,MaterialManager *materialManager);
+	static Material::ptr loadMaterial(mxml_node_t *node,int version,Engine *engine);
 	static mxml_node_t *saveMaterial(Material::ptr material,int version);
 
-	static Mesh::ptr loadMesh(mxml_node_t *node,int version,BufferManager *bufferManager,MaterialManager *materialManager);
+	static Mesh::ptr loadMesh(mxml_node_t *node,int version,Engine *engine);
 	static mxml_node_t *saveMesh(Mesh::ptr mesh,int version);
 
 	static Skeleton::ptr loadSkeleton(mxml_node_t *node,int version);
 	static mxml_node_t *saveSkeleton(Skeleton::ptr skeleton,int version);
 
-	static Sequence::ptr loadSequence(mxml_node_t *node,int version,BufferManager *bufferManager);
+	static Sequence::ptr loadSequence(mxml_node_t *node,int version,Engine *engine);
 	static mxml_node_t *saveSequence(Sequence::ptr sequence,int version);
 
 	class MaterialRequest:public Object,public ResourceRequest{
 	public:
 		TOADLET_IOBJECT(MaterialRequest);
 
-		MaterialRequest(MaterialManager *materialManager,Mesh::ptr mesh,ResourceRequest *request):mMaterialManager(materialManager),mMesh(mesh),mRequest(request),mIndex(0){}
+		MaterialRequest(Engine *engine,Mesh::ptr mesh,ResourceRequest *request):mEngine(engine),mMesh(mesh),mRequest(request),mIndex(0){}
 
 		void request();
 
@@ -66,6 +66,7 @@ public:
 		void resourceProgress(float progress){}
 
 	protected:
+		Engine *mEngine;
 		MaterialManager *mMaterialManager;
 		Mesh::ptr mMesh;
 		ResourceRequest::ptr mRequest;
