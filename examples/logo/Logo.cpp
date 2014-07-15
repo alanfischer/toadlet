@@ -1,4 +1,5 @@
 #include "Logo.h"
+#include <toadlet/tadpole/plugins/ShadowMappedRenderManager.h>
 
 Logo::Logo(Application *app){
 	this->app=app;
@@ -13,6 +14,9 @@ void Logo::create(){
 
 	scene=new Scene(engine);
 
+	ShadowMappedRenderManager::ptr renderManager=new ShadowMappedRenderManager(scene);
+	scene->setRenderManager(renderManager);
+
 	Node::ptr node=new Node(scene);
 	{
 		LightComponent::ptr light=new LightComponent();
@@ -21,6 +25,8 @@ void Logo::create(){
 		state.direction=Math::NEG_Z_UNIT_VECTOR3;
 		light->setLightState(state);
 		node->attach(light);
+
+		renderManager->setLight(light);
 	}
 	scene->getRoot()->attach(node);
 
