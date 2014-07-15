@@ -39,9 +39,8 @@ ShadowMappedRenderManager::ShadowMappedRenderManager(Scene *scene):
 	mShadowTarget=engine->getTextureManager()->createPixelBufferRenderTarget();
 	mShadowTarget->attach(mShadowTexture->getMipPixelBuffer(0,0),PixelBufferRenderTarget::Attachment_DEPTH_STENCIL);
 
-//	mLightCamera=engine->createNodeType(CameraNode::type(),scene);
-//	mLightCamera->setProjectionFovX(Math::PI/4,1,30,60);
-//	scene->getRoot()->attach(mLightCamera);
+	mLightCamera=new Camera(engine);
+	mLightCamera->setProjectionFovX(Math::PI/4,1,30,60);
 
 	mShadowState=engine->getMaterialManager()->createRenderState();
 	mShadowState->setRasterizerState(RasterizerState(RasterizerState::CullType_FRONT,RasterizerState::FillType_SOLID,0,0.1));
@@ -52,50 +51,54 @@ ShadowMappedRenderManager::ShadowMappedRenderManager(Scene *scene):
 ShadowMappedRenderManager::~ShadowMappedRenderManager(){
 }
 
-void ShadowMappedRenderManager::renderScene(RenderDevice *renderDevice,Node *node,Camera *camera){
-/*	if(mLight==NULL){
-		SimpleRenderManager::renderScene(renderDevice,node,camera);
+void ShadowMappedRenderManager::renderScene(RenderDevice *device,Node *node,Camera *camera){
+	if(mLight==NULL){
+		SimpleRenderManager::renderScene(device,node,camera);
 		return;
 	}
 
-	mLightCamera->setTransform(mLight->getParent()->getTransform());
+	mDevice=device;
+	mCamera=camera;
+
+	mLightCamera->setWorldMatrix(mLight->getParent()->getWorldTransform()->getMatrix());
 
 	gatherRenderables(mRenderableSet,node,mLightCamera);
 
-	RenderTarget *oldRenderTarget=renderDevice->getRenderTarget();
+	RenderTarget *oldRenderTarget=device->getRenderTarget();
 
-	renderDevice->setRenderTarget(mShadowTarget);
+	device->setRenderTarget(mShadowTarget);
 	{
-		renderDevice->setRenderState(mShadowState);
+		device->setRenderState(mShadowState);
 
-		renderRenderables(mRenderableSet,renderDevice,mLightCamera,false);
+		renderRenderables(mRenderableSet,device,mLightCamera,false);
 	}
-	renderDevice->swap();
+	device->swap();
 
 
 	gatherRenderables(mRenderableSet,node,camera);
 
-	renderDevice->setRenderTarget(oldRenderTarget);
+	device->setRenderTarget(oldRenderTarget);
 	{
 		// Calculate texture matrix for projection
 		// This matrix takes us from eye space to the light's clip space
 		Matrix4x4 biasMatrix;
-		renderDevice->getShadowBiasMatrix(mShadowTexture,biasMatrix);
+		device->getShadowBiasMatrix(mShadowTexture,biasMatrix);
 		Matrix4x4 textureMatrix;
 		Math::mul(textureMatrix,biasMatrix,mLightCamera->getProjectionMatrix());
 		Math::postMul(textureMatrix,mLightCamera->getViewMatrix());
-		Math::postMul(textureMatrix,camera->calculateInverseViewMatrix());
+		Matrix4x4 invViewMatrix;
+		Math::invert(invViewMatrix,camera->getViewMatrix());
+		Math::postMul(textureMatrix,invViewMatrix);
 
 		TextureState lightTextureState;
 		lightTextureState.calculation=TextureState::CalculationType_CAMERASPACE;
 		lightTextureState.matrix.set(textureMatrix);
-TOADLET_ASSERT(false && "BROKEN!");
-	//	mLightState->setTextureState(0,lightTextureState);
-//		renderDevice->setRenderState(mLightState);
-//		renderDevice->setTexture(0,mShadowTexture);
+		mLightState->setTextureState(Shader::ShaderType_VERTEX,0,lightTextureState);
+		device->setRenderState(mLightState);
+		device->setTexture(Shader::ShaderType_FRAGMENT,0,mShadowTexture);
 
-		renderRenderables(mRenderableSet,renderDevice,camera,false);
-	}*/
+		renderRenderables(mRenderableSet,device,camera,false);
+	}
 }
 
 }

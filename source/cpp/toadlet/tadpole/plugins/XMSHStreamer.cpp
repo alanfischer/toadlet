@@ -140,7 +140,7 @@ bool XMSHStreamer::load(Stream::ptr stream,ResourceData *data,ResourceRequest *r
 
 	mesh->compileBoneBounds();
 
-	XMLMeshUtilities::MaterialRequest::ptr materialRequest=new XMLMeshUtilities::MaterialRequest(mEngine->getMaterialManager(),mesh,request);
+	XMLMeshUtilities::MaterialRequest::ptr materialRequest=new XMLMeshUtilities::MaterialRequest(mEngine,mesh,request);
 	materialRequest->request();
 
 	return true;
@@ -185,13 +185,13 @@ Mesh::ptr XMSHStreamer::loadMeshVersion1(mxml_node_t *root){
 	mxml_node_t *block=root->child;
 	while((block=block->next)!=NULL){
 		if(strcmp(mxmlGetElementName(block),"MeshData")==0){
-			mesh=XMLMeshUtilities::loadMesh(block,1,mEngine->getBufferManager(),mEngine->getMaterialManager());
+			mesh=XMLMeshUtilities::loadMesh(block,1,mEngine);
 		}
 		else if(strcmp(mxmlGetElementName(block),"SkeletonData")==0){
 			mesh->setSkeleton(XMLMeshUtilities::loadSkeleton(block,1));
 		}
 		else if(strcmp(mxmlGetElementName(block),"AnimationData")==0){
-			mesh->getSkeleton()->addSequence(XMLMeshUtilities::loadSequence(block,1,mEngine->getBufferManager()));
+			mesh->getSkeleton()->addSequence(XMLMeshUtilities::loadSequence(block,1,mEngine));
 		}
 	}
 
@@ -204,13 +204,13 @@ Mesh::ptr XMSHStreamer::loadMeshVersion2Up(mxml_node_t *root,int version){
 	mxml_node_t *block=root->child;
 	while((block=block->next)!=NULL){
 		if(strcmp(mxmlGetElementName(block),"Mesh")==0){
-			mesh=XMLMeshUtilities::loadMesh(block,version,mEngine->getBufferManager(),mEngine->getMaterialManager());
+			mesh=XMLMeshUtilities::loadMesh(block,version,mEngine);
 		}
 		else if(strcmp(mxmlGetElementName(block),"Skeleton")==0){
 			mesh->setSkeleton(XMLMeshUtilities::loadSkeleton(block,version));
 		}
 		else if(strcmp(mxmlGetElementName(block),"Sequence")==0){
-			mesh->getSkeleton()->addSequence(XMLMeshUtilities::loadSequence(block,version,mEngine->getBufferManager()));
+			mesh->getSkeleton()->addSequence(XMLMeshUtilities::loadSequence(block,version,mEngine));
 		}
 	}
 

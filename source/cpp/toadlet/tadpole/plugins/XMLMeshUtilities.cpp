@@ -113,17 +113,16 @@ String makeBoneAssignment(const Mesh::VertexBoneAssignmentList &vbaList){
 	return String(buffer);
 }
 
-/// @todo: Support loading all of the material, instead of starting with a DiffuseMaterial
-Material::ptr XMLMeshUtilities::loadMaterial(mxml_node_t *materialNode,int version,MaterialManager *materialManager){
+Material::ptr XMLMeshUtilities::loadMaterial(mxml_node_t *materialNode,int version,Engine *engine){
 	const char *prop=mxmlElementGetAttr(materialNode,"Name");
 
-	Material::ptr material=new Material(materialManager);
+	Material::ptr material=new Material(engine->getMaterialManager());
 
 	if(prop!=NULL){
 		material->setName(prop);
 	}
 
-	RenderState::ptr renderState=materialManager->createRenderState();
+	RenderState::ptr renderState=engine->getMaterialManager()->createRenderState();
 
 	if(renderState!=NULL){
 		MaterialState materialState;
@@ -313,7 +312,7 @@ mxml_node_t *XMLMeshUtilities::saveMaterial(Material::ptr material,int version){
 	return materialNode;
 }
 
-Mesh::ptr XMLMeshUtilities::loadMesh(mxml_node_t *node,int version,BufferManager *bufferManager,MaterialManager *materialManager){
+Mesh::ptr XMLMeshUtilities::loadMesh(mxml_node_t *node,int version,Engine *engine){
 	Mesh::ptr mesh=new Mesh();
 	const char *prop=NULL;
 
@@ -348,7 +347,7 @@ Mesh::ptr XMLMeshUtilities::loadMesh(mxml_node_t *node,int version,BufferManager
 	mxml_node_t *vertexNode=mxmlFindChild(node,"Vertexes");
 	{
 		int count=0;
-		VertexFormat::ptr vertexFormat=bufferManager->createVertexFormat();
+		VertexFormat::ptr vertexFormat=engine->getBufferManager()->createVertexFormat();
 		Collection<Mesh::VertexBoneAssignmentList> vbas;
 
 		prop=mxmlElementGetAttr(vertexNode,"Count");
@@ -402,10 +401,10 @@ Mesh::ptr XMLMeshUtilities::loadMesh(mxml_node_t *node,int version,BufferManager
 
 		VertexBuffer::ptr vertexBuffer;
 		if(vbas.size()>0){
-			vertexBuffer=bufferManager->createVertexBuffer(Buffer::Usage_BIT_STAGING,Buffer::Access_READ_WRITE,vertexFormat,count);
+			vertexBuffer=engine->getBufferManager()->createVertexBuffer(Buffer::Usage_BIT_STAGING,Buffer::Access_READ_WRITE,vertexFormat,count);
 		}
 		else{
-			vertexBuffer=bufferManager->createVertexBuffer(Buffer::Usage_BIT_STATIC,Buffer::Access_BIT_WRITE,vertexFormat,count);
+			vertexBuffer=engine->getBufferManager()->createVertexBuffer(Buffer::Usage_BIT_STATIC,Buffer::Access_BIT_WRITE,vertexFormat,count);
 		}
 
 		int pi=vertexFormat->findElement(VertexFormat::Semantic_POSITION);
@@ -538,7 +537,7 @@ Mesh::ptr XMLMeshUtilities::loadMesh(mxml_node_t *node,int version,BufferManager
 				count=parseInt(prop);
 			}
 
-			IndexBuffer::ptr indexBuffer=bufferManager->createIndexBuffer(Buffer::Usage_BIT_STATIC,Buffer::Access_BIT_WRITE,IndexBuffer::IndexFormat_UINT16,count);
+			IndexBuffer::ptr indexBuffer=engine->getBufferManager()->createIndexBuffer(Buffer::Usage_BIT_STATIC,Buffer::Access_BIT_WRITE,IndexBuffer::IndexFormat_UINT16,count);
 
 			subMesh->indexData=new IndexData(IndexData::Primitive_TRIS,indexBuffer,0,count);
 
@@ -583,11 +582,11 @@ Mesh::ptr XMLMeshUtilities::loadMesh(mxml_node_t *node,int version,BufferManager
 			prop=mxmlElementGetAttr(materialNode,"File");
 			if(prop!=NULL){
 				subMesh->materialName=prop;
-				subMesh->material=new Material(materialManager);
+				subMesh->material=new Material(engine->getMaterialManager());
 				subMesh->material->setName(prop);
 			}
 			else{
-				material=loadMaterial(materialNode,version,materialManager);
+				material=loadMaterial(materialNode,version,engine);
 			}
 
 			subMesh->material=material;
@@ -845,7 +844,7 @@ mxml_node_t *XMLMeshUtilities::saveSkeleton(Skeleton::ptr skeleton,int version){
 	return skeletonNode;
 }
 
-Sequence::ptr XMLMeshUtilities::loadSequence(mxml_node_t *node,int version,BufferManager *bufferManager){
+Sequence::ptr XMLMeshUtilities::loadSequence(mxml_node_t *node,int version,Engine *engine){
 	Sequence::ptr sequence=new Sequence();
 
 	const char *prop=NULL;
@@ -866,7 +865,7 @@ Sequence::ptr XMLMeshUtilities::loadSequence(mxml_node_t *node,int version,Buffe
 			continue;
 		}
 
-		VertexFormat::ptr format=bufferManager->createVertexFormat();
+		VertexFormat::ptr format=engine->getBufferManager()->createVertexFormat();
 		format->addElement(VertexFormat::Semantic_POSITION,0,VertexFormat::Format_TYPE_FLOAT_32|VertexFormat::Format_COUNT_3);
 		format->addElement(VertexFormat::Semantic_ROTATE,0,VertexFormat::Format_TYPE_FLOAT_32|VertexFormat::Format_COUNT_4);
 		format->addElement(VertexFormat::Semantic_SCALE,0,VertexFormat::Format_TYPE_FLOAT_32|VertexFormat::Format_COUNT_3);
@@ -980,12 +979,13 @@ mxml_node_t *XMLMeshUtilities::saveSequence(Sequence::ptr sequence,int version){
 }
 
 void XMLMeshUtilities::MaterialRequest::request(){
-	while(mIndex<mMesh->getNumSubMeshes() && mMesh->getSubMesh(mIndex)->materialName.length()==0){
-		mIndex++;
-	}
-	
 	if(mIndex<mMesh->getNumSubMeshes()){
-		mMaterialManager->find(mMesh->getSubMesh(mIndex)->materialName,this);
+		if(mMesh->getSubMesh(mIndex)->materialName.length()!=0){
+			mMaterialManager->find(mMesh->getSubMesh(mIndex)->materialName,this);
+		}
+		else{
+			resourceException(Exception());
+		}
 	}
 	else{
 		mMesh->compile();
@@ -1006,6 +1006,10 @@ void XMLMeshUtilities::MaterialRequest::resourceReady(Resource *resource){
 }
 
 void XMLMeshUtilities::MaterialRequest::resourceException(const Exception &ex){
+	Mesh::SubMesh *subMesh=mMesh->getSubMesh(mIndex);
+	Material::ptr material=mEngine->createDiffuseMaterial(NULL,subMesh->material->getRenderState());
+	subMesh->material=material;
+
 	mIndex++;
 	request();
 }
