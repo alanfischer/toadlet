@@ -67,8 +67,8 @@ Scene::Scene(Engine *engine,int options,scalar epsilon):Object(),
 
 	mRenderManager=new SimpleRenderManager(this);
 
-#if !defined(TOADLET_HAS_BULLET)
-	if((options&=Options_BIT_NOBULLET)==0){
+#if defined(TOADLET_HAS_BULLET)
+	if((options&=Option_BIT_NOBULLET)==0){
 		mPhysicsManager=new BulletManager(this);
 	}
 	else
