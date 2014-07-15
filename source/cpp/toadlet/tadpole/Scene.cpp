@@ -31,14 +31,13 @@
 #include <toadlet/tadpole/plugins/SimpleRenderManager.h>
 #ifdef TOADLET_HAS_BULLET
 #include <toadlet/tadpole/plugins/BulletManager.h>
-#else
-#include <toadlet/tadpole/plugins/HopManager.h>
 #endif
+#include <toadlet/tadpole/plugins/HopManager.h>
 
 namespace toadlet{
 namespace tadpole{
 
-Scene::Scene(Engine *engine,scalar epsilon):Object(),
+Scene::Scene(Engine *engine,int options,scalar epsilon):Object(),
 	mUpdateListener(NULL),
 
 	mExcessiveDT(0),
@@ -68,8 +67,11 @@ Scene::Scene(Engine *engine,scalar epsilon):Object(),
 
 	mRenderManager=new SimpleRenderManager(this);
 
-#if defined(TOADLET_HAS_BULLET)
-	mPhysicsManager=new BulletManager(this);
+#if !defined(TOADLET_HAS_BULLET)
+	if((options&=Options_BIT_NOBULLET)==0){
+		mPhysicsManager=new BulletManager(this);
+	}
+	else
 #else
 	mPhysicsManager=new HopManager(this);
 #endif
