@@ -228,7 +228,9 @@ void Scene::logicUpdate(int dt,int scope,Node *node){
 			mPhysicsManager->logicUpdate(dt,scope,NULL);
 		}
 
-		mBackground->logicUpdate(dt,scope);
+		if(mBackground!=NULL){
+			mBackground->logicUpdate(dt,scope);
+		}
 		mRoot->logicUpdate(dt,scope);
 	}
 
@@ -252,7 +254,9 @@ void Scene::frameUpdate(int dt,int scope,Node *node){
 			mPhysicsManager->frameUpdate(dt,scope,NULL);
 		}
 
-		mBackground->frameUpdate(dt,scope);
+		if(mBackground!=NULL){
+			mBackground->frameUpdate(dt,scope);
+		}
 		mRoot->frameUpdate(dt,scope);
 	}
 }
@@ -262,8 +266,10 @@ void Scene::render(RenderDevice *device,Camera *camera,Node *node){
 		node=mRoot;
 	}
 
-	// Reposition our background node & update it to update the world positions
-	mBackground->setTranslate(camera->getPosition());
+	if(mBackground!=NULL){
+		// Reposition our background node & update it to update the world positions
+		mBackground->setTranslate(camera->getPosition());
+	}
 
 	mRenderManager->renderScene(device,node,camera);
 }
