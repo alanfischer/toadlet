@@ -136,7 +136,7 @@ void RandIsle::resourceCacheReady(ResourceCache *cache){
 	scalar scale=16*64/mPatchSize;
 	mPatchScale.set(scale,scale,64);
 
-	mScene=new Scene(mEngine);
+	mScene=new Scene(mEngine,Scene::Option_BIT_NOBULLET);
 	mScene->setUpdateListener(this);
 
 	DecalShadowRenderManager::ptr renderManager=new DecalShadowRenderManager(mScene);

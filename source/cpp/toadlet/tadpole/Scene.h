@@ -45,7 +45,11 @@ class TOADLET_API Scene:public Object,public ContextListener{
 public:
 	TOADLET_OBJECT(Scene);
 
-	Scene(Engine *engine,scalar epsilon=Math::fromMilli(1));
+	enum{
+		Option_BIT_NOBULLET=			1<<0,
+	};
+
+	Scene(Engine *engine,int options=0,scalar epsilon=Math::fromMilli(1));
 	void destroy();
 
 	Engine *getEngine(){return mEngine;}
