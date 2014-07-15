@@ -193,7 +193,7 @@ void SimpleRenderManager::gatherRenderables(RenderableSet *set,Node *node,Camera
 
 	/// @todo: We need a way to expose gatherRenderables so we can not only gather Renderables but also Nodes, which can be processed for shadows, since decal shadows would be node based, not renderable based
 	set->startQueuing();
-	if(node==mScene->getRoot()){
+	if(node==mScene->getRoot() && mScene->getBackground()!=NULL){
 		mScene->getBackground()->gatherRenderables(camera,set);
 	}
 	node->gatherRenderables(camera,set);

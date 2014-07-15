@@ -11,7 +11,7 @@ if (NOT TOADLET_PLATFORM_ANDROID AND NOT TOADLET_PLATFORM_IOS)
 	
 	# Platform specific libraries
 	if (TOADLET_PLATFORM_WIN32)
-		target_link_libraries (unitTest toadlet_egg toadlet_peeper toadlet_ribbit toadlet_tadpole)
+		target_link_libraries (unitTest toadlet_egg toadlet_flick toadlet_peeper toadlet_ribbit toadlet_tadpole toadlet_pad)
 
 		# On windows we use fixup_bundle to collect the required dlls for build directory execution
 		set (FIXUP_APP ${CMAKE_CURRENT_BINARY_DIR}/\${CONFIGURATION}/unitTest.exe)

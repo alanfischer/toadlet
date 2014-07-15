@@ -14,8 +14,8 @@ void Logo::create(){
 
 	scene=new Scene(engine);
 
-	ShadowMappedRenderManager::ptr renderManager=new ShadowMappedRenderManager(scene);
-	scene->setRenderManager(renderManager);
+//	ShadowMappedRenderManager::ptr renderManager=new ShadowMappedRenderManager(scene);
+//	scene->setRenderManager(renderManager);
 
 	Node::ptr node=new Node(scene);
 	{
@@ -26,7 +26,7 @@ void Logo::create(){
 		light->setLightState(state);
 		node->attach(light);
 
-		renderManager->setLight(light);
+//		renderManager->setLight(light);
 	}
 	scene->getRoot()->attach(node);
 
