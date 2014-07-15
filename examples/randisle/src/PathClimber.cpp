@@ -226,8 +226,8 @@ void PathClimber::setIdealRotation(const Quaternion &idealRotation){
 PathEdge *PathClimber::findPassedEdge(PathVertex *vertex,int direction,scalar time){
 	PathEdge *edge=NULL;
 	if(direction>0){
-		edge=vertex->getEdges().end()-1;
 		PathVertex::iterator begin=vertex->getEdges().end(),end=vertex->getEdges().begin();--begin,--end;
+		edge=begin;
 		for(PathVertex::iterator it=begin;it!=end;--it){
 			if(it->getTime(it->getVertex(true)==vertex)<=time){
 				edge=it;
@@ -236,8 +236,8 @@ PathEdge *PathClimber::findPassedEdge(PathVertex *vertex,int direction,scalar ti
 		}
 	}
 	else{
-		edge=vertex->getEdges().begin();
 		PathVertex::iterator begin=vertex->getEdges().begin(),end=vertex->getEdges().end();
+		edge=begin;
 		for(PathVertex::iterator it=begin;it!=end;++it){
 			if(it->getTime(it->getVertex(true)==vertex)>=time){
 				edge=it;
