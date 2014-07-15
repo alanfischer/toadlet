@@ -674,12 +674,14 @@ void TMSHStreamer::writeSequence(DataStream *stream,Sequence::ptr sequence){
 }
 
 void TMSHStreamer::MaterialRequest::request(){
-	while(mIndex<mMesh->getNumSubMeshes() && mMesh->getSubMesh(mIndex)->materialName.length()==0){
-		mIndex++;
-	}
-	
 	if(mIndex<mMesh->getNumSubMeshes()){
-		mEngine->getMaterialManager()->find(mMesh->getSubMesh(mIndex)->materialName,this);
+		if(mMesh->getSubMesh(mIndex)->materialName.length()!=0){
+			mEngine->getMaterialManager()->find(mMesh->getSubMesh(mIndex)->materialName,this);
+		}
+		else{
+			// Force it to build a default material
+			resourceException(Exception());
+		}
 	}
 	else{
 		mMesh->compile();
