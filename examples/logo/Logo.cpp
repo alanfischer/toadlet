@@ -26,6 +26,10 @@ void Logo::create(){
 		light->setLightState(state);
 		node->attach(light);
 
+		Matrix4x4 lookMatrix;
+		Math::setMatrix4x4FromLookAt(lookMatrix,Vector3(0,0,150),Math::ZERO_VECTOR3,Math::Y_UNIT_VECTOR3,true);
+		node->setMatrix4x4(lookMatrix);
+
 //		renderManager->setLight(light);
 	}
 	scene->getRoot()->attach(node);
@@ -40,11 +44,20 @@ void Logo::create(){
 			AnimationAction::ptr animation=new AnimationAction(mesh->getSkeleton()->getAnimation(0));
 			animation->setCycling(AnimationAction::Cycling_REFLECT);
 			lt->attach(new ActionComponent("animation",animation));
-			mesh->getSkeleton()->setRenderSkeleton(true);
 		}
 		lt->startAction("animation");
 	}
 	scene->getRoot()->attach(lt);
+
+	Node::ptr ground=new Node(scene);
+	{
+ 		MeshComponent::ptr mesh=new MeshComponent(engine);
+		mesh->setMesh(engine->createAABoxMesh(AABox(-100,-100,-1,100,100,0),shared_static_cast<Material>(engine->getMaterialManager()->find("C:\\Users\\siralanf\\Pictures\\My Scans\\scan0001.jpg"))));
+		ground->attach(mesh);
+
+		ground->setTranslate(0,0,-30);
+	}
+	scene->getRoot()->attach(ground);
 
 	node=new Node(scene);
 	{

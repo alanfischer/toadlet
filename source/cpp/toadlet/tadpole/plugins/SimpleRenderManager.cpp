@@ -55,28 +55,14 @@ void SimpleRenderManager::renderScene(RenderDevice *device,Node *node,Camera *ca
 	TOADLET_PROFILE_AUTOSCOPE();
 
 	mDevice=device;
-	mCamera=camera;
-
-	RenderTarget *target=camera->getRenderTarget();
-	device->setRenderTarget(target!=NULL?target:device->getPrimaryRenderTarget());
-
-	Viewport viewport=camera->getViewport();
-	if(viewport.empty){
-		viewport.set(0,0,device->getRenderTarget()->getWidth(),device->getRenderTarget()->getHeight());
-	}
-	if(mParams->getViewport()!=viewport){
-		device->setViewport(viewport);
-		mParams->setViewport(viewport);
-	}
 
 	gatherRenderables(mRenderableSet,node,camera);
 
-	mParams->setCamera(camera);
+	setupCamera(camera,device);
 
 	renderRenderables(mRenderableSet,device,camera);
 
 	mParams->setCamera(NULL);
-
 	mLastPass=NULL;
 	mLastRenderState=NULL;
 	mLastShaderState=NULL;
@@ -200,11 +186,11 @@ void SimpleRenderManager::gatherRenderables(RenderableSet *set,Node *node,Camera
 	set->endQueuing();
 }
 
-void SimpleRenderManager::renderRenderables(RenderableSet *set,RenderDevice *device,Camera *camera,bool useMaterials){
+void SimpleRenderManager::renderRenderables(RenderableSet *set,RenderDevice *device,Camera *camera,bool skipClear,bool useMaterials){
 	TOADLET_PROFILE_AUTOSCOPE();
 
 	int clearFlags=camera->getClearFlags();
-	if(clearFlags!=0 && !camera->getSkipFirstClear()){
+	if(skipClear==false && clearFlags!=0 && !camera->getSkipFirstClear()){
 		device->clear(clearFlags,camera->getClearColor());
 	}
 
@@ -250,7 +236,7 @@ void SimpleRenderManager::renderRenderables(RenderableSet *set,RenderDevice *dev
 			}
 		}
 
-		renderQueueItems((useMaterials && material!=NULL)?material:NULL,&queue[0],queue.size());
+		renderQueueItems((useMaterials && material!=NULL)?material:NULL,&queue[0],queue.size(),useMaterials);
 	}
 
 	interRenderRenderables(set,device,camera,useMaterials);
@@ -273,13 +259,13 @@ void SimpleRenderManager::renderDepthSortedRenderables(const RenderableSet::Rend
 	for(i=0;i<queue.size();++i){
 		const RenderableSet::RenderableQueueItem &item=queue[i];
 		Material *material=item.material;
-		renderQueueItems((useMaterials && material!=NULL)?material:NULL,&item,1);
+		renderQueueItems((useMaterials && material!=NULL)?material:NULL,&item,1,useMaterials);
 	}
 }
 
 /// @todo: We should see if the Pass is a Fixed or Shader pass, in which case we either set Fixed states, or setupRenderVariables
 ///  And then maybe set Fixed states should be moved the pass, like setupRenderVariables
-void SimpleRenderManager::renderQueueItems(Material *material,const RenderableSet::RenderableQueueItem *items,int numItems){
+void SimpleRenderManager::renderQueueItems(Material *material,const RenderableSet::RenderableQueueItem *items,int numItems,bool useMaterials){
 	int j;
 	RenderPath *path=(material!=NULL)?material->getBestPath():NULL;
 	if(path!=NULL){
@@ -293,13 +279,33 @@ void SimpleRenderManager::renderQueueItems(Material *material,const RenderableSe
 		}
 	}
 	else{
-		RenderPass *pass=mDefaultMaterial->getPass();
-		setupPass(pass,mDevice);
+		RenderPass *pass=NULL;
+		if(useMaterials){
+			pass=mDefaultMaterial->getPass();
+			setupPass(pass,mDevice);
+		}
 		for(j=0;j<numItems;++j){
 			const RenderableSet::RenderableQueueItem &item=items[j];
 			setupPassForRenderable(pass,mDevice,item.renderable,item.ambient);
 			item.renderable->render(this);
 		}
+	}
+}
+
+void SimpleRenderManager::setupCamera(Camera *camera,RenderDevice *device){
+	mCamera=camera;
+	mParams->setCamera(camera);
+
+	RenderTarget *target=camera->getRenderTarget();
+	device->setRenderTarget(target!=NULL?target:device->getPrimaryRenderTarget());
+
+	Viewport viewport=camera->getViewport();
+	if(viewport.empty){
+		viewport.set(0,0,device->getRenderTarget()->getWidth(),device->getRenderTarget()->getHeight());
+	}
+	if(mParams->getViewport()!=viewport){
+		device->setViewport(viewport);
+		mParams->setViewport(viewport);
 	}
 }
 
