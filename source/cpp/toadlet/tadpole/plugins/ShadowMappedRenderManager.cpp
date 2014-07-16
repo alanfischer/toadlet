@@ -35,17 +35,28 @@ ShadowMappedRenderManager::ShadowMappedRenderManager(Scene *scene):
 {
 	Engine *engine=scene->getEngine();
 
+	// TODO: This is currently ONLY functional on a FixedFunction GLRenderDevice, fix that!
+	Log::warning("ShadowMappedRenderManager is only functional on a FixedFunction GLRenderDevice");
+	TOADLET_ASSERT(!engine->hasShader(Shader::ShaderType_FRAGMENT));
+
 	mShadowTexture=engine->getTextureManager()->createTexture(Texture::Usage_BIT_RENDERTARGET,new TextureFormat(TextureFormat::Dimension_D2,TextureFormat::Format_DEPTH_24,1024,1024,1,1));
 	mShadowTarget=engine->getTextureManager()->createPixelBufferRenderTarget();
 	mShadowTarget->attach(mShadowTexture->getMipPixelBuffer(0,0),PixelBufferRenderTarget::Attachment_DEPTH_STENCIL);
 
 	mLightCamera=new Camera(engine);
-	mLightCamera->setProjectionFovX(Math::PI/4,1,30,60);
+	mLightCamera->setProjectionFovX(Math::PI/4,1,10,300);
+	mLightCamera->setRenderTarget(mShadowTarget);
 
 	mShadowState=engine->getMaterialManager()->createRenderState();
-	mShadowState->setRasterizerState(RasterizerState(RasterizerState::CullType_FRONT,RasterizerState::FillType_SOLID,0,0.1));
+	mShadowState->setRasterizerState(RasterizerState(RasterizerState::CullType_FRONT,RasterizerState::FillType_SOLID,0,-1));
 
 	mLightState=engine->getMaterialManager()->createRenderState();
+	TextureState lightTextureState;
+	lightTextureState.calculation=TextureState::CalculationType_CAMERASPACE;
+	lightTextureState.shadowResult=TextureState::ShadowResult_A;
+	mLightState->setTextureState(Shader::ShaderType_VERTEX,0,lightTextureState);
+	mLightState->setDepthState(DepthState(DepthState::DepthTest_LEQUAL,false));
+	mLightState->setMaterialState(MaterialState(MaterialState::AlphaTest_GEQUAL,0.6f));
 }
 
 ShadowMappedRenderManager::~ShadowMappedRenderManager(){
@@ -58,47 +69,57 @@ void ShadowMappedRenderManager::renderScene(RenderDevice *device,Node *node,Came
 	}
 
 	mDevice=device;
-	mCamera=camera;
 
+	
 	mLightCamera->setWorldMatrix(mLight->getParent()->getWorldTransform()->getMatrix());
 
+	// Calculate texture matrix for projection
+	// This matrix takes us from eye space to the light's clip space
+	Matrix4x4 biasMatrix;
+	device->getShadowBiasMatrix(mShadowTexture,biasMatrix);
+	Matrix4x4 textureMatrix;
+	Math::mul(textureMatrix,biasMatrix,mLightCamera->getProjectionMatrix());
+	Math::postMul(textureMatrix,mLightCamera->getViewMatrix());
+	Matrix4x4 invViewMatrix;
+	Math::invert(invViewMatrix,camera->getViewMatrix());
+	Math::postMul(textureMatrix,invViewMatrix);
+
+	TextureState lightTextureState;
+	mLightState->getTextureState(Shader::ShaderType_VERTEX,0,lightTextureState);
+	lightTextureState.matrix.set(textureMatrix);
+	mLightState->setTextureState(Shader::ShaderType_VERTEX,0,lightTextureState);
+
+
+	// First pass, render from light's view to get depth buffer into shadowTexture
 	gatherRenderables(mRenderableSet,node,mLightCamera);
 
-	RenderTarget *oldRenderTarget=device->getRenderTarget();
+	setupCamera(mLightCamera,device);
 
-	device->setRenderTarget(mShadowTarget);
-	{
-		device->setRenderState(mShadowState);
+	device->setRenderState(mShadowState);
+	renderRenderables(mRenderableSet,device,mLightCamera,false,false);
 
-		renderRenderables(mRenderableSet,device,mLightCamera,false);
-	}
-	device->swap();
-
-
+	
+	// Second pass, render from camera's view to show shadowed areas
 	gatherRenderables(mRenderableSet,node,camera);
 
-	device->setRenderTarget(oldRenderTarget);
-	{
-		// Calculate texture matrix for projection
-		// This matrix takes us from eye space to the light's clip space
-		Matrix4x4 biasMatrix;
-		device->getShadowBiasMatrix(mShadowTexture,biasMatrix);
-		Matrix4x4 textureMatrix;
-		Math::mul(textureMatrix,biasMatrix,mLightCamera->getProjectionMatrix());
-		Math::postMul(textureMatrix,mLightCamera->getViewMatrix());
-		Matrix4x4 invViewMatrix;
-		Math::invert(invViewMatrix,camera->getViewMatrix());
-		Math::postMul(textureMatrix,invViewMatrix);
+	setupCamera(camera,device);
 
-		TextureState lightTextureState;
-		lightTextureState.calculation=TextureState::CalculationType_CAMERASPACE;
-		lightTextureState.matrix.set(textureMatrix);
-		mLightState->setTextureState(Shader::ShaderType_VERTEX,0,lightTextureState);
-		device->setRenderState(mLightState);
-		device->setTexture(Shader::ShaderType_FRAGMENT,0,mShadowTexture);
+	renderRenderables(mRenderableSet,device,camera);
 
-		renderRenderables(mRenderableSet,device,camera,false);
-	}
+
+	// Third pass, render from camera's view to show lit areas
+	device->setRenderState(mLightState);
+	device->setTexture(Shader::ShaderType_FRAGMENT,0,mShadowTexture);
+
+	renderRenderables(mRenderableSet,device,camera,true,false);
+
+
+	mParams->setCamera(NULL);
+	mCamera=NULL;
+	mDevice=NULL;
+	mLastPass=NULL;
+	mLastRenderState=NULL;
+	mLastShaderState=NULL;
 }
 
 }

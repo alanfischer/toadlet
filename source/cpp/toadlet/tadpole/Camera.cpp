@@ -187,7 +187,7 @@ void Camera::setPosition(const Vector3 &position){
 void Camera::setRenderTarget(RenderTarget *target){
 	mRenderTarget=target;
 	if(target==NULL){
-		mViewport.set(0,0,0,0);
+		mViewport.reset();
 	}
 	else{
 		mViewport.set(0,0,target->getWidth(),target->getHeight());

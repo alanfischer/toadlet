@@ -1018,7 +1018,7 @@ void D3D9RenderDevice::getShadowBiasMatrix(const Texture *shadowTexture,Matrix4x
 	scalar yoff=Math::HALF+Math::div(Math::HALF,Math::fromInt(height));
 	result.set( Math::HALF, 0,           0,         xoff,
 				0,          -Math::HALF, 0,         yoff,
-				0,          0,           float(1<<24)/*Math::ONE*/, -400000.0f/*0*/,
+				0,          0,           float(1<<24), -400000.0f,
 				0,          0,           0,         Math::ONE);
 }
 
