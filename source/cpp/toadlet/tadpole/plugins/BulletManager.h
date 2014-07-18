@@ -57,7 +57,7 @@ public:
 	btDynamicsWorld *getWorld() const{return mWorld;}
 
 	void setGravity(const Vector3 &gravity){btVector3 v;setVector3(v,gravity);mWorld->setGravity(v);}
-	const Vector3 &BulletManager::getGravity() const{setVector3(mGravity,mWorld->getGravity());return mGravity;}
+	const Vector3 &getGravity() const{setVector3(mGravity,mWorld->getGravity());return mGravity;}
 
 	void setTraceable(PhysicsTraceable *traceable){}
 	void setTraceableCollisionScope(int scope){}
