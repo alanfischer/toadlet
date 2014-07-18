@@ -39,7 +39,7 @@ ShadowMappedRenderManager::ShadowMappedRenderManager(Scene *scene):
 	Log::warning("ShadowMappedRenderManager is only functional on a FixedFunction GLRenderDevice");
 	TOADLET_ASSERT(!engine->hasShader(Shader::ShaderType_FRAGMENT));
 
-	mShadowTexture=engine->getTextureManager()->createTexture(Texture::Usage_BIT_RENDERTARGET,new TextureFormat(TextureFormat::Dimension_D2,TextureFormat::Format_DEPTH_24,1024,1024,1,1));
+	mShadowTexture=engine->getTextureManager()->createTexture(Texture::Usage_BIT_DYNAMIC | Texture::Usage_BIT_RENDERTARGET,new TextureFormat(TextureFormat::Dimension_D2,TextureFormat::Format_DEPTH_24,1024,1024,1,1));
 	mShadowTarget=engine->getTextureManager()->createPixelBufferRenderTarget();
 	mShadowTarget->attach(mShadowTexture->getMipPixelBuffer(0,0),PixelBufferRenderTarget::Attachment_DEPTH_STENCIL);
 
@@ -56,6 +56,7 @@ ShadowMappedRenderManager::ShadowMappedRenderManager(Scene *scene):
 	lightTextureState.shadowResult=TextureState::ShadowResult_A;
 	mLightState->setTextureState(Shader::ShaderType_VERTEX,0,lightTextureState);
 	mLightState->setDepthState(DepthState(DepthState::DepthTest_LEQUAL,false));
+//	mLightState->setBlendState(BlendState(BlendState::Combination_COLOR));
 	mLightState->setMaterialState(MaterialState(MaterialState::AlphaTest_GEQUAL,0.6f));
 }
 
@@ -95,6 +96,7 @@ void ShadowMappedRenderManager::renderScene(RenderDevice *device,Node *node,Came
 
 	setupCamera(mLightCamera,device);
 
+	device->setDefaultState();
 	device->setRenderState(mShadowState);
 	renderRenderables(mRenderableSet,device,mLightCamera,false,false);
 
@@ -104,10 +106,12 @@ void ShadowMappedRenderManager::renderScene(RenderDevice *device,Node *node,Came
 
 	setupCamera(camera,device);
 
+	device->setDefaultState();
 	renderRenderables(mRenderableSet,device,camera);
 
 
 	// Third pass, render from camera's view to show lit areas
+	device->setDefaultState();
 	device->setRenderState(mLightState);
 	device->setTexture(Shader::ShaderType_FRAGMENT,0,mShadowTexture);
 
