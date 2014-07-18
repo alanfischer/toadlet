@@ -132,7 +132,7 @@ public:
 	// Misc operations
 	virtual int getClosePixelFormat(int pixelFormat,int usage)=0;
 	virtual bool getShaderProfileSupported(const String &profile)=0;
-	virtual void getShadowBiasMatrix(const Texture *shadowTexture,Matrix4x4 &result)=0;
+	virtual void getShadowBiasMatrix(Matrix4x4 &result,const Texture *shadowTexture,scalar bias)=0;
 	virtual bool getRenderCaps(RenderCaps &caps)=0;
 };
 

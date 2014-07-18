@@ -35,8 +35,7 @@ ShadowMappedRenderManager::ShadowMappedRenderManager(Scene *scene):
 {
 	Engine *engine=scene->getEngine();
 
-	// TODO: This is currently ONLY functional on a FixedFunction GLRenderDevice, fix that!
-	Log::warning("ShadowMappedRenderManager is only functional on a FixedFunction GLRenderDevice");
+	// TODO: This is currently ONLY functional on a FixedFunction pipeline, fix that!
 	TOADLET_ASSERT(!engine->hasShader(Shader::ShaderType_FRAGMENT));
 
 	mShadowTexture=engine->getTextureManager()->createTexture(Texture::Usage_BIT_DYNAMIC | Texture::Usage_BIT_RENDERTARGET,new TextureFormat(TextureFormat::Dimension_D2,TextureFormat::Format_DEPTH_24,1024,1024,1,1));
@@ -48,15 +47,15 @@ ShadowMappedRenderManager::ShadowMappedRenderManager(Scene *scene):
 	mLightCamera->setRenderTarget(mShadowTarget);
 
 	mShadowState=engine->getMaterialManager()->createRenderState();
-	mShadowState->setRasterizerState(RasterizerState(RasterizerState::CullType_FRONT,RasterizerState::FillType_SOLID,0,-1));
+	mShadowState->setRasterizerState(RasterizerState(RasterizerState::CullType_FRONT,RasterizerState::FillType_SOLID));
 
 	mLightState=engine->getMaterialManager()->createRenderState();
 	TextureState lightTextureState;
 	lightTextureState.calculation=TextureState::CalculationType_CAMERASPACE;
 	lightTextureState.shadowResult=TextureState::ShadowResult_A;
 	mLightState->setTextureState(Shader::ShaderType_VERTEX,0,lightTextureState);
-	mLightState->setDepthState(DepthState(DepthState::DepthTest_LEQUAL,false));
-//	mLightState->setBlendState(BlendState(BlendState::Combination_COLOR));
+	mLightState->setSamplerState(Shader::ShaderType_VERTEX,0,SamplerState());
+	mLightState->setDepthState(DepthState(DepthState::DepthTest_LEQUAL,true));
 	mLightState->setMaterialState(MaterialState(MaterialState::AlphaTest_GEQUAL,0.6f));
 }
 
@@ -77,7 +76,7 @@ void ShadowMappedRenderManager::renderScene(RenderDevice *device,Node *node,Came
 	// Calculate texture matrix for projection
 	// This matrix takes us from eye space to the light's clip space
 	Matrix4x4 biasMatrix;
-	device->getShadowBiasMatrix(mShadowTexture,biasMatrix);
+	device->getShadowBiasMatrix(biasMatrix,mShadowTexture,0.02);
 	Matrix4x4 textureMatrix;
 	Math::mul(textureMatrix,biasMatrix,mLightCamera->getProjectionMatrix());
 	Math::postMul(textureMatrix,mLightCamera->getViewMatrix());
@@ -96,7 +95,6 @@ void ShadowMappedRenderManager::renderScene(RenderDevice *device,Node *node,Came
 
 	setupCamera(mLightCamera,device);
 
-	device->setDefaultState();
 	device->setRenderState(mShadowState);
 	renderRenderables(mRenderableSet,device,mLightCamera,false,false);
 
@@ -106,12 +104,10 @@ void ShadowMappedRenderManager::renderScene(RenderDevice *device,Node *node,Came
 
 	setupCamera(camera,device);
 
-	device->setDefaultState();
 	renderRenderables(mRenderableSet,device,camera);
 
 
 	// Third pass, render from camera's view to show lit areas
-	device->setDefaultState();
 	device->setRenderState(mLightState);
 	device->setTexture(Shader::ShaderType_FRAGMENT,0,mShadowTexture);
 
