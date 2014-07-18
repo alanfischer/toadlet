@@ -98,6 +98,7 @@ public:
 
 	// Misc operations
 	void getShadowBiasMatrix(const Texture *shadowTexture,Matrix4x4 &result);
+	int getClosePixelFormat(int format,int usage,bool pixelBuffer);
 	int getClosePixelFormat(int format,int usage);
 	int getClosePixelFormat(int format);
 	bool getShaderProfileSupported(const String &profile);
@@ -116,14 +117,14 @@ public:
 
 	inline IDirect3DDevice9 *getDirect3DDevice9(){return mD3DDevice;}
 	inline const D3DCAPS9 &getD3DCAPS9() const{return mD3DCaps;}
-	bool isD3DFORMATValid(D3DFORMAT textureFormat,DWORD usage);
+	bool isD3DFORMATValid(D3DFORMAT textureFormat,DWORD usage,D3DRESOURCETYPE type);
 	void updateProjectionMatrix(Matrix4x4 &matrix);
 
 	Matrix4x4 cacheMatrix4x4;
 	D3DMATRIX cacheD3DMatrix;
 
 	static DWORD getD3DTOP(TextureState::Operation operation,TextureState::Source alphaSource);
-	static D3DFORMAT getD3DFORMAT(int textureFormat);
+	static D3DFORMAT getD3DFORMAT(int textureFormat,bool offscreen=false);
 	static DWORD getD3DUSAGE(int textureFormat,int usage);
 	static D3DPOOL getD3DPOOL(int usage);
 	static DWORD getD3DTADDRESS(SamplerState::AddressType addressMode);

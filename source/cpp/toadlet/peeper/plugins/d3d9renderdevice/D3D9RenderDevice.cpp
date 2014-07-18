@@ -132,12 +132,12 @@ bool D3D9RenderDevice::create(RenderTarget *target,int options){
 	HRESULT result=mD3DDevice->GetDeviceCaps(&mD3DCaps);
 	TOADLET_CHECK_D3D9ERROR(result,"Error getting caps");
 
-	HRESULT renderToTextureResult=isD3DFORMATValid(D3DFMT_X8R8G8B8,D3DUSAGE_RENDERTARGET);
+	HRESULT renderToTextureResult=isD3DFORMATValid(D3DFMT_X8R8G8B8,D3DUSAGE_RENDERTARGET,D3DRTYPE_TEXTURE);
 	HRESULT renderToDepthTextureResult=
 	#if defined(TOADLET_SET_D3DM)
 		E_FAIL;
 	#else
-		isD3DFORMATValid(D3DFMT_D24S8,D3DUSAGE_DEPTHSTENCIL);
+		isD3DFORMATValid(D3DFMT_D24S8,D3DUSAGE_DEPTHSTENCIL,D3DRTYPE_TEXTURE);
 	#endif
 	setCapsFromD3DCAPS9(mCaps,mD3DCaps,SUCCEEDED(renderToTextureResult),SUCCEEDED(renderToDepthTextureResult));
 
@@ -1018,20 +1018,24 @@ void D3D9RenderDevice::getShadowBiasMatrix(const Texture *shadowTexture,Matrix4x
 	scalar yoff=Math::HALF+Math::div(Math::HALF,Math::fromInt(height));
 	result.set( Math::HALF, 0,           0,         xoff,
 				0,          -Math::HALF, 0,         yoff,
-				0,          0,           float(1<<24), -400000.0f,
+				0,          0,           Math::ONE, -.01,
 				0,          0,           0,         Math::ONE);
 }
 
-int D3D9RenderDevice::getClosePixelFormat(int format,int usage){
+int D3D9RenderDevice::getClosePixelFormat(int format,int usage,bool pixelBuffer){
 	int closeFormat=getClosePixelFormat(format);
 	DWORD d3dusage=getD3DUSAGE(closeFormat,usage);
 	D3DFORMAT d3dformat=getD3DFORMAT(closeFormat);
-	if(isD3DFORMATValid(d3dformat,d3dusage)==false){
-		return TextureFormat::Format_BGRA_8;
+	if(isD3DFORMATValid(d3dformat,pixelBuffer?0:d3dusage,pixelBuffer?D3DRTYPE_SURFACE:D3DRTYPE_TEXTURE)==false){
+		return (format&TextureFormat::Format_MASK_SEMANTICS)!=TextureFormat::Format_SEMANTIC_DEPTH ? TextureFormat::Format_BGRA_8 : 0;
 	}
 	else{
 		return closeFormat;
 	}
+}
+
+int D3D9RenderDevice::getClosePixelFormat(int format,int usage){
+	return getClosePixelFormat(format,usage,false);
 }
 
 int D3D9RenderDevice::getClosePixelFormat(int format){
@@ -1079,8 +1083,8 @@ void D3D9RenderDevice::updateProjectionMatrix(Matrix4x4 &matrix){
 	}
 }
 
-bool D3D9RenderDevice::isD3DFORMATValid(D3DFORMAT textureFormat,DWORD usage){
-	return SUCCEEDED(mD3D->CheckDeviceFormat(mD3DAdapter,mD3DDevType,mD3DAdapterFormat,usage,D3DRTYPE_TEXTURE,textureFormat));
+bool D3D9RenderDevice::isD3DFORMATValid(D3DFORMAT textureFormat,DWORD usage,D3DRESOURCETYPE type){
+	return SUCCEEDED(mD3D->CheckDeviceFormat(mD3DAdapter,mD3DDevType,mD3DAdapterFormat,usage,type,textureFormat));
 }
 
 DWORD D3D9RenderDevice::getD3DTOP(TextureState::Operation operation,TextureState::Source alphaSource){
@@ -1111,7 +1115,7 @@ DWORD D3D9RenderDevice::getD3DTOP(TextureState::Operation operation,TextureState
 	}
 }
 
-D3DFORMAT D3D9RenderDevice::getD3DFORMAT(int format){
+D3DFORMAT D3D9RenderDevice::getD3DFORMAT(int format,bool offscreen){
 	switch(format){
 		#if !defined(TOADLET_SET_D3DM)
 			case TextureFormat::Format_L_8:
@@ -1132,11 +1136,11 @@ D3DFORMAT D3D9RenderDevice::getD3DFORMAT(int format){
 		case TextureFormat::Format_BGRA_4_4_4_4:
 			return D3DFMT_A4R4G4B4;
 		case TextureFormat::Format_DEPTH_16:
-			return D3DFMT_D16;
+			return offscreen?D3DFMT_D16_LOCKABLE:D3DFMT_D16;
 		case TextureFormat::Format_DEPTH_24:
-			return D3DFMT_D24S8;
+			return offscreen?D3DFMT_D16_LOCKABLE:D3DFMT_D24S8;
 		case TextureFormat::Format_DEPTH_32:
-			return D3DFMT_D32;
+			return offscreen?D3DFMT_D32_LOCKABLE:D3DFMT_D32;
 		case TextureFormat::Format_RGB_DXT1:
 			return D3DFMT_DXT1;
 		case TextureFormat::Format_RGBA_DXT2:

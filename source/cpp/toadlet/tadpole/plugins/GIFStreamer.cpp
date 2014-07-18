@@ -293,7 +293,11 @@ GifFileType *GIFStreamer::openFile(Stream *stream){
 }
 
 int GIFStreamer::closeFile(GifFileType *file){
+#if defined(GIFLIB_MAJOR) && (GIFLIB_MAJOR >= 5)
+	int result=DGifCloseFile(file,NULL);
+#else
 	int result=DGifCloseFile(file);
+#endif
 	return result;
 }
 
