@@ -337,7 +337,7 @@ Resource::ptr GIFStreamer::load(Stream::ptr stream,ResourceData *data){
 	}while(result==GIF_OK && working!=NULL);
 
 	if(result!=GIF_ERROR){
-		result=DGifCloseFile(file);
+		result=closeFile(file);
 	}
 	
 	Texture::ptr texture;
