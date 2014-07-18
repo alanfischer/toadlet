@@ -70,9 +70,7 @@ Scene::Scene(Engine *engine,int options,scalar epsilon):Object(),
 #if defined(TOADLET_HAS_BULLET)
 	if((options&Option_BIT_NOBULLET)==0){
 		mPhysicsManager=new BulletManager(this);
-	}
-#else
-	else
+	} else
 #endif
 	mPhysicsManager=new HopManager(this);
 
