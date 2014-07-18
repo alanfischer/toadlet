@@ -97,8 +97,7 @@ public:
 	void setAmbientColor(const Vector4 &ambient);
 
 	// Misc operations
-	void getShadowBiasMatrix(const Texture *shadowTexture,Matrix4x4 &result);
-	int getClosePixelFormat(int format,int usage,bool pixelBuffer);
+	void getShadowBiasMatrix(Matrix4x4 &result,const Texture *shadowTexture,scalar bias);
 	int getClosePixelFormat(int format,int usage);
 	int getClosePixelFormat(int format);
 	bool getShaderProfileSupported(const String &profile);

@@ -799,6 +799,7 @@ void D3D9RenderDevice::setTextureState(int i,TextureState *state){
 		TextureState::CalculationType calculation=state->calculation;
 		if(calculation!=TextureState::CalculationType_DISABLED){
 			if(calculation==TextureState::CalculationType_NORMAL){
+				mD3DDevice->SetTextureStageState(i,D3DTSS_TEXCOORDINDEX,D3DTSS_TCI_PASSTHRU | state->texCoordIndex);
 				/// @todo: Get this working with 3D Texture coordinates.  Doesnt seem to currently
 				//  I have tried just switching to D3DTTFF_COUNT3, but nothing changed, I'm pretty sure it has
 				//  something to do with the setup of the cacheD3DMatrix below
@@ -817,13 +818,13 @@ void D3D9RenderDevice::setTextureState(int i,TextureState *state){
 				t=cacheD3DMatrix._34; cacheD3DMatrix._34=cacheD3DMatrix._44; cacheD3DMatrix._44=t;
 			}
 			else if(calculation==TextureState::CalculationType_OBJECTSPACE){
-				mD3DDevice->SetTextureStageState(i,D3DTSS_TEXCOORDINDEX,D3DTSS_TCI_PASSTHRU);
+				mD3DDevice->SetTextureStageState(i,D3DTSS_TEXCOORDINDEX,D3DTSS_TCI_PASSTHRU | state->texCoordIndex);
 				mD3DDevice->SetTextureStageState(i,D3DTSS_TEXTURETRANSFORMFLAGS,D3DTTFF_COUNT4|D3DTTFF_PROJECTED);
 
 				toD3DMATRIX(cacheD3DMatrix,state->matrix);
 			}
 			else if(calculation==TextureState::CalculationType_CAMERASPACE){
-				mD3DDevice->SetTextureStageState(i,D3DTSS_TEXCOORDINDEX,D3DTSS_TCI_CAMERASPACEPOSITION);
+				mD3DDevice->SetTextureStageState(i,D3DTSS_TEXCOORDINDEX,D3DTSS_TCI_CAMERASPACEPOSITION | state->texCoordIndex);
 				mD3DDevice->SetTextureStageState(i,D3DTSS_TEXTURETRANSFORMFLAGS,D3DTTFF_COUNT4|D3DTTFF_PROJECTED);
 
 				toD3DMATRIX(cacheD3DMatrix,state->matrix);
@@ -832,10 +833,9 @@ void D3D9RenderDevice::setTextureState(int i,TextureState *state){
 			mD3DDevice->SetTransform((D3DTRANSFORMSTATETYPE)(D3DTS_TEXTURE0+i),&cacheD3DMatrix TOADLET_D3DMFMT);
 		}
 		else{
+			mD3DDevice->SetTextureStageState(i,D3DTSS_TEXCOORDINDEX,D3DTSS_TCI_PASSTHRU | state->texCoordIndex);
 			mD3DDevice->SetTextureStageState(i,D3DTSS_TEXTURETRANSFORMFLAGS,D3DTTFF_DISABLE);
 		}
-
-		mD3DDevice->SetTextureStageState(i,D3DTSS_TEXCOORDINDEX,state->texCoordIndex);
 	}
 	else{
 		mD3DDevice->SetTextureStageState(i,D3DTSS_COLOROP,D3DTOP_DISABLE);
@@ -1011,31 +1011,27 @@ void D3D9RenderDevice::getPrimitiveTypeAndCount(D3DPRIMITIVETYPE &d3dpt,int &cou
 	}
 }
 
-void D3D9RenderDevice::getShadowBiasMatrix(const Texture *shadowTexture,Matrix4x4 &result){
+void D3D9RenderDevice::getShadowBiasMatrix(Matrix4x4 &result,const Texture *shadowTexture,scalar bias){
 	int width=shadowTexture->getFormat()->getWidth();
 	int height=shadowTexture->getFormat()->getHeight();
 	scalar xoff=Math::HALF+Math::div(Math::HALF,Math::fromInt(width));
 	scalar yoff=Math::HALF+Math::div(Math::HALF,Math::fromInt(height));
 	result.set( Math::HALF, 0,           0,         xoff,
 				0,          -Math::HALF, 0,         yoff,
-				0,          0,           Math::ONE, -.01,
+				0,          0,           Math::ONE, bias,
 				0,          0,           0,         Math::ONE);
 }
 
-int D3D9RenderDevice::getClosePixelFormat(int format,int usage,bool pixelBuffer){
+int D3D9RenderDevice::getClosePixelFormat(int format,int usage){
 	int closeFormat=getClosePixelFormat(format);
 	DWORD d3dusage=getD3DUSAGE(closeFormat,usage);
 	D3DFORMAT d3dformat=getD3DFORMAT(closeFormat);
-	if(isD3DFORMATValid(d3dformat,pixelBuffer?0:d3dusage,pixelBuffer?D3DRTYPE_SURFACE:D3DRTYPE_TEXTURE)==false){
-		return (format&TextureFormat::Format_MASK_SEMANTICS)!=TextureFormat::Format_SEMANTIC_DEPTH ? TextureFormat::Format_BGRA_8 : 0;
+	if(isD3DFORMATValid(d3dformat,d3dusage,D3DRTYPE_TEXTURE)==false){
+		return TextureFormat::Format_BGRA_8;
 	}
 	else{
 		return closeFormat;
 	}
-}
-
-int D3D9RenderDevice::getClosePixelFormat(int format,int usage){
-	return getClosePixelFormat(format,usage,false);
 }
 
 int D3D9RenderDevice::getClosePixelFormat(int format){

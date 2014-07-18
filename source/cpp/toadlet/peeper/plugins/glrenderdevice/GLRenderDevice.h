@@ -114,7 +114,7 @@ public:
 	// Misc operations
 	int getClosePixelFormat(int pixelFormat,int usage);
 	bool getShaderProfileSupported(const String &profile);
-	void getShadowBiasMatrix(const Texture *shadowTexture,Matrix4x4 &result);
+	void getShadowBiasMatrix(Matrix4x4 &result,const Texture *shadowTexture,float bias);
 	bool getRenderCaps(RenderCaps &caps){caps.set(mCaps);return true;}
 
 	void setBlendState(BlendState *state);

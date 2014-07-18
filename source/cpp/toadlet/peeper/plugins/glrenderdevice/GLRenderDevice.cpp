@@ -1692,7 +1692,8 @@ void GLRenderDevice::setAmbientColor(const Vector4 &ambient){
 #endif
 }
 
-void GLRenderDevice::getShadowBiasMatrix(const Texture *shadowTexture,Matrix4x4 &result){
+void GLRenderDevice::getShadowBiasMatrix(Matrix4x4 &result,const Texture *shadowTexture,scalar bias){
+	/// @todo: Insert bias in here somewhere
 	result.set( Math::HALF, 0,          0,          Math::HALF,
 				0,          Math::HALF, 0,          Math::HALF,
 				0,          0,          Math::HALF, Math::HALF,

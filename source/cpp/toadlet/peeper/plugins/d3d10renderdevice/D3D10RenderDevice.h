@@ -98,7 +98,7 @@ public:
 	// Misc operations
 	int getClosePixelFormat(int pixelFormat,int usage);
 	bool getShaderProfileSupported(const String &profile);
-	void getShadowBiasMatrix(const Texture *shadowTexture,Matrix4x4 &result);
+	void getShadowBiasMatrix(Matrix4x4 &result,const Texture *shadowTexture,scalar bias);
 	bool getRenderCaps(RenderCaps &caps){caps.set(mCaps);return true;}
 
 	inline ID3D10Device *getD3D10Device(){return mD3DDevice;}

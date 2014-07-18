@@ -464,7 +464,7 @@ void D3D10RenderDevice::setTexture(Shader::ShaderType shaderType,int i,Texture *
 	}
 }
 
-void D3D10RenderDevice::getShadowBiasMatrix(const Texture *shadowTexture,Matrix4x4 &result){
+void D3D10RenderDevice::getShadowBiasMatrix(Matrix4x4 &result,const Texture *shadowTexture,scalar bias){
 	result.reset();
 }
 
