@@ -48,12 +48,10 @@ bool D3D9PixelBuffer::create(int usage,int access,TextureFormat::ptr format){
 	mUsage=usage;
 	mAccess=access;
 	mFormat=new TextureFormat(format);
-	mFormat->setPixelFormat(mDevice->getClosePixelFormat(format->getPixelFormat()));
+	mFormat->setPixelFormat(mDevice->getClosePixelFormat(format->getPixelFormat(),mUsage,true));
 	mDataSize=mFormat->getDataSize();
 
-	createContext(false);
-
-	return true;
+	return createContext(false);
 }
 
 void D3D9PixelBuffer::destroy(){
@@ -81,7 +79,7 @@ bool D3D9PixelBuffer::createContext(bool restore){
 	}
 
 	int width=mFormat->getWidth(),height=mFormat->getHeight();
-	D3DFORMAT d3dformat=D3D9RenderDevice::getD3DFORMAT(mFormat->getPixelFormat());
+	D3DFORMAT d3dformat=D3D9RenderDevice::getD3DFORMAT(mFormat->getPixelFormat(),!mRenderTarget);
 	HRESULT result=S_OK;
 	IDirect3DSurface9 *d3dsurface=NULL;
 	if(mRenderTarget){
