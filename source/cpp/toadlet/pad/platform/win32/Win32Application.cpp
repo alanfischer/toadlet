@@ -787,6 +787,10 @@ int Win32Application::translateKey(int key){
 			return Key_DELETE;
 	}
 
+	if(key>=VK_NUMPAD0 && key<=VK_NUMPAD9){
+		return key-VK_NUMPAD0 + Key_NUMPAD0;
+	}
+
 	return key;
 }
 

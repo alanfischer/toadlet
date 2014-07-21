@@ -672,6 +672,10 @@ int X11Application::translateKey(int key){
 			return Key_SPACE;
 	}
 
+	if(key>=XK_KP_0 && key<=XK_KP_9){
+		return key-XK_KP_0 + Key_NUMPAD0;
+	}
+
 	return key;
 }
 
