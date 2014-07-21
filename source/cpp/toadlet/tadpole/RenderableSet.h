@@ -36,9 +36,9 @@ namespace tadpole{
 
 class Scene;
 
-class TOADLET_API RenderableSet{
+class TOADLET_API RenderableSet:public Object{
 public:
-	TOADLET_SPTR(RenderableSet);
+	TOADLET_OBJECT(RenderableSet);
 
 	class RenderableQueueItem{
 	public:

@@ -65,13 +65,6 @@ void StereoscopicCamera::setClearColor(const Vector4 &clearColor){
 	mRightCamera->setClearColor(clearColor);
 }
 
-void StereoscopicCamera::setSkipFirstClear(bool skip){
-	Camera::setSkipFirstClear(skip);
-
-	mLeftCamera->setSkipFirstClear(skip);
-	mRightCamera->setSkipFirstClear(skip);
-}
-
 void StereoscopicCamera::setDefaultState(RenderState *renderState){
 	Camera::setDefaultState(renderState);
 
