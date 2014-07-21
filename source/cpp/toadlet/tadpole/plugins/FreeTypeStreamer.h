@@ -33,10 +33,10 @@
 extern "C" {
 	#define USE_FREETYPE2_STATIC
 	#include <ft2build.h>
-	#include <freetype2/freetype.h>
-	#include <freetype2/ftglyph.h>
-	#include <freetype2/ftoutln.h>
-	#include <freetype2/fttrigon.h>
+	#include <freetype.h>
+	#include <ftglyph.h>
+	#include <ftoutln.h>
+	#include <fttrigon.h>
 }
 
 namespace toadlet{
