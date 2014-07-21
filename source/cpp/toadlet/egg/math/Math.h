@@ -633,6 +633,14 @@ namespace Math{
 	TOADLET_API bool setEulerAngleFromQuaternion(EulerAngle &r,const Quaternion &q,real epsilon);
 
 	// Matrix3x3 basic operations
+	TOADLET_API void add(Matrix3x3 &r,const Matrix3x3 &m1,const Matrix3x3 &m2);
+
+	TOADLET_API void add(Matrix3x3 &m1,const Matrix3x3 &m2);
+
+	TOADLET_API void sub(Matrix3x3 &r,const Matrix3x3 &m1,const Matrix3x3 &m2);
+
+	TOADLET_API void sub(Matrix3x3 &m1,const Matrix3x3 &m2);
+
 	TOADLET_API void mul(Matrix3x3 &r,const Matrix3x3 &m1,const Matrix3x3 &m2);
 
 	TOADLET_API void postMul(Matrix3x3 &m1,const Matrix3x3 &m2);
@@ -665,6 +673,14 @@ namespace Math{
 	TOADLET_API bool invert(Matrix3x3 &r,const Matrix3x3 &m);
 
 	// Matrix4x4 basic operations
+	TOADLET_API void add(Matrix4x4 &r,const Matrix4x4 &m1,const Matrix4x4 &m2);
+
+	TOADLET_API void add(Matrix4x4 &m1,const Matrix4x4 &m2);
+
+	TOADLET_API void sub(Matrix4x4 &r,const Matrix4x4 &m1,const Matrix4x4 &m2);
+
+	TOADLET_API void sub(Matrix4x4 &m1,const Matrix4x4 &m2);
+
 	TOADLET_API void mul(Matrix4x4 &r,const Matrix4x4 &m1,const Matrix4x4 &m2);
 	TOADLET_API void mulMatrix4x4Traditional(Matrix4x4 &r,const Matrix4x4 &m1,const Matrix4x4 &m2);
 	TOADLET_API void mulMatrix4x4SSE(Matrix4x4 &r,const Matrix4x4 &m1,const Matrix4x4 &m2);
