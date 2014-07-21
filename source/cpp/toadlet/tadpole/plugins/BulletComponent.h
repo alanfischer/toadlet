@@ -60,7 +60,7 @@ public:
 	void setAngularVelocity(const Vector3 &velocity){btVector3 v;setVector3(v,velocity);mBody->setAngularVelocity(v);}
 	const Vector3 &getAngularVelocity() const{return reinterpret_cast<const Vector3&>(mBody->getAngularVelocity());}
 
-	void addForce(const Vector3 &force){btVector3 v;setVector3(v,force);mBody->applyCentralForce(v);}
+	void addForce(const Vector3 &force,const Vector3 &offset);
 
 	void setMass(scalar mass);
 	scalar getMass() const;

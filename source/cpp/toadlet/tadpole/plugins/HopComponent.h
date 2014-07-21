@@ -59,7 +59,7 @@ public:
 	void setAngularVelocity(const Vector3 &velocity){}
 	const Vector3 &getAngularVelocity() const{return Math::ZERO_VECTOR3;}
 
-	void addForce(const Vector3 &force){mSolid->addForce(force);}
+	void addForce(const Vector3 &force,const Vector3 &offset){mSolid->addForce(force);}
 
 	void setMass(scalar mass){mSolid->setMass(mass);}
 	scalar getMass() const{return mSolid->getMass();}

@@ -31,6 +31,10 @@
 namespace toadlet{
 namespace tadpole{
 
+void physicsCallback(btDynamicsWorld *world, btScalar timeStep){
+	((BulletManager*)world->getWorldUserInfo())->physicsUpdate(timeStep);
+}
+
 BulletManager::BulletManager(Scene *scene):
 	mWorld(NULL)
 {
@@ -45,6 +49,7 @@ BulletManager::BulletManager(Scene *scene):
 
 	mWorld=new btDiscreteDynamicsWorld(dispatcher,broadphase,solver,collisionConfiguration);
 	mWorld->setLatencyMotionStateInterpolation(true);
+	mWorld->setInternalTickCallback(&physicsCallback,this,true); 
 
 	setGravity(Vector3(0,0,-Math::fromMilli(9810)));
 }
@@ -80,6 +85,13 @@ void BulletManager::frameUpdate(int dt,int scope,Node *node){
 				body->getMotionState()->setWorldTransform(interpolatedTransform);
 			}
 		}
+	}
+}
+
+void BulletManager::physicsUpdate(btScalar timeStep){
+	int i;
+	for(i=0;i<mListeners.size();++i){
+		mListeners[i]->physicsUpdate(timeStep);
 	}
 }
 
