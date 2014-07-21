@@ -34,6 +34,62 @@ namespace toadlet{
 namespace egg{
 namespace math{
 
+void Math::add(Matrix3x3 &r,const Matrix3x3 &m1,const Matrix3x3 &m2){
+	r.data[0+0*3]=m1.data[0+0*3] + m2.data[0+0*3];
+	r.data[0+1*3]=m1.data[0+1*3] + m2.data[0+1*3];
+	r.data[0+2*3]=m1.data[0+2*3] + m2.data[0+2*3];
+
+	r.data[1+0*3]=m1.data[1+0*3] + m2.data[1+0*3];
+	r.data[1+1*3]=m1.data[1+1*3] + m2.data[1+1*3];
+	r.data[1+2*3]=m1.data[1+2*3] + m2.data[1+2*3];
+
+	r.data[2+0*3]=m1.data[2+0*3] + m2.data[2+0*3];
+	r.data[2+1*3]=m1.data[2+1*3] + m2.data[2+1*3];
+	r.data[2+2*3]=m1.data[2+2*3] + m2.data[2+2*3];
+}
+
+void Math::add(Matrix3x3 &m1,const Matrix3x3 &m2){
+	m1.data[0+0*3]+=m2.data[0+0*3];
+	m1.data[0+1*3]+=m2.data[0+1*3];
+	m1.data[0+2*3]+=m2.data[0+2*3];
+
+	m1.data[1+0*3]+=m2.data[1+0*3];
+	m1.data[1+1*3]+=m2.data[1+1*3];
+	m1.data[1+2*3]+=m2.data[1+2*3];
+
+	m1.data[2+0*3]+=m2.data[2+0*3];
+	m1.data[2+1*3]+=m2.data[2+1*3];
+	m1.data[2+2*3]+=m2.data[2+2*3];
+}
+
+void Math::sub(Matrix3x3 &r,const Matrix3x3 &m1,const Matrix3x3 &m2){
+	r.data[0+0*3]=m1.data[0+0*3] - m2.data[0+0*3];
+	r.data[0+1*3]=m1.data[0+1*3] - m2.data[0+1*3];
+	r.data[0+2*3]=m1.data[0+2*3] - m2.data[0+2*3];
+
+	r.data[1+0*3]=m1.data[1+0*3] - m2.data[1+0*3];
+	r.data[1+1*3]=m1.data[1+1*3] - m2.data[1+1*3];
+	r.data[1+2*3]=m1.data[1+2*3] - m2.data[1+2*3];
+
+	r.data[2+0*3]=m1.data[2+0*3] - m2.data[2+0*3];
+	r.data[2+1*3]=m1.data[2+1*3] - m2.data[2+1*3];
+	r.data[2+2*3]=m1.data[2+2*3] - m2.data[2+2*3];
+}
+
+void Math::sub(Matrix3x3 &m1,const Matrix3x3 &m2){
+	m1.data[0+0*3]-=m2.data[0+0*3];
+	m1.data[0+1*3]-=m2.data[0+1*3];
+	m1.data[0+2*3]-=m2.data[0+2*3];
+
+	m1.data[1+0*3]-=m2.data[1+0*3];
+	m1.data[1+1*3]-=m2.data[1+1*3];
+	m1.data[1+2*3]-=m2.data[1+2*3];
+
+	m1.data[2+0*3]-=m2.data[2+0*3];
+	m1.data[2+1*3]-=m2.data[2+1*3];
+	m1.data[2+2*3]-=m2.data[2+2*3];
+}
+
 void Math::mul(Matrix3x3 &r,const Matrix3x3 &m1,const Matrix3x3 &m2){
 	r.data[0+0*3]=m1.data[0+0*3] * m2.data[0+0*3] + m1.data[0+1*3] * m2.data[1+0*3] + m1.data[0+2*3] * m2.data[2+0*3];
 	r.data[0+1*3]=m1.data[0+0*3] * m2.data[0+1*3] + m1.data[0+1*3] * m2.data[1+1*3] + m1.data[0+2*3] * m2.data[2+1*3];
@@ -82,6 +138,94 @@ void Math::preMul(Matrix3x3 &m2,const Matrix3x3 &m1){
 	m2.data[0+0*3]=d00; m2.data[0+1*3]=d01; m2.data[0+2*3]=d02;
 	m2.data[1+0*3]=d10; m2.data[1+1*3]=d11; m2.data[1+2*3]=d12;
 	m2.data[2+0*3]=d20; m2.data[2+1*3]=d21; m2.data[2+2*3]=d22;
+}
+
+void Math::add(Matrix4x4 &r,const Matrix4x4 &m1,const Matrix4x4 &m2){
+	r.data[0+0*4]=m1.data[0+0*4] + m2.data[0+0*4];
+	r.data[0+1*4]=m1.data[0+1*4] + m2.data[0+1*4];
+	r.data[0+2*4]=m1.data[0+2*4] + m2.data[0+2*4];
+	r.data[0+3*4]=m1.data[0+3*4] + m2.data[0+3*4];
+
+	r.data[1+0*4]=m1.data[1+0*4] + m2.data[1+0*4];
+	r.data[1+1*4]=m1.data[1+1*4] + m2.data[1+1*4];
+	r.data[1+2*4]=m1.data[1+2*4] + m2.data[1+2*4];
+	r.data[1+3*4]=m1.data[1+3*4] + m2.data[1+3*4];
+
+	r.data[2+0*4]=m1.data[2+0*4] + m2.data[2+0*4];
+	r.data[2+1*4]=m1.data[2+1*4] + m2.data[2+1*4];
+	r.data[2+2*4]=m1.data[2+2*4] + m2.data[2+2*4];
+	r.data[2+3*4]=m1.data[2+3*4] + m2.data[2+3*4];
+
+	r.data[3+0*4]=m1.data[3+0*4] + m2.data[3+0*4];
+	r.data[3+1*4]=m1.data[3+1*4] + m2.data[3+1*4];
+	r.data[3+2*4]=m1.data[3+2*4] + m2.data[3+2*4];
+	r.data[3+3*4]=m1.data[3+3*4] + m2.data[3+3*4];
+}
+
+void Math::add(Matrix4x4 &m1,const Matrix4x4 &m2){
+	m1.data[0+0*4]+=m2.data[0+0*4];
+	m1.data[0+1*4]+=m2.data[0+1*4];
+	m1.data[0+2*4]+=m2.data[0+2*4];
+	m1.data[0+3*4]+=m2.data[0+3*4];
+
+	m1.data[1+0*4]+=m2.data[1+0*4];
+	m1.data[1+1*4]+=m2.data[1+1*4];
+	m1.data[1+2*4]+=m2.data[1+2*4];
+	m1.data[1+3*4]+=m2.data[1+3*4];
+
+	m1.data[2+0*4]+=m2.data[2+0*4];
+	m1.data[2+1*4]+=m2.data[2+1*4];
+	m1.data[2+2*4]+=m2.data[2+2*4];
+	m1.data[2+3*4]+=m2.data[2+3*4];
+
+	m1.data[3+0*4]+=m2.data[3+0*4];
+	m1.data[3+1*4]+=m2.data[3+1*4];
+	m1.data[3+2*4]+=m2.data[3+2*4];
+	m1.data[3+3*4]+=m2.data[3+3*4];
+}
+
+void Math::sub(Matrix4x4 &r,const Matrix4x4 &m1,const Matrix4x4 &m2){
+	r.data[0+0*4]=m1.data[0+0*4] - m2.data[0+0*4];
+	r.data[0+1*4]=m1.data[0+1*4] - m2.data[0+1*4];
+	r.data[0+2*4]=m1.data[0+2*4] - m2.data[0+2*4];
+	r.data[0+3*4]=m1.data[0+3*4] - m2.data[0+3*4];
+
+	r.data[1+0*4]=m1.data[1+0*4] - m2.data[1+0*4];
+	r.data[1+1*4]=m1.data[1+1*4] - m2.data[1+1*4];
+	r.data[1+2*4]=m1.data[1+2*4] - m2.data[1+2*4];
+	r.data[1+3*4]=m1.data[1+3*4] - m2.data[1+3*4];
+
+	r.data[2+0*4]=m1.data[2+0*4] - m2.data[2+0*4];
+	r.data[2+1*4]=m1.data[2+1*4] - m2.data[2+1*4];
+	r.data[2+2*4]=m1.data[2+2*4] - m2.data[2+2*4];
+	r.data[2+3*4]=m1.data[2+3*4] - m2.data[2+3*4];
+
+	r.data[3+0*4]=m1.data[3+0*4] - m2.data[3+0*4];
+	r.data[3+1*4]=m1.data[3+1*4] - m2.data[3+1*4];
+	r.data[3+2*4]=m1.data[3+2*4] - m2.data[3+2*4];
+	r.data[3+3*4]=m1.data[3+3*4] - m2.data[3+3*4];
+}
+
+void Math::sub(Matrix4x4 &m1,const Matrix4x4 &m2){
+	m1.data[0+0*4]-=m2.data[0+0*4];
+	m1.data[0+1*4]-=m2.data[0+1*4];
+	m1.data[0+2*4]-=m2.data[0+2*4];
+	m1.data[0+3*4]-=m2.data[0+3*4];
+
+	m1.data[1+0*4]-=m2.data[1+0*4];
+	m1.data[1+1*4]-=m2.data[1+1*4];
+	m1.data[1+2*4]-=m2.data[1+2*4];
+	m1.data[1+3*4]-=m2.data[1+3*4];
+
+	m1.data[2+0*4]-=m2.data[2+0*4];
+	m1.data[2+1*4]-=m2.data[2+1*4];
+	m1.data[2+2*4]-=m2.data[2+2*4];
+	m1.data[2+3*4]-=m2.data[2+3*4];
+
+	m1.data[3+0*4]-=m2.data[3+0*4];
+	m1.data[3+1*4]-=m2.data[3+1*4];
+	m1.data[3+2*4]-=m2.data[3+2*4];
+	m1.data[3+3*4]-=m2.data[3+3*4];
 }
 
 void(*mulMatrix4x4)(Matrix4x4 &,const Matrix4x4 &,const Matrix4x4 &);
