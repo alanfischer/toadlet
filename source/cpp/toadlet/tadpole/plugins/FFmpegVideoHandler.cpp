@@ -80,14 +80,13 @@ FFmpegAudioStream::FFmpegAudioStream(FFmpegController *controller,FFmpegControll
 
 	AVCodecContext *ctx=mStreamData->codecCtx;
 	mAudioFormat=new AudioFormat(16,ctx->channels,ctx->sample_rate);
-	mDecodeBuffer=(tbyte*)av_mallocz(AVCODEC_MAX_AUDIO_FRAME_SIZE);
+	mAudioFrame=(AVFrame*)av_mallocz(sizeof(AVFrame));
 }
 
 FFmpegAudioStream::~FFmpegAudioStream(){
 	close();
 
-	av_free(mDecodeBuffer);
-	mDecodeBuffer=NULL;
+	av_free(mAudioFrame);
 }
 
 void FFmpegAudioStream::close(){
@@ -106,7 +105,7 @@ int FFmpegAudioStream::read(tbyte *buffer,int length){
 	while(length>0){
 		if(mDecodeLength>0){
 			amt=mDecodeLength<length?mDecodeLength:length;
-			memcpy(buffer,mDecodeBuffer+mDecodeOffset,amt);
+			memcpy(buffer,mAudioFrame->data[0]+mDecodeOffset,amt);
 			mDecodeLength-=amt;
 			mDecodeOffset+=amt;
 			length-=amt;
@@ -128,9 +127,8 @@ int FFmpegAudioStream::read(tbyte *buffer,int length){
 			result=-1;
 			int64 ptsTime=av_rescale_q(mPkt.dts!=AV_NOPTS_VALUE?mPkt.dts:0,mController->getFormatCtx()->streams[mPkt.stream_index]->time_base,avTimeBaseQ);
 			if(ptsTime<=time){
-				mDecodeLength=AVCODEC_MAX_AUDIO_FRAME_SIZE;
 				mDecodeOffset=0;
-				result=avcodec_decode_audio3(mStreamData->codecCtx,(int16_t*)mDecodeBuffer,&mDecodeLength,&mPkt);
+				mDecodeLength=avcodec_decode_audio4(mStreamData->codecCtx,mAudioFrame,&result,&mPkt);
 			}
 
 			if(ptsTime<=time || mStreamData->queue->flushed()){
@@ -170,9 +168,9 @@ FFmpegVideoStream::FFmpegVideoStream(FFmpegController *controller,FFmpegControll
 		NULL,NULL,NULL
 	);
 
-	mVideoFrame=avcodec_alloc_frame();
-	mDeinterlacedFrame=avcodec_alloc_frame();
-	mTextureFrame=avcodec_alloc_frame();
+	mVideoFrame=(AVFrame*)av_mallocz(sizeof(AVFrame));
+	mDeinterlacedFrame=(AVFrame*)av_mallocz(sizeof(AVFrame));
+	mTextureFrame=(AVFrame*)av_mallocz(sizeof(AVFrame));
 
 	avpicture_alloc((AVPicture*)mDeinterlacedFrame,ctx->pix_fmt,ctx->width,ctx->height);
 	avpicture_alloc((AVPicture*)mTextureFrame,FFmpegVideoHandler::getPixelFormat(textureFormat->getPixelFormat()),textureFormat->getWidth(),textureFormat->getHeight());

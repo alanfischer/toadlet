@@ -194,14 +194,20 @@ void X11Application::stepEventLoop(){
 			case ConfigureNotify:
 				configured(event.xconfigure.x,event.xconfigure.y,event.xconfigure.width,event.xconfigure.height);
 				break;
-			case KeyRelease:
-				key=XKeycodeToKeysym(x11->mDisplay,event.xkey.keycode,0);
-				keyReleased(translateKey(key));
+			case KeyRelease:{
+				int tmp=0;
+				KeySym *sym=XGetKeyboardMapping(x11->mDisplay,event.xkey.keycode,1,&tmp);
+				keyReleased(translateKey(sym[0]));
+				XFree(sym);
 				break;
-			case KeyPress:
-				key=XKeycodeToKeysym(x11->mDisplay,event.xkey.keycode,0);
-				keyPressed(translateKey(key));
+			}
+			case KeyPress:{
+				int tmp=0;
+				KeySym *sym=XGetKeyboardMapping(x11->mDisplay,event.xkey.keycode,1,&tmp);
+				keyPressed(translateKey(sym[0]));
+				XFree(sym);
 				break;
+			}
 			case MotionNotify:
 				internal_mouseMoved(event.xmotion.x,event.xmotion.y);
 				break;
