@@ -126,6 +126,14 @@ void BulletComponent::setMass(scalar mass){
 	mBody->setMassProps(mass,inertia);
 }
 
+void BulletComponent::addForce(const Vector3 &force,const Vector3 &offset){
+	btVector3 bforce,boffset;
+	setVector3(bforce,force);
+	setVector3(boffset,offset);
+	mBody->applyForce(bforce,boffset);
+	mBody->activate();
+}
+
 scalar BulletComponent::getMass() const{
 	scalar mass=mBody->getInvMass();
 	if(mass>0){

@@ -57,7 +57,7 @@ public:
 	virtual void setAngularVelocity(const Vector3 &velocity)=0;
 	virtual const Vector3 &getAngularVelocity() const=0;
 
-	virtual void addForce(const Vector3 &force)=0;
+	virtual void addForce(const Vector3 &force,const Vector3 &offset)=0;
 
 	virtual void setMass(scalar mass)=0;
 	virtual scalar getMass() const=0;

@@ -34,16 +34,20 @@ namespace toadlet{
 namespace tadpole{
 
 class PhysicsComponent;
+class PhysicsManagerListener;
 
 class TOADLET_API PhysicsManager:public Interface{
 public:
 	TOADLET_INTERFACE(PhysicsManager);
 
 	virtual PhysicsComponent *createPhysicsComponent()=0;
+
+	virtual void addListener(PhysicsManagerListener *listener)=0;
+	virtual void removeListener(PhysicsManagerListener *listener)=0;
 	
 	virtual void setGravity(const Vector3 &gravity)=0;
 	virtual const Vector3 &getGravity() const=0;
-
+	
 	virtual void setTraceable(PhysicsTraceable *traceable)=0;
 	virtual void setTraceableCollisionScope(int scope)=0;
 	virtual int getTraceableCollisionScope() const=0;

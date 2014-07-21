@@ -29,6 +29,7 @@
 #include <toadlet/hop/Simulator.h>
 #include <toadlet/tadpole/PhysicsCollision.h>
 #include <toadlet/tadpole/PhysicsManager.h>
+#include <toadlet/tadpole/PhysicsManagerListener.h>
 #include <toadlet/tadpole/PhysicsTraceable.h>
 #include <toadlet/tadpole/sensor/BoundingVolumeSensor.h>
 
@@ -46,6 +47,9 @@ public:
 
 	PhysicsComponent *createPhysicsComponent();
 
+	void addListener(PhysicsManagerListener *listener){mListeners.add(listener);}
+	void removeListener(PhysicsManagerListener *listener){mListeners.remove(listener);}
+	
 	void setGravity(const Vector3 &gravity);
 	const Vector3 &getGravity() const;
 
@@ -68,7 +72,7 @@ public:
 	int findSolidsInAABox(const AABox &box,hop::Solid *solids[],int maxSolids);
 	void traceSegment(hop::Collision &result,const Segment &segment,int collideWithScope);
 	void traceSolid(hop::Collision &result,hop::Solid *solid,const Segment &segment,int collideWithScope);
-	void preUpdate(int dt,scalar fdt){}
+	void preUpdate(int dt,scalar fdt);
 	void postUpdate(int dt,scalar fdt){}
 	void preUpdate(hop::Solid *solid,int dt,scalar fdt){}
 	void intraUpdate(hop::Solid *solid,int dt,scalar fdt){}
@@ -112,6 +116,7 @@ protected:
 	hop::Simulator::ptr mSimulator;
 	PhysicsTraceable *mTraceable;
 	hop::Solid::ptr mSolid;
+	Collection<PhysicsManagerListener*> mListeners;
 
 	BoundingVolumeSensor::ptr mVolumeSensor;
 	SolidSensorResults::ptr mSensorResults;
