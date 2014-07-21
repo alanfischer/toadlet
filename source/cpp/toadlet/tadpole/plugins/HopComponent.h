@@ -50,8 +50,14 @@ public:
 	void setPosition(const Vector3 &position);
 	const Vector3 &getPosition() const{return mSolid->getPosition();}
 
+	void setOrientation(const Quaternion &orientation){}
+	const Quaternion &getOrientation() const{return Math::IDENTITY_QUATERNION;}
+
 	void setVelocity(const Vector3 &velocity){mSolid->setVelocity(velocity);}
 	const Vector3 &getVelocity() const{return mSolid->getVelocity();}
+
+	void setAngularVelocity(const Vector3 &velocity){}
+	const Vector3 &getAngularVelocity() const{return Math::ZERO_VECTOR3;}
 
 	void addForce(const Vector3 &force){mSolid->addForce(force);}
 
