@@ -29,6 +29,7 @@
 #include <btBulletDynamicsCommon.h>
 #include <toadlet/tadpole/PhysicsCollision.h>
 #include <toadlet/tadpole/PhysicsManager.h>
+#include <toadlet/tadpole/PhysicsManagerListener.h>
 #include <toadlet/tadpole/PhysicsTraceable.h>
 #include <toadlet/tadpole/sensor/BoundingVolumeSensor.h>
 
@@ -52,10 +53,13 @@ public:
 	BulletManager(Scene *scene);
 	virtual ~BulletManager();
 
-	PhysicsComponent *createPhysicsComponent();
-
 	btDynamicsWorld *getWorld() const{return mWorld;}
 
+	PhysicsComponent *createPhysicsComponent();
+
+	void addListener(PhysicsManagerListener *listener){mListeners.add(listener);}
+	void removeListener(PhysicsManagerListener *listener){mListeners.remove(listener);}
+	
 	void setGravity(const Vector3 &gravity){btVector3 v;setVector3(v,gravity);mWorld->setGravity(v);}
 	const Vector3 &getGravity() const{setVector3(mBulletGravity,mWorld->getGravity());return mBulletGravity;}
 
@@ -73,10 +77,13 @@ public:
 	void componentCreated(BulletComponent *component){mComponents.add(component);}
 	void componentDestroyed(BulletComponent *component){mComponents.remove(component);}
 
+	void physicsUpdate(btScalar timeStep);
+
 protected:
 	Scene::ptr mScene;
 	btDiscreteDynamicsWorld *mWorld;
 	Collection<BulletComponent*> mComponents;
+	Collection<PhysicsManagerListener*> mListeners;
 
 	mutable Vector3 mBulletGravity;
 };
