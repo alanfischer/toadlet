@@ -107,6 +107,14 @@ void BulletComponent::setPosition(const Vector3 &position){
 	mBody->setWorldTransform(transform);
 }
 
+void BulletComponent::setOrientation(const Quaternion &orientation){
+	btTransform transform=mBody->getWorldTransform();
+	btQuaternion rotation;
+	setQuaternion(rotation,orientation);
+	transform.setRotation(rotation);
+	mBody->setWorldTransform(transform);
+}
+
 void BulletComponent::setMass(scalar mass){
 	mass=Math::maxVal(mass,0);
 

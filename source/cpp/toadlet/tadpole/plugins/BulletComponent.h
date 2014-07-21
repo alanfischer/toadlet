@@ -49,10 +49,16 @@ public:
 	void removeCollisionListener(PhysicsCollisionListener *listener){mListeners.remove(listener);}
 
 	void setPosition(const Vector3 &position);
-	const Vector3 &getPosition() const{return reinterpret_cast<const Vector3&>(mBody->getCenterOfMassPosition());}
+	const Vector3 &getPosition() const{setVector3(mBulletPosition,mBody->getCenterOfMassPosition());return mBulletPosition;}
+
+	void setOrientation(const Quaternion &orientation);
+	const Quaternion &getOrientation() const{setQuaternion(mBulletOrientation,mBody->getOrientation());return mBulletOrientation;}
 
 	void setVelocity(const Vector3 &velocity){btVector3 v;setVector3(v,velocity);mBody->setLinearVelocity(v);}
 	const Vector3 &getVelocity() const{return reinterpret_cast<const Vector3&>(mBody->getLinearVelocity());}
+
+	void setAngularVelocity(const Vector3 &velocity){btVector3 v;setVector3(v,velocity);mBody->setAngularVelocity(v);}
+	const Vector3 &getAngularVelocity() const{return reinterpret_cast<const Vector3&>(mBody->getAngularVelocity());}
 
 	void addForce(const Vector3 &force){btVector3 v;setVector3(v,force);mBody->applyCentralForce(v);}
 
@@ -111,6 +117,9 @@ protected:
 	Bound::ptr mBound;
 	Bound::ptr mWorldBound;
 	PhysicsTraceable::ptr mTraceable;
+
+	mutable Vector3 mBulletPosition;
+	mutable Quaternion mBulletOrientation;
 };
 
 }
