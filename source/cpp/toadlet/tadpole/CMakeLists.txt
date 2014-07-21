@@ -258,6 +258,7 @@ set (TADPOLE_HDR
 	PhysicsCollisionListener.h
 	PhysicsComponent.h
 	PhysicsManager.h
+	PhysicsManagerListener.h
 	Renderable.h
 	ResourceCache.h
 	ResourceCreator.h

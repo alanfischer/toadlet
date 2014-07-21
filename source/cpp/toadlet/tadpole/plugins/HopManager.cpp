@@ -198,6 +198,13 @@ void HopManager::traceSolid(hop::Collision &result,hop::Solid *solid,const Segme
 	}
 }
 
+void HopManager::preUpdate(int dt,scalar fdt){
+	int i;
+	for(i=0;i<mListeners.size();++i){
+		mListeners[i]->physicsUpdate(fdt);
+	}
+}
+
 void HopManager::set(PhysicsCollision &r,const hop::Collision &c){
 	r.time=c.time;
 	r.point.set(c.point);
