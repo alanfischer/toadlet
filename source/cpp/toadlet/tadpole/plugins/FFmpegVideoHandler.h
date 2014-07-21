@@ -23,7 +23,7 @@ class FFmpegVideoStream;
 
 class FFmpegController:public Object,public VideoController{
 public:
-	TOADLET_OBJECT(FFmpegController);
+	TOADLET_IOBJECT(FFmpegController);
 
 	class PacketQueue{
 	public:
@@ -117,7 +117,7 @@ protected:
 	Stream::ptr mStream;
 	AVIOContext *mIOCtx;
 	tbyte *mIOBuffer;
-    AVFormatContext *mFormatCtx;
+	AVFormatContext *mFormatCtx;
 	StreamData mStreams[AVMEDIA_TYPE_NB];
 	TextureFormat::ptr mVideoFormat;
 
@@ -128,7 +128,7 @@ protected:
 
 class FFmpegAudioStream:public Object,public AudioStream{
 public:
-	TOADLET_OBJECT(FFmpegAudioStream);
+	TOADLET_IOBJECT(FFmpegAudioStream);
 
 	FFmpegAudioStream(FFmpegController *controller,FFmpegController::StreamData *streamData);
 	virtual ~FFmpegAudioStream();
@@ -155,8 +155,8 @@ protected:
 	FFmpegController *mController;
 	FFmpegController::StreamData *mStreamData;
 	AudioFormat::ptr mAudioFormat;
-	tbyte *mDecodeBuffer;
 	int mDecodeLength,mDecodeOffset;
+	AVFrame *mAudioFrame;
 
 	friend class FFmpegController;
 };
