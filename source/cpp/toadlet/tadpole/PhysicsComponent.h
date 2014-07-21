@@ -48,8 +48,14 @@ public:
 	virtual void setPosition(const Vector3 &position)=0;
 	virtual const Vector3 &getPosition() const=0;
 
+	virtual void setOrientation(const Quaternion &orientation)=0;
+	virtual const Quaternion &getOrientation() const=0;
+
 	virtual void setVelocity(const Vector3 &velocity)=0;
 	virtual const Vector3 &getVelocity() const=0;
+
+	virtual void setAngularVelocity(const Vector3 &velocity)=0;
+	virtual const Vector3 &getAngularVelocity() const=0;
 
 	virtual void addForce(const Vector3 &force)=0;
 

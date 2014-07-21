@@ -61,6 +61,16 @@ public:
 		Key_SPECIAL,
 		Key_BACKSPACE,
 		Key_DELETE,
+		Key_NUMPAD0,
+		Key_NUMPAD1,
+		Key_NUMPAD2,
+		Key_NUMPAD3,
+		Key_NUMPAD4,
+		Key_NUMPAD5,
+		Key_NUMPAD6,
+		Key_NUMPAD7,
+		Key_NUMPAD8,
+		Key_NUMPAD9,
 
 		// Cellphone keys
 		Key_SOFTLEFT=4096,
