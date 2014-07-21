@@ -38,7 +38,6 @@ Camera::Camera(Engine *engine):
 	mBottomDist(0),mTopDist(0),
 	mNearDist(0),mFarDist(0),
 	mClearFlags(0),
-	mSkipFirstClear(false),
 	mAlignmentCalculationsUseOrigin(false),
 	mAutoYHeight(false),
 

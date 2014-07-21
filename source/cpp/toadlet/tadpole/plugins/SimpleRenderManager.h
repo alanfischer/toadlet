@@ -46,13 +46,13 @@ public:
 
 protected:
 	virtual void gatherRenderables(RenderableSet *set,Node *node,Camera *camera);
-	virtual void renderRenderables(RenderableSet *set,RenderDevice *device,Camera *camera,bool skipClear=false,bool useMaterials=true);
+	virtual void renderRenderables(RenderableSet *set,RenderDevice *device,Camera *camera,bool useMaterials);
 	virtual void renderDepthSortedRenderables(const RenderableSet::RenderableQueue &queue,bool useMaterials);
 	virtual void renderQueueItems(Material *material,const RenderableSet::RenderableQueueItem *items,int numItems,bool useMaterials);
 	virtual void interRenderRenderables(RenderableSet *set,RenderDevice *device,Camera *camera,bool useMaterials){}
 
 	void setupCamera(Camera *camera,RenderDevice *device);
-	void setupLights(const RenderableSet::LightQueue &lightQueue,RenderDevice *device);
+	void setupLights(RenderableSet *set,RenderDevice *device);
 	void setupTextures(RenderPass *pass,int scope,RenderDevice *device);
 	void setupVariableBuffers(RenderPass *pass,int scope,RenderDevice *device);
 

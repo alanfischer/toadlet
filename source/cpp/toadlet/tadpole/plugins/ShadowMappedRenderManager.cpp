@@ -54,7 +54,10 @@ ShadowMappedRenderManager::ShadowMappedRenderManager(Scene *scene):
 	lightTextureState.calculation=TextureState::CalculationType_CAMERASPACE;
 	lightTextureState.shadowResult=TextureState::ShadowResult_A;
 	mLightState->setTextureState(Shader::ShaderType_VERTEX,0,lightTextureState);
-	mLightState->setSamplerState(Shader::ShaderType_VERTEX,0,SamplerState());
+	SamplerState lightSamplerState(
+		SamplerState::FilterType_LINEAR,SamplerState::FilterType_LINEAR,SamplerState::FilterType_LINEAR,
+		SamplerState::AddressType_CLAMP_TO_EDGE,SamplerState::AddressType_CLAMP_TO_EDGE,SamplerState::AddressType_CLAMP_TO_EDGE);
+	mLightState->setSamplerState(Shader::ShaderType_VERTEX,0,lightSamplerState);
 	mLightState->setDepthState(DepthState(DepthState::DepthTest_LEQUAL,true));
 	mLightState->setMaterialState(MaterialState(MaterialState::AlphaTest_GEQUAL,0.6f));
 }
@@ -96,7 +99,7 @@ void ShadowMappedRenderManager::renderScene(RenderDevice *device,Node *node,Came
 	setupCamera(mLightCamera,device);
 
 	device->setRenderState(mShadowState);
-	renderRenderables(mRenderableSet,device,mLightCamera,false,false);
+	renderRenderables(mRenderableSet,device,mLightCamera,false);
 
 	
 	// Second pass, render from camera's view to show shadowed areas
@@ -104,14 +107,16 @@ void ShadowMappedRenderManager::renderScene(RenderDevice *device,Node *node,Came
 
 	setupCamera(camera,device);
 
-	renderRenderables(mRenderableSet,device,camera);
+	setupLights(mRenderableSet,device);
+
+	renderRenderables(mRenderableSet,device,camera,true);
 
 
 	// Third pass, render from camera's view to show lit areas
 	device->setRenderState(mLightState);
 	device->setTexture(Shader::ShaderType_FRAGMENT,0,mShadowTexture);
 
-	renderRenderables(mRenderableSet,device,camera,true,false);
+	renderRenderables(mRenderableSet,device,camera,false);
 
 
 	mParams->setCamera(NULL);

@@ -43,8 +43,6 @@ public:
 
 	void setClearColor(const Vector4 &clearColor);
 
-	void setSkipFirstClear(bool skip);
-
 	void setDefaultState(RenderState *renderState);
 
 	void setRenderTarget(RenderTarget *target);

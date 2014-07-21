@@ -105,9 +105,6 @@ public:
 	virtual void setClearColor(const Vector4 &clearColor){mClearColor.set(clearColor);}
 	inline const Vector4 &getClearColor() const{return mClearColor;}
 
-	virtual void setSkipFirstClear(bool skip){mSkipFirstClear=skip;}
-	inline bool getSkipFirstClear() const{return mSkipFirstClear;}
-
 	virtual void setDefaultState(RenderState *renderState){mDefaultState=renderState;}
 	inline RenderState* getDefaultState() const{return mDefaultState;}
 
@@ -150,7 +147,6 @@ protected:
 	Viewport mViewport;
 	int mClearFlags;
 	Vector4 mClearColor;
-	bool mSkipFirstClear;
 	bool mAlignmentCalculationsUseOrigin;
 	bool mAutoYHeight;
 	RenderState::ptr mDefaultState;

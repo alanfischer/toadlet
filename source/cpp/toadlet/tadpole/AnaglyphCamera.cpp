@@ -128,13 +128,6 @@ void AnaglyphCamera::setClearColor(const Vector4 &clearColor){
 	mRightCamera->setClearColor(clearColor);
 }
 
-void AnaglyphCamera::setSkipFirstClear(bool skip){
-	Camera::setSkipFirstClear(skip);
-
-	mLeftCamera->setSkipFirstClear(skip);
-	mRightCamera->setSkipFirstClear(skip);
-}
-
 void AnaglyphCamera::setDefaultState(RenderState *renderState){
 	Camera::setDefaultState(renderState);
 

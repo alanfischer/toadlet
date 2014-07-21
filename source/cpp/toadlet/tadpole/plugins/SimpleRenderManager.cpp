@@ -41,7 +41,7 @@ SimpleRenderManager::SimpleRenderManager(Scene *scene):
 	mLastRenderState(NULL),
 	mLastShaderState(NULL)
 {
-	mRenderableSet=RenderableSet::ptr(new RenderableSet(scene));
+	mRenderableSet=new RenderableSet(scene);
 	mParams=new SceneParameters();
 	mParams->setScene(scene);
 	mDefaultMaterial=scene->getEngine()->createDiffuseMaterial(NULL);
@@ -60,7 +60,9 @@ void SimpleRenderManager::renderScene(RenderDevice *device,Node *node,Camera *ca
 
 	setupCamera(camera,device);
 
-	renderRenderables(mRenderableSet,device,camera);
+	setupLights(mRenderableSet,device);
+
+	renderRenderables(mRenderableSet,device,camera,true);
 
 	mParams->setCamera(NULL);
 	mLastPass=NULL;
@@ -88,7 +90,7 @@ void SimpleRenderManager::setupPass(RenderPass *pass,RenderDevice *device){
 			int oldBits=((~renderBits) & lastBits);
 
 			if(oldBits & cameraBits){
-				mDevice->setRenderState(mCamera->getDefaultState());
+				device->setRenderState(mCamera->getDefaultState());
 				mParams->setRenderState(mCamera->getDefaultState());
 			}
 		}
@@ -186,33 +188,15 @@ void SimpleRenderManager::gatherRenderables(RenderableSet *set,Node *node,Camera
 	set->endQueuing();
 }
 
-void SimpleRenderManager::renderRenderables(RenderableSet *set,RenderDevice *device,Camera *camera,bool skipClear,bool useMaterials){
+void SimpleRenderManager::renderRenderables(RenderableSet *set,RenderDevice *device,Camera *camera,bool useMaterials){
 	TOADLET_PROFILE_AUTOSCOPE();
 
-	int clearFlags=camera->getClearFlags();
-	if(skipClear==false && clearFlags!=0 && !camera->getSkipFirstClear()){
-		device->clear(clearFlags,camera->getClearColor());
-	}
-
-	device->setMatrix(RenderDevice::MatrixType_VIEW,camera->getViewMatrix());
-	mParams->setMatrix(RenderDevice::MatrixType_VIEW,camera->getViewMatrix());
-
-	device->setMatrix(RenderDevice::MatrixType_PROJECTION,camera->getProjectionMatrix());
-	mParams->setMatrix(RenderDevice::MatrixType_PROJECTION,camera->getProjectionMatrix());
-
-	device->setMatrix(RenderDevice::MatrixType_MODEL,Math::IDENTITY_MATRIX4X4);
-	mParams->setMatrix(RenderDevice::MatrixType_MODEL,Math::IDENTITY_MATRIX4X4);
-
 	if(useMaterials){
-		/// @todo: Removed this redundant step.  If we DO find issues with fixed function materials, then we should trace them down, not rely on a massive reset
-		//device->setDefaultState();
 		if(camera->getDefaultState()!=NULL){
 			device->setRenderState(camera->getDefaultState());
 			mParams->setRenderState(camera->getDefaultState());
 		}
 	}
-
-	setupLights(set->getLightQueue(),device);
 
 	const RenderableSet::IndexCollection &materialQueueIndexes=set->getLayeredMaterialQueueIndexes();
 	const RenderableSet::IndexCollection &depthQueueIndexes=set->getLayeredDepthQueueIndexes();
@@ -245,12 +229,6 @@ void SimpleRenderManager::renderRenderables(RenderableSet *set,RenderDevice *dev
 		const RenderableSet::RenderableQueue &depthQueue=set->getRenderableQueue(depthQueueIndexes[depthIndex]);
 		renderDepthSortedRenderables(depthQueue,useMaterials);
 		depthIndex++;
-	}
-
-	if(useMaterials){
-		/// @todo: Removed this redundant step.  If we DO find issues with fixed function materials, then we should trace them down, not rely on a massive reset
-		// This seems redundant, but it solves some issues with fixed function materials
-		// device->setDefaultState();
 	}
 }
 
@@ -307,10 +285,26 @@ void SimpleRenderManager::setupCamera(Camera *camera,RenderDevice *device){
 		device->setViewport(viewport);
 		mParams->setViewport(viewport);
 	}
+
+	device->setMatrix(RenderDevice::MatrixType_VIEW,camera->getViewMatrix());
+	mParams->setMatrix(RenderDevice::MatrixType_VIEW,camera->getViewMatrix());
+
+	device->setMatrix(RenderDevice::MatrixType_PROJECTION,camera->getProjectionMatrix());
+	mParams->setMatrix(RenderDevice::MatrixType_PROJECTION,camera->getProjectionMatrix());
+
+	device->setMatrix(RenderDevice::MatrixType_MODEL,Math::IDENTITY_MATRIX4X4);
+	mParams->setMatrix(RenderDevice::MatrixType_MODEL,Math::IDENTITY_MATRIX4X4);
+
+	int clearFlags=camera->getClearFlags();
+	if(clearFlags!=0){
+		device->clear(clearFlags,camera->getClearColor());
+	}
 }
 
 /// @todo: Clean this up to handle multiple lights in shader passes
-void SimpleRenderManager::setupLights(const RenderableSet::LightQueue &lightQueue,RenderDevice *device){
+void SimpleRenderManager::setupLights(RenderableSet *set,RenderDevice *device){
+	const RenderableSet::LightQueue &lightQueue=set->getLightQueue();
+
 	if(lightQueue.size()>0){
 		LightComponent *light=lightQueue[0].light;
 
