@@ -295,4 +295,4 @@ add_subdirectory (toadlet)
 
 
 # add the unit tests
-add_subdirectory (test)
+#add_subdirectory (test)
