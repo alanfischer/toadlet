@@ -197,13 +197,13 @@ void X11Application::stepEventLoop(){
 				configured(event.xconfigure.x,event.xconfigure.y,event.xconfigure.width,event.xconfigure.height);
 				break;
 			case KeyRelease:
-				numBytes=XLookupString(&event,str,256,&key,NULL);
+				numBytes=XLookupString((XKeyEvent*)&event,str,256,&key,NULL);
 				if(key!=NoSymbol){
 					keyReleased(translateKey(key));
 				}
 				break;
 			case KeyPress:
-				numBytes=XLookupString(&event,str,256,&key,NULL);
+				numBytes=XLookupString((XKeyEvent*)&event,str,256,&key,NULL);
 				if(key!=NoSymbol){
 					keyPressed(translateKey(key));
 				}
