@@ -166,7 +166,7 @@ public:
 	const Sphere &getSphere() const{return mSphere;}
 	const AABox &getAABox() const{return mBox;}
 
-	void transform(Bound *source,Transform *transform){
+	Bound *transform(Bound *source,Transform *transform){
 		mType=source->mType;
 
 		const Vector3 &translate=transform->getTranslate();
@@ -188,9 +188,11 @@ public:
 			Math::add(mBox,translate);
 		}
 		update();
+
+		return this;
 	}
 
-	void inverseTransform(Bound *source,Transform *transform){
+	Bound *inverseTransform(Bound *source,Transform *transform){
 		mType=source->mType;
 
 		Vector3 translate;Math::neg(translate,transform->getTranslate());
@@ -212,6 +214,8 @@ public:
 			Math::add(mBox,translate);
 		}
 		update();
+
+		return this;
 	}
 
 protected:

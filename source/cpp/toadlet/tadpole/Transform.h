@@ -55,34 +55,42 @@ public:
 		mTransformListener(NULL)
 	{}
 
-	void reset(){
+	Transform *reset(){
 		mTranslate.reset();
 		mScale.set(Math::ONE,Math::ONE,Math::ONE);
 		mRotate.reset();
 		changed();
+
+		return this;
 	}
 
-	void set(const Transform *transform){
+	Transform *set(const Transform *transform){
 		mTranslate.set(transform->mTranslate);
 		mScale.set(transform->mScale);
 		mRotate.set(transform->mRotate);
 		changed();
+
+		return this;
 	}
 
-	void set(const Vector3 &t,const Vector3 &s,const Quaternion &r){
+	Transform *set(const Vector3 &t,const Vector3 &s,const Quaternion &r){
 		mTranslate.set(t);
 		mScale.set(s);
 		mRotate.set(r);
 		changed();
+
+		return this;
 	}
 
-	void setTransform(const Transform *parentTransform,const Transform *transform){
+	Transform *setTransform(const Transform *parentTransform,const Transform *transform){
 		Math::mul(mRotate,parentTransform->mRotate,transform->mRotate);
 		Math::mul(mScale,parentTransform->mScale,transform->mScale);
 		Math::mul(mTranslate,parentTransform->mRotate,transform->mTranslate);
 		Math::mul(mTranslate,parentTransform->mScale);
 		Math::add(mTranslate,parentTransform->mTranslate);
 		changed();
+
+		return this;
 	}
 	
 	const Vector3 &getTranslate() const{return mTranslate;}
