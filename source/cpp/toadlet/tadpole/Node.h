@@ -67,6 +67,10 @@ class ActionComponent;
 class LightComponent;
 class PhysicsComponent;
 
+namespace action{
+class Action;
+}
+
 class TOADLET_API Node:public BaseComponent,public TransformListener{
 public:
 	TOADLET_NODE(Node);
@@ -110,7 +114,7 @@ public:
 	// Attached Interface methods
 	virtual void actionAttached(ActionComponent *action);
 	virtual void actionRemoved(ActionComponent *action);
-	virtual ActionComponent *getAction(const String &name) const;
+	virtual Action *getAction(const String &name) const;
 	virtual void startAction(const String &name);
 	virtual void stopAction(const String &name);
 	virtual void stopAllActions();
