@@ -20,10 +20,6 @@ RenderTarget *new_EGLWindowRenderTarget2(val canvas){
 	return new_EGLWindowRenderTarget(NULL,NULL,&format);
 }
 
-Texture *toTexture(Resource *resource){
-	return (Texture*)resource;
-}
-
 EMSCRIPTEN_BINDINGS(peeper) {
 	using namespace emscripten::internal;
 
@@ -74,7 +70,9 @@ EMSCRIPTEN_BINDINGS(peeper) {
 		.smart_ptr<Texture::ptr>()
 	;
 
-	function("toTexture",&toTexture, allow_raw_pointers());
+	function("toTexture",select_overload<Texture*(Resource*)>(
+		[](Resource *resource){return (Texture*)resource;}
+	), allow_raw_pointers());
 
 	enum_<LightState::Type>("LightType")
 		.value("Type_DIRECTION", LightState::Type_DIRECTION)
