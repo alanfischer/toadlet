@@ -570,7 +570,7 @@ void Win32Application::internal_resize(int width,int height){
 	if(mActive && mRenderDevice!=NULL){
 		if(mEngine->getRenderCaps().resetOnResize){
 			if(mContextActive==false && visible==true){
-				mEngine->contextDeactivate(mRenderDevice);
+				mEngine->contextActivate(mRenderDevice);
 				mContextActive=true;
 			}
 			else if(mContextActive==true && visible==false){

@@ -49,6 +49,8 @@ public:
 
 	virtual bool getActive() const{return mAction!=NULL?mAction->getActive():false;}
 
+	Action *getAction() const{return mAction;}
+
 	virtual void actionStarted(Action *component){}
 	virtual void actionStopped(Action *component){}
 

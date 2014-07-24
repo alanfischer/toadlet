@@ -212,11 +212,11 @@ Node *Node::getNode(const Type<Component> *type) const{
 	return NULL;
 }
 
-ActionComponent *Node::getAction(const String &name) const{
+Action *Node::getAction(const String &name) const{
 	int i;
 	for(i=0;i<mActions.size();++i){
 		if(mActions[i]->getName()==name){
-			return mActions[i];
+			return mActions[i]->getAction();
 		}
 	}
 	return NULL;
