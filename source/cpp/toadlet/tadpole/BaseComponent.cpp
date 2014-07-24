@@ -41,6 +41,22 @@ void BaseComponent::destroy(){
 }
 
 void BaseComponent::parentChanged(Node *node){
+	baseParentChanged(node);
+}
+
+void BaseComponent::rootChanged(Node *root){
+	baseRootChanged(root);
+}
+
+void BaseComponent::notifyParentAttached(){
+	mParent->componentAttached(this);
+}
+
+void BaseComponent::notifyParentRemoved(){
+	mParent->componentRemoved(this);
+}
+
+void BaseComponent::baseParentChanged(Node *node){
 	if(mParent!=NULL){
 		notifyParentRemoved();
 	}
@@ -61,16 +77,8 @@ void BaseComponent::parentChanged(Node *node){
 	}
 }
 
-void BaseComponent::rootChanged(Node *root){
+void BaseComponent::baseRootChanged(Node *root){
 	mRoot=root;
-}
-
-void BaseComponent::notifyParentAttached(){
-	mParent->componentAttached(this);
-}
-
-void BaseComponent::notifyParentRemoved(){
-	mParent->componentRemoved(this);
 }
 
 }

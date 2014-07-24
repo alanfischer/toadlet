@@ -12,14 +12,6 @@ using namespace toadlet;
 using namespace toadlet::egg;
 using namespace toadlet::egg::math;
 
-void Log_initialize(bool startSilent){
-	Log::initialize(startSilent);
-}
-
-String Exception_getDescription(const Exception &ex){
-	return ex.getDescription();
-}
-
 void StreamRequest_stringStreamReady(StreamRequest *request,const String &data){
 	tbyte *rawdata=new tbyte[data.length()];
 	memcpy(rawdata,data.c_str(),data.length());
@@ -65,7 +57,9 @@ EMSCRIPTEN_BINDINGS(egg) {
     constant("NEG_Z_UNIT_VECTOR3", Math::NEG_Z_UNIT_VECTOR3);
 
 	class_<Log>("Log")
-		.class_function("initialize", Log_initialize)
+		.class_function("initialize", select_overload<void(bool)>(
+			[](bool silent){Log::initialize();}
+		), allow_raw_pointers())
 		.class_function("destroy", &Log::destroy)
 		.class_function("error", select_overload<void(const char*)>(&Log::error), allow_raw_pointers())
 		.class_function("warning", select_overload<void(const char*)>(&Log::warning), allow_raw_pointers())
@@ -76,8 +70,10 @@ EMSCRIPTEN_BINDINGS(egg) {
 
 	class_<Exception>("Exception")
 		.constructor<const String&>()
-		.function("getError", &Exception::getError, allow_raw_pointers())
-		.function("getDescription", &Exception_getDescription, allow_raw_pointers())
+		.function("getError", &Exception::getError)
+		.function("getDescription", select_overload<String(Exception*)>(
+			[](Exception *ex){return String(ex->getDescription());}
+		), allow_raw_pointers())
 	;
 
 	class_<Stream>("Stream")
