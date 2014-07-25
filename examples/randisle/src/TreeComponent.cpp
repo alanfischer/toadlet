@@ -1,6 +1,8 @@
 #include "TreeComponent.h"
 #include "Resources.h"
 
+namespace randisle{
+
 TreeComponent::TreeComponent(Scene *scene,int seed,Material::ptr branchMaterial,Material::ptr leafMaterial):
 	mScene(NULL)
 {
@@ -81,4 +83,6 @@ void TreeComponent::transformChanged(Transform *transform){
 
 void TreeComponent::traceSegment(PhysicsCollision &result,const Vector3 &position,const Segment &segment,const Vector3 &size){
 	mSystem->traceSegment(result,position,segment,size);
+}
+
 }

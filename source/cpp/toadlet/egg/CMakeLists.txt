@@ -102,6 +102,7 @@ set (EGG_HDR
 	FileLoggerListener.h
 	Interface.h
 	IntrusivePointer.h
+	Iterator.h
 	Log.h
 	Logger.h
 	LoggerListener.h

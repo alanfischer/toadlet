@@ -1,5 +1,7 @@
 #include "PathClimber.h"
 
+namespace randisle{
+
 static const scalar epsilon=0.001f;
 
 PathClimber::PathClimber():BaseComponent(),
@@ -272,4 +274,6 @@ void PathClimber::findRotation(Quaternion &r,const Vector3 &tangent,const Vector
 
 bool PathClimber::passedJunction(int direction,scalar oldTime,scalar newTime,scalar junctionTime){
 	return direction>0?(oldTime<=junctionTime && newTime>junctionTime):(oldTime>=junctionTime && newTime<junctionTime);
+}
+
 }
