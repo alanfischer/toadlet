@@ -45,6 +45,9 @@ public:
 	virtual void addListener(PhysicsManagerListener *listener)=0;
 	virtual void removeListener(PhysicsManagerListener *listener)=0;
 	
+	virtual void setFixedDT(float fdt)=0;
+	virtual float getFixedDT() const=0;
+
 	virtual void setGravity(const Vector3 &gravity)=0;
 	virtual const Vector3 &getGravity() const=0;
 	

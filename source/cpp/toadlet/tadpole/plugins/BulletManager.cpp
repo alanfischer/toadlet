@@ -36,6 +36,7 @@ void physicsCallback(btDynamicsWorld *world, btScalar timeStep){
 }
 
 BulletManager::BulletManager(Scene *scene):
+	mFixedDT(1.0/60.0),
 	mWorld(NULL)
 {
 	Log::alert("BulletManager initializing");
@@ -65,7 +66,9 @@ PhysicsComponent *BulletManager::createPhysicsComponent(){
 void BulletManager::logicUpdate(int dt,int scope,Node *node){
 	scalar fdt=Math::milliToReal(dt);
 
-	mWorld->stepSimulation(fdt,100,1.0/60.0);
+	int maxSteps=fdt/mFixedDT + 1;
+
+	mWorld->stepSimulation(fdt,maxSteps,mFixedDT);
 }
 
 void BulletManager::frameUpdate(int dt,int scope,Node *node){

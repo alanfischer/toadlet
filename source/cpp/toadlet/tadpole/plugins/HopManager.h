@@ -50,6 +50,9 @@ public:
 	void addListener(PhysicsManagerListener *listener){mListeners.add(listener);}
 	void removeListener(PhysicsManagerListener *listener){mListeners.remove(listener);}
 	
+	void setFixedDT(float fdt){}
+	float getFixedDT() const{return 0;}
+
 	void setGravity(const Vector3 &gravity);
 	const Vector3 &getGravity() const;
 
