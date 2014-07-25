@@ -4,6 +4,10 @@
 #include <toadlet/toadlet.h>
 #include "Clouds.h"
 
+namespace randisle{
+
+using namespace toadlet;
+
 class Sky:public Node{
 public:
 	TOADLET_OBJECT(Sky);
@@ -26,5 +30,7 @@ protected:
 	Clouds::ptr mClouds;
 	MeshComponent::ptr mSkyDome;
 };
+
+}
 
 #endif

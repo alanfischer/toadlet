@@ -1,5 +1,7 @@
 #include "TreeSystem.h"
 
+namespace randisle{
+
 TreeSystem::TreeSystem(Engine *engine,int seed,Material::ptr branchMaterial,Material::ptr leafMaterial,BranchSystem::BranchListener *listener):BranchSystem(seed),
 	mEngine(NULL),
 
@@ -569,4 +571,6 @@ void TreeSystem::resetCounts(){
 	mLowBranchIndexCount=0;
 	mLeafVertexCount=0;
 	mLeafIndexCount=0;
+}
+
 }

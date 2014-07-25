@@ -3,6 +3,10 @@
 
 #include <toadlet/toadlet.h>
 
+namespace randisle{
+
+using namespace toadlet;
+
 class Resources:public Object,public ResourceCacheListener{
 public:
 	TOADLET_IOBJECT(Resources);
@@ -258,6 +262,8 @@ public:
 	Font::ptr wooden;
 	Font::ptr system;
 };
+
+}
 
 #endif
 

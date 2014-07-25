@@ -3,6 +3,10 @@
 
 #include <toadlet/toadlet.h>
 
+namespace randisle{
+
+using namespace toadlet;
+
 class BranchSystem:public Object{
 public:
 	TOADLET_OBJECT(BranchSystem);
@@ -70,5 +74,7 @@ protected:
 	BranchListener *mBranchListener;
 	Collection<Branch::ptr> mBranches;
 };
+
+}
 
 #endif

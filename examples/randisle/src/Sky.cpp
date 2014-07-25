@@ -1,5 +1,7 @@
 #include "Sky.h"
 
+namespace randisle{
+
 Sky::Sky(Scene *scene,int cloudSize,const Vector4 &skyColor,const Vector4 &fadeColor):Node(scene)
 {
 	Vector3 lightDir(1,-1,0.5);
@@ -83,4 +85,6 @@ tbyte *Sky::createGlow(TextureFormat *format){
 	}
 
 	return data;
+}
+
 }
