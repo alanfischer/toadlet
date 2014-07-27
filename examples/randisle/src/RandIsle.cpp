@@ -9,6 +9,8 @@
 
 #define TREE_CAMERA_DISTANCE 80
 
+namespace randisle{
+
 static const scalar epsilon=0.001f;
 
 class SnowComponent:public BaseComponent{
@@ -967,6 +969,8 @@ scalar RandIsle::pathValue(float ty){
 	return mPatchNoise.perlin1(ty/4);
 }
 
+}
+
 Applet *createApplet(Application *app){
 	String path;
 	String lookFor="/grass.png";
@@ -979,5 +983,5 @@ Applet *createApplet(Application *app){
 		}
 	}
 
-	return new RandIsle(app,path);
+	return new randisle::RandIsle(app,path);
 }

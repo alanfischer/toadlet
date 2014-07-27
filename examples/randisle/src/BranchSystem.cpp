@@ -1,5 +1,7 @@
 #include "BranchSystem.h"
 
+namespace randisle{
+
 BranchSystem::BranchSystem(int seed):
 	mBranchListener(NULL)
 {
@@ -163,4 +165,6 @@ void BranchSystem::getBranchVectors(Branch *branch,Vector3 &branchUp,Vector3 &br
 	}
 	Math::cross(branchBinormal,branchUp,branchNormal);
 	Math::normalizeCarefully(branchBinormal,0);
+}
+
 }

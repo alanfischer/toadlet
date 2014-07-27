@@ -27,6 +27,7 @@
 #define TOADLET_FLICK_BASEINPUTDEVICE_H
 
 #include <toadlet/flick/InputDevice.h>
+#include <toadlet/egg/Object.h>
 
 namespace toadlet{
 namespace flick{

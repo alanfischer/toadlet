@@ -5,6 +5,10 @@
 #include <toadlet/tadpole/plugins/SkyDomeMeshCreator.h>
 #include <toadlet/tadpole/plugins/SkyBoxMaterialCreator.h>
 
+namespace randisle{
+
+using namespace toadlet;
+
 class Clouds:public BaseComponent,public ContextListener{
 public:
 	TOADLET_COMPONENT(Clouds);
@@ -59,5 +63,7 @@ protected:
 	Mesh::ptr mMesh;
 	Material::ptr mMaterial;
 };
+
+}
 
 #endif

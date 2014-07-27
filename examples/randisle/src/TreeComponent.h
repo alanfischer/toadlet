@@ -4,6 +4,8 @@
 #include <toadlet/toadlet.h>
 #include "TreeSystem.h"
 
+namespace randisle{
+
 class TreeComponent:public BaseComponent,public BranchSystem::BranchListener,public Spacial,public DetailTraceable{
 public:
 	TOADLET_COMPONENT(TreeComponent);
@@ -41,5 +43,7 @@ protected:
 
 	TreeSystem::ptr mSystem;
 };
+
+}
 
 #endif

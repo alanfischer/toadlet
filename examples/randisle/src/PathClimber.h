@@ -5,6 +5,10 @@
 #include "Path.h"
 #include "PathClimberListener.h"
 
+namespace randisle{
+
+using namespace toadlet;
+
 class PathClimber:public BaseComponent{
 public:
 	TOADLET_COMPONENT(PathClimber);
@@ -51,5 +55,7 @@ protected:
 	Collection<Vector3> mPreviousNormals;
 	int mNormalIndex;
 };
+
+}
 
 #endif

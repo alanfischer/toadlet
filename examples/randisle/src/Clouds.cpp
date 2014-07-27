@@ -1,5 +1,7 @@
 #include "Clouds.h"
 
+namespace randisle{
+
 Clouds::Clouds(Scene *scene,int cloudSize,const Vector4 &skyColor,const Vector4 &fadeColor):BaseComponent(),
 	mCloudData(NULL),
 	mBumpData(NULL),
@@ -493,3 +495,4 @@ void Clouds::createComposite(TextureFormat *format,tbyte *data,tbyte *cloudData,
 	}
 }
 
+}

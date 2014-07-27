@@ -64,10 +64,12 @@ else (WIN32)
 	set (HEADER_SEARCH_PATHS
 		/usr/include
 		/usr/local/include
+		${TOADLET_DIR}/include
 	)
 	set (LIBRARY_SEARCH_PATHS
 		/usr/lib 
 		/usr/local/lib
+		${TOADLET_DIR}/lib
 	)
 endif (WIN32)
 

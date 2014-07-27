@@ -8,6 +8,8 @@
 #include "HUD.h"
 #include "Resources.h"
 
+namespace randisle{
+
 class RandIsle:public Object,public Applet,public TerrainNodeDataSource,public ResourceCacheListener,public UpdateListener,public TerrainNodeListener,public InputDeviceListener,public PathClimberListener{
 public:
 	TOADLET_IOBJECT(RandIsle);
@@ -128,5 +130,7 @@ protected:
 
 	Resources::ptr resources;
 };
+
+}
 
 #endif

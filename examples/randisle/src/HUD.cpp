@@ -1,6 +1,8 @@
 #include "HUD.h"
 #include "PathClimber.h"
 
+namespace randisle{
+
 class CompassComponent:public BaseComponent{
 public:
 	TOADLET_OBJECT(CompassComponent);
@@ -353,4 +355,6 @@ HUD::HUD(Scene *scene,Node *player,Camera *camera,Resources *resources):Node(sce
 		mFPS->attach(fps);
 	}
 	attach(mFPS);
+}
+
 }
