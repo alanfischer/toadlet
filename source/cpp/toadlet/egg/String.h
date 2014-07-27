@@ -148,6 +148,9 @@ public:
 
 	String trimRight() const;
 
+	Collection<String> &split(Collection<String> &results,const char *delimiter=" ",bool keepEmpty=false) const;
+	Collection<String> split(const char *delimiter=" ",bool keepEmpty=false) const;
+
 	int32 toInt32() const;
 
 	uint32 toUInt32() const;
