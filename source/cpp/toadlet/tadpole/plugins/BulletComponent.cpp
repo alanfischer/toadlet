@@ -100,30 +100,47 @@ void BulletComponent::rootChanged(Node *root){
 }
 
 void BulletComponent::setPosition(const Vector3 &position){
-	btTransform transform=mBody->getWorldTransform();
-	btVector3 origin;
-	setVector3(origin,position);
-	transform.setOrigin(origin);
-	mBody->setWorldTransform(transform);
+	if((mBody->getCollisionFlags() & btCollisionObject::CF_KINEMATIC_OBJECT)!=0 && mParent!=NULL){
+		mParent->setTranslate(position);
+	}
+	else{
+		btTransform transform=mBody->getWorldTransform();
+		btVector3 origin;
+		setVector3(origin,position);
+		transform.setOrigin(origin);
+		mBody->setWorldTransform(transform);
+	}
 }
 
 void BulletComponent::setOrientation(const Quaternion &orientation){
-	btTransform transform=mBody->getWorldTransform();
-	btQuaternion rotation;
-	setQuaternion(rotation,orientation);
-	transform.setRotation(rotation);
-	mBody->setWorldTransform(transform);
+	if((mBody->getCollisionFlags() & btCollisionObject::CF_KINEMATIC_OBJECT)!=0 && mParent!=NULL){
+		mParent->setRotate(orientation);
+	}
+	else{
+		btTransform transform=mBody->getWorldTransform();
+		btQuaternion rotation;
+		setQuaternion(rotation,orientation);
+		transform.setRotation(rotation);
+		mBody->setWorldTransform(transform);
+	}
 }
 
 void BulletComponent::setMass(scalar mass){
-	mass=Math::maxVal(mass,0);
-
-	btVector3 inertia;
-	if(mShape!=NULL){
-		mShape->calculateLocalInertia(mass,inertia);
+	if(mass<0){
+		mBody->setCollisionFlags(mBody->getCollisionFlags() | btCollisionObject::CF_KINEMATIC_OBJECT);
+		mBody->setActivationState(DISABLE_DEACTIVATION);
 	}
+	else{
+		mBody->setCollisionFlags(mBody->getCollisionFlags() & ~btCollisionObject::CF_KINEMATIC_OBJECT);
+		mBody->setActivationState(0);
 
-	mBody->setMassProps(mass,inertia);
+		btVector3 inertia;
+		if(mShape!=NULL){
+			mShape->calculateLocalInertia(mass,inertia);
+		}
+
+		mBody->setMassProps(mass,inertia);
+	}
 }
 
 void BulletComponent::addForce(const Vector3 &force,const Vector3 &offset){
@@ -135,11 +152,16 @@ void BulletComponent::addForce(const Vector3 &force,const Vector3 &offset){
 }
 
 scalar BulletComponent::getMass() const{
-	scalar mass=mBody->getInvMass();
-	if(mass>0){
-		mass=Math::div(Math::ONE,mass);
+	if((mBody->getCollisionFlags() & btCollisionObject::CF_KINEMATIC_OBJECT)!=0){
+		return -Math::ONE;
 	}
-	return mass;
+	else{
+		scalar mass=mBody->getInvMass();
+		if(mass>0){
+			mass=Math::div(Math::ONE,mass);
+		}
+		return mass;
+	}
 }
 
 void BulletComponent::setGravity(scalar amount){

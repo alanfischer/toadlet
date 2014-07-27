@@ -3,6 +3,8 @@
 
 #include <toadlet/toadlet.h>
 
+namespace randisle{
+
 using namespace toadlet;
 
 class SmoothFollower:public BaseComponent{
@@ -90,5 +92,7 @@ public:
 	Vector3 mTargetOffset;
 	egg::Collection<Vector3> mPositions;
 };
+
+}
 
 #endif

@@ -1,6 +1,8 @@
 #ifndef PATHCLIMBERLISTENER_H
 #define PATHCLIMBERLISTENER_H
 
+namespace randisle{
+
 class PathClimber;
 class PathVertex;
 
@@ -10,5 +12,7 @@ public:
 	virtual void pathDismounted(PathClimber *climber)=0;
 	virtual int atJunction(PathClimber *climber,PathVertex *current,PathVertex *neighbor)=0;
 };
+
+}
 
 #endif

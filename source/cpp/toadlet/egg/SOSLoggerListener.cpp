@@ -84,14 +84,22 @@ void SOSLoggerListener::sendEntry(Logger::Category *category,Logger::Level level
 	
 	formattedMessage += String("</showMessage>");
 	
-	mSocket->send((tbyte*)formattedMessage.c_str(), formattedMessage.length());
-	mSocket->send(&mTermination, 1);
+	TOADLET_TRY
+		mSocket->send((tbyte*)formattedMessage.c_str(), formattedMessage.length());
+		mSocket->send(&mTermination, 1);
+	TOADLET_CATCH_ANONYMOUS(){}
 }
 
 void SOSLoggerListener::run(){
-	bool result = mSocket->connect(mServerAddress,4444);
+	bool result = false;
+	TOADLET_TRY
+		mSocket->connect(mServerAddress,4444);
+	TOADLET_CATCH_ANONYMOUS(){
+		result=false;
+	}
+
 	if (result == false) {
-		Error::unknown("SOSLoggerListener could not connect!");
+		Log::error("SOSLoggerListener could not connect!");
 		return;
 	}
 

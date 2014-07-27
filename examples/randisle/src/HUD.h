@@ -4,6 +4,10 @@
 #include <toadlet/toadlet.h>
 #include "Resources.h"
 
+namespace randisle{
+
+using namespace toadlet;
+
 class HUD:public Node{
 public:
 	TOADLET_OBJECT(HUD);
@@ -18,5 +22,7 @@ protected:
 	Node::ptr mAcorn;
 	Node::ptr mFPS;
 };
+
+}
 
 #endif

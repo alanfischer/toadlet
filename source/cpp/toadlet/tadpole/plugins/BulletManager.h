@@ -59,7 +59,10 @@ public:
 
 	void addListener(PhysicsManagerListener *listener){mListeners.add(listener);}
 	void removeListener(PhysicsManagerListener *listener){mListeners.remove(listener);}
-	
+
+	void setFixedDT(float fdt){mFixedDT=fdt;}
+	float getFixedDT() const{return mFixedDT;}
+
 	void setGravity(const Vector3 &gravity){btVector3 v;setVector3(v,gravity);mWorld->setGravity(v);}
 	const Vector3 &getGravity() const{setVector3(mBulletGravity,mWorld->getGravity());return mBulletGravity;}
 
@@ -80,6 +83,7 @@ public:
 	void physicsUpdate(btScalar timeStep);
 
 protected:
+	float mFixedDT;
 	Scene::ptr mScene;
 	btDiscreteDynamicsWorld *mWorld;
 	Collection<BulletComponent*> mComponents;

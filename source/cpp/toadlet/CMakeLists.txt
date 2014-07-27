@@ -59,10 +59,6 @@ foreach (TOADLET_LIBRARY ${TOADLET_LIBRARY_LIST})
 endforeach (TOADLET_LIBRARY)
 
 file (APPEND ${HEADER_FILE} "\n")
-
-file (APPEND ${HEADER_FILE} "using namespace toadlet;\n")
-
-file (APPEND ${HEADER_FILE} "\n")
 file (APPEND ${HEADER_FILE} "#endif\n")
 
 

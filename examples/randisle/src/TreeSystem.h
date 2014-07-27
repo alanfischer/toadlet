@@ -4,6 +4,8 @@
 #include "Path.h"
 #include "BranchSystem.h"
 
+namespace randisle{
+
 class TreeSystem:public BranchSystem,public BranchSystem::BranchListener{
 public:
 	TOADLET_OBJECT(TreeSystem);
@@ -137,5 +139,7 @@ protected:
 	Mesh::ptr mMesh;
 	Mesh::ptr mLowMesh;
 };
+
+}
 
 #endif
