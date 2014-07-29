@@ -112,6 +112,8 @@ protected:
 	int mCollisionScope;
 	int mCollideWithScope;
 	Collection<PhysicsCollisionListener*> mListeners;
+	Vector3 mKinematicPosition;
+	Quaternion mKinematicOrientation;
 	Vector3 mCurrentPosition;
 	Quaternion mCurrentOrientation;
 	Bound::ptr mBound;

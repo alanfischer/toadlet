@@ -100,8 +100,8 @@ void BulletComponent::rootChanged(Node *root){
 }
 
 void BulletComponent::setPosition(const Vector3 &position){
-	if((mBody->getCollisionFlags() & btCollisionObject::CF_KINEMATIC_OBJECT)!=0 && mParent!=NULL){
-		mParent->setTranslate(position);
+	if((mBody->getCollisionFlags() & btCollisionObject::CF_KINEMATIC_OBJECT)!=0){
+		mKinematicPosition=position;
 	}
 	else{
 		btTransform transform=mBody->getWorldTransform();
@@ -113,8 +113,8 @@ void BulletComponent::setPosition(const Vector3 &position){
 }
 
 void BulletComponent::setOrientation(const Quaternion &orientation){
-	if((mBody->getCollisionFlags() & btCollisionObject::CF_KINEMATIC_OBJECT)!=0 && mParent!=NULL){
-		mParent->setRotate(orientation);
+	if((mBody->getCollisionFlags() & btCollisionObject::CF_KINEMATIC_OBJECT)!=0){
+		mKinematicOrientation=orientation;
 	}
 	else{
 		btTransform transform=mBody->getWorldTransform();
@@ -228,6 +228,11 @@ void BulletComponent::transformChanged(Transform *transform){
 	const Vector3 &translate=parentTransform->getTranslate();
 	const Quaternion &rotate=parentTransform->getRotate();
 	if(mCurrentPosition.equals(translate)==false || mCurrentOrientation.equals(rotate)==false){
+		if((mBody->getCollisionFlags() & btCollisionObject::CF_KINEMATIC_OBJECT)!=0){
+			mKinematicPosition.set(translate);
+			mKinematicOrientation.set(rotate);
+		}
+
 		mCurrentPosition.set(translate);
 		mCurrentOrientation.set(rotate);
 
@@ -254,15 +259,25 @@ void BulletComponent::getWorldTransform(btTransform& worldTrans) const{
 		return;
 	}
 
-	Transform *parentTransform=mParent->getTransform();
-	Vector3 position=parentTransform->getTranslate();
-	Quaternion orientation=parentTransform->getRotate();
-	btVector3 origin;
-	setVector3(origin,position);
-	btQuaternion rotation;
-	setQuaternion(rotation,orientation);
-	worldTrans.setOrigin(origin);
-	worldTrans.setRotation(rotation);
+	if((mBody->getCollisionFlags() & btCollisionObject::CF_KINEMATIC_OBJECT)!=0){
+		btVector3 origin;
+		setVector3(origin,mKinematicPosition);
+		btQuaternion rotation;
+		setQuaternion(rotation,mKinematicOrientation);
+		worldTrans.setOrigin(origin);
+		worldTrans.setRotation(rotation);
+	}
+	else{
+		Transform *parentTransform=mParent->getTransform();
+		Vector3 position=parentTransform->getTranslate();
+		Quaternion orientation=parentTransform->getRotate();
+		btVector3 origin;
+		setVector3(origin,position);
+		btQuaternion rotation;
+		setQuaternion(rotation,orientation);
+		worldTrans.setOrigin(origin);
+		worldTrans.setRotation(rotation);
+	}
 }
 
 void BulletComponent::setWorldTransform(const btTransform& worldTrans){
