@@ -79,14 +79,16 @@ void BulletManager::frameUpdate(int dt,int scope,Node *node){
 	for(int i=0;i<mComponents.size();++i){
 		btRigidBody *body=mComponents[i]->getBody();
 		if(body!=NULL && body->isActive()){
-			if(body->getMotionState() && !body->isStaticOrKinematicObject()){
-				btTransform interpolatedTransform;
-				btTransformUtil::integrateTransform(body->getInterpolationWorldTransform(),
-				body->getInterpolationLinearVelocity(),body->getInterpolationAngularVelocity(),
-				timeStep,
-				interpolatedTransform);
-				body->getMotionState()->setWorldTransform(interpolatedTransform);
-			}
+			if(body->getMotionState()){
+//				if(!body->isStaticOrKinematicObject()){
+					btTransform interpolatedTransform;
+					btTransformUtil::integrateTransform(body->getInterpolationWorldTransform(),
+					body->getInterpolationLinearVelocity(),body->getInterpolationAngularVelocity(),
+					timeStep,
+					interpolatedTransform);
+					body->getMotionState()->setWorldTransform(interpolatedTransform);
+				}
+	//		}
 		}
 	}
 }
