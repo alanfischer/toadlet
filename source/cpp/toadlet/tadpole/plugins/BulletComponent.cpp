@@ -38,6 +38,7 @@ BulletComponent::BulletComponent(BulletManager *manager):
 
 	mShape=new btCompoundShape();
 	mBody=new btRigidBody(1.0f,this,mShape);
+	mBody->setUserPointer(this);
 
 	mBound=new Bound();
 	mWorldBound=new Bound();
@@ -91,7 +92,7 @@ void BulletComponent::rootChanged(Node *root){
 			mManager->getWorld()->addRigidBody(mBody,mCollisionScope,mCollideWithScope);
 		}
 		else{
-			mManager->getWorld()->addRigidBody(mBody);
+			mManager->getWorld()->addRigidBody(mBody,btBroadphaseProxy::DefaultFilter,btBroadphaseProxy::AllFilter);
 		}
 	}
 	else{
@@ -252,6 +253,10 @@ void BulletComponent::transformChanged(Transform *transform){
 }
 
 void BulletComponent::collision(const PhysicsCollision &collision){
+	int i;
+	for(i=0;i<mListeners.size();++i){
+		mListeners[i]->collision(collision);
+	}
 }
 
 void BulletComponent::getWorldTransform(btTransform& worldTrans) const{

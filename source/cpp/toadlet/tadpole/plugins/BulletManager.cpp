@@ -80,20 +80,53 @@ void BulletManager::frameUpdate(int dt,int scope,Node *node){
 		btRigidBody *body=mComponents[i]->getBody();
 		if(body!=NULL && body->isActive()){
 			if(body->getMotionState()){
-//				if(!body->isStaticOrKinematicObject()){
-					btTransform interpolatedTransform;
-					btTransformUtil::integrateTransform(body->getInterpolationWorldTransform(),
-					body->getInterpolationLinearVelocity(),body->getInterpolationAngularVelocity(),
-					timeStep,
-					interpolatedTransform);
-					body->getMotionState()->setWorldTransform(interpolatedTransform);
-				}
-	//		}
+				btTransform interpolatedTransform;
+				btTransformUtil::integrateTransform(body->getInterpolationWorldTransform(),
+				body->getInterpolationLinearVelocity(),body->getInterpolationAngularVelocity(),
+				timeStep,
+				interpolatedTransform);
+				body->getMotionState()->setWorldTransform(interpolatedTransform);
+			}
 		}
 	}
 }
 
 void BulletManager::physicsUpdate(btScalar timeStep){
+	int numManifolds=mWorld->getDispatcher()->getNumManifolds();
+	for(int i=0;i<numManifolds;i++){
+		btPersistentManifold *contactManifold=mWorld->getDispatcher()->getManifoldByIndexInternal(i);
+		const btCollisionObject *coA=static_cast<const btCollisionObject*>(contactManifold->getBody0());
+		const btCollisionObject *coB=static_cast<const btCollisionObject*>(contactManifold->getBody1());
+		BulletComponent *solidA=static_cast<BulletComponent*>(coA->getUserPointer());
+		BulletComponent *solidB=static_cast<BulletComponent*>(coB->getUserPointer());
+
+		int numContacts=contactManifold->getNumContacts();
+		for(int j=0;j<numContacts;j++){
+			const btManifoldPoint &pt = contactManifold->getContactPoint(j);
+			if(pt.getDistance()<0.f){
+				const btVector3& ptA=pt.getPositionWorldOnA();
+				const btVector3& ptB=pt.getPositionWorldOnB();
+				const btVector3& normalOnB=pt.m_normalWorldOnB;
+
+				PhysicsCollision c;
+				c.time=pt.getDistance();
+				setVector3(c.point,ptA);
+				setVector3(c.normal,normalOnB);
+				c.velocity=solidA->getVelocity();
+				c.collider=solidB->getParent();
+
+				solidA->collision(c);
+
+				setVector3(c.point,ptB);
+				Math::neg(c.normal);
+				c.velocity=solidB->getVelocity();
+				c.collider=solidA->getParent();
+				
+				solidB->collision(c);
+			}
+		}
+	}
+
 	int i;
 	for(i=0;i<mListeners.size();++i){
 		mListeners[i]->physicsUpdate(timeStep);
