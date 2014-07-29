@@ -66,9 +66,6 @@ public:
 	virtual void parentChanged(Node *node);
 	virtual void rootChanged(Node *root);
 
-	virtual void notifyParentAttached();
-	virtual void notifyParentRemoved();
-
 	virtual Node *getParent() const{return mParent;}
 
 	virtual void logicUpdate(int dt,int scope){}
@@ -78,6 +75,12 @@ public:
 
 	virtual bool getActive() const{return false;}
 
+	virtual void notifyParentAttached();
+	virtual void notifyParentRemoved();
+
+	void baseParentChanged(Node *node);
+	void baseRootChanged(Node *root);
+	
 protected:
 	Node *mParent;
 	Node *mRoot;

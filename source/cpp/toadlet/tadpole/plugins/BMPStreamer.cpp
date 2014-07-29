@@ -129,6 +129,11 @@ Resource::ptr BMPStreamer::load(Stream::ptr stream,ResourceData *data){
 	TextureFormat::ptr textureFormat=new TextureFormat(TextureFormat::Dimension_D2,pixelFormat,width,height,1,0);
 	tbyte *textureData=new tbyte[textureFormat->getDataSize()];
 
+	int ro=0,go=1,bo=2;
+	if(pixelFormat==TextureFormat::Format_RGB_8 || pixelFormat==TextureFormat::Format_RGBA_8){
+		ro=2,go=1,bo=0;
+	}
+
 	if(bmih.biBitCount==1 || bmih.biBitCount==2 || bmih.biBitCount==4 || bmih.biBitCount==8){
 		tbyte *palette=new tbyte[(1<<bmih.biBitCount)*4];
 		stream->read(palette,(1<<bmih.biBitCount)*4);
@@ -148,9 +153,9 @@ Resource::ptr BMPStreamer::load(Stream::ptr stream,ResourceData *data){
 				int index=(rawData[(i*bmih.biBitCount)/8 + j*rowSize] >> (8-((bmih.biBitCount*(i+1))%8))%8) % (1 << bmih.biBitCount);
 				int imageDataOffset=i*3 + j*width*3;
 
-				textureData[imageDataOffset+0]=palette[index*4+2];
-				textureData[imageDataOffset+1]=palette[index*4+1];
-				textureData[imageDataOffset+2]=palette[index*4+0];
+				textureData[imageDataOffset+0]=palette[index*4+ro];
+				textureData[imageDataOffset+1]=palette[index*4+go];
+				textureData[imageDataOffset+2]=palette[index*4+bo];
 			}
 		}
 
@@ -170,9 +175,9 @@ Resource::ptr BMPStreamer::load(Stream::ptr stream,ResourceData *data){
 				int rawDataOffset=i*3 + j*rowSize;
 				int imageDataOffset=i*3 + j*width*3;
 
-				textureData[imageDataOffset+0]=rawData[rawDataOffset+2];
-				textureData[imageDataOffset+1]=rawData[rawDataOffset+1];
-				textureData[imageDataOffset+2]=rawData[rawDataOffset+0];
+				textureData[imageDataOffset+0]=rawData[rawDataOffset+ro];
+				textureData[imageDataOffset+1]=rawData[rawDataOffset+go];
+				textureData[imageDataOffset+2]=rawData[rawDataOffset+bo];
 			}
 		}
 
@@ -181,17 +186,22 @@ Resource::ptr BMPStreamer::load(Stream::ptr stream,ResourceData *data){
 	else if(bmih.biBitCount==32){
 		stream->seek(bmfh.bfOffBits);
 
-		stream->read((tbyte*)textureData,width*height*4);
+		tbyte *rawData=new tbyte[width*height*4];
+		stream->read((tbyte*)rawData,width*height*4);
 
 		for(j=0;j<height;++j){
 			for(i=0;i<width;++i){
+				int rawDataOffset=i*4 + j*width*4;
 				int imageDataOffset=i*4 + j*width*4;
-				tbyte temp=textureData[imageDataOffset+2];
 
-				textureData[imageDataOffset+2]=textureData[imageDataOffset+0];
-				textureData[imageDataOffset+0]=temp;
+				textureData[imageDataOffset+0]=rawData[rawDataOffset+ro];
+				textureData[imageDataOffset+1]=rawData[rawDataOffset+go];
+				textureData[imageDataOffset+2]=rawData[rawDataOffset+bo];
+				textureData[imageDataOffset+3]=rawData[rawDataOffset+3];
 			}
 		}
+
+		delete[] rawData;
 	}
 
 	Texture::ptr texture=mTextureManager->createTexture(usage,textureFormat,textureData);
@@ -219,19 +229,26 @@ bool BMPStreamer::save(Stream::ptr stream,Resource::ptr resource,ResourceData *d
 		return false;
 	}
 
-	if(!(textureFormat->getPixelFormat()==TextureFormat::Format_RGB_8 || textureFormat->getPixelFormat()==TextureFormat::Format_RGBA_8)){
+	int pixelFormat=textureFormat->getPixelFormat();
+	int width=textureFormat->getWidth();
+	int height=textureFormat->getHeight();
+
+	if(	!(pixelFormat==TextureFormat::Format_RGB_8 || pixelFormat==TextureFormat::Format_RGBA_8) &&
+		!(pixelFormat==TextureFormat::Format_BGR_8 || pixelFormat==TextureFormat::Format_BGRA_8)
+	){
 		Error::unknown(Categories::TOADLET_TADPOLE,
-			"texture isn't in RGB/RGBA format");
+			"texture isn't in RGB/RGBA/BGR/BGRA format");
 		return false;
+	}
+
+	int ro=0,go=1,bo=2;
+	if(pixelFormat==TextureFormat::Format_RGB_8 || pixelFormat==TextureFormat::Format_RGBA_8){
+		ro=2,go=1,bo=0;
 	}
 
 	tbyte *textureData=new tbyte[textureFormat->getDataSize()];
 
 	texture->read(textureFormat,textureData);
-
-	int pixelFormat=textureFormat->getPixelFormat();
-	int width=textureFormat->getWidth();
-	int height=textureFormat->getHeight();
 
 	rowSize=textureFormat->getXPitch() + (4-(textureFormat->getXPitch())%4)%4;
 
@@ -259,10 +276,10 @@ bool BMPStreamer::save(Stream::ptr stream,Resource::ptr resource,ResourceData *d
 	bmih.biWidth=width;
 	bmih.biHeight=height;
 	bmih.biPlanes=1;
-	if(pixelFormat==TextureFormat::Format_RGB_8){
+	if(pixelFormat==TextureFormat::Format_RGB_8 || pixelFormat==TextureFormat::Format_BGR_8){
 		bmih.biBitCount=24;
 	}
-	else if(pixelFormat==TextureFormat::Format_RGBA_8){
+	else if(pixelFormat==TextureFormat::Format_RGBA_8 || pixelFormat==TextureFormat::Format_BGRA_8){
 		bmih.biBitCount=32;
 	}
 	bmih.biCompression=BI_RGB; // Only non-compressed supported
@@ -285,7 +302,7 @@ bool BMPStreamer::save(Stream::ptr stream,Resource::ptr resource,ResourceData *d
 	dataStream->writeLUInt32(bmih.biClrUsed);
 	dataStream->writeLUInt32(bmih.biClrImportant);
 
-	if(pixelFormat==TextureFormat::Format_RGB_8){
+	if(pixelFormat==TextureFormat::Format_RGB_8 || pixelFormat==TextureFormat::Format_BGR_8){
 		int rowSize=(width*3) + (4-(width*3)%4)%4;
 
 		tbyte *rawData=new tbyte[rowSize*height];
@@ -296,9 +313,9 @@ bool BMPStreamer::save(Stream::ptr stream,Resource::ptr resource,ResourceData *d
 				int rawDataOffset=i*3 + j*rowSize;
 				int imageDataOffset=i*3 + j*width*3;
 
-				rawData[rawDataOffset+2]=textureData[imageDataOffset+0];
-				rawData[rawDataOffset+1]=textureData[imageDataOffset+1];
-				rawData[rawDataOffset+0]=textureData[imageDataOffset+2];
+				rawData[rawDataOffset+ro]=textureData[imageDataOffset+0];
+				rawData[rawDataOffset+go]=textureData[imageDataOffset+1];
+				rawData[rawDataOffset+bo]=textureData[imageDataOffset+2];
 			}
 		}
 
@@ -306,7 +323,7 @@ bool BMPStreamer::save(Stream::ptr stream,Resource::ptr resource,ResourceData *d
 
 		delete[] rawData;
 	}
-	else if(pixelFormat==TextureFormat::Format_RGBA_8){
+	else if(pixelFormat==TextureFormat::Format_RGBA_8 || pixelFormat==TextureFormat::Format_BGRA_8){
 		tbyte *rawData=new tbyte[width*height*4];
 		memset(rawData,0,width*height*4);
 
@@ -315,9 +332,9 @@ bool BMPStreamer::save(Stream::ptr stream,Resource::ptr resource,ResourceData *d
 				int rawDataOffset=i*4 + j*width*4;
 				int imageDataOffset=i*4 + j*width*4;
 
-				rawData[rawDataOffset+2]=textureData[imageDataOffset+0];
-				rawData[rawDataOffset+1]=textureData[imageDataOffset+1];
-				rawData[rawDataOffset+0]=textureData[imageDataOffset+2];
+				rawData[rawDataOffset+ro]=textureData[imageDataOffset+0];
+				rawData[rawDataOffset+go]=textureData[imageDataOffset+1];
+				rawData[rawDataOffset+bo]=textureData[imageDataOffset+2];
 				rawData[rawDataOffset+3]=textureData[imageDataOffset+3];
 			}
 		}
