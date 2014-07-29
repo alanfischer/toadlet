@@ -17,9 +17,35 @@ using namespace toadlet;
 using namespace toadlet::egg;
 using namespace toadlet::tadpole;
 
-Texture::ptr TextureManager_createTexture(TextureManager *manager,TextureFormat::ptr format){
-	return manager->createTexture(format,(tbyte*)NULL);
-}
+class BaseComponentWrapper:public wrapper<BaseComponent> {
+public:
+	TOADLET_OBJECT(BaseComponentWrapper);
+	EMSCRIPTEN_WRAPPER(BaseComponentWrapper);
+
+	virtual void parentChanged(Node *node){
+		return call<void>("parentChanged",node);
+	}
+	
+	virtual void rootChanged(Node *root){
+		return call<void>("rootChanged",root);
+	}
+
+	virtual void logicUpdate(int dt,int scope){
+		return call<void>("logicUpdate",dt,scope);
+	}
+	
+	virtual void frameUpdate(int dt,int scope){
+		return call<void>("frameUpdate",dt,scope);
+	}
+
+	virtual bool handleEvent(Event *event){
+		return call<bool>("handleEvent",event);
+	}
+
+	virtual bool getActive() const{
+		return call<bool>("getActive");
+	}
+};
 
 extern "C" void *DOMArchive();
 
@@ -27,14 +53,6 @@ Archive::ptr makeDOMArchive(Engine *engine){
 	volatile bool link=false;
 	if(link){DOMArchive();}
 	return val::module_property("DOMArchive")(engine).as<Archive::ptr>();
-}
-
-Mesh *toMesh(Resource *resource){
-	return (Mesh*)resource;
-}
-
-Material *toMaterial(Resource *resource){
-	return (Material*)resource;
 }
 
 EMSCRIPTEN_BINDINGS(tadpole) {
@@ -66,13 +84,17 @@ EMSCRIPTEN_BINDINGS(tadpole) {
 		.smart_ptr<Mesh::ptr>()
 	;
 
-	function("toMesh",&toMesh, allow_raw_pointers());
+	function("toMesh",select_overload<Mesh*(Resource*)>(
+		[](Resource *resource){return (Mesh*)resource;}
+	), allow_raw_pointers());
 
 	class_<Material>("Material")
 		.smart_ptr<Material::ptr>()
 	;
 
-	function("toMaterial",&toMaterial, allow_raw_pointers());
+	function("toMaterial",select_overload<Material*(Resource*)>(
+		[](Resource *resource){return (Material*)resource;}
+	), allow_raw_pointers());
 
 	class_<Skeleton>("Skeleton")
 		.smart_ptr<Skeleton::ptr>()
@@ -98,7 +120,12 @@ EMSCRIPTEN_BINDINGS(tadpole) {
 	class_<TextureManager,base<ResourceManager>>("TextureManager")
 		.smart_ptr<TextureManager::ptr>()
 
-		.function("createTexture",&TextureManager_createTexture, allow_raw_pointers())
+		.function("createTexture",select_overload<Texture::ptr(TextureManager*,TextureFormat::ptr)>(
+			[](TextureManager *manager,TextureFormat::ptr format){return manager->createTexture(format,(tbyte*)NULL);}
+		), allow_raw_pointers())
+		.function("createTextureWithUsage",select_overload<Texture::ptr(TextureManager*,int,TextureFormat::ptr)>(
+			[](TextureManager *manager,int usage,TextureFormat::ptr format){return manager->createTexture(usage,format,(tbyte*)NULL);}
+		), allow_raw_pointers())
 
 		.function("getTexture",&TextureManager::getTexture, allow_raw_pointers())
 	;
@@ -185,6 +212,21 @@ EMSCRIPTEN_BINDINGS(tadpole) {
 		.function("getName",&Component::getName)
 	;
 
+	class_<BaseComponent,base<Component>>("BaseComponent")
+		.smart_ptr<BaseComponent::ptr>()
+		.allow_subclass<BaseComponentWrapper, BaseComponentWrapper::ptr>()
+		.function("destroy",&BaseComponent::destroy)
+		.function("parentChanged",&BaseComponent::parentChanged, allow_raw_pointers())
+		.function("rootChanged",&BaseComponent::rootChanged, allow_raw_pointers())
+		.function("setName",&BaseComponent::setName)
+		.function("logicUpdate",&BaseComponent::logicUpdate)
+		.function("frameUpdate",&BaseComponent::frameUpdate)
+		.function("handleEvent",&BaseComponent::handleEvent, allow_raw_pointers())
+		.function("getActive",&BaseComponent::getActive)
+		.function("baseParentChanged",&BaseComponent::baseParentChanged, allow_raw_pointers())
+		.function("baseRootChanged",&BaseComponent::baseRootChanged, allow_raw_pointers())
+	;
+	
 	class_<CameraComponent,base<Component>>("CameraComponent")
 		.smart_ptr_constructor(&make_ptr<CameraComponent,Camera*>)
 		.function("setClearColor",&CameraComponent::setClearColor)
@@ -218,10 +260,6 @@ EMSCRIPTEN_BINDINGS(tadpole) {
 
 	class_<ActionComponent,base<Component>>("ActionComponent")
 		.smart_ptr_constructor(&make_ptr<ActionComponent,const String&,Action*>)
-	;
-	
-	class_<BaseComponent,base<Component>>("BaseComponent")
-		.function("setName",&BaseComponent::setName)
 	;
 
 	class_<Node,base<BaseComponent>>("Node")

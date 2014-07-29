@@ -436,6 +436,29 @@ String String::trimRight() const{
 	}
 }
 
+Collection<String> &String::split(Collection<String> &results,const char *delimiter,bool keepEmpty) const{
+	size_t prev=0;
+	size_t next=0;
+
+	while((next=find(delimiter,prev))!=npos){
+		if(keepEmpty || (next-prev!=0)){
+			results.push_back(substr(prev,next-prev));
+		}
+		prev=next+1;
+	}
+
+	if(prev<length()){
+		results.push_back(substr(prev,npos));
+	}
+
+	return results;
+}
+
+Collection<String> String::split(const char *delimiter,bool keepEmpty) const{
+	Collection<String> results;
+	return split(results,delimiter,keepEmpty);
+}
+
 int32 String::toInt32() const{
 	int32 i=0;
 	TOADLET_SSCANF(*this,"%d",&i);
