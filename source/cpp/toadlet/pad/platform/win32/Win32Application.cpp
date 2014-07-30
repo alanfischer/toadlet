@@ -61,30 +61,30 @@ using namespace toadlet::flick;
 	#pragma comment(lib,"toadlet_peeper_glrenderdevice" TOADLET_LIBRARY_EXTENSION)
 	extern "C" RenderDevice *new_GLRenderDevice();
 	#if defined(TOADLET_PLATFORM_WINCE)
-		extern "C" RenderTarget *new_EGLWindowRenderTarget(void *display,void *window,WindowRenderTargetFormat *format);
+		extern "C" RenderTarget *new_EGLWindowRenderTarget(void *display,void *window,WindowRenderTargetFormat *format,RenderTarget *shareTarget);
 	#else
-		extern "C" RenderTarget *new_WGLWindowRenderTarget(void *display,void *window,WindowRenderTargetFormat *format);
+		extern "C" RenderTarget *new_WGLWindowRenderTarget(void *display,void *window,WindowRenderTargetFormat *format,RenderTarget *shareTarget);
 	#endif
 #endif
 #if defined(TOADLET_HAS_D3DM)
 	#pragma comment(lib,"toadlet_peeper_d3dmrenderdevice" TOADLET_LIBRARY_EXTENSION)
 	extern "C" RenderDevice *new_D3DMRenderDevice();
-	extern "C" RenderTarget *new_D3DMWindowRenderTarget(void *display,void *window,WindowRenderTargetFormat *format);
+	extern "C" RenderTarget *new_D3DMWindowRenderTarget(void *display,void *window,WindowRenderTargetFormat *format,RenderTarget *shareTarget);
 #endif
 #if defined(TOADLET_HAS_D3D9)
 	#pragma comment(lib,"toadlet_peeper_d3d9renderdevice" TOADLET_LIBRARY_EXTENSION)
 	extern "C" RenderDevice *new_D3D9RenderDevice();
-	extern "C" RenderTarget *new_D3D9WindowRenderTarget(void *display,void *window,WindowRenderTargetFormat *format);
+	extern "C" RenderTarget *new_D3D9WindowRenderTarget(void *display,void *window,WindowRenderTargetFormat *format,RenderTarget *shareTarget);
 #endif
 #if defined(TOADLET_HAS_D3D10)
 	#pragma comment(lib,"toadlet_peeper_d3d10renderdevice" TOADLET_LIBRARY_EXTENSION)
 	extern "C" RenderDevice *new_D3D10RenderDevice();
-	extern "C" RenderTarget *new_D3D10WindowRenderTarget(void *display,void *window,WindowRenderTargetFormat *format);
+	extern "C" RenderTarget *new_D3D10WindowRenderTarget(void *display,void *window,WindowRenderTargetFormat *format,RenderTarget *shareTarget);
 #endif
 #if defined(TOADLET_HAS_D3D11)
 	#pragma comment(lib,"toadlet_peeper_d3d11renderdevice" TOADLET_LIBRARY_EXTENSION)
 	extern "C" RenderDevice *new_D3D11RenderDevice();
-	extern "C" RenderTarget *new_D3D11WindowRenderTarget(void *display,void *window,WindowRenderTargetFormat *format);
+	extern "C" RenderTarget *new_D3D11WindowRenderTarget(void *display,void *window,WindowRenderTargetFormat *format,RenderTarget *shareTarget);
 #endif
 
 #if defined(TOADLET_HAS_OPENAL)

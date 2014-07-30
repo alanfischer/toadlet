@@ -6,6 +6,8 @@
 #include <toadlet/egg/io/Stream.h>
 #include <toadlet/egg/io/BaseArchive.h>
 
+namespace toadlet{
+
 class QtFileStream:public Object,public Stream{
 public:
 	TOADLET_IOBJECT(QtFileStream);
@@ -54,5 +56,7 @@ public:
 protected:
 	Collection<String> mEntries;
 };
+
+}
 
 #endif

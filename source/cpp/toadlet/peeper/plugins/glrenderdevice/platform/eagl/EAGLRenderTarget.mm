@@ -36,19 +36,19 @@ namespace peeper{
 
 #if defined(TOADLET_HAS_GLES)
 	#if defined(TOADLET_HAS_GL_20)
-		TOADLET_C_API RenderTarget *new_EAGL2RenderTarget(void *display,void *layer,WindowRenderTargetFormat *format){
+		TOADLET_C_API RenderTarget *new_EAGL2RenderTarget(void *display,void *layer,WindowRenderTargetFormat *format,RenderTarget *shareTarget){
 			format->flags=2;
-			return (GLRenderTarget*)(new EAGLRenderTarget((CAEAGLLayer*)layer,format));
+			return (GLRenderTarget*)(new EAGLRenderTarget((CAEAGLLayer*)layer,format,shareTarget));
 		}
 	#else
-		TOADLET_C_API RenderTarget *new_EAGL1RenderTarget(void *display,void *layer,WindowRenderTargetFormat *format){
+		TOADLET_C_API RenderTarget *new_EAGL1RenderTarget(void *display,void *layer,WindowRenderTargetFormat *format,RenderTarget *shareTarget){
 			format->flags=1;
-			return (GLRenderTarget*)(new EAGLRenderTarget((CAEAGLLayer*)layer,format));
+			return (GLRenderTarget*)(new EAGLRenderTarget((CAEAGLLayer*)layer,format,shareTarget));
 		}
 	#endif
 #else
-	TOADLET_C_API RenderTarget *new_EAGLRenderTarget(void *display,void *layer,WindowRenderTargetFormat *format){
-		return (GLRenderTarget*)(new EAGLRenderTarget((CAEAGLLayer*)layer,format));
+	TOADLET_C_API RenderTarget *new_EAGLRenderTarget(void *display,void *layer,WindowRenderTargetFormat *format,RenderTarget *shareTarget){
+		return (GLRenderTarget*)(new EAGLRenderTarget((CAEAGLLayer*)layer,format,shareTarget));
 	}
 #endif
 
@@ -63,7 +63,7 @@ EAGLRenderTarget::EAGLRenderTarget():GLFBORenderTarget(NULL),
 {
 }
 
-EAGLRenderTarget::EAGLRenderTarget(CAEAGLLayer *drawable,WindowRenderTargetFormat *format,NSString *colorFormat):GLFBORenderTarget(NULL),
+EAGLRenderTarget::EAGLRenderTarget(CAEAGLLayer *drawable,WindowRenderTargetFormat *format,RenderTarget *shareTarget):GLFBORenderTarget(NULL),
 	mDrawable(nil),
 	mContext(nil),
 	mRenderBufferHandle(0),
@@ -72,7 +72,7 @@ EAGLRenderTarget::EAGLRenderTarget(CAEAGLLayer *drawable,WindowRenderTargetForma
 	mMSAARenderBufferHandle(0),
 	mMSAADepthBufferHandle(0)
 {
-	createContext(drawable,format,colorFormat);
+	createContext(drawable,format,shareTarget);
 }
 
 void EAGLRenderTarget::destroy(){
@@ -81,7 +81,7 @@ void EAGLRenderTarget::destroy(){
 	BaseResource::destroy();
 }
 
-bool EAGLRenderTarget::createContext(CAEAGLLayer *drawable,WindowRenderTargetFormat *format,NSString *colorFormat){
+bool EAGLRenderTarget::createContext(CAEAGLLayer *drawable,WindowRenderTargetFormat *format,RenderTarget *shareTarget){
 	mDrawable=drawable;
 
 	mDrawable.drawableProperties=[NSDictionary dictionaryWithObjectsAndKeys:
@@ -96,7 +96,14 @@ bool EAGLRenderTarget::createContext(CAEAGLLayer *drawable,WindowRenderTargetFor
 	if(format->flags==2){
 		api=kEAGLRenderingAPIOpenGLES2;
 	}
-	mContext=[[EAGLContext alloc] initWithAPI:api];
+	
+	if(shareTarget!=NULL){
+		EAGLShareGroup *shareGroup=((EAGLRenderTarget*)(shareTarget->getRootRenderTarget()))->mContext.sharegroup
+		mContext=[[EAGLContext alloc] initWithAPI:api sharegroup:shareGroup];
+	}
+	else{
+		mContext=[[EAGLContext alloc] initWithAPI:api];
+	}
 	if(mContext==nil){
 		Error::unknown(Categories::TOADLET_PEEPER,
 			"Failed to create EAGLContext");

@@ -30,8 +30,8 @@
 namespace toadlet{
 namespace peeper{
 
-TOADLET_C_API RenderTarget *new_GLXWindowRenderTarget(void *display,void *window,WindowRenderTargetFormat *format){
-	return new GLXWindowRenderTarget((Display*)display,(Window)window,format);
+TOADLET_C_API RenderTarget *new_GLXWindowRenderTarget(void *display,void *window,WindowRenderTargetFormat *format,RenderTarget *shareTarget){
+	return new GLXWindowRenderTarget((Display*)display,(Window)window,format,shareTarget);
 }
 
 GLXWindowRenderTarget::GLXWindowRenderTarget()
@@ -39,11 +39,11 @@ GLXWindowRenderTarget::GLXWindowRenderTarget()
 	//mThreadIDs
 {}
 
-GLXWindowRenderTarget::GLXWindowRenderTarget(Display *display,Window window,WindowRenderTargetFormat *format)
+GLXWindowRenderTarget::GLXWindowRenderTarget(Display *display,Window window,WindowRenderTargetFormat *format,RenderTarget *shareTarget)
 	//mThreadContexts,
 	//mThreadIDs
 {
-	createContext(display,window,format);
+	createContext(display,window,format,shareTarget);
 }
 
 void GLXWindowRenderTarget::destroy(){
@@ -52,7 +52,7 @@ void GLXWindowRenderTarget::destroy(){
 	BaseResource::destroy();
 }
 
-bool GLXWindowRenderTarget::createContext(Display *display,Window window,WindowRenderTargetFormat *format){
+bool GLXWindowRenderTarget::createContext(Display *display,Window window,WindowRenderTargetFormat *format,RenderTarget *shareTarget){
 	mDrawable=window;
 	mDisplay=display;
 
@@ -77,7 +77,11 @@ bool GLXWindowRenderTarget::createContext(Display *display,Window window,WindowR
 		return false;
 	}
 
-	mContext=glXCreateContext(mDisplay,visualInfo,NULL,True);
+	GLXContext shareContext=NULL;
+	if(shareTarget!=NULL){
+		shareContext=((GLXRenderTarget*)(shareTarget->getRootRenderTarget()))->getGLXContext();
+	}
+	mContext=glXCreateContext(mDisplay,visualInfo,shareContext,True);
 	if(!mContext){
 		Error::unknown(Categories::TOADLET_PEEPER,
 			"glXCreateContext failed");

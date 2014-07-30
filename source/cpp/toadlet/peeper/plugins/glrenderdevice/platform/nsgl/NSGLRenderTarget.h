@@ -39,13 +39,13 @@ namespace peeper{
 class TOADLET_API NSGLRenderTarget:public GLRenderTarget{
 public:
 	NSGLRenderTarget();
-	NSGLRenderTarget(NSView *view,WindowRenderTargetFormat *format,NSOpenGLPixelFormat *pixelFormat=nil);
+	NSGLRenderTarget(NSView *view,WindowRenderTargetFormat *format,RenderTarget *shareTarget,NSOpenGLPixelFormat *pixelFormat=nil);
 	NSGLRenderTarget(NSOpenGLContext *context);
 	void destroy();
 
 	RenderTarget *getRootRenderTarget(){return (GLRenderTarget*)this;}
 	
-	bool createContext(NSView *view,WindowRenderTargetFormat *format,NSOpenGLPixelFormat *pixelFormat=nil);
+	bool createContext(NSView *view,WindowRenderTargetFormat *format,RenderTarget *shareTarget,NSOpenGLPixelFormat *pixelFormat=nil);
 	bool destroyContext();
 
 	bool activate();

@@ -186,7 +186,7 @@ RenderTarget::ptr BaseApplication::makeRenderTarget(const String &plugin){
 	Map<String,RenderDevicePlugin>::iterator it=mRenderDevicePlugins.find(plugin);
 	if(it!=mRenderDevicePlugins.end()){
 		TOADLET_TRY
-			target=it->second.createRenderTarget(getDisplay(),getWindow(),mFormat);
+			target=it->second.createRenderTarget(getDisplay(),getWindow(),mFormat,NULL);
 		TOADLET_CATCH_ANONYMOUS(){target=NULL;}
 	}
 	if(target!=NULL && target->isValid()==false){

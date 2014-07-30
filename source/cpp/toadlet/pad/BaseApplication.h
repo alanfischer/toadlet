@@ -83,11 +83,11 @@ protected:
 	class RenderDevicePlugin{
 	public:
 		RenderDevicePlugin(
-			RenderTarget *(*renderTarget)(void *,void *,WindowRenderTargetFormat *)=NULL,
+			RenderTarget *(*renderTarget)(void *,void *,WindowRenderTargetFormat *,RenderTarget *)=NULL,
 			RenderDevice *(*renderDevice)()=NULL
 		):createRenderTarget(renderTarget),createRenderDevice(renderDevice){}
 
-		RenderTarget *(*createRenderTarget)(void *,void *,WindowRenderTargetFormat *);
+		RenderTarget *(*createRenderTarget)(void *,void *,WindowRenderTargetFormat *,RenderTarget *);
 		RenderDevice *(*createRenderDevice)();
 	};
 

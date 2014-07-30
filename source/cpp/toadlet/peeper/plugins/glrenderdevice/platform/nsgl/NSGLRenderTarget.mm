@@ -31,8 +31,8 @@
 namespace toadlet{
 namespace peeper{
 
-TOADLET_C_API RenderTarget *new_NSGLRenderTarget(void *display,void *view,WindowRenderTargetFormat *format){
-	return new NSGLRenderTarget((NSView*)view,format);
+TOADLET_C_API RenderTarget *new_NSGLRenderTarget(void *display,void *view,RenderTarget *shareTarget,WindowRenderTargetFormat *format){
+	return new NSGLRenderTarget((NSView*)view,format,shareTarget);
 }
 	
 NSGLRenderTarget::NSGLRenderTarget():
@@ -41,12 +41,12 @@ NSGLRenderTarget::NSGLRenderTarget():
 	mContext(nil)
 {}
 
-NSGLRenderTarget::NSGLRenderTarget(NSView *view,WindowRenderTargetFormat *format,NSOpenGLPixelFormat *pixelFormat):GLRenderTarget(),
+NSGLRenderTarget::NSGLRenderTarget(NSView *view,WindowRenderTargetFormat *format,RenderTarget *shareTarget,NSOpenGLPixelFormat *pixelFormat):GLRenderTarget(),
 	mView(nil),
 	mPixelFormat(nil),
 	mContext(nil)
 {
-	createContext(view,format,pixelFormat);
+	createContext(view,format,pixelFormat,shareTarget);
 }
 
 NSGLRenderTarget::NSGLRenderTarget(NSOpenGLContext *context):GLRenderTarget(),
@@ -63,7 +63,7 @@ void NSGLRenderTarget::destroy(){
 	BaseResource::destroy();
 }
 
-bool NSGLRenderTarget::createContext(NSView *view,WindowRenderTargetFormat *format,NSOpenGLPixelFormat *pixelFormat){
+bool NSGLRenderTarget::createContext(NSView *view,WindowRenderTargetFormat *format,RenderTarget *shareTarget,NSOpenGLPixelFormat *pixelFormat){
 	if(pixelFormat==nil){
 		NSOpenGLPixelFormatAttribute attrs[]={
 			NSOpenGLPFADoubleBuffer,
@@ -79,7 +79,11 @@ bool NSGLRenderTarget::createContext(NSView *view,WindowRenderTargetFormat *form
 		[mPixelFormat retain];
 	}
 
-	mContext=[[NSOpenGLContext alloc] initWithFormat:mPixelFormat shareContext:nil];
+	NSOpenGLContext *shareContext=nil;
+	if(shareTarget!=NULL){
+		shareContext=((NSGLRenderTarget*)(shareTarget->getRootRenderTarget()))->getContext();
+	}
+	mContext=[[NSOpenGLContext alloc] initWithFormat:mPixelFormat shareContext:shareContext];
 	if(mContext==nil){
 		destroyContext();
 		Error::unknown(Categories::TOADLET_PEEPER,
