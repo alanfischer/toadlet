@@ -51,11 +51,11 @@ using namespace toadlet::pad;
 	#if defined(TOADLET_HAS_UIKIT)
 		extern "C" RenderDevice *new_GLES1RenderDevice();
 		extern "C" RenderDevice *new_GLES2RenderDevice();
-		extern "C" RenderTarget *new_EAGL1RenderTarget(void *display,void *layer,WindowRenderTargetFormat *format);
-		extern "C" RenderTarget *new_EAGL2RenderTarget(void *display,void *layer,WindowRenderTargetFormat *format);
+		extern "C" RenderTarget *new_EAGL1RenderTarget(void *display,void *layer,WindowRenderTargetFormat *format,RenderTarget *shareTarget);
+		extern "C" RenderTarget *new_EAGL2RenderTarget(void *display,void *layer,WindowRenderTargetFormat *format,RenderTarget *shareTarget);
 	#else
 		extern "C" RenderDevice *new_GLRenderDevice();
-		extern "C" RenderTarget *new_NSGLRenderTarget(void *display,void *view,WindowRenderTargetFormat *format);
+		extern "C" RenderTarget *new_NSGLRenderTarget(void *display,void *view,WindowRenderTargetFormat *format,RenderTarget *shareTarget);
 	#endif
 #endif
 #if defined(TOADLET_HAS_OPENAL)

@@ -69,8 +69,8 @@ BOOL safe_wglDeleteContext(HGLRC glrc){
 	}
 }
 
-TOADLET_C_API RenderTarget *new_WGLWindowRenderTarget(void *display,void *window,WindowRenderTargetFormat *format){
-	return new WGLWindowRenderTarget((HWND)window,format);
+TOADLET_C_API RenderTarget *new_WGLWindowRenderTarget(void *display,void *window,WindowRenderTargetFormat *format,RenderTarget *shareTarget){
+	return new WGLWindowRenderTarget((HWND)window,format,shareTarget);
 }
 
 WGLWindowRenderTarget::WGLWindowRenderTarget():WGLRenderTarget(),
@@ -80,7 +80,7 @@ WGLWindowRenderTarget::WGLWindowRenderTarget():WGLRenderTarget(),
 	//mThreadIDs
 {}
 
-WGLWindowRenderTarget::WGLWindowRenderTarget(HWND wnd,WindowRenderTargetFormat *format):WGLRenderTarget(),
+WGLWindowRenderTarget::WGLWindowRenderTarget(HWND wnd,WindowRenderTargetFormat *format,RenderTarget *shareTarget):WGLRenderTarget(),
 	mWnd(NULL)
 	//mPFD,
 	//mThreadContexts,
@@ -92,7 +92,7 @@ WGLWindowRenderTarget::WGLWindowRenderTarget(HWND wnd,WindowRenderTargetFormat *
 		HWND tmpWnd=CreateWindow(TEXT("Static"),NULL,0,0,0,0,0,0,0,0,0);
 		bool result=false;
 		TOADLET_TRY
-			result=createContext(tmpWnd,format,winPixelFormat);
+			result=createContext(tmpWnd,format,shareTarget,winPixelFormat);
 		TOADLET_CATCH_ANONYMOUS(){
 			result=false;
 		}
@@ -137,7 +137,7 @@ WGLWindowRenderTarget::WGLWindowRenderTarget(HWND wnd,WindowRenderTargetFormat *
 	}
 
 	TOADLET_TRY
-		createContext(wnd,format,winPixelFormat);
+		createContext(wnd,format,shareTarget,winPixelFormat);
 	TOADLET_CATCH_ANONYMOUS(){}
 }
 
@@ -147,7 +147,7 @@ void WGLWindowRenderTarget::destroy(){
 	BaseResource::destroy();
 }
 
-bool WGLWindowRenderTarget::createContext(HWND wnd,WindowRenderTargetFormat *format,int winPixelFormat){
+bool WGLWindowRenderTarget::createContext(HWND wnd,WindowRenderTargetFormat *format,RenderTarget *shareTarget,int winPixelFormat){
 	Log::alert(Categories::TOADLET_PEEPER,
 		"WGLWindowRenderTarget::createContext");
 
@@ -209,6 +209,11 @@ bool WGLWindowRenderTarget::createContext(HWND wnd,WindowRenderTargetFormat *for
 		return false;
 	}
 
+	if(shareTarget!=NULL){
+		HGLRC shareGLRC=((WGLRenderTarget*)(shareTarget->getRootRenderTarget()))->getGLRC();
+		wglShareLists(mGLRC,shareGLRC);
+	}
+	
 	if(wglIsExtensionSupported("WGL_EXT_swap_control")){
 		PFNWGLSWAPINTERVALEXTPROC wglSwapIntervalEXT=
 			(PFNWGLSWAPINTERVALEXTPROC)wglGetProcAddress("wglSwapIntervalEXT");

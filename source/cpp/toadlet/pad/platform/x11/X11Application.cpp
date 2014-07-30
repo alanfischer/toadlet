@@ -40,10 +40,10 @@ using namespace toadlet::flick;
 #if defined(TOADLET_HAS_OPENGL)
 	#if defined(TOADLET_PLATFORM_EMSCRIPTEN)
 		extern "C" RenderDevice *new_GLES2RenderDevice();
-		extern "C" RenderTarget *new_EGLWindowRenderTarget(void *display,void *window,WindowRenderTargetFormat *format);
+		extern "C" RenderTarget *new_EGLWindowRenderTarget(void *display,void *window,WindowRenderTargetFormat *format,RenderTarget *shareTarget);
 	#else
 		extern "C" RenderDevice *new_GLRenderDevice();
-		extern "C" RenderTarget *new_GLXWindowRenderTarget(void *display,void *window,WindowRenderTargetFormat *format);
+		extern "C" RenderTarget *new_GLXWindowRenderTarget(void *display,void *window,WindowRenderTargetFormat *format,RenderTarget *shareTarget);
 	#endif
 #endif
 #if defined(TOADLET_HAS_OPENAL)

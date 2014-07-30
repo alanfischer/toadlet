@@ -29,8 +29,8 @@
 namespace toadlet{
 namespace peeper{
 
-TOADLET_C_API RenderTarget *new_EGLWindowRenderTarget(void *display,void *window,WindowRenderTargetFormat *format){
-	return new EGLWindowRenderTarget(display,window,format);
+TOADLET_C_API RenderTarget *new_EGLWindowRenderTarget(void *display,void *window,WindowRenderTargetFormat *format,RenderTarget *shareTarget){
+	return new EGLWindowRenderTarget(display,window,format,shareTarget);
 }
 
 EGLWindowRenderTarget::EGLWindowRenderTarget():
@@ -38,7 +38,7 @@ EGLWindowRenderTarget::EGLWindowRenderTarget():
 	mPixmap(false)
 {}
 
-EGLWindowRenderTarget::EGLWindowRenderTarget(void *display,void *window,WindowRenderTargetFormat *format,bool pixmap):
+EGLWindowRenderTarget::EGLWindowRenderTarget(void *display,void *window,WindowRenderTargetFormat *format,RenderTarget *shareTarget,bool pixmap):
 	mConfig(0),
 	mPixmap(false)
 {
@@ -56,7 +56,7 @@ EGLWindowRenderTarget::EGLWindowRenderTarget(void *display,void *window,WindowRe
 		}
 	#endif
 
-	bool result=createContext(display,window,format,pixmap);
+	bool result=createContext(display,window,format,shareTarget,pixmap);
 
 	#if defined(TOADLET_HAS_GLESEM)
 		if(result==false && !initialized){
@@ -188,6 +188,10 @@ bool EGLWindowRenderTarget::createContext(void *display,void *window,WindowRende
 	// Terminate the list with EGL_NONE
 	configOptions[i++]=EGL_NONE;
 
+	EGLContext shareContext=EGL_NO_CONTEXT;
+	if(shareTarget!=NULL){
+		shareContext=((EGLRenderTarget*)(shareTarget->getRootRenderTarget()))->getEGLContext();
+	}
 	mContext=eglCreateContext(mDisplay,mConfig,EGL_NO_CONTEXT,configOptions);
 	TOADLET_CHECK_EGLERROR("eglCreateContext");
 	

@@ -33,17 +33,17 @@
 namespace toadlet{
 namespace peeper{
 
-TOADLET_C_API RenderTarget *new_GLXWindowRenderTarget(void *display,void *window,WindowRenderTargetFormat *format);
+TOADLET_C_API RenderTarget *new_GLXWindowRenderTarget(void *display,void *window,WindowRenderTargetFormat *format,RenderTarget *shareTarget);
 
 class TOADLET_API GLXWindowRenderTarget:public GLXRenderTarget{
 public:
 	GLXWindowRenderTarget();
-	GLXWindowRenderTarget(Display *display,Window window,WindowRenderTargetFormat *format);
+	GLXWindowRenderTarget(Display *display,Window window,WindowRenderTargetFormat *format,RenderTarget *shareTarget);
 	void destroy();
 
 	RenderTarget *getRootRenderTarget(){return (GLRenderTarget*)this;}
 
-	bool createContext(Display *display,Window window,WindowRenderTargetFormat *format);
+	bool createContext(Display *display,Window window,WindowRenderTargetFormat *format,RenderTarget *shareTarget);
 	bool destroyContext();
 	bool activateAdditionalContext();
 	void deactivateAdditionalContext();

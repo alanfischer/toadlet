@@ -32,12 +32,12 @@
 namespace toadlet{
 namespace peeper{
 
-TOADLET_C_API RenderTarget *new_EGLWindowRenderTarget(void *display,void *window,WindowRenderTargetFormat *format);
+TOADLET_C_API RenderTarget *new_EGLWindowRenderTarget(void *display,void *window,WindowRenderTargetFormat *format,RenderTarget *shareTarget);
 
 class TOADLET_API EGLWindowRenderTarget:public EGLRenderTarget{
 public:
 	EGLWindowRenderTarget();
-	EGLWindowRenderTarget(void *display,void *window,WindowRenderTargetFormat *format,bool pixmap=false);
+	EGLWindowRenderTarget(void *display,void *window,WindowRenderTargetFormat *format,RenderTarget *shareTarget,bool pixmap=false);
 	void destroy();
 
 	virtual RenderTarget *getRootRenderTarget(){return (GLRenderTarget*)this;}
@@ -47,7 +47,7 @@ public:
 	int getWidth() const;
 	int getHeight() const;
 
-	bool createContext(void *display,void *window,WindowRenderTargetFormat *format,bool pixmap=false);
+	bool createContext(void *display,void *window,WindowRenderTargetFormat *format,RenderTarget *shareTarget,bool pixmap=false);
 	bool destroyContext();
 	bool activateAdditionalContext(){return false;}
 	void deactivateAdditionalContext(){}

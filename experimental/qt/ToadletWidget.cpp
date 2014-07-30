@@ -4,23 +4,25 @@
 #endif
 
 #if defined(TOADLET_PLATFORM_WIN32)
-	TOADLET_C_API RenderTarget *new_WGLWindowRenderTarget(void *display,void *window,WindowRenderTargetFormat *format);
-	TOADLET_C_API RenderDevice *new_GLRenderDevice();
-	TOADLET_C_API RenderTarget *new_D3D9WindowRenderTarget(void *display,void *window,WindowRenderTargetFormat *format);
-	TOADLET_C_API RenderDevice *new_D3D9RenderDevice();
-	TOADLET_C_API RenderTarget *new_D3D10WindowRenderTarget(void *display,void *window,WindowRenderTargetFormat *format);
-	TOADLET_C_API RenderDevice *new_D3D10RenderDevice();
-	TOADLET_C_API AudioDevice *new_MMAudioDevice();
-	TOADLET_C_API AudioDevice *new_ALAudioDevice();
+	TOADLET_C_API toadlet::RenderTarget *new_WGLWindowRenderTarget(void *display,void *window,toadlet::WindowRenderTargetFormat *format,toadlet::RenderTarget *shareTarget);
+	TOADLET_C_API toadlet::RenderDevice *new_GLRenderDevice();
+	TOADLET_C_API toadlet::RenderTarget *new_D3D9WindowRenderTarget(void *display,void *window,toadlet::WindowRenderTargetFormat *format,toadlet::RenderTarget *shareTarget);
+	TOADLET_C_API toadlet::RenderDevice *new_D3D9RenderDevice();
+	TOADLET_C_API toadlet::RenderTarget *new_D3D10WindowRenderTarget(void *display,void *window,toadlet::WindowRenderTargetFormat *format,toadlet::RenderTarget *shareTarget);
+	TOADLET_C_API toadlet::RenderDevice *new_D3D10RenderDevice();
+	TOADLET_C_API toadlet::AudioDevice *new_MMAudioDevice();
+	TOADLET_C_API toadlet::AudioDevice *new_ALAudioDevice();
 #elif defined(TOADLET_PLATFORM_OSX)
-	TOADLET_C_API RenderTarget *new_NSGLRenderTarget(void *display,void *view,WindowRenderTargetFormat *format);
-    TOADLET_C_API RenderDevice *new_GLRenderDevice();
-	TOADLET_C_API AudioDevice *new_ALAudioDevice();
+	TOADLET_C_API toadlet::RenderTarget *new_NSGLRenderTarget(void *display,void *view,toadlet::WindowRenderTargetFormat *format,toadlet::RenderTarget *shareTarget);
+    TOADLET_C_API toadlet::RenderDevice *new_GLRenderDevice();
+	TOADLET_C_API toadlet::AudioDevice *new_ALAudioDevice();
 #elif defined(TOADLET_PLATFORM_POSIX)
-	TOADLET_C_API RenderTarget *new_GLXWindowRenderTarget(void *display,void *window,WindowRenderTargetFormat *format);
-    TOADLET_C_API RenderDevice *new_GLRenderDevice();
-	TOADLET_C_API AudioDevice *new_ALAudioDevice();
+	TOADLET_C_API toadlet::RenderTarget *new_GLXWindowRenderTarget(void *display,void *window,toadlet::WindowRenderTargetFormat *format,toadlet::RenderTarget *shareTarget);
+    TOADLET_C_API toadlet::RenderDevice *new_GLRenderDevice();
+	TOADLET_C_API toadlet::AudioDevice *new_ALAudioDevice();
 #endif
+
+namespace toadlet{
 
 ToadletWidget::ToadletWidget(QWidget *parent):QWidget(parent),
 	renderTarget(NULL),
@@ -49,7 +51,7 @@ ToadletWidget::~ToadletWidget(){
 	}
 }
 
-void ToadletWidget::create(bool render,bool audio){
+void ToadletWidget::create(bool render,bool audio,RenderTarget *shareTarget){
 	WindowRenderTargetFormat::ptr format(new WindowRenderTargetFormat(TextureFormat::Format_RGB_5_6_5,16));
 	#if defined(TOADLET_DEBUG)
 		format->debug=true;
@@ -61,7 +63,7 @@ void ToadletWidget::create(bool render,bool audio){
 			#if 0
 				if(result==false){
 					TOADLET_TRY
-						renderTarget=new_D3D10WindowRenderTarget(NULL,winId(),format);
+						renderTarget=new_D3D10WindowRenderTarget(NULL,winId(),format,shareTarget);
 						renderDevice=new_D3D10RenderDevice();
 						if(renderTarget!=NULL && renderDevice!=NULL){
 							result=renderDevice->create(renderTarget,NULL);
@@ -75,7 +77,7 @@ void ToadletWidget::create(bool render,bool audio){
 			#if 0
 				if(result==false){
 					TOADLET_TRY
-						renderTarget=new_D3D9WindowRenderTarget(NULL,winId(),format);
+						renderTarget=new_D3D9WindowRenderTarget(NULL,winId(),format,shareTarget);
 						renderDevice=new_D3D9RenderDevice();
 						if(renderTarget!=NULL && renderDevice!=NULL){
 							result=renderDevice->create(renderTarget,NULL);
@@ -89,7 +91,7 @@ void ToadletWidget::create(bool render,bool audio){
 			#if 1
 				if(result==false){
 					TOADLET_TRY
-						renderTarget=new_WGLWindowRenderTarget(NULL,winId(),format);
+						renderTarget=new_WGLWindowRenderTarget(NULL,(void*)winId(),format,shareTarget);
 						renderDevice=new_GLRenderDevice();
 						if(renderTarget!=NULL && renderDevice!=NULL){
 							result=renderDevice->create(renderTarget,NULL);
@@ -103,7 +105,7 @@ void ToadletWidget::create(bool render,bool audio){
 		#elif defined(TOADLET_PLATFORM_OSX)
 			if(result==false){
                 TOADLET_TRY
-                    renderTarget=new_NSGLRenderTarget(NULL,(void*)winId(),format);
+                    renderTarget=new_NSGLRenderTarget(NULL,(void*)winId(),format,shareTarget);
                     renderDevice=new_GLRenderDevice();
                     if(renderTarget!=NULL && renderDevice!=NULL){
                         result=renderDevice->create(renderTarget,NULL);
@@ -116,7 +118,7 @@ void ToadletWidget::create(bool render,bool audio){
 		#elif defined(TOADLET_PLATFORM_POSIX)
 			if(result==false){
 				TOADLET_TRY
-					renderTarget=new_GLXWindowRenderTarget(x11Info().display(),(void*)winId(),format);
+					renderTarget=new_GLXWindowRenderTarget(x11Info().display(),(void*)winId(),format,shareTarget);
 					renderDevice=new_GLRenderDevice();
 					if(renderTarget!=NULL && renderDevice!=NULL){
 						result=renderDevice->create(renderTarget,NULL);
@@ -177,4 +179,6 @@ void ToadletWidget::create(bool render,bool audio){
 			}
 		#endif
 	}
+}
+
 }
