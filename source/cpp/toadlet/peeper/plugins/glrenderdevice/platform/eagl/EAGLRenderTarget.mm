@@ -98,7 +98,7 @@ bool EAGLRenderTarget::createContext(CAEAGLLayer *drawable,WindowRenderTargetFor
 	}
 	
 	if(shareTarget!=NULL){
-		EAGLSharegroup *sharegroup=((EAGLRenderTarget*)(GLRenderTarget*)(shareTarget->getRootRenderTarget()))->mContext.sharegroup
+		EAGLSharegroup *sharegroup=((EAGLRenderTarget*)(GLRenderTarget*)(shareTarget->getRootRenderTarget()))->mContext.sharegroup;
 		mContext=[[EAGLContext alloc] initWithAPI:api sharegroup:sharegroup];
 	}
 	else{
