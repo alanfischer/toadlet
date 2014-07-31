@@ -1,7 +1,4 @@
 #include "ToadletWidget.h"
-#if defined (TOADLET_PLATFORM_POSIX)
-	#include <QX11Info>
-#endif
 
 #if defined(TOADLET_PLATFORM_WIN32)
 	TOADLET_C_API toadlet::RenderTarget *new_WGLWindowRenderTarget(void *display,void *window,toadlet::WindowRenderTargetFormat *format,toadlet::RenderTarget *shareTarget);
@@ -118,7 +115,7 @@ void ToadletWidget::create(bool render,bool audio,RenderTarget *shareTarget){
 		#elif defined(TOADLET_PLATFORM_POSIX)
 			if(result==false){
 				TOADLET_TRY
-					renderTarget=new_GLXWindowRenderTarget(x11Info().display(),(void*)winId(),format,shareTarget);
+					renderTarget=new_GLXWindowRenderTarget(NULL,(void*)winId(),format,shareTarget);
 					renderDevice=new_GLRenderDevice();
 					if(renderTarget!=NULL && renderDevice!=NULL){
 						result=renderDevice->create(renderTarget,NULL);

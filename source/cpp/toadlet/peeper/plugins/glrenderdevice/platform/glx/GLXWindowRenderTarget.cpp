@@ -34,12 +34,14 @@ TOADLET_C_API RenderTarget *new_GLXWindowRenderTarget(void *display,void *window
 	return new GLXWindowRenderTarget((Display*)display,(Window)window,format,shareTarget);
 }
 
-GLXWindowRenderTarget::GLXWindowRenderTarget()
+GLXWindowRenderTarget::GLXWindowRenderTarget():
+	mOwnsDisplay(false)
 	//mThreadContexts,
 	//mThreadIDs
 {}
 
-GLXWindowRenderTarget::GLXWindowRenderTarget(Display *display,Window window,WindowRenderTargetFormat *format,RenderTarget *shareTarget)
+GLXWindowRenderTarget::GLXWindowRenderTarget(Display *display,Window window,WindowRenderTargetFormat *format,RenderTarget *shareTarget):
+	mOwnsDisplay(false)
 	//mThreadContexts,
 	//mThreadIDs
 {
@@ -53,8 +55,13 @@ void GLXWindowRenderTarget::destroy(){
 }
 
 bool GLXWindowRenderTarget::createContext(Display *display,Window window,WindowRenderTargetFormat *format,RenderTarget *shareTarget){
-	mDrawable=window;
 	mDisplay=display;
+	if(mDisplay==NULL){
+		mDisplay=XOpenDisplay(NULL);
+		mOwnsDisplay=true;
+	}
+	
+	mDrawable=window;
 
 	XWindowAttributes attributes;
 	XGetWindowAttributes(display,window,&attributes);
@@ -124,6 +131,12 @@ bool GLXWindowRenderTarget::destroyContext(){
 		glXMakeCurrent(mDisplay,None,NULL);
 		glXDestroyContext(mDisplay,mContext);
 		mContext=NULL;
+	}
+	
+	if(mOwnsDisplay && mDisplay!=NULL){
+		XCloseDisplay(mDisplay);
+		mDisplay=NULL;
+		mOwnsDisplay=false;
 	}
 
 	return true;
