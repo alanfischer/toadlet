@@ -56,6 +56,7 @@ public:
 	int getHeight() const;
 
 protected:
+	bool mOwnsDisplay;
 	Collection<GLXContext> mThreadContexts;
 	Collection<int> mThreadIDs;
 };
