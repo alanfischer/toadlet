@@ -55,11 +55,11 @@ void GLXWindowRenderTarget::destroy(){
 }
 
 bool GLXWindowRenderTarget::createContext(Display *display,Window window,WindowRenderTargetFormat *format,RenderTarget *shareTarget){
-	mDisplay=display;
-	if(mDisplay==NULL){
-		mDisplay=XOpenDisplay(NULL);
+	if(display==NULL){
+		display=XOpenDisplay(NULL);
 		mOwnsDisplay=true;
 	}
+	mDisplay=display;
 	
 	mDrawable=window;
 
