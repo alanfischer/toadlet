@@ -53,6 +53,8 @@ void ToadletWidget::create(bool render,bool audio,RenderTarget *shareTarget){
 	#if defined(TOADLET_DEBUG)
 		format->debug=true;
 	#endif
+	int renderOptions=0;
+	int audioOptions=0;
 
 	if(render){
 		bool result=false;
@@ -63,7 +65,7 @@ void ToadletWidget::create(bool render,bool audio,RenderTarget *shareTarget){
 						renderTarget=new_D3D10WindowRenderTarget(NULL,winId(),format,shareTarget);
 						renderDevice=new_D3D10RenderDevice();
 						if(renderTarget!=NULL && renderDevice!=NULL){
-							result=renderDevice->create(renderTarget,NULL);
+							result=renderDevice->create(renderTarget,renderOptions);
 						}
 						else{
 							result=false;
@@ -77,7 +79,7 @@ void ToadletWidget::create(bool render,bool audio,RenderTarget *shareTarget){
 						renderTarget=new_D3D9WindowRenderTarget(NULL,winId(),format,shareTarget);
 						renderDevice=new_D3D9RenderDevice();
 						if(renderTarget!=NULL && renderDevice!=NULL){
-							result=renderDevice->create(renderTarget,NULL);
+							result=renderDevice->create(renderTarget,renderOptions);
 						}
 						else{
 							result=false;
@@ -91,7 +93,7 @@ void ToadletWidget::create(bool render,bool audio,RenderTarget *shareTarget){
 						renderTarget=new_WGLWindowRenderTarget(NULL,(void*)winId(),format,shareTarget);
 						renderDevice=new_GLRenderDevice();
 						if(renderTarget!=NULL && renderDevice!=NULL){
-							result=renderDevice->create(renderTarget,NULL);
+							result=renderDevice->create(renderTarget,renderOptions);
 						}
 						else{
 							result=false;
@@ -105,7 +107,7 @@ void ToadletWidget::create(bool render,bool audio,RenderTarget *shareTarget){
                     renderTarget=new_NSGLRenderTarget(NULL,(void*)winId(),format,shareTarget);
                     renderDevice=new_GLRenderDevice();
                     if(renderTarget!=NULL && renderDevice!=NULL){
-                        result=renderDevice->create(renderTarget,NULL);
+                        result=renderDevice->create(renderTarget,renderOptions);
                     }
                     else{
                         result=false;
@@ -118,7 +120,7 @@ void ToadletWidget::create(bool render,bool audio,RenderTarget *shareTarget){
 					renderTarget=new_GLXWindowRenderTarget(NULL,(void*)winId(),format,shareTarget);
 					renderDevice=new_GLRenderDevice();
 					if(renderTarget!=NULL && renderDevice!=NULL){
-						result=renderDevice->create(renderTarget,NULL);
+						result=renderDevice->create(renderTarget,renderOptions);
 					}
 					else{
 						result=false;
@@ -141,7 +143,7 @@ void ToadletWidget::create(bool render,bool audio,RenderTarget *shareTarget){
 					audioDevice=new_ALAudioDevice();
 					if(audioDevice!=NULL){
 						TOADLET_TRY
-							result=audioDevice->create(NULL);
+							result=audioDevice->create(audioOptions);
 						TOADLET_CATCH_ANONYMOUS(){result=false;}
 					}
 				}
@@ -151,7 +153,7 @@ void ToadletWidget::create(bool render,bool audio,RenderTarget *shareTarget){
 					audioDevice=new_MMAudioDevice();
 					if(audioDevice!=NULL){
 						TOADLET_TRY
-							result=audioDevice->create(NULL);
+							result=audioDevice->create(audioOptions);
 						TOADLET_CATCH_ANONYMOUS(){result=false;}
 					}
 				}
@@ -161,7 +163,7 @@ void ToadletWidget::create(bool render,bool audio,RenderTarget *shareTarget){
                 audioDevice=new_ALAudioDevice();
                 if(audioDevice!=NULL){
                     TOADLET_TRY
-                        result=audioDevice->create(NULL);
+                        result=audioDevice->create(audioOptions);
                     TOADLET_CATCH_ANONYMOUS(){result=false;}
                 }
             }
@@ -170,7 +172,7 @@ void ToadletWidget::create(bool render,bool audio,RenderTarget *shareTarget){
 				audioDevice=new_ALAudioDevice();
 				if(audioDevice!=NULL){
 					TOADLET_TRY
-						result=audioDevice->create(NULL);
+						result=audioDevice->create(audioOptions);
 					TOADLET_CATCH_ANONYMOUS(){result=false;}
 				}
 			}
