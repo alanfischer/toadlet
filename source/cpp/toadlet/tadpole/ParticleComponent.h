@@ -148,6 +148,7 @@ protected:
 	Engine *mEngine;
 	Scene *mScene;
 	int mParticleType;
+	scalar mParticleScale;
 	int mBeamLength;
 	int mBeamCount;
 	int mBeamType;

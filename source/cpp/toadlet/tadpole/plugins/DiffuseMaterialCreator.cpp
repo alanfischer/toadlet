@@ -198,10 +198,89 @@ DiffuseMaterialCreator::DiffuseMaterialCreator(Engine *engine){
 		"}\n"
 	};
 
-	const char *pointSpriteFragmentCode[]={
-	#if defined(TOADLET_HAS_GLFIXED)
-		"#version 120\n"
+	const char *pointSpriteVertexCode[]={
+		"attribute vec4 POSITION;\n"
+		"attribute vec3 NORMAL;\n"
+		"attribute vec4 COLOR;\n"
+		"attribute vec2 TEXCOORD0;\n"
+		"varying vec4 color;\n"
+		"varying float fog;\n"
+		"varying vec2 texCoord;\n"
 
+		"uniform mat4 modelViewProjectionMatrix;\n"
+		"uniform mat4 modelViewMatrix;\n"
+		"uniform mat4 normalMatrix;\n"
+		"uniform vec4 materialDiffuseColor;\n"
+		"uniform vec4 materialAmbientColor;\n"
+		"uniform float materialTrackColor;\n"
+		"uniform vec4 lightViewPosition;\n"
+		"uniform vec4 lightColor;\n"
+		"uniform vec4 ambientColor;\n"
+		"uniform float materialLight;\n"
+		"uniform mat4 textureMatrix;\n"
+		"uniform float fogDensity;\n"
+		"uniform vec2 fogDistance;\n"
+		"uniform float pointSize;\n"
+		"unform vec4 viewport;\n"
+
+		"void main(){\n"
+			"gl_Position=modelViewProjectionMatrix * POSITION;\n"
+			"vec3 viewNormal=normalize(normalMatrix * vec4(NORMAL,0.0)).xyz;\n"
+			"float lightIntensity=clamp(-dot(lightViewPosition.xyz,viewNormal),0.0,1.0);\n"
+			"vec4 localLightColor=(lightIntensity*lightColor*materialLight)+(1.0-materialLight);\n"
+			"color=clamp(localLightColor*materialDiffuseColor + ambientColor*materialAmbientColor,0.0,1.0);\n"
+			"color=COLOR*materialTrackColor+color*(1.0-materialTrackColor);\n"
+			"texCoord=(textureMatrix * vec4(TEXCOORD0,0.0,1.0)).xy;\n"
+			"fog=clamp(1.0-fogDensity*(gl_Position.z-fogDistance.x)/(fogDistance.y-fogDistance.x),0.0,1.0);\n"
+
+			"vec4 eyePos=modelViewMatrix * vec4(POSITION.x, POSITION.y, 0.5, 1);\n"
+			"float dist=length(eyePos);\n"
+			"gl_PointSize=pointSize * viewport.w * inversesqrt(1.0 + 1.0*dist + 1.0*dist*dist);\n"
+		"}",
+
+
+
+		"struct VIN{\n"
+			"float4 position : POSITION;\n"
+			"float3 normal : NORMAL;\n"
+			"float4 color : COLOR;\n"
+			"float2 texCoord: TEXCOORD0;\n"
+		"};\n"
+		"struct VOUT{\n"
+			"float4 position : SV_POSITION;\n"
+			"float4 color : COLOR;\n"
+			"float fog: FOG;\n"
+			"float2 texCoord: TEXCOORD0;\n"
+		"};\n"
+
+		"float4x4 modelViewProjectionMatrix;\n"
+		"float4x4 normalMatrix;\n"
+		"float4 materialDiffuseColor;\n"
+		"float4 materialAmbientColor;\n"
+		"float materialTrackColor;\n"
+		"float4 lightViewPosition;\n"
+		"float4 lightColor;\n"
+		"float4 ambientColor;\n"
+		"float materialLight;\n"
+		"float4x4 textureMatrix;\n"
+		"float fogDensity;\n"
+		"float2 fogDistance;\n"
+
+		"VOUT main(VIN vin){\n"
+			"VOUT vout;\n"
+			"vout.position=mul(modelViewProjectionMatrix,vin.position);\n"
+			"float3 viewNormal=normalize(mul(normalMatrix,vin.normal));\n"
+			"float lightIntensity=clamp(-dot(lightViewPosition,viewNormal),0.0,1.0);\n"
+			"float4 localLightColor=lightIntensity*lightColor*materialLight+(1.0-materialLight);\n"
+			"vout.color=clamp(localLightColor*materialDiffuseColor + ambientColor*materialAmbientColor,0.0,1.0);\n"
+			"vout.color=vin.color*materialTrackColor+vout.color*(1.0-materialTrackColor);\n"
+			"vout.texCoord=mul(textureMatrix,float4(vin.texCoord,0.0,1.0));\n "
+			"vout.fog=clamp(1.0-fogDensity*(vout.position.z-fogDistance.x)/(fogDistance.y-fogDistance.x),0.0,1.0);\n"
+			"return vout;\n"
+		"}"
+	};
+
+	const char *pointSpriteFragmentCode[]={
 		"#if defined(GL_ES)\n"
 			"precision mediump float;\n"
 		"#endif\n"
@@ -217,9 +296,6 @@ DiffuseMaterialCreator::DiffuseMaterialCreator(Engine *engine){
 			"vec4 fragColor=color*(texture2D(tex,gl_PointCoord)+(1.0-textureSet));\n"
 			"gl_FragColor=mix(fogColor,fragColor,fog);\n"
 		"}\n",
-	#else
-		(char*)NULL,
-	#endif
 
 	
 
@@ -251,6 +327,9 @@ DiffuseMaterialCreator::DiffuseMaterialCreator(Engine *engine){
 		mPointSpriteGeometryShader=mEngine->getShaderManager()->createShader(Shader::ShaderType_GEOMETRY,profiles,pointSpriteGeometryCode,2);
 	TOADLET_CATCH_ANONYMOUS(){}
 	TOADLET_TRY
+		mPointSpriteVertexShader=mEngine->getShaderManager()->createShader(Shader::ShaderType_VERTEX,profiles,pointSpriteVertexCode,2);
+	TOADLET_CATCH_ANONYMOUS(){}
+	TOADLET_TRY
 		mPointSpriteFragmentShader=mEngine->getShaderManager()->createShader(Shader::ShaderType_FRAGMENT,profiles,pointSpriteFragmentCode,2);
 	TOADLET_CATCH_ANONYMOUS(){}
 
@@ -262,8 +341,8 @@ DiffuseMaterialCreator::DiffuseMaterialCreator(Engine *engine){
 
 	mPointShaderState=mEngine->getMaterialManager()->createShaderState();
 	if(mPointShaderState!=NULL){
-		mPointShaderState->setShader(Shader::ShaderType_VERTEX,mDiffuseVertexShader);
 		mPointShaderState->setShader(Shader::ShaderType_GEOMETRY,mPointSpriteGeometryShader);
+		mPointShaderState->setShader(Shader::ShaderType_VERTEX,mPointSpriteVertexShader);
 		mPointShaderState->setShader(Shader::ShaderType_FRAGMENT,mPointSpriteFragmentShader);
 	}
 }
@@ -280,6 +359,10 @@ void DiffuseMaterialCreator::destroy(){
 	if(mPointSpriteGeometryShader!=NULL){
 		mPointSpriteGeometryShader->destroy();
 		mPointSpriteGeometryShader=NULL;
+	}
+	if(mPointSpriteVertexShader!=NULL){
+		mPointSpriteVertexShader->destroy();
+		mPointSpriteVertexShader=NULL;
 	}
 	if(mPointSpriteFragmentShader!=NULL){
 		mPointSpriteFragmentShader->destroy();
@@ -387,6 +470,7 @@ Material::ptr DiffuseMaterialCreator::createPointSpriteMaterial(Texture *texture
 		RenderPass::ptr pass=shaderPath->addPass(renderState,mPointShaderState);
 
 		pass->addVariable("modelViewProjectionMatrix",RenderVariable::ptr(new MVPMatrixVariable()),Material::Scope_RENDERABLE);
+		pass->addVariable("modelViewMatrix",RenderVariable::ptr(new MVMatrixVariable()),Material::Scope_RENDERABLE);
 		pass->addVariable("normalMatrix",RenderVariable::ptr(new NormalMatrixVariable()),Material::Scope_RENDERABLE);
 		pass->addVariable("lightViewPosition",RenderVariable::ptr(new LightViewPositionVariable()),Material::Scope_MATERIAL);
 		pass->addVariable("lightColor",RenderVariable::ptr(new LightDiffuseVariable()),Material::Scope_MATERIAL);

@@ -85,6 +85,27 @@
 		#endif
 	}
 	#define TOADLET_HAS_GLEW
+	#if defined(GL_VERSION_4_1)
+		#define TOADLET_HAS_GL_41
+	#endif
+	#if defined(GL_VERSION_4_0)
+		#define TOADLET_HAS_GL_40
+	#endif
+	#if defined(GL_VERSION_3_3)
+		#define TOADLET_HAS_GL_33
+	#endif
+	#if defined(GL_VERSION_3_2)
+		#define TOADLET_HAS_GL_32
+	#endif
+	#if defined(GL_VERSION_3_1)
+		#define TOADLET_HAS_GL_31
+	#endif
+	#if defined(GL_VERSION_3_0)
+		#define TOADLET_HAS_GL_30
+	#endif
+	#if defined(GL_VERSION_2_1)
+		#define TOADLET_HAS_GL_21
+	#endif
 	#if defined(GL_VERSION_2_1)
 		#define TOADLET_HAS_GL_21
 	#endif

@@ -13,99 +13,6 @@ namespace randisle{
 
 static const scalar epsilon=0.001f;
 
-class SnowComponent:public BaseComponent{
-public:
-	SnowComponent(ParticleComponent *particles,int skip):
-		mParticles(particles),
-		mSkip(skip),
-		mNext(0)
-	{
-		mSnowData.resize(mParticles->getNumParticles());
-		for(int i=0;i<mParticles->getNumParticles();++i){
-			ParticleComponent::Particle *p=mParticles->getParticle(i);
-			mSnowData[i].oldPosition=mSnowData[i].newPosition=Vector3(p->x,p->y,p->z);
-		}
-	}
-
-	void frameUpdate(int dt,int scope){
-		Scene *scene=mParent->getScene();
-
-		for(int i=0;i<mParticles->getNumParticles();i++){
-			ParticleComponent::Particle *p=mParticles->getParticle(i);
-
-			Vector3 position(p->x,p->y,p->z);
-
-			float t=float((i-mNext+mSkip)%mSkip)/float(mSkip);
-			t = 1.0 - (t - scene->getLogicFraction()/float(mSkip));
-			if(mSnowData[i].traceTime>0){
-				t = Math::clamp(0, Math::ONE, t / mSnowData[i].traceTime);
-			}
-			Math::lerp(position,mSnowData[i].oldPosition,mSnowData[i].newPosition,t);
-
-			p->x=position.x;p->y=position.y;p->z=position.z;
-		}
-	}
-
-	void logicUpdate(int dt,int scope){
-		Scene *scene=mParent->getScene();
-
-		for(int i=0;i<mParticles->getNumParticles();i++){
-			ParticleComponent::Particle *p=mParticles->getParticle(i);
-
-			Vector3 position(p->x,p->y,p->z);
-			Vector3 velocity(p->vx,p->vy,p->vz);
-
-			float t=float((i-mNext+mSkip)%mSkip)/float(mSkip);
-			t = 1.0 - t;
-			if(mSnowData[i].traceTime>0){
-				t = Math::clamp(0, Math::ONE, t / mSnowData[i].traceTime);
-			}
-			Math::lerp(position,mSnowData[i].oldPosition,mSnowData[i].newPosition,t);
-
-			if((i%mSkip)==mNext){
-				Segment segment;
-				segment.origin=position;
-				segment.direction=velocity*Math::fromMilli(dt) * mSkip;
-
-				PhysicsCollision result;
-				scene->getPhysicsManager()->traceSegment(result,segment,-1,NULL);
-				mSnowData[i].traceTime=result.time;
-
-				mSnowData[i].oldPosition=mSnowData[i].newPosition;
-
-				if(result.time<1){
-					mSnowData[i].newPosition=result.point;
-				}
-				else{
-					mSnowData[i].newPosition=position+segment.direction;
-				}
-			}
-
-			p->x=position.x;p->y=position.y;p->z=position.z;
-			p->vx=velocity.x;p->vy=velocity.y;p->vz=velocity.z;
-		}
-
-		mNext++;
-		if(mNext>=mSkip){
-			mNext=0;
-		}
-	}
-
-protected:
-	class SnowData{
-	public:
-		SnowData():traceTime(0){}
-
-		Vector3 oldPosition;
-		Vector3 newPosition;
-		scalar traceTime;
-	};
-
-	ParticleComponent::ptr mParticles;
-	Collection<SnowData> mSnowData;
-	int mSkip,mNext;
-};
-
 RandIsle::RandIsle(Application *app,String path):
 	mMouseButtons(0),
 	mXJoy(0),mYJoy(0),
@@ -125,6 +32,7 @@ void RandIsle::create(){
 	Log::debug("RandIsle::create");
 
 	mEngine=mApp->getEngine();
+	mEngine->setHasMaximumShader(false);
 	mEngine->getArchiveManager()->addDirectory(mPath);
 
 	resources=new Resources(mEngine,this);
@@ -279,14 +187,6 @@ void RandIsle::resourceCacheReady(ResourceCache *cache){
 	mFollower->setTarget(mPlayer);
 	mTerrain->setUpdateTargetBias(128/(getPatchSize()*getPatchScale().x));
 
-if(false){
-Node::ptr node=new Node(mScene);
-CameraComponent::ptr cc=new CameraComponent(mCamera);
-node->attach(cc);
-mPlayer->attach(node);
-cc->setLookDir(Vector3(0,0,0),Vector3(0,1,0),Vector3(0,0,1));
-}
-
 	Log::alert("Adding props");
 	mProps=new Node(mScene);
 	for(int i=0;i<resources->numProps;++i){
@@ -314,24 +214,6 @@ cc->setLookDir(Vector3(0,0,0),Vector3(0,1,0),Vector3(0,0,1));
 		joyDevice->setListener(this);
 		joyDevice->start();
 	}
-/*
-	Node::ptr snow=new Node(mScene);
-	{
-		ParticleComponent::ptr particles=new ParticleComponent(mScene);
-		particles->setNumParticles(2000,ParticleComponent::ParticleType_SPRITE,1);
-		particles->setMaterial(resources->acorn);
-		Random r;
-		for(int i=0;i<particles->getNumParticles();++i){
-			ParticleComponent::Particle *p=particles->getParticle(i);
-			p->x=r.nextFloat(-100,100);p->y=r.nextFloat(-100,100);p->z=200;
-			p->vx=r.nextFloat(-1,1);p->vy=r.nextFloat(-1,1);p->vz=r.nextFloat(0,-15);
-		}
-		snow->attach(particles);
-
-		snow->attach(new SnowComponent(particles,50));
-	}
-	mScene->getRoot()->attach(snow);
-*/
 }
 
 void RandIsle::destroy(){
@@ -651,7 +533,7 @@ void RandIsle::updatePredictedPath(PathClimber *climber,int dt){
 
 		float dt=1.0;
 		int np=0,i=0;
-		for(i=0;i<vba.getSize()-2 && vertex!=NULL && predictTime>0;i+=2){
+		for(i=0;i<vba.getSize()-2 && vertex!=NULL && predictTime>0 && np<mPathSequence.size();i+=2){
 			vertex->getPoint(point,time);
 			Math::add(point,climber->getMounted()->getWorldTranslate());
 			vertex->getOrientation(tangent,normal,scale,time);
@@ -671,12 +553,13 @@ void RandIsle::updatePredictedPath(PathClimber *climber,int dt){
 			oldTime=time;
 			time+=dt*direction;
 
-			if(skipCheck==false && climber->passedJunction(direction,oldTime,time,nextTime)){
+			bool passed=climber->passedJunction(direction,oldTime,time,nextTime);
+			if(skipCheck==false && passed){
 				// Make sure we get a point on extactly each junction
 				predictTime+=Math::abs(time-nextTime); 
 				time=nextTime;
 			}
-			else if(skipCheck==true || climber->passedJunction(direction,oldTime,time,nextTime)){
+			else if(skipCheck==true || passed){
 				scalar extraTime=Math::abs(time-nextTime);
 				PathVertex *nextVertex=mPathSequence[np]->getVertex(mPathSequence[np]->getVertex(false)==vertex);
 				np++;
@@ -688,6 +571,9 @@ void RandIsle::updatePredictedPath(PathClimber *climber,int dt){
 					time+=direction*extraTime;
 					// We have to check the direction again, in case we passed our destination with the extraTime
 					direction=(nextTime>time)?1:-1;
+				}
+				else{
+ 					break;
 				}
 				vertex=nextVertex;
 			}
@@ -970,6 +856,8 @@ scalar RandIsle::pathValue(float ty){
 }
 
 }
+
+using namespace randisle;
 
 Applet *createApplet(Application *app){
 	String path;

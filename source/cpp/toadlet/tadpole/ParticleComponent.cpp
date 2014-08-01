@@ -36,6 +36,7 @@ ParticleComponent::ParticleComponent(Scene *scene):
 	//mParticles,
 
 	mParticleType(0),
+	mParticleScale(Math::ONE),
 	mBeamLength(0),
 	mBeamCount(0),
 	mBeamType(0),
@@ -111,6 +112,7 @@ bool ParticleComponent::setNumParticles(int numParticles,int particleType,scalar
 	mParticles.resize(numParticles);
 
 	mParticleType=particleType;
+	mParticleScale=scale;
 	mBeamLength=particleType&~ParticleType_FLAGS;
 	if((particleType&ParticleType_BIT_SERIES)!=0){
 		if((particleType&ParticleType_BIT_LOOP)!=0){
@@ -150,6 +152,12 @@ bool ParticleComponent::setNumParticles(int numParticles,int particleType,scalar
 	}
 	for(i=0;i<numParticles;++i){
 		mParticles[i].scale=scale;
+	}
+
+	GeometryState state;
+	if(mMaterial!=NULL && mMaterial->getRenderState()->getGeometryState(state)){
+		state.size=mParticleScale;
+		mMaterial->getRenderState()->setGeometryState(state);
 	}
 
 	createVertexData();
@@ -203,6 +211,12 @@ void ParticleComponent::setSorted(bool sorted){
 
 void ParticleComponent::setMaterial(Material *material){
 	mMaterial=material;
+
+	GeometryState state;
+	if(mMaterial!=NULL && mMaterial->getRenderState()->getGeometryState(state)){
+		state.size=mParticleScale;
+		mMaterial->getRenderState()->setGeometryState(state);
+	}
 
 	if(mSharedRenderState!=NULL){
 		mMaterial=mEngine->getMaterialManager()->createSharedMaterial(mMaterial,mSharedRenderState);
