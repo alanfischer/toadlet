@@ -221,7 +221,7 @@ DiffuseMaterialCreator::DiffuseMaterialCreator(Engine *engine){
 		"uniform float fogDensity;\n"
 		"uniform vec2 fogDistance;\n"
 		"uniform float pointSize;\n"
-		"unform vec4 viewport;\n"
+		"uniform vec4 viewport;\n"
 
 		"void main(){\n"
 			"gl_Position=modelViewProjectionMatrix * POSITION;\n"
