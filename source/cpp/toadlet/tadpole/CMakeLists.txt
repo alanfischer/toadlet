@@ -90,6 +90,7 @@ set (TADPOLE_PLUGINS_SRC
 	plugins/GridMeshCreator.cpp
 	plugins/GeoSphereMeshCreator.cpp
 	plugins/NormalizationTextureCreator.cpp
+	plugins/PointTextureCreator.cpp
 	plugins/SkyBoxMeshCreator.cpp
 	plugins/SkyDomeMeshCreator.cpp
 	plugins/SphereMeshCreator.cpp
@@ -328,6 +329,7 @@ set (TADPOLE_PLUGINS_HDR
 	plugins/GridMeshCreator.h
 	plugins/GeoSphereMeshCreator.h
 	plugins/NormalizationTextureCreator.h
+	plugins/PointTextureCreator.h
 	plugins/SkyBoxMeshCreator.h
 	plugins/SkyDomeMeshCreator.h
 	plugins/TorusMeshCreator.h

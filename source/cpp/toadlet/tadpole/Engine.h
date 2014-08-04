@@ -114,6 +114,7 @@ public:
 	inline ResourceManager *getSpriteModelManager() const{return mSpriteModelManager;}
 
 	Texture::ptr createNormalizationTexture(int size);
+	Texture::ptr createPointTexture(TextureFormat *format,float colorOffset,float colorFactor,float alphaOffset,float alphaFactor,float falloff);
 
 	Material::ptr createDiffuseMaterial(Texture *texture,RenderState *renderState=NULL);
 	Material::ptr createPointSpriteMaterial(Texture *texture,scalar size,bool attenuated);
@@ -155,7 +156,7 @@ protected:
 	ResourceManager::ptr mStudioModelManager;
 	ResourceManager::ptr mSpriteModelManager;
 
-	ResourceCreator::ptr mNormalizationCreator;
+	ResourceCreator::ptr mNormalizationCreator,mPointCreator;
 	ResourceCreator::ptr mDiffuseCreator,mSkyBoxMaterialCreator,mWaterMaterialCreator;
 	ResourceCreator::ptr mAABoxCreator,mSphereCreator,mTorusCreator,mGridCreator,mSkyBoxCreator,mSkyDomeCreator;
 };

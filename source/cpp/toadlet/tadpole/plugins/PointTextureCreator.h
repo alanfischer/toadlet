@@ -23,43 +23,38 @@
  *
  ********** Copyright header - do not remove **********/
 
-#ifndef TOADLET_TADPOLE_DECALSHADOWRENDERMANAGER_H
-#define TOADLET_TADPOLE_DECALSHADOWRENDERMANAGER_H
+#ifndef TOADLET_TADPOLE_POINTTEXTURECREATOR_H
+#define TOADLET_TADPOLE_POINTTEXTURECREATOR_H
 
-#include "SimpleRenderManager.h"
+#include <toadlet/tadpole/Engine.h>
+#include <toadlet/tadpole/BaseResourceCreator.h>
+#include <toadlet/peeper/Texture.h>
 
 namespace toadlet{
 namespace tadpole{
 
-class TOADLET_API DecalShadowRenderManager:public SimpleRenderManager{
+class TOADLET_API PointTextureCreator:public BaseResourceCreator{
 public:
-	TOADLET_OBJECT(DecalShadowRenderManager);
+	TOADLET_OBJECT(PointTextureCreator);
 
-	DecalShadowRenderManager(Scene *scene);
-	virtual ~DecalShadowRenderManager();
+	PointTextureCreator(Engine *engine){
+		mEngine=engine;
+	}
 
-	void setShadowScope(int scope){mShadowScope=scope;}
-	int getShadowScope() const{return mShadowScope;}
+	void destroy(){}
 
-	void setTraceScope(int scope){mTraceScope=scope;}
-	int getTraceScope() const{return mTraceScope;}
-
-	void setTraceDistance(scalar distance){mTraceDistance=distance;}
-	scalar getTraceDistance() const{return mTraceDistance;}
-
-	void setOffset(scalar offset){mOffset=offset;}
-	scalar getOffset() const{return mOffset;}
-
-	void interRenderRenderables(RenderableSet *set,RenderDevice *device,Camera *camera,bool useMaterials);
+	Resource::ptr create(const String &name,ResourceData *data){
+		TextureFormat::ptr format=new TextureFormat(TextureFormat::Dimension_D2,TextureFormat::Format_LA_8,128,128,1,0);
+		Resource::ptr resource=createPointTexture(format,0,1,0,1,1);
+		resource->setName(name);
+		return resource;
+	}
+	
+	static bool createPointTexture(TextureFormat *format,tbyte *data,int xoffset,int yoffset,int width,int height,float colorOffset,float colorFactor,float alphaOffset,float alphaFactor,float falloff);
+	Texture::ptr createPointTexture(TextureFormat *format,float colorOffset,float colorFactor,float alphaOffset,float alphaFactor,float falloff);
 
 protected:
-	int mShadowScope;
-	int mTraceScope;
-	scalar mTraceDistance;
-	scalar mOffset;
-	Material::ptr mMaterial;
-	VertexData::ptr mVertexData;
-	IndexData::ptr mIndexData;
+	Engine *mEngine;
 };
 
 }

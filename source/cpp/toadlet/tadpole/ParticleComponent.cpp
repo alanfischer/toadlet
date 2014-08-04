@@ -243,16 +243,27 @@ void ParticleComponent::updateParticles(Camera *camera){
 }
 
 void ParticleComponent::updateBound(){
+	bool dynamic=false;
 	AABox box;
+
 	if(mParticles.size()>0){
-		Particle *p=&mParticles[0];
-		box.set(p->x,p->y,p->z,p->x,p->y,p->z);
-		for(int i=1;i<mParticles.size();++i){
-			p=&mParticles[i];
-			box.merge(Vector3(p->x,p->y,p->z));
-		}
+		const Particle &p=mParticles[0];
+		box.set(p.x,p.y,p.z,p.x,p.y,p.z);
 	}
-	mBound->set(box);
+
+	int i;
+	for(i=0;i<mParticles.size() && !dynamic;++i){
+		const Particle &p=mParticles[i];
+		box.merge(Vector3(p.x,p.y,p.z));
+		dynamic |= (p.vx!=0 || p.vy!=0 || p.vz!=0);
+	}
+
+	if(dynamic){
+		mBound->setInfinite();
+	}
+	else{
+		mBound->set(box);
+	}
 
 	if(mWorldSpace){
 		mWorldBound->set(mBound);

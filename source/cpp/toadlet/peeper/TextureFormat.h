@@ -211,6 +211,35 @@ public:
 			default:
 				return 0;
 		}
+	}
+
+	static inline uint8 getColorBits(int format){
+		switch(format){
+			case Format_L_8:
+			case Format_LA_8:
+				return 8;
+			case Format_RGB_8:
+			case Format_RGBA_8:
+			case Format_BGR_8:
+			case Format_BGRA_8:
+				return 8*3;
+			case Format_RGB_F32:
+			case Format_RGBA_F32:
+			case Format_BGR_F32:
+			case Format_BGRA_F32:
+				return 32*3;
+			case Format_RGB_5_6_5:
+			case Format_BGR_5_6_5:
+				return 16;
+			case Format_BGRA_5_5_5_1:
+			case Format_RGBA_5_5_5_1:
+				return 15;
+			case Format_RGBA_4_4_4_4:
+			case Format_BGRA_4_4_4_4:
+				return 4*3;
+			default:
+				return 0;
+		}
 	}		
 
 	static inline uint8 getAlphaBits(int format){

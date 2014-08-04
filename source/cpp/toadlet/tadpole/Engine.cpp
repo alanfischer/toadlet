@@ -37,6 +37,7 @@
 #include <toadlet/tadpole/plugins/SkyBoxMeshCreator.h>
 #include <toadlet/tadpole/plugins/SkyDomeMeshCreator.h>
 #include <toadlet/tadpole/plugins/NormalizationTextureCreator.h>
+#include <toadlet/tadpole/plugins/PointTextureCreator.h>
 #include <toadlet/tadpole/plugins/DiffuseMaterialCreator.h>
 #include <toadlet/tadpole/plugins/SkyBoxMaterialCreator.h>
 #include <toadlet/tadpole/plugins/WaterMaterialCreator.h>
@@ -353,8 +354,9 @@ void Engine::installHandlers(){
 		mArchiveManager->manage(domArchive,"DOMArchive");
 		mTextureManager->addResourceArchive(domArchive);
 	#endif
-		
+	
 	mNormalizationCreator=new NormalizationTextureCreator(this);
+	mPointCreator=new PointTextureCreator(this);
 
 	mDiffuseCreator=new DiffuseMaterialCreator(this);
 	mSkyBoxMaterialCreator=new SkyBoxMaterialCreator(this);
@@ -649,6 +651,12 @@ void Engine::contextDeactivate(RenderDevice *renderDevice){
 
 Texture::ptr Engine::createNormalizationTexture(int size){
 	Texture::ptr texture=shared_static_cast<NormalizationTextureCreator>(mNormalizationCreator)->createNormalizationTexture(size);
+	mTextureManager->manage(texture);
+	return texture;
+}
+
+Texture::ptr Engine::createPointTexture(TextureFormat *format,float colorOffset,float colorFactor,float alphaOffset,float alphaFactor,float falloff){
+	Texture::ptr texture=shared_static_cast<PointTextureCreator>(mPointCreator)->createPointTexture(format,colorOffset,colorFactor,alphaOffset,alphaFactor,falloff);
 	mTextureManager->manage(texture);
 	return texture;
 }
