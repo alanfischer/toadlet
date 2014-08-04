@@ -1,4 +1,5 @@
 #include "Sandbox.h"
+#include <toadlet/tadpole/plugins/PointTextureCreator.h>
 
 class SnowComponent:public BaseComponent{
 public:
@@ -68,16 +69,11 @@ public:
 				if(result.time<1){
 					position.z+=100;
 					mSnowData[i].newPosition=position;
+
 					int x=(0   + (result.point.x/200.0f + 0.5)) * size;
 					int y=(1.0 - (result.point.y/200.0f + 0.5)) * size;
-					for(int tx=-s;tx<=s;tx++){
-						for(int ty=-s;ty<=s;ty++){
-							int px=Math::intClamp(0,size,x+tx);
-							int py=Math::intClamp(0,size,y+ty);
-							int l=Math::intClamp(0,255,(1.0 - Math::length(Vector2(x,y),Vector2(px,py)) / (float)s) * 255);
-							mBufferData[py * size + px + 0] = Math::intClamp(0,200,mBufferData[py * size + px + 0] + l);
-						}
-					}
+
+					PointTextureCreator::createPointTexture(mBuffer->getTextureFormat(),mBufferData,x-s,y-s,s*2,s*2,0,1,0,0,5);
 				}
 				else{
 					mSnowData[i].newPosition=position+segment.direction;
@@ -146,7 +142,8 @@ void Sandbox::create(){
 	}
 	scene->getRoot()->attach(node);
 		
-	Texture::ptr snowflakeTexture=shared_static_cast<Texture>(engine->getTextureManager()->find("snowflake.png"));
+	TextureFormat::ptr snowflakeFormat=new TextureFormat(TextureFormat::Dimension_D2,TextureFormat::Format_LA_8,128,128,1,0);
+	Texture::ptr snowflakeTexture=engine->createPointTexture(snowflakeFormat,1,0,0,1,1.25);
 
 	PixelBuffer::ptr buffer;
 	Node::ptr ground=new Node(scene);

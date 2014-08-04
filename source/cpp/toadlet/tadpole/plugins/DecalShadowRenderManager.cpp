@@ -42,12 +42,10 @@ DecalShadowRenderManager::DecalShadowRenderManager(Scene *scene):SimpleRenderMan
 	Engine *engine=mScene->getEngine();
 
 	TextureFormat::ptr pointFormat=new TextureFormat(TextureFormat::Dimension_D2,TextureFormat::Format_LA_8,128,128,1,0);
-	tbyte *pointData=createPoint(pointFormat);
-	Texture::ptr pointTexture=engine->getTextureManager()->createTexture(pointFormat,pointData);
-	delete[] pointData;
+	Texture::ptr pointTexture=engine->createPointTexture(pointFormat,0,0,0,1,1.25);
 
 	RenderState::ptr renderState=engine->getMaterialManager()->createRenderState();
-	renderState->setBlendState(BlendState(BlendState::Operation_ONE_MINUS_SOURCE_ALPHA,BlendState::Operation_SOURCE_ALPHA));
+	renderState->setBlendState(BlendState(BlendState::Combination_ALPHA));
 	renderState->setDepthState(DepthState(DepthState::DepthTest_LEQUAL,false));
 	renderState->setMaterialState(MaterialState(false));
 	renderState->setRasterizerState(RasterizerState(RasterizerState::CullType_BACK));
@@ -179,27 +177,6 @@ void DecalShadowRenderManager::interRenderRenderables(RenderableSet *set,RenderD
 			mLastRenderState=NULL;
 		}
 	}
-}
-
-tbyte *DecalShadowRenderManager::createPoint(TextureFormat *format){
-	int width=format->getWidth(),height=format->getHeight();
-	tbyte *data=new tbyte[format->getDataSize()];
-
-	int x=0,y=0;
-	for(y=0;y<height;y++){
-		for(x=0;x<width;x++){
-			float v=1.0;
-			v=v*(Math::length(Vector2(x-width/2,y-height/2))/(width/2));
-			if(v<0) v=0;
-			if(v>1) v=1;
-			v=pow(v,1.25f);
-
-			data[(y*width+x)*2+0]=0;
-			data[(y*width+x)*2+1]=255*v;
-		}
-	}
-
-	return data;
 }
 
 }

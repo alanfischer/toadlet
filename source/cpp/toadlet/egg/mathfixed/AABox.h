@@ -182,21 +182,21 @@ public:
 	}
 
 	inline void merge(const AABox &box){
-		if(box.mins.x<mins.x)mins.x=box.mins.x;
-		if(box.mins.y<mins.y)mins.y=box.mins.y;
-		if(box.mins.z<mins.z)mins.z=box.mins.z;
-		if(box.maxs.x>maxs.x)maxs.x=box.maxs.x;
-		if(box.maxs.y>maxs.y)maxs.y=box.maxs.y;
-		if(box.maxs.z>maxs.z)maxs.z=box.maxs.z;
+		mins.x=Math::minVal(mins.x,box.mins.x);
+		mins.y=Math::minVal(mins.y,box.mins.y);
+		mins.z=Math::minVal(mins.z,box.mins.z);
+		maxs.x=Math::maxVal(maxs.x,box.maxs.x);
+		maxs.y=Math::maxVal(maxs.y,box.maxs.y);
+		maxs.z=Math::maxVal(maxs.z,box.maxs.z);
 	}
 
 	inline void merge(const Vector3 &vec){
-		if(vec.x<mins.x)mins.x=vec.x;
-		if(vec.y<mins.y)mins.y=vec.y;
-		if(vec.z<mins.z)mins.z=vec.z;
-		if(vec.x>maxs.x)maxs.x=vec.x;
-		if(vec.y>maxs.y)maxs.y=vec.y;
-		if(vec.z>maxs.z)maxs.z=vec.z;
+		mins.x=Math::minVal(mins.x,vec.x);
+		mins.y=Math::minVal(mins.y,vec.y);
+		mins.z=Math::minVal(mins.z,vec.z);
+		maxs.x=Math::maxVal(maxs.x,vec.x);
+		maxs.y=Math::maxVal(maxs.y,vec.y);
+		maxs.z=Math::maxVal(maxs.z,vec.z);
 	}
 
 	inline bool equals(const AABox &box) const{
