@@ -31,8 +31,31 @@ namespace toadlet{
 namespace tadpole{
 namespace terrain{
 
-DiffuseTerrainMaterialSource::DiffuseTerrainMaterialSource(Engine *engine){
-	mEngine=engine;
+DiffuseTerrainMaterialSource::DiffuseTerrainMaterialSource(Engine *engine):
+	mEngine(engine),
+	mDiffuseScale(1,1,1),mDetailScale(1,1,1)
+{
+	createShaders();
+}
+
+DiffuseTerrainMaterialSource::DiffuseTerrainMaterialSource(Engine *engine,const String &name,const Vector3 &scale,const Vector3 &offset):
+	mEngine(engine),
+	mDiffuseScale(scale),mDetailScale(scale),
+	mDiffuseOffset(offset),mDetailOffset(offset)
+{
+	setDiffuseTexture(0,name);
+	setDetailTexture(name);
+
+	createShaders();
+}
+
+DiffuseTerrainMaterialSource::DiffuseTerrainMaterialSource(Engine *engine,Texture *texture,const Vector3 &scale,const Vector3 &offset):
+	mEngine(engine),
+	mDiffuseScale(scale),mDetailScale(scale),
+	mDiffuseOffset(offset),mDetailOffset(offset)
+{
+	setDiffuseTexture(0,texture);
+	setDetailTexture(texture);
 
 	createShaders();
 }
@@ -279,11 +302,11 @@ Material::ptr DiffuseTerrainMaterialSource::getMaterial(TerrainPatchComponent *p
 
 	TextureState diffuseState;
 	diffuseState.calculation=TextureState::CalculationType_NORMAL;
-	Math::setMatrix4x4FromScale(diffuseState.matrix,mDiffuseScale);
+	getTextureMatrix(diffuseState.matrix,patch,false);
 
 	TextureState detailState;
 	detailState.calculation=TextureState::CalculationType_NORMAL;
-	Math::setMatrix4x4FromScale(detailState.matrix,mDetailScale);
+	getTextureMatrix(detailState.matrix,patch,true);
 
 	TextureState layerState;
 	layerState.colorOperation=TextureState::Operation_REPLACE;
@@ -390,6 +413,17 @@ Material::ptr DiffuseTerrainMaterialSource::getMaterial(TerrainPatchComponent *p
 	material->compile();
 
 	return material;
+}
+
+void DiffuseTerrainMaterialSource::getTextureMatrix(Matrix4x4 &result,TerrainPatchComponent *patch,bool detail){
+	if(!detail){
+		Math::setMatrix4x4FromScale(result,mDiffuseScale);
+		Math::setMatrix4x4FromTranslate(result,Vector3(mDiffuseOffset.x + mDiffuseScale.x * patch->getTerrainX(),mDiffuseOffset.y + mDiffuseScale.y * patch->getTerrainY(),mDiffuseOffset.z));
+	}
+	else{
+		Math::setMatrix4x4FromScale(result,mDetailScale);
+		Math::setMatrix4x4FromTranslate(result,Vector3(mDetailOffset.x + mDetailScale.x * patch->getTerrainX(),mDetailOffset.y + mDetailScale.y * patch->getTerrainY(),mDetailOffset.z));
+	}
 }
 
 }

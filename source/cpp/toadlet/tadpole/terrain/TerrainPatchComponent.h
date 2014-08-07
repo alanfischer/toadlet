@@ -25,6 +25,7 @@
 #include <toadlet/tadpole/Renderable.h>
 #include <toadlet/tadpole/Visible.h>
 #include <toadlet/tadpole/PhysicsTraceable.h>
+#include <toadlet/tadpole/DetailTraceable.h>
 #include <toadlet/tadpole/RenderManager.h>
 #include <toadlet/tadpole/BaseComponent.h>
 
@@ -32,7 +33,7 @@ namespace toadlet{
 namespace tadpole{
 namespace terrain{
 
-class TOADLET_API TerrainPatchComponent:public BaseComponent,public Spacial,public Visible,public Renderable,public PhysicsTraceable{
+class TOADLET_API TerrainPatchComponent:public BaseComponent,public Spacial,public Visible,public Renderable,public PhysicsTraceable,public DetailTraceable{
 public:
 	TOADLET_COMPONENT(TerrainPatchComponent);
 
@@ -97,11 +98,14 @@ public:
 	bool setLayerData(tbyte *data,int rowPitch,int width,int height);
 	bool setMaterial(Material *material);
 	bool setWaterMaterial(Material *material);
+	void setTerrainXY(int x,int y){mTerrainX=x;mTerrainY=y;}
 
 	int getSize() const{return mSize;}
 	inline Vertex *vertexAt(int x,int y){return &mVertexes[y*(mSize+1)+x];}
 	inline const Vertex *vertexAt(int x,int y) const{return &mVertexes[y*(mSize+1)+x];}
 	inline int indexOf(int x,int y) const{return y*(mSize+1)+x;}
+	int getTerrainX() const{return mTerrainX;}
+	int getTerrainY() const{return mTerrainY;}
 
 	bool stitchToRight(TerrainPatchComponent *terrain,bool restitchDependents=true);
 	void updateBlockBoundsRight(Block *block,int q,int x,int y,int s);
@@ -150,8 +154,10 @@ public:
 	void render(RenderManager *manager) const;
 
 	// Traceable
-	Bound *getTraceableBound() const{return mBound;}
-	void traceSegment(PhysicsCollision &result,const Vector3 &position,const Segment &segment,const Vector3 &size);
+	Bound *getPhysicsBound() const{return mBound;}
+	void tracePhysicsSegment(PhysicsCollision &result,const Vector3 &position,const Segment &segment,const Vector3 &size);
+	Bound *getDetailBound() const{return mBound;}
+	void traceDetailSegment(PhysicsCollision &result,const Vector3 &position,const Segment &segment,const Vector3 &size);
 	void traceLocalSegment(PhysicsCollision &result,const Segment &segment,scalar epsilon,scalar cellEpsilon);
 	bool traceCell(PhysicsCollision &result,int x,int y,const Segment &segment,scalar epsilon,scalar cellEpsilon);
 
@@ -257,6 +263,7 @@ protected:
 	int mNumUnprocessedBlocks;
 	scalar mEpsilon;
 	scalar mCellEpsilon;
+	int mTerrainX,mTerrainY;
 
 	TerrainPatchComponent::ptr mLeftDependent;
 	TerrainPatchComponent::ptr mTopDependent;

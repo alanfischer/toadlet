@@ -385,7 +385,7 @@ void StudioModelComponent::resourceReady(Resource *resource){
 	setModel((StudioModel*)resource);
 }
 
-void StudioModelComponent::traceSegment(PhysicsCollision &result,const Vector3 &position,const Segment &segment,const Vector3 &size){
+void StudioModelComponent::traceDetailSegment(PhysicsCollision &result,const Vector3 &position,const Segment &segment,const Vector3 &size){
 	Vector3 point,normal;
 	Segment localSegment,boxSegment;
 	Quaternion invrot;

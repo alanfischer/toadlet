@@ -348,12 +348,30 @@ bool BSP30Node::findAmbientForBound(Vector4 &r,Bound *bound){
 	end.z-=1024;
 	scalar threshold=512;
 	if(mMap!=NULL && bound->getSphere().radius<threshold){
-		return mMap->modelLightTrace(r,0,start,end);
+		PhysicsCollision collision;
+		if(mMap->modelDetailTrace(collision,0,start,end)){
+			bface *face=&mMap->faces[collision.index];
+			BSP30Map::facedata *faced=&mMap->facedatas[collision.index];
+
+			int pixelSize=3;
+			int size=faced->lightmapSize[0]*faced->lightmapSize[1]*pixelSize;
+	
+			int ld[3]={0,0,0};
+			int j;
+			for(j=0;j<MAX_LIGHTMAPS && face->styles[j]!=255;++j){
+				int intensity=mMap->styleIntensities[face->styles[j]];
+				tbyte *ls=((tbyte*)mMap->lighting) + face->lightofs + size*j+ (faced->lightmapSize[0]*((int)(collision.texCoord.y)>>4) + ((int)(collision.texCoord.x)>>4))*3;
+				ld[0]=Math::intClamp(0,255,ld[0]+(((int)ls[0]*intensity)>>8));
+				ld[1]=Math::intClamp(0,255,ld[1]+(((int)ls[1]*intensity)>>8));
+				ld[2]=Math::intClamp(0,255,ld[2]+(((int)ls[2]*intensity)>>8));
+			}
+			r.set(ld[0]/255.0,ld[1]/255.0,ld[2]/255.0,1.0);
+		}
 	}
 	return false;
 }
 
-void BSP30Node::traceSegment(PhysicsCollision &result,const Vector3 &position,const Segment &segment,const Vector3 &size){
+void BSP30Node::tracePhysicsSegment(PhysicsCollision &result,const Vector3 &position,const Segment &segment,const Vector3 &size){
 	Segment localSegment=segment;
 	Transform transform;
 
@@ -366,10 +384,29 @@ void BSP30Node::traceSegment(PhysicsCollision &result,const Vector3 &position,co
 	result.time=Math::ONE;
 	localSegment.getEndPoint(result.point);
 	if(mMap!=NULL){
-		int contents=mMap->modelCollisionTrace(result,0,size,localSegment.origin,result.point);
-		if(contents!=CONTENTS_EMPTY){
-			result.scope|=(-1-contents)<<1;
-		}
+		mMap->modelPhysicsTrace(result,0,size,localSegment.origin,result.point);
+	}
+
+	if(transformed && result.time<Math::ONE){
+		transform.transform(result.point);
+		transform.transformNormal(result.normal);
+	}
+}
+
+void BSP30Node::traceDetailSegment(PhysicsCollision &result,const Vector3 &position,const Segment &segment,const Vector3 &size){
+	Segment localSegment=segment;
+	Transform transform;
+
+	bool transformed=true;//(getWorldTransform()!=Node::identityTransform());
+	if(transformed){
+		transform.set(position,mWorldTransform->getScale(),mWorldTransform->getRotate());
+		transform.inverseTransform(localSegment);
+	}
+
+	result.time=Math::ONE;
+	localSegment.getEndPoint(result.point);
+	if(mMap!=NULL){
+		mMap->modelDetailTrace(result,0,localSegment.origin,result.point);
 	}
 
 	if(transformed && result.time<Math::ONE){

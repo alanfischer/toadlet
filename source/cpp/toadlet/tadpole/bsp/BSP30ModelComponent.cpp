@@ -207,7 +207,7 @@ void BSP30ModelComponent::gatherRenderables(Camera*camera,RenderableSet *set){
 	}
 }
 
-void BSP30ModelComponent::traceSegment(PhysicsCollision &result,const Vector3 &position,const Segment &segment,const Vector3 &size){
+void BSP30ModelComponent::tracePhysicsSegment(PhysicsCollision &result,const Vector3 &position,const Segment &segment,const Vector3 &size){
 	Segment localSegment=segment;
 	Transform transform;
 
@@ -220,10 +220,7 @@ void BSP30ModelComponent::traceSegment(PhysicsCollision &result,const Vector3 &p
 	result.time=Math::ONE;
 	localSegment.getEndPoint(result.point);
 	if(mMap!=NULL){
-		int contents=mMap->modelCollisionTrace(result,mModelIndex,size,localSegment.origin,result.point);
-		if(contents!=CONTENTS_EMPTY){
-			result.scope|=(-1-contents)<<1;
-		}
+		mMap->modelPhysicsTrace(result,mModelIndex,size,localSegment.origin,result.point);
 	}
 
 	if(transformed && result.time<Math::ONE){

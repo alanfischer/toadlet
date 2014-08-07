@@ -39,8 +39,8 @@ public:
 
 	virtual ~PhysicsTraceable(){}
 
-	virtual Bound *getTraceableBound() const=0;
-	virtual void traceSegment(PhysicsCollision &result,const Vector3 &position,const Segment &segment,const Vector3 &size)=0;
+	virtual Bound *getPhysicsBound() const=0;
+	virtual void tracePhysicsSegment(PhysicsCollision &result,const Vector3 &position,const Segment &segment,const Vector3 &size)=0;
 };
 
 }

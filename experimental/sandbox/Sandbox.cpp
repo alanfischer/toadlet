@@ -59,21 +59,22 @@ public:
 				segment.direction=velocity*Math::fromMilli(dt) * mSkip;
 
 				PhysicsCollision result;
-				scene->getPhysicsManager()->traceSegment(result,segment,-1,NULL);
+				((TerrainNode*)scene->getRoot())->traceDetailSegment(result,Vector3(),segment,Vector3());
+//				scene->getPhysicsManager()->traceSegment(result,segment,-1,NULL);
 				mSnowData[i].traceTime=result.time;
 
 				mSnowData[i].oldPosition=mSnowData[i].newPosition;
 
-				int size=mBuffer->getTextureFormat()->getWidth();
-				int s=8;
 				if(result.time<1){
 					position.z+=100;
 					mSnowData[i].newPosition=position;
 
-					int x=(0   + (result.point.x/200.0f + 0.5)) * size;
-					int y=(1.0 - (result.point.y/200.0f + 0.5)) * size;
-
-					PointTextureCreator::createPointTexture(mBuffer->getTextureFormat(),mBufferData,x-s,y-s,s*2,s*2,0,1,0,0,5);
+					if(result.texCoord.x>=0 && result.texCoord.x<1 && result.texCoord.y>=0 && result.texCoord.y<1){
+						int x=(result.texCoord.x) * mBuffer->getTextureFormat()->getWidth();
+						int y=(result.texCoord.y) * mBuffer->getTextureFormat()->getHeight();
+						int s=8;
+						PointTextureCreator::createPointTexture(mBuffer->getTextureFormat(),mBufferData,x-s,y-s,s*2,s*2,0,1,0,0,1.25);
+					}
 				}
 				else{
 					mSnowData[i].newPosition=position+segment.direction;
@@ -122,6 +123,17 @@ void Sandbox::create(){
 
 	scene=new Scene(engine,Scene::Option_BIT_NOBULLET);
 
+	PixelBuffer::ptr buffer;
+	TextureFormat::ptr format=new TextureFormat(2,TextureFormat::Format_L_8,1024,1024,1,0);
+	Texture::ptr texture=engine->getTextureManager()->createTexture(Texture::Usage_BIT_STREAM|Texture::Usage_BIT_AUTOGEN_MIPMAPS,format,(tbyte*)NULL);
+	buffer=texture->getMipPixelBuffer(0,0);
+
+	TerrainNode::ptr terrain=new TerrainNode(scene);
+	terrain->setDataSource(new TextureDataSource(engine,Vector3(.5,.5,12),0,"terrain.png"));
+	terrain->setMaterialSource(new DiffuseTerrainMaterialSource(engine,texture));//,Vector3(.5,.5,1),Vector3(0,0,0)));
+	terrain->setTolerance(0);
+	scene->setRoot(terrain);
+
 	Node::ptr node=new Node(scene);
 	{
 		LightComponent::ptr light=new LightComponent();
@@ -145,27 +157,6 @@ void Sandbox::create(){
 	TextureFormat::ptr snowflakeFormat=new TextureFormat(TextureFormat::Dimension_D2,TextureFormat::Format_LA_8,128,128,1,0);
 	Texture::ptr snowflakeTexture=engine->createPointTexture(snowflakeFormat,1,0,0,1,1.25);
 
-	PixelBuffer::ptr buffer;
-	Node::ptr ground=new Node(scene);
-	{
-		TextureFormat::ptr format=new TextureFormat(2,TextureFormat::Format_L_8,1024,1024,1,0);
-		Texture::ptr texture=engine->getTextureManager()->createTexture(Texture::Usage_BIT_STREAM|Texture::Usage_BIT_AUTOGEN_MIPMAPS,format,(tbyte*)NULL);
-		buffer=texture->getMipPixelBuffer(0,0);
-		
-		Material::ptr material=engine->createDiffuseMaterial(texture);
-
-		MeshComponent::ptr mesh=new MeshComponent(engine);
-		mesh->setMesh(engine->createAABoxMesh(AABox(-100,-100,-100,100,100,0),material));
-		ground->attach(mesh);
-
-		PhysicsComponent::ptr physics=scene->getPhysicsManager()->createPhysicsComponent();
-		physics->setMass(-1);
-		physics->setGravity(0);
-		physics->setBound(mesh->getBound());
-		ground->attach(physics);
-	}
-	scene->getRoot()->attach(ground);
-
 	Node::ptr snow=new Node(scene);
 	{
 		Material::ptr material=engine->createPointSpriteMaterial(snowflakeTexture,1,true);
@@ -175,7 +166,7 @@ void Sandbox::create(){
 
 		ParticleComponent::ptr particles=new ParticleComponent(scene);
 		particles->setMaterial(material);
-		particles->setNumParticles(10000,ParticleComponent::ParticleType_POINTSPRITE,2);
+		particles->setNumParticles(40,ParticleComponent::ParticleType_POINTSPRITE,2);
 		particles->setVelocityAligned(true);
 		Random r;
 		for(int i=0;i<particles->getNumParticles();++i){
