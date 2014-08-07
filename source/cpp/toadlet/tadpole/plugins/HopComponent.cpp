@@ -209,14 +209,14 @@ void HopComponent::collision(const hop::Collision &c){
 
 void HopComponent::getBound(AABox &result){
 	if(mTraceable!=NULL){
-		result.set(mTraceable->getTraceableBound()->getAABox());
+		result.set(mTraceable->getPhysicsBound()->getAABox());
 	}
 }
 
 void HopComponent::traceSegment(hop::Collision &result,const Vector3 &position,const Segment &segment){
 	if(mTraceable!=NULL){
 		PhysicsCollision collision;
-		mTraceable->traceSegment(collision,position,segment,Math::ZERO_VECTOR3);
+		mTraceable->tracePhysicsSegment(collision,position,segment,Math::ZERO_VECTOR3);
 		HopManager::set(result,collision,mSolid,NULL);
 	}
 }
@@ -236,7 +236,7 @@ void HopComponent::traceSolid(hop::Collision &result,hop::Solid *solid,const Vec
 		Segment adjustedSegment(segment);
 		Math::add(adjustedSegment.origin,origin);
 
-		mTraceable->traceSegment(collision,position,adjustedSegment,size);
+		mTraceable->tracePhysicsSegment(collision,position,adjustedSegment,size);
 
 		Math::sub(collision.point,origin);
 

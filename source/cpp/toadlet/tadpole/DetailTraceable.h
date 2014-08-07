@@ -26,16 +26,21 @@
 #ifndef TOADLET_TADPOLE_DETAILTRACEABLE_H
 #define TOADLET_TADPOLE_DETAILTRACEABLE_H
 
-#include <toadlet/tadpole/PhysicsTraceable.h>
+#include <toadlet/tadpole/Types.h>
+#include <toadlet/tadpole/Bound.h>
+#include <toadlet/tadpole/PhysicsCollision.h>
 
 namespace toadlet{
 namespace tadpole{
 
-// This is the same signature as a PhysicsTraceable
-//  but a different interface to reinforce the fact that it's not to be used for physics tracing
-class DetailTraceable:public PhysicsTraceable{
+class DetailTraceable:public Interface{
 public:
+	TOADLET_INTERFACE(DetailTraceable);
+
 	virtual ~DetailTraceable(){}
+
+	virtual Bound *getDetailBound() const=0;
+	virtual void traceDetailSegment(PhysicsCollision &result,const Vector3 &position,const Segment &segment,const Vector3 &size)=0;
 };
 
 }

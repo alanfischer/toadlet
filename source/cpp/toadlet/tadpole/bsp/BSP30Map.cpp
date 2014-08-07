@@ -91,7 +91,7 @@ void BSP30Map::destroy(){
 	BaseResource::destroy();
 }
 
-int BSP30Map::modelCollisionTrace(PhysicsCollision &result,int model,const Vector3 &size,const Vector3 &start,const Vector3 &end){
+bool BSP30Map::modelPhysicsTrace(PhysicsCollision &result,int model,const Vector3 &size,const Vector3 &start,const Vector3 &end){
 	int hullIndex=0;
 	if(header.version==Q1BSPVERSION){
 		if(size[0]<3){
@@ -124,7 +124,7 @@ int BSP30Map::modelCollisionTrace(PhysicsCollision &result,int model,const Vecto
 	int headNode=models[model].headnode[0];
 	int headClipNode=models[model].headnode[hullIndex];
 	if(headNode<0 || headNode>=nnodes || headClipNode<0 || headClipNode>=nclipnodes){
-		return 0;
+		return false;
 	}
 
 	const Vector3 &hullSize=HULLSIZES[hullIndex];
@@ -152,50 +152,42 @@ int BSP30Map::modelCollisionTrace(PhysicsCollision &result,int model,const Vecto
 		result.point.z-=off;
 	}
 
-	return contents;
+	if(contents!=CONTENTS_EMPTY){
+		result.scope|=(-1-contents)<<1;
+	}
+
+	return true;
 }
 
-bool BSP30Map::modelLightTrace(Vector4 &result,int model,const Vector3 &start,const Vector3 &end){
+bool BSP30Map::modelDetailTrace(PhysicsCollision &result,int model,const Vector3 &start,const Vector3 &end){
 	int headNode=models[model].headnode[0];
 	if(headNode<0 || headNode>=nnodes){
 		return false;
 	}
 
-	PhysicsCollision collision;
 	int lastNode=-1;
-	hullTrace(collision,planes,leafs,nodes,sizeof(bnode),headNode,0,Math::ONE,start,end,0.03125,(-1-CONTENTS_SOLID)<<1,&lastNode);
+	hullTrace(result,planes,leafs,nodes,sizeof(bnode),headNode,0,Math::ONE,start,end,0.03125,(-1-CONTENTS_SOLID)<<1,&lastNode);
 	if(lastNode>=0){
 		int mins[2],maxs[2];
 		bnode *node=nodes+lastNode;
 		bface *face=faces+node->firstface;
-		int i,j;
+		int i;
 		for(i=0;i<node->numfaces;++i,++face){
 			btexinfo *texinfo=texinfos+face->texinfo;
 			if((texinfo->flags&TEX_SPECIAL)!=0) continue;
 			if(face->lightofs==0) continue;
 			
-			facedata *faced=&facedatas[node->firstface+i];
-
 			findSurfaceExtents(face,mins,maxs);
 
-			int s=Math::dot(collision.point,(Vector3&)texinfo->vecs[0]) + texinfo->vecs[0][3];
-			int t=Math::dot(collision.point,(Vector3&)texinfo->vecs[1]) + texinfo->vecs[1][3];
+			int s=Math::dot(result.point,(Vector3&)texinfo->vecs[0]) + texinfo->vecs[0][3];
+			int t=Math::dot(result.point,(Vector3&)texinfo->vecs[1]) + texinfo->vecs[1][3];
 
 			if(s<mins[0] || t<mins[1]) continue;
 			if(s>maxs[0] || t>maxs[1]) continue;
 
-			int pixelSize=3;
-			int size=faced->lightmapSize[0]*faced->lightmapSize[1]*pixelSize;
+			result.texCoord.set(s - mins[0],t - mins[1],0);
+			result.index=node->firstface+i;
 
-			int ld[3]={0,0,0};
-			for(j=0;j<MAX_LIGHTMAPS && face->styles[j]!=255;++j){
-				int intensity=styleIntensities[face->styles[j]];
-				tbyte *ls=((tbyte*)lighting) + face->lightofs + size*j+ (faced->lightmapSize[0]*((t-mins[1])>>4) + ((s-mins[0])>>4))*3;
-				ld[0]=Math::intClamp(0,255,ld[0]+(((int)ls[0]*intensity)>>8));
-				ld[1]=Math::intClamp(0,255,ld[1]+(((int)ls[1]*intensity)>>8));
-				ld[2]=Math::intClamp(0,255,ld[2]+(((int)ls[2]*intensity)>>8));
-			}
-			result.set(ld[0]/255.0,ld[1]/255.0,ld[2]/255.0,1.0);
 			return true;
 		}
 	}

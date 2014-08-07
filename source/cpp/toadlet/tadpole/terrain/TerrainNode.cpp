@@ -58,7 +58,7 @@ TerrainNode::TerrainNode(Scene *scene):PartitionNode(scene),
 	mHalfSize=mSize/2;
 	mPatchGrid.resize(mSize*mSize);
 	mUpdateTargetBias=Math::fromMilli(250);
-	mPatchTolerance=0.00001f;
+	mPatchTolerance=0.000001f;
 	mPatchScale.set(1,1,1);
 
 	int i,j;
@@ -284,15 +284,43 @@ void TerrainNode::frameUpdate(int dt,int scope){
 	}
 }
 
-void TerrainNode::traceSegment(PhysicsCollision &result,const Vector3 &position,const Segment &segment,const Vector3 &size){
+void TerrainNode::tracePhysicsSegment(PhysicsCollision &result,const Vector3 &position,const Segment &segment,const Vector3 &size){
 	result.time=Math::ONE;
 
 	PhysicsCollision r;
 	int i;
 	for(i=0;i<mPatchGrid.size();++i){
+		TerrainPatchComponent *patch=mPatchGrid[i];
 		r.reset();
-		if(mPatchGrid[i]!=NULL){
-			mPatchGrid[i]->traceSegment(r,mPatchGrid[i]->getParent()->getWorldTranslate(),segment,size);
+		if(patch!=NULL){
+			patch->tracePhysicsSegment(r,patch->getParent()->getWorldTranslate(),segment,size);
+		}
+		if(r.time<result.time){
+			result.set(r);
+		}
+	}
+}
+
+void TerrainNode::traceDetailSegment(PhysicsCollision &result,const Vector3 &position,const Segment &segment,const Vector3 &size){
+	result.time=Math::ONE;
+
+	PhysicsCollision r;
+	int i;
+	for(i=0;i<mPatchGrid.size();++i){
+		TerrainPatchComponent *patch=mPatchGrid[i];
+		r.reset();
+		if(patch!=NULL){
+			patch->traceDetailSegment(r,patch->getParent()->getWorldTranslate(),segment,size);
+
+			if(mMaterialSource!=NULL){
+				Matrix4x4 texMatrix;
+				mMaterialSource->getTextureMatrix(texMatrix,patch);
+				Math::mulPoint3(r.texCoord,texMatrix);
+				r.texCoord.x=Math::mod(r.texCoord.x,Math::ONE);
+				if(r.texCoord.x<0) r.texCoord.x+=Math::ONE;
+				r.texCoord.y=Math::mod(r.texCoord.y,Math::ONE);
+				if(r.texCoord.y<0) r.texCoord.y+=Math::ONE;
+			}
 		}
 		if(r.time<result.time){
 			result.set(r);
@@ -390,6 +418,7 @@ void TerrainNode::createPatch(int x,int y,bool notify){
 
 	patch->getParent()->setScale(mPatchScale);
 	patch->getParent()->setTranslate(toWorldXi(x)-mPatchSize*mPatchScale.x/2,toWorldYi(y)-mPatchSize*mPatchScale.y/2,0);
+	patch->setTerrainXY(x,y);
 	patch->setTolerance(mPatchTolerance);
 	patch->setWaterLevel(mPatchWaterLevel);
 	patch->setCameraUpdateScope(mPatchCameraUpdateScope);

@@ -34,7 +34,7 @@ namespace toadlet{
 namespace tadpole{
 namespace terrain{
 
-class TOADLET_API TextureDataSource:public Object,public TerrainNodeDataSource,public ResourceRequest{
+class TOADLET_API TextureDataSource:public Object,public TerrainNodeDataSource{
 public:
 	TOADLET_IOBJECT(TextureDataSource);
 
@@ -62,7 +62,7 @@ protected:
 		void resourceProgress(float progress){}
 
 	protected:
-		TextureDataSource::ptr mParent;
+		TextureDataSource *mParent;
 		int mPx,mPy;
 	};
 

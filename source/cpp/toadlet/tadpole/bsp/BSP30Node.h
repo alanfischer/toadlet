@@ -32,6 +32,7 @@
 #include <toadlet/tadpole/Renderable.h>
 #include <toadlet/tadpole/Visible.h>
 #include <toadlet/tadpole/PhysicsTraceable.h>
+#include <toadlet/tadpole/DetailTraceable.h>
 #include <toadlet/tadpole/MeshComponent.h>
 #include <toadlet/tadpole/PartitionNode.h>
 #include <toadlet/tadpole/bsp/BSP30Streamer.h>
@@ -41,7 +42,7 @@ namespace toadlet{
 namespace tadpole{
 namespace bsp{
 
-class TOADLET_API BSP30Node:public PartitionNode,public ResourceRequest,public StreamRequest,public Renderable,public PhysicsTraceable{
+class TOADLET_API BSP30Node:public PartitionNode,public ResourceRequest,public StreamRequest,public Renderable,public PhysicsTraceable,public DetailTraceable{
 public:
 	TOADLET_INODE(BSP30Node);
 
@@ -87,8 +88,10 @@ public:
 	void render(RenderManager *manager) const;
 
 	// Traceable items
-	Bound *getTraceableBound() const{return Node::getBound();}
-	void traceSegment(PhysicsCollision &result,const Vector3 &position,const Segment &segment,const Vector3 &size);
+	Bound *getPhysicsBound() const{return Node::getBound();}
+	void tracePhysicsSegment(PhysicsCollision &result,const Vector3 &position,const Segment &segment,const Vector3 &size);
+	Bound *getDetailBound() const{return Node::getBound();}
+	void traceDetailSegment(PhysicsCollision &result,const Vector3 &position,const Segment &segment,const Vector3 &size);
 
 protected:
 	class SkyMeshRequest:public Object,public ResourceRequest{

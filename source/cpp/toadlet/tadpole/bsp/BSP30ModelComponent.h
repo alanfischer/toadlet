@@ -96,8 +96,8 @@ public:
 	void gatherRenderables(Camera *camera,RenderableSet *set);
 
 	// Traceable
-	Bound *getTraceableBound() const{return mBound;}
-	void traceSegment(PhysicsCollision &result,const Vector3 &position,const Segment &segment,const Vector3 &size);
+	Bound *getPhysicsBound() const{return mBound;}
+	void tracePhysicsSegment(PhysicsCollision &result,const Vector3 &position,const Segment &segment,const Vector3 &size);
 
 protected:
 	Engine *mEngine;

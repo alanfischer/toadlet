@@ -37,7 +37,7 @@ namespace tadpole{
 namespace terrain{
 
 /// @todo: Use the quadtree to store child nodes and implement the commented out methods
-class TOADLET_API TerrainNode:public PartitionNode,public PhysicsTraceable{
+class TOADLET_API TerrainNode:public PartitionNode,public PhysicsTraceable,public DetailTraceable{
 public:
 	TOADLET_INODE(TerrainNode);
 
@@ -112,9 +112,11 @@ public:
 	void logicUpdate(int dt,int scope);
 	void frameUpdate(int dt,int scope);
 
-	// PhysicsTraceable
-	Bound *getTraceableBound() const{return Node::getBound();}
-	void traceSegment(PhysicsCollision &result,const Vector3 &position,const Segment &segment,const Vector3 &size);
+	// Traceable
+	Bound *getPhysicsBound() const{return Node::getBound();}
+	void tracePhysicsSegment(PhysicsCollision &result,const Vector3 &position,const Segment &segment,const Vector3 &size);
+	Bound *getDetailBound() const{return Node::getBound();}
+	void traceDetailSegment(PhysicsCollision &result,const Vector3 &position,const Segment &segment,const Vector3 &size);
 
 	void updateTarget();
 	void createPatch(int x,int y,bool notify=true);

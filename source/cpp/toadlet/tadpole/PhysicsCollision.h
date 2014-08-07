@@ -39,6 +39,7 @@ public:
 		time(Math::ONE),
 		//point,
 		//normal,
+		//texCoord
 		//velocity,
 		collider(NULL),
 		scope(0),
@@ -49,6 +50,7 @@ public:
 		time=c.time;
 		point.set(c.point);
 		normal.set(c.normal);
+		texCoord.set(c.texCoord);
 		velocity.set(c.velocity);
 		collider=c.collider;
 		scope=c.scope;
@@ -59,6 +61,7 @@ public:
 		time=Math::ONE;
 		point.set(Math::ZERO_VECTOR3);
 		normal.set(Math::ZERO_VECTOR3);
+		texCoord.set(Math::ZERO_VECTOR3);
 		velocity.set(Math::ZERO_VECTOR3);
 		collider=NULL;
 		scope=0;
@@ -68,6 +71,7 @@ public:
 	scalar time;
 	Vector3 point; // This is the point at which the tracing node would stop
 	Vector3 normal;
+	Vector3 texCoord;
 	Vector3 velocity;
 	Node *collider; // The node that blocked the trace
 	int scope; // The OR'd scope of the collision point

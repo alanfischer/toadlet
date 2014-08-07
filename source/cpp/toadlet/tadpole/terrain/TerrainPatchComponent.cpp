@@ -41,6 +41,7 @@ TerrainPatchComponent::TerrainPatchComponent(Scene *scene):
 	//mTopDependent,
 	mEpsilon(0),
 	mCellEpsilon(0),
+	mTerrainX(0),mTerrainY(0),
 	mProtected(false),
 
 	mCameraUpdateScope(-1),
@@ -62,7 +63,7 @@ TerrainPatchComponent::TerrainPatchComponent(Scene *scene):
 	//  that, offset via epsilon at a shallow angle, would be interested outside of the cell 
 	mCellEpsilon=0.03125*4;
 
-	mTolerance=0.00001f;
+	mTolerance=0.000001f;
 
 	mWaterTransform=new Transform();
 	mWaterWorldTransform=new Transform();
@@ -701,7 +702,7 @@ void TerrainPatchComponent::render(RenderManager *manager) const{
 	manager->getDevice()->renderPrimitive(mVertexData,mIndexData);
 }
 
-void TerrainPatchComponent::traceSegment(PhysicsCollision &result,const Vector3 &position,const Segment &segment,const Vector3 &size){
+void TerrainPatchComponent::tracePhysicsSegment(PhysicsCollision &result,const Vector3 &position,const Segment &segment,const Vector3 &size){
 	Transform *worldTransform=mParent->getWorldTransform();
 
 	Segment localSegment;
@@ -724,6 +725,44 @@ void TerrainPatchComponent::traceSegment(PhysicsCollision &result,const Vector3 
 	scalar maxs2y=Math::maxVal(localSegment.origin.y,localSegment.origin.y+localSegment.direction.y);
 	if(!(mins1.x>maxs2x || mins1.y>maxs2y || mins2x>maxs1.x || mins2y>maxs1.y)){
 		traceLocalSegment(result,localSegment,mEpsilon,mCellEpsilon);
+	}
+
+	result.point.z+=sizeAdjust;
+	if(result.time<Math::ONE){
+		transform.transform(result.point);
+		transform.transformNormal(result.normal);
+	}
+}
+
+void TerrainPatchComponent::traceDetailSegment(PhysicsCollision &result,const Vector3 &position,const Segment &segment,const Vector3 &size){
+	Transform *worldTransform=mParent->getWorldTransform();
+
+	Segment localSegment;
+	scalar sizeAdjust=Math::div(size.z/2,worldTransform->getScale().z);
+	Transform transform;
+
+	transform.set(position,worldTransform->getScale(),worldTransform->getRotate());
+	transform.inverseTransform(localSegment,segment);
+	localSegment.origin.z-=sizeAdjust;
+
+	result.time=Math::ONE;
+
+	Block *block=&mBlocks[0];
+	const Vector3 &mins1=block->mins;
+	const Vector3 &maxs1=block->maxs;
+
+	scalar mins2x=Math::minVal(localSegment.origin.x,localSegment.origin.x+localSegment.direction.x);
+	scalar mins2y=Math::minVal(localSegment.origin.y,localSegment.origin.y+localSegment.direction.y);
+	scalar maxs2x=Math::maxVal(localSegment.origin.x,localSegment.origin.x+localSegment.direction.x);
+	scalar maxs2y=Math::maxVal(localSegment.origin.y,localSegment.origin.y+localSegment.direction.y);
+	if(!(mins1.x>maxs2x || mins1.y>maxs2y || mins2x>maxs1.x || mins2y>maxs1.y)){
+		traceLocalSegment(result,localSegment,mEpsilon,mCellEpsilon);
+
+		result.texCoord.set(
+			Math::div(result.point.x - mins1.x, maxs1.x - mins1.x) + Math::div(Math::HALF,mSize),
+			Math::div(result.point.y - mins1.y, maxs1.y - mins1.y) + Math::div(Math::HALF,mSize),
+			0
+		);
 	}
 
 	result.point.z+=sizeAdjust;

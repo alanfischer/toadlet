@@ -179,7 +179,7 @@ int HopManager::findSolidsInAABox(const AABox &box,hop::Solid *solids[],int maxS
 void HopManager::traceSegment(hop::Collision &result,const Segment &segment,int collideWithScope){
 	if(mTraceable!=NULL && (collideWithScope&mSolid->getCollisionScope())!=0){
 		PhysicsCollision collision;
-		mTraceable->traceSegment(collision,Math::ZERO_VECTOR3,segment,Math::ZERO_VECTOR3);
+		mTraceable->tracePhysicsSegment(collision,Math::ZERO_VECTOR3,segment,Math::ZERO_VECTOR3);
 		set(result,collision,NULL,NULL);
 		result.collider=mSolid;
 	}
@@ -192,7 +192,7 @@ void HopManager::traceSolid(hop::Collision &result,hop::Solid *solid,const Segme
 		const AABox &bound=solid->getLocalBound();
 		Vector3 size;
 		Math::sub(size,bound.maxs,bound.mins);
-		mTraceable->traceSegment(collision,Math::ZERO_VECTOR3,segment,size);
+		mTraceable->tracePhysicsSegment(collision,Math::ZERO_VECTOR3,segment,size);
 		set(result,collision,NULL,solid);
 		result.collider=mSolid;
 	}

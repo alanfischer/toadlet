@@ -39,6 +39,7 @@ public:
 	TOADLET_INTERFACE(TerrainNodeMaterialSource);
 
 	virtual Material::ptr getMaterial(TerrainPatchComponent *patch)=0;
+	virtual void getTextureMatrix(Matrix4x4 &result,TerrainPatchComponent *patch)=0;
 };
 
 }
