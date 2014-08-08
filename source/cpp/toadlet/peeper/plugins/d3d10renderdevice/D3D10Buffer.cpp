@@ -322,9 +322,12 @@ bool D3D10Buffer::unlock(){
 bool D3D10Buffer::update(tbyte *data,int start,int size){
 	// UpdateSubresource does not allow partial buffer updates
 
-	tbyte *bdata=lock(Access_BIT_WRITE);
-	memcpy(bdata+start,data,size);
-	return unlock();
+	tbyte *lockData=lock(Access_BIT_WRITE);
+	if(lockData!=NULL){
+		memcpy(lockData+start,data,size);
+		return unlock();
+	}
+	return false;
 }
 
 bool D3D10Buffer::updateTexture(int i,Texture::ptr texture,const SamplerState &state){
