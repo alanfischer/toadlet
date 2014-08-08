@@ -937,6 +937,7 @@ bool GLRenderDevice::setShaderState(ShaderState *shaderState){
 	#if defined(TOADLET_HAS_GLSL)
 		GLSLShaderState *glshaderState=shaderState!=NULL?(GLSLShaderState*)shaderState->getRootShaderState():NULL;
 		if(glshaderState==NULL){
+			glUseProgram(0);
 			mLastShaderState=NULL;
 			return false;
 		}

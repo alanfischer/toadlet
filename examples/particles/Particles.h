@@ -4,6 +4,8 @@
 #include <toadlet/toadlet.h>
 //#include <LFX2.h>
 
+using namespace toadlet;
+
 class Particles:public Object,public Applet{
 public:
 	TOADLET_IOBJECT(Particles);
@@ -33,7 +35,7 @@ public:
 	Scene::ptr scene;
 	Camera::ptr camera;
 	Random random;
-	ParticleComponent::ptr points,sprites,beams;
+	ParticleComponent::ptr points,attenuateds,sprites,beams;
 	Collection<ParticleComponent::ptr> particles;
 
 	#if defined(LFX_DLL_NAME)

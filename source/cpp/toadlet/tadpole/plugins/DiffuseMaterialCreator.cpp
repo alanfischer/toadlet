@@ -158,6 +158,7 @@ DiffuseMaterialCreator::DiffuseMaterialCreator(Engine *engine){
 			"float4 position: SV_POSITION;\n"
 			"float4 color : COLOR;\n"
 			"float fog : FOG;\n"
+			"float pointSize : PSIZE;\n"
 			"float2 texCoord: TEXCOORD0;\n"
 		"};\n"
 		"struct GOUT{\n"
@@ -167,13 +168,12 @@ DiffuseMaterialCreator::DiffuseMaterialCreator(Engine *engine){
 			"float2 texCoord: TEXCOORD0;\n"
 		"};\n"
 
-		"float pointSize;\n"
-		"float4 viewport;\n"
+		"float4 geometryViewport;\n"
 
 		"[maxvertexcount(4)]\n"
 		"void main(point GIN gin[1],inout TriangleStream<GOUT> stream){\n"
-			"float aspect=viewport.w/viewport.z;\n"
-			"float w=aspect*pointSize/4.0,h=pointSize/4.0;\n"
+			"float aspect=geometryViewport.w/geometryViewport.z;\n"
+			"float w=aspect*gin[0].pointSize/4.0,h=gin[0].pointSize/4.0;\n"
 			"const float3 positions[4]={\n"
 				"float3(-w,-h,0.0),\n"
 				"float3(w,-h,0.0),\n"
@@ -250,10 +250,12 @@ DiffuseMaterialCreator::DiffuseMaterialCreator(Engine *engine){
 			"float4 position : SV_POSITION;\n"
 			"float4 color : COLOR;\n"
 			"float fog: FOG;\n"
+			"float pointSize: PSIZE;\n"
 			"float2 texCoord: TEXCOORD0;\n"
 		"};\n"
 
 		"float4x4 modelViewProjectionMatrix;\n"
+		"float4x4 modelViewMatrix;\n"
 		"float4x4 normalMatrix;\n"
 		"float4 materialDiffuseColor;\n"
 		"float4 materialAmbientColor;\n"
@@ -265,6 +267,8 @@ DiffuseMaterialCreator::DiffuseMaterialCreator(Engine *engine){
 		"float4x4 textureMatrix;\n"
 		"float fogDensity;\n"
 		"float2 fogDistance;\n"
+		"float pointSize;\n"
+		"float4 viewport;\n"
 
 		"VOUT main(VIN vin){\n"
 			"VOUT vout;\n"
@@ -276,6 +280,10 @@ DiffuseMaterialCreator::DiffuseMaterialCreator(Engine *engine){
 			"vout.color=vin.color*materialTrackColor+vout.color*(1.0-materialTrackColor);\n"
 			"vout.texCoord=mul(textureMatrix,float4(vin.texCoord,0.0,1.0));\n "
 			"vout.fog=clamp(1.0-fogDensity*(vout.position.z-fogDistance.x)/(fogDistance.y-fogDistance.x),0.0,1.0);\n"
+
+			"float4 eyePos=mul(modelViewMatrix,float4(vin.position.x, vin.position.y, 0.5, 1));\n"
+			"float dist=length(eyePos);\n"
+			"vout.pointSize=pointSize * viewport.w * rsqrt(1.0 + 1.0*dist + 1.0*dist*dist);\n"
 			"return vout;\n"
 		"}"
 	};
@@ -339,9 +347,15 @@ DiffuseMaterialCreator::DiffuseMaterialCreator(Engine *engine){
 		mDiffuseShaderState->setShader(Shader::ShaderType_FRAGMENT,mDiffuseFragmentShader);
 	}
 
+	mPointGeometryShaderState=mEngine->getMaterialManager()->createShaderState();
+	if(mPointGeometryShaderState!=NULL){
+		mPointGeometryShaderState->setShader(Shader::ShaderType_GEOMETRY,mPointSpriteGeometryShader);
+		mPointGeometryShaderState->setShader(Shader::ShaderType_VERTEX,mPointSpriteVertexShader);
+		mPointGeometryShaderState->setShader(Shader::ShaderType_FRAGMENT,mPointSpriteFragmentShader);
+	}
+
 	mPointShaderState=mEngine->getMaterialManager()->createShaderState();
 	if(mPointShaderState!=NULL){
-		mPointShaderState->setShader(Shader::ShaderType_GEOMETRY,mPointSpriteGeometryShader);
 		mPointShaderState->setShader(Shader::ShaderType_VERTEX,mPointSpriteVertexShader);
 		mPointShaderState->setShader(Shader::ShaderType_FRAGMENT,mPointSpriteFragmentShader);
 	}
@@ -372,6 +386,10 @@ void DiffuseMaterialCreator::destroy(){
 	if(mDiffuseShaderState!=NULL){
 		mDiffuseShaderState->destroy();
 		mDiffuseShaderState=NULL;
+	}
+	if(mPointGeometryShaderState!=NULL){
+		mPointGeometryShaderState->destroy();
+		mPointGeometryShaderState=NULL;
 	}
 	if(mPointShaderState!=NULL){
 		mPointShaderState->destroy();
@@ -460,10 +478,43 @@ Material::ptr DiffuseMaterialCreator::createPointSpriteMaterial(Texture *texture
 		renderState->setGeometryState(GeometryState(true,size,attenuated));
 	}
 
+	if(	mPointGeometryShaderState &&
+		mEngine->hasShader(Shader::ShaderType_VERTEX) &&
+		mEngine->hasShader(Shader::ShaderType_FRAGMENT) && 
+		mEngine->hasShader(Shader::ShaderType_GEOMETRY)
+	){
+		RenderPath::ptr shaderPath=material->addPath("shader");
+
+		RenderPass::ptr pass=shaderPath->addPass(renderState,mPointGeometryShaderState);
+
+		pass->addVariable("modelViewProjectionMatrix",RenderVariable::ptr(new MVPMatrixVariable()),Material::Scope_RENDERABLE);
+		pass->addVariable("modelViewMatrix",RenderVariable::ptr(new MVMatrixVariable()),Material::Scope_RENDERABLE);
+		pass->addVariable("normalMatrix",RenderVariable::ptr(new NormalMatrixVariable()),Material::Scope_RENDERABLE);
+		pass->addVariable("lightViewPosition",RenderVariable::ptr(new LightViewPositionVariable()),Material::Scope_MATERIAL);
+		pass->addVariable("lightColor",RenderVariable::ptr(new LightDiffuseVariable()),Material::Scope_MATERIAL);
+		pass->addVariable("ambientColor",RenderVariable::ptr(new AmbientVariable()),Material::Scope_RENDERABLE);
+		pass->addVariable("materialLight",RenderVariable::ptr(new MaterialLightVariable()),Material::Scope_MATERIAL);
+		pass->addVariable("materialDiffuseColor",RenderVariable::ptr(new MaterialDiffuseVariable()),Material::Scope_MATERIAL);
+		pass->addVariable("materialAmbientColor",RenderVariable::ptr(new MaterialAmbientVariable()),Material::Scope_MATERIAL);
+		pass->addVariable("materialTrackColor",RenderVariable::ptr(new MaterialTrackColorVariable()),Material::Scope_MATERIAL);
+		pass->addVariable("fogDensity",RenderVariable::ptr(new FogDensityVariable()),Material::Scope_MATERIAL);
+		pass->addVariable("fogDistance",RenderVariable::ptr(new FogDistanceVariable()),Material::Scope_MATERIAL);
+		pass->addVariable("fogColor",RenderVariable::ptr(new FogColorVariable()),Material::Scope_MATERIAL);
+		pass->addVariable("textureMatrix",RenderVariable::ptr(new TextureMatrixVariable("tex")),Material::Scope_MATERIAL);
+		pass->addVariable("textureSet",RenderVariable::ptr(new TextureSetVariable("tex")),Material::Scope_MATERIAL);
+		pass->addVariable("pointSize",RenderVariable::ptr(new PointSizeVariable()),Material::Scope_MATERIAL);
+		pass->addVariable("viewport",RenderVariable::ptr(new ViewportVariable()),Material::Scope_MATERIAL);
+		// TODO: This is the same value as viewport, but just used in the geometry shader.  Can we support multiple variables of the same name in different shaders?
+		pass->addVariable("geometryViewport",RenderVariable::ptr(new ViewportVariable()),Material::Scope_MATERIAL);
+		
+		if(texture!=NULL){
+			pass->setTexture("tex",texture,"samp",mEngine->getMaterialManager()->getDefaultSamplerState(),TextureState());
+		}
+	}
+
 	if(	mPointShaderState &&
 		mEngine->hasShader(Shader::ShaderType_VERTEX) &&
-		mEngine->hasShader(Shader::ShaderType_FRAGMENT)	&& 
-		mEngine->hasShader(Shader::ShaderType_GEOMETRY)
+		mEngine->hasShader(Shader::ShaderType_FRAGMENT)
 	){
 		RenderPath::ptr shaderPath=material->addPath("shader");
 
@@ -486,7 +537,7 @@ Material::ptr DiffuseMaterialCreator::createPointSpriteMaterial(Texture *texture
 		pass->addVariable("textureSet",RenderVariable::ptr(new TextureSetVariable("tex")),Material::Scope_MATERIAL);
 		pass->addVariable("pointSize",RenderVariable::ptr(new PointSizeVariable()),Material::Scope_MATERIAL);
 		pass->addVariable("viewport",RenderVariable::ptr(new ViewportVariable()),Material::Scope_MATERIAL);
-
+		
 		if(texture!=NULL){
 			pass->setTexture("tex",texture,"samp",mEngine->getMaterialManager()->getDefaultSamplerState(),TextureState());
 		}

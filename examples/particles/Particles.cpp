@@ -16,10 +16,10 @@ void Particles::create(){
 	scalar ten=Math::ONE*10;
 
 	Vector3 pointPositions[]={
-		Vector3(-ten,-ten,0),
-		Vector3(ten,-ten,0),
-		Vector3(ten,ten,ten),
-		Vector3(-ten,ten,ten),
+		Vector3(-ten,-ten*20,0),
+		Vector3(ten,-ten*20,0),
+		Vector3(ten,ten*20,ten),
+		Vector3(-ten,ten*20,ten),
 	};
 
 	Vector3 beamPositions[]={
@@ -33,7 +33,9 @@ void Particles::create(){
 		Vector3(-ten,-ten,0),
 	};
 
-	Material::ptr pointMaterial=engine->createPointSpriteMaterial(shared_static_cast<Texture>(engine->getTextureManager()->find("sparkle.png")),ten,false);
+	Texture::ptr texture=shared_static_cast<Texture>(engine->getTextureManager()->find("sparkle.png"));
+
+	Material::ptr pointMaterial=engine->createPointSpriteMaterial(texture,Math::ONE,false);
 	if(pointMaterial!=NULL){
 		pointMaterial->getPass()->setBlendState(BlendState::Combination_ALPHA_ADDITIVE);
 		pointMaterial->getPass()->setRasterizerState(RasterizerState(RasterizerState::CullType_NONE));
@@ -41,7 +43,15 @@ void Particles::create(){
 		pointMaterial->getPass()->setDepthState(DepthState(DepthState::DepthTest_LEQUAL,false));
 	}
 
-	Material::ptr spriteMaterial=shared_static_cast<Material>(engine->getMaterialManager()->find("sparkle.png"));
+	Material::ptr attenuatedMaterial=engine->createPointSpriteMaterial(texture,Math::ONE,true);
+	if(attenuatedMaterial!=NULL){
+		attenuatedMaterial->getPass()->setBlendState(BlendState::Combination_ALPHA_ADDITIVE);
+		attenuatedMaterial->getPass()->setRasterizerState(RasterizerState(RasterizerState::CullType_NONE));
+		attenuatedMaterial->getPass()->setMaterialState(MaterialState(false));
+		attenuatedMaterial->getPass()->setDepthState(DepthState(DepthState::DepthTest_LEQUAL,false));
+	}
+
+	Material::ptr spriteMaterial=engine->createDiffuseMaterial(texture);
 	if(spriteMaterial!=NULL){
 		spriteMaterial->getPass()->setBlendState(BlendState::Combination_ALPHA_ADDITIVE);
 		spriteMaterial->getPass()->setRasterizerState(RasterizerState(RasterizerState::CullType_NONE));
@@ -49,7 +59,7 @@ void Particles::create(){
 		spriteMaterial->getPass()->setDepthState(DepthState(DepthState::DepthTest_LEQUAL,false));
 	}
 
-	Material::ptr beamMaterial=shared_static_cast<Material>(engine->getMaterialManager()->find("fancyGlow.png"));
+	Material::ptr beamMaterial=engine->createDiffuseMaterial(texture);
 	if(beamMaterial!=NULL){
 		beamMaterial->getPass()->setBlendState(BlendState::Combination_ALPHA_ADDITIVE);
 		beamMaterial->getPass()->setRasterizerState(RasterizerState(RasterizerState::CullType_NONE));
@@ -64,8 +74,18 @@ void Particles::create(){
 		points->setMaterial(pointMaterial);
 		pointsNode->attach(points);
 	}
-	pointsNode->setTranslate(-Math::fromInt(40),0,0);
+	pointsNode->setTranslate(-Math::fromInt(60),0,0);
 	scene->getRoot()->attach(pointsNode);
+
+	Node::ptr attenuatedNode=new Node(scene);
+	{
+		attenuateds=new ParticleComponent(scene);
+		attenuateds->setNumParticles(4,ParticleComponent::ParticleType_POINTSPRITE,Math::ONE,pointPositions);
+		attenuateds->setMaterial(attenuatedMaterial);
+		attenuatedNode->attach(attenuateds);
+	}
+	attenuatedNode->setTranslate(-Math::fromInt(20),0,0);
+	scene->getRoot()->attach(attenuatedNode);
 
 	Node::ptr spritesNode=new Node(scene);
 	{
@@ -74,7 +94,7 @@ void Particles::create(){
 		sprites->setMaterial(spriteMaterial);
 		spritesNode->attach(sprites);
 	}
-	spritesNode->setTranslate(0,0,0);
+	spritesNode->setTranslate(Math::fromInt(20),0,0);
 	scene->getRoot()->attach(spritesNode);
 
 	Node::ptr beamsNode=new Node(scene);
@@ -84,7 +104,7 @@ void Particles::create(){
 		beams->setMaterial(beamMaterial);
 		beamsNode->attach(beams);
 	}
-	beamsNode->setTranslate(Math::fromInt(40),0,0);
+	beamsNode->setTranslate(Math::fromInt(60),0,0);
 	scene->getRoot()->attach(beamsNode);
 
 	camera=new Camera(engine);
@@ -94,6 +114,10 @@ void Particles::create(){
 	if(points){
 		points->setWorldSpace(true);
 		particles.add(points);
+	}
+	if(attenuateds){
+		attenuateds->setWorldSpace(true);
+		particles.add(attenuateds);
 	}
 	if(sprites){
 		sprites->setWorldSpace(true);

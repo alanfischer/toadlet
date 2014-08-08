@@ -59,7 +59,7 @@ public:
 				segment.direction=velocity*Math::fromMilli(dt) * mSkip;
 
 				PhysicsCollision result;
-				((TerrainNode*)scene->getRoot())->traceDetailSegment(result,Vector3(),segment,Vector3());
+//				((TerrainNode*)scene->getRoot())->traceDetailSegment(result,Vector3(),segment,Vector3());
 //				scene->getPhysicsManager()->traceSegment(result,segment,-1,NULL);
 				mSnowData[i].traceTime=result.time;
 
@@ -159,15 +159,14 @@ void Sandbox::create(){
 
 	Node::ptr snow=new Node(scene);
 	{
-		Material::ptr material=engine->createPointSpriteMaterial(snowflakeTexture,1,true);
+		Material::ptr material=engine->createPointSpriteMaterial(snowflakeTexture,4,true);
 		material->getRenderState()->setRasterizerState(RasterizerState(RasterizerState::CullType_NONE));
 		material->getRenderState()->setBlendState(BlendState::Combination_ALPHA_ADDITIVE);
 		material->getRenderState()->setDepthState(DepthState(DepthState::DepthTest_LEQUAL,false));
 
 		ParticleComponent::ptr particles=new ParticleComponent(scene);
 		particles->setMaterial(material);
-		particles->setNumParticles(40,ParticleComponent::ParticleType_POINTSPRITE,2);
-		particles->setVelocityAligned(true);
+		particles->setNumParticles(500,ParticleComponent::ParticleType_POINTSPRITE,1);
 		Random r;
 		for(int i=0;i<particles->getNumParticles();++i){
 			ParticleComponent::Particle *p=particles->getParticle(i);
