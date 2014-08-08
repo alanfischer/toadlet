@@ -576,6 +576,10 @@ bool D3D9RenderDevice::setRenderState(RenderState *renderState){
 bool D3D9RenderDevice::setShaderState(ShaderState *shaderState){
 	D3D9ShaderState *d3dshaderState=shaderState!=NULL?(D3D9ShaderState*)shaderState->getRootShaderState():NULL;
 	if(d3dshaderState==NULL){
+		#if !defined(TOADLET_SET_D3DM)
+			mD3DDevice->SetVertexShader(NULL);
+			mD3DDevice->SetPixelShader(NULL);
+		#endif
 		return false;
 	}
 

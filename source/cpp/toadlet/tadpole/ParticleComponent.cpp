@@ -154,12 +154,6 @@ bool ParticleComponent::setNumParticles(int numParticles,int particleType,scalar
 		mParticles[i].scale=scale;
 	}
 
-	GeometryState state;
-	if(mMaterial!=NULL && mMaterial->getRenderState()->getGeometryState(state)){
-		state.size=mParticleScale;
-		mMaterial->getRenderState()->setGeometryState(state);
-	}
-
 	createVertexData();
 	createIndexData();
 
@@ -211,12 +205,6 @@ void ParticleComponent::setSorted(bool sorted){
 
 void ParticleComponent::setMaterial(Material *material){
 	mMaterial=material;
-
-	GeometryState state;
-	if(mMaterial!=NULL && mMaterial->getRenderState()->getGeometryState(state)){
-		state.size=mParticleScale;
-		mMaterial->getRenderState()->setGeometryState(state);
-	}
 
 	if(mSharedRenderState!=NULL){
 		mMaterial=mEngine->getMaterialManager()->createSharedMaterial(mMaterial,mSharedRenderState);
@@ -538,6 +526,7 @@ void ParticleComponent::updateVertexData(Camera *camera){
 			for(i=0;i<numParticles;++i){
 				const Particle &p=mParticles[i];
 				int vi=i*4;
+				scalar scale=p.scale/2;
 
 				if(useOrigin){
 					viewForward.set(p.x,p.y,p.z);
@@ -554,12 +543,12 @@ void ParticleComponent::updateVertexData(Camera *camera){
 					if(mWorldSpace==false){
 						Math::mul(up,invRot);
 					}
-					Math::mul(up,p.scale);
-					Math::mul(right,viewRight,p.scale);
+					Math::mul(up,scale);
+					Math::mul(right,viewRight,scale);
 				}
 				else{
-					Math::mul(up,viewUp,p.scale);
-					Math::mul(right,viewRight,p.scale);
+					Math::mul(up,viewUp,scale);
+					Math::mul(right,viewRight,scale);
 				}
 
 				vba.set3(vi+0,0,	p.x+up.x-right.x, p.y+up.y-right.y, p.z+up.z-right.z);
@@ -587,7 +576,8 @@ void ParticleComponent::updateVertexData(Camera *camera){
 				Particle &p=mParticles[pi];
 				Particle &p1=mParticles[(pi+1)%mParticles.size()];
 				Particle &pn=mParticles[(pi+mBeamLength-1)%mParticles.size()];
-				
+				scalar scale=p.scale/2;
+
 				right.x=p1.x-p.x; right.y=p1.y-p.y; right.z=p1.z-p.z;
 
 				Math::normalizeCarefully(right,epsilon);
@@ -595,8 +585,8 @@ void ParticleComponent::updateVertexData(Camera *camera){
 				if(Math::normalizeCarefully(up,epsilon)==false){
 					up.set(Math::X_UNIT_VECTOR3);
 				}
-				Math::mul(up,p.scale);
-				Math::mul(right,p.scale);
+				Math::mul(up,scale);
+				Math::mul(right,scale);
 
 				if(mBeamType==0){
 					vba.set3(vi+0,0,		p.x+up.x-right.x, p.y+up.y-right.y, p.z+up.z-right.z);
@@ -630,13 +620,13 @@ void ParticleComponent::updateVertexData(Camera *camera){
 					if(Math::normalizeCarefully(up2,epsilon)==false){
 						up2.set(Math::X_UNIT_VECTOR3);
 					}
-					Math::mul(up2,p.scale);
+					Math::mul(up2,scale);
 
 					Math::add(up,up2);
 					if(Math::normalizeCarefully(up,epsilon)==false){
 						up.set(Math::X_UNIT_VECTOR3);
 					}
-					Math::mul(up,p.scale);
+					Math::mul(up,scale);
 
 					vba.set3(ivi+0,0,		ip.x+up.x, ip.y+up.y, ip.z+up.z);
 					vba.setRGBA(ivi+0,1,	p.color);
@@ -656,7 +646,7 @@ void ParticleComponent::updateVertexData(Camera *camera){
 					if(Math::normalizeCarefully(up,epsilon)==false){
 						up.set(Math::X_UNIT_VECTOR3);
 					}
-					Math::mul(up,p.scale);
+					Math::mul(up,scale);
 				}
 				else{
 					// We re-use the up from the previous particle pair,
@@ -664,7 +654,7 @@ void ParticleComponent::updateVertexData(Camera *camera){
 					//  only need to calculate the right, and only if we drew middle particles
 					if(j>0){
 						Math::normalizeCarefully(right,epsilon);
-						Math::mul(right,p.scale);
+						Math::mul(right,scale);
 					}
 				}
 

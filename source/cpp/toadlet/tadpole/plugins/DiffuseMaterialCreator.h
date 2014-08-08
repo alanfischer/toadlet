@@ -50,7 +50,7 @@ protected:
 	Engine *mEngine;
 	Shader::ptr mDiffuseVertexShader,mDiffuseFragmentShader;
 	Shader::ptr mPointSpriteGeometryShader,mPointSpriteVertexShader,mPointSpriteFragmentShader;
-	ShaderState::ptr mDiffuseShaderState,mPointShaderState;
+	ShaderState::ptr mDiffuseShaderState,mPointGeometryShaderState,mPointShaderState;
 };
 
 }
