@@ -165,6 +165,15 @@ bool D3D10TextureMipPixelBuffer::unlock(){
 	return true;
 }
 
+bool D3D10TextureMipPixelBuffer::update(tbyte *data,int start,int size){
+	tbyte *lockData=lock(Access_BIT_WRITE);
+	if(lockData!=NULL){
+		memcpy(lockData+start,data,size);
+		return unlock();
+	}
+	return false;
+}
+
 bool D3D10TextureMipPixelBuffer::createViews(int dimension,int pixelFormat,int level){
 	HRESULT result=S_OK;
 	if((pixelFormat&TextureFormat::Format_MASK_SEMANTICS)!=TextureFormat::Format_SEMANTIC_DEPTH){

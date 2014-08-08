@@ -3,11 +3,11 @@
 
 class SnowComponent:public BaseComponent{
 public:
-	SnowComponent(ParticleComponent *particles,int skip,PixelBuffer::ptr buffer):
+	SnowComponent(ParticleComponent *particles,int skip,Texture::ptr texture):
 		mParticles(particles),
 		mSkip(skip),
 		mNext(0),
-		mBuffer(buffer)
+		mTexture(texture)
 	{
 		mSnowData.resize(mParticles->getNumParticles());
 		for(int i=0;i<mParticles->getNumParticles();++i){
@@ -15,8 +15,8 @@ public:
 			mSnowData[i].oldPosition=mSnowData[i].newPosition=Vector3(p->x,p->y,p->z);
 		}
 
-		mBufferData=new tbyte[buffer->getTextureFormat()->getDataSize()];
-		memset(mBufferData,0,buffer->getTextureFormat()->getDataSize());
+		mBufferData=new tbyte[texture->getFormat()->getDataSize()];
+		memset(mBufferData,0,texture->getFormat()->getDataSize());
 	}
 
 	void frameUpdate(int dt,int scope){
@@ -59,7 +59,7 @@ public:
 				segment.direction=velocity*Math::fromMilli(dt) * mSkip;
 
 				PhysicsCollision result;
-//				((TerrainNode*)scene->getRoot())->traceDetailSegment(result,Vector3(),segment,Vector3());
+				((TerrainNode*)scene->getRoot())->traceDetailSegment(result,Vector3(),segment,Vector3());
 //				scene->getPhysicsManager()->traceSegment(result,segment,-1,NULL);
 				mSnowData[i].traceTime=result.time;
 
@@ -70,10 +70,10 @@ public:
 					mSnowData[i].newPosition=position;
 
 					if(result.texCoord.x>=0 && result.texCoord.x<1 && result.texCoord.y>=0 && result.texCoord.y<1){
-						int x=(result.texCoord.x) * mBuffer->getTextureFormat()->getWidth();
-						int y=(result.texCoord.y) * mBuffer->getTextureFormat()->getHeight();
+						int x=(result.texCoord.x) * mTexture->getFormat()->getWidth();
+						int y=(result.texCoord.y) * mTexture->getFormat()->getHeight();
 						int s=8;
-						PointTextureCreator::createPointTexture(mBuffer->getTextureFormat(),mBufferData,x-s,y-s,s*2,s*2,0,1,0,0,1.25);
+						PointTextureCreator::createPointTexture(mTexture->getFormat(),mBufferData,x-s,y-s,s*2,s*2,0,1,0,0,1.25);
 					}
 				}
 				else{
@@ -90,7 +90,7 @@ public:
 			mNext=0;
 		}
 
-		mBuffer->update(mBufferData,0,mBuffer->getTextureFormat()->getDataSize());
+		mTexture->load(mTexture->getFormat(),mBufferData);
 	}
 
 protected:
@@ -106,7 +106,7 @@ protected:
 	ParticleComponent::ptr mParticles;
 	Collection<SnowData> mSnowData;
 	int mSkip,mNext;
-	PixelBuffer::ptr mBuffer;
+	Texture::ptr mTexture;
 	tbyte *mBufferData;
 };
 
@@ -123,10 +123,8 @@ void Sandbox::create(){
 
 	scene=new Scene(engine,Scene::Option_BIT_NOBULLET);
 
-	PixelBuffer::ptr buffer;
 	TextureFormat::ptr format=new TextureFormat(2,TextureFormat::Format_L_8,1024,1024,1,0);
 	Texture::ptr texture=engine->getTextureManager()->createTexture(Texture::Usage_BIT_STREAM|Texture::Usage_BIT_AUTOGEN_MIPMAPS,format,(tbyte*)NULL);
-	buffer=texture->getMipPixelBuffer(0,0);
 
 	TerrainNode::ptr terrain=new TerrainNode(scene);
 	terrain->setDataSource(new TextureDataSource(engine,Vector3(.5,.5,12),0,"terrain.png"));
@@ -175,7 +173,7 @@ void Sandbox::create(){
 		}
 		snow->attach(particles);
 
-		snow->attach(new SnowComponent(particles,10,buffer));
+		snow->attach(new SnowComponent(particles,10,texture));
 	}
 	scene->getRoot()->attach(snow);
 }

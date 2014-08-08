@@ -177,6 +177,15 @@ bool D3D9PixelBuffer::unlock(){
 	return SUCCEEDED(result);
 }
 
+bool D3D9PixelBuffer::update(tbyte *data,int start,int size){
+	uint8 *lockData=lock(Buffer::Access_BIT_WRITE);
+	if(lockData!=NULL){
+		memcpy(lockData+start,data,size);
+		return unlock();
+	}
+	return false;
+}
+
 bool D3D9PixelBuffer::needsReset(){
 	#if defined(TOADLET_SET_D3DM)
 		return false;

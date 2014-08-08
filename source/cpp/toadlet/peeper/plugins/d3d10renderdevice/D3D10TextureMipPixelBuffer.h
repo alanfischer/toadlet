@@ -57,7 +57,7 @@ public:
 
 	tbyte *lock(int lockAccess);
 	bool unlock();
-	bool update(tbyte *data,int start,int size){return false;}
+	bool update(tbyte *data,int start,int size);
 
 	inline D3D10Texture *getTexture() const{return mTexture;}
 	inline ID3D10RenderTargetView *getD3D10RenderTargetView() const{return mD3DRenderTargetView;}
