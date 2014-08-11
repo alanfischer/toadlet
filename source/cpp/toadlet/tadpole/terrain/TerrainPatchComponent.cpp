@@ -150,7 +150,13 @@ bool TerrainPatchComponent::setHeightData(scalar *data,int rowPitch,int width,in
 	int numVertexes=Math::square(mSize+1);
 	int numIndexes=Math::square(mSize)*6;
 	VertexFormat::ptr vertexFormat=mEngine->getVertexFormats().POSITION_NORMAL_TEX_COORD;
-	IndexBuffer::IndexFormat indexFormat=IndexBuffer::IndexFormat_UINT16;
+	IndexBuffer::IndexFormat indexFormat;
+	if(numIndexes>Extents::MAX_UINT16){
+		indexFormat=IndexBuffer::IndexFormat_UINT32;
+	}
+	else{
+		indexFormat=IndexBuffer::IndexFormat_UINT16;
+	}
 
 	mVertexes.resize(numVertexes);
 
