@@ -82,7 +82,14 @@ void ArchiveManager::ArchiveStreamRequest::request(){
 	if(mIt!=mManager->mResources.end()){
 		Archive *archive=((Archive*)(*mIt));
 		if(archive!=NULL){
-			archive->openStream(mName,this);
+			bool result=false;
+			Exception exception;
+			TOADLET_TRY
+				result=archive->openStream(mName,this);
+			TOADLET_CATCH(Exception ex){exception=ex;}
+			if(result==false){
+				streamException(exception);
+			}
 		}
 		else{
 			streamException(Exception());

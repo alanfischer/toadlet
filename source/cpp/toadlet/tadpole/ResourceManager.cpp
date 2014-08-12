@@ -387,12 +387,16 @@ ResourceManager::ArchiveResourceRequest::ArchiveResourceRequest(ResourceManager 
 void ResourceManager::ArchiveResourceRequest::request(){
 	if(mIt!=mManager->mResourceArchives.end()){
 		mSearchingArchives=true;
+		bool result=false;
+		Exception exception;
 		Archive *archive=((Archive*)(*mIt));
 		if(archive!=NULL){
-			archive->openResource(mName,this);
+			TOADLET_TRY
+				result=archive->openResource(mName,this);
+			TOADLET_CATCH(Exception ex){exception=ex;}
 		}
-		else{
-			resourceException(Exception());
+		if(result==false){
+			resourceException(exception);
 		}
 	}
 	else{
@@ -412,7 +416,14 @@ void ResourceManager::ArchiveResourceRequest::notFound(){
 			mStreamer=mManager->mDefaultStreamer;
 		}
 		if(mStreamer!=NULL){
-			engine->getArchiveManager()->openStream(mFilename,this);
+			bool result=false;
+			Exception exception;
+			TOADLET_TRY
+				result=engine->getArchiveManager()->openStream(mFilename,this);
+			TOADLET_CATCH(Exception ex){exception=ex;}
+			if(result==false){
+				mRequest->resourceException(exception);
+			}
 		}
 		else{
 			mRequest->resourceException(Error::unknown(Categories::TOADLET_TADPOLE,
@@ -479,7 +490,14 @@ void ResourceManager::ArchiveResourceRequest::streamReady(Stream *stream){
 		mPushedTemp=false;
 	}
 
-	mStreamer->load(stream,mData,this);
+	bool result=false;
+	Exception exception;
+	TOADLET_TRY
+		result=mStreamer->load(stream,mData,this);
+	TOADLET_CATCH(Exception ex){exception=ex;}
+	if(result==false){
+		resourceException(exception);
+	}
 }
 
 void ArchiveManager::ArchiveResourceRequest::streamException(const Exception &ex){

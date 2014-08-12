@@ -48,12 +48,11 @@ public:
 		TOADLET_CATCH(Exception ex){exception=ex;}
 		if(result!=NULL){
 			request->streamReady(result);
-			return true;
 		}
 		else{
 			request->streamException(exception);
-			return false;
 		}
+		return true;
 	}
 
 	bool openResource(const String &name,ResourceRequest *request){
@@ -64,12 +63,11 @@ public:
 		TOADLET_CATCH(Exception ex){exception=ex;}
 		if(result!=NULL){
 			request->resourceReady(result);
-			return true;
 		}
 		else{
 			request->resourceException(exception);
-			return false;
 		}
+		return true;
 	}
 
 	virtual Stream::ptr openStream(const String &name){return NULL;}

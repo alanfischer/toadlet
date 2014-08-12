@@ -81,7 +81,7 @@ void TreeComponent::transformChanged(Transform *transform){
 	mWorldBound->transform(getBound(),mParent->getWorldTransform());
 }
 
-void TreeComponent::traceSegment(PhysicsCollision &result,const Vector3 &position,const Segment &segment,const Vector3 &size){
+void TreeComponent::traceDetailSegment(PhysicsCollision &result,const Vector3 &position,const Segment &segment,const Vector3 &size){
 	mSystem->traceSegment(result,position,segment,size);
 }
 

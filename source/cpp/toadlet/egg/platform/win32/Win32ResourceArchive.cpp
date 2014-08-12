@@ -72,13 +72,13 @@ Stream::ptr Win32ResourceArchive::openStream(const String &name){
 	HRSRC src=FindResource((HMODULE)mModule,IS_INTRESOURCE(resName)?resName:"\""+String(resName)+"\"",RT_RCDATA);
 	if(src==NULL){
 		//Error::nullPointer(Categories::TOADLET_EGG,"error in FindResource");
-		return false;
+		return NULL;
 	}
 	
 	HGLOBAL handle=LoadResource((HMODULE)mModule,src);
 	if(handle==NULL){
 		Error::nullPointer(Categories::TOADLET_EGG,"error in LoadResource");
-		return false;
+		return NULL;
 	}
 	
 	LPVOID data=LockResource(handle);

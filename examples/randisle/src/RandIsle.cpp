@@ -42,6 +42,8 @@ void RandIsle::create(){
 }
 
 void RandIsle::resourceCacheReady(ResourceCache *cache){
+	Log::debug("RandIsle::resourceCacheReady");
+
 	mPatchSize=resources->patchSize;
 	scalar scale=16*64/mPatchSize;
 	mPatchScale.set(scale,scale,64);
@@ -214,6 +216,8 @@ void RandIsle::resourceCacheReady(ResourceCache *cache){
 		joyDevice->setListener(this);
 		joyDevice->start();
 	}
+
+	Log::debug("RandIsle::resourceCacheReady finished");
 }
 
 void RandIsle::destroy(){
@@ -245,6 +249,8 @@ void RandIsle::destroy(){
 }
 
 void RandIsle::render(){
+	TOADLET_ASSERT(mCamera!=NULL);
+
 	TOADLET_PROFILE_AUTOSCOPE();
 
 	Matrix4x4 matrix;

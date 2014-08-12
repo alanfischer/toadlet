@@ -32,8 +32,8 @@ public:
 	void transformChanged(Transform *transform);
 
 	// DetailTraceable
-	Bound *getTraceableBound() const{return getBound();}
-	void traceSegment(PhysicsCollision &result,const Vector3 &position,const Segment &segment,const Vector3 &size);
+	Bound *getDetailBound() const{return getBound();}
+	void traceDetailSegment(PhysicsCollision &result,const Vector3 &position,const Segment &segment,const Vector3 &size);
 
 protected:
 	Scene *mScene;

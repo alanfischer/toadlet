@@ -2,10 +2,10 @@
 #include <jni.h>
 
 extern "C" JNIEXPORT jobject JNICALL Java_us_toadlet_logo_Logo_createApplet(JNIEnv *env,jobject obj){
-	Logger::alert("getting Application");
+	Log::alert("getting Application");
 	Application *app=new JApplication(env,obj);
 
-	Logger::alert("creating applet");
+	Log::alert("creating applet");
 	Applet *applet=new Logo(app);
 
 	jobject appletObj=NULL;

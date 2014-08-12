@@ -3,6 +3,8 @@
 
 #include <toadlet/toadlet.h>
 
+using namespace toadlet;
+
 class Logo:public Object,public Applet{
 public:
 	TOADLET_IOBJECT(Logo);

@@ -9,14 +9,12 @@ public class Logo extends AndroidApplication{
 		System.loadLibrary("toadlet_hop");
 		System.loadLibrary("toadlet_flick");
 		System.loadLibrary("toadlet_flick_jinputdevice");
-		System.loadLibrary("toadlet_knot");
 		System.loadLibrary("toadlet_peeper");
 		System.loadLibrary("toadlet_peeper_gles1renderdevice");
 		System.loadLibrary("toadlet_peeper_gles2renderdevice");
 		System.loadLibrary("toadlet_ribbit");
 		System.loadLibrary("toadlet_ribbit_jaudiodevice");
 		System.loadLibrary("toadlet_tadpole");
-		System.loadLibrary("toadlet_tadpole_hop");
 		System.loadLibrary("toadlet_pad");
 		System.loadLibrary("logo");
 	}
