@@ -487,6 +487,10 @@ void Engine::setHasBackableTriangleFan(bool has){
 }
 
 void Engine::setHasMaximumShader(bool has){
+	if(!has){
+		Log::warning(Categories::TOADLET_TADPOLE,"Disabling shaders");
+	}
+
 	for(int i=0;i<Shader::ShaderType_MAX;++i){
 		mMaximumRenderCaps.hasShader[i]=has;
 	}
@@ -494,6 +498,10 @@ void Engine::setHasMaximumShader(bool has){
 }
 
 void Engine::setHasMaximumFixed(bool has){
+	if(!has){
+		Log::warning(Categories::TOADLET_TADPOLE,"Disabling fixed function");
+	}
+
 	for(int i=0;i<Shader::ShaderType_MAX;++i){
 		mMaximumRenderCaps.hasFixed[i]=has;
 	}
