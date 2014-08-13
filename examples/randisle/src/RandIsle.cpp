@@ -32,7 +32,6 @@ void RandIsle::create(){
 	Log::debug("RandIsle::create");
 
 	mEngine=mApp->getEngine();
-	mEngine->setHasMaximumShader(false);
 	mEngine->getArchiveManager()->addDirectory(mPath);
 
 	resources=new Resources(mEngine,this);
