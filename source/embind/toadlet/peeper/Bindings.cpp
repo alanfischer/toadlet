@@ -12,12 +12,13 @@ using namespace toadlet::egg;
 using namespace toadlet::peeper;
 
 extern "C" RenderDevice *new_GLES2RenderDevice();
-extern "C" RenderTarget *new_EGLWindowRenderTarget(void *display,void *window,WindowRenderTargetFormat *format);
+extern "C" RenderTarget *new_EGLWindowRenderTarget(void *display,void *window,WindowRenderTargetFormat *format,RenderTarget *shareTarget);
 
 RenderTarget *new_EGLWindowRenderTarget2(val canvas){
 	val::global("Module").set("canvas",canvas);
 	WindowRenderTargetFormat format;
-	return new_EGLWindowRenderTarget(NULL,NULL,&format);
+	format.flags=2;
+	return new_EGLWindowRenderTarget(NULL,NULL,&format,NULL);
 }
 
 EMSCRIPTEN_BINDINGS(peeper) {
@@ -32,11 +33,11 @@ EMSCRIPTEN_BINDINGS(peeper) {
 	;
 
 	class_<RenderTarget>("RenderTarget")
-		.smart_ptr<RenderTarget::ptr>()
+		.smart_ptr<RenderTarget::ptr>("RenderTargetPtr")
 	;
 
 	class_<RenderDevice>("RenderDevice")
-		.smart_ptr<RenderDevice::ptr>()
+		.smart_ptr<RenderDevice::ptr>("RenderDevice_ptr")
 		.function("create",&RenderDevice::create, allow_raw_pointers())
 		.function("beginScene",&RenderDevice::beginScene)
 		.function("endScene",&RenderDevice::endScene)
@@ -47,7 +48,7 @@ EMSCRIPTEN_BINDINGS(peeper) {
 	function("new_EGLWindowRenderTarget",&new_EGLWindowRenderTarget2, allow_raw_pointers());
 
 	class_<RenderState>("RenderState")
-		.smart_ptr<RenderState::ptr>()
+		.smart_ptr<RenderState::ptr>("RenderState_ptr")
 	;
     
 	enum_<TextureFormat::Dimension>("Dimension")
@@ -63,11 +64,11 @@ EMSCRIPTEN_BINDINGS(peeper) {
 	;
 
 	class_<TextureFormat>("TextureFormat")
-		.smart_ptr_constructor(&make_ptr<TextureFormat,int,int,int,int,int,int>)
+		.smart_ptr_constructor("TextureFormat_ptr",&make_ptr<TextureFormat,int,int,int,int,int,int>)
 	;
 
 	class_<Texture,base<Resource>>("Texture")
-		.smart_ptr<Texture::ptr>()
+		.smart_ptr<Texture::ptr>("Texture_ptr")
 	;
 
 	function("toTexture",select_overload<Texture*(Resource*)>(
