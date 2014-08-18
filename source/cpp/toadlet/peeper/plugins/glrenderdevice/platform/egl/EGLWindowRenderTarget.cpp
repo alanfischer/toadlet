@@ -70,7 +70,7 @@ EGLWindowRenderTarget::EGLWindowRenderTarget(void *display,void *window,WindowRe
 			}
 		}
 
-		result=createContext(display,window,format,pixmap);
+		result=createContext(display,window,format,shareTarget,pixmap);
 	#endif
 }
 
@@ -80,7 +80,7 @@ void EGLWindowRenderTarget::destroy(){
 	BaseResource::destroy();
 }
 
-bool EGLWindowRenderTarget::createContext(void *display,void *window,WindowRenderTargetFormat *format,bool pixmap){
+bool EGLWindowRenderTarget::createContext(void *display,void *window,WindowRenderTargetFormat *format,RenderTarget *shareTarget,bool pixmap){
 	#if defined(TOADLET_PLATFORM_WIN32)
 		if(display==NULL){
 		if(display==NULL){
@@ -181,8 +181,15 @@ bool EGLWindowRenderTarget::createContext(void *display,void *window,WindowRende
 	int i=0;
 
 	if(contextVersion>0){
+		Log::alert(Categories::TOADLET_PEEPER,
+			String("EGL_CONTEXT_CLIENT_VERSION:") + contextVersion);
+	
 		configOptions[i++]=EGL_CONTEXT_CLIENT_VERSION;
 		configOptions[i++]=contextVersion;
+	}
+	else{
+		Log::alert(Categories::TOADLET_PEEPER,
+			String("No EGL_CONTEXT_CLIENT_VERSION"));
 	}
 	
 	// Terminate the list with EGL_NONE
@@ -192,7 +199,7 @@ bool EGLWindowRenderTarget::createContext(void *display,void *window,WindowRende
 	if(shareTarget!=NULL){
 		shareContext=((EGLRenderTarget*)(shareTarget->getRootRenderTarget()))->getEGLContext();
 	}
-	mContext=eglCreateContext(mDisplay,mConfig,EGL_NO_CONTEXT,configOptions);
+	mContext=eglCreateContext(mDisplay,mConfig,shareContext,configOptions);
 	TOADLET_CHECK_EGLERROR("eglCreateContext");
 	
 	if(mContext==EGL_NO_CONTEXT){

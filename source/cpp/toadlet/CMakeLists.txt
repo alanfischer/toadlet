@@ -68,18 +68,18 @@ configure_file (${CMAKE_CURRENT_SOURCE_DIR}/Config.h.cmake ${CMAKE_CURRENT_BINAR
 
 # Javascript library
 if (TOADLET_PLATFORM_EMSCRIPTEN)
-	add_executable (toadlet.js 
+	add_executable (toadlet
 		"../../embind/toadlet/egg/Bindings.cpp"
 		"../../embind/toadlet/hop/Bindings.cpp"
 		"../../embind/toadlet/peeper/Bindings.cpp"
 		"../../embind/toadlet/tadpole/Bindings.cpp"
 	)
 	
-	set_target_properties (toadlet.js PROPERTIES COMPILE_FLAGS "--bind")
-	set_target_properties (toadlet.js PROPERTIES LINK_FLAGS "--bind --js-library ../../../../source/js/DOMArchive.js")
-	target_link_libraries (toadlet.js "toadlet_egg_s" "toadlet_hop_s" "toadlet_peeper_s" "toadlet_peeper_gles2renderdevice_s" "toadlet_ribbit_s" "toadlet_ribbit_alaudiodevice_s" "toadlet_tadpole_s")
-	get_target_property (TOADLET_JS_OUTPUT toadlet.js LOCATION)
-	add_custom_command(TARGET toadlet.js POST_BUILD
+	set_target_properties (toadlet PROPERTIES COMPILE_FLAGS "--bind")
+	set_target_properties (toadlet PROPERTIES LINK_FLAGS "--bind --js-library ../../../../source/js/DOMArchive.js")
+	target_link_libraries (toadlet "toadlet_egg_s" "toadlet_hop_s" "toadlet_peeper_s" "toadlet_peeper_gles2renderdevice_s" "toadlet_ribbit_s" "toadlet_ribbit_alaudiodevice_s" "toadlet_tadpole_s")
+	get_target_property (TOADLET_JS_OUTPUT toadlet LOCATION)
+	add_custom_command(TARGET toadlet POST_BUILD
 		COMMAND python ${CMAKE_CURRENT_SOURCE_DIR}/../../../cmake/Modules/JSModulify.py toadlet ${TOADLET_JS_OUTPUT} ${CMAKE_INSTALL_PREFIX}/${LIB_INSTALL_DIR}/toadlet.js)
 endif (TOADLET_PLATFORM_EMSCRIPTEN)
 

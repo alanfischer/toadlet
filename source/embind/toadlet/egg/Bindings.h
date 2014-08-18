@@ -47,30 +47,17 @@ namespace emscripten {
 			return ptr.get();
 		}
 
-		static sharing_policy get_sharing_policy() {
-			return sharing_policy::BY_EMVAL;
-		}
-
 		static toadlet::egg::IntrusivePointer<PointeeType>* share(PointeeType* p, internal::EM_VAL v) {
-			return new toadlet::egg::IntrusivePointer<PointeeType>(
-				p);//, val_deleter(val::take_ownership(v)));
+			return new toadlet::egg::IntrusivePointer<PointeeType>(p);
 		}
 
-	private:
-		class val_deleter {
-		public:
-			val_deleter() = delete;
-			explicit val_deleter(val v)
-				: v(v)
-			{}
-			void operator()(void const*) {
-				v();
-				// eventually we'll need to support emptied out val
-				v = val::undefined();
-			}
-		private:
-			val v;
-		};
+		static sharing_policy get_sharing_policy() {
+			return sharing_policy::INTRUSIVE;
+		}
+
+		static PointerType* construct_null() {
+            return new PointerType;
+        }
 	};
 
 	template<typename T, typename... Args>

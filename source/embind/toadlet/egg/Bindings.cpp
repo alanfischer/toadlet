@@ -77,7 +77,7 @@ EMSCRIPTEN_BINDINGS(egg) {
 	;
 
 	class_<Stream>("Stream")
-		.smart_ptr<Stream::ptr>()
+		.smart_ptr<Stream::ptr>("Stream_ptr")
 
 		.function("close", &Stream::close)
 		.function("closed", &Stream::closed)
@@ -96,12 +96,12 @@ EMSCRIPTEN_BINDINGS(egg) {
 	;
 
 	class_<Resource>("Resource")
-		.smart_ptr<Resource::ptr>()
+		.smart_ptr<Resource::ptr>("Resource_ptr")
 	;
 
 	class_<StreamRequest>("StreamRequest")
-		.smart_ptr<StreamRequest::ptr>()
-		.allow_subclass<StreamRequestWrapper, StreamRequestWrapper::ptr>()
+		.smart_ptr<StreamRequest::ptr>("StreamRequest_ptr")
+		.allow_subclass<StreamRequestWrapper, StreamRequestWrapper::ptr>("StreamRequestWrapper")
 		.function("streamReady", &StreamRequest::streamReady, allow_raw_pointers())
 		.function("stringStreamReady", &StreamRequest_stringStreamReady, allow_raw_pointers())
 		.function("streamException", &StreamRequest::streamException)
@@ -109,8 +109,8 @@ EMSCRIPTEN_BINDINGS(egg) {
 	;
 
 	class_<ResourceRequest>("ResourceRequest")
-		.smart_ptr<ResourceRequest::ptr>()
-		.allow_subclass<ResourceRequestWrapper, ResourceRequestWrapper::ptr>()
+		.smart_ptr<ResourceRequest::ptr>("ResourceRequest_ptr")
+		.allow_subclass<ResourceRequestWrapper, ResourceRequestWrapper::ptr>("ResourceRequestWrapper")
 
 		.function("resourceReady", &ResourceRequest::resourceReady, allow_raw_pointers())
 		.function("resourceException", &ResourceRequest::resourceException)
@@ -118,8 +118,8 @@ EMSCRIPTEN_BINDINGS(egg) {
 	;
 
 	class_<Archive,base<Resource>>("Archive")
-		.smart_ptr<Archive::ptr>()
-		.allow_subclass<ArchiveWrapper, ArchiveWrapper::ptr>()
+		.smart_ptr<Archive::ptr>("Archive_ptr")
+		.allow_subclass<ArchiveWrapper, ArchiveWrapper::ptr>("ArchiveWrapper")
 
 		.function("openStream", &Archive::openStream, allow_raw_pointers())
 		.function("openResource", &Archive::openResource, allow_raw_pointers())
