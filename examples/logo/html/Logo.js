@@ -27,7 +27,6 @@ var Logo=function(engine){ return{
 						var animation=new toadlet.AnimationAction(mesh.getSkeleton().getAnimationWithIndex(0));
 						animation.setCycling(toadlet.Cycling.Cycling_REFLECT);
 						lt.attach(new toadlet.ActionComponent("animation",animation));
-						resource.delete();
 					}
 
 					lt.startAction("animation");

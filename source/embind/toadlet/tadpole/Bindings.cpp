@@ -47,14 +47,12 @@ public:
 	}
 };
 
-extern "C" void *DOMArchive();
+extern "C" void DOMArchive();
 
-Archive::ptr makeDOMArchive(Engine *engine){
+Archive::ptr new_DOMArchive(Engine *engine){
 	volatile bool link=false;
 	if(link){DOMArchive();}
-	val v=val::module_property("DOMArchive")(engine);
-	Archive::ptr a=v.as<Archive::ptr>();
-	return a;
+	return val::module_property("DOMArchive")().new_(engine).as<ArchiveWrapper::ptr>();
 }
 
 EMSCRIPTEN_BINDINGS(tadpole) {
@@ -117,6 +115,9 @@ EMSCRIPTEN_BINDINGS(tadpole) {
 
 	class_<ArchiveManager,base<ResourceManager>>("ArchiveManager")
 		.smart_ptr<ArchiveManager::ptr>("ArchiveManager_ptr")
+
+		.function("addArchive",&ArchiveManager::addArchive, allow_raw_pointers())
+		.function("removeArchive",&ArchiveManager::removeArchive, allow_raw_pointers())
 	;
 
 	class_<TextureManager,base<ResourceManager>>("TextureManager")

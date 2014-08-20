@@ -107,7 +107,7 @@
 #endif
 
 #if defined(TOADLET_PLATFORM_EMSCRIPTEN)
-	extern toadlet::egg::io::Archive::ptr makeDOMArchive(toadlet::tadpole::Engine *engine);
+	extern toadlet::egg::io::Archive::ptr new_DOMArchive(toadlet::tadpole::Engine *engine);
 #endif
 
 #if !defined(TOADLET_FIXED_POINT)
@@ -350,8 +350,8 @@ void Engine::installHandlers(){
 	#endif
 
 	#if defined(TOADLET_PLATFORM_EMSCRIPTEN)
-		Archive::ptr domArchive=makeDOMArchive(this);
-		mArchiveManager->manage(domArchive,"DOMArchive");
+		Archive::ptr domArchive=new_DOMArchive(this);
+		mArchiveManager->addArchive(domArchive);
 		mTextureManager->addResourceArchive(domArchive);
 	#endif
 	

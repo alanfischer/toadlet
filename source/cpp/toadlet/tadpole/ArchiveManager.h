@@ -39,6 +39,9 @@ public:
 
 	ArchiveManager(Engine *engine);
 
+	void addArchive(Archive *archive){manage(archive);}
+	void removeArchive(Archive *archive){unmanage(archive);}
+
 	Resource::ptr manage(Resource *resource,const String &name=(char*)NULL);
 	void unmanage(Resource *resource);
 
