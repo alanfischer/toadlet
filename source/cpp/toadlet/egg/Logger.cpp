@@ -54,7 +54,7 @@ Logger::Logger(bool startSilent):
 		pthread_mutexattr_t attrib;
 		pthread_mutexattr_init(&attrib);
 		pthread_mutexattr_settype(&attrib,PTHREAD_MUTEX_RECURSIVE);
-		int result=pthread_mutex_init(mMutex,&attrib);
+		int result=pthread_mutex_init((pthread_mutex_t*)mMutex,&attrib);
 		pthread_mutexattr_destroy(&attrib);
 	#endif
 
@@ -78,8 +78,8 @@ Logger::~Logger(){
 	#elif defined(TOADLET_PLATFORM_WIN32)
 		CloseHandle(mMutex);
 	#else
-		pthread_mutex_destroy(mMutex);
-		delete mMutex;
+		pthread_mutex_destroy((pthread_mutex_t*)mMutex);
+		delete (pthread_mutex_t*)mMutex;
 	#endif
 }
 
@@ -229,7 +229,7 @@ void Logger::lock(){
 	#elif defined(TOADLET_PLATFORM_WIN32)
 		WaitForSingleObject(mMutex,INFINITE);
 	#else
-		pthread_mutex_lock(mMutex);
+		pthread_mutex_lock((pthread_mutex_t*)mMutex);
 	#endif
 }
 
@@ -238,7 +238,7 @@ void Logger::unlock(){
 	#elif defined(TOADLET_PLATFORM_WIN32)
 		ReleaseMutex(mMutex);
 	#else
-		pthread_mutex_unlock(mMutex);
+		pthread_mutex_unlock((pthread_mutex_t*)mMutex);
 	#endif
 }
 
