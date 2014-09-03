@@ -289,9 +289,6 @@ public:
 
 Logger *Log::mTheLogger=NULL;
 Collection<LoggerListener*> Log::mListeners;
-#if defined(TOADLET_THREADSAFE)
-	Mutex Log::mMutex;
-#endif
 Map<int,Logger*> Log::mThreadLoggers;
 bool Log::mPerThread=false;
 
@@ -301,22 +298,20 @@ Logger *Log::getInstance(){
 	}
 
 	Logger *logger=mTheLogger;
-	#if defined(TOADLET_THREADSAFE)
-		if(mPerThread){
-			int thread=System::threadID();
-			mMutex.lock();
-				Logger *logger=mThreadLoggers[thread];
-				if(logger==NULL){
-					LoggerListener *listener=new ParentListener(mTheLogger);
-					mListeners.add(listener);
+	if(mPerThread){
+		int thread=System::threadID();
+		logger->lock();
+			Logger *logger=mThreadLoggers[thread];
+			if(logger==NULL){
+				LoggerListener *listener=new ParentListener(mTheLogger);
+				mListeners.add(listener);
 
-					logger=new Logger(true);
-					logger->addLoggerListener(listener);
-					mThreadLoggers[thread]=logger;
-				}
-			mMutex.unlock();
-		}
-	#endif
+				logger=new Logger(true);
+				logger->addLoggerListener(listener);
+				mThreadLoggers[thread]=logger;
+			}
+		logger->unlock();
+	}
 	return logger;
 }
 

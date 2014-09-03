@@ -63,18 +63,19 @@ void SOSLoggerListener::sendEntry(Logger::Category *category,Logger::Level level
 	String messagePrefix = String("[") + _sos_level_names[level] + String("] ");
 	
 	if (category != NULL) {
+		String name=category->name;
 		// Occasionally, we use __FILE__ as the category name. If we do, we don't
 		// care about the full file path. Just the file name.
-		if (category->name.startsWith("/")) { // Posix file paths
-			int index = category->name.rfind('/');
-			messagePrefix += category->name.substr(index + 1, category->name.length() - index - 1);
+		if (name.startsWith("/")) { // Posix file paths
+			int index = name.rfind('/');
+			messagePrefix += name.substr(index + 1, name.length() - index - 1);
 		}
-		else if (category->name.find('\\') > -1) { // Windows file paths
-			int index = category->name.rfind('\\');
-			messagePrefix += category->name.substr(index + 1, category->name.length() - index - 1);
+		else if (name.find('\\') > -1) { // Windows file paths
+			int index = name.rfind('\\');
+			messagePrefix += name.substr(index + 1, name.length() - index - 1);
 		}
 		else {
-			messagePrefix += category->name;
+			messagePrefix += name;
 		}
 		
 		messagePrefix += String(": ");

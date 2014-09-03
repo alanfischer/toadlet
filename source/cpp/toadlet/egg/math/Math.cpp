@@ -24,6 +24,7 @@
  ********** Copyright header - do not remove **********/
 
 #include <toadlet/egg/math/Math.h>
+#include <toadlet/egg/Assert.h>
 #include <toadlet/egg/Log.h>
 #include <toadlet/egg/System.h>
 #if defined(TOADLET_HAS_SSE)

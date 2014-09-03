@@ -26,6 +26,7 @@
 #ifndef TOADLET_TADPOLE_BUFFERMANAGER_H
 #define TOADLET_TADPOLE_BUFFERMANAGER_H
 
+#include <toadlet/egg/Mutex.h>
 #include <toadlet/peeper/RenderDevice.h>
 #include <toadlet/peeper/VariableBuffer.h>
 #include <toadlet/tadpole/Types.h>

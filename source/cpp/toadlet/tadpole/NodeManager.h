@@ -26,6 +26,7 @@
 #ifndef TOADLET_TADPOLE_NODEMANAGER_H
 #define TOADLET_TADPOLE_NODEMANAGER_H
 
+#include <toadlet/egg/Mutex.h>
 #include <toadlet/tadpole/Node.h>
 
 namespace toadlet{

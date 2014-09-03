@@ -23,39 +23,73 @@
  *
  ********** Copyright header - do not remove **********/
 
+#include <stdio.h>
 #include <toadlet/egg/Logger.h>
 #include <toadlet/egg/LoggerListener.h>
 #include <toadlet/egg/System.h>
 #include <toadlet/egg/Version.h>
 
+#if !defined(TOADLET_THREADSAFE) 
+#elif defined(TOADLET_PLATFORM_WIN32)
+	#ifndef WIN32_LEAN_AND_MEAN
+		#define WIN32_LEAN_AND_MEAN 1
+	#endif
+	#include <windows.h>
+#else
+	#include <pthread.h>
+#endif
+
 namespace toadlet{
 namespace egg{
 
 Logger::Logger(bool startSilent):
-	mStoreLogEntry(false),
-	mReportingLevel(Level_MAX)
+	mReportingLevel(Level_MAX),
+	mStoreLogEntry(false)
 {
+	#if !defined(TOADLET_THREADSAFE) 
+	#elif defined(TOADLET_PLATFORM_WIN32)
+		mMutex=CreateMutex(NULL,0,NULL);
+	#else
+		mMutex=new pthread_mutex_t();
+		pthread_mutexattr_t attrib;
+		pthread_mutexattr_init(&attrib);
+		pthread_mutexattr_settype(&attrib,PTHREAD_MUTEX_RECURSIVE);
+		int result=pthread_mutex_init(mMutex,&attrib);
+		pthread_mutexattr_destroy(&attrib);
+	#endif
+
 	if(startSilent==false){
-		String line=String("creating toadlet.egg.Logger:")+Version::STRING;
+		char line[128];
+		sprintf(line,"creating toadlet.egg.Logger:%s",Version::STRING);
 		addCompleteLogEntry(NULL,Level_DISABLED,line);
 	}
 }
 
 Logger::~Logger(){
-	while(mCategoryNameCategoryMap.begin()!=mCategoryNameCategoryMap.end()){
-		Category *category=mCategoryNameCategoryMap.begin()->second;
-		delete category;
-		mCategoryNameCategoryMap.erase(mCategoryNameCategoryMap.begin());
+	int i;
+	for(i=0;i<mCategories.size();++i){
+		delete mCategories[i];
+	}
+	for(i=0;i<mLogEntries.size();++i){
+		delete mLogEntries[i];
 	}
 
-	clearLogEntries();
+	#if !defined(TOADLET_THREADSAFE)
+	#elif defined(TOADLET_PLATFORM_WIN32)
+		CloseHandle(mMutex);
+	#else
+		pthread_mutex_destroy(mMutex);
+		delete mMutex;
+	#endif
 }
 
 void Logger::setMasterReportingLevel(Level level){
 	mReportingLevel=level;
 
 	lock();
-		addCompleteLogEntry(NULL,Level_DISABLED,String("Master Reporting Level is ")+level);
+		char line[128];
+		sprintf(line,"Master Reporting Level is %d",level);
+		addCompleteLogEntry(NULL,Level_DISABLED,line);
 	unlock();
 }
 
@@ -174,13 +208,16 @@ Logger::Category *Logger::getCategory(const char *categoryName){
 
 	Category *category=NULL;
 	lock();
-		CategoryNameCategoryMap::iterator it=mCategoryNameCategoryMap.find(categoryName);
-		if(it!=mCategoryNameCategoryMap.end()){
-			category=it->second;
+		int i;
+		for(i=0;i<mCategories.size();++i){
+			if(mCategories[i]->name==categoryName){
+				category=mCategories[i];
+				break;
+			}
 		}
 		if(category==NULL){
 			category=new Category(categoryName);
-			mCategoryNameCategoryMap.add(categoryName,category);
+			mCategories.add(category);
 		}
 	unlock();
 
@@ -188,14 +225,20 @@ Logger::Category *Logger::getCategory(const char *categoryName){
 }
 
 void Logger::lock(){
-	#if defined(TOADLET_THREADSAFE)
-		mMutex.lock();
+	#if !defined(TOADLET_THREADSAFE)
+	#elif defined(TOADLET_PLATFORM_WIN32)
+		WaitForSingleObject(mMutex,INFINITE);
+	#else
+		pthread_mutex_lock(mMutex);
 	#endif
 }
 
 void Logger::unlock(){
-	#if defined(TOADLET_THREADSAFE)
-		mMutex.unlock();
+	#if !defined(TOADLET_THREADSAFE)
+	#elif defined(TOADLET_PLATFORM_WIN32)
+		ReleaseMutex(mMutex);
+	#else
+		pthread_mutex_unlock(mMutex);
 	#endif
 }
 

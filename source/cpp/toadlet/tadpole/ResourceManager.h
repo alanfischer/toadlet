@@ -28,6 +28,7 @@
 
 #include <toadlet/tadpole/Types.h>
 #include <toadlet/egg/Map.h>
+#include <toadlet/egg/Mutex.h>
 #include <toadlet/egg/Resource.h>
 #include <toadlet/egg/ResourceDestroyedListener.h>
 #include <toadlet/egg/io/Archive.h>
