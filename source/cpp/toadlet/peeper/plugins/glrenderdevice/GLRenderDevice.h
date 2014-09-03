@@ -28,6 +28,7 @@
 
 #include "GLIncludes.h"
 #include "GLRenderTarget.h"
+#include <toadlet/egg/Mutex.h>
 #include <toadlet/peeper/RenderDevice.h>
 #include <toadlet/peeper/BlendState.h>
 #include <toadlet/peeper/DepthState.h>

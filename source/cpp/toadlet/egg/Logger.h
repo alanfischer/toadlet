@@ -26,11 +26,11 @@
 #ifndef TOADLET_EGG_LOGGER_H
 #define TOADLET_EGG_LOGGER_H
 
-#include <toadlet/egg/Categories.h>
-#include <toadlet/egg/Map.h>
-#include <toadlet/egg/String.h>
-#if defined(TOADLET_THREADSAFE)
-	#include <toadlet/egg/Mutex.h>
+#include <toadlet/egg/Types.h>
+#include <toadlet/egg/Collection.h>
+
+#if defined(TOADLET_PLATFORM_WIN32)
+	#pragma warning(disable:4996)
 #endif
 
 namespace toadlet{
@@ -55,11 +55,20 @@ public:
 	class Category{
 	public:
 		Category(const char *name,Level reportingLevel=Level_MAX){
-			this->name=name;
+			if(name==NULL){
+				this->name=NULL;
+			}
+			else{
+				this->name=new char[strlen(name)+1];
+				strcpy(this->name,name);
+			}
 			this->reportingLevel=reportingLevel;
 		}
+		~Category(){
+			delete[] name;
+		}
 
-		String name;
+		char *name;
 		Level reportingLevel;
 	};
 
@@ -69,13 +78,22 @@ public:
 			this->category=category;
 			this->level=level;
 			this->time=time;
-			this->text=text;
+			if(text==NULL){
+				this->text=NULL;
+			}
+			else{
+				this->text=new char[strlen(text)+1];
+				strcpy(this->text,text);
+			}
+		}
+		~Entry(){
+			delete[] text;
 		}
 
 		Category *category;
 		Level level;
 		uint64 time;
-		String text;
+		char *text;
 	};
 
 	Logger(bool startSilent);
@@ -105,27 +123,23 @@ public:
 
 	int getNumLogEntries();
 	Entry *getLogEntry(int i);
-	String getLogString(int i){return getLogEntry(i)->text;}
+	const char *getLogString(int i){return getLogEntry(i)->text;}
 
 	Category *addCategory(const char *categoryName);
 	Category *getCategory(const char *categoryName);
 
-private:
-	typedef Map<String,Category*> CategoryNameCategoryMap;
-
-	void addCompleteLogEntry(Category *category,Level level,const char *text);
-
 	void lock();
 	void unlock();
 
+private:
+	void addCompleteLogEntry(Category *category,Level level,const char *text);
+
 	egg::Collection<LoggerListener*> mLoggerListeners;
-	bool mStoreLogEntry;
 	Level mReportingLevel;
+	egg::Collection<Category*> mCategories;
+	bool mStoreLogEntry;
 	egg::Collection<Entry*> mLogEntries;
-	CategoryNameCategoryMap mCategoryNameCategoryMap;
-	#if defined(TOADLET_THREADSAFE)
-		Mutex mMutex;
-	#endif
+	void *mMutex;
 };
 
 }

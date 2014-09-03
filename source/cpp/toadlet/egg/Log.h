@@ -26,7 +26,9 @@
 #ifndef TOADLET_EGG_LOG_H
 #define TOADLET_EGG_LOG_H
 
+#include <toadlet/egg/Categories.h>
 #include <toadlet/egg/Logger.h>
+#include <toadlet/egg/Map.h>
 
 #define TOADLET_MAKE_LOG_FUNCTION(name,level) \
 	static void name(const char *text){name((char*)NULL,text);} \
@@ -58,9 +60,6 @@ public:
 private:
 	static Logger *mTheLogger;
 	static Collection<LoggerListener*> mListeners;
-	#if defined(TOADLET_THREADSAFE)
-		static Mutex mMutex;
-	#endif
 	static bool mPerThread;
 	static Map<int,Logger*> mThreadLoggers;
 };

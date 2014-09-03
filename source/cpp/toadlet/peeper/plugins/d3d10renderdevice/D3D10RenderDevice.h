@@ -28,6 +28,7 @@
 
 #include "D3D10Includes.h"
 #include "D3D10RenderTarget.h"
+#include <toadlet/egg/Mutex.h>
 #include <toadlet/peeper/RenderDevice.h>
 #include <toadlet/peeper/BlendState.h>
 #include <toadlet/peeper/DepthState.h>
