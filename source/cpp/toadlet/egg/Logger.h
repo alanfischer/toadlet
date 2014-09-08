@@ -53,7 +53,7 @@ public:
 
 	class Category{
 	public:
-		Category(const char *name,Level reportingLevel=Level_MAX){
+		Category(const char *name,Level reportingLevel=Level_MAX):data(NULL){
 			if(name==NULL){
 				this->name=NULL;
 			}
@@ -69,6 +69,7 @@ public:
 
 		char *name;
 		Level reportingLevel;
+		void *data;
 	};
 
 	class Entry{
@@ -189,11 +190,14 @@ public:
 
 	void flush();
 
+	Category *addCategory(const char *categoryName);
+	Category *getCategory(const char *categoryName);
+
 	const List<Entry*> &getLogEntries() const{return mLogEntries;}
 	void clearLogEntries();
 
-	Category *addCategory(const char *categoryName);
-	Category *getCategory(const char *categoryName);
+	void setThreadID(int id){mThreadID=id;}
+	int getThreadID() const{return mThreadID;}
 
 	void lock();
 	void unlock();
@@ -207,6 +211,7 @@ private:
 	List<LoggerListener*> mLoggerListeners;
 	bool mStoreLogEntry;
 	List<Entry*> mLogEntries;
+	int mThreadID;
 	void *mMutex;
 };
 

@@ -41,7 +41,8 @@ namespace egg{
 
 Logger::Logger(bool startSilent):
 	mReportingLevel(Level_MAX),
-	mStoreLogEntry(false)
+	mStoreLogEntry(false),
+	mThreadID(0)
 {
 	#if defined(TOADLET_PLATFORM_WIN32)
 		mMutex=CreateMutex(NULL,0,NULL);
