@@ -34,8 +34,6 @@
 namespace toadlet{
 namespace egg{
 
-const uint64 Win32System::DELTA_EPOC_MICROSECONDS=TOADLET_MAKE_UINT64(11644473600000000);
-
 void Win32System::usleep(uint64 microseconds){
 	// Poorly implemented
 	Sleep((DWORD)(microseconds/1000));
@@ -53,18 +51,16 @@ uint64 Win32System::utime(){
 }
 
 uint64 Win32System::mtime(){
-	FILETIME fileTime;
-	GetSystemTimeAsFileTime(&fileTime);
-	uint64 time=(*(uint64*)&fileTime);
-	time=(time/10-DELTA_EPOC_MICROSECONDS)/1000;
-	return time;
+	FILETIME now;
+	GetSystemTimeAsFileTime(&now);
+	return ((*(uint64*)&now) / 10 - 11644473600000000) / 1000;
 }
 
 String Win32System::mtimeToString(uint64 time){
 	char timeString[128];
 	FILETIME fileTime;
 	SYSTEMTIME systemTime;
-	time=(time*1000+DELTA_EPOC_MICROSECONDS)*10;
+	time=(time * 1000 + 11644473600000000) * 10;
 	fileTime=(*(FILETIME*)&time);
 	FileTimeToSystemTime(&fileTime,&systemTime);
 	sprintf(timeString,"%04d-%02d-%02d %02d:%02d:%02d",systemTime.wYear,systemTime.wMonth,systemTime.wDay,systemTime.wHour,systemTime.wMinute,systemTime.wSecond);

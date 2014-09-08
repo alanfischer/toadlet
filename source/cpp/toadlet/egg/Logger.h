@@ -27,7 +27,6 @@
 #define TOADLET_EGG_LOGGER_H
 
 #include <toadlet/egg/Types.h>
-#include <toadlet/egg/Collection.h>
 
 #if defined(TOADLET_PLATFORM_WIN32)
 	#pragma warning(disable:4996)
@@ -96,6 +95,77 @@ public:
 		char *text;
 	};
 
+	template<typename Type>
+	class List{
+	public:
+		struct node{
+			node():next(NULL){}
+			Type item;
+			node *next;
+		};
+
+		struct iterator{
+			iterator(node *n):next(n){}
+			inline operator Type&() const{return next->item;}
+			inline Type &operator*() const{return next->item;}
+			inline Type *operator->() const{return &next->item;}
+			inline bool operator==(const iterator &it) const{return it.next==next;}
+			inline bool operator!=(const iterator &it) const{return it.next!=next;}
+			inline iterator& operator++(){next=next->next;return *this;}
+			node *next;
+		};
+
+		List(){
+			head=new node();
+			tail=head;
+		}
+
+		~List(){
+			node *n=head;
+			while(n->next!=NULL){
+				node *t=n;
+				n=n->next;
+				delete t;
+			}
+			delete n;
+		}
+
+		void push_back(const Type &item){
+			node *n=head;
+			while(n->next!=NULL) n=n->next;
+			n->item=item;
+			n->next=new node();
+			tail=n->next;
+		}
+
+		void remove(const Type &item){
+			node *n=head;
+			while(n->next!=NULL && n->next->item!=item) n=n->next;
+			if(n->next!=NULL){
+				node *t=n->next;
+				n->next=t->next;
+				delete t;
+			}
+		}
+
+		void clear(){
+			node *n=head;
+			while(n->next!=NULL){
+				node *t=n;
+				n=n->next;
+				delete t;
+			}
+			head=n;
+			tail=head;
+		}
+
+		iterator begin() const{return iterator(head);}
+		iterator end() const{return iterator(tail);}
+
+		node *head;
+		node *tail;
+	};
+
 	Logger(bool startSilent);
 	virtual ~Logger();
 
@@ -119,26 +189,24 @@ public:
 
 	void flush();
 
+	const List<Entry*> &getLogEntries() const{return mLogEntries;}
 	void clearLogEntries();
-
-	int getNumLogEntries();
-	Entry *getLogEntry(int i);
-	const char *getLogString(int i){return getLogEntry(i)->text;}
 
 	Category *addCategory(const char *categoryName);
 	Category *getCategory(const char *categoryName);
 
 	void lock();
 	void unlock();
+	static uint64 mtime();
 
 private:
 	void addCompleteLogEntry(Category *category,Level level,const char *text);
 
-	egg::Collection<LoggerListener*> mLoggerListeners;
 	Level mReportingLevel;
-	egg::Collection<Category*> mCategories;
+	List<Category*> mCategories;
+	List<LoggerListener*> mLoggerListeners;
 	bool mStoreLogEntry;
-	egg::Collection<Entry*> mLogEntries;
+	List<Entry*> mLogEntries;
 	void *mMutex;
 };
 

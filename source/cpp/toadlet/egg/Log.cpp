@@ -23,17 +23,23 @@
  *
  ********** Copyright header - do not remove **********/
 
-#include <toadlet/egg/Log.h>
-#include <toadlet/egg/LoggerListener.h>
-#include <toadlet/egg/System.h>
+#include "Log.h"
+#include "LoggerListener.h"
+#include <toadlet/egg/String.h>
 #include <time.h>
 #include <stdio.h>
 
 #if defined(TOADLET_PLATFORM_WIN32)
 	#include <windows.h>
-#elif defined(TOADLET_PLATFORM_OSX)
+#else
+	#include <pthread.h>
+#endif
+
+#if defined(TOADLET_PLATFORM_OSX)
 	#include <asl.h>
-#elif defined(TOADLET_PLATFORM_ANDROID)
+#endif
+
+#if defined(TOADLET_PLATFORM_ANDROID)
 	#include <android/log.h>
 #endif
 
@@ -48,7 +54,13 @@ class BaseLoggerListener:public LoggerListener{
 public:
 	BaseLoggerListener(){}
 
-	String getTimeString(uint64 time){return System::mtimeToString(time);}
+	String getTimeString(uint64 time){
+		char timeString[128];
+		time_t tt=time/1000;
+		struct tm *ts=gmtime(&tt);
+		strftime(timeString,sizeof(timeString),"%Y-%m-%d %H:%M:%S",ts);
+		return timeString;
+	}
 
 	const char *getLevelString(Logger::Level level){
 		switch(level){
@@ -288,9 +300,9 @@ public:
 };
 
 Logger *Log::mTheLogger=NULL;
-Collection<LoggerListener*> Log::mListeners;
-Map<int,Logger*> Log::mThreadLoggers;
 bool Log::mPerThread=false;
+Logger::List<LoggerListener*> Log::mListeners;
+Logger::List<Log::idlog> Log::mThreadLoggers;
 
 Logger *Log::getInstance(){
 	if(mTheLogger==NULL){
@@ -299,72 +311,85 @@ Logger *Log::getInstance(){
 
 	Logger *logger=mTheLogger;
 	if(mPerThread){
-		int thread=System::threadID();
-		logger->lock();
-			Logger *logger=mThreadLoggers[thread];
-			if(logger==NULL){
+		int thread=threadID();
+		mTheLogger->lock();
+			Logger::List<idlog>::iterator it=mThreadLoggers.begin();
+			while(it!=mThreadLoggers.end() && it->id==thread){
+				++it;
+			}
+			if(it!=mThreadLoggers.end()){
+				logger=it->log;
+			}
+			else{
 				LoggerListener *listener=new ParentListener(mTheLogger);
-				mListeners.add(listener);
+				mListeners.push_back(listener);
 
 				logger=new Logger(true);
 				logger->addLoggerListener(listener);
-				mThreadLoggers[thread]=logger;
+				idlog il={thread,logger};
+				mThreadLoggers.push_back(il);
 			}
-		logger->unlock();
+		mTheLogger->unlock();
 	}
 	return logger;
 }
 
 void Log::initialize(bool startSilent,bool perThread,const char *options){
+	mPerThread=perThread;
+
 	if(mTheLogger==NULL){
 		mTheLogger=new Logger(startSilent);
 
 		#if defined(TOADLET_PLATFORM_WIN32)
-			mListeners.add(new ConsoleListener());
-			mListeners.add(new OutputDebugStringListener());
+			mListeners.push_back(new ConsoleListener());
+			mListeners.push_back(new OutputDebugStringListener());
 		#elif defined(TOADLET_PLATFORM_OSX)
-			mListeners.add(new StandardListener());
-			mListeners.add(new ASLListener());
+			mListeners.push_back(new StandardListener());
+			mListeners.push_back(new ASLListener());
 		#elif defined(TOADLET_PLATFORM_ANDROID)
-			mListeners.add(new StandardListener());
-			mListeners.add(new AndroidListener());
+			mListeners.push_back(new StandardListener());
+			mListeners.push_back(new AndroidListener());
 		#elif defined(TOADLET_PLATFORM_EMSCRIPTEN)
-			mListeners.add(new StandardListener());
+			mListeners.push_back(new StandardListener());
 		#else
-			mListeners.add(new ANSIStandardListener());
+			mListeners.push_back(new ANSIStandardListener());
 		#endif
 
 		#if !defined(TOADLET_PLATFORM_EMSCRIPTEN)
 			if(options!=NULL){
-				mListeners.add(new SOSLoggerListener(options));
+				mListeners.push_back(new SOSLoggerListener(options));
 			}
 		#endif
 
-		int i;
-		for(i=0;i<mListeners.size();++i){
-			mTheLogger->addLoggerListener(mListeners[i]);
+		for(Logger::List<LoggerListener*>::iterator it=mListeners.begin();it!=mListeners.end();++it){
+			mTheLogger->addLoggerListener(it);
 		}
-
-		mPerThread=perThread;
 	}
 }
 
 void Log::destroy(){
 	if(mTheLogger!=NULL){
-		int i;
-		for(i=0;i<mListeners.size();++i){
-			mTheLogger->removeLoggerListener(mListeners[i]);
-			delete mListeners[i];
+		for(Logger::List<LoggerListener*>::iterator it=mListeners.begin();it!=mListeners.end();++it){
+			mTheLogger->removeLoggerListener(it);
+			delete it;
 		}
 		mListeners.clear();
 
 		delete mTheLogger;
 		mTheLogger=NULL;
 	}
-	for(Map<int,Logger*>::iterator it=mThreadLoggers.begin();it!=mThreadLoggers.end();++it){
-		delete it->second;
+	for(Logger::List<idlog>::iterator it=mThreadLoggers.begin();it!=mThreadLoggers.end();++it){
+		delete it->log;
 	}
 	mThreadLoggers.clear();
+}
+
+int Log::threadID(){
+	#if defined(TOADLET_PLATFORM_WIN32)
+		return GetCurrentThreadId();
+	#else
+		return (intptr_t)(int*)(pthread_self());
+	#endif
 }
 
 }

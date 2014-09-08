@@ -24,6 +24,7 @@
  ********** Copyright header - do not remove **********/
 
 #include <toadlet/egg/io/FileStream.h>
+#include <toadlet/egg/Categories.h>
 #include <toadlet/egg/Log.h>
 
 namespace toadlet{

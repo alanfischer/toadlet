@@ -23,14 +23,11 @@
  *
  ********** Copyright header - do not remove **********/
 
+#include "Logger.h"
+#include "LoggerListener.h"
 #include <stdio.h>
-#include <toadlet/egg/Logger.h>
-#include <toadlet/egg/LoggerListener.h>
-#include <toadlet/egg/System.h>
-#include <toadlet/egg/Version.h>
 
-#if !defined(TOADLET_THREADSAFE) 
-#elif defined(TOADLET_PLATFORM_WIN32)
+#if defined(TOADLET_PLATFORM_WIN32)
 	#ifndef WIN32_LEAN_AND_MEAN
 		#define WIN32_LEAN_AND_MEAN 1
 	#endif
@@ -46,8 +43,7 @@ Logger::Logger(bool startSilent):
 	mReportingLevel(Level_MAX),
 	mStoreLogEntry(false)
 {
-	#if !defined(TOADLET_THREADSAFE) 
-	#elif defined(TOADLET_PLATFORM_WIN32)
+	#if defined(TOADLET_PLATFORM_WIN32)
 		mMutex=CreateMutex(NULL,0,NULL);
 	#else
 		mMutex=new pthread_mutex_t();
@@ -59,23 +55,19 @@ Logger::Logger(bool startSilent):
 	#endif
 
 	if(startSilent==false){
-		char line[128];
-		sprintf(line,"creating toadlet.egg.Logger:%s",Version::STRING);
-		addCompleteLogEntry(NULL,Level_DISABLED,line);
+		addCompleteLogEntry(NULL,Level_DISABLED,"creating toadlet.egg.Logger");
 	}
 }
 
 Logger::~Logger(){
-	int i;
-	for(i=0;i<mCategories.size();++i){
-		delete mCategories[i];
+	for(List<Category*>::iterator it=mCategories.begin();it!=mCategories.end();++it){
+		delete it;
 	}
-	for(i=0;i<mLogEntries.size();++i){
-		delete mLogEntries[i];
+	for(List<Entry*>::iterator it=mLogEntries.begin();it!=mLogEntries.end();++it){
+		delete it;
 	}
 
-	#if !defined(TOADLET_THREADSAFE)
-	#elif defined(TOADLET_PLATFORM_WIN32)
+	#if defined(TOADLET_PLATFORM_WIN32)
 		CloseHandle(mMutex);
 	#else
 		pthread_mutex_destroy((pthread_mutex_t*)mMutex);
@@ -126,7 +118,7 @@ Logger::Level Logger::getMasterCategoryReportingLevel(const char *categoryName){
 
 void Logger::addLoggerListener(LoggerListener *listener){
 	lock();
-		mLoggerListeners.add(listener);
+		mLoggerListeners.push_back(listener);
 	unlock();
 }
 
@@ -152,50 +144,31 @@ void Logger::addLogEntry(Category *category,Level level,const char *text){
 
 void Logger::flush(){
 	lock();
-		int i;
-		for(i=mLoggerListeners.size()-1;i>=0;--i){
-			mLoggerListeners[i]->flush();
+		for(List<LoggerListener*>::iterator it=mLoggerListeners.begin();it!=mLoggerListeners.end();++it){
+			(*it)->flush();
 		}
 	unlock();
 }
 
 void Logger::clearLogEntries(){
 	lock();
-		int i;
-		for(i=0;i<mLogEntries.size();++i){
-			delete mLogEntries[i];
+		for(List<Entry*>::iterator it=mLogEntries.begin();it!=mLogEntries.end();++it){
+			delete it;
 		}
+
 		mLogEntries.clear();
 	unlock();
 }
 
-int Logger::getNumLogEntries(){
-	int size=0;
-	lock();
-		size=mLogEntries.size();
-	unlock();
-	return size;
-}
-
-Logger::Entry *Logger::getLogEntry(int i){
-	Entry *entry=NULL;
-	lock();
-		entry=mLogEntries[i];
-	unlock();
-	return entry;
-}
-
 void Logger::addCompleteLogEntry(Category *category,Level level,const char *text){
-	int i;
+	uint64 time=mtime();
 
-	uint64 time=System::mtime();
-
-	for(i=mLoggerListeners.size()-1;i>=0;--i){
-		mLoggerListeners[i]->addLogEntry(category,level,time,text);
+	for(List<LoggerListener*>::iterator it=mLoggerListeners.begin();it!=mLoggerListeners.end();++it){
+		(*it)->addLogEntry(category,level,time,text);
 	}
 
 	if(mStoreLogEntry){
-		mLogEntries.add(new Entry(category,level,time,text));
+		mLogEntries.push_back(new Entry(category,level,time,text));
 	}
 }
 
@@ -208,16 +181,15 @@ Logger::Category *Logger::getCategory(const char *categoryName){
 
 	Category *category=NULL;
 	lock();
-		int i;
-		for(i=0;i<mCategories.size();++i){
-			if(mCategories[i]->name==categoryName){
-				category=mCategories[i];
+		for(List<Category*>::iterator it=mCategories.begin();it!=mCategories.end();++it){
+			if(strcmp((*it)->name,categoryName)==0){
+				category=it;
 				break;
 			}
 		}
 		if(category==NULL){
 			category=new Category(categoryName);
-			mCategories.add(category);
+			mCategories.push_back(category);
 		}
 	unlock();
 
@@ -225,8 +197,7 @@ Logger::Category *Logger::getCategory(const char *categoryName){
 }
 
 void Logger::lock(){
-	#if !defined(TOADLET_THREADSAFE)
-	#elif defined(TOADLET_PLATFORM_WIN32)
+	#if defined(TOADLET_PLATFORM_WIN32)
 		WaitForSingleObject(mMutex,INFINITE);
 	#else
 		pthread_mutex_lock((pthread_mutex_t*)mMutex);
@@ -234,11 +205,22 @@ void Logger::lock(){
 }
 
 void Logger::unlock(){
-	#if !defined(TOADLET_THREADSAFE)
-	#elif defined(TOADLET_PLATFORM_WIN32)
+	#if defined(TOADLET_PLATFORM_WIN32)
 		ReleaseMutex(mMutex);
 	#else
 		pthread_mutex_unlock((pthread_mutex_t*)mMutex);
+	#endif
+}
+
+uint64 Logger::mtime(){
+	#if defined(TOADLET_PLATFORM_WIN32)
+		FILETIME now;
+		GetSystemTimeAsFileTime(&now);
+		return ((*(uint64*)&now) / 10 - 11644473600000000) / 1000;
+	#else
+		struct timeval now;
+		gettimeofday(&now,0);
+		return ((uint64)now.tv_sec) * 1000 + ((uint64)(now.tv_usec)) / 1000;
 	#endif
 }
 

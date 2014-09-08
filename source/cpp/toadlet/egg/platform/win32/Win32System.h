@@ -51,8 +51,6 @@ public:
 	static String getEnv(const String &name);
 
 protected:
-	static const uint64 DELTA_EPOC_MICROSECONDS;
-
 	static void testSSE(SystemCaps &caps);
 };
 
