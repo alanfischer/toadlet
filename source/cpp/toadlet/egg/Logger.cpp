@@ -34,6 +34,7 @@
 	#include <windows.h>
 #else
 	#include <pthread.h>
+	#include <sys/time.h>
 #endif
 
 namespace toadlet{
@@ -51,7 +52,7 @@ Logger::Logger(bool startSilent):
 		pthread_mutexattr_t attrib;
 		pthread_mutexattr_init(&attrib);
 		pthread_mutexattr_settype(&attrib,PTHREAD_MUTEX_RECURSIVE);
-		int result=pthread_mutex_init((pthread_mutex_t*)mMutex,&attrib);
+		pthread_mutex_init((pthread_mutex_t*)mMutex,&attrib);
 		pthread_mutexattr_destroy(&attrib);
 	#endif
 
