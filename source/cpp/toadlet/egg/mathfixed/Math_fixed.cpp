@@ -24,6 +24,7 @@
  ********** Copyright header - do not remove **********/
 
 #include <toadlet/egg/mathfixed/Math.h>
+#include <toadlet/egg/Categories.h>
 #include <toadlet/egg/Log.h>
 #include <toadlet/egg/System.h>
 

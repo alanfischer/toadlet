@@ -26,9 +26,7 @@
 #ifndef TOADLET_EGG_LOG_H
 #define TOADLET_EGG_LOG_H
 
-#include <toadlet/egg/Categories.h>
-#include <toadlet/egg/Logger.h>
-#include <toadlet/egg/Map.h>
+#include "Logger.h"
 
 #define TOADLET_MAKE_LOG_FUNCTION(name,level) \
 	static void name(const char *text){name((char*)NULL,text);} \
@@ -58,10 +56,17 @@ public:
 	TOADLET_MAKE_LOG_FUNCTION(excess,Logger::Level_EXCESS);
 
 private:
+	struct idlog{
+		int id;
+		Logger* log;
+	};
+
+	static int threadID();
+
 	static Logger *mTheLogger;
-	static Collection<LoggerListener*> mListeners;
 	static bool mPerThread;
-	static Map<int,Logger*> mThreadLoggers;
+	static Logger::List<LoggerListener*> mListeners;
+	static Logger::List<idlog> mThreadLoggers;
 };
 
 }
