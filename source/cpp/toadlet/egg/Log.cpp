@@ -164,26 +164,22 @@ protected:
 #elif defined(TOADLET_PLATFORM_OSX)
 	class ASLListener:public BaseLoggerListener{
 	public:
-		typedef Map<String,aslclient> CategoryNameClientMap;
-
 		virtual ~ASLListener(){
-			while(mCategoryNameClientMap.begin()!=mCategoryNameClientMap.end()){
-				aslclient client=mCategoryNameClientMap.begin()->second;
-				asl_close(client);
-				mCategoryNameClientMap.erase(mCategoryNameClientMap.begin());
+			for(List<aslclient>::iterator it=mClients.begin();it!=mClients.end;++it){
+				asl_close((*it));
 			}
 		}
 
 		void addLogEntry(Logger::Category *category,Logger::Level level,uint64 time,const char *text){
 			aslclient client=NULL;
 			if(category!=NULL){
-				CategoryNameClientMap::iterator it=mCategoryNameClientMap.find(category->name);
-				if(it!=mCategoryNameClientMap.end()){
-					client=it->second;
+				if(category->data==NULL){
+					client=asl_open(category->name,category->name,0);
+					category->data=client;
+					mClients.push_back(client);
 				}
 				else{
-					client=asl_open(category->name,category->name,0);
-					mCategoryNameClientMap.add(category->name,client);
+					client=(aslclient)category->data;
 				}
 			}
 
@@ -216,7 +212,7 @@ protected:
 		}
 
 	protected:
-		CategoryNameClientMap mCategoryNameClientMap;
+		List<aslclient> mClients;
 	};
 #elif defined(TOADLET_PLATFORM_ANDROID)
 	class AndroidListener:public BaseLoggerListener{
@@ -302,7 +298,7 @@ public:
 Logger *Log::mTheLogger=NULL;
 bool Log::mPerThread=false;
 Logger::List<LoggerListener*> Log::mListeners;
-Logger::List<Log::idlog> Log::mThreadLoggers;
+Logger::List<Logger*> Log::mThreadLoggers;
 
 Logger *Log::getInstance(){
 	if(mTheLogger==NULL){
@@ -311,23 +307,23 @@ Logger *Log::getInstance(){
 
 	Logger *logger=mTheLogger;
 	if(mPerThread){
-		int thread=threadID();
+		int id=threadID();
 		mTheLogger->lock();
-			Logger::List<idlog>::iterator it=mThreadLoggers.begin();
-			while(it!=mThreadLoggers.end() && it->id==thread){
+			Logger::List<Logger*>::iterator it=mThreadLoggers.begin();
+			while(it!=mThreadLoggers.end() && (*it)->getThreadID()==id){
 				++it;
 			}
 			if(it!=mThreadLoggers.end()){
-				logger=it->log;
+				logger=(*it);
 			}
 			else{
 				LoggerListener *listener=new ParentListener(mTheLogger);
 				mListeners.push_back(listener);
 
 				logger=new Logger(true);
+				logger->setThreadID(id);
 				logger->addLoggerListener(listener);
-				idlog il={thread,logger};
-				mThreadLoggers.push_back(il);
+				mThreadLoggers.push_back(logger);
 			}
 		mTheLogger->unlock();
 	}
@@ -378,8 +374,8 @@ void Log::destroy(){
 		delete mTheLogger;
 		mTheLogger=NULL;
 	}
-	for(Logger::List<idlog>::iterator it=mThreadLoggers.begin();it!=mThreadLoggers.end();++it){
-		delete it->log;
+	for(Logger::List<Logger*>::iterator it=mThreadLoggers.begin();it!=mThreadLoggers.end();++it){
+		delete it;
 	}
 	mThreadLoggers.clear();
 }

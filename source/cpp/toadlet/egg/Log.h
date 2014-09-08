@@ -56,17 +56,12 @@ public:
 	TOADLET_MAKE_LOG_FUNCTION(excess,Logger::Level_EXCESS);
 
 private:
-	struct idlog{
-		int id;
-		Logger* log;
-	};
-
 	static int threadID();
 
 	static Logger *mTheLogger;
 	static bool mPerThread;
 	static Logger::List<LoggerListener*> mListeners;
-	static Logger::List<idlog> mThreadLoggers;
+	static Logger::List<Logger*> mThreadLoggers;
 };
 
 }
