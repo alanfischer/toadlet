@@ -208,7 +208,7 @@ void Camera::projectionUpdated(){
 		Math::mul(cplane,invtransProjMatrix,oplane);
 
 		float inv=abs((int)cplane[2]);
-		if(inv!=0){cplane/=inv;}// normalize such that depth is not scaled
+		if(inv!=0){cplane/=inv;} // normalize such that depth is not scaled
 		cplane[3] -= 1;
 
 		if(cplane[2] < 0)

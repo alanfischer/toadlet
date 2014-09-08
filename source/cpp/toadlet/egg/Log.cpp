@@ -33,6 +33,7 @@
 	#include <windows.h>
 #else
 	#include <pthread.h>
+	#include <stdint.h>
 #endif
 
 #if defined(TOADLET_PLATFORM_OSX)
@@ -98,7 +99,7 @@ public:
 	}
 
 	void addLogEntry(Logger::Category *category,Logger::Level level,uint64 time,const char *text){
-		mParent->addLogEntry(category==NULL?String():category->name,level,text);
+		mParent->addLogEntry(category==NULL?NULL:category->name,level,text);
 	}
 
 protected:
@@ -165,8 +166,8 @@ protected:
 	class ASLListener:public BaseLoggerListener{
 	public:
 		virtual ~ASLListener(){
-			for(List<aslclient>::iterator it=mClients.begin();it!=mClients.end;++it){
-				asl_close((*it));
+			for(Logger::List<aslclient>::iterator it=mClients.begin();it!=mClients.end();++it){
+				asl_close(*it);
 			}
 		}
 
@@ -212,7 +213,7 @@ protected:
 		}
 
 	protected:
-		List<aslclient> mClients;
+		Logger::List<aslclient> mClients;
 	};
 #elif defined(TOADLET_PLATFORM_ANDROID)
 	class AndroidListener:public BaseLoggerListener{
