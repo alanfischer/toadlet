@@ -95,7 +95,7 @@ void RandIsle::resourceCacheReady(ResourceCache *cache){
 		mReflectCamera->getDefaultState()->setFogState(FogState(FogState::FogType_LINEAR,Math::ONE,mCamera->getFarDist()/2,mCamera->getFarDist(),mCamera->getClearColor()));
 	}
 
-	if(resources->refractTarget!=NULL){
+	if(0 && resources->refractTarget!=NULL){
 		mRefractCamera=new Camera(mEngine);
 		mRefractCamera->setRenderTarget(resources->refractTarget);
 		mRefractCamera->setAutoProjectionFov(Math::degToRad(Math::fromInt(60)),false,mCamera->getNearDist(),mCamera->getFarDist());
@@ -279,7 +279,7 @@ void RandIsle::render(){
 		Math::setMatrix4x4FromTranslate(matrix,0,0,-5);
 		Math::preMul(matrix,mReflectCamera->getViewMatrix());
 		/// @todo: Fix d3d10 obliqness
-		//mReflectCamera->setObliqueNearPlaneMatrix(matrix);
+		mReflectCamera->setObliqueNearPlaneMatrix(matrix);
 	}
 
 	RenderDevice *device=mEngine->getRenderDevice();
@@ -292,6 +292,12 @@ void RandIsle::render(){
 		if(mReflectCamera!=NULL && mReflectCamera->ready()){
 			mReflectCamera->render(device,mScene);
 		}
+//mCamera->setLookDir(position,forward,up);
+matrix.reset();
+//Math::setMatrix4x4FromX(matrix,Math::PI);
+Math::setMatrix4x4FromTranslate(matrix,0,0,25);
+Math::preMul(matrix,mCamera->getViewMatrix());
+mCamera->setObliqueNearPlaneMatrix(matrix);
 
 		mCamera->render(device,mScene);
 

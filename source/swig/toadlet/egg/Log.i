@@ -11,20 +11,20 @@ public:
 	static Logger *getInstance();
 	static void destroy();
 	
-	static void error(String text);
-	static void error(String categoryName,String text);
+	static void error(const char *text);
+	static void error(const char *categoryName,const char *text);
 
-	static void warning(String text);
-	static void warning(String categoryName,String text);
+	static void warning(const char *text);
+	static void warning(const char *categoryName,const char *text);
 
-	static void alert(String text);
-	static void alert(String categoryName,String text);
+	static void alert(const char *text);
+	static void alert(const char *categoryName,const char *text);
 
-	static void debug(String text);
-	static void debug(String categoryName,String text);
+	static void debug(const char *text);
+	static void debug(const char *categoryName,const char *text);
 
-	static void excess(String text);
-	static void excess(String categoryName,String text);
+	static void excess(const char *text);
+	static void excess(const char *categoryName,const char *text);
 };
 
 }

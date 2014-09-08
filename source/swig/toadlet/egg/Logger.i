@@ -25,19 +25,16 @@ public:
 	void setMasterReportingLevel(Level level);
 	Level getMasterReportingLevel() const;
 
-	void setCategoryReportingLevel(String categoryName,Level level);
-	Level getCategoryReportingLevel(String categoryName);
+	void setCategoryReportingLevel(const char *categoryName,Level level);
+	Level getCategoryReportingLevel(const char *categoryName);
 
-	Level getMasterCategoryReportingLevel(String categoryName);
+	Level getMasterCategoryReportingLevel(const char *categoryName);
 
 	void setStoreLogEntry(bool storeLogEntry);
 	bool getStoreLogEntry() const;
 
-	void addLogEntry(String categoryName,Level level,String text);
-	void addLogEntry(Level level,String text);
-
-	int getNumLogEntries();
-	String getLogString(int i);
+	void addLogEntry(const char *categoryName,Level level,const char *text);
+	void addLogEntry(Level level,const char *text);
 
 	void flush();
 };
