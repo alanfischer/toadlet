@@ -25,12 +25,12 @@
 
 #include "Log.h"
 #include "LoggerListener.h"
-#include <toadlet/egg/String.h>
 #include <time.h>
 #include <stdio.h>
 
 #if defined(TOADLET_PLATFORM_WIN32)
 	#include <windows.h>
+	#define snprintf _snprintf
 #else
 	#include <pthread.h>
 	#include <stdint.h>
@@ -45,7 +45,7 @@
 #endif
 
 #if !defined(TOADLET_PLATFORM_EMSCRIPTEN)
-	#include <toadlet/egg/SOSLoggerListener.h>
+//	#include <toadlet/egg/SOSLoggerListener.h>
 #endif
 
 namespace toadlet{
@@ -53,10 +53,12 @@ namespace egg{
 
 class BaseLoggerListener:public LoggerListener{
 public:
-	BaseLoggerListener(){}
+	BaseLoggerListener(){
+		newLine[0]=(char)10;
+		newLine[1]=0;
+	}
 
-	String getTimeString(uint64 time){
-		char timeString[128];
+	const char *getTimeString(uint64 time){
 		time_t tt=time/1000;
 		struct tm *ts=gmtime(&tt);
 		strftime(timeString,sizeof(timeString),"%Y-%m-%d %H:%M:%S",ts);
@@ -90,6 +92,10 @@ public:
 	}
 
 	void flush(){}
+	
+protected:
+	char timeString[128];
+	char newLine[2];
 };
 
 class ParentListener:public BaseLoggerListener{
@@ -110,11 +116,10 @@ protected:
 	class OutputDebugStringListener:public BaseLoggerListener{
 	public:
 		void addLogEntry(Logger::Category *category,Logger::Level level,uint64 time,const char *text){
-			String timeString=getTimeString(time);
-			String levelString=getLevelString(level);
+			const char *timeString=getTimeString(time);
+			const char *levelString=getLevelString(level);
 
-			String line=String()+timeString+": "+levelString+text+(char)10;
-			int len=line.length();
+			int len=snprintf(line,sizeof(line),"%s: %s%s%s",timeString,levelString,text,newLine);
 			// If we go above a certain amount, windows apparently just starts ignoring messages
 			if(len>=8192){
 				OutputDebugString(TEXT("WARNING: Excessive string length, may be truncated and near future messages dropped\n"));
@@ -125,17 +130,22 @@ protected:
 				if(newi>len){
 					newi=len;
 				}
-				OutputDebugString(line.substr(i,newi-i));
+				char t=line[newi-i];
+				line[newi-i]=0;
+				OutputDebugString(line+i);
+				line[newi-i]=t;
 				i=newi;
 			}
 		}
+		
+	protected:
+		char line[8192];
 	};
 	class ConsoleListener:public BaseLoggerListener{
 	public:
 		void addLogEntry(Logger::Category *category,Logger::Level level,uint64 time,const char *text){
-			String timeString=getTimeString(time)+": ";
-			String levelString=getLevelString(level);
-			String textString=String()+text+(char)10;
+			const char *timeString=getTimeString(time);
+			const char *levelString=getLevelString(level);
 
 			int textColor=FOREGROUND_RED|FOREGROUND_GREEN|FOREGROUND_BLUE;
 			int levelColor=textColor;
@@ -155,11 +165,13 @@ protected:
 				break;
 			}
 
-			WriteConsole(outHandle,(const TCHAR*)timeString,timeString.length(),NULL,NULL);
+			WriteConsole(outHandle,(const TCHAR*)timeString,strlen(timeString),NULL,NULL);
+			WriteConsole(outHandle,(const TCHAR*)": ",2,NULL,NULL);
 			SetConsoleTextAttribute(outHandle,levelColor);
-			WriteConsole(outHandle,(const TCHAR*)levelString,levelString.length(),NULL,NULL);
+			WriteConsole(outHandle,(const TCHAR*)levelString,strlen(levelString),NULL,NULL);
 			SetConsoleTextAttribute(outHandle,textColor);
-			WriteConsole(outHandle,(const TCHAR*)textString,textString.length(),NULL,NULL);
+			WriteConsole(outHandle,(const TCHAR*)text,strlen(text),NULL,NULL);
+			WriteConsole(outHandle,(const TCHAR*)newLine,strlen(newLine),NULL,NULL);
 		}
 	};
 #elif defined(TOADLET_PLATFORM_OSX)
@@ -184,8 +196,8 @@ protected:
 				}
 			}
 
-			String timeString=getTimeString(time);
-			String levelString=getLevelString(level);
+			const char *timeString=getTimeString(time);
+			const char *levelString=getLevelString(level);
 
 			int asllevel=ASL_LEVEL_NOTICE;
 			switch(level){
@@ -208,8 +220,7 @@ protected:
 				break;
 			}
 		
-			String line=String()+timeString+": "+levelString+text+(char)10;
-			asl_log(client,NULL,asllevel,"%s",line.c_str());
+			asl_log(client,NULL,asllevel,"%s: %s%s%s",timeString,levelString,text,newLine);
 		}
 
 	protected:
@@ -248,12 +259,11 @@ protected:
 class ANSIStandardListener:public BaseLoggerListener{
 public:
 	void addLogEntry(Logger::Category *category,Logger::Level level,uint64 time,const char *text){
-		String timeString=getTimeString(time)+": ";
-		String levelString=getLevelString(level);
-		String textString=String()+text+(char)10;
+		const char *timeString=getTimeString(time);
+		const char *levelString=getLevelString(level);
 
-		String textColor="\x1b[39m";
-		String levelColor=textColor;
+		const char *textColor="\x1b[39m";
+		const char *levelColor=textColor;
 		FILE *outFile=stdout;
 		switch(level){
 			case Logger::Level_ERROR:
@@ -271,19 +281,20 @@ public:
 		}
 
 		fputs(timeString,outFile);
+		fputs(": ",outFile);
 		fputs(levelColor,outFile);
 		fputs(levelString,outFile);
 		fputs(textColor,outFile);
-		fputs(textString,outFile);
+		fputs(text,outFile);
+		fputs(newLine,outFile);
 	}
 };
 
 class StandardListener:public BaseLoggerListener{
 public:
 	void addLogEntry(Logger::Category *category,Logger::Level level,uint64 time,const char *text){
-		String timeString=getTimeString(time)+": ";
-		String levelString=getLevelString(level);
-		String textString=String()+text+(char)10;
+		const char *timeString=getTimeString(time);
+		const char *levelString=getLevelString(level);
 
 		FILE *outFile=stdout;
 		if(level==Logger::Level_ERROR){
@@ -291,8 +302,10 @@ public:
 		}
 
 		fputs(timeString,outFile);
+		fputs(": ",outFile);
 		fputs(levelString,outFile);
-		fputs(textString,outFile);
+		fputs(text,outFile);
+		fputs(newLine,outFile);
 	}
 };
 
@@ -354,7 +367,7 @@ void Log::initialize(bool startSilent,bool perThread,const char *options){
 
 		#if !defined(TOADLET_PLATFORM_EMSCRIPTEN)
 			if(options!=NULL){
-				mListeners.push_back(new SOSLoggerListener(options));
+	//			mListeners.push_back(new SOSLoggerListener(options));
 			}
 		#endif
 
