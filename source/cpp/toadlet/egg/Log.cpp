@@ -25,7 +25,7 @@
 
 #include "Log.h"
 #include "LoggerListener.h"
-#include <time.h>
+#include "BaseLoggerListener.h"
 #include <stdio.h>
 
 #if defined(TOADLET_PLATFORM_WIN32)
@@ -50,53 +50,6 @@
 
 namespace toadlet{
 namespace egg{
-
-class BaseLoggerListener:public LoggerListener{
-public:
-	BaseLoggerListener(){
-		newLine[0]=(char)10;
-		newLine[1]=0;
-	}
-
-	const char *getTimeString(uint64 time){
-		time_t tt=time/1000;
-		struct tm *ts=gmtime(&tt);
-		strftime(timeString,sizeof(timeString),"%Y-%m-%d %H:%M:%S",ts);
-		return timeString;
-	}
-
-	const char *getLevelString(Logger::Level level){
-		switch(level){
-			case Logger::Level_DISABLED:
-				return "LOGGER:  ";
-			break;
-			case Logger::Level_ERROR:
-				return "ERROR:   ";
-			break;
-			case Logger::Level_WARNING:
-				return "WARNING: ";
-			break;
-			case Logger::Level_ALERT:
-				return "ALERT:   ";
-			break;
-			case Logger::Level_DEBUG:
-				return "DEBUG:   ";
-			break;
-			case Logger::Level_EXCESS:
-				return "EXCESS:  ";
-			break;
-			default:
-				return "UNKNOWN: ";
-			break;
-		}
-	}
-
-	void flush(){}
-	
-protected:
-	char timeString[128];
-	char newLine[2];
-};
 
 class ParentListener:public BaseLoggerListener{
 public:

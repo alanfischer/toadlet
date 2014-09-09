@@ -87,6 +87,7 @@ set (EGG_PLATFORM_WIN32_SRC
 set (EGG_HDR
 	Assert.h
 	Atomic.h
+	BaseLoggerListener.h
 	BaseResource.h
 	Categories.h
 	CircularBuffer.h
