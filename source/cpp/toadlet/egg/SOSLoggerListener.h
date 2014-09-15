@@ -13,26 +13,29 @@ namespace egg{
 
 class SOSLoggerListener:public LoggerListener,public Runnable{
 public:
-	SOSLoggerListener(String serverAddress);
+	SOSLoggerListener(const char *serverAddress);
 	virtual ~SOSLoggerListener();
 
 	void addLogEntry(Logger::Category *category,Logger::Level level,uint64 time,const char *text);
 
 	void flush();
 
-	void sendEntry(Logger::Category *category,Logger::Level level,uint64 time,const char *text);
-
 	void run();
 
 protected:
-	String mServerAddress;
+	void sendEntry(Logger::Category *category,Logger::Level level,uint64 time,const char *text);
+
+	const char *getSOSLevelName(Logger::Level level);
+
+	char *mServerAddress;
+	char *mMessageBuffer;
+	int mMessageBufferLength;
+	Logger::List<Logger::Entry*> mEntries;
 	Socket::ptr mSocket;
-	Collection<Logger::Entry> mEntries;
 	Mutex::ptr mMutex;
 	WaitCondition::ptr mCondition;
 	Thread::ptr mThread;
 	bool mStop;
-	tbyte mTermination;
 };
 
 }

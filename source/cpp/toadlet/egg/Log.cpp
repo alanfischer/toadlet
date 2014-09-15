@@ -61,6 +61,10 @@ public:
 		mParent->addLogEntry(category==NULL?NULL:category->name,level,text);
 	}
 
+	void flush(){
+		mParent->flush();
+	}
+
 protected:
 	Logger *mParent;
 };

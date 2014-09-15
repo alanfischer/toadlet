@@ -63,6 +63,18 @@ public:
 			}
 			this->reportingLevel=reportingLevel;
 		}
+
+		Category(const Category &category){
+			if(category.name==NULL){
+				this->name=NULL;
+			}
+			else{
+				this->name=new char[strlen(category.name)+1];
+				strcpy(this->name,category.name);
+			}
+			this->reportingLevel=category.reportingLevel;
+		}
+
 		~Category(){
 			delete[] name;
 		}
