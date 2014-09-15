@@ -1,28 +1,21 @@
 #include "SOSLoggerListener.h"
-#include <toadlet/egg/Log.h>
-#include <toadlet/egg/Error.h>
+#include <stdio.h>
 
 namespace toadlet{
 namespace egg{
-	
-const char *const _sos_level_names[] = {
-	"Off",
-	"Error",
-	"Warning",
-	"Info",
-	"Debug",
-	"Trace",
-	"Trace"
-};
 
-SOSLoggerListener::SOSLoggerListener(String serverAddress):
-	mStop(false),
-	mTermination(0)
+SOSLoggerListener::SOSLoggerListener(const char *serverAddress):
+	mServerAddress(NULL),
+	mMessageBuffer(NULL),
+	mMessageBufferLength(0),
+	mStop(false)
 {
-	// Turn off egg errors when in use, to avoid recursion
-	Log::getInstance()->setCategoryReportingLevel(Categories::TOADLET_EGG,Logger::Level_DISABLED);
+	mServerAddress=new char[strlen(serverAddress)+1];
+	strcpy(mServerAddress,serverAddress);
 
-	mServerAddress=serverAddress;
+	mMessageBufferLength=1024;
+	mMessageBuffer=new char[mMessageBufferLength];
+
 	mMutex=Mutex::ptr(new Mutex());
 	mCondition=WaitCondition::ptr(new WaitCondition());
 
@@ -39,11 +32,18 @@ SOSLoggerListener::~SOSLoggerListener(){
 
 	mStop=true;
 	mThread->join();
+
+	for(Logger::List<Logger::Entry*>::iterator it=mEntries.begin();it!=mEntries.end();++it){
+		delete *it;
+	}
+
+	delete[] mMessageBuffer;
+	delete[] mServerAddress;
 }
 
 void SOSLoggerListener::addLogEntry(Logger::Category *category,Logger::Level level,uint64 time,const char *text){
 	mMutex->lock();
-	mEntries.add(Logger::Entry(category,level,time,text));
+	mEntries.push_back(new Logger::Entry(category,level,time,text));
 	mMutex->unlock();
 }
 
@@ -58,71 +58,84 @@ void SOSLoggerListener::sendEntry(Logger::Category *category,Logger::Level level
 		return;
 	}
 	
-	String formattedMessage = String("!SOS<showMessage key='") + _sos_level_names[level] + ("'>");
-	
-	String messagePrefix = String("[") + _sos_level_names[level] + String("] ");
-	
-	if (category != NULL) {
-		String name=category->name;
-		// Occasionally, we use __FILE__ as the category name. If we do, we don't
-		// care about the full file path. Just the file name.
-		if (name.startsWith("/")) { // Posix file paths
-			int index = name.rfind('/');
-			messagePrefix += name.substr(index + 1, name.length() - index - 1);
-		}
-		else if (name.find('\\') > -1) { // Windows file paths
-			int index = name.rfind('\\');
-			messagePrefix += name.substr(index + 1, name.length() - index - 1);
-		}
-		else {
-			messagePrefix += name;
-		}
-		
-		messagePrefix += String(": ");
+	const char *startText="!SOS<showMessage key='";
+	const char *levelText=getSOSLevelName(level);
+	const char *preLevelText="'>[";
+	const char *postLevelText="]";
+	const char *categoryText="";
+	const char *separatorText="";
+	const char *endText="</showMessage>";
+	if(category!=NULL){
+		categoryText=category->name;
+		separatorText=": ";
 	}
+
+	int length=strlen(startText) + strlen(levelText) + strlen(preLevelText) + strlen(levelText) + strlen(postLevelText) + strlen(categoryText) + strlen(separatorText) + strlen(text) + strlen(endText) + 1;
+	if(mMessageBufferLength < length){
+		delete[] mMessageBuffer;
+		mMessageBufferLength=length;
+		mMessageBuffer=new char[length];
+	}
+
+	sprintf(mMessageBuffer,"%s%s%s%s%s%s%s%s%s",startText,levelText,preLevelText,levelText,postLevelText,categoryText,separatorText,text,endText);
 	
-	formattedMessage += messagePrefix + text;
-	
-	formattedMessage += String("</showMessage>");
-	
-	TOADLET_TRY
-		mSocket->send((tbyte*)formattedMessage.c_str(), formattedMessage.length());
-		mSocket->send(&mTermination, 1);
-	TOADLET_CATCH_ANONYMOUS(){}
+	try{
+		mSocket->send((tbyte*)mMessageBuffer, mMessageBufferLength);
+	}catch(...){}
 }
 
 void SOSLoggerListener::run(){
 	bool result = false;
-	TOADLET_TRY
+	try{
 		mSocket->connect(mServerAddress,4444);
-	TOADLET_CATCH_ANONYMOUS(){
-		result=false;
-	}
+	}catch(...){}
 
 	if (result == false) {
-		Log::error("SOSLoggerListener could not connect!");
+		fprintf(stderr,"SOSLoggerListener could not connect!");
 		return;
 	}
 
-	Logger::Entry entry;
-	bool hasEntry=false;
+	Logger::Entry *entry=NULL;
 
 	while(mStop==false){
 		mMutex->lock();
-		if(mEntries.size()>0){
-			entry=mEntries.at(0);
-			mEntries.removeAt(0);
-			hasEntry=true;
+		if(mEntries.begin()!=mEntries.end()){
+			entry=*mEntries.begin();
+			mEntries.remove(entry);
 		}
 		else{
 			mCondition->notify();
-			hasEntry=false;
 		}
 		mMutex->unlock();
 
-		if(hasEntry){
-			sendEntry(entry.category,entry.level,entry.time,entry.text);
+		if(entry){
+			sendEntry(entry->category,entry->level,entry->time,entry->text);
+			delete entry;
 		}
+	}
+}
+
+const char *SOSLoggerListener::getSOSLevelName(Logger::Level level){
+	switch(level){
+		case Logger::Level_DISABLED:
+			return "Off";
+		break;
+		case Logger::Level_ERROR:
+			return "Error";
+		break;
+		case Logger::Level_WARNING:
+			return "Warning";
+		break;
+		case Logger::Level_ALERT:
+			return "Info";
+		break;
+		case Logger::Level_DEBUG:
+			return "Debug";
+		break;
+		case Logger::Level_EXCESS:
+		default:
+			return "Trace";
+		break;
 	}
 }
 
