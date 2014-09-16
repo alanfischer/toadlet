@@ -55,9 +55,18 @@ public:
 	TOADLET_MAKE_LOG_FUNCTION(debug,Logger::Level_DEBUG);
 	TOADLET_MAKE_LOG_FUNCTION(excess,Logger::Level_EXCESS);
 
-private:
-	static int threadID();
+	static Logger::timestamp mtime();
+	static void *currentThread();
+	static void *createMutex();
+	static void destroyMutex(void *mutex);
+	static void lock(void *mutex);
+	static void unlock(void *mutex);
+	static void *createCondition();
+	static void destroyCondition(void *wait);
+	static void wait(void *condition,void *mutex);
+	static void notify(void *condition);
 
+private:
 	static Logger *mTheLogger;
 	static bool mPerThread;
 	static Logger::List<LoggerListener*> mListeners;

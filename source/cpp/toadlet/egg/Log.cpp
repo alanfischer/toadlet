@@ -29,11 +29,15 @@
 #include <stdio.h>
 
 #if defined(TOADLET_PLATFORM_WIN32)
+	#ifndef WIN32_LEAN_AND_MEAN
+		#define WIN32_LEAN_AND_MEAN 1
+	#endif
 	#include <windows.h>
 	#define snprintf _snprintf
 #else
 	#include <pthread.h>
 	#include <stdint.h>
+	#include <sys/time.h>
 #endif
 
 #if defined(TOADLET_PLATFORM_OSX)
@@ -45,7 +49,7 @@
 #endif
 
 #if !defined(TOADLET_PLATFORM_EMSCRIPTEN)
-//	#include <toadlet/egg/SOSLoggerListener.h>
+	#include <toadlet/egg/SOSLoggerListener.h>
 #endif
 
 namespace toadlet{
@@ -57,7 +61,7 @@ public:
 		mParent=parent;
 	}
 
-	void addLogEntry(Logger::Category *category,Logger::Level level,uint64 time,const char *text){
+	void addLogEntry(Logger::Category *category,Logger::Level level,Logger::timestamp time,const char *text){
 		mParent->addLogEntry(category==NULL?NULL:category->name,level,text);
 	}
 
@@ -72,7 +76,7 @@ protected:
 #if defined(TOADLET_PLATFORM_WIN32)
 	class OutputDebugStringListener:public BaseLoggerListener{
 	public:
-		void addLogEntry(Logger::Category *category,Logger::Level level,uint64 time,const char *text){
+		void addLogEntry(Logger::Category *category,Logger::Level level,Logger::timestamp time,const char *text){
 			const char *timeString=getTimeString(time);
 			const char *levelString=getLevelString(level);
 
@@ -100,7 +104,7 @@ protected:
 	};
 	class ConsoleListener:public BaseLoggerListener{
 	public:
-		void addLogEntry(Logger::Category *category,Logger::Level level,uint64 time,const char *text){
+		void addLogEntry(Logger::Category *category,Logger::Level level,Logger::timestamp time,const char *text){
 			const char *timeString=getTimeString(time);
 			const char *levelString=getLevelString(level);
 
@@ -140,7 +144,7 @@ protected:
 			}
 		}
 
-		void addLogEntry(Logger::Category *category,Logger::Level level,uint64 time,const char *text){
+		void addLogEntry(Logger::Category *category,Logger::Level level,Logger::timestamp time,const char *text){
 			aslclient client=NULL;
 			if(category!=NULL){
 				if(category->data==NULL){
@@ -186,7 +190,7 @@ protected:
 #elif defined(TOADLET_PLATFORM_ANDROID)
 	class AndroidListener:public BaseLoggerListener{
 	public:
-		void addLogEntry(Logger::Category *category,Logger::Level level,uint64 time,const char *text){
+		void addLogEntry(Logger::Category *category,Logger::Level level,Logger::timestamp time,const char *text){
 			int priority=0;
 			switch(level){
 				case Logger::Level_ERROR:
@@ -215,7 +219,7 @@ protected:
 
 class ANSIStandardListener:public BaseLoggerListener{
 public:
-	void addLogEntry(Logger::Category *category,Logger::Level level,uint64 time,const char *text){
+	void addLogEntry(Logger::Category *category,Logger::Level level,Logger::timestamp time,const char *text){
 		const char *timeString=getTimeString(time);
 		const char *levelString=getLevelString(level);
 
@@ -249,7 +253,7 @@ public:
 
 class StandardListener:public BaseLoggerListener{
 public:
-	void addLogEntry(Logger::Category *category,Logger::Level level,uint64 time,const char *text){
+	void addLogEntry(Logger::Category *category,Logger::Level level,Logger::timestamp time,const char *text){
 		const char *timeString=getTimeString(time);
 		const char *levelString=getLevelString(level);
 
@@ -278,10 +282,10 @@ Logger *Log::getInstance(){
 
 	Logger *logger=mTheLogger;
 	if(mPerThread){
-		int id=threadID();
+		void *thread=currentThread();
 		mTheLogger->lock();
 			Logger::List<Logger*>::iterator it=mThreadLoggers.begin();
-			while(it!=mThreadLoggers.end() && (*it)->getThreadID()==id){
+			while(it!=mThreadLoggers.end() && (*it)->getThread()==thread){
 				++it;
 			}
 			if(it!=mThreadLoggers.end()){
@@ -292,7 +296,7 @@ Logger *Log::getInstance(){
 				mListeners.push_back(listener);
 
 				logger=new Logger(true);
-				logger->setThreadID(id);
+				logger->setThread(thread);
 				logger->addLoggerListener(listener);
 				mThreadLoggers.push_back(logger);
 			}
@@ -324,7 +328,7 @@ void Log::initialize(bool startSilent,bool perThread,const char *options){
 
 		#if !defined(TOADLET_PLATFORM_EMSCRIPTEN)
 			if(options!=NULL){
-	//			mListeners.push_back(new SOSLoggerListener(options));
+				mListeners.push_back(new SOSLoggerListener(options));
 			}
 		#endif
 
@@ -350,12 +354,100 @@ void Log::destroy(){
 	}
 	mThreadLoggers.clear();
 }
-
-int Log::threadID(){
+Logger::timestamp Log::mtime(){
 	#if defined(TOADLET_PLATFORM_WIN32)
-		return GetCurrentThreadId();
+		FILETIME now;
+		GetSystemTimeAsFileTime(&now);
+		return ((*(Logger::timestamp*)&now) / 10 - 11644473600000000) / 1000;
+	#else
+		struct timeval now;
+		gettimeofday(&now,0);
+		return ((Logger::timestamp)now.tv_sec) * 1000 + ((Logger::timestamp)(now.tv_usec)) / 1000;
+	#endif
+}
+
+void *Log::currentThread(){
+	#if defined(TOADLET_PLATFORM_WIN32)
+		return (void*)GetCurrentThreadId();
 	#else
 		return (intptr_t)(int*)(pthread_self());
+	#endif
+}
+
+void *Log::createMutex(){
+	void *mutex=NULL;
+	#if defined(TOADLET_PLATFORM_WIN32)
+		mutex=CreateMutex(NULL,0,NULL);
+	#else
+		mutex=new pthread_mutex_t();
+		pthread_mutexattr_t attrib;
+		pthread_mutexattr_init(&attrib);
+		pthread_mutexattr_settype(&attrib,PTHREAD_MUTEX_RECURSIVE);
+		pthread_mutex_init((pthread_mutex_t*)mutex,&attrib);
+		pthread_mutexattr_destroy(&attrib);
+	#endif
+	return mutex;
+}
+
+void Log::destroyMutex(void *mutex){
+	#if defined(TOADLET_PLATFORM_WIN32)
+		CloseHandle(mutex);
+	#else
+		pthread_mutex_destroy((pthread_mutex_t*)mutex);
+		delete (pthread_mutex_t*)mutex;
+	#endif
+}
+
+void Log::lock(void *mutex){
+	#if defined(TOADLET_PLATFORM_WIN32)
+		WaitForSingleObject(mutex,INFINITE);
+	#else
+		pthread_mutex_lock((pthread_mutex_t*)mutex);
+	#endif
+}
+
+void Log::unlock(void *mutex){
+	#if defined(TOADLET_PLATFORM_WIN32)
+		ReleaseMutex(mutex);
+	#else
+		pthread_mutex_unlock((pthread_mutex_t*)mutex);
+	#endif
+}
+
+void *Log::createCondition(){
+	void *condition=NULL;
+	#if defined(TOADLET_PLATFORM_WIN32)
+		condition=CreateEvent(NULL,FALSE,FALSE,NULL);
+	#else
+		condition=new pthread_cond_t();
+		pthread_cond_init((pthread_cond_t*)condition,0);
+	#endif
+	return condition;
+}
+
+void Log::destroyCondition(void *condition){
+	#if defined(TOADLET_PLATFORM_WIN32)
+		CloseHandle(condition);
+	#else
+		pthread_cond_destroy((pthread_cond_t*)condition);
+	#endif
+}
+
+void Log::wait(void *condition,void *mutex){
+	#if defined(TOADLET_PLATFORM_WIN32)
+		ReleaseMutex(mutex);
+		DWORD result=WaitForSingleObject(condition,INFINITE);
+		WaitForSingleObject(mutex,INFINITE);
+	#else
+		pthread_cond_wait((pthread_cond_t*)condition,(pthread_mutex_t*)mutex)==0;
+	#endif
+}
+
+void Log::notify(void *condition){
+	#if defined(TOADLET_PLATFORM_WIN32)
+		SetEvent(condition);
+	#else
+		pthread_cond_signal((pthread_cond_t*)condition);
 	#endif
 }
 

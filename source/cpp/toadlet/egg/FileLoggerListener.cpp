@@ -23,7 +23,7 @@ FileLoggerListener::~FileLoggerListener(){
 	delete[] mPrefix;
 }
 
-void FileLoggerListener::addLogEntry(Logger::Category *category,Logger::Level level,uint64 logtime,const char *text){
+void FileLoggerListener::addLogEntry(Logger::Category *category,Logger::Level level,Logger::timestamp logtime,const char *text){
 	// Get the current date
 	time_t currentTime = time(0);
 	struct tm currentTm=*localtime(&currentTime);
