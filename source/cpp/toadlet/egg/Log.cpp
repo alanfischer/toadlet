@@ -370,7 +370,7 @@ void *Log::currentThread(){
 	#if defined(TOADLET_PLATFORM_WIN32)
 		return (void*)GetCurrentThreadId();
 	#else
-		return (void*)(intptr_t)(int*)(pthread_self());
+		return (void*)pthread_self();
 	#endif
 }
 
