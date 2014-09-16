@@ -14,6 +14,7 @@
 	#include <netinet/tcp.h>
 	#include <netdb.h>
 	#include <pthread.h>
+	#include <unistd.h>
 #endif
 
 namespace toadlet{
