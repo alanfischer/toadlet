@@ -25,17 +25,8 @@
 
 #include "Logger.h"
 #include "LoggerListener.h"
+#include "Log.h"
 #include <stdio.h>
-
-#if defined(TOADLET_PLATFORM_WIN32)
-	#ifndef WIN32_LEAN_AND_MEAN
-		#define WIN32_LEAN_AND_MEAN 1
-	#endif
-	#include <windows.h>
-#else
-	#include <pthread.h>
-	#include <sys/time.h>
-#endif
 
 namespace toadlet{
 namespace egg{
@@ -43,18 +34,10 @@ namespace egg{
 Logger::Logger(bool startSilent):
 	mReportingLevel(Level_MAX),
 	mStoreLogEntry(false),
-	mThreadID(0)
+	mThread(NULL),
+	mMutex(NULL)
 {
-	#if defined(TOADLET_PLATFORM_WIN32)
-		mMutex=CreateMutex(NULL,0,NULL);
-	#else
-		mMutex=new pthread_mutex_t();
-		pthread_mutexattr_t attrib;
-		pthread_mutexattr_init(&attrib);
-		pthread_mutexattr_settype(&attrib,PTHREAD_MUTEX_RECURSIVE);
-		pthread_mutex_init((pthread_mutex_t*)mMutex,&attrib);
-		pthread_mutexattr_destroy(&attrib);
-	#endif
+	mMutex=Log::createMutex();
 
 	if(startSilent==false){
 		addCompleteLogEntry(NULL,Level_DISABLED,"creating toadlet.egg.Logger");
@@ -69,12 +52,7 @@ Logger::~Logger(){
 		delete it;
 	}
 
-	#if defined(TOADLET_PLATFORM_WIN32)
-		CloseHandle(mMutex);
-	#else
-		pthread_mutex_destroy((pthread_mutex_t*)mMutex);
-		delete (pthread_mutex_t*)mMutex;
-	#endif
+	Log::destroyMutex(mMutex);
 }
 
 void Logger::setMasterReportingLevel(Level level){
@@ -163,7 +141,7 @@ void Logger::clearLogEntries(){
 }
 
 void Logger::addCompleteLogEntry(Category *category,Level level,const char *text){
-	uint64 time=mtime();
+	timestamp time=Log::mtime();
 
 	for(List<LoggerListener*>::iterator it=mLoggerListeners.begin();it!=mLoggerListeners.end();++it){
 		(*it)->addLogEntry(category,level,time,text);
@@ -199,31 +177,11 @@ Logger::Category *Logger::getCategory(const char *categoryName){
 }
 
 void Logger::lock(){
-	#if defined(TOADLET_PLATFORM_WIN32)
-		WaitForSingleObject(mMutex,INFINITE);
-	#else
-		pthread_mutex_lock((pthread_mutex_t*)mMutex);
-	#endif
+	Log::lock(mMutex);
 }
 
 void Logger::unlock(){
-	#if defined(TOADLET_PLATFORM_WIN32)
-		ReleaseMutex(mMutex);
-	#else
-		pthread_mutex_unlock((pthread_mutex_t*)mMutex);
-	#endif
-}
-
-uint64 Logger::mtime(){
-	#if defined(TOADLET_PLATFORM_WIN32)
-		FILETIME now;
-		GetSystemTimeAsFileTime(&now);
-		return ((*(uint64*)&now) / 10 - 11644473600000000) / 1000;
-	#else
-		struct timeval now;
-		gettimeofday(&now,0);
-		return ((uint64)now.tv_sec) * 1000 + ((uint64)(now.tv_usec)) / 1000;
-	#endif
+	Log::unlock(mMutex);
 }
 
 }

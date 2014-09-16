@@ -39,6 +39,8 @@ class LoggerListener;
 
 class TOADLET_API Logger{
 public:
+	typedef uint64 timestamp;
+
 	enum Level{
 		Level_DISABLED=0,
 
@@ -86,7 +88,7 @@ public:
 
 	class Entry{
 	public:
-		Entry(Category *category=NULL,Level level=Level_MAX,uint64 time=0,const char *text=(char*)NULL){
+		Entry(Category *category=NULL,Level level=Level_MAX,timestamp time=0,const char *text=(char*)NULL){
 			this->category=category;
 			this->level=level;
 			this->time=time;
@@ -104,7 +106,7 @@ public:
 
 		Category *category;
 		Level level;
-		uint64 time;
+		timestamp time;
 		char *text;
 	};
 
@@ -208,12 +210,11 @@ public:
 	const List<Entry*> &getLogEntries() const{return mLogEntries;}
 	void clearLogEntries();
 
-	void setThreadID(int id){mThreadID=id;}
-	int getThreadID() const{return mThreadID;}
+	void setThread(void *thread){mThread=thread;}
+	void *getThread() const{return mThread;}
 
 	void lock();
 	void unlock();
-	static uint64 mtime();
 
 private:
 	void addCompleteLogEntry(Category *category,Level level,const char *text);
@@ -223,7 +224,7 @@ private:
 	List<LoggerListener*> mLoggerListeners;
 	bool mStoreLogEntry;
 	List<Entry*> mLogEntries;
-	int mThreadID;
+	void *mThread;
 	void *mMutex;
 };
 

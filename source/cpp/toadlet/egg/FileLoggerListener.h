@@ -12,7 +12,7 @@ public:
 	FileLoggerListener(bool date,const char *directory,const char *prefix);
 	virtual ~FileLoggerListener();
 
-	void addLogEntry(Logger::Category *category,Logger::Level level,uint64 logtime,const char *text);
+	void addLogEntry(Logger::Category *category,Logger::Level level,Logger::timestamp logtime,const char *text);
 	void flush();
 
 protected:

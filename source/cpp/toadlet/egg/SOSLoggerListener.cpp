@@ -1,14 +1,44 @@
 #include "SOSLoggerListener.h"
+#include "Log.h"
 #include <stdio.h>
+
+#if defined(TOADLET_PLATFORM_WIN32)
+	#ifndef WIN32_LEAN_AND_MEAN
+		#define WIN32_LEAN_AND_MEAN 1
+	#endif
+	#include <windows.h>
+	#include <winsock.h>
+#else
+	#include <sys/socket.h>
+	#include <pthread.h>
+#endif
 
 namespace toadlet{
 namespace egg{
+
+#if defined(TOADLET_PLATFORM_WIN32)
+unsigned long WINAPI startSOSThread(void *thread){
+#else
+void *startSOSThread(void *thread){
+#endif
+	((SOSLoggerListener*)thread)->run();
+
+	#if defined(TOADLET_PLATFORM_WIN32)
+		ExitThread(0);
+	#else
+		pthread_exit(NULL);
+	#endif
+
+	return 0;
+}
 
 SOSLoggerListener::SOSLoggerListener(const char *serverAddress):
 	mServerAddress(NULL),
 	mMessageBuffer(NULL),
 	mMessageBufferLength(0),
-	mStop(false)
+	mStop(false),
+	mMutex(NULL),
+	mCondition(NULL)
 {
 	mServerAddress=new char[strlen(serverAddress)+1];
 	strcpy(mServerAddress,serverAddress);
@@ -16,22 +46,41 @@ SOSLoggerListener::SOSLoggerListener(const char *serverAddress):
 	mMessageBufferLength=1024;
 	mMessageBuffer=new char[mMessageBufferLength];
 
-	mMutex=Mutex::ptr(new Mutex());
-	mCondition=WaitCondition::ptr(new WaitCondition());
+	mSocket=socket(PF_INET,SOCK_STREAM,IPPROTO_TCP);
 
-	mSocket=Socket::createTCPSocket();
+	mMutex=Log::createMutex();
+	mCondition=Log::createCondition();
 
-	mThread=new Thread(this);
-	mThread->start();	
+	#if defined(TOADLET_PLATFORM_WIN32)
+		mThread=CreateThread(NULL,0,&startSOSThread,this,0,0);
+		ResumeThread(mThread);
+	#else
+		mThread=new pthread_t();
+		pthread_create((pthread_t*)mThread,NULL,&startSOSThread,(void*)this);
+	#endif
 }
 
 SOSLoggerListener::~SOSLoggerListener(){
 	flush();
 	
-	mSocket->close();
+	#if defined(TOADLET_PLATFORM_WIN32)
+		shutdown(mSocket,2);
+		::closesocket(mSocket);
+	#else
+		shutdown(mSocket,SHUT_RDWR);
+		::close(mSocket);
+	#endif
 
 	mStop=true;
-	mThread->join();
+
+	#if defined(TOADLET_PLATFORM_WIN32)
+		WaitForSingleObject(mThread,INFINITE);
+		CloseHandle(mThread);
+	#else
+		pthread_join((pthread_t*)mThread,NULL);
+		pthread_detach((pthread_t*)mThread);
+		delete (pthread_t*)mThread;
+	#endif
 
 	for(Logger::List<Logger::Entry*>::iterator it=mEntries.begin();it!=mEntries.end();++it){
 		delete *it;
@@ -39,21 +88,24 @@ SOSLoggerListener::~SOSLoggerListener(){
 
 	delete[] mMessageBuffer;
 	delete[] mServerAddress;
+
+	Log::destroyCondition(mCondition);
+	Log::destroyMutex(mMutex);
 }
 
-void SOSLoggerListener::addLogEntry(Logger::Category *category,Logger::Level level,uint64 time,const char *text){
-	mMutex->lock();
+void SOSLoggerListener::addLogEntry(Logger::Category *category,Logger::Level level,Logger::timestamp time,const char *text){
+	Log::lock(mMutex);
 	mEntries.push_back(new Logger::Entry(category,level,time,text));
-	mMutex->unlock();
+	Log::unlock(mMutex);
 }
 
 void SOSLoggerListener::flush(){
-	mMutex->lock();
-	mCondition->wait(mMutex);
-	mMutex->unlock();
+	Log::lock(mMutex);
+	Log::wait(mCondition,mMutex);
+	Log::unlock(mMutex);
 }
 
-void SOSLoggerListener::sendEntry(Logger::Category *category,Logger::Level level,uint64 time,const char *text){
+void SOSLoggerListener::sendEntry(Logger::Category *category,Logger::Level level,Logger::timestamp time,const char *text){
 	if (level <= 0) {
 		return;
 	}
@@ -78,35 +130,40 @@ void SOSLoggerListener::sendEntry(Logger::Category *category,Logger::Level level
 	}
 
 	sprintf(mMessageBuffer,"%s%s%s%s%s%s%s%s%s",startText,levelText,preLevelText,levelText,postLevelText,categoryText,separatorText,text,endText);
-	
-	try{
-		mSocket->send((tbyte*)mMessageBuffer, mMessageBufferLength);
-	}catch(...){}
+
+	send(mSocket,mMessageBuffer,mMessageBufferLength,0);
 }
 
 void SOSLoggerListener::run(){
-	bool result = false;
-	try{
-		mSocket->connect(mServerAddress,4444);
-	}catch(...){}
+	struct sockaddr_in address={0};
+	address.sin_family=AF_INET;
+	address.sin_port=htons(4444);
 
-	if (result == false) {
-		fprintf(stderr,"SOSLoggerListener could not connect!");
+	struct hostent *he=gethostbyaddr((char*)&mServerAddress,4,AF_INET);
+	if(he!=NULL){
+		char **list=he->h_addr_list;
+		if((*list)!=NULL){
+			address.sin_addr.s_addr=*(uint32*)(*list);
+		}
+	}
+
+	if(connect(mSocket,(struct sockaddr*)&address,sizeof(address))<=0){
+		fprintf(stderr,"SOSLoggerListener: unable to connect to %s",mServerAddress);
 		return;
 	}
 
 	Logger::Entry *entry=NULL;
 
 	while(mStop==false){
-		mMutex->lock();
+		Log::lock(mMutex);
 		if(mEntries.begin()!=mEntries.end()){
 			entry=*mEntries.begin();
 			mEntries.remove(entry);
 		}
 		else{
-			mCondition->notify();
+			Log::notify(mCondition);
 		}
-		mMutex->unlock();
+		Log::unlock(mMutex);
 
 		if(entry){
 			sendEntry(entry->category,entry->level,entry->time,entry->text);
