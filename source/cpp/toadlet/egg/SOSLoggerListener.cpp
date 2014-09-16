@@ -12,6 +12,7 @@
 	#include <sys/socket.h>
 	#include <netinet/in.h>
 	#include <netinet/tcp.h>
+	#include <netdb.h>
 	#include <pthread.h>
 #endif
 
@@ -38,9 +39,9 @@ SOSLoggerListener::SOSLoggerListener(const char *serverAddress):
 	mServerAddress(NULL),
 	mMessageBuffer(NULL),
 	mMessageBufferLength(0),
-	mStop(false),
 	mMutex(NULL),
-	mCondition(NULL)
+	mCondition(NULL),
+	mStop(false)
 {
 	mServerAddress=new char[strlen(serverAddress)+1];
 	strcpy(mServerAddress,serverAddress);
@@ -57,7 +58,7 @@ SOSLoggerListener::SOSLoggerListener(const char *serverAddress):
 		mThread=CreateThread(NULL,0,&startSOSThread,this,0,0);
 		ResumeThread(mThread);
 	#else
-		pthread_create((pthread_t)mThread,NULL,&startSOSThread,(void*)this);
+		pthread_create((pthread_t*)&mThread,NULL,&startSOSThread,(void*)this);
 	#endif
 }
 
