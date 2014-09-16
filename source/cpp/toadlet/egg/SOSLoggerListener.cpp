@@ -10,6 +10,8 @@
 	#include <winsock.h>
 #else
 	#include <sys/socket.h>
+	#include <netinet/in.h>
+	#include <netinet/tcp.h>
 	#include <pthread.h>
 #endif
 
@@ -55,8 +57,7 @@ SOSLoggerListener::SOSLoggerListener(const char *serverAddress):
 		mThread=CreateThread(NULL,0,&startSOSThread,this,0,0);
 		ResumeThread(mThread);
 	#else
-		mThread=new pthread_t();
-		pthread_create((pthread_t*)mThread,NULL,&startSOSThread,(void*)this);
+		pthread_create((pthread_t)mThread,NULL,&startSOSThread,(void*)this);
 	#endif
 }
 
@@ -77,9 +78,8 @@ SOSLoggerListener::~SOSLoggerListener(){
 		WaitForSingleObject(mThread,INFINITE);
 		CloseHandle(mThread);
 	#else
-		pthread_join((pthread_t*)mThread,NULL);
-		pthread_detach((pthread_t*)mThread);
-		delete (pthread_t*)mThread;
+		pthread_join((pthread_t)mThread,NULL);
+		pthread_detach((pthread_t)mThread);
 	#endif
 
 	for(Logger::List<Logger::Entry*>::iterator it=mEntries.begin();it!=mEntries.end();++it){
