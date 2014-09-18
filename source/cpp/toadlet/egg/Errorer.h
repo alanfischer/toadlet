@@ -58,12 +58,11 @@ public:
 	Errorer();
 	virtual ~Errorer();
 
-	void setError(int error);
-	void setError(int error,const char *description);
+	void setError(int error,const char *description=NULL);
 	void setException(const Exception &ex);
 
 	int getError();
-	// The result of getErrorDescription() is only valid if getError() returned a value other than ERROR_NONE
+	// The result of getDescription() is only valid if getError() returned a value other than ERROR_NONE
 	const char *getDescription();
 	const Exception &getException();
 

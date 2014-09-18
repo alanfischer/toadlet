@@ -41,15 +41,10 @@ Errorer::Errorer(){
 Errorer::~Errorer(){
 }
 
-void Errorer::setError(int error){
-	mLastError=error;
-	mLastDescription[0]=0;
-}
-
 void Errorer::setError(int error,const char *description){
 	mLastError=error;
 	int c=0;
-	while(description[c]!=0 && c<MAX_DESCRIPTION_LENGTH){
+	while(description!=NULL && description[c]!=0 && c<MAX_DESCRIPTION_LENGTH){
 		mLastDescription[c]=description[c];
 		c++;
 	}
