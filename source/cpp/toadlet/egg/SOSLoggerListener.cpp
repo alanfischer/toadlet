@@ -8,6 +8,12 @@
 	#endif
 	#include <windows.h>
 	#include <winsock.h>
+
+	#if defined(TOADLET_PLATFORM_WINCE)
+		#pragma comment(lib,"ws2.lib")
+	#else
+		#pragma comment(lib,"wsock32.lib")
+	#endif
 #else
 	#include <sys/socket.h>
 	#include <netinet/in.h>
