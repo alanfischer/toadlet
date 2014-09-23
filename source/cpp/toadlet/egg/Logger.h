@@ -228,6 +228,12 @@ private:
 	void *mMutex;
 };
 
+typedef Logger::Category LoggerCategory;
+
+typedef Logger::Entry LoggerEntry;
+
+template<typename Type> class LoggerList:public Logger::List<Type>{};
+
 }
 }
 

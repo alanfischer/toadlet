@@ -5,8 +5,15 @@
 namespace toadlet{
 namespace egg{
 
+class LoggerEntry;
+
+template<typename Type>
+class LoggerList{};
+
 class Logger{
 public:
+	typedef uint64 timestamp;
+
 	enum Level{
 		DISABLED=0,
 
@@ -18,7 +25,7 @@ public:
 
 		MAX,
 	};
-
+	
 	Logger(bool startSilent);
 	virtual ~Logger();
 
@@ -36,8 +43,61 @@ public:
 	void addLogEntry(const char *categoryName,Level level,const char *text);
 	void addLogEntry(Level level,const char *text);
 
+	const LoggerList<LoggerEntry*>& getLogEntries() const;
+	
 	void flush();
+};
+
+class LoggerEntry{
+public:
+	Logger::Level level;
+	Logger::timestamp time;
+	char *text;
 };
 
 }
 }
+
+%typemap(javainterfaces) EntryIterator "java.util.Iterator<LoggerEntry>"
+%typemap(javacode) EntryIterator %{
+public void remove() throws UnsupportedOperationException {
+	throw new UnsupportedOperationException();
+}
+
+public LoggerEntry next() throws java.util.NoSuchElementException {
+	if (!hasNext()) {
+		throw new java.util.NoSuchElementException();
+	}
+	return nextImpl();
+}
+%}
+
+%javamethodmodifiers EntryIterator::nextImpl "private";
+%inline %{
+struct EntryIterator {
+	typedef toadlet::egg::LoggerList<toadlet::egg::LoggerEntry*> entry_list;
+	EntryIterator(const entry_list& l) : it(l.begin()), list(l) {}
+	bool hasNext() const {
+		return it != list.end();
+	}
+
+	toadlet::egg::LoggerEntry *nextImpl() {
+		toadlet::egg::LoggerEntry *entry = it++;
+		return entry;
+	}
+private:
+	entry_list::iterator it;
+	const entry_list& list;    
+};
+%}
+
+%typemap(javainterfaces) toadlet::egg::LoggerList<toadlet::egg::LoggerEntry*> "Iterable<LoggerEntry>"
+
+%newobject toadlet::egg::LoggerList<toadlet::egg::LoggerEntry*>::iterator() const;
+%extend toadlet::egg::LoggerList<toadlet::egg::LoggerEntry*> {
+	EntryIterator *iterator() const {
+		return new EntryIterator(*$self);
+	}
+}
+
+%template(EntryList) toadlet::egg::LoggerList<toadlet::egg::LoggerEntry*>;
