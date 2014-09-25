@@ -59,11 +59,11 @@ public:
 	static void *currentThread();
 	static void *createMutex();
 	static void destroyMutex(void *mutex);
-	static void lock(void *mutex);
-	static void unlock(void *mutex);
+	static bool lock(void *mutex);
+	static bool unlock(void *mutex);
 	static void *createCondition();
 	static void destroyCondition(void *wait);
-	static void wait(void *condition,void *mutex);
+	static bool wait(void *condition,void *mutex);
 	static void notify(void *condition);
 
 private:

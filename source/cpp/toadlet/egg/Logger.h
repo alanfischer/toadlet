@@ -113,6 +113,8 @@ public:
 	template<typename Type>
 	class List{
 	public:
+		typedef Type type;
+	
 		struct node{
 			node():next(NULL){}
 			Type item;
@@ -127,6 +129,7 @@ public:
 			inline bool operator==(const iterator &it) const{return it.next==next;}
 			inline bool operator!=(const iterator &it) const{return it.next!=next;}
 			inline iterator& operator++(){next=next->next;return *this;}
+			inline iterator& operator++(int){iterator it=*this;next=next->next;return it;}
 			node *next;
 		};
 
