@@ -2,6 +2,8 @@
 #include <toadlet/tadpole/action/ActionListener.h>
 %}
 
+// This is from: http://stackoverflow.com/questions/8168517/generating-java-interface-with-swig
+
 // @todo: Reenable this when dynamic_cast is supported by default on android, or write custom java directors
 // #define ACTIONLISTENER_DIRECTOR
 

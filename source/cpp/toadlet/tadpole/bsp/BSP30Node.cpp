@@ -366,6 +366,7 @@ bool BSP30Node::findAmbientForBound(Vector4 &r,Bound *bound){
 				ld[2]=Math::intClamp(0,255,ld[2]+(((int)ls[2]*intensity)>>8));
 			}
 			r.set(ld[0]/255.0,ld[1]/255.0,ld[2]/255.0,1.0);
+			return true;
 		}
 	}
 	return false;

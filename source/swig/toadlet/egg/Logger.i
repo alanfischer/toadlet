@@ -58,6 +58,8 @@ public:
 }
 }
 
+// This is from: http://stackoverflow.com/questions/9465856/no-iterator-for-java-when-using-swig-with-cs-stdmap
+
 %typemap(javainterfaces) EntryIterator "java.util.Iterator<LoggerEntry>"
 %typemap(javacode) EntryIterator %{
 public void remove() throws UnsupportedOperationException {
