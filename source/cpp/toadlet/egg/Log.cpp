@@ -398,19 +398,19 @@ void Log::destroyMutex(void *mutex){
 	#endif
 }
 
-void Log::lock(void *mutex){
+bool Log::lock(void *mutex){
 	#if defined(TOADLET_PLATFORM_WIN32)
-		WaitForSingleObject(mutex,INFINITE);
+		return WaitForSingleObject(mutex,INFINITE)==WAIT_OBJECT_0;
 	#else
-		pthread_mutex_lock((pthread_mutex_t*)mutex);
+		return pthread_mutex_lock((pthread_mutex_t*)mutex)==0;
 	#endif
 }
 
-void Log::unlock(void *mutex){
+bool Log::unlock(void *mutex){
 	#if defined(TOADLET_PLATFORM_WIN32)
-		ReleaseMutex(mutex);
+		return ReleaseMutex(mutex)==WAIT_OBJECT_0;
 	#else
-		pthread_mutex_unlock((pthread_mutex_t*)mutex);
+		return pthread_mutex_unlock((pthread_mutex_t*)mutex)==0;
 	#endif
 }
 
@@ -433,13 +433,14 @@ void Log::destroyCondition(void *condition){
 	#endif
 }
 
-void Log::wait(void *condition,void *mutex){
+bool Log::wait(void *condition,void *mutex){
 	#if defined(TOADLET_PLATFORM_WIN32)
 		ReleaseMutex(mutex);
 		DWORD result=WaitForSingleObject(condition,INFINITE);
 		WaitForSingleObject(mutex,INFINITE);
+		return result==WAIT_OBJECT_0;
 	#else
-		pthread_cond_wait((pthread_cond_t*)condition,(pthread_mutex_t*)mutex)==0;
+		return pthread_cond_wait((pthread_cond_t*)condition,(pthread_mutex_t*)mutex)==0;
 	#endif
 }
 

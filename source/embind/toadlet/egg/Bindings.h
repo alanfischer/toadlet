@@ -6,6 +6,7 @@
 #include <toadlet/egg/Iterator.h>
 #include <toadlet/egg/String.h>
 #include <toadlet/egg/Object.h>
+#include <toadlet/egg/Logger.h>
 #include <toadlet/egg/IntrusivePointer.h>
 #include <toadlet/egg/io/BaseArchive.h>
 
@@ -83,6 +84,40 @@ namespace emscripten {
 			.function("atEnd", &RangeAccess<RangeType>::atEnd)
 			.function("next", &RangeAccess<RangeType>::next)
 			.function("prev", &RangeAccess<RangeType>::prev)
+			;
+	}
+
+	template<typename ListType>
+	struct ListIterator {
+		typename ListType::iterator it;
+		typename ListType::iterator end;
+		
+		ListIterator(ListType& list):it(list.begin()),end(list.end()){}
+		typename ListType::type& next(){return *it++;}
+		bool hasNext() const{return it!=end;}
+	};
+
+	template<typename ListType>
+	struct ListAccess {
+		static ListIterator<ListType> iterator(ListType& list){return ListIterator<ListType>(list);}
+		static void push_back(ListType& list,const typename ListType::type& type){list.push_back(type);}
+		static void remove(ListType& list,const typename ListType::type& type){list.remove(type);}
+	};
+
+	template<typename T>
+	class_<Logger::List<T>> register_list(const char* name) {
+		typedef Logger::List<T> ListType;
+
+		class_<ListIterator<ListType>>((String(name) + "Iterator").c_str())
+			.function("next", &ListIterator<ListType>::next)
+			.function("hasNext", &ListIterator<ListType>::hasNext)
+			;
+		
+		return class_<ListType>(name)
+            .template constructor<>()
+			.function("iterator", &ListAccess<ListType>::iterator)
+			.function("push_back", &ListAccess<ListType>::push_back)
+			.function("remove", &ListAccess<ListType>::remove)
 			;
 	}
 
