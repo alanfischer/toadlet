@@ -104,10 +104,8 @@ namespace emscripten {
 		static void remove(ListType& list,const typename ListType::type& type){list.remove(type);}
 	};
 
-	template<typename T>
-	class_<Logger::List<T>> register_list(const char* name) {
-		typedef Logger::List<T> ListType;
-
+	template<typename ListType>
+	class_<ListType> register_list(const char* name) {
 		class_<ListIterator<ListType>>((String(name) + "Iterator").c_str())
 			.function("next", &ListIterator<ListType>::next)
 			.function("hasNext", &ListIterator<ListType>::hasNext)
