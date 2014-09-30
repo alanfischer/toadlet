@@ -12,6 +12,8 @@
 #include <toadlet/tadpole/MeshComponent.h>
 #include <toadlet/tadpole/Node.h>
 
+#include <list>
+
 using namespace emscripten;
 using namespace toadlet;
 using namespace toadlet::egg;
@@ -289,6 +291,4 @@ EMSCRIPTEN_BINDINGS(tadpole) {
 	class_<PartitionNode,base<Node>>("PartitionNode")
 		.smart_ptr<PartitionNode::ptr>("PartitionNode_ptr")
 	;
-
-	register_range<Node>("NodeRange");
 }
