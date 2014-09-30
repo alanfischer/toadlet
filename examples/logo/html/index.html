@@ -18,6 +18,10 @@ function update(){
 };
 
 function init(){
+	window.setTimeout(start,5);
+}
+
+function start(){	
 	var renderTarget=toadlet.new_EGLWindowRenderTarget(document.getElementById("canvas"));
 	renderDevice=toadlet.new_GLES2RenderDevice();
 	renderDevice.create(renderTarget,0);

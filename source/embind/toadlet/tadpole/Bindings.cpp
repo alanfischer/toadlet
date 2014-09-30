@@ -291,4 +291,6 @@ EMSCRIPTEN_BINDINGS(tadpole) {
 	class_<PartitionNode,base<Node>>("PartitionNode")
 		.smart_ptr<PartitionNode::ptr>("PartitionNode_ptr")
 	;
+
+	register_range<PointerIteratorRange<Node>>("NodeRange","NodeRangeIterator");
 }
