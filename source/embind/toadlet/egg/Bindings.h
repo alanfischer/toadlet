@@ -66,48 +66,58 @@ namespace emscripten {
 		return toadlet::egg::IntrusivePointer<T>(new T(std::forward<Args>(args)...));
 	}
 
+	// range bindings
 	template<typename RangeType>
-	struct RangeAccess {
-		static bool atBegin(const RangeType& r){return r.it==r.begin();}
-		static bool atEnd(const RangeType& r){return r.it==r.end();}
-
-		static val next(RangeType& r){val v((typename RangeType::type)r.it);++r.it;return v;}
-		static val prev(RangeType& r){val v((typename RangeType::type)r.it);--r.it;return v;}
+	struct RangeIterator {
+		RangeType& range;
+		typename RangeType::iterator it;
+		
+		RangeIterator(RangeType& range):range(range),it(range.begin()){}
+		typename RangeType::value_type next(){return *it++;}
+		bool hasNext() const{return it!=range.end();}
+		typename RangeType::value_type prev(){return *it--;}
+		bool hasPrev() const{return it!=range.begin();}
 	};
 
-	template<typename T>
-	class_<PointerIteratorRange<T>> register_range(const char* name) {
-		typedef PointerIteratorRange<T> RangeType;
+	template<typename RangeType>
+	struct RangeAccess {
+		static RangeIterator<RangeType> iterator(RangeType& range){return RangeIterator<RangeType>(range);}
+	};
 
-		return class_<PointerIteratorRange<T>>(name)
-			.function("atBegin", &RangeAccess<RangeType>::atBegin)
-			.function("atEnd", &RangeAccess<RangeType>::atEnd)
-			.function("next", &RangeAccess<RangeType>::next)
-			.function("prev", &RangeAccess<RangeType>::prev)
+	template<typename RangeType>
+	class_<RangeType> register_range(const char* name,const char* iteratorName) {
+		class_<RangeIterator<RangeType>>(iteratorName)
+			.function("next", &RangeIterator<RangeType>::next, allow_raw_pointers())
+			.function("hasNext", &RangeIterator<RangeType>::hasNext)
+			;
+		
+		return class_<RangeType>(name)
+			.function("iterator", &RangeAccess<RangeType>::iterator)
 			;
 	}
 
+	// list bindings
 	template<typename ListType>
 	struct ListIterator {
+		ListType& list;
 		typename ListType::iterator it;
-		typename ListType::iterator end;
 		
-		ListIterator(ListType& list):it(list.begin()),end(list.end()){}
-		typename ListType::type& next(){return *it++;}
-		bool hasNext() const{return it!=end;}
+		ListIterator(ListType& list):list(list),it(list.begin()){}
+		typename ListType::value_type next(){return *it++;}
+		bool hasNext() const{return it!=list.end();}
 	};
 
 	template<typename ListType>
 	struct ListAccess {
 		static ListIterator<ListType> iterator(ListType& list){return ListIterator<ListType>(list);}
-		static void push_back(ListType& list,const typename ListType::type& type){list.push_back(type);}
-		static void remove(ListType& list,const typename ListType::type& type){list.remove(type);}
+		static void push_back(ListType& list,typename ListType::const_reference type){list.push_back(type);}
+		static void remove(ListType& list,typename ListType::const_reference type){list.remove(type);}
 	};
 
 	template<typename ListType>
-	class_<ListType> register_list(const char* name) {
-		class_<ListIterator<ListType>>((String(name) + "Iterator").c_str())
-			.function("next", &ListIterator<ListType>::next)
+	class_<ListType> register_list(const char* name,const char* iteratorName) {
+		class_<ListIterator<ListType>>(iteratorName)
+			.function("next", &ListIterator<ListType>::next, allow_raw_pointers())
 			.function("hasNext", &ListIterator<ListType>::hasNext)
 			;
 		

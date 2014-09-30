@@ -82,6 +82,7 @@ public:
 	inline Type operator*() const{return iter->dereference();}
 	inline AnyIterator& operator=(const AnyIterator& it){delete iter;iter=it.iter->clone();return(*this);}
 	inline AnyIterator& operator++(){iter->increment();return(*this);}
+	inline AnyIterator operator++(int){AnyIterator it=*this;iter->increment();return it;}
 	inline AnyIterator& operator--(){iter->decrement();return(*this);}
 
 	inline bool operator==(const AnyIterator<Type> &it) const{return iter->equals(it.iter);}
@@ -98,10 +99,12 @@ public:
 	AnyPointerIterator():iter(NULL){}
 	~AnyPointerIterator(){delete iter;}
 
+	inline typename Type::ptr operator*() const{return iter->dereference();}
 	inline Type *operator->() const{return iter->dereference();}
 	inline operator Type*() const{return iter->dereference();}
 	inline AnyPointerIterator& operator=(const AnyPointerIterator& it){delete iter;iter=it.iter->clone();return(*this);}
 	inline AnyPointerIterator& operator++(){iter->increment();return(*this);}
+	inline AnyPointerIterator operator++(int){AnyPointerIterator it=*this;iter->increment();return it;}
 	inline AnyPointerIterator& operator--(){iter->decrement();return(*this);}
 
 	inline bool operator==(const AnyPointerIterator<Type> &it) const{return iter->equals(it.iter);}
@@ -113,41 +116,43 @@ public:
 template<typename Type>
 class IteratorRange{
 public:
-	typedef Type type;
+	typedef Type value_type;
 	typedef AnyIterator<Type> iterator;
+	typedef Type& reference;
+	typedef const Type& const_reference;
 
-	IteratorRange(const iterator &bit,const iterator &eit):beginit(bit),endit(eit){it=beginit;}
+	IteratorRange(const iterator &bit,const iterator &eit):beginit(bit),endit(eit){}
 
 	template<typename CollectionType>
 	IteratorRange(const CollectionType &collection):
 		beginit(WrapIterator<typename CollectionType::value_type,typename CollectionType::iterator>(collection.begin())),
-		endit(WrapIterator<typename CollectionType::value_type,typename CollectionType::iterator>(collection.end())){it=beginit;}
+		endit(WrapIterator<typename CollectionType::value_type,typename CollectionType::iterator>(collection.end())){}
 
 	inline const iterator &begin() const{return beginit;}
 	inline const iterator &end() const{return endit;}
 
 	iterator beginit,endit;
-	iterator it; // To let the range iterate
 };
 
 template<typename Type>
 class PointerIteratorRange{
 public:
-	typedef typename Type::ptr type;
+	typedef typename Type::ptr value_type;
 	typedef AnyPointerIterator<Type> iterator;
+	typedef typename Type::ptr& reference;
+	typedef const typename Type::ptr& const_reference;
 
-	PointerIteratorRange(const iterator &bit,const iterator &eit):beginit(bit),endit(eit){it=beginit;}
+	PointerIteratorRange(const iterator &bit,const iterator &eit):beginit(bit),endit(eit){}
 
 	template<typename CollectionType>
 	PointerIteratorRange(const CollectionType &collection):
 		beginit(WrapPointerIterator<typename Type::ptr,typename CollectionType::iterator>(collection.begin())),
-		endit(WrapPointerIterator<typename Type::ptr,typename CollectionType::iterator>(collection.end())){it=beginit;}
+		endit(WrapPointerIterator<typename Type::ptr,typename CollectionType::iterator>(collection.end())){}
 
 	inline const iterator &begin() const{return beginit;}
 	inline const iterator &end() const{return endit;}
 
 	iterator beginit,endit;
-	iterator it; // To let the range iterate
 };
 
 }
