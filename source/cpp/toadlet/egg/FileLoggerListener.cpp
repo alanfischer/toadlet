@@ -6,7 +6,8 @@ namespace egg{
 
 FileLoggerListener::FileLoggerListener(bool date,const char *directory,const char *prefix):
 	mUseDate(date),
-	mDateLogTime(0)
+	mDateLogTime(0),
+	mDateLogStream(NULL)
 {
 	mDirectory=new char[strlen(directory)+1];
 	strcpy(mDirectory,directory);

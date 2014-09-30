@@ -54,8 +54,8 @@ if (TOADLET_PLATFORM_ANDROID)
 	set (TOADLET_BUILD_STATIC OFF CACHE BOOL "Build static libraries" FORCE)
 
 	# Set defaults
-	option (TOADLET_RTTI "Enable Run Time Type Information" OFF)
-	option (TOADLET_EXCEPTIONS "Enable Exception handling" OFF)
+	option (TOADLET_RTTI "Enable Run Time Type Information" ON)
+	option (TOADLET_EXCEPTIONS "Enable Exception handling" ON)
 
 	# Enable/Disable RTTI
 	if (TOADLET_RTTI)
