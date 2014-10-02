@@ -96,7 +96,7 @@ void DecalShadowRenderManager::interRenderRenderables(RenderableSet *set,RenderD
 	if(path==NULL){
 		return;
 	}
-	int ni,vi;
+	int ni;
 	tforeach(RenderPath::PassCollection::iterator,pass,path->getPasses()){
 		setupPass(pass,mDevice);
 
@@ -104,12 +104,14 @@ void DecalShadowRenderManager::interRenderRenderables(RenderableSet *set,RenderD
 			Node *node=set->getNodeQueue().at(ni);
 
 			/// @todo: Replace this with a node stack that increments counts of all renderables queued in the node & subnodes
-			for(vi=0;vi<node->getNumVisibles();++vi){
-				if(node->getVisible(vi)->getRendered()){
+			bool rendered=false;
+			tforeach(IteratorRange<Visible*>::iterator,vi,node->getVisibles()){
+				if((*vi)->getRendered()){
+					rendered=true;
 					break;
 				}
 			}
-			if(vi==node->getNumVisibles()){
+			if(!rendered){
 				continue;
 			}
 
