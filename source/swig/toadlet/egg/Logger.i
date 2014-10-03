@@ -62,34 +62,21 @@ public:
 
 %typemap(javainterfaces) EntryIterator "java.util.Iterator<LoggerEntry>"
 %typemap(javacode) EntryIterator %{
-public void remove() throws UnsupportedOperationException {
-	throw new UnsupportedOperationException();
-}
-
-public LoggerEntry next() throws java.util.NoSuchElementException {
-	if (!hasNext()) {
-		throw new java.util.NoSuchElementException();
-	}
-	return nextImpl();
-}
+public void remove() throws UnsupportedOperationException { throw new UnsupportedOperationException(); }
+public LoggerEntry next() throws java.util.NoSuchElementException { if (!hasNext()) { throw new java.util.NoSuchElementException(); } return nextImpl(); }
 %}
 
 %javamethodmodifiers EntryIterator::nextImpl "private";
 %inline %{
 struct EntryIterator {
 	typedef toadlet::egg::LoggerList<toadlet::egg::LoggerEntry*> entry_list;
-	EntryIterator(const entry_list& l) : it(l.begin()), list(l) {}
-	bool hasNext() const {
-		return it != list.end();
-	}
-
-	toadlet::egg::LoggerEntry *nextImpl() {
-		toadlet::egg::LoggerEntry *entry = it++;
-		return entry;
-	}
+	EntryIterator(const entry_list& l) : list(l), it(list.begin()) {}
+	bool hasNext() const { return it != list.end(); }
+	toadlet::egg::LoggerEntry *nextImpl() { return it++; }
+	
 private:
+	const entry_list& list;
 	entry_list::iterator it;
-	const entry_list& list;    
 };
 %}
 
