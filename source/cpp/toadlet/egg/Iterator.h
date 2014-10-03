@@ -121,6 +121,8 @@ public:
 	typedef Type& reference;
 	typedef const Type& const_reference;
 
+	IteratorRange(){}
+	IteratorRange(const IteratorRange &range):beginit(range.beginit),endit(range.endit){}
 	IteratorRange(const iterator &bit,const iterator &eit):beginit(bit),endit(eit){}
 
 	template<typename CollectionType>
@@ -142,6 +144,8 @@ public:
 	typedef typename Type::ptr& reference;
 	typedef const typename Type::ptr& const_reference;
 
+	PointerIteratorRange(){}
+	PointerIteratorRange(const PointerIteratorRange &range):beginit(range.beginit),endit(range.endit){}
 	PointerIteratorRange(const iterator &bit,const iterator &eit):beginit(bit),endit(eit){}
 
 	template<typename CollectionType>
