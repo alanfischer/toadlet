@@ -139,10 +139,10 @@ public:
 template<typename Type>
 class PointerIteratorRange{
 public:
-	typedef typename Type* value_type;
+	typedef Type* value_type;
 	typedef AnyPointerIterator<Type> iterator;
-	typedef typename Type*& reference;
-	typedef const typename Type*& const_reference;
+	typedef Type*& reference;
+	typedef const Type*& const_reference;
 
 	PointerIteratorRange(){}
 	PointerIteratorRange(const PointerIteratorRange &range):beginit(range.beginit),endit(range.endit){}
