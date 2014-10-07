@@ -293,11 +293,11 @@ void RandIsle::render(){
 			mReflectCamera->render(device,mScene);
 		}
 //mCamera->setLookDir(position,forward,up);
-matrix.reset();
+//matrix.reset();
 //Math::setMatrix4x4FromX(matrix,Math::PI);
-Math::setMatrix4x4FromTranslate(matrix,0,0,25);
-Math::preMul(matrix,mCamera->getViewMatrix());
-mCamera->setObliqueNearPlaneMatrix(matrix);
+//Math::setMatrix4x4FromTranslate(matrix,0,0,25);
+//Math::preMul(matrix,mCamera->getViewMatrix());
+//mCamera->setObliqueNearPlaneMatrix(matrix);
 
 		mCamera->render(device,mScene);
 
@@ -445,8 +445,8 @@ void RandIsle::updateProps(){
 			a=0;
 		}
 
-		for(int j=0;j<prop->getNumVisibles();++j){
-			prop->getVisible(j)->getSharedRenderState()->setMaterialState(MaterialState(Vector4(Math::ONE,Math::ONE,Math::ONE,a)));
+		tforeach(PointerIteratorRange<Visible>::iterator,visible,prop->getVisibles()){
+			visible->getSharedRenderState()->setMaterialState(MaterialState(Vector4(Math::ONE,Math::ONE,Math::ONE,a)));
 		}
 	}
 }

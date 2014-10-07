@@ -18,9 +18,11 @@ public:
 
 		BaseComponent::parentChanged(node);
 
-		if(mParent!=NULL && mParent->getNumVisibles()>0){
-			mParent->getVisible(0)->setSharedRenderState(NULL);
-			mState=mParent->getVisible(0)->getSharedRenderState();
+		if(mParent!=NULL){
+			tforeach(PointerIteratorRange<Visible>::iterator,visible,mParent->getVisibles()){
+				visible->setSharedRenderState(NULL);
+				mState=visible->getSharedRenderState();
+			}
 		}
 	}
 
