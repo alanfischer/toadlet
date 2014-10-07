@@ -68,15 +68,11 @@ public LoggerEntry next() throws java.util.NoSuchElementException { if (!hasNext
 
 %javamethodmodifiers EntryIterator::nextImpl "private";
 %inline %{
-struct EntryIterator {
-	typedef toadlet::egg::LoggerList<toadlet::egg::LoggerEntry*> entry_list;
-	EntryIterator(const entry_list& l) : list(l), it(list.begin()) {}
-	bool hasNext() const { return it != list.end(); }
-	toadlet::egg::LoggerEntry *nextImpl() { return it++; }
-	
-private:
-	const entry_list& list;
-	entry_list::iterator it;
+class EntryIterator:public RangeIterator<toadlet::egg::LoggerList<toadlet::egg::LoggerEntry*> >{
+public:
+	EntryIterator(const toadlet::egg::LoggerList<toadlet::egg::LoggerEntry*>& r) : RangeIterator(r) {}
+	bool hasNext() const{return RangeIterator::hasNext();}
+	toadlet::egg::LoggerEntry *nextImpl(){return RangeIterator::nextImpl();}
 };
 %}
 
