@@ -106,7 +106,7 @@ public:
 
 	virtual void nodeAttached(Node *node);
 	virtual void nodeRemoved(Node *node);
-	virtual PointerIteratorRange<Node> getNodes() const{return PointerIteratorRange<Node>(mNodes);}
+	virtual PointerIteratorRange<Node> getNodes() const{return PointerIteratorRange<Node>::wrapPointerCollection(mNodes);}
 	virtual Node *getNode(const String &name) const;
 	virtual Node *getNode(const Type<Component> *type) const;
 	template<typename Type> Type *getNodeType() const{return (Type*)getNode(Type::type());}
@@ -122,19 +122,19 @@ public:
 
 	virtual void spacialAttached(Spacial *spacial);
 	virtual void spacialRemoved(Spacial *spacial);
-	virtual IteratorRange<Spacial*> getSpacials() const{return IteratorRange<Spacial*>(mSpacials);}
+	virtual PointerIteratorRange<Spacial> getSpacials() const{return PointerIteratorRange<Spacial>::wrapCollection(mSpacials);}
 
 	virtual void visibleAttached(Visible *visible);
 	virtual void visibleRemoved(Visible *visible);
-	virtual IteratorRange<Visible*> getVisibles() const{return IteratorRange<Visible*>(mVisibles);}
+	virtual PointerIteratorRange<Visible> getVisibles() const{return PointerIteratorRange<Visible>::wrapCollection(mVisibles);}
 	
 	virtual void animatableAttached(Animatable *animatable);
 	virtual void animatableRemoved(Animatable *animatable);
-	virtual IteratorRange<Animatable*> getAnimatables() const{return IteratorRange<Animatable*>(mAnimatables);}
+	virtual PointerIteratorRange<Animatable> getAnimatables() const{return PointerIteratorRange<Animatable>::wrapCollection(mAnimatables);}
 
 	virtual void lightAttached(LightComponent *light);
 	virtual void lightRemoved(LightComponent *light);
-	virtual IteratorRange<LightComponent*> getLights() const{return IteratorRange<LightComponent*>(mLights);}
+	virtual PointerIteratorRange<LightComponent> getLights() const{return PointerIteratorRange<LightComponent>::wrapCollection(mLights);}
 	
 	virtual void physicsAttached(PhysicsComponent *physics);
 	virtual void physicsRemoved(PhysicsComponent *physics);

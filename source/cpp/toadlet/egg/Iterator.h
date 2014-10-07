@@ -94,12 +94,12 @@ public:
 template<typename Type>
 class AnyPointerIterator{
 public:
-	AnyPointerIterator(const Iterator<typename Type::ptr> &it):iter(it.clone()){}
+	AnyPointerIterator(const Iterator<Type*> &it):iter(it.clone()){}
 	AnyPointerIterator(const AnyPointerIterator &it):iter(it.iter->clone()){}
 	AnyPointerIterator():iter(NULL){}
 	~AnyPointerIterator(){delete iter;}
 
-	inline typename Type::ptr operator*() const{return iter->dereference();}
+	inline Type *operator*() const{return iter->dereference();}
 	inline Type *operator->() const{return iter->dereference();}
 	inline operator Type*() const{return iter->dereference();}
 	inline AnyPointerIterator& operator=(const AnyPointerIterator& it){delete iter;iter=it.iter->clone();return(*this);}
@@ -110,7 +110,7 @@ public:
 	inline bool operator==(const AnyPointerIterator<Type> &it) const{return iter->equals(it.iter);}
 	inline bool operator!=(const AnyPointerIterator<Type> &it) const{return !iter->equals(it.iter);}
 
-	Iterator<typename Type::ptr> *iter;
+	Iterator<Type*> *iter;
 };
 
 template<typename Type>
@@ -126,9 +126,9 @@ public:
 	IteratorRange(const iterator &bit,const iterator &eit):beginit(bit),endit(eit){}
 
 	template<typename CollectionType>
-	IteratorRange(const CollectionType &collection):
-		beginit(WrapIterator<typename CollectionType::value_type,typename CollectionType::iterator>(collection.begin())),
-		endit(WrapIterator<typename CollectionType::value_type,typename CollectionType::iterator>(collection.end())){}
+	static IteratorRange wrapCollection(const CollectionType &collection){return IteratorRange(
+		WrapIterator<typename CollectionType::value_type,typename CollectionType::iterator>(collection.begin()),
+		WrapIterator<typename CollectionType::value_type,typename CollectionType::iterator>(collection.end()));}
 
 	inline const iterator &begin() const{return beginit;}
 	inline const iterator &end() const{return endit;}
@@ -139,19 +139,24 @@ public:
 template<typename Type>
 class PointerIteratorRange{
 public:
-	typedef typename Type::ptr value_type;
+	typedef typename Type* value_type;
 	typedef AnyPointerIterator<Type> iterator;
-	typedef typename Type::ptr& reference;
-	typedef const typename Type::ptr& const_reference;
+	typedef typename Type*& reference;
+	typedef const typename Type*& const_reference;
 
 	PointerIteratorRange(){}
 	PointerIteratorRange(const PointerIteratorRange &range):beginit(range.beginit),endit(range.endit){}
 	PointerIteratorRange(const iterator &bit,const iterator &eit):beginit(bit),endit(eit){}
 
 	template<typename CollectionType>
-	PointerIteratorRange(const CollectionType &collection):
-		beginit(WrapPointerIterator<typename Type::ptr,typename CollectionType::iterator>(collection.begin())),
-		endit(WrapPointerIterator<typename Type::ptr,typename CollectionType::iterator>(collection.end())){}
+	static PointerIteratorRange wrapCollection(const CollectionType &collection){return PointerIteratorRange(
+		WrapIterator<Type*,typename CollectionType::iterator>(collection.begin()),
+		WrapIterator<Type*,typename CollectionType::iterator>(collection.end()));}
+
+	template<typename CollectionType>
+	static PointerIteratorRange wrapPointerCollection(const CollectionType &collection){return PointerIteratorRange(
+		WrapPointerIterator<Type*,typename CollectionType::iterator>(collection.begin()),
+		WrapPointerIterator<Type*,typename CollectionType::iterator>(collection.end()));}
 
 	inline const iterator &begin() const{return beginit;}
 	inline const iterator &end() const{return endit;}
