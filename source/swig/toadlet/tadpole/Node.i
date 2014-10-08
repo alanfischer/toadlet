@@ -3,17 +3,7 @@
 %}
 
 namespace toadlet{
-namespace egg{
-
-template<typename Type>
-class PointerIteratorRange{};
-
-}
-
 namespace tadpole{
-
-template<typename Type>
-class LoggerList{};
 
 class Node:public Component{
 public:
@@ -41,7 +31,7 @@ public:
 	void stopAction(String name);
 	bool getActionActive(String name);
 	
-	PointerIteratorRange<Visible> getVisibles() const;
+	VisibleRange getVisibles() const;
 };
 
 }
@@ -57,21 +47,21 @@ public Visible next() throws java.util.NoSuchElementException { if (!hasNext()) 
 
 %javamethodmodifiers VisibleIterator::nextImpl "private";
 %inline %{
-class VisibleIterator:public RangeIterator<toadlet::egg::PointerIteratorRange<toadlet::tadpole::Visible> >{
+class VisibleIterator:public RangeIterator<toadlet::tadpole::VisibleRange>{
 public:
-	VisibleIterator(const toadlet::egg::PointerIteratorRange<toadlet::tadpole::Visible>& r) : RangeIterator(r) {}
+	VisibleIterator(const toadlet::tadpole::VisibleRange& r) : RangeIterator(r) {}
 	bool hasNext() const{return RangeIterator::hasNext();}
 	toadlet::tadpole::Visible *nextImpl(){return RangeIterator::nextImpl();}
 };
 %}
 
-%typemap(javainterfaces) toadlet::egg::PointerIteratorRange<toadlet::tadpole::Visible> "Iterable<Visible>"
+%typemap(javainterfaces) toadlet::tadpole::VisibleRange "Iterable<Visible>"
 
-%newobject toadlet::egg::PointerIteratorRange<toadlet::tadpole::Visible>::iterator() const;
-%extend toadlet::egg::PointerIteratorRange<toadlet::tadpole::Visible> {
+namespace toadlet{namespace tadpole{class VisibleRange{};}}
+
+%newobject toadlet::tadpole::VisibleRange::iterator() const;
+%extend toadlet::tadpole::VisibleRange {
 	VisibleIterator *iterator() const {
 		return new VisibleIterator(*$self);
 	}
 }
-
-%template(VisibleRange) toadlet::egg::PointerIteratorRange<Visible>;

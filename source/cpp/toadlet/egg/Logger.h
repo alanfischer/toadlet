@@ -26,7 +26,7 @@
 #ifndef TOADLET_EGG_LOGGER_H
 #define TOADLET_EGG_LOGGER_H
 
-#include <toadlet/egg/Types.h>
+#include <toadlet/Types.h>
 
 #if defined(TOADLET_PLATFORM_WIN32)
 	#pragma warning(disable:4996)
@@ -181,6 +181,7 @@ public:
 
 		iterator begin() const{return iterator(head);}
 		iterator end() const{return iterator(tail);}
+		inline bool empty() const{return head==tail;}
 
 		node *head;
 		node *tail;
@@ -234,10 +235,8 @@ private:
 };
 
 typedef Logger::Category LoggerCategory;
-
 typedef Logger::Entry LoggerEntry;
-
-template<typename Type> class LoggerList:public Logger::List<Type>{};
+typedef Logger::List<LoggerEntry*> LoggerEntryList;
 
 }
 }
