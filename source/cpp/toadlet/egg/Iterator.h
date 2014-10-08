@@ -132,6 +132,7 @@ public:
 
 	inline const iterator &begin() const{return beginit;}
 	inline const iterator &end() const{return endit;}
+	inline bool empty() const{return beginit==endit;}
 
 	iterator beginit,endit;
 };
@@ -160,6 +161,7 @@ public:
 
 	inline const iterator &begin() const{return beginit;}
 	inline const iterator &end() const{return endit;}
+	inline bool empty() const{return beginit==endit;}
 
 	iterator beginit,endit;
 };

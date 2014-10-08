@@ -5,11 +5,6 @@
 namespace toadlet{
 namespace egg{
 
-class LoggerEntry;
-
-template<typename Type>
-class LoggerList{};
-
 class Logger{
 public:
 	typedef uint64 timestamp;
@@ -43,7 +38,7 @@ public:
 	void addLogEntry(const char *categoryName,Level level,const char *text);
 	void addLogEntry(Level level,const char *text);
 
-	const LoggerList<LoggerEntry*>& getLogEntries() const;
+	const LoggerEntryList& getLogEntries() const;
 	
 	void flush();
 };
@@ -68,21 +63,21 @@ public LoggerEntry next() throws java.util.NoSuchElementException { if (!hasNext
 
 %javamethodmodifiers EntryIterator::nextImpl "private";
 %inline %{
-class EntryIterator:public RangeIterator<toadlet::egg::LoggerList<toadlet::egg::LoggerEntry*> >{
+class EntryIterator:public RangeIterator<toadlet::egg::LoggerEntryList>{
 public:
-	EntryIterator(const toadlet::egg::LoggerList<toadlet::egg::LoggerEntry*>& r) : RangeIterator(r) {}
+	EntryIterator(const toadlet::egg::LoggerEntryList& r) : RangeIterator(r) {}
 	bool hasNext() const{return RangeIterator::hasNext();}
 	toadlet::egg::LoggerEntry *nextImpl(){return RangeIterator::nextImpl();}
 };
 %}
 
-%typemap(javainterfaces) toadlet::egg::LoggerList<toadlet::egg::LoggerEntry*> "Iterable<LoggerEntry>"
+%typemap(javainterfaces) toadlet::egg::LoggerEntryList "Iterable<LoggerEntry>"
 
-%newobject toadlet::egg::LoggerList<toadlet::egg::LoggerEntry*>::iterator() const;
-%extend toadlet::egg::LoggerList<toadlet::egg::LoggerEntry*> {
+namespace toadlet{namespace egg{class LoggerEntryList{};}}
+
+%newobject toadlet::egg::LoggerEntryList::iterator() const;
+%extend toadlet::egg::LoggerEntryList {
 	EntryIterator *iterator() const {
 		return new EntryIterator(*$self);
 	}
 }
-
-%template(EntryList) toadlet::egg::LoggerList<toadlet::egg::LoggerEntry*>;
