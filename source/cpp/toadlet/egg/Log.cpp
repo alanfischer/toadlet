@@ -275,36 +275,6 @@ bool Log::mPerThread=false;
 Logger::List<LoggerListener*> Log::mListeners;
 Logger::List<Logger*> Log::mThreadLoggers;
 
-Logger *Log::getInstance(){
-	if(mTheLogger==NULL){
-		initialize();
-	}
-
-	Logger *logger=mTheLogger;
-	if(mPerThread){
-		void *thread=currentThread();
-		mTheLogger->lock();
-			Logger::List<Logger*>::iterator it=mThreadLoggers.begin();
-			while(it!=mThreadLoggers.end() && (*it)->getThread()==thread){
-				++it;
-			}
-			if(it!=mThreadLoggers.end()){
-				logger=(*it);
-			}
-			else{
-				LoggerListener *listener=new ParentListener(mTheLogger);
-				mListeners.push_back(listener);
-
-				logger=new Logger(true);
-				logger->setThread(thread);
-				logger->addLoggerListener(listener);
-				mThreadLoggers.push_back(logger);
-			}
-		mTheLogger->unlock();
-	}
-	return logger;
-}
-
 void Log::initialize(bool startSilent,bool perThread,const char *options){
 	mPerThread=perThread;
 
@@ -336,6 +306,36 @@ void Log::initialize(bool startSilent,bool perThread,const char *options){
 			mTheLogger->addLoggerListener(it);
 		}
 	}
+}
+
+Logger *Log::getInstance(){
+	if(mTheLogger==NULL){
+		initialize();
+	}
+
+	Logger *logger=mTheLogger;
+	if(mPerThread){
+		void *thread=currentThread();
+		mTheLogger->lock();
+			Logger::List<Logger*>::iterator it=mThreadLoggers.begin();
+			while(it!=mThreadLoggers.end() && (*it)->getThread()==thread){
+				++it;
+			}
+			if(it!=mThreadLoggers.end()){
+				logger=(*it);
+			}
+			else{
+				LoggerListener *listener=new ParentListener(mTheLogger);
+				mListeners.push_back(listener);
+
+				logger=new Logger(true);
+				logger->setThread(thread);
+				logger->addLoggerListener(listener);
+				mThreadLoggers.push_back(logger);
+			}
+		mTheLogger->unlock();
+	}
+	return logger;
 }
 
 void Log::destroy(){

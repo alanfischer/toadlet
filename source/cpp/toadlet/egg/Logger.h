@@ -55,7 +55,11 @@ public:
 
 	class Category{
 	public:
-		Category(const char *name,Level reportingLevel=Level_MAX):data(NULL){
+		Category(const char *name,Level reportingLevel=Level_MAX):data(NULL){init(name,reportingLevel);}
+		Category(const Category &category):data(NULL){init(category.name,category.reportingLevel);}
+		~Category(){delete[] name;}
+
+		void init(const char *name,Level reportingLevel){
 			if(name==NULL){
 				this->name=NULL;
 			}
@@ -66,21 +70,6 @@ public:
 			this->reportingLevel=reportingLevel;
 		}
 
-		Category(const Category &category){
-			if(category.name==NULL){
-				this->name=NULL;
-			}
-			else{
-				this->name=new char[strlen(category.name)+1];
-				strcpy(this->name,category.name);
-			}
-			this->reportingLevel=category.reportingLevel;
-		}
-
-		~Category(){
-			delete[] name;
-		}
-
 		char *name;
 		Level reportingLevel;
 		void *data;
@@ -88,7 +77,11 @@ public:
 
 	class Entry{
 	public:
-		Entry(Category *category=NULL,Level level=Level_MAX,timestamp time=0,const char *text=(char*)NULL){
+		Entry(Category *category=NULL,Level level=Level_MAX,timestamp time=0,const char *text=(char*)NULL){init(category,level,time,text);}
+		Entry(const Entry &entry){init(entry.category,entry.level,entry.time,entry.text);}
+		~Entry(){delete[] text;}
+
+		void init(Category *category,Level level,timestamp time,const char *text){
 			this->category=category;
 			this->level=level;
 			this->time=time;
@@ -99,9 +92,6 @@ public:
 				this->text=new char[strlen(text)+1];
 				strcpy(this->text,text);
 			}
-		}
-		~Entry(){
-			delete[] text;
 		}
 
 		Category *category;
@@ -183,8 +173,7 @@ public:
 		iterator end() const{return iterator(tail);}
 		inline bool empty() const{return head==tail;}
 
-		node *head;
-		node *tail;
+		node *head,*tail;
 	};
 
 	Logger(bool startSilent);

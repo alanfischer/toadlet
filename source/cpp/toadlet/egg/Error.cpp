@@ -26,28 +26,62 @@
 #include <toadlet/egg/Error.h>
 #include <toadlet/egg/Log.h>
 
+#if defined(TOADLET_PLATFORM_WIN32)
+	#include <toadlet/egg/platform/win32/Win32ErrorHandler.h>
+#elif defined(TOADLET_PLATFORM_POSIX)
+	#include <toadlet/egg/platform/posix/PosixErrorHandler.h>
+#endif
+
 namespace toadlet{
 namespace egg{
 
 Errorer *Error::mTheErrorer=NULL;
+void *Error::mErrorHandler=NULL;
 
 Errorer *Error::getInstance(){
 	if(mTheErrorer==NULL){
-		mTheErrorer=new Errorer();
+		initialize();
 	}
 
 	return mTheErrorer;
 }
 
+void Error::initialize(bool handler){
+	if(mTheErrorer==NULL){
+		mTheErrorer=new Errorer(Log::getInstance());
+
+		if(handler){
+			#if defined(TOADLET_PLATFORM_WIN32)
+				Win32ErrorHandler *errorHandler=new Win32ErrorHandler();
+				errorHandler->setStackTraceListener(mTheErrorer);
+				errorHandler->installHandler();
+				mErrorHandler=errorHandler;
+			#elif defined(TOADLET_PLATFORM_POSIX)
+				PosixErrorHandler *errorHandler=new PosixErrorHandler();
+				errorHandler->setStackTraceListener(mTheErrorer);
+				errorHandler->installHandler();
+				mErrorHandler=errorHandler;
+			#endif
+		}
+	}
+}
+
 void Error::destroy(){
+	if(mErrorHandler!=NULL){
+		#if defined(TOADLET_PLATFORM_WIN32)
+			Win32ErrorHandler *errorHandler=(Win32ErrorHandler*)mErrorHandler;
+			errorHandler->uninstallHandler();
+		#elif defined(TOADLET_PLATFORM_POSIX)
+			PosixErrorHandler *errorHandler=(PosixErrorHandler*)mErrorHandler;
+			errorHandler->uninstallHandler();
+		#endif
+		mErrorHandler=NULL;
+	}
+
 	if(mTheErrorer!=NULL){
 		delete mTheErrorer;
 		mTheErrorer=NULL;
 	}
-}
-
-void Error::errorLog(const char *categoryName,const char *text){
-	Log::getInstance()->addLogEntry(categoryName,Logger::Level_ERROR,text);
 }
 
 }
