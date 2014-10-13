@@ -114,10 +114,10 @@ public:
 	void gatherRenderables(Camera *camera,RenderableSet *set);
 
 	// Attachable
-	int getNumAttachments(){return mSkeleton!=NULL?mSkeleton->getNumAttachments():0;}
-	String getAttachmentName(int index){return mSkeleton!=NULL?mSkeleton->getAttachmentName(index):(char*)NULL;}
-	int getAttachmentIndex(const String &name){return mSkeleton!=NULL?mSkeleton->getAttachmentIndex(name):0;}
-	bool getAttachmentTransform(Transform *result,int index){return mSkeleton!=NULL?mSkeleton->getAttachmentTransform(result,index):false;}
+	int getNumAttachments() const{return mSkeleton!=NULL?mSkeleton->getNumAttachments():0;}
+	String getAttachmentName(int index) const{return mSkeleton!=NULL?mSkeleton->getAttachmentName(index):(char*)NULL;}
+	int getAttachmentIndex(const String &name) const{return mSkeleton!=NULL?mSkeleton->getAttachmentIndex(name):0;}
+	bool getAttachmentTransform(Transform *result,int index) const{return mSkeleton!=NULL?mSkeleton->getAttachmentTransform(result,index):false;}
 
 	void createVertexBuffer();
 	void updateVertexBuffer();

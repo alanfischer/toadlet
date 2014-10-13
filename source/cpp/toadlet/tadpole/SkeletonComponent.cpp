@@ -394,7 +394,7 @@ void SkeletonComponent::render(RenderManager *manager) const{
 	manager->getDevice()->renderPrimitive(mHitBoxVertexData,mHitBoxIndexData);
 }
 
-bool SkeletonComponent::getAttachmentTransform(Transform *result,int index){
+bool SkeletonComponent::getAttachmentTransform(Transform *result,int index) const{
 	if(index>=0 && index<mBones.size()){
 		Bone *bone=mBones[index];
 		result->setTranslate(bone->worldTranslate);
@@ -406,7 +406,7 @@ bool SkeletonComponent::getAttachmentTransform(Transform *result,int index){
 	}
 }
 
-Animation *SkeletonComponent::getAnimation(const String &name){
+Animation *SkeletonComponent::getAnimation(const String &name) const{
 	int i;
 	for(i=0;i<mAnimations.size();++i){
 		if(mAnimations[i]->getName()==name){

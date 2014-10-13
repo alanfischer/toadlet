@@ -172,15 +172,15 @@ public:
 	void render(RenderManager *manager) const;
 
 	// Attachable
-	int getNumAttachments(){return mModel->header->numattachments;}
-	String getAttachmentName(int index){return mModel->attachment(index)->name;}
-	int getAttachmentIndex(const String &name);
-	bool getAttachmentTransform(Transform *result,int index);
+	int getNumAttachments() const{return mModel->header->numattachments;}
+	String getAttachmentName(int index) const{return mModel->attachment(index)->name;}
+	int getAttachmentIndex(const String &name) const;
+	bool getAttachmentTransform(Transform *result,int index) const;
 
 	// Animatable
-	int getNumAnimations(){return mAnimations.size();}
-	Animation *getAnimation(const String &name);
-	Animation *getAnimation(int index){return mAnimations[index];}
+	int getNumAnimations() const{return mAnimations.size();}
+	Animation *getAnimation(const String &name) const;
+	Animation *getAnimation(int index) const{return mAnimations[index];}
 
 protected:
 	void updateSkeleton();

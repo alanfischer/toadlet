@@ -29,35 +29,45 @@
 #include <toadlet/egg/Types.h>
 #include <toadlet/egg/String.h>
 
-#if defined(TOADLET_EXCEPTIONS)
-	#include <stdexcept>
-#endif
-
 namespace toadlet{
 namespace egg{
 
-class TOADLET_API Exception
-	#if defined(TOADLET_EXCEPTIONS)
-		:public std::exception
-	#endif
-{
+class TOADLET_API Exception{
 public:
-	Exception(int type=0);
-	Exception(const char *description);
-	Exception(int type,const char *description);
-	Exception(const Exception &ex);
-	virtual ~Exception() throw();
+	Exception(int error=0){init(error,NULL,NULL);}
+	Exception(const char *description){init(0,NULL,description);}
+	Exception(int error,const char *description){init(error,NULL,description);}
+	Exception(int error,const char *category,const char *description){init(error,category,description);}
+	Exception(const Exception &ex){init(ex.error,ex.category,ex.description);}
+	virtual ~Exception() throw(){delete description;}
 
-	int getError() const throw();
-	const char *getDescription() const throw();
+	virtual const char *what() const throw(){return description;}
 
-	#if defined(TOADLET_EXCEPTIONS)
-		const char* what() const throw(){return getDescription();}
-	#endif
+	int getError() const throw(){return error;}
+	const char *getCategory() const throw(){return category;}
+	const char *getDescription() const throw(){return description;}
 
-protected:
-	int mError;
-	String mDescription;
+	void init(int error,const char *category,const char *description){
+		this->error=error;
+		if(category==NULL){
+			this->category=NULL;
+		}
+		else{
+			this->category=new char[strlen(category)+1];
+			strcpy(this->category,category);
+		}
+		if(description==NULL){
+			this->description=NULL;
+		}
+		else{
+			this->description=new char[strlen(description)+1];
+			strcpy(this->description,description);
+		}
+	}
+
+	int error;
+	char *category;
+	char *description;
 };
 
 }

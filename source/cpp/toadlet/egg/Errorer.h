@@ -28,7 +28,7 @@
 
 #include <toadlet/egg/Categories.h>
 #include <toadlet/egg/Exception.h>
-#include <toadlet/egg/ErrorHandler.h>
+#include <toadlet/egg/Logger.h>
 #include <toadlet/egg/StackTraceListener.h>
 
 namespace toadlet{
@@ -55,30 +55,26 @@ public:
 		Type_SOCKET,
 	};
 
-	Errorer();
+	Errorer(Logger *logger);
 	virtual ~Errorer();
 
-	void setError(int error,const char *description=NULL);
-	void setException(const Exception &ex);
+	void setError(int error,const char *category=NULL,const char *description=NULL,bool report=false);
+	void setException(const Exception &ex,bool report=false);
 
 	int getError();
-	// The result of getDescription() is only valid if getError() returned a value other than ERROR_NONE
 	const char *getDescription();
 	const Exception &getException();
-
-	void installHandler();
-	void uninstallHandler();
 
 	void startTrace();
 	void traceFrame(const char *description);
 	void endTrace();
 
 protected:
-	static const int MAX_DESCRIPTION_LENGTH=1024;
 	int mLastError;
-	char mLastDescription[MAX_DESCRIPTION_LENGTH+1];
+	char *mLastDescription;
+	int mLastDescriptionLength;
 	Exception mException;
-	ErrorHandler mErrorHandler;
+	Logger *mLogger;
 };
 
 }
