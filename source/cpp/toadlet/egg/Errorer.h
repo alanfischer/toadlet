@@ -26,10 +26,9 @@
 #ifndef TOADLET_EGG_ERRORER_H
 #define TOADLET_EGG_ERRORER_H
 
-#include <toadlet/egg/Categories.h>
-#include <toadlet/egg/Exception.h>
-#include <toadlet/egg/Logger.h>
-#include <toadlet/egg/StackTraceListener.h>
+#include "StackTraceListener.h"
+#include "Exception.h"
+#include "Logger.h"
 
 namespace toadlet{
 namespace egg{

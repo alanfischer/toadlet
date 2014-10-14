@@ -26,7 +26,6 @@ if (MS3D_FOUND)
 
 	# Library
 	add_library (msTMSHImporter SHARED ${MSTMSHIMPORTER_SRC} ${MSTMSHIMPORTER_H})
-	set_target_properties (msTMSHImporter PROPERTIES COMPILE_FLAGS "/MT")
 	target_link_libraries (msTMSHImporter ${MSTMSHIMPORTER_LIBS})
 	install (TARGETS msTMSHImporter DESTINATION ${MS3D_DIR})
 endif (MS3D_FOUND)

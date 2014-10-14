@@ -22,6 +22,8 @@
 
 #include <toadlet/toadlet.h>
 
+using namespace toadlet;
+
 class VertexLighter{
 public:
 	VertexLighter(Engine *engine);

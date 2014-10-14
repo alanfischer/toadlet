@@ -26,7 +26,7 @@
 #ifndef TOADLET_EGG_LOGGERLISTENER_H
 #define TOADLET_EGG_LOGGERLISTENER_H
 
-#include <toadlet/egg/Logger.h>
+#include "Logger.h"
 
 namespace toadlet{
 namespace egg{

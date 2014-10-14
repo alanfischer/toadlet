@@ -36,6 +36,8 @@ extern "C"{
 #include "../shared/NVTriStrip/NvTriStrip.h"
 #endif
 
+using namespace toadlet;
+
 class M3GObject3D;
 
 class M3GConverter{

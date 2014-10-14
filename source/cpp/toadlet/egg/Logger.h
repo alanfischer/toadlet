@@ -60,9 +60,7 @@ public:
 		~Category(){delete[] name;}
 
 		void init(const char *name,Level reportingLevel){
-			if(name==NULL){
-				this->name=NULL;
-			}
+			if(name==NULL){this->name=NULL;}
 			else{
 				this->name=new char[strlen(name)+1];
 				strcpy(this->name,name);
@@ -85,9 +83,7 @@ public:
 			this->category=category;
 			this->level=level;
 			this->time=time;
-			if(text==NULL){
-				this->text=NULL;
-			}
+			if(text==NULL){this->text=NULL;}
 			else{
 				this->text=new char[strlen(text)+1];
 				strcpy(this->text,text);

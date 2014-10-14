@@ -26,9 +26,7 @@
 #ifndef TOADLET_EGG_ASSERT_H
 #define TOADLET_EGG_ASSERT_H
 
-#include <toadlet/egg/Types.h>
-
-// We want to avoid including assert.h, at least on win32, since it brings in windows.h
+#include <toadlet/Types.h>
 
 namespace toadlet{
 namespace egg{

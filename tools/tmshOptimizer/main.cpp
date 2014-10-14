@@ -5,6 +5,8 @@
 
 #include "MeshOptimizer.h"
 
+using namespace toadlet;
+
 int main(int argc,char **argv){
 	String arg;
 	int i,j;
