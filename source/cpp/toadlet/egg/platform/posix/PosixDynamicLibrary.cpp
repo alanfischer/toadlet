@@ -24,6 +24,7 @@
  ********** Copyright header - do not remove **********/
 
 #include "PosixDynamicLibrary.h"
+#include <toadlet/egg/Categories.h>
 #include <toadlet/egg/Error.h>
 
 namespace toadlet{
