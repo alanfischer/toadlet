@@ -3,6 +3,8 @@
 #include <toadlet/tadpole/plugins/XMSHStreamer.h>
 #include <iostream>
 
+using namespace toadlet;
+
 int main(int argc,char **argv){
 	String arg;
 	int i,j;

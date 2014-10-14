@@ -26,8 +26,7 @@
 #ifndef TOADLET_EGG_EXCEPTION_H
 #define TOADLET_EGG_EXCEPTION_H
 
-#include <toadlet/egg/Types.h>
-#include <toadlet/egg/String.h>
+#include <toadlet/Types.h>
 
 namespace toadlet{
 namespace egg{
@@ -39,7 +38,7 @@ public:
 	Exception(int error,const char *description){init(error,NULL,description);}
 	Exception(int error,const char *category,const char *description){init(error,category,description);}
 	Exception(const Exception &ex){init(ex.error,ex.category,ex.description);}
-	virtual ~Exception() throw(){delete description;}
+	virtual ~Exception() throw(){delete category;delete description;}
 
 	virtual const char *what() const throw(){return description;}
 
@@ -49,16 +48,12 @@ public:
 
 	void init(int error,const char *category,const char *description){
 		this->error=error;
-		if(category==NULL){
-			this->category=NULL;
-		}
+		if(category==NULL){this->category=NULL;	}
 		else{
 			this->category=new char[strlen(category)+1];
 			strcpy(this->category,category);
 		}
-		if(description==NULL){
-			this->description=NULL;
-		}
+		if(description==NULL){this->description=NULL;}
 		else{
 			this->description=new char[strlen(description)+1];
 			strcpy(this->description,description);

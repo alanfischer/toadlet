@@ -26,6 +26,7 @@
 #include <toadlet/egg/math/Math.h>
 #include <toadlet/egg/Assert.h>
 #include <toadlet/egg/Categories.h>
+#include <toadlet/egg/Error.h>
 #include <toadlet/egg/Log.h>
 #include <toadlet/egg/System.h>
 #if defined(TOADLET_HAS_SSE)

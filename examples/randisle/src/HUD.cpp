@@ -239,8 +239,8 @@ public:
 		}
 	}
 
-	int getNumAnimations(){return 2;}
-	Animation *getAnimation(const String &name){
+	int getNumAnimations() const{return 2;}
+	Animation *getAnimation(const String &name) const{
 		if(name=="danger"){
 			return mDangerAnimation;
 		}
@@ -248,7 +248,7 @@ public:
 			return mChompAnimation;
 		}
 	}
-	Animation *getAnimation(int index){
+	Animation *getAnimation(int index) const{
 		if(index==0){
 			return mDangerAnimation;
 		}

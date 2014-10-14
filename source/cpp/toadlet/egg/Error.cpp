@@ -23,8 +23,8 @@
  *
  ********** Copyright header - do not remove **********/
 
-#include <toadlet/egg/Error.h>
-#include <toadlet/egg/Log.h>
+#include "Error.h"
+#include "Log.h"
 
 #if defined(TOADLET_PLATFORM_WIN32)
 	#include <toadlet/egg/platform/win32/Win32ErrorHandler.h>
@@ -71,9 +71,11 @@ void Error::destroy(){
 		#if defined(TOADLET_PLATFORM_WIN32)
 			Win32ErrorHandler *errorHandler=(Win32ErrorHandler*)mErrorHandler;
 			errorHandler->uninstallHandler();
+			delete errorHandler;
 		#elif defined(TOADLET_PLATFORM_POSIX)
 			PosixErrorHandler *errorHandler=(PosixErrorHandler*)mErrorHandler;
 			errorHandler->uninstallHandler();
+			delete errorHandler;
 		#endif
 		mErrorHandler=NULL;
 	}

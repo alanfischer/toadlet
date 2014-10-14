@@ -22,6 +22,8 @@
 
 #include <toadlet/toadlet.h>
 
+using namespace toadlet;
+
 class BACVertex{
 public:
 	BACVertex():normal(0,0,1){}

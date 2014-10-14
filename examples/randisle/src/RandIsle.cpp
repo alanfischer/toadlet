@@ -13,7 +13,7 @@ namespace randisle{
 
 static const scalar epsilon=0.001f;
 
-RandIsle::RandIsle(Application *app,String path):
+RandIsle::RandIsle(Application *app):
 	mMouseButtons(0),
 	mXJoy(0),mYJoy(0),
 
@@ -22,7 +22,6 @@ RandIsle::RandIsle(Application *app,String path):
 	mPatchNoise(4,4,1,1,256)
 {
 	mApp=app;
-	mPath=path;
 }
 
 RandIsle::~RandIsle(){
@@ -32,7 +31,8 @@ void RandIsle::create(){
 	Log::debug("RandIsle::create");
 
 	mEngine=mApp->getEngine();
-	mEngine->getArchiveManager()->addDirectory(mPath);
+	mEngine->getArchiveManager()->addDirectory("../res");
+	mEngine->getArchiveManager()->addDirectory("../../randisle/res");
 
 	resources=new Resources(mEngine,this);
 	resources->create();
@@ -871,16 +871,5 @@ scalar RandIsle::pathValue(float ty){
 using namespace randisle;
 
 Applet *createApplet(Application *app){
-	String path;
-	String lookFor="/grass.png";
-	const char *paths[]={"../../randisle/res","../randisle/res","../../res","../res","res",".",NULL};
-	int i;
-	for(i=0;paths[i]!=NULL;++i){
-		if(FileStream(paths[i]+lookFor,FileStream::Open_BIT_READ|FileStream::Open_BIT_BINARY).closed()==false){
-			path=paths[i];
-			break;
-		}
-	}
-
-	return new randisle::RandIsle(app,path);
+	return new randisle::RandIsle(app);
 }

@@ -3,6 +3,8 @@
 
 #include <toadlet/toadlet.h>
 
+using namespace toadlet;
+
 class MeshOptimizer{
 public:
 	MeshOptimizer();

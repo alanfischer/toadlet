@@ -26,7 +26,7 @@
 #ifndef TOADLET_EGG_ERROR_H
 #define TOADLET_EGG_ERROR_H
 
-#include <toadlet/egg/Errorer.h>
+#include "Errorer.h"
 
 #if defined(TOADLET_EXCEPTIONS)
 	#define TOADLET_MAKE_ERROR_FUNCTION(name,type) \

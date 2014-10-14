@@ -3,6 +3,8 @@
 
 #include <toadlet/toadlet.h>
 
+using namespace toadlet;
+
 class Input:public Object,public Applet,public InputDeviceListener{
 public:
 	TOADLET_IOBJECT(Input);

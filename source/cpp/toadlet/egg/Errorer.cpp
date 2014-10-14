@@ -23,8 +23,7 @@
  *
  ********** Copyright header - do not remove **********/
 
-#include <toadlet/egg/Errorer.h>
-#include <toadlet/egg/Log.h>
+#include "Errorer.h"
 
 namespace toadlet{
 namespace egg{
@@ -46,9 +45,7 @@ Errorer::~Errorer(){
 
 void Errorer::setError(int error,const char *category,const char *description,bool report){
 	mLastError=error;
-	if(description==NULL){
-		mLastDescription[0]=0;
-	}
+	if(description==NULL){mLastDescription[0]=0;}
 	else{
 		int length=strlen(description);
 		if(length>mLastDescriptionLength){
