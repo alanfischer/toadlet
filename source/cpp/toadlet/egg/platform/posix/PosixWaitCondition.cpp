@@ -25,6 +25,7 @@
 
 #include <toadlet/egg/platform/posix/PosixWaitCondition.h>
 #include <toadlet/egg/platform/posix/PosixMutex.h>
+#include <toadlet/egg/Categories.h>
 #include <toadlet/egg/Error.h>
 
 namespace toadlet{
