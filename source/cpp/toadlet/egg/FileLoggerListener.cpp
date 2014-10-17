@@ -56,13 +56,31 @@ void FileLoggerListener::addLogEntry(Logger::Category *category,Logger::Level le
 		mDateLogStream=fopen(logName,flags);
 	}
 
+	const char *textColor="\x1b[39m";
+	const char *levelColor=textColor;
+	switch(level){
+		case Logger::Level_ERROR:
+			levelColor="\x1b[31m";
+		break;
+		case Logger::Level_WARNING:
+			levelColor="\x1b[33m";
+		break;
+		case Logger::Level_ALERT:
+			levelColor="\x1b[32m";
+		break;
+		default:
+		break;
+	}
+
 	if(mDateLogStream!=NULL){
 		const char *timeString=getTimeString(logtime);
 		const char *levelString=getLevelString(level);
 
 		fputs(timeString,mDateLogStream);
 		fputs(": ",mDateLogStream);
+		fputs(levelColor,mDateLogStream);
 		fputs(levelString,mDateLogStream);
+		fputs(textColor,mDateLogStream);
 		fputs(text,mDateLogStream);
 		fputs(newLine,mDateLogStream);
 	}
