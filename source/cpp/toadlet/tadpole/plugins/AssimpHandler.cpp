@@ -256,12 +256,12 @@ aiNode *AssimpHandler::saveScene(Scene *scene,const aiScene *ascene,Node *node){
 		// TODO
 	}
 
-	tforeach(AnyPointerIterator<Node>,child,node->getNodes()){anode->mNumChildren++;}
+	tforeach(NodeRange::iterator,child,node->getNodes()){anode->mNumChildren++;}
 
 	if(anode->mNumChildren>0){
 		anode->mChildren=new aiNode*[anode->mNumChildren];
 		i=0;
-		tforeach(AnyPointerIterator<Node>,child,node->getNodes()){
+		tforeach(NodeRange::iterator,child,node->getNodes()){
 			anode->mChildren[i++]=saveScene(scene,ascene,child);
 		}
 	}
