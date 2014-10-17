@@ -24,6 +24,7 @@
  ********** Copyright header - do not remove **********/
 
 #include <toadlet/egg/platform/posix/PosixThread.h>
+#include <toadlet/egg/Categories.h>
 #include <toadlet/egg/Error.h>
 #include <unistd.h>
 #include <stdlib.h>

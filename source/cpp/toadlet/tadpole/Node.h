@@ -71,6 +71,12 @@ namespace action{
 class Action;
 }
 
+typedef PointerIteratorRange<Node> NodeRange;
+typedef PointerIteratorRange<Spacial> SpacialRange;
+typedef PointerIteratorRange<Visible> VisibleRange;
+typedef PointerIteratorRange<Animatable> AnimatableRange;
+typedef PointerIteratorRange<LightComponent> LightRange;
+
 class TOADLET_API Node:public BaseComponent,public TransformListener{
 public:
 	TOADLET_NODE(Node);
@@ -106,7 +112,7 @@ public:
 
 	virtual void nodeAttached(Node *node);
 	virtual void nodeRemoved(Node *node);
-	virtual PointerIteratorRange<Node> getNodes(){return PointerIteratorRange<Node>(mNodes);}
+	virtual NodeRange getNodes() const{return NodeRange::wrapPointerCollection(mNodes);}
 	virtual Node *getNode(const String &name) const;
 	virtual Node *getNode(const Type<Component> *type) const;
 	template<typename Type> Type *getNodeType() const{return (Type*)getNode(Type::type());}
@@ -122,23 +128,19 @@ public:
 
 	virtual void spacialAttached(Spacial *spacial);
 	virtual void spacialRemoved(Spacial *spacial);
-	virtual int getNumSpacials() const{return mSpacials.size();}
-	virtual Spacial *getSpacial(int i) const{return mSpacials[i];}
+	virtual SpacialRange getSpacials() const{return SpacialRange::wrapCollection(mSpacials);}
 
 	virtual void visibleAttached(Visible *visible);
 	virtual void visibleRemoved(Visible *visible);
-	virtual int getNumVisibles() const{return mVisibles.size();}
-	virtual Visible *getVisible(int i) const{return mVisibles[i];}
+	virtual VisibleRange getVisibles() const{return VisibleRange::wrapCollection(mVisibles);}
 	
 	virtual void animatableAttached(Animatable *animatable);
 	virtual void animatableRemoved(Animatable *animatable);
-	virtual int getNumAnimatables() const{return mAnimatables.size();}
-	virtual Animatable *getAnimatable(int i) const{return mAnimatables[i];}
+	virtual AnimatableRange getAnimatables() const{return AnimatableRange::wrapCollection(mAnimatables);}
 
 	virtual void lightAttached(LightComponent *light);
 	virtual void lightRemoved(LightComponent *light);
-	virtual int getNumLights() const{return mLights.size();}
-	virtual LightComponent *getLight(int i) const{return mLights[i];}
+	virtual LightRange getLights() const{return LightRange::wrapCollection(mLights);}
 	
 	virtual void physicsAttached(PhysicsComponent *physics);
 	virtual void physicsRemoved(PhysicsComponent *physics);

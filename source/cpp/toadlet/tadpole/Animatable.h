@@ -37,9 +37,9 @@ class Animatable{
 public:
 	virtual ~Animatable(){}
 
-	virtual int getNumAnimations()=0;
-	virtual Animation *getAnimation(const String &name)=0;
-	virtual Animation *getAnimation(int index)=0;
+	virtual int getNumAnimations() const=0;
+	virtual Animation *getAnimation(const String &name) const=0;
+	virtual Animation *getAnimation(int index) const=0;
 };
 
 }

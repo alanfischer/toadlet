@@ -18,9 +18,11 @@ public:
 
 		BaseComponent::parentChanged(node);
 
-		if(mParent!=NULL && mParent->getNumVisibles()>0){
-			mParent->getVisible(0)->setSharedRenderState(NULL);
-			mState=mParent->getVisible(0)->getSharedRenderState();
+		if(mParent!=NULL){
+			tforeach(PointerIteratorRange<Visible>::iterator,visible,mParent->getVisibles()){
+				visible->setSharedRenderState(NULL);
+				mState=visible->getSharedRenderState();
+			}
 		}
 	}
 
@@ -237,8 +239,8 @@ public:
 		}
 	}
 
-	int getNumAnimations(){return 2;}
-	Animation *getAnimation(const String &name){
+	int getNumAnimations() const{return 2;}
+	Animation *getAnimation(const String &name) const{
 		if(name=="danger"){
 			return mDangerAnimation;
 		}
@@ -246,7 +248,7 @@ public:
 			return mChompAnimation;
 		}
 	}
-	Animation *getAnimation(int index){
+	Animation *getAnimation(int index) const{
 		if(index==0){
 			return mDangerAnimation;
 		}

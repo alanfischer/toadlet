@@ -35,10 +35,10 @@ class Attachable{
 public:
 	virtual ~Attachable(){}
 
-	virtual int getNumAttachments()=0;
-	virtual String getAttachmentName(int index)=0;
-	virtual int getAttachmentIndex(const String &name)=0;
-	virtual bool getAttachmentTransform(Transform *result,int index)=0;
+	virtual int getNumAttachments() const=0;
+	virtual String getAttachmentName(int index) const=0;
+	virtual int getAttachmentIndex(const String &name) const=0;
+	virtual bool getAttachmentTransform(Transform *result,int index) const=0;
 };
 
 }

@@ -9,6 +9,7 @@
 #include <toadlet/tadpole/Engine.h>
 
 extern "C"{
+	#define __STDC_CONSTANT_MACROS
 	#include <libavutil/avutil.h>
 	#include <libavcodec/avcodec.h>
 	#include <libavformat/avformat.h>

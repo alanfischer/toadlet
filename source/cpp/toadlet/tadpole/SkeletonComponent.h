@@ -172,15 +172,15 @@ public:
 	void render(RenderManager *manager) const;
 
 	// Attachable
-	int getNumAttachments(){return mBones.size();}
-	String getAttachmentName(int index){return getBoneName(index);}
-	int getAttachmentIndex(const String &name){return getBoneIndex(name);}
-	bool getAttachmentTransform(Transform *result,int index);
+	int getNumAttachments() const{return mBones.size();}
+	String getAttachmentName(int index) const{return getBoneName(index);}
+	int getAttachmentIndex(const String &name) const{return getBoneIndex(name);}
+	bool getAttachmentTransform(Transform *result,int index) const;
 
 	// Animatable
-	int getNumAnimations(){return mAnimations.size();}
-	Animation *getAnimation(const String &name);
-	Animation *getAnimation(int index){return mAnimations[index];}
+	int getNumAnimations() const{return mAnimations.size();}
+	Animation *getAnimation(const String &name) const;
+	Animation *getAnimation(int index) const{return mAnimations[index];}
 
 protected:
 	void createSkeletonBuffers();

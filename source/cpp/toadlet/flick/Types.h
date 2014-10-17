@@ -36,8 +36,9 @@
 #include <toadlet/egg/IntrusivePointer.h>
 #include <toadlet/egg/Object.h>
 #include <toadlet/egg/String.h>
-#include <toadlet/egg/Log.h>
+#include <toadlet/egg/Categories.h>
 #include <toadlet/egg/Error.h>
+#include <toadlet/egg/Log.h>
 #include <toadlet/peeper/Types.h>
 
 namespace toadlet{

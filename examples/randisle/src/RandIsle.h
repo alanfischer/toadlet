@@ -24,7 +24,7 @@ public:
 		Scope_BIT_SHADOW=		1<<7,
 	};
 
-	RandIsle(Application *app,String path);
+	RandIsle(Application *app);
 	virtual ~RandIsle();
 
 	void create();
@@ -96,7 +96,6 @@ protected:
 	};
 
 	Application *mApp;
-	String mPath;
 	Engine::ptr mEngine;
 	Scene::ptr mScene;
 	TerrainNode::ptr mTerrain;

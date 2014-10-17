@@ -24,6 +24,7 @@
  ********** Copyright header - do not remove **********/
 
 #include <toadlet/egg/io/DataStream.h>
+#include <toadlet/egg/Categories.h>
 #include <toadlet/egg/Collection.h>
 #include <toadlet/egg/Extents.h>
 #include <toadlet/egg/EndianConversion.h>

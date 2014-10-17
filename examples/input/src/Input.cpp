@@ -10,6 +10,7 @@ Input::~Input(){
 void Input::create(){
 	engine=app->getEngine();
 	engine->getArchiveManager()->addDirectory("../res");
+	engine->getArchiveManager()->addDirectory("../../input/res");
 
 	scene=new Scene(engine);
 
@@ -108,11 +109,15 @@ Node::ptr Input::makeNeedle(){
 	Node::ptr node=new Node(scene);
 
 	MeshComponent::ptr eye=new MeshComponent(engine);
-	eye->setMesh(engine->createSphereMesh(Sphere(1),shared_static_cast<Material>(engine->getMaterialManager()->find("P.png"))));
+	TOADLET_TRY
+		eye->setMesh(engine->createSphereMesh(Sphere(1),shared_static_cast<Material>(engine->getMaterialManager()->find("P.png"))));
+	TOADLET_CATCH_ANONYMOUS(){}
 	node->attach(eye);
 
  	MeshComponent::ptr point=new MeshComponent(engine);
-	point->setMesh(engine->createAABoxMesh(AABox(-.25,0,-.25,.25,10,.25),shared_static_cast<Material>(engine->getMaterialManager()->find("P.png"))));
+	TOADLET_TRY
+		point->setMesh(engine->createAABoxMesh(AABox(-.25,0,-.25,.25,10,.25),shared_static_cast<Material>(engine->getMaterialManager()->find("P.png"))));
+	TOADLET_CATCH_ANONYMOUS(){}
 	node->attach(point);
 
 	return node;
