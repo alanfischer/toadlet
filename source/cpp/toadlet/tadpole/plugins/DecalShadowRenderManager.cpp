@@ -105,7 +105,7 @@ void DecalShadowRenderManager::interRenderRenderables(RenderableSet *set,RenderD
 
 			/// @todo: Replace this with a node stack that increments counts of all renderables queued in the node & subnodes
 			bool rendered=false;
-			tforeach(PointerIteratorRange<Visible>::iterator,vi,node->getVisibles()){
+			tforeach(VisibleRange::iterator,vi,node->getVisibles()){
 				if(vi->getRendered()){
 					rendered=true;
 					break;

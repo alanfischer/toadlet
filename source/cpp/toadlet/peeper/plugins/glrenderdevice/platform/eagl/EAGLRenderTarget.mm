@@ -32,6 +32,16 @@
 #include <toadlet/peeper/TextureFormat.h>
 #import <QuartzCore/QuartzCore.h>
 
+#ifndef GL_RGBA4
+#	define GL_RGBA4 0x8056
+#endif
+#ifndef GL_RGB5_A1
+#	define GL_RGB5_A1 0x8057
+#endif
+#ifndef GL_RGB565
+#	define GL_RGB565 0x8D62
+#endif
+
 namespace toadlet{
 namespace peeper{
 
