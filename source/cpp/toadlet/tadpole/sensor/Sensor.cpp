@@ -64,7 +64,7 @@ int Sensor::senseNodes(Node *node,SensorResultsListener *results){
 		}
 	}
 
-	tforeach(AnyPointerIterator<Node>,n,node->getNodes()){
+	tforeach(NodeRange::iterator,n,node->getNodes()){
 		int r=senseNodes(n,results);
 		if(r<0){
 			return -1;
