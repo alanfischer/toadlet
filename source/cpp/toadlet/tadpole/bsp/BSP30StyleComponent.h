@@ -53,9 +53,9 @@ public:
 	scalar getIntensity() const{return mIntensity;}
 	
 	// Animatable
-	int getNumAnimations(){return 1;}
-	Animation *getAnimation(const String &name){return this;}
-	Animation *getAnimation(int index){return this;}
+	int getNumAnimations() const{return 1;}
+	Animation *getAnimation(const String &name) const{return (Animation*)this;}
+	Animation *getAnimation(int index) const{return (Animation*)this;}
 
 	// Animation
 	const String &getName() const{return BaseComponent::getName();}

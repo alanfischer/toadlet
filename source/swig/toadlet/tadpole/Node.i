@@ -31,12 +31,37 @@ public:
 	void stopAction(String name);
 	bool getActionActive(String name);
 	
-	int getNumVisibles() const;
-	Visible *getVisible(int i);
-	
-	int getNumLights() const;
-	LightComponent *getLight(int i);
+	VisibleRange getVisibles() const;
 };
 
 }
+}
+
+// This is from: http://stackoverflow.com/questions/9465856/no-iterator-for-java-when-using-swig-with-cs-stdmap
+
+%typemap(javainterfaces) VisibleIterator "java.util.Iterator<Visible>"
+%typemap(javacode) VisibleIterator %{
+public void remove() throws UnsupportedOperationException { throw new UnsupportedOperationException(); }
+public Visible next() throws java.util.NoSuchElementException { if (!hasNext()) { throw new java.util.NoSuchElementException(); } return nextImpl(); }
+%}
+
+%javamethodmodifiers VisibleIterator::nextImpl "private";
+%inline %{
+class VisibleIterator:public RangeIterator<toadlet::tadpole::VisibleRange>{
+public:
+	VisibleIterator(const toadlet::tadpole::VisibleRange& r) : RangeIterator(r) {}
+	bool hasNext() const{return RangeIterator::hasNext();}
+	toadlet::tadpole::Visible *nextImpl(){return RangeIterator::nextImpl();}
+};
+%}
+
+%typemap(javainterfaces) toadlet::tadpole::VisibleRange "Iterable<Visible>"
+
+namespace toadlet{namespace tadpole{class VisibleRange{};}}
+
+%newobject toadlet::tadpole::VisibleRange::iterator() const;
+%extend toadlet::tadpole::VisibleRange {
+	VisibleIterator *iterator() const {
+		return new VisibleIterator(*$self);
+	}
 }

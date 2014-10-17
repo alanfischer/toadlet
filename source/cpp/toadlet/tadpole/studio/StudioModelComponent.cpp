@@ -475,7 +475,7 @@ void StudioModelComponent::render(RenderManager *manager) const{
 	manager->getDevice()->renderPrimitive(mHitBoxVertexData,mHitBoxIndexData);
 }
 
-int StudioModelComponent::getAttachmentIndex(const String &name){
+int StudioModelComponent::getAttachmentIndex(const String &name) const{
 	int i;
 	for(i=0;i<mModel->header->numattachments;++i){
 		if(name.equals(mModel->attachment(i)->name)){
@@ -486,7 +486,7 @@ int StudioModelComponent::getAttachmentIndex(const String &name){
 	return -1;
 }
 
-bool StudioModelComponent::getAttachmentTransform(Transform *result,int index){
+bool StudioModelComponent::getAttachmentTransform(Transform *result,int index) const{
 	if(index<0 || index>mModel->header->numattachments){
 		return false;
 	}
@@ -506,7 +506,7 @@ bool StudioModelComponent::getAttachmentTransform(Transform *result,int index){
 	return true;
 }
 
-Animation *StudioModelComponent::getAnimation(const String &name){
+Animation *StudioModelComponent::getAnimation(const String &name) const{
 	int i;
 	for(i=0;i<mAnimations.size();++i){
 		if(mAnimations[i]->getName()==name){

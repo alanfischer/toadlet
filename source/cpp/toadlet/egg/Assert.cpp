@@ -23,8 +23,8 @@
  *
  ********** Copyright header - do not remove **********/
 
-#include <toadlet/egg/Assert.h>
-#include <toadlet/egg/Error.h>
+#include "Assert.h"
+#include "Error.h"
 
 namespace toadlet{
 namespace egg{

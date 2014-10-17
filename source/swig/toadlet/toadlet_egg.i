@@ -110,3 +110,16 @@ typedef signed char tbyte;
 
 using namespace toadlet::egg;
 using namespace toadlet;
+
+%inline %{
+template<typename RangeType>
+struct RangeIterator {
+	RangeIterator(const RangeType& r) : range(r), it(range.begin()) {}
+	bool hasNext() const { return it != range.end(); }
+	typename RangeType::value_type nextImpl() { return *it++; }
+	
+private:
+	RangeType range;    
+	typename RangeType::iterator it;
+};
+%}

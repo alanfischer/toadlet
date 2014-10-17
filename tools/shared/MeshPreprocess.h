@@ -22,6 +22,8 @@
 
 #include <toadlet/toadlet.h>
 
+using namespace toadlet;
+
 class MeshPreprocess{
 public:
 	static void adjustTexCoords(Mesh *mesh,float texCoordAdjust);

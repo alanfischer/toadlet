@@ -3,6 +3,8 @@
 
 #include <toadlet/toadlet.h>
 
+using namespace toadlet;
+
 class Viewer:public Object,public Applet{
 public:
 	TOADLET_IOBJECT(Viewer);

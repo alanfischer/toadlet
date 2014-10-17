@@ -8,7 +8,6 @@ set (EGG_SRC
 	Atomic.cpp
 	Error.cpp
 	Errorer.cpp
-	Exception.cpp
 	FileLoggerListener.cpp
 	Log.cpp
 	Logger.cpp

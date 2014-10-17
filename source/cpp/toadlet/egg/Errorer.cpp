@@ -23,36 +23,49 @@
  *
  ********** Copyright header - do not remove **********/
 
-#include <toadlet/egg/Errorer.h>
-#include <toadlet/egg/Log.h>
+#include "Errorer.h"
 
 namespace toadlet{
 namespace egg{
 
-Errorer::Errorer(){
-	mLastError=Type_NONE;
-	memset(mLastDescription,0,sizeof(mLastDescription));
-
-	#if defined(TOADLET_EGG_ERRORHANDLER_H)
-		mErrorHandler.setStackTraceListener(this);
-	#endif
+Errorer::Errorer(Logger *logger):
+	mLastError(Type_NONE),
+	mLastDescription(NULL),
+	mLastDescriptionLength(0),
+	mLogger(logger)
+{
+	mLastDescriptionLength=1024;
+	mLastDescription=new char[mLastDescriptionLength];
+	memset(mLastDescription,0,mLastDescriptionLength);
 }
 
 Errorer::~Errorer(){
+	delete mLastDescription;
 }
 
-void Errorer::setError(int error,const char *description){
+void Errorer::setError(int error,const char *category,const char *description,bool report){
 	mLastError=error;
-	int c=0;
-	while(description!=NULL && description[c]!=0 && c<MAX_DESCRIPTION_LENGTH){
-		mLastDescription[c]=description[c];
-		c++;
+	if(description==NULL){mLastDescription[0]=0;}
+	else{
+		int length=strlen(description);
+		if(length>mLastDescriptionLength){
+			char *lastDescription=new char[length+1];
+			if(lastDescription!=NULL){
+				delete mLastDescription;
+				mLastDescriptionLength=length+1;
+				mLastDescription=lastDescription;
+			}
+		}
+		strncpy(mLastDescription,description,mLastDescriptionLength);
 	}
-	mLastDescription[c]=0;
+
+	if(report && mLogger!=NULL){
+		mLogger->addLogEntry(category,Logger::Level_ERROR,description);
+	}
 }
 
-void Errorer::setException(const Exception &ex){
-	setError(ex.getError(),ex.getDescription());
+void Errorer::setException(const Exception &ex,bool report){
+	setError(ex.getError(),ex.getCategory(),ex.getDescription(),report);
 	mException=ex;
 }
 
@@ -70,29 +83,23 @@ const Exception &Errorer::getException(){
 	return mException;
 }
 
-void Errorer::installHandler(){
-	#if defined(TOADLET_EGG_ERRORHANDLER_H)
-		mErrorHandler.installHandler();
-	#endif
-}
-	
-void Errorer::uninstallHandler(){
-	#if defined(TOADLET_EGG_ERRORHANDLER_H)
-		mErrorHandler.uninstallHandler();
-	#endif
-}
-
 void Errorer::startTrace(){
-	Log::getInstance()->addLogEntry(Logger::Level_ERROR,"Backtrace starting");
+	if(mLogger!=NULL){
+		mLogger->addLogEntry(Logger::Level_ERROR,"Backtrace starting");
+	}
 }
 
 void Errorer::traceFrame(const char *description){
-	Log::getInstance()->addLogEntry(Logger::Level_ERROR,description);
+	if(mLogger!=NULL){
+		mLogger->addLogEntry(Logger::Level_ERROR,description);
+	}
 }
 
 void Errorer::endTrace(){
-	Log::getInstance()->addLogEntry(Logger::Level_ERROR,"Backtrace ended");
-	Log::getInstance()->flush();
+	if(mLogger!=NULL){
+		mLogger->addLogEntry(Logger::Level_ERROR,"Backtrace ended");
+		mLogger->flush();
+	}
 }
 
 }

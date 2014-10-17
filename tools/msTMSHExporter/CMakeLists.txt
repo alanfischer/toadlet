@@ -26,7 +26,6 @@ if (MS3D_FOUND)
 
 	# Library
 	add_library (msTMSHExporter SHARED ${MSTMSHEXPORTER_SRC} ${MSTMSHEXPORTER_H})
-	set_target_properties (msTMSHExporter PROPERTIES COMPILE_FLAGS "/MT")
 	target_link_libraries (msTMSHExporter ${MSTMSHEXPORTER_LIBS})
 	install (TARGETS msTMSHExporter DESTINATION ${MS3D_DIR})
 endif (MS3D_FOUND)

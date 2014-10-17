@@ -20,7 +20,7 @@ public:
 
 		virtual ~TreeBranch(){}
 
-		virtual PointerIteratorRange<PathEdge> getEdges() const{return PointerIteratorRange<PathEdge>(branches);}
+		virtual PointerIteratorRange<PathEdge> getEdges() const{return PointerIteratorRange<PathEdge>::wrapPointerCollection(branches);}
 		virtual scalar getLength() const{return length;}
 		virtual void getPoint(Vector3 &point,scalar time) const{
 			scalar t=lerp(times.data(),times.size(),time);

@@ -1,4 +1,6 @@
 #include "PacketMessageStream.h"
+#include <toadlet/egg/Categories.h>
+#include <toadlet/egg/Error.h>
 #include <toadlet/egg/Log.h>
 
 using namespace toadlet;

@@ -4,6 +4,7 @@
 #include <toadlet/egg/io/Stream.h>
 
 extern "C"{
+	#define __STDC_CONSTANT_MACROS
 	#include <libavformat/avformat.h>
 }
 
