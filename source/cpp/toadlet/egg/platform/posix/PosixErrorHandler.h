@@ -26,13 +26,13 @@
 #ifndef POSIXERRORHANDLER_H
 #define POSIXERRORHANDLER_H
 
-#include <toadlet/egg/StackTraceListener.h>
+#include "../../StackTraceListener.h"
 #include <signal.h>
 
 namespace toadlet{
 namespace egg{
 
-class PosixErrorHandler{
+class TOADLET_API PosixErrorHandler{
 public:
 	PosixErrorHandler();
 	~PosixErrorHandler();

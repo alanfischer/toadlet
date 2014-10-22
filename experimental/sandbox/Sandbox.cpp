@@ -138,7 +138,7 @@ void Sandbox::create(){
 	Texture::ptr texture=engine->getTextureManager()->createTexture(Texture::Usage_BIT_STREAM|Texture::Usage_BIT_AUTOGEN_MIPMAPS,format,(tbyte*)NULL);
 
 	TerrainNode::ptr terrain=new TerrainNode(scene);
-	terrain->setDataSource(new TextureDataSource(engine,Vector3(.5,.5,12),0,"terrain.jpg"));
+	terrain->setDataSource(new TextureDataSource(engine,Vector3(.5,.5,12),0,"terrain.png"));
 	terrain->setMaterialSource(new DiffuseTerrainMaterialSource(engine,texture));//,Vector3(.5,.5,1),Vector3(0,0,0)));
 	terrain->setTolerance(0);
 	scene->setRoot(terrain);

@@ -70,8 +70,13 @@ bool TextureDataSource::setTexture(const String &name,int px,int py){
 }
 
 bool TextureDataSource::setTexture(Texture *texture,int px,int py){
+	if(texture==NULL){
+		Error::nullPointer("invalid texture");
+		return false;
+	}
+
 	TextureFormat::ptr format=texture->getFormat();
-	if(format->getWidth()!=format->getHeight() || (mPatchSize!=0 && mPatchSize!=format->getWidth())){
+	if(format->getWidth()==0 || format->getWidth()!=format->getHeight() || (mPatchSize!=0 && mPatchSize!=format->getWidth())){
 		Error::unknown("incorrect texture size");
 		return false;
 	}
