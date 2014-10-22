@@ -25,7 +25,6 @@
 
 #include "Win32ErrorHandler.h"
 #include "Win32ErrorHandler_currentctx.h"
-#include <toadlet/egg/String.h>
 #include "tchar.h"
 
 #include <stdio.h>
@@ -216,17 +215,15 @@ void Win32ErrorHandler::handleFrames(STACKFRAME64 *stackFrames,int numFrames,HAN
 	CHAR *name=mWorkingName;
 	memset(name,0,sizeof(mWorkingName));
 
-	DWORD64 symbolOffset=0;
-	DWORD lineOffset=0;
-
 	IMAGEHLP_LINE64 *line=&mWorkingLine;
 	memset(line,0,sizeof(mWorkingLine));
 	line->SizeOfStruct=sizeof(IMAGEHLP_LINE64);
 
-	CHAR path[MAX_PATH];
-	memset(path,0,sizeof(path));
-	CHAR symbolPath[4096];
-	memset(symbolPath,0,sizeof(symbolPath));
+	CHAR *path=mWorkingPath;
+	memset(path,0,sizeof(mWorkingPath));
+	CHAR *symbolPath=mWorkingSymbolPath;
+	memset(symbolPath,0,sizeof(mWorkingSymbolPath));
+
 	if(GetCurrentDirectoryA(MAX_PATH,path)>0){
 		strcat(symbolPath,path);
 		strcat(symbolPath,";");
@@ -259,8 +256,10 @@ void Win32ErrorHandler::handleFrames(STACKFRAME64 *stackFrames,int numFrames,HAN
 	options&=~SYMOPT_DEFERRED_LOADS;
 	options=SymSetOptions(options);
 
-	String descriptions[MAX_STACKFRAMES];
-
+	DWORD64 symbolOffset=0;
+	DWORD lineOffset=0;
+	char description[MAX_NAME_LENGTH+128];
+	
 	if(mListener!=NULL){
 		mListener->startTrace();
 	}
@@ -277,9 +276,9 @@ void Win32ErrorHandler::handleFrames(STACKFRAME64 *stackFrames,int numFrames,HAN
 				SymGetLineFromAddr64(process,s->AddrPC.Offset,&lineOffset,line);
 			}
 
-			descriptions[i]=String(name)+":"+(int)line->LineNumber;
+			sprintf(description,"%s:%d",name,(int)line->LineNumber);
 			if(mListener!=NULL){
-				mListener->traceFrame(descriptions[i]);
+				mListener->traceFrame(description);
 			}
 		}
 	}

@@ -58,7 +58,7 @@ protected:
 		TextureRequest(TextureDataSource *parent,int px,int py):mParent(parent),mPx(px),mPy(py){}
 
 		void resourceReady(Resource *resource){mParent->setTexture((Texture*)resource,mPx,mPy);}
-		void resourceException(const Exception &ex){}
+		void resourceException(const Exception &ex){mParent->setTexture(NULL,mPx,mPy);}
 		void resourceProgress(float progress){}
 
 	protected:

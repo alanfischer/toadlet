@@ -26,8 +26,7 @@
 #ifndef TOADLET_EGG_WIN32ERRORHANDLER_H
 #define TOADLET_EGG_WIN32ERRORHANDLER_H
 
-#include <toadlet/egg/Types.h>
-#include <toadlet/egg/StackTraceListener.h>
+#include "../../StackTraceListener.h"
 #include <windows.h>
 #include "Win32ErrorHandler_dbghelp.h"
 
@@ -78,6 +77,8 @@ protected:
 	SYMBOL mWorkingSymbol;
 	CHAR mWorkingName[MAX_NAME_LENGTH];
 	IMAGEHLP_LINE64 mWorkingLine;
+	CHAR mWorkingPath[MAX_PATH];
+	CHAR mWorkingSymbolPath[MAX_PATH * 2 + 2];
 
 	TOADLET_DEFINEPROCEDURE(BOOL,StackWalk64,(DWORD MachineType,HANDLE hProcess,HANDLE hThread,LPSTACKFRAME64 StackFrame,PVOID ContextRecord,PREAD_PROCESS_MEMORY_ROUTINE64 ReadMemoryRoutine,PFUNCTION_TABLE_ACCESS_ROUTINE64 FunctionTableAccessRoutine,PGET_MODULE_BASE_ROUTINE64 GetModuleBaseRoutine,PTRANSLATE_ADDRESS_ROUTINE64 TranslateAddress));
 	TOADLET_DEFINEPROCEDURE(BOOL,SymInitialize,(IN HANDLE hProcess,IN PSTR UserSearchPath,IN BOOL fInvadeProcess));

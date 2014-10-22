@@ -23,7 +23,7 @@
  *
  ********** Copyright header - do not remove **********/
 
-#include <toadlet/egg/platform/posix/PosixErrorHandler.h>
+#include "PosixErrorHandler.h"
 #include <stdlib.h>
 #include <stdio.h>
 
