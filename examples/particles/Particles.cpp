@@ -113,20 +113,20 @@ void Particles::create(){
 
 	if(points){
 		points->setWorldSpace(true);
-		particles.add(points);
+		particles.push_back(points);
 	}
 	if(attenuateds){
 		attenuateds->setWorldSpace(true);
-		particles.add(attenuateds);
+		particles.push_back(attenuateds);
 	}
 	if(sprites){
 		sprites->setWorldSpace(true);
 		sprites->setVelocityAligned(true);
-		particles.add(sprites);
+		particles.push_back(sprites);
 	}
 	if(beams){
 		beams->setWorldSpace(true);
-		particles.add(beams);
+		particles.push_back(beams);
 	}
 
 	#if defined(LFX_DLL_NAME)

@@ -33,39 +33,39 @@ namespace pad{
 void BaseApplication::mapKeyNames(Map<int,String> &keyToName,Map<String,int> &nameToKey){
 	Map<int,String> &map=keyToName;
 
-	map.add(Key_ENTER,		"enter");
-	map.add(Key_TAB,		"tab");
-	map.add(Key_SPACE,		"space");
+	map[Key_ENTER]=		"enter";
+	map[Key_TAB]=		"tab";
+	map[Key_SPACE]=		"space";
 
-	map.add(Key_LEFT,		"left");
-	map.add(Key_RIGHT,		"right");
-	map.add(Key_UP,			"up");
-	map.add(Key_DOWN,		"down");
+	map[Key_LEFT]=		"left";
+	map[Key_RIGHT]=		"right";
+	map[Key_UP]=		"up";
+	map[Key_DOWN]=		"down";
 
-	map.add(Key_ESC,		"esc");
-	map.add(Key_PAUSE,		"pause");
-	map.add(Key_SHIFT,		"shift");
-	map.add(Key_CTRL,		"ctrl");
-	map.add(Key_ALT,		"alt");
-	map.add(Key_SPECIAL,	"special");
-	map.add(Key_BACKSPACE,	"backspace");
-	map.add(Key_DELETE,		"delete");
+	map[Key_ESC]=		"esc";
+	map[Key_PAUSE]=		"pause";
+	map[Key_SHIFT]=		"shift";
+	map[Key_CTRL]=		"ctrl";
+	map[Key_ALT]=		"alt";
+	map[Key_SPECIAL]=	"special";
+	map[Key_BACKSPACE]=	"backspace";
+	map[Key_DELETE]=	"delete";
 
-	map.add(Key_SOFTLEFT,	"softleft");
-	map.add(Key_SOFTRIGHT,	"softright");
-	map.add(Key_ACTION,		"action");
-	map.add(Key_BACK,		"back");
+	map[Key_SOFTLEFT]=	"softleft";
+	map[Key_SOFTRIGHT]=	"softright";
+	map[Key_ACTION]=	"action";
+	map[Key_BACK]=		"back";
 
 	int key;
 	for(key=0;key<256;++key){
 		if(isalpha(key) || isdigit(key)){
-			map.add(key,String()+(char)key);
+			map[key]=String()+(char)key;
 		}
 	}
 
 	Map<int,String>::iterator it;
 	for(it=keyToName.begin();it!=keyToName.end();++it){
-		nameToKey.add(it->second,it->first);
+		nameToKey[it->second]=it->first;
 	}
 }
 

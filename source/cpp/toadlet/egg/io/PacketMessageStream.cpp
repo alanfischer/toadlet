@@ -63,7 +63,7 @@ int PacketMessageStream::readMessage(){
 	message=&mReadMessages[mReadMessages.size()-1];
 	message->reset();
 
-	memcpy(message->data,&header,sizeof(header));
+	memcpy(&message->data[0],&header,sizeof(header));
 	message->header=header;
 
 	if(message->maxLength==0 && message->data.size() < message->header.length + sizeof(message->header)){
@@ -72,7 +72,7 @@ int PacketMessageStream::readMessage(){
 
 	int total=0,amount=1;
 	for(total=0;total<message->header.length && amount>0;total+=amount){
-		amount=mStream->read(message->data + sizeof(message->header) + total,message->header.length - total);
+		amount=mStream->read(&message->data[0] + sizeof(message->header) + total,message->header.length - total);
 	}
 
 	if((message->header.sequence & Sequence_END)==Sequence_END){
@@ -172,10 +172,10 @@ bool PacketMessageStream::flush(){
 			return false;
 		}
 
-		memcpy(message->data,&message->header,sizeof(message->header));
+		memcpy(&message->data[0],&message->header,sizeof(message->header));
 
 		int totalLength=sizeof(message->header) + message->header.length;
-		int amount=mStream->write(message->data,totalLength);
+		int amount=mStream->write(&message->data[0],totalLength);
 
 		if(amount != totalLength){
 			return false;
@@ -202,7 +202,7 @@ void PacketMessageStream::Message::reset(int id){
 
 int PacketMessageStream::Message::read(tbyte *buffer,int length){
 	length=toadlet::egg::math::Math::intMinVal(length,header.length - position);
-	memcpy(buffer,data + sizeof(header) + position,length);
+	memcpy(buffer,&data[0] + sizeof(header) + position,length);
 	position+=length;
 	return length;
 }
@@ -214,7 +214,7 @@ int PacketMessageStream::Message::write(const tbyte *buffer,int length){
 		data.resize(sizeof(header) + header.length);
 	}
 	length=toadlet::egg::math::Math::intMinVal(length,header.length - position);
-	memcpy(data + sizeof(header) + position,buffer,length);
+	memcpy(&data[0] + sizeof(header) + position,buffer,length);
 	position+=length;
 	return length;
 }

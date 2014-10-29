@@ -49,7 +49,7 @@ bool VertexData::addVertexBuffer(VertexBuffer::ptr vertexBuffer){
 		return false;
 	}
 
-	vertexBuffers.add(vertexBuffer);
+	vertexBuffers.push_back(vertexBuffer);
 
 	return true;
 }

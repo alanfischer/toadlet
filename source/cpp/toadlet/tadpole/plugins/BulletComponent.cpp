@@ -100,6 +100,14 @@ void BulletComponent::rootChanged(Node *root){
 	}
 }
 
+void BulletComponent::addCollisionListener(PhysicsCollisionListener *listener){
+	mListeners.push_back(listener);
+}
+
+void BulletComponent::removeCollisionListener(PhysicsCollisionListener *listener){
+	mListeners.erase(std::remove(mListeners.begin(),mListeners.end(),listener),mListeners.end());
+}
+
 void BulletComponent::setPosition(const Vector3 &position){
 	if((mBody->getCollisionFlags() & btCollisionObject::CF_KINEMATIC_OBJECT)!=0){
 		mKinematicPosition=position;

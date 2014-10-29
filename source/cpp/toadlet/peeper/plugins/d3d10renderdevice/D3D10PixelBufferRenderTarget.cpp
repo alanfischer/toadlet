@@ -84,8 +84,8 @@ bool D3D10PixelBufferRenderTarget::deactivate(){
 }
 
 bool D3D10PixelBufferRenderTarget::attach(PixelBuffer::ptr buffer,Attachment attachment){
-	mBuffers.add(buffer);
-	mBufferAttachments.add(attachment);
+	mBuffers.push_back(buffer);
+	mBufferAttachments.push_back(attachment);
 
 	mWidth=buffer->getTextureFormat()->getWidth();
 	mHeight=buffer->getTextureFormat()->getHeight();
@@ -105,8 +105,8 @@ bool D3D10PixelBufferRenderTarget::remove(PixelBuffer::ptr buffer){
 		return false;
 	}
 
-	mBuffers.removeAt(i);
-	mBufferAttachments.removeAt(i);
+	mBuffers.erase(mBuffers.begin()+i);
+	mBufferAttachments.erase(mBufferAttachments.begin()+i);
 	mNeedsCompile=true;
 
 	return true;
@@ -149,7 +149,7 @@ bool D3D10PixelBufferRenderTarget::compile(){
 			mDepthStencilView=buffer->getD3D10DepthStencilView();
 		}
 		else{
-			mRenderTargetViews.add(buffer->getD3D10RenderTargetView());
+			mRenderTargetViews.push_back(buffer->getD3D10RenderTargetView());
 		}
 	}
 

@@ -145,41 +145,41 @@ Win32Application::Win32Application():
 	#endif
 
 	#if defined(TOADLET_HAS_D3DM)
-		mRenderDevicePlugins.add("d3dm",RenderDevicePlugin(new_D3DMWindowRenderTarget,new_D3DMRenderDevice));
+		mRenderDevicePlugins["d3dm"]=RenderDevicePlugin(new_D3DMWindowRenderTarget,new_D3DMRenderDevice);
 	#endif
 	#if defined(TOADLET_HAS_D3D9)
-		mRenderDevicePlugins.add("d3d9",RenderDevicePlugin(new_D3D9WindowRenderTarget,new_D3D9RenderDevice));
+		mRenderDevicePlugins["d3d9"]=RenderDevicePlugin(new_D3D9WindowRenderTarget,new_D3D9RenderDevice);
 	#endif
 	#if defined(TOADLET_HAS_D3D10)
-		mRenderDevicePlugins.add("d3d10",RenderDevicePlugin(new_D3D10WindowRenderTarget,new_D3D10RenderDevice));
+		mRenderDevicePlugins["d3d10"]=RenderDevicePlugin(new_D3D10WindowRenderTarget,new_D3D10RenderDevice);
 	#endif
 	#if defined(TOADLET_HAS_D3D11)
-		mRenderDevicePlugins.add("d3d11",RenderDevicePlugin(new_D3D11WindowRenderTarget,new_D3D11RenderDevice));
+		mRenderDevicePlugins["d3d11"]=RenderDevicePlugin(new_D3D11WindowRenderTarget,new_D3D11RenderDevice);
 	#endif
 	#if defined(TOADLET_HAS_OPENGL)
-		mRenderDevicePlugins.add("gl",RenderDevicePlugin(
+		mRenderDevicePlugins["gl"]=RenderDevicePlugin(
 			#if defined(TOADLET_PLATFORM_WINCE)
 				new_EGLWindowRenderTarget
 			#else
 				new_WGLWindowRenderTarget
 			#endif
 			,new_GLRenderDevice
-		));
+		);
 	#endif
-	mRenderDevicePreferences.add("d3d9");
-	mRenderDevicePreferences.add("d3dm");
-	mRenderDevicePreferences.add("d3d10");
-	mRenderDevicePreferences.add("d3d11");
-	mRenderDevicePreferences.add("gl");
+	mRenderDevicePreferences.push_back("d3d9");
+	mRenderDevicePreferences.push_back("d3dm");
+	mRenderDevicePreferences.push_back("d3d10");
+	mRenderDevicePreferences.push_back("d3d11");
+	mRenderDevicePreferences.push_back("gl");
 
 	#if defined(TOADLET_HAS_OPENAL)
-		mAudioDevicePlugins.add("al",AudioDevicePlugin(new_ALAudioDevice));
+		mAudioDevicePlugins["al"]=AudioDevicePlugin(new_ALAudioDevice);
 	#endif
 	#if defined(TOADLET_PLATFORM_WIN32)
-		mAudioDevicePlugins.add("mm",AudioDevicePlugin(new_MMAudioDevice));
+		mAudioDevicePlugins["mm"]=AudioDevicePlugin(new_MMAudioDevice);
 	#endif
-	mAudioDevicePreferences.add("al");
-	mAudioDevicePreferences.add("mm");
+	mAudioDevicePreferences.push_back("al");
+	mAudioDevicePreferences.push_back("mm");
 }
 
 Win32Application::~Win32Application(){
@@ -443,7 +443,7 @@ bool Win32Application::createWindow(){
 	mHeight=rect.bottom-rect.top;
 	mWidth=rect.right-rect.left;
 
-	mApplicationMap.add(win32->mWnd,this);
+	mApplicationMap[win32->mWnd]=this;
 
 	ShowWindow(win32->mWnd,SW_SHOW);
 	SetForegroundWindow(win32->mWnd);

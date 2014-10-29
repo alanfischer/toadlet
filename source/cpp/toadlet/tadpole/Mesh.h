@@ -88,8 +88,8 @@ public:
 	virtual void setBound(Bound::ptr bound){mBound=bound;}
 	Bound *getBound() const{return mBound;}
 
-	virtual void addSubMesh(SubMesh::ptr subMesh){mSubMeshes.add(subMesh);}
-	virtual void removeSubMesh(SubMesh::ptr subMesh){mSubMeshes.remove(subMesh);}
+	virtual void addSubMesh(SubMesh::ptr subMesh);
+	virtual void removeSubMesh(SubMesh::ptr subMesh);
 	int getNumSubMeshes() const{return mSubMeshes.size();}
 	SubMesh::ptr getSubMesh(int i){return mSubMeshes[i];}
 	SubMesh::ptr getSubMesh(const String &name);

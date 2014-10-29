@@ -15,7 +15,7 @@ public:
 		TOADLET_IOBJECT(TreeBranch);
 
 		TreeBranch():skipFirst(false),started(false),lastVertex(-1){
-			branches.add(this);
+			branches.push_back(this);
 		}
 
 		virtual ~TreeBranch(){}

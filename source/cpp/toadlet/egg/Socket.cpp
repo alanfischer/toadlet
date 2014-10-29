@@ -500,7 +500,7 @@ bool Socket::getHostAdaptorsByName(Collection<uint32> &adaptors,const String &na
 	if(he!=NULL){
 		char **list=he->h_addr_list;
 		while((*list)!=NULL){
-			adaptors.add(*(uint32*)(*list));
+			adaptors.push_back(*(uint32*)(*list));
 			++list;
 		}
 		return true;
@@ -515,7 +515,7 @@ bool Socket::getHostAdaptorsByIP(Collection<uint32> &adaptors,uint32 ip){
 	if(he!=NULL){
 		char **list=he->h_addr_list;
 		while((*list)!=NULL){
-			adaptors.add(*(uint32*)(*list));
+			adaptors.push_back(*(uint32*)(*list));
 			++list;
 		}
 		return true;
@@ -543,14 +543,14 @@ bool Socket::getLocalAdaptors(Collection<uint32> &adaptors){
 
 		int count=ifconf.ifc_len/sizeof(struct ifreq);
 		for(int i=0;i<count;++i){
-			adaptors.add(((struct sockaddr_in*)&ifreqs[i].ifr_addr)->sin_addr.s_addr);
+			adaptors.push_back(((struct sockaddr_in*)&ifreqs[i].ifr_addr)->sin_addr.s_addr);
 		}
 	#else
 		struct ifaddrs *addrs,*a=NULL;
 		getifaddrs(&addrs);
 		for(a=addrs;a!=NULL;a=a->ifa_next){
 			if(a->ifa_addr->sa_family==AF_INET){
-				adaptors.add(((struct sockaddr_in*)a->ifa_addr)->sin_addr.s_addr);
+				adaptors.push_back(((struct sockaddr_in*)a->ifa_addr)->sin_addr.s_addr);
 			}
 		}
 		freeifaddrs(addrs);

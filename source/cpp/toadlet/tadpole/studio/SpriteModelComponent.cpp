@@ -104,7 +104,7 @@ void SpriteModelComponent::setModel(SpriteModel *model){
 
 	int i;
 	for(i=0;i<mModel->materials.size();++i){
-		mMaterials.add(mModel->materials[i]);
+		mMaterials.push_back(mModel->materials[i]);
 		if(mSharedRenderState!=NULL){
 			mMaterials[i]=mEngine->getMaterialManager()->createSharedMaterial(mMaterials[i],mSharedRenderState);
 		}

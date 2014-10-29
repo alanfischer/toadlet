@@ -108,7 +108,7 @@ int DataStream::readAll(tbyte *&resultBuffer){
 		}
 		else{
 			total+=amount;
-			buffers.add(buffer);
+			buffers.push_back(buffer);
 		}
 	}
 

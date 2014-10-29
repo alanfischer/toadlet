@@ -72,9 +72,11 @@ Material::ptr MaterialManager::createMaterial(){
 Material::ptr MaterialManager::createSharedMaterial(Material::ptr source,RenderState::ptr renderState){
 	Material::ptr material=new Material(this);
 
-	tforeach(Material::PathCollection::iterator,srcPath,source->getPaths()){
+	tforeach(Material::PathCollection::const_iterator,srcPathIt,source->getPaths()){
+		RenderPath *srcPath=*srcPathIt;
 		RenderPath *dstPath=material->addPath();
-		tforeach(RenderPath::PassCollection::iterator,srcPass,srcPath->getPasses()){
+		tforeach(RenderPath::PassCollection::const_iterator,srcPassIt,srcPath->getPasses()){
+			RenderPass *srcPass=*srcPassIt;
 			RenderPass *dstPass=new RenderPass(this,srcPass);
 
 			// We need to copy the Texture & Sampler states, since the shared RenderState has no knowledge of Texture or Sampler states by default
@@ -132,7 +134,7 @@ RenderState::ptr MaterialManager::createRenderState(){
 	}
 
 	if(renderState!=NULL){
-		mRenderStates.add(renderState);
+		mRenderStates.push_back(renderState);
 
 		renderState->setDestroyedListener(this);
 	}
@@ -168,7 +170,7 @@ ShaderState::ptr MaterialManager::createShaderState(){
 	}
 
 	if(shaderState!=NULL){
-		mShaderStates.add(shaderState);
+		mShaderStates.push_back(shaderState);
 
 		shaderState->setDestroyedListener(this);
 	}
@@ -279,15 +281,24 @@ void MaterialManager::contextDeactivate(RenderDevice *renderDevice){
 }
 
 void MaterialManager::resourceDestroyed(Resource *resource){
-	if(mRenderStates.remove(resource)==false){
-		if(mShaderStates.remove(resource)==false){
+	RenderStateCollection::iterator rit=std::find(mRenderStates.begin(),mRenderStates.end(),resource);
+	if(rit!=mRenderStates.end()){
+		mRenderStates.erase(rit);
+	}
+	else{
+		ShaderStateCollection::iterator sit=std::find(mShaderStates.begin(),mShaderStates.end(),resource);
+		if(sit!=mShaderStates.end()){
+			mShaderStates.erase(sit);
+		}
+		else{
 			ResourceManager::resourceDestroyed(resource);
 		}
 	}
 }
 
 bool MaterialManager::isPathUseable(RenderPath *path,const RenderCaps &caps){
-	tforeach(RenderPath::PassCollection::iterator,pass,path->getPasses()){
+	tforeach(RenderPath::PassCollection::const_iterator,it,path->getPasses()){
+		RenderPass *pass=*it;
 		ShaderState *state=pass->getShaderState();
 
 		int j;
@@ -324,7 +335,8 @@ bool MaterialManager::compileMaterial(Material *material){
 	else if(mEngine->getRenderDevice()!=NULL){
 		RenderCaps caps;
 		mEngine->getRenderDevice()->getRenderCaps(caps);
-		tforeach(Material::PathCollection::iterator,path,material->getPaths()){
+		tforeach(Material::PathCollection::const_iterator,it,material->getPaths()){
+			RenderPath *path=*it;
 			if(isPathUseable(path,caps)){
 				bestPath=path;
 				break;

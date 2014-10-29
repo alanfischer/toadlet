@@ -183,11 +183,11 @@ void MMAudioDevice::update(int dt){
 }
 
 void MMAudioDevice::internal_audioCreate(MMAudio *audio){
-	mAudios.add(audio);
+	mAudios.push_back(audio);
 }
 
 void MMAudioDevice::internal_audioDestroy(MMAudio *audio){
-	mAudios.remove(audio);
+	mAudios.erase(std::remove(mAudios.begin(),mAudios.end(),audio),mAudios.end());
 }
 
 // Mix all the currently playing audios

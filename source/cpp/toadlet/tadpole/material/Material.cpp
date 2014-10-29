@@ -39,7 +39,8 @@ Material::Material(MaterialManager *manager):BaseResource(),
 }
 
 void Material::destroy(){
-	tforeach(PointerCollection<RenderPath>::iterator,path,mPaths){
+	tforeach(PathCollection::iterator,it,mPaths){
+		RenderPath *path=*it;
 		path->destroy();
 	}
 	mPaths.clear();
@@ -50,12 +51,13 @@ void Material::destroy(){
 RenderPath::ptr Material::addPath(const String name){
 	RenderPath::ptr path=new RenderPath(mManager);
 	path->setName(name);
-	mPaths.add(path);
+	mPaths.push_back(path);
 	return path;
 }
 
 RenderPath::ptr Material::getPath(const String name) const{
-	tforeach(PointerCollection<RenderPath>::iterator,path,mPaths){
+	tforeach(PathCollection::const_iterator,it,mPaths){
+		RenderPath *path=*it;
 		if(path->getName()==name){
 			return path;
 		}

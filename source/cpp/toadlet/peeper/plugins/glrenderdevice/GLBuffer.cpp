@@ -97,10 +97,10 @@ bool GLBuffer::create(int usage,int access,VertexFormat::ptr vertexFormat,int si
 	int i;
 	for(i=0;i<mVertexFormat->getNumElements();++i){
 		if(mHandle!=0){
-			mElementOffsets.add(reinterpret_cast<uint8*>(mVertexFormat->getElementOffset(i)));
+			mElementOffsets.push_back(reinterpret_cast<uint8*>(mVertexFormat->getElementOffset(i)));
 		}
 		else{
-			mElementOffsets.add(mData+mVertexFormat->getElementOffset(i));
+			mElementOffsets.push_back(mData+mVertexFormat->getElementOffset(i));
 		}
 	}
 

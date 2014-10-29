@@ -87,6 +87,14 @@ void HopComponent::rootChanged(Node *root){
 	}
 }
 
+void HopComponent::addCollisionListener(PhysicsCollisionListener *listener){
+	mListeners.push_back(listener);
+}
+
+void HopComponent::removeCollisionListener(PhysicsCollisionListener *listener){
+	mListeners.erase(std::remove(mListeners.begin(),mListeners.end(),listener),mListeners.end());
+}
+
 void HopComponent::setPosition(const Vector3 &position){
 	mSolid->setPosition(position);
 }

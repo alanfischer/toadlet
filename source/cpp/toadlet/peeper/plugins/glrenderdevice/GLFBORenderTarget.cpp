@@ -154,8 +154,8 @@ bool GLFBORenderTarget::attach(PixelBuffer::ptr buffer,Attachment attachment){
 	}
 	glBindFramebuffer(GL_FRAMEBUFFER,0);
 
-	mBuffers.add(buffer);
-	mBufferAttachments.add(attachment);
+	mBuffers.push_back(buffer);
+	mBufferAttachments.push_back(attachment);
 	mNeedsCompile=true;
 
 	TOADLET_CHECK_GLERROR("GLFBORenderTarget::attach");
@@ -190,8 +190,8 @@ bool GLFBORenderTarget::remove(PixelBuffer::ptr buffer){
 	}
 	glBindFramebuffer(GL_FRAMEBUFFER,0);
 
-	mBuffers.removeAt(i);
-	mBufferAttachments.removeAt(i);
+	mBuffers.erase(mBuffers.begin()+i);
+	mBufferAttachments.erase(mBufferAttachments.begin()+i);
 	mNeedsCompile=true;
 
 	TOADLET_CHECK_GLERROR("GLFBORenderTarget::remove");

@@ -135,7 +135,7 @@ void VariableBufferFormat::compile(){
 }
 
 void VariableBufferFormat::compile(Variable::ptr variable,Variable *parent){
-	mFlatVariables.add(variable);
+	mFlatVariables.push_back(variable);
 	variable->setFullName(variable->getName());
 	int i;
 	for(i=0;i<variable->getStructSize();++i){

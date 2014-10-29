@@ -45,7 +45,7 @@ CompositeAction::~CompositeAction(){
 }
 
 void CompositeAction::attach(Action *action){
-	mActions.add(action);
+	mActions.push_back(action);
 
 	action->addActionListener(this);
 }
@@ -53,7 +53,7 @@ void CompositeAction::attach(Action *action){
 void CompositeAction::remove(Action *action){
 	action->removeActionListener(this);
 
-	mActions.remove(action);
+	mActions.erase(std::remove(mActions.begin(),mActions.end(),action),mActions.end());
 }
 
 void CompositeAction::start(){
@@ -96,6 +96,14 @@ bool CompositeAction::getActive() const{
 		active|=mActions[i]->getActive();
 	}
 	return active;
+}
+
+void CompositeAction::addActionListener(ActionListener *listener){
+	mListeners.push_back(listener);
+}
+
+void CompositeAction::removeActionListener(ActionListener *listener){
+	mListeners.erase(std::remove(mListeners.begin(),mListeners.end(),listener),mListeners.end());
 }
 
 void CompositeAction::actionStarted(Action *action){

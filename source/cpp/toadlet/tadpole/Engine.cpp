@@ -657,6 +657,14 @@ void Engine::contextDeactivate(RenderDevice *renderDevice){
 	}
 }
 
+void Engine::addContextListener(ContextListener *listener){
+	mContextListeners.push_back(listener);
+}
+
+void Engine::removeContextListener(ContextListener *listener){
+	mContextListeners.erase(std::remove(mContextListeners.begin(),mContextListeners.end(),listener),mContextListeners.end());
+}
+
 Texture::ptr Engine::createNormalizationTexture(int size){
 	Texture::ptr texture=shared_static_cast<NormalizationTextureCreator>(mNormalizationCreator)->createNormalizationTexture(size);
 	mTextureManager->manage(texture);

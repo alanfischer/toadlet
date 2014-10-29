@@ -28,7 +28,7 @@
 
 #include <toadlet/tadpole/Types.h>
 #include <toadlet/egg/Type.h>
-#include <toadlet/egg/PointerCollection.h>
+#include <toadlet/egg/Collection.h>
 #include <toadlet/egg/Iterator.h>
 #include <toadlet/tadpole/Bound.h>
 #include <toadlet/tadpole/BaseComponent.h>
@@ -112,7 +112,7 @@ public:
 
 	virtual void nodeAttached(Node *node);
 	virtual void nodeRemoved(Node *node);
-	virtual NodeRange getNodes() const{return NodeRange::wrapPointerCollection(mNodes);}
+	virtual NodeRange getNodes() const{return NodeRange::wrapCollection(mNodes);}
 	virtual Node *getNode(const String &name) const;
 	virtual Node *getNode(const Type<Component> *type) const;
 	template<typename Type> Type *getNodeType() const{return (Type*)getNode(Type::type());}
@@ -201,8 +201,8 @@ public:
 	inline Scene *getScene() const{return (Scene*)mScene;}
 
 protected:
-	typedef PointerCollection<Component> ComponentCollection;
-	typedef PointerCollection<Node> NodeCollection;
+	typedef Collection<Component::ptr> ComponentCollection;
+	typedef Collection<Node::ptr> NodeCollection;
 
 	virtual void calculateBound();
 

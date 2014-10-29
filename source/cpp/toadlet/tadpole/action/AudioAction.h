@@ -43,8 +43,8 @@ public:
 
 	bool getActive() const{return mRunning;}
 
-	void addActionListener(ActionListener *listener){mListeners.add(listener);}
-	void removeActionListener(ActionListener *listener){mListeners.remove(listener);}
+	void addActionListener(ActionListener *listener);
+	void removeActionListener(ActionListener *listener);
 
 	void setAudio(AudioComponent *audio);
 

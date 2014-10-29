@@ -287,20 +287,20 @@ void ALAudioDevice::setListenerGain(scalar gain){
 }
 
 ALuint ALAudioDevice::checkoutSourceHandle(ALAudio *audio){
-	mAudios.add(audio);
+	mAudios.push_back(audio);
 
 	ALuint handle=-1;
-	if(mSourcePool.size()>0){
-		handle=mSourcePool[0];
-		mSourcePool.removeAt(0);
+	if(mSourcePool.empty()==false){
+		handle=mSourcePool.front();
+		mSourcePool.erase(mSourcePool.begin());
 	}
 	return handle;
 }
 
 void ALAudioDevice::checkinSourceHandle(ALAudio *audio,ALuint source){
-	mSourcePool.add(source);
+	mSourcePool.push_back(source);
 
-	mAudios.remove(audio);
+	mAudios.erase(std::remove(mAudios.begin(),mAudios.end(),audio),mAudios.end());
 }
 
 void ALAudioDevice::preDestroyBuffer(ALAudioBuffer *buffer){

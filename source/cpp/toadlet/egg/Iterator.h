@@ -65,7 +65,7 @@ public:
 	void increment(){++iter;}
 	void decrement(){--iter;}
 	Iterator<PointerType> *clone() const{return new WrapPointerIterator(iter);}
-	PointerType dereference() const{return &*iter;}
+	PointerType dereference() const{return *iter;}
 	bool equals(Iterator<PointerType> *it) const{return iter==((WrapPointerIterator*)it)->iter;}
 
 	IteratorType iter;
@@ -74,6 +74,13 @@ public:
 template<typename Type>
 class AnyIterator{
 public:
+	typedef Type value_type;
+	typedef Type& reference;
+	typedef const Type& const_reference;
+	typedef Type* pointer;
+	typedef int difference_type;
+	struct iterator_category{};
+
 	AnyIterator(const Iterator<Type> &it):iter(it.clone()){}
 	AnyIterator(const AnyIterator &it):iter(it.iter->clone()){}
 	AnyIterator():iter(NULL){}
@@ -94,6 +101,13 @@ public:
 template<typename Type>
 class AnyPointerIterator{
 public:
+	typedef Type value_type;
+	typedef Type& reference;
+	typedef const Type& const_reference;
+	typedef Type* pointer;
+	typedef int difference_type;
+	struct iterator_category{};
+
 	AnyPointerIterator(const Iterator<Type*> &it):iter(it.clone()){}
 	AnyPointerIterator(const AnyPointerIterator &it):iter(it.iter->clone()){}
 	AnyPointerIterator():iter(NULL){}
@@ -116,10 +130,14 @@ public:
 template<typename Type>
 class IteratorRange{
 public:
-	typedef Type value_type;
 	typedef AnyIterator<Type> iterator;
-	typedef Type& reference;
-	typedef const Type& const_reference;
+
+	typedef typename iterator::value_type value_type;
+	typedef typename iterator::reference reference;
+	typedef typename iterator::const_reference const_reference;
+	typedef typename iterator::pointer pointer;
+	typedef typename iterator::difference_type difference_type;
+	typedef typename iterator::iterator_category iterator_category;
 
 	IteratorRange(){}
 	IteratorRange(const IteratorRange &range):beginit(range.beginit),endit(range.endit){}
@@ -140,10 +158,14 @@ public:
 template<typename Type>
 class PointerIteratorRange{
 public:
-	typedef Type* value_type;
 	typedef AnyPointerIterator<Type> iterator;
-	typedef Type*& reference;
-	typedef const Type*& const_reference;
+
+	typedef typename iterator::value_type value_type;
+	typedef typename iterator::reference reference;
+	typedef typename iterator::const_reference const_reference;
+	typedef typename iterator::pointer pointer;
+	typedef typename iterator::difference_type difference_type;
+	typedef typename iterator::iterator_category iterator_category;
 
 	PointerIteratorRange(){}
 	PointerIteratorRange(const PointerIteratorRange &range):beginit(range.beginit),endit(range.endit){}
@@ -151,13 +173,13 @@ public:
 
 	template<typename CollectionType>
 	static PointerIteratorRange wrapCollection(const CollectionType &collection){return PointerIteratorRange(
-		WrapIterator<Type*,typename CollectionType::iterator>(collection.begin()),
-		WrapIterator<Type*,typename CollectionType::iterator>(collection.end()));}
+		WrapIterator<Type*,typename CollectionType::iterator>(const_cast<CollectionType&>(collection).begin()),
+		WrapIterator<Type*,typename CollectionType::iterator>(const_cast<CollectionType&>(collection).end()));}
 
 	template<typename CollectionType>
 	static PointerIteratorRange wrapPointerCollection(const CollectionType &collection){return PointerIteratorRange(
-		WrapPointerIterator<Type*,typename CollectionType::iterator>(collection.begin()),
-		WrapPointerIterator<Type*,typename CollectionType::iterator>(collection.end()));}
+		WrapPointerIterator<Type*,typename CollectionType::iterator>(const_cast<CollectionType&>(collection).begin()),
+		WrapPointerIterator<Type*,typename CollectionType::iterator>(const_cast<CollectionType&>(collection).end()));}
 
 	inline const iterator &begin() const{return beginit;}
 	inline const iterator &end() const{return endit;}

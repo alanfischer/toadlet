@@ -177,7 +177,7 @@ cPlugIn::findEmptyBones(msModel *pModel,Collection<int> &emptyBones){
 				}
 			}
 			if(j==msModel_GetBoneCount(pModel)){
-				emptyBones.add(i);
+				emptyBones.push_back(i);
 			}
 		}
 	}
@@ -265,7 +265,7 @@ cPlugIn::exportMesh(msModel *pModel,const String &name){
 				convertMSVec3ToVector3(vert,v.position,true);
 				v.texCoord=Vector2(tex[0],1.0f-tex[1]);
 				convertMSVec3ToVector3(norm,v.normal,true);
-				v.bones.add(Mesh::VertexBoneAssignment(bone,1));
+				v.bones.push_back(Mesh::VertexBoneAssignment(bone,1));
 
 				int l;
 				for(l=0;l<vertexes.size();++l){
@@ -273,11 +273,11 @@ cPlugIn::exportMesh(msModel *pModel,const String &name){
 				}
 
 				if(l==vertexes.size()){
-					vertexes.add(v);
-					indexes[i].add(vertexes.size()-1);
+					vertexes.push_back(v);
+					indexes[i].push_back(vertexes.size()-1);
 				}
 				else{
-					indexes[i].add(l);
+					indexes[i].push_back(l);
 				}
 			}
 		}
@@ -524,10 +524,10 @@ cPlugIn::exportAnimation(msModel *pModel,const String &name){
 				Math::add(frame.translate,skeleton->getBone(newi)->translate);
 				frame.translateSet=true;
 				if(insertAfter==-1){
-					frames.add(frame);
+					frames.push_back(frame);
 				}
 				else{
-					frames.insert(insertAfter+1,frame);
+					frames.insert(frames.begin()+insertAfter+1,frame);
 				}
 			}
 		}
@@ -558,10 +558,10 @@ cPlugIn::exportAnimation(msModel *pModel,const String &name){
 				Math::preMul(frame.rotate,skeleton->getBone(newi)->rotate);
 				frame.rotateSet=true;
 				if(insertAfter==-1){
-					frames.add(frame);
+					frames.push_back(frame);
 				}
 				else{
-					frames.insert(insertAfter+1,frame);
+					frames.insert(frames.begin()+insertAfter+1,frame);
 				}
 			}
 		}

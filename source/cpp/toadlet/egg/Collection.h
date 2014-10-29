@@ -27,19 +27,37 @@
 #define TOADLET_EGG_COLLECTION_H
 
 #include <toadlet/egg/Types.h>
+#include <algorithm>
+#include <vector>
 
 namespace toadlet{
 namespace egg{
-
+#if 1
 template<typename Type>
 class TOADLET_API Collection{
 public:
 	typedef Type value_type;
-	
+	typedef Type& reference;
+	typedef const Type& const_reference;
+	typedef Type* pointer;
+	typedef int difference_type;
+	#if defined(TOADLET_COLLECTION_ITERATOR_CATEGORY)
+		typedef TOADLET_COLLECTION_ITERATOR_CATEGORY iterator_category;
+	#else
+		typedef struct{} iterator_category;
+	#endif
+
 	class const_iterator;
 
     class iterator{
     public:
+		typedef typename Collection<Type>::value_type value_type;
+		typedef typename Collection<Type>::reference reference;
+		typedef typename Collection<Type>::const_reference const_reference;
+		typedef typename Collection<Type>::pointer pointer;
+		typedef typename Collection<Type>::difference_type difference_type;
+		typedef typename Collection<Type>::iterator_category iterator_category;
+
 		inline iterator():parent(NULL),index(0){}
 		inline iterator(Collection *p,int i):parent(p),index(i){}
 		inline iterator(const iterator &it):parent(it.parent),index(it.index){}
@@ -67,6 +85,14 @@ public:
 
     class const_iterator{
     public:
+
+		typedef typename Collection<Type>::value_type value_type;
+		typedef typename Collection<Type>::reference reference;
+		typedef typename Collection<Type>::const_reference const_reference;
+		typedef typename Collection<Type>::pointer pointer;
+		typedef typename Collection<Type>::difference_type difference_type;
+		typedef typename Collection<Type>::iterator_category iterator_category;
+
 		inline const_iterator():parent(NULL),index(0){}
 		inline const_iterator(Collection *p,int i):parent(p),index(i){}
 		inline const_iterator(const const_iterator &it):parent(it.parent),index(it.index){}
@@ -290,41 +316,23 @@ public:
 		return iterator(this,iit);
 	}
 
-	template<typename Type2> bool remove(const Type2 &type){
+	iterator erase(const iterator &start,const iterator &end){
+		int istart=start-begin();
+		int iend=end-begin();
+		int size=end-start;
+
 		int i;
-		for(i=0;i<mSize;++i){
-			if(mData[i]==type){
-				break;
-			}
+		for(i=istart+size;i<mSize;++i){
+			mData[i-size]=mData[i];
 		}
+		for(i=mSize-size;i<mSize;++i){
+			mData[i]=Type();
+		}
+		mSize-=size;
+		mEnd=iterator(this,mSize);
 
-		if(i<mSize){
-			for(i++;i<mSize;++i){
-				mData[i-1]=mData[i];
-			}
-
-			mData[mSize-1]=Type();
-			mSize--;
-			mEnd=iterator(this,mSize);
-			
-			return true;
-		}
-		else{
-			return false;
-		}
+		return iterator(this,istart);
 	}
-
-	template<typename Type2> int indexOf(const Type2 &type) const{
-		int i;
-		for(i=0;i<mSize;++i){
-			if(mData[i]==type){
-				return i;
-			}
-		}
-		return -1;
-	}
-
-	template<typename Type2> bool contains(const Type2 &type) const{return indexOf(type)>=0;}
 
 	void reserve(int s){
 		if(mCapacity<s){
@@ -366,23 +374,11 @@ public:
 	inline int capacity() const{return mCapacity;}
 	inline bool empty() const{return mSize==0;}
 
-	inline void removeAt(int i){erase(begin()+i);}
-	inline void add(const Type &type){push_back(type);}
-	inline void setAt(int index,const Type &type){mData[index]=type;}
-	inline void addAll(const Collection<Type> &collection){insert(end(),collection.begin(),collection.end());}
-	inline void insert(int index,const Type &type){insert(begin()+index,type);}
-	
-	inline Type *toArray(){return mData;}
-	inline const Type *toArray() const{return mData;}
-
 	inline Type &at(int n){return mData[n];}
 	inline const Type &at(int n) const{return mData[n];}
 	
 	inline Type &operator[](int n){return mData[n];}
 	inline const Type &operator[](int n) const{return mData[n];}
-
-	inline operator Type *(){return mData;}
-	inline operator const Type *() const{return mData;}
 
 	Collection &operator=(const Collection &c){
 		reserve(c.mCapacity);
@@ -418,6 +414,9 @@ protected:
 	Type *mData;
 	iterator mBegin,mEnd;
 };
+#else
+#define Collection std::vector
+#endif
 
 }
 }

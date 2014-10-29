@@ -61,8 +61,8 @@ public:
 
 	bool getActive() const;
 
-	void addActionListener(ActionListener *listener){mListeners.add(listener);}
-	void removeActionListener(ActionListener *listener){mListeners.remove(listener);}
+	void addActionListener(ActionListener *listener);
+	void removeActionListener(ActionListener *listener);
 
 	void actionStarted(Action *action);
 	void actionStopped(Action *action);

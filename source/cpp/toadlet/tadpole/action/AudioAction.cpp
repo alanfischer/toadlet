@@ -37,6 +37,14 @@ AudioAction::AudioAction(AudioComponent *audio):
 {
 }
 
+void AudioAction::addActionListener(ActionListener *listener){
+	mListeners.push_back(listener);
+}
+
+void AudioAction::removeActionListener(ActionListener *listener){
+	mListeners.erase(std::remove(mListeners.begin(),mListeners.end(),listener),mListeners.end());
+}
+
 void AudioAction::setAudio(AudioComponent *audio){
 	mAudio=audio;
 }

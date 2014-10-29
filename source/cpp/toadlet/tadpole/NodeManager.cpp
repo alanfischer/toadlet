@@ -28,10 +28,9 @@ void NodeManager::nodeCreated(Node *node){
 			mMutex.lock();
 		#endif
 
-		int size=mFreeHandles.size();
-		if(size>0){
-			handle=mFreeHandles.at(size-1);
-			mFreeHandles.removeAt(size-1);
+		if(mFreeHandles.empty()==false){
+			handle=mFreeHandles.back();
+			mFreeHandles.pop_back();
 		}
 		else{
 			handle=mNodes.size();
@@ -56,7 +55,7 @@ void NodeManager::nodeDestroyed(Node *node){
 
 	if(handle>0 && mNodes[handle]==node){
 		mNodes[handle]=NULL;
-		mFreeHandles.add(handle);
+		mFreeHandles.push_back(handle);
 	}
 
 	#if defined(TOADLET_THREADSAFE)

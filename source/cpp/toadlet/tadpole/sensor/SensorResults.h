@@ -28,6 +28,7 @@
 
 #include <toadlet/tadpole/sensor/SensorResultsListener.h>
 #include <toadlet/tadpole/Node.h>
+#include <toadlet/egg/Iterator.h>
 
 namespace toadlet{
 namespace tadpole{
@@ -37,8 +38,8 @@ class TOADLET_API SensorResults:public Object,public SensorResultsListener{
 public:
 	TOADLET_OBJECT(SensorResults);
 
-	typedef PointerCollection<Node> NodeCollection;
-	typedef NodeCollection::iterator iterator;
+	typedef PointerIteratorRange<Node> NodeRange;
+	typedef NodeRange::iterator iterator;
 
 	SensorResults();
 
@@ -49,13 +50,15 @@ public:
 	bool resultFound(Node *result,scalar distance);
 	void sensingEnding();
 	
-	inline const NodeCollection::iterator &begin(){return mNodes.begin();}
-	inline const NodeCollection::iterator &end(){return mNodes.end();}
+	inline const iterator &begin(){return mRange.begin();}
+	inline const iterator &end(){return mRange.end();}
+	inline bool empty() const{return mRange.empty();}
 	inline int size() const{return mNodes.size();}
 
 protected:
 	int mScope;
-	NodeCollection mNodes;
+	Collection<Node::ptr> mNodes;
+	NodeRange mRange;
 };
 
 }

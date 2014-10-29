@@ -124,7 +124,8 @@ public:
 
 			for(int i=0;i<grass->getNumSubMeshes();++i){
 				Mesh::SubMesh *subMesh=grass->getSubMesh(i);
-				tforeach(Material::PathCollection::iterator,path,subMesh->material->getPaths()){
+				tforeach(Material::PathCollection::iterator,it,subMesh->material->getPaths()){
+					RenderPath *path=*it;
 					RenderPass *pass=path->getPasses()[0];
 					RenderState *state=pass->getRenderState();
 

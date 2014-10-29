@@ -78,7 +78,7 @@ int main(int argc,char **argv){
 					keepNormals=true;
 				}
 				if(arg.substr(j,1)=="s"){
-					skip.add(arg.substr(j+1,arg.length()-(j+1)).toInt32());
+					skip.push_back(arg.substr(j+1,arg.length()-(j+1)).toInt32());
 				}
 				if(arg.substr(j,1)=="e"){
 					lightEdges=false;

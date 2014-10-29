@@ -70,6 +70,14 @@ void AnimationAction::setTimeScale(scalar scale){
 	mTimeScale=scale;
 }
 
+void AnimationAction::addActionListener(ActionListener *listener){
+	mListeners.push_back(listener);
+}
+
+void AnimationAction::removeActionListener(ActionListener *listener){
+	mListeners.erase(std::remove(mListeners.begin(),mListeners.end(),listener),mListeners.end());
+}
+
 void AnimationAction::start(){
 	if(mResetOnStart){
 		mTime=0;
@@ -182,7 +190,7 @@ void AnimationAction::setValue(scalar value){
 }
 
 void AnimationAction::attach(Animation *animation){
-	mAnimations.add(animation);
+	mAnimations.push_back(animation);
 
 	animation->setAnimationListener(this);
 
@@ -192,7 +200,7 @@ void AnimationAction::attach(Animation *animation){
 void AnimationAction::remove(Animation *animation){
 	animation->setAnimationListener(NULL);
 
-	mAnimations.remove(animation);
+	mAnimations.erase(std::remove(mAnimations.begin(),mAnimations.end(),animation),mAnimations.end());
 
 	animationExtentsChanged(NULL);
 }

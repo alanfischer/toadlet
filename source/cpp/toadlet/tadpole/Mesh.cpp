@@ -86,6 +86,25 @@ void Mesh::compileBoneBounds(){
 	}
 }
 
+void Mesh::addSubMesh(SubMesh::ptr subMesh){
+	mSubMeshes.push_back(subMesh);
+}
+
+void Mesh::removeSubMesh(SubMesh::ptr subMesh){
+	mSubMeshes.erase(std::remove(mSubMeshes.begin(),mSubMeshes.end(),subMesh),mSubMeshes.end());
+}
+
+Mesh::SubMesh::ptr Mesh::getSubMesh(const String &name){
+	int i;
+	for(i=0;i<mSubMeshes.size();++i){
+		if(mSubMeshes[i]->getName().equals(name)){
+			return mSubMeshes[i];
+		}
+	}
+
+	return NULL;
+}
+
 void Mesh::setStaticVertexData(VertexData::ptr vertexData){
 	if(mStaticVertexData!=NULL){
 		mStaticVertexData->destroy();

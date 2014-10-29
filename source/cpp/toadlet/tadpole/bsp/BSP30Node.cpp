@@ -45,7 +45,7 @@ void BSP30Node::setMap(const String &name){
 }
 
 void BSP30Node::setMap(BSP30Map *map){
-	tforeach(NodeCollection::iterator,node,mNodes){
+	tforeach(NodeRange::iterator,node,getNodes()){
 		Collection<int> &indexes=((childdata*)node->getParentData())->leafs;
 		removeNodeLeafIndexes(indexes,node);
 	}
@@ -56,7 +56,7 @@ void BSP30Node::setMap(BSP30Map *map){
 	mMarkedFaces=new uint8[(mMap->nfaces+7)>>3]; // Allocate enough markedfaces for 1 bit for each face
 	mVisibleMaterialFaces.resize(map->miptexlump->nummiptex);
 
-	tforeach(NodeCollection::iterator,node,mNodes){
+	tforeach(NodeRange::iterator,node,getNodes()){
 		Collection<int> &indexes=((childdata*)node->getParentData())->leafs;
 		findBoundLeafs(indexes,node);
 		insertNodeLeafIndexes(indexes,node);
@@ -135,24 +135,16 @@ void BSP30Node::nodeRemoved(Node *node){
 void BSP30Node::insertNodeLeafIndexes(const Collection<int> &indexes,Node *node){
 	int i;
 	for(i=indexes.size()-1;i>=0;--i){
-		if(indexes[i]<0){
-			mGlobalLeafData.occupants.add(node);
-		}
-		else{
-			mLeafData[indexes[i]].occupants.add(node);
-		}
+		Collection<Node*> &occupants=indexes[i]<0 ? mGlobalLeafData.occupants : mLeafData[indexes[i]].occupants;
+		occupants.push_back(node);
 	}
 }
 
 void BSP30Node::removeNodeLeafIndexes(const Collection<int> &indexes,Node *node){
 	int i;
 	for(i=indexes.size()-1;i>=0;--i){
-		if(indexes[i]<0){
-			mGlobalLeafData.occupants.remove(node);
-		}
-		else{
-			mLeafData[indexes[i]].occupants.remove(node);
-		}
+		Collection<Node*> &occupants=indexes[i]<0 ? mGlobalLeafData.occupants : mLeafData[indexes[i]].occupants;
+		occupants.erase(std::remove(occupants.begin(),occupants.end(),node),occupants.end());
 	}
 }
 
@@ -191,7 +183,8 @@ void BSP30Node::gatherRenderables(Camera *camera,RenderableSet *set){
 			mMap->updateFaceLights(faceIndex);
 		}
 
-		tforeach(NodeCollection::iterator,node,mNodes){
+		tforeach(NodeCollection::iterator,it,mNodes){
+			Node *node=*it;
 			if((camera->getScope()&node->getScope())!=0 && camera->culled(node->getWorldBound())==false){
 				node->gatherRenderables(camera,set);
 			}
@@ -304,7 +297,8 @@ bool BSP30Node::sensePotentiallyVisible(SensorResultsListener *listener,const Ve
 	memset(&mVisibleMaterialFaces[0],0,sizeof(BSP30Map::facedata*)*mVisibleMaterialFaces.size());
 	int leaf=mMap->findPointLeaf(mMap->planes,mMap->nodes,sizeof(bnode),0,point);
 	if(leaf==0 || mMap->nvisibility==0){
-		tforeach(NodeCollection::iterator,node,mNodes){
+		tforeach(NodeCollection::iterator,it,mNodes){
+			Node *node=*it;
 			result|=true;
 			if(listener->resultFound(node,Math::lengthSquared(point,node->getWorldTranslate()))==false){
 				return true;
@@ -421,7 +415,8 @@ void BSP30Node::render(RenderManager *manager) const{
 	for(i=0;i<mVisibleMaterialFaces.size();i++){
 		if(mVisibleMaterialFaces[i]!=NULL){
 			RenderPath *path=mMap->materials[i]->getBestPath();
-			tforeach(RenderPath::PassCollection::iterator,pass,path->getPasses()){
+			tforeach(RenderPath::PassCollection::const_iterator,it,path->getPasses()){
+				RenderPass *pass=*it;
 				manager->setupPass(pass,manager->getDevice());
 				manager->setupPassForRenderable(pass,manager->getDevice(),(Renderable*)this,Math::ZERO_VECTOR4);
 				mMap->renderFaces(manager->getDevice(),mVisibleMaterialFaces[i]);
@@ -490,14 +485,14 @@ void BSP30Node::addLeafToVisible(bleaf *leaf,const Vector3 &cameraPosition){
 	}
 }
 
-void BSP30Node::findBoundLeafs(egg::Collection<int> &leafs,Node *node){
+void BSP30Node::findBoundLeafs(Collection<int> &leafs,Node *node){
 	Bound *bound=node->getWorldBound();
 
 	const AABox &box=bound->getAABox();
 	// If the radius is infinite or greater than our threshold, assume its global
 	scalar threshold=512;
 	if(bound->getType()==Bound::Type_INFINITE || box.maxs.x-box.mins.x>=threshold || box.maxs.y-box.mins.y>=threshold || box.maxs.z-box.mins.z>=threshold){
-		leafs.add(-1);
+		leafs.push_back(-1);
 	}
 	else{
 		mMap->findBoundLeafs(leafs,mMap->nodes,0,box);

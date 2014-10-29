@@ -66,14 +66,14 @@ public:
 	void compile();
 
 	int getNumBones() const{return mBones.size();}
-	void addBone(Bone *bone){mBones.add(bone);}
-	void removeBone(int i){mBones.removeAt(i);}
+	void addBone(Bone *bone){mBones.push_back(bone);}
+	void removeBone(int i){mBones.erase(mBones.begin()+i);}
 	Bone *getBone(int i) const{return mBones[i];}
 	Bone *getBone(const String &name) const;
 
 	int getNumSequences() const{return mSequences.size();}
-	void addSequence(Sequence *sequence){mSequences.add(sequence);}
-	void removeSequence(int i){mSequences.removeAt(i);}
+	void addSequence(Sequence *sequence){mSequences.push_back(sequence);}
+	void removeSequence(int i){mSequences.erase(mSequences.begin()+i);}
 	Sequence *getSequence(int i){return mSequences[i];}
 
 protected:

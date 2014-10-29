@@ -97,8 +97,8 @@ public:
 	void contextActivate(RenderDevice *renderDevice);
 	void contextDeactivate(RenderDevice *renderDevice);
 
-	void addContextListener(ContextListener *listener){mContextListeners.add(listener);}
-	void removeContextListener(ContextListener *listener){mContextListeners.remove(listener);}
+	void addContextListener(ContextListener *listener);
+	void removeContextListener(ContextListener *listener);
 
 	inline ArchiveManager *getArchiveManager() const{return mArchiveManager;}
 	inline TextureManager *getTextureManager() const{return mTextureManager;}

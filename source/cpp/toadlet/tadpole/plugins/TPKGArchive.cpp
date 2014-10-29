@@ -83,7 +83,7 @@ bool TPKGArchive::open(Stream::ptr stream){
 		index.position=mStream->readBUInt32();mDataOffset+=4;
 		index.length=mStream->readBUInt32();mDataOffset+=4;
 
-		mEntries.add(name);
+		mEntries.push_back(name);
 		mIndex[name]=index;
 		delete[] name;
 	}

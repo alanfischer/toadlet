@@ -102,6 +102,13 @@ public:
 		typedef Type value_type;
 		typedef Type& reference;
 		typedef const Type& const_reference;
+		typedef Type* pointer;
+		typedef int difference_type;
+		#if defined(TOADLET_LOGGER_ITERATOR_CATEGORY)
+			typedef TOADLET_LOGGER_ITERATOR_CATEGORY iterator_category;
+		#else
+		typedef struct{} iterator_category;
+		#endif
 	
 		struct node{
 			node():next(NULL){}
@@ -110,6 +117,13 @@ public:
 		};
 
 		struct iterator{
+			typedef typename List<Type>::value_type value_type;
+			typedef typename List<Type>::reference reference;
+			typedef typename List<Type>::const_reference const_reference;
+			typedef typename List<Type>::pointer pointer;
+			typedef typename List<Type>::difference_type difference_type;
+			typedef typename List<Type>::iterator_category iterator_category;
+
 			iterator(node *n):next(n){}
 			inline operator Type&() const{return next->item;}
 			inline Type &operator*() const{return next->item;}

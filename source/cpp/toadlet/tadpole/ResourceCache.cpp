@@ -33,7 +33,7 @@ ResourceCache::ResourceCache():
 {}
 
 void ResourceCache::cacheResource(const String &name,ResourceManager *manager,ResourceData *data){
-	mCacheInfos.add(CacheInfo(name,manager,data));
+	mCacheInfos.push_back(CacheInfo(name,manager,data));
 }
 
 void ResourceCache::startCaching(){
@@ -47,7 +47,7 @@ void ResourceCache::startCaching(){
 }
 	
 void ResourceCache::resourceReady(Resource *resource){
-	mResources.add(resource);
+	mResources.push_back(resource);
 	mCacheInfos.pop_back();
 	startCaching();
 }

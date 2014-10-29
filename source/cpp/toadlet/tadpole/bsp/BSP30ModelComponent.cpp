@@ -142,7 +142,7 @@ void BSP30ModelComponent::setModel(BSP30Map *map,int index){
 			if(mSharedRenderState!=NULL){
 				subModel->mMaterial=mEngine->getMaterialManager()->createSharedMaterial(subModel->mMaterial,mSharedRenderState);
 			}
-			mSubModels.add(subModel);
+			mSubModels.push_back(subModel);
 		}
 		else{
 			facedata->next=mSubModels[j]->mFaces;

@@ -120,11 +120,14 @@ void Simulator::setGravity(const Vector3 &gravity){
 }
 
 void Simulator::addSolid(Solid *solid){
-	if(mSolids.contains(solid)){
-		return;
+	int i;
+	for(i=0;i<mSolids.size();++i){
+		if(solid==mSolids[i]){
+			return;
+		}
 	}
 
-	mSolids.add(solid);
+	mSolids.push_back(solid);
 
 	solid->internal_setSimulator(this);
 	solid->activate();
@@ -169,15 +172,18 @@ void Simulator::removeSolid(Solid *solid){
 
 	solid->internal_setSimulator(NULL);
 
-	mSolids.remove(solid);
+	mSolids.erase(std::remove(mSolids.begin(),mSolids.end(),solid),mSolids.end());
 }
 
 void Simulator::addConstraint(Constraint *constraint){
-	if(mConstraints.contains(constraint)){
-		return;
+	int i;
+	for(i=0;i<mConstraints.size();++i){
+		if(constraint==mConstraints[i]){
+			return;
+		}
 	}
 
-	mConstraints.add(constraint);
+	mConstraints.push_back(constraint);
 
 	constraint->internal_setSimulator(this);
 	constraint->activate();
@@ -186,7 +192,7 @@ void Simulator::addConstraint(Constraint *constraint){
 void Simulator::removeConstraint(Constraint *constraint){
 	constraint->internal_setSimulator(NULL);
 
-	mConstraints.remove(constraint);
+	mConstraints.erase(std::remove(mConstraints.begin(),mConstraints.end(),constraint),mConstraints.end());
 }
 
 void Simulator::update(int dt,int scope,Solid *solid){
@@ -419,7 +425,7 @@ void Simulator::updateSolid(Solid *solid,int dt,scalar fdt){
 			box.maxs.y+=m;
 			box.maxs.z+=m;
 
-			mNumSpacialCollection=findSolidsInAABox(box,mSpacialCollection,mSpacialCollection.size());
+			mNumSpacialCollection=findSolidsInAABox(box,&mSpacialCollection[0],mSpacialCollection.size());
 		}
 	}
 
@@ -715,7 +721,7 @@ void Simulator::traceSegment(Collision &result,const Segment &segment,int collid
 	segment.getEndPoint(endPoint);
 	AABox total=cache_traceSegment_total.set(segment.origin,segment.origin);
 	total.merge(endPoint);
-	mNumSpacialCollection=findSolidsInAABox(total,mSpacialCollection,mSpacialCollection.size());
+	mNumSpacialCollection=findSolidsInAABox(total,&mSpacialCollection[0],mSpacialCollection.size());
 
 	traceSegmentWithCurrentSpacials(result,segment,collideWithScope,ignore);
 }
@@ -727,7 +733,7 @@ void Simulator::traceSolid(Collision &result,Solid *solid,const Segment &segment
 	Math::add(box.mins,solid->mLocalBound.mins);
 	Math::add(box.maxs,solid->mLocalBound.maxs);
 
-	mNumSpacialCollection=findSolidsInAABox(box,mSpacialCollection,mSpacialCollection.size());
+	mNumSpacialCollection=findSolidsInAABox(box,&mSpacialCollection[0],mSpacialCollection.size());
 
 	traceSolidWithCurrentSpacials(result,solid,segment,collideWithScope);
 }

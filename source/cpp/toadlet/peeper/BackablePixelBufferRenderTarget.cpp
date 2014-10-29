@@ -51,8 +51,8 @@ void BackablePixelBufferRenderTarget::destroy(){
 }
 
 bool BackablePixelBufferRenderTarget::attach(PixelBuffer::ptr buffer,Attachment attachment){
-	mBuffers.add(buffer);
-	mBufferAttachments.add(attachment);
+	mBuffers.push_back(buffer);
+	mBufferAttachments.push_back(attachment);
 	
 	if(mBack!=NULL){
 		return mBack->attach(buffer,attachment);
@@ -73,8 +73,8 @@ bool BackablePixelBufferRenderTarget::remove(PixelBuffer::ptr buffer){
 		return false;
 	}
 
-	mBuffers.removeAt(i);
-	mBufferAttachments.removeAt(i);
+	mBuffers.erase(mBuffers.begin()+i);
+	mBufferAttachments.erase(mBufferAttachments.begin()+i);
 
 	if(mBack!=NULL){
 		return mBack->remove(buffer);

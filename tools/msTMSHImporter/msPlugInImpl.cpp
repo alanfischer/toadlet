@@ -180,7 +180,7 @@ cPlugIn::importMesh(msModel *pModel,const String &name,int flags){
 					if(v==vertexesToAdd[x]) break;
 				}
 				if(x==vertexesToAdd.size()){
-					vertexesToAdd.add(v);
+					vertexesToAdd.push_back(v);
 					oldToNewMap[v]=vertexesToAdd.size()-1;
 				}
 			}

@@ -2628,14 +2628,14 @@ void GLRenderDevice::vertexFormatDestroyed(GLVertexFormat *format){
 				if(layout!=NULL){
 					layout->destroy();
 				}
-				state->mLayouts.removeAt(handle);
+				state->mLayouts.erase(state->mLayouts.begin()+handle);
 			}
 		}
 	#endif
 	for(i=handle;i<mVertexFormats.size();++i){
 		mVertexFormats[i]->mRenderHandle--;
 	}
-	mVertexFormats.removeAt(handle);
+	mVertexFormats.erase(mVertexFormats.begin()+handle);
 
 	#if defined(TOADLET_THREADSAFE)
 		mMutex.unlock();
@@ -2647,7 +2647,7 @@ void GLRenderDevice::shaderStateCreated(GLSLShaderState *state){
 		mMutex.lock();
 	#endif
 
-	mShaderStates.add(state);
+	mShaderStates.push_back(state);
 
 	#if defined(TOADLET_THREADSAFE)
 		mMutex.unlock();
@@ -2659,7 +2659,7 @@ void GLRenderDevice::shaderStateDestroyed(GLSLShaderState *state){
 		mMutex.lock();
 	#endif
 
-	mShaderStates.remove(state);
+	mShaderStates.erase(std::remove(mShaderStates.begin(),mShaderStates.end(),state),mShaderStates.end());
 
 	#if defined(TOADLET_THREADSAFE)
 		mMutex.unlock();

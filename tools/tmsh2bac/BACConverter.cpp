@@ -154,13 +154,13 @@ bool BACConverter::extractMeshData(Mesh::ptr mesh,bool useSubmeshes){
 		}
 
 		v->id=i;
-		vertexList.add(v);
+		vertexList.push_back(v);
 
 		if(texCoordIndex>=0){
 			BACTexCoord *t=new BACTexCoord();
 			vba.get2(i,texCoordIndex,t->texture);
 			t->id=i;
-			texCoordList.add(t);
+			texCoordList.push_back(t);
 		}
 	}
 	vba.unlock();
@@ -181,7 +181,7 @@ bool BACConverter::extractMeshData(Mesh::ptr mesh,bool useSubmeshes){
 
 		// Reassign id number and add to mVertices
 		v1->id=i;
-		mVertices.add(v1);
+		mVertices.push_back(v1);
 
 		// Eliminate duplicate vertices
 		while(vit2!=vertexList.end()){
@@ -221,7 +221,7 @@ bool BACConverter::extractMeshData(Mesh::ptr mesh,bool useSubmeshes){
 
 		// Reassign id number and add to mMaterials
 		t1->id=i;
-		mTexCoords.add(t1);
+		mTexCoords.push_back(t1);
 		
 		// Eliminate duplicate texture coords
 		while(tit2!=texCoordList.end()){
@@ -292,7 +292,7 @@ bool BACConverter::extractMeshData(Mesh::ptr mesh,bool useSubmeshes){
 			}
 			tri->dead=false;
 			
-			mTriangles.add(tri);
+			mTriangles.push_back(tri);
 		}
 		iba.unlock();
 
@@ -330,25 +330,25 @@ bool BACConverter::extractMeshData(Mesh::ptr mesh,bool useSubmeshes){
 				else{
 					Log::alert(String("Texture ")+texture->getName()+" not found, a texture must be available so msh2bac can determine the texture size.  Will default to 256x256");
 				}
-				mTextures.add(Vector2(width,height));
+				mTextures.push_back(Vector2(width,height));
 				m->textureIndex=mTextures.size()-1;
 				m->colorIndex=-1;
 			}
 			else{
-				mColors.add(materialState.diffuse);
+				mColors.push_back(materialState.diffuse);
 				m->textureIndex=-1;
 				m->colorIndex=mColors.size()-1;
 			}
 		}
 		else{
-			mColors.add(Colors::WHITE);
+			mColors.push_back(Colors::WHITE);
 			m->doubleSided=true;
 			m->lighting=true;
 			m->colorIndex=mColors.size()-1;
 			m->textureIndex=-1;
 		}
 
-		mMaterials.add(m);
+		mMaterials.push_back(m);
 	}
 
 	Log::alert(String("Number of mTriangles: ")+mTriangles.size()+" triangles");
@@ -363,9 +363,9 @@ bool BACConverter::extractMeshData(Mesh::ptr mesh,bool useSubmeshes){
 		bone->hasBrother=false;
 
 		for(i=0;i<mVertices.size();++i){
-			bone->vertexIndexes.add(i);
+			bone->vertexIndexes.push_back(i);
 		}
-		mBones.add(bone);
+		mBones.push_back(bone);
 	}
 	else{
 		SkeletonComponent::ptr skeleton=new SkeletonComponent(mEngine,mesh->getSkeleton());
@@ -436,11 +436,11 @@ void BACConverter::buildBones(Mesh *mesh,SkeletonComponent *nodeSkeleton,int bon
 	// be more efficient, but this is just a conversion utility and it won't really matter
 	for(i=0;i<mVertices.size();++i){
 		if(mVertices[i]->bone==bone){
-			bacBone->vertexIndexes.add(i);
+			bacBone->vertexIndexes.push_back(i);
 		}
 	}
 
-	mBones.add(bacBone);
+	mBones.push_back(bacBone);
 
 	if(nextChild!=-1){
 		buildBones(mesh,nodeSkeleton,nextChild);
@@ -499,7 +499,7 @@ void BACConverter::constructQuads(){
 				e.tri=tri2;
 				e.edge[0]=idMatch[0];
 				e.edge[1]=idMatch[1];
-				sharedEdges.add(e);
+				sharedEdges.push_back(e);
 			}
 		}
 
@@ -635,7 +635,7 @@ void BACConverter::constructQuads(){
 
 		// Now add this quad, delete the others in sharedEdges and schedule tri1 and the shared edge tri for deletion
 		if(selectQuad!=-1){
-			mQuads.add(sharedEdges[selectQuad].quad);
+			mQuads.push_back(sharedEdges[selectQuad].quad);
 			tri1->dead=true;
 			sharedEdges[selectQuad].tri->dead=true;
 
@@ -1190,13 +1190,13 @@ void BACConverter::extractAnimationData(Mesh *mesh,Sequence *animation){
 				Matrix3x3 invBoneRotate; Math::invert(invBoneRotate,boneRotate);
 
 				Vector3 keyframeTranslate=invBoneRotate*(translate-meshbone->translate);
-				bacbone->translatex.add(Pair<int,float>(frame,keyframeTranslate.x));
-				bacbone->translatey.add(Pair<int,float>(frame,keyframeTranslate.y));
-				bacbone->translatez.add(Pair<int,float>(frame,keyframeTranslate.z));
+				bacbone->translatex.push_back(Pair<int,float>(frame,keyframeTranslate.x));
+				bacbone->translatey.push_back(Pair<int,float>(frame,keyframeTranslate.y));
+				bacbone->translatez.push_back(Pair<int,float>(frame,keyframeTranslate.z));
 
-				bacbone->scalex.add(Pair<int,float>(frame,(scale.x/meshbone->scale.x)*100.0f));
-				bacbone->scaley.add(Pair<int,float>(frame,(scale.y/meshbone->scale.y)*100.0f));
-				bacbone->scalez.add(Pair<int,float>(frame,(scale.z/meshbone->scale.z)*100.0f));
+				bacbone->scalex.push_back(Pair<int,float>(frame,(scale.x/meshbone->scale.x)*100.0f));
+				bacbone->scaley.push_back(Pair<int,float>(frame,(scale.y/meshbone->scale.y)*100.0f));
+				bacbone->scalez.push_back(Pair<int,float>(frame,(scale.z/meshbone->scale.z)*100.0f));
 
 				Vector3 zAxis=Vector3(0,0,1);
 				Matrix3x3 keyframeRotate; Math::setMatrix3x3FromQuaternion(keyframeRotate,rotate);
@@ -1208,10 +1208,10 @@ void BACConverter::extractAnimationData(Mesh *mesh,Sequence *animation){
 				//  But to avoid breakage if we rework the EulerAngle format, we just manually calculate the roll from the matrix
 				float roll=Math::atan2(-matrix.at(0,1),matrix.at(0,0));
 
-				bacbone->rotatex.add(Pair<int,float>(frame,zAxis.x*100.0f));
-				bacbone->rotatey.add(Pair<int,float>(frame,zAxis.y*100.0f));
-				bacbone->rotatez.add(Pair<int,float>(frame,zAxis.z*100.0f));
-				bacbone->roll.add(Pair<int,float>(frame,Math::radToDeg(roll)));
+				bacbone->rotatex.push_back(Pair<int,float>(frame,zAxis.x*100.0f));
+				bacbone->rotatey.push_back(Pair<int,float>(frame,zAxis.y*100.0f));
+				bacbone->rotatez.push_back(Pair<int,float>(frame,zAxis.z*100.0f));
+				bacbone->roll.push_back(Pair<int,float>(frame,Math::radToDeg(roll)));
 			}
 
 			// Clean out redundant information
@@ -1295,7 +1295,7 @@ void BACConverter::extractAnimationData(Mesh *mesh,Sequence *animation){
 				}
 			}
 
-			mAnimationBones.add(bacbone);
+			mAnimationBones.push_back(bacbone);
 		}
 	}
 }

@@ -29,7 +29,7 @@ template <typename T> void addNoDuplicates(Collection<T> &collection,const T &t)
 		}
 	}
 	if(i==collection.size()){
-		collection.add(t);
+		collection.push_back(t);
 	}
 }
 

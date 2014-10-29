@@ -73,7 +73,7 @@ Mesh::VertexBoneAssignmentList parseBoneAssignment(const String &string){
 		else{
 			parseScalar(vba.weight,string.substr(i,comma-i));
 			total+=vba.weight;
-			vbaList.add(vba);
+			vbaList.push_back(vba);
 		}
 
 		i=comma+1;

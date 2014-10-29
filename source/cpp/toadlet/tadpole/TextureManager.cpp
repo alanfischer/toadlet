@@ -124,7 +124,7 @@ PixelBufferRenderTarget::ptr TextureManager::createPixelBufferRenderTarget(){
 	}
 
 	if(renderTarget!=NULL){
-		mRenderTargets.add(renderTarget);
+		mRenderTargets.push_back(renderTarget);
 
 		renderTarget->setDestroyedListener(this);
 	}
@@ -233,7 +233,11 @@ void TextureManager::postContextReset(peeper::RenderDevice *renderDevice){
 }
 
 void TextureManager::resourceDestroyed(Resource *resource){
-	if(mRenderTargets.remove(resource)==false){
+	RenderTargetCollection::iterator rit=std::find(mRenderTargets.begin(),mRenderTargets.end(),resource);
+	if(rit!=mRenderTargets.end()){
+		mRenderTargets.erase(rit);
+	}
+	else{
 		ResourceManager::resourceDestroyed(resource);
 	}
 }

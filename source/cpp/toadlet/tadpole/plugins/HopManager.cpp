@@ -56,6 +56,14 @@ PhysicsComponent *HopManager::createPhysicsComponent(){
 	return new HopComponent(this);
 }
 
+void HopManager::addListener(PhysicsManagerListener *listener){
+	mListeners.push_back(listener);
+}
+
+void HopManager::removeListener(PhysicsManagerListener *listener){
+	mListeners.erase(std::remove(mListeners.begin(),mListeners.end(),listener),mListeners.end());
+}
+
 void HopManager::setGravity(const Vector3 &gravity){
 	mSimulator->setGravity(gravity);
 

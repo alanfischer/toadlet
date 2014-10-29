@@ -247,7 +247,8 @@ void SimpleRenderManager::renderQueueItems(Material *material,const RenderableSe
 	int j;
 	RenderPath *path=(material!=NULL)?material->getBestPath():NULL;
 	if(path!=NULL){
-		tforeach(PointerCollection<RenderPass>::iterator,pass,path->getPasses()){
+		tforeach(RenderPath::PassCollection::const_iterator,it,path->getPasses()){
+			RenderPass *pass=*it;
 			setupPass(pass,mDevice);
 			for(j=0;j<numItems;++j){
 				const RenderableSet::RenderableQueueItem &item=items[j];

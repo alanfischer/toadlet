@@ -67,13 +67,13 @@ bool TMSHStreamer::load(Stream::ptr stream,ResourceData *data,ResourceRequest *r
 				mesh=readMesh(dataStream,blockSize);
 			break;
 			case Block_MATERIAL:
-				materials.add(readMaterial(dataStream,blockSize));
+				materials.push_back(readMaterial(dataStream,blockSize));
 			break;
 			case Block_SKELETON:
 				skeleton=readSkeleton(dataStream,blockSize);
 			break;
 			case Block_SEQUENCE:
-				sequences.add(readSequence(dataStream,blockSize));
+				sequences.push_back(readSequence(dataStream,blockSize));
 			break;
 			default:
 				stream->seek(stream->position()+blockSize);

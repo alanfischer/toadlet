@@ -28,7 +28,7 @@ int main(int argc,char **argv){
 				smd.setTexCoordEpsilon(arg.substr(j+1,arg.length()).toFloat());
 			}
 			if(arg.substr(j,1)=="f"){
-				fpses.add(arg.substr(j+1,arg.length()).toFloat());
+				fpses.push_back(arg.substr(j+1,arg.length()).toFloat());
 			}
 			if(arg.substr(j,1)=="k"){
 				smd.setRemoveSkeleton(true);
@@ -52,7 +52,7 @@ int main(int argc,char **argv){
             }
         }
 		else{
-			files.add(String(argv[i]));
+			files.push_back(String(argv[i]));
 		}
 	}
 

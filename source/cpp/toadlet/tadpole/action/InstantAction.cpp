@@ -35,6 +35,14 @@ InstantAction::InstantAction():
 {
 }
 
+void InstantAction::addActionListener(ActionListener *listener){
+	mListeners.push_back(listener);
+}
+
+void InstantAction::removeActionListener(ActionListener *listener){
+	mListeners.erase(std::remove(mListeners.begin(),mListeners.end(),listener),mListeners.end());
+}
+
 void InstantAction::start(){
 	mRunning=true;
 
