@@ -140,7 +140,7 @@ void StudioStreamer::buildBuffers(StudioModel *model){
 						}
 					}
 
-					model->meshdatas[meshCount].indexDatas.add(indexData);
+					model->meshdatas[meshCount].indexDatas.push_back(indexData);
 
 					for(;l>0;l--,tricmds+=4){
 						// Setting these manually, they dont appear to be set in the mdl
@@ -163,7 +163,7 @@ void StudioStreamer::buildTextures(StudioModel *model){
 		int i;
 		for(i=0;i<model->header->numtextures;i++){
 			studiotexture *stexture=model->texture(i);
-			model->textures.add(createTexture(stexture,model->data+stexture->index,model->data+stexture->index+stexture->width*stexture->height));
+			model->textures.push_back(createTexture(stexture,model->data+stexture->index,model->data+stexture->index+stexture->width*stexture->height));
 		}
 	}
 }

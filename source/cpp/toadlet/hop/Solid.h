@@ -133,8 +133,8 @@ public:
 
 protected:
 	void internal_setSimulator(Simulator *s);
-	void internal_addConstraint(Constraint *constraint){mConstraints.add(constraint);}
-	void internal_removeConstraint(Constraint *constraint){mConstraints.remove(constraint);}
+	void internal_addConstraint(Constraint *constraint);
+	void internal_removeConstraint(Constraint *constraint);
 
 	int mScope;
 	int mInternalScope;

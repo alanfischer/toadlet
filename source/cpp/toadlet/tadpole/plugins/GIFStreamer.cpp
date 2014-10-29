@@ -331,8 +331,8 @@ Resource::ptr GIFStreamer::load(Stream::ptr stream,ResourceData *data){
 		if(working!=NULL && result!=GIF_ERROR){
 			tbyte *image=new tbyte[format->getDataSize()];
 			memcpy(image,working,format->getDataSize());
-			images.add(image);
-			delays.add(delay);
+			images.push_back(image);
+			delays.push_back(delay);
 		}
 	}while(result==GIF_OK && working!=NULL);
 

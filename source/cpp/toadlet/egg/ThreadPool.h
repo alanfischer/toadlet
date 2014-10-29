@@ -40,16 +40,16 @@ namespace egg{
 template<typename Type>
 class TaskQueue{
 public:
-	void add(const Type &type){
+	void push(const Type &type){
 		mMutex.lock();
 		{
-			mCollection.add(type);
+			mCollection.push_back(type);
 			mWait.notify();
 		}
 		mMutex.unlock();
 	}
 	
-	Type take(){
+	Type pop(){
 		Type type;
 		mMutex.lock();
 		{
@@ -57,8 +57,8 @@ public:
 				mWait.wait(&mMutex);
 			}
 			if(mCollection.size()>0){
-				type=mCollection.at(0);
-				mCollection.removeAt(0);
+				type=mCollection[0];
+				mCollection.erase(mCollection.begin());
 			}
 		}
 		mMutex.unlock();

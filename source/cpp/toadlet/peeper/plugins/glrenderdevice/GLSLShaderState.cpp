@@ -279,7 +279,7 @@ bool GLSLShaderState::reflect(){
 
 				variableFormat->compile();
 
-				mVariableBufferFormats.add(variableFormat);
+				mVariableBufferFormats.push_back(variableFormat);
 			}
 		}
 	#endif
@@ -291,7 +291,7 @@ bool GLSLShaderState::reflect(){
 			dataSize+=VariableBufferFormat::getFormatSize(primaryVariables[i]->getFormat());
 		}
 		else{
-			primaryVariables.removeAt(i);
+			primaryVariables.erase(primaryVariables.begin()+i);
 			i--;
 		}
 	}

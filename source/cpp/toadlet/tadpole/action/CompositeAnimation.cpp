@@ -45,7 +45,7 @@ CompositeAnimation::~CompositeAnimation(){
 }
 
 void CompositeAnimation::attach(Animation *animation){
-	mAnimations.add(animation);
+	mAnimations.push_back(animation);
 
 	animation->setAnimationListener(this);
 
@@ -55,7 +55,7 @@ void CompositeAnimation::attach(Animation *animation){
 void CompositeAnimation::remove(Animation *animation){
 	animation->setAnimationListener(NULL);
 
-	mAnimations.remove(animation);
+	mAnimations.erase(std::remove(mAnimations.begin(),mAnimations.end(),animation),mAnimations.end());
 
 	animationExtentsChanged(animation);
 }

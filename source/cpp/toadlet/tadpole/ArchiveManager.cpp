@@ -38,30 +38,30 @@ ArchiveManager::ArchiveManager(Engine *engine):ResourceManager(engine){
 
 Resource::ptr ArchiveManager::manage(Resource *resource,const String &name){
 	Archive *archive=(Archive*)resource;
-	mArchives.add(archive);
+	mArchives.push_back(archive);
 	return ResourceManager::manage(resource,name);
 }
 
 void ArchiveManager::unmanage(Resource *resource){
 	Archive *archive=(Archive*)resource;
-	mArchives.remove(archive);
+	mArchives.erase(std::remove(mArchives.begin(),mArchives.end(),archive),mArchives.end());
 	ResourceManager::unmanage(resource);
 }
 
 void ArchiveManager::addDirectory(const String &directory){
-	mDirectories.add(cleanPath(directory,true));
+	mDirectories.push_back(cleanPath(directory,true));
 }
 
 void ArchiveManager::removeDirectory(const String &directory){
-	mDirectories.remove(cleanPath(directory,true));
+	mDirectories.erase(std::remove(mDirectories.begin(),mDirectories.end(),cleanPath(directory,true)),mDirectories.end());
 }
 
 void ArchiveManager::pushDirectory(const String &directory){
-	mDirectories.add(cleanPath(directory,true));
+	mDirectories.push_back(cleanPath(directory,true));
 }
 
 void ArchiveManager::popDirectory(){
-	mDirectories.removeAt(mDirectories.size()-1);
+	mDirectories.pop_back();
 }
 
 bool ArchiveManager::openStream(const String &name,StreamRequest *request){

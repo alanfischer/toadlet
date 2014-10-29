@@ -67,7 +67,9 @@ public:
 	ResourceData *createResourceData(){return new TextureData();}
 
 protected:
-	Collection<PixelBufferRenderTarget::ptr> mRenderTargets;
+	typedef Collection<PixelBufferRenderTarget::ptr> RenderTargetCollection;
+
+	RenderTargetCollection mRenderTargets;
 };
 
 }

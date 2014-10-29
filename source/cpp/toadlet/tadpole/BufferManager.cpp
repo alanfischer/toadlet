@@ -118,7 +118,7 @@ VertexFormat::ptr BufferManager::createVertexFormat(){
 	}
 
 	if(vertexFormat!=NULL){
-		mVertexFormats.add(vertexFormat);
+		mVertexFormats.push_back(vertexFormat);
 
 		vertexFormat->setDestroyedListener(this);
 	}
@@ -165,7 +165,7 @@ IndexBuffer::ptr BufferManager::createIndexBuffer(int usage,int access,IndexBuff
 	}
 
 	if(buffer!=NULL){
-		mIndexBuffers.add(buffer);
+		mIndexBuffers.push_back(buffer);
 
 		buffer->setDestroyedListener(this);
 	}
@@ -212,7 +212,7 @@ VertexBuffer::ptr BufferManager::createVertexBuffer(int usage,int access,VertexF
 	}
 
 	if(buffer!=NULL){
-		mVertexBuffers.add(buffer);
+		mVertexBuffers.push_back(buffer);
 
 		buffer->setDestroyedListener(this);
 	}
@@ -260,7 +260,7 @@ PixelBuffer::ptr BufferManager::createPixelBuffer(int usage,int access,int pixel
 	}
 
 	if(buffer!=NULL){
-		mPixelBuffers.add(buffer);
+		mPixelBuffers.push_back(buffer);
 
 		buffer->setDestroyedListener(this);
 	}
@@ -307,7 +307,7 @@ VariableBuffer::ptr BufferManager::createVariableBuffer(int usage,int access,Var
 	}
 
 	if(buffer!=NULL){
-		mVariableBuffers.add(buffer);
+		mVariableBuffers.push_back(buffer);
 
 		buffer->setDestroyedListener(this);
 	}
@@ -566,11 +566,30 @@ void BufferManager::resourceDestroyed(Resource *resource){
 		mMutex.lock();
 	#endif
 
-	if(mIndexBuffers.remove(resource)==false){
-		if(mVertexBuffers.remove(resource)==false){
-			if(mPixelBuffers.remove(resource)==false){
-				if(mVariableBuffers.remove(resource)==false){
-					mVertexFormats.remove(resource);
+	IndexBufferCollection::iterator iit=std::find(mIndexBuffers.begin(),mIndexBuffers.end(),resource);
+	if(iit!=mIndexBuffers.end()){
+		mIndexBuffers.erase(iit);
+	}
+	else{
+		VertexBufferCollection::iterator vit=std::find(mVertexBuffers.begin(),mVertexBuffers.end(),resource);
+		if(vit!=mVertexBuffers.end()){
+			mVertexBuffers.erase(vit);
+		}
+		else{
+			PixelBufferCollection::iterator pit=std::find(mPixelBuffers.begin(),mPixelBuffers.end(),resource);
+			if(pit!=mPixelBuffers.end()){
+				mPixelBuffers.erase(pit);
+			}
+			else{
+				VariableBufferCollection::iterator vait=std::find(mVariableBuffers.begin(),mVariableBuffers.end(),resource);
+				if(vait!=mVariableBuffers.end()){
+					mVariableBuffers.erase(vait);
+				}
+				else{
+					VertexFormatCollection::iterator vfit=std::find(mVertexFormats.begin(),mVertexFormats.end(),resource);
+					if(vfit!=mVertexFormats.end()){
+						mVertexFormats.erase(vfit);
+					}
 				}
 			}
 		}

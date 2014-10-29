@@ -94,7 +94,7 @@ const Collection<String> &Win32ResourceArchive::getEntries(){
 }
 
 void Win32ResourceArchive::resourceFound(const String &name){
-	mEntries.add(name);
+	mEntries.push_back(name);
 }
 
 void *Win32ResourceArchive::findResourceName(const String &name){

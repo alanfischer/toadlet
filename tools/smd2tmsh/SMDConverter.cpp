@@ -202,7 +202,7 @@ void SMDConverter::load(Engine *engine,Stream *in,const String &fileName){
 				if(++vertindex>3){
 					vertindex=0;
 
-					triangles.add(Triangle(material,triverts[0],triverts[1],triverts[2]));
+					triangles.push_back(Triangle(material,triverts[0],triverts[1],triverts[2]));
 				}
 			}
 		}
@@ -237,13 +237,13 @@ void SMDConverter::load(Engine *engine,Stream *in,const String &fileName){
 			for(j=0;j<3;++j){
 				for(k=0;k<verts.size();++k){
 					if(vertsEqual(verts.at(k),triangles.at(i).verts[j])){
-						materialIndexLists[triangles.at(i).material].add(k);
+						materialIndexLists[triangles.at(i).material].push_back(k);
 						break;
 					}
 				}
 				if(k==verts.size()){
-					verts.add(triangles.at(i).verts[j]);
-					materialIndexLists[triangles.at(i).material].add(k);
+					verts.push_back(triangles.at(i).verts[j]);
+					materialIndexLists[triangles.at(i).material].push_back(k);
 				}
 			}
 		}
@@ -269,8 +269,8 @@ void SMDConverter::load(Engine *engine,Stream *in,const String &fileName){
 			Collection<Mesh::VertexBoneAssignmentList> vbas(verts.size());
 			for(i=0;i<verts.size();++i){
 				Mesh::VertexBoneAssignmentList list;
-				list.add(Mesh::VertexBoneAssignment(verts[i].bone,Math::ONE));
-				vbas.setAt(i,list);
+				list.push_back(Mesh::VertexBoneAssignment(verts[i].bone,Math::ONE));
+				vbas[i]=list;
 			}
 			mMesh->setVertexBoneAssignments(vbas);
 		}

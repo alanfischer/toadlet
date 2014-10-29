@@ -466,7 +466,8 @@ void RandIsle::updateClimber(PathClimber *climber,int dt){
 			mBoundSensor->setBound(mMountBound);
 			SensorResults::ptr results=mBoundSensor->sense();
 
-			tforeach(SensorResults::iterator,node,results){
+			tforeach(SensorResults::iterator,it,results){
+				Node *node=*it;
 				TreeComponent *tree=node->getChildType<TreeComponent>();
 				if(tree!=NULL){
 					Vector3 point;
@@ -727,9 +728,9 @@ float RandIsle::findPathSequence(PointerCollection<PathEdge> &sequence,PathClimb
 int RandIsle::atJunction(PathClimber *climber,PathVertex *current,PathVertex *next){
 	findPathSequence(mPathSequence,climber,climber->getPath(),climber->getPathDirection(),climber->getPathTime());
 
-	if(mPathSequence.size()>0 && mPathSequence[0]->getVertex(mPathSequence[0]->getVertex(false)==current)==next){
-		mPathSequence.removeAt(0);
-		if(mPathSequence.size()>0){
+	if(mPathSequence.empty()==false && mPathSequence[0]->getVertex(mPathSequence[0]->getVertex(false)==current)==next){
+		mPathSequence.erase(mPathSequence.begin());
+		if(mPathSequence.empty()==false){
 			if(mPathSequence[0]->getTime(mPathSequence[0]->getVertex(true)==next) > mPathSequence[0]->getTime(mPathSequence[0]->getVertex(true)==current)){
 				return 1;
 			}
@@ -796,7 +797,7 @@ bool RandIsle::updatePopulatePatches(){
 		}
 
 		if((patch->dy>=0 && patch->y>=getPatchSize()) || (patch->dy<0 && patch->y<=0)){
-			mPopulatePatches.removeAt(i);
+			mPopulatePatches.erase(mPopulatePatches.begin()+i);
 			i--;
 		}
 	}
@@ -805,13 +806,14 @@ bool RandIsle::updatePopulatePatches(){
 }
 
 void RandIsle::terrainPatchCreated(int px,int py,Bound *bound){
-	mPopulatePatches.add(PopulatePatch(px,py,px-mTerrain->getTerrainX(),py-mTerrain->getTerrainY(),bound));
+	mPopulatePatches.push_back(PopulatePatch(px,py,px-mTerrain->getTerrainX(),py-mTerrain->getTerrainY(),bound));
 }
 
 void RandIsle::terrainPatchDestroyed(int px,int py,Bound *bound){
 	mBoundSensor->setBound(bound);
 	SensorResults::ptr results=mBoundSensor->sense();
-	tforeach(SensorResults::iterator,node,results){
+	tforeach(SensorResults::iterator,it,results){
+		Node *node=*it;
 		if(node->getChildType<TreeComponent>()!=NULL && Math::testInside(bound->getAABox(),node->getWorldTranslate())){
 			node->destroy();
 		}

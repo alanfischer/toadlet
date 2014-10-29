@@ -245,7 +245,7 @@ bool MeshOptimizer::optimizeMesh(Mesh *mesh,Engine *engine){
 					nvba.set2(i-unusedCount,texCoordIndex,texCoord);
 				}
 
-				if(mesh->getVertexBoneAssignments()>0){
+				if(mesh->getVertexBoneAssignments().empty()==false){
 					nvertexBoneAssignments[i-unusedCount]=mesh->getVertexBoneAssignments()[i];
 				}
 			}

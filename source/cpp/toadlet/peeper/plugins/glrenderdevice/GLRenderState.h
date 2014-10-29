@@ -101,8 +101,8 @@ protected:
 	FogState *mFogState;
 	GeometryState *mGeometryState;
 	MaterialState *mMaterialState;
-	egg::Collection<SamplerState*> mSamplerStates;
-	egg::Collection<TextureState*> mTextureStates;
+	Collection<SamplerState*> mSamplerStates;
+	Collection<TextureState*> mTextureStates;
 	
 	friend class GLRenderDevice;
 };

@@ -179,14 +179,14 @@ void Solid::addForce(const Vector3 &force){
 }
 
 void Solid::addShape(Shape *shape){
-	mShapes.add(shape);
+	mShapes.push_back(shape);
 	shape->mSolid=this;
 	updateLocalBound();
 	activate();
 }
 
 void Solid::removeShape(Shape *shape){
-	mShapes.remove(shape);
+	mShapes.erase(std::remove(mShapes.begin(),mShapes.end(),shape),mShapes.end());
 	shape->mSolid=NULL;
 	updateLocalBound();
 	activate();
@@ -255,6 +255,14 @@ void Solid::updateLocalBound(){
 
 void Solid::internal_setSimulator(Simulator *s){
 	mSimulator=s;
+}
+
+void Solid::internal_addConstraint(Constraint *constraint){
+	mConstraints.push_back(constraint);
+}
+
+void Solid::internal_removeConstraint(Constraint *constraint){
+	mConstraints.erase(std::remove(mConstraints.begin(),mConstraints.end(),constraint),mConstraints.end());
 }
 
 }

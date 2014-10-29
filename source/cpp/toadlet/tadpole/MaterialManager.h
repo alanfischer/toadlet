@@ -73,8 +73,11 @@ public:
 	BufferManager *getBufferManager();
 
 protected:
-	Collection<RenderState::ptr> mRenderStates;
-	Collection<ShaderState::ptr> mShaderStates;
+	typedef Collection<RenderState::ptr> RenderStateCollection;
+	typedef Collection<ShaderState::ptr> ShaderStateCollection;
+
+	RenderStateCollection mRenderStates;
+	ShaderStateCollection mShaderStates;
 
 	RenderPathChooser *mRenderPathChooser;
 	SamplerState mDefaultSamplerState;

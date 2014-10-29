@@ -75,7 +75,7 @@ void SpriteStreamer::buildTextures(SpriteModel *model){
 	int i;
 	for(i=0;i<model->header->numframes;++i){
 		spriteframe *frame=model->frame(i);
-		model->textures.add(createTexture(model,frame,((tbyte*)frame)+sizeof(spriteframe),model->palette));
+		model->textures.push_back(createTexture(model,frame,((tbyte*)frame)+sizeof(spriteframe),model->palette));
 	}
 }
 

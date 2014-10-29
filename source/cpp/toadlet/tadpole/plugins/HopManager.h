@@ -47,8 +47,8 @@ public:
 
 	PhysicsComponent *createPhysicsComponent();
 
-	void addListener(PhysicsManagerListener *listener){mListeners.add(listener);}
-	void removeListener(PhysicsManagerListener *listener){mListeners.remove(listener);}
+	void addListener(PhysicsManagerListener *listener);
+	void removeListener(PhysicsManagerListener *listener);
 	
 	void setFixedDT(float fdt){}
 	float getFixedDT() const{return 0;}

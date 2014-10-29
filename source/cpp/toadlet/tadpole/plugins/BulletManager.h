@@ -57,8 +57,8 @@ public:
 
 	PhysicsComponent *createPhysicsComponent();
 
-	void addListener(PhysicsManagerListener *listener){mListeners.add(listener);}
-	void removeListener(PhysicsManagerListener *listener){mListeners.remove(listener);}
+	void addListener(PhysicsManagerListener *listener);
+	void removeListener(PhysicsManagerListener *listener);
 
 	void setFixedDT(float fdt){mFixedDT=fdt;}
 	float getFixedDT() const{return mFixedDT;}
@@ -77,8 +77,8 @@ public:
 	void logicUpdate(int dt,int scope,Node *node);
 	void frameUpdate(int dt,int scope,Node *node);
 
-	void componentCreated(BulletComponent *component){mComponents.add(component);}
-	void componentDestroyed(BulletComponent *component){mComponents.remove(component);}
+	void componentCreated(BulletComponent *component);
+	void componentDestroyed(BulletComponent *component);
 
 	void physicsUpdate(btScalar timeStep);
 

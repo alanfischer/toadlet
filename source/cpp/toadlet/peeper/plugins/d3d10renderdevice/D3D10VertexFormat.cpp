@@ -72,27 +72,27 @@ void D3D10VertexFormat::destroy(){
 bool D3D10VertexFormat::addElement(int semantic,const String &name,int index,int format){
 	int offset=mVertexSize;
 	if(semantic==Semantic_UNKNOWN){
-		mSemantics.add(BackableVertexFormat::getSemanticFromName(name));
+		mSemantics.push_back(BackableVertexFormat::getSemanticFromName(name));
 	}
 	else{
-		mSemantics.add(semantic);
+		mSemantics.push_back(semantic);
 	}
 	if(name==(char*)NULL){
-		mNames.add(BackableVertexFormat::getNameFromSemantic(semantic));
+		mNames.push_back(BackableVertexFormat::getNameFromSemantic(semantic));
 	}
 	else{
-		mNames.add(name);
+		mNames.push_back(name);
 	}
-	mIndexes.add(index);
-	mFormats.add(format);
-	mOffsets.add(offset);
+	mIndexes.push_back(index);
+	mFormats.push_back(format);
+	mOffsets.push_back(offset);
 
 	mVertexSize+=getFormatSize(format);
 
 	D3D10_INPUT_ELEMENT_DESC element={
 		NULL,index,D3D10RenderDevice::getVertexDXGI_FORMAT(format),0,offset,D3D10_INPUT_PER_VERTEX_DATA,0
 	};
-	mElements.add(element);
+	mElements.push_back(element);
 
 	// Reassign char pointers because the vector realllocates memory
 	int i;

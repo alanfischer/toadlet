@@ -66,11 +66,11 @@ TerrainNode::TerrainNode(Scene *scene):PartitionNode(scene),
 		for(i=0;i<mSize;++i){
 			TerrainPatchComponent::ptr patch=new TerrainPatchComponent(mScene);
 			patch->setProtected(true);
-			mUnactivePatches.add(patch);
+			mUnactivePatches.push_back(patch);
 
 			Node::ptr node=new Node(mScene);
 			node->attach(patch);
-			mPatchNodes.add(node);
+			mPatchNodes.push_back(node);
 		}
 	}
 
@@ -483,7 +483,7 @@ void TerrainNode::destroyPatch(int x,int y,bool notify){
 		mListener->terrainPatchDestroyed(x,y,patch->getParent()->getWorldBound());
 	}
 
-	mUnactivePatches.add(patch);
+	mUnactivePatches.push_back(patch);
 	setPatchAt(x,y,NULL);
 }
 

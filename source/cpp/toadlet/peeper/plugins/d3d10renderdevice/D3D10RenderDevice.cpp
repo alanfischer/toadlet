@@ -942,13 +942,13 @@ void D3D10RenderDevice::vertexFormatDestroyed(D3D10VertexFormat *format){
 			if(layout!=NULL){
 				layout->Release();
 			}
-			shader->mLayouts.removeAt(handle);
+			shader->mLayouts.erase(shader->mLayouts.begin()+handle);
 		}
 	}
 	for(i=handle;i<mVertexFormats.size();++i){
 		mVertexFormats[i]->mRenderHandle--;
 	}
-	mVertexFormats.removeAt(handle);
+	mVertexFormats.erase(mVertexFormats.begin()+handle);
 
 	#if defined(TOADLET_THREADSAFE)
 		mMutex.unlock();
@@ -961,7 +961,7 @@ void D3D10RenderDevice::shaderCreated(D3D10Shader *shader){
 	#endif
 
 	if(shader->mShaderType==Shader::ShaderType_VERTEX){
-		mVertexShaders.add(shader);
+		mVertexShaders.push_back(shader);
 	}
 
 	#if defined(TOADLET_THREADSAFE)
@@ -975,7 +975,7 @@ void D3D10RenderDevice::shaderDestroyed(D3D10Shader *shader){
 	#endif
 
 	if(shader->mShaderType==Shader::ShaderType_VERTEX){
-		mVertexShaders.remove(shader);
+		mVertexShaders.erase(std::remove(mVertexShaders.begin(),mVertexShaders.end(),shader),mVertexShaders.end());
 	}
 
 	#if defined(TOADLET_THREADSAFE)

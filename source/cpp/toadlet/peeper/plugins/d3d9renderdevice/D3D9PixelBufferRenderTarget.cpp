@@ -141,16 +141,16 @@ bool D3D9PixelBufferRenderTarget::attach(PixelBuffer::ptr buffer,Attachment atta
 		mBuffers.resize(2);
 		mBufferAttachments.resize(2);
 		if(attachment==Attachment_DEPTH_STENCIL){
-			mBuffers.setAt(1,buffer);
-			mBufferAttachments.setAt(1,attachment);
+			mBuffers[1]=buffer;
+			mBufferAttachments[1]=attachment;
 		}
 		else{
-			mBuffers.setAt(0,buffer);
-			mBufferAttachments.setAt(0,attachment);
+			mBuffers[0]=buffer;
+			mBufferAttachments[0]=attachment;
 		}
 	#else
-		mBuffers.add(buffer);
-		mBufferAttachments.add(attachment);
+		mBuffers.push_back(buffer);
+		mBufferAttachments.push_back(attachment);
 	#endif
 
 	mWidth=buffer->getTextureFormat()->getWidth();
@@ -171,8 +171,8 @@ bool D3D9PixelBufferRenderTarget::remove(PixelBuffer::ptr buffer){
 		return false;
 	}
 
-	mBuffers.removeAt(i);
-	mBufferAttachments.removeAt(i);
+	mBuffers.erase(mBuffers.begin()+i);
+	mBufferAttachments.erase(mBufferAttachments.begin()+i);
 	mNeedsCompile=true;
 
 	return true;

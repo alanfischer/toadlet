@@ -49,7 +49,7 @@ public:
 		inline iterator(const const_iterator &it):iter(it.iter){}
 		inline iterator(const typename CollectionType::iterator &it):iter(it){}
 
-		inline Type& operator*() const{return **iter;}
+		inline TypePtr& operator*() const{return *iter;}
 		inline TypePtr& operator->() const{return *iter;}
 		inline operator Type*() const{return *iter;}
 		inline operator TypePtr() const{return *iter;}
@@ -76,7 +76,7 @@ public:
 		inline const_iterator(const iterator &it):iter(it.iter){}
 		inline const_iterator(const typename CollectionType::const_iterator &it):iter(it.iter){}
 
-		inline const Type& operator*() const{return **iter;}
+		inline const TypePtr& operator*() const{return *iter;}
 		inline const TypePtr& operator->() const{return *iter;}
 		inline operator const Type*() const{return const_cast<Type*>((Type*)*iter);}
 		inline operator const TypePtr() const{return *iter;}
@@ -115,23 +115,15 @@ public:
 	inline iterator insert(const iterator &at,const const_iterator &start,const const_iterator &end){return mCollection.insert(reinterpret_cast<const typename CollectionType::iterator&>(at),reinterpret_cast<const typename CollectionType::iterator&>(start),reinterpret_cast<const typename CollectionType::iterator&>(end));}
 
 	inline void resize(int s){mCollection.resize(s);}
-	inline iterator erase(iterator it){return mCollection.erase(reinterpret_cast<const typename CollectionType::iterator&>(it));}
-	template<typename Type2> inline bool remove(const Type2 &type){return mCollection.remove(type);}
-	template<typename Type2> inline int indexOf(const Type2 &type) const{return mCollection.indexOf(type);}
-	template<typename Type2> inline bool contains(const Type2 &type) const{return mCollection.contains(type);}
+	inline iterator erase(const iterator &it){return mCollection.erase(reinterpret_cast<const typename CollectionType::iterator&>(it));}
+	inline iterator erase(const iterator &start,const iterator &end){return mCollection.erase(reinterpret_cast<const typename CollectionType::iterator&>(start),reinterpret_cast<const typename CollectionType::iterator&>(end));}
 	inline void reserve(int s){mCollection.reserve(s);}
 	inline void clear(){mCollection.clear();}
 
+	inline TypePtr* data() const{return mCollection.data();}
 	inline int size() const{return mCollection.size();}
 	inline int capacity() const{return mCollection.capacity();}
 	inline bool empty() const{return mCollection.empty();}
-	inline TypePtr* data() const{return mCollection.data();}
-
-	inline void removeAt(int i){erase(begin()+i);}
-	inline void add(const TypePtr &type){mCollection.add(type);}
-	inline void setAt(int index,const TypePtr &type){mCollection.setAt(index,type);}
-	inline void addAll(const PointerCollection<Type> &collection){insert(end(),collection.begin(),collection.end());}
-	inline void insert(int index,const TypePtr &type){mCollection.insert(index,type);}
 
 	inline TypePtr &at(int n){return mCollection.at(n);}
 	inline const TypePtr &at(int n) const{return mCollection.at(n);}

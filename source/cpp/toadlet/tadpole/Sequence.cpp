@@ -38,7 +38,7 @@ void Sequence::destroy(){
 }
 
 void Sequence::addTrack(Track *track){
-	mTracks.add(track);
+	mTracks.push_back(track);
 
 	if(mLength<track->getLength()){
 		mLength=track->getLength();
@@ -46,7 +46,7 @@ void Sequence::addTrack(Track *track){
 }
 
 void Sequence::removeTrack(int i){
-	mTracks.removeAt(i);
+	mTracks.erase(mTracks.begin()+i);
 }
 
 void Sequence::compile(){

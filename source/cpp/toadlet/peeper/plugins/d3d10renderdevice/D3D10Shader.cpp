@@ -179,14 +179,14 @@ ID3D10InputLayout *D3D10Shader::findInputLayout(D3D10VertexFormat *vertexFormat)
 				}
 			}
 			if(j==vertexFormat->mElements.size()){
-				missingParameters.add(parameterDesc);
+				missingParameters.push_back(parameterDesc);
 			}
 		}
 
 		D3D10_INPUT_ELEMENT_DESC *elements=NULL;
 		int numElements=0;
 		if(missingParameters.size()==0){
-			elements=vertexFormat->mElements;
+			elements=&vertexFormat->mElements[0];
 			numElements=vertexFormat->mElements.size();
 		}
 		else{
@@ -230,7 +230,7 @@ ID3D10InputLayout *D3D10Shader::findInputLayout(D3D10VertexFormat *vertexFormat)
 			}
 		}
 		mDevice->getD3D10Device()->CreateInputLayout(elements,numElements,mBytecode->GetBufferPointer(),mBytecode->GetBufferSize(),&layout);
-		if(elements!=vertexFormat->mElements){
+		if(elements!=&vertexFormat->mElements[0]){
 			delete[] elements;
 			elements=NULL;
 		}
@@ -253,7 +253,7 @@ bool D3D10Shader::reflect(){
 	for(i=0;i<desc.InputParameters;++i){
 		D3D10_SIGNATURE_PARAMETER_DESC parameterDesc;
 		mReflector->GetInputParameterDesc(i,&parameterDesc);
-		mInputParameters.add(parameterDesc);
+		mInputParameters.push_back(parameterDesc);
 	}
 
 	int numResources=0;
@@ -299,12 +299,12 @@ bool D3D10Shader::reflect(){
 			format->setStructVariable(j,variable);
 		}
 
-		mVariableBufferFormats.add(format);
+		mVariableBufferFormats.push_back(format);
 	}
 
 	if(primaryFormat==NULL && desc.BoundResources>0){
 		primaryFormat=new VariableBufferFormat(true,"$Globals",0,desc.BoundResources);
-		mVariableBufferFormats.add(primaryFormat);
+		mVariableBufferFormats.push_back(primaryFormat);
 	}
 
 	for(i=0,j=0;i<desc.BoundResources;++i){

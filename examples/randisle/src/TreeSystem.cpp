@@ -164,11 +164,11 @@ BranchSystem::Branch::ptr TreeSystem::branchCreated(BranchSystem::Branch *parent
 
 	if(parentTreeBranch!=NULL){
 		treeBranch->parentTime=parentTreeBranch->length;
-		parentTreeBranch->branches.add(treeBranch);
+		parentTreeBranch->branches.push_back(treeBranch);
 	}
 
 	if(!mCountMode){
-		mTreeBranches.add(treeBranch);
+		mTreeBranches.push_back(treeBranch);
 	}
 
 	return treeBranch;
@@ -190,13 +190,13 @@ void TreeSystem::branchBuild(BranchSystem::Branch *branch){
 		treeBranch->bound.merge(branch->position);
 	}
 
-	treeBranch->points.add(branch->position);
+	treeBranch->points.push_back(branch->position);
 	Vector3 tangent;
 	Math::normalizeCarefully(tangent,branch->velocity,0.001);
-	treeBranch->tangents.add(tangent);
-	treeBranch->normals.add((branch->length==0 && treeBranch->parent==NULL)?Math::X_UNIT_VECTOR3:Math::ZERO_VECTOR3);
-	treeBranch->scales.add(branch->scale);
-	treeBranch->times.add(branch->length);
+	treeBranch->tangents.push_back(tangent);
+	treeBranch->normals.push_back((branch->length==0 && treeBranch->parent==NULL)?Math::X_UNIT_VECTOR3:Math::ZERO_VECTOR3);
+	treeBranch->scales.push_back(branch->scale);
+	treeBranch->times.push_back(branch->length);
 
 	// Branches & Nodes
 	int i;
@@ -331,7 +331,7 @@ void TreeSystem::branchLeaf(BranchSystem::Branch *branch,const Vector3 &offset,s
 		mLeaves[leafIndex].segment.setStartDir(point,branchNormal);
 		mLeaves[leafIndex].wiggleOffset=leafWiggleOffset;
 
-		treeBranch->leaves.add(leafIndex);
+		treeBranch->leaves.push_back(leafIndex);
 	}
 	mLeafVertexCount+=4;
 	mLeafIndexCount+=6;

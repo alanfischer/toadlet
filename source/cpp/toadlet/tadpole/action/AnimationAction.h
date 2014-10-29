@@ -72,8 +72,8 @@ public:
 	inline scalar getMinValue() const{return mMinValue;}
 	inline scalar getMaxValue() const{return mMaxValue;}
 
-	void addActionListener(ActionListener *listener){mListeners.add(listener);}
-	void removeActionListener(ActionListener *listener){mListeners.remove(listener);}
+	void addActionListener(ActionListener *listener);
+	void removeActionListener(ActionListener *listener);
 
 	void start();
 	void stop();

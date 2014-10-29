@@ -375,8 +375,8 @@ void Camera::updateFramesPerSecond(uint64 time){
 		mFPS=Math::div(Math::fromInt(newf.count-oldf.count),Math::fromMilli(newf.time-oldf.time));
 	}
 
-	mFPSData.removeAt(0);
-	mFPSData.add(newf);
+	mFPSData.erase(mFPSData.begin());
+	mFPSData.push_back(newf);
 }
 
 void Camera::updateWorldTransform(){

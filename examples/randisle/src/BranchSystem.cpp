@@ -40,7 +40,7 @@ void BranchSystem::start(){
 	branch->velocityNoise.set(initVelocityNoise);
 	branch->scale=branch->life*branchScale;
 	branch->visibilityAmount=initVisibilityAmount;
-	mBranches.add(branch);
+	mBranches.push_back(branch);
 
 	if(mBranchListener!=NULL){
 		mBranchListener->branchBuild(branch);
@@ -123,7 +123,7 @@ void BranchSystem::updateBranch(Branch *branch,int dt){
 
 		childBranch->barkTime=branch->barkTime;
 
-		mBranches.add(childBranch);
+		mBranches.push_back(childBranch);
 
 		if(mBranchListener!=NULL){
 			mBranchListener->branchBuild(childBranch);
@@ -147,7 +147,7 @@ void BranchSystem::updateBranch(Branch *branch,int dt){
 			mBranchListener->branchDestroyed(branch);
 		}
 		
-		mBranches.remove(branch);
+		mBranches.erase(std::remove(mBranches.begin(),mBranches.end(),branch),mBranches.end());
 	}
 	else if(branch->buildTime==0){
 		if(mBranchListener!=NULL){

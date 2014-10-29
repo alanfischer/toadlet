@@ -528,11 +528,11 @@ void StudioModelComponent::updateVertexes(StudioModel *model,int bodypartsIndex,
 
 	Vector3 normal;
 	Vector2 chrome;
-	Vector3 *verts=mTransformedVerts;
-	Vector3 *norms=mTransformedNorms;
-	Vector2 *chromes=mTransformedChromes;
-	Vector3 *boneTranslates=mBoneTranslates;
-	Quaternion *boneRotates=mBoneRotates;
+	Vector3 *verts=&mTransformedVerts[0];
+	Vector3 *norms=&mTransformedNorms[0];
+	Vector2 *chromes=&mTransformedChromes[0];
+	Vector3 *boneTranslates=&mBoneTranslates[0];
+	Quaternion *boneRotates=&mBoneRotates[0];
 
 	for(i=0;i<smodel->numverts;++i){
 		Math::mul(verts[i],boneRotates[svertbone[i]],sverts[i]);
@@ -630,7 +630,7 @@ void StudioModelComponent::updateSkeleton(){
 				}
 			}
 
-			findBoneTransforms(mBoneTranslates,mBoneRotates,mModel,sseqdesc,sanim,animation);
+			findBoneTransforms(&mBoneTranslates[0],&mBoneRotates[0],mModel,sseqdesc,sanim,animation);
 
 			AABox box(sseqdesc->bbmin,sseqdesc->bbmax);
 			if(i==0){
@@ -665,7 +665,7 @@ void StudioModelComponent::updateSkeleton(){
 		studioanim *sanim=mModel->anim(sseqdesc)+mModel->header->numbones;
 		SequenceAnimation *animation=mAnimations[mBlendSequenceIndex];
 
-		findBoneTransforms(mBlendBoneTranslates,mBlendBoneRotates,mModel,sseqdesc,sanim,animation);
+		findBoneTransforms(&mBlendBoneTranslates[0],&mBlendBoneRotates[0],mModel,sseqdesc,sanim,animation);
 
 		for(i=0;i<mModel->header->numbones;++i){
 			Quaternion r;
@@ -836,7 +836,7 @@ void StudioModelComponent::createSubModels(){
 		if(mSharedRenderState!=NULL){
 			subModel->mMaterial=mEngine->getMaterialManager()->createSharedMaterial(subModel->mMaterial,mSharedRenderState);
 		}
-		mSubModels.add(subModel);
+		mSubModels.push_back(subModel);
 	}
 }
 

@@ -45,8 +45,8 @@ public:
 	void parentChanged(Node *node);
 	void rootChanged(Node *root);
 
-	void addCollisionListener(PhysicsCollisionListener *listener){mListeners.add(listener);}
-	void removeCollisionListener(PhysicsCollisionListener *listener){mListeners.remove(listener);}
+	void addCollisionListener(PhysicsCollisionListener *listener);
+	void removeCollisionListener(PhysicsCollisionListener *listener);
 
 	void setPosition(const Vector3 &position);
 	const Vector3 &getPosition() const{setVector3(mBulletPosition,mBody->getCenterOfMassPosition());return mBulletPosition;}

@@ -32,7 +32,7 @@ namespace tadpole{
 
 ResourceManager::ResourceManager(Engine *engine){
 	mEngine=engine;
-	mResources.add(NULL); // Handle 0 is always NULL
+	mResources.push_back(NULL); // Handle 0 is always NULL
 	#if defined(TOADLET_PLATFORM_ANDROID)
 		mMaxStreamLength=256*256*4*2; // Twice the size of a 256x256 32bpp image
 	#else
@@ -58,7 +58,7 @@ void ResourceManager::addResourceArchive(Archive *archive){
 		mMutex.lock();
 	#endif
 
-	mResourceArchives.add(archive);
+	mResourceArchives.push_back(archive);
 
 	#if defined(TOADLET_THREADSAFE)
 		mMutex.unlock();
@@ -70,7 +70,7 @@ void ResourceManager::removeResourceArchive(Archive  *archive){
 		mMutex.lock();
 	#endif
 
-	mResourceArchives.remove(archive);
+	mResourceArchives.erase(std::remove(mResourceArchives.begin(),mResourceArchives.end(),archive),mResourceArchives.end());
 
 	#if defined(TOADLET_THREADSAFE)
 		mMutex.unlock();
@@ -147,12 +147,11 @@ Resource::ptr ResourceManager::manage(Resource  *resource,const String &name){
 		mMutex.lock();
 	#endif
 
-	if(mResources.contains(resource)==false){
+	if(std::find(mResources.begin(),mResources.end(),resource)==mResources.end()){
 		int handle=-1;
-		int size=mFreeHandles.size();
-		if(size>0){
-			handle=mFreeHandles.at(size-1);
-			mFreeHandles.removeAt(size-1);
+		if(mFreeHandles.empty()==false){
+			handle=mFreeHandles.back();
+			mFreeHandles.pop_back();
 		}
 		else{
 			handle=mResources.size();
@@ -176,7 +175,7 @@ Resource::ptr ResourceManager::manage(Resource  *resource,const String &name){
 	}
 
 	if(resource->getName()!=(char*)NULL){
-		mNameResourceMap.add(resource->getName(),resource);
+		mNameResourceMap[resource->getName()]=resource;
 	}
 
 	#if defined(TOADLET_THREADSAFE)
@@ -191,7 +190,7 @@ void ResourceManager::unmanage(Resource *resource){
 		mMutex.lock();
 	#endif
 
-	if(mResources.contains(resource)==false){
+	if(std::find(mResources.begin(),mResources.end(),resource)==mResources.end()){
 		#if defined(TOADLET_THREADSAFE)
 			mMutex.unlock();
 		#endif
@@ -204,7 +203,7 @@ void ResourceManager::unmanage(Resource *resource){
 		int handle=resource->getUniqueHandle();
 		if(handle>=0 && mResources[handle]==resource){
 			mResources[handle]=NULL;
-			mFreeHandles.add(handle);
+			mFreeHandles.push_back(handle);
 		}
 	}
 
@@ -238,7 +237,7 @@ void ResourceManager::setStreamer(ResourceStreamer  *streamer,const String &exte
 	if(streamer!=NULL){
 		Log::debug(Categories::TOADLET_TADPOLE,
 			"adding streamer for extension "+extension);
-		mExtensionStreamerMap.add(extension,streamer);
+		mExtensionStreamerMap[extension]=streamer;
 	}
 
 	#if defined(TOADLET_THREADSAFE)

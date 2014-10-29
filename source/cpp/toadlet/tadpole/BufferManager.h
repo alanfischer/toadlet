@@ -67,13 +67,19 @@ public:
 	void outputVariable(VariableBufferFormat::Variable *variable,const String &tabs);
 
 protected:
+	typedef Collection<VertexFormat::ptr> VertexFormatCollection;
+	typedef Collection<VertexBuffer::ptr> VertexBufferCollection;
+	typedef Collection<IndexBuffer::ptr> IndexBufferCollection;
+	typedef Collection<PixelBuffer::ptr> PixelBufferCollection;
+	typedef Collection<VariableBuffer::ptr> VariableBufferCollection;
+
 	Engine *mEngine;
 
-	Collection<VertexFormat::ptr> mVertexFormats;
-	Collection<VertexBuffer::ptr> mVertexBuffers;
-	Collection<IndexBuffer::ptr> mIndexBuffers;
-	Collection<PixelBuffer::ptr> mPixelBuffers;
-	Collection<VariableBuffer::ptr> mVariableBuffers;
+	VertexFormatCollection mVertexFormats;
+	VertexBufferCollection mVertexBuffers;
+	IndexBufferCollection mIndexBuffers;
+	PixelBufferCollection mPixelBuffers;
+	VariableBufferCollection mVariableBuffers;
 
 	#if defined(TOADLET_THREADSAFE)
 		Mutex mMutex;

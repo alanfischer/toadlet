@@ -27,7 +27,7 @@
 #define TOADLET_TADPOLE_MATERIAL_MATERIAL_H
 
 #include <toadlet/egg/BaseResource.h>
-#include <toadlet/egg/PointerCollection.h>
+#include <toadlet/egg/Collection.h>
 #include <toadlet/tadpole/material/RenderPath.h>
 
 namespace toadlet{
@@ -49,7 +49,7 @@ public:
 		Scope_RENDERABLE=1<<1,
 	};
 
-	typedef PointerCollection<RenderPath> PathCollection;
+	typedef Collection<RenderPath::ptr> PathCollection;
 
 	Material(MaterialManager *manager);
 

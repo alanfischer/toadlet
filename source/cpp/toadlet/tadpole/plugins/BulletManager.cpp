@@ -63,6 +63,14 @@ PhysicsComponent *BulletManager::createPhysicsComponent(){
 	return new BulletComponent(this);
 }
 
+void BulletManager::addListener(PhysicsManagerListener *listener){
+	mListeners.push_back(listener);
+}
+
+void BulletManager::removeListener(PhysicsManagerListener *listener){
+	mListeners.erase(std::remove(mListeners.begin(),mListeners.end(),listener),mListeners.end());
+}
+
 void BulletManager::logicUpdate(int dt,int scope,Node *node){
 	scalar fdt=Math::milliToReal(dt);
 
@@ -89,6 +97,14 @@ void BulletManager::frameUpdate(int dt,int scope,Node *node){
 			}
 		}
 	}
+}
+
+void BulletManager::componentCreated(BulletComponent *component){
+	mComponents.push_back(component);
+}
+
+void BulletManager::componentDestroyed(BulletComponent *component){
+	mComponents.erase(std::remove(mComponents.begin(),mComponents.end(),component),mComponents.end());
 }
 
 void BulletManager::physicsUpdate(btScalar timeStep){

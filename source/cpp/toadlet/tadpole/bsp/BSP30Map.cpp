@@ -236,12 +236,12 @@ void BSP30Map::initLightmap(){
 
 void BSP30Map::uploadLightmap(){
 	Texture::ptr texture=engine->getTextureManager()->createTexture(Texture::Usage_BIT_STREAM|Texture::Usage_BIT_AUTOGEN_MIPMAPS,lightmapFormat,lightmapData);
-	lightmapTextures.add(texture);
-	lightmapDirties.add(false);
+	lightmapTextures.push_back(texture);
+	lightmapDirties.push_back(false);
 
 	tbyte *clonedData=new tbyte[lightmapFormat->getDataSize()];
 	memcpy(clonedData,lightmapData,lightmapFormat->getDataSize());
-	lightmapDatas.add(clonedData);
+	lightmapDatas.push_back(clonedData);
 }
 
 void BSP30Map::updateFaceLights(int faceIndex){
@@ -477,7 +477,7 @@ void BSP30Map::findBoundLeafs(Collection<int> &leafs,bnode *hull,int index,const
 	if(index<0){
 		// Ignore solid leaf
 		if((-1-index)>0){
-			leafs.add(-1-index);
+			leafs.push_back(-1-index);
 		}
 		return;
 	}

@@ -149,14 +149,16 @@ void AnaglyphCamera::setSeparation(scalar separation){
 
 void AnaglyphCamera::setLeftColor(const Vector4 &color){
 	mLeftColor.set(color);
-	tforeach(Material::PathCollection::iterator,path,mMaterial->getPaths()){
+	tforeach(Material::PathCollection::const_iterator,it,mMaterial->getPaths()){
+		RenderPath *path=*it;
 		path->getPasses()[0]->getRenderState()->setMaterialState(MaterialState(mLeftColor));
 	}
 }
 
 void AnaglyphCamera::setRightColor(const Vector4 &color){
 	mRightColor.set(color);
-	tforeach(Material::PathCollection::iterator,path,mMaterial->getPaths()){
+	tforeach(Material::PathCollection::const_iterator,it,mMaterial->getPaths()){
+		RenderPath *path=*it;
 		path->getPasses()[1]->getRenderState()->setMaterialState(MaterialState(mRightColor));
 	}
 }

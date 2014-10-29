@@ -51,7 +51,7 @@ public:
 
 	void logicUpdate(const toadlet::tadpole::Vector3 &position,int dt){
 		mPositions.insert(mPositions.begin(),position);
-		mPositions.removeAt(mPositions.size()-1);
+		mPositions.pop_back();
 	}
 
 	void frameUpdate(int dt,int scope){

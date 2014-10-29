@@ -110,7 +110,7 @@ TaskThread::TaskThread(ThreadPool *pool):
 
 void TaskThread::run(){
 	while(mPool->running()){
-		Pair<TaskGroup::ptr,Runner::ptr> item=mPool->queue()->take();
+		Pair<TaskGroup::ptr,Runner::ptr> item=mPool->queue()->pop();
 		if(item.second){
 			TOADLET_TRY
 				item.second->run();
@@ -135,7 +135,7 @@ ThreadPool::~ThreadPool() {
 	mRunning=false;
 
 	for(int i=0;i<mPool.size();++i){
-		mQueue.add(Pair<TaskGroup::ptr,Runner::ptr>(NULL,NULL)); // Add dummy tasks to force the pool threads to finish
+		mQueue.push(Pair<TaskGroup::ptr,Runner::ptr>(NULL,NULL)); // Add dummy tasks to force the pool threads to finish
 	}
 
 	for(int i=0;i<mPool.size();++i){
@@ -145,7 +145,7 @@ ThreadPool::~ThreadPool() {
 
 void ThreadPool::queueTask(Runner::ptr task){
 	Collection<Runner::ptr> tasks;
-	tasks.add(task);
+	tasks.push_back(task);
 	queueTasks(tasks,false);
 }
 
@@ -155,7 +155,7 @@ void ThreadPool::queueTasks(const Collection<Runner::ptr> &tasks){
 
 void ThreadPool::blockForTask(Runner::ptr task){
 	Collection<Runner::ptr> tasks;
-	tasks.add(task);
+	tasks.push_back(task);
 	queueTasks(tasks,true);
 }
 
@@ -180,7 +180,7 @@ void ThreadPool::queueTasks(const Collection<Runner::ptr> &tasks,bool block){
 	
 		for(int i=0;i<tasks.size();++i){
 			group->addTask();
-			mQueue.add(Pair<TaskGroup::ptr,Runner::ptr>(group,tasks[i]));
+			mQueue.push(Pair<TaskGroup::ptr,Runner::ptr>(group,tasks[i]));
 		}
 	
 		if(block){

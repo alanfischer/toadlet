@@ -45,18 +45,20 @@ bool SensorResults::resultFound(Node *result,scalar distance){
 	}
 
 	int handle=result->getUniqueHandle();
-	NodeCollection::iterator n,end;
-	for(n=mNodes.begin(),end=mNodes.end();n!=end;++n){
-		if(n->getUniqueHandle()>handle){
+	Collection<Node::ptr>::iterator it,end;
+	for(it=mNodes.begin(),end=mNodes.end();it!=end;++it){
+		Node *node=*it;
+		if(node->getUniqueHandle()>handle){
 			break;
 		}
 	}
-	mNodes.insert(n,result);
+	mNodes.insert(it,result);
 
 	return true;
 }
 
 void SensorResults::sensingEnding(){
+	mRange=NodeRange::wrapCollection(mNodes);
 }
 
 }

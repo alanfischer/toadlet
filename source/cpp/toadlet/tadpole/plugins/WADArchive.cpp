@@ -63,8 +63,8 @@ bool WADArchive::open(Stream::ptr stream){
 	for(i=0;i<mHeader.numlumps;i++){
 		mLumpinfos[i].filepos=littleInt32(mLumpinfos[i].filepos);
 		mLumpinfos[i].size=littleInt32(mLumpinfos[i].size);
-		mNameMap.add(String(mLumpinfos[i].name).toLower(),i);
-		mEntries.add(mLumpinfos[i].name);
+		mNameMap[String(mLumpinfos[i].name).toLower()]=i;
+		mEntries.push_back(mLumpinfos[i].name);
 	}
 
 	return true;

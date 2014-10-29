@@ -180,7 +180,7 @@ void BSP30Streamer::parseEntities(BSP30Map *map){
 			keyValues.clear();
 		}
 		else if(*data=='}'){
-			map->parsedEntities.add(keyValues);
+			map->parsedEntities.push_back(keyValues);
 		}
 		else if(*data=='\"'){
 			char *key=++data;
@@ -193,7 +193,7 @@ void BSP30Streamer::parseEntities(BSP30Map *map){
 			while(*data!='\"') data++;
 			*data=0;
 
-			keyValues.add(BSP30Map::keyvalue(key,value));
+			keyValues.push_back(BSP30Map::keyvalue(key,value));
 		}
 		data++;
 	}
@@ -347,7 +347,7 @@ void BSP30Streamer::MaterialRequest::parseWADs(BSP30Map *map){
 				int start=0,end=0;
 				while((end=wad.find(".wad",end+1))!=-1){
 					start=Math::maxVal(wad.rfind('\\',end)+1,wad.rfind(';',end)+1);
-					wadNames.add(wad.substr(start,(end-start)+4));
+					wadNames.push_back(wad.substr(start,(end-start)+4));
 				}
 			}
 		}

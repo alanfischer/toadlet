@@ -93,7 +93,7 @@ void BackableShader::setBack(Shader::ptr back,RenderDevice *renderDevice){
 	mBack=back;
 	
 	if(mBack!=NULL){
-		if(convertCreate(mBack,renderDevice,mShaderType,mRawProfiles,mRawCodes,mProfiles.size())==false){
+		if(convertCreate(mBack,renderDevice,mShaderType,&mRawProfiles[0],&mRawCodes[0],mProfiles.size())==false){
 			mBack=NULL;
 		}
 	}

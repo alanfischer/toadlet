@@ -98,13 +98,15 @@ void Node::create(Scene *scene){
 }
 
 void Node::destroyAllChildren(){
-	ComponentCollection::iterator c;
-	while((c=mComponents.begin())!=mComponents.end()){
-		c->destroy();
+	ComponentCollection::iterator componentIt;
+	while((componentIt=mComponents.begin())!=mComponents.end()){
+		Component *component=*componentIt;
+		component->destroy();
 	}
-	NodeCollection::iterator n;
-	while((n=mNodes.begin())!=mNodes.end()){
-		n->destroy();
+	NodeCollection::iterator nodeIt;
+	while((nodeIt=mNodes.begin())!=mNodes.end()){
+		Node *node=*nodeIt;
+		node->destroy();
 	}
 }
 
@@ -133,40 +135,42 @@ bool Node::remove(Component *component){
 }
 
 void Node::componentAttached(Component *component){
-	mComponents.add(component);
+	mComponents.push_back(component);
 }
 
 void Node::componentRemoved(Component *component){
-	mComponents.remove(component);
+	mComponents.erase(std::remove(mComponents.begin(),mComponents.end(),component),mComponents.end());
 }
 
 void Node::nodeAttached(Node *node){
-	mNodes.add(node);
+	mNodes.push_back(node);
 
 	node->transformChanged(node->mTransform); // Trigger bound updating
 }
 
 void Node::nodeRemoved(Node *node){
-	mNodes.remove(node);
+	mNodes.erase(std::remove(mNodes.begin(),mNodes.end(),node));
 }
 
 void Node::actionAttached(ActionComponent *action){
-	mActions.add(action);
+	mActions.push_back(action);
 }
 
 void Node::actionRemoved(ActionComponent *action){
-	mActions.remove(action);
+	mActions.erase(std::remove(mActions.begin(),mActions.end(),action),mActions.end());
 }
 
 Component *Node::getChild(const String &name) const{
-	tforeach(ComponentCollection::const_iterator,c,mComponents){
-		if(c->getName()==name){
-			return (Component*)(const Component*)c;
+	tforeach(ComponentCollection::const_iterator,it,mComponents){
+		Component *component=*it;
+		if(component->getName()==name){
+			return component;
 		}
 	}
-	tforeach(NodeCollection::const_iterator,n,mNodes){
-		if(n->getName()==name){
-			return (Node*)(const Node*)n;
+	tforeach(NodeCollection::const_iterator,it,mNodes){
+		Node *node=*it;
+		if(node->getName()==name){
+			return node;
 		}
 	}
 	return NULL;
@@ -177,23 +181,26 @@ Component *Node::getChild(const Type<Component> *type) const{
 		return NULL;
 	}
 
-	tforeach(ComponentCollection::const_iterator,c,mComponents){
-		if(c->getType()->getFullName()==type->getFullName()){ // Compare names to avoid the issue of multiple types being built into different libraries
-			return (Component*)(const Component*)c;
+	tforeach(ComponentCollection::const_iterator,it,mComponents){
+		Component *component=*it;
+		if(component->getType()->getFullName()==type->getFullName()){ // Compare names to avoid the issue of multiple types being built into different libraries
+			return component;
 		}
 	}
-	tforeach(NodeCollection::const_iterator,n,mNodes){
-		if(n->getType()->getFullName()==type->getFullName()){  // Compare names to avoid the issue of multiple types being built into different libraries
-			return (Node*)(const Node*)n;
+	tforeach(NodeCollection::const_iterator,it,mNodes){
+		Node *node=*it;
+		if(node->getType()->getFullName()==type->getFullName()){  // Compare names to avoid the issue of multiple types being built into different libraries
+			return node;
 		}
 	}
 	return NULL;
 }
 
 Node *Node::getNode(const String &name) const{
-	tforeach(NodeCollection::const_iterator,n,mNodes){
-		if(n->getName()==name){
-			return (Node*)(const Node*)n;
+	tforeach(NodeCollection::const_iterator,it,mNodes){
+		Node *node=*it;
+		if(node->getName()==name){
+			return node;
 		}
 	}
 	return NULL;
@@ -204,9 +211,10 @@ Node *Node::getNode(const Type<Component> *type) const{
 		return NULL;
 	}
 
-	tforeach(NodeCollection::const_iterator,n,mNodes){
-		if(n->getType()->getFullName()==type->getFullName()){ // Compare names to avoid the issue of multiple types being built into different libraries
-			return (Node*)(const Node*)n;
+	tforeach(NodeCollection::const_iterator,it,mNodes){
+		Node *node=*it;
+		if(node->getType()->getFullName()==type->getFullName()){ // Compare names to avoid the issue of multiple types being built into different libraries
+			return node;
 		}
 	}
 	return NULL;
@@ -260,37 +268,37 @@ bool Node::getActionActive(const String &action) const{
 }
 
 void Node::spacialAttached(Spacial *spacial){
-	mSpacials.add(spacial);
+	mSpacials.push_back(spacial);
 
 	spacial->transformChanged(spacial->getTransform());
 }
 
 void Node::spacialRemoved(Spacial *spacial){
-	mSpacials.remove(spacial);
+	mSpacials.erase(std::remove(mSpacials.begin(),mSpacials.end(),spacial),mSpacials.end());
 }
 
 void Node::visibleAttached(Visible *visible){
-	mVisibles.add(visible);
+	mVisibles.push_back(visible);
 }
 
 void Node::visibleRemoved(Visible *visible){
-	mVisibles.remove(visible);
+	mVisibles.erase(std::remove(mVisibles.begin(),mVisibles.end(),visible),mVisibles.end());
 }
 
 void Node::animatableAttached(Animatable *animatable){
-	mAnimatables.add(animatable);
+	mAnimatables.push_back(animatable);
 }
 
 void Node::animatableRemoved(Animatable *animatable){
-	mAnimatables.remove(animatable);
+	mAnimatables.erase(std::remove(mAnimatables.begin(),mAnimatables.end(),animatable),mAnimatables.end());
 }
 
 void Node::lightAttached(LightComponent *light){
-	mLights.add(light);
+	mLights.push_back(light);
 }
 
 void Node::lightRemoved(LightComponent *light){
-	mLights.remove(light);
+	mLights.erase(std::remove(mLights.begin(),mLights.end(),light),mLights.end());
 }
 
 void Node::physicsAttached(PhysicsComponent *physics){
@@ -304,11 +312,13 @@ void Node::physicsRemoved(PhysicsComponent *physics){
 void Node::rootChanged(Node *root){
 	BaseComponent::rootChanged(root);
 
-	tforeach(ComponentCollection::iterator,c,mComponents){
-		c->rootChanged(root);
+	tforeach(ComponentCollection::iterator,it,mComponents){
+		Component *component=*it;
+		component->rootChanged(root);
 	}
-	tforeach(NodeCollection::iterator,n,mNodes){
-		n->rootChanged(root);
+	tforeach(NodeCollection::iterator,it,mNodes){
+		Node *node=*it;
+		node->rootChanged(root);
 	}
 }
 
@@ -371,23 +381,26 @@ void Node::logicUpdate(int dt,int scope){
 	TOADLET_PROFILE_AUTOSCOPE();
 
 	if(mActivateChildren){
-		tforeach(NodeCollection::iterator,n,mNodes){
-			n->activate();
+		tforeach(NodeCollection::iterator,it,mNodes){
+			Node *node=*it;
+			node->activate();
 		}
 		mActivateChildren=false;
 	}
 
 	mChildrenActive=false;
-	tforeach(ComponentCollection::iterator,c,mComponents){
-		c->logicUpdate(dt,scope);
-		mChildrenActive|=c->getActive();
+	tforeach(ComponentCollection::iterator,it,mComponents){
+		Component *component=*it;
+		component->logicUpdate(dt,scope);
+		mChildrenActive|=component->getActive();
 	}
 
-	tforeach(NodeCollection::iterator,n,mNodes){
-		n->logicUpdate(dt,scope);
-		mChildrenActive|=n->getActive();
-		if(n->getActive() && (n->getScope()&scope)!=0){
-			n->tryDeactivate();
+	tforeach(NodeCollection::iterator,it,mNodes){
+		Node *node=*it;
+		node->logicUpdate(dt,scope);
+		mChildrenActive|=node->getActive();
+		if(node->getActive() && (node->getScope()&scope)!=0){
+			node->tryDeactivate();
 		}
 	}
 }
@@ -395,22 +408,26 @@ void Node::logicUpdate(int dt,int scope){
 void Node::frameUpdate(int dt,int scope){
 	TOADLET_PROFILE_AUTOSCOPE();
 
-	tforeach(ComponentCollection::iterator,c,mComponents){
-		c->frameUpdate(dt,scope);
+	tforeach(ComponentCollection::iterator,it,mComponents){
+		Component *component=*it;
+		component->frameUpdate(dt,scope);
 	}
 
-	tforeach(NodeCollection::iterator,n,mNodes){
-		n->frameUpdate(dt,scope);
+	tforeach(NodeCollection::iterator,it,mNodes){
+		Node *node=*it;
+		node->frameUpdate(dt,scope);
 	}
 }
 
 bool Node::handleEvent(Event *event){
 	bool result=false;
-	tforeach(ComponentCollection::iterator,c,mComponents){
-		result|=c->handleEvent(event);
+	tforeach(ComponentCollection::iterator,it,mComponents){
+		Component *component=*it;
+		result|=component->handleEvent(event);
 	}
-	tforeach(NodeCollection::iterator,n,mNodes){
-		result|=n->handleEvent(event);
+	tforeach(NodeCollection::iterator,it,mNodes){
+		Node *node=*it;
+		result|=node->handleEvent(event);
 	}
 	return result;
 }
@@ -447,8 +464,9 @@ void Node::deactivate(){
 	mActive=false;
 	mDeactivateCount=0;
 
-	tforeach(NodeCollection::iterator,n,mNodes){
-		n->deactivate();
+	tforeach(NodeCollection::iterator,it,mNodes){
+		Node *node=*it;
+		node->deactivate();
 	}
 }
 
@@ -478,8 +496,9 @@ void Node::transformChanged(Transform *transform){
 		mWorldScope=mParent->mWorldScope&mScope;
 	}
 
-	tforeach(NodeCollection::iterator,n,mNodes){
-		n->transformChanged(mWorldTransform);
+	tforeach(NodeCollection::iterator,it,mNodes){
+		Node *node=*it;
+		node->transformChanged(mWorldTransform);
 	}
 	for(int i=0;i<mSpacials.size();++i){
 		mSpacials[i]->transformChanged(mWorldTransform);
@@ -510,9 +529,10 @@ void Node::gatherRenderables(Camera *camera,RenderableSet *set){
 
 	set->queueNode(this);
 
-	tforeach(NodeCollection::iterator,n,mNodes){
-		if((camera->getScope()&n->getScope())!=0 && camera->culled(n->getWorldBound())==false){
-			n->gatherRenderables(camera,set);
+	tforeach(NodeCollection::iterator,it,mNodes){
+		Node *node=*it;
+		if((camera->getScope()&node->getScope())!=0 && camera->culled(node->getWorldBound())==false){
+			node->gatherRenderables(camera,set);
 		}
 	}
 	
@@ -536,8 +556,9 @@ void Node::calculateBound(){
 
 		scalar epsilon=mScene!=NULL?mScene->getEpsilon():0;
 
-		tforeach(NodeCollection::const_iterator,n,mNodes){
-			mWorldBound->merge(n->getWorldBound(),epsilon);
+		tforeach(NodeCollection::const_iterator,it,mNodes){
+			Node *node=*it;
+			mWorldBound->merge(node->getWorldBound(),epsilon);
 		}
 
 		for(int i=0;i<mSpacials.size();++i){

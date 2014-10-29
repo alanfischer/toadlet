@@ -256,7 +256,7 @@ Resource::ptr DDSStreamer::load(Stream::ptr stream,ResourceData *data){
 		Log::alert("Other type");
 	}
 
-	Texture::ptr texture=mTextureManager->createTexture(usage,textureFormat,mipDatas);
+	Texture::ptr texture=mTextureManager->createTexture(usage,textureFormat,&mipDatas[0]);
 
 	for(i=0;i<mipCount;++i){
 		delete[] mipDatas[i];

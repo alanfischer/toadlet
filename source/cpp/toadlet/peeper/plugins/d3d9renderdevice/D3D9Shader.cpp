@@ -177,7 +177,7 @@ bool D3D9Shader::reflect(){
 	primaryFormat->setDataSize(dataSize);
 
 	primaryFormat->compile();
-	mVariableBufferFormats.add(primaryFormat);
+	mVariableBufferFormats.push_back(primaryFormat);
 
 	return true;
 }

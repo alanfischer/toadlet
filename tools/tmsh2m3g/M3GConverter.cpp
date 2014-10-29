@@ -210,7 +210,7 @@ public:
 				animationTracks[i]->gatherObjects(objects);
 			}
 		}
-		objects.add(this);
+		objects.push_back(this);
 	}
 
 	uint32 userID;
@@ -1442,7 +1442,7 @@ bool M3GConverter::convertMesh(Mesh *mesh,Stream *outStream,float scale,int forc
 	Collection<M3GProxy*> objects;
 	M3GHeaderObject headerObject;
 	objects.clear();
-	objects.add(&headerObject);
+	objects.push_back(&headerObject);
 	M3GSection section0(objects);
 
 	objects.clear();
@@ -1508,7 +1508,7 @@ M3GObject3D *M3GConverter::buildSceneGraph(Mesh *toadletMesh,float scale,int for
 		reorder[i]=i;
 	}
 
-	if(toadletMesh->getSkeleton()!=NULL && toadletMesh->getVertexBoneAssignments()>0){
+	if(toadletMesh->getSkeleton()!=NULL && toadletMesh->getVertexBoneAssignments().empty()==false){
 		Skeleton::ptr toadletSkeleton=toadletMesh->getSkeleton();
 		const Collection<Mesh::VertexBoneAssignmentList> &vbas=toadletMesh->getVertexBoneAssignments();
 
@@ -1528,7 +1528,7 @@ M3GObject3D *M3GConverter::buildSceneGraph(Mesh *toadletMesh,float scale,int for
 			for(j=0;j<vbas.size();++j){
 				const Mesh::VertexBoneAssignmentList &assignments=vbas[j];
 				if(assignments.size()>0 && assignments[0].bone==i){
-					boneverts[i].add(count);
+					boneverts[i].push_back(count);
 					reorder[j]=count;
 					count++;
 				}
@@ -1541,7 +1541,7 @@ M3GObject3D *M3GConverter::buildSceneGraph(Mesh *toadletMesh,float scale,int for
 		for(i=0;i<toadletSkeleton->getNumBones();++i){
 			Skeleton::Bone *toadletBone=toadletSkeleton->getBone(i);
 			M3GGroup *bone=new M3GGroup();
-			bones.add(bone);
+			bones.push_back(bone);
 
 			if(toadletBone->parentIndex==-1){
 				if(skinnedMesh->skeleton==NULL){
@@ -1560,7 +1560,7 @@ M3GObject3D *M3GConverter::buildSceneGraph(Mesh *toadletMesh,float scale,int for
 				}
 			}
 			else{
-				bones[toadletBone->parentIndex]->children.add(bone);
+				bones[toadletBone->parentIndex]->children.push_back(bone);
 			}
 
 			// Assign the vertexes to the bone
@@ -1570,7 +1570,7 @@ M3GObject3D *M3GConverter::buildSceneGraph(Mesh *toadletMesh,float scale,int for
 				meshBone.weight=1;
 				meshBone.firstVertex=boneverts[i][0];
 				meshBone.vertexCount=boneverts[i].size();
-				skinnedMesh->bones.add(meshBone);
+				skinnedMesh->bones.push_back(meshBone);
 			}
 
 			// Setup bone transform
@@ -1604,7 +1604,7 @@ M3GObject3D *M3GConverter::buildSceneGraph(Mesh *toadletMesh,float scale,int for
 			animationController->userID=i+1;
 
 			skinnedMesh->userParameters[i].id=i+1;
-			skinnedMesh->userParameters[i].value.add(i+1);
+			skinnedMesh->userParameters[i].value.push_back(i+1);
 
 			for(j=0;j<sequence->getNumTracks();++j){
 				Track *track=sequence->getTrack(j);
@@ -1777,7 +1777,7 @@ M3GObject3D *M3GConverter::buildSceneGraph(Mesh *toadletMesh,float scale,int for
 					translationTrack->keyframeSequence=translationSequence;
 					translationTrack->animationController=animationController;
 					translationTrack->propertyID=M3GAnimationTrack::TRANSLATION;
-					bones[j]->animationTracks.add(translationTrack);
+					bones[j]->animationTracks.push_back(translationTrack);
 				}
 
 				if(keepRotationSequence){
@@ -1785,7 +1785,7 @@ M3GObject3D *M3GConverter::buildSceneGraph(Mesh *toadletMesh,float scale,int for
 					rotationTrack->keyframeSequence=rotationSequence;
 					rotationTrack->animationController=animationController;
 					rotationTrack->propertyID=M3GAnimationTrack::ORIENTATION;
-					bones[j]->animationTracks.add(rotationTrack);
+					bones[j]->animationTracks.push_back(rotationTrack);
 				}
 			}
 		}
@@ -1977,7 +1977,7 @@ M3GObject3D *M3GConverter::buildSceneGraph(Mesh *toadletMesh,float scale,int for
 				}
 			}
 
-			vertexes->texCoordArrays.add(texCoords);
+			vertexes->texCoordArrays.push_back(texCoords);
 		}
 		vba.unlock();
 	}
@@ -2009,15 +2009,15 @@ M3GObject3D *M3GConverter::buildSceneGraph(Mesh *toadletMesh,float scale,int for
 
 			actcBeginOutput(mTC);
 			while((prim=actcStartNextPrim(mTC,&v1,&v2))!=ACTC_DATABASE_EMPTY){
-				strips.add(Collection<int>());
+				strips.push_back(Collection<int>());
 				Collection<int> &strip=strips[strips.size()-1];
 
-				strip.add(v1);
-				strip.add(v2);
+				strip.push_back(v1);
+				strip.push_back(v2);
 				numIndexes+=2;
 
 				while(actcGetNextVert(mTC,&v3)!=ACTC_PRIM_COMPLETE){
-					strip.add(v3);
+					strip.push_back(v3);
 					numIndexes++;
 				}
 			}
@@ -2130,11 +2130,11 @@ M3GObject3D *M3GConverter::buildSceneGraph(Mesh *toadletMesh,float scale,int for
 			appearance->userParameters.resize(1);
 			if(material->getPass()->getNumTextures(Shader::ShaderType_FRAGMENT)>0){
 				appearance->userParameters[0].id=0;
-				appearance->userParameters[0].value.add(1);
+				appearance->userParameters[0].value.push_back(1);
 			}
 			else{
 				appearance->userParameters[0].id=0;
-				appearance->userParameters[0].value.add(0);
+				appearance->userParameters[0].value.push_back(0);
 			}
 		}
 		else{
@@ -2143,7 +2143,7 @@ M3GObject3D *M3GConverter::buildSceneGraph(Mesh *toadletMesh,float scale,int for
 			appearance->polygonMode=new M3GPolygonMode();
 			appearance->userParameters.resize(1);
 			appearance->userParameters[0].id=0;
-			appearance->userParameters[0].value.add(0);
+			appearance->userParameters[0].value.push_back(0);
 		}
 		iba.unlock();
 
@@ -2168,7 +2168,7 @@ M3GObject3D *M3GConverter::buildSceneGraph(Mesh *toadletMesh,float scale,int for
 		camera->aspectRatio=1;
 		camera->nearDist=1;
 		camera->farDist=1000;
-		world->children.add(camera);
+		world->children.push_back(camera);
 		world->activeCamera=camera;
 
 		M3GBackground *background=new M3GBackground();
@@ -2184,7 +2184,7 @@ M3GObject3D *M3GConverter::buildSceneGraph(Mesh *toadletMesh,float scale,int for
 		light->intensity=1.0f;
 		light->spotAngle=0.0f;
 		light->spotExponent=0.0f;
-		world->children.add(light);
+		world->children.push_back(light);
 
 		light=new M3GLight();
 		light->attenuationConstant=1.0f;
@@ -2195,9 +2195,9 @@ M3GObject3D *M3GConverter::buildSceneGraph(Mesh *toadletMesh,float scale,int for
 		light->intensity=1.0f;
 		light->spotAngle=0.0f;
 		light->spotExponent=0.0f;
-		world->children.add(light);
+		world->children.push_back(light);
 
-		world->children.add(mesh);
+		world->children.push_back(mesh);
 
 		return world;
 	}

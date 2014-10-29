@@ -89,7 +89,7 @@ bool RenderPass::setTexture(const String &name,Texture *texture,const String &sa
 	t.samplerLocationName=samplerName;
 	t.samplerState=samplerState;
 	t.textureState=textureState;
-	mUnlinkedTextures.add(t);
+	mUnlinkedTextures.push_back(t);
 
 	return true;
 }
@@ -201,7 +201,7 @@ bool RenderPass::addVariable(const String &name,RenderVariable::ptr variable,int
 	v.variable=variable;
 	v.location=-1;
 	v.scope=scope;
-	mUnlinkedVariables.add(v);
+	mUnlinkedVariables.push_back(v);
 	
 	return true;
 }
@@ -289,7 +289,7 @@ bool RenderPass::linkVariables(){
 		vardata.location=formatVariable->getOffset();
 
 		variable->linked(this);
-		mBuffers[bufferType][bufferIndex].variables.add(i);
+		mBuffers[bufferType][bufferIndex].variables.push_back(i);
 		mBuffers[bufferType][bufferIndex].scope|=scope;
 
 		// Combine the two format, not sure this is ideal, but it will let us transfer information about the RenderVariable to the Buffer for items like Format_SAMPLER_MATRIX
