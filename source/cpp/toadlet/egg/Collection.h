@@ -28,7 +28,8 @@
 
 #include <toadlet/egg/Types.h>
 #include <algorithm>
-#include <vector>
+
+namespace std{ struct bidirectional_iterator_tag; }
 
 namespace toadlet{
 namespace egg{
@@ -41,11 +42,7 @@ public:
 	typedef const Type& const_reference;
 	typedef Type* pointer;
 	typedef int difference_type;
-	#if defined(TOADLET_COLLECTION_ITERATOR_CATEGORY)
-		typedef TOADLET_COLLECTION_ITERATOR_CATEGORY iterator_category;
-	#else
-		typedef struct{} iterator_category;
-	#endif
+	typedef std::bidirectional_iterator_tag iterator_category;
 
 	class const_iterator;
 

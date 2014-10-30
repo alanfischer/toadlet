@@ -1,8 +1,6 @@
 #ifndef BRANCHSYSTEM_H
 #define BRANCHSYSTEM_H
 
-#define TOADLET_COLLECTION_ITERATOR_CATEGORY std::bidirectional_iterator_tag
-
 #include <toadlet/toadlet.h>
 
 namespace randisle{

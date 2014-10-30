@@ -120,7 +120,7 @@ toadlet::peeper::RenderDevice *new_RenderDevice(char *name){
 		result=library->load(name,(char*)NULL,(char*)NULL);
 	TOADLET_CATCH_ANONYMOUS(){}
 	if(result){
-		libraries.add(library);
+		libraries.push_back(library);
 		RenderDevice *(*creator)()=NULL;
 		TOADLET_TRY
 			creator=(RenderDevice*(*)())library->getSymbol("new_RenderDevice");
@@ -138,7 +138,7 @@ toadlet::ribbit::AudioDevice *new_AudioDevice(char *name){
 		result=library->load(name,(char*)NULL,(char*)NULL);
 	TOADLET_CATCH_ANONYMOUS(){}
 	if(result){
-		libraries.add(library);
+		libraries.push_back(library);
 		AudioDevice *(*creator)()=NULL;
 		TOADLET_TRY
 			creator=(AudioDevice*(*)())library->getSymbol("new_AudioDevice");

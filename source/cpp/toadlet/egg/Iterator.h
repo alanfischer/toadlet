@@ -28,6 +28,8 @@
 
 #include <toadlet/egg/Types.h>
 
+namespace std{ struct bidirectional_iterator_tag; }
+
 namespace toadlet{
 namespace egg{
 
@@ -79,7 +81,7 @@ public:
 	typedef const Type& const_reference;
 	typedef Type* pointer;
 	typedef int difference_type;
-	struct iterator_category{};
+	typedef std::bidirectional_iterator_tag iterator_category;
 
 	AnyIterator(const Iterator<Type> &it):iter(it.clone()){}
 	AnyIterator(const AnyIterator &it):iter(it.iter->clone()){}
@@ -101,12 +103,12 @@ public:
 template<typename Type>
 class AnyPointerIterator{
 public:
-	typedef Type value_type;
-	typedef Type& reference;
-	typedef const Type& const_reference;
-	typedef Type* pointer;
+	typedef Type* value_type;
+	typedef Type*& reference;
+	typedef const Type*& const_reference;
+	typedef Type** pointer;
 	typedef int difference_type;
-	struct iterator_category{};
+	typedef std::bidirectional_iterator_tag iterator_category;
 
 	AnyPointerIterator(const Iterator<Type*> &it):iter(it.clone()){}
 	AnyPointerIterator(const AnyPointerIterator &it):iter(it.iter->clone()){}
