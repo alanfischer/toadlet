@@ -29,16 +29,30 @@
 #include <toadlet/egg/Types.h>
 #include <toadlet/egg/Collection.h>
 
+namespace std{ struct bidirectional_iterator_tag; }
+
 namespace toadlet{
 namespace egg{
 
 template<typename Type>
 class TOADLET_API CircularBuffer{
 public:
-	typedef Collection<Type> CollectionType;
+	typedef Type value_type;
+	typedef Type& reference;
+	typedef const Type& const_reference;
+	typedef Type* pointer;
+	typedef int difference_type;
+	typedef std::bidirectional_iterator_tag iterator_category;
 
 	class iterator{
 	public:
+		typedef typename CircularBuffer<Type>::value_type value_type;
+		typedef typename CircularBuffer<Type>::reference reference;
+		typedef typename CircularBuffer<Type>::const_reference const_reference;
+		typedef typename CircularBuffer<Type>::pointer pointer;
+		typedef typename CircularBuffer<Type>::difference_type difference_type;
+		typedef typename CircularBuffer<Type>::iterator_category iterator_category;
+
 		inline iterator():it(NULL),begin(NULL),end(NULL){}
 		inline iterator(Type *i,Type *b,Type *e):it(i),begin(b),end(e){}
 
@@ -59,6 +73,13 @@ public:
 
 	class const_iterator{
 	public:
+		typedef typename CircularBuffer<Type>::value_type value_type;
+		typedef typename CircularBuffer<Type>::reference reference;
+		typedef typename CircularBuffer<Type>::const_reference const_reference;
+		typedef typename CircularBuffer<Type>::pointer pointer;
+		typedef typename CircularBuffer<Type>::difference_type difference_type;
+		typedef typename CircularBuffer<Type>::iterator_category iterator_category;
+
 		inline const_iterator():it(NULL),begin(NULL),end(NULL){}
 		inline const_iterator(const Type *i,const Type *b,const Type *e):it(i),begin(b),end(e){}
 
@@ -120,7 +141,7 @@ public:
 
 protected:
 	int mSize,mBegin,mEnd;
-	CollectionType mContainer;
+	Collection<Type> mContainer;
 };
 
 }
