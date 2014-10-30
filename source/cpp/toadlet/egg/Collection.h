@@ -315,7 +315,6 @@ public:
 
 	iterator erase(const iterator &start,const iterator &end){
 		int istart=start-begin();
-		int iend=end-begin();
 		int size=end-start;
 
 		int i;

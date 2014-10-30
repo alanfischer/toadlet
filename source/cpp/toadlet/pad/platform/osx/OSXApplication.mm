@@ -291,19 +291,19 @@ OSXApplication::OSXApplication():
 {
 	#if defined(TOADLET_HAS_OPENGL)
 		#if defined(TOADLET_HAS_UIKIT)
-			mRenderDevicePlugins.add("gles1",RenderDevicePlugin(new_EAGL1RenderTarget,new_GLES1RenderDevice));
-			mRenderDevicePlugins.add("gles2",RenderDevicePlugin(new_EAGL2RenderTarget,new_GLES2RenderDevice));
-			mRenderDevicePreferences.add("gles2");
-			mRenderDevicePreferences.add("gles1");
+			mRenderDevicePlugins["gles1"]=RenderDevicePlugin(new_EAGL1RenderTarget,new_GLES1RenderDevice);
+			mRenderDevicePlugins["gles2"]=RenderDevicePlugin(new_EAGL2RenderTarget,new_GLES2RenderDevice);
+			mRenderDevicePreferences.push_back("gles2");
+			mRenderDevicePreferences.push_back("gles1");
 		#else
-			mRenderDevicePlugins.add("gl",RenderDevicePlugin(new_NSGLRenderTarget,new_GLRenderDevice));
-			mRenderDevicePreferences.add("gl");
+			mRenderDevicePlugins["gl"]=RenderDevicePlugin(new_NSGLRenderTarget,new_GLRenderDevice);
+			mRenderDevicePreferences.push_back("gl");
 		#endif
 	#endif
 	
 	#if defined(TOADLET_HAS_OPENAL)
-		mAudioDevicePlugins.add("al",AudioDevicePlugin(new_ALAudioDevice));
-		mAudioDevicePreferences.add("al");
+		mAudioDevicePlugins["al"]=AudioDevicePlugin(new_ALAudioDevice);
+		mAudioDevicePreferences.push_back("al");
 	#endif
 }
 

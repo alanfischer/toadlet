@@ -98,15 +98,15 @@ X11Application::X11Application():
 
 	#if defined(TOADLET_HAS_OPENGL)
 		#if defined(TOADLET_PLATFORM_EMSCRIPTEN)
-			mRenderDevicePlugins.add("gles2",RenderDevicePlugin(new_EGLWindowRenderTarget,new_GLES2RenderDevice));
+			mRenderDevicePlugins["gles2"]=RenderDevicePlugin(new_EGLWindowRenderTarget,new_GLES2RenderDevice);
 		#else
-			mRenderDevicePlugins.add("gl",RenderDevicePlugin(new_GLXWindowRenderTarget,new_GLRenderDevice));
+			mRenderDevicePlugins["gl"]=RenderDevicePlugin(new_GLXWindowRenderTarget,new_GLRenderDevice);
 		#endif
 	#endif
 
 	#if defined(TOADLET_HAS_OPENAL)
 		#if !defined(TOADLET_PLATFORM_EMSCRIPTEN)
-			mAudioDevicePlugins.add("al",AudioDevicePlugin(new_ALAudioDevice));
+			mAudioDevicePlugins["al"]=AudioDevicePlugin(new_ALAudioDevice);
 		#endif
 	#endif
 }
