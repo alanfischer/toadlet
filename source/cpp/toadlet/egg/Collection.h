@@ -29,7 +29,7 @@
 #include <toadlet/egg/Types.h>
 #include <algorithm>
 
-namespace std{ struct bidirectional_iterator_tag; }
+namespace std{ struct random_access_iterator_tag; }
 
 namespace toadlet{
 namespace egg{
@@ -42,7 +42,7 @@ public:
 	typedef const Type& const_reference;
 	typedef Type* pointer;
 	typedef int difference_type;
-	typedef std::bidirectional_iterator_tag iterator_category;
+	typedef std::random_access_iterator_tag iterator_category;
 
 	class const_iterator;
 
