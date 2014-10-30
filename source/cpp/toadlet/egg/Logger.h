@@ -32,6 +32,8 @@
 	#pragma warning(disable:4996)
 #endif
 
+namespace std{ struct input_iterator_tag; }
+
 namespace toadlet{
 namespace egg{
 
@@ -104,11 +106,7 @@ public:
 		typedef const Type& const_reference;
 		typedef Type* pointer;
 		typedef int difference_type;
-		#if defined(TOADLET_LOGGER_ITERATOR_CATEGORY)
-			typedef TOADLET_LOGGER_ITERATOR_CATEGORY iterator_category;
-		#else
-		typedef struct{} iterator_category;
-		#endif
+		typedef std::input_iterator_tag iterator_category;
 	
 		struct node{
 			node():next(NULL){}

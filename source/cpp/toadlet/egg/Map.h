@@ -27,7 +27,6 @@
 #define TOADLET_EGG_MAP_H
 
 #include <toadlet/egg/Collection.h>
-#include <map>
 
 namespace toadlet{
 namespace egg{
