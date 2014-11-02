@@ -57,6 +57,7 @@ public:
 
 protected:
 	int mScope;
+	bool mSensing;
 	Collection<Node::ptr> mNodes;
 	NodeRange mRange;
 };

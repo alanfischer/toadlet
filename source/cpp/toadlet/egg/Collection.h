@@ -29,11 +29,12 @@
 #include <toadlet/egg/Types.h>
 #include <algorithm>
 
+#if 1
 namespace std{ struct random_access_iterator_tag; }
 
 namespace toadlet{
 namespace egg{
-#if 1
+
 template<typename Type>
 class TOADLET_API Collection{
 public:
@@ -410,12 +411,13 @@ protected:
 	Type *mData;
 	iterator mBegin,mEnd;
 };
-#else
-#define Collection std::vector
-#endif
 
 }
 }
+#else
+#include <vector>
+#define Collection std::vector
+#endif
 
 #endif
 

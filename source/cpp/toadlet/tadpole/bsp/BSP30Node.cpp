@@ -135,16 +135,16 @@ void BSP30Node::nodeRemoved(Node *node){
 void BSP30Node::insertNodeLeafIndexes(const Collection<int> &indexes,Node *node){
 	int i;
 	for(i=indexes.size()-1;i>=0;--i){
-		Collection<Node*> &occupants=indexes[i]<0 ? mGlobalLeafData.occupants : mLeafData[indexes[i]].occupants;
-		occupants.push_back(node);
+		leafdata *data=indexes[i]<0 ? &mGlobalLeafData : &mLeafData[indexes[i]];
+		data->occupants.push_back(node);
 	}
 }
 
 void BSP30Node::removeNodeLeafIndexes(const Collection<int> &indexes,Node *node){
 	int i;
 	for(i=indexes.size()-1;i>=0;--i){
-		Collection<Node*> &occupants=indexes[i]<0 ? mGlobalLeafData.occupants : mLeafData[indexes[i]].occupants;
-		occupants.erase(std::remove(occupants.begin(),occupants.end(),node),occupants.end());
+		leafdata *data=indexes[i]<0 ? &mGlobalLeafData : &mLeafData[indexes[i]];
+		data->occupants.erase(std::remove(data->occupants.begin(),data->occupants.end(),node),data->occupants.end());
 	}
 }
 
