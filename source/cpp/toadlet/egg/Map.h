@@ -28,9 +28,10 @@
 
 #include <toadlet/egg/Collection.h>
 
+#if 1 
 namespace toadlet{
 namespace egg{
-#if 1
+
 template <typename T>
 inline T advance (T i, int offset){
 	return (i + offset);
@@ -200,12 +201,13 @@ inline void Map<K,V>::erase (const_key_ref k){
 	if (ip != end())
 	erase (ip);
 }
-#else
-#define Map std::map
-#define Pair std::pair
-#endif
 
 }
 }
+#else
+#include <map>
+#define Map std::map
+#define Pair std::pair
+#endif
 
 #endif

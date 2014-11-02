@@ -31,12 +31,14 @@ namespace tadpole{
 namespace sensor{
 
 SensorResults::SensorResults():
-	mScope(-1)
+	mScope(-1),
+	mSensing(false)
 	//mResults
 {}
 
 void SensorResults::sensingBeginning(){
 	mNodes.clear();
+	mSensing=true;
 }
 	
 bool SensorResults::resultFound(Node *result,scalar distance){
@@ -54,10 +56,15 @@ bool SensorResults::resultFound(Node *result,scalar distance){
 	}
 	mNodes.insert(it,result);
 
+	if(mSensing==false){
+		mRange=NodeRange::wrapCollection(mNodes);
+	}
+
 	return true;
 }
 
 void SensorResults::sensingEnding(){
+	mSensing=false;
 	mRange=NodeRange::wrapCollection(mNodes);
 }
 

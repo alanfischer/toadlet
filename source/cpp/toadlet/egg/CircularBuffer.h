@@ -111,11 +111,11 @@ public:
 	inline const Type &front() const{return mContainer[mBegin];}
 	inline const Type &back() const{return mContainer[(mEnd + mSize - 1) % mSize];}
 
-	inline iterator begin(){return iterator(mContainer.begin()+mBegin,mContainer.begin(),mContainer.end());}
-	inline iterator end(){return iterator(mContainer.begin()+mEnd,mContainer.begin(),mContainer.end());}
+	inline iterator begin(){return iterator(&*(mContainer.begin()+mBegin),&*mContainer.begin(),&*mContainer.end());}
+	inline iterator end(){return iterator(&*(mContainer.begin()+mEnd),&*mContainer.begin(),&*mContainer.end());}
 
-	inline const_iterator begin() const{return iterator(mContainer.begin()+mBegin,mContainer.begin(),mContainer.end());}
-	inline const_iterator end() const{return iterator(mContainer.begin()+mEnd,mContainer.begin(),mContainer.end());}
+	inline const_iterator begin() const{return iterator(&*(mContainer.begin()+mBegin),&*mContainer.begin(),&*mContainer.end());}
+	inline const_iterator end() const{return iterator(&*(mContainer.begin()+mEnd),&*mContainer.begin(),&*mContainer.end());}
 
 	inline void push_back(){
 		mEnd = (mEnd + 1) % mSize;

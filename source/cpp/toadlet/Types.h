@@ -27,6 +27,7 @@
 #define TOADLET_TYPES_H
 
 #include <toadlet/Config.h>
+#define _ITERATOR_DEBUG_LEVEL 0
 
 #if !defined(TOADLET_DEBUG) && (defined(DEBUG) || defined(_DEBUG))
 	#define TOADLET_DEBUG 1

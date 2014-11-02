@@ -149,7 +149,7 @@ void Node::nodeAttached(Node *node){
 }
 
 void Node::nodeRemoved(Node *node){
-	mNodes.erase(std::remove(mNodes.begin(),mNodes.end(),node));
+	mNodes.erase(std::remove(mNodes.begin(),mNodes.end(),node),mNodes.end());
 }
 
 void Node::actionAttached(ActionComponent *action){

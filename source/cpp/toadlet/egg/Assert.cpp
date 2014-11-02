@@ -26,6 +26,15 @@
 #include "Assert.h"
 #include "Error.h"
 
+#if 0
+#include <vector>
+void TOADLET_API std::_Xout_of_range(char const*){}
+void TOADLET_API std::_Xlength_error(char const*){}
+void TOADLET_API std::_Xbad_alloc(){}
+void std::_Container_base0::_Orphan_all(){}
+void std::_Container_base0::_Swap_all(std::_Container_base0&){}
+#endif
+
 namespace toadlet{
 namespace egg{
 
