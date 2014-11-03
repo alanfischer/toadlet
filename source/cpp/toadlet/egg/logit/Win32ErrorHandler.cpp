@@ -29,10 +29,9 @@
 
 #include <stdio.h>
 
-#define TOADLET_GETPROCEDURE(library,name) name=(proc_##name)GetProcAddress(library,TEXT(#name))
+#define LOGIT_GETPROCEDURE(library,name) name=(proc_##name)GetProcAddress(library,TEXT(#name))
 
-namespace toadlet{
-namespace egg{
+namespace logit{
 
 Win32ErrorHandler *Win32ErrorHandler::instance=NULL;
 
@@ -72,16 +71,16 @@ Win32ErrorHandler::Win32ErrorHandler():
 	}
 
 	if(mDbgHelp!=NULL){
-		TOADLET_GETPROCEDURE(mDbgHelp,StackWalk64);
-		TOADLET_GETPROCEDURE(mDbgHelp,SymInitialize);
-		TOADLET_GETPROCEDURE(mDbgHelp,SymGetOptions);
-		TOADLET_GETPROCEDURE(mDbgHelp,SymSetOptions);
-		TOADLET_GETPROCEDURE(mDbgHelp,SymCleanup);
-		TOADLET_GETPROCEDURE(mDbgHelp,SymFunctionTableAccess64);
-		TOADLET_GETPROCEDURE(mDbgHelp,SymGetModuleBase64);
-		TOADLET_GETPROCEDURE(mDbgHelp,SymGetSymFromAddr64);
-		TOADLET_GETPROCEDURE(mDbgHelp,UnDecorateSymbolName);
-		TOADLET_GETPROCEDURE(mDbgHelp,SymGetLineFromAddr64);
+		LOGIT_GETPROCEDURE(mDbgHelp,StackWalk64);
+		LOGIT_GETPROCEDURE(mDbgHelp,SymInitialize);
+		LOGIT_GETPROCEDURE(mDbgHelp,SymGetOptions);
+		LOGIT_GETPROCEDURE(mDbgHelp,SymSetOptions);
+		LOGIT_GETPROCEDURE(mDbgHelp,SymCleanup);
+		LOGIT_GETPROCEDURE(mDbgHelp,SymFunctionTableAccess64);
+		LOGIT_GETPROCEDURE(mDbgHelp,SymGetModuleBase64);
+		LOGIT_GETPROCEDURE(mDbgHelp,SymGetSymFromAddr64);
+		LOGIT_GETPROCEDURE(mDbgHelp,UnDecorateSymbolName);
+		LOGIT_GETPROCEDURE(mDbgHelp,SymGetLineFromAddr64);
 	}
 }
 
@@ -249,7 +248,7 @@ void Win32ErrorHandler::handleFrames(STACKFRAME64 *stackFrames,int numFrames,HAN
 	DWORD options=SymGetOptions();
 	options|=SYMOPT_LOAD_LINES;
 	options|=SYMOPT_FAIL_CRITICAL_ERRORS;
-	#if defined(TOADLET_DEBUG)
+	#if defined(LOGIT_DEBUG)
 		options|=SYMOPT_DEBUG;
 	#endif
 	options&=~SYMOPT_UNDNAME;
@@ -290,5 +289,4 @@ void Win32ErrorHandler::handleFrames(STACKFRAME64 *stackFrames,int numFrames,HAN
 	SymCleanup(process);
 }
 
-}
 }

@@ -419,7 +419,7 @@ void RandIsle::updateProps(){
 	Segment segment;
 	Vector2 origin(mPlayer->getPhysics()->getPosition().x,mPlayer->getPhysics()->getPosition().y);
 	Random r(System::mtime());
-	tforeach(AnyPointerIterator<Node>,prop,mProps->getNodes()){
+	tforeach(NodeRange::iterator,prop,mProps->getNodes()){
 		Vector2 propOrigin(prop->getWorldTranslate().x,prop->getWorldTranslate().y);
 		scalar d=Math::length(propOrigin,origin);
 		scalar a=Math::ONE-(d-minDist)/(maxDist-minDist);
@@ -680,7 +680,7 @@ void RandIsle::playerMove(Node *player,scalar dr,scalar ds){
 	climber->setSpeed(speed);
 }
 
-float RandIsle::findPathSequence(PointerCollection<PathEdge> &sequence,PathClimber *climber,PathVertex *vertex,int direction,scalar time){
+float RandIsle::findPathSequence(Collection<PathEdge::ptr> &sequence,PathClimber *climber,PathVertex *vertex,int direction,scalar time){
 	Vector3 right,forward,up;
 	Math::setAxesFromQuaternion(climber->getIdealRotation(),right,forward,up);
 	forward.z+=0.25;
@@ -690,7 +690,7 @@ float RandIsle::findPathSequence(PointerCollection<PathEdge> &sequence,PathClimb
 	return result;
 }
 
-float RandIsle::findPathSequence(PointerCollection<PathEdge> &sequence,PathClimber *climber,const Vector3 &forward,PathVertex *previous,PathVertex *vertex,int direction,scalar time,bool first){
+float RandIsle::findPathSequence(Collection<PathEdge::ptr> &sequence,PathClimber *climber,const Vector3 &forward,PathVertex *previous,PathVertex *vertex,int direction,scalar time,bool first){
 	if(vertex==NULL){
 		return 0;
 	}
@@ -710,7 +710,7 @@ float RandIsle::findPathSequence(PointerCollection<PathEdge> &sequence,PathClimb
 		Math::sub(tangent,point);
 
 		scalar d=0;
-		PointerCollection<PathEdge> p;
+		Collection<PathEdge::ptr> p;
 		d=Math::dot(tangent,forward);
 		d+=findPathSequence(p,climber,forward,vertex,next->getVertex(next->getVertex(false)==vertex),0,next!=NULL?next->getTime(next->getVertex(true)==vertex):0,false);
 

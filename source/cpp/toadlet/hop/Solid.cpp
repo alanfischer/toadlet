@@ -186,7 +186,7 @@ void Solid::addShape(Shape *shape){
 }
 
 void Solid::removeShape(Shape *shape){
-	mShapes.erase(std::remove(mShapes.begin(),mShapes.end(),shape),mShapes.end());
+	mShapes.erase(remove(mShapes.begin(),mShapes.end(),shape),mShapes.end());
 	shape->mSolid=NULL;
 	updateLocalBound();
 	activate();
@@ -262,7 +262,7 @@ void Solid::internal_addConstraint(Constraint *constraint){
 }
 
 void Solid::internal_removeConstraint(Constraint *constraint){
-	mConstraints.erase(std::remove(mConstraints.begin(),mConstraints.end(),constraint),mConstraints.end());
+	mConstraints.erase(remove(mConstraints.begin(),mConstraints.end(),constraint),mConstraints.end());
 }
 
 }

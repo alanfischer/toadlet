@@ -35,9 +35,9 @@ namespace egg{
 
 template<typename Type>
 class IteratorRange:public std::iterator_range<Type>{
-	IteratorRange():std::iterator_range<Type>{}
+	IteratorRange():std::iterator_range<Type>(){}
 	IteratorRange(const std::iterator_range<Type> &range):std::iterator_range<Type>(range){}
-	IteratorRange(const iterator &bit,const iterator &eit):std::iterator_range<Type>(bit,eit){}
+	IteratorRange(const typename std::iterator_range<Type>::iterator &bit,const typename std::iterator_range<Type>::iterator &eit):std::iterator_range<Type>(bit,eit){}
 };
 
 template<typename Type>
@@ -45,7 +45,7 @@ class PointerIteratorRange:public std::pointer_iterator_range<Type>{
 public:
 	PointerIteratorRange():std::pointer_iterator_range<Type>(){}
 	PointerIteratorRange(const std::pointer_iterator_range<Type> &range):std::pointer_iterator_range<Type>(range){}
-	PointerIteratorRange(const iterator &bit,const iterator &eit):std::pointer_iterator_range<Type>(bit,eit){}
+	PointerIteratorRange(const typename std::pointer_iterator_range<Type>::iterator &bit,const typename std::pointer_iterator_range<Type>::iterator &eit):std::pointer_iterator_range<Type>(bit,eit){}
 
 };
 

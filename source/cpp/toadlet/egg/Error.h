@@ -26,65 +26,14 @@
 #ifndef TOADLET_EGG_ERROR_H
 #define TOADLET_EGG_ERROR_H
 
-#include "Errorer.h"
+#include "Log.h"
 
-#if defined(TOADLET_EXCEPTIONS)
-	#define TOADLET_MAKE_ERROR_FUNCTION(name,type) \
-		static toadlet::egg::Exception name(const char *text){return name((char*)NULL,true,text,Throw_YES);} \
-		static toadlet::egg::Exception name(const char *text,Throw throwit){return name((char*)NULL,true,text,throwit);} \
-		static toadlet::egg::Exception name(const char *category,const char *text,Throw throwit=Throw_YES){return name(category,true,text,throwit);} \
-		static toadlet::egg::Exception name(const char *category,bool report,const char *text,Throw throwit=Throw_YES){ \
-			Errorer *instance=getInstance(); \
-			toadlet::egg::Exception ex(type,category,text); \
-			instance->setException(ex,report); \
-			if(throwit==Throw_YES){ \
-				throw ex; \
-			} \
-			return ex; \
-		}
-#else
-	#define TOADLET_MAKE_ERROR_FUNCTION(name,type) \
-		static toadlet::egg::Exception name(const char *text){return name((char*)NULL,true,text,Throw_YES);} \
-		static toadlet::egg::Exception name(const char *text,Throw throwit){return name((char*)NULL,true,text,throwit);} \
-		static toadlet::egg::Exception name(const char *category,const char *text,Throw throwit=Throw_YES){return name(category,true,text,throwit);} \
-		static toadlet::egg::Exception name(const char *category,bool report,const char *text,Throw throwit=Throw_YES){ \
-			Errorer *instance=getInstance(); \
-			toadlet::egg::Exception ex(type,category,text); \
-			instance->setException(ex,report); \
-			return ex; \
-		}
-#endif
+#include "logit/Error.h"
 
 namespace toadlet{
 namespace egg{
 
-class TOADLET_API Error{
-public:
-	enum Throw{
-		Throw_NO,
-		Throw_YES
-	};
-
-	static void initialize(bool handler=true);
-	static Errorer *getInstance();
-	static void destroy();
-    
-	TOADLET_MAKE_ERROR_FUNCTION(unknown,Errorer::Type_UNKNOWN)
-	TOADLET_MAKE_ERROR_FUNCTION(tassert,Errorer::Type_ASSERT) // Name assert may already be in use
-	TOADLET_MAKE_ERROR_FUNCTION(invalidParameters,Errorer::Type_INVALID_PARAMETERS)
-	TOADLET_MAKE_ERROR_FUNCTION(nullPointer,Errorer::Type_NULL_POINTER)
-	TOADLET_MAKE_ERROR_FUNCTION(unimplemented,Errorer::Type_UNIMPLEMENTED)
-	TOADLET_MAKE_ERROR_FUNCTION(overflow,Errorer::Type_OVERFLOW)
-	TOADLET_MAKE_ERROR_FUNCTION(insufficientMemory,Errorer::Type_INSUFFICIENT_MEMORY)
-	TOADLET_MAKE_ERROR_FUNCTION(fileNotFound,Errorer::Type_FILE_NOT_FOUND)
-	TOADLET_MAKE_ERROR_FUNCTION(libraryNotFound,Errorer::Type_LIBRARY_NOT_FOUND)
-	TOADLET_MAKE_ERROR_FUNCTION(symbolNotFound,Errorer::Type_SYMBOL_NOT_FOUND)
-	TOADLET_MAKE_ERROR_FUNCTION(socket,Errorer::Type_SOCKET)
-
-protected:
-	static Errorer *mTheErrorer;
-	static void *mErrorHandler;
-};
+using namespace logit;
 
 }
 }

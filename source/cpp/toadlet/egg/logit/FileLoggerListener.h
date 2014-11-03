@@ -1,13 +1,12 @@
-#ifndef TOADLET_EGG_FILELOGGERLISTENER_H
-#define TOADLET_EGG_FILELOGGERLISTENER_H
+#ifndef LOGIT_FILELOGGERLISTENER_H
+#define LOGIT_FILELOGGERLISTENER_H
 
 #include "BaseLoggerListener.h"
 #include <stdio.h>
 
-namespace toadlet{
-namespace egg{
+namespace logit{
 
-class TOADLET_API FileLoggerListener:public BaseLoggerListener{
+class LOGIT_API FileLoggerListener:public BaseLoggerListener{
 public:
 	FileLoggerListener(bool date,const char *directory,const char *prefix);
 	virtual ~FileLoggerListener();
@@ -23,7 +22,6 @@ protected:
 	FILE *mDateLogStream;
 };
 
-}
 }
 
 #endif

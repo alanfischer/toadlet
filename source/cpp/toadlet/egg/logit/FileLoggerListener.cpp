@@ -1,8 +1,7 @@
 #include "FileLoggerListener.h"
 #include <time.h>
 
-namespace toadlet{
-namespace egg{
+namespace logit{
 
 FileLoggerListener::FileLoggerListener(bool date,const char *directory,const char *prefix):
 	mUseDate(date),
@@ -92,5 +91,4 @@ void FileLoggerListener::flush(){
 	}
 }
 
-}
 }

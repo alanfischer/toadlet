@@ -28,8 +28,7 @@
 #include "Log.h"
 #include <stdio.h>
 
-namespace toadlet{
-namespace egg{
+namespace logit{
 
 Logger::Logger(bool startSilent):
 	mReportingLevel(Level_MAX),
@@ -40,7 +39,7 @@ Logger::Logger(bool startSilent):
 	mMutex=Log::createMutex();
 
 	if(startSilent==false){
-		addCompleteLogEntry(NULL,Level_DISABLED,"creating toadlet.egg.Logger");
+		addCompleteLogEntry(NULL,Level_DISABLED,"creating logit.Logger");
 	}
 }
 
@@ -184,5 +183,4 @@ void Logger::unlock(){
 	Log::unlock(mMutex);
 }
 
-}
 }

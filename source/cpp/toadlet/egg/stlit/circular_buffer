@@ -139,7 +139,7 @@ public:
 
 protected:
 	int mSize,mBegin,mEnd;
-	Collection<Type> mContainer;
+	vector<Type> mContainer;
 };
 
 }

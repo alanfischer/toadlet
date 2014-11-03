@@ -23,6 +23,9 @@
  *
  ********** Copyright header - do not remove **********/
 
+#ifndef CURRENTCTX_H
+#define CURRENTCTX_H
+
 #include <windows.h>
 
 #if defined(_M_IX86) && (_WIN32_WINNT <= 0x0500) && (_MSC_VER < 1400)
@@ -60,4 +63,6 @@
 			(c).ContextFlags = contextFlags; \
 			RtlCaptureContext(&(c)); \
 		} while(0);
+#endif
+
 #endif

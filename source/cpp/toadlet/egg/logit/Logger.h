@@ -23,23 +23,23 @@
  *
  ********** Copyright header - do not remove **********/
 
-#ifndef TOADLET_EGG_LOGGER_H
-#define TOADLET_EGG_LOGGER_H
-
-#include <toadlet/Types.h>
-
-#if defined(TOADLET_PLATFORM_WIN32)
-	#pragma warning(disable:4996)
-#endif
+#ifndef LOGIT_LOGGER_H
+#define LOGIT_LOGGER_H
 
 namespace std{ struct input_iterator_tag; }
 
-namespace toadlet{
-namespace egg{
+namespace logit{
+
+#if defined(LOGIT_PLATFORM_WIN32)
+	#pragma warning(disable:4996)
+	typedef unsigned __int64 uint64;
+#else
+	typedef unsigned long long int uint64;
+#endif
 
 class LoggerListener;
 
-class TOADLET_API Logger{
+class LOGIT_API Logger{
 public:
 	typedef uint64 timestamp;
 
@@ -235,7 +235,6 @@ typedef Logger::Category LoggerCategory;
 typedef Logger::Entry LoggerEntry;
 typedef Logger::List<LoggerEntry*> LoggerEntryList;
 
-}
 }
 
 #endif

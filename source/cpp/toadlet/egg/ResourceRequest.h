@@ -27,7 +27,7 @@
 #define TOADLET_EGG_IO_RESOURCEREQUEST_H
 
 #include <toadlet/egg/Resource.h>
-#include <toadlet/egg/Exception.h>
+#include <toadlet/egg/Error.h>
 
 namespace toadlet{
 namespace egg{

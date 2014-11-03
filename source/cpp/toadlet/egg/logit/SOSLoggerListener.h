@@ -1,10 +1,9 @@
-#ifndef TOADLET_EGG_SOSLOGGERLISTENER_H
-#define TOADLET_EGG_SOSLOGGERLISTENER_H
+#ifndef LOGIT_SOSLOGGERLISTENER_H
+#define LOGIT_SOSLOGGERLISTENER_H
 
 #include "LoggerListener.h"
 
-namespace toadlet{
-namespace egg{
+namespace logit{
 
 class SOSLoggerListener:public LoggerListener{
 public:
@@ -31,7 +30,6 @@ protected:
 	bool mStop;
 };
 
-}
 }
 
 #endif

@@ -27,18 +27,17 @@
 #include <stdlib.h>
 #include <stdio.h>
 
-#if !defined(TOADLET_PLATFORM_ANDROID) && !defined(TOADLET_PLATFORM_EMSCRIPTEN)
-	#define TOADLET_HAS_BACKTRACE
+#if !defined(LOGIT_PLATFORM_ANDROID) && !defined(LOGIT_PLATFORM_EMSCRIPTEN)
+	#define LOGIT_HAS_BACKTRACE
 #endif
 
-#if defined(TOADLET_HAS_BACKTRACE)
+#if defined(LOGIT_HAS_BACKTRACE)
 	#include <execinfo.h>
 #endif
 
-namespace toadlet{
-namespace egg{
+namespace logit{
 
-#if defined(TOADLET_PLATFORM_OSX)
+#if defined(LOGIT_PLATFORM_OSX)
 	extern "C" void PosixErrorHandler_installNSHandler();
 	extern "C" void PosixErrorHandler_uninstallNSHandler();
 #endif
@@ -86,7 +85,7 @@ bool PosixErrorHandler::installHandler(){
 		sigaction(mSignals[i],&mAction,&mOldActions[i]);
 	}
 
-	#if defined(TOADLET_PLATFORM_OSX)
+	#if defined(LOGIT_PLATFORM_OSX)
 		PosixErrorHandler_installNSHandler();
 	#endif
 	
@@ -103,7 +102,7 @@ bool PosixErrorHandler::uninstallHandler(){
 
 	memset(&mAction,0,sizeof(mAction));
 
-	#if defined(TOADLET_PLATFORM_OSX)
+	#if defined(LOGIT_PLATFORM_OSX)
 		PosixErrorHandler_uninstallNSHandler();
 	#endif
 	
@@ -113,7 +112,7 @@ bool PosixErrorHandler::uninstallHandler(){
 void PosixErrorHandler::signalHandler(int sig,siginfo_t *info,void *context){
 	void **stackFrames=instance->mStackFrames;
 	int frameCount=
-	#if defined(TOADLET_HAS_BACKTRACE)
+	#if defined(LOGIT_HAS_BACKTRACE)
 		backtrace(stackFrames,MAX_STACKFRAMES);
 	#else
 		0;
@@ -123,7 +122,7 @@ void PosixErrorHandler::signalHandler(int sig,siginfo_t *info,void *context){
 }
 
 void PosixErrorHandler::handleFrames(void **frames,int count){
-	#if defined(TOADLET_HAS_BACKTRACE)
+	#if defined(LOGIT_HAS_BACKTRACE)
 		char **strings=backtrace_symbols(frames,count);
 
 		if(mListener!=NULL){
@@ -149,5 +148,4 @@ void PosixErrorHandler::errorHandled(){
 	abort();
 }
 
-}
 }

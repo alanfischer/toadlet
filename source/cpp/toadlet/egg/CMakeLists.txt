@@ -7,12 +7,8 @@ set (EGG_SRC
 	Assert.cpp
 	Atomic.cpp
 	Error.cpp
-	Errorer.cpp
-	FileLoggerListener.cpp
 	Log.cpp
-	Logger.cpp
 	MathFormatting.cpp
-	SOSLoggerListener.cpp
 	Object.cpp
 	Profile.cpp
 	Random.cpp
@@ -53,7 +49,6 @@ set (EGG_MATHFIXED_SRC
 
 set (EGG_PLATFORM_POSIX_SRC
 	platform/posix/PosixDynamicLibrary.cpp
-	platform/posix/PosixErrorHandler.cpp
 	platform/posix/PosixMutex.cpp
 	platform/posix/PosixSystem.cpp
 	platform/posix/PosixThread.cpp
@@ -67,13 +62,12 @@ set (EGG_PLATFORM_ANDROID_SRC
 
 set (EGG_PLATFORM_OSX_SRC
 	platform/osx/OSXBundleArchive.mm
-	platform/posix/PosixErrorHandler_osx.mm
+	logit/PosixErrorHandler_osx.mm
 )
 
 set (EGG_PLATFORM_WIN32_SRC
 	platform/win32/StreamIStream.h
 	platform/win32/Win32DynamicLibrary.cpp
-	platform/win32/Win32ErrorHandler.cpp
 	platform/win32/Win32Mutex.cpp
 	platform/win32/Win32ResourceArchive.cpp
 	platform/win32/Win32System.cpp
@@ -86,7 +80,6 @@ set (EGG_PLATFORM_WIN32_SRC
 set (EGG_HDR
 	Assert.h
 	Atomic.h
-	BaseLoggerListener.h
 	BaseResource.h
 	Categories.h
 	CircularBuffer.h
@@ -94,18 +87,13 @@ set (EGG_HDR
 	DynamicLibrary.h
 	EndianConversion.h
 	Error.h
-	Errorer.h
 	Event.h
-	Exception.h
 	Extents.h
 	ExplicitIntrusivePointer.h
-	FileLoggerListener.h
 	Interface.h
 	IntrusivePointer.h
 	IteratorRange.h
 	Log.h
-	Logger.h
-	LoggerListener.h
 	MathConversion.h
 	MathFormatting.h
 	Map.h
@@ -121,7 +109,6 @@ set (EGG_HDR
 	Runner.h
 	SharedPointer.h
 	Socket.h
-	SOSLoggerListener.h
 	String.h
 	System.h
 	Thread.h
@@ -196,7 +183,6 @@ set (EGG_IO_STL_HDR
 
 set (EGG_PLATFORM_POSIX_HDR
 	platform/posix/PosixDynamicLibrary.h
-	platform/posix/PosixErrorHandler.h
 	platform/posix/PosixMutex.h
 	platform/posix/PosixSystem.h
 	platform/posix/PosixThread.h
@@ -214,7 +200,6 @@ set (EGG_PLATFORM_OSX_HDR
 
 set (EGG_PLATFORM_WIN32_HDR
 	platform/win32/Win32DynamicLibrary.h
-	platform/win32/Win32ErrorHandler.h
 	platform/win32/Win32Mutex.h
 	platform/win32/Win32ResourceArchive.h
 	platform/win32/Win32System.h

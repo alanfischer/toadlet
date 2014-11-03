@@ -23,21 +23,20 @@
  *
  ********** Copyright header - do not remove **********/
 
-#ifndef TOADLET_EGG_WIN32ERRORHANDLER_H
-#define TOADLET_EGG_WIN32ERRORHANDLER_H
+#ifndef LOGIT_WIN32ERRORHANDLER_H
+#define LOGIT_WIN32ERRORHANDLER_H
 
-#include "../../StackTraceListener.h"
+#include "StackTraceListener.h"
 #include <windows.h>
 #include "Win32ErrorHandler_dbghelp.h"
 
-#define TOADLET_DEFINEPROCEDURE(ret,name,sig) \
+#define LOGIT_DEFINEPROCEDURE(ret,name,sig) \
 	typedef ret (__stdcall *proc_##name) sig; \
 	proc_##name name;
 
-namespace toadlet{
-namespace egg{
+namespace logit{
 
-class TOADLET_API Win32ErrorHandler{
+class LOGIT_API Win32ErrorHandler{
 public:
 	Win32ErrorHandler();
 	~Win32ErrorHandler();
@@ -80,22 +79,21 @@ protected:
 	CHAR mWorkingPath[MAX_PATH];
 	CHAR mWorkingSymbolPath[MAX_PATH * 2 + 2];
 
-	TOADLET_DEFINEPROCEDURE(BOOL,StackWalk64,(DWORD MachineType,HANDLE hProcess,HANDLE hThread,LPSTACKFRAME64 StackFrame,PVOID ContextRecord,PREAD_PROCESS_MEMORY_ROUTINE64 ReadMemoryRoutine,PFUNCTION_TABLE_ACCESS_ROUTINE64 FunctionTableAccessRoutine,PGET_MODULE_BASE_ROUTINE64 GetModuleBaseRoutine,PTRANSLATE_ADDRESS_ROUTINE64 TranslateAddress));
-	TOADLET_DEFINEPROCEDURE(BOOL,SymInitialize,(IN HANDLE hProcess,IN PSTR UserSearchPath,IN BOOL fInvadeProcess));
-	TOADLET_DEFINEPROCEDURE(DWORD,SymGetOptions,(VOID));
-	TOADLET_DEFINEPROCEDURE(DWORD,SymSetOptions,(IN DWORD SymOptions));
-	TOADLET_DEFINEPROCEDURE(BOOL,SymCleanup,(IN HANDLE hProcess));
-	TOADLET_DEFINEPROCEDURE(PVOID,SymFunctionTableAccess64,(HANDLE hProcess,DWORD64 AddrBase));
-	TOADLET_DEFINEPROCEDURE(DWORD64,SymGetModuleBase64,(IN HANDLE hProcess,IN DWORD64 dwAddr));
-	TOADLET_DEFINEPROCEDURE(BOOL,SymGetSymFromAddr64,(IN HANDLE hProcess,IN DWORD64 dwAddr,OUT PDWORD64 pdwDisplacement,OUT PIMAGEHLP_SYMBOL64 Symbol));
-	TOADLET_DEFINEPROCEDURE(DWORD,UnDecorateSymbolName,(PCSTR DecoratedName,PSTR UnDecoratedName,DWORD UndecoratedLength,DWORD Flags));
-	TOADLET_DEFINEPROCEDURE(BOOL,SymGetLineFromAddr64,(IN HANDLE hProcess,IN DWORD64 dwAddr,OUT PDWORD pdwDisplacement,OUT PIMAGEHLP_LINE64 Line));
+	LOGIT_DEFINEPROCEDURE(BOOL,StackWalk64,(DWORD MachineType,HANDLE hProcess,HANDLE hThread,LPSTACKFRAME64 StackFrame,PVOID ContextRecord,PREAD_PROCESS_MEMORY_ROUTINE64 ReadMemoryRoutine,PFUNCTION_TABLE_ACCESS_ROUTINE64 FunctionTableAccessRoutine,PGET_MODULE_BASE_ROUTINE64 GetModuleBaseRoutine,PTRANSLATE_ADDRESS_ROUTINE64 TranslateAddress));
+	LOGIT_DEFINEPROCEDURE(BOOL,SymInitialize,(IN HANDLE hProcess,IN PSTR UserSearchPath,IN BOOL fInvadeProcess));
+	LOGIT_DEFINEPROCEDURE(DWORD,SymGetOptions,(VOID));
+	LOGIT_DEFINEPROCEDURE(DWORD,SymSetOptions,(IN DWORD SymOptions));
+	LOGIT_DEFINEPROCEDURE(BOOL,SymCleanup,(IN HANDLE hProcess));
+	LOGIT_DEFINEPROCEDURE(PVOID,SymFunctionTableAccess64,(HANDLE hProcess,DWORD64 AddrBase));
+	LOGIT_DEFINEPROCEDURE(DWORD64,SymGetModuleBase64,(IN HANDLE hProcess,IN DWORD64 dwAddr));
+	LOGIT_DEFINEPROCEDURE(BOOL,SymGetSymFromAddr64,(IN HANDLE hProcess,IN DWORD64 dwAddr,OUT PDWORD64 pdwDisplacement,OUT PIMAGEHLP_SYMBOL64 Symbol));
+	LOGIT_DEFINEPROCEDURE(DWORD,UnDecorateSymbolName,(PCSTR DecoratedName,PSTR UnDecoratedName,DWORD UndecoratedLength,DWORD Flags));
+	LOGIT_DEFINEPROCEDURE(BOOL,SymGetLineFromAddr64,(IN HANDLE hProcess,IN DWORD64 dwAddr,OUT PDWORD pdwDisplacement,OUT PIMAGEHLP_LINE64 Line));
 };
 
 }
-}
 
-#undef TOADLET_DEFINEPROCEDURE
+#undef LOGIT_DEFINEPROCEDURE
 
 #endif
 

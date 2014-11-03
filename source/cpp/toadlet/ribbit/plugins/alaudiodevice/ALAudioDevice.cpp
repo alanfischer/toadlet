@@ -300,7 +300,7 @@ ALuint ALAudioDevice::checkoutSourceHandle(ALAudio *audio){
 void ALAudioDevice::checkinSourceHandle(ALAudio *audio,ALuint source){
 	mSourcePool.push_back(source);
 
-	mAudios.erase(std::remove(mAudios.begin(),mAudios.end(),audio),mAudios.end());
+	mAudios.erase(remove(mAudios.begin(),mAudios.end(),audio),mAudios.end());
 }
 
 void ALAudioDevice::preDestroyBuffer(ALAudioBuffer *buffer){

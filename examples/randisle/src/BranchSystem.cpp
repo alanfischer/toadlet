@@ -147,7 +147,7 @@ void BranchSystem::updateBranch(Branch *branch,int dt){
 			mBranchListener->branchDestroyed(branch);
 		}
 		
-		mBranches.erase(std::remove(mBranches.begin(),mBranches.end(),branch),mBranches.end());
+		mBranches.erase(remove(mBranches.begin(),mBranches.end(),branch),mBranches.end());
 	}
 	else if(branch->buildTime==0){
 		if(mBranchListener!=NULL){

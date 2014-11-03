@@ -280,7 +280,7 @@ void Scene::traceSegment(PhysicsCollision &result,const Segment &segment,int col
 }
 
 void Scene::destroy(Component *component){
-	if(std::find(mDestroyComponents.begin(),mDestroyComponents.end(),component)==mDestroyComponents.end()){
+	if(find(mDestroyComponents.begin(),mDestroyComponents.end(),component)==mDestroyComponents.end()){
 		mDestroyComponents.push_back(component);
 	}
 }
