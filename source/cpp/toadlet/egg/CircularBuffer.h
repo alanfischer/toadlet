@@ -26,126 +26,22 @@
 #ifndef TOADLET_EGG_CIRCULARBUFFER_H
 #define TOADLET_EGG_CIRCULARBUFFER_H
 
-#include <toadlet/egg/Types.h>
-#include <toadlet/egg/Collection.h>
+#include "stlit/circular_buffer"
 
-namespace std{ struct bidirectional_iterator_tag; }
+namespace std{ using namespace stlit; }
 
 namespace toadlet{
 namespace egg{
 
-template<typename Type>
-class TOADLET_API CircularBuffer{
+template <typename Type>
+class CircularBuffer:public std::circular_buffer<Type>{
 public:
-	typedef Type value_type;
-	typedef Type& reference;
-	typedef const Type& const_reference;
-	typedef Type* pointer;
-	typedef int difference_type;
-	typedef std::bidirectional_iterator_tag iterator_category;
-
-	class iterator{
-	public:
-		typedef typename CircularBuffer<Type>::value_type value_type;
-		typedef typename CircularBuffer<Type>::reference reference;
-		typedef typename CircularBuffer<Type>::const_reference const_reference;
-		typedef typename CircularBuffer<Type>::pointer pointer;
-		typedef typename CircularBuffer<Type>::difference_type difference_type;
-		typedef typename CircularBuffer<Type>::iterator_category iterator_category;
-
-		inline iterator():it(NULL),begin(NULL),end(NULL){}
-		inline iterator(Type *i,Type *b,Type *e):it(i),begin(b),end(e){}
-
-		inline Type& operator*() const{return *it;}
-		inline Type *operator->() const{return it;}
-		inline operator Type*() const{return it;}
-		inline const iterator &operator ++(){++it;if(it==end)it=begin;return *this;}
-		inline iterator operator ++(int){iterator r=it++;if(it==end)it=begin;return r;}
-		inline const iterator &operator --(){--it;if(it<begin)it=end-1;return *this;}
-		inline iterator operator --(int){iterator r=it--;if(it<begin)it=end-1;return r;}
-
-		inline bool operator==(const iterator &i) const{return it==i.it;}
-		inline bool operator!=(const iterator &i) const{return it!=i.it;}
-
-		Type *it;
-		Type *begin,*end;
-	};
-
-	class const_iterator{
-	public:
-		typedef typename CircularBuffer<Type>::value_type value_type;
-		typedef typename CircularBuffer<Type>::reference reference;
-		typedef typename CircularBuffer<Type>::const_reference const_reference;
-		typedef typename CircularBuffer<Type>::pointer pointer;
-		typedef typename CircularBuffer<Type>::difference_type difference_type;
-		typedef typename CircularBuffer<Type>::iterator_category iterator_category;
-
-		inline const_iterator():it(NULL),begin(NULL),end(NULL){}
-		inline const_iterator(const Type *i,const Type *b,const Type *e):it(i),begin(b),end(e){}
-
-		inline const Type& operator*() const{return *it;}
-		inline const Type *operator->() const{return it;}
-		inline operator const Type*() const{return it;}
-		inline const const_iterator &operator ++(){++it;if(it==end)it=begin;return *this;}
-		inline const_iterator operator ++(int){iterator r=it++;if(it==end)it=begin;return r;}
-		inline const const_iterator &operator --(){--it;if(it<begin)it=end-1;return *this;}
-		inline const_iterator operator --(int){iterator r=it--;if(it<begin)it=end-1;return r;}
-
-		inline bool operator==(const const_iterator &i) const{return it==i.it;}
-		inline bool operator!=(const const_iterator &i) const{return it!=i.it;}
-
-		const Type *it;
-		const Type *begin,*end;
-	};
-
-	inline CircularBuffer(int size):
-		mSize(size+1),
-		mBegin(0),
-		mEnd(0),
-		mContainer(mSize)
-	{}
-
-	inline Type &front(){return mContainer[mBegin];}
-	inline Type &back(){return mContainer[(mEnd + mSize - 1) % mSize];}
-
-	inline const Type &front() const{return mContainer[mBegin];}
-	inline const Type &back() const{return mContainer[(mEnd + mSize - 1) % mSize];}
-
-	inline iterator begin(){return iterator(&*(mContainer.begin()+mBegin),&*mContainer.begin(),&*mContainer.end());}
-	inline iterator end(){return iterator(&*(mContainer.begin()+mEnd),&*mContainer.begin(),&*mContainer.end());}
-
-	inline const_iterator begin() const{return iterator(&*(mContainer.begin()+mBegin),&*mContainer.begin(),&*mContainer.end());}
-	inline const_iterator end() const{return iterator(&*(mContainer.begin()+mEnd),&*mContainer.begin(),&*mContainer.end());}
-
-	inline void push_back(){
-		mEnd = (mEnd + 1) % mSize;
-		if(mEnd == mBegin){
-			mBegin = (mBegin + 1) % mSize;
-		}
-	}
-
-	inline void push_back(const Type &type){
-		mContainer[mEnd]=type;
-		mEnd = (mEnd + 1) % mSize;
-		if(mEnd == mBegin){
-			mBegin = (mBegin + 1) % mSize;
-		}
-	}
-
-	inline void pop_front(){
-		mBegin = (mBegin + 1) % mSize;
-	}
-
-	inline bool empty() const{return mEnd == mBegin; }
-	inline bool full() const{return (mEnd + 1) % mSize == mBegin;}
-
-protected:
-	int mSize,mBegin,mEnd;
-	Collection<Type> mContainer;
+	inline CircularBuffer():std::circular_buffer<Type>(){}
+	inline CircularBuffer(int size):std::circular_buffer<Type>(size){}
+	inline CircularBuffer(const std::circular_buffer<Type> &v):std::circular_buffer<Type>(v){}
 };
 
 }
 }
 
 #endif
-

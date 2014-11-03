@@ -29,7 +29,7 @@
 #include <toadlet/tadpole/Types.h>
 #include <toadlet/egg/Type.h>
 #include <toadlet/egg/Collection.h>
-#include <toadlet/egg/Iterator.h>
+#include <toadlet/egg/IteratorRange.h>
 #include <toadlet/tadpole/Bound.h>
 #include <toadlet/tadpole/BaseComponent.h>
 

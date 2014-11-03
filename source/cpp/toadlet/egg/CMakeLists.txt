@@ -102,7 +102,7 @@ set (EGG_HDR
 	FileLoggerListener.h
 	Interface.h
 	IntrusivePointer.h
-	Iterator.h
+	IteratorRange.h
 	Log.h
 	Logger.h
 	LoggerListener.h
@@ -131,6 +131,14 @@ set (EGG_HDR
 	WeakPointer.h
 	TUUID.h
 	Version.h
+)
+
+set (STLIT_HDR
+	stlit/circular_buffer
+	stlit/iterator_range
+	stlit/map
+	stlit/utility
+	stlit/vector
 )
 
 set (EGG_IO_HDR
@@ -219,12 +227,21 @@ if (TOADLET_EXCEPTIONS)
 endif (TOADLET_EXCEPTIONS)
 
 
+# Bundle headers
+source_group ("Header Files\\\\stlit" FILES ${STLIT_HDR})
+
+# Sources, headers and namespaces
+set (EGG_HDR ${EGG_HDR} ${STLIT_HDR})
+
+
+
 # Bundle source
 source_group ("Source Files\\\\io" FILES ${EGG_IO_SRC})
 
 
 # Bundle headers
 source_group ("Header Files\\\\io" FILES ${EGG_IO_HDR})
+
 
 
 # Sources, headers and namespaces

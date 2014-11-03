@@ -23,32 +23,34 @@
  *
  ********** Copyright header - do not remove **********/
 
-#ifndef TOADLET_EGG_MAP_H
-#define TOADLET_EGG_MAP_H
+#ifndef TOADLET_EGG_ITERATORRANGE_H
+#define TOADLET_EGG_ITERATORRANGE_H
 
-#include "stlit/map"
+#include "stlit/iterator_range"
 
 namespace std{ using namespace stlit; }
 
 namespace toadlet{
 namespace egg{
 
-template <typename Type1,typename Type2>
-class Pair:public std::pair<Type1,Type2>{
-public:
-	inline Pair():std::pair<Type1,Type2>(){}
-	inline Pair(const Type1& a,const Type2& b):std::pair<Type1,Type2>(a,b){}
+template<typename Type>
+class IteratorRange:public std::iterator_range<Type>{
+	IteratorRange():std::iterator_range<Type>{}
+	IteratorRange(const std::iterator_range<Type> &range):std::iterator_range<Type>(range){}
+	IteratorRange(const iterator &bit,const iterator &eit):std::iterator_range<Type>(bit,eit){}
 };
 
-template <typename Type1,typename Type2>
-class Map:public std::map<Type1,Type2>{
+template<typename Type>
+class PointerIteratorRange:public std::pointer_iterator_range<Type>{
 public:
-	inline Map():std::map<Type1,Type2>(){}
-	inline Map(int size):std::map<Type1,Type2>(size){}
-	inline Map(const std::map<Type1,Type2> &m):std::map<Type1,Type2>(m){}
+	PointerIteratorRange():std::pointer_iterator_range<Type>(){}
+	PointerIteratorRange(const std::pointer_iterator_range<Type> &range):std::pointer_iterator_range<Type>(range){}
+	PointerIteratorRange(const iterator &bit,const iterator &eit):std::pointer_iterator_range<Type>(bit,eit){}
+
 };
 
 }
 }
 
 #endif
+
