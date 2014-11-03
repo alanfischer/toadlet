@@ -26,8 +26,7 @@
 #include "PosixErrorHandler.h"
 #import <Foundation/Foundation.h>
 
-namespace toadlet{
-namespace egg{
+namespace logit{
 
 NSUncaughtExceptionHandler *mOldHandler=NULL;
 
@@ -55,6 +54,5 @@ extern "C" void PosixErrorHandler_uninstallNSHandler(){
 	mOldHandler=NULL;
 }
 
-}
 }
 

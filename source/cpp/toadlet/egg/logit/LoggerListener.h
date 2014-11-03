@@ -23,13 +23,12 @@
  *
  ********** Copyright header - do not remove **********/
 
-#ifndef TOADLET_EGG_LOGGERLISTENER_H
-#define TOADLET_EGG_LOGGERLISTENER_H
+#ifndef LOGIT_LOGGERLISTENER_H
+#define LOGIT_LOGGERLISTENER_H
 
 #include "Logger.h"
 
-namespace toadlet{
-namespace egg{
+namespace logit{
 
 class LoggerListener{
 public:
@@ -39,7 +38,6 @@ public:
 	virtual void flush()=0;
 };
 
-}
 }
 
 #endif

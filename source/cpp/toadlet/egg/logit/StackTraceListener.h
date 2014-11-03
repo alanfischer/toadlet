@@ -23,13 +23,10 @@
  *
  ********** Copyright header - do not remove **********/
 
-#ifndef STACKTRACELISTENER_H
-#define STACKTRACELISTENER_H
+#ifndef LOGIT_STACKTRACELISTENER_H
+#define LOGIT_STACKTRACELISTENER_H
 
-#include <toadlet/Types.h>
-
-namespace toadlet{
-namespace egg{
+namespace logit{
 
 class StackTraceListener{
 public:
@@ -38,7 +35,6 @@ public:
 	virtual void endTrace()=0;
 };
 
-}
 }
 
 #endif

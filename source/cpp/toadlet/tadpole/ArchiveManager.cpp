@@ -44,7 +44,7 @@ Resource::ptr ArchiveManager::manage(Resource *resource,const String &name){
 
 void ArchiveManager::unmanage(Resource *resource){
 	Archive *archive=(Archive*)resource;
-	mArchives.erase(std::remove(mArchives.begin(),mArchives.end(),archive),mArchives.end());
+	mArchives.erase(remove(mArchives.begin(),mArchives.end(),archive),mArchives.end());
 	ResourceManager::unmanage(resource);
 }
 
@@ -53,7 +53,7 @@ void ArchiveManager::addDirectory(const String &directory){
 }
 
 void ArchiveManager::removeDirectory(const String &directory){
-	mDirectories.erase(std::remove(mDirectories.begin(),mDirectories.end(),cleanPath(directory,true)),mDirectories.end());
+	mDirectories.erase(remove(mDirectories.begin(),mDirectories.end(),cleanPath(directory,true)),mDirectories.end());
 }
 
 void ArchiveManager::pushDirectory(const String &directory){

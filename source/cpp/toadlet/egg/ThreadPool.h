@@ -28,7 +28,7 @@
 
 #include <toadlet/egg/Collection.h>
 #include <toadlet/egg/Map.h>
-#include <toadlet/egg/Exception.h>
+#include <toadlet/egg/Error.h>
 #include <toadlet/egg/Object.h>
 #include <toadlet/egg/Mutex.h>
 #include <toadlet/egg/Thread.h>

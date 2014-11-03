@@ -23,14 +23,13 @@
  *
  ********** Copyright header - do not remove **********/
 
-#ifndef TOADLET_EGG_BASELOGGERLISTENER_H
-#define TOADLET_EGG_BASELOGGERLISTENER_H
+#ifndef LOGIT_BASELOGGERLISTENER_H
+#define LOGIT_BASELOGGERLISTENER_H
 
 #include "LoggerListener.h"
 #include <time.h>
 
-namespace toadlet{
-namespace egg{
+namespace logit{
 
 class BaseLoggerListener:public LoggerListener{
 public:
@@ -79,7 +78,6 @@ protected:
 	char newLine[2];
 };
 
-}
 }
 
 #endif

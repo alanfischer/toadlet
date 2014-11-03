@@ -20,7 +20,7 @@ public:
 
 		virtual ~TreeBranch(){}
 
-		virtual PointerIteratorRange<PathEdge> getEdges() const{return PointerIteratorRange<PathEdge>::wrapPointerCollection(branches);}
+		virtual PointerIteratorRange<PathEdge> getEdges() const{return PointerIteratorRange<PathEdge>::wrapCollection(branches);}
 		virtual scalar getLength() const{return length;}
 		virtual void getPoint(Vector3 &point,scalar time) const{
 			scalar t=lerp(times.data(),times.size(),time);
@@ -65,7 +65,7 @@ public:
 		Collection<scalar> times;
 		TreeBranch *parent;
 		float parentTime;
-		PointerCollection<TreeBranch> branches;
+		Collection<TreeBranch::ptr> branches;
 		Collection<int> leaves;
 		AABox bound;
 	};

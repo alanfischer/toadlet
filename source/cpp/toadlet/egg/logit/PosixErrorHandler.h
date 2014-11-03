@@ -23,60 +23,45 @@
  *
  ********** Copyright header - do not remove **********/
 
-#ifndef TOADLET_EGG_ERRORER_H
-#define TOADLET_EGG_ERRORER_H
+#ifndef LOGIT_POSIXERRORHANDLER_H
+#define LOGIT_POSIXERRORHANDLER_H
 
 #include "StackTraceListener.h"
-#include "Exception.h"
-#include "Logger.h"
+#include <signal.h>
 
-namespace toadlet{
-namespace egg{
+namespace logit{
 
-class TOADLET_API Errorer:public StackTraceListener{
+class LOGIT_API PosixErrorHandler{
 public:
-	enum Type{
-		// General errors
-		Type_UNKNOWN=-1,
-		Type_NONE=0,
-		Type_ASSERT,
-		Type_INVALID_PARAMETERS,
-		Type_NULL_POINTER,
-		Type_UNIMPLEMENTED,
-		Type_OVERFLOW,
-		Type_INSUFFICIENT_MEMORY,
+	PosixErrorHandler();
+	~PosixErrorHandler();
 
-		// Egg errors
-		Type_EGG_START=1000,
-		Type_FILE_NOT_FOUND,
-		Type_LIBRARY_NOT_FOUND,
-		Type_SYMBOL_NOT_FOUND,
-		Type_SOCKET,
-	};
+	virtual void setStackTraceListener(StackTraceListener *listener){mListener=listener;}
+	virtual StackTraceListener *getStackTraceListener(){return mListener;}
 
-	Errorer(Logger *logger);
-	virtual ~Errorer();
+	virtual bool installHandler();
+	virtual bool uninstallHandler();
 
-	void setError(int error,const char *category=NULL,const char *description=NULL,bool report=false);
-	void setException(const Exception &ex,bool report=false);
+	virtual void handleFrames(void **frames,int count);
+	virtual void errorHandled();
 
-	int getError();
-	const char *getDescription();
-	const Exception &getException();
-
-	void startTrace();
-	void traceFrame(const char *description);
-	void endTrace();
+	static PosixErrorHandler *instance;
 
 protected:
-	int mLastError;
-	char *mLastDescription;
-	int mLastDescriptionLength;
-	Exception mException;
-	Logger *mLogger;
+	static void signalHandler(int sig,siginfo_t *info,void *context);
+
+	static int mSignals[NSIG];
+
+	StackTraceListener *mListener;
+
+	struct sigaction mAction;
+	struct sigaction mOldActions[NSIG];
+	
+	const static int MAX_STACKFRAMES=128;
+	void *mStackFrames[MAX_STACKFRAMES];
 };
 
 }
-}
 
 #endif
+

@@ -26,52 +26,28 @@
 #ifndef TOADLET_EGG_LOG_H
 #define TOADLET_EGG_LOG_H
 
-#include "Logger.h"
+#include <toadlet/Types.h>
 
-#define TOADLET_MAKE_LOG_FUNCTION(name,level) \
-	static void name(const char *text){name((char*)NULL,text);} \
-	static void name(const char *categoryName,const char *text){ \
-		Logger *instance=getInstance(); \
-		if(level>Logger::Level_MAX) ; \
-		else if(level<=instance->getMasterReportingLevel() && level<=instance->getCategoryReportingLevel(categoryName)){ \
-			instance->addLogEntry(categoryName,level,text); \
-		} \
-	}
+#define LOGIT_API TOADLET_API
+#if defined(TOADLET_PLATFORM_WIN32)
+	#define LOGIT_PLATFORM_WIN32
+#endif
+#if defined(TOADLET_PLATFORM_OSX)
+	#define LOGIT_PLATFORM_OSX
+#endif
+#if defined(TOADLET_PLATFORM_POSIX)
+	#define LOGIT_PLATFORM_POSIX
+#endif
+#if defined(TOADLET_PLATFORM_ANDROID)
+	#define LOGIT_PLATFORM_ANDROID
+#endif
+
+#include "logit/Log.h"
 
 namespace toadlet{
 namespace egg{
 
-class LoggerListener;
-
-class TOADLET_API Log{
-public:
-	static void initialize(bool startSilent=false,bool perThread=false,const char *options=NULL);
-	static Logger *getInstance();
-	static void destroy();
-
-	TOADLET_MAKE_LOG_FUNCTION(error,Logger::Level_ERROR);
-	TOADLET_MAKE_LOG_FUNCTION(warning,Logger::Level_WARNING);
-	TOADLET_MAKE_LOG_FUNCTION(alert,Logger::Level_ALERT);
-	TOADLET_MAKE_LOG_FUNCTION(debug,Logger::Level_DEBUG);
-	TOADLET_MAKE_LOG_FUNCTION(excess,Logger::Level_EXCESS);
-
-	static Logger::timestamp mtime();
-	static void *currentThread();
-	static void *createMutex();
-	static void destroyMutex(void *mutex);
-	static bool lock(void *mutex);
-	static bool unlock(void *mutex);
-	static void *createCondition();
-	static void destroyCondition(void *wait);
-	static bool wait(void *condition,void *mutex);
-	static void notify(void *condition);
-
-private:
-	static Logger *mTheLogger;
-	static bool mPerThread;
-	static Logger::List<LoggerListener*> mListeners;
-	static Logger::List<Logger*> mThreadLoggers;
-};
+using namespace logit;
 
 }
 }

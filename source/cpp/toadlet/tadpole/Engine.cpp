@@ -662,7 +662,7 @@ void Engine::addContextListener(ContextListener *listener){
 }
 
 void Engine::removeContextListener(ContextListener *listener){
-	mContextListeners.erase(std::remove(mContextListeners.begin(),mContextListeners.end(),listener),mContextListeners.end());
+	mContextListeners.erase(remove(mContextListeners.begin(),mContextListeners.end(),listener),mContextListeners.end());
 }
 
 Texture::ptr Engine::createNormalizationTexture(int size){

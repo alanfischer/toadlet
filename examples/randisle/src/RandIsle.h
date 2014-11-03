@@ -53,8 +53,8 @@ public:
 	void playerJump(Node *player);
 	void playerMove(Node *player,scalar dr,scalar ds);
 
-	float findPathSequence(PointerCollection<PathEdge> &sequence,PathClimber *climber,PathVertex *vertex,int direction,scalar time);
-	float findPathSequence(PointerCollection<PathEdge> &sequence,PathClimber *climber,const Vector3 &forward,PathVertex *previous,PathVertex *vertex,int direction,scalar time,bool first);
+	float findPathSequence(Collection<PathEdge::ptr> &sequence,PathClimber *climber,PathVertex *vertex,int direction,scalar time);
+	float findPathSequence(Collection<PathEdge::ptr> &sequence,PathClimber *climber,const Vector3 &forward,PathVertex *previous,PathVertex *vertex,int direction,scalar time,bool first);
 	void updateDanger(int dt);
 	void updateProps();
 	void updateClimber(PathClimber *climber,int dt);
@@ -106,7 +106,7 @@ protected:
 	Node::ptr mProps;
 	int mMouseButtons;
 	scalar mXJoy,mYJoy;
-	PointerCollection<PathEdge> mPathSequence;
+	Collection<PathEdge::ptr> mPathSequence;
 	Collection<PopulatePatch> mPopulatePatches;
 
 	Quaternion mLastPredictedRotation;

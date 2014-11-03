@@ -975,7 +975,7 @@ void D3D10RenderDevice::shaderDestroyed(D3D10Shader *shader){
 	#endif
 
 	if(shader->mShaderType==Shader::ShaderType_VERTEX){
-		mVertexShaders.erase(std::remove(mVertexShaders.begin(),mVertexShaders.end(),shader),mVertexShaders.end());
+		mVertexShaders.erase(remove(mVertexShaders.begin(),mVertexShaders.end(),shader),mVertexShaders.end());
 	}
 
 	#if defined(TOADLET_THREADSAFE)

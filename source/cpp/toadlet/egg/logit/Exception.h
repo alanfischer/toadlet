@@ -23,19 +23,16 @@
  *
  ********** Copyright header - do not remove **********/
 
-#ifndef TOADLET_EGG_EXCEPTION_H
-#define TOADLET_EGG_EXCEPTION_H
+#ifndef LOGIT_EXCEPTION_H
+#define LOGIT_EXCEPTION_H
 
-#include <toadlet/Types.h>
-
-#if defined(TOADLET_PLATFORM_WIN32)
+#if defined(LOGIT_PLATFORM_WIN32)
 	#pragma warning(disable:4996)
 #endif
 
-namespace toadlet{
-namespace egg{
+namespace logit{
 
-class TOADLET_API Exception{
+class LOGIT_API Exception{
 public:
 	Exception(int error=0){init(error,NULL,NULL);}
 	Exception(const char *description){init(0,NULL,description);}
@@ -69,7 +66,6 @@ public:
 	char *description;
 };
 
-}
 }
 
 #endif

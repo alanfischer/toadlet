@@ -1,5 +1,5 @@
 %{
-#	include <toadlet/egg/Logger.h>
+#	include <toadlet/egg/Log.h>
 %}
 
 namespace toadlet{

@@ -40,7 +40,7 @@ void InstantAction::addActionListener(ActionListener *listener){
 }
 
 void InstantAction::removeActionListener(ActionListener *listener){
-	mListeners.erase(std::remove(mListeners.begin(),mListeners.end(),listener),mListeners.end());
+	mListeners.erase(remove(mListeners.begin(),mListeners.end(),listener),mListeners.end());
 }
 
 void InstantAction::start(){

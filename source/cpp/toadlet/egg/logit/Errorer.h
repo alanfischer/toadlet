@@ -23,47 +23,58 @@
  *
  ********** Copyright header - do not remove **********/
 
-#ifndef POSIXERRORHANDLER_H
-#define POSIXERRORHANDLER_H
+#ifndef LOGIT_ERRORER_H
+#define LOGIT_ERRORER_H
 
-#include "../../StackTraceListener.h"
-#include <signal.h>
+#include "StackTraceListener.h"
+#include "Exception.h"
+#include "Logger.h"
 
-namespace toadlet{
-namespace egg{
+namespace logit{
 
-class TOADLET_API PosixErrorHandler{
+class LOGIT_API Errorer:public StackTraceListener{
 public:
-	PosixErrorHandler();
-	~PosixErrorHandler();
+	enum Type{
+		// General errors
+		Type_UNKNOWN=-1,
+		Type_NONE=0,
+		Type_ASSERT,
+		Type_INVALID_PARAMETERS,
+		Type_NULL_POINTER,
+		Type_UNIMPLEMENTED,
+		Type_OVERFLOW,
+		Type_INSUFFICIENT_MEMORY,
 
-	virtual void setStackTraceListener(StackTraceListener *listener){mListener=listener;}
-	virtual StackTraceListener *getStackTraceListener(){return mListener;}
+		// Egg errors
+		Type_EGG_START=1000,
+		Type_FILE_NOT_FOUND,
+		Type_LIBRARY_NOT_FOUND,
+		Type_SYMBOL_NOT_FOUND,
+		Type_SOCKET,
+	};
 
-	virtual bool installHandler();
-	virtual bool uninstallHandler();
+	Errorer(Logger *logger);
+	virtual ~Errorer();
 
-	virtual void handleFrames(void **frames,int count);
-	virtual void errorHandled();
+	void setError(int error,const char *category=NULL,const char *description=NULL,bool report=false);
+	void setException(const Exception &ex,bool report=false);
 
-	static PosixErrorHandler *instance;
+	int getError();
+	const char *getDescription();
+	const Exception &getException();
+
+	void startTrace();
+	void traceFrame(const char *description);
+	void endTrace();
 
 protected:
-	static void signalHandler(int sig,siginfo_t *info,void *context);
-
-	static int mSignals[NSIG];
-
-	StackTraceListener *mListener;
-
-	struct sigaction mAction;
-	struct sigaction mOldActions[NSIG];
-	
-	const static int MAX_STACKFRAMES=128;
-	void *mStackFrames[MAX_STACKFRAMES];
+	int mLastError;
+	char *mLastDescription;
+	int mLastDescriptionLength;
+	Exception mException;
+	Logger *mLogger;
 };
 
 }
-}
 
 #endif
-

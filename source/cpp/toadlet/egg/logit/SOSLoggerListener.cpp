@@ -2,14 +2,14 @@
 #include "Log.h"
 #include <stdio.h>
 
-#if defined(TOADLET_PLATFORM_WIN32)
+#if defined(LOGIT_PLATFORM_WIN32)
 	#ifndef WIN32_LEAN_AND_MEAN
 		#define WIN32_LEAN_AND_MEAN 1
 	#endif
 	#include <windows.h>
 	#include <winsock.h>
 
-	#if defined(TOADLET_PLATFORM_WINCE)
+	#if defined(LOGIT_PLATFORM_WINCE)
 		#pragma comment(lib,"ws2.lib")
 	#else
 		#pragma comment(lib,"wsock32.lib")
@@ -23,17 +23,16 @@
 	#include <unistd.h>
 #endif
 
-namespace toadlet{
-namespace egg{
+namespace logit{
 
-#if defined(TOADLET_PLATFORM_WIN32)
+#if defined(LOGIT_PLATFORM_WIN32)
 unsigned long WINAPI startSOSThread(void *thread){
 #else
 void *startSOSThread(void *thread){
 #endif
 	((SOSLoggerListener*)thread)->run();
 
-	#if defined(TOADLET_PLATFORM_WIN32)
+	#if defined(LOGIT_PLATFORM_WIN32)
 		ExitThread(0);
 	#else
 		pthread_exit(NULL);
@@ -61,7 +60,7 @@ SOSLoggerListener::SOSLoggerListener(const char *serverAddress):
 	mMutex=Log::createMutex();
 	mCondition=Log::createCondition();
 
-	#if defined(TOADLET_PLATFORM_WIN32)
+	#if defined(LOGIT_PLATFORM_WIN32)
 		mThread=CreateThread(NULL,0,&startSOSThread,this,0,0);
 		ResumeThread(mThread);
 	#else
@@ -72,7 +71,7 @@ SOSLoggerListener::SOSLoggerListener(const char *serverAddress):
 SOSLoggerListener::~SOSLoggerListener(){
 	flush();
 	
-	#if defined(TOADLET_PLATFORM_WIN32)
+	#if defined(LOGIT_PLATFORM_WIN32)
 		shutdown(mSocket,2);
 		::closesocket(mSocket);
 	#else
@@ -82,7 +81,7 @@ SOSLoggerListener::~SOSLoggerListener(){
 
 	mStop=true;
 
-	#if defined(TOADLET_PLATFORM_WIN32)
+	#if defined(LOGIT_PLATFORM_WIN32)
 		WaitForSingleObject(mThread,INFINITE);
 		CloseHandle(mThread);
 	#else
@@ -151,7 +150,7 @@ void SOSLoggerListener::run(){
 	if(he!=NULL){
 		char **list=he->h_addr_list;
 		if((*list)!=NULL){
-			address.sin_addr.s_addr=*(uint32*)(*list);
+			address.sin_addr.s_addr=*(unsigned int*)(*list);
 		}
 	}
 
@@ -204,5 +203,4 @@ const char *SOSLoggerListener::getSOSLevelName(Logger::Level level){
 	}
 }
 
-}
 }

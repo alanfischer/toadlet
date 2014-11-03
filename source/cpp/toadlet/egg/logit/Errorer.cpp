@@ -25,8 +25,7 @@
 
 #include "Errorer.h"
 
-namespace toadlet{
-namespace egg{
+namespace logit{
 
 Errorer::Errorer(Logger *logger):
 	mLastError(Type_NONE),
@@ -102,5 +101,4 @@ void Errorer::endTrace(){
 	}
 }
 
-}
 }

@@ -91,7 +91,7 @@ void Mesh::addSubMesh(SubMesh::ptr subMesh){
 }
 
 void Mesh::removeSubMesh(SubMesh::ptr subMesh){
-	mSubMeshes.erase(std::remove(mSubMeshes.begin(),mSubMeshes.end(),subMesh),mSubMeshes.end());
+	mSubMeshes.erase(remove(mSubMeshes.begin(),mSubMeshes.end(),subMesh),mSubMeshes.end());
 }
 
 Mesh::SubMesh::ptr Mesh::getSubMesh(const String &name){
