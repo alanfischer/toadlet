@@ -28,6 +28,10 @@
 
 #include <toadlet/Types.h>
 
+#if defined(TOADLET_PLATFORM_WIN32)
+	#pragma warning(disable:4996)
+#endif
+
 namespace toadlet{
 namespace egg{
 

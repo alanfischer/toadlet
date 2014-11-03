@@ -28,7 +28,6 @@
 
 #include <toadlet/tadpole/sensor/SensorResultsListener.h>
 #include <toadlet/tadpole/Node.h>
-#include <toadlet/egg/Iterator.h>
 
 namespace toadlet{
 namespace tadpole{
