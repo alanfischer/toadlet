@@ -28,7 +28,9 @@
 
 #include <toadlet/Types.h>
 
-#define LOGIT_API TOADLET_API
+#if defined(TOADLET_API)
+	#define LOGIT_API TOADLET_API
+#endif
 #if defined(TOADLET_PLATFORM_WIN32)
 	#define LOGIT_PLATFORM_WIN32
 #endif
