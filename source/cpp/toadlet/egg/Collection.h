@@ -26,24 +26,31 @@
 #ifndef TOADLET_EGG_COLLECTION_H
 #define TOADLET_EGG_COLLECTION_H
 
-#include "stlit/vector"
-#include "stlit/utility"
+#ifdef _WIN32
+	#include "stlit/vector"
+	#define TOADLET_STL_NAMESPACE stlit
+#else
+	#include <vector>
+	#define TOADLET_STL_NAMESPACE std
+#endif
 
-namespace std{ using namespace stlit; }
+#include "stlit/utility"
 
 namespace toadlet{
 namespace egg{
 
 template <typename Type>
-class Collection:public std::vector<Type>{
+class Collection:public TOADLET_STL_NAMESPACE::vector<Type>{
 public:
-	inline Collection():std::vector<Type>(){}
-	inline Collection(int size):std::vector<Type>(size){}
-	inline Collection(int size,const Type &value):std::vector<Type>(size,value){}
-	inline Collection(const std::vector<Type> &v):std::vector<Type>(v){}
+	inline Collection():TOADLET_STL_NAMESPACE::vector<Type>(){}
+	inline Collection(int size):TOADLET_STL_NAMESPACE::vector<Type>(size){}
+	inline Collection(int size,const Type &value):TOADLET_STL_NAMESPACE::vector<Type>(size,value){}
+	inline Collection(const TOADLET_STL_NAMESPACE::vector<Type> &v):TOADLET_STL_NAMESPACE::vector<Type>(v){}
 };
 
 }
 }
+
+#undef TOADLET_STL_NAMESPACE
 
 #endif

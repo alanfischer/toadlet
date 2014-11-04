@@ -566,27 +566,27 @@ void BufferManager::resourceDestroyed(Resource *resource){
 		mMutex.lock();
 	#endif
 
-	IndexBufferCollection::iterator iit=find(mIndexBuffers.begin(),mIndexBuffers.end(),resource);
+	IndexBufferCollection::iterator iit=stlit::find(mIndexBuffers.begin(),mIndexBuffers.end(),resource);
 	if(iit!=mIndexBuffers.end()){
 		mIndexBuffers.erase(iit);
 	}
 	else{
-		VertexBufferCollection::iterator vit=find(mVertexBuffers.begin(),mVertexBuffers.end(),resource);
+		VertexBufferCollection::iterator vit=stlit::find(mVertexBuffers.begin(),mVertexBuffers.end(),resource);
 		if(vit!=mVertexBuffers.end()){
 			mVertexBuffers.erase(vit);
 		}
 		else{
-			PixelBufferCollection::iterator pit=find(mPixelBuffers.begin(),mPixelBuffers.end(),resource);
+			PixelBufferCollection::iterator pit=stlit::find(mPixelBuffers.begin(),mPixelBuffers.end(),resource);
 			if(pit!=mPixelBuffers.end()){
 				mPixelBuffers.erase(pit);
 			}
 			else{
-				VariableBufferCollection::iterator vait=find(mVariableBuffers.begin(),mVariableBuffers.end(),resource);
+				VariableBufferCollection::iterator vait=stlit::find(mVariableBuffers.begin(),mVariableBuffers.end(),resource);
 				if(vait!=mVariableBuffers.end()){
 					mVariableBuffers.erase(vait);
 				}
 				else{
-					VertexFormatCollection::iterator vfit=find(mVertexFormats.begin(),mVertexFormats.end(),resource);
+					VertexFormatCollection::iterator vfit=stlit::find(mVertexFormats.begin(),mVertexFormats.end(),resource);
 					if(vfit!=mVertexFormats.end()){
 						mVertexFormats.erase(vfit);
 					}

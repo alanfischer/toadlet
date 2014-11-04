@@ -39,7 +39,7 @@ InputIterator find(InputIterator first, InputIterator last, const T& value){
 
 template <class ForwardIterator, class T>
 ForwardIterator remove(ForwardIterator first, ForwardIterator last, const T& value){
-	first = find(first, last, value);
+	first = stlit::find(first, last, value);
 	if (first != last)
 		for(ForwardIterator i = first; ++i != last; )
 			if (!(*i == value))

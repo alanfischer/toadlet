@@ -172,7 +172,7 @@ void Simulator::removeSolid(Solid *solid){
 
 	solid->internal_setSimulator(NULL);
 
-	mSolids.erase(remove(mSolids.begin(),mSolids.end(),solid),mSolids.end());
+	mSolids.erase(stlit::remove(mSolids.begin(),mSolids.end(),solid),mSolids.end());
 }
 
 void Simulator::addConstraint(Constraint *constraint){
@@ -192,7 +192,7 @@ void Simulator::addConstraint(Constraint *constraint){
 void Simulator::removeConstraint(Constraint *constraint){
 	constraint->internal_setSimulator(NULL);
 
-	mConstraints.erase(remove(mConstraints.begin(),mConstraints.end(),constraint),mConstraints.end());
+	mConstraints.erase(stlit::remove(mConstraints.begin(),mConstraints.end(),constraint),mConstraints.end());
 }
 
 void Simulator::update(int dt,int scope,Solid *solid){

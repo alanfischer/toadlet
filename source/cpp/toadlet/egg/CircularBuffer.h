@@ -27,21 +27,22 @@
 #define TOADLET_EGG_CIRCULARBUFFER_H
 
 #include "stlit/circular_buffer"
-
-namespace std{ using namespace stlit; }
+#define TOADLET_STL_NAMESPACE stlit
 
 namespace toadlet{
 namespace egg{
 
 template <typename Type>
-class CircularBuffer:public std::circular_buffer<Type>{
+class CircularBuffer:public TOADLET_STL_NAMESPACE::circular_buffer<Type>{
 public:
-	inline CircularBuffer():std::circular_buffer<Type>(){}
-	inline CircularBuffer(int size):std::circular_buffer<Type>(size){}
-	inline CircularBuffer(const std::circular_buffer<Type> &v):std::circular_buffer<Type>(v){}
+	inline CircularBuffer():TOADLET_STL_NAMESPACE::circular_buffer<Type>(){}
+	inline CircularBuffer(int size):TOADLET_STL_NAMESPACE::circular_buffer<Type>(size){}
+	inline CircularBuffer(const TOADLET_STL_NAMESPACE::circular_buffer<Type> &v):TOADLET_STL_NAMESPACE::circular_buffer<Type>(v){}
 };
 
 }
 }
+
+#undef TOADLET_STL_NAMESPACE
 
 #endif

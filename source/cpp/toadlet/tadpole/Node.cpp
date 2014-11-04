@@ -139,7 +139,7 @@ void Node::componentAttached(Component *component){
 }
 
 void Node::componentRemoved(Component *component){
-	mComponents.erase(std::remove(mComponents.begin(),mComponents.end(),component),mComponents.end());
+	mComponents.erase(stlit::remove(mComponents.begin(),mComponents.end(),component),mComponents.end());
 }
 
 void Node::nodeAttached(Node *node){
@@ -149,7 +149,7 @@ void Node::nodeAttached(Node *node){
 }
 
 void Node::nodeRemoved(Node *node){
-	mNodes.erase(std::remove(mNodes.begin(),mNodes.end(),node),mNodes.end());
+	mNodes.erase(stlit::remove(mNodes.begin(),mNodes.end(),node),mNodes.end());
 }
 
 void Node::actionAttached(ActionComponent *action){
@@ -157,7 +157,7 @@ void Node::actionAttached(ActionComponent *action){
 }
 
 void Node::actionRemoved(ActionComponent *action){
-	mActions.erase(std::remove(mActions.begin(),mActions.end(),action),mActions.end());
+	mActions.erase(stlit::remove(mActions.begin(),mActions.end(),action),mActions.end());
 }
 
 Component *Node::getChild(const String &name) const{
@@ -274,7 +274,7 @@ void Node::spacialAttached(Spacial *spacial){
 }
 
 void Node::spacialRemoved(Spacial *spacial){
-	mSpacials.erase(std::remove(mSpacials.begin(),mSpacials.end(),spacial),mSpacials.end());
+	mSpacials.erase(stlit::remove(mSpacials.begin(),mSpacials.end(),spacial),mSpacials.end());
 }
 
 void Node::visibleAttached(Visible *visible){
@@ -282,7 +282,7 @@ void Node::visibleAttached(Visible *visible){
 }
 
 void Node::visibleRemoved(Visible *visible){
-	mVisibles.erase(std::remove(mVisibles.begin(),mVisibles.end(),visible),mVisibles.end());
+	mVisibles.erase(stlit::remove(mVisibles.begin(),mVisibles.end(),visible),mVisibles.end());
 }
 
 void Node::animatableAttached(Animatable *animatable){
@@ -290,7 +290,7 @@ void Node::animatableAttached(Animatable *animatable){
 }
 
 void Node::animatableRemoved(Animatable *animatable){
-	mAnimatables.erase(std::remove(mAnimatables.begin(),mAnimatables.end(),animatable),mAnimatables.end());
+	mAnimatables.erase(stlit::remove(mAnimatables.begin(),mAnimatables.end(),animatable),mAnimatables.end());
 }
 
 void Node::lightAttached(LightComponent *light){
@@ -298,7 +298,7 @@ void Node::lightAttached(LightComponent *light){
 }
 
 void Node::lightRemoved(LightComponent *light){
-	mLights.erase(std::remove(mLights.begin(),mLights.end(),light),mLights.end());
+	mLights.erase(stlit::remove(mLights.begin(),mLights.end(),light),mLights.end());
 }
 
 void Node::physicsAttached(PhysicsComponent *physics){

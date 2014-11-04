@@ -27,6 +27,7 @@
 #define LOGIT_LOG_H
 
 #include "Logger.h"
+#include "FileLoggerListener.h"
 
 #define LOGIT_MAKE_LOG_FUNCTION(name,level) \
 	static void name(const char *text){name((char*)NULL,text);} \

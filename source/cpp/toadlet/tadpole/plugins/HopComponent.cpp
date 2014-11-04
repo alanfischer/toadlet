@@ -92,7 +92,7 @@ void HopComponent::addCollisionListener(PhysicsCollisionListener *listener){
 }
 
 void HopComponent::removeCollisionListener(PhysicsCollisionListener *listener){
-	mListeners.erase(remove(mListeners.begin(),mListeners.end(),listener),mListeners.end());
+	mListeners.erase(stlit::remove(mListeners.begin(),mListeners.end(),listener),mListeners.end());
 }
 
 void HopComponent::setPosition(const Vector3 &position){
