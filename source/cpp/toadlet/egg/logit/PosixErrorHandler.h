@@ -31,7 +31,7 @@
 
 namespace logit{
 
-class LOGIT_API PosixErrorHandler{
+class PosixErrorHandler{
 public:
 	PosixErrorHandler();
 	~PosixErrorHandler();
