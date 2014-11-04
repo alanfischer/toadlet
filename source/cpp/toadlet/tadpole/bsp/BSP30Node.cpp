@@ -144,7 +144,7 @@ void BSP30Node::removeNodeLeafIndexes(const Collection<int> &indexes,Node *node)
 	int i;
 	for(i=indexes.size()-1;i>=0;--i){
 		leafdata *data=indexes[i]<0 ? &mGlobalLeafData : &mLeafData[indexes[i]];
-		data->occupants.erase(std::remove(data->occupants.begin(),data->occupants.end(),node),data->occupants.end());
+		data->occupants.erase(stlit::remove(data->occupants.begin(),data->occupants.end(),node),data->occupants.end());
 	}
 }
 

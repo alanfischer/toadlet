@@ -281,12 +281,12 @@ void MaterialManager::contextDeactivate(RenderDevice *renderDevice){
 }
 
 void MaterialManager::resourceDestroyed(Resource *resource){
-	RenderStateCollection::iterator rit=std::find(mRenderStates.begin(),mRenderStates.end(),resource);
+	RenderStateCollection::iterator rit=stlit::find(mRenderStates.begin(),mRenderStates.end(),resource);
 	if(rit!=mRenderStates.end()){
 		mRenderStates.erase(rit);
 	}
 	else{
-		ShaderStateCollection::iterator sit=std::find(mShaderStates.begin(),mShaderStates.end(),resource);
+		ShaderStateCollection::iterator sit=stlit::find(mShaderStates.begin(),mShaderStates.end(),resource);
 		if(sit!=mShaderStates.end()){
 			mShaderStates.erase(sit);
 		}

@@ -233,7 +233,7 @@ void TextureManager::postContextReset(peeper::RenderDevice *renderDevice){
 }
 
 void TextureManager::resourceDestroyed(Resource *resource){
-	RenderTargetCollection::iterator rit=std::find(mRenderTargets.begin(),mRenderTargets.end(),resource);
+	RenderTargetCollection::iterator rit=stlit::find(mRenderTargets.begin(),mRenderTargets.end(),resource);
 	if(rit!=mRenderTargets.end()){
 		mRenderTargets.erase(rit);
 	}

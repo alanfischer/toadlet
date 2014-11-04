@@ -26,29 +26,35 @@
 #ifndef TOADLET_EGG_MAP_H
 #define TOADLET_EGG_MAP_H
 
-#include "stlit/map"
-
-namespace std{ using namespace stlit; }
+#ifdef _WIN32
+	#include "stlit/map"
+	#define TOADLET_STL_NAMESPACE stlit
+#else
+	#include <map>
+	#define TOADLET_STL_NAMESPACE std
+#endif
 
 namespace toadlet{
 namespace egg{
 
 template <typename Type1,typename Type2>
-class Pair:public std::pair<Type1,Type2>{
+class Pair:public TOADLET_STL_NAMESPACE::pair<Type1,Type2>{
 public:
-	inline Pair():std::pair<Type1,Type2>(){}
-	inline Pair(const Type1& a,const Type2& b):std::pair<Type1,Type2>(a,b){}
+	inline Pair():TOADLET_STL_NAMESPACE::pair<Type1,Type2>(){}
+	inline Pair(const Type1& a,const Type2& b):TOADLET_STL_NAMESPACE::pair<Type1,Type2>(a,b){}
 };
 
 template <typename Type1,typename Type2>
-class Map:public std::map<Type1,Type2>{
+class Map:public TOADLET_STL_NAMESPACE::map<Type1,Type2>{
 public:
-	inline Map():std::map<Type1,Type2>(){}
-	inline Map(int size):std::map<Type1,Type2>(size){}
-	inline Map(const std::map<Type1,Type2> &m):std::map<Type1,Type2>(m){}
+	inline Map():TOADLET_STL_NAMESPACE::map<Type1,Type2>(){}
+	inline Map(int size):TOADLET_STL_NAMESPACE::map<Type1,Type2>(size){}
+	inline Map(const TOADLET_STL_NAMESPACE::map<Type1,Type2> &m):TOADLET_STL_NAMESPACE::map<Type1,Type2>(m){}
 };
 
 }
 }
+
+#undef TOADLET_STL_NAMESPACE
 
 #endif

@@ -75,7 +75,7 @@ void AnimationAction::addActionListener(ActionListener *listener){
 }
 
 void AnimationAction::removeActionListener(ActionListener *listener){
-	mListeners.erase(std::remove(mListeners.begin(),mListeners.end(),listener),mListeners.end());
+	mListeners.erase(stlit::remove(mListeners.begin(),mListeners.end(),listener),mListeners.end());
 }
 
 void AnimationAction::start(){
@@ -200,7 +200,7 @@ void AnimationAction::attach(Animation *animation){
 void AnimationAction::remove(Animation *animation){
 	animation->setAnimationListener(NULL);
 
-	mAnimations.erase(std::remove(mAnimations.begin(),mAnimations.end(),animation),mAnimations.end());
+	mAnimations.erase(stlit::remove(mAnimations.begin(),mAnimations.end(),animation),mAnimations.end());
 
 	animationExtentsChanged(NULL);
 }

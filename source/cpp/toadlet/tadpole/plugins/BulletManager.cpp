@@ -68,7 +68,7 @@ void BulletManager::addListener(PhysicsManagerListener *listener){
 }
 
 void BulletManager::removeListener(PhysicsManagerListener *listener){
-	mListeners.erase(remove(mListeners.begin(),mListeners.end(),listener),mListeners.end());
+	mListeners.erase(stlit::remove(mListeners.begin(),mListeners.end(),listener),mListeners.end());
 }
 
 void BulletManager::logicUpdate(int dt,int scope,Node *node){
@@ -104,7 +104,7 @@ void BulletManager::componentCreated(BulletComponent *component){
 }
 
 void BulletManager::componentDestroyed(BulletComponent *component){
-	mComponents.erase(remove(mComponents.begin(),mComponents.end(),component),mComponents.end());
+	mComponents.erase(stlit::remove(mComponents.begin(),mComponents.end(),component),mComponents.end());
 }
 
 void BulletManager::physicsUpdate(btScalar timeStep){

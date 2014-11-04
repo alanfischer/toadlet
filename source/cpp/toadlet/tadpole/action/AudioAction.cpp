@@ -42,7 +42,7 @@ void AudioAction::addActionListener(ActionListener *listener){
 }
 
 void AudioAction::removeActionListener(ActionListener *listener){
-	mListeners.erase(remove(mListeners.begin(),mListeners.end(),listener),mListeners.end());
+	mListeners.erase(stlit::remove(mListeners.begin(),mListeners.end(),listener),mListeners.end());
 }
 
 void AudioAction::setAudio(AudioComponent *audio){

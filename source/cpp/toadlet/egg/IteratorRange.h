@@ -27,30 +27,31 @@
 #define TOADLET_EGG_ITERATORRANGE_H
 
 #include "stlit/iterator_range"
-
-namespace std{ using namespace stlit; }
+#define TOADLET_STL_NAMESPACE stlit
 
 namespace toadlet{
 namespace egg{
 
 template<typename Type>
-class IteratorRange:public std::iterator_range<Type>{
-	IteratorRange():std::iterator_range<Type>(){}
-	IteratorRange(const std::iterator_range<Type> &range):std::iterator_range<Type>(range){}
-	IteratorRange(const typename std::iterator_range<Type>::iterator &bit,const typename std::iterator_range<Type>::iterator &eit):std::iterator_range<Type>(bit,eit){}
+class IteratorRange:public TOADLET_STL_NAMESPACE::iterator_range<Type>{
+	IteratorRange():TOADLET_STL_NAMESPACE::iterator_range<Type>(){}
+	IteratorRange(const TOADLET_STL_NAMESPACE::iterator_range<Type> &range):TOADLET_STL_NAMESPACE::iterator_range<Type>(range){}
+	IteratorRange(const typename TOADLET_STL_NAMESPACE::iterator_range<Type>::iterator &bit,const typename TOADLET_STL_NAMESPACE::iterator_range<Type>::iterator &eit):TOADLET_STL_NAMESPACE::iterator_range<Type>(bit,eit){}
 };
 
 template<typename Type>
-class PointerIteratorRange:public std::pointer_iterator_range<Type>{
+class PointerIteratorRange:public TOADLET_STL_NAMESPACE::pointer_iterator_range<Type>{
 public:
-	PointerIteratorRange():std::pointer_iterator_range<Type>(){}
-	PointerIteratorRange(const std::pointer_iterator_range<Type> &range):std::pointer_iterator_range<Type>(range){}
-	PointerIteratorRange(const typename std::pointer_iterator_range<Type>::iterator &bit,const typename std::pointer_iterator_range<Type>::iterator &eit):std::pointer_iterator_range<Type>(bit,eit){}
+	PointerIteratorRange():TOADLET_STL_NAMESPACE::pointer_iterator_range<Type>(){}
+	PointerIteratorRange(const TOADLET_STL_NAMESPACE::pointer_iterator_range<Type> &range):TOADLET_STL_NAMESPACE::pointer_iterator_range<Type>(range){}
+	PointerIteratorRange(const typename TOADLET_STL_NAMESPACE::pointer_iterator_range<Type>::iterator &bit,const typename TOADLET_STL_NAMESPACE::pointer_iterator_range<Type>::iterator &eit):TOADLET_STL_NAMESPACE::pointer_iterator_range<Type>(bit,eit){}
 
 };
 
 }
 }
+
+#undef TOADLET_STL_NAMESPACE
 
 #endif
 

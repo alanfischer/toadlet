@@ -105,7 +105,7 @@ void BulletComponent::addCollisionListener(PhysicsCollisionListener *listener){
 }
 
 void BulletComponent::removeCollisionListener(PhysicsCollisionListener *listener){
-	mListeners.erase(remove(mListeners.begin(),mListeners.end(),listener),mListeners.end());
+	mListeners.erase(stlit::remove(mListeners.begin(),mListeners.end(),listener),mListeners.end());
 }
 
 void BulletComponent::setPosition(const Vector3 &position){

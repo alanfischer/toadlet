@@ -187,7 +187,7 @@ void MMAudioDevice::internal_audioCreate(MMAudio *audio){
 }
 
 void MMAudioDevice::internal_audioDestroy(MMAudio *audio){
-	mAudios.erase(remove(mAudios.begin(),mAudios.end(),audio),mAudios.end());
+	mAudios.erase(stlit::remove(mAudios.begin(),mAudios.end(),audio),mAudios.end());
 }
 
 // Mix all the currently playing audios

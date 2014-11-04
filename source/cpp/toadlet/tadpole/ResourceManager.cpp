@@ -70,7 +70,7 @@ void ResourceManager::removeResourceArchive(Archive  *archive){
 		mMutex.lock();
 	#endif
 
-	mResourceArchives.erase(std::remove(mResourceArchives.begin(),mResourceArchives.end(),archive),mResourceArchives.end());
+	mResourceArchives.erase(stlit::remove(mResourceArchives.begin(),mResourceArchives.end(),archive),mResourceArchives.end());
 
 	#if defined(TOADLET_THREADSAFE)
 		mMutex.unlock();
@@ -147,7 +147,7 @@ Resource::ptr ResourceManager::manage(Resource  *resource,const String &name){
 		mMutex.lock();
 	#endif
 
-	if(std::find(mResources.begin(),mResources.end(),resource)==mResources.end()){
+	if(stlit::find(mResources.begin(),mResources.end(),resource)==mResources.end()){
 		int handle=-1;
 		if(mFreeHandles.empty()==false){
 			handle=mFreeHandles.back();
@@ -190,7 +190,7 @@ void ResourceManager::unmanage(Resource *resource){
 		mMutex.lock();
 	#endif
 
-	if(std::find(mResources.begin(),mResources.end(),resource)==mResources.end()){
+	if(stlit::find(mResources.begin(),mResources.end(),resource)==mResources.end()){
 		#if defined(TOADLET_THREADSAFE)
 			mMutex.unlock();
 		#endif

@@ -53,7 +53,7 @@ void CompositeAction::attach(Action *action){
 void CompositeAction::remove(Action *action){
 	action->removeActionListener(this);
 
-	mActions.erase(std::remove(mActions.begin(),mActions.end(),action),mActions.end());
+	mActions.erase(stlit::remove(mActions.begin(),mActions.end(),action),mActions.end());
 }
 
 void CompositeAction::start(){
@@ -103,7 +103,7 @@ void CompositeAction::addActionListener(ActionListener *listener){
 }
 
 void CompositeAction::removeActionListener(ActionListener *listener){
-	mListeners.erase(std::remove(mListeners.begin(),mListeners.end(),listener),mListeners.end());
+	mListeners.erase(stlit::remove(mListeners.begin(),mListeners.end(),listener),mListeners.end());
 }
 
 void CompositeAction::actionStarted(Action *action){

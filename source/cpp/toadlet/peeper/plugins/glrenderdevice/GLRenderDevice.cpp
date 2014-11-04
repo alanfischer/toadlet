@@ -2659,7 +2659,7 @@ void GLRenderDevice::shaderStateDestroyed(GLSLShaderState *state){
 		mMutex.lock();
 	#endif
 
-	mShaderStates.erase(remove(mShaderStates.begin(),mShaderStates.end(),state),mShaderStates.end());
+	mShaderStates.erase(stlit::remove(mShaderStates.begin(),mShaderStates.end(),state),mShaderStates.end());
 
 	#if defined(TOADLET_THREADSAFE)
 		mMutex.unlock();
