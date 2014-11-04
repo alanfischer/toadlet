@@ -32,16 +32,17 @@ namespace logit{
 
 #if defined(LOGIT_PLATFORM_WIN32)
 	#pragma warning(disable:4996)
-	typedef unsigned __int64 uint64;
-#else
-	typedef unsigned long long int uint64;
 #endif
 
 class LoggerListener;
 
 class LOGIT_API Logger{
 public:
-	typedef uint64 timestamp;
+	#if defined(LOGIT_PLATFORM_WIN32)
+		typedef unsigned __int64 timestamp;
+	#else
+		typedef unsigned long long int timestamp;
+	#endif
 
 	enum Level{
 		Level_DISABLED=0,
