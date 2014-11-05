@@ -14,13 +14,18 @@ make_directory (${ARDIR})
 
 # Extract every dependent library into a series of object files
 foreach (LIB ${LIBRARIES})
-	get_filename_component (LIBNAME ${LIB} NAME)
-	file (MAKE_DIRECTORY ${ARDIR}/${LIBNAME})
-	execute_process (
-		COMMAND ${CMAKE_AR} x ${LIB} WORKING_DIRECTORY ${ARDIR}/${LIBNAME}
-	)
-	file (GLOB_RECURSE OBJS "${ARDIR}/${LIBNAME}/*")
-	set (AROBJS ${AROBJS} ${OBJS})
+	get_filename_component (LIBEXT ${LIB} EXT)
+	if (${LIBEXT} MATCHES "^.so.*")
+		message(STATUS "Not merging library ${LIB}")
+	else (${LIBEXT} MATCHES "^.so.*")	
+		get_filename_component (LIBNAME ${LIB} NAME)
+		file (MAKE_DIRECTORY ${ARDIR}/${LIBNAME})
+		execute_process (
+			COMMAND ${CMAKE_AR} x ${LIB} WORKING_DIRECTORY ${ARDIR}/${LIBNAME}
+		)
+		file (GLOB_RECURSE OBJS "${ARDIR}/${LIBNAME}/*")
+		set (AROBJS ${AROBJS} ${OBJS})
+	endif (${LIBEXT} MATCHES "^.so.*")
 endforeach (LIB)
 
 # Merge all extracted object files into the existing target archive
