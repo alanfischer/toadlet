@@ -120,14 +120,6 @@ set (EGG_HDR
 	Version.h
 )
 
-set (STLIT_HDR
-	stlit/circular_buffer
-	stlit/iterator_range
-	stlit/map
-	stlit/utility
-	stlit/vector
-)
-
 set (EGG_IO_HDR
 	io/Archive.h
 	io/BaseArchive.h
@@ -210,14 +202,6 @@ set (EGG_PLATFORM_WIN32_HDR
 if (TOADLET_EXCEPTIONS)
 	set (EGG_IO_HDR ${EGG_IO_HDR} ${EGG_IO_STL_HDR})
 endif (TOADLET_EXCEPTIONS)
-
-
-# Bundle headers
-source_group ("Header Files\\\\stlit" FILES ${STLIT_HDR})
-
-# Sources, headers and namespaces
-set (EGG_HDR ${EGG_HDR} ${STLIT_HDR})
-
 
 
 # Bundle source
