@@ -39,7 +39,7 @@ public:
 	}
 
 	const char *getTimeString(Logger::timestamp time){
-		time_t tt=time/1000;
+		time_t tt=static_cast<time_t>(time/1000);
 		struct tm *ts=gmtime(&tt);
 		strftime(timeString,sizeof(timeString),"%Y-%m-%d %H:%M:%S",ts);
 		return timeString;
