@@ -26,7 +26,7 @@ if (NOT TOADLET_PLATFORM_WIN32)
 	option (TOADLET_PROFILE "Build with profiling information" OFF)
 endif (NOT TOADLET_PLATFORM_WIN32)
 if (TOADLET_PLATFORM_OSX)
-	option (TOADLET_OSX_STDCPP "Build against legacy libstdc++" ON)
+	option (TOADLET_OSX_STDCPP "Build against legacy libstdc++" OFF)
 endif (TOADLET_PLATFORM_OSX)
 
 
