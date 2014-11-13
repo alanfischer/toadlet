@@ -279,6 +279,7 @@ void Log::initialize(bool startSilent,bool perThread,const char *options){
 
 	if(mTheLogger==NULL){
 		mTheLogger=new Logger(startSilent);
+		mTheLogger->setThread(currentThread());
 
 		#if defined(LOGIT_PLATFORM_WIN32)
 			mListeners.push_back(new ConsoleListener());
@@ -315,24 +316,26 @@ Logger *Log::getInstance(){
 	Logger *logger=mTheLogger;
 	if(mPerThread){
 		void *thread=currentThread();
-		mTheLogger->lock();
-			Logger::List<Logger*>::iterator it=mThreadLoggers.begin();
-			while(it!=mThreadLoggers.end() && (*it)->getThread()==thread){
-				++it;
-			}
-			if(it!=mThreadLoggers.end()){
-				logger=(*it);
-			}
-			else{
-				LoggerListener *listener=new ParentListener(mTheLogger);
-				mListeners.push_back(listener);
+		if(mTheLogger->getThread()!=thread){
+			mTheLogger->lock();
+				Logger::List<Logger*>::iterator it=mThreadLoggers.begin();
+				while(it!=mThreadLoggers.end() && (*it)->getThread()==thread){
+					++it;
+				}
+				if(it!=mThreadLoggers.end()){
+					logger=(*it);
+				}
+				else{
+					LoggerListener *listener=new ParentListener(mTheLogger);
+					mListeners.push_back(listener);
 
-				logger=new Logger(true);
-				logger->setThread(thread);
-				logger->addLoggerListener(listener);
-				mThreadLoggers.push_back(logger);
-			}
-		mTheLogger->unlock();
+					logger=new Logger(true);
+					logger->setThread(thread);
+					logger->addLoggerListener(listener);
+					mThreadLoggers.push_back(logger);
+				}
+			mTheLogger->unlock();
+		}
 	}
 	return logger;
 }
