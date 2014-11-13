@@ -33,8 +33,11 @@ void Particles::create(){
 		Vector3(-ten,-ten,0),
 	};
 
-	Texture::ptr texture=shared_static_cast<Texture>(engine->getTextureManager()->find("sparkle.png"));
-
+    Texture::ptr texture;
+    TOADLET_TRY
+        texture=shared_static_cast<Texture>(engine->getTextureManager()->find("sparkle.png"));
+    TOADLET_CATCH_ANONYMOUS(){}
+    
 	Material::ptr pointMaterial=engine->createPointSpriteMaterial(texture,Math::ONE,false);
 	if(pointMaterial!=NULL){
 		pointMaterial->getPass()->setBlendState(BlendState::Combination_ALPHA_ADDITIVE);

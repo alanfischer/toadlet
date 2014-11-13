@@ -32,7 +32,7 @@
 namespace toadlet{
 namespace peeper{
 
-TOADLET_C_API RenderTarget *new_NSGLRenderTarget(void *display,void *view,RenderTarget *shareTarget,WindowRenderTargetFormat *format){
+TOADLET_C_API RenderTarget *new_NSGLRenderTarget(void *display,void *view,WindowRenderTargetFormat *format,RenderTarget *shareTarget){
 	return new NSGLRenderTarget((NSView*)view,format,shareTarget);
 }
 	
@@ -47,7 +47,7 @@ NSGLRenderTarget::NSGLRenderTarget(NSView *view,WindowRenderTargetFormat *format
 	mPixelFormat(nil),
 	mContext(nil)
 {
-	createContext(view,format,pixelFormat,shareTarget);
+	createContext(view,format,shareTarget,pixelFormat);
 }
 
 NSGLRenderTarget::NSGLRenderTarget(NSOpenGLContext *context):GLRenderTarget(),
