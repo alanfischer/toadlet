@@ -34,7 +34,7 @@ namespace logit{
 class PosixErrorHandler{
 public:
 	PosixErrorHandler();
-	~PosixErrorHandler();
+	virtual ~PosixErrorHandler();
 
 	virtual void setStackTraceListener(StackTraceListener *listener){mListener=listener;}
 	virtual StackTraceListener *getStackTraceListener(){return mListener;}

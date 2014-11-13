@@ -440,6 +440,7 @@ void ResourceManager::ArchiveResourceRequest::notFound(){
 void ResourceManager::ArchiveResourceRequest::resourceReady(Resource *resource){
 	if(mPushedTemp){
 		mManager->mEngine->getArchiveManager()->popDirectory();
+		mPushedTemp=false;
 	}
 
 	resource->setName(mName);
@@ -451,6 +452,7 @@ void ResourceManager::ArchiveResourceRequest::resourceReady(Resource *resource){
 void ResourceManager::ArchiveResourceRequest::resourceException(const Exception &ex){
 	if(mPushedTemp){
 		mManager->mEngine->getArchiveManager()->popDirectory();
+		mPushedTemp=false;
 	}
 
 	if(mSearchingArchives){

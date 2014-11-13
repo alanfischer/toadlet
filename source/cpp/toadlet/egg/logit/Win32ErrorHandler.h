@@ -39,7 +39,7 @@ namespace logit{
 class LOGIT_API Win32ErrorHandler{
 public:
 	Win32ErrorHandler();
-	~Win32ErrorHandler();
+	virtual ~Win32ErrorHandler();
 
 	virtual void setStackTraceListener(StackTraceListener *listener){mListener=listener;}
 	virtual StackTraceListener *getStackTraceListener(){return mListener;}

@@ -42,14 +42,14 @@ TerrainPatchComponent::TerrainPatchComponent(Scene *scene):
 	mEpsilon(0),
 	mCellEpsilon(0),
 	mTerrainX(0),mTerrainY(0),
-	mProtected(false),
 
 	mCameraUpdateScope(-1),
 	mTerrainScope(-1),
 	mWaterScope(-1),
 	mWaterTransparentScope(-1),
 	mTolerance(0),
-	mWaterLevel(0)
+	mWaterLevel(0),
+    mProtected(false)
 {
 	mScene=scene;
 	mEngine=scene->getEngine();
