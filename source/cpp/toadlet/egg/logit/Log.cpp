@@ -280,7 +280,6 @@ void Log::initialize(int flags,const char *data){
 	if(mTheLogger==NULL){
 		mTheLogger=new Logger((mFlags&Flags_START_SILENT)!=0);
 		mTheLogger->setThread(currentThread());
-		mTheLogger->setStoreLogEntry((mFlags&Flags_STORE_MAIN_ENTRIES)!=0);
 
 		#if defined(LOGIT_PLATFORM_WIN32)
 			mListeners.push_back(new ConsoleListener());
@@ -307,6 +306,8 @@ void Log::initialize(int flags,const char *data){
 			mTheLogger->addLoggerListener(it);
 		}
 	}
+
+	mTheLogger->setStoreLogEntry((mFlags&Flags_STORE_MAIN_ENTRIES)!=0);
 }
 
 Logger *Log::getInstance(){
@@ -320,7 +321,7 @@ Logger *Log::getInstance(){
 		if(mTheLogger->getThread()!=thread){
 			mTheLogger->lock();
 				Logger::List<Logger*>::iterator it=mThreadLoggers.begin();
-				while(it!=mThreadLoggers.end() && (*it)->getThread()==thread){
+				while(it!=mThreadLoggers.end() && (*it)->getThread()!=thread){
 					++it;
 				}
 				if(it!=mThreadLoggers.end()){

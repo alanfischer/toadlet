@@ -2,6 +2,7 @@
 
 Particles::Particles(Application *application){
 	app=application;
+	Log::initialize(Log::Flags_STORE_MAIN_ENTRIES);
 }
 
 Particles::~Particles(){
@@ -13,6 +14,10 @@ void Particles::create(){
 
 	scene=new Scene(engine);
 
+	for(Logger::List<Logger::Entry*>::iterator it=Log::getInstance()->getLogEntries().begin();it!=Log::getInstance()->getLogEntries().end();++it){
+		std::cout<< (*it)->text << std::endl;
+	}
+	
 	scalar ten=Math::ONE*10;
 
 	Vector3 pointPositions[]={
