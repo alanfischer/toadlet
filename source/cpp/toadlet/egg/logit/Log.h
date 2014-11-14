@@ -45,7 +45,14 @@ class LoggerListener;
 
 class LOGIT_API Log{
 public:
-	static void initialize(bool startSilent=false,bool perThread=false,const char *options=NULL);
+	enum Flags{
+		Flags_START_SILENT=1<<0,
+		Flags_PER_THREAD=1<<1,
+		Flags_STORE_MAIN_ENTRIES=1<<2,
+		Flags_STORE_THREAD_ENTRIES=1<<3,
+	};
+
+	static void initialize(int flags=0,const char *data=NULL);
 	static Logger *getInstance();
 	static void destroy();
 
@@ -68,7 +75,7 @@ public:
 
 private:
 	static Logger *mTheLogger;
-	static bool mPerThread;
+	static int mFlags;
 	static Logger::List<LoggerListener*> mListeners;
 	static Logger::List<Logger*> mThreadLoggers;
 };
