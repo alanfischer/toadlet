@@ -7,7 +7,14 @@ namespace egg{
 
 class Log{
 public:
-	static void initialize(bool startSlient=false,bool perThread=false,const char *options=NULL);
+	enum Flags{
+		Flags_START_SILENT=1<<0,
+		Flags_PER_THREAD=1<<1,
+		Flags_STORE_MAIN_ENTRIES=1<<2,
+		Flags_STORE_THREAD_ENTRIES=1<<3,
+	};
+
+	static void initialize(int flags,const char *data=NULL);
 	static Logger *getInstance();
 	static void destroy();
 	

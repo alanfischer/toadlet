@@ -270,16 +270,17 @@ public:
 };
 
 Logger *Log::mTheLogger=NULL;
-bool Log::mPerThread=false;
+int Log::mFlags=0;
 Logger::List<LoggerListener*> Log::mListeners;
 Logger::List<Logger*> Log::mThreadLoggers;
 
-void Log::initialize(bool startSilent,bool perThread,const char *options){
-	mPerThread=perThread;
+void Log::initialize(int flags,const char *data){
+	mFlags=flags;
 
 	if(mTheLogger==NULL){
-		mTheLogger=new Logger(startSilent);
+		mTheLogger=new Logger((mFlags&Flags_START_SILENT)!=0);
 		mTheLogger->setThread(currentThread());
+		mTheLogger->setStoreLogEntry((mFlags&Flags_STORE_MAIN_ENTRIES)!=0);
 
 		#if defined(LOGIT_PLATFORM_WIN32)
 			mListeners.push_back(new ConsoleListener());
@@ -297,8 +298,8 @@ void Log::initialize(bool startSilent,bool perThread,const char *options){
 		#endif
 
 		#if !defined(LOGIT_PLATFORM_EMSCRIPTEN)
-			if(options!=NULL){
-				mListeners.push_back(new SOSLoggerListener(options));
+			if(data!=NULL){
+				mListeners.push_back(new SOSLoggerListener(data));
 			}
 		#endif
 
@@ -314,7 +315,7 @@ Logger *Log::getInstance(){
 	}
 
 	Logger *logger=mTheLogger;
-	if(mPerThread){
+	if((mFlags&Flags_PER_THREAD)!=0){
 		void *thread=currentThread();
 		if(mTheLogger->getThread()!=thread){
 			mTheLogger->lock();
@@ -331,6 +332,7 @@ Logger *Log::getInstance(){
 
 					logger=new Logger(true);
 					logger->setThread(thread);
+					logger->setStoreLogEntry((mFlags&Flags_STORE_THREAD_ENTRIES)!=0);
 					logger->addLoggerListener(listener);
 					mThreadLoggers.push_back(logger);
 				}
