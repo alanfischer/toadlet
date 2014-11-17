@@ -222,11 +222,11 @@ class Exception;
 %}
 
 %typemap(directorin,descriptor="Ljava/lang/Exception;") Exception %{
-	$input = jenv->NewUTF8String($1.what());
+	$input = jenv->NewStringUTF($1.what());
 %}
 
 %typemap(out) Exception %{
-	$input = jenv->NewUTF8String($1.what());
+	$input = jenv->NewStringUTF($1.what());
 %}
 	
 %typemap(javain) Exception "$javainput.getMessage()"
@@ -265,11 +265,11 @@ class Exception;
 %}
 
 %typemap(directorin,descriptor="Ljava/lang/Exception;") const Exception & %{
-	$input = jenv->NewUTF8String($1.what());
+	$input = jenv->NewStringUTF($1.what());
 %}
 
 %typemap(out) const Exception & %{
-	$input = jenv->NewUTF8String($1.what());
+	$input = jenv->NewStringUTF($1.what());
 %}
 	
 %typemap(javain) const Exception & "$javainput.getMessage()"
