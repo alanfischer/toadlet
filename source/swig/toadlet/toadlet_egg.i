@@ -206,7 +206,8 @@ class Exception;
 	} 
 	const char *$1_pstr = (const char *)jenv->GetStringUTFChars($input, 0); 
 	if (!$1_pstr) return $null;
-	*$1=Exception($1_pstr);
+	Exception $1_ex($1_pstr);
+	$1=&$1_ex;
 	jenv->ReleaseStringUTFChars($input, $1_pstr);
 %}
 
@@ -217,7 +218,8 @@ class Exception;
 	}
 	const char *$1_pstr = (const char *)jenv->GetStringUTFChars($input, 0); 
 	if (!$1_pstr) return $null;
-	*$result=Exception($1_pstr);
+	Exception $1_ex($1_pstr);
+	$result=&$1_ex;
 	jenv->ReleaseStringUTFChars($input, $1_pstr);
 %}
 
@@ -249,7 +251,8 @@ class Exception;
 	} 
 	const char *$1_pstr = (const char *)jenv->GetStringUTFChars($input, 0); 
 	if (!$1_pstr) return $null;
-	*$1=Exception($1_pstr);
+	Exception $1_ex($1_pstr);
+	$1=&$1_ex;
 	jenv->ReleaseStringUTFChars($input, $1_pstr);
 %}
 
@@ -260,7 +263,8 @@ class Exception;
 	}
 	const char *$1_pstr = (const char *)jenv->GetStringUTFChars($input, 0); 
 	if (!$1_pstr) return $null;
-	*$result=Exception($1_pstr);
+	Exception $1_ex($1_pstr);
+	$result=&$1_ex;
 	jenv->ReleaseStringUTFChars($input, $1_pstr);
 %}
 
