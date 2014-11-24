@@ -26,7 +26,7 @@
 #ifndef TOADLET_EGG_CIRCULARBUFFER_H
 #define TOADLET_EGG_CIRCULARBUFFER_H
 
-#include "stlit/circular_buffer"
+#include "stlit/circular_buffer.h"
 #define TOADLET_STL_NAMESPACE stlit
 
 namespace toadlet{

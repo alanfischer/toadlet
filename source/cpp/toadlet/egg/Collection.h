@@ -27,14 +27,14 @@
 #define TOADLET_EGG_COLLECTION_H
 
 #ifdef _WIN32
-	#include "stlit/vector"
+	#include "stlit/vector.h"
 	#define TOADLET_STL_NAMESPACE stlit
 #else
 	#include <vector>
 	#define TOADLET_STL_NAMESPACE std
 #endif
 
-#include "stlit/utility"
+#include "stlit/utility.h"
 
 namespace toadlet{
 namespace egg{
