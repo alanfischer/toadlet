@@ -27,7 +27,7 @@
 #define TOADLET_EGG_MAP_H
 
 #ifdef _WIN32
-	#include "stlit/map"
+	#include "stlit/map.h"
 	#define TOADLET_STL_NAMESPACE stlit
 #else
 	#include <map>
