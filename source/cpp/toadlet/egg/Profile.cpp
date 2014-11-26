@@ -116,7 +116,7 @@ void Profile::outputTimings(ProfileNode *node,int depth,int total){
 	}
 
 	if(node->getTotal()>0){
-		Log::alert(Categories::TOADLET_EGG_PROFILE,spaces+node->getName()+":"+node->getTotal()+" us:%"+(float)node->getTotal()*100/(float)total);
+		Log::alert(Categories::TOADLET_EGG_PROFILE,spaces+node->getName()+" : "+node->getTotal()+"us : %"+(float)node->getTotal()*100/(float)total);
 	}
 
 	for(node=node->getFirstChild();node!=NULL;node=node->getNext()){
