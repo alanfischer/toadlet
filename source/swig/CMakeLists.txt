@@ -14,11 +14,13 @@ if (NOT TOADLET_PLATFORM_PYTHON)
 		PARENT_SCOPE
 	)
 	set (EGG_SWIG_INT_DEPS
+		${CMAKE_CURRENT_SOURCE_DIR}/toadlet/egg/Error.i
 		${CMAKE_CURRENT_SOURCE_DIR}/toadlet/egg/Log.i
 		${CMAKE_CURRENT_SOURCE_DIR}/toadlet/egg/Logger.i
 		PARENT_SCOPE
 	)
 	set (EGG_SWIG_INT_OUTPUTS
+		${PROJECT_BINARY_DIR}/source/java/us/toadlet/egg/Error.java
 		${PROJECT_BINARY_DIR}/source/java/us/toadlet/egg/Log.java
 		${PROJECT_BINARY_DIR}/source/java/us/toadlet/egg/Logger.java
 		${PROJECT_BINARY_DIR}/source/java/us/toadlet/egg/egg.java
