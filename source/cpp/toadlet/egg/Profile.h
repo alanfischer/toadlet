@@ -106,12 +106,14 @@ protected:
 	#define TOADLET_PROFILE_ENDSECTION(x) toadlet::egg::Profile::getInstance()->endSection(#x)
 	#define TOADLET_PROFILE_SCOPE(x) toadlet::egg::ScopeProfile PROFILE##x(#x)
 	#define TOADLET_PROFILE_AUTOSCOPE() toadlet::egg::ScopeProfile PROFILE##__LINE__(__FUNCTION__)
+	#define TOADLET_PROFILE_OUTPUTTIMINGS() toadlet::egg::Profile::getInstance()->outputTimings()
 	#define TOADLET_PROFILE_CLEARTIMINGS() toadlet::egg::Profile::getInstance()->clearTimings()
 #else
 	#define TOADLET_PROFILE_BEGINSECTION(x)
 	#define TOADLET_PROFILE_ENDSECTION(x)
 	#define TOADLET_PROFILE_SCOPE(x)
 	#define TOADLET_PROFILE_AUTOSCOPE()
+	#define TOADLET_PROFILE_OUTPUTTIMINGS()
 	#define TOADLET_PROFILE_CLEARTIMINGS()
 #endif
 
