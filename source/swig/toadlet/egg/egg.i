@@ -7,6 +7,7 @@
 %include <enumtypeunsafe.swg>
 %javaconst(1);
 
+%include <toadlet/egg/Error.i>
 %include <toadlet/egg/Log.i>
 %include <toadlet/egg/Logger.i>
 %{
