@@ -208,7 +208,6 @@ public:
 
 	void flush();
 
-	Category *addCategory(const char *categoryName);
 	Category *getCategory(const char *categoryName);
 
 	const List<Entry*> &getLogEntries() const{return mLogEntries;}

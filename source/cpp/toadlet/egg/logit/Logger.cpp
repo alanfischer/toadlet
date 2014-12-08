@@ -151,10 +151,6 @@ void Logger::addCompleteLogEntry(Category *category,Level level,const char *text
 	}
 }
 
-Logger::Category *Logger::addCategory(const char *categoryName){
-	return getCategory(categoryName);
-}
-
 Logger::Category *Logger::getCategory(const char *categoryName){
 	if(categoryName==(char*)NULL) return NULL;
 
