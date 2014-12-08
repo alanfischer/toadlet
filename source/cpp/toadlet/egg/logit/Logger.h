@@ -158,11 +158,15 @@ public:
 		}
 
 		void remove(const Type &item){
-			node *n=head;
-			while(n->next!=NULL && n->next->item!=item) n=n->next;
+			node *n=head,*p=NULL;
+			while(n->next!=NULL && n->item!=item){
+				p=n;
+				n=n->next;
+			}
 			if(n->next!=NULL){
-				node *t=n->next;
-				n->next=t->next;
+				node *t=n;
+				if(p!=NULL) p->next=t->next;
+				if(t==head) head=n->next;
 				delete t;
 			}
 		}
