@@ -28,6 +28,7 @@
 
 #include "Logger.h"
 #include "FileLoggerListener.h"
+#include <stdarg.h>
 
 #define LOGIT_MAKE_LOG_FUNCTION(name,level) \
 	static void name(const char *text){name((char*)NULL,text);} \
@@ -37,6 +38,22 @@
 		else if(level<=instance->getMasterReportingLevel() && level<=instance->getCategoryReportingLevel(categoryName)){ \
 			instance->addLogEntry(categoryName,level,text); \
 		} \
+	} \
+	static void name##f(const char *format,...){ \
+		char buffer[1024]; \
+		va_list list; \
+		va_start(list,format); \
+		vsnprintf(buffer,1024,format,list); \
+		va_end(list); \
+		name((char*)NULL,buffer); \
+	} \
+	static void name##f(const char *categoryName,const char *format,...){ \
+		char buffer[1024]; \
+		va_list list; \
+		va_start(list,format); \
+		vsnprintf(buffer,1024,format,list); \
+		va_end(list); \
+		name(categoryName,buffer); \
 	}
 
 namespace logit{

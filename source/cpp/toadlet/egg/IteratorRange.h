@@ -34,6 +34,7 @@ namespace egg{
 
 template<typename Type>
 class IteratorRange:public TOADLET_STL_NAMESPACE::iterator_range<Type>{
+public:
 	IteratorRange():TOADLET_STL_NAMESPACE::iterator_range<Type>(){}
 	IteratorRange(const TOADLET_STL_NAMESPACE::iterator_range<Type> &range):TOADLET_STL_NAMESPACE::iterator_range<Type>(range){}
 	IteratorRange(const typename TOADLET_STL_NAMESPACE::iterator_range<Type>::iterator &bit,const typename TOADLET_STL_NAMESPACE::iterator_range<Type>::iterator &eit):TOADLET_STL_NAMESPACE::iterator_range<Type>(bit,eit){}
