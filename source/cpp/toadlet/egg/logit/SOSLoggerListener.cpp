@@ -18,6 +18,7 @@
 	#include <sys/socket.h>
 	#include <netinet/in.h>
 	#include <netinet/tcp.h>
+	#include <arpa/inet.h>
 	#include <netdb.h>
 	#include <pthread.h>
 	#include <unistd.h>
@@ -137,16 +138,16 @@ void SOSLoggerListener::sendEntry(Logger::Category *category,Logger::Level level
 	}
 
 	sprintf(mMessageBuffer,"%s%s%s%s%s%s%s%s%s",startText,levelText,preLevelText,levelText,postLevelText,categoryText,separatorText,text,endText);
-
-	send(mSocket,mMessageBuffer,mMessageBufferLength,0);
+	send(mSocket,mMessageBuffer,length,0);
 }
 
 void SOSLoggerListener::run(){
 	struct sockaddr_in address={0};
 	address.sin_family=AF_INET;
 	address.sin_port=htons(4444);
-
-	struct hostent *he=gethostbyaddr((char*)&mServerAddress,4,AF_INET);
+	struct hostent *he=NULL;
+	
+	he=gethostbyname(mServerAddress);
 	if(he!=NULL){
 		char **list=he->h_addr_list;
 		if((*list)!=NULL){
@@ -154,7 +155,7 @@ void SOSLoggerListener::run(){
 		}
 	}
 
-	if(connect(mSocket,(struct sockaddr*)&address,sizeof(address))<=0){
+	if(connect(mSocket,(struct sockaddr*)&address,sizeof(address))<0){
 		fprintf(stderr,"SOSLoggerListener: unable to connect to %s",mServerAddress);
 		return;
 	}
@@ -165,7 +166,7 @@ void SOSLoggerListener::run(){
 		Log::lock(mMutex);
 		if(mEntries.begin()!=mEntries.end()){
 			entry=*mEntries.begin();
-			mEntries.remove(entry);
+			mEntries.remove(mEntries.begin());
 		}
 		else{
 			Log::notify(mCondition);
@@ -175,6 +176,7 @@ void SOSLoggerListener::run(){
 		if(entry){
 			sendEntry(entry->category,entry->level,entry->time,entry->text);
 			delete entry;
+			entry=NULL;
 		}
 	}
 }
