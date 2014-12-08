@@ -20,8 +20,8 @@ class PathVertex:public toadlet::egg::Interface{
 public:
 	TOADLET_INTERFACE(PathVertex);
 
-	typedef toadlet::egg::IteratorRange<PathEdge::ptr>::iterator iterator;
-	virtual toadlet::egg::IteratorRange<PathEdge::ptr> getEdges() const=0;
+	typedef toadlet::egg::PointerIteratorRange<PathEdge>::iterator iterator;
+	virtual toadlet::egg::PointerIteratorRange<PathEdge> getEdges() const=0;
 
 	virtual toadlet::egg::math::real getLength() const=0;
 	virtual void getPoint(toadlet::egg::math::Vector3 &point,toadlet::egg::math::real time) const=0;
