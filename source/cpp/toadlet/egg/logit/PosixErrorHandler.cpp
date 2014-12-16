@@ -74,6 +74,11 @@ PosixErrorHandler::~PosixErrorHandler(){
 }
 
 bool PosixErrorHandler::installHandler(){
+	// Dont install for now, until android has a proper stack trace, otherwise its worthless
+	#if defined(LOGIT_PLATFORM_ANDROID)
+		return false;
+	#endif
+	
 	if(mAction.sa_sigaction!=NULL) return true;
 
 	mAction.sa_sigaction=signalHandler;
