@@ -26,7 +26,7 @@
 #ifndef STLIT_CIRCULAR_BUFFER_H
 #define STLIT_CIRCULAR_BUFFER_H
 
-#include "vector"
+#include <toadlet/egg/stlit/vector.h>
 
 namespace std{ struct bidirectional_iterator_tag; }
 
