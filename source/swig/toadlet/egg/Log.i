@@ -14,7 +14,7 @@ public:
 		Flags_STORE_THREAD_ENTRIES=1<<3,
 	};
 
-	static void initialize(int flags,const char *data=NULL);
+	static void initialize(int flags=0,const char *data=NULL);
 	static Logger *getInstance();
 	static void destroy();
 	
