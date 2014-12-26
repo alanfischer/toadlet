@@ -209,7 +209,7 @@ void SMDConverter::load(Engine *engine,Stream *in,const String &fileName){
 	}
 
 	if(reference){
-		int i,j,k;
+		int i,j;
 
 		if(mRemoveSkeleton==false && mSkeleton!=NULL){
 			SkeletonComponent::ptr skeleton=new SkeletonComponent(mEngine,mSkeleton);
@@ -233,17 +233,17 @@ void SMDConverter::load(Engine *engine,Stream *in,const String &fileName){
 
 		Collection<Vertex> verts;
 		Map<String,Collection<int> > materialIndexLists;
-		for(i=0;i<triangles.size();++i){
-			for(j=0;j<3;++j){
-				for(k=0;k<verts.size();++k){
-					if(vertsEqual(verts.at(k),triangles.at(i).verts[j])){
-						materialIndexLists[triangles.at(i).material].push_back(k);
+		for(Collection<Triangle>::iterator ti=triangles.begin();ti!=triangles.end();++ti){
+			for(i=0;i<3;++i){
+				for(j=0;j<verts.size();++j){
+					if(vertsEqual(verts.at(j),ti->verts[i])){
+						materialIndexLists[ti->material].push_back(j);
 						break;
 					}
 				}
-				if(k==verts.size()){
-					verts.push_back(triangles.at(i).verts[j]);
-					materialIndexLists[triangles.at(i).material].push_back(k);
+				if(j==verts.size()){
+					verts.push_back(ti->verts[i]);
+					materialIndexLists[ti->material].push_back(j);
 				}
 			}
 		}
@@ -275,9 +275,9 @@ void SMDConverter::load(Engine *engine,Stream *in,const String &fileName){
 			mMesh->setVertexBoneAssignments(vbas);
 		}
 
-		for(j=0;j<materialIndexLists.size();++j){
-			const String &materialName=materialIndexLists.at(j).first;
-			const Collection<int> &indexList=materialIndexLists.at(j).second;
+		for(Map<String,Collection<int> >::iterator mi=materialIndexLists.begin();mi!=materialIndexLists.end();++mi){
+			const String &materialName=mi->first;
+			const Collection<int> &indexList=mi->second;
 
 			IndexBuffer::ptr indexBuffer=mEngine->getBufferManager()->createIndexBuffer(Buffer::Usage_BIT_STATIC,Buffer::Access_BIT_WRITE,IndexBuffer::IndexFormat_UINT16,indexList.size());
 			{
