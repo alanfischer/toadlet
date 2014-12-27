@@ -74,14 +74,6 @@ int Errorer::getError(){
 	return error;
 }
 
-const char *Errorer::getDescription(){
-	return mLastDescription;
-}
-
-const Exception &Errorer::getException(){
-	return mException;
-}
-
 void Errorer::startTrace(){
 	if(mLogger!=NULL){
 		mLogger->addLogEntry(Logger::Level_ERROR,"Backtrace starting");

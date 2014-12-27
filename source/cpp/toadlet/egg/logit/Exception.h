@@ -34,11 +34,11 @@ namespace logit{
 
 class LOGIT_API Exception{
 public:
-	Exception(int error=0){init(error,NULL,NULL);}
-	Exception(const char *description){init(0,NULL,description);}
-	Exception(int error,const char *description){init(error,NULL,description);}
-	Exception(int error,const char *category,const char *description){init(error,category,description);}
-	Exception(const Exception &ex){init(ex.error,ex.category,ex.description);}
+	Exception(int error=0) throw(){init(error,NULL,NULL);}
+	Exception(const char *description) throw(){init(0,NULL,description);}
+	Exception(int error,const char *description) throw(){init(error,NULL,description);}
+	Exception(int error,const char *category,const char *description) throw(){init(error,category,description);}
+	Exception(const Exception &ex) throw(){init(ex.error,ex.category,ex.description);}
 	virtual ~Exception() throw(){delete category;delete description;}
 
 	virtual const char *what() const throw(){return description;}
@@ -47,7 +47,7 @@ public:
 	const char *getCategory() const throw(){return category;}
 	const char *getDescription() const throw(){return description;}
 
-	void init(int error,const char *category,const char *description){
+	void init(int error,const char *category,const char *description) throw(){
 		this->error=error;
 		if(category==NULL){this->category=NULL;	}
 		else{

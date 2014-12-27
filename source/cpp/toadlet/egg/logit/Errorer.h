@@ -60,8 +60,8 @@ public:
 	void setException(const Exception &ex,bool report=false);
 
 	int getError();
-	const char *getDescription();
-	const Exception &getException();
+	const char *getDescription() const{return mLastDescription;}
+	const Exception &getException() const{return mException;}
 
 	void startTrace();
 	void traceFrame(const char *description);
