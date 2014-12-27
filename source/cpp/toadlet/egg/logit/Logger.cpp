@@ -66,7 +66,6 @@ void Logger::setMasterReportingLevel(Level level){
 
 void Logger::setCategoryReportingLevel(const char *categoryName,Level level){
 	Category *category=getCategory(categoryName);
-
 	if(category!=NULL){
 		lock();
 			category->reportingLevel=level;
@@ -134,7 +133,6 @@ void Logger::clearLogEntries(){
 		for(List<Entry*>::iterator it=mLogEntries.begin();it!=mLogEntries.end();++it){
 			delete it;
 		}
-
 		mLogEntries.clear();
 	unlock();
 }
