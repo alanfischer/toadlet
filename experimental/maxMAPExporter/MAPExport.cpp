@@ -181,7 +181,7 @@ int MAPExport::getMaterialIndexFromMtl(Mtl *mtl){
 
 		maxMaterialToToadletMaterial(mEngine,mtl,mInterface->GetTime(),mat);
 
-		toadlet::tadpole::material::StandardMaterial::Ptr smat=shared_dynamic_cast<toadlet::tadpole::material::StandardMaterial>(mat);
+		toadlet::tadpole::material::StandardMaterial::Ptr smat=dynamic_pointer_cast<toadlet::tadpole::material::StandardMaterial>(mat);
 		if(smat!=NULL && smat->getMap(StandardMaterial::MAP_DIFFUSE)==NULL){
 			mMissingMaps.push_back(smat->getMapName(StandardMaterial::MAP_DIFFUSE));
 		}

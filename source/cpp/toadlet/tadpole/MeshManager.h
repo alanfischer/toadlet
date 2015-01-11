@@ -38,7 +38,7 @@ public:
 
 	MeshManager(Engine *engine):ResourceManager(engine){}
 
-	Mesh::ptr getMesh(const String &name){return shared_static_cast<Mesh>(get(name));}
+	Mesh::ptr getMesh(const String &name){return static_pointer_cast<Mesh>(get(name));}
 };
 
 }

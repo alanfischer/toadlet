@@ -53,7 +53,7 @@ public:
 
 	PixelBufferRenderTarget::ptr createPixelBufferRenderTarget();
 
-	Texture::ptr getTexture(const String &name){return shared_static_cast<Texture>(get(name));}
+	Texture::ptr getTexture(const String &name){return static_pointer_cast<Texture>(get(name));}
 
 	bool textureLoad(Texture::ptr texture,TextureFormat *format,tbyte *mipData);
 

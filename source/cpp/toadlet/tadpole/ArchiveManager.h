@@ -45,7 +45,7 @@ public:
 	Resource::ptr manage(Resource *resource,const String &name=(char*)NULL);
 	void unmanage(Resource *resource);
 
-	Archive::ptr getArchive(const String &name){return shared_static_cast<Archive>(get(name));}
+	Archive::ptr getArchive(const String &name){return static_pointer_cast<Archive>(get(name));}
 
 	void addDirectory(const String &directory);
 	void removeDirectory(const String &directory);

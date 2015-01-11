@@ -45,7 +45,7 @@ public:
 
 	Audio::ptr createAudio();
 
-	AudioBuffer::ptr getAudioBuffer(const String &name){return shared_static_cast<AudioBuffer>(get(name));}
+	AudioBuffer::ptr getAudioBuffer(const String &name){return static_pointer_cast<AudioBuffer>(get(name));}
 
 	bool findAudioBuffer(const String &name,ResourceRequest *request,int track=0){return ResourceManager::find(name,request,new AudioData(track));}
 	bool findAudioStream(const String &name,StreamRequest *request,int track=0){return findAudioStream(name,request,new AudioData(track));}

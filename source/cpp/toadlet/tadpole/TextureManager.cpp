@@ -95,7 +95,7 @@ Texture::ptr TextureManager::createTexture(int usage,TextureFormat::ptr format,t
 	}
 
 	if(texture!=NULL){
-		manage(shared_static_cast<Texture>(texture));
+		manage(static_pointer_cast<Texture>(texture));
 	}
 
 	return texture;
@@ -167,7 +167,7 @@ void TextureManager::contextActivate(RenderDevice *renderDevice){
 		PixelBufferRenderTarget::ptr renderTarget=mRenderTargets[i];
 		if(renderTarget!=NULL && renderTarget->getRootRenderTarget()!=renderTarget){
 			PixelBufferRenderTarget::ptr back=renderDevice->createPixelBufferRenderTarget();
-			shared_static_cast<BackablePixelBufferRenderTarget>(renderTarget)->setBack(back);
+			static_pointer_cast<BackablePixelBufferRenderTarget>(renderTarget)->setBack(back);
 		}
 	}
 #endif
@@ -188,7 +188,7 @@ void TextureManager::contextDeactivate(RenderDevice *renderDevice){
 	for(i=0;i<mRenderTargets.size();++i){
 		PixelBufferRenderTarget::ptr renderTarget=mRenderTargets[i];
 		if(renderTarget!=NULL && renderTarget->getRootPixelBufferRenderTarget()!=renderTarget){
-			shared_static_cast<BackablePixelBufferRenderTarget>(renderTarget)->setBack(NULL);
+			static_pointer_cast<BackablePixelBufferRenderTarget>(renderTarget)->setBack(NULL);
 		}
 	}
 #endif

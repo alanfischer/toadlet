@@ -71,7 +71,7 @@ Resource::ptr XANMStreamer::load(Stream::ptr stream,ResourceData *data){
 }
 
 bool XANMStreamer::save(Stream::ptr stream,Resource::ptr resource,ResourceData *data){
-	Sequence::ptr sequence=shared_static_cast<Sequence>(resource);
+	Sequence::ptr sequence=static_pointer_cast<Sequence>(resource);
 	if(sequence==NULL){
 		return false;
 	}

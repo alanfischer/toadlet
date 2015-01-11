@@ -45,7 +45,7 @@ public:
 
 	Font::ptr getDefaultFont();
 
-	Font::ptr getFont(const String &name,float pointSize){return shared_static_cast<Font>(get(name+String(":")+pointSize));}
+	Font::ptr getFont(const String &name,float pointSize){return static_pointer_cast<Font>(get(name+String(":")+pointSize));}
 
 	bool findFont(const String &name,float pointSize,ResourceRequest *request){return find(name,request,new FontData(pointSize));}
 	

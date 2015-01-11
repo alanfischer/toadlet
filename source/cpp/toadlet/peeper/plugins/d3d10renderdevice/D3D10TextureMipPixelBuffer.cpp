@@ -86,7 +86,7 @@ bool D3D10TextureMipPixelBuffer::create(int usage,int access,TextureFormat::ptr 
 	mFormat=format;
 
 	mBufferTexture=Texture::ptr(mDevice->createTexture());
-	mTexture=shared_static_cast<D3D10Texture>(mBufferTexture);
+	mTexture=static_pointer_cast<D3D10Texture>(mBufferTexture);
 	mTexture->create(usage|Texture::Usage_BIT_RENDERTARGET,mFormat,NULL);
 	mD3DTexture=mTexture->mTexture;
 	mLevel=0;

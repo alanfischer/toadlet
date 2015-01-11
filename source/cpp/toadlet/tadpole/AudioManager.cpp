@@ -76,7 +76,7 @@ bool AudioManager::findAudioStream(const String &name,StreamRequest *request,Res
 		streamer=mDefaultStreamer;
 	}
 	if(streamer!=NULL){
-		return mEngine->getArchiveManager()->openStream(filename,new AudioStreamRequest(request,shared_static_cast<AudioStreamer>(streamer),data));
+		return mEngine->getArchiveManager()->openStream(filename,new AudioStreamRequest(request,static_pointer_cast<AudioStreamer>(streamer),data));
 	}
 	else{
 		Error::unknown(Categories::TOADLET_TADPOLE,
@@ -94,7 +94,7 @@ AudioManager::AudioStreamRequest::AudioStreamRequest(StreamRequest *request,Reso
 }
 
 void AudioManager::AudioStreamRequest::streamReady(Stream *stream){
-	AudioStream::ptr audioStream=shared_static_cast<AudioStreamer>(mStreamer)->createAudioStream(stream,mData);
+	AudioStream::ptr audioStream=static_pointer_cast<AudioStreamer>(mStreamer)->createAudioStream(stream,mData);
 	if(audioStream!=NULL){
 		mRequest->streamReady(audioStream);
 	}

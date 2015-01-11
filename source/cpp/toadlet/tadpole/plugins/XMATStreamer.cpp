@@ -68,7 +68,7 @@ Resource::ptr XMATStreamer::load(Stream::ptr stream,ResourceData *data){
 }
 
 bool XMATStreamer::save(Stream::ptr stream,Resource::ptr resource,ResourceData *data){
-	Material::ptr material=shared_static_cast<Material>(resource);
+	Material::ptr material=static_pointer_cast<Material>(resource);
 	if(material==NULL){
 		return false;
 	}

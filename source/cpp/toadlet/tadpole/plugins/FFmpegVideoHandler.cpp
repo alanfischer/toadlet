@@ -431,7 +431,7 @@ void FFmpegController::setAudio(Audio::ptr audio){
 		mAudioStream=new FFmpegAudioStream(this,audioStreamData);
 
 		if(mAudio!=NULL){
-			mAudio->create(shared_static_cast<AudioStream>(mAudioStream));
+			mAudio->create(static_pointer_cast<AudioStream>(mAudioStream));
 		}
 	}
 }

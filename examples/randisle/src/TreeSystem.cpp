@@ -129,7 +129,7 @@ void TreeSystem::grow(){
 		subMesh->material=mLeafMaterial;
 		mMesh->addSubMesh(subMesh);
 	}
-	mMesh=shared_static_cast<Mesh>(mEngine->getMeshManager()->manage(mMesh));
+	mMesh=static_pointer_cast<Mesh>(mEngine->getMeshManager()->manage(mMesh));
 
 	mLowMesh=new Mesh();
 	mLowMesh->setStaticVertexData(new VertexData(mBranchVertexBuffer));
@@ -147,7 +147,7 @@ void TreeSystem::grow(){
 		subMesh->material=mLeafMaterial;
 		mLowMesh->addSubMesh(subMesh);
 	}
-	mLowMesh=shared_static_cast<Mesh>(mEngine->getMeshManager()->manage(mLowMesh));
+	mLowMesh=static_pointer_cast<Mesh>(mEngine->getMeshManager()->manage(mLowMesh));
 
 	alignLeaves(Math::ZERO_VECTOR3,Math::X_UNIT_VECTOR3,true);
 }

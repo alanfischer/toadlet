@@ -77,7 +77,7 @@ public:
 	void resourceException(const Exception &ex){}
 	void resourceProgress(float progress){}
 
-	void streamReady(Stream *stream){shared_static_cast<ResourceStreamer>(mStreamer)->load(stream,NULL,this);}
+	void streamReady(Stream *stream){static_pointer_cast<ResourceStreamer>(mStreamer)->load(stream,NULL,this);}
 	void streamException(const Exception &ex){}
 	void streamProgress(float progress){}
 

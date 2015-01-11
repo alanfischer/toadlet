@@ -130,7 +130,7 @@ int GetGeometry::callback(INode *node){
 					unsigned int textureWidth=1,textureHeight=1;
 					int materialIndex=mExport->getMaterialIndexFromMtl(mtl);
 					toadlet::tadpole::material::Material::Ptr material=mExport->mBrushCollection.materials[materialIndex];
-					toadlet::tadpole::material::StandardMaterial::Ptr smat=shared_dynamic_cast<toadlet::tadpole::material::StandardMaterial>(material);
+					toadlet::tadpole::material::StandardMaterial::Ptr smat=dynamic_pointer_cast<toadlet::tadpole::material::StandardMaterial>(material);
 					if(smat!=NULL){
 						toadlet::peeper::Texture *tex=smat->getMap(toadlet::tadpole::material::StandardMaterial::MAP_DIFFUSE);
 						if(tex!=NULL){

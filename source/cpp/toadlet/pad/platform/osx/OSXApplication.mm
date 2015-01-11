@@ -390,8 +390,8 @@ void OSXApplication::postEngineCreate(){
 #endif
 	
 	mBundleArchive=new OSXBundleArchive();
-	shared_static_cast<OSXBundleArchive>(mBundleArchive)->open([NSBundle mainBundle]);
-	mEngine->getArchiveManager()->manage(shared_static_cast<Archive>(mBundleArchive));
+	static_pointer_cast<OSXBundleArchive>(mBundleArchive)->open([NSBundle mainBundle]);
+	mEngine->getArchiveManager()->manage(static_pointer_cast<Archive>(mBundleArchive));
 }
 
 void OSXApplication::destroy(){

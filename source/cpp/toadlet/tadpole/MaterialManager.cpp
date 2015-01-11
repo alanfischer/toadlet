@@ -232,7 +232,7 @@ void MaterialManager::contextActivate(RenderDevice *renderDevice){
 				back=renderDevice->createRenderState();
 			TOADLET_CATCH_ANONYMOUS(){}
 			if(back!=NULL){
-				shared_static_cast<BackableRenderState>(renderState)->setBack(back);
+				static_pointer_cast<BackableRenderState>(renderState)->setBack(back);
 			}
 		}
 	}
@@ -245,7 +245,7 @@ void MaterialManager::contextActivate(RenderDevice *renderDevice){
 				back=renderDevice->createShaderState();
 			TOADLET_CATCH_ANONYMOUS(){}
 			if(back!=NULL){
-				shared_static_cast<BackableShaderState>(shaderState)->setBack(back);
+				static_pointer_cast<BackableShaderState>(shaderState)->setBack(back);
 			}
 		}
 	}
@@ -267,14 +267,14 @@ void MaterialManager::contextDeactivate(RenderDevice *renderDevice){
 	for(i=0;i<mRenderStates.size();++i){
 		RenderState::ptr renderState=mRenderStates[i];
 		if(renderState!=NULL && renderState->getRootRenderState()!=renderState){
-			shared_static_cast<BackableRenderState>(renderState)->setBack(NULL);
+			static_pointer_cast<BackableRenderState>(renderState)->setBack(NULL);
 		}
 	}
 
 	for(i=0;i<mShaderStates.size();++i){
 		ShaderState::ptr shaderState=mShaderStates[i];
 		if(shaderState!=NULL && shaderState->getRootShaderState()!=shaderState){
-			shared_static_cast<BackableShaderState>(shaderState)->setBack(NULL);
+			static_pointer_cast<BackableShaderState>(shaderState)->setBack(NULL);
 		}
 	}
 #endif

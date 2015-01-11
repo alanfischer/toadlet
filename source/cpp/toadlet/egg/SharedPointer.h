@@ -257,7 +257,7 @@ protected:
 	PointerCounter *mCount;
 };
 
-template<typename Type,typename Type2,typename PointerSemantics> inline SharedPointer<Type,PointerSemantics> shared_dynamic_cast(const SharedPointer<Type2,PointerSemantics> &pointer){
+template<typename Type,typename Type2,typename PointerSemantics> inline SharedPointer<Type,PointerSemantics> dynamic_pointer_cast(const SharedPointer<Type2,PointerSemantics> &pointer){
 	SharedPointer<Type,PointerSemantics> p;
 	p.internal_setPointer(dynamic_cast<Type*>(const_cast<Type2*>(pointer.get())));
 	if(p.get()!=NULL){
@@ -270,7 +270,7 @@ template<typename Type,typename Type2,typename PointerSemantics> inline SharedPo
 	return p;
 }
 
-template<typename Type,typename Type2,typename PointerSemantics> inline SharedPointer<Type,PointerSemantics> shared_dynamic_cast(const WeakPointer<Type2,PointerSemantics> &pointer){
+template<typename Type,typename Type2,typename PointerSemantics> inline SharedPointer<Type,PointerSemantics> dynamic_pointer_cast(const WeakPointer<Type2,PointerSemantics> &pointer){
 	SharedPointer<Type,PointerSemantics> p;
 	p.internal_setPointer(dynamic_cast<Type*>(const_cast<Type2*>(pointer.get())));
 	if(p.get()!=NULL){
@@ -283,7 +283,7 @@ template<typename Type,typename Type2,typename PointerSemantics> inline SharedPo
 	return p;
 }
 
-template<typename Type,typename Type2,typename PointerSemantics> inline SharedPointer<Type,PointerSemantics> shared_static_cast(const SharedPointer<Type2,PointerSemantics> &pointer){
+template<typename Type,typename Type2,typename PointerSemantics> inline SharedPointer<Type,PointerSemantics> static_pointer_cast(const SharedPointer<Type2,PointerSemantics> &pointer){
 	SharedPointer<Type,PointerSemantics> p;
 	p.internal_setPointer((Type*)pointer.get());
 	if(p.get()!=NULL){
@@ -296,7 +296,7 @@ template<typename Type,typename Type2,typename PointerSemantics> inline SharedPo
 	return p;
 }
 
-template<typename Type,typename Type2,typename PointerSemantics> inline SharedPointer<Type,PointerSemantics> shared_static_cast(const WeakPointer<Type2,PointerSemantics> &pointer){
+template<typename Type,typename Type2,typename PointerSemantics> inline SharedPointer<Type,PointerSemantics> static_pointer_cast(const WeakPointer<Type2,PointerSemantics> &pointer){
 	SharedPointer<Type,PointerSemantics> p;
 	p.internal_setPointer((Type*)pointer.get());
 	if(p.get()!=NULL){

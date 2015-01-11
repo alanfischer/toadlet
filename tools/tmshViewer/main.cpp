@@ -40,7 +40,7 @@ int main(int argc,char **argv){
 		meshName=meshName.substr(loc+1,meshName.length());
 	}
 
-	Mesh::ptr mesh=shared_static_cast<Mesh>(engine->getMeshManager()->find(meshName));
+	Mesh::ptr mesh=static_pointer_cast<Mesh>(engine->getMeshManager()->find(meshName));
 	if(mesh==NULL){
 		std::cout << "Error loading " << (const char*)meshName << std::endl;
 

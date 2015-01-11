@@ -65,7 +65,7 @@ Shader::ptr ShaderManager::createShader(Shader::ShaderType type,const char *prof
 	}
 
 	if(shader!=NULL){
-		manage(shared_static_cast<Shader>(shader));
+		manage(static_pointer_cast<Shader>(shader));
 	}
 
 	return shader;
