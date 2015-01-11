@@ -79,7 +79,7 @@ void RandIsle::resourceCacheReady(ResourceCache *cache){
 	mScene->getRoot()->attach(mFollowNode);
 
 	mCamera=new Camera(mEngine);
-//	shared_static_cast<StereoscopicCamera>(mCamera)->setCrossEyed(true);
+//	static_pointer_cast<StereoscopicCamera>(mCamera)->setCrossEyed(true);
 	mCamera->setAutoProjectionFov(Math::degToRad(Math::fromInt(60)),false,mCamera->getNearDist(),1024);
 	mCamera->setScope(~Scope_BIT_HUD | (Scope_BIT_MAIN_CAMERA & ~Scope_BIT_WATER_TRANSPARENT));
 	mCamera->setClearColor(resources->fadeColor);

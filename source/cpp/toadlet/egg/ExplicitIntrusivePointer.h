@@ -170,7 +170,7 @@ protected:
 	Type *mPointer;
 };
 
-template<typename Type,typename Type2,typename PointerSemantics> inline ExplicitIntrusivePointer<Type,PointerSemantics> shared_dynamic_cast(const ExplicitIntrusivePointer<Type2,PointerSemantics> &pointer){
+template<typename Type,typename Type2,typename PointerSemantics> inline ExplicitIntrusivePointer<Type,PointerSemantics> dynamic_pointer_cast(const ExplicitIntrusivePointer<Type2,PointerSemantics> &pointer){
 	ExplicitIntrusivePointer<Type,PointerSemantics> p;
 	p.internal_setPointer(dynamic_cast<Type*>(const_cast<Type2*>(pointer.get())));
 	if(p.get()!=NULL){
@@ -179,7 +179,7 @@ template<typename Type,typename Type2,typename PointerSemantics> inline Explicit
 	return p;
 }
 
-template<typename Type,typename Type2,typename PointerSemantics> inline ExplicitIntrusivePointer<Type,PointerSemantics> shared_static_cast(const ExplicitIntrusivePointer<Type2,PointerSemantics> &pointer){
+template<typename Type,typename Type2,typename PointerSemantics> inline ExplicitIntrusivePointer<Type,PointerSemantics> static_pointer_cast(const ExplicitIntrusivePointer<Type2,PointerSemantics> &pointer){
 	ExplicitIntrusivePointer<Type,PointerSemantics> p;
 	p.internal_setPointer((Type*)pointer.get());
 	if(p.get()!=NULL){

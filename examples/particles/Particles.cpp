@@ -40,7 +40,7 @@ void Particles::create(){
 
     Texture::ptr texture;
     TOADLET_TRY
-        texture=shared_static_cast<Texture>(engine->getTextureManager()->find("sparkle.png"));
+        texture=static_pointer_cast<Texture>(engine->getTextureManager()->find("sparkle.png"));
     TOADLET_CATCH_ANONYMOUS(){}
     
 	Material::ptr pointMaterial=engine->createPointSpriteMaterial(texture,Math::ONE,false);

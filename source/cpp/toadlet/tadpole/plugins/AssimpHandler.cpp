@@ -400,7 +400,7 @@ Material::ptr AssimpHandler::loadMaterial(Engine *engine,Scene *scene,const aiMa
 			texture=scene->textures[index];
 		}
 		else{
-			texture=shared_static_cast<Texture>(engine->getTextureManager()->find(path.C_Str()));
+			texture=static_pointer_cast<Texture>(engine->getTextureManager()->find(path.C_Str()));
 		}
 	}
 

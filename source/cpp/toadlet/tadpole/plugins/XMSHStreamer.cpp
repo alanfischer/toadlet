@@ -147,7 +147,7 @@ bool XMSHStreamer::load(Stream::ptr stream,ResourceData *data,ResourceRequest *r
 }
 
 bool XMSHStreamer::save(Stream::ptr stream,Resource::ptr resource,ResourceData *data){
-	Mesh::ptr mesh=shared_static_cast<Mesh>(resource);
+	Mesh::ptr mesh=static_pointer_cast<Mesh>(resource);
 	if(mesh==NULL){
 		return false;
 	}

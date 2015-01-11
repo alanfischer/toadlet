@@ -44,7 +44,7 @@ public:
 		WADArchive::ptr archive=new WADArchive(mTextureManager);
 		bool result=archive->open(stream);
 		if(result){
-			return shared_static_cast<Archive>(archive);
+			return static_pointer_cast<Archive>(archive);
 		}
 		else{
 			return NULL;

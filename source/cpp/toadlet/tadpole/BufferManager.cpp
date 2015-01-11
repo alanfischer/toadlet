@@ -417,7 +417,7 @@ void BufferManager::contextActivate(RenderDevice *renderDevice){
 		VertexFormat::ptr vertexFormat=mVertexFormats[i];
 		if(vertexFormat->getRootVertexFormat()!=vertexFormat){
 			VertexFormat::ptr back=renderDevice->createVertexFormat();
-			shared_static_cast<BackableVertexFormat>(vertexFormat)->setBack(back);
+			static_pointer_cast<BackableVertexFormat>(vertexFormat)->setBack(back);
 		}
 	}
 #if defined(TOADLET_BACKABLE)
@@ -425,7 +425,7 @@ void BufferManager::contextActivate(RenderDevice *renderDevice){
 		IndexBuffer::ptr buffer=mIndexBuffers[i];
 		if(buffer->getRootIndexBuffer()!=buffer){
 			IndexBuffer::ptr back=renderDevice->createIndexBuffer();
-			shared_static_cast<BackableBuffer>(buffer)->setBack(back);
+			static_pointer_cast<BackableBuffer>(buffer)->setBack(back);
 		}
 	}
 
@@ -433,7 +433,7 @@ void BufferManager::contextActivate(RenderDevice *renderDevice){
 		VertexBuffer::ptr buffer=mVertexBuffers[i];
 		if(buffer->getRootVertexBuffer()!=buffer){
 			VertexBuffer::ptr back=renderDevice->createVertexBuffer();
-			shared_static_cast<BackableBuffer>(buffer)->setBack(back);
+			static_pointer_cast<BackableBuffer>(buffer)->setBack(back);
 		}
 	}
 
@@ -441,7 +441,7 @@ void BufferManager::contextActivate(RenderDevice *renderDevice){
 		PixelBuffer::ptr buffer=mPixelBuffers[i];
 		if(buffer->getRootPixelBuffer()!=buffer){
 			PixelBuffer::ptr back=renderDevice->createPixelBuffer();
-			shared_static_cast<BackableBuffer>(buffer)->setBack(back,renderDevice);
+			static_pointer_cast<BackableBuffer>(buffer)->setBack(back,renderDevice);
 		}
 	}
 
@@ -449,7 +449,7 @@ void BufferManager::contextActivate(RenderDevice *renderDevice){
 		VariableBuffer::ptr buffer=mVariableBuffers[i];
 		if(buffer->getRootVariableBuffer()!=buffer){
 			VariableBuffer::ptr back=renderDevice->createVariableBuffer();
-			shared_static_cast<BackableBuffer>(buffer)->setBack(back);
+			static_pointer_cast<BackableBuffer>(buffer)->setBack(back);
 		}
 	}
 #endif
@@ -471,28 +471,28 @@ void BufferManager::contextDeactivate(RenderDevice *renderDevice){
 	for(i=0;i<mVariableBuffers.size();++i){
 		VariableBuffer::ptr buffer=mVariableBuffers[i];
 		if(buffer->getRootVariableBuffer()!=buffer){
-			shared_static_cast<BackableBuffer>(buffer)->setBack(VariableBuffer::ptr());
+			static_pointer_cast<BackableBuffer>(buffer)->setBack(VariableBuffer::ptr());
 		}
 	}
 
 	for(i=0;i<mPixelBuffers.size();++i){
 		PixelBuffer::ptr buffer=mPixelBuffers[i];
 		if(buffer->getRootPixelBuffer()!=buffer){
-			shared_static_cast<BackableBuffer>(buffer)->setBack(PixelBuffer::ptr(),NULL);
+			static_pointer_cast<BackableBuffer>(buffer)->setBack(PixelBuffer::ptr(),NULL);
 		}
 	}
 
 	for(i=0;i<mVertexBuffers.size();++i){
 		VertexBuffer::ptr buffer=mVertexBuffers[i];
 		if(buffer->getRootVertexBuffer()!=buffer){
-			shared_static_cast<BackableBuffer>(buffer)->setBack(VertexBuffer::ptr());
+			static_pointer_cast<BackableBuffer>(buffer)->setBack(VertexBuffer::ptr());
 		}
 	}
 
 	for(i=0;i<mIndexBuffers.size();++i){
 		IndexBuffer::ptr buffer=mIndexBuffers[i];
 		if(buffer->getRootIndexBuffer()!=buffer){
-			shared_static_cast<BackableBuffer>(buffer)->setBack(IndexBuffer::ptr());
+			static_pointer_cast<BackableBuffer>(buffer)->setBack(IndexBuffer::ptr());
 		}
 	}
 #endif
@@ -500,7 +500,7 @@ void BufferManager::contextDeactivate(RenderDevice *renderDevice){
 	for(i=0;i<mVertexFormats.size();++i){
 		VertexFormat::ptr vertexFormat=mVertexFormats[i];
 		if(vertexFormat->getRootVertexFormat()!=vertexFormat){
-			shared_static_cast<BackableVertexFormat>(vertexFormat)->setBack(NULL);
+			static_pointer_cast<BackableVertexFormat>(vertexFormat)->setBack(NULL);
 		}
 	}
 

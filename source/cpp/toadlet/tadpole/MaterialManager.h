@@ -51,7 +51,7 @@ public:
 	RenderState::ptr createRenderState();
 	ShaderState::ptr createShaderState();
 
-	Material::ptr getMaterial(const String &name){return shared_static_cast<Material>(get(name));}
+	Material::ptr getMaterial(const String &name){return static_pointer_cast<Material>(get(name));}
 
 	void modifyRenderState(RenderState::ptr dst,RenderState::ptr src);
 	void modifyShaderState(ShaderState::ptr dst,ShaderState::ptr src);

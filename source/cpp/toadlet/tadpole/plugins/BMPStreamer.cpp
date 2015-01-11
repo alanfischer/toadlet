@@ -220,7 +220,7 @@ bool BMPStreamer::save(Stream::ptr stream,Resource::ptr resource,ResourceData *d
 	BITMAPINFOHEADER bmih={0};
 	BITMAPFILEHEADER bmfh={0};
 
-	Texture::ptr texture=shared_static_cast<Texture>(resource);
+	Texture::ptr texture=static_pointer_cast<Texture>(resource);
 	TextureFormat::ptr textureFormat=texture->getFormat();
 
 	if(textureFormat->getDimension()!=TextureFormat::Dimension_D2){

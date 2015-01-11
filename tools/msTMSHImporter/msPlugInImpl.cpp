@@ -146,7 +146,7 @@ cPlugIn::importMesh(msModel *pModel,const String &name,int flags){
 	XMSHStreamer::ptr streamer=new XMSHStreamer(engine);
 	ResourceManager::ImmediateFindRequest::ptr request=new ResourceManager::ImmediateFindRequest();
 	streamer->load(stream,NULL,request);
-	Mesh::ptr mesh=shared_static_cast<Mesh>(request->get());
+	Mesh::ptr mesh=static_pointer_cast<Mesh>(request->get());
 	if(mesh==NULL){
 		::MessageBox(NULL,"Toadlet Mesh/Animation Import","Error loading file",MB_OK);
 		return -1;
@@ -405,7 +405,7 @@ cPlugIn::importAnimation(msModel *pModel,const String &name,int flags){
 	ResourceStreamer::ptr streamer=new XANMStreamer(engine);
 	ResourceManager::ImmediateFindRequest::ptr request=new ResourceManager::ImmediateFindRequest();
 	streamer->load(stream,NULL,request);
-	Sequence::ptr sequence=shared_static_cast<Sequence>(request->get());
+	Sequence::ptr sequence=static_pointer_cast<Sequence>(request->get());
 	if(sequence==NULL){
 		::MessageBox(NULL,"Toadlet Mesh/Animation Import","Error loading file",MB_OK);
 		return -1;

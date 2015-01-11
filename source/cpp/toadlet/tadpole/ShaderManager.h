@@ -43,7 +43,7 @@ public:
 	Shader::ptr createShader(Shader::ShaderType type,const char *profiles[],const char *codes[],int numCodes);
 	Shader::ptr createShader(Shader::ShaderType type,const char *profile,const char *code);
 
-	Shader::ptr getShader(const String &name){return shared_static_cast<Shader>(get(name));}
+	Shader::ptr getShader(const String &name){return static_pointer_cast<Shader>(get(name));}
 
 	void contextActivate(RenderDevice *renderDevice);
 	void contextDeactivate(RenderDevice *renderDevice);

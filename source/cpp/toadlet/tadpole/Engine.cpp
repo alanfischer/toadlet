@@ -660,79 +660,79 @@ void Engine::removeContextListener(ContextListener *listener){
 }
 
 Texture::ptr Engine::createNormalizationTexture(int size){
-	Texture::ptr texture=shared_static_cast<NormalizationTextureCreator>(mNormalizationCreator)->createNormalizationTexture(size);
+	Texture::ptr texture=static_pointer_cast<NormalizationTextureCreator>(mNormalizationCreator)->createNormalizationTexture(size);
 	mTextureManager->manage(texture);
 	return texture;
 }
 
 Texture::ptr Engine::createPointTexture(TextureFormat *format,float colorOffset,float colorFactor,float alphaOffset,float alphaFactor,float falloff){
-	Texture::ptr texture=shared_static_cast<PointTextureCreator>(mPointCreator)->createPointTexture(format,colorOffset,colorFactor,alphaOffset,alphaFactor,falloff);
+	Texture::ptr texture=static_pointer_cast<PointTextureCreator>(mPointCreator)->createPointTexture(format,colorOffset,colorFactor,alphaOffset,alphaFactor,falloff);
 	mTextureManager->manage(texture);
 	return texture;
 }
 
 Material::ptr Engine::createDiffuseMaterial(Texture *texture,RenderState *renderState){
-	Material::ptr material=shared_static_cast<DiffuseMaterialCreator>(mDiffuseCreator)->createDiffuseMaterial(texture,renderState);
+	Material::ptr material=static_pointer_cast<DiffuseMaterialCreator>(mDiffuseCreator)->createDiffuseMaterial(texture,renderState);
 	mMaterialManager->manage(material);
 	return material;
 }
 
 Material::ptr Engine::createPointSpriteMaterial(Texture *texture,scalar size,bool attenuated){
-	Material::ptr material=shared_static_cast<DiffuseMaterialCreator>(mDiffuseCreator)->createPointSpriteMaterial(texture,size,attenuated);
+	Material::ptr material=static_pointer_cast<DiffuseMaterialCreator>(mDiffuseCreator)->createPointSpriteMaterial(texture,size,attenuated);
 	mMaterialManager->manage(material);
 	return material;
 }
 
 Material::ptr Engine::createFontMaterial(Font *font){
-	Material::ptr material=shared_static_cast<DiffuseMaterialCreator>(mDiffuseCreator)->createFontMaterial(font);
+	Material::ptr material=static_pointer_cast<DiffuseMaterialCreator>(mDiffuseCreator)->createFontMaterial(font);
 	mMaterialManager->manage(material);
 	return material;
 }
 
 Material::ptr Engine::createSkyBoxMaterial(Texture *texture,bool clamp,RenderState *renderState){
-	Material::ptr material=shared_static_cast<SkyBoxMaterialCreator>(mSkyBoxMaterialCreator)->createSkyBoxMaterial(texture,clamp,renderState);
+	Material::ptr material=static_pointer_cast<SkyBoxMaterialCreator>(mSkyBoxMaterialCreator)->createSkyBoxMaterial(texture,clamp,renderState);
 	mMaterialManager->manage(material);
 	return material;
 }
 
 Material::ptr Engine::createWaterMaterial(Texture *reflectTexture,Texture *refractTexture,Texture *bumpTexture,const Vector4 &color){
-	Material::ptr material=shared_static_cast<WaterMaterialCreator>(mWaterMaterialCreator)->createWaterMaterial(reflectTexture,refractTexture,bumpTexture,color);
+	Material::ptr material=static_pointer_cast<WaterMaterialCreator>(mWaterMaterialCreator)->createWaterMaterial(reflectTexture,refractTexture,bumpTexture,color);
 	mMaterialManager->manage(material);
 	return material;
 }
 
 Mesh::ptr Engine::createAABoxMesh(const AABox &box,Material *material){
-	Mesh::ptr mesh=shared_static_cast<AABoxMeshCreator>(mAABoxCreator)->createAABoxMesh(box,material);
+	Mesh::ptr mesh=static_pointer_cast<AABoxMeshCreator>(mAABoxCreator)->createAABoxMesh(box,material);
 	mMeshManager->manage(mesh);
 	return mesh;
 }
 
 Mesh::ptr Engine::createSphereMesh(const Sphere &sphere,Material *material){
-	Mesh::ptr mesh=shared_static_cast<SphereMeshCreator>(mSphereCreator)->createSphereMesh(sphere,16,16,material);
+	Mesh::ptr mesh=static_pointer_cast<SphereMeshCreator>(mSphereCreator)->createSphereMesh(sphere,16,16,material);
 	mMeshManager->manage(mesh);
 	return mesh;
 }
 
 Mesh::ptr Engine::createTorusMesh(scalar majorRadius,scalar minorRadius,int numMajor,int numMinor,Material *material){
-	Mesh::ptr mesh=shared_static_cast<TorusMeshCreator>(mTorusCreator)->createTorusMesh(majorRadius,minorRadius,numMajor,numMinor,material);
+	Mesh::ptr mesh=static_pointer_cast<TorusMeshCreator>(mTorusCreator)->createTorusMesh(majorRadius,minorRadius,numMajor,numMinor,material);
 	mMeshManager->manage(mesh);
 	return mesh;
 }
 
 Mesh::ptr Engine::createGridMesh(scalar width,scalar height,int numWidth,int numHeight,Material *material){
-	Mesh::ptr mesh=shared_static_cast<GridMeshCreator>(mGridCreator)->createGridMesh(width,height,numWidth,numHeight,material);
+	Mesh::ptr mesh=static_pointer_cast<GridMeshCreator>(mGridCreator)->createGridMesh(width,height,numWidth,numHeight,material);
 	mMeshManager->manage(mesh);
 	return mesh;
 }
 
 Mesh::ptr Engine::createSkyBoxMesh(scalar size,bool unfolded,bool invert,Material *bottom,Material *top,Material *left,Material *right,Material *back,Material *front){
-	Mesh::ptr mesh=shared_static_cast<SkyBoxMeshCreator>(mSkyBoxCreator)->createSkyBoxMesh(size,unfolded,invert,bottom,top,left,right,back,front);
+	Mesh::ptr mesh=static_pointer_cast<SkyBoxMeshCreator>(mSkyBoxCreator)->createSkyBoxMesh(size,unfolded,invert,bottom,top,left,right,back,front);
 	mMeshManager->manage(mesh);
 	return mesh;
 }
 
 Mesh::ptr Engine::createSkyDomeMesh(const Sphere &sphere,int numSegments,int numRings,scalar fade,Material *material){
-	Mesh::ptr mesh=shared_static_cast<SkyDomeMeshCreator>(mSkyDomeCreator)->createSkyDomeMesh(sphere,numSegments,numRings,fade,material);
+	Mesh::ptr mesh=static_pointer_cast<SkyDomeMeshCreator>(mSkyDomeCreator)->createSkyDomeMesh(sphere,numSegments,numRings,fade,material);
 	mMeshManager->manage(mesh);
 	return mesh;
 }

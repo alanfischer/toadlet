@@ -40,7 +40,7 @@ public:
 	SPRStreamer(Engine *engine):mStreamer(new studio::SpriteStreamer(engine)){}
 
 	Resource::ptr load(Stream::ptr stream,ResourceData *data){
-		studio::SpriteModel::ptr sprite=shared_static_cast<studio::SpriteModel>(mStreamer->load(stream,NULL));
+		studio::SpriteModel::ptr sprite=static_pointer_cast<studio::SpriteModel>(mStreamer->load(stream,NULL));
 
 		if(sprite!=NULL && sprite->textures.size()>0){
 			return sprite->textures[0];

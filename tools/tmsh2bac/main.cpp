@@ -110,7 +110,7 @@ int main(int argc,char **argv){
 		}
 
 		// Load the mesh data
-		Mesh::ptr mesh=shared_static_cast<Mesh>(engine->getMeshManager()->find(mshFileName));
+		Mesh::ptr mesh=static_pointer_cast<Mesh>(engine->getMeshManager()->find(mshFileName));
 		if(mesh==NULL){
 			std::cerr << "Error loading \"" << (const char*)mshFileName << "\" failed!  File invalid or not found." << std::endl;
 			continue;

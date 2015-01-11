@@ -55,7 +55,7 @@ int main(int argc,char **argv){
 	engine->installHandlers();
 
 	// Load the mesh data
-	Mesh::ptr mesh=shared_static_cast<Mesh>(engine->getMeshManager()->find(mshFileName));
+	Mesh::ptr mesh=static_pointer_cast<Mesh>(engine->getMeshManager()->find(mshFileName));
 	if(mesh==NULL){
 		std::cout << "Error loading file: " << (const char*)mshFileName << std::endl;
 		return 0;
@@ -110,7 +110,7 @@ int main(int argc,char **argv){
 				return 0;
 			}
 			XANMStreamer::ptr streamer=new XANMStreamer(engine);
-			Sequence::ptr sequence=shared_static_cast<Sequence>(streamer->load(stream,NULL));
+			Sequence::ptr sequence=static_pointer_cast<Sequence>(streamer->load(stream,NULL));
 			skeleton->addSequence(sequence);
 		}
 
