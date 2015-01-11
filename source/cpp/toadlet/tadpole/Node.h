@@ -71,6 +71,7 @@ namespace action{
 class Action;
 }
 
+typedef PointerIteratorRange<Component> ComponentRange;
 typedef PointerIteratorRange<Node> NodeRange;
 typedef PointerIteratorRange<Spacial> SpacialRange;
 typedef PointerIteratorRange<Visible> VisibleRange;
@@ -106,6 +107,7 @@ public:
 	virtual bool remove(Component *component);
 	virtual void componentAttached(Component *component);
 	virtual void componentRemoved(Component *component);
+	virtual ComponentRange getComponents() const{return ComponentRange::wrapCollection(mComponents);}
 	virtual Component *getChild(const String &name) const;
 	virtual Component *getChild(const Type<Component> *type) const;
 	template<typename Type> Type *getChildType() const{return (Type*)getChild(Type::type());}

@@ -59,10 +59,11 @@ public:
 	RenderPath::ptr addPath(const String name=(char*)NULL);
 	RenderPath::ptr getPath(const String name=(char*)NULL) const;
 	inline void setBestPath(RenderPath::ptr path){mBestPath=path;}
-	RenderPath::ptr getBestPath(){return mBestPath;}
+	RenderPath::ptr getBestPath() const{return mBestPath;}
+	RenderPass::ptr getPass(int path=-1,int pass=-1) const;
 	RenderPass::ptr getPass(int path=-1,int pass=-1);
 
-	RenderState::ptr getRenderState(){return getPass()->getRenderState();}
+	RenderState::ptr getRenderState() const{return getPass()->getRenderState();}
 
 	/// @todo: Move SortType to the RenderPath at least, so some paths may be sorted, and others not
 	inline void setSort(SortType sort){mSort=sort;}

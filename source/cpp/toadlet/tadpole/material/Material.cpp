@@ -65,6 +65,46 @@ RenderPath::ptr Material::getPath(const String name) const{
 	return NULL;
 }
 
+RenderPass::ptr Material::getPass(int pathIndex,int passIndex) const{
+	RenderPath::ptr path;
+	if(pathIndex==-1){
+		if(mBestPath!=NULL){
+			path=mBestPath;
+		}
+		else if(mPaths.size()>0){
+			path=mPaths[0];
+		}
+		else{
+			return NULL;
+		}
+	}
+	else{
+		if(pathIndex<mPaths.size()){
+			path=mPaths[pathIndex];
+		}
+		else{
+			return NULL;
+		}
+	}
+
+	if(passIndex==-1){
+		if(path->getPasses().size()>0){
+			return path->getPasses()[0];
+		}
+		else{
+			return path->addPass();
+		}
+	}
+	else{
+		if(passIndex<path->getPasses().size()){
+			return path->getPasses()[passIndex];
+		}
+		else{
+			return NULL;
+		}
+	}
+}
+
 RenderPass::ptr Material::getPass(int pathIndex,int passIndex){
 	RenderPath::ptr path;
 	if(pathIndex==-1){

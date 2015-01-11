@@ -1,5 +1,6 @@
 #include "Sandbox.h"
 #include <toadlet/tadpole/plugins/PointTextureCreator.h>
+#include <toadlet/tadpole/plugins/AssimpHandler.h>
 
 class SnowComponent:public BaseComponent{
 public:
@@ -153,6 +154,12 @@ void Sandbox::create(){
 		node->attach(light);
 	}
 	scene->getRoot()->attach(node);
+
+	FileStream::ptr stream=new FileStream("C:\\users\\siralanf\\toadlet\\examples\\data\\teddy.obj",FileStream::Open_READ_WRITE_BINARY);
+
+	AssimpHandler::ptr assimp=new AssimpHandler(engine);
+	Node::ptr teddy=assimp->load(stream,"obj");
+	scene->getRoot()->attach(teddy);
 
 	node=new Node(scene);
 	{

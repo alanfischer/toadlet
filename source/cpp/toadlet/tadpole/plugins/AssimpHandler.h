@@ -31,9 +31,15 @@
 #include <toadlet/tadpole/CameraComponent.h>
 #include <toadlet/tadpole/MeshComponent.h>
 #include <toadlet/tadpole/LightComponent.h>
-#include <assimp/scene.h>
 #include <assimp/vector3.h>
 #include <assimp/color4.h>
+#include <assimp/quaternion.h>
+#include <assimp/matrix4x4.h>
+
+struct aiScene;
+struct aiNode;
+struct aiMesh;
+struct aiMaterial;
 
 namespace toadlet{
 namespace tadpole{
@@ -47,10 +53,8 @@ public:
 	Node::ptr load(Stream *stream,const String &format);
 	bool save(Stream *stream,Node *node,const String &format);
 
-	Node::ptr loadScene(const aiScene *ascene);
-	const aiScene *saveScene(Node *node);
-
-	Mesh::ptr loadMesh(const aiMesh *mesh);
+	static Node::ptr loadScene(Engine *engine,const aiScene *ascene);
+	static aiScene *saveScene(const Node *node);
 
 	static aiVector3D toVector3(const Vector3 &v){return aiVector3D(v.x,v.y,v.z);}
 	static aiColor4D toColor4(const Vector4 &v){return aiColor4D(v.x,v.y,v.z,v.w);}
@@ -78,10 +82,18 @@ protected:
 		Collection<Camera::ptr> cameras;
 		Collection<LightState> lights;
 		Collection<Mesh::ptr> meshes;
+		Collection<Material::ptr> materials;
+		Collection<Texture::ptr> textures;
 	};
 
-	Node::ptr loadScene(Scene *scene,const aiScene *ascene,const aiNode *anode);
-	aiNode *saveScene(Scene *scene,const aiScene *ascene,Node *node);
+	static Node::ptr loadScene(Engine *engine,Scene *scene,const aiScene *ascene,const aiNode *anode);
+	static aiNode *saveScene(Scene *scene,const aiScene *ascene,const Node *node);
+
+	static Mesh::ptr loadMesh(Engine *engine,Scene *scene,const aiMesh *amesh);
+	static aiMesh *saveMesh(Scene *scene,const Mesh *mesh);
+
+	static Material::ptr loadMaterial(Engine *engine,Scene *scene,const aiMaterial *amaterial);
+	static aiMaterial *saveMaterial(Scene *scene,const Material *material);
 
 	Engine *mEngine;
 };

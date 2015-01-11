@@ -158,7 +158,6 @@ set (TADPOLE_PLUGINS_ZIP_SRC
 
 set (TADPOLE_PLUGINS_ASSIMP_SRC
 	plugins/AssimpHandler.cpp
-	plugins/AssimpMeshStreamer.cpp
 )
 
 set (TADPOLE_PLUGINS_HOP_SRC
@@ -403,7 +402,6 @@ set (TADPOLE_PLUGINS_ZIP_HDR
 
 set (TADPOLE_PLUGINS_ASSIMP_HDR
 	plugins/AssimpHandler.h
-	plugins/AssimpMeshStreamer.h
 )
 
 set (TADPOLE_PLUGINS_HOP_HDR
