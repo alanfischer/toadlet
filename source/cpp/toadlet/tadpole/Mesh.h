@@ -91,11 +91,11 @@ public:
 	virtual void addSubMesh(SubMesh::ptr subMesh);
 	virtual void removeSubMesh(SubMesh::ptr subMesh);
 	int getNumSubMeshes() const{return mSubMeshes.size();}
-	SubMesh::ptr getSubMesh(int i){return mSubMeshes[i];}
-	SubMesh::ptr getSubMesh(const String &name);
+	SubMesh::ptr getSubMesh(int i) const{return mSubMeshes[i];}
+	SubMesh::ptr getSubMesh(const String &name) const;
 
 	virtual void setStaticVertexData(VertexData::ptr vertexData);
-	VertexData::ptr getStaticVertexData(){return mStaticVertexData;}
+	VertexData::ptr getStaticVertexData() const{return mStaticVertexData;}
 
 	virtual void setSkeleton(Skeleton::ptr skeleton);
 	Skeleton::ptr getSkeleton() const{return mSkeleton;}

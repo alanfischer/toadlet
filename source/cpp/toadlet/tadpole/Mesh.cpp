@@ -94,7 +94,7 @@ void Mesh::removeSubMesh(SubMesh::ptr subMesh){
 	mSubMeshes.erase(stlit::remove(mSubMeshes.begin(),mSubMeshes.end(),subMesh),mSubMeshes.end());
 }
 
-Mesh::SubMesh::ptr Mesh::getSubMesh(const String &name){
+Mesh::SubMesh::ptr Mesh::getSubMesh(const String &name) const{
 	int i;
 	for(i=0;i<mSubMeshes.size();++i){
 		if(mSubMeshes[i]->getName().equals(name)){
