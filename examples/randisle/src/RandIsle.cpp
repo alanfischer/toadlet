@@ -7,6 +7,8 @@
 #include <toadlet/tadpole/plugins/HopComponent.h>
 #include <toadlet/tadpole/plugins/DecalShadowRenderManager.h>
 
+#include <toadlet/tadpole/plugins/AssimpHandler.h>
+
 #define TREE_CAMERA_DISTANCE 80
 
 namespace randisle{
@@ -145,6 +147,10 @@ void RandIsle::resourceCacheReady(ResourceCache *cache){
 
 	mPlayer=new Node(mScene);
 	{
+AssimpHandler::ptr assimp=new AssimpHandler(mEngine);
+mEngine->getArchiveManager()->addDirectory("C:\\temp\\Textures");
+Node::ptr teddy=assimp->load("C:\\temp\\OBJ\\Farmhouse OBJ.obj","obj");
+mPlayer->attach(teddy);
 		PathClimber *climber=new PathClimber();
 		{
 			climber->setPathClimberListener(this);

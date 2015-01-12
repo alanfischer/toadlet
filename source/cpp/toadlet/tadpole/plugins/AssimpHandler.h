@@ -51,7 +51,9 @@ public:
 	AssimpHandler(Engine *engine);
 	
 	Node::ptr load(Stream *stream,const String &format);
+	Node::ptr load(const String &name,const String &format);
 	bool save(Stream *stream,Node *node,const String &format);
+	bool save(const String &name,Node *node,const String &format);
 
 	static Node::ptr loadScene(Engine *engine,const aiScene *ascene);
 	static aiScene *saveScene(const Node *node);
@@ -96,6 +98,7 @@ protected:
 	static aiMaterial *saveMaterial(Scene *scene,const Material *material);
 
 	Engine *mEngine;
+	int mFlags;
 };
 
 }

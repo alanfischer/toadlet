@@ -27,12 +27,14 @@
 #include <assimp/Importer.hpp>
 #include <assimp/Exporter.hpp>
 #include <assimp/scene.h>
+#include <assimp/postprocess.h>
 
 namespace toadlet{
 namespace tadpole{
 
 AssimpHandler::AssimpHandler(Engine *engine):
-	mEngine(engine)
+	mEngine(engine),
+	mFlags(aiProcess_Triangulate) //aiProcessPreset_TargetRealtime_Quality
 {}
 
 Node::ptr AssimpHandler::load(Stream *stream,const String &format){
@@ -42,13 +44,25 @@ Node::ptr AssimpHandler::load(Stream *stream,const String &format){
 
 	Assimp::Importer *importer=new Assimp::Importer();
 	
-	const aiScene *scene=importer->ReadFileFromMemory(data,length,0,format);
+	const aiScene *scene=importer->ReadFileFromMemory(data,length,mFlags,format);
 	
 	Node::ptr node=loadScene(mEngine,scene);
 	
 	delete importer;
 	
 	delete[] data;
+	
+	return node;
+}
+
+Node::ptr AssimpHandler::load(const String &name,const String &format){
+	Assimp::Importer *importer=new Assimp::Importer();
+
+	const aiScene *scene=importer->ReadFile(name,mFlags);
+	
+	Node::ptr node=loadScene(mEngine,scene);
+	
+	delete importer;
 	
 	return node;
 }
@@ -65,6 +79,20 @@ bool AssimpHandler::save(Stream *stream,Node *node,const String &format){
 		blob=blob->next;
 	}
 	
+	delete exporter;
+	
+	delete scene;
+
+	return true;
+}
+
+bool AssimpHandler::save(const String& name,Node *node,const String &format){
+	const aiScene *scene=saveScene(node);
+
+	Assimp::Exporter *exporter=new Assimp::Exporter();
+	
+	exporter->Export(scene,format,name);
+
 	delete exporter;
 	
 	delete scene;
@@ -179,7 +207,9 @@ aiNode *AssimpHandler::saveScene(Scene *scene,const aiScene *ascene,const Node *
 }
 
 Mesh::ptr AssimpHandler::loadMesh(Engine *engine,Scene *scene,const aiMesh *amesh){
-	int i,v;
+	int i,j,v;
+
+	Mesh::ptr mesh=new Mesh();
 
 	VertexFormat::ptr format=engine->getBufferManager()->createVertexFormat();
 	{
@@ -283,7 +313,31 @@ Mesh::ptr AssimpHandler::loadMesh(Engine *engine,Scene *scene,const aiMesh *ames
 		iba.unlock();
 	}
 
-	Mesh::ptr mesh=new Mesh();
+	if(amesh->HasBones()){
+		Skeleton::ptr skeleton=new Skeleton();
+		Collection<Mesh::VertexBoneAssignmentList> assignments(vertexBuffer->getSize());
+
+		for(i=0;i<amesh->mNumBones;++i){
+			aiBone *abone=amesh->mBones[i];
+			Skeleton::Bone::ptr bone=new Skeleton::Bone();
+
+			bone->name=abone->mName.C_Str();
+			aiQuaternion rotation;
+			aiVector3D position;
+			abone->mOffsetMatrix.DecomposeNoScaling(rotation,position);
+			bone->worldToBoneRotate=toQuaternion(rotation);
+			bone->worldToBoneTranslate=toVector3(position);
+
+			for(j=0;j<abone->mNumWeights;++j){
+				assignments[abone->mWeights[j].mVertexId].push_back(Mesh::VertexBoneAssignment(skeleton->getNumBones(),abone->mWeights[j].mWeight));
+			}
+
+			skeleton->addBone(bone);
+		}
+
+		mesh->setSkeleton(skeleton);
+		mesh->setVertexBoneAssignments(assignments);
+	}
 
 	mesh->setStaticVertexData(new VertexData(vertexBuffer));
 
@@ -383,6 +437,41 @@ aiMesh *AssimpHandler::saveMesh(Scene *scene,const Mesh *mesh){
 		amesh->mMaterialIndex=i;
 	}
 
+	if(mesh->getSkeleton()!=NULL){
+		Skeleton::ptr skeleton=mesh->getSkeleton();
+
+		const Collection<Mesh::VertexBoneAssignmentList>& assignments=mesh->getVertexBoneAssignments();
+		Collection<Collection<aiVertexWeight> > weights(skeleton->getNumBones());
+
+		for(i=0;i<assignments.size();++i){
+			const Mesh::VertexBoneAssignmentList& list=assignments[i];
+			for(j=0;j<list.size();++j){
+				weights[list[j].bone].push_back(aiVertexWeight(i,list[j].weight));
+			}
+		}
+
+		amesh->mNumBones=skeleton->getNumBones();
+		amesh->mBones=new aiBone*[amesh->mNumBones];
+		for(i=0;i<skeleton->getNumBones();++i){
+			Skeleton::Bone::ptr bone=skeleton->getBone(i);
+
+			aiBone *abone=new aiBone();
+
+			abone->mName=bone->name;
+			aiQuaternion rotation=toQuaternion(bone->worldToBoneRotate);
+			aiVector3D position=toVector3(bone->worldToBoneTranslate);
+			abone->mOffsetMatrix=aiMatrix4x4(aiVector3D(),rotation,position);
+
+			abone->mNumWeights=weights[i].size();
+			abone->mWeights=new aiVertexWeight[abone->mNumWeights];
+			for(j=0;j<abone->mNumWeights;++j){
+				abone->mWeights[j]=weights[i][j];
+			}
+
+			amesh->mBones[i];
+		}
+	}
+
 	return amesh;
 }
 
@@ -400,7 +489,9 @@ Material::ptr AssimpHandler::loadMaterial(Engine *engine,Scene *scene,const aiMa
 			texture=scene->textures[index];
 		}
 		else{
-			texture=static_pointer_cast<Texture>(engine->getTextureManager()->find(path.C_Str()));
+			TOADLET_TRY
+				texture=static_pointer_cast<Texture>(engine->getTextureManager()->find(path.C_Str()));
+			TOADLET_CATCH_ANONYMOUS(){}
 		}
 	}
 
