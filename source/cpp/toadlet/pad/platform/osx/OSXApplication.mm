@@ -513,7 +513,9 @@ void OSXApplication::internal_mouseMoved(int x,int y){
 
 			NSPoint npoint=NSMakePoint(getWidth()/2,getHeight()/2);
 			npoint=[(ApplicationView*)mView convertPoint:npoint toView:nil];
-			npoint=[[(ApplicationView*)mView window] convertBaseToScreen:npoint];
+			NSRect nrect=NSMakeRect(npoint.x,npoint.y,0,0);
+			nrect=[[(ApplicationView*)mView window] convertRectToScreen:nrect];
+			npoint=nrect.origin;
 			npoint.y=[[NSScreen mainScreen] frame].size.height-npoint.y;
 			CGPoint cpoint=CGPointMake(npoint.x,npoint.y);
 			CGWarpMouseCursorPosition(cpoint);

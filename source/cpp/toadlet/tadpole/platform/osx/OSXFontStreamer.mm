@@ -185,9 +185,8 @@ Resource::ptr OSXFontStreamer::load(Stream::ptr in,ResourceData *resourceData){
 	egg::Collection<Font::Glyph*> glyphs(numChars);
 	x=0,y=0;
 	for(i=0;i<numChars;++i){
-		int px=x-sizes[i].origin.x;
-		int py=(y-sizes[i].origin.y);
-		CGContextShowGlyphsAtPoint(context,px,py,&cgglyphs[i],1);
+		CGPoint point=CGPointMake(x-sizes[i].origin.x,y-sizes[i].origin.y);
+		CGContextShowGlyphsAtPositions(context,&cgglyphs[i],&point,1);
 
 		Font::Glyph *glyph=new Font::Glyph();
 		glyph->advancex=Math::fromInt(advances[i]);
