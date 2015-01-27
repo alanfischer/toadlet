@@ -47,7 +47,7 @@
 		va_end(list); \
 		name((char*)NULL,buffer); \
 	} \
-	static void name##f(const char *categoryName,const char *format,...){ \
+	static void name##cf(const char *categoryName,const char *format,...){ \
 		char buffer[1024]; \
 		va_list list; \
 		va_start(list,format); \
