@@ -1326,8 +1326,8 @@ void Math::optimize(int o){
 	SystemCaps caps;
 	System::getSystemCaps(caps);
 
-	Log::alert(String("Detected SSE version:")+caps.sseVersion);
-	Log::alert(String("Detected NEON version:")+caps.neonVersion);
+	Log::alert(Categories::TOADLET_EGG,String("Detected SSE version:")+caps.sseVersion);
+	Log::alert(Categories::TOADLET_EGG,String("Detected NEON version:")+caps.neonVersion);
 	{
 		Log::excess(Categories::TOADLET_EGG,"forcing Traditional math");
 
