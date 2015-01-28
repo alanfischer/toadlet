@@ -40,6 +40,8 @@ struct aiScene;
 struct aiNode;
 struct aiMesh;
 struct aiMaterial;
+struct aiAnimation;
+struct aiNodeAnim;
 
 namespace toadlet{
 namespace tadpole{
@@ -86,6 +88,7 @@ protected:
 		Collection<Mesh::ptr> meshes;
 		Collection<Material::ptr> materials;
 		Collection<Texture::ptr> textures;
+		Collection<Sequence::ptr> animations;
 	};
 
 	static Node::ptr loadScene(Engine *engine,Scene *scene,const aiScene *ascene,const aiNode *anode);
@@ -96,6 +99,12 @@ protected:
 
 	static Material::ptr loadMaterial(Engine *engine,Scene *scene,const aiMaterial *amaterial);
 	static aiMaterial *saveMaterial(Scene *scene,const Material *material);
+
+	static Sequence::ptr loadAnimation(Engine *engine,Scene *scene,const aiAnimation *aanimation);
+	static aiAnimation *saveAnimation(Scene *scene,const Sequence *animation);
+
+	static Track::ptr loadChannel(Engine *engine,Scene *scene,const aiNodeAnim *achannel);
+	static aiNodeAnim *saveChannel(Scene *scene,const Track *channel);
 
 	Engine *mEngine;
 	int mFlags;

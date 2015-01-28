@@ -457,6 +457,14 @@ void Engine::updateVertexFormats(){
 	mVertexFormats.POSITION_ROTATE_SCALE=format;
 
 	format=mBufferManager->createVertexFormat();
+	format->addElement(VertexFormat::Semantic_ROTATE,0,formatType|VertexFormat::Format_COUNT_4);
+	mVertexFormats.ROTATE=format;
+
+	format=mBufferManager->createVertexFormat();
+	format->addElement(VertexFormat::Semantic_SCALE,0,formatType|VertexFormat::Format_COUNT_3);
+	mVertexFormats.SCALE=format;
+
+	format=mBufferManager->createVertexFormat();
 	format->addElement(VertexFormat::Semantic_COLOR,0,formatType|VertexFormat::Format_COUNT_4);
 	mVertexFormats.COLOR=format;
 }

@@ -51,7 +51,7 @@ public:
 	int getKeyFrameSize() const{return mFormat->getVertexSize();}
 	int getNumKeyFrames() const{return mTimes.size();}
 
-	scalar getTime(int i){return mTimes[i];}
+	scalar getTime(int i) const{return mTimes[i];}
 	scalar getKeyFramesAtTime(scalar time,int &f1,int &f2,int &trackHint) const;
 
 	void setIndex(int index){mIndex=index;}
@@ -61,6 +61,7 @@ public:
 	scalar getLength() const{return mLength;}
 
 	VertexBufferAccessor &getAccessor(){return mVBA;}
+	const VertexBufferAccessor &getAccessor() const{return mVBA;}
 
 	int getUsage() const{return Usage_BIT_DYNAMIC;}
 	int getAccess() const{return Access_READ_WRITE;}

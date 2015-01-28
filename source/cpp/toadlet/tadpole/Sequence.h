@@ -43,7 +43,7 @@ public:
 	int getNumTracks() const{return mTracks.size();}
 	void addTrack(Track *track);
 	void removeTrack(int i);
-	Track *getTrack(int i){return mTracks[i];}
+	Track *getTrack(int i) const{return mTracks[i];}
 
 	scalar getLength() const{return mLength;}
 	void setLength(scalar length){mLength=length;}
