@@ -119,6 +119,11 @@ Node::ptr AssimpHandler::loadScene(Engine *engine,const aiScene *ascene){
 		scene->meshes[i]=loadMesh(engine,scene,ascene->mMeshes[i]);
 	}
 
+	scene->animations.resize(ascene->mNumAnimations);
+	for(i=0;i<ascene->mNumAnimations;++i){
+		scene->animations[i]=loadAnimation(engine,scene,ascene->mAnimations[i]);
+	}
+
 	Node::ptr node=loadScene(engine,scene,ascene,ascene->mRootNode);
 
 	delete scene;
@@ -162,6 +167,11 @@ aiScene *AssimpHandler::saveScene(const Node *node){
 	ascene->mNumMaterials=scene->materials.size();
 	for(int i=0;i<ascene->mNumMaterials;++i){
 		ascene->mMaterials[i]=saveMaterial(scene,scene->materials[i]);
+	}
+
+	ascene->mNumAnimations=scene->animations.size();
+	for(int i=0;i<ascene->mNumAnimations;++i){
+		ascene->mAnimations[i]=saveAnimation(scene,scene->animations[i]);
 	}
 
 	delete scene;
@@ -356,6 +366,8 @@ aiMesh *AssimpHandler::saveMesh(Scene *scene,const Mesh *mesh){
 
 	aiMesh *amesh=new aiMesh();
 
+	amesh->mName=mesh->getName();
+
 	VertexBuffer::ptr vertexBuffer=mesh->getStaticVertexData()->getVertexBuffer(0);
 	amesh->mNumVertices=vertexBuffer->getSize();
 	VertexFormat::ptr format=vertexBuffer->getVertexFormat();
@@ -517,6 +529,177 @@ aiMaterial *AssimpHandler::saveMaterial(Scene *scene,const Material *material){
 	}
 
 	return amaterial;
+}
+
+Sequence::ptr AssimpHandler::loadAnimation(Engine *engine,Scene *scene,const aiAnimation *aanimation){
+	Sequence::ptr animation=new Sequence();
+
+	animation->setName(aanimation->mName.C_Str());
+
+	animation->setLength(aanimation->mDuration / aanimation->mTicksPerSecond);
+
+	for(int i=0;i<aanimation->mNumChannels;++i){
+		animation->addTrack(loadChannel(engine,scene,aanimation->mChannels[i]));
+	}
+
+	animation->compile();
+
+	return animation;
+}
+
+aiAnimation *AssimpHandler::saveAnimation(Scene *scene,const Sequence *animation){
+	aiAnimation *aanimation=new aiAnimation();
+
+	aanimation->mName=animation->getName();
+
+	aanimation->mTicksPerSecond=30;
+
+	aanimation->mDuration=animation->getLength() * aanimation->mTicksPerSecond;
+
+	aanimation->mNumChannels=animation->getNumTracks();
+	aanimation->mChannels=new aiNodeAnim*[aanimation->mNumChannels];
+	for(int i=0;i<aanimation->mNumChannels;++i){
+		aanimation->mChannels[i]=saveChannel(scene,animation->getTrack(i));
+	}
+
+	return aanimation;
+}
+
+struct AnimFrame{
+	AnimFrame():hasTranslate(false),hasRotate(false),hasScale(false){}
+
+	bool hasTranslate;
+	Vector3 translate;
+	bool hasRotate;
+	Quaternion rotate;
+	bool hasScale;
+	Vector3 scale;
+};
+
+Track::ptr AssimpHandler::loadChannel(Engine *engine,Scene *scene,const aiNodeAnim *achannel){
+	Track::ptr track=new Track(engine->getVertexFormats().POSITION_ROTATE_SCALE);
+
+	tforeach(Collection<Mesh::ptr>::iterator,mesh,scene->meshes){
+		Skeleton::ptr skeleton=(*mesh)->getSkeleton();
+		if(skeleton!=NULL){
+			int i;
+			for(i=0;i>skeleton->getNumBones();++i){
+				if(skeleton->getBone(i)->name == achannel->mNodeName.C_Str()){
+					track->setIndex(i);
+					break;
+				}
+			}
+			if(i<skeleton->getNumBones()) break;
+		}
+	}
+
+	track->setName(achannel->mNodeName.C_Str());
+
+	Track::ptr positionTrack=new Track(engine->getVertexFormats().POSITION);
+	Track::ptr rotationTrack=new Track(engine->getVertexFormats().ROTATE);
+	Track::ptr scalingTrack=new Track(engine->getVertexFormats().SCALE);
+
+	Map<float,bool> times;
+	int i;
+	for(i=0;achannel->mNumPositionKeys;++i){
+		aiVectorKey& key=achannel->mPositionKeys[i];
+		positionTrack->addKeyFrame(key.mTime,&key.mValue);
+		times[key.mTime]=true;
+	}
+	for(i=0;achannel->mNumRotationKeys;++i){
+		aiQuatKey& key=achannel->mRotationKeys[i];
+		rotationTrack->addKeyFrame(key.mTime,&key.mValue);
+		times[key.mTime]=true;
+	}
+	for(i=0;achannel->mNumScalingKeys;++i){
+		aiVectorKey& key=achannel->mScalingKeys[i];
+		scalingTrack->addKeyFrame(key.mTime,&key.mValue);
+		times[key.mTime]=true;
+	}
+
+	VertexBufferAccessor &vba=track->getAccessor();
+	i=0;
+	for(Map<float,bool>::iterator it=times.begin();it!=times.end();++it,++i){
+		track->addKeyFrame(it->first);
+
+		int f1=0,f2=0,hint=0;
+		float t;
+
+		t=positionTrack->getKeyFramesAtTime(it->first,f1,f2,hint);
+		Vector3 t1,t2,tr;
+		positionTrack->getKeyFrame(&t1,f1);
+		positionTrack->getKeyFrame(&t2,f2);
+		Math::lerp(tr,t1,t2,t);
+		vba.set3(i,0,tr);
+
+		t=rotationTrack->getKeyFramesAtTime(it->first,f1,f2,hint);
+		Quaternion r1,r2,rr;
+		rotationTrack->getKeyFrame(&r1,f1);
+		rotationTrack->getKeyFrame(&r2,f2);
+		Math::lerp(rr,r1,r2,t);
+		vba.set4(i,1,rr);
+
+		t=scalingTrack->getKeyFramesAtTime(it->first,f1,f2,hint);
+		Vector3 s1,s2,sr;
+		scalingTrack->getKeyFrame(&s1,f1);
+		scalingTrack->getKeyFrame(&s2,f2);
+		Math::lerp(sr,s1,s2,t);
+		vba.set3(i,2,sr);
+	}
+
+	return track;
+}
+
+aiNodeAnim *AssimpHandler::saveChannel(Scene *scene,const Track *track){
+	aiNodeAnim *achannel=new aiNodeAnim();
+
+	tforeach(Collection<Mesh::ptr>::iterator,mesh,scene->meshes){
+		Skeleton::ptr skeleton=(*mesh)->getSkeleton();
+		if(skeleton!=NULL){
+			int i;
+			for(i=0;i>skeleton->getNumSequences();++i){
+				Sequence::ptr sequence=skeleton->getSequence(i);
+				int j;
+				for(j=0;j<sequence->getNumTracks();++j){
+					if(sequence->getTrack(i) == track){
+						achannel->mNodeName=skeleton->getBone(track->getIndex())->name;
+						break;
+					}
+				}
+				if(j<sequence->getNumTracks()) break;
+			}
+			if(i<skeleton->getNumBones()) break;
+		}
+	}
+
+	achannel->mNumPositionKeys=track->getNumKeyFrames();
+	achannel->mPositionKeys=new aiVectorKey[achannel->mNumPositionKeys];
+
+	achannel->mNumRotationKeys=track->getNumKeyFrames();
+	achannel->mRotationKeys=new aiQuatKey[achannel->mNumRotationKeys];
+
+	achannel->mNumScalingKeys=track->getNumKeyFrames();
+	achannel->mScalingKeys=new aiVectorKey[achannel->mNumScalingKeys];
+
+	const VertexBufferAccessor &vba=track->getAccessor();
+	int i;
+	for(i=0;i<track->getNumKeyFrames();++i){
+		float time=track->getTime(i);
+
+		Vector3 position;
+		vba.get3(i,0,position);
+		achannel->mPositionKeys[i]=aiVectorKey(time,toVector3(position));
+
+		Quaternion rotation;
+		vba.get4(i,1,rotation);
+		achannel->mRotationKeys[i]=aiQuatKey(time,toQuaternion(rotation));
+
+		Vector3 scaling;
+		vba.get3(i,2,scaling);
+		achannel->mScalingKeys[i]=aiVectorKey(time,toVector3(scaling));
+	}
+
+	return achannel;
 }
 
 }
