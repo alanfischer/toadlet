@@ -45,7 +45,12 @@ Node::ptr AssimpHandler::load(Stream *stream,const String &format){
 	Assimp::Importer *importer=new Assimp::Importer();
 	
 	const aiScene *scene=importer->ReadFileFromMemory(data,length,mFlags,format);
-	
+
+	if(scene==NULL){
+		Error::unknown("Cannot read data");
+		return NULL;
+	}
+
 	Node::ptr node=loadScene(mEngine,scene);
 	
 	delete importer;
@@ -59,7 +64,12 @@ Node::ptr AssimpHandler::load(const String &name,const String &format){
 	Assimp::Importer *importer=new Assimp::Importer();
 
 	const aiScene *scene=importer->ReadFile(name,mFlags);
-	
+
+	if(scene==NULL){
+		Error::unknown("Cannot read file:"+name);
+		return NULL;
+	}
+
 	Node::ptr node=loadScene(mEngine,scene);
 	
 	delete importer;

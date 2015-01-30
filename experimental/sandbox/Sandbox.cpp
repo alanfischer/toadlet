@@ -1,5 +1,6 @@
 #include "Sandbox.h"
 #include <toadlet/tadpole/plugins/PointTextureCreator.h>
+#include <toadlet/tadpole/plugins/AssimpHandler.h>
 
 class SnowComponent:public BaseComponent{
 public:
@@ -165,7 +166,7 @@ void Sandbox::create(){
 		
 	TextureFormat::ptr snowflakeFormat=new TextureFormat(TextureFormat::Dimension_D2,TextureFormat::Format_LA_8,128,128,1,0);
 	Texture::ptr snowflakeTexture=engine->createPointTexture(snowflakeFormat,1,0,0,1,1.25);
-
+/*
 	Node::ptr snow=new Node(scene);
 	{
 		Material::ptr material=engine->createPointSpriteMaterial(snowflakeTexture,2,true);
@@ -187,6 +188,12 @@ void Sandbox::create(){
 		snow->attach(new SnowComponent(particles,10,texture));
 	}
 	scene->getRoot()->attach(snow);
+*/
+	AssimpHandler::ptr handler=new AssimpHandler(engine);
+	node=handler->load("../duck.dae","obj");
+	node->setScale(.2);
+	node->setTranslate(0,-20,50);
+	scene->getRoot()->attach(node);
 }
 
 void Sandbox::destroy(){
