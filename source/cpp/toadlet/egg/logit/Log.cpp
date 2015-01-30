@@ -79,7 +79,7 @@ protected:
 			const char *timeString=getTimeString(time);
 			const char *levelString=getLevelString(level);
 
-			int len=snprintf(line,sizeof(line),"%s: %s%s%s",timeString,levelString,text,newLine);
+			int len=snprintf(line,sizeof(line),"%s: %s: %s%s",timeString,levelString,text,newLine);
 			// If we go above a certain amount, windows apparently just starts ignoring messages
 			if(len>=8192){
 				OutputDebugString(TEXT("WARNING: Excessive string length, may be truncated and near future messages dropped\n"));
@@ -130,6 +130,7 @@ protected:
 			SetConsoleTextAttribute(outHandle,levelColor);
 			WriteConsole(outHandle,(const TCHAR*)levelString,strlen(levelString),NULL,NULL);
 			SetConsoleTextAttribute(outHandle,textColor);
+			WriteConsole(outHandle,(const TCHAR*)": ",2,NULL,NULL);
 			WriteConsole(outHandle,(const TCHAR*)text,strlen(text),NULL,NULL);
 			WriteConsole(outHandle,(const TCHAR*)newLine,strlen(newLine),NULL,NULL);
 		}
@@ -180,7 +181,7 @@ protected:
 				break;
 			}
 		
-			asl_log(client,NULL,asllevel,"%s: %s%s%s",timeString,levelString,text,newLine);
+			asl_log(client,NULL,asllevel,"%s: %s: %s%s",timeString,levelString,text,newLine);
 		}
 
 	protected:
@@ -245,6 +246,7 @@ public:
 		fputs(levelColor,outFile);
 		fputs(levelString,outFile);
 		fputs(textColor,outFile);
+		fputs(": ",outFile);
 		fputs(text,outFile);
 		fputs(newLine,outFile);
 	}
@@ -264,6 +266,7 @@ public:
 		fputs(timeString,outFile);
 		fputs(": ",outFile);
 		fputs(levelString,outFile);
+		fputs(": ",outFile);
 		fputs(text,outFile);
 		fputs(newLine,outFile);
 	}
