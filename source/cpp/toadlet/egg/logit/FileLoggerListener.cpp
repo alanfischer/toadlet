@@ -80,6 +80,7 @@ void FileLoggerListener::addLogEntry(Logger::Category *category,Logger::Level le
 		fputs(levelColor,mDateLogStream);
 		fputs(levelString,mDateLogStream);
 		fputs(textColor,mDateLogStream);
+		fputs(": ",mDateLogStream);
 		fputs(text,mDateLogStream);
 		fputs(newLine,mDateLogStream);
 	}

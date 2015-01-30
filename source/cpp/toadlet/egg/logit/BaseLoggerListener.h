@@ -48,25 +48,25 @@ public:
 	const char *getLevelString(Logger::Level level){
 		switch(level){
 			case Logger::Level_DISABLED:
-				return "LOGGER:  ";
+				return "LOGGER  ";
 			break;
 			case Logger::Level_ERROR:
-				return "ERROR:   ";
+				return "ERROR   ";
 			break;
 			case Logger::Level_WARNING:
-				return "WARNING: ";
+				return "WARNING ";
 			break;
 			case Logger::Level_ALERT:
-				return "ALERT:   ";
+				return "ALERT   ";
 			break;
 			case Logger::Level_DEBUG:
-				return "DEBUG:   ";
+				return "DEBUG   ";
 			break;
 			case Logger::Level_EXCESS:
-				return "EXCESS:  ";
+				return "EXCESS  ";
 			break;
 			default:
-				return "UNKNOWN: ";
+				return "UNKNOWN ";
 			break;
 		}
 	}
