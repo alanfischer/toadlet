@@ -108,6 +108,9 @@ void PosixThread::run(){
 }
 
 void PosixThread::startRun(){
+	// Deathgrip keeps this around long enough to cleanup
+	PosixThread::ptr reference=this;
+
 	run();
 
 	mRunnable=NULL;
