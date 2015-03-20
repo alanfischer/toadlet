@@ -65,6 +65,8 @@ public:
 		return type;
 	}
 
+	int size() const{return mCollection.size();}
+
 protected:
 	Mutex mMutex;
 	WaitCondition mWait;
@@ -108,6 +110,7 @@ public:
 	void blockForTasks(const Collection<Runner::ptr> &tasks);
 
 	bool running() const{return mRunning;}
+	int size() const{return mPool.size();}
 
 	TaskQueue<Pair<TaskGroup::ptr,Runner::ptr> > *queue(){return &mQueue;}
 
