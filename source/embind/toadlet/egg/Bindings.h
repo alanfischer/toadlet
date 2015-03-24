@@ -3,10 +3,9 @@
 
 #include <emscripten/bind.h>
 #include <emscripten/wire.h>
-#include <toadlet/egg/Iterator.h>
 #include <toadlet/egg/String.h>
 #include <toadlet/egg/Object.h>
-#include <toadlet/egg/Logger.h>
+#include <toadlet/egg/Log.h>
 #include <toadlet/egg/IntrusivePointer.h>
 #include <toadlet/egg/io/BaseArchive.h>
 

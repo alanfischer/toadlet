@@ -99,17 +99,21 @@ public:
 	TaskThread(ThreadPool *pool);
 	
 	void run();
-	
+
+	void stop(){mRun=false;}	
+
 protected:
 	ThreadPool *mPool;
+	bool mRun;
 };
 
 TaskThread::TaskThread(ThreadPool *pool):
-	mPool(pool)
+	mPool(pool),
+	mRun(true)
 {}
 
 void TaskThread::run(){
-	while(mPool->running()){
+	while(mRun && mPool->running()){
 		Pair<TaskGroup::ptr,Runner::ptr> item=mPool->queue()->pop();
 		if(item.second){
 			TOADLET_TRY
@@ -163,6 +167,20 @@ void ThreadPool::blockForTasks(const Collection<Runner::ptr> &tasks){
 	queueTasks(tasks,true);
 }
 
+void ThreadPool::resizePool(int poolSize){
+	int i;
+	for(i=poolSize;i<mPool.size();++i){
+		static_pointer_cast<TaskThread>(mPool[i])->stop();
+	}
+
+	mPool.resize(poolSize);
+
+	for(i=0;i<mPool.size();++i){
+		mPool[i]=new TaskThread(this);
+		mPool[i]->start();
+	}
+}
+
 void ThreadPool::queueTasks(const Collection<Runner::ptr> &tasks,bool block){
 	Exception exception;
 
@@ -199,16 +217,6 @@ void ThreadPool::queueTasks(const Collection<Runner::ptr> &tasks,bool block){
 }
 
 void ThreadPool::update(){
-}
-
-void ThreadPool::resizePool(int poolSize){
-	mPool.resize(poolSize);
-
-	int i;
-	for(i=0;i<mPool.size();++i){
-		mPool[i]=new TaskThread(this);
-		mPool[i]->start();
-	}
 }
 
 }

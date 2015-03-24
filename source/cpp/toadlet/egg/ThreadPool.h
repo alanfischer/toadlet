@@ -112,12 +112,12 @@ public:
 	bool running() const{return mRunning;}
 	int size() const{return mPool.size();}
 
+	void resizePool(int size);
+
 	TaskQueue<Pair<TaskGroup::ptr,Runner::ptr> > *queue(){return &mQueue;}
 
 protected:
 	void queueTasks(const Collection<Runner::ptr> &tasks,bool block);
-
-	void resizePool(int size);
 
 	bool mRunning;
 	TaskQueue<Pair<TaskGroup::ptr,Runner::ptr> > mQueue;
