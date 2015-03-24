@@ -197,7 +197,7 @@ elseif (TOADLET_PLATFORM_OSX)
 	find_package (OPENGL)
 	find_package (GLEW)
 	if (OPENGL_FOUND AND GLEW_FOUND)
-		# CMake wont include '/usr/include' with include_directories, so add it this way
+		# HACK: CMake wont include '/usr/include' with include_directories on OSX Mavericks, so add it this way
 		set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -I${GLEW_INCLUDE_DIR}")
 		set (TOADLET_HAS_OPENGL ON PARENT_SCOPE)
 		add_subdirectory (plugins/glrenderdevice)

@@ -124,6 +124,6 @@ EMSCRIPTEN_BINDINGS(egg) {
 		.function("openStream", &Archive::openStream, allow_raw_pointers())
 		.function("openResource", &Archive::openResource, allow_raw_pointers())
 	;
-	
+
 	register_list<Logger::List<String>>("StringList","StringListIterator");
 }

@@ -92,6 +92,9 @@ void Win32Thread::run(){
 }
 
 void Win32Thread::internal_startRun(){
+	// Deathgrip keeps this around long enough to cleanup
+	Win32Thread::ptr reference=this;
+
 	run();
 
 	if(mThread!=0){

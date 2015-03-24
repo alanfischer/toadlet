@@ -43,6 +43,9 @@
 #if defined(TOADLET_PLATFORM_ANDROID)
 	#define LOGIT_PLATFORM_ANDROID
 #endif
+#if defined(TOADLET_PLATFORM_EMSCRIPTEN)
+	#define LOGIT_PLATFORM_EMSCRIPTEN
+#endif
 
 #include "logit/Log.h"
 
