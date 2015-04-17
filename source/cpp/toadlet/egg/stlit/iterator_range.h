@@ -26,7 +26,7 @@
 #ifndef STLIT_ITERATOR_RANGE_H
 #define STLIT_ITERATOR_RANGE_H
 
-namespace std{ struct bidirectional_iterator_tag; }
+#include "iterator.h"
 
 namespace stlit{
 

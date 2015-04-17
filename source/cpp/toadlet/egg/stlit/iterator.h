@@ -23,34 +23,15 @@
  *
  ********** Copyright header - do not remove **********/
 
-#ifndef TOADLET_EGG_COLLECTION_H
-#define TOADLET_EGG_COLLECTION_H
+#ifndef STLIT_ITERATOR_H
+#define STLIT_ITERATOR_H
 
-#ifdef _WIN32
-	#include "stlit/vector.h"
-	#define TOADLET_STL_NAMESPACE stlit
+#if defined(TOADLET_PLATFORM_WIN32)
+	namespace std{ struct bidirectional_iterator_tag; }
+	namespace std{ struct random_access_iterator_tag; }
 #else
-	#include <vector>
-	#define TOADLET_STL_NAMESPACE std
+	#include <iterator>
 #endif
 
-#include "stlit/utility.h"
-
-namespace toadlet{
-namespace egg{
-
-template <typename Type>
-class Collection:public TOADLET_STL_NAMESPACE::vector<Type>{
-public:
-	inline Collection():TOADLET_STL_NAMESPACE::vector<Type>(){}
-	inline Collection(int size):TOADLET_STL_NAMESPACE::vector<Type>(size){}
-	inline Collection(int size,const Type &value):TOADLET_STL_NAMESPACE::vector<Type>(size,value){}
-	inline Collection(const TOADLET_STL_NAMESPACE::vector<Type> &v):TOADLET_STL_NAMESPACE::vector<Type>(v){}
-};
-
-}
-}
-
-#undef TOADLET_STL_NAMESPACE
-
 #endif
+

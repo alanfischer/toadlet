@@ -26,13 +26,14 @@
 #ifndef LOGIT_LOGGER_H
 #define LOGIT_LOGGER_H
 
-namespace std{ struct input_iterator_tag; }
-
-namespace logit{
-
 #if defined(LOGIT_PLATFORM_WIN32)
 	#pragma warning(disable:4996)
+	namespace std{ struct input_iterator_tag; }
+#else
+	#include <iterator>
 #endif
+
+namespace logit{
 
 class LoggerListener;
 

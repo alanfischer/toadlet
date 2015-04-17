@@ -26,8 +26,8 @@
 #ifndef STLIT_MAP_H
 #define STLIT_MAP_H
 
-#include <toadlet/egg/stlit/vector.h>
-#include <toadlet/egg/stlit/utility.h>
+#include "vector.h"
+#include "utility.h"
 
 namespace stlit{
 
