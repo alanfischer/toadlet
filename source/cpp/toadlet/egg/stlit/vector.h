@@ -28,7 +28,7 @@
 
 #include <toadlet/egg/Types.h>
 
-namespace std{ struct random_access_iterator_tag; }
+#include "iterator.h"
 
 namespace stlit{
 
@@ -357,7 +357,7 @@ public:
 
 	inline Type &at(int n){return mData[n];}
 	inline const Type &at(int n) const{return mData[n];}
-	
+
 	inline Type &operator[](int n){return mData[n];}
 	inline const Type &operator[](int n) const{return mData[n];}
 
